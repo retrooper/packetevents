@@ -1,0 +1,4 @@
+name: PacketEvents
+version: ${project.version}
+main: me.retrooper.packetevents.Main
+authors: [purplex]
