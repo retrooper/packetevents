@@ -1,20 +1,35 @@
 package me.retrooper.packetevents.events;
 
-import org.bukkit.event.*;
+import org.bukkit.entity.Player;
 
-public class PacketSendEvent extends Event {
-    private static final HandlerList handlers = new HandlerList();
+public class PacketSendEvent extends PacketEvent {
 
-    public PacketSendEvent() {
+    private Player player;
+    private String name;
+    private Object packet;
+    private long timestamp;
+    public PacketSendEvent(Player player, String packetName, Object packet) {
+        this.player = player;
+        this.name = packetName;
+        this.packet = packet;
+        this.timestamp = (System.nanoTime() / 1000000);
     }
 
 
-    public HandlerList getHandlers() {
-        return handlers;
+    public Player getPlayer() {
+        return this.player;
     }
 
-    public static HandlerList getHandlerList() {
-        return handlers;
+    public String getPacketName() {
+        return this.name;
     }
 
+    public Object getPacket() {
+        return this.packet;
+    }
+
+    public long getTimestamp() {
+        return timestamp;
+    }
 }
+
