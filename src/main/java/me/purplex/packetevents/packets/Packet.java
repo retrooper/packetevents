@@ -1,4 +1,4 @@
-package me.retrooper.packetevents.packets;
+package me.purplex.packetevents.packets;
 
 public abstract class Packet {
     public static class Client {

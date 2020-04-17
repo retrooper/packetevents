@@ -1,7 +1,11 @@
-package me.retrooper.packetevents.example;
+package me.purplex.packetevents.example;
 
+import me.purplex.packetevents.events.PacketHandler;
+import me.purplex.packetevents.events.PacketListener;
+import me.purplex.packetevents.events.PacketReceiveEvent;
+import me.purplex.packetevents.events.PacketSendEvent;
+import me.purplex.packetevents.packets.Packet;
 import me.retrooper.packetevents.events.*;
-import me.retrooper.packetevents.packets.Packet;
 
 public class TestExample implements PacketListener {
     @PacketHandler

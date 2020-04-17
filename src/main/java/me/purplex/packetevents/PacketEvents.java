@@ -1,6 +1,6 @@
-package me.retrooper.packetevents;
+package me.purplex.packetevents;
 
-import me.retrooper.packetevents.events.PacketManager;
+import me.purplex.packetevents.events.PacketManager;
 
 public class PacketEvents {
     private static PacketManager packetManager;

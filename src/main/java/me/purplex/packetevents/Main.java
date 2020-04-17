@@ -1,9 +1,10 @@
-package me.retrooper.packetevents;
+package me.purplex.packetevents;
 
 import com.comphenix.tinyprotocol.*;
 import io.netty.channel.Channel;
+import me.purplex.packetevents.events.PacketReceiveEvent;
 import me.retrooper.packetevents.events.*;
-import me.retrooper.packetevents.example.TestExample;
+import me.purplex.packetevents.example.TestExample;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.*;

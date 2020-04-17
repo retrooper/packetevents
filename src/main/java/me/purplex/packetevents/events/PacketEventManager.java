@@ -1,4 +1,4 @@
-package me.retrooper.packetevents.events;
+package me.purplex.packetevents.events;
 
 import java.util.LinkedList;
 

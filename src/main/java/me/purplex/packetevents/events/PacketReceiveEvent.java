@@ -1,14 +1,14 @@
-package me.retrooper.packetevents.events;
+package me.purplex.packetevents.events;
 
 import org.bukkit.entity.Player;
 
-public class PacketSendEvent extends PacketEvent {
+public class PacketReceiveEvent extends PacketEvent {
 
     private Player player;
     private String name;
     private Object packet;
     private long timestamp;
-    public PacketSendEvent(Player player, String packetName, Object packet) {
+    public PacketReceiveEvent(Player player, String packetName, Object packet) {
         this.player = player;
         this.name = packetName;
         this.packet = packet;
@@ -32,4 +32,3 @@ public class PacketSendEvent extends PacketEvent {
         return timestamp;
     }
 }
-
