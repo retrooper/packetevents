@@ -3,7 +3,6 @@ package me.purplex.packetevents;
 import com.comphenix.tinyprotocol.*;
 import io.netty.channel.Channel;
 import me.purplex.packetevents.events.PacketReceiveEvent;
-import me.retrooper.packetevents.events.*;
 import me.purplex.packetevents.example.TestExample;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -16,7 +15,7 @@ public class Main extends JavaPlugin implements Listener {
     @Override
     public void onEnable() {
         Bukkit.getPluginManager().registerEvents(this, this);
-        PacketEvents.getPacketManager().registerPacketListener(new TestExample());
+        //PacketEvents.getPacketManager().registerPacketListener(new TestExample());
         protocol = new TinyProtocol(this) {
             @Override
             public Object onPacketInAsync(Player p, Channel channel, Object packet) {
