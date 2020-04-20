@@ -80,7 +80,10 @@
             <groupId>io.netty</groupId>
             <artifactId>netty-all</artifactId>
             <version>4.1.42.Final</version>
+<<<<<<< HEAD
             <scope>compile</scope>
+=======
+>>>>>>> 6d0a4c07c64f35deb6f9780f3194f7577115d66a
         </dependency>
         <dependency>
             <groupId>org.bukkit</groupId>
