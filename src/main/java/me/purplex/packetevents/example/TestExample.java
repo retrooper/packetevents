@@ -1,10 +1,13 @@
 package me.purplex.packetevents.example;
 
+import me.purplex.packetevents.bukkitevent.ServerTickEvent;
 import me.purplex.packetevents.events.PacketHandler;
 import me.purplex.packetevents.events.PacketListener;
 import me.purplex.packetevents.events.PacketReceiveEvent;
 import me.purplex.packetevents.events.PacketSendEvent;
 import me.purplex.packetevents.packets.Packet;
+import org.bukkit.Bukkit;
+import org.bukkit.entity.Player;
 
 public class TestExample implements PacketListener {
     /**
@@ -12,6 +15,8 @@ public class TestExample implements PacketListener {
      *
      *  PacketEvents.getPacketManager().registerPacketListener(new TestExample());
      */
+
+    private int tick;
 
 
     @PacketHandler
@@ -33,6 +38,17 @@ public class TestExample implements PacketListener {
         //ONLY SERVER PACKETS ALLOWED HERE!
         if(e.getPacketName().equals(Packet.Server.ENTITY_VELOCITY)) {
             e.getPlayer().sendMessage("You took velocity!");
+        }
+    }
+
+    @PacketHandler
+    public void onServerTick(ServerTickEvent e) {
+        //CALLED EVERY TICK
+        tick++;
+        if(tick % 20 == 0) {
+            for(Player p : Bukkit.getOnlinePlayers()) {
+                p.sendMessage("One second has passed!");
+            }
         }
     }
 }

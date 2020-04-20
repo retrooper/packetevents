@@ -1,5 +1,7 @@
 package me.purplex.packetevents.events;
 
+import me.purplex.packetevents.bukkitevent.ServerTickEvent;
+
 import java.util.LinkedList;
 
 public interface PacketEventManager {
@@ -9,5 +11,7 @@ public interface PacketEventManager {
     public void callPacketSendEvent(PacketSendEvent e);
 
     public void registerPacketListener(PacketListener e);
+
+    public void callServerTickEvent(ServerTickEvent e);
 
 }

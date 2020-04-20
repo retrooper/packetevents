@@ -2,7 +2,9 @@ package me.purplex.packetevents;
 
 import com.comphenix.tinyprotocol.*;
 import io.netty.channel.Channel;
+import me.purplex.packetevents.bukkitevent.ServerTickEvent;
 import me.purplex.packetevents.events.PacketReceiveEvent;
+import me.purplex.packetevents.example.TestExample;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.*;
@@ -36,6 +38,14 @@ public class Main extends JavaPlugin implements Listener {
                 return super.onPacketOutAsync(p, channel, packet);
             }
         };
+
+        Bukkit.getScheduler().scheduleAsyncRepeatingTask(this, new Runnable() {
+            @Override
+            public void run() {
+                long now = System.currentTimeMillis();
+                PacketEvents.getPacketManager().callServerTickEvent(new ServerTickEvent(now));
+            }
+        },  0L, 1L);
 
     }
     @Override
