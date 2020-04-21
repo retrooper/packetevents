@@ -7,7 +7,7 @@ PacketEvents coded by purplex
 Discord server: https://discord.gg/ZWTkg4v
 
 
-#Maven
+# Maven
 
 
 <repositories>
