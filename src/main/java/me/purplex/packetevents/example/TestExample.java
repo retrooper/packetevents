@@ -1,19 +1,24 @@
 package me.purplex.packetevents.example;
 
-import me.purplex.packetevents.bukkitevent.ServerTickEvent;
-import me.purplex.packetevents.events.PacketHandler;
-import me.purplex.packetevents.events.PacketListener;
-import me.purplex.packetevents.events.PacketReceiveEvent;
-import me.purplex.packetevents.events.PacketSendEvent;
+import me.purplex.packetevents.enums.EntityUseAction;
+import me.purplex.packetevents.enums.PlayerAction;
+import me.purplex.packetevents.enums.PlayerDigType;
+import me.purplex.packetevents.events.packetevent.ServerTickEvent;
+import me.purplex.packetevents.events.handler.PacketHandler;
+import me.purplex.packetevents.events.listener.PacketListener;
+import me.purplex.packetevents.events.packetevent.PacketReceiveEvent;
+import me.purplex.packetevents.events.packetevent.PacketSendEvent;
 import me.purplex.packetevents.packets.Packet;
 import org.bukkit.Bukkit;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
 
 public class TestExample implements PacketListener {
     /**
      * How to register a packet listener?
-     *
-     *  PacketEvents.getPacketManager().registerPacketListener(new TestExample());
+     * <p>
+     * PacketEvents.getPacketManager().registerPacketListener(new TestExample());
      */
 
     private int tick;
@@ -22,22 +27,27 @@ public class TestExample implements PacketListener {
     @PacketHandler
     public void onPacketReceive(PacketReceiveEvent e) {
         //ONLY CLIENT PACKETS ALLOWED HERE!
-        if(e.getPacketName().equals(Packet.Client.USE_ENTITY)) {
-            e.getPlayer().sendMessage("You have attacked an entity!");
-        }
-        else if(e.getPacketName().equals(Packet.Client.ARM_ANIMATION)) {
+        if (e.getPacketName().equals(Packet.Client.USE_ENTITY)) {
+            Entity entity = e.getInteractedEntity();
+            EntityUseAction entityUseAction = e.getEntityUseAction();
+            e.getPlayer().sendMessage("Dist: " + entity.getLocation().distanceSquared(e.getPlayer().getLocation()));
+        } else if (e.getPacketName().equals(Packet.Client.ARM_ANIMATION)) {
             e.getPlayer().sendMessage("You swung your arm.");
-        }
-        else if(e.getPacketName().equals(Packet.Client.POSITION)) {
-            e.getPlayer().sendMessage("You updated your position!");
+        } else if (e.getPacketName().equals(Packet.Client.BLOCK_DIG)) {
+            PlayerDigType type = e.getPlayerDigType();
+        } else if (e.getPacketName().equals(Packet.Client.CHAT)) {
+            String message = e.getChatPacketMessage();
         }
     }
 
     @PacketHandler
     public void onPacketSend(PacketSendEvent e) {
         //ONLY SERVER PACKETS ALLOWED HERE!
-        if(e.getPacketName().equals(Packet.Server.ENTITY_VELOCITY)) {
-            e.getPlayer().sendMessage("You took velocity!");
+        if (e.getPacketName().equals(Packet.Server.ENTITY_VELOCITY)) {
+            System.out.println("preee");
+            Entity entity = e.getVelocityEntity();
+            System.out.println(entity.getName());
+            System.out.println(e.getVelocityX());
         }
     }
 
@@ -45,8 +55,8 @@ public class TestExample implements PacketListener {
     public void onServerTick(ServerTickEvent e) {
         //CALLED EVERY TICK
         tick++;
-        if(tick % 20 == 0) {
-            for(Player p : Bukkit.getOnlinePlayers()) {
+        if (tick % 20 == 0) {
+            for (Player p : Bukkit.getOnlinePlayers()) {
                 p.sendMessage("One second has passed!");
             }
         }

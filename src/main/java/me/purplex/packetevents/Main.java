@@ -2,8 +2,9 @@ package me.purplex.packetevents;
 
 import com.comphenix.tinyprotocol.*;
 import io.netty.channel.Channel;
-import me.purplex.packetevents.bukkitevent.ServerTickEvent;
-import me.purplex.packetevents.events.PacketReceiveEvent;
+import me.purplex.packetevents.events.packetevent.PacketSendEvent;
+import me.purplex.packetevents.events.packetevent.ServerTickEvent;
+import me.purplex.packetevents.events.packetevent.PacketReceiveEvent;
 import me.purplex.packetevents.example.TestExample;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -16,7 +17,7 @@ public class Main extends JavaPlugin implements Listener {
     @Override
     public void onEnable() {
         Bukkit.getPluginManager().registerEvents(this, this);
-        //PacketEvents.getPacketManager().registerPacketListener(new TestExample());
+        PacketEvents.getPacketManager().registerPacketListener(new TestExample());
         protocol = new TinyProtocol(this) {
             @Override
             public Object onPacketInAsync(Player p, Channel channel, Object packet) {
@@ -24,7 +25,11 @@ public class Main extends JavaPlugin implements Listener {
                 if(p == null)  return super.onPacketInAsync(null, channel, packet);
                 if(channel == null)  return super.onPacketInAsync(p, null, packet);
                 String packetName = packet.getClass().getSimpleName();
-                PacketEvents.getPacketManager().callPacketReceiveEvent(new PacketReceiveEvent(p, packetName, packet));
+                PacketReceiveEvent e = new PacketReceiveEvent(p, packetName, packet);
+                PacketEvents.getPacketManager().callPacketReceiveEvent(e);
+                if(e.isCancelled()) {
+                    return super.onPacketInAsync(null, null, null);
+                }
                 return super.onPacketInAsync(p, channel, packet);
             }
 
@@ -34,7 +39,11 @@ public class Main extends JavaPlugin implements Listener {
                 if(p == null)  return super.onPacketInAsync(null, channel, packet);
                 if(channel == null)  return super.onPacketInAsync(p, null, packet);
                 String packetName = packet.getClass().getSimpleName();
-                PacketEvents.getPacketManager().callPacketReceiveEvent(new PacketReceiveEvent(p, packetName, packet));
+                PacketSendEvent e = new PacketSendEvent(p, packetName, packet);
+                PacketEvents.getPacketManager().callPacketSendEvent(e);
+                if(e.isCancelled()) {
+                    return super.onPacketOutAsync(null, null, null);
+                }
                 return super.onPacketOutAsync(p, channel, packet);
             }
         };

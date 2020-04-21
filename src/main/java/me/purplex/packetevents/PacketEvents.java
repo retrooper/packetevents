@@ -1,6 +1,6 @@
 package me.purplex.packetevents;
 
-import me.purplex.packetevents.events.PacketManager;
+import me.purplex.packetevents.events.manager.PacketManager;
 
 public class PacketEvents {
     private static PacketManager packetManager;

@@ -1,6 +1,9 @@
-package me.purplex.packetevents.events;
+package me.purplex.packetevents.events.eventmanager;
 
-import me.purplex.packetevents.bukkitevent.ServerTickEvent;
+import me.purplex.packetevents.events.packetevent.ServerTickEvent;
+import me.purplex.packetevents.events.listener.PacketListener;
+import me.purplex.packetevents.events.packetevent.PacketReceiveEvent;
+import me.purplex.packetevents.events.packetevent.PacketSendEvent;
 
 import java.util.LinkedList;
 

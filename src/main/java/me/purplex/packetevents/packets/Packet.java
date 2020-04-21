@@ -4,6 +4,8 @@ public abstract class Packet {
     public static class Client {
         private static final String CLIENT = "PacketPlayIn";
         public static final String KEEP_ALIVE = CLIENT + "KeepAlive";
+
+        @Deprecated
         public static final String FLYING = CLIENT + "Flying";
         public static final String POSITION = CLIENT + "Position";
         public static final String POSITION_LOOK = CLIENT + "PositionLook";

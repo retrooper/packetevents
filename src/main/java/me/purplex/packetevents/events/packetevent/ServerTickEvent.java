@@ -1,4 +1,4 @@
-package me.purplex.packetevents.bukkitevent;
+package me.purplex.packetevents.events.packetevent;
 
 import me.purplex.packetevents.events.PacketEvent;
 
