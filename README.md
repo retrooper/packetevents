@@ -6,10 +6,10 @@ Credit to TinyProtocol
 PacketEvents coded by purplex
 Discord server: https://discord.gg/ZWTkg4v
 
-How to use with maven?
+
+#Maven
 
 
-[code]
 <repositories>
         <repository>
             <id>jitpack.io</id>
@@ -25,4 +25,3 @@ How to use with maven?
             <scope>compile</scope>
         </dependency>
 </dependencies>
-[\code]
