@@ -17,7 +17,7 @@ public class Main extends JavaPlugin implements Listener {
     @Override
     public void onEnable() {
         Bukkit.getPluginManager().registerEvents(this, this);
-        PacketEvents.getPacketManager().registerPacketListener(new TestExample());
+        //PacketEvents.getPacketManager().registerPacketListener(new TestExample());
         protocol = new TinyProtocol(this) {
             @Override
             public Object onPacketInAsync(Player p, Channel channel, Object packet) {
