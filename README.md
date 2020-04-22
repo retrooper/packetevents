@@ -1,9 +1,10 @@
 # PacketEvents
-API for listenening to minecraft packets
+Listen to minecraft packets and send minecraft packets.
 
 Credit to TinyProtocol
 
-PacketEvents coded by purplex
+PacketEvents coded by purplex.
+
 Discord server: https://discord.gg/ZWTkg4v
 
 # Gradle
