@@ -6,7 +6,7 @@
 
     <groupId>me.retrooper</groupId>
     <artifactId>packetevents</artifactId>
-    <version>1.0.3</version>
+    <version>1.0.6</version>
     <packaging>jar</packaging>
 
     <name>PacketEvents</name>

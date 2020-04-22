@@ -1,7 +1,7 @@
 package me.purplex.packetevents.example;
 
+import me.purplex.packetevents.PacketEvents;
 import me.purplex.packetevents.enums.EntityUseAction;
-import me.purplex.packetevents.enums.PlayerAction;
 import me.purplex.packetevents.enums.PlayerDigType;
 import me.purplex.packetevents.events.packetevent.ServerTickEvent;
 import me.purplex.packetevents.events.handler.PacketHandler;
@@ -12,7 +12,6 @@ import me.purplex.packetevents.packets.Packet;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
 
 public class TestExample implements PacketListener {
     /**
@@ -32,11 +31,21 @@ public class TestExample implements PacketListener {
             EntityUseAction entityUseAction = e.getEntityUseAction();
             e.getPlayer().sendMessage("Dist: " + entity.getLocation().distanceSquared(e.getPlayer().getLocation()));
         } else if (e.getPacketName().equals(Packet.Client.ARM_ANIMATION)) {
-            e.getPlayer().sendMessage("You swung your arm.");
+            long timestam = e.getTimestamp();
         } else if (e.getPacketName().equals(Packet.Client.BLOCK_DIG)) {
             PlayerDigType type = e.getPlayerDigType();
         } else if (e.getPacketName().equals(Packet.Client.CHAT)) {
             String message = e.getChatPacketMessage();
+            System.out.println("got: " + message);
+            if(message.equals("pls jump")) {
+                //shoot them in the air
+                PacketEvents.sendVelocity(e.getPlayer(), 0.0, 50.0, 0.0);
+            }
+        }
+        else if(e.getPacketName().equals(Packet.Client.POSITION)) {
+            double motX = e.getMotionX();
+            double motY = e.getMotionY();
+            double motZ= e.getMotionZ();
         }
     }
 
@@ -44,10 +53,11 @@ public class TestExample implements PacketListener {
     public void onPacketSend(PacketSendEvent e) {
         //ONLY SERVER PACKETS ALLOWED HERE!
         if (e.getPacketName().equals(Packet.Server.ENTITY_VELOCITY)) {
-            System.out.println("preee");
+            int ping = e.getPing();
             Entity entity = e.getVelocityEntity();
-            System.out.println(entity.getName());
-            System.out.println(e.getVelocityX());
+            double velX = e.getVelocityX();
+            double velY = e.getVelocityY();
+            double velZ = e.getVelocityZ();
         }
     }
 

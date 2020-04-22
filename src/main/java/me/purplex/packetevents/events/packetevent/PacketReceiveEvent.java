@@ -6,10 +6,14 @@ import me.purplex.packetevents.enums.EntityUseAction;
 import me.purplex.packetevents.enums.PlayerAction;
 import me.purplex.packetevents.enums.PlayerDigType;
 import me.purplex.packetevents.events.PacketEvent;
+import me.purplex.packetevents.packets.Packet;
 import org.apache.commons.lang3.reflect.FieldUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.entity.*;
+
+import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
 
 public class PacketReceiveEvent extends PacketEvent {
 
@@ -28,26 +32,50 @@ public class PacketReceiveEvent extends PacketEvent {
     }
 
 
+    /**
+     * Get the player sending the packet
+     * @return
+     */
     public Player getPlayer() {
         return this.player;
     }
 
+    /**
+     * Get the packet object's class name, aka. Packet Name
+     * @return
+     */
     public String getPacketName() {
         return this.name;
     }
 
+    /**
+     * Get the raw packet object
+     * @return
+     */
     public Object getPacket() {
         return this.packet;
     }
 
+    /**
+     * The time the packet was received(ms)
+     * @return
+     */
     public long getTimestamp() {
         return timestamp;
     }
 
+    /**
+     * Cancel the packet
+     * @param cancelled
+     */
     public void setCancelled(boolean cancelled) {
         this.cancelled = cancelled;
     }
 
+    /**
+     * Returns if the packet has been cancelled
+     * @return
+     */
     public boolean isCancelled() {
         return cancelled;
     }
@@ -145,4 +173,100 @@ public class PacketReceiveEvent extends PacketEvent {
         return message;
     }
 
+
+    public int getPing() {
+        int ping = 0;
+        try {
+            Object entityPlayer = player.getClass().getMethod("getHandle").invoke(player);
+            ping = (int) entityPlayer.getClass().getField("ping").get(entityPlayer);
+        } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException | NoSuchMethodException
+                | SecurityException | NoSuchFieldException e) {
+            e.printStackTrace();
+        }
+        return ping;
+    }
+
+    /**
+     * Get the motX variable in the player's CraftPlayer class
+     * using Reflection
+     * @return
+     */
+    public double getMotionX() {
+        Reflection.MethodInvoker getPlayerHandle = Reflection.getMethod("{obc}.entity.CraftPlayer", "getHandle");
+        Object entityplayer = getPlayerHandle.invoke(player);
+        Field field = null;
+        try {
+            field = entityplayer.getClass().getField("motX");
+        } catch (NoSuchFieldException e1) {
+            e1.printStackTrace();
+        } catch (SecurityException e1) {
+            e1.printStackTrace();
+        }
+        double mot = 0.0D;
+        try {
+            mot = field.getDouble(entityplayer);
+        } catch (IllegalArgumentException e) {
+            e.printStackTrace();
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        }
+
+        return mot;
+    }
+
+    /**
+     * Get the motY variable in the player's CraftPlayer class
+     * using Reflection
+     * @return
+     */
+    public double getMotionY() {
+        Reflection.MethodInvoker getPlayerHandle = Reflection.getMethod("{obc}.entity.CraftPlayer", "getHandle");
+        Object entityplayer = getPlayerHandle.invoke(player);
+        Field field = null;
+        try {
+            field = entityplayer.getClass().getField("motY");
+        } catch (NoSuchFieldException e1) {
+            e1.printStackTrace();
+        } catch (SecurityException e1) {
+            e1.printStackTrace();
+        }
+        double mot = 0.0D;
+        try {
+            mot = field.getDouble(entityplayer);
+        } catch (IllegalArgumentException e) {
+            e.printStackTrace();
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        }
+
+        return mot;
+    }
+
+    /**
+     * Get the motZ variable in the player's CraftPlayer class
+     * using Reflection
+     * @return
+     */
+    public double getMotionZ() {
+        Reflection.MethodInvoker getPlayerHandle = Reflection.getMethod("{obc}.entity.CraftPlayer", "getHandle");
+        Object entityplayer = getPlayerHandle.invoke(player);
+        Field field = null;
+        try {
+            field = entityplayer.getClass().getField("motZ");
+        } catch (NoSuchFieldException e1) {
+            e1.printStackTrace();
+        } catch (SecurityException e1) {
+            e1.printStackTrace();
+        }
+        double mot = 0.0D;
+        try {
+            mot = field.getDouble(entityplayer);
+        } catch (IllegalArgumentException e) {
+            e.printStackTrace();
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        }
+
+        return mot;
+    }
 }

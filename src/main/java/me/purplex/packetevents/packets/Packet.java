@@ -38,6 +38,7 @@ public abstract class Packet {
     public static class Server {
         private static final String SERVER = "PacketPlayOut";
 
+        public static final String ANIMATION = SERVER + "Animation";
         public static final String KEEP_ALIVE = SERVER + "KeepAlive";
         public static final String CHAT = SERVER + "Chat";
         public static final String POSITION = SERVER + "Position";
@@ -59,11 +60,14 @@ public abstract class Packet {
         public static final String WORLD_PARTICLE = SERVER + "WorldParticles";
         public static final String COMMANDS = SERVER + "Commands";
         public static final String OPEN_WINDOW = SERVER + "OpenWindow";
+        public static final String LOGIN = SERVER + "Login";
+        public static final String SERVER_DIFFICULTY = SERVER + "ServerDifficulty";
     }
 
     public static class Login {
         public static final String HANDSHAKE = "PacketHandshakingInSetProtocol";
         public static final String PING = "PacketStatusInPing";
         public static final String START = "PacketStatusInStart";
+        public static final String SUCCESS = "PacketLoginOutSuccess";
     }
 }

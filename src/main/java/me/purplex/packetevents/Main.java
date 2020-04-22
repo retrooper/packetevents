@@ -13,11 +13,13 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 public class Main extends JavaPlugin implements Listener {
 
+    private static Main instance;
     public TinyProtocol protocol;
     @Override
     public void onEnable() {
-        Bukkit.getPluginManager().registerEvents(this, this);
-        //PacketEvents.getPacketManager().registerPacketListener(new TestExample());
+        instance = this;
+        //Bukkit.getPluginManager().registerEvents(this, this);
+        PacketEvents.getPacketManager().registerPacketListener(new TestExample());
         protocol = new TinyProtocol(this) {
             @Override
             public Object onPacketInAsync(Player p, Channel channel, Object packet) {
@@ -60,6 +62,10 @@ public class Main extends JavaPlugin implements Listener {
     @Override
     public void onDisable() {
 
+    }
+
+    public static Main getInstance() {
+        return instance;
     }
 
 
