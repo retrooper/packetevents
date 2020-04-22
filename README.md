@@ -38,7 +38,6 @@ dependencies {
             <groupId>com.github.purplexdev</groupId>
             <artifactId>PacketEvents</artifactId>
             <version>1.0.6</version>
-            <scope>provided</scope>
         </dependency>
 </dependencies>
 ```
