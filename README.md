@@ -7,6 +7,9 @@ PacketEvents coded by purplex.
 
 Discord server: https://discord.gg/ZWTkg4v
 
+Examples can be found at
+me/purplex/packetevents/example/TestExample.java
+
 # Gradle
 
 ```gradle
