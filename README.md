@@ -18,7 +18,7 @@ allprojects {
 }
 
 dependencies {
-        implementation 'com.github.purplexdev:packetevents:Tag'
+        implementation 'com.github.purplexdev:packetevents:1.0.6'
 }
 ```
 
@@ -48,14 +48,14 @@ dependencies {
 ```
 resolvers += "jitpack" at "https://jitpack.io"
 
-libraryDependencies += "com.github.purplexdev" % "packetevents" % "Tag"	
+libraryDependencies += "com.github.purplexdev" % "packetevents" % "1.0.6"	
 ```
 
 # leiningen
 ```
 :repositories [["jitpack" "https://jitpack.io"]]
 
-:dependencies [[com.github.purplexdev/packetevents "Tag"]]	
+:dependencies [[com.github.purplexdev/packetevents "1.0.6"]]	
 ```
 
 
