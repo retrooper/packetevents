@@ -39,7 +39,7 @@ dependencies {
 <dependencies>
         <dependency>
             <groupId>com.github.purplexdev</groupId>
-            <artifactId>PacketEvents</artifactId>
+            <artifactId>packetevents</artifactId>
             <version>1.0.6</version>
         </dependency>
 </dependencies>
