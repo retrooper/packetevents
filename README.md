@@ -5,7 +5,7 @@ Credit to TinyProtocol
 
 PacketEvents coded by purplex.
 
-Discord server: https://discord.gg/ZWTkg4v
+Coding help discord server: https://discord.gg/ZWTkg4v
 
 Examples can be found at
 me/purplex/packetevents/example/TestExample.java
