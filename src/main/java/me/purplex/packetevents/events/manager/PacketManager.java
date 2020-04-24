@@ -53,6 +53,12 @@ public class PacketManager implements PacketEventManager {
     }
 
     @Override
+    public void unregisterPacketListener(PacketListener e) {
+        this.packetListeners.remove(e);
+    }
+
+
+    @Override
     public void callServerTickEvent(ServerTickEvent e) {
         for (PacketListener listener : this.packetListeners) {
             Method[] methods = listener.getClass().getMethods();
