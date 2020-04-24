@@ -9,9 +9,7 @@ import me.purplex.packetevents.events.listener.PacketListener;
 import me.purplex.packetevents.events.packetevent.PacketReceiveEvent;
 import me.purplex.packetevents.events.packetevent.PacketSendEvent;
 import me.purplex.packetevents.packets.Packet;
-import org.bukkit.Bukkit;
 import org.bukkit.entity.Entity;
-import org.bukkit.entity.Player;
 
 public class TestExample implements PacketListener {
     /**
@@ -26,17 +24,24 @@ public class TestExample implements PacketListener {
     @PacketHandler
     public void onPacketReceive(PacketReceiveEvent e) {
         //ONLY CLIENT PACKETS ALLOWED HERE!
+        long timestamp = e.getTimestamp();
         if (e.getPacketName().equals(Packet.Client.USE_ENTITY)) {
             Entity entity = e.getInteractedEntity();
             EntityUseAction entityUseAction = e.getEntityUseAction();
+            if(entityUseAction == EntityUseAction.ATTACK) {
+                //LEFT CLICKED
+                e.getPlayer().sendMessage("Attacked an entity!");
+            }
             e.getPlayer().sendMessage("Dist: " + entity.getLocation().distanceSquared(e.getPlayer().getLocation()));
         } else if (e.getPacketName().equals(Packet.Client.ARM_ANIMATION)) {
-            long timestam = e.getTimestamp();
+
         } else if (e.getPacketName().equals(Packet.Client.BLOCK_DIG)) {
             PlayerDigType type = e.getPlayerDigType();
+            if(type == PlayerDigType.ABORT_DESTROY_BLOCK) {
+                //aborted destroying a block
+            }
         } else if (e.getPacketName().equals(Packet.Client.CHAT)) {
             String message = e.getChatPacketMessage();
-            System.out.println("got: " + message);
             if(message.equals("pls jump")) {
                 //shoot them in the air
                 PacketEvents.sendVelocity(e.getPlayer(), 0.0, 50.0, 0.0);
@@ -66,9 +71,9 @@ public class TestExample implements PacketListener {
         //CALLED EVERY TICK
         tick++;
         if (tick % 20 == 0) {
-            for (Player p : Bukkit.getOnlinePlayers()) {
+            /*for (Player p : Bukkit.getOnlinePlayers()) {
                 p.sendMessage("One second has passed!");
-            }
+            }*/
         }
     }
 }
