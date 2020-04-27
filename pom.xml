@@ -4,13 +4,11 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>me.retrooper</groupId>
+    <groupId>me.purplex</groupId>
     <artifactId>packetevents</artifactId>
-    <version>1.0.6</version>
+    <version>1.0.9</version>
     <packaging>jar</packaging>
-
     <name>PacketEvents</name>
-
     <properties>
         <java.version>1.8</java.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -20,6 +18,14 @@
         <defaultGoal>clean package</defaultGoal>
         <plugins>
             <plugin>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.7.0</version>
+                <configuration>
+                    <source>1.8</source>
+                    <target>1.8</target>
+                </configuration>
+            </plugin>
+            <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
                 <version>3.7.0</version>
@@ -27,22 +33,6 @@
                     <source>${java.version}</source>
                     <target>${java.version}</target>
                 </configuration>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-shade-plugin</artifactId>
-                <version>3.1.0</version>
-                <executions>
-                    <execution>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>shade</goal>
-                        </goals>
-                        <configuration>
-                            <createDependencyReducedPom>false</createDependencyReducedPom>
-                        </configuration>
-                    </execution>
-                </executions>
             </plugin>
         </plugins>
         <resources>
@@ -55,28 +45,140 @@
 
     <repositories>
         <repository>
-            <id>spigot-repo</id>
-            <url>https://hub.spigotmc.org/nexus/content/groups/public/</url>
+            <id>jitpack.io</id>
+            <url>https://jitpack.io</url>
         </repository>
         <repository>
-            <id>libraries-mojang</id>
-            <url>https://libraries.minecraft.net/</url>
+            <id>funkemunky-releases</id>
+            <url>https://nexus.funkemunky.cc/content/repositories/releases/</url>
         </repository>
+
     </repositories>
+
 
     <dependencies>
         <dependency>
-            <groupId>com.mojang</groupId>
-            <artifactId>authlib</artifactId>
-            <version>1.5.21</version>
-            <scope>compile</scope>
+            <groupId>org.github.spigot</groupId>
+            <artifactId>1.14.1</artifactId>
+            <version>1.14.1</version>
+            <scope>provided</scope>
         </dependency>
         <dependency>
-            <groupId>io.netty</groupId>
-            <artifactId>netty-all</artifactId>
-            <version>4.1.42.Final</version>
-            <scope>compile</scope>
+            <groupId>org.github.spigot</groupId>
+            <artifactId>1.15.1</artifactId>
+            <version>1.15.1</version>
+            <scope>provided</scope>
         </dependency>
+        <dependency>
+            <groupId>org.github.spigot</groupId>
+            <artifactId>1.14.3</artifactId>
+            <version>1.14.3</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.github.spigot</groupId>
+            <artifactId>1.14.2</artifactId>
+            <version>1.14.2</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.github.spigot</groupId>
+            <artifactId>1.15</artifactId>
+            <version>1.15</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.github.spigot</groupId>
+            <artifactId>1.15.2</artifactId>
+            <version>1.15.2</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.github.spigot</groupId>
+            <artifactId>1.13.2</artifactId>
+            <version>1.13.2</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.github.spigot</groupId>
+            <artifactId>1.7.10</artifactId>
+            <version>1.7.10</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.github.spigot</groupId>
+            <artifactId>1.8</artifactId>
+            <version>1.8</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.github.spigot</groupId>
+            <artifactId>1.8.3</artifactId>
+            <version>1.8.3</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.github.spigot</groupId>
+            <artifactId>1.8.8</artifactId>
+            <version>1.8.8</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.github.spigot</groupId>
+            <artifactId>1.9</artifactId>
+            <version>1.9</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.github.spigot</groupId>
+            <artifactId>1.9.4</artifactId>
+            <version>1.9.4</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.github.spigot</groupId>
+            <artifactId>1.10.2</artifactId>
+            <version>1.10.2</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.github.spigot</groupId>
+            <artifactId>1.11.1</artifactId>
+            <version>1.11.1</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.github.spigot</groupId>
+            <artifactId>1.11.2</artifactId>
+            <version>1.11.2</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.github.spigot</groupId>
+            <artifactId>1.12.1</artifactId>
+            <version>1.12.1</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.github.spigot</groupId>
+            <artifactId>1.12.2</artifactId>
+            <version>1.12.2</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.github.spigot</groupId>
+            <artifactId>1.13</artifactId>
+            <version>1.13</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.github.spigot</groupId>
+            <artifactId>1.14</artifactId>
+            <version>1.14</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <!--Bukkit-->
         <dependency>
             <groupId>org.bukkit</groupId>
             <artifactId>bukkit</artifactId>

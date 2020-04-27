@@ -3,12 +3,17 @@ package me.purplex.packetevents;
 import com.comphenix.tinyprotocol.Reflection.*;
 import com.comphenix.tinyprotocol.Reflection;
 import io.netty.channel.Channel;
+import me.purplex.packetevents.enums.ServerVersion;
 import me.purplex.packetevents.events.manager.PacketManager;
 import me.purplex.packetevents.packets.Packet;
 import org.bukkit.entity.Player;
 
 public class PacketEvents {
     private static PacketManager packetManager;
+
+    public static ServerVersion getServerVersion() {
+        return ServerVersion.getVersion();
+    }
 
 
     public static PacketManager getPacketManager() {

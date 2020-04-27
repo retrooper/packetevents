@@ -17,5 +17,5 @@ public enum PlayerAction {
 
     OPEN_INVENTORY,
 
-    START_FALL_FLYING, WRONG_PACKET;
+    START_FALL_FLYING;
 }

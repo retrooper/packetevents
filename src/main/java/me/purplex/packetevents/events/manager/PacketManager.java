@@ -6,7 +6,6 @@ import me.purplex.packetevents.events.handler.PacketHandler;
 import me.purplex.packetevents.events.listener.PacketListener;
 import me.purplex.packetevents.events.packetevent.PacketReceiveEvent;
 import me.purplex.packetevents.events.packetevent.PacketSendEvent;
-
 import java.lang.reflect.Method;
 
 public class PacketManager implements PacketEventManager {

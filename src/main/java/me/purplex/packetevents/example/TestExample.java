@@ -3,12 +3,15 @@ package me.purplex.packetevents.example;
 import me.purplex.packetevents.PacketEvents;
 import me.purplex.packetevents.enums.EntityUseAction;
 import me.purplex.packetevents.enums.PlayerDigType;
+import me.purplex.packetevents.enums.ServerVersion;
 import me.purplex.packetevents.events.packetevent.ServerTickEvent;
 import me.purplex.packetevents.events.handler.PacketHandler;
 import me.purplex.packetevents.events.listener.PacketListener;
 import me.purplex.packetevents.events.packetevent.PacketReceiveEvent;
 import me.purplex.packetevents.events.packetevent.PacketSendEvent;
+import me.purplex.packetevents.exceptions.VersionNotFoundException;
 import me.purplex.packetevents.packets.Packet;
+import net.minecraft.server.v1_8_R1.*;
 import org.bukkit.entity.Entity;
 
 public class TestExample implements PacketListener {
@@ -20,15 +23,19 @@ public class TestExample implements PacketListener {
 
     private int tick;
 
+    private static ServerVersion serverVersion = ServerVersion.getVersion();
 
     @PacketHandler
-    public void onPacketReceive(PacketReceiveEvent e) {
+    public void onPacketReceive(PacketReceiveEvent e) throws VersionNotFoundException {
         //ONLY CLIENT PACKETS ALLOWED HERE!
+        double motX = e.getMotX();
+        double motY = e.getMotY();
+        double motZ = e.getMotZ();
         long timestamp = e.getTimestamp();
         if (e.getPacketName().equals(Packet.Client.USE_ENTITY)) {
             Entity entity = e.getInteractedEntity();
             EntityUseAction entityUseAction = e.getEntityUseAction();
-            if(entityUseAction == EntityUseAction.ATTACK) {
+            if (entityUseAction == EntityUseAction.ATTACK) {
                 //LEFT CLICKED
                 e.getPlayer().sendMessage("Attacked an entity!");
             }
@@ -37,25 +44,25 @@ public class TestExample implements PacketListener {
 
         } else if (e.getPacketName().equals(Packet.Client.BLOCK_DIG)) {
             PlayerDigType type = e.getPlayerDigType();
-            if(type == PlayerDigType.ABORT_DESTROY_BLOCK) {
+            if (type == PlayerDigType.ABORT_DESTROY_BLOCK) {
                 //aborted destroying a block
             }
         } else if (e.getPacketName().equals(Packet.Client.CHAT)) {
             String message = e.getChatPacketMessage();
-            if(message.equals("pls jump")) {
+            if (message.equals("pls jump")) {
                 //shoot them in the air
                 PacketEvents.sendVelocity(e.getPlayer(), 0.0, 50.0, 0.0);
             }
         }
-        else if(e.getPacketName().equals(Packet.Client.POSITION)) {
-            double motX = e.getMotionX();
-            double motY = e.getMotionY();
-            double motZ= e.getMotionZ();
+        if (serverVersion == ServerVersion.v_1_8) {
+            if (e.getPacket() instanceof net.minecraft.server.v1_8_R1.PacketPlayInFlying) {
+                //flying packet, position, position_look extend the flying packet
+            }
         }
     }
 
     @PacketHandler
-    public void onPacketSend(PacketSendEvent e) {
+    public void onPacketSend(PacketSendEvent e) throws VersionNotFoundException {
         //ONLY SERVER PACKETS ALLOWED HERE!
         if (e.getPacketName().equals(Packet.Server.ENTITY_VELOCITY)) {
             int ping = e.getPing();

@@ -1,27 +1,21 @@
 package me.purplex.packetevents.events.packetevent;
 
-import com.comphenix.tinyprotocol.Reflection;
-import com.comphenix.tinyprotocol.Reflection.*;
 import me.purplex.packetevents.enums.EntityUseAction;
 import me.purplex.packetevents.enums.PlayerAction;
 import me.purplex.packetevents.enums.PlayerDigType;
+import me.purplex.packetevents.enums.ServerVersion;
 import me.purplex.packetevents.events.PacketEvent;
-import me.purplex.packetevents.packets.Packet;
-import org.apache.commons.lang3.reflect.FieldUtils;
-import org.bukkit.Bukkit;
-import org.bukkit.World;
+import me.purplex.packetevents.exceptions.VersionNotFoundException;
 import org.bukkit.entity.*;
-
-import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
 
 public class PacketReceiveEvent extends PacketEvent {
 
-    private Player player;
-    private String name;
-    private Object packet;
-    private long timestamp;
+    private final Player player;
+    private final String name;
+    private final Object packet;
+    private final long timestamp;
     private boolean cancelled;
+    private final ServerVersion version = ServerVersion.getVersion();
 
     public PacketReceiveEvent(Player player, String packetName, Object packet) {
         this.player = player;
@@ -34,6 +28,7 @@ public class PacketReceiveEvent extends PacketEvent {
 
     /**
      * Get the player sending the packet
+     *
      * @return
      */
     public Player getPlayer() {
@@ -41,7 +36,8 @@ public class PacketReceiveEvent extends PacketEvent {
     }
 
     /**
-     * Get the packet object's class name, aka. Packet Name
+     * Get the packet's name (NMS packet class simple name)
+     *
      * @return
      */
     public String getPacketName() {
@@ -49,7 +45,8 @@ public class PacketReceiveEvent extends PacketEvent {
     }
 
     /**
-     * Get the raw packet object
+     * Get the NMS packet object
+     *
      * @return
      */
     public Object getPacket() {
@@ -58,6 +55,7 @@ public class PacketReceiveEvent extends PacketEvent {
 
     /**
      * The time the packet was received(ms)
+     *
      * @return
      */
     public long getTimestamp() {
@@ -66,6 +64,7 @@ public class PacketReceiveEvent extends PacketEvent {
 
     /**
      * Cancel the packet
+     *
      * @param cancelled
      */
     public void setCancelled(boolean cancelled) {
@@ -74,7 +73,8 @@ public class PacketReceiveEvent extends PacketEvent {
 
     /**
      * Returns if the packet has been cancelled
-     * @return
+     *
+     * @return cancelled
      */
     public boolean isCancelled() {
         return cancelled;
@@ -83,15 +83,57 @@ public class PacketReceiveEvent extends PacketEvent {
     /**
      * Get the type of dig
      * PacketPlayInBlockDig
+     *
      * @return
      */
-    public PlayerDigType getPlayerDigType() {
-        String c = String.valueOf(Reflection.getMethod(packet.getClass(), "c").invoke(packet));
+    public PlayerDigType getPlayerDigType() throws VersionNotFoundException {
         PlayerDigType type;
-        try {
-            type = PlayerDigType.valueOf(c);
-        } catch (IllegalArgumentException e) {
-            type = PlayerDigType.WRONG_PACKET;
+        if (version == ServerVersion.v_1_8) {
+            net.minecraft.server.v1_8_R1.PacketPlayInBlockDig p = (net.minecraft.server.v1_8_R1.PacketPlayInBlockDig) packet;
+            type = PlayerDigType.valueOf(p.c().name());
+        } else if (version == ServerVersion.v_1_8_3) {
+            net.minecraft.server.v1_8_R2.PacketPlayInBlockDig p = (net.minecraft.server.v1_8_R2.PacketPlayInBlockDig) packet;
+            type = PlayerDigType.valueOf(p.c().name());
+        } else if (version == ServerVersion.v_1_8_8) {
+            net.minecraft.server.v1_8_R3.PacketPlayInBlockDig p = (net.minecraft.server.v1_8_R3.PacketPlayInBlockDig) packet;
+            type = PlayerDigType.valueOf(p.c().name());
+        } else if (version == ServerVersion.v_1_9) {
+            net.minecraft.server.v1_9_R1.PacketPlayInBlockDig p = (net.minecraft.server.v1_9_R1.PacketPlayInBlockDig) packet;
+            type = PlayerDigType.valueOf(p.c().name());
+        } else if (version == ServerVersion.v_1_9_4) {
+            net.minecraft.server.v1_9_R2.PacketPlayInBlockDig p = (net.minecraft.server.v1_9_R2.PacketPlayInBlockDig) packet;
+            type = PlayerDigType.valueOf(p.c().name());
+        } else if (version == ServerVersion.v_1_10_2) {
+            net.minecraft.server.v1_10_R1.PacketPlayInBlockDig p = (net.minecraft.server.v1_10_R1.PacketPlayInBlockDig) packet;
+            type = PlayerDigType.valueOf(p.c().name());
+        } else if (version == ServerVersion.v_1_11_1) {
+            net.minecraft.server.v1_11_R1.PacketPlayInBlockDig p = (net.minecraft.server.v1_11_R1.PacketPlayInBlockDig) packet;
+            type = PlayerDigType.valueOf(p.c().name());
+        } else if (version == ServerVersion.v_1_11_2) {
+            net.minecraft.server.v1_11_R1.PacketPlayInBlockDig p = (net.minecraft.server.v1_11_R1.PacketPlayInBlockDig) packet;
+            type = PlayerDigType.valueOf(p.c().name());
+        } else if (version == ServerVersion.v_1_12_1 || version == ServerVersion.v_1_12_2) {
+            net.minecraft.server.v1_12_R1.PacketPlayInBlockDig p = (net.minecraft.server.v1_12_R1.PacketPlayInBlockDig) packet;
+            type = PlayerDigType.valueOf(p.c().name());
+        } else if (version == ServerVersion.v_1_13) {
+            net.minecraft.server.v1_13_R1.PacketPlayInBlockDig p = (net.minecraft.server.v1_13_R1.PacketPlayInBlockDig) packet;
+            type = PlayerDigType.valueOf(p.c().name());
+        }
+        else if(version == ServerVersion.v_1_13_2) {
+            net.minecraft.server.v1_13_R2.PacketPlayInBlockDig p = (net.minecraft.server.v1_13_R2.PacketPlayInBlockDig) packet;
+            type = PlayerDigType.valueOf(p.c().name());
+        }
+        else if (version == ServerVersion.v_1_14) {
+            net.minecraft.server.v1_14_R1.PacketPlayInBlockDig p = (net.minecraft.server.v1_14_R1.PacketPlayInBlockDig) packet;
+            type = PlayerDigType.valueOf(p.c().name());
+        } else if (version == ServerVersion.v_1_14_1) {
+            net.minecraft.server.v1_14_R1.PacketPlayInBlockDig p = (net.minecraft.server.v1_14_R1.PacketPlayInBlockDig) packet;
+            type = PlayerDigType.valueOf(p.c().name());
+        } else if (version == ServerVersion.v_1_15_1) {
+            net.minecraft.server.v1_15_R1.PacketPlayInBlockDig p = (net.minecraft.server.v1_15_R1.PacketPlayInBlockDig) packet;
+            type = PlayerDigType.valueOf(p.c().name());
+        } else {
+            throw new VersionNotFoundException();
         }
         return type;
     }
@@ -99,174 +141,455 @@ public class PacketReceiveEvent extends PacketEvent {
     /**
      * Get the entity interact action
      * PacketPlayInUseEntity
-     * @return
+     *
+     * @return me.purplex.packetevents.enums.EntityUseAction
      */
-    public EntityUseAction getEntityUseAction() {
-        Object action = null;
-        try {
-            action = FieldUtils.readDeclaredField(packet, "action", true);
-        } catch (IllegalAccessException e) {
-            e.printStackTrace();
+    public EntityUseAction getEntityUseAction() throws VersionNotFoundException {
+        EntityUseAction entityUseAction;
+        if (version == ServerVersion.v_1_8) {
+            net.minecraft.server.v1_8_R1.PacketPlayInUseEntity useEntity = (net.minecraft.server.v1_8_R1.PacketPlayInUseEntity) packet;
+            entityUseAction = EntityUseAction.valueOf(useEntity.a().name());
+        } else if (version == ServerVersion.v_1_8_3) {
+            net.minecraft.server.v1_8_R2.PacketPlayInUseEntity useEntity = (net.minecraft.server.v1_8_R2.PacketPlayInUseEntity) packet;
+            entityUseAction = EntityUseAction.valueOf(useEntity.a().name());
+        } else if (version == ServerVersion.v_1_8_8) {
+            net.minecraft.server.v1_8_R3.PacketPlayInUseEntity useEntity = (net.minecraft.server.v1_8_R3.PacketPlayInUseEntity) packet;
+            entityUseAction = EntityUseAction.valueOf(useEntity.a().name());
+        } else if (version == ServerVersion.v_1_9) {
+            net.minecraft.server.v1_9_R1.PacketPlayInUseEntity useEntity = (net.minecraft.server.v1_9_R1.PacketPlayInUseEntity) packet;
+            entityUseAction = EntityUseAction.valueOf(useEntity.a().name());
+        } else if (version == ServerVersion.v_1_9_4) {
+            net.minecraft.server.v1_9_R2.PacketPlayInUseEntity useEntity = (net.minecraft.server.v1_9_R2.PacketPlayInUseEntity) packet;
+            entityUseAction = EntityUseAction.valueOf(useEntity.a().name());
+        } else if (version == ServerVersion.v_1_10_2) {
+            net.minecraft.server.v1_10_R1.PacketPlayInUseEntity useEntity = (net.minecraft.server.v1_10_R1.PacketPlayInUseEntity) packet;
+            entityUseAction = EntityUseAction.valueOf(useEntity.a().name());
+        } else if (version == ServerVersion.v_1_11_1) {
+            net.minecraft.server.v1_11_R1.PacketPlayInUseEntity useEntity = (net.minecraft.server.v1_11_R1.PacketPlayInUseEntity) packet;
+            entityUseAction = EntityUseAction.valueOf(useEntity.a().name());
+        } else if (version == ServerVersion.v_1_11_2) {
+            net.minecraft.server.v1_11_R1.PacketPlayInUseEntity useEntity = (net.minecraft.server.v1_11_R1.PacketPlayInUseEntity) packet;
+            entityUseAction = EntityUseAction.valueOf(useEntity.a().name());
+        } else if (version == ServerVersion.v_1_12_1 || version == ServerVersion.v_1_12_2) {
+            net.minecraft.server.v1_12_R1.PacketPlayInUseEntity useEntity = (net.minecraft.server.v1_12_R1.PacketPlayInUseEntity) packet;
+            entityUseAction = EntityUseAction.valueOf(useEntity.a().name());
+        } else if (version == ServerVersion.v_1_13) {
+            net.minecraft.server.v1_13_R1.PacketPlayInUseEntity useEntity = (net.minecraft.server.v1_13_R1.PacketPlayInUseEntity) packet;
+            entityUseAction = EntityUseAction.valueOf(useEntity.b().name());
         }
-        for (EntityUseAction a : EntityUseAction.values()) {
-            if (a.toString().equalsIgnoreCase(action.toString())) {
-                return a;
-            }
+        else if(version == ServerVersion.v_1_13_2) {
+            net.minecraft.server.v1_13_R2.PacketPlayInUseEntity useEntity = (net.minecraft.server.v1_13_R2.PacketPlayInUseEntity) packet;
+            entityUseAction = EntityUseAction.valueOf(useEntity.b().name());
         }
-        return EntityUseAction.WRONG_PACKET;
+        else if (version == ServerVersion.v_1_14) {
+            net.minecraft.server.v1_14_R1.PacketPlayInUseEntity useEntity = (net.minecraft.server.v1_14_R1.PacketPlayInUseEntity) packet;
+            entityUseAction = EntityUseAction.valueOf(useEntity.b().name());
+        } else if (version == ServerVersion.v_1_14_1) {
+            net.minecraft.server.v1_14_R1.PacketPlayInUseEntity useEntity = (net.minecraft.server.v1_14_R1.PacketPlayInUseEntity) packet;
+            entityUseAction = EntityUseAction.valueOf(useEntity.b().name());
+        } else if (version == ServerVersion.v_1_15_1) {
+            net.minecraft.server.v1_15_R1.PacketPlayInUseEntity useEntity = (net.minecraft.server.v1_15_R1.PacketPlayInUseEntity) packet;
+            entityUseAction = EntityUseAction.valueOf(useEntity.b().name());
+        } else {
+            throw new VersionNotFoundException();
+        }
+        return entityUseAction;
     }
 
     /**
      * Get the PlayerAction
      * PacketPlayInEntityAction
-     * @return
+     *
+     * @return me.purplex.packetevents.enums.PlayerAction
      */
-    public PlayerAction getPlayerAction() {
-        Object animation = null;
-        try {
-            animation = FieldUtils.readDeclaredField(packet, "animation", true);
-        } catch (IllegalAccessException e) {
-            e.printStackTrace();
+    public PlayerAction getPlayerAction() throws VersionNotFoundException {
+        String animation;
+        if (version == ServerVersion.v_1_8) {
+            net.minecraft.server.v1_8_R1.PacketPlayInEntityAction action = (net.minecraft.server.v1_8_R1.PacketPlayInEntityAction) packet;
+            animation = action.b().name();
+        } else if (version == ServerVersion.v_1_8_3) {
+            net.minecraft.server.v1_8_R2.PacketPlayInEntityAction action = (net.minecraft.server.v1_8_R2.PacketPlayInEntityAction) packet;
+            animation = action.b().name();
+        } else if (version == ServerVersion.v_1_8_8) {
+            net.minecraft.server.v1_8_R3.PacketPlayInEntityAction action = (net.minecraft.server.v1_8_R3.PacketPlayInEntityAction) packet;
+            animation = action.b().name();
+        } else if (version == ServerVersion.v_1_9) {
+            net.minecraft.server.v1_9_R1.PacketPlayInEntityAction action = (net.minecraft.server.v1_9_R1.PacketPlayInEntityAction) packet;
+            animation = action.b().name();
+        } else if (version == ServerVersion.v_1_9_4) {
+            net.minecraft.server.v1_9_R2.PacketPlayInEntityAction action = (net.minecraft.server.v1_9_R2.PacketPlayInEntityAction) packet;
+            animation = action.b().name();
+        } else if (version == ServerVersion.v_1_10_2) {
+            net.minecraft.server.v1_10_R1.PacketPlayInEntityAction action = (net.minecraft.server.v1_10_R1.PacketPlayInEntityAction) packet;
+            animation = action.b().name();
+        } else if (version == ServerVersion.v_1_11_1) {
+            net.minecraft.server.v1_11_R1.PacketPlayInEntityAction action = (net.minecraft.server.v1_11_R1.PacketPlayInEntityAction) packet;
+            animation = action.b().name();
+        } else if (version == ServerVersion.v_1_11_2) {
+            net.minecraft.server.v1_11_R1.PacketPlayInEntityAction action = (net.minecraft.server.v1_11_R1.PacketPlayInEntityAction) packet;
+            animation = action.b().name();
+        } else if (version == ServerVersion.v_1_12_1) {
+            net.minecraft.server.v1_12_R1.PacketPlayInEntityAction action = (net.minecraft.server.v1_12_R1.PacketPlayInEntityAction) packet;
+            animation = action.b().name();
+        } else if (version == ServerVersion.v_1_12_2) {
+            net.minecraft.server.v1_12_R1.PacketPlayInEntityAction action = (net.minecraft.server.v1_12_R1.PacketPlayInEntityAction) packet;
+            animation = action.b().name();
+        } else if (version == ServerVersion.v_1_13) {
+            net.minecraft.server.v1_13_R1.PacketPlayInEntityAction action = (net.minecraft.server.v1_13_R1.PacketPlayInEntityAction) packet;
+            animation = action.c().name();
         }
-        for (PlayerAction a : PlayerAction.values()) {
-            if (a.toString().equalsIgnoreCase(animation.toString())) {
-                return a;
-            }
+        else if(version == ServerVersion.v_1_13_2) {
+            net.minecraft.server.v1_13_R2.PacketPlayInEntityAction action = (net.minecraft.server.v1_13_R2.PacketPlayInEntityAction) packet;
+            animation = action.c().name();
         }
-        return PlayerAction.WRONG_PACKET;
+        else if (version == ServerVersion.v_1_14) {
+            net.minecraft.server.v1_14_R1.PacketPlayInEntityAction action = (net.minecraft.server.v1_14_R1.PacketPlayInEntityAction) packet;
+            animation = action.c().name();
+        } else if (version == ServerVersion.v_1_14_1) {
+            net.minecraft.server.v1_14_R1.PacketPlayInEntityAction action = (net.minecraft.server.v1_14_R1.PacketPlayInEntityAction) packet;
+            animation = action.c().name();
+        } else if (version == ServerVersion.v_1_15_1) {
+            net.minecraft.server.v1_15_R1.PacketPlayInEntityAction action = (net.minecraft.server.v1_15_R1.PacketPlayInEntityAction) packet;
+            animation = action.c().name();
+        } else {
+            throw new VersionNotFoundException();
+        }
+        return PlayerAction.valueOf(animation);
     }
 
     /**
      * Entity you interacted with
      * PacketPlayInUseEntity
-     * @return
+     *
+     * @return org.bukkit.entity.Entity
      */
-    public Entity getInteractedEntity() {
-        try {
-            FieldAccessor<Integer> field = Reflection.getField(packet.getClass(), int.class, 0);
-            int id = field.get(packet);
-            for (Entity e : player.getWorld().getEntities()) {
-                if (e.getEntityId() == id) {
-                    return e;
-                }
-            }
-            for(World w : Bukkit.getWorlds()) {
-                for(Entity e  : w.getEntities()) {
-                    if(e.getEntityId() == id) {
-                        return e;
-                    }
-                }
-            }
-        } catch (Exception ex) {
+    public Entity getInteractedEntity() throws VersionNotFoundException {
+        Entity entity;
+        if (version == ServerVersion.v_1_8) {
+            net.minecraft.server.v1_8_R1.PacketPlayInUseEntity useEntity = (net.minecraft.server.v1_8_R1.PacketPlayInUseEntity) packet;
+            net.minecraft.server.v1_8_R1.World world = ((org.bukkit.craftbukkit.v1_8_R1.CraftWorld) player.getWorld()).getHandle();
+            entity = useEntity.a(world).getBukkitEntity();
+        } else if (version == ServerVersion.v_1_8_3) {
+            net.minecraft.server.v1_8_R2.PacketPlayInUseEntity useEntity = (net.minecraft.server.v1_8_R2.PacketPlayInUseEntity) packet;
+            net.minecraft.server.v1_8_R2.World world = ((org.bukkit.craftbukkit.v1_8_R2.CraftWorld) player.getWorld()).getHandle();
+            entity = useEntity.a(world).getBukkitEntity();
+        } else if (version == ServerVersion.v_1_8_8) {
+            net.minecraft.server.v1_8_R3.PacketPlayInUseEntity useEntity = (net.minecraft.server.v1_8_R3.PacketPlayInUseEntity) packet;
+            net.minecraft.server.v1_8_R3.World world = ((org.bukkit.craftbukkit.v1_8_R3.CraftWorld) player.getWorld()).getHandle();
+            entity = useEntity.a(world).getBukkitEntity();
+        } else if (version == ServerVersion.v_1_9) {
+            net.minecraft.server.v1_9_R1.PacketPlayInUseEntity useEntity = (net.minecraft.server.v1_9_R1.PacketPlayInUseEntity) packet;
+            net.minecraft.server.v1_9_R1.World world = ((org.bukkit.craftbukkit.v1_9_R1.CraftWorld) player.getWorld()).getHandle();
+            entity = useEntity.a(world).getBukkitEntity();
+        } else if (version == ServerVersion.v_1_9_4) {
+            net.minecraft.server.v1_9_R2.PacketPlayInUseEntity useEntity = (net.minecraft.server.v1_9_R2.PacketPlayInUseEntity) packet;
+            net.minecraft.server.v1_9_R2.World world = ((org.bukkit.craftbukkit.v1_9_R2.CraftWorld) player.getWorld()).getHandle();
+            entity = useEntity.a(world).getBukkitEntity();
+        } else if (version == ServerVersion.v_1_10_2) {
+            net.minecraft.server.v1_10_R1.PacketPlayInUseEntity useEntity = (net.minecraft.server.v1_10_R1.PacketPlayInUseEntity) packet;
+            net.minecraft.server.v1_10_R1.World world = ((org.bukkit.craftbukkit.v1_10_R1.CraftWorld) player.getWorld()).getHandle();
+            entity = useEntity.a(world).getBukkitEntity();
+        } else if (version == ServerVersion.v_1_11_1) {
+            net.minecraft.server.v1_11_R1.PacketPlayInUseEntity useEntity = (net.minecraft.server.v1_11_R1.PacketPlayInUseEntity) packet;
+            net.minecraft.server.v1_11_R1.World world = ((org.bukkit.craftbukkit.v1_11_R1.CraftWorld) player.getWorld()).getHandle();
+            entity = useEntity.a(world).getBukkitEntity();
+        } else if (version == ServerVersion.v_1_11_2) {
+            net.minecraft.server.v1_11_R1.PacketPlayInUseEntity useEntity = (net.minecraft.server.v1_11_R1.PacketPlayInUseEntity) packet;
+            net.minecraft.server.v1_11_R1.World world = ((org.bukkit.craftbukkit.v1_11_R1.CraftWorld) player.getWorld()).getHandle();
+            entity = useEntity.a(world).getBukkitEntity();
+        } else if (version == ServerVersion.v_1_12_1 || version == ServerVersion.v_1_12_2) {
+            net.minecraft.server.v1_12_R1.PacketPlayInUseEntity useEntity = (net.minecraft.server.v1_12_R1.PacketPlayInUseEntity) packet;
+            net.minecraft.server.v1_12_R1.World world = ((org.bukkit.craftbukkit.v1_12_R1.CraftWorld) player.getWorld()).getHandle();
+            entity = useEntity.a(world).getBukkitEntity();
+        } else if (version == ServerVersion.v_1_13) {
+            net.minecraft.server.v1_13_R1.PacketPlayInUseEntity useEntity = (net.minecraft.server.v1_13_R1.PacketPlayInUseEntity) packet;
+            net.minecraft.server.v1_13_R1.World world = ((org.bukkit.craftbukkit.v1_13_R1.CraftWorld) player.getWorld()).getHandle();
+            entity = useEntity.a(world).getBukkitEntity();
         }
-        return null;
+        else if(version == ServerVersion.v_1_13_2) {
+            net.minecraft.server.v1_13_R2.PacketPlayInUseEntity useEntity = (net.minecraft.server.v1_13_R2.PacketPlayInUseEntity) packet;
+            net.minecraft.server.v1_13_R2.World world = ((org.bukkit.craftbukkit.v1_13_R2.CraftWorld) player.getWorld()).getHandle();
+            entity = useEntity.a(world).getBukkitEntity();
+        }
+        else if (version == ServerVersion.v_1_14) {
+            net.minecraft.server.v1_14_R1.PacketPlayInUseEntity useEntity = (net.minecraft.server.v1_14_R1.PacketPlayInUseEntity) packet;
+            net.minecraft.server.v1_14_R1.World world = ((org.bukkit.craftbukkit.v1_14_R1.CraftWorld) player.getWorld()).getHandle();
+            entity = useEntity.a(world).getBukkitEntity();
+        } else if (version == ServerVersion.v_1_14_1) {
+            net.minecraft.server.v1_14_R1.PacketPlayInUseEntity useEntity = (net.minecraft.server.v1_14_R1.PacketPlayInUseEntity) packet;
+            net.minecraft.server.v1_14_R1.World world = ((org.bukkit.craftbukkit.v1_14_R1.CraftWorld) player.getWorld()).getHandle();
+            entity = useEntity.a(world).getBukkitEntity();
+        } else if (version == ServerVersion.v_1_15_1) {
+            net.minecraft.server.v1_15_R1.PacketPlayInUseEntity useEntity = (net.minecraft.server.v1_15_R1.PacketPlayInUseEntity) packet;
+            net.minecraft.server.v1_15_R1.World world = ((org.bukkit.craftbukkit.v1_15_R1.CraftWorld) player.getWorld()).getHandle();
+            entity = useEntity.a(world).getBukkitEntity();
+        } else {
+            throw new VersionNotFoundException();
+        }
+        return entity;
     }
 
     /**
      * Get the string message
      * PacketPlayInChat
-     * @return
+     *
+     * @return message
      */
-    public String getChatPacketMessage() {
-        FieldAccessor<String> field = Reflection.getField(packet.getClass(), String.class, 0);
-        String message = field.get(packet);
+    public String getChatPacketMessage() throws VersionNotFoundException {
+        String message;
+        if (version == ServerVersion.v_1_8) {
+            net.minecraft.server.v1_8_R1.PacketPlayInChat p = (net.minecraft.server.v1_8_R1.PacketPlayInChat) packet;
+            message = p.a();
+        } else if (version == ServerVersion.v_1_8_3) {
+            net.minecraft.server.v1_8_R2.PacketPlayInChat p = (net.minecraft.server.v1_8_R2.PacketPlayInChat) packet;
+            message = p.a();
+        } else if (version == ServerVersion.v_1_8_8) {
+            net.minecraft.server.v1_8_R3.PacketPlayInChat p = (net.minecraft.server.v1_8_R3.PacketPlayInChat) packet;
+            message = p.a();
+        } else if (version == ServerVersion.v_1_9) {
+            net.minecraft.server.v1_9_R1.PacketPlayInChat p = (net.minecraft.server.v1_9_R1.PacketPlayInChat) packet;
+            message = p.a();
+        } else if (version == ServerVersion.v_1_9_4) {
+            net.minecraft.server.v1_9_R2.PacketPlayInChat p = (net.minecraft.server.v1_9_R2.PacketPlayInChat) packet;
+            message = p.a();
+        } else if (version == ServerVersion.v_1_10_2) {
+            net.minecraft.server.v1_10_R1.PacketPlayInChat p = (net.minecraft.server.v1_10_R1.PacketPlayInChat) packet;
+            message = p.a();
+        } else if (version == ServerVersion.v_1_11_1) {
+            net.minecraft.server.v1_11_R1.PacketPlayInChat p = (net.minecraft.server.v1_11_R1.PacketPlayInChat) packet;
+            message = p.a();
+        } else if (version == ServerVersion.v_1_11_2) {
+            net.minecraft.server.v1_11_R1.PacketPlayInChat p = (net.minecraft.server.v1_11_R1.PacketPlayInChat) packet;
+            message = p.a();
+        } else if (version == ServerVersion.v_1_12_1 || version == ServerVersion.v_1_12_2) {
+            net.minecraft.server.v1_12_R1.PacketPlayInChat p = (net.minecraft.server.v1_12_R1.PacketPlayInChat) packet;
+            message = p.a();
+        } else if (version == ServerVersion.v_1_13) {
+            net.minecraft.server.v1_13_R1.PacketPlayInChat p = (net.minecraft.server.v1_13_R1.PacketPlayInChat) packet;
+            message = p.b();
+        }
+        else if(version == ServerVersion.v_1_13_2) {
+            net.minecraft.server.v1_13_R2.PacketPlayInChat p = (net.minecraft.server.v1_13_R2.PacketPlayInChat) packet;
+            message = p.b();
+        }
+        else if (version == ServerVersion.v_1_14) {
+            net.minecraft.server.v1_14_R1.PacketPlayInChat p = (net.minecraft.server.v1_14_R1.PacketPlayInChat) packet;
+            message = p.b();
+        } else if (version == ServerVersion.v_1_14_1) {
+            net.minecraft.server.v1_14_R1.PacketPlayInChat p = (net.minecraft.server.v1_14_R1.PacketPlayInChat) packet;
+            message = p.b();
+        } else if (version == ServerVersion.v_1_15_1) {
+            net.minecraft.server.v1_15_R1.PacketPlayInChat p = (net.minecraft.server.v1_15_R1.PacketPlayInChat) packet;
+            message = p.b();
+        } else {
+            throw new VersionNotFoundException();
+        }
         return message;
     }
 
-
-    public int getPing() {
-        int ping = 0;
-        try {
-            Object entityPlayer = player.getClass().getMethod("getHandle").invoke(player);
-            ping = (int) entityPlayer.getClass().getField("ping").get(entityPlayer);
-        } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException | NoSuchMethodException
-                | SecurityException | NoSuchFieldException e) {
-            e.printStackTrace();
+    /**
+     * Get the player's ping in the EntityPlayer's class
+     * @return ping
+     * @throws VersionNotFoundException
+     */
+    public int getPing() throws VersionNotFoundException {
+        int ping;
+        if (version == ServerVersion.v_1_8) {
+            net.minecraft.server.v1_8_R1.EntityPlayer ePlayer = ((org.bukkit.craftbukkit.v1_8_R1.entity.CraftPlayer)player).getHandle();
+            ping = ePlayer.ping;
+        } else if (version == ServerVersion.v_1_8_3) {
+            net.minecraft.server.v1_8_R2.EntityPlayer ePlayer = ((org.bukkit.craftbukkit.v1_8_R2.entity.CraftPlayer)player).getHandle();
+            ping = ePlayer.ping;
+        } else if (version == ServerVersion.v_1_8_8) {
+            net.minecraft.server.v1_8_R3.EntityPlayer ePlayer = ((org.bukkit.craftbukkit.v1_8_R3.entity.CraftPlayer)player).getHandle();
+            ping = ePlayer.ping;
+        } else if (version == ServerVersion.v_1_9) {
+            net.minecraft.server.v1_9_R1.EntityPlayer ePlayer = ((org.bukkit.craftbukkit.v1_9_R1.entity.CraftPlayer)player).getHandle();
+            ping = ePlayer.ping;
+        } else if (version == ServerVersion.v_1_9_4) {
+            net.minecraft.server.v1_9_R2.EntityPlayer ePlayer = ((org.bukkit.craftbukkit.v1_9_R2.entity.CraftPlayer)player).getHandle();
+            ping = ePlayer.ping;
+        } else if (version == ServerVersion.v_1_10_2) {
+            net.minecraft.server.v1_10_R1.EntityPlayer ePlayer = ((org.bukkit.craftbukkit.v1_10_R1.entity.CraftPlayer)player).getHandle();
+            ping = ePlayer.ping;
+        } else if (version == ServerVersion.v_1_11_1 || version == ServerVersion.v_1_11_2) {
+            net.minecraft.server.v1_11_R1.EntityPlayer ePlayer = ((org.bukkit.craftbukkit.v1_11_R1.entity.CraftPlayer)player).getHandle();
+            ping = ePlayer.ping;
+        }  else if (version == ServerVersion.v_1_12_1 || version == ServerVersion.v_1_12_2) {
+            net.minecraft.server.v1_12_R1.EntityPlayer ePlayer = ((org.bukkit.craftbukkit.v1_12_R1.entity.CraftPlayer)player).getHandle();
+            ping = ePlayer.ping;
+        } else if (version == ServerVersion.v_1_13) {
+            net.minecraft.server.v1_13_R1.EntityPlayer ePlayer = ((org.bukkit.craftbukkit.v1_13_R1.entity.CraftPlayer)player).getHandle();
+            ping = ePlayer.ping;
+        }
+        else if(version == ServerVersion.v_1_13_2) {
+            net.minecraft.server.v1_13_R2.EntityPlayer ePlayer = ((org.bukkit.craftbukkit.v1_13_R2.entity.CraftPlayer)player).getHandle();
+            ping = ePlayer.ping;
+        }
+        else if (version == ServerVersion.v_1_14 || version == ServerVersion.v_1_14_1) {
+            net.minecraft.server.v1_14_R1.EntityPlayer ePlayer = ((org.bukkit.craftbukkit.v1_14_R1.entity.CraftPlayer)player).getHandle();
+            ping = ePlayer.ping;
+        } else if (version == ServerVersion.v_1_15_1) {
+            net.minecraft.server.v1_15_R1.EntityPlayer ePlayer = ((org.bukkit.craftbukkit.v1_15_R1.entity.CraftPlayer)player).getHandle();
+            ping = ePlayer.ping;
+        } else {
+            throw new VersionNotFoundException();
         }
         return ping;
     }
 
     /**
-     * Get the motX variable in the player's CraftPlayer class
-     * using Reflection
-     * @return
+     * Get the motX variable in the EntityPlayer class
+     *
+     * @return motX
      */
-    public double getMotionX() {
-        Reflection.MethodInvoker getPlayerHandle = Reflection.getMethod("{obc}.entity.CraftPlayer", "getHandle");
-        Object entityplayer = getPlayerHandle.invoke(player);
-        Field field = null;
-        try {
-            field = entityplayer.getClass().getField("motX");
-        } catch (NoSuchFieldException e1) {
-            e1.printStackTrace();
-        } catch (SecurityException e1) {
-            e1.printStackTrace();
+    public double getMotX() throws VersionNotFoundException {
+        double motX;
+        if (version == ServerVersion.v_1_8) {
+            net.minecraft.server.v1_8_R1.EntityPlayer ePlayer = ((org.bukkit.craftbukkit.v1_8_R1.entity.CraftPlayer)player).getHandle();
+            motX = ePlayer.motX;
+        } else if (version == ServerVersion.v_1_8_3) {
+            net.minecraft.server.v1_8_R2.EntityPlayer ePlayer = ((org.bukkit.craftbukkit.v1_8_R2.entity.CraftPlayer)player).getHandle();
+            motX = ePlayer.motX;
+        } else if (version == ServerVersion.v_1_8_8) {
+            net.minecraft.server.v1_8_R3.EntityPlayer ePlayer = ((org.bukkit.craftbukkit.v1_8_R3.entity.CraftPlayer)player).getHandle();
+            motX = ePlayer.motX;
+        } else if (version == ServerVersion.v_1_9) {
+            net.minecraft.server.v1_9_R1.EntityPlayer ePlayer = ((org.bukkit.craftbukkit.v1_9_R1.entity.CraftPlayer)player).getHandle();
+            motX = ePlayer.motX;
+        } else if (version == ServerVersion.v_1_9_4) {
+            net.minecraft.server.v1_9_R2.EntityPlayer ePlayer = ((org.bukkit.craftbukkit.v1_9_R2.entity.CraftPlayer)player).getHandle();
+            motX = ePlayer.motX;
+        } else if (version == ServerVersion.v_1_10_2) {
+            net.minecraft.server.v1_10_R1.EntityPlayer ePlayer = ((org.bukkit.craftbukkit.v1_10_R1.entity.CraftPlayer)player).getHandle();
+            motX = ePlayer.motX;
+        } else if (version == ServerVersion.v_1_11_1 || version == ServerVersion.v_1_11_2) {
+            net.minecraft.server.v1_11_R1.EntityPlayer ePlayer = ((org.bukkit.craftbukkit.v1_11_R1.entity.CraftPlayer)player).getHandle();
+            motX = ePlayer.motX;
+        }  else if (version == ServerVersion.v_1_12_1 || version == ServerVersion.v_1_12_2) {
+            net.minecraft.server.v1_12_R1.EntityPlayer ePlayer = ((org.bukkit.craftbukkit.v1_12_R1.entity.CraftPlayer)player).getHandle();
+            motX = ePlayer.motX;
+        } else if (version == ServerVersion.v_1_13) {
+            net.minecraft.server.v1_13_R1.EntityPlayer ePlayer = ((org.bukkit.craftbukkit.v1_13_R1.entity.CraftPlayer)player).getHandle();
+            motX = ePlayer.motX;
         }
-        double mot = 0.0D;
-        try {
-            mot = field.getDouble(entityplayer);
-        } catch (IllegalArgumentException e) {
-            e.printStackTrace();
-        } catch (IllegalAccessException e) {
-            e.printStackTrace();
+        else if(version == ServerVersion.v_1_13_2) {
+            net.minecraft.server.v1_13_R2.EntityPlayer ePlayer = ((org.bukkit.craftbukkit.v1_13_R2.entity.CraftPlayer)player).getHandle();
+            motX = ePlayer.motX;
         }
+        else if (version == ServerVersion.v_1_14 || version == ServerVersion.v_1_14_1) {
+            net.minecraft.server.v1_14_R1.EntityPlayer ePlayer = ((org.bukkit.craftbukkit.v1_14_R1.entity.CraftPlayer)player).getHandle();
+            motX = ePlayer.getMot().getX();
+        } else if (version == ServerVersion.v_1_15_1) {
+            net.minecraft.server.v1_15_R1.EntityPlayer ePlayer = ((org.bukkit.craftbukkit.v1_15_R1.entity.CraftPlayer)player).getHandle();
+            motX = ePlayer.getMot().getX();
+        } else {
+            throw new VersionNotFoundException();
+        }
+        return motX;
+    }
 
-        return mot;
+
+
+    /**
+     * Get the motY variable in the EntityPlayer class
+     *
+     * @return motY
+     */
+    public double getMotY() throws VersionNotFoundException {
+        double motY;
+        if (version == ServerVersion.v_1_8) {
+            net.minecraft.server.v1_8_R1.EntityPlayer ePlayer = ((org.bukkit.craftbukkit.v1_8_R1.entity.CraftPlayer)player).getHandle();
+            motY = ePlayer.motY;
+        } else if (version == ServerVersion.v_1_8_3) {
+            net.minecraft.server.v1_8_R2.EntityPlayer ePlayer = ((org.bukkit.craftbukkit.v1_8_R2.entity.CraftPlayer)player).getHandle();
+            motY = ePlayer.motY;
+        } else if (version == ServerVersion.v_1_8_8) {
+            net.minecraft.server.v1_8_R3.EntityPlayer ePlayer = ((org.bukkit.craftbukkit.v1_8_R3.entity.CraftPlayer)player).getHandle();
+            motY = ePlayer.motY;
+        } else if (version == ServerVersion.v_1_9) {
+            net.minecraft.server.v1_9_R1.EntityPlayer ePlayer = ((org.bukkit.craftbukkit.v1_9_R1.entity.CraftPlayer)player).getHandle();
+            motY = ePlayer.motY;
+        } else if (version == ServerVersion.v_1_9_4) {
+            net.minecraft.server.v1_9_R2.EntityPlayer ePlayer = ((org.bukkit.craftbukkit.v1_9_R2.entity.CraftPlayer)player).getHandle();
+            motY = ePlayer.motY;
+        } else if (version == ServerVersion.v_1_10_2) {
+            net.minecraft.server.v1_10_R1.EntityPlayer ePlayer = ((org.bukkit.craftbukkit.v1_10_R1.entity.CraftPlayer)player).getHandle();
+            motY = ePlayer.motY;
+        } else if (version == ServerVersion.v_1_11_1 || version == ServerVersion.v_1_11_2) {
+            net.minecraft.server.v1_11_R1.EntityPlayer ePlayer = ((org.bukkit.craftbukkit.v1_11_R1.entity.CraftPlayer)player).getHandle();
+            motY = ePlayer.motY;
+        }  else if (version == ServerVersion.v_1_12_1 || version == ServerVersion.v_1_12_2) {
+            net.minecraft.server.v1_12_R1.EntityPlayer ePlayer = ((org.bukkit.craftbukkit.v1_12_R1.entity.CraftPlayer)player).getHandle();
+            motY = ePlayer.motY;
+        } else if (version == ServerVersion.v_1_13) {
+            net.minecraft.server.v1_13_R1.EntityPlayer ePlayer = ((org.bukkit.craftbukkit.v1_13_R1.entity.CraftPlayer)player).getHandle();
+            motY = ePlayer.motY;
+        }
+        else if(version == ServerVersion.v_1_13_2) {
+            net.minecraft.server.v1_13_R2.EntityPlayer ePlayer = ((org.bukkit.craftbukkit.v1_13_R2.entity.CraftPlayer)player).getHandle();
+            motY = ePlayer.motY;
+        }
+        else if (version == ServerVersion.v_1_14 || version == ServerVersion.v_1_14_1) {
+            net.minecraft.server.v1_14_R1.EntityPlayer ePlayer = ((org.bukkit.craftbukkit.v1_14_R1.entity.CraftPlayer)player).getHandle();
+            motY = ePlayer.getMot().getY();
+        } else if (version == ServerVersion.v_1_15_1) {
+            net.minecraft.server.v1_15_R1.EntityPlayer ePlayer = ((org.bukkit.craftbukkit.v1_15_R1.entity.CraftPlayer)player).getHandle();
+            motY = ePlayer.getMot().getY();
+        } else {
+            throw new VersionNotFoundException();
+        }
+        return motY;
     }
 
     /**
-     * Get the motY variable in the player's CraftPlayer class
-     * using Reflection
-     * @return
+     * Get the motZ variable in the EntityPlayer class
+     *
+     * @return motZ
      */
-    public double getMotionY() {
-        Reflection.MethodInvoker getPlayerHandle = Reflection.getMethod("{obc}.entity.CraftPlayer", "getHandle");
-        Object entityplayer = getPlayerHandle.invoke(player);
-        Field field = null;
-        try {
-            field = entityplayer.getClass().getField("motY");
-        } catch (NoSuchFieldException e1) {
-            e1.printStackTrace();
-        } catch (SecurityException e1) {
-            e1.printStackTrace();
+    public double getMotZ() throws VersionNotFoundException {
+        double motZ;
+        if (version == ServerVersion.v_1_8) {
+            net.minecraft.server.v1_8_R1.EntityPlayer ePlayer = ((org.bukkit.craftbukkit.v1_8_R1.entity.CraftPlayer)player).getHandle();
+            motZ = ePlayer.motZ;
+        } else if (version == ServerVersion.v_1_8_3) {
+            net.minecraft.server.v1_8_R2.EntityPlayer ePlayer = ((org.bukkit.craftbukkit.v1_8_R2.entity.CraftPlayer)player).getHandle();
+            motZ = ePlayer.motZ;
+        } else if (version == ServerVersion.v_1_8_8) {
+            net.minecraft.server.v1_8_R3.EntityPlayer ePlayer = ((org.bukkit.craftbukkit.v1_8_R3.entity.CraftPlayer)player).getHandle();
+            motZ = ePlayer.motZ;
+        } else if (version == ServerVersion.v_1_9) {
+            net.minecraft.server.v1_9_R1.EntityPlayer ePlayer = ((org.bukkit.craftbukkit.v1_9_R1.entity.CraftPlayer)player).getHandle();
+            motZ = ePlayer.motZ;
+        } else if (version == ServerVersion.v_1_9_4) {
+            net.minecraft.server.v1_9_R2.EntityPlayer ePlayer = ((org.bukkit.craftbukkit.v1_9_R2.entity.CraftPlayer)player).getHandle();
+            motZ = ePlayer.motZ;
+        } else if (version == ServerVersion.v_1_10_2) {
+            net.minecraft.server.v1_10_R1.EntityPlayer ePlayer = ((org.bukkit.craftbukkit.v1_10_R1.entity.CraftPlayer)player).getHandle();
+            motZ = ePlayer.motZ;
+        } else if (version == ServerVersion.v_1_11_1 || version == ServerVersion.v_1_11_2) {
+            net.minecraft.server.v1_11_R1.EntityPlayer ePlayer = ((org.bukkit.craftbukkit.v1_11_R1.entity.CraftPlayer)player).getHandle();
+            motZ = ePlayer.motZ;
+        }  else if (version == ServerVersion.v_1_12_1 || version == ServerVersion.v_1_12_2) {
+            net.minecraft.server.v1_12_R1.EntityPlayer ePlayer = ((org.bukkit.craftbukkit.v1_12_R1.entity.CraftPlayer)player).getHandle();
+            motZ = ePlayer.motZ;
+        } else if (version == ServerVersion.v_1_13) {
+            net.minecraft.server.v1_13_R1.EntityPlayer ePlayer = ((org.bukkit.craftbukkit.v1_13_R1.entity.CraftPlayer)player).getHandle();
+            motZ = ePlayer.motZ;
         }
-        double mot = 0.0D;
-        try {
-            mot = field.getDouble(entityplayer);
-        } catch (IllegalArgumentException e) {
-            e.printStackTrace();
-        } catch (IllegalAccessException e) {
-            e.printStackTrace();
+        else if(version == ServerVersion.v_1_13_2) {
+            net.minecraft.server.v1_13_R2.EntityPlayer ePlayer = ((org.bukkit.craftbukkit.v1_13_R2.entity.CraftPlayer)player).getHandle();
+            motZ = ePlayer.motZ;
         }
-
-        return mot;
-    }
-
-    /**
-     * Get the motZ variable in the player's CraftPlayer class
-     * using Reflection
-     * @return
-     */
-    public double getMotionZ() {
-        Reflection.MethodInvoker getPlayerHandle = Reflection.getMethod("{obc}.entity.CraftPlayer", "getHandle");
-        Object entityplayer = getPlayerHandle.invoke(player);
-        Field field = null;
-        try {
-            field = entityplayer.getClass().getField("motZ");
-        } catch (NoSuchFieldException e1) {
-            e1.printStackTrace();
-        } catch (SecurityException e1) {
-            e1.printStackTrace();
+        else if (version == ServerVersion.v_1_14 || version == ServerVersion.v_1_14_1) {
+            net.minecraft.server.v1_14_R1.EntityPlayer ePlayer = ((org.bukkit.craftbukkit.v1_14_R1.entity.CraftPlayer)player).getHandle();
+            motZ = ePlayer.getMot().getZ();
+        } else if (version == ServerVersion.v_1_15_1) {
+            net.minecraft.server.v1_15_R1.EntityPlayer ePlayer = ((org.bukkit.craftbukkit.v1_15_R1.entity.CraftPlayer)player).getHandle();
+            motZ = ePlayer.getMot().getZ();
+        } else {
+            throw new VersionNotFoundException();
         }
-        double mot = 0.0D;
-        try {
-            mot = field.getDouble(entityplayer);
-        } catch (IllegalArgumentException e) {
-            e.printStackTrace();
-        } catch (IllegalAccessException e) {
-            e.printStackTrace();
-        }
-
-        return mot;
+        return motZ;
     }
 }
