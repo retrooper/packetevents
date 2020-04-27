@@ -14,7 +14,8 @@ public enum ServerVersion
         ArrayUtils.reverse(vals);
         for(ServerVersion val : vals) {
             String valName = val.name().substring(2).replace("_", ".");
-            if(Bukkit.getVersion().contains(valName)) {
+            if(Bukkit.getBukkitVersion().contains(valName)) {
+                System.out.println(val + " we got");
                 return val;
             }
         }

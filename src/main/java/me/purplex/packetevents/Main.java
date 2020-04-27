@@ -2,10 +2,10 @@ package me.purplex.packetevents;
 
 import com.comphenix.tinyprotocol.*;
 import io.netty.channel.Channel;
+import me.purplex.packetevents.enums.ServerVersion;
 import me.purplex.packetevents.events.packetevent.PacketSendEvent;
 import me.purplex.packetevents.events.packetevent.ServerTickEvent;
 import me.purplex.packetevents.events.packetevent.PacketReceiveEvent;
-import me.purplex.packetevents.example.TestExample;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.*;

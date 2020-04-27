@@ -11,7 +11,6 @@ import me.purplex.packetevents.events.packetevent.PacketReceiveEvent;
 import me.purplex.packetevents.events.packetevent.PacketSendEvent;
 import me.purplex.packetevents.exceptions.VersionNotFoundException;
 import me.purplex.packetevents.packets.Packet;
-import net.minecraft.server.v1_8_R1.*;
 import org.bukkit.entity.Entity;
 
 public class TestExample implements PacketListener {
