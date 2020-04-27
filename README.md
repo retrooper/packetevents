@@ -21,7 +21,7 @@ allprojects {
 }
 
 dependencies {
-        implementation 'com.github.purplexdev:packetevents:1.0.6'
+        implementation 'com.github.purplexdev:packetevents:1.0.8'
 }
 ```
 
@@ -40,7 +40,7 @@ dependencies {
         <dependency>
             <groupId>com.github.purplexdev</groupId>
             <artifactId>packetevents</artifactId>
-            <version>1.0.6</version>
+            <version>1.0.8</version>
         </dependency>
 </dependencies>
 ```
@@ -50,14 +50,14 @@ dependencies {
 ```
 resolvers += "jitpack" at "https://jitpack.io"
 
-libraryDependencies += "com.github.purplexdev" % "packetevents" % "1.0.6"	
+libraryDependencies += "com.github.purplexdev" % "packetevents" % "1.0.8"	
 ```
 
 # leiningen
 ```
 :repositories [["jitpack" "https://jitpack.io"]]
 
-:dependencies [[com.github.purplexdev/packetevents "1.0.6"]]	
+:dependencies [[com.github.purplexdev/packetevents "1.0.8"]]	
 ```
 
 
