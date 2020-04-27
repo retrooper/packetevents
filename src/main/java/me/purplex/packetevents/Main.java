@@ -2,7 +2,6 @@ package me.purplex.packetevents;
 
 import com.comphenix.tinyprotocol.*;
 import io.netty.channel.Channel;
-import me.purplex.packetevents.enums.ServerVersion;
 import me.purplex.packetevents.events.packetevent.PacketSendEvent;
 import me.purplex.packetevents.events.packetevent.ServerTickEvent;
 import me.purplex.packetevents.events.packetevent.PacketReceiveEvent;

@@ -15,7 +15,6 @@ public enum ServerVersion
         for(ServerVersion val : vals) {
             String valName = val.name().substring(2).replace("_", ".");
             if(Bukkit.getBukkitVersion().contains(valName)) {
-                System.out.println(val + " we got");
                 return val;
             }
         }
