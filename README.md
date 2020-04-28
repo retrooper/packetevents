@@ -1,7 +1,5 @@
 # PacketEvents
-Listen to minecraft packets and send minecraft packets.
-
-Credit to TinyProtocol
+Listen to minecraft packets.
 
 PacketEvents coded by purplex.
 
