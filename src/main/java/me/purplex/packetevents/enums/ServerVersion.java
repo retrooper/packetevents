@@ -6,7 +6,7 @@ import org.bukkit.Bukkit;
 
 public enum ServerVersion
 {
-    v_1_8, v_1_8_3, v_1_8_8, v_1_9, v_1_9_4, v_1_10_2, v_1_11_1, v_1_11_2, v_1_12_1, v_1_12_2, v_1_13, v_1_13_2, v_1_14, v_1_14_1, v_1_15_1,
+    v_1_8, v_1_8_3, v_1_8_8, v_1_9, v_1_9_4, v_1_10, v_1_11, v_1_12, v_1_13, v_1_13_2, v_1_14, v_1_15,
     ERROR;
 
     public static ServerVersion getVersion() {
