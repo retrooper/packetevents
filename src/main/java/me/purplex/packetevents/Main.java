@@ -5,6 +5,7 @@ import me.purplex.packetevents.events.packetevent.ServerTickEvent;
 import me.purplex.packetevents.example.TestExample;
 import org.bukkit.Bukkit;
 import org.bukkit.event.*;
+import org.bukkit.event.player.PlayerChangedWorldEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -38,15 +39,17 @@ public class Main extends JavaPlugin implements Listener {
 
     @EventHandler
     public void onJoin(PlayerJoinEvent e) {
-        packetInjector.injectPlayer(e.getPlayer());
-
+        Bukkit.getScheduler().runTaskAsynchronously(this, new Runnable() {
+            @Override
+            public void run() {
+                packetInjector.injectPlayer(e.getPlayer());
+            }
+        });
     }
 
     @EventHandler
     public void onQuit(PlayerQuitEvent e) {
-
         packetInjector.uninjectPlayer(e.getPlayer());
-
     }
 
     public static Main getInstance() {
