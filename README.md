@@ -1,14 +1,17 @@
 # PacketEvents
-Listen to minecraft packets and send minecraft packets.
-
-Credit to TinyProtocol
+Listen to minecraft packets.
 
 PacketEvents coded by purplex.
 
 Coding help discord server: https://discord.gg/ZWTkg4v
 
-Examples can be found at
+Examples can be found in this class->
 me/purplex/packetevents/example/TestExample.java
+
+
+How to use with gradle, maven, sbt and leiningen.
+The last stable tested versions are displayed below. 
+Updated daily.
 
 # Gradle
 
@@ -21,7 +24,7 @@ allprojects {
 }
 
 dependencies {
-        implementation 'com.github.purplexdev:packetevents:1.0.9'
+        implementation 'com.github.purplexdev:packetevents:1.1.3'
 }
 ```
 
@@ -40,7 +43,7 @@ dependencies {
         <dependency>
             <groupId>com.github.purplexdev</groupId>
             <artifactId>packetevents</artifactId>
-            <version>1.0.9</version>
+            <version>1.1.3</version>
         </dependency>
 </dependencies>
 ```
@@ -50,14 +53,14 @@ dependencies {
 ```
 resolvers += "jitpack" at "https://jitpack.io"
 
-libraryDependencies += "com.github.purplexdev" % "packetevents" % "1.0.9"	
+libraryDependencies += "com.github.purplexdev" % "packetevents" % "1.1.3"	
 ```
 
 # leiningen
 ```
 :repositories [["jitpack" "https://jitpack.io"]]
 
-:dependencies [[com.github.purplexdev/packetevents "1.0.9"]]	
+:dependencies [[com.github.purplexdev/packetevents "1.1.3"]]	
 ```
 
 
