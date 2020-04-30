@@ -38,7 +38,7 @@ public class Main extends JavaPlugin implements Listener {
          * This is just an example
          */
 
-        //PacketEvents.getPacketManager().unregisterListener(new TestExample());
+        PacketEvents.getPacketManager().unregisterListener(new TestExample());
     }
 
     @EventHandler

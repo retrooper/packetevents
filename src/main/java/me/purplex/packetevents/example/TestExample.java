@@ -31,7 +31,7 @@ public class TestExample implements PacketListener {
                 final Entity entity = useEntity.getEntity();
                 if (useEntity.getEntityUseAction() == EntityUseAction.ATTACK) {
                     final double dist = entity.getLocation().distanceSquared(p.getLocation());
-                    p.sendMessage("dist: " + dist);
+                    //p.sendMessage("dist: " + dist);
                 }
                 break;
             case Packet.Client.ABILITIES:
