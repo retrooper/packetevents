@@ -5,14 +5,12 @@ PacketEvents coded by purplex.
 
 Coding help discord server: https://discord.gg/ZWTkg4v
 
-Examples can be found in this class->
-me/purplex/packetevents/example/TestExample.java
+Examples can be found in the TestExample class.
 
+[![](https://jitpack.io/v/purplexdev/packetevents.svg)](https://jitpack.io/#purplexdev/packetevents)
 
 How to use with gradle, maven, sbt and leiningen.
 The last stable tested versions are displayed below. 
-
-[![](https://jitpack.io/v/purplexdev/packetevents.svg)](https://jitpack.io/#purplexdev/packetevents)
 
 # Gradle
 
