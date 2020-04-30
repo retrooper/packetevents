@@ -1,7 +1,7 @@
 package me.purplex.packetevents;
 
 import me.purplex.packetevents.enums.ServerVersion;
-import me.purplex.packetevents.events.manager.PacketManager;
+import me.purplex.packetevents.packetmanager.PacketManager;
 
 public class PacketEvents {
     private static PacketManager packetManager;
