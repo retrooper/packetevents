@@ -11,8 +11,6 @@ me/purplex/packetevents/example/TestExample.java
 
 How to use with gradle, maven, sbt and leiningen.
 The last stable tested versions are displayed below. 
-Updated daily.
-
 
 [![](https://jitpack.io/v/purplexdev/packetevents.svg)](https://jitpack.io/#purplexdev/packetevents)
 
