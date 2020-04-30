@@ -1,4 +1,4 @@
-# PacketEvents
+# packetevents by purplex
 Listen to minecraft packets.
 
 PacketEvents coded by purplex.
@@ -24,7 +24,7 @@ allprojects {
 }
 
 dependencies {
-        implementation 'com.github.purplexdev:packetevents:1.1.3'
+        implementation 'com.github.purplexdev:packetevents:1.1.5'
 }
 ```
 
@@ -43,7 +43,7 @@ dependencies {
         <dependency>
             <groupId>com.github.purplexdev</groupId>
             <artifactId>packetevents</artifactId>
-            <version>1.1.3</version>
+            <version>1.1.5</version>
         </dependency>
 </dependencies>
 ```
@@ -53,14 +53,14 @@ dependencies {
 ```
 resolvers += "jitpack" at "https://jitpack.io"
 
-libraryDependencies += "com.github.purplexdev" % "packetevents" % "1.1.3"	
+libraryDependencies += "com.github.purplexdev" % "packetevents" % "1.1.5"	
 ```
 
 # leiningen
 ```
 :repositories [["jitpack" "https://jitpack.io"]]
 
-:dependencies [[com.github.purplexdev/packetevents "1.1.3"]]	
+:dependencies [[com.github.purplexdev/packetevents "1.1.5"]]	
 ```
 
 
