@@ -63,6 +63,7 @@ libraryDependencies += "com.github.purplexdev" % "packetevents" % "1.1.5"
 :dependencies [[com.github.purplexdev/packetevents "1.1.5"]]	
 ```
 
+[![](https://jitpack.io/v/purplexdev/packetevents.svg)](https://jitpack.io/#purplexdev/packetevents)
 
 
 
