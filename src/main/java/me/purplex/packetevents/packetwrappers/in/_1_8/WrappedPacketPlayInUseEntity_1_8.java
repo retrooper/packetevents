@@ -2,21 +2,18 @@ package me.purplex.packetevents.packetwrappers.in._1_8;
 
 import me.purplex.packetevents.enums.EntityUseAction;
 import me.purplex.packetevents.enums.ServerVersion;
+import me.purplex.packetevents.packetwrappers.api.WrappedVersionPacket;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.entity.Entity;
 
-public class WrappedPacketPlayInUseEntity_1_8 {
-    private final ServerVersion version;
+public class WrappedPacketPlayInUseEntity_1_8 extends WrappedVersionPacket {
     private Entity entity;
     private EntityUseAction action;
-    private final Object packet;
 
     public WrappedPacketPlayInUseEntity_1_8(Object packet) {
-        this.version = ServerVersion.getVersion();
-        this.packet = packet;
-        setupEntity();
-        setupAction();
+        super(packet);
+
     }
 
     private Object getRawPacket() {
@@ -29,6 +26,12 @@ public class WrappedPacketPlayInUseEntity_1_8 {
 
     public EntityUseAction getEntityUseAction() {
         return action;
+    }
+
+    @Override
+    protected void setup() {
+        setupEntity();
+        setupAction();
     }
 
     private void setupEntity() {

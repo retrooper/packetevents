@@ -1,5 +1,5 @@
 package me.purplex.packetevents.enums;
 
 public enum EntityUseAction {
-    INTERACT, INTERACT_AT, ATTACK, INVALID;
+    INTERACT, INTERACT_AT, ATTACK, INVALID
 }

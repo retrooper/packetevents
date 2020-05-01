@@ -2,6 +2,7 @@ package me.purplex.packetevents.packetwrappers.in._1_7_10;
 
 import me.purplex.packetevents.enums.EntityUseAction;
 import me.purplex.packetevents.enums.ServerVersion;
+import me.purplex.packetevents.packetwrappers.api.WrappedVersionPacket;
 import net.minecraft.server.v1_7_R4.Entity;
 import net.minecraft.server.v1_7_R4.PacketPlayInUseEntity;
 import net.minecraft.server.v1_7_R4.WorldServer;
@@ -9,17 +10,13 @@ import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.craftbukkit.v1_7_R4.CraftWorld;
 
-public class WrappedPacketPlayInUseEntity_1_7_10 {
-    private final ServerVersion version;
+public class WrappedPacketPlayInUseEntity_1_7_10 extends WrappedVersionPacket {
     private org.bukkit.entity.Entity entity;
     private EntityUseAction action;
-    private final Object packet;
 
     public WrappedPacketPlayInUseEntity_1_7_10(Object packet) {
-        this.version = ServerVersion.getVersion();
-        this.packet = packet;
-        setupEntity();
-        setupAction();
+        super(packet);
+        version = ServerVersion.getVersion();
     }
 
     private Object getRawPacket() {
@@ -34,20 +31,24 @@ public class WrappedPacketPlayInUseEntity_1_7_10 {
         return action;
     }
 
+    @Override
+    protected void setup() {
+        setupEntity();
+        setupAction();
+    }
+
     private void setupEntity() {
-        if (version == ServerVersion.v_1_8) {
-            PacketPlayInUseEntity packet = (PacketPlayInUseEntity) getRawPacket();
-            WorldServer worldServer = null;
-            for (World bukkitWorld : Bukkit.getWorlds()) {
-                CraftWorld craftWorld = (CraftWorld) bukkitWorld;
-                worldServer = craftWorld.getHandle();
-                if (packet.a(worldServer) != null) {
-                    break;
-                }
+        PacketPlayInUseEntity packet = (PacketPlayInUseEntity) getRawPacket();
+        WorldServer worldServer = null;
+        for (World bukkitWorld : Bukkit.getWorlds()) {
+            CraftWorld craftWorld = (CraftWorld) bukkitWorld;
+            worldServer = craftWorld.getHandle();
+            if (packet.a(worldServer) != null) {
+                break;
             }
-            Entity entity = packet.a(worldServer);
-            this.entity = entity.getBukkitEntity();
         }
+        Entity entity = packet.a(worldServer);
+        this.entity = entity.getBukkitEntity();
     }
 
     private void setupAction() {

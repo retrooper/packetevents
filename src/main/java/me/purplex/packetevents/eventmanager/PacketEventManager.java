@@ -9,13 +9,13 @@ import me.purplex.packetevents.events.packetevent.PacketSendEvent;
 import java.util.LinkedList;
 
 public interface PacketEventManager {
-    public LinkedList<PacketListener> packetListeners = new LinkedList<>();
-    public void callEvent(PacketEvent e);
+    LinkedList<PacketListener> packetListeners = new LinkedList<>();
+    void callEvent(PacketEvent e);
 
-    public void registerListener(PacketListener e);
-    public void unregisterListener(PacketListener e);
+    void registerListener(PacketListener e);
+    void unregisterListener(PacketListener e);
 
-    public void unregisterAllListeners(PacketListener e);
+    void unregisterAllListeners(PacketListener e);
 
 
 

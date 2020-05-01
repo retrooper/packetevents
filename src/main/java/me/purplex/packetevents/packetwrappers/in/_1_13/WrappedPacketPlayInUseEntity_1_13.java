@@ -1,32 +1,22 @@
 package me.purplex.packetevents.packetwrappers.in._1_13;
 
 import me.purplex.packetevents.enums.EntityUseAction;
-import me.purplex.packetevents.enums.ServerVersion;
+import me.purplex.packetevents.packetwrappers.api.WrappedVersionPacket;
+import net.minecraft.server.v1_13_R1.Entity;
 import net.minecraft.server.v1_13_R1.PacketPlayInUseEntity;
 import net.minecraft.server.v1_13_R1.WorldServer;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.craftbukkit.v1_13_R1.CraftWorld;
-import org.bukkit.entity.Entity;
 
-public class WrappedPacketPlayInUseEntity_1_13 {
-    private final ServerVersion version;
-    private Entity entity;
+public class WrappedPacketPlayInUseEntity_1_13 extends WrappedVersionPacket {
+    private org.bukkit.entity.Entity entity;
     private EntityUseAction action;
-    private final Object packet;
 
     public WrappedPacketPlayInUseEntity_1_13(Object packet) {
-        this.version = ServerVersion.getVersion();
-        this.packet = packet;
-        setupEntity();
-        setupAction();
+       super(packet);
     }
-
-    private Object getRawPacket() {
-        return this.packet;
-    }
-
-    public Entity getEntity() {
+    public org.bukkit.entity.Entity getEntity() {
         return entity;
     }
 
@@ -34,24 +24,30 @@ public class WrappedPacketPlayInUseEntity_1_13 {
         return action;
     }
 
+    @Override
+    protected void setup() {
+        setupEntity();
+        setupAction();
+    }
+
     private void setupEntity() {
-        PacketPlayInUseEntity packet = (PacketPlayInUseEntity) getRawPacket();
+        PacketPlayInUseEntity p = (PacketPlayInUseEntity) packet;
         WorldServer worldServer = null;
         for (World bukkitWorld : Bukkit.getWorlds()) {
             CraftWorld craftWorld = (CraftWorld) bukkitWorld;
             worldServer = craftWorld.getHandle();
-            if (packet.a(worldServer) != null) {
+            if (p.a(worldServer) != null) {
                 break;
             }
         }
-        net.minecraft.server.v1_13_R1.Entity entity = packet.a(worldServer);
+        Entity entity = p.a(worldServer);
         this.entity = entity.getBukkitEntity();
 
     }
 
     private void setupAction() {
-        PacketPlayInUseEntity packet = (PacketPlayInUseEntity) getRawPacket();
-        String name = packet.b().name();
+        PacketPlayInUseEntity p = (PacketPlayInUseEntity) packet;
+        String name = p.b().name();
         this.action = EntityUseAction.valueOf(name);
     }
 }

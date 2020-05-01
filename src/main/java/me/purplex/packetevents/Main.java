@@ -4,6 +4,7 @@ import me.purplex.packetevents.customlistener.injector.PacketInjector;
 import me.purplex.packetevents.events.packetevent.ServerTickEvent;
 import me.purplex.packetevents.example.TestExample;
 import org.bukkit.Bukkit;
+import org.bukkit.entity.Player;
 import org.bukkit.event.*;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
@@ -59,6 +60,5 @@ public class Main extends JavaPlugin implements Listener {
     public static Main getInstance() {
         return instance;
     }
-
 
 }

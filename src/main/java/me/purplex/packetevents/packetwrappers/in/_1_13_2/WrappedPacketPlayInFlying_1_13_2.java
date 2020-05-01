@@ -1,12 +1,11 @@
 package me.purplex.packetevents.packetwrappers.in._1_13_2;
 
+import me.purplex.packetevents.packetwrappers.api.WrappedVersionPacket;
 import net.minecraft.server.v1_13_R2.PacketPlayInFlying;
 
 import java.lang.reflect.Field;
 
-public class WrappedPacketPlayInFlying_1_13_2 {
-    private final Object packet;
-
+public class WrappedPacketPlayInFlying_1_13_2 extends WrappedVersionPacket {
     public double x;
     public double y;
     public double z;
@@ -15,38 +14,44 @@ public class WrappedPacketPlayInFlying_1_13_2 {
     public boolean f;
     public boolean hasPos;
     public boolean hasLook;
+
     public WrappedPacketPlayInFlying_1_13_2(Object packet) {
-        this.packet = packet;
+        super(packet);
+    }
+
+    @Override
+    protected void setup() {
+        PacketPlayInFlying p = (PacketPlayInFlying) packet;
         try {
-            setupFields();
+            this.hasPos = fieldHasPos.getBoolean(p);
+            this.hasLook = fieldHasLook.getBoolean(p);
         } catch (IllegalAccessException e) {
             e.printStackTrace();
         }
-    }
-
-
-
-    private void setupFields() throws IllegalAccessException {
-        PacketPlayInFlying p = (PacketPlayInFlying) packet;
-        this.hasPos = fieldHasPos.getBoolean(p);
-        this.hasLook = fieldHasLook.getBoolean(p);
         if (hasPos) {
             this.x = p.a(0.0D);
             this.y = p.b(0.0D);
             this.z = p.c(0.0D);
         } else {
-            this.x = fieldX.getDouble(p);
-            this.y = fieldY.getDouble(p);
-            this.z = fieldZ.getDouble(p);
+            try {
+                this.x = fieldX.getDouble(p);
+                this.y = fieldY.getDouble(p);
+                this.z = fieldZ.getDouble(p);
+            } catch (IllegalAccessException e) {
+                e.printStackTrace();
+            }
         }
 
         if (hasLook) {
             this.yaw = p.a(0.0F);
             this.pitch = p.b(0.0F);
-        }
-        else {
-            this.yaw = fieldYaw.getFloat(p);
-            this.pitch = fieldPitch.getFloat(p);
+        } else {
+            try {
+                this.yaw = fieldYaw.getFloat(p);
+                this.pitch = fieldPitch.getFloat(p);
+            } catch (IllegalAccessException e) {
+                e.printStackTrace();
+            }
         }
         this.f = p.a();
     }
@@ -78,40 +83,19 @@ public class WrappedPacketPlayInFlying_1_13_2 {
     static {
         try {
             fieldHasPos = PacketPlayInFlying.class.getDeclaredField("hasPos");
-        } catch (NoSuchFieldException e) {
-            e.printStackTrace();
-        }
-        try {
+            fieldHasPos.setAccessible(true);
             fieldHasLook = PacketPlayInFlying.class.getDeclaredField("hasLook");
-        } catch (NoSuchFieldException e) {
-            e.printStackTrace();
-        }
-        try {
-            fieldX = PacketPlayInFlying.class.getDeclaredField("x");
-        } catch (NoSuchFieldException e) {
-            e.printStackTrace();
-        }
-
-        try {
+            fieldHasLook.setAccessible(true);
             fieldY = PacketPlayInFlying.class.getDeclaredField("y");
-        } catch (NoSuchFieldException e) {
-            e.printStackTrace();
-        }
-
-        try {
+            fieldY.setAccessible(true);
+            fieldX = PacketPlayInFlying.class.getDeclaredField("x");
+            fieldX.setAccessible(true);
             fieldZ = PacketPlayInFlying.class.getDeclaredField("z");
-        } catch (NoSuchFieldException e) {
-            e.printStackTrace();
-        }
-
-        try {
-            fieldYaw = PacketPlayInFlying.class.getDeclaredField("yaw");
-        } catch (NoSuchFieldException e) {
-            e.printStackTrace();
-        }
-
-        try {
+            fieldZ.setAccessible(true);
             fieldPitch = PacketPlayInFlying.class.getDeclaredField("pitch");
+            fieldPitch.setAccessible(true);
+            fieldYaw = PacketPlayInFlying.class.getDeclaredField("yaw");
+            fieldYaw.setAccessible(true);
         } catch (NoSuchFieldException e) {
             e.printStackTrace();
         }

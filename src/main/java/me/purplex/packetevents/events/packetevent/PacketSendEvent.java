@@ -9,12 +9,9 @@ public class PacketSendEvent extends PacketEvent {
     private final Player player;
     private final String name;
     private final Object packet;
-    private final long timestamp;
     private boolean cancelled;
-    public final ServerVersion version;
 
     public PacketSendEvent(Player player, String packetName, Object packet) {
-        this.version = PacketEvents.getServerVersion();
         this.player = player;
         this.name = packetName;
         this.packet = packet;
@@ -38,12 +35,6 @@ public class PacketSendEvent extends PacketEvent {
      */
     public Object getPacket() {
         return this.packet;
-    }
-
-
-
-    public long getTimestamp() {
-        return timestamp;
     }
 
 

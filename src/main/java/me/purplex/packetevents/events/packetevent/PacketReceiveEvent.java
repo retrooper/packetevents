@@ -10,12 +10,9 @@ public class PacketReceiveEvent extends PacketEvent {
     private final Player player;
     private final String name;
     private final Object packet;
-    private final long timestamp;
     private boolean cancelled;
-    public final ServerVersion version;
 
     public PacketReceiveEvent(Player player, String packetName, Object packet) {
-        this.version = PacketEvents.getServerVersion();
         this.player = player;
         this.name = packetName;
         this.packet = packet;
@@ -48,15 +45,6 @@ public class PacketReceiveEvent extends PacketEvent {
      */
     public Object getPacket() {
         return this.packet;
-    }
-
-    /**
-     * The time the packet was received(ms)
-     *
-     * @return
-     */
-    public long getTimestamp() {
-        return timestamp;
     }
 
     /**

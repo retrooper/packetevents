@@ -1,16 +1,16 @@
 package me.purplex.packetevents.packetwrappers.in._1_7_10;
 
 import me.purplex.packetevents.enums.PlayerDigType;
+import me.purplex.packetevents.packetwrappers.api.WrappedVersionPacket;
 import net.minecraft.server.v1_7_R4.PacketPlayInBlockDig;
 
-public class WrappedPacketPlayInBlockDig_1_7_10 {
-    private final Object packet;
+public class WrappedPacketPlayInBlockDig_1_7_10 extends WrappedVersionPacket {
     public WrappedPacketPlayInBlockDig_1_7_10(Object packet) {
-        this.packet = packet;
-        setupDigType();
+        super(packet);
     }
 
-    private void setupDigType() {
+    @Override
+    protected void setup() {
         PacketPlayInBlockDig p = (PacketPlayInBlockDig)packet;
         int status = p.e();
         this.digType = PlayerDigType.values()[status];

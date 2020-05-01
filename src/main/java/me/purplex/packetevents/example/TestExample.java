@@ -24,6 +24,7 @@ public class TestExample implements PacketListener {
     @PacketHandler
     public void onPacketReceive(PacketReceiveEvent e) {
         final Player p = e.getPlayer();
+        final long timestamp = e.getTimestamp();
         //ONLY CLIENT PACKETS ALLOWED HERE!
         switch (e.getPacketName()) {
             case Packet.Client.USE_ENTITY:

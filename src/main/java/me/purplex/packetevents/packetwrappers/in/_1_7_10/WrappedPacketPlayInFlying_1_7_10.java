@@ -1,12 +1,11 @@
 package me.purplex.packetevents.packetwrappers.in._1_7_10;
 
+import me.purplex.packetevents.packetwrappers.api.WrappedVersionPacket;
 import net.minecraft.server.v1_7_R4.PacketPlayInFlying;
 
-public class WrappedPacketPlayInFlying_1_7_10 {
-    private final Object packet;
+public class WrappedPacketPlayInFlying_1_7_10 extends WrappedVersionPacket {
     public WrappedPacketPlayInFlying_1_7_10(Object packet) {
-        this.packet = packet;
-        setupFields();
+        super(packet);
     }
 
     public double x;
@@ -19,7 +18,8 @@ public class WrappedPacketPlayInFlying_1_7_10 {
     public boolean hasLook;
 
 
-    private void setupFields() {
+    @Override
+    protected void setup() {
         PacketPlayInFlying p = (PacketPlayInFlying)packet;
         this.x = p.c();
         this.y = p.d();

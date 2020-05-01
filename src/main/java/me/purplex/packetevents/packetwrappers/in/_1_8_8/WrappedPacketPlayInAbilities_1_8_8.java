@@ -1,32 +1,27 @@
 package me.purplex.packetevents.packetwrappers.in._1_8_8;
 
+import me.purplex.packetevents.packetwrappers.api.WrappedVersionPacket;
 import net.minecraft.server.v1_8_R3.PacketPlayInAbilities;
 
 import java.lang.Object;
 import java.lang.reflect.Field;
 
-public class WrappedPacketPlayInAbilities_1_8_8 {
-    private final Object packet;
+public class WrappedPacketPlayInAbilities_1_8_8 extends WrappedVersionPacket {
 
-    private Field fieldE;
-    private Field fieldF;
+    public boolean a;
+    public boolean b;
+    public boolean c;
+    public boolean d;
+    public float e;
+    public float f;
+
     public WrappedPacketPlayInAbilities_1_8_8(Object packet) {
-        this.packet = packet;
-        try {
-            this.fieldE = PacketPlayInAbilities.class.getDeclaredField("e");
-        } catch (NoSuchFieldException e) {
-            e.printStackTrace();
-        }
-        try {
-            this.fieldF = PacketPlayInAbilities.class.getDeclaredField("f");
-        } catch (NoSuchFieldException e) {
-            e.printStackTrace();
-        }
-        setupFields();
+        super(packet);
     }
 
 
-    private void setupFields() {
+    @Override
+    protected void setup() {
         PacketPlayInAbilities p = (PacketPlayInAbilities) packet;
         this.a = p.a();
         this.b = p.isFlying();
@@ -44,10 +39,17 @@ public class WrappedPacketPlayInAbilities_1_8_8 {
         }
     }
 
-    public boolean a;
-    public boolean b;
-    public boolean c;
-    public boolean d;
-    public float e;
-    public float f;
+    private static Field fieldE;
+    private static Field fieldF;
+
+    static {
+        try {
+            fieldE = PacketPlayInAbilities.class.getDeclaredField("e");
+            fieldE.setAccessible(true);
+            fieldF = PacketPlayInAbilities.class.getDeclaredField("f");
+            fieldF.setAccessible(true);
+        } catch (NoSuchFieldException e) {
+            e.printStackTrace();
+        }
+    }
 }

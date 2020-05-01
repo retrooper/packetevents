@@ -1,18 +1,17 @@
 package me.purplex.packetevents.packetwrappers.in._1_7_10;
 
+import me.purplex.packetevents.packetwrappers.api.WrappedVersionPacket;
 import net.minecraft.server.v1_7_R4.PacketPlayInAbilities;
 
 
-public class WrappedPacketPlayInAbilities_1_7_10 {
-    private final Object packet;
-
+public class WrappedPacketPlayInAbilities_1_7_10 extends WrappedVersionPacket {
     public WrappedPacketPlayInAbilities_1_7_10(Object packet) {
-        this.packet = packet;
-        setupFields();
+        super(packet);
     }
 
 
-    private void setupFields() {
+    @Override
+    protected void setup() {
         PacketPlayInAbilities p = (PacketPlayInAbilities) packet;
         this.a = p.c();
         this.b = p.isFlying();
