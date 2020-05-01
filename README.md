@@ -9,7 +9,8 @@ Licensed with the GPL3 license.
 Coding help discord server: https://discord.gg/ZWTkg4v
 
 How to use with **Gradle, Maven, sbt and leiningen**.
-The last stable tested versions are displayed below. 
+
+The lastest stable tested versions are displayed below. 
 
 [![](https://jitpack.io/v/purplexdev/packetevents.svg)](https://jitpack.io/#purplexdev/packetevents)
 
