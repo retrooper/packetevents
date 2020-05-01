@@ -1,16 +1,18 @@
 # packetevents by purplex
-Listen to minecraft packets.
 
-PacketEvents coded by purplex.
+PacketListener coded by purplex.
+
+Licensed with the GPL3 license.
+
+License: GPL v3
+[![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
 
 Coding help discord server: https://discord.gg/ZWTkg4v
 
-Examples can be found in the TestExample class.
-
-[![](https://jitpack.io/v/purplexdev/packetevents.svg)](https://jitpack.io/#purplexdev/packetevents)
-
 How to use with gradle, maven, sbt and leiningen.
 The last stable tested versions are displayed below. 
+
+[![](https://jitpack.io/v/purplexdev/packetevents.svg)](https://jitpack.io/#purplexdev/packetevents)
 
 # Gradle
 
