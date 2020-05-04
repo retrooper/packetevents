@@ -1,4 +1,4 @@
-package me.purplex.packetevents.packets;
+package me.purplex.packetevents.packetevent.packet;
 
 public abstract class Packet {
     public static class Client {

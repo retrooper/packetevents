@@ -1,7 +1,7 @@
-package me.purplex.packetevents.events.packetevent;
+package me.purplex.packetevents.packetevent.impl;
 
-import me.purplex.packetevents.events.PacketEvent;
 
+import me.purplex.packetevents.packetevent.PacketEvent;
 
 public class ServerTickEvent extends PacketEvent {
 

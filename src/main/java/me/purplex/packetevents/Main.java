@@ -1,10 +1,9 @@
 package me.purplex.packetevents;
 
-import me.purplex.packetevents.customlistener.injector.PacketInjector;
-import me.purplex.packetevents.events.packetevent.ServerTickEvent;
+import me.purplex.packetevents.injector.PacketInjector;
+import me.purplex.packetevents.packetevent.impl.ServerTickEvent;
 import me.purplex.packetevents.example.TestExample;
 import org.bukkit.Bukkit;
-import org.bukkit.entity.Player;
 import org.bukkit.event.*;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
@@ -19,9 +18,10 @@ public class Main extends JavaPlugin implements Listener {
     public void onEnable() {
         instance = this;
         Bukkit.getPluginManager().registerEvents(this, this);
-        packetInjector = new PacketInjector();
-        PacketEvents.getPacketManager().registerListener(new TestExample());
 
+        packetInjector = new PacketInjector();
+        //PacketEvents.getPacketManager().registerListener(new TestExample());
+//Bukkit.getPluginManager().registerEvents(new TestExample(),this);
         Bukkit.getScheduler().scheduleAsyncRepeatingTask(this, new Runnable() {
             @Override
             public void run() {
@@ -35,11 +35,11 @@ public class Main extends JavaPlugin implements Listener {
     @Override
     public void onDisable() {
         /**
-         * You don't need to unregister all events when the server shutsdown,
+         * You don't need to unregister all events when the plugin disables,
          * This is just an example
          */
 
-        PacketEvents.getPacketManager().unregisterListener(new TestExample());
+        //PacketEvents.getPacketManager().unregisterListener(new TestExample());
     }
 
     @EventHandler

@@ -1,22 +1,32 @@
 package me.purplex.packetevents.example;
 
+import me.purplex.packetevents.PacketEvents;
 import me.purplex.packetevents.enums.EntityUseAction;
 import me.purplex.packetevents.enums.PlayerDigType;
-import me.purplex.packetevents.enums.ServerVersion;
-import me.purplex.packetevents.events.packetevent.ServerTickEvent;
-import me.purplex.packetevents.events.handler.PacketHandler;
-import me.purplex.packetevents.events.listener.PacketListener;
-import me.purplex.packetevents.events.packetevent.*;
+import me.purplex.packetevents.packetevent.PacketEvent;
+import me.purplex.packetevents.packetevent.impl.PacketReceiveEvent;
+import me.purplex.packetevents.packetevent.impl.PacketSendEvent;
+import me.purplex.packetevents.packetevent.impl.ServerTickEvent;
+import me.purplex.packetevents.packetevent.handler.PacketHandler;
+import me.purplex.packetevents.packetevent.listener.PacketListener;
+import me.purplex.packetevents.packetevent.packet.Packet;
 import me.purplex.packetevents.packetwrappers.in.*;
-import me.purplex.packetevents.packets.Packet;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.Listener;
+import org.bukkit.event.player.PlayerMoveEvent;
 
-public class TestExample implements PacketListener {
+public class TestExample implements PacketListener, Listener {
     /**
      * How to register a packet listener?
      * <p>
-     * PacketEvents.getPacketManager().registerPacketListener(new TestExample());
+     * PacketEvents.getPacketManager().registerListener(new TestExample());
+     */
+
+    /**
+     * How to unregister a packet listener?
+     * PacketEvents.getPacketManager().unregisterListener(new TestExample());
      */
 
     private int tick;
@@ -43,7 +53,6 @@ public class TestExample implements PacketListener {
                 final boolean d = abilities.d;
                 final float eFloat = abilities.e;
                 final float fFloat = abilities.f;
-                //just like the 1.8 NMS classes.
                 break;
             case Packet.Client.BLOCK_DIG:
                 final WrappedPacketPlayInBlockDig blockDig = new WrappedPacketPlayInBlockDig(e.getPacket());
@@ -69,16 +78,39 @@ public class TestExample implements PacketListener {
         }
     }
 
+    @PacketHandler
+    public void onPacket(PacketEvent e) {
+        if(e instanceof PacketSendEvent) {
+            PacketSendEvent p = (PacketSendEvent)e;
+            onPacketSend(p);
+        }
+    }
+
+    private void onPacketSend(PacketSendEvent e) {
+        //code
+    }
+
+    @EventHandler
+    public void onMove(PlayerMoveEvent e) {
+        CustomMoveEvent customMoveEvent = new CustomMoveEvent(e.getPlayer(),e.getTo(), e.getFrom());
+        e.setCancelled(customMoveEvent.isCancelled());
+        PacketEvents.getPacketManager().callEvent(customMoveEvent);
+
+        if(e.getTo() != customMoveEvent.getTo()) {
+            e.setTo(customMoveEvent.getTo());
+        }
+        if(e.getFrom() != customMoveEvent.getFrom()) {
+            e.setFrom(customMoveEvent.getFrom());
+        }
+    }
 
     @PacketHandler
     public void onServerTick(ServerTickEvent e) {
-        //CALLED EVERY TICK
-        tick++;
+
         if (tick % 20 == 0) {
-            /*for (Player p : Bukkit.getOnlinePlayers()) {
-                p.sendMessage("One second has passed!");
-            }*/
+           //one tick passed
         }
+        tick++;
     }
 
 }

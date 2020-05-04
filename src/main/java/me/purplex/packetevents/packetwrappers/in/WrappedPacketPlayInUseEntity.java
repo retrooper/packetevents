@@ -17,6 +17,7 @@ import me.purplex.packetevents.packetwrappers.in._1_8_8.WrappedPacketPlayInUseEn
 import me.purplex.packetevents.packetwrappers.in._1_9.WrappedPacketPlayInUseEntity_1_9;
 import me.purplex.packetevents.packetwrappers.in._1_9_4.WrappedPacketPlayInUseEntity_1_9_4;
 import org.bukkit.entity.Entity;
+import org.bukkit.entity.Player;
 
 public class WrappedPacketPlayInUseEntity extends WrappedPacket {
 
@@ -34,6 +35,7 @@ public class WrappedPacketPlayInUseEntity extends WrappedPacket {
     public EntityUseAction getEntityUseAction() {
         return action;
     }
+
 
     @Override
     protected void setup() {

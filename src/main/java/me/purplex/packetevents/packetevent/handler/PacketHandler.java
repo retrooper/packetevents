@@ -1,4 +1,4 @@
-package me.purplex.packetevents.events.handler;
+package me.purplex.packetevents.packetevent.handler;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -7,6 +7,10 @@ import java.lang.annotation.Target;
 
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
+/**
+ * Just like Bukkit's @EventHandler, but for packets.
+ * Make sure your class implements the PacketListener interface, and is registered!
+ */
 public @interface PacketHandler {
 
 

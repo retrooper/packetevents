@@ -1,8 +1,6 @@
-package me.purplex.packetevents.events.packetevent;
+package me.purplex.packetevents.packetevent.impl;
 
-import me.purplex.packetevents.PacketEvents;
-import me.purplex.packetevents.enums.ServerVersion;
-import me.purplex.packetevents.events.PacketEvent;
+import me.purplex.packetevents.packetevent.PacketEvent;
 import org.bukkit.entity.Player;
 
 public class PacketSendEvent extends PacketEvent {

@@ -1,4 +1,4 @@
-package me.purplex.packetevents.events;
+package me.purplex.packetevents.packetevent;
 
 
 import me.purplex.packetevents.enums.ServerVersion;
