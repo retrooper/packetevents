@@ -1,6 +1,6 @@
 package me.purplex.packetevents.packetwrappers.in._1_9_4;
 
-import me.purplex.packetevents.packetwrappers.api.WrappedVersionPacket;
+import me.purplex.packetevents.packetwrappers.api.version.WrappedVersionPacket;
 import net.minecraft.server.v1_9_R2.PacketPlayInFlying;
 
 import java.lang.reflect.Field;

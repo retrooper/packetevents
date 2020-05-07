@@ -3,7 +3,6 @@ package me.purplex.packetevents.packetwrappers.in;
 
 import me.purplex.packetevents.enums.ServerVersion;
 import me.purplex.packetevents.packetwrappers.api.WrappedPacket;
-import me.purplex.packetevents.packetwrappers.api.WrappedVersionPacket;
 import me.purplex.packetevents.packetwrappers.in._1_10.WrappedPacketPlayInAbilities_1_10;
 import me.purplex.packetevents.packetwrappers.in._1_11.WrappedPacketPlayInAbilities_1_11;
 import me.purplex.packetevents.packetwrappers.in._1_12.WrappedPacketPlayInAbilities_1_12;

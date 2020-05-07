@@ -1,4 +1,4 @@
-package me.purplex.packetevents.packetwrappers.api;
+package me.purplex.packetevents.packetwrappers.api.version;
 
 import me.purplex.packetevents.enums.ServerVersion;
 

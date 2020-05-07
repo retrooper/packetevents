@@ -1,6 +1,6 @@
 package me.purplex.packetevents.packetwrappers.in._1_7_10;
 
-import me.purplex.packetevents.packetwrappers.api.WrappedVersionPacket;
+import me.purplex.packetevents.packetwrappers.api.version.WrappedVersionPacket;
 import net.minecraft.server.v1_7_R4.PacketPlayInFlying;
 
 public class WrappedPacketPlayInFlying_1_7_10 extends WrappedVersionPacket {

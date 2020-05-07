@@ -1,7 +1,7 @@
 package me.purplex.packetevents.packetwrappers.in._1_14;
 
 import me.purplex.packetevents.enums.PlayerDigType;
-import me.purplex.packetevents.packetwrappers.api.WrappedVersionPacket;
+import me.purplex.packetevents.packetwrappers.api.version.WrappedVersionPacket;
 import net.minecraft.server.v1_14_R1.PacketPlayInBlockDig;
 
 public class WrappedPacketPlayInBlockDig_1_14 extends WrappedVersionPacket {

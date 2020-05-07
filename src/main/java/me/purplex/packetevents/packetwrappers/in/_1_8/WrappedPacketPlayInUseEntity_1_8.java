@@ -2,7 +2,7 @@ package me.purplex.packetevents.packetwrappers.in._1_8;
 
 import me.purplex.packetevents.enums.EntityUseAction;
 import me.purplex.packetevents.enums.ServerVersion;
-import me.purplex.packetevents.packetwrappers.api.WrappedVersionPacket;
+import me.purplex.packetevents.packetwrappers.api.version.WrappedVersionPacket;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.entity.Entity;

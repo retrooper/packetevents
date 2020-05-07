@@ -1,7 +1,7 @@
 package me.purplex.packetevents.packetwrappers.in._1_8_8;
 
 import me.purplex.packetevents.enums.EntityUseAction;
-import me.purplex.packetevents.packetwrappers.api.WrappedVersionPacket;
+import me.purplex.packetevents.packetwrappers.api.version.WrappedVersionPacket;
 import net.minecraft.server.v1_8_R3.Entity;
 import net.minecraft.server.v1_8_R3.PacketPlayInUseEntity;
 import net.minecraft.server.v1_8_R3.WorldServer;

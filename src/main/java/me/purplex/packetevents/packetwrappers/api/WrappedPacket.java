@@ -13,7 +13,16 @@ public class WrappedPacket {
         setup();
     }
 
+   /* public WrappedPacket(String name, PacketData data) {
+        String packetName = "PacketPlayOut" + name;
+        
+    }*/
+
     protected void setup() {
 
+    }
+
+    public Object getPacket() {
+        return packet;
     }
 }

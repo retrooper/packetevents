@@ -7,6 +7,8 @@ import me.purplex.packetevents.packetevent.handler.PacketHandler;
 import me.purplex.packetevents.packetevent.listener.PacketListener;
 import me.purplex.packetevents.packetevent.impl.PacketReceiveEvent;
 import me.purplex.packetevents.packetevent.impl.PacketSendEvent;
+import me.purplex.packetevents.packetwrappers.api.WrappedPacket;
+import org.bukkit.entity.Player;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -48,5 +50,10 @@ public class PacketManager implements PacketEventManager {
     public void unregisterAllListeners(PacketListener e) {
         this.packetListeners.clear();
     }
+
+    /*@Override
+    public void sendPacket(Player player, WrappedPacket packet) {
+
+    }*/
 
 }
