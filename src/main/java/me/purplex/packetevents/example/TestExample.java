@@ -11,6 +11,7 @@ import me.purplex.packetevents.packetevent.handler.PacketHandler;
 import me.purplex.packetevents.packetevent.listener.PacketListener;
 import me.purplex.packetevents.packetevent.packet.Packet;
 import me.purplex.packetevents.packetwrappers.in.*;
+import org.bukkit.Location;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -31,6 +32,10 @@ public class TestExample implements PacketListener, Listener {
 
     private int tick;
 
+    /**
+     * Only listen to the onPacketReceive
+     * @param e
+     */
     @PacketHandler
     public void onPacketReceive(PacketReceiveEvent e) {
         final Player p = e.getPlayer();
@@ -79,17 +84,40 @@ public class TestExample implements PacketListener, Listener {
     }
 
     @PacketHandler
+    public void onPacketSend(PacketSendEvent e) {
+
+    }
+
+    @PacketHandler
+    public void onCustomMove(CustomMoveEvent e) {
+
+    }
+
+    /**
+     * Another way to listen to packets
+     * @param e
+     */
+    @PacketHandler
     public void onPacket(PacketEvent e) {
         if(e instanceof PacketSendEvent) {
-            PacketSendEvent p = (PacketSendEvent)e;
-            onPacketSend(p);
+            final PacketSendEvent p = (PacketSendEvent)e;
+            final Player targetPlayer = p.getPlayer();
+            final Object rawNMSPacket = p.getPacket();
+            final long timestamp = p.getTimestamp();
+        }
+        else if(e instanceof CustomMoveEvent){
+            final CustomMoveEvent event = (CustomMoveEvent)e;
+            final Player player = event.getPlayer();
+            final Location to = event.getTo();
+            final Location from = event.getFrom();
         }
     }
 
-    private void onPacketSend(PacketSendEvent e) {
-        //code
-    }
 
+    /**
+     * Update the CustomMoveEvent event
+     * @param e
+     */
     @EventHandler
     public void onMove(PlayerMoveEvent e) {
         CustomMoveEvent customMoveEvent = new CustomMoveEvent(e.getPlayer(),e.getTo(), e.getFrom());
@@ -104,6 +132,10 @@ public class TestExample implements PacketListener, Listener {
         }
     }
 
+    /**
+     * Only listen to server tick
+     * @param e
+     */
     @PacketHandler
     public void onServerTick(ServerTickEvent e) {
 
