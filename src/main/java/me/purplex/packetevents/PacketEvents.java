@@ -35,7 +35,7 @@ public class PacketEvents implements Listener {
     }
 
     @Deprecated
-    public static void setup(JavaPlugin plugin, boolean serverTickEventEnabled) {
+    public static void setup(final JavaPlugin plugin, final boolean serverTickEventEnabled) {
         serverTickEventActive = serverTickEventEnabled;
         Bukkit.getPluginManager().registerEvents(getInstance(), plugin);
 
@@ -50,7 +50,7 @@ public class PacketEvents implements Listener {
     }
 
     @Deprecated
-    public static void cleanup(JavaPlugin plugin) {
+    public static void cleanup() {
         if (serverTickEventActive) {
             serverTickTask.cancel();
         }
