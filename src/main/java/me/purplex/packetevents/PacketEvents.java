@@ -12,13 +12,11 @@ import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitTask;
-import java.text.DecimalFormat;
 import java.util.concurrent.*;
 
 public class PacketEvents implements Listener {
     private static ServerVersion version = ServerVersion.getVersion();
     private static PacketEvents instance;
-    private static final DecimalFormat decimalFormat = new DecimalFormat("##.##");
     private static PacketInjector packetInjector = new PacketInjector();
     public static ExecutorService executor = Executors.newCachedThreadPool();
     private static final PacketManager packetManager = new PacketManager();
