@@ -18,6 +18,10 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerMoveEvent;
 
+/**
+ * Implementing PacketListener to listen to packets and packetevents' custom events.
+ * Implementing org.bukkit.event.Listener to listen to bukkit's events
+ */
 public class TestExample implements PacketListener, Listener {
     /**
      * How to register a packet listener?
