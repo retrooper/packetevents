@@ -44,13 +44,14 @@ public class TestExample implements PacketListener, Listener {
         switch (e.getPacketName()) {
             case Packet.Client.USE_ENTITY:
                 final WrappedPacketPlayInUseEntity useEntity = new WrappedPacketPlayInUseEntity(e.getPacket());
-                final Entity entity = useEntity.getEntity();
-                if (useEntity.getEntityUseAction() == EntityUseAction.ATTACK) {
+                final Entity entity = useEntity.entity;
+                if (useEntity.action == EntityUseAction.ATTACK) {
                     final double dist = entity.getLocation().distanceSquared(p.getLocation());
                     //p.sendMessage("dist: " + dist);
                 }
                 break;
             case Packet.Client.ABILITIES:
+                //1.8 packet style
                 final WrappedPacketPlayInAbilities abilities = new WrappedPacketPlayInAbilities(e.getPacket());
                 final boolean a = abilities.a;
                 final boolean b = abilities.b;
@@ -60,8 +61,9 @@ public class TestExample implements PacketListener, Listener {
                 final float fFloat = abilities.f;
                 break;
             case Packet.Client.BLOCK_DIG:
+                //Custom PlayerDigType enum
                 final WrappedPacketPlayInBlockDig blockDig = new WrappedPacketPlayInBlockDig(e.getPacket());
-                final PlayerDigType type = blockDig.getPlayerDigType();
+                final PlayerDigType type = blockDig.digType;
                 break;
             case Packet.Client.FLYING:
                 final WrappedPacketPlayInFlying flying = new WrappedPacketPlayInFlying(e.getPacket());
@@ -80,12 +82,18 @@ public class TestExample implements PacketListener, Listener {
                         new WrappedPacketPlayInFlying.WrappedPacketPlayInPosition_Look(e.getPacket());
                 final boolean isLook = position_look.hasLook; //true
                 break;
+            case Packet.Client.CHAT:
+                final WrappedPacketPlayInChat chat = new WrappedPacketPlayInChat(e.getPacket());
+                final String message = chat.message;
+                //System.out.println("YOU SAID: " + message);
         }
     }
 
     @PacketHandler
     public void onPacketSend(PacketSendEvent e) {
+        if(e.getPacketName().equals(Packet.Server.KEEP_ALIVE)) {
 
+        }
     }
 
     @PacketHandler
@@ -133,16 +141,14 @@ public class TestExample implements PacketListener, Listener {
     }
 
     /**
-     * Only listen to server tick
+     * Only listen to server tick (if enabled)
      * @param e
      */
     @PacketHandler
     public void onServerTick(ServerTickEvent e) {
-
-        if (tick % 20 == 0) {
-           //one tick passed
+        if (tick++ % 20 == 0) {
+           //one second passed
         }
-        tick++;
     }
 
 }

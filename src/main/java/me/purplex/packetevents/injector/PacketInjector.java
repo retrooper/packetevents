@@ -61,9 +61,11 @@ public class PacketInjector {
 
     public void uninjectPlayer(Player player) {
         Channel channel = getChannel(player);
-        channel.eventLoop().submit(() -> {
-            channel.pipeline().remove(player.getName());
-            return null;
+        channel.eventLoop().submit(new Runnable() {
+            @Override
+            public void run() {
+                channel.pipeline().remove(player.getName());
+            }
         });
     }
 
@@ -96,7 +98,7 @@ public class PacketInjector {
         } else if (version == ServerVersion.v_1_15) {
             channel = new Channel_1_15().getChannel(player);
         } else {
-            String err = "Version unsupported, please contact purplex#0001 and tell him what version your server is running on! Make sure you are using paperspigot or spigot.";
+            String err = "Version unsupported, please contact purplex(creator) through his discord server (http://discord.gg/2uZY5A4) and tell him what version your server is running on! Make sure you are using spigot!";
             throw new IllegalStateException(err);
         }
         return channel;

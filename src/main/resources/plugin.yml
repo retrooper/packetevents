@@ -1,5 +1,0 @@
-name: PacketEvents
-version: ${project.version}
-main: me.purplex.packetevents.Main
-authors: [purplex]
-description: An API you can use to listen to packets!

@@ -19,15 +19,12 @@ import me.purplex.packetevents.packetwrappers.in._1_9_4.WrappedPacketPlayInBlock
 
 public class WrappedPacketPlayInBlockDig extends WrappedPacket {
 
-    private PlayerDigType digType;
+    public PlayerDigType digType;
 
     public WrappedPacketPlayInBlockDig(Object packet) {
         super(packet);
     }
 
-    public PlayerDigType getPlayerDigType() {
-        return digType;
-    }
 
     @Override
     public void setup() {

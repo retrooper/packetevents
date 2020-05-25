@@ -21,19 +21,11 @@ import org.bukkit.entity.Player;
 
 public class WrappedPacketPlayInUseEntity extends WrappedPacket {
 
-    private Entity entity;
-    private EntityUseAction action;
+    public Entity entity;
+    public EntityUseAction action;
 
     public WrappedPacketPlayInUseEntity(Object packet) {
         super(packet);
-    }
-
-    public Entity getEntity() {
-        return entity;
-    }
-
-    public EntityUseAction getEntityUseAction() {
-        return action;
     }
 
 
