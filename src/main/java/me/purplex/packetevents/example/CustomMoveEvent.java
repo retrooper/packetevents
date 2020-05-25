@@ -1,6 +1,6 @@
 package me.purplex.packetevents.example;
 
-import me.purplex.packetevents.packetevent.PacketEvent;
+import me.purplex.packetevents.event.PacketEvent;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 

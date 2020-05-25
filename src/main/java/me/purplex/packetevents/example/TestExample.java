@@ -3,13 +3,13 @@ package me.purplex.packetevents.example;
 import me.purplex.packetevents.PacketEvents;
 import me.purplex.packetevents.enums.EntityUseAction;
 import me.purplex.packetevents.enums.PlayerDigType;
-import me.purplex.packetevents.packetevent.PacketEvent;
-import me.purplex.packetevents.packetevent.impl.PacketReceiveEvent;
-import me.purplex.packetevents.packetevent.impl.PacketSendEvent;
-import me.purplex.packetevents.packetevent.impl.ServerTickEvent;
-import me.purplex.packetevents.packetevent.handler.PacketHandler;
-import me.purplex.packetevents.packetevent.listener.PacketListener;
-import me.purplex.packetevents.packetevent.packet.Packet;
+import me.purplex.packetevents.event.PacketEvent;
+import me.purplex.packetevents.event.impl.PacketReceiveEvent;
+import me.purplex.packetevents.event.impl.PacketSendEvent;
+import me.purplex.packetevents.event.impl.ServerTickEvent;
+import me.purplex.packetevents.event.handler.PacketHandler;
+import me.purplex.packetevents.event.listener.PacketListener;
+import me.purplex.packetevents.packet.Packet;
 import me.purplex.packetevents.packetwrappers.in.*;
 import org.bukkit.Location;
 import org.bukkit.entity.Entity;
@@ -103,7 +103,7 @@ public class TestExample implements PacketListener, Listener {
 
     @PacketHandler
     public void onCustomMove(CustomMoveEvent e) {
-
+        double distance = e.getTo().distanceSquared(e.getFrom());
     }
 
     /**
@@ -126,7 +126,10 @@ public class TestExample implements PacketListener, Listener {
         } else if (e instanceof ServerTickEvent) {
             final ServerTickEvent event = (ServerTickEvent) e;
             final int currentTick = event.getCurrentTick();
+            //will be true once a second
+            if(event.hasOneSecondPassed()) {
 
+            }
         }
     }
 

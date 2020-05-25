@@ -2,8 +2,9 @@ package me.purplex.packetevents;
 
 import me.purplex.packetevents.enums.ServerVersion;
 import me.purplex.packetevents.injector.PacketInjector;
-import me.purplex.packetevents.packetevent.impl.ServerTickEvent;
-import me.purplex.packetevents.packetevent.manager.PacketManager;
+import me.purplex.packetevents.event.impl.ServerTickEvent;
+import me.purplex.packetevents.event.manager.PacketManager;
+import me.purplex.packetevents.utils.tps.*; //All tps' util classes
 import org.bukkit.Bukkit;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -11,10 +12,13 @@ import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitTask;
+import java.text.DecimalFormat;
 import java.util.concurrent.*;
 
 public class PacketEvents implements Listener {
+    private static ServerVersion version = ServerVersion.getVersion();
     private static PacketEvents instance;
+    private static final DecimalFormat decimalFormat = new DecimalFormat("##.##");
     private static PacketInjector packetInjector = new PacketInjector();
     public static ExecutorService executor = Executors.newCachedThreadPool();
     private static final PacketManager packetManager = new PacketManager();
@@ -30,6 +34,7 @@ public class PacketEvents implements Listener {
         return packetManager;
     }
 
+    @Deprecated
     public static void setup(JavaPlugin plugin, boolean serverTickEventEnabled) {
         serverTickEventActive = serverTickEventEnabled;
         Bukkit.getPluginManager().registerEvents(getInstance(), plugin);
@@ -44,6 +49,7 @@ public class PacketEvents implements Listener {
         }
     }
 
+    @Deprecated
     public static void cleanup(JavaPlugin plugin) {
         if (serverTickEventActive) {
             serverTickTask.cancel();
@@ -58,7 +64,7 @@ public class PacketEvents implements Listener {
             packetInjector.injectPlayer(e.getPlayer());
             System.out.println("Failed to inject " + e.getPlayer().getName() + " asynchronously!");
         }
-        executor.submit(new Runnable() {
+        Future<?> future = executor.submit(new Runnable() {
             @Override
             public void run() {
                 packetInjector.injectPlayer(e.getPlayer());
@@ -72,10 +78,49 @@ public class PacketEvents implements Listener {
     }
 
     public static ServerVersion getServerVersion() {
-        return ServerVersion.getVersion();
+        return version;
     }
 
     public static PacketEvents getInstance() {
         return instance == null ? instance = new PacketEvents() : instance;
+    }
+
+
+    public static double[] getRecentServerTPS() {
+        final double[] tpsArray;
+        if (version == ServerVersion.v_1_7_10) {
+            tpsArray = TPS_1_7_10.getTPS();
+        } else if (version == ServerVersion.v_1_8) {
+            tpsArray = TPS_1_8.getTPS();
+        } else if (version == ServerVersion.v_1_8_3) {
+            tpsArray = TPS_1_8_3.getTPS();
+        } else if (version == ServerVersion.v_1_8_8) {
+            tpsArray = TPS_1_8_8.getTPS();
+        } else if (version == ServerVersion.v_1_9) {
+            tpsArray = TPS_1_9.getTPS();
+        } else if (version == ServerVersion.v_1_9_4) {
+            tpsArray = TPS_1_9_4.getTPS();
+        } else if (version == ServerVersion.v_1_10) {
+            tpsArray = TPS_1_10.getTPS();
+        } else if (version == ServerVersion.v_1_11) {
+            tpsArray = TPS_1_11.getTPS();
+        } else if (version == ServerVersion.v_1_12) {
+            tpsArray = TPS_1_12.getTPS();
+        } else if (version == ServerVersion.v_1_13) {
+            tpsArray = TPS_1_13.getTPS();
+        } else if (version == ServerVersion.v_1_13_2) {
+            tpsArray = TPS_1_13_2.getTPS();
+        } else if (version == ServerVersion.v_1_14) {
+            tpsArray = TPS_1_14.getTPS();
+        } else if (version == ServerVersion.v_1_15) {
+            tpsArray = TPS_1_15.getTPS();
+        } else {
+            throw new IllegalStateException("Unable to calculate your the server's TPS, this version is not supported! Make sure you are using Spigot!");
+        }
+        return tpsArray;
+    }
+
+    public static double getCurrentServerTPS() {
+        return getRecentServerTPS()[0];
     }
 }

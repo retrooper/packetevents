@@ -1,7 +1,6 @@
 package me.purplex.packetevents.packetwrappers.in._1_7_10;
 
 import me.purplex.packetevents.enums.EntityUseAction;
-import me.purplex.packetevents.enums.ServerVersion;
 import me.purplex.packetevents.packetwrappers.api.version.WrappedVersionPacket;
 import net.minecraft.server.v1_7_R4.Entity;
 import net.minecraft.server.v1_7_R4.PacketPlayInUseEntity;
@@ -16,7 +15,6 @@ public class WrappedPacketPlayInUseEntity_1_7_10 extends WrappedVersionPacket {
 
     public WrappedPacketPlayInUseEntity_1_7_10(Object packet) {
         super(packet);
-        version = ServerVersion.getVersion();
     }
 
     private Object getRawPacket() {

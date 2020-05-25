@@ -9,7 +9,6 @@ public class WrappedPacket {
         this.packet = packet;
         setup();
     }
-
     protected void setup() {
 
     }

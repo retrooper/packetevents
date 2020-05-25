@@ -4,31 +4,14 @@ package me.purplex.packetevents.injector;
 import io.netty.channel.*;
 import me.purplex.packetevents.PacketEvents;
 import me.purplex.packetevents.enums.ServerVersion;
-import me.purplex.packetevents.injector.channels._1_10.Channel_1_10;
-import me.purplex.packetevents.injector.channels._1_11.Channel_1_11;
-import me.purplex.packetevents.injector.channels._1_12.Channel_1_12;
-import me.purplex.packetevents.injector.channels._1_13.Channel_1_13;
-import me.purplex.packetevents.injector.channels._1_13_2.Channel_1_13_2;
-import me.purplex.packetevents.injector.channels._1_14.Channel_1_14;
-import me.purplex.packetevents.injector.channels._1_15.Channel_1_15;
-import me.purplex.packetevents.injector.channels._1_7_10.Channel_1_7_10;
-import me.purplex.packetevents.injector.channels._1_8.Channel_1_8;
-import me.purplex.packetevents.injector.channels._1_8_3.Channel_1_8_3;
-import me.purplex.packetevents.injector.channels._1_8_8.Channel_1_8_8;
-import me.purplex.packetevents.injector.channels._1_9.Channel_1_9;
-import me.purplex.packetevents.injector.channels._1_9_4.Channel_1_9_4;
-import me.purplex.packetevents.packetevent.impl.PacketReceiveEvent;
-import me.purplex.packetevents.packetevent.impl.PacketSendEvent;
+import me.purplex.packetevents.injector.channels.*; //all channel classes
+import me.purplex.packetevents.event.impl.PacketReceiveEvent;
+import me.purplex.packetevents.event.impl.PacketSendEvent;
 import org.bukkit.entity.Player;
 
 
 public class PacketInjector {
-    private final static ServerVersion version;
-
-    static {
-        version = ServerVersion.getVersion();
-    }
-
+    private final static ServerVersion version = PacketEvents.getServerVersion();
     public void injectPlayer(Player player) {
         ChannelDuplexHandler channelDuplexHandler = new ChannelDuplexHandler() {
             @Override
@@ -40,7 +23,6 @@ public class PacketInjector {
                     return;
                 }
                 super.channelRead(ctx, packet);
-
             }
 
             @Override
@@ -69,6 +51,7 @@ public class PacketInjector {
         });
     }
 
+    @Deprecated
     public Channel getChannel(Player player) {
         Channel channel = null;
         if (version == ServerVersion.v_1_7_10) {
