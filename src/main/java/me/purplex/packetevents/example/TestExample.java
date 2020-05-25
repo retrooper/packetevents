@@ -34,12 +34,12 @@ public class TestExample implements PacketListener, Listener {
      * PacketEvents.getPacketManager().unregisterListener(new TestExample());
      */
 
-    private int tick;
+
 
     /**
-     * Only listen to the onPacketReceive
+     * Listen to PacketReceiveEvent
      *
-     * @param e
+     * @param e PacketReceiveEvent
      */
     @PacketHandler
     public void onPacketReceive(PacketReceiveEvent e) {
@@ -51,7 +51,7 @@ public class TestExample implements PacketListener, Listener {
                 final WrappedPacketPlayInUseEntity useEntity = new WrappedPacketPlayInUseEntity(e.getPacket());
                 final Entity entity = useEntity.entity;
                 if (useEntity.action == EntityUseAction.ATTACK) {
-                    final double dist = entity.getLocation().distanceSquared(p.getLocation());
+                    final double distance = entity.getLocation().distanceSquared(p.getLocation());
                     //p.sendMessage("dist: " + dist);
                 }
                 break;
@@ -109,7 +109,7 @@ public class TestExample implements PacketListener, Listener {
     /**
      * Another way to listen to packets
      *
-     * @param e
+     * @param e PacketEvent
      */
     @PacketHandler
     public void onPacket(PacketEvent e) {
@@ -135,9 +135,9 @@ public class TestExample implements PacketListener, Listener {
 
 
     /**
-     * Update the CustomMoveEvent event
+     * Call the CustomMoveEvent event
      *
-     * @param e
+     * @param e PlayerMoveEvent
      */
     @EventHandler
     public void onMove(PlayerMoveEvent e) {
@@ -156,7 +156,7 @@ public class TestExample implements PacketListener, Listener {
     /**
      * Only listen to server tick (if enabled)
      *
-     * @param e
+     * @param e ServerTickEvent
      */
     @PacketHandler
     public void onServerTick(ServerTickEvent e) {

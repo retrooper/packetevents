@@ -7,9 +7,8 @@ import org.bukkit.plugin.java.JavaPlugin;
 public class MainExample extends JavaPlugin {
     @Override
     public void onEnable() {
-        /**
-         * Should the ServerTickEvent ever get called?
-         */
+
+        //Should the ServerTickEvent ever get called?
         final boolean serverTickEventEnabled = true;
 
         /**
@@ -38,7 +37,7 @@ public class MainExample extends JavaPlugin {
         /**
          * Stops server tick event task if enabled
          */
-        PacketEvents.cleanup(this);
+        PacketEvents.cleanup();
     }
 
 }

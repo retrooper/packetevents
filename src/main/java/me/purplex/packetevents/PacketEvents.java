@@ -15,9 +15,9 @@ import org.bukkit.scheduler.BukkitTask;
 import java.util.concurrent.*;
 
 public class PacketEvents implements Listener {
-    private static ServerVersion version = ServerVersion.getVersion();
+    private static final ServerVersion version = ServerVersion.getVersion();
     private static PacketEvents instance;
-    private static PacketInjector packetInjector = new PacketInjector();
+    private static final PacketInjector packetInjector = new PacketInjector();
     public static ExecutorService executor = Executors.newCachedThreadPool();
     private static final PacketManager packetManager = new PacketManager();
 
@@ -38,12 +38,13 @@ public class PacketEvents implements Listener {
         Bukkit.getPluginManager().registerEvents(getInstance(), plugin);
 
         if (serverTickEventEnabled) {
-            serverTickTask = Bukkit.getScheduler().runTaskTimer(plugin, new Runnable() {
+            final Runnable runnable = new Runnable() {
                 @Override
                 public void run() {
                     PacketEvents.getPacketManager().callEvent(new ServerTickEvent(currentTick++, System.nanoTime() / 1000000));
                 }
-            }, 0L, 1L);
+            };
+            serverTickTask = Bukkit.getScheduler().runTaskTimer(plugin, runnable, 0L, 1L);
         }
     }
 
@@ -62,12 +63,14 @@ public class PacketEvents implements Listener {
             packetInjector.injectPlayer(e.getPlayer());
             System.out.println("Failed to inject " + e.getPlayer().getName() + " asynchronously!");
         }
-        Future<?> future = executor.submit(new Runnable() {
+
+        final Runnable runnable = new Runnable() {
             @Override
             public void run() {
                 packetInjector.injectPlayer(e.getPlayer());
             }
-        });
+        };
+        Future<?> future = executor.submit(runnable);
     }
 
     @EventHandler

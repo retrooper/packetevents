@@ -15,7 +15,7 @@ public class PacketInjector {
     public void injectPlayer(Player player) {
         ChannelDuplexHandler channelDuplexHandler = new ChannelDuplexHandler() {
             @Override
-            public void channelRead(ChannelHandlerContext ctx, Object packet) throws Exception {
+            public void channelRead(final ChannelHandlerContext ctx, final Object packet) throws Exception {
                 String packetName = packet.getClass().getSimpleName();
                 PacketReceiveEvent e = new PacketReceiveEvent(player, packetName, packet);
                 PacketEvents.getPacketManager().callEvent(e);
@@ -26,7 +26,7 @@ public class PacketInjector {
             }
 
             @Override
-            public void write(ChannelHandlerContext ctx, Object packet, ChannelPromise promise) throws Exception {
+            public void write(final ChannelHandlerContext ctx, final Object packet, final ChannelPromise promise) throws Exception {
                 String packetName = packet.getClass().getSimpleName();
                 PacketSendEvent e = new PacketSendEvent(player, packetName, packet);
                 PacketEvents.getPacketManager().callEvent(e);
@@ -36,19 +36,18 @@ public class PacketInjector {
                 super.write(ctx, packet, promise);
             }
         };
-        Channel channel = getChannel(player);
-        ChannelPipeline pipeline = channel.pipeline();
-        pipeline.addBefore("packet_handler", player.getName(), channelDuplexHandler);
+        getChannel(player).pipeline().addBefore("packet_handler", player.getName(), channelDuplexHandler);
     }
 
     public void uninjectPlayer(Player player) {
         Channel channel = getChannel(player);
-        channel.eventLoop().submit(new Runnable() {
+        final Runnable runnable = new Runnable() {
             @Override
             public void run() {
                 channel.pipeline().remove(player.getName());
             }
-        });
+        };
+        channel.eventLoop().submit(runnable);
     }
 
     @Deprecated
