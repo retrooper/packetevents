@@ -10,7 +10,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.plugin.java.JavaPlugin;
-
+import org.bukkit.scheduler.BukkitTask;
 import java.util.concurrent.*;
 
 public class PacketEvents implements Listener {
@@ -19,11 +19,9 @@ public class PacketEvents implements Listener {
     public static ExecutorService executor = Executors.newCachedThreadPool();
     private static final PacketManager packetManager = new PacketManager();
 
-    public static ServerVersion getServerVersion() {
-        return ServerVersion.getVersion();
-    }
+    private static int currentTick = 0;
 
-    private static int asyncRepeatingTask;
+    private static BukkitTask serverTickTask;
 
     private static boolean serverTickEventActive = false;
 
@@ -37,11 +35,10 @@ public class PacketEvents implements Listener {
         Bukkit.getPluginManager().registerEvents(getInstance(), plugin);
 
         if (serverTickEventEnabled) {
-            asyncRepeatingTask = Bukkit.getScheduler().scheduleAsyncRepeatingTask(plugin, new Runnable() {
+            serverTickTask = Bukkit.getScheduler().runTaskTimer(plugin, new Runnable() {
                 @Override
                 public void run() {
-                    long now = System.currentTimeMillis();
-                    PacketEvents.getPacketManager().callEvent(new ServerTickEvent(now));
+                    PacketEvents.getPacketManager().callEvent(new ServerTickEvent(currentTick++, System.nanoTime() / 1000000));
                 }
             }, 0L, 1L);
         }
@@ -49,7 +46,7 @@ public class PacketEvents implements Listener {
 
     public static void cleanup(JavaPlugin plugin) {
         if (serverTickEventActive) {
-            Bukkit.getScheduler().cancelTasks(plugin);
+            serverTickTask.cancel();
         }
     }
 
@@ -72,6 +69,10 @@ public class PacketEvents implements Listener {
     @EventHandler
     public void onQuit(PlayerQuitEvent e) {
         packetInjector.uninjectPlayer(e.getPlayer());
+    }
+
+    public static ServerVersion getServerVersion() {
+        return ServerVersion.getVersion();
     }
 
     public static PacketEvents getInstance() {

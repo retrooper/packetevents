@@ -10,7 +10,7 @@ public class PacketReceiveEvent extends PacketEvent {
     private final Object packet;
     private boolean cancelled;
 
-    public PacketReceiveEvent(Player player, String packetName, Object packet) {
+    public PacketReceiveEvent(final Player player, final String packetName, final Object packet) {
         this.player = player;
         this.name = packetName;
         this.packet = packet;

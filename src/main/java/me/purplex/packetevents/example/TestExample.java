@@ -38,6 +38,7 @@ public class TestExample implements PacketListener, Listener {
 
     /**
      * Only listen to the onPacketReceive
+     *
      * @param e
      */
     @PacketHandler
@@ -95,7 +96,7 @@ public class TestExample implements PacketListener, Listener {
 
     @PacketHandler
     public void onPacketSend(PacketSendEvent e) {
-        if(e.getPacketName().equals(Packet.Server.KEEP_ALIVE)) {
+        if (e.getPacketName().equals(Packet.Server.KEEP_ALIVE)) {
 
         }
     }
@@ -107,52 +108,56 @@ public class TestExample implements PacketListener, Listener {
 
     /**
      * Another way to listen to packets
+     *
      * @param e
      */
     @PacketHandler
     public void onPacket(PacketEvent e) {
-        if(e instanceof PacketSendEvent) {
-            final PacketSendEvent p = (PacketSendEvent)e;
+        if (e instanceof PacketSendEvent) {
+            final PacketSendEvent p = (PacketSendEvent) e;
             final Player targetPlayer = p.getPlayer();
             final Object rawNMSPacket = p.getPacket();
             final long timestamp = p.getTimestamp();
-        }
-        else if(e instanceof CustomMoveEvent){
-            final CustomMoveEvent event = (CustomMoveEvent)e;
+        } else if (e instanceof CustomMoveEvent) {
+            final CustomMoveEvent event = (CustomMoveEvent) e;
             final Player player = event.getPlayer();
             final Location to = event.getTo();
             final Location from = event.getFrom();
+        } else if (e instanceof ServerTickEvent) {
+            final ServerTickEvent event = (ServerTickEvent) e;
+            final int currentTick = event.getCurrentTick();
+
         }
     }
 
 
     /**
      * Update the CustomMoveEvent event
+     *
      * @param e
      */
     @EventHandler
     public void onMove(PlayerMoveEvent e) {
-        CustomMoveEvent customMoveEvent = new CustomMoveEvent(e.getPlayer(),e.getTo(), e.getFrom());
+        CustomMoveEvent customMoveEvent = new CustomMoveEvent(e.getPlayer(), e.getTo(), e.getFrom());
         e.setCancelled(customMoveEvent.isCancelled());
         PacketEvents.getPacketManager().callEvent(customMoveEvent);
 
-        if(e.getTo() != customMoveEvent.getTo()) {
+        if (e.getTo() != customMoveEvent.getTo()) {
             e.setTo(customMoveEvent.getTo());
         }
-        if(e.getFrom() != customMoveEvent.getFrom()) {
+        if (e.getFrom() != customMoveEvent.getFrom()) {
             e.setFrom(customMoveEvent.getFrom());
         }
     }
 
     /**
      * Only listen to server tick (if enabled)
+     *
      * @param e
      */
     @PacketHandler
     public void onServerTick(ServerTickEvent e) {
-        if (tick++ % 20 == 0) {
-           //one second passed
-        }
+
     }
 
 }

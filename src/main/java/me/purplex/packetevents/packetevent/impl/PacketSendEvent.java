@@ -9,7 +9,7 @@ public class PacketSendEvent extends PacketEvent {
     private final Object packet;
     private boolean cancelled;
 
-    public PacketSendEvent(Player player, String packetName, Object packet) {
+    public PacketSendEvent(final Player player, final String packetName, final Object packet) {
         this.player = player;
         this.name = packetName;
         this.packet = packet;
