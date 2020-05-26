@@ -127,6 +127,6 @@ public class PacketEvents implements Listener {
     }
 
     public static long currentTimeMS() {
-        return PacketEvents.currentTimeMS();
+        return System.nanoTime() / 1000000;
     }
 }
