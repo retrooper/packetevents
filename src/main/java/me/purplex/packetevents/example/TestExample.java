@@ -145,9 +145,9 @@ public class TestExample implements PacketListener, Listener {
         } else if (e instanceof ServerTickEvent) {
             final ServerTickEvent event = (ServerTickEvent) e;
             final int currentTick = event.getCurrentTick();
-            //will be true once a second
-            System.out.println(PacketEvents.getCurrentServerTPS() + " is tps");
+           // System.out.println(PacketEvents.getCurrentServerTPS() + " is tps");
         } else if (e instanceof PacketLoginEvent) {
+            System.out.println("LLLOOOOOGIN");
             final PacketLoginEvent event = (PacketLoginEvent) e;
             if (event.getPacketName().equals(Packet.Login.HANDSHAKE)) {
                 final WrappedPacketLoginHandshake handshake = new WrappedPacketLoginHandshake(event.getPacket());
