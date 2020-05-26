@@ -6,11 +6,16 @@ import me.purplex.packetevents.enums.PlayerDigType;
 import me.purplex.packetevents.event.PacketEvent;
 import me.purplex.packetevents.event.impl.PacketReceiveEvent;
 import me.purplex.packetevents.event.impl.PacketSendEvent;
+import me.purplex.packetevents.event.impl.PlayerInjectEvent;
 import me.purplex.packetevents.event.impl.ServerTickEvent;
 import me.purplex.packetevents.event.handler.PacketHandler;
 import me.purplex.packetevents.event.listener.PacketListener;
 import me.purplex.packetevents.packet.Packet;
-import me.purplex.packetevents.packetwrappers.in.*;
+import me.purplex.packetevents.packetwrappers.in.abilities.WrappedPacketInAbilities;
+import me.purplex.packetevents.packetwrappers.in.blockdig.WrappedPacketInBlockDig;
+import me.purplex.packetevents.packetwrappers.in.chat.WrappedPacketInChat;
+import me.purplex.packetevents.packetwrappers.in.flying.WrappedPacketInFlying;
+import me.purplex.packetevents.packetwrappers.in.use_entity.WrappedPacketInUseEntity;
 import org.bukkit.Location;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
@@ -35,7 +40,6 @@ public class TestExample implements PacketListener, Listener {
      */
 
 
-
     /**
      * Listen to PacketReceiveEvent
      *
@@ -48,7 +52,7 @@ public class TestExample implements PacketListener, Listener {
         //ONLY CLIENT PACKETS ALLOWED HERE!
         switch (e.getPacketName()) {
             case Packet.Client.USE_ENTITY:
-                final WrappedPacketPlayInUseEntity useEntity = new WrappedPacketPlayInUseEntity(e.getPacket());
+                final WrappedPacketInUseEntity useEntity = new WrappedPacketPlayInUseEntity(e.getPacket());
                 final Entity entity = useEntity.entity;
                 if (useEntity.action == EntityUseAction.ATTACK) {
                     final double distance = entity.getLocation().distanceSquared(p.getLocation());
@@ -57,7 +61,7 @@ public class TestExample implements PacketListener, Listener {
                 break;
             case Packet.Client.ABILITIES:
                 //1.8 packet style
-                final WrappedPacketPlayInAbilities abilities = new WrappedPacketPlayInAbilities(e.getPacket());
+                final WrappedPacketInAbilities abilities = new WrappedPacketInAbilities(e.getPacket());
                 final boolean a = abilities.a;
                 final boolean b = abilities.b;
                 final boolean c = abilities.c;
@@ -67,28 +71,28 @@ public class TestExample implements PacketListener, Listener {
                 break;
             case Packet.Client.BLOCK_DIG:
                 //Custom PlayerDigType enum
-                final WrappedPacketPlayInBlockDig blockDig = new WrappedPacketPlayInBlockDig(e.getPacket());
+                final WrappedPacketInBlockDig blockDig = new WrappedPacketInBlockDig(e.getPacket());
                 final PlayerDigType type = blockDig.digType;
                 break;
             case Packet.Client.FLYING:
-                final WrappedPacketPlayInFlying flying = new WrappedPacketPlayInFlying(e.getPacket());
+                final WrappedPacketInFlying flying = new WrappedPacketInFlying(e.getPacket());
                 final float pitch = flying.pitch;
                 final float yaw = flying.yaw;
                 final boolean hasPos = flying.hasPos;
                 final boolean hasLook = flying.hasLook;
                 break;
             case Packet.Client.POSITION:
-                final WrappedPacketPlayInFlying.WrappedPacketPlayInPosition position =
-                        new WrappedPacketPlayInFlying.WrappedPacketPlayInPosition(e.getPacket());
+                final WrappedPacketInFlying.WrappedPacketInPosition position =
+                        new WrappedPacketInFlying.WrappedPacketInPosition(e.getPacket());
                 final boolean isPos = position.hasPos; //true
                 break;
             case Packet.Client.POSITION_LOOK:
-                final WrappedPacketPlayInFlying.WrappedPacketPlayInPosition_Look position_look =
-                        new WrappedPacketPlayInFlying.WrappedPacketPlayInPosition_Look(e.getPacket());
+                final WrappedPacketInFlying.WrappedPacketInPosition_Look position_look =
+                        new WrappedPacketInFlying.WrappedPacketInPosition_Look(e.getPacket());
                 final boolean isLook = position_look.hasLook; //true
                 break;
             case Packet.Client.CHAT:
-                final WrappedPacketPlayInChat chat = new WrappedPacketPlayInChat(e.getPacket());
+                final WrappedPacketInChat chat = new WrappedPacketInChat(e.getPacket());
                 final String message = chat.message;
                 //System.out.println("YOU SAID: " + message);
         }
@@ -104,6 +108,11 @@ public class TestExample implements PacketListener, Listener {
     @PacketHandler
     public void onCustomMove(CustomMoveEvent e) {
         double distance = e.getTo().distanceSquared(e.getFrom());
+    }
+
+    @PacketHandler
+    public void onInject(PlayerInjectEvent e) {
+        //System.out.println("NOT INJECTED HAHA");
     }
 
     /**
@@ -127,9 +136,18 @@ public class TestExample implements PacketListener, Listener {
             final ServerTickEvent event = (ServerTickEvent) e;
             final int currentTick = event.getCurrentTick();
             //will be true once a second
-            if(event.hasOneSecondPassed()) {
+            System.out.println(PacketEvents.getCurrentServerTPS() + " is tps");
+        } else if (e instanceof PlayerInjectEvent) {
+            final PlayerInjectEvent event = (PlayerInjectEvent) e;
+            event.setCancelled(true);
+            //Kick the player synchronously
 
-            }
+           /* Bukkit.getScheduler().runTask(PacketEvents.getInstance().plugin, new Runnable() {
+                @Override
+                public void run() {
+                    event.getPlayer().kickPlayer("nope");
+                }
+            });*/
         }
     }
 

@@ -1,6 +1,5 @@
 package me.purplex.packetevents.event.impl;
 
-
 import me.purplex.packetevents.event.PacketEvent;
 import org.bukkit.entity.Player;
 
@@ -14,8 +13,6 @@ public class PacketReceiveEvent extends PacketEvent {
         this.player = player;
         this.name = packetName;
         this.packet = packet;
-        this.timestamp = (System.nanoTime() / 1000000);
-        this.cancelled = false;
     }
 
     /**

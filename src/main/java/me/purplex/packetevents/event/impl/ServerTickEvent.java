@@ -1,16 +1,16 @@
 package me.purplex.packetevents.event.impl;
 
-
 import me.purplex.packetevents.event.PacketEvent;
 
 public class ServerTickEvent extends PacketEvent {
-
-    private final long timestamp;
     private final int tick;
-
     public ServerTickEvent(final int tick, final long timestamp) {
         this.tick = tick;
         this.timestamp = timestamp;
+    }
+
+    public ServerTickEvent(final int tick) {
+        this.tick = tick;
     }
 
 
@@ -22,8 +22,5 @@ public class ServerTickEvent extends PacketEvent {
         return tick;
     }
 
-    public boolean hasOneSecondPassed() {
-        return tick % 20 == 0;
-    }
 
 }

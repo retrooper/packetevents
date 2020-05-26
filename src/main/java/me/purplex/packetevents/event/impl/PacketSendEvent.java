@@ -13,7 +13,6 @@ public class PacketSendEvent extends PacketEvent {
         this.player = player;
         this.name = packetName;
         this.packet = packet;
-        this.timestamp = (System.nanoTime() / 1000000);
         this.cancelled = false;
     }
 

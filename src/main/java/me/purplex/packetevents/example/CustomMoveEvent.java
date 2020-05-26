@@ -1,5 +1,6 @@
 package me.purplex.packetevents.example;
 
+import me.purplex.packetevents.PacketEvents;
 import me.purplex.packetevents.event.PacketEvent;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
@@ -19,9 +20,8 @@ public class CustomMoveEvent extends PacketEvent {
         this.to = to;
         this.from = from;
         this.cancelled = false;
-
-        //IMPORTANT to initialize the timestamp variable
-        this.timestamp = (System.nanoTime() / 1000000);
+        //Timestamp is initialized automatically, so you don't need to initiate it, but you may modify it
+        //this.timestamp = PacketEvents.currentTimeMS();
     }
 
     @Override

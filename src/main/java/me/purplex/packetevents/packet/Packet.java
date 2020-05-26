@@ -70,4 +70,13 @@ public abstract class Packet {
         public static final String START = "PacketStatusInStart";
         public static final String SUCCESS = "PacketLoginOutSuccess";
     }
+
+    public static boolean isInstanceOf(String fatherPacket, String childPacket) {
+        if (fatherPacket.equals(Client.FLYING) && childPacket.equals(Client.POSITION) || childPacket.equals(Client.POSITION_LOOK)) {
+            return true;
+        }
+        return fatherPacket.equals(childPacket);
+    }
+
+
 }

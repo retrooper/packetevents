@@ -4,14 +4,15 @@ package me.purplex.packetevents.injector;
 import io.netty.channel.*;
 import me.purplex.packetevents.PacketEvents;
 import me.purplex.packetevents.enums.ServerVersion;
+import me.purplex.packetevents.event.impl.*;
 import me.purplex.packetevents.injector.channels.*; //all channel classes
-import me.purplex.packetevents.event.impl.PacketReceiveEvent;
-import me.purplex.packetevents.event.impl.PacketSendEvent;
+import me.purplex.packetevents.packet.Packet;
 import org.bukkit.entity.Player;
 
 
 public class PacketInjector {
     private final static ServerVersion version = PacketEvents.getServerVersion();
+
     public void injectPlayer(Player player) {
         ChannelDuplexHandler channelDuplexHandler = new ChannelDuplexHandler() {
             @Override
@@ -28,31 +29,48 @@ public class PacketInjector {
             @Override
             public void write(final ChannelHandlerContext ctx, final Object packet, final ChannelPromise promise) throws Exception {
                 String packetName = packet.getClass().getSimpleName();
-                PacketSendEvent e = new PacketSendEvent(player, packetName, packet);
-                PacketEvents.getPacketManager().callEvent(e);
-                if (e.isCancelled()) {
-                    return;
+                //LOGIN PACKET
+                if (Packet.Login.HANDSHAKE.equals(packetName)
+                        || Packet.Login.PING.equals(packetName)
+                        || Packet.Login.START.equals(packetName)
+                        || Packet.Login.SUCCESS.equals(packetName)) {
+                    PacketLoginEvent e = new PacketLoginEvent(player, packetName, packet);
+                    PacketEvents.getPacketManager().callEvent(e);
+                } else {
+                    PacketSendEvent e = new PacketSendEvent(player, packetName, packet);
+                    PacketEvents.getPacketManager().callEvent(e);
+                    if (e.isCancelled()) {
+                        return;
+                    }
                 }
                 super.write(ctx, packet, promise);
             }
         };
-        getChannel(player).pipeline().addBefore("packet_handler", player.getName(), channelDuplexHandler);
+        final PlayerInjectEvent injectEvent = new PlayerInjectEvent(player);
+        PacketEvents.getPacketManager().callEvent(injectEvent);
+        if (!injectEvent.isCancelled()) {
+            getChannel(player).pipeline().addBefore("packet_handler", player.getName(), channelDuplexHandler);
+        }
     }
 
-    public void uninjectPlayer(Player player) {
-        Channel channel = getChannel(player);
+    public void uninjectPlayer(final Player player) {
+        final Channel channel = getChannel(player);
         final Runnable runnable = new Runnable() {
             @Override
             public void run() {
                 channel.pipeline().remove(player.getName());
             }
         };
-        channel.eventLoop().submit(runnable);
+        final PlayerUninjectEvent uninjectEvent = new PlayerUninjectEvent(player);
+        PacketEvents.getPacketManager().callEvent(uninjectEvent);
+        if (!uninjectEvent.isCancelled()) {
+            channel.eventLoop().submit(runnable);
+        }
     }
 
     @Deprecated
     public Channel getChannel(Player player) {
-        Channel channel = null;
+        final Channel channel;
         if (version == ServerVersion.v_1_7_10) {
             channel = new Channel_1_7_10().getChannel(player);
         } else if (version == ServerVersion.v_1_8) {
@@ -80,7 +98,7 @@ public class PacketInjector {
         } else if (version == ServerVersion.v_1_15) {
             channel = new Channel_1_15().getChannel(player);
         } else {
-            String err = "Version unsupported, please contact purplex(creator) through his discord server (http://discord.gg/2uZY5A4) and tell him what version your server is running on! Make sure you are using spigot!";
+            final String err = "Version unsupported, please contact purplex(creator) through his discord server (http://discord.gg/2uZY5A4) and tell him what version your server is running on! Make sure you are using spigot!";
             throw new IllegalStateException(err);
         }
         return channel;

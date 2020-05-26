@@ -11,7 +11,6 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.plugin.java.JavaPlugin;
-import org.bukkit.scheduler.BukkitTask;
 import java.util.concurrent.*;
 
 public class PacketEvents implements Listener {
@@ -21,12 +20,13 @@ public class PacketEvents implements Listener {
     public static ExecutorService executor = Executors.newCachedThreadPool();
     private static final PacketManager packetManager = new PacketManager();
 
-    private static int currentTick = 0;
+    private static int currentTick;
 
-    private static BukkitTask serverTickTask;
+    private static int serverTickTask;
 
     private static boolean serverTickEventActive = false;
 
+    public static JavaPlugin plugin;
 
     public static PacketManager getPacketManager() {
         return packetManager;
@@ -34,6 +34,7 @@ public class PacketEvents implements Listener {
 
     @Deprecated
     public static void setup(final JavaPlugin plugin, final boolean serverTickEventEnabled) {
+        PacketEvents.plugin = plugin;
         serverTickEventActive = serverTickEventEnabled;
         Bukkit.getPluginManager().registerEvents(getInstance(), plugin);
 
@@ -41,17 +42,17 @@ public class PacketEvents implements Listener {
             final Runnable runnable = new Runnable() {
                 @Override
                 public void run() {
-                    PacketEvents.getPacketManager().callEvent(new ServerTickEvent(currentTick++, System.nanoTime() / 1000000));
+                    PacketEvents.getPacketManager().callEvent(new ServerTickEvent(currentTick++, PacketEvents.currentTimeMS()));
                 }
             };
-            serverTickTask = Bukkit.getScheduler().runTaskTimer(plugin, runnable, 0L, 1L);
+            serverTickTask = Bukkit.getScheduler().scheduleAsyncRepeatingTask(plugin, runnable, 0L, 1L);
         }
     }
 
     @Deprecated
     public static void cleanup() {
         if (serverTickEventActive) {
-            serverTickTask.cancel();
+            Bukkit.getScheduler().cancelTask(serverTickTask);
         }
     }
 
@@ -123,5 +124,9 @@ public class PacketEvents implements Listener {
 
     public static double getCurrentServerTPS() {
         return getRecentServerTPS()[0];
+    }
+
+    public static long currentTimeMS() {
+        return PacketEvents.currentTimeMS();
     }
 }
