@@ -52,7 +52,7 @@ public class TestExample implements PacketListener, Listener {
         //ONLY CLIENT PACKETS ALLOWED HERE!
         switch (e.getPacketName()) {
             case Packet.Client.USE_ENTITY:
-                final WrappedPacketInUseEntity useEntity = new WrappedPacketPlayInUseEntity(e.getPacket());
+                final WrappedPacketInUseEntity useEntity = new WrappedPacketInUseEntity(e.getPacket());
                 final Entity entity = useEntity.entity;
                 if (useEntity.action == EntityUseAction.ATTACK) {
                     final double distance = entity.getLocation().distanceSquared(p.getLocation());
