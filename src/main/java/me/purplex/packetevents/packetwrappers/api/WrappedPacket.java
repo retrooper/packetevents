@@ -18,7 +18,7 @@ public class WrappedPacket {
 
     }
 
-    protected IllegalStateException throwUnsupportedVersion() {
-        return new IllegalStateException(err);
+    protected void throwUnsupportedVersion() {
+        throw new IllegalStateException(err);
     }
 }

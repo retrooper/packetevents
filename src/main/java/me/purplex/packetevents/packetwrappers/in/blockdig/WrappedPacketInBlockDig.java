@@ -3,7 +3,6 @@ package me.purplex.packetevents.packetwrappers.in.blockdig;
 import me.purplex.packetevents.enums.PlayerDigType;
 import me.purplex.packetevents.enums.ServerVersion;
 import me.purplex.packetevents.packetwrappers.api.WrappedPacket;
-import me.purplex.packetevents.packetwrappers.in.blockdig.impl.*;
 
 public class WrappedPacketInBlockDig extends WrappedPacket {
 
@@ -58,7 +57,7 @@ public class WrappedPacketInBlockDig extends WrappedPacket {
             this.digType = p.digType;
         }
         else {
-            throw throwUnsupportedVersion();
+            throwUnsupportedVersion();
         }
     }
 }

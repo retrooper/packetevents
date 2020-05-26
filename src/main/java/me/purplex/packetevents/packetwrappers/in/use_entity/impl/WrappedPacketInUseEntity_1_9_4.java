@@ -9,10 +9,10 @@ import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.craftbukkit.v1_9_R2.CraftWorld;
 
-public class WrappedPacketInUseEntity_1_9_4 extends WrappedVersionPacket {
+class WrappedPacketInUseEntity_1_9_4 extends WrappedVersionPacket {
     private org.bukkit.entity.Entity entity;
     private EntityUseAction action;
-    public WrappedPacketInUseEntity_1_9_4(Object packet) {
+    WrappedPacketInUseEntity_1_9_4(Object packet) {
         super(packet);
     }
 

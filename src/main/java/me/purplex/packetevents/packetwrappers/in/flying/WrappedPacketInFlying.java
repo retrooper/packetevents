@@ -2,7 +2,6 @@ package me.purplex.packetevents.packetwrappers.in.flying;
 
 import me.purplex.packetevents.enums.ServerVersion;
 import me.purplex.packetevents.packetwrappers.api.WrappedPacket;
-import me.purplex.packetevents.packetwrappers.in.flying.impl.*;
 
 public class WrappedPacketInFlying extends WrappedPacket {
 
@@ -165,7 +164,7 @@ public class WrappedPacketInFlying extends WrappedPacket {
             this.hasLook = p.hasLook;
         }
         else {
-            throw throwUnsupportedVersion();
+            throwUnsupportedVersion();
         }
     }
 
@@ -256,7 +255,7 @@ public class WrappedPacketInFlying extends WrappedPacket {
                 this.hasLook = p.hasLook;
             }
             else {
-                throw throwUnsupportedVersion();
+                throwUnsupportedVersion();
             }
         }
 
@@ -428,7 +427,7 @@ public class WrappedPacketInFlying extends WrappedPacket {
                 this.hasLook = p.hasLook;
             }
             else {
-                throw throwUnsupportedVersion();
+                throwUnsupportedVersion();
             }
         }
     }

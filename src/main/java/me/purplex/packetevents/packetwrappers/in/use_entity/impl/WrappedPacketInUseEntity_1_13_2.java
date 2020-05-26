@@ -8,12 +8,12 @@ import org.bukkit.World;
 import org.bukkit.craftbukkit.v1_13_R2.CraftWorld;
 import net.minecraft.server.v1_13_R2.PacketPlayInUseEntity;
 import net.minecraft.server.v1_13_R2.WorldServer;
-public class WrappedPacketInUseEntity_1_13_2 extends WrappedVersionPacket {
+class WrappedPacketInUseEntity_1_13_2 extends WrappedVersionPacket {
 
     private org.bukkit.entity.Entity entity;
     private EntityUseAction action;
 
-    public WrappedPacketInUseEntity_1_13_2(Object packet) {
+    WrappedPacketInUseEntity_1_13_2(Object packet) {
         super(packet);
     }
 

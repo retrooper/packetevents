@@ -2,7 +2,6 @@ package me.purplex.packetevents.packetwrappers.in.chat;
 
 import me.purplex.packetevents.enums.ServerVersion;
 import me.purplex.packetevents.packetwrappers.api.WrappedPacket;
-import me.purplex.packetevents.packetwrappers.in.chat.impl.*;
 
 public class WrappedPacketInChat extends WrappedPacket {
     public String message;
@@ -54,7 +53,7 @@ public class WrappedPacketInChat extends WrappedPacket {
             this.message = p.message;
         }
         else {
-            throw throwUnsupportedVersion();
+            throwUnsupportedVersion();
         }
     }
 }

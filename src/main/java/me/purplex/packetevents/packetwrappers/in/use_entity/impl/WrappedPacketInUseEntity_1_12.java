@@ -8,11 +8,11 @@ import net.minecraft.server.v1_12_R1.WorldServer;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
 
-public class WrappedPacketInUseEntity_1_12 extends WrappedVersionPacket {
+class WrappedPacketInUseEntity_1_12 extends WrappedVersionPacket {
     private org.bukkit.entity.Entity entity;
     private EntityUseAction action;
 
-    public WrappedPacketInUseEntity_1_12(Object packet) {
+    WrappedPacketInUseEntity_1_12(Object packet) {
         super(packet);
     }
 

@@ -3,7 +3,6 @@ package me.purplex.packetevents.packetwrappers.in.abilities;
 
 import me.purplex.packetevents.enums.ServerVersion;
 import me.purplex.packetevents.packetwrappers.api.WrappedPacket;
-import me.purplex.packetevents.packetwrappers.in.abilities.impl.*;
 
 public class WrappedPacketInAbilities extends WrappedPacket {
 
@@ -112,7 +111,7 @@ public class WrappedPacketInAbilities extends WrappedPacket {
             this.e = p.e;
             this.f = p.f;
         } else {
-            throw throwUnsupportedVersion();
+            throwUnsupportedVersion();
         }
     }
 

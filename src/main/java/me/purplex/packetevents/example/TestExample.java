@@ -4,10 +4,7 @@ import me.purplex.packetevents.PacketEvents;
 import me.purplex.packetevents.enums.EntityUseAction;
 import me.purplex.packetevents.enums.PlayerDigType;
 import me.purplex.packetevents.event.PacketEvent;
-import me.purplex.packetevents.event.impl.PacketReceiveEvent;
-import me.purplex.packetevents.event.impl.PacketSendEvent;
-import me.purplex.packetevents.event.impl.PlayerInjectEvent;
-import me.purplex.packetevents.event.impl.ServerTickEvent;
+import me.purplex.packetevents.event.impl.*;
 import me.purplex.packetevents.event.handler.PacketHandler;
 import me.purplex.packetevents.event.listener.PacketListener;
 import me.purplex.packetevents.packet.Packet;
@@ -15,7 +12,9 @@ import me.purplex.packetevents.packetwrappers.in.abilities.WrappedPacketInAbilit
 import me.purplex.packetevents.packetwrappers.in.blockdig.WrappedPacketInBlockDig;
 import me.purplex.packetevents.packetwrappers.in.chat.WrappedPacketInChat;
 import me.purplex.packetevents.packetwrappers.in.flying.WrappedPacketInFlying;
-import me.purplex.packetevents.packetwrappers.in.use_entity.WrappedPacketInUseEntity;
+import me.purplex.packetevents.packetwrappers.in.use_entity.impl.WrappedPacketInUseEntity;
+import me.purplex.packetevents.packetwrappers.login.handshake.WrappedPacketLoginHandshake;
+import me.purplex.packetevents.utils.playerprotocolversion.PlayerVersionManager;
 import org.bukkit.Location;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
@@ -100,9 +99,7 @@ public class TestExample implements PacketListener, Listener {
 
     @PacketHandler
     public void onPacketSend(PacketSendEvent e) {
-        if (e.getPacketName().equals(Packet.Server.KEEP_ALIVE)) {
 
-        }
     }
 
     @PacketHandler
@@ -111,8 +108,21 @@ public class TestExample implements PacketListener, Listener {
     }
 
     @PacketHandler
-    public void onInject(PlayerInjectEvent e) {
-        //System.out.println("NOT INJECTED HAHA");
+    public void onInject(PlayerInjectEvent event) {
+        event.setCancelled(true);
+        //Kick the player synchronously as I called it asynchronously
+
+           /* Bukkit.getScheduler().runTask(PacketEvents.getInstance().plugin, new Runnable() {
+                @Override
+                public void run() {
+                    event.getPlayer().kickPlayer("nope");
+                }
+            });*/
+    }
+
+    @PacketHandler
+    public void onUninject(PlayerUninjectEvent e) {
+
     }
 
     /**
@@ -137,18 +147,18 @@ public class TestExample implements PacketListener, Listener {
             final int currentTick = event.getCurrentTick();
             //will be true once a second
             System.out.println(PacketEvents.getCurrentServerTPS() + " is tps");
-        } else if (e instanceof PlayerInjectEvent) {
-            final PlayerInjectEvent event = (PlayerInjectEvent) e;
-            event.setCancelled(true);
-            //Kick the player synchronously
-
-           /* Bukkit.getScheduler().runTask(PacketEvents.getInstance().plugin, new Runnable() {
-                @Override
-                public void run() {
-                    event.getPlayer().kickPlayer("nope");
-                }
-            });*/
+        } else if (e instanceof PacketLoginEvent) {
+            final PacketLoginEvent event = (PacketLoginEvent) e;
+            if (event.getPacketName().equals(Packet.Login.HANDSHAKE)) {
+                final WrappedPacketLoginHandshake handshake = new WrappedPacketLoginHandshake(event.getPacket());
+                final String hostname = handshake.hostname;
+                final int port = handshake.port;
+                final int protocolVersion = handshake.protocolVersion;
+                PlayerVersionManager.setPlayerProtocolVersion(event.getPlayer().getUniqueId(), protocolVersion);
+                System.out.println("PROTOCOL NUMBER: " + protocolVersion);
+            }
         }
+
     }
 
 
