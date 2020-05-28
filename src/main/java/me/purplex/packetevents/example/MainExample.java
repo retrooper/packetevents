@@ -1,7 +1,6 @@
 package me.purplex.packetevents.example;
 
 import me.purplex.packetevents.PacketEvents;
-import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
 
 public class MainExample extends JavaPlugin {
@@ -23,7 +22,7 @@ public class MainExample extends JavaPlugin {
         /**
          * Register TestExample's PacketListener
          */
-        PacketEvents.getEventManager().registerListener(new ExampleListener());
+        PacketEvents.getEventManager().registerListener(new RegisteredListener());
     }
 
     @Override
