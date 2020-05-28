@@ -24,20 +24,15 @@ public class MainExample extends JavaPlugin {
          * Register TestExample's PacketListener
          */
         PacketEvents.getEventManager().registerListener(new ExampleListener());
-
-
-        /**
-         * Register TestExample's bukkit Listener
-         */
-        Bukkit.getPluginManager().registerEvents(new ExampleListener(), this);
     }
 
     @Override
     public void onDisable() {
         /**
-         * Stops server tick event task if enabled
+         * Stops server tick event task if enabled and unregister all listeners
          */
         PacketEvents.cleanup();
+
     }
 
 }

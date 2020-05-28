@@ -17,5 +17,9 @@ public enum PlayerAction {
 
     OPEN_INVENTORY,
 
-    START_FALL_FLYING
+    START_FALL_FLYING;
+
+    public static PlayerAction get(final byte i) {
+        return values()[i];
+    }
 }

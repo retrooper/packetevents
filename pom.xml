@@ -6,7 +6,7 @@
 
     <groupId>me.purplex</groupId>
     <artifactId>packetevents</artifactId>
-    <version>1.2.4</version>
+    <version>1.2.5</version>
     <packaging>jar</packaging>
     <name>packetevents</name>
     <properties>
@@ -178,14 +178,6 @@
             <groupId>org.github.spigot</groupId>
             <artifactId>1.14</artifactId>
             <version>1.14</version>
-            <scope>provided</scope>
-        </dependency>
-
-        <!--Spigot API-->
-        <dependency>
-            <groupId>org.spigotmc</groupId>
-            <artifactId>spigot-api</artifactId>
-            <version>1.8-R0.1-SNAPSHOT</version>
             <scope>provided</scope>
         </dependency>
     </dependencies>

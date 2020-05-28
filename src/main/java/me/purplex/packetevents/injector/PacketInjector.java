@@ -10,16 +10,13 @@ public class PacketInjector {
 
     private final static ServerVersion version = PacketEvents.getServerVersion();
 
-    private static final String nettyImport = "io.netty.channel";
-
-    public static final String nettyPrefixImport = version == ServerVersion.v_1_7_10 ? "net.minecraft.util." + nettyImport : nettyImport;
-
     public void injectPlayer(final Player player) {
         if(version == ServerVersion.v_1_7_10) {
             PlayerInject_1_7_10.injectPlayer(player);
         }
         else {
             PlayerInject_1_8.injectPlayer(player);
+           // player.sendMessage("injected");
         }
     }
 
@@ -30,6 +27,7 @@ public class PacketInjector {
         else {
             PlayerInject_1_8.uninjectPlayer(player);
         }
+        ChannelManager.removeChannel(player.getUniqueId());
     }
 
 }

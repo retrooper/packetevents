@@ -5,7 +5,6 @@ import org.bukkit.entity.Player;
 
 public class PlayerInjectEvent extends PacketEvent {
     private final Player player;
-    private boolean cancelled;
     public PlayerInjectEvent(final Player player) {
         this.player = player;
     }
@@ -14,11 +13,4 @@ public class PlayerInjectEvent extends PacketEvent {
         return player;
     }
 
-    public void setCancelled(final boolean val) {
-        cancelled = val;
-    }
-
-    public boolean isCancelled() {
-        return cancelled;
-    }
 }

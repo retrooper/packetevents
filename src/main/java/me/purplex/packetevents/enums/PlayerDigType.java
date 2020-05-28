@@ -16,7 +16,9 @@ public enum PlayerDigType {
 
     SWAP_HELD_ITEMS,
 
-    WRONG_PACKET
+    WRONG_PACKET;
 
-
+    public static PlayerDigType get(final byte i) {
+        return values()[i];
+    }
 }

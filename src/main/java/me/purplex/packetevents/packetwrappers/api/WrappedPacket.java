@@ -12,13 +12,18 @@ public class WrappedPacket {
             "Make sure you are using spigot!";
     public WrappedPacket(Object packet) {
         this.packet = packet;
-        setup();
+        try {
+            setup();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
-    protected void setup() {
+    protected void setup() throws Exception {
 
     }
 
     protected void throwUnsupportedVersion() {
         throw new IllegalStateException(err);
     }
+
 }

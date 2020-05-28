@@ -1,118 +1,81 @@
 package me.purplex.packetevents.packetwrappers.in.abilities;
 
-
-import me.purplex.packetevents.enums.ServerVersion;
 import me.purplex.packetevents.packetwrappers.api.WrappedPacket;
+import me.purplex.packetevents.utils.NMSUtils;
+
+import java.lang.reflect.Field;
 
 public class WrappedPacketInAbilities extends WrappedPacket {
-
-    public boolean a;
-    public boolean b;
-    public boolean c;
-    public boolean d;
-    public float e;
-    public float f;
+    private boolean isVulnerable;
+    private boolean isFlying;
+    private boolean allowFly;
+    private boolean instantBuild;
+    private float flySpeed;
+    private float walkSpeed;
 
     public WrappedPacketInAbilities(Object packet) {
         super(packet);
     }
 
     @Override
-    protected void setup() {
-        if (version == ServerVersion.v_1_7_10) {
-            WrappedPacketInAbilities_1_7_10 p = new WrappedPacketInAbilities_1_7_10(packet);
-            this.a = p.a;
-            this.b = p.b;
-            this.c = p.c;
-            this.d = p.d;
-            this.e = p.e;
-        } else if (version == ServerVersion.v_1_8) {
-            WrappedPacketInAbilities_1_8 p = new WrappedPacketInAbilities_1_8(packet);
-            this.a = p.a;
-            this.b = p.b;
-            this.c = p.c;
-            this.e = p.e;
-            this.f = p.f;
-        } else if (version == ServerVersion.v_1_8_3) {
-            WrappedPacketInAbilities_1_8_3 p = new WrappedPacketInAbilities_1_8_3(packet);
-            this.a = p.a;
-            this.b = p.b;
-            this.c = p.c;
-            this.e = p.e;
-            this.f = p.f;
-        } else if (version == ServerVersion.v_1_8_8) {
-            WrappedPacketInAbilities_1_8_8 p = new WrappedPacketInAbilities_1_8_8(packet);
-            this.a = p.a;
-            this.b = p.b;
-            this.c = p.c;
-            this.e = p.e;
-            this.f = p.f;
-        } else if (version == ServerVersion.v_1_9) {
-            WrappedPacketInAbilities_1_9 p = new WrappedPacketInAbilities_1_9(packet);
-            this.a = p.a;
-            this.b = p.b;
-            this.c = p.c;
-            this.e = p.e;
-            this.f = p.f;
-        } else if (version == ServerVersion.v_1_9_4) {
-            WrappedPacketInAbilities_1_9_4 p = new WrappedPacketInAbilities_1_9_4(packet);
-            this.a = p.a;
-            this.b = p.b;
-            this.c = p.c;
-            this.e = p.e;
-            this.f = p.f;
-        } else if (version == ServerVersion.v_1_10) {
-            WrappedPacketInAbilities_1_10 p = new WrappedPacketInAbilities_1_10(packet);
-            this.a = p.a;
-            this.b = p.b;
-            this.c = p.c;
-            this.e = p.e;
-            this.f = p.f;
-        } else if (version == ServerVersion.v_1_11) {
-            WrappedPacketInAbilities_1_11 p = new WrappedPacketInAbilities_1_11(packet);
-            this.a = p.a;
-            this.b = p.b;
-            this.c = p.c;
-            this.e = p.e;
-            this.f = p.f;
-        } else if (version == ServerVersion.v_1_12) {
-            WrappedPacketInAbilities_1_12 p = new WrappedPacketInAbilities_1_12(packet);
-            this.a = p.a;
-            this.b = p.b;
-            this.c = p.c;
-            this.e = p.e;
-            this.f = p.f;
-        } else if (version == ServerVersion.v_1_13) {
-            WrappedPacketInAbilities_1_13 p = new WrappedPacketInAbilities_1_13(packet);
-            this.a = p.a;
-            this.b = p.b;
-            this.c = p.c;
-            this.e = p.e;
-            this.f = p.f;
-        } else if (version == ServerVersion.v_1_13_2) {
-            WrappedPacketInAbilities_1_13_2 p = new WrappedPacketInAbilities_1_13_2(packet);
-            this.a = p.a;
-            this.b = p.b;
-            this.c = p.c;
-            this.e = p.e;
-            this.f = p.f;
-        } else if (version == ServerVersion.v_1_14) {
-            WrappedPacketInAbilities_1_14 p = new WrappedPacketInAbilities_1_14(packet);
-            this.a = p.a;
-            this.b = p.b;
-            this.c = p.c;
-            this.e = p.e;
-            this.f = p.f;
-        } else if (version == ServerVersion.v_1_15) {
-            WrappedPacketInAbilities_1_15 p = new WrappedPacketInAbilities_1_15(packet);
-            this.a = p.a;
-            this.b = p.b;
-            this.c = p.c;
-            this.e = p.e;
-            this.f = p.f;
-        } else {
-            throwUnsupportedVersion();
-        }
+    protected void setup() throws IllegalAccessException {
+        this.isVulnerable = fields[0].getBoolean(packet);
+        this.isFlying = fields[1].getBoolean(packet);
+        this.allowFly = fields[2].getBoolean(packet);
+        this.instantBuild = fields[3].getBoolean(packet);
+        this.flySpeed = fields[4].getFloat(packet);
+        this.walkSpeed = fields[5].getFloat(packet);
     }
 
+    public boolean isVulnerable() {
+        return isVulnerable;
+    }
+
+    public boolean isFlying() {
+        return isFlying;
+    }
+
+    public boolean canFly() {
+        return allowFly;
+    }
+
+    public boolean canInstantlyBuild() {
+        return instantBuild;
+    }
+
+    public float getFlySpeed() {
+        return flySpeed;
+    }
+
+    public float getWalkSpeed() {
+        return walkSpeed;
+    }
+
+    private static Class<?> abilitiesClass;
+
+    private static Field[] fields = new Field[6];
+    static {
+        //CLASS
+        try {
+            abilitiesClass = NMSUtils.getNMSClass("PacketPlayInAbilities");
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+
+        //FIELDS
+        try {
+            fields[0] = abilitiesClass.getDeclaredField("a");
+            fields[1] = abilitiesClass.getDeclaredField("b");
+            fields[2] = abilitiesClass.getDeclaredField("c");
+            fields[3] = abilitiesClass.getDeclaredField("d");
+            fields[4] = abilitiesClass.getDeclaredField("e");
+            fields[5] = abilitiesClass.getDeclaredField("f");
+        } catch (NoSuchFieldException e) {
+            e.printStackTrace();
+        }
+
+        for(Field f : fields) {
+            f.setAccessible(true);
+        }
+    }
 }
