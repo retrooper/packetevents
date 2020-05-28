@@ -23,13 +23,13 @@ public class MainExample extends JavaPlugin {
         /**
          * Register TestExample's PacketListener
          */
-        PacketEvents.getPacketManager().registerListener(new TestExample());
+        PacketEvents.getEventManager().registerListener(new ExampleListener());
 
 
         /**
          * Register TestExample's bukkit Listener
          */
-        Bukkit.getPluginManager().registerEvents(new TestExample(), this);
+        Bukkit.getPluginManager().registerEvents(new ExampleListener(), this);
     }
 
     @Override

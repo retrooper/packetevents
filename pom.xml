@@ -6,7 +6,7 @@
 
     <groupId>me.purplex</groupId>
     <artifactId>packetevents</artifactId>
-    <version>1.2.3</version>
+    <version>1.2.4</version>
     <packaging>jar</packaging>
     <name>packetevents</name>
     <properties>
@@ -56,7 +56,6 @@
             <id>funkemunky-releases</id>
             <url>https://nexus.funkemunky.cc/content/repositories/releases/</url>
         </repository>
-
     </repositories>
 
 

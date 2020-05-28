@@ -1,9 +1,9 @@
 package me.purplex.packetevents;
 
 import me.purplex.packetevents.enums.ServerVersion;
-import me.purplex.packetevents.injector.PacketInjector;
 import me.purplex.packetevents.event.impl.ServerTickEvent;
-import me.purplex.packetevents.event.manager.PacketManager;
+import me.purplex.packetevents.event.manager.EventManager;
+import me.purplex.packetevents.injector.PacketInjector;
 import me.purplex.packetevents.utils.tps.*; //All tps' util classes
 import org.bukkit.Bukkit;
 import org.bukkit.event.EventHandler;
@@ -11,6 +11,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.plugin.java.JavaPlugin;
+
 import java.util.concurrent.*;
 
 public class PacketEvents implements Listener {
@@ -18,31 +19,31 @@ public class PacketEvents implements Listener {
     private static PacketEvents instance;
     private static final PacketInjector packetInjector = new PacketInjector();
     public static ExecutorService executor = Executors.newCachedThreadPool();
-    private static final PacketManager packetManager = new PacketManager();
+    private static final EventManager eventManager = new EventManager();
 
     private static int currentTick;
 
     private static int serverTickTask;
 
-    private static boolean serverTickEventActive = false;
+    private static boolean serverTickEventActive;
 
     public static JavaPlugin plugin;
 
-    public static PacketManager getPacketManager() {
-        return packetManager;
+    public static EventManager getEventManager() {
+        return eventManager;
     }
 
     @Deprecated
     public static void setup(final JavaPlugin plugin, final boolean serverTickEventEnabled) {
         PacketEvents.plugin = plugin;
-        serverTickEventActive = serverTickEventEnabled;
+        PacketEvents.serverTickEventActive = serverTickEventEnabled;
         Bukkit.getPluginManager().registerEvents(getInstance(), plugin);
 
         if (serverTickEventEnabled) {
             final Runnable runnable = new Runnable() {
                 @Override
                 public void run() {
-                    PacketEvents.getPacketManager().callEvent(new ServerTickEvent(currentTick++, PacketEvents.currentTimeMS()));
+                    PacketEvents.getEventManager().callEvent(new ServerTickEvent(currentTick++, PacketEvents.currentTimeMS()));
                 }
             };
             serverTickTask = Bukkit.getScheduler().scheduleAsyncRepeatingTask(plugin, runnable, 0L, 1L);
@@ -87,7 +88,6 @@ public class PacketEvents implements Listener {
         return instance == null ? instance = new PacketEvents() : instance;
     }
 
-
     public static double[] getRecentServerTPS() {
         final double[] tpsArray;
         if (version == ServerVersion.v_1_7_10) {
@@ -118,6 +118,11 @@ public class PacketEvents implements Listener {
             tpsArray = TPS_1_15.getTPS();
         } else {
             throw new IllegalStateException("Unable to calculate your the server's TPS, this version is not supported! Make sure you are using Spigot!");
+        }
+        for (int i = 0; i < tpsArray.length; i++) {
+            if (tpsArray[i] > 20.0) {
+                tpsArray[i] = 20.0;
+            }
         }
         return tpsArray;
     }
