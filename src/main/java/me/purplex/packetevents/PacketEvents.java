@@ -8,8 +8,7 @@ import me.purplex.packetevents.utils.TPSUtils; //tps utils
 import org.bukkit.Bukkit;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-import org.bukkit.event.player.PlayerJoinEvent;
-import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.event.player.*;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitTask;
 
@@ -58,7 +57,7 @@ public class PacketEvents implements Listener {
 
 
     @EventHandler
-    public void onJoin(PlayerJoinEvent e) {
+    public void onJoin(PlayerLoginEvent e) {
         if (executor == null) {
             executor = Executors.newCachedThreadPool();
             packetInjector.injectPlayer(e.getPlayer());

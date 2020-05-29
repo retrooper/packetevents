@@ -68,10 +68,8 @@ public class WrappedPacketInBlockPlace extends WrappedPacket {
     static {
             if (version.isHigherThan(ServerVersion.v_1_8_8)) {
                 WrappedPacketInBlockPlace_1_9.setupStaticVars();
-                System.out.println("WOOOOO");
             } else {
                 WrappedPacketInBlockPlace_Legacy.setupStaticVars();
-                System.out.println("SAAA");
             }
     }
 

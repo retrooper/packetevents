@@ -22,7 +22,6 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.inventory.ItemStack;
 
@@ -42,6 +41,7 @@ public class RegisteredListener implements PacketListener, Listener {
     public void onPacketReceive(PacketReceiveEvent e) {
         final Player p = e.getPlayer();
         final long timestamp = e.getTimestamp();
+        System.out.println(e.getPacketName());
         //ONLY CLIENT PACKETS ALLOWED HERE!
         switch (e.getPacketName()) {
             case Packet.Client.USE_ENTITY:
