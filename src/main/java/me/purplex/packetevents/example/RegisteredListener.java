@@ -1,4 +1,5 @@
 package me.purplex.packetevents.example;
+
 import me.purplex.packetevents.PacketEvents;
 import me.purplex.packetevents.enums.Direction;
 import me.purplex.packetevents.enums.EntityUseAction;
@@ -11,17 +12,19 @@ import me.purplex.packetevents.event.listener.PacketListener;
 import me.purplex.packetevents.packet.Packet;
 import me.purplex.packetevents.packetwrappers.in.abilities.WrappedPacketInAbilities;
 import me.purplex.packetevents.packetwrappers.in.blockdig.WrappedPacketInBlockDig;
+import me.purplex.packetevents.packetwrappers.in.blockplace.WrappedPacketInBlockPlace;
 import me.purplex.packetevents.packetwrappers.in.chat.WrappedPacketInChat;
 import me.purplex.packetevents.packetwrappers.in.flying.WrappedPacketInFlying;
-import me.purplex.packetevents.packetwrappers.in.use_entity.WrappedPacketInUseEntity;
-import me.purplex.packetevents.packetwrappers.login.handshake.WrappedPacketLoginHandshake;
-import me.purplex.packetevents.utils.playerprotocolversion.PlayerVersionManager;
+import me.purplex.packetevents.packetwrappers.in.useentity.WrappedPacketInUseEntity;
+import me.purplex.packetevents.utils.math.Vector3i;
 import org.bukkit.Location;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
+import org.bukkit.inventory.ItemStack;
 
 /**
  * Implementing PacketListener to listen to packets and packetevents' custom events,
@@ -42,9 +45,9 @@ public class RegisteredListener implements PacketListener, Listener {
         //ONLY CLIENT PACKETS ALLOWED HERE!
         switch (e.getPacketName()) {
             case Packet.Client.USE_ENTITY:
-                final WrappedPacketInUseEntity useEntity = new WrappedPacketInUseEntity(e.getPacket());
+                final WrappedPacketInUseEntity useEntity = new WrappedPacketInUseEntity(e.getPlayer(), e.getPacket());
                 final Entity entity = useEntity.getEntity();
-                final double distance = entity.getLocation().distanceSquared(p.getLocation());
+                final double distanceSquared = entity.getLocation().distanceSquared(p.getLocation());
                 final Hand hand = useEntity.getHand();
                 final EntityUseAction action = useEntity.getAction();
                 break;
@@ -63,7 +66,6 @@ public class RegisteredListener implements PacketListener, Listener {
                 final WrappedPacketInBlockDig blockDig = new WrappedPacketInBlockDig(e.getPacket());
                 final PlayerDigType type = blockDig.getDigType();
                 final Direction direction = blockDig.getDirection();
-
                 break;
             case Packet.Client.FLYING:
                 final WrappedPacketInFlying flying = new WrappedPacketInFlying(e.getPacket());
@@ -85,6 +87,13 @@ public class RegisteredListener implements PacketListener, Listener {
                 final String message = chat.getMessage();
                 //e.getPlayer().sendMessage(message);
                 break;
+            case Packet.Client.BLOCK_PLACE:
+                final WrappedPacketInBlockPlace blockPlace = new WrappedPacketInBlockPlace(e.getPlayer(), e.getPacket());
+                final Vector3i blockPosition = blockPlace.getBlockPosition();
+                final Hand h = blockPlace.getHand();
+                final ItemStack stack = blockPlace.getItemStack();
+                break;
+
             //System.out.println("YOU SAID: " + message);
         }
 
@@ -134,19 +143,7 @@ public class RegisteredListener implements PacketListener, Listener {
             final ServerTickEvent event = (ServerTickEvent) e;
             final int currentTick = event.getCurrentTick();
             // System.out.println(PacketEvents.getCurrentServerTPS() + " is tps");
-        } else if (e instanceof PacketLoginEvent) {
-            //System.out.println("LLLOOOOOGIN");
-            final PacketLoginEvent event = (PacketLoginEvent) e;
-            if (event.getPacketName().equals(Packet.Login.HANDSHAKE)) {
-                final WrappedPacketLoginHandshake handshake = new WrappedPacketLoginHandshake(event.getPacket());
-                final String hostname = handshake.hostname;
-                final int port = handshake.port;
-                final int protocolVersion = handshake.protocolVersion;
-                PlayerVersionManager.setPlayerProtocolVersion(event.getPlayer().getUniqueId(), protocolVersion);
-                //  System.out.println("PROTOCOL NUMBER: " + protocolVersion);
-            }
         }
-
     }
 
 

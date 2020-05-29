@@ -2,6 +2,7 @@ package me.purplex.packetevents.utils;
 
 import me.purplex.packetevents.PacketEvents;
 import me.purplex.packetevents.enums.ServerVersion;
+import me.purplex.packetevents.utils.math.Vector3i;
 
 public class BaseBlockUtils {
     private static final ServerVersion version = PacketEvents.getServerVersion();

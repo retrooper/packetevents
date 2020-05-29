@@ -1,12 +1,17 @@
 package me.purplex.packetevents.utils;
 
 import me.purplex.packetevents.enums.ServerVersion;
+import me.purplex.packetevents.utils.entityfinder.EntityFinderUtils;
 import net.minecraft.server.v1_7_R4.WorldServer;
 import net.minecraft.server.v1_8_R3.MinecraftServer;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.craftbukkit.v1_8_R1.CraftWorld;
 import org.bukkit.entity.Entity;
+import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Player;
+import org.bukkit.entity.Zombie;
+import org.bukkit.util.BlockIterator;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
@@ -32,7 +37,7 @@ public class NMSUtils {
     private static Method entityMethod;
 
     static {
-        //CLASSES
+
         try {
             minecraftServerClass = getNMSClass("MinecraftServer");
             worldServerClass = getNMSClass("WorldServer");
@@ -45,12 +50,12 @@ public class NMSUtils {
         try {
             getServerMethod = minecraftServerClass.getMethod("getServer");
             getCraftWorldHandleMethod = craftWorldsClass.getMethod("getHandle");
-           // entityMethod = worldServerClass.getMethod(is_1_8() ? "a" : "getEntity");
+            // entityMethod = worldServerClass.getMethod(is_1_8() ? "a" : "getEntity");
         } catch (NoSuchMethodException e) {
             e.printStackTrace();
         }
 
-        //FIELDS
+
         try {
             recentTPSField = minecraftServerClass.getField("recentTps");
         } catch (NoSuchFieldException e) {
@@ -76,26 +81,8 @@ public class NMSUtils {
         return Class.forName(obcDir + "." + name);
     }
 
-    public static Object getEntityById(final int id) throws InvocationTargetException, IllegalAccessException {
-        //1.13.2 worlds field -> getWorlds()
-        //1.8->1.8.8, world.a(ID); rest is getEntity(ID);
-        final List<World> worlds = Bukkit.getWorlds();
-        for (World w : worlds) {
-           /* Object craftWorld = craftWorldsClass.cast(w);
-
-            Object worldServer = getCraftWorldHandleMethod.invoke(craftWorld);
-            try {
-                return entityMethod.invoke(worldServer, id);
-            } catch (NullPointerException e) {
-                continue;
-            }*/
-            for(Entity e : w.getEntities()) {
-                if(e.getEntityId() == id) {
-                    return e;
-                }
-            }
-        }
-        return null;
+    public static Entity getNearByEntityById(final World w, final int id) throws InvocationTargetException, IllegalAccessException {
+        return EntityFinderUtils.getEntityById(w, id);
     }
 
     public static boolean is_1_8() {

@@ -106,14 +106,14 @@ public class WrappedPacketInFlying extends WrappedPacket {
     private static Field[] fields = new Field[8]; //x, y, z, yaw pitch, onGround, isPositionPacket, isLookPacket
 
     static {
-        //CLASS
+
         try {
             flyingClass = NMSUtils.getNMSClass("PacketPlayInFlying");
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
         }
 
-        //FIELDS
+
         try {
             fields[0] = flyingClass.getDeclaredField("x");
             fields[1] = flyingClass.getDeclaredField("y");
@@ -128,7 +128,7 @@ public class WrappedPacketInFlying extends WrappedPacket {
         }
 
         for (Field f : fields) {
-            if (!f.isAccessible()) {
+            if (f != null) {
                 f.setAccessible(true);
             }
         }

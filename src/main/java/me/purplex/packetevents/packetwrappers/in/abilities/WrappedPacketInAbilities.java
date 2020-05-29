@@ -54,15 +54,16 @@ public class WrappedPacketInAbilities extends WrappedPacket {
     private static Class<?> abilitiesClass;
 
     private static Field[] fields = new Field[6];
+
     static {
-        //CLASS
+
         try {
             abilitiesClass = NMSUtils.getNMSClass("PacketPlayInAbilities");
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
         }
 
-        //FIELDS
+
         try {
             fields[0] = abilitiesClass.getDeclaredField("a");
             fields[1] = abilitiesClass.getDeclaredField("b");
@@ -74,8 +75,10 @@ public class WrappedPacketInAbilities extends WrappedPacket {
             e.printStackTrace();
         }
 
-        for(Field f : fields) {
-            f.setAccessible(true);
+        for (Field f : fields) {
+            if (f != null) {
+                f.setAccessible(true);
+            }
         }
     }
 }

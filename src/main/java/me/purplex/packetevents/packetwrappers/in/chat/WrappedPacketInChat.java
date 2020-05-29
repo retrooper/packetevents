@@ -28,7 +28,7 @@ public class WrappedPacketInChat extends WrappedPacket {
     private static Field field;
 
     static {
-        //CLASSES
+
         try {
             chatPacketClass = NMSUtils.getNMSClass("PacketPlayInChat");
         } catch (ClassNotFoundException e) {
@@ -41,9 +41,7 @@ public class WrappedPacketInChat extends WrappedPacket {
             e.printStackTrace();
         }
 
-        if (!field.isAccessible()) {
-            field.setAccessible(true);
-        }
+        field.setAccessible(true);
     }
 
     private static String getChatFieldName() {

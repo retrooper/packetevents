@@ -41,7 +41,7 @@ public class ChannelManager {
             throw new IllegalStateException("Failed to find a NMS class! You are probably using an unsupported version of spigot.");
         }
 
-        //FIELDS & METHODS
+
         try {
             channelField = networkManager.getDeclaredField(getChannelFieldName());
         } catch (NoSuchFieldException e) {
