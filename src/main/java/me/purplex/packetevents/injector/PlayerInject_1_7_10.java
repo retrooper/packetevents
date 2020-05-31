@@ -55,6 +55,7 @@ class PlayerInject_1_7_10 {
         PacketEvents.getEventManager().callEvent(uninjectEvent);
         channel.eventLoop().submit(runnable);
     }
+
     public static Channel getChannel(final Player player) {
         return (Channel) ChannelManager.getChannel(player);
     }

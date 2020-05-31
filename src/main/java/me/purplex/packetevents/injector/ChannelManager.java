@@ -2,8 +2,10 @@ package me.purplex.packetevents.injector;
 
 import me.purplex.packetevents.enums.ServerVersion;
 
+import net.minecraft.server.v1_7_R4.EntityPlayer;
 import net.minecraft.server.v1_8_R3.NetworkManager;
 import net.minecraft.util.io.netty.channel.Channel;
+import org.bukkit.craftbukkit.v1_7_R4.entity.CraftPlayer;
 import org.bukkit.entity.Player;
 
 import java.lang.reflect.Field;
@@ -53,13 +55,10 @@ public class ChannelManager {
         }
 
         try {
-            handleMethod = craftPlayer.getDeclaredMethod("getHandle");
+            handleMethod = craftPlayer.getMethod("getHandle");
         } catch (NoSuchMethodException e) {
             e.printStackTrace();
             throw new IllegalStateException("Failed to find the getHandle function in the CraftPlayer class! You are probably using an unsupported version of spigot.");
-        }
-        if (!handleMethod.isAccessible()) {
-            handleMethod.setAccessible(true);
         }
 
         try {
@@ -97,11 +96,16 @@ public class ChannelManager {
         playerChannels.remove(uuid);
     }
 
+    public static boolean contains(final Player player) {
+        return playerChannels.containsKey(player.getUniqueId());
+    }
+
     public static Object getChannel(final Player player) {
         final UUID uuid = player.getUniqueId();
-        if (playerChannels.containsKey(uuid)) {
+        if (contains(player)) {
             return playerChannels.get(uuid);
         }
+
         Object channel = null;
         try {
             channel = getChannelObject(player);
@@ -112,8 +116,7 @@ public class ChannelManager {
         }
         if (channel != null) {
             playerChannels.put(uuid, channel);
-        }
-        else {
+        } else {
             System.out.println("ITS NULL");
         }
         return channel;

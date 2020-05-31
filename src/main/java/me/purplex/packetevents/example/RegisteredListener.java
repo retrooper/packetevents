@@ -41,7 +41,6 @@ public class RegisteredListener implements PacketListener, Listener {
     public void onPacketReceive(PacketReceiveEvent e) {
         final Player p = e.getPlayer();
         final long timestamp = e.getTimestamp();
-        System.out.println(e.getPacketName());
         //ONLY CLIENT PACKETS ALLOWED HERE!
         switch (e.getPacketName()) {
             case Packet.Client.USE_ENTITY:
@@ -101,7 +100,7 @@ public class RegisteredListener implements PacketListener, Listener {
 
     @PacketHandler
     public void onPacketSend(PacketSendEvent e) {
-
+        //System.out.println(e.getPacketName());
     }
 
     @PacketHandler

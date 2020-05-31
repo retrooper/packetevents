@@ -16,7 +16,6 @@ public class PacketInjector {
         }
         else {
             PlayerInject_1_8.injectPlayer(player);
-           // player.sendMessage("injected");
         }
     }
 
@@ -29,5 +28,4 @@ public class PacketInjector {
         }
         ChannelManager.removeChannel(player.getUniqueId());
     }
-
 }

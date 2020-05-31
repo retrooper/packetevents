@@ -5,16 +5,17 @@ import me.purplex.packetevents.event.impl.ServerTickEvent;
 import me.purplex.packetevents.event.manager.EventManager;
 import me.purplex.packetevents.injector.PacketInjector; //public packet injector
 import me.purplex.packetevents.utils.TPSUtils; //tps utils
+import me.purplex.packetevents.utils.playerprotocolversion.PlayerVersionManager;
 import org.bukkit.Bukkit;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.*;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitTask;
-
 import java.util.concurrent.*;
 
 public class PacketEvents implements Listener {
+    public static boolean viaVersionPresent = false;
     private static final ServerVersion version = ServerVersion.getVersion();
     private static PacketEvents instance;
     private static final PacketInjector packetInjector = new PacketInjector();
@@ -57,7 +58,7 @@ public class PacketEvents implements Listener {
 
 
     @EventHandler
-    public void onJoin(PlayerLoginEvent e) {
+    public void onJoin(PlayerJoinEvent e) {
         if (executor == null) {
             executor = Executors.newCachedThreadPool();
             packetInjector.injectPlayer(e.getPlayer());
@@ -71,12 +72,12 @@ public class PacketEvents implements Listener {
             }
         };
         Future<?> future = executor.submit(runnable);
-
     }
 
     @EventHandler
     public void onQuit(PlayerQuitEvent e) {
         packetInjector.uninjectPlayer(e.getPlayer());
+        PlayerVersionManager.clearPlayerProtocolVersion(e.getPlayer());
     }
 
     public static ServerVersion getServerVersion() {
