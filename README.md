@@ -1,6 +1,6 @@
-# packetevents by purplex
+# packetevents by explored
 
-PacketListener coded by purplex.
+PacketListener coded by explored.
 
 Dependencies? Nah...
 
