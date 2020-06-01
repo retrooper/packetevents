@@ -13,7 +13,9 @@ Join my discord server(to talk to me): https://discord.gg/ZWTkg4v
 How to use with **Gradle, Maven, sbt and leiningen**.
 
 Click the link below.
+
 Make sure to replace **Tag** with a proper release version.
+
 I recommend you to use the latest released version!
 
 
