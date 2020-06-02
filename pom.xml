@@ -6,7 +6,7 @@
 
     <groupId>me.purplex</groupId>
     <artifactId>packetevents</artifactId>
-    <version>1.2.5</version>
+    <version>1.2.6</version>
     <packaging>jar</packaging>
     <name>packetevents</name>
     <properties>
@@ -44,10 +44,6 @@
     </build>
 
     <repositories>
-        <repository>
-            <id>viaversion-repo</id>
-            <url>https://repo.viaversion.com</url>
-        </repository>
         <repository>
             <id>spigot-repo</id>
             <url>https://hub.spigotmc.org/nexus/content/repositories/snapshots/</url>
