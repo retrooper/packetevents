@@ -1,6 +1,6 @@
-# packetevents by purplex
+# packetevents by explored
 
-PacketListener coded by purplex.
+PacketListener coded by explored.
 
 Dependencies? Nah...
 
@@ -8,63 +8,17 @@ Licensed with the GPL3 license.
 
 [![](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
 
-Coding help discord server: https://discord.gg/ZWTkg4v
+Join my discord server(to talk to me): https://discord.gg/ZWTkg4v
 
 How to use with **Gradle, Maven, sbt and leiningen**.
 
-The lastest stable version is displayed below. 
+Click the link below.
 
-[![](https://jitpack.io/v/purplexdev/packetevents.svg)](https://jitpack.io/#purplexdev/packetevents)
+Make sure to replace **Tag** with a proper release version.
 
-# Gradle
-
-```gradle
-allprojects {
-        repositories {
-		...
-		maven { url 'https://jitpack.io' }
-	}
-}
-
-dependencies {
-        implementation 'com.github.purplexdev:packetevents:1.2.5'
-}
-```
+I recommend you to use the latest released version!
 
 
-# Maven
+[![](http://jitpack.io/v/explored/packetevents.svg)](http://jitpack.io/#explored/packetevents)
 
-```xml
-<repositories>
-        <repository>
-            <id>jitpack.io</id>
-            <url>https://jitpack.io</url>
-        </repository>
-    </repositories>
-
-<dependencies>
-        <dependency>
-            <groupId>com.github.purplexdev</groupId>
-            <artifactId>packetevents</artifactId>
-            <version>1.2.5</version>
-        </dependency>
-</dependencies>
-```
-
-# sbt
-
-```
-resolvers += "jitpack" at "https://jitpack.io"
-
-libraryDependencies += "com.github.purplexdev" % "packetevents" % "1.2.5"	
-```
-
-# leiningen
-```
-:repositories [["jitpack" "https://jitpack.io"]]
-
-:dependencies [[com.github.purplexdev/packetevents "1.2.5"]]	
-```
-
-
-
+If clicking the badge doesn't work paste this link into your browser http://jitpack.io/#explored/packetevents
