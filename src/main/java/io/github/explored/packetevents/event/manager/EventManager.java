@@ -3,6 +3,7 @@ package io.github.explored.packetevents.event.manager;
 import io.github.explored.packetevents.event.PacketEvent;
 import io.github.explored.packetevents.event.PacketListener;
 import io.github.explored.packetevents.event.PacketHandler;
+
 import java.lang.reflect.*;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -14,14 +15,16 @@ public class EventManager {
 
     public static void callEvent(final PacketEvent e) {
         for (final PacketListener listener : registeredMethods.keySet()) {
-            boolean calledOnPacket = false;
             //Annotated methods
             final List<Method> methods = registeredMethods.get(listener);
-            for(final Method method : methods) {
-                try {
-                    method.invoke(listener, e);
-                } catch (IllegalAccessException | InvocationTargetException ex) {
-                    ex.printStackTrace();
+            for (final Method method : methods) {
+                if (method.getParameterTypes()[0].equals(PacketEvent.class)
+                        || method.getParameterTypes()[0].getSimpleName().equals(e.getClass().getSimpleName())) {
+                    try {
+                        method.invoke(listener, e);
+                    } catch (IllegalAccessException | InvocationTargetException ex) {
+                        ex.printStackTrace();
+                    }
                 }
             }
         }
@@ -32,10 +35,7 @@ public class EventManager {
         final List<Method> methods = new ArrayList<Method>();
         for (final Method m : e.getClass().getMethods()) {
             if (m.isAnnotationPresent(PacketHandler.class)) {
-                if (m.getParameterTypes()[0].equals(PacketEvent.class)
-                        || m.getParameterTypes()[0].getSimpleName().equals(e.getClass().getSimpleName())) {
-                    methods.add(m);
-                }
+                methods.add(m);
             }
         }
         registeredMethods.put(e, methods);

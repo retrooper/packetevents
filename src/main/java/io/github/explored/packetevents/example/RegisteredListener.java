@@ -95,16 +95,35 @@ public class RegisteredListener implements PacketListener, Listener {
 
     }
 
+    /**
+     * Example of a custom event
+     * @param e
+     */
     @PacketHandler
     public void onCustomMove(CustomMoveEvent e) {
         double distance = e.getTo().distanceSquared(e.getFrom());
     }
 
+    /**
+     * I recommend you use the player inject event
+     * to register your players instead of any other bukkit event,
+     * to avoid any issues.
+     * @param event
+     */
     @PacketHandler
     public void onInject(PlayerInjectEvent event) {
 
     }
 
+    /**
+     * I recommend you use the player uninject event,
+     * to unregister your players
+     *
+     * You can also call this event to "whitelist" a player,
+     * our API won't even notice the player exists, so you won't
+     * be able to listen to any packets from the player
+     * @param e
+     */
     @PacketHandler
     public void onUninject(PlayerUninjectEvent e) {
 
@@ -116,7 +135,7 @@ public class RegisteredListener implements PacketListener, Listener {
      * @param e PacketEvent
      */
     @PacketHandler
-    public void onPacket(PacketEvent e) {
+    public void onPacket(final PacketEvent e) {
         if (e instanceof PacketSendEvent) {
             final PacketSendEvent p = (PacketSendEvent) e;
             final Player targetPlayer = p.getPlayer();
@@ -142,7 +161,7 @@ public class RegisteredListener implements PacketListener, Listener {
      */
     @EventHandler
     public void onMove(PlayerMoveEvent e) {
-        CustomMoveEvent customMoveEvent = new CustomMoveEvent(e.getPlayer(), e.getTo(), e.getFrom());
+        final CustomMoveEvent customMoveEvent = new CustomMoveEvent(e.getPlayer(), e.getTo(), e.getFrom());
         e.setCancelled(customMoveEvent.isCancelled());
         PacketEvents.getEventManager().callEvent(customMoveEvent);
 
@@ -153,15 +172,4 @@ public class RegisteredListener implements PacketListener, Listener {
             e.setFrom(customMoveEvent.getFrom());
         }
     }
-
-    /**
-     * Only listen to server tick (if enabled)
-     *
-     * @param e ServerTickEvent
-     */
-    @PacketHandler
-    public void onServerTick(ServerTickEvent e) {
-
-    }
-
 }
