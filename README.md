@@ -1,10 +1,10 @@
-# packetevents by explored
+# packetevents by retrooper
 
-PacketListener coded by explored.
+An asynchronous spigot packetListener coded by retrooper.
 
-Dependencies? Nah...
+* No dependencies
 
-Licensed with the GPL3 license.
+* Licensed with the GPL3 license.
 
 [![](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
 
