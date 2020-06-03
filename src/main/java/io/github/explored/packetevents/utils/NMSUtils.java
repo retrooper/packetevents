@@ -2,12 +2,9 @@ package io.github.explored.packetevents.utils;
 
 import io.github.explored.packetevents.enums.ServerVersion;
 import io.github.explored.packetevents.utils.nms_entityfinder.EntityFinderUtils;
-import net.minecraft.server.v1_7_R4.EntityPlayer;
 import org.bukkit.World;
-import org.bukkit.craftbukkit.v1_7_R4.entity.CraftPlayer;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
-
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;

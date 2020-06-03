@@ -11,6 +11,7 @@ import io.github.explored.packetevents.packetwrappers.in.blockdig.WrappedPacketI
 import io.github.explored.packetevents.packetwrappers.in.blockplace.WrappedPacketInBlockPlace;
 import io.github.explored.packetevents.packetwrappers.in.chat.WrappedPacketInChat;
 import io.github.explored.packetevents.packetwrappers.in.flying.WrappedPacketInFlying;
+import io.github.explored.packetevents.packetwrappers.in.keepalive.WrappedPacketInKeepAlive;
 import io.github.explored.packetevents.packetwrappers.in.useentity.WrappedPacketInUseEntity;
 import io.github.explored.packetevents.packet.Packet;
 import io.github.explored.packetevents.utils.vector.Vector3i;
@@ -89,7 +90,10 @@ public class RegisteredListener implements PacketListener, Listener {
                 final Hand h = blockPlace.getHand();
                 final ItemStack stack = blockPlace.getItemStack();
                 break;
-
+            case Packet.Client.KEEP_ALIVE:
+                final WrappedPacketInKeepAlive keepAlive = new WrappedPacketInKeepAlive(e.getPacket());
+                final long responseID = keepAlive.getId();
+                break;
             //System.out.println("YOU SAID: " + message);
         }
 
