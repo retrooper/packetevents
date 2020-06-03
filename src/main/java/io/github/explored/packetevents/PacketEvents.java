@@ -4,8 +4,10 @@ import io.github.explored.packetevents.enums.*;
 import io.github.explored.packetevents.event.impl.ServerTickEvent;
 import io.github.explored.packetevents.event.manager.EventManager;
 import io.github.explored.packetevents.injector.PacketInjector;
+import io.github.explored.packetevents.utils.NMSUtils;
 import io.github.explored.packetevents.utils.TPSUtils;
 import org.bukkit.Bukkit;
+import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.*;
@@ -102,6 +104,10 @@ public class PacketEvents implements Listener {
 
     public static double getCurrentServerTPS() {
         return getRecentServerTPS()[0];
+    }
+
+    public static int getPing(final Player player) {
+        return NMSUtils.getPlayerPing(player);
     }
 
     public static long currentTimeMS() {
