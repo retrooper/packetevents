@@ -19,6 +19,6 @@ Make sure to replace **Tag** with a proper release version.
 I recommend you to use the latest released version!
 
 
-[![](http://jitpack.io/v/explored/packetevents.svg)](http://jitpack.io/#explored/packetevents)
+[![](https://jitpack.io/v/retrooper/packetevents.svg)](https://jitpack.io/#retrooper/packetevents)
 
 If clicking the badge doesn't work paste this link into your browser http://jitpack.io/#explored/packetevents
