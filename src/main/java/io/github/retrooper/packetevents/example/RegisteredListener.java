@@ -1,7 +1,7 @@
 package io.github.retrooper.packetevents.example;
 
 import io.github.retrooper.packetevents.PacketEvents;
-import io.github.retrooper.packetevents.enums.PlayerDigType;
+import io.github.retrooper.packetevents.enums.*;
 import io.github.retrooper.packetevents.event.PacketEvent;
 import io.github.retrooper.packetevents.event.PacketHandler;
 import io.github.retrooper.packetevents.event.PacketListener;
@@ -9,14 +9,12 @@ import io.github.retrooper.packetevents.packetwrappers.in.abilities.WrappedPacke
 import io.github.retrooper.packetevents.packetwrappers.in.blockdig.WrappedPacketInBlockDig;
 import io.github.retrooper.packetevents.packetwrappers.in.blockplace.WrappedPacketInBlockPlace;
 import io.github.retrooper.packetevents.packetwrappers.in.chat.WrappedPacketInChat;
+import io.github.retrooper.packetevents.packetwrappers.in.entityaction.WrappedPacketInEntityAction;
 import io.github.retrooper.packetevents.packetwrappers.in.flying.WrappedPacketInFlying;
 import io.github.retrooper.packetevents.packetwrappers.in.keepalive.WrappedPacketInKeepAlive;
 import io.github.retrooper.packetevents.packetwrappers.in.useentity.WrappedPacketInUseEntity;
 import io.github.retrooper.packetevents.packet.Packet;
 import io.github.retrooper.packetevents.utils.vector.Vector3i;
-import io.github.retrooper.packetevents.enums.Direction;
-import io.github.retrooper.packetevents.enums.EntityUseAction;
-import io.github.retrooper.packetevents.enums.Hand;
 import io.github.retrooper.packetevents.event.impl.*;
 import org.bukkit.Location;
 import org.bukkit.entity.Entity;
@@ -45,11 +43,10 @@ public class RegisteredListener implements PacketListener, Listener {
         //ONLY CLIENT PACKETS ALLOWED HERE!
         switch (e.getPacketName()) {
             case Packet.Client.USE_ENTITY:
-                final WrappedPacketInUseEntity useEntity = new WrappedPacketInUseEntity(e.getPlayer(), e.getPacket());
+                final WrappedPacketInUseEntity useEntity = new WrappedPacketInUseEntity(e.getPacket());
                 final Entity entity = useEntity.getEntity();
                 final double distanceSquared = entity.getLocation().distanceSquared(p.getLocation());
-                final Hand hand = useEntity.getHand();
-                final EntityUseAction action = useEntity.getAction();
+                final EntityUseAction useAction = useEntity.getAction();
                 break;
             case Packet.Client.ABILITIES:
                 final WrappedPacketInAbilities abilities = new WrappedPacketInAbilities(e.getPacket());
@@ -96,6 +93,11 @@ public class RegisteredListener implements PacketListener, Listener {
             case Packet.Client.KEEP_ALIVE:
                 final WrappedPacketInKeepAlive keepAlive = new WrappedPacketInKeepAlive(e.getPacket());
                 final long responseID = keepAlive.getId();
+                break;
+            case Packet.Client.ENTITY_ACTION:
+                final WrappedPacketInEntityAction entityAction = new WrappedPacketInEntityAction(e.getPacket());
+                final PlayerAction action = entityAction.getAction();
+                final int jumpBoost = entityAction.getJumpBoost();
                 break;
             //System.out.println("YOU SAID: " + message);
         }

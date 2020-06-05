@@ -1,54 +1,30 @@
 package io.github.retrooper.packetevents.packetwrappers.in.useentity;
 
 import io.github.retrooper.packetevents.enums.EntityUseAction;
-import io.github.retrooper.packetevents.enums.ServerVersion;
 import io.github.retrooper.packetevents.packetwrappers.api.WrappedPacket;
 import io.github.retrooper.packetevents.utils.NMSUtils;
-import io.github.retrooper.packetevents.enums.Hand;
 import org.bukkit.entity.Entity;
-import org.bukkit.entity.Player;
-
-import javax.annotation.Nullable;
 import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
 
 public class WrappedPacketInUseEntity extends WrappedPacket {
     private int entityId;
     private Entity entity;
     private EntityUseAction action;
-    private Hand hand;
 
-    public WrappedPacketInUseEntity(final Player player, final Object packet) {
-        super(player, packet);
+    public WrappedPacketInUseEntity(final Object packet) {
+        super(packet);
     }
 
 
     @Override
-    protected void setup() throws IllegalAccessException, InvocationTargetException {
+    protected void setup() throws IllegalAccessException {
         this.entityId = fields[0].getInt(packet);
-
-        this.entity = NMSUtils.getNearByEntityById(getPlayer().getWorld(), entityId);
-
-
+        this.entity = NMSUtils.getEntityById(this.entityId);
         final Object useActionEnum = fields[1].get(packet);
         this.action = EntityUseAction.valueOf(useActionEnum.toString());
-
-        final Object handObj;
-        if (fields[2] == null) {
-            handObj = Hand.MAIN_HAND.name();
-        } else {
-            handObj = fields[2].get(packet);
-        }
-
-        this.hand = Hand.valueOf(handObj.toString());
     }
 
 
-    @Nullable
-    /**
-     * It is possible for the entity to be null, if the player attacks from way too far,
-     * if it is null, please find the entity yourself with the entity ID
-     */
     public Entity getEntity() {
         return entity;
     }
@@ -61,23 +37,19 @@ public class WrappedPacketInUseEntity extends WrappedPacket {
         return action;
     }
 
-
-    public Hand getHand() {
-        return hand;
-    }
-
-
     private static Class<?> useEntityClass;
 
     private static Class<?> entityClass;
 
-    private static Field[] fields = new Field[3];
+
+    private static Field[] fields = new Field[2];
 
     static {
 
         try {
             useEntityClass = NMSUtils.getNMSClass("PacketPlayInUseEntity");
             entityClass = NMSUtils.getNMSClass("Entity");
+
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
         }
@@ -86,9 +58,6 @@ public class WrappedPacketInUseEntity extends WrappedPacket {
         try {
             fields[0] = useEntityClass.getDeclaredField("a");
             fields[1] = useEntityClass.getDeclaredField("action");
-            if (version.isHigherThan(ServerVersion.v_1_8_8)) {
-                fields[2] = useEntityClass.getDeclaredField("d");
-            }
 
         } catch (NoSuchFieldException e) {
             e.printStackTrace();

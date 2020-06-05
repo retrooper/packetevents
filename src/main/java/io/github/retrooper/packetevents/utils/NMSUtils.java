@@ -2,9 +2,12 @@ package io.github.retrooper.packetevents.utils;
 
 import io.github.retrooper.packetevents.enums.ServerVersion;
 import io.github.retrooper.packetevents.utils.nms_entityfinder.EntityFinderUtils;
+import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
+
+import javax.annotation.Nullable;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -22,8 +25,6 @@ public class NMSUtils {
     private static Method getServerMethod;
     private static Field recentTPSField;
 
-    private static Class<?> worldServerClass;
-
 
     private static Method getCraftWorldHandleMethod;
     private static Method entityMethod;
@@ -34,14 +35,14 @@ public class NMSUtils {
     private static Method getCraftPlayerHandle;
 
     private static Field entityPlayerPingField;
+
     static {
 
         try {
             minecraftServerClass = getNMSClass("MinecraftServer");
-            worldServerClass = getNMSClass("WorldServer");
             craftWorldsClass = getOBCClass("CraftWorld");
             craftPlayerClass = getOBCClass("entity.CraftPlayer");
-            entityPlayerClass= getNMSClass("EntityPlayer");
+            entityPlayerClass = getNMSClass("EntityPlayer");
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
         }
@@ -50,7 +51,6 @@ public class NMSUtils {
         try {
             getServerMethod = minecraftServerClass.getMethod("getServer");
             getCraftWorldHandleMethod = craftWorldsClass.getMethod("getHandle");
-            // entityMethod = worldServerClass.getMethod(is_1_8() ? "a" : "getEntity");
             getCraftPlayerHandle = craftPlayerClass.getMethod("getHandle");
         } catch (NoSuchMethodException e) {
             e.printStackTrace();
@@ -59,7 +59,7 @@ public class NMSUtils {
 
         try {
             recentTPSField = minecraftServerClass.getField("recentTps");
-            entityPlayerPingField =entityPlayerClass.getField("ping");
+            entityPlayerPingField = entityPlayerClass.getField("ping");
         } catch (NoSuchFieldException e) {
             e.printStackTrace();
         }
@@ -87,11 +87,17 @@ public class NMSUtils {
         return Class.forName(nettyPrefix + "." + name);
     }
 
-    public static Entity getNearByEntityById(final World w, final int id) throws InvocationTargetException, IllegalAccessException {
-        return EntityFinderUtils.getEntityById(w, id);
+    @Nullable
+    public static Entity getEntityById(final int id) {
+        return EntityFinderUtils.getEntityById(id);
     }
 
-    public static int getPlayerPing(final Player player){
+    @Nullable
+    public static Entity getEntityByIdWithWorld(final World world, final int id) {
+        return EntityFinderUtils.getEntityByIdWithWorld(world, id);
+    }
+
+    public static int getPlayerPing(final Player player) {
         final Object craftPlayer = craftPlayerClass.cast(player);
         Object entityPlayer = null;
         try {

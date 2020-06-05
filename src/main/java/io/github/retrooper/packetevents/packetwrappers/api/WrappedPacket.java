@@ -13,12 +13,12 @@ public class WrappedPacket {
             "and tell him what version your server is running on! " +
             "Make sure you are using spigot!";
 
-    public WrappedPacket(Object packet) {
+    public WrappedPacket(final Object packet) {
         this.player = null;
         this.packet = packet;
         try {
             setup();
-        } catch (Exception e) {
+        } catch (final Exception e) {
             e.printStackTrace();
         }
     }
@@ -28,10 +28,8 @@ public class WrappedPacket {
         this.packet = packet;
         try {
             setup();
-        } catch (Exception e) {
-            if (!(e instanceof NullPointerException)) {
-                e.printStackTrace();
-            }
+        } catch (final Exception e) {
+            e.printStackTrace();
         }
     }
 
