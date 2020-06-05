@@ -14,6 +14,8 @@ import io.github.retrooper.packetevents.packetwrappers.in.flying.WrappedPacketIn
 import io.github.retrooper.packetevents.packetwrappers.in.keepalive.WrappedPacketInKeepAlive;
 import io.github.retrooper.packetevents.packetwrappers.in.useentity.WrappedPacketInUseEntity;
 import io.github.retrooper.packetevents.packet.Packet;
+import io.github.retrooper.packetevents.packetwrappers.out.entityvelocity.WrappedPacketOutEntityVelocity;
+import io.github.retrooper.packetevents.utils.NMSUtils;
 import io.github.retrooper.packetevents.utils.vector.Vector3i;
 import io.github.retrooper.packetevents.event.impl.*;
 import org.bukkit.Location;
@@ -47,6 +49,8 @@ public class RegisteredListener implements PacketListener, Listener {
                 final Entity entity = useEntity.getEntity();
                 final double distanceSquared = entity.getLocation().distanceSquared(p.getLocation());
                 final EntityUseAction useAction = useEntity.getAction();
+
+                NMSUtils.sendSendableWrapper(e.getPlayer(), new WrappedPacketOutEntityVelocity(e.getPlayer(), 0, 20, 0));
                 break;
             case Packet.Client.ABILITIES:
                 final WrappedPacketInAbilities abilities = new WrappedPacketInAbilities(e.getPacket());

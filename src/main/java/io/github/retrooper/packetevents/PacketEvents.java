@@ -4,7 +4,6 @@ import io.github.retrooper.packetevents.event.impl.ServerTickEvent;
 import io.github.retrooper.packetevents.event.manager.EventManager;
 import io.github.retrooper.packetevents.injector.PacketInjector;
 import io.github.retrooper.packetevents.utils.NMSUtils;
-import io.github.retrooper.packetevents.utils.TPSUtils;
 import io.github.retrooper.packetevents.enums.ServerVersion;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -13,7 +12,8 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.*;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitTask;
-import javax.annotation.Nullable;
+
+import java.lang.reflect.InvocationTargetException;
 import java.util.concurrent.*;
 
 public class PacketEvents implements Listener {
@@ -28,6 +28,7 @@ public class PacketEvents implements Listener {
     private static BukkitTask serverTickTask;
 
     public static JavaPlugin plugin;
+
 
     public static EventManager getEventManager() {
         return eventManager;
@@ -70,7 +71,7 @@ public class PacketEvents implements Listener {
                 packetInjector.injectPlayer(e.getPlayer());
             }
         };
-        Future<?> future = executor.submit(runnable);
+        final Future<?> future = executor.submit(runnable);
     }
 
     @EventHandler
@@ -90,9 +91,16 @@ public class PacketEvents implements Listener {
         return serverTickTask != null;
     }
 
-    @Nullable
+
     public static double[] getRecentServerTPS() {
-        final double[] tpsArray = TPSUtils.getRecentTPS();
+        double[] tpsArray = new double[0];
+        try {
+            tpsArray = NMSUtils.recentTPS();
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        } catch (InvocationTargetException e) {
+            e.printStackTrace();
+        }
         final int size = tpsArray.length;
         for (int i = 0; i < size; i++) {
             if (tpsArray[i] > 20.0) {
@@ -113,4 +121,7 @@ public class PacketEvents implements Listener {
     public static long currentTimeMS() {
         return System.nanoTime() / 1000000;
     }
+
+
+
 }

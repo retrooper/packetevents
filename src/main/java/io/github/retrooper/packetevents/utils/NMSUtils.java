@@ -1,6 +1,7 @@
 package io.github.retrooper.packetevents.utils;
 
 import io.github.retrooper.packetevents.enums.ServerVersion;
+import io.github.retrooper.packetevents.packetwrappers.Sendable;
 import io.github.retrooper.packetevents.utils.nms_entityfinder.EntityFinderUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
@@ -22,6 +23,8 @@ public class NMSUtils {
 
     public static Class<?> minecraftServerClass;
     private static Class<?> craftWorldsClass;
+    private static Class<?> packetClass;
+
     private static Method getServerMethod;
     private static Field recentTPSField;
 
@@ -33,8 +36,10 @@ public class NMSUtils {
 
     private static Class<?> entityPlayerClass;
     private static Method getCraftPlayerHandle;
+    private static Method sendPacketMethod;
 
     private static Field entityPlayerPingField;
+    private static Field playerConnectionField;
 
     static {
 
@@ -43,6 +48,7 @@ public class NMSUtils {
             craftWorldsClass = getOBCClass("CraftWorld");
             craftPlayerClass = getOBCClass("entity.CraftPlayer");
             entityPlayerClass = getNMSClass("EntityPlayer");
+            packetClass = getNMSClass("Packet");
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
         }
@@ -52,6 +58,7 @@ public class NMSUtils {
             getServerMethod = minecraftServerClass.getMethod("getServer");
             getCraftWorldHandleMethod = craftWorldsClass.getMethod("getHandle");
             getCraftPlayerHandle = craftPlayerClass.getMethod("getHandle");
+            sendPacketMethod = entityPlayerClass.getMethod("sendPacket", packetClass);
         } catch (NoSuchMethodException e) {
             e.printStackTrace();
         }
@@ -60,9 +67,13 @@ public class NMSUtils {
         try {
             recentTPSField = minecraftServerClass.getField("recentTps");
             entityPlayerPingField = entityPlayerClass.getField("ping");
+            playerConnectionField = entityPlayerClass.getField("playerConnection");
         } catch (NoSuchFieldException e) {
             e.printStackTrace();
         }
+
+
+
     }
 
     public static Object getMinecraftServerInstance() throws InvocationTargetException, IllegalAccessException {
@@ -119,6 +130,38 @@ public class NMSUtils {
         return version.isHigherThan(ServerVersion.v_1_7_10)
                 && version.isLowerThan(ServerVersion.v_1_9);
     }
+
+    public static void sendSendableWrapper(final Player player, final Sendable sendable){
+        sendNMSPacket(player, sendable.asNMSPacket());
+    }
+
+    public static void sendNMSPacket(final Player player, final Object nmsPacket) {
+        Object entityPlayer = null;
+        try {
+            entityPlayer = getCraftPlayerHandle.invoke(craftPlayerClass.cast(player));
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        } catch (InvocationTargetException e) {
+            e.printStackTrace();
+        }
+
+        Object playerConnection = null;
+        try {
+            playerConnection = playerConnectionField.get(entityPlayer);
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        }
+
+        try {
+            sendPacketMethod.invoke(playerConnection, nmsPacket);
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        } catch (InvocationTargetException e) {
+            e.printStackTrace();
+        }
+    }
+
+
 
     public static String getServerConnectionFieldName() {
         return "p";

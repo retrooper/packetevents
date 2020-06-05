@@ -49,9 +49,4 @@ public class EventManager {
         registeredMethods.clear();
     }
 
-    /*@Override
-    public void sendPacket(Player player, WrappedPacket packet) {
-
-    }*/
-
 }
