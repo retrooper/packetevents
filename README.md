@@ -6,7 +6,7 @@ An asynchronous spigot packetListener coded by retrooper.
 
 * Licensed with the GPL2 license.
 
-[![](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-2.0)
+[![](https://img.shields.io/badge/License-GPLv2-blue.svg)](https://www.gnu.org/licenses/gpl-2.0)
 
 Join my discord server(to talk to me): https://discord.gg/ZWTkg4v
 
