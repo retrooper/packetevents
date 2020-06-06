@@ -32,26 +32,22 @@ public class EntityFinderUtils {
         Object worldServer = null;
         try {
             worldServer = craftWorldGetHandle.invoke(craftWorld);
-        } catch (IllegalAccessException e) {
-            e.printStackTrace();
-        } catch (InvocationTargetException e) {
+        } catch (IllegalAccessException | InvocationTargetException e) {
             e.printStackTrace();
         }
 
         Object nmsEntity = null;
         try {
             nmsEntity = getEntityByIdMethod.invoke(worldServer, id);
-        } catch (IllegalAccessException e) {
-            e.printStackTrace();
-        } catch (InvocationTargetException e) {
+        } catch (IllegalAccessException | InvocationTargetException e) {
             e.printStackTrace();
         }
-
+        if(nmsEntity == null) {
+            return null;
+        }
         try {
             return (Entity) getBukkitEntity.invoke(nmsEntity);
-        } catch (IllegalAccessException e) {
-            e.printStackTrace();
-        } catch (InvocationTargetException e) {
+        } catch (IllegalAccessException | InvocationTargetException e) {
             e.printStackTrace();
         }
         return null;

@@ -12,17 +12,22 @@ import java.lang.reflect.Field;
 class WrappedPacketInBlockPlace_1_9 extends WrappedPacket {
     private Block block;
     private Hand hand;
+
     public WrappedPacketInBlockPlace_1_9(final Player player, final Object packet) {
         super(player, packet);
     }
 
     @Override
-    protected void setup() throws Exception {
-        this.block = BlockFinder.getBlocksInDirection(getPlayer(), 10);
+    protected void setup() {
+        try {
+            this.block = BlockFinder.getBlocksInDirection(getPlayer(), 10);
 
-        final Object enumHandObj = enumHandField.get(packet);
+            final Object enumHandObj = enumHandField.get(packet);
 
-        this.hand = Hand.valueOf(enumHandObj.toString());
+            this.hand = Hand.valueOf(enumHandObj.toString());
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        }
     }
 
     public Hand getHand() {
@@ -38,7 +43,6 @@ class WrappedPacketInBlockPlace_1_9 extends WrappedPacket {
     private static Field enumHandField;
 
 
-
     protected static void setupStaticVars() {
         try {
             blockPlaceClass_1_9 = NMSUtils.getNMSClass("PacketPlayInBlockPlace");
@@ -52,7 +56,7 @@ class WrappedPacketInBlockPlace_1_9 extends WrappedPacket {
             e.printStackTrace();
         }
 
-        if(!enumHandField.isAccessible()) {
+        if (!enumHandField.isAccessible()) {
             enumHandField.setAccessible(true);
         }
     }

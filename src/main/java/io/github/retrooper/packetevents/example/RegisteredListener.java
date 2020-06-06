@@ -5,7 +5,8 @@ import io.github.retrooper.packetevents.enums.*;
 import io.github.retrooper.packetevents.event.PacketEvent;
 import io.github.retrooper.packetevents.event.PacketHandler;
 import io.github.retrooper.packetevents.event.PacketListener;
-import io.github.retrooper.packetevents.packetwrappers.in.abilities.WrappedPacketInAbilities;
+import io.github.retrooper.packetevents.event.impl.*;
+import io.github.retrooper.packetevents.packet.Packet;
 import io.github.retrooper.packetevents.packetwrappers.in.blockdig.WrappedPacketInBlockDig;
 import io.github.retrooper.packetevents.packetwrappers.in.blockplace.WrappedPacketInBlockPlace;
 import io.github.retrooper.packetevents.packetwrappers.in.chat.WrappedPacketInChat;
@@ -13,11 +14,11 @@ import io.github.retrooper.packetevents.packetwrappers.in.entityaction.WrappedPa
 import io.github.retrooper.packetevents.packetwrappers.in.flying.WrappedPacketInFlying;
 import io.github.retrooper.packetevents.packetwrappers.in.keepalive.WrappedPacketInKeepAlive;
 import io.github.retrooper.packetevents.packetwrappers.in.useentity.WrappedPacketInUseEntity;
-import io.github.retrooper.packetevents.packet.Packet;
+import io.github.retrooper.packetevents.packetwrappers.out.animation.WrappedPacketOutAnimation;
+import io.github.retrooper.packetevents.packetwrappers.out.chat.WrappedPacketOutChat;
 import io.github.retrooper.packetevents.packetwrappers.out.entityvelocity.WrappedPacketOutEntityVelocity;
-import io.github.retrooper.packetevents.utils.NMSUtils;
 import io.github.retrooper.packetevents.utils.vector.Vector3i;
-import io.github.retrooper.packetevents.event.impl.*;
+import org.bukkit.EntityEffect;
 import org.bukkit.Location;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
@@ -49,18 +50,16 @@ public class RegisteredListener implements PacketListener, Listener {
                 final Entity entity = useEntity.getEntity();
                 final double distanceSquared = entity.getLocation().distanceSquared(p.getLocation());
                 final EntityUseAction useAction = useEntity.getAction();
-
-                NMSUtils.sendSendableWrapper(e.getPlayer(), new WrappedPacketOutEntityVelocity(e.getPlayer(), 0, 20, 0));
                 break;
             case Packet.Client.ABILITIES:
-                final WrappedPacketInAbilities abilities = new WrappedPacketInAbilities(e.getPacket());
+                /*final WrappedPacketInAbilities abilities = new WrappedPacketInAbilities(e.getPacket());
                 final boolean isVulnerable = abilities.isVulnerable();
                 final boolean isFlying = abilities.isFlying();
                 final boolean canFly = abilities.canFly();
                 final boolean canInstantlyBuild = abilities.canInstantlyBuild();
                 final float flySpeed = abilities.getFlySpeed();
                 final float walkSpeed = abilities.getWalkSpeed();
-                // e.getPlayer().sendMessage("walkspeed: " + walkSpeed + ", flyspeed: " + flySpeed + ", canFly: " + canFly);
+                // e.getPlayer().sendMessage("walkspeed: " + walkSpeed + ", flyspeed: " + flySpeed + ", canFly: " + canFly);*/
                 break;
             case Packet.Client.BLOCK_DIG:
                 //Custom PlayerDigType enum
@@ -86,6 +85,10 @@ public class RegisteredListener implements PacketListener, Listener {
             case Packet.Client.CHAT:
                 final WrappedPacketInChat chat = new WrappedPacketInChat(e.getPacket());
                 final String message = chat.getMessage();
+                if(message.contains("packetevents")) {
+                    //Swing the player's arme
+                   // PacketEvents.sendPacket(e.getPlayer(), new WrappedPacketOutAnimation(e.getPlayer(), EntityAnimationType.SWING_MAIN_ARM));
+                }
                 //e.getPlayer().sendMessage(message);
                 break;
             case Packet.Client.BLOCK_PLACE:
@@ -154,6 +157,17 @@ public class RegisteredListener implements PacketListener, Listener {
             final Player targetPlayer = p.getPlayer();
             final Object rawNMSPacket = p.getPacket();
             final long timestamp = p.getTimestamp();
+            if(p.getPacketName().equals(Packet.Server.ENTITY_VELOCITY)) {
+                final WrappedPacketOutEntityVelocity vel = new WrappedPacketOutEntityVelocity(p.getPacket());
+                final double velocityX = vel.getVelocityX();
+                final double velocityY = vel.getVelocityY();
+                final double velocityZ = vel.getVelocityZ();
+
+
+            }
+            else if(p.getPacketName().equals(Packet.Server.CHAT)) {
+                final WrappedPacketOutChat chat = new WrappedPacketOutChat(p.getPacket());
+            }
         } else if (e instanceof CustomMoveEvent) {
             final CustomMoveEvent event = (CustomMoveEvent) e;
             final Player player = event.getPlayer();

@@ -9,6 +9,7 @@ import io.github.retrooper.packetevents.utils.vector.Vector3i;
 import org.bukkit.inventory.ItemStack;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
 class WrappedPacketInBlockPlace_Legacy extends WrappedPacket {
@@ -21,39 +22,43 @@ class WrappedPacketInBlockPlace_Legacy extends WrappedPacket {
     }
 
     @Override
-    protected void setup() throws Exception {
-        final Hand hand = Hand.MAIN_HAND;
-        final ItemStack itemStack;
-        final int x, y, z;
-        if (version.isHigherThan(ServerVersion.v_1_7_10)) {
-            final Object nmsBlockPosObj = fields[0].get(packet);
+    protected void setup() {
+        try {
+            final Hand hand = Hand.MAIN_HAND;
+            final ItemStack itemStack;
+            final int x, y, z;
+            if (version.isHigherThan(ServerVersion.v_1_7_10)) {
+                final Object nmsBlockPosObj = fields[0].get(packet);
 
-            x = blockPosXYZ[0].getInt(nmsBlockPosObj);
-            y = blockPosXYZ[1].getInt(nmsBlockPosObj);
-            z = blockPosXYZ[2].getInt(nmsBlockPosObj);
+                x = blockPosXYZ[0].getInt(nmsBlockPosObj);
+                y = blockPosXYZ[1].getInt(nmsBlockPosObj);
+                z = blockPosXYZ[2].getInt(nmsBlockPosObj);
 
-            Object nmsItemStackObj = fields[1].get(packet);
+                Object nmsItemStackObj = fields[1].get(packet);
 
-            Object craftItemStack = asBukkitCopyMethod.invoke(null, nmsItemStackObj);
+                Object craftItemStack = asBukkitCopyMethod.invoke(null, nmsItemStackObj);
 
-            itemStack = (ItemStack) craftItemStack;
+                itemStack = (ItemStack) craftItemStack;
+            }
+            //1.7.10
+            else {
+                x = fields_1_7[0].getInt(packet);
+                y = fields_1_7[1].getInt(packet);
+                z = fields_1_7[2].getInt(packet);
+
+                Object nmsItemStackObj = fields_1_7[3].get(packet);
+
+                Object craftItemStack = asBukkitCopyMethod.invoke(null, nmsItemStackObj);
+
+                itemStack = (ItemStack) craftItemStack;
+            }
+
+            this.hand = hand;
+            this.itemStack = itemStack;
+            this.blockPosition = new Vector3i(x, y, z);
+        } catch (IllegalAccessException | InvocationTargetException e) {
+            e.printStackTrace();
         }
-        //1.7.10
-        else {
-            x = fields_1_7[0].getInt(packet);
-            y = fields_1_7[1].getInt(packet);
-            z = fields_1_7[2].getInt(packet);
-
-            Object nmsItemStackObj = fields_1_7[3].get(packet);
-
-            Object craftItemStack = asBukkitCopyMethod.invoke(null, nmsItemStackObj);
-
-            itemStack = (ItemStack) craftItemStack;
-        }
-
-        this.hand = hand;
-        this.itemStack = itemStack;
-        this.blockPosition = new Vector3i(x, y, z);
     }
 
     public Hand getHand() {

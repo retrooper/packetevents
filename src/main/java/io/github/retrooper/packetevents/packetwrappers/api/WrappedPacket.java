@@ -35,7 +35,7 @@ public class WrappedPacket {
         }
     }
 
-    protected void setup() throws Exception {
+    protected void setup()  {
 
     }
 

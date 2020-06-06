@@ -7,7 +7,7 @@ public class PlayerUninjectEvent extends PacketEvent {
     private final Player player;
 
     public PlayerUninjectEvent(final Player player) {
-        this.player = player;
+        this.player =player;
     }
 
     public Player getPlayer() {

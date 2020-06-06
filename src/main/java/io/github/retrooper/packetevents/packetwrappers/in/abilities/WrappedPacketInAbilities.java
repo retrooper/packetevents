@@ -18,13 +18,17 @@ public class WrappedPacketInAbilities extends WrappedPacket {
     }
 
     @Override
-    protected void setup() throws IllegalAccessException {
-        this.isVulnerable = fields[0].getBoolean(packet);
-        this.isFlying = fields[1].getBoolean(packet);
-        this.allowFly = fields[2].getBoolean(packet);
-        this.instantBuild = fields[3].getBoolean(packet);
-        this.flySpeed = fields[4].getFloat(packet);
-        this.walkSpeed = fields[5].getFloat(packet);
+    protected void setup() {
+        try {
+            this.isVulnerable = fields[0].getBoolean(packet);
+            this.isFlying = fields[1].getBoolean(packet);
+            this.allowFly = fields[2].getBoolean(packet);
+            this.instantBuild = fields[3].getBoolean(packet);
+            this.flySpeed = fields[4].getFloat(packet);
+            this.walkSpeed = fields[5].getFloat(packet);
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        }
     }
 
     public boolean isVulnerable() {

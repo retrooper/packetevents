@@ -14,16 +14,12 @@ public class WrappedPacketOutEntityVelocity extends WrappedPacket implements Sen
     private int entityId;
     private double velocityX, velocityY, velocityZ;
 
-    private final boolean sending;
-
     public WrappedPacketOutEntityVelocity(final Object packet) {
         super(packet);
-        sending = false;
     }
 
     public WrappedPacketOutEntityVelocity(final Entity entity, final double velocityX, final double velocityY, final double velocityZ) {
         super(null);
-        this.sending = true;
         this.entityId = entity.getEntityId();
         this.entity = entity;
         this.velocityX = velocityX;
@@ -32,19 +28,24 @@ public class WrappedPacketOutEntityVelocity extends WrappedPacket implements Sen
     }
 
     @Override
-    protected void setup() throws Exception {
-        final int entityId = fields[0].getInt(packet);
+    protected void setup() {
+        try {
+            final int entityId = fields[0].getInt(packet);
 
-        final int x = fields[1].getInt(packet);
-        final int y = fields[2].getInt(packet);
-        final int z = fields[3].getInt(packet);
+            final int x = fields[1].getInt(packet);
+            final int y = fields[2].getInt(packet);
+            final int z = fields[3].getInt(packet);
 
-        this.entityId = entityId;
-        this.entity = NMSUtils.getEntityById(this.entityId);
+            this.entityId = entityId;
+            this.entity = NMSUtils.getEntityById(this.entityId);
 
-        this.velocityX = x / 8000.0D;
-        this.velocityY = y / 8000.0D;
-        this.velocityZ = z / 8000.0D;
+            this.velocityX = x / 8000.0D;
+            this.velocityY = y / 8000.0D;
+            this.velocityZ = z / 8000.0D;
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        }
+
     }
 
     public final int getEntityId() {
@@ -69,10 +70,6 @@ public class WrappedPacketOutEntityVelocity extends WrappedPacket implements Sen
 
     @Override
     public Object asNMSPacket() {
-        if(!sending) {
-            throw new IllegalStateException("You cannot convert a non sendable wrapped packet to an nms packet!");
-        }
-
         try {
             return velocityConstructor.newInstance(entityId, velocityX, velocityY, velocityZ);
         } catch (InstantiationException e) {

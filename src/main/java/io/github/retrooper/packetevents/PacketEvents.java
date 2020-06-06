@@ -1,48 +1,48 @@
 package io.github.retrooper.packetevents;
 
+import io.github.retrooper.packetevents.enums.ServerVersion;
 import io.github.retrooper.packetevents.event.impl.ServerTickEvent;
 import io.github.retrooper.packetevents.event.manager.EventManager;
-import io.github.retrooper.packetevents.injector.PacketInjector;
+import io.github.retrooper.packetevents.injector.PacketHandler;
+import io.github.retrooper.packetevents.packetwrappers.Sendable;
 import io.github.retrooper.packetevents.utils.NMSUtils;
-import io.github.retrooper.packetevents.enums.ServerVersion;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
-import org.bukkit.event.EventHandler;
-import org.bukkit.event.Listener;
-import org.bukkit.event.player.*;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitTask;
 
 import java.lang.reflect.InvocationTargetException;
-import java.util.concurrent.*;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
-public class PacketEvents implements Listener {
+public class PacketEvents{
     private static final ServerVersion version = ServerVersion.getVersion();
     private static PacketEvents instance;
-    private static final PacketInjector packetInjector = new PacketInjector();
+    public static JavaPlugin plugin;
+    private static PacketHandler packetInjector;
     public static ExecutorService executor = Executors.newCachedThreadPool();
-    private static final EventManager eventManager = new EventManager();
+
+    private static EventManager eventManager = new EventManager();
 
     private static int currentTick;
 
     private static BukkitTask serverTickTask;
 
-    public static JavaPlugin plugin;
-
-
     public static EventManager getEventManager() {
         return eventManager;
     }
 
+
     public static void setup(final JavaPlugin plugin, final boolean serverTickEventEnabled) {
         PacketEvents.plugin = plugin;
-        Bukkit.getPluginManager().registerEvents(getInstance(), plugin);
+        packetInjector = new PacketHandler(plugin);
+        packetInjector.initTinyProtocol();
 
         if (serverTickEventEnabled) {
             final Runnable runnable = new Runnable() {
                 @Override
                 public void run() {
-                    PacketEvents.getEventManager().callEvent(new ServerTickEvent(currentTick++, PacketEvents.currentTimeMS()));
+                    getEventManager().callEvent(new ServerTickEvent(currentTick++, PacketEvents.currentTimeMS()));
                 }
             };
             serverTickTask = Bukkit.getScheduler().runTaskTimerAsynchronously(plugin, runnable, 0L, 1L);
@@ -56,28 +56,6 @@ public class PacketEvents implements Listener {
         getEventManager().unregisterAllListeners();
     }
 
-
-    @EventHandler
-    public void onJoin(PlayerJoinEvent e) {
-        if (executor == null) {
-            executor = Executors.newCachedThreadPool();
-            packetInjector.injectPlayer(e.getPlayer());
-            System.out.println("Failed to inject " + e.getPlayer().getName() + " asynchronously!");
-        }
-
-        final Runnable runnable = new Runnable() {
-            @Override
-            public void run() {
-                packetInjector.injectPlayer(e.getPlayer());
-            }
-        };
-        final Future<?> future = executor.submit(runnable);
-    }
-
-    @EventHandler
-    public void onQuit(PlayerQuitEvent e) {
-        packetInjector.uninjectPlayer(e.getPlayer());
-    }
 
     public static ServerVersion getServerVersion() {
         return version;
@@ -119,9 +97,10 @@ public class PacketEvents implements Listener {
     }
 
     public static long currentTimeMS() {
-        return System.nanoTime() / 1000000;
+        return System.currentTimeMillis();
     }
 
-
-
+    public static void sendPacket(final Player player, final Sendable sendable) {
+        NMSUtils.sendSendableWrapper(player, sendable);
+    }
 }

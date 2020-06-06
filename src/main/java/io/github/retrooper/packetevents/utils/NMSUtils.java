@@ -3,7 +3,6 @@ package io.github.retrooper.packetevents.utils;
 import io.github.retrooper.packetevents.enums.ServerVersion;
 import io.github.retrooper.packetevents.packetwrappers.Sendable;
 import io.github.retrooper.packetevents.utils.nms_entityfinder.EntityFinderUtils;
-import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
@@ -21,34 +20,32 @@ public class NMSUtils {
     private static final String nmsDir = ServerVersion.getNMSDirectory();
     private static final String obcDir = ServerVersion.getOBCDirectory();
 
-    public static Class<?> minecraftServerClass;
-    private static Class<?> craftWorldsClass;
-    private static Class<?> packetClass;
+    public static Class<?> minecraftServerClass, craftWorldsClass,
+            packetClass, entityPlayerClass, playerConnectionClass, craftPlayerClass;
+    private static Class<?> serverConnectionClass, craftEntityClass;
 
     private static Method getServerMethod;
-    private static Field recentTPSField;
-
-
     private static Method getCraftWorldHandleMethod;
     private static Method entityMethod;
-
-    private static Class<?> craftPlayerClass;
-
-    private static Class<?> entityPlayerClass;
-    private static Method getCraftPlayerHandle;
+    public static Method getServerConnection;
+    public static Method getCraftPlayerHandle;
+    public static Method getCraftEntityHandle;
     private static Method sendPacketMethod;
 
+    private static Field recentTPSField;
     private static Field entityPlayerPingField;
     private static Field playerConnectionField;
 
     static {
-
         try {
             minecraftServerClass = getNMSClass("MinecraftServer");
             craftWorldsClass = getOBCClass("CraftWorld");
             craftPlayerClass = getOBCClass("entity.CraftPlayer");
             entityPlayerClass = getNMSClass("EntityPlayer");
             packetClass = getNMSClass("Packet");
+            playerConnectionClass = getNMSClass("PlayerConnection");
+            serverConnectionClass = getNMSClass("ServerConnection");
+            craftEntityClass = getOBCClass("entity.CraftEntity");
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
         }
@@ -58,7 +55,9 @@ public class NMSUtils {
             getServerMethod = minecraftServerClass.getMethod("getServer");
             getCraftWorldHandleMethod = craftWorldsClass.getMethod("getHandle");
             getCraftPlayerHandle = craftPlayerClass.getMethod("getHandle");
-            sendPacketMethod = entityPlayerClass.getMethod("sendPacket", packetClass);
+            getCraftEntityHandle = craftEntityClass.getMethod("getHandle");
+            sendPacketMethod = playerConnectionClass.getMethod("sendPacket", packetClass);
+            getServerConnection = minecraftServerClass.getMethod("getServerConnection");
         } catch (NoSuchMethodException e) {
             e.printStackTrace();
         }
@@ -71,7 +70,6 @@ public class NMSUtils {
         } catch (NoSuchFieldException e) {
             e.printStackTrace();
         }
-
 
 
     }
@@ -98,6 +96,14 @@ public class NMSUtils {
         return Class.forName(nettyPrefix + "." + name);
     }
 
+    public static final String getChannelFutureListFieldName() {
+        if (version.isLowerThan(ServerVersion.v_1_8))
+            return "e";
+        if (version.isLowerThan(ServerVersion.v_1_13))
+            return "g";
+        return "f";
+    }
+
     @Nullable
     public static Entity getEntityById(final int id) {
         return EntityFinderUtils.getEntityById(id);
@@ -106,6 +112,29 @@ public class NMSUtils {
     @Nullable
     public static Entity getEntityByIdWithWorld(final World world, final int id) {
         return EntityFinderUtils.getEntityByIdWithWorld(world, id);
+    }
+
+    public static Object getNMSEntity(final Entity entity) {
+        final Object craftEntity = craftEntityClass.cast(entity);
+        try {
+            return getCraftEntityHandle.invoke(craftEntity);
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        } catch (InvocationTargetException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    public static Object getEntityPlayer(final Player player) {
+        try {
+            return getCraftPlayerHandle.invoke(craftPlayerClass.cast(player));
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        } catch (InvocationTargetException e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 
     public static int getPlayerPing(final Player player) {
@@ -131,7 +160,7 @@ public class NMSUtils {
                 && version.isLowerThan(ServerVersion.v_1_9);
     }
 
-    public static void sendSendableWrapper(final Player player, final Sendable sendable){
+    public static void sendSendableWrapper(final Player player, final Sendable sendable) {
         sendNMSPacket(player, sendable.asNMSPacket());
     }
 
@@ -160,7 +189,6 @@ public class NMSUtils {
             e.printStackTrace();
         }
     }
-
 
 
     public static String getServerConnectionFieldName() {

@@ -1,12 +1,12 @@
 package io.github.retrooper.packetevents.packetwrappers.in.blockdig;
 
+import io.github.retrooper.packetevents.enums.Direction;
 import io.github.retrooper.packetevents.enums.PlayerDigType;
 import io.github.retrooper.packetevents.enums.ServerVersion;
 import io.github.retrooper.packetevents.packetwrappers.api.WrappedPacket;
 import io.github.retrooper.packetevents.utils.BaseBlockUtils;
 import io.github.retrooper.packetevents.utils.NMSUtils;
 import io.github.retrooper.packetevents.utils.vector.Vector3i;
-import io.github.retrooper.packetevents.enums.Direction;
 
 import java.lang.reflect.Field;
 
@@ -21,35 +21,39 @@ public class WrappedPacketInBlockDig extends WrappedPacket {
 
 
     @Override
-    protected void setup() throws Exception {
-        final Direction enumDirection;
-        final PlayerDigType enumDigType;
+    protected void setup() {
+        Direction enumDirection = null;
+        PlayerDigType enumDigType = null;
         //1.7.10
-        if (version == ServerVersion.v_1_7_10) {
-            final int x = fields[0].getInt(packet);
-            final int y = fields[1].getInt(packet);
-            final int z = fields[2].getInt(packet);
+        try {
+            if (version == ServerVersion.v_1_7_10) {
+                final int x = fields[0].getInt(packet);
+                final int y = fields[1].getInt(packet);
+                final int z = fields[2].getInt(packet);
 
-            this.blockPosition = new Vector3i(x, y, z);
+                this.blockPosition = new Vector3i(x, y, z);
 
-            enumDirection = Direction.get((byte) face.getInt(packet));
-            enumDigType = PlayerDigType.get((byte)e.getInt(packet));
-        } else {
-            //1.8+
-            final Object blockPosObj = fields[0].get(packet);
-            final Object enumDirectionObj = fields[1].get(packet);
-            final Object digTypeObj = fields[2].get(packet);
+                enumDirection = Direction.get((byte) face.getInt(packet));
+                enumDigType = PlayerDigType.get((byte) e.getInt(packet));
+            } else {
+                //1.8+
+                final Object blockPosObj = fields[0].get(packet);
+                final Object enumDirectionObj = fields[1].get(packet);
+                final Object digTypeObj = fields[2].get(packet);
 
-            final int x = blockPosXYZ[0].getInt(blockPosObj);
-            final int y = blockPosXYZ[1].getInt(blockPosObj);
-            final int z = blockPosXYZ[2].getInt(blockPosObj);
+                final int x = blockPosXYZ[0].getInt(blockPosObj);
+                final int y = blockPosXYZ[1].getInt(blockPosObj);
+                final int z = blockPosXYZ[2].getInt(blockPosObj);
 
-            this.blockPosition = new Vector3i(x, y, z);
+                this.blockPosition = new Vector3i(x, y, z);
 
-            enumDirection = Direction.valueOf(((Enum)enumDirectionObj).name());
-            enumDigType =  PlayerDigType.valueOf(((Enum)digTypeObj).name());
+                enumDirection = Direction.valueOf(((Enum) enumDirectionObj).name());
+                enumDigType = PlayerDigType.valueOf(((Enum) digTypeObj).name());
+            }
         }
-
+        catch(IllegalAccessException e) {
+            e.printStackTrace();
+        }
         this.direction =  enumDirection;
         this.digType = enumDigType;
     }
