@@ -14,11 +14,11 @@ How to use with **Gradle, Maven, sbt and leiningen**.
 
 Click the link below.
 
-Make sure to replace **Tag** with a proper release version.
+Make sure to replace **Tag** with a proper release version or a valid commit hash(first 7 characters)
 
 I recommend you to use the latest released version!
 
 
 [![](https://jitpack.io/v/retrooper/packetevents.svg)](https://jitpack.io/#retrooper/packetevents)
 
-If clicking the badge doesn't work paste this link into your browser http://jitpack.io/#explored/packetevents
+If clicking the badge doesn't work paste this link into your browser http://jitpack.io/#retrooper/packetevents
