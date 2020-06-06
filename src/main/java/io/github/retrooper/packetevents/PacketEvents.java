@@ -3,7 +3,7 @@ package io.github.retrooper.packetevents;
 import io.github.retrooper.packetevents.enums.ServerVersion;
 import io.github.retrooper.packetevents.event.impl.ServerTickEvent;
 import io.github.retrooper.packetevents.event.manager.EventManager;
-import io.github.retrooper.packetevents.injector.PacketHandler;
+import io.github.retrooper.packetevents.handler.PacketHandler;
 import io.github.retrooper.packetevents.packetwrappers.Sendable;
 import io.github.retrooper.packetevents.utils.NMSUtils;
 import org.bukkit.Bukkit;

@@ -1,4 +1,4 @@
-package io.github.retrooper.packetevents.injector;
+package io.github.retrooper.packetevents.handler;
 
 import io.github.retrooper.packetevents.PacketEvents;
 import io.github.retrooper.packetevents.event.impl.PacketReceiveEvent;

@@ -149,8 +149,6 @@ public class RegisteredListener implements PacketListener {
                 final double velocityX = vel.getVelocityX();
                 final double velocityY = vel.getVelocityY();
                 final double velocityZ = vel.getVelocityZ();
-
-
             }
             else if(p.getPacketName().equals(Packet.Server.CHAT)) {
                 final WrappedPacketOutChat chat = new WrappedPacketOutChat(p.getPacket());
