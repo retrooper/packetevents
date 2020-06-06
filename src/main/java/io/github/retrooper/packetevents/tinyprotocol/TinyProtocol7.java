@@ -349,15 +349,9 @@ public abstract class TinyProtocol7 {
         channel.pipeline().context("encoder").fireChannelRead(packet);
     }
 
-    /**
-     * Retrieve the name of the channel injector, default implementation is "tiny-" + plugin name + "-" + a unique ID.
-     * <p>
-     * Note that this method will only be invoked once. It is no longer necessary to override this to support multiple instances.
-     *
-     * @return A unique channel handler name.
-     */
+
     protected String getHandlerName() {
-        return "tiny-" + plugin.getName() + "-" + ID.incrementAndGet();
+        return "packetevents-" + plugin.getName() + "-" + ID.incrementAndGet();
     }
 
     /**

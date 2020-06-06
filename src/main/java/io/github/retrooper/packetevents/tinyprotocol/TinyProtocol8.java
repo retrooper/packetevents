@@ -24,6 +24,7 @@ import com.mojang.authlib.GameProfile;
 import io.github.retrooper.packetevents.PacketEvents;
 import io.github.retrooper.packetevents.event.impl.PlayerInjectEvent;
 import io.github.retrooper.packetevents.event.impl.PlayerUninjectEvent;
+import io.github.retrooper.packetevents.injector.PacketHandler_1_8;
 import io.github.retrooper.packetevents.tinyprotocol.Reflection.FieldAccessor;
 import io.github.retrooper.packetevents.tinyprotocol.Reflection.MethodInvoker;
 import io.netty.channel.*;
@@ -38,6 +39,7 @@ import org.bukkit.event.server.PluginDisableEvent;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
 
+import java.lang.reflect.Field;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Level;
@@ -117,14 +119,18 @@ public abstract class TinyProtocol8 {
         try {
             registerChannelHandler();
             registerPlayers(plugin);
-        } catch (IllegalArgumentException ex) {
+        } catch (IllegalArgumentException | NoSuchFieldException | IllegalAccessException ex) {
             // Damn you, late bind
             plugin.getLogger().info("[TinyProtocol] Delaying server channel injection due to late bind.");
 
             new BukkitRunnable() {
                 @Override
                 public void run() {
-                    registerChannelHandler();
+                    try {
+                        registerChannelHandler();
+                    } catch (NoSuchFieldException | IllegalAccessException e) {
+                        e.printStackTrace();
+                    }
                     registerPlayers(plugin);
                     plugin.getLogger().info("[TinyProtocol] Late bind injection successful.");
                 }
@@ -209,13 +215,15 @@ public abstract class TinyProtocol8 {
     }
 
     @SuppressWarnings("unchecked")
-    private void registerChannelHandler() {
+    private void registerChannelHandler() throws NoSuchFieldException, IllegalAccessException {
         Object mcServer = getMinecraftServer.get(Bukkit.getServer());
         Object serverConnection = getServerConnection.get(mcServer);
         boolean looking = true;
 
         // We need to synchronize against this list
-        networkManagers = (List<Object>) getNetworkMarkers.invoke(null, serverConnection);
+        final Field networkManagersField = serverConnection.getClass().getDeclaredField(PacketHandler_1_8.getNetworkManagersFieldName());
+        networkManagersField.setAccessible(true);
+        networkManagers = (List<Object>) networkManagersField.get(serverConnection);
         createServerChannelHandler();
 
         // Find the correct list, or implicitly throw an exception
@@ -341,15 +349,9 @@ public abstract class TinyProtocol8 {
         channel.pipeline().context("encoder").fireChannelRead(packet);
     }
 
-    /**
-     * Retrieve the name of the channel injector, default implementation is "tiny-" + plugin name + "-" + a unique ID.
-     * <p>
-     * Note that this method will only be invoked once. It is no longer necessary to override this to support multiple instances.
-     *
-     * @return A unique channel handler name.
-     */
+
     protected String getHandlerName() {
-        return "tiny-" + plugin.getName() + "-" + ID.incrementAndGet();
+        return "packetevents-" + plugin.getName() + "-" + ID.incrementAndGet();
     }
 
     /**

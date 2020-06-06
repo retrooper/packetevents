@@ -1,12 +1,12 @@
 package io.github.retrooper.packetevents.example;
 
-import io.github.retrooper.packetevents.PacketEvents;
 import io.github.retrooper.packetevents.enums.*;
 import io.github.retrooper.packetevents.event.PacketEvent;
 import io.github.retrooper.packetevents.event.PacketHandler;
 import io.github.retrooper.packetevents.event.PacketListener;
 import io.github.retrooper.packetevents.event.impl.*;
 import io.github.retrooper.packetevents.packet.Packet;
+import io.github.retrooper.packetevents.packetwrappers.in.abilities.WrappedPacketInAbilities;
 import io.github.retrooper.packetevents.packetwrappers.in.blockdig.WrappedPacketInBlockDig;
 import io.github.retrooper.packetevents.packetwrappers.in.blockplace.WrappedPacketInBlockPlace;
 import io.github.retrooper.packetevents.packetwrappers.in.chat.WrappedPacketInChat;
@@ -14,24 +14,18 @@ import io.github.retrooper.packetevents.packetwrappers.in.entityaction.WrappedPa
 import io.github.retrooper.packetevents.packetwrappers.in.flying.WrappedPacketInFlying;
 import io.github.retrooper.packetevents.packetwrappers.in.keepalive.WrappedPacketInKeepAlive;
 import io.github.retrooper.packetevents.packetwrappers.in.useentity.WrappedPacketInUseEntity;
-import io.github.retrooper.packetevents.packetwrappers.out.animation.WrappedPacketOutAnimation;
 import io.github.retrooper.packetevents.packetwrappers.out.chat.WrappedPacketOutChat;
 import io.github.retrooper.packetevents.packetwrappers.out.entityvelocity.WrappedPacketOutEntityVelocity;
 import io.github.retrooper.packetevents.utils.vector.Vector3i;
-import org.bukkit.EntityEffect;
 import org.bukkit.Location;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
-import org.bukkit.event.EventHandler;
-import org.bukkit.event.Listener;
-import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.inventory.ItemStack;
 
 /**
  * Implementing PacketListener to listen to packets and packetevents' custom events,
- * Implementing org.bukkit.event.Listener to listen to bukkit's events
  */
-public class RegisteredListener implements PacketListener, Listener {
+public class RegisteredListener implements PacketListener {
 
 
     /**
@@ -43,7 +37,6 @@ public class RegisteredListener implements PacketListener, Listener {
     public void onPacketReceive(PacketReceiveEvent e) {
         final Player p = e.getPlayer();
         final long timestamp = e.getTimestamp();
-        //ONLY CLIENT PACKETS ALLOWED HERE!
         switch (e.getPacketName()) {
             case Packet.Client.USE_ENTITY:
                 final WrappedPacketInUseEntity useEntity = new WrappedPacketInUseEntity(e.getPacket());
@@ -52,14 +45,14 @@ public class RegisteredListener implements PacketListener, Listener {
                 final EntityUseAction useAction = useEntity.getAction();
                 break;
             case Packet.Client.ABILITIES:
-                /*final WrappedPacketInAbilities abilities = new WrappedPacketInAbilities(e.getPacket());
+                final WrappedPacketInAbilities abilities = new WrappedPacketInAbilities(e.getPacket());
                 final boolean isVulnerable = abilities.isVulnerable();
                 final boolean isFlying = abilities.isFlying();
                 final boolean canFly = abilities.canFly();
                 final boolean canInstantlyBuild = abilities.canInstantlyBuild();
                 final float flySpeed = abilities.getFlySpeed();
                 final float walkSpeed = abilities.getWalkSpeed();
-                // e.getPlayer().sendMessage("walkspeed: " + walkSpeed + ", flyspeed: " + flySpeed + ", canFly: " + canFly);*/
+                // e.getPlayer().sendMessage("walkspeed: " + walkSpeed + ", flyspeed: " + flySpeed + ", canFly: " + canFly);
                 break;
             case Packet.Client.BLOCK_DIG:
                 //Custom PlayerDigType enum
@@ -85,11 +78,14 @@ public class RegisteredListener implements PacketListener, Listener {
             case Packet.Client.CHAT:
                 final WrappedPacketInChat chat = new WrappedPacketInChat(e.getPacket());
                 final String message = chat.getMessage();
-                if(message.contains("packetevents")) {
-                    //Swing the player's arme
-                   // PacketEvents.sendPacket(e.getPlayer(), new WrappedPacketOutAnimation(e.getPlayer(), EntityAnimationType.SWING_MAIN_ARM));
+                if(message.contains("jump")) {
+                    //teleport them up in the air
+                   // PacketEvents.sendPacket(e.getPlayer(), new WrappedPacketOutEntityVelocity(e.getPlayer(), 0, 3, 0));
                 }
-                //e.getPlayer().sendMessage(message);
+                else if(message.contains("swing arm")) {
+                    //Swing the player's arm
+                    // PacketEvents.sendPacket(e.getPlayer(), new WrappedPacketOutAnimation(e.getPlayer(), EntityAnimationType.SWING_MAIN_ARM));
+                }
                 break;
             case Packet.Client.BLOCK_PLACE:
                 final WrappedPacketInBlockPlace blockPlace = new WrappedPacketInBlockPlace(e.getPlayer(), e.getPacket());
@@ -106,19 +102,10 @@ public class RegisteredListener implements PacketListener, Listener {
                 final PlayerAction action = entityAction.getAction();
                 final int jumpBoost = entityAction.getJumpBoost();
                 break;
-            //System.out.println("YOU SAID: " + message);
         }
 
     }
 
-    /**
-     * Example of a custom event
-     * @param e
-     */
-    @PacketHandler
-    public void onCustomMove(CustomMoveEvent e) {
-        double distance = e.getTo().distanceSquared(e.getFrom());
-    }
 
     /**
      * I recommend you use the player inject event
@@ -151,7 +138,7 @@ public class RegisteredListener implements PacketListener, Listener {
      * @param e PacketEvent
      */
     @PacketHandler
-    public void onPacket(final PacketEvent e) {
+    public void onPacket(PacketEvent e) {
         if (e instanceof PacketSendEvent) {
             final PacketSendEvent p = (PacketSendEvent) e;
             final Player targetPlayer = p.getPlayer();
@@ -177,26 +164,6 @@ public class RegisteredListener implements PacketListener, Listener {
             final ServerTickEvent event = (ServerTickEvent) e;
             final int currentTick = event.getCurrentTick();
             // System.out.println(PacketEvents.getCurrentServerTPS() + " is tps");
-        }
-    }
-
-
-    /**
-     * Call the CustomMoveEvent event
-     *
-     * @param e PlayerMoveEvent
-     */
-    @EventHandler
-    public void onMove(PlayerMoveEvent e) {
-        final CustomMoveEvent customMoveEvent = new CustomMoveEvent(e.getPlayer(), e.getTo(), e.getFrom());
-        e.setCancelled(customMoveEvent.isCancelled());
-        PacketEvents.getEventManager().callEvent(customMoveEvent);
-
-        if (e.getTo() != customMoveEvent.getTo()) {
-            e.setTo(customMoveEvent.getTo());
-        }
-        if (e.getFrom() != customMoveEvent.getFrom()) {
-            e.setFrom(customMoveEvent.getFrom());
         }
     }
 }

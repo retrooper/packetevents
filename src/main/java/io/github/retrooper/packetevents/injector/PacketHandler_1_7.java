@@ -8,16 +8,15 @@ import net.minecraft.util.io.netty.channel.Channel;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 
-class PacketHandler_1_7 {
+public class PacketHandler_1_7 {
     private final Plugin plugin;
 
     public PacketHandler_1_7(final Plugin plugin) {
         this.plugin = plugin;
     }
-    private TinyProtocol7 tinyProtocol;
 
     public void initTinyProtocol() {
-        this.tinyProtocol = new TinyProtocol7(getPlugin()) {
+        new TinyProtocol7(getPlugin()) {
             @Override
             public Object onPacketOutAsync(Player receiver, Channel channel, Object packet) {
                 final String packetName = packet.getClass().getSimpleName();

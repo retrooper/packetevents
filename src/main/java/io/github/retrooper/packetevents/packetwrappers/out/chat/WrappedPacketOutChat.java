@@ -23,7 +23,8 @@ public class WrappedPacketOutChat extends WrappedPacket implements Sendable {
 
     @Override
     protected void setup() {
-
+        //all fields are IChatBaseComponents, and named 'a'
+        net.minecraft.server.v1_8_R3.PacketPlayOutChat c;
     }
 
     @Override

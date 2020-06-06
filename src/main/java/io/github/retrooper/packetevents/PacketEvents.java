@@ -12,16 +12,11 @@ import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitTask;
 
 import java.lang.reflect.InvocationTargetException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-
 public class PacketEvents{
     private static final ServerVersion version = ServerVersion.getVersion();
     private static PacketEvents instance;
     public static JavaPlugin plugin;
     private static PacketHandler packetInjector;
-    public static ExecutorService executor = Executors.newCachedThreadPool();
-
     private static EventManager eventManager = new EventManager();
 
     private static int currentTick;
