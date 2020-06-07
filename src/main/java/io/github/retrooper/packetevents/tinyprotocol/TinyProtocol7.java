@@ -72,14 +72,10 @@ public abstract class TinyProtocol7 {
 
     // Packets we have to intercept
     private static final Class<?> PACKET_LOGIN_IN_START = Reflection.getMinecraftClass("PacketLoginInStart");
-    private static final Class<?> PACKET_HANDSHAKING_IN_SET_PROTOCOL = Reflection.getMinecraftClass("PacketHandshakingInSetProtocol");
     private static final FieldAccessor<GameProfile> getGameProfile = Reflection.getField(PACKET_LOGIN_IN_START, GameProfile.class, 0);
-    private static final FieldAccessor<Integer> protocolId = Reflection.getField(PACKET_HANDSHAKING_IN_SET_PROTOCOL, int.class, 0);
-    private static final FieldAccessor<Enum> protocolType = Reflection.getField(PACKET_HANDSHAKING_IN_SET_PROTOCOL, Enum.class, 0);
 
     // Speedup channel/protocol lookup
-    private Map<String, Channel> channelLookup = new MapMaker().weakValues().makeMap();
-    private Map<Channel, Integer> protocolLookup = new MapMaker().weakKeys().makeMap();
+    private final Map<String, Channel> channelLookup = new MapMaker().weakValues().makeMap();
     private Listener listener;
 
     // Channels that have already been removed
@@ -421,20 +417,6 @@ public abstract class TinyProtocol7 {
         return channel;
     }
 
-    public int getProtocolVersion(Player player) {
-        Channel channel = channelLookup.get(player.getName());
-
-        // Lookup channel again
-        if (channel == null) {
-            Object connection = getConnection.get(getPlayerHandle.invoke(player));
-            Object manager = getManager.get(connection);
-
-            channelLookup.put(player.getName(), channel = getChannel.get(manager));
-        }
-
-        return protocolLookup.get(channel);
-    }
-
     /**
      * Uninject a specific player.
      *
@@ -550,10 +532,6 @@ public abstract class TinyProtocol7 {
             if (PACKET_LOGIN_IN_START.isInstance(packet)) {
                 GameProfile profile = getGameProfile.get(packet);
                 channelLookup.put(profile.getName(), channel);
-            } else if (PACKET_HANDSHAKING_IN_SET_PROTOCOL.isInstance(packet)) {
-                if (protocolType.get(packet).name().equalsIgnoreCase("LOGIN")) {
-                    protocolLookup.put(channel, protocolId.get(packet));
-                }
             }
         }
     }

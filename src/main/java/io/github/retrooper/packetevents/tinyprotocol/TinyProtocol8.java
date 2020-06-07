@@ -26,7 +26,6 @@ import io.github.retrooper.packetevents.event.impl.PlayerInjectEvent;
 import io.github.retrooper.packetevents.event.impl.PlayerUninjectEvent;
 import io.github.retrooper.packetevents.handler.PacketHandler_1_8;
 import io.github.retrooper.packetevents.tinyprotocol.Reflection.FieldAccessor;
-import io.github.retrooper.packetevents.tinyprotocol.Reflection.MethodInvoker;
 import io.netty.channel.*;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -68,28 +67,23 @@ public abstract class TinyProtocol8 {
     private static final Class<Object> serverConnectionClass = Reflection.getUntypedClass("{nms}.ServerConnection");
     private static final FieldAccessor<Object> getMinecraftServer = Reflection.getField("{obc}.CraftServer", minecraftServerClass, 0);
     private static final FieldAccessor<Object> getServerConnection = Reflection.getField(minecraftServerClass, serverConnectionClass, 0);
-    private static final MethodInvoker getNetworkMarkers = Reflection.getTypedMethod(serverConnectionClass, null, List.class, serverConnectionClass);
 
     // Packets we have to intercept
     private static final Class<?> PACKET_LOGIN_IN_START = Reflection.getMinecraftClass("PacketLoginInStart");
-    private static final Class<?> PACKET_HANDSHAKING_IN_SET_PROTOCOL = Reflection.getMinecraftClass("PacketHandshakingInSetProtocol");
     private static final FieldAccessor<GameProfile> getGameProfile = Reflection.getField(PACKET_LOGIN_IN_START, GameProfile.class, 0);
-    private static final FieldAccessor<Integer> protocolId = Reflection.getField(PACKET_HANDSHAKING_IN_SET_PROTOCOL, int.class, 0);
-    private static final FieldAccessor<Enum> protocolType = Reflection.getField(PACKET_HANDSHAKING_IN_SET_PROTOCOL, Enum.class, 0);
 
     // Speedup channel/protocol lookup
-    private Map<String, Channel> channelLookup = new MapMaker().weakValues().makeMap();
-    private Map<Channel, Integer> protocolLookup = new MapMaker().weakKeys().makeMap();
+    private final Map<String, Channel> channelLookup = new MapMaker().weakValues().makeMap();
     private Listener listener;
 
     // Channels that have already been removed
-    private Set<Channel> uninjectedChannels = Collections.newSetFromMap(new MapMaker().weakKeys().<Channel, Boolean>makeMap());
+    private final Set<Channel> uninjectedChannels = Collections.newSetFromMap(new MapMaker().weakKeys().<Channel, Boolean>makeMap());
 
     // List of network markers
     private List<Object> networkManagers;
 
     // Injected channel handlers
-    private List<Channel> serverChannels = Lists.newArrayList();
+    private final List<Channel> serverChannels = Lists.newArrayList();
     private ChannelInboundHandlerAdapter serverChannelHandler;
     private ChannelInitializer<Channel> beginInitProtocol;
     private ChannelInitializer<Channel> endInitProtocol;
@@ -284,7 +278,7 @@ public abstract class TinyProtocol8 {
      * @return The packet to send instead, or NULL to cancel the transmission.
      */
     public Object onPacketOutAsync(Player receiver, Channel channel, Object packet) {
-      return packet;
+        return packet;
     }
 
     /**
@@ -420,20 +414,6 @@ public abstract class TinyProtocol8 {
         return channel;
     }
 
-    public int getProtocolVersion(Player player) {
-        Channel channel = channelLookup.get(player.getName());
-
-        // Lookup channel again
-        if (channel == null) {
-            Object connection = getConnection.get(getPlayerHandle.invoke(player));
-            Object manager = getManager.get(connection);
-
-            channelLookup.put(player.getName(), channel = getChannel.get(manager));
-        }
-
-        return protocolLookup.get(channel);
-    }
-
     /**
      * Uninject a specific player.
      *
@@ -549,10 +529,6 @@ public abstract class TinyProtocol8 {
             if (PACKET_LOGIN_IN_START.isInstance(packet)) {
                 GameProfile profile = getGameProfile.get(packet);
                 channelLookup.put(profile.getName(), channel);
-            } else if (PACKET_HANDSHAKING_IN_SET_PROTOCOL.isInstance(packet)) {
-                if (protocolType.get(packet).name().equalsIgnoreCase("LOGIN")) {
-                    protocolLookup.put(channel, protocolId.get(packet));
-                }
             }
         }
     }
