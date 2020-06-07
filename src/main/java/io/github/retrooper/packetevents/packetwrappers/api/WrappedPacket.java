@@ -4,7 +4,7 @@ import io.github.retrooper.packetevents.enums.ServerVersion;
 import org.bukkit.entity.Player;
 
 public class WrappedPacket {
-    private final Player player;
+    protected final Player player;
     protected Object packet;
     protected static ServerVersion version = ServerVersion.getVersion();
 
@@ -32,10 +32,6 @@ public class WrappedPacket {
 
     protected void setup()  {
 
-    }
-
-    public final Player getPlayer() {
-        return player;
     }
 
 }

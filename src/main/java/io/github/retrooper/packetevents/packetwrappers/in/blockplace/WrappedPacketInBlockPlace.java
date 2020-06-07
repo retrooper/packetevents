@@ -46,6 +46,9 @@ public class WrappedPacketInBlockPlace extends WrappedPacket {
         this.itemStack = itemStack;
         this.hand = hand;
     }
+    public Player getPlayer() {
+        return this.player;
+    }
 
     public Vector3i getBlockPosition() {
         return blockPosition;

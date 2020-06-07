@@ -30,6 +30,10 @@ class WrappedPacketInBlockPlace_1_9 extends WrappedPacket {
         }
     }
 
+    public Player getPlayer() {
+        return this.player;
+    }
+
     public Hand getHand() {
         return hand;
     }

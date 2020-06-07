@@ -1,8 +1,10 @@
 package io.github.retrooper.packetevents.handler;
 
 import io.github.retrooper.packetevents.PacketEvents;
+import io.github.retrooper.packetevents.event.impl.PacketLoginEvent;
 import io.github.retrooper.packetevents.event.impl.PacketReceiveEvent;
 import io.github.retrooper.packetevents.event.impl.PacketSendEvent;
+import io.github.retrooper.packetevents.packet.Packet;
 import io.github.retrooper.packetevents.tinyprotocol.TinyProtocol7;
 import net.minecraft.util.io.netty.channel.Channel;
 import org.bukkit.entity.Player;
@@ -31,6 +33,11 @@ public class PacketHandler_1_7 {
             @Override
             public Object onPacketInAsync(Player sender, Channel channel, Object packet) {
                 final String packetName = packet.getClass().getSimpleName();
+                for(final String loginPacket : Packet.Login.LOGIN_PACKETS) {
+                    if(packetName.equals(loginPacket)) {
+                        PacketEvents.getEventManager().callEvent(new PacketLoginEvent(packetName, packet));
+                    }
+                }
                 final PacketReceiveEvent packetReceiveEvent = new PacketReceiveEvent(sender, packetName, packet);
                 PacketEvents.getEventManager().callEvent(packetReceiveEvent);
                 if (!packetReceiveEvent.isCancelled()) {

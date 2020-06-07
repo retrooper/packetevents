@@ -1,6 +1,5 @@
 package io.github.retrooper.packetevents.example;
 
-import io.github.retrooper.packetevents.PacketEvents;
 import io.github.retrooper.packetevents.enums.*;
 import io.github.retrooper.packetevents.event.PacketEvent;
 import io.github.retrooper.packetevents.event.PacketHandler;
@@ -15,7 +14,6 @@ import io.github.retrooper.packetevents.packetwrappers.in.entityaction.WrappedPa
 import io.github.retrooper.packetevents.packetwrappers.in.flying.WrappedPacketInFlying;
 import io.github.retrooper.packetevents.packetwrappers.in.keepalive.WrappedPacketInKeepAlive;
 import io.github.retrooper.packetevents.packetwrappers.in.useentity.WrappedPacketInUseEntity;
-import io.github.retrooper.packetevents.packetwrappers.out.animation.WrappedPacketOutAnimation;
 import io.github.retrooper.packetevents.packetwrappers.out.chat.WrappedPacketOutChat;
 import io.github.retrooper.packetevents.packetwrappers.out.entityvelocity.WrappedPacketOutEntityVelocity;
 import io.github.retrooper.packetevents.utils.vector.Vector3i;
@@ -105,6 +103,7 @@ public class RegisteredListener implements PacketListener {
      * I recommend you use the player inject event
      * to register your players instead of any other bukkit event,
      * to avoid any issues.
+     *
      * @param event
      */
     @PacketHandler
@@ -115,10 +114,11 @@ public class RegisteredListener implements PacketListener {
     /**
      * I recommend you use the player uninject event,
      * to unregister your players
-     *
+     * <p>
      * You can also call this event to "whitelist" a player,
      * our API won't even notice the player exists, so you won't
      * be able to listen to any packets from the player
+     *
      * @param event
      */
     @PacketHandler
@@ -138,13 +138,12 @@ public class RegisteredListener implements PacketListener {
             final Player targetPlayer = p.getPlayer();
             final Object rawNMSPacket = p.getPacket();
             final long timestamp = p.getTimestamp();
-            if(p.getPacketName().equals(Packet.Server.ENTITY_VELOCITY)) {
+            if (p.getPacketName().equals(Packet.Server.ENTITY_VELOCITY)) {
                 final WrappedPacketOutEntityVelocity vel = new WrappedPacketOutEntityVelocity(p.getPacket());
                 final double velocityX = vel.getVelocityX();
                 final double velocityY = vel.getVelocityY();
                 final double velocityZ = vel.getVelocityZ();
-            }
-            else if(p.getPacketName().equals(Packet.Server.CHAT)) {
+            } else if (p.getPacketName().equals(Packet.Server.CHAT)) {
                 final WrappedPacketOutChat chat = new WrappedPacketOutChat(p.getPacket());
             }
         } else if (e instanceof CustomMoveEvent) {

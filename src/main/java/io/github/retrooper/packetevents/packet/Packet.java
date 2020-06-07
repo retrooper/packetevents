@@ -68,6 +68,8 @@ public abstract class Packet {
         public static final String PING = "PacketStatusInPing";
         public static final String START = "PacketStatusInStart";
         public static final String SUCCESS = "PacketLoginOutSuccess";
+
+        public static final String[] LOGIN_PACKETS = new String[] {"PacketHandshakingInSetProtocol","PacketLoginInStart",  "PacketLoginInEncryptionBegin"};
     }
 
     public static boolean isInstanceOf(String fatherPacket, String childPacket) {

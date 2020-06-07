@@ -6,6 +6,7 @@ import io.github.retrooper.packetevents.packetwrappers.api.WrappedPacket;
 import io.github.retrooper.packetevents.utils.BaseBlockUtils;
 import io.github.retrooper.packetevents.utils.NMSUtils;
 import io.github.retrooper.packetevents.utils.vector.Vector3i;
+import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
 import java.lang.reflect.Field;
@@ -59,6 +60,10 @@ class WrappedPacketInBlockPlace_Legacy extends WrappedPacket {
         } catch (IllegalAccessException | InvocationTargetException e) {
             e.printStackTrace();
         }
+    }
+
+    public Player getPlayer() {
+        return this.player;
     }
 
     public Hand getHand() {
