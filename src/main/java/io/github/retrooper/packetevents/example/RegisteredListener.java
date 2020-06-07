@@ -14,6 +14,7 @@ import io.github.retrooper.packetevents.packetwrappers.in.entityaction.WrappedPa
 import io.github.retrooper.packetevents.packetwrappers.in.flying.WrappedPacketInFlying;
 import io.github.retrooper.packetevents.packetwrappers.in.keepalive.WrappedPacketInKeepAlive;
 import io.github.retrooper.packetevents.packetwrappers.in.useentity.WrappedPacketInUseEntity;
+import io.github.retrooper.packetevents.packetwrappers.login.WrappedPacketLoginHandshake;
 import io.github.retrooper.packetevents.packetwrappers.out.chat.WrappedPacketOutChat;
 import io.github.retrooper.packetevents.packetwrappers.out.entityvelocity.WrappedPacketOutEntityVelocity;
 import io.github.retrooper.packetevents.utils.vector.Vector3i;
@@ -155,6 +156,15 @@ public class RegisteredListener implements PacketListener {
             final ServerTickEvent event = (ServerTickEvent) e;
             final int currentTick = event.getCurrentTick();
             // System.out.println(PacketEvents.getCurrentServerTPS() + " is tps");
+        }
+        else if(e instanceof PacketLoginEvent) {
+            final PacketLoginEvent event = (PacketLoginEvent)e;
+            if(event.getPacketName().equals(Packet.Login.HANDSHAKE)) {
+                final WrappedPacketLoginHandshake handshake = new WrappedPacketLoginHandshake(event.getPacket());
+                final int protocolVersion = handshake.getProtocolVersion();
+                final String hostname = handshake.getHostname();
+                final int port = handshake.getPort();
+            }
         }
     }
 }

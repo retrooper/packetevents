@@ -29,16 +29,6 @@ public class PacketHandler_1_8 {
         new TinyProtocol8(getPlugin()) {
             @Override
             public Object onPacketOutAsync(Player receiver, Channel channel, Object packet) {
-                if(receiver == null) {
-                    System.out.println("player is null n");
-                    System.out.println("packetname is " + packet.getClass().getSimpleName());
-                }
-                if(channel == null){
-                    System.out.println("CHANNEL IS NULL");
-                }
-                if(packet == null) {
-                    System.out.println("PACKET IS NULL");
-                }
                 final String packetName = packet.getClass().getSimpleName();
                 final PacketSendEvent packetSendEvent = new PacketSendEvent(receiver, packetName, packet);
                 PacketEvents.getEventManager().callEvent(packetSendEvent);
