@@ -4,7 +4,6 @@ import io.github.retrooper.packetevents.enums.ServerVersion;
 import io.github.retrooper.packetevents.packetwrappers.Sendable;
 import io.github.retrooper.packetevents.packetwrappers.api.WrappedPacket;
 import io.github.retrooper.packetevents.utils.NMSUtils;
-import net.minecraft.server.v1_15_R1.Vec3D;
 import org.bukkit.entity.Entity;
 
 import java.lang.reflect.Constructor;
@@ -18,6 +17,7 @@ public class WrappedPacketOutEntityVelocity extends WrappedPacket implements Sen
 
     public WrappedPacketOutEntityVelocity(final Object packet) {
         super(packet);
+        System.out.println("success: " + -1);
     }
 
     public WrappedPacketOutEntityVelocity(final Entity entity, final double velocityX, final double velocityY, final double velocityZ) {
@@ -32,18 +32,28 @@ public class WrappedPacketOutEntityVelocity extends WrappedPacket implements Sen
     @Override
     protected void setup() {
         try {
+            int i = 0;
             final int entityId = fields[0].getInt(packet);
+            System.out.println("success: " + i++);
 
             final int x = fields[1].getInt(packet);
+            System.out.println("success: " + i++);
             final int y = fields[2].getInt(packet);
+            System.out.println("success: " + i++);
             final int z = fields[3].getInt(packet);
+            System.out.println("success: " + i++);
 
             this.entityId = entityId;
+            System.out.println("success: " + i++);
             this.entity = NMSUtils.getEntityById(this.entityId);
+            System.out.println("success: " + i++);
 
             this.velocityX = x / 8000.0D;
+            System.out.println("success: " + i++);
             this.velocityY = y / 8000.0D;
+            System.out.println("success: " + i++);
             this.velocityZ = z / 8000.0D;
+            System.out.println("success: " + i++);
         } catch (IllegalAccessException e) {
             e.printStackTrace();
         }
@@ -100,8 +110,6 @@ public class WrappedPacketOutEntityVelocity extends WrappedPacket implements Sen
      * 1.14+ use int, Vec3D style
      */
     static {
-        Vec3D vec = new Vec3D(0, 0, 0);
-
         try {
 
             velocityClass = NMSUtils.getNMSClass("PacketPlayOutEntityVelocity");

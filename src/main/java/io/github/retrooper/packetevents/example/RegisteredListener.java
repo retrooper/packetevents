@@ -1,5 +1,6 @@
 package io.github.retrooper.packetevents.example;
 
+import io.github.retrooper.packetevents.PacketEvents;
 import io.github.retrooper.packetevents.enums.*;
 import io.github.retrooper.packetevents.event.PacketEvent;
 import io.github.retrooper.packetevents.event.PacketHandler;
@@ -14,6 +15,7 @@ import io.github.retrooper.packetevents.packetwrappers.in.entityaction.WrappedPa
 import io.github.retrooper.packetevents.packetwrappers.in.flying.WrappedPacketInFlying;
 import io.github.retrooper.packetevents.packetwrappers.in.keepalive.WrappedPacketInKeepAlive;
 import io.github.retrooper.packetevents.packetwrappers.in.useentity.WrappedPacketInUseEntity;
+import io.github.retrooper.packetevents.packetwrappers.out.animation.WrappedPacketOutAnimation;
 import io.github.retrooper.packetevents.packetwrappers.out.chat.WrappedPacketOutChat;
 import io.github.retrooper.packetevents.packetwrappers.out.entityvelocity.WrappedPacketOutEntityVelocity;
 import io.github.retrooper.packetevents.utils.vector.Vector3i;
@@ -78,14 +80,6 @@ public class RegisteredListener implements PacketListener {
             case Packet.Client.CHAT:
                 final WrappedPacketInChat chat = new WrappedPacketInChat(e.getPacket());
                 final String message = chat.getMessage();
-                if(message.contains("jump")) {
-                    //teleport them up in the air
-                   // PacketEvents.sendPacket(e.getPlayer(), new WrappedPacketOutEntityVelocity(e.getPlayer(), 0, 3, 0));
-                }
-                else if(message.contains("swing arm")) {
-                    //Swing the player's arm
-                    // PacketEvents.sendPacket(e.getPlayer(), new WrappedPacketOutAnimation(e.getPlayer(), EntityAnimationType.SWING_MAIN_ARM));
-                }
                 break;
             case Packet.Client.BLOCK_PLACE:
                 final WrappedPacketInBlockPlace blockPlace = new WrappedPacketInBlockPlace(e.getPlayer(), e.getPacket());
@@ -125,10 +119,10 @@ public class RegisteredListener implements PacketListener {
      * You can also call this event to "whitelist" a player,
      * our API won't even notice the player exists, so you won't
      * be able to listen to any packets from the player
-     * @param e
+     * @param event
      */
     @PacketHandler
-    public void onUninject(PlayerUninjectEvent e) {
+    public void onUninject(PlayerUninjectEvent event) {
 
     }
 

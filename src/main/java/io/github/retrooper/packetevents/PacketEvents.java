@@ -15,8 +15,6 @@ import java.lang.reflect.InvocationTargetException;
 public class PacketEvents{
     private static final ServerVersion version = ServerVersion.getVersion();
     private static PacketEvents instance;
-    public static JavaPlugin plugin;
-    private static PacketHandler packetInjector;
     private static EventManager eventManager = new EventManager();
 
     private static int currentTick;
@@ -29,9 +27,8 @@ public class PacketEvents{
 
 
     public static void setup(final JavaPlugin plugin, final boolean serverTickEventEnabled) {
-        PacketEvents.plugin = plugin;
-        packetInjector = new PacketHandler(plugin);
-        packetInjector.initTinyProtocol();
+        final PacketHandler packetHandler = new PacketHandler(plugin);
+        packetHandler.initTinyProtocol();
 
         if (serverTickEventEnabled) {
             final Runnable runnable = new Runnable() {
