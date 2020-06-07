@@ -1,6 +1,6 @@
 # packetevents by retrooper
 
-An asynchronous spigot packetListener coded by retrooper.
+A lightweight spigot packetlistener & packetsender coded by retrooper.
 
 Credit to TinyProtocol, PacketEvents uses a modified version of [TinyProtocol](http://github.com/dmulloy2/ProtocolLib/blob/master/TinyProtocol/src/main/java/com/comphenix/tinyprotocol/TinyProtocol.java) by DeprecatedLuke to support 1.7.10 & 1.8.
 PacketEvents does some extra modifications to support the rest of the versions!
