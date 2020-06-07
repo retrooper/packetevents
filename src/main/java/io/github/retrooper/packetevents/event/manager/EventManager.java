@@ -50,4 +50,7 @@ public class EventManager {
         registeredMethods.clear();
     }
 
+    public boolean hasRegistered(final PacketListener listener) {
+        return registeredMethods.containsKey(listener);
+    }
 }

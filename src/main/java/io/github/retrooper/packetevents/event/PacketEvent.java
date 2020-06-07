@@ -9,7 +9,7 @@ import io.github.retrooper.packetevents.enums.ServerVersion;
  * recommended to avoid non thread safe bukkit operations
  */
 public class PacketEvent {
-    protected long timestamp = PacketEvents.currentTimeMS();
+    protected long timestamp = PacketEvents.currentCalculatedMS();
     protected static ServerVersion version = PacketEvents.getServerVersion();
 
     /**

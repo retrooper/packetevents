@@ -1,21 +1,17 @@
 package io.github.retrooper.packetevents.event.impl;
 
-import io.github.retrooper.packetevents.PacketEvents;
 import io.github.retrooper.packetevents.event.PacketEvent;
 
 //unfinished
 public class ServerReloadEvent extends PacketEvent {
-    private final long currentTime;
+    private boolean cancelled;
 
-    public ServerReloadEvent(final long currentTime){
-        this.currentTime = currentTime;
+    public void setCancelled(final boolean val) {
+        this.cancelled = val;
     }
 
-    public ServerReloadEvent() {
-        this.currentTime = PacketEvents.currentTimeMS();
+    public boolean isCancelled() {
+        return cancelled;
     }
 
-    public final long getCurrentTime() {
-        return currentTime;
-    }
 }

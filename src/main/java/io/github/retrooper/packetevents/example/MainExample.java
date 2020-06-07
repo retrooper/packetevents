@@ -16,7 +16,7 @@ public class MainExample extends JavaPlugin {
          * The first argument is an instance to your Main Class,
          * The second argument is a boolean whether the servertickevent should ever get called
          */
-        PacketEvents.setup(this, serverTickEventEnabled);
+        PacketEvents.start(this, serverTickEventEnabled);
 
 
         /**
@@ -30,7 +30,7 @@ public class MainExample extends JavaPlugin {
         /**
          * Stops server tick event task if enabled and unregister all listeners
          */
-        PacketEvents.cleanup();
+        PacketEvents.stop();
 
     }
 

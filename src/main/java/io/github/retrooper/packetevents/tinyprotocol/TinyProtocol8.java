@@ -24,7 +24,7 @@ import com.mojang.authlib.GameProfile;
 import io.github.retrooper.packetevents.PacketEvents;
 import io.github.retrooper.packetevents.event.impl.PlayerInjectEvent;
 import io.github.retrooper.packetevents.event.impl.PlayerUninjectEvent;
-import io.github.retrooper.packetevents.handler.PacketHandler_1_8;
+import io.github.retrooper.packetevents.handler.TinyProtocolHandler_1_8;
 import io.github.retrooper.packetevents.tinyprotocol.Reflection.FieldAccessor;
 import io.netty.channel.*;
 import org.bukkit.Bukkit;
@@ -215,7 +215,7 @@ public abstract class TinyProtocol8 {
         boolean looking = true;
 
         // We need to synchronize against this list
-        final Field networkManagersField = serverConnection.getClass().getDeclaredField(PacketHandler_1_8.getNetworkManagersFieldName());
+        final Field networkManagersField = serverConnection.getClass().getDeclaredField(TinyProtocolHandler_1_8.getNetworkManagersFieldName());
         networkManagersField.setAccessible(true);
         networkManagers = (List<Object>) networkManagersField.get(serverConnection);
         createServerChannelHandler();

@@ -1,5 +1,6 @@
 package io.github.retrooper.packetevents.example;
 
+import io.github.retrooper.packetevents.PacketEvents;
 import io.github.retrooper.packetevents.enums.*;
 import io.github.retrooper.packetevents.event.PacketEvent;
 import io.github.retrooper.packetevents.event.PacketHandler;
@@ -155,7 +156,7 @@ public class RegisteredListener implements PacketListener {
         } else if (e instanceof ServerTickEvent) {
             final ServerTickEvent event = (ServerTickEvent) e;
             final int currentTick = event.getCurrentTick();
-            // System.out.println(PacketEvents.getCurrentServerTPS() + " is tps");
+            final double tps = PacketEvents.getCurrentServerTPS();
         }
         else if(e instanceof PacketLoginEvent) {
             final PacketLoginEvent event = (PacketLoginEvent)e;

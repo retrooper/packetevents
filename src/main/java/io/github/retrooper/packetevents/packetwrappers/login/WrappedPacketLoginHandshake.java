@@ -1,8 +1,8 @@
 package io.github.retrooper.packetevents.packetwrappers.login;
 
 import io.github.retrooper.packetevents.packetwrappers.api.WrappedPacket;
-import io.github.retrooper.packetevents.tinyprotocol.Reflection.*;
 import io.github.retrooper.packetevents.tinyprotocol.Reflection;
+import io.github.retrooper.packetevents.tinyprotocol.Reflection.FieldAccessor;
 import io.github.retrooper.packetevents.utils.NMSUtils;
 
 

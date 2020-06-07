@@ -16,25 +16,16 @@ public class NMSUtils {
     private static final ServerVersion version = ServerVersion.getVersion();
 
 
-    private static final String nettyPrefix = version == ServerVersion.v_1_7_10 ? "net.minecraft.util.io.netty" : "io.netty";
+    public static final String nettyPrefix = version.isLowerThan(ServerVersion.v_1_8) ? "net.minecraft.util.io.netty" : "io.netty";
     private static final String nmsDir = ServerVersion.getNMSDirectory();
     private static final String obcDir = ServerVersion.getOBCDirectory();
 
     public static Class<?> minecraftServerClass, craftWorldsClass,
-            packetClass, entityPlayerClass, playerConnectionClass, craftPlayerClass;
-    private static Class<?> serverConnectionClass, craftEntityClass;
+            packetClass, entityPlayerClass, playerConnectionClass, craftPlayerClass, serverConnectionClass, craftEntityClass;
 
-    private static Method getServerMethod;
-    private static Method getCraftWorldHandleMethod;
-    private static Method entityMethod;
-    public static Method getServerConnection;
-    public static Method getCraftPlayerHandle;
-    public static Method getCraftEntityHandle;
-    private static Method sendPacketMethod;
+    private static Method getServerMethod, getCraftWorldHandleMethod, entityMethod, getServerConnection, getCraftPlayerHandle, getCraftEntityHandle, sendPacketMethod;
 
-    private static Field recentTPSField;
-    private static Field entityPlayerPingField;
-    private static Field playerConnectionField;
+    private static Field recentTPSField, entityPlayerPingField, playerConnectionField;
 
     static {
         try {
@@ -118,35 +109,29 @@ public class NMSUtils {
         final Object craftEntity = craftEntityClass.cast(entity);
         try {
             return getCraftEntityHandle.invoke(craftEntity);
-        } catch (IllegalAccessException e) {
-            e.printStackTrace();
-        } catch (InvocationTargetException e) {
+        } catch (IllegalAccessException | InvocationTargetException e) {
             e.printStackTrace();
         }
         return null;
     }
 
+    public static Object getCraftPlayer(final Player player) {
+        return craftPlayerClass.cast(player);
+    }
+
     public static Object getEntityPlayer(final Player player) {
+        final Object craftPlayer = getCraftPlayer(player);
+        Object entityPlayer = null;
         try {
-            return getCraftPlayerHandle.invoke(craftPlayerClass.cast(player));
-        } catch (IllegalAccessException e) {
-            e.printStackTrace();
-        } catch (InvocationTargetException e) {
+            return getCraftPlayerHandle.invoke(craftPlayer);
+        } catch (IllegalAccessException | InvocationTargetException e) {
             e.printStackTrace();
         }
         return null;
     }
 
     public static int getPlayerPing(final Player player) {
-        final Object craftPlayer = craftPlayerClass.cast(player);
-        Object entityPlayer = null;
-        try {
-            entityPlayer = getCraftPlayerHandle.invoke(craftPlayer);
-        } catch (IllegalAccessException e) {
-            e.printStackTrace();
-        } catch (InvocationTargetException e) {
-            e.printStackTrace();
-        }
+        Object entityPlayer = getEntityPlayer(player);
         try {
             return entityPlayerPingField.getInt(entityPlayer);
         } catch (IllegalAccessException e) {
@@ -165,15 +150,7 @@ public class NMSUtils {
     }
 
     public static void sendNMSPacket(final Player player, final Object nmsPacket) {
-        Object entityPlayer = null;
-        try {
-            entityPlayer = getCraftPlayerHandle.invoke(craftPlayerClass.cast(player));
-        } catch (IllegalAccessException e) {
-            e.printStackTrace();
-        } catch (InvocationTargetException e) {
-            e.printStackTrace();
-        }
-
+        Object entityPlayer = getEntityPlayer(player);
         Object playerConnection = null;
         try {
             playerConnection = playerConnectionField.get(entityPlayer);
@@ -183,9 +160,7 @@ public class NMSUtils {
 
         try {
             sendPacketMethod.invoke(playerConnection, nmsPacket);
-        } catch (IllegalAccessException e) {
-            e.printStackTrace();
-        } catch (InvocationTargetException e) {
+        } catch (IllegalAccessException | InvocationTargetException e) {
             e.printStackTrace();
         }
     }

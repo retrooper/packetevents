@@ -10,10 +10,10 @@ import net.minecraft.util.io.netty.channel.Channel;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 
-public class PacketHandler_1_7 {
+public class TinyProtocolHandler_1_7 {
     private final Plugin plugin;
 
-    public PacketHandler_1_7(final Plugin plugin) {
+    public TinyProtocolHandler_1_7(final Plugin plugin) {
         this.plugin = plugin;
     }
 
@@ -35,7 +35,7 @@ public class PacketHandler_1_7 {
                 final String packetName = packet.getClass().getSimpleName();
                 for(final String loginPacket : Packet.Login.LOGIN_PACKETS) {
                     if(packetName.equals(loginPacket)) {
-                        PacketEvents.getEventManager().callEvent(new PacketLoginEvent(packetName, packet));
+                        PacketEvents.getEventManager().callEvent(new PacketLoginEvent(channel, packetName, packet));
                     }
                 }
                 final PacketReceiveEvent packetReceiveEvent = new PacketReceiveEvent(sender, packetName, packet);
