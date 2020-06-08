@@ -106,6 +106,9 @@ public class RegisteredListener implements PacketListener {
      * to register your players instead of any other bukkit event,
      * to avoid any issues.
      *
+     * DO NOT CHECK YOUR CLIENT VERSIONS HERE,
+     * USE PLAYER JOIN EVENT TO CHECK A CLIENT'S VERSION!
+     *
      * @param event
      */
     @PacketHandler

@@ -4,9 +4,10 @@ import io.github.retrooper.packetevents.enums.Direction;
 import io.github.retrooper.packetevents.enums.PlayerDigType;
 import io.github.retrooper.packetevents.enums.ServerVersion;
 import io.github.retrooper.packetevents.packetwrappers.api.WrappedPacket;
-import io.github.retrooper.packetevents.utils.BaseBlockUtils;
+import io.github.retrooper.packetevents.tinyprotocol.Reflection;
 import io.github.retrooper.packetevents.utils.NMSUtils;
 import io.github.retrooper.packetevents.utils.vector.Vector3i;
+import net.minecraft.server.v1_15_R1.BaseBlockPosition;
 
 import java.lang.reflect.Field;
 
@@ -41,9 +42,9 @@ public class WrappedPacketInBlockDig extends WrappedPacket {
                 final Object enumDirectionObj = fields[1].get(packet);
                 final Object digTypeObj = fields[2].get(packet);
 
-                final int x = blockPosXYZ[0].getInt(blockPosObj);
-                final int y = blockPosXYZ[1].getInt(blockPosObj);
-                final int z = blockPosXYZ[2].getInt(blockPosObj);
+                final int x = blockPosXYZ[0].get(blockPosObj);
+                final int y = blockPosXYZ[1].get(blockPosObj);
+                final int z = blockPosXYZ[2].get(blockPosObj);
 
                 this.blockPosition = new Vector3i(x, y, z);
 
@@ -79,7 +80,7 @@ public class WrappedPacketInBlockDig extends WrappedPacket {
 
     private static Class<?> blockPositionClass;
 
-    private static Field[] blockPosXYZ = new Field[3];
+    private static Reflection.FieldAccessor<Integer>[] blockPosXYZ = new Reflection.FieldAccessor[3];
 
     //1.7
     private static Field face;
@@ -107,9 +108,9 @@ public class WrappedPacketInBlockDig extends WrappedPacket {
             fields[2] = blockDigClass.getDeclaredField("c");
 
             if (version != ServerVersion.v_1_7_10) {
-                blockPosXYZ[0] = blockPositionClass.getSuperclass().getDeclaredField(BaseBlockUtils.getPosXFieldName());
-                blockPosXYZ[1] = blockPositionClass.getSuperclass().getDeclaredField(BaseBlockUtils.getPosXFieldName());
-                blockPosXYZ[2] = blockPositionClass.getSuperclass().getDeclaredField(BaseBlockUtils.getPosZFieldName());
+                blockPosXYZ[0] = Reflection.getField(blockPositionClass.getSuperclass(), int.class, 0);
+                blockPosXYZ[1] = Reflection.getField(blockPositionClass.getSuperclass(), int.class, 1);
+                blockPosXYZ[2] = Reflection.getField(blockPositionClass.getSuperclass(), int.class, 2);
             } else {
                 face = blockDigClass.getDeclaredField("face");
                 e = blockDigClass.getDeclaredField("e");
@@ -119,12 +120,6 @@ public class WrappedPacketInBlockDig extends WrappedPacket {
         }
 
         for(Field f : fields) {
-            if(f != null) {
-                f.setAccessible(true);
-            }
-        }
-
-        for(Field f : blockPosXYZ) {
             if(f != null) {
                 f.setAccessible(true);
             }
