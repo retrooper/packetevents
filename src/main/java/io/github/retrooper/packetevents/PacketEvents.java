@@ -128,6 +128,11 @@ public class PacketEvents implements PacketListener{
         return clientVersionLookup.get(channel);
     }
 
+    @Nullable
+    public static ClientVersion getClientVersion(final Object channel) {
+        return clientVersionLookup.get(channel);
+    }
+
     @PacketHandler
     public void onLogin(final PacketLoginEvent e) {
         if (e.getPacketName().equals(Packet.Login.HANDSHAKE)) {

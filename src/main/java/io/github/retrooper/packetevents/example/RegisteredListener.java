@@ -28,8 +28,6 @@ import org.bukkit.inventory.ItemStack;
  * Implementing PacketListener to listen to packets and packetevents' custom events,
  */
 public class RegisteredListener implements PacketListener {
-
-
     /**
      * Listen to PacketReceiveEvent
      *

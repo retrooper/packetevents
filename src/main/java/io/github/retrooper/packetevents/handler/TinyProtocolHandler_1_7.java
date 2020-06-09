@@ -36,6 +36,7 @@ public class TinyProtocolHandler_1_7 {
                 for(final String loginPacket : Packet.Login.LOGIN_PACKETS) {
                     if(packetName.equals(loginPacket)) {
                         PacketEvents.getEventManager().callEvent(new PacketLoginEvent(channel, packetName, packet));
+                        return packet;
                     }
                 }
                 final PacketReceiveEvent packetReceiveEvent = new PacketReceiveEvent(sender, packetName, packet);
