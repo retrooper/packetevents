@@ -2,9 +2,13 @@
 
 A lightweight spigot packetlistener & packetsender coded by retrooper.
 
-Credit to TinyProtocol, PacketEvents uses a modified version of [TinyProtocol](http://github.com/dmulloy2/ProtocolLib/blob/master/TinyProtocol/src/main/java/com/comphenix/tinyprotocol/TinyProtocol.java) by DeprecatedLuke to support 1.7.10 & 1.8.
-I modified TinyProtocol to support 1.9+.
-I also make the wrapper classes and useful utilities that support 1.7.10 -> 1.15.2!
+## Credit:
+
+PacketEvents uses a modified version of [TinyProtocol](http://github.com/dmulloy2/ProtocolLib/blob/master/TinyProtocol/src/main/java/com/comphenix/tinyprotocol/TinyProtocol.java) by DeprecatedLuke to support 1.7.10 & 1.8.
+I modified DeprecatedLuek's version of TinyProtocol and added support for 1.9+ versions.
+
+PacketEvents also took Atlas' Packet class.(all the packet names)
+
 This packetlistener is **only** supported on spigot servers and works on these spigot forks:(PaperSpigot, Tuinity)
 
 * No dependencies
