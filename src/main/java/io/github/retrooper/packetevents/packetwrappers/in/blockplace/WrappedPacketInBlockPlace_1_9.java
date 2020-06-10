@@ -3,8 +3,10 @@ package io.github.retrooper.packetevents.packetwrappers.in.blockplace;
 
 import io.github.retrooper.packetevents.packetwrappers.api.WrappedPacket;
 import io.github.retrooper.packetevents.utils.NMSUtils;
+import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
+import java.util.HashSet;
 
 class WrappedPacketInBlockPlace_1_9 extends WrappedPacket {
     private Block block;
@@ -15,7 +17,7 @@ class WrappedPacketInBlockPlace_1_9 extends WrappedPacket {
 
     @Override
     protected void setup() {
-        this.block = player.getTargetBlock(null, 3);
+        this.block = getPlayer().getTargetBlock((HashSet<Material>)null, 3);
 
     }
 
