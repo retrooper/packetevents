@@ -6,6 +6,7 @@ import io.github.retrooper.packetevents.utils.nms_entityfinder.EntityFinderUtils
 import org.bukkit.World;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
 
 import javax.annotation.Nullable;
 import java.lang.reflect.Field;
@@ -21,9 +22,9 @@ public class NMSUtils {
     private static final String obcDir = ServerVersion.getOBCDirectory();
 
     public static Class<?> minecraftServerClass, craftWorldsClass,
-            packetClass, entityPlayerClass, playerConnectionClass, craftPlayerClass, serverConnectionClass, craftEntityClass;
+            packetClass, entityPlayerClass, playerConnectionClass, craftPlayerClass, serverConnectionClass, craftEntityClass, craftItemStack, nmsItemStackClass;
 
-    private static Method getServerMethod, getCraftWorldHandleMethod, entityMethod, getServerConnection, getCraftPlayerHandle, getCraftEntityHandle, sendPacketMethod;
+    private static Method getServerMethod, getCraftWorldHandleMethod, getServerConnection, getCraftPlayerHandle, getCraftEntityHandle, sendPacketMethod, asBukkitCopy;
 
     private static Field recentTPSField, entityPlayerPingField, playerConnectionField;
 
@@ -37,6 +38,8 @@ public class NMSUtils {
             playerConnectionClass = getNMSClass("PlayerConnection");
             serverConnectionClass = getNMSClass("ServerConnection");
             craftEntityClass = getOBCClass("entity.CraftEntity");
+            craftItemStack = getOBCClass("inventory.CraftItemStack");
+            nmsItemStackClass = getNMSClass("ItemStack");
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
         }
@@ -49,6 +52,7 @@ public class NMSUtils {
             getCraftEntityHandle = craftEntityClass.getMethod("getHandle");
             sendPacketMethod = playerConnectionClass.getMethod("sendPacket", packetClass);
             getServerConnection = minecraftServerClass.getMethod("getServerConnection");
+            asBukkitCopy = craftItemStack.getMethod("asBukkitCopy", nmsItemStackClass);
         } catch (NoSuchMethodException e) {
             e.printStackTrace();
         }
@@ -138,6 +142,17 @@ public class NMSUtils {
             e.printStackTrace();
         }
         return -1;
+    }
+
+    public static ItemStack toBukkitItemStack(final Object nmsItemstack) {
+        try {
+            return (ItemStack) asBukkitCopy.invoke(null, nmsItemstack);
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        } catch (InvocationTargetException e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 
     public static boolean is_1_8() {

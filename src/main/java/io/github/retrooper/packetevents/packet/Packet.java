@@ -1,6 +1,9 @@
 package io.github.retrooper.packetevents.packet;
 
 
+import io.github.retrooper.packetevents.PacketEvents;
+import io.github.retrooper.packetevents.enums.ServerVersion;
+
 public abstract class Packet {
     public static class Client {
         private static final String c = "PacketPlayIn";
@@ -23,7 +26,10 @@ public abstract class Packet {
         public static final String STEER_VEHICLE = c + "SteerVehicle";
         public static final String CUSTOM_PAYLOAD = c + "CustomPayload";
         public static final String ARM_ANIMATION = c + "ArmAnimation";
-        public static final String BLOCK_PLACE = c + "BlockPlace";
+        /**
+         * The packet name of the block place depending on your server version, "PacketPlayInBlockPlace" or "PacketPlayInUseItem"
+         */
+        public static final String BLOCK_PLACE = c + ((ServerVersion.getVersion().isHigherThan(ServerVersion.v_1_8_8)) ? "UseItem" : "BlockPlace");;
         public static final String ABILITIES = c + "Abilities";
         public static final String HELD_ITEM_SLOT = c + "HeldItemSlot";
         public static final String CLOSE_WINDOW = c + "CloseWindow";

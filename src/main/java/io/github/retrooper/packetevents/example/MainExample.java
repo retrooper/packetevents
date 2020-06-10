@@ -1,6 +1,8 @@
 package io.github.retrooper.packetevents.example;
 
 import io.github.retrooper.packetevents.PacketEvents;
+import io.github.retrooper.packetevents.enums.ServerVersion;
+import io.github.retrooper.packetevents.packet.Packet;
 import org.bukkit.plugin.java.JavaPlugin;
 
 public class MainExample extends JavaPlugin {

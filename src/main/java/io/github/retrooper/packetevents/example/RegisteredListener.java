@@ -37,6 +37,15 @@ public class RegisteredListener implements PacketListener {
     public void onPacketReceive(PacketReceiveEvent e) {
         final Player p = e.getPlayer();
         final long timestamp = e.getTimestamp();
+
+        //The block place name field is not set at compilation time, so we cannot use it in the switch statement
+        //On 1.7->1.8.8 servers it is "PacketPlayInBlockPlace" and on 1.9 servers it is "PacketPlayInUseItem"
+        if(e.getPacketName().equals(Packet.Client.BLOCK_PLACE)) {
+            final WrappedPacketInBlockPlace blockPlace = new WrappedPacketInBlockPlace(e.getPlayer(), e.getPacket());
+            final Vector3i blockPosition = blockPlace.getBlockPosition();
+            final ItemStack stack = blockPlace.getItemStack();
+            e.getPlayer().sendMessage("pos: " + blockPosition.toString() + ", type: " + stack.getType());
+        }
         switch (e.getPacketName()) {
             case Packet.Client.USE_ENTITY:
                 final WrappedPacketInUseEntity useEntity = new WrappedPacketInUseEntity(e.getPacket());
@@ -52,7 +61,7 @@ public class RegisteredListener implements PacketListener {
                 final boolean canInstantlyBuild = abilities.canInstantlyBuild();
                 final float flySpeed = abilities.getFlySpeed();
                 final float walkSpeed = abilities.getWalkSpeed();
-                // e.getPlayer().sendMessage("walkspeed: " + walkSpeed + ", flyspeed: " + flySpeed + ", canFly: " + canFly);
+                 e.getPlayer().sendMessage("walkspeed: " + walkSpeed + ", flyspeed: " + flySpeed + ", canFly: " + canFly);
                 break;
             case Packet.Client.BLOCK_DIG:
                 //Custom PlayerDigType enum
@@ -69,6 +78,7 @@ public class RegisteredListener implements PacketListener {
                 final WrappedPacketInFlying.WrappedPacketInPosition position =
                         new WrappedPacketInFlying.WrappedPacketInPosition(e.getPacket());
                 final boolean isPos = position.isPosition(); //true
+                p.sendMessage("gaaang pos");
                 break;
             case Packet.Client.POSITION_LOOK:
                 final WrappedPacketInFlying.WrappedPacketInPosition_Look position_look =
@@ -78,12 +88,6 @@ public class RegisteredListener implements PacketListener {
             case Packet.Client.CHAT:
                 final WrappedPacketInChat chat = new WrappedPacketInChat(e.getPacket());
                 final String message = chat.getMessage();
-                break;
-            case Packet.Client.BLOCK_PLACE:
-                final WrappedPacketInBlockPlace blockPlace = new WrappedPacketInBlockPlace(e.getPlayer(), e.getPacket());
-                final Vector3i blockPosition = blockPlace.getBlockPosition();
-                final Hand h = blockPlace.getHand();
-                final ItemStack stack = blockPlace.getItemStack();
                 break;
             case Packet.Client.KEEP_ALIVE:
                 final WrappedPacketInKeepAlive keepAlive = new WrappedPacketInKeepAlive(e.getPacket());

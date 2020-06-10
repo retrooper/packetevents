@@ -7,7 +7,6 @@ import io.github.retrooper.packetevents.packetwrappers.api.WrappedPacket;
 import io.github.retrooper.packetevents.tinyprotocol.Reflection;
 import io.github.retrooper.packetevents.utils.NMSUtils;
 import io.github.retrooper.packetevents.utils.vector.Vector3i;
-import net.minecraft.server.v1_15_R1.BaseBlockPosition;
 
 import java.lang.reflect.Field;
 
