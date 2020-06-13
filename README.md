@@ -11,7 +11,7 @@ PacketEvents also took Atlas' Packet class.(all the packet names)
 
 ## About
 
-This packetlistener is **only** supported on spigot servers and works on these spigot forks:(PaperSpigot, Tuinity)
+This packetlistener is **only** supported on spigot servers and has been tested to work on these spigot forks: PaperSpigot, Tuinity
 
 * No dependencies
 
