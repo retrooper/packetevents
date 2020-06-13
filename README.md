@@ -9,11 +9,13 @@ I modified DeprecatedLuek's version of TinyProtocol and added support for 1.9+ v
 
 PacketEvents also took Atlas' Packet class.(all the packet names)
 
+## About
+
 This packetlistener is **only** supported on spigot servers and works on these spigot forks:(PaperSpigot, Tuinity)
 
 * No dependencies
 
-* Licensed with the GPL2 license.
+* Licensed under the GPL2 license.
 
 [![](https://img.shields.io/badge/License-GPLv2-blue.svg)](https://www.gnu.org/licenses/gpl-2.0)
 
