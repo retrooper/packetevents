@@ -11,6 +11,8 @@ import io.netty.channel.Channel;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 
+import javax.annotation.Nullable;
+
 public class TinyProtocolHandler_1_8 {
     private static final ServerVersion version = PacketEvents.getServerVersion();
     private final Plugin plugin;
@@ -20,15 +22,13 @@ public class TinyProtocolHandler_1_8 {
     }
 
 
-    /*
-     * Login wrappers TODO
-     * PacketLoginInStart
-     * PacketLoginInEncryptionBegin
-     */
+
+    @Nullable
+    public TinyProtocol8 tinyProtocol;
 
 
     public void initTinyProtocol() {
-        new TinyProtocol8(getPlugin()) {
+        tinyProtocol = new TinyProtocol8(getPlugin()) {
             @Override
             public Object onPacketOutAsync(Player receiver, Channel channel, Object packet) {
                 final String packetName = packet.getClass().getSimpleName();

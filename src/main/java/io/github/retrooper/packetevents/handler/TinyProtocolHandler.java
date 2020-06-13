@@ -11,19 +11,57 @@ import org.bukkit.plugin.Plugin;
 
 public class TinyProtocolHandler {
     private static final ServerVersion version = PacketEvents.getServerVersion();
-    private final Plugin plugin;
 
-    public TinyProtocolHandler(final Plugin plugin) {
-        this.plugin = plugin;
-    }
-    public void initTinyProtocol() {
-        if(version.isLowerThan(ServerVersion.v_1_8)) {
-            new TinyProtocolHandler_1_7(getPlugin()).initTinyProtocol();
+    private static Object tinyProtocol;
+
+    public static void initTinyProtocol(final Plugin plugin) {
+        if (version.isLowerThan(ServerVersion.v_1_8)) {
+            TinyProtocolHandler_1_7 tiny = new TinyProtocolHandler_1_7(plugin);
+            tiny.initTinyProtocol();
+            tinyProtocol = tiny;
+        } else {
+            TinyProtocolHandler_1_8 tiny = new TinyProtocolHandler_1_8(plugin);
+            tiny.initTinyProtocol();
+            tinyProtocol = tiny;
         }
-        else {
-            new TinyProtocolHandler_1_8(getPlugin()).initTinyProtocol();
+    }
+
+    public static boolean hasInjected(final Player player) {
+        if (version.isLowerThan(ServerVersion.v_1_8)) {
+            TinyProtocolHandler_1_7 tiny = (TinyProtocolHandler_1_7) tinyProtocol;
+            assert tiny.tinyProtocol != null;
+            return tiny.tinyProtocol.hasInjected(player);
+        } else {
+            TinyProtocolHandler_1_8 tiny = (TinyProtocolHandler_1_8) tinyProtocol;
+            assert tiny.tinyProtocol != null;
+            return tiny.tinyProtocol.hasInjected(player);
         }
     }
+
+    public static void inject(final Player player) {
+        if (version.isLowerThan(ServerVersion.v_1_8)) {
+            TinyProtocolHandler_1_7 tiny = (TinyProtocolHandler_1_7) tinyProtocol;
+            assert tiny.tinyProtocol != null;
+            tiny.tinyProtocol.injectPlayer(player);
+        } else {
+            TinyProtocolHandler_1_8 tiny = (TinyProtocolHandler_1_8) tinyProtocol;
+            assert tiny.tinyProtocol != null;
+            tiny.tinyProtocol.injectPlayer(player);
+        }
+    }
+
+    public static void uninject(final Player player) {
+        if (version.isLowerThan(ServerVersion.v_1_8)) {
+            TinyProtocolHandler_1_7 tiny = (TinyProtocolHandler_1_7) tinyProtocol;
+            assert tiny.tinyProtocol != null;
+            tiny.tinyProtocol.uninjectPlayer(player);
+        } else {
+            TinyProtocolHandler_1_8 tiny = (TinyProtocolHandler_1_8) tinyProtocol;
+            assert tiny.tinyProtocol != null;
+            tiny.tinyProtocol.uninjectPlayer(player);
+        }
+    }
+
 
     public static Object getPlayerChannel(final Player player) {
         final Object entityPlayer = NMSUtils.getEntityPlayer(player);
@@ -32,9 +70,6 @@ public class TinyProtocolHandler {
         return nettyChannelAccessor.get(networkManager);
     }
 
-    public final Plugin getPlugin() {
-        return plugin;
-    }
 
     private static Class<?> networkManagerClass;
 

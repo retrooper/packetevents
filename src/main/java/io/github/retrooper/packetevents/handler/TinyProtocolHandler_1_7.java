@@ -10,6 +10,8 @@ import net.minecraft.util.io.netty.channel.Channel;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 
+import javax.annotation.Nullable;
+
 public class TinyProtocolHandler_1_7 {
     private final Plugin plugin;
 
@@ -17,8 +19,11 @@ public class TinyProtocolHandler_1_7 {
         this.plugin = plugin;
     }
 
+    @Nullable
+    public TinyProtocol7 tinyProtocol;
+
     public void initTinyProtocol() {
-        new TinyProtocol7(getPlugin()) {
+        tinyProtocol = new TinyProtocol7(getPlugin()) {
             @Override
             public Object onPacketOutAsync(Player receiver, Channel channel, Object packet) {
                 final String packetName = packet.getClass().getSimpleName();

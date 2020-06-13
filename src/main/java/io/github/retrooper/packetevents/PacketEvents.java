@@ -32,6 +32,12 @@ import java.util.UUID;
 public class PacketEvents implements PacketListener, Listener {
 
 
+    /*
+     * Login wrappers TODO
+     * PacketLoginInStart
+     * PacketLoginInEncryptionBegin
+     */
+
     private static boolean hasRegistered;
 
     private static final ServerVersion version = ServerVersion.getVersion();
@@ -44,14 +50,10 @@ public class PacketEvents implements PacketListener, Listener {
 
     private static final HashMap<Object, ClientVersion> clientVersionLookup = new HashMap<Object, ClientVersion>();
 
-    public static final HashSet<UUID> awaitingInjection = new HashSet<UUID>();
-
     public static EventManager getEventManager() {
         return eventManager;
     }
 
-
-    private static TinyProtocolHandler packetHandler;
 
     /**
      * Starts the server tick task and initiates the TinyProtocolHandler
@@ -65,8 +67,7 @@ public class PacketEvents implements PacketListener, Listener {
             Bukkit.getPluginManager().registerEvents(getInstance(), plugin);
 
             //Initialize the TinyProtocolHandler
-            packetHandler = new TinyProtocolHandler(plugin);
-            packetHandler.initTinyProtocol();
+            TinyProtocolHandler.initTinyProtocol(plugin);
 
             //Start the server tick task
             final Runnable tickRunnable = new Runnable() {
@@ -101,6 +102,7 @@ public class PacketEvents implements PacketListener, Listener {
 
     /**
      * Returns the server tick task, you may cancel it if you wish.
+     * To cancel it do PacketEvents.getServerTickTask().cancel();
      * <p>
      * This bukkit task runs asynchronously every tick and is started in the start(plugin) function
      *
@@ -222,7 +224,6 @@ public class PacketEvents implements PacketListener, Listener {
 
     /**
      * Called after the PlayerJoinEvent ONLY if the player has been injected!
-     *
      * @param e
      */
     @PacketHandler
@@ -249,10 +250,34 @@ public class PacketEvents implements PacketListener, Listener {
 
     @EventHandler
     public void onJoin(PlayerJoinEvent e) {
-        if (awaitingInjection.contains(e.getPlayer().getUniqueId())) {
+        if (hasInjected(e.getPlayer())) {
             PacketEvents.getEventManager().callEvent(new PostPlayerInjectEvent(e.getPlayer()));
-            awaitingInjection.remove(e.getPlayer().getUniqueId());
         }
+    }
+
+    /**
+     * Version independant player injection
+     * @param player
+     */
+    public static void injectPlayer(final Player player) {
+        TinyProtocolHandler.inject(player);
+    }
+
+    /**
+     * Version independant player injection
+     * @param player
+     */
+    public static void uninjectPlayer(final Player player) {
+        TinyProtocolHandler.uninject(player);
+    }
+
+    /**
+     * Returns whether we have injected the player
+     * @param player
+     * @return hasInjected
+     */
+    public static boolean hasInjected(final Player player) {
+        return TinyProtocolHandler.hasInjected(player);
     }
 
     /**
