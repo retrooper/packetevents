@@ -9,25 +9,20 @@ I modified DeprecatedLuek's version of TinyProtocol and added support for 1.9+ v
 
 PacketEvents also took Atlas' Packet class.(all the packet names)
 
-This packetlistener is **only** supported on spigot servers and works on these spigot forks:(PaperSpigot, Tuinity)
+## About
+
+This packetlistener is **only** supported on spigot servers and has been tested to work on these spigot forks: PaperSpigot, Tuinity
 
 * No dependencies
 
-* Licensed with the GPL2 license.
+* Licensed under the GPL2 license.
 
 [![](https://img.shields.io/badge/License-GPLv2-blue.svg)](https://www.gnu.org/licenses/gpl-2.0)
 
 Join my discord server(to talk to me): https://discord.gg/ZWTkg4v
 
-How to use with **Gradle, Maven, sbt and leiningen**.
-
-Click the link below.
-
-Make sure to replace **Tag** with a proper release version or a valid commit hash(first 7 characters)
-
-I recommend you to use the latest released version!
-
-
 [![](https://jitpack.io/v/retrooper/packetevents.svg)](https://jitpack.io/#retrooper/packetevents)
 
-If clicking the badge doesn't work paste this link into your browser http://jitpack.io/#retrooper/packetevents
+To learn how to setup this API please click on the link below
+[Setup Guide](https://github.com/retrooper/packetevents/wiki/PacketEvents-Setup-Guide)
+(or just paste this into your browser: https://github.com/retrooper/packetevents/wiki/PacketEvents-Setup-Guide)
