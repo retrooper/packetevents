@@ -21,15 +21,8 @@ This packetlistener is **only** supported on spigot servers and works on these s
 
 Join my discord server(to talk to me): https://discord.gg/ZWTkg4v
 
-How to use with **Gradle, Maven, sbt and leiningen**.
-
-Click the link below.
-
-Make sure to replace **Tag** with a proper release version or a valid commit hash(first 7 characters)
-
-I recommend you to use the latest released version!
-
-
 [![](https://jitpack.io/v/retrooper/packetevents.svg)](https://jitpack.io/#retrooper/packetevents)
 
-If clicking the badge doesn't work paste this link into your browser http://jitpack.io/#retrooper/packetevents
+To learn how to setup this API please click on the link below
+[Setup Guide](https://github.com/retrooper/packetevents/wiki/PacketEvents-Setup-Guide)
+(or just paste this into your browser: https://github.com/retrooper/packetevents/wiki/PacketEvents-Setup-Guide)
