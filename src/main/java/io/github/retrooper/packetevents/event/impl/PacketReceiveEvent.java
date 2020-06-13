@@ -3,7 +3,7 @@ package io.github.retrooper.packetevents.event.impl;
 import io.github.retrooper.packetevents.event.PacketEvent;
 import org.bukkit.entity.Player;
 
-public class PacketReceiveEvent extends PacketEvent {
+public final class PacketReceiveEvent extends PacketEvent {
     private final Player player;
     private final String name;
     private final Object packet;

@@ -6,6 +6,7 @@ import io.github.retrooper.packetevents.event.PacketHandler;
 import io.github.retrooper.packetevents.event.PacketListener;
 import io.github.retrooper.packetevents.event.impl.PacketLoginEvent;
 import io.github.retrooper.packetevents.event.impl.PlayerInjectEvent;
+import io.github.retrooper.packetevents.event.impl.PostPlayerInjectEvent;
 import io.github.retrooper.packetevents.event.impl.ServerTickEvent;
 import io.github.retrooper.packetevents.event.manager.EventManager;
 import io.github.retrooper.packetevents.handler.TinyProtocolHandler;
@@ -15,16 +16,23 @@ import io.github.retrooper.packetevents.packetwrappers.login.WrappedPacketLoginH
 import io.github.retrooper.packetevents.utils.NMSUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
-import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.Listener;
+import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.event.player.PlayerLoginEvent;
+import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitTask;
 
 import javax.annotation.Nullable;
 import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.UUID;
 
-public class PacketEvents implements PacketListener{
+public class PacketEvents implements PacketListener, Listener {
 
-    private static boolean hasRegistered = false;
+
+    private static boolean hasRegistered;
 
     private static final ServerVersion version = ServerVersion.getVersion();
     private static PacketEvents instance;
@@ -36,30 +44,45 @@ public class PacketEvents implements PacketListener{
 
     private static final HashMap<Object, ClientVersion> clientVersionLookup = new HashMap<Object, ClientVersion>();
 
+    public static final HashSet<UUID> awaitingInjection = new HashSet<UUID>();
+
     public static EventManager getEventManager() {
         return eventManager;
     }
 
 
-    public static void start(final JavaPlugin plugin, final boolean serverTickEventEnabled) {
-        if (!hasRegistered) {
-            getEventManager().registerListener(getInstance());
-            hasRegistered = true;
-        }
-        final TinyProtocolHandler packetHandler = new TinyProtocolHandler(plugin);
-        packetHandler.initTinyProtocol();
+    private static TinyProtocolHandler packetHandler;
 
-        if (serverTickEventEnabled) {
-            final Runnable runnable = new Runnable() {
+    /**
+     * Starts the server tick task and initiates the TinyProtocolHandler
+     *
+     * @param plugin
+     */
+    public static void start(final Plugin plugin) {
+        if (!hasRegistered) {
+            //Register Bukkit and PacketListener
+            getEventManager().registerListener(getInstance());
+            Bukkit.getPluginManager().registerEvents(getInstance(), plugin);
+
+            //Initialize the TinyProtocolHandler
+            packetHandler = new TinyProtocolHandler(plugin);
+            packetHandler.initTinyProtocol();
+
+            //Start the server tick task
+            final Runnable tickRunnable = new Runnable() {
                 @Override
                 public void run() {
                     getEventManager().callEvent(new ServerTickEvent(currentTick++, PacketEvents.currentCalculatedMS()));
                 }
             };
-            serverTickTask = Bukkit.getScheduler().runTaskTimerAsynchronously(plugin, runnable, 0L, 1L);
+            serverTickTask = Bukkit.getScheduler().runTaskTimerAsynchronously(plugin, tickRunnable, 0L, 1L);
+            hasRegistered = true;
         }
     }
 
+    /**
+     * Stop all tasks and unregisters all packetevent listeners
+     */
     public static void stop() {
         if (serverTickTask != null) {
             serverTickTask.cancel();
@@ -67,20 +90,43 @@ public class PacketEvents implements PacketListener{
         getEventManager().unregisterAllListeners();
     }
 
-
+    /**
+     * Get the server's version
+     *
+     * @return version
+     */
     public static ServerVersion getServerVersion() {
         return version;
     }
 
+    /**
+     * Returns the server tick task, you may cancel it if you wish.
+     * <p>
+     * This bukkit task runs asynchronously every tick and is started in the start(plugin) function
+     *
+     * @return serverTickTask
+     */
+    public static BukkitTask getServerTickTask() {
+        return serverTickTask;
+    }
+
+    /**
+     * Get an instance of the PacketEvents API class
+     *
+     * @return instance
+     */
     public static PacketEvents getInstance() {
         return instance == null ? instance = new PacketEvents() : instance;
     }
 
-    public static boolean isServerTickTaskEnabled() {
-        return serverTickTask != null;
-    }
 
-
+    /**
+     * Get the server's recent TPS values
+     * TPS stands for ticks per second.
+     * Learn more about ticks <a href="https://apexminecrafthosting.com/what-is-minecraft-tps/">"https://apexminecrafthosting.com/what-is-minecraft-tps/"</a>
+     *
+     * @return recentTPS[]
+     */
     public static double[] getRecentServerTPS() {
         double[] tpsArray = new double[0];
         try {
@@ -91,35 +137,48 @@ public class PacketEvents implements PacketListener{
         return tpsArray;
     }
 
+    /**
+     * Get the server's current TPS
+     * TPS stands for ticks per second.
+     * Learn more about ticks <a href="https://apexminecrafthosting.com/what-is-minecraft-tps/">"https://apexminecrafthosting.com/what-is-minecraft-tps/"</a>
+     *
+     * @return currentTPS / recentTPS[0]
+     */
     public static double getCurrentServerTPS() {
         return getRecentServerTPS()[0];
     }
 
+    /**
+     * Get the player's ping.
+     * Learn more about ping <a href="https://en.wikipedia.org/wiki/Ping_(networking_utility)">https://en.wikipedia.org/wiki/Ping_(networking_utility)</a>
+     *
+     * @param player
+     * @return ping
+     */
     public static int getPing(final Player player) {
         return NMSUtils.getPlayerPing(player);
     }
 
     /**
-     * This function returns nanoTime / 1 million,
+     * Should I use this over System.currentTimeMillis()?
+     * <p>
+     * 1. System.currentTimeMillis() isn't supported on all machines
+     * 2. This is way more accurate than System.currentTimeMillis()
+     * 3. System.currentTimeMillis() can be up to 50ms off, depending on the operating system.
      *
-     * Why use this instead of System.currentTimeMillis()?
-     *
-     * System.currentTimeMillis() isn't supported on all machines,
-     * This function is also more accurate, although it is slower on
-     * Windows machines, it is faster than System.currentTimeMillis() on other Operating Systems!
-     * @return
+     * @return nanoTime / 1 million
      */
     public static long currentCalculatedMS() {
         return System.nanoTime() / 1000000;
     }
 
     /**
-     * Get the player's clients' version.
-     *
-     * Do not call this method in the PlayerInjectEvent or before the player is injected.
+     * Get the player's version.
+     * Do not call this method in the PlayerInjectEvent, it is safe to call it in the PostPlayerInjectEvent.
      * The EntityPlayer object is null at that time, resulting in the version lookup to fail.
+     *
      * @param player
-     * @return
+     * @return ClientVersion
      */
     @Nullable
     public static ClientVersion getClientVersion(final Player player) {
@@ -127,6 +186,14 @@ public class PacketEvents implements PacketListener{
         return clientVersionLookup.get(channel);
     }
 
+    /**
+     * Get the players' client version
+     * Do not call this method in the PlayerInjectEvent, it is safe to call it in the PostPlayerInjectEvent.
+     * The EntityPlayer object is null at that time, resulting in the version lookup to fail.
+     *
+     * @param channel
+     * @return ClientVersion
+     */
     @Nullable
     public static ClientVersion getClientVersion(final Object channel) {
         return clientVersionLookup.get(channel);
@@ -142,18 +209,55 @@ public class PacketEvents implements PacketListener{
     }
 
     /**
-     * Do not check the client version in or before the PlayerInjectEvent,
-     * it will cause ERRORSS
+     * Do not check the client version in or before the PlayerInjectEvent, use the PostPlayerInjectEvent.
+     * It is not recommended to do much in the PlayerInjectEvent, as some fields in the Player object are be null.
+     * Use the PostPlayerInjectEvent which is only called after the PlayerJoinEvent if the player was injected.
+     *
      * @param e
      */
     @PacketHandler
     public void onInject(final PlayerInjectEvent e) {
         final String username = e.getPlayer().getName();
+    }
 
+    /**
+     * Called after the PlayerJoinEvent ONLY if the player has been injected!
+     *
+     * @param e
+     */
+    @PacketHandler
+    public void onPostInject(final PostPlayerInjectEvent e) {
+        //It is safe to get his client version in here.
+        final ClientVersion clientVersion = PacketEvents.getClientVersion(e.getPlayer());
+    }
+
+    @EventHandler
+    public void onLogin(final PlayerLoginEvent e) {
+        final Plugin[] plugins = Bukkit.getPluginManager().getPlugins();
+        boolean canJoin = true;
+        for (final Plugin pl : plugins) {
+            if (!pl.isEnabled()) {
+                canJoin = false;
+                break;
+            }
+        }
+        if (!canJoin) {
+            e.setResult(PlayerLoginEvent.Result.KICK_OTHER);
+            e.setKickMessage("Please wait for the server to finish loading all plugins");
+        }
+    }
+
+    @EventHandler
+    public void onJoin(PlayerJoinEvent e) {
+        if (awaitingInjection.contains(e.getPlayer().getUniqueId())) {
+            PacketEvents.getEventManager().callEvent(new PostPlayerInjectEvent(e.getPlayer()));
+            awaitingInjection.remove(e.getPlayer().getUniqueId());
+        }
     }
 
     /**
      * Send a wrapped sendable packet to a player
+     *
      * @param player
      * @param sendable
      */

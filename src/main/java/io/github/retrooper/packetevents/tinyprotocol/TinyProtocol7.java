@@ -294,7 +294,7 @@ public abstract class TinyProtocol7 {
      * @return The packet to recieve instead, or NULL to cancel.
      */
     public Object onPacketInAsync(Player sender, Channel channel, Object packet) {
-       return packet;
+        return packet;
     }
 
     /**
@@ -346,6 +346,10 @@ public abstract class TinyProtocol7 {
     }
 
 
+    /**
+     * Changed from "tiny-" to "packetevents"
+     * @return handlerName
+     */
     protected String getHandlerName() {
         return "packetevents-" + plugin.getName() + "-" + ID.incrementAndGet();
     }
@@ -358,9 +362,11 @@ public abstract class TinyProtocol7 {
      * @param player - the player to inject.
      */
     public void injectPlayer(Player player) {
-        injectChannelInternal(getChannel(player)).player = player;
-        PacketEvents.getEventManager().callEvent(new PlayerInjectEvent(player));
-
+        final PlayerInjectEvent playerInjectEvent = new PlayerInjectEvent(player);
+        PacketEvents.getEventManager().callEvent(playerInjectEvent);
+        if (!playerInjectEvent.isCancelled()) {
+            injectChannelInternal(getChannel(player)).player = player;
+        }
     }
 
     /**

@@ -1,7 +1,10 @@
 package io.github.retrooper.packetevents.example;
 
 import io.github.retrooper.packetevents.PacketEvents;
-import io.github.retrooper.packetevents.enums.*;
+import io.github.retrooper.packetevents.enums.Direction;
+import io.github.retrooper.packetevents.enums.EntityUseAction;
+import io.github.retrooper.packetevents.enums.PlayerAction;
+import io.github.retrooper.packetevents.enums.PlayerDigType;
 import io.github.retrooper.packetevents.event.PacketEvent;
 import io.github.retrooper.packetevents.event.PacketHandler;
 import io.github.retrooper.packetevents.event.PacketListener;
@@ -25,7 +28,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
 /**
- * Implementing PacketListener to listen to packets and packetevents' custom events,
+ * Implementing PacketListener to listen to packetevents' custom events,
  */
 public class RegisteredListener implements PacketListener {
     /**
@@ -39,12 +42,12 @@ public class RegisteredListener implements PacketListener {
         final long timestamp = e.getTimestamp();
 
         //The block place name field is not set at compilation time, so we cannot use it in the switch statement
-        //On 1.7->1.8.8 servers it is "PacketPlayInBlockPlace" and on 1.9 servers it is "PacketPlayInUseItem"
+        //On 1.7->1.8.8 servers it is "PacketPlayInBlockPlace" and on 1.9+ servers it is "PacketPlayInUseItem"
         if(e.getPacketName().equals(Packet.Client.BLOCK_PLACE)) {
             final WrappedPacketInBlockPlace blockPlace = new WrappedPacketInBlockPlace(e.getPlayer(), e.getPacket());
             final Vector3i blockPosition = blockPlace.getBlockPosition();
             final ItemStack stack = blockPlace.getItemStack();
-            e.getPlayer().sendMessage("pos: " + blockPosition.toString() + ", type: " + stack.getType());
+           // e.getPlayer().sendMessage("pos: " + blockPosition.toString() + ", type: " + stack.getType());
         }
         switch (e.getPacketName()) {
             case Packet.Client.USE_ENTITY:
@@ -61,7 +64,7 @@ public class RegisteredListener implements PacketListener {
                 final boolean canInstantlyBuild = abilities.canInstantlyBuild();
                 final float flySpeed = abilities.getFlySpeed();
                 final float walkSpeed = abilities.getWalkSpeed();
-                 e.getPlayer().sendMessage("walkspeed: " + walkSpeed + ", flyspeed: " + flySpeed + ", canFly: " + canFly);
+               //  e.getPlayer().sendMessage("walkspeed: " + walkSpeed + ", flyspeed: " + flySpeed + ", canFly: " + canFly);
                 break;
             case Packet.Client.BLOCK_DIG:
                 //Custom PlayerDigType enum
@@ -78,7 +81,6 @@ public class RegisteredListener implements PacketListener {
                 final WrappedPacketInFlying.WrappedPacketInPosition position =
                         new WrappedPacketInFlying.WrappedPacketInPosition(e.getPacket());
                 final boolean isPos = position.isPosition(); //true
-                p.sendMessage("gaaang pos");
                 break;
             case Packet.Client.POSITION_LOOK:
                 final WrappedPacketInFlying.WrappedPacketInPosition_Look position_look =
@@ -103,29 +105,25 @@ public class RegisteredListener implements PacketListener {
     }
 
 
-    /**
-     * I recommend you use the player inject event
-     * to register your players instead of any other bukkit event,
-     * to avoid any issues.
-     *
-     * DO NOT CHECK YOUR CLIENT VERSIONS HERE,
-     * USE PLAYER JOIN EVENT TO CHECK A CLIENT'S VERSION!
-     *
-     * @param event
-     */
     @PacketHandler
     public void onInject(PlayerInjectEvent event) {
 
     }
 
     /**
-     * I recommend you use the player uninject event,
-     * to unregister your players
-     * <p>
-     * You can also call this event to "whitelist" a player,
-     * our API won't even notice the player exists, so you won't
-     * be able to listen to any packets from the player
-     *
+     * In this event you can safely register your players, unlike the PlayerInjectEvent.
+     * In the PlayerInjectEvent some fields in the player object might be null.
+     * So use this event!
+     * @param event
+     */
+    @PacketHandler
+    public void onPostInject(PostPlayerInjectEvent event) {
+
+    }
+
+    /**
+     * You can use this event to unregister your players,
+     * This event is called when a player is uninjected
      * @param event
      */
     @PacketHandler

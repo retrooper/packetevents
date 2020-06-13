@@ -208,13 +208,22 @@ public abstract class TinyProtocol8 {
         plugin.getServer().getPluginManager().registerEvents(listener, plugin);
     }
 
+    /**
+     * Function modified by Retrooper
+     *
+     * @throws NoSuchFieldException
+     * @throws IllegalAccessException
+     */
     @SuppressWarnings("unchecked")
     private void registerChannelHandler() throws NoSuchFieldException, IllegalAccessException {
         Object mcServer = getMinecraftServer.get(Bukkit.getServer());
         Object serverConnection = getServerConnection.get(mcServer);
         boolean looking = true;
 
-        // We need to synchronize against this list
+        /*
+         * I am doing this so we can support 1.8->1.15.2, the previous method TinyProtocol used wasn't supported on some versions
+         * like 1.15.2
+         */
         final Field networkManagersField = serverConnection.getClass().getDeclaredField(TinyProtocolHandler_1_8.getNetworkManagersFieldName());
         networkManagersField.setAccessible(true);
         networkManagers = (List<Object>) networkManagersField.get(serverConnection);
@@ -223,7 +232,6 @@ public abstract class TinyProtocol8 {
         // Find the correct list, or implicitly throw an exception
         for (int i = 0; looking; i++) {
             List<Object> list = Reflection.getField(serverConnection.getClass(), List.class, i).get(serverConnection);
-
             for (Object item : list) {
                 if (!(item instanceof ChannelFuture))
                     break;
@@ -256,7 +264,6 @@ public abstract class TinyProtocol8 {
                         // That's fine
                     }
                 }
-
             });
         }
     }
@@ -344,6 +351,11 @@ public abstract class TinyProtocol8 {
     }
 
 
+    /**
+     * Changed from "tiny-" to "packetevents"
+     *
+     * @return handlerName
+     */
     protected String getHandlerName() {
         return "packetevents-" + plugin.getName() + "-" + ID.incrementAndGet();
     }
@@ -356,8 +368,11 @@ public abstract class TinyProtocol8 {
      * @param player - the player to inject.
      */
     public void injectPlayer(Player player) {
-        injectChannelInternal(getChannel(player)).player = player;
-        PacketEvents.getEventManager().callEvent(new PlayerInjectEvent(player));
+        final PlayerInjectEvent playerInjectEvent = new PlayerInjectEvent(player);
+        PacketEvents.getEventManager().callEvent(playerInjectEvent);
+        if (!playerInjectEvent.isCancelled()) {
+            injectChannelInternal(getChannel(player)).player = player;
+        }
     }
 
     /**
