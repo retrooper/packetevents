@@ -1,5 +1,0 @@
-name: packetevents
-version: 1.3.0
-main: io.github.retrooper.packetevents.example.MainExample
-author: retrooper
-load: STARTUP
