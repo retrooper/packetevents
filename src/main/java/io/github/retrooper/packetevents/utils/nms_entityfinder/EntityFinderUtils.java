@@ -1,19 +1,20 @@
 package io.github.retrooper.packetevents.utils.nms_entityfinder;
 
 import io.github.retrooper.packetevents.PacketEvents;
+import io.github.retrooper.packetevents.annotations.Nullable;
 import io.github.retrooper.packetevents.enums.ServerVersion;
 import io.github.retrooper.packetevents.utils.NMSUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.entity.Entity;
 
-import javax.annotation.Nullable;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
-public class EntityFinderUtils {
+public final class EntityFinderUtils {
     @Nullable
     private static ServerVersion version = PacketEvents.getServerVersion();
+
 
     public static Entity getEntityById(final int id) {
         for (final World world : Bukkit.getWorlds()) {
@@ -27,6 +28,9 @@ public class EntityFinderUtils {
 
     @Nullable
     public static Entity getEntityByIdWithWorld(final World world, final int id) {
+        if(world == null) {
+            return null;
+        }
         Object craftWorld = craftWorldClass.cast(world);
 
         Object worldServer = null;

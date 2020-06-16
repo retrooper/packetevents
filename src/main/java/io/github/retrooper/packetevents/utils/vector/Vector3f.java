@@ -1,9 +1,9 @@
 package io.github.retrooper.packetevents.utils.vector;
 
-public final class Vector3i {
-    public int x, y, z;
+public final class Vector3f {
+    public float x, y, z;
 
-    public Vector3i(final int x, final int y, final int z) {
+    public Vector3f(final float x, final float y, final float z) {
         this.x = x;
         this.y = y;
         this.z = z;

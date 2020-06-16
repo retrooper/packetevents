@@ -10,9 +10,9 @@ import net.minecraft.util.io.netty.channel.Channel;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 
-import javax.annotation.Nullable;
+import io.github.retrooper.packetevents.annotations.Nullable;
 
-public class TinyProtocolHandler_1_7 {
+public final class TinyProtocolHandler_1_7 {
     private final Plugin plugin;
 
     public TinyProtocolHandler_1_7(final Plugin plugin) {

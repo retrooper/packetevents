@@ -11,9 +11,9 @@ import io.netty.channel.Channel;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 
-import javax.annotation.Nullable;
+import io.github.retrooper.packetevents.annotations.Nullable;
 
-public class TinyProtocolHandler_1_8 {
+public final class TinyProtocolHandler_1_8 {
     private static final ServerVersion version = PacketEvents.getServerVersion();
     private final Plugin plugin;
 

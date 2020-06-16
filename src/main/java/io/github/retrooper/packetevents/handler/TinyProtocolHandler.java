@@ -9,7 +9,7 @@ import io.github.retrooper.packetevents.utils.NMSUtils;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 
-public class TinyProtocolHandler {
+public final class TinyProtocolHandler {
     private static final ServerVersion version = PacketEvents.getServerVersion();
 
     private static Object tinyProtocol;

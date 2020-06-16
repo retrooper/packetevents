@@ -8,12 +8,12 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
-import javax.annotation.Nullable;
+import io.github.retrooper.packetevents.annotations.Nullable;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
-public class NMSUtils {
+public final class NMSUtils {
     private static final ServerVersion version = ServerVersion.getVersion();
 
 

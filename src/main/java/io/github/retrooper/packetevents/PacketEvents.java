@@ -2,7 +2,7 @@ package io.github.retrooper.packetevents;
 
 import io.github.retrooper.packetevents.enums.ClientVersion;
 import io.github.retrooper.packetevents.enums.ServerVersion;
-import io.github.retrooper.packetevents.event.PacketHandler;
+import io.github.retrooper.packetevents.annotations.PacketHandler;
 import io.github.retrooper.packetevents.event.PacketListener;
 import io.github.retrooper.packetevents.event.impl.PacketLoginEvent;
 import io.github.retrooper.packetevents.event.impl.PlayerInjectEvent;
@@ -17,17 +17,15 @@ import io.github.retrooper.packetevents.utils.NMSUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
-import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
-import org.bukkit.event.player.PlayerLoginEvent;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitTask;
 
-import javax.annotation.Nullable;
+import io.github.retrooper.packetevents.annotations.Nullable;
 import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 
-public class PacketEvents implements PacketListener, Listener {
+public final class PacketEvents implements PacketListener{
 
 
     /*
@@ -40,7 +38,7 @@ public class PacketEvents implements PacketListener, Listener {
 
     private static final ServerVersion version = ServerVersion.getVersion();
     private static PacketEvents instance;
-    private static EventManager eventManager = new EventManager();
+    private static final EventManager eventManager = new EventManager();
 
     private static int currentTick;
 
@@ -62,7 +60,6 @@ public class PacketEvents implements PacketListener, Listener {
         if (!hasRegistered) {
             //Register Bukkit and PacketListener
             getEventManager().registerListener(getInstance());
-            Bukkit.getPluginManager().registerEvents(getInstance(), plugin);
 
             //Initialize the TinyProtocolHandler
             TinyProtocolHandler.initTinyProtocol(plugin);
@@ -228,22 +225,6 @@ public class PacketEvents implements PacketListener, Listener {
     public void onPostInject(final PostPlayerInjectEvent e) {
         //It is safe to get his client version in here.
         final ClientVersion clientVersion = PacketEvents.getClientVersion(e.getPlayer());
-    }
-
-    @EventHandler
-    public void onLogin(final PlayerLoginEvent e) {
-        final Plugin[] plugins = Bukkit.getPluginManager().getPlugins();
-        boolean canJoin = true;
-        for (final Plugin pl : plugins) {
-            if (!pl.isEnabled()) {
-                canJoin = false;
-                break;
-            }
-        }
-        if (!canJoin) {
-            e.setResult(PlayerLoginEvent.Result.KICK_OTHER);
-            e.setKickMessage("Please wait for the server to finish loading all plugins");
-        }
     }
 
     @EventHandler

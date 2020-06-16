@@ -1,4 +1,4 @@
-package io.github.retrooper.packetevents.event;
+package io.github.retrooper.packetevents.annotations;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
