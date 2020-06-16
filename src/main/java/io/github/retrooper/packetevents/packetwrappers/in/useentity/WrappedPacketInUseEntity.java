@@ -7,7 +7,7 @@ import org.bukkit.entity.Entity;
 
 import java.lang.reflect.Field;
 
-public class WrappedPacketInUseEntity extends WrappedPacket {
+public final class WrappedPacketInUseEntity extends WrappedPacket {
     private int entityId;
     private Entity entity;
     private EntityUseAction action;

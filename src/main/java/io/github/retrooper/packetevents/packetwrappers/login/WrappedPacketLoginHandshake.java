@@ -6,7 +6,7 @@ import io.github.retrooper.packetevents.tinyprotocol.Reflection.FieldAccessor;
 import io.github.retrooper.packetevents.utils.NMSUtils;
 
 
-public class WrappedPacketLoginHandshake extends WrappedPacket {
+public final class WrappedPacketLoginHandshake extends WrappedPacket {
     private int protocolVersion, port;
     private String hostname;
 

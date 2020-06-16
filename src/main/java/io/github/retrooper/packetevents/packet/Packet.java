@@ -1,14 +1,15 @@
 package io.github.retrooper.packetevents.packet;
 
-
 import io.github.retrooper.packetevents.enums.ServerVersion;
 
 public abstract class Packet {
+
     public static class Client {
         private static final String c = "PacketPlayIn";
 
         @Deprecated
         public static final String FLYING = c + "Flying";
+
 
         public static final String POSITION = c + "Position";
 
@@ -28,7 +29,8 @@ public abstract class Packet {
         /**
          * The packet name of the block place depending on your server version, "PacketPlayInBlockPlace" or "PacketPlayInUseItem"
          */
-        public static final String BLOCK_PLACE = c + ((ServerVersion.getVersion().isHigherThan(ServerVersion.v_1_8_8)) ? "UseItem" : "BlockPlace");;
+        public static final String BLOCK_PLACE = c + ((ServerVersion.getVersion().isHigherThan(ServerVersion.v_1_8_8)) ? "UseItem" : "BlockPlace");
+
         public static final String ABILITIES = c + "Abilities";
         public static final String HELD_ITEM_SLOT = c + "HeldItemSlot";
         public static final String CLOSE_WINDOW = c + "CloseWindow";
@@ -37,6 +39,7 @@ public abstract class Packet {
         public static final String SET_CREATIVE_SLOT = c + "SetCreativeSlot";
 
         public static final String KEEP_ALIVE = c + "KeepAlive";
+
     }
 
     public static class Server {
@@ -74,7 +77,7 @@ public abstract class Packet {
         public static final String START = "PacketStatusInStart";
         public static final String SUCCESS = "PacketLoginOutSuccess";
 
-        public static final String[] LOGIN_PACKETS = new String[] {"PacketHandshakingInSetProtocol","PacketLoginInStart",  "PacketLoginInEncryptionBegin"};
+        public static final String[] LOGIN_PACKETS = new String[]{"PacketHandshakingInSetProtocol", "PacketLoginInStart", "PacketLoginInEncryptionBegin"};
     }
 
     public static boolean isInstanceOf(String fatherPacket, String childPacket) {

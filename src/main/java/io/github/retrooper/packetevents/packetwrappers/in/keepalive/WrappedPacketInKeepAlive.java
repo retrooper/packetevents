@@ -6,7 +6,7 @@ import io.github.retrooper.packetevents.utils.NMSUtils;
 
 import java.lang.reflect.Field;
 
-public class WrappedPacketInKeepAlive extends WrappedPacket {
+public final class WrappedPacketInKeepAlive extends WrappedPacket {
     public WrappedPacketInKeepAlive(final Object packet) {
         super(packet);
     }

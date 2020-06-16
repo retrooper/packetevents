@@ -6,7 +6,7 @@ import io.github.retrooper.packetevents.utils.NMSUtils;
 
 import java.lang.reflect.Field;
 
-public class WrappedPacketInChat extends WrappedPacket {
+public final class WrappedPacketInChat extends WrappedPacket {
     private String message;
 
     public WrappedPacketInChat(Object packet) {

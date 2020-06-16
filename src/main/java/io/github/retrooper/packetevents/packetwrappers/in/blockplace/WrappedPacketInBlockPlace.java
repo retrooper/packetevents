@@ -8,7 +8,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
 
-public class WrappedPacketInBlockPlace extends WrappedPacket {
+public final class WrappedPacketInBlockPlace extends WrappedPacket {
     private Vector3i blockPosition;
     private ItemStack itemStack;
 

@@ -10,7 +10,7 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 
-public class WrappedPacketOutEntityVelocity extends WrappedPacket implements Sendable {
+public final class WrappedPacketOutEntityVelocity extends WrappedPacket implements Sendable {
     private Entity entity;
     private int entityId;
     private double velocityX, velocityY, velocityZ;
@@ -49,23 +49,23 @@ public class WrappedPacketOutEntityVelocity extends WrappedPacket implements Sen
         }
     }
 
-    public final int getEntityId() {
+    public int getEntityId() {
         return entityId;
     }
 
-    public final Entity getEntity() {
+    public Entity getEntity() {
         return entity;
     }
 
-    public final double getVelocityX() {
+    public double getVelocityX() {
         return velocityX;
     }
 
-    public final double getVelocityY() {
+    public double getVelocityY() {
         return velocityY;
     }
 
-    public final double getVelocityZ() {
+    public double getVelocityZ() {
         return velocityZ;
     }
 

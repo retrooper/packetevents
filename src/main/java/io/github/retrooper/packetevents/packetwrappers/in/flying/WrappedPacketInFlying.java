@@ -8,7 +8,6 @@ import io.github.retrooper.packetevents.utils.NMSUtils;
 import java.lang.reflect.Field;
 
 public class WrappedPacketInFlying extends WrappedPacket {
-
     private double x;
     private double y;
     private double z;
@@ -73,27 +72,27 @@ public class WrappedPacketInFlying extends WrappedPacket {
         }
     }
 
-    public double getX() {
+    public final double getX() {
         return x;
     }
 
-    public double getY() {
+    public final double getY() {
         return y;
     }
 
-    public double getZ() {
+    public final double getZ() {
         return z;
     }
 
-    public float getYaw() {
+    public final float getYaw() {
         return yaw;
     }
 
-    public float getPitch() {
+    public final float getPitch() {
         return pitch;
     }
 
-    public boolean isOnGround() {
+    public final boolean isOnGround() {
         return onGround;
     }
 

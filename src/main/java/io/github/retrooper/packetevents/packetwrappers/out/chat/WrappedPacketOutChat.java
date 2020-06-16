@@ -10,7 +10,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
-public class WrappedPacketOutChat extends WrappedPacket implements Sendable {
+public final class WrappedPacketOutChat extends WrappedPacket implements Sendable {
     private String message;
 
     public WrappedPacketOutChat(final Object packet) {
@@ -39,19 +39,30 @@ public class WrappedPacketOutChat extends WrappedPacket implements Sendable {
 
     @Override
     public Object asNMSPacket() {
-        Object iChatBaseComponentObj = null;
         try {
-            iChatBaseComponentObj = serialize.invoke(null, this.message);
-        } catch (IllegalAccessException | InvocationTargetException e) {
-            e.printStackTrace();
-        }
-
-        try {
-            return chatClassConstructor.newInstance(iChatBaseComponentObj);
+            return chatClassConstructor.newInstance(toIChatBaseComponent(this.message));
         } catch (InstantiationException | InvocationTargetException | IllegalAccessException e) {
             e.printStackTrace();
         }
 
+        return null;
+    }
+
+    public static String toStringFromIChatBaseComponent(Object obj) {
+        try {
+            return getStringOfIChatBase.invoke(obj).toString();
+        } catch (IllegalAccessException | InvocationTargetException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    public static Object toIChatBaseComponent(String msg) {
+        try {
+            return serialize.invoke(null, msg);
+        } catch (IllegalAccessException | InvocationTargetException e) {
+            e.printStackTrace();
+        }
         return null;
     }
 

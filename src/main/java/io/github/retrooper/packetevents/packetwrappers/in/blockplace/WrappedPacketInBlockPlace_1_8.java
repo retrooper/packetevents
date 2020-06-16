@@ -6,7 +6,7 @@ import io.github.retrooper.packetevents.utils.NMSUtils;
 import io.github.retrooper.packetevents.utils.vector.Vector3i;
 import org.bukkit.inventory.ItemStack;
 
-class WrappedPacketInBlockPlace_1_8 extends WrappedPacket {
+final class WrappedPacketInBlockPlace_1_8 extends WrappedPacket {
     private Vector3i blockPosition;
     private ItemStack itemStack;
     WrappedPacketInBlockPlace_1_8(final Object packet) {

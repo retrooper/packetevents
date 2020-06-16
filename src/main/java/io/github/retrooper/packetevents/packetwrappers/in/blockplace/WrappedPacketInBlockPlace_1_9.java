@@ -9,7 +9,7 @@ import org.bukkit.entity.Player;
 
 import java.util.HashSet;
 
-class WrappedPacketInBlockPlace_1_9 extends WrappedPacket {
+final class WrappedPacketInBlockPlace_1_9 extends WrappedPacket {
     private Block block;
 
     public WrappedPacketInBlockPlace_1_9(final Player player, final Object packet) {

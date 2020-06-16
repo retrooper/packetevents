@@ -10,7 +10,7 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 
-public class WrappedPacketOutAnimation extends WrappedPacket implements Sendable {
+public final class WrappedPacketOutAnimation extends WrappedPacket implements Sendable {
     private Entity entity;
     private int entityID;
     private EntityAnimationType type;
@@ -40,15 +40,15 @@ public class WrappedPacketOutAnimation extends WrappedPacket implements Sendable
 
     }
 
-    public final Entity getEntity() {
+    public Entity getEntity() {
         return this.entity;
     }
 
-    public final int getEntityId() {
+    public int getEntityId() {
         return this.entityID;
     }
 
-    public final EntityAnimationType getAnimationType() {
+    public EntityAnimationType getAnimationType() {
         return type;
     }
 

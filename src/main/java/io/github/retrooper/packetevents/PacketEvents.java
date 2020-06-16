@@ -26,8 +26,6 @@ import org.bukkit.scheduler.BukkitTask;
 import javax.annotation.Nullable;
 import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
-import java.util.HashSet;
-import java.util.UUID;
 
 public class PacketEvents implements PacketListener, Listener {
 

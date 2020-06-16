@@ -5,7 +5,7 @@ import io.github.retrooper.packetevents.utils.NMSUtils;
 
 import java.lang.reflect.Field;
 
-public class WrappedPacketInAbilities extends WrappedPacket {
+public final class WrappedPacketInAbilities extends WrappedPacket {
     private boolean isVulnerable;
     private boolean isFlying;
     private boolean allowFly;

@@ -21,6 +21,7 @@ import io.github.retrooper.packetevents.packetwrappers.in.useentity.WrappedPacke
 import io.github.retrooper.packetevents.packetwrappers.login.WrappedPacketLoginHandshake;
 import io.github.retrooper.packetevents.packetwrappers.out.chat.WrappedPacketOutChat;
 import io.github.retrooper.packetevents.packetwrappers.out.entityvelocity.WrappedPacketOutEntityVelocity;
+import io.github.retrooper.packetevents.packetwrappers.out.kickdisconnect.WrappedPacketOutKickDisconnect;
 import io.github.retrooper.packetevents.utils.vector.Vector3i;
 import org.bukkit.Location;
 import org.bukkit.entity.Entity;

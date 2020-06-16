@@ -10,7 +10,7 @@ import io.github.retrooper.packetevents.utils.vector.Vector3i;
 
 import java.lang.reflect.Field;
 
-public class WrappedPacketInBlockDig extends WrappedPacket {
+public final class WrappedPacketInBlockDig extends WrappedPacket {
     private Vector3i blockPosition;
     private Direction direction;
     private PlayerDigType digType;

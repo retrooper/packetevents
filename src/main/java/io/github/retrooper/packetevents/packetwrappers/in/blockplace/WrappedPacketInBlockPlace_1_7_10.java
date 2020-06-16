@@ -6,7 +6,7 @@ import net.minecraft.server.v1_7_R4.PacketPlayInBlockPlace;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
-class WrappedPacketInBlockPlace_1_7_10 extends WrappedPacket {
+final class WrappedPacketInBlockPlace_1_7_10 extends WrappedPacket {
     private Vector3i blockPosition;
     private ItemStack itemStack;
     private int blockFace;
