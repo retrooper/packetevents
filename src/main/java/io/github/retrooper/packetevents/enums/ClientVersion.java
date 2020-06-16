@@ -64,4 +64,35 @@ public enum ClientVersion {
         }
         return INVALID;
     }
+
+    /**
+     * Returns if the client's version is more up to date than the argument passed version
+     *
+     * @param version
+     * @return
+     */
+    public boolean isHigherThan(final ClientVersion version) {
+        if (this == version) return false;
+        return !isLowerThan(version);
+    }
+
+    /**
+     * Returns if the client's version is more outdated than the argument passed version
+     * @param version
+     * @return
+     */
+    public boolean isLowerThan(final ClientVersion version) {
+        if(version == this) return false;
+        byte len = (byte) values().length;
+        for (byte i = 0; i < len; i++) {
+            final ClientVersion v = values()[i];
+            if(v == this) {
+                return true;
+            }
+            else if(v == version) {
+                return false;
+            }
+        }
+        return false;
+    }
 }

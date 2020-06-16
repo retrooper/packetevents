@@ -1,10 +1,7 @@
 package io.github.retrooper.packetevents.example;
 
 import io.github.retrooper.packetevents.PacketEvents;
-import io.github.retrooper.packetevents.enums.Direction;
-import io.github.retrooper.packetevents.enums.EntityUseAction;
-import io.github.retrooper.packetevents.enums.PlayerAction;
-import io.github.retrooper.packetevents.enums.PlayerDigType;
+import io.github.retrooper.packetevents.enums.*;
 import io.github.retrooper.packetevents.event.PacketEvent;
 import io.github.retrooper.packetevents.event.PacketHandler;
 import io.github.retrooper.packetevents.event.PacketListener;
