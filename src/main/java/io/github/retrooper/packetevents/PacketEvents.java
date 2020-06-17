@@ -10,13 +10,12 @@ import io.github.retrooper.packetevents.event.impl.PostPlayerInjectEvent;
 import io.github.retrooper.packetevents.event.impl.ServerTickEvent;
 import io.github.retrooper.packetevents.event.manager.EventManager;
 import io.github.retrooper.packetevents.handler.TinyProtocolHandler;
+import io.github.retrooper.packetevents.mojang.GameProfile;
 import io.github.retrooper.packetevents.packet.Packet;
 import io.github.retrooper.packetevents.packetwrappers.Sendable;
-import io.github.retrooper.packetevents.packetwrappers.login.WrappedPacketLoginHandshake;
+import io.github.retrooper.packetevents.packetwrappers.login.*;
 import io.github.retrooper.packetevents.utils.NMSUtils;
 import org.bukkit.Bukkit;
-import org.bukkit.Material;
-import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -25,16 +24,17 @@ import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitTask;
 
 import io.github.retrooper.packetevents.annotations.Nullable;
+
 import java.lang.reflect.InvocationTargetException;
+import java.security.PublicKey;
 import java.util.HashMap;
 
 public final class PacketEvents implements PacketListener, Listener {
 
 
     /*
-     * Login wrappers TODO
-     * PacketLoginInStart
-     * PacketLoginInEncryptionBegin
+     * Wrappers TODO:
+     * Spawn entity
      */
 
     private static boolean hasRegistered;
@@ -223,6 +223,7 @@ public final class PacketEvents implements PacketListener, Listener {
 
     /**
      * Called after the PlayerJoinEvent ONLY if the player has been injected!
+     *
      * @param e
      */
     @PacketHandler
@@ -240,6 +241,7 @@ public final class PacketEvents implements PacketListener, Listener {
 
     /**
      * Version independant player injection
+     *
      * @param player
      */
     public static void injectPlayer(final Player player) {
@@ -248,6 +250,7 @@ public final class PacketEvents implements PacketListener, Listener {
 
     /**
      * Version independant player injection
+     *
      * @param player
      */
     public static void uninjectPlayer(final Player player) {
@@ -256,6 +259,7 @@ public final class PacketEvents implements PacketListener, Listener {
 
     /**
      * Returns whether we have injected the player
+     *
      * @param player
      * @return hasInjected
      */

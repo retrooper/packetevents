@@ -77,6 +77,8 @@ public abstract class Packet {
         public static final String PING = "PacketStatusInPing";
         public static final String START = "PacketStatusInStart";
         public static final String SUCCESS = "PacketLoginOutSuccess";
+        public static final String ENCRYPTION_BEGIN_IN = "PacketLoginInEncryptionBegin";
+        public static final String ENCRYPTION_BEGIN_OUT = "PacketLoginOutEncryptionBegin";
 
         public static final String[] LOGIN_PACKETS = new String[]{"PacketHandshakingInSetProtocol", "PacketLoginInStart", "PacketLoginInEncryptionBegin"};
     }
