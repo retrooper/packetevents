@@ -1,19 +1,17 @@
 package io.github.retrooper.packetevents;
 
+import io.github.retrooper.packetevents.annotations.Nullable;
+import io.github.retrooper.packetevents.annotations.PacketHandler;
 import io.github.retrooper.packetevents.enums.ClientVersion;
 import io.github.retrooper.packetevents.enums.ServerVersion;
-import io.github.retrooper.packetevents.annotations.PacketHandler;
+import io.github.retrooper.packetevents.event.PacketEvent;
 import io.github.retrooper.packetevents.event.PacketListener;
-import io.github.retrooper.packetevents.event.impl.PacketLoginEvent;
-import io.github.retrooper.packetevents.event.impl.PlayerInjectEvent;
-import io.github.retrooper.packetevents.event.impl.PostPlayerInjectEvent;
-import io.github.retrooper.packetevents.event.impl.ServerTickEvent;
+import io.github.retrooper.packetevents.event.impl.*;
 import io.github.retrooper.packetevents.event.manager.EventManager;
 import io.github.retrooper.packetevents.handler.TinyProtocolHandler;
-import io.github.retrooper.packetevents.mojang.GameProfile;
 import io.github.retrooper.packetevents.packet.Packet;
 import io.github.retrooper.packetevents.packetwrappers.Sendable;
-import io.github.retrooper.packetevents.packetwrappers.login.*;
+import io.github.retrooper.packetevents.packetwrappers.login.WrappedPacketLoginHandshake;
 import io.github.retrooper.packetevents.utils.NMSUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -23,10 +21,7 @@ import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitTask;
 
-import io.github.retrooper.packetevents.annotations.Nullable;
-
 import java.lang.reflect.InvocationTargetException;
-import java.security.PublicKey;
 import java.util.HashMap;
 
 public final class PacketEvents implements PacketListener, Listener {
@@ -209,6 +204,13 @@ public final class PacketEvents implements PacketListener, Listener {
         }
     }
 
+    @PacketHandler
+    public void onPacket(final PacketEvent e) {
+        if(e instanceof PacketReceiveEvent) {
+          // System.out.println("RECEIVED");
+        }
+    }
+
     /**
      * Do not check the client version in or before the PlayerInjectEvent, use the PostPlayerInjectEvent.
      * It is not recommended to do much in the PlayerInjectEvent, as some fields in the Player object are be null.
@@ -240,8 +242,7 @@ public final class PacketEvents implements PacketListener, Listener {
     }
 
     /**
-     * Version independant player injection
-     *
+     * Version independent player injection
      * @param player
      */
     public static void injectPlayer(final Player player) {

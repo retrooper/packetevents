@@ -1,12 +1,12 @@
 package io.github.retrooper.packetevents.packetwrappers.in.entityaction;
 
+import io.github.retrooper.packetevents.annotations.Nullable;
 import io.github.retrooper.packetevents.enums.PlayerAction;
 import io.github.retrooper.packetevents.enums.ServerVersion;
 import io.github.retrooper.packetevents.packetwrappers.api.WrappedPacket;
 import io.github.retrooper.packetevents.utils.NMSUtils;
 import org.bukkit.entity.Entity;
 
-import io.github.retrooper.packetevents.annotations.Nullable;
 import java.lang.reflect.Field;
 
 public final class WrappedPacketInEntityAction extends WrappedPacket {

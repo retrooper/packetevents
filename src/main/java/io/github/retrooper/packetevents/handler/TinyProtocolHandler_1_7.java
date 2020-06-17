@@ -1,6 +1,7 @@
 package io.github.retrooper.packetevents.handler;
 
 import io.github.retrooper.packetevents.PacketEvents;
+import io.github.retrooper.packetevents.annotations.Nullable;
 import io.github.retrooper.packetevents.event.impl.PacketLoginEvent;
 import io.github.retrooper.packetevents.event.impl.PacketReceiveEvent;
 import io.github.retrooper.packetevents.event.impl.PacketSendEvent;
@@ -9,8 +10,6 @@ import io.github.retrooper.packetevents.tinyprotocol.TinyProtocol7;
 import net.minecraft.util.io.netty.channel.Channel;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
-
-import io.github.retrooper.packetevents.annotations.Nullable;
 
 public final class TinyProtocolHandler_1_7 {
     private final Plugin plugin;
