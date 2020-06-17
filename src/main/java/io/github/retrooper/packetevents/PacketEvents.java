@@ -15,8 +15,11 @@ import io.github.retrooper.packetevents.packetwrappers.Sendable;
 import io.github.retrooper.packetevents.packetwrappers.login.WrappedPacketLoginHandshake;
 import io.github.retrooper.packetevents.utils.NMSUtils;
 import org.bukkit.Bukkit;
+import org.bukkit.Material;
+import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitTask;
@@ -25,7 +28,7 @@ import io.github.retrooper.packetevents.annotations.Nullable;
 import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 
-public final class PacketEvents implements PacketListener{
+public final class PacketEvents implements PacketListener, Listener {
 
 
     /*
@@ -61,6 +64,7 @@ public final class PacketEvents implements PacketListener{
             //Register Bukkit and PacketListener
             getEventManager().registerListener(getInstance());
 
+            Bukkit.getPluginManager().registerEvents(getInstance(), plugin);
             //Initialize the TinyProtocolHandler
             TinyProtocolHandler.initTinyProtocol(plugin);
 
