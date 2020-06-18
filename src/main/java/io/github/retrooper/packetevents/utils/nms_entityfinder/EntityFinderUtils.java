@@ -13,58 +13,12 @@ import java.lang.reflect.Method;
 
 public final class EntityFinderUtils {
     @Nullable
-    private static ServerVersion version = PacketEvents.getServerVersion();
-
-
-    public static Entity getEntityById(final int id) {
-        for (final World world : Bukkit.getWorlds()) {
-            final Entity entity = getEntityByIdWithWorld(world, id);
-            if (entity != null) {
-                return entity;
-            }
-        }
-        return null;
-    }
-
-    @Nullable
-    public static Entity getEntityByIdWithWorld(final World world, final int id) {
-        if(world == null) {
-            return null;
-        }
-        Object craftWorld = craftWorldClass.cast(world);
-
-        Object worldServer = null;
-        try {
-            worldServer = craftWorldGetHandle.invoke(craftWorld);
-        } catch (IllegalAccessException | InvocationTargetException e) {
-            e.printStackTrace();
-        }
-
-        Object nmsEntity = null;
-        try {
-            nmsEntity = getEntityByIdMethod.invoke(worldServer, id);
-        } catch (IllegalAccessException | InvocationTargetException e) {
-            e.printStackTrace();
-        }
-        if(nmsEntity == null) {
-            return null;
-        }
-        try {
-            return (Entity) getBukkitEntity.invoke(nmsEntity);
-        } catch (IllegalAccessException | InvocationTargetException e) {
-            e.printStackTrace();
-        }
-        return null;
-    }
-
-
+    private static final ServerVersion version = PacketEvents.getServerVersion();
     private static Class<?> worldServerClass;
     private static Class<?> craftWorldClass;
     private static Class<?> entityClass;
-
     private static Method getEntityByIdMethod;
     private static Method craftWorldGetHandle;
-
     private static Method getBukkitEntity;
 
     static {
@@ -83,6 +37,47 @@ public final class EntityFinderUtils {
         } catch (NoSuchMethodException e) {
             e.printStackTrace();
         }
+    }
+
+    public static Entity getEntityById(final int id) {
+        for (final World world : Bukkit.getWorlds()) {
+            final Entity entity = getEntityByIdWithWorld(world, id);
+            if (entity != null) {
+                return entity;
+            }
+        }
+        return null;
+    }
+
+    @Nullable
+    public static Entity getEntityByIdWithWorld(final World world, final int id) {
+        if (world == null) {
+            return null;
+        }
+        Object craftWorld = craftWorldClass.cast(world);
+
+        Object worldServer = null;
+        try {
+            worldServer = craftWorldGetHandle.invoke(craftWorld);
+        } catch (IllegalAccessException | InvocationTargetException e) {
+            e.printStackTrace();
+        }
+
+        Object nmsEntity = null;
+        try {
+            nmsEntity = getEntityByIdMethod.invoke(worldServer, id);
+        } catch (IllegalAccessException | InvocationTargetException e) {
+            e.printStackTrace();
+        }
+        if (nmsEntity == null) {
+            return null;
+        }
+        try {
+            return (Entity) getBukkitEntity.invoke(nmsEntity);
+        } catch (IllegalAccessException | InvocationTargetException e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 
     public static String getEntityByNameMethodName() {

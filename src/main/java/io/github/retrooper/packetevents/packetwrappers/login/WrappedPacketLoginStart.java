@@ -6,7 +6,20 @@ import io.github.retrooper.packetevents.tinyprotocol.Reflection;
 import io.github.retrooper.packetevents.utils.NMSUtils;
 
 public final class WrappedPacketLoginStart extends WrappedPacket {
+    private static final Reflection.FieldAccessor<com.mojang.authlib.GameProfile> gameProfileAccessor;
+    private static Class<?> packetClass;
+
+    static {
+        try {
+            packetClass = NMSUtils.getNMSClass("PacketLoginInStart");
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+        gameProfileAccessor = Reflection.getField(packetClass, com.mojang.authlib.GameProfile.class, 0);
+    }
+
     private GameProfile gameProfile;
+
     public WrappedPacketLoginStart(final Object packet) {
         super(packet);
     }
@@ -19,18 +32,5 @@ public final class WrappedPacketLoginStart extends WrappedPacket {
 
     public GameProfile getGameProfile() {
         return gameProfile;
-    }
-
-    private static Class<?> packetClass;
-
-    private static final Reflection.FieldAccessor<com.mojang.authlib.GameProfile> gameProfileAccessor;
-
-    static {
-        try {
-            packetClass = NMSUtils.getNMSClass("PacketLoginInStart");
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
-        }
-        gameProfileAccessor = Reflection.getField(packetClass, com.mojang.authlib.GameProfile.class, 0);
     }
 }

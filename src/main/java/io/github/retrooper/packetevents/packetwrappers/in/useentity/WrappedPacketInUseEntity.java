@@ -8,46 +8,9 @@ import org.bukkit.entity.Entity;
 import java.lang.reflect.Field;
 
 public final class WrappedPacketInUseEntity extends WrappedPacket {
-    private int entityId;
-    private Entity entity;
-    private EntityUseAction action;
-
-    public WrappedPacketInUseEntity(final Object packet) {
-        super(packet);
-    }
-
-
-    @Override
-    protected void setup() {
-        try {
-            this.entityId = fields[0].getInt(packet);
-            this.entity = NMSUtils.getEntityById(this.entityId);
-            final Object useActionEnum = fields[1].get(packet);
-            this.action = EntityUseAction.valueOf(useActionEnum.toString());
-        } catch (IllegalAccessException e) {
-            e.printStackTrace();
-        }
-    }
-
-
-    public Entity getEntity() {
-        return entity;
-    }
-
-    public int getEntityId() {
-        return entityId;
-    }
-
-    public EntityUseAction getAction() {
-        return action;
-    }
-
     private static Class<?> useEntityClass;
-
     private static Class<?> entityClass;
-
-
-    private static Field[] fields = new Field[2];
+    private static final Field[] fields = new Field[2];
 
     static {
 
@@ -74,5 +37,37 @@ public final class WrappedPacketInUseEntity extends WrappedPacket {
             }
         }
 
+    }
+
+    private int entityId;
+    private Entity entity;
+    private EntityUseAction action;
+
+    public WrappedPacketInUseEntity(final Object packet) {
+        super(packet);
+    }
+
+    @Override
+    protected void setup() {
+        try {
+            this.entityId = fields[0].getInt(packet);
+            this.entity = NMSUtils.getEntityById(this.entityId);
+            final Object useActionEnum = fields[1].get(packet);
+            this.action = EntityUseAction.valueOf(useActionEnum.toString());
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public Entity getEntity() {
+        return entity;
+    }
+
+    public int getEntityId() {
+        return entityId;
+    }
+
+    public EntityUseAction getAction() {
+        return action;
     }
 }

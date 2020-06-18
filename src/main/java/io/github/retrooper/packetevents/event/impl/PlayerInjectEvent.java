@@ -6,6 +6,7 @@ import org.bukkit.entity.Player;
 public final class PlayerInjectEvent extends PacketEvent {
     private final Player player;
     private boolean cancelled;
+
     public PlayerInjectEvent(final Player player) {
         this.player = player;
     }

@@ -10,15 +10,24 @@ import org.bukkit.entity.Player;
 import java.util.HashSet;
 
 final class WrappedPacketInBlockPlace_1_9 extends WrappedPacket {
+    private static Class<?> blockPlaceClass_1_9;
     private Block block;
 
     public WrappedPacketInBlockPlace_1_9(final Player player, final Object packet) {
         super(player, packet);
     }
 
+    protected static void initStatic() {
+        try {
+            blockPlaceClass_1_9 = NMSUtils.getNMSClass("PacketPlayInUseItem");
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+    }
+
     @Override
     protected void setup() {
-        this.block = getPlayer().getTargetBlock((HashSet<Material>)null, 3);
+        this.block = getPlayer().getTargetBlock(null, 3);
 
     }
 
@@ -28,15 +37,6 @@ final class WrappedPacketInBlockPlace_1_9 extends WrappedPacket {
 
     public Block getBlock() {
         return block;
-    }
-
-    private static Class<?> blockPlaceClass_1_9;
-    protected static void initStatic() {
-        try {
-            blockPlaceClass_1_9 = NMSUtils.getNMSClass("PacketPlayInUseItem");
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
-        }
     }
 
 

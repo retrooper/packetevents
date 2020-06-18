@@ -10,6 +10,40 @@ import org.bukkit.entity.Entity;
 import java.lang.reflect.Field;
 
 public final class WrappedPacketInEntityAction extends WrappedPacket {
+    private static Class<?> entityActionClass;
+    @Nullable
+    private static Class<?> enumPlayerActionClass;
+    private static final Field[] fields = new Field[3];
+    @Nullable
+    private static Object[] enumPlayerActionConstants;
+
+    static {
+        try {
+            entityActionClass = NMSUtils.getNMSClass("PacketPlayInEntityAction");
+            if (version.isHigherThan(ServerVersion.v_1_7_10)) {
+                enumPlayerActionClass = NMSUtils.getNMSClass("PacketPlayInEntityAction$EnumPlayerAction");
+            }
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+
+        try {
+            //ints in 1.7.10, EnumPlayerAction in 1.8+
+            fields[0] = entityActionClass.getDeclaredField("a");
+            fields[1] = entityActionClass.getDeclaredField("animation");
+            fields[2] = entityActionClass.getDeclaredField("c");
+            if (version.isHigherThan(ServerVersion.v_1_7_10)) {
+                enumPlayerActionConstants = enumPlayerActionClass.getEnumConstants();
+            }
+        } catch (NoSuchFieldException e) {
+            e.printStackTrace();
+        }
+
+        for (final Field f : fields) {
+            f.setAccessible(true);
+        }
+    }
+
     private Entity entity;
     private int entityId;
     private PlayerAction action;
@@ -70,42 +104,5 @@ public final class WrappedPacketInEntityAction extends WrappedPacket {
 
     public int getJumpBoost() {
         return jumpBoost;
-    }
-
-    private static Class<?> entityActionClass;
-
-    @Nullable
-    private static Class<?> enumPlayerActionClass;
-
-    private static Field[] fields = new Field[3];
-
-    @Nullable
-    private static Object[] enumPlayerActionConstants;
-
-    static {
-        try {
-            entityActionClass = NMSUtils.getNMSClass("PacketPlayInEntityAction");
-            if (version.isHigherThan(ServerVersion.v_1_7_10)) {
-                enumPlayerActionClass = NMSUtils.getNMSClass("PacketPlayInEntityAction$EnumPlayerAction");
-            }
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
-        }
-
-        try {
-            //ints in 1.7.10, EnumPlayerAction in 1.8+
-            fields[0] = entityActionClass.getDeclaredField("a");
-            fields[1] = entityActionClass.getDeclaredField("animation");
-            fields[2] = entityActionClass.getDeclaredField("c");
-            if (version.isHigherThan(ServerVersion.v_1_7_10)) {
-                enumPlayerActionConstants = enumPlayerActionClass.getEnumConstants();
-            }
-        } catch (NoSuchFieldException e) {
-            e.printStackTrace();
-        }
-
-        for (final Field f : fields) {
-            f.setAccessible(true);
-        }
     }
 }

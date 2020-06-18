@@ -15,16 +15,32 @@ import org.bukkit.plugin.Plugin;
 public final class TinyProtocolHandler_1_8 {
     private static final ServerVersion version = PacketEvents.getServerVersion();
     private final Plugin plugin;
+    @Nullable
+    public TinyProtocol8 tinyProtocol;
+
 
     public TinyProtocolHandler_1_8(final Plugin plugin) {
         this.plugin = plugin;
     }
 
-
-
-    @Nullable
-    public TinyProtocol8 tinyProtocol;
-
+    public static String getNetworkManagersFieldName() {
+        //1.8
+        if (version.equals(ServerVersion.v_1_8)) {
+            return "g";
+        }
+        //1.8.3->1.12
+        else if (version.isLowerThan(ServerVersion.v_1_13)) {
+            return "h";
+        }
+        //1.13->1.14
+        else if (version.isLowerThan(ServerVersion.v_1_15)) {
+            return "g";
+        }
+        //1.15
+        else {
+            return "listeningChannels";
+        }
+    }
 
     public void initTinyProtocol() {
         tinyProtocol = new TinyProtocol8(getPlugin()) {
@@ -57,25 +73,6 @@ public final class TinyProtocolHandler_1_8 {
                 return null;
             }
         };
-    }
-
-    public static String getNetworkManagersFieldName() {
-        //1.8
-        if (version.equals(ServerVersion.v_1_8)) {
-            return "g";
-        }
-        //1.8.3->1.12
-        else if (version.isLowerThan(ServerVersion.v_1_13)) {
-            return "h";
-        }
-        //1.13->1.14
-        else if (version.isLowerThan(ServerVersion.v_1_15)) {
-            return "g";
-        }
-        //1.15
-        else {
-            return "listeningChannels";
-        }
     }
 
     public Plugin getPlugin() {

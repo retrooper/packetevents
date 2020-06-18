@@ -11,6 +11,36 @@ import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 
 public final class WrappedPacketOutAnimation extends WrappedPacket implements Sendable {
+    private static Class<?> animationClass, nmsEntityClass;
+    private static Constructor<?> animationConstructor;
+    private static final Field[] fields = new Field[2];
+
+    static {
+        try {
+            animationClass = NMSUtils.getNMSClass("PacketPlayOutAnimation");
+            nmsEntityClass = NMSUtils.getNMSClass("Entity");
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+
+        try {
+            animationConstructor = animationClass.getConstructor(nmsEntityClass, int.class);
+        } catch (NoSuchMethodException e) {
+            e.printStackTrace();
+        }
+        try {
+            fields[0] = animationClass.getDeclaredField("a");
+            fields[1] = animationClass.getDeclaredField("b");
+        } catch (NoSuchFieldException e) {
+            e.printStackTrace();
+        }
+
+        for (final Field f : fields) {
+            f.setAccessible(true);
+        }
+
+    }
+
     private Entity entity;
     private int entityID;
     private EntityAnimationType type;
@@ -52,7 +82,6 @@ public final class WrappedPacketOutAnimation extends WrappedPacket implements Se
         return type;
     }
 
-
     @Override
     public Object asNMSPacket() {
         final Object nmsEntity = NMSUtils.getNMSEntity(this.entity);
@@ -63,36 +92,5 @@ public final class WrappedPacketOutAnimation extends WrappedPacket implements Se
             e.printStackTrace();
         }
         return null;
-    }
-
-    private static Class<?> animationClass, nmsEntityClass;
-    private static Constructor<?> animationConstructor;
-
-    private static Field[] fields = new Field[2];
-
-    static {
-        try {
-            animationClass = NMSUtils.getNMSClass("PacketPlayOutAnimation");
-            nmsEntityClass = NMSUtils.getNMSClass("Entity");
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
-        }
-
-        try {
-            animationConstructor = animationClass.getConstructor(nmsEntityClass, int.class);
-        } catch (NoSuchMethodException e) {
-            e.printStackTrace();
-        }
-        try {
-            fields[0] = animationClass.getDeclaredField("a");
-            fields[1] = animationClass.getDeclaredField("b");
-        } catch (NoSuchFieldException e) {
-            e.printStackTrace();
-        }
-
-        for (final Field f : fields) {
-            f.setAccessible(true);
-        }
-
     }
 }

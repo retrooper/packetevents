@@ -6,7 +6,7 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 
 /**
- *  Could be null.
+ * Could be null.
  */
 @Documented
 @Retention(RetentionPolicy.RUNTIME)

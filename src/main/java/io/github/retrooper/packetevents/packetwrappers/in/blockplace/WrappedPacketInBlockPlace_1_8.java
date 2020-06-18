@@ -7,10 +7,32 @@ import io.github.retrooper.packetevents.utils.vector.Vector3i;
 import org.bukkit.inventory.ItemStack;
 
 final class WrappedPacketInBlockPlace_1_8 extends WrappedPacket {
+    private static final Reflection.MethodInvoker[] blockPositionXYZInvoker = new Reflection.MethodInvoker[3];
+    private static Class<?> blockPlaceClass, blockPositionClass;
+    private static Reflection.FieldAccessor<?> blockPositionAccessor, itemStackFieldAccessor;
     private Vector3i blockPosition;
     private ItemStack itemStack;
+
     WrappedPacketInBlockPlace_1_8(final Object packet) {
         super(packet);
+    }
+
+    protected static void initStatic() {
+        try {
+            blockPlaceClass = NMSUtils.getNMSClass("PacketPlayInBlockPlace");
+
+            blockPositionClass = NMSUtils.getNMSClass("BlockPosition");
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+
+        itemStackFieldAccessor = Reflection.getField(blockPlaceClass, NMSUtils.nmsItemStackClass, 0);
+
+        blockPositionAccessor = Reflection.getField(blockPlaceClass, blockPositionClass, 1);
+
+        blockPositionXYZInvoker[0] = Reflection.getMethod(blockPositionClass.getSuperclass(), "getX");
+        blockPositionXYZInvoker[1] = Reflection.getMethod(blockPositionClass.getSuperclass(), "getY");
+        blockPositionXYZInvoker[2] = Reflection.getMethod(blockPositionClass.getSuperclass(), "getZ");
     }
 
     @Override
@@ -32,28 +54,5 @@ final class WrappedPacketInBlockPlace_1_8 extends WrappedPacket {
 
     public ItemStack getItemStack() {
         return itemStack;
-    }
-
-    private static Class<?> blockPlaceClass, blockPositionClass;
-
-    private static Reflection.FieldAccessor<?> blockPositionAccessor, itemStackFieldAccessor;
-    private static final Reflection.MethodInvoker[] blockPositionXYZInvoker = new Reflection.MethodInvoker[3];
-
-    protected static void initStatic(){
-        try {
-            blockPlaceClass = NMSUtils.getNMSClass("PacketPlayInBlockPlace");
-
-            blockPositionClass = NMSUtils.getNMSClass("BlockPosition");
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
-        }
-
-        itemStackFieldAccessor = Reflection.getField(blockPlaceClass, NMSUtils.nmsItemStackClass, 0);
-
-        blockPositionAccessor = Reflection.getField(blockPlaceClass, blockPositionClass, 1);
-
-        blockPositionXYZInvoker[0] = Reflection.getMethod(blockPositionClass.getSuperclass(), "getX");
-        blockPositionXYZInvoker[1] = Reflection.getMethod(blockPositionClass.getSuperclass(), "getY");
-        blockPositionXYZInvoker[2] = Reflection.getMethod(blockPositionClass.getSuperclass(), "getZ");
     }
 }

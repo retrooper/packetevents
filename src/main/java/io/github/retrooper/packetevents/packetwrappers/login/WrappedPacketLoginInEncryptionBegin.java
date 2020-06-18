@@ -5,7 +5,22 @@ import io.github.retrooper.packetevents.tinyprotocol.Reflection;
 import io.github.retrooper.packetevents.utils.NMSUtils;
 
 public final class WrappedPacketLoginInEncryptionBegin extends WrappedPacket {
+    private static final Reflection.FieldAccessor<byte[]>[] fields = new Reflection.FieldAccessor[2];
+    private static Class<?> packetClass;
+
+    static {
+        try {
+            packetClass = NMSUtils.getNMSClass("PacketLoginInEncryptionBegin");
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+
+        fields[0] = Reflection.getField(packetClass, byte[].class, 0);
+        fields[1] = Reflection.getField(packetClass, byte[].class, 1);
+    }
+
     private byte[] publicKey, verifyToken;
+
     public WrappedPacketLoginInEncryptionBegin(final Object packet) {
         super(packet);
     }
@@ -22,20 +37,5 @@ public final class WrappedPacketLoginInEncryptionBegin extends WrappedPacket {
 
     public byte[] getVerifyToken() {
         return verifyToken;
-    }
-
-    private static Class<?> packetClass;
-
-    private static final Reflection.FieldAccessor<byte[]>[] fields = new Reflection.FieldAccessor[2];
-
-    static {
-        try {
-            packetClass = NMSUtils.getNMSClass("PacketLoginInEncryptionBegin");
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
-        }
-
-        fields[0] = Reflection.getField(packetClass, byte[].class, 0);
-        fields[1] = Reflection.getField(packetClass, byte[].class, 1);
     }
 }

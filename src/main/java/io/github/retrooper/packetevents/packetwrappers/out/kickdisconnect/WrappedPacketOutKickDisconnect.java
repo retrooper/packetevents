@@ -10,6 +10,26 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 
 public final class WrappedPacketOutKickDisconnect extends WrappedPacket implements Sendable {
+    private static final Reflection.FieldAccessor<?> iChatBaseComponentAccessor;
+    private static Class<?> packetClass, iChatBaseComponentClass;
+    private static Constructor<?> kickDisconnectConstructor;
+
+    static {
+        try {
+            packetClass = NMSUtils.getNMSClass("PacketPlayOutKickDisconnect");
+            iChatBaseComponentClass = NMSUtils.getNMSClass("IChatBaseComponent");
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+
+        try {
+            kickDisconnectConstructor = packetClass.getConstructor(iChatBaseComponentClass);
+        } catch (NoSuchMethodException e) {
+            e.printStackTrace();
+        }
+        iChatBaseComponentAccessor = Reflection.getField(packetClass, iChatBaseComponentClass, 0);
+    }
+
     private String kickMessage;
 
     public WrappedPacketOutKickDisconnect(final Object packet) {
@@ -38,27 +58,5 @@ public final class WrappedPacketOutKickDisconnect extends WrappedPacket implemen
             e.printStackTrace();
         }
         return null;
-    }
-
-    private static Class<?> packetClass, iChatBaseComponentClass;
-
-    private static Constructor<?> kickDisconnectConstructor;
-
-    private static final Reflection.FieldAccessor<?> iChatBaseComponentAccessor;
-
-    static {
-        try {
-            packetClass = NMSUtils.getNMSClass("PacketPlayOutKickDisconnect");
-            iChatBaseComponentClass = NMSUtils.getNMSClass("IChatBaseComponent");
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
-        }
-
-        try {
-            kickDisconnectConstructor = packetClass.getConstructor(iChatBaseComponentClass);
-        } catch (NoSuchMethodException e) {
-            e.printStackTrace();
-        }
-        iChatBaseComponentAccessor = Reflection.getField(packetClass, iChatBaseComponentClass, 0);
     }
 }

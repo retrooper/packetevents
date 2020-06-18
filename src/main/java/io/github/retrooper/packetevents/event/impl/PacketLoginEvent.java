@@ -6,8 +6,9 @@ public final class PacketLoginEvent extends PacketEvent {
     private final Object channel;
     private final String name;
     private final Object packet;
+
     public PacketLoginEvent(final Object channel, final String packetName, final Object packet) {
-        this.channel =channel;
+        this.channel = channel;
         this.name = packetName;
         this.packet = packet;
     }

@@ -8,6 +8,21 @@ import java.security.PublicKey;
 
 
 public final class WrappedPacketLoginOutEncryptionBegin extends WrappedPacket {
+    private static final Reflection.FieldAccessor<?>[] fields = new Reflection.FieldAccessor[3];
+    private static Class<?> packetClass;
+
+    static {
+        try {
+            packetClass = NMSUtils.getNMSClass("PacketLoginOutEncryptionBegin");
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+
+        fields[0] = Reflection.getField(packetClass, String.class, 0);
+        fields[1] = Reflection.getField(packetClass, PublicKey.class, 1);
+        fields[2] = Reflection.getField(packetClass, byte[].class, 2);
+    }
+
     private String encodedString;
     private PublicKey encodedKey;
     private byte[] byteArray;
@@ -36,22 +51,6 @@ public final class WrappedPacketLoginOutEncryptionBegin extends WrappedPacket {
 
     public byte[] getByteArray() {
         return byteArray;
-    }
-
-    private static Class<?> packetClass;
-
-    private static final Reflection.FieldAccessor<?>[] fields = new Reflection.FieldAccessor[3];
-
-    static {
-        try {
-            packetClass = NMSUtils.getNMSClass("PacketLoginOutEncryptionBegin");
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
-        }
-
-        fields[0] = Reflection.getField(packetClass, String.class, 0);
-        fields[1] = Reflection.getField(packetClass, PublicKey.class, 1);
-        fields[2] = Reflection.getField(packetClass, byte[].class, 2);
     }
 
 

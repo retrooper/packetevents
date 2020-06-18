@@ -43,20 +43,20 @@ public final class PacketReceiveEvent extends PacketEvent {
     }
 
     /**
-     * Cancel the packet
-     *
-     * @param cancelled
-     */
-    public void setCancelled(boolean cancelled) {
-        this.cancelled = cancelled;
-    }
-
-    /**
      * Returns if the packet has been cancelled
      *
      * @return cancelled
      */
     public boolean isCancelled() {
         return cancelled;
+    }
+
+    /**
+     * Cancel the packet
+     *
+     * @param cancelled
+     */
+    public void setCancelled(boolean cancelled) {
+        this.cancelled = cancelled;
     }
 }

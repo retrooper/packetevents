@@ -10,6 +10,7 @@ final class WrappedPacketInBlockPlace_1_7_10 extends WrappedPacket {
     private Vector3i blockPosition;
     private ItemStack itemStack;
     private int blockFace;
+
     WrappedPacketInBlockPlace_1_7_10(final Player player, final Object packet) {
         super(player, packet);
     }
@@ -17,14 +18,14 @@ final class WrappedPacketInBlockPlace_1_7_10 extends WrappedPacket {
 
     @Override
     protected void setup() {
-        final PacketPlayInBlockPlace blockPlace = (PacketPlayInBlockPlace)packet;
+        final PacketPlayInBlockPlace blockPlace = (PacketPlayInBlockPlace) packet;
 
         this.blockPosition = new Vector3i(blockPlace.c(), blockPlace.d(), blockPlace.e());
 
         this.blockFace = blockPlace.d();
 
         net.minecraft.server.v1_7_R4.ItemStack stack = blockPlace.getItemStack();
-       this.itemStack = org.bukkit.craftbukkit.v1_7_R4.inventory.CraftItemStack.asBukkitCopy(stack);
+        this.itemStack = org.bukkit.craftbukkit.v1_7_R4.inventory.CraftItemStack.asBukkitCopy(stack);
     }
 
     public Vector3i getBlockPosition() {

@@ -6,6 +6,36 @@ import io.github.retrooper.packetevents.utils.NMSUtils;
 import java.lang.reflect.Field;
 
 public final class WrappedPacketInAbilities extends WrappedPacket {
+    private static Class<?> abilitiesClass;
+    private static final Field[] fields = new Field[6];
+
+    static {
+
+        try {
+            abilitiesClass = NMSUtils.getNMSClass("PacketPlayInAbilities");
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+
+
+        try {
+            fields[0] = abilitiesClass.getDeclaredField("a");
+            fields[1] = abilitiesClass.getDeclaredField("b");
+            fields[2] = abilitiesClass.getDeclaredField("c");
+            fields[3] = abilitiesClass.getDeclaredField("d");
+            fields[4] = abilitiesClass.getDeclaredField("e");
+            fields[5] = abilitiesClass.getDeclaredField("f");
+        } catch (NoSuchFieldException e) {
+            e.printStackTrace();
+        }
+
+        for (Field f : fields) {
+            if (f != null) {
+                f.setAccessible(true);
+            }
+        }
+    }
+
     private boolean isVulnerable;
     private boolean isFlying;
     private boolean allowFly;
@@ -53,36 +83,5 @@ public final class WrappedPacketInAbilities extends WrappedPacket {
 
     public float getWalkSpeed() {
         return walkSpeed;
-    }
-
-    private static Class<?> abilitiesClass;
-
-    private static Field[] fields = new Field[6];
-
-    static {
-
-        try {
-            abilitiesClass = NMSUtils.getNMSClass("PacketPlayInAbilities");
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
-        }
-
-
-        try {
-            fields[0] = abilitiesClass.getDeclaredField("a");
-            fields[1] = abilitiesClass.getDeclaredField("b");
-            fields[2] = abilitiesClass.getDeclaredField("c");
-            fields[3] = abilitiesClass.getDeclaredField("d");
-            fields[4] = abilitiesClass.getDeclaredField("e");
-            fields[5] = abilitiesClass.getDeclaredField("f");
-        } catch (NoSuchFieldException e) {
-            e.printStackTrace();
-        }
-
-        for (Field f : fields) {
-            if (f != null) {
-                f.setAccessible(true);
-            }
-        }
     }
 }

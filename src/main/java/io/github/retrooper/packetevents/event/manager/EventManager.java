@@ -9,10 +9,13 @@ import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public final class EventManager {
 
-    private HashMap<PacketListener, List<Method>> registeredMethods = new HashMap<PacketListener, List<Method>>();
+    private static final ExecutorService executorService = Executors.newCachedThreadPool();
+    private final HashMap<PacketListener, List<Method>> registeredMethods = new HashMap<PacketListener, List<Method>>();
 
     public void callEvent(final PacketEvent e) {
         for (final PacketListener listener : registeredMethods.keySet()) {
@@ -31,7 +34,6 @@ public final class EventManager {
             }
         }
     }
-
 
     public void registerListener(final PacketListener e) {
         if (registeredMethods.containsKey(e)) {
@@ -57,7 +59,7 @@ public final class EventManager {
         registeredMethods.clear();
     }
 
-    public boolean hasRegistered(final PacketListener listener) {
+    public boolean isRegistered(final PacketListener listener) {
         return registeredMethods.containsKey(listener);
     }
 }

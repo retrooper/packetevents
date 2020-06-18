@@ -7,28 +7,7 @@ import io.github.retrooper.packetevents.utils.NMSUtils;
 import java.lang.reflect.Field;
 
 public final class WrappedPacketInChat extends WrappedPacket {
-    private String message;
-
-    public WrappedPacketInChat(Object packet) {
-        super(packet);
-    }
-
-    @Override
-    protected void setup() {
-        try {
-            final Object obj = field.get(packet);
-            this.message = obj.toString();
-        } catch (IllegalAccessException e) {
-            e.printStackTrace();
-        }
-    }
-
-    public String getMessage() {
-        return message;
-    }
-
     private static Class<?> chatPacketClass;
-
     private static Field field;
 
     static {
@@ -48,10 +27,30 @@ public final class WrappedPacketInChat extends WrappedPacket {
         field.setAccessible(true);
     }
 
+    private String message;
+
+    public WrappedPacketInChat(Object packet) {
+        super(packet);
+    }
+
     private static String getChatFieldName() {
         if (version == ServerVersion.v_1_7_10) {
             return "message";
         }
         return "a";
+    }
+
+    @Override
+    protected void setup() {
+        try {
+            final Object obj = field.get(packet);
+            this.message = obj.toString();
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public String getMessage() {
+        return message;
     }
 }

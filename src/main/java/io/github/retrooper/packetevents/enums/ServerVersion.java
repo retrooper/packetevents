@@ -9,6 +9,8 @@ public enum ServerVersion {
     ERROR;
 
 
+    private static final String nmsVersionSuffix = Bukkit.getServer().getClass().getPackage().getName().replace(".", ",").split(",")[3];
+
     public static ServerVersion getVersion() {
         ServerVersion[] vals = values();
         ArrayUtils.reverse(vals);
@@ -20,8 +22,6 @@ public enum ServerVersion {
         }
         return ERROR;
     }
-
-    private static final String nmsVersionSuffix = Bukkit.getServer().getClass().getPackage().getName().replace(".", ",").split(",")[3];
 
     public static String getNmsSuffix() {
         return nmsVersionSuffix;
@@ -53,14 +53,13 @@ public enum ServerVersion {
      * @return
      */
     public boolean isLowerThan(final ServerVersion version) {
-        if(version == this) return false;
+        if (version == this) return false;
         byte len = (byte) values().length;
         for (byte i = 0; i < len; i++) {
             final ServerVersion v = values()[i];
-            if(v == this) {
+            if (v == this) {
                 return true;
-            }
-            else if(v == version) {
+            } else if (v == version) {
                 return false;
             }
         }

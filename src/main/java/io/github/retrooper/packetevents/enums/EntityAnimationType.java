@@ -8,9 +8,9 @@ public enum EntityAnimationType {
     }
 
     public final int getIndex() {
-        for(int i = 0; i < values().length; i++) {
+        for (int i = 0; i < values().length; i++) {
             final EntityAnimationType curType = values()[0];
-            if(curType == this) {
+            if (curType == this) {
                 return i;
             }
         }

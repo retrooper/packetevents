@@ -35,13 +35,12 @@ public final class PacketSendEvent extends PacketEvent {
         return this.packet;
     }
 
+    public boolean isCancelled() {
+        return cancelled;
+    }
 
     public void setCancelled(boolean cancelled) {
         this.cancelled = cancelled;
-    }
-
-    public boolean isCancelled() {
-        return cancelled;
     }
 }
 

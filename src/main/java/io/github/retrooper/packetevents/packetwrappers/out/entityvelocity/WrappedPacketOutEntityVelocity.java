@@ -11,6 +11,58 @@ import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 
 public final class WrappedPacketOutEntityVelocity extends WrappedPacket implements Sendable {
+    private static Constructor<?> velocityConstructor, vec3dConstructor;
+    private static Class<?> velocityClass, vec3dClass;
+    private static final Field[] fields = new Field[4];
+
+    /**
+     * Velocity Constructor parameter types:
+     * 1.7.10->1.13.2 use int, double, double, double style,
+     * 1.14+ use int, Vec3D style
+     */
+    static {
+        try {
+
+            velocityClass = NMSUtils.getNMSClass("PacketPlayOutEntityVelocity");
+            if (version.isHigherThan(ServerVersion.v_1_13_2)) {
+                vec3dClass = NMSUtils.getNMSClass("Vec3D");
+            }
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+
+        try {
+            if (version.isHigherThan(ServerVersion.v_1_13_2)) {
+                velocityConstructor = velocityClass.getConstructor(int.class, vec3dClass);
+                //vec3d constructor
+                vec3dConstructor = vec3dClass.getConstructor(double.class, double.class, double.class);
+            } else {
+                velocityConstructor = velocityClass.getConstructor(int.class, double.class, double.class, double.class);
+            }
+        } catch (NoSuchMethodException e) {
+            e.printStackTrace();
+        }
+
+        try {
+            //entity id
+            fields[0] = velocityClass.getDeclaredField("a");
+            //x
+            fields[1] = velocityClass.getDeclaredField("b");
+            //y
+            fields[2] = velocityClass.getDeclaredField("c");
+            //z
+            fields[3] = velocityClass.getDeclaredField("d");
+        } catch (NoSuchFieldException e) {
+            e.printStackTrace();
+        }
+
+        for (final Field f : fields) {
+            f.setAccessible(true);
+        }
+
+
+    }
+
     private Entity entity;
     private int entityId;
     private double velocityX, velocityY, velocityZ;
@@ -85,61 +137,6 @@ public final class WrappedPacketOutEntityVelocity extends WrappedPacket implemen
             }
         }
         return null;
-    }
-
-
-    private static Constructor<?> velocityConstructor, vec3dConstructor;
-    private static Class<?> velocityClass, vec3dClass;
-
-    private static Field[] fields = new Field[4];
-
-
-    /**
-     * Velocity Constructor parameter types:
-     * 1.7.10->1.13.2 use int, double, double, double style,
-     * 1.14+ use int, Vec3D style
-     */
-    static {
-        try {
-
-            velocityClass = NMSUtils.getNMSClass("PacketPlayOutEntityVelocity");
-            if (version.isHigherThan(ServerVersion.v_1_13_2)) {
-                vec3dClass = NMSUtils.getNMSClass("Vec3D");
-            }
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
-        }
-
-        try {
-            if (version.isHigherThan(ServerVersion.v_1_13_2)) {
-                velocityConstructor = velocityClass.getConstructor(int.class, vec3dClass);
-                //vec3d constructor
-                vec3dConstructor = vec3dClass.getConstructor(double.class, double.class, double.class);
-            } else {
-                velocityConstructor = velocityClass.getConstructor(int.class, double.class, double.class, double.class);
-            }
-        } catch (NoSuchMethodException e) {
-            e.printStackTrace();
-        }
-
-        try {
-            //entity id
-            fields[0] = velocityClass.getDeclaredField("a");
-            //x
-            fields[1] = velocityClass.getDeclaredField("b");
-            //y
-            fields[2] = velocityClass.getDeclaredField("c");
-            //z
-            fields[3] = velocityClass.getDeclaredField("d");
-        } catch (NoSuchFieldException e) {
-            e.printStackTrace();
-        }
-
-        for (final Field f : fields) {
-            f.setAccessible(true);
-        }
-
-
     }
 
 }

@@ -7,11 +7,30 @@ import io.github.retrooper.packetevents.utils.NMSUtils;
 import java.lang.reflect.Field;
 
 public final class WrappedPacketInKeepAlive extends WrappedPacket {
-    public WrappedPacketInKeepAlive(final Object packet) {
-        super(packet);
+    private static Class<?> keepAliveClass;
+    //1.7.10->1.12.2 has int field "a", rest as long field "a"
+    private static Field idField;
+
+    static {
+        try {
+            keepAliveClass = NMSUtils.getNMSClass("PacketPlayInKeepAlive");
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+
+        try {
+            idField = keepAliveClass.getDeclaredField("a");
+            idField.setAccessible(true);
+        } catch (NoSuchFieldException e) {
+            e.printStackTrace();
+        }
     }
 
     private long id;
+
+    public WrappedPacketInKeepAlive(final Object packet) {
+        super(packet);
+    }
 
     @Override
     protected void setup() {
@@ -34,25 +53,5 @@ public final class WrappedPacketInKeepAlive extends WrappedPacket {
      */
     public long getId() {
         return id;
-    }
-
-    private static Class<?> keepAliveClass;
-
-    //1.7.10->1.12.2 has int field "a", rest as long field "a"
-    private static Field idField;
-
-    static {
-        try {
-            keepAliveClass = NMSUtils.getNMSClass("PacketPlayInKeepAlive");
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
-        }
-
-        try {
-            idField = keepAliveClass.getDeclaredField("a");
-            idField.setAccessible(true);
-        } catch (NoSuchFieldException e) {
-            e.printStackTrace();
-        }
     }
 }

@@ -13,13 +13,12 @@ import org.bukkit.plugin.Plugin;
 
 public final class TinyProtocolHandler_1_7 {
     private final Plugin plugin;
+    @Nullable
+    public TinyProtocol7 tinyProtocol;
 
     public TinyProtocolHandler_1_7(final Plugin plugin) {
         this.plugin = plugin;
     }
-
-    @Nullable
-    public TinyProtocol7 tinyProtocol;
 
     public void initTinyProtocol() {
         tinyProtocol = new TinyProtocol7(getPlugin()) {
@@ -37,8 +36,8 @@ public final class TinyProtocolHandler_1_7 {
             @Override
             public Object onPacketInAsync(Player sender, Channel channel, Object packet) {
                 final String packetName = packet.getClass().getSimpleName();
-                for(final String loginPacket : Packet.Login.LOGIN_PACKETS) {
-                    if(packetName.equals(loginPacket)) {
+                for (final String loginPacket : Packet.Login.LOGIN_PACKETS) {
+                    if (packetName.equals(loginPacket)) {
                         PacketEvents.getEventManager().callEvent(new PacketLoginEvent(channel, packetName, packet));
                         return packet;
                     }

@@ -8,10 +8,15 @@ public class MainExample extends JavaPlugin {
     @Override
     public void onEnable() {
         PacketEvents.start(this);
+
+        PacketEvents.getServerTickTask().cancel();
+
+        //To fix bugs it is recommend to set this to TRUE
+        PacketEvents.setShouldKickOnRestart(true);
     }
 
     @Override
     public void onDisable() {
-        PacketEvents.stop();
+        PacketEvents.stop(); //it kicks when you call the stop() function
     }
 }

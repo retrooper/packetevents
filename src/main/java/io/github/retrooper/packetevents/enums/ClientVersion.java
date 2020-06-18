@@ -59,7 +59,7 @@ public enum ClientVersion {
             default:
                 remainder = protocolVersion;
         }
-        if(remainder > 578) {
+        if (remainder > 578) {
             return HIGHER_THAN_V_1_15_2;
         }
         return INVALID;
@@ -78,18 +78,18 @@ public enum ClientVersion {
 
     /**
      * Returns if the client's version is more outdated than the argument passed version
+     *
      * @param version
      * @return
      */
     public boolean isLowerThan(final ClientVersion version) {
-        if(version == this) return false;
+        if (version == this) return false;
         byte len = (byte) values().length;
         for (byte i = 0; i < len; i++) {
             final ClientVersion v = values()[i];
-            if(v == this) {
+            if (v == this) {
                 return true;
-            }
-            else if(v == version) {
+            } else if (v == version) {
                 return false;
             }
         }

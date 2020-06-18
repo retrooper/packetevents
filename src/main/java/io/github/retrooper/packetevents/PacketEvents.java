@@ -1,5 +1,6 @@
 package io.github.retrooper.packetevents;
 
+import io.github.retrooper.packetevents.annotations.NotNull;
 import io.github.retrooper.packetevents.annotations.Nullable;
 import io.github.retrooper.packetevents.annotations.PacketHandler;
 import io.github.retrooper.packetevents.enums.ClientVersion;
@@ -26,23 +27,14 @@ import java.util.HashMap;
 
 public final class PacketEvents implements PacketListener, Listener {
 
-
-    /*
-     * Wrappers TODO:
-     * Spawn entity
-     */
-
-    private static boolean hasRegistered;
-
     private static final ServerVersion version = ServerVersion.getVersion();
-    private static PacketEvents instance;
     private static final EventManager eventManager = new EventManager();
-
-    private static int currentTick;
-
-    private static BukkitTask serverTickTask;
-
     private static final HashMap<Object, ClientVersion> clientVersionLookup = new HashMap<Object, ClientVersion>();
+    private static boolean hasRegistered;
+    private static PacketEvents instance;
+    private static int currentTick;
+    private static BukkitTask serverTickTask;
+    private static boolean kickOnRestart;
 
     public static EventManager getEventManager() {
         return eventManager;
@@ -67,7 +59,7 @@ public final class PacketEvents implements PacketListener, Listener {
             final Runnable tickRunnable = new Runnable() {
                 @Override
                 public void run() {
-                    getEventManager().callEvent(new ServerTickEvent(currentTick++, PacketEvents.currentCalculatedMS()));
+                    getEventManager().callEvent(new ServerTickEvent(currentTick++, highlyPreciseMillis()));
                 }
             };
             serverTickTask = Bukkit.getScheduler().runTaskTimerAsynchronously(plugin, tickRunnable, 0L, 1L);
@@ -76,13 +68,22 @@ public final class PacketEvents implements PacketListener, Listener {
     }
 
     /**
-     * Stop all tasks and unregisters all packetevent listeners
+     * Stop all tasks and unregisters all PacketEvents' listeners
      */
     public static void stop() {
         if (serverTickTask != null) {
-            serverTickTask.cancel();
+            if (!serverTickTask.isCancelled()) {
+                serverTickTask.cancel();
+            }
         }
         getEventManager().unregisterAllListeners();
+        if (shouldKickOnStop()) {
+            for (final Player p : Bukkit.getOnlinePlayers()) {
+                if (p != null) {
+                    p.kickPlayer("Please wait till the server finishes reloading/restarting.");
+                }
+            }
+        }
     }
 
     /**
@@ -151,22 +152,29 @@ public final class PacketEvents implements PacketListener, Listener {
      * @param player
      * @return ping
      */
-    public static int getPing(final Player player) {
+    public static int getPing(@NotNull final Player player) {
         return NMSUtils.getPlayerPing(player);
     }
 
     /**
-     * Should I use this over System.currentTimeMillis()?
-     * <p>
-     * 1. System.currentTimeMillis() isn't supported on all machines
-     * 2. This is way more accurate than System.currentTimeMillis()
-     * 3. System.currentTimeMillis() can be up to 50ms off, depending on the operating system.
-     *
+     * When to use this(nano / 1 million) over {@link System#currentTimeMillis()}
+     * This is preciser than System.currentTimeMillis(), System.currentTimeMillis() can be up to 50ms off on some operating systems, but using this isn't cheap.
+     * Java documentation recommend using nano time if you are measuring elapsed time.
+     * In this function nanoTime is divided by 1 million giving us milliseconds.
+     * It is also important to mention that using this method doesn't guarantee thread safety.
      * @return nanoTime / 1 million
+     */
+    public static long highlyPreciseMillis() {
+        return System.nanoTime() / 1000000;
+    }
+
+    /**
+     * This is deprecated, use {@link #highlyPreciseMillis()} as they do the same thing, this is basically just a method rename.
      */
     public static long currentCalculatedMS() {
         return System.nanoTime() / 1000000;
     }
+
 
     /**
      * Get the player's version.
@@ -177,7 +185,7 @@ public final class PacketEvents implements PacketListener, Listener {
      * @return ClientVersion
      */
     @Nullable
-    public static ClientVersion getClientVersion(final Player player) {
+    public static ClientVersion getClientVersion(@NotNull final Player player) {
         final Object channel = TinyProtocolHandler.getPlayerChannel(player);
         return clientVersionLookup.get(channel);
     }
@@ -191,58 +199,21 @@ public final class PacketEvents implements PacketListener, Listener {
      * @return ClientVersion
      */
     @Nullable
-    public static ClientVersion getClientVersion(final Object channel) {
+    public static ClientVersion getClientVersion(@NotNull final Object channel) {
         return clientVersionLookup.get(channel);
     }
 
-    @PacketHandler
-    public void onLogin(final PacketLoginEvent e) {
-        if (e.getPacketName().equals(Packet.Login.HANDSHAKE)) {
-            final WrappedPacketLoginHandshake handshake = new WrappedPacketLoginHandshake(e.getPacket());
-            final ClientVersion clientVersion = ClientVersion.fromProtocolVersion(handshake.getProtocolVersion());
-            clientVersionLookup.put(e.getNettyChannel(), clientVersion);
-        }
+    public static boolean shouldKickOnStop() {
+        return kickOnRestart;
     }
 
-    @PacketHandler
-    public void onPacket(final PacketEvent e) {
-        if(e instanceof PacketReceiveEvent) {
-          // System.out.println("RECEIVED");
-        }
-    }
-
-    /**
-     * Do not check the client version in or before the PlayerInjectEvent, use the PostPlayerInjectEvent.
-     * It is not recommended to do much in the PlayerInjectEvent, as some fields in the Player object are be null.
-     * Use the PostPlayerInjectEvent which is only called after the PlayerJoinEvent if the player was injected.
-     *
-     * @param e
-     */
-    @PacketHandler
-    public void onInject(final PlayerInjectEvent e) {
-        final String username = e.getPlayer().getName();
-    }
-
-    /**
-     * Called after the PlayerJoinEvent ONLY if the player has been injected!
-     *
-     * @param e
-     */
-    @PacketHandler
-    public void onPostInject(final PostPlayerInjectEvent e) {
-        //It is safe to get his client version in here.
-        final ClientVersion clientVersion = PacketEvents.getClientVersion(e.getPlayer());
-    }
-
-    @EventHandler
-    public void onJoin(PlayerJoinEvent e) {
-        if (hasInjected(e.getPlayer())) {
-            PacketEvents.getEventManager().callEvent(new PostPlayerInjectEvent(e.getPlayer()));
-        }
+    public static void setShouldKickOnRestart(final boolean val) {
+        kickOnRestart = val;
     }
 
     /**
      * Version independent player injection
+     *
      * @param player
      */
     public static void injectPlayer(final Player player) {
@@ -276,5 +247,51 @@ public final class PacketEvents implements PacketListener, Listener {
      */
     public static void sendPacket(final Player player, final Sendable sendable) {
         NMSUtils.sendSendableWrapper(player, sendable);
+    }
+
+    @PacketHandler
+    public void onLogin(final PacketLoginEvent e) {
+        if (e.getPacketName().equals(Packet.Login.HANDSHAKE)) {
+            final WrappedPacketLoginHandshake handshake = new WrappedPacketLoginHandshake(e.getPacket());
+            final ClientVersion clientVersion = ClientVersion.fromProtocolVersion(handshake.getProtocolVersion());
+            clientVersionLookup.put(e.getNettyChannel(), clientVersion);
+        }
+    }
+
+    @PacketHandler
+    public void onPacket(final PacketEvent e) {
+        if (e instanceof PacketReceiveEvent) {
+            // System.out.println("RECEIVED");
+        }
+    }
+
+    /**
+     * Do not check the client version in or before the PlayerInjectEvent, use the PostPlayerInjectEvent.
+     * It is not recommended to do much in the PlayerInjectEvent, as some fields in the Player object are be null.
+     * Use the PostPlayerInjectEvent which is only called after the PlayerJoinEvent if the player was injected.
+     *
+     * @param e
+     */
+    @PacketHandler
+    public void onInject(final PlayerInjectEvent e) {
+        final String username = e.getPlayer().getName();
+    }
+
+    /**
+     * Called after the PlayerJoinEvent ONLY if the player has been injected!
+     *
+     * @param e
+     */
+    @PacketHandler
+    public void onPostInject(final PostPlayerInjectEvent e) {
+        //It is safe to get his client version in here.
+        final ClientVersion clientVersion = PacketEvents.getClientVersion(e.getPlayer());
+    }
+
+    @EventHandler
+    public void onJoin(PlayerJoinEvent e) {
+        if (hasInjected(e.getPlayer())) {
+            PacketEvents.getEventManager().callEvent(new PostPlayerInjectEvent(e.getPlayer()));
+        }
     }
 }

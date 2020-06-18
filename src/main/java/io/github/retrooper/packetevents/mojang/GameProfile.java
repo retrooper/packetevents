@@ -39,10 +39,8 @@ public class GameProfile {
 
     public boolean equalsMojangGameProfile(com.mojang.authlib.GameProfile profile) {
         if (profile != null) {
-            if (profile.getId() != null && getId() != null && profile.getId() == getId()
-                    && profile.getName() != null && getName() != null && profile.getName().equals(getName())) {
-                return true;
-            }
+            return profile.getId() != null && getId() != null && profile.getId() == getId()
+                    && profile.getName() != null && getName() != null && profile.getName().equals(getName());
         }
         return false;
     }
@@ -61,14 +59,8 @@ public class GameProfile {
             }
 
             if (this.name != null) {
-                if (this.name.equals(that.name)) {
-                    return true;
-                }
-            } else if (that.name == null) {
-                return true;
-            }
-
-            return false;
+                return this.name.equals(that.name);
+            } else return that.name == null;
         } else {
             return false;
         }
