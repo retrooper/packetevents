@@ -10,7 +10,7 @@ import io.github.retrooper.packetevents.enums.ServerVersion;
  */
 public class PacketEvent {
     protected static ServerVersion version = PacketEvents.getServerVersion();
-    protected long timestamp = PacketEvents.currentCalculatedMS();
+    protected long timestamp = PacketEvents.highlyPreciseMillis();
 
     /**
      * Timestamp of the packet
