@@ -21,7 +21,6 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitTask;
-
 import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 
@@ -72,9 +71,7 @@ public final class PacketEvents implements PacketListener, Listener {
      */
     public static void stop() {
         if (serverTickTask != null) {
-            if (!serverTickTask.isCancelled()) {
-                serverTickTask.cancel();
-            }
+            serverTickTask.cancel();
         }
         getEventManager().unregisterAllListeners();
         if (shouldKickOnStop()) {
@@ -120,7 +117,7 @@ public final class PacketEvents implements PacketListener, Listener {
     /**
      * Get the server's recent TPS values
      * TPS stands for ticks per second.
-     * Learn more about ticks <a href="https://apexminecrafthosting.com/what-is-minecraft-tps/">"https://apexminecrafthosting.com/what-is-minecraft-tps/"</a>
+     * See to learn more about TPS<a href="https://apexminecrafthosting.com/what-is-minecraft-tps/">"https://apexminecrafthosting.com/what-is-minecraft-tps/"</a>
      *
      * @return recentTPS[]
      */
@@ -137,9 +134,9 @@ public final class PacketEvents implements PacketListener, Listener {
     /**
      * Get the server's current TPS
      * TPS stands for ticks per second.
-     * Learn more about ticks <a href="https://apexminecrafthosting.com/what-is-minecraft-tps/">"https://apexminecrafthosting.com/what-is-minecraft-tps/"</a>
+     * See to learn more about TPS <a href="https://apexminecrafthosting.com/what-is-minecraft-tps/">"https://apexminecrafthosting.com/what-is-minecraft-tps/"</a>
      *
-     * @return currentTPS / recentTPS[0]
+     * @return {@link PacketEvents#getRecentServerTPS()[0]}
      */
     public static double getCurrentServerTPS() {
         return getRecentServerTPS()[0];
@@ -162,6 +159,7 @@ public final class PacketEvents implements PacketListener, Listener {
      * Java documentation recommend using nano time if you are measuring elapsed time.
      * In this function nanoTime is divided by 1 million giving us milliseconds.
      * It is also important to mention that using this method doesn't guarantee thread safety.
+     *
      * @return nanoTime / 1 million
      */
     public static long highlyPreciseMillis() {
@@ -171,6 +169,7 @@ public final class PacketEvents implements PacketListener, Listener {
     /**
      * This is deprecated, use {@link #highlyPreciseMillis()} as they do the same thing, this is basically just a method rename.
      */
+    @Deprecated
     public static long currentCalculatedMS() {
         return System.nanoTime() / 1000000;
     }

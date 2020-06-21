@@ -27,7 +27,7 @@ final class WrappedPacketInBlockPlace_1_9 extends WrappedPacket {
 
     @Override
     protected void setup() {
-        this.block = getPlayer().getTargetBlock(null, 3);
+        this.block = getPlayer().getTargetBlock((HashSet<Material>) null, 3);
 
     }
 
