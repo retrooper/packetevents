@@ -1,4 +1,4 @@
-package io.github.retrooper.packetevents.tinyprotocol;
+package io.github.retrooper.packetevents.reflectionutils;
 
 import org.bukkit.Bukkit;
 

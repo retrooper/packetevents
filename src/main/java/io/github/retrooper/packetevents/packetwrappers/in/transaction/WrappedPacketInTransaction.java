@@ -1,7 +1,7 @@
 package io.github.retrooper.packetevents.packetwrappers.in.transaction;
 
 import io.github.retrooper.packetevents.packetwrappers.api.WrappedPacket;
-import io.github.retrooper.packetevents.tinyprotocol.Reflection;
+import io.github.retrooper.packetevents.reflectionutils.Reflection;
 import io.github.retrooper.packetevents.utils.NMSUtils;
 
 public final class WrappedPacketInTransaction extends WrappedPacket {

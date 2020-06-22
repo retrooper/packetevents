@@ -2,7 +2,7 @@ package io.github.retrooper.packetevents.packetwrappers.out.transaction;
 
 import io.github.retrooper.packetevents.packetwrappers.Sendable;
 import io.github.retrooper.packetevents.packetwrappers.api.WrappedPacket;
-import io.github.retrooper.packetevents.tinyprotocol.Reflection;
+import io.github.retrooper.packetevents.reflectionutils.Reflection;
 import io.github.retrooper.packetevents.utils.NMSUtils;
 
 import java.lang.reflect.Constructor;

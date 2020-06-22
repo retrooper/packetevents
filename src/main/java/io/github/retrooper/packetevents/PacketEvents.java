@@ -8,11 +8,9 @@ import io.github.retrooper.packetevents.enums.ServerVersion;
 import io.github.retrooper.packetevents.event.PacketListener;
 import io.github.retrooper.packetevents.event.impl.*;
 import io.github.retrooper.packetevents.event.manager.EventManager;
-import io.github.retrooper.packetevents.handler.TinyProtocolHandler;
+import io.github.retrooper.packetevents.handler.NettyPacketHandler;
 import io.github.retrooper.packetevents.packet.Packet;
 import io.github.retrooper.packetevents.packetwrappers.Sendable;
-import io.github.retrooper.packetevents.packetwrappers.login.WrappedPacketLoginHandshake;
-import io.github.retrooper.packetevents.packetwrappers.out.abilities.WrappedPacketOutAbilities;
 import io.github.retrooper.packetevents.utils.NMSUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -30,7 +28,6 @@ public final class PacketEvents implements PacketListener, Listener {
 
     private static final ServerVersion version = ServerVersion.getVersion();
     private static final EventManager eventManager = new EventManager();
-    private static final HashMap<Object, ClientVersion> clientVersionLookup = new HashMap<Object, ClientVersion>();
     private static boolean hasRegistered;
     private static PacketEvents instance;
     private static int currentTick;
@@ -53,8 +50,6 @@ public final class PacketEvents implements PacketListener, Listener {
             getEventManager().registerListener(getInstance());
 
             Bukkit.getPluginManager().registerEvents(getInstance(), plugin);
-            //Initialize the TinyProtocolHandler
-            TinyProtocolHandler.initTinyProtocol(plugin);
 
             //Start the server tick task
             final Runnable tickRunnable = new Runnable() {
@@ -182,27 +177,15 @@ public final class PacketEvents implements PacketListener, Listener {
      * Do not call this method in the PlayerInjectEvent, it is safe to call it in the PostPlayerInjectEvent.
      * The EntityPlayer object is null at that time, resulting in the version lookup to fail.
      *
-     * @param player
+     * / / @param player
      * @return ClientVersion
-     */
+
     @Nullable
     public static ClientVersion getClientVersion(@NotNull final Player player) {
         final Object channel = TinyProtocolHandler.getPlayerChannel(player);
         return clientVersionLookup.get(channel);
     }
-
-    /**
-     * Get the players' client version
-     * Do not call this method in the PlayerInjectEvent, it is safe to call it in the PostPlayerInjectEvent.
-     * The EntityPlayer object is null at that time, resulting in the version lookup to fail.
-     *
-     * @param channel
-     * @return ClientVersion
-     */
-    @Nullable
-    public static ClientVersion getClientVersion(@NotNull final Object channel) {
-        return clientVersionLookup.get(channel);
-    }
+*/
 
     public static boolean shouldKickOnStop() {
         return kickOnRestart;
@@ -218,7 +201,7 @@ public final class PacketEvents implements PacketListener, Listener {
      * @param player
      */
     public static void injectPlayer(final Player player) {
-        TinyProtocolHandler.inject(player);
+        NettyPacketHandler.injectPlayer(player);
     }
 
     /**
@@ -227,7 +210,7 @@ public final class PacketEvents implements PacketListener, Listener {
      * @param player
      */
     public static void uninjectPlayer(final Player player) {
-        TinyProtocolHandler.uninject(player);
+        NettyPacketHandler.uninjectPlayer(player);
     }
 
     /**
@@ -237,7 +220,7 @@ public final class PacketEvents implements PacketListener, Listener {
      * @return hasInjected
      */
     public static boolean hasInjected(final Player player) {
-        return TinyProtocolHandler.hasInjected(player);
+        return NettyPacketHandler.hasInjected(player);
     }
 
     /**
@@ -249,16 +232,6 @@ public final class PacketEvents implements PacketListener, Listener {
     public static void sendPacket(final Player player, final Sendable sendable) {
         NMSUtils.sendSendableWrapper(player, sendable);
     }
-
-    @PacketHandler
-    public void onLogin(final PacketLoginEvent e) {
-        if (e.getPacketName().equals(Packet.Login.HANDSHAKE)) {
-            final WrappedPacketLoginHandshake handshake = new WrappedPacketLoginHandshake(e.getPacket());
-            final ClientVersion clientVersion = ClientVersion.fromProtocolVersion(handshake.getProtocolVersion());
-            clientVersionLookup.put(e.getNettyChannel(), clientVersion);
-        }
-    }
-
 
     /**
      * Do not check the client version in or before the PlayerInjectEvent, use the PostPlayerInjectEvent.
@@ -279,14 +252,20 @@ public final class PacketEvents implements PacketListener, Listener {
      */
     @PacketHandler
     public void onPostInject(final PostPlayerInjectEvent e) {
-        //It is safe to get his client version in here.
-        final ClientVersion clientVersion = PacketEvents.getClientVersion(e.getPlayer());
+
     }
 
     @EventHandler
     public void onJoin(final PlayerJoinEvent e) {
-        if (hasInjected(e.getPlayer())) {
-            PacketEvents.getEventManager().callEvent(new PostPlayerInjectEvent(e.getPlayer()));
+        if (!hasInjected(e.getPlayer())) {
+
+            PlayerInjectEvent injectEvent = new PlayerInjectEvent(e.getPlayer());
+            PacketEvents.getEventManager().callEvent(injectEvent);
+            if(!injectEvent.isCancelled()) {
+                injectPlayer(e.getPlayer());
+                PacketEvents.getEventManager().callEvent(new PostPlayerInjectEvent(e.getPlayer()));
+            }
+
         }
     }
 

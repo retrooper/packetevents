@@ -4,7 +4,7 @@ import io.github.retrooper.packetevents.enums.Direction;
 import io.github.retrooper.packetevents.enums.PlayerDigType;
 import io.github.retrooper.packetevents.enums.ServerVersion;
 import io.github.retrooper.packetevents.packetwrappers.api.WrappedPacket;
-import io.github.retrooper.packetevents.tinyprotocol.Reflection;
+import io.github.retrooper.packetevents.reflectionutils.Reflection;
 import io.github.retrooper.packetevents.utils.NMSUtils;
 import io.github.retrooper.packetevents.utils.vector.Vector3i;
 

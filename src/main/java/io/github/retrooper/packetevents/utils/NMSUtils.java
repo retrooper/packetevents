@@ -3,6 +3,7 @@ package io.github.retrooper.packetevents.utils;
 import io.github.retrooper.packetevents.annotations.Nullable;
 import io.github.retrooper.packetevents.enums.ServerVersion;
 import io.github.retrooper.packetevents.packetwrappers.Sendable;
+import io.github.retrooper.packetevents.reflectionutils.Reflection;
 import io.github.retrooper.packetevents.utils.nms_entityfinder.EntityFinderUtils;
 import org.bukkit.World;
 import org.bukkit.entity.Entity;
@@ -22,14 +23,18 @@ public final class NMSUtils {
     private static final String obcDir = ServerVersion.getOBCDirectory();
 
     public static Class<?> minecraftServerClass, craftWorldsClass,
-            packetClass, entityPlayerClass, playerConnectionClass, craftPlayerClass, serverConnectionClass, craftEntityClass, craftItemStack, nmsItemStackClass;
+            packetClass, entityPlayerClass, playerConnectionClass,
+            craftPlayerClass, serverConnectionClass, craftEntityClass,
+    craftItemStack, nmsItemStackClass, networkManagerClass, nettyChannelClass;
 
     private static Method getServerMethod, getCraftWorldHandleMethod, getServerConnection, getCraftPlayerHandle, getCraftEntityHandle, sendPacketMethod, asBukkitCopy;
 
     private static Field recentTPSField, entityPlayerPingField, playerConnectionField;
+    public static final Reflection.FieldAccessor<?> networkManagerFieldAccesssor, channelFieldAccessor;
 
     static {
         try {
+            nettyChannelClass = getNettyClass("channel.Channel");
             minecraftServerClass = getNMSClass("MinecraftServer");
             craftWorldsClass = getOBCClass("CraftWorld");
             craftPlayerClass = getOBCClass("entity.CraftPlayer");
@@ -40,6 +45,7 @@ public final class NMSUtils {
             craftEntityClass = getOBCClass("entity.CraftEntity");
             craftItemStack = getOBCClass("inventory.CraftItemStack");
             nmsItemStackClass = getNMSClass("ItemStack");
+            networkManagerClass = getNMSClass("NetworkManager");
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
         }
@@ -66,7 +72,8 @@ public final class NMSUtils {
             e.printStackTrace();
         }
 
-
+        networkManagerFieldAccesssor = Reflection.getField(playerConnectionClass, networkManagerClass, 0);
+        channelFieldAccessor = Reflection.getField(networkManagerClass, nettyChannelClass, 0);
     }
 
     public static Object getMinecraftServerInstance() throws InvocationTargetException, IllegalAccessException {
@@ -124,14 +131,30 @@ public final class NMSUtils {
     }
 
     public static Object getEntityPlayer(final Player player) {
-        final Object craftPlayer = getCraftPlayer(player);
         Object entityPlayer = null;
         try {
-            return getCraftPlayerHandle.invoke(craftPlayer);
+            return getCraftPlayerHandle.invoke(getCraftPlayer(player));
         } catch (IllegalAccessException | InvocationTargetException e) {
             e.printStackTrace();
         }
         return null;
+    }
+
+    public static Object getPlayerConnection(final Player player) {
+        try {
+            return playerConnectionField.get( getEntityPlayer(player));
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    public static Object getNetworkManager(final Player player) {
+        return networkManagerFieldAccesssor.get(getPlayerConnection(player));
+    }
+
+    public static Object getChannel(final Player player) {
+        return channelFieldAccessor.get(getNetworkManager(player));
     }
 
     public static int getPlayerPing(final Player player) {
