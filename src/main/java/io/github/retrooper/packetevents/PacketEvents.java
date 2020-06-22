@@ -5,7 +5,6 @@ import io.github.retrooper.packetevents.annotations.Nullable;
 import io.github.retrooper.packetevents.annotations.PacketHandler;
 import io.github.retrooper.packetevents.enums.ClientVersion;
 import io.github.retrooper.packetevents.enums.ServerVersion;
-import io.github.retrooper.packetevents.event.PacketEvent;
 import io.github.retrooper.packetevents.event.PacketListener;
 import io.github.retrooper.packetevents.event.impl.*;
 import io.github.retrooper.packetevents.event.manager.EventManager;
@@ -19,6 +18,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitTask;
 import java.lang.reflect.InvocationTargetException;
@@ -257,12 +257,6 @@ public final class PacketEvents implements PacketListener, Listener {
         }
     }
 
-    @PacketHandler
-    public void onPacket(final PacketEvent e) {
-        if (e instanceof PacketReceiveEvent) {
-            // System.out.println("RECEIVED");
-        }
-    }
 
     /**
      * Do not check the client version in or before the PlayerInjectEvent, use the PostPlayerInjectEvent.
@@ -288,9 +282,14 @@ public final class PacketEvents implements PacketListener, Listener {
     }
 
     @EventHandler
-    public void onJoin(PlayerJoinEvent e) {
+    public void onJoin(final PlayerJoinEvent e) {
         if (hasInjected(e.getPlayer())) {
             PacketEvents.getEventManager().callEvent(new PostPlayerInjectEvent(e.getPlayer()));
         }
+    }
+
+    @EventHandler
+    public void onMove(final PlayerMoveEvent e) {
+        PacketEvents.getEventManager().callEvent(new BukkitMoveEvent(e));
     }
 }
