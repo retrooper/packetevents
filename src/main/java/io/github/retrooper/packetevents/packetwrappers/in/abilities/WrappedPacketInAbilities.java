@@ -69,6 +69,15 @@ public final class WrappedPacketInAbilities extends WrappedPacket {
         return isFlying;
     }
 
+    public boolean isFlightAllowed() {
+        return allowFly;
+    }
+
+    /**
+     * Use {@link WrappedPacketInAbilities#isFlightAllowed()}
+     * @return
+     */
+    @Deprecated
     public boolean canFly() {
         return allowFly;
     }

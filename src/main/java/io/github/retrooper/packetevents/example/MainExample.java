@@ -19,4 +19,6 @@ public class MainExample extends JavaPlugin {
     public void onDisable() {
         PacketEvents.stop(); //it kicks when you call the stop() function
     }
+
+
 }
