@@ -6,7 +6,7 @@ import io.github.retrooper.packetevents.utils.NMSUtils;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 
-public final class PlayerAbilitiesUtils {
+final class PlayerAbilitiesUtils {
 
     public static Class<?> playerAbilitiesClass;
 

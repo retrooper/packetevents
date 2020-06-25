@@ -8,8 +8,7 @@ import org.bukkit.entity.Entity;
 import java.lang.reflect.Field;
 
 public final class WrappedPacketInUseEntity extends WrappedPacket {
-    private static Class<?> useEntityClass;
-    private static Class<?> entityClass;
+    private static Class<?> useEntityClass, entityClass;
     private static final Field[] fields = new Field[2];
 
     static {
