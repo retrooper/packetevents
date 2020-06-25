@@ -14,7 +14,7 @@ final class NettyPacketHandler_8 {
         final ChannelDuplexHandler channelDuplexHandler = new ChannelDuplexHandler() {
             @Override
             public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
-                Object packet = NettyPacketHandler.write(player, msg);
+                Object packet = NettyPacketHandler.read(player, msg);
                 if(packet == null) {
                     return;
                 }
@@ -23,7 +23,7 @@ final class NettyPacketHandler_8 {
 
             @Override
             public void write(ChannelHandlerContext ctx, Object msg, ChannelPromise promise) throws Exception {
-                Object packet = NettyPacketHandler.read(player, msg);
+                Object packet = NettyPacketHandler.write(player, msg);
                 if(packet == null) {
                     return;
                 }
