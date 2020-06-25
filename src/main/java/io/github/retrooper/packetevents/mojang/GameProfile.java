@@ -1,19 +1,17 @@
 package io.github.retrooper.packetevents.mojang;
 
 import com.mojang.authlib.properties.PropertyMap;
-import org.bukkit.craftbukkit.libs.org.apache.commons.lang3.StringUtils;
-import org.bukkit.craftbukkit.libs.org.apache.commons.lang3.builder.ToStringBuilder;
 
 import java.util.UUID;
 
-public class GameProfile {
+public final class GameProfile {
     private final UUID id;
     private final String name;
     private final PropertyMap properties = new PropertyMap();
     private boolean legacy;
 
     public GameProfile(UUID id, String name) {
-        if (id == null && StringUtils.isBlank(name)) {
+        if (id == null && name.isEmpty()) {
             throw new IllegalArgumentException("Name and ID cannot both be blank");
         } else {
             this.id = id;
@@ -34,10 +32,15 @@ public class GameProfile {
     }
 
     public boolean isComplete() {
-        return this.id != null && StringUtils.isNotBlank(this.getName());
+        return this.id != null && !getName().isEmpty();
     }
 
-    public boolean equalsMojangGameProfile(com.mojang.authlib.GameProfile profile) {
+
+    public boolean isLegacy() {
+        return this.legacy;
+    }
+
+    public boolean equals(com.mojang.authlib.GameProfile profile) {
         if (profile != null) {
             return profile.getId() != null && getId() != null && profile.getId() == getId()
                     && profile.getName() != null && getName() != null && profile.getName().equals(getName());
@@ -45,6 +48,7 @@ public class GameProfile {
         return false;
     }
 
+    @Override
     public boolean equals(Object o) {
         if (this == o) {
             return true;
@@ -66,17 +70,15 @@ public class GameProfile {
         }
     }
 
+    @Override
     public int hashCode() {
         int result = this.id != null ? this.id.hashCode() : 0;
         result = 31 * result + (this.name != null ? this.name.hashCode() : 0);
         return result;
     }
 
+    @Override
     public String toString() {
-        return (new ToStringBuilder(this)).append("id", this.id).append("name", this.name).append("properties", this.properties).append("legacy", this.legacy).toString();
-    }
-
-    public boolean isLegacy() {
-        return this.legacy;
+        return "id: " + id + ", name: " + name + ", legacy: " + legacy;
     }
 }

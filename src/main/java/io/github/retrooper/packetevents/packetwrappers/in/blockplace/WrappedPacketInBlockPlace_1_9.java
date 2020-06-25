@@ -7,11 +7,14 @@ import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.HashSet;
 
 final class WrappedPacketInBlockPlace_1_9 extends WrappedPacket {
-    private static Class<?> blockPlaceClass_1_9;
     private Block block;
+
+    private static Method getTargetBlockMethod;
 
     public WrappedPacketInBlockPlace_1_9(final Player player, final Object packet) {
         super(player, packet);
@@ -19,15 +22,21 @@ final class WrappedPacketInBlockPlace_1_9 extends WrappedPacket {
 
     protected static void initStatic() {
         try {
-            blockPlaceClass_1_9 = NMSUtils.getNMSClass("PacketPlayInUseItem");
-        } catch (ClassNotFoundException e) {
+            getTargetBlockMethod = Player.class.getMethod("getTargetBlock", HashSet.class, int.class);
+        } catch (NoSuchMethodException e) {
             e.printStackTrace();
         }
     }
 
     @Override
     protected void setup() {
-        this.block = getPlayer().getTargetBlock((HashSet<Material>) null, 3);
+        try {
+            this.block = (Block) getTargetBlockMethod.invoke(getPlayer(), null, 3);
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        } catch (InvocationTargetException e) {
+            e.printStackTrace();
+        }
 
     }
 
