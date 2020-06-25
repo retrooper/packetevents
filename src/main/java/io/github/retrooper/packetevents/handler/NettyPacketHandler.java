@@ -8,7 +8,7 @@ import org.bukkit.entity.Player;
 import java.util.concurrent.Future;
 
 public class NettyPacketHandler {
-    public static final String handlerName = "PacketListener";
+    public static final String handlerName = "packet_handler";
     private static final ServerVersion version = PacketEvents.getServerVersion();
 
     public static void injectPlayer(final Player player) {
