@@ -37,9 +37,9 @@ public class NettyPacketHandler {
         return null;
     }
 
-    public static Object read(final Player receiver, final Object packet) {
+    public static Object write(final Player sender, final Object packet) {
         final String packetName = packet.getClass().getSimpleName();
-        final PacketSendEvent packetSendEvent = new PacketSendEvent(receiver, packetName, packet);
+        final PacketSendEvent packetSendEvent = new PacketSendEvent(sender, packetName, packet);
         PacketEvents.getEventManager().callEvent(packetSendEvent);
         if (!packetSendEvent.isCancelled()) {
             return packet;
@@ -47,9 +47,9 @@ public class NettyPacketHandler {
         return null;
     }
 
-    public static Object write(final Player sender, final Object packet) {
+    public static Object read(final Player receiver, final Object packet) {
         final String packetName = packet.getClass().getSimpleName();
-        final PacketReceiveEvent packetReceiveEvent = new PacketReceiveEvent(sender, packetName, packet);
+        final PacketReceiveEvent packetReceiveEvent = new PacketReceiveEvent(receiver, packetName, packet);
         PacketEvents.getEventManager().callEvent(packetReceiveEvent);
         if (!packetReceiveEvent.isCancelled()) {
             return packet;
