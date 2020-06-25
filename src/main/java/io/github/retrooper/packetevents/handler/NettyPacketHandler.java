@@ -2,34 +2,32 @@ package io.github.retrooper.packetevents.handler;
 
 import io.github.retrooper.packetevents.PacketEvents;
 import io.github.retrooper.packetevents.enums.ServerVersion;
-import io.github.retrooper.packetevents.event.impl.PacketReceiveEvent;
-import io.github.retrooper.packetevents.event.impl.PacketSendEvent;
+import io.github.retrooper.packetevents.event.impl.*;
 import org.bukkit.entity.Player;
 
-import java.util.HashSet;
-import java.util.UUID;
 import java.util.concurrent.Future;
 
 public class NettyPacketHandler {
-    public static final String handlerName = "packet_handler";
+    public static final String handlerName = "PacketListener";
     private static final ServerVersion version = PacketEvents.getServerVersion();
 
-    public static final HashSet<UUID> injectedSet = new HashSet<UUID>();
-
     public static void injectPlayer(final Player player) {
-        if (!hasInjected(player)) {
+        final PlayerInjectEvent injectEvent = new PlayerInjectEvent(player);
+        PacketEvents.getEventManager().callEvent(injectEvent);
+        if (!injectEvent.isCancelled()) {
             if (version.isLowerThan(ServerVersion.v_1_8)) {
                 NettyPacketHandler_7.injectPlayer(player);
             } else {
                 NettyPacketHandler_8.injectPlayer(player);
             }
-            injectedSet.add(player.getUniqueId());
+            PacketEvents.getEventManager().callEvent(new PostPlayerInjectEvent(player));
         }
     }
 
     public static Future<?> uninjectPlayer(final Player player) {
-        if (hasInjected(player)) {
-            injectedSet.remove(player.getUniqueId());
+        final PlayerUninjectEvent uninjectEvent = new PlayerUninjectEvent(player);
+        PacketEvents.getEventManager().callEvent(uninjectEvent);
+        if (!uninjectEvent.isCancelled()) {
             if (version.isLowerThan(ServerVersion.v_1_8)) {
                 return NettyPacketHandler_7.uninjectPlayer(player);
             } else {
@@ -37,10 +35,6 @@ public class NettyPacketHandler {
             }
         }
         return null;
-    }
-
-    public static boolean hasInjected(final Player player) {
-        return injectedSet.contains(player.getUniqueId());
     }
 
     public static Object read(final Player receiver, final Object packet) {

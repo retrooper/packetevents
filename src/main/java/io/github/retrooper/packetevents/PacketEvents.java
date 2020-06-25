@@ -9,8 +9,6 @@ import io.github.retrooper.packetevents.event.PacketListener;
 import io.github.retrooper.packetevents.event.impl.*;
 import io.github.retrooper.packetevents.event.manager.EventManager;
 import io.github.retrooper.packetevents.handler.NettyPacketHandler;
-import io.github.retrooper.packetevents.packet.Packet;
-import io.github.retrooper.packetevents.packet.PacketType;
 import io.github.retrooper.packetevents.packetwrappers.Sendable;
 import io.github.retrooper.packetevents.utils.NMSUtils;
 import org.bukkit.Bukkit;
@@ -19,6 +17,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
+import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitTask;
 
@@ -193,12 +192,7 @@ public final class PacketEvents implements PacketListener, Listener {
      * @param player
      */
     public static void injectPlayer(final Player player) {
-        final PlayerInjectEvent injectEvent = new PlayerInjectEvent(player);
-        PacketEvents.getEventManager().callEvent(injectEvent);
-        if (!injectEvent.isCancelled()) {
-            PacketEvents.getEventManager().callEvent(new PostPlayerInjectEvent(player));
-            NettyPacketHandler.injectPlayer(player);
-        }
+        NettyPacketHandler.injectPlayer(player);
     }
 
     /**
@@ -207,22 +201,9 @@ public final class PacketEvents implements PacketListener, Listener {
      * @param player
      */
     public static void uninjectPlayer(final Player player) {
-        final PlayerUninjectEvent uninjectEvent = new PlayerUninjectEvent(player);
-        PacketEvents.getEventManager().callEvent(uninjectEvent);
-        if(!uninjectEvent.isCancelled()) {
-            NettyPacketHandler.uninjectPlayer(player);
-        }
+        NettyPacketHandler.uninjectPlayer(player);
     }
 
-    /**
-     * Returns whether we have injected the player
-     *
-     * @param player
-     * @return hasInjected
-     */
-    public static boolean hasInjected(final Player player) {
-        return NettyPacketHandler.hasInjected(player);
-    }
 
     /**
      * Send a wrapped sendable packet to a player
@@ -262,10 +243,12 @@ public final class PacketEvents implements PacketListener, Listener {
 
     @EventHandler
     public void onJoin(final PlayerJoinEvent e) {
-        if (!hasInjected(e.getPlayer())) {
-            injectPlayer(e.getPlayer());
+        injectPlayer(e.getPlayer());
+    }
 
-        }
+    @EventHandler
+    public void onQuit(final PlayerQuitEvent e) {
+        uninjectPlayer(e.getPlayer());
     }
 
     @EventHandler
