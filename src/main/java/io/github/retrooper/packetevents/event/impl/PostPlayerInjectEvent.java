@@ -4,7 +4,7 @@ import io.github.retrooper.packetevents.event.PacketEvent;
 import org.bukkit.entity.Player;
 
 /**
- * It is now safe to use PlayerInjectEvent
+ * Please use {@link PlayerInjectEvent}
  */
 @Deprecated
 public final class PostPlayerInjectEvent extends PacketEvent {

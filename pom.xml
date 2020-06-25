@@ -6,7 +6,7 @@
 
     <groupId>io.github.retrooper</groupId>
     <artifactId>packetevents</artifactId>
-    <version>1.3.4.1</version>
+    <version>1.3.5</version>
     <packaging>jar</packaging>
     <name>packetevents</name>
     <properties>
@@ -55,6 +55,10 @@
         <repository>
             <id>funkemunky-releases</id>
             <url>https://nexus.funkemunky.cc/content/repositories/releases/</url>
+        </repository>
+        <repository>
+            <id>viaversion-repo</id>
+            <url>https://repo.viaversion.com</url>
         </repository>
     </repositories>
 
@@ -179,6 +183,18 @@
             <artifactId>1.14</artifactId>
             <version>1.14</version>
             <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>us.myles</groupId>
+            <artifactId>viaversion</artifactId>
+            <version>3.0.1</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.github.ProtocolSupport</groupId>
+            <artifactId>ProtocolSupport</artifactId>
+            <version>4fdd683</version>
         </dependency>
     </dependencies>
 </project>

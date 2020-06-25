@@ -11,10 +11,10 @@ import java.util.UUID;
 import java.util.concurrent.Future;
 
 public class NettyPacketHandler {
-    public static final String handlerName = "PacketEventsListener";
+    public static final String handlerName = "packet_handler";
     private static final ServerVersion version = PacketEvents.getServerVersion();
 
-    public static final HashSet<UUID> injectedList = new HashSet<UUID>();
+    public static final HashSet<UUID> injectedSet = new HashSet<UUID>();
 
     public static void injectPlayer(final Player player) {
         if (!hasInjected(player)) {
@@ -23,13 +23,13 @@ public class NettyPacketHandler {
             } else {
                 NettyPacketHandler_8.injectPlayer(player);
             }
-            injectedList.add(player.getUniqueId());
+            injectedSet.add(player.getUniqueId());
         }
     }
 
     public static Future<?> uninjectPlayer(final Player player) {
         if (hasInjected(player)) {
-            injectedList.remove(player.getUniqueId());
+            injectedSet.remove(player.getUniqueId());
             if (version.isLowerThan(ServerVersion.v_1_8)) {
                 return NettyPacketHandler_7.uninjectPlayer(player);
             } else {
@@ -40,7 +40,7 @@ public class NettyPacketHandler {
     }
 
     public static boolean hasInjected(final Player player) {
-        return injectedList.contains(player.getUniqueId());
+        return injectedSet.contains(player.getUniqueId());
     }
 
     public static Object read(final Player receiver, final Object packet) {

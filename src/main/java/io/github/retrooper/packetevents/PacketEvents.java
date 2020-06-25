@@ -10,6 +10,7 @@ import io.github.retrooper.packetevents.event.impl.*;
 import io.github.retrooper.packetevents.event.manager.EventManager;
 import io.github.retrooper.packetevents.handler.NettyPacketHandler;
 import io.github.retrooper.packetevents.packet.Packet;
+import io.github.retrooper.packetevents.packet.PacketType;
 import io.github.retrooper.packetevents.packetwrappers.Sendable;
 import io.github.retrooper.packetevents.utils.NMSUtils;
 import org.bukkit.Bukkit;
@@ -23,6 +24,7 @@ import org.bukkit.scheduler.BukkitTask;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
+import java.util.UUID;
 
 public final class PacketEvents implements PacketListener, Listener {
 
@@ -32,7 +34,8 @@ public final class PacketEvents implements PacketListener, Listener {
     private static PacketEvents instance;
     private static int currentTick;
     private static BukkitTask serverTickTask;
-    private static boolean kickOnRestart;
+
+    private static final HashMap<UUID, ClientVersion> clientVersionsMap = new HashMap<UUID, ClientVersion>();
 
     public static EventManager getEventManager() {
         return eventManager;
@@ -55,7 +58,7 @@ public final class PacketEvents implements PacketListener, Listener {
             final Runnable tickRunnable = new Runnable() {
                 @Override
                 public void run() {
-                    getEventManager().callEvent(new ServerTickEvent(currentTick++, highlyPreciseMillis()));
+                    getEventManager().callEvent(new ServerTickEvent(currentTick++, PacketEvents.highlyPreciseMillis()));
                 }
             };
             serverTickTask = Bukkit.getScheduler().runTaskTimerAsynchronously(plugin, tickRunnable, 0L, 1L);
@@ -71,13 +74,6 @@ public final class PacketEvents implements PacketListener, Listener {
             serverTickTask.cancel();
         }
         getEventManager().unregisterAllListeners();
-        if (shouldKickOnStop()) {
-            for (final Player p : Bukkit.getOnlinePlayers()) {
-                if (p != null) {
-                    p.kickPlayer("Please wait till the server finishes reloading/restarting.");
-                }
-            }
-        }
     }
 
     /**
@@ -163,8 +159,9 @@ public final class PacketEvents implements PacketListener, Listener {
         return System.nanoTime() / 1000000;
     }
 
+
     /**
-     * This is deprecated, use {@link #highlyPreciseMillis()} as they do the same thing, this is basically just a method rename.
+     * This is deprecated, use {@link #highlyPreciseMillis()} as they do the same thing, I just renamed the method.
      */
     @Deprecated
     public static long currentCalculatedMS() {
@@ -177,22 +174,17 @@ public final class PacketEvents implements PacketListener, Listener {
      * Do not call this method in the PlayerInjectEvent, it is safe to call it in the PostPlayerInjectEvent.
      * The EntityPlayer object is null at that time, resulting in the version lookup to fail.
      *
-     * / / @param player
+     * @param player
      * @return ClientVersion
+     */
 
     @Nullable
     public static ClientVersion getClientVersion(@NotNull final Player player) {
-        final Object channel = TinyProtocolHandler.getPlayerChannel(player);
-        return clientVersionLookup.get(channel);
-    }
-*/
-
-    public static boolean shouldKickOnStop() {
-        return kickOnRestart;
+        return getClientVersion(player.getUniqueId());
     }
 
-    public static void setShouldKickOnRestart(final boolean val) {
-        kickOnRestart = val;
+    public static ClientVersion getClientVersion(@NotNull final UUID uuid) {
+        return clientVersionsMap.get(uuid);
     }
 
     /**
@@ -201,7 +193,12 @@ public final class PacketEvents implements PacketListener, Listener {
      * @param player
      */
     public static void injectPlayer(final Player player) {
-        NettyPacketHandler.injectPlayer(player);
+        final PlayerInjectEvent injectEvent = new PlayerInjectEvent(player);
+        PacketEvents.getEventManager().callEvent(injectEvent);
+        if (!injectEvent.isCancelled()) {
+            PacketEvents.getEventManager().callEvent(new PostPlayerInjectEvent(player));
+            NettyPacketHandler.injectPlayer(player);
+        }
     }
 
     /**
@@ -210,7 +207,11 @@ public final class PacketEvents implements PacketListener, Listener {
      * @param player
      */
     public static void uninjectPlayer(final Player player) {
-        NettyPacketHandler.uninjectPlayer(player);
+        final PlayerUninjectEvent uninjectEvent = new PlayerUninjectEvent(player);
+        PacketEvents.getEventManager().callEvent(uninjectEvent);
+        if(!uninjectEvent.isCancelled()) {
+            NettyPacketHandler.uninjectPlayer(player);
+        }
     }
 
     /**
@@ -242,11 +243,15 @@ public final class PacketEvents implements PacketListener, Listener {
      */
     @PacketHandler
     public void onInject(final PlayerInjectEvent e) {
-        final String username = e.getPlayer().getName();
+        clientVersionsMap.put(e.getPlayer().getUniqueId(), e.getClientVersion());
+    }
+
+    @PacketHandler
+    public void onReceive(final PacketReceiveEvent e) {
     }
 
     /**
-     * Called after the PlayerJoinEvent ONLY if the player has been injected!
+     * Deprecated, please do not use this anymore
      *
      * @param e
      */
@@ -258,13 +263,7 @@ public final class PacketEvents implements PacketListener, Listener {
     @EventHandler
     public void onJoin(final PlayerJoinEvent e) {
         if (!hasInjected(e.getPlayer())) {
-
-            PlayerInjectEvent injectEvent = new PlayerInjectEvent(e.getPlayer());
-            PacketEvents.getEventManager().callEvent(injectEvent);
-            if(!injectEvent.isCancelled()) {
-                injectPlayer(e.getPlayer());
-                PacketEvents.getEventManager().callEvent(new PostPlayerInjectEvent(e.getPlayer()));
-            }
+            injectPlayer(e.getPlayer());
 
         }
     }

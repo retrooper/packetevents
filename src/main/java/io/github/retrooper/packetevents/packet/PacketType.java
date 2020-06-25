@@ -3,60 +3,91 @@ package io.github.retrooper.packetevents.packet;
 import io.github.retrooper.packetevents.enums.ServerVersion;
 import io.github.retrooper.packetevents.utils.NMSUtils;
 
-@Deprecated
-public final class Packet {
+public final class PacketType {
 
-    private static Class<?> packetPlayInFlying, packetPlayInPosition, packetPlayInPositionLook, packetPlayInLook;
 
-    static {
-        try {
-            packetPlayInFlying = NMSUtils.getNMSClass(Client.FLYING);
-        } catch (ClassNotFoundException e) {
-            //That is fine, they are on 1.9+
+    public static final class Util {
+        /**
+         * Is this NMS packet an instance of the "PacketPlayInFlying" packet?
+         * Supports 1.9->1.15.2 too!
+         *
+         * @param nmsPacket
+         * @return If the nms packet provided is an instanceof the "PacketPlayInFlying" packet in the 1.8 protocol!
+         */
+        public static boolean isInstanceOfFlyingPacket(final Object nmsPacket) {
+            //1.7->1.8.8
+            if (packetPlayInFlying != null) {
+                return packetPlayInFlying.isInstance(nmsPacket);
+            } else {
+                //1.9->1.15.2
+                return isInstanceOfPositionOrPositionLook(nmsPacket) || isInstanceOfPositionLookPacket(nmsPacket);
+            }
         }
-        try {
-            packetPlayInPosition = NMSUtils.getNMSClass(Client.POSITION);
-            packetPlayInPositionLook = NMSUtils.getNMSClass(Client.POSITION_LOOK);
-            packetPlayInLook = NMSUtils.getNMSClass(Client.LOOK);
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
+
+        /**
+         * Is this NMS packet an instance of the "PacketPlayInPosition" packet?
+         *
+         * @param nmsPacket
+         * @return nmsPacket instanceof PacketPlayInPosition
+         */
+        public static boolean isInstanceOfPositionPacket(final Object nmsPacket) {
+            return packetPlayInPosition.isInstance(nmsPacket);
+        }
+
+        /**
+         * Is this NMS packet an instance of the "PacketPlayInPositionLook" packet?
+         *
+         * @param nmsPacket
+         * @return nmsPacket instanceof PacketPlayInPositionLook
+         */
+        public static boolean isInstanceOfPositionLookPacket(final Object nmsPacket) {
+            return packetPlayInPositionLook.isInstance(nmsPacket);
+        }
+
+        /**
+         * Is this NMS Packet an instanceof the "PacketPlayInPosition" or "PacketPlayInPositionLook"
+         *
+         * @param nmsPacket
+         * @return nmsPacket instanceof PacketPlayInPosition || nmsPacket instanceof PacketPlayInPositionLook
+         */
+        public static boolean isInstanceOfPositionOrPositionLook(final Object nmsPacket) {
+            return isInstanceOfPositionPacket(nmsPacket) || isInstanceOfPositionLookPacket(nmsPacket);
+        }
+
+        /**
+         * Is this NMS Packet an instance of the "PacketPlayInLook" packet?
+         *
+         * @param nmsPacket
+         * @return nmsPacket instanceof PacketPlayInLook
+         */
+        public static boolean isInstanceOfLook(final Object nmsPacket) {
+            return packetPlayInLook.isInstance(nmsPacket);
+        }
+
+        public static boolean isInstanceOfUseEntity(final Object nmsPacket) {
+            return packetPlayInUseEntity.isInstance(nmsPacket);
+        }
+
+        private static Class<?> packetPlayInFlying, packetPlayInPosition, packetPlayInPositionLook, packetPlayInLook, packetPlayInUseEntity;
+
+        static {
+            try {
+                packetPlayInFlying = NMSUtils.getNMSClass(Client.FLYING);
+            } catch (ClassNotFoundException e) {
+                //That is fine, they are on 1.9+
+            }
+            try {
+                packetPlayInPosition = NMSUtils.getNMSClass(Client.POSITION);
+                packetPlayInPositionLook = NMSUtils.getNMSClass(Client.POSITION_LOOK);
+                packetPlayInLook = NMSUtils.getNMSClass(Client.LOOK);
+                packetPlayInUseEntity = NMSUtils.getNMSClass(Client.USE_ENTITY);
+            } catch (ClassNotFoundException e) {
+                e.printStackTrace();
+            }
         }
     }
 
-    /**
-     * Is this NMS packet an instanceof the "PacketPlayInFlying" packet in the 1.8 protocol?
-     * Supports 1.9->1.15.2 too!
-     *
-     * @param nmsPacket
-     * @return If the nms packet provided is an instanceof the "PacketPlayInFlying" packet in the 1.8 protocol!
-     */
-    public static boolean isInstanceOfFlyingPacket(Object nmsPacket) {
-        //1.7->1.8.8
-        if (packetPlayInFlying != null) {
-            return packetPlayInFlying.isInstance(nmsPacket);
-        } else {
-            //1.9->1.15.2
-            return packetPlayInPosition.isInstance(nmsPacket)
-                    || packetPlayInPositionLook.isInstance(nmsPacket)
-                    || packetPlayInLook.isInstance(nmsPacket);
-        }
-    }
-
-    /**
-     * Is this NMS Packet an instanceof the "PacketPlayInPosition" or "PacketPlayInPositionLook"
-     * @param nmsPacket
-     * @return
-     */
-    public static boolean isInstanceOfPositionOrPositionLook(final Object nmsPacket) {
-        return packetPlayInPosition.isInstance(nmsPacket) || packetPlayInPositionLook.isInstance(nmsPacket);
-    }
-
-    public static boolean isInstanceOfLook(final Object nmsPacket) {
-        return packetPlayInLook.isInstance(nmsPacket);
-    }
-
-
-    public static class Client {
+    public static final class Client {
         private static final String c = "PacketPlayIn";
 
         @Deprecated
@@ -94,7 +125,7 @@ public final class Packet {
 
     }
 
-    public static class Server {
+    public static final class Server {
         private static final String s = "PacketPlayOut";
 
         public static final String ANIMATION = s + "Animation";
@@ -123,15 +154,13 @@ public final class Packet {
         public static final String SERVER_DIFFICULTY = s + "ServerDifficulty";
     }
 
-    public static class Login {
+    public static final class Login {
         public static final String HANDSHAKE = "PacketHandshakingInSetProtocol";
         public static final String PING = "PacketStatusInPing";
         public static final String START = "PacketStatusInStart";
         public static final String SUCCESS = "PacketLoginOutSuccess";
         public static final String ENCRYPTION_BEGIN_IN = "PacketLoginInEncryptionBegin";
         public static final String ENCRYPTION_BEGIN_OUT = "PacketLoginOutEncryptionBegin";
-
-        public static final String[] LOGIN_PACKETS = new String[]{"PacketHandshakingInSetProtocol", "PacketLoginInStart", "PacketLoginInEncryptionBegin"};
     }
 
 }
