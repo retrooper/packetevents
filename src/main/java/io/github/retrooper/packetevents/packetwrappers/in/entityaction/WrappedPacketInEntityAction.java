@@ -12,9 +12,6 @@ public final class WrappedPacketInEntityAction extends WrappedPacket {
     private static Class<?> entityActionClass;
     @Nullable
     private static Class<?> enumPlayerActionClass;
-    @Nullable
-    private static Object[] enumPlayerActionConstants;
-
     static {
         try {
             entityActionClass = NMSUtils.getNMSClass("PacketPlayInEntityAction");
@@ -25,7 +22,10 @@ public final class WrappedPacketInEntityAction extends WrappedPacket {
                         break;
                     }
                 }
-            }
+            } 
+            else {
+               enumPlayerActionClass = NMSUtils.getNMSClass("EnumPlayerAction");
+            } 
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
         }
@@ -59,23 +59,16 @@ public final class WrappedPacketInEntityAction extends WrappedPacket {
                 animationIndex = Reflection.getField(entityActionClass, int.class, 1).getInt(packet);
             } else {
                 final Object enumObj = Reflection.getField(entityActionClass, enumPlayerActionClass, 0).get(packet);
-
-                final Object[] enumValues = enumPlayerActionConstants;
-                final int len = enumValues.length;
-                for (int i = 0; i < len; i++) {
-                    final Object val = enumValues[i];
-                    if (val.toString().equals(enumObj.toString())) {
-                        animationIndex = i;
-                        break;
-                    }
-                }
+                 
+                this.action = PlayerAction.valueOf(enumObj.toString());
             }
 
 
             this.entityId = entityId;
             this.jumpBoost = jumpBoost;
-            this.action = PlayerAction.get(animationIndex);
-
+            if(animationIndex != -1) {
+                this.action = PlayerAction.get(animationIndex);
+            }
             this.entity = NMSUtils.getEntityById(this.entityId);
         } catch (IllegalAccessException e) {
             e.printStackTrace();
