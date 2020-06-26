@@ -146,7 +146,7 @@ public final class PacketEvents implements PacketListener, Listener {
     }
 
     /**
-     * When to use this(nano / 1 million) over {@link System#currentTimeMillis()}
+     * When to use this(nano / 1 million) vs {@link System#currentTimeMillis()}
      * This is preciser than System.currentTimeMillis(), System.currentTimeMillis() can be up to 50ms off on some operating systems, but using this isn't cheap.
      * Java documentation recommend using nano time if you are measuring elapsed time.
      * In this function nanoTime is divided by 1 million giving us milliseconds.

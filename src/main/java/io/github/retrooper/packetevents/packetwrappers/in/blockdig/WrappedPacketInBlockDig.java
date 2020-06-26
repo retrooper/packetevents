@@ -1,7 +1,7 @@
 package io.github.retrooper.packetevents.packetwrappers.in.blockdig;
 
 import io.github.retrooper.packetevents.enums.Direction;
-import io.github.retrooper.packetevents.enums.PlayerDigType;
+import io.github.retrooper.packetevents.enums.minecraft.PlayerDigType;
 import io.github.retrooper.packetevents.enums.ServerVersion;
 import io.github.retrooper.packetevents.packetwrappers.api.WrappedPacket;
 import io.github.retrooper.packetevents.reflectionutils.Reflection;

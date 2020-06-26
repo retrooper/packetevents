@@ -1,26 +1,54 @@
 package io.github.retrooper.packetevents.enums;
 
-import org.apache.commons.lang.ArrayUtils;
 import org.bukkit.Bukkit;
 
-
+/**
+ * @author retrooper
+ */
 public enum ServerVersion {
-    v_1_7_10, v_1_8, v_1_8_3, v_1_8_8, v_1_9, v_1_9_4, v_1_10, v_1_11, v_1_12, v_1_13, v_1_13_2, v_1_14, v_1_15, v_1_16,
-    ERROR;
+    v_1_7_10, v_1_8, v_1_8_3, v_1_8_8, v_1_9, v_1_9_4, v_1_10, v_1_11, v_1_12, v_1_13, v_1_13_2, v_1_14, v_1_15, v_1_16_1,
+    ERROR, EMPTY;
 
+    private static final ServerVersion[] reversedValues;
+
+    static {
+        reversedValues = reverse(values());
+    }
 
     private static final String nmsVersionSuffix = Bukkit.getServer().getClass().getPackage().getName().replace(".", ",").split(",")[3];
 
+    private static ServerVersion cachedVersion = ServerVersion.EMPTY;
+
     public static ServerVersion getVersion() {
-        ServerVersion[] vals = values();
-        ArrayUtils.reverse(vals);
-        for (ServerVersion val : vals) {
+        if(cachedVersion != ServerVersion.EMPTY) {
+            return cachedVersion;
+        }
+        for (final ServerVersion val : reversedValues) {
             String valName = val.name().substring(2).replace("_", ".");
             if (Bukkit.getBukkitVersion().contains(valName)) {
+                cachedVersion = val;
                 return val;
             }
         }
         return ERROR;
+    }
+
+    private static ServerVersion[] reverse(final ServerVersion[] arr) {
+        ServerVersion[] array = arr.clone();
+        if (array == null) {
+            return null;
+        }
+        int i = 0;
+        int j = array.length - 1;
+        ServerVersion tmp;
+        while (j > i) {
+            tmp = array[j];
+            array[j] = array[i];
+            array[i] = tmp;
+            j--;
+            i++;
+        }
+        return array;
     }
 
     public static String getNmsSuffix() {
@@ -67,4 +95,3 @@ public enum ServerVersion {
     }
 
 }
-

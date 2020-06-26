@@ -1,6 +1,6 @@
 package io.github.retrooper.packetevents.packetwrappers.out.animation;
 
-import io.github.retrooper.packetevents.enums.EntityAnimationType;
+import io.github.retrooper.packetevents.enums.minecraft.EntityAnimationType;
 import io.github.retrooper.packetevents.packetwrappers.Sendable;
 import io.github.retrooper.packetevents.packetwrappers.api.WrappedPacket;
 import io.github.retrooper.packetevents.utils.NMSUtils;

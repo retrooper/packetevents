@@ -1,6 +1,6 @@
 package io.github.retrooper.packetevents.packetwrappers.in.useentity;
 
-import io.github.retrooper.packetevents.enums.EntityUseAction;
+import io.github.retrooper.packetevents.enums.minecraft.EntityUseAction;
 import io.github.retrooper.packetevents.packetwrappers.api.WrappedPacket;
 import io.github.retrooper.packetevents.utils.NMSUtils;
 import org.bukkit.entity.Entity;

@@ -1,4 +1,4 @@
-package io.github.retrooper.packetevents.enums;
+package io.github.retrooper.packetevents.enums.minecraft;
 
 public enum PlayerDigType {
 
