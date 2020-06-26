@@ -44,7 +44,13 @@ public final class WrappedPacketInEntityAction extends WrappedPacket {
     protected void setup() {
         try {
             final int entityId = Reflection.getField(entityActionClass, int.class, 0).getInt(packet);
-            final int jumpBoost = Reflection.getField(entityActionClass, int.class, 2).getInt(packet);
+            final int jumpBoost;
+            if(version.isLowerThan(ServerVersion.v_1_8)) {
+                jumpBoost = Reflection.getField(entityActionClass, int.class, 2).getInt(packet)
+            }
+            else {
+                jumpBoost = Reflection.getField(entityActionClass, int.class, 1).getInt(packet)
+            }
 
             int animationIndex = -1;
 
@@ -52,7 +58,7 @@ public final class WrappedPacketInEntityAction extends WrappedPacket {
             if (version.isLowerThan(ServerVersion.v_1_8)) {
                 animationIndex = Reflection.getField(entityActionClass, int.class, 1).getInt(packet);
             } else {
-                final Object enumObj = Reflection.getField(entityActionClass, enumPlayerActionClass, 0);
+                final Object enumObj = Reflection.getField(entityActionClass, enumPlayerActionClass, 0).get(packet);
 
                 final Object[] enumValues = enumPlayerActionConstants;
                 final int len = enumValues.length;
