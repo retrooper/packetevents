@@ -1,39 +1,32 @@
 package io.github.retrooper.packetevents.packetwrappers.out.chat;
 
-import io.github.retrooper.packetevents.enums.ServerVersion;
 import io.github.retrooper.packetevents.packetwrappers.Sendable;
 import io.github.retrooper.packetevents.packetwrappers.api.WrappedPacket;
+import io.github.retrooper.packetevents.reflectionutils.Reflection;
 import io.github.retrooper.packetevents.utils.NMSUtils;
 
 import java.lang.reflect.Constructor;
-import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 
 public final class WrappedPacketOutChat extends WrappedPacket implements Sendable {
     private static Constructor<?> chatClassConstructor;
     private static Class<?> chatClass, iChatBaseComponentClass, chatSerializerClass;
-    private static Field iChatBaseField;
-    private static Method serialize, getStringOfIChatBase;
 
     static {
         try {
             chatClass = NMSUtils.getNMSClass("PacketPlayOutChat");
             iChatBaseComponentClass = NMSUtils.getNMSClass("IChatBaseComponent");
-
-            //In 1.8.3+ the ChatSerializer class is declared in the IChatBaseComponent class, so we have to handle tahat
-            if (version.isHigherThan(ServerVersion.v_1_8)) {
-                for (final Class<?> cls : iChatBaseComponentClass.getDeclaredClasses()) {
-                    if (cls.getSimpleName().equals("ChatSerializer")) {
-                        chatSerializerClass = cls;
-                        break;
-                    }
-                }
-            } else {
-                chatSerializerClass = NMSUtils.getNMSClass("ChatSerializer");
-            }
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
+        }
+
+        //In 1.8.3+ the ChatSerializer class is declared in the IChatBaseComponent class, so we have to handle that
+        try {
+            chatSerializerClass = NMSUtils.getNMSClass("ChatSerializer");
+        }
+        catch(ClassNotFoundException e) {
+            //That is fine, it is probably a subclass
+            chatSerializerClass = Reflection.getSubClass(iChatBaseComponentClass, "ChatSerializer");
         }
 
         try {
@@ -42,19 +35,6 @@ public final class WrappedPacketOutChat extends WrappedPacket implements Sendabl
             e.printStackTrace();
         }
 
-        try {
-            serialize = chatSerializerClass.getMethod("a", String.class);
-            getStringOfIChatBase = iChatBaseComponentClass.getMethod(getTextMethodName());
-        } catch (NoSuchMethodException e) {
-            e.printStackTrace();
-        }
-
-        try {
-            iChatBaseField = chatClass.getDeclaredField("a");
-        } catch (NoSuchFieldException e) {
-            e.printStackTrace();
-        }
-        iChatBaseField.setAccessible(true);
 
     }
 
@@ -71,7 +51,7 @@ public final class WrappedPacketOutChat extends WrappedPacket implements Sendabl
 
     public static String toStringFromIChatBaseComponent(Object obj) {
         try {
-            return getStringOfIChatBase.invoke(obj).toString();
+            return Reflection.getMethod(iChatBaseComponentClass, String.class, 0).invoke(obj).toString();
         } catch (IllegalAccessException | InvocationTargetException e) {
             e.printStackTrace();
         }
@@ -80,30 +60,20 @@ public final class WrappedPacketOutChat extends WrappedPacket implements Sendabl
 
     public static Object toIChatBaseComponent(String msg) {
         try {
-            return serialize.invoke(null, msg);
+            return Reflection.getMethod(chatSerializerClass, 0, String.class).invoke(null, msg);
         } catch (IllegalAccessException | InvocationTargetException e) {
             e.printStackTrace();
         }
         return null;
     }
 
-    private static String getTextMethodName() {
-        //1.7.10
-        if (version.isLowerThan(ServerVersion.v_1_8)) {
-            return "e"; //or c
-        } else {
-            return "getText";
-        }
-    }
 
     @Override
     protected void setup() {
-        //all fields are IChatBaseComponents, and named 'a'
-
         try {
-            Object iChatBaseObj = iChatBaseField.get(packet);
+            final Object iChatBaseObj = Reflection.getField(chatClass, iChatBaseComponentClass, 0).get(packet);
 
-            Object contentString = getStringOfIChatBase.invoke(iChatBaseObj);
+            final Object contentString = Reflection.getMethod(iChatBaseComponentClass, String.class, 0).invoke(iChatBaseObj);
 
             this.message = contentString.toString();
         } catch (IllegalAccessException | InvocationTargetException e) {

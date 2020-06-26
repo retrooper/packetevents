@@ -9,12 +9,9 @@ import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 public final class EventManager {
 
-    private static final ExecutorService executorService = Executors.newCachedThreadPool();
     private final HashMap<PacketListener, List<Method>> registeredMethods = new HashMap<PacketListener, List<Method>>();
 
     public void callEvent(final PacketEvent e) {
@@ -36,9 +33,6 @@ public final class EventManager {
     }
 
     public void registerListener(final PacketListener e) {
-        if (registeredMethods.containsKey(e)) {
-            return;
-        }
         final List<Method> methods = new ArrayList<Method>();
         for (final Method m : e.getClass().getMethods()) {
             if (m.isAnnotationPresent(PacketHandler.class)

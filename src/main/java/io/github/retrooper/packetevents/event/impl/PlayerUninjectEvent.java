@@ -11,16 +11,16 @@ public final class PlayerUninjectEvent extends PacketEvent {
         this.player = player;
     }
 
-    public void setCancelled(final boolean val) {
-        this.cancelled = val;
-    }
-
     public void cancel() {
         setCancelled(true);
     }
 
     public boolean isCancelled() {
         return this.cancelled;
+    }
+
+    public void setCancelled(final boolean val) {
+        this.cancelled = val;
     }
 
     public Player getPlayer() {

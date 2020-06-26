@@ -1,15 +1,12 @@
 package io.github.retrooper.packetevents.packetwrappers.in.flying;
 
 
-import io.github.retrooper.packetevents.enums.ServerVersion;
 import io.github.retrooper.packetevents.packetwrappers.api.WrappedPacket;
+import io.github.retrooper.packetevents.reflectionutils.Reflection;
 import io.github.retrooper.packetevents.utils.NMSUtils;
-
-import java.lang.reflect.Field;
 
 public class WrappedPacketInFlying extends WrappedPacket {
     private static Class<?> flyingClass;
-    private static final Field[] fields = new Field[8]; //x, y, z, yaw pitch, onGround, isPositionPacket, isLookPacket
 
     static {
 
@@ -17,26 +14,6 @@ public class WrappedPacketInFlying extends WrappedPacket {
             flyingClass = NMSUtils.getNMSClass("PacketPlayInFlying");
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
-        }
-
-
-        try {
-            fields[0] = flyingClass.getDeclaredField("x");
-            fields[1] = flyingClass.getDeclaredField("y");
-            fields[2] = flyingClass.getDeclaredField("z");
-            fields[3] = flyingClass.getDeclaredField("yaw");
-            fields[4] = flyingClass.getDeclaredField("pitch");
-            fields[5] = flyingClass.getDeclaredField(getOnGroundFieldName());
-            fields[6] = flyingClass.getDeclaredField("hasPos");
-            fields[7] = flyingClass.getDeclaredField("hasLook");
-        } catch (NoSuchFieldException e) {
-            e.printStackTrace();
-        }
-
-        for (Field f : fields) {
-            if (f != null) {
-                f.setAccessible(true);
-            }
         }
     }
 
@@ -53,27 +30,21 @@ public class WrappedPacketInFlying extends WrappedPacket {
         super(packet);
     }
 
-    private static String getOnGroundFieldName() {
-        if (version == ServerVersion.v_1_7_10) {
-            return "g";
-        }
-        return "f";
-    }
-
     @Override
     protected void setup() {
         try {
-            this.x = fields[0].getDouble(packet);
-            this.y = fields[1].getDouble(packet);
-            this.z = fields[2].getDouble(packet);
+            //x, y, z, yaw pitch, onGround, isPosition, isLook
+            this.x = Reflection.getField(flyingClass, double.class, 0).getDouble(packet);
+            this.y = Reflection.getField(flyingClass, double.class, 1).getDouble(packet);
+            this.z = Reflection.getField(flyingClass, double.class, 2).getDouble(packet);
 
-            this.yaw = fields[3].getFloat(packet);
-            this.pitch = fields[4].getFloat(packet);
+            this.yaw = Reflection.getField(flyingClass, float.class, 0).getFloat(packet);
+            this.pitch = Reflection.getField(flyingClass, float.class, 1).getFloat(packet);
 
-            this.onGround = fields[5].getBoolean(packet);
+            this.onGround = Reflection.getField(flyingClass, boolean.class, 0).getBoolean(packet);
 
-            this.isPosition = fields[6].getBoolean(packet);
-            this.isLook = fields[7].getBoolean(packet);
+            this.isPosition = Reflection.getField(flyingClass, boolean.class, 1).getBoolean(packet);
+            this.isLook = Reflection.getField(flyingClass, boolean.class, 2).getBoolean(packet);
         } catch (IllegalAccessException e) {
             e.printStackTrace();
         }
@@ -118,11 +89,21 @@ public class WrappedPacketInFlying extends WrappedPacket {
 
         @Override
         public boolean isPosition() {
+            try {
+                return Reflection.getField(flyingClass, boolean.class, 1).getBoolean(packet);
+            } catch (IllegalAccessException e) {
+                e.printStackTrace();
+            }
             return true;
         }
 
         @Override
         public boolean isLook() {
+            try {
+                return Reflection.getField(flyingClass, boolean.class, 2).getBoolean(packet);
+            } catch (IllegalAccessException e) {
+                e.printStackTrace();
+            }
             return false;
         }
     }
@@ -133,13 +114,49 @@ public class WrappedPacketInFlying extends WrappedPacket {
         }
 
         @Override
-        public boolean isLook() {
+        public boolean isPosition() {
+            try {
+                return Reflection.getField(flyingClass, boolean.class, 1).getBoolean(packet);
+            } catch (IllegalAccessException e) {
+                e.printStackTrace();
+            }
             return true;
         }
 
         @Override
+        public boolean isLook() {
+            try {
+                return Reflection.getField(flyingClass, boolean.class, 2).getBoolean(packet);
+            } catch (IllegalAccessException e) {
+                e.printStackTrace();
+            }
+            return true;
+        }
+    }
+
+    public static class WrappedPacketInLook extends WrappedPacketInFlying {
+
+        public WrappedPacketInLook(Object packet) {
+            super(packet);
+        }
+        @Override
         public boolean isPosition() {
+            try {
+                return Reflection.getField(flyingClass, boolean.class, 1).getBoolean(packet);
+            } catch (IllegalAccessException e) {
+                e.printStackTrace();
+            }
             return false;
+        }
+
+        @Override
+        public boolean isLook() {
+            try {
+                return Reflection.getField(flyingClass, boolean.class, 2).getBoolean(packet);
+            } catch (IllegalAccessException e) {
+                e.printStackTrace();
+            }
+            return true;
         }
     }
 

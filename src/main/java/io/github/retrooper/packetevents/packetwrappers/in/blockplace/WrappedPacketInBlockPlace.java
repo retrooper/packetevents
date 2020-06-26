@@ -9,6 +9,12 @@ import org.bukkit.inventory.ItemStack;
 
 
 public final class WrappedPacketInBlockPlace extends WrappedPacket {
+    static {
+        if (version.isHigherThan(ServerVersion.v_1_7_10)) {
+            WrappedPacketInBlockPlace_1_8.initStatic();
+        }
+    }
+
     private Vector3i blockPosition;
     private ItemStack itemStack;
 
@@ -27,12 +33,11 @@ public final class WrappedPacketInBlockPlace extends WrappedPacket {
                 final Block block = blockPlace_1_9.getBlock();
                 position = new Vector3i(block.getX(), block.getY(), block.getZ());
                 itemStack = new ItemStack(block.getType());
-            } else if(version.isHigherThan(ServerVersion.v_1_7_10)){
+            } else if (version.isHigherThan(ServerVersion.v_1_7_10)) {
                 final WrappedPacketInBlockPlace_1_8 blockPlace_1_8 = new WrappedPacketInBlockPlace_1_8(packet);
                 position = blockPlace_1_8.getBlockPosition();
                 itemStack = blockPlace_1_8.getItemStack();
-            }
-            else {
+            } else {
                 final WrappedPacketInBlockPlace_1_7_10 blockPlace_1_7_10 = new WrappedPacketInBlockPlace_1_7_10(getPlayer(), packet);
                 position = blockPlace_1_7_10.getBlockPosition();
                 this.itemStack = blockPlace_1_7_10.getItemStack();
@@ -54,14 +59,6 @@ public final class WrappedPacketInBlockPlace extends WrappedPacket {
 
     public ItemStack getItemStack() {
         return itemStack;
-    }
-
-    static {
-        if (version.isHigherThan(ServerVersion.v_1_8_8)) {
-            WrappedPacketInBlockPlace_1_9.initStatic();
-        } else if (version.isHigherThan(ServerVersion.v_1_7_10)) {
-            WrappedPacketInBlockPlace_1_8.initStatic();
-        }
     }
 
 }

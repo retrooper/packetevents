@@ -90,7 +90,7 @@ public enum ClientVersion {
      */
     public boolean isLowerThan(final ClientVersion version) {
         if (version == this) return false;
-        byte len = (byte) values().length;
+        final int len = values().length;
         for (byte i = 0; i < len; i++) {
             final ClientVersion v = values()[i];
             if (v == this) {

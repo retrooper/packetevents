@@ -3,17 +3,16 @@ package io.github.retrooper.packetevents.packetwrappers.out.animation;
 import io.github.retrooper.packetevents.enums.minecraft.EntityAnimationType;
 import io.github.retrooper.packetevents.packetwrappers.Sendable;
 import io.github.retrooper.packetevents.packetwrappers.api.WrappedPacket;
+import io.github.retrooper.packetevents.reflectionutils.Reflection;
 import io.github.retrooper.packetevents.utils.NMSUtils;
 import org.bukkit.entity.Entity;
 
 import java.lang.reflect.Constructor;
-import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 
 public final class WrappedPacketOutAnimation extends WrappedPacket implements Sendable {
     private static Class<?> animationClass, nmsEntityClass;
     private static Constructor<?> animationConstructor;
-    private static final Field[] fields = new Field[2];
 
     static {
         try {
@@ -28,17 +27,6 @@ public final class WrappedPacketOutAnimation extends WrappedPacket implements Se
         } catch (NoSuchMethodException e) {
             e.printStackTrace();
         }
-        try {
-            fields[0] = animationClass.getDeclaredField("a");
-            fields[1] = animationClass.getDeclaredField("b");
-        } catch (NoSuchFieldException e) {
-            e.printStackTrace();
-        }
-
-        for (final Field f : fields) {
-            f.setAccessible(true);
-        }
-
     }
 
     private Entity entity;
@@ -61,9 +49,9 @@ public final class WrappedPacketOutAnimation extends WrappedPacket implements Se
         try {
             //a - ID
             //b - TYPE
-            this.entityID = fields[0].getInt(packet);
+            this.entityID = Reflection.getField(animationClass, int.class, 0).getInt(packet);
             this.entity = NMSUtils.getEntityById(this.entityID);
-            this.type = EntityAnimationType.get(fields[1].getInt(packet));
+            this.type = EntityAnimationType.get(Reflection.getField(animationClass, int.class, 1).getInt(packet));
         } catch (IllegalAccessException e) {
             e.printStackTrace();
         }

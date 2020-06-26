@@ -9,7 +9,7 @@ public enum Direction {
     SOUTH_SOUTH_EAST, SOUTH_SOUTH_WEST,
     WEST_SOUTH_WEST, SELF, NULL;
 
-    public static Direction get(final byte i) {
+    public static Direction get(final int i) {
         return values()[i];
     }
 }

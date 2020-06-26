@@ -2,6 +2,7 @@ package io.github.retrooper.packetevents.packet;
 
 import io.github.retrooper.packetevents.PacketEvents;
 import io.github.retrooper.packetevents.enums.ServerVersion;
+import io.github.retrooper.packetevents.reflectionutils.Reflection;
 import io.github.retrooper.packetevents.utils.NMSUtils;
 
 public final class PacketType {
@@ -9,6 +10,33 @@ public final class PacketType {
 
 
     public static final class Util {
+        private static Class<?> packetPlayInFlying, packetPlayInPosition, packetPlayInPositionLook, packetPlayInLook, packetPlayInUseEntity;
+
+        static {
+            try {
+                //Only exists in 1.7->1.8.8 & 1.16 protocol
+                packetPlayInFlying = NMSUtils.getNMSClass(Client.FLYING);
+            } catch (ClassNotFoundException e) {
+                //That is fine, they are on 1.9->1.15.2
+            }
+            try {
+                packetPlayInPosition = NMSUtils.getNMSClass(Client.POSITION);
+                packetPlayInPositionLook = NMSUtils.getNMSClass(Client.POSITION_LOOK);
+                packetPlayInLook = NMSUtils.getNMSClass(Client.LOOK);
+
+            } catch (ClassNotFoundException e) {
+                packetPlayInPosition = Reflection.getSubClass(packetPlayInFlying, Client.POSITION);
+                packetPlayInPositionLook = Reflection.getSubClass(packetPlayInFlying, Client.POSITION_LOOK);
+                packetPlayInLook = Reflection.getSubClass(packetPlayInFlying, Client.LOOK);
+            }
+
+            try {
+                packetPlayInUseEntity = NMSUtils.getNMSClass(Client.USE_ENTITY);
+            } catch (ClassNotFoundException e) {
+                e.printStackTrace();
+            }
+        }
+
         /**
          * Is this NMS packet an instance of the "PacketPlayInFlying" packet?
          * Supports 1.9->1.15.2 too!
@@ -68,40 +96,6 @@ public final class PacketType {
 
         public static boolean isInstanceOfUseEntity(final Object nmsPacket) {
             return packetPlayInUseEntity.isInstance(nmsPacket);
-        }
-
-        private static Class<?> packetPlayInFlying, packetPlayInPosition, packetPlayInPositionLook, packetPlayInLook, packetPlayInUseEntity;
-
-        static {
-            try {
-                //Only exists in 1.7->1.8.8 & 1.16 protocol
-                packetPlayInFlying = NMSUtils.getNMSClass(Client.FLYING);
-            } catch (ClassNotFoundException e) {
-                //That is fine, they are on 1.9->1.15.2
-            }
-            try {
-                    packetPlayInPosition = NMSUtils.getNMSClass(Client.POSITION);
-                    packetPlayInPositionLook = NMSUtils.getNMSClass(Client.POSITION_LOOK);
-                    packetPlayInLook = NMSUtils.getNMSClass(Client.LOOK);
-
-            } catch (ClassNotFoundException e) {
-                for (final Class<?> cls : packetPlayInFlying.getDeclaredClasses()) {
-                    if (cls.getSimpleName().equals(Client.POSITION)) {
-                        packetPlayInPosition = cls;
-                    } else if (cls.getSimpleName().equals(Client.POSITION_LOOK)) {
-                        packetPlayInPositionLook = cls;
-                    } else if (cls.getSimpleName().equals(Client.LOOK)) {
-                        packetPlayInLook = cls;
-                    }
-                }
-            }
-
-            try {
-                packetPlayInUseEntity = NMSUtils.getNMSClass(Client.USE_ENTITY);
-            }
-            catch(ClassNotFoundException e) {
-                e.printStackTrace();
-            }
         }
     }
 

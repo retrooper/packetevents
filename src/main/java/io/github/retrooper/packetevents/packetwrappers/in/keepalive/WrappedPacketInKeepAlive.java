@@ -2,26 +2,16 @@ package io.github.retrooper.packetevents.packetwrappers.in.keepalive;
 
 import io.github.retrooper.packetevents.enums.ServerVersion;
 import io.github.retrooper.packetevents.packetwrappers.api.WrappedPacket;
+import io.github.retrooper.packetevents.reflectionutils.Reflection;
 import io.github.retrooper.packetevents.utils.NMSUtils;
-
-import java.lang.reflect.Field;
 
 public final class WrappedPacketInKeepAlive extends WrappedPacket {
     private static Class<?> keepAliveClass;
-    //1.7.10->1.12.2 has int field "a", rest as long field "a"
-    private static Field idField;
 
     static {
         try {
             keepAliveClass = NMSUtils.getNMSClass("PacketPlayInKeepAlive");
         } catch (ClassNotFoundException e) {
-            e.printStackTrace();
-        }
-
-        try {
-            idField = keepAliveClass.getDeclaredField("a");
-            idField.setAccessible(true);
-        } catch (NoSuchFieldException e) {
             e.printStackTrace();
         }
     }
@@ -36,9 +26,9 @@ public final class WrappedPacketInKeepAlive extends WrappedPacket {
     protected void setup() {
         try {
             if (version.isHigherThan(ServerVersion.v_1_12)) {
-                this.id = idField.getLong(packet);
+                this.id = Reflection.getField(keepAliveClass, long.class, 0).getLong(packet);
             } else {
-                this.id = idField.getInt(packet);
+                this.id = Reflection.getField(keepAliveClass, int.class, 0).getInt(packet);
             }
         } catch (IllegalAccessException e) {
             e.printStackTrace();

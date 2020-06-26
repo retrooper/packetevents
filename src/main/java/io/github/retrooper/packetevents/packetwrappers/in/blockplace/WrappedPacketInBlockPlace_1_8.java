@@ -6,10 +6,10 @@ import io.github.retrooper.packetevents.utils.NMSUtils;
 import io.github.retrooper.packetevents.utils.vector.Vector3i;
 import org.bukkit.inventory.ItemStack;
 
+import java.lang.reflect.InvocationTargetException;
+
 final class WrappedPacketInBlockPlace_1_8 extends WrappedPacket {
-    private static final Reflection.MethodInvoker[] blockPositionXYZInvoker = new Reflection.MethodInvoker[3];
     private static Class<?> blockPlaceClass, blockPositionClass;
-    private static Reflection.FieldAccessor<?> blockPositionAccessor, itemStackFieldAccessor;
     private Vector3i blockPosition;
     private ItemStack itemStack;
 
@@ -25,27 +25,25 @@ final class WrappedPacketInBlockPlace_1_8 extends WrappedPacket {
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
         }
-
-        itemStackFieldAccessor = Reflection.getField(blockPlaceClass, NMSUtils.nmsItemStackClass, 0);
-
-        blockPositionAccessor = Reflection.getField(blockPlaceClass, blockPositionClass, 1);
-
-        blockPositionXYZInvoker[0] = Reflection.getMethod(blockPositionClass.getSuperclass(), "getX");
-        blockPositionXYZInvoker[1] = Reflection.getMethod(blockPositionClass.getSuperclass(), "getY");
-        blockPositionXYZInvoker[2] = Reflection.getMethod(blockPositionClass.getSuperclass(), "getZ");
     }
 
     @Override
     protected void setup() {
-        Object nmsBlockPos = blockPositionAccessor.get(packet);
+        try {
+            Object nmsBlockPos = Reflection.getField(blockPlaceClass, blockPositionClass, 1).get(packet);
 
-        int x = (int) blockPositionXYZInvoker[0].invoke(nmsBlockPos);
-        int y = (int) blockPositionXYZInvoker[1].invoke(nmsBlockPos);
-        int z = (int) blockPositionXYZInvoker[2].invoke(nmsBlockPos);
+            final int[] coords = new int[3];
+            for (int i = 0; i < 3; i++) {
+                final String s = "get" + (i == 0 ? "X" : i == 1 ? "Y" : "Z");
+                coords[i] = (int) Reflection.getMethod(blockPositionClass.getSuperclass(), s, 0).invoke(nmsBlockPos);
+            }
 
-        this.blockPosition = new Vector3i(x, y, z);
+            this.blockPosition = new Vector3i(coords[0], coords[1], coords[2]);
 
-        this.itemStack = NMSUtils.toBukkitItemStack(itemStackFieldAccessor.get(packet));
+            this.itemStack = NMSUtils.toBukkitItemStack(Reflection.getField(blockPlaceClass, NMSUtils.nmsItemStackClass, 0).get(packet));
+        } catch (IllegalAccessException | InvocationTargetException e) {
+            e.printStackTrace();
+        }
     }
 
     public Vector3i getBlockPosition() {

@@ -18,7 +18,7 @@ public enum PlayerDigType {
 
     WRONG_PACKET;
 
-    public static PlayerDigType get(final byte i) {
+    public static PlayerDigType get(final int i) {
         return values()[i];
     }
 }

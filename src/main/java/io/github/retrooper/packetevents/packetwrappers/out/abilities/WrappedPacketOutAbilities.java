@@ -9,6 +9,23 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 
 public final class WrappedPacketOutAbilities extends WrappedPacket implements Sendable {
+    private static Class<?> packetClass;
+    private static Constructor<?> packetConstructor;
+
+    static {
+        try {
+            packetClass = NMSUtils.getNMSClass("PacketPlayOutAbilities");
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+
+        try {
+            packetConstructor = packetClass.getConstructor(PlayerAbilitiesUtils.playerAbilitiesClass);
+        } catch (NoSuchMethodException e) {
+            e.printStackTrace();
+        }
+    }
+
     private boolean vulnerable, flying, allowFlight, instantBuild;
     private float flySpeed, walkSpeed;
 
@@ -29,13 +46,18 @@ public final class WrappedPacketOutAbilities extends WrappedPacket implements Se
 
     @Override
     protected void setup() {
-        this.vulnerable = booleanFieldAccessors[0].get(packet);
-        this.flying = booleanFieldAccessors[1].get(packet);
-        this.allowFlight = booleanFieldAccessors[2].get(packet);
-        this.instantBuild = booleanFieldAccessors[3].get(packet);
+        try {
+            this.vulnerable = Reflection.getField(packetClass, boolean.class, 0).getBoolean(packet);
+            this.flying = Reflection.getField(packetClass, boolean.class, 1).getBoolean(packet);
+            this.allowFlight = Reflection.getField(packetClass, boolean.class, 2).getBoolean(packet);
+            this.instantBuild = Reflection.getField(packetClass, boolean.class, 3).getBoolean(packet);
 
-        this.flySpeed = floatFieldAccessors[0].get(packet);
-        this.walkSpeed = floatFieldAccessors[1].get(packet);
+            this.flySpeed = Reflection.getField(packetClass, float.class, 0).getFloat(packet);
+            this.walkSpeed = Reflection.getField(packetClass, float.class, 0).getFloat(packet);
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        }
+
     }
 
     public boolean isVulnerable() {
@@ -60,35 +82,6 @@ public final class WrappedPacketOutAbilities extends WrappedPacket implements Se
 
     public float getWalkSpeed() {
         return walkSpeed;
-    }
-
-    private static Class<?> packetClass;
-
-    private static Constructor<?> packetConstructor;
-
-    private static final Reflection.FieldAccessor<Boolean>[] booleanFieldAccessors = new Reflection.FieldAccessor[4];
-    private static final Reflection.FieldAccessor<Float>[] floatFieldAccessors = new Reflection.FieldAccessor[2];
-
-    static {
-        try {
-            packetClass = NMSUtils.getNMSClass("PacketPlayOutAbilities");
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
-        }
-
-        try {
-            packetConstructor = packetClass.getConstructor(PlayerAbilitiesUtils.playerAbilitiesClass);
-        } catch (NoSuchMethodException e) {
-            e.printStackTrace();
-        }
-
-        for (byte i = 0; i < booleanFieldAccessors.length; i++) {
-            booleanFieldAccessors[i] = Reflection.getField(packetClass, boolean.class, i);
-        }
-
-        for (byte i = 0; i < floatFieldAccessors.length; i++) {
-            floatFieldAccessors[i] = Reflection.getField(packetClass, float.class, i);
-        }
     }
 
     @Override

@@ -6,7 +6,10 @@ import io.github.retrooper.packetevents.annotations.PacketHandler;
 import io.github.retrooper.packetevents.enums.ClientVersion;
 import io.github.retrooper.packetevents.enums.ServerVersion;
 import io.github.retrooper.packetevents.event.PacketListener;
-import io.github.retrooper.packetevents.event.impl.*;
+import io.github.retrooper.packetevents.event.impl.BukkitMoveEvent;
+import io.github.retrooper.packetevents.event.impl.PacketReceiveEvent;
+import io.github.retrooper.packetevents.event.impl.PlayerInjectEvent;
+import io.github.retrooper.packetevents.event.impl.ServerTickEvent;
 import io.github.retrooper.packetevents.event.manager.EventManager;
 import io.github.retrooper.packetevents.handler.NettyPacketHandler;
 import io.github.retrooper.packetevents.packetwrappers.Sendable;
@@ -29,12 +32,11 @@ public final class PacketEvents implements PacketListener, Listener {
 
     private static final ServerVersion version = ServerVersion.getVersion();
     private static final EventManager eventManager = new EventManager();
+    private static final HashMap<UUID, ClientVersion> clientVersionsMap = new HashMap<UUID, ClientVersion>();
     private static boolean hasRegistered;
     private static PacketEvents instance;
     private static int currentTick;
     private static BukkitTask serverTickTask;
-
-    private static final HashMap<UUID, ClientVersion> clientVersionsMap = new HashMap<UUID, ClientVersion>();
 
     public static EventManager getEventManager() {
         return eventManager;

@@ -13,7 +13,7 @@ final class NettyPacketHandler_7 {
             @Override
             public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
                 Object packet = NettyPacketHandler.read(player, msg);
-                if(packet == null) {
+                if (packet == null) {
                     return;
                 }
                 super.channelRead(ctx, msg);
@@ -22,7 +22,7 @@ final class NettyPacketHandler_7 {
             @Override
             public void write(ChannelHandlerContext ctx, Object msg, ChannelPromise promise) throws Exception {
                 Object packet = NettyPacketHandler.write(player, msg);
-                if(packet == null) {
+                if (packet == null) {
                     return;
                 }
                 super.write(ctx, msg, promise);

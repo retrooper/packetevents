@@ -19,7 +19,7 @@ public enum PlayerAction {
 
     START_FALL_FLYING;
 
-    public static PlayerAction get(final byte i) {
+    public static PlayerAction get(final int i) {
         return values()[i];
     }
 }

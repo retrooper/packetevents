@@ -10,7 +10,6 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 
 public final class WrappedPacketOutKickDisconnect extends WrappedPacket implements Sendable {
-    private static final Reflection.FieldAccessor<?> iChatBaseComponentAccessor;
     private static Class<?> packetClass, iChatBaseComponentClass;
     private static Constructor<?> kickDisconnectConstructor;
 
@@ -27,7 +26,6 @@ public final class WrappedPacketOutKickDisconnect extends WrappedPacket implemen
         } catch (NoSuchMethodException e) {
             e.printStackTrace();
         }
-        iChatBaseComponentAccessor = Reflection.getField(packetClass, iChatBaseComponentClass, 0);
     }
 
     private String kickMessage;
@@ -43,7 +41,11 @@ public final class WrappedPacketOutKickDisconnect extends WrappedPacket implemen
 
     @Override
     protected void setup() {
-        this.kickMessage = WrappedPacketOutChat.toStringFromIChatBaseComponent(iChatBaseComponentAccessor.get(packet));
+        try {
+            this.kickMessage = WrappedPacketOutChat.toStringFromIChatBaseComponent(Reflection.getField(packetClass, iChatBaseComponentClass, 0).get(packet));
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        }
     }
 
     public String getKickMessage() {

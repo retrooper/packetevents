@@ -35,6 +35,7 @@ public final class PacketReceiveEvent extends PacketEvent {
 
     /**
      * Get the raw NMS packet object
+     *
      * @return packet object
      */
     public Object getNMSPacket() {

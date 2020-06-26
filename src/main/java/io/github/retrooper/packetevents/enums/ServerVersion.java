@@ -10,17 +10,15 @@ public enum ServerVersion {
     ERROR, EMPTY;
 
     private static final ServerVersion[] reversedValues;
+    private static final String nmsVersionSuffix = Bukkit.getServer().getClass().getPackage().getName().replace(".", ",").split(",")[3];
+    private static ServerVersion cachedVersion = ServerVersion.EMPTY;
 
     static {
         reversedValues = reverse(values());
     }
 
-    private static final String nmsVersionSuffix = Bukkit.getServer().getClass().getPackage().getName().replace(".", ",").split(",")[3];
-
-    private static ServerVersion cachedVersion = ServerVersion.EMPTY;
-
     public static ServerVersion getVersion() {
-        if(cachedVersion != ServerVersion.EMPTY) {
+        if (cachedVersion != ServerVersion.EMPTY) {
             return cachedVersion;
         }
         for (final ServerVersion val : reversedValues) {
@@ -82,7 +80,7 @@ public enum ServerVersion {
      */
     public boolean isLowerThan(final ServerVersion version) {
         if (version == this) return false;
-        byte len = (byte) values().length;
+        final int len = values().length;
         for (byte i = 0; i < len; i++) {
             final ServerVersion v = values()[i];
             if (v == this) {

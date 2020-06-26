@@ -1,19 +1,17 @@
 package io.github.retrooper.packetevents.packetwrappers.in.entityaction;
 
 import io.github.retrooper.packetevents.annotations.Nullable;
-import io.github.retrooper.packetevents.enums.minecraft.PlayerAction;
 import io.github.retrooper.packetevents.enums.ServerVersion;
+import io.github.retrooper.packetevents.enums.minecraft.PlayerAction;
 import io.github.retrooper.packetevents.packetwrappers.api.WrappedPacket;
+import io.github.retrooper.packetevents.reflectionutils.Reflection;
 import io.github.retrooper.packetevents.utils.NMSUtils;
 import org.bukkit.entity.Entity;
-
-import java.lang.reflect.Field;
 
 public final class WrappedPacketInEntityAction extends WrappedPacket {
     private static Class<?> entityActionClass;
     @Nullable
     private static Class<?> enumPlayerActionClass;
-    private static final Field[] fields = new Field[3];
     @Nullable
     private static Object[] enumPlayerActionConstants;
 
@@ -21,26 +19,15 @@ public final class WrappedPacketInEntityAction extends WrappedPacket {
         try {
             entityActionClass = NMSUtils.getNMSClass("PacketPlayInEntityAction");
             if (version.isHigherThan(ServerVersion.v_1_7_10)) {
-                enumPlayerActionClass = NMSUtils.getNMSClass("PacketPlayInEntityAction$EnumPlayerAction");
+                for (final Class<?> sub : entityActionClass.getDeclaredClasses()) {
+                    if (sub.getSimpleName().equals("EnumPlayerAction")) {
+                        enumPlayerActionClass = sub;
+                        break;
+                    }
+                }
             }
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
-        }
-
-        try {
-            //ints in 1.7.10, EnumPlayerAction in 1.8+
-            fields[0] = entityActionClass.getDeclaredField("a");
-            fields[1] = entityActionClass.getDeclaredField("animation");
-            fields[2] = entityActionClass.getDeclaredField("c");
-            if (version.isHigherThan(ServerVersion.v_1_7_10)) {
-                enumPlayerActionConstants = enumPlayerActionClass.getEnumConstants();
-            }
-        } catch (NoSuchFieldException e) {
-            e.printStackTrace();
-        }
-
-        for (final Field f : fields) {
-            f.setAccessible(true);
         }
     }
 
@@ -56,16 +43,16 @@ public final class WrappedPacketInEntityAction extends WrappedPacket {
     @Override
     protected void setup() {
         try {
-            final int entityId = fields[0].getInt(packet);
-            final int jumpBoost = fields[2].getInt(packet);
+            final int entityId = Reflection.getField(entityActionClass, int.class, 0).getInt(packet);
+            final int jumpBoost = Reflection.getField(entityActionClass, int.class, 2).getInt(packet);
 
             int animationIndex = -1;
 
             //1.7.10
             if (version.isLowerThan(ServerVersion.v_1_8)) {
-                animationIndex = fields[1].getInt(packet);
+                animationIndex = Reflection.getField(entityActionClass, int.class, 1).getInt(packet);
             } else {
-                final Object enumObj = fields[1].get(packet);
+                final Object enumObj = Reflection.getField(entityActionClass, enumPlayerActionClass, 0);
 
                 final Object[] enumValues = enumPlayerActionConstants;
                 final int len = enumValues.length;
@@ -80,9 +67,8 @@ public final class WrappedPacketInEntityAction extends WrappedPacket {
 
 
             this.entityId = entityId;
-            this.action = action;
             this.jumpBoost = jumpBoost;
-            this.action = PlayerAction.get((byte) animationIndex);
+            this.action = PlayerAction.get(animationIndex);
 
             this.entity = NMSUtils.getEntityById(this.entityId);
         } catch (IllegalAccessException e) {

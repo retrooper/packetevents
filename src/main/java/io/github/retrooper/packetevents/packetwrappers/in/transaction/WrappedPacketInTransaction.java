@@ -5,18 +5,34 @@ import io.github.retrooper.packetevents.reflectionutils.Reflection;
 import io.github.retrooper.packetevents.utils.NMSUtils;
 
 public final class WrappedPacketInTransaction extends WrappedPacket {
+    private static Class<?> packetClass;
+
+    static {
+        try {
+            packetClass = NMSUtils.getNMSClass("PacketPlayInTransaction");
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+    }
+
     private int windowId;
     private short actionNumber;
     private boolean accepted;
+
     public WrappedPacketInTransaction(final Object packet) {
         super(packet);
     }
 
     @Override
     protected void setup() {
-        this.windowId = windowIdAccessor.get(packet);
-        this.actionNumber = actionNumberAccessor.get(packet);
-        this.accepted = acceptedAccessor.get(packet);
+        try {
+            this.windowId = Reflection.getField(packetClass, int.class, 0).getInt(packet);
+            this.actionNumber = Reflection.getField(packetClass, short.class, 0).getShort(packet);
+            this.accepted = Reflection.getField(packetClass, boolean.class, 0).getBoolean(packet);
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        }
+
     }
 
     public int getWindowId() {
@@ -29,23 +45,5 @@ public final class WrappedPacketInTransaction extends WrappedPacket {
 
     public boolean isAccepted() {
         return accepted;
-    }
-
-    private static Class<?> packetClass;
-
-    private static final Reflection.FieldAccessor<Integer> windowIdAccessor;
-    private static final Reflection.FieldAccessor<Short> actionNumberAccessor;
-    private static final Reflection.FieldAccessor<Boolean> acceptedAccessor;
-
-    static {
-        try {
-            packetClass = NMSUtils.getNMSClass("PacketPlayInTransaction");
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
-        }
-
-        windowIdAccessor = Reflection.getField(packetClass, int.class, 0);
-        actionNumberAccessor = Reflection.getField(packetClass, short.class, 0);
-        acceptedAccessor= Reflection.getField(packetClass, boolean.class, 0);
     }
 }
