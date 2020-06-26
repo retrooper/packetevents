@@ -20,7 +20,6 @@ public class NettyPacketHandler {
             } else {
                 NettyPacketHandler_8.injectPlayer(player);
             }
-            PacketEvents.getEventManager().callEvent(new PostPlayerInjectEvent(player));
         }
     }
 

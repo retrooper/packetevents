@@ -26,20 +26,10 @@ public final class PacketSendEvent extends PacketEvent {
         return this.name;
     }
 
-    /**
-     * This is deprecated, please us {@link #getNMSPacket()}
-     *
-     * @return packet
-     */
-    @Deprecated
-    public Object getPacket() {
-        return this.packet;
-    }
 
     /**
-     * Get the raw packet object
-     *
-     * @return packet
+     * Get the raw NMS packet object
+     * @return packet object
      */
     public Object getNMSPacket() {
         return this.packet;

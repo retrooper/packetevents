@@ -107,8 +107,9 @@ public final class PacketType {
 
     public static final class Client {
         private static final String c = "PacketPlayIn";
-
-        @Deprecated
+        /*
+         * Only exists in 1.7.10->1.8.8 & 1.16+
+         */
         public static final String FLYING = c + "Flying";
 
 

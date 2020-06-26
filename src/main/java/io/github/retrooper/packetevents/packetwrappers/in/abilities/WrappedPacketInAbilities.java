@@ -73,15 +73,6 @@ public final class WrappedPacketInAbilities extends WrappedPacket {
         return allowFly;
     }
 
-    /**
-     * Use {@link WrappedPacketInAbilities#isFlightAllowed()}
-     * @return
-     */
-    @Deprecated
-    public boolean canFly() {
-        return allowFly;
-    }
-
     public boolean canInstantlyBuild() {
         return instantBuild;
     }

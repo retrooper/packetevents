@@ -34,15 +34,9 @@ public final class PacketReceiveEvent extends PacketEvent {
     }
 
     /**
-     * This is deprecated, please us {@link #getNMSPacket()}
-     *
-     * @return packet
+     * Get the raw NMS packet object
+     * @return packet object
      */
-    @Deprecated
-    public Object getPacket() {
-        return this.packet;
-    }
-
     public Object getNMSPacket() {
         return this.packet;
     }

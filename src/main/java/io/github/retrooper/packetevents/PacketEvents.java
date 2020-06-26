@@ -160,15 +160,6 @@ public final class PacketEvents implements PacketListener, Listener {
 
 
     /**
-     * This is deprecated, use {@link #highlyPreciseMillis()} as they do the same thing, I just renamed the method.
-     */
-    @Deprecated
-    public static long currentCalculatedMS() {
-        return System.nanoTime() / 1000000;
-    }
-
-
-    /**
      * Get the player's version.
      * Do not call this method in the PlayerInjectEvent, it is safe to call it in the PostPlayerInjectEvent.
      * The EntityPlayer object is null at that time, resulting in the version lookup to fail.
@@ -229,16 +220,6 @@ public final class PacketEvents implements PacketListener, Listener {
 
     @PacketHandler
     public void onReceive(final PacketReceiveEvent e) {
-    }
-
-    /**
-     * Deprecated, please do not use this anymore
-     *
-     * @param e
-     */
-    @PacketHandler
-    public void onPostInject(final PostPlayerInjectEvent e) {
-
     }
 
     @EventHandler
