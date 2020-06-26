@@ -2,7 +2,7 @@ package io.github.retrooper.packetevents.enums;
 
 public enum ClientVersion {
     LESS_THAN_V_1_7_10, v_1_7_10, v_1_8, v_1_9, v_1_9_1, v_1_9_2, v_1_9_3, v_1_10, v_1_11, v_1_11_1, v_1_12, v_1_12_1, v_1_12_2,
-    v_1_13, v_1_13_1, v_1_13_2, v_1_14, v_1_14_1, v_1_14_2, v_1_14_3, v_1_14_4, v_1_15, v_1_15_1, v_1_15_2, HIGHER_THAN_V_1_15_2, INVALID, ACCESS_FAILURE;
+    v_1_13, v_1_13_1, v_1_13_2, v_1_14, v_1_14_1, v_1_14_2, v_1_14_3, v_1_14_4, v_1_15, v_1_15_1, v_1_15_2, v_1_16, v_1_16_1, HIGHER_THAN_V_1_16_1, INVALID, ACCESS_FAILURE;
 
     public static ClientVersion fromProtocolVersion(final int protocolVersion) {
         int remainder = -1;
@@ -58,11 +58,15 @@ public enum ClientVersion {
                 return v_1_15_1;
             case 578:
                 return v_1_15_2;
+            case 735:
+                return v_1_16;
+            case 736:
+                return v_1_16_1;
             default:
                 remainder = protocolVersion;
         }
         if (remainder > 578) {
-            return HIGHER_THAN_V_1_15_2;
+            return HIGHER_THAN_V_1_16_1;
         }
         return INVALID;
     }
