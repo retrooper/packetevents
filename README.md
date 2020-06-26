@@ -4,10 +4,6 @@ A lightweight spigot packetlistener & packetsender coded by retrooper.
 
 ## Credit
 
-PacketEvents uses [TinyProtocol](https://github.com/dmulloy2/ProtocolLib/blob/master/TinyProtocol)'s [Reflection](https://github.com/dmulloy2/ProtocolLib/blob/master/TinyProtocol/src/main/java/com/comphenix/tinyprotocol/Reflection.java) util class.
-
-[Find it here in our source](https://github.com/retrooper/packetevents/blob/master/src/main/java/io/github/retrooper/packetevents/reflectionutils/Reflection.java)
-
 PacketEvents forked [Atlas](https://github.com/funkemunky/Atlas)' [Packet](https://github.com/funkemunky/Atlas/blob/master/AtlasParent/Atlas/src/main/java/cc/funkemunky/api/tinyprotocol/api/Packet.java) class.
 
 [Find our forked version](https://github.com/retrooper/packetevents/blob/master/src/main/java/io/github/retrooper/packetevents/packet/PacketType.java)
