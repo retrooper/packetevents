@@ -46,10 +46,10 @@ public final class WrappedPacketInEntityAction extends WrappedPacket {
             final int entityId = Reflection.getField(entityActionClass, int.class, 0).getInt(packet);
             final int jumpBoost;
             if(version.isLowerThan(ServerVersion.v_1_8)) {
-                jumpBoost = Reflection.getField(entityActionClass, int.class, 2).getInt(packet)
+                jumpBoost = Reflection.getField(entityActionClass, int.class, 2).getInt(packet);
             }
             else {
-                jumpBoost = Reflection.getField(entityActionClass, int.class, 1).getInt(packet)
+                jumpBoost = Reflection.getField(entityActionClass, int.class, 1).getInt(packet);
             }
 
             int animationIndex = -1;
