@@ -1,9 +1,10 @@
 package io.github.retrooper.packetevents.example;
 
 import io.github.retrooper.packetevents.PacketEvents;
+import io.github.retrooper.packetevents.event.PacketListener;
 import org.bukkit.plugin.java.JavaPlugin;
 
-public class MainExample extends JavaPlugin {
+public class MainExample extends JavaPlugin implements PacketListener {
 
     @Override
     public void onEnable() {
