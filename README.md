@@ -21,6 +21,8 @@ Join my discord server(to talk to me): https://discord.gg/ZWTkg4v
 
 [![](https://jitpack.io/v/retrooper/packetevents.svg)](https://jitpack.io/#retrooper/packetevents)
 
+[![](https://jitci.com/gh/retrooper/packetevents/svg)](https://jitci.com/gh/retrooper/packetevents)
+
 To learn how to setup this API please click on the link below
 [Setup Guide](https://github.com/retrooper/packetevents/wiki/PacketEvents-Setup-Guide)
 (or just paste this into your browser: https://github.com/retrooper/packetevents/wiki/PacketEvents-Setup-Guide)
