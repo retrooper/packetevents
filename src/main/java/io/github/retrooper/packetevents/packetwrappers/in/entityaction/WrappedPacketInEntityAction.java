@@ -12,6 +12,7 @@ public final class WrappedPacketInEntityAction extends WrappedPacket {
     private static Class<?> entityActionClass;
     @Nullable
     private static Class<?> enumPlayerActionClass;
+
     static {
         try {
             entityActionClass = NMSUtils.getNMSClass("PacketPlayInEntityAction");
@@ -22,10 +23,9 @@ public final class WrappedPacketInEntityAction extends WrappedPacket {
                         break;
                     }
                 }
-            } 
-            else {
-               enumPlayerActionClass = NMSUtils.getNMSClass("EnumPlayerAction");
-            } 
+            } else {
+                enumPlayerActionClass = NMSUtils.getNMSClass("EnumPlayerAction");
+            }
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
         }
@@ -45,10 +45,9 @@ public final class WrappedPacketInEntityAction extends WrappedPacket {
         try {
             final int entityId = Reflection.getField(entityActionClass, int.class, 0).getInt(packet);
             final int jumpBoost;
-            if(version.isLowerThan(ServerVersion.v_1_8)) {
+            if (version.isLowerThan(ServerVersion.v_1_8)) {
                 jumpBoost = Reflection.getField(entityActionClass, int.class, 2).getInt(packet);
-            }
-            else {
+            } else {
                 jumpBoost = Reflection.getField(entityActionClass, int.class, 1).getInt(packet);
             }
 
@@ -59,14 +58,20 @@ public final class WrappedPacketInEntityAction extends WrappedPacket {
                 animationIndex = Reflection.getField(entityActionClass, int.class, 1).getInt(packet);
             } else {
                 final Object enumObj = Reflection.getField(entityActionClass, enumPlayerActionClass, 0).get(packet);
-                 
-                this.action = PlayerAction.valueOf(enumObj.toString());
+                final String enumValue= enumObj.toString();
+                try {
+                    this.action = PlayerAction.valueOf(enumValue);
+                } catch (IllegalArgumentException e) {
+                    //They aren't on a legacy version and the enum has changed
+                    final PlayerAction.UpdatedPlayerAction updatedPlayerAction = PlayerAction.UpdatedPlayerAction.valueOf(enumValue);
+                    this.action = PlayerAction.get(updatedPlayerAction.getIndex());
+                }
             }
 
 
             this.entityId = entityId;
             this.jumpBoost = jumpBoost;
-            if(animationIndex != -1) {
+            if (animationIndex != -1) {
                 this.action = PlayerAction.get(animationIndex);
             }
             this.entity = NMSUtils.getEntityById(this.entityId);
