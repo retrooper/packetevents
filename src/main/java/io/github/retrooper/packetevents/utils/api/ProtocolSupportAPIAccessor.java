@@ -1,4 +1,4 @@
-package io.github.retrooper.packetevents.utils;
+package io.github.retrooper.packetevents.utils.api;
 
 import org.bukkit.entity.Player;
 import protocolsupport.api.ProtocolSupportAPI;

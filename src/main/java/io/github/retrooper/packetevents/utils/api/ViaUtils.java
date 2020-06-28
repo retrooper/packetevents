@@ -1,4 +1,4 @@
-package io.github.retrooper.packetevents.utils;
+package io.github.retrooper.packetevents.utils.api;
 
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -9,7 +9,7 @@ public class ViaUtils {
         return ViaAPIAccessor.getProtocolVersion(player);
     }
 
-    public static boolean isViaAPIAvaialable() {
-        return Bukkit.getPluginManager().getPlugin("ViaVersion") != null;
+    public static boolean isAvailable() {
+        return Bukkit.getPluginManager().isPluginEnabled("ViaVersion");
     }
 }
