@@ -11,6 +11,7 @@ public class MainExample extends JavaPlugin {
     public void onEnable() {
         PacketEvents.start(this);
 
+
         getAPI().getServerTickTask().cancel();
     }
 

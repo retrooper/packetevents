@@ -81,6 +81,15 @@ public final class NMSUtils {
         return Class.forName(nmsDir + "." + name);
     }
 
+    public static Class<?> getNMSClassWithoutException(String name) {
+        try {
+            return getNMSClass(name);
+        } catch (ClassNotFoundException e) {
+            return null;
+        }
+
+    }
+
     public static Class<?> getOBCClass(String name) throws ClassNotFoundException {
         return Class.forName(obcDir + "." + name);
     }

@@ -34,12 +34,20 @@ public final class PacketReceiveEvent extends PacketEvent {
     }
 
     /**
-     * Get the raw NMS packet object
+     * Get the NMS packet object
      *
      * @return packet object
      */
     public Object getNMSPacket() {
         return this.packet;
+    }
+
+    /**
+     * Get the class of the NMS packet object
+     * @return packet object class
+     */
+    public Class<?> getNMSPacketClass() {
+        return getNMSPacket().getClass();
     }
 
     /**
