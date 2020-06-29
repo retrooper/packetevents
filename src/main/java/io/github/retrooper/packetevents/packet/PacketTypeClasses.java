@@ -42,6 +42,18 @@ public class PacketTypeClasses {
                 e.printStackTrace();
             }
             //Block place
+            try {
+                BLOCK_PLACE = NMSUtils.getNMSClass(c + "BlockPlace");
+            }
+            catch(ClassNotFoundException e) {
+                //They are just on a newer version
+                try {
+                    BLOCK_PLACE = NMSUtils.getNMSClass(c + "UseItem");
+                }
+                catch(ClassNotFoundException e) {
+                    e.printStackTrace();
+                }
+            }
         }
     }
 
