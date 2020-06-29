@@ -36,16 +36,6 @@ public enum PlayerAction {
     public enum UpdatedPlayerAction {
         PRESS_SHIFT_KEY, RELEASE_SHIFT_KEY, STOP_SLEEPING, START_SPRINTING, STOP_SPRINTING, START_RIDING_JUMP, STOP_RIDING_JUMP, OPEN_INVENTORY, START_FALL_FLYING;
 
-        public int getIndex() {
-            for (int i = 0; i < values().length; i++) {
-                final UpdatedPlayerAction action = values()[i];
-                if (action == this) {
-                    return i;
-                }
-            }
-            return -1;
-        }
-
         public static UpdatedPlayerAction get(final int index) {
             for (int i = 0; i < index + 1; i++) {
                 final UpdatedPlayerAction action = values()[i];
@@ -54,6 +44,16 @@ public enum PlayerAction {
                 }
             }
             return null;
+        }
+
+        public int getIndex() {
+            for (int i = 0; i < values().length; i++) {
+                final UpdatedPlayerAction action = values()[i];
+                if (action == this) {
+                    return i;
+                }
+            }
+            return -1;
         }
     }
 }

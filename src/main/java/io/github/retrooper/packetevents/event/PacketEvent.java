@@ -9,8 +9,8 @@ import io.github.retrooper.packetevents.enums.ServerVersion;
  * recommended to avoid non thread safe bukkit operations
  */
 public class PacketEvent {
-    protected static ServerVersion version = PacketEvents.getServerVersion();
-    protected long timestamp = PacketEvents.highlyPreciseMillis();
+    protected static ServerVersion version = PacketEvents.getAPI().getServerUtilities().getServerVersion();
+    protected long timestamp = PacketEvents.getAPI().currentPreciseMillis();
 
     /**
      * Timestamp of the packet

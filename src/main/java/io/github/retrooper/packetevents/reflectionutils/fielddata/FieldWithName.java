@@ -4,6 +4,7 @@ public class FieldWithName {
 
     private final Class<?> cls;
     private final String name;
+
     public FieldWithName(Class<?> cls, String name) {
         this.cls = cls;
         this.name = name;

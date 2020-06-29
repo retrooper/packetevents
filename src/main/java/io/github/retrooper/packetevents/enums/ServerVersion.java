@@ -11,24 +11,27 @@ public enum ServerVersion {
 
     private static final ServerVersion[] reversedValues;
     private static final String nmsVersionSuffix = Bukkit.getServer().getClass().getPackage().getName().replace(".", ",").split(",")[3];
-    private static ServerVersion cachedVersion = ServerVersion.EMPTY;
+    private static ServerVersion cachedVersion;
 
     static {
         reversedValues = reverse(values());
     }
 
-    public static ServerVersion getVersion() {
-        if (cachedVersion != ServerVersion.EMPTY) {
-            return cachedVersion;
-        }
+    private static ServerVersion getVers() {
         for (final ServerVersion val : reversedValues) {
             String valName = val.name().substring(2).replace("_", ".");
             if (Bukkit.getBukkitVersion().contains(valName)) {
-                cachedVersion = val;
                 return val;
             }
         }
         return ERROR;
+    }
+
+    public static ServerVersion getVersion() {
+        if(cachedVersion == null) {
+            cachedVersion = getVers();
+        }
+        return cachedVersion;
     }
 
     private static ServerVersion[] reverse(final ServerVersion[] arr) {

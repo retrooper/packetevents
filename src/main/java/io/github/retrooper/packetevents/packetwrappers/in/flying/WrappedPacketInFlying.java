@@ -139,6 +139,7 @@ public class WrappedPacketInFlying extends WrappedPacket {
         public WrappedPacketInLook(Object packet) {
             super(packet);
         }
+
         @Override
         public boolean isPosition() {
             try {

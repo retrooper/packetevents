@@ -3,6 +3,10 @@ package io.github.retrooper.packetevents.packetwrappers.api;
 import io.github.retrooper.packetevents.enums.ServerVersion;
 import org.bukkit.entity.Player;
 
+import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+
 public class WrappedPacket {
     protected static ServerVersion version = ServerVersion.getVersion();
     protected final Player player;

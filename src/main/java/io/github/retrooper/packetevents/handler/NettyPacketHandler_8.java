@@ -9,7 +9,7 @@ import org.bukkit.entity.Player;
 import java.util.concurrent.Future;
 
 final class NettyPacketHandler_8 {
-    private static final ServerVersion version = PacketEvents.getServerVersion();
+    private static final ServerVersion version = PacketEvents.getAPI().getServerUtilities().getServerVersion();
 
     public static void injectPlayer(final Player player) {
         final ChannelDuplexHandler channelDuplexHandler = new ChannelDuplexHandler() {

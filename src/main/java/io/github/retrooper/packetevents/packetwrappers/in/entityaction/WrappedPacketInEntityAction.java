@@ -58,7 +58,7 @@ public final class WrappedPacketInEntityAction extends WrappedPacket {
                 animationIndex = Reflection.getField(entityActionClass, int.class, 1).getInt(packet);
             } else {
                 final Object enumObj = Reflection.getField(entityActionClass, enumPlayerActionClass, 0).get(packet);
-                final String enumValue= enumObj.toString();
+                final String enumValue = enumObj.toString();
                 try {
                     this.action = PlayerAction.valueOf(enumValue);
                 } catch (IllegalArgumentException e) {

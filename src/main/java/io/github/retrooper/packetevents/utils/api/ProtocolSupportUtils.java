@@ -2,7 +2,6 @@ package io.github.retrooper.packetevents.utils.api;
 
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
-import protocolsupport.api.ProtocolSupportAPI;
 
 public class ProtocolSupportUtils {
     public static boolean isAvailable() {

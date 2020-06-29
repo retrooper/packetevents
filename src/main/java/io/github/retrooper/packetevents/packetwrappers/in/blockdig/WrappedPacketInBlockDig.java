@@ -7,10 +7,6 @@ import io.github.retrooper.packetevents.packetwrappers.api.WrappedPacket;
 import io.github.retrooper.packetevents.reflectionutils.Reflection;
 import io.github.retrooper.packetevents.utils.NMSUtils;
 import io.github.retrooper.packetevents.utils.vector.Vector3i;
-import net.minecraft.server.v1_8_R3.PacketPlayInBlockDig;
-import org.bukkit.block.Block;
-
-import java.lang.reflect.Field;
 
 public final class WrappedPacketInBlockDig extends WrappedPacket {
     private static Class<?> blockDigClass, blockPositionClass, enumDirectionClass, digTypeClass;
@@ -29,8 +25,7 @@ public final class WrappedPacketInBlockDig extends WrappedPacket {
 
         try {
             digTypeClass = NMSUtils.getNMSClass("EnumPlayerDigType");
-        }
-        catch(ClassNotFoundException e) {
+        } catch (ClassNotFoundException e) {
             //It is probably a subclass
             digTypeClass = Reflection.getSubClass(blockDigClass, "EnumPlayerDigType");
         }

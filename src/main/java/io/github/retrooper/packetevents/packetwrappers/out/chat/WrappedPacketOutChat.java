@@ -23,8 +23,7 @@ public final class WrappedPacketOutChat extends WrappedPacket implements Sendabl
         //In 1.8.3+ the ChatSerializer class is declared in the IChatBaseComponent class, so we have to handle that
         try {
             chatSerializerClass = NMSUtils.getNMSClass("ChatSerializer");
-        }
-        catch(ClassNotFoundException e) {
+        } catch (ClassNotFoundException e) {
             //That is fine, it is probably a subclass
             chatSerializerClass = Reflection.getSubClass(iChatBaseComponentClass, "ChatSerializer");
         }

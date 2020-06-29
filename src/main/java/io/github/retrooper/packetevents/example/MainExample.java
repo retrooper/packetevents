@@ -1,8 +1,9 @@
 package io.github.retrooper.packetevents.example;
 
 import io.github.retrooper.packetevents.PacketEvents;
-
 import org.bukkit.plugin.java.JavaPlugin;
+
+import static io.github.retrooper.packetevents.PacketEvents.getAPI;
 
 public class MainExample extends JavaPlugin {
 
@@ -10,8 +11,7 @@ public class MainExample extends JavaPlugin {
     public void onEnable() {
         PacketEvents.start(this);
 
-        PacketEvents.getServerTickTask().cancel();
-
+        getAPI().getServerTickTask().cancel();
     }
 
     @Override

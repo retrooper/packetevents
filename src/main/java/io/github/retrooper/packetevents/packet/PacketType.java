@@ -6,7 +6,7 @@ import io.github.retrooper.packetevents.reflectionutils.Reflection;
 import io.github.retrooper.packetevents.utils.NMSUtils;
 
 public final class PacketType {
-    private static final ServerVersion version = PacketEvents.getServerVersion();
+    private static final ServerVersion version = PacketEvents.getAPI().getServerUtilities().getServerVersion();
 
 
     public static final class Util {

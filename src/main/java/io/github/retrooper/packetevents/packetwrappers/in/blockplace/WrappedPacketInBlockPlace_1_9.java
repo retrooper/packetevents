@@ -2,15 +2,9 @@ package io.github.retrooper.packetevents.packetwrappers.in.blockplace;
 
 
 import io.github.retrooper.packetevents.packetwrappers.api.WrappedPacket;
-import io.github.retrooper.packetevents.reflectionutils.Reflection;
 import io.github.retrooper.packetevents.utils.BlockIteratorUtils;
-import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
-
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.util.HashSet;
 
 final class WrappedPacketInBlockPlace_1_9 extends WrappedPacket {
     private Block block;
@@ -22,7 +16,7 @@ final class WrappedPacketInBlockPlace_1_9 extends WrappedPacket {
 
     @Override
     protected void setup() {
-       this.block = BlockIteratorUtils.getBlockLookingAt(getPlayer(), 3);
+        this.block = BlockIteratorUtils.getBlockLookingAt(getPlayer(), 3);
     }
 
     public Player getPlayer() {

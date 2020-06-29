@@ -21,6 +21,10 @@ public final class Reflection {
 
 
     //FIELDS
+    private static final HashMap<FieldWithName, Field> fieldWithNameHashMap = new HashMap<FieldWithName, Field>();
+    private static final HashMap<FieldWithTypeAndIndex, Field> fieldWithTypeAndIndexHashMap = new HashMap<FieldWithTypeAndIndex, Field>();
+    private static final HashMap<FieldWithIndex, Field> fieldWithIndexHashMap = new HashMap<FieldWithIndex, Field>();
+    private static final HashMap<MethodWithIndexAndParams, Method> methodWithIndexAndParamsHashMap = new HashMap<MethodWithIndexAndParams, Method>();
 
     public static Field[] getFields(final Class<?> cls) {
         if (cachedFields.containsKey(cls)) {
@@ -34,8 +38,6 @@ public final class Reflection {
             return fields;
         }
     }
-
-    private static final HashMap<FieldWithName, Field> fieldWithNameHashMap = new HashMap<FieldWithName, Field>();
 
     public static Field getField(final Class<?> cls, final String name) {
         final FieldWithName fwn = new FieldWithName(cls, name);
@@ -51,8 +53,6 @@ public final class Reflection {
         }
         return null;
     }
-
-    private static final HashMap<FieldWithTypeAndIndex, Field> fieldWithTypeAndIndexHashMap = new HashMap<FieldWithTypeAndIndex, Field>();
 
     public static Field getField(final Class<?> cls, final Class<?> dataType, final int index) {
         final FieldWithTypeAndIndex fwtai = new FieldWithTypeAndIndex(cls, dataType, index);
@@ -71,8 +71,6 @@ public final class Reflection {
         }
         return null;
     }
-
-    private static final HashMap<FieldWithIndex, Field> fieldWithIndexHashMap = new HashMap<FieldWithIndex, Field>();
 
     public static Field getField(final Class<?> cls, final int index) {
         final FieldWithIndex fwi = new FieldWithIndex(cls, index);
@@ -103,8 +101,6 @@ public final class Reflection {
             return methods;
         }
     }
-
-    private static final HashMap<MethodWithIndexAndParams, Method> methodWithIndexAndParamsHashMap = new HashMap<MethodWithIndexAndParams, Method>();
 
     public static Method getMethod(final Class<?> cls, final int index, final Class<?>... params) {
         final MethodWithIndexAndParams mwiap = new MethodWithIndexAndParams(cls, index, params);
