@@ -35,8 +35,6 @@ public class PacketTypeClasses {
                 SETTINGS = NMSUtils.getNMSClass(c +"Settings");
                 ENCHANT_ITEM = NMSUtils.getNMSClass(c + "EnchantItem");
 
-
-
                 CLIENT_COMMAND = NMSUtils.getNMSClass(c + "ClientCommand");
                 TRANSACTION = NMSUtils.getNMSClass(c + "Transaction");
                 BLOCK_DIG = NMSUtils.getNMSClass(c + "BlockDig");
@@ -72,7 +70,7 @@ public class PacketTypeClasses {
                 RESOURCE_PACK_STATUS = NMSUtils.getNMSClassWithoutException(c + "ResourcePackStatus");
 
                 ADVANCEMENTS = NMSUtils.getNMSClassWithoutException(c + "Advancements");
-                TR_SEL = NMSUtils.getNMSClass(c + "TrSel");
+                TR_SEL = NMSUtils.getNMSClassWithoutException(c + "TrSel");
                 BEACON = NMSUtils.getNMSClassWithoutException(c + "Beacon");
                 SET_COMMAND_BLOCK = NMSUtils.getNMSClassWithoutException(c + "SetCommandBlock");
                 SET_COMMAND_MINECART = NMSUtils.getNMSClassWithoutException(c + "SetCommandMinecart");
