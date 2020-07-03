@@ -21,8 +21,9 @@ public class PacketTypeClasses {
         @Nullable
         public static final Class<?> FLYING = NMSUtils.getNMSClassWithoutException(c + "Flying");
 
-        static {
-            try {POSITION = NMSUtils.getNMSClass(c + "Position");
+        public static void load() {
+            try {
+                POSITION = NMSUtils.getNMSClass(c + "Position");
                 POSITION_LOOK = NMSUtils.getNMSClass(c + "PositionLook");
                 LOOK = NMSUtils.getNMSClass(c + "Look");
             } catch (ClassNotFoundException e) {

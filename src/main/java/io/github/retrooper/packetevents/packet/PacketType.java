@@ -7,6 +7,12 @@ public class PacketType {
 
 
     public static class Client {
+        public static class Util {
+            public static boolean isInstanceOfFlying(final int packetId) {
+                return packetId == FLYING
+                        || packetId == POSITION || packetId == POSITION_LOOK || packetId == LOOK;
+            }
+        }
         public static final Map<Class<?>, Integer> packetIds = new HashMap<Class<?>, Integer>();
 
         public static final int TELEPORT_ACCEPT = 0,
@@ -69,7 +75,6 @@ public class PacketType {
             packetIds.put(PacketTypeClasses.Client.SPECTATE, SPECTATE);
             packetIds.put(PacketTypeClasses.Client.USE_ITEM, USE_ITEM);
             packetIds.put(PacketTypeClasses.Client.BLOCK_PLACE, BLOCK_PLACE);
-
         }
     }
 }

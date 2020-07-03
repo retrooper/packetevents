@@ -6,6 +6,7 @@ import io.github.retrooper.packetevents.event.impl.BukkitMoveEvent;
 import io.github.retrooper.packetevents.event.impl.PacketReceiveEvent;
 import io.github.retrooper.packetevents.event.impl.PlayerInjectEvent;
 import io.github.retrooper.packetevents.event.impl.ServerTickEvent;
+import io.github.retrooper.packetevents.packet.PacketTypeClasses;
 import org.bukkit.Bukkit;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -20,6 +21,14 @@ public final class PacketEvents implements PacketListener, Listener {
     private static boolean hasRegistered;
     private static int currentTick;
     private static Plugin plugin;
+    private static boolean hasLoaded;
+    /**
+     * Call this before start(), this is also very heavy
+     */
+    public static void load() {
+        PacketTypeClasses.Client.load();
+        hasLoaded = true;
+    }
 
     /**
      * Starts the server tick task and initiates the TinyProtocolHandler
@@ -27,6 +36,9 @@ public final class PacketEvents implements PacketListener, Listener {
      * @param plugin
      */
     public static void start(final Plugin plugin) {
+        if(!hasLoaded) {
+            load();
+        }
         if (!hasRegistered) {
             //Register Bukkit and PacketListener
             getAPI().getEventManager().registerListener(getInstance());

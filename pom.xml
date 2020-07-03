@@ -74,6 +74,7 @@
             <version>1.7.10</version>
             <scope>provided</scope>
         </dependency>
+
         <dependency>
             <groupId>org.github.spigot</groupId>
             <artifactId>1.8.8</artifactId>

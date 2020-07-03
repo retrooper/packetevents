@@ -12,13 +12,21 @@ import java.util.concurrent.Future;
 
 public class NettyPacketHandler {
     public static final String handlerName = "packet_handler";
-    private static final ServerVersion version = PacketEvents.getAPI().getServerUtilities().getServerVersion();
+    private static boolean v1_7_nettyMode = false;
+
+    static {
+        try {
+            Class.forName("io.netty.channel.Channel");
+        } catch (ClassNotFoundException e) {
+            v1_7_nettyMode = true;
+        }
+    }
 
     public static void injectPlayer(final Player player) {
         final PlayerInjectEvent injectEvent = new PlayerInjectEvent(player);
         PacketEvents.getAPI().getEventManager().callEvent(injectEvent);
         if (!injectEvent.isCancelled()) {
-            if (version.isLowerThan(ServerVersion.v_1_8)) {
+            if (v1_7_nettyMode) {
                 NettyPacketHandler_7.injectPlayer(player);
             } else {
                 NettyPacketHandler_8.injectPlayer(player);
@@ -30,7 +38,7 @@ public class NettyPacketHandler {
         final PlayerUninjectEvent uninjectEvent = new PlayerUninjectEvent(player);
         PacketEvents.getAPI().getEventManager().callEvent(uninjectEvent);
         if (!uninjectEvent.isCancelled()) {
-            if (version.isLowerThan(ServerVersion.v_1_8)) {
+            if (v1_7_nettyMode) {
                 return NettyPacketHandler_7.uninjectPlayer(player);
             } else {
                 return NettyPacketHandler_8.uninjectPlayer(player);
