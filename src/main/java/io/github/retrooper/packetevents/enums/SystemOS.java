@@ -8,7 +8,7 @@ public enum SystemOS {
     private static SystemOS getOS() {
         final String os = System.getProperty("os.name");
         for (final String osName : getOperatingSystemNames()) {
-            if(os.toLowerCase().contains(osName.toLowerCase())) {
+            if (os.toLowerCase().contains(osName.toLowerCase())) {
                 return SystemOS.valueOf(osName);
             }
         }
@@ -16,7 +16,7 @@ public enum SystemOS {
     }
 
     public static SystemOS getOperatingSystem() {
-        if(value == null) {
+        if (value == null) {
             value = getOS();
         }
         return value;

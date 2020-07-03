@@ -28,7 +28,7 @@ public enum ServerVersion {
     }
 
     public static ServerVersion getVersion() {
-        if(cachedVersion == null) {
+        if (cachedVersion == null) {
             cachedVersion = getVers();
         }
         return cachedVersion;

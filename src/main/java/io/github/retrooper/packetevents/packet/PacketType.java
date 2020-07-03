@@ -1,178 +1,75 @@
 package io.github.retrooper.packetevents.packet;
 
-import io.github.retrooper.packetevents.PacketEvents;
-import io.github.retrooper.packetevents.enums.ServerVersion;
-import io.github.retrooper.packetevents.reflectionutils.Reflection;
-import io.github.retrooper.packetevents.utils.NMSUtils;
+import java.util.HashMap;
+import java.util.Map;
 
-public final class PacketType {
-    private static final ServerVersion version = PacketEvents.getAPI().getServerUtilities().getServerVersion();
+public class PacketType {
 
 
-    public static final class Util {
-        private static Class<?> packetPlayInFlying, packetPlayInPosition, packetPlayInPositionLook, packetPlayInLook, packetPlayInUseEntity;
+    public static class Client {
+        public static final Map<Class<?>, Integer> packetIds = new HashMap<Class<?>, Integer>();
+
+        public static final int TELEPORT_ACCEPT = 0,
+                TILE_NBT_QUERY = 1,
+                DIFFICULTY_CHANGE = 2,
+                CHAT = 3,
+                CLIENT_COMMAND = 4,
+                SETTINGS = 5,
+        TAB_COMPLETE = 6, TRANSACTION = 7, ENCHANT_ITEM =8,
+                WINDOW_CLICK = 9, CLOSE_WINDOW =10, CUSTOM_PAYLOAD = 11,
+                B_EDIT = 12, ENTITY_NBT_QUERY = 13, USE_ENTITY = 14, JIGSAW_GENERATE = 15, KEEP_ALIVE= 16, DIFFICULTY_LOCK = 17,
+        POSITION = 18, POSITION_LOOK = 19, LOOK = 20, FLYING = 21, VEHICLE_MOVE = 22, BOAT_MOVE = 23, PICK_ITEM = 24, AUTO_RECIPE = 25, ABILITIES = 26, BLOCK_DIG = 27, ENTITY_ACTION = 28, STEER_VEHICLE = 29, RECIPE_DISPLAYED = 30, ITEM_NAME = 31, RESOURCE_PACK_STATUS = 32, ADVANCEMENTS = 33, TR_SEL = 34, BEACON = 35, HELD_ITEM_SLOT = 36, SET_COMMAND_BLOCK = 37,
+                SET_COMMAND_MINECART = 38, SET_CREATIVE_SLOT = 39, SET_JIGSAW = 40, STRUCT = 41, UPDATE_SIGN = 42, ARM_ANIMATION = 43, SPECTATE = 44, USE_ITEM = 45, BLOCK_PLACE = 46;
 
         static {
-            try {
-                //Only exists in 1.7->1.8.8 & 1.16 protocol
-                packetPlayInFlying = NMSUtils.getNMSClass(Client.FLYING);
-            } catch (ClassNotFoundException e) {
-                //That is fine, they are on 1.9->1.15.2
-            }
-            try {
-                packetPlayInPosition = NMSUtils.getNMSClass(Client.POSITION);
-                packetPlayInPositionLook = NMSUtils.getNMSClass(Client.POSITION_LOOK);
-                packetPlayInLook = NMSUtils.getNMSClass(Client.LOOK);
+            packetIds.put(PacketTypeClasses.Client.TELEPORT_ACCEPT, TELEPORT_ACCEPT);
+            packetIds.put(PacketTypeClasses.Client.TILE_NBT_QUERY, TILE_NBT_QUERY);
+            packetIds.put(PacketTypeClasses.Client.DIFFICULTY_CHANGE, DIFFICULTY_CHANGE);
+            packetIds.put(PacketTypeClasses.Client.CHAT, CHAT);
+            packetIds.put(PacketTypeClasses.Client.CLIENT_COMMAND, CLIENT_COMMAND);
+            packetIds.put(PacketTypeClasses.Client.SETTINGS, SETTINGS);
+            packetIds.put(PacketTypeClasses.Client.TAB_COMPLETE, TAB_COMPLETE);
+            packetIds.put(PacketTypeClasses.Client.TRANSACTION, TRANSACTION);
+            packetIds.put(PacketTypeClasses.Client.ENCHANT_ITEM, ENCHANT_ITEM);
+            packetIds.put(PacketTypeClasses.Client.WINDOW_CLICK, WINDOW_CLICK);
+            packetIds.put(PacketTypeClasses.Client.CLOSE_WINDOW, CLOSE_WINDOW);
+            packetIds.put(PacketTypeClasses.Client.CUSTOM_PAYLOAD, CUSTOM_PAYLOAD);
+            packetIds.put(PacketTypeClasses.Client.B_EDIT, B_EDIT);
+            packetIds.put(PacketTypeClasses.Client.ENTITY_NBT_QUERY, ENTITY_NBT_QUERY);
+            packetIds.put(PacketTypeClasses.Client.USE_ENTITY, USE_ENTITY);
+            packetIds.put(PacketTypeClasses.Client.JIGSAW_GENERATE, JIGSAW_GENERATE);
+            packetIds.put(PacketTypeClasses.Client.KEEP_ALIVE, KEEP_ALIVE);
+            packetIds.put(PacketTypeClasses.Client.DIFFICULTY_LOCK, DIFFICULTY_LOCK);
+            packetIds.put(PacketTypeClasses.Client.POSITION, POSITION);
+            packetIds.put(PacketTypeClasses.Client.POSITION_LOOK, POSITION_LOOK);
+            packetIds.put(PacketTypeClasses.Client.LOOK, LOOK);
+            packetIds.put(PacketTypeClasses.Client.FLYING, FLYING);
+            packetIds.put(PacketTypeClasses.Client.VEHICLE_MOVE, VEHICLE_MOVE);
+            packetIds.put(PacketTypeClasses.Client.BOAT_MOVE, BOAT_MOVE);
+            packetIds.put(PacketTypeClasses.Client.PICK_ITEM, PICK_ITEM);
+            packetIds.put(PacketTypeClasses.Client.AUTO_RECIPE, AUTO_RECIPE);
+            packetIds.put(PacketTypeClasses.Client.ABILITIES, ABILITIES);
+            packetIds.put(PacketTypeClasses.Client.BLOCK_DIG, BLOCK_DIG);
+            packetIds.put(PacketTypeClasses.Client.ENTITY_ACTION, ENTITY_ACTION);
+            packetIds.put(PacketTypeClasses.Client.STEER_VEHICLE, STEER_VEHICLE);
+            packetIds.put(PacketTypeClasses.Client.RECIPE_DISPLAYED, RECIPE_DISPLAYED);
+            packetIds.put(PacketTypeClasses.Client.ITEM_NAME, ITEM_NAME);
+            packetIds.put(PacketTypeClasses.Client.RESOURCE_PACK_STATUS, RESOURCE_PACK_STATUS);
+            packetIds.put(PacketTypeClasses.Client.ADVANCEMENTS, ADVANCEMENTS);
+            packetIds.put(PacketTypeClasses.Client.TR_SEL, TR_SEL);
+            packetIds.put(PacketTypeClasses.Client.BEACON, BEACON);
+            packetIds.put(PacketTypeClasses.Client.HELD_ITEM_SLOT, HELD_ITEM_SLOT);
+            packetIds.put(PacketTypeClasses.Client.SET_COMMAND_BLOCK, SET_COMMAND_BLOCK);
+            packetIds.put(PacketTypeClasses.Client.SET_COMMAND_MINECART, SET_COMMAND_MINECART);
+            packetIds.put(PacketTypeClasses.Client.SET_CREATIVE_SLOT, SET_CREATIVE_SLOT);
+            packetIds.put(PacketTypeClasses.Client.SET_JIGSAW, SET_JIGSAW);
+            packetIds.put(PacketTypeClasses.Client.STRUCT, STRUCT);
+            packetIds.put(PacketTypeClasses.Client.UPDATE_SIGN, UPDATE_SIGN);
+            packetIds.put(PacketTypeClasses.Client.ARM_ANIMATION, ARM_ANIMATION);
+            packetIds.put(PacketTypeClasses.Client.SPECTATE, SPECTATE);
+            packetIds.put(PacketTypeClasses.Client.USE_ITEM, USE_ITEM);
+            packetIds.put(PacketTypeClasses.Client.BLOCK_PLACE, BLOCK_PLACE);
 
-            } catch (ClassNotFoundException e) {
-                packetPlayInPosition = Reflection.getSubClass(packetPlayInFlying, Client.POSITION);
-                packetPlayInPositionLook = Reflection.getSubClass(packetPlayInFlying, Client.POSITION_LOOK);
-                packetPlayInLook = Reflection.getSubClass(packetPlayInFlying, Client.LOOK);
-            }
-
-            try {
-                packetPlayInUseEntity = NMSUtils.getNMSClass(Client.USE_ENTITY);
-            } catch (ClassNotFoundException e) {
-                e.printStackTrace();
-            }
-        }
-
-        /**
-         * Is this NMS packet an instance of the "PacketPlayInFlying" packet?
-         * Supports 1.9->1.15.2 too!
-         *
-         * @param nmsPacket
-         * @return If the nms packet provided is an instanceof the "PacketPlayInFlying" packet in the 1.8 protocol & 1.16 protocol!
-         */
-        public static boolean isInstanceOfFlyingPacket(final Object nmsPacket) {
-            //1.7->1.8.8
-            if (packetPlayInFlying != null) {
-                return packetPlayInFlying.isInstance(nmsPacket);
-            } else {
-                //1.9->1.15.2
-                return isInstanceOfPositionOrPositionLook(nmsPacket) || isInstanceOfPositionLookPacket(nmsPacket);
-            }
-        }
-
-        /**
-         * Is this NMS packet an instance of the "PacketPlayInPosition" packet?
-         *
-         * @param nmsPacket
-         * @return nmsPacket instanceof PacketPlayInPosition
-         */
-        public static boolean isInstanceOfPositionPacket(final Object nmsPacket) {
-            return packetPlayInPosition.isInstance(nmsPacket);
-        }
-
-        /**
-         * Is this NMS packet an instance of the "PacketPlayInPositionLook" packet?
-         *
-         * @param nmsPacket
-         * @return nmsPacket instanceof PacketPlayInPositionLook
-         */
-        public static boolean isInstanceOfPositionLookPacket(final Object nmsPacket) {
-            return packetPlayInPositionLook.isInstance(nmsPacket);
-        }
-
-        /**
-         * Is this NMS Packet an instanceof the "PacketPlayInPosition" or "PacketPlayInPositionLook"
-         *
-         * @param nmsPacket
-         * @return nmsPacket instanceof PacketPlayInPosition || nmsPacket instanceof PacketPlayInPositionLook
-         */
-        public static boolean isInstanceOfPositionOrPositionLook(final Object nmsPacket) {
-            return isInstanceOfPositionPacket(nmsPacket) || isInstanceOfPositionLookPacket(nmsPacket);
-        }
-
-        /**
-         * Is this NMS Packet an instance of the "PacketPlayInLook" packet?
-         *
-         * @param nmsPacket
-         * @return nmsPacket instanceof PacketPlayInLook
-         */
-        public static boolean isInstanceOfLook(final Object nmsPacket) {
-            return packetPlayInLook.isInstance(nmsPacket);
-        }
-
-        public static boolean isInstanceOfUseEntity(final Object nmsPacket) {
-            return packetPlayInUseEntity.isInstance(nmsPacket);
         }
     }
-
-    public static final class Client {
-        private static final String c = "PacketPlayIn";
-        /*
-         * Only exists in 1.7.10->1.8.8 & 1.16+
-         */
-        public static final String FLYING = c + "Flying";
-
-
-        public static final String POSITION = c + "Position";
-
-        public static final String POSITION_LOOK = c + "PositionLook";
-
-        public static final String LOOK = c + "Look";
-        public static final String CLIENT_COMMAND = c + "ClientCommand";
-
-        public static final String TRANSACTION = c + "Transaction";
-        public static final String BLOCK_DIG = c + "BlockDig";
-        public static final String ENTITY_ACTION = c + "EntityAction";
-        public static final String USE_ENTITY = c + "UseEntity";
-        public static final String WINDOW_CLICK = c + "WindowClick";
-        public static final String STEER_VEHICLE = c + "SteerVehicle";
-        public static final String CUSTOM_PAYLOAD = c + "CustomPayload";
-        public static final String ARM_ANIMATION = c + "ArmAnimation";
-        /**
-         * The packet name of the block place depending on your server version, "PacketPlayInBlockPlace" or "PacketPlayInUseItem"
-         */
-        public static final String BLOCK_PLACE = c + ((ServerVersion.getVersion().isHigherThan(ServerVersion.v_1_8_8)) ? "UseItem" : "BlockPlace");
-
-        public static final String ABILITIES = c + "Abilities";
-        public static final String HELD_ITEM_SLOT = c + "HeldItemSlot";
-        public static final String CLOSE_WINDOW = c + "CloseWindow";
-        public static final String TAB_COMPLETE = c + "TabComplete";
-        public static final String CHAT = c + "Chat";
-        public static final String SET_CREATIVE_SLOT = c + "SetCreativeSlot";
-
-        public static final String KEEP_ALIVE = c + "KeepAlive";
-    }
-
-    public static final class Server {
-        private static final String s = "PacketPlayOut";
-
-        public static final String ANIMATION = s + "Animation";
-        public static final String KEEP_ALIVE = s + "KeepAlive";
-        public static final String CHAT = s + "Chat";
-        public static final String POSITION = s + "Position";
-        public static final String TRANSACTION = s + "Transaction";
-        public static final String NAMED_ENTITY_SPAWN = s + "NamedEntitySpawn";
-        public static final String SPAWN_ENTITY_LIVING = s + "SpawnEntityLiving";
-        public static final String SPAWN_ENTITY = s + "SpawnEntity";
-        public static final String CUSTOM_PAYLOAD = s + "CustomPayload";
-        public static final String ABILITIES = s + "Abilities";
-        public static final String ENTITY_METADATA = s + "EntityMetadata";
-        public static final String ENTITY_VELOCITY = s + "EntityVelocity";
-        public static final String ENTITY_DESTROY = s + "EntityDestroy";
-        public static final String ENTITY_HEAD_ROTATION = s + "EntityHeadRotation";
-        public static final String BLOCK_CHANGE = s + "BlockChange";
-        public static final String CLOSE_WINDOW = s + "CloseWindow";
-        public static final String HELD_ITEM_SLOT = s + "HeldItemSlot";
-        public static final String TAB_COMPLETE = s + "TabComplete";
-        public static final String RESPAWN = s + "Respawn";
-        public static final String WORLD_PARTICLES = s + "WorldParticles";
-        public static final String COMMANDS = s + "Commands";
-        public static final String OPEN_WINDOW = s + "OpenWindow";
-        public static final String LOGIN = s + "Login";
-        public static final String SERVER_DIFFICULTY = s + "ServerDifficulty";
-    }
-
-    public static final class Login {
-        public static final String HANDSHAKE = "PacketHandshakingInSetProtocol";
-        public static final String PING = "PacketStatusInPing";
-        public static final String START = "PacketStatusInStart";
-        public static final String SUCCESS = "PacketLoginOutSuccess";
-        public static final String ENCRYPTION_BEGIN_IN = "PacketLoginInEncryptionBegin";
-        public static final String ENCRYPTION_BEGIN_OUT = "PacketLoginOutEncryptionBegin";
-    }
-
 }

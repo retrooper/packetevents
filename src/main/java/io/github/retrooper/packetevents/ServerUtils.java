@@ -25,7 +25,7 @@ public class ServerUtils {
         return getRecentServerTPS()[0];
     }
 
-    public SystemOS getPlatform(){
+    public SystemOS getPlatform() {
         return SystemOS.getOperatingSystem();
     }
 }

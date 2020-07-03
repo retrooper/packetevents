@@ -1,6 +1,7 @@
 package io.github.retrooper.packetevents.event.impl;
 
 import io.github.retrooper.packetevents.event.PacketEvent;
+import io.github.retrooper.packetevents.packet.PacketType;
 import org.bukkit.entity.Player;
 
 public final class PacketReceiveEvent extends PacketEvent {
@@ -44,10 +45,19 @@ public final class PacketReceiveEvent extends PacketEvent {
 
     /**
      * Get the class of the NMS packet object
+     *
      * @return packet object class
      */
     public Class<?> getNMSPacketClass() {
         return getNMSPacket().getClass();
+    }
+
+    /**
+     * Get the ID of the packet
+     * @return packet id
+     */
+    public int getPacketId() {
+        return PacketType.Client.packetIds.get(getNMSPacketClass());
     }
 
     /**

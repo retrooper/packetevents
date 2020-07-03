@@ -15,7 +15,7 @@ public enum PlayerDigType {
     RELEASE_USE_ITEM,
 
     SWAP_HELD_ITEMS,
-    
+
     SWAP_ITEM_WITH_OFFHAND,
 
     WRONG_PACKET;

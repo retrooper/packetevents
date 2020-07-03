@@ -1,6 +1,7 @@
 package io.github.retrooper.packetevents.annotations;
 
 import io.github.retrooper.packetevents.annotations.data.EventSynchronization;
+
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;

@@ -5,6 +5,16 @@ import io.github.retrooper.packetevents.reflectionutils.Reflection;
 import io.github.retrooper.packetevents.utils.NMSUtils;
 
 public class WrappedPacketInSteerVehicle extends WrappedPacket {
+    private static Class<?> packetClass;
+
+    static {
+        try {
+            packetClass = NMSUtils.getNMSClass("PacketPlayInSteerVehicle");
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+    }
+
     private float side, forward;
     private boolean jump, unmount;
 
@@ -24,10 +34,12 @@ public class WrappedPacketInSteerVehicle extends WrappedPacket {
             e.printStackTrace();
         }
     }
+
     //Positive side value means left, negative means right
     public float getSideValue() {
         return side;
     }
+
     //Positive forward value means forward, negative is backwards
     public float getForwardValue() {
         return forward;
@@ -39,15 +51,5 @@ public class WrappedPacketInSteerVehicle extends WrappedPacket {
 
     public boolean isUnmount() {
         return unmount;
-    }
-
-    private static Class<?> packetClass;
-
-    static {
-        try {
-            packetClass = NMSUtils.getNMSClass("PacketPlayInSteerVehicle");
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
-        }
     }
 }

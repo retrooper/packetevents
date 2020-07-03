@@ -15,6 +15,7 @@ public final class PacketEventsAPI {
      * Preciser than #currentMillis()
      * Expensive
      * Returns crazy values when you change system time
+     *
      * @return {@link System#nanoTime()} / 1000000(1 million)
      */
     public long currentPreciseMillis() {
@@ -35,6 +36,7 @@ public final class PacketEventsAPI {
 
     /**
      * Get all utilities to do with the player
+     *
      * @return Player Utilities
      */
     public PlayerUtils getPlayerUtilities() {
@@ -43,6 +45,7 @@ public final class PacketEventsAPI {
 
     /**
      * Get all utilities to do with the server
+     *
      * @return Server Utilities
      */
     public ServerUtils getServerUtilities() {
@@ -52,6 +55,7 @@ public final class PacketEventsAPI {
     /**
      * Get the event manager
      * Used to call events, register and unregister listeners
+     *
      * @return PacketEvents' event manager
      */
     public EventManager getEventManager() {
@@ -60,6 +64,7 @@ public final class PacketEventsAPI {
 
     /**
      * Get the server tick task, called **asynchronously** every tick
+     *
      * @return server tick task
      */
     public BukkitTask getServerTickTask() {
@@ -68,6 +73,7 @@ public final class PacketEventsAPI {
 
     /**
      * Modify the server tick task object
+     *
      * @param task
      */
     public void setServerTickTask(final BukkitTask task) {

@@ -9,7 +9,7 @@ public final class ServerTickEvent extends PacketEvent {
 
     public ServerTickEvent(final int tick, final long timestamp) {
         this.tick = tick;
-        this.timestamp = timestamp;
+        setTimestamp(timestamp);
         this.tps = PacketEvents.getAPI().getServerUtilities().getCurrentServerTPS();
     }
 
@@ -18,10 +18,6 @@ public final class ServerTickEvent extends PacketEvent {
         this.tps = PacketEvents.getAPI().getServerUtilities().getCurrentServerTPS();
     }
 
-
-    public long getTimestamp() {
-        return timestamp;
-    }
 
     public int getCurrentTick() {
         return tick;

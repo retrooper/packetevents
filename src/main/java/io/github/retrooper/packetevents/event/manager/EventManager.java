@@ -22,6 +22,7 @@ public final class EventManager {
     public EventManager(final int threadCount) {
         executorService = Executors.newFixedThreadPool(threadCount);
     }
+
     public EventManager() {
         this(Runtime.getRuntime().availableProcessors());
     }
