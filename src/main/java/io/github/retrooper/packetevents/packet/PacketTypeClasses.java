@@ -1,6 +1,7 @@
 package io.github.retrooper.packetevents.packet;
 
 import io.github.retrooper.packetevents.annotations.Nullable;
+import io.github.retrooper.packetevents.reflectionutils.Reflection;
 import io.github.retrooper.packetevents.utils.NMSUtils;
 
 public class PacketTypeClasses {
@@ -21,12 +22,20 @@ public class PacketTypeClasses {
         public static final Class<?> FLYING = NMSUtils.getNMSClassWithoutException(c + "Flying");
 
         static {
+            try {POSITION = NMSUtils.getNMSClass(c + "Position");
+                POSITION_LOOK = NMSUtils.getNMSClass(c + "PositionLook");
+                LOOK = NMSUtils.getNMSClass(c + "Look");
+            } catch (ClassNotFoundException e) {
+                POSITION = Reflection.getSubClass(FLYING, c + "Position");
+                POSITION_LOOK = Reflection.getSubClass(FLYING, c + "PositionLook");
+                LOOK = Reflection.getSubClass(FLYING,  c +",Look");
+            }
+
             try {
                 SETTINGS = NMSUtils.getNMSClass(c +"Settings");
                 ENCHANT_ITEM = NMSUtils.getNMSClass(c + "EnchantItem");
-                POSITION = NMSUtils.getNMSClass(c + "Position");
-                POSITION_LOOK = NMSUtils.getNMSClass(c + "PositionLook");
-                LOOK = NMSUtils.getNMSClass(c + "Look");
+
+
 
                 CLIENT_COMMAND = NMSUtils.getNMSClass(c + "ClientCommand");
                 TRANSACTION = NMSUtils.getNMSClass(c + "Transaction");

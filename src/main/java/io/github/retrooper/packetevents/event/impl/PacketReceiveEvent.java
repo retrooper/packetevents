@@ -2,6 +2,7 @@ package io.github.retrooper.packetevents.event.impl;
 
 import io.github.retrooper.packetevents.event.PacketEvent;
 import io.github.retrooper.packetevents.packet.PacketType;
+import io.github.retrooper.packetevents.packet.PacketTypeClasses;
 import org.bukkit.entity.Player;
 
 public final class PacketReceiveEvent extends PacketEvent {
@@ -57,6 +58,9 @@ public final class PacketReceiveEvent extends PacketEvent {
      * @return packet id
      */
     public int getPacketId() {
+        if(PacketTypeClasses.Client.ARM_ANIMATION == null) {
+            System.out.println("why is arm null");
+        }
         return PacketType.Client.packetIds.get(getNMSPacketClass());
     }
 
