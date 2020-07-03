@@ -28,7 +28,7 @@ public class PacketTypeClasses {
             } catch (ClassNotFoundException e) {
                 POSITION = Reflection.getSubClass(FLYING, c + "Position");
                 POSITION_LOOK = Reflection.getSubClass(FLYING, c + "PositionLook");
-                LOOK = Reflection.getSubClass(FLYING,  c +",Look");
+                LOOK = Reflection.getSubClass(FLYING,  c +"Look");
             }
 
             try {
