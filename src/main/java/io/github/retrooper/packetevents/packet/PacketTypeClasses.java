@@ -85,6 +85,9 @@ public class PacketTypeClasses {
                     e2.printStackTrace();
                 }
             }
+
+
+            PacketType.Client.init();
         }
     }
 
