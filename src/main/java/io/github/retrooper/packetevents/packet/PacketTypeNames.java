@@ -4,6 +4,7 @@ import io.github.retrooper.packetevents.PacketEvents;
 import io.github.retrooper.packetevents.enums.ServerVersion;
 import io.github.retrooper.packetevents.reflectionutils.Reflection;
 import io.github.retrooper.packetevents.utils.NMSUtils;
+
 @Deprecated
 public final class PacketTypeNames {
     private static final ServerVersion version = PacketEvents.getAPI().getServerUtilities().getServerVersion();

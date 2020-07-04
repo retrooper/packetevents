@@ -6,6 +6,7 @@ import io.github.retrooper.packetevents.event.impl.BukkitMoveEvent;
 import io.github.retrooper.packetevents.event.impl.PacketReceiveEvent;
 import io.github.retrooper.packetevents.event.impl.PlayerInjectEvent;
 import io.github.retrooper.packetevents.event.impl.ServerTickEvent;
+import io.github.retrooper.packetevents.packet.PacketType;
 import io.github.retrooper.packetevents.packet.PacketTypeClasses;
 import org.bukkit.Bukkit;
 import org.bukkit.event.EventHandler;
@@ -22,21 +23,23 @@ public final class PacketEvents implements PacketListener, Listener {
     private static int currentTick;
     private static Plugin plugin;
     private static boolean hasLoaded;
+
     /**
      * Call this before start(), this is also very heavy
      */
     public static void load() {
         PacketTypeClasses.Client.load();
+        PacketTypeClasses.Server.load();
         hasLoaded = true;
     }
 
     /**
-     * Starts the server tick task and initiates the TinyProtocolHandler
+     * Starts the server tick task and registers what is needed to be registered
      *
      * @param plugin
      */
     public static void start(final Plugin plugin) {
-        if(!hasLoaded) {
+        if (!hasLoaded) {
             load();
         }
         if (!hasRegistered) {
@@ -49,7 +52,7 @@ public final class PacketEvents implements PacketListener, Listener {
             final Runnable tickRunnable = new Runnable() {
                 @Override
                 public void run() {
-                    getAPI().getEventManager().callEvent(new ServerTickEvent(currentTick++, PacketEvents.getAPI().currentPreciseMillis()));
+                    getAPI().getEventManager().callEvent(new ServerTickEvent(currentTick++, PacketEvents.getAPI().currentMillis()));
                 }
             };
             getAPI().setServerTickTask(Bukkit.getScheduler().runTaskTimerAsynchronously(plugin, tickRunnable, 0L, 1L));
@@ -66,6 +69,9 @@ public final class PacketEvents implements PacketListener, Listener {
             getAPI().getServerTickTask().cancel();
         }
         getAPI().getEventManager().unregisterAllListeners();
+
+        PacketType.Client.packetIds.clear();
+        PacketType.Server.packetIds.clear();
     }
 
     public static PacketEventsAPI getAPI() {

@@ -27,6 +27,19 @@ public final class PacketSendEvent extends PacketEvent {
         return this.name;
     }
 
+    /**
+     * Get the ID of the packet
+     *
+     * @return packet id
+     */
+    public int getPacketId() {
+        Integer id =
+                PacketType.Server.packetIds.get(getNMSPacketClass());
+        if (id == null) {
+            return -1;
+        }
+        return id;
+    }
 
     /**
      * Get the NMS packet object
