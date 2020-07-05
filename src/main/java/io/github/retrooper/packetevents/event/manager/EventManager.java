@@ -72,8 +72,20 @@ public final class EventManager {
         }
     }
 
+    public void registerListeners(final PacketListener... listeners) {
+        for(final PacketListener listener : listeners) {
+            registerListener(listener);
+        }
+    }
+
     public void unregisterListener(final PacketListener e) {
         registeredMethods.remove(e);
+    }
+
+    public void unregisterListeners(final PacketListener... listeners) {
+        for(final PacketListener listener : listeners) {
+            unregisterListener(listener);
+        }
     }
 
     public void unregisterAllListeners() {
