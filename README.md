@@ -2,11 +2,6 @@
 
 A lightweight spigot packetlistener & packetsender coded by retrooper.
 
-## Credit
-
-PacketEvents forked [Atlas](https://github.com/funkemunky/Atlas)' [Packet](https://github.com/funkemunky/Atlas/blob/master/AtlasParent/Atlas/src/main/java/cc/funkemunky/api/tinyprotocol/api/Packet.java) class.
-
-[Find our forked version](https://github.com/retrooper/packetevents/blob/master/src/main/java/io/github/retrooper/packetevents/packet/PacketType.java)
 ## About
 
 This packetlistener is **only** supported on spigot servers and has been tested to work on these spigot forks: PaperSpigot, Tuinity
