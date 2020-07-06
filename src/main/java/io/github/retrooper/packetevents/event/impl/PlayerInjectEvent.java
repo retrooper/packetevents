@@ -2,7 +2,7 @@ package io.github.retrooper.packetevents.event.impl;
 
 import io.github.retrooper.packetevents.enums.ClientVersion;
 import io.github.retrooper.packetevents.event.PacketEvent;
-import io.github.retrooper.packetevents.utils.api.VersionLookupUtils;
+import io.github.retrooper.packetevents.utils.versionlookup.VersionLookupUtils;
 import org.bukkit.entity.Player;
 
 public final class PlayerInjectEvent extends PacketEvent {

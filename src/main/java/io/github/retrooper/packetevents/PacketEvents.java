@@ -101,7 +101,7 @@ public final class PacketEvents implements PacketListener, Listener {
      */
     @PacketHandler
     public void onInject(final PlayerInjectEvent e) {
-        getAPI().getPlayerUtilities().clientVersionsMap.put(e.getPlayer().getUniqueId(), e.getClientVersion());
+        getAPI().getPlayerUtilities().setClientVersion(e.getPlayer(), e.getClientVersion());
     }
 
     @PacketHandler
@@ -115,6 +115,7 @@ public final class PacketEvents implements PacketListener, Listener {
 
     @EventHandler
     public void onQuit(final PlayerQuitEvent e) {
+        getAPI().getPlayerUtilities().clearClientVersion(e.getPlayer());
         getAPI().getPlayerUtilities().uninjectPlayer(e.getPlayer());
     }
 

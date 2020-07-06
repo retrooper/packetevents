@@ -1,5 +1,6 @@
 package io.github.retrooper.packetevents.utils;
 
+import io.github.retrooper.packetevents.PacketEvents;
 import io.github.retrooper.packetevents.annotations.Nullable;
 import io.github.retrooper.packetevents.enums.ServerVersion;
 import io.github.retrooper.packetevents.packetwrappers.Sendable;
@@ -15,18 +16,24 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
 public final class NMSUtils {
-    private static final ServerVersion version = ServerVersion.getVersion();
-    public static final String nettyPrefix = version.isLowerThan(ServerVersion.v_1_8) ? "net.minecraft.util.io.netty" : "io.netty";
+    private static final ServerVersion version = PacketEvents.getAPI().getServerUtilities().getServerVersion();
+    public static String nettyPrefix;
     private static final String nmsDir = ServerVersion.getNMSDirectory();
     private static final String obcDir = ServerVersion.getOBCDirectory();
     public static Class<?> minecraftServerClass, craftWorldsClass,
             packetClass, entityPlayerClass, playerConnectionClass,
             craftPlayerClass, serverConnectionClass, craftEntityClass,
             craftItemStack, nmsItemStackClass, networkManagerClass, nettyChannelClass;
-    private static Method getServerMethod, getCraftWorldHandleMethod, getServerConnection, getCraftPlayerHandle, getCraftEntityHandle, sendPacketMethod, asBukkitCopy;
-    private static Field recentTPSField, entityPlayerPingField, playerConnectionField;
+    private static Method getCraftWorldHandleMethod, getServerConnection, getCraftPlayerHandle, getCraftEntityHandle, sendPacketMethod, asBukkitCopy;
+    private static Field entityPlayerPingField, playerConnectionField;
 
     static {
+        try {
+            nettyPrefix = "io.netty";
+            Class.forName("io.netty.channel.Channel");
+        } catch (ClassNotFoundException e) {
+            nettyPrefix = "net.minecraft.util.io.netty";
+        }
         try {
             nettyChannelClass = getNettyClass("channel.Channel");
             minecraftServerClass = getNMSClass("MinecraftServer");
@@ -46,7 +53,6 @@ public final class NMSUtils {
 
         //METHODS
         try {
-            getServerMethod = minecraftServerClass.getMethod("getServer");
             getCraftWorldHandleMethod = craftWorldsClass.getMethod("getHandle");
             getCraftPlayerHandle = craftPlayerClass.getMethod("getHandle");
             getCraftEntityHandle = craftEntityClass.getMethod("getHandle");
@@ -59,7 +65,6 @@ public final class NMSUtils {
 
 
         try {
-            recentTPSField = minecraftServerClass.getField("recentTps");
             entityPlayerPingField = entityPlayerClass.getField("ping");
             playerConnectionField = entityPlayerClass.getField("playerConnection");
         } catch (NoSuchFieldException e) {
@@ -68,13 +73,12 @@ public final class NMSUtils {
     }
 
     public static Object getMinecraftServerInstance() throws InvocationTargetException, IllegalAccessException {
-        return getServerMethod.invoke(null);
+        return Reflection.getMethod(minecraftServerClass, "getServer", 0).invoke(null);
     }
 
     public static double[] recentTPS() throws IllegalAccessException, InvocationTargetException {
         final Object minecraftServerObj = getMinecraftServerInstance();
-        double[] recentTPS = (double[]) recentTPSField.get(minecraftServerObj);
-        return recentTPS;
+        return (double[]) Reflection.getField(minecraftServerClass, double[].class, 0).get(minecraftServerObj);
     }
 
     public static Class<?> getNMSClass(String name) throws ClassNotFoundException {

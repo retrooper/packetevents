@@ -10,18 +10,19 @@ public class WrappedPacketOutEntity extends WrappedPacket {
     private double deltaX, deltaY, deltaZ;
     private byte yaw, pitch;
     private boolean onGround;
+
     public WrappedPacketOutEntity(Object packet) {
         super(packet);
     }
 
     @Override
-    protected void setup(){
+    protected void setup() {
         try {
             this.entityId = Reflection.getField(packetClass, int.class, 0).getInt(packet);
             this.onGround = Reflection.getField(packetClass, boolean.class, 0).getBoolean(packet);
-            if(version.isLowerThan(ServerVersion.v_1_9)) {
-                 byte dX = Reflection.getField(packetClass, byte.class, 0).getByte(packet);
-                 byte dY = Reflection.getField(packetClass, byte.class, 1).getByte(packet);
+            if (version.isLowerThan(ServerVersion.v_1_9)) {
+                byte dX = Reflection.getField(packetClass, byte.class, 0).getByte(packet);
+                byte dY = Reflection.getField(packetClass, byte.class, 1).getByte(packet);
                 byte dZ = Reflection.getField(packetClass, byte.class, 2).getByte(packet);
 
                 this.deltaX = dX / 32.0;
@@ -30,8 +31,7 @@ public class WrappedPacketOutEntity extends WrappedPacket {
 
                 this.yaw = Reflection.getField(packetClass, byte.class, 3).getByte(packet);
                 this.pitch = Reflection.getField(packetClass, byte.class, 4).getByte(packet);
-            }
-            else {
+            } else {
                 short dX = Reflection.getField(packetClass, short.class, 0).getShort(packet);
                 short dY = Reflection.getField(packetClass, short.class, 1).getShort(packet);
                 short dZ = Reflection.getField(packetClass, short.class, 2).getShort(packet);

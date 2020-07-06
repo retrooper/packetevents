@@ -6,7 +6,7 @@
 
     <groupId>io.github.retrooper</groupId>
     <artifactId>packetevents</artifactId>
-    <version>1.4</version>
+    <version>1.4.1</version>
     <packaging>jar</packaging>
     <name>packetevents</name>
     <properties>

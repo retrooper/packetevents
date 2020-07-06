@@ -73,7 +73,7 @@ public final class EventManager {
     }
 
     public void registerListeners(final PacketListener... listeners) {
-        for(final PacketListener listener : listeners) {
+        for (final PacketListener listener : listeners) {
             registerListener(listener);
         }
     }
@@ -83,7 +83,7 @@ public final class EventManager {
     }
 
     public void unregisterListeners(final PacketListener... listeners) {
-        for(final PacketListener listener : listeners) {
+        for (final PacketListener listener : listeners) {
             unregisterListener(listener);
         }
     }

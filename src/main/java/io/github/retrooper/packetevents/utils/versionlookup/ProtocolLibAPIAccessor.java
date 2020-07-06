@@ -1,4 +1,4 @@
-package io.github.retrooper.packetevents.utils.api;
+package io.github.retrooper.packetevents.utils.versionlookup;
 
 import com.comphenix.protocol.ProtocolLibrary;
 import org.bukkit.entity.Player;

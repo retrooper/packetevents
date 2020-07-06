@@ -1,4 +1,4 @@
-package io.github.retrooper.packetevents;
+package io.github.retrooper.packetevents.utils.api;
 
 import io.github.retrooper.packetevents.enums.ServerVersion;
 import io.github.retrooper.packetevents.enums.SystemOS;
@@ -6,7 +6,7 @@ import io.github.retrooper.packetevents.utils.NMSUtils;
 
 import java.lang.reflect.InvocationTargetException;
 
-public class ServerUtils {
+public final class ServerUtils {
     public ServerVersion getServerVersion() {
         return ServerVersion.getVersion();
     }

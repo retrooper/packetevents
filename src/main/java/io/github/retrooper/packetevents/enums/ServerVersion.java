@@ -1,5 +1,6 @@
 package io.github.retrooper.packetevents.enums;
 
+import io.github.retrooper.packetevents.PacketEvents;
 import org.bukkit.Bukkit;
 
 /**
@@ -24,6 +25,9 @@ public enum ServerVersion {
                 return val;
             }
         }
+        if (PacketEvents.getAPI().getSettings().getDefaultServerVersion() != null) {
+            return PacketEvents.getAPI().getSettings().getDefaultServerVersion();
+        }
         return ERROR;
     }
 
@@ -33,6 +37,7 @@ public enum ServerVersion {
         }
         return cachedVersion;
     }
+
 
     private static ServerVersion[] reverse(final ServerVersion[] arr) {
         ServerVersion[] array = arr.clone();
@@ -57,7 +62,7 @@ public enum ServerVersion {
     }
 
     public static String getNMSDirectory() {
-        return "net.minecraft.server." + nmsVersionSuffix;
+        return "net.minecraft.server." + getNmsSuffix();
     }
 
     public static String getOBCDirectory() {

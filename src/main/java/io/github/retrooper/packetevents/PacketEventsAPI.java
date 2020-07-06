@@ -1,12 +1,16 @@
 package io.github.retrooper.packetevents;
 
 import io.github.retrooper.packetevents.event.manager.EventManager;
+import io.github.retrooper.packetevents.settings.Settings;
+import io.github.retrooper.packetevents.utils.api.PlayerUtils;
+import io.github.retrooper.packetevents.utils.api.ServerUtils;
 import org.bukkit.scheduler.BukkitTask;
 
 public final class PacketEventsAPI {
     private final EventManager eventManager = new EventManager();
     private final PlayerUtils playerUtils = new PlayerUtils();
     private final ServerUtils serverUtils = new ServerUtils();
+    private final Settings settings = new Settings();
 
     private BukkitTask serverTickTask;
 
@@ -67,6 +71,7 @@ public final class PacketEventsAPI {
      *
      * @return server tick task
      */
+    @Deprecated
     public BukkitTask getServerTickTask() {
         return serverTickTask;
     }
@@ -76,8 +81,13 @@ public final class PacketEventsAPI {
      *
      * @param task
      */
+    @Deprecated
     public void setServerTickTask(final BukkitTask task) {
         this.serverTickTask = task;
+    }
+
+    public Settings getSettings() {
+        return settings;
     }
 
 
