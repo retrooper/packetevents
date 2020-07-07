@@ -32,8 +32,8 @@ public final class PacketSendEvent extends PacketEvent {
      *
      * @return packet id
      */
-    public int getPacketId() {
-        Integer id =
+    public byte getPacketId() {
+        Byte id =
                 PacketType.Server.packetIds.get(getNMSPacketClass());
         if (id == null) {
             return -1;

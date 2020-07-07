@@ -5,8 +5,8 @@ import io.github.retrooper.packetevents.PacketEvents;
 import io.github.retrooper.packetevents.enums.ServerVersion;
 
 public class PacketEvent {
-    protected static ServerVersion version = PacketEvents.getAPI().getServerUtilities().getServerVersion();
-    private long timestamp = PacketEvents.getAPI().currentMillis();
+    protected static ServerVersion version = ServerVersion.getVersion();
+    private long timestamp = System.currentTimeMillis();
 
     /**
      * Timestamp of the packet

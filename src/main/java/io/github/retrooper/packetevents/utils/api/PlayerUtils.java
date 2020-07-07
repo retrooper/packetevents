@@ -1,5 +1,6 @@
 package io.github.retrooper.packetevents.utils.api;
 
+import io.github.retrooper.packetevents.PacketEvents;
 import io.github.retrooper.packetevents.enums.ClientVersion;
 import io.github.retrooper.packetevents.handler.NettyPacketHandler;
 import io.github.retrooper.packetevents.packetwrappers.Sendable;
@@ -11,17 +12,6 @@ import java.util.UUID;
 
 public final class PlayerUtils {
     private final HashMap<UUID, ClientVersion> clientVersionsMap = new HashMap<UUID, ClientVersion>();
-
-    /**
-     * Use {@link #getPing(Player)}
-     *
-     * @param player
-     * @return
-     */
-    @Deprecated
-    public int getPlayerPing(final Player player) {
-        return getPing(player);
-    }
 
     public int getPing(final Player player) {
         return NMSUtils.getPlayerPing(player);
@@ -51,12 +41,12 @@ public final class PlayerUtils {
         clearClientVersion(player.getUniqueId());
     }
 
-    public void injectPlayer(final Player player) {
-        NettyPacketHandler.injectPlayer(player);
+    public void injectPlayer(final Player player, final PacketEvents pe) {
+        NettyPacketHandler.injectPlayer(player,pe);
     }
 
-    public void uninjectPlayer(final Player player) {
-        NettyPacketHandler.uninjectPlayer(player);
+    public void uninjectPlayer(final Player player, final PacketEvents pe) {
+        NettyPacketHandler.uninjectPlayer(player, pe);
     }
 
     public void sendPacket(final Player player, final Sendable sendable) {

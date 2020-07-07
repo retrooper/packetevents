@@ -24,9 +24,9 @@ public enum ServerVersion {
             if (Bukkit.getBukkitVersion().contains(valName)) {
                 return val;
             }
-        }
-        if (PacketEvents.getAPI().getSettings().getDefaultServerVersion() != null) {
-            return PacketEvents.getAPI().getSettings().getDefaultServerVersion();
+            else if(PacketEvents.getSettings().getDefaultServerVersion() != null) {
+                return PacketEvents.getSettings().getDefaultServerVersion();
+            }
         }
         return ERROR;
     }

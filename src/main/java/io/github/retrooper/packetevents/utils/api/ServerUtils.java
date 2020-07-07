@@ -7,11 +7,24 @@ import io.github.retrooper.packetevents.utils.NMSUtils;
 import java.lang.reflect.InvocationTargetException;
 
 public final class ServerUtils {
+    @Deprecated
     public ServerVersion getServerVersion() {
+        return getVersion();
+    }
+    @Deprecated
+    public double[] getRecentServerTPS() {
+       return getRecentTPS();
+    }
+    @Deprecated
+    public double getCurrentServerTPS() {
+        return getCurrentTPS();
+    }
+
+    public ServerVersion getVersion() {
         return ServerVersion.getVersion();
     }
 
-    public double[] getRecentServerTPS() {
+    public double[] getRecentTPS() {
         double[] tpsArray = new double[0];
         try {
             tpsArray = NMSUtils.recentTPS();
@@ -21,8 +34,8 @@ public final class ServerUtils {
         return tpsArray;
     }
 
-    public double getCurrentServerTPS() {
-        return getRecentServerTPS()[0];
+    public double getCurrentTPS() {
+        return getRecentTPS()[0];
     }
 
     public SystemOS getPlatform() {

@@ -21,21 +21,21 @@ public class NettyPacketHandler {
         }
     }
 
-    public static void injectPlayer(final Player player) {
+    public static void injectPlayer(final Player player, PacketEvents pe) {
         final PlayerInjectEvent injectEvent = new PlayerInjectEvent(player);
-        PacketEvents.getAPI().getEventManager().callEvent(injectEvent);
+        pe.getAPI().getEventManager().callEvent(injectEvent, pe.getPlugin());
         if (!injectEvent.isCancelled()) {
             if (v1_7_nettyMode) {
-                NettyPacketHandler_7.injectPlayer(player);
+                NettyPacketHandler_7.injectPlayer(player, pe);
             } else {
-                NettyPacketHandler_8.injectPlayer(player);
+                NettyPacketHandler_8.injectPlayer(player, pe);
             }
         }
     }
 
-    public static Future<?> uninjectPlayer(final Player player) {
+    public static Future<?> uninjectPlayer(final Player player, PacketEvents pe) {
         final PlayerUninjectEvent uninjectEvent = new PlayerUninjectEvent(player);
-        PacketEvents.getAPI().getEventManager().callEvent(uninjectEvent);
+        pe.getAPI().getEventManager().callEvent(uninjectEvent, pe.getPlugin());
         if (!uninjectEvent.isCancelled()) {
             if (v1_7_nettyMode) {
                 return NettyPacketHandler_7.uninjectPlayer(player);
@@ -46,20 +46,20 @@ public class NettyPacketHandler {
         return null;
     }
 
-    public static Object write(final Player sender, final Object packet) {
+    public static Object write(final Player sender, final Object packet, PacketEvents pe) {
         final String packetName = packet.getClass().getSimpleName();
         final PacketSendEvent packetSendEvent = new PacketSendEvent(sender, packetName, packet);
-        PacketEvents.getAPI().getEventManager().callEvent(packetSendEvent);
+        pe.getAPI().getEventManager().callEvent(packetSendEvent, pe.getPlugin());
         if (!packetSendEvent.isCancelled()) {
             return packet;
         }
         return null;
     }
 
-    public static Object read(final Player receiver, final Object packet) {
+    public static Object read(final Player receiver, final Object packet, PacketEvents pe) {
         final String packetName = packet.getClass().getSimpleName();
         final PacketReceiveEvent packetReceiveEvent = new PacketReceiveEvent(receiver, packetName, packet);
-        PacketEvents.getAPI().getEventManager().callEvent(packetReceiveEvent);
+        pe.getAPI().getEventManager().callEvent(packetReceiveEvent, pe.getPlugin());
         if (!packetReceiveEvent.isCancelled()) {
             return packet;
         }

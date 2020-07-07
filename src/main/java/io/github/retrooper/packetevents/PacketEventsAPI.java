@@ -9,10 +9,7 @@ import org.bukkit.scheduler.BukkitTask;
 public final class PacketEventsAPI {
     private final EventManager eventManager = new EventManager();
     private final PlayerUtils playerUtils = new PlayerUtils();
-    private final ServerUtils serverUtils = new ServerUtils();
-    private final Settings settings = new Settings();
-
-    private BukkitTask serverTickTask;
+    private final ServerUtils serverUtils = new ServerUtils();;
 
     /**
      * Not thread safe
@@ -66,29 +63,6 @@ public final class PacketEventsAPI {
         return eventManager;
     }
 
-    /**
-     * Get the server tick task, called **asynchronously** every tick
-     *
-     * @return server tick task
-     */
-    @Deprecated
-    public BukkitTask getServerTickTask() {
-        return serverTickTask;
-    }
-
-    /**
-     * Modify the server tick task object
-     *
-     * @param task
-     */
-    @Deprecated
-    public void setServerTickTask(final BukkitTask task) {
-        this.serverTickTask = task;
-    }
-
-    public Settings getSettings() {
-        return settings;
-    }
 
 
 }

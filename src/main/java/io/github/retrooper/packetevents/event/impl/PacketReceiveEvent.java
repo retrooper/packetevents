@@ -57,8 +57,8 @@ public final class PacketReceiveEvent extends PacketEvent {
      *
      * @return packet id
      */
-    public int getPacketId() {
-        Integer id = PacketType.Client.packetIds.get(getNMSPacketClass());
+    public byte getPacketId() {
+        Byte id = PacketType.Client.packetIds.get(getNMSPacketClass());
         if (id == null) {
             return -1;
         }

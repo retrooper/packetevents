@@ -5,10 +5,11 @@ import io.github.retrooper.packetevents.event.PacketListener;
 import io.github.retrooper.packetevents.event.impl.BukkitMoveEvent;
 import io.github.retrooper.packetevents.event.impl.PacketReceiveEvent;
 import io.github.retrooper.packetevents.event.impl.PlayerInjectEvent;
-import io.github.retrooper.packetevents.event.impl.ServerTickEvent;
 import io.github.retrooper.packetevents.packet.PacketType;
 import io.github.retrooper.packetevents.packet.PacketTypeClasses;
+import io.github.retrooper.packetevents.settings.Settings;
 import org.bukkit.Bukkit;
+import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
@@ -16,16 +17,21 @@ import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.plugin.Plugin;
 
+import java.util.HashMap;
+
 public final class PacketEvents implements PacketListener, Listener {
-    private static final PacketEventsAPI packetEventsAPI = new PacketEventsAPI();
-    private static final PacketEvents instance = new PacketEvents();
-    private static boolean hasRegistered;
-    private static int currentTick;
-    private static Plugin plugin;
+    public static HashMap<Plugin, Integer> plugins = new HashMap<Plugin, Integer>();
+    public PacketEvents(final Plugin plugin) {
+        this.plugin = plugin;
+        plugins.put(plugin, plugins.size());
+    }
+    private final Plugin plugin;
+    private final PacketEventsAPI packetEventsAPI = new PacketEventsAPI();
     private static boolean hasLoaded;
+    private static final Settings settings = new Settings();
 
     /**
-     * Call this before start(), this is also very heavy
+     * Call this before start()
      */
     public static void load() {
         PacketTypeClasses.Client.load();
@@ -34,71 +40,51 @@ public final class PacketEvents implements PacketListener, Listener {
     }
 
     /**
-     * Starts the server tick task and registers what is needed to be registered
-     *
-     * @param plugin
+     *Loads PacketEvents if you haven't already, Sets everything up, injects all players
      */
-    public static void start(final Plugin plugin) {
+    public void start() {
         if (!hasLoaded) {
             load();
         }
-        if (!hasRegistered) {
             //Register Bukkit and PacketListener
-            getAPI().getEventManager().registerListener(getInstance());
+            getAPI().getEventManager().registerListener(this);
 
-            Bukkit.getPluginManager().registerEvents(getInstance(), plugin);
+            Bukkit.getPluginManager().registerEvents(this, plugin);
 
-            //Start the server tick task
-            final Runnable tickRunnable = new Runnable() {
-                @Override
-                public void run() {
-                    getAPI().getEventManager().callEvent(new ServerTickEvent(currentTick++, PacketEvents.getAPI().currentMillis()));
-                }
-            };
-            getAPI().setServerTickTask(Bukkit.getScheduler().runTaskTimerAsynchronously(plugin, tickRunnable, 0L, 1L));
-            hasRegistered = true;
-            PacketEvents.plugin = plugin;
-        }
+            for(final Player p : Bukkit.getServer().getOnlinePlayers()) {
+                getAPI().getPlayerUtilities().injectPlayer(p, this);
+            }
+
     }
 
     /**
      * Stop all tasks and unregisters all PacketEvents' listeners
      */
-    public static void stop() {
-        if (getAPI().getServerTickTask() != null) {
-            getAPI().getServerTickTask().cancel();
-        }
+    public void stop() {
         getAPI().getEventManager().unregisterAllListeners();
 
         PacketType.Client.packetIds.clear();
         PacketType.Server.packetIds.clear();
+        for(final Player p : Bukkit.getServer().getOnlinePlayers()) {
+            getAPI().getPlayerUtilities().uninjectPlayer(p, this);
+        }
     }
 
-    public static PacketEventsAPI getAPI() {
+    public PacketEventsAPI getAPI() {
         return packetEventsAPI;
     }
 
-
-    /**
-     * Get an instance of the PacketEvents API class
-     *
-     * @return instance
-     */
-    private static PacketEvents getInstance() {
-        return instance;
-    }
-
-    public static Plugin getPlugin() {
+    public Plugin getPlugin() {
         return plugin;
     }
 
-    /**
-     * Do not check the client version in or before the PlayerInjectEvent, use the PostPlayerInjectEvent.
-     * It is not recommended to do much in the PlayerInjectEvent, as some fields in the Player object are be null.
-     * Use the PostPlayerInjectEvent which is only called after the PlayerJoinEvent if the player was injected.
-     *
-     * @param e
-     */
+    public String getHandlerName() {
+        return "packetevents_" + plugins.get(plugin);
+    }
+    public static Settings getSettings() {
+        return settings;
+    }
+
     @PacketHandler
     public void onInject(final PlayerInjectEvent e) {
         getAPI().getPlayerUtilities().setClientVersion(e.getPlayer(), e.getClientVersion());
@@ -110,17 +96,17 @@ public final class PacketEvents implements PacketListener, Listener {
 
     @EventHandler
     public void onJoin(final PlayerJoinEvent e) {
-        getAPI().getPlayerUtilities().injectPlayer(e.getPlayer());
+        getAPI().getPlayerUtilities().injectPlayer(e.getPlayer(), this);
     }
 
     @EventHandler
     public void onQuit(final PlayerQuitEvent e) {
         getAPI().getPlayerUtilities().clearClientVersion(e.getPlayer());
-        getAPI().getPlayerUtilities().uninjectPlayer(e.getPlayer());
+        getAPI().getPlayerUtilities().uninjectPlayer(e.getPlayer(), this);
     }
 
     @EventHandler
     public void onMove(final PlayerMoveEvent e) {
-        getAPI().getEventManager().callEvent(new BukkitMoveEvent(e));
+        getAPI().getEventManager().callEvent(new BukkitMoveEvent(e), getPlugin());
     }
 }
