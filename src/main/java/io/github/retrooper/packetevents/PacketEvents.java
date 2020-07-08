@@ -79,7 +79,7 @@ public final class PacketEvents implements PacketListener, Listener {
     }
 
     public String getHandlerName() {
-        return "packetevents_" + plugins.get(plugin);
+        return "pe" + plugin.getName();
     }
     public static Settings getSettings() {
         return settings;
