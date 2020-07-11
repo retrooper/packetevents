@@ -8,6 +8,7 @@ import org.bukkit.event.player.PlayerMoveEvent;
 public final class BukkitMoveEvent extends PacketEvent {
     private final Player player;
     private final Location to, from;
+    private boolean cancelled;
 
     public BukkitMoveEvent(final Player player, final Location to, final Location from) {
         this.player = player;
@@ -31,5 +32,17 @@ public final class BukkitMoveEvent extends PacketEvent {
 
     public Location getTo() {
         return to;
+    }
+
+    public void setCancelled(final boolean val) {
+        this.cancelled = val;
+    }
+
+    public boolean isCancelled() {
+        return cancelled;
+    }
+
+    public void cancel() {
+        setCancelled(true);
     }
 }

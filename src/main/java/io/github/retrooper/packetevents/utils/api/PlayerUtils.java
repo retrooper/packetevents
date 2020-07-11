@@ -41,12 +41,12 @@ public final class PlayerUtils {
         clearClientVersion(player.getUniqueId());
     }
 
-    public void injectPlayer(final Player player, final PacketEvents pe) {
-        NettyPacketHandler.injectPlayer(player,pe);
+    public void injectPlayer(final Player player) {
+        NettyPacketHandler.injectPlayer(player);
     }
 
-    public void uninjectPlayer(final Player player, final PacketEvents pe) {
-        NettyPacketHandler.uninjectPlayer(player, pe);
+    public void uninjectPlayer(final Player player) {
+        NettyPacketHandler.uninjectPlayer(player);
     }
 
     public void sendPacket(final Player player, final Sendable sendable) {

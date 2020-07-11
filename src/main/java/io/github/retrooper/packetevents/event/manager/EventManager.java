@@ -6,7 +6,6 @@ import io.github.retrooper.packetevents.annotations.data.EventSynchronization;
 import io.github.retrooper.packetevents.event.PacketEvent;
 import io.github.retrooper.packetevents.event.PacketListener;
 import org.bukkit.Bukkit;
-import org.bukkit.plugin.Plugin;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -28,7 +27,7 @@ public final class EventManager {
         this(Runtime.getRuntime().availableProcessors());
     }
 
-    public void callEvent(final PacketEvent e, final Plugin plugin) {
+    public void callEvent(final PacketEvent e) {
         for (final PacketListener listener : registeredMethods.keySet()) {
             //Annotated methods
             final List<Method> methods = registeredMethods.get(listener);
@@ -50,7 +49,7 @@ public final class EventManager {
                     if (annotation.synchronization() == EventSynchronization.FORCE_ASYNC) {
                         executorService.execute(invokeMethod);
                     } else if (annotation.synchronization() == EventSynchronization.FORCE_SYNC) {
-                        Bukkit.getScheduler().runTask(plugin, invokeMethod);
+                        Bukkit.getScheduler().runTask(PacketEvents.getPlugin(), invokeMethod);
                     } else {
                         invokeMethod.run();
                     }

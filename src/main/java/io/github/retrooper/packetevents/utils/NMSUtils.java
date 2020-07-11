@@ -1,6 +1,5 @@
 package io.github.retrooper.packetevents.utils;
 
-import io.github.retrooper.packetevents.PacketEvents;
 import io.github.retrooper.packetevents.annotations.Nullable;
 import io.github.retrooper.packetevents.enums.ServerVersion;
 import io.github.retrooper.packetevents.packetwrappers.Sendable;

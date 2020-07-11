@@ -1,7 +1,6 @@
 package io.github.retrooper.packetevents.handler;
 
 import io.github.retrooper.packetevents.PacketEvents;
-import io.github.retrooper.packetevents.enums.ServerVersion;
 import io.github.retrooper.packetevents.utils.NMSUtils;
 import io.netty.channel.*;
 import org.bukkit.entity.Player;
@@ -10,11 +9,11 @@ import java.util.concurrent.Future;
 
 final class NettyPacketHandler_8 {
 
-    public static void injectPlayer(final Player player, final PacketEvents pe) {
+    public static void injectPlayer(final Player player) {
         final ChannelDuplexHandler channelDuplexHandler = new ChannelDuplexHandler() {
             @Override
             public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
-                Object packet = NettyPacketHandler.read(player, msg, pe);
+                Object packet = NettyPacketHandler.read(player, msg);
                 if (packet == null) {
                     return;
                 }
@@ -23,7 +22,7 @@ final class NettyPacketHandler_8 {
 
             @Override
             public void write(ChannelHandlerContext ctx, Object msg, ChannelPromise promise) throws Exception {
-                Object packet = NettyPacketHandler.write(player, msg, pe);
+                Object packet = NettyPacketHandler.write(player, msg);
                 if (packet == null) {
                     return;
                 }
@@ -31,7 +30,7 @@ final class NettyPacketHandler_8 {
             }
         };
         final ChannelPipeline pipeline = ((Channel) NMSUtils.getChannel(player)).pipeline();
-        pipeline.addBefore(pe.getHandlerName(), player.getName(), channelDuplexHandler);
+        pipeline.addBefore("packet_handler", PacketEvents.getHandlerName(player.getName()), channelDuplexHandler);
     }
 
     public static Future<?> uninjectPlayer(final Player player) {
@@ -39,7 +38,7 @@ final class NettyPacketHandler_8 {
         return channel.eventLoop().submit(new Runnable() {
             @Override
             public void run() {
-                channel.pipeline().remove(player.getName());
+                channel.pipeline().remove(PacketEvents.getHandlerName(player.getName()));
             }
         });
     }

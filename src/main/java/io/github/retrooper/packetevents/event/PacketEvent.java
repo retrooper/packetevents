@@ -1,7 +1,6 @@
 package io.github.retrooper.packetevents.event;
 
 
-import io.github.retrooper.packetevents.PacketEvents;
 import io.github.retrooper.packetevents.enums.ServerVersion;
 
 public class PacketEvent {

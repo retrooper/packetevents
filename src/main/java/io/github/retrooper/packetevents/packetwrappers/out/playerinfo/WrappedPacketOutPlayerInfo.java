@@ -1,5 +1,6 @@
 package io.github.retrooper.packetevents.packetwrappers.out.playerinfo;
 
+import io.github.retrooper.packetevents.enums.minecraft.Gamemode;
 import io.github.retrooper.packetevents.enums.minecraft.PlayerInfoAction;
 import io.github.retrooper.packetevents.packetwrappers.api.WrappedPacket;
 import io.github.retrooper.packetevents.reflectionutils.Reflection;
@@ -31,6 +32,12 @@ public class WrappedPacketOutPlayerInfo extends WrappedPacket {
             enumPlayerInfoActionClass = NMSUtils.getNMSClass("EnumPLayerInfoAction");
         } catch (ClassNotFoundException e) {
             enumPlayerInfoActionClass = Reflection.getSubClass(packetClass, "EnumPlayerInfoAction");
+        }
+    }
+
+    public class PlayerDataInfo {
+        public PlayerDataInfo(Object gameProfile, int var, Gamemode gamemode,String s ) {
+
         }
     }
 

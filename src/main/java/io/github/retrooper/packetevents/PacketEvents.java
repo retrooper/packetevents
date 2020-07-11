@@ -1,13 +1,12 @@
 package io.github.retrooper.packetevents;
 
-import io.github.retrooper.packetevents.annotations.PacketHandler;
+import io.github.retrooper.packetevents.enums.ClientVersion;
 import io.github.retrooper.packetevents.event.PacketListener;
 import io.github.retrooper.packetevents.event.impl.BukkitMoveEvent;
-import io.github.retrooper.packetevents.event.impl.PacketReceiveEvent;
-import io.github.retrooper.packetevents.event.impl.PlayerInjectEvent;
 import io.github.retrooper.packetevents.packet.PacketType;
 import io.github.retrooper.packetevents.packet.PacketTypeClasses;
 import io.github.retrooper.packetevents.settings.Settings;
+import io.github.retrooper.packetevents.utils.versionlookup.VersionLookupUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -17,16 +16,10 @@ import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.plugin.Plugin;
 
-import java.util.HashMap;
-
 public final class PacketEvents implements PacketListener, Listener {
-    public static HashMap<Plugin, Integer> plugins = new HashMap<Plugin, Integer>();
-    public PacketEvents(final Plugin plugin) {
-        this.plugin = plugin;
-        plugins.put(plugin, plugins.size());
-    }
-    private final Plugin plugin;
-    private final PacketEventsAPI packetEventsAPI = new PacketEventsAPI();
+    private static Plugin plugin;
+    private static final PacketEventsAPI packetEventsAPI = new PacketEventsAPI();
+    private static final PacketEvents instance = new PacketEvents();
     private static boolean hasLoaded;
     private static final Settings settings = new Settings();
 
@@ -42,71 +35,67 @@ public final class PacketEvents implements PacketListener, Listener {
     /**
      *Loads PacketEvents if you haven't already, Sets everything up, injects all players
      */
-    public void start() {
+    public static void start(final Plugin pl) {
         if (!hasLoaded) {
             load();
         }
+        plugin = pl;
             //Register Bukkit and PacketListener
-            getAPI().getEventManager().registerListener(this);
+            getAPI().getEventManager().registerListener(instance);
 
-            Bukkit.getPluginManager().registerEvents(this, plugin);
+            Bukkit.getPluginManager().registerEvents(instance, plugin);
 
-            for(final Player p : Bukkit.getServer().getOnlinePlayers()) {
-                getAPI().getPlayerUtilities().injectPlayer(p, this);
+            for(final Player p : pl.getServer().getOnlinePlayers()) {
+                getAPI().getPlayerUtilities().injectPlayer(p);
             }
-
     }
 
     /**
      * Stop all tasks and unregisters all PacketEvents' listeners
      */
-    public void stop() {
+    public static void stop() {
+
+        for(final Player p : plugin.getServer().getOnlinePlayers()) {
+            getAPI().getPlayerUtilities().uninjectPlayer(p);
+        }
         getAPI().getEventManager().unregisterAllListeners();
 
         PacketType.Client.packetIds.clear();
         PacketType.Server.packetIds.clear();
-        for(final Player p : Bukkit.getServer().getOnlinePlayers()) {
-            getAPI().getPlayerUtilities().uninjectPlayer(p, this);
-        }
     }
 
-    public PacketEventsAPI getAPI() {
+    public static PacketEventsAPI getAPI() {
         return packetEventsAPI;
     }
 
-    public Plugin getPlugin() {
+    public static Plugin getPlugin() {
         return plugin;
     }
 
-    public String getHandlerName() {
-        return "pe" + plugin.getName();
+    public static String getHandlerName(final String name) {
+        return "pe-" + getSettings().getIdentifier() + "-" + name;
     }
     public static Settings getSettings() {
         return settings;
     }
 
-    @PacketHandler
-    public void onInject(final PlayerInjectEvent e) {
-        getAPI().getPlayerUtilities().setClientVersion(e.getPlayer(), e.getClientVersion());
-    }
-
-    @PacketHandler
-    public void onReceive(final PacketReceiveEvent e) {
-    }
 
     @EventHandler
     public void onJoin(final PlayerJoinEvent e) {
-        getAPI().getPlayerUtilities().injectPlayer(e.getPlayer(), this);
+        getAPI().getPlayerUtilities().injectPlayer(e.getPlayer());
+        getAPI().getPlayerUtilities().setClientVersion(e.getPlayer(), ClientVersion.fromProtocolVersion(VersionLookupUtils.getProtocolVersion(e.getPlayer())));
     }
 
     @EventHandler
     public void onQuit(final PlayerQuitEvent e) {
         getAPI().getPlayerUtilities().clearClientVersion(e.getPlayer());
-        getAPI().getPlayerUtilities().uninjectPlayer(e.getPlayer(), this);
+        getAPI().getPlayerUtilities().uninjectPlayer(e.getPlayer());
     }
 
     @EventHandler
     public void onMove(final PlayerMoveEvent e) {
-        getAPI().getEventManager().callEvent(new BukkitMoveEvent(e), getPlugin());
+        BukkitMoveEvent moveEvent = new BukkitMoveEvent(e);
+        getAPI().getEventManager().callEvent(moveEvent);
+        e.setCancelled(moveEvent.isCancelled());
     }
 }

@@ -1,10 +1,8 @@
 package io.github.retrooper.packetevents;
 
 import io.github.retrooper.packetevents.event.manager.EventManager;
-import io.github.retrooper.packetevents.settings.Settings;
 import io.github.retrooper.packetevents.utils.api.PlayerUtils;
 import io.github.retrooper.packetevents.utils.api.ServerUtils;
-import org.bukkit.scheduler.BukkitTask;
 
 public final class PacketEventsAPI {
     private final EventManager eventManager = new EventManager();
