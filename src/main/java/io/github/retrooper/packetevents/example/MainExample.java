@@ -16,13 +16,13 @@ public class MainExample extends JavaPlugin implements PacketListener {
     }
 
     @Override
-    public void onEnable() {
+    public void onEnable() { //Make sure you set a unique identifier, if another present plugin has the same identifier, you could run into issues
+        PacketEvents.getSettings().setIdentifier("official_api");
+
         PacketEvents.start(this);
         //If packetevents cannot detect your server version, it will use the default you specify version
         // getAPI().getSettings().setDefaultServerVersion(ServerVersion.v_1_7_10);
 
-        //Make sure you set a unique identifier, if another present plugin has the same identifier, you could run into issues
-        PacketEvents.getSettings().setIdentifier("official_api");
 
         PacketEvents.getAPI().getEventManager().registerListeners(this);
     }
@@ -40,7 +40,7 @@ public class MainExample extends JavaPlugin implements PacketListener {
 
     @PacketHandler
     public void onKeepAlive(PacketReceiveEvent e) {
-        if(e.getPacketId() == PacketType.Client.KEEP_ALIVE) {
+        if (e.getPacketId() == PacketType.Client.KEEP_ALIVE) {
             e.getPlayer().sendMessage("you sent keep alive");
         }
     }

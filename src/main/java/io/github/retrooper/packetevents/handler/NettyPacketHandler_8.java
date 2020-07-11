@@ -42,4 +42,9 @@ final class NettyPacketHandler_8 {
             }
         });
     }
+
+    public static void uninjectPlayerNow(final Player player) {
+        final Channel channel = (Channel) NMSUtils.getChannel(player);
+        channel.pipeline().remove(PacketEvents.getHandlerName(player.getName()));
+    }
 }

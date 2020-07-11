@@ -12,7 +12,7 @@ import java.lang.reflect.Method;
 
 public final class EntityFinderUtils {
     @Nullable
-    private static final ServerVersion version =ServerVersion.getVersion();
+    private static final ServerVersion version = ServerVersion.getVersion();
     private static Class<?> worldServerClass;
     private static Class<?> craftWorldClass;
     private static Class<?> entityClass;

@@ -36,7 +36,7 @@ public class WrappedPacketOutPlayerInfo extends WrappedPacket {
     }
 
     public class PlayerDataInfo {
-        public PlayerDataInfo(Object gameProfile, int var, Gamemode gamemode,String s ) {
+        public PlayerDataInfo(Object gameProfile, int var, Gamemode gamemode, String s) {
 
         }
     }

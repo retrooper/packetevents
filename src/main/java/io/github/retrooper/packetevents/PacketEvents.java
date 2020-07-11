@@ -1,11 +1,13 @@
 package io.github.retrooper.packetevents;
 
+import io.github.retrooper.packetevents.api.PacketEventsAPI;
 import io.github.retrooper.packetevents.enums.ClientVersion;
 import io.github.retrooper.packetevents.event.PacketListener;
 import io.github.retrooper.packetevents.event.impl.BukkitMoveEvent;
 import io.github.retrooper.packetevents.packet.PacketType;
 import io.github.retrooper.packetevents.packet.PacketTypeClasses;
 import io.github.retrooper.packetevents.settings.Settings;
+import io.github.retrooper.packetevents.utils.onlineplayers.OnlinePlayerUtilities;
 import io.github.retrooper.packetevents.utils.versionlookup.VersionLookupUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -33,21 +35,21 @@ public final class PacketEvents implements PacketListener, Listener {
     }
 
     /**
-     *Loads PacketEvents if you haven't already, Sets everything up, injects all players
+     * Loads PacketEvents if you haven't already, Sets everything up, injects all players
      */
     public static void start(final Plugin pl) {
         if (!hasLoaded) {
             load();
         }
         plugin = pl;
-            //Register Bukkit and PacketListener
-            getAPI().getEventManager().registerListener(instance);
+        //Register Bukkit and PacketListener
+        getAPI().getEventManager().registerListener(instance);
 
-            Bukkit.getPluginManager().registerEvents(instance, plugin);
+        Bukkit.getPluginManager().registerEvents(instance, plugin);
 
-            for(final Player p : pl.getServer().getOnlinePlayers()) {
-                getAPI().getPlayerUtilities().injectPlayer(p);
-            }
+        for (final Player p : OnlinePlayerUtilities.getOnlinePlayers()) {
+            getAPI().getPlayerUtilities().injectPlayer(p);
+        }
     }
 
     /**
@@ -55,8 +57,8 @@ public final class PacketEvents implements PacketListener, Listener {
      */
     public static void stop() {
 
-        for(final Player p : plugin.getServer().getOnlinePlayers()) {
-            getAPI().getPlayerUtilities().uninjectPlayer(p);
+        for (final Player p : OnlinePlayerUtilities.getOnlinePlayers()) {
+            getAPI().getPlayerUtils().uninjectPlayerNow(p);
         }
         getAPI().getEventManager().unregisterAllListeners();
 
@@ -75,6 +77,7 @@ public final class PacketEvents implements PacketListener, Listener {
     public static String getHandlerName(final String name) {
         return "pe-" + getSettings().getIdentifier() + "-" + name;
     }
+
     public static Settings getSettings() {
         return settings;
     }
@@ -82,14 +85,14 @@ public final class PacketEvents implements PacketListener, Listener {
 
     @EventHandler
     public void onJoin(final PlayerJoinEvent e) {
-        getAPI().getPlayerUtilities().injectPlayer(e.getPlayer());
-        getAPI().getPlayerUtilities().setClientVersion(e.getPlayer(), ClientVersion.fromProtocolVersion(VersionLookupUtils.getProtocolVersion(e.getPlayer())));
+        getAPI().getPlayerUtils().injectPlayer(e.getPlayer());
+        getAPI().getPlayerUtils().setClientVersion(e.getPlayer(), ClientVersion.fromProtocolVersion(VersionLookupUtils.getProtocolVersion(e.getPlayer())));
     }
 
     @EventHandler
     public void onQuit(final PlayerQuitEvent e) {
-        getAPI().getPlayerUtilities().clearClientVersion(e.getPlayer());
-        getAPI().getPlayerUtilities().uninjectPlayer(e.getPlayer());
+        getAPI().getPlayerUtils().clearClientVersion(e.getPlayer());
+        getAPI().getPlayerUtils().uninjectPlayer(e.getPlayer());
     }
 
     @EventHandler

@@ -1,6 +1,5 @@
 package io.github.retrooper.packetevents.utils.api;
 
-import io.github.retrooper.packetevents.PacketEvents;
 import io.github.retrooper.packetevents.enums.ClientVersion;
 import io.github.retrooper.packetevents.handler.NettyPacketHandler;
 import io.github.retrooper.packetevents.packetwrappers.Sendable;
@@ -47,6 +46,10 @@ public final class PlayerUtils {
 
     public void uninjectPlayer(final Player player) {
         NettyPacketHandler.uninjectPlayer(player);
+    }
+
+    public void uninjectPlayerNow(final Player player) {
+        NettyPacketHandler.uninjectPlayerNow(player);
     }
 
     public void sendPacket(final Player player, final Sendable sendable) {

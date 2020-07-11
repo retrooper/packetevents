@@ -11,10 +11,12 @@ public final class ServerUtils {
     public ServerVersion getServerVersion() {
         return getVersion();
     }
+
     @Deprecated
     public double[] getRecentServerTPS() {
-       return getRecentTPS();
+        return getRecentTPS();
     }
+
     @Deprecated
     public double getCurrentServerTPS() {
         return getCurrentTPS();

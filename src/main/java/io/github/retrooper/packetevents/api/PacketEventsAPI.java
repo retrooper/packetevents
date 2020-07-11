@@ -1,4 +1,4 @@
-package io.github.retrooper.packetevents;
+package io.github.retrooper.packetevents.api;
 
 import io.github.retrooper.packetevents.event.manager.EventManager;
 import io.github.retrooper.packetevents.utils.api.PlayerUtils;
@@ -7,7 +7,7 @@ import io.github.retrooper.packetevents.utils.api.ServerUtils;
 public final class PacketEventsAPI {
     private final EventManager eventManager = new EventManager();
     private final PlayerUtils playerUtils = new PlayerUtils();
-    private final ServerUtils serverUtils = new ServerUtils();;
+    private final ServerUtils serverUtils = new ServerUtils();
 
     /**
      * Not thread safe
@@ -38,6 +38,16 @@ public final class PacketEventsAPI {
      *
      * @return Player Utilities
      */
+    public PlayerUtils getPlayerUtils() {
+        return playerUtils;
+    }
+
+    /**
+     * Use {@link #getPlayerUtils()}
+     *
+     * @return
+     */
+    @Deprecated
     public PlayerUtils getPlayerUtilities() {
         return playerUtils;
     }
@@ -47,6 +57,16 @@ public final class PacketEventsAPI {
      *
      * @return Server Utilities
      */
+    public ServerUtils getServerUtils() {
+        return serverUtils;
+    }
+
+    /**
+     * Please use {@link #getServerUtils()}
+     *
+     * @return
+     */
+    @Deprecated
     public ServerUtils getServerUtilities() {
         return serverUtils;
     }
@@ -60,7 +80,6 @@ public final class PacketEventsAPI {
     public EventManager getEventManager() {
         return eventManager;
     }
-
 
 
 }

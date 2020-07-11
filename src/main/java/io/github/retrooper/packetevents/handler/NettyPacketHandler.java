@@ -33,7 +33,7 @@ public class NettyPacketHandler {
     }
 
     public static Future<?> uninjectPlayer(final Player player) {
-        final PlayerUninjectEvent uninjectEvent = new PlayerUninjectEvent(player);
+        final PlayerUninjectEvent uninjectEvent = new PlayerUninjectEvent(player, false);
         PacketEvents.getAPI().getEventManager().callEvent(uninjectEvent);
         if (!uninjectEvent.isCancelled()) {
             if (v1_7_nettyMode) {
@@ -43,6 +43,18 @@ public class NettyPacketHandler {
             }
         }
         return null;
+    }
+
+    public static void uninjectPlayerNow(final Player player) {
+        final PlayerUninjectEvent uninjectEvent = new PlayerUninjectEvent(player, true);
+        PacketEvents.getAPI().getEventManager().callEvent(uninjectEvent);
+        if (!uninjectEvent.isCancelled()) {
+            if (v1_7_nettyMode) {
+                NettyPacketHandler_7.uninjectPlayerNow(player);
+            } else {
+                NettyPacketHandler_8.uninjectPlayerNow(player);
+            }
+        }
     }
 
     public static Object write(final Player sender, final Object packet) {

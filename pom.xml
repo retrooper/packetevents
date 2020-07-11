@@ -62,19 +62,21 @@
 
 
     <dependencies>
-        <dependency>
-            <groupId>org.github.spigot</groupId>
-            <artifactId>1.7.10</artifactId>
-            <version>1.7.10</version>
-            <scope>provided</scope>
-        </dependency>
 
         <dependency>
-            <groupId>org.github.spigot</groupId>
-            <artifactId>1.8.8</artifactId>
-            <version>1.8.8</version>
-            <scope>provided</scope>
-        </dependency>
+        <groupId>org.github.spigot</groupId>
+        <artifactId>1.8.8</artifactId>
+        <version>1.8.8</version>
+        <scope>provided</scope>
+    </dependency>
+        <dependency>
+        <groupId>org.github.spigot</groupId>
+        <artifactId>1.7.10</artifactId>
+        <version>1.7.10</version>
+        <scope>provided</scope>
+    </dependency>
+
+
         <dependency>
             <groupId>com.comphenix.protocol</groupId>
             <artifactId>ProtocolLib</artifactId>

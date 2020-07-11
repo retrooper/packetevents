@@ -10,7 +10,7 @@ public enum Gamemode {
     int f;
     String g;
 
-    private Gamemode(int var3, String var4) {
+    Gamemode(int var3, String var4) {
         this.f = var3;
         this.g = var4;
     }
