@@ -1,24 +1,25 @@
-package io.github.retrooper.packetevents.packetwrappers.in.keepalive;
+package io.github.retrooper.packetevents.packetwrappers.out.keepalive;
 
 import io.github.retrooper.packetevents.packetwrappers.api.WrappedPacket;
 import io.github.retrooper.packetevents.reflectionutils.Reflection;
 import io.github.retrooper.packetevents.utils.NMSUtils;
+import net.minecraft.server.v1_8_R3.PacketPlayOutKeepAlive;
 
-public final class WrappedPacketInKeepAlive extends WrappedPacket {
-    private static Class<?> packetClass;
-
-    static {
-        try {
-            packetClass = NMSUtils.getNMSClass("PacketPlayInKeepAlive");
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
-        }
-    }
-
+public class WrappedPacketOutKeepAlive extends WrappedPacket {
     private long id;
 
-    public WrappedPacketInKeepAlive(final Object packet) {
+    public WrappedPacketOutKeepAlive(Object packet) {
         super(packet);
+    }
+
+    /**
+     * Optionally Cast this long to an integer if you are using 1.7.10->1.12.2!
+     * In 1.13.2->1.16.1 a long is sent
+     *
+     * @return response is
+     */
+    public long getId() {
+        return id;
     }
 
     @Override
@@ -38,13 +39,14 @@ public final class WrappedPacketInKeepAlive extends WrappedPacket {
         }
     }
 
-    /**
-     * Optionally Cast this long to an integer if you are using 1.7.10->1.12.2!
-     * In 1.13.2->1.16.1 a long is sent
-     *
-     * @return response is
-     */
-    public long getId() {
-        return id;
+    private static Class<?> packetClass;
+
+    static {
+        try {
+            packetClass = NMSUtils.getNMSClass("PacketPlayOutKeepAlive");
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+        PacketPlayOutKeepAlive p;
     }
 }

@@ -3,9 +3,10 @@ package io.github.retrooper.packetevents.example;
 import io.github.retrooper.packetevents.PacketEvents;
 import io.github.retrooper.packetevents.annotations.PacketHandler;
 import io.github.retrooper.packetevents.event.PacketListener;
-import io.github.retrooper.packetevents.event.impl.PacketReceiveEvent;
+import io.github.retrooper.packetevents.event.impl.PacketSendEvent;
 import io.github.retrooper.packetevents.event.impl.PlayerInjectEvent;
 import io.github.retrooper.packetevents.packet.PacketType;
+import io.github.retrooper.packetevents.packetwrappers.out.keepalive.WrappedPacketOutKeepAlive;
 import org.bukkit.plugin.java.JavaPlugin;
 
 public class MainExample extends JavaPlugin implements PacketListener {
@@ -16,7 +17,8 @@ public class MainExample extends JavaPlugin implements PacketListener {
     }
 
     @Override
-    public void onEnable() { //Make sure you set a unique identifier, if another present plugin has the same identifier, you could run into issues
+    public void onEnable() {
+        //Make sure you set a unique identifier, if another present plugin has the same identifier, you could run into issues
         PacketEvents.getSettings().setIdentifier("official_api");
 
         PacketEvents.start(this);
@@ -32,16 +34,4 @@ public class MainExample extends JavaPlugin implements PacketListener {
         PacketEvents.stop();
     }
 
-    @PacketHandler
-    public void onInject(PlayerInjectEvent e) {
-        e.getPlayer().sendMessage("you have been injected");
-        System.out.println("he has been injected");
-    }
-
-    @PacketHandler
-    public void onKeepAlive(PacketReceiveEvent e) {
-        if (e.getPacketId() == PacketType.Client.KEEP_ALIVE) {
-            e.getPlayer().sendMessage("you sent keep alive");
-        }
-    }
 }
