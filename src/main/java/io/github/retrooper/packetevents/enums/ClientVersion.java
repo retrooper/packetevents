@@ -14,6 +14,8 @@ public enum ClientVersion {
             case 3:
             case 4:
                 return LESS_THAN_V_1_7_10;
+            case 5:
+                return v_1_7_10;
             case 47://ranging from 1.8->1.8.9
                 return v_1_8;
             case 107:
