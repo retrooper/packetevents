@@ -139,6 +139,7 @@ public enum ServerVersion {
         if(this.equals(ServerVersion.v_1_16_1)) {
          return 735;
      }
+        return -1;
     }
 
 }
