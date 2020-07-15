@@ -31,6 +31,7 @@ public final class PacketEvents implements PacketListener, Listener {
     public static void load() {
         PacketTypeClasses.Client.load();
         PacketTypeClasses.Server.load();
+        ClientVersion.prepareLookUp();
         hasLoaded = true;
     }
 
