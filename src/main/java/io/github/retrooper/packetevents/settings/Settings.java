@@ -5,6 +5,7 @@ import io.github.retrooper.packetevents.enums.ServerVersion;
 public class Settings {
     private ServerVersion defaultServerVersion;
     private String identifier = "";
+    private boolean autoResolveClientProtocolVersion;
 
     /**
      * If PacketEvents fails to detect your server version, it will use the recommended version
@@ -31,4 +32,13 @@ public class Settings {
     public void setIdentifier(final String identifier) {
         this.identifier = identifier;
     }
+    
+    public boolean doAutoResolveClientProtocolVersion() {
+        return autoResolveClientProtocolVersion;
+    }
+    
+    public void setDoAutoResolveClientProtocolVersion(boolean autoResolveClientProtocolVersion) {
+     this.autoResolveClientProtocolVersion = autoResolveClientProtocolVersion;
+    }
+    
 }
