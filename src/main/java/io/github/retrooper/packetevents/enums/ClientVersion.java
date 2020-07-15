@@ -65,7 +65,7 @@ public enum ClientVersion {
             default:
                 remainder = protocolVersion;
         }
-        if (remainder > 578) {
+        if (remainder > 736) {
             return HIGHER_THAN_V_1_16_1;
         }
         return INVALID;
