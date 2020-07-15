@@ -32,9 +32,25 @@ public enum ClientVersion {
         VERSION_LOOKUP.put(485, v_1_14_2);
         VERSION_LOOKUP.put(490, v_1_14_3);
         VERSION_LOOKUP.put(498, v_1_14_4);
+        VERSION_LOOKUP.put(565, v_1_15_PRE_1);
+        VERSION_LOOKUP.put(566, v_1_15_PRE_2);
+        VERSION_LOOKUP.put(567, v_1_15_PRE_3);
+        VERSION_LOOKUP.put(569, v_1_15_PRE_4);
+        VERSION_LOOKUP.put(570, v_1_15_PRE_5);
+        VERSION_LOOKUP.put(571, v_1_15_PRE_6);
+        VERSION_LOOKUP.put(572, v_1_15_PRE_7);
         VERSION_LOOKUP.put(573, v_1_15);
         VERSION_LOOKUP.put(575, v_1_15_1);
         VERSION_LOOKUP.put(578, v_1_15_2);
+        VERSION_LOOKUP.put(721, v_1_16_PRE_1);
+        VERSION_LOOKUP.put(722, v_1_16_PRE_2);
+        VERSION_LOOKUP.put(725, v_1_16_PRE_3);
+        VERSION_LOOKUP.put(727, v_1_16_PRE_4);
+        VERSION_LOOKUP.put(729, v_1_16_PRE_5);
+        VERSION_LOOKUP.put(730, v_1_16_PRE_6);
+        VERSION_LOOKUP.put(732, v_1_16_PRE_7);
+        VERSION_LOOKUP.put(733, v_1_16_PRE_8);
+        VERSION_LOOKUP.put(734, v_1_16_RC_1);
         VERSION_LOOKUP.put(735, v_1_16);
         VERSION_LOOKUP.put(736, v_1_16_1);
     }
