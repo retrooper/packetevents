@@ -8,7 +8,7 @@ public enum ClientVersion {
         int remainder = -1;
         switch (protocolVersion) {
             case -1:
-                return ACCESS_FAILURE;
+                return !PacketEvents.getSettings().doAutoResolveClientProtocolVersion() ? ACCESS_FAILURE : ServerVersion.getVersion().toProtocolVersion();
             case 1:
             case 2:
             case 3:
