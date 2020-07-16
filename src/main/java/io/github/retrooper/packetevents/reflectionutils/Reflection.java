@@ -75,13 +75,13 @@ public final class Reflection {
     public static Field getField(final Class<?> cls, final int index) {
         final FieldWithIndex fwi = new FieldWithIndex(cls, index);
         if (!fieldWithIndexHashMap.containsKey(fwi)) {
-            int i = 0;
-            for (final Field f : getFields(cls)) {
-                if (index == i++) {
-                    fieldWithIndexHashMap.put(fwi, f);
-                    return f;
-                }
+            final Field[] fields = getFields(cls);
+            if(fields.length <= index) {
+                return null;
             }
+            final Field field = fields[index];
+            fieldWithIndexHashMap.put(fwi, field);
+              return field;
         } else {
             return fieldWithIndexHashMap.get(fwi);
         }
