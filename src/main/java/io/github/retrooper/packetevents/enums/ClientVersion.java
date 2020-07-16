@@ -1,8 +1,14 @@
 package io.github.retrooper.packetevents.enums;
 
+import io.github.retrooper.packetevents.PacketEvents;
+
+import java.util.HashMap;
+import java.util.Map;
+
 public enum ClientVersion {
     LESS_THAN_V_1_7_10, v_1_7_10, v_1_8, v_1_9, v_1_9_1, v_1_9_2, v_1_9_3, v_1_10, v_1_11, v_1_11_1, v_1_12, v_1_12_1, v_1_12_2,
-    v_1_13, v_1_13_1, v_1_13_2, v_1_14, v_1_14_1, v_1_14_2, v_1_14_3, v_1_14_4, v_1_15, v_1_15_1, v_1_15_2, v_1_16, v_1_16_1, HIGHER_THAN_V_1_16_1, INVALID, ACCESS_FAILURE;
+    v_1_13, v_1_13_1, v_1_13_2, v_1_14, v_1_14_1, v_1_14_2, v_1_14_3, v_1_14_4, v_1_15_PRE_1, v_1_15_PRE_2, v_1_15_PRE_3, v_1_15_PRE_4, v_1_15_PRE_5, v_1_15_PRE_6, v_1_15_PRE_7,
+    v_1_15, v_1_15_1, v_1_15_2, v_1_16, v_1_16_PRE_1, v_1_16_PRE_2, v_1_16_PRE_3, v_1_16_PRE_4, v_1_16_PRE_5, v_1_16_PRE_6, v_1_16_PRE_7, v_1_16_PRE_8, v_1_16_RC_1, v_1_16_1, HIGHER_THAN_V_1_16_1, INVALID, ACCESS_FAILURE;
 
     private static final Map<Integer, ClientVersion> VERSION_LOOKUP = new HashMap<>();
 
