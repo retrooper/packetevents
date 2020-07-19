@@ -39,6 +39,7 @@ final class NettyPacketHandler_7 {
             @Override
             public void run() {
                 channel.pipeline().remove(PacketEvents.getHandlerName(player.getName()));
+                PacketEvents.pendingUninjections.remove(player);
             }
         });
     }

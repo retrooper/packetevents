@@ -18,12 +18,16 @@ import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.plugin.Plugin;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public final class PacketEvents implements PacketListener, Listener {
     private static Plugin plugin;
     private static final PacketEventsAPI packetEventsAPI = new PacketEventsAPI();
     private static final PacketEvents instance = new PacketEvents();
     private static boolean hasLoaded;
     private static final Settings settings = new Settings();
+    public static final List<Player> pendingUninjections = new ArrayList<Player>();
 
     /**
      * Call this before start()
@@ -49,7 +53,7 @@ public final class PacketEvents implements PacketListener, Listener {
         Bukkit.getPluginManager().registerEvents(instance, plugin);
 
         for (final Player p : OnlinePlayerUtilities.getOnlinePlayers()) {
-            getAPI().getPlayerUtilities().injectPlayer(p);
+            getAPI().getPlayerUtils().injectPlayer(p);
         }
     }
 
@@ -57,14 +61,25 @@ public final class PacketEvents implements PacketListener, Listener {
      * Stop all tasks and unregisters all PacketEvents' listeners
      */
     public static void stop() {
-
         for (final Player p : OnlinePlayerUtilities.getOnlinePlayers()) {
-            getAPI().getPlayerUtils().uninjectPlayerNow(p);
+            if(!pendingUninjections.contains(p)) {
+            getAPI().getPlayerUtils().uninjectPlayerNow(p);}
         }
         getAPI().getEventManager().unregisterAllListeners();
 
         PacketType.Client.packetIds.clear();
         PacketType.Server.packetIds.clear();
+        int i = 0;
+        long init = System.currentTimeMillis();
+        while(pendingUninjections.size() > 0) {
+            if(i++ == 0) {
+                System.out.println("PacketEvents is attempting to uninject some players.");
+            }
+            else if(System.currentTimeMillis() - init > 1000L) {
+                init = System.currentTimeMillis();
+                System.out.println("PacketEvents is still attempting to uninject some players...");
+            }
+        }
     }
 
     public static PacketEventsAPI getAPI() {
@@ -93,7 +108,9 @@ public final class PacketEvents implements PacketListener, Listener {
     @EventHandler
     public void onQuit(final PlayerQuitEvent e) {
         getAPI().getPlayerUtils().clearClientVersion(e.getPlayer());
+        pendingUninjections.add(e.getPlayer());
         getAPI().getPlayerUtils().uninjectPlayer(e.getPlayer());
+
     }
 
     @EventHandler

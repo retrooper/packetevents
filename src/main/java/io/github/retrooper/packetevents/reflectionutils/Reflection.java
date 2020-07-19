@@ -85,7 +85,6 @@ public final class Reflection {
         } else {
             return fieldWithIndexHashMap.get(fwi);
         }
-        return null;
     }
 
     //METHODS
