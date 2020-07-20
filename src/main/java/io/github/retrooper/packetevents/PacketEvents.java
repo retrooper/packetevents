@@ -18,16 +18,12 @@ import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.plugin.Plugin;
 
-import java.util.ArrayList;
-import java.util.List;
-
 public final class PacketEvents implements PacketListener, Listener {
     private static Plugin plugin;
     private static final PacketEventsAPI packetEventsAPI = new PacketEventsAPI();
     private static final PacketEvents instance = new PacketEvents();
-    private static boolean hasLoaded;
+    private static boolean hasLoaded, hasStarted;
     private static final Settings settings = new Settings();
-    public static final List<Player> pendingUninjections = new ArrayList<Player>();
 
     /**
      * Call this before start()
@@ -46,14 +42,17 @@ public final class PacketEvents implements PacketListener, Listener {
         if (!hasLoaded) {
             load();
         }
-        plugin = pl;
-        //Register Bukkit and PacketListener
-        getAPI().getEventManager().registerListener(instance);
+        if (!hasStarted) {
+            plugin = pl;
+            //Register Bukkit and PacketListener
+            getAPI().getEventManager().registerListener(instance);
 
-        Bukkit.getPluginManager().registerEvents(instance, plugin);
+            Bukkit.getPluginManager().registerEvents(instance, plugin);
 
-        for (final Player p : OnlinePlayerUtilities.getOnlinePlayers()) {
-            getAPI().getPlayerUtils().injectPlayer(p);
+            for (final Player p : OnlinePlayerUtilities.getOnlinePlayers()) {
+                getAPI().getPlayerUtils().injectPlayer(p);
+            }
+            hasStarted = true;
         }
     }
 
@@ -61,25 +60,24 @@ public final class PacketEvents implements PacketListener, Listener {
      * Stop all tasks and unregisters all PacketEvents' listeners
      */
     public static void stop() {
-        for (final Player p : OnlinePlayerUtilities.getOnlinePlayers()) {
-            if(!pendingUninjections.contains(p)) {
-            getAPI().getPlayerUtils().uninjectPlayerNow(p);}
-        }
-        getAPI().getEventManager().unregisterAllListeners();
+        if (hasStarted) {
+            for (final Player p : OnlinePlayerUtilities.getOnlinePlayers()) {
 
-        PacketType.Client.packetIds.clear();
-        PacketType.Server.packetIds.clear();
-        int i = 0;
-        long init = System.currentTimeMillis();
-        while(pendingUninjections.size() > 0) {
-            if(i++ == 0) {
-                System.out.println("PacketEvents is attempting to uninject some players.");
+                getAPI().getPlayerUtils().uninjectPlayerNow(p);
             }
-            else if(System.currentTimeMillis() - init > 1000L) {
-                init = System.currentTimeMillis();
-                System.out.println("PacketEvents is still attempting to uninject some players...");
-            }
+            getAPI().getEventManager().unregisterAllListeners();
+
+            PacketType.Client.packetIds.clear();
+            PacketType.Server.packetIds.clear();
         }
+    }
+
+    public static boolean hasLoaded() {
+        return hasLoaded;
+    }
+
+    public static boolean hasStarted() {
+        return hasStarted;
     }
 
     public static PacketEventsAPI getAPI() {
@@ -108,9 +106,7 @@ public final class PacketEvents implements PacketListener, Listener {
     @EventHandler
     public void onQuit(final PlayerQuitEvent e) {
         getAPI().getPlayerUtils().clearClientVersion(e.getPlayer());
-        pendingUninjections.add(e.getPlayer());
-        getAPI().getPlayerUtils().uninjectPlayer(e.getPlayer());
-
+        getAPI().getPlayerUtils().uninjectPlayerNow(e.getPlayer());
     }
 
     @EventHandler

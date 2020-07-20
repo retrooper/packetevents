@@ -98,47 +98,47 @@ public enum ServerVersion {
         }
         return false;
     }
-    
+
     public int toProtocolVersion() {
-      if(this.equals(ServerVersion.v_1_7_10)) {
-         return 5;
-     }
-      if(this.name().startsWith("v_1_8")) {
-         return 47;
-     }
-        if(this.equals(ServerVersion.v_1_9)) {
-         return 107;
-     }
-        if(this.equals(ServerVersion.v_1_9_4)) {
-         return 110;
-     }
-        if(this.equals(ServerVersion.v_1_10)) {
-         return 210;
-     }
-        if(this.equals(ServerVersion.v_1_11)) {
-         return 315;
-     }
-        if(this.equals(ServerVersion.v_1_11)) {
-         return 315;
-     }
-        if(this.equals(ServerVersion.v_1_12)) {
-         return 335;
-     }
-        if(this.equals(ServerVersion.v_1_13)) {
-         return 393;
-     }
-        if(this.equals(ServerVersion.v_1_13_2)) {
-         return 404;
-     }
-        if(this.equals(ServerVersion.v_1_14)) {
-         return 477;
-     }
-        if(this.equals(ServerVersion.v_1_15)) {
-         return 573;
-     }
-        if(this.equals(ServerVersion.v_1_16_1)) {
-         return 735;
-     }
+        if (this.equals(ServerVersion.v_1_7_10)) {
+            return 5;
+        }
+        if (this.name().startsWith("v_1_8")) {
+            return 47;
+        }
+        if (this.equals(ServerVersion.v_1_9)) {
+            return 107;
+        }
+        if (this.equals(ServerVersion.v_1_9_4)) {
+            return 110;
+        }
+        if (this.equals(ServerVersion.v_1_10)) {
+            return 210;
+        }
+        if (this.equals(ServerVersion.v_1_11)) {
+            return 315;
+        }
+        if (this.equals(ServerVersion.v_1_11)) {
+            return 315;
+        }
+        if (this.equals(ServerVersion.v_1_12)) {
+            return 335;
+        }
+        if (this.equals(ServerVersion.v_1_13)) {
+            return 393;
+        }
+        if (this.equals(ServerVersion.v_1_13_2)) {
+            return 404;
+        }
+        if (this.equals(ServerVersion.v_1_14)) {
+            return 477;
+        }
+        if (this.equals(ServerVersion.v_1_15)) {
+            return 573;
+        }
+        if (this.equals(ServerVersion.v_1_16_1)) {
+            return 735;
+        }
         return -1;
     }
 

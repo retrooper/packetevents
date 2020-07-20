@@ -76,12 +76,12 @@ public final class Reflection {
         final FieldWithIndex fwi = new FieldWithIndex(cls, index);
         if (!fieldWithIndexHashMap.containsKey(fwi)) {
             final Field[] fields = getFields(cls);
-            if(fields.length <= index) {
+            if (fields.length <= index) {
                 return null;
             }
             final Field field = fields[index];
             fieldWithIndexHashMap.put(fwi, field);
-              return field;
+            return field;
         } else {
             return fieldWithIndexHashMap.get(fwi);
         }

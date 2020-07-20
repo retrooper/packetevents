@@ -60,13 +60,13 @@ public enum ClientVersion {
         VERSION_LOOKUP.put(735, v_1_16);
         VERSION_LOOKUP.put(736, v_1_16_1);
     }
-    
+
     public static ClientVersion fromProtocolVersion(int protocolVersion) {
-        if(protocolVersion == -1 && PacketEvents.getSettings().doAutoResolveClientProtocolVersion()) {
-           protocolVersion = ServerVersion.getVersion().toProtocolVersion();
+        if (protocolVersion == -1 && PacketEvents.getSettings().doAutoResolveClientProtocolVersion()) {
+            protocolVersion = ServerVersion.getVersion().toProtocolVersion();
         }
         final ClientVersion lookedUp = VERSION_LOOKUP.get(protocolVersion);
-        if(lookedUp != null) {
+        if (lookedUp != null) {
             return lookedUp;
         }
         return protocolVersion > 736 ? HIGHER_THAN_V_1_16_1 : INVALID;

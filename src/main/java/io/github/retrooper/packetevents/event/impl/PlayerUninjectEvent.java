@@ -25,6 +25,12 @@ public final class PlayerUninjectEvent extends PacketEvent {
         this.cancelled = val;
     }
 
+    /**
+     * Whether the uninjection was called synchronously or asynchronously.
+     * The event is still called synchronously.
+     * By default all uninjections are called aynchronously in this build.
+     * @return If the uninjection was done async or sync
+     */
     public boolean isSync() {
         return sync;
     }

@@ -32,13 +32,13 @@ public class Settings {
     public void setIdentifier(final String identifier) {
         this.identifier = identifier;
     }
-    
+
     public boolean doAutoResolveClientProtocolVersion() {
         return autoResolveClientProtocolVersion;
     }
-    
+
     public void setDoAutoResolveClientProtocolVersion(boolean autoResolveClientProtocolVersion) {
-     this.autoResolveClientProtocolVersion = autoResolveClientProtocolVersion;
+        this.autoResolveClientProtocolVersion = autoResolveClientProtocolVersion;
     }
-    
+
 }
