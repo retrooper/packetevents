@@ -34,36 +34,38 @@ public class NettyPacketHandler {
     }
 
     public static Future<?> uninjectPlayer(final Player player) {
-        final PlayerUninjectEvent uninjectEvent = new PlayerUninjectEvent(player, false);
-        PacketEvents.getAPI().getEventManager().callEvent(uninjectEvent);
-        if (!uninjectEvent.isCancelled()) {
-            try {
-            if (v1_7_nettyMode) {
-                return NettyPacketHandler_7.uninjectPlayer(player);
-            } else {
-                return NettyPacketHandler_8.uninjectPlayer(player);
-            }}
-            catch(NoSuchElementException e) {
-
+        try {
+            final PlayerUninjectEvent uninjectEvent = new PlayerUninjectEvent(player, false);
+            PacketEvents.getAPI().getEventManager().callEvent(uninjectEvent);
+            if (!uninjectEvent.isCancelled()) {
+                if (v1_7_nettyMode) {
+                    return NettyPacketHandler_7.uninjectPlayer(player);
+                } else {
+                    return NettyPacketHandler_8.uninjectPlayer(player);
+                }
             }
+        } catch(Exception e) {
+
         }
         return null;
     }
 
     public static void uninjectPlayerNow(final Player player) {
+        try {
         final PlayerUninjectEvent uninjectEvent = new PlayerUninjectEvent(player, true);
         PacketEvents.getAPI().getEventManager().callEvent(uninjectEvent);
         if (!uninjectEvent.isCancelled()) {
-            try {
             if (v1_7_nettyMode) {
                 NettyPacketHandler_7.uninjectPlayerNow(player);
             } else {
                 NettyPacketHandler_8.uninjectPlayerNow(player);
-            }}
-            catch(NoSuchElementException e) {
-
             }
         }
+    }
+    catch(Exception e)
+
+    {
+    }
     }
 
     public static Object write(final Player sender, final Object packet) {
