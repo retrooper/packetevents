@@ -7,6 +7,7 @@ import io.github.retrooper.packetevents.event.impl.PlayerInjectEvent;
 import io.github.retrooper.packetevents.event.impl.PlayerUninjectEvent;
 import org.bukkit.entity.Player;
 
+import java.util.NoSuchElementException;
 import java.util.concurrent.Future;
 
 public class NettyPacketHandler {
@@ -36,10 +37,14 @@ public class NettyPacketHandler {
         final PlayerUninjectEvent uninjectEvent = new PlayerUninjectEvent(player, false);
         PacketEvents.getAPI().getEventManager().callEvent(uninjectEvent);
         if (!uninjectEvent.isCancelled()) {
+            try {
             if (v1_7_nettyMode) {
                 return NettyPacketHandler_7.uninjectPlayer(player);
             } else {
                 return NettyPacketHandler_8.uninjectPlayer(player);
+            }}
+            catch(NoSuchElementException e) {
+
             }
         }
         return null;
@@ -49,10 +54,14 @@ public class NettyPacketHandler {
         final PlayerUninjectEvent uninjectEvent = new PlayerUninjectEvent(player, true);
         PacketEvents.getAPI().getEventManager().callEvent(uninjectEvent);
         if (!uninjectEvent.isCancelled()) {
+            try {
             if (v1_7_nettyMode) {
                 NettyPacketHandler_7.uninjectPlayerNow(player);
             } else {
                 NettyPacketHandler_8.uninjectPlayerNow(player);
+            }}
+            catch(NoSuchElementException e) {
+
             }
         }
     }
