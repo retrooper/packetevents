@@ -8,9 +8,9 @@ This packetlistener is **only** supported on spigot servers and has been tested 
 
 * No dependencies
 
-* Licensed under the GPL3 license.
+* Licensed under the MIT license
 
-[![](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 Join my discord server(to talk to me): https://discord.gg/ZWTkg4v
 
@@ -18,6 +18,3 @@ Join my discord server(to talk to me): https://discord.gg/ZWTkg4v
 
 [![](https://jitci.com/gh/retrooper/packetevents/svg)](https://jitci.com/gh/retrooper/packetevents)
 
-To learn how to setup this API please click on the link below
-[Setup Guide](https://github.com/retrooper/packetevents/wiki/PacketEvents-Setup-Guide)
-(or just paste this into your browser: https://github.com/retrooper/packetevents/wiki/PacketEvents-Setup-Guide)
