@@ -12,7 +12,7 @@ This packetlistener is **only** supported on spigot servers and has been tested 
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-Join my discord server(to talk to me): https://discord.gg/ZWTkg4v
+Our discord server: https://discord.me/packetevents
 
 [![](https://jitpack.io/v/retrooper/packetevents.svg)](https://jitpack.io/#retrooper/packetevents)
 
