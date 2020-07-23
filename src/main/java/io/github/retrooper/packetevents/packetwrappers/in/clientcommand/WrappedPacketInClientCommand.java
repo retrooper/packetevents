@@ -17,12 +17,7 @@ public final class WrappedPacketInClientCommand extends WrappedPacket {
         try {
             packetClass = NMSUtils.getNMSClass("PacketPlayInClientCommand");
             if(version.isHigherThan(ServerVersion.v_1_7_10)) {
-                for (final Class<?> sub : enumClientCommandClass.getDeclaredClasses()) {
-                    if(sub.getSimpleName().equalsIgnoreCase("EnumClientCommand")) {
-                        enumClientCommandClass = sub;
-                        break;
-                    }
-                }
+                enumClientCommandClass = Reflection.getSubClass(packetClass, "EnumClientCommand");
             }else {
                 enumClientCommandClass = NMSUtils.getNMSClass("EnumClientCommand");
             }
@@ -31,7 +26,7 @@ public final class WrappedPacketInClientCommand extends WrappedPacket {
         }
     }
 
-    private EnumClientCommand clientCommand;
+    private ClientCommand clientCommand;
 
     public WrappedPacketInClientCommand(Object packet) {
         super(packet);
@@ -41,29 +36,29 @@ public final class WrappedPacketInClientCommand extends WrappedPacket {
     public void setup() {
         try {
             if(version.isLowerThan(ServerVersion.v_1_8)) {
-                clientCommand = EnumClientCommand.get(Reflection.getField(enumClientCommandClass, int.class, 1).getInt(packet));
+                clientCommand = ClientCommand.get(Reflection.getField(enumClientCommandClass, int.class, 1).getInt(packet));
             } else {
                 final Object enumObj = Reflection.getField(packetClass, enumClientCommandClass, 0).get(packet);
-                this.clientCommand = EnumClientCommand.valueOf(enumObj.toString());
+                this.clientCommand = ClientCommand.valueOf(enumObj.toString());
             }
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
-    public EnumClientCommand getClientCommand() {
+    public ClientCommand getClientCommand() {
         return clientCommand;
     }
 
-    public static enum EnumClientCommand {
+    public static enum ClientCommand {
         PERFORM_RESPAWN,
         REQUEST_STATS,
         OPEN_INVENTORY_ACHIEVEMENT;
 
-        private EnumClientCommand() {
+        private ClientCommand() {
         }
 
-        public static EnumClientCommand get(final int i) {
+        public static ClientCommand get(final int i) {
             return values()[i];
         }
     }

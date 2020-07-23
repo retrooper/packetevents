@@ -6,13 +6,11 @@ import org.bukkit.entity.Player;
 
 public final class PacketReceiveEvent extends PacketEvent {
     private final Player player;
-    private final String name;
     private final Object packet;
     private boolean cancelled;
 
-    public PacketReceiveEvent(final Player player, final String packetName, final Object packet) {
+    public PacketReceiveEvent(final Player player, final Object packet) {
         this.player = player;
-        this.name = packetName;
         this.packet = packet;
     }
 
@@ -27,11 +25,9 @@ public final class PacketReceiveEvent extends PacketEvent {
 
     /**
      * Get the packet's name (NMS packet class simple name)
-     *
-     * @return
      */
     public String getPacketName() {
-        return this.name;
+        return this.packet.getClass().getSimpleName();
     }
 
     /**

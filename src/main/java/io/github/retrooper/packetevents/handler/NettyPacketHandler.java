@@ -7,7 +7,6 @@ import io.github.retrooper.packetevents.event.impl.PlayerInjectEvent;
 import io.github.retrooper.packetevents.event.impl.PlayerUninjectEvent;
 import org.bukkit.entity.Player;
 
-import java.util.NoSuchElementException;
 import java.util.concurrent.Future;
 
 public class NettyPacketHandler {
@@ -44,7 +43,7 @@ public class NettyPacketHandler {
                     return NettyPacketHandler_8.uninjectPlayer(player);
                 }
             }
-        } catch(Exception e) {
+        } catch (Exception e) {
 
         }
         return null;
@@ -52,25 +51,21 @@ public class NettyPacketHandler {
 
     public static void uninjectPlayerNow(final Player player) {
         try {
-        final PlayerUninjectEvent uninjectEvent = new PlayerUninjectEvent(player, true);
-        PacketEvents.getAPI().getEventManager().callEvent(uninjectEvent);
-        if (!uninjectEvent.isCancelled()) {
-            if (v1_7_nettyMode) {
-                NettyPacketHandler_7.uninjectPlayerNow(player);
-            } else {
-                NettyPacketHandler_8.uninjectPlayerNow(player);
+            final PlayerUninjectEvent uninjectEvent = new PlayerUninjectEvent(player, true);
+            PacketEvents.getAPI().getEventManager().callEvent(uninjectEvent);
+            if (!uninjectEvent.isCancelled()) {
+                if (v1_7_nettyMode) {
+                    NettyPacketHandler_7.uninjectPlayerNow(player);
+                } else {
+                    NettyPacketHandler_8.uninjectPlayerNow(player);
+                }
             }
+        } catch (Exception e) {
         }
-    }
-    catch(Exception e)
-
-    {
-    }
     }
 
     public static Object write(final Player sender, final Object packet) {
-        final String packetName = packet.getClass().getSimpleName();
-        final PacketSendEvent packetSendEvent = new PacketSendEvent(sender, packetName, packet);
+        final PacketSendEvent packetSendEvent = new PacketSendEvent(sender, packet);
         PacketEvents.getAPI().getEventManager().callEvent(packetSendEvent);
         if (!packetSendEvent.isCancelled()) {
             return packet;
@@ -79,8 +74,7 @@ public class NettyPacketHandler {
     }
 
     public static Object read(final Player receiver, final Object packet) {
-        final String packetName = packet.getClass().getSimpleName();
-        final PacketReceiveEvent packetReceiveEvent = new PacketReceiveEvent(receiver, packetName, packet);
+        final PacketReceiveEvent packetReceiveEvent = new PacketReceiveEvent(receiver, packet);
         PacketEvents.getAPI().getEventManager().callEvent(packetReceiveEvent);
         if (!packetReceiveEvent.isCancelled()) {
             return packet;

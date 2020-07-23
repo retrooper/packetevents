@@ -24,12 +24,12 @@ public final class WrappedPacketInArmAnimation extends WrappedPacket {
 
     @Override
     public void setup() {
-        //Lazy way, do you really need to get the timestamp in the actual class?
+        //Lazy way, do you really need to get the timestamp in the actual class? Edit by Retrooper: Yes lol
         //TODO: Get EnumHand value sent in 1.9+, however not really necessary
         timeStamp = System.currentTimeMillis();
     }
 
-    public long getTimeStamp() {
+    public long getTimestamp() {
         return timeStamp;
     }
 
