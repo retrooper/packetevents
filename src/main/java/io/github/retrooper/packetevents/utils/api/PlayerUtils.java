@@ -55,6 +55,4 @@ public final class PlayerUtils {
     public void sendPacket(final Player player, final Sendable sendable) {
         NMSUtils.sendSendableWrapper(player, sendable);
     }
-
-
 }

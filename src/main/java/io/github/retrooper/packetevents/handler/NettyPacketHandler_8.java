@@ -2,7 +2,11 @@ package io.github.retrooper.packetevents.handler;
 
 import io.github.retrooper.packetevents.PacketEvents;
 import io.github.retrooper.packetevents.utils.NMSUtils;
-import io.netty.channel.*;
+import io.netty.channel.Channel;
+import io.netty.channel.ChannelDuplexHandler;
+import io.netty.channel.ChannelHandlerContext;
+import io.netty.channel.ChannelPipeline;
+import io.netty.channel.ChannelPromise;
 import org.bukkit.entity.Player;
 
 import java.util.concurrent.Future;
@@ -35,11 +39,8 @@ final class NettyPacketHandler_8 {
 
     public static Future<?> uninjectPlayer(final Player player) {
         final Channel channel = (Channel) NMSUtils.getChannel(player);
-        return channel.eventLoop().submit(new Runnable() {
-            @Override
-            public void run() {
-                channel.pipeline().remove(PacketEvents.getHandlerName(player.getName()));
-            }
+        return channel.eventLoop().submit(() -> {
+            channel.pipeline().remove(PacketEvents.getHandlerName(player.getName()));
         });
     }
 

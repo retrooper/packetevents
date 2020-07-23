@@ -43,7 +43,7 @@ public class NettyPacketHandler {
                     return NettyPacketHandler_8.uninjectPlayer(player);
                 }
             }
-        } catch (Exception e) {
+        } catch (Exception ignored) {
 
         }
         return null;
@@ -60,7 +60,7 @@ public class NettyPacketHandler {
                     NettyPacketHandler_8.uninjectPlayerNow(player);
                 }
             }
-        } catch (Exception e) {
+        } catch (Exception ignored) {
         }
     }
 
