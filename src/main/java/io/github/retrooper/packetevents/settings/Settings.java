@@ -29,6 +29,12 @@ public class Settings {
         return identifier;
     }
 
+    /**
+     * Set a unique Identifier (Usually something that represents your plugin, For example: MyPluginPacketHandler)
+     * If another present plugin uses the same Identifier, It might cause incompatibilities
+     *
+     * @param identifier
+     */
     public void setIdentifier(final String identifier) {
         this.identifier = identifier;
     }
@@ -37,8 +43,15 @@ public class Settings {
         return autoResolveClientProtocolVersion;
     }
 
+    /**
+     * If PacketEvents fails to detect a client's version
+     * Should it assume that the client is using the same version that the server is?
+     * <p>
+     * Returns ACCESS_FAILURE if false
+     *
+     * @param autoResolveClientProtocolVersion
+     */
     public void setDoAutoResolveClientProtocolVersion(boolean autoResolveClientProtocolVersion) {
         this.autoResolveClientProtocolVersion = autoResolveClientProtocolVersion;
     }
-
 }

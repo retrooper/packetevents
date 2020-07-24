@@ -101,7 +101,7 @@ public final class NMSUtils {
         return Class.forName(nettyPrefix + "." + name);
     }
 
-    public static final String getChannelFutureListFieldName() {
+    public static String getChannelFutureListFieldName() {
         if (version.isLowerThan(ServerVersion.v_1_8))
             return "e";
         if (version.isLowerThan(ServerVersion.v_1_13))
@@ -134,7 +134,6 @@ public final class NMSUtils {
     }
 
     public static Object getEntityPlayer(final Player player) {
-        Object entityPlayer = null;
         try {
             return getCraftPlayerHandle.invoke(getCraftPlayer(player));
         } catch (IllegalAccessException | InvocationTargetException e) {
@@ -183,9 +182,7 @@ public final class NMSUtils {
     public static ItemStack toBukkitItemStack(final Object nmsItemstack) {
         try {
             return (ItemStack) asBukkitCopy.invoke(null, nmsItemstack);
-        } catch (IllegalAccessException e) {
-            e.printStackTrace();
-        } catch (InvocationTargetException e) {
+        } catch (IllegalAccessException | InvocationTargetException e) {
             e.printStackTrace();
         }
         return null;

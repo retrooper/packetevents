@@ -51,6 +51,10 @@ public final class WrappedPacketInCustomPayload extends WrappedPacket {
     public String getData() {
         return data;
     }
+    
+    public Object getMinecraftKey() {
+        return minecraftKey;
+    }
 
     public Object getDataSerializer() {
         return dataSerializer;
