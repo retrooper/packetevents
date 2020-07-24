@@ -43,7 +43,7 @@ public final class WrappedPacketInCustomPayload extends WrappedPacket {
                 this.data = (String)Reflection.getField(packetClass, String.class, 0).get(packet);
                 this.dataSerializer = Reflection.getField(packetClass, nmsPacketDataSerializer, 0).get(packet);
             } catch (Exception e) {
-                e.printStackTrace();
+//intentionally empty, allegedly 1.7.10 produces a NPE?
             }
         }
     }

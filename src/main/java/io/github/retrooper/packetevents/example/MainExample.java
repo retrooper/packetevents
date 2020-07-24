@@ -1,7 +1,13 @@
 package io.github.retrooper.packetevents.example;
 
 import io.github.retrooper.packetevents.PacketEvents;
+import io.github.retrooper.packetevents.annotations.PacketHandler;
 import io.github.retrooper.packetevents.event.PacketListener;
+import io.github.retrooper.packetevents.event.impl.PacketReceiveEvent;
+import io.github.retrooper.packetevents.packet.PacketType;
+import io.github.retrooper.packetevents.packetwrappers.in.armanimation.WrappedPacketInArmAnimation;
+import io.github.retrooper.packetevents.packetwrappers.in.custompayload.WrappedPacketInCustomPayload;
+import io.github.retrooper.packetevents.packetwrappers.in.helditemslot.WrappedPacketInHeldItemSlot;
 import org.bukkit.plugin.java.JavaPlugin;
 
 public class MainExample extends JavaPlugin implements PacketListener {
@@ -28,5 +34,4 @@ public class MainExample extends JavaPlugin implements PacketListener {
     public void onDisable() {
         PacketEvents.stop();
     }
-
 }
