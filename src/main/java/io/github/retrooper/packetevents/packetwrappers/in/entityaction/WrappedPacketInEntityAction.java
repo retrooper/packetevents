@@ -53,7 +53,7 @@ public final class WrappedPacketInEntityAction extends WrappedPacket {
 
             //1.7.10
             if (version.isLowerThan(ServerVersion.v_1_8)) {
-                animationIndex += Reflection.getField(entityActionClass, int.class, 1).getInt(packet);
+                animationIndex = Reflection.getField(entityActionClass, int.class, 1).getInt(packet); // TODO: += if packetdataserializer.version < 16
             } else {
                 final Object enumObj = Reflection.getField(entityActionClass, enumPlayerActionClass, 0).get(packet);
                 final String enumValue = enumObj.toString();
