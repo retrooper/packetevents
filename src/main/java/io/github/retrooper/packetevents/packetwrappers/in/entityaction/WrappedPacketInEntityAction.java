@@ -23,8 +23,6 @@ public final class WrappedPacketInEntityAction extends WrappedPacket {
                         break;
                     }
                 }
-            } else {
-                enumPlayerActionClass = NMSUtils.getNMSClass("EnumPlayerAction");
             }
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
