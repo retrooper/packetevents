@@ -43,16 +43,6 @@ public final class PacketEventsAPI {
     }
 
     /**
-     * Use {@link #getPlayerUtils()}
-     *
-     * @return
-     */
-    @Deprecated
-    public PlayerUtils getPlayerUtilities() {
-        return playerUtils;
-    }
-
-    /**
      * Get all utilities to do with the server
      *
      * @return Server Utilities
@@ -61,15 +51,6 @@ public final class PacketEventsAPI {
         return serverUtils;
     }
 
-    /**
-     * Please use {@link #getServerUtils()}
-     *
-     * @return
-     */
-    @Deprecated
-    public ServerUtils getServerUtilities() {
-        return serverUtils;
-    }
 
     /**
      * Get the event manager

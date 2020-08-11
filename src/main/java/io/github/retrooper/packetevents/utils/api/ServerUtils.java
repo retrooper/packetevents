@@ -7,20 +7,6 @@ import io.github.retrooper.packetevents.utils.NMSUtils;
 import java.lang.reflect.InvocationTargetException;
 
 public final class ServerUtils {
-    @Deprecated
-    public ServerVersion getServerVersion() {
-        return getVersion();
-    }
-
-    @Deprecated
-    public double[] getRecentServerTPS() {
-        return getRecentTPS();
-    }
-
-    @Deprecated
-    public double getCurrentServerTPS() {
-        return getCurrentTPS();
-    }
 
     public ServerVersion getVersion() {
         return ServerVersion.getVersion();
