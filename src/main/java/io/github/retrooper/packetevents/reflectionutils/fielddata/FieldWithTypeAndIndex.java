@@ -28,7 +28,7 @@ public class FieldWithTypeAndIndex {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        FieldWithTypeAndIndexk that = (FieldWithTypeAndIndex) o;
+        FieldWithTypeAndIndex that = (FieldWithTypeAndIndex) o;
         return index == that.index &&
                 Objects.equals(cls, that.cls) &&
                 Objects.equals(type, that.type);
