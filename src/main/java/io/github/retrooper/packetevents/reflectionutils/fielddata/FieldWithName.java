@@ -17,4 +17,19 @@ public class FieldWithName {
     public String getName() {
         return name;
     }
+    
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        FieldWithName that = (FieldWithName) o;
+        return name.equals(that.name) &&
+                Objects.equals(type, that.type);
+    }
+    
+    @Override
+	public int hashCode() {
+		return Objects.hash(cls, name);
+	}
+    
 }
