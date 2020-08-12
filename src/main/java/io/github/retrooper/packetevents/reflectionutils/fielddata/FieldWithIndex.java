@@ -16,4 +16,19 @@ public class FieldWithIndex {
     public int getIndex() {
         return index;
     }
+    
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        FieldWithIndex that = (FieldWithIndex) o;
+        return index == that.index &&
+                Objects.equals(cls, that.cls);
+    }
+    
+    @Override
+	public int hashCode() {
+		return Objects.hash(cls, index);
+	}
+    
 }
