@@ -22,4 +22,20 @@ public class MethodWithIndexAndParams {
     public Class<?>[] getParams() {
         return params;
     }
+    
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        MethodWithIndexAndParams that = (MethodWithIndexAndParams) o;
+        return index == that.index &&
+                Objects.equals(cls, that.cls) &&
+                Objects.equals(params, that.params);
+    }
+    
+    @Override
+	public int hashCode() {
+		return Objects.hash(cls, params, index);
+	}
+    
 }
