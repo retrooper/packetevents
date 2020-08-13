@@ -1,5 +1,7 @@
 package io.github.retrooper.packetevents.reflectionutils.fielddata;
 
+import java.util.Objects;
+
 public class FieldWithIndex {
     private final Class<?> cls;
     private final int index;

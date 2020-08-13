@@ -1,5 +1,7 @@
 package io.github.retrooper.packetevents.reflectionutils.methoddata;
 
+import java.util.Objects;
+
 public class MethodWithIndexAndParams {
     private final Class<?> cls;
     private final int index;
