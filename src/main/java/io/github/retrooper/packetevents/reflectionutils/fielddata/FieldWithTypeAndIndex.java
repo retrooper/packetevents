@@ -1,5 +1,7 @@
 package io.github.retrooper.packetevents.reflectionutils.fielddata;
 
+import java.util.Objects;
+
 public class FieldWithTypeAndIndex {
     private final Class<?> cls, type;
     private final int index;
@@ -21,4 +23,20 @@ public class FieldWithTypeAndIndex {
     public int getIndex() {
         return index;
     }
+    
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        FieldWithTypeAndIndex that = (FieldWithTypeAndIndex) o;
+        return index == that.index &&
+                Objects.equals(cls, that.cls) &&
+                Objects.equals(type, that.type);
+    }
+    
+    @Override
+	public int hashCode() {
+		return Objects.hash(cls, type, index);
+	}
+    
 }
