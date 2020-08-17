@@ -1,12 +1,16 @@
 package io.github.retrooper.packetevents;
 
+import io.github.retrooper.packetevents.annotations.PacketHandler;
 import io.github.retrooper.packetevents.api.PacketEventsAPI;
 import io.github.retrooper.packetevents.enums.ClientVersion;
+import io.github.retrooper.packetevents.enums.ServerVersion;
 import io.github.retrooper.packetevents.event.PacketListener;
 import io.github.retrooper.packetevents.event.impl.BukkitMoveEvent;
+import io.github.retrooper.packetevents.event.impl.PacketReceiveEvent;
 import io.github.retrooper.packetevents.packet.PacketType;
 import io.github.retrooper.packetevents.packet.PacketTypeClasses;
-import io.github.retrooper.packetevents.settings.Settings;
+import io.github.retrooper.packetevents.packetwrappers.in.settings.WrappedPacketInSettings;
+import io.github.retrooper.packetevents.settings.PacketEventsSettings;
 import io.github.retrooper.packetevents.utils.onlineplayers.OnlinePlayerUtilities;
 import io.github.retrooper.packetevents.utils.versionlookup.VersionLookupUtils;
 import org.bukkit.Bukkit;
@@ -18,17 +22,24 @@ import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.plugin.Plugin;
 
+import java.util.HashMap;
+
 public final class PacketEvents implements PacketListener, Listener {
     private static Plugin plugin;
     private static final PacketEventsAPI packetEventsAPI = new PacketEventsAPI();
     private static final PacketEvents instance = new PacketEvents();
     private static boolean hasLoaded, hasStarted;
-    private static final Settings settings = new Settings();
+    private static final PacketEventsSettings settings = new PacketEventsSettings();
 
     /**
      * Call this before start()
      */
     public static void load() {
+        //SERVER VERSION LOADING
+
+        //Server Version reversed values caching
+        ServerVersion.reversedValues = ServerVersion.reverse(ServerVersion.values());
+
         PacketTypeClasses.Client.load();
         PacketTypeClasses.Server.load();
         ClientVersion.prepareLookUp();
@@ -92,10 +103,9 @@ public final class PacketEvents implements PacketListener, Listener {
         return "pe-" + getSettings().getIdentifier() + "-" + name;
     }
 
-    public static Settings getSettings() {
+    public static PacketEventsSettings getSettings() {
         return settings;
     }
-
 
     @EventHandler
     public void onJoin(final PlayerJoinEvent e) {

@@ -1,0 +1,142 @@
+package io.github.retrooper.packetevents.packetwrappers.in.settings;
+
+import io.github.retrooper.packetevents.annotations.Nullable;
+import io.github.retrooper.packetevents.enums.ServerVersion;
+import io.github.retrooper.packetevents.packetwrappers.api.WrappedPacket;
+import io.github.retrooper.packetevents.reflectionutils.Reflection;
+import io.github.retrooper.packetevents.utils.NMSUtils;
+
+import java.util.HashMap;
+
+public class WrappedPacketInSettings extends WrappedPacket {
+    private static Class<?> packetClass;
+    private static Class<?> chatVisibilityEnumClass;
+    static {
+        try {
+            packetClass = NMSUtils.getNMSClass("PacketPlayInSettings");
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+
+        try {
+            chatVisibilityEnumClass = NMSUtils.getNMSClass("EnumChatVisibility");
+        } catch (ClassNotFoundException e) {
+            Class<?> entityHumanClass = NMSUtils.getNMSClassWithoutException("EntityHuman");
+            //They are just on an outdated version
+            chatVisibilityEnumClass = Reflection.getSubClass(entityHumanClass, "EnumChatVisibility");
+        }
+    }
+
+    public enum ChatVisibility {
+        ENABLED, COMMANDS_ONLY, HIDDEN
+    }
+
+
+    public enum DisplayedSkinPart {
+        CAPE, JACKET, LEFT_SLEEVE, RIGHT_SLEEVE, LEFT_PANTS, RIGHT_PANTS, HAT
+    }
+
+    private String locale;
+    private byte viewDistance;
+    private ChatVisibility chatVisibility;
+    private boolean chatColors;
+    private HashMap<DisplayedSkinPart, Boolean> displayedSkinParts;
+
+    public WrappedPacketInSettings(final Object packet) {
+        super(packet);
+    }
+
+    @Override
+    protected void setup() {
+        try {
+            //LOCALE
+            this.locale = Reflection.getField(packetClass, String.class, 0).get(packet).toString();
+            //VIEW DISTANCE
+            this.viewDistance = (byte) Reflection.getField(packetClass, int.class, 0).getInt(packet);
+
+            //CHAT VISIBILITY
+            Object chatVisibilityEnumObject = Reflection.getField(packetClass, chatVisibilityEnumClass, 0).get(packet);
+            String enumValueAsString = chatVisibilityEnumObject.toString();
+            if(enumValueAsString.equals("FULL")) {
+                chatVisibility = ChatVisibility.ENABLED;
+            }
+            else if(enumValueAsString.equals("SYSTEM")) {
+                chatVisibility = ChatVisibility.COMMANDS_ONLY;
+            }
+            else {
+                chatVisibility = ChatVisibility.HIDDEN;
+            }
+
+            //CHAT COLORS
+            this.chatColors = Reflection.getField(packetClass, boolean.class, 0).getBoolean(packet);
+
+            //DISPLAYED SKIN PARTS
+            this.displayedSkinParts = new HashMap<DisplayedSkinPart, Boolean>();
+
+            if(version.isLowerThan(ServerVersion.v_1_8)) {
+                //in 1.7.10 only the cape display skin part is sent
+                boolean capeEnabled = Reflection.getField(packetClass, boolean.class, 1).getBoolean(packet);
+                displayedSkinParts.put(DisplayedSkinPart.CAPE, capeEnabled);
+            }
+            else {
+                //in 1.8, all the skin parts are sent
+                int skinPartFlags = Reflection.getField(packetClass, int.class, 1).getInt(packet);
+                displayedSkinParts.put(DisplayedSkinPart.CAPE, (skinPartFlags & 0x01) != 0);
+                displayedSkinParts.put(DisplayedSkinPart.JACKET, (skinPartFlags & 0x02) != 0);
+                displayedSkinParts.put(DisplayedSkinPart.LEFT_SLEEVE, (skinPartFlags & 0x04) != 0);
+                displayedSkinParts.put(DisplayedSkinPart.RIGHT_SLEEVE, (skinPartFlags & 0x08) != 0);
+                displayedSkinParts.put(DisplayedSkinPart.LEFT_PANTS, (skinPartFlags & 0x10) != 0);
+                displayedSkinParts.put(DisplayedSkinPart.RIGHT_PANTS, (skinPartFlags & 0x20) != 0);
+                displayedSkinParts.put(DisplayedSkinPart.HAT, (skinPartFlags & 0x40) != 0);
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+    }
+
+    public static Class<?> getChatVisibilityEnumClass() {
+        return chatVisibilityEnumClass;
+    }
+
+    public String getLocale() {
+        return locale;
+    }
+
+    public byte getViewDistance() {
+        return viewDistance;
+    }
+
+    public ChatVisibility getChatVisibility() {
+        return chatVisibility;
+    }
+
+    public boolean isChatColors() {
+        return chatColors;
+    }
+
+    /**
+     * It is possible for some keys to not exist.
+     * If that is the case, the server version is 1.7.10.
+     * 1.7.10 only sends the cape skin part.
+     */
+    @Nullable
+    public HashMap<DisplayedSkinPart, Boolean> getDisplayedSkinPartsMap() {
+        return displayedSkinParts;
+    }
+
+    /**
+     * On 1.7.10, some skin parts will default to 'false' as 1.7.10
+     * only sends the 'cape' skin part.
+     * @param part
+     * @return
+     */
+    public boolean isDisplaySkinPartEnabled(DisplayedSkinPart part) {
+        //1.7.10, we will default the other skin parts to return false.
+        if(!displayedSkinParts.containsKey(part)) {
+           return false;
+        }
+        return displayedSkinParts.get(part);
+    }
+}

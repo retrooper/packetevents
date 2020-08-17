@@ -2,7 +2,7 @@ package io.github.retrooper.packetevents.settings;
 
 import io.github.retrooper.packetevents.enums.ServerVersion;
 
-public class Settings {
+public class PacketEventsSettings {
     private ServerVersion defaultServerVersion;
     private String identifier = "";
     private boolean autoResolveClientProtocolVersion;

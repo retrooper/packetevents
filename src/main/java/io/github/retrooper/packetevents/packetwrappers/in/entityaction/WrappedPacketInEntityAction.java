@@ -17,12 +17,7 @@ public final class WrappedPacketInEntityAction extends WrappedPacket {
         try {
             entityActionClass = NMSUtils.getNMSClass("PacketPlayInEntityAction");
             if (version.isHigherThan(ServerVersion.v_1_7_10)) {
-                for (final Class<?> sub : entityActionClass.getDeclaredClasses()) {
-                    if (sub.getSimpleName().equals("EnumPlayerAction")) {
-                        enumPlayerActionClass = sub;
-                        break;
-                    }
-                }
+                enumPlayerActionClass = Reflection.getSubClass(entityActionClass, "EnumPlayerAction");
             }
         } catch (ClassNotFoundException e) {
             e.printStackTrace();

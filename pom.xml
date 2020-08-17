@@ -6,7 +6,7 @@
 
     <groupId>io.github.retrooper</groupId>
     <artifactId>packetevents</artifactId>
-    <version>1.5.7</version>
+    <version>1.5.8</version>
     <packaging>jar</packaging>
     <name>packetevents</name>
 
@@ -15,28 +15,6 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
 
-
-    <!-- You can build the project with this: "mvn clean compile assembly:single" -->
-    <build>
-        <plugins>
-            <plugin>
-                <artifactId>maven-assembly-plugin</artifactId>
-                <configuration>
-                    <descriptorRefs>
-                        <descriptorRef>jar-with-dependencies</descriptorRef>
-                    </descriptorRefs>
-                </configuration>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <configuration>
-                    <source>8</source>
-                    <target>8</target>
-                </configuration>
-            </plugin>
-        </plugins>
-    </build>
     <repositories>
         <repository>
             <id>spigot-repo</id>
@@ -64,26 +42,26 @@
     <dependencies>
 
         <dependency>
-        <groupId>org.github.spigot</groupId>
-        <artifactId>1.8.8</artifactId>
-        <version>1.8.8</version>
-        <scope>provided</scope>
-    </dependency>
-        <dependency>
-        <groupId>org.github.spigot</groupId>
-        <artifactId>1.7.10</artifactId>
-        <version>1.7.10</version>
-        <scope>provided</scope>
-    </dependency>
+            <groupId>org.github.spigot</groupId>
+            <artifactId>1.8.8</artifactId>
+            <version>1.8.8</version>
+            <scope>provided</scope>
+        </dependency>
 
+        <dependency>
+            <groupId>org.github.spigot</groupId>
+            <artifactId>1.7.10</artifactId>
+            <version>1.7.10</version>
+            <scope>provided</scope>
+        </dependency>
 
         <dependency>
             <groupId>com.comphenix.protocol</groupId>
             <artifactId>ProtocolLib</artifactId>
             <version>4.5.0</version>
             <scope>provided</scope>
-          </dependency>
-        <!-- ViaVersion API-->
+        </dependency>
+
         <dependency>
             <groupId>us.myles</groupId>
             <artifactId>viaversion</artifactId>
@@ -91,7 +69,6 @@
             <scope>provided</scope>
         </dependency>
 
-        <!-- ProtocolSupport API-->
         <dependency>
             <groupId>com.github.ProtocolSupport</groupId>
             <artifactId>ProtocolSupport</artifactId>

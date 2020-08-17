@@ -8,6 +8,7 @@ import io.github.retrooper.packetevents.packet.PacketType;
 import io.github.retrooper.packetevents.packetwrappers.in.armanimation.WrappedPacketInArmAnimation;
 import io.github.retrooper.packetevents.packetwrappers.in.custompayload.WrappedPacketInCustomPayload;
 import io.github.retrooper.packetevents.packetwrappers.in.helditemslot.WrappedPacketInHeldItemSlot;
+import io.github.retrooper.packetevents.packetwrappers.in.settings.WrappedPacketInSettings;
 import org.bukkit.plugin.java.JavaPlugin;
 
 public class MainExample extends JavaPlugin implements PacketListener {
