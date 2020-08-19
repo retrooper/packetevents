@@ -2,10 +2,13 @@ package io.github.retrooper.packetevents.example;
 
 import io.github.retrooper.packetevents.PacketEvents;
 import io.github.retrooper.packetevents.annotations.PacketHandler;
+import io.github.retrooper.packetevents.enums.Direction;
+import io.github.retrooper.packetevents.enums.minecraft.PlayerDigType;
 import io.github.retrooper.packetevents.event.PacketListener;
 import io.github.retrooper.packetevents.event.impl.PacketReceiveEvent;
 import io.github.retrooper.packetevents.packet.PacketType;
 import io.github.retrooper.packetevents.packetwrappers.in.armanimation.WrappedPacketInArmAnimation;
+import io.github.retrooper.packetevents.packetwrappers.in.blockdig.WrappedPacketInBlockDig;
 import io.github.retrooper.packetevents.packetwrappers.in.custompayload.WrappedPacketInCustomPayload;
 import io.github.retrooper.packetevents.packetwrappers.in.helditemslot.WrappedPacketInHeldItemSlot;
 import io.github.retrooper.packetevents.packetwrappers.in.settings.WrappedPacketInSettings;
@@ -24,7 +27,7 @@ public class MainExample extends JavaPlugin implements PacketListener {
         PacketEvents.getSettings().setIdentifier("official_api");
 
         PacketEvents.start(this);
-        //If packetevents cannot detect your server version, it will use the default you specify version
+        //If PacketEvents cannot detect your server version, it will use the default you specify version
         // getAPI().getSettings().setDefaultServerVersion(ServerVersion.v_1_7_10);
 
 
