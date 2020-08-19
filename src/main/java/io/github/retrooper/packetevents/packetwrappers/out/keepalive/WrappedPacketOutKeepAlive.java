@@ -3,9 +3,18 @@ package io.github.retrooper.packetevents.packetwrappers.out.keepalive;
 import io.github.retrooper.packetevents.packetwrappers.api.WrappedPacket;
 import io.github.retrooper.packetevents.reflectionutils.Reflection;
 import io.github.retrooper.packetevents.utils.NMSUtils;
-import net.minecraft.server.v1_8_R3.PacketPlayOutKeepAlive;
 
 public class WrappedPacketOutKeepAlive extends WrappedPacket {
+    private static Class<?> packetClass;
+
+    static {
+        try {
+            packetClass = NMSUtils.getNMSClass("PacketPlayOutKeepAlive");
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+    }
+
     private long id;
 
     public WrappedPacketOutKeepAlive(Object packet) {
@@ -37,16 +46,5 @@ public class WrappedPacketOutKeepAlive extends WrappedPacket {
                 e.printStackTrace();
             }
         }
-    }
-
-    private static Class<?> packetClass;
-
-    static {
-        try {
-            packetClass = NMSUtils.getNMSClass("PacketPlayOutKeepAlive");
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
-        }
-        PacketPlayOutKeepAlive p;
     }
 }

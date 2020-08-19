@@ -1,17 +1,13 @@
 package io.github.retrooper.packetevents;
 
-import io.github.retrooper.packetevents.annotations.PacketHandler;
 import io.github.retrooper.packetevents.api.PacketEventsAPI;
 import io.github.retrooper.packetevents.enums.ClientVersion;
 import io.github.retrooper.packetevents.enums.ServerVersion;
 import io.github.retrooper.packetevents.event.PacketListener;
 import io.github.retrooper.packetevents.event.impl.BukkitMoveEvent;
-import io.github.retrooper.packetevents.event.impl.PacketReceiveEvent;
 import io.github.retrooper.packetevents.packet.PacketType;
 import io.github.retrooper.packetevents.packet.PacketTypeClasses;
-import io.github.retrooper.packetevents.packetwrappers.in.settings.WrappedPacketInSettings;
 import io.github.retrooper.packetevents.settings.PacketEventsSettings;
-import io.github.retrooper.packetevents.utils.onlineplayers.OnlinePlayerUtilities;
 import io.github.retrooper.packetevents.utils.versionlookup.VersionLookupUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -22,14 +18,12 @@ import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.plugin.Plugin;
 
-import java.util.HashMap;
-
 public final class PacketEvents implements PacketListener, Listener {
-    private static Plugin plugin;
     private static final PacketEventsAPI packetEventsAPI = new PacketEventsAPI();
     private static final PacketEvents instance = new PacketEvents();
-    private static boolean hasLoaded, hasStarted;
     private static final PacketEventsSettings settings = new PacketEventsSettings();
+    private static Plugin plugin;
+    private static boolean hasLoaded, hasStarted;
 
     /**
      * Call this before start()
@@ -60,7 +54,7 @@ public final class PacketEvents implements PacketListener, Listener {
 
             Bukkit.getPluginManager().registerEvents(instance, plugin);
 
-            for (final Player p : OnlinePlayerUtilities.getOnlinePlayers()) {
+            for (final Player p : Bukkit.getOnlinePlayers()) {
                 getAPI().getPlayerUtils().injectPlayer(p);
             }
             hasStarted = true;
@@ -72,7 +66,7 @@ public final class PacketEvents implements PacketListener, Listener {
      */
     public static void stop() {
         if (hasStarted) {
-            for (final Player p : OnlinePlayerUtilities.getOnlinePlayers()) {
+            for (final Player p : Bukkit.getOnlinePlayers()) {
 
                 getAPI().getPlayerUtils().uninjectPlayerNow(p);
             }

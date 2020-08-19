@@ -34,12 +34,12 @@ public final class BukkitMoveEvent extends PacketEvent {
         return to;
     }
 
-    public void setCancelled(final boolean val) {
-        this.cancelled = val;
-    }
-
     public boolean isCancelled() {
         return cancelled;
+    }
+
+    public void setCancelled(final boolean val) {
+        this.cancelled = val;
     }
 
     public void cancel() {

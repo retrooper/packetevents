@@ -4,12 +4,24 @@ import io.github.retrooper.packetevents.enums.ServerVersion;
 import io.github.retrooper.packetevents.packetwrappers.api.WrappedPacket;
 import io.github.retrooper.packetevents.reflectionutils.Reflection;
 import io.github.retrooper.packetevents.utils.NMSUtils;
+import org.bukkit.entity.Entity;
 
 public class WrappedPacketOutEntity extends WrappedPacket {
-    private int entityId;
+    private static Class<?> packetClass;
+
+    static {
+        try {
+            packetClass = NMSUtils.getNMSClass("PacketPlayOutEntity");
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private int entityID;
     private double deltaX, deltaY, deltaZ;
     private byte yaw, pitch;
     private boolean onGround;
+
 
     public WrappedPacketOutEntity(Object packet) {
         super(packet);
@@ -18,7 +30,7 @@ public class WrappedPacketOutEntity extends WrappedPacket {
     @Override
     protected void setup() {
         try {
-            this.entityId = Reflection.getField(packetClass, int.class, 0).getInt(packet);
+            this.entityID = Reflection.getField(packetClass, int.class, 0).getInt(packet);
             this.onGround = Reflection.getField(packetClass, boolean.class, 0).getBoolean(packet);
             if (version.isLowerThan(ServerVersion.v_1_9)) {
                 byte dX = Reflection.getField(packetClass, byte.class, 0).getByte(packet);
@@ -49,7 +61,6 @@ public class WrappedPacketOutEntity extends WrappedPacket {
 
     }
 
-
     public byte getPitch() {
         return pitch;
     }
@@ -70,21 +81,15 @@ public class WrappedPacketOutEntity extends WrappedPacket {
         return deltaX;
     }
 
+    public Entity getEntity() {
+        return NMSUtils.getEntityById(entityID);
+    }
+
     public int getEntityId() {
-        return entityId;
+        return entityID;
     }
 
     public boolean isOnGround() {
         return onGround;
-    }
-
-    private static Class<?> packetClass;
-
-    static {
-        try {
-            packetClass = NMSUtils.getNMSClass("PacketPlayOutEntity");
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
-        }
     }
 }

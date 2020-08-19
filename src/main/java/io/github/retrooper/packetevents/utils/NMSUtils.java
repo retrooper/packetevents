@@ -16,9 +16,9 @@ import java.lang.reflect.Method;
 
 public final class NMSUtils {
     private static final ServerVersion version = ServerVersion.getVersion();
-    public static String nettyPrefix;
     private static final String nmsDir = ServerVersion.getNMSDirectory();
     private static final String obcDir = ServerVersion.getOBCDirectory();
+    public static String nettyPrefix;
     public static Class<?> minecraftServerClass, craftWorldsClass,
             packetClass, entityPlayerClass, playerConnectionClass,
             craftPlayerClass, serverConnectionClass, craftEntityClass,

@@ -24,7 +24,7 @@ public class MethodWithIndexAndParams {
     public Class<?>[] getParams() {
         return params;
     }
-    
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -34,10 +34,10 @@ public class MethodWithIndexAndParams {
                 Objects.equals(cls, that.cls) &&
                 Objects.equals(params, that.params);
     }
-    
+
     @Override
-	public int hashCode() {
-		return Objects.hash(cls, params, index);
-	}
-    
+    public int hashCode() {
+        return Objects.hash(cls, params, index);
+    }
+
 }

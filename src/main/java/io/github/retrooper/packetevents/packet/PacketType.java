@@ -7,17 +7,7 @@ public class PacketType {
 
 
     public static class Client {
-        public static class Util {
-            public static boolean isInstanceOfFlying(final byte packetId) {
-                return packetId == FLYING
-                        || packetId == POSITION
-                        || packetId == POSITION_LOOK
-                        || packetId == LOOK;
-            }
-        }
-
         public static final Map<Class<?>, Byte> packetIds = new HashMap<Class<?>, Byte>();
-
         public static final byte TELEPORT_ACCEPT = 0,
                 TILE_NBT_QUERY = 1, DIFFICULTY_CHANGE = 2, CHAT = 3, CLIENT_COMMAND = 4,
                 SETTINGS = 5, TAB_COMPLETE = 6, TRANSACTION = 7, ENCHANT_ITEM = 8,
@@ -80,6 +70,15 @@ public class PacketType {
             packetIds.put(PacketTypeClasses.Client.SPECTATE, SPECTATE);
             packetIds.put(PacketTypeClasses.Client.USE_ITEM, USE_ITEM);
             packetIds.put(PacketTypeClasses.Client.BLOCK_PLACE, BLOCK_PLACE);
+        }
+
+        public static class Util {
+            public static boolean isInstanceOfFlying(final byte packetId) {
+                return packetId == FLYING
+                        || packetId == POSITION
+                        || packetId == POSITION_LOOK
+                        || packetId == LOOK;
+            }
         }
     }
 

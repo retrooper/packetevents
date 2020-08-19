@@ -14,7 +14,7 @@ public final class WrappedPacketInCustomPayload extends WrappedPacket {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        try{
+        try {
             //Only on 1.13+
             nmsMinecraftKey = NMSUtils.getNMSClass("MinecraftKey");
         } catch (Exception e) {
@@ -31,7 +31,7 @@ public final class WrappedPacketInCustomPayload extends WrappedPacket {
 
     @Override
     public void setup() {
-        if(Reflection.getField(packetClass, String.class, 0) == null) {
+        if (Reflection.getField(packetClass, String.class, 0) == null) {
             try {
                 this.minecraftKey = Reflection.getField(packetClass, nmsMinecraftKey, 0).get(packet);
                 this.dataSerializer = Reflection.getField(packetClass, nmsPacketDataSerializer, 0).get(packet);
@@ -40,7 +40,7 @@ public final class WrappedPacketInCustomPayload extends WrappedPacket {
             }
         } else {
             try {
-                this.data = (String)Reflection.getField(packetClass, String.class, 0).get(packet);
+                this.data = (String) Reflection.getField(packetClass, String.class, 0).get(packet);
                 this.dataSerializer = Reflection.getField(packetClass, nmsPacketDataSerializer, 0).get(packet);
             } catch (Exception e) {
 //intentionally empty, allegedly 1.7.10 produces a NPE?
@@ -51,7 +51,7 @@ public final class WrappedPacketInCustomPayload extends WrappedPacket {
     public String getData() {
         return data;
     }
-    
+
     public Object getMinecraftKey() {
         return minecraftKey;
     }

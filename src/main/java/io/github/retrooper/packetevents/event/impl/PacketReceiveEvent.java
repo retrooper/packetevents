@@ -24,8 +24,10 @@ public final class PacketReceiveEvent extends PacketEvent {
     }
 
     /**
-     * Get the packet's name (NMS packet class simple name)
+     * Get the packet's name (NMS packet class simple name).
+     * Deprecated, it is recommended not to use this for performance reasons.
      */
+    @Deprecated
     public String getPacketName() {
         return this.packet.getClass().getSimpleName();
     }
@@ -41,11 +43,13 @@ public final class PacketReceiveEvent extends PacketEvent {
 
     /**
      * Get the class of the NMS packet object
+     * Deprecated, as it is useless, rather use getNMSPacket().getClass()
      *
      * @return packet object class
      */
+    @Deprecated
     public Class<?> getNMSPacketClass() {
-        return getNMSPacket().getClass();
+        return packet.getClass();
     }
 
     /**
@@ -54,11 +58,7 @@ public final class PacketReceiveEvent extends PacketEvent {
      * @return packet id
      */
     public byte getPacketId() {
-        Byte id = PacketType.Client.packetIds.get(getNMSPacketClass());
-        if (id == null) {
-            return -1;
-        }
-        return id;
+        return PacketType.Client.packetIds.getOrDefault(packet.getClass(), (byte) -1);
     }
 
     /**

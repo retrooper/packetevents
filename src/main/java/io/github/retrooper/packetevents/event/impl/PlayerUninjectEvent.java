@@ -5,12 +5,18 @@ import org.bukkit.entity.Player;
 
 public final class PlayerUninjectEvent extends PacketEvent {
     private final Player player;
-    private boolean cancelled;
     private final boolean sync;
+    private boolean cancelled;
 
-    public PlayerUninjectEvent(final Player player, final boolean sync) {
+    @Deprecated
+    public PlayerUninjectEvent(final Player player, @Deprecated final boolean sync) {
         this.player = player;
         this.sync = sync;
+    }
+
+    public PlayerUninjectEvent(final Player player) {
+        this.player = player;
+        this.sync = true;
     }
 
     public void cancel() {
@@ -31,7 +37,9 @@ public final class PlayerUninjectEvent extends PacketEvent {
      * By default all uninjections are called aynchronously in this build.
      *
      * @return If the uninjection was done async or sync
+     * @deprecated because it is unneeded
      */
+    @Deprecated
     public boolean isSync() {
         return sync;
     }

@@ -54,7 +54,7 @@ public final class WrappedPacketOutEntityVelocity extends WrappedPacket implemen
     }
 
     public WrappedPacketOutEntityVelocity(final Entity entity, final double velocityX, final double velocityY, final double velocityZ) {
-        super(null);
+        super();
         this.entityId = entity.getEntityId();
         this.entity = entity;
         this.velocityX = velocityX;

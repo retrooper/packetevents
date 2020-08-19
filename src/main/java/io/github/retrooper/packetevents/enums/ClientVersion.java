@@ -11,6 +11,7 @@ public enum ClientVersion {
     v_1_15, v_1_15_1, v_1_15_2, v_1_16, v_1_16_PRE_1, v_1_16_PRE_2, v_1_16_PRE_3, v_1_16_PRE_4, v_1_16_PRE_5, v_1_16_PRE_6, v_1_16_PRE_7, v_1_16_PRE_8, v_1_16_RC_1, v_1_16_1, v_1_16_2, HIGHER_THAN_V_1_16_2, INVALID, ACCESS_FAILURE;
 
     private static final Map<Integer, ClientVersion> VERSION_LOOKUP = new HashMap<Integer, ClientVersion>();
+
     public static void prepareLookUp() {
         VERSION_LOOKUP.put(-1, ACCESS_FAILURE);
         VERSION_LOOKUP.put(1, LESS_THAN_V_1_7_10);

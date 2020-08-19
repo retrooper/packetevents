@@ -8,6 +8,11 @@ public class WrappedPacket {
     protected final Player player;
     protected Object packet;
 
+    public WrappedPacket() {
+        this.player= null;
+        this.packet = null;
+    }
+
     public WrappedPacket(final Object packet) {
         this.player = null;
         if (packet == null) return;

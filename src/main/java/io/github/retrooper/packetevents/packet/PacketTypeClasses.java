@@ -6,6 +6,9 @@ import io.github.retrooper.packetevents.utils.NMSUtils;
 
 public class PacketTypeClasses {
     public static class Client {
+        private static final String c = "PacketPlayIn";
+        @Nullable
+        public static final Class<?> FLYING = NMSUtils.getNMSClassWithoutException(c + "Flying");
         public static Class<?> POSITION, POSITION_LOOK, LOOK, CLIENT_COMMAND,
                 TRANSACTION, BLOCK_DIG, ENTITY_ACTION, USE_ENTITY,
                 WINDOW_CLICK, STEER_VEHICLE, CUSTOM_PAYLOAD, ARM_ANIMATION,
@@ -17,9 +20,6 @@ public class PacketTypeClasses {
                 AUTO_RECIPE, RECIPE_DISPLAYED, ITEM_NAME, RESOURCE_PACK_STATUS,
                 ADVANCEMENTS, TR_SEL, BEACON, SET_COMMAND_BLOCK,
                 SET_COMMAND_MINECART, SET_JIGSAW, STRUCT, UPDATE_SIGN, SPECTATE;
-        private static final String c = "PacketPlayIn";
-        @Nullable
-        public static final Class<?> FLYING = NMSUtils.getNMSClassWithoutException(c + "Flying");
 
         public static void load() {
             try {

@@ -3,8 +3,6 @@ package io.github.retrooper.packetevents.enums;
 import io.github.retrooper.packetevents.PacketEvents;
 import org.bukkit.Bukkit;
 
-import java.util.HashMap;
-
 /**
  * @author retrooper
  */
@@ -12,9 +10,10 @@ public enum ServerVersion {
     v_1_7_10, v_1_8, v_1_8_3, v_1_8_8, v_1_9, v_1_9_4, v_1_10, v_1_11, v_1_12, v_1_13, v_1_13_2, v_1_14, v_1_15, v_1_16, v_1_16_1, v_1_16_2,
     ERROR, EMPTY;
 
-    public static ServerVersion[] reversedValues;
     private static final String nmsVersionSuffix = Bukkit.getServer().getClass().getPackage().getName().replace(".", ",").split(",")[3];
+    public static ServerVersion[] reversedValues;
     private static ServerVersion cachedVersion;
+
     private static ServerVersion getVers() {
         for (final ServerVersion val : reversedValues) {
             String valName = val.name().substring(2).replace("_", ".");
@@ -133,10 +132,10 @@ public enum ServerVersion {
         if (this.equals(ServerVersion.v_1_16)) {
             return 735;
         }
-        if(this.equals(ServerVersion.v_1_16_1)) {
+        if (this.equals(ServerVersion.v_1_16_1)) {
             return 736;
         }
-        if(this.equals(ServerVersion.v_1_16_2)) {
+        if (this.equals(ServerVersion.v_1_16_2)) {
             return 737;
         }
         return -1;

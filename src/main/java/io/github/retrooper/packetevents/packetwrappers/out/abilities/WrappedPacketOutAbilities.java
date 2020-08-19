@@ -35,7 +35,7 @@ public final class WrappedPacketOutAbilities extends WrappedPacket implements Se
 
     public WrappedPacketOutAbilities(final boolean isVulnerable, final boolean isFlying, final boolean allowFlight, final boolean canBuildInstantly,
                                      final float flySpeed, final float walkSpeed) {
-        super(null);
+        super();
         this.vulnerable = isVulnerable;
         this.flying = isFlying;
         this.allowFlight = allowFlight;

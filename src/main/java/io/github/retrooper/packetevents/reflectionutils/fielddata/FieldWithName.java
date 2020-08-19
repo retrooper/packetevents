@@ -19,7 +19,7 @@ public class FieldWithName {
     public String getName() {
         return name;
     }
-    
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -28,10 +28,10 @@ public class FieldWithName {
         return name.equals(that.name) &&
                 Objects.equals(cls, that.cls);
     }
-    
+
     @Override
-	public int hashCode() {
-		return Objects.hash(cls, name);
-	}
-    
+    public int hashCode() {
+        return Objects.hash(cls, name);
+    }
+
 }

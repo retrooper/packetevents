@@ -44,7 +44,7 @@ public final class WrappedPacketOutChat extends WrappedPacket implements Sendabl
     }
 
     public WrappedPacketOutChat(final String message) {
-        super(null);
+        super();
         this.message = "{\"text\": \"" + message + "\"}";
     }
 

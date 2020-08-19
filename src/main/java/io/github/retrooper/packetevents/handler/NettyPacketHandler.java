@@ -34,7 +34,7 @@ public class NettyPacketHandler {
 
     public static Future<?> uninjectPlayer(final Player player) {
         try {
-            final PlayerUninjectEvent uninjectEvent = new PlayerUninjectEvent(player, false);
+            final PlayerUninjectEvent uninjectEvent = new PlayerUninjectEvent(player);
             PacketEvents.getAPI().getEventManager().callEvent(uninjectEvent);
             if (!uninjectEvent.isCancelled()) {
                 if (v1_7_nettyMode) {
@@ -51,7 +51,7 @@ public class NettyPacketHandler {
 
     public static void uninjectPlayerNow(final Player player) {
         try {
-            final PlayerUninjectEvent uninjectEvent = new PlayerUninjectEvent(player, true);
+            final PlayerUninjectEvent uninjectEvent = new PlayerUninjectEvent(player);
             PacketEvents.getAPI().getEventManager().callEvent(uninjectEvent);
             if (!uninjectEvent.isCancelled()) {
                 if (v1_7_nettyMode) {

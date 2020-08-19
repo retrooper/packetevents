@@ -23,7 +23,7 @@ public class FieldWithTypeAndIndex {
     public int getIndex() {
         return index;
     }
-    
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -33,10 +33,10 @@ public class FieldWithTypeAndIndex {
                 Objects.equals(cls, that.cls) &&
                 Objects.equals(type, that.type);
     }
-    
+
     @Override
-	public int hashCode() {
-		return Objects.hash(cls, type, index);
-	}
-    
+    public int hashCode() {
+        return Objects.hash(cls, type, index);
+    }
+
 }

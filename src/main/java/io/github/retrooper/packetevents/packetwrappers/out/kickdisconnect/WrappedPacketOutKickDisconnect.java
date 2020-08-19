@@ -35,7 +35,7 @@ public final class WrappedPacketOutKickDisconnect extends WrappedPacket implemen
     }
 
     public WrappedPacketOutKickDisconnect(final String kickMessage) {
-        super(null);
+        super();
         this.kickMessage = kickMessage;
     }
 

@@ -2,7 +2,6 @@ package io.github.retrooper.packetevents.event.manager;
 
 import io.github.retrooper.packetevents.PacketEvents;
 import io.github.retrooper.packetevents.annotations.PacketHandler;
-import io.github.retrooper.packetevents.annotations.data.EventSynchronization;
 import io.github.retrooper.packetevents.event.PacketEvent;
 import io.github.retrooper.packetevents.event.PacketListener;
 import org.bukkit.Bukkit;
@@ -12,20 +11,9 @@ import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 public final class EventManager {
-    private final ExecutorService executorService;
     private final HashMap<PacketListener, List<Method>> registeredMethods = new HashMap<PacketListener, List<Method>>();
-
-    public EventManager(final int threadCount) {
-        executorService = Executors.newFixedThreadPool(threadCount);
-    }
-
-    public EventManager() {
-        this(Runtime.getRuntime().availableProcessors());
-    }
 
     public void callEvent(final PacketEvent e) {
         for (final PacketListener listener : registeredMethods.keySet()) {
@@ -46,12 +34,17 @@ public final class EventManager {
                             }
                         }
                     };
-                    if (annotation.synchronization() == EventSynchronization.FORCE_ASYNC) {
-                        executorService.execute(invokeMethod);
-                    } else if (annotation.synchronization() == EventSynchronization.FORCE_SYNC) {
-                        Bukkit.getScheduler().runTask(PacketEvents.getPlugin(), invokeMethod);
-                    } else {
-                        invokeMethod.run();
+
+                    switch (annotation.synchronization()) {
+                        case FORCE_ASYNC:
+                            Bukkit.getScheduler().runTaskAsynchronously(PacketEvents.getPlugin(), invokeMethod);
+                            break;
+                        case FORCE_SYNC:
+                            Bukkit.getScheduler().runTask(PacketEvents.getPlugin(), invokeMethod);
+                            break;
+                        default:
+                            invokeMethod.run();
+                            break;
                     }
                 }
             }

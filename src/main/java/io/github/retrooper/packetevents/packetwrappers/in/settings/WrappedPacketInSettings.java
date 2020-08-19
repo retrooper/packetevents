@@ -11,6 +11,7 @@ import java.util.HashMap;
 public class WrappedPacketInSettings extends WrappedPacket {
     private static Class<?> packetClass;
     private static Class<?> chatVisibilityEnumClass;
+
     static {
         try {
             packetClass = NMSUtils.getNMSClass("PacketPlayInSettings");
@@ -27,23 +28,17 @@ public class WrappedPacketInSettings extends WrappedPacket {
         }
     }
 
-    public enum ChatVisibility {
-        ENABLED, COMMANDS_ONLY, HIDDEN
-    }
-
-
-    public enum DisplayedSkinPart {
-        CAPE, JACKET, LEFT_SLEEVE, RIGHT_SLEEVE, LEFT_PANTS, RIGHT_PANTS, HAT
-    }
-
     private String locale;
     private byte viewDistance;
     private ChatVisibility chatVisibility;
     private boolean chatColors;
     private HashMap<DisplayedSkinPart, Boolean> displayedSkinParts;
-
     public WrappedPacketInSettings(final Object packet) {
         super(packet);
+    }
+
+    public static Class<?> getChatVisibilityEnumClass() {
+        return chatVisibilityEnumClass;
     }
 
     @Override
@@ -57,13 +52,11 @@ public class WrappedPacketInSettings extends WrappedPacket {
             //CHAT VISIBILITY
             Object chatVisibilityEnumObject = Reflection.getField(packetClass, chatVisibilityEnumClass, 0).get(packet);
             String enumValueAsString = chatVisibilityEnumObject.toString();
-            if(enumValueAsString.equals("FULL")) {
+            if (enumValueAsString.equals("FULL")) {
                 chatVisibility = ChatVisibility.ENABLED;
-            }
-            else if(enumValueAsString.equals("SYSTEM")) {
+            } else if (enumValueAsString.equals("SYSTEM")) {
                 chatVisibility = ChatVisibility.COMMANDS_ONLY;
-            }
-            else {
+            } else {
                 chatVisibility = ChatVisibility.HIDDEN;
             }
 
@@ -73,12 +66,11 @@ public class WrappedPacketInSettings extends WrappedPacket {
             //DISPLAYED SKIN PARTS
             this.displayedSkinParts = new HashMap<DisplayedSkinPart, Boolean>();
 
-            if(version.isLowerThan(ServerVersion.v_1_8)) {
+            if (version.isLowerThan(ServerVersion.v_1_8)) {
                 //in 1.7.10 only the cape display skin part is sent
                 boolean capeEnabled = Reflection.getField(packetClass, boolean.class, 1).getBoolean(packet);
                 displayedSkinParts.put(DisplayedSkinPart.CAPE, capeEnabled);
-            }
-            else {
+            } else {
                 //in 1.8, all the skin parts are sent
                 int skinPartFlags = Reflection.getField(packetClass, int.class, 1).getInt(packet);
                 displayedSkinParts.put(DisplayedSkinPart.CAPE, (skinPartFlags & 0x01) != 0);
@@ -94,10 +86,6 @@ public class WrappedPacketInSettings extends WrappedPacket {
             e.printStackTrace();
         }
 
-    }
-
-    public static Class<?> getChatVisibilityEnumClass() {
-        return chatVisibilityEnumClass;
     }
 
     public String getLocale() {
@@ -129,14 +117,23 @@ public class WrappedPacketInSettings extends WrappedPacket {
     /**
      * On 1.7.10, some skin parts will default to 'false' as 1.7.10
      * only sends the 'cape' skin part.
+     *
      * @param part
      * @return
      */
     public boolean isDisplaySkinPartEnabled(DisplayedSkinPart part) {
         //1.7.10, we will default the other skin parts to return false.
-        if(!displayedSkinParts.containsKey(part)) {
-           return false;
+        if (!displayedSkinParts.containsKey(part)) {
+            return false;
         }
         return displayedSkinParts.get(part);
+    }
+
+    public enum ChatVisibility {
+        ENABLED, COMMANDS_ONLY, HIDDEN
+    }
+
+    public enum DisplayedSkinPart {
+        CAPE, JACKET, LEFT_SLEEVE, RIGHT_SLEEVE, LEFT_PANTS, RIGHT_PANTS, HAT
     }
 }

@@ -35,7 +35,7 @@ public class WrappedPacketOutTransaction extends WrappedPacket implements Sendab
     }
 
     public WrappedPacketOutTransaction(final int windowId, final short actionNumber, final boolean accepted) {
-        super(null);
+        super();
         this.windowId = windowId;
         this.actionNumber = actionNumber;
         this.accepted = accepted;

@@ -8,8 +8,6 @@ import io.github.retrooper.packetevents.reflectionutils.Reflection;
 import io.github.retrooper.packetevents.utils.NMSUtils;
 import io.github.retrooper.packetevents.utils.vector.Vector3i;
 
-import java.util.Vector;
-
 public final class WrappedPacketInBlockDig extends WrappedPacket {
     private static Class<?> blockDigClass, blockPositionClass, enumDirectionClass, digTypeClass;
 
@@ -25,7 +23,7 @@ public final class WrappedPacketInBlockDig extends WrappedPacket {
             e.printStackTrace();
         }
 
-        if(version.isHigherThan(ServerVersion.v_1_7_10)) {
+        if (version.isHigherThan(ServerVersion.v_1_7_10)) {
             try {
                 digTypeClass = NMSUtils.getNMSClass("EnumPlayerDigType");
             } catch (ClassNotFoundException e) {
@@ -74,10 +72,9 @@ public final class WrappedPacketInBlockDig extends WrappedPacket {
             e.printStackTrace();
         }
         this.blockPosition = new Vector3i(x, y, z);
-        if(enumDirection == null) {
+        if (enumDirection == null) {
             this.direction = Direction.NULL;
-        }
-        else {
+        } else {
             this.direction = enumDirection;
         }
         this.digType = enumDigType;

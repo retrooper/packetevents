@@ -38,7 +38,7 @@ public final class WrappedPacketOutAnimation extends WrappedPacket implements Se
     }
 
     public WrappedPacketOutAnimation(final Entity target, final EntityAnimationType type) {
-        super(null);
+        super();
         this.entityID = target.getEntityId();
         this.entity = target;
         this.type = type;

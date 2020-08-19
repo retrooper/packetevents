@@ -41,7 +41,7 @@ public final class WrappedPacketOutUpdateHealth extends WrappedPacket implements
      * @param foodSaturation
      */
     public WrappedPacketOutUpdateHealth(final float health, final int food, final float foodSaturation) {
-        super(null);
+        super();
         this.health = health;
         this.food = food;
         this.foodSaturation = foodSaturation;
