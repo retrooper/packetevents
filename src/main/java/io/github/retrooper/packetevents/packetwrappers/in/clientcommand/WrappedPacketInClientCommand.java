@@ -35,7 +35,7 @@ public final class WrappedPacketInClientCommand extends WrappedPacket {
     public void setup() {
         try {
             if (version.isLowerThan(ServerVersion.v_1_8)) {
-                clientCommand = ClientCommand.get(Reflection.getField(enumClientCommandClass, int.class, 1).getInt(packet));
+                clientCommand = ClientCommand.values()[(Reflection.getField(enumClientCommandClass, int.class, 1).getInt(packet))];
             } else {
                 final Object enumObj = Reflection.getField(packetClass, enumClientCommandClass, 0).get(packet);
                 this.clientCommand = ClientCommand.valueOf(enumObj.toString());
@@ -53,13 +53,6 @@ public final class WrappedPacketInClientCommand extends WrappedPacket {
         PERFORM_RESPAWN,
         REQUEST_STATS,
         OPEN_INVENTORY_ACHIEVEMENT;
-
-        ClientCommand() {
-        }
-
-        public static ClientCommand get(final int i) {
-            return values()[i];
-        }
     }
 
 }

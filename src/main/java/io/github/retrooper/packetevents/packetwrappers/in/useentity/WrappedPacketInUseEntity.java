@@ -32,7 +32,6 @@ public final class WrappedPacketInUseEntity extends WrappedPacket {
     }
 
     private int entityId;
-    private Entity entity;
     private EntityUseAction action;
 
     public WrappedPacketInUseEntity(final Object packet) {
@@ -43,7 +42,6 @@ public final class WrappedPacketInUseEntity extends WrappedPacket {
     protected void setup() {
         try {
             this.entityId = Reflection.getField(useEntityClass, int.class, 0).getInt(packet);
-            this.entity = NMSUtils.getEntityById(this.entityId);
             final Object useActionEnum = Reflection.getField(useEntityClass, enumEntityUseActionClass, 0).get(packet);
             this.action = EntityUseAction.valueOf(useActionEnum.toString());
         } catch (IllegalAccessException e) {
@@ -52,7 +50,7 @@ public final class WrappedPacketInUseEntity extends WrappedPacket {
     }
 
     public Entity getEntity() {
-        return entity;
+        return NMSUtils.getEntityById(this.entityId);
     }
 
     public int getEntityId() {

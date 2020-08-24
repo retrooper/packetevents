@@ -5,7 +5,6 @@ import java.util.Map;
 
 public class PacketType {
 
-
     public static class Client {
         public static final Map<Class<?>, Byte> packetIds = new HashMap<Class<?>, Byte>();
         public static final byte TELEPORT_ACCEPT = 0,
@@ -203,6 +202,13 @@ public class PacketType {
             packetIds.put(PacketTypeClasses.Server.RECIPE_UPDATE, RECIPE_UPDATE);
             packetIds.put(PacketTypeClasses.Server.TAGS, TAGS);
             packetIds.put(PacketTypeClasses.Server.MAP_CHUNK_BULK, MAP_CHUNK_BULK);
+        }
+
+        public static class Util {
+            public static boolean isInstanceOfEntity(final byte packetId) {
+                return packetId == ENTITY || packetId == REL_ENTITY_MOVE ||
+                        packetId == REL_ENTITY_MOVE_LOOK || packetId == ENTITY_LOOK;
+            }
         }
     }
 
