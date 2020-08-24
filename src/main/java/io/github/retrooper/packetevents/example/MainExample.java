@@ -27,7 +27,7 @@ public class MainExample extends JavaPlugin implements PacketListener {
         // getAPI().getSettings().setDefaultServerVersion(ServerVersion.v_1_7_10);
 
 
-        PacketEvents.getAPI().getEventManager().registerListeners(this);
+       // PacketEvents.getAPI().getEventManager().registerListeners(this);
     }
 
     @Override
@@ -35,15 +35,4 @@ public class MainExample extends JavaPlugin implements PacketListener {
         PacketEvents.stop();
     }
 
-    @PacketHandler(synchronization = EventSynchronization.NORMAL)
-    public void onReceive(PacketSendEvent e) {
-        if(PacketType.Server.Util.isInstanceOfEntity(e.getPacketId())) {
-            WrappedPacketOutEntity entity = new WrappedPacketOutEntity(e.getNMSPacket());
-            double deltaX = entity.getDeltaX();
-            double deltaY = entity.getDeltaY();
-            double deltaZ = entity.getDeltaZ();
-            Entity ent = entity.getEntity();
-            e.getPlayer().sendMessage("DX: " + deltaX + ", DY: " + deltaY + ", DZ: " + deltaZ);
-        }
-    }
 }
