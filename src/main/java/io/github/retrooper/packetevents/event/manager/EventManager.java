@@ -43,7 +43,11 @@ public final class EventManager {
                             Bukkit.getScheduler().runTask(PacketEvents.getPlugin(), invokeMethod);
                             break;
                         default:
-                            invokeMethod.run();
+                            try {
+                                method.invoke(listener, e);
+                            } catch (IllegalAccessException | InvocationTargetException ex) {
+                                ex.printStackTrace();
+                            }
                             break;
                     }
                 }

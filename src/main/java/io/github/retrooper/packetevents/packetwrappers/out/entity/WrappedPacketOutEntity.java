@@ -62,9 +62,9 @@ public class WrappedPacketOutEntity extends WrappedPacket {
                     this.pitch = Reflection.getField(packetClass, byte.class, 4).getByte(packet);
                     break;
                 case 1:
-                    dX = Reflection.getField(packetClass, int.class, 1).getByte(packet);
-                    dY = Reflection.getField(packetClass, int.class, 2).getByte(packet);
-                    dZ = Reflection.getField(packetClass, int.class, 3).getByte(packet);
+                    dX = Reflection.getField(packetClass, int.class, 1).getInt(packet);
+                    dY = Reflection.getField(packetClass, int.class, 2).getInt(packet);
+                    dZ = Reflection.getField(packetClass, int.class, 3).getInt(packet);
                     this.yaw = Reflection.getField(packetClass, byte.class, 0).getByte(packet);
                     this.pitch = Reflection.getField(packetClass, byte.class, 1).getByte(packet);
                     break;
