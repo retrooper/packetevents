@@ -1,5 +1,6 @@
 package io.github.retrooper.packetevents.packetwrappers.in.abilities;
 
+import io.github.retrooper.packetevents.packet.PacketTypeClasses;
 import io.github.retrooper.packetevents.packetwrappers.api.WrappedPacket;
 import io.github.retrooper.packetevents.reflectionutils.Reflection;
 import io.github.retrooper.packetevents.utils.NMSUtils;
@@ -7,13 +8,8 @@ import io.github.retrooper.packetevents.utils.NMSUtils;
 public final class WrappedPacketInAbilities extends WrappedPacket {
     private static Class<?> abilitiesClass;
 
-    static {
-
-        try {
-            abilitiesClass = NMSUtils.getNMSClass("PacketPlayInAbilities");
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
-        }
+    public static void load() {
+        abilitiesClass = PacketTypeClasses.Client.ABILITIES;
     }
 
     private boolean isVulnerable;

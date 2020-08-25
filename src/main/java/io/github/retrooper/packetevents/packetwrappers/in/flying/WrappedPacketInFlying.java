@@ -1,30 +1,28 @@
 package io.github.retrooper.packetevents.packetwrappers.in.flying;
 
 
+import io.github.retrooper.packetevents.packet.PacketTypeClasses;
 import io.github.retrooper.packetevents.packetwrappers.api.WrappedPacket;
 import io.github.retrooper.packetevents.reflectionutils.Reflection;
-import io.github.retrooper.packetevents.utils.NMSUtils;
 
 public class WrappedPacketInFlying extends WrappedPacket {
     private static Class<?> flyingClass;
 
-    static {
-
-        try {
-            flyingClass = NMSUtils.getNMSClass("PacketPlayInFlying");
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
-        }
+    public static void load() {
+        flyingClass = PacketTypeClasses.Client.FLYING;
+        WrappedPacketInPosition.loadPos();
+        WrappedPacketInPosition_Look.loadPosLook();
+        WrappedPacketInLook.loadLook();
     }
 
-    private double x;
-    private double y;
-    private double z;
-    private float yaw;
-    private float pitch;
-    private boolean onGround;
-    private boolean isPosition;
-    private boolean isLook;
+    protected double x;
+    protected double y;
+    protected double z;
+    protected float yaw;
+    protected float pitch;
+    protected boolean onGround;
+    protected boolean isPosition;
+    protected boolean isLook;
 
     public WrappedPacketInFlying(Object packet) {
         super(packet);
@@ -74,90 +72,81 @@ public class WrappedPacketInFlying extends WrappedPacket {
         return onGround;
     }
 
-    public boolean isPosition() {
+    public final boolean isPosition() {
         return isPosition;
     }
 
-    public boolean isLook() {
+    public final boolean isLook() {
         return isLook;
     }
 
     public static class WrappedPacketInPosition extends WrappedPacketInFlying {
+        private static Class<?> packetClass;
+
+        public static void loadPos() {
+            packetClass = PacketTypeClasses.Client.POSITION;
+        }
+
         public WrappedPacketInPosition(Object packet) {
             super(packet);
         }
 
         @Override
-        public boolean isPosition() {
+        protected void setup() {
             try {
-                return Reflection.getField(flyingClass, boolean.class, 1).getBoolean(packet);
+                this.x = Reflection.getField(packetClass, double.class, 0).getDouble(packet);
+                this.y = Reflection.getField(packetClass, double.class, 0).getDouble(packet);
+                this.z = Reflection.getField(packetClass, double.class, 0).getDouble(packet);
             } catch (IllegalAccessException e) {
                 e.printStackTrace();
             }
-            return true;
-        }
-
-        @Override
-        public boolean isLook() {
-            try {
-                return Reflection.getField(flyingClass, boolean.class, 2).getBoolean(packet);
-            } catch (IllegalAccessException e) {
-                e.printStackTrace();
-            }
-            return false;
         }
     }
 
     public static class WrappedPacketInPosition_Look extends WrappedPacketInFlying {
+        private static Class<?> packetClass;
+
+        public static void loadPosLook() {
+            packetClass = PacketTypeClasses.Client.POSITION_LOOK;
+        }
+
         public WrappedPacketInPosition_Look(Object packet) {
             super(packet);
         }
 
         @Override
-        public boolean isPosition() {
+        protected void setup() {
             try {
-                return Reflection.getField(flyingClass, boolean.class, 1).getBoolean(packet);
+                this.x = Reflection.getField(packetClass, double.class, 0).getDouble(packet);
+                this.y = Reflection.getField(packetClass, double.class, 0).getDouble(packet);
+                this.z = Reflection.getField(packetClass, double.class, 0).getDouble(packet);
+                this.yaw = Reflection.getField(packetClass, float.class, 0).getFloat(packet);
+                this.pitch = Reflection.getField(packetClass, float.class, 1).getFloat(packet);
             } catch (IllegalAccessException e) {
                 e.printStackTrace();
             }
-            return true;
-        }
-
-        @Override
-        public boolean isLook() {
-            try {
-                return Reflection.getField(flyingClass, boolean.class, 2).getBoolean(packet);
-            } catch (IllegalAccessException e) {
-                e.printStackTrace();
-            }
-            return true;
         }
     }
 
     public static class WrappedPacketInLook extends WrappedPacketInFlying {
+        private static Class<?> packetClass;
+
+        public static void loadLook() {
+            packetClass = PacketTypeClasses.Client.LOOK;
+        }
 
         public WrappedPacketInLook(Object packet) {
             super(packet);
         }
 
         @Override
-        public boolean isPosition() {
+        protected void setup() {
             try {
-                return Reflection.getField(flyingClass, boolean.class, 1).getBoolean(packet);
+                this.yaw = Reflection.getField(packetClass, float.class, 0).getFloat(packet);
+                this.pitch = Reflection.getField(packetClass, float.class, 1).getFloat(packet);
             } catch (IllegalAccessException e) {
                 e.printStackTrace();
             }
-            return false;
-        }
-
-        @Override
-        public boolean isLook() {
-            try {
-                return Reflection.getField(flyingClass, boolean.class, 2).getBoolean(packet);
-            } catch (IllegalAccessException e) {
-                e.printStackTrace();
-            }
-            return true;
         }
     }
 

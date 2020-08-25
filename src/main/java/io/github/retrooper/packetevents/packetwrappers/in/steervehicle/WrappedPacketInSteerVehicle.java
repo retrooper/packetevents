@@ -1,18 +1,14 @@
 package io.github.retrooper.packetevents.packetwrappers.in.steervehicle;
 
+import io.github.retrooper.packetevents.packet.PacketTypeClasses;
 import io.github.retrooper.packetevents.packetwrappers.api.WrappedPacket;
 import io.github.retrooper.packetevents.reflectionutils.Reflection;
-import io.github.retrooper.packetevents.utils.NMSUtils;
 
 public class WrappedPacketInSteerVehicle extends WrappedPacket {
     private static Class<?> packetClass;
 
-    static {
-        try {
-            packetClass = NMSUtils.getNMSClass("PacketPlayInSteerVehicle");
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
-        }
+    public static void load() {
+        packetClass = PacketTypeClasses.Client.STEER_VEHICLE;
     }
 
     private float side, forward;

@@ -1,33 +1,24 @@
 package io.github.retrooper.packetevents.packetwrappers.in.useentity;
 
 import io.github.retrooper.packetevents.enums.minecraft.EntityUseAction;
+import io.github.retrooper.packetevents.packet.PacketTypeClasses;
 import io.github.retrooper.packetevents.packetwrappers.api.WrappedPacket;
 import io.github.retrooper.packetevents.reflectionutils.Reflection;
 import io.github.retrooper.packetevents.utils.NMSUtils;
 import org.bukkit.entity.Entity;
 
 public final class WrappedPacketInUseEntity extends WrappedPacket {
-    private static Class<?> useEntityClass, entityClass, enumEntityUseActionClass;
+    private static Class<?> useEntityClass;
+    private static Class<?> enumEntityUseActionClass;
 
-    static {
-
-        try {
-            useEntityClass = NMSUtils.getNMSClass("PacketPlayInUseEntity");
-            entityClass = NMSUtils.getNMSClass("Entity");
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
-        }
+    public static void load() {
+        useEntityClass = PacketTypeClasses.Client.USE_ENTITY;
 
         try {
             enumEntityUseActionClass = NMSUtils.getNMSClass("EnumEntityUseAction");
         } catch (ClassNotFoundException e) {
             //That is fine, it is probably a subclass
-            for (final Class<?> sub : useEntityClass.getDeclaredClasses()) {
-                if (sub.getSimpleName().equals("EnumEntityUseAction")) {
-                    enumEntityUseActionClass = sub;
-                    break;
-                }
-            }
+            enumEntityUseActionClass = Reflection.getSubClass(useEntityClass, "EnumEntityUseAction");
         }
     }
 

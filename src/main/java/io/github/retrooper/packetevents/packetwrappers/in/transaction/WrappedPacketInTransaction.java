@@ -1,18 +1,14 @@
 package io.github.retrooper.packetevents.packetwrappers.in.transaction;
 
+import io.github.retrooper.packetevents.packet.PacketTypeClasses;
 import io.github.retrooper.packetevents.packetwrappers.api.WrappedPacket;
 import io.github.retrooper.packetevents.reflectionutils.Reflection;
-import io.github.retrooper.packetevents.utils.NMSUtils;
 
 public final class WrappedPacketInTransaction extends WrappedPacket {
     private static Class<?> packetClass;
 
-    static {
-        try {
-            packetClass = NMSUtils.getNMSClass("PacketPlayInTransaction");
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
-        }
+    public static void load() {
+        packetClass = PacketTypeClasses.Client.TRANSACTION;
     }
 
     private int windowId;

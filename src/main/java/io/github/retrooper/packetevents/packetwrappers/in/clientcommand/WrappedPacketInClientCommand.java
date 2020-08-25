@@ -2,6 +2,7 @@ package io.github.retrooper.packetevents.packetwrappers.in.clientcommand;
 
 import io.github.retrooper.packetevents.annotations.Nullable;
 import io.github.retrooper.packetevents.enums.ServerVersion;
+import io.github.retrooper.packetevents.packet.PacketTypeClasses;
 import io.github.retrooper.packetevents.packetwrappers.api.WrappedPacket;
 import io.github.retrooper.packetevents.reflectionutils.Reflection;
 import io.github.retrooper.packetevents.utils.NMSUtils;
@@ -12,9 +13,13 @@ public final class WrappedPacketInClientCommand extends WrappedPacket {
     @Nullable
     private static Class<?> enumClientCommandClass;
 
-    static {
+    private static boolean isLowerThan_v_1_8;
+
+    public static void load() {
+        packetClass = PacketTypeClasses.Client.CLIENT_COMMAND;
+
+        isLowerThan_v_1_8 = version.isLowerThan(ServerVersion.v_1_8);
         try {
-            packetClass = NMSUtils.getNMSClass("PacketPlayInClientCommand");
             if (version.isHigherThan(ServerVersion.v_1_7_10)) {
                 enumClientCommandClass = Reflection.getSubClass(packetClass, "EnumClientCommand");
             } else {
@@ -34,7 +39,7 @@ public final class WrappedPacketInClientCommand extends WrappedPacket {
     @Override
     public void setup() {
         try {
-            if (version.isLowerThan(ServerVersion.v_1_8)) {
+            if (isLowerThan_v_1_8) {
                 clientCommand = ClientCommand.values()[(Reflection.getField(enumClientCommandClass, int.class, 1).getInt(packet))];
             } else {
                 final Object enumObj = Reflection.getField(packetClass, enumClientCommandClass, 0).get(packet);

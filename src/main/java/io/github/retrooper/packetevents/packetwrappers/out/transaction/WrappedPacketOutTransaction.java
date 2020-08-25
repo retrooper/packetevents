@@ -1,5 +1,6 @@
 package io.github.retrooper.packetevents.packetwrappers.out.transaction;
 
+import io.github.retrooper.packetevents.packet.PacketTypeClasses;
 import io.github.retrooper.packetevents.packetwrappers.Sendable;
 import io.github.retrooper.packetevents.packetwrappers.api.WrappedPacket;
 import io.github.retrooper.packetevents.reflectionutils.Reflection;
@@ -12,12 +13,8 @@ public class WrappedPacketOutTransaction extends WrappedPacket implements Sendab
     private static Class<?> packetClass;
     private static Constructor<?> packetConstructor;
 
-    static {
-        try {
-            packetClass = NMSUtils.getNMSClass("PacketPlayOutTransaction");
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
-        }
+    public static void load() {
+       packetClass = PacketTypeClasses.Server.TRANSACTION;
 
         try {
             packetConstructor = packetClass.getConstructor(int.class, short.class, boolean.class);

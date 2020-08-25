@@ -1,5 +1,6 @@
 package io.github.retrooper.packetevents.packetwrappers.out.abilities;
 
+import io.github.retrooper.packetevents.packet.PacketTypeClasses;
 import io.github.retrooper.packetevents.packetwrappers.Sendable;
 import io.github.retrooper.packetevents.packetwrappers.api.WrappedPacket;
 import io.github.retrooper.packetevents.reflectionutils.Reflection;
@@ -12,12 +13,8 @@ public final class WrappedPacketOutAbilities extends WrappedPacket implements Se
     private static Class<?> packetClass;
     private static Constructor<?> packetConstructor;
 
-    static {
-        try {
-            packetClass = NMSUtils.getNMSClass("PacketPlayOutAbilities");
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
-        }
+    public static void load() {
+       packetClass = PacketTypeClasses.Server.ABILITIES;
 
         try {
             packetConstructor = packetClass.getConstructor(PlayerAbilitiesUtils.playerAbilitiesClass);

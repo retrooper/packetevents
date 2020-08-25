@@ -1,5 +1,6 @@
 package io.github.retrooper.packetevents.packetwrappers.in.helditemslot;
 
+import io.github.retrooper.packetevents.packet.PacketTypeClasses;
 import io.github.retrooper.packetevents.packetwrappers.api.WrappedPacket;
 import io.github.retrooper.packetevents.reflectionutils.Reflection;
 import io.github.retrooper.packetevents.utils.NMSUtils;
@@ -7,12 +8,8 @@ import io.github.retrooper.packetevents.utils.NMSUtils;
 public final class WrappedPacketInHeldItemSlot extends WrappedPacket {
     private static Class<?> packetClass;
 
-    static {
-        try {
-            packetClass = NMSUtils.getNMSClass("PacketPlayInHeldItemSlot");
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+    public static void load() {
+        packetClass = PacketTypeClasses.Client.HELD_ITEM_SLOT;
     }
 
     private int itemInHandIndex;

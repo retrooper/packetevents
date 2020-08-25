@@ -3,6 +3,7 @@ package io.github.retrooper.packetevents.packetwrappers.in.blockdig;
 import io.github.retrooper.packetevents.enums.Direction;
 import io.github.retrooper.packetevents.enums.ServerVersion;
 import io.github.retrooper.packetevents.enums.minecraft.PlayerDigType;
+import io.github.retrooper.packetevents.packet.PacketTypeClasses;
 import io.github.retrooper.packetevents.packetwrappers.api.WrappedPacket;
 import io.github.retrooper.packetevents.reflectionutils.Reflection;
 import io.github.retrooper.packetevents.utils.NMSUtils;
@@ -10,11 +11,10 @@ import io.github.retrooper.packetevents.utils.vector.Vector3i;
 
 public final class WrappedPacketInBlockDig extends WrappedPacket {
     private static Class<?> blockDigClass, blockPositionClass, enumDirectionClass, digTypeClass;
-
-    static {
-
+    private static boolean isVersionLowerThan_v_1_8;
+    public static void load() {
+        blockDigClass = PacketTypeClasses.Client.BLOCK_DIG;
         try {
-            blockDigClass = NMSUtils.getNMSClass("PacketPlayInBlockDig");
             if (version.isHigherThan(ServerVersion.v_1_7_10)) {
                 blockPositionClass = NMSUtils.getNMSClass("BlockPosition");
                 enumDirectionClass = NMSUtils.getNMSClass("EnumDirection");
@@ -22,8 +22,9 @@ public final class WrappedPacketInBlockDig extends WrappedPacket {
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
         }
+        isVersionLowerThan_v_1_8 = version.isLowerThan(ServerVersion.v_1_8);
 
-        if (version.isHigherThan(ServerVersion.v_1_7_10)) {
+        if (version != ServerVersion.v_1_7_10) {
             try {
                 digTypeClass = NMSUtils.getNMSClass("EnumPlayerDigType");
             } catch (ClassNotFoundException e) {
@@ -48,7 +49,7 @@ public final class WrappedPacketInBlockDig extends WrappedPacket {
         int x = 0, y = 0, z = 0;
         //1.7.10
         try {
-            if (version.isLowerThan(ServerVersion.v_1_8)) {
+            if (isVersionLowerThan_v_1_8) {
                 enumDigType = PlayerDigType.get(Reflection.getField(blockDigClass, int.class, 4).getInt(packet));
                 x = Reflection.getField(blockDigClass, int.class, 0).getInt(packet);
                 y = Reflection.getField(blockDigClass, int.class, 1).getInt(packet);

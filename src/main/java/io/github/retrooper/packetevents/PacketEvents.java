@@ -7,6 +7,7 @@ import io.github.retrooper.packetevents.event.PacketListener;
 import io.github.retrooper.packetevents.event.impl.BukkitMoveEvent;
 import io.github.retrooper.packetevents.packet.PacketType;
 import io.github.retrooper.packetevents.packet.PacketTypeClasses;
+import io.github.retrooper.packetevents.packetwrappers.api.WrappedPacket;
 import io.github.retrooper.packetevents.settings.PacketEventsSettings;
 import io.github.retrooper.packetevents.utils.versionlookup.VersionLookupUtils;
 import org.bukkit.Bukkit;
@@ -36,6 +37,7 @@ public final class PacketEvents implements PacketListener, Listener {
 
         PacketTypeClasses.Client.load();
         PacketTypeClasses.Server.load();
+        WrappedPacket.loadAllWrappers();
         ClientVersion.prepareLookUp();
         hasLoaded = true;
     }

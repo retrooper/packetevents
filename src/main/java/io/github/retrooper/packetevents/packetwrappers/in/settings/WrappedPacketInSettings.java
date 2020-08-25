@@ -2,6 +2,7 @@ package io.github.retrooper.packetevents.packetwrappers.in.settings;
 
 import io.github.retrooper.packetevents.annotations.Nullable;
 import io.github.retrooper.packetevents.enums.ServerVersion;
+import io.github.retrooper.packetevents.packet.PacketTypeClasses;
 import io.github.retrooper.packetevents.packetwrappers.api.WrappedPacket;
 import io.github.retrooper.packetevents.reflectionutils.Reflection;
 import io.github.retrooper.packetevents.utils.NMSUtils;
@@ -12,12 +13,12 @@ public class WrappedPacketInSettings extends WrappedPacket {
     private static Class<?> packetClass;
     private static Class<?> chatVisibilityEnumClass;
 
-    static {
-        try {
-            packetClass = NMSUtils.getNMSClass("PacketPlayInSettings");
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
-        }
+    private static boolean isLowerThan_v_1_8;
+
+    public static void load() {
+        packetClass = PacketTypeClasses.Client.SETTINGS;
+
+        isLowerThan_v_1_8 = version.isLowerThan(ServerVersion.v_1_8);
 
         try {
             chatVisibilityEnumClass = NMSUtils.getNMSClass("EnumChatVisibility");
@@ -66,7 +67,7 @@ public class WrappedPacketInSettings extends WrappedPacket {
             //DISPLAYED SKIN PARTS
             this.displayedSkinParts = new HashMap<DisplayedSkinPart, Boolean>();
 
-            if (version.isLowerThan(ServerVersion.v_1_8)) {
+            if (isLowerThan_v_1_8) {
                 //in 1.7.10 only the cape display skin part is sent
                 boolean capeEnabled = Reflection.getField(packetClass, boolean.class, 1).getBoolean(packet);
                 displayedSkinParts.put(DisplayedSkinPart.CAPE, capeEnabled);

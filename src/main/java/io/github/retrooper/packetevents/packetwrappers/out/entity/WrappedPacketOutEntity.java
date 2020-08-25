@@ -1,5 +1,6 @@
 package io.github.retrooper.packetevents.packetwrappers.out.entity;
 
+import io.github.retrooper.packetevents.packet.PacketTypeClasses;
 import io.github.retrooper.packetevents.packetwrappers.api.WrappedPacket;
 import io.github.retrooper.packetevents.reflectionutils.Reflection;
 import io.github.retrooper.packetevents.utils.NMSUtils;
@@ -13,14 +14,11 @@ public class WrappedPacketOutEntity extends WrappedPacket {
     private static byte mode = 0; //byte = 0, int = 1, short = 2
     private static double dXYZDivisor = 0.0;
 
-    static {
-        try {
-            packetClass = NMSUtils.getNMSClass("PacketPlayOutEntity");
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
-        }
+    public static void load() {
+       packetClass = PacketTypeClasses.Server.ENTITY;
 
         Field dxField = Reflection.getField(packetClass, 1);
+        assert dxField != null;
         if (dxField.equals(Reflection.getField(packetClass, byte.class, 0))) {
             mode = 0;
         } else if (dxField.equals(Reflection.getField(packetClass, int.class, 1))) {
@@ -83,7 +81,6 @@ public class WrappedPacketOutEntity extends WrappedPacket {
         } catch (IllegalAccessException e) {
             e.printStackTrace();
         }
-
     }
 
     public byte getPitch() {

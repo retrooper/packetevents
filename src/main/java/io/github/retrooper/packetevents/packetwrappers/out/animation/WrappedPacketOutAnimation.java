@@ -1,6 +1,7 @@
 package io.github.retrooper.packetevents.packetwrappers.out.animation;
 
 import io.github.retrooper.packetevents.enums.minecraft.EntityAnimationType;
+import io.github.retrooper.packetevents.packet.PacketTypeClasses;
 import io.github.retrooper.packetevents.packetwrappers.Sendable;
 import io.github.retrooper.packetevents.packetwrappers.api.WrappedPacket;
 import io.github.retrooper.packetevents.reflectionutils.Reflection;
@@ -14,9 +15,9 @@ public final class WrappedPacketOutAnimation extends WrappedPacket implements Se
     private static Class<?> animationClass, nmsEntityClass;
     private static Constructor<?> animationConstructor;
 
-    static {
+    public static void load() {
+        animationClass = PacketTypeClasses.Server.ANIMATION;
         try {
-            animationClass = NMSUtils.getNMSClass("PacketPlayOutAnimation");
             nmsEntityClass = NMSUtils.getNMSClass("Entity");
         } catch (ClassNotFoundException e) {
             e.printStackTrace();

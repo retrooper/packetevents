@@ -3,6 +3,7 @@ package io.github.retrooper.packetevents.packetwrappers.in.entityaction;
 import io.github.retrooper.packetevents.annotations.Nullable;
 import io.github.retrooper.packetevents.enums.ServerVersion;
 import io.github.retrooper.packetevents.enums.minecraft.PlayerAction;
+import io.github.retrooper.packetevents.packet.PacketTypeClasses;
 import io.github.retrooper.packetevents.packetwrappers.api.WrappedPacket;
 import io.github.retrooper.packetevents.reflectionutils.Reflection;
 import io.github.retrooper.packetevents.utils.NMSUtils;
@@ -13,14 +14,13 @@ public final class WrappedPacketInEntityAction extends WrappedPacket {
     @Nullable
     private static Class<?> enumPlayerActionClass;
 
-    static {
-        try {
-            entityActionClass = NMSUtils.getNMSClass("PacketPlayInEntityAction");
-            if (version.isHigherThan(ServerVersion.v_1_7_10)) {
-                enumPlayerActionClass = Reflection.getSubClass(entityActionClass, "EnumPlayerAction");
-            }
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
+    private static boolean isLowerThan_v_1_8;
+
+    public static void load() {
+        entityActionClass = PacketTypeClasses.Client.ENTITY_ACTION;
+        isLowerThan_v_1_8 = version.isLowerThan(ServerVersion.v_1_8);
+        if (version.isHigherThan(ServerVersion.v_1_7_10)) {
+            enumPlayerActionClass = Reflection.getSubClass(entityActionClass, "EnumPlayerAction");
         }
     }
 
@@ -38,7 +38,7 @@ public final class WrappedPacketInEntityAction extends WrappedPacket {
         try {
             final int entityId = Reflection.getField(entityActionClass, int.class, 0).getInt(packet);
             final int jumpBoost;
-            if (version.isLowerThan(ServerVersion.v_1_8)) {
+            if (isLowerThan_v_1_8) {
                 jumpBoost = Reflection.getField(entityActionClass, int.class, 2).getInt(packet);
             } else {
                 jumpBoost = Reflection.getField(entityActionClass, int.class, 1).getInt(packet);
@@ -47,7 +47,7 @@ public final class WrappedPacketInEntityAction extends WrappedPacket {
             int animationIndex = -1;
 
             //1.7.10
-            if (version.isLowerThan(ServerVersion.v_1_8)) {
+            if (isLowerThan_v_1_8) {
                 animationIndex = Reflection.getField(entityActionClass, int.class, 1).getInt(packet); // TODO: += if packetdataserializer.version < 16
             } else {
                 final Object enumObj = Reflection.getField(entityActionClass, enumPlayerActionClass, 0).get(packet);

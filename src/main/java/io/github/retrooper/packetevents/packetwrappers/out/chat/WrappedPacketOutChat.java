@@ -1,5 +1,6 @@
 package io.github.retrooper.packetevents.packetwrappers.out.chat;
 
+import io.github.retrooper.packetevents.packet.PacketTypeClasses;
 import io.github.retrooper.packetevents.packetwrappers.Sendable;
 import io.github.retrooper.packetevents.packetwrappers.api.WrappedPacket;
 import io.github.retrooper.packetevents.reflectionutils.Reflection;
@@ -10,11 +11,11 @@ import java.lang.reflect.InvocationTargetException;
 
 public final class WrappedPacketOutChat extends WrappedPacket implements Sendable {
     private static Constructor<?> chatClassConstructor;
-    private static Class<?> chatClass, iChatBaseComponentClass, chatSerializerClass;
+    private static Class<?> packetClass, iChatBaseComponentClass, chatSerializerClass;
 
-    static {
+    public static void load() {
         try {
-            chatClass = NMSUtils.getNMSClass("PacketPlayOutChat");
+            packetClass = PacketTypeClasses.Server.CHAT;
             iChatBaseComponentClass = NMSUtils.getNMSClass("IChatBaseComponent");
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
@@ -29,7 +30,7 @@ public final class WrappedPacketOutChat extends WrappedPacket implements Sendabl
         }
 
         try {
-            chatClassConstructor = chatClass.getConstructor(iChatBaseComponentClass);
+            chatClassConstructor = packetClass.getConstructor(iChatBaseComponentClass);
         } catch (NoSuchMethodException e) {
             e.printStackTrace();
         }
@@ -70,7 +71,7 @@ public final class WrappedPacketOutChat extends WrappedPacket implements Sendabl
     @Override
     protected void setup() {
         try {
-            final Object iChatBaseObj = Reflection.getField(chatClass, iChatBaseComponentClass, 0).get(packet);
+            final Object iChatBaseObj = Reflection.getField(packetClass, iChatBaseComponentClass, 0).get(packet);
 
             final Object contentString = Reflection.getMethod(iChatBaseComponentClass, String.class, 0).invoke(iChatBaseObj);
 

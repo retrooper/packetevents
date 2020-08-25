@@ -1,18 +1,15 @@
 package io.github.retrooper.packetevents.packetwrappers.in.keepalive;
 
+import io.github.retrooper.packetevents.packet.PacketTypeClasses;
 import io.github.retrooper.packetevents.packetwrappers.api.WrappedPacket;
 import io.github.retrooper.packetevents.reflectionutils.Reflection;
-import io.github.retrooper.packetevents.utils.NMSUtils;
 
 public final class WrappedPacketInKeepAlive extends WrappedPacket {
     private static Class<?> packetClass;
-
-    static {
-        try {
-            packetClass = NMSUtils.getNMSClass("PacketPlayInKeepAlive");
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
-        }
+    private static boolean integerPresentInIndex0;
+    public static void load() {
+        packetClass = PacketTypeClasses.Client.KEEP_ALIVE;
+        integerPresentInIndex0 = Reflection.getField(packetClass, int.class, 0) != null;
     }
 
     private long id;
@@ -23,7 +20,7 @@ public final class WrappedPacketInKeepAlive extends WrappedPacket {
 
     @Override
     protected void setup() {
-        if (Reflection.getField(packetClass, int.class, 0) == null) {
+        if (!integerPresentInIndex0) {
             try {
                 this.id = Reflection.getField(packetClass, long.class, 0).getLong(packet);
             } catch (IllegalAccessException e) {

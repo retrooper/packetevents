@@ -3,6 +3,7 @@ package io.github.retrooper.packetevents.packetwrappers.out.position;
 import io.github.retrooper.packetevents.packet.PacketTypeClasses;
 import io.github.retrooper.packetevents.packetwrappers.api.WrappedPacket;
 import io.github.retrooper.packetevents.reflectionutils.Reflection;
+import io.github.retrooper.packetevents.utils.NMSUtils;
 
 public final class WrappedPacketOutPosition extends WrappedPacket {
     private double x;
@@ -13,8 +14,8 @@ public final class WrappedPacketOutPosition extends WrappedPacket {
 
     private static Class<?> packetClass;
 
-    static {
-        packetClass = PacketTypeClasses.Server.POSITION;
+    public static void load() {
+       packetClass = PacketTypeClasses.Server.POSITION;
     }
     public WrappedPacketOutPosition(Object packet) {
         super(packet);

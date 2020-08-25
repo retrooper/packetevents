@@ -1,5 +1,6 @@
 package io.github.retrooper.packetevents.packetwrappers.out.kickdisconnect;
 
+import io.github.retrooper.packetevents.packet.PacketTypeClasses;
 import io.github.retrooper.packetevents.packetwrappers.Sendable;
 import io.github.retrooper.packetevents.packetwrappers.api.WrappedPacket;
 import io.github.retrooper.packetevents.packetwrappers.out.chat.WrappedPacketOutChat;
@@ -13,9 +14,9 @@ public final class WrappedPacketOutKickDisconnect extends WrappedPacket implemen
     private static Class<?> packetClass, iChatBaseComponentClass;
     private static Constructor<?> kickDisconnectConstructor;
 
-    static {
+    public static void load() {
+        packetClass = PacketTypeClasses.Server.KICK_DISCONNECT;
         try {
-            packetClass = NMSUtils.getNMSClass("PacketPlayOutKickDisconnect");
             iChatBaseComponentClass = NMSUtils.getNMSClass("IChatBaseComponent");
         } catch (ClassNotFoundException e) {
             e.printStackTrace();

@@ -1,5 +1,6 @@
 package io.github.retrooper.packetevents.packetwrappers.in.blockplace;
 
+import io.github.retrooper.packetevents.packet.PacketTypeClasses;
 import io.github.retrooper.packetevents.packetwrappers.api.WrappedPacket;
 import io.github.retrooper.packetevents.reflectionutils.Reflection;
 import io.github.retrooper.packetevents.utils.NMSUtils;
@@ -17,10 +18,9 @@ final class WrappedPacketInBlockPlace_1_8 extends WrappedPacket {
         super(packet);
     }
 
-    protected static void initStatic() {
+    protected static void load() {
+        blockPlaceClass = PacketTypeClasses.Client.BLOCK_PLACE;
         try {
-            blockPlaceClass = NMSUtils.getNMSClass("PacketPlayInBlockPlace");
-
             blockPositionClass = NMSUtils.getNMSClass("BlockPosition");
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
