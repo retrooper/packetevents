@@ -7,6 +7,7 @@ import io.github.retrooper.packetevents.event.PacketListener;
 import io.github.retrooper.packetevents.event.impl.PacketSendEvent;
 import io.github.retrooper.packetevents.packet.PacketType;
 import io.github.retrooper.packetevents.packetwrappers.out.entity.WrappedPacketOutEntity;
+import io.github.retrooper.packetevents.packetwrappers.out.entityvelocity.WrappedPacketOutEntityVelocity;
 import org.bukkit.entity.Entity;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -27,7 +28,7 @@ public class MainExample extends JavaPlugin implements PacketListener {
         // getAPI().getSettings().setDefaultServerVersion(ServerVersion.v_1_7_10);
 
 
-       // PacketEvents.getAPI().getEventManager().registerListeners(this);
+        PacketEvents.getAPI().getEventManager().registerListeners(this);
     }
 
     @Override
@@ -35,4 +36,8 @@ public class MainExample extends JavaPlugin implements PacketListener {
         PacketEvents.stop();
     }
 
+    @PacketHandler
+    public void onSend(PacketSendEvent e) {
+        
+    }
 }

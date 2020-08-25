@@ -9,6 +9,7 @@ import java.lang.reflect.Field;
 
 public class WrappedPacketOutEntity extends WrappedPacket {
     private static Class<?> packetClass;
+    //Byte = 1.7.10->1.8.8, Int = 1.9->1.15.x, Short = 1.16.x
     private static byte mode = 0; //byte = 0, int = 1, short = 2
     private static double dXYZDivisor = 0.0;
 
