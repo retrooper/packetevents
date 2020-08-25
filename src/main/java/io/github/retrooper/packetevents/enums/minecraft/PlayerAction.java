@@ -17,7 +17,9 @@ public enum PlayerAction {
 
     OPEN_INVENTORY,
 
-    START_FALL_FLYING;
+    START_FALL_FLYING,
+
+    RIDING_JUMP;
 
     public static PlayerAction get(final int i) {
         return values()[i];
@@ -34,7 +36,7 @@ public enum PlayerAction {
     }
 
     public enum UpdatedPlayerAction {
-        PRESS_SHIFT_KEY, RELEASE_SHIFT_KEY, STOP_SLEEPING, START_SPRINTING, STOP_SPRINTING, START_RIDING_JUMP, RIDING_JUMP, STOP_RIDING_JUMP, OPEN_INVENTORY, START_FALL_FLYING;
+        PRESS_SHIFT_KEY, RELEASE_SHIFT_KEY, STOP_SLEEPING, START_SPRINTING, STOP_SPRINTING, START_RIDING_JUMP, STOP_RIDING_JUMP, OPEN_INVENTORY, START_FALL_FLYING;
 
         public static UpdatedPlayerAction get(final int index) {
             for (int i = 0; i < index + 1; i++) {
