@@ -13,6 +13,8 @@ public enum PlayerAction {
 
     START_RIDING_JUMP,
 
+    RIDING_JUMP,
+
     STOP_RIDING_JUMP,
 
     OPEN_INVENTORY,
