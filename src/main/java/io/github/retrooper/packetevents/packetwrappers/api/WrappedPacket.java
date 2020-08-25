@@ -30,7 +30,7 @@ import io.github.retrooper.packetevents.packetwrappers.out.updatehealth.WrappedP
 import org.bukkit.entity.Player;
 
 public class WrappedPacket {
-    protected static ServerVersion version = ServerVersion.getVersion();
+    public static ServerVersion version = null;
     protected final Player player;
     protected Object packet;
 
