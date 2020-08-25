@@ -1,15 +1,18 @@
 package io.github.retrooper.packetevents.packetwrappers.in.abilities;
 
+import io.github.retrooper.packetevents.annotations.NotNull;
+import io.github.retrooper.packetevents.annotations.Nullable;
 import io.github.retrooper.packetevents.packet.PacketTypeClasses;
 import io.github.retrooper.packetevents.packetwrappers.api.WrappedPacket;
 import io.github.retrooper.packetevents.reflectionutils.Reflection;
-import io.github.retrooper.packetevents.utils.NMSUtils;
 
 public final class WrappedPacketInAbilities extends WrappedPacket {
     private static Class<?> abilitiesClass;
+    private static boolean isMoreThanOneBoolPresent;
 
     public static void load() {
         abilitiesClass = PacketTypeClasses.Client.ABILITIES;
+        isMoreThanOneBoolPresent = Reflection.getField(abilitiesClass, boolean.class, 1) != null;
     }
 
     private boolean isVulnerable;
@@ -26,18 +29,28 @@ public final class WrappedPacketInAbilities extends WrappedPacket {
     @Override
     protected void setup() {
         try {
-            this.isVulnerable = Reflection.getField(abilitiesClass, boolean.class, 0).getBoolean(packet);
-            this.isFlying = Reflection.getField(abilitiesClass, boolean.class, 1).getBoolean(packet);
-            this.allowFly = Reflection.getField(abilitiesClass, boolean.class, 2).getBoolean(packet);
-            this.instantBuild = Reflection.getField(abilitiesClass, boolean.class, 3).getBoolean(packet);
-            this.flySpeed = Reflection.getField(abilitiesClass, float.class, 0).getFloat(packet);
-            this.walkSpeed = Reflection.getField(abilitiesClass, float.class, 1).getFloat(packet);
+            if (isMoreThanOneBoolPresent) {
+                this.isVulnerable = Reflection.getField(abilitiesClass, boolean.class, 0).getBoolean(packet);
+                this.isFlying = Reflection.getField(abilitiesClass, boolean.class, 1).getBoolean(packet);
+                this.allowFly = Reflection.getField(abilitiesClass, boolean.class, 2).getBoolean(packet);
+                this.instantBuild = Reflection.getField(abilitiesClass, boolean.class, 3).getBoolean(packet);
+                this.flySpeed = Reflection.getField(abilitiesClass, float.class, 0).getFloat(packet);
+                this.walkSpeed = Reflection.getField(abilitiesClass, float.class, 1).getFloat(packet);
+            }
+            else {
+                this.isFlying = Reflection.getField(abilitiesClass, boolean.class, 0).getBoolean(packet);
+            }
         } catch (IllegalAccessException e) {
             e.printStackTrace();
         }
     }
 
-    public boolean isVulnerable() {
+    /**
+     * This will return null if the server version is not available in 1.16.x and above
+     */
+    @Deprecated
+    @Nullable
+    public Boolean isVulnerable() {
         return isVulnerable;
     }
 
@@ -45,19 +58,39 @@ public final class WrappedPacketInAbilities extends WrappedPacket {
         return isFlying;
     }
 
-    public boolean isFlightAllowed() {
+    /**
+     * This will return null if the server version is not available in 1.16.x and above
+     */
+    @Deprecated
+    @Nullable
+    public Boolean isFlightAllowed() {
         return allowFly;
     }
 
-    public boolean canInstantlyBuild() {
+    /**
+     * This will return null if the server version is not available in 1.16.x and above
+     */
+    @Deprecated
+    @Nullable
+    public Boolean canInstantlyBuild() {
         return instantBuild;
     }
 
-    public float getFlySpeed() {
+    /**
+     * This will return null if the server version is not available in 1.16.x and above
+     */
+    @Deprecated
+    @Nullable
+    public Float getFlySpeed() {
         return flySpeed;
     }
 
-    public float getWalkSpeed() {
+    /**
+     * This will return null if the server version is not available in 1.16.x and above
+     */
+    @Deprecated
+    @Nullable
+    public Float getWalkSpeed() {
         return walkSpeed;
     }
 }
