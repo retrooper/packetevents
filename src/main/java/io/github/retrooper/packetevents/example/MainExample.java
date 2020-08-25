@@ -38,4 +38,5 @@ public class MainExample extends JavaPlugin implements PacketListener {
     public void onDisable() {
         PacketEvents.stop();
     }
+
 }
