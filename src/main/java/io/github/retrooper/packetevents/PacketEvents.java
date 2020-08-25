@@ -37,6 +37,7 @@ public final class PacketEvents implements PacketListener, Listener {
 
         PacketTypeClasses.Client.load();
         PacketTypeClasses.Server.load();
+        WrappedPacket.version = ServerVersion.getVersion();
         WrappedPacket.loadAllWrappers();
         ClientVersion.prepareLookUp();
         hasLoaded = true;
