@@ -31,35 +31,11 @@ public class MainExample extends JavaPlugin implements PacketListener {
         // getAPI().getSettings().setDefaultServerVersion(ServerVersion.v_1_7_10);
 
 
-        PacketEvents.getAPI().getEventManager().registerListeners(this);
+      //  PacketEvents.getAPI().getEventManager().registerListeners(this);
     }
 
     @Override
     public void onDisable() {
         PacketEvents.stop();
-    }
-
-
-    //TODO test FLYING, WINDOW_CLICK
-
-    @PacketHandler
-    public void onReceive(PacketReceiveEvent e) {
-        if(PacketType.Client.Util.isInstanceOfFlying(e.getPacketId())) {
-            WrappedPacketInFlying flying = new WrappedPacketInFlying(e.getNMSPacket());
-            if(flying.isPosition() && !flying.isLook()) {
-                WrappedPacketInFlying.WrappedPacketInPosition pos = new WrappedPacketInFlying.WrappedPacketInPosition(e.getNMSPacket());
-                System.out.println("X: " + pos.getX() + ", Y: " + pos.getY() + ", Z: " + pos.getZ());
-                System.out.println("isPos: "+  pos.isPosition() + ", isLook: " + pos.isLook());
-            }
-        }
-        else if(e.getPacketId() == PacketType.Client.WINDOW_CLICK) {
-            WrappedPacketInWindowClick windowClick = new WrappedPacketInWindowClick(e.getNMSPacket());
-            e.getPlayer().sendMessage("Type: " + windowClick.getWindowClickType().name());
-        }
-    }
-
-    @PacketHandler
-    public void onSend(PacketSendEvent e) {
-        
     }
 }

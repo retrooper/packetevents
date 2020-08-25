@@ -20,7 +20,7 @@ public class WrappedPacketInWindowClick extends WrappedPacket {
     private ItemStack clickedItem;
 
     private static Class<?> packetClass, invClickTypeClass;
-    private static boolean isClickModePrimitive = false, clickModeInfoFound = false;
+    private static boolean isClickModePrimitive = false;
     private static final HashMap<String, Integer> invClickTypeMapCache = new HashMap<String, Integer>();
 
     private static final HashMap<Integer, ArrayList<WindowClickType>> windowClickTypeCache = new HashMap<Integer, ArrayList<WindowClickType>>();
@@ -78,6 +78,7 @@ public class WrappedPacketInWindowClick extends WrappedPacket {
                 WindowClickType.ENDING_MIDDLE_MOUSE_DRAG));
 
         windowClickTypeCache.put(6, getArrayListOfWindowClickTypes(WindowClickType.DOUBLE_CLICK));
+        isClickModePrimitive = Reflection.getField(packetClass, int.class, 3) != null;
     }
 
     public WrappedPacketInWindowClick(Object packet) {
@@ -93,11 +94,7 @@ public class WrappedPacketInWindowClick extends WrappedPacket {
             this.actionNumber = Reflection.getField(packetClass, short.class, 0).getShort(packet);
             Object nmsItemStack = Reflection.getField(packetClass, NMSUtils.nmsItemStackClass, 0).get(packet);
             this.clickedItem = NMSUtils.toBukkitItemStack(nmsItemStack);
-            Object clickMode = Reflection.getFields(packetClass)[5].get(packet);
-            if (!clickModeInfoFound) {
-                isClickModePrimitive = clickMode.getClass().isPrimitive();
-                clickModeInfoFound = true;
-            }
+            Object clickMode = Reflection.getField(packetClass, 5).get(packet);
 
             if (isClickModePrimitive) {
                 mode = (int) clickMode;
