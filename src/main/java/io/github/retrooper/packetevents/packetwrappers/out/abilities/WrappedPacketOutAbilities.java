@@ -4,7 +4,6 @@ import io.github.retrooper.packetevents.packet.PacketTypeClasses;
 import io.github.retrooper.packetevents.packetwrappers.Sendable;
 import io.github.retrooper.packetevents.packetwrappers.api.WrappedPacket;
 import io.github.retrooper.packetevents.reflectionutils.Reflection;
-import io.github.retrooper.packetevents.utils.NMSUtils;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
@@ -12,20 +11,8 @@ import java.lang.reflect.InvocationTargetException;
 public final class WrappedPacketOutAbilities extends WrappedPacket implements Sendable {
     private static Class<?> packetClass;
     private static Constructor<?> packetConstructor;
-
-    public static void load() {
-       packetClass = PacketTypeClasses.Server.ABILITIES;
-
-        try {
-            packetConstructor = packetClass.getConstructor(PlayerAbilitiesUtils.playerAbilitiesClass);
-        } catch (NoSuchMethodException e) {
-            e.printStackTrace();
-        }
-    }
-
     private boolean vulnerable, flying, allowFlight, instantBuild;
     private float flySpeed, walkSpeed;
-
     public WrappedPacketOutAbilities(final Object packet) {
         super(packet);
     }
@@ -39,6 +26,16 @@ public final class WrappedPacketOutAbilities extends WrappedPacket implements Se
         this.instantBuild = canBuildInstantly;
         this.flySpeed = flySpeed;
         this.walkSpeed = walkSpeed;
+    }
+
+    public static void load() {
+        packetClass = PacketTypeClasses.Server.ABILITIES;
+
+        try {
+            packetConstructor = packetClass.getConstructor(PlayerAbilitiesUtils.playerAbilitiesClass);
+        } catch (NoSuchMethodException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override

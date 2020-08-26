@@ -1,5 +1,6 @@
 package io.github.retrooper.packetevents.packetwrappers.in.blockplace;
 
+import io.github.retrooper.packetevents.annotations.Nullable;
 import io.github.retrooper.packetevents.enums.ServerVersion;
 import io.github.retrooper.packetevents.packetwrappers.api.WrappedPacket;
 import io.github.retrooper.packetevents.utils.vector.Vector3i;
@@ -9,21 +10,19 @@ import org.bukkit.inventory.ItemStack;
 
 
 public final class WrappedPacketInBlockPlace extends WrappedPacket {
+    private static boolean isHigherThan_v_1_8_8, isHigherThan_v_1_7_10;
+    private Vector3i blockPosition;
+    private ItemStack itemStack;
+    public WrappedPacketInBlockPlace(final Player player, final Object packet) {
+        super(player, packet);
+    }
+
     public static void load() {
         isHigherThan_v_1_8_8 = version.isHigherThan(ServerVersion.v_1_8_8);
         isHigherThan_v_1_7_10 = version.isHigherThan(ServerVersion.v_1_7_10);
-        if (version.isHigherThan(ServerVersion.v_1_7_10)) {
+        if (isHigherThan_v_1_7_10) {
             WrappedPacketInBlockPlace_1_8.load();
         }
-    }
-
-    private static boolean isHigherThan_v_1_8_8, isHigherThan_v_1_7_10;
-
-    private Vector3i blockPosition;
-    private ItemStack itemStack;
-
-    public WrappedPacketInBlockPlace(final Player player, final Object packet) {
-        super(player, packet);
     }
 
     @Override
@@ -44,7 +43,7 @@ public final class WrappedPacketInBlockPlace extends WrappedPacket {
             } else {
                 final WrappedPacketInBlockPlace_1_7_10 blockPlace_1_7_10 = new WrappedPacketInBlockPlace_1_7_10(getPlayer(), packet);
                 position = blockPlace_1_7_10.getBlockPosition();
-                this.itemStack = blockPlace_1_7_10.getItemStack();
+                itemStack = blockPlace_1_7_10.getItemStack();
             }
         } catch (IllegalArgumentException e) {
             e.printStackTrace();
@@ -61,6 +60,7 @@ public final class WrappedPacketInBlockPlace extends WrappedPacket {
         return blockPosition;
     }
 
+    @Nullable
     public ItemStack getItemStack() {
         return itemStack;
     }

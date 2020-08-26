@@ -7,15 +7,15 @@ import io.github.retrooper.packetevents.reflectionutils.Reflection;
 public final class WrappedPacketInKeepAlive extends WrappedPacket {
     private static Class<?> packetClass;
     private static boolean integerPresentInIndex0;
-    public static void load() {
-        packetClass = PacketTypeClasses.Client.KEEP_ALIVE;
-        integerPresentInIndex0 = Reflection.getField(packetClass, int.class, 0) != null;
-    }
-
     private long id;
 
     public WrappedPacketInKeepAlive(final Object packet) {
         super(packet);
+    }
+
+    public static void load() {
+        packetClass = PacketTypeClasses.Client.KEEP_ALIVE;
+        integerPresentInIndex0 = Reflection.getField(packetClass, int.class, 0) != null;
     }
 
     @Override

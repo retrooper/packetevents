@@ -6,16 +6,14 @@ import io.github.retrooper.packetevents.reflectionutils.Reflection;
 
 public class WrappedPacketInSteerVehicle extends WrappedPacket {
     private static Class<?> packetClass;
+    private float side, forward;
+    private boolean jump, unmount;
+    public WrappedPacketInSteerVehicle(Object packet) {
+        super(packet);
+    }
 
     public static void load() {
         packetClass = PacketTypeClasses.Client.STEER_VEHICLE;
-    }
-
-    private float side, forward;
-    private boolean jump, unmount;
-
-    public WrappedPacketInSteerVehicle(Object packet) {
-        super(packet);
     }
 
     @Override

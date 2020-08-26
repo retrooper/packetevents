@@ -6,17 +6,15 @@ import io.github.retrooper.packetevents.reflectionutils.Reflection;
 
 public final class WrappedPacketInTransaction extends WrappedPacket {
     private static Class<?> packetClass;
-
-    public static void load() {
-        packetClass = PacketTypeClasses.Client.TRANSACTION;
-    }
-
     private int windowId;
     private short actionNumber;
     private boolean accepted;
-
     public WrappedPacketInTransaction(final Object packet) {
         super(packet);
+    }
+
+    public static void load() {
+        packetClass = PacketTypeClasses.Client.TRANSACTION;
     }
 
     @Override

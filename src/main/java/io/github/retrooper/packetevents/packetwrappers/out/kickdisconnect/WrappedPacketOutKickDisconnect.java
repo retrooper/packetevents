@@ -13,6 +13,16 @@ import java.lang.reflect.InvocationTargetException;
 public final class WrappedPacketOutKickDisconnect extends WrappedPacket implements Sendable {
     private static Class<?> packetClass, iChatBaseComponentClass;
     private static Constructor<?> kickDisconnectConstructor;
+    private String kickMessage;
+
+    public WrappedPacketOutKickDisconnect(final Object packet) {
+        super(packet);
+    }
+
+    public WrappedPacketOutKickDisconnect(final String kickMessage) {
+        super();
+        this.kickMessage = kickMessage;
+    }
 
     public static void load() {
         packetClass = PacketTypeClasses.Server.KICK_DISCONNECT;
@@ -27,17 +37,6 @@ public final class WrappedPacketOutKickDisconnect extends WrappedPacket implemen
         } catch (NoSuchMethodException e) {
             e.printStackTrace();
         }
-    }
-
-    private String kickMessage;
-
-    public WrappedPacketOutKickDisconnect(final Object packet) {
-        super(packet);
-    }
-
-    public WrappedPacketOutKickDisconnect(final String kickMessage) {
-        super();
-        this.kickMessage = kickMessage;
     }
 
     @Override

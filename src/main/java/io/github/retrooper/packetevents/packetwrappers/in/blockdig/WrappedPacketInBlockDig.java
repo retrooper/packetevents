@@ -2,7 +2,6 @@ package io.github.retrooper.packetevents.packetwrappers.in.blockdig;
 
 import io.github.retrooper.packetevents.enums.Direction;
 import io.github.retrooper.packetevents.enums.ServerVersion;
-import io.github.retrooper.packetevents.enums.minecraft.PlayerDigType;
 import io.github.retrooper.packetevents.packet.PacketTypeClasses;
 import io.github.retrooper.packetevents.packetwrappers.api.WrappedPacket;
 import io.github.retrooper.packetevents.reflectionutils.Reflection;
@@ -12,6 +11,13 @@ import io.github.retrooper.packetevents.utils.vector.Vector3i;
 public final class WrappedPacketInBlockDig extends WrappedPacket {
     private static Class<?> blockDigClass, blockPositionClass, enumDirectionClass, digTypeClass;
     private static boolean isVersionLowerThan_v_1_8;
+    private Vector3i blockPosition;
+    private Direction direction;
+    private PlayerDigType digType;
+    public WrappedPacketInBlockDig(Object packet) {
+        super(packet);
+    }
+
     public static void load() {
         blockDigClass = PacketTypeClasses.Client.BLOCK_DIG;
         try {
@@ -34,14 +40,6 @@ public final class WrappedPacketInBlockDig extends WrappedPacket {
         }
     }
 
-    private Vector3i blockPosition;
-    private Direction direction;
-    private PlayerDigType digType;
-
-    public WrappedPacketInBlockDig(Object packet) {
-        super(packet);
-    }
-
     @Override
     protected void setup() {
         Direction enumDirection = null;
@@ -50,7 +48,7 @@ public final class WrappedPacketInBlockDig extends WrappedPacket {
         //1.7.10
         try {
             if (isVersionLowerThan_v_1_8) {
-                enumDigType = PlayerDigType.get(Reflection.getField(blockDigClass, int.class, 4).getInt(packet));
+                enumDigType = PlayerDigType.values()[(Reflection.getField(blockDigClass, int.class, 4).getInt(packet))];
                 x = Reflection.getField(blockDigClass, int.class, 0).getInt(packet);
                 y = Reflection.getField(blockDigClass, int.class, 1).getInt(packet);
                 z = Reflection.getField(blockDigClass, int.class, 2).getInt(packet);
@@ -91,6 +89,27 @@ public final class WrappedPacketInBlockDig extends WrappedPacket {
 
     public PlayerDigType getDigType() {
         return digType;
+    }
+
+    public enum PlayerDigType {
+
+        START_DESTROY_BLOCK,
+
+        ABORT_DESTROY_BLOCK,
+
+        STOP_DESTROY_BLOCK,
+
+        DROP_ALL_ITEMS,
+
+        DROP_ITEM,
+
+        RELEASE_USE_ITEM,
+
+        SWAP_HELD_ITEMS,
+
+        SWAP_ITEM_WITH_OFFHAND,
+
+        WRONG_PACKET
     }
 
 

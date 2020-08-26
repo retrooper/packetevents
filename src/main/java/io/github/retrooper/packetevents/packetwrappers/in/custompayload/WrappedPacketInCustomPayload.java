@@ -1,14 +1,22 @@
 package io.github.retrooper.packetevents.packetwrappers.in.custompayload;
 
+import io.github.retrooper.packetevents.annotations.Nullable;
 import io.github.retrooper.packetevents.packet.PacketTypeClasses;
 import io.github.retrooper.packetevents.packetwrappers.api.WrappedPacket;
 import io.github.retrooper.packetevents.reflectionutils.Reflection;
 import io.github.retrooper.packetevents.utils.NMSUtils;
 
+import java.lang.reflect.Field;
+
 public final class WrappedPacketInCustomPayload extends WrappedPacket {
     private static Class<?> packetClass, nmsMinecraftKey, nmsPacketDataSerializer;
 
     private static boolean strPresentInIndex0;
+    private String data;
+    private Object minecraftKey, dataSerializer;
+    public WrappedPacketInCustomPayload(Object packet) {
+        super(packet);
+    }
 
     public static void load() {
         packetClass = PacketTypeClasses.Client.CUSTOM_PAYLOAD;
@@ -26,13 +34,6 @@ public final class WrappedPacketInCustomPayload extends WrappedPacket {
         }
     }
 
-    private String data;
-    private Object minecraftKey, dataSerializer;
-
-    public WrappedPacketInCustomPayload(Object packet) {
-        super(packet);
-    }
-
     @Override
     public void setup() {
         if (!strPresentInIndex0) {
@@ -44,12 +45,17 @@ public final class WrappedPacketInCustomPayload extends WrappedPacket {
             }
 
         } else {
+            Field dataSerializerField = Reflection.getField(packetClass, nmsPacketDataSerializer, 0);
             try {
                 this.data = (String) Reflection.getField(packetClass, String.class, 0).get(packet);
-                this.dataSerializer = Reflection.getField(packetClass, nmsPacketDataSerializer, 0).get(packet);
+                if (dataSerializerField != null) {
+                    this.dataSerializer = dataSerializerField.get(packet);
+                }
+
             } catch (IllegalAccessException e) {
-                //intentionally empty, allegedly 1.7.10 produces a NPE?
+                e.printStackTrace();
             }
+
         }
     }
 
@@ -61,6 +67,7 @@ public final class WrappedPacketInCustomPayload extends WrappedPacket {
         return minecraftKey;
     }
 
+    @Nullable
     public Object getDataSerializer() {
         return dataSerializer;
     }

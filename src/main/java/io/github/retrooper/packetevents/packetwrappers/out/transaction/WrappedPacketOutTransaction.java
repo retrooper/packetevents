@@ -4,7 +4,6 @@ import io.github.retrooper.packetevents.packet.PacketTypeClasses;
 import io.github.retrooper.packetevents.packetwrappers.Sendable;
 import io.github.retrooper.packetevents.packetwrappers.api.WrappedPacket;
 import io.github.retrooper.packetevents.reflectionutils.Reflection;
-import io.github.retrooper.packetevents.utils.NMSUtils;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
@@ -12,21 +11,9 @@ import java.lang.reflect.InvocationTargetException;
 public class WrappedPacketOutTransaction extends WrappedPacket implements Sendable {
     private static Class<?> packetClass;
     private static Constructor<?> packetConstructor;
-
-    public static void load() {
-       packetClass = PacketTypeClasses.Server.TRANSACTION;
-
-        try {
-            packetConstructor = packetClass.getConstructor(int.class, short.class, boolean.class);
-        } catch (NoSuchMethodException e) {
-            e.printStackTrace();
-        }
-    }
-
     private int windowId;
     private short actionNumber;
     private boolean accepted;
-
     public WrappedPacketOutTransaction(final Object packet) {
         super(packet);
     }
@@ -36,6 +23,16 @@ public class WrappedPacketOutTransaction extends WrappedPacket implements Sendab
         this.windowId = windowId;
         this.actionNumber = actionNumber;
         this.accepted = accepted;
+    }
+
+    public static void load() {
+        packetClass = PacketTypeClasses.Server.TRANSACTION;
+
+        try {
+            packetConstructor = packetClass.getConstructor(int.class, short.class, boolean.class);
+        } catch (NoSuchMethodException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override

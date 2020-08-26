@@ -35,7 +35,7 @@ public class WrappedPacket {
     protected Object packet;
 
     public WrappedPacket() {
-        this.player= null;
+        this.player = null;
         this.packet = null;
     }
 
@@ -59,11 +59,6 @@ public class WrappedPacket {
         } catch (final Exception e) {
             e.printStackTrace();
         }
-    }
-
-
-    protected void setup() {
-
     }
 
     public static void loadAllWrappers() {
@@ -96,6 +91,10 @@ public class WrappedPacket {
         WrappedPacketOutPosition.load();
         WrappedPacketOutTransaction.load();
         WrappedPacketOutUpdateHealth.load();
+    }
+
+    protected void setup() {
+
     }
 
 }

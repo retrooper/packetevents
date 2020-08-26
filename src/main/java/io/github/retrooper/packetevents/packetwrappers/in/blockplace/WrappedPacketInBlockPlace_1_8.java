@@ -10,7 +10,7 @@ import org.bukkit.inventory.ItemStack;
 import java.lang.reflect.InvocationTargetException;
 
 final class WrappedPacketInBlockPlace_1_8 extends WrappedPacket {
-    private static Class<?> blockPlaceClass, blockPositionClass;
+    private static Class<?> blockPlaceClass, blockPositionClass, blockPositionSuperClass;
     private Vector3i blockPosition;
     private ItemStack itemStack;
 
@@ -25,20 +25,18 @@ final class WrappedPacketInBlockPlace_1_8 extends WrappedPacket {
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
         }
+        blockPositionSuperClass = blockPositionClass.getSuperclass();
     }
 
     @Override
     protected void setup() {
         try {
             Object nmsBlockPos = Reflection.getField(blockPlaceClass, blockPositionClass, 1).get(packet);
+            this.blockPosition = new Vector3i(0, 0, 0);
+            this.blockPosition.x = (int) Reflection.getMethod(blockPositionSuperClass, "getX", 0).invoke(nmsBlockPos);
+            this.blockPosition.y = (int) Reflection.getMethod(blockPositionSuperClass, "getY", 0).invoke(nmsBlockPos);
+            this.blockPosition.z = (int) Reflection.getMethod(blockPositionSuperClass, "getZ", 0).invoke(nmsBlockPos);
 
-            final int[] coords = new int[3];
-            for (int i = 0; i < 3; i++) {
-                final String s = "get" + (i == 0 ? "X" : i == 1 ? "Y" : "Z");
-                coords[i] = (int) Reflection.getMethod(blockPositionClass.getSuperclass(), s, 0).invoke(nmsBlockPos);
-            }
-
-            this.blockPosition = new Vector3i(coords[0], coords[1], coords[2]);
 
             this.itemStack = NMSUtils.toBukkitItemStack(Reflection.getField(blockPlaceClass, NMSUtils.nmsItemStackClass, 0).get(packet));
         } catch (IllegalAccessException | InvocationTargetException e) {
@@ -46,8 +44,21 @@ final class WrappedPacketInBlockPlace_1_8 extends WrappedPacket {
         }
     }
 
+    @Deprecated
     public Vector3i getBlockPosition() {
         return blockPosition;
+    }
+
+    public int getBlockPositionX() {
+        return blockPosition.x;
+    }
+
+    public int getBlockPositionY() {
+        return blockPosition.y;
+    }
+
+    public int getBlockPositionZ() {
+        return blockPosition.z;
     }
 
     public ItemStack getItemStack() {

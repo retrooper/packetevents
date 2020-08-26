@@ -1,6 +1,5 @@
 package io.github.retrooper.packetevents.packetwrappers.in.useentity;
 
-import io.github.retrooper.packetevents.enums.minecraft.EntityUseAction;
 import io.github.retrooper.packetevents.packet.PacketTypeClasses;
 import io.github.retrooper.packetevents.packetwrappers.api.WrappedPacket;
 import io.github.retrooper.packetevents.reflectionutils.Reflection;
@@ -10,6 +9,11 @@ import org.bukkit.entity.Entity;
 public final class WrappedPacketInUseEntity extends WrappedPacket {
     private static Class<?> useEntityClass;
     private static Class<?> enumEntityUseActionClass;
+    private int entityId;
+    private EntityUseAction action;
+    public WrappedPacketInUseEntity(final Object packet) {
+        super(packet);
+    }
 
     public static void load() {
         useEntityClass = PacketTypeClasses.Client.USE_ENTITY;
@@ -20,13 +24,6 @@ public final class WrappedPacketInUseEntity extends WrappedPacket {
             //That is fine, it is probably a subclass
             enumEntityUseActionClass = Reflection.getSubClass(useEntityClass, "EnumEntityUseAction");
         }
-    }
-
-    private int entityId;
-    private EntityUseAction action;
-
-    public WrappedPacketInUseEntity(final Object packet) {
-        super(packet);
     }
 
     @Override
@@ -50,5 +47,9 @@ public final class WrappedPacketInUseEntity extends WrappedPacket {
 
     public EntityUseAction getAction() {
         return action;
+    }
+
+    public enum EntityUseAction {
+        INTERACT, INTERACT_AT, ATTACK, INVALID
     }
 }

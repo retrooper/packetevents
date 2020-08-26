@@ -13,9 +13,16 @@ public class WrappedPacketOutEntity extends WrappedPacket {
     //Byte = 1.7.10->1.8.8, Int = 1.9->1.15.x, Short = 1.16.x
     private static byte mode = 0; //byte = 0, int = 1, short = 2
     private static double dXYZDivisor = 0.0;
+    private int entityID;
+    private double deltaX, deltaY, deltaZ;
+    private byte yaw, pitch;
+    private boolean onGround;
+    public WrappedPacketOutEntity(Object packet) {
+        super(packet);
+    }
 
     public static void load() {
-       packetClass = PacketTypeClasses.Server.ENTITY;
+        packetClass = PacketTypeClasses.Server.ENTITY;
 
         Field dxField = Reflection.getField(packetClass, 1);
         assert dxField != null;
@@ -33,16 +40,6 @@ public class WrappedPacketOutEntity extends WrappedPacket {
             dXYZDivisor = 4096.0;
         }
 
-    }
-
-    private int entityID;
-    private double deltaX, deltaY, deltaZ;
-    private byte yaw, pitch;
-    private boolean onGround;
-
-
-    public WrappedPacketOutEntity(Object packet) {
-        super(packet);
     }
 
     @Override

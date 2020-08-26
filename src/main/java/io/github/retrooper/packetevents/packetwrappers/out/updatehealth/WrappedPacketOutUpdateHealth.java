@@ -4,7 +4,6 @@ import io.github.retrooper.packetevents.packet.PacketTypeClasses;
 import io.github.retrooper.packetevents.packetwrappers.Sendable;
 import io.github.retrooper.packetevents.packetwrappers.api.WrappedPacket;
 import io.github.retrooper.packetevents.reflectionutils.Reflection;
-import io.github.retrooper.packetevents.utils.NMSUtils;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
@@ -12,20 +11,8 @@ import java.lang.reflect.InvocationTargetException;
 public final class WrappedPacketOutUpdateHealth extends WrappedPacket implements Sendable {
     private static Class<?> packetClass;
     private static Constructor<?> packetConstructor;
-
-    public static void load() {
-       packetClass = PacketTypeClasses.Server.UPDATE_HEALTH;
-
-        try {
-            packetConstructor = packetClass.getConstructor(float.class, int.class, float.class);
-        } catch (NoSuchMethodException e) {
-            e.printStackTrace();
-        }
-    }
-
     private float health, foodSaturation;
     private int food;
-
     public WrappedPacketOutUpdateHealth(final Object packet) {
         super(packet);
     }
@@ -42,6 +29,16 @@ public final class WrappedPacketOutUpdateHealth extends WrappedPacket implements
         this.health = health;
         this.food = food;
         this.foodSaturation = foodSaturation;
+    }
+
+    public static void load() {
+        packetClass = PacketTypeClasses.Server.UPDATE_HEALTH;
+
+        try {
+            packetConstructor = packetClass.getConstructor(float.class, int.class, float.class);
+        } catch (NoSuchMethodException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override

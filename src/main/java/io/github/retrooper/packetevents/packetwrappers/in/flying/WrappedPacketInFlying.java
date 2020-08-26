@@ -7,11 +7,6 @@ import io.github.retrooper.packetevents.reflectionutils.Reflection;
 
 public class WrappedPacketInFlying extends WrappedPacket {
     private static Class<?> flyingClass;
-
-    public static void load() {
-        flyingClass = PacketTypeClasses.Client.FLYING;
-    }
-
     protected double x;
     protected double y;
     protected double z;
@@ -20,9 +15,12 @@ public class WrappedPacketInFlying extends WrappedPacket {
     protected boolean onGround;
     protected boolean isPosition;
     protected boolean isLook;
-
     public WrappedPacketInFlying(Object packet) {
         super(packet);
+    }
+
+    public static void load() {
+        flyingClass = PacketTypeClasses.Client.FLYING;
     }
 
     @Override

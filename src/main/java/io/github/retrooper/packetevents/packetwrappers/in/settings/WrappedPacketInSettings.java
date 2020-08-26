@@ -14,6 +14,14 @@ public class WrappedPacketInSettings extends WrappedPacket {
     private static Class<?> chatVisibilityEnumClass;
 
     private static boolean isLowerThan_v_1_8;
+    private String locale;
+    private byte viewDistance;
+    private ChatVisibility chatVisibility;
+    private boolean chatColors;
+    private HashMap<DisplayedSkinPart, Boolean> displayedSkinParts;
+    public WrappedPacketInSettings(final Object packet) {
+        super(packet);
+    }
 
     public static void load() {
         packetClass = PacketTypeClasses.Client.SETTINGS;
@@ -27,15 +35,6 @@ public class WrappedPacketInSettings extends WrappedPacket {
             //They are just on an outdated version
             chatVisibilityEnumClass = Reflection.getSubClass(entityHumanClass, "EnumChatVisibility");
         }
-    }
-
-    private String locale;
-    private byte viewDistance;
-    private ChatVisibility chatVisibility;
-    private boolean chatColors;
-    private HashMap<DisplayedSkinPart, Boolean> displayedSkinParts;
-    public WrappedPacketInSettings(final Object packet) {
-        super(packet);
     }
 
     public static Class<?> getChatVisibilityEnumClass() {

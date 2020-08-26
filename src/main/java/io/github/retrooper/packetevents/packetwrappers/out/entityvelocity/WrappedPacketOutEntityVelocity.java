@@ -15,6 +15,21 @@ public final class WrappedPacketOutEntityVelocity extends WrappedPacket implemen
     private static Constructor<?> velocityConstructor, vec3dConstructor;
     private static Class<?> velocityClass, vec3dClass;
     private static boolean isVec3dPresent;
+    private int entityId;
+    private double velocityX, velocityY, velocityZ;
+    private Entity entity;
+    public WrappedPacketOutEntityVelocity(final Object packet) {
+        super(packet);
+    }
+
+    public WrappedPacketOutEntityVelocity(final Entity entity, final double velocityX, final double velocityY, final double velocityZ) {
+        super();
+        this.entityId = entity.getEntityId();
+        this.entity = entity;
+        this.velocityX = velocityX;
+        this.velocityY = velocityY;
+        this.velocityZ = velocityZ;
+    }
 
     /**
      * Velocity Constructor parameter types:
@@ -45,23 +60,6 @@ public final class WrappedPacketOutEntityVelocity extends WrappedPacket implemen
             }
 
         }
-    }
-
-    private int entityId;
-    private double velocityX, velocityY, velocityZ;
-    private Entity entity;
-
-    public WrappedPacketOutEntityVelocity(final Object packet) {
-        super(packet);
-    }
-
-    public WrappedPacketOutEntityVelocity(final Entity entity, final double velocityX, final double velocityY, final double velocityZ) {
-        super();
-        this.entityId = entity.getEntityId();
-        this.entity = entity;
-        this.velocityX = velocityX;
-        this.velocityY = velocityY;
-        this.velocityZ = velocityZ;
     }
 
     @Override

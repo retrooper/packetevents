@@ -14,6 +14,11 @@ public final class WrappedPacketInClientCommand extends WrappedPacket {
     private static Class<?> enumClientCommandClass;
 
     private static boolean isLowerThan_v_1_8;
+    private ClientCommand clientCommand;
+
+    public WrappedPacketInClientCommand(Object packet) {
+        super(packet);
+    }
 
     public static void load() {
         packetClass = PacketTypeClasses.Client.CLIENT_COMMAND;
@@ -30,21 +35,11 @@ public final class WrappedPacketInClientCommand extends WrappedPacket {
         }
     }
 
-    private ClientCommand clientCommand;
-
-    public WrappedPacketInClientCommand(Object packet) {
-        super(packet);
-    }
-
     @Override
     public void setup() {
         try {
-            if (isLowerThan_v_1_8) {
-                clientCommand = ClientCommand.values()[(Reflection.getField(enumClientCommandClass, int.class, 1).getInt(packet))];
-            } else {
-                final Object enumObj = Reflection.getField(packetClass, enumClientCommandClass, 0).get(packet);
-                this.clientCommand = ClientCommand.valueOf(enumObj.toString());
-            }
+            Object enumObj = Reflection.getField(packetClass, enumClientCommandClass, 0).get(packet);
+            this.clientCommand = ClientCommand.valueOf(enumObj.toString());
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -57,7 +52,7 @@ public final class WrappedPacketInClientCommand extends WrappedPacket {
     public enum ClientCommand {
         PERFORM_RESPAWN,
         REQUEST_STATS,
-        OPEN_INVENTORY_ACHIEVEMENT;
+        OPEN_INVENTORY_ACHIEVEMENT
     }
 
 }

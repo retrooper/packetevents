@@ -12,6 +12,16 @@ import java.lang.reflect.InvocationTargetException;
 public final class WrappedPacketOutChat extends WrappedPacket implements Sendable {
     private static Constructor<?> chatClassConstructor;
     private static Class<?> packetClass, iChatBaseComponentClass, chatSerializerClass;
+    private String message;
+
+    public WrappedPacketOutChat(final Object packet) {
+        super(packet);
+    }
+
+    public WrappedPacketOutChat(final String message) {
+        super();
+        this.message = "{\"text\": \"" + message + "\"}";
+    }
 
     public static void load() {
         try {
@@ -36,17 +46,6 @@ public final class WrappedPacketOutChat extends WrappedPacket implements Sendabl
         }
 
 
-    }
-
-    private String message;
-
-    public WrappedPacketOutChat(final Object packet) {
-        super(packet);
-    }
-
-    public WrappedPacketOutChat(final String message) {
-        super();
-        this.message = "{\"text\": \"" + message + "\"}";
     }
 
     public static String toStringFromIChatBaseComponent(Object obj) {

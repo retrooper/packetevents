@@ -12,6 +12,10 @@ import java.util.Arrays;
 import java.util.HashMap;
 
 public class WrappedPacketInWindowClick extends WrappedPacket {
+    private static final HashMap<String, Integer> invClickTypeMapCache = new HashMap<String, Integer>();
+    private static final HashMap<Integer, ArrayList<WindowClickType>> windowClickTypeCache = new HashMap<Integer, ArrayList<WindowClickType>>();
+    private static Class<?> packetClass, invClickTypeClass;
+    private static boolean isClickModePrimitive = false;
     private int id;
     private int slot;
     private int button;
@@ -19,11 +23,9 @@ public class WrappedPacketInWindowClick extends WrappedPacket {
     private int mode;
     private ItemStack clickedItem;
 
-    private static Class<?> packetClass, invClickTypeClass;
-    private static boolean isClickModePrimitive = false;
-    private static final HashMap<String, Integer> invClickTypeMapCache = new HashMap<String, Integer>();
-
-    private static final HashMap<Integer, ArrayList<WindowClickType>> windowClickTypeCache = new HashMap<Integer, ArrayList<WindowClickType>>();
+    public WrappedPacketInWindowClick(Object packet) {
+        super(packet);
+    }
 
     public static void load() {
         packetClass = PacketTypeClasses.Client.WINDOW_CLICK;
@@ -58,31 +60,32 @@ public class WrappedPacketInWindowClick extends WrappedPacket {
                 WindowClickType.KEY_NUMBER9));
 
         //MODE 3
-        windowClickTypeCache.put(3, getArrayListOfWindowClickTypes(WindowClickType.CREATIVE_MIDDLE_CLICK));
+        windowClickTypeCache.put(3, getArrayListOfWindowClickTypes(WindowClickType.UNKNOWN, WindowClickType.UNKNOWN, WindowClickType.CREATIVE_MIDDLE_CLICK));
 
         //MODE 4
         windowClickTypeCache.put(4, getArrayListOfWindowClickTypes(WindowClickType.KEY_DROP,
-                WindowClickType.KEY_DROP_STACK, WindowClickType.LEFT_CLICK_OUTSIDE_WINDOW_HOLDING_NOTHING,
-                WindowClickType.RIGHT_CLICK_OUTSIDE_WINDOW_HOLDING_NOTHING));
+                WindowClickType.KEY_DROP_STACK));
 
         //MODE 5
         windowClickTypeCache.put(5, getArrayListOfWindowClickTypes(
                 WindowClickType.STARTING_LEFT_MOUSE_DRAG,
-                WindowClickType.STARTING_RIGHT_MOUSE_DRAG,
-                WindowClickType.CREATIVE_STARTING_MIDDLE_MOUSE_DRAG,
                 WindowClickType.ADD_SLOT_LEFT_MOUSE_DRAG,
-                WindowClickType.ADD_SLOT_RIGHT_MOUSE_DRAG,
-                WindowClickType.ADD_SLOT_MIDDLE_MOUSE_DRAG,
                 WindowClickType.ENDING_LEFT_MOUSE_DRAG,
-                WindowClickType.ENDING_RIGHT_MOUSE_DRAG,
+                WindowClickType.UNKNOWN,
+                WindowClickType.STARTING_RIGHT_MOUSE_DRAG,
+                WindowClickType.ADD_SLOT_RIGHT_MOUSE_DRAG,
+                WindowClickType.CREATIVE_STARTING_MIDDLE_MOUSE_DRAG,
+                WindowClickType.ADD_SLOT_MIDDLE_MOUSE_DRAG,
                 WindowClickType.ENDING_MIDDLE_MOUSE_DRAG));
 
         windowClickTypeCache.put(6, getArrayListOfWindowClickTypes(WindowClickType.DOUBLE_CLICK));
         isClickModePrimitive = Reflection.getField(packetClass, int.class, 3) != null;
     }
 
-    public WrappedPacketInWindowClick(Object packet) {
-        super(packet);
+    private static ArrayList<WindowClickType> getArrayListOfWindowClickTypes(WindowClickType... types) {
+        ArrayList<WindowClickType> arrayList = new ArrayList<WindowClickType>(types.length);
+        arrayList.addAll(Arrays.asList(types));
+        return arrayList;
     }
 
     @Override
@@ -106,6 +109,50 @@ public class WrappedPacketInWindowClick extends WrappedPacket {
         }
     }
 
+    public int getWindowID() {
+        return id;
+    }
+
+    public int getWindowSlot() {
+        return slot;
+    }
+
+    public int getWindowButton() {
+        return button;
+    }
+
+    public short getActionNumber() {
+        return actionNumber;
+    }
+
+    @Nullable
+    public WindowClickType getWindowClickType() {
+        if (windowClickTypeCache.get(mode) == null) {
+            return WindowClickType.UNKNOWN;
+        }
+        if (button + 1 > windowClickTypeCache.size()) {
+            return WindowClickType.UNKNOWN;
+        }
+
+        if (mode == 4) {
+            if (slot == -999) {
+                if (button == 0) {
+                    return WindowClickType.LEFT_CLICK_OUTSIDE_WINDOW_HOLDING_NOTHING;
+                } else if (button == 1) {
+                    return WindowClickType.RIGHT_CLICK_OUTSIDE_WINDOW_HOLDING_NOTHING;
+                }
+            }
+        }
+        return windowClickTypeCache.get(mode).get(button);
+    }
+
+    public int getMode() {
+        return mode;
+    }
+
+    public ItemStack getClickedItem() {
+        return clickedItem;
+    }
 
     public enum WindowClickType {
         LEFT_MOUSE_CLICK, RIGHT_MOUSE_CLICK,
@@ -131,41 +178,8 @@ public class WrappedPacketInWindowClick extends WrappedPacket {
         ENDING_RIGHT_MOUSE_DRAG,
         ENDING_MIDDLE_MOUSE_DRAG,
 
-        DOUBLE_CLICK
-    }
+        DOUBLE_CLICK,
 
-    public int getWindowID() {
-        return id;
-    }
-
-    public int getWindowSlot() {
-        return slot;
-    }
-
-    public int getWindowButton() {
-        return button;
-    }
-
-    public short getActionNumber() {
-        return actionNumber;
-    }
-
-    @Nullable
-    public WindowClickType getWindowClickType() {
-        return windowClickTypeCache.get(mode).get(button);
-    }
-
-    public int getMode() {
-        return mode;
-    }
-
-    public ItemStack getClickedItem() {
-        return clickedItem;
-    }
-
-    private static ArrayList<WindowClickType> getArrayListOfWindowClickTypes(WindowClickType... types) {
-        ArrayList<WindowClickType> arrayList = new ArrayList<WindowClickType>(types.length);
-        arrayList.addAll(Arrays.asList(types));
-        return arrayList;
+        UNKNOWN
     }
 }
