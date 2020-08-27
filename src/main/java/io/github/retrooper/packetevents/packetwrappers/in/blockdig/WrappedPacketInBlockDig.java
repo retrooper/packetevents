@@ -1,3 +1,6 @@
+/**
+ * Copyright (c) 2020 retrooper
+ */
 package io.github.retrooper.packetevents.packetwrappers.in.blockdig;
 
 import io.github.retrooper.packetevents.enums.Direction;

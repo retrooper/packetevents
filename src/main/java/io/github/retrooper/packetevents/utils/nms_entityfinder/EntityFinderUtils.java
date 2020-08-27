@@ -1,3 +1,6 @@
+/**
+ * Copyright (c) 2020 retrooper
+ */
 package io.github.retrooper.packetevents.utils.nms_entityfinder;
 
 import io.github.retrooper.packetevents.annotations.Nullable;
@@ -12,7 +15,7 @@ import java.lang.reflect.Method;
 
 public final class EntityFinderUtils {
     @Nullable
-    private static final ServerVersion version = ServerVersion.getVersion();
+    public static ServerVersion version;
     private static Class<?> worldServerClass;
     private static Class<?> craftWorldClass;
     private static Class<?> entityClass;
@@ -20,7 +23,10 @@ public final class EntityFinderUtils {
     private static Method craftWorldGetHandle;
     private static Method getBukkitEntity;
 
-    static {
+    private static boolean isServerVersion_v_1_8_x;
+
+    public static void load() {
+        isServerVersion_v_1_8_x = version.isHigherThan(ServerVersion.v_1_7_10) && version.isLowerThan(ServerVersion.v_1_9);
         try {
             worldServerClass = NMSUtils.getNMSClass("WorldServer");
             craftWorldClass = NMSUtils.getOBCClass("CraftWorld");
@@ -30,7 +36,7 @@ public final class EntityFinderUtils {
         }
 
         try {
-            getEntityByIdMethod = worldServerClass.getMethod(getEntityByNameMethodName(), int.class);
+            getEntityByIdMethod = worldServerClass.getMethod(getEntityByIDMethodName(), int.class);
             craftWorldGetHandle = craftWorldClass.getMethod("getHandle");
             getBukkitEntity = entityClass.getMethod("getBukkitEntity");
         } catch (NoSuchMethodException e) {
@@ -79,8 +85,13 @@ public final class EntityFinderUtils {
         return null;
     }
 
-    public static String getEntityByNameMethodName() {
-        if (version.isHigherThan(ServerVersion.v_1_7_10) && version.isLowerThan(ServerVersion.v_1_9)) {
+    /**
+     * This is the name of the method that returns the NMS entity when you pass in its ID.
+     * On 1.8->1.8.8 the name is called 'a', on 1.7.10 & 1.9+ the name is called 'getEntity'.
+     * @return entity by ID method name
+     */
+    public static String getEntityByIDMethodName() {
+        if (isServerVersion_v_1_8_x) {
             return "a";
         }
         return "getEntity";

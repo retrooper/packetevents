@@ -1,14 +1,19 @@
+/**
+ * Copyright (c) 2020 retrooper
+ */
 package io.github.retrooper.packetevents;
 
 import io.github.retrooper.packetevents.api.PacketEventsAPI;
 import io.github.retrooper.packetevents.enums.ClientVersion;
 import io.github.retrooper.packetevents.enums.ServerVersion;
+import io.github.retrooper.packetevents.event.PacketEvent;
 import io.github.retrooper.packetevents.event.PacketListener;
 import io.github.retrooper.packetevents.event.impl.BukkitMoveEvent;
 import io.github.retrooper.packetevents.packet.PacketType;
 import io.github.retrooper.packetevents.packet.PacketTypeClasses;
 import io.github.retrooper.packetevents.packetwrappers.api.WrappedPacket;
 import io.github.retrooper.packetevents.settings.PacketEventsSettings;
+import io.github.retrooper.packetevents.utils.nms_entityfinder.EntityFinderUtils;
 import io.github.retrooper.packetevents.utils.versionlookup.VersionLookupUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -37,7 +42,10 @@ public final class PacketEvents implements PacketListener, Listener {
 
         PacketTypeClasses.Client.load();
         PacketTypeClasses.Server.load();
-        WrappedPacket.version = ServerVersion.getVersion();
+        ServerVersion version= ServerVersion.getVersion();
+        WrappedPacket.version = version;
+        PacketEvent.version = version;
+        EntityFinderUtils.version = version;
         WrappedPacket.loadAllWrappers();
         ClientVersion.prepareLookUp();
         hasLoaded = true;
@@ -70,8 +78,7 @@ public final class PacketEvents implements PacketListener, Listener {
     public static void stop() {
         if (hasStarted) {
             for (final Player p : Bukkit.getOnlinePlayers()) {
-
-                getAPI().getPlayerUtils().uninjectPlayerNow(p);
+                getAPI().getPlayerUtils().uninjectPlayer(p);
             }
             getAPI().getEventManager().unregisterAllListeners();
 
@@ -113,7 +120,7 @@ public final class PacketEvents implements PacketListener, Listener {
     @EventHandler
     public void onQuit(final PlayerQuitEvent e) {
         getAPI().getPlayerUtils().clearClientVersion(e.getPlayer());
-        getAPI().getPlayerUtils().uninjectPlayerNow(e.getPlayer());
+        getAPI().getPlayerUtils().uninjectPlayer(e.getPlayer());
     }
 
     @EventHandler

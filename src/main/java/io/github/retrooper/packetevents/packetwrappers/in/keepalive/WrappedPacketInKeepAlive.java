@@ -1,3 +1,6 @@
+/**
+ * Copyright (c) 2020 retrooper
+ */
 package io.github.retrooper.packetevents.packetwrappers.in.keepalive;
 
 import io.github.retrooper.packetevents.packet.PacketTypeClasses;

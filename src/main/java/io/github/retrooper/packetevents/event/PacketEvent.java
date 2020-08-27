@@ -1,10 +1,13 @@
+/**
+ * Copyright (c) 2020 retrooper
+ */
 package io.github.retrooper.packetevents.event;
 
 
 import io.github.retrooper.packetevents.enums.ServerVersion;
 
-public class PacketEvent {
-    protected static ServerVersion version = ServerVersion.getVersion();
+public abstract class PacketEvent {
+    public static ServerVersion version;
     private long timestamp = System.currentTimeMillis();
 
     /**
@@ -19,4 +22,6 @@ public class PacketEvent {
     public void setTimestamp(long timestamp) {
         this.timestamp = timestamp;
     }
+
+    public abstract boolean isAsyncByDefault();
 }

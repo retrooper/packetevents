@@ -1,3 +1,6 @@
+/**
+ * Copyright (c) 2020 retrooper
+ */
 package io.github.retrooper.packetevents.utils.versionlookup;
 
 import org.bukkit.entity.Player;

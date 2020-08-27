@@ -1,3 +1,6 @@
+/**
+ * Copyright (c) 2020 retrooper
+ */
 package io.github.retrooper.packetevents.handler;
 
 import io.github.retrooper.packetevents.PacketEvents;
@@ -33,14 +36,7 @@ final class NettyPacketHandler_8 {
         pipeline.addBefore("packet_handler", PacketEvents.getHandlerName(player.getName()), channelDuplexHandler);
     }
 
-    public static Future<?> uninjectPlayer(final Player player) {
-        final Channel channel = (Channel) NMSUtils.getChannel(player);
-        return channel.eventLoop().submit(() -> {
-            channel.pipeline().remove(PacketEvents.getHandlerName(player.getName()));
-        });
-    }
-
-    public static void uninjectPlayerNow(final Player player) {
+    public static void uninjectPlayer(final Player player) {
         final Channel channel = (Channel) NMSUtils.getChannel(player);
         channel.pipeline().remove(PacketEvents.getHandlerName(player.getName()));
     }

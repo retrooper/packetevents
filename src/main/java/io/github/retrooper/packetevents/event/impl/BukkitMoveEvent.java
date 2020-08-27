@@ -1,3 +1,6 @@
+/**
+ * Copyright (c) 2020 retrooper
+ */
 package io.github.retrooper.packetevents.event.impl;
 
 import io.github.retrooper.packetevents.event.PacketEvent;
@@ -44,5 +47,10 @@ public final class BukkitMoveEvent extends PacketEvent {
 
     public void cancel() {
         setCancelled(true);
+    }
+
+    @Override
+    public boolean isAsyncByDefault() {
+        return false;
     }
 }

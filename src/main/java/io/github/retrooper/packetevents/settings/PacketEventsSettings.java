@@ -1,3 +1,6 @@
+/**
+ * Copyright (c) 2020 retrooper
+ */
 package io.github.retrooper.packetevents.settings;
 
 import io.github.retrooper.packetevents.enums.ServerVersion;
@@ -17,7 +20,7 @@ public class PacketEventsSettings {
     }
 
     /**
-     * Set the recommended version
+     * Set the default version
      *
      * @param version
      */
@@ -46,7 +49,6 @@ public class PacketEventsSettings {
     /**
      * If PacketEvents fails to detect a client's version
      * Should it assume that the client is using the same version that the server is?
-     * <p>
      * Returns ACCESS_FAILURE if false
      *
      * @param autoResolveClientProtocolVersion

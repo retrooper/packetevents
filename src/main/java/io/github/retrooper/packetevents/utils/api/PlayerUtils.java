@@ -1,3 +1,6 @@
+/**
+ * Copyright (c) 2020 retrooper
+ */
 package io.github.retrooper.packetevents.utils.api;
 
 import io.github.retrooper.packetevents.enums.ClientVersion;
@@ -46,10 +49,6 @@ public final class PlayerUtils {
 
     public void uninjectPlayer(final Player player) {
         NettyPacketHandler.uninjectPlayer(player);
-    }
-
-    public void uninjectPlayerNow(final Player player) {
-        NettyPacketHandler.uninjectPlayerNow(player);
     }
 
     public void sendPacket(final Player player, final Sendable sendable) {

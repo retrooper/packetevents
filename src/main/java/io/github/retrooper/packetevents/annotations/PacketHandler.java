@@ -1,3 +1,6 @@
+/**
+ * Copyright (c) 2020 retrooper
+ */
 package io.github.retrooper.packetevents.annotations;
 
 import io.github.retrooper.packetevents.enums.EventSynchronization;

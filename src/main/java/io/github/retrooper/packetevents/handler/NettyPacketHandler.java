@@ -1,3 +1,6 @@
+/**
+ * Copyright (c) 2020 retrooper
+ */
 package io.github.retrooper.packetevents.handler;
 
 import io.github.retrooper.packetevents.PacketEvents;
@@ -32,35 +35,19 @@ public class NettyPacketHandler {
         }
     }
 
-    public static Future<?> uninjectPlayer(final Player player) {
+    public static void uninjectPlayer(final Player player) {
         try {
             final PlayerUninjectEvent uninjectEvent = new PlayerUninjectEvent(player);
             PacketEvents.getAPI().getEventManager().callEvent(uninjectEvent);
             if (!uninjectEvent.isCancelled()) {
                 if (v1_7_nettyMode) {
-                    return NettyPacketHandler_7.uninjectPlayer(player);
+                    NettyPacketHandler_7.uninjectPlayer(player);
                 } else {
-                    return NettyPacketHandler_8.uninjectPlayer(player);
+                    NettyPacketHandler_8.uninjectPlayer(player);
                 }
             }
-        } catch (Exception ignored) {
-
-        }
-        return null;
-    }
-
-    public static void uninjectPlayerNow(final Player player) {
-        try {
-            final PlayerUninjectEvent uninjectEvent = new PlayerUninjectEvent(player);
-            PacketEvents.getAPI().getEventManager().callEvent(uninjectEvent);
-            if (!uninjectEvent.isCancelled()) {
-                if (v1_7_nettyMode) {
-                    NettyPacketHandler_7.uninjectPlayerNow(player);
-                } else {
-                    NettyPacketHandler_8.uninjectPlayerNow(player);
-                }
-            }
-        } catch (Exception ignored) {
+        } catch (Exception ex) {
+            //Failed, but that is alright
         }
     }
 

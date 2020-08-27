@@ -1,3 +1,6 @@
+/**
+ * Copyright (c) 2020 retrooper
+ */
 package io.github.retrooper.packetevents.api;
 
 import io.github.retrooper.packetevents.event.manager.EventManager;

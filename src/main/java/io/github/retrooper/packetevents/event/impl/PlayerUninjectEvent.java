@@ -1,3 +1,6 @@
+/**
+ * Copyright (c) 2020 retrooper
+ */
 package io.github.retrooper.packetevents.event.impl;
 
 import io.github.retrooper.packetevents.event.PacketEvent;
@@ -46,5 +49,10 @@ public final class PlayerUninjectEvent extends PacketEvent {
 
     public Player getPlayer() {
         return player;
+    }
+
+    @Override
+    public boolean isAsyncByDefault() {
+        return false;
     }
 }

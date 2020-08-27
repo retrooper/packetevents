@@ -1,14 +1,19 @@
+/**
+ * Copyright (c) 2020 retrooper
+ */
 package io.github.retrooper.packetevents.packet;
 
 import io.github.retrooper.packetevents.annotations.Nullable;
 import io.github.retrooper.packetevents.reflectionutils.Reflection;
 import io.github.retrooper.packetevents.utils.NMSUtils;
+import net.minecraft.server.v1_10_R1.PacketPlayInFlying;
 
 public class PacketTypeClasses {
     public static class Client {
         private static final String c = "PacketPlayIn";
         @Nullable
-        public static final Class<?> FLYING = NMSUtils.getNMSClassWithoutException(c + "Flying");
+        public static Class<?> FLYING;
+
         public static Class<?> POSITION, POSITION_LOOK, LOOK, CLIENT_COMMAND,
                 TRANSACTION, BLOCK_DIG, ENTITY_ACTION, USE_ENTITY,
                 WINDOW_CLICK, STEER_VEHICLE, CUSTOM_PAYLOAD, ARM_ANIMATION,
@@ -22,6 +27,7 @@ public class PacketTypeClasses {
                 SET_COMMAND_MINECART, SET_JIGSAW, STRUCT, UPDATE_SIGN, SPECTATE;
 
         public static void load() {
+            FLYING = NMSUtils.getNMSClassWithoutException(c + "Flying");
             try {
                 POSITION = NMSUtils.getNMSClass(c + "Position");
                 POSITION_LOOK = NMSUtils.getNMSClass(c + "PositionLook");
@@ -94,10 +100,8 @@ public class PacketTypeClasses {
                 }
             }
 
-
             PacketType.Client.init();
         }
-
     }
 
     public static class Server {

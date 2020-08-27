@@ -1,3 +1,6 @@
+/**
+ * Copyright (c) 2020 retrooper
+ */
 package io.github.retrooper.packetevents.packetwrappers.in.steervehicle;
 
 import io.github.retrooper.packetevents.packet.PacketTypeClasses;

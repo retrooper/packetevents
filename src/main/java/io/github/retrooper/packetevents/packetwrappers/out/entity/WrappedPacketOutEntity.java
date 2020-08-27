@@ -1,3 +1,6 @@
+/**
+ * Copyright (c) 2020 retrooper
+ */
 package io.github.retrooper.packetevents.packetwrappers.out.entity;
 
 import io.github.retrooper.packetevents.packet.PacketTypeClasses;
@@ -48,7 +51,6 @@ public class WrappedPacketOutEntity extends WrappedPacket {
             this.entityID = Reflection.getField(packetClass, int.class, 0).getInt(packet);
             this.onGround = Reflection.getField(packetClass, boolean.class, 0).getBoolean(packet);
             int dX = 1, dY = 1, dZ = 1;
-
             switch (mode) {
                 case 0:
                     dX = Reflection.getField(packetClass, byte.class, 0).getByte(packet);
