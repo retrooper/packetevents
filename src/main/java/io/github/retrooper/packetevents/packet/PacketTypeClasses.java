@@ -6,7 +6,6 @@ package io.github.retrooper.packetevents.packet;
 import io.github.retrooper.packetevents.annotations.Nullable;
 import io.github.retrooper.packetevents.reflectionutils.Reflection;
 import io.github.retrooper.packetevents.utils.NMSUtils;
-import net.minecraft.server.v1_10_R1.PacketPlayInFlying;
 
 public class PacketTypeClasses {
     public static class Client {
