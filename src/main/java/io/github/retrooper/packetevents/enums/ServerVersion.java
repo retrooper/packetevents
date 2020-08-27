@@ -70,8 +70,8 @@ public enum ServerVersion {
     /**
      * Returns if the current version is more up to date than the argument passed version
      *
-     * @param version
-     * @return
+     * @param version The version to compare to the server's value.
+     * @return True if the supplied version is lower, false if it is equal or higher than the server's version.
      */
     public boolean isHigherThan(final ServerVersion version) {
         if (this == version) return false;
@@ -81,8 +81,8 @@ public enum ServerVersion {
     /**
      * Returns if the current version is more outdated than the argument passed version
      *
-     * @param version
-     * @return
+     * @param version The version to compare to the server's value.
+     * @return True if the supplied version is higher, false if it is equal or lower than the server's version.
      */
     public boolean isLowerThan(final ServerVersion version) {
         if (this == version) return false;

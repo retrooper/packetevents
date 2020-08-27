@@ -46,6 +46,8 @@ public final class WrappedPacketInAbilities extends WrappedPacket {
 
     /**
      * This will return null if the server version is not available in 1.16.x and above
+     *
+     * @return Whether the player is vulnerable to damage or not.
      */
     @Deprecated
     @Nullable
@@ -59,6 +61,8 @@ public final class WrappedPacketInAbilities extends WrappedPacket {
 
     /**
      * This will return null if the server version is not available in 1.16.x and above
+     *
+     * @return Whether or not the player can fly.
      */
     @Deprecated
     @Nullable
@@ -68,6 +72,8 @@ public final class WrappedPacketInAbilities extends WrappedPacket {
 
     /**
      * This will return null if the server version is not available in 1.16.x and above
+     *
+     * @return Whether or not the player can break blocks instantly.
      */
     @Deprecated
     @Nullable
@@ -77,6 +83,8 @@ public final class WrappedPacketInAbilities extends WrappedPacket {
 
     /**
      * This will return null if the server version is not available in 1.16.x and above
+     *
+     * @return The speed at which the player can fly, as a float.
      */
     @Deprecated
     @Nullable
@@ -86,6 +94,8 @@ public final class WrappedPacketInAbilities extends WrappedPacket {
 
     /**
      * This will return null if the server version is not available in 1.16.x and above
+     *
+     * @return The speed at which the player can walk, as a float.
      */
     @Deprecated
     @Nullable

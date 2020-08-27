@@ -53,6 +53,8 @@ public final class PacketEvents implements PacketListener, Listener {
 
     /**
      * Loads PacketEvents if you haven't already, Sets everything up, injects all players
+     *
+     * @param pl The plugin to set the library up for.
      */
     public static void start(final Plugin pl) {
         if (!hasLoaded) {

@@ -23,9 +23,9 @@ public final class WrappedPacketOutUpdateHealth extends WrappedPacket implements
     /**
      * See https://wiki.vg/Protocol#Update_Health
      *
-     * @param health
-     * @param food
-     * @param foodSaturation
+     * @param health 0 or less = dead, 20 = full HP
+     * @param food 0–20
+     * @param foodSaturation Seems to vary from 0.0 to 5.0 in integer increments
      */
     public WrappedPacketOutUpdateHealth(final float health, final int food, final float foodSaturation) {
         super();
