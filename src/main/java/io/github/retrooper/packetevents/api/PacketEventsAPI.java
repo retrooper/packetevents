@@ -64,6 +64,4 @@ public final class PacketEventsAPI {
     public EventManager getEventManager() {
         return eventManager;
     }
-
-
 }

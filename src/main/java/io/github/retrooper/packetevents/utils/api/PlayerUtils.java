@@ -6,6 +6,7 @@ package io.github.retrooper.packetevents.utils.api;
 import io.github.retrooper.packetevents.enums.ClientVersion;
 import io.github.retrooper.packetevents.handler.NettyPacketHandler;
 import io.github.retrooper.packetevents.packetwrappers.Sendable;
+import io.github.retrooper.packetevents.settings.PacketEventsSettings;
 import io.github.retrooper.packetevents.utils.NMSUtils;
 import org.bukkit.entity.Player;
 
@@ -13,7 +14,9 @@ import java.util.HashMap;
 import java.util.UUID;
 
 public final class PlayerUtils {
+
     private final HashMap<UUID, ClientVersion> clientVersionsMap = new HashMap<UUID, ClientVersion>();
+    private final PacketEventsSettings settings = new PacketEventsSettings();
 
     public int getPing(final Player player) {
         return NMSUtils.getPlayerPing(player);
@@ -48,7 +51,11 @@ public final class PlayerUtils {
     }
 
     public void uninjectPlayer(final Player player) {
-        NettyPacketHandler.uninjectPlayer(player);
+        if (settings.isUninjectAsync()) {
+            NettyPacketHandler.uninjectPlayerAsync(player);
+        } else {
+            NettyPacketHandler.uninjectPlayer(player);
+        }
     }
 
     public void sendPacket(final Player player, final Sendable sendable) {

@@ -7,8 +7,8 @@ import io.github.retrooper.packetevents.enums.ServerVersion;
 
 public class PacketEventsSettings {
     private ServerVersion defaultServerVersion;
-    private String identifier = "";
     private boolean autoResolveClientProtocolVersion;
+    private boolean uninjectAsync = false;
 
     /**
      * If PacketEvents fails to detect your server version, it will use the recommended version
@@ -16,7 +16,7 @@ public class PacketEventsSettings {
      * @return Recommended version
      */
     public ServerVersion getDefaultServerVersion() {
-        return defaultServerVersion;
+        return this.defaultServerVersion;
     }
 
     /**
@@ -25,21 +25,7 @@ public class PacketEventsSettings {
      * @param version
      */
     public void setDefaultServerVersion(final ServerVersion version) {
-        defaultServerVersion = version;
-    }
-
-    public String getIdentifier() {
-        return identifier;
-    }
-
-    /**
-     * Set a unique Identifier (Usually something that represents your plugin, For example: MyPluginPacketHandler)
-     * If another present plugin uses the same Identifier, It might cause incompatibilities
-     *
-     * @param identifier
-     */
-    public void setIdentifier(final String identifier) {
-        this.identifier = identifier;
+        this.defaultServerVersion = version;
     }
 
     public boolean doAutoResolveClientProtocolVersion() {
@@ -55,5 +41,19 @@ public class PacketEventsSettings {
      */
     public void setDoAutoResolveClientProtocolVersion(boolean autoResolveClientProtocolVersion) {
         this.autoResolveClientProtocolVersion = autoResolveClientProtocolVersion;
+    }
+
+    /**
+     * Would you like PacketEvents to Uninject players Asynchronously?
+     * WARNING! This might make reloading unsupported
+     *
+     * @param uninjectAsync
+     */
+    public void setUninjectAsync(boolean uninjectAsync) {
+        this.uninjectAsync = uninjectAsync;
+    }
+
+    public boolean isUninjectAsync() {
+        return this.uninjectAsync;
     }
 }

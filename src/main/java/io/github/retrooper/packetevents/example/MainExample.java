@@ -17,7 +17,6 @@ public class MainExample extends JavaPlugin implements PacketListener {
 
     @Override
     public void onEnable() {
-        PacketEvents.getSettings().setIdentifier("packetevents_api");
 
         PacketEvents.getSettings().setDefaultServerVersion(ServerVersion.v_1_7_10);
 

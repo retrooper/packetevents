@@ -18,13 +18,17 @@ import io.github.retrooper.packetevents.utils.versionlookup.VersionLookupUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.plugin.Plugin;
 
+import java.util.Random;
+
 public final class PacketEvents implements PacketListener, Listener {
+
     private static final PacketEventsAPI packetEventsAPI = new PacketEventsAPI();
     private static final PacketEvents instance = new PacketEvents();
     private static final PacketEventsSettings settings = new PacketEventsSettings();
@@ -33,6 +37,8 @@ public final class PacketEvents implements PacketListener, Listener {
 
     /**
      * Call this before start()
+     *
+     * Recommended on your onLoad() Bukkit Method
      */
     public static void load() {
         //SERVER VERSION LOADING
@@ -53,8 +59,6 @@ public final class PacketEvents implements PacketListener, Listener {
 
     /**
      * Loads PacketEvents if you haven't already, Sets everything up, injects all players
-     *
-     * @param pl The plugin to set the library up for.
      */
     public static void start(final Plugin pl) {
         if (!hasLoaded) {
@@ -106,20 +110,20 @@ public final class PacketEvents implements PacketListener, Listener {
     }
 
     public static String getHandlerName(final String name) {
-        return "pe-" + getSettings().getIdentifier() + "-" + name;
+        return "pe-" + instance.getRandomIdentifier() + "-" + name;
     }
 
     public static PacketEventsSettings getSettings() {
         return settings;
     }
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.LOWEST)
     public void onJoin(final PlayerJoinEvent e) {
         getAPI().getPlayerUtils().injectPlayer(e.getPlayer());
         getAPI().getPlayerUtils().setClientVersion(e.getPlayer(), ClientVersion.fromProtocolVersion(VersionLookupUtils.getProtocolVersion(e.getPlayer())));
     }
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.LOWEST)
     public void onQuit(final PlayerQuitEvent e) {
         getAPI().getPlayerUtils().clearClientVersion(e.getPlayer());
         getAPI().getPlayerUtils().uninjectPlayer(e.getPlayer());
@@ -130,5 +134,16 @@ public final class PacketEvents implements PacketListener, Listener {
         BukkitMoveEvent moveEvent = new BukkitMoveEvent(e);
         getAPI().getEventManager().callEvent(moveEvent);
         e.setCancelled(moveEvent.isCancelled());
+    }
+
+    private String getRandomIdentifier() {
+        String alphabet = "abcdefghijklmnopqrstuvwxyz";
+        StringBuilder sb = new StringBuilder();
+        Random random = new Random();
+        while (sb.length() < 13) {
+            int index = (int) (random.nextFloat() * alphabet.length());
+            sb.append(alphabet.charAt(index));
+        }
+        return sb.toString();
     }
 }
