@@ -39,8 +39,8 @@ public final class WrappedPacketInKeepAlive extends WrappedPacket {
     }
 
     /**
-     * Optionally Cast this long to an integer if you are using 1.7.10->1.12.2!
-     * In 1.13.2->1.16.1 a long is sent
+     * Optionally Cast this long to an integer if you are using 1.7.10 -&gt; 1.12.2!
+     * In 1.13.2 -&gt; 1.16.1 a long is sent
      *
      * @return response is
      */

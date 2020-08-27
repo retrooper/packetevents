@@ -79,8 +79,8 @@ public enum ClientVersion {
     /**
      * Returns if the client's version is more up to date than the argument passed version
      *
-     * @param version
-     * @return
+     * @param version The version to compare to the client's value.
+     * @return True if the supplied version is lower, false if it is equal or higher than the client's version.
      */
     public boolean isHigherThan(final ClientVersion version) {
         if (this == version) return false;
@@ -90,8 +90,8 @@ public enum ClientVersion {
     /**
      * Returns if the client's version is more outdated than the argument passed version
      *
-     * @param version
-     * @return
+     * @param version The version to compare to the client's value.
+     * @return True if the supplied version is higher, false if it is equal or lower than the client's version.
      */
     public boolean isLowerThan(final ClientVersion version) {
         if (this == version) return false;

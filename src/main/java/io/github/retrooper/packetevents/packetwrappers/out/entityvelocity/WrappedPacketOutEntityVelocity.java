@@ -36,7 +36,7 @@ public final class WrappedPacketOutEntityVelocity extends WrappedPacket implemen
 
     /**
      * Velocity Constructor parameter types:
-     * 1.7.10->1.13.2 use int, double, double, double style,
+     * 1.7.10 -&gt; 1.13.2 use int, double, double, double style,
      * 1.14+ use int, Vec3D style
      */
     public static void load() {

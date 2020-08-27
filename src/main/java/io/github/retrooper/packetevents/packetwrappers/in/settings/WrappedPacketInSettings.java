@@ -111,6 +111,8 @@ public class WrappedPacketInSettings extends WrappedPacket {
      * It is possible for some keys to not exist.
      * If that is the case, the server version is 1.7.10.
      * 1.7.10 only sends the cape skin part.
+     *
+     * @return A map associating skin parts with whether or not they are enabled.
      */
     @Nullable
     public HashMap<DisplayedSkinPart, Boolean> getDisplayedSkinPartsMap() {
@@ -121,8 +123,8 @@ public class WrappedPacketInSettings extends WrappedPacket {
      * On 1.7.10, some skin parts will default to 'false' as 1.7.10
      * only sends the 'cape' skin part.
      *
-     * @param part
-     * @return
+     * @param part The skin part to check the status of.
+     * @return True if the specified skin part is enabled, otherwise false.
      */
     public boolean isDisplaySkinPartEnabled(DisplayedSkinPart part) {
         //1.7.10, we will default the other skin parts to return false.
