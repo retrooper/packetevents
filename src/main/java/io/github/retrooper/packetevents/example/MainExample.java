@@ -19,8 +19,8 @@ public class MainExample extends JavaPlugin implements PacketListener {
         PacketEvents.getSettings().setIdentifier("official_api");
 
         PacketEvents.start(this);
-        //If PacketEvents cannot detect your server version, it will use the default you specify version
-        // getAPI().getSettings().setDefaultServerVersion(ServerVersion.v_1_7_10);
+        // If PacketEvents cannot detect your server version, it will use the default you specify version
+        // PacketEvents.getSettings().setDefaultServerVersion(ServerVersion.v_1_7_10);              Like Above.
 
 
        // PacketEvents.getAPI().getEventManager().registerListeners(this);
