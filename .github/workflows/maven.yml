@@ -29,6 +29,4 @@ jobs:
         target_branch: javadocs
         keep_history: true
         build_dir: target/apidocs
-        committer: SamJakob <me@samjakob.com>
-        author: SamJakob <me@samjakob.com>
         commit_message: Update JavaDocs
