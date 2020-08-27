@@ -41,4 +41,10 @@ final class NettyPacketHandler_7 {
         channel.pipeline().remove(PacketEvents.getHandlerName(player.getName()));
     }
 
+    public static Future<?> uninjectPlayerAsync(final Player player) {
+        final Channel channel = (Channel) NMSUtils.getChannel(player);
+        return channel.eventLoop().submit(() -> {
+            channel.pipeline().remove(PacketEvents.getHandlerName(player.getName()));
+        });
+    }
 }
