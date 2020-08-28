@@ -44,13 +44,31 @@ public final class EntityFinderUtils {
         }
     }
 
-    public static Entity getEntityById(final int id) {
+    public static Entity getEntityByIdUnsafe(final int id) {
         for (final World world : Bukkit.getWorlds()) {
             final Entity entity = getEntityByIdWithWorld(world, id);
             if (entity != null) {
                 return entity;
             }
         }
+        return  null;
+    }
+
+    public static Entity getEntityById(final int id) {
+        Entity en  = getEntityByIdUnsafe(id);
+        if(en != null) {
+            return en;
+        }
+        //System.out.println("Warning, we are iterating through all entities...");
+        //Not found, we are forced to iterate through all entities in the world.
+        for(World world : Bukkit.getWorlds()) {
+            for(Entity entity : world.getEntities()) {
+                if(entity.getEntityId() == id) {
+                    return entity;
+                }
+            }
+        }
+        //Entity by this ID does not exist
         return null;
     }
 
@@ -60,8 +78,7 @@ public final class EntityFinderUtils {
             return null;
         }
         else if(craftWorldClass == null) {
-            System.out.println("Craft World class is null wtf");
-            return null;
+            throw new IllegalStateException("PacketEvents failed to locate the CraftWorld class.");
         }
         Object craftWorld = craftWorldClass.cast(world);
 

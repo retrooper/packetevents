@@ -32,9 +32,14 @@ public final class NMSUtils {
     public static void load() {
         try {
             nettyPrefix = "io.netty";
-            Class.forName("io.netty.channel.Channel");
+            Class.forName(nettyPrefix + ".channel.Channel");
         } catch (ClassNotFoundException e) {
             nettyPrefix = "net.minecraft.util.io.netty";
+            try {
+                Class.forName(nettyPrefix + ".channel.Channel");
+            } catch (ClassNotFoundException e2) {
+                throw new IllegalStateException("PacketEvents failed to locate Netty's location.");
+            }
         }
         try {
             nettyChannelClass = getNettyClass("channel.Channel");
@@ -105,11 +110,17 @@ public final class NMSUtils {
     }
 
     public static String getChannelFutureListFieldName() {
-        if (version.isLowerThan(ServerVersion.v_1_8))
+        if (version.isLowerThan(ServerVersion.v_1_8)) {
             return "e";
-        if (version.isLowerThan(ServerVersion.v_1_13))
+        }
+        if (version.isLowerThan(ServerVersion.v_1_13)) {
             return "g";
+        }
         return "f";
+    }
+
+    public static Entity getEntityByIdUnsafe(final int id) {
+        return EntityFinderUtils.getEntityByIdUnsafe(id);
     }
 
     @Nullable
@@ -209,10 +220,5 @@ public final class NMSUtils {
         } catch (IllegalAccessException | InvocationTargetException e) {
             e.printStackTrace();
         }
-    }
-
-
-    public static String getServerConnectionFieldName() {
-        return "p";
     }
 }

@@ -58,10 +58,12 @@ public final class PacketEvents implements PacketListener, Listener {
 
         EntityFinderUtils.load();
 
-        WrappedPacket.loadAllWrappers();
+
 
         VersionLookupUtils.load();
         ClientVersion.prepareLookUp();
+
+        WrappedPacket.loadAllWrappers();
         hasLoaded = true;
     }
 
@@ -76,7 +78,7 @@ public final class PacketEvents implements PacketListener, Listener {
         if (!hasStarted) {
             plugin = pl;
             //Register Bukkit and PacketListener
-            getAPI().getEventManager().registerListener(instance);
+            PacketEvents.getAPI().getEventManager().registerListener(instance);
 
             Bukkit.getPluginManager().registerEvents(instance, plugin);
 
@@ -144,4 +146,5 @@ public final class PacketEvents implements PacketListener, Listener {
         getAPI().getEventManager().callEvent(moveEvent);
         e.setCancelled(moveEvent.isCancelled());
     }
+
 }
