@@ -25,8 +25,6 @@ import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.plugin.Plugin;
 
-import java.util.Random;
-
 public final class PacketEvents implements PacketListener, Listener {
 
     private static final PacketEventsAPI packetEventsAPI = new PacketEventsAPI();
@@ -48,7 +46,7 @@ public final class PacketEvents implements PacketListener, Listener {
 
         PacketTypeClasses.Client.load();
         PacketTypeClasses.Server.load();
-        ServerVersion version= ServerVersion.getVersion();
+        ServerVersion version = ServerVersion.getVersion();
         WrappedPacket.version = version;
         PacketEvent.version = version;
         EntityFinderUtils.version = version;
@@ -110,20 +108,20 @@ public final class PacketEvents implements PacketListener, Listener {
     }
 
     public static String getHandlerName(final String name) {
-        return "pe-" + instance.getRandomIdentifier() + "-" + name;
+        return "pe-" + settings.getIdentifier() + "-" + name;
     }
 
     public static PacketEventsSettings getSettings() {
         return settings;
     }
 
-    @EventHandler(priority = EventPriority.LOWEST)
+    @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
     public void onJoin(final PlayerJoinEvent e) {
         getAPI().getPlayerUtils().injectPlayer(e.getPlayer());
         getAPI().getPlayerUtils().setClientVersion(e.getPlayer(), ClientVersion.fromProtocolVersion(VersionLookupUtils.getProtocolVersion(e.getPlayer())));
     }
 
-    @EventHandler(priority = EventPriority.LOWEST)
+    @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
     public void onQuit(final PlayerQuitEvent e) {
         getAPI().getPlayerUtils().clearClientVersion(e.getPlayer());
         getAPI().getPlayerUtils().uninjectPlayer(e.getPlayer());
@@ -134,16 +132,5 @@ public final class PacketEvents implements PacketListener, Listener {
         BukkitMoveEvent moveEvent = new BukkitMoveEvent(e);
         getAPI().getEventManager().callEvent(moveEvent);
         e.setCancelled(moveEvent.isCancelled());
-    }
-
-    private String getRandomIdentifier() {
-        String alphabet = "abcdefghijklmnopqrstuvwxyz";
-        StringBuilder sb = new StringBuilder();
-        Random random = new Random();
-        while (sb.length() < 13) {
-            int index = (int) (random.nextFloat() * alphabet.length());
-            sb.append(alphabet.charAt(index));
-        }
-        return sb.toString();
     }
 }
