@@ -5,8 +5,12 @@ package io.github.retrooper.packetevents.settings;
 
 import io.github.retrooper.packetevents.enums.ServerVersion;
 
+import java.util.Random;
+
 public class PacketEventsSettings {
+
     private ServerVersion defaultServerVersion;
+    private String identifier = "";
     private boolean autoResolveClientProtocolVersion;
     private boolean uninjectAsync = false;
 
@@ -26,6 +30,33 @@ public class PacketEventsSettings {
      */
     public void setDefaultServerVersion(final ServerVersion version) {
         this.defaultServerVersion = version;
+    }
+
+    public String getIdentifier() {
+        if (this.identifier.isEmpty()) {
+            String alphabet = "abcdefghijklmnopqrstuvwxyz";
+            StringBuilder sb = new StringBuilder();
+            Random random = new Random();
+            while (sb.length() < 13) {
+                int index = (int) (random.nextFloat() * alphabet.length());
+                sb.append(alphabet.charAt(index));
+            }
+
+            this.identifier = sb.toString();
+        }
+        return this.identifier;
+    }
+
+    /**
+     * Set a unique Identifier (Usually something that represents your plugin, For example: MyPluginPacketHandler)
+     * If another present plugin uses the same Identifier, It might cause incompatibilities
+     *
+     * @param identifier
+     * @deprecated Identifiers are now randomly generated on startup
+     */
+    @Deprecated
+    public void setIdentifier(final String identifier) {
+        this.identifier = identifier;
     }
 
     public boolean doAutoResolveClientProtocolVersion() {
