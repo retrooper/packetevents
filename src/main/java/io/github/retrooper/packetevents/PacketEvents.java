@@ -46,7 +46,7 @@ public final class PacketEvents implements PacketListener, Listener {
 
         PacketTypeClasses.Client.load();
         PacketTypeClasses.Server.load();
-        ServerVersion version= ServerVersion.getVersion();
+        ServerVersion version = ServerVersion.getVersion();
         WrappedPacket.version = version;
         PacketEvent.version = version;
         EntityFinderUtils.version = version;
