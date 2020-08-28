@@ -20,7 +20,7 @@ public final class PacketReceiveEvent extends PacketEvent {
     /**
      * Get the player sending the packet
      *
-     * @return
+     * @return player
      */
     public Player getPlayer() {
         return this.player;
@@ -28,7 +28,8 @@ public final class PacketReceiveEvent extends PacketEvent {
 
     /**
      * Get the packet's name (NMS packet class simple name).
-     * Deprecated, it is recommended not to use this for performance reasons.
+     * @deprecated It is recommended not to use this, it is an expensive method to call.
+     * @return Name of the packet
      */
     @Deprecated
     public String getPacketName() {
@@ -76,7 +77,7 @@ public final class PacketReceiveEvent extends PacketEvent {
     /**
      * Cancel the packet
      *
-     * @param cancelled
+     * @param cancelled boolean
      */
     public void setCancelled(boolean cancelled) {
         this.cancelled = cancelled;

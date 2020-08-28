@@ -8,6 +8,7 @@ import io.github.retrooper.packetevents.handler.NettyPacketHandler;
 import io.github.retrooper.packetevents.packetwrappers.Sendable;
 import io.github.retrooper.packetevents.settings.PacketEventsSettings;
 import io.github.retrooper.packetevents.utils.NMSUtils;
+import io.github.retrooper.packetevents.utils.versionlookup.VersionLookupUtils;
 import org.bukkit.entity.Player;
 
 import java.util.HashMap;
@@ -24,6 +25,10 @@ public final class PlayerUtils {
 
     public ClientVersion getClientVersion(final UUID uuid) {
         return clientVersionsMap.get(uuid);
+    }
+
+    public int getProtocolVersion(Player player) {
+        return VersionLookupUtils.getProtocolVersion(player);
     }
 
     public ClientVersion getClientVersion(final Player player) {
@@ -60,5 +65,9 @@ public final class PlayerUtils {
 
     public void sendPacket(final Player player, final Sendable sendable) {
         NMSUtils.sendSendableWrapper(player, sendable);
+    }
+
+    public void sendNMSPacket(final Player player, Object nmsPacket) {
+        NMSUtils.sendNMSPacket(player, nmsPacket);
     }
 }

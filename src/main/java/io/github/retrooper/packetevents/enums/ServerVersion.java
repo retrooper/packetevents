@@ -10,14 +10,22 @@ import org.bukkit.Bukkit;
  * @author retrooper
  */
 public enum ServerVersion {
-    v_1_7_10, v_1_8, v_1_8_3, v_1_8_8, v_1_9, v_1_9_4, v_1_10, v_1_11, v_1_12, v_1_13, v_1_13_2, v_1_14, v_1_15, v_1_16, v_1_16_1, v_1_16_2,
-    ERROR, EMPTY;
+
+    v_1_7_10, v_1_8, v_1_8_3, v_1_8_4, v_1_8_5, v_1_8_6, v_1_8_7, v_1_8_8,
+    v_1_9, v_1_9_2, v_1_9_4, v_1_10, v_1_10_2, v_1_11, v_1_11_1, v_1_11_2,
+    v_1_12, v_1_12_1, v_1_12_2, v_1_13, v_1_13_1, v_1_13_2, v_1_14, v_1_14_1,
+    v_1_14_2, v_1_14_3, v_1_14_4, v_1_15, v_1_15_1, v_1_15_2, v_1_16, v_1_16_1,
+    v_1_16_2, ERROR, EMPTY;
 
     private static final String nmsVersionSuffix = Bukkit.getServer().getClass().getPackage().getName().replace(".", ",").split(",")[3];
     public static ServerVersion[] reversedValues;
     private static ServerVersion cachedVersion;
 
-    private static ServerVersion getVers() {
+    public static void load() {
+        reversedValues = ServerVersion.reverse(values());
+    }
+
+    private static ServerVersion getVersionNoCache() {
         for (final ServerVersion val : reversedValues) {
             String valName = val.name().substring(2).replace("_", ".");
             if (Bukkit.getBukkitVersion().contains(valName)) {
@@ -31,7 +39,7 @@ public enum ServerVersion {
 
     public static ServerVersion getVersion() {
         if (cachedVersion == null) {
-            cachedVersion = getVers();
+            cachedVersion = getVersionNoCache();
         }
         return cachedVersion;
     }
@@ -98,49 +106,73 @@ public enum ServerVersion {
         return false;
     }
 
-    public int toProtocolVersion() {
-        if (this.equals(ServerVersion.v_1_7_10)) {
-            return 5;
+    /**
+     * Converts the server version to a protocol version.
+     * Recommended to cache.
+     * @return protocol version
+     */
+    public short toProtocolVersion() {
+        switch (this) {
+            case v_1_7_10:
+                return 5;
+            case v_1_8:
+            case v_1_8_3:
+            case v_1_8_4:
+            case v_1_8_5:
+            case v_1_8_6:
+            case v_1_8_7:
+            case v_1_8_8:
+                return 47;
+            case v_1_9:
+                return 107;
+            case v_1_9_2:
+                return 109;
+            case v_1_9_4:
+                return 110;
+            case v_1_10:
+            case v_1_10_2:
+                return 210;
+            case v_1_11:
+                return 315;
+            case v_1_11_1:
+            case v_1_11_2:
+                return 316;
+            case v_1_12:
+                return 335;
+            case v_1_12_1:
+                return 338;
+            case v_1_12_2:
+                return 340;
+            case v_1_13:
+                return 393;
+            case v_1_13_1:
+                return 401;
+            case v_1_13_2:
+                return 404;
+            case v_1_14:
+                return 477;
+            case v_1_14_1:
+                return 480;
+            case v_1_14_2:
+                return 485;
+            case v_1_14_3:
+                return 490;
+            case v_1_14_4:
+                return 498;
+            case v_1_15:
+                return 573;
+            case v_1_15_1:
+                return 575;
+            case v_1_15_2:
+                return 578;
+            case v_1_16:
+                return 735;
+            case v_1_16_1:
+                return 736;
+            case v_1_16_2:
+                return 751;
+            default:
+                return -1;
         }
-        if (this.name().startsWith("v_1_8")) {
-            return 47;
-        }
-        if (this.equals(ServerVersion.v_1_9)) {
-            return 107;
-        }
-        if (this.equals(ServerVersion.v_1_9_4)) {
-            return 110;
-        }
-        if (this.equals(ServerVersion.v_1_10)) {
-            return 210;
-        }
-        if (this.equals(ServerVersion.v_1_11)) {
-            return 315;
-        }
-        if (this.equals(ServerVersion.v_1_12)) {
-            return 335;
-        }
-        if (this.equals(ServerVersion.v_1_13)) {
-            return 393;
-        }
-        if (this.equals(ServerVersion.v_1_13_2)) {
-            return 404;
-        }
-        if (this.equals(ServerVersion.v_1_14)) {
-            return 477;
-        }
-        if (this.equals(ServerVersion.v_1_15)) {
-            return 573;
-        }
-        if (this.equals(ServerVersion.v_1_16)) {
-            return 735;
-        }
-        if (this.equals(ServerVersion.v_1_16_1)) {
-            return 736;
-        }
-        if (this.equals(ServerVersion.v_1_16_2)) {
-            return 737;
-        }
-        return -1;
     }
 }

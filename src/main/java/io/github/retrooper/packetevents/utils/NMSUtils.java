@@ -18,7 +18,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
 public final class NMSUtils {
-    private static final ServerVersion version = ServerVersion.getVersion();
+    public static ServerVersion version;
     private static final String nmsDir = ServerVersion.getNMSDirectory();
     private static final String obcDir = ServerVersion.getOBCDirectory();
     public static String nettyPrefix;
@@ -29,7 +29,7 @@ public final class NMSUtils {
     private static Method getCraftWorldHandleMethod, getServerConnection, getCraftPlayerHandle, getCraftEntityHandle, sendPacketMethod, asBukkitCopy;
     private static Field entityPlayerPingField, playerConnectionField;
 
-    static {
+    public static void load() {
         try {
             nettyPrefix = "io.netty";
             Class.forName("io.netty.channel.Channel");
@@ -191,13 +191,8 @@ public final class NMSUtils {
         return null;
     }
 
-    public static boolean is_1_8() {
-        return version.isHigherThan(ServerVersion.v_1_7_10)
-                && version.isLowerThan(ServerVersion.v_1_9);
-    }
-
     public static void sendSendableWrapper(final Player player, final Sendable sendable) {
-        sendNMSPacket(player, sendable.asNMSPacket());
+        NMSUtils.sendNMSPacket(player, sendable.asNMSPacket());
     }
 
     public static void sendNMSPacket(final Player player, final Object nmsPacket) {

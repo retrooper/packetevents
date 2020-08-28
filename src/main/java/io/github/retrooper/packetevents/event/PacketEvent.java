@@ -13,7 +13,7 @@ public abstract class PacketEvent {
     /**
      * Timestamp of the packet
      *
-     * @return
+     * @return timestamp in milliseconds
      */
     public long getTimestamp() {
         return timestamp;

@@ -65,7 +65,7 @@ public enum ClientVersion {
         VERSION_LOOKUP.put(737, v_1_16_2);
     }
 
-    public static ClientVersion fromProtocolVersion(int protocolVersion) {
+    public static ClientVersion fromProtocolVersion(short protocolVersion) {
         if (protocolVersion == -1 && PacketEvents.getSettings().doAutoResolveClientProtocolVersion()) {
             protocolVersion = ServerVersion.getVersion().toProtocolVersion();
         }

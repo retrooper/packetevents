@@ -59,6 +59,10 @@ public final class EntityFinderUtils {
         if (world == null) {
             return null;
         }
+        else if(craftWorldClass == null) {
+            System.out.println("Craft World class is null wtf");
+            return null;
+        }
         Object craftWorld = craftWorldClass.cast(world);
 
         Object worldServer = null;
@@ -87,8 +91,7 @@ public final class EntityFinderUtils {
 
     /**
      * This is the name of the method that returns the NMS entity when you pass in its ID.
-     * On 1.8 -&gt; 1.8.8 the name is called 'a', on 1.7.10 &amp; 1.9+ the name is called 'getEntity'.
-     *
+     * On 1.8-1.8.8 the function name is called 'a', on 1.7.10 and 1.9 and above the name is called 'getEntity'.
      * @return entity by ID method name
      */
     public static String getEntityByIDMethodName() {

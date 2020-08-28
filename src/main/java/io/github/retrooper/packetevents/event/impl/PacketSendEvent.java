@@ -26,7 +26,8 @@ public final class PacketSendEvent extends PacketEvent {
 
     /**
      * Get the packet's name (NMS packet class simple name)
-     * Deprecated, it is recommended not to use this for performance reasons.
+     * @deprecated It is recommended not to use this, as it is an expensive function to call.
+     * @return Name of the packet
      */
     @Deprecated
     public String getPacketName() {

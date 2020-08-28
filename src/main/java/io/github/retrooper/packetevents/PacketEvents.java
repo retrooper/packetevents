@@ -13,6 +13,7 @@ import io.github.retrooper.packetevents.packet.PacketType;
 import io.github.retrooper.packetevents.packet.PacketTypeClasses;
 import io.github.retrooper.packetevents.packetwrappers.api.WrappedPacket;
 import io.github.retrooper.packetevents.settings.PacketEventsSettings;
+import io.github.retrooper.packetevents.utils.NMSUtils;
 import io.github.retrooper.packetevents.utils.nms_entityfinder.EntityFinderUtils;
 import io.github.retrooper.packetevents.utils.versionlookup.VersionLookupUtils;
 import org.bukkit.Bukkit;
@@ -41,22 +42,32 @@ public final class PacketEvents implements PacketListener, Listener {
     public static void load() {
         //SERVER VERSION LOADING
 
-        //Server Version reversed values caching
-        ServerVersion.reversedValues = ServerVersion.reverse(ServerVersion.values());
+        //Server Version loading
+        ServerVersion.load();
 
-        PacketTypeClasses.Client.load();
-        PacketTypeClasses.Server.load();
         ServerVersion version = ServerVersion.getVersion();
         WrappedPacket.version = version;
         PacketEvent.version = version;
+        NMSUtils.version = version;
         EntityFinderUtils.version = version;
+
+        NMSUtils.load();
+
+        PacketTypeClasses.Client.load();
+        PacketTypeClasses.Server.load();
+
+        EntityFinderUtils.load();
+
         WrappedPacket.loadAllWrappers();
+
+        VersionLookupUtils.load();
         ClientVersion.prepareLookUp();
         hasLoaded = true;
     }
 
     /**
      * Loads PacketEvents if you haven't already, Sets everything up, injects all players
+     * @param pl Plugin instance
      */
     public static void start(final Plugin pl) {
         if (!hasLoaded) {
@@ -118,7 +129,7 @@ public final class PacketEvents implements PacketListener, Listener {
     @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
     public void onJoin(final PlayerJoinEvent e) {
         getAPI().getPlayerUtils().injectPlayer(e.getPlayer());
-        getAPI().getPlayerUtils().setClientVersion(e.getPlayer(), ClientVersion.fromProtocolVersion(VersionLookupUtils.getProtocolVersion(e.getPlayer())));
+        getAPI().getPlayerUtils().setClientVersion(e.getPlayer(), ClientVersion.fromProtocolVersion((short) VersionLookupUtils.getProtocolVersion(e.getPlayer())));
     }
 
     @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
