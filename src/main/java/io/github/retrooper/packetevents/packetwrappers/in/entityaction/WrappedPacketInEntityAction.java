@@ -15,6 +15,7 @@ import java.util.HashMap;
 
 public final class WrappedPacketInEntityAction extends WrappedPacket {
     private static final HashMap<String, PlayerAction> cachedPlayerActionNames = new HashMap<String, PlayerAction>();
+    private static final HashMap<Integer, PlayerAction> cachedPlayerActionIDs = new HashMap<Integer, PlayerAction>();
     private static Class<?> entityActionClass;
     @Nullable
     private static Class<?> enumPlayerActionClass;
@@ -41,6 +42,15 @@ public final class WrappedPacketInEntityAction extends WrappedPacket {
         cachedPlayerActionNames.put("PRESS_SHIFT_KEY", PlayerAction.START_SNEAKING);
         cachedPlayerActionNames.put("RELEASE_SHIFT_KEY", PlayerAction.STOP_SNEAKING);
         cachedPlayerActionNames.put("RIDING_JUMP", PlayerAction.START_RIDING_JUMP);
+
+        cachedPlayerActionIDs.put(1, PlayerAction.START_SNEAKING);
+        cachedPlayerActionIDs.put(2, PlayerAction.STOP_SNEAKING);
+        cachedPlayerActionIDs.put(3, PlayerAction.STOP_SLEEPING);
+        cachedPlayerActionIDs.put(4, PlayerAction.START_SPRINTING);
+        cachedPlayerActionIDs.put(5, PlayerAction.STOP_SPRINTING);
+        cachedPlayerActionIDs.put(6, PlayerAction.START_RIDING_JUMP); //riding jump
+        cachedPlayerActionIDs.put(7, PlayerAction.OPEN_INVENTORY); //horse interaction
+
     }
 
     @Override
@@ -54,11 +64,10 @@ public final class WrappedPacketInEntityAction extends WrappedPacket {
                 jumpBoost = Reflection.getField(entityActionClass, int.class, 1).getInt(packet);
             }
 
-            int animationIndex = -1;
-
             //1.7.10
             if (isLowerThan_v_1_8) {
-                animationIndex = Reflection.getField(entityActionClass, int.class, 1).getInt(packet); // TODO: += if packetdataserializer.version < 16
+                int animationIndex = Reflection.getField(entityActionClass, int.class, 1).getInt(packet); // TODO: += if packetdataserializer.version < 16
+                this.action = cachedPlayerActionIDs.get(animationIndex);
             } else {
                 final Object enumObj = Reflection.getField(entityActionClass, enumPlayerActionClass, 0).get(packet);
                 final String enumName = enumObj.toString();
@@ -68,9 +77,6 @@ public final class WrappedPacketInEntityAction extends WrappedPacket {
 
             this.entityId = entityId;
             this.jumpBoost = jumpBoost;
-            if (animationIndex != -1) {
-                this.action = PlayerAction.values()[animationIndex];
-            }
         } catch (IllegalAccessException e) {
             e.printStackTrace();
         }
