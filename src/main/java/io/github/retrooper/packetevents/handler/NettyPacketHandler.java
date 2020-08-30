@@ -24,15 +24,36 @@ public class NettyPacketHandler {
     }
 
     public static void injectPlayer(final Player player) {
-        final PlayerInjectEvent injectEvent = new PlayerInjectEvent(player);
-        PacketEvents.getAPI().getEventManager().callEvent(injectEvent);
-        if (!injectEvent.isCancelled()) {
-            if (v1_7_nettyMode) {
-                NettyPacketHandler_7.injectPlayer(player);
-            } else {
-                NettyPacketHandler_8.injectPlayer(player);
+        try {
+            final PlayerInjectEvent injectEvent = new PlayerInjectEvent(player);
+            PacketEvents.getAPI().getEventManager().callEvent(injectEvent);
+            if (!injectEvent.isCancelled()) {
+                if (v1_7_nettyMode) {
+                    NettyPacketHandler_7.injectPlayer(player);
+                } else {
+                    NettyPacketHandler_8.injectPlayer(player);
+                }
             }
+        } catch (Exception ignored) {
+
         }
+    }
+
+    public static Future<?> injectPlayerAsync(final Player player) {
+        try {
+            final PlayerInjectEvent injectEvent = new PlayerInjectEvent(player);
+            PacketEvents.getAPI().getEventManager().callEvent(injectEvent);
+            if (!injectEvent.isCancelled()) {
+                if (v1_7_nettyMode) {
+                    return NettyPacketHandler_7.injectPlayerAsync(player);
+                } else {
+                    return NettyPacketHandler_8.injectPlayerAsync(player);
+                }
+            }
+        } catch (Exception ignored) {
+
+        }
+        return null;
     }
 
     public static Future<?> uninjectPlayerAsync(final Player player) {
@@ -63,8 +84,8 @@ public class NettyPacketHandler {
                     NettyPacketHandler_8.uninjectPlayer(player);
                 }
             }
-        } catch (Exception ex) {
-            //Failed, but that is alright
+        } catch (Exception ignored) {
+
         }
     }
 

@@ -13,6 +13,7 @@ public class PacketEventsSettings {
     private String identifier = "";
     private boolean autoResolveClientProtocolVersion;
     private boolean uninjectAsync = false;
+    private boolean injectAsync = false;
 
     /**
      * If PacketEvents fails to detect your server version, it will use the recommended version
@@ -95,5 +96,19 @@ public class PacketEventsSettings {
 
     public boolean isUninjectAsync() {
         return this.uninjectAsync;
+    }
+
+    public boolean isInjectAsync() {
+        return this.injectAsync;
+    }
+
+    /**
+     * Would you like PacketEvents to Inject players Asynchronously?
+     * WARNING! This might make reloading unsupported
+     *
+     * @param injectAsync boolean
+     */
+    public void setInjectAsync(boolean injectAsync) {
+        this.injectAsync = injectAsync;
     }
 }
