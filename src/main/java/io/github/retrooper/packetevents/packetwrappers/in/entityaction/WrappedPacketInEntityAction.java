@@ -62,7 +62,7 @@ public final class WrappedPacketInEntityAction extends WrappedPacket {
             } else {
                 final Object enumObj = Reflection.getField(entityActionClass, enumPlayerActionClass, 0).get(packet);
                 final String enumName = enumObj.toString();
-
+                this.action = cachedPlayerActionNames.get(enumName);
             }
 
 
