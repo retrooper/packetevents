@@ -1,6 +1,26 @@
 /**
- * Copyright (c) 2020 retrooper
- */
+MIT License
+
+Copyright (c) 2020 retrooper
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+*/
 package io.github.retrooper.packetevents.handler;
 
 import io.github.retrooper.packetevents.PacketEvents;
@@ -10,10 +30,13 @@ import io.github.retrooper.packetevents.event.impl.PlayerInjectEvent;
 import io.github.retrooper.packetevents.event.impl.PlayerUninjectEvent;
 import org.bukkit.entity.Player;
 
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
 public class NettyPacketHandler {
     private static boolean v1_7_nettyMode = false;
+    private static final ExecutorService executorService = Executors.newCachedThreadPool();
 
     static {
         try {
@@ -40,37 +63,21 @@ public class NettyPacketHandler {
     }
 
     public static Future<?> injectPlayerAsync(final Player player) {
-        try {
-            final PlayerInjectEvent injectEvent = new PlayerInjectEvent(player);
-            PacketEvents.getAPI().getEventManager().callEvent(injectEvent);
-            if (!injectEvent.isCancelled()) {
-                if (v1_7_nettyMode) {
-                    return NettyPacketHandler_7.injectPlayerAsync(player);
-                } else {
-                    return NettyPacketHandler_8.injectPlayerAsync(player);
+        return executorService.submit(() -> {
+            try {
+                final PlayerInjectEvent injectEvent = new PlayerInjectEvent(player, true);
+                PacketEvents.getAPI().getEventManager().callEvent(injectEvent);
+                if (!injectEvent.isCancelled()) {
+                    if (v1_7_nettyMode) {
+                        NettyPacketHandler_7.injectPlayer(player);
+                    } else {
+                        NettyPacketHandler_8.injectPlayer(player);
+                    }
                 }
+            } catch (Exception ignored) {
+
             }
-        } catch (Exception ignored) {
-
-        }
-        return null;
-    }
-
-    public static Future<?> uninjectPlayerAsync(final Player player) {
-        try {
-            final PlayerUninjectEvent uninjectEvent = new PlayerUninjectEvent(player);
-            PacketEvents.getAPI().getEventManager().callEvent(uninjectEvent);
-            if (!uninjectEvent.isCancelled()) {
-                if (v1_7_nettyMode) {
-                    return NettyPacketHandler_7.uninjectPlayerAsync(player);
-                } else {
-                    return NettyPacketHandler_8.uninjectPlayerAsync(player);
-                }
-            }
-        } catch (Exception ignored) {
-
-        }
-        return null;
+        });
     }
 
     public static void uninjectPlayer(final Player player) {
@@ -87,6 +94,24 @@ public class NettyPacketHandler {
         } catch (Exception ignored) {
 
         }
+    }
+
+    public static Future<?> uninjectPlayerAsync(final Player player) {
+        return executorService.submit(() -> {
+            try {
+                final PlayerUninjectEvent uninjectEvent = new PlayerUninjectEvent(player, true);
+                PacketEvents.getAPI().getEventManager().callEvent(uninjectEvent);
+                if (!uninjectEvent.isCancelled()) {
+                    if (v1_7_nettyMode) {
+                        NettyPacketHandler_7.uninjectPlayer(player);
+                    } else {
+                        NettyPacketHandler_8.uninjectPlayer(player);
+                    }
+                }
+            } catch (Exception ignored) {
+
+            }
+        });
     }
 
     public static Object write(final Player sender, final Object packet) {

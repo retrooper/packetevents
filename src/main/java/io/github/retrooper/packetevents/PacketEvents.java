@@ -1,6 +1,26 @@
 /**
- * Copyright (c) 2020 retrooper
- */
+MIT License
+
+Copyright (c) 2020 retrooper
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+*/
 package io.github.retrooper.packetevents;
 
 import io.github.retrooper.packetevents.api.PacketEventsAPI;
@@ -69,9 +89,9 @@ public final class PacketEvents implements PacketListener, Listener {
 
     /**
      * Loads PacketEvents if you haven't already, Sets everything up, injects all players
-     * @param pl Plugin instance
+     * @param pl JavaPlugin instance
      */
-    public static void start(final Plugin pl) {
+    public static void init(final Plugin pl) {
         if (!hasLoaded) {
             load();
         }
@@ -87,6 +107,16 @@ public final class PacketEvents implements PacketListener, Listener {
             }
             hasStarted = true;
         }
+    }
+
+    /**
+     * Loads PacketEvents if you haven't already, Sets everything up, injects all players
+     * @param pl Plugin instance
+     * @deprecated Use {@link #init(Plugin)}
+     */
+    @Deprecated
+    public static void start(final Plugin pl) {
+        init(pl);
     }
 
     /**
@@ -140,7 +170,7 @@ public final class PacketEvents implements PacketListener, Listener {
         getAPI().getPlayerUtils().uninjectPlayer(e.getPlayer());
     }
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     public void onMove(final PlayerMoveEvent e) {
         BukkitMoveEvent moveEvent = new BukkitMoveEvent(e);
         getAPI().getEventManager().callEvent(moveEvent);

@@ -1,14 +1,15 @@
-/**
- * Copyright (c) 2020 retrooper
- */
 package io.github.retrooper.packetevents.event.impl;
 
+import io.github.retrooper.packetevents.event.CancellableEvent;
 import io.github.retrooper.packetevents.event.PacketEvent;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerMoveEvent;
 
-public final class BukkitMoveEvent extends PacketEvent {
+//Do not use this, I plan to remove this event.
+//If you wish you may recreate this class yourself and use it.
+@Deprecated
+public final class BukkitMoveEvent extends PacketEvent implements CancellableEvent {
     private final Player player;
     private final Location to, from;
     private boolean cancelled;
@@ -37,20 +38,18 @@ public final class BukkitMoveEvent extends PacketEvent {
         return to;
     }
 
+    @Override
     public boolean isCancelled() {
         return cancelled;
     }
 
+    @Override
     public void setCancelled(final boolean val) {
         this.cancelled = val;
     }
 
+    @Override
     public void cancel() {
         setCancelled(true);
-    }
-
-    @Override
-    public boolean isAsyncByDefault() {
-        return false;
     }
 }
