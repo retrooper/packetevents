@@ -14,7 +14,6 @@ import io.github.retrooper.packetevents.packetwrappers.in.entityaction.WrappedPa
 import io.github.retrooper.packetevents.packetwrappers.in.useentity.WrappedPacketInUseEntity;
 import io.github.retrooper.packetevents.packetwrappers.out.entityvelocity.WrappedPacketOutEntityVelocity;
 import org.bukkit.plugin.java.JavaPlugin;
-
 public class MainExample extends JavaPlugin implements PacketListener {
 
     @Override
