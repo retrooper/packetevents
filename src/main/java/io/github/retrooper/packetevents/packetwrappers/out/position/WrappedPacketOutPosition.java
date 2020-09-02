@@ -59,22 +59,42 @@ public final class WrappedPacketOutPosition extends WrappedPacket {
         }
     }
 
+    /**
+     * Get the X position.
+     * @return Get X Position
+     */
     public double getX() {
         return x;
     }
 
+    /**
+     * Get the Y position.
+     * @return Get Y Position
+     */
     public double getY() {
         return y;
     }
 
+    /**
+     * Get the Z position.
+     * @return Get Z Position
+     */
     public double getZ() {
         return z;
     }
 
+    /**
+     * Get the Yaw.
+     * @return Get Yaw
+     */
     public float getYaw() {
         return yaw;
     }
 
+    /**
+     * Get the Pitch,
+     * @return Get Pitch
+     */
     public float getPitch() {
         return pitch;
     }

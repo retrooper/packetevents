@@ -103,18 +103,36 @@ public final class WrappedPacketInEntityAction extends WrappedPacket {
         }
     }
 
+    /**
+     * Lookup the associated entity by the ID that was sent in the packet.
+     * @return Entity
+     */
     public Entity getEntity() {
         return NMSUtils.getEntityById(this.entityId);
     }
 
+    /**
+     * Get the ID of the entity.
+     * If you do not want to use {@link #getEntity()},
+     * you lookup the entity by yourself with this entity ID.
+     * @return Entity ID
+     */
     public int getEntityId() {
         return entityId;
     }
 
+    /**
+     * Get the player action.
+     * @return Player Action
+     */
     public PlayerAction getAction() {
         return action;
     }
 
+    /**
+     * Get the jump boost integer.
+     * @return Jump Boost
+     */
     public int getJumpBoost() {
         return jumpBoost;
     }

@@ -33,7 +33,7 @@ import org.bukkit.entity.Entity;
 public final class WrappedPacketInUseEntity extends WrappedPacket {
     private static Class<?> useEntityClass;
     private static Class<?> enumEntityUseActionClass;
-    private int entityId;
+    private int entityID;
     private EntityUseAction action;
     public WrappedPacketInUseEntity(final Object packet) {
         super(packet);
@@ -53,7 +53,7 @@ public final class WrappedPacketInUseEntity extends WrappedPacket {
     @Override
     protected void setup() {
         try {
-            this.entityId = Reflection.getField(useEntityClass, int.class, 0).getInt(packet);
+            this.entityID = Reflection.getField(useEntityClass, int.class, 0).getInt(packet);
             final Object useActionEnum = Reflection.getField(useEntityClass, enumEntityUseActionClass, 0).get(packet);
             this.action = EntityUseAction.valueOf(useActionEnum.toString());
         } catch (IllegalAccessException e) {
@@ -61,14 +61,28 @@ public final class WrappedPacketInUseEntity extends WrappedPacket {
         }
     }
 
+    /**
+     * Lookup the associated entity by the ID that was sent in the packet.
+     * @return Entity
+     */
     public Entity getEntity() {
-        return NMSUtils.getEntityById(this.entityId);
+        return NMSUtils.getEntityById(this.entityID);
     }
 
+    /**
+     * Get the ID of the entity.
+     * If you do not want to use {@link #getEntity()},
+     * you lookup the entity by yourself with this entity ID.
+     * @return Entity ID
+     */
     public int getEntityId() {
-        return entityId;
+        return entityID;
     }
 
+    /**
+     * Get the associated action.
+     * @return Get EntityUseAction
+     */
     public EntityUseAction getAction() {
         return action;
     }

@@ -133,23 +133,42 @@ public class WrappedPacketInWindowClick extends WrappedPacket {
         }
     }
 
+    /**
+     * Get the Window ID.
+     * @return Get Window ID
+     */
     public int getWindowID() {
         return id;
     }
 
+    /**
+     * Get the Window slot.
+     * @return Get Window Slot
+     */
     public int getWindowSlot() {
         return slot;
     }
 
+    /**
+     * Get the Window button.
+     * @return Get Window Button
+     */
     public int getWindowButton() {
         return button;
     }
 
+    /**
+     * Get the action number.
+     * @return Get Action Number
+     */
     public short getActionNumber() {
         return actionNumber;
     }
 
-    @Nullable
+    /**
+     * Get the window click type.
+     * @return Get Window Click Type
+     */
     public WindowClickType getWindowClickType() {
         if (windowClickTypeCache.get(mode) == null) {
             return WindowClickType.UNKNOWN;
@@ -170,10 +189,18 @@ public class WrappedPacketInWindowClick extends WrappedPacket {
         return windowClickTypeCache.get(mode).get(button);
     }
 
+    /**
+     * Get the Window mode.
+     * @return Get Window Mode.
+     */
     public int getMode() {
         return mode;
     }
 
+    /**
+     * Get the clicked item.
+     * @return Get Clicked ItemStack
+     */
     public ItemStack getClickedItem() {
         return clickedItem;
     }

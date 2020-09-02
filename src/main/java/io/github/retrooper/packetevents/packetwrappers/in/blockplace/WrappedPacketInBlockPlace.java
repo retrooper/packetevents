@@ -76,14 +76,51 @@ public final class WrappedPacketInBlockPlace extends WrappedPacket {
         this.itemStack = itemStack;
     }
 
+    /**
+     * Get the player that placed the block
+     * @return Block placer
+     */
     public Player getPlayer() {
         return this.player;
     }
 
+    /**
+     * Get X position of the block
+     * @return Block Position X
+     */
+    public int getBlockPositionX() {
+        return blockPosition.x;
+    }
+
+    /**
+     * Get Y position of the block
+     * @return Block Position Y
+     */
+    public int getBlockPositionY() {
+        return blockPosition.y;
+    }
+
+    /**
+     * Get Z position of the block
+     * @return Block Position Z
+     */
+    public int getBlockPositionZ() {
+        return blockPosition.z;
+    }
+
+    /**
+     * Use {@link #getBlockPositionX()}, {@link #getBlockPositionY()}, {@link #getBlockPositionZ()}
+     * @return Block Position
+     */
+    @Deprecated
     public Vector3i getBlockPosition() {
         return blockPosition;
     }
 
+    /**
+     * The ItemStack of the placed block.
+     * @return ItemStack
+     */
     @Nullable
     public ItemStack getItemStack() {
         return itemStack;

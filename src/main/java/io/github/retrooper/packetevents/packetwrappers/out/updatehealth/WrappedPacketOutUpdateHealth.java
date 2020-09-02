@@ -77,14 +77,26 @@ public final class WrappedPacketOutUpdateHealth extends WrappedPacket implements
 
     }
 
+    /**
+     * Get health value.
+     * @return Get Health
+     */
     public float getHealth() {
         return health;
     }
 
+    /**
+     * Get food saturation value.
+     * @return Get Food Saturation
+     */
     public float getFoodSaturation() {
         return foodSaturation;
     }
 
+    /**
+     * Get food value.
+     * @return Get Food
+     */
     public int getFood() {
         return food;
     }

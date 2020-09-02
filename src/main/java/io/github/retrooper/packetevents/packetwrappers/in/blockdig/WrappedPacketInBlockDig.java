@@ -103,18 +103,35 @@ public final class WrappedPacketInBlockDig extends WrappedPacket {
         this.digType = enumDigType;
     }
 
+    /**
+     * Get X position of the block
+     * @return Block Position X
+     */
     public int getBlockPositionX() {
         return blockPosition.x;
     }
 
+    /**
+     * Get Y position of the block
+     * @return Block Position Y
+     */
     public int getBlockPositionY() {
         return blockPosition.y;
     }
 
+    /**
+     * Get Z position of the block
+     * @return Block Position Z
+     */
     public int getBlockPositionZ() {
         return blockPosition.z;
     }
 
+    /**
+     * Use {@link #getBlockPositionX()}, {@link #getBlockPositionY()}, {@link #getBlockPositionZ()}
+     * @return Block Position
+     */
+    @Deprecated
     public Vector3i getBlockPosition() {
         return blockPosition;
     }

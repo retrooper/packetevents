@@ -71,14 +71,26 @@ public class WrappedPacketOutTransaction extends WrappedPacket implements Sendab
 
     }
 
+    /**
+     * Get the Window ID.
+     * @return Get Window ID
+     */
     public int getWindowId() {
         return windowId;
     }
 
+    /**
+     * Get the action number.
+     * @return Get Action Number
+     */
     public short getActionNumber() {
         return actionNumber;
     }
 
+    /**
+     * Has the transaction packet been accepted?
+     * @return Is Accepted
+     */
     public boolean isAccepted() {
         return accepted;
     }

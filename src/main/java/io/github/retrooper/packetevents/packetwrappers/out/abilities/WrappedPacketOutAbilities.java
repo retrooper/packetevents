@@ -78,26 +78,50 @@ public final class WrappedPacketOutAbilities extends WrappedPacket implements Se
 
     }
 
+    /**
+     * Should the client be vulnerable?
+     * @return Is Vulnerable
+     */
     public boolean isVulnerable() {
         return vulnerable;
     }
 
+    /**
+     * Should the client be flying?
+     * @return Is Flying
+     */
     public boolean isFlying() {
         return flying;
     }
 
+    /**
+     * Should the client be allowed to fly?
+     * @return Is Allowed To Fly
+     */
     public boolean isFlightAllowed() {
         return allowFlight;
     }
 
+    /**
+     * Should the client be able to build instantly?
+     * @return Is Allowed To Build Instantly
+     */
     public boolean canInstantlyBuild() {
         return instantBuild;
     }
 
+    /**
+     * Get the client's defined fly speed.
+     * @return Get Fly Speed
+     */
     public float getFlySpeed() {
         return flySpeed;
     }
 
+    /**
+     * Get the client's defined walk speed.
+     * @return Get Walk Speed
+     */
     public float getWalkSpeed() {
         return walkSpeed;
     }

@@ -91,7 +91,6 @@ public final class WrappedPacketOutEntityVelocity extends WrappedPacket implemen
         try {
             //ENTITY ID
             this.entityId = Reflection.getField(velocityClass, int.class, 0).getInt(packet);
-            //System.out.println("entity id: " + entityId);
 
             int x = Reflection.getField(velocityClass, int.class, 1).getInt(packet);
             int y = Reflection.getField(velocityClass, int.class, 2).getInt(packet);
@@ -106,22 +105,44 @@ public final class WrappedPacketOutEntityVelocity extends WrappedPacket implemen
         }
     }
 
-    public int getEntityId() {
-        return entityId;
-    }
-
+    /**
+     * Lookup the associated entity by the ID that was sent in the packet.
+     * @return Entity
+     */
     public Entity getEntity() {
         return NMSUtils.getEntityById(this.entityId);
     }
 
+    /**
+     * Get the ID of the entity.
+     * If you do not want to use {@link #getEntity()},
+     * you lookup the entity by yourself with this entity ID.
+     * @return Entity ID
+     */
+    public int getEntityId() {
+        return entityId;
+    }
+
+    /**
+     * Get the Velocity X
+     * @return Get Velocity X
+     */
     public double getVelocityX() {
         return velocityX;
     }
 
+    /**
+     * Get the Velocity Y
+     * @return Get Velocity Y
+     */
     public double getVelocityY() {
         return velocityY;
     }
 
+    /**
+     * Get the Velocity Z
+     * @return Get Velocity Z
+     */
     public double getVelocityZ() {
         return velocityZ;
     }

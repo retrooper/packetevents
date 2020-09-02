@@ -32,10 +32,18 @@ import java.lang.reflect.InvocationTargetException;
 
 public final class ServerUtils {
 
+    /**
+     * Get the server version.
+     * @return Get Server Version
+     */
     public ServerVersion getVersion() {
         return ServerVersion.getVersion();
     }
 
+    /**
+     * Get recent TPS array from NMS.
+     * @return Get Recent TPS
+     */
     public double[] getRecentTPS() {
         double[] tpsArray = new double[0];
         try {
@@ -46,20 +54,38 @@ public final class ServerUtils {
         return tpsArray;
     }
 
+    /**
+     * Get the current TPS.
+     * @return Get Current TPS
+     */
     public double getTPS() {
         return getRecentTPS()[0];
     }
 
     /**
      * Use {@link #getTPS()}
-     * @return
+     * @return Get Current TPS
      */
     @Deprecated
     public double getCurrentTPS() {
         return getRecentTPS()[0];
     }
 
+    /**
+     * Use {@link #getOperatingSystem()}
+     * @deprecated Method rename pending to next minor update.
+     * @return
+     */
+    @Deprecated
     public SystemOS getPlatform() {
+        return SystemOS.getOperatingSystem();
+    }
+
+    /**
+     * Get the Operating System the server is running on.
+     * @return Get Server Operating System
+     */
+    public SystemOS getOperatingSystem() {
         return SystemOS.getOperatingSystem();
     }
 }

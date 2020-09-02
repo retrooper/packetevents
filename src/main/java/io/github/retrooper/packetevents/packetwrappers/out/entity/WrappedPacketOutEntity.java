@@ -103,34 +103,68 @@ public class WrappedPacketOutEntity extends WrappedPacket {
         }
     }
 
+    /**
+     * Get the pitch.
+     * @return Get Byte Pitch
+     */
     public byte getPitch() {
         return pitch;
     }
 
+    /**
+     * Get the Yaw.
+     * @return Get Byte Yaw
+     */
     public byte getYaw() {
         return yaw;
     }
 
-    public double getDeltaZ() {
-        return deltaZ;
-    }
-
-    public double getDeltaY() {
-        return deltaY;
-    }
-
+    /**
+     * Get the Delta X
+     * @return Delta X
+     */
     public double getDeltaX() {
         return deltaX;
     }
 
-    public Entity getEntity() {
-        return NMSUtils.getEntityById(entityID);
+    /**
+     * Get the Delta Y
+     * @return Delta Y
+     */
+    public double getDeltaY() {
+        return deltaY;
     }
 
+    /**
+     * Get the Delta Z
+     * @return Delta Z
+     */
+    public double getDeltaZ() {
+        return deltaZ;
+    }
+
+    /**
+     * Lookup the associated entity by the ID that was sent in the packet.
+     * @return Entity
+     */
+    public Entity getEntity() {
+        return NMSUtils.getEntityById(this.entityID);
+    }
+
+    /**
+     * Get the ID of the entity.
+     * If you do not want to use {@link #getEntity()},
+     * you lookup the entity by yourself with this entity ID.
+     * @return Entity ID
+     */
     public int getEntityId() {
         return entityID;
     }
 
+    /**
+     * Is the entity on the ground?
+     * @return On Ground
+     */
     public boolean isOnGround() {
         return onGround;
     }

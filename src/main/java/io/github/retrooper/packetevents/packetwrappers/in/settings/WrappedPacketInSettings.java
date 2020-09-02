@@ -112,28 +112,46 @@ public class WrappedPacketInSettings extends WrappedPacket {
 
     }
 
+    /**
+     * Get language client setting
+     * @return String Locale
+     */
     public String getLocale() {
         return locale;
     }
 
+    /**
+     * Get client view distance.
+     * @return View Distance
+     */
     public byte getViewDistance() {
         return viewDistance;
     }
 
+    /**
+     * Get Chat Visibility
+     * @return Chat Visibility
+     */
     public ChatVisibility getChatVisibility() {
         return chatVisibility;
     }
 
+    /**
+     * Is chat colors
+     * @return Chat Colors
+     */
     public boolean isChatColors() {
         return chatColors;
     }
 
     /**
+     * Get Displayed skin parts.
+     *
      * It is possible for some keys to not exist.
      * If that is the case, the server version is 1.7.10.
      * 1.7.10 only sends the cape skin part.
      *
-     * @return A map associating skin parts with whether or not they are enabled.
+     * @return A map with a Skin Parts as a key, and a boolean as a value.
      */
     @Nullable
     public HashMap<DisplayedSkinPart, Boolean> getDisplayedSkinPartsMap() {
@@ -141,11 +159,13 @@ public class WrappedPacketInSettings extends WrappedPacket {
     }
 
     /**
+     * Is the skin part enabled.
+     *
      * On 1.7.10, some skin parts will default to 'false' as 1.7.10
      * only sends the 'cape' skin part.
      *
      * @param part The skin part to check the status of.
-     * @return True if the specified skin part is enabled, otherwise false.
+     * @return Is the skin part enabled
      */
     public boolean isDisplaySkinPartEnabled(DisplayedSkinPart part) {
         //1.7.10, we will default the other skin parts to return false.
@@ -155,10 +175,16 @@ public class WrappedPacketInSettings extends WrappedPacket {
         return displayedSkinParts.get(part);
     }
 
+    /**
+     * Enum for the client chat visibility setting
+     */
     public enum ChatVisibility {
         ENABLED, COMMANDS_ONLY, HIDDEN
     }
 
+    /**
+     * Enum for the client displayed skin parts settings
+     */
     public enum DisplayedSkinPart {
         CAPE, JACKET, LEFT_SLEEVE, RIGHT_SLEEVE, LEFT_PANTS, RIGHT_PANTS, HAT
     }

@@ -50,6 +50,10 @@ public final class WrappedPacketInChat extends WrappedPacket {
         }
     }
 
+    /**
+     * Get the message.
+     * @return Chat Message
+     */
     public String getMessage() {
         return message;
     }

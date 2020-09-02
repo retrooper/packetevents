@@ -65,7 +65,12 @@ public final class EntityFinderUtils {
         }
     }
 
-    public static Entity getEntityByIdFast(final int id) {
+    /**
+     * Get an entity by their ID.
+     * @param id
+     * @return Entity
+     */
+    public static Entity getEntityById(final int id) {
         for (final World world : Bukkit.getWorlds()) {
             final Entity entity = getEntityByIdWithWorld(world, id);
             if (entity != null) {
@@ -75,24 +80,12 @@ public final class EntityFinderUtils {
         return  null;
     }
 
-    public static Entity getEntityById(final int id) {
-        Entity en  = getEntityByIdFast(id);
-        if(en != null) {
-            return en;
-        }
-        //System.out.println("Warning, we are iterating through all entities...");
-        //Not found, we are forced to iterate through all entities in the world.
-        for(World world : Bukkit.getWorlds()) {
-            for(Entity entity : world.getEntities()) {
-                if(entity.getEntityId() == id) {
-                    return entity;
-                }
-            }
-        }
-        //Entity by this ID does not exist
-        return null;
-    }
-
+    /**
+     * Get an entity by their ID, guaranteed to be in the specified world.
+     * @param world
+     * @param id
+     * @return Entity
+     */
     @Nullable
     public static Entity getEntityByIdWithWorld(final World world, final int id) {
         if (world == null) {

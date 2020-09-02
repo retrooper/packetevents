@@ -53,20 +53,38 @@ public class WrappedPacketInSteerVehicle extends WrappedPacket {
         }
     }
 
-    //Positive side value means left, negative means right
+    /**
+     * Get the side value.
+     *
+     * If positive, they are moving to the left, if negative, they are moving to the right.
+     * @return Side Value
+     */
     public float getSideValue() {
         return side;
     }
 
-    //Positive forward value means forward, negative is backwards
+    /**
+     * Get the forward value.
+     *
+     * If positive, they are moving forward, if negative, they are moving backwards.
+     * @return Forward Value
+     */
     public float getForwardValue() {
         return forward;
     }
 
+    /**
+     * Is a Jump
+     * @return Is Jump
+     */
     public boolean isJump() {
         return jump;
     }
 
+    /**
+     * Is an unmount
+     * @return Is Unmounting
+     */
     public boolean isUnmount() {
         return unmount;
     }

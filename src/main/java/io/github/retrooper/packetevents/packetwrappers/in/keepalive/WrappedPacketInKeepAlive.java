@@ -60,10 +60,11 @@ public final class WrappedPacketInKeepAlive extends WrappedPacket {
     }
 
     /**
-     * Optionally Cast this long to an integer if you are using 1.7.10 -&gt; 1.12.2!
-     * In 1.13.2 -&gt; 1.16.1 a long is sent
+     * Get the ID response from the client.
      *
-     * @return response is
+     * You may cast this down to an int if you are on 1.7.10 - 1.12.2.
+     * On 1.13.2 - 1.16.2 a long is sent.
+     * @return response ID
      */
     public long getId() {
         return id;

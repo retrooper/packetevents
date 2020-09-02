@@ -72,6 +72,10 @@ public final class WrappedPacketOutKickDisconnect extends WrappedPacket implemen
         }
     }
 
+    /**
+     * Get the kick message.
+     * @return Get Kick Message
+     */
     public String getKickMessage() {
         return kickMessage;
     }

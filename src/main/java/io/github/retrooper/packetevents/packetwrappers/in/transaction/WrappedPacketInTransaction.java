@@ -53,14 +53,26 @@ public final class WrappedPacketInTransaction extends WrappedPacket {
 
     }
 
+    /**
+     * Get the window ID.
+     * @return Window ID
+     */
     public int getWindowId() {
         return windowId;
     }
 
+    /**
+     * Get the action number.
+     * @return Action number
+     */
     public short getActionNumber() {
         return actionNumber;
     }
 
+    /**
+     * Is transaction accepted.
+     * @return Transaction Accepted
+     */
     public boolean isAccepted() {
         return accepted;
     }

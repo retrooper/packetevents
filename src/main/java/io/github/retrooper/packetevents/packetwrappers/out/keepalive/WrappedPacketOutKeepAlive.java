@@ -83,10 +83,12 @@ public class WrappedPacketOutKeepAlive extends WrappedPacket implements Sendable
     }
 
     /**
-     * You can cast this long to an integer if you are using 1.7.10 -&gt; 1.12.2!
-     * In 1.13.2 -&gt; 1.16.2 a long is sent
+     * Get the Keep Alive ID.
      *
-     * @return Keep Alive ID
+     * You may cast this down to an int if you are on 1.7.10 - 1.12.2.
+     * On 1.13.2 - 1.16.2 a long is sent.
+     *
+     * @return Get Keep Alive ID
      */
     public long getId() {
         return id;

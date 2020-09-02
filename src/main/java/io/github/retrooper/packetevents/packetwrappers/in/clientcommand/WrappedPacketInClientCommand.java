@@ -29,7 +29,6 @@ import io.github.retrooper.packetevents.packetwrappers.api.WrappedPacket;
 import io.github.retrooper.packetevents.reflectionutils.Reflection;
 import io.github.retrooper.packetevents.utils.NMSUtils;
 
-//TODO: Test on 1.9, 1.10, 1.11, 1.13, 1.14
 public final class WrappedPacketInClientCommand extends WrappedPacket {
     private static Class<?> packetClass;
     private static Class<?> enumClientCommandClass;
@@ -60,6 +59,10 @@ public final class WrappedPacketInClientCommand extends WrappedPacket {
         }
     }
 
+    /**
+     * Get the Client Command enum sent in the packet
+     * @return ClientCommand
+     */
     public ClientCommand getClientCommand() {
         return clientCommand;
     }

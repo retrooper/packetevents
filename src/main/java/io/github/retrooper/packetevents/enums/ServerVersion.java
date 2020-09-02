@@ -63,8 +63,6 @@ public enum ServerVersion {
         if (cachedVersion == null) {
             cachedVersion = getVersionNoCache();
         }
-        //WARNING TODO debug
-        System.out.println(cachedVersion.name());
         return cachedVersion;
     }
 

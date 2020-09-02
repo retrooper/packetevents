@@ -24,6 +24,9 @@
 
 package io.github.retrooper.packetevents.packetwrappers;
 
+/**
+ * This interface indicates that a packet wrapper supports being sent to a client.
+ */
 public interface Sendable {
     Object asNMSPacket();
 }

@@ -140,10 +140,6 @@ public final class NMSUtils {
         return "f";
     }
 
-    public static Entity getEntityByIdFast(final int id) {
-        return EntityFinderUtils.getEntityByIdFast(id);
-    }
-
     @Nullable
     public static Entity getEntityById(final int id) {
         return EntityFinderUtils.getEntityById(id);

@@ -255,10 +255,21 @@ public final class WrappedPacketOutChat extends WrappedPacket implements Sendabl
         return null;
     }
 
+    /**
+     * Get the message.
+     * @return Get String Message
+     */
     public String getMessage() {
         return this.message;
     }
 
+    /**
+     * Get the chat position.
+     *
+     * On 1.7.10, Only CHAT and SYSTEM_MESSAGE exist.
+     * If an invalid chat position is sent, it will be defaulted it to CHAT.
+     * @return ChatPosition
+     */
     public ChatPosition getChatPosition() {
         if(this.chatPosition == null) {
             this.chatPosition = ChatPosition.CHAT;

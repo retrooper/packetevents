@@ -37,24 +37,53 @@ import java.util.UUID;
 
 public final class PlayerUtils {
 
+    /**
+     * This map stores each player's client version.
+     */
     public final HashMap<UUID, ClientVersion> clientVersionsMap = new HashMap<UUID, ClientVersion>();
 
+    /**
+     * Get the player's ping.
+     * @param player
+     * @return Get Player Ping
+     */
     public int getPing(final Player player) {
         return NMSUtils.getPlayerPing(player);
     }
 
+    /**
+     * Get the client version by a UUID.
+     * @param uuid
+     * @return Get Client Version
+     */
     public ClientVersion getClientVersion(final UUID uuid) {
         return clientVersionsMap.get(uuid);
     }
 
+    /**
+     * Get the client version by a player object.
+     * @param player
+     * @return Get Client Version
+     */
     public ClientVersion getClientVersion(final Player player) {
         return getClientVersion(player.getUniqueId());
     }
 
+    /**
+     * Get the protocol version.
+     * @param player
+     * @return Get Protocol Version
+     */
     public int getProtocolVersion(Player player) {
         return VersionLookupUtils.getProtocolVersion(player);
     }
 
+    /**
+     * Inject a player.
+     *
+     * (This also calls the {@link io.github.retrooper.packetevents.event.impl.PlayerInjectEvent})
+     * @param player
+     */
     public void injectPlayer(final Player player) {
         if (PacketEvents.getSettings().isInjectAsync()) {
             NettyPacketHandler.injectPlayerAsync(player);
@@ -63,6 +92,10 @@ public final class PlayerUtils {
         }
     }
 
+    /**
+     * Use {@link #ejectPlayer(Player)}
+     * @param player
+     */
     @Deprecated
     public void uninjectPlayer(final Player player) {
         if (PacketEvents.getSettings().isUninjectAsync()) {
@@ -72,6 +105,11 @@ public final class PlayerUtils {
         }
     }
 
+    /**
+     * Eject a player.
+     * (This also calls the {@link io.github.retrooper.packetevents.event.impl.PlayerUninjectEvent})
+     * @param player
+     */
     public void ejectPlayer(final Player player) {
         if (PacketEvents.getSettings().isUninjectAsync()) {
             NettyPacketHandler.ejectPlayerAsync(player);
@@ -80,10 +118,20 @@ public final class PlayerUtils {
         }
     }
 
+    /**
+     * Send a {@link Sendable} wrapper to a player.
+     * @param player
+     * @param sendable
+     */
     public void sendPacket(final Player player, final Sendable sendable) {
         NMSUtils.sendSendableWrapper(player, sendable);
     }
 
+    /**
+     * Send a raw NMS packet to a player.
+     * @param player
+     * @param nmsPacket
+     */
     public void sendNMSPacket(final Player player, Object nmsPacket) {
         NMSUtils.sendNMSPacket(player, nmsPacket);
     }
