@@ -30,7 +30,7 @@ import org.bukkit.entity.Player;
 
 public class VersionLookupUtils {
 
-    private static byte protocolAccessMode;
+    private static byte protocolAccessMode = -2;
 
     public static void load() {
         protocolAccessMode = (byte) (ViaUtils.isAvailable() ?
@@ -38,8 +38,13 @@ public class VersionLookupUtils {
                 1 : ProtocolLibUtils.isAvailable() ?
                 2 : PacketEvents.getAPI().getServerUtils().getVersion() == ServerVersion.v_1_7_10 ?
                 3 : -1);
-
     }
+
+    public static boolean hasLoaded() {
+        return protocolAccessMode != -2;
+    }
+
+
 
     /**
      * If ViaVersion is present, we get the protocol version with the ViaVersion API.

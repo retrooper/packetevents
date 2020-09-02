@@ -36,7 +36,6 @@ public enum ClientVersion {
 
     private static final Map<Integer, ClientVersion> VERSION_LOOKUP = new HashMap<Integer, ClientVersion>();
 
-
     public static void prepareLookUp() {
         VERSION_LOOKUP.put(-1, ACCESS_FAILURE);
         VERSION_LOOKUP.put(1, LESS_THAN_V_1_7_10);

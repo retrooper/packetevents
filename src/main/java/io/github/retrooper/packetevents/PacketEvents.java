@@ -90,9 +90,6 @@ public final class PacketEvents implements Listener {
 
         EntityFinderUtils.load();
 
-
-
-        VersionLookupUtils.load();
         ClientVersion.prepareLookUp();
 
         WrappedPacket.loadAllWrappers();
@@ -142,7 +139,7 @@ public final class PacketEvents implements Listener {
     public static void stop() {
         if (hasStarted) {
             for (final Player p : Bukkit.getOnlinePlayers()) {
-                getAPI().getPlayerUtils().uninjectPlayer(p);
+                getAPI().getPlayerUtils().ejectPlayer(p);
             }
             getAPI().getEventManager().unregisterAllListeners();
         }
@@ -179,9 +176,12 @@ public final class PacketEvents implements Listener {
 
     @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
     public void onJoin(final PlayerJoinEvent e) {
-        PacketEvents.getAPI().getPlayerUtils().injectPlayer(e.getPlayer());
+        if(!VersionLookupUtils.hasLoaded()) {
+            VersionLookupUtils.load();
+        }
         ClientVersion version = ClientVersion.fromProtocolVersion(VersionLookupUtils.getProtocolVersion(e.getPlayer()));
         PacketEvents.getAPI().getPlayerUtils().clientVersionsMap.put(e.getPlayer().getUniqueId(), version);
+        PacketEvents.getAPI().getPlayerUtils().injectPlayer(e.getPlayer());
     }
 
     @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)

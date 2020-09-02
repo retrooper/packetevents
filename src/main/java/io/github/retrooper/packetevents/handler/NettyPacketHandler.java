@@ -49,7 +49,7 @@ public class NettyPacketHandler {
 
     /**
      * Synchronously inject a player
-     * @param player
+     * @param player Target player to inject
      */
     public static void injectPlayer(final Player player) {
         try {

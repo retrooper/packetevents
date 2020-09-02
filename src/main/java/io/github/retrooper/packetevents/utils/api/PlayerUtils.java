@@ -66,7 +66,7 @@ public final class PlayerUtils {
      * @return Get Client Version
      */
     public ClientVersion getClientVersion(final Player player) {
-        return getClientVersion(player.getUniqueId());
+        return clientVersionsMap.get(player.getUniqueId());
     }
 
     /**

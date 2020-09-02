@@ -25,11 +25,7 @@
 package io.github.retrooper.packetevents.example;
 
 import io.github.retrooper.packetevents.PacketEvents;
-import io.github.retrooper.packetevents.annotations.PacketHandler;
-import io.github.retrooper.packetevents.enums.ClientVersion;
-import io.github.retrooper.packetevents.event.CancellableEvent;
 import io.github.retrooper.packetevents.event.PacketListener;
-import io.github.retrooper.packetevents.event.impl.PlayerInjectEvent;
 import org.bukkit.plugin.java.JavaPlugin;
 
 public class MainExample extends JavaPlugin implements PacketListener {
@@ -39,38 +35,17 @@ public class MainExample extends JavaPlugin implements PacketListener {
         PacketEvents.load();
     }
 
-    //TODO
-    //registering a packet listener now gets declared methods
-    //packetevents has been fully documented
-    //PacketEvents.getAPI().getPlayerUtils().ejectPlayer(Player) RENAME, DEPRECATION OF OLD METHOD
-    //
     @Override
     public void onEnable() {
         //Deprecated, as it is no longer needed
-        //PacketEvents.getSettings().setIdentifier("packetevents_api");
+        PacketEvents.getSettings().setIdentifier("official_api");
 
         PacketEvents.init(this);
         PacketEvents.getAPI().getEventManager().registerListener(this);
-
-        System.out.println("Server Version: " + PacketEvents.getAPI().getServerUtils().getVersion());
-        System.out.println("Server Platform: " + PacketEvents.getAPI().getServerUtils().getOperatingSystem());
     }
 
     @Override
     public void onDisable() {
         PacketEvents.stop();
     }
-    @PacketHandler
-    public void onInject(PlayerInjectEvent e) {
-        if(e.isAsync()) {
-            System.out.println("ASYNC injection");
-        }
-        else {
-            System.out.println("SYNC injection");
-            ClientVersion version = PacketEvents.getAPI().getPlayerUtils().getClientVersion(e.getPlayer());
-            System.out.println("ClientVersion: " + version.name());
-        }
-    }
-
-
 }
