@@ -37,7 +37,8 @@ import java.util.concurrent.Future;
 
 public class NettyPacketHandler {
     private static boolean v1_7_nettyMode = false;
-    private static final ExecutorService executorService = Executors.newCachedThreadPool();
+    private static final ExecutorService cachedThreadPoolExecutor = Executors.newCachedThreadPool();
+    private static final ExecutorService singleThreadedExecutor = Executors.newSingleThreadExecutor();
 
     static {
         try {
@@ -73,7 +74,7 @@ public class NettyPacketHandler {
      * @return {@link java.util.concurrent.Future}
      */
     public static Future<?> injectPlayerAsync(final Player player) {
-        return executorService.submit(() -> {
+        return cachedThreadPoolExecutor.submit(() -> {
             try {
                 final PlayerInjectEvent injectEvent = new PlayerInjectEvent(player, true);
                 PacketEvents.getAPI().getEventManager().callEvent(injectEvent);
@@ -116,7 +117,7 @@ public class NettyPacketHandler {
      * @return {@link java.util.concurrent.Future}
      */
     public static Future<?> ejectPlayerAsync(final Player player) {
-        return executorService.submit(() -> {
+        return cachedThreadPoolExecutor.submit(() -> {
             try {
                 final PlayerUninjectEvent uninjectEvent = new PlayerUninjectEvent(player, true);
                 PacketEvents.getAPI().getEventManager().callEvent(uninjectEvent);
@@ -140,12 +141,19 @@ public class NettyPacketHandler {
      * @return
      */
     public static Object write(final Player sender, final Object packet) {
-        final PacketSendEvent packetSendEvent = new PacketSendEvent(sender, packet);
-        PacketEvents.getAPI().getEventManager().callEvent(packetSendEvent);
-        if (!packetSendEvent.isCancelled()) {
-            return packet;
-        }
-        return null;
+        final Object[] returningPacket = new Object[1];
+        singleThreadedExecutor.submit(new Runnable() {
+            @Override
+            public void run() {
+                final PacketSendEvent packetSendEvent = new PacketSendEvent(sender, packet);
+                PacketEvents.getAPI().getEventManager().callEvent(packetSendEvent);
+                if (!packetSendEvent.isCancelled()) {
+                    returningPacket[0] = packet;
+                }
+                returningPacket[0] = null;
+            }
+        });
+        return returningPacket[0];
     }
 
     /**
@@ -155,11 +163,18 @@ public class NettyPacketHandler {
      * @return
      */
     public static Object read(final Player receiver, final Object packet) {
-        final PacketReceiveEvent packetReceiveEvent = new PacketReceiveEvent(receiver, packet);
-        PacketEvents.getAPI().getEventManager().callEvent(packetReceiveEvent);
-        if (!packetReceiveEvent.isCancelled()) {
-            return packet;
-        }
-        return null;
+        final Object[] returningPacket = new Object[1];
+       singleThreadedExecutor.submit(new Runnable() {
+           @Override
+           public void run() {
+               final PacketReceiveEvent packetReceiveEvent = new PacketReceiveEvent(receiver, packet);
+               PacketEvents.getAPI().getEventManager().callEvent(packetReceiveEvent);
+               if (!packetReceiveEvent.isCancelled()) {
+                   returningPacket[0] = packet;
+               }
+               returningPacket[0] = null;
+           }
+       });
+       return returningPacket[0];
     }
 }
