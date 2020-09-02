@@ -37,7 +37,6 @@ import java.util.concurrent.Future;
 
 public class NettyPacketHandler {
     private static boolean v1_7_nettyMode = false;
-    private static final ExecutorService cachedThreadPoolExecutor = Executors.newCachedThreadPool();
     private static final ExecutorService singleThreadedExecutor = Executors.newSingleThreadExecutor();
 
     static {
@@ -50,6 +49,7 @@ public class NettyPacketHandler {
 
     /**
      * Synchronously inject a player
+     *
      * @param player Target player to inject
      */
     public static void injectPlayer(final Player player) {
@@ -70,11 +70,12 @@ public class NettyPacketHandler {
 
     /**
      * Asynchronously inject a player
+     *
      * @param player
      * @return {@link java.util.concurrent.Future}
      */
     public static Future<?> injectPlayerAsync(final Player player) {
-        return cachedThreadPoolExecutor.submit(() -> {
+        return singleThreadedExecutor.submit(() -> {
             try {
                 final PlayerInjectEvent injectEvent = new PlayerInjectEvent(player, true);
                 PacketEvents.getAPI().getEventManager().callEvent(injectEvent);
@@ -93,6 +94,7 @@ public class NettyPacketHandler {
 
     /**
      * Synchronously eject a player.
+     *
      * @param player
      */
     public static void ejectPlayer(final Player player) {
@@ -113,11 +115,12 @@ public class NettyPacketHandler {
 
     /**
      * Asynchronously eject a player
+     *
      * @param player
      * @return {@link java.util.concurrent.Future}
      */
     public static Future<?> ejectPlayerAsync(final Player player) {
-        return cachedThreadPoolExecutor.submit(() -> {
+        return singleThreadedExecutor.submit(() -> {
             try {
                 final PlayerUninjectEvent uninjectEvent = new PlayerUninjectEvent(player, true);
                 PacketEvents.getAPI().getEventManager().callEvent(uninjectEvent);
@@ -136,45 +139,35 @@ public class NettyPacketHandler {
 
     /**
      * This function is called each time the server plans to send a packet to the client.
+     *
      * @param sender
      * @param packet
      * @return
      */
     public static Object write(final Player sender, final Object packet) {
-        final Object[] returningPacket = new Object[1];
-        singleThreadedExecutor.submit(new Runnable() {
-            @Override
-            public void run() {
-                final PacketSendEvent packetSendEvent = new PacketSendEvent(sender, packet);
-                PacketEvents.getAPI().getEventManager().callEvent(packetSendEvent);
-                if (!packetSendEvent.isCancelled()) {
-                    returningPacket[0] = packet;
-                }
-                returningPacket[0] = null;
-            }
-        });
-        return returningPacket[0];
+        final PacketSendEvent packetSendEvent = new PacketSendEvent(sender, packet);
+        PacketEvents.getAPI().getEventManager().callEvent(packetSendEvent);
+        if (!packetSendEvent.isCancelled()) {
+            return packet;
+        }
+        return null;
     }
+
 
     /**
      * This function is called each time the server receives a packet from the client.
+     *
      * @param receiver
      * @param packet
      * @return
      */
     public static Object read(final Player receiver, final Object packet) {
-        final Object[] returningPacket = new Object[1];
-       singleThreadedExecutor.submit(new Runnable() {
-           @Override
-           public void run() {
-               final PacketReceiveEvent packetReceiveEvent = new PacketReceiveEvent(receiver, packet);
-               PacketEvents.getAPI().getEventManager().callEvent(packetReceiveEvent);
-               if (!packetReceiveEvent.isCancelled()) {
-                   returningPacket[0] = packet;
-               }
-               returningPacket[0] = null;
-           }
-       });
-       return returningPacket[0];
+        final PacketReceiveEvent packetReceiveEvent = new PacketReceiveEvent(receiver, packet);
+        PacketEvents.getAPI().getEventManager().callEvent(packetReceiveEvent);
+        if (!packetReceiveEvent.isCancelled()) {
+            return packet;
+        }
+        return null;
     }
+
 }
