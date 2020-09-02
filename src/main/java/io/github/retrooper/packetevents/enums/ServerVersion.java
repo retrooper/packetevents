@@ -1,30 +1,32 @@
-/**
-MIT License
+/*
+ * MIT License
+ *
+ * Copyright (c) 2020 retrooper
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
 
-Copyright (c) 2020 retrooper
-
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
-*/
 package io.github.retrooper.packetevents.enums;
 
 import io.github.retrooper.packetevents.PacketEvents;
 import org.bukkit.Bukkit;
+import org.bukkit.Server;
 
 /**
  * @author retrooper
@@ -38,14 +40,13 @@ public enum ServerVersion {
     v_1_16_2, ERROR, EMPTY;
 
     private static final String nmsVersionSuffix = Bukkit.getServer().getClass().getPackage().getName().replace(".", ",").split(",")[3];
-    public static ServerVersion[] reversedValues;
+    public static ServerVersion[] reversedValues = new ServerVersion[values().length];
     private static ServerVersion cachedVersion;
 
-    public static void load() {
-        reversedValues = ServerVersion.reverse(values());
-    }
-
     private static ServerVersion getVersionNoCache() {
+        if(reversedValues[0] == null) {
+            reversedValues = ServerVersion.reverse(values());
+        }
         for (final ServerVersion val : reversedValues) {
             String valName = val.name().substring(2).replace("_", ".");
             if (Bukkit.getBukkitVersion().contains(valName)) {
@@ -62,6 +63,8 @@ public enum ServerVersion {
         if (cachedVersion == null) {
             cachedVersion = getVersionNoCache();
         }
+        //WARNING TODO debug
+        System.out.println(cachedVersion.name());
         return cachedVersion;
     }
 

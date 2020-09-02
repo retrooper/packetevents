@@ -1,26 +1,27 @@
-/**
-MIT License
+/*
+ * MIT License
+ *
+ * Copyright (c) 2020 retrooper
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
 
-Copyright (c) 2020 retrooper
-
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
-*/
 package io.github.retrooper.packetevents.event.impl;
 
 import io.github.retrooper.packetevents.event.CancellableEvent;
@@ -28,6 +29,9 @@ import io.github.retrooper.packetevents.event.PacketEvent;
 import io.github.retrooper.packetevents.packet.PacketType;
 import org.bukkit.entity.Player;
 
+/**
+ * This event is called each time a packet is received from a client.
+ */
 public final class PacketReceiveEvent extends PacketEvent implements CancellableEvent {
     private final Player player;
     private final Object packet;
@@ -39,8 +43,7 @@ public final class PacketReceiveEvent extends PacketEvent implements Cancellable
     }
 
     /**
-     * Get the player sending the packet
-     *
+     * Get the packet sender
      * @return player
      */
     public Player getPlayer() {
@@ -49,9 +52,8 @@ public final class PacketReceiveEvent extends PacketEvent implements Cancellable
 
     /**
      * Get the packet's name (NMS packet class simple name).
-     *
      * @return Name of the packet
-     * @deprecated It is recommended not to use this, it is an expensive method to call.
+     * @deprecated It is recommended not to use this.
      */
     @Deprecated
     public String getPacketName() {
@@ -59,8 +61,7 @@ public final class PacketReceiveEvent extends PacketEvent implements Cancellable
     }
 
     /**
-     * Get the NMS packet object
-     *
+     * Get the raw packet object
      * @return packet object
      */
     public Object getNMSPacket() {
@@ -69,8 +70,7 @@ public final class PacketReceiveEvent extends PacketEvent implements Cancellable
 
     /**
      * Get the class of the NMS packet object
-     * Deprecated, as it is useless, rather use getNMSPacket().getClass()
-     *
+     * @deprecated It is useless, rather use getNMSPacket().getClass()
      * @return packet object class
      */
     @Deprecated
@@ -80,7 +80,6 @@ public final class PacketReceiveEvent extends PacketEvent implements Cancellable
 
     /**
      * Get the ID of the packet
-     *
      * @return packet id
      */
     public byte getPacketId() {

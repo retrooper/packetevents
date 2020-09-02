@@ -1,26 +1,27 @@
-/**
-MIT License
+/*
+ * MIT License
+ *
+ * Copyright (c) 2020 retrooper
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
 
-Copyright (c) 2020 retrooper
-
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
-*/
 package io.github.retrooper.packetevents.enums;
 
 import io.github.retrooper.packetevents.PacketEvents;
@@ -34,6 +35,7 @@ public enum ClientVersion {
     v_1_15, v_1_15_1, v_1_15_2, v_1_16, v_1_16_PRE_1, v_1_16_PRE_2, v_1_16_PRE_3, v_1_16_PRE_4, v_1_16_PRE_5, v_1_16_PRE_6, v_1_16_PRE_7, v_1_16_PRE_8, v_1_16_RC_1, v_1_16_1, v_1_16_2, HIGHER_THAN_V_1_16_2, INVALID, ACCESS_FAILURE;
 
     private static final Map<Integer, ClientVersion> VERSION_LOOKUP = new HashMap<Integer, ClientVersion>();
+
 
     public static void prepareLookUp() {
         VERSION_LOOKUP.put(-1, ACCESS_FAILURE);
@@ -85,7 +87,7 @@ public enum ClientVersion {
         VERSION_LOOKUP.put(737, v_1_16_2);
     }
 
-    public static ClientVersion fromProtocolVersion(short protocolVersion) {
+    public static ClientVersion fromProtocolVersion(int protocolVersion) {
         if (protocolVersion == -1 && PacketEvents.getSettings().doAutoResolveClientProtocolVersion()) {
             protocolVersion = ServerVersion.getVersion().toProtocolVersion();
         }

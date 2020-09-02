@@ -6,7 +6,7 @@
 
     <groupId>io.github.retrooper</groupId>
     <artifactId>packetevents</artifactId>
-    <version>1.6.3</version>
+    <version>1.6.5</version>
 
     <!-- You can build the project with this: "mvn clean compile assembly:single" -->
     <build>

@@ -1,26 +1,27 @@
-/**
-MIT License
+/*
+ * MIT License
+ *
+ * Copyright (c) 2020 retrooper
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
 
-Copyright (c) 2020 retrooper
-
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
-*/
 package io.github.retrooper.packetevents.packetwrappers.in.blockdig;
 
 import io.github.retrooper.packetevents.enums.Direction;
@@ -102,36 +103,48 @@ public final class WrappedPacketInBlockDig extends WrappedPacket {
         this.digType = enumDigType;
     }
 
+    public int getBlockPositionX() {
+        return blockPosition.x;
+    }
+
+    public int getBlockPositionY() {
+        return blockPosition.y;
+    }
+
+    public int getBlockPositionZ() {
+        return blockPosition.z;
+    }
+
     public Vector3i getBlockPosition() {
         return blockPosition;
     }
 
+    /**
+     * Get the direction
+     * Is Direction.NULL on 1.7.10 FOR NOW
+     * @return Direction
+     */
     public Direction getDirection() {
         return direction;
     }
 
+    /**
+     * Get the PlayerDigType enum sent in this packet.
+     * @return Dig Type
+     */
     public PlayerDigType getDigType() {
         return digType;
     }
 
     public enum PlayerDigType {
-
         START_DESTROY_BLOCK,
-
         ABORT_DESTROY_BLOCK,
-
         STOP_DESTROY_BLOCK,
-
         DROP_ALL_ITEMS,
-
         DROP_ITEM,
-
         RELEASE_USE_ITEM,
-
         SWAP_HELD_ITEMS,
-
         SWAP_ITEM_WITH_OFFHAND,
-
         WRONG_PACKET
     }
 

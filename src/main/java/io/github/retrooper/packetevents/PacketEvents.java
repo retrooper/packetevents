@@ -1,26 +1,27 @@
-/**
-MIT License
+/*
+ * MIT License
+ *
+ * Copyright (c) 2020 retrooper
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
 
-Copyright (c) 2020 retrooper
-
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
-*/
 package io.github.retrooper.packetevents;
 
 import io.github.retrooper.packetevents.api.PacketEventsAPI;
@@ -46,25 +47,36 @@ import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.plugin.Plugin;
 
-public final class PacketEvents implements PacketListener, Listener {
+import java.util.ArrayList;
 
+public final class PacketEvents implements Listener {
     private static final PacketEventsAPI packetEventsAPI = new PacketEventsAPI();
     private static final PacketEvents instance = new PacketEvents();
     private static final PacketEventsSettings settings = new PacketEventsSettings();
-    private static Plugin plugin;
+    private static final ArrayList<Plugin> plugins = new ArrayList<Plugin>(1);
     private static boolean hasLoaded, hasStarted;
 
     /**
-     * Call this before start()
+     * This loads the PacketEvents API.
      *
-     * Recommended on your onLoad() Bukkit Method
+     * ServerVersion:
+     * In this method we detect and cache the server version.
+     *
+     * NMSUtils:
+     * We setup some NMS utilities.
+     *
+     * Packet ID System:
+     * All the packet classes we will be needing are cached in a Map with an integer ID.
+     *
+     * Version Lookup Utils:
+     * We setup the client protocol version system.
+     * We check if ViaVersion, ProtocolSupport or ProtocolLib is present.
+     *
+     * Wrappers:
+     * All PacketEvents' wrappers are setup and do all loading they need to do.
+     *
      */
     public static void load() {
-        //SERVER VERSION LOADING
-
-        //Server Version loading
-        ServerVersion.load();
-
         ServerVersion version = ServerVersion.getVersion();
         WrappedPacket.version = version;
         PacketEvent.version = version;
@@ -88,7 +100,14 @@ public final class PacketEvents implements PacketListener, Listener {
     }
 
     /**
-     * Loads PacketEvents if you haven't already, Sets everything up, injects all players
+     * Initiates PacketEvents
+     *
+     * Loading:
+     * Loads PacketEvents if you haven't already.
+     *
+     * Registering:
+     * Registers this class as a Bukkit listener to inject/uninject players.
+     *
      * @param pl JavaPlugin instance
      */
     public static void init(final Plugin pl) {
@@ -96,11 +115,9 @@ public final class PacketEvents implements PacketListener, Listener {
             load();
         }
         if (!hasStarted) {
-            plugin = pl;
-            //Register Bukkit and PacketListener
-            PacketEvents.getAPI().getEventManager().registerListener(instance);
-
-            Bukkit.getPluginManager().registerEvents(instance, plugin);
+            plugins.add(pl);
+            //Register Bukkit listener
+            Bukkit.getPluginManager().registerEvents(instance, plugins.get(0));
 
             for (final Player p : Bukkit.getOnlinePlayers()) {
                 getAPI().getPlayerUtils().injectPlayer(p);
@@ -120,7 +137,7 @@ public final class PacketEvents implements PacketListener, Listener {
     }
 
     /**
-     * Stop all tasks and unregisters all PacketEvents' listeners
+     *
      */
     public static void stop() {
         if (hasStarted) {
@@ -128,9 +145,6 @@ public final class PacketEvents implements PacketListener, Listener {
                 getAPI().getPlayerUtils().uninjectPlayer(p);
             }
             getAPI().getEventManager().unregisterAllListeners();
-
-            PacketType.Client.packetIds.clear();
-            PacketType.Server.packetIds.clear();
         }
     }
 
@@ -146,8 +160,13 @@ public final class PacketEvents implements PacketListener, Listener {
         return packetEventsAPI;
     }
 
+    @Deprecated
     public static Plugin getPlugin() {
-        return plugin;
+        return plugins.get(0);
+    }
+
+    public static ArrayList<Plugin> getPlugins() {
+        return plugins;
     }
 
     public static String getHandlerName(final String name) {
@@ -160,20 +179,21 @@ public final class PacketEvents implements PacketListener, Listener {
 
     @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
     public void onJoin(final PlayerJoinEvent e) {
-        getAPI().getPlayerUtils().injectPlayer(e.getPlayer());
-        getAPI().getPlayerUtils().setClientVersion(e.getPlayer(), ClientVersion.fromProtocolVersion((short) VersionLookupUtils.getProtocolVersion(e.getPlayer())));
+        PacketEvents.getAPI().getPlayerUtils().injectPlayer(e.getPlayer());
+        ClientVersion version = ClientVersion.fromProtocolVersion(VersionLookupUtils.getProtocolVersion(e.getPlayer()));
+        PacketEvents.getAPI().getPlayerUtils().clientVersionsMap.put(e.getPlayer().getUniqueId(), version);
     }
 
     @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
     public void onQuit(final PlayerQuitEvent e) {
-        getAPI().getPlayerUtils().clearClientVersion(e.getPlayer());
-        getAPI().getPlayerUtils().uninjectPlayer(e.getPlayer());
+        PacketEvents.getAPI().getPlayerUtils().ejectPlayer(e.getPlayer());
+        PacketEvents.getAPI().getPlayerUtils().clientVersionsMap.remove(e.getPlayer().getUniqueId());
     }
 
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     public void onMove(final PlayerMoveEvent e) {
         BukkitMoveEvent moveEvent = new BukkitMoveEvent(e);
-        getAPI().getEventManager().callEvent(moveEvent);
+        PacketEvents.getAPI().getEventManager().callEvent(moveEvent);
         e.setCancelled(moveEvent.isCancelled());
     }
 

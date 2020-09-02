@@ -1,33 +1,33 @@
-/**
-MIT License
+/*
+ * MIT License
+ *
+ * Copyright (c) 2020 retrooper
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
 
-Copyright (c) 2020 retrooper
-
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
-*/
 package io.github.retrooper.packetevents.packet;
 
 import java.util.HashMap;
 import java.util.Map;
 
 public class PacketType {
-
     public static class Client {
         public static final Map<Class<?>, Byte> packetIds = new HashMap<Class<?>, Byte>();
         public static final byte TELEPORT_ACCEPT = 0,
@@ -95,11 +95,16 @@ public class PacketType {
         }
 
         public static class Util {
-            public static boolean isInstanceOfFlying(final byte packetId) {
-                return packetId == FLYING
-                        || packetId == POSITION
-                        || packetId == POSITION_LOOK
-                        || packetId == LOOK;
+            /**
+             * Is the packet an instance of the PacketPlayInFlying packet?
+             * @param packetID
+             * @return packetID == FLYING or POSITION or POSITION_LOOK or LOOK
+             */
+            public static boolean isInstanceOfFlying(final byte packetID) {
+                return packetID == FLYING
+                        || packetID == POSITION
+                        || packetID == POSITION_LOOK
+                        || packetID == LOOK;
             }
         }
     }
@@ -156,6 +161,7 @@ public class PacketType {
             packetIds.put(PacketTypeClasses.Server.WINDOW_ITEMS, WINDOW_ITEMS);
             packetIds.put(PacketTypeClasses.Server.WINDOW_DATA, WINDOW_DATA);
             packetIds.put(PacketTypeClasses.Server.SET_SLOT, SET_SLOT);
+            packetIds.put(PacketTypeClasses.Server.SET_COOLDOWN, SET_COOLDOWN);
             packetIds.put(PacketTypeClasses.Server.CUSTOM_PAYLOAD, CUSTOM_PAYLOAD);
             packetIds.put(PacketTypeClasses.Server.CUSTOM_SOUND_EFFECT, CUSTOM_SOUND_EFFECT);
             packetIds.put(PacketTypeClasses.Server.KICK_DISCONNECT, KICK_DISCONNECT);
@@ -166,6 +172,7 @@ public class PacketType {
             packetIds.put(PacketTypeClasses.Server.OPEN_WINDOW_HORSE, OPEN_WINDOW_HORSE);
             packetIds.put(PacketTypeClasses.Server.KEEP_ALIVE, KEEP_ALIVE);
             packetIds.put(PacketTypeClasses.Server.MAP_CHUNK, MAP_CHUNK);
+            packetIds.put(PacketTypeClasses.Server.WORLD_EVENT, WORLD_EVENT);
             packetIds.put(PacketTypeClasses.Server.WORLD_EVENT, SPAWN_ENTITY);
             packetIds.put(PacketTypeClasses.Server.WORLD_PARTICLES, WORLD_PARTICLES);
             packetIds.put(PacketTypeClasses.Server.LIGHT_UPDATE, LIGHT_UPDATE);
@@ -228,9 +235,14 @@ public class PacketType {
         }
 
         public static class Util {
-            public static boolean isInstanceOfEntity(final byte packetId) {
-                return packetId == ENTITY || packetId == REL_ENTITY_MOVE ||
-                        packetId == REL_ENTITY_MOVE_LOOK || packetId == ENTITY_LOOK;
+            /**
+             * Is the packet an instance of the PacketPlayOutEntity packet?
+             * @param packetID
+             * @return packetID == ENTITY or REL_ENTITY_MOVE or REL_ENTITY_MOVE_LOOK or ENTITY_LOOK
+             */
+            public static boolean isInstanceOfEntity(final byte packetID) {
+                return packetID == ENTITY || packetID == REL_ENTITY_MOVE ||
+                        packetID == REL_ENTITY_MOVE_LOOK || packetID == ENTITY_LOOK;
             }
         }
     }

@@ -1,26 +1,27 @@
-/**
-MIT License
+/*
+ * MIT License
+ *
+ * Copyright (c) 2020 retrooper
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
 
-Copyright (c) 2020 retrooper
-
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
-*/
 package io.github.retrooper.packetevents.handler;
 
 import io.github.retrooper.packetevents.PacketEvents;
@@ -46,6 +47,10 @@ public class NettyPacketHandler {
         }
     }
 
+    /**
+     * Synchronously inject a player
+     * @param player
+     */
     public static void injectPlayer(final Player player) {
         try {
             final PlayerInjectEvent injectEvent = new PlayerInjectEvent(player);
@@ -62,6 +67,11 @@ public class NettyPacketHandler {
         }
     }
 
+    /**
+     * Asynchronously inject a player
+     * @param player
+     * @return {@link java.util.concurrent.Future}
+     */
     public static Future<?> injectPlayerAsync(final Player player) {
         return executorService.submit(() -> {
             try {
@@ -80,15 +90,19 @@ public class NettyPacketHandler {
         });
     }
 
-    public static void uninjectPlayer(final Player player) {
+    /**
+     * Synchronously eject a player.
+     * @param player
+     */
+    public static void ejectPlayer(final Player player) {
         try {
             final PlayerUninjectEvent uninjectEvent = new PlayerUninjectEvent(player);
             PacketEvents.getAPI().getEventManager().callEvent(uninjectEvent);
             if (!uninjectEvent.isCancelled()) {
                 if (v1_7_nettyMode) {
-                    NettyPacketHandler_7.uninjectPlayer(player);
+                    NettyPacketHandler_7.ejectPlayer(player);
                 } else {
-                    NettyPacketHandler_8.uninjectPlayer(player);
+                    NettyPacketHandler_8.ejectPlayer(player);
                 }
             }
         } catch (Exception ignored) {
@@ -96,16 +110,21 @@ public class NettyPacketHandler {
         }
     }
 
-    public static Future<?> uninjectPlayerAsync(final Player player) {
+    /**
+     * Asynchronously eject a player
+     * @param player
+     * @return {@link java.util.concurrent.Future}
+     */
+    public static Future<?> ejectPlayerAsync(final Player player) {
         return executorService.submit(() -> {
             try {
                 final PlayerUninjectEvent uninjectEvent = new PlayerUninjectEvent(player, true);
                 PacketEvents.getAPI().getEventManager().callEvent(uninjectEvent);
                 if (!uninjectEvent.isCancelled()) {
                     if (v1_7_nettyMode) {
-                        NettyPacketHandler_7.uninjectPlayer(player);
+                        NettyPacketHandler_7.ejectPlayer(player);
                     } else {
-                        NettyPacketHandler_8.uninjectPlayer(player);
+                        NettyPacketHandler_8.ejectPlayer(player);
                     }
                 }
             } catch (Exception ignored) {
@@ -114,6 +133,12 @@ public class NettyPacketHandler {
         });
     }
 
+    /**
+     * This function is called each time the server plans to send a packet to the client.
+     * @param sender
+     * @param packet
+     * @return
+     */
     public static Object write(final Player sender, final Object packet) {
         final PacketSendEvent packetSendEvent = new PacketSendEvent(sender, packet);
         PacketEvents.getAPI().getEventManager().callEvent(packetSendEvent);
@@ -123,6 +148,12 @@ public class NettyPacketHandler {
         return null;
     }
 
+    /**
+     * This function is called each time the server receives a packet from the client.
+     * @param receiver
+     * @param packet
+     * @return
+     */
     public static Object read(final Player receiver, final Object packet) {
         final PacketReceiveEvent packetReceiveEvent = new PacketReceiveEvent(receiver, packet);
         PacketEvents.getAPI().getEventManager().callEvent(packetReceiveEvent);
