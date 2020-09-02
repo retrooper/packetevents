@@ -90,7 +90,7 @@ public final class WrappedPacketOutEntityVelocity extends WrappedPacket implemen
         try {
             //ENTITY ID
             this.entityId = Reflection.getField(velocityClass, int.class, 0).getInt(packet);
-            System.out.println("entity id: " + entityId);
+            //System.out.println("entity id: " + entityId);
 
             int x = Reflection.getField(velocityClass, int.class, 1).getInt(packet);
             int y = Reflection.getField(velocityClass, int.class, 2).getInt(packet);

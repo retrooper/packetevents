@@ -50,9 +50,10 @@ public enum ServerVersion {
             String valName = val.name().substring(2).replace("_", ".");
             if (Bukkit.getBukkitVersion().contains(valName)) {
                 return val;
-            } else if (PacketEvents.getSettings().getDefaultServerVersion() != null) {
-                return PacketEvents.getSettings().getDefaultServerVersion();
             }
+        }
+        if(PacketEvents.getSettings().getDefaultServerVersion() != null) {
+            return PacketEvents.getSettings().getDefaultServerVersion();
         }
         return ERROR;
     }
