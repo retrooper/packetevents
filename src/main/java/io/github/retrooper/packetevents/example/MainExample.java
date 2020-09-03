@@ -45,21 +45,11 @@ public class MainExample extends JavaPlugin implements PacketListener {
         PacketEvents.getSettings().setIdentifier("official_api");
 
         PacketEvents.init(this);
-        PacketEvents.getAPI().getEventManager().registerListener(this);
+      //  PacketEvents.getAPI().getEventManager().registerListener(this);
     }
 
     @Override
     public void onDisable() {
         PacketEvents.stop();
-    }
-
-    @PacketHandler
-    public void onUseEntity(PacketReceiveEvent e) {
-        if(e.getPacketId() == PacketType.Client.USE_ENTITY) {
-            WrappedPacketInUseEntity useEntity = new WrappedPacketInUseEntity(e.getNMSPacket());
-            if(useEntity.getAction() == WrappedPacketInUseEntity.EntityUseAction.ATTACK) {
-                e.cancel();
-            }
-        }
     }
 }
