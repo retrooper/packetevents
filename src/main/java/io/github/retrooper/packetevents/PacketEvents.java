@@ -181,7 +181,7 @@ public final class PacketEvents implements Listener {
         return settings;
     }
 
-    @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
+    @EventHandler
     public void onJoin(final PlayerJoinEvent e) {
         if(!VersionLookupUtils.hasLoaded()) {
             VersionLookupUtils.load();
@@ -191,13 +191,13 @@ public final class PacketEvents implements Listener {
         PacketEvents.getAPI().getPlayerUtils().injectPlayer(e.getPlayer());
     }
 
-    @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
+    @EventHandler
     public void onQuit(final PlayerQuitEvent e) {
         PacketEvents.getAPI().getPlayerUtils().ejectPlayer(e.getPlayer());
         PacketEvents.getAPI().getPlayerUtils().clientVersionsMap.remove(e.getPlayer().getUniqueId());
     }
 
-    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
+    @EventHandler
     public void onMove(final PlayerMoveEvent e) {
         BukkitMoveEvent moveEvent = new BukkitMoveEvent(e);
         PacketEvents.getAPI().getEventManager().callEvent(moveEvent);

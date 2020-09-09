@@ -22,13 +22,17 @@
  * SOFTWARE.
  */
 
-package io.github.retrooper.packetevents.utils.versionlookup;
+package io.github.retrooper.packetevents.utils.protocolsupport;
 
-import com.comphenix.protocol.ProtocolLibrary;
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
-class ProtocolLibAPIAccessor {
+public class ProtocolSupportUtils {
+    public static boolean isAvailable() {
+        return Bukkit.getPluginManager().isPluginEnabled("ProtocolSupport");
+    }
+
     public static int getProtocolVersion(final Player player) {
-        return ProtocolLibrary.getProtocolManager().getProtocolVersion(player);
+        return ProtocolSupportAPIAccessor.getProtocolVersion(player);
     }
 }

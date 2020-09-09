@@ -22,17 +22,13 @@
  * SOFTWARE.
  */
 
-package io.github.retrooper.packetevents.utils.versionlookup;
+package io.github.retrooper.packetevents.enums;
 
-import org.bukkit.Bukkit;
-import org.bukkit.entity.Player;
-
-public class ProtocolLibUtils {
-    public static boolean isAvailable() {
-        return Bukkit.getPluginManager().isPluginEnabled("ProtocolLib");
-    }
-
-    public static int getProtocolVersion(final Player player) {
-        return ProtocolLibAPIAccessor.getProtocolVersion(player);
-    }
+public interface PacketEventPriority {
+    byte LOWEST = 0;
+    byte LOW = 1;
+    byte NORMAL = 2;
+    byte HIGH = 3;
+    byte HIGHEST = 4;
+    byte MONITOR = 5;
 }

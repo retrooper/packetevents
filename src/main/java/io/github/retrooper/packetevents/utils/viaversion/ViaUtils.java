@@ -22,19 +22,18 @@
  * SOFTWARE.
  */
 
-package io.github.retrooper.packetevents.utils.versionlookup;
+package io.github.retrooper.packetevents.utils.viaversion;
 
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
-import us.myles.ViaVersion.api.Via;
 
-import java.util.UUID;
 
-class ViaAPIAccessor {
+public class ViaUtils {
     public static int getProtocolVersion(final Player player) {
-        return getProtocolVersion(player.getUniqueId());
+        return ViaAPIAccessor.getProtocolVersion(player);
     }
 
-    public static int getProtocolVersion(final UUID uuid) {
-        return Via.getAPI().getPlayerVersion(uuid);
+    public static boolean isAvailable() {
+        return Bukkit.getPluginManager().isPluginEnabled("ViaVersion");
     }
 }

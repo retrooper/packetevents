@@ -22,23 +22,17 @@
  * SOFTWARE.
  */
 
-package io.github.retrooper.packetevents.annotations;
+package io.github.retrooper.packetevents.utils.protocollib;
 
-import io.github.retrooper.packetevents.enums.EventSynchronization;
-import io.github.retrooper.packetevents.enums.PacketEventPriority;
-import org.bukkit.event.EventHandler;
+import org.bukkit.Bukkit;
+import org.bukkit.entity.Player;
 
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+public class ProtocolLibUtils {
+    public static boolean isAvailable() {
+        return Bukkit.getPluginManager().isPluginEnabled("ProtocolLib");
+    }
 
-@Target(ElementType.METHOD)
-@Retention(RetentionPolicy.RUNTIME)
-
-public @interface PacketHandler {
-    @Deprecated
-    EventSynchronization synchronization() default EventSynchronization.NORMAL;
-
-    byte priority() default PacketEventPriority.NORMAL;
+    public static int getProtocolVersion(final Player player) {
+        return ProtocolLibAPIAccessor.getProtocolVersion(player);
+    }
 }
