@@ -111,7 +111,7 @@ public class PacketType {
 
     public static class Server {
         public static final Map<Class<?>, Byte> packetIds = new HashMap<Class<?>, Byte>();
-        public static byte SPAWN_ENTITY = 0, SPAWN_ENTITY_EXPERIENCE_ORB = 1, SPAWN_ENTITY_WEATHER = 2, SPAWN_ENTITY_LIVING = 3,
+        public static final byte SPAWN_ENTITY = 0, SPAWN_ENTITY_EXPERIENCE_ORB = 1, SPAWN_ENTITY_WEATHER = 2, SPAWN_ENTITY_LIVING = 3,
                 SPAWN_ENTITY_PAINTING = 4, SPAWN_ENTITY_SPAWN = 5, ANIMATION = 6, STATISTIC = 7,
                 BLOCK_BREAK = 8, BLOCK_BREAK_ANIMATION = 9, TILE_ENTITY_DATA = 10, BLOCK_ACTION = 11,
                 BLOCK_CHANGE = 12, BOSS = 13, SERVER_DIFFICULTY = 14, CHAT = 15, MULTI_BLOCK_CHANGE = 16,
