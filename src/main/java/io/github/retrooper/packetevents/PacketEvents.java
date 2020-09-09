@@ -54,7 +54,7 @@ public final class PacketEvents implements Listener {
     private static final PacketEvents instance = new PacketEvents();
     private static final PacketEventsSettings settings = new PacketEventsSettings();
     private static final ArrayList<Plugin> plugins = new ArrayList<Plugin>(1);
-    private static boolean hasLoaded, hasStarted;
+    private static boolean hasLoaded, isStarted;
 
     /**
      * This loads the PacketEvents API.
@@ -103,7 +103,7 @@ public final class PacketEvents implements Listener {
      * Loads PacketEvents if you haven't already.
      *
      * Registering:
-     * Registers this class as a Bukkit listener to inject/uninject players.
+     * Registers this class as a Bukkit listener to inject/eject players.
      *
      * @param pl JavaPlugin instance
      */
@@ -111,7 +111,7 @@ public final class PacketEvents implements Listener {
         if (!hasLoaded) {
             load();
         }
-        if (!hasStarted) {
+        if (!isStarted) {
             plugins.add(pl);
             //Register Bukkit listener
             Bukkit.getPluginManager().registerEvents(instance, plugins.get(0));
@@ -119,7 +119,7 @@ public final class PacketEvents implements Listener {
             for (final Player p : Bukkit.getOnlinePlayers()) {
                 getAPI().getPlayerUtils().injectPlayer(p);
             }
-            hasStarted = true;
+            isStarted = true;
         }
     }
 
@@ -137,11 +137,13 @@ public final class PacketEvents implements Listener {
      *
      */
     public static void stop() {
-        if (hasStarted) {
+        if (isStarted) {
             for (final Player p : Bukkit.getOnlinePlayers()) {
                 getAPI().getPlayerUtils().ejectPlayer(p);
             }
             getAPI().getEventManager().unregisterAllListeners();
+
+            isStarted = false;
         }
     }
 
@@ -149,8 +151,13 @@ public final class PacketEvents implements Listener {
         return hasLoaded;
     }
 
+    @Deprecated
     public static boolean hasStarted() {
-        return hasStarted;
+        return isStarted;
+    }
+
+    public static boolean isInitialized() {
+        return isStarted;
     }
 
     public static PacketEventsAPI getAPI() {
