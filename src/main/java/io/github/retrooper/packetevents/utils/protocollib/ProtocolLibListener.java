@@ -90,7 +90,7 @@ public class ProtocolLibListener {
                                 @Override
                                 public void onPacketReceiving(PacketEvent event) {
                                     event.setReadOnly(false);
-                                    PacketReceiveEvent receiveEvent = new PacketReceiveEvent(event.getPlayer(), event.getSource());
+                                    PacketReceiveEvent receiveEvent = new PacketReceiveEvent(event.getPlayer(), event.getPacket().getHandle());
                                     try {
                                         m.invoke(listener, receiveEvent);
                                     } catch (IllegalAccessException | InvocationTargetException e) {
@@ -128,7 +128,7 @@ public class ProtocolLibListener {
                                 @Override
                                 public void onPacketSending(PacketEvent event) {
                                     event.setReadOnly(false);
-                                    PacketSendEvent sendEvent = new PacketSendEvent(event.getPlayer(), event.getSource());
+                                    PacketSendEvent sendEvent = new PacketSendEvent(event.getPlayer(), event.getPacket().getHandle());
                                     try {
                                         m.invoke(listener, sendEvent);
                                     } catch (IllegalAccessException | InvocationTargetException e) {

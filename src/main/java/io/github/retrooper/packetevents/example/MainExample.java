@@ -25,12 +25,7 @@
 package io.github.retrooper.packetevents.example;
 
 import io.github.retrooper.packetevents.PacketEvents;
-import io.github.retrooper.packetevents.annotations.PacketHandler;
-import io.github.retrooper.packetevents.enums.PacketEventPriority;
 import io.github.retrooper.packetevents.event.PacketListener;
-import io.github.retrooper.packetevents.event.impl.PacketReceiveEvent;
-import io.github.retrooper.packetevents.packet.PacketType;
-import io.github.retrooper.packetevents.packetwrappers.in.useentity.WrappedPacketInUseEntity;
 import org.bukkit.plugin.java.JavaPlugin;
 
 public class MainExample extends JavaPlugin implements PacketListener {
@@ -46,34 +41,11 @@ public class MainExample extends JavaPlugin implements PacketListener {
         PacketEvents.getSettings().setIdentifier("official_api");
 
         PacketEvents.init(this);
-        PacketEvents.getAPI().getEventManager().registerListener(this);
+        //PacketEvents.getAPI().getEventManager().registerListener(this);
     }
 
     @Override
     public void onDisable() {
         PacketEvents.stop();
-    }
-
-    @PacketHandler(priority = PacketEventPriority.LOWEST)
-    public void onReceiveLowestPriority(PacketReceiveEvent e) {
-        if(e.getPacketId() == PacketType.Client.USE_ENTITY) {
-            WrappedPacketInUseEntity ue = new WrappedPacketInUseEntity(e.getNMSPacket());
-            if(ue.getAction() == WrappedPacketInUseEntity.EntityUseAction.ATTACK) {
-                System.out.println("1");
-                //e.cancel();
-                e.setCancelled(false);
-            }
-        }
-    }
-
-    @PacketHandler(priority = PacketEventPriority.MONITOR)
-    public void onReceive(PacketReceiveEvent e) {
-        if(e.getPacketId() == PacketType.Client.USE_ENTITY) {
-            WrappedPacketInUseEntity ue = new WrappedPacketInUseEntity(e.getNMSPacket());
-            if(ue.getAction() == WrappedPacketInUseEntity.EntityUseAction.ATTACK) {
-                System.out.println("2");
-                e.cancel();
-            }
-        }
     }
 }
