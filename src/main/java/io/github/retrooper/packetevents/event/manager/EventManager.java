@@ -54,9 +54,9 @@ public final class EventManager {
                 final Class<?> parameterType = method.getParameterTypes()[0];
                 if (parameterType.equals(PacketEvent.class)
                         || parameterType.isInstance(e)) {
-                    PacketHandler annotation = method.getAnnotation(PacketHandler.class);
+                    PacketHandler annotation = methods.get(highestPriorityMethodListenerIndex).getAnnotation(PacketHandler.class);
 
-                    PacketHandler competitorAnnotation = methods.get(highestPriorityMethodListenerIndex).getAnnotation(PacketHandler.class);
+                    PacketHandler competitorAnnotation = methods.get(i).getAnnotation(PacketHandler.class);
 
                     if(competitorAnnotation.priority() >= annotation.priority()) {
                         highestPriorityMethodListenerIndex = i;
@@ -108,7 +108,11 @@ public final class EventManager {
     }
 
     public void registerListener(final PacketListener listener) {
-        final List<Method> methods = new ArrayList<Method>();
+        if (ProtocolLibListener.isProtocolLibPresent() == ProtocolLibListener.ProtocolLibPresent.UNKNOWN) {
+            ProtocolLibListener.load();
+        }
+
+            final List<Method> methods = new ArrayList<Method>();
         for (final Method m : listener.getClass().getDeclaredMethods()) {
             if (m.isAnnotationPresent(PacketHandler.class)
                     && m.getParameterTypes().length == 1) {

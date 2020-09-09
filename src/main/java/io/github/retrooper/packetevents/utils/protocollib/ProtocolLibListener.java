@@ -24,18 +24,20 @@
 
 package io.github.retrooper.packetevents.utils.protocollib;
 
+import com.comphenix.protocol.PacketType;
 import com.comphenix.protocol.ProtocolLibrary;
+import com.comphenix.protocol.events.ListenerPriority;
 import com.comphenix.protocol.events.PacketAdapter;
 import com.comphenix.protocol.events.PacketEvent;
 import io.github.retrooper.packetevents.PacketEvents;
 import io.github.retrooper.packetevents.annotations.PacketHandler;
+import io.github.retrooper.packetevents.enums.PacketEventPriority;
 import io.github.retrooper.packetevents.event.PacketListener;
 import io.github.retrooper.packetevents.event.impl.PacketReceiveEvent;
 import io.github.retrooper.packetevents.event.impl.PacketSendEvent;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.ArrayList;
 import java.util.List;
 
 public class ProtocolLibListener {
@@ -58,102 +60,86 @@ public class ProtocolLibListener {
 
     public static void registerProtocolLibListener(PacketListener listener, List<Method> methods) {
         if (plibPresent == ProtocolLibPresent.PRESENT) {
-            List<Method> receiveListener = new ArrayList<Method>();
-            List<Method> sendListener = new ArrayList<Method>();
-
-            List<Boolean> receiveListenerIsCancelled = new ArrayList<Boolean>();
-            List<Boolean> sendListenerIsCancelled = new ArrayList<Boolean>();
-
-            int highestPriorityMethodReceiveListenerIndex = 0;
-            int highestPriorityMethodSendListenerIndex = 0;
-
-            //PACKET RECEIVE EVENT
-            for (int i = 0; i < methods.size(); i++) {
-                Method m = methods.get(i);
-
-                PacketHandler annotation = m.getAnnotation(PacketHandler.class);
-
-                PacketHandler competitorAnnotation = methods.get(highestPriorityMethodReceiveListenerIndex).getAnnotation(PacketHandler.class);
-
-                if (competitorAnnotation.priority() >= annotation.priority()) {
-                    highestPriorityMethodReceiveListenerIndex = i;
-                }
-
+            for (Method m : methods) {
                 if (m.getParameterTypes()[0].equals(PacketReceiveEvent.class)) {
-                    receiveListener.add(m);
-
+                    PacketHandler annot = m.getAnnotation(PacketHandler.class);
+                    ListenerPriority priority;
+                    switch (annot.priority()) {
+                        case PacketEventPriority.LOWEST:
+                            priority = ListenerPriority.LOWEST;
+                            break;
+                        case PacketEventPriority.LOW:
+                            priority = ListenerPriority.LOW;
+                            break;
+                        case PacketEventPriority.HIGH:
+                            priority = ListenerPriority.HIGH;
+                            break;
+                        case PacketEventPriority.HIGHEST:
+                            priority = ListenerPriority.HIGHEST;
+                            break;
+                        case PacketEventPriority.MONITOR:
+                            priority = ListenerPriority.MONITOR;
+                            break;
+                        default:
+                            priority = ListenerPriority.NORMAL;
+                            break;
+                    }
+                    ProtocolLibrary.getProtocolManager().
+                            addPacketListener(new PacketAdapter(PacketEvents.getPlugins().get(0),
+                                    priority, PacketType.Play.Client.getInstance().values()) {
+                                @Override
+                                public void onPacketReceiving(PacketEvent event) {
+                                    PacketReceiveEvent receiveEvent = new PacketReceiveEvent(event.getPlayer(), event.getSource());
+                                    try {
+                                        m.invoke(listener, receiveEvent);
+                                    } catch (IllegalAccessException | InvocationTargetException e) {
+                                        e.printStackTrace();
+                                    }
+                                    event.setCancelled(receiveEvent.isCancelled());
+                                }
+                            });
+                } else if (m.getParameterTypes()[0].equals(PacketSendEvent.class)) {
+                    PacketHandler annot = m.getAnnotation(PacketHandler.class);
+                    ListenerPriority priority;
+                    switch (annot.priority()) {
+                        case PacketEventPriority.LOWEST:
+                            priority = ListenerPriority.LOWEST;
+                            break;
+                        case PacketEventPriority.LOW:
+                            priority = ListenerPriority.LOW;
+                            break;
+                        case PacketEventPriority.NORMAL:
+                            priority = ListenerPriority.NORMAL;
+                            break;
+                        case PacketEventPriority.HIGH:
+                            priority = ListenerPriority.HIGH;
+                            break;
+                        case PacketEventPriority.HIGHEST:
+                            priority = ListenerPriority.HIGHEST;
+                            break;
+                        case PacketEventPriority.MONITOR:
+                            priority = ListenerPriority.MONITOR;
+                            break;
+                        default:
+                            priority = ListenerPriority.NORMAL;
+                            break;
+                    }
+                    ProtocolLibrary.getProtocolManager().
+                            addPacketListener(new PacketAdapter(PacketEvents.getPlugins().get(0),
+                                    priority, PacketType.Play.Server.getInstance().values()) {
+                                @Override
+                                public void onPacketReceiving(PacketEvent event) {
+                                    PacketSendEvent sendEvent = new PacketSendEvent(event.getPlayer(), event.getSource());
+                                    try {
+                                        m.invoke(listener, sendEvent);
+                                    } catch (IllegalAccessException | InvocationTargetException e) {
+                                        e.printStackTrace();
+                                    }
+                                    event.setCancelled(sendEvent.isCancelled());
+                                }
+                            });
                 }
             }
-
-            final int finalHighestPriorityMethodReceiveListenerIndex = highestPriorityMethodReceiveListenerIndex;
-            ProtocolLibrary.getProtocolManager().addPacketListener(
-                    new PacketAdapter(PacketEvents.getPlugins().get(0)) {
-                        @Override
-                        public void onPacketReceiving(PacketEvent event) {
-                            System.out.println(event.getSource().getClass().getSimpleName());
-                            PacketReceiveEvent receiveEvent =
-                                    new PacketReceiveEvent(event.getPlayer(), event.getSource());
-
-                            for (Method receive : receiveListener) {
-                                try {
-                                    receive.invoke(listener, receiveEvent);
-                                } catch (IllegalAccessException | InvocationTargetException e) {
-                                    e.printStackTrace();
-                                }
-                            }
-
-                            receiveListenerIsCancelled.add(receiveEvent.isCancelled());
-
-
-                            if (receiveListener.size() == receiveListenerIsCancelled.size()) {
-                                event.setCancelled(receiveListenerIsCancelled.get(finalHighestPriorityMethodReceiveListenerIndex));
-                            }
-                        }
-                    });
-
-            //PACKET SEND EVENT
-            for (int i = 0; i < methods.size(); i++) {
-                Method m = methods.get(i);
-
-                PacketHandler annotation = m.getAnnotation(PacketHandler.class);
-
-                PacketHandler competitorAnnotation = methods.get(highestPriorityMethodSendListenerIndex).getAnnotation(PacketHandler.class);
-
-                if (competitorAnnotation.priority() >= annotation.priority()) {
-                    highestPriorityMethodSendListenerIndex = i;
-                }
-
-                if (m.getParameterTypes()[0].equals(PacketSendEvent.class)) {
-                    sendListener.add(m);
-                }
-            }
-
-            final int finalHighestPriorityMethodSendListenerIndex = highestPriorityMethodSendListenerIndex;
-            ProtocolLibrary.getProtocolManager().addPacketListener(
-                    new PacketAdapter(PacketEvents.getPlugins().get(0)) {
-                        @Override
-                        public void onPacketReceiving(PacketEvent event) {
-                            System.out.println(event.getSource().getClass().getSimpleName());
-                            PacketSendEvent sendEvent =
-                                    new PacketSendEvent(event.getPlayer(), event.getSource());
-
-                            for (Method send : sendListener) {
-                                try {
-                                    send.invoke(listener, sendEvent);
-                                } catch (IllegalAccessException | InvocationTargetException e) {
-                                    e.printStackTrace();
-                                }
-                            }
-
-                            sendListenerIsCancelled.add(sendEvent.isCancelled());
-
-
-                            if (sendListener.size() == sendListenerIsCancelled.size()) {
-                                event.setCancelled(sendListenerIsCancelled.get(finalHighestPriorityMethodSendListenerIndex));
-                            }
-                        }
-                    });
-
         }
     }
 
