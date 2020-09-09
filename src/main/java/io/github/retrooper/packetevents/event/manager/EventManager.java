@@ -31,6 +31,7 @@ import io.github.retrooper.packetevents.event.CancellableEvent;
 import io.github.retrooper.packetevents.event.PacketEvent;
 import io.github.retrooper.packetevents.event.PacketListener;
 import io.github.retrooper.packetevents.utils.protocollib.ProtocolLibListener;
+import io.github.retrooper.packetevents.utils.protocollib.ProtocolLibUtils;
 import org.bukkit.Bukkit;
 
 import java.lang.reflect.InvocationTargetException;
@@ -108,10 +109,6 @@ public final class EventManager {
     }
 
     public void registerListener(final PacketListener listener) {
-        if (ProtocolLibListener.isProtocolLibPresent() == ProtocolLibListener.ProtocolLibPresent.UNKNOWN) {
-            ProtocolLibListener.load();
-        }
-
             final List<Method> methods = new ArrayList<Method>();
         for (final Method m : listener.getClass().getDeclaredMethods()) {
             if (m.isAnnotationPresent(PacketHandler.class)
@@ -121,7 +118,7 @@ public final class EventManager {
         }
 
         if (!methods.isEmpty()) {
-            if (ProtocolLibListener.isProtocolLibPresent() == ProtocolLibListener.ProtocolLibPresent.PRESENT) {
+            if (ProtocolLibUtils.isAvailable()) {
                 ProtocolLibListener.registerProtocolLibListener(listener, methods);
             } else {
                 registeredMethods.put(listener, methods);

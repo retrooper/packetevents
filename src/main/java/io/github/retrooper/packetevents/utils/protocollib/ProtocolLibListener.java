@@ -41,25 +41,9 @@ import java.lang.reflect.Method;
 import java.util.List;
 
 public class ProtocolLibListener {
-    public enum ProtocolLibPresent {
-        UNKNOWN, NOT_PRESENT, PRESENT
-    }
-
-    private static ProtocolLibPresent plibPresent = ProtocolLibPresent.UNKNOWN;
-
-
-    public static void load() {
-        if (ProtocolLibUtils.isAvailable()) {
-            plibPresent = ProtocolLibPresent.PRESENT;
-        }
-    }
-
-    public static ProtocolLibPresent isProtocolLibPresent() {
-        return plibPresent;
-    }
 
     public static void registerProtocolLibListener(PacketListener listener, List<Method> methods) {
-        if (plibPresent == ProtocolLibPresent.PRESENT) {
+        if (ProtocolLibUtils.isAvailable()) {
             for (Method m : methods) {
                 if (m.getParameterTypes()[0].equals(PacketReceiveEvent.class)) {
                     PacketHandler annot = m.getAnnotation(PacketHandler.class);
