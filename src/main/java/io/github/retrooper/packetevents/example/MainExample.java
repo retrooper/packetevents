@@ -54,7 +54,7 @@ public class MainExample extends JavaPlugin implements PacketListener {
         PacketEvents.stop();
     }
 
-    @PacketHandler(priority = PacketEventPriority.MONITOR)
+    @PacketHandler(priority = PacketEventPriority.LOWEST)
     public void onReceiveLowestPriority(PacketReceiveEvent e) {
         if(e.getPacketId() == PacketType.Client.USE_ENTITY) {
             WrappedPacketInUseEntity ue = new WrappedPacketInUseEntity(e.getNMSPacket());
@@ -66,7 +66,7 @@ public class MainExample extends JavaPlugin implements PacketListener {
         }
     }
 
-    @PacketHandler(priority = PacketEventPriority.LOWEST)
+    @PacketHandler(priority = PacketEventPriority.MONITOR)
     public void onReceive(PacketReceiveEvent e) {
         if(e.getPacketId() == PacketType.Client.USE_ENTITY) {
             WrappedPacketInUseEntity ue = new WrappedPacketInUseEntity(e.getNMSPacket());

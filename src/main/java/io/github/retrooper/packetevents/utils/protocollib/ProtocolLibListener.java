@@ -89,6 +89,7 @@ public class ProtocolLibListener {
                                     priority, PacketType.Play.Client.getInstance().values()) {
                                 @Override
                                 public void onPacketReceiving(PacketEvent event) {
+                                    event.setReadOnly(false);
                                     PacketReceiveEvent receiveEvent = new PacketReceiveEvent(event.getPlayer(), event.getSource());
                                     try {
                                         m.invoke(listener, receiveEvent);
@@ -108,9 +109,6 @@ public class ProtocolLibListener {
                         case PacketEventPriority.LOW:
                             priority = ListenerPriority.LOW;
                             break;
-                        case PacketEventPriority.NORMAL:
-                            priority = ListenerPriority.NORMAL;
-                            break;
                         case PacketEventPriority.HIGH:
                             priority = ListenerPriority.HIGH;
                             break;
@@ -128,7 +126,8 @@ public class ProtocolLibListener {
                             addPacketListener(new PacketAdapter(PacketEvents.getPlugins().get(0),
                                     priority, PacketType.Play.Server.getInstance().values()) {
                                 @Override
-                                public void onPacketReceiving(PacketEvent event) {
+                                public void onPacketSending(PacketEvent event) {
+                                    event.setReadOnly(false);
                                     PacketSendEvent sendEvent = new PacketSendEvent(event.getPlayer(), event.getSource());
                                     try {
                                         m.invoke(listener, sendEvent);
