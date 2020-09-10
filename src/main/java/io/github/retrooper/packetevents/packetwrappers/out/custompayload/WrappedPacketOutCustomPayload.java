@@ -33,7 +33,9 @@ import io.github.retrooper.packetevents.utils.NMSUtils;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 
-public class WrappedPacketOutCustomPayload extends WrappedPacket implements SendableWrapper {
+class WrappedPacketOutCustomPayload extends WrappedPacket implements SendableWrapper {
+//TODO load the outcustompayload wrapper
+
     private static Class<?> packetClass;
     private static Constructor<?> constructor;
     private static Constructor<?> packetDataSerializerConstructor;
@@ -154,7 +156,6 @@ public class WrappedPacketOutCustomPayload extends WrappedPacket implements Send
                 try {
                     Object minecraftKey = minecraftKeyConstructor.newInstance(tag);
                     Object dataSerializer = packetDataSerializerConstructor.newInstance(byteBufObject);
-                    ;
                     return constructor.newInstance(minecraftKey, dataSerializer);
                 } catch (InstantiationException | InvocationTargetException | IllegalAccessException e) {
                     e.printStackTrace();
