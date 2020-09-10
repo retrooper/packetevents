@@ -25,7 +25,7 @@
 package io.github.retrooper.packetevents.packetwrappers.in.blockplace;
 
 
-import io.github.retrooper.packetevents.packetwrappers.api.WrappedPacket;
+import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
 import io.github.retrooper.packetevents.utils.BlockIteratorUtils;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;

@@ -22,53 +22,11 @@
  * SOFTWARE.
  */
 
-package io.github.retrooper.packetevents.event.impl;
-
-import io.github.retrooper.packetevents.event.CancellableEvent;
-import io.github.retrooper.packetevents.event.PacketEvent;
-import org.bukkit.entity.Player;
+package io.github.retrooper.packetevents.packetwrappers;
 
 /**
- * This event is called each time you inject a player.
+ * This interface indicates that a packet wrapper supports being sent to a client.
  */
-public final class PlayerInjectEvent extends PacketEvent implements CancellableEvent {
-    private final Player player;
-    private final boolean async;
-    private boolean cancelled;
-
-    public PlayerInjectEvent(final Player player) {
-        this(player, false);
-    }
-
-    public PlayerInjectEvent(final Player player, boolean isAsync) {
-        this.player= player;
-        this.async = isAsync;
-    }
-
-    @Override
-    public boolean isCancelled() {
-        return cancelled;
-    }
-
-    @Override
-    public void setCancelled(boolean cancelled) {
-        this.cancelled = cancelled;
-    }
-
-    @Override
-    public void cancel() {
-        this.cancelled = true;
-    }
-
-    @Override
-    public void uncancel() {this.cancelled = false; }
-
-    public Player getPlayer() {
-        return player;
-    }
-
-    public boolean isAsync() {
-        return async;
-    }
-
+public interface SendableWrapper {
+    Object asNMSPacket();
 }

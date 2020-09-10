@@ -24,9 +24,8 @@
 
 package io.github.retrooper.packetevents.packetwrappers.in.windowclick;
 
-import io.github.retrooper.packetevents.annotations.Nullable;
 import io.github.retrooper.packetevents.packet.PacketTypeClasses;
-import io.github.retrooper.packetevents.packetwrappers.api.WrappedPacket;
+import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
 import io.github.retrooper.packetevents.reflectionutils.Reflection;
 import io.github.retrooper.packetevents.utils.NMSUtils;
 import org.bukkit.inventory.ItemStack;
@@ -114,22 +113,18 @@ public class WrappedPacketInWindowClick extends WrappedPacket {
 
     @Override
     protected void setup() {
-        try {
-            this.id = Reflection.getField(packetClass, int.class, 0).getInt(packet);
-            this.slot = Reflection.getField(packetClass, int.class, 1).getInt(packet);
-            this.button = Reflection.getField(packetClass, int.class, 2).getInt(packet);
-            this.actionNumber = Reflection.getField(packetClass, short.class, 0).getShort(packet);
-            Object nmsItemStack = Reflection.getField(packetClass, NMSUtils.nmsItemStackClass, 0).get(packet);
-            this.clickedItem = NMSUtils.toBukkitItemStack(nmsItemStack);
-            Object clickMode = Reflection.getField(packetClass, 5).get(packet);
+        this.id = readInt(0);
+        this.slot = readInt(1);
+        this.button = readInt(2);
+        this.actionNumber = readShort(0);
+        Object nmsItemStack = readObject(0, NMSUtils.nmsItemStackClass);
+        this.clickedItem = NMSUtils.toBukkitItemStack(nmsItemStack);
+        Object clickMode = readAnyObject(5);
 
-            if (isClickModePrimitive) {
-                mode = (int) clickMode;
-            } else {
-                mode = invClickTypeMapCache.get(clickMode.toString());
-            }
-        } catch (IllegalAccessException e) {
-            e.printStackTrace();
+        if (isClickModePrimitive) {
+            mode = (int) clickMode;
+        } else {
+            mode = invClickTypeMapCache.get(clickMode.toString());
         }
     }
 

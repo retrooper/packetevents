@@ -25,7 +25,7 @@
 package io.github.retrooper.packetevents.packetwrappers.in.useentity;
 
 import io.github.retrooper.packetevents.packet.PacketTypeClasses;
-import io.github.retrooper.packetevents.packetwrappers.api.WrappedPacket;
+import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
 import io.github.retrooper.packetevents.reflectionutils.Reflection;
 import io.github.retrooper.packetevents.utils.NMSUtils;
 import org.bukkit.entity.Entity;
@@ -33,6 +33,7 @@ import org.bukkit.entity.Entity;
 public final class WrappedPacketInUseEntity extends WrappedPacket {
     private static Class<?> useEntityClass;
     private static Class<?> enumEntityUseActionClass;
+    private Entity entity;
     private int entityID;
     private EntityUseAction action;
     public WrappedPacketInUseEntity(final Object packet) {
@@ -52,13 +53,9 @@ public final class WrappedPacketInUseEntity extends WrappedPacket {
 
     @Override
     protected void setup() {
-        try {
-            this.entityID = Reflection.getField(useEntityClass, int.class, 0).getInt(packet);
-            final Object useActionEnum = Reflection.getField(useEntityClass, enumEntityUseActionClass, 0).get(packet);
-            this.action = EntityUseAction.valueOf(useActionEnum.toString());
-        } catch (IllegalAccessException e) {
-            e.printStackTrace();
-        }
+        this.entityID = readInt(0);
+        final Object useActionEnum = readObject(0, enumEntityUseActionClass);
+        this.action = EntityUseAction.valueOf(useActionEnum.toString());
     }
 
     /**
@@ -66,7 +63,10 @@ public final class WrappedPacketInUseEntity extends WrappedPacket {
      * @return Entity
      */
     public Entity getEntity() {
-        return NMSUtils.getEntityById(this.entityID);
+        if(entity != null) {
+            return entity;
+        }
+        return entity = NMSUtils.getEntityById(this.entityID);
     }
 
     /**

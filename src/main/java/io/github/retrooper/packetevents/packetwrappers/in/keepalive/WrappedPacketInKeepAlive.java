@@ -25,7 +25,7 @@
 package io.github.retrooper.packetevents.packetwrappers.in.keepalive;
 
 import io.github.retrooper.packetevents.packet.PacketTypeClasses;
-import io.github.retrooper.packetevents.packetwrappers.api.WrappedPacket;
+import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
 import io.github.retrooper.packetevents.reflectionutils.Reflection;
 
 public final class WrappedPacketInKeepAlive extends WrappedPacket {
@@ -45,17 +45,9 @@ public final class WrappedPacketInKeepAlive extends WrappedPacket {
     @Override
     protected void setup() {
         if (!integerPresentInIndex0) {
-            try {
-                this.id = Reflection.getField(packetClass, long.class, 0).getLong(packet);
-            } catch (IllegalAccessException e) {
-                e.printStackTrace();
-            }
+            this.id = readLong(0);
         } else {
-            try {
-                this.id = Reflection.getField(packetClass, int.class, 0).getInt(packet);
-            } catch (IllegalAccessException e) {
-                e.printStackTrace();
-            }
+            this.id = readInt(0);
         }
     }
 

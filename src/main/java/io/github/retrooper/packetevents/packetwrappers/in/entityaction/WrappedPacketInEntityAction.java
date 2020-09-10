@@ -27,7 +27,7 @@ package io.github.retrooper.packetevents.packetwrappers.in.entityaction;
 import io.github.retrooper.packetevents.annotations.Nullable;
 import io.github.retrooper.packetevents.enums.ServerVersion;
 import io.github.retrooper.packetevents.packet.PacketTypeClasses;
-import io.github.retrooper.packetevents.packetwrappers.api.WrappedPacket;
+import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
 import io.github.retrooper.packetevents.reflectionutils.Reflection;
 import io.github.retrooper.packetevents.utils.NMSUtils;
 import org.bukkit.entity.Entity;
@@ -76,31 +76,27 @@ public final class WrappedPacketInEntityAction extends WrappedPacket {
 
     @Override
     protected void setup() {
-        try {
-            final int entityId = Reflection.getField(entityActionClass, int.class, 0).getInt(packet);
-            final int jumpBoost;
-            if (isLowerThan_v_1_8) {
-                jumpBoost = Reflection.getField(entityActionClass, int.class, 2).getInt(packet);
-            } else {
-                jumpBoost = Reflection.getField(entityActionClass, int.class, 1).getInt(packet);
-            }
-
-            //1.7.10
-            if (isLowerThan_v_1_8) {
-                int animationIndex = Reflection.getField(entityActionClass, int.class, 1).getInt(packet); // TODO: += if packetdataserializer.version < 16
-                this.action = cachedPlayerActionIDs.get(animationIndex);
-            } else {
-                final Object enumObj = Reflection.getField(entityActionClass, enumPlayerActionClass, 0).get(packet);
-                final String enumName = enumObj.toString();
-                this.action = cachedPlayerActionNames.get(enumName);
-            }
-
-
-            this.entityId = entityId;
-            this.jumpBoost = jumpBoost;
-        } catch (IllegalAccessException e) {
-            e.printStackTrace();
+        final int entityId = readInt(0);
+        final int jumpBoost;
+        if (isLowerThan_v_1_8) {
+            jumpBoost = readInt(2);
+        } else {
+            jumpBoost = readInt(1);
         }
+
+        //1.7.10
+        if (isLowerThan_v_1_8) {
+            int animationIndex = readInt(1);
+            this.action = cachedPlayerActionIDs.get(animationIndex);
+        } else {
+            final Object enumObj = readObject(0, enumPlayerActionClass);
+            final String enumName = enumObj.toString();
+            this.action = cachedPlayerActionNames.get(enumName);
+        }
+
+
+        this.entityId = entityId;
+        this.jumpBoost = jumpBoost;
     }
 
     /**

@@ -24,9 +24,25 @@
 
 package io.github.retrooper.packetevents.packetwrappers;
 
-/**
- * This interface indicates that a packet wrapper supports being sent to a client.
- */
-public interface Sendable {
-    Object asNMSPacket();
+public interface WrapperPacketReader {
+
+    boolean readBoolean(int index);
+
+    byte readByte(int index);
+
+    short readShort(int index);
+
+    int readInt(int index);
+
+    long readLong(int index);
+
+    float readFloat(int index);
+
+    double readDouble(int index);
+
+    Object readObject(int index, Class<?> type);
+
+    Object readAnyObject(int index);
+
+    String readString(int index);
 }

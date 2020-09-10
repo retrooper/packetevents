@@ -25,8 +25,8 @@
 package io.github.retrooper.packetevents.packetwrappers.out.kickdisconnect;
 
 import io.github.retrooper.packetevents.packet.PacketTypeClasses;
-import io.github.retrooper.packetevents.packetwrappers.Sendable;
-import io.github.retrooper.packetevents.packetwrappers.api.WrappedPacket;
+import io.github.retrooper.packetevents.packetwrappers.SendableWrapper;
+import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
 import io.github.retrooper.packetevents.packetwrappers.out.chat.WrappedPacketOutChat;
 import io.github.retrooper.packetevents.reflectionutils.Reflection;
 import io.github.retrooper.packetevents.utils.NMSUtils;
@@ -34,7 +34,7 @@ import io.github.retrooper.packetevents.utils.NMSUtils;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 
-public final class WrappedPacketOutKickDisconnect extends WrappedPacket implements Sendable {
+public final class WrappedPacketOutKickDisconnect extends WrappedPacket implements SendableWrapper {
     private static Class<?> packetClass, iChatBaseComponentClass;
     private static Constructor<?> kickDisconnectConstructor;
     private String kickMessage;
@@ -65,11 +65,8 @@ public final class WrappedPacketOutKickDisconnect extends WrappedPacket implemen
 
     @Override
     protected void setup() {
-        try {
-            this.kickMessage = WrappedPacketOutChat.toStringFromIChatBaseComponent(Reflection.getField(packetClass, iChatBaseComponentClass, 0).get(packet));
-        } catch (IllegalAccessException e) {
-            e.printStackTrace();
-        }
+        Object ichatbaseComponentoObject = readObject(0, iChatBaseComponentClass);
+        this.kickMessage = WrappedPacketOutChat.toStringFromIChatBaseComponent(ichatbaseComponentoObject);
     }
 
     /**
@@ -83,7 +80,7 @@ public final class WrappedPacketOutKickDisconnect extends WrappedPacket implemen
     @Override
     public Object asNMSPacket() {
         try {
-            return kickDisconnectConstructor.newInstance(WrappedPacketOutChat.toIChatBaseComponent("{\"text\": \"" + kickMessage + "\"}"));
+            return kickDisconnectConstructor.newInstance(WrappedPacketOutChat.toIChatBaseComponent(WrappedPacketOutChat.fromStringToJSON(kickMessage)));
         } catch (InstantiationException | InvocationTargetException | IllegalAccessException e) {
             e.printStackTrace();
         }

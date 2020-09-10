@@ -27,7 +27,7 @@ package io.github.retrooper.packetevents.utils.api;
 import io.github.retrooper.packetevents.PacketEvents;
 import io.github.retrooper.packetevents.enums.ClientVersion;
 import io.github.retrooper.packetevents.handler.NettyPacketHandler;
-import io.github.retrooper.packetevents.packetwrappers.Sendable;
+import io.github.retrooper.packetevents.packetwrappers.SendableWrapper;
 import io.github.retrooper.packetevents.utils.NMSUtils;
 import io.github.retrooper.packetevents.utils.versionlookup.VersionLookupUtils;
 import org.bukkit.entity.Player;
@@ -119,12 +119,12 @@ public final class PlayerUtils {
     }
 
     /**
-     * Send a {@link Sendable} wrapper to a player.
+     * Send a {@link SendableWrapper} wrapper to a player.
      * @param player
-     * @param sendable
+     * @param sendableWrapper
      */
-    public void sendPacket(final Player player, final Sendable sendable) {
-        NMSUtils.sendSendableWrapper(player, sendable);
+    public void sendPacket(final Player player, final SendableWrapper sendableWrapper) {
+        NMSUtils.sendSendableWrapper(player, sendableWrapper);
     }
 
     /**

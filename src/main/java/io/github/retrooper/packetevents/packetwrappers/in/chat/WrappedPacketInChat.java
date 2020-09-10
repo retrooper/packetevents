@@ -25,7 +25,7 @@
 package io.github.retrooper.packetevents.packetwrappers.in.chat;
 
 import io.github.retrooper.packetevents.packet.PacketTypeClasses;
-import io.github.retrooper.packetevents.packetwrappers.api.WrappedPacket;
+import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
 import io.github.retrooper.packetevents.reflectionutils.Reflection;
 
 public final class WrappedPacketInChat extends WrappedPacket {
@@ -42,12 +42,7 @@ public final class WrappedPacketInChat extends WrappedPacket {
 
     @Override
     protected void setup() {
-        try {
-            final Object obj = Reflection.getField(chatPacketClass, String.class, 0).get(packet);
-            this.message = obj.toString();
-        } catch (IllegalAccessException e) {
-            e.printStackTrace();
-        }
+        this.message = readString(0);
     }
 
     /**

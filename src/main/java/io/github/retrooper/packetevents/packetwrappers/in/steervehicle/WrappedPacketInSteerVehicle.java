@@ -25,7 +25,7 @@
 package io.github.retrooper.packetevents.packetwrappers.in.steervehicle;
 
 import io.github.retrooper.packetevents.packet.PacketTypeClasses;
-import io.github.retrooper.packetevents.packetwrappers.api.WrappedPacket;
+import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
 import io.github.retrooper.packetevents.reflectionutils.Reflection;
 
 public class WrappedPacketInSteerVehicle extends WrappedPacket {
@@ -42,15 +42,11 @@ public class WrappedPacketInSteerVehicle extends WrappedPacket {
 
     @Override
     protected void setup() {
-        try {
-            this.side = Reflection.getField(packetClass, float.class, 0).getFloat(packet);
-            this.forward = Reflection.getField(packetClass, float.class, 1).getFloat(packet);
+        this.side = readFloat(0);
+        this.forward = readFloat(1);
 
-            this.jump = Reflection.getField(packetClass, boolean.class, 0).getBoolean(packet);
-            this.unmount = Reflection.getField(packetClass, boolean.class, 1).getBoolean(packet);
-        } catch (IllegalAccessException e) {
-            e.printStackTrace();
-        }
+        this.jump = readBoolean(0);
+        this.unmount = readBoolean(1);
     }
 
     /**

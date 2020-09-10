@@ -27,7 +27,7 @@ package io.github.retrooper.packetevents.packetwrappers.in.blockdig;
 import io.github.retrooper.packetevents.enums.Direction;
 import io.github.retrooper.packetevents.enums.ServerVersion;
 import io.github.retrooper.packetevents.packet.PacketTypeClasses;
-import io.github.retrooper.packetevents.packetwrappers.api.WrappedPacket;
+import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
 import io.github.retrooper.packetevents.reflectionutils.Reflection;
 import io.github.retrooper.packetevents.utils.NMSUtils;
 import io.github.retrooper.packetevents.utils.vector.Vector3i;
@@ -73,23 +73,24 @@ public final class WrappedPacketInBlockDig extends WrappedPacket {
         try {
             if (isVersionLowerThan_v_1_8) {
                 enumDigType = PlayerDigType.values()[(Reflection.getField(blockDigClass, int.class, 4).getInt(packet))];
-                x = Reflection.getField(blockDigClass, int.class, 0).getInt(packet);
-                y = Reflection.getField(blockDigClass, int.class, 1).getInt(packet);
-                z = Reflection.getField(blockDigClass, int.class, 2).getInt(packet);
+                x = readInt(0);
+                y = readInt(1);
+                z = readInt(2);
                 enumDirection = null;
             } else {
                 //1.8+
-                final Object blockPosObj = Reflection.getField(blockDigClass, blockPositionClass, 0).get(packet);
-                final Object enumDirectionObj = Reflection.getField(blockDigClass, enumDirectionClass, 0).get(packet);
-                final Object digTypeObj = Reflection.getField(blockDigClass, digTypeClass, 0).get(packet);
+                final Object blockPosObj = readObject(0, blockPositionClass);
+                final Object enumDirectionObj = readObject(0, enumDirectionClass);
+                final Object digTypeObj = readObject(0, digTypeClass);
 
                 Class<?> blockPosSuper = blockPositionClass;
                 x = Reflection.getField(blockPosSuper, int.class, 0).getInt(blockPosObj);
                 y = Reflection.getField(blockPosSuper, int.class, 1).getInt(blockPosObj);
                 z = Reflection.getField(blockPosSuper, int.class, 2).getInt(blockPosObj);
 
-                enumDirection = Direction.valueOf(((Enum) enumDirectionObj).name());
-                enumDigType = PlayerDigType.valueOf(((Enum) digTypeObj).name());
+                //.toString() won't work so we must do this
+                enumDirection = Direction.valueOf(((Enum)enumDirectionObj).name());
+                enumDigType = PlayerDigType.valueOf(((Enum)digTypeObj).name());
             }
         } catch (IllegalAccessException e) {
             e.printStackTrace();

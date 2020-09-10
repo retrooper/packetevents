@@ -26,8 +26,8 @@ package io.github.retrooper.packetevents.packetwrappers.out.entityvelocity;
 
 import io.github.retrooper.packetevents.enums.ServerVersion;
 import io.github.retrooper.packetevents.packet.PacketTypeClasses;
-import io.github.retrooper.packetevents.packetwrappers.Sendable;
-import io.github.retrooper.packetevents.packetwrappers.api.WrappedPacket;
+import io.github.retrooper.packetevents.packetwrappers.SendableWrapper;
+import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
 import io.github.retrooper.packetevents.reflectionutils.Reflection;
 import io.github.retrooper.packetevents.utils.NMSUtils;
 import org.bukkit.entity.Entity;
@@ -35,7 +35,7 @@ import org.bukkit.entity.Entity;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 
-public final class WrappedPacketOutEntityVelocity extends WrappedPacket implements Sendable {
+public final class WrappedPacketOutEntityVelocity extends WrappedPacket implements SendableWrapper {
     private static Constructor<?> velocityConstructor, vec3dConstructor;
     private static Class<?> velocityClass, vec3dClass;
     private static boolean isVec3dPresent;
@@ -88,21 +88,17 @@ public final class WrappedPacketOutEntityVelocity extends WrappedPacket implemen
 
     @Override
     protected void setup() {
-        try {
-            //ENTITY ID
-            this.entityId = Reflection.getField(velocityClass, int.class, 0).getInt(packet);
+        //ENTITY ID
+        this.entityId = readInt(0);
 
-            int x = Reflection.getField(velocityClass, int.class, 1).getInt(packet);
-            int y = Reflection.getField(velocityClass, int.class, 2).getInt(packet);
-            int z = Reflection.getField(velocityClass, int.class, 3).getInt(packet);
+        int x = readInt(1);
+        int y = readInt(2);
+        int z = readInt(3);
 
-            //VELOCITY XYZ
-            this.velocityX = x / 8000.0D;
-            this.velocityY = y / 8000.0D;
-            this.velocityZ = z / 8000.0D;
-        } catch (IllegalAccessException e) {
-            e.printStackTrace();
-        }
+        //VELOCITY XYZ
+        this.velocityX = x / 8000.0D;
+        this.velocityY = y / 8000.0D;
+        this.velocityZ = z / 8000.0D;
     }
 
     /**
@@ -110,7 +106,10 @@ public final class WrappedPacketOutEntityVelocity extends WrappedPacket implemen
      * @return Entity
      */
     public Entity getEntity() {
-        return NMSUtils.getEntityById(this.entityId);
+        if(entity != null) {
+            return entity;
+        }
+        return entity = NMSUtils.getEntityById(this.entityId);
     }
 
     /**

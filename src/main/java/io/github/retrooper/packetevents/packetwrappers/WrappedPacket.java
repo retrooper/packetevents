@@ -22,9 +22,10 @@
  * SOFTWARE.
  */
 
-package io.github.retrooper.packetevents.packetwrappers.api;
+package io.github.retrooper.packetevents.packetwrappers;
 
 import io.github.retrooper.packetevents.enums.ServerVersion;
+import io.github.retrooper.packetevents.packet.PacketTypeClasses;
 import io.github.retrooper.packetevents.packetwrappers.in.abilities.WrappedPacketInAbilities;
 import io.github.retrooper.packetevents.packetwrappers.in.armanimation.WrappedPacketInArmAnimation;
 import io.github.retrooper.packetevents.packetwrappers.in.blockdig.WrappedPacketInBlockDig;
@@ -51,38 +52,34 @@ import io.github.retrooper.packetevents.packetwrappers.out.kickdisconnect.Wrappe
 import io.github.retrooper.packetevents.packetwrappers.out.position.WrappedPacketOutPosition;
 import io.github.retrooper.packetevents.packetwrappers.out.transaction.WrappedPacketOutTransaction;
 import io.github.retrooper.packetevents.packetwrappers.out.updatehealth.WrappedPacketOutUpdateHealth;
+import io.github.retrooper.packetevents.reflectionutils.Reflection;
 import org.bukkit.entity.Player;
 
-public class WrappedPacket {
+public class WrappedPacket implements WrapperPacketReader {
     public static ServerVersion version;
     protected final Player player;
     protected Object packet;
+    private Class<?> packetClass;
 
     public WrappedPacket() {
-        this.player = null;
-        this.packet = null;
+        this(null);
     }
 
     public WrappedPacket(final Object packet) {
-        this.player = null;
-        if (packet == null) return;
-        this.packet = packet;
-        try {
-            setup();
-        } catch (final Exception e) {
-            e.printStackTrace();
-        }
+        this(null, packet);
     }
 
     public WrappedPacket(final Player player, final Object packet) {
         this.player = player;
         if (packet == null) return;
         this.packet = packet;
-        try {
-            setup();
-        } catch (final Exception e) {
-            e.printStackTrace();
+        this.packetClass = packet.getClass();
+        if (packet.getClass().getSuperclass().equals(PacketTypeClasses.Client.FLYING)) {
+            packetClass = PacketTypeClasses.Client.FLYING;
+        } else if (packet.getClass().getSuperclass().equals(PacketTypeClasses.Server.ENTITY)) {
+            packetClass = PacketTypeClasses.Server.ENTITY;
         }
+        setup();
     }
 
     public static void loadAllWrappers() {
@@ -121,4 +118,98 @@ public class WrappedPacket {
 
     }
 
+    @Override
+    public boolean readBoolean(int index) {
+        try {
+            return Reflection.getField(packetClass, boolean.class, index).getBoolean(packet);
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    @Override
+    public byte readByte(int index) {
+        try {
+            return Reflection.getField(packetClass, byte.class, index).getByte(packet);
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        }
+        return -1;
+    }
+
+    @Override
+    public short readShort(int index) {
+        try {
+            return Reflection.getField(packetClass, short.class, index).getShort(packet);
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        }
+        return -1;
+    }
+
+    @Override
+    public int readInt(int index) {
+        try {
+            return Reflection.getField(packetClass, int.class, index).getInt(packet);
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        }
+        return -1;
+    }
+
+    @Override
+    public long readLong(int index) {
+        try {
+            return Reflection.getField(packetClass, long.class, index).getLong(packet);
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        }
+        return -1;
+    }
+
+    @Override
+    public float readFloat(int index) {
+        try {
+            return Reflection.getField(packetClass, float.class, index).getFloat(packet);
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        }
+        return -1;
+    }
+
+    @Override
+    public double readDouble(int index) {
+        try {
+            return Reflection.getField(packetClass, double.class, index).getDouble(packet);
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        }
+        return -1;
+    }
+
+    @Override
+    public Object readObject(int index, Class<?> type) {
+        try {
+            return Reflection.getField(packetClass, type, index).get(packet);
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    @Override
+    public Object readAnyObject(int index) {
+        try {
+            return Reflection.getField(packetClass, index).get(packet);
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    @Override
+    public String readString(int index) {
+        return readObject(index, String.class).toString();
+    }
 }

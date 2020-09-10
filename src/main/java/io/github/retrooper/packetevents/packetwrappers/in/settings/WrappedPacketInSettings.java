@@ -27,7 +27,7 @@ package io.github.retrooper.packetevents.packetwrappers.in.settings;
 import io.github.retrooper.packetevents.annotations.Nullable;
 import io.github.retrooper.packetevents.enums.ServerVersion;
 import io.github.retrooper.packetevents.packet.PacketTypeClasses;
-import io.github.retrooper.packetevents.packetwrappers.api.WrappedPacket;
+import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
 import io.github.retrooper.packetevents.reflectionutils.Reflection;
 import io.github.retrooper.packetevents.utils.NMSUtils;
 
@@ -39,10 +39,11 @@ public class WrappedPacketInSettings extends WrappedPacket {
 
     private static boolean isLowerThan_v_1_8;
     private String locale;
-    private byte viewDistance;
+    private int viewDistance;
     private ChatVisibility chatVisibility;
     private boolean chatColors;
     private HashMap<DisplayedSkinPart, Boolean> displayedSkinParts;
+
     public WrappedPacketInSettings(final Object packet) {
         super(packet);
     }
@@ -69,12 +70,12 @@ public class WrappedPacketInSettings extends WrappedPacket {
     protected void setup() {
         try {
             //LOCALE
-            this.locale = Reflection.getField(packetClass, String.class, 0).get(packet).toString();
+            this.locale = readString(0);
             //VIEW DISTANCE
-            this.viewDistance = (byte) Reflection.getField(packetClass, int.class, 0).getInt(packet);
+            this.viewDistance = readInt(0);
 
             //CHAT VISIBILITY
-            Object chatVisibilityEnumObject = Reflection.getField(packetClass, chatVisibilityEnumClass, 0).get(packet);
+            Object chatVisibilityEnumObject = readObject(0, chatVisibilityEnumClass);
             String enumValueAsString = chatVisibilityEnumObject.toString();
             if (enumValueAsString.equals("FULL")) {
                 chatVisibility = ChatVisibility.ENABLED;
@@ -85,18 +86,18 @@ public class WrappedPacketInSettings extends WrappedPacket {
             }
 
             //CHAT COLORS
-            this.chatColors = Reflection.getField(packetClass, boolean.class, 0).getBoolean(packet);
+            this.chatColors = readBoolean(0);
 
             //DISPLAYED SKIN PARTS
             this.displayedSkinParts = new HashMap<DisplayedSkinPart, Boolean>();
 
             if (isLowerThan_v_1_8) {
                 //in 1.7.10 only the cape display skin part is sent
-                boolean capeEnabled = Reflection.getField(packetClass, boolean.class, 1).getBoolean(packet);
+                boolean capeEnabled = readBoolean(1);
                 displayedSkinParts.put(DisplayedSkinPart.CAPE, capeEnabled);
             } else {
                 //in 1.8, all the skin parts are sent
-                int skinPartFlags = Reflection.getField(packetClass, int.class, 1).getInt(packet);
+                int skinPartFlags = readInt(1);
                 displayedSkinParts.put(DisplayedSkinPart.CAPE, (skinPartFlags & 0x01) != 0);
                 displayedSkinParts.put(DisplayedSkinPart.JACKET, (skinPartFlags & 0x02) != 0);
                 displayedSkinParts.put(DisplayedSkinPart.LEFT_SLEEVE, (skinPartFlags & 0x04) != 0);
@@ -114,6 +115,7 @@ public class WrappedPacketInSettings extends WrappedPacket {
 
     /**
      * Get language client setting
+     *
      * @return String Locale
      */
     public String getLocale() {
@@ -122,14 +124,16 @@ public class WrappedPacketInSettings extends WrappedPacket {
 
     /**
      * Get client view distance.
+     *
      * @return View Distance
      */
-    public byte getViewDistance() {
+    public int getViewDistance() {
         return viewDistance;
     }
 
     /**
      * Get Chat Visibility
+     *
      * @return Chat Visibility
      */
     public ChatVisibility getChatVisibility() {
@@ -138,6 +142,7 @@ public class WrappedPacketInSettings extends WrappedPacket {
 
     /**
      * Is chat colors
+     *
      * @return Chat Colors
      */
     public boolean isChatColors() {
@@ -146,7 +151,7 @@ public class WrappedPacketInSettings extends WrappedPacket {
 
     /**
      * Get Displayed skin parts.
-     *
+     * <p>
      * It is possible for some keys to not exist.
      * If that is the case, the server version is 1.7.10.
      * 1.7.10 only sends the cape skin part.
@@ -160,7 +165,7 @@ public class WrappedPacketInSettings extends WrappedPacket {
 
     /**
      * Is the skin part enabled.
-     *
+     * <p>
      * On 1.7.10, some skin parts will default to 'false' as 1.7.10
      * only sends the 'cape' skin part.
      *

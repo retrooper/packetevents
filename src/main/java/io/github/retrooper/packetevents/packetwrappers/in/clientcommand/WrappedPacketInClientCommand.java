@@ -25,7 +25,7 @@
 package io.github.retrooper.packetevents.packetwrappers.in.clientcommand;
 
 import io.github.retrooper.packetevents.packet.PacketTypeClasses;
-import io.github.retrooper.packetevents.packetwrappers.api.WrappedPacket;
+import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
 import io.github.retrooper.packetevents.reflectionutils.Reflection;
 import io.github.retrooper.packetevents.utils.NMSUtils;
 
@@ -51,16 +51,13 @@ public final class WrappedPacketInClientCommand extends WrappedPacket {
 
     @Override
     public void setup() {
-        try {
-            Object enumObj = Reflection.getField(packetClass, enumClientCommandClass, 0).get(packet);
-            this.clientCommand = ClientCommand.valueOf(enumObj.toString());
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        Object enumObj = readObject(0, enumClientCommandClass);
+        this.clientCommand = ClientCommand.valueOf(enumObj.toString());
     }
 
     /**
      * Get the Client Command enum sent in the packet
+     *
      * @return ClientCommand
      */
     public ClientCommand getClientCommand() {

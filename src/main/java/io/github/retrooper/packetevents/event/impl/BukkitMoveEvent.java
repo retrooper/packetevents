@@ -50,6 +50,11 @@ public final class BukkitMoveEvent extends PacketEvent implements CancellableEve
 
     @Override
     public void cancel() {
-        setCancelled(true);
+        this.cancelled = true;
+    }
+
+    @Override
+    public void uncancel() {
+        this.cancelled = false;
     }
 }

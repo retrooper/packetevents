@@ -25,7 +25,7 @@
 package io.github.retrooper.packetevents.packetwrappers.in.transaction;
 
 import io.github.retrooper.packetevents.packet.PacketTypeClasses;
-import io.github.retrooper.packetevents.packetwrappers.api.WrappedPacket;
+import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
 import io.github.retrooper.packetevents.reflectionutils.Reflection;
 
 public final class WrappedPacketInTransaction extends WrappedPacket {
@@ -43,14 +43,9 @@ public final class WrappedPacketInTransaction extends WrappedPacket {
 
     @Override
     protected void setup() {
-        try {
-            this.windowId = Reflection.getField(packetClass, int.class, 0).getInt(packet);
-            this.actionNumber = Reflection.getField(packetClass, short.class, 0).getShort(packet);
-            this.accepted = Reflection.getField(packetClass, boolean.class, 0).getBoolean(packet);
-        } catch (IllegalAccessException e) {
-            e.printStackTrace();
-        }
-
+        this.windowId = readInt(0);
+        this.actionNumber = readShort(0);
+        this.accepted = readBoolean(0);
     }
 
     /**

@@ -25,14 +25,14 @@
 package io.github.retrooper.packetevents.packetwrappers.out.updatehealth;
 
 import io.github.retrooper.packetevents.packet.PacketTypeClasses;
-import io.github.retrooper.packetevents.packetwrappers.Sendable;
-import io.github.retrooper.packetevents.packetwrappers.api.WrappedPacket;
+import io.github.retrooper.packetevents.packetwrappers.SendableWrapper;
+import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
 import io.github.retrooper.packetevents.reflectionutils.Reflection;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 
-public final class WrappedPacketOutUpdateHealth extends WrappedPacket implements Sendable {
+public final class WrappedPacketOutUpdateHealth extends WrappedPacket implements SendableWrapper {
     private static Class<?> packetClass;
     private static Constructor<?> packetConstructor;
     private float health, foodSaturation;
@@ -68,8 +68,8 @@ public final class WrappedPacketOutUpdateHealth extends WrappedPacket implements
     @Override
     protected void setup() {
         try {
-            this.health = Reflection.getField(packetClass, float.class, 0).getFloat(packet);
-            this.foodSaturation = Reflection.getField(packetClass, float.class, 0).getFloat(packet);
+            this.health = readFloat(0);
+            this.foodSaturation = readFloat(1);
             this.food = Reflection.getField(packetClass, int.class, 0).getInt(packet);
         } catch (IllegalAccessException e) {
             e.printStackTrace();

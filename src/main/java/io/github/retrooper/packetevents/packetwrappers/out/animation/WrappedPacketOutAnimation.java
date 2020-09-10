@@ -25,8 +25,8 @@
 package io.github.retrooper.packetevents.packetwrappers.out.animation;
 
 import io.github.retrooper.packetevents.packet.PacketTypeClasses;
-import io.github.retrooper.packetevents.packetwrappers.Sendable;
-import io.github.retrooper.packetevents.packetwrappers.api.WrappedPacket;
+import io.github.retrooper.packetevents.packetwrappers.SendableWrapper;
+import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
 import io.github.retrooper.packetevents.reflectionutils.Reflection;
 import io.github.retrooper.packetevents.utils.NMSUtils;
 import org.bukkit.entity.Entity;
@@ -35,7 +35,7 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 
-public final class WrappedPacketOutAnimation extends WrappedPacket implements Sendable {
+public final class WrappedPacketOutAnimation extends WrappedPacket implements SendableWrapper {
     private static Class<?> animationClass, nmsEntityClass;
     private static Constructor<?> animationConstructor;
 
@@ -85,16 +85,9 @@ public final class WrappedPacketOutAnimation extends WrappedPacket implements Se
 
     @Override
     protected void setup() {
-        try {
-            //a - ID
-            //b - TYPE
-            this.entityID = Reflection.getField(animationClass, int.class, 0).getInt(packet);
-            int animationID = Reflection.getField(animationClass, int.class, 1).getInt(packet);
-            this.type = cachedAnimationIDS.get(animationID);
-        } catch (IllegalAccessException e) {
-            e.printStackTrace();
-        }
-
+        this.entityID = readInt(0);
+        int animationID = readInt(1);
+        this.type = cachedAnimationIDS.get(animationID);
     }
 
     /**

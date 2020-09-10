@@ -25,14 +25,14 @@
 package io.github.retrooper.packetevents.packetwrappers.out.transaction;
 
 import io.github.retrooper.packetevents.packet.PacketTypeClasses;
-import io.github.retrooper.packetevents.packetwrappers.Sendable;
-import io.github.retrooper.packetevents.packetwrappers.api.WrappedPacket;
+import io.github.retrooper.packetevents.packetwrappers.SendableWrapper;
+import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
 import io.github.retrooper.packetevents.reflectionutils.Reflection;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 
-public class WrappedPacketOutTransaction extends WrappedPacket implements Sendable {
+public class WrappedPacketOutTransaction extends WrappedPacket implements SendableWrapper {
     private static Class<?> packetClass;
     private static Constructor<?> packetConstructor;
     private int windowId;
@@ -61,13 +61,9 @@ public class WrappedPacketOutTransaction extends WrappedPacket implements Sendab
 
     @Override
     protected void setup() {
-        try {
-            this.windowId = Reflection.getField(packetClass, int.class, 0).getInt(packet);
-            this.actionNumber = Reflection.getField(packetClass, short.class, 0).getShort(packet);
-            this.accepted = Reflection.getField(packetClass, boolean.class, 0).getBoolean(packet);
-        } catch (IllegalAccessException e) {
-            e.printStackTrace();
-        }
+        this.windowId = readInt(0);
+        this.actionNumber = readShort(0);
+        this.accepted = readBoolean(0);
 
     }
 

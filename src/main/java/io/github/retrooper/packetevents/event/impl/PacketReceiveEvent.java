@@ -92,6 +92,11 @@ public final class PacketReceiveEvent extends PacketEvent implements Cancellable
     }
 
     @Override
+    public void uncancel() {
+        this.cancelled = false;
+    }
+
+    @Override
     public boolean isCancelled() {
         return cancelled;
     }

@@ -51,6 +51,9 @@ public final class PlayerUninjectEvent extends PacketEvent implements Cancellabl
     }
 
     @Override
+    public void uncancel() {this.cancelled = false; }
+
+    @Override
     public boolean isCancelled() {
         return this.cancelled;
     }

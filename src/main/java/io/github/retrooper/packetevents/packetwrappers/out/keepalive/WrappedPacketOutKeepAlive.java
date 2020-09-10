@@ -25,14 +25,14 @@
 package io.github.retrooper.packetevents.packetwrappers.out.keepalive;
 
 import io.github.retrooper.packetevents.packet.PacketTypeClasses;
-import io.github.retrooper.packetevents.packetwrappers.Sendable;
-import io.github.retrooper.packetevents.packetwrappers.api.WrappedPacket;
+import io.github.retrooper.packetevents.packetwrappers.SendableWrapper;
+import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
 import io.github.retrooper.packetevents.reflectionutils.Reflection;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 
-public class WrappedPacketOutKeepAlive extends WrappedPacket implements Sendable {
+public class WrappedPacketOutKeepAlive extends WrappedPacket implements SendableWrapper {
     private static Class<?> packetClass;
     private static Constructor<?> keepAliveConstructor;
     private static boolean integerMode;
@@ -67,18 +67,11 @@ public class WrappedPacketOutKeepAlive extends WrappedPacket implements Sendable
 
     @Override
     protected void setup() {
-        if (!integerMode) {
-            try {
-                this.id = Reflection.getField(packetClass, long.class, 0).getLong(packet);
-            } catch (IllegalAccessException e) {
-                e.printStackTrace();
-            }
-        } else {
-            try {
-                this.id = Reflection.getField(packetClass, int.class, 0).getInt(packet);
-            } catch (IllegalAccessException e) {
-                e.printStackTrace();
-            }
+        if(integerMode) {
+            this.id = readInt(0);
+        }
+        else {
+            this.id = readLong(0);
         }
     }
 

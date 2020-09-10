@@ -26,7 +26,8 @@ package io.github.retrooper.packetevents.packetwrappers.in.custompayload;
 
 import io.github.retrooper.packetevents.annotations.Nullable;
 import io.github.retrooper.packetevents.packet.PacketTypeClasses;
-import io.github.retrooper.packetevents.packetwrappers.api.WrappedPacket;
+import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
+import io.github.retrooper.packetevents.packetwrappers.in.clientcommand.WrappedPacketInClientCommand;
 import io.github.retrooper.packetevents.reflectionutils.Reflection;
 import io.github.retrooper.packetevents.utils.NMSUtils;
 
@@ -61,12 +62,8 @@ public final class WrappedPacketInCustomPayload extends WrappedPacket {
     @Override
     public void setup() {
         if (!strPresentInIndex0) {
-            try {
-                this.minecraftKey = Reflection.getField(packetClass, nmsMinecraftKey, 0).get(packet);
-                this.dataSerializer = Reflection.getField(packetClass, nmsPacketDataSerializer, 0).get(packet);
-            } catch (IllegalAccessException e) {
-                e.printStackTrace();
-            }
+            this.minecraftKey = readObject(0, nmsMinecraftKey);
+            this.dataSerializer = readObject(0, nmsPacketDataSerializer);
 
         } else {
             Field dataSerializerField = Reflection.getField(packetClass, nmsPacketDataSerializer, 0);

@@ -25,7 +25,7 @@
 package io.github.retrooper.packetevents.packetwrappers.in.helditemslot;
 
 import io.github.retrooper.packetevents.packet.PacketTypeClasses;
-import io.github.retrooper.packetevents.packetwrappers.api.WrappedPacket;
+import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
 import io.github.retrooper.packetevents.reflectionutils.Reflection;
 
 public final class WrappedPacketInHeldItemSlot extends WrappedPacket {
@@ -43,7 +43,7 @@ public final class WrappedPacketInHeldItemSlot extends WrappedPacket {
     @Override
     public void setup() {
         try {
-            itemInHandIndex = Reflection.getField(packetClass, int.class, 0).getInt(packet);
+            itemInHandIndex = readInt(0);
         } catch (Exception e) {
             e.printStackTrace();
         }

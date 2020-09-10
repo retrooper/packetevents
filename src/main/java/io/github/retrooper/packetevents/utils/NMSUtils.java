@@ -26,7 +26,7 @@ package io.github.retrooper.packetevents.utils;
 
 import io.github.retrooper.packetevents.annotations.Nullable;
 import io.github.retrooper.packetevents.enums.ServerVersion;
-import io.github.retrooper.packetevents.packetwrappers.Sendable;
+import io.github.retrooper.packetevents.packetwrappers.SendableWrapper;
 import io.github.retrooper.packetevents.reflectionutils.Reflection;
 import io.github.retrooper.packetevents.utils.nms_entityfinder.EntityFinderUtils;
 import org.bukkit.World;
@@ -219,8 +219,8 @@ public final class NMSUtils {
         return null;
     }
 
-    public static void sendSendableWrapper(final Player player, final Sendable sendable) {
-        NMSUtils.sendNMSPacket(player, sendable.asNMSPacket());
+    public static void sendSendableWrapper(final Player player, final SendableWrapper sendableWrapper) {
+        NMSUtils.sendNMSPacket(player, sendableWrapper.asNMSPacket());
     }
 
     public static void sendNMSPacket(final Player player, final Object nmsPacket) {

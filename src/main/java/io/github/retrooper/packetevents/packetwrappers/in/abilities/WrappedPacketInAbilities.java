@@ -24,13 +24,13 @@
 
 package io.github.retrooper.packetevents.packetwrappers.in.abilities;
 
+import io.github.retrooper.packetevents.annotations.NotNull;
 import io.github.retrooper.packetevents.annotations.Nullable;
 import io.github.retrooper.packetevents.packet.PacketTypeClasses;
-import io.github.retrooper.packetevents.packetwrappers.api.WrappedPacket;
+import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
 import io.github.retrooper.packetevents.reflectionutils.Reflection;
 
 public final class WrappedPacketInAbilities extends WrappedPacket {
-    private static Class<?> abilitiesClass;
     private static boolean isMoreThanOneBoolPresent;
     private boolean isVulnerable;
     private boolean isFlying;
@@ -38,30 +38,26 @@ public final class WrappedPacketInAbilities extends WrappedPacket {
     private boolean instantBuild;
     private float flySpeed;
     private float walkSpeed;
+
     public WrappedPacketInAbilities(Object packet) {
         super(packet);
     }
 
     public static void load() {
-        abilitiesClass = PacketTypeClasses.Client.ABILITIES;
-        isMoreThanOneBoolPresent = Reflection.getField(abilitiesClass, boolean.class, 1) != null;
+        isMoreThanOneBoolPresent = Reflection.getField(PacketTypeClasses.Client.ABILITIES, boolean.class, 1) != null;
     }
 
     @Override
     protected void setup() {
-        try {
-            if (isMoreThanOneBoolPresent) {
-                this.isVulnerable = Reflection.getField(abilitiesClass, boolean.class, 0).getBoolean(packet);
-                this.isFlying = Reflection.getField(abilitiesClass, boolean.class, 1).getBoolean(packet);
-                this.allowFly = Reflection.getField(abilitiesClass, boolean.class, 2).getBoolean(packet);
-                this.instantBuild = Reflection.getField(abilitiesClass, boolean.class, 3).getBoolean(packet);
-                this.flySpeed = Reflection.getField(abilitiesClass, float.class, 0).getFloat(packet);
-                this.walkSpeed = Reflection.getField(abilitiesClass, float.class, 1).getFloat(packet);
-            } else {
-                this.isFlying = Reflection.getField(abilitiesClass, boolean.class, 0).getBoolean(packet);
-            }
-        } catch (IllegalAccessException e) {
-            e.printStackTrace();
+        if (isMoreThanOneBoolPresent) {
+            this.isVulnerable = readBoolean(0);
+            this.isFlying = readBoolean(1);
+            this.allowFly = readBoolean(2);
+            this.instantBuild = readBoolean(3);
+            this.flySpeed = readFloat(0);
+            this.walkSpeed = readFloat(1);
+        } else {
+            this.isFlying = readBoolean(0);
         }
     }
 
@@ -76,6 +72,7 @@ public final class WrappedPacketInAbilities extends WrappedPacket {
         return isVulnerable;
     }
 
+    @NotNull
     public boolean isFlying() {
         return isFlying;
     }

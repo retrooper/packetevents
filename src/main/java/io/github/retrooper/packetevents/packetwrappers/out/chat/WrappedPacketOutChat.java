@@ -25,9 +25,10 @@
 package io.github.retrooper.packetevents.packetwrappers.out.chat;
 
 import io.github.retrooper.packetevents.annotations.Beta;
+import io.github.retrooper.packetevents.annotations.NotNull;
 import io.github.retrooper.packetevents.packet.PacketTypeClasses;
-import io.github.retrooper.packetevents.packetwrappers.Sendable;
-import io.github.retrooper.packetevents.packetwrappers.api.WrappedPacket;
+import io.github.retrooper.packetevents.packetwrappers.SendableWrapper;
+import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
 import io.github.retrooper.packetevents.reflectionutils.Reflection;
 import io.github.retrooper.packetevents.utils.NMSUtils;
 
@@ -41,7 +42,7 @@ import java.util.UUID;
  * This wrapper MIGHT not be stable
  */
 @Beta
-public final class WrappedPacketOutChat extends WrappedPacket implements Sendable {
+public final class WrappedPacketOutChat extends WrappedPacket implements SendableWrapper {
     private static Constructor<?> chatClassConstructor;
     private static Class<?> packetClass, iChatBaseComponentClass, chatSerializerClass, chatMessageTypeEnum;
     private static Method chatMessageTypeCreatorMethod;
@@ -61,6 +62,12 @@ public final class WrappedPacketOutChat extends WrappedPacket implements Sendabl
     private ChatPosition chatPosition;
     private UUID uuid;
 
+
+    @Deprecated
+    public WrappedPacketOutChat(String message) {
+        this(message, null);
+    }
+
     public WrappedPacketOutChat(final Object packet) {
         super(packet);
     }
@@ -70,7 +77,6 @@ public final class WrappedPacketOutChat extends WrappedPacket implements Sendabl
     }
 
     public WrappedPacketOutChat(String message, ChatPosition chatPosition, UUID uuid) {
-        super();
         this.uuid = uuid;
         this.message = message;
         this.chatPosition = chatPosition;
@@ -152,7 +158,7 @@ public final class WrappedPacketOutChat extends WrappedPacket implements Sendabl
     }
 
     public static String fromStringToJSON(String message) {
-        return "{\"text\": \"" + "use entity action name: " + message + "\"}";
+        return "{\"text\": \"" + message + "\"}";
     }
 
     public static String toStringFromIChatBaseComponent(Object obj) {
@@ -177,7 +183,7 @@ public final class WrappedPacketOutChat extends WrappedPacket implements Sendabl
     @Override
     protected void setup() {
         try {
-            final Object iChatBaseObj = Reflection.getField(packetClass, iChatBaseComponentClass, 0).get(packet);
+            final Object iChatBaseObj = readObject(0, iChatBaseComponentClass);
 
             final Object contentString = Reflection.getMethod(iChatBaseComponentClass, String.class, 0).invoke(iChatBaseObj);
 
@@ -186,14 +192,14 @@ public final class WrappedPacketOutChat extends WrappedPacket implements Sendabl
             byte chatPosInteger = 0;
             switch (constructorMode) {
                 case 0:
-                    chatPosInteger = Reflection.getField(packetClass, byte.class, 0).getByte(packet);
+                    chatPosInteger = readByte(0);
                     break;
                 case 1:
-                    chatPosInteger = (byte) Reflection.getField(packetClass, int.class, 0).getInt(packet);
+                    chatPosInteger = (byte) readInt(0);
                     break;
                 case 2:
                 case 3:
-                    Object chatTypeEnumInstance = Reflection.getField(packetClass, chatMessageTypeEnum, 0).get(packet);
+                    Object chatTypeEnumInstance = readObject(0, chatMessageTypeEnum);
                     chatPosInteger = cachedChatMessageTypeIntegers.get(chatTypeEnumInstance.toString());
                     break;
             }
@@ -270,6 +276,7 @@ public final class WrappedPacketOutChat extends WrappedPacket implements Sendabl
      * If an invalid chat position is sent, it will be defaulted it to CHAT.
      * @return ChatPosition
      */
+    @NotNull
     public ChatPosition getChatPosition() {
         if(this.chatPosition == null) {
             this.chatPosition = ChatPosition.CHAT;

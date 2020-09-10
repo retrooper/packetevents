@@ -25,7 +25,7 @@
 package io.github.retrooper.packetevents.packetwrappers.in.blockplace;
 
 import io.github.retrooper.packetevents.packet.PacketTypeClasses;
-import io.github.retrooper.packetevents.packetwrappers.api.WrappedPacket;
+import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
 import io.github.retrooper.packetevents.reflectionutils.Reflection;
 import io.github.retrooper.packetevents.utils.NMSUtils;
 import io.github.retrooper.packetevents.utils.vector.Vector3i;
@@ -62,7 +62,7 @@ final class WrappedPacketInBlockPlace_1_8 extends WrappedPacket {
             this.blockPosition.z = (int) Reflection.getMethod(blockPositionSuperClass, "getZ", 0).invoke(nmsBlockPos);
 
 
-            this.itemStack = NMSUtils.toBukkitItemStack(Reflection.getField(blockPlaceClass, NMSUtils.nmsItemStackClass, 0).get(packet));
+            this.itemStack = NMSUtils.toBukkitItemStack(readObject(0, NMSUtils.nmsItemStackClass));
         } catch (IllegalAccessException | InvocationTargetException e) {
             e.printStackTrace();
         }

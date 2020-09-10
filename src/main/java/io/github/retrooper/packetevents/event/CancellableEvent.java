@@ -44,7 +44,13 @@ public interface CancellableEvent {
 
     /**
      * Cancel the event.
-     * This is the same as just doing: CancellableEvent#setCancelled(true)
+     * You can achieve the same result by just using {@link #setCancelled(boolean)}
      */
     void cancel();
+
+    /**
+     * Uncancel the event.
+     * You can achieve the same result by just using {@link #setCancelled(boolean)}
+     */
+    void uncancel();
 }

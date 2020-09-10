@@ -25,14 +25,14 @@
 package io.github.retrooper.packetevents.packetwrappers.out.abilities;
 
 import io.github.retrooper.packetevents.packet.PacketTypeClasses;
-import io.github.retrooper.packetevents.packetwrappers.Sendable;
-import io.github.retrooper.packetevents.packetwrappers.api.WrappedPacket;
+import io.github.retrooper.packetevents.packetwrappers.SendableWrapper;
+import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
 import io.github.retrooper.packetevents.reflectionutils.Reflection;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 
-public final class WrappedPacketOutAbilities extends WrappedPacket implements Sendable {
+public final class WrappedPacketOutAbilities extends WrappedPacket implements SendableWrapper {
     private static Class<?> packetClass;
     private static Constructor<?> packetConstructor;
     private boolean vulnerable, flying, allowFlight, instantBuild;
@@ -64,18 +64,13 @@ public final class WrappedPacketOutAbilities extends WrappedPacket implements Se
 
     @Override
     protected void setup() {
-        try {
-            this.vulnerable = Reflection.getField(packetClass, boolean.class, 0).getBoolean(packet);
-            this.flying = Reflection.getField(packetClass, boolean.class, 1).getBoolean(packet);
-            this.allowFlight = Reflection.getField(packetClass, boolean.class, 2).getBoolean(packet);
-            this.instantBuild = Reflection.getField(packetClass, boolean.class, 3).getBoolean(packet);
+        this.vulnerable = readBoolean(0);
+        this.flying = readBoolean(1);
+        this.allowFlight = readBoolean(2);
+        this.instantBuild = readBoolean(3);
 
-            this.flySpeed = Reflection.getField(packetClass, float.class, 0).getFloat(packet);
-            this.walkSpeed = Reflection.getField(packetClass, float.class, 0).getFloat(packet);
-        } catch (IllegalAccessException e) {
-            e.printStackTrace();
-        }
-
+        this.flySpeed = readFloat(0);
+        this.walkSpeed = readFloat(1);
     }
 
     /**
