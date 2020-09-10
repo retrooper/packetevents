@@ -26,16 +26,10 @@ package io.github.retrooper.packetevents.example;
 
 import io.github.retrooper.packetevents.PacketEvents;
 import io.github.retrooper.packetevents.annotations.PacketHandler;
-import io.github.retrooper.packetevents.enums.PacketEventPriority;
 import io.github.retrooper.packetevents.event.PacketListener;
-import io.github.retrooper.packetevents.event.impl.PacketReceiveEvent;
 import io.github.retrooper.packetevents.event.impl.PacketSendEvent;
 import io.github.retrooper.packetevents.packet.PacketType;
-import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
-import io.github.retrooper.packetevents.packetwrappers.in.blockdig.WrappedPacketInBlockDig;
-import io.github.retrooper.packetevents.packetwrappers.in.flying.WrappedPacketInFlying;
-import io.github.retrooper.packetevents.packetwrappers.in.useentity.WrappedPacketInUseEntity;
-import io.github.retrooper.packetevents.packetwrappers.out.chat.WrappedPacketOutChat;
+import io.github.retrooper.packetevents.packetwrappers.out.custompayload.WrappedPacketOutCustomPayload;
 import io.github.retrooper.packetevents.packetwrappers.out.entity.WrappedPacketOutEntity;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -62,15 +56,11 @@ public class MainExample extends JavaPlugin implements PacketListener {
 
     @PacketHandler
     public void onSend(PacketSendEvent e) {
-        if(e.getPacketId() == PacketType.Server.REL_ENTITY_MOVE_LOOK) {
-            WrappedPacketOutEntity.WrappedPacketOutRelEntityMoveLook eml = new WrappedPacketOutEntity.WrappedPacketOutRelEntityMoveLook(e.getNMSPacket());
-            double deltaX = eml.getDeltaX();
-            e.getPlayer().sendMessage("deltaX: " + deltaX);
+        if (e.getPacketId() == PacketType.Server.CUSTOM_PAYLOAD) {
+            WrappedPacketOutCustomPayload cp = new WrappedPacketOutCustomPayload(e.getNMSPacket());
+
         }
     }
-    //UPDATE PE EXAMPLE repo
-    //PE CHANGELOG:
-
     //creating wrappers is much easier and cleaner now with new functions.
     //all wrappers cleaned up
     // walk speed returning the fly speed FIXED,
