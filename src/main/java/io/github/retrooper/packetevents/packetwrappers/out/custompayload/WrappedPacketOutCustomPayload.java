@@ -29,9 +29,6 @@ import io.github.retrooper.packetevents.packetwrappers.SendableWrapper;
 import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
 import io.github.retrooper.packetevents.reflectionutils.Reflection;
 import io.github.retrooper.packetevents.utils.NMSUtils;
-import io.netty.buffer.Unpooled;
-import net.minecraft.server.v1_13_R2.MinecraftKey;
-import net.minecraft.server.v1_16_R1.PacketDataSerializer;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
@@ -99,28 +96,26 @@ public class WrappedPacketOutCustomPayload extends WrappedPacket implements Send
                 }
             }
         }
-        PacketDataSerializer ds = new PacketDataSerializer(Unpooled.copiedBuffer(new byte[10]));
-
     }
 
     private String tag;
     private byte[] data;
 
-    public WrappedPacketOutCustomPayload(String tag, byte[] bytes) {
+    public WrappedPacketOutCustomPayload(String tag, byte[] data) {
         this.tag = tag;
         this.data = data;
     }
 
 
-    public WrappedPacketOutCustomPayload(Object packet) {
-        super(packet);
-    }
+    /*    public WrappedPacketOutCustomPayload(Object packet) {
+            super(packet);
+        }
 
-    @Override
-    protected void setup() {
+        @Override
+        protected void setup() {
 
-    }
-
+        }
+    */
     public String getTag() {
         return tag;
     }
@@ -158,7 +153,8 @@ public class WrappedPacketOutCustomPayload extends WrappedPacket implements Send
 
                 try {
                     Object minecraftKey = minecraftKeyConstructor.newInstance(tag);
-                    Object dataSerializer = packetDataSerializerConstructor.newInstance(byteBufObject);;
+                    Object dataSerializer = packetDataSerializerConstructor.newInstance(byteBufObject);
+                    ;
                     return constructor.newInstance(minecraftKey, dataSerializer);
                 } catch (InstantiationException | InvocationTargetException | IllegalAccessException e) {
                     e.printStackTrace();

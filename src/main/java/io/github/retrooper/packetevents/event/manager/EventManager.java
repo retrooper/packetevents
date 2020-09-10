@@ -36,49 +36,40 @@ import org.bukkit.Bukkit;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
 public final class EventManager {
-    private final HashMap<PacketListener, List<Method>> registeredMethods = new HashMap<PacketListener, List<Method>>();
+    private final ConcurrentHashMap<PacketListener, ConcurrentLinkedQueue<Method>> registeredMethods = new ConcurrentHashMap<>();
 
     public void callEvent(final PacketEvent e) {
         for (final PacketListener listener : registeredMethods.keySet()) {
-            //Annotated methods
-            final List<Method> methods = registeredMethods.get(listener);
-            final List<Boolean> isCancellingList = new ArrayList<Boolean>(methods.size());
-
-            int highestPriorityMethodListenerIndex = 0;
-            for(int i = 0; i < methods.size(); i++) {
-                Method method = methods.get(i);
-                final Class<?> parameterType = method.getParameterTypes()[0];
+            ConcurrentLinkedQueue<Method> methods = registeredMethods.get(listener);
+            final boolean[] isCancelled = {false};
+            final byte[] eventPriority = {PacketEventPriority.LOWEST};
+            for (Method method : methods) {
+                Class<?> parameterType = method.getParameterTypes()[0];
                 if (parameterType.equals(PacketEvent.class)
                         || parameterType.isInstance(e)) {
-                    PacketHandler annotation = methods.get(highestPriorityMethodListenerIndex).getAnnotation(PacketHandler.class);
 
-                    PacketHandler competitorAnnotation = methods.get(i).getAnnotation(PacketHandler.class);
-
-                    if(competitorAnnotation.priority() >= annotation.priority()) {
-                        highestPriorityMethodListenerIndex = i;
-                    }
-
-                    boolean isCurEventCancelled = false;
-                    final Runnable invokeMethod = new Runnable() {
+                    PacketHandler annotation = method.getAnnotation(PacketHandler.class);
+                    Runnable invokeMethod = new Runnable() {
                         @Override
                         public void run() {
                             try {
                                 method.invoke(listener, e);
-                                if(e instanceof CancellableEvent) {
-                                    isCancellingList.add(((CancellableEvent) e).isCancelled());
-                                }
                             } catch (IllegalAccessException | InvocationTargetException ex) {
                                 ex.printStackTrace();
                             }
+                            if (e instanceof CancellableEvent) {
+                                CancellableEvent ce = (CancellableEvent) e;
+                                if (annotation.priority() >= eventPriority[0]) {
+                                    eventPriority[0] = annotation.priority();
+                                    isCancelled[0] = ce.isCancelled();
+                                }
+                            }
                         }
                     };
-
-
                     switch (annotation.synchronization()) {
                         case FORCE_ASYNC:
                             Bukkit.getScheduler().runTaskAsynchronously(PacketEvents.getPlugin(), invokeMethod);
@@ -92,16 +83,18 @@ public final class EventManager {
                             } catch (IllegalAccessException | InvocationTargetException ex) {
                                 ex.printStackTrace();
                             }
-                            isCancellingList.add(((CancellableEvent)e).isCancelled());
+                            if (e instanceof CancellableEvent) {
+                                CancellableEvent ce = (CancellableEvent) e;
+                                if (annotation.priority() >= eventPriority[0]) {
+                                    eventPriority[0] = annotation.priority();
+                                    isCancelled[0] = ce.isCancelled();
+                                }
+                            }
                             break;
                     }
-
-                    //Last iteration
-                    if(i + 1 == methods.size()) {
-                        if(e instanceof CancellableEvent) {
-                            CancellableEvent cancellable = (CancellableEvent)e;
-                            cancellable.setCancelled(isCancellingList.get(highestPriorityMethodListenerIndex));
-                        }
+                    if (e instanceof CancellableEvent) {
+                        CancellableEvent cancellableEvent = (CancellableEvent) e;
+                        cancellableEvent.setCancelled(isCancelled[0]);
                     }
                 }
             }
@@ -109,7 +102,7 @@ public final class EventManager {
     }
 
     public void registerListener(final PacketListener listener) {
-            final List<Method> methods = new ArrayList<Method>();
+        final ConcurrentLinkedQueue<Method> methods = new ConcurrentLinkedQueue<>();
         for (final Method m : listener.getClass().getDeclaredMethods()) {
             if (m.isAnnotationPresent(PacketHandler.class)
                     && m.getParameterTypes().length == 1) {
