@@ -23,7 +23,7 @@
  */
 
 package io.github.retrooper.packetevents.enums;
-
+@Deprecated
 public interface PacketEventPriority {
     byte LOWEST = 0;
     byte LOW = 1;

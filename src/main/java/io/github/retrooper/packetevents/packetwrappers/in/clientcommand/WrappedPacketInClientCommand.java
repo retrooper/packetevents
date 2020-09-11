@@ -26,8 +26,9 @@ package io.github.retrooper.packetevents.packetwrappers.in.clientcommand;
 
 import io.github.retrooper.packetevents.packet.PacketTypeClasses;
 import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
-import io.github.retrooper.packetevents.reflectionutils.Reflection;
+import io.github.retrooper.packetevents.utils.reflection.Reflection;
 import io.github.retrooper.packetevents.utils.NMSUtils;
+import io.github.retrooper.packetevents.utils.reflection.SubclassUtil;
 
 public final class WrappedPacketInClientCommand extends WrappedPacket {
     private static Class<?> packetClass;
@@ -45,7 +46,7 @@ public final class WrappedPacketInClientCommand extends WrappedPacket {
             enumClientCommandClass = NMSUtils.getNMSClass("EnumClientCommand");
         } catch (ClassNotFoundException e) {
             //Probably a subclass
-            enumClientCommandClass = Reflection.getSubClass(packetClass, "EnumClientCommand");
+            enumClientCommandClass = SubclassUtil.getSubClass(packetClass, "EnumClientCommand");
         }
     }
 

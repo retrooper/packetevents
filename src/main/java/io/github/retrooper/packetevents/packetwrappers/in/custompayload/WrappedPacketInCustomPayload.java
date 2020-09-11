@@ -27,8 +27,7 @@ package io.github.retrooper.packetevents.packetwrappers.in.custompayload;
 import io.github.retrooper.packetevents.annotations.Nullable;
 import io.github.retrooper.packetevents.packet.PacketTypeClasses;
 import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
-import io.github.retrooper.packetevents.packetwrappers.in.clientcommand.WrappedPacketInClientCommand;
-import io.github.retrooper.packetevents.reflectionutils.Reflection;
+import io.github.retrooper.packetevents.utils.reflection.Reflection;
 import io.github.retrooper.packetevents.utils.NMSUtils;
 
 import java.lang.reflect.Field;
@@ -55,7 +54,7 @@ public final class WrappedPacketInCustomPayload extends WrappedPacket {
             //Only on 1.13+
             nmsMinecraftKey = NMSUtils.getNMSClass("MinecraftKey");
         } catch (ClassNotFoundException e) {
-            //Its okay, this means they are on versions 1.7.10 ~ 1.12.2
+            //Its okay, this means they are on versions 1.7.10 - 1.12.2
         }
     }
 

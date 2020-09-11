@@ -24,8 +24,9 @@
 
 package io.github.retrooper.packetevents.packet;
 
-import io.github.retrooper.packetevents.reflectionutils.Reflection;
+import io.github.retrooper.packetevents.utils.reflection.Reflection;
 import io.github.retrooper.packetevents.utils.NMSUtils;
+import io.github.retrooper.packetevents.utils.reflection.SubclassUtil;
 
 public class PacketTypeClasses {
     public static class Client {
@@ -52,9 +53,9 @@ public class PacketTypeClasses {
                 POSITION_LOOK = NMSUtils.getNMSClass(c + "PositionLook");
                 LOOK = NMSUtils.getNMSClass(c + "Look");
             } catch (ClassNotFoundException e) {
-                POSITION = Reflection.getSubClass(FLYING, c + "Position");
-                POSITION_LOOK = Reflection.getSubClass(FLYING, c + "PositionLook");
-                LOOK = Reflection.getSubClass(FLYING, c + "Look");
+                POSITION = SubclassUtil.getSubClass(FLYING, c + "Position");
+                POSITION_LOOK = SubclassUtil.getSubClass(FLYING, c + "PositionLook");
+                LOOK = SubclassUtil.getSubClass(FLYING, c + "Look");
             }
 
             try {
@@ -195,9 +196,9 @@ public class PacketTypeClasses {
             MAP = NMSUtils.getNMSClassWithoutException(s + "Map");
             OPEN_WINDOW_MERCHANT = NMSUtils.getNMSClassWithoutException(s + "OpenWindowMerchant");
             ENTITY = NMSUtils.getNMSClassWithoutException(s + "Entity");
-            REL_ENTITY_MOVE = Reflection.getSubClass(ENTITY, s + "RelEntityMove");
-            REL_ENTITY_MOVE_LOOK = Reflection.getSubClass(ENTITY, s + "RelEntityMoveLook");
-            ENTITY_LOOK = Reflection.getSubClass(ENTITY, s + "EntityLook");
+            REL_ENTITY_MOVE = SubclassUtil.getSubClass(ENTITY, s + "RelEntityMove");
+            REL_ENTITY_MOVE_LOOK = SubclassUtil.getSubClass(ENTITY, s + "RelEntityMoveLook");
+            ENTITY_LOOK = SubclassUtil.getSubClass(ENTITY, s + "EntityLook");
             if (REL_ENTITY_MOVE == null) {
                 //is not a subclass and should be accessed normally
                 REL_ENTITY_MOVE = NMSUtils.getNMSClassWithoutException(s + "RelEntityMove");

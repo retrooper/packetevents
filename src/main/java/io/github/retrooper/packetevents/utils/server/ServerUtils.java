@@ -22,7 +22,7 @@
  * SOFTWARE.
  */
 
-package io.github.retrooper.packetevents.utils.api;
+package io.github.retrooper.packetevents.utils.server;
 
 import io.github.retrooper.packetevents.enums.ServerVersion;
 import io.github.retrooper.packetevents.enums.SystemOS;
@@ -74,7 +74,7 @@ public final class ServerUtils {
     /**
      * Use {@link #getOperatingSystem()}
      * @deprecated Method rename pending to next minor update.
-     * @return
+     * @return Operating system of the current machine
      */
     @Deprecated
     public SystemOS getPlatform() {
@@ -82,10 +82,18 @@ public final class ServerUtils {
     }
 
     /**
-     * Get the Operating System the server is running on.
-     * @return Get Server Operating System
+     * @deprecated Use {@link #getOS()}
      */
+    @Deprecated
     public SystemOS getOperatingSystem() {
+        return SystemOS.getOperatingSystem();
+    }
+
+    /**
+     * Get the operating system of the local machine
+     * @return Get Operating System
+     */
+    public SystemOS getOS() {
         return SystemOS.getOperatingSystem();
     }
 }

@@ -24,7 +24,7 @@
 
 package io.github.retrooper.packetevents.packetwrappers.out.abilities;
 
-import io.github.retrooper.packetevents.reflectionutils.Reflection;
+import io.github.retrooper.packetevents.utils.reflection.Reflection;
 import io.github.retrooper.packetevents.utils.NMSUtils;
 
 import java.lang.reflect.Constructor;

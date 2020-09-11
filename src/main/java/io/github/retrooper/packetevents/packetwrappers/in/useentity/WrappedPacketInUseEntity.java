@@ -26,8 +26,9 @@ package io.github.retrooper.packetevents.packetwrappers.in.useentity;
 
 import io.github.retrooper.packetevents.packet.PacketTypeClasses;
 import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
-import io.github.retrooper.packetevents.reflectionutils.Reflection;
+import io.github.retrooper.packetevents.utils.reflection.Reflection;
 import io.github.retrooper.packetevents.utils.NMSUtils;
+import io.github.retrooper.packetevents.utils.reflection.SubclassUtil;
 import org.bukkit.entity.Entity;
 
 public final class WrappedPacketInUseEntity extends WrappedPacket {
@@ -47,7 +48,7 @@ public final class WrappedPacketInUseEntity extends WrappedPacket {
             enumEntityUseActionClass = NMSUtils.getNMSClass("EnumEntityUseAction");
         } catch (ClassNotFoundException e) {
             //That is fine, it is probably a subclass
-            enumEntityUseActionClass = Reflection.getSubClass(useEntityClass, "EnumEntityUseAction");
+            enumEntityUseActionClass = SubclassUtil.getSubClass(useEntityClass, "EnumEntityUseAction");
         }
     }
 

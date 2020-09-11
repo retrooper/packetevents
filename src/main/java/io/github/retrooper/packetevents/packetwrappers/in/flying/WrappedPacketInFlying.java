@@ -27,7 +27,6 @@ package io.github.retrooper.packetevents.packetwrappers.in.flying;
 
 import io.github.retrooper.packetevents.packet.PacketTypeClasses;
 import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
-import io.github.retrooper.packetevents.reflectionutils.Reflection;
 
 public class WrappedPacketInFlying extends WrappedPacket {
     private static Class<?> flyingClass;

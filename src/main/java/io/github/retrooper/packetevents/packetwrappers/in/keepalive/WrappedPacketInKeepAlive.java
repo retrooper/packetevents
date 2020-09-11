@@ -26,7 +26,7 @@ package io.github.retrooper.packetevents.packetwrappers.in.keepalive;
 
 import io.github.retrooper.packetevents.packet.PacketTypeClasses;
 import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
-import io.github.retrooper.packetevents.reflectionutils.Reflection;
+import io.github.retrooper.packetevents.utils.reflection.Reflection;
 
 public final class WrappedPacketInKeepAlive extends WrappedPacket {
     private static Class<?> packetClass;

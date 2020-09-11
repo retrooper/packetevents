@@ -22,39 +22,17 @@
  * SOFTWARE.
  */
 
-package io.github.retrooper.packetevents.reflectionutils.fielddata;
+package io.github.retrooper.packetevents.utils.reflection;
 
-import java.util.Objects;
+import java.util.HashMap;
 
-public class FieldWithIndex {
-    private final Class<?> cls;
-    private final int index;
+public class ClassUtil {
+    private static final HashMap<Class<?>, String> classSimpleNameCache = new HashMap<Class<?>, String>();
 
-    public FieldWithIndex(Class<?> cls, int index) {
-        this.cls = cls;
-        this.index = index;
+    public static String getClassSimpleName(Class<?> cls) {
+        if(!classSimpleNameCache.containsKey(cls)) {
+            classSimpleNameCache.put(cls, cls.getSimpleName());
+        }
+        return classSimpleNameCache.get(cls);
     }
-
-    public Class<?> getCls() {
-        return cls;
-    }
-
-    public int getIndex() {
-        return index;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        FieldWithIndex that = (FieldWithIndex) o;
-        return index == that.index &&
-                Objects.equals(cls, that.cls);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(cls, index);
-    }
-
 }

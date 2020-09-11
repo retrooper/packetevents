@@ -28,8 +28,9 @@ import io.github.retrooper.packetevents.enums.Direction;
 import io.github.retrooper.packetevents.enums.ServerVersion;
 import io.github.retrooper.packetevents.packet.PacketTypeClasses;
 import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
-import io.github.retrooper.packetevents.reflectionutils.Reflection;
+import io.github.retrooper.packetevents.utils.reflection.Reflection;
 import io.github.retrooper.packetevents.utils.NMSUtils;
+import io.github.retrooper.packetevents.utils.reflection.SubclassUtil;
 import io.github.retrooper.packetevents.utils.vector.Vector3i;
 
 public final class WrappedPacketInBlockDig extends WrappedPacket {
@@ -59,7 +60,7 @@ public final class WrappedPacketInBlockDig extends WrappedPacket {
                 digTypeClass = NMSUtils.getNMSClass("EnumPlayerDigType");
             } catch (ClassNotFoundException e) {
                 //It is probably a subclass
-                digTypeClass = Reflection.getSubClass(blockDigClass, "EnumPlayerDigType");
+                digTypeClass = SubclassUtil.getSubClass(blockDigClass, "EnumPlayerDigType");
             }
         }
     }

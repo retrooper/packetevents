@@ -26,7 +26,6 @@ package io.github.retrooper.packetevents.packetwrappers.in.chat;
 
 import io.github.retrooper.packetevents.packet.PacketTypeClasses;
 import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
-import io.github.retrooper.packetevents.reflectionutils.Reflection;
 
 public final class WrappedPacketInChat extends WrappedPacket {
     private static Class<?> chatPacketClass;

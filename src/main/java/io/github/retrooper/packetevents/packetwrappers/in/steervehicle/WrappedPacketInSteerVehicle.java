@@ -26,7 +26,6 @@ package io.github.retrooper.packetevents.packetwrappers.in.steervehicle;
 
 import io.github.retrooper.packetevents.packet.PacketTypeClasses;
 import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
-import io.github.retrooper.packetevents.reflectionutils.Reflection;
 
 public class WrappedPacketInSteerVehicle extends WrappedPacket {
     private static Class<?> packetClass;

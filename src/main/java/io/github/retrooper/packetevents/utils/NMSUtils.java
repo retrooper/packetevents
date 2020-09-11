@@ -27,8 +27,8 @@ package io.github.retrooper.packetevents.utils;
 import io.github.retrooper.packetevents.annotations.Nullable;
 import io.github.retrooper.packetevents.enums.ServerVersion;
 import io.github.retrooper.packetevents.packetwrappers.SendableWrapper;
-import io.github.retrooper.packetevents.reflectionutils.Reflection;
-import io.github.retrooper.packetevents.utils.nms_entityfinder.EntityFinderUtils;
+import io.github.retrooper.packetevents.utils.reflection.Reflection;
+import io.github.retrooper.packetevents.utils.entityfinder.EntityFinderUtils;
 import org.bukkit.World;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
@@ -42,7 +42,7 @@ public final class NMSUtils {
     public static ServerVersion version;
     private static final String nmsDir = ServerVersion.getNMSDirectory();
     private static final String obcDir = ServerVersion.getOBCDirectory();
-    public static String nettyPrefix;
+    public static String nettyPrefix = "io.netty";
     public static Class<?> minecraftServerClass, craftWorldsClass,
             packetClass, entityPlayerClass, playerConnectionClass,
             craftPlayerClass, serverConnectionClass, craftEntityClass,
@@ -52,7 +52,6 @@ public final class NMSUtils {
 
     public static void load() {
         try {
-            nettyPrefix = "io.netty";
             Class.forName(nettyPrefix + ".channel.Channel");
         } catch (ClassNotFoundException e) {
             nettyPrefix = "net.minecraft.util.io.netty";

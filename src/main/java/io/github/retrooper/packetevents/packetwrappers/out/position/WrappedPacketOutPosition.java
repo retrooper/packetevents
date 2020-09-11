@@ -26,7 +26,6 @@ package io.github.retrooper.packetevents.packetwrappers.out.position;
 
 import io.github.retrooper.packetevents.packet.PacketTypeClasses;
 import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
-import io.github.retrooper.packetevents.reflectionutils.Reflection;
 
 public final class WrappedPacketOutPosition extends WrappedPacket {
     private static Class<?> packetClass;

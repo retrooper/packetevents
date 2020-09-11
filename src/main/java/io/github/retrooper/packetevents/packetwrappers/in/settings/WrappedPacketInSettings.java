@@ -28,8 +28,9 @@ import io.github.retrooper.packetevents.annotations.Nullable;
 import io.github.retrooper.packetevents.enums.ServerVersion;
 import io.github.retrooper.packetevents.packet.PacketTypeClasses;
 import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
-import io.github.retrooper.packetevents.reflectionutils.Reflection;
+import io.github.retrooper.packetevents.utils.reflection.Reflection;
 import io.github.retrooper.packetevents.utils.NMSUtils;
+import io.github.retrooper.packetevents.utils.reflection.SubclassUtil;
 
 import java.util.HashMap;
 
@@ -58,7 +59,8 @@ public class WrappedPacketInSettings extends WrappedPacket {
         } catch (ClassNotFoundException e) {
             Class<?> entityHumanClass = NMSUtils.getNMSClassWithoutException("EntityHuman");
             //They are just on an outdated version
-            chatVisibilityEnumClass = Reflection.getSubClass(entityHumanClass, "EnumChatVisibility");
+            assert entityHumanClass != null;
+            chatVisibilityEnumClass = SubclassUtil.getSubClass(entityHumanClass, "EnumChatVisibility");
         }
     }
 

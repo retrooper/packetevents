@@ -22,11 +22,11 @@
  * SOFTWARE.
  */
 
-package io.github.retrooper.packetevents.utils.api;
+package io.github.retrooper.packetevents.utils.player;
 
 import io.github.retrooper.packetevents.PacketEvents;
 import io.github.retrooper.packetevents.enums.ClientVersion;
-import io.github.retrooper.packetevents.handler.NettyPacketHandler;
+import io.github.retrooper.packetevents.nettyhandler.NettyPacketHandler;
 import io.github.retrooper.packetevents.packetwrappers.SendableWrapper;
 import io.github.retrooper.packetevents.utils.NMSUtils;
 import io.github.retrooper.packetevents.utils.versionlookup.VersionLookupUtils;

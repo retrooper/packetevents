@@ -22,7 +22,7 @@
  * SOFTWARE.
  */
 
-package io.github.retrooper.packetevents.handler;
+package io.github.retrooper.packetevents.nettyhandler;
 
 import io.github.retrooper.packetevents.PacketEvents;
 import io.github.retrooper.packetevents.utils.NMSUtils;
@@ -32,8 +32,6 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelPipeline;
 import io.netty.channel.ChannelPromise;
 import org.bukkit.entity.Player;
-
-import java.util.concurrent.Future;
 
 final class NettyPacketHandler_8 {
     /**

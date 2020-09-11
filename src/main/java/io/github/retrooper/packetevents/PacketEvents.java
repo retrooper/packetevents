@@ -24,7 +24,6 @@
 
 package io.github.retrooper.packetevents;
 
-import io.github.retrooper.packetevents.api.PacketEventsAPI;
 import io.github.retrooper.packetevents.enums.ClientVersion;
 import io.github.retrooper.packetevents.enums.ServerVersion;
 import io.github.retrooper.packetevents.event.PacketEvent;
@@ -33,7 +32,7 @@ import io.github.retrooper.packetevents.packet.PacketTypeClasses;
 import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
 import io.github.retrooper.packetevents.settings.PacketEventsSettings;
 import io.github.retrooper.packetevents.utils.NMSUtils;
-import io.github.retrooper.packetevents.utils.nms_entityfinder.EntityFinderUtils;
+import io.github.retrooper.packetevents.utils.entityfinder.EntityFinderUtils;
 import io.github.retrooper.packetevents.utils.versionlookup.VersionLookupUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -51,10 +50,9 @@ import java.util.ArrayList;
 public final class PacketEvents implements Listener {
     private static final PacketEventsAPI packetEventsAPI = new PacketEventsAPI();
     private static final PacketEvents instance = new PacketEvents();
-    private static final PacketEventsSettings settings = new PacketEventsSettings();
     private static final ArrayList<Plugin> plugins = new ArrayList<Plugin>(1);
-    private static boolean hasLoaded, isStarted, hasCreatedTempDataFile;
-
+    private static boolean loaded, initialized;
+ 
     /**
      * This loads the PacketEvents API.
      * <p>
@@ -91,7 +89,7 @@ public final class PacketEvents implements Listener {
         ClientVersion.prepareLookUp();
 
         WrappedPacket.loadAllWrappers();
-        hasLoaded = true;
+        loaded = true;
     }
 
     /**
@@ -106,10 +104,10 @@ public final class PacketEvents implements Listener {
      * @param pl JavaPlugin instance
      */
     public static void init(final Plugin pl) {
-        if (!hasLoaded) {
+        if (!loaded) {
             load();
         }
-        if (!isStarted) {
+        if (!initialized) {
             plugins.add(pl);
             //Register Bukkit listener
             Bukkit.getPluginManager().registerEvents(instance, plugins.get(0));
@@ -117,34 +115,7 @@ public final class PacketEvents implements Listener {
             for (final Player p : Bukkit.getOnlinePlayers()) {
                 getAPI().getPlayerUtils().injectPlayer(p);
             }
-            isStarted = true;
-        }
-
-        if (!hasCreatedTempDataFile) {
-            File tempDataFile = getTemporaryDataFile();
-            if (!tempDataFile.exists()) {
-                boolean success = tempDataFile.mkdir();
-                if (!success) {
-                    Bukkit.getConsoleSender().sendMessage(
-                            ChatColor.RED + "PacketEvents failed to create a temporary data file.");
-                    return;
-                }
-            } else {
-                String data = readFromTemporaryDataFile(tempDataFile);
-                if(data.equals("false shutdown")) {
-                    tempDataFile.delete();
-                    return;
-                }
-                else if (data.equals("true")) {
-                    Bukkit.getConsoleSender().sendMessage(
-                            ChatColor.YELLOW + "PacketEvents has found another instance of PacketEvents," +
-                                    " it is recommended to install ProtocolLib to ensure no bugs occur.");
-                } else if (data.equals("false")) {
-                    writeToTempDataFile("true", tempDataFile);
-                }
-            }
-
-            hasCreatedTempDataFile = true;
+            initialized = true;
         }
     }
 
@@ -163,31 +134,27 @@ public final class PacketEvents implements Listener {
      *
      */
     public static void stop() {
-        if (isStarted) {
+        if (initialized) {
             for (final Player p : Bukkit.getOnlinePlayers()) {
                 getAPI().getPlayerUtils().ejectPlayer(p);
             }
             getAPI().getEventManager().unregisterAllListeners();
 
-            isStarted = false;
-            File tempDataFile = getTemporaryDataFile();
-            if (tempDataFile.exists()) {
-                writeToTempDataFile("false shutdown", tempDataFile);
-            }
+            initialized = false;
         }
     }
 
     public static boolean hasLoaded() {
-        return hasLoaded;
+        return loaded;
     }
 
     @Deprecated
     public static boolean hasStarted() {
-        return isStarted;
+        return initialized;
     }
 
     public static boolean isInitialized() {
-        return isStarted;
+        return initialized;
     }
 
     public static PacketEventsAPI getAPI() {
@@ -204,50 +171,11 @@ public final class PacketEvents implements Listener {
     }
 
     public static String getHandlerName(final String name) {
-        return "pe-" + settings.getIdentifier() + "-" + name;
+        return "pe-" + PacketEvents.getAPI().getSettings().getIdentifier() + "-" + name;
     }
 
     public static PacketEventsSettings getSettings() {
-        return settings;
-    }
-
-    private static File getTemporaryDataFile() {
-        File file = new File(".");
-        String path = "";
-        try {
-            path = file.getCanonicalPath();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        path += File.separator + "plugins" + File.separator + "packeteventsdata.tmp";
-        return new File(path);
-    }
-
-    private static String readFromTemporaryDataFile(File tempDataFile) {
-        String data = "";
-        try (BufferedReader bufferedReader = new BufferedReader(new FileReader(tempDataFile))) {
-            String line = bufferedReader.readLine();
-            while (line != null) {
-                line = bufferedReader.readLine();
-                data += line;
-            }
-        } catch (FileNotFoundException e) {
-            Bukkit.getConsoleSender().sendMessage(
-                    ChatColor.RED + "PacketEvents failed to find the temporary data file.");
-        } catch (IOException e) {
-            Bukkit.getConsoleSender().sendMessage(
-                    ChatColor.RED + "PacketEvents failed to read from the temporary data file.");
-        }
-        return data;
-    }
-
-    private static void writeToTempDataFile(String data, File tempDataFile) {
-        try (BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(tempDataFile))) {
-            bufferedWriter.write(data);
-        } catch (IOException e) {
-            Bukkit.getConsoleSender().sendMessage(
-                    ChatColor.RED + "PacketEvents failed to write to the temporary data file.");
-        }
+        return PacketEvents.getAPI().getSettings();
     }
 
     @EventHandler

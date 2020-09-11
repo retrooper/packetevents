@@ -28,7 +28,7 @@ import io.github.retrooper.packetevents.annotations.NotNull;
 import io.github.retrooper.packetevents.annotations.Nullable;
 import io.github.retrooper.packetevents.packet.PacketTypeClasses;
 import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
-import io.github.retrooper.packetevents.reflectionutils.Reflection;
+import io.github.retrooper.packetevents.utils.reflection.Reflection;
 
 public final class WrappedPacketInAbilities extends WrappedPacket {
     private static boolean isMoreThanOneBoolPresent;

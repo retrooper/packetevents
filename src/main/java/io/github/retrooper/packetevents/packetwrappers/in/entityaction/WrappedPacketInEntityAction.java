@@ -28,8 +28,9 @@ import io.github.retrooper.packetevents.annotations.Nullable;
 import io.github.retrooper.packetevents.enums.ServerVersion;
 import io.github.retrooper.packetevents.packet.PacketTypeClasses;
 import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
-import io.github.retrooper.packetevents.reflectionutils.Reflection;
+import io.github.retrooper.packetevents.utils.reflection.Reflection;
 import io.github.retrooper.packetevents.utils.NMSUtils;
+import io.github.retrooper.packetevents.utils.reflection.SubclassUtil;
 import org.bukkit.entity.Entity;
 
 import java.util.HashMap;
@@ -53,7 +54,7 @@ public final class WrappedPacketInEntityAction extends WrappedPacket {
         entityActionClass = PacketTypeClasses.Client.ENTITY_ACTION;
         isLowerThan_v_1_8 = version.isLowerThan(ServerVersion.v_1_8);
         if (version.isHigherThan(ServerVersion.v_1_7_10)) {
-            enumPlayerActionClass = Reflection.getSubClass(entityActionClass, "EnumPlayerAction");
+            enumPlayerActionClass = SubclassUtil.getSubClass(entityActionClass, "EnumPlayerAction");
         }
         //All the already existing values
         for (PlayerAction val : PlayerAction.values()) {

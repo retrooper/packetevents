@@ -52,10 +52,15 @@ import io.github.retrooper.packetevents.packetwrappers.out.kickdisconnect.Wrappe
 import io.github.retrooper.packetevents.packetwrappers.out.position.WrappedPacketOutPosition;
 import io.github.retrooper.packetevents.packetwrappers.out.transaction.WrappedPacketOutTransaction;
 import io.github.retrooper.packetevents.packetwrappers.out.updatehealth.WrappedPacketOutUpdateHealth;
-import io.github.retrooper.packetevents.reflectionutils.Reflection;
 import org.bukkit.entity.Player;
 
+import java.lang.invoke.MethodHandles;
+import java.lang.reflect.Field;
+import java.util.ArrayList;
+import java.util.List;
+
 public class WrappedPacket implements WrapperPacketReader {
+    protected final List<Field> fields = new ArrayList<>();
     public static ServerVersion version;
     protected final Player player;
     protected Object packet;
@@ -70,8 +75,11 @@ public class WrappedPacket implements WrapperPacketReader {
     }
 
     public WrappedPacket(final Player player, final Object packet) {
+        for (Field f : packet.getClass().getDeclaredFields()) {
+            f.setAccessible(true);
+            fields.add(f);
+        }
         this.player = player;
-        if (packet == null) return;
         this.packet = packet;
         this.packetClass = packet.getClass();
         if (packet.getClass().getSuperclass().equals(PacketTypeClasses.Client.FLYING)) {
@@ -121,90 +129,69 @@ public class WrappedPacket implements WrapperPacketReader {
 
     @Override
     public boolean readBoolean(int index) {
-        try {
-            return Reflection.getField(packetClass, boolean.class, index).getBoolean(packet);
-        } catch (IllegalAccessException e) {
-            e.printStackTrace();
-        }
-        return false;
+        return (boolean) readObject(index, boolean.class);
     }
 
     @Override
     public byte readByte(int index) {
-        try {
-            return Reflection.getField(packetClass, byte.class, index).getByte(packet);
-        } catch (IllegalAccessException e) {
-            e.printStackTrace();
-        }
-        return -1;
+        return (byte) readObject(index, byte.class);
     }
 
     @Override
     public short readShort(int index) {
-        try {
-            return Reflection.getField(packetClass, short.class, index).getShort(packet);
-        } catch (IllegalAccessException e) {
-            e.printStackTrace();
-        }
-        return -1;
+        return (short) readObject(index, short.class);
     }
 
     @Override
     public int readInt(int index) {
-        try {
-            return Reflection.getField(packetClass, int.class, index).getInt(packet);
-        } catch (IllegalAccessException e) {
-            e.printStackTrace();
-        }
-        return -1;
+        return (int) readObject(index, int.class);
     }
 
     @Override
     public long readLong(int index) {
-        try {
-            return Reflection.getField(packetClass, long.class, index).getLong(packet);
-        } catch (IllegalAccessException e) {
-            e.printStackTrace();
-        }
-        return -1;
+        return (long) readObject(index, long.class);
     }
 
     @Override
     public float readFloat(int index) {
-        try {
-            return Reflection.getField(packetClass, float.class, index).getFloat(packet);
-        } catch (IllegalAccessException e) {
-            e.printStackTrace();
-        }
-        return -1;
+        return (float) readObject(index, float.class);
     }
 
     @Override
     public double readDouble(int index) {
-        try {
-            return Reflection.getField(packetClass, double.class, index).getDouble(packet);
-        } catch (IllegalAccessException e) {
-            e.printStackTrace();
-        }
-        return -1;
+        return (double) readObject(index, double.class);
     }
 
     @Override
     public Object readObject(int index, Class<?> type) {
-        try {
-            return Reflection.getField(packetClass, type, index).get(packet);
-        } catch (IllegalAccessException e) {
-            e.printStackTrace();
+        MethodHandles.Lookup lookup = MethodHandles.lookup();
+        int currentIndex = 0;
+        for (Field f : fields) {
+            if (f.getType().equals(type)) {
+                if (index == currentIndex++) {
+                    try {
+                        return lookup.unreflectGetter(f).invoke(packet);
+                    } catch (Throwable throwable) {
+                        throwable.printStackTrace();
+                    }
+                }
+            }
         }
         return null;
     }
 
     @Override
     public Object readAnyObject(int index) {
-        try {
-            return Reflection.getField(packetClass, index).get(packet);
-        } catch (IllegalAccessException e) {
-            e.printStackTrace();
+        MethodHandles.Lookup lookup = MethodHandles.lookup();
+        int currentIndex = 0;
+        for (Field f : fields) {
+            if (index == currentIndex++) {
+                try {
+                    return lookup.unreflectGetter(f).invoke(packet);
+                } catch (Throwable throwable) {
+                    throwable.printStackTrace();
+                }
+            }
         }
         return null;
     }

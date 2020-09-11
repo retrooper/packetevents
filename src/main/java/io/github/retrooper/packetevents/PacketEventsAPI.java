@@ -22,16 +22,18 @@
  * SOFTWARE.
  */
 
-package io.github.retrooper.packetevents.api;
+package io.github.retrooper.packetevents;
 
 import io.github.retrooper.packetevents.event.manager.EventManager;
-import io.github.retrooper.packetevents.utils.api.PlayerUtils;
-import io.github.retrooper.packetevents.utils.api.ServerUtils;
+import io.github.retrooper.packetevents.settings.PacketEventsSettings;
+import io.github.retrooper.packetevents.utils.player.PlayerUtils;
+import io.github.retrooper.packetevents.utils.server.ServerUtils;
 
 public final class PacketEventsAPI {
     private final EventManager eventManager = new EventManager();
     private final PlayerUtils playerUtils = new PlayerUtils();
     private final ServerUtils serverUtils = new ServerUtils();
+    private final PacketEventsSettings settings = new PacketEventsSettings();
 
     /**
      * Not thread safe
@@ -83,5 +85,13 @@ public final class PacketEventsAPI {
      */
     public EventManager getEventManager() {
         return eventManager;
+    }
+
+    /**
+     * Get the PacketEvents settings.
+     * @return Configure some settings for the API
+     */
+    public PacketEventsSettings getSettings() {
+        return settings;
     }
 }
