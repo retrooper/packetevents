@@ -24,6 +24,7 @@
 
 package io.github.retrooper.packetevents.enums;
 
+@Deprecated
 public enum EventSynchronization {
     NORMAL, FORCE_SYNC, FORCE_ASYNC
 }
