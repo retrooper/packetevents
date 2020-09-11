@@ -25,7 +25,11 @@
 package io.github.retrooper.packetevents.example;
 
 import io.github.retrooper.packetevents.PacketEvents;
+import io.github.retrooper.packetevents.annotations.PacketHandler;
 import io.github.retrooper.packetevents.event.PacketListener;
+import io.github.retrooper.packetevents.event.impl.PacketReceiveEvent;
+import io.github.retrooper.packetevents.packet.PacketType;
+import io.github.retrooper.packetevents.packetwrappers.in.flying.WrappedPacketInFlying;
 import org.bukkit.plugin.java.JavaPlugin;
 
 public class MainExample extends JavaPlugin implements PacketListener {
@@ -37,7 +41,14 @@ public class MainExample extends JavaPlugin implements PacketListener {
 
     @Override
     public void onEnable() {
-        //Deprecated, as it is no longer needed
+        //Deprecated, as it is no longer needed.
+        /*
+         *
+         * PacketEvents will generate a random identifier for you if you do not set one
+         * before initializing PacketEvents
+         *
+         */
+
         PacketEvents.getSettings().setIdentifier("official_api");
 
         PacketEvents.init(this);
@@ -47,5 +58,13 @@ public class MainExample extends JavaPlugin implements PacketListener {
     @Override
     public void onDisable() {
         PacketEvents.stop();
+    }
+
+    @PacketHandler
+    public void onFlying(PacketReceiveEvent e) {
+        if (e.getPacketId() == PacketType.Client.FLYING) {
+            WrappedPacketInFlying ue = new WrappedPacketInFlying(e.getNMSPacket());
+            e.getPlayer().sendMessage("x: " + ue.getX());
+        }
     }
 }

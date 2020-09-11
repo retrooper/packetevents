@@ -85,7 +85,6 @@ public class PacketEventsSettings {
      * @deprecated This method is deprecated as you no longer need to set an identifier,
      * a unique identifier is already automatically generated for you.
      */
-    @Deprecated
     public void setIdentifier(final String identifier) {
         this.identifier = identifier;
     }
