@@ -67,7 +67,6 @@ public class WrappedPacket implements WrapperPacketReader {
     private Class<?> packetClass;
 
     public WrappedPacket() {
-        this(null);
     }
 
     public WrappedPacket(final Object packet) {
