@@ -75,14 +75,15 @@ public class WrappedPacket implements WrapperPacketReader {
     }
 
     public WrappedPacket(final Player player, final Object packet) {
+        if(packet == null) {
+            this.player = null;
+            return;
+        }
         for (Field f : packet.getClass().getDeclaredFields()) {
             f.setAccessible(true);
             fields.add(f);
         }
         this.player = player;
-        if(packet == null) {
-            return;
-        }
         this.packet = packet;
         this.packetClass = packet.getClass();
         if (packet.getClass().getSuperclass().equals(PacketTypeClasses.Client.FLYING)) {
