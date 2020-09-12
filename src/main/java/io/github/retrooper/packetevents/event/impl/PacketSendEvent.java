@@ -26,7 +26,7 @@ package io.github.retrooper.packetevents.event.impl;
 
 import io.github.retrooper.packetevents.event.CancellableEvent;
 import io.github.retrooper.packetevents.event.PacketEvent;
-import io.github.retrooper.packetevents.packet.PacketType;
+import io.github.retrooper.packetevents.packettype.PacketType;
 import org.bukkit.entity.Player;
 
 /**
