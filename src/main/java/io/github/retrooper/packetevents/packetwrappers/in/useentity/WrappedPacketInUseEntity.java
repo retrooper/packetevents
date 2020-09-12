@@ -42,6 +42,7 @@ public final class WrappedPacketInUseEntity extends WrappedPacket {
     }
 
     public static void load() {
+        System.out.println("USE ENTITY HAS BEEN LOADED BROOOIOII");
         useEntityClass = NMSUtils.getNMSClassWithoutException("PacketPlayInUseEntity");
 
         try {
