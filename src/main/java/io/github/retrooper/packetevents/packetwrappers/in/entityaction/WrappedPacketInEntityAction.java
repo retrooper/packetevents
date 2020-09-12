@@ -31,7 +31,6 @@ import io.github.retrooper.packetevents.packet.PacketTypeClasses;
 import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
 import io.github.retrooper.packetevents.utils.NMSUtils;
 import io.github.retrooper.packetevents.utils.reflection.SubclassUtil;
-import net.minecraft.server.v1_8_R3.PacketPlayInEntityAction;
 import org.bukkit.entity.Entity;
 
 import java.util.HashMap;
@@ -53,7 +52,7 @@ public final class WrappedPacketInEntityAction extends WrappedPacket {
     }
 
     public static void load() {
-        entityActionClass = PacketTypeClasses.Client.ENTITY_ACTION;
+        entityActionClass = NMSUtils.getNMSClassWithoutException("PacketPlayInEntityAction");
         isLowerThan_v_1_8 = version.isLowerThan(ServerVersion.v_1_8);
         if (!isLowerThan_v_1_8) {
             enumPlayerActionClass = SubclassUtil.getSubClass(entityActionClass, "EnumPlayerAction");
