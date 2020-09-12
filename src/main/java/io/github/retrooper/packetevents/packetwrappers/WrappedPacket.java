@@ -134,36 +134,36 @@ public class WrappedPacket implements WrapperPacketReader {
 
     @Override
     public boolean readBoolean(int index) {
-        return (boolean) readObject(index, Boolean.getClass());
+        return (boolean) readObject(index, boolean.class);
 
     @Override
     public byte readByte(int index) {
-        return (byte) readObject(index, Byte.getClass());
+        return (byte) readObject(index, byte.class);
     }
 
     @Override
     public short readShort(int index) {
-        return (short) readObject(index, Short.getClass());
+        return (short) readObject(index, short.class);
     }
 
     @Override
     public int readInt(int index) {
-        return (int) readObject(index, Integer.getClass());
+        return (int) readObject(index, int.class);
     }
 
     @Override
     public long readLong(int index) {
-        return (long) readObject(index, Long.getClass());
+        return (long) readObject(index, long.class);
     }
 
     @Override
     public float readFloat(int index) {
-        return (float) readObject(index, Float.getClass());
+        return (float) readObject(index, float.class);
     }
 
     @Override
     public double readDouble(int index) {
-        return (double) readObject(index, Double.getClass());
+        return (double) readObject(index, double.class);
     }
 
     @Override
@@ -171,7 +171,7 @@ public class WrappedPacket implements WrapperPacketReader {
         MethodHandles.Lookup lookup = MethodHandles.lookup();
         int currentIndex = 0;
         for (Field f : fields) {
-            if (f.getType().equals(type)) {
+            if (type.isAssignableFrom(f.getType())) {
                 if (index == currentIndex++) {
                     try {
                         MethodHandle handle = lookup.unreflectGetter(f);
