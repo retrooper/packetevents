@@ -54,6 +54,7 @@ import io.github.retrooper.packetevents.packetwrappers.out.transaction.WrappedPa
 import io.github.retrooper.packetevents.packetwrappers.out.updatehealth.WrappedPacketOutUpdateHealth;
 import org.bukkit.entity.Player;
 
+import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
@@ -174,7 +175,12 @@ public class WrappedPacket implements WrapperPacketReader {
             if (f.getType().equals(type)) {
                 if (index == currentIndex++) {
                     try {
-                        return lookup.unreflectGetter(f).invoke(packet);
+                        MethodHandle handle = lookup.unreflectGetter(f);
+                        if(handle == null) {
+                            System.out.println("Getter not found");
+                            return f.get(packet);
+                        }
+                        return handle.invoke(packet);
                     } catch (Throwable throwable) {
                         throwable.printStackTrace();
                     }

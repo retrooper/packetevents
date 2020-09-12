@@ -31,6 +31,7 @@ import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
 import io.github.retrooper.packetevents.utils.reflection.Reflection;
 import io.github.retrooper.packetevents.utils.NMSUtils;
 import io.github.retrooper.packetevents.utils.reflection.SubclassUtil;
+import net.minecraft.server.v1_8_R3.PacketPlayInEntityAction;
 import org.bukkit.entity.Entity;
 
 import java.util.HashMap;
@@ -90,9 +91,10 @@ public final class WrappedPacketInEntityAction extends WrappedPacket {
             int animationIndex = readInt(1);
             this.action = cachedPlayerActionIDs.get(animationIndex);
         } else {
+            PacketPlayInEntityAction ea;
             final Object enumObj = readObject(0, enumPlayerActionClass);
-            final String enumName = enumObj.toString();
-            this.action = cachedPlayerActionNames.get(enumName);
+            final String enumValueName = enumObj.toString();
+            this.action = cachedPlayerActionNames.get(enumValueName);
         }
 
 
