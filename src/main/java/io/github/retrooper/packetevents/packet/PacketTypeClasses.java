@@ -121,6 +121,8 @@ public class PacketTypeClasses {
             }
 
             PacketType.Client.init();
+            io.github.retrooper.packetevents.packettype.PacketType.Client.init();
+
         }
     }
 
@@ -255,6 +257,7 @@ public class PacketTypeClasses {
             TAGS = NMSUtils.getNMSClassWithoutException(s + "Tags");
             MAP_CHUNK_BULK = NMSUtils.getNMSClassWithoutException(s + "MapChunkBulk");
             PacketType.Server.init();
+            io.github.retrooper.packetevents.packettype.PacketType.Server.init();
         }
     }
 
