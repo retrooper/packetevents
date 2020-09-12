@@ -24,6 +24,7 @@
 
 package io.github.retrooper.packetevents.packet;
 
+import io.github.retrooper.packetevents.packettype.PacketType;
 import io.github.retrooper.packetevents.utils.reflection.Reflection;
 import io.github.retrooper.packetevents.utils.NMSUtils;
 import io.github.retrooper.packetevents.utils.reflection.SubclassUtil;
@@ -121,8 +122,6 @@ public class PacketTypeClasses {
             }
 
             PacketType.Client.init();
-            io.github.retrooper.packetevents.packettype.PacketType.Client.init();
-
         }
     }
 
@@ -257,7 +256,6 @@ public class PacketTypeClasses {
             TAGS = NMSUtils.getNMSClassWithoutException(s + "Tags");
             MAP_CHUNK_BULK = NMSUtils.getNMSClassWithoutException(s + "MapChunkBulk");
             PacketType.Server.init();
-            io.github.retrooper.packetevents.packettype.PacketType.Server.init();
         }
     }
 
