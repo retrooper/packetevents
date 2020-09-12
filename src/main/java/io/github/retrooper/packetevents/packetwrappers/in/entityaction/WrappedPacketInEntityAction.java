@@ -28,10 +28,8 @@ import io.github.retrooper.packetevents.annotations.Nullable;
 import io.github.retrooper.packetevents.enums.ServerVersion;
 import io.github.retrooper.packetevents.packet.PacketTypeClasses;
 import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
-import io.github.retrooper.packetevents.utils.reflection.Reflection;
 import io.github.retrooper.packetevents.utils.NMSUtils;
 import io.github.retrooper.packetevents.utils.reflection.SubclassUtil;
-import net.minecraft.server.v1_8_R3.PacketPlayInEntityAction;
 import org.bukkit.entity.Entity;
 
 import java.util.HashMap;
@@ -47,6 +45,7 @@ public final class WrappedPacketInEntityAction extends WrappedPacket {
     private int entityId;
     private PlayerAction action;
     private int jumpBoost;
+
     public WrappedPacketInEntityAction(final Object packet) {
         super(packet);
     }
@@ -91,7 +90,6 @@ public final class WrappedPacketInEntityAction extends WrappedPacket {
             int animationIndex = readInt(1);
             this.action = cachedPlayerActionIDs.get(animationIndex);
         } else {
-            PacketPlayInEntityAction ea;
             final Object enumObj = readObject(0, enumPlayerActionClass);
             final String enumValueName = enumObj.toString();
             this.action = cachedPlayerActionNames.get(enumValueName);
@@ -104,6 +102,7 @@ public final class WrappedPacketInEntityAction extends WrappedPacket {
 
     /**
      * Lookup the associated entity by the ID that was sent in the packet.
+     *
      * @return Entity
      */
     public Entity getEntity() {
@@ -114,6 +113,7 @@ public final class WrappedPacketInEntityAction extends WrappedPacket {
      * Get the ID of the entity.
      * If you do not want to use {@link #getEntity()},
      * you lookup the entity by yourself with this entity ID.
+     *
      * @return Entity ID
      */
     public int getEntityId() {
@@ -122,6 +122,7 @@ public final class WrappedPacketInEntityAction extends WrappedPacket {
 
     /**
      * Get the player action.
+     *
      * @return Player Action
      */
     public PlayerAction getAction() {
@@ -130,6 +131,7 @@ public final class WrappedPacketInEntityAction extends WrappedPacket {
 
     /**
      * Get the jump boost integer.
+     *
      * @return Jump Boost
      */
     public int getJumpBoost() {
