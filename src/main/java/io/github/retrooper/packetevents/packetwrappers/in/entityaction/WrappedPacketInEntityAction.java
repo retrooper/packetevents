@@ -26,6 +26,7 @@ package io.github.retrooper.packetevents.packetwrappers.in.entityaction;
 
 import io.github.retrooper.packetevents.annotations.Nullable;
 import io.github.retrooper.packetevents.enums.ServerVersion;
+import io.github.retrooper.packetevents.example.MainExample;
 import io.github.retrooper.packetevents.packet.PacketTypeClasses;
 import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
 import io.github.retrooper.packetevents.utils.NMSUtils;
