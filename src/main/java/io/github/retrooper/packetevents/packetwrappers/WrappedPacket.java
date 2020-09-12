@@ -134,37 +134,36 @@ public class WrappedPacket implements WrapperPacketReader {
 
     @Override
     public boolean readBoolean(int index) {
-        return (boolean) readObject(index, boolean.class);
-    }
+        return (boolean) readObject(index, Boolean.getClass());
 
     @Override
     public byte readByte(int index) {
-        return (byte) readObject(index, byte.class);
+        return (byte) readObject(index, Byte.getClass());
     }
 
     @Override
     public short readShort(int index) {
-        return (short) readObject(index, short.class);
+        return (short) readObject(index, Short.getClass());
     }
 
     @Override
     public int readInt(int index) {
-        return (int) readObject(index, int.class);
+        return (int) readObject(index, Integer.getClass());
     }
 
     @Override
     public long readLong(int index) {
-        return (long) readObject(index, long.class);
+        return (long) readObject(index, Long.getClass());
     }
 
     @Override
     public float readFloat(int index) {
-        return (float) readObject(index, float.class);
+        return (float) readObject(index, Float.getClass());
     }
 
     @Override
     public double readDouble(int index) {
-        return (double) readObject(index, double.class);
+        return (double) readObject(index, Double.getClass());
     }
 
     @Override
