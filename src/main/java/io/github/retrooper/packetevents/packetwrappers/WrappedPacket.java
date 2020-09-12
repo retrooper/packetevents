@@ -67,6 +67,7 @@ public class WrappedPacket implements WrapperPacketReader {
     private Class<?> packetClass;
 
     public WrappedPacket() {
+        this(null);
     }
 
     public WrappedPacket(final Object packet) {
@@ -79,6 +80,9 @@ public class WrappedPacket implements WrapperPacketReader {
             fields.add(f);
         }
         this.player = player;
+        if(packet == null) {
+            return;
+        }
         this.packet = packet;
         this.packetClass = packet.getClass();
         if (packet.getClass().getSuperclass().equals(PacketTypeClasses.Client.FLYING)) {
