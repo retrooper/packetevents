@@ -54,7 +54,6 @@ public final class WrappedPacketInEntityAction extends WrappedPacket {
     public static void load() {
         entityActionClass = PacketTypeClasses.Client.ENTITY_ACTION;
         isLowerThan_v_1_8 = version.isLowerThan(ServerVersion.v_1_8);
-        PacketPlayInEntityAction EA;
         if (!isLowerThan_v_1_8) {
             enumPlayerActionClass = SubclassUtil.getSubClass(entityActionClass, "EnumPlayerAction");
         }
@@ -92,9 +91,6 @@ public final class WrappedPacketInEntityAction extends WrappedPacket {
             int animationIndex = readInt(1);
             this.action = cachedPlayerActionIDs.get(animationIndex);
         } else {
-            if(enumPlayerActionClass == null) {
-                System.out.println("enum player action class is null for some reason?");
-            }
             final Object enumObj = readObject(0, enumPlayerActionClass);
             final String enumValueName = enumObj.toString();
             this.action = cachedPlayerActionNames.get(enumValueName);
