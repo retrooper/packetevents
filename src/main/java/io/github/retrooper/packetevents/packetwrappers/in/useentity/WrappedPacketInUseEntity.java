@@ -55,6 +55,9 @@ public final class WrappedPacketInUseEntity extends WrappedPacket {
     @Override
     protected void setup() {
         this.entityID = readInt(0);
+        if(enumEntityUseActionClass == null) {
+                System.out.println("cls is null");
+        }
         final Object useActionEnum = readObject(0, enumEntityUseActionClass);
         this.action = EntityUseAction.valueOf(useActionEnum.toString());
     }
