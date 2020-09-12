@@ -29,7 +29,7 @@ import java.lang.annotation.Annotation;
 public class SubclassUtil {
     public static Class<?> getSubClass(Class<?> cls, String name) {
         for (Class<?> subClass : cls.getDeclaredClasses()) {
-            if (ClassUtil.getClassSimpleName(cls).equals(name)) {
+            if (ClassUtil.getClassSimpleName(subClass).equals(name)) {
                 return subClass;
             }
         }
