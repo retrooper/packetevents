@@ -42,7 +42,7 @@ public final class WrappedPacketInUseEntity extends WrappedPacket {
     }
 
     public static void load() {
-        useEntityClass = PacketTypeClasses.Client.USE_ENTITY;
+        useEntityClass = NMSUtils.getNMSClassWithoutException("PacketPlayInUseEntity");
 
         try {
             enumEntityUseActionClass = NMSUtils.getNMSClass("EnumEntityUseAction");
