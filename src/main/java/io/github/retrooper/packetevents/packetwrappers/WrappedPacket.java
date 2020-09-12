@@ -135,6 +135,7 @@ public class WrappedPacket implements WrapperPacketReader {
     @Override
     public boolean readBoolean(int index) {
         return (boolean) readObject(index, boolean.class);
+    }
 
     @Override
     public byte readByte(int index) {
