@@ -1,6 +1,6 @@
-# packetevents by retrooper
+# packetevents 
 
-A lightweight spigot packetlistener & packetsender coded by retrooper.
+A spigot packet API with some nice utlities.
 
 ## About
 
