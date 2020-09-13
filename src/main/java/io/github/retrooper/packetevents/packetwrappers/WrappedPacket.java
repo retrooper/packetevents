@@ -59,6 +59,8 @@ import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class WrappedPacket implements WrapperPacketReader {
     protected final List<Field> fields = new ArrayList<>();
@@ -66,6 +68,8 @@ public class WrappedPacket implements WrapperPacketReader {
     protected final Player player;
     protected Object packet;
     private Class<?> packetClass;
+
+    private static Map<String, Field> fieldCache = new ConcurrentHashMap<>();
 
     public WrappedPacket() {
         this(null);
@@ -80,18 +84,18 @@ public class WrappedPacket implements WrapperPacketReader {
             this.player = null;
             return;
         }
-        for (Field f : packet.getClass().getDeclaredFields()) {
-            f.setAccessible(true);
-            fields.add(f);
-        }
-        this.player = player;
-        this.packet = packet;
         this.packetClass = packet.getClass();
         if (packet.getClass().getSuperclass().equals(PacketTypeClasses.Client.FLYING)) {
             packetClass = PacketTypeClasses.Client.FLYING;
         } else if (packet.getClass().getSuperclass().equals(PacketTypeClasses.Server.ENTITY)) {
             packetClass = PacketTypeClasses.Server.ENTITY;
         }
+        for (Field f : packetClass.getDeclaredFields()) {
+            f.setAccessible(true);
+            fields.add(f);
+        }
+        this.player = player;
+        this.packet = packet;
         setup();
     }
 
@@ -169,24 +173,21 @@ public class WrappedPacket implements WrapperPacketReader {
 
     @Override
     public Object readObject(int index, Class<?> type) {
-        MethodHandles.Lookup lookup = MethodHandles.lookup();
         int currentIndex = 0;
+        long start = System.nanoTime();
         for (Field f : fields) {
             if (type.isAssignableFrom(f.getType())) {
                 if (index == currentIndex++) {
                     try {
-                        MethodHandle handle = lookup.unreflectGetter(f);
-                        if(handle == null) {
-                            System.out.println("Getter not found");
-                            return f.get(packet);
-                        }
-                        return handle.invoke(packet);
-                    } catch (Throwable throwable) {
-                        throwable.printStackTrace();
+                        System.out.println("Ended: " + (System.nanoTime() - start) + "ns");
+                        return f.get(packet);
+                    } catch (Exception exception) {
+                        exception.printStackTrace();
                     }
                 }
             }
         }
+        System.out.println("Ended: " + (System.nanoTime() - start) + "ns");
         return null;
     }
 

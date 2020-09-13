@@ -84,7 +84,6 @@ public final class PacketEvents implements Listener {
         PacketTypeClasses.Client.load();
         PacketTypeClasses.Server.load();
 
-
         EntityFinderUtils.load();
 
         ClientVersion.prepareLookUp();
