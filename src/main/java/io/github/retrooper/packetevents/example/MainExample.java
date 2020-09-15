@@ -59,12 +59,4 @@ public class MainExample extends JavaPlugin implements PacketListener {
     public void onDisable() {
         PacketEvents.stop();
     }
-
-    @PacketHandler
-    public void onFlying(PacketReceiveEvent e) {
-        if (e.getPacketId() == PacketType.Client.FLYING) {
-            WrappedPacketInFlying ue = new WrappedPacketInFlying(e.getNMSPacket());
-            e.getPlayer().sendMessage("x: " + ue.getX());
-        }
-    }
 }

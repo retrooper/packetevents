@@ -111,7 +111,8 @@ public final class EventManager {
         }
 
         if (!methods.isEmpty()) {
-            if (ProtocolLibUtils.isAvailable()) {
+            if (ProtocolLibUtils.isAvailable()
+                    && PacketEvents.getAPI().getSettings().isUseProtocolLibIfAvailable()) {
                 ProtocolLibListener.registerProtocolLibListener(listener, methods);
             } else {
                 registeredMethods.put(listener, methods);

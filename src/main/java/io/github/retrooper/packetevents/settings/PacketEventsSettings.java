@@ -32,9 +32,10 @@ public class PacketEventsSettings {
 
     private ServerVersion defaultServerVersion = ServerVersion.v_1_7_10;
     private String identifier = "";
-    private boolean autoResolveClientProtocolVersion;
-    private boolean uninjectAsync = false;
-    private boolean injectAsync = false;
+    private boolean autoResolveClientProtocolVersion = false;
+    private boolean uninjectAsync = true;
+    private boolean injectAsync = true;
+    private boolean useProtocolLibIfAvailable = true;
 
     /**
      * If PacketEvents fails to detect your server version, it will use the recommended version
@@ -130,5 +131,22 @@ public class PacketEventsSettings {
      */
     public void setInjectAsync(boolean injectAsync) {
         this.injectAsync = injectAsync;
+    }
+
+    public boolean isUseProtocolLibIfAvailable() {
+        return this.useProtocolLibIfAvailable;
+    }
+
+    /**
+     * Would you like PacketEvents to make use of ProtocolLib if it is available?
+     * If yes, enable this, if not disable this.
+     * Having this on can help your plugin have compatibility
+     * with other plugins that might be using ProtocolLib.
+     * Especially if they or you are doing packet cancellations,
+     * PacketEvents passes the event priority to ProtocolLib.
+     * @param val boolean
+     */
+    public void setUseProtocolLibIfAvailable(boolean val) {
+        this.useProtocolLibIfAvailable = val;
     }
 }

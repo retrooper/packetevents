@@ -31,7 +31,7 @@ import com.comphenix.protocol.events.PacketAdapter;
 import com.comphenix.protocol.events.PacketEvent;
 import io.github.retrooper.packetevents.PacketEvents;
 import io.github.retrooper.packetevents.annotations.PacketHandler;
-import io.github.retrooper.packetevents.enums.PacketEventPriority;
+import io.github.retrooper.packetevents.event.priority.PacketEventPriority;
 import io.github.retrooper.packetevents.event.PacketListener;
 import io.github.retrooper.packetevents.event.impl.PacketReceiveEvent;
 import io.github.retrooper.packetevents.event.impl.PacketSendEvent;
@@ -47,9 +47,9 @@ public class ProtocolLibListener {
         if (ProtocolLibUtils.isAvailable()) {
             for (Method m : methods) {
                 if (m.getParameterTypes()[0].equals(PacketReceiveEvent.class)) {
-                    PacketHandler annot = m.getAnnotation(PacketHandler.class);
+                    PacketHandler annotation = m.getAnnotation(PacketHandler.class);
                     ListenerPriority priority;
-                    switch (annot.priority()) {
+                    switch (annotation.priority()) {
                         case PacketEventPriority.LOWEST:
                             priority = ListenerPriority.LOWEST;
                             break;
@@ -61,7 +61,7 @@ public class ProtocolLibListener {
                             break;
                         case PacketEventPriority.HIGHEST:
                             priority = ListenerPriority.HIGHEST;
-                            break;
+                            break; 
                         case PacketEventPriority.MONITOR:
                             priority = ListenerPriority.MONITOR;
                             break;
@@ -85,9 +85,9 @@ public class ProtocolLibListener {
                                 }
                             });
                 } else if (m.getParameterTypes()[0].equals(PacketSendEvent.class)) {
-                    PacketHandler annot = m.getAnnotation(PacketHandler.class);
+                    PacketHandler annotation = m.getAnnotation(PacketHandler.class);
                     ListenerPriority priority;
-                    switch (annot.priority()) {
+                    switch (annotation.priority()) {
                         case PacketEventPriority.LOWEST:
                             priority = ListenerPriority.LOWEST;
                             break;
