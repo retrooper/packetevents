@@ -27,6 +27,8 @@ package io.github.retrooper.packetevents.packetwrappers.out.gamestatechange;
 import io.github.retrooper.packetevents.packet.PacketTypeClasses;
 import io.github.retrooper.packetevents.packetwrappers.SendableWrapper;
 import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
+import io.github.retrooper.packetevents.utils.reflection.Reflection;
+import io.github.retrooper.packetevents.utils.reflection.SubclassUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 
@@ -38,15 +40,29 @@ public class WrappedPacketOutGameStateChange extends WrappedPacket implements Se
     private double value;
 
     private static Constructor<?> packetConstructor;
+    private static Class<?> reasonClassType;
 
+    private static boolean reasonIntMode;
+    private static boolean valueFloatMode;
     public static void load() {
+        reasonClassType = SubclassUtil.getSubClass(PacketTypeClasses.Server.GAME_STATE_CHANGE, 0);
+        reasonIntMode = reasonClassType == null;
+        valueFloatMode = Reflection.getField(PacketTypeClasses.Server.GAME_STATE_CHANGE, float.class, 0) != null;
+
         try {
-            packetConstructor = PacketTypeClasses.Server.GAME_STATE_CHANGE.getConstructor(int.class, double.class);
-        }
-        catch (NullPointerException e) {
+            Class<?> valueClassType, intClassType;
+           if(valueFloatMode) {
+               valueClassType = float.class;
+           }
+           else {
+               //Just an older version(1.7.10/1.8.x or so)
+               valueClassType = double.class;
+           }
+
+            packetConstructor = PacketTypeClasses.Server.GAME_STATE_CHANGE.getConstructor(reasonClassType, valueClassType);
+        } catch (NullPointerException e) {
             Bukkit.getConsoleSender().sendMessage(ChatColor.RED + "PacketEvents failed to find the constructor for the outbound Game state packet wrapper.");
-        }
-        catch (NoSuchMethodException e) {
+        } catch (NoSuchMethodException e) {
             e.printStackTrace();
         }
 
@@ -58,16 +74,27 @@ public class WrappedPacketOutGameStateChange extends WrappedPacket implements Se
 
     @Override
     protected void setup() {
-        reason = readInt(0);
-        value = readDouble(0);
+        if(reasonIntMode) {
+            reason = readInt(0);
+        }
+        else {
+            //this packet is obfuscated quite strongly(1.16), so we must do this
+            Object reasonObject = readObject(12, reasonClassType);
+            reason = 0; //first INT inside reasonObject
+        }
+        if (valueFloatMode) {
+            value = readFloat(0);
+        } else {
+            value = readDouble(0);
+        }
     }
 
     public int getReason() {
-        return 0;
+        return reason;
     }
 
     public double getValue() {
-        return 0.0;
+        return reason;
     }
 
     @Override

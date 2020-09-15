@@ -54,8 +54,6 @@ import io.github.retrooper.packetevents.packetwrappers.out.transaction.WrappedPa
 import io.github.retrooper.packetevents.packetwrappers.out.updatehealth.WrappedPacketOutUpdateHealth;
 import org.bukkit.entity.Player;
 
-import java.lang.invoke.MethodHandle;
-import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
@@ -69,8 +67,6 @@ public class WrappedPacket implements WrapperPacketReader {
     protected Object packet;
     private Class<?> packetClass;
 
-    private static Map<String, Field> fieldCache = new ConcurrentHashMap<>();
-
     public WrappedPacket() {
         this(null);
     }
@@ -80,7 +76,7 @@ public class WrappedPacket implements WrapperPacketReader {
     }
 
     public WrappedPacket(final Player player, final Object packet) {
-        if(packet == null) {
+        if (packet == null) {
             this.player = null;
             return;
         }
@@ -174,12 +170,10 @@ public class WrappedPacket implements WrapperPacketReader {
     @Override
     public Object readObject(int index, Class<?> type) {
         int currentIndex = 0;
-        long start = System.nanoTime();
         for (Field f : fields) {
             if (type.isAssignableFrom(f.getType())) {
                 if (index == currentIndex++) {
                     try {
-                        //System.out.println("Ended: " + (System.nanoTime() - start) + "ns");
                         return f.get(packet);
                     } catch (Exception exception) {
                         exception.printStackTrace();
@@ -187,20 +181,18 @@ public class WrappedPacket implements WrapperPacketReader {
                 }
             }
         }
-        //System.out.println("Ended: " + (System.nanoTime() - start) + "ns");
         return null;
     }
 
     @Override
     public Object readAnyObject(int index) {
-        MethodHandles.Lookup lookup = MethodHandles.lookup();
         int currentIndex = 0;
         for (Field f : fields) {
             if (index == currentIndex++) {
                 try {
-                    return lookup.unreflectGetter(f).invoke(packet);
-                } catch (Throwable throwable) {
-                    throwable.printStackTrace();
+                    return f.get(packet);
+                } catch (Exception exception) {
+                    exception.printStackTrace();
                 }
             }
         }
