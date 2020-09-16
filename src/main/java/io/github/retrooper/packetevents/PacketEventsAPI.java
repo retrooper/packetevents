@@ -34,6 +34,7 @@ public final class PacketEventsAPI {
     private final PlayerUtils playerUtils = new PlayerUtils();
     private final ServerUtils serverUtils = new ServerUtils();
     private final PacketEventsSettings settings = new PacketEventsSettings();
+    //private final UpdateChecker updateChecker = new UpdateChecker();
 
     /**
      * Not thread safe
@@ -63,6 +64,7 @@ public final class PacketEventsAPI {
 
     /**
      * Get all utilities to do with the player
+     *
      * @return Player Utilities
      */
     public PlayerUtils getPlayerUtils() {
@@ -71,6 +73,7 @@ public final class PacketEventsAPI {
 
     /**
      * Get all utilities to do with the server
+     *
      * @return Server Utilities
      */
     public ServerUtils getServerUtils() {
@@ -81,6 +84,7 @@ public final class PacketEventsAPI {
     /**
      * Get the event manager
      * Used to call events, register and unregister listeners
+     *
      * @return PacketEvents' event manager
      */
     public EventManager getEventManager() {
@@ -89,9 +93,19 @@ public final class PacketEventsAPI {
 
     /**
      * Get the PacketEvents settings.
+     *
      * @return Configure some settings for the API
      */
     public PacketEventsSettings getSettings() {
         return settings;
     }
+/*
+    /**
+     * Get the update checker
+     * @return Update Checker
+     *
+    public UpdateChecker getUpdateChecker() {
+        return updateChecker;
+    }
+*/
 }

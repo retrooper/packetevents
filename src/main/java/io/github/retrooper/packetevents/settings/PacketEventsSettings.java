@@ -36,6 +36,7 @@ public class PacketEventsSettings {
     private boolean uninjectAsync = true;
     private boolean injectAsync = true;
     private boolean useProtocolLibIfAvailable = true;
+    private boolean checkForUpdates = true;
 
     /**
      * If PacketEvents fails to detect your server version, it will use the recommended version
@@ -61,6 +62,7 @@ public class PacketEventsSettings {
      * If you manually set the identifier using its setter '#setIdentifier(String)'.
      * We will use that identifier to generate each player's handler name.
      * If you do not set the identifier manually, we automatically generate one for you.
+     *
      * @return stored identifier or new generated identifier
      */
     public String getIdentifier() {
@@ -99,6 +101,7 @@ public class PacketEventsSettings {
      * (when ViaVersion, ProtocolLib or ProtocolSupport can't be found on the server),
      * should it assume that the client is using the same version as the server?
      * Returns ACCESS_FAILURE if this is set to FALSE(default value is false).
+     *
      * @param autoResolveClientProtocolVersion boolean
      */
     public void setDoAutoResolveClientProtocolVersion(boolean autoResolveClientProtocolVersion) {
@@ -144,9 +147,18 @@ public class PacketEventsSettings {
      * with other plugins that might be using ProtocolLib.
      * Especially if they or you are doing packet cancellations,
      * PacketEvents passes the event priority to ProtocolLib.
+     *
      * @param val boolean
      */
     public void setUseProtocolLibIfAvailable(boolean val) {
         this.useProtocolLibIfAvailable = val;
     }
+
+    /*public void setShouldCheckForUpdates(boolean val) {
+        this.checkForUpdates = val;
+    }
+
+    public boolean shouldCheckForUpdates() {
+        return checkForUpdates;
+    }*/
 }
