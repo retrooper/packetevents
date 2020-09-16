@@ -47,6 +47,7 @@ import io.github.retrooper.packetevents.packetwrappers.out.animation.WrappedPack
 import io.github.retrooper.packetevents.packetwrappers.out.chat.WrappedPacketOutChat;
 import io.github.retrooper.packetevents.packetwrappers.out.entity.WrappedPacketOutEntity;
 import io.github.retrooper.packetevents.packetwrappers.out.entityvelocity.WrappedPacketOutEntityVelocity;
+import io.github.retrooper.packetevents.packetwrappers.out.gamestatechange.WrappedPacketOutGameStateChange;
 import io.github.retrooper.packetevents.packetwrappers.out.keepalive.WrappedPacketOutKeepAlive;
 import io.github.retrooper.packetevents.packetwrappers.out.kickdisconnect.WrappedPacketOutKickDisconnect;
 import io.github.retrooper.packetevents.packetwrappers.out.position.WrappedPacketOutPosition;
@@ -125,6 +126,7 @@ public class WrappedPacket implements WrapperPacketReader {
         WrappedPacketOutPosition.load();
         WrappedPacketOutTransaction.load();
         WrappedPacketOutUpdateHealth.load();
+        WrappedPacketOutGameStateChange.load();
         //WrappedPacketOutCustomPayload.load();
     }
 

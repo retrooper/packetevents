@@ -39,25 +39,26 @@ public class WrappedPacketOutGameStateChange extends WrappedPacket implements Se
     private int reason;
     private double value;
 
-    private static Constructor<?> packetConstructor;
+    private static Constructor<?> packetConstructor, reasonClassConstructor;
     private static Class<?> reasonClassType;
 
     private static boolean reasonIntMode;
     private static boolean valueFloatMode;
+
     public static void load() {
         reasonClassType = SubclassUtil.getSubClass(PacketTypeClasses.Server.GAME_STATE_CHANGE, 0);
+
         reasonIntMode = reasonClassType == null;
         valueFloatMode = Reflection.getField(PacketTypeClasses.Server.GAME_STATE_CHANGE, float.class, 0) != null;
 
         try {
-            Class<?> valueClassType, intClassType;
-           if(valueFloatMode) {
-               valueClassType = float.class;
-           }
-           else {
-               //Just an older version(1.7.10/1.8.x or so)
-               valueClassType = double.class;
-           }
+            Class<?> valueClassType;
+            if (valueFloatMode) {
+                valueClassType = float.class;
+            } else {
+                //Just an older version(1.7.10/1.8.x or so)
+                valueClassType = double.class;
+            }
 
             packetConstructor = PacketTypeClasses.Server.GAME_STATE_CHANGE.getConstructor(reasonClassType, valueClassType);
         } catch (NullPointerException e) {
@@ -74,13 +75,16 @@ public class WrappedPacketOutGameStateChange extends WrappedPacket implements Se
 
     @Override
     protected void setup() {
-        if(reasonIntMode) {
+        if (reasonIntMode) {
             reason = readInt(0);
-        }
-        else {
+        } else {
             //this packet is obfuscated quite strongly(1.16), so we must do this
             Object reasonObject = readObject(12, reasonClassType);
-            reason = 0; //first INT inside reasonObject
+            try {
+                reason = Reflection.getField(reasonClassType, int.class, 0).getInt(reasonObject);
+            } catch (IllegalAccessException e) {
+                e.printStackTrace();
+            }
         }
         if (valueFloatMode) {
             value = readFloat(0);
@@ -99,10 +103,32 @@ public class WrappedPacketOutGameStateChange extends WrappedPacket implements Se
 
     @Override
     public Object asNMSPacket() {
-        try {
-            return packetConstructor.newInstance(reason, value);
-        } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
-            e.printStackTrace();
+        if (reasonClassType == null) {
+            try {
+                if (valueFloatMode) {
+                    return packetConstructor.newInstance(reason, (float) value);
+                } else {
+                    return packetConstructor.newInstance(reason, value);
+                }
+            } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
+                e.printStackTrace();
+            }
+        } else {
+            Object reasonObject = null;
+            try {
+                reasonObject = reasonClassConstructor.newInstance(reason);
+            } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
+                e.printStackTrace();
+            }
+            try {
+                if (valueFloatMode) {
+                    return packetConstructor.newInstance(reasonObject, (float) value);
+                } else {
+                    return packetConstructor.newInstance(reasonObject, value);
+                }
+            } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
+                e.printStackTrace();
+            }
         }
         return null;
     }
