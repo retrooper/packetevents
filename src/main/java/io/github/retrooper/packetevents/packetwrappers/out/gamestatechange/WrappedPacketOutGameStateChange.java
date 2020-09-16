@@ -47,7 +47,13 @@ public class WrappedPacketOutGameStateChange extends WrappedPacket implements Se
 
     public static void load() {
         reasonClassType = SubclassUtil.getSubClass(PacketTypeClasses.Server.GAME_STATE_CHANGE, 0);
-
+        if(reasonClassType != null) {
+            try {
+                reasonClassConstructor = reasonClassType.getConstructor(int.class);
+            } catch (NoSuchMethodException e) {
+                e.printStackTrace();
+            }
+        }
         reasonIntMode = reasonClassType == null;
         valueFloatMode = Reflection.getField(PacketTypeClasses.Server.GAME_STATE_CHANGE, float.class, 0) != null;
 
@@ -71,6 +77,15 @@ public class WrappedPacketOutGameStateChange extends WrappedPacket implements Se
 
     public WrappedPacketOutGameStateChange(Object packet) {
         super(packet);
+    }
+
+    public WrappedPacketOutGameStateChange(int reason, double value) {
+        this.reason = reason;
+        this.value = value;
+    }
+
+    public WrappedPacketOutGameStateChange(int reason, float value){
+        this(reason, (double)value);
     }
 
     @Override
