@@ -73,7 +73,7 @@ public final class WrappedPacketInBlockDig extends WrappedPacket {
         //1.7.10
         try {
             if (isVersionLowerThan_v_1_8) {
-                enumDigType = PlayerDigType.values()[(Reflection.getField(blockDigClass, int.class, 4).getInt(packet))];
+                enumDigType = PlayerDigType.values()[(readInt(4))];
                 x = readInt(0);
                 y = readInt(1);
                 z = readInt(2);
@@ -84,10 +84,9 @@ public final class WrappedPacketInBlockDig extends WrappedPacket {
                 final Object enumDirectionObj = readObject(0, enumDirectionClass);
                 final Object digTypeObj = readObject(0, digTypeClass);
 
-                Class<?> blockPosSuper = blockPositionClass;
-                x = Reflection.getField(blockPosSuper, int.class, 0).getInt(blockPosObj);
-                y = Reflection.getField(blockPosSuper, int.class, 1).getInt(blockPosObj);
-                z = Reflection.getField(blockPosSuper, int.class, 2).getInt(blockPosObj);
+                x = Reflection.getField(blockPositionClass, int.class, 0).getInt(blockPosObj);
+                y = Reflection.getField(blockPositionClass, int.class, 1).getInt(blockPosObj);
+                z = Reflection.getField(blockPositionClass, int.class, 2).getInt(blockPosObj);
 
                 //.toString() won't work so we must do this
                 enumDirection = Direction.valueOf(((Enum)enumDirectionObj).name());

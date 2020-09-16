@@ -40,6 +40,7 @@ import io.github.retrooper.packetevents.packetwrappers.in.keepalive.WrappedPacke
 import io.github.retrooper.packetevents.packetwrappers.in.settings.WrappedPacketInSettings;
 import io.github.retrooper.packetevents.packetwrappers.in.steervehicle.WrappedPacketInSteerVehicle;
 import io.github.retrooper.packetevents.packetwrappers.in.transaction.WrappedPacketInTransaction;
+import io.github.retrooper.packetevents.packetwrappers.in.updatesign.WrappedPacketInUpdateSign;
 import io.github.retrooper.packetevents.packetwrappers.in.useentity.WrappedPacketInUseEntity;
 import io.github.retrooper.packetevents.packetwrappers.in.windowclick.WrappedPacketInWindowClick;
 import io.github.retrooper.packetevents.packetwrappers.out.abilities.WrappedPacketOutAbilities;
@@ -113,6 +114,7 @@ public class WrappedPacket implements WrapperPacketReader {
         WrappedPacketInSteerVehicle.load();
         WrappedPacketInTransaction.load();
         WrappedPacketInUseEntity.load();
+        WrappedPacketInUpdateSign.load();
         WrappedPacketInWindowClick.load();
 
         //CLIENTBOUND
@@ -167,6 +169,147 @@ public class WrappedPacket implements WrapperPacketReader {
     @Override
     public double readDouble(int index) {
         return (double) readObject(index, double.class);
+    }
+
+    @Override
+    public boolean[] readBooleanArray(int index) {
+        int currentIndex = 0;
+        for(Field f : fields) {
+            if (boolean.class.isAssignableFrom(f.getType())) {
+                if(index == currentIndex++) {
+                    try {
+                        return (boolean[]) f.get(packet);
+                    } catch (IllegalAccessException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        }
+        return new boolean[0];
+    }
+
+    @Override
+    public byte[] readByteArray(int index) {
+        int currentIndex = 0;
+        for(Field f : fields) {
+            if (byte.class.isAssignableFrom(f.getType())) {
+                if(index == currentIndex++) {
+                    try {
+                        return (byte[]) f.get(packet);
+                    } catch (IllegalAccessException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        }
+        return new byte[0];
+    }
+
+    @Override
+    public short[] readShortArray(int index) {
+        int currentIndex = 0;
+        for(Field f : fields) {
+            if (short.class.isAssignableFrom(f.getType())) {
+                if(index == currentIndex++) {
+                    try {
+                        return (short[]) f.get(packet);
+                    } catch (IllegalAccessException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        }
+        return new short[0];
+    }
+
+    @Override
+    public int[] readIntArray(int index) {
+        int currentIndex = 0;
+        for(Field f : fields) {
+            if (int.class.isAssignableFrom(f.getType())) {
+                if(index == currentIndex++) {
+                    try {
+                        return (int[]) f.get(packet);
+                    } catch (IllegalAccessException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        }
+        return new int[0];
+    }
+
+    @Override
+    public long[] readLongArray(int index) {
+        int currentIndex = 0;
+        for(Field f : fields) {
+            if (long.class.isAssignableFrom(f.getType())) {
+                if(index == currentIndex++) {
+                    try {
+                        return (long[]) f.get(packet);
+                    } catch (IllegalAccessException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        }
+        return new long[0];
+    }
+
+    @Override
+    public float[] readFloatArray(int index) {
+        int currentIndex = 0;
+        for(Field f : fields) {
+            if (float.class.isAssignableFrom(f.getType())) {
+                if(index == currentIndex++) {
+                    try {
+                        return (float[]) f.get(packet);
+                    } catch (IllegalAccessException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        }
+        return new float[0];
+    }
+
+    @Override
+    public double[] readDoubleArray(int index) {
+        int currentIndex = 0;
+        for(Field f : fields) {
+            if (double.class.isAssignableFrom(f.getType())) {
+                if(index == currentIndex++) {
+                    try {
+                        return (double[]) f.get(packet);
+                    } catch (IllegalAccessException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        }
+        return new double[0];
+    }
+
+    @Override
+    public String[] readStringArray(int index) {
+        return (String[]) readObjectArray(index, String.class);
+    }
+
+    @Override
+    public Object[] readObjectArray(int index, Class<?> type) {
+        int currentIndex = 0;
+        for(Field f : fields) {
+            if (type.isAssignableFrom(f.getType())) {
+                if(index == currentIndex++) {
+                    try {
+                        return (Object[]) f.get(packet);
+                    } catch (IllegalAccessException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        }
+        return new Object[0];
     }
 
     @Override

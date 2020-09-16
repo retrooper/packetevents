@@ -40,6 +40,24 @@ public interface WrapperPacketReader {
 
     double readDouble(int index);
 
+    boolean[] readBooleanArray(int index);
+
+    byte[] readByteArray(int index);
+
+    short[] readShortArray(int index);
+
+    int[] readIntArray(int index);
+
+    long[] readLongArray(int index);
+
+    float[] readFloatArray(int index);
+
+    double[] readDoubleArray(int index);
+
+    String[] readStringArray(int index);
+
+    Object[] readObjectArray(int index, Class<?> type);
+
     Object readObject(int index, Class<?> type);
 
     Object readAnyObject(int index);
