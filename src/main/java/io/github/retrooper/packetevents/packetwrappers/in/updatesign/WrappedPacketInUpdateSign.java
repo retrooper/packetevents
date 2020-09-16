@@ -31,7 +31,7 @@ import io.github.retrooper.packetevents.utils.nms.NMSUtils;
 import io.github.retrooper.packetevents.utils.reflection.Reflection;
 
 public class WrappedPacketInUpdateSign extends WrappedPacket {
-    private static boolean v_1_7_mode;
+    private static boolean v_1_7_mode, strArrayMode;
     private static Class<?> blockPosClass, iChatBaseComponentClass;
 
     private int x, y, z;
@@ -39,11 +39,12 @@ public class WrappedPacketInUpdateSign extends WrappedPacket {
 
     public static void load() {
         v_1_7_mode = Reflection.getField(PacketTypeClasses.Client.UPDATE_SIGN, int.class, 0) != null;
+        strArrayMode = Reflection.getField(PacketTypeClasses.Client.UPDATE_SIGN, String[].class, 0) != null;
 
         try {
             blockPosClass = NMSUtils.getNMSClass("BlockPosition");
         } catch (ClassNotFoundException e) {
-            if(!v_1_7_mode) {
+            if (!v_1_7_mode) {
                 e.printStackTrace();
             }
         }
@@ -64,11 +65,8 @@ public class WrappedPacketInUpdateSign extends WrappedPacket {
             x = readInt(0);
             y = readInt(1);
             z = readInt(2);
-            lines = readStringArray(0);
-        }
-        else {
+        } else {
             Object blockPos = readObject(0, blockPosClass);
-
             try {
                 x = Reflection.getField(blockPosClass, int.class, 0).getInt(packet);
                 y = Reflection.getField(blockPosClass, int.class, 1).getInt(packet);
@@ -76,9 +74,14 @@ public class WrappedPacketInUpdateSign extends WrappedPacket {
             } catch (IllegalAccessException e) {
                 e.printStackTrace();
             }
-
+        }
+        if (strArrayMode) {
+            //1.7.10 and the newest versions use this
+            lines = readStringArray(0);
+        } else {
+            //1.8 uses this for example
             Object[] iChatComponents = readObjectArray(0, iChatBaseComponentClass);
-            for(int i = 0; i < iChatComponents.length; i++) {
+            for (int i = 0; i < iChatComponents.length; i++) {
                 lines[i] = WrappedPacketOutChat.
                         toStringFromIChatBaseComponent(iChatComponents[i]);
             }

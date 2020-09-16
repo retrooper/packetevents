@@ -175,7 +175,7 @@ public class WrappedPacket implements WrapperPacketReader {
     public boolean[] readBooleanArray(int index) {
         int currentIndex = 0;
         for(Field f : fields) {
-            if (boolean.class.isAssignableFrom(f.getType())) {
+            if (boolean[].class.isAssignableFrom(f.getType())) {
                 if(index == currentIndex++) {
                     try {
                         return (boolean[]) f.get(packet);
@@ -192,7 +192,7 @@ public class WrappedPacket implements WrapperPacketReader {
     public byte[] readByteArray(int index) {
         int currentIndex = 0;
         for(Field f : fields) {
-            if (byte.class.isAssignableFrom(f.getType())) {
+            if (byte[].class.isAssignableFrom(f.getType())) {
                 if(index == currentIndex++) {
                     try {
                         return (byte[]) f.get(packet);
@@ -209,7 +209,7 @@ public class WrappedPacket implements WrapperPacketReader {
     public short[] readShortArray(int index) {
         int currentIndex = 0;
         for(Field f : fields) {
-            if (short.class.isAssignableFrom(f.getType())) {
+            if (short[].class.isAssignableFrom(f.getType())) {
                 if(index == currentIndex++) {
                     try {
                         return (short[]) f.get(packet);
@@ -226,7 +226,7 @@ public class WrappedPacket implements WrapperPacketReader {
     public int[] readIntArray(int index) {
         int currentIndex = 0;
         for(Field f : fields) {
-            if (int.class.isAssignableFrom(f.getType())) {
+            if (int[].class.isAssignableFrom(f.getType())) {
                 if(index == currentIndex++) {
                     try {
                         return (int[]) f.get(packet);
@@ -243,7 +243,7 @@ public class WrappedPacket implements WrapperPacketReader {
     public long[] readLongArray(int index) {
         int currentIndex = 0;
         for(Field f : fields) {
-            if (long.class.isAssignableFrom(f.getType())) {
+            if (long[].class.isAssignableFrom(f.getType())) {
                 if(index == currentIndex++) {
                     try {
                         return (long[]) f.get(packet);
@@ -277,7 +277,7 @@ public class WrappedPacket implements WrapperPacketReader {
     public double[] readDoubleArray(int index) {
         int currentIndex = 0;
         for(Field f : fields) {
-            if (double.class.isAssignableFrom(f.getType())) {
+            if (double[].class.isAssignableFrom(f.getType())) {
                 if(index == currentIndex++) {
                     try {
                         return (double[]) f.get(packet);
@@ -292,7 +292,13 @@ public class WrappedPacket implements WrapperPacketReader {
 
     @Override
     public String[] readStringArray(int index) {
-        return (String[]) readObjectArray(index, String.class);
+        Object[] array = readObjectArray(index, String[].class);
+        int len = array.length;
+        String[] stringArray = new String[len];
+        for(int i = 0; i < len; i++) {
+            stringArray[i] = array[i].toString();
+        }
+        return stringArray;
     }
 
     @Override
