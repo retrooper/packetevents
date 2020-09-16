@@ -154,6 +154,19 @@ public class PacketEventsSettings {
         this.useProtocolLibIfAvailable = val;
     }
 
+    public boolean isCheckForUpdates() {
+        return checkForUpdates;
+    }
+
+    /**
+     * Would you like PacketEvents to Check for Updates on startup?
+     *
+     * @param checkForUpdates boolean
+     */
+    public void setCheckForUpdates(boolean checkForUpdates) {
+        this.checkForUpdates = checkForUpdates;
+    }
+
     /*public void setShouldCheckForUpdates(boolean val) {
         this.checkForUpdates = val;
     }
@@ -161,4 +174,5 @@ public class PacketEventsSettings {
     public boolean shouldCheckForUpdates() {
         return checkForUpdates;
     }*/
+
 }
