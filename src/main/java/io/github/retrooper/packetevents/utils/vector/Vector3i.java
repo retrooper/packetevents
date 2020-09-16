@@ -23,7 +23,7 @@
  */
 
 package io.github.retrooper.packetevents.utils.vector;
-
+@Deprecated
 public final class Vector3i {
     public int x, y, z;
 

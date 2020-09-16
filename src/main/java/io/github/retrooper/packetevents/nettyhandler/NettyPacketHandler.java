@@ -170,4 +170,12 @@ public class NettyPacketHandler {
         return null;
     }
 
+    public static void sendPacket(Object channel, Object packet) {
+        if(v1_7_nettyMode) {
+            NettyPacketHandler_7.sendPacket(channel, packet);
+        }
+        else {
+            NettyPacketHandler_8.sendPacket(channel, packet);
+        }
+    }
 }

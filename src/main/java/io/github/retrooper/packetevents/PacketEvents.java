@@ -31,11 +31,10 @@ import io.github.retrooper.packetevents.event.impl.BukkitMoveEvent;
 import io.github.retrooper.packetevents.packet.PacketTypeClasses;
 import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
 import io.github.retrooper.packetevents.settings.PacketEventsSettings;
-import io.github.retrooper.packetevents.utils.NMSUtils;
+import io.github.retrooper.packetevents.utils.nms.NMSUtils;
 import io.github.retrooper.packetevents.utils.entityfinder.EntityFinderUtils;
 import io.github.retrooper.packetevents.utils.versionlookup.VersionLookupUtils;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -44,7 +43,6 @@ import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.plugin.Plugin;
 
-import java.io.*;
 import java.util.ArrayList;
 
 public final class PacketEvents implements Listener {
@@ -192,6 +190,7 @@ public final class PacketEvents implements Listener {
     public void onQuit(final PlayerQuitEvent e) {
         PacketEvents.getAPI().getPlayerUtils().ejectPlayer(e.getPlayer());
         PacketEvents.getAPI().getPlayerUtils().clientVersionsMap.remove(e.getPlayer().getUniqueId());
+        NMSUtils.channelCache.remove(e.getPlayer().getUniqueId());
     }
 
     @EventHandler

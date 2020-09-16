@@ -24,6 +24,7 @@
 
 package io.github.retrooper.packetevents.utils.vector;
 
+@Deprecated
 public final class Vector3d {
     public double x, y, z;
 

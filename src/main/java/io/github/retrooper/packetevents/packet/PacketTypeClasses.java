@@ -25,8 +25,7 @@
 package io.github.retrooper.packetevents.packet;
 
 import io.github.retrooper.packetevents.packettype.PacketType;
-import io.github.retrooper.packetevents.utils.reflection.Reflection;
-import io.github.retrooper.packetevents.utils.NMSUtils;
+import io.github.retrooper.packetevents.utils.nms.NMSUtils;
 import io.github.retrooper.packetevents.utils.reflection.SubclassUtil;
 
 public class PacketTypeClasses {

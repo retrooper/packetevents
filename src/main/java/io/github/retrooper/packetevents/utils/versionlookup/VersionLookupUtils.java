@@ -28,6 +28,7 @@ import io.github.retrooper.packetevents.PacketEvents;
 import io.github.retrooper.packetevents.enums.ServerVersion;
 import io.github.retrooper.packetevents.utils.protocollib.ProtocolLibUtils;
 import io.github.retrooper.packetevents.utils.protocolsupport.ProtocolSupportUtils;
+import io.github.retrooper.packetevents.utils.v_1_7_10.ProtocolVersionAccessor_v_1_7;
 import io.github.retrooper.packetevents.utils.viaversion.ViaUtils;
 import org.bukkit.entity.Player;
 

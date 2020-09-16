@@ -26,7 +26,7 @@ package io.github.retrooper.packetevents.utils.entityfinder;
 
 import io.github.retrooper.packetevents.annotations.Nullable;
 import io.github.retrooper.packetevents.enums.ServerVersion;
-import io.github.retrooper.packetevents.utils.NMSUtils;
+import io.github.retrooper.packetevents.utils.nms.NMSUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.entity.Entity;

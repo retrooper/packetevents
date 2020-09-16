@@ -22,10 +22,11 @@
  * SOFTWARE.
  */
 
-package io.github.retrooper.packetevents.utils;
+package io.github.retrooper.packetevents.utils.nms;
 
 import io.github.retrooper.packetevents.annotations.Nullable;
 import io.github.retrooper.packetevents.enums.ServerVersion;
+import io.github.retrooper.packetevents.nettyhandler.NettyPacketHandler;
 import io.github.retrooper.packetevents.packetwrappers.SendableWrapper;
 import io.github.retrooper.packetevents.utils.reflection.Reflection;
 import io.github.retrooper.packetevents.utils.entityfinder.EntityFinderUtils;
@@ -37,6 +38,8 @@ import org.bukkit.inventory.ItemStack;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.HashMap;
+import java.util.UUID;
 
 public final class NMSUtils {
     public static ServerVersion version;
@@ -49,6 +52,8 @@ public final class NMSUtils {
             craftItemStack, nmsItemStackClass, networkManagerClass, nettyChannelClass;
     private static Method getCraftWorldHandleMethod, getServerConnection, getCraftPlayerHandle, getCraftEntityHandle, sendPacketMethod, asBukkitCopy;
     private static Field entityPlayerPingField, playerConnectionField;
+
+    public static final HashMap<UUID, Object> channelCache = new HashMap<UUID, Object>();
 
     public static void load() {
         try {
@@ -191,12 +196,16 @@ public final class NMSUtils {
     }
 
     public static Object getChannel(final Player player) {
-        try {
-            return Reflection.getField(networkManagerClass, nettyChannelClass, 0).get(getNetworkManager(player));
-        } catch (IllegalAccessException e) {
-            e.printStackTrace();
+        UUID uuid = player.getUniqueId();
+        if(!channelCache.containsKey(uuid)) {
+            try {
+                Object channel = Reflection.getField(networkManagerClass, nettyChannelClass, 0).get(getNetworkManager(player));
+                channelCache.put(uuid, channel);
+            } catch (IllegalAccessException e) {
+                e.printStackTrace();
+            }
         }
-        return null;
+        return channelCache.get(uuid);
     }
 
     public static int getPlayerPing(final Player player) {
@@ -223,18 +232,6 @@ public final class NMSUtils {
     }
 
     public static void sendNMSPacket(final Player player, final Object nmsPacket) {
-        Object entityPlayer = getEntityPlayer(player);
-        Object playerConnection = null;
-        try {
-            playerConnection = playerConnectionField.get(entityPlayer);
-        } catch (IllegalAccessException e) {
-            e.printStackTrace();
-        }
-
-        try {
-            sendPacketMethod.invoke(playerConnection, nmsPacket);
-        } catch (IllegalAccessException | InvocationTargetException e) {
-            e.printStackTrace();
-        }
+        NettyPacketHandler.sendPacket(getChannel(player), nmsPacket);
     }
 }

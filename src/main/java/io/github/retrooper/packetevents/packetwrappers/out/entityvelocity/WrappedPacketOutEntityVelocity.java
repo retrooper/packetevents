@@ -28,7 +28,7 @@ import io.github.retrooper.packetevents.enums.ServerVersion;
 import io.github.retrooper.packetevents.packet.PacketTypeClasses;
 import io.github.retrooper.packetevents.packetwrappers.SendableWrapper;
 import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
-import io.github.retrooper.packetevents.utils.NMSUtils;
+import io.github.retrooper.packetevents.utils.nms.NMSUtils;
 import org.bukkit.entity.Entity;
 
 import java.lang.reflect.Constructor;
@@ -38,7 +38,7 @@ public final class WrappedPacketOutEntityVelocity extends WrappedPacket implemen
     private static Constructor<?> velocityConstructor, vec3dConstructor;
     private static Class<?> velocityClass, vec3dClass;
     private static boolean isVec3dPresent;
-    private int entityId;
+    private int entityID;
     private double velocityX, velocityY, velocityZ;
     private Entity entity;
     public WrappedPacketOutEntityVelocity(final Object packet) {
@@ -46,12 +46,18 @@ public final class WrappedPacketOutEntityVelocity extends WrappedPacket implemen
     }
 
     public WrappedPacketOutEntityVelocity(final Entity entity, final double velocityX, final double velocityY, final double velocityZ) {
-        super();
-        this.entityId = entity.getEntityId();
+        this.entityID = entity.getEntityId();
         this.entity = entity;
         this.velocityX = velocityX;
         this.velocityY = velocityY;
         this.velocityZ = velocityZ;
+    }
+
+    public WrappedPacketOutEntityVelocity(int entityID, double velX, double velY, double velZ) {
+        this.entityID = entityID;
+        this.velocityX = velX;
+        this.velocityY = velY;
+        this.velocityZ = velZ;
     }
 
     /**
@@ -88,7 +94,7 @@ public final class WrappedPacketOutEntityVelocity extends WrappedPacket implemen
     @Override
     protected void setup() {
         //ENTITY ID
-        this.entityId = readInt(0);
+        this.entityID = readInt(0);
 
         int x = readInt(1);
         int y = readInt(2);
@@ -108,7 +114,7 @@ public final class WrappedPacketOutEntityVelocity extends WrappedPacket implemen
         if(entity != null) {
             return entity;
         }
-        return entity = NMSUtils.getEntityById(this.entityId);
+        return entity = NMSUtils.getEntityById(this.entityID);
     }
 
     /**
@@ -118,7 +124,7 @@ public final class WrappedPacketOutEntityVelocity extends WrappedPacket implemen
      * @return Entity ID
      */
     public int getEntityId() {
-        return entityId;
+        return entityID;
     }
 
     /**
@@ -149,13 +155,13 @@ public final class WrappedPacketOutEntityVelocity extends WrappedPacket implemen
     public Object asNMSPacket() {
         if (!isVec3dPresent) {
             try {
-                return velocityConstructor.newInstance(entityId, velocityX, velocityY, velocityZ);
+                return velocityConstructor.newInstance(entityID, velocityX, velocityY, velocityZ);
             } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
                 e.printStackTrace();
             }
         } else {
             try {
-                return velocityConstructor.newInstance(entityId, vec3dConstructor.newInstance(velocityX, velocityY, velocityZ));
+                return velocityConstructor.newInstance(entityID, vec3dConstructor.newInstance(velocityX, velocityY, velocityZ));
             } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
                 e.printStackTrace();
             }

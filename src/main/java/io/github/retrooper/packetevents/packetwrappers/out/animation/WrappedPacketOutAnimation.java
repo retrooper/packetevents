@@ -27,7 +27,7 @@ package io.github.retrooper.packetevents.packetwrappers.out.animation;
 import io.github.retrooper.packetevents.packet.PacketTypeClasses;
 import io.github.retrooper.packetevents.packetwrappers.SendableWrapper;
 import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
-import io.github.retrooper.packetevents.utils.NMSUtils;
+import io.github.retrooper.packetevents.utils.nms.NMSUtils;
 import org.bukkit.entity.Entity;
 
 import java.lang.reflect.Constructor;

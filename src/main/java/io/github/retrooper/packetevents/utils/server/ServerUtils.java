@@ -26,7 +26,7 @@ package io.github.retrooper.packetevents.utils.server;
 
 import io.github.retrooper.packetevents.enums.ServerVersion;
 import io.github.retrooper.packetevents.enums.SystemOS;
-import io.github.retrooper.packetevents.utils.NMSUtils;
+import io.github.retrooper.packetevents.utils.nms.NMSUtils;
 
 import java.lang.reflect.InvocationTargetException;
 

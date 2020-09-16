@@ -27,7 +27,7 @@ package io.github.retrooper.packetevents.packetwrappers.out.entity;
 import io.github.retrooper.packetevents.packet.PacketTypeClasses;
 import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
 import io.github.retrooper.packetevents.utils.reflection.Reflection;
-import io.github.retrooper.packetevents.utils.NMSUtils;
+import io.github.retrooper.packetevents.utils.nms.NMSUtils;
 import org.bukkit.entity.Entity;
 
 import java.lang.reflect.Field;

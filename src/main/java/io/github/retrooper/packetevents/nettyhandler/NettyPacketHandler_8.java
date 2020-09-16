@@ -25,7 +25,7 @@
 package io.github.retrooper.packetevents.nettyhandler;
 
 import io.github.retrooper.packetevents.PacketEvents;
-import io.github.retrooper.packetevents.utils.NMSUtils;
+import io.github.retrooper.packetevents.utils.nms.NMSUtils;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelDuplexHandler;
 import io.netty.channel.ChannelHandlerContext;
@@ -69,5 +69,10 @@ final class NettyPacketHandler_8 {
     public static void ejectPlayer(final Player player) {
         final Channel channel = (Channel) NMSUtils.getChannel(player);
         channel.pipeline().remove(PacketEvents.getHandlerName(player.getName()));
+    }
+
+    public static void sendPacket(Object rawChannel, Object packet) {
+        Channel channel = (Channel)rawChannel;
+        channel.pipeline().writeAndFlush(packet);
     }
 }

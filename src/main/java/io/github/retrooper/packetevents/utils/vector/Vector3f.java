@@ -24,6 +24,7 @@
 
 package io.github.retrooper.packetevents.utils.vector;
 
+@Deprecated
 public final class Vector3f {
     public float x, y, z;
 
