@@ -25,7 +25,7 @@ public class UpdateChecker extends BukkitRunnable {
             newVersion = readLines();
 
             //Please don't compare two strings using ==... ILL FIND WHERE U LIVE
-            if (PacketEvents.getVersion().equals(newVersion)) {
+            if (!PacketEvents.getVersion().equals(newVersion)) {
                 //We don't wanna access the Bukkit API Async (It really does not make a difference but Just to be safe)
                 inform();
             }
