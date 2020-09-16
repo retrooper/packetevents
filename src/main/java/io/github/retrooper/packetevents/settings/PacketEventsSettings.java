@@ -36,6 +36,7 @@ public class PacketEventsSettings {
     private boolean uninjectAsync = true;
     private boolean injectAsync = true;
     private boolean useProtocolLibIfAvailable = true;
+    private boolean checkForUpdates = true;
 
     /**
      * If PacketEvents fails to detect your server version, it will use the recommended version
@@ -148,5 +149,18 @@ public class PacketEventsSettings {
      */
     public void setUseProtocolLibIfAvailable(boolean val) {
         this.useProtocolLibIfAvailable = val;
+    }
+
+    public boolean isCheckForUpdates() {
+        return checkForUpdates;
+    }
+
+    /**
+     * Would you like PacketEvents to Check for Updates on startup?
+     *
+     * @param checkForUpdates boolean
+     */
+    public void setCheckForUpdates(boolean checkForUpdates) {
+        this.checkForUpdates = checkForUpdates;
     }
 }

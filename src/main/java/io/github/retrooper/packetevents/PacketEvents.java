@@ -51,6 +51,7 @@ public final class PacketEvents implements Listener {
     private static final PacketEvents instance = new PacketEvents();
     private static final ArrayList<Plugin> plugins = new ArrayList<Plugin>(1);
     private static boolean loaded, initialized, isBungee;
+    private static final String version = "1.6.8";
 
     /**
      * This loads the PacketEvents API.
@@ -124,6 +125,10 @@ public final class PacketEvents implements Listener {
             } catch (ClassNotFoundException | NoSuchFieldException | IllegalAccessException e) {
                 isBungee = false;
             }
+
+            if (getAPI().getSettings().isCheckForUpdates()) {
+                new UpdateChecker(pl).runTaskAsynchronously(pl);
+            }
         }
     }
 
@@ -184,6 +189,10 @@ public final class PacketEvents implements Listener {
 
     public static PacketEventsSettings getSettings() {
         return PacketEvents.getAPI().getSettings();
+    }
+
+    public static String getVersion() {
+        return version;
     }
 
     @EventHandler
