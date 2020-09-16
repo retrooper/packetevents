@@ -31,8 +31,8 @@ import io.github.retrooper.packetevents.event.impl.BukkitMoveEvent;
 import io.github.retrooper.packetevents.packet.PacketTypeClasses;
 import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
 import io.github.retrooper.packetevents.settings.PacketEventsSettings;
-import io.github.retrooper.packetevents.utils.nms.NMSUtils;
 import io.github.retrooper.packetevents.utils.entityfinder.EntityFinderUtils;
+import io.github.retrooper.packetevents.utils.nms.NMSUtils;
 import io.github.retrooper.packetevents.utils.versionlookup.VersionLookupUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -43,14 +43,15 @@ import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.plugin.Plugin;
 
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 
 public final class PacketEvents implements Listener {
     private static final PacketEventsAPI packetEventsAPI = new PacketEventsAPI();
     private static final PacketEvents instance = new PacketEvents();
     private static final ArrayList<Plugin> plugins = new ArrayList<Plugin>(1);
-    private static boolean loaded, initialized;
- 
+    private static boolean loaded, initialized, isBungee;
+
     /**
      * This loads the PacketEvents API.
      * <p>
@@ -114,6 +115,15 @@ public final class PacketEvents implements Listener {
                 getAPI().getPlayerUtils().injectPlayer(p);
             }
             initialized = true;
+
+            Class<?> spigotConfigClass;
+            try {
+                spigotConfigClass = Class.forName("org.spigotmc.SpigotConfig");
+                Field f = spigotConfigClass.getDeclaredField("bungee");
+                isBungee = f.getBoolean(null);
+            } catch (ClassNotFoundException | NoSuchFieldException | IllegalAccessException e) {
+                isBungee = false;
+            }
         }
     }
 
@@ -181,16 +191,21 @@ public final class PacketEvents implements Listener {
         if (!VersionLookupUtils.hasLoaded()) {
             VersionLookupUtils.load();
         }
-        ClientVersion version = ClientVersion.fromProtocolVersion(VersionLookupUtils.getProtocolVersion(e.getPlayer()));
-        PacketEvents.getAPI().getPlayerUtils().clientVersionsMap.put(e.getPlayer().getUniqueId(), version);
-        PacketEvents.getAPI().getPlayerUtils().injectPlayer(e.getPlayer());
+        //for now we don't support bungee, rather handle it than have it FALSE
+        //and return the version of the server.
+        if (isBungee) {
+            PacketEvents.getAPI().getPlayerUtils().clientVersionsMap.put(e.getPlayer().getUniqueId(), ClientVersion.ACCESS_FAILURE);
+        } else {
+            ClientVersion version = ClientVersion.fromProtocolVersion(VersionLookupUtils.getProtocolVersion(e.getPlayer()));
+            PacketEvents.getAPI().getPlayerUtils().clientVersionsMap.put(e.getPlayer().getUniqueId(), version);
+            PacketEvents.getAPI().getPlayerUtils().injectPlayer(e.getPlayer());
+        }
     }
 
     @EventHandler
     public void onQuit(final PlayerQuitEvent e) {
         PacketEvents.getAPI().getPlayerUtils().ejectPlayer(e.getPlayer());
         PacketEvents.getAPI().getPlayerUtils().clientVersionsMap.remove(e.getPlayer().getUniqueId());
-        NMSUtils.channelCache.remove(e.getPlayer().getUniqueId());
     }
 
     @EventHandler

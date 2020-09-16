@@ -69,6 +69,7 @@ final class NettyPacketHandler_8 {
     public static void ejectPlayer(final Player player) {
         final Channel channel = (Channel) NMSUtils.getChannel(player);
         channel.pipeline().remove(PacketEvents.getHandlerName(player.getName()));
+        NMSUtils.channelCache.remove(player.getUniqueId());
     }
 
     public static void sendPacket(Object rawChannel, Object packet) {
