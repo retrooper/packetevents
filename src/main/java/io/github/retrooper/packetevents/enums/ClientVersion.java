@@ -95,7 +95,7 @@ public enum ClientVersion {
         if (lookedUp != null) {
             return lookedUp;
         }
-        return protocolVersion > 737 ? HIGHER_THAN_V_1_16_2 : INVALID;
+        return protocolVersion > 737 ? HIGHER_THAN_V_1_16_3 : INVALID;
     }
 
     /**
