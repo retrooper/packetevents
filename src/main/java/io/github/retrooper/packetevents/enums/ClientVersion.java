@@ -84,7 +84,7 @@ public enum ClientVersion {
         VERSION_LOOKUP.put(735, v_1_16);
         VERSION_LOOKUP.put(736, v_1_16_1);
         VERSION_LOOKUP.put(751, v_1_16_2);
-        VERSION_LOOKUP.put(753, v_1_16_2);
+        VERSION_LOOKUP.put(753, v_1_16_3);
     }
 
     public static ClientVersion fromProtocolVersion(int protocolVersion) {
@@ -95,7 +95,7 @@ public enum ClientVersion {
         if (lookedUp != null) {
             return lookedUp;
         }
-        return protocolVersion > 737 ? HIGHER_THAN_V_1_16_3 : INVALID;
+        return protocolVersion > 753 ? HIGHER_THAN_V_1_16_3 : INVALID;
     }
 
     /**
