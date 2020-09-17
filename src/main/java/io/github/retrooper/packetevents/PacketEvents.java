@@ -51,7 +51,7 @@ public final class PacketEvents implements Listener {
     private static final PacketEvents instance = new PacketEvents();
     private static final ArrayList<Plugin> plugins = new ArrayList<Plugin>(1);
     private static boolean loaded, initialized, isBungee;
-    private static final String version = "1.6.8";
+    private static final String version = "1.6.8.1";
 
     /**
      * This loads the PacketEvents API.
@@ -85,8 +85,6 @@ public final class PacketEvents implements Listener {
         PacketTypeClasses.Server.load();
 
         EntityFinderUtils.load();
-
-        ClientVersion.prepareLookUp();
 
         WrappedPacket.loadAllWrappers();
         loaded = true;
@@ -203,9 +201,9 @@ public final class PacketEvents implements Listener {
         //for now we don't support bungee, rather handle it than have it FALSE
         //and return the version of the server.
         if (isBungee) {
-            PacketEvents.getAPI().getPlayerUtils().clientVersionsMap.put(e.getPlayer().getUniqueId(), ClientVersion.ACCESS_FAILURE);
+            PacketEvents.getAPI().getPlayerUtils().clientVersionsMap.put(e.getPlayer().getUniqueId(), ClientVersion.UNKNOWN);
         } else {
-            ClientVersion version = ClientVersion.fromProtocolVersion(VersionLookupUtils.getProtocolVersion(e.getPlayer()));
+            ClientVersion version = ClientVersion.getClientVersion(VersionLookupUtils.getProtocolVersion(e.getPlayer()));
             PacketEvents.getAPI().getPlayerUtils().clientVersionsMap.put(e.getPlayer().getUniqueId(), version);
             PacketEvents.getAPI().getPlayerUtils().injectPlayer(e.getPlayer());
         }
