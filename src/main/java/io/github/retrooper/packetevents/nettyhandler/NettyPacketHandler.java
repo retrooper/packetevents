@@ -37,7 +37,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
 public class NettyPacketHandler {
-    private static boolean v1_7_nettyMode = false;
+    public static boolean v1_7_nettyMode = false;
     private static final ExecutorService singleThreadedExecutor = Executors.newSingleThreadExecutor();
 
     static {

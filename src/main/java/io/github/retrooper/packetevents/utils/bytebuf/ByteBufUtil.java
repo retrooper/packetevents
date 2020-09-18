@@ -22,45 +22,16 @@
  * SOFTWARE.
  */
 
-package io.github.retrooper.packetevents.packetwrappers;
+package io.github.retrooper.packetevents.utils.bytebuf;
 
-public interface WrapperPacketReader {
+import io.github.retrooper.packetevents.nettyhandler.NettyPacketHandler;
 
-    boolean readBoolean(int index);
-
-    byte readByte(int index);
-
-    short readShort(int index);
-
-    int readInt(int index);
-
-    long readLong(int index);
-
-    float readFloat(int index);
-
-    double readDouble(int index);
-
-    boolean[] readBooleanArray(int index);
-
-    byte[] readByteArray(int index);
-
-    short[] readShortArray(int index);
-
-    int[] readIntArray(int index);
-
-    long[] readLongArray(int index);
-
-    float[] readFloatArray(int index);
-
-    double[] readDoubleArray(int index);
-
-    String[] readStringArray(int index);
-
-    String readString(int index);
-
-    Object readObject(int index, Class<?> type);
-
-    Object readAnyObject(int index);
-
-    Object[] readObjectArray(int index, Class<?> type);
+public class ByteBufUtil {
+    public static Object copiedBuffer(byte[] bytes) {
+        if (NettyPacketHandler.v1_7_nettyMode) {
+            return ByteBufUtil_7.copiedBuffer(bytes);
+        } else {
+            return ByteBufUtil_8.copiedBuffer(bytes);
+        }
+    }
 }

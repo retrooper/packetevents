@@ -27,8 +27,10 @@ package io.github.retrooper.packetevents.packetwrappers.out.custompayload;
 import io.github.retrooper.packetevents.packet.PacketTypeClasses;
 import io.github.retrooper.packetevents.packetwrappers.SendableWrapper;
 import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
+import io.github.retrooper.packetevents.utils.bytebuf.ByteBufUtil;
 import io.github.retrooper.packetevents.utils.reflection.Reflection;
 import io.github.retrooper.packetevents.utils.nms.NMSUtils;
+import io.netty.buffer.Unpooled;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
@@ -41,7 +43,6 @@ class WrappedPacketOutCustomPayload extends WrappedPacket implements SendableWra
     private static Constructor<?> packetDataSerializerConstructor;
     private static Constructor<?> minecraftKeyConstructor;
     private static Class<?> byteBufClass;
-    private static Class<?> unpooledClass;
     private static Class<?> packetDataSerializerClass;
     private static Class<?> minecraftKeyClass;
 
@@ -53,16 +54,15 @@ class WrappedPacketOutCustomPayload extends WrappedPacket implements SendableWra
         minecraftKeyClass = NMSUtils.getNMSClassWithoutException("MinecraftKey");
 
         try {
-            unpooledClass = NMSUtils.getNettyClass("buffer.Unpooled");
             byteBufClass = NMSUtils.getNettyClass("buffer.ByteBuf");
         } catch (ClassNotFoundException e) {
 
         }
         try {
-            packetDataSerializerConstructor = packetDataSerializerClass.getConstructor(NMSUtils.getNettyClass("ByteBuf"));
+            packetDataSerializerConstructor = packetDataSerializerClass.getConstructor(byteBufClass);
         } catch (NullPointerException e) {
             //Nothing
-        } catch (NoSuchMethodException | ClassNotFoundException e) {
+        } catch (NoSuchMethodException e) {
             //also nothing
         }
 
@@ -128,13 +128,7 @@ class WrappedPacketOutCustomPayload extends WrappedPacket implements SendableWra
 
     @Override
     public Object asNMSPacket() {
-        Object byteBufObject = null;
-        try {
-            byteBufObject = Reflection.getMethod(unpooledClass, "copiedBuffer", 0).invoke(null, data);
-        } catch (InvocationTargetException | IllegalAccessException e) {
-            e.printStackTrace();
-        }
-
+        Object byteBufObject = ByteBufUtil.copiedBuffer(data);
         switch (constructorMode) {
             case 0:
                 try {

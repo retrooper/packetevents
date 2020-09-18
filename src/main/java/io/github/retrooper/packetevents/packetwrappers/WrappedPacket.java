@@ -58,12 +58,11 @@ import org.bukkit.entity.Player;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 public class WrappedPacket implements WrapperPacketReader {
-    protected final List<Field> fields = new ArrayList<>();
+    private static final HashMap<Class<?>, HashMap<Class<?>, Field[]>> fieldCache = new HashMap<>();
     public static ServerVersion version;
     protected final Player player;
     protected Object packet;
@@ -88,9 +87,130 @@ public class WrappedPacket implements WrapperPacketReader {
         } else if (packet.getClass().getSuperclass().equals(PacketTypeClasses.Server.ENTITY)) {
             packetClass = PacketTypeClasses.Server.ENTITY;
         }
-        for (Field f : packetClass.getDeclaredFields()) {
-            f.setAccessible(true);
-            fields.add(f);
+
+
+        if (!fieldCache.containsKey(packetClass)) {
+            final Field[] declaredFields = packetClass.getDeclaredFields();
+            List<Field> boolFields = new ArrayList<>();
+            List<Field> byteFields = new ArrayList<>();
+            List<Field> shortFields = new ArrayList<>();
+            List<Field> intFields = new ArrayList<>();
+            List<Field> longFields = new ArrayList<>();
+            List<Field> floatFields = new ArrayList<>();
+            List<Field> doubleFields = new ArrayList<>();
+            List<Field> stringFields = new ArrayList<>();
+
+            List<Field> boolArrayFields = new ArrayList<>();
+            List<Field> byteArrayFields = new ArrayList<>();
+            List<Field> shortArrayFields = new ArrayList<>();
+            List<Field> intArrayFields = new ArrayList<>();
+            List<Field> longArrayFields = new ArrayList<>();
+            List<Field> floatArrayFields = new ArrayList<>();
+            List<Field> doubleArrayFields = new ArrayList<>();
+            List<Field> stringArrayFields = new ArrayList<>();
+
+            for (Field f : declaredFields) {
+                f.setAccessible(true);
+                if (f.getType().equals(boolean.class)) {
+                    boolFields.add(f);
+                } else if (f.getType().equals(byte.class)) {
+                    byteFields.add(f);
+                } else if (f.getType().equals(short.class)) {
+                    shortFields.add(f);
+                } else if (f.getType().equals(int.class)) {
+                    intFields.add(f);
+                } else if (f.getType().equals(long.class)) {
+                    longFields.add(f);
+                } else if (f.getType().equals(float.class)) {
+                    floatFields.add(f);
+                } else if (f.getType().equals(double.class)) {
+                    doubleFields.add(f);
+                } else if (f.getType().equals(String.class)) {
+                    stringFields.add(f);
+                } else if (f.getType().equals(boolean[].class)) {
+                    boolArrayFields.add(f);
+                } else if (f.getType().equals(byte[].class)) {
+                    byteArrayFields.add(f);
+                } else if (f.getType().equals(short[].class)) {
+                    shortArrayFields.add(f);
+                } else if (f.getType().equals(int[].class)) {
+                    intArrayFields.add(f);
+                } else if (f.getType().equals(long[].class)) {
+                    longArrayFields.add(f);
+                } else if (f.getType().equals(float[].class)) {
+                    floatArrayFields.add(f);
+                } else if (f.getType().equals(double[].class)) {
+                    doubleArrayFields.add(f);
+                } else if (f.getType().equals(String[].class)) {
+                    stringArrayFields.add(f);
+                }
+            }
+
+            HashMap<Class<?>, Field[]> map = new HashMap<>();
+            if (!boolFields.isEmpty()) {
+                map.put(boolean.class, boolFields.toArray(new Field[0]));
+            }
+
+            if (!byteFields.isEmpty()) {
+                map.put(byte.class, byteFields.toArray(new Field[0]));
+            }
+
+            if (!shortFields.isEmpty()) {
+                map.put(short.class, shortFields.toArray(new Field[0]));
+            }
+
+            if (!intFields.isEmpty()) {
+                map.put(int.class, intFields.toArray(new Field[0]));
+            }
+
+            if (!longFields.isEmpty()) {
+                map.put(long.class, longFields.toArray(new Field[0]));
+            }
+
+            if (!floatFields.isEmpty()) {
+                map.put(float.class, floatFields.toArray(new Field[0]));
+            }
+
+            if (!doubleFields.isEmpty()) {
+                map.put(double.class, doubleFields.toArray(new Field[0]));
+            }
+
+            if (!stringFields.isEmpty()) {
+                map.put(String.class, stringFields.toArray(new Field[0]));
+            }
+
+            if (!boolArrayFields.isEmpty()) {
+                map.put(boolean[].class, boolArrayFields.toArray(new Field[0]));
+            }
+
+            if (!byteArrayFields.isEmpty()) {
+                map.put(byte[].class, byteArrayFields.toArray(new Field[0]));
+            }
+
+            if (!shortArrayFields.isEmpty()) {
+                map.put(short[].class, shortArrayFields.toArray(new Field[0]));
+            }
+
+            if (!intArrayFields.isEmpty()) {
+                map.put(int[].class, intArrayFields.toArray(new Field[0]));
+            }
+
+            if (!longArrayFields.isEmpty()) {
+                map.put(long[].class, longArrayFields.toArray(new Field[0]));
+            }
+
+            if (!floatArrayFields.isEmpty()) {
+                map.put(float[].class, floatArrayFields.toArray(new Field[0]));
+            }
+
+            if (!doubleArrayFields.isEmpty()) {
+                map.put(double[].class, doubleArrayFields.toArray(new Field[0]));
+            }
+
+            if (!stringArrayFields.isEmpty()) {
+                map.put(String[].class, stringArrayFields.toArray(new Field[0]));
+            }
+            fieldCache.put(packetClass, map);
         }
         this.player = player;
         this.packet = packet;
@@ -138,45 +258,102 @@ public class WrappedPacket implements WrapperPacketReader {
 
     @Override
     public boolean readBoolean(int index) {
-        return (boolean) readObject(index, boolean.class);
+        if (fieldCache.containsKey(packetClass)) {
+            try {
+                return fieldCache.get(packetClass).get(boolean.class)[index].getBoolean(packet);
+            } catch (IllegalAccessException e) {
+                e.printStackTrace();
+            }
+        }
+        return false;
     }
 
     @Override
     public byte readByte(int index) {
-        return (byte) readObject(index, byte.class);
+        if (fieldCache.containsKey(packetClass)) {
+            try {
+                return fieldCache.get(packetClass).get(byte.class)[index].getByte(packet);
+            } catch (IllegalAccessException e) {
+                e.printStackTrace();
+            }
+        }
+        return 0;
     }
 
     @Override
     public short readShort(int index) {
-        return (short) readObject(index, short.class);
+        if (fieldCache.containsKey(packetClass)) {
+            try {
+                return fieldCache.get(packetClass).get(short.class)[index].getShort(packet);
+            } catch (IllegalAccessException e) {
+                e.printStackTrace();
+            }
+        }
+        return 0;
     }
 
     @Override
     public int readInt(int index) {
-        return (int) readObject(index, int.class);
+        if (fieldCache.containsKey(packetClass)) {
+            try {
+                return fieldCache.get(packetClass).get(int.class)[index].getInt(packet);
+            } catch (IllegalAccessException e) {
+                e.printStackTrace();
+            }
+        }
+        return 0;
     }
 
     @Override
     public long readLong(int index) {
-        return (long) readObject(index, long.class);
+        if (fieldCache.containsKey(packetClass)) {
+            try {
+                return fieldCache.get(packetClass).get(long.class)[index].getLong(packet);
+            } catch (IllegalAccessException e) {
+                e.printStackTrace();
+            }
+        }
+        return 0L;
     }
 
     @Override
     public float readFloat(int index) {
-        return (float) readObject(index, float.class);
+        if (fieldCache.containsKey(packetClass)) {
+            try {
+                return fieldCache.get(packetClass).get(float.class)[index].getFloat(packet);
+            } catch (IllegalAccessException e) {
+                e.printStackTrace();
+            }
+        }
+        return 0.0F;
     }
 
     @Override
     public double readDouble(int index) {
-        return (double) readObject(index, double.class);
+        if (fieldCache.containsKey(packetClass)) {
+            try {
+                return fieldCache.get(packetClass).get(double.class)[index].getDouble(packet);
+            } catch (IllegalAccessException e) {
+                e.printStackTrace();
+            }
+        }
+        return 0.0;
     }
 
     @Override
     public boolean[] readBooleanArray(int index) {
+        if (fieldCache.containsKey(packetClass)) {
+            try {
+                return (boolean[]) fieldCache.get(packetClass).get(boolean[].class)[index].get(packet);
+            } catch (IllegalAccessException e) {
+                e.printStackTrace();
+            }
+        }
         int currentIndex = 0;
-        for(Field f : fields) {
+        for (Field f : packetClass.getDeclaredFields()) {
+            f.setAccessible(true);
             if (boolean[].class.isAssignableFrom(f.getType())) {
-                if(index == currentIndex++) {
+                if (index == currentIndex++) {
                     try {
                         return (boolean[]) f.get(packet);
                     } catch (IllegalAccessException e) {
@@ -190,10 +367,18 @@ public class WrappedPacket implements WrapperPacketReader {
 
     @Override
     public byte[] readByteArray(int index) {
+        if (fieldCache.containsKey(packetClass)) {
+            try {
+                return (byte[]) fieldCache.get(packetClass).get(byte[].class)[index].get(packet);
+            } catch (IllegalAccessException e) {
+                e.printStackTrace();
+            }
+        }
         int currentIndex = 0;
-        for(Field f : fields) {
+        for (Field f : packetClass.getDeclaredFields()) {
+            f.setAccessible(true);
             if (byte[].class.isAssignableFrom(f.getType())) {
-                if(index == currentIndex++) {
+                if (index == currentIndex++) {
                     try {
                         return (byte[]) f.get(packet);
                     } catch (IllegalAccessException e) {
@@ -207,10 +392,18 @@ public class WrappedPacket implements WrapperPacketReader {
 
     @Override
     public short[] readShortArray(int index) {
+        if (fieldCache.containsKey(packetClass)) {
+            try {
+                return (short[]) fieldCache.get(packetClass).get(short[].class)[index].get(packet);
+            } catch (IllegalAccessException e) {
+                e.printStackTrace();
+            }
+        }
         int currentIndex = 0;
-        for(Field f : fields) {
+        for (Field f : packetClass.getDeclaredFields()) {
+            f.setAccessible(true);
             if (short[].class.isAssignableFrom(f.getType())) {
-                if(index == currentIndex++) {
+                if (index == currentIndex++) {
                     try {
                         return (short[]) f.get(packet);
                     } catch (IllegalAccessException e) {
@@ -224,10 +417,18 @@ public class WrappedPacket implements WrapperPacketReader {
 
     @Override
     public int[] readIntArray(int index) {
+        if (fieldCache.containsKey(packetClass)) {
+            try {
+                return (int[]) fieldCache.get(packetClass).get(int[].class)[index].get(packet);
+            } catch (IllegalAccessException e) {
+                e.printStackTrace();
+            }
+        }
         int currentIndex = 0;
-        for(Field f : fields) {
+        for (Field f : packetClass.getDeclaredFields()) {
+            f.setAccessible(true);
             if (int[].class.isAssignableFrom(f.getType())) {
-                if(index == currentIndex++) {
+                if (index == currentIndex++) {
                     try {
                         return (int[]) f.get(packet);
                     } catch (IllegalAccessException e) {
@@ -241,10 +442,18 @@ public class WrappedPacket implements WrapperPacketReader {
 
     @Override
     public long[] readLongArray(int index) {
+        if (fieldCache.containsKey(packetClass)) {
+            try {
+                return (long[]) fieldCache.get(packetClass).get(long[].class)[index].get(packet);
+            } catch (IllegalAccessException e) {
+                e.printStackTrace();
+            }
+        }
         int currentIndex = 0;
-        for(Field f : fields) {
+        for (Field f : packetClass.getDeclaredFields()) {
+            f.setAccessible(true);
             if (long[].class.isAssignableFrom(f.getType())) {
-                if(index == currentIndex++) {
+                if (index == currentIndex++) {
                     try {
                         return (long[]) f.get(packet);
                     } catch (IllegalAccessException e) {
@@ -258,10 +467,18 @@ public class WrappedPacket implements WrapperPacketReader {
 
     @Override
     public float[] readFloatArray(int index) {
+        if (fieldCache.containsKey(packetClass)) {
+            try {
+                return (float[]) fieldCache.get(packetClass).get(float[].class)[index].get(packet);
+            } catch (IllegalAccessException e) {
+                e.printStackTrace();
+            }
+        }
         int currentIndex = 0;
-        for(Field f : fields) {
+        for (Field f : packetClass.getDeclaredFields()) {
+            f.setAccessible(true);
             if (float.class.isAssignableFrom(f.getType())) {
-                if(index == currentIndex++) {
+                if (index == currentIndex++) {
                     try {
                         return (float[]) f.get(packet);
                     } catch (IllegalAccessException e) {
@@ -275,10 +492,18 @@ public class WrappedPacket implements WrapperPacketReader {
 
     @Override
     public double[] readDoubleArray(int index) {
+        if (fieldCache.containsKey(packetClass)) {
+            try {
+                return (double[]) fieldCache.get(packetClass).get(double[].class)[index].get(packet);
+            } catch (IllegalAccessException e) {
+                e.printStackTrace();
+            }
+        }
         int currentIndex = 0;
-        for(Field f : fields) {
+        for (Field f : packetClass.getDeclaredFields()) {
+            f.setAccessible(true);
             if (double[].class.isAssignableFrom(f.getType())) {
-                if(index == currentIndex++) {
+                if (index == currentIndex++) {
                     try {
                         return (double[]) f.get(packet);
                     } catch (IllegalAccessException e) {
@@ -292,66 +517,62 @@ public class WrappedPacket implements WrapperPacketReader {
 
     @Override
     public String[] readStringArray(int index) {
-        Object[] array = readObjectArray(index, String[].class);
-        int len = array.length;
-        String[] stringArray = new String[len];
-        for(int i = 0; i < len; i++) {
-            stringArray[i] = array[i].toString();
-        }
-        return stringArray;
-    }
-
-    @Override
-    public Object[] readObjectArray(int index, Class<?> type) {
-        int currentIndex = 0;
-        for(Field f : fields) {
-            if (type.isAssignableFrom(f.getType())) {
-                if(index == currentIndex++) {
-                    try {
-                        return (Object[]) f.get(packet);
-                    } catch (IllegalAccessException e) {
-                        e.printStackTrace();
-                    }
+        if (fieldCache.containsKey(packetClass)) {
+            try {
+                Object[] array = (Object[]) fieldCache.get(packetClass).get(String[].class)[index].get(packet);
+                int len = array.length;
+                String[] stringArray = new String[len];
+                for (int i = 0; i < len; i++) {
+                    stringArray[i] = array[i].toString();
                 }
+                return stringArray;
+            } catch (IllegalAccessException e) {
+                e.printStackTrace();
             }
         }
-        return new Object[0];
-    }
-
-    @Override
-    public Object readObject(int index, Class<?> type) {
-        int currentIndex = 0;
-        for (Field f : fields) {
-            if (type.isAssignableFrom(f.getType())) {
-                if (index == currentIndex++) {
-                    try {
-                        return f.get(packet);
-                    } catch (Exception exception) {
-                        exception.printStackTrace();
-                    }
-                }
-            }
-        }
-        return null;
-    }
-
-    @Override
-    public Object readAnyObject(int index) {
-        int currentIndex = 0;
-        for (Field f : fields) {
-            if (index == currentIndex++) {
-                try {
-                    return f.get(packet);
-                } catch (Exception exception) {
-                    exception.printStackTrace();
-                }
-            }
-        }
-        return null;
+        return new String[0];
     }
 
     @Override
     public String readString(int index) {
-        return readObject(index, String.class).toString();
+        if (fieldCache.containsKey(packetClass)) {
+            try {
+                Object obj = fieldCache.get(packetClass).get(String.class)[index].get(packet);
+                return obj.toString();
+            } catch (IllegalAccessException e) {
+                e.printStackTrace();
+            }
+        }
+        return "";
+    }
+
+    public Object readAnyObject(int index) {
+       return packetClass.getDeclaredFields()[index];
+    }
+
+    public Object readObject(int index, Class<?> type) {
+        if (fieldCache.containsKey(packetClass)) {
+            if (!fieldCache.get(packetClass).containsKey(type)) {
+                List<Field> typeFields = new ArrayList<>();
+                for (Field f : packetClass.getDeclaredFields()) {
+                    f.setAccessible(true);
+                    if (f.getType().equals(type)) {
+                        typeFields.add(f);
+                    }
+                }
+                if (!typeFields.isEmpty()) {
+                    fieldCache.get(packetClass).put(type, typeFields.toArray(new Field[0]));
+                }
+            }
+        }
+        return null;
+    }
+
+    public Object[] readObjectArray(int index, Class<?> type) {
+        Object res = readObject(index, type);
+        if(res == null) {
+            return new Object[0];
+        }
+        return (Object[])res;
     }
 }

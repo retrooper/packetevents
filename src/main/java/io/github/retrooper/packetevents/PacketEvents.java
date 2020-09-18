@@ -51,7 +51,7 @@ public final class PacketEvents implements Listener {
     private static final PacketEvents instance = new PacketEvents();
     private static final ArrayList<Plugin> plugins = new ArrayList<Plugin>(1);
     private static boolean loaded, initialized, isBungee;
-    private static final String version = "1.6.8.1";
+    private static final String version = "1.6.8.3";
 
     /**
      * This loads the PacketEvents API.
