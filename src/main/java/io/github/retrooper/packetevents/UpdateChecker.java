@@ -27,6 +27,10 @@ public class UpdateChecker extends BukkitRunnable {
             //Please don't compare two strings using ==... ILL FIND WHERE U LIVE
             if (!PacketEvents.getVersion().equals(newVersion)) {
                 //We don't wanna access the Bukkit API Async (It really does not make a difference but Just to be safe)
+                //Edit by retrooper, responding to the comment above by a contributor:
+                //Logging is thread safe, and it can make a slight difference.
+                //Redundant thread switching can have a performance cost.
+                //It would be best to already execute it as we already are on another thread.
                 inform();
             }
         } catch (IOException ignored) {
@@ -35,11 +39,7 @@ public class UpdateChecker extends BukkitRunnable {
     }
 
     private void inform() {
-        new BukkitRunnable() {
-            public void run() {
-                Bukkit.getLogger().info("[PacketEvents] There is an update available for PacketEventsAPI! (" + newVersion + ")");
-            }
-        }.runTask(plugin);
+        Bukkit.getLogger().info("[PacketEvents] There is an update available for PacketEventsAPI! (" + newVersion + ")");
     }
 
     private String readLines() throws IOException {

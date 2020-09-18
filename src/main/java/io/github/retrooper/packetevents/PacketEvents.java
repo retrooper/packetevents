@@ -124,7 +124,7 @@ public final class PacketEvents implements Listener {
                 isBungee = false;
             }
 
-            if (getAPI().getSettings().isCheckForUpdates()) {
+            if (PacketEvents.getAPI().getSettings().shouldCheckForUpdates()) {
                 new UpdateChecker(pl).runTaskAsynchronously(pl);
             }
         }
@@ -205,8 +205,8 @@ public final class PacketEvents implements Listener {
         } else {
             ClientVersion version = ClientVersion.getClientVersion(VersionLookupUtils.getProtocolVersion(e.getPlayer()));
             PacketEvents.getAPI().getPlayerUtils().clientVersionsMap.put(e.getPlayer().getUniqueId(), version);
-            PacketEvents.getAPI().getPlayerUtils().injectPlayer(e.getPlayer());
         }
+        PacketEvents.getAPI().getPlayerUtils().injectPlayer(e.getPlayer());
     }
 
     @EventHandler

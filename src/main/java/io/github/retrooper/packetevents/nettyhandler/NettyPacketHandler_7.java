@@ -31,6 +31,7 @@ import net.minecraft.util.io.netty.channel.ChannelDuplexHandler;
 import net.minecraft.util.io.netty.channel.ChannelHandlerContext;
 import net.minecraft.util.io.netty.channel.ChannelPipeline;
 import net.minecraft.util.io.netty.channel.ChannelPromise;
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
 final class NettyPacketHandler_7 {
@@ -68,9 +69,9 @@ final class NettyPacketHandler_7 {
      * @param player
      */
     public static void ejectPlayer(final Player player) {
-         Channel channel = (Channel) NMSUtils.getChannel(player);
+         Channel channel = (Channel) NMSUtils.getChannelNoCache(player);
         channel.pipeline().remove(PacketEvents.getHandlerName(player.getName()));
-        NMSUtils.channelCache.remove(player.getUniqueId());
+        //Make sure we are removing the cache synchronously
     }
 
     public static void sendPacket(Object rawChannel, Object packet) {

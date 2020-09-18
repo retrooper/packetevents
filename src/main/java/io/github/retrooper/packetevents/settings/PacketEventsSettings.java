@@ -92,8 +92,26 @@ public class PacketEventsSettings {
         this.identifier = identifier;
     }
 
+    public boolean shouldAutoResolveClientProtocolVersion() {
+        return autoResolveClientProtocolVersion;
+    }
+
+    /**
+     * @deprecated Use {@link #shouldAutoResolveClientProtocolVersion()}
+     * @return
+     */
+    @Deprecated
     public boolean doAutoResolveClientProtocolVersion() {
         return autoResolveClientProtocolVersion;
+    }
+
+    /**
+     * @deprecated Use {@link #setShouldAutoResolveClientProtocolVersion(boolean)}
+     * @param autoResolveClientProtocolVersion
+     */
+    @Deprecated
+    public void setDoAutoResolveClientProtocolVersion(boolean autoResolveClientProtocolVersion) {
+        this.autoResolveClientProtocolVersion = autoResolveClientProtocolVersion;
     }
 
     /**
@@ -104,9 +122,11 @@ public class PacketEventsSettings {
      *
      * @param autoResolveClientProtocolVersion boolean
      */
-    public void setDoAutoResolveClientProtocolVersion(boolean autoResolveClientProtocolVersion) {
-        this.autoResolveClientProtocolVersion = autoResolveClientProtocolVersion;
+    public void setShouldAutoResolveClientProtocolVersion(boolean val) {
+        this.autoResolveClientProtocolVersion = val;
     }
+    
+    
 
     /**
      * Would you like PacketEvents to Uninject players Asynchronously?
@@ -154,7 +174,7 @@ public class PacketEventsSettings {
         this.useProtocolLibIfAvailable = val;
     }
 
-    public boolean isCheckForUpdates() {
+    public boolean shouldCheckForUpdates() {
         return checkForUpdates;
     }
 
@@ -163,16 +183,7 @@ public class PacketEventsSettings {
      *
      * @param checkForUpdates boolean
      */
-    public void setCheckForUpdates(boolean checkForUpdates) {
+    public void setShouldCheckForUpdates(boolean checkForUpdates) {
         this.checkForUpdates = checkForUpdates;
     }
-
-    /*public void setShouldCheckForUpdates(boolean val) {
-        this.checkForUpdates = val;
-    }
-
-    public boolean shouldCheckForUpdates() {
-        return checkForUpdates;
-    }*/
-
 }

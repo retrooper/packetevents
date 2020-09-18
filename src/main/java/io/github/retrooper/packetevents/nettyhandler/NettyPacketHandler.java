@@ -29,6 +29,7 @@ import io.github.retrooper.packetevents.event.impl.PacketReceiveEvent;
 import io.github.retrooper.packetevents.event.impl.PacketSendEvent;
 import io.github.retrooper.packetevents.event.impl.PlayerInjectEvent;
 import io.github.retrooper.packetevents.event.impl.PlayerUninjectEvent;
+import io.github.retrooper.packetevents.utils.nms.NMSUtils;
 import org.bukkit.entity.Player;
 
 import java.util.concurrent.ExecutorService;
@@ -75,6 +76,8 @@ public class NettyPacketHandler {
      * @return {@link java.util.concurrent.Future}
      */
     public static Future<?> injectPlayerAsync(final Player player) {
+        //Make sure we cache the channel SYNCHRONOUSLY
+        Object channel = NMSUtils.getChannel(player);
         return singleThreadedExecutor.submit(() -> {
             try {
                 final PlayerInjectEvent injectEvent = new PlayerInjectEvent(player, true);
@@ -98,6 +101,7 @@ public class NettyPacketHandler {
      * @param player
      */
     public static void ejectPlayer(final Player player) {
+        NMSUtils.channelCache.remove(player.getUniqueId());
         try {
             final PlayerUninjectEvent uninjectEvent = new PlayerUninjectEvent(player);
             PacketEvents.getAPI().getEventManager().callEvent(uninjectEvent);
@@ -120,7 +124,8 @@ public class NettyPacketHandler {
      * @return {@link java.util.concurrent.Future}
      */
     public static Future<?> ejectPlayerAsync(final Player player) {
-        return singleThreadedExecutor.submit(() -> {
+        NMSUtils.channelCache.remove(player.getUniqueId());
+        Future<?> f = singleThreadedExecutor.submit(() -> {
             try {
                 final PlayerUninjectEvent uninjectEvent = new PlayerUninjectEvent(player, true);
                 PacketEvents.getAPI().getEventManager().callEvent(uninjectEvent);
@@ -135,6 +140,7 @@ public class NettyPacketHandler {
 
             }
         });
+        return f;
     }
 
     /**

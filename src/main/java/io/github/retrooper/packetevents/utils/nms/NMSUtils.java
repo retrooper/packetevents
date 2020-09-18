@@ -40,6 +40,8 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
 public final class NMSUtils {
     public static ServerVersion version;
@@ -53,7 +55,7 @@ public final class NMSUtils {
     private static Method getCraftWorldHandleMethod, getServerConnection, getCraftPlayerHandle, getCraftEntityHandle, sendPacketMethod, asBukkitCopy;
     private static Field entityPlayerPingField, playerConnectionField;
 
-    public static final HashMap<UUID, Object> channelCache = new HashMap<UUID, Object>();
+    public static final HashMap<UUID, Object> channelCache = new HashMap<>();
 
     public static void load() {
         try {
@@ -198,14 +200,18 @@ public final class NMSUtils {
     public static Object getChannel(final Player player) {
         UUID uuid = player.getUniqueId();
         if(!channelCache.containsKey(uuid)) {
-            try {
-                Object channel = Reflection.getField(networkManagerClass, nettyChannelClass, 0).get(getNetworkManager(player));
-                channelCache.put(uuid, channel);
-            } catch (IllegalAccessException e) {
-                e.printStackTrace();
-            }
+            channelCache.put(uuid, getChannelNoCache(player));
         }
         return channelCache.get(uuid);
+    }
+
+    public static Object getChannelNoCache(final Player player) {
+        try {
+            return Reflection.getField(networkManagerClass, nettyChannelClass, 0).get(getNetworkManager(player));
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 
     public static int getPlayerPing(final Player player) {
