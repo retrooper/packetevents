@@ -28,14 +28,15 @@ import io.github.retrooper.packetevents.packet.PacketTypeClasses;
 import io.github.retrooper.packetevents.packetwrappers.SendableWrapper;
 import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
 import io.github.retrooper.packetevents.utils.bytebuf.ByteBufUtil;
-import io.github.retrooper.packetevents.utils.reflection.Reflection;
 import io.github.retrooper.packetevents.utils.nms.NMSUtils;
-import io.netty.buffer.Unpooled;
+import io.github.retrooper.packetevents.utils.reflection.Reflection;
 
 import java.lang.reflect.Constructor;
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Modifier;
 
-class WrappedPacketOutCustomPayload extends WrappedPacket implements SendableWrapper {
+public class WrappedPacketOutCustomPayload extends WrappedPacket implements SendableWrapper {
 //TODO load the outcustompayload wrapper
 
     private static Class<?> packetClass;
@@ -45,6 +46,7 @@ class WrappedPacketOutCustomPayload extends WrappedPacket implements SendableWra
     private static Class<?> byteBufClass;
     private static Class<?> packetDataSerializerClass;
     private static Class<?> minecraftKeyClass;
+    private static int minecraftKeyIndexInClass;
 
     private static byte constructorMode = 1;
 
@@ -67,7 +69,9 @@ class WrappedPacketOutCustomPayload extends WrappedPacket implements SendableWra
         }
 
         try {
-            minecraftKeyConstructor = minecraftKeyClass.getConstructor(String.class);
+            if (minecraftKeyClass != null) {
+                minecraftKeyConstructor = minecraftKeyClass.getConstructor(String.class);
+            }
         } catch (NoSuchMethodException e) {
             //Nothing
         }
@@ -91,6 +95,15 @@ class WrappedPacketOutCustomPayload extends WrappedPacket implements SendableWra
             } catch (NoSuchMethodException e2) {
                 //That's fine, just an even newer version
                 try {
+                    //Minecraft key exists
+
+                    for(int i = 0; i < packetClass.getDeclaredFields().length; i++) {
+                        Field f = packetClass.getDeclaredFields()[i];
+                        if(!Modifier.isStatic(f.getModifiers())) {
+                            minecraftKeyIndexInClass = i;
+                            break;
+                        }
+                    }
                     constructor = packetClass.getConstructor(minecraftKeyClass, packetDataSerializerClass);
                     constructorMode = 2;
                 } catch (NoSuchMethodException e3) {
@@ -109,15 +122,43 @@ class WrappedPacketOutCustomPayload extends WrappedPacket implements SendableWra
     }
 
 
-    /*    public WrappedPacketOutCustomPayload(Object packet) {
-            super(packet);
-        }
+    public WrappedPacketOutCustomPayload(Object packet) {
+        super(packet);
+    }
 
-        @Override
-        protected void setup() {
-
+    @Override
+    protected void setup() {
+        switch(constructorMode) {
+            case 0:
+                this.tag = readString(0);
+                this.data = readByteArray(0);
+                break;
+            case 1:
+                this.tag = readString(0);
+                Object dataSerializer = readObject(0, packetDataSerializerClass);
+                try {
+                    this.data = (byte[]) Reflection.getMethod(packetClass, byte[].class, 0).invoke(dataSerializer);
+                } catch (IllegalAccessException | InvocationTargetException e) {
+                    e.printStackTrace();
+                }
+                break;
+            case 2:
+                Object minecraftKey = readObject(minecraftKeyIndexInClass, minecraftKeyClass);
+                try {
+                    this.tag = Reflection.getField(minecraftKeyClass, String.class, 1).get(minecraftKey).toString();
+                } catch (IllegalAccessException e) {
+                    e.printStackTrace();
+                }
+                Object dataSerializer2 = readObject(0, packetDataSerializerClass);
+                try {
+                    this.data = (byte[]) Reflection.getMethod(packetClass, byte[].class, 0).invoke(dataSerializer2);
+                } catch (IllegalAccessException | InvocationTargetException e) {
+                    e.printStackTrace();
+                }
+                break;
         }
-    */
+    }
+
     public String getTag() {
         return tag;
     }
