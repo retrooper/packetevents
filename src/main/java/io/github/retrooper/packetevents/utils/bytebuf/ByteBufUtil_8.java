@@ -27,7 +27,7 @@ package io.github.retrooper.packetevents.utils.bytebuf;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 
-public class ByteBufUtil_8 {
+class ByteBufUtil_8 {
     public static Object copiedBuffer(byte[] bytes) {
         return Unpooled.copiedBuffer(bytes);
     }

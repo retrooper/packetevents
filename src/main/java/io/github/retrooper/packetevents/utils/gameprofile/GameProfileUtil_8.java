@@ -22,25 +22,14 @@
  * SOFTWARE.
  */
 
-package io.github.retrooper.packetevents.utils.bytebuf;
+package io.github.retrooper.packetevents.utils.gameprofile;
 
-import net.minecraft.util.io.netty.buffer.ByteBuf;
-import net.minecraft.util.io.netty.buffer.Unpooled;
+import com.mojang.authlib.GameProfile;
 
-class ByteBufUtil_7 {
-    public static Object copiedBuffer(byte[] bytes) {
-        return Unpooled.copiedBuffer(bytes);
-    }
+import java.util.UUID;
 
-    public static byte[] getBytes(Object byteBuf) {
-        ByteBuf bb = (ByteBuf)byteBuf;
-        byte[] bytes;
-        if (bb.hasArray()) {
-            bytes = bb.array();
-        } else {
-            bytes = new byte[bb.readableBytes()];
-            bb.getBytes(bb.readerIndex(), bytes);
-        }
-        return bytes;
+class GameProfileUtil_8 {
+    public static Object getGameProfile(UUID uuid, String username) {
+        return new GameProfile(uuid, username);
     }
 }
