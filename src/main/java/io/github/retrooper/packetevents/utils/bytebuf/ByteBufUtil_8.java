@@ -24,10 +24,23 @@
 
 package io.github.retrooper.packetevents.utils.bytebuf;
 
+import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 
 public class ByteBufUtil_8 {
     public static Object copiedBuffer(byte[] bytes) {
         return Unpooled.copiedBuffer(bytes);
+    }
+
+    public static byte[] getBytes(Object byteBuf) {
+        ByteBuf bb = (ByteBuf)byteBuf;
+        byte[] bytes;
+        if (bb.hasArray()) {
+            bytes = bb.array();
+        } else {
+            bytes = new byte[bb.readableBytes()];
+            bb.getBytes(bb.readerIndex(), bytes);
+        }
+        return bytes;
     }
 }

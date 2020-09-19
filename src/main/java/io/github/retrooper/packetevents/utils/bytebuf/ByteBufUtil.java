@@ -34,4 +34,13 @@ public class ByteBufUtil {
             return ByteBufUtil_8.copiedBuffer(bytes);
         }
     }
+
+    public static byte[] getBytes(Object byteBuf) {
+        if(NettyPacketHandler.v1_7_nettyMode) {
+            return ByteBufUtil_7.getBytes(byteBuf);
+        }
+        else {
+            return ByteBufUtil_8.getBytes(byteBuf);
+        }
+    }
 }

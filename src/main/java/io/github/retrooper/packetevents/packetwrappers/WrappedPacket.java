@@ -538,7 +538,8 @@ public class WrappedPacket implements WrapperPacketReader {
     public String readString(int index) {
         if (fieldCache.containsKey(packetClass)) {
             try {
-                Object obj = fieldCache.get(packetClass).get(String.class)[index].get(packet);
+                Field[] fields = fieldCache.get(packetClass).get(String.class);
+                Object obj = fields[index].get(packet);
                 return obj.toString();
             } catch (IllegalAccessException e) {
                 e.printStackTrace();
@@ -548,12 +549,13 @@ public class WrappedPacket implements WrapperPacketReader {
     }
 
     public Object readAnyObject(int index) {
-       return packetClass.getDeclaredFields()[index];
+        return packetClass.getDeclaredFields()[index];
     }
 
     public Object readObject(int index, Class<?> type) {
         if (fieldCache.containsKey(packetClass)) {
-            if (!fieldCache.get(packetClass).containsKey(type)) {
+            HashMap<Class<?>, Field[]> map = fieldCache.get(packetClass);
+            if (!map.containsKey(type)) {
                 List<Field> typeFields = new ArrayList<>();
                 for (Field f : packetClass.getDeclaredFields()) {
                     f.setAccessible(true);
@@ -562,18 +564,24 @@ public class WrappedPacket implements WrapperPacketReader {
                     }
                 }
                 if (!typeFields.isEmpty()) {
-                    fieldCache.get(packetClass).put(type, typeFields.toArray(new Field[0]));
+                    map.put(type, typeFields.toArray(new Field[0]));
                 }
             }
+
+        }
+        try {
+            return fieldCache.get(packetClass).get(type)[index].get(packet);
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
         }
         return null;
     }
 
     public Object[] readObjectArray(int index, Class<?> type) {
         Object res = readObject(index, type);
-        if(res == null) {
+        if (res == null) {
             return new Object[0];
         }
-        return (Object[])res;
+        return (Object[]) res;
     }
 }

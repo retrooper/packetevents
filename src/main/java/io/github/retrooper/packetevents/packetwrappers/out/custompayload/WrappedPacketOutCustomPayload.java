@@ -29,7 +29,6 @@ import io.github.retrooper.packetevents.packetwrappers.SendableWrapper;
 import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
 import io.github.retrooper.packetevents.utils.bytebuf.ByteBufUtil;
 import io.github.retrooper.packetevents.utils.nms.NMSUtils;
-import io.github.retrooper.packetevents.utils.reflection.Reflection;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
@@ -37,8 +36,6 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Modifier;
 
 public class WrappedPacketOutCustomPayload extends WrappedPacket implements SendableWrapper {
-//TODO load the outcustompayload wrapper
-
     private static Class<?> packetClass;
     private static Constructor<?> constructor;
     private static Constructor<?> packetDataSerializerConstructor;
@@ -48,7 +45,7 @@ public class WrappedPacketOutCustomPayload extends WrappedPacket implements Send
     private static Class<?> minecraftKeyClass;
     private static int minecraftKeyIndexInClass;
 
-    private static byte constructorMode = 1;
+    private static byte constructorMode = 0;
 
     public static void load() {
         packetClass = PacketTypeClasses.Server.CUSTOM_PAYLOAD;
@@ -97,9 +94,9 @@ public class WrappedPacketOutCustomPayload extends WrappedPacket implements Send
                 try {
                     //Minecraft key exists
 
-                    for(int i = 0; i < packetClass.getDeclaredFields().length; i++) {
+                    for (int i = 0; i < packetClass.getDeclaredFields().length; i++) {
                         Field f = packetClass.getDeclaredFields()[i];
-                        if(!Modifier.isStatic(f.getModifiers())) {
+                        if (!Modifier.isStatic(f.getModifiers())) {
                             minecraftKeyIndexInClass = i;
                             break;
                         }
@@ -128,7 +125,7 @@ public class WrappedPacketOutCustomPayload extends WrappedPacket implements Send
 
     @Override
     protected void setup() {
-        switch(constructorMode) {
+        switch (constructorMode) {
             case 0:
                 this.tag = readString(0);
                 this.data = readByteArray(0);
@@ -136,25 +133,20 @@ public class WrappedPacketOutCustomPayload extends WrappedPacket implements Send
             case 1:
                 this.tag = readString(0);
                 Object dataSerializer = readObject(0, packetDataSerializerClass);
-                try {
-                    this.data = (byte[]) Reflection.getMethod(packetClass, byte[].class, 0).invoke(dataSerializer);
-                } catch (IllegalAccessException | InvocationTargetException e) {
-                    e.printStackTrace();
-                }
+                WrappedPacket byteBufWrapper = new WrappedPacket(dataSerializer);
+
+                Object byteBuf = byteBufWrapper.readObject(0, byteBufClass);
+
+                this.data = ByteBufUtil.getBytes(byteBuf);
                 break;
             case 2:
                 Object minecraftKey = readObject(minecraftKeyIndexInClass, minecraftKeyClass);
-                try {
-                    this.tag = Reflection.getField(minecraftKeyClass, String.class, 1).get(minecraftKey).toString();
-                } catch (IllegalAccessException e) {
-                    e.printStackTrace();
-                }
+                WrappedPacket minecraftKeyWrapper = new WrappedPacket(minecraftKey);
+                this.tag = minecraftKeyWrapper.readString(1);
                 Object dataSerializer2 = readObject(0, packetDataSerializerClass);
-                try {
-                    this.data = (byte[]) Reflection.getMethod(packetClass, byte[].class, 0).invoke(dataSerializer2);
-                } catch (IllegalAccessException | InvocationTargetException e) {
-                    e.printStackTrace();
-                }
+                WrappedPacket byteBuf2Wrapper = new WrappedPacket(dataSerializer2);
+                Object byteBuf2 = byteBuf2Wrapper.readObject(0, byteBufClass);
+                this.data = ByteBufUtil.getBytes(byteBuf2);
                 break;
         }
     }

@@ -116,7 +116,7 @@ public final class Reflection {
     public static Method getMethod(final Class<?> cls, final Class<?> returning, final int index) {
         int currentIndex = 0;
         for (final Method m : getMethods(cls)) {
-            if (m.getReturnType().equals(returning) && index == currentIndex++) {
+            if (returning.equals(m.getReturnType()) && index == currentIndex++) {
                 return m;
             }
         }
