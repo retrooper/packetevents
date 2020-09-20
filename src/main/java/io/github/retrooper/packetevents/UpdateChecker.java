@@ -1,6 +1,7 @@
 package io.github.retrooper.packetevents;
 
 import org.bukkit.Bukkit;
+import org.bukkit.scheduler.BukkitRunnable;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -8,12 +9,11 @@ import java.io.InputStreamReader;
 import java.net.URL;
 import java.net.URLConnection;
 
-public class UpdateChecker implements Runnable {
-    @Override
-    public void run() {
+public class UpdateChecker {
+    public void handleUpdate() {
         try {
-
-            PEVersion newVersion = new PEVersion(readLines());
+            String line = readLatestVersion();
+            PEVersion newVersion = new PEVersion(line);
             PEVersion localVersion = PacketEvents.getVersion();
             if (localVersion.isOlder(newVersion)) {
                 inform("[PacketEvents] There is an update available for the PacketEvents API! (" + newVersion.toString() + ")");
@@ -33,7 +33,7 @@ public class UpdateChecker implements Runnable {
         Bukkit.getLogger().info(message);
     }
 
-    private String readLines() throws IOException {
+    private String readLatestVersion() throws IOException {
         URLConnection connection = new URL("https://api.spigotmc.org/legacy/update.php?resource=80279").openConnection();
         connection.addRequestProperty("User-Agent", "Mozilla/4.0");
 

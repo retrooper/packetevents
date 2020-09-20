@@ -27,30 +27,61 @@ package io.github.retrooper.packetevents;
 import java.util.ArrayList;
 import java.util.List;
 
+
+
 public class PEVersion {
-    private final int[] version;
+    private final int[] version = new int[4];
 
-
-    public PEVersion(int... version) {
-        this.version = version;
+    public PEVersion(int... version) throws IllegalArgumentException {
+        if (version.length > 4) {
+            throw new IllegalArgumentException("You are not allowed to have more than 4 arguments!");
+        } else if (version.length < 2) {
+            throw new IllegalArgumentException("You need atleast two arguments.");
+        }
+        int len = version.length;
+        if (len < 4) {
+            this.version[0] = version[0];
+            this.version[1] = version[1];
+            if (len == 3) {
+                this.version[2] = version[2];
+            } else {
+                this.version[2] = 0;
+                this.version[3] = 0;
+            }
+        } else {
+            System.arraycopy(version, 0, this.version, 0, version.length);
+        }
     }
 
     public PEVersion(String text) {
+        this(stringConstructor(text));
+    }
+
+    private static int[] stringConstructor(String text) {
         //1.2.3.4
         text += ".";
-        //1.2.3.4.
-        int arrayIndex = 0;
-        int[] version = new int[4];
-        // String t = "1.2.3.4";
-        for(int i = 0; i < text.toCharArray().length; i++) {
-            char c = text.toCharArray()[i];
-            if(c == '.') {
-                version[arrayIndex++] =
-                        Integer.parseInt(String.valueOf(text.toCharArray()[i - 1]));
+
+        int dotCount = 0;
+        for (char c : text.toCharArray()) {
+            if (c == '.') {
+                dotCount++;
             }
         }
 
-        this.version = version;
+        //1.2.3.4.
+        int arrayIndex = 0;
+        int[] version = new int[4];
+
+        // String t = "1.2.3.4";
+        for (int i = 0; i < text.toCharArray().length; i++) {
+            char c = text.toCharArray()[i];
+
+            if (c == '.') {
+                version[arrayIndex++] =
+                        Integer.parseInt(Character.toString(text.toCharArray()[i - 1]));
+            }
+        }
+        return version;
     }
 
     public boolean isNewer(PEVersion other) {
@@ -84,26 +115,29 @@ public class PEVersion {
     }
 
     public final int[] getVersionAsByteArrayShortened() {
-        int endingIndex = 0;
-        for (int i = version.length - 1; i >= 0; i--) {
-            if (version[i] == 0) {
-                endingIndex = i;
-            }
-        }
+        List<Integer> versionBoxed = new ArrayList<>();
+        if (version[3] == 0) {
+            versionBoxed.add(version[0]);
+            versionBoxed.add(version[1]);
+            versionBoxed.add(version[2]);
 
-        List<Integer> versionListBoxed = new ArrayList<>();
-        for (int i = 0; i < version.length; i++) {
-            if (i == endingIndex) {
-                break;
+            if (version[2] == 0) {
+                versionBoxed.clear();
+                versionBoxed.add(version[0]);
+                versionBoxed.add(version[1]);
             }
-            versionListBoxed.add(version[i]);
+            return convertIntListToIntArray(versionBoxed);
+        } else {
+            return version;
         }
+    }
 
-        int[] version = new int[versionListBoxed.size()];
-        for (int i = 0; i < version.length; i++) {
-            version[i] = versionListBoxed.get(i);
+    private int[] convertIntListToIntArray(List<Integer> list) {
+        int[] versionArray = new int[list.size()];
+        for (int i = 0; i < versionArray.length; i++) {
+            versionArray[i] = list.get(i);
         }
-        return version;
+        return versionArray;
     }
 
     @Override

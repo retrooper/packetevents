@@ -51,7 +51,7 @@ public final class PacketEvents implements Listener {
     private static final PacketEvents instance = new PacketEvents();
     private static final ArrayList<Plugin> plugins = new ArrayList<Plugin>(1);
     private static boolean loaded, initialized, isBungee;
-    private static final PEVersion version = new PEVersion(1, 6, 8, 3);
+    private static final PEVersion version = new PEVersion(1, 6, 8, 5);
 
     /**
      * This loads the PacketEvents API.
@@ -125,7 +125,12 @@ public final class PacketEvents implements Listener {
             }
 
             if (PacketEvents.getAPI().getSettings().shouldCheckForUpdates()) {
-                Bukkit.getScheduler().runTaskAsynchronously(pl, new UpdateChecker());
+                Bukkit.getScheduler().runTask(pl, new Runnable() {
+                    @Override
+                    public void run() {
+                        new UpdateChecker().handleUpdate();
+                    }
+                });
             }
         }
     }
