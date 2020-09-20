@@ -24,20 +24,28 @@
 
 package io.github.retrooper.packetevents.settings;
 
+import io.github.retrooper.packetevents.PacketEvents;
 import io.github.retrooper.packetevents.enums.ServerVersion;
+import io.github.retrooper.packetevents.event.PacketListener;
 import io.github.retrooper.packetevents.packettype.PacketType;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
 
 public class PacketEventsSettings {
 
-    private ServerVersion backupServerVersion = ServerVersion.v_1_7_10;
-    private String identifier = "";
-    private boolean autoResolveClientProtocolVersion = false;
-    private boolean uninjectAsync = true;
-    private boolean injectAsync = true;
-    private boolean useProtocolLibIfAvailable = true;
-    private boolean checkForUpdates = true;
+    public ServerVersion backupServerVersion = ServerVersion.v_1_7_10;
+    public String identifier = "";
+    public boolean autoResolveClientProtocolVersion = false;
+    public boolean uninjectAsync = true;
+    public boolean injectAsync = true;
+    public boolean useProtocolLibIfAvailable = true;
+    public boolean checkForUpdates = true;
+
+    public PacketEventsSettings(String identifier) {
+        this.identifier = identifier;
+    }
 
     /**
      * If PacketEvents fails to detect your server version, it will use the recommended version
@@ -134,6 +142,17 @@ public class PacketEventsSettings {
      */
     public void setShouldAutoResolveClientProtocolVersion(boolean val) {
         this.autoResolveClientProtocolVersion = val;
+    }
+
+    private List<PacketListener> listeners = new ArrayList<>();
+
+    public void registerEvent(final PacketListener listener) {
+        listeners.add(listener);
+
+    }
+
+    public List<PacketListener> getListeners() {
+        return listeners;
     }
     
     

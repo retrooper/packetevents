@@ -53,6 +53,8 @@ public final class PacketEvents implements Listener {
     private static boolean loaded, initialized, isBungee;
     private static final PEVersion version = new PEVersion(1, 6, 9);
 
+    private static PacketEventsSettings settings = null;
+
     /**
      * This loads the PacketEvents API.
      * <p>
@@ -101,11 +103,12 @@ public final class PacketEvents implements Listener {
      *
      * @param pl JavaPlugin instance
      */
-    public static void init(final Plugin pl) {
+    public static void init(final Plugin pl, PacketEventsSettings packetEventsSettings) {
         if (!loaded) {
             load();
         }
         if (!initialized) {
+            settings = packetEventsSettings;
             plugins.add(pl);
             //Register Bukkit listener
             Bukkit.getPluginManager().registerEvents(instance, plugins.get(0));
@@ -124,26 +127,22 @@ public final class PacketEvents implements Listener {
                 isBungee = false;
             }
 
-            if (PacketEvents.getAPI().getSettings().shouldCheckForUpdates()) {
-                Bukkit.getScheduler().runTask(pl, new Runnable() {
-                    @Override
-                    public void run() {
-                        new UpdateChecker().handleUpdate();
-                    }
-                });
+            if (settings.shouldCheckForUpdates()) {
+                Bukkit.getScheduler().runTask(pl, () -> new UpdateChecker().handleUpdate());
             }
         }
+        packetEventsSettings.getListeners().forEach(listener -> PacketEvents.getAPI().getEventManager().registerListener(listener));
     }
 
     /**
      * Loads PacketEvents if you haven't already, Sets everything up, injects all players
      *
      * @param pl Plugin instance
-     * @deprecated Use {@link #init(Plugin)}
+     * @deprecated Use {@link #init(Plugin, PacketEventsSettings)}
      */
     @Deprecated
-    public static void start(final Plugin pl) {
-        init(pl);
+    public static void start(final Plugin pl, PacketEventsSettings settings) {
+        init(pl, settings);
     }
 
     /**
@@ -190,8 +189,13 @@ public final class PacketEvents implements Listener {
         return "pe-" + PacketEvents.getAPI().getSettings().getIdentifier() + "-" + name;
     }
 
+    /**
+     * Get the PacketEvents settings.
+     *
+     * @return Configure some settings for the API
+     */
     public static PacketEventsSettings getSettings() {
-        return PacketEvents.getAPI().getSettings();
+        return settings;
     }
 
     public static PEVersion getVersion() {
