@@ -44,9 +44,6 @@ public class PEVersion {
             this.version[1] = version[1];
             if (len == 3) {
                 this.version[2] = version[2];
-            } else {
-                this.version[2] = 0;
-                this.version[3] = 0;
             }
         } else {
             System.arraycopy(version, 0, this.version, 0, version.length);
