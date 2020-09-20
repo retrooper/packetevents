@@ -31,12 +31,11 @@ import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
 import io.github.retrooper.packetevents.utils.reflection.Reflection;
 import io.github.retrooper.packetevents.utils.nms.NMSUtils;
 import io.github.retrooper.packetevents.utils.reflection.SubclassUtil;
-import io.github.retrooper.packetevents.utils.vector.Vector3i;
 
 public final class WrappedPacketInBlockDig extends WrappedPacket {
     private static Class<?> blockDigClass, blockPositionClass, enumDirectionClass, digTypeClass;
     private static boolean isVersionLowerThan_v_1_8;
-    private Vector3i blockPosition;
+    private int x, y, z;
     private Direction direction;
     private PlayerDigType digType;
     public WrappedPacketInBlockDig(Object packet) {
@@ -95,7 +94,9 @@ public final class WrappedPacketInBlockDig extends WrappedPacket {
         } catch (IllegalAccessException e) {
             e.printStackTrace();
         }
-        this.blockPosition = new Vector3i(x, y, z);
+        this.x = x;
+        this.y = y;
+        this.z = z;
         if (enumDirection == null) {
             this.direction = Direction.NULL;
         } else {
@@ -109,7 +110,7 @@ public final class WrappedPacketInBlockDig extends WrappedPacket {
      * @return Block Position X
      */
     public int getBlockPositionX() {
-        return blockPosition.x;
+        return x;
     }
 
     /**
@@ -117,7 +118,7 @@ public final class WrappedPacketInBlockDig extends WrappedPacket {
      * @return Block Position Y
      */
     public int getBlockPositionY() {
-        return blockPosition.y;
+        return y;
     }
 
     /**
@@ -125,16 +126,7 @@ public final class WrappedPacketInBlockDig extends WrappedPacket {
      * @return Block Position Z
      */
     public int getBlockPositionZ() {
-        return blockPosition.z;
-    }
-
-    /**
-     * Use {@link #getBlockPositionX()}, {@link #getBlockPositionY()}, {@link #getBlockPositionZ()}
-     * @return Block Position
-     */
-    @Deprecated
-    public Vector3i getBlockPosition() {
-        return blockPosition;
+        return z;
     }
 
     /**
@@ -165,6 +157,4 @@ public final class WrappedPacketInBlockDig extends WrappedPacket {
         SWAP_ITEM_WITH_OFFHAND,
         WRONG_PACKET
     }
-
-
 }

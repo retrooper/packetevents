@@ -26,17 +26,16 @@ package io.github.retrooper.packetevents.packetwrappers.in.blockplace;
 
 import io.github.retrooper.packetevents.packettype.PacketTypeClasses;
 import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
-import io.github.retrooper.packetevents.utils.reflection.Reflection;
 import io.github.retrooper.packetevents.utils.nms.NMSUtils;
-import io.github.retrooper.packetevents.utils.vector.Vector3i;
+import io.github.retrooper.packetevents.utils.reflection.Reflection;
 import org.bukkit.inventory.ItemStack;
 
 import java.lang.reflect.InvocationTargetException;
 
 final class WrappedPacketInBlockPlace_1_8 extends WrappedPacket {
     private static Class<?> blockPlaceClass, blockPositionClass, blockPositionSuperClass;
-    private Vector3i blockPosition;
-    private ItemStack itemStack;
+    public int x, y, z;
+    public ItemStack itemStack;
 
     WrappedPacketInBlockPlace_1_8(final Object packet) {
         super(packet);
@@ -56,36 +55,13 @@ final class WrappedPacketInBlockPlace_1_8 extends WrappedPacket {
     protected void setup() {
         try {
             Object nmsBlockPos = Reflection.getField(blockPlaceClass, blockPositionClass, 1).get(packet);
-            this.blockPosition = new Vector3i(0, 0, 0);
-            this.blockPosition.x = (int) Reflection.getMethod(blockPositionSuperClass, "getX", 0).invoke(nmsBlockPos);
-            this.blockPosition.y = (int) Reflection.getMethod(blockPositionSuperClass, "getY", 0).invoke(nmsBlockPos);
-            this.blockPosition.z = (int) Reflection.getMethod(blockPositionSuperClass, "getZ", 0).invoke(nmsBlockPos);
-
+            x = (int) Reflection.getMethod(blockPositionSuperClass, "getX", 0).invoke(nmsBlockPos);
+            y = (int) Reflection.getMethod(blockPositionSuperClass, "getY", 0).invoke(nmsBlockPos);
+            z = (int) Reflection.getMethod(blockPositionSuperClass, "getZ", 0).invoke(nmsBlockPos);
 
             this.itemStack = NMSUtils.toBukkitItemStack(readObject(0, NMSUtils.nmsItemStackClass));
         } catch (IllegalAccessException | InvocationTargetException e) {
             e.printStackTrace();
         }
-    }
-
-    @Deprecated
-    public Vector3i getBlockPosition() {
-        return blockPosition;
-    }
-
-    public int getBlockPositionX() {
-        return blockPosition.x;
-    }
-
-    public int getBlockPositionY() {
-        return blockPosition.y;
-    }
-
-    public int getBlockPositionZ() {
-        return blockPosition.z;
-    }
-
-    public ItemStack getItemStack() {
-        return itemStack;
     }
 }

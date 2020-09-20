@@ -25,9 +25,8 @@
 package io.github.retrooper.packetevents.packetwrappers.in.blockplace;
 
 import io.github.retrooper.packetevents.annotations.Nullable;
-import io.github.retrooper.packetevents.utils.server.ServerVersion;
 import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
-import io.github.retrooper.packetevents.utils.vector.Vector3i;
+import io.github.retrooper.packetevents.utils.server.ServerVersion;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -35,8 +34,9 @@ import org.bukkit.inventory.ItemStack;
 
 public final class WrappedPacketInBlockPlace extends WrappedPacket {
     private static boolean isHigherThan_v_1_8_8, isHigherThan_v_1_7_10;
-    private Vector3i blockPosition;
+    private int x, y, z;
     private ItemStack itemStack;
+
     public WrappedPacketInBlockPlace(final Player player, final Object packet) {
         super(player, packet);
     }
@@ -51,33 +51,35 @@ public final class WrappedPacketInBlockPlace extends WrappedPacket {
 
     @Override
     protected void setup() {
-        //1.7.10
-        Vector3i position = null;
-        ItemStack itemStack = null;
         try {
             if (isHigherThan_v_1_8_8) {
                 final WrappedPacketInBlockPlace_1_9 blockPlace_1_9 = new WrappedPacketInBlockPlace_1_9(getPlayer(), packet);
-                final Block block = blockPlace_1_9.getBlock();
-                position = new Vector3i(block.getX(), block.getY(), block.getZ());
+                final Block block = blockPlace_1_9.block;
+                x = block.getX();
+                y = block.getY();
+                z = block.getZ();
                 itemStack = new ItemStack(block.getType());
             } else if (isHigherThan_v_1_7_10) {
                 final WrappedPacketInBlockPlace_1_8 blockPlace_1_8 = new WrappedPacketInBlockPlace_1_8(packet);
-                position = blockPlace_1_8.getBlockPosition();
-                itemStack = blockPlace_1_8.getItemStack();
+                x = blockPlace_1_8.x;
+                y = blockPlace_1_8.y;
+                z = blockPlace_1_8.z;
+                itemStack = blockPlace_1_8.itemStack;
             } else {
                 final WrappedPacketInBlockPlace_1_7_10 blockPlace_1_7_10 = new WrappedPacketInBlockPlace_1_7_10(getPlayer(), packet);
-                position = blockPlace_1_7_10.getBlockPosition();
-                itemStack = blockPlace_1_7_10.getItemStack();
+                x = blockPlace_1_7_10.x;
+                y = blockPlace_1_7_10.y;
+                z = blockPlace_1_7_10.z;
+                itemStack = blockPlace_1_7_10.itemStack;
             }
         } catch (IllegalArgumentException e) {
             e.printStackTrace();
         }
-        this.blockPosition = position;
-        this.itemStack = itemStack;
     }
 
     /**
      * Get the player that placed the block
+     *
      * @return Block placer
      */
     public Player getPlayer() {
@@ -86,39 +88,35 @@ public final class WrappedPacketInBlockPlace extends WrappedPacket {
 
     /**
      * Get X position of the block
+     *
      * @return Block Position X
      */
     public int getBlockPositionX() {
-        return blockPosition.x;
+        return x;
     }
 
     /**
      * Get Y position of the block
+     *
      * @return Block Position Y
      */
     public int getBlockPositionY() {
-        return blockPosition.y;
+        return y;
     }
 
     /**
      * Get Z position of the block
+     *
      * @return Block Position Z
      */
     public int getBlockPositionZ() {
-        return blockPosition.z;
+        return z;
     }
 
-    /**
-     * Use {@link #getBlockPositionX()}, {@link #getBlockPositionY()}, {@link #getBlockPositionZ()}
-     * @return Block Position
-     */
-    @Deprecated
-    public Vector3i getBlockPosition() {
-        return blockPosition;
-    }
 
     /**
      * The ItemStack of the placed block.
+     *
      * @return ItemStack
      */
     @Nullable

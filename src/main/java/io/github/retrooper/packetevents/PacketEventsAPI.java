@@ -33,33 +33,6 @@ public final class PacketEventsAPI {
     private final EventManager eventManager = new EventManager();
     private final PlayerUtils playerUtils = new PlayerUtils();
     private final ServerUtils serverUtils = new ServerUtils();
-    //private final UpdateChecker updateChecker = new UpdateChecker();
-
-    /**
-     * Not thread safe
-     * Preciser than #currentMillis()
-     * Expensive
-     * Returns crazy values when you change system time
-     *
-     * @return {@link System#nanoTime()} / 1000000(1 million)
-     */
-    @Deprecated
-    public long currentPreciseMillis() {
-        return System.nanoTime() / 1000000;
-    }
-
-    /**
-     * Thread safe
-     * Less precise compared to #currentPreciseMillis()
-     * Cheap
-     * Doesn't break when system time is changed
-     *
-     * @return {@link System#currentTimeMillis()}
-     */
-    @Deprecated
-    public long currentMillis() {
-        return System.currentTimeMillis();
-    }
 
     /**
      * Get all utilities to do with the player
@@ -89,23 +62,4 @@ public final class PacketEventsAPI {
     public EventManager getEventManager() {
         return eventManager;
     }
-
-    /**
-     * Get the PacketEvents settings.
-     *
-     * @return Configure some settings for the API
-     */
-    @Deprecated
-    public PacketEventsSettings getSettings() {
-        return PacketEvents.getSettings();
-    }
-/*
-    /**
-     * Get the update checker
-     * @return Update Checker
-     *
-    public UpdateChecker getUpdateChecker() {
-        return updateChecker;
-    }
-*/
 }

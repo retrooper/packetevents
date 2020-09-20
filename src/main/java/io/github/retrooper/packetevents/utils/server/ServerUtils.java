@@ -30,7 +30,6 @@ import io.github.retrooper.packetevents.utils.nms.NMSUtils;
 import java.lang.reflect.InvocationTargetException;
 
 public final class ServerUtils {
-
     /**
      * Get the server version.
      * @return Get Server Version
@@ -59,33 +58,6 @@ public final class ServerUtils {
      */
     public double getTPS() {
         return getRecentTPS()[0];
-    }
-
-    /**
-     * Use {@link #getTPS()}
-     * @return Get Current TPS
-     */
-    @Deprecated
-    public double getCurrentTPS() {
-        return getRecentTPS()[0];
-    }
-
-    /**
-     * Use {@link #getOperatingSystem()}
-     * @deprecated Method rename pending to next minor update.
-     * @return Operating system of the current machine
-     */
-    @Deprecated
-    public SystemOS getPlatform() {
-        return SystemOS.getOperatingSystem();
-    }
-
-    /**
-     * @deprecated Use {@link #getOS()}
-     */
-    @Deprecated
-    public SystemOS getOperatingSystem() {
-        return SystemOS.getOperatingSystem();
     }
 
     /**
