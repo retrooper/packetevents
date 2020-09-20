@@ -22,11 +22,10 @@
  * SOFTWARE.
  */
 
-package io.github.retrooper.packetevents.enums;
+package io.github.retrooper.packetevents.utils.server;
 
 import io.github.retrooper.packetevents.PacketEvents;
 import org.bukkit.Bukkit;
-import org.bukkit.Server;
 
 /**
  * @author retrooper
@@ -53,8 +52,8 @@ public enum ServerVersion {
                 return val;
             }
         }
-        if(PacketEvents.getSettings().getDefaultServerVersion() != null) {
-            return PacketEvents.getSettings().getDefaultServerVersion();
+        if(PacketEvents.getSettings().getBackupServerVersion() != null) {
+            return PacketEvents.getSettings().getBackupServerVersion();
         }
         return ERROR;
     }

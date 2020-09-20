@@ -22,7 +22,7 @@
  * SOFTWARE.
  */
 
-package io.github.retrooper.packetevents;
+package io.github.retrooper.packetevents.version;
 
 import java.util.ArrayList;
 import java.util.List;

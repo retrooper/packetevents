@@ -22,23 +22,52 @@
  * SOFTWARE.
  */
 
-package io.github.retrooper.packetevents.annotations;
+package io.github.retrooper.packetevents.event.impl;
 
-import io.github.retrooper.packetevents.enums.EventSynchronization;
-import io.github.retrooper.packetevents.enums.PacketEventPriority;
-import org.bukkit.event.EventHandler;
+import io.github.retrooper.packetevents.event.CancellableEvent;
+import io.github.retrooper.packetevents.event.PacketEvent;
+import org.bukkit.entity.Player;
 
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+/**
+ * This event is called each time you eject a player.
+ */
+public final class PlayerEjectEvent extends PacketEvent implements CancellableEvent {
+    private final Player player;
+    private final boolean async;
+    private boolean cancelled;
 
-@Target(ElementType.METHOD)
-@Retention(RetentionPolicy.RUNTIME)
+    public PlayerEjectEvent(final Player player, final boolean isAsync) {
+        this.player = player;
+        this.async = isAsync;
+    }
 
-public @interface PacketHandler {
-    @Deprecated
-    EventSynchronization synchronization() default EventSynchronization.NORMAL;
+    public PlayerEjectEvent(final Player player) {
+        this(player, false);
+    }
 
-    byte priority() default PacketEventPriority.NORMAL;
+    @Override
+    public void cancel() {
+        this.cancelled = true;
+    }
+
+    @Override
+    public void uncancel() {this.cancelled = false; }
+
+    @Override
+    public boolean isCancelled() {
+        return this.cancelled;
+    }
+
+    @Override
+    public void setCancelled(final boolean val) {
+        this.cancelled = val;
+    }
+
+    public Player getPlayer() {
+        return player;
+    }
+
+    public boolean isAsync() {
+        return async;
+    }
 }

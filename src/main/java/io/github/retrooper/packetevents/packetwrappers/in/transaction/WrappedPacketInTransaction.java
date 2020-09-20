@@ -24,7 +24,7 @@
 
 package io.github.retrooper.packetevents.packetwrappers.in.transaction;
 
-import io.github.retrooper.packetevents.packet.PacketTypeClasses;
+import io.github.retrooper.packetevents.packettype.PacketTypeClasses;
 import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
 
 public final class WrappedPacketInTransaction extends WrappedPacket {

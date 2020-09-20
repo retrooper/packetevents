@@ -22,13 +22,40 @@
  * SOFTWARE.
  */
 
-package io.github.retrooper.packetevents.enums;
-@Deprecated
-public interface PacketEventPriority {
-    byte LOWEST = 0;
-    byte LOW = 1;
-    byte NORMAL = 2;
-    byte HIGH = 3;
-    byte HIGHEST = 4;
-    byte MONITOR = 5;
+package io.github.retrooper.packetevents.example;
+
+import io.github.retrooper.packetevents.utils.server.ServerVersion;
+import io.github.retrooper.packetevents.settings.PacketEventsSettings;
+
+public class ExamplePacketEventsSettings extends PacketEventsSettings {
+
+    @Override
+    public ServerVersion getBackupServerVersion() {
+        return ServerVersion.v_1_7_10;
+    }
+
+    @Override
+    public boolean shouldAutoResolveClientProtocolVersion() {
+        return true;
+    }
+
+    @Override
+    public boolean shouldInjectAsync() {
+        return true;
+    }
+
+    @Override
+    public boolean shouldEjectAsync() {
+        return true;
+    }
+
+    @Override
+    public boolean shouldUseProtocolLibIfAvailable() {
+        return true;
+    }
+
+    @Override
+    public boolean shouldCheckForUpdates() {
+        return true;
+    }
 }

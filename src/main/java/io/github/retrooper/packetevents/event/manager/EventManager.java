@@ -25,14 +25,13 @@
 package io.github.retrooper.packetevents.event.manager;
 
 import io.github.retrooper.packetevents.PacketEvents;
-import io.github.retrooper.packetevents.annotations.PacketHandler;
-import io.github.retrooper.packetevents.enums.PacketEventPriority;
+import io.github.retrooper.packetevents.event.annotation.PacketHandler;
 import io.github.retrooper.packetevents.event.CancellableEvent;
 import io.github.retrooper.packetevents.event.PacketEvent;
 import io.github.retrooper.packetevents.event.PacketListener;
+import io.github.retrooper.packetevents.event.priority.PacketEventPriority;
 import io.github.retrooper.packetevents.utils.protocollib.ProtocolLibListener;
 import io.github.retrooper.packetevents.utils.protocollib.ProtocolLibUtils;
-import org.bukkit.Bukkit;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -70,27 +69,17 @@ public final class EventManager {
                             }
                         }
                     };
-                    switch (annotation.synchronization()) {
-                        case FORCE_ASYNC:
-                            Bukkit.getScheduler().runTaskAsynchronously(PacketEvents.getPlugin(), invokeMethod);
-                            break;
-                        case FORCE_SYNC:
-                            Bukkit.getScheduler().runTask(PacketEvents.getPlugin(), invokeMethod);
-                            break;
-                        default:
-                            try {
-                                method.invoke(listener, e);
-                            } catch (IllegalAccessException | InvocationTargetException ex) {
-                                ex.printStackTrace();
-                            }
-                            if (e instanceof CancellableEvent) {
-                                CancellableEvent ce = (CancellableEvent) e;
-                                if (annotation.priority() >= eventPriority[0]) {
-                                    eventPriority[0] = annotation.priority();
-                                    isCancelled[0] = ce.isCancelled();
-                                }
-                            }
-                            break;
+                    try {
+                        method.invoke(listener, e);
+                    } catch (IllegalAccessException | InvocationTargetException ex) {
+                        ex.printStackTrace();
+                    }
+                    if (e instanceof CancellableEvent) {
+                        CancellableEvent ce = (CancellableEvent) e;
+                        if (annotation.priority() >= eventPriority[0]) {
+                            eventPriority[0] = annotation.priority();
+                            isCancelled[0] = ce.isCancelled();
+                        }
                     }
                     if (e instanceof CancellableEvent) {
                         CancellableEvent cancellableEvent = (CancellableEvent) e;
@@ -112,7 +101,7 @@ public final class EventManager {
 
         if (!methods.isEmpty()) {
             if (ProtocolLibUtils.isAvailable()
-                    && PacketEvents.getSettings().isUseProtocolLibIfAvailable()) {
+                    && PacketEvents.getSettings().shouldUseProtocolLibIfAvailable()) {
                 ProtocolLibListener.registerProtocolLibListener(listener, methods);
             } else {
                 registeredMethods.put(listener, methods);

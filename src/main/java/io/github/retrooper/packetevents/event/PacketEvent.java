@@ -25,7 +25,7 @@
 package io.github.retrooper.packetevents.event;
 
 
-import io.github.retrooper.packetevents.enums.ServerVersion;
+import io.github.retrooper.packetevents.utils.server.ServerVersion;
 
 /**
  * An event in the PacketEvents EventManager system.

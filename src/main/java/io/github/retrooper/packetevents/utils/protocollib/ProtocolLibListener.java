@@ -30,7 +30,7 @@ import com.comphenix.protocol.events.ListenerPriority;
 import com.comphenix.protocol.events.PacketAdapter;
 import com.comphenix.protocol.events.PacketEvent;
 import io.github.retrooper.packetevents.PacketEvents;
-import io.github.retrooper.packetevents.annotations.PacketHandler;
+import io.github.retrooper.packetevents.event.annotation.PacketHandler;
 import io.github.retrooper.packetevents.event.priority.PacketEventPriority;
 import io.github.retrooper.packetevents.event.PacketListener;
 import io.github.retrooper.packetevents.event.impl.PacketReceiveEvent;
@@ -38,7 +38,6 @@ import io.github.retrooper.packetevents.event.impl.PacketSendEvent;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.List;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 public class ProtocolLibListener {

@@ -22,12 +22,9 @@
  * SOFTWARE.
  */
 
-package io.github.retrooper.packetevents.enums;
+package io.github.retrooper.packetevents.utils.player;
 
 import io.github.retrooper.packetevents.PacketEvents;
-
-import java.util.HashMap;
-import java.util.Map;
 
 public enum ClientVersion {
     LOWER_THAN_SUPPORTED_VERSIONS(4),
@@ -98,18 +95,8 @@ public enum ClientVersion {
         return protocolVersion == target.getProtocolVersion();
     }
 
-    /**
-     * @deprecated Added for now just to have backwards compatibility.
-     * @param protocolVersion
-     * @return
-     */
-    @Deprecated
-    public static ClientVersion fromProtocolVersion(int protocolVersion) {
-        return getClientVersion(protocolVersion);
-    }
-
     public static ClientVersion getClientVersion(int protocolVersion) {
-        if(protocolVersion == -1 && PacketEvents.getAPI().getSettings().doAutoResolveClientProtocolVersion()) {
+        if(protocolVersion == -1 && PacketEvents.getSettings().shouldAutoResolveClientProtocolVersion()) {
             protocolVersion = PacketEvents.getAPI().getServerUtils().getVersion().toProtocolVersion();
         }
         for(ClientVersion version : ClientVersion.values()) {

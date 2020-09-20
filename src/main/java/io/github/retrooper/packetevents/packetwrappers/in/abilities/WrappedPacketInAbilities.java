@@ -26,7 +26,7 @@ package io.github.retrooper.packetevents.packetwrappers.in.abilities;
 
 import io.github.retrooper.packetevents.annotations.NotNull;
 import io.github.retrooper.packetevents.annotations.Nullable;
-import io.github.retrooper.packetevents.packet.PacketTypeClasses;
+import io.github.retrooper.packetevents.packettype.PacketTypeClasses;
 import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
 import io.github.retrooper.packetevents.utils.reflection.Reflection;
 

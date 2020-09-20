@@ -22,9 +22,18 @@
  * SOFTWARE.
  */
 
-package io.github.retrooper.packetevents.enums;
+package io.github.retrooper.packetevents.event.annotation;
 
-@Deprecated
-public enum EventSynchronization {
-    NORMAL, FORCE_SYNC, FORCE_ASYNC
+import io.github.retrooper.packetevents.event.priority.PacketEventPriority;
+
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
+
+@Target(ElementType.METHOD)
+@Retention(RetentionPolicy.RUNTIME)
+
+public @interface PacketHandler {
+    byte priority() default PacketEventPriority.NORMAL;
 }
