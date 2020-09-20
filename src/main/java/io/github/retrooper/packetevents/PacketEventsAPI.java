@@ -33,7 +33,6 @@ public final class PacketEventsAPI {
     private final EventManager eventManager = new EventManager();
     private final PlayerUtils playerUtils = new PlayerUtils();
     private final ServerUtils serverUtils = new ServerUtils();
-    private final PacketEventsSettings settings = new PacketEventsSettings();
     //private final UpdateChecker updateChecker = new UpdateChecker();
 
     /**
@@ -96,8 +95,9 @@ public final class PacketEventsAPI {
      *
      * @return Configure some settings for the API
      */
+    @Deprecated
     public PacketEventsSettings getSettings() {
-        return settings;
+        return PacketEvents.getSettings();
     }
 /*
     /**

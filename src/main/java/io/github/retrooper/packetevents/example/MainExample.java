@@ -28,7 +28,7 @@ import io.github.retrooper.packetevents.PacketEvents;
 import io.github.retrooper.packetevents.event.PacketListener;
 import org.bukkit.plugin.java.JavaPlugin;
 
-public class MainExample extends JavaPlugin implements PacketListener {
+public class MainExample extends JavaPlugin {
 
     @Override
     public void onLoad() {
@@ -37,8 +37,7 @@ public class MainExample extends JavaPlugin implements PacketListener {
 
     @Override
     public void onEnable() {
-        PacketEvents.init(this);
-        PacketEvents.getAPI().getEventManager().registerListener(this);
+        PacketEvents.init(this, new ExampleSettings());
     }
 
     @Override
