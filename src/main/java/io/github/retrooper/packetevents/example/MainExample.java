@@ -37,16 +37,6 @@ public class MainExample extends JavaPlugin implements PacketListener {
 
     @Override
     public void onEnable() {
-        //Deprecated, as it is no longer needed.
-        /*
-         *
-         * PacketEvents will generate a random identifier for you if you do not set one
-         * before initializing PacketEvents
-         *
-         */
-
-        PacketEvents.getSettings().setIdentifier("official_api");
-
         PacketEvents.init(this);
         PacketEvents.getAPI().getEventManager().registerListener(this);
     }
