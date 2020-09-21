@@ -26,36 +26,42 @@ package io.github.retrooper.packetevents.settings;
 
 import io.github.retrooper.packetevents.utils.server.ServerVersion;
 
-public class PacketEventsSettings {
+public final class PacketEventsSettings {
     private ServerVersion backupServerVersion = ServerVersion.v_1_7_10;
-    private boolean autoResolveClientProtocolVersion = false;
+    private boolean autoResolveClientProtocolVersion;
     private boolean injectAsync = true;
     private boolean ejectAsync = true;
-    private boolean useProtocolLibIfAvailable = false;
+    private boolean useProtocolLibIfAvailable;
     private boolean checkForUpdates = true;
 
-    public final void setBackupServerVersion(ServerVersion serverVersion) {
+    public PacketEventsSettings backupServerVersion(ServerVersion serverVersion) {
         this.backupServerVersion = serverVersion;
+        return this;
     }
 
-    public final void setShouldAutoResolveClientProtocolVersion(boolean autoResolveClientProtocolVersion) {
+    public PacketEventsSettings autoResolveClientProtocolVersion(boolean autoResolveClientProtocolVersion) {
         this.autoResolveClientProtocolVersion = autoResolveClientProtocolVersion;
+        return this;
     }
 
-    public final void setShouldInjectAsync(boolean injectAsync) {
+    public PacketEventsSettings injectAsync(boolean injectAsync) {
         this.injectAsync = injectAsync;
+        return this;
     }
 
-    public final void setShouldEjectAsync(boolean ejectAsync) {
+    public PacketEventsSettings ejectAsync(boolean ejectAsync) {
         this.ejectAsync = ejectAsync;
+        return this;
     }
 
-    public final void setShouldUseProtocolLibIfAvailable(boolean useProtocolLibIfAvailable) {
+    public PacketEventsSettings useProtocolLibIfAvailable(boolean useProtocolLibIfAvailable) {
         this.useProtocolLibIfAvailable = useProtocolLibIfAvailable;
+        return this;
     }
 
-    public final void setShouldCheckForUpdates(boolean checkForUpdates) {
+    public PacketEventsSettings checkForUpdates(boolean checkForUpdates) {
         this.checkForUpdates = checkForUpdates;
+        return this;
     }
 
     public ServerVersion getBackupServerVersion() {
