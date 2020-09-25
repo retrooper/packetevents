@@ -22,27 +22,19 @@
  * SOFTWARE.
  */
 
-package io.github.retrooper.packetevents.example;
+package io.github.retrooper.packetevents.utils.gameprofile;
 
-import io.github.retrooper.packetevents.PacketEvents;
-import io.github.retrooper.packetevents.event.PacketListener;
-import org.bukkit.plugin.java.JavaPlugin;
+import io.github.retrooper.packetevents.nettyhandler.NettyPacketHandler;
 
-public class MainExample extends JavaPlugin implements PacketListener {
+import java.util.UUID;
 
-    @Override
-    public void onLoad() {
-        PacketEvents.load();
-    }
-
-    @Override
-    public void onEnable() {
-        PacketEvents.init(this);
-        PacketEvents.getAPI().getEventManager().registerListener(this);
-    }
-
-    @Override
-    public void onDisable() {
-        PacketEvents.stop();
+public class GameProfileUtil {
+    public static Object getGameProfile(UUID uuid, String username) {
+        if(NettyPacketHandler.v1_7_nettyMode) {
+            return GameProfileUtil_7.getGameProfile(uuid, username);
+        }
+        else {
+            return GameProfileUtil_8.getGameProfile(uuid, username);
+        }
     }
 }

@@ -1,7 +1,6 @@
 package io.github.retrooper.packetevents;
 
 import org.bukkit.Bukkit;
-import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import java.io.BufferedReader;
@@ -10,39 +9,31 @@ import java.io.InputStreamReader;
 import java.net.URL;
 import java.net.URLConnection;
 
-public class UpdateChecker extends BukkitRunnable {
-
-    private final Plugin plugin;
-    private String newVersion;
-
-    public UpdateChecker(Plugin plugin) {
-        this.plugin = plugin;
-    }
-
-    @Override
-    public void run() {
+public class UpdateChecker {
+    public void handleUpdate() {
         try {
-            newVersion = readLines();
-
-            //Please don't compare two strings using ==... ILL FIND WHERE U LIVE
-            if (!PacketEvents.getVersion().equals(newVersion)) {
-                //We don't wanna access the Bukkit API Async (It really does not make a difference but Just to be safe)
-                inform();
+            String line = readLatestVersion();
+            PEVersion newVersion = new PEVersion(line);
+            PEVersion localVersion = PacketEvents.getVersion();
+            if (localVersion.isOlder(newVersion)) {
+                inform("[PacketEvents] There is an update available for the PacketEvents API! (" + newVersion.toString() + ")");
+            }
+            else if(localVersion.equals(newVersion)) {
+                inform("[PacketEvents] You are on the latest released version of PacketEvents. (" + newVersion.toString() + ")");
+            }
+            else if(localVersion.isNewer(newVersion)) {
+                inform("[PacketEvents] You are on a dev or pre released build of PacketEvents. Your build: (" + localVersion.toString() + ") | Last released build: (" + newVersion.toString() + ")");
             }
         } catch (IOException ignored) {
             //Thats fine, Not important
         }
     }
 
-    private void inform() {
-        new BukkitRunnable() {
-            public void run() {
-                Bukkit.getLogger().info("[PacketEvents] There is an update available for PacketEventsAPI! (" + newVersion + ")");
-            }
-        }.runTask(plugin);
+    private void inform(String message) {
+        Bukkit.getLogger().info(message);
     }
 
-    private String readLines() throws IOException {
+    private String readLatestVersion() throws IOException {
         URLConnection connection = new URL("https://api.spigotmc.org/legacy/update.php?resource=80279").openConnection();
         connection.addRequestProperty("User-Agent", "Mozilla/4.0");
 

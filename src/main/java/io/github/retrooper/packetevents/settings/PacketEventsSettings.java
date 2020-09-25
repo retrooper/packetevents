@@ -25,12 +25,13 @@
 package io.github.retrooper.packetevents.settings;
 
 import io.github.retrooper.packetevents.enums.ServerVersion;
+import io.github.retrooper.packetevents.packettype.PacketType;
 
 import java.util.Random;
 
 public class PacketEventsSettings {
 
-    private ServerVersion defaultServerVersion = ServerVersion.v_1_7_10;
+    private ServerVersion backupServerVersion = ServerVersion.v_1_7_10;
     private String identifier = "";
     private boolean autoResolveClientProtocolVersion = false;
     private boolean uninjectAsync = true;
@@ -40,20 +41,30 @@ public class PacketEventsSettings {
 
     /**
      * If PacketEvents fails to detect your server version, it will use the recommended version
-     *
+     * @deprecated Use {@link #getBackupServerVersion()}
      * @return Recommended version
      */
+    @Deprecated
     public ServerVersion getDefaultServerVersion() {
-        return this.defaultServerVersion;
+        return this.backupServerVersion;
     }
 
     /**
      * Set the default version
-     *
+     * @deprecated Use {@link #setBackupServerVersion(ServerVersion)}
      * @param version ServerVersion
      */
+    @Deprecated
     public void setDefaultServerVersion(final ServerVersion version) {
-        this.defaultServerVersion = version;
+        this.backupServerVersion = version;
+    }
+
+    public void setBackupServerVersion(ServerVersion version) {
+        this.backupServerVersion = version;
+    }
+
+    public ServerVersion getBackupServerVersion() {
+        return backupServerVersion;
     }
 
     /**
@@ -84,16 +95,33 @@ public class PacketEventsSettings {
      * Set a unique Identifier (Usually something that represents your plugin, For example: MyPluginPacketHandler)
      * If another present plugin uses the same Identifier, It will cause incompatibilities.
      *
+     * This function is now unneeded as PacketEvents generates a random identifier for you already.
      * @param identifier Unique string
-     * @deprecated This method is deprecated as you no longer need to set an identifier,
-     * a unique identifier is already automatically generated for you.
      */
     public void setIdentifier(final String identifier) {
         this.identifier = identifier;
     }
 
+    public boolean shouldAutoResolveClientProtocolVersion() {
+        return autoResolveClientProtocolVersion;
+    }
+
+    /**
+     * @deprecated Use {@link #shouldAutoResolveClientProtocolVersion()}
+     * @return
+     */
+    @Deprecated
     public boolean doAutoResolveClientProtocolVersion() {
         return autoResolveClientProtocolVersion;
+    }
+
+    /**
+     * @deprecated Use {@link #setShouldAutoResolveClientProtocolVersion(boolean)}
+     * @param autoResolveClientProtocolVersion
+     */
+    @Deprecated
+    public void setDoAutoResolveClientProtocolVersion(boolean autoResolveClientProtocolVersion) {
+        this.autoResolveClientProtocolVersion = autoResolveClientProtocolVersion;
     }
 
     /**
@@ -102,11 +130,13 @@ public class PacketEventsSettings {
      * should it assume that the client is using the same version as the server?
      * Returns ACCESS_FAILURE if this is set to FALSE(default value is false).
      *
-     * @param autoResolveClientProtocolVersion boolean
+     * @param val boolean
      */
-    public void setDoAutoResolveClientProtocolVersion(boolean autoResolveClientProtocolVersion) {
-        this.autoResolveClientProtocolVersion = autoResolveClientProtocolVersion;
+    public void setShouldAutoResolveClientProtocolVersion(boolean val) {
+        this.autoResolveClientProtocolVersion = val;
     }
+    
+    
 
     /**
      * Would you like PacketEvents to Uninject players Asynchronously?
@@ -154,7 +184,7 @@ public class PacketEventsSettings {
         this.useProtocolLibIfAvailable = val;
     }
 
-    public boolean isCheckForUpdates() {
+    public boolean shouldCheckForUpdates() {
         return checkForUpdates;
     }
 
@@ -163,16 +193,7 @@ public class PacketEventsSettings {
      *
      * @param checkForUpdates boolean
      */
-    public void setCheckForUpdates(boolean checkForUpdates) {
+    public void setShouldCheckForUpdates(boolean checkForUpdates) {
         this.checkForUpdates = checkForUpdates;
     }
-
-    /*public void setShouldCheckForUpdates(boolean val) {
-        this.checkForUpdates = val;
-    }
-
-    public boolean shouldCheckForUpdates() {
-        return checkForUpdates;
-    }*/
-
 }

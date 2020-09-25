@@ -22,27 +22,25 @@
  * SOFTWARE.
  */
 
-package io.github.retrooper.packetevents.example;
+package io.github.retrooper.packetevents.utils.bytebuf;
 
-import io.github.retrooper.packetevents.PacketEvents;
-import io.github.retrooper.packetevents.event.PacketListener;
-import org.bukkit.plugin.java.JavaPlugin;
+import net.minecraft.util.io.netty.buffer.ByteBuf;
+import net.minecraft.util.io.netty.buffer.Unpooled;
 
-public class MainExample extends JavaPlugin implements PacketListener {
-
-    @Override
-    public void onLoad() {
-        PacketEvents.load();
+class ByteBufUtil_7 {
+    public static Object copiedBuffer(byte[] bytes) {
+        return Unpooled.copiedBuffer(bytes);
     }
 
-    @Override
-    public void onEnable() {
-        PacketEvents.init(this);
-        PacketEvents.getAPI().getEventManager().registerListener(this);
-    }
-
-    @Override
-    public void onDisable() {
-        PacketEvents.stop();
+    public static byte[] getBytes(Object byteBuf) {
+        ByteBuf bb = (ByteBuf)byteBuf;
+        byte[] bytes;
+        if (bb.hasArray()) {
+            bytes = bb.array();
+        } else {
+            bytes = new byte[bb.readableBytes()];
+            bb.getBytes(bb.readerIndex(), bytes);
+        }
+        return bytes;
     }
 }

@@ -37,7 +37,7 @@ public enum ServerVersion {
     v_1_9, v_1_9_2, v_1_9_4, v_1_10, v_1_10_2, v_1_11, v_1_11_1, v_1_11_2,
     v_1_12, v_1_12_1, v_1_12_2, v_1_13, v_1_13_1, v_1_13_2, v_1_14, v_1_14_1,
     v_1_14_2, v_1_14_3, v_1_14_4, v_1_15, v_1_15_1, v_1_15_2, v_1_16, v_1_16_1,
-    v_1_16_2, ERROR, EMPTY;
+    v_1_16_2, v_1_16_3, ERROR, EMPTY;
 
     private static final String nmsVersionSuffix = Bukkit.getServer().getClass().getPackage().getName().replace(".", ",").split(",")[3];
     public static ServerVersion[] reversedValues = new ServerVersion[values().length];
@@ -193,6 +193,8 @@ public enum ServerVersion {
                 return 736;
             case v_1_16_2:
                 return 751;
+            case v_1_16_3:
+                return 753;
             default:
                 return -1;
         }

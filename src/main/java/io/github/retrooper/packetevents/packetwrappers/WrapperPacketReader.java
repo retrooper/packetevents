@@ -56,11 +56,11 @@ public interface WrapperPacketReader {
 
     String[] readStringArray(int index);
 
-    Object[] readObjectArray(int index, Class<?> type);
+    String readString(int index);
 
     Object readObject(int index, Class<?> type);
 
     Object readAnyObject(int index);
 
-    String readString(int index);
+    Object[] readObjectArray(int index, Class<?> type);
 }

@@ -84,6 +84,16 @@ public final class Reflection {
         return null;
     }
 
+    public static Method getMethod(Class<?> cls, Class<?> returning, int index, Class<?>... params) {
+        int currentIndex = 0;
+        for(Method m : getMethods(cls)) {
+            if(Arrays.equals(m.getParameterTypes(), params) && m.getReturnType().equals(returning) && index == currentIndex++) {
+                return m;
+            }
+        }
+        return null;
+    }
+
     public static Method getMethod(final Class<?> cls, final String name, Class<?> returning, Class<?>... params) {
         for (final Method m : getMethods(cls)) {
             if (m.getName().equals(name) && Arrays.equals(m.getParameterTypes(), params) && m.getReturnType().equals(returning)) {
@@ -106,7 +116,7 @@ public final class Reflection {
     public static Method getMethod(final Class<?> cls, final Class<?> returning, final int index) {
         int currentIndex = 0;
         for (final Method m : getMethods(cls)) {
-            if (m.getReturnType().equals(returning) && index == currentIndex++) {
+            if (returning.equals(m.getReturnType()) && index == currentIndex++) {
                 return m;
             }
         }

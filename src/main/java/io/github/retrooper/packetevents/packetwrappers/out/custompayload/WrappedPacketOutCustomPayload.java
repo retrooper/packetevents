@@ -27,25 +27,25 @@ package io.github.retrooper.packetevents.packetwrappers.out.custompayload;
 import io.github.retrooper.packetevents.packet.PacketTypeClasses;
 import io.github.retrooper.packetevents.packetwrappers.SendableWrapper;
 import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
-import io.github.retrooper.packetevents.utils.reflection.Reflection;
+import io.github.retrooper.packetevents.utils.bytebuf.ByteBufUtil;
 import io.github.retrooper.packetevents.utils.nms.NMSUtils;
 
 import java.lang.reflect.Constructor;
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Modifier;
 
-class WrappedPacketOutCustomPayload extends WrappedPacket implements SendableWrapper {
-//TODO load the outcustompayload wrapper
-
+public class WrappedPacketOutCustomPayload extends WrappedPacket implements SendableWrapper {
     private static Class<?> packetClass;
     private static Constructor<?> constructor;
     private static Constructor<?> packetDataSerializerConstructor;
     private static Constructor<?> minecraftKeyConstructor;
     private static Class<?> byteBufClass;
-    private static Class<?> unpooledClass;
     private static Class<?> packetDataSerializerClass;
     private static Class<?> minecraftKeyClass;
+    private static int minecraftKeyIndexInClass;
 
-    private static byte constructorMode = 1;
+    private static byte constructorMode = 0;
 
     public static void load() {
         packetClass = PacketTypeClasses.Server.CUSTOM_PAYLOAD;
@@ -53,21 +53,22 @@ class WrappedPacketOutCustomPayload extends WrappedPacket implements SendableWra
         minecraftKeyClass = NMSUtils.getNMSClassWithoutException("MinecraftKey");
 
         try {
-            unpooledClass = NMSUtils.getNettyClass("buffer.Unpooled");
             byteBufClass = NMSUtils.getNettyClass("buffer.ByteBuf");
         } catch (ClassNotFoundException e) {
 
         }
         try {
-            packetDataSerializerConstructor = packetDataSerializerClass.getConstructor(NMSUtils.getNettyClass("ByteBuf"));
+            packetDataSerializerConstructor = packetDataSerializerClass.getConstructor(byteBufClass);
         } catch (NullPointerException e) {
             //Nothing
-        } catch (NoSuchMethodException | ClassNotFoundException e) {
+        } catch (NoSuchMethodException e) {
             //also nothing
         }
 
         try {
-            minecraftKeyConstructor = minecraftKeyClass.getConstructor(String.class);
+            if (minecraftKeyClass != null) {
+                minecraftKeyConstructor = minecraftKeyClass.getConstructor(String.class);
+            }
         } catch (NoSuchMethodException e) {
             //Nothing
         }
@@ -91,6 +92,15 @@ class WrappedPacketOutCustomPayload extends WrappedPacket implements SendableWra
             } catch (NoSuchMethodException e2) {
                 //That's fine, just an even newer version
                 try {
+                    //Minecraft key exists
+
+                    for (int i = 0; i < packetClass.getDeclaredFields().length; i++) {
+                        Field f = packetClass.getDeclaredFields()[i];
+                        if (!Modifier.isStatic(f.getModifiers())) {
+                            minecraftKeyIndexInClass = i;
+                            break;
+                        }
+                    }
                     constructor = packetClass.getConstructor(minecraftKeyClass, packetDataSerializerClass);
                     constructorMode = 2;
                 } catch (NoSuchMethodException e3) {
@@ -109,15 +119,38 @@ class WrappedPacketOutCustomPayload extends WrappedPacket implements SendableWra
     }
 
 
-    /*    public WrappedPacketOutCustomPayload(Object packet) {
-            super(packet);
-        }
+    public WrappedPacketOutCustomPayload(Object packet) {
+        super(packet);
+    }
 
-        @Override
-        protected void setup() {
+    @Override
+    protected void setup() {
+        switch (constructorMode) {
+            case 0:
+                this.tag = readString(0);
+                this.data = readByteArray(0);
+                break;
+            case 1:
+                this.tag = readString(0);
+                Object dataSerializer = readObject(0, packetDataSerializerClass);
+                WrappedPacket byteBufWrapper = new WrappedPacket(dataSerializer);
 
+                Object byteBuf = byteBufWrapper.readObject(0, byteBufClass);
+
+                this.data = ByteBufUtil.getBytes(byteBuf);
+                break;
+            case 2:
+                Object minecraftKey = readObject(minecraftKeyIndexInClass, minecraftKeyClass);
+                WrappedPacket minecraftKeyWrapper = new WrappedPacket(minecraftKey);
+                this.tag = minecraftKeyWrapper.readString(1);
+                Object dataSerializer2 = readObject(0, packetDataSerializerClass);
+                WrappedPacket byteBuf2Wrapper = new WrappedPacket(dataSerializer2);
+                Object byteBuf2 = byteBuf2Wrapper.readObject(0, byteBufClass);
+                this.data = ByteBufUtil.getBytes(byteBuf2);
+                break;
         }
-    */
+    }
+
     public String getTag() {
         return tag;
     }
@@ -128,13 +161,7 @@ class WrappedPacketOutCustomPayload extends WrappedPacket implements SendableWra
 
     @Override
     public Object asNMSPacket() {
-        Object byteBufObject = null;
-        try {
-            byteBufObject = Reflection.getMethod(unpooledClass, "copiedBuffer", 0).invoke(null, data);
-        } catch (InvocationTargetException | IllegalAccessException e) {
-            e.printStackTrace();
-        }
-
+        Object byteBufObject = ByteBufUtil.copiedBuffer(data);
         switch (constructorMode) {
             case 0:
                 try {
