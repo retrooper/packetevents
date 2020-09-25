@@ -49,24 +49,18 @@ public final class EventManager {
             final byte[] eventPriority = {PacketEventPriority.LOWEST};
             for (Method method : methods) {
                 Class<?> parameterType = method.getParameterTypes()[0];
-                if (parameterType.equals(PacketEvent.class)
-                        || parameterType.isInstance(e)) {
-
+                if (parameterType.equals(PacketEvent.class) || parameterType.isInstance(e)) {
                     PacketHandler annotation = method.getAnnotation(PacketHandler.class);
-                    Runnable invokeMethod = new Runnable() {
-                        @Override
-                        public void run() {
-                            try {
-                                method.invoke(listener, e);
-                            } catch (IllegalAccessException | InvocationTargetException ex) {
-                                ex.printStackTrace();
-                            }
-                            if (e instanceof CancellableEvent) {
-                                CancellableEvent ce = (CancellableEvent) e;
-                                if (annotation.priority() >= eventPriority[0]) {
-                                    eventPriority[0] = annotation.priority();
-                                    isCancelled[0] = ce.isCancelled();
-                                }
+                    Runnable invokeMethod = () -> {
+                        try {
+                            method.invoke(listener, e);
+                        } catch (IllegalAccessException | InvocationTargetException ignored) {
+                        }
+                        if (e instanceof CancellableEvent) {
+                            CancellableEvent ce = (CancellableEvent) e;
+                            if (annotation.priority() >= eventPriority[0]) {
+                                eventPriority[0] = annotation.priority();
+                                isCancelled[0] = ce.isCancelled();
                             }
                         }
                     };
