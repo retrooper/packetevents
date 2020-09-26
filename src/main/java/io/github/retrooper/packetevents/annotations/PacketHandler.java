@@ -26,7 +26,6 @@ package io.github.retrooper.packetevents.annotations;
 
 import io.github.retrooper.packetevents.enums.EventSynchronization;
 import io.github.retrooper.packetevents.enums.PacketEventPriority;
-import org.bukkit.event.EventHandler;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -37,6 +36,8 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 
 public @interface PacketHandler {
+    //Please do not remove this:( This makes us able to create custom events since we can make the packet run sync
+    //Feel free to let me know if we're able to do this via another way -Nik
     @Deprecated
     EventSynchronization synchronization() default EventSynchronization.NORMAL;
 

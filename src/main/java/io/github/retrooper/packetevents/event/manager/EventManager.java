@@ -53,20 +53,16 @@ public final class EventManager {
                         || parameterType.isInstance(e)) {
 
                     PacketHandler annotation = method.getAnnotation(PacketHandler.class);
-                    Runnable invokeMethod = new Runnable() {
-                        @Override
-                        public void run() {
-                            try {
-                                method.invoke(listener, e);
-                            } catch (IllegalAccessException | InvocationTargetException ex) {
-                                ex.printStackTrace();
-                            }
-                            if (e instanceof CancellableEvent) {
-                                CancellableEvent ce = (CancellableEvent) e;
-                                if (annotation.priority() >= eventPriority[0]) {
-                                    eventPriority[0] = annotation.priority();
-                                    isCancelled[0] = ce.isCancelled();
-                                }
+                    Runnable invokeMethod = () -> {
+                        try {
+                            method.invoke(listener, e);
+                        } catch (IllegalAccessException | InvocationTargetException ignored) {
+                        }
+                        if (e instanceof CancellableEvent) {
+                            CancellableEvent ce = (CancellableEvent) e;
+                            if (annotation.priority() >= eventPriority[0]) {
+                                eventPriority[0] = annotation.priority();
+                                isCancelled[0] = ce.isCancelled();
                             }
                         }
                     };
