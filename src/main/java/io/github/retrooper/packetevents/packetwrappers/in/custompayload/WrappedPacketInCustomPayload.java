@@ -24,31 +24,30 @@
 
 package io.github.retrooper.packetevents.packetwrappers.in.custompayload;
 
-import io.github.retrooper.packetevents.annotations.Nullable;
-import io.github.retrooper.packetevents.packet.PacketTypeClasses;
+import io.github.retrooper.packetevents.packettype.PacketTypeClasses;
 import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
-import io.github.retrooper.packetevents.utils.reflection.Reflection;
+import io.github.retrooper.packetevents.utils.bytebuf.ByteBufUtil;
 import io.github.retrooper.packetevents.utils.nms.NMSUtils;
-
-import java.lang.reflect.Field;
+import io.github.retrooper.packetevents.utils.reflection.Reflection;
 
 public final class WrappedPacketInCustomPayload extends WrappedPacket {
-    private static Class<?> packetClass, nmsMinecraftKey, nmsPacketDataSerializer;
+    private static Class<?> nmsMinecraftKey, packetDataSerializerClass, byteBufClass;
 
-    private static boolean strPresentInIndex0;
-    private String data;
-    private Object minecraftKey, dataSerializer;
+    private static boolean strPresent, byteArrayPresent;
+
     public WrappedPacketInCustomPayload(Object packet) {
         super(packet);
     }
 
     public static void load() {
-        packetClass = PacketTypeClasses.Client.CUSTOM_PAYLOAD;
-        strPresentInIndex0 = Reflection.getField(packetClass, String.class, 0) != null;
+        Class<?> packetClass = PacketTypeClasses.Client.CUSTOM_PAYLOAD;
+        strPresent = Reflection.getField(packetClass, String.class, 0) != null;
+        byteArrayPresent = Reflection.getField(packetClass, byte[].class, 0) != null;
+        packetDataSerializerClass = NMSUtils.getNMSClassWithoutException("PacketDataSerializer");
         try {
-            nmsPacketDataSerializer = NMSUtils.getNMSClass("PacketDataSerializer");
+            byteBufClass = NMSUtils.getNettyClass("buffer.ByteBuf");
         } catch (ClassNotFoundException e) {
-            e.printStackTrace();
+
         }
         try {
             //Only on 1.13+
@@ -58,50 +57,26 @@ public final class WrappedPacketInCustomPayload extends WrappedPacket {
         }
     }
 
-    @Override
-    public void setup() {
-        if (!strPresentInIndex0) {
-            this.minecraftKey = readObject(0, nmsMinecraftKey);
-            this.dataSerializer = readObject(0, nmsPacketDataSerializer);
-
+    public String getTag() {
+        if (strPresent) {
+            return readString(0);
         } else {
-            Field dataSerializerField = Reflection.getField(packetClass, nmsPacketDataSerializer, 0);
-            try {
-                this.data = (String) Reflection.getField(packetClass, String.class, 0).get(packet);
-                if (dataSerializerField != null) {
-                    this.dataSerializer = dataSerializerField.get(packet);
-                }
-
-            } catch (IllegalAccessException e) {
-                e.printStackTrace();
-            }
-
+            Object minecraftKey = readObject(0, nmsMinecraftKey);
+            WrappedPacket minecraftKeyWrapper = new WrappedPacket(minecraftKey);
+            return minecraftKeyWrapper.readString(1);
         }
     }
 
-    /**
-     * Get the data
-     * @return String data
-     */
-    public String getData() {
-        return data;
-    }
+    public byte[] getData() {
+        if (byteArrayPresent) {
+            return readByteArray(0);
+        } else {
+            Object dataSerializer = readObject(0, packetDataSerializerClass);
+            WrappedPacket byteBufWrapper = new WrappedPacket(dataSerializer);
 
-    /**
-     * Get the minecraft key
-     * @return Minecraft Key object
-     */
-    public Object getMinecraftKey() {
-        return minecraftKey;
-    }
+            Object byteBuf = byteBufWrapper.readObject(0, byteBufClass);
 
-
-    /**
-     * Get the data serializer
-     * @return Data Serializer object
-     */
-    @Nullable
-    public Object getDataSerializer() {
-        return dataSerializer;
+            return ByteBufUtil.getBytes(byteBuf);
+        }
     }
 }

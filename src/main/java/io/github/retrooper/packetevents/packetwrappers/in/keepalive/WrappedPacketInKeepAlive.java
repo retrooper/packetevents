@@ -24,7 +24,7 @@
 
 package io.github.retrooper.packetevents.packetwrappers.in.keepalive;
 
-import io.github.retrooper.packetevents.packet.PacketTypeClasses;
+import io.github.retrooper.packetevents.packettype.PacketTypeClasses;
 import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
 import io.github.retrooper.packetevents.utils.reflection.Reflection;
 
@@ -59,6 +59,11 @@ public final class WrappedPacketInKeepAlive extends WrappedPacket {
      * @return response ID
      */
     public long getId() {
-        return id;
+        if(!integerPresentInIndex0) {
+            return readLong(0);
+        }
+        else {
+            return readInt(0);
+        }
     }
 }

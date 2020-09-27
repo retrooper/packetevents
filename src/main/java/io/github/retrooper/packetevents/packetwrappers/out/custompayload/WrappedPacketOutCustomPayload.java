@@ -24,7 +24,7 @@
 
 package io.github.retrooper.packetevents.packetwrappers.out.custompayload;
 
-import io.github.retrooper.packetevents.packet.PacketTypeClasses;
+import io.github.retrooper.packetevents.packettype.PacketTypeClasses;
 import io.github.retrooper.packetevents.packetwrappers.SendableWrapper;
 import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
 import io.github.retrooper.packetevents.utils.bytebuf.ByteBufUtil;

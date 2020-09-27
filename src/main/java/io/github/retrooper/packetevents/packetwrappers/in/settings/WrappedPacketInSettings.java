@@ -25,31 +25,27 @@
 package io.github.retrooper.packetevents.packetwrappers.in.settings;
 
 import io.github.retrooper.packetevents.annotations.Nullable;
-import io.github.retrooper.packetevents.enums.ServerVersion;
-import io.github.retrooper.packetevents.packet.PacketTypeClasses;
+import io.github.retrooper.packetevents.packettype.PacketTypeClasses;
 import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
 import io.github.retrooper.packetevents.utils.nms.NMSUtils;
 import io.github.retrooper.packetevents.utils.reflection.SubclassUtil;
+import io.github.retrooper.packetevents.utils.server.ServerVersion;
 
 import java.util.HashMap;
 
 public class WrappedPacketInSettings extends WrappedPacket {
-    private static Class<?> packetClass;
     private static Class<?> chatVisibilityEnumClass;
 
     private static boolean isLowerThan_v_1_8;
-    private String locale;
-    private int viewDistance;
-    private ChatVisibility chatVisibility;
-    private boolean chatColors;
-    private HashMap<DisplayedSkinPart, Boolean> displayedSkinParts;
+    private Object chatVisibilityEnumObj;
+    private HashMap<DisplayedSkinPart, Boolean> displayedSkinParts = new HashMap<>();
 
     public WrappedPacketInSettings(final Object packet) {
         super(packet);
     }
 
     public static void load() {
-        packetClass = PacketTypeClasses.Client.SETTINGS;
+        Class<?> packetClass = PacketTypeClasses.Client.SETTINGS;
 
         isLowerThan_v_1_8 = version.isLowerThan(ServerVersion.v_1_8);
 
@@ -63,35 +59,64 @@ public class WrappedPacketInSettings extends WrappedPacket {
         }
     }
 
-    public static Class<?> getChatVisibilityEnumClass() {
-        return chatVisibilityEnumClass;
+    /**
+     * Get language client setting
+     *
+     * @return String Locale
+     */
+    public String getLocale() {
+        return readString(0);
     }
 
-    @Override
-    protected void setup() {
-        try {
-            //LOCALE
-            this.locale = readString(0);
-            //VIEW DISTANCE
-            this.viewDistance = readInt(0);
+    /**
+     * Get client view distance.
+     *
+     * @return View Distance
+     */
+    public int getViewDistance() {
+        return readInt(0);
+    }
 
-            //CHAT VISIBILITY
-            Object chatVisibilityEnumObject = readObject(0, chatVisibilityEnumClass);
-            String enumValueAsString = chatVisibilityEnumObject.toString();
-            if (enumValueAsString.equals("FULL")) {
-                chatVisibility = ChatVisibility.ENABLED;
-            } else if (enumValueAsString.equals("SYSTEM")) {
-                chatVisibility = ChatVisibility.COMMANDS_ONLY;
-            } else {
-                chatVisibility = ChatVisibility.HIDDEN;
-            }
+    /**
+     * Get Chat Visibility
+     *
+     * @return Chat Visibility
+     */
+    public ChatVisibility getChatVisibility() {
+        if (chatVisibilityEnumObj == null) {
+            chatVisibilityEnumObj = readObject(0, chatVisibilityEnumClass);
+        }
+        String enumValueAsString = chatVisibilityEnumObj.toString();
+        if (enumValueAsString.equals("FULL")) {
+            return ChatVisibility.ENABLED;
+        } else if (enumValueAsString.equals("SYSTEM")) {
+            return ChatVisibility.COMMANDS_ONLY;
+        } else {
+            return ChatVisibility.HIDDEN;
+        }
+    }
 
-            //CHAT COLORS
-            this.chatColors = readBoolean(0);
+    /**
+     * Is chat colors
+     *
+     * @return Chat Colors
+     */
+    public boolean isChatColors() {
+        return readBoolean(0);
+    }
 
-            //DISPLAYED SKIN PARTS
-            this.displayedSkinParts = new HashMap<DisplayedSkinPart, Boolean>();
-
+    /**
+     * Get Displayed skin parts.
+     * <p>
+     * It is possible for some keys to not exist.
+     * If that is the case, the server version is 1.7.10.
+     * 1.7.10 only sends the cape skin part.
+     *
+     * @return A map with a Skin Parts as a key, and a boolean as a value.
+     */
+    @Nullable
+    public HashMap<DisplayedSkinPart, Boolean> getDisplayedSkinPartsMap() {
+        if (displayedSkinParts.isEmpty()) {
             if (isLowerThan_v_1_8) {
                 //in 1.7.10 only the cape display skin part is sent
                 boolean capeEnabled = readBoolean(1);
@@ -107,60 +132,7 @@ public class WrappedPacketInSettings extends WrappedPacket {
                 displayedSkinParts.put(DisplayedSkinPart.RIGHT_PANTS, (skinPartFlags & 0x20) != 0);
                 displayedSkinParts.put(DisplayedSkinPart.HAT, (skinPartFlags & 0x40) != 0);
             }
-
-        } catch (Exception e) {
-            e.printStackTrace();
         }
-
-    }
-
-    /**
-     * Get language client setting
-     *
-     * @return String Locale
-     */
-    public String getLocale() {
-        return locale;
-    }
-
-    /**
-     * Get client view distance.
-     *
-     * @return View Distance
-     */
-    public int getViewDistance() {
-        return viewDistance;
-    }
-
-    /**
-     * Get Chat Visibility
-     *
-     * @return Chat Visibility
-     */
-    public ChatVisibility getChatVisibility() {
-        return chatVisibility;
-    }
-
-    /**
-     * Is chat colors
-     *
-     * @return Chat Colors
-     */
-    public boolean isChatColors() {
-        return chatColors;
-    }
-
-    /**
-     * Get Displayed skin parts.
-     * <p>
-     * It is possible for some keys to not exist.
-     * If that is the case, the server version is 1.7.10.
-     * 1.7.10 only sends the cape skin part.
-     *
-     * @return A map with a Skin Parts as a key, and a boolean as a value.
-     */
-    @Nullable
-    public HashMap<DisplayedSkinPart, Boolean> getDisplayedSkinPartsMap() {
         return displayedSkinParts;
     }
 
@@ -174,6 +146,9 @@ public class WrappedPacketInSettings extends WrappedPacket {
      * @return Is the skin part enabled
      */
     public boolean isDisplaySkinPartEnabled(DisplayedSkinPart part) {
+        if(displayedSkinParts.isEmpty()) {
+            displayedSkinParts = getDisplayedSkinPartsMap();
+        }
         //1.7.10, we will default the other skin parts to return false.
         if (!displayedSkinParts.containsKey(part)) {
             return false;

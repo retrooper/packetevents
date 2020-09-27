@@ -24,8 +24,8 @@
 
 package io.github.retrooper.packetevents.packetwrappers.out.entityvelocity;
 
-import io.github.retrooper.packetevents.enums.ServerVersion;
-import io.github.retrooper.packetevents.packet.PacketTypeClasses;
+import io.github.retrooper.packetevents.utils.server.ServerVersion;
+import io.github.retrooper.packetevents.packettype.PacketTypeClasses;
 import io.github.retrooper.packetevents.packetwrappers.SendableWrapper;
 import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
 import io.github.retrooper.packetevents.utils.nms.NMSUtils;

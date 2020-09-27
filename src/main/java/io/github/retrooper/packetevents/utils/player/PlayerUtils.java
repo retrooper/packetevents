@@ -25,7 +25,7 @@
 package io.github.retrooper.packetevents.utils.player;
 
 import io.github.retrooper.packetevents.PacketEvents;
-import io.github.retrooper.packetevents.enums.ClientVersion;
+import io.github.retrooper.packetevents.event.impl.PlayerEjectEvent;
 import io.github.retrooper.packetevents.nettyhandler.NettyPacketHandler;
 import io.github.retrooper.packetevents.packetwrappers.SendableWrapper;
 import io.github.retrooper.packetevents.utils.nms.NMSUtils;
@@ -85,7 +85,7 @@ public final class PlayerUtils {
      * @param player
      */
     public void injectPlayer(final Player player) {
-        if (PacketEvents.getSettings().isInjectAsync()) {
+        if (PacketEvents.getSettings().shouldInjectAsync()) {
             NettyPacketHandler.injectPlayerAsync(player);
         } else {
             NettyPacketHandler.injectPlayer(player);
@@ -93,25 +93,12 @@ public final class PlayerUtils {
     }
 
     /**
-     * Use {@link #ejectPlayer(Player)}
-     * @param player
-     */
-    @Deprecated
-    public void uninjectPlayer(final Player player) {
-        if (PacketEvents.getSettings().isUninjectAsync()) {
-            NettyPacketHandler.ejectPlayerAsync(player);
-        } else {
-            NettyPacketHandler.ejectPlayer(player);
-        }
-    }
-
-    /**
      * Eject a player.
-     * (This also calls the {@link io.github.retrooper.packetevents.event.impl.PlayerUninjectEvent})
+     * (This also calls the {@link PlayerEjectEvent})
      * @param player
      */
     public void ejectPlayer(final Player player) {
-        if (PacketEvents.getSettings().isUninjectAsync()) {
+        if (PacketEvents.getSettings().shouldEjectAsync()) {
             NettyPacketHandler.ejectPlayerAsync(player);
         } else {
             NettyPacketHandler.ejectPlayer(player);

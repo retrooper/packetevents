@@ -24,34 +24,39 @@
 
 package io.github.retrooper.packetevents;
 
-import io.github.retrooper.packetevents.enums.ClientVersion;
-import io.github.retrooper.packetevents.enums.ServerVersion;
 import io.github.retrooper.packetevents.event.PacketEvent;
-import io.github.retrooper.packetevents.event.impl.BukkitMoveEvent;
-import io.github.retrooper.packetevents.packet.PacketTypeClasses;
+import io.github.retrooper.packetevents.packettype.PacketTypeClasses;
 import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
 import io.github.retrooper.packetevents.settings.PacketEventsSettings;
+import io.github.retrooper.packetevents.updatechecker.UpdateChecker;
 import io.github.retrooper.packetevents.utils.entityfinder.EntityFinderUtils;
 import io.github.retrooper.packetevents.utils.nms.NMSUtils;
+import io.github.retrooper.packetevents.utils.player.ClientVersion;
+import io.github.retrooper.packetevents.utils.server.ServerVersion;
 import io.github.retrooper.packetevents.utils.versionlookup.VersionLookupUtils;
+import io.github.retrooper.packetevents.version.PEVersion;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
-import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.plugin.Plugin;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
+import java.util.Random;
 
 public final class PacketEvents implements Listener {
+    private static String nettyHandlerIdentifier = generateRandomNettyIdentifier();
+
     private static final PacketEventsAPI packetEventsAPI = new PacketEventsAPI();
     private static final PacketEvents instance = new PacketEvents();
     private static final ArrayList<Plugin> plugins = new ArrayList<Plugin>(1);
     private static boolean loaded, initialized, isBungee;
-    private static final PEVersion version = new PEVersion(1, 6, 9);
+    private static final PEVersion version = new PEVersion(1, 6, 9, 1);
+
+    private static PacketEventsSettings settings = new PacketEventsSettings();
 
     /**
      * This loads the PacketEvents API.
@@ -73,21 +78,32 @@ public final class PacketEvents implements Listener {
      * All PacketEvents' wrappers are setup and do all loading they need to do.
      */
     public static void load() {
-        ServerVersion version = ServerVersion.getVersion();
-        WrappedPacket.version = version;
-        PacketEvent.version = version;
-        NMSUtils.version = version;
-        EntityFinderUtils.version = version;
+        if (!loaded) {
+            ServerVersion version = ServerVersion.getVersion();
+            WrappedPacket.version = version;
+            PacketEvent.version = version;
+            NMSUtils.version = version;
+            EntityFinderUtils.version = version;
 
-        NMSUtils.load();
+            NMSUtils.load();
 
-        PacketTypeClasses.Client.load();
-        PacketTypeClasses.Server.load();
+            PacketTypeClasses.Client.load();
+            PacketTypeClasses.Server.load();
 
-        EntityFinderUtils.load();
+            EntityFinderUtils.load();
 
-        WrappedPacket.loadAllWrappers();
-        loaded = true;
+            WrappedPacket.loadAllWrappers();
+            loaded = true;
+        }
+
+    }
+
+    public static void loadSettings(PacketEventsSettings settings) {
+        PacketEvents.settings = settings;
+    }
+
+    public static void init(final Plugin plugin) {
+        init(plugin, settings);
     }
 
     /**
@@ -101,11 +117,12 @@ public final class PacketEvents implements Listener {
      *
      * @param pl JavaPlugin instance
      */
-    public static void init(final Plugin pl) {
+    public static void init(final Plugin pl, PacketEventsSettings packetEventsSettings) {
         if (!loaded) {
             load();
         }
         if (!initialized) {
+            settings = packetEventsSettings;
             plugins.add(pl);
             //Register Bukkit listener
             Bukkit.getPluginManager().registerEvents(instance, plugins.get(0));
@@ -124,26 +141,10 @@ public final class PacketEvents implements Listener {
                 isBungee = false;
             }
 
-            if (PacketEvents.getAPI().getSettings().shouldCheckForUpdates()) {
-                Bukkit.getScheduler().runTask(pl, new Runnable() {
-                    @Override
-                    public void run() {
-                        new UpdateChecker().handleUpdate();
-                    }
-                });
+            if (settings.shouldCheckForUpdates()) {
+                Bukkit.getScheduler().runTask(pl, () -> new UpdateChecker().handleUpdate());
             }
         }
-    }
-
-    /**
-     * Loads PacketEvents if you haven't already, Sets everything up, injects all players
-     *
-     * @param pl Plugin instance
-     * @deprecated Use {@link #init(Plugin)}
-     */
-    @Deprecated
-    public static void start(final Plugin pl) {
-        init(pl);
     }
 
     /**
@@ -164,11 +165,6 @@ public final class PacketEvents implements Listener {
         return loaded;
     }
 
-    @Deprecated
-    public static boolean hasStarted() {
-        return initialized;
-    }
-
     public static boolean isInitialized() {
         return initialized;
     }
@@ -177,21 +173,21 @@ public final class PacketEvents implements Listener {
         return packetEventsAPI;
     }
 
-    @Deprecated
-    public static Plugin getPlugin() {
-        return plugins.get(0);
-    }
-
     public static ArrayList<Plugin> getPlugins() {
         return plugins;
     }
 
     public static String getHandlerName(final String name) {
-        return "pe-" + PacketEvents.getAPI().getSettings().getIdentifier() + "-" + name;
+        return "pe-" + nettyHandlerIdentifier + "-" + name;
     }
 
+    /**
+     * Get the PacketEvents settings.
+     *
+     * @return Configure some settings for the API
+     */
     public static PacketEventsSettings getSettings() {
-        return PacketEvents.getAPI().getSettings();
+        return settings;
     }
 
     public static PEVersion getVersion() {
@@ -220,11 +216,16 @@ public final class PacketEvents implements Listener {
         PacketEvents.getAPI().getPlayerUtils().clientVersionsMap.remove(e.getPlayer().getUniqueId());
     }
 
-    @EventHandler
-    public void onMove(final PlayerMoveEvent e) {
-        BukkitMoveEvent moveEvent = new BukkitMoveEvent(e);
-        PacketEvents.getAPI().getEventManager().callEvent(moveEvent);
-        e.setCancelled(moveEvent.isCancelled());
+    private static String generateRandomNettyIdentifier() {
+        String alphabet = "abcdefghijklmnopqrstuvwxyz";
+        StringBuilder sb = new StringBuilder();
+        Random random = new Random();
+        while (sb.length() < 13) {
+            int index = (int) (random.nextFloat() * alphabet.length());
+            sb.append(alphabet.charAt(index));
+        }
+
+        return sb.toString();
     }
 
 }
