@@ -26,7 +26,7 @@ package io.github.retrooper.packetevents.settings;
 
 import io.github.retrooper.packetevents.utils.server.ServerVersion;
 
-public final class PacketEventsSettings {
+public class PacketEventsSettings {
     private ServerVersion backupServerVersion = ServerVersion.v_1_7_10;
     private boolean autoResolveClientProtocolVersion;
     private boolean injectAsync = true;
