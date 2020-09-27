@@ -103,6 +103,7 @@ public class WrappedPacketInWindowClick extends WrappedPacket {
 
         windowClickTypeCache.put(6, getArrayListOfWindowClickTypes(WindowClickType.DOUBLE_CLICK));
         isClickModePrimitive = Reflection.getField(packetClass, int.class, 3) != null;
+        invClickTypeClass = NMSUtils.getNMSClassWithoutException("InventoryClickType");
     }
 
     private static ArrayList<WindowClickType> getArrayListOfWindowClickTypes(WindowClickType... types) {
@@ -119,12 +120,10 @@ public class WrappedPacketInWindowClick extends WrappedPacket {
         this.actionNumber = readShort(0);
         Object nmsItemStack = readObject(0, NMSUtils.nmsItemStackClass);
         this.clickedItem = NMSUtils.toBukkitItemStack(nmsItemStack);
-        Object clickMode = readAnyObject(5);
-
         if (isClickModePrimitive) {
-            mode = (int) clickMode;
+            mode = readInt(3);
         } else {
-            mode = invClickTypeMapCache.get(clickMode.toString());
+            mode = invClickTypeMapCache.get(readObject(5, invClickTypeClass).toString());
         }
     }
 

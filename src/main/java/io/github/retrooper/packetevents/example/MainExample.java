@@ -25,9 +25,15 @@
 package io.github.retrooper.packetevents.example;
 
 import io.github.retrooper.packetevents.PacketEvents;
+import io.github.retrooper.packetevents.event.PacketListener;
+import io.github.retrooper.packetevents.event.annotation.PacketHandler;
+import io.github.retrooper.packetevents.event.impl.PacketReceiveEvent;
+import io.github.retrooper.packetevents.packettype.PacketType;
+import io.github.retrooper.packetevents.packetwrappers.in.chat.WrappedPacketInChat;
+import io.github.retrooper.packetevents.utils.server.ServerVersion;
 import org.bukkit.plugin.java.JavaPlugin;
 
-public class MainExample extends JavaPlugin {
+public class MainExample extends JavaPlugin implements PacketListener {
 
     @Override
     public void onLoad() {
@@ -36,7 +42,12 @@ public class MainExample extends JavaPlugin {
 
     @Override
     public void onEnable() {
-        PacketEvents.init(this, new ExamplePacketEventsSettings());
+        PacketEvents.getSettings().injectAsync(true).ejectAsync(true)
+                .autoResolveClientProtocolVersion(true)
+                .backupServerVersion(ServerVersion.v_1_7_10).
+                useProtocolLibIfAvailable(true).checkForUpdates(true);
+        PacketEvents.init(this);
+        PacketEvents.getAPI().getEventManager().registerListener(this);
     }
 
     @Override
