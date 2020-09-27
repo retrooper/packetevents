@@ -31,36 +31,10 @@ import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
 import io.github.retrooper.packetevents.utils.reflection.Reflection;
 
 public final class WrappedPacketInAbilities extends WrappedPacket {
-    private static boolean isMoreThanOneBoolPresent;
-    private boolean isVulnerable;
-    private boolean isFlying;
-    private boolean allowFly;
-    private boolean instantBuild;
-    private float flySpeed;
-    private float walkSpeed;
 
     public WrappedPacketInAbilities(Object packet) {
         super(packet);
     }
-
-    public static void load() {
-        isMoreThanOneBoolPresent = Reflection.getField(PacketTypeClasses.Client.ABILITIES, boolean.class, 1) != null;
-    }
-
-    @Override
-    protected void setup() {
-        if (isMoreThanOneBoolPresent) {
-            this.isVulnerable = readBoolean(0);
-            this.isFlying = readBoolean(1);
-            this.allowFly = readBoolean(2);
-            this.instantBuild = readBoolean(3);
-            this.flySpeed = readFloat(0);
-            this.walkSpeed = readFloat(1);
-        } else {
-            this.isFlying = readBoolean(0);
-        }
-    }
-
     /**
      * This will return null if the server version is not available in 1.16.x and above
      *
@@ -68,13 +42,13 @@ public final class WrappedPacketInAbilities extends WrappedPacket {
      */
     @Deprecated
     @Nullable
-    public Boolean isVulnerable() {
-        return isVulnerable;
+    public boolean isVulnerable() {
+        return readBoolean(0);
     }
 
     @NotNull
     public boolean isFlying() {
-        return isFlying;
+        return readBoolean(1);
     }
 
     /**
@@ -84,8 +58,8 @@ public final class WrappedPacketInAbilities extends WrappedPacket {
      */
     @Deprecated
     @Nullable
-    public Boolean isFlightAllowed() {
-        return allowFly;
+    public boolean isFlightAllowed() {
+        return readBoolean(2);
     }
 
     /**
@@ -95,8 +69,8 @@ public final class WrappedPacketInAbilities extends WrappedPacket {
      */
     @Deprecated
     @Nullable
-    public Boolean canInstantlyBuild() {
-        return instantBuild;
+    public boolean canInstantlyBuild() {
+        return readBoolean(3);
     }
 
     /**
@@ -106,8 +80,8 @@ public final class WrappedPacketInAbilities extends WrappedPacket {
      */
     @Deprecated
     @Nullable
-    public Float getFlySpeed() {
-        return flySpeed;
+    public float getFlySpeed() {
+        return readFloat(0);
     }
 
     /**
@@ -117,7 +91,7 @@ public final class WrappedPacketInAbilities extends WrappedPacket {
      */
     @Deprecated
     @Nullable
-    public Float getWalkSpeed() {
-        return walkSpeed;
+    public float getWalkSpeed() {
+        return readFloat(1);
     }
 }

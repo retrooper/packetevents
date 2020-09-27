@@ -24,6 +24,7 @@
 
 package io.github.retrooper.packetevents.packetwrappers.in.blockplace;
 
+import io.github.retrooper.packetevents.exceptions.WrapperFieldNotFoundException;
 import io.github.retrooper.packetevents.packettype.PacketTypeClasses;
 import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
 import io.github.retrooper.packetevents.utils.nms.NMSUtils;
@@ -34,8 +35,7 @@ import java.lang.reflect.InvocationTargetException;
 
 final class WrappedPacketInBlockPlace_1_8 extends WrappedPacket {
     private static Class<?> blockPlaceClass, blockPositionClass, blockPositionSuperClass;
-    public int x, y, z;
-    public ItemStack itemStack;
+    private Object blockPosObj;
 
     WrappedPacketInBlockPlace_1_8(final Object packet) {
         super(packet);
@@ -51,17 +51,43 @@ final class WrappedPacketInBlockPlace_1_8 extends WrappedPacket {
         blockPositionSuperClass = blockPositionClass.getSuperclass();
     }
 
-    @Override
-    protected void setup() {
+    public int getX() {
+        if(blockPosObj == null) {
+            blockPosObj = new WrappedPacket(packet).readObject(0, blockPositionClass);
+        }
         try {
-            Object nmsBlockPos = Reflection.getField(blockPlaceClass, blockPositionClass, 1).get(packet);
-            x = (int) Reflection.getMethod(blockPositionSuperClass, "getX", 0).invoke(nmsBlockPos);
-            y = (int) Reflection.getMethod(blockPositionSuperClass, "getY", 0).invoke(nmsBlockPos);
-            z = (int) Reflection.getMethod(blockPositionSuperClass, "getZ", 0).invoke(nmsBlockPos);
-
-            this.itemStack = NMSUtils.toBukkitItemStack(readObject(0, NMSUtils.nmsItemStackClass));
+            return (int)Reflection.getMethod(blockPositionSuperClass, "getX", 0).invoke(blockPosObj);
         } catch (IllegalAccessException | InvocationTargetException e) {
             e.printStackTrace();
         }
+        return 0;
+    }
+
+    public int getY() {
+        if(blockPosObj == null) {
+            blockPosObj = new WrappedPacket(packet).readObject(0, blockPositionClass);
+        }
+        try {
+            return (int)Reflection.getMethod(blockPositionSuperClass, "getY", 0).invoke(blockPosObj);
+        } catch (IllegalAccessException | InvocationTargetException e) {
+            e.printStackTrace();
+        }
+        return 0;
+    }
+
+    public int getZ() {
+        if(blockPosObj == null) {
+            blockPosObj = new WrappedPacket(packet).readObject(0, blockPositionClass);
+        }
+        try {
+            return (int)Reflection.getMethod(blockPositionSuperClass, "getZ", 0).invoke(blockPosObj);
+        } catch (IllegalAccessException | InvocationTargetException e) {
+            e.printStackTrace();
+        }
+        return 0;
+    }
+
+    public ItemStack getItemStack() {
+        return NMSUtils.toBukkitItemStack(readObject(0, NMSUtils.nmsItemStackClass));
     }
 }

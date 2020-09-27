@@ -22,25 +22,16 @@
  * SOFTWARE.
  */
 
-package io.github.retrooper.packetevents.packetwrappers.in.armanimation;
+package io.github.retrooper.packetevents.exceptions;
 
-import io.github.retrooper.packetevents.packettype.PacketTypeClasses;
-import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
+import io.github.retrooper.packetevents.utils.reflection.ClassUtil;
 
-public final class WrappedPacketInArmAnimation extends WrappedPacket {
-    private static Class<?> packetClass;
-
-    public WrappedPacketInArmAnimation(Object packet) {
-        super(packet);
+public class WrapperFieldNotFoundException extends RuntimeException{
+    public WrapperFieldNotFoundException(String message) {
+        super(message);
     }
 
-    public static void load() {
-        packetClass = PacketTypeClasses.Client.ARM_ANIMATION;
+    public WrapperFieldNotFoundException(Class<?> packetClass, Class<?> type, int index) {
+        this("PacketEvents failed to find a " + ClassUtil.getClassSimpleName(type) + " indexed " + index + " in the " + packetClass.getName() + " class!");
     }
-
-    @Override
-    public void setup() {
-
-    }
-
 }

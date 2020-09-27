@@ -59,6 +59,11 @@ public final class WrappedPacketInKeepAlive extends WrappedPacket {
      * @return response ID
      */
     public long getId() {
-        return id;
+        if(!integerPresentInIndex0) {
+            return readLong(0);
+        }
+        else {
+            return readInt(0);
+        }
     }
 }

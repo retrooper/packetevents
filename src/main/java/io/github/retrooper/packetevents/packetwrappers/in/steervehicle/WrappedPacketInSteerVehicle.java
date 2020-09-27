@@ -24,63 +24,50 @@
 
 package io.github.retrooper.packetevents.packetwrappers.in.steervehicle;
 
-import io.github.retrooper.packetevents.packettype.PacketTypeClasses;
 import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
 
 public class WrappedPacketInSteerVehicle extends WrappedPacket {
-    private static Class<?> packetClass;
-    private float side, forward;
-    private boolean jump, unmount;
     public WrappedPacketInSteerVehicle(Object packet) {
         super(packet);
     }
 
-    public static void load() {
-        packetClass = PacketTypeClasses.Client.STEER_VEHICLE;
-    }
-
-    @Override
-    protected void setup() {
-        this.side = readFloat(0);
-        this.forward = readFloat(1);
-
-        this.jump = readBoolean(0);
-        this.unmount = readBoolean(1);
-    }
-
     /**
      * Get the side value.
-     *
+     * <p>
      * If positive, they are moving to the left, if negative, they are moving to the right.
+     *
      * @return Side Value
      */
     public float getSideValue() {
-        return side;
+        return readFloat(0);
     }
 
     /**
      * Get the forward value.
-     *
+     * <p>
      * If positive, they are moving forward, if negative, they are moving backwards.
+     *
      * @return Forward Value
      */
     public float getForwardValue() {
-        return forward;
+        return readFloat(1);
     }
 
     /**
      * Is a Jump
+     *
      * @return Is Jump
      */
     public boolean isJump() {
-        return jump;
+        return readBoolean(0);
     }
 
     /**
      * Is an unmount
+     *
      * @return Is Unmounting
      */
     public boolean isUnmount() {
-        return unmount;
+        return readBoolean(1);
     }
 }

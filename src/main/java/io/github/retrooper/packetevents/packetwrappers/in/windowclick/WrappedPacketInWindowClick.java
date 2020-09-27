@@ -112,27 +112,12 @@ public class WrappedPacketInWindowClick extends WrappedPacket {
         return arrayList;
     }
 
-    @Override
-    protected void setup() {
-        this.id = readInt(0);
-        this.slot = readInt(1);
-        this.button = readInt(2);
-        this.actionNumber = readShort(0);
-        Object nmsItemStack = readObject(0, NMSUtils.nmsItemStackClass);
-        this.clickedItem = NMSUtils.toBukkitItemStack(nmsItemStack);
-        if (isClickModePrimitive) {
-            mode = readInt(3);
-        } else {
-            mode = invClickTypeMapCache.get(readObject(5, invClickTypeClass).toString());
-        }
-    }
-
     /**
      * Get the Window ID.
      * @return Get Window ID
      */
     public int getWindowID() {
-        return id;
+        return readInt(0);
     }
 
     /**
@@ -140,7 +125,7 @@ public class WrappedPacketInWindowClick extends WrappedPacket {
      * @return Get Window Slot
      */
     public int getWindowSlot() {
-        return slot;
+        return readInt(1);
     }
 
     /**
@@ -148,7 +133,7 @@ public class WrappedPacketInWindowClick extends WrappedPacket {
      * @return Get Window Button
      */
     public int getWindowButton() {
-        return button;
+        return readInt(2);
     }
 
     /**
@@ -156,7 +141,7 @@ public class WrappedPacketInWindowClick extends WrappedPacket {
      * @return Get Action Number
      */
     public short getActionNumber() {
-        return actionNumber;
+        return readShort(0);
     }
 
     /**
@@ -188,7 +173,11 @@ public class WrappedPacketInWindowClick extends WrappedPacket {
      * @return Get Window Mode.
      */
     public int getMode() {
-        return mode;
+        if (isClickModePrimitive) {
+            return readInt(3);
+        } else {
+            return invClickTypeMapCache.get(readObject(5, invClickTypeClass).toString());
+        }
     }
 
     /**
@@ -196,7 +185,8 @@ public class WrappedPacketInWindowClick extends WrappedPacket {
      * @return Get Clicked ItemStack
      */
     public ItemStack getClickedItem() {
-        return clickedItem;
+        Object nmsItemStack = readObject(0, NMSUtils.nmsItemStackClass);
+        return NMSUtils.toBukkitItemStack(nmsItemStack);
     }
 
     public enum WindowClickType {

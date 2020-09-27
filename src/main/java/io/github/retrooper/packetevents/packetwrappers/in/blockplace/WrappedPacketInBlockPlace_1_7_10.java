@@ -34,8 +34,8 @@ final class WrappedPacketInBlockPlace_1_7_10 extends WrappedPacket {
     public ItemStack itemStack;
     public int blockFace;
 
-    WrappedPacketInBlockPlace_1_7_10(final Player player, final Object packet) {
-        super(player, packet);
+    WrappedPacketInBlockPlace_1_7_10(final Object packet) {
+        super(packet);
     }
 
 

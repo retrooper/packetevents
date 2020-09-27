@@ -35,9 +35,7 @@ import io.github.retrooper.packetevents.utils.reflection.SubclassUtil;
 public final class WrappedPacketInBlockDig extends WrappedPacket {
     private static Class<?> blockDigClass, blockPositionClass, enumDirectionClass, digTypeClass;
     private static boolean isVersionLowerThan_v_1_8;
-    private int x, y, z;
-    private Direction direction;
-    private PlayerDigType digType;
+    private Object blockPosObj, enumDirObj, digTypeObj;
     public WrappedPacketInBlockDig(Object packet) {
         super(packet);
     }
@@ -64,69 +62,55 @@ public final class WrappedPacketInBlockDig extends WrappedPacket {
         }
     }
 
-    @Override
-    protected void setup() {
-        Direction enumDirection = null;
-        PlayerDigType enumDigType = null;
-        int x = 0, y = 0, z = 0;
-        //1.7.10
-        try {
-            if (isVersionLowerThan_v_1_8) {
-                enumDigType = PlayerDigType.values()[(readInt(4))];
-                x = readInt(0);
-                y = readInt(1);
-                z = readInt(2);
-                enumDirection = null;
-            } else {
-                //1.8+
-                final Object blockPosObj = readObject(0, blockPositionClass);
-                final Object enumDirectionObj = readObject(0, enumDirectionClass);
-                final Object digTypeObj = readObject(0, digTypeClass);
-
-                x = Reflection.getField(blockPositionClass, int.class, 0).getInt(blockPosObj);
-                y = Reflection.getField(blockPositionClass, int.class, 1).getInt(blockPosObj);
-                z = Reflection.getField(blockPositionClass, int.class, 2).getInt(blockPosObj);
-
-                //.toString() won't work so we must do this
-                enumDirection = Direction.valueOf(((Enum)enumDirectionObj).name());
-                enumDigType = PlayerDigType.valueOf(((Enum)digTypeObj).name());
-            }
-        } catch (IllegalAccessException e) {
-            e.printStackTrace();
-        }
-        this.x = x;
-        this.y = y;
-        this.z = z;
-        if (enumDirection == null) {
-            this.direction = Direction.NULL;
-        } else {
-            this.direction = enumDirection;
-        }
-        this.digType = enumDigType;
-    }
-
     /**
      * Get X position of the block
      * @return Block Position X
      */
-    public int getBlockPositionX() {
-        return x;
+    public int getX() {
+        if(isVersionLowerThan_v_1_8) {
+            return readInt(0);
+        }
+        else {
+            if(blockPosObj == null) {
+                blockPosObj = readObject(0, blockPositionClass);
+            }
+            WrappedPacket blockPosWrapper = new WrappedPacket(blockPosObj);
+            return blockPosWrapper.readInt(0);
+        }
     }
 
     /**
      * Get Y position of the block
      * @return Block Position Y
      */
-    public int getBlockPositionY() {
-        return y;
+    public int getY() {
+        if(isVersionLowerThan_v_1_8) {
+            return readInt(1);
+        }
+        else {
+            if(blockPosObj == null) {
+                blockPosObj = readObject(0, blockPositionClass);
+            }
+            WrappedPacket blockPosWrapper = new WrappedPacket(blockPosObj);
+            return blockPosWrapper.readInt(1);
+        }
     }
 
     /**
      * Get Z position of the block
      * @return Block Position Z
      */
-    public int getBlockPositionZ() {
-        return z;
+    public int getZ() {
+        if(isVersionLowerThan_v_1_8) {
+            return readInt(2);
+        }
+        else {
+            if(blockPosObj == null) {
+                blockPosObj = readObject(0, blockPositionClass);
+            }
+            WrappedPacket blockPosWrapper = new WrappedPacket(blockPosObj);
+            return blockPosWrapper.readInt(2);
+        }
     }
 
     /**
@@ -135,7 +119,15 @@ public final class WrappedPacketInBlockDig extends WrappedPacket {
      * @return Direction
      */
     public Direction getDirection() {
-        return direction;
+        if(isVersionLowerThan_v_1_8) {
+            return Direction.NULL;
+        }
+        else {
+            if(enumDirObj == null) {
+                enumDirObj = readObject(0, enumDirectionClass);
+            }
+            return Direction.valueOf(((Enum)enumDirObj).name());
+        }
     }
 
     /**
@@ -143,7 +135,12 @@ public final class WrappedPacketInBlockDig extends WrappedPacket {
      * @return Dig Type
      */
     public PlayerDigType getDigType() {
-        return digType;
+        if(isVersionLowerThan_v_1_8) {
+            return PlayerDigType.values()[readInt(4)];
+        }
+        else {
+            return PlayerDigType.valueOf(((Enum)readObject(0, digTypeClass)).name());
+        }
     }
 
     public enum PlayerDigType {
