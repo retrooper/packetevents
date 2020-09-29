@@ -25,13 +25,13 @@
 package io.github.retrooper.packetevents.packetwrappers.in.flying;
 
 
-import io.github.retrooper.packetevents.packettype.PacketTypeClasses;
 import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
 
 public class WrappedPacketInFlying extends WrappedPacket {
     public WrappedPacketInFlying(Object packet) {
         super(packet);
     }
+    
     public double getX() {
         return readDouble(0);
     }

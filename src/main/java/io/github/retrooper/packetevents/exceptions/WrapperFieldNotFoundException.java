@@ -32,6 +32,6 @@ public class WrapperFieldNotFoundException extends RuntimeException{
     }
 
     public WrapperFieldNotFoundException(Class<?> packetClass, Class<?> type, int index) {
-        this("PacketEvents failed to find a " + ClassUtil.getClassSimpleName(type) + " indexed " + index + " in the " + packetClass.getName() + " class!");
+        this("PacketEvents failed to find a " + ClassUtil.getClassSimpleName(type) + " indexed " + index + " by its type in the " + packetClass.getName() + " class!");
     }
 }

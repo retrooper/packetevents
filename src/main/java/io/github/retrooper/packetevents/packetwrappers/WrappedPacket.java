@@ -85,12 +85,12 @@ public class WrappedPacket implements WrapperPacketReader {
             this.player = null;
             return;
         }
-        this.packetClass = packetClass;
         if (packet.getClass().getSuperclass().equals(PacketTypeClasses.Client.FLYING)) {
             packetClass = PacketTypeClasses.Client.FLYING;
         } else if (packet.getClass().getSuperclass().equals(PacketTypeClasses.Server.ENTITY)) {
             packetClass = PacketTypeClasses.Server.ENTITY;
         }
+        this.packetClass = packetClass;
 
 
         if (!fieldCache.containsKey(packetClass)) {
