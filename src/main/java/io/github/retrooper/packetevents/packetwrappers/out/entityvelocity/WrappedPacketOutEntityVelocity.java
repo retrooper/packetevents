@@ -123,7 +123,7 @@ public final class WrappedPacketOutEntityVelocity extends WrappedPacket implemen
      * you lookup the entity by yourself with this entity ID.
      * @return Entity ID
      */
-    public int getEntityId() {
+    public int getEntityID() {
         return entityID;
     }
 

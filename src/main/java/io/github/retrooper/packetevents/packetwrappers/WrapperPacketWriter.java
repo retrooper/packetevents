@@ -22,39 +22,24 @@
  * SOFTWARE.
  */
 
-package io.github.retrooper.packetevents.packetwrappers.in.keepalive;
+package io.github.retrooper.packetevents.packetwrappers;
 
-import io.github.retrooper.packetevents.packettype.PacketTypeClasses;
-import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
-import io.github.retrooper.packetevents.utils.reflection.Reflection;
+public interface WrapperPacketWriter {
 
-public final class WrappedPacketInKeepAlive extends WrappedPacket {
-    private static Class<?> packetClass;
-    private static boolean integerPresentInIndex0;
-    private long id;
+    //TODO write for the arrays
+    void writeBoolean(int index, boolean value);
 
-    public WrappedPacketInKeepAlive(final Object packet) {
-        super(packet);
-    }
+    void writeByte(int index, byte value);
 
-    public static void load() {
-        packetClass = PacketTypeClasses.Client.KEEP_ALIVE;
-        integerPresentInIndex0 = Reflection.getField(packetClass, int.class, 0) != null;
-    }
+    void writeShort(int index, short value);
 
-    /**
-     * Get the ID response from the client.
-     *
-     * You may cast this down to an int if you are on 1.7.10 - 1.12.2.
-     * On 1.13.2 - 1.16.3 a long is sent.
-     * @return response ID
-     */
-    public long getId() {
-        if(!integerPresentInIndex0) {
-            return readLong(0);
-        }
-        else {
-            return readInt(0);
-        }
-    }
+    void writeInt(int index, int value);
+
+    void writeLong(int index, long value);
+
+    void writeFloat(int index, float value);
+
+    void writeDouble(int index, double value);
+
+    void writeString(int index, String value);
 }

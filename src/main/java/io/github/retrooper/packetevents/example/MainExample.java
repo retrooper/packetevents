@@ -38,6 +38,7 @@ public class MainExample extends JavaPlugin implements PacketListener {
 
     @Override
     public void onEnable() {
+
         PacketEvents.getSettings().injectAsync(true).ejectAsync(true)
                 .autoResolveClientProtocolVersion(true)
                 .backupServerVersion(ServerVersion.v_1_7_10).

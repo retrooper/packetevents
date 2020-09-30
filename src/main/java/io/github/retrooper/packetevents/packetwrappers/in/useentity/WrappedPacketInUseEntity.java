@@ -32,8 +32,7 @@ import org.bukkit.entity.Entity;
 public final class WrappedPacketInUseEntity extends WrappedPacket {
     private static Class<?> enumEntityUseActionClass;
     private Entity entity;
-    private int entityID;
-    private boolean hasInitiatedEntityID = false;
+    private int entityID = -1;
     public WrappedPacketInUseEntity(final Object packet) {
         super(packet);
     }
@@ -61,7 +60,7 @@ public final class WrappedPacketInUseEntity extends WrappedPacket {
         if(entity != null) {
             return entity;
         }
-        return entity = NMSUtils.getEntityById(getEntityId());
+        return entity = NMSUtils.getEntityById(getEntityID());
     }
 
     /**
@@ -70,12 +69,11 @@ public final class WrappedPacketInUseEntity extends WrappedPacket {
      * you lookup the entity by yourself with this entity ID.
      * @return Entity ID
      */
-    public int getEntityId() {
-        if(hasInitiatedEntityID) {
+    public int getEntityID() {
+        if(entityID != -1) {
             return entityID;
         }
         else {
-            hasInitiatedEntityID = true;
             return entityID = readInt(0);
         }
     }

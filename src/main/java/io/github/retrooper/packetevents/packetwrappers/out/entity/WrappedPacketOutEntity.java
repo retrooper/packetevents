@@ -148,7 +148,7 @@ public class WrappedPacketOutEntity extends WrappedPacket {
         if (entity != null) {
             return entity;
         }
-        return entity = NMSUtils.getEntityById(getEntityId());
+        return entity = NMSUtils.getEntityById(getEntityID());
     }
 
     /**
@@ -158,7 +158,7 @@ public class WrappedPacketOutEntity extends WrappedPacket {
      *
      * @return Entity ID
      */
-    public int getEntityId() {
+    public int getEntityID() {
         if (entityIDInitiated) {
             return entityID;
         } else {

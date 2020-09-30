@@ -103,7 +103,7 @@ public final class WrappedPacketOutAnimation extends WrappedPacket implements Se
      * you lookup the entity by yourself with this entity ID.
      * @return Entity ID
      */
-    public int getEntityId() {
+    public int getEntityID() {
         return entityID;
     }
 
