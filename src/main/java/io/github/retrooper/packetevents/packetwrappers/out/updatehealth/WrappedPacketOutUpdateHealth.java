@@ -37,15 +37,18 @@ public final class WrappedPacketOutUpdateHealth extends WrappedPacket implements
     private static Constructor<?> packetConstructor;
     private float health, foodSaturation;
     private int food;
+    private boolean isListening = false;
+
     public WrappedPacketOutUpdateHealth(final Object packet) {
         super(packet);
+        isListening = true;
     }
 
     /**
      * See https://wiki.vg/Protocol#Update_Health
      *
-     * @param health 0 or less = dead, 20 = full HP
-     * @param food 0–20
+     * @param health         0 or less = dead, 20 = full HP
+     * @param food           0–20
      * @param foodSaturation Seems to vary from 0.0 to 5.0 in integer increments
      */
     public WrappedPacketOutUpdateHealth(final float health, final int food, final float foodSaturation) {
@@ -65,40 +68,44 @@ public final class WrappedPacketOutUpdateHealth extends WrappedPacket implements
         }
     }
 
-    @Override
-    protected void setup() {
-        try {
-            this.health = readFloat(0);
-            this.foodSaturation = readFloat(1);
-            this.food = Reflection.getField(packetClass, int.class, 0).getInt(packet);
-        } catch (IllegalAccessException e) {
-            e.printStackTrace();
-        }
-
-    }
-
     /**
      * Get health value.
+     *
      * @return Get Health
      */
     public float getHealth() {
-        return health;
+        if (isListening) {
+            return readFloat(0);
+        } else {
+            return health;
+        }
     }
 
     /**
      * Get food saturation value.
+     *
      * @return Get Food Saturation
      */
     public float getFoodSaturation() {
-        return foodSaturation;
+        if (isListening) {
+            return readFloat(1);
+        } else {
+            return foodSaturation;
+        }
     }
 
     /**
      * Get food value.
+     *
      * @return Get Food
      */
     public int getFood() {
-        return food;
+        if(isListening) {
+            return readInt(0);
+        }
+        else {
+            return food;
+        }
     }
 
     @Override
