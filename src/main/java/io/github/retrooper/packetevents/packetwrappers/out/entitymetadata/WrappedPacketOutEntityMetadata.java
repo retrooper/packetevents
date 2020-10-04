@@ -22,16 +22,24 @@
  * SOFTWARE.
  */
 
-package io.github.retrooper.packetevents.exceptions;
+package io.github.retrooper.packetevents.packetwrappers.out.entitymetadata;
 
-import io.github.retrooper.packetevents.utils.reflection.ClassUtil;
+import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
 
-public class WrapperFieldNotFoundException extends RuntimeException{
-    public WrapperFieldNotFoundException(String message) {
-        super(message);
+public class WrappedPacketOutEntityMetadata extends WrappedPacket {
+    private boolean isListening = false;
+
+    public WrappedPacketOutEntityMetadata(Object packet) {
+        super(packet);
+        isListening = true;
     }
 
-    public WrapperFieldNotFoundException(Class<?> packetClass, Class<?> type, int index) {
-        this("PacketEvents failed to find a " + ClassUtil.getClassSimpleName(type) + " indexed " + index + " by its type in the " + packetClass.getName() + " class!");
+    public int getEntityID() {
+        if (isListening) {
+            return readInt(0);
+        } else {
+
+        }
+        return -1;
     }
 }

@@ -42,15 +42,6 @@ public final class WrappedPacketInKeepAlive extends WrappedPacket {
         integerPresentInIndex0 = Reflection.getField(packetClass, int.class, 0) != null;
     }
 
-    @Override
-    protected void setup() {
-        if (!integerPresentInIndex0) {
-            this.id = readLong(0);
-        } else {
-            this.id = readInt(0);
-        }
-    }
-
     /**
      * Get the ID response from the client.
      *

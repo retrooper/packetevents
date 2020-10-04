@@ -22,16 +22,24 @@
  * SOFTWARE.
  */
 
-package io.github.retrooper.packetevents.exceptions;
+package io.github.retrooper.packetevents.packetwrappers;
 
-import io.github.retrooper.packetevents.utils.reflection.ClassUtil;
+public interface WrapperPacketWriter {
 
-public class WrapperFieldNotFoundException extends RuntimeException{
-    public WrapperFieldNotFoundException(String message) {
-        super(message);
-    }
+    //TODO write for the arrays
+    void writeBoolean(int index, boolean value);
 
-    public WrapperFieldNotFoundException(Class<?> packetClass, Class<?> type, int index) {
-        this("PacketEvents failed to find a " + ClassUtil.getClassSimpleName(type) + " indexed " + index + " by its type in the " + packetClass.getName() + " class!");
-    }
+    void writeByte(int index, byte value);
+
+    void writeShort(int index, short value);
+
+    void writeInt(int index, int value);
+
+    void writeLong(int index, long value);
+
+    void writeFloat(int index, float value);
+
+    void writeDouble(int index, double value);
+
+    void writeString(int index, String value);
 }

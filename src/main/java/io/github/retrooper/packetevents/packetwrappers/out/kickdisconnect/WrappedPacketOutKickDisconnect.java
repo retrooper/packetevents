@@ -37,9 +37,11 @@ public final class WrappedPacketOutKickDisconnect extends WrappedPacket implemen
     private static Class<?> packetClass, iChatBaseComponentClass;
     private static Constructor<?> kickDisconnectConstructor;
     private String kickMessage;
+    private boolean isListening = false;
 
     public WrappedPacketOutKickDisconnect(final Object packet) {
         super(packet);
+        isListening = true;
     }
 
     public WrappedPacketOutKickDisconnect(final String kickMessage) {
@@ -62,18 +64,18 @@ public final class WrappedPacketOutKickDisconnect extends WrappedPacket implemen
         }
     }
 
-    @Override
-    protected void setup() {
-        Object ichatbaseComponentoObject = readObject(0, iChatBaseComponentClass);
-        this.kickMessage = WrappedPacketOutChat.toStringFromIChatBaseComponent(ichatbaseComponentoObject);
-    }
-
     /**
      * Get the kick message.
+     *
      * @return Get Kick Message
      */
     public String getKickMessage() {
-        return kickMessage;
+        if (isListening) {
+            Object iChatBaseComponentObject = readObject(0, iChatBaseComponentClass);
+            return WrappedPacketOutChat.toStringFromIChatBaseComponent(iChatBaseComponentObject);
+        } else {
+            return kickMessage;
+        }
     }
 
     @Override

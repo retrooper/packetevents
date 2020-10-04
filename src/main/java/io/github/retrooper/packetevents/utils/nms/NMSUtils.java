@@ -48,11 +48,10 @@ public final class NMSUtils {
     private static final String nmsDir = ServerVersion.getNMSDirectory();
     private static final String obcDir = ServerVersion.getOBCDirectory();
     public static String nettyPrefix = "io.netty";
-    public static Class<?> minecraftServerClass, craftWorldClass, playerInteractManagerClass,
-            packetClass, entityPlayerClass, playerConnectionClass, craftServerClass,
+    public static Class<?> nmsEntityClass, minecraftServerClass, craftWorldClass, playerInteractManagerClass, entityPlayerClass, playerConnectionClass, craftServerClass,
             craftPlayerClass, serverConnectionClass, craftEntityClass,
             craftItemStack, nmsItemStackClass, networkManagerClass, nettyChannelClass;
-    private static Method craftWorldGetHandle,getCraftWorldHandleMethod, getServerConnection, getCraftPlayerHandle, getCraftEntityHandle, sendPacketMethod, asBukkitCopy;
+    private static Method craftWorldGetHandle,getCraftWorldHandleMethod, getServerConnection, getCraftPlayerHandle, getCraftEntityHandle, asBukkitCopy;
     private static Field entityPlayerPingField, playerConnectionField;
 
     public static final HashMap<UUID, Object> channelCache = new HashMap<>();
@@ -70,12 +69,12 @@ public final class NMSUtils {
         }
         try {
             nettyChannelClass = getNettyClass("channel.Channel");
+            nmsEntityClass = getNMSClass("Entity");
             minecraftServerClass = getNMSClass("MinecraftServer");
             craftWorldClass = getOBCClass("CraftWorld");
             craftPlayerClass = getOBCClass("entity.CraftPlayer");
             craftServerClass = getOBCClass("CraftServer");
             entityPlayerClass = getNMSClass("EntityPlayer");
-            packetClass = getNMSClass("Packet");
             playerConnectionClass = getNMSClass("PlayerConnection");
             serverConnectionClass = getNMSClass("ServerConnection");
             craftEntityClass = getOBCClass("entity.CraftEntity");
@@ -92,7 +91,6 @@ public final class NMSUtils {
             getCraftWorldHandleMethod = craftWorldClass.getMethod("getHandle");
             getCraftPlayerHandle = craftPlayerClass.getMethod("getHandle");
             getCraftEntityHandle = craftEntityClass.getMethod("getHandle");
-            sendPacketMethod = playerConnectionClass.getMethod("sendPacket", packetClass);
             getServerConnection = minecraftServerClass.getMethod("getServerConnection");
             asBukkitCopy = craftItemStack.getMethod("asBukkitCopy", nmsItemStackClass);
             craftWorldGetHandle = craftWorldClass.getMethod("getHandle");
@@ -147,6 +145,14 @@ public final class NMSUtils {
             return "g";
         }
         return "f";
+    }
+
+    public static Object getNMSEntityById(final int id) {
+        return EntityFinderUtils.getNMSEntityById(id);
+    }
+
+    public static Object getNMSEntityByIdWithWorld(final World world, final int id) {
+        return EntityFinderUtils.getNMSEntityByIdWithWorld(world, id);
     }
 
     @Nullable

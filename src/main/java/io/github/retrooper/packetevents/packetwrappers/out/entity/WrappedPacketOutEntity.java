@@ -34,17 +34,18 @@ import java.lang.reflect.Field;
 
 public class WrappedPacketOutEntity extends WrappedPacket {
     private static Class<?> packetClass;
-    private boolean entityIDInitiated = false;
-    private int entityID = 0;
+    private int entityID = -1;
     //Byte = 1.7.10->1.8.8, Int = 1.9->1.15.x, Short = 1.16.x
     private static byte mode = 0; //byte = 0, int = 1, short = 2
     private static double dXYZDivisor = 0.0;
     private static int yawByteIndex = 0;
     private static int pitchByteIndex = 1;
     private Entity entity;
+    private boolean isListening = false;
 
     public WrappedPacketOutEntity(Object packet) {
         super(packet);
+        isListening = true;
     }
 
     public static void load() {
@@ -76,7 +77,11 @@ public class WrappedPacketOutEntity extends WrappedPacket {
      * @return Get Byte Pitch
      */
     public byte getPitch() {
-        return readByte(pitchByteIndex);
+        if (isListening) {
+            return readByte(pitchByteIndex);
+        } else {
+            return 0;
+        }
     }
 
     /**
@@ -85,7 +90,11 @@ public class WrappedPacketOutEntity extends WrappedPacket {
      * @return Get Byte Yaw
      */
     public byte getYaw() {
-        return readByte(yawByteIndex);
+        if (isListening) {
+            return readByte(yawByteIndex);
+        } else {
+            return 0;
+        }
     }
 
     /**
@@ -94,13 +103,17 @@ public class WrappedPacketOutEntity extends WrappedPacket {
      * @return Delta X
      */
     public double getDeltaX() {
-        switch (mode) {
-            case 0:
-                return readByte(0) / dXYZDivisor;
-            case 1:
-                return readInt(1) / dXYZDivisor;
-            case 2:
-                return readShort(0) / dXYZDivisor;
+        if (isListening) {
+            switch (mode) {
+                case 0:
+                    return readByte(0) / dXYZDivisor;
+                case 1:
+                    return readInt(1) / dXYZDivisor;
+                case 2:
+                    return readShort(0) / dXYZDivisor;
+            }
+        } else {
+
         }
         return 0.0;
     }
@@ -111,13 +124,17 @@ public class WrappedPacketOutEntity extends WrappedPacket {
      * @return Delta Y
      */
     public double getDeltaY() {
-        switch (mode) {
-            case 0:
-                return readByte(1) / dXYZDivisor;
-            case 1:
-                return readInt(2) / dXYZDivisor;
-            case 2:
-                return readShort(1) / dXYZDivisor;
+        if (isListening) {
+            switch (mode) {
+                case 0:
+                    return readByte(1) / dXYZDivisor;
+                case 1:
+                    return readInt(2) / dXYZDivisor;
+                case 2:
+                    return readShort(1) / dXYZDivisor;
+            }
+        } else {
+
         }
         return 0.0;
     }
@@ -128,13 +145,17 @@ public class WrappedPacketOutEntity extends WrappedPacket {
      * @return Delta Z
      */
     public double getDeltaZ() {
-        switch (mode) {
-            case 0:
-                return readByte(2) / dXYZDivisor;
-            case 1:
-                return readInt(3) / dXYZDivisor;
-            case 2:
-                return readShort(2) / dXYZDivisor;
+        if (isListening) {
+            switch (mode) {
+                case 0:
+                    return readByte(2) / dXYZDivisor;
+                case 1:
+                    return readInt(3) / dXYZDivisor;
+                case 2:
+                    return readShort(2) / dXYZDivisor;
+            }
+        } else {
+
         }
         return 0.0;
     }
@@ -148,7 +169,7 @@ public class WrappedPacketOutEntity extends WrappedPacket {
         if (entity != null) {
             return entity;
         }
-        return entity = NMSUtils.getEntityById(getEntityId());
+        return entity = NMSUtils.getEntityById(getEntityID());
     }
 
     /**
@@ -158,11 +179,10 @@ public class WrappedPacketOutEntity extends WrappedPacket {
      *
      * @return Entity ID
      */
-    public int getEntityId() {
-        if (entityIDInitiated) {
+    public int getEntityID() {
+        if (entityID != -1) {
             return entityID;
         } else {
-            entityIDInitiated = true;
             return entityID = readInt(0);
         }
     }
@@ -173,6 +193,11 @@ public class WrappedPacketOutEntity extends WrappedPacket {
      * @return On Ground
      */
     public boolean isOnGround() {
-        return readBoolean(0);
+        if (isListening) {
+            return readBoolean(0);
+        } else {
+
+        }
+        return false;
     }
 }

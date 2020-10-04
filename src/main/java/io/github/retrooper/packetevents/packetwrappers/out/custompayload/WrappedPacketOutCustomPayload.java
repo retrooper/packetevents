@@ -46,6 +46,7 @@ public class WrappedPacketOutCustomPayload extends WrappedPacket implements Send
     private static int minecraftKeyIndexInClass;
 
     private static byte constructorMode = 0;
+    private boolean isListening = false;
 
     public static void load() {
         packetClass = PacketTypeClasses.Server.CUSTOM_PAYLOAD;
@@ -121,6 +122,7 @@ public class WrappedPacketOutCustomPayload extends WrappedPacket implements Send
 
     public WrappedPacketOutCustomPayload(Object packet) {
         super(packet);
+        isListening = true;
     }
 
     @Override
@@ -152,11 +154,42 @@ public class WrappedPacketOutCustomPayload extends WrappedPacket implements Send
     }
 
     public String getTag() {
-        return tag;
+        if(isListening) {
+            switch(constructorMode) {
+                case 0:
+                case 1:
+                    return readString(0);
+                case 2:
+                    Object minecraftKey = readObject(minecraftKeyIndexInClass, minecraftKeyClass);
+                    WrappedPacket minecraftKeyWrapper = new WrappedPacket(minecraftKey);
+                    return minecraftKeyWrapper.readString(1);
+            }
+        }
+        else {
+            return tag;
+        }
+        return null;
     }
 
     public byte[] getData() {
-        return data;
+        if(isListening) {
+            switch(constructorMode) {
+                case 0:
+                    return readByteArray(0);
+                case 1:
+                case 2:
+                    Object dataSerializer = readObject(0, packetDataSerializerClass);
+                    WrappedPacket byteBufWrapper = new WrappedPacket(dataSerializer);
+
+                    Object byteBuf = byteBufWrapper.readObject(0, byteBufClass);
+
+                    return ByteBufUtil.getBytes(byteBuf);
+            }
+        }
+        else {
+            return data;
+        }
+        return null;
     }
 
     @Override

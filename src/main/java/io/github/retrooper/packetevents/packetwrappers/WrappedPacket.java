@@ -36,6 +36,7 @@ import io.github.retrooper.packetevents.packetwrappers.in.settings.WrappedPacket
 import io.github.retrooper.packetevents.packetwrappers.in.updatesign.WrappedPacketInUpdateSign;
 import io.github.retrooper.packetevents.packetwrappers.in.useentity.WrappedPacketInUseEntity;
 import io.github.retrooper.packetevents.packetwrappers.in.windowclick.WrappedPacketInWindowClick;
+import io.github.retrooper.packetevents.packetwrappers.out.entityteleport.WrappedPacketOutEntityTeleport;
 import io.github.retrooper.packetevents.packetwrappers.out.abilities.WrappedPacketOutAbilities;
 import io.github.retrooper.packetevents.packetwrappers.out.animation.WrappedPacketOutAnimation;
 import io.github.retrooper.packetevents.packetwrappers.out.chat.WrappedPacketOutChat;
@@ -57,7 +58,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-public class WrappedPacket implements WrapperPacketReader {
+public class WrappedPacket implements WrapperPacketReader, WrapperPacketWriter {
     private static final HashMap<Class<?>, HashMap<Class<?>, Field[]>> fieldCache = new HashMap<>();
     public static ServerVersion version;
     protected final Player player;
@@ -65,7 +66,9 @@ public class WrappedPacket implements WrapperPacketReader {
     private Class<?> packetClass;
 
     public WrappedPacket() {
-        this(null, null, null);
+        this.player = null;
+        this.packet = null;
+        this.packetClass = null;
     }
 
     public WrappedPacket(final Object packet) {
@@ -85,12 +88,12 @@ public class WrappedPacket implements WrapperPacketReader {
             this.player = null;
             return;
         }
-        this.packetClass = packetClass;
         if (packet.getClass().getSuperclass().equals(PacketTypeClasses.Client.FLYING)) {
             packetClass = PacketTypeClasses.Client.FLYING;
         } else if (packet.getClass().getSuperclass().equals(PacketTypeClasses.Server.ENTITY)) {
             packetClass = PacketTypeClasses.Server.ENTITY;
         }
+        this.packetClass = packetClass;
 
 
         if (!fieldCache.containsKey(packetClass)) {
@@ -240,6 +243,7 @@ public class WrappedPacket implements WrapperPacketReader {
         WrappedPacketOutChat.load();
         WrappedPacketOutEntity.load();
         WrappedPacketOutEntityVelocity.load();
+        WrappedPacketOutEntityTeleport.load();
         WrappedPacketOutKeepAlive.load();
         WrappedPacketOutKickDisconnect.load();
         WrappedPacketOutPosition.load();
@@ -546,8 +550,12 @@ public class WrappedPacket implements WrapperPacketReader {
 
     public Object readAnyObject(int index) {
         try {
+            Field f = packetClass.getDeclaredFields()[index];
+            if (!f.isAccessible()) {
+                f.setAccessible(true);
+            }
             try {
-                return packetClass.getDeclaredFields()[index].get(packet);
+                return f.get(packet);
             } catch (IllegalAccessException e) {
                 e.printStackTrace();
             }
@@ -584,5 +592,117 @@ public class WrappedPacket implements WrapperPacketReader {
 
     public Object[] readObjectArray(int index, Class<?> type) {
         return (Object[]) readObject(index, type);
+    }
+
+    @Override
+    public void writeBoolean(int index, boolean value) {
+        if (fieldCache.containsKey(packetClass)) {
+            try {
+                fieldCache.get(packetClass).get(boolean.class)[index].setBoolean(packet, value);
+            } catch (IllegalAccessException | NullPointerException e) {
+                if(e instanceof NullPointerException) {
+                    throw new WrapperFieldNotFoundException(packetClass, boolean.class, index);
+                }
+                e.printStackTrace();
+            }
+        }
+    }
+
+    @Override
+    public void writeByte(int index, byte value) {
+        if (fieldCache.containsKey(packetClass)) {
+            try {
+                fieldCache.get(packetClass).get(byte.class)[index].setByte(packet, value);
+            } catch (IllegalAccessException | NullPointerException e) {
+                if(e instanceof NullPointerException) {
+                    throw new WrapperFieldNotFoundException(packetClass, byte.class, index);
+                }
+                e.printStackTrace();
+            }
+        }
+    }
+
+    @Override
+    public void writeShort(int index, short value) {
+        if (fieldCache.containsKey(packetClass)) {
+            try {
+                fieldCache.get(packetClass).get(short.class)[index].setShort(packet, value);
+            } catch (IllegalAccessException | NullPointerException e) {
+                if (e instanceof NullPointerException) {
+                    throw new WrapperFieldNotFoundException(packetClass, short.class, index);
+                }
+                e.printStackTrace();
+            }
+        }
+    }
+
+    @Override
+    public void writeInt(int index, int value) {
+        if (fieldCache.containsKey(packetClass)) {
+            try {
+                fieldCache.get(packetClass).get(int.class)[index].setInt(packet, value);
+            } catch (IllegalAccessException | NullPointerException e) {
+                if (e instanceof NullPointerException) {
+                    throw new WrapperFieldNotFoundException(packetClass, int.class, index);
+                }
+                e.printStackTrace();
+            }
+        }
+    }
+
+    @Override
+    public void writeLong(int index, long value) {
+        if (fieldCache.containsKey(packetClass)) {
+            try {
+                fieldCache.get(packetClass).get(long.class)[index].setLong(packet, value);
+            } catch (IllegalAccessException | NullPointerException e) {
+                if(e instanceof NullPointerException) {
+                    throw new WrapperFieldNotFoundException(packetClass, long.class, index);
+                }
+                e.printStackTrace();
+            }
+        }
+    }
+
+    @Override
+    public void writeFloat(int index, float value) {
+        if (fieldCache.containsKey(packetClass)) {
+            try {
+                fieldCache.get(packetClass).get(float.class)[index].setFloat(packet, value);
+            } catch (IllegalAccessException | NullPointerException e) {
+                if(e instanceof NullPointerException) {
+                    throw new WrapperFieldNotFoundException(packetClass, float.class, index);
+                }
+                e.printStackTrace();
+            }
+        }
+    }
+
+    @Override
+    public void writeDouble(int index, double value) {
+        if (fieldCache.containsKey(packetClass)) {
+            try {
+                fieldCache.get(packetClass).get(double.class)[index].setDouble(packet, value);
+            } catch (IllegalAccessException | NullPointerException e) {
+                if(e instanceof NullPointerException) {
+                    throw new WrapperFieldNotFoundException(packetClass, double.class, index);
+                }
+                e.printStackTrace();
+            }
+        }
+    }
+
+    @Override
+    public void writeString(int index, String value) {
+        if (fieldCache.containsKey(packetClass)) {
+            try {
+                fieldCache.get(packetClass).get(String.class)[index].set(packet, value);
+            } catch (IllegalAccessException | NullPointerException e) {
+                if(e instanceof NullPointerException) {
+                    throw new WrapperFieldNotFoundException(packetClass, String.class, index);
+                }
+                e.printStackTrace();
+            }
+        }
     }
 }
