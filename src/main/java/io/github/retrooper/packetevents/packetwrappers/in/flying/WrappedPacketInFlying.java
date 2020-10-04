@@ -25,72 +25,42 @@
 package io.github.retrooper.packetevents.packetwrappers.in.flying;
 
 
-import io.github.retrooper.packetevents.packet.PacketTypeClasses;
 import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
 
 public class WrappedPacketInFlying extends WrappedPacket {
-    private static Class<?> flyingClass;
-    private double x;
-    private double y;
-    private double z;
-    private float yaw;
-    private float pitch;
-    private boolean onGround;
-    private boolean isPosition;
-    private boolean isLook;
     public WrappedPacketInFlying(Object packet) {
         super(packet);
     }
-
-    public static void load() {
-        flyingClass = PacketTypeClasses.Client.FLYING;
-    }
-
-    @Override
-    protected void setup() {
-        x = readDouble(0);
-        y = readDouble(1);
-        z = readDouble(2);
-
-        yaw = readFloat(0);
-        pitch = readFloat(1);
-
-        onGround = readBoolean(0);
-
-        isPosition = readBoolean(1);
-        isLook = readBoolean(2);
-    }
-
+    
     public double getX() {
-        return x;
+        return readDouble(0);
     }
 
     public double getY() {
-        return y;
+        return readDouble(1);
     }
 
     public double getZ() {
-        return z;
+        return readDouble(2);
     }
 
     public float getYaw() {
-        return yaw;
+        return readFloat(0);
     }
 
     public float getPitch() {
-        return pitch;
+        return readFloat(1);
     }
 
     public boolean isOnGround() {
-        return onGround;
+        return readBoolean(0);
     }
 
     public final boolean isPosition() {
-        return isPosition;
+        return readBoolean(1);
     }
 
     public final boolean isLook() {
-        return isLook;
+        return readBoolean(2);
     }
-
 }

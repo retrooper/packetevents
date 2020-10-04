@@ -22,25 +22,18 @@
  * SOFTWARE.
  */
 
-package io.github.retrooper.packetevents.packetwrappers.in.armanimation;
+package io.github.retrooper.packetevents.event.annotation;
 
-import io.github.retrooper.packetevents.packet.PacketTypeClasses;
-import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
+import io.github.retrooper.packetevents.event.priority.PacketEventPriority;
 
-public final class WrappedPacketInArmAnimation extends WrappedPacket {
-    private static Class<?> packetClass;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
-    public WrappedPacketInArmAnimation(Object packet) {
-        super(packet);
-    }
+@Target(ElementType.METHOD)
+@Retention(RetentionPolicy.RUNTIME)
 
-    public static void load() {
-        packetClass = PacketTypeClasses.Client.ARM_ANIMATION;
-    }
-
-    @Override
-    public void setup() {
-
-    }
-
+public @interface PacketHandler {
+    byte priority() default PacketEventPriority.NORMAL;
 }

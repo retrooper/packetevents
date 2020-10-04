@@ -24,36 +24,20 @@
 
 package io.github.retrooper.packetevents.packetwrappers.in.helditemslot;
 
-import io.github.retrooper.packetevents.packet.PacketTypeClasses;
+import io.github.retrooper.packetevents.packettype.PacketTypeClasses;
 import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
 
 public final class WrappedPacketInHeldItemSlot extends WrappedPacket {
-    private static Class<?> packetClass;
-    private int itemInHandIndex;
-
     public WrappedPacketInHeldItemSlot(Object packet) {
         super(packet);
-    }
-
-    public static void load() {
-        packetClass = PacketTypeClasses.Client.HELD_ITEM_SLOT;
-    }
-
-    @Override
-    public void setup() {
-        try {
-            itemInHandIndex = readInt(0);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
     }
 
     /**
      * Get the index of the item we currently have in hand.
      * @return Item in hand Index
      */
-    public int getItemInHandIndex() {
-        return itemInHandIndex;
+    public int getCurrentSelectedSlot() {
+        return readInt(0);
     }
 
 }

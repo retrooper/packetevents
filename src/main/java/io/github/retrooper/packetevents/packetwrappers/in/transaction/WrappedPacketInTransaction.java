@@ -24,50 +24,37 @@
 
 package io.github.retrooper.packetevents.packetwrappers.in.transaction;
 
-import io.github.retrooper.packetevents.packet.PacketTypeClasses;
 import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
 
 public final class WrappedPacketInTransaction extends WrappedPacket {
-    private static Class<?> packetClass;
-    private int windowId;
-    private short actionNumber;
-    private boolean accepted;
     public WrappedPacketInTransaction(final Object packet) {
         super(packet);
     }
 
-    public static void load() {
-        packetClass = PacketTypeClasses.Client.TRANSACTION;
-    }
-
-    @Override
-    protected void setup() {
-        this.windowId = readInt(0);
-        this.actionNumber = readShort(0);
-        this.accepted = readBoolean(0);
-    }
-
     /**
      * Get the window ID.
+     *
      * @return Window ID
      */
     public int getWindowId() {
-        return windowId;
+        return readInt(0);
     }
 
     /**
      * Get the action number.
+     *
      * @return Action number
      */
     public short getActionNumber() {
-        return actionNumber;
+        return readShort(0);
     }
 
     /**
      * Is transaction accepted.
+     *
      * @return Transaction Accepted
      */
     public boolean isAccepted() {
-        return accepted;
+        return readBoolean(0);
     }
 }

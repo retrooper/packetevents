@@ -28,7 +28,7 @@ import io.github.retrooper.packetevents.PacketEvents;
 import io.github.retrooper.packetevents.event.impl.PacketReceiveEvent;
 import io.github.retrooper.packetevents.event.impl.PacketSendEvent;
 import io.github.retrooper.packetevents.event.impl.PlayerInjectEvent;
-import io.github.retrooper.packetevents.event.impl.PlayerUninjectEvent;
+import io.github.retrooper.packetevents.event.impl.PlayerEjectEvent;
 import io.github.retrooper.packetevents.utils.nms.NMSUtils;
 import org.bukkit.entity.Player;
 
@@ -103,7 +103,7 @@ public class NettyPacketHandler {
     public static void ejectPlayer(final Player player) {
         NMSUtils.channelCache.remove(player.getUniqueId());
         try {
-            final PlayerUninjectEvent uninjectEvent = new PlayerUninjectEvent(player);
+            final PlayerEjectEvent uninjectEvent = new PlayerEjectEvent(player);
             PacketEvents.getAPI().getEventManager().callEvent(uninjectEvent);
             if (!uninjectEvent.isCancelled()) {
                 if (v1_7_nettyMode) {
@@ -127,7 +127,7 @@ public class NettyPacketHandler {
         NMSUtils.channelCache.remove(player.getUniqueId());
         Future<?> f = singleThreadedExecutor.submit(() -> {
             try {
-                final PlayerUninjectEvent uninjectEvent = new PlayerUninjectEvent(player, true);
+                final PlayerEjectEvent uninjectEvent = new PlayerEjectEvent(player, true);
                 PacketEvents.getAPI().getEventManager().callEvent(uninjectEvent);
                 if (!uninjectEvent.isCancelled()) {
                     if (v1_7_nettyMode) {

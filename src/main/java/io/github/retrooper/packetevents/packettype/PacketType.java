@@ -24,8 +24,6 @@
 
 package io.github.retrooper.packetevents.packettype;
 
-import io.github.retrooper.packetevents.packet.PacketTypeClasses;
-
 import java.util.HashMap;
 import java.util.Map;
 

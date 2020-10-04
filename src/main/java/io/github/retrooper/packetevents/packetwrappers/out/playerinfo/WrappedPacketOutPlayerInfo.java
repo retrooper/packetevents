@@ -33,7 +33,7 @@ import java.util.List;
 
 class WrappedPacketOutPlayerInfo extends WrappedPacket implements SendableWrapper {
 //TODO load this wrapper
-
+    private boolean isListening = false;
     private PlayerInfoAction action;
     private List<PlayerInfoData> playerInfoDataList = new ArrayList<>();
 
@@ -45,6 +45,7 @@ class WrappedPacketOutPlayerInfo extends WrappedPacket implements SendableWrappe
 
     public WrappedPacketOutPlayerInfo(Object packet) {
         super(packet);
+        isListening = true;
     }
 
     public WrappedPacketOutPlayerInfo(PlayerInfoAction action, Object gameProfile,

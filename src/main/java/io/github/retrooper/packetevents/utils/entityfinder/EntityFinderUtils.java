@@ -25,8 +25,8 @@
 package io.github.retrooper.packetevents.utils.entityfinder;
 
 import io.github.retrooper.packetevents.annotations.Nullable;
-import io.github.retrooper.packetevents.enums.ServerVersion;
 import io.github.retrooper.packetevents.utils.nms.NMSUtils;
+import io.github.retrooper.packetevents.utils.server.ServerVersion;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.entity.Entity;
@@ -65,33 +65,36 @@ public final class EntityFinderUtils {
         }
     }
 
-    /**
-     * Get an entity by their ID.
-     * @param id
-     * @return Entity
-     */
-    public static Entity getEntityById(final int id) {
+    public static Object getNMSEntityById(final int id) {
         for (final World world : Bukkit.getWorlds()) {
-            final Entity entity = getEntityByIdWithWorld(world, id);
+            final Object entity = getNMSEntityByIdWithWorld(world, id);
             if (entity != null) {
                 return entity;
             }
         }
-        return  null;
+        return null;
     }
 
     /**
-     * Get an entity by their ID, guaranteed to be in the specified world.
-     * @param world
+     * Get an entity by their ID.
+     *
      * @param id
      * @return Entity
      */
-    @Nullable
-    public static Entity getEntityByIdWithWorld(final World world, final int id) {
+    public static Entity getEntityById(final int id) {
+        Object nmsEntity = getNMSEntityById(id);
+        try {
+            return (Entity) getBukkitEntity.invoke(nmsEntity);
+        } catch (IllegalAccessException | InvocationTargetException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    public static Object getNMSEntityByIdWithWorld(final World world, final int id) {
         if (world == null) {
             return null;
-        }
-        else if(craftWorldClass == null) {
+        } else if (craftWorldClass == null) {
             throw new IllegalStateException("PacketEvents failed to locate the CraftWorld class.");
         }
         Object craftWorld = craftWorldClass.cast(world);
@@ -109,6 +112,19 @@ public final class EntityFinderUtils {
         } catch (IllegalAccessException | InvocationTargetException e) {
             e.printStackTrace();
         }
+        return nmsEntity;
+    }
+
+    /**
+     * Get an entity by their ID, guaranteed to be in the specified world.
+     *
+     * @param world
+     * @param id
+     * @return Entity
+     */
+    @Nullable
+    public static Entity getEntityByIdWithWorld(final World world, final int id) {
+        Object nmsEntity = getNMSEntityByIdWithWorld(world, id);
         if (nmsEntity == null) {
             return null;
         }
@@ -123,6 +139,7 @@ public final class EntityFinderUtils {
     /**
      * This is the name of the method that returns the NMS entity when you pass in its ID.
      * On 1.8-1.8.8 the function name is called 'a', on 1.7.10 and 1.9 and above the name is called 'getEntity'.
+     *
      * @return entity by ID method name
      */
     public static String getEntityByIDMethodName() {

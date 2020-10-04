@@ -30,18 +30,16 @@ import io.github.retrooper.packetevents.utils.reflection.SubclassUtil;
 import org.bukkit.entity.Entity;
 
 public final class WrappedPacketInUseEntity extends WrappedPacket {
-    private static Class<?> useEntityClass;
     private static Class<?> enumEntityUseActionClass;
     private Entity entity;
-    private int entityID;
-    private EntityUseAction action;
+    private int entityID = -1;
     public WrappedPacketInUseEntity(final Object packet) {
         super(packet);
     }
 
     public static void load() {
         //System.out.println("USE ENTITY HAS BEEN LOADED BROOOIOII");
-        useEntityClass = NMSUtils.getNMSClassWithoutException("PacketPlayInUseEntity");
+        Class<?> useEntityClass = NMSUtils.getNMSClassWithoutException("PacketPlayInUseEntity");
         /*if(useEntityClass == null) {
             System.out.println("failed to init use entity wtfffff");
         }*/
@@ -53,15 +51,6 @@ public final class WrappedPacketInUseEntity extends WrappedPacket {
         }
     }
 
-    @Override
-    protected void setup() {
-        this.entityID = readInt(0);
-        if(enumEntityUseActionClass == null) {
-                System.out.println("cls is null");
-        }
-        final Object useActionEnum = readObject(0, enumEntityUseActionClass);
-        this.action = EntityUseAction.valueOf(useActionEnum.toString());
-    }
 
     /**
      * Lookup the associated entity by the ID that was sent in the packet.
@@ -71,7 +60,7 @@ public final class WrappedPacketInUseEntity extends WrappedPacket {
         if(entity != null) {
             return entity;
         }
-        return entity = NMSUtils.getEntityById(this.entityID);
+        return entity = NMSUtils.getEntityById(getEntityID());
     }
 
     /**
@@ -80,8 +69,13 @@ public final class WrappedPacketInUseEntity extends WrappedPacket {
      * you lookup the entity by yourself with this entity ID.
      * @return Entity ID
      */
-    public int getEntityId() {
-        return entityID;
+    public int getEntityID() {
+        if(entityID != -1) {
+            return entityID;
+        }
+        else {
+            return entityID = readInt(0);
+        }
     }
 
     /**
@@ -89,7 +83,8 @@ public final class WrappedPacketInUseEntity extends WrappedPacket {
      * @return Get EntityUseAction
      */
     public EntityUseAction getAction() {
-        return action;
+        final Object useActionEnum = readObject(0, enumEntityUseActionClass);
+        return EntityUseAction.valueOf(useActionEnum.toString());
     }
 
     public enum EntityUseAction {

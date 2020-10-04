@@ -24,10 +24,8 @@
 
 package io.github.retrooper.packetevents.packetwrappers.in.blockplace;
 
-import io.github.retrooper.packetevents.annotations.Nullable;
-import io.github.retrooper.packetevents.enums.ServerVersion;
 import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
-import io.github.retrooper.packetevents.utils.vector.Vector3i;
+import io.github.retrooper.packetevents.utils.server.ServerVersion;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -35,8 +33,8 @@ import org.bukkit.inventory.ItemStack;
 
 public final class WrappedPacketInBlockPlace extends WrappedPacket {
     private static boolean isHigherThan_v_1_8_8, isHigherThan_v_1_7_10;
-    private Vector3i blockPosition;
-    private ItemStack itemStack;
+    private WrappedPacket cachedWrappedPacket;
+
     public WrappedPacketInBlockPlace(final Player player, final Object packet) {
         super(player, packet);
     }
@@ -49,81 +47,92 @@ public final class WrappedPacketInBlockPlace extends WrappedPacket {
         }
     }
 
-    @Override
-    protected void setup() {
-        //1.7.10
-        Vector3i position = null;
-        ItemStack itemStack = null;
-        try {
-            if (isHigherThan_v_1_8_8) {
-                final WrappedPacketInBlockPlace_1_9 blockPlace_1_9 = new WrappedPacketInBlockPlace_1_9(getPlayer(), packet);
-                final Block block = blockPlace_1_9.getBlock();
-                position = new Vector3i(block.getX(), block.getY(), block.getZ());
-                itemStack = new ItemStack(block.getType());
-            } else if (isHigherThan_v_1_7_10) {
-                final WrappedPacketInBlockPlace_1_8 blockPlace_1_8 = new WrappedPacketInBlockPlace_1_8(packet);
-                position = blockPlace_1_8.getBlockPosition();
-                itemStack = blockPlace_1_8.getItemStack();
-            } else {
-                final WrappedPacketInBlockPlace_1_7_10 blockPlace_1_7_10 = new WrappedPacketInBlockPlace_1_7_10(getPlayer(), packet);
-                position = blockPlace_1_7_10.getBlockPosition();
-                itemStack = blockPlace_1_7_10.getItemStack();
-            }
-        } catch (IllegalArgumentException e) {
-            e.printStackTrace();
-        }
-        this.blockPosition = position;
-        this.itemStack = itemStack;
-    }
-
-    /**
-     * Get the player that placed the block
-     * @return Block placer
-     */
     public Player getPlayer() {
-        return this.player;
+        return player;
     }
 
-    /**
-     * Get X position of the block
-     * @return Block Position X
-     */
-    public int getBlockPositionX() {
-        return blockPosition.x;
+    public int getX() {
+        if (isHigherThan_v_1_8_8) {
+            if (cachedWrappedPacket == null) {
+                WrappedPacketInBlockPlace_1_9 blockPlace_1_9 = new WrappedPacketInBlockPlace_1_9(getPlayer(), packet);
+                cachedWrappedPacket = blockPlace_1_9;
+                return blockPlace_1_9.getBlock().getX();
+            }
+            return ((WrappedPacketInBlockPlace_1_9)cachedWrappedPacket).getBlock().getX();
+        } else if (isHigherThan_v_1_7_10) {
+           if(cachedWrappedPacket == null) {
+               WrappedPacketInBlockPlace_1_8 blockPlace_1_8 = new WrappedPacketInBlockPlace_1_8(packet);
+               cachedWrappedPacket = blockPlace_1_8;
+               return blockPlace_1_8.getX();
+           }
+        } else {
+            WrappedPacketInBlockPlace_1_7_10 blockPlace_1_7_10 = new WrappedPacketInBlockPlace_1_7_10(packet);
+            return blockPlace_1_7_10.x;
+        }
+        return 0;
     }
 
-    /**
-     * Get Y position of the block
-     * @return Block Position Y
-     */
-    public int getBlockPositionY() {
-        return blockPosition.y;
+    public int getY() {
+        if (isHigherThan_v_1_8_8) {
+            if (cachedWrappedPacket == null) {
+                WrappedPacketInBlockPlace_1_9 blockPlace_1_9 = new WrappedPacketInBlockPlace_1_9(getPlayer(), packet);
+                cachedWrappedPacket = blockPlace_1_9;
+                return blockPlace_1_9.getBlock().getY();
+            }
+            return ((WrappedPacketInBlockPlace_1_9)cachedWrappedPacket).getBlock().getX();
+        } else if (isHigherThan_v_1_7_10) {
+            if(cachedWrappedPacket == null) {
+                WrappedPacketInBlockPlace_1_8 blockPlace_1_8 = new WrappedPacketInBlockPlace_1_8(packet);
+                cachedWrappedPacket = blockPlace_1_8;
+                return blockPlace_1_8.getY();
+            }
+        } else {
+            WrappedPacketInBlockPlace_1_7_10 blockPlace_1_7_10 = new WrappedPacketInBlockPlace_1_7_10(packet);
+            return blockPlace_1_7_10.y;
+        }
+        return 0;
     }
 
-    /**
-     * Get Z position of the block
-     * @return Block Position Z
-     */
-    public int getBlockPositionZ() {
-        return blockPosition.z;
+    public int getZ() {
+        if (isHigherThan_v_1_8_8) {
+            if (cachedWrappedPacket == null) {
+                WrappedPacketInBlockPlace_1_9 blockPlace_1_9 = new WrappedPacketInBlockPlace_1_9(getPlayer(), packet);
+                cachedWrappedPacket = blockPlace_1_9;
+                return blockPlace_1_9.getBlock().getZ();
+            }
+            return ((WrappedPacketInBlockPlace_1_9)cachedWrappedPacket).getBlock().getX();
+        } else if (isHigherThan_v_1_7_10) {
+            if(cachedWrappedPacket == null) {
+                WrappedPacketInBlockPlace_1_8 blockPlace_1_8 = new WrappedPacketInBlockPlace_1_8(packet);
+                cachedWrappedPacket = blockPlace_1_8;
+                return blockPlace_1_8.getZ();
+            }
+        } else {
+            WrappedPacketInBlockPlace_1_7_10 blockPlace_1_7_10 = new WrappedPacketInBlockPlace_1_7_10(packet);
+            return blockPlace_1_7_10.z;
+        }
+        return 0;
     }
 
-    /**
-     * Use {@link #getBlockPositionX()}, {@link #getBlockPositionY()}, {@link #getBlockPositionZ()}
-     * @return Block Position
-     */
-    @Deprecated
-    public Vector3i getBlockPosition() {
-        return blockPosition;
-    }
-
-    /**
-     * The ItemStack of the placed block.
-     * @return ItemStack
-     */
-    @Nullable
     public ItemStack getItemStack() {
-        return itemStack;
+        if (isHigherThan_v_1_8_8) {
+            if (cachedWrappedPacket == null) {
+                WrappedPacketInBlockPlace_1_9 blockPlace_1_9 = new WrappedPacketInBlockPlace_1_9(getPlayer(), packet);
+                cachedWrappedPacket = blockPlace_1_9;
+                return new ItemStack(blockPlace_1_9.getBlock().getType());
+            }
+            return new ItemStack(((WrappedPacketInBlockPlace_1_9)cachedWrappedPacket).getBlock().getType());
+        } else if (isHigherThan_v_1_7_10) {
+            if(cachedWrappedPacket == null) {
+                WrappedPacketInBlockPlace_1_8 blockPlace_1_8 = new WrappedPacketInBlockPlace_1_8(packet);
+                cachedWrappedPacket = blockPlace_1_8;
+                return blockPlace_1_8.getItemStack();
+            }
+        } else {
+            WrappedPacketInBlockPlace_1_7_10 blockPlace_1_7_10 = new WrappedPacketInBlockPlace_1_7_10(packet);
+            return blockPlace_1_7_10.itemStack;
+        }
+        return null;
     }
 
 }

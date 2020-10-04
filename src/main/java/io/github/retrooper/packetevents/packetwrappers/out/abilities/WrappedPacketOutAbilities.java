@@ -24,7 +24,7 @@
 
 package io.github.retrooper.packetevents.packetwrappers.out.abilities;
 
-import io.github.retrooper.packetevents.packet.PacketTypeClasses;
+import io.github.retrooper.packetevents.packettype.PacketTypeClasses;
 import io.github.retrooper.packetevents.packetwrappers.SendableWrapper;
 import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
 
@@ -34,10 +34,13 @@ import java.lang.reflect.InvocationTargetException;
 public final class WrappedPacketOutAbilities extends WrappedPacket implements SendableWrapper {
     private static Class<?> packetClass;
     private static Constructor<?> packetConstructor;
+    private boolean isListening = false;
     private boolean vulnerable, flying, allowFlight, instantBuild;
     private float flySpeed, walkSpeed;
+
     public WrappedPacketOutAbilities(final Object packet) {
         super(packet);
+        isListening = true;
     }
 
     public WrappedPacketOutAbilities(final boolean isVulnerable, final boolean isFlying, final boolean allowFlight, final boolean canBuildInstantly,
@@ -61,63 +64,82 @@ public final class WrappedPacketOutAbilities extends WrappedPacket implements Se
         }
     }
 
-    @Override
-    protected void setup() {
-        this.vulnerable = readBoolean(0);
-        this.flying = readBoolean(1);
-        this.allowFlight = readBoolean(2);
-        this.instantBuild = readBoolean(3);
-
-        this.flySpeed = readFloat(0);
-        this.walkSpeed = readFloat(1);
-    }
-
     /**
      * Should the client be vulnerable?
+     *
      * @return Is Vulnerable
      */
     public boolean isVulnerable() {
-        return vulnerable;
+        if (isListening) {
+            return readBoolean(0);
+        } else {
+            return vulnerable;
+        }
     }
 
     /**
      * Should the client be flying?
+     *
      * @return Is Flying
      */
     public boolean isFlying() {
-        return flying;
+        if (isListening) {
+            return readBoolean(1);
+        } else {
+            return flying;
+        }
     }
 
     /**
      * Should the client be allowed to fly?
+     *
      * @return Is Allowed To Fly
      */
     public boolean isFlightAllowed() {
-        return allowFlight;
+        if (isListening) {
+            return readBoolean(2);
+        } else {
+            return allowFlight;
+        }
     }
 
     /**
      * Should the client be able to build instantly?
+     *
      * @return Is Allowed To Build Instantly
      */
     public boolean canInstantlyBuild() {
-        return instantBuild;
+        if (isListening) {
+            return readBoolean(3);
+        } else {
+            return instantBuild;
+        }
     }
 
     /**
      * Get the client's defined fly speed.
+     *
      * @return Get Fly Speed
      */
     public float getFlySpeed() {
-        return flySpeed;
+        if (isListening) {
+            return readFloat(0);
+        } else {
+            return flySpeed;
+        }
     }
 
     /**
      * Get the client's defined walk speed.
+     *
      * @return Get Walk Speed
      */
     public float getWalkSpeed() {
-        return walkSpeed;
+        if (isListening) {
+            return readFloat(1);
+        } else {
+            return walkSpeed;
+        }
     }
 
     @Override

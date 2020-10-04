@@ -24,7 +24,7 @@
 
 package io.github.retrooper.packetevents.packetwrappers.out.animation;
 
-import io.github.retrooper.packetevents.packet.PacketTypeClasses;
+import io.github.retrooper.packetevents.packettype.PacketTypeClasses;
 import io.github.retrooper.packetevents.packetwrappers.SendableWrapper;
 import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
 import io.github.retrooper.packetevents.utils.nms.NMSUtils;
@@ -41,10 +41,13 @@ public final class WrappedPacketOutAnimation extends WrappedPacket implements Se
     private static final HashMap<Integer, EntityAnimationType> cachedAnimationIDS = new HashMap<Integer, EntityAnimationType>();
     private static final HashMap<EntityAnimationType, Integer> cachedAnimations = new HashMap<EntityAnimationType, Integer>();
     private Entity entity;
-    private int entityID;
+    private int entityID = -1;
     private EntityAnimationType type;
+    private boolean isListening = false;
+
     public WrappedPacketOutAnimation(final Object packet) {
         super(packet);
+        isListening = true;
     }
 
     public WrappedPacketOutAnimation(final Entity target, final EntityAnimationType type) {
@@ -82,37 +85,43 @@ public final class WrappedPacketOutAnimation extends WrappedPacket implements Se
         cachedAnimations.put(EntityAnimationType.MAGIC_CRITICAL_EFFECT, 5);
     }
 
-    @Override
-    protected void setup() {
-        this.entityID = readInt(0);
-        int animationID = readInt(1);
-        this.type = cachedAnimationIDS.get(animationID);
-    }
-
     /**
      * Lookup the associated entity by the ID that was sent in the packet.
+     *
      * @return Entity
      */
     public Entity getEntity() {
-        return NMSUtils.getEntityById(this.entityID);
+        if (entity != null) {
+            return entity;
+        }
+        return entity = NMSUtils.getEntityById(getEntityID());
     }
 
     /**
      * Get the ID of the entity.
      * If you do not want to use {@link #getEntity()},
      * you lookup the entity by yourself with this entity ID.
+     *
      * @return Entity ID
      */
-    public int getEntityId() {
+    public int getEntityID() {
+        if (entityID == -1) {
+            entityID = readInt(0);
+        }
         return entityID;
     }
 
     /**
      * Get the entity animation type.
+     *
      * @return Get Entity Animation Type
      */
     public EntityAnimationType getAnimationType() {
-        return type;
+        if (isListening) {
+            return cachedAnimationIDS.get(readInt(1));
+        } else {
+            return type;
+        }
     }
 
     @Override

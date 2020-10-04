@@ -22,19 +22,16 @@
  * SOFTWARE.
  */
 
-package io.github.retrooper.packetevents.utils.vector;
-@Deprecated
-public final class Vector3i {
-    public int x, y, z;
+package io.github.retrooper.packetevents.exceptions;
 
-    public Vector3i(final int x, final int y, final int z) {
-        this.x = x;
-        this.y = y;
-        this.z = z;
+import io.github.retrooper.packetevents.utils.reflection.ClassUtil;
+
+public class WrapperFieldNotFoundException extends RuntimeException{
+    public WrapperFieldNotFoundException(String message) {
+        super(message);
     }
 
-    @Override
-    public String toString() {
-        return "X: " + x + ", Y: " + y + ", Z: " + z;
+    public WrapperFieldNotFoundException(Class<?> packetClass, Class<?> type, int index) {
+        this("PacketEvents failed to find a " + ClassUtil.getClassSimpleName(type) + " indexed " + index + " by its type in the " + packetClass.getName() + " class!");
     }
 }

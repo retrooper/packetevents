@@ -24,7 +24,7 @@
 
 package io.github.retrooper.packetevents.packetwrappers.out.gamestatechange;
 
-import io.github.retrooper.packetevents.packet.PacketTypeClasses;
+import io.github.retrooper.packetevents.packettype.PacketTypeClasses;
 import io.github.retrooper.packetevents.packetwrappers.SendableWrapper;
 import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
 import io.github.retrooper.packetevents.utils.reflection.Reflection;
@@ -45,9 +45,11 @@ public class WrappedPacketOutGameStateChange extends WrappedPacket implements Se
     private static boolean reasonIntMode;
     private static boolean valueFloatMode;
 
+    private boolean isListening = false;
+
     public static void load() {
         reasonClassType = SubclassUtil.getSubClass(PacketTypeClasses.Server.GAME_STATE_CHANGE, "a");
-        if(reasonClassType != null) {
+        if (reasonClassType != null) {
             try {
                 reasonClassConstructor = reasonClassType.getConstructor(int.class);
             } catch (NoSuchMethodException e) {
@@ -66,7 +68,7 @@ public class WrappedPacketOutGameStateChange extends WrappedPacket implements Se
                 //Just an older version(1.7.10/1.8.x or so)
                 valueClassType = double.class;
             }
-            if(reasonClassType == null) {
+            if (reasonClassType == null) {
                 reasonClassType = int.class;
             }
             packetConstructor = PacketTypeClasses.Server.GAME_STATE_CHANGE.getConstructor(reasonClassType, valueClassType);
@@ -81,6 +83,7 @@ public class WrappedPacketOutGameStateChange extends WrappedPacket implements Se
 
     public WrappedPacketOutGameStateChange(Object packet) {
         super(packet);
+        isListening = true;
     }
 
     public WrappedPacketOutGameStateChange(int reason, double value) {
@@ -88,36 +91,40 @@ public class WrappedPacketOutGameStateChange extends WrappedPacket implements Se
         this.value = value;
     }
 
-    public WrappedPacketOutGameStateChange(int reason, float value){
-        this(reason, (double)value);
-    }
-
-    @Override
-    protected void setup() {
-        if (reasonIntMode) {
-            reason = readInt(0);
-        } else {
-            //this packet is obfuscated quite strongly(1.16), so we must do this
-            Object reasonObject = readObject(12, reasonClassType);
-            try {
-                reason = Reflection.getField(reasonClassType, int.class, 0).getInt(reasonObject);
-            } catch (IllegalAccessException e) {
-                e.printStackTrace();
-            }
-        }
-        if (valueFloatMode) {
-            value = readFloat(0);
-        } else {
-            value = readDouble(0);
-        }
+    public WrappedPacketOutGameStateChange(int reason, float value) {
+        this(reason, (double) value);
     }
 
     public int getReason() {
-        return reason;
+        if (isListening) {
+            if (reasonIntMode) {
+                return readInt(0);
+            } else {
+                //this packet is obfuscated quite strongly(1.16), so we must do this
+                Object reasonObject = readObject(12, reasonClassType);
+                try {
+                    return Reflection.getField(reasonClassType, int.class, 0).getInt(reasonObject);
+                } catch (IllegalAccessException e) {
+                    e.printStackTrace();
+                }
+            }
+        } else {
+            return reason;
+        }
+        return 0;
     }
 
     public double getValue() {
-        return reason;
+        if(isListening) {
+            if (valueFloatMode) {
+                return readFloat(0);
+            } else {
+                return readDouble(0);
+            }
+        }
+        else {
+            return value;
+        }
     }
 
     @Override

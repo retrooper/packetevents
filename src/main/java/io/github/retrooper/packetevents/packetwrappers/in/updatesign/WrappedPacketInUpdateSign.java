@@ -24,7 +24,7 @@
 
 package io.github.retrooper.packetevents.packetwrappers.in.updatesign;
 
-import io.github.retrooper.packetevents.packet.PacketTypeClasses;
+import io.github.retrooper.packetevents.packettype.PacketTypeClasses;
 import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
 import io.github.retrooper.packetevents.packetwrappers.out.chat.WrappedPacketOutChat;
 import io.github.retrooper.packetevents.utils.nms.NMSUtils;
@@ -34,8 +34,7 @@ public class WrappedPacketInUpdateSign extends WrappedPacket {
     private static boolean v_1_7_mode, strArrayMode;
     private static Class<?> blockPosClass, iChatBaseComponentClass;
 
-    private int x, y, z;
-    private String[] lines;
+    private Object blockPosObj;
 
     public static void load() {
         v_1_7_mode = Reflection.getField(PacketTypeClasses.Client.UPDATE_SIGN, int.class, 0) != null;
@@ -59,48 +58,61 @@ public class WrappedPacketInUpdateSign extends WrappedPacket {
         super(packet);
     }
 
-    @Override
-    protected void setup() {
-        if (v_1_7_mode) {
-            x = readInt(0);
-            y = readInt(1);
-            z = readInt(2);
-        } else {
-            Object blockPos = readObject(0, blockPosClass);
-            try {
-                x = Reflection.getField(blockPosClass, int.class, 0).getInt(packet);
-                y = Reflection.getField(blockPosClass, int.class, 1).getInt(packet);
-                z = Reflection.getField(blockPosClass, int.class, 2).getInt(packet);
-            } catch (IllegalAccessException e) {
-                e.printStackTrace();
+    public int getX() {
+        if(v_1_7_mode) {
+            return readInt(0);
+        }
+        else {
+            if(blockPosObj == null) {
+                blockPosObj = readObject(0, blockPosClass);
+                WrappedPacket blockPosWrapper = new WrappedPacket(blockPosObj);
+                return blockPosWrapper.readInt(0);
             }
         }
+        return 0;
+    }
+
+    public int getY() {
+        if(v_1_7_mode) {
+            return readInt(1);
+        }
+        else {
+            if(blockPosObj == null) {
+                blockPosObj = readObject(0, blockPosClass);
+                WrappedPacket blockPosWrapper = new WrappedPacket(blockPosObj);
+                return blockPosWrapper.readInt(1);
+            }
+        }
+        return 0;
+    }
+
+    public int getZ() {
+        if(v_1_7_mode) {
+            return readInt(2);
+        }
+        else {
+            if(blockPosObj == null) {
+                blockPosObj = readObject(0, blockPosClass);
+                WrappedPacket blockPosWrapper = new WrappedPacket(blockPosObj);
+                return blockPosWrapper.readInt(2);
+            }
+        }
+        return 0;
+    }
+
+    public String[] getTextLines() {
         if (strArrayMode) {
             //1.7.10 and the newest versions use this
-            lines = readStringArray(0);
+            return readStringArray(0);
         } else {
             //1.8 uses this for example
             Object[] iChatComponents = readObjectArray(0, iChatBaseComponentClass);
+            String[] lines = new String[iChatComponents.length];
             for (int i = 0; i < iChatComponents.length; i++) {
                 lines[i] = WrappedPacketOutChat.
                         toStringFromIChatBaseComponent(iChatComponents[i]);
             }
+            return lines;
         }
-    }
-
-    public int getBlockPositionX() {
-        return x;
-    }
-
-    public int getBlockPositionY() {
-        return y;
-    }
-
-    public int getBlockPositionZ() {
-        return z;
-    }
-
-    public String[] getTextLines() {
-        return lines;
     }
 }

@@ -24,31 +24,19 @@
 
 package io.github.retrooper.packetevents.packetwrappers.in.chat;
 
-import io.github.retrooper.packetevents.packet.PacketTypeClasses;
 import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
 
 public final class WrappedPacketInChat extends WrappedPacket {
-    private static Class<?> chatPacketClass;
-    private String message;
-
     public WrappedPacketInChat(Object packet) {
         super(packet);
     }
 
-    public static void load() {
-        chatPacketClass = PacketTypeClasses.Client.CHAT;
-    }
-
-    @Override
-    protected void setup() {
-        this.message = readString(0);
-    }
-
     /**
      * Get the message.
+     *
      * @return Chat Message
      */
     public String getMessage() {
-        return message;
+        return readString(0);
     }
 }

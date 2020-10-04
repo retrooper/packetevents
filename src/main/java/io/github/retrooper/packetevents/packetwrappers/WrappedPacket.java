@@ -24,25 +24,19 @@
 
 package io.github.retrooper.packetevents.packetwrappers;
 
-import io.github.retrooper.packetevents.enums.ServerVersion;
-import io.github.retrooper.packetevents.packet.PacketTypeClasses;
-import io.github.retrooper.packetevents.packetwrappers.in.abilities.WrappedPacketInAbilities;
-import io.github.retrooper.packetevents.packetwrappers.in.armanimation.WrappedPacketInArmAnimation;
+import io.github.retrooper.packetevents.exceptions.WrapperFieldNotFoundException;
+import io.github.retrooper.packetevents.packettype.PacketTypeClasses;
 import io.github.retrooper.packetevents.packetwrappers.in.blockdig.WrappedPacketInBlockDig;
 import io.github.retrooper.packetevents.packetwrappers.in.blockplace.WrappedPacketInBlockPlace;
-import io.github.retrooper.packetevents.packetwrappers.in.chat.WrappedPacketInChat;
 import io.github.retrooper.packetevents.packetwrappers.in.clientcommand.WrappedPacketInClientCommand;
 import io.github.retrooper.packetevents.packetwrappers.in.custompayload.WrappedPacketInCustomPayload;
 import io.github.retrooper.packetevents.packetwrappers.in.entityaction.WrappedPacketInEntityAction;
-import io.github.retrooper.packetevents.packetwrappers.in.flying.WrappedPacketInFlying;
-import io.github.retrooper.packetevents.packetwrappers.in.helditemslot.WrappedPacketInHeldItemSlot;
 import io.github.retrooper.packetevents.packetwrappers.in.keepalive.WrappedPacketInKeepAlive;
 import io.github.retrooper.packetevents.packetwrappers.in.settings.WrappedPacketInSettings;
-import io.github.retrooper.packetevents.packetwrappers.in.steervehicle.WrappedPacketInSteerVehicle;
-import io.github.retrooper.packetevents.packetwrappers.in.transaction.WrappedPacketInTransaction;
 import io.github.retrooper.packetevents.packetwrappers.in.updatesign.WrappedPacketInUpdateSign;
 import io.github.retrooper.packetevents.packetwrappers.in.useentity.WrappedPacketInUseEntity;
 import io.github.retrooper.packetevents.packetwrappers.in.windowclick.WrappedPacketInWindowClick;
+import io.github.retrooper.packetevents.packetwrappers.out.entityteleport.WrappedPacketOutEntityTeleport;
 import io.github.retrooper.packetevents.packetwrappers.out.abilities.WrappedPacketOutAbilities;
 import io.github.retrooper.packetevents.packetwrappers.out.animation.WrappedPacketOutAnimation;
 import io.github.retrooper.packetevents.packetwrappers.out.chat.WrappedPacketOutChat;
@@ -55,6 +49,8 @@ import io.github.retrooper.packetevents.packetwrappers.out.kickdisconnect.Wrappe
 import io.github.retrooper.packetevents.packetwrappers.out.position.WrappedPacketOutPosition;
 import io.github.retrooper.packetevents.packetwrappers.out.transaction.WrappedPacketOutTransaction;
 import io.github.retrooper.packetevents.packetwrappers.out.updatehealth.WrappedPacketOutUpdateHealth;
+import io.github.retrooper.packetevents.utils.reflection.ClassUtil;
+import io.github.retrooper.packetevents.utils.server.ServerVersion;
 import org.bukkit.entity.Player;
 
 import java.lang.reflect.Field;
@@ -62,7 +58,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-public class WrappedPacket implements WrapperPacketReader {
+public class WrappedPacket implements WrapperPacketReader, WrapperPacketWriter {
     private static final HashMap<Class<?>, HashMap<Class<?>, Field[]>> fieldCache = new HashMap<>();
     public static ServerVersion version;
     protected final Player player;
@@ -70,24 +66,34 @@ public class WrappedPacket implements WrapperPacketReader {
     private Class<?> packetClass;
 
     public WrappedPacket() {
-        this(null);
+        this.player = null;
+        this.packet = null;
+        this.packetClass = null;
     }
 
     public WrappedPacket(final Object packet) {
-        this(null, packet);
+        this(packet, packet.getClass());
+    }
+
+    public WrappedPacket(final Object packet, final Class<?> packetClass) {
+        this(null, packet, packetClass);
     }
 
     public WrappedPacket(final Player player, final Object packet) {
+        this(player, packet, packet.getClass());
+    }
+
+    public WrappedPacket(final Player player, final Object packet, Class<?> packetClass) {
         if (packet == null) {
             this.player = null;
             return;
         }
-        this.packetClass = packet.getClass();
         if (packet.getClass().getSuperclass().equals(PacketTypeClasses.Client.FLYING)) {
             packetClass = PacketTypeClasses.Client.FLYING;
         } else if (packet.getClass().getSuperclass().equals(PacketTypeClasses.Server.ENTITY)) {
             packetClass = PacketTypeClasses.Server.ENTITY;
         }
+        this.packetClass = packetClass;
 
 
         if (!fieldCache.containsKey(packetClass)) {
@@ -220,20 +226,13 @@ public class WrappedPacket implements WrapperPacketReader {
 
     public static void loadAllWrappers() {
         //SERVER BOUND
-        WrappedPacketInAbilities.load();
-        WrappedPacketInArmAnimation.load();
         WrappedPacketInBlockDig.load();
         WrappedPacketInBlockPlace.load();
-        WrappedPacketInChat.load();
         WrappedPacketInClientCommand.load();
         WrappedPacketInCustomPayload.load();
         WrappedPacketInEntityAction.load();
-        WrappedPacketInFlying.load();
-        WrappedPacketInHeldItemSlot.load();
         WrappedPacketInKeepAlive.load();
         WrappedPacketInSettings.load();
-        WrappedPacketInSteerVehicle.load();
-        WrappedPacketInTransaction.load();
         WrappedPacketInUseEntity.load();
         WrappedPacketInUpdateSign.load();
         WrappedPacketInWindowClick.load();
@@ -244,6 +243,7 @@ public class WrappedPacket implements WrapperPacketReader {
         WrappedPacketOutChat.load();
         WrappedPacketOutEntity.load();
         WrappedPacketOutEntityVelocity.load();
+        WrappedPacketOutEntityTeleport.load();
         WrappedPacketOutKeepAlive.load();
         WrappedPacketOutKickDisconnect.load();
         WrappedPacketOutPosition.load();
@@ -266,7 +266,7 @@ public class WrappedPacket implements WrapperPacketReader {
                 e.printStackTrace();
             }
         }
-        return false;
+        throw new WrapperFieldNotFoundException(packetClass, boolean.class, index);
     }
 
     @Override
@@ -278,7 +278,7 @@ public class WrappedPacket implements WrapperPacketReader {
                 e.printStackTrace();
             }
         }
-        return 0;
+        throw new WrapperFieldNotFoundException(packetClass, byte.class, index);
     }
 
     @Override
@@ -290,7 +290,7 @@ public class WrappedPacket implements WrapperPacketReader {
                 e.printStackTrace();
             }
         }
-        return 0;
+        throw new WrapperFieldNotFoundException(packetClass, short.class, index);
     }
 
     @Override
@@ -302,7 +302,7 @@ public class WrappedPacket implements WrapperPacketReader {
                 e.printStackTrace();
             }
         }
-        return 0;
+        throw new WrapperFieldNotFoundException(packetClass, int.class, index);
     }
 
     @Override
@@ -314,7 +314,7 @@ public class WrappedPacket implements WrapperPacketReader {
                 e.printStackTrace();
             }
         }
-        return 0L;
+        throw new WrapperFieldNotFoundException(packetClass, long.class, index);
     }
 
     @Override
@@ -326,7 +326,7 @@ public class WrappedPacket implements WrapperPacketReader {
                 e.printStackTrace();
             }
         }
-        return 0.0F;
+        throw new WrapperFieldNotFoundException(packetClass, float.class, index);
     }
 
     @Override
@@ -338,7 +338,7 @@ public class WrappedPacket implements WrapperPacketReader {
                 e.printStackTrace();
             }
         }
-        return 0.0;
+        throw new WrapperFieldNotFoundException(packetClass, double.class, index);
     }
 
     @Override
@@ -363,7 +363,7 @@ public class WrappedPacket implements WrapperPacketReader {
                 }
             }
         }
-        return new boolean[0];
+        throw new WrapperFieldNotFoundException(packetClass, boolean[].class, index);
     }
 
     @Override
@@ -388,7 +388,7 @@ public class WrappedPacket implements WrapperPacketReader {
                 }
             }
         }
-        return new byte[0];
+        throw new WrapperFieldNotFoundException(packetClass, byte[].class, index);
     }
 
     @Override
@@ -413,7 +413,7 @@ public class WrappedPacket implements WrapperPacketReader {
                 }
             }
         }
-        return new short[0];
+        throw new WrapperFieldNotFoundException(packetClass, short[].class, index);
     }
 
     @Override
@@ -438,7 +438,7 @@ public class WrappedPacket implements WrapperPacketReader {
                 }
             }
         }
-        return new int[0];
+        throw new WrapperFieldNotFoundException(packetClass, int[].class, index);
     }
 
     @Override
@@ -463,7 +463,7 @@ public class WrappedPacket implements WrapperPacketReader {
                 }
             }
         }
-        return new long[0];
+        throw new WrapperFieldNotFoundException(packetClass, long[].class, index);
     }
 
     @Override
@@ -488,7 +488,7 @@ public class WrappedPacket implements WrapperPacketReader {
                 }
             }
         }
-        return new float[0];
+        throw new WrapperFieldNotFoundException(packetClass, float[].class, index);
     }
 
     @Override
@@ -513,7 +513,7 @@ public class WrappedPacket implements WrapperPacketReader {
                 }
             }
         }
-        return new double[0];
+        throw new WrapperFieldNotFoundException(packetClass, double[].class, index);
     }
 
     @Override
@@ -531,7 +531,7 @@ public class WrappedPacket implements WrapperPacketReader {
                 e.printStackTrace();
             }
         }
-        return new String[0];
+        throw new WrapperFieldNotFoundException(packetClass, String[].class, index);
     }
 
     @Override
@@ -545,11 +545,24 @@ public class WrappedPacket implements WrapperPacketReader {
                 e.printStackTrace();
             }
         }
-        return "";
+        throw new WrapperFieldNotFoundException(packetClass, String.class, index);
     }
 
     public Object readAnyObject(int index) {
-        return packetClass.getDeclaredFields()[index];
+        try {
+            Field f = packetClass.getDeclaredFields()[index];
+            if (!f.isAccessible()) {
+                f.setAccessible(true);
+            }
+            try {
+                return f.get(packet);
+            } catch (IllegalAccessException e) {
+                e.printStackTrace();
+            }
+        } catch (ArrayIndexOutOfBoundsException e) {
+            throw new WrapperFieldNotFoundException("PacketEvents failed to find any field indexed " + index + " in the " + ClassUtil.getClassSimpleName(packetClass) + " class!");
+        }
+        return null;
     }
 
     public Object readObject(int index, Class<?> type) {
@@ -574,14 +587,122 @@ public class WrappedPacket implements WrapperPacketReader {
         } catch (IllegalAccessException e) {
             e.printStackTrace();
         }
-        return null;
+        throw new WrapperFieldNotFoundException(packetClass, type, index);
     }
 
     public Object[] readObjectArray(int index, Class<?> type) {
-        Object res = readObject(index, type);
-        if (res == null) {
-            return new Object[0];
+        return (Object[]) readObject(index, type);
+    }
+
+    @Override
+    public void writeBoolean(int index, boolean value) {
+        if (fieldCache.containsKey(packetClass)) {
+            try {
+                fieldCache.get(packetClass).get(boolean.class)[index].setBoolean(packet, value);
+            } catch (IllegalAccessException | NullPointerException e) {
+                if(e instanceof NullPointerException) {
+                    throw new WrapperFieldNotFoundException(packetClass, boolean.class, index);
+                }
+                e.printStackTrace();
+            }
         }
-        return (Object[]) res;
+    }
+
+    @Override
+    public void writeByte(int index, byte value) {
+        if (fieldCache.containsKey(packetClass)) {
+            try {
+                fieldCache.get(packetClass).get(byte.class)[index].setByte(packet, value);
+            } catch (IllegalAccessException | NullPointerException e) {
+                if(e instanceof NullPointerException) {
+                    throw new WrapperFieldNotFoundException(packetClass, byte.class, index);
+                }
+                e.printStackTrace();
+            }
+        }
+    }
+
+    @Override
+    public void writeShort(int index, short value) {
+        if (fieldCache.containsKey(packetClass)) {
+            try {
+                fieldCache.get(packetClass).get(short.class)[index].setShort(packet, value);
+            } catch (IllegalAccessException | NullPointerException e) {
+                if (e instanceof NullPointerException) {
+                    throw new WrapperFieldNotFoundException(packetClass, short.class, index);
+                }
+                e.printStackTrace();
+            }
+        }
+    }
+
+    @Override
+    public void writeInt(int index, int value) {
+        if (fieldCache.containsKey(packetClass)) {
+            try {
+                fieldCache.get(packetClass).get(int.class)[index].setInt(packet, value);
+            } catch (IllegalAccessException | NullPointerException e) {
+                if (e instanceof NullPointerException) {
+                    throw new WrapperFieldNotFoundException(packetClass, int.class, index);
+                }
+                e.printStackTrace();
+            }
+        }
+    }
+
+    @Override
+    public void writeLong(int index, long value) {
+        if (fieldCache.containsKey(packetClass)) {
+            try {
+                fieldCache.get(packetClass).get(long.class)[index].setLong(packet, value);
+            } catch (IllegalAccessException | NullPointerException e) {
+                if(e instanceof NullPointerException) {
+                    throw new WrapperFieldNotFoundException(packetClass, long.class, index);
+                }
+                e.printStackTrace();
+            }
+        }
+    }
+
+    @Override
+    public void writeFloat(int index, float value) {
+        if (fieldCache.containsKey(packetClass)) {
+            try {
+                fieldCache.get(packetClass).get(float.class)[index].setFloat(packet, value);
+            } catch (IllegalAccessException | NullPointerException e) {
+                if(e instanceof NullPointerException) {
+                    throw new WrapperFieldNotFoundException(packetClass, float.class, index);
+                }
+                e.printStackTrace();
+            }
+        }
+    }
+
+    @Override
+    public void writeDouble(int index, double value) {
+        if (fieldCache.containsKey(packetClass)) {
+            try {
+                fieldCache.get(packetClass).get(double.class)[index].setDouble(packet, value);
+            } catch (IllegalAccessException | NullPointerException e) {
+                if(e instanceof NullPointerException) {
+                    throw new WrapperFieldNotFoundException(packetClass, double.class, index);
+                }
+                e.printStackTrace();
+            }
+        }
+    }
+
+    @Override
+    public void writeString(int index, String value) {
+        if (fieldCache.containsKey(packetClass)) {
+            try {
+                fieldCache.get(packetClass).get(String.class)[index].set(packet, value);
+            } catch (IllegalAccessException | NullPointerException e) {
+                if(e instanceof NullPointerException) {
+                    throw new WrapperFieldNotFoundException(packetClass, String.class, index);
+                }
+                e.printStackTrace();
+            }
+        }
     }
 }

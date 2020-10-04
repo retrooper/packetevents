@@ -31,16 +31,8 @@ import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 
 final class WrappedPacketInBlockPlace_1_9 extends WrappedPacket {
-    private Block block;
-
     public WrappedPacketInBlockPlace_1_9(final Player player, final Object packet) {
         super(player, packet);
-    }
-
-
-    @Override
-    protected void setup() {
-        this.block = BlockIteratorUtils.getBlockLookingAt(getPlayer(), 3);
     }
 
     public Player getPlayer() {
@@ -48,8 +40,6 @@ final class WrappedPacketInBlockPlace_1_9 extends WrappedPacket {
     }
 
     public Block getBlock() {
-        return block;
+        return BlockIteratorUtils.getBlockLookingAt(getPlayer(),3);
     }
-
-
 }

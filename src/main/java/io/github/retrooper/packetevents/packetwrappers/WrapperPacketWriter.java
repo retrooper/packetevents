@@ -22,20 +22,24 @@
  * SOFTWARE.
  */
 
-package io.github.retrooper.packetevents.utils.vector;
+package io.github.retrooper.packetevents.packetwrappers;
 
-@Deprecated
-public final class Vector3f {
-    public float x, y, z;
+public interface WrapperPacketWriter {
 
-    public Vector3f(final float x, final float y, final float z) {
-        this.x = x;
-        this.y = y;
-        this.z = z;
-    }
+    //TODO write for the arrays
+    void writeBoolean(int index, boolean value);
 
-    @Override
-    public String toString() {
-        return "X: " + x + ", Y: " + y + ", Z: " + z;
-    }
+    void writeByte(int index, byte value);
+
+    void writeShort(int index, short value);
+
+    void writeInt(int index, int value);
+
+    void writeLong(int index, long value);
+
+    void writeFloat(int index, float value);
+
+    void writeDouble(int index, double value);
+
+    void writeString(int index, String value);
 }

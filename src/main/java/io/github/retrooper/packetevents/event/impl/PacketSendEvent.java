@@ -27,6 +27,7 @@ package io.github.retrooper.packetevents.event.impl;
 import io.github.retrooper.packetevents.event.CancellableEvent;
 import io.github.retrooper.packetevents.event.PacketEvent;
 import io.github.retrooper.packetevents.packettype.PacketType;
+import io.github.retrooper.packetevents.utils.reflection.ClassUtil;
 import org.bukkit.entity.Player;
 
 /**
@@ -49,13 +50,12 @@ public final class PacketSendEvent extends PacketEvent implements CancellableEve
     }
 
     /**
-     * Get the packet's name (NMS packet class simple name)
-     * @deprecated It is recommended not to use this, as it is an expensive function to call.
+     * Get the packet's name (NMS packet class simple name).
+     * The class simple name is cached.
      * @return Name of the packet
      */
-    @Deprecated
     public String getPacketName() {
-        return this.packet.getClass().getSimpleName();
+        return ClassUtil.getClassSimpleName(packet.getClass());
     }
 
     /**
@@ -74,17 +74,6 @@ public final class PacketSendEvent extends PacketEvent implements CancellableEve
      */
     public Object getNMSPacket() {
         return this.packet;
-    }
-
-    /**
-     * Get the class of the NMS packet object.
-     * Deprecated because it is useless, rather use getNMSPacket().getClass().
-     *
-     * @return packet object class
-     */
-    @Deprecated
-    public Class<?> getNMSPacketClass() {
-        return packet.getClass();
     }
 
     @Override

@@ -24,6 +24,7 @@
 
 package io.github.retrooper.packetevents.packetwrappers.out.abilities;
 
+import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
 import io.github.retrooper.packetevents.utils.reflection.Reflection;
 import io.github.retrooper.packetevents.utils.nms.NMSUtils;
 
@@ -50,13 +51,13 @@ final class PlayerAbilitiesUtils {
     public static Object getPlayerAbilities(final boolean isVulnerable, final boolean isFlying, final boolean allowFlight, final boolean canBuildInstantly,
                                             final float flySpeed, final float walkSpeed) throws IllegalAccessException, InvocationTargetException, InstantiationException {
         final Object instance = playerAbilitiesConstructor.newInstance();
-        Reflection.getField(playerAbilitiesClass, boolean.class, 0).setBoolean(instance, isVulnerable);
-        Reflection.getField(playerAbilitiesClass, boolean.class, 1).setBoolean(instance, isFlying);
-        Reflection.getField(playerAbilitiesClass, boolean.class, 2).setBoolean(instance, allowFlight);
-        Reflection.getField(playerAbilitiesClass, boolean.class, 3).setBoolean(instance, canBuildInstantly);
-
-        Reflection.getField(playerAbilitiesClass, float.class, 0).setFloat(instance, flySpeed);
-        Reflection.getField(playerAbilitiesClass, float.class, 1).setFloat(instance, walkSpeed);
+        WrappedPacket wrapper = new WrappedPacket(instance);
+        wrapper.writeBoolean(0, isVulnerable);
+        wrapper.writeBoolean(1, isFlying);
+        wrapper.writeBoolean(2, allowFlight);
+        wrapper.writeBoolean(3, canBuildInstantly);
+        wrapper.writeFloat(0, flySpeed);
+        wrapper.writeFloat(1, walkSpeed);
         return instance;
     }
 }

@@ -24,7 +24,7 @@
 
 package io.github.retrooper.packetevents.packetwrappers.out.transaction;
 
-import io.github.retrooper.packetevents.packet.PacketTypeClasses;
+import io.github.retrooper.packetevents.packettype.PacketTypeClasses;
 import io.github.retrooper.packetevents.packetwrappers.SendableWrapper;
 import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
 
@@ -37,8 +37,10 @@ public class WrappedPacketOutTransaction extends WrappedPacket implements Sendab
     private int windowId;
     private short actionNumber;
     private boolean accepted;
+    private boolean isListening = false;
     public WrappedPacketOutTransaction(final Object packet) {
         super(packet);
+        isListening = true;
     }
 
     public WrappedPacketOutTransaction(final int windowId, final short actionNumber, final boolean accepted) {
@@ -58,20 +60,17 @@ public class WrappedPacketOutTransaction extends WrappedPacket implements Sendab
         }
     }
 
-    @Override
-    protected void setup() {
-        this.windowId = readInt(0);
-        this.actionNumber = readShort(0);
-        this.accepted = readBoolean(0);
-
-    }
-
     /**
      * Get the Window ID.
      * @return Get Window ID
      */
     public int getWindowId() {
-        return windowId;
+        if(isListening) {
+            return readInt(0);
+        }
+        else {
+            return windowId;
+        }
     }
 
     /**
@@ -79,7 +78,12 @@ public class WrappedPacketOutTransaction extends WrappedPacket implements Sendab
      * @return Get Action Number
      */
     public short getActionNumber() {
-        return actionNumber;
+        if(isListening) {
+            return readShort(0);
+        }
+        else {
+            return actionNumber;
+        }
     }
 
     /**
@@ -87,7 +91,12 @@ public class WrappedPacketOutTransaction extends WrappedPacket implements Sendab
      * @return Is Accepted
      */
     public boolean isAccepted() {
-        return accepted;
+        if(isListening) {
+            return readBoolean(0);
+        }
+        else {
+            return accepted;
+        }
     }
 
     @Override

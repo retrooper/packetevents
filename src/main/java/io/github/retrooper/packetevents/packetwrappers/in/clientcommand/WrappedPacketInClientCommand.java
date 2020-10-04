@@ -24,22 +24,21 @@
 
 package io.github.retrooper.packetevents.packetwrappers.in.clientcommand;
 
-import io.github.retrooper.packetevents.packet.PacketTypeClasses;
+import io.github.retrooper.packetevents.packettype.PacketTypeClasses;
 import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
 import io.github.retrooper.packetevents.utils.nms.NMSUtils;
 import io.github.retrooper.packetevents.utils.reflection.SubclassUtil;
 
 public final class WrappedPacketInClientCommand extends WrappedPacket {
-    private static Class<?> packetClass;
     private static Class<?> enumClientCommandClass;
-    private ClientCommand clientCommand;
+    private Object enumObj;
 
     public WrappedPacketInClientCommand(Object packet) {
         super(packet);
     }
 
     public static void load() {
-        packetClass = PacketTypeClasses.Client.CLIENT_COMMAND;
+        Class<?> packetClass = PacketTypeClasses.Client.CLIENT_COMMAND;
 
         try {
             enumClientCommandClass = NMSUtils.getNMSClass("EnumClientCommand");
@@ -49,19 +48,16 @@ public final class WrappedPacketInClientCommand extends WrappedPacket {
         }
     }
 
-    @Override
-    public void setup() {
-        Object enumObj = readObject(0, enumClientCommandClass);
-        this.clientCommand = ClientCommand.valueOf(enumObj.toString());
-    }
-
     /**
      * Get the Client Command enum sent in the packet
      *
      * @return ClientCommand
      */
     public ClientCommand getClientCommand() {
-        return clientCommand;
+        if(enumObj == null) {
+            enumObj = readObject(0, enumClientCommandClass);
+        }
+        return ClientCommand.valueOf(enumObj.toString());
     }
 
     public enum ClientCommand {

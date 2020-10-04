@@ -24,7 +24,7 @@
 
 package io.github.retrooper.packetevents.packetwrappers.out.position;
 
-import io.github.retrooper.packetevents.packet.PacketTypeClasses;
+import io.github.retrooper.packetevents.packettype.PacketTypeClasses;
 import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
 
 public final class WrappedPacketOutPosition extends WrappedPacket {
@@ -35,8 +35,11 @@ public final class WrappedPacketOutPosition extends WrappedPacket {
     private float yaw;
     private float pitch;
 
+    private boolean isListening = false;
+
     public WrappedPacketOutPosition(Object packet) {
         super(packet);
+        isListening = true;
     }
 
     public static void load() {
@@ -59,7 +62,12 @@ public final class WrappedPacketOutPosition extends WrappedPacket {
      * @return Get X Position
      */
     public double getX() {
-        return x;
+        if(isListening) {
+            return readDouble(0);
+        }
+        else {
+            return x;
+        }
     }
 
     /**
@@ -67,7 +75,12 @@ public final class WrappedPacketOutPosition extends WrappedPacket {
      * @return Get Y Position
      */
     public double getY() {
-        return y;
+        if(isListening) {
+            return readDouble(1);
+        }
+        else {
+            return y;
+        }
     }
 
     /**
@@ -75,7 +88,12 @@ public final class WrappedPacketOutPosition extends WrappedPacket {
      * @return Get Z Position
      */
     public double getZ() {
-        return z;
+        if(isListening) {
+            return readDouble(2);
+        }
+        else {
+            return z;
+        }
     }
 
     /**
@@ -83,7 +101,12 @@ public final class WrappedPacketOutPosition extends WrappedPacket {
      * @return Get Yaw
      */
     public float getYaw() {
-        return yaw;
+        if(isListening) {
+            return readFloat(0);
+        }
+        else {
+            return yaw;
+        }
     }
 
     /**
@@ -91,6 +114,11 @@ public final class WrappedPacketOutPosition extends WrappedPacket {
      * @return Get Pitch
      */
     public float getPitch() {
-        return pitch;
+        if(isListening) {
+            return readFloat(1);
+        }
+        else {
+            return pitch;
+        }
     }
 }

@@ -25,14 +25,18 @@
 package io.github.retrooper.packetevents.utils.reflection;
 
 import java.util.HashMap;
+import java.util.Map;
 
 public class ClassUtil {
-    private static final HashMap<Class<?>, String> classSimpleNameCache = new HashMap<Class<?>, String>();
+    private static final Map<Class<?>, String> classSimpleNameCache = new HashMap<Class<?>, String>();
 
     public static String getClassSimpleName(Class<?> cls) {
-        if(!classSimpleNameCache.containsKey(cls)) {
-            classSimpleNameCache.put(cls, cls.getSimpleName());
+        String tmp = classSimpleNameCache.get(cls);
+        if(tmp == null) {
+            String name = cls.getSimpleName();
+            classSimpleNameCache.put(cls, name);
+            return name;
         }
-        return classSimpleNameCache.get(cls);
+        return tmp;
     }
 }

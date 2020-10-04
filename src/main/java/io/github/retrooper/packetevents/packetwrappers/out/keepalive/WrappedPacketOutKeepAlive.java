@@ -24,7 +24,7 @@
 
 package io.github.retrooper.packetevents.packetwrappers.out.keepalive;
 
-import io.github.retrooper.packetevents.packet.PacketTypeClasses;
+import io.github.retrooper.packetevents.packettype.PacketTypeClasses;
 import io.github.retrooper.packetevents.packetwrappers.SendableWrapper;
 import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
 import io.github.retrooper.packetevents.utils.reflection.Reflection;
@@ -37,9 +37,11 @@ public class WrappedPacketOutKeepAlive extends WrappedPacket implements Sendable
     private static Constructor<?> keepAliveConstructor;
     private static boolean integerMode;
     private long id;
+    private boolean isListening = false;
 
     public WrappedPacketOutKeepAlive(Object packet) {
         super(packet);
+        isListening = true;
     }
 
     public WrappedPacketOutKeepAlive(long id) {
@@ -65,26 +67,24 @@ public class WrappedPacketOutKeepAlive extends WrappedPacket implements Sendable
         }
     }
 
-    @Override
-    protected void setup() {
-        if(integerMode) {
-            this.id = readInt(0);
-        }
-        else {
-            this.id = readLong(0);
-        }
-    }
-
     /**
      * Get the Keep Alive ID.
-     *
+     * <p>
      * You may cast this down to an int if you are on 1.7.10 - 1.12.2.
      * On 1.13.2 - 1.16.3 a long is sent.
      *
      * @return Get Keep Alive ID
      */
     public long getId() {
-        return id;
+        if (isListening) {
+            if (integerMode) {
+                return readInt(0);
+            } else {
+                return readLong(0);
+            }
+        } else {
+            return id;
+        }
     }
 
     @Override

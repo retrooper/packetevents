@@ -22,20 +22,52 @@
  * SOFTWARE.
  */
 
-package io.github.retrooper.packetevents.utils.vector;
+package io.github.retrooper.packetevents.event.impl;
 
-@Deprecated
-public final class Vector3d {
-    public double x, y, z;
+import io.github.retrooper.packetevents.event.CancellableEvent;
+import io.github.retrooper.packetevents.event.PacketEvent;
+import org.bukkit.entity.Player;
 
-    public Vector3d(final double x, final double y, final double z) {
-        this.x = x;
-        this.y = y;
-        this.z = z;
+/**
+ * This event is called each time you eject a player.
+ */
+public final class PlayerEjectEvent extends PacketEvent implements CancellableEvent {
+    private final Player player;
+    private final boolean async;
+    private boolean cancelled;
+
+    public PlayerEjectEvent(final Player player, final boolean isAsync) {
+        this.player = player;
+        this.async = isAsync;
+    }
+
+    public PlayerEjectEvent(final Player player) {
+        this(player, false);
     }
 
     @Override
-    public String toString() {
-        return "X: " + x + ", Y: " + y + ", Z: " + z;
+    public void cancel() {
+        this.cancelled = true;
+    }
+
+    @Override
+    public void uncancel() {this.cancelled = false; }
+
+    @Override
+    public boolean isCancelled() {
+        return this.cancelled;
+    }
+
+    @Override
+    public void setCancelled(final boolean val) {
+        this.cancelled = val;
+    }
+
+    public Player getPlayer() {
+        return player;
+    }
+
+    public boolean isAsync() {
+        return async;
     }
 }

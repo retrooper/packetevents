@@ -26,7 +26,7 @@ package io.github.retrooper.packetevents.packetwrappers.out.chat;
 
 import io.github.retrooper.packetevents.annotations.Beta;
 import io.github.retrooper.packetevents.annotations.NotNull;
-import io.github.retrooper.packetevents.packet.PacketTypeClasses;
+import io.github.retrooper.packetevents.packettype.PacketTypeClasses;
 import io.github.retrooper.packetevents.packetwrappers.SendableWrapper;
 import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
 import io.github.retrooper.packetevents.utils.reflection.Reflection;
@@ -62,7 +62,7 @@ public final class WrappedPacketOutChat extends WrappedPacket implements Sendabl
     private String message;
     private ChatPosition chatPosition;
     private UUID uuid;
-
+    private boolean isListening = false;
 
     @Deprecated
     public WrappedPacketOutChat(String message) {
@@ -71,6 +71,7 @@ public final class WrappedPacketOutChat extends WrappedPacket implements Sendabl
 
     public WrappedPacketOutChat(final Object packet) {
         super(packet);
+        isListening = true;
     }
 
     public WrappedPacketOutChat(String message, UUID uuid) {
@@ -180,36 +181,6 @@ public final class WrappedPacketOutChat extends WrappedPacket implements Sendabl
         return null;
     }
 
-
-    @Override
-    protected void setup() {
-        try {
-            final Object iChatBaseObj = readObject(0, iChatBaseComponentClass);
-
-            final Object contentString = Reflection.getMethod(iChatBaseComponentClass, String.class, 0).invoke(iChatBaseObj);
-
-            this.message = contentString.toString();
-
-            byte chatPosInteger = 0;
-            switch (constructorMode) {
-                case 0:
-                    chatPosInteger = readByte(0);
-                    break;
-                case 1:
-                    chatPosInteger = (byte) readInt(0);
-                    break;
-                case 2:
-                case 3:
-                    Object chatTypeEnumInstance = readObject(0, chatMessageTypeEnum);
-                    chatPosInteger = cachedChatMessageTypeIntegers.get(chatTypeEnumInstance.toString());
-                    break;
-            }
-            this.chatPosition = cachedChatPositionIntegers.get(chatPosInteger);
-        } catch (IllegalAccessException | InvocationTargetException e) {
-            e.printStackTrace();
-        }
-    }
-
     @Override
     public Object asNMSPacket() {
         int integerChatPos = cachedChatPositions.get(chatPosition);
@@ -267,7 +238,20 @@ public final class WrappedPacketOutChat extends WrappedPacket implements Sendabl
      * @return Get String Message
      */
     public String getMessage() {
-        return this.message;
+        if(isListening) {
+            final Object iChatBaseObj = readObject(0, iChatBaseComponentClass);
+
+            try {
+                Object contentString = Reflection.getMethod(iChatBaseComponentClass, String.class, 0).invoke(iChatBaseObj);
+                return contentString.toString();
+            } catch (IllegalAccessException | InvocationTargetException e) {
+                e.printStackTrace();
+            }
+            return null;
+        }
+        else {
+            return message;
+        }
     }
 
     /**
@@ -277,11 +261,27 @@ public final class WrappedPacketOutChat extends WrappedPacket implements Sendabl
      * If an invalid chat position is sent, it will be defaulted it to CHAT.
      * @return ChatPosition
      */
-    @NotNull
     public ChatPosition getChatPosition() {
-        if(this.chatPosition == null) {
-            this.chatPosition = ChatPosition.CHAT;
+        if(isListening) {
+            byte chatPosInteger = 0;
+            switch (constructorMode) {
+                case 0:
+                    chatPosInteger = readByte(0);
+                    break;
+                case 1:
+                    chatPosInteger = (byte) readInt(0);
+                    break;
+                case 2:
+                case 3:
+                    Object chatTypeEnumInstance = readObject(0, chatMessageTypeEnum);
+                    chatPosInteger = cachedChatMessageTypeIntegers.get(chatTypeEnumInstance.toString());
+                    break;
+            }
+            return cachedChatPositionIntegers.get(chatPosInteger);
         }
-        return this.chatPosition;
+        else {
+            return chatPosition;
+        }
     }
+
 }

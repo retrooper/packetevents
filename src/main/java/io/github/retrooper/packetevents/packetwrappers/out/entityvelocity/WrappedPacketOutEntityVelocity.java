@@ -24,11 +24,11 @@
 
 package io.github.retrooper.packetevents.packetwrappers.out.entityvelocity;
 
-import io.github.retrooper.packetevents.enums.ServerVersion;
-import io.github.retrooper.packetevents.packet.PacketTypeClasses;
+import io.github.retrooper.packetevents.packettype.PacketTypeClasses;
 import io.github.retrooper.packetevents.packetwrappers.SendableWrapper;
 import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
 import io.github.retrooper.packetevents.utils.nms.NMSUtils;
+import io.github.retrooper.packetevents.utils.server.ServerVersion;
 import org.bukkit.entity.Entity;
 
 import java.lang.reflect.Constructor;
@@ -38,11 +38,14 @@ public final class WrappedPacketOutEntityVelocity extends WrappedPacket implemen
     private static Constructor<?> velocityConstructor, vec3dConstructor;
     private static Class<?> velocityClass, vec3dClass;
     private static boolean isVec3dPresent;
-    private int entityID;
+    private int entityID = -1;
     private double velocityX, velocityY, velocityZ;
     private Entity entity;
+    private boolean isListening = false;
+
     public WrappedPacketOutEntityVelocity(final Object packet) {
         super(packet);
+        isListening = true;
     }
 
     public WrappedPacketOutEntityVelocity(final Entity entity, final double velocityX, final double velocityY, final double velocityZ) {
@@ -91,64 +94,71 @@ public final class WrappedPacketOutEntityVelocity extends WrappedPacket implemen
         }
     }
 
-    @Override
-    protected void setup() {
-        //ENTITY ID
-        this.entityID = readInt(0);
-
-        int x = readInt(1);
-        int y = readInt(2);
-        int z = readInt(3);
-
-        //VELOCITY XYZ
-        this.velocityX = x / 8000.0D;
-        this.velocityY = y / 8000.0D;
-        this.velocityZ = z / 8000.0D;
-    }
-
     /**
      * Lookup the associated entity by the ID that was sent in the packet.
+     *
      * @return Entity
      */
     public Entity getEntity() {
-        if(entity != null) {
+        if (entity != null) {
             return entity;
         }
-        return entity = NMSUtils.getEntityById(this.entityID);
+        return entity = NMSUtils.getEntityById(getEntityID());
     }
 
     /**
      * Get the ID of the entity.
      * If you do not want to use {@link #getEntity()},
      * you lookup the entity by yourself with this entity ID.
+     *
      * @return Entity ID
      */
-    public int getEntityId() {
-        return entityID;
+    public int getEntityID() {
+        if (entityID != -1) {
+            return entityID;
+        }
+        return entityID = readInt(0);
     }
 
     /**
      * Get the Velocity X
+     *
      * @return Get Velocity X
      */
     public double getVelocityX() {
-        return velocityX;
+        if (isListening) {
+            return readInt(1) / 8000.0D;
+        } else {
+            return velocityX;
+        }
     }
 
     /**
      * Get the Velocity Y
+     *
      * @return Get Velocity Y
      */
     public double getVelocityY() {
+        if(isListening) {
+        return readInt(2) / 8000.0D;
+    }
+    else {
         return velocityY;
+        }
     }
 
     /**
      * Get the Velocity Z
+     *
      * @return Get Velocity Z
      */
     public double getVelocityZ() {
+        if(isListening) {
+        return readInt(3) / 8000.0D;
+    }
+    else {
         return velocityZ;
+        }
     }
 
     @Override
