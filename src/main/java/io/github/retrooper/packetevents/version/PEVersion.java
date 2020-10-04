@@ -38,16 +38,7 @@ public class PEVersion {
         } else if (version.length < 2) {
             throw new IllegalArgumentException("You need atleast two arguments.");
         }
-        int len = version.length;
-        if (len < 4) {
-            this.version[0] = version[0];
-            this.version[1] = version[1];
-            if (len == 3) {
-                this.version[2] = version[2];
-            }
-        } else {
-            System.arraycopy(version, 0, this.version, 0, version.length);
-        }
+        System.arraycopy(version, 0, this.version, 0, version.length);
     }
 
     public PEVersion(String text) {
