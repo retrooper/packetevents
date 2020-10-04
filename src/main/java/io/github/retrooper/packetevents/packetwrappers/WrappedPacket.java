@@ -67,8 +67,6 @@ public class WrappedPacket implements WrapperPacketReader, WrapperPacketWriter {
 
     public WrappedPacket() {
         this.player = null;
-        this.packet = null;
-        this.packetClass = null;
     }
 
     public WrappedPacket(final Object packet) {
