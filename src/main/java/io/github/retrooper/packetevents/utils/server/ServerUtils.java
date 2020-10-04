@@ -43,13 +43,12 @@ public final class ServerUtils {
      * @return Get Recent TPS
      */
     public double[] getRecentTPS() {
-        double[] tpsArray = new double[0];
         try {
-            tpsArray = NMSUtils.recentTPS();
+            return NMSUtils.recentTPS();
         } catch (IllegalAccessException | InvocationTargetException e) {
             e.printStackTrace();
         }
-        return tpsArray;
+        return new double[0];
     }
 
     /**
