@@ -98,26 +98,23 @@ public class PEVersion {
         return false;
     }
 
+    // TODO: Remove "AsByteArray"
     public final int[] getVersionAsByteArray() {
         return version;
     }
 
+    // TODO: Remove "AsByteArray"
     public final int[] getVersionAsByteArrayShortened() {
-        List<Integer> versionBoxed = new ArrayList<>();
-        if (version[3] == 0) {
-            versionBoxed.add(version[0]);
-            versionBoxed.add(version[1]);
-            versionBoxed.add(version[2]);
-
-            if (version[2] == 0) {
-                versionBoxed.clear();
-                versionBoxed.add(version[0]);
-                versionBoxed.add(version[1]);
-            }
-            return convertIntListToIntArray(versionBoxed);
-        } else {
-            return version;
+        int length = 2;
+        if(version[2] != 0) {
+         length++;   
         }
+        if(version[3] != 0) {
+         length++;   
+        }
+        int[] shortened = new int[length];
+        System.arraycopy(version, 0, shortened, 0, length);
+        return shortened;
     }
 
     private int[] convertIntListToIntArray(List<Integer> list) {
