@@ -88,7 +88,7 @@ public final class PacketReceiveEvent extends PacketEvent implements Cancellable
 
     @Override
     public boolean isCancelled() {
-        return cancelled;
+        return this.cancelled;
     }
 
     @Override
