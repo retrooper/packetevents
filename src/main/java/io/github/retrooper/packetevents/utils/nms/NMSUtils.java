@@ -51,7 +51,7 @@ public final class NMSUtils {
     public static Class<?> nmsEntityClass, minecraftServerClass, craftWorldClass, playerInteractManagerClass, entityPlayerClass, playerConnectionClass, craftServerClass,
             craftPlayerClass, serverConnectionClass, craftEntityClass,
             craftItemStack, nmsItemStackClass, networkManagerClass, nettyChannelClass;
-    private static Method craftWorldGetHandle,getCraftWorldHandleMethod, getServerConnection, getCraftPlayerHandle, getCraftEntityHandle, asBukkitCopy;
+    private static Method craftWorldGetHandle, getCraftWorldHandleMethod, getServerConnection, getCraftPlayerHandle, getCraftEntityHandle, asBukkitCopy;
     private static Field entityPlayerPingField, playerConnectionField;
 
     public static final HashMap<UUID, Object> channelCache = new HashMap<>();
@@ -208,10 +208,13 @@ public final class NMSUtils {
 
     public static Object getChannel(final Player player) {
         UUID uuid = player.getUniqueId();
-        if (!channelCache.containsKey(uuid)) {
-            channelCache.put(uuid, getChannelNoCache(player));
+        Object channel = channelCache.get(uuid);
+        if (channel == null) {
+            Object newChannel = getChannelNoCache(player);
+            channelCache.put(uuid, newChannel);
+            return newChannel;
         }
-        return channelCache.get(uuid);
+        return channel;
     }
 
     public static Object getChannelNoCache(final Player player) {
@@ -251,13 +254,12 @@ public final class NMSUtils {
     public static Object convertBukkitWorldToNMSWorld(World world) {
         Object craftWorld = craftWorldClass.cast(world);
 
-        Object worldServer = null;
         try {
-            worldServer = craftWorldGetHandle.invoke(craftWorld);
+            return craftWorldGetHandle.invoke(craftWorld);
         } catch (IllegalAccessException | InvocationTargetException e) {
             e.printStackTrace();
         }
-        return worldServer;
+        return null;
     }
 
     public static Object createNewEntityPlayer(Server server, World world, Object gameProfile) {
