@@ -168,6 +168,10 @@ public final class PacketEvents implements Listener {
     public static boolean isInitialized() {
         return initialized;
     }
+    
+    public static boolean isBungeecord() {
+        return isBungee;
+    }
 
     public static PacketEventsAPI getAPI() {
         return packetEventsAPI;
