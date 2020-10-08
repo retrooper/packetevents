@@ -70,5 +70,4 @@ public final class PlayerInjectEvent extends PacketEvent implements CancellableE
     public boolean isAsync() {
         return async;
     }
-
 }

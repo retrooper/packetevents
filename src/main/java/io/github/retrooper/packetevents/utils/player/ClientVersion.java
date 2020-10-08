@@ -61,7 +61,9 @@ public enum ClientVersion {
      */
     ANY_PRE_RELEASE_VERSION(0),
 
-    UNKNOWN(-1);
+    UNKNOWN(-1),
+
+    UNKNOWN_BUNGEE_SERVER(-1);
 
     private final int protocolVersion;
 

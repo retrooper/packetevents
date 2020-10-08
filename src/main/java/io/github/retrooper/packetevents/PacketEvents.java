@@ -53,7 +53,7 @@ public final class PacketEvents implements Listener {
     private static final PacketEventsAPI packetEventsAPI = new PacketEventsAPI();
     private static final PacketEvents instance = new PacketEvents();
     private static final ArrayList<Plugin> plugins = new ArrayList<Plugin>(1);
-    private static boolean loaded, initialized, isBungee;
+    private static boolean loaded, initialized;
     private static final PEVersion version = new PEVersion(1, 6, 9, 2);
 
     private static PacketEventsSettings settings = new PacketEventsSettings();
@@ -130,20 +130,10 @@ public final class PacketEvents implements Listener {
             for (final Player p : Bukkit.getOnlinePlayers()) {
                 getAPI().getPlayerUtils().injectPlayer(p);
             }
-            initialized = true;
-
-            Class<?> spigotConfigClass;
-            try {
-                spigotConfigClass = Class.forName("org.spigotmc.SpigotConfig");
-                Field f = spigotConfigClass.getDeclaredField("bungee");
-                isBungee = f.getBoolean(null);
-            } catch (ClassNotFoundException | NoSuchFieldException | IllegalAccessException e) {
-                isBungee = false;
-            }
-
             if (settings.shouldCheckForUpdates()) {
                 Bukkit.getScheduler().runTask(pl, () -> new UpdateChecker().handleUpdate());
             }
+            initialized = true;
         }
     }
 
@@ -196,13 +186,12 @@ public final class PacketEvents implements Listener {
 
     @EventHandler
     public void onJoin(final PlayerJoinEvent e) {
-        if (!VersionLookupUtils.hasLoaded()) {
-            VersionLookupUtils.load();
+        if (!VersionLookupUtils.hasHandledLoadedDependencies()) {
+            VersionLookupUtils.handleLoadedDependencies();
         }
-        //for now we don't support bungee, rather handle it than have it FALSE
-        //and return the version of the server.
-        if (isBungee) {
-            PacketEvents.getAPI().getPlayerUtils().clientVersionsMap.put(e.getPlayer().getUniqueId(), ClientVersion.UNKNOWN);
+        //for now we don't support bungee
+        if (PacketEvents.getAPI().getServerUtils().isBungeeCordEnabled()) {
+            PacketEvents.getAPI().getPlayerUtils().clientVersionsMap.put(e.getPlayer().getUniqueId(), ClientVersion.UNKNOWN_BUNGEE_SERVER);
         } else {
             ClientVersion version = ClientVersion.getClientVersion(VersionLookupUtils.getProtocolVersion(e.getPlayer()));
             PacketEvents.getAPI().getPlayerUtils().clientVersionsMap.put(e.getPlayer().getUniqueId(), version);
@@ -224,7 +213,6 @@ public final class PacketEvents implements Listener {
             int index = (int) (random.nextFloat() * alphabet.length());
             sb.append(alphabet.charAt(index));
         }
-
         return sb.toString();
     }
 

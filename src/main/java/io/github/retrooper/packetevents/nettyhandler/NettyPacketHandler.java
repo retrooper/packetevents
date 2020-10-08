@@ -27,8 +27,8 @@ package io.github.retrooper.packetevents.nettyhandler;
 import io.github.retrooper.packetevents.PacketEvents;
 import io.github.retrooper.packetevents.event.impl.PacketReceiveEvent;
 import io.github.retrooper.packetevents.event.impl.PacketSendEvent;
-import io.github.retrooper.packetevents.event.impl.PlayerInjectEvent;
 import io.github.retrooper.packetevents.event.impl.PlayerEjectEvent;
+import io.github.retrooper.packetevents.event.impl.PlayerInjectEvent;
 import io.github.retrooper.packetevents.utils.nms.NMSUtils;
 import org.bukkit.entity.Player;
 
@@ -76,13 +76,12 @@ public class NettyPacketHandler {
      * @return {@link java.util.concurrent.Future}
      */
     public static Future<?> injectPlayerAsync(final Player player) {
-        //Make sure we cache the channel SYNCHRONOUSLY
         Object channel = NMSUtils.getChannel(player);
-        return singleThreadedExecutor.submit(() -> {
+        Future<?> future = singleThreadedExecutor.submit(() -> {
             try {
                 final PlayerInjectEvent injectEvent = new PlayerInjectEvent(player, true);
                 PacketEvents.getAPI().getEventManager().callEvent(injectEvent);
-                if (!injectEvent.isCancelled()) {
+                if (injectEvent.isCancelled()) {
                     if (v1_7_nettyMode) {
                         NettyPacketHandler_7.injectPlayer(player);
                     } else {
@@ -93,6 +92,7 @@ public class NettyPacketHandler {
 
             }
         });
+        return future;
     }
 
     /**
@@ -177,10 +177,9 @@ public class NettyPacketHandler {
     }
 
     public static void sendPacket(Object channel, Object packet) {
-        if(v1_7_nettyMode) {
+        if (v1_7_nettyMode) {
             NettyPacketHandler_7.sendPacket(channel, packet);
-        }
-        else {
+        } else {
             NettyPacketHandler_8.sendPacket(channel, packet);
         }
     }

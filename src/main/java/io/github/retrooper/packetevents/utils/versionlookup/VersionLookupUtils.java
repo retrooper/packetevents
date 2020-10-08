@@ -36,7 +36,7 @@ public class VersionLookupUtils {
 
     private static byte protocolAccessMode = -2;
 
-    public static void load() {
+    public static void handleLoadedDependencies() {
         protocolAccessMode = (byte) (ViaUtils.isAvailable() ?
                 0 : ProtocolSupportUtils.isAvailable() ?
                 1 : ProtocolLibUtils.isAvailable() ?
@@ -44,7 +44,7 @@ public class VersionLookupUtils {
                 3 : -1);
     }
 
-    public static boolean hasLoaded() {
+    public static boolean hasHandledLoadedDependencies() {
         return protocolAccessMode != -2;
     }
 

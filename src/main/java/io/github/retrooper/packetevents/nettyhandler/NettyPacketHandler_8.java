@@ -69,15 +69,8 @@ final class NettyPacketHandler_8 {
      */
     public static void ejectPlayer(final Player player) {
         final Channel channel = (Channel) NMSUtils.getChannelNoCache(player);
+        assert channel != null;
         channel.pipeline().remove(PacketEvents.getHandlerName(player.getName()));
-        //Make sure we are removing the cache synchronously
-        Bukkit.getScheduler().runTask(PacketEvents.getPlugins().get(0), new Runnable() {
-            @Override
-            public void run() {
-                //Make sure we are removing the cache SYNCHRONOUSLY
-                NMSUtils.channelCache.remove(player.getUniqueId());
-            }
-        });
     }
 
     public static void sendPacket(Object rawChannel, Object packet) {

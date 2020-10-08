@@ -70,8 +70,8 @@ final class NettyPacketHandler_7 {
      */
     public static void ejectPlayer(final Player player) {
          Channel channel = (Channel) NMSUtils.getChannelNoCache(player);
+        assert channel != null;
         channel.pipeline().remove(PacketEvents.getHandlerName(player.getName()));
-        //Make sure we are removing the cache synchronously
     }
 
     public static void sendPacket(Object rawChannel, Object packet) {
