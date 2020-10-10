@@ -26,24 +26,12 @@ package io.github.retrooper.packetevents.utils.server;
 
 import io.github.retrooper.packetevents.enums.SystemOS;
 import io.github.retrooper.packetevents.utils.nms.NMSUtils;
+import org.spigotmc.SpigotConfig;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 
 public final class ServerUtils {
-    static {
-        Class<?> spigotConfigClass;
-        try {
-            spigotConfigClass = Class.forName("org.spigotmc.SpigotConfig");
-            spigotBungeeField = spigotConfigClass.getDeclaredField("bungee");
-        } catch (Exception e) {
-
-        }
-
-    }
-    private static Field spigotBungeeField = null;
-    private static boolean isBungeeCache = false;
-    private static boolean hasCachedBungee = false;
     /**
      * Get the server version.
      * @return Get Server Version
@@ -82,12 +70,6 @@ public final class ServerUtils {
     }
 
     public boolean isBungeeCordEnabled() {
-        try {
-            hasCachedBungee = true;
-            return isBungeeCache = spigotBungeeField.getBoolean(null);
-        } catch (IllegalAccessException e) {
-            e.printStackTrace();
-        }
-        return false;
+        return SpigotConfig.bungee;
     }
 }

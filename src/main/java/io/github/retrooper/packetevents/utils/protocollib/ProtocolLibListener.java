@@ -71,7 +71,7 @@ public class ProtocolLibListener {
                             break;
                     }
                     Set<PacketType> clientValues = new HashSet<>();
-                    for(PacketType type : clientValues) {
+                    for(PacketType type : PacketType.Play.Client.getInstance().values()) {
                         if(type.isSupported()) {
                             clientValues.add(type);
                         }

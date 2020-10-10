@@ -66,7 +66,7 @@ final class NettyPacketHandler_7 {
 
     /**
      * Eject a player using 1.7.10 netty import location.
-     * @param player
+     * @param player Target Player
      */
     public static void ejectPlayer(final Player player) {
          Channel channel = (Channel) NMSUtils.getChannelNoCache(player);

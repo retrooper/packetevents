@@ -198,12 +198,8 @@ public final class NMSUtils {
     }
 
     public static Object getNetworkManager(final Player player) {
-        try {
-            return Reflection.getField(playerConnectionClass, networkManagerClass, 0).get(getPlayerConnection(player));
-        } catch (IllegalAccessException e) {
-            e.printStackTrace();
-        }
-        return null;
+        WrappedPacket wrapper = new WrappedPacket(getPlayerConnection(player));
+        return wrapper.readObject(0, networkManagerClass);
     }
 
     public static Object getChannel(final Player player) {
@@ -218,12 +214,8 @@ public final class NMSUtils {
     }
 
     public static Object getChannelNoCache(final Player player) {
-        try {
-            return Reflection.getField(networkManagerClass, nettyChannelClass, 0).get(getNetworkManager(player));
-        } catch (IllegalAccessException e) {
-            e.printStackTrace();
-        }
-        return null;
+        WrappedPacket wrapper = new WrappedPacket(getNetworkManager(player));
+        return wrapper.readObject(0, nettyChannelClass);
     }
 
     public static int getPlayerPing(final Player player) {

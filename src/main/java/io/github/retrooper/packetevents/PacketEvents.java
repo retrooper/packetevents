@@ -24,6 +24,7 @@
 
 package io.github.retrooper.packetevents;
 
+import io.github.retrooper.packetevents.bungee.BungeePluginMessageListener;
 import io.github.retrooper.packetevents.event.PacketEvent;
 import io.github.retrooper.packetevents.packettype.PacketTypeClasses;
 import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
@@ -40,6 +41,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.event.player.PlayerLoginEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.plugin.Plugin;
 
@@ -133,6 +135,10 @@ public final class PacketEvents implements Listener {
             if (settings.shouldCheckForUpdates()) {
                 Bukkit.getScheduler().runTask(pl, () -> new UpdateChecker().handleUpdate());
             }
+
+            if(PacketEvents.getAPI().getServerUtils().isBungeeCordEnabled()) {
+                Bukkit.getServer().getMessenger().registerIncomingPluginChannel(pl, BungeePluginMessageListener.tagName, new BungeePluginMessageListener());
+            }
             initialized = true;
         }
     }
@@ -183,7 +189,6 @@ public final class PacketEvents implements Listener {
     public static PEVersion getVersion() {
         return version;
     }
-
     @EventHandler
     public void onJoin(final PlayerJoinEvent e) {
         if (!VersionLookupUtils.hasHandledLoadedDependencies()) {
@@ -198,6 +203,7 @@ public final class PacketEvents implements Listener {
         }
         PacketEvents.getAPI().getPlayerUtils().injectPlayer(e.getPlayer());
     }
+
 
     @EventHandler
     public void onQuit(final PlayerQuitEvent e) {
