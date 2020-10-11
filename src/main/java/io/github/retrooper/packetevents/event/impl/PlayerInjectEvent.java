@@ -61,7 +61,9 @@ public final class PlayerInjectEvent extends PacketEvent implements CancellableE
     }
 
     @Override
-    public void uncancel() {this.cancelled = false; }
+    public void uncancel() {
+        this.cancelled = false;
+    }
 
     public Player getPlayer() {
         return player;
