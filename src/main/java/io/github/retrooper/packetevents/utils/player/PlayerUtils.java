@@ -42,7 +42,7 @@ public final class PlayerUtils {
     /**
      * This map stores each player's client version.
      */
-    public final HashMap<UUID, ClientVersion> clientVersionsMap = new HashMap<UUID, ClientVersion>();
+    public final HashMap<UUID, ClientVersion> clientVersionsMap = new HashMap<>();
 
     /**
      * Use reflection to read the ping value NMS calculates for the player.
@@ -67,11 +67,11 @@ public final class PlayerUtils {
         return playerSmoothedPingMap.getOrDefault(player.getUniqueId(), (short)0);
     }
 
-    public short getPing(UUID uuid) {
+    public short getPing(final UUID uuid) {
         return playerPingMap.getOrDefault(uuid, (short)0);
     }
 
-    public short getSmoothedPing(UUID uuid) {
+    public short getSmoothedPing(final UUID uuid) {
         return playerSmoothedPingMap.getOrDefault(uuid, (short)0);
     }
 
@@ -98,7 +98,7 @@ public final class PlayerUtils {
      * @param player
      * @return Get Protocol Version
      */
-    public int getProtocolVersion(Player player) {
+    public int getProtocolVersion(final Player player) {
         return VersionLookupUtils.getProtocolVersion(player);
     }
 
@@ -143,7 +143,7 @@ public final class PlayerUtils {
      * @param player
      * @param nmsPacket
      */
-    public void sendNMSPacket(final Player player, Object nmsPacket) {
+    public void sendNMSPacket(final Player player, final Object nmsPacket) {
         NMSUtils.sendNMSPacket(player, nmsPacket);
     }
 }
