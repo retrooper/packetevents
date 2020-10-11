@@ -92,6 +92,8 @@ public final class PacketSendEvent extends PacketEvent implements CancellableEve
     }
 
     @Override
-    public void uncancel() { this.cancelled = false;}
+    public void uncancel() {
+        this.cancelled = false;
+    }
 }
 
