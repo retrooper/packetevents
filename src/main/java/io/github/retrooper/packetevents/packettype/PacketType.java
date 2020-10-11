@@ -29,7 +29,7 @@ import java.util.Map;
 
 public class PacketType {
     public static class Client {
-        public static final Map<Class<?>, Byte> packetIds = new HashMap<Class<?>, Byte>();
+        public static final Map<Class<?>, Byte> packetIds = new HashMap<>();
         public static final byte TELEPORT_ACCEPT = 0,
                 TILE_NBT_QUERY = 1, DIFFICULTY_CHANGE = 2, CHAT = 3, CLIENT_COMMAND = 4,
                 SETTINGS = 5, TAB_COMPLETE = 6, TRANSACTION = 7, ENCHANT_ITEM = 8,
@@ -110,7 +110,7 @@ public class PacketType {
     }
 
     public static class Server {
-        public static final Map<Class<?>, Byte> packetIds = new HashMap<Class<?>, Byte>();
+        public static final Map<Class<?>, Byte> packetIds = new HashMap<>();
         public static final byte SPAWN_ENTITY = 0, SPAWN_ENTITY_EXPERIENCE_ORB = 1, SPAWN_ENTITY_WEATHER = 2, SPAWN_ENTITY_LIVING = 3,
                 SPAWN_ENTITY_PAINTING = 4, SPAWN_ENTITY_SPAWN = 5, ANIMATION = 6, STATISTIC = 7,
                 BLOCK_BREAK = 8, BLOCK_BREAK_ANIMATION = 9, TILE_ENTITY_DATA = 10, BLOCK_ACTION = 11,
