@@ -36,6 +36,8 @@ import java.util.HashMap;
 import java.util.UUID;
 
 public final class PlayerUtils {
+    public final HashMap<UUID, Short> playerPingMap = new HashMap<>();
+    public final HashMap<UUID, Short> playerSmoothedPingMap = new HashMap<>();
 
     /**
      * This map stores each player's client version.
@@ -43,12 +45,34 @@ public final class PlayerUtils {
     public final HashMap<UUID, ClientVersion> clientVersionsMap = new HashMap<UUID, ClientVersion>();
 
     /**
-     * Get the player's ping.
+     * Use reflection to read the ping value NMS calculates for the player.
+     * NMS smooths the player ping.
      * @param player
-     * @return Get Player Ping
+     * @return Get NMS smoothed Player Ping
      */
-    public int getPing(final Player player) {
+    public int getNMSPing(final Player player) {
         return NMSUtils.getPlayerPing(player);
+    }
+
+    /**
+     * Use the ping PacketEvents calculates for the player. (Updates every incoming Keep Alive packet)
+     * @param player Player
+     * @return Get Ping
+     */
+    public short getPing(final Player player) {
+        return playerPingMap.getOrDefault(player.getUniqueId(), (short)0);
+    }
+
+    public short getSmoothedPing(final Player player) {
+        return playerSmoothedPingMap.getOrDefault(player.getUniqueId(), (short)0);
+    }
+
+    public short getPing(UUID uuid) {
+        return playerPingMap.getOrDefault(uuid, (short)0);
+    }
+
+    public short getSmoothedPing(UUID uuid) {
+        return playerSmoothedPingMap.getOrDefault(uuid, (short)0);
     }
 
     /**

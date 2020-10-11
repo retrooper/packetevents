@@ -29,16 +29,22 @@ import io.github.retrooper.packetevents.event.impl.PacketReceiveEvent;
 import io.github.retrooper.packetevents.event.impl.PacketSendEvent;
 import io.github.retrooper.packetevents.event.impl.PlayerEjectEvent;
 import io.github.retrooper.packetevents.event.impl.PlayerInjectEvent;
+import io.github.retrooper.packetevents.packettype.PacketType;
 import io.github.retrooper.packetevents.utils.nms.NMSUtils;
 import org.bukkit.entity.Player;
 
+import java.util.HashMap;
+import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
 public class NettyPacketHandler {
     public static boolean v1_7_nettyMode = false;
-    private static final ExecutorService singleThreadedExecutor = Executors.newSingleThreadExecutor();
+    public static final ExecutorService
+            executorService =
+            Executors.newFixedThreadPool(Math.max(Runtime.getRuntime().availableProcessors(), 64));
+    private static final HashMap<UUID, Long> keepAliveMap = new HashMap<>();
 
     static {
         try {
@@ -77,11 +83,11 @@ public class NettyPacketHandler {
      */
     public static Future<?> injectPlayerAsync(final Player player) {
         Object channel = NMSUtils.getChannel(player);
-        Future<?> future = singleThreadedExecutor.submit(() -> {
+        Future<?> future = executorService.submit(() -> {
             try {
                 final PlayerInjectEvent injectEvent = new PlayerInjectEvent(player, true);
                 PacketEvents.getAPI().getEventManager().callEvent(injectEvent);
-                if (injectEvent.isCancelled()) {
+                if (!injectEvent.isCancelled()) {
                     if (v1_7_nettyMode) {
                         NettyPacketHandler_7.injectPlayer(player);
                     } else {
@@ -125,7 +131,7 @@ public class NettyPacketHandler {
      */
     public static Future<?> ejectPlayerAsync(final Player player) {
         NMSUtils.channelCache.remove(player.getUniqueId());
-        Future<?> f = singleThreadedExecutor.submit(() -> {
+        Future<?> f = executorService.submit(() -> {
             try {
                 final PlayerEjectEvent uninjectEvent = new PlayerEjectEvent(player, true);
                 PacketEvents.getAPI().getEventManager().callEvent(uninjectEvent);
@@ -153,6 +159,7 @@ public class NettyPacketHandler {
     public static Object write(final Player sender, final Object packet) {
         final PacketSendEvent packetSendEvent = new PacketSendEvent(sender, packet);
         PacketEvents.getAPI().getEventManager().callEvent(packetSendEvent);
+        interceptSendEvent(packetSendEvent);
         if (!packetSendEvent.isCancelled()) {
             return packet;
         }
@@ -170,10 +177,29 @@ public class NettyPacketHandler {
     public static Object read(final Player receiver, final Object packet) {
         final PacketReceiveEvent packetReceiveEvent = new PacketReceiveEvent(receiver, packet);
         PacketEvents.getAPI().getEventManager().callEvent(packetReceiveEvent);
+        interceptReceiveEvent(packetReceiveEvent);
         if (!packetReceiveEvent.isCancelled()) {
             return packet;
         }
         return null;
+    }
+
+    private static void interceptSendEvent(PacketSendEvent event) {
+        if (event.getPacketId() == PacketType.Server.KEEP_ALIVE) {
+            keepAliveMap.put(event.getPlayer().getUniqueId(), event.getTimestamp());
+        }
+    }
+
+    private static void interceptReceiveEvent(PacketReceiveEvent event) {
+        if (event.getPacketId() == PacketType.Client.KEEP_ALIVE) {
+            UUID uuid = event.getPlayer().getUniqueId();
+            long timestamp = keepAliveMap.getOrDefault(uuid, event.getTimestamp());
+            long currentTime = event.getTimestamp();
+            long ping = currentTime - timestamp;
+            long smoothedPing = ((PacketEvents.getAPI().getPlayerUtils().getSmoothedPing(event.getPlayer()) * 3) + ping) / 4;
+            PacketEvents.getAPI().getPlayerUtils().playerPingMap.put(uuid, (short) ping);
+            PacketEvents.getAPI().getPlayerUtils().playerSmoothedPingMap.put(uuid, (short) smoothedPing);
+        }
     }
 
     public static void sendPacket(Object channel, Object packet) {

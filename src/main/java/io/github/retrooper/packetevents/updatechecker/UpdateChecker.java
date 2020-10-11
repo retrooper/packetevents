@@ -27,6 +27,7 @@ package io.github.retrooper.packetevents.updatechecker;
 import io.github.retrooper.packetevents.PacketEvents;
 import io.github.retrooper.packetevents.version.PEVersion;
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -36,10 +37,10 @@ import java.net.URLConnection;
 
 public class UpdateChecker {
     public void handleUpdate() {
+        PEVersion localVersion = PacketEvents.getVersion();
         try {
             String line = readLatestVersion();
             PEVersion newVersion = new PEVersion(line);
-            PEVersion localVersion = PacketEvents.getVersion();
             if (localVersion.isOlder(newVersion)) {
                 inform("[PacketEvents] There is an update available for the PacketEvents API! (" + newVersion.toString() + ")");
             }
@@ -50,12 +51,16 @@ public class UpdateChecker {
                 inform("[PacketEvents] You are on a dev or pre released build of PacketEvents. Your build: (" + localVersion.toString() + ") | Last released build: (" + newVersion.toString() + ")");
             }
         } catch (IOException ignored) {
-            //Thats fine, Not important
+            report("[PacketEvents] We failed to find the latest released version of PacketEvents. Your build: ("  + localVersion.toString() + ")");
         }
     }
 
     private void inform(String message) {
         Bukkit.getLogger().info(message);
+    }
+
+    private void report(String message) {
+        Bukkit.getLogger().info(ChatColor.DARK_RED + message);
     }
 
     private String readLatestVersion() throws IOException {

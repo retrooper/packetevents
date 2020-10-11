@@ -76,6 +76,9 @@ public final class EventManager {
     public void registerListener(final PacketListener listener) {
         final ConcurrentLinkedQueue<Method> methods = new ConcurrentLinkedQueue<>();
         for (final Method m : listener.getClass().getDeclaredMethods()) {
+            if(!m.isAccessible()) {
+                m.setAccessible(true);
+            }
             if (m.isAnnotationPresent(PacketHandler.class)
                     && m.getParameterTypes().length == 1) {
                 methods.add(m);
