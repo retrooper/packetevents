@@ -51,7 +51,9 @@ public final class PlayerEjectEvent extends PacketEvent implements CancellableEv
     }
 
     @Override
-    public void uncancel() {this.cancelled = false; }
+    public void uncancel() {
+        this.cancelled = false;
+    }
 
     @Override
     public boolean isCancelled() {
