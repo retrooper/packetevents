@@ -50,7 +50,8 @@ public class PEVersion {
         text += ".";
 
         int dotCount = 0;
-        for (char c : text.toCharArray()) {
+        char[] chars = text.toCharArray();
+        for (char c : chars) {
             if (c == '.') {
                 dotCount++;
             }
@@ -61,12 +62,12 @@ public class PEVersion {
         int[] version = new int[4];
 
         // String t = "1.2.3.4";
-        for (int i = 0; i < text.toCharArray().length; i++) {
-            char c = text.toCharArray()[i];
+        for (int i = 0; i < chars.length; i++) {
+            char c = chars[i];
 
             if (c == '.') {
                 version[arrayIndex++] =
-                        Integer.parseInt(Character.toString(text.toCharArray()[i - 1]));
+                        Integer.parseInt(Character.toString(chars[i - 1]));
             }
         }
         return version;
