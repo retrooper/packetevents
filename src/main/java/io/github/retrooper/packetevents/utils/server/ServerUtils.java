@@ -24,11 +24,9 @@
 
 package io.github.retrooper.packetevents.utils.server;
 
-import io.github.retrooper.packetevents.enums.SystemOS;
 import io.github.retrooper.packetevents.utils.nms.NMSUtils;
 import org.spigotmc.SpigotConfig;
 
-import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 
 public final class ServerUtils {

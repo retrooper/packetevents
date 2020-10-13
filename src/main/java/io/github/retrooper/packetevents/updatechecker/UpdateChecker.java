@@ -25,7 +25,7 @@
 package io.github.retrooper.packetevents.updatechecker;
 
 import io.github.retrooper.packetevents.PacketEvents;
-import io.github.retrooper.packetevents.version.PEVersion;
+import io.github.retrooper.packetevents.utils.server.PEVersion;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 

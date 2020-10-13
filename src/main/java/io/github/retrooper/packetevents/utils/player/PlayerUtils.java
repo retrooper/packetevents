@@ -135,7 +135,7 @@ public final class PlayerUtils {
      * @param sendableWrapper
      */
     public void sendPacket(final Player player, final SendableWrapper sendableWrapper) {
-        NMSUtils.sendSendableWrapper(player, sendableWrapper);
+        NettyPacketHandler.sendPacket(NMSUtils.getChannel(player), sendableWrapper.asNMSPacket());
     }
 
     /**
@@ -144,6 +144,6 @@ public final class PlayerUtils {
      * @param nmsPacket
      */
     public void sendNMSPacket(final Player player, Object nmsPacket) {
-        NMSUtils.sendNMSPacket(player, nmsPacket);
+        NettyPacketHandler.sendPacket(NMSUtils.getChannel(player), nmsPacket);
     }
 }

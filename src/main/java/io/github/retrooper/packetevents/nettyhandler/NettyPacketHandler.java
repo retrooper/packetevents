@@ -25,10 +25,7 @@
 package io.github.retrooper.packetevents.nettyhandler;
 
 import io.github.retrooper.packetevents.PacketEvents;
-import io.github.retrooper.packetevents.event.impl.PacketReceiveEvent;
-import io.github.retrooper.packetevents.event.impl.PacketSendEvent;
-import io.github.retrooper.packetevents.event.impl.PlayerEjectEvent;
-import io.github.retrooper.packetevents.event.impl.PlayerInjectEvent;
+import io.github.retrooper.packetevents.event.impl.*;
 import io.github.retrooper.packetevents.packettype.PacketType;
 import io.github.retrooper.packetevents.utils.nms.NMSUtils;
 import org.bukkit.entity.Player;
@@ -152,12 +149,12 @@ public class NettyPacketHandler {
     /**
      * This function is called each time the server plans to send a packet to the client.
      *
-     * @param sender
+     * @param player
      * @param packet
      * @return
      */
-    public static Object write(final Player sender, final Object packet) {
-        final PacketSendEvent packetSendEvent = new PacketSendEvent(sender, packet);
+    public static Object write(final Player player, final Object packet) {
+        final PacketSendEvent packetSendEvent = new PacketSendEvent(player, packet);
         PacketEvents.getAPI().getEventManager().callEvent(packetSendEvent);
         interceptSendEvent(packetSendEvent);
         if (!packetSendEvent.isCancelled()) {
@@ -170,18 +167,26 @@ public class NettyPacketHandler {
     /**
      * This function is called each time the server receives a packet from the client.
      *
-     * @param receiver
+     * @param player
      * @param packet
      * @return
      */
-    public static Object read(final Player receiver, final Object packet) {
-        final PacketReceiveEvent packetReceiveEvent = new PacketReceiveEvent(receiver, packet);
+    public static Object read(final Player player, final Object packet) {
+        final PacketReceiveEvent packetReceiveEvent = new PacketReceiveEvent(player, packet);
         PacketEvents.getAPI().getEventManager().callEvent(packetReceiveEvent);
         interceptReceiveEvent(packetReceiveEvent);
         if (!packetReceiveEvent.isCancelled()) {
             return packet;
         }
         return null;
+    }
+
+    public static void postRead(Player player, final Object packet) {
+        PacketEvents.getAPI().getEventManager().callEvent(new PostPacketReceiveEvent(player, packet));
+    }
+
+    public static void postSend(Player player, final Object packet) {
+        PacketEvents.getAPI().getEventManager().callEvent(new PostPacketSendEvent(player, packet));
     }
 
     private static void interceptSendEvent(PacketSendEvent event) {

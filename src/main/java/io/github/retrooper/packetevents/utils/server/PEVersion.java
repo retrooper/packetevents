@@ -22,13 +22,12 @@
  * SOFTWARE.
  */
 
-package io.github.retrooper.packetevents.version;
+package io.github.retrooper.packetevents.utils.server;
 
-import java.util.ArrayList;
 import java.util.List;
 
 
-
+//I was lazy while making this class, I know
 public class PEVersion {
     private final int[] version = new int[4];
 
@@ -36,7 +35,7 @@ public class PEVersion {
         if (version.length > 4) {
             throw new IllegalArgumentException("You are not allowed to have more than 4 arguments!");
         } else if (version.length < 2) {
-            throw new IllegalArgumentException("You need atleast two arguments.");
+            throw new IllegalArgumentException("You need at least two arguments.");
         }
         System.arraycopy(version, 0, this.version, 0, version.length);
     }

@@ -49,6 +49,7 @@ final class NettyPacketHandler_7 {
                     return;
                 }
                 super.channelRead(ctx, msg);
+                NettyPacketHandler.postRead(player, packet);
             }
 
             @Override
@@ -58,6 +59,7 @@ final class NettyPacketHandler_7 {
                     return;
                 }
                 super.write(ctx, msg, promise);
+                NettyPacketHandler.postSend(player, packet);
             }
         };
         final ChannelPipeline pipeline = ((Channel) NMSUtils.getChannel(player)).pipeline();

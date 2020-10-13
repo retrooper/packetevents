@@ -24,55 +24,53 @@
 
 package io.github.retrooper.packetevents.event.impl;
 
-import io.github.retrooper.packetevents.event.eventtypes.CancellableEvent;
 import io.github.retrooper.packetevents.event.PacketEvent;
 import io.github.retrooper.packetevents.event.eventtypes.PlayerEvent;
+import io.github.retrooper.packetevents.packettype.PacketType;
+import io.github.retrooper.packetevents.utils.reflection.ClassUtil;
 import org.bukkit.entity.Player;
 
-/**
- * This event is called each time you eject a player.
- */
-public final class PlayerEjectEvent extends PacketEvent implements CancellableEvent, PlayerEvent {
+public class PostPacketSendEvent extends PacketEvent implements PlayerEvent {
     private final Player player;
-    private final boolean async;
+    private final Object packet;
     private boolean cancelled;
 
-    public PlayerEjectEvent(final Player player, final boolean isAsync) {
+    public PostPacketSendEvent(final Player player, final Object packet) {
         this.player = player;
-        this.async = isAsync;
+        this.packet = packet;
     }
 
-    public PlayerEjectEvent(final Player player) {
-        this.player = player;
-        this.async = true; //default value
-    }
-
-    @Override
-    public void cancel() {
-        cancelled = true;
-    }
-
-    @Override
-    public void uncancel() {
-        cancelled = false;
-    }
-
-    @Override
-    public boolean isCancelled() {
-        return cancelled;
-    }
-
-    @Override
-    public void setCancelled(boolean value) {
-        cancelled = value;
-    }
-
+    /**
+     * Get the packet sender
+     * @return player
+     */
     @Override
     public Player getPlayer() {
         return player;
     }
 
-    public boolean isAsync() {
-        return async;
+    /**
+     * Get the packet's name (NMS packet class simple name).
+     * The class simple name is cached.
+     * @return Name of the packet
+     */
+    public String getPacketName() {
+        return ClassUtil.getClassSimpleName(packet.getClass());
+    }
+
+    /**
+     * Get the raw packet object
+     * @return packet object
+     */
+    public Object getNMSPacket() {
+        return packet;
+    }
+
+    /**
+     * Get the ID of the packet
+     * @return packet id
+     */
+    public byte getPacketId() {
+        return PacketType.Server.packetIds.getOrDefault(packet.getClass(), (byte) -1);
     }
 }

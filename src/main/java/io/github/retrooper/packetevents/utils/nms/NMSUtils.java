@@ -279,12 +279,4 @@ public final class NMSUtils {
         }
         return null;
     }
-
-    public static void sendSendableWrapper(final Player player, final SendableWrapper sendableWrapper) {
-        NMSUtils.sendNMSPacket(player, sendableWrapper.asNMSPacket());
-    }
-
-    public static void sendNMSPacket(final Player player, final Object nmsPacket) {
-        NettyPacketHandler.sendPacket(getChannel(player), nmsPacket);
-    }
 }

@@ -24,8 +24,9 @@
 
 package io.github.retrooper.packetevents.event.impl;
 
-import io.github.retrooper.packetevents.event.CancellableEvent;
+import io.github.retrooper.packetevents.event.eventtypes.CancellableEvent;
 import io.github.retrooper.packetevents.event.PacketEvent;
+import io.github.retrooper.packetevents.event.eventtypes.PlayerEvent;
 import io.github.retrooper.packetevents.packettype.PacketType;
 import io.github.retrooper.packetevents.utils.reflection.ClassUtil;
 import org.bukkit.entity.Player;
@@ -33,7 +34,7 @@ import org.bukkit.entity.Player;
 /**
  * This event is called each time a packet is received from a client.
  */
-public final class PacketReceiveEvent extends PacketEvent implements CancellableEvent {
+public final class PacketReceiveEvent extends PacketEvent implements CancellableEvent, PlayerEvent {
     private final Player player;
     private final Object packet;
     private boolean cancelled;
@@ -47,8 +48,9 @@ public final class PacketReceiveEvent extends PacketEvent implements Cancellable
      * Get the packet sender
      * @return player
      */
+    @Override
     public Player getPlayer() {
-        return this.player;
+        return player;
     }
 
     /**
@@ -65,7 +67,7 @@ public final class PacketReceiveEvent extends PacketEvent implements Cancellable
      * @return packet object
      */
     public Object getNMSPacket() {
-        return this.packet;
+        return packet;
     }
 
     /**
@@ -78,22 +80,22 @@ public final class PacketReceiveEvent extends PacketEvent implements Cancellable
 
     @Override
     public void cancel() {
-        this.cancelled = true;
+        cancelled = true;
     }
 
     @Override
     public void uncancel() {
-        this.cancelled = false;
+        cancelled = false;
     }
 
     @Override
     public boolean isCancelled() {
-        return this.cancelled;
+        return cancelled;
     }
 
     @Override
-    public void setCancelled(boolean cancelled) {
-        this.cancelled = cancelled;
+    public void setCancelled(boolean value) {
+        cancelled = value;
     }
 
 }

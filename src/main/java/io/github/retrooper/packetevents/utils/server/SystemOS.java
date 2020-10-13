@@ -22,7 +22,7 @@
  * SOFTWARE.
  */
 
-package io.github.retrooper.packetevents.enums;
+package io.github.retrooper.packetevents.utils.server;
 
 public enum SystemOS {
     WINDOWS, MACOS, LINUX, OTHER;

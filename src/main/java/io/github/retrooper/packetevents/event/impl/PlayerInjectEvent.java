@@ -24,14 +24,15 @@
 
 package io.github.retrooper.packetevents.event.impl;
 
-import io.github.retrooper.packetevents.event.CancellableEvent;
+import io.github.retrooper.packetevents.event.eventtypes.CancellableEvent;
 import io.github.retrooper.packetevents.event.PacketEvent;
+import io.github.retrooper.packetevents.event.eventtypes.PlayerEvent;
 import org.bukkit.entity.Player;
 
 /**
  * This event is called each time you inject a player.
  */
-public final class PlayerInjectEvent extends PacketEvent implements CancellableEvent {
+public final class PlayerInjectEvent extends PacketEvent implements CancellableEvent, PlayerEvent {
     private final Player player;
     private final boolean async;
     private boolean cancelled;
@@ -46,23 +47,26 @@ public final class PlayerInjectEvent extends PacketEvent implements CancellableE
     }
 
     @Override
+    public void cancel() {
+        cancelled = true;
+    }
+
+    @Override
+    public void uncancel() {
+        cancelled = false;
+    }
+
+    @Override
     public boolean isCancelled() {
         return cancelled;
     }
 
     @Override
-    public void setCancelled(boolean cancelled) {
-        this.cancelled = cancelled;
+    public void setCancelled(boolean value) {
+        cancelled = value;
     }
 
     @Override
-    public void cancel() {
-        this.cancelled = true;
-    }
-
-    @Override
-    public void uncancel() {this.cancelled = false; }
-
     public Player getPlayer() {
         return player;
     }

@@ -26,7 +26,7 @@ package io.github.retrooper.packetevents.event.manager;
 
 import io.github.retrooper.packetevents.PacketEvents;
 import io.github.retrooper.packetevents.event.annotation.PacketHandler;
-import io.github.retrooper.packetevents.event.CancellableEvent;
+import io.github.retrooper.packetevents.event.eventtypes.CancellableEvent;
 import io.github.retrooper.packetevents.event.PacketEvent;
 import io.github.retrooper.packetevents.event.PacketListener;
 import io.github.retrooper.packetevents.event.priority.PacketEventPriority;

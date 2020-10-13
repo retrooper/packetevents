@@ -36,19 +36,18 @@ import io.github.retrooper.packetevents.utils.nms.NMSUtils;
 import io.github.retrooper.packetevents.utils.player.ClientVersion;
 import io.github.retrooper.packetevents.utils.server.ServerVersion;
 import io.github.retrooper.packetevents.utils.versionlookup.VersionLookupUtils;
-import io.github.retrooper.packetevents.version.PEVersion;
+import io.github.retrooper.packetevents.utils.server.PEVersion;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
-import org.bukkit.event.player.PlayerLoginEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.plugin.Plugin;
 
-import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Random;
+import java.util.concurrent.Future;
 
 public final class PacketEvents implements Listener {
     private static final String nettyHandlerIdentifier = generateRandomNettyIdentifier();
@@ -133,8 +132,14 @@ public final class PacketEvents implements Listener {
             for (final Player p : Bukkit.getOnlinePlayers()) {
                 getAPI().getPlayerUtils().injectPlayer(p);
             }
+
             if (settings.shouldCheckForUpdates()) {
-                Bukkit.getScheduler().runTaskAsynchronously(pl, () -> new UpdateChecker().handleUpdate());
+                Future<?> future = NettyPacketHandler.executorService.submit(new Runnable() {
+                    @Override
+                    public void run() {
+                        new UpdateChecker().handleUpdate();
+                    }
+                });
             }
 
             if(PacketEvents.getAPI().getServerUtils().isBungeeCordEnabled()) {
@@ -153,14 +158,10 @@ public final class PacketEvents implements Listener {
                 getAPI().getPlayerUtils().ejectPlayer(p);
             }
 
-            NettyPacketHandler.executorService.shutdown();
-
             getAPI().getEventManager().unregisterAllListeners();
 
             initialized = false;
-            if(!NettyPacketHandler.executorService.isShutdown()) {
-                NettyPacketHandler.executorService.shutdownNow();
-            }
+            NettyPacketHandler.executorService.shutdownNow();
         }
     }
 
