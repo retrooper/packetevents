@@ -4,7 +4,7 @@ A spigot packet API with some nice utlities.
 
 ## About
 
-This packetlistener is **only** supported on spigot servers and has been tested to work on these spigot forks: PaperMC, Tuinity
+This packetlistener is **only** supported on Spigot servers and has been tested to work on these Spigot forks: PaperMC, Tuinity
 
 * No dependencies
 
