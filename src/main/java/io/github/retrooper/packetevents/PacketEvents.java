@@ -120,9 +120,7 @@ public final class PacketEvents implements Listener {
      * @param pl JavaPlugin instance
      */
     public static void init(final Plugin pl, PacketEventsSettings packetEventsSettings) {
-        if (!loaded) {
-            load();
-        }
+       load();
         if (!initialized) {
             settings = packetEventsSettings;
             plugins.add(pl);
@@ -142,7 +140,7 @@ public final class PacketEvents implements Listener {
                 });
             }
 
-            if(PacketEvents.getAPI().getServerUtils().isBungeeCordEnabled()) {
+            if(getAPI().getServerUtils().isBungeeCordEnabled()) {
                 Bukkit.getServer().getMessenger().registerIncomingPluginChannel(pl, BungeePluginMessageListener.tagName, new BungeePluginMessageListener());
             }
             initialized = true;
