@@ -42,7 +42,7 @@ public final class PlayerUtils {
     /**
      * This map stores each player's client version.
      */
-    public final HashMap<UUID, ClientVersion> clientVersionsMap = new HashMap<UUID, ClientVersion>();
+    public final HashMap<UUID, ClientVersion> clientVersionsMap = new HashMap<>();
 
     /**
      * Use reflection to read the ping value NMS calculates for the player.
