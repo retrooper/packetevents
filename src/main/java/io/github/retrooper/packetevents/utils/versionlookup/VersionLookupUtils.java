@@ -70,7 +70,7 @@ public class VersionLookupUtils {
             case 3:
                 return ProtocolVersionAccessor_v_1_7.getProtocolVersion(player);
             default:
-                return -1;
+                return PacketEvents.getSettings().shouldAutoResolveClientProtocolVersion() ? PacketEvents.getAPI().getServerUtils().getVersion().toProtocolVersion() : -1;
         }
     }
 }
