@@ -24,6 +24,8 @@
 
 package io.github.retrooper.packetevents.event.eventtypes;
 
+import org.bukkit.entity.Player;
+
 /**
  * Event having to do with a player.
  */
