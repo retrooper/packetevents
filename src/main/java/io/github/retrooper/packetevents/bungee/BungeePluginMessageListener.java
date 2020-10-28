@@ -41,8 +41,7 @@ public class BungeePluginMessageListener implements PluginMessageListener {
         if (tag.equals(tagName)) {
             ByteArrayDataInput in = ByteStreams.newDataInput(bytes);
             if (in.readUTF().equals("version")) {
-                String rawUUIDString = in.readUTF();
-                String uuidString = rawUUIDString.replace("-", "");
+                String uuidString = in.readUTF();
                 UUID uuid = UUID.fromString(uuidString);
                 short protocolVersion = in.readShort();
                 ClientVersion version = ClientVersion.getClientVersion(protocolVersion);
