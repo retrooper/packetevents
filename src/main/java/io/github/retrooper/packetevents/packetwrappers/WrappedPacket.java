@@ -36,12 +36,12 @@ import io.github.retrooper.packetevents.packetwrappers.in.settings.WrappedPacket
 import io.github.retrooper.packetevents.packetwrappers.in.updatesign.WrappedPacketInUpdateSign;
 import io.github.retrooper.packetevents.packetwrappers.in.useentity.WrappedPacketInUseEntity;
 import io.github.retrooper.packetevents.packetwrappers.in.windowclick.WrappedPacketInWindowClick;
-import io.github.retrooper.packetevents.packetwrappers.out.entityteleport.WrappedPacketOutEntityTeleport;
 import io.github.retrooper.packetevents.packetwrappers.out.abilities.WrappedPacketOutAbilities;
 import io.github.retrooper.packetevents.packetwrappers.out.animation.WrappedPacketOutAnimation;
 import io.github.retrooper.packetevents.packetwrappers.out.chat.WrappedPacketOutChat;
 import io.github.retrooper.packetevents.packetwrappers.out.custompayload.WrappedPacketOutCustomPayload;
 import io.github.retrooper.packetevents.packetwrappers.out.entity.WrappedPacketOutEntity;
+import io.github.retrooper.packetevents.packetwrappers.out.entityteleport.WrappedPacketOutEntityTeleport;
 import io.github.retrooper.packetevents.packetwrappers.out.entityvelocity.WrappedPacketOutEntityVelocity;
 import io.github.retrooper.packetevents.packetwrappers.out.explosion.WrappedPacketOutExplosion;
 import io.github.retrooper.packetevents.packetwrappers.out.gamestatechange.WrappedPacketOutGameStateChange;
@@ -58,9 +58,10 @@ import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class WrappedPacket implements WrapperPacketReader, WrapperPacketWriter {
-    private static final HashMap<Class<?>, HashMap<Class<?>, Field[]>> fieldCache = new HashMap<>();
+    private static final Map<Class<?>, Map<Class<?>, Field[]>> fieldCache = new HashMap<>();
     public static ServerVersion version;
     protected final Player player;
     protected Object packet;
@@ -152,7 +153,7 @@ public class WrappedPacket implements WrapperPacketReader, WrapperPacketWriter {
                 }
             }
 
-            HashMap<Class<?>, Field[]> map = new HashMap<>();
+            Map<Class<?>, Field[]> map = new HashMap<>();
             if (!boolFields.isEmpty()) {
                 map.put(boolean.class, boolFields.toArray(new Field[0]));
             }
@@ -259,98 +260,42 @@ public class WrappedPacket implements WrapperPacketReader, WrapperPacketWriter {
 
     @Override
     public boolean readBoolean(int index) {
-        HashMap<Class<?>, Field[]> cached = fieldCache.get(packetClass);
-        if (cached != null) {
-            try {
-                return cached.get(boolean.class)[index].getBoolean(packet);
-            } catch (IllegalAccessException e) {
-                e.printStackTrace();
-            }
-        }
-        throw new WrapperFieldNotFoundException(packetClass, boolean.class, index);
+        return (boolean) read(String.class, index);
     }
 
     @Override
     public byte readByte(int index) {
-        HashMap<Class<?>, Field[]> cached = fieldCache.get(packetClass);
-        if (cached != null) {
-            try {
-                return cached.get(byte.class)[index].getByte(packet);
-            } catch (IllegalAccessException e) {
-                e.printStackTrace();
-            }
-        }
-        throw new WrapperFieldNotFoundException(packetClass, byte.class, index);
+        return (byte) read(String.class, index);
     }
 
     @Override
     public short readShort(int index) {
-        HashMap<Class<?>, Field[]> cached = fieldCache.get(packetClass);
-        if (cached != null) {
-            try {
-                return cached.get(short.class)[index].getShort(packet);
-            } catch (IllegalAccessException e) {
-                e.printStackTrace();
-            }
-        }
-        throw new WrapperFieldNotFoundException(packetClass, short.class, index);
+        return (short) read(String.class, index);
     }
 
     @Override
     public int readInt(int index) {
-        HashMap<Class<?>, Field[]> cached = fieldCache.get(packetClass);
-        if (cached != null) {
-            try {
-                return cached.get(int.class)[index].getInt(packet);
-            } catch (IllegalAccessException e) {
-                e.printStackTrace();
-            }
-        }
-        throw new WrapperFieldNotFoundException(packetClass, int.class, index);
+        return (int) read(String.class, index);
     }
 
     @Override
     public long readLong(int index) {
-        HashMap<Class<?>, Field[]> cached = fieldCache.get(packetClass);
-        if (cached != null) {
-            try {
-                return cached.get(long.class)[index].getLong(packet);
-            } catch (IllegalAccessException e) {
-                e.printStackTrace();
-            }
-        }
-        throw new WrapperFieldNotFoundException(packetClass, long.class, index);
+        return (long) read(String.class, index);
     }
 
     @Override
     public float readFloat(int index) {
-        HashMap<Class<?>, Field[]> cached = fieldCache.get(packetClass);
-        if (cached != null) {
-            try {
-                return cached.get(float.class)[index].getFloat(packet);
-            } catch (IllegalAccessException e) {
-                e.printStackTrace();
-            }
-        }
-        throw new WrapperFieldNotFoundException(packetClass, float.class, index);
+        return (float) read(String.class, index);
     }
 
     @Override
     public double readDouble(int index) {
-        HashMap<Class<?>, Field[]> cached = fieldCache.get(packetClass);
-        if (cached != null) {
-            try {
-                return cached.get(double.class)[index].getDouble(packet);
-            } catch (IllegalAccessException e) {
-                e.printStackTrace();
-            }
-        }
-        throw new WrapperFieldNotFoundException(packetClass, double.class, index);
+        return (double) read(String.class, index);
     }
 
     @Override
     public boolean[] readBooleanArray(int index) {
-         HashMap<Class<?>, Field[]> cached = fieldCache.get(packetClass);
+        Map<Class<?>, Field[]> cached = fieldCache.get(packetClass);
         if (cached != null) {
             try {
                 return (boolean[]) cached.get(boolean[].class)[index].get(packet);
@@ -376,7 +321,7 @@ public class WrappedPacket implements WrapperPacketReader, WrapperPacketWriter {
 
     @Override
     public byte[] readByteArray(int index) {
-         HashMap<Class<?>, Field[]> cached = fieldCache.get(packetClass);
+        Map<Class<?>, Field[]> cached = fieldCache.get(packetClass);
         if (cached != null) {
             try {
                 return (byte[]) cached.get(byte[].class)[index].get(packet);
@@ -402,7 +347,7 @@ public class WrappedPacket implements WrapperPacketReader, WrapperPacketWriter {
 
     @Override
     public short[] readShortArray(int index) {
-         HashMap<Class<?>, Field[]> cached = fieldCache.get(packetClass);
+        Map<Class<?>, Field[]> cached = fieldCache.get(packetClass);
         if (cached != null) {
             try {
                 return (short[]) cached.get(short[].class)[index].get(packet);
@@ -428,7 +373,7 @@ public class WrappedPacket implements WrapperPacketReader, WrapperPacketWriter {
 
     @Override
     public int[] readIntArray(int index) {
-        HashMap<Class<?>, Field[]> cached = fieldCache.get(packetClass);
+        Map<Class<?>, Field[]> cached = fieldCache.get(packetClass);
         if (cached != null) {
             try {
                 return (int[]) cached.get(int[].class)[index].get(packet);
@@ -454,7 +399,7 @@ public class WrappedPacket implements WrapperPacketReader, WrapperPacketWriter {
 
     @Override
     public long[] readLongArray(int index) {
-         HashMap<Class<?>, Field[]> cached = fieldCache.get(packetClass);
+        Map<Class<?>, Field[]> cached = fieldCache.get(packetClass);
         if (cached != null) {
             try {
                 return (long[]) cached.get(long[].class)[index].get(packet);
@@ -480,7 +425,7 @@ public class WrappedPacket implements WrapperPacketReader, WrapperPacketWriter {
 
     @Override
     public float[] readFloatArray(int index) {
-         HashMap<Class<?>, Field[]> cached = fieldCache.get(packetClass);
+        Map<Class<?>, Field[]> cached = fieldCache.get(packetClass);
         if (cached != null) {
             try {
                 return (float[]) cached.get(float[].class)[index].get(packet);
@@ -506,7 +451,7 @@ public class WrappedPacket implements WrapperPacketReader, WrapperPacketWriter {
 
     @Override
     public double[] readDoubleArray(int index) {
-         HashMap<Class<?>, Field[]> cached = fieldCache.get(packetClass);
+        Map<Class<?>, Field[]> cached = fieldCache.get(packetClass);
         if (cached != null) {
             try {
                 return (double[]) cached.get(double[].class)[index].get(packet);
@@ -532,7 +477,7 @@ public class WrappedPacket implements WrapperPacketReader, WrapperPacketWriter {
 
     @Override
     public String[] readStringArray(int index) {
-         HashMap<Class<?>, Field[]> cached = fieldCache.get(packetClass);
+        Map<Class<?>, Field[]> cached = fieldCache.get(packetClass);
         if (cached != null) {
             try {
                 Object[] array = (Object[]) cached.get(String[].class)[index].get(packet);
@@ -551,17 +496,7 @@ public class WrappedPacket implements WrapperPacketReader, WrapperPacketWriter {
 
     @Override
     public String readString(int index) {
-         HashMap<Class<?>, Field[]> cached = fieldCache.get(packetClass);
-        if (cached != null) {
-            try {
-                Field[] fields = cached.get(String.class);
-                Object obj = fields[index].get(packet);
-                return obj.toString();
-            } catch (IllegalAccessException e) {
-                e.printStackTrace();
-            }
-        }
-        throw new WrapperFieldNotFoundException(packetClass, String.class, index);
+       return (String) read(String.class, index);
     }
 
     public Object readAnyObject(int index) {
@@ -582,7 +517,7 @@ public class WrappedPacket implements WrapperPacketReader, WrapperPacketWriter {
     }
 
     public Object readObject(int index, Class<?> type) {
-         HashMap<Class<?>, Field[]> cached = fieldCache.get(packetClass);
+        Map<Class<?>, Field[]> cached = fieldCache.get(packetClass);
         if (cached != null) {
             if (!cached.containsKey(type)) {
                 List<Field> typeFields = new ArrayList<>();
@@ -612,121 +547,79 @@ public class WrappedPacket implements WrapperPacketReader, WrapperPacketWriter {
 
     @Override
     public void writeBoolean(int index, boolean value) {
-         HashMap<Class<?>, Field[]> cached = fieldCache.get(packetClass);
-        if (cached != null) {
-            try {
-                cached.get(boolean.class)[index].setBoolean(packet, value);
-            } catch (IllegalAccessException | NullPointerException e) {
-                if(e instanceof NullPointerException) {
-                    throw new WrapperFieldNotFoundException(packetClass, boolean.class, index);
-                }
-                e.printStackTrace();
-            }
-        }
+        write(boolean.class, index, value);
     }
 
     @Override
     public void writeByte(int index, byte value) {
-         HashMap<Class<?>, Field[]> cached = fieldCache.get(packetClass);
-        if (cached != null) {
-            try {
-                cached.get(byte.class)[index].setByte(packet, value);
-            } catch (IllegalAccessException | NullPointerException e) {
-                if(e instanceof NullPointerException) {
-                    throw new WrapperFieldNotFoundException(packetClass, byte.class, index);
-                }
-                e.printStackTrace();
-            }
-        }
+        write(byte.class, index, value);
     }
 
     @Override
     public void writeShort(int index, short value) {
-         HashMap<Class<?>, Field[]> cached = fieldCache.get(packetClass);
-        if (cached != null) {
-            try {
-                cached.get(short.class)[index].setShort(packet, value);
-            } catch (IllegalAccessException | NullPointerException e) {
-                if (e instanceof NullPointerException) {
-                    throw new WrapperFieldNotFoundException(packetClass, short.class, index);
-                }
-                e.printStackTrace();
-            }
-        }
+        write(short.class, index, value);
     }
 
     @Override
     public void writeInt(int index, int value) {
-         HashMap<Class<?>, Field[]> cached = fieldCache.get(packetClass);
-        if (cached != null) {
-            try {
-                cached.get(int.class)[index].setInt(packet, value);
-            } catch (IllegalAccessException | NullPointerException e) {
-                if (e instanceof NullPointerException) {
-                    throw new WrapperFieldNotFoundException(packetClass, int.class, index);
-                }
-                e.printStackTrace();
-            }
-        }
+        write(int.class, index, value);
     }
 
     @Override
     public void writeLong(int index, long value) {
-         HashMap<Class<?>, Field[]> cached = fieldCache.get(packetClass);
-        if (cached != null) {
-            try {
-                cached.get(long.class)[index].setLong(packet, value);
-            } catch (IllegalAccessException | NullPointerException e) {
-                if(e instanceof NullPointerException) {
-                    throw new WrapperFieldNotFoundException(packetClass, long.class, index);
-                }
-                e.printStackTrace();
-            }
-        }
+        write(long.class, index, value);
     }
 
     @Override
     public void writeFloat(int index, float value) {
-         HashMap<Class<?>, Field[]> cached = fieldCache.get(packetClass);
-        if (cached != null) {
-            try {
-                cached.get(float.class)[index].setFloat(packet, value);
-            } catch (IllegalAccessException | NullPointerException e) {
-                if(e instanceof NullPointerException) {
-                    throw new WrapperFieldNotFoundException(packetClass, float.class, index);
-                }
-                e.printStackTrace();
-            }
-        }
+        write(float.class, index, value);
     }
 
     @Override
     public void writeDouble(int index, double value) {
-         HashMap<Class<?>, Field[]> cached = fieldCache.get(packetClass);
-        if (cached != null) {
-            try {
-                cached.get(double.class)[index].setDouble(packet, value);
-            } catch (IllegalAccessException | NullPointerException e) {
-                if(e instanceof NullPointerException) {
-                    throw new WrapperFieldNotFoundException(packetClass, double.class, index);
-                }
-                e.printStackTrace();
-            }
-        }
+        write(double.class, index, value);
     }
 
     @Override
     public void writeString(int index, String value) {
-         HashMap<Class<?>, Field[]> cached = fieldCache.get(packetClass);
-        if (cached != null) {
-            try {
-                cached.get(String.class)[index].set(packet, value);
-            } catch (IllegalAccessException | NullPointerException e) {
-                if(e instanceof NullPointerException) {
-                    throw new WrapperFieldNotFoundException(packetClass, String.class, index);
-                }
-                e.printStackTrace();
-            }
+        write(String.class, index, value);
+    }
+
+    private void write(Class<?> type, int index, Object value) throws WrapperFieldNotFoundException {
+        Field field = getField(type, index);
+        if(field == null) {
+            throw new WrapperFieldNotFoundException(packetClass, String.class, index);
+        }
+        try {
+            field.set(packet, value);
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
         }
     }
+
+    private Object read(Class<?> type, int index) throws WrapperFieldNotFoundException {
+        Field field = getField(type, index);
+        if(field == null) {
+            throw new WrapperFieldNotFoundException(packetClass, String.class, index);
+        }
+        try {
+            return field.get(packet);
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    private Field getField(Class<?> type, int index) {
+        Map<Class<?>, Field[]> cached = fieldCache.get(packetClass);
+        if (cached == null) {
+            return null;
+        }
+        Field[] fields = cached.get(String.class);
+        if (fields != null) {
+            return fields[index];
+        }
+        return null;
+    }
+
 }
