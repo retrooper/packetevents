@@ -141,7 +141,8 @@ public final class PacketEvents implements Listener {
             }
 
             if(getAPI().getServerUtils().isBungeeCordEnabled()) {
-                Bukkit.getServer().getMessenger().registerIncomingPluginChannel(pl, BungeePluginMessageListener.tagName, new BungeePluginMessageListener());
+                Bukkit.getMessenger().registerOutgoingPluginChannel(plugins.get(0), "BungeeCord");
+                Bukkit.getServer().getMessenger().registerIncomingPluginChannel(plugins.get(0), BungeePluginMessageListener.tagName, new BungeePluginMessageListener());
             }
             initialized = true;
         }

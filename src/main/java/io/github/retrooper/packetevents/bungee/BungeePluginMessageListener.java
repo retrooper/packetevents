@@ -47,6 +47,7 @@ public class BungeePluginMessageListener implements PluginMessageListener {
                 short protocolVersion = in.readShort();
                 ClientVersion version = ClientVersion.getClientVersion(protocolVersion);
                 PacketEvents.getAPI().getPlayerUtils().clientVersionsMap.put(uuid, version);
+                System.out.println("ClientVersion received from Bungee: " + version.name());
             }
         }
     }
