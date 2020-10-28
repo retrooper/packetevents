@@ -22,23 +22,35 @@
  * SOFTWARE.
  */
 
-package io.github.retrooper.packetevents.packetwrappers.out.entitymetadata;
+package io.github.retrooper.packetevents.utils.vector;
 
-import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
+public class Vector3i {
+    public int x, y, z;
+    public Vector3i() {
 
-public class WrappedPacketOutEntityMetadata extends WrappedPacket {
-    private boolean isListening = false;
-    private int entityID;
-    public WrappedPacketOutEntityMetadata(Object packet) {
-        super(packet);
-        isListening = true;
     }
 
-    public int getEntityID() {
-        if (isListening) {
-            return readInt(0);
-        } else {
-            return entityID;
-        }
+    public Vector3i(int x, int y, int z) {
+        this.x = x;
+        this.y = y;
+        this.z = z;
+    }
+
+    public Vector3i(int[] coordinates) {
+        x = coordinates[0];
+        y = coordinates[1];
+        z = coordinates[2];
+    }
+
+    public final int getX() {
+        return x;
+    }
+
+    public final int getY() {
+        return y;
+    }
+
+    public final int getZ() {
+        return z;
     }
 }
