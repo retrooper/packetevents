@@ -22,28 +22,20 @@
  * SOFTWARE.
  */
 
-package io.github.retrooper.packetevents.utils.gameprofile;
+package io.github.retrooper.packetevents.packetwrappers.login.out;
 
-import io.github.retrooper.packetevents.nettyhandler.NettyPacketManager;
+import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
 
-import java.util.UUID;
-
-public class GameProfileUtil {
-    public static Object getGameProfile(UUID uuid, String username) {
-        if(NettyPacketManager.v1_7_nettyMode) {
-            return GameProfileUtil_7.getGameProfile(uuid, username);
-        }
-        else {
-            return GameProfileUtil_8.getGameProfile(uuid, username);
-        }
+//This packet does not exist on 1.7.10
+public class WrappedPacketLoginOutSetCompression extends WrappedPacket {
+    public WrappedPacketLoginOutSetCompression(Object packet) {
+        super(packet);
     }
 
-    public static WrappedGameProfile getWrappedGameProfile(Object gameProfile) {
-        if(NettyPacketManager.v1_7_nettyMode) {
-            return GameProfileUtil_7.getWrappedGameProfile(gameProfile);
-        }
-        else {
-            return GameProfileUtil_8.getWrappedGameProfile(gameProfile);
-        }
+    /**
+     * Maximum size of a packet before it can be compressed.
+     */
+    public int getThreshold() {
+        return readInt(0);
     }
 }

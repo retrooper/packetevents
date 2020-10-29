@@ -22,28 +22,19 @@
  * SOFTWARE.
  */
 
-package io.github.retrooper.packetevents.utils.gameprofile;
+package io.github.retrooper.packetevents.packetwrappers.login.in;
 
-import io.github.retrooper.packetevents.nettyhandler.NettyPacketManager;
+import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
+import io.github.retrooper.packetevents.utils.gameprofile.GameProfileUtil;
+import io.github.retrooper.packetevents.utils.gameprofile.WrappedGameProfile;
+import io.github.retrooper.packetevents.utils.nms.NMSUtils;
 
-import java.util.UUID;
-
-public class GameProfileUtil {
-    public static Object getGameProfile(UUID uuid, String username) {
-        if(NettyPacketManager.v1_7_nettyMode) {
-            return GameProfileUtil_7.getGameProfile(uuid, username);
-        }
-        else {
-            return GameProfileUtil_8.getGameProfile(uuid, username);
-        }
+public class WrappedPacketLoginInStart extends WrappedPacket {
+    public WrappedPacketLoginInStart(Object packet) {
+        super(packet);
     }
 
-    public static WrappedGameProfile getWrappedGameProfile(Object gameProfile) {
-        if(NettyPacketManager.v1_7_nettyMode) {
-            return GameProfileUtil_7.getWrappedGameProfile(gameProfile);
-        }
-        else {
-            return GameProfileUtil_8.getWrappedGameProfile(gameProfile);
-        }
+    public WrappedGameProfile getGameProfile() {
+        return GameProfileUtil.getWrappedGameProfile(readObject(0, NMSUtils.gameProfileClass));
     }
 }

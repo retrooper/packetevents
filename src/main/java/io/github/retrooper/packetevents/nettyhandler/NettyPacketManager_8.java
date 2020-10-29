@@ -26,40 +26,38 @@ package io.github.retrooper.packetevents.nettyhandler;
 
 import io.github.retrooper.packetevents.PacketEvents;
 import io.github.retrooper.packetevents.utils.nms.NMSUtils;
-import net.minecraft.util.io.netty.channel.Channel;
-import net.minecraft.util.io.netty.channel.ChannelDuplexHandler;
-import net.minecraft.util.io.netty.channel.ChannelHandlerContext;
-import net.minecraft.util.io.netty.channel.ChannelPipeline;
-import net.minecraft.util.io.netty.channel.ChannelPromise;
-import org.bukkit.Bukkit;
+import io.netty.channel.Channel;
+import io.netty.channel.ChannelDuplexHandler;
+import io.netty.channel.ChannelHandlerContext;
+import io.netty.channel.ChannelPipeline;
+import io.netty.channel.ChannelPromise;
 import org.bukkit.entity.Player;
 
-final class NettyPacketHandler_7 {
-
+final class NettyPacketManager_8 {
     /**
-     * Inject a player using 1.7.10's netty import location
+     * Inject a player with 1.8+ netty import location.
      * @param player
      */
     public static void injectPlayer(final Player player) {
         final ChannelDuplexHandler channelDuplexHandler = new ChannelDuplexHandler() {
             @Override
             public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
-                Object packet = NettyPacketHandler.read(player, msg);
+                Object packet = NettyPacketManager.read(player, msg);
                 if (packet == null) {
                     return;
                 }
                 super.channelRead(ctx, msg);
-                NettyPacketHandler.postRead(player, packet);
+                NettyPacketManager.postRead(player, packet);
             }
 
             @Override
             public void write(ChannelHandlerContext ctx, Object msg, ChannelPromise promise) throws Exception {
-                Object packet = NettyPacketHandler.write(player, msg);
+                Object packet = NettyPacketManager.write(player, msg);
                 if (packet == null) {
                     return;
                 }
                 super.write(ctx, msg, promise);
-                NettyPacketHandler.postSend(player, packet);
+                NettyPacketManager.postSend(player, packet);
             }
         };
         final ChannelPipeline pipeline = ((Channel) NMSUtils.getChannel(player)).pipeline();
@@ -67,11 +65,11 @@ final class NettyPacketHandler_7 {
     }
 
     /**
-     * Eject a player using 1.7.10 netty import location.
-     * @param player Target Player
+     * Eject a player with 1.8+ netty import location.
+     * @param player
      */
     public static void ejectPlayer(final Player player) {
-         Channel channel = (Channel) NMSUtils.getChannelNoCache(player);
+        final Channel channel = (Channel) NMSUtils.getChannelNoCache(player);
         assert channel != null;
         channel.pipeline().remove(PacketEvents.getHandlerName(player.getName()));
     }

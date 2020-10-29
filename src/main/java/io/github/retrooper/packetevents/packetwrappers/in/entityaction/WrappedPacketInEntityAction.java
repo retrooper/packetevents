@@ -78,7 +78,7 @@ public final class WrappedPacketInEntityAction extends WrappedPacket {
      */
     public Entity getEntity() {
         if(entity == null) {
-            return entity = NMSUtils.getEntityById(getEntityID());
+            return entity = NMSUtils.getEntityById(getEntityId());
         }
         return entity;
     }
@@ -90,7 +90,7 @@ public final class WrappedPacketInEntityAction extends WrappedPacket {
      *
      * @return Entity ID
      */
-    public int getEntityID() {
+    public int getEntityId() {
         if(entityId != -1) {
             return entityId;
         }

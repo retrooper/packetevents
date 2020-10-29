@@ -33,6 +33,7 @@ public class PacketEventsSettings {
     private boolean ejectAsync = true;
     private boolean useProtocolLibIfAvailable;
     private boolean checkForUpdates = true;
+    private boolean injectEarly = false;
 
     public PacketEventsSettings backupServerVersion(ServerVersion serverVersion) {
         this.backupServerVersion = serverVersion;
@@ -64,6 +65,12 @@ public class PacketEventsSettings {
         return this;
     }
 
+
+    public PacketEventsSettings injectEarly(boolean injectEarly) {
+        this.injectEarly = injectEarly;
+        return this;
+    }
+
     public ServerVersion getBackupServerVersion() {
         return backupServerVersion;
     }
@@ -86,5 +93,9 @@ public class PacketEventsSettings {
 
     public boolean shouldCheckForUpdates() {
         return checkForUpdates;
+    }
+
+    public boolean shouldInjectEarly() {
+        return injectEarly;
     }
 }

@@ -22,28 +22,24 @@
  * SOFTWARE.
  */
 
-package io.github.retrooper.packetevents.utils.gameprofile;
+package io.github.retrooper.packetevents.packetwrappers.login.in;
 
-import io.github.retrooper.packetevents.nettyhandler.NettyPacketManager;
+import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
 
-import java.util.UUID;
-
-public class GameProfileUtil {
-    public static Object getGameProfile(UUID uuid, String username) {
-        if(NettyPacketManager.v1_7_nettyMode) {
-            return GameProfileUtil_7.getGameProfile(uuid, username);
-        }
-        else {
-            return GameProfileUtil_8.getGameProfile(uuid, username);
-        }
+public class WrappedPacketLoginHandshake extends WrappedPacket {
+    public WrappedPacketLoginHandshake(Object packet) {
+        super(packet);
     }
 
-    public static WrappedGameProfile getWrappedGameProfile(Object gameProfile) {
-        if(NettyPacketManager.v1_7_nettyMode) {
-            return GameProfileUtil_7.getWrappedGameProfile(gameProfile);
-        }
-        else {
-            return GameProfileUtil_8.getWrappedGameProfile(gameProfile);
-        }
+    public int getProtocolVersion() {
+        return readInt(0);
+    }
+
+    public String getHostName() {
+        return readString(0);
+    }
+
+    public int getPort() {
+        return readInt(1);
     }
 }

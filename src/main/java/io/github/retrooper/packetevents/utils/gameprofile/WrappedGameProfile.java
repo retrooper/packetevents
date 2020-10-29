@@ -24,26 +24,46 @@
 
 package io.github.retrooper.packetevents.utils.gameprofile;
 
-import io.github.retrooper.packetevents.nettyhandler.NettyPacketManager;
-
 import java.util.UUID;
 
-public class GameProfileUtil {
-    public static Object getGameProfile(UUID uuid, String username) {
-        if(NettyPacketManager.v1_7_nettyMode) {
-            return GameProfileUtil_7.getGameProfile(uuid, username);
-        }
-        else {
-            return GameProfileUtil_8.getGameProfile(uuid, username);
-        }
+public class WrappedGameProfile {
+    public UUID id;
+    public String name;
+    public boolean legacy;
+
+    public WrappedGameProfile(UUID id, String name, boolean legacy) {
+        this.id = id;
+        this.name = name;
+        this.legacy = legacy;
     }
 
-    public static WrappedGameProfile getWrappedGameProfile(Object gameProfile) {
-        if(NettyPacketManager.v1_7_nettyMode) {
-            return GameProfileUtil_7.getWrappedGameProfile(gameProfile);
-        }
-        else {
-            return GameProfileUtil_8.getWrappedGameProfile(gameProfile);
+    public UUID getId() {
+        return id;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public boolean isLegacy() {
+        return legacy;
+    }
+
+    public boolean isComplete() {
+        return id != null && !isBlank(name);
+    }
+
+    private boolean isBlank(CharSequence cs) {
+        int strLen;
+        if (cs != null && (strLen = cs.length()) != 0) {
+            for (int i = 0; i < strLen; ++i) {
+                if (!Character.isWhitespace(cs.charAt(i))) {
+                    return false;
+                }
+            }
+            return true;
+        } else {
+            return true;
         }
     }
 }

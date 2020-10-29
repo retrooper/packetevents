@@ -25,12 +25,10 @@
 package io.github.retrooper.packetevents.utils.nms;
 
 import io.github.retrooper.packetevents.annotations.Nullable;
-import io.github.retrooper.packetevents.utils.server.ServerVersion;
-import io.github.retrooper.packetevents.nettyhandler.NettyPacketHandler;
-import io.github.retrooper.packetevents.packetwrappers.SendableWrapper;
 import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
 import io.github.retrooper.packetevents.utils.entityfinder.EntityFinderUtils;
 import io.github.retrooper.packetevents.utils.reflection.Reflection;
+import io.github.retrooper.packetevents.utils.server.ServerVersion;
 import org.bukkit.Server;
 import org.bukkit.World;
 import org.bukkit.entity.Entity;
@@ -50,7 +48,7 @@ public final class NMSUtils {
     public static String nettyPrefix = "io.netty";
     public static Class<?> nmsEntityClass, minecraftServerClass, craftWorldClass, playerInteractManagerClass, entityPlayerClass, playerConnectionClass, craftServerClass,
             craftPlayerClass, serverConnectionClass, craftEntityClass,
-            craftItemStack, nmsItemStackClass, networkManagerClass, nettyChannelClass;
+            craftItemStack, nmsItemStackClass, networkManagerClass, nettyChannelClass, gameProfileClass, iChatBaseComponentClass;
     private static Method craftWorldGetHandle, getCraftWorldHandleMethod, getServerConnection, getCraftPlayerHandle, getCraftEntityHandle, asBukkitCopy;
     private static Field entityPlayerPingField, playerConnectionField;
 
@@ -82,6 +80,12 @@ public final class NMSUtils {
             nmsItemStackClass = getNMSClass("ItemStack");
             networkManagerClass = getNMSClass("NetworkManager");
             playerInteractManagerClass = getNMSClass("PlayerInteractManager");
+            try {
+                gameProfileClass = Class.forName("com.mojang.authlib.GameProfile");
+            } catch (ClassNotFoundException e) {
+                gameProfileClass = Class.forName("net.minecraft.util.com.mojang.authlib.GameProfile");
+            }
+            iChatBaseComponentClass = NMSUtils.getNMSClass("IChatBaseComponent");
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
         }
@@ -109,6 +113,19 @@ public final class NMSUtils {
 
     public static Object getMinecraftServerInstance() throws InvocationTargetException, IllegalAccessException {
         return Reflection.getMethod(minecraftServerClass, "getServer", 0).invoke(null);
+    }
+
+    public static Object getMinecraftServerConnection() {
+        WrappedPacket wrapper = null;
+        try {
+            wrapper = new WrappedPacket(getMinecraftServerInstance());
+        } catch (InvocationTargetException | IllegalAccessException e) {
+            e.printStackTrace();
+        }
+        if (wrapper == null) {
+            return null;
+        }
+        return wrapper.readObject(0, serverConnectionClass);
     }
 
     public static double[] recentTPS() throws IllegalAccessException, InvocationTargetException {
@@ -242,7 +259,7 @@ public final class NMSUtils {
         WrappedPacket wrapper = new WrappedPacket(craftServer);
         return wrapper.readObject(0, minecraftServerClass);
     }
-    
+
     public static Object convertBukkitWorldToNMSWorld(World world) {
         Object craftWorld = craftWorldClass.cast(world);
 

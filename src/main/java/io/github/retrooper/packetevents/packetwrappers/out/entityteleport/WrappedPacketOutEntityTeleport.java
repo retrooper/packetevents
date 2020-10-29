@@ -91,12 +91,12 @@ public class WrappedPacketOutEntityTeleport extends WrappedPacket implements Sen
 
     public Entity getEntity() {
         if(entity == null) {
-            entity = NMSUtils.getEntityById(getEntityID());
+            entity = NMSUtils.getEntityById(getEntityId());
         }
         return entity;
     }
 
-    public int getEntityID() {
+    public int getEntityId() {
         if (listeningMode) {
             if (entityID != -1) {
                 return readInt(0);

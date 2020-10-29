@@ -200,7 +200,7 @@ public class WrappedPacketOutEntity extends WrappedPacket implements SendableWra
         if (entity != null) {
             return entity;
         }
-        return entity = NMSUtils.getEntityById(getEntityID());
+        return entity = NMSUtils.getEntityById(getEntityId());
     }
 
     /**
@@ -210,7 +210,7 @@ public class WrappedPacketOutEntity extends WrappedPacket implements SendableWra
      *
      * @return Entity ID
      */
-    public int getEntityID() {
+    public int getEntityId() {
         if (entityID != -1) {
             return entityID;
         } else {

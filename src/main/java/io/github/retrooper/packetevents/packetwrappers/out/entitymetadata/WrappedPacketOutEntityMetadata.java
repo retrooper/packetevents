@@ -34,7 +34,7 @@ public class WrappedPacketOutEntityMetadata extends WrappedPacket {
         isListening = true;
     }
 
-    public int getEntityID() {
+    public int getEntityId() {
         if (isListening) {
             return readInt(0);
         } else {

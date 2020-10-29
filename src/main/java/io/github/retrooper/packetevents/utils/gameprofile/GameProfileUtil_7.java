@@ -32,4 +32,9 @@ class GameProfileUtil_7 {
     public static Object getGameProfile(UUID uuid, String username) {
         return new GameProfile(uuid, username);
     }
+
+    public static WrappedGameProfile getWrappedGameProfile(Object gameProfile) {
+        GameProfile gp = (GameProfile) gameProfile;
+        return new WrappedGameProfile(gp.getId(), gp.getName(), gp.isLegacy());
+    }
 }

@@ -26,7 +26,7 @@ package io.github.retrooper.packetevents.utils.player;
 
 import io.github.retrooper.packetevents.PacketEvents;
 import io.github.retrooper.packetevents.event.impl.PlayerEjectEvent;
-import io.github.retrooper.packetevents.nettyhandler.NettyPacketHandler;
+import io.github.retrooper.packetevents.nettyhandler.NettyPacketManager;
 import io.github.retrooper.packetevents.packetwrappers.SendableWrapper;
 import io.github.retrooper.packetevents.utils.nms.NMSUtils;
 import io.github.retrooper.packetevents.utils.versionlookup.VersionLookupUtils;
@@ -110,9 +110,9 @@ public final class PlayerUtils {
      */
     public void injectPlayer(final Player player) {
         if (PacketEvents.getSettings().shouldInjectAsync()) {
-            NettyPacketHandler.injectPlayerAsync(player);
+            NettyPacketManager.injectPlayerAsync(player);
         } else {
-            NettyPacketHandler.injectPlayer(player);
+            NettyPacketManager.injectPlayer(player);
         }
     }
 
@@ -123,9 +123,9 @@ public final class PlayerUtils {
      */
     public void ejectPlayer(final Player player) {
         if (PacketEvents.getSettings().shouldEjectAsync()) {
-            NettyPacketHandler.ejectPlayerAsync(player);
+            NettyPacketManager.ejectPlayerAsync(player);
         } else {
-            NettyPacketHandler.ejectPlayer(player);
+            NettyPacketManager.ejectPlayer(player);
         }
     }
 
@@ -135,7 +135,7 @@ public final class PlayerUtils {
      * @param sendableWrapper
      */
     public void sendPacket(final Player player, final SendableWrapper sendableWrapper) {
-        NettyPacketHandler.sendPacket(NMSUtils.getChannel(player), sendableWrapper.asNMSPacket());
+        NettyPacketManager.sendPacket(NMSUtils.getChannel(player), sendableWrapper.asNMSPacket());
     }
 
     /**
@@ -144,6 +144,6 @@ public final class PlayerUtils {
      * @param nmsPacket
      */
     public void sendNMSPacket(final Player player, Object nmsPacket) {
-        NettyPacketHandler.sendPacket(NMSUtils.getChannel(player), nmsPacket);
+        NettyPacketManager.sendPacket(NMSUtils.getChannel(player), nmsPacket);
     }
 }

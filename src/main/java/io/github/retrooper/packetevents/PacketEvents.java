@@ -26,7 +26,8 @@ package io.github.retrooper.packetevents;
 
 import io.github.retrooper.packetevents.bungee.BungeePluginMessageListener;
 import io.github.retrooper.packetevents.event.PacketEvent;
-import io.github.retrooper.packetevents.nettyhandler.NettyPacketHandler;
+import io.github.retrooper.packetevents.nettyhandler.NettyPacketManager;
+import io.github.retrooper.packetevents.nettyhandler.TinyProtocolManager;
 import io.github.retrooper.packetevents.packettype.PacketTypeClasses;
 import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
 import io.github.retrooper.packetevents.settings.PacketEventsSettings;
@@ -34,14 +35,15 @@ import io.github.retrooper.packetevents.updatechecker.UpdateChecker;
 import io.github.retrooper.packetevents.utils.entityfinder.EntityFinderUtils;
 import io.github.retrooper.packetevents.utils.nms.NMSUtils;
 import io.github.retrooper.packetevents.utils.player.ClientVersion;
+import io.github.retrooper.packetevents.utils.server.PEVersion;
 import io.github.retrooper.packetevents.utils.server.ServerVersion;
 import io.github.retrooper.packetevents.utils.versionlookup.VersionLookupUtils;
-import io.github.retrooper.packetevents.utils.server.PEVersion;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.event.player.PlayerLoginEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.plugin.Plugin;
 
@@ -91,6 +93,8 @@ public final class PacketEvents implements Listener {
 
             PacketTypeClasses.Client.load();
             PacketTypeClasses.Server.load();
+            PacketTypeClasses.Login.load();
+            PacketTypeClasses.Status.load();
 
             EntityFinderUtils.load();
 
@@ -120,10 +124,14 @@ public final class PacketEvents implements Listener {
      * @param pl JavaPlugin instance
      */
     public static void init(final Plugin pl, PacketEventsSettings packetEventsSettings) {
-       load();
+        load();
         if (!initialized) {
             settings = packetEventsSettings;
             plugins.add(pl);
+
+            if (settings.shouldInjectEarly()) {
+                TinyProtocolManager.init(plugins.get(0));
+            }
             //Register Bukkit listener
             Bukkit.getPluginManager().registerEvents(instance, plugins.get(0));
 
@@ -132,7 +140,7 @@ public final class PacketEvents implements Listener {
             }
 
             if (settings.shouldCheckForUpdates()) {
-                Future<?> future = NettyPacketHandler.executorService.submit(new Runnable() {
+                Future<?> future = NettyPacketManager.executorService.submit(new Runnable() {
                     @Override
                     public void run() {
                         new UpdateChecker().handleUpdate();
@@ -140,10 +148,11 @@ public final class PacketEvents implements Listener {
                 });
             }
 
-            if(getAPI().getServerUtils().isBungeeCordEnabled()) {
+            if (getAPI().getServerUtils().isBungeeCordEnabled()) {
                 Bukkit.getMessenger().registerOutgoingPluginChannel(plugins.get(0), "BungeeCord");
                 Bukkit.getServer().getMessenger().registerIncomingPluginChannel(plugins.get(0), BungeePluginMessageListener.tagName, new BungeePluginMessageListener());
             }
+
             initialized = true;
         }
     }
@@ -160,7 +169,7 @@ public final class PacketEvents implements Listener {
             getAPI().getEventManager().unregisterAllListeners();
 
             initialized = false;
-            NettyPacketHandler.executorService.shutdownNow();
+            NettyPacketManager.executorService.shutdownNow();
         }
     }
 
@@ -196,6 +205,14 @@ public final class PacketEvents implements Listener {
     public static PEVersion getVersion() {
         return version;
     }
+
+    @EventHandler
+    public void onLogin(PlayerLoginEvent e) {
+        if (TinyProtocolManager.tinyProtocol != null) {
+            PacketEvents.getAPI().getPlayerUtils().injectPlayer(e.getPlayer());
+        }
+    }
+
     @EventHandler
     public void onJoin(final PlayerJoinEvent e) {
         if (!VersionLookupUtils.hasHandledLoadedDependencies()) {
@@ -208,7 +225,9 @@ public final class PacketEvents implements Listener {
             ClientVersion version = ClientVersion.getClientVersion(VersionLookupUtils.getProtocolVersion(e.getPlayer()));
             PacketEvents.getAPI().getPlayerUtils().clientVersionsMap.put(e.getPlayer().getUniqueId(), version);
         }
-        PacketEvents.getAPI().getPlayerUtils().injectPlayer(e.getPlayer());
+        if (TinyProtocolManager.tinyProtocol == null) {
+            PacketEvents.getAPI().getPlayerUtils().injectPlayer(e.getPlayer());
+        }
     }
 
 

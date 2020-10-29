@@ -49,7 +49,7 @@ public final class WrappedPacketOutEntityVelocity extends WrappedPacket implemen
     }
 
     public WrappedPacketOutEntityVelocity(final Entity entity, final double velocityX, final double velocityY, final double velocityZ) {
-        this.entityID = entity.getEntityId();
+        this.entityID = entity.getEntityId()();
         this.entity = entity;
         this.velocityX = velocityX;
         this.velocityY = velocityY;
@@ -103,7 +103,7 @@ public final class WrappedPacketOutEntityVelocity extends WrappedPacket implemen
         if (entity != null) {
             return entity;
         }
-        return entity = NMSUtils.getEntityById(getEntityID());
+        return entity = NMSUtils.getEntityById(getEntityId());
     }
 
     /**
@@ -113,7 +113,7 @@ public final class WrappedPacketOutEntityVelocity extends WrappedPacket implemen
      *
      * @return Entity ID
      */
-    public int getEntityID() {
+    public int getEntityId() {
         if (entityID != -1) {
             return entityID;
         }
