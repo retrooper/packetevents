@@ -260,37 +260,37 @@ public class WrappedPacket implements WrapperPacketReader, WrapperPacketWriter {
 
     @Override
     public boolean readBoolean(int index) {
-        return (boolean) read(String.class, index);
+        return (boolean) read(boolean.class, index);
     }
 
     @Override
     public byte readByte(int index) {
-        return (byte) read(String.class, index);
+        return (byte) read(byte.class, index);
     }
 
     @Override
     public short readShort(int index) {
-        return (short) read(String.class, index);
+        return (short) read(short.class, index);
     }
 
     @Override
     public int readInt(int index) {
-        return (int) read(String.class, index);
+        return (int) read(int.class, index);
     }
 
     @Override
     public long readLong(int index) {
-        return (long) read(String.class, index);
+        return (long) read(long.class, index);
     }
 
     @Override
     public float readFloat(int index) {
-        return (float) read(String.class, index);
+        return (float) read(float.class, index);
     }
 
     @Override
     public double readDouble(int index) {
-        return (double) read(String.class, index);
+        return (double) read(double.class, index);
     }
 
     @Override
@@ -600,7 +600,7 @@ public class WrappedPacket implements WrapperPacketReader, WrapperPacketWriter {
     private Object read(Class<?> type, int index) throws WrapperFieldNotFoundException {
         Field field = getField(type, index);
         if(field == null) {
-            throw new WrapperFieldNotFoundException(packetClass, String.class, index);
+            throw new WrapperFieldNotFoundException(packetClass, type, index);
         }
         try {
             return field.get(packet);
