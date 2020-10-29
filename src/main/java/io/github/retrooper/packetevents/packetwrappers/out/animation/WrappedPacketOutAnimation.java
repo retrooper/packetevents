@@ -94,7 +94,7 @@ public final class WrappedPacketOutAnimation extends WrappedPacket implements Se
         if (entity != null) {
             return entity;
         }
-        return entity = NMSUtils.getEntityById(getEntityId);
+        return entity = NMSUtils.getEntityById(getEntityId());
     }
 
     /**
