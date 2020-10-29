@@ -24,7 +24,7 @@
 
 package io.github.retrooper.packetevents.utils.bytebuf;
 
-import io.github.retrooper.packetevents.nettyhandler.NettyPacketManager;
+import io.github.retrooper.packetevents.packetmanager.netty.NettyPacketManager;
 
 public class ByteBufUtil {
     public static Object copiedBuffer(byte[] bytes) {

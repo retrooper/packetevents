@@ -61,9 +61,7 @@ public enum ClientVersion {
      */
     ANY_PRE_RELEASE_VERSION(0),
 
-    UNKNOWN(-1),
-
-    UNKNOWN_BUNGEE_SERVER(-1);
+    UNRESOLVED(-1);
 
     private final int protocolVersion;
 
@@ -98,8 +96,8 @@ public enum ClientVersion {
     }
 
     public static ClientVersion getClientVersion(int protocolVersion) {
-        if(protocolVersion == -1 && PacketEvents.getSettings().shouldAutoResolveClientProtocolVersion()) {
-            protocolVersion = PacketEvents.getAPI().getServerUtils().getVersion().toProtocolVersion();
+        if(protocolVersion == -1) {
+          return ClientVersion.UNRESOLVED;
         }
         for(ClientVersion version : ClientVersion.values()) {
             if(version.protocolVersion > protocolVersion) {
@@ -119,6 +117,6 @@ public enum ClientVersion {
                 && protocolVersion < highestSupportedProtocolVersion) {
             return ANY_PRE_RELEASE_VERSION;
         }
-        return UNKNOWN;
+        return UNRESOLVED;
     }
 }

@@ -25,9 +25,9 @@
 package io.github.retrooper.packetevents.utils.versionlookup;
 
 import io.github.retrooper.packetevents.PacketEvents;
-import io.github.retrooper.packetevents.utils.server.ServerVersion;
 import io.github.retrooper.packetevents.utils.protocollib.ProtocolLibUtils;
 import io.github.retrooper.packetevents.utils.protocolsupport.ProtocolSupportUtils;
+import io.github.retrooper.packetevents.utils.server.ServerVersion;
 import io.github.retrooper.packetevents.utils.v_1_7_10.ProtocolVersionAccessor_v_1_7;
 import io.github.retrooper.packetevents.utils.viaversion.ViaUtils;
 import org.bukkit.entity.Player;
@@ -48,6 +48,11 @@ public class VersionLookupUtils {
         return protocolAccessMode != -2;
     }
 
+    public static boolean isDependencyAvailable() {
+        return ViaUtils.isAvailable()
+                || ProtocolSupportUtils.isAvailable()
+                || ProtocolLibUtils.isAvailable();
+    }
 
 
     /**
@@ -60,7 +65,7 @@ public class VersionLookupUtils {
      * @return protocol version of the player if ViaVersion or ProtocolSupport or ProtocolLib is present. Otherwise -1
      */
     public static int getProtocolVersion(final Player player) {
-        switch(protocolAccessMode) {
+        switch (protocolAccessMode) {
             case 0:
                 return ViaUtils.getProtocolVersion(player);
             case 1:
@@ -70,7 +75,7 @@ public class VersionLookupUtils {
             case 3:
                 return ProtocolVersionAccessor_v_1_7.getProtocolVersion(player);
             default:
-                return PacketEvents.getSettings().shouldAutoResolveClientProtocolVersion() ? PacketEvents.getAPI().getServerUtils().getVersion().toProtocolVersion() : -1;
+                return -1;
         }
     }
 }

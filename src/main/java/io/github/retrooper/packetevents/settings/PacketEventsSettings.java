@@ -28,7 +28,6 @@ import io.github.retrooper.packetevents.utils.server.ServerVersion;
 
 public class PacketEventsSettings {
     private ServerVersion backupServerVersion = ServerVersion.v_1_7_10;
-    private boolean autoResolveClientProtocolVersion;
     private boolean injectAsync = true;
     private boolean ejectAsync = true;
     private boolean useProtocolLibIfAvailable;
@@ -40,10 +39,6 @@ public class PacketEventsSettings {
         return this;
     }
 
-    public PacketEventsSettings autoResolveClientProtocolVersion(boolean autoResolveClientProtocolVersion) {
-        this.autoResolveClientProtocolVersion = autoResolveClientProtocolVersion;
-        return this;
-    }
 
     public PacketEventsSettings injectAsync(boolean injectAsync) {
         this.injectAsync = injectAsync;
@@ -73,10 +68,6 @@ public class PacketEventsSettings {
 
     public ServerVersion getBackupServerVersion() {
         return backupServerVersion;
-    }
-
-    public boolean shouldAutoResolveClientProtocolVersion() {
-        return autoResolveClientProtocolVersion;
     }
 
     public boolean shouldInjectAsync() {

@@ -47,7 +47,9 @@ public class WrappedPacketOutExplosion extends WrappedPacket implements Sendable
         try {
             packetConstructor = packetClass.getConstructor(double.class, double.class, double.class, float.class, List.class, vec3DClass);
             vec3dConstructor = vec3DClass.getConstructor(double.class, double.class, double.class);
-            chunkPosConstructor = chunkPosClass.getConstructor(int.class, int.class, int.class);
+            if (chunkPosClass != null) {
+                chunkPosConstructor = chunkPosClass.getConstructor(int.class, int.class, int.class);
+            }
             blockPosConstructor = blockPosClass.getConstructor(int.class, int.class, int.class);
         } catch (NoSuchMethodException e) {
             e.printStackTrace();

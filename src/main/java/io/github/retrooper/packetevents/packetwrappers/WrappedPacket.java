@@ -588,7 +588,7 @@ public class WrappedPacket implements WrapperPacketReader, WrapperPacketWriter {
     private void write(Class<?> type, int index, Object value) throws WrapperFieldNotFoundException {
         Field field = getField(type, index);
         if(field == null) {
-            throw new WrapperFieldNotFoundException(packetClass, String.class, index);
+            throw new WrapperFieldNotFoundException(packetClass, type, index);
         }
         try {
             field.set(packet, value);
@@ -615,7 +615,7 @@ public class WrappedPacket implements WrapperPacketReader, WrapperPacketWriter {
         if (cached == null) {
             return null;
         }
-        Field[] fields = cached.get(String.class);
+        Field[] fields = cached.get(type);
         if (fields != null) {
             return fields[index];
         }

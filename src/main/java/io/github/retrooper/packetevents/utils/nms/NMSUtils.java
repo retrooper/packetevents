@@ -24,6 +24,7 @@
 
 package io.github.retrooper.packetevents.utils.nms;
 
+import io.github.retrooper.packetevents.PacketEvents;
 import io.github.retrooper.packetevents.annotations.Nullable;
 import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
 import io.github.retrooper.packetevents.utils.entityfinder.EntityFinderUtils;
@@ -220,19 +221,27 @@ public final class NMSUtils {
     }
 
     public static Object getChannel(final Player player) {
-        UUID uuid = player.getUniqueId();
-        Object channel = channelCache.get(uuid);
-        if (channel == null) {
-            Object newChannel = getChannelNoCache(player);
-            channelCache.put(uuid, newChannel);
-            return newChannel;
+        if (PacketEvents.getAPI().packetManager.tinyProtocol == null) {
+            UUID uuid = player.getUniqueId();
+            Object channel = channelCache.get(uuid);
+            if (channel == null) {
+                Object newChannel = getChannelNoCache(player);
+                channelCache.put(uuid, newChannel);
+                return newChannel;
+            }
+            return channel;
+        } else {
+            return PacketEvents.getAPI().packetManager.tinyProtocol.getChannel(player);
         }
-        return channel;
     }
 
     public static Object getChannelNoCache(final Player player) {
-        WrappedPacket wrapper = new WrappedPacket(getNetworkManager(player));
-        return wrapper.readObject(0, nettyChannelClass);
+        if (PacketEvents.getAPI().packetManager.tinyProtocol == null) {
+            WrappedPacket wrapper = new WrappedPacket(getNetworkManager(player));
+            return wrapper.readObject(0, nettyChannelClass);
+        } else {
+            return PacketEvents.getAPI().packetManager.tinyProtocol.getChannel(player);
+        }
     }
 
     public static int getPlayerPing(final Player player) {

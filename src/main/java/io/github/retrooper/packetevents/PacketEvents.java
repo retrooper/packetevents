@@ -26,8 +26,8 @@ package io.github.retrooper.packetevents;
 
 import io.github.retrooper.packetevents.bungee.BungeePluginMessageListener;
 import io.github.retrooper.packetevents.event.PacketEvent;
-import io.github.retrooper.packetevents.nettyhandler.NettyPacketManager;
-import io.github.retrooper.packetevents.nettyhandler.TinyProtocolManager;
+import io.github.retrooper.packetevents.packetmanager.PacketManager;
+import io.github.retrooper.packetevents.packetmanager.netty.NettyPacketManager;
 import io.github.retrooper.packetevents.packettype.PacketTypeClasses;
 import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
 import io.github.retrooper.packetevents.settings.PacketEventsSettings;
@@ -129,11 +129,9 @@ public final class PacketEvents implements Listener {
             settings = packetEventsSettings;
             plugins.add(pl);
 
-            if (settings.shouldInjectEarly()) {
-                TinyProtocolManager.init(plugins.get(0));
-            }
             //Register Bukkit listener
             Bukkit.getPluginManager().registerEvents(instance, plugins.get(0));
+            PacketEvents.getAPI().packetManager = new PacketManager(plugins.get(0), settings.shouldInjectEarly());
 
             for (final Player p : Bukkit.getOnlinePlayers()) {
                 getAPI().getPlayerUtils().injectPlayer(p);
@@ -208,8 +206,11 @@ public final class PacketEvents implements Listener {
 
     @EventHandler
     public void onLogin(PlayerLoginEvent e) {
-        if (TinyProtocolManager.tinyProtocol != null) {
-            PacketEvents.getAPI().getPlayerUtils().injectPlayer(e.getPlayer());
+        if (PacketEvents.getSettings().shouldInjectEarly()) {
+            assert getAPI().packetManager.tinyProtocol != null;
+            if (getAPI().packetManager.tinyProtocol.canInject(e.getPlayer())) {
+                getAPI().packetManager.injectPlayer(e.getPlayer());
+            }
         }
     }
 
@@ -218,15 +219,17 @@ public final class PacketEvents implements Listener {
         if (!VersionLookupUtils.hasHandledLoadedDependencies()) {
             VersionLookupUtils.handleLoadedDependencies();
         }
-        //for now we don't support bungee
-        if (PacketEvents.getAPI().getServerUtils().isBungeeCordEnabled()) {
-            PacketEvents.getAPI().getPlayerUtils().clientVersionsMap.put(e.getPlayer().getUniqueId(), ClientVersion.UNKNOWN_BUNGEE_SERVER);
-        } else {
-            ClientVersion version = ClientVersion.getClientVersion(VersionLookupUtils.getProtocolVersion(e.getPlayer()));
-            PacketEvents.getAPI().getPlayerUtils().clientVersionsMap.put(e.getPlayer().getUniqueId(), version);
+        Object channel = NMSUtils.getChannel(e.getPlayer());
+        //Waiting for the BungeeCord server to send their plugin message with your version,
+        //So we leave bungee alone
+        if (!PacketEvents.getAPI().getServerUtils().isBungeeCordEnabled()) {
+            if (VersionLookupUtils.isDependencyAvailable()) {
+                ClientVersion version = ClientVersion.getClientVersion(VersionLookupUtils.getProtocolVersion(e.getPlayer()));
+                PacketEvents.getAPI().getPlayerUtils().clientVersionsMap.put(channel, version);
+            }
         }
-        if (TinyProtocolManager.tinyProtocol == null) {
-            PacketEvents.getAPI().getPlayerUtils().injectPlayer(e.getPlayer());
+        if (!PacketEvents.getSettings().shouldInjectEarly()) {
+            PacketEvents.getAPI().packetManager.injectPlayer(e.getPlayer());
         }
     }
 

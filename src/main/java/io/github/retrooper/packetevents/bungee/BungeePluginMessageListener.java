@@ -27,6 +27,7 @@ package io.github.retrooper.packetevents.bungee;
 import com.google.common.io.ByteArrayDataInput;
 import com.google.common.io.ByteStreams;
 import io.github.retrooper.packetevents.PacketEvents;
+import io.github.retrooper.packetevents.utils.nms.NMSUtils;
 import io.github.retrooper.packetevents.utils.player.ClientVersion;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.messaging.PluginMessageListener;
@@ -42,10 +43,11 @@ public class BungeePluginMessageListener implements PluginMessageListener {
             ByteArrayDataInput in = ByteStreams.newDataInput(bytes);
             if (in.readUTF().equals("version")) {
                 String uuidString = in.readUTF();
-                UUID uuid = UUID.fromString(uuidString);
+                Object channel = NMSUtils.getChannel(player);
                 short protocolVersion = in.readShort();
                 ClientVersion version = ClientVersion.getClientVersion(protocolVersion);
-                PacketEvents.getAPI().getPlayerUtils().clientVersionsMap.put(uuid, version);
+                PacketEvents.getAPI().getPlayerUtils().clientVersionsMap.put(channel, version);
+                //DEBUG
                 System.out.println("ClientVersion received from Bungee: " + version.name());
             }
         }

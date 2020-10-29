@@ -26,7 +26,7 @@ package io.github.retrooper.packetevents.utils.player;
 
 import io.github.retrooper.packetevents.PacketEvents;
 import io.github.retrooper.packetevents.event.impl.PlayerEjectEvent;
-import io.github.retrooper.packetevents.nettyhandler.NettyPacketManager;
+import io.github.retrooper.packetevents.packetmanager.netty.NettyPacketManager;
 import io.github.retrooper.packetevents.packetwrappers.SendableWrapper;
 import io.github.retrooper.packetevents.utils.nms.NMSUtils;
 import io.github.retrooper.packetevents.utils.versionlookup.VersionLookupUtils;
@@ -42,7 +42,7 @@ public final class PlayerUtils {
     /**
      * This map stores each player's client version.
      */
-    public final HashMap<UUID, ClientVersion> clientVersionsMap = new HashMap<>();
+    public final HashMap<Object, ClientVersion> clientVersionsMap = new HashMap<>();
 
     /**
      * Use reflection to read the ping value NMS calculates for the player.
@@ -76,30 +76,12 @@ public final class PlayerUtils {
     }
 
     /**
-     * Get the client version by a UUID.
-     * @param uuid
-     * @return Get Client Version
-     */
-    public ClientVersion getClientVersion(final UUID uuid) {
-        return clientVersionsMap.get(uuid);
-    }
-
-    /**
      * Get the client version by a player object.
      * @param player
      * @return Get Client Version
      */
     public ClientVersion getClientVersion(final Player player) {
-        return clientVersionsMap.get(player.getUniqueId());
-    }
-
-    /**
-     * Get the protocol version.
-     * @param player
-     * @return Get Protocol Version
-     */
-    public int getProtocolVersion(Player player) {
-        return VersionLookupUtils.getProtocolVersion(player);
+        return clientVersionsMap.get(NMSUtils.getChannel(player));
     }
 
     /**
@@ -109,11 +91,7 @@ public final class PlayerUtils {
      * @param player
      */
     public void injectPlayer(final Player player) {
-        if (PacketEvents.getSettings().shouldInjectAsync()) {
-            NettyPacketManager.injectPlayerAsync(player);
-        } else {
-            NettyPacketManager.injectPlayer(player);
-        }
+       PacketEvents.getAPI().packetManager.injectPlayer(player);
     }
 
     /**
@@ -122,11 +100,7 @@ public final class PlayerUtils {
      * @param player
      */
     public void ejectPlayer(final Player player) {
-        if (PacketEvents.getSettings().shouldEjectAsync()) {
-            NettyPacketManager.ejectPlayerAsync(player);
-        } else {
-            NettyPacketManager.ejectPlayer(player);
-        }
+        PacketEvents.getAPI().packetManager.ejectPlayer(player);
     }
 
     /**
@@ -135,7 +109,7 @@ public final class PlayerUtils {
      * @param sendableWrapper
      */
     public void sendPacket(final Player player, final SendableWrapper sendableWrapper) {
-        NettyPacketManager.sendPacket(NMSUtils.getChannel(player), sendableWrapper.asNMSPacket());
+        PacketEvents.getAPI().packetManager.sendPacket(NMSUtils.getChannel(player), sendableWrapper.asNMSPacket());
     }
 
     /**
@@ -144,6 +118,6 @@ public final class PlayerUtils {
      * @param nmsPacket
      */
     public void sendNMSPacket(final Player player, Object nmsPacket) {
-        NettyPacketManager.sendPacket(NMSUtils.getChannel(player), nmsPacket);
+        PacketEvents.getAPI().packetManager.sendPacket(NMSUtils.getChannel(player), nmsPacket);
     }
 }

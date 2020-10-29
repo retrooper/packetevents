@@ -24,7 +24,7 @@
 
 package io.github.retrooper.packetevents.utils.gameprofile;
 
-import io.github.retrooper.packetevents.nettyhandler.NettyPacketManager;
+import io.github.retrooper.packetevents.packetmanager.netty.NettyPacketManager;
 
 import java.util.UUID;
 

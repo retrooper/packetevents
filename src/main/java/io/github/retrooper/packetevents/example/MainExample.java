@@ -27,10 +27,9 @@ package io.github.retrooper.packetevents.example;
 import io.github.retrooper.packetevents.PacketEvents;
 import io.github.retrooper.packetevents.event.PacketListener;
 import io.github.retrooper.packetevents.event.annotation.PacketHandler;
-import io.github.retrooper.packetevents.event.impl.PacketLoginEvent;
+import io.github.retrooper.packetevents.event.impl.PacketReceiveEvent;
 import io.github.retrooper.packetevents.packettype.PacketType;
-import io.github.retrooper.packetevents.packetwrappers.login.in.WrappedPacketLoginHandshake;
-import io.github.retrooper.packetevents.utils.player.ClientVersion;
+import io.github.retrooper.packetevents.packetwrappers.in.chat.WrappedPacketInChat;
 import io.github.retrooper.packetevents.utils.server.ServerVersion;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -43,9 +42,9 @@ public class MainExample extends JavaPlugin implements PacketListener {
 
     @Override
     public void onEnable() {
-        PacketEvents.getSettings().injectAsync(true).ejectAsync(true)
+        PacketEvents.getSettings().injectAsync(false).ejectAsync(true)
                 .backupServerVersion(ServerVersion.v_1_7_10).
-                useProtocolLibIfAvailable(true).checkForUpdates(true);
+                useProtocolLibIfAvailable(true).checkForUpdates(true).injectEarly(true);
         PacketEvents.getAPI().getEventManager().registerListener(this);
         PacketEvents.init(this);
 
@@ -54,16 +53,5 @@ public class MainExample extends JavaPlugin implements PacketListener {
     @Override
     public void onDisable() {
         PacketEvents.stop();
-    }
-
-
-    @PacketHandler
-    public void onLogin(PacketLoginEvent e) {
-        if (e.getPacketId() == PacketType.Login.HANDSHAKE) {
-            WrappedPacketLoginHandshake handshake = new WrappedPacketLoginHandshake(e.getNMSPacket());
-            int protocolVersion = handshake.getProtocolVersion();
-            ClientVersion version = ClientVersion.getClientVersion(protocolVersion);
-            System.out.println("Your version: " + version.name());
-        }
     }
 }

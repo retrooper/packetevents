@@ -22,7 +22,7 @@
  * SOFTWARE.
  */
 
-package io.github.retrooper.packetevents.nettyhandler;
+package io.github.retrooper.packetevents.packetmanager.netty;
 
 import io.github.retrooper.packetevents.PacketEvents;
 import io.github.retrooper.packetevents.utils.nms.NMSUtils;
@@ -34,31 +34,33 @@ import net.minecraft.util.io.netty.channel.ChannelPromise;
 import org.bukkit.entity.Player;
 
 final class NettyPacketManager_7 {
+    NettyPacketManager_7() {
 
+    }
     /**
      * Inject a player using 1.7.10's netty import location
      * @param player
      */
-    public static void injectPlayer(final Player player) {
+    public void injectPlayer(final Player player) {
         final ChannelDuplexHandler channelDuplexHandler = new ChannelDuplexHandler() {
             @Override
             public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
-                Object packet = NettyPacketManager.read(player, msg);
+                Object packet = PacketEvents.getAPI().packetManager.read(player, ctx.channel(), msg);
                 if (packet == null) {
                     return;
                 }
                 super.channelRead(ctx, msg);
-                NettyPacketManager.postRead(player, packet);
+                PacketEvents.getAPI().packetManager.postRead(player, packet);
             }
 
             @Override
             public void write(ChannelHandlerContext ctx, Object msg, ChannelPromise promise) throws Exception {
-                Object packet = NettyPacketManager.write(player, msg);
+                Object packet = PacketEvents.getAPI().packetManager.write(player, ctx.channel(),msg);
                 if (packet == null) {
                     return;
                 }
                 super.write(ctx, msg, promise);
-                NettyPacketManager.postSend(player, packet);
+                PacketEvents.getAPI().packetManager.postWrite(player, packet);
             }
         };
         final ChannelPipeline pipeline = ((Channel) NMSUtils.getChannel(player)).pipeline();
@@ -69,13 +71,13 @@ final class NettyPacketManager_7 {
      * Eject a player using 1.7.10 netty import location.
      * @param player Target Player
      */
-    public static void ejectPlayer(final Player player) {
+    public void ejectPlayer(final Player player) {
          Channel channel = (Channel) NMSUtils.getChannelNoCache(player);
         assert channel != null;
         channel.pipeline().remove(PacketEvents.getHandlerName(player.getName()));
     }
 
-    public static void sendPacket(Object rawChannel, Object packet) {
+    public void sendPacket(Object rawChannel, Object packet) {
         Channel channel = (Channel)rawChannel;
         channel.pipeline().writeAndFlush(packet);
     }
