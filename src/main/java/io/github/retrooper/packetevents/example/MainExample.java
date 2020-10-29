@@ -55,4 +55,15 @@ public class MainExample extends JavaPlugin implements PacketListener {
     public void onDisable() {
         PacketEvents.stop();
     }
+
+
+    @PacketHandler
+    public void onLogin(PacketLoginEvent e) {
+        if (e.getPacketId() == PacketType.Login.HANDSHAKE) {
+            WrappedPacketLoginHandshake handshake = new WrappedPacketLoginHandshake(e.getNMSPacket());
+            int protocolVersion = handshake.getProtocolVersion();
+            ClientVersion version = ClientVersion.getClientVersion(protocolVersion);
+            System.out.println("Your version: " + version.name());
+        }
+    }
 }
