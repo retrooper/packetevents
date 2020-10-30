@@ -30,9 +30,9 @@ public class PacketEventsSettings {
     private ServerVersion backupServerVersion = ServerVersion.v_1_7_10;
     private boolean injectAsync = true;
     private boolean ejectAsync = true;
-    private boolean useProtocolLibIfAvailable;
+    private boolean useProtocolLibIfAvailable = false;
     private boolean checkForUpdates = true;
-    private boolean injectEarly = false;
+    private boolean injectEarly = true;
 
     public PacketEventsSettings backupServerVersion(ServerVersion serverVersion) {
         this.backupServerVersion = serverVersion;

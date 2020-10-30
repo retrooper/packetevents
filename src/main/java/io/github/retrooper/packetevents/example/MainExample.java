@@ -28,8 +28,11 @@ import io.github.retrooper.packetevents.PacketEvents;
 import io.github.retrooper.packetevents.event.PacketListener;
 import io.github.retrooper.packetevents.event.annotation.PacketHandler;
 import io.github.retrooper.packetevents.event.impl.PacketReceiveEvent;
+import io.github.retrooper.packetevents.event.impl.PacketSendEvent;
+import io.github.retrooper.packetevents.event.impl.PlayerInjectEvent;
 import io.github.retrooper.packetevents.packettype.PacketType;
-import io.github.retrooper.packetevents.packetwrappers.in.chat.WrappedPacketInChat;
+import io.github.retrooper.packetevents.packetwrappers.out.animation.WrappedPacketOutAnimation;
+import io.github.retrooper.packetevents.packetwrappers.out.explosion.WrappedPacketOutExplosion;
 import io.github.retrooper.packetevents.utils.server.ServerVersion;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -42,7 +45,7 @@ public class MainExample extends JavaPlugin implements PacketListener {
 
     @Override
     public void onEnable() {
-        PacketEvents.getSettings().injectAsync(false).ejectAsync(true)
+        PacketEvents.getSettings().injectAsync(true).ejectAsync(true)
                 .backupServerVersion(ServerVersion.v_1_7_10).
                 useProtocolLibIfAvailable(true).checkForUpdates(true).injectEarly(true);
         PacketEvents.getAPI().getEventManager().registerListener(this);

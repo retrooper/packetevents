@@ -76,38 +76,54 @@ public class PacketManager {
     }
 
     public void injectPlayerSync(Player player) {
-        if (tinyProtocolMode) {
-            tinyProtocol.injectPlayer(player);
-        } else {
-            nettyProtocol.injectPlayer(player);
+        PlayerInjectEvent injectEvent = new PlayerInjectEvent(player, false);
+        PacketEvents.getAPI().getEventManager().callEvent(injectEvent);
+        if (!injectEvent.isCancelled()) {
+            if (tinyProtocolMode) {
+                tinyProtocol.injectPlayer(player);
+            } else {
+                nettyProtocol.injectPlayer(player);
+            }
         }
     }
 
     public void injectPlayerAsync(Player player) {
-        if (tinyProtocolMode) {
-            tinyProtocol.injectPlayerAsync(player);
-        } else {
-            nettyProtocol.injectPlayerAsync(player);
+        PlayerInjectEvent injectEvent = new PlayerInjectEvent(player, true);
+        PacketEvents.getAPI().getEventManager().callEvent(injectEvent);
+        if (!injectEvent.isCancelled()) {
+            if (tinyProtocolMode) {
+                tinyProtocol.injectPlayerAsync(player);
+            } else {
+                nettyProtocol.injectPlayerAsync(player);
+            }
         }
     }
 
     public void ejectPlayerSync(Player player) {
-        keepAliveMap.remove(player.getUniqueId());
-        NMSUtils.channelCache.remove(player.getUniqueId());
-        if (tinyProtocolMode) {
-            tinyProtocol.ejectPlayer(player);
-        } else {
-            nettyProtocol.ejectPlayer(player);
+        PlayerEjectEvent ejectEvent = new PlayerEjectEvent(player, false);
+        PacketEvents.getAPI().getEventManager().callEvent(ejectEvent);
+        if (!ejectEvent.isCancelled()) {
+            keepAliveMap.remove(player.getUniqueId());
+            NMSUtils.channelCache.remove(player.getUniqueId());
+            if (tinyProtocolMode) {
+                tinyProtocol.ejectPlayer(player);
+            } else {
+                nettyProtocol.ejectPlayer(player);
+            }
         }
     }
 
     public void ejectPlayerAsync(Player player) {
-        keepAliveMap.remove(player.getUniqueId());
-        NMSUtils.channelCache.remove(player.getUniqueId());
-        if (tinyProtocolMode) {
-            tinyProtocol.ejectPlayerAsync(player);
-        } else {
-            nettyProtocol.ejectPlayerAsync(player);
+        PlayerEjectEvent ejectEvent = new PlayerEjectEvent(player, true);
+        PacketEvents.getAPI().getEventManager().callEvent(ejectEvent);
+        if (!ejectEvent.isCancelled()) {
+            keepAliveMap.remove(player.getUniqueId());
+            NMSUtils.channelCache.remove(player.getUniqueId());
+            if (tinyProtocolMode) {
+                tinyProtocol.ejectPlayerAsync(player);
+            } else {
+                nettyProtocol.ejectPlayerAsync(player);
+            }
         }
     }
 

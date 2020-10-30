@@ -89,16 +89,20 @@ public final class PacketEvents implements Listener {
             NMSUtils.version = version;
             EntityFinderUtils.version = version;
 
-            NMSUtils.load();
+            try {
+                NMSUtils.load();
 
-            PacketTypeClasses.Client.load();
-            PacketTypeClasses.Server.load();
-            PacketTypeClasses.Login.load();
-            PacketTypeClasses.Status.load();
+                PacketTypeClasses.Client.load();
+                PacketTypeClasses.Server.load();
+                PacketTypeClasses.Login.load();
+                PacketTypeClasses.Status.load();
 
-            EntityFinderUtils.load();
+                EntityFinderUtils.load();
 
-            WrappedPacket.loadAllWrappers();
+                WrappedPacket.loadAllWrappers();
+            } catch (Exception ex) {
+                throw new IllegalStateException("PacketEvents failed to successfully load...", ex);
+            }
             loaded = true;
         }
 

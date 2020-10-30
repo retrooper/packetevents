@@ -46,16 +46,22 @@ public class WrappedPacketOutExplosion extends WrappedPacket implements Sendable
         vec3DClass = NMSUtils.getNMSClassWithoutException("Vec3D");
         try {
             packetConstructor = packetClass.getConstructor(double.class, double.class, double.class, float.class, List.class, vec3DClass);
-            vec3dConstructor = vec3DClass.getConstructor(double.class, double.class, double.class);
+            vec3dConstructor = vec3DClass.getDeclaredConstructor(double.class, double.class, double.class);
             if (chunkPosClass != null) {
                 chunkPosConstructor = chunkPosClass.getConstructor(int.class, int.class, int.class);
             }
-            blockPosConstructor = blockPosClass.getConstructor(int.class, int.class, int.class);
+
         } catch (NoSuchMethodException e) {
             e.printStackTrace();
         }
 
-
+        try {
+            if (blockPosClass != null) {
+                blockPosConstructor = blockPosClass.getConstructor(int.class, int.class, int.class);
+            }
+        } catch (NoSuchMethodException e) {
+            e.printStackTrace();
+        }
     }
 
     private boolean isListening = false;
