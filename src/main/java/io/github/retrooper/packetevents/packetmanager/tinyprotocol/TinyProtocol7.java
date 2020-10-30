@@ -51,7 +51,7 @@ import java.util.logging.Level;
 //BROKEN: NPEs when player joins while server is starting, and using PlayerJoinEvent instead will cause NPE for protocol version lookup.
 //Protocol version number lookup method from DeprecatedLuke's version of TinyProtocol
 public class TinyProtocol7 {
-    private static final AtomicInteger ID = new AtomicInteger(0);
+    private static final AtomicInteger ID = new AtomicInteger();
 
     // Used in order to lookup a channel
     private static final MethodInvoker getPlayerHandle = Reflection.getMethod("{obc}.entity.CraftPlayer", "getHandle");
@@ -111,14 +111,14 @@ public class TinyProtocol7 {
             registerPlayers(plugin);
         } catch (IllegalArgumentException ex) {
             // Damn you, late bind
-            plugin.getLogger().info("[TinyProtocol] Delaying server channel injection due to late bind.");
+            plugin.getLogger().info("Delaying server channel injection due to late bind.");
 
             new BukkitRunnable() {
                 @Override
                 public void run() {
                     registerChannelHandler();
                     registerPlayers(plugin);
-                    plugin.getLogger().info("[TinyProtocol] Late bind injection successful.");
+                    plugin.getLogger().info("Late bind injection successful.");
                 }
             }.runTask(plugin);
         }
@@ -280,7 +280,7 @@ public class TinyProtocol7 {
     }
 
     public void sendPacket(Object channel, Object packet) {
-        sendPacket((Channel)channel, packet);
+        sendPacket((Channel) channel, packet);
     }
 
     /**
@@ -315,7 +315,7 @@ public class TinyProtocol7 {
      * @return A unique channel handler name.
      */
     protected String getHandlerName() {
-        return "tiny-" + plugin.getName() + "-" + ID.incrementAndGet();
+        return "PacketEvents-" + ID.incrementAndGet();
     }
 
     /**
