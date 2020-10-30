@@ -26,7 +26,7 @@ package io.github.retrooper.packetevents.event.manager;
 
 import io.github.retrooper.packetevents.PacketEvents;
 import io.github.retrooper.packetevents.event.annotation.PacketHandler;
-import io.github.retrooper.packetevents.event.CancellableEvent;
+import io.github.retrooper.packetevents.event.eventtypes.CancellableEvent;
 import io.github.retrooper.packetevents.event.PacketEvent;
 import io.github.retrooper.packetevents.event.PacketListener;
 import io.github.retrooper.packetevents.event.priority.PacketEventPriority;
@@ -52,23 +52,6 @@ public final class EventManager {
                         || parameterType.isInstance(e)) {
 
                     PacketHandler annotation = method.getAnnotation(PacketHandler.class);
-                    Runnable invokeMethod = new Runnable() {
-                        @Override
-                        public void run() {
-                            try {
-                                method.invoke(listener, e);
-                            } catch (IllegalAccessException | InvocationTargetException ex) {
-                                ex.printStackTrace();
-                            }
-                            if (e instanceof CancellableEvent) {
-                                CancellableEvent ce = (CancellableEvent) e;
-                                if (annotation.priority() >= eventPriority[0]) {
-                                    eventPriority[0] = annotation.priority();
-                                    isCancelled[0] = ce.isCancelled();
-                                }
-                            }
-                        }
-                    };
                     try {
                         method.invoke(listener, e);
                     } catch (IllegalAccessException | InvocationTargetException ex) {
@@ -93,6 +76,9 @@ public final class EventManager {
     public void registerListener(final PacketListener listener) {
         final ConcurrentLinkedQueue<Method> methods = new ConcurrentLinkedQueue<>();
         for (final Method m : listener.getClass().getDeclaredMethods()) {
+            if(!m.isAccessible()) {
+                m.setAccessible(true);
+            }
             if (m.isAnnotationPresent(PacketHandler.class)
                     && m.getParameterTypes().length == 1) {
                 methods.add(m);

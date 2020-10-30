@@ -22,35 +22,48 @@
  * SOFTWARE.
  */
 
-package io.github.retrooper.packetevents.enums;
+package io.github.retrooper.packetevents.utils.gameprofile;
 
-public enum SystemOS {
-    WINDOWS, MACOS, LINUX, OTHER;
+import java.util.UUID;
 
-    private static SystemOS value;
+public class WrappedGameProfile {
+    public UUID id;
+    public String name;
+    public boolean legacy;
 
-    private static SystemOS getOS() {
-        final String os = System.getProperty("os.name");
-        for (final String osName : getOperatingSystemNames()) {
-            if (os.toLowerCase().contains(osName.toLowerCase())) {
-                return SystemOS.valueOf(osName);
+    public WrappedGameProfile(UUID id, String name, boolean legacy) {
+        this.id = id;
+        this.name = name;
+        this.legacy = legacy;
+    }
+
+    public UUID getId() {
+        return id;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public boolean isLegacy() {
+        return legacy;
+    }
+
+    public boolean isComplete() {
+        return id != null && !isBlank(name);
+    }
+
+    private boolean isBlank(CharSequence cs) {
+        int strLen;
+        if (cs != null && (strLen = cs.length()) != 0) {
+            for (int i = 0; i < strLen; ++i) {
+                if (!Character.isWhitespace(cs.charAt(i))) {
+                    return false;
+                }
             }
+            return true;
+        } else {
+            return true;
         }
-        return OTHER;
-    }
-
-    public static SystemOS getOperatingSystem() {
-        if (value == null) {
-            value = getOS();
-        }
-        return value;
-    }
-
-    public static String[] getOperatingSystemNames() {
-        final String[] arr = new String[values().length - 1];
-        for (int i = 0; i < values().length - 1; i++) {
-            arr[i] = values()[i].name();
-        }
-        return arr;
     }
 }

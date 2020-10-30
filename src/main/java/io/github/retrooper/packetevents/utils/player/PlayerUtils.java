@@ -26,7 +26,7 @@ package io.github.retrooper.packetevents.utils.player;
 
 import io.github.retrooper.packetevents.PacketEvents;
 import io.github.retrooper.packetevents.event.impl.PlayerEjectEvent;
-import io.github.retrooper.packetevents.nettyhandler.NettyPacketHandler;
+import io.github.retrooper.packetevents.packetmanager.netty.NettyPacketManager;
 import io.github.retrooper.packetevents.packetwrappers.SendableWrapper;
 import io.github.retrooper.packetevents.utils.nms.NMSUtils;
 import io.github.retrooper.packetevents.utils.versionlookup.VersionLookupUtils;
@@ -36,28 +36,43 @@ import java.util.HashMap;
 import java.util.UUID;
 
 public final class PlayerUtils {
+    public final HashMap<UUID, Short> playerPingMap = new HashMap<>();
+    public final HashMap<UUID, Short> playerSmoothedPingMap = new HashMap<>();
 
     /**
      * This map stores each player's client version.
      */
-    public final HashMap<UUID, ClientVersion> clientVersionsMap = new HashMap<UUID, ClientVersion>();
+    public final HashMap<Object, ClientVersion> clientVersionsMap = new HashMap<>();
 
     /**
-     * Get the player's ping.
+     * Use reflection to read the ping value NMS calculates for the player.
+     * NMS smooths the player ping.
      * @param player
-     * @return Get Player Ping
+     * @return Get NMS smoothed Player Ping
      */
-    public int getPing(final Player player) {
+    public int getNMSPing(final Player player) {
         return NMSUtils.getPlayerPing(player);
     }
 
     /**
-     * Get the client version by a UUID.
-     * @param uuid
-     * @return Get Client Version
+     * Use the ping PacketEvents calculates for the player. (Updates every incoming Keep Alive packet)
+     * @param player Player
+     * @return Get Ping
      */
-    public ClientVersion getClientVersion(final UUID uuid) {
-        return clientVersionsMap.get(uuid);
+    public short getPing(final Player player) {
+        return playerPingMap.getOrDefault(player.getUniqueId(), (short)0);
+    }
+
+    public short getSmoothedPing(final Player player) {
+        return playerSmoothedPingMap.getOrDefault(player.getUniqueId(), (short)0);
+    }
+
+    public short getPing(UUID uuid) {
+        return playerPingMap.getOrDefault(uuid, (short)0);
+    }
+
+    public short getSmoothedPing(UUID uuid) {
+        return playerSmoothedPingMap.getOrDefault(uuid, (short)0);
     }
 
     /**
@@ -66,16 +81,7 @@ public final class PlayerUtils {
      * @return Get Client Version
      */
     public ClientVersion getClientVersion(final Player player) {
-        return clientVersionsMap.get(player.getUniqueId());
-    }
-
-    /**
-     * Get the protocol version.
-     * @param player
-     * @return Get Protocol Version
-     */
-    public int getProtocolVersion(Player player) {
-        return VersionLookupUtils.getProtocolVersion(player);
+        return clientVersionsMap.get(NMSUtils.getChannel(player));
     }
 
     /**
@@ -85,11 +91,7 @@ public final class PlayerUtils {
      * @param player
      */
     public void injectPlayer(final Player player) {
-        if (PacketEvents.getSettings().shouldInjectAsync()) {
-            NettyPacketHandler.injectPlayerAsync(player);
-        } else {
-            NettyPacketHandler.injectPlayer(player);
-        }
+       PacketEvents.getAPI().packetManager.injectPlayer(player);
     }
 
     /**
@@ -98,11 +100,7 @@ public final class PlayerUtils {
      * @param player
      */
     public void ejectPlayer(final Player player) {
-        if (PacketEvents.getSettings().shouldEjectAsync()) {
-            NettyPacketHandler.ejectPlayerAsync(player);
-        } else {
-            NettyPacketHandler.ejectPlayer(player);
-        }
+        PacketEvents.getAPI().packetManager.ejectPlayer(player);
     }
 
     /**
@@ -111,7 +109,7 @@ public final class PlayerUtils {
      * @param sendableWrapper
      */
     public void sendPacket(final Player player, final SendableWrapper sendableWrapper) {
-        NMSUtils.sendSendableWrapper(player, sendableWrapper);
+        PacketEvents.getAPI().packetManager.sendPacket(NMSUtils.getChannel(player), sendableWrapper.asNMSPacket());
     }
 
     /**
@@ -120,6 +118,6 @@ public final class PlayerUtils {
      * @param nmsPacket
      */
     public void sendNMSPacket(final Player player, Object nmsPacket) {
-        NMSUtils.sendNMSPacket(player, nmsPacket);
+        PacketEvents.getAPI().packetManager.sendPacket(NMSUtils.getChannel(player), nmsPacket);
     }
 }

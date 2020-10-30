@@ -22,7 +22,7 @@
  * SOFTWARE.
  */
 
-package io.github.retrooper.packetevents.event;
+package io.github.retrooper.packetevents.event.eventtypes;
 
 /**
  * This indicates that it is possible to cancel an event,

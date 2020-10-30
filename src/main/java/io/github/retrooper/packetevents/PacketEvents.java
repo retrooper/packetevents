@@ -24,7 +24,10 @@
 
 package io.github.retrooper.packetevents;
 
+import io.github.retrooper.packetevents.bungee.BungeePluginMessageListener;
 import io.github.retrooper.packetevents.event.PacketEvent;
+import io.github.retrooper.packetevents.packetmanager.PacketManager;
+import io.github.retrooper.packetevents.packetmanager.netty.NettyPacketManager;
 import io.github.retrooper.packetevents.packettype.PacketTypeClasses;
 import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
 import io.github.retrooper.packetevents.settings.PacketEventsSettings;
@@ -32,29 +35,30 @@ import io.github.retrooper.packetevents.updatechecker.UpdateChecker;
 import io.github.retrooper.packetevents.utils.entityfinder.EntityFinderUtils;
 import io.github.retrooper.packetevents.utils.nms.NMSUtils;
 import io.github.retrooper.packetevents.utils.player.ClientVersion;
+import io.github.retrooper.packetevents.utils.server.PEVersion;
 import io.github.retrooper.packetevents.utils.server.ServerVersion;
 import io.github.retrooper.packetevents.utils.versionlookup.VersionLookupUtils;
-import io.github.retrooper.packetevents.version.PEVersion;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.event.player.PlayerLoginEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.plugin.Plugin;
 
-import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Random;
+import java.util.concurrent.Future;
 
 public final class PacketEvents implements Listener {
-    private static String nettyHandlerIdentifier = generateRandomNettyIdentifier();
+    private static final String nettyHandlerIdentifier = generateRandomNettyIdentifier();
 
     private static final PacketEventsAPI packetEventsAPI = new PacketEventsAPI();
     private static final PacketEvents instance = new PacketEvents();
     private static final ArrayList<Plugin> plugins = new ArrayList<Plugin>(1);
-    private static boolean loaded, initialized, isBungee;
-    private static final PEVersion version = new PEVersion(1, 6, 9);
+    private static boolean loaded, initialized;
+    private static final PEVersion version = new PEVersion(1, 7);
 
     private static PacketEventsSettings settings = new PacketEventsSettings();
 
@@ -85,14 +89,20 @@ public final class PacketEvents implements Listener {
             NMSUtils.version = version;
             EntityFinderUtils.version = version;
 
-            NMSUtils.load();
+            try {
+                NMSUtils.load();
 
-            PacketTypeClasses.Client.load();
-            PacketTypeClasses.Server.load();
+                PacketTypeClasses.Client.load();
+                PacketTypeClasses.Server.load();
+                PacketTypeClasses.Login.load();
+                PacketTypeClasses.Status.load();
 
-            EntityFinderUtils.load();
+                EntityFinderUtils.load();
 
-            WrappedPacket.loadAllWrappers();
+                WrappedPacket.loadAllWrappers();
+            } catch (Exception ex) {
+                throw new IllegalStateException("PacketEvents failed to successfully load...", ex);
+            }
             loaded = true;
         }
 
@@ -118,32 +128,34 @@ public final class PacketEvents implements Listener {
      * @param pl JavaPlugin instance
      */
     public static void init(final Plugin pl, PacketEventsSettings packetEventsSettings) {
-        if (!loaded) {
-            load();
-        }
+        load();
         if (!initialized) {
             settings = packetEventsSettings;
             plugins.add(pl);
+
             //Register Bukkit listener
             Bukkit.getPluginManager().registerEvents(instance, plugins.get(0));
+            PacketEvents.getAPI().packetManager = new PacketManager(plugins.get(0), settings.shouldInjectEarly());
 
             for (final Player p : Bukkit.getOnlinePlayers()) {
                 getAPI().getPlayerUtils().injectPlayer(p);
             }
-            initialized = true;
-
-            Class<?> spigotConfigClass;
-            try {
-                spigotConfigClass = Class.forName("org.spigotmc.SpigotConfig");
-                Field f = spigotConfigClass.getDeclaredField("bungee");
-                isBungee = f.getBoolean(null);
-            } catch (ClassNotFoundException | NoSuchFieldException | IllegalAccessException e) {
-                isBungee = false;
-            }
 
             if (settings.shouldCheckForUpdates()) {
-                Bukkit.getScheduler().runTask(pl, () -> new UpdateChecker().handleUpdate());
+                Future<?> future = NettyPacketManager.executorService.submit(new Runnable() {
+                    @Override
+                    public void run() {
+                        new UpdateChecker().handleUpdate();
+                    }
+                });
             }
+
+            if (getAPI().getServerUtils().isBungeeCordEnabled()) {
+                Bukkit.getMessenger().registerOutgoingPluginChannel(plugins.get(0), "BungeeCord");
+                Bukkit.getServer().getMessenger().registerIncomingPluginChannel(plugins.get(0), BungeePluginMessageListener.tagName, new BungeePluginMessageListener());
+            }
+
+            initialized = true;
         }
     }
 
@@ -155,9 +167,11 @@ public final class PacketEvents implements Listener {
             for (final Player p : Bukkit.getOnlinePlayers()) {
                 getAPI().getPlayerUtils().ejectPlayer(p);
             }
+
             getAPI().getEventManager().unregisterAllListeners();
 
             initialized = false;
+            NettyPacketManager.executorService.shutdownNow();
         }
     }
 
@@ -195,20 +209,34 @@ public final class PacketEvents implements Listener {
     }
 
     @EventHandler
-    public void onJoin(final PlayerJoinEvent e) {
-        if (!VersionLookupUtils.hasLoaded()) {
-            VersionLookupUtils.load();
+    public void onLogin(PlayerLoginEvent e) {
+        if (PacketEvents.getSettings().shouldInjectEarly()) {
+            assert getAPI().packetManager.tinyProtocol != null;
+            if (getAPI().packetManager.tinyProtocol.canInject(e.getPlayer())) {
+                getAPI().packetManager.injectPlayer(e.getPlayer());
+            }
         }
-        //for now we don't support bungee, rather handle it than have it FALSE
-        //and return the version of the server.
-        if (isBungee) {
-            PacketEvents.getAPI().getPlayerUtils().clientVersionsMap.put(e.getPlayer().getUniqueId(), ClientVersion.UNKNOWN);
-        } else {
-            ClientVersion version = ClientVersion.getClientVersion(VersionLookupUtils.getProtocolVersion(e.getPlayer()));
-            PacketEvents.getAPI().getPlayerUtils().clientVersionsMap.put(e.getPlayer().getUniqueId(), version);
-        }
-        PacketEvents.getAPI().getPlayerUtils().injectPlayer(e.getPlayer());
     }
+
+    @EventHandler
+    public void onJoin(final PlayerJoinEvent e) {
+        if (!VersionLookupUtils.hasHandledLoadedDependencies()) {
+            VersionLookupUtils.handleLoadedDependencies();
+        }
+        Object channel = NMSUtils.getChannel(e.getPlayer());
+        //Waiting for the BungeeCord server to send their plugin message with your version,
+        //So we leave bungee alone
+        if (!PacketEvents.getAPI().getServerUtils().isBungeeCordEnabled()) {
+            if (VersionLookupUtils.isDependencyAvailable()) {
+                ClientVersion version = ClientVersion.getClientVersion(VersionLookupUtils.getProtocolVersion(e.getPlayer()));
+                PacketEvents.getAPI().getPlayerUtils().clientVersionsMap.put(channel, version);
+            }
+        }
+        if (!PacketEvents.getSettings().shouldInjectEarly()) {
+            PacketEvents.getAPI().packetManager.injectPlayer(e.getPlayer());
+        }
+    }
+
 
     @EventHandler
     public void onQuit(final PlayerQuitEvent e) {
@@ -224,7 +252,6 @@ public final class PacketEvents implements Listener {
             int index = (int) (random.nextFloat() * alphabet.length());
             sb.append(alphabet.charAt(index));
         }
-
         return sb.toString();
     }
 

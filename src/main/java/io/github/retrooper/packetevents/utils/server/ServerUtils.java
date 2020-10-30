@@ -24,8 +24,8 @@
 
 package io.github.retrooper.packetevents.utils.server;
 
-import io.github.retrooper.packetevents.enums.SystemOS;
 import io.github.retrooper.packetevents.utils.nms.NMSUtils;
+import org.spigotmc.SpigotConfig;
 
 import java.lang.reflect.InvocationTargetException;
 
@@ -43,13 +43,12 @@ public final class ServerUtils {
      * @return Get Recent TPS
      */
     public double[] getRecentTPS() {
-        double[] tpsArray = new double[0];
         try {
-            tpsArray = NMSUtils.recentTPS();
+            return NMSUtils.recentTPS();
         } catch (IllegalAccessException | InvocationTargetException e) {
             e.printStackTrace();
         }
-        return tpsArray;
+        return new double[0];
     }
 
     /**
@@ -66,5 +65,9 @@ public final class ServerUtils {
      */
     public SystemOS getOS() {
         return SystemOS.getOperatingSystem();
+    }
+
+    public boolean isBungeeCordEnabled() {
+        return SpigotConfig.bungee;
     }
 }

@@ -24,11 +24,38 @@
 
 package io.github.retrooper.packetevents.packettype;
 
-import io.github.retrooper.packetevents.packettype.PacketType;
 import io.github.retrooper.packetevents.utils.nms.NMSUtils;
 import io.github.retrooper.packetevents.utils.reflection.SubclassUtil;
 
 public class PacketTypeClasses {
+    public static class Status {
+        public static Class<?> PING, PONG;
+
+        public static void load() {
+            PING = NMSUtils.getNMSClassWithoutException("PacketStatusInPing");
+            PONG = NMSUtils.getNMSClassWithoutException("PacketStatusOutPong");
+            PacketType.Status.init();
+        }
+    }
+    public static class Login {
+        public static Class<?>  HANDSHAKE,
+                IN_CUSTOM_PAYLOAD, OUT_CUSTOM_PAYLOAD,IN_START, IN_ENCRYPTION_BEGIN,
+                DISCONNECT, OUT_ENCRYPTION_BEGIN, OUT_SUCCESS;
+
+        public static void load() {
+            HANDSHAKE = NMSUtils.getNMSClassWithoutException("PacketHandshakingInSetProtocol");
+            //In and Out custom payload login packets have been here since AROUND 1.13.2?
+            IN_CUSTOM_PAYLOAD = NMSUtils.getNMSClassWithoutException("PacketLoginInCustomPayload");
+            OUT_CUSTOM_PAYLOAD = NMSUtils.getNMSClassWithoutException("PacketLoginOutCustomPayload");
+            IN_START = NMSUtils.getNMSClassWithoutException("PacketLoginInStart");
+            IN_ENCRYPTION_BEGIN = NMSUtils.getNMSClassWithoutException("PacketLoginInEncryptionBegin");
+            DISCONNECT = NMSUtils.getNMSClassWithoutException("PacketLoginOutDisconnect");
+            OUT_ENCRYPTION_BEGIN = NMSUtils.getNMSClassWithoutException("PacketLoginOutEncryptionBegin");
+            OUT_SUCCESS = NMSUtils.getNMSClassWithoutException("PacketLoginOutSuccess");
+            PacketType.Login.init();
+        }
+    }
+
     public static class Client {
         private static final String c = "PacketPlayIn";
         public static Class<?> FLYING, POSITION, POSITION_LOOK, LOOK, CLIENT_COMMAND,
@@ -107,17 +134,16 @@ public class PacketTypeClasses {
             } catch (ClassNotFoundException e) {
                 e.printStackTrace();
             }
-            //Block place
+
             try {
                 BLOCK_PLACE = NMSUtils.getNMSClass(c + "BlockPlace");
             } catch (ClassNotFoundException e) {
-                //They are just on a newer version
-                try {
-                    USE_ITEM = NMSUtils.getNMSClass(c + "UseItem");
-                } catch (ClassNotFoundException e2) {
-                    e.printStackTrace();
-                    e2.printStackTrace();
-                }
+
+            }
+            try {
+                USE_ITEM = NMSUtils.getNMSClass(c + "UseItem");
+            } catch (ClassNotFoundException e2) {
+
             }
 
             PacketType.Client.init();

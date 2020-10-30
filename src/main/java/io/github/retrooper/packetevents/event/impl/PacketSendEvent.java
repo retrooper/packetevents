@@ -24,8 +24,9 @@
 
 package io.github.retrooper.packetevents.event.impl;
 
-import io.github.retrooper.packetevents.event.CancellableEvent;
+import io.github.retrooper.packetevents.event.eventtypes.CancellableEvent;
 import io.github.retrooper.packetevents.event.PacketEvent;
+import io.github.retrooper.packetevents.event.eventtypes.PlayerEvent;
 import io.github.retrooper.packetevents.packettype.PacketType;
 import io.github.retrooper.packetevents.utils.reflection.ClassUtil;
 import org.bukkit.entity.Player;
@@ -33,7 +34,7 @@ import org.bukkit.entity.Player;
 /**
  * This event is called each time the server sends a packet to the client.
  */
-public final class PacketSendEvent extends PacketEvent implements CancellableEvent {
+public final class PacketSendEvent extends PacketEvent implements CancellableEvent, PlayerEvent {
     private final Player player;
     private final Object packet;
     private boolean cancelled;
@@ -44,9 +45,9 @@ public final class PacketSendEvent extends PacketEvent implements CancellableEve
         this.cancelled = false;
     }
 
-
+    @Override
     public Player getPlayer() {
-        return this.player;
+        return player;
     }
 
     /**
@@ -73,7 +74,17 @@ public final class PacketSendEvent extends PacketEvent implements CancellableEve
      * @return packet object
      */
     public Object getNMSPacket() {
-        return this.packet;
+        return packet;
+    }
+
+    @Override
+    public void cancel() {
+        cancelled = true;
+    }
+
+    @Override
+    public void uncancel() {
+        cancelled = false;
     }
 
     @Override
@@ -82,16 +93,8 @@ public final class PacketSendEvent extends PacketEvent implements CancellableEve
     }
 
     @Override
-    public void setCancelled(boolean cancelled) {
-        this.cancelled = cancelled;
+    public void setCancelled(boolean value) {
+        cancelled = value;
     }
-
-    @Override
-    public void cancel() {
-        this.cancelled = true;
-    }
-
-    @Override
-    public void uncancel() { this.cancelled = false;}
 }
 

@@ -28,15 +28,14 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class ClassUtil {
-    private static final Map<Class<?>, String> classSimpleNameCache = new HashMap<Class<?>, String>();
+    private static final Map<String, String> classSimpleNameCache = new HashMap<String, String>();
 
     public static String getClassSimpleName(Class<?> cls) {
-        String tmp = classSimpleNameCache.get(cls);
-        if(tmp == null) {
-            String name = cls.getSimpleName();
-            classSimpleNameCache.put(cls, name);
-            return name;
+        String simpleClassName = classSimpleNameCache.get(cls.getName());
+        if(simpleClassName == null) {
+            String name = simpleClassName = cls.getSimpleName();
+            classSimpleNameCache.put(cls.getName(), name);
         }
-        return tmp;
+        return simpleClassName;
     }
 }

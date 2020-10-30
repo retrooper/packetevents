@@ -25,26 +25,53 @@
 package io.github.retrooper.packetevents.packetwrappers.out.entity;
 
 import io.github.retrooper.packetevents.packettype.PacketTypeClasses;
+import io.github.retrooper.packetevents.packetwrappers.SendableWrapper;
 import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
 import io.github.retrooper.packetevents.utils.nms.NMSUtils;
 import io.github.retrooper.packetevents.utils.reflection.Reflection;
 import org.bukkit.entity.Entity;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
 
-public class WrappedPacketOutEntity extends WrappedPacket {
+public class WrappedPacketOutEntity extends WrappedPacket implements SendableWrapper {
     private static Class<?> packetClass;
-    private boolean entityIDInitiated = false;
-    private int entityID = 0;
     //Byte = 1.7.10->1.8.8, Int = 1.9->1.15.x, Short = 1.16.x
     private static byte mode = 0; //byte = 0, int = 1, short = 2
     private static double dXYZDivisor = 0.0;
     private static int yawByteIndex = 0;
     private static int pitchByteIndex = 1;
     private Entity entity;
+    private boolean isListening = false;
+    private static Constructor<?> entityPacketConstructor;
+    private int entityID;
+    private double deltaX, deltaY, deltaZ;
+    private byte pitch, yaw;
+    private boolean onGround;
 
     public WrappedPacketOutEntity(Object packet) {
         super(packet);
+        isListening = true;
+    }
+
+    public WrappedPacketOutEntity(int entityID, double deltaX, double deltaY, double deltaZ,
+                                  byte pitch, byte yaw, boolean onGround) {
+        this.entityID = entityID;
+        this.deltaX = deltaX;
+        this.deltaY = deltaY;
+        this.deltaZ = deltaZ;
+        this.pitch = pitch;
+        this.yaw = yaw;
+        this.onGround = onGround;
+        //Get entity player then pass it into the packetplayoutnamedentityspawn!
+      //  net.minecraft.server.v1_7_R4.EntityPlayer cp = null;
+        //net.minecraft.server.v1_7_R4.PacketPlayOutNamedEntitySpawn es = new net.minecraft.server.v1_7_R4.PacketPlayOutNamedEntitySpawn(cp);
+    }
+
+    public WrappedPacketOutEntity(Entity entity, double deltaX, double deltaY, double deltaZ,
+                                  byte pitch, byte yaw, boolean onGround) {
+        this(entity.getEntityId(), deltaX, deltaY, deltaZ, pitch, yaw, onGround);
     }
 
     public static void load() {
@@ -67,6 +94,11 @@ public class WrappedPacketOutEntity extends WrappedPacket {
         } else {
             dXYZDivisor = 4096.0;
         }
+        try {
+            entityPacketConstructor = packetClass.getConstructor(int.class);
+        } catch (NoSuchMethodException e) {
+            e.printStackTrace();
+        }
 
     }
 
@@ -76,7 +108,11 @@ public class WrappedPacketOutEntity extends WrappedPacket {
      * @return Get Byte Pitch
      */
     public byte getPitch() {
-        return readByte(pitchByteIndex);
+        if (isListening) {
+            return readByte(pitchByteIndex);
+        } else {
+            return pitch;
+        }
     }
 
     /**
@@ -85,7 +121,11 @@ public class WrappedPacketOutEntity extends WrappedPacket {
      * @return Get Byte Yaw
      */
     public byte getYaw() {
-        return readByte(yawByteIndex);
+        if (isListening) {
+            return readByte(yawByteIndex);
+        } else {
+            return yaw;
+        }
     }
 
     /**
@@ -94,13 +134,17 @@ public class WrappedPacketOutEntity extends WrappedPacket {
      * @return Delta X
      */
     public double getDeltaX() {
-        switch (mode) {
-            case 0:
-                return readByte(0) / dXYZDivisor;
-            case 1:
-                return readInt(1) / dXYZDivisor;
-            case 2:
-                return readShort(0) / dXYZDivisor;
+        if (isListening) {
+            switch (mode) {
+                case 0:
+                    return readByte(0) / dXYZDivisor;
+                case 1:
+                    return readInt(1) / dXYZDivisor;
+                case 2:
+                    return readShort(0) / dXYZDivisor;
+            }
+        } else {
+            return deltaX;
         }
         return 0.0;
     }
@@ -111,13 +155,17 @@ public class WrappedPacketOutEntity extends WrappedPacket {
      * @return Delta Y
      */
     public double getDeltaY() {
-        switch (mode) {
-            case 0:
-                return readByte(1) / dXYZDivisor;
-            case 1:
-                return readInt(2) / dXYZDivisor;
-            case 2:
-                return readShort(1) / dXYZDivisor;
+        if (isListening) {
+            switch (mode) {
+                case 0:
+                    return readByte(1) / dXYZDivisor;
+                case 1:
+                    return readInt(2) / dXYZDivisor;
+                case 2:
+                    return readShort(1) / dXYZDivisor;
+            }
+        } else {
+            return deltaY;
         }
         return 0.0;
     }
@@ -128,13 +176,17 @@ public class WrappedPacketOutEntity extends WrappedPacket {
      * @return Delta Z
      */
     public double getDeltaZ() {
-        switch (mode) {
-            case 0:
-                return readByte(2) / dXYZDivisor;
-            case 1:
-                return readInt(3) / dXYZDivisor;
-            case 2:
-                return readShort(2) / dXYZDivisor;
+        if (isListening) {
+            switch (mode) {
+                case 0:
+                    return readByte(2) / dXYZDivisor;
+                case 1:
+                    return readInt(3) / dXYZDivisor;
+                case 2:
+                    return readShort(2) / dXYZDivisor;
+            }
+        } else {
+            return deltaZ;
         }
         return 0.0;
     }
@@ -159,10 +211,9 @@ public class WrappedPacketOutEntity extends WrappedPacket {
      * @return Entity ID
      */
     public int getEntityId() {
-        if (entityIDInitiated) {
+        if (entityID != -1) {
             return entityID;
         } else {
-            entityIDInitiated = true;
             return entityID = readInt(0);
         }
     }
@@ -173,6 +224,42 @@ public class WrappedPacketOutEntity extends WrappedPacket {
      * @return On Ground
      */
     public boolean isOnGround() {
-        return readBoolean(0);
+        if (isListening) {
+            return readBoolean(0);
+        } else {
+            return onGround;
+        }
+    }
+
+    @Override
+    public Object asNMSPacket() {
+        try {
+            Object packetInstance = entityPacketConstructor.newInstance(entityID);
+            WrappedPacket wrapper = new WrappedPacket(packetInstance);
+            switch(mode) {
+                case 0:
+                    wrapper.writeByte(0, (byte)(deltaX * dXYZDivisor));
+                    wrapper.writeByte(1, (byte)(deltaY * dXYZDivisor));
+                    wrapper.writeByte(2, (byte)(deltaZ * dXYZDivisor));
+                    break;
+                case 1:
+                    wrapper.writeInt(1, (int)(deltaX * dXYZDivisor));
+                    wrapper.writeInt(2, (int)(deltaY * dXYZDivisor));
+                    wrapper.writeInt(3, (int)(deltaZ * dXYZDivisor));
+                    break;
+                case 2:
+                    wrapper.writeShort(0, (short)(deltaX * dXYZDivisor));
+                    wrapper.writeShort(1, (short)(deltaY * dXYZDivisor));
+                    wrapper.writeShort(2, (short)(deltaZ * dXYZDivisor));
+                    break;
+            }
+            wrapper.writeByte(yawByteIndex, yaw);
+            wrapper.writeByte(pitchByteIndex, pitch);
+            wrapper.writeBoolean(0, onGround);
+            return packetInstance;
+        } catch (InstantiationException | InvocationTargetException | IllegalAccessException e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 }

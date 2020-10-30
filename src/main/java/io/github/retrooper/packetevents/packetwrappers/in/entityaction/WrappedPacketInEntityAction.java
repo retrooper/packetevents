@@ -36,21 +36,19 @@ import java.util.HashMap;
 public final class WrappedPacketInEntityAction extends WrappedPacket {
     private static final HashMap<String, PlayerAction> cachedPlayerActionNames = new HashMap<String, PlayerAction>();
     private static final HashMap<Integer, PlayerAction> cachedPlayerActionIDs = new HashMap<Integer, PlayerAction>();
-    private static Class<?> entityActionClass;
     @Nullable
     private static Class<?> enumPlayerActionClass;
     private static boolean isLowerThan_v_1_8;
     private Entity entity;
-    private int entityId;
+    private int entityId = -1;
     private PlayerAction action;
-    private int jumpBoost;
 
     public WrappedPacketInEntityAction(final Object packet) {
         super(packet);
     }
 
     public static void load() {
-        entityActionClass = NMSUtils.getNMSClassWithoutException("PacketPlayInEntityAction");
+        Class<?> entityActionClass = NMSUtils.getNMSClassWithoutException("PacketPlayInEntityAction");
         isLowerThan_v_1_8 = version.isLowerThan(ServerVersion.v_1_8);
         if (!isLowerThan_v_1_8) {
             enumPlayerActionClass = SubclassUtil.getSubClass(entityActionClass, "EnumPlayerAction");
@@ -73,32 +71,6 @@ public final class WrappedPacketInEntityAction extends WrappedPacket {
         cachedPlayerActionIDs.put(7, PlayerAction.OPEN_INVENTORY); //horse interaction
 
     }
-
-    @Override
-    protected void setup() {
-        final int entityId = readInt(0);
-        final int jumpBoost;
-        if (isLowerThan_v_1_8) {
-            jumpBoost = readInt(2);
-        } else {
-            jumpBoost = readInt(1);
-        }
-
-        //1.7.10
-        if (isLowerThan_v_1_8) {
-            int animationIndex = readInt(1);
-            this.action = cachedPlayerActionIDs.get(animationIndex);
-        } else {
-            final Object enumObj = readObject(0, enumPlayerActionClass);
-            final String enumValueName = enumObj.toString();
-            this.action = cachedPlayerActionNames.get(enumValueName);
-        }
-
-
-        this.entityId = entityId;
-        this.jumpBoost = jumpBoost;
-    }
-
     /**
      * Lookup the associated entity by the ID that was sent in the packet.
      *
@@ -106,7 +78,7 @@ public final class WrappedPacketInEntityAction extends WrappedPacket {
      */
     public Entity getEntity() {
         if(entity == null) {
-            return entity = NMSUtils.getEntityById(this.entityId);
+            return entity = NMSUtils.getEntityById(getEntityId());
         }
         return entity;
     }
@@ -119,7 +91,10 @@ public final class WrappedPacketInEntityAction extends WrappedPacket {
      * @return Entity ID
      */
     public int getEntityId() {
-        return entityId;
+        if(entityId != -1) {
+            return entityId;
+        }
+        return readInt(0);
     }
 
     /**
@@ -128,7 +103,14 @@ public final class WrappedPacketInEntityAction extends WrappedPacket {
      * @return Player Action
      */
     public PlayerAction getAction() {
-        return action;
+        if (isLowerThan_v_1_8) {
+            int animationIndex = readInt(1);
+            return cachedPlayerActionIDs.get(animationIndex);
+        } else {
+            final Object enumObj = readObject(0, enumPlayerActionClass);
+            final String enumValueName = enumObj.toString();
+            return cachedPlayerActionNames.get(enumValueName);
+        }
     }
 
     /**
@@ -137,7 +119,11 @@ public final class WrappedPacketInEntityAction extends WrappedPacket {
      * @return Jump Boost
      */
     public int getJumpBoost() {
-        return jumpBoost;
+        if (isLowerThan_v_1_8) {
+            return readInt(2);
+        } else {
+            return readInt(1);
+        }
     }
 
     public enum PlayerAction {

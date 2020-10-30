@@ -38,6 +38,8 @@ import io.github.retrooper.packetevents.event.impl.PacketSendEvent;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 public class ProtocolLibListener {
@@ -68,9 +70,15 @@ public class ProtocolLibListener {
                             priority = ListenerPriority.NORMAL;
                             break;
                     }
+                    Set<PacketType> clientValues = new HashSet<>();
+                    for(PacketType type : PacketType.Play.Client.getInstance().values()) {
+                        if(type.isSupported()) {
+                            clientValues.add(type);
+                        }
+                    }
                     ProtocolLibrary.getProtocolManager().
                             addPacketListener(new PacketAdapter(PacketEvents.getPlugins().get(0),
-                                    priority, PacketType.Play.Client.getInstance().values()) {
+                                    priority, clientValues) {
                                 @Override
                                 public void onPacketReceiving(PacketEvent event) {
                                     event.setReadOnly(false);
@@ -106,9 +114,17 @@ public class ProtocolLibListener {
                             priority = ListenerPriority.NORMAL;
                             break;
                     }
+                    Set<PacketType> serverValues = new HashSet<>();
+                    for(PacketType serverType : PacketType.Play.Server.getInstance().values()) {
+                        if(serverType.isSupported()) {
+                            serverValues.add(serverType);
+                        }
+                    }
+
+
                     ProtocolLibrary.getProtocolManager().
                             addPacketListener(new PacketAdapter(PacketEvents.getPlugins().get(0),
-                                    priority, PacketType.Play.Server.getInstance().values()) {
+                                    priority, serverValues) {
                                 @Override
                                 public void onPacketSending(PacketEvent event) {
                                     event.setReadOnly(false);

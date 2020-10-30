@@ -24,14 +24,15 @@
 
 package io.github.retrooper.packetevents.event.impl;
 
-import io.github.retrooper.packetevents.event.CancellableEvent;
+import io.github.retrooper.packetevents.event.eventtypes.CancellableEvent;
 import io.github.retrooper.packetevents.event.PacketEvent;
+import io.github.retrooper.packetevents.event.eventtypes.PlayerEvent;
 import org.bukkit.entity.Player;
 
 /**
  * This event is called each time you eject a player.
  */
-public final class PlayerEjectEvent extends PacketEvent implements CancellableEvent {
+public final class PlayerEjectEvent extends PacketEvent implements CancellableEvent, PlayerEvent {
     private final Player player;
     private final boolean async;
     private boolean cancelled;
@@ -42,27 +43,31 @@ public final class PlayerEjectEvent extends PacketEvent implements CancellableEv
     }
 
     public PlayerEjectEvent(final Player player) {
-        this(player, false);
+        this.player = player;
+        this.async = true; //default value
     }
 
     @Override
     public void cancel() {
-        this.cancelled = true;
+        cancelled = true;
     }
 
     @Override
-    public void uncancel() {this.cancelled = false; }
+    public void uncancel() {
+        cancelled = false;
+    }
 
     @Override
     public boolean isCancelled() {
-        return this.cancelled;
+        return cancelled;
     }
 
     @Override
-    public void setCancelled(final boolean val) {
-        this.cancelled = val;
+    public void setCancelled(boolean value) {
+        cancelled = value;
     }
 
+    @Override
     public Player getPlayer() {
         return player;
     }

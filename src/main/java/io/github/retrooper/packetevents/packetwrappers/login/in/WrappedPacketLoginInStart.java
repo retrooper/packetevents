@@ -22,40 +22,19 @@
  * SOFTWARE.
  */
 
-package io.github.retrooper.packetevents.example;
+package io.github.retrooper.packetevents.packetwrappers.login.in;
 
-import io.github.retrooper.packetevents.utils.server.ServerVersion;
-import io.github.retrooper.packetevents.settings.PacketEventsSettings;
+import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
+import io.github.retrooper.packetevents.utils.gameprofile.GameProfileUtil;
+import io.github.retrooper.packetevents.utils.gameprofile.WrappedGameProfile;
+import io.github.retrooper.packetevents.utils.nms.NMSUtils;
 
-public class ExamplePacketEventsSettings extends PacketEventsSettings {
-
-    @Override
-    public ServerVersion getBackupServerVersion() {
-        return ServerVersion.v_1_7_10;
+public class WrappedPacketLoginInStart extends WrappedPacket {
+    public WrappedPacketLoginInStart(Object packet) {
+        super(packet);
     }
 
-    @Override
-    public boolean shouldAutoResolveClientProtocolVersion() {
-        return true;
-    }
-
-    @Override
-    public boolean shouldInjectAsync() {
-        return true;
-    }
-
-    @Override
-    public boolean shouldEjectAsync() {
-        return true;
-    }
-
-    @Override
-    public boolean shouldUseProtocolLibIfAvailable() {
-        return true;
-    }
-
-    @Override
-    public boolean shouldCheckForUpdates() {
-        return true;
+    public WrappedGameProfile getGameProfile() {
+        return GameProfileUtil.getWrappedGameProfile(readObject(0, NMSUtils.gameProfileClass));
     }
 }

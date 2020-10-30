@@ -28,8 +28,35 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class PacketType {
+    public static class Status {
+        public static final Map<Class<?>, Byte> packetIds = new HashMap<>();
+        public static final byte PING = 0, PONG = 1;
+
+        public static void init() {
+            packetIds.put(PacketTypeClasses.Status.PING, PING);
+            packetIds.put(PacketTypeClasses.Status.PONG, PONG);
+        }
+    }
+    public static class Login {
+        public static final Map<Class<?>, Byte> packetIds = new HashMap<>();
+        public static final byte HANDSHAKE = 0,
+        IN_CUSTOM_PAYLOAD = 1, OUT_CUSTOM_PAYLOAD = 2,IN_START = 3, IN_ENCRYPTION_BEGIN = 4,
+        DISCONNECT = 5, OUT_ENCRYPTION_BEGIN = 6, OUT_SUCCESS = 7;
+
+        public static void init() {
+            packetIds.put(PacketTypeClasses.Login.HANDSHAKE, HANDSHAKE);
+            packetIds.put(PacketTypeClasses.Login.IN_CUSTOM_PAYLOAD, IN_CUSTOM_PAYLOAD);
+            packetIds.put(PacketTypeClasses.Login.OUT_CUSTOM_PAYLOAD, OUT_CUSTOM_PAYLOAD);
+            packetIds.put(PacketTypeClasses.Login.IN_START, IN_START);
+            packetIds.put(PacketTypeClasses.Login.IN_ENCRYPTION_BEGIN, IN_ENCRYPTION_BEGIN);
+            packetIds.put(PacketTypeClasses.Login.DISCONNECT, DISCONNECT);
+            packetIds.put(PacketTypeClasses.Login.OUT_ENCRYPTION_BEGIN, OUT_ENCRYPTION_BEGIN);
+            packetIds.put(PacketTypeClasses.Login.OUT_SUCCESS, OUT_SUCCESS);
+        }
+    }
+
     public static class Client {
-        public static final Map<Class<?>, Byte> packetIds = new HashMap<Class<?>, Byte>();
+        public static final Map<Class<?>, Byte> packetIds = new HashMap<>();
         public static final byte TELEPORT_ACCEPT = 0,
                 TILE_NBT_QUERY = 1, DIFFICULTY_CHANGE = 2, CHAT = 3, CLIENT_COMMAND = 4,
                 SETTINGS = 5, TAB_COMPLETE = 6, TRANSACTION = 7, ENCHANT_ITEM = 8,
@@ -97,6 +124,7 @@ public class PacketType {
         public static class Util {
             /**
              * Is the packet an instance of the PacketPlayInFlying packet?
+             *
              * @param packetID
              * @return packetID == FLYING or POSITION or POSITION_LOOK or LOOK
              */
@@ -110,7 +138,7 @@ public class PacketType {
     }
 
     public static class Server {
-        public static final Map<Class<?>, Byte> packetIds = new HashMap<Class<?>, Byte>();
+        public static final Map<Class<?>, Byte> packetIds = new HashMap<>();
         public static final byte SPAWN_ENTITY = 0, SPAWN_ENTITY_EXPERIENCE_ORB = 1, SPAWN_ENTITY_WEATHER = 2, SPAWN_ENTITY_LIVING = 3,
                 SPAWN_ENTITY_PAINTING = 4, SPAWN_ENTITY_SPAWN = 5, ANIMATION = 6, STATISTIC = 7,
                 BLOCK_BREAK = 8, BLOCK_BREAK_ANIMATION = 9, TILE_ENTITY_DATA = 10, BLOCK_ACTION = 11,
@@ -237,6 +265,7 @@ public class PacketType {
         public static class Util {
             /**
              * Is the packet an instance of the PacketPlayOutEntity packet?
+             *
              * @param packetID
              * @return packetID == ENTITY or REL_ENTITY_MOVE or REL_ENTITY_MOVE_LOOK or ENTITY_LOOK
              */

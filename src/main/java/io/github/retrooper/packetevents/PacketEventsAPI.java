@@ -25,6 +25,7 @@
 package io.github.retrooper.packetevents;
 
 import io.github.retrooper.packetevents.event.manager.EventManager;
+import io.github.retrooper.packetevents.packetmanager.PacketManager;
 import io.github.retrooper.packetevents.settings.PacketEventsSettings;
 import io.github.retrooper.packetevents.utils.player.PlayerUtils;
 import io.github.retrooper.packetevents.utils.server.ServerUtils;
@@ -33,6 +34,7 @@ public final class PacketEventsAPI {
     private final EventManager eventManager = new EventManager();
     private final PlayerUtils playerUtils = new PlayerUtils();
     private final ServerUtils serverUtils = new ServerUtils();
+    public PacketManager packetManager = null;
 
     /**
      * Get all utilities to do with the player
