@@ -344,7 +344,6 @@ public class TinyProtocol8 {
      * Add a custom channel handler to the given channel.
      *
      * @param channel - the channel to inject.
-     * @return The intercepted channel, or NULL if it has already been injected.
      */
     public void injectChannel(Channel channel) {
         injectChannelInternal(channel);

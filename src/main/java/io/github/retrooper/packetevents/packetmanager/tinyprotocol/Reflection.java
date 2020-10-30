@@ -291,7 +291,7 @@ public final class Reflection {
      * This is useful when looking up fields by a NMS or OBC type.
      * <p>
      *
-     * @see {@link #getClass()} for more information.
+     * See {@link #getClass()} for more information.
      * @param lookupName - the class name with variables.
      * @return The class.
      */
@@ -301,34 +301,7 @@ public final class Reflection {
         return clazz;
     }
 
-    /**
-     * Retrieve a class from its full name.
-     * <p>
-     * Strings enclosed with curly brackets - such as {TEXT} - will be replaced according to the following table:
-     * <p>
-     * <table border="1">
-     * <tr>
-     * <th>Variable</th>
-     * <th>Content</th>
-     * </tr>
-     * <tr>
-     * <td>{nms}</td>
-     * <td>Actual package name of net.minecraft.server.VERSION</td>
-     * </tr>
-     * <tr>
-     * <td>{obc}</td>
-     * <td>Actual pacakge name of org.bukkit.craftbukkit.VERSION</td>
-     * </tr>
-     * <tr>
-     * <td>{version}</td>
-     * <td>The current Minecraft package VERSION, if any.</td>
-     * </tr>
-     * </table>
-     *
-     * @param lookupName - the class name with variables.
-     * @return The looked up class.
-     * @throws IllegalArgumentException If a variable or class could not be found.
-     */
+
     public static Class<?> getClass(String lookupName) {
         return getCanonicalClass(expandVariables(lookupName));
     }

@@ -111,7 +111,6 @@ public class NettyPacketManager {
      * Asynchronously eject a player
      *
      * @param player
-     * @return {@link java.util.concurrent.Future}
      */
     public void ejectPlayerAsync(final Player player) {
         executorService.execute(() -> {
