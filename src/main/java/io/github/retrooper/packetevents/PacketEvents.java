@@ -216,11 +216,12 @@ public final class PacketEvents implements Listener {
                 try {
                     getAPI().packetManager.injectPlayer(e.getPlayer());
                 }
-                catch(NullPointerException ex) {
+                catch(Exception ex) {
                     e.disallow(PlayerLoginEvent.Result.KICK_OTHER, "Failed to inject you. Please try joining again!");
                 }
             }
         }
+        e.allow();
     }
 
     @EventHandler
