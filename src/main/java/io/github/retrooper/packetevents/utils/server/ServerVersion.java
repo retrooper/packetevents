@@ -50,7 +50,7 @@ public enum ServerVersion {
 		this.protocolId = protocolId;
 	}
 	
-	public short toProtocolVersion() {
+	public short getProtocolVersion() {
 		return protocolId;
 	}
 

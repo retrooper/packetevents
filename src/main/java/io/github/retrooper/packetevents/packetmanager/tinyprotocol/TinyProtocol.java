@@ -109,12 +109,16 @@ public class TinyProtocol {
     }
 
     public boolean canInject(Player player) {
+        Object channel = getChannel(player);
+        if(channel == null) {
+            return false;
+        }
         if (NettyPacketManager.v1_7_nettyMode) {
             TinyProtocol7 tp7 = (TinyProtocol7) tinyProt;
-            return !tp7.uninjectedChannels.contains(getChannel(player));
+            return !tp7.uninjectedChannels.contains(channel);
         } else {
             TinyProtocol8 tp8 = (TinyProtocol8) tinyProt;
-            return !tp8.uninjectedChannels.contains(getChannel(player));
+            return !tp8.uninjectedChannels.contains(channel);
         }
     }
 }
