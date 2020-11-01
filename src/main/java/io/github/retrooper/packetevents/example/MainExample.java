@@ -50,7 +50,6 @@ public class MainExample extends JavaPlugin implements PacketListener {
                 useProtocolLibIfAvailable(true).checkForUpdates(true).injectEarly(true);
         PacketEvents.getAPI().getEventManager().registerListener(this);
         PacketEvents.init(this);
-
     }
 
     @Override

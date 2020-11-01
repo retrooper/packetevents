@@ -212,8 +212,12 @@ public final class PacketEvents implements Listener {
     public void onLogin(PlayerLoginEvent e) {
         if (PacketEvents.getSettings().shouldInjectEarly()) {
             assert getAPI().packetManager.tinyProtocol != null;
-            if (getAPI().packetManager.tinyProtocol.canInject(e.getPlayer())) {
-                getAPI().packetManager.injectPlayer(e.getPlayer());
+            try {
+                if (getAPI().packetManager.tinyProtocol.canInject(e.getPlayer())) {
+                    getAPI().packetManager.injectPlayer(e.getPlayer());
+                }
+            } catch (Exception ex) {
+                e.disallow(PlayerLoginEvent.Result.KICK_OTHER, "We are unable to inject you. Please try again!");
             }
         }
     }
