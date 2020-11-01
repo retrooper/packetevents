@@ -27,12 +27,8 @@ import net.minecraft.util.com.mojang.authlib.GameProfile;
 import net.minecraft.util.io.netty.channel.*;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
-import org.bukkit.event.EventHandler;
-import org.bukkit.event.EventPriority;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
-import org.bukkit.event.player.PlayerLoginEvent;
-import org.bukkit.event.server.PluginDisableEvent;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
 
@@ -252,7 +248,7 @@ public class TinyProtocol7 {
      * @return The packet to recieve instead, or NULL to cancel.
      */
     public Object onPacketInAsync(Player sender, Channel channel, Object packet) {
-        return PacketEvents.getAPI().packetManager.read(sender, channel,packet);
+        return PacketEvents.getAPI().packetManager.read(sender, channel, packet);
     }
 
     /**
