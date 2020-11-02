@@ -58,7 +58,7 @@ public final class PacketEvents implements Listener {
     private static final PacketEvents instance = new PacketEvents();
     private static final ArrayList<Plugin> plugins = new ArrayList<>(1);
     private static boolean loaded, initialized;
-    private static final PEVersion version = new PEVersion(1, 7, 1);
+    private static final PEVersion version = new PEVersion(1, 7, 2);
 
     private static PacketEventsSettings settings = new PacketEventsSettings();
 
