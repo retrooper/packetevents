@@ -56,9 +56,9 @@ public final class PacketEvents implements Listener {
 
     private static final PacketEventsAPI packetEventsAPI = new PacketEventsAPI();
     private static final PacketEvents instance = new PacketEvents();
-    private static final ArrayList<Plugin> plugins = new ArrayList<Plugin>(1);
+    private static final ArrayList<Plugin> plugins = new ArrayList<>(1);
     private static boolean loaded, initialized;
-    private static final PEVersion version = new PEVersion(1, 7, 1);
+    private static final PEVersion version = new PEVersion(1, 7, 2);
 
     private static PacketEventsSettings settings = new PacketEventsSettings();
 
@@ -169,9 +169,8 @@ public final class PacketEvents implements Listener {
             }
 
             getAPI().getEventManager().unregisterAllListeners();
-
-            initialized = false;
             NettyPacketManager.executorService.shutdownNow();
+            initialized = false;
         }
     }
 

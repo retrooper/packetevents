@@ -29,11 +29,12 @@ import io.github.retrooper.packetevents.utils.reflection.SubclassUtil;
 
 public class PacketTypeClasses {
     public static class Status {
-        public static Class<?> PING, PONG;
+        public static Class<?> PING, PONG, SERVER_INFO;
 
         public static void load() {
             PING = NMSUtils.getNMSClassWithoutException("PacketStatusInPing");
             PONG = NMSUtils.getNMSClassWithoutException("PacketStatusOutPong");
+            SERVER_INFO = NMSUtils.getNMSClassWithoutException("PacketStatusOutServerInfo");
             PacketType.Status.init();
         }
     }

@@ -33,17 +33,20 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 public class NettyPacketManager {
-    public static boolean v1_7_nettyMode = false;
+    public static final boolean v1_7_nettyMode;
     public static final ExecutorService
             executorService =
             Executors.newFixedThreadPool(Math.max(Runtime.getRuntime().availableProcessors(), 64));
 
     static {
+        boolean v1_7_nettyMode1;
         try {
-            Class.forName("io.netty.channel.Channel");
+            Class.forName("net.minecraft.util.io.netty.channel.Channel");
+            v1_7_nettyMode1 = true;
         } catch (ClassNotFoundException e) {
-            v1_7_nettyMode = true;
+            v1_7_nettyMode1 = false;
         }
+        v1_7_nettyMode = v1_7_nettyMode1;
     }
 
     private Plugin plugin;
