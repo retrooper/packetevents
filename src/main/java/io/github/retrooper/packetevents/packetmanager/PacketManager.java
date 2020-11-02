@@ -149,7 +149,6 @@ public class PacketManager {
                 }
                 break;
             case "PacketStatusInPing":
-            case "PacketStatusOutServerInfo":
                 final PacketStatusEvent packetStatusEvent = new PacketStatusEvent(channel, packet);
                 PacketEvents.getAPI().getEventManager().callEvent(packetStatusEvent);
                 interceptStatus(packetStatusEvent);
@@ -211,7 +210,6 @@ public class PacketManager {
             case "PacketLoginInStart":
             case "PacketLoginInEncryptionBegin":
             case "PacketStatusInPing":
-            case "PacketStatusOutServerInfo":
                 break;
             default:
                 PacketEvents.getAPI().getEventManager().callEvent(new PostPacketReceiveEvent(player, packet));
