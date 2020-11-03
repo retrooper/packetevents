@@ -71,9 +71,6 @@ public class TinyProtocol7 {
     private Map<String, Channel> channelLookup = new MapMaker().weakValues().makeMap();
     private Listener listener;
 
-    // Channels that have already been removed
-    public Set<Channel> uninjectedChannels = Collections.newSetFromMap(new MapMaker().weakKeys().<Channel, Boolean>makeMap());
-
     // List of network markers
     private List<Object> networkManagers;
 
@@ -357,7 +354,6 @@ public class TinyProtocol7 {
             if (interceptor == null) {
                 interceptor = new PacketInterceptor();
                 channel.pipeline().addBefore("packet_handler", handlerName, interceptor);
-                uninjectedChannels.remove(channel);
             }
 
             return interceptor;
@@ -381,7 +377,6 @@ public class TinyProtocol7 {
                         channel.pipeline().addBefore("packet_handler", handlerName, pi);
                     }
                 });
-                uninjectedChannels.remove(channel);
             }
 
             return interceptor;
@@ -425,6 +420,14 @@ public class TinyProtocol7 {
         uninjectChannelAsync(channel);
     }
 
+    public void ejectChannelSync(Object ch) {
+        uninjectChannel((Channel)ch);
+    }
+
+    public void ejectChannelAsync(Object ch) {
+        uninjectChannelAsync((Channel)ch);
+    }
+
     /**
      * Uninject a specific channel.
      * <p>
@@ -433,21 +436,11 @@ public class TinyProtocol7 {
      * @param channel - the injected channel.
      */
     public void uninjectChannel(final Channel channel) {
-        // No need to guard against this if we're closing
-        if (!closed) {
-            uninjectedChannels.add(channel);
-        }
-
         // See ChannelInjector in ProtocolLib, line 590
         channel.pipeline().remove(handlerName);
     }
 
     public void uninjectChannelAsync(Channel channel) {
-        // No need to guard against this if we're closing
-        if (!closed) {
-            uninjectedChannels.add(channel);
-        }
-
         // See ChannelInjector in ProtocolLib, line 590
         NettyPacketManager.executorService.execute(new Runnable() {
             @Override
@@ -455,7 +448,6 @@ public class TinyProtocol7 {
                 channel.pipeline().remove(handlerName);
             }
         });
-
     }
 
     /**
@@ -481,20 +473,6 @@ public class TinyProtocol7 {
     /**
      * Cease listening for packets. This is called automatically when your plugin is disabled.
      */
-    public final void close() {
-        if (!closed) {
-            closed = true;
-
-            // Remove our handlers
-            for (Player player : plugin.getServer().getOnlinePlayers()) {
-                uninjectPlayer(player);
-            }
-
-            // Clean up Bukkit
-            HandlerList.unregisterAll(listener);
-            unregisterChannelHandler();
-        }
-    }
 
     /**
      * Channel handler that is inserted into the player's channel pipeline, allowing us to intercept sent and received packets.

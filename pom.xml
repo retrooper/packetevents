@@ -6,7 +6,7 @@
 
     <groupId>io.github.retrooper</groupId>
     <artifactId>packetevents</artifactId>
-    <version>1.7.2</version>
+    <version>1.7.3</version>
 
     <!-- You can build the project with this: "mvn clean compile assembly:single" -->
     <build>
@@ -92,6 +92,13 @@
             <groupId>org.github.spigot</groupId>
             <artifactId>1.12.2</artifactId>
             <version>1.12.2</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.github.spigot</groupId>
+            <artifactId>1.9</artifactId>
+            <version>1.9</version>
             <scope>provided</scope>
         </dependency>
 

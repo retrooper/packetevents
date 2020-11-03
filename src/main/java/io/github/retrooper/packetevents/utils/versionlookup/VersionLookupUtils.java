@@ -25,7 +25,6 @@
 package io.github.retrooper.packetevents.utils.versionlookup;
 
 import io.github.retrooper.packetevents.PacketEvents;
-import io.github.retrooper.packetevents.utils.protocollib.ProtocolLibUtils;
 import io.github.retrooper.packetevents.utils.protocolsupport.ProtocolSupportUtils;
 import io.github.retrooper.packetevents.utils.server.ServerVersion;
 import io.github.retrooper.packetevents.utils.v_1_7_10.ProtocolVersionAccessor_v_1_7;
@@ -39,9 +38,8 @@ public class VersionLookupUtils {
     public static void handleLoadedDependencies() {
         protocolAccessMode = (byte) (ViaUtils.isAvailable() ?
                 0 : ProtocolSupportUtils.isAvailable() ?
-                1 : ProtocolLibUtils.isAvailable() ?
-                2 : PacketEvents.getAPI().getServerUtils().getVersion() == ServerVersion.v_1_7_10 ?
-                3 : -1);
+                1 : PacketEvents.getAPI().getServerUtils().getVersion() == ServerVersion.v_1_7_10 ?
+                2 : -1);
     }
 
     public static boolean hasHandledLoadedDependencies() {
@@ -50,8 +48,7 @@ public class VersionLookupUtils {
 
     public static boolean isDependencyAvailable() {
         return ViaUtils.isAvailable()
-                || ProtocolSupportUtils.isAvailable()
-                || ProtocolLibUtils.isAvailable();
+                || ProtocolSupportUtils.isAvailable();
     }
 
 
@@ -71,8 +68,6 @@ public class VersionLookupUtils {
             case 1:
                 return ProtocolSupportUtils.getProtocolVersion(player);
             case 2:
-                return ProtocolLibUtils.getProtocolVersion(player);
-            case 3:
                 return ProtocolVersionAccessor_v_1_7.getProtocolVersion(player);
             default:
                 return -1;
