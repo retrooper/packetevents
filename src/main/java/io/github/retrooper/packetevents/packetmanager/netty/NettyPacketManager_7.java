@@ -64,18 +64,19 @@ final class NettyPacketManager_7 {
             }
         };
         final ChannelPipeline pipeline = ((Channel) NMSUtils.getChannel(player)).pipeline();
-        pipeline.addBefore("packet_handler", PacketEvents.getHandlerName(player.getName()), channelDuplexHandler);
+        pipeline.addBefore("packet_handler", PacketEvents.getAPI().packetManager.getNettyHandlerName(), channelDuplexHandler);
     }
 
-    /**
-     * Eject a player using 1.7.10 netty import location.
-     * @param player Target Player
-     */
-    public void ejectPlayer(final Player player) {
-         Channel channel = (Channel) NMSUtils.getChannelNoCache(player);
+    public void ejectPlayer(Player player) {
+        Channel channel = (Channel)NMSUtils.getChannel(player);
         assert channel != null;
-        channel.pipeline().remove(PacketEvents.getHandlerName(player.getName()));
+        ejectChannel(channel);
     }
+
+   public void ejectChannel(Object ch) {
+        Channel channel = (Channel)ch;
+        channel.pipeline().remove(PacketEvents.getAPI().packetManager.getNettyHandlerName());
+   }
 
     public void sendPacket(Object rawChannel, Object packet) {
         Channel channel = (Channel)rawChannel;

@@ -25,12 +25,12 @@
 package io.github.retrooper.packetevents.event.manager;
 
 import io.github.retrooper.packetevents.PacketEvents;
-import io.github.retrooper.packetevents.event.annotation.PacketHandler;
-import io.github.retrooper.packetevents.event.eventtypes.CancellableEvent;
 import io.github.retrooper.packetevents.event.PacketEvent;
 import io.github.retrooper.packetevents.event.PacketListener;
+import io.github.retrooper.packetevents.event.annotation.PacketHandler;
+import io.github.retrooper.packetevents.event.eventtypes.CancellableEvent;
 import io.github.retrooper.packetevents.event.priority.PacketEventPriority;
-import io.github.retrooper.packetevents.utils.protocollib.ProtocolLibListener;
+import io.github.retrooper.packetevents.utils.protocollib.ProtocolLibAPIListener;
 import io.github.retrooper.packetevents.utils.protocollib.ProtocolLibUtils;
 
 import java.lang.reflect.InvocationTargetException;
@@ -76,7 +76,7 @@ public final class EventManager {
     public void registerListener(final PacketListener listener) {
         final ConcurrentLinkedQueue<Method> methods = new ConcurrentLinkedQueue<>();
         for (final Method m : listener.getClass().getDeclaredMethods()) {
-            if(!m.isAccessible()) {
+            if (!m.isAccessible()) {
                 m.setAccessible(true);
             }
             if (m.isAnnotationPresent(PacketHandler.class)
@@ -88,7 +88,7 @@ public final class EventManager {
         if (!methods.isEmpty()) {
             if (ProtocolLibUtils.isAvailable()
                     && PacketEvents.getSettings().shouldUseProtocolLibIfAvailable()) {
-                ProtocolLibListener.registerProtocolLibListener(listener, methods);
+                ProtocolLibAPIListener.registerProtocolLibListener(listener, methods);
             } else {
                 registeredMethods.put(listener, methods);
             }

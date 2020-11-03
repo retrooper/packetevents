@@ -39,13 +39,18 @@ import org.bukkit.plugin.Plugin;
 
 import java.util.HashMap;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class PacketManager {
+    private static AtomicInteger handlerID = new AtomicInteger(0);
+    private int handlerNumber = handlerID.getAndIncrement();
     private final Plugin plugin;
     private final boolean tinyProtocolMode;
     public final TinyProtocol tinyProtocol;
     public final NettyPacketManager nettyProtocol;
     private final HashMap<UUID, Long> keepAliveMap = new HashMap<>();
+    public final ConcurrentLinkedQueue<Object> queuedEjectionChannels = new ConcurrentLinkedQueue<>();
 
     public PacketManager(Plugin plugin, boolean tinyProtocolMode) {
         this.plugin = plugin;
@@ -65,6 +70,10 @@ public class PacketManager {
         } else {
             injectPlayerSync(player);
         }
+    }
+
+    public void schedulePlayerEjection(Player player) {
+        queuedEjectionChannels.add(NMSUtils.getChannel(player));
     }
 
     public void ejectPlayer(Player player) {
@@ -104,7 +113,6 @@ public class PacketManager {
         PacketEvents.getAPI().getEventManager().callEvent(ejectEvent);
         if (!ejectEvent.isCancelled()) {
             keepAliveMap.remove(player.getUniqueId());
-            NMSUtils.channelCache.remove(player.getUniqueId());
             if (tinyProtocolMode) {
                 tinyProtocol.ejectPlayer(player);
             } else {
@@ -118,12 +126,38 @@ public class PacketManager {
         PacketEvents.getAPI().getEventManager().callEvent(ejectEvent);
         if (!ejectEvent.isCancelled()) {
             keepAliveMap.remove(player.getUniqueId());
-            NMSUtils.channelCache.remove(player.getUniqueId());
             if (tinyProtocolMode) {
                 tinyProtocol.ejectPlayerAsync(player);
             } else {
                 nettyProtocol.ejectPlayerAsync(player);
             }
+        }
+    }
+
+    public void ejectChannel(Object channel) {
+        if(!PacketEvents.getSettings().shouldEjectAsync()) {
+           ejectChannelSync(channel);
+        }
+        else {
+            ejectChannelAsync(channel);
+        }
+    }
+
+    public void ejectChannelSync(Object channel) {
+        if(tinyProtocolMode) {
+            tinyProtocol.ejectChannelSync(channel);
+        }
+        else {
+            nettyProtocol.ejectChannelSync(channel);
+        }
+    }
+
+    public void ejectChannelAsync(Object channel) {
+        if(tinyProtocolMode) {
+            tinyProtocol.ejectChannelAsync(channel);
+        }
+        else {
+            nettyProtocol.ejectChannelAsync(channel);
         }
     }
 
@@ -133,6 +167,18 @@ public class PacketManager {
         } else {
             nettyProtocol.sendPacket(channel, packet);
         }
+    }
+
+    public boolean canInject(Player player) {
+        Object channel = NMSUtils.getChannel(player);
+        if(channel == null) {
+            return true;
+        }
+        return !queuedEjectionChannels.contains(channel);
+    }
+
+    public String getNettyHandlerName() {
+        return "pe-" + plugin.getName() + "-" + handlerNumber;
     }
 
     public Object read(Player player, Object channel, Object packet) {
@@ -265,4 +311,5 @@ public class PacketManager {
     private void interceptStatus(PacketStatusEvent event) {
 
     }
+
 }

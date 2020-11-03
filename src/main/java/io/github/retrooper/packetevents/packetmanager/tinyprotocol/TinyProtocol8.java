@@ -74,9 +74,6 @@ public class TinyProtocol8 {
     private Map<String, Channel> channelLookup = new MapMaker().weakValues().makeMap();
     private Listener listener;
 
-    // Channels that have already been removed
-    public Set<Channel> uninjectedChannels = Collections.newSetFromMap(new MapMaker().weakKeys().<Channel, Boolean>makeMap());
-
     // List of network markers
     private List<Object> networkManagers;
 
@@ -363,7 +360,6 @@ public class TinyProtocol8 {
             if (interceptor == null) {
                 interceptor = new PacketInterceptor();
                 channel.pipeline().addBefore("packet_handler", handlerName, interceptor);
-                uninjectedChannels.remove(channel);
             }
 
             return interceptor;
@@ -387,8 +383,6 @@ public class TinyProtocol8 {
                         channel.pipeline().addBefore("packet_handler", handlerName, pi);
                     }
                 });
-
-                uninjectedChannels.remove(channel);
             }
 
             return interceptor;
@@ -432,6 +426,13 @@ public class TinyProtocol8 {
         uninjectChannelAsync(channel);
     }
 
+    public void ejectChannelSync(Object ch) {
+        uninjectChannel((Channel)ch);
+    }
+
+    public void ejectChannelAsync(Object ch) {
+        uninjectChannelAsync((Channel)ch);
+    }
     /**
      * Uninject a specific channel.
      * <p>
@@ -440,21 +441,11 @@ public class TinyProtocol8 {
      * @param channel - the injected channel.
      */
     public void uninjectChannel(final Channel channel) {
-        // No need to guard against this if we're closing
-        if (!closed) {
-            uninjectedChannels.add(channel);
-        }
-
         // See ChannelInjector in ProtocolLib, line 590
         channel.pipeline().remove(handlerName);
     }
 
     public void uninjectChannelAsync(Channel channel) {
-        // No need to guard against this if we're closing
-        if (!closed) {
-            uninjectedChannels.add(channel);
-        }
-
         // See ChannelInjector in ProtocolLib, line 590
         NettyPacketManager.executorService.execute(new Runnable() {
             @Override

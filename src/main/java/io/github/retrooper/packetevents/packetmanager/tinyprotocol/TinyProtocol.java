@@ -80,6 +80,26 @@ public class TinyProtocol {
         }
     }
 
+    public void ejectChannelSync(Object channel) {
+        if (!NettyPacketManager.v1_7_nettyMode) {
+            TinyProtocol8 tp8 = (TinyProtocol8) tinyProt;
+            tp8.ejectChannelSync(channel);
+        } else {
+            TinyProtocol7 tp7 = (TinyProtocol7) tinyProt;
+            tp7.ejectChannelSync(channel);
+        }
+    }
+
+    public void ejectChannelAsync(Object channel) {
+        if (!NettyPacketManager.v1_7_nettyMode) {
+            TinyProtocol8 tp8 = (TinyProtocol8) tinyProt;
+            tp8.ejectChannelAsync(channel);
+        } else {
+            TinyProtocol7 tp7 = (TinyProtocol7) tinyProt;
+            tp7.ejectChannelAsync(channel);
+        }
+    }
+
     public void sendPacket(Object channel, Object packet) {
         if (!NettyPacketManager.v1_7_nettyMode) {
             TinyProtocol8 tp8 = (TinyProtocol8) tinyProt;
@@ -88,14 +108,6 @@ public class TinyProtocol {
             TinyProtocol7 tp7 = (TinyProtocol7) tinyProt;
             tp7.sendPacket(channel, packet);
         }
-    }
-
-    public Object read(Player player, Object channel, Object packet) {
-        return PacketEvents.getAPI().packetManager.read(player, channel, packet);
-    }
-
-    public Object write(Player player, Object channel, Object packet) {
-        return PacketEvents.getAPI().packetManager.write(player, channel, packet);
     }
 
     public Object getChannel(Player player) {
@@ -108,17 +120,7 @@ public class TinyProtocol {
         }
     }
 
-    public boolean canInject(Player player) {
-        Object channel = getChannel(player);
-        if(channel == null) {
-            return false;
-        }
-        if (NettyPacketManager.v1_7_nettyMode) {
-            TinyProtocol7 tp7 = (TinyProtocol7) tinyProt;
-            return !tp7.uninjectedChannels.contains(channel);
-        } else {
-            TinyProtocol8 tp8 = (TinyProtocol8) tinyProt;
-            return !tp8.uninjectedChannels.contains(channel);
-        }
+    public void unregisterChannelHandler() {
+
     }
 }

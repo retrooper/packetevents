@@ -48,17 +48,14 @@ import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.plugin.Plugin;
 
 import java.util.ArrayList;
-import java.util.Random;
 import java.util.concurrent.Future;
 
 public final class PacketEvents implements Listener {
-    private static final String nettyHandlerIdentifier = generateRandomNettyIdentifier();
-
     private static final PacketEventsAPI packetEventsAPI = new PacketEventsAPI();
     private static final PacketEvents instance = new PacketEvents();
     private static final ArrayList<Plugin> plugins = new ArrayList<>(1);
     private static boolean loaded, initialized;
-    private static final PEVersion version = new PEVersion(1, 7, 2);
+    private static final PEVersion version = new PEVersion(1, 7, 3);
 
     private static PacketEventsSettings settings = new PacketEventsSettings();
 
@@ -164,10 +161,13 @@ public final class PacketEvents implements Listener {
      */
     public static void stop() {
         if (initialized) {
-            for (final Player p : Bukkit.getOnlinePlayers()) {
-                getAPI().getPlayerUtils().ejectPlayer(p);
+            for (Player player : Bukkit.getOnlinePlayers()) {
+                PacketEvents.getAPI().packetManager.ejectPlayer(player);
             }
 
+            if (PacketEvents.getAPI().packetManager.tinyProtocol != null) {
+                PacketEvents.getAPI().packetManager.tinyProtocol.unregisterChannelHandler();
+            }
             getAPI().getEventManager().unregisterAllListeners();
             NettyPacketManager.executorService.shutdownNow();
             initialized = false;
@@ -190,10 +190,6 @@ public final class PacketEvents implements Listener {
         return plugins;
     }
 
-    public static String getHandlerName(final String name) {
-        return "pe-" + nettyHandlerIdentifier + "-" + name;
-    }
-
     /**
      * Get the PacketEvents settings.
      *
@@ -212,7 +208,7 @@ public final class PacketEvents implements Listener {
         if (PacketEvents.getSettings().shouldInjectEarly()) {
             assert getAPI().packetManager.tinyProtocol != null;
             try {
-                if (getAPI().packetManager.tinyProtocol.canInject(e.getPlayer())) {
+                if (getAPI().packetManager.canInject(e.getPlayer())) {
                     getAPI().packetManager.injectPlayer(e.getPlayer());
                 }
             } catch (Exception ex) {
@@ -236,26 +232,15 @@ public final class PacketEvents implements Listener {
             }
         }
         if (!PacketEvents.getSettings().shouldInjectEarly()) {
-            PacketEvents.getAPI().packetManager.injectPlayer(e.getPlayer());
+            if (getAPI().packetManager.canInject(e.getPlayer())) {
+                PacketEvents.getAPI().packetManager.injectPlayer(e.getPlayer());
+            }
         }
     }
 
 
     @EventHandler
     public void onQuit(final PlayerQuitEvent e) {
-        PacketEvents.getAPI().getPlayerUtils().ejectPlayer(e.getPlayer());
         PacketEvents.getAPI().getPlayerUtils().clientVersionsMap.remove(e.getPlayer().getUniqueId());
     }
-
-    private static String generateRandomNettyIdentifier() {
-        String alphabet = "abcdefghijklmnopqrstuvwxyz";
-        StringBuilder sb = new StringBuilder();
-        Random random = new Random();
-        while (sb.length() < 13) {
-            int index = (int) (random.nextFloat() * alphabet.length());
-            sb.append(alphabet.charAt(index));
-        }
-        return sb.toString();
-    }
-
 }

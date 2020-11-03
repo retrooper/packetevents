@@ -24,7 +24,6 @@
 
 package io.github.retrooper.packetevents.packetmanager.netty;
 
-import io.github.retrooper.packetevents.PacketEvents;
 import io.github.retrooper.packetevents.utils.nms.NMSUtils;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
@@ -68,10 +67,10 @@ public class NettyPacketManager {
      */
     public void injectPlayer(final Player player) {
         if (v1_7_nettyMode) {
-            NettyPacketManager_7 npm_7 = (NettyPacketManager_7)npm;
+            NettyPacketManager_7 npm_7 = (NettyPacketManager_7) npm;
             npm_7.injectPlayer(player);
         } else {
-            NettyPacketManager_8 npm_8 = (NettyPacketManager_8)npm;
+            NettyPacketManager_8 npm_8 = (NettyPacketManager_8) npm;
             npm_8.injectPlayer(player);
         }
     }
@@ -86,10 +85,10 @@ public class NettyPacketManager {
         Object channel = NMSUtils.getChannel(player);
         executorService.execute(() -> {
             if (v1_7_nettyMode) {
-                NettyPacketManager_7 npm_7 = (NettyPacketManager_7)npm;
+                NettyPacketManager_7 npm_7 = (NettyPacketManager_7) npm;
                 npm_7.injectPlayer(player);
             } else {
-                NettyPacketManager_8 npm_8 = (NettyPacketManager_8)npm;
+                NettyPacketManager_8 npm_8 = (NettyPacketManager_8) npm;
                 npm_8.injectPlayer(player);
             }
         });
@@ -102,10 +101,10 @@ public class NettyPacketManager {
      */
     public void ejectPlayer(final Player player) {
         if (v1_7_nettyMode) {
-            NettyPacketManager_7 npm_7 = (NettyPacketManager_7)npm;
+            NettyPacketManager_7 npm_7 = (NettyPacketManager_7) npm;
             npm_7.ejectPlayer(player);
         } else {
-            NettyPacketManager_8 npm_8 = (NettyPacketManager_8)npm;
+            NettyPacketManager_8 npm_8 = (NettyPacketManager_8) npm;
             npm_8.ejectPlayer(player);
         }
     }
@@ -118,21 +117,43 @@ public class NettyPacketManager {
     public void ejectPlayerAsync(final Player player) {
         executorService.execute(() -> {
             if (v1_7_nettyMode) {
-                NettyPacketManager_7 npm_7 = (NettyPacketManager_7)npm;
+                NettyPacketManager_7 npm_7 = (NettyPacketManager_7) npm;
                 npm_7.ejectPlayer(player);
             } else {
-                NettyPacketManager_8 npm_8 = (NettyPacketManager_8)npm;
+                NettyPacketManager_8 npm_8 = (NettyPacketManager_8) npm;
                 npm_8.ejectPlayer(player);
+            }
+        });
+    }
+
+    public void ejectChannelSync(Object channel) {
+        if (v1_7_nettyMode) {
+            NettyPacketManager_7 npm_7 = (NettyPacketManager_7) npm;
+            npm_7.ejectChannel(channel);
+        } else {
+            NettyPacketManager_8 npm_8 = (NettyPacketManager_8) npm;
+            npm_8.ejectChannel(channel);
+        }
+    }
+
+    public void ejectChannelAsync(Object channel) {
+        executorService.execute(() -> {
+            if (v1_7_nettyMode) {
+                NettyPacketManager_7 npm_7 = (NettyPacketManager_7) npm;
+                npm_7.ejectChannel(channel);
+            } else {
+                NettyPacketManager_8 npm_8 = (NettyPacketManager_8) npm;
+                npm_8.ejectChannel(channel);
             }
         });
     }
 
     public void sendPacket(Object channel, Object packet) {
         if (v1_7_nettyMode) {
-            NettyPacketManager_7 npm_7 = (NettyPacketManager_7)npm;
+            NettyPacketManager_7 npm_7 = (NettyPacketManager_7) npm;
             npm_7.sendPacket(channel, packet);
         } else {
-            NettyPacketManager_8 npm_8 = (NettyPacketManager_8)npm;
+            NettyPacketManager_8 npm_8 = (NettyPacketManager_8) npm;
             npm_8.sendPacket(channel, packet);
         }
     }

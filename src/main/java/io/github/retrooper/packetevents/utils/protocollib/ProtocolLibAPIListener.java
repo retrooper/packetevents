@@ -30,11 +30,11 @@ import com.comphenix.protocol.events.ListenerPriority;
 import com.comphenix.protocol.events.PacketAdapter;
 import com.comphenix.protocol.events.PacketEvent;
 import io.github.retrooper.packetevents.PacketEvents;
-import io.github.retrooper.packetevents.event.annotation.PacketHandler;
-import io.github.retrooper.packetevents.event.priority.PacketEventPriority;
 import io.github.retrooper.packetevents.event.PacketListener;
+import io.github.retrooper.packetevents.event.annotation.PacketHandler;
 import io.github.retrooper.packetevents.event.impl.PacketReceiveEvent;
 import io.github.retrooper.packetevents.event.impl.PacketSendEvent;
+import io.github.retrooper.packetevents.event.priority.PacketEventPriority;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -42,8 +42,7 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
-public class ProtocolLibListener {
-
+public class ProtocolLibAPIListener {
     public static void registerProtocolLibListener(PacketListener listener, ConcurrentLinkedQueue<Method> methods) {
         if (ProtocolLibUtils.isAvailable()) {
             for (Method m : methods) {
@@ -62,7 +61,7 @@ public class ProtocolLibListener {
                             break;
                         case PacketEventPriority.HIGHEST:
                             priority = ListenerPriority.HIGHEST;
-                            break; 
+                            break;
                         case PacketEventPriority.MONITOR:
                             priority = ListenerPriority.MONITOR;
                             break;
@@ -141,6 +140,4 @@ public class ProtocolLibListener {
             }
         }
     }
-
-
 }
