@@ -32,9 +32,8 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 
 public final class WrappedPacketOutAbilities extends WrappedPacket implements SendableWrapper {
-    private static Class<?> packetClass;
     private static Constructor<?> packetConstructor;
-    private boolean isListening = false;
+    private boolean isListening;
     private boolean vulnerable, flying, allowFlight, instantBuild;
     private float flySpeed, walkSpeed;
 
@@ -55,7 +54,7 @@ public final class WrappedPacketOutAbilities extends WrappedPacket implements Se
     }
 
     public static void load() {
-        packetClass = PacketTypeClasses.Server.ABILITIES;
+        Class<?> packetClass = PacketTypeClasses.Server.ABILITIES;
 
         try {
             packetConstructor = packetClass.getConstructor(PlayerAbilitiesUtils.playerAbilitiesClass);

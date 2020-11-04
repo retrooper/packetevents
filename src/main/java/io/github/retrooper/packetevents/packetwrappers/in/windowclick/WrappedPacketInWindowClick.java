@@ -35,10 +35,11 @@ import java.util.Arrays;
 import java.util.HashMap;
 
 public class WrappedPacketInWindowClick extends WrappedPacket {
-    private static final HashMap<String, Integer> invClickTypeMapCache = new HashMap<String, Integer>();
-    private static final HashMap<Integer, ArrayList<WindowClickType>> windowClickTypeCache = new HashMap<Integer, ArrayList<WindowClickType>>();
-    private static Class<?> packetClass, invClickTypeClass;
-    private static boolean isClickModePrimitive = false;
+    private static final HashMap<String, Integer> invClickTypeMapCache = new HashMap<>();
+    private static final HashMap<Integer, ArrayList<WindowClickType>> windowClickTypeCache = new HashMap<>();
+    private static Class<?> invClickTypeClass;
+    private static boolean isClickModePrimitive;
+    // TODO: All the fields below are useless cuz there is never a value assigned to them - change this
     private int id;
     private int slot;
     private int button;
@@ -51,7 +52,7 @@ public class WrappedPacketInWindowClick extends WrappedPacket {
     }
 
     public static void load() {
-        packetClass = PacketTypeClasses.Client.WINDOW_CLICK;
+        Class<?> packetClass = PacketTypeClasses.Client.WINDOW_CLICK;
         invClickTypeClass = NMSUtils.getNMSClassWithoutException("InventoryClickType");
 
         invClickTypeMapCache.put("PICKUP", 0);
@@ -156,6 +157,7 @@ public class WrappedPacketInWindowClick extends WrappedPacket {
             return WindowClickType.UNKNOWN;
         }
 
+        // TODO: This has no use cuz the fields used are never getting assigned a value to them
         if (mode == 4) {
             if (slot == -999) {
                 if (button == 0) {

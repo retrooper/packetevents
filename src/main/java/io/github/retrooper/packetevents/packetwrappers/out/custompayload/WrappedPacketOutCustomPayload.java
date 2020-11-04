@@ -36,7 +36,6 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Modifier;
 
 public class WrappedPacketOutCustomPayload extends WrappedPacket implements SendableWrapper {
-    private static Class<?> packetClass;
     private static Constructor<?> constructor;
     private static Constructor<?> packetDataSerializerConstructor;
     private static Constructor<?> minecraftKeyConstructor;
@@ -49,13 +48,13 @@ public class WrappedPacketOutCustomPayload extends WrappedPacket implements Send
     private boolean isListening = false;
 
     public static void load() {
-        packetClass = PacketTypeClasses.Server.CUSTOM_PAYLOAD;
+        Class<?> packetClass = PacketTypeClasses.Server.CUSTOM_PAYLOAD;
         packetDataSerializerClass = NMSUtils.getNMSClassWithoutException("PacketDataSerializer");
         minecraftKeyClass = NMSUtils.getNMSClassWithoutException("MinecraftKey");
 
         try {
             byteBufClass = NMSUtils.getNettyClass("buffer.ByteBuf");
-        } catch (ClassNotFoundException e) {
+        } catch (ClassNotFoundException ignored) {
 
         }
         try {

@@ -33,11 +33,10 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 
 public class WrappedPacketOutKeepAlive extends WrappedPacket implements SendableWrapper {
-    private static Class<?> packetClass;
     private static Constructor<?> keepAliveConstructor;
     private static boolean integerMode;
     private long id;
-    private boolean isListening = false;
+    private boolean isListening;
 
     public WrappedPacketOutKeepAlive(Object packet) {
         super(packet);
@@ -45,11 +44,11 @@ public class WrappedPacketOutKeepAlive extends WrappedPacket implements Sendable
     }
 
     public WrappedPacketOutKeepAlive(long id) {
-        super();
+        this.id = id;
     }
 
     public static void load() {
-        packetClass = PacketTypeClasses.Server.KEEP_ALIVE;
+        Class<?> packetClass = PacketTypeClasses.Server.KEEP_ALIVE;
         integerMode = Reflection.getField(packetClass, int.class, 0) != null;
 
         if (integerMode) {
@@ -91,7 +90,7 @@ public class WrappedPacketOutKeepAlive extends WrappedPacket implements Sendable
     public Object asNMSPacket() {
         if (integerMode) {
             try {
-                return keepAliveConstructor.newInstance((int) id);
+                return keepAliveConstructor.newInstance(id);
             } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
                 e.printStackTrace();
             }

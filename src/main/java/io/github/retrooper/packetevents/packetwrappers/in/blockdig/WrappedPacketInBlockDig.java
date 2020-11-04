@@ -25,17 +25,18 @@
 package io.github.retrooper.packetevents.packetwrappers.in.blockdig;
 
 import io.github.retrooper.packetevents.enums.Direction;
-import io.github.retrooper.packetevents.utils.server.ServerVersion;
 import io.github.retrooper.packetevents.packettype.PacketTypeClasses;
 import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
-import io.github.retrooper.packetevents.utils.reflection.Reflection;
 import io.github.retrooper.packetevents.utils.nms.NMSUtils;
 import io.github.retrooper.packetevents.utils.reflection.SubclassUtil;
+import io.github.retrooper.packetevents.utils.server.ServerVersion;
 
 public final class WrappedPacketInBlockDig extends WrappedPacket {
     private static Class<?> blockDigClass, blockPositionClass, enumDirectionClass, digTypeClass;
     private static boolean isVersionLowerThan_v_1_8;
-    private Object blockPosObj, enumDirObj, digTypeObj;
+    private Object blockPosObj;
+    private Object enumDirObj;
+
     public WrappedPacketInBlockDig(Object packet) {
         super(packet);
     }

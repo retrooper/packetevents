@@ -24,8 +24,6 @@
 
 package io.github.retrooper.packetevents.utils.player;
 
-import io.github.retrooper.packetevents.PacketEvents;
-
 public enum ClientVersion {
     LOWER_THAN_SUPPORTED_VERSIONS(4),
     v_1_7_10(5),

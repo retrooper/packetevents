@@ -34,14 +34,13 @@ import org.bukkit.entity.Entity;
 import java.util.HashMap;
 
 public final class WrappedPacketInEntityAction extends WrappedPacket {
-    private static final HashMap<String, PlayerAction> cachedPlayerActionNames = new HashMap<String, PlayerAction>();
-    private static final HashMap<Integer, PlayerAction> cachedPlayerActionIDs = new HashMap<Integer, PlayerAction>();
+    private static final HashMap<String, PlayerAction> cachedPlayerActionNames = new HashMap<>();
+    private static final HashMap<Integer, PlayerAction> cachedPlayerActionIDs = new HashMap<>();
     @Nullable
     private static Class<?> enumPlayerActionClass;
     private static boolean isLowerThan_v_1_8;
     private Entity entity;
     private int entityId = -1;
-    private PlayerAction action;
 
     public WrappedPacketInEntityAction(final Object packet) {
         super(packet);
@@ -91,10 +90,10 @@ public final class WrappedPacketInEntityAction extends WrappedPacket {
      * @return Entity ID
      */
     public int getEntityId() {
-        if(entityId != -1) {
-            return entityId;
+        if(entityId == -1) {
+            entityId = readInt(0);
         }
-        return readInt(0);
+        return entityId;
     }
 
     /**

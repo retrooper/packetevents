@@ -33,13 +33,14 @@ import org.bukkit.entity.Entity;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
+import java.util.Map;
 
 public final class WrappedPacketOutAnimation extends WrappedPacket implements SendableWrapper {
-    private static Class<?> animationClass, nmsEntityClass;
+    private static Class<?> nmsEntityClass;
     private static Constructor<?> animationConstructor;
 
-    private static final HashMap<Integer, EntityAnimationType> cachedAnimationIDS = new HashMap<Integer, EntityAnimationType>();
-    private static final HashMap<EntityAnimationType, Integer> cachedAnimations = new HashMap<EntityAnimationType, Integer>();
+    private static final Map<Integer, EntityAnimationType> cachedAnimationIDS = new HashMap<>();
+    private static final Map<EntityAnimationType, Integer> cachedAnimations = new HashMap<>();
     private Entity entity;
     private int entityID = -1;
     private EntityAnimationType type;
@@ -58,7 +59,7 @@ public final class WrappedPacketOutAnimation extends WrappedPacket implements Se
     }
 
     public static void load() {
-        animationClass = PacketTypeClasses.Server.ANIMATION;
+        Class<?> animationClass = PacketTypeClasses.Server.ANIMATION;
         try {
             nmsEntityClass = NMSUtils.getNMSClass("Entity");
         } catch (ClassNotFoundException e) {

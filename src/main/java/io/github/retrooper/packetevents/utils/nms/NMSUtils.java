@@ -50,7 +50,10 @@ public final class NMSUtils {
     public static Class<?> nmsEntityClass, minecraftServerClass, craftWorldClass, playerInteractManagerClass, entityPlayerClass, playerConnectionClass, craftServerClass,
             craftPlayerClass, serverConnectionClass, craftEntityClass,
             craftItemStack, nmsItemStackClass, networkManagerClass, nettyChannelClass, gameProfileClass, iChatBaseComponentClass;
-    private static Method craftWorldGetHandle, getCraftWorldHandleMethod, getServerConnection, getCraftPlayerHandle, getCraftEntityHandle, asBukkitCopy;
+    private static Method craftWorldGetHandle;
+    private static Method getCraftPlayerHandle;
+    private static Method getCraftEntityHandle;
+    private static Method asBukkitCopy;
     private static Field entityPlayerPingField, playerConnectionField;
 
     public static final HashMap<UUID, Object> channelCache = new HashMap<>();
@@ -93,10 +96,8 @@ public final class NMSUtils {
 
         //METHODS
         try {
-            getCraftWorldHandleMethod = craftWorldClass.getMethod("getHandle");
             getCraftPlayerHandle = craftPlayerClass.getMethod("getHandle");
             getCraftEntityHandle = craftEntityClass.getMethod("getHandle");
-            getServerConnection = minecraftServerClass.getMethod("getServerConnection");
             asBukkitCopy = craftItemStack.getMethod("asBukkitCopy", nmsItemStackClass);
             craftWorldGetHandle = craftWorldClass.getMethod("getHandle");
         } catch (NoSuchMethodException e) {

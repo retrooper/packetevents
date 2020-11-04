@@ -25,7 +25,6 @@
 package io.github.retrooper.packetevents.packetwrappers.in.settings;
 
 import io.github.retrooper.packetevents.annotations.Nullable;
-import io.github.retrooper.packetevents.packettype.PacketTypeClasses;
 import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
 import io.github.retrooper.packetevents.utils.nms.NMSUtils;
 import io.github.retrooper.packetevents.utils.reflection.SubclassUtil;
@@ -45,7 +44,6 @@ public class WrappedPacketInSettings extends WrappedPacket {
     }
 
     public static void load() {
-        Class<?> packetClass = PacketTypeClasses.Client.SETTINGS;
 
         isLowerThan_v_1_8 = version.isLowerThan(ServerVersion.v_1_8);
 

@@ -24,7 +24,6 @@
 
 package io.github.retrooper.packetevents.packetwrappers.in.helditemslot;
 
-import io.github.retrooper.packetevents.packettype.PacketTypeClasses;
 import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
 
 public final class WrappedPacketInHeldItemSlot extends WrappedPacket {

@@ -61,9 +61,7 @@ public class WrappedGameProfile {
                     return false;
                 }
             }
-            return true;
-        } else {
-            return true;
         }
+        return true;
     }
 }

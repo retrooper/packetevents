@@ -28,7 +28,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class ClassUtil {
-    private static final Map<String, String> classSimpleNameCache = new HashMap<String, String>();
+    private static final Map<String, String> classSimpleNameCache = new HashMap<>();
 
     public static String getClassSimpleName(Class<?> cls) {
         String simpleClassName = classSimpleNameCache.get(cls.getName());

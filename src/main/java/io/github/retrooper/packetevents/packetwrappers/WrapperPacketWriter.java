@@ -26,7 +26,7 @@ package io.github.retrooper.packetevents.packetwrappers;
 
 public interface WrapperPacketWriter {
 
-    //TODO write for the arrays
+    // TODO write for the arrays
     void writeBoolean(int index, boolean value);
 
     void writeByte(int index, byte value);

@@ -35,8 +35,8 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 
 public class WrappedPacketOutEntityTeleport extends WrappedPacket implements SendableWrapper {
-    private static boolean legacyVersionMode = false;
-    private static boolean ultraLegacyVersionMode = false;
+    private static boolean legacyVersionMode;
+    private static boolean ultraLegacyVersionMode;
     private boolean listeningMode = false;
     private static final float rotationMultiplier = 256.0F / 360.0F;
     private static Constructor<?> constructor;

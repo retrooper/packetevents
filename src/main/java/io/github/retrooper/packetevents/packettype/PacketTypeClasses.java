@@ -138,12 +138,8 @@ public class PacketTypeClasses {
 
             try {
                 BLOCK_PLACE = NMSUtils.getNMSClass(c + "BlockPlace");
-            } catch (ClassNotFoundException e) {
-
-            }
-            try {
                 USE_ITEM = NMSUtils.getNMSClass(c + "UseItem");
-            } catch (ClassNotFoundException e2) {
+            } catch (ClassNotFoundException ignored) {
 
             }
 

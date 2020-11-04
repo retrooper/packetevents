@@ -36,12 +36,12 @@ import java.lang.reflect.InvocationTargetException;
 
 public final class WrappedPacketOutEntityVelocity extends WrappedPacket implements SendableWrapper {
     private static Constructor<?> velocityConstructor, vec3dConstructor;
-    private static Class<?> velocityClass, vec3dClass;
+    private static Class<?> vec3dClass;
     private static boolean isVec3dPresent;
     private int entityID = -1;
     private double velocityX, velocityY, velocityZ;
     private Entity entity;
-    private boolean isListening = false;
+    private boolean isListening;
 
     public WrappedPacketOutEntityVelocity(final Object packet) {
         super(packet);
@@ -69,7 +69,7 @@ public final class WrappedPacketOutEntityVelocity extends WrappedPacket implemen
      * 1.14+ use int, Vec3D style
      */
     public static void load() {
-        velocityClass = PacketTypeClasses.Server.ENTITY_VELOCITY;
+        Class<?> velocityClass = PacketTypeClasses.Server.ENTITY_VELOCITY;
         if (version.isHigherThan(ServerVersion.v_1_13_2)) {
             try {
                 vec3dClass = NMSUtils.getNMSClass("Vec3D");

@@ -24,8 +24,6 @@
 
 package io.github.retrooper.packetevents.packetwrappers.in.blockplace;
 
-import io.github.retrooper.packetevents.exceptions.WrapperFieldNotFoundException;
-import io.github.retrooper.packetevents.packettype.PacketTypeClasses;
 import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
 import io.github.retrooper.packetevents.utils.nms.NMSUtils;
 import io.github.retrooper.packetevents.utils.reflection.Reflection;
@@ -34,7 +32,8 @@ import org.bukkit.inventory.ItemStack;
 import java.lang.reflect.InvocationTargetException;
 
 final class WrappedPacketInBlockPlace_1_8 extends WrappedPacket {
-    private static Class<?> blockPlaceClass, blockPositionClass, blockPositionSuperClass;
+    private static Class<?> blockPositionClass;
+    private static Class<?> blockPositionSuperClass;
     private Object blockPosObj;
 
     WrappedPacketInBlockPlace_1_8(final Object packet) {
@@ -42,7 +41,6 @@ final class WrappedPacketInBlockPlace_1_8 extends WrappedPacket {
     }
 
     protected static void load() {
-        blockPlaceClass = PacketTypeClasses.Client.BLOCK_PLACE;
         try {
             blockPositionClass = NMSUtils.getNMSClass("BlockPosition");
         } catch (ClassNotFoundException e) {

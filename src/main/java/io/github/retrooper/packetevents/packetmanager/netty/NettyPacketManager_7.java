@@ -68,18 +68,18 @@ final class NettyPacketManager_7 {
     }
 
     public void ejectPlayer(Player player) {
-        Channel channel = (Channel)NMSUtils.getChannel(player);
+        Channel channel = (Channel) NMSUtils.getChannel(player);
         assert channel != null;
         ejectChannel(channel);
     }
 
    public void ejectChannel(Object ch) {
-        Channel channel = (Channel)ch;
+        Channel channel = (Channel) ch;
         channel.pipeline().remove(PacketEvents.getAPI().packetManager.getNettyHandlerName());
    }
 
     public void sendPacket(Object rawChannel, Object packet) {
-        Channel channel = (Channel)rawChannel;
+        Channel channel = (Channel) rawChannel;
         channel.pipeline().writeAndFlush(packet);
     }
 }

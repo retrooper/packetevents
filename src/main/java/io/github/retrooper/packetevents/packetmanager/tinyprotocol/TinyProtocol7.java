@@ -68,20 +68,19 @@ public class TinyProtocol7 {
     private static final FieldAccessor<GameProfile> getGameProfile = Reflection.getField(PACKET_LOGIN_IN_START, GameProfile.class, 0);
 
     // Speedup channel/protocol lookup
-    private Map<String, Channel> channelLookup = new MapMaker().weakValues().makeMap();
-    private Listener listener;
+    private final Map<String, Channel> channelLookup = new MapMaker().weakValues().makeMap();
 
     // List of network markers
     private List<Object> networkManagers;
 
     // Injected channel handlers
-    private List<Channel> serverChannels = Lists.newArrayList();
+    private final List<Channel> serverChannels = Lists.newArrayList();
     private ChannelInboundHandlerAdapter serverChannelHandler;
     private ChannelInitializer<Channel> beginInitProtocol;
     private ChannelInitializer<Channel> endInitProtocol;
 
     // Current handler name
-    private String handlerName;
+    private final String handlerName;
 
     protected volatile boolean closed;
     protected Plugin plugin;

@@ -71,20 +71,19 @@ public class TinyProtocol8 {
     private static final FieldAccessor<Enum> protocolType = Reflection.getField(PACKET_HANDSHAKING_IN_SET_PROTOCOL, Enum.class, 0);
 
     // Speedup channel/protocol lookup
-    private Map<String, Channel> channelLookup = new MapMaker().weakValues().makeMap();
-    private Listener listener;
+    private final Map<String, Channel> channelLookup = new MapMaker().weakValues().makeMap();
 
     // List of network markers
     private List<Object> networkManagers;
 
     // Injected channel handlers
-    private List<Channel> serverChannels = Lists.newArrayList();
+    private final List<Channel> serverChannels = Lists.newArrayList();
     private ChannelInboundHandlerAdapter serverChannelHandler;
     private ChannelInitializer<Channel> beginInitProtocol;
     private ChannelInitializer<Channel> endInitProtocol;
 
     // Current handler name
-    private String handlerName;
+    private final String handlerName;
 
     protected volatile boolean closed;
     protected Plugin plugin;
@@ -489,7 +488,6 @@ public class TinyProtocol8 {
             }
 
             // Clean up Bukkit
-            HandlerList.unregisterAll(listener);
             unregisterChannelHandler();
         }
     }

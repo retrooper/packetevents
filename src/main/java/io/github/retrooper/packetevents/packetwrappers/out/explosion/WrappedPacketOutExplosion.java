@@ -36,14 +36,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class WrappedPacketOutExplosion extends WrappedPacket implements SendableWrapper {
-    private static Class<?> chunkPosClass, blockPosClass, vec3DClass;
     private static Constructor<?> chunkPosConstructor, blockPosConstructor, packetConstructor, vec3dConstructor;
 
     public static void load() {
-        chunkPosClass = NMSUtils.getNMSClassWithoutException("ChunkPosition");
-        blockPosClass = NMSUtils.getNMSClassWithoutException("BlockPosition");
+        Class<?> chunkPosClass = NMSUtils.getNMSClassWithoutException("ChunkPosition");
+        Class<?> blockPosClass = NMSUtils.getNMSClassWithoutException("BlockPosition");
         Class<?> packetClass = NMSUtils.getNMSClassWithoutException("PacketPlayOutExplosion");
-        vec3DClass = NMSUtils.getNMSClassWithoutException("Vec3D");
+        Class<?> vec3DClass = NMSUtils.getNMSClassWithoutException("Vec3D");
         try {
             packetConstructor = packetClass.getConstructor(double.class, double.class, double.class, float.class, List.class, vec3DClass);
             vec3dConstructor = vec3DClass.getDeclaredConstructor(double.class, double.class, double.class);

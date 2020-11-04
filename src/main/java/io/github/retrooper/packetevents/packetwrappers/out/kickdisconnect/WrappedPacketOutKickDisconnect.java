@@ -34,10 +34,10 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 
 public final class WrappedPacketOutKickDisconnect extends WrappedPacket implements SendableWrapper {
-    private static Class<?> packetClass, iChatBaseComponentClass;
+    private static Class<?> iChatBaseComponentClass;
     private static Constructor<?> kickDisconnectConstructor;
     private String kickMessage;
-    private boolean isListening = false;
+    private boolean isListening;
 
     public WrappedPacketOutKickDisconnect(final Object packet) {
         super(packet);
@@ -50,7 +50,7 @@ public final class WrappedPacketOutKickDisconnect extends WrappedPacket implemen
     }
 
     public static void load() {
-        packetClass = PacketTypeClasses.Server.KICK_DISCONNECT;
+        Class<?> packetClass = PacketTypeClasses.Server.KICK_DISCONNECT;
         try {
             iChatBaseComponentClass = NMSUtils.getNMSClass("IChatBaseComponent");
         } catch (ClassNotFoundException e) {

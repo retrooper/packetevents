@@ -46,7 +46,7 @@ public final class WrappedPacketInCustomPayload extends WrappedPacket {
         packetDataSerializerClass = NMSUtils.getNMSClassWithoutException("PacketDataSerializer");
         try {
             byteBufClass = NMSUtils.getNettyClass("buffer.ByteBuf");
-        } catch (ClassNotFoundException e) {
+        } catch (ClassNotFoundException ignored) {
 
         }
         try {

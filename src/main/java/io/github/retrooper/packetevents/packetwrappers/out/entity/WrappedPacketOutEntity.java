@@ -36,14 +36,13 @@ import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 
 public class WrappedPacketOutEntity extends WrappedPacket implements SendableWrapper {
-    private static Class<?> packetClass;
     //Byte = 1.7.10->1.8.8, Int = 1.9->1.15.x, Short = 1.16.x
-    private static byte mode = 0; //byte = 0, int = 1, short = 2
-    private static double dXYZDivisor = 0.0;
-    private static int yawByteIndex = 0;
+    private static byte mode; //byte = 0, int = 1, short = 2
+    private static double dXYZDivisor;
+    private static int yawByteIndex;
     private static int pitchByteIndex = 1;
     private Entity entity;
-    private boolean isListening = false;
+    private boolean isListening;
     private static Constructor<?> entityPacketConstructor;
     private int entityID;
     private double deltaX, deltaY, deltaZ;
@@ -75,7 +74,7 @@ public class WrappedPacketOutEntity extends WrappedPacket implements SendableWra
     }
 
     public static void load() {
-        packetClass = PacketTypeClasses.Server.ENTITY;
+        Class<?> packetClass = PacketTypeClasses.Server.ENTITY;
 
         Field dxField = Reflection.getField(packetClass, 1);
         assert dxField != null;

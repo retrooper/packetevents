@@ -25,12 +25,11 @@
 package io.github.retrooper.packetevents.packetwrappers.out.chat;
 
 import io.github.retrooper.packetevents.annotations.Beta;
-import io.github.retrooper.packetevents.annotations.NotNull;
 import io.github.retrooper.packetevents.packettype.PacketTypeClasses;
 import io.github.retrooper.packetevents.packetwrappers.SendableWrapper;
 import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
-import io.github.retrooper.packetevents.utils.reflection.Reflection;
 import io.github.retrooper.packetevents.utils.nms.NMSUtils;
+import io.github.retrooper.packetevents.utils.reflection.Reflection;
 import io.github.retrooper.packetevents.utils.reflection.SubclassUtil;
 
 import java.lang.reflect.Constructor;
@@ -56,9 +55,9 @@ public final class WrappedPacketOutChat extends WrappedPacket implements Sendabl
     //0 = Byte
     //1 = Byte, Boolean
     private static byte chatTypeMessageEnumConstructorMode;
-    private static final HashMap<ChatPosition, Byte> cachedChatPositions = new HashMap<ChatPosition, Byte>();
-    private static final HashMap<Byte, ChatPosition> cachedChatPositionIntegers = new HashMap<Byte, ChatPosition>();
-    private static final HashMap<String, Byte> cachedChatMessageTypeIntegers = new HashMap<String, Byte>();
+    private static final HashMap<ChatPosition, Byte> cachedChatPositions = new HashMap<>();
+    private static final HashMap<Byte, ChatPosition> cachedChatPositionIntegers = new HashMap<>();
+    private static final HashMap<String, Byte> cachedChatMessageTypeIntegers = new HashMap<>();
     private String message;
     private ChatPosition chatPosition;
     private UUID uuid;

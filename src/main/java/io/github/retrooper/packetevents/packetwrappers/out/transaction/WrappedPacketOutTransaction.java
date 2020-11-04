@@ -32,7 +32,6 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 
 public class WrappedPacketOutTransaction extends WrappedPacket implements SendableWrapper {
-    private static Class<?> packetClass;
     private static Constructor<?> packetConstructor;
     private int windowId;
     private short actionNumber;
@@ -51,7 +50,7 @@ public class WrappedPacketOutTransaction extends WrappedPacket implements Sendab
     }
 
     public static void load() {
-        packetClass = PacketTypeClasses.Server.TRANSACTION;
+        Class<?> packetClass = PacketTypeClasses.Server.TRANSACTION;
 
         try {
             packetConstructor = packetClass.getConstructor(int.class, short.class, boolean.class);

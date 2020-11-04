@@ -26,7 +26,6 @@ package io.github.retrooper.packetevents.packetwrappers.in.blockplace;
 
 import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
 import net.minecraft.server.v1_7_R4.PacketPlayInBlockPlace;
-import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
 final class WrappedPacketInBlockPlace_1_7_10 extends WrappedPacket {

@@ -43,8 +43,9 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class PacketManager {
-    private static AtomicInteger handlerID = new AtomicInteger(0);
-    private int handlerNumber = handlerID.getAndIncrement();
+
+    private static final AtomicInteger handlerID = new AtomicInteger();
+    private final int handlerNumber = handlerID.getAndIncrement();
     private final Plugin plugin;
     private final boolean tinyProtocolMode;
     public final TinyProtocol tinyProtocol;

@@ -24,27 +24,22 @@
 
 package io.github.retrooper.packetevents.packetwrappers.out.position;
 
-import io.github.retrooper.packetevents.packettype.PacketTypeClasses;
 import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
 
 public final class WrappedPacketOutPosition extends WrappedPacket {
-    private static Class<?> packetClass;
     private double x;
     private double y;
     private double z;
     private float yaw;
     private float pitch;
 
-    private boolean isListening = false;
+    private final boolean isListening = true;
 
     public WrappedPacketOutPosition(Object packet) {
         super(packet);
-        isListening = true;
     }
 
-    public static void load() {
-        packetClass = PacketTypeClasses.Server.POSITION;
-    }
+    public static void load() {}
 
     @Override
     protected void setup() {

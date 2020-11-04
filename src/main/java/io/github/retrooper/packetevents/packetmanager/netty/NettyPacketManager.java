@@ -33,9 +33,7 @@ import java.util.concurrent.Executors;
 
 public class NettyPacketManager {
     public static final boolean v1_7_nettyMode;
-    public static final ExecutorService
-            executorService =
-            Executors.newFixedThreadPool(Math.max(Runtime.getRuntime().availableProcessors(), 64));
+    public static final ExecutorService executorService = Executors.newFixedThreadPool(Math.max(Runtime.getRuntime().availableProcessors(), 64));
 
     static {
         boolean v1_7_nettyMode1;
@@ -48,11 +46,9 @@ public class NettyPacketManager {
         v1_7_nettyMode = v1_7_nettyMode1;
     }
 
-    private Plugin plugin;
-    private Object npm;
+    private final Object npm;
 
     public NettyPacketManager(Plugin plugin) {
-        this.plugin = plugin;
         if (v1_7_nettyMode) {
             npm = new NettyPacketManager_7();
         } else {

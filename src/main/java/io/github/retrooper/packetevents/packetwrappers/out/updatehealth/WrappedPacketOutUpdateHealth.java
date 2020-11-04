@@ -33,11 +33,10 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 
 public final class WrappedPacketOutUpdateHealth extends WrappedPacket implements SendableWrapper {
-    private static Class<?> packetClass;
     private static Constructor<?> packetConstructor;
     private float health, foodSaturation;
     private int food;
-    private boolean isListening = false;
+    private boolean isListening;
 
     public WrappedPacketOutUpdateHealth(final Object packet) {
         super(packet);
@@ -59,7 +58,7 @@ public final class WrappedPacketOutUpdateHealth extends WrappedPacket implements
     }
 
     public static void load() {
-        packetClass = PacketTypeClasses.Server.UPDATE_HEALTH;
+        Class<?> packetClass = PacketTypeClasses.Server.UPDATE_HEALTH;
 
         try {
             packetConstructor = packetClass.getConstructor(float.class, int.class, float.class);

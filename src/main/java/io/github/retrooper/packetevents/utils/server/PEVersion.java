@@ -48,13 +48,7 @@ public class PEVersion {
         //1.2.3.4
         text += ".";
 
-        int dotCount = 0;
         char[] chars = text.toCharArray();
-        for (char c : chars) {
-            if (c == '.') {
-                dotCount++;
-            }
-        }
 
         //1.2.3.4.
         int arrayIndex = 0;

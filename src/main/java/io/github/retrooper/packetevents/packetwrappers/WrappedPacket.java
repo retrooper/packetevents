@@ -100,124 +100,92 @@ public class WrappedPacket implements WrapperPacketReader, WrapperPacketWriter {
 
         if (!fieldCache.containsKey(packetClass)) {
             final Field[] declaredFields = packetClass.getDeclaredFields();
-            List<Field> boolFields = new ArrayList<>();
-            List<Field> byteFields = new ArrayList<>();
-            List<Field> shortFields = new ArrayList<>();
-            List<Field> intFields = new ArrayList<>();
-            List<Field> longFields = new ArrayList<>();
-            List<Field> floatFields = new ArrayList<>();
-            List<Field> doubleFields = new ArrayList<>();
-            List<Field> stringFields = new ArrayList<>();
-
-            List<Field> boolArrayFields = new ArrayList<>();
-            List<Field> byteArrayFields = new ArrayList<>();
-            List<Field> shortArrayFields = new ArrayList<>();
-            List<Field> intArrayFields = new ArrayList<>();
-            List<Field> longArrayFields = new ArrayList<>();
-            List<Field> floatArrayFields = new ArrayList<>();
-            List<Field> doubleArrayFields = new ArrayList<>();
-            List<Field> stringArrayFields = new ArrayList<>();
-
             for (Field f : declaredFields) {
                 f.setAccessible(true);
-                if (f.getType().equals(boolean.class)) {
-                    boolFields.add(f);
-                } else if (f.getType().equals(byte.class)) {
-                    byteFields.add(f);
-                } else if (f.getType().equals(short.class)) {
-                    shortFields.add(f);
-                } else if (f.getType().equals(int.class)) {
-                    intFields.add(f);
-                } else if (f.getType().equals(long.class)) {
-                    longFields.add(f);
-                } else if (f.getType().equals(float.class)) {
-                    floatFields.add(f);
-                } else if (f.getType().equals(double.class)) {
-                    doubleFields.add(f);
-                } else if (f.getType().equals(String.class)) {
-                    stringFields.add(f);
-                } else if (f.getType().equals(boolean[].class)) {
-                    boolArrayFields.add(f);
-                } else if (f.getType().equals(byte[].class)) {
-                    byteArrayFields.add(f);
-                } else if (f.getType().equals(short[].class)) {
-                    shortArrayFields.add(f);
-                } else if (f.getType().equals(int[].class)) {
-                    intArrayFields.add(f);
-                } else if (f.getType().equals(long[].class)) {
-                    longArrayFields.add(f);
-                } else if (f.getType().equals(float[].class)) {
-                    floatArrayFields.add(f);
-                } else if (f.getType().equals(double[].class)) {
-                    doubleArrayFields.add(f);
-                } else if (f.getType().equals(String[].class)) {
-                    stringArrayFields.add(f);
-                }
             }
+            List<Field> boolFields = getFields(boolean.class, declaredFields);
+            List<Field> byteFields = getFields(byte.class, declaredFields);
+            List<Field> shortFields = getFields(short.class, declaredFields);
+            List<Field> intFields = getFields(int.class, declaredFields);;
+            List<Field> longFields = getFields(long.class, declaredFields);;
+            List<Field> floatFields = getFields(float.class, declaredFields);;
+            List<Field> doubleFields = getFields(double.class, declaredFields);;
+            List<Field> stringFields = getFields(String.class, declaredFields);;
+
+            List<Field> boolArrayFields = getFields(boolean[].class, declaredFields);;
+            List<Field> byteArrayFields = getFields(byte[].class, declaredFields);;
+            List<Field> shortArrayFields = getFields(short[].class, declaredFields);;
+            List<Field> intArrayFields = getFields(int[].class, declaredFields);;
+            List<Field> longArrayFields = getFields(long[].class, declaredFields);;
+            List<Field> floatArrayFields = getFields(float[].class, declaredFields);;
+            List<Field> doubleArrayFields = getFields(double[].class, declaredFields);;
+            List<Field> stringArrayFields = getFields(String[].class, declaredFields);;
+
+            Field[] tmp = new Field[0];
 
             Map<Class<?>, Field[]> map = new HashMap<>();
-            if (!boolFields.isEmpty()) {
-                map.put(boolean.class, boolFields.toArray(new Field[0]));
+            if (boolFields != null) {
+                map.put(boolean.class, boolFields.toArray(tmp));
             }
 
-            if (!byteFields.isEmpty()) {
-                map.put(byte.class, byteFields.toArray(new Field[0]));
+            if (byteFields != null) {
+                map.put(byte.class, byteFields.toArray(tmp));
             }
 
-            if (!shortFields.isEmpty()) {
-                map.put(short.class, shortFields.toArray(new Field[0]));
+            if (shortFields != null) {
+                map.put(short.class, shortFields.toArray(tmp));
             }
 
-            if (!intFields.isEmpty()) {
-                map.put(int.class, intFields.toArray(new Field[0]));
+            if (intFields != null) {
+                map.put(int.class, intFields.toArray(tmp));
             }
 
-            if (!longFields.isEmpty()) {
-                map.put(long.class, longFields.toArray(new Field[0]));
+            if (longFields != null) {
+                map.put(long.class, longFields.toArray(tmp));
             }
 
-            if (!floatFields.isEmpty()) {
-                map.put(float.class, floatFields.toArray(new Field[0]));
+            if (floatFields != null) {
+                map.put(float.class, floatFields.toArray(tmp));
             }
 
-            if (!doubleFields.isEmpty()) {
-                map.put(double.class, doubleFields.toArray(new Field[0]));
+            if (doubleFields != null) {
+                map.put(double.class, doubleFields.toArray(tmp));
             }
 
-            if (!stringFields.isEmpty()) {
-                map.put(String.class, stringFields.toArray(new Field[0]));
+            if (stringFields != null) {
+                map.put(String.class, stringFields.toArray(tmp));
             }
 
-            if (!boolArrayFields.isEmpty()) {
-                map.put(boolean[].class, boolArrayFields.toArray(new Field[0]));
+            if (boolArrayFields != null) {
+                map.put(boolean[].class, boolArrayFields.toArray(tmp));
             }
 
-            if (!byteArrayFields.isEmpty()) {
-                map.put(byte[].class, byteArrayFields.toArray(new Field[0]));
+            if (byteArrayFields != null) {
+                map.put(byte[].class, byteArrayFields.toArray(tmp));
             }
 
-            if (!shortArrayFields.isEmpty()) {
-                map.put(short[].class, shortArrayFields.toArray(new Field[0]));
+            if (shortArrayFields != null) {
+                map.put(short[].class, shortArrayFields.toArray(tmp));
             }
 
-            if (!intArrayFields.isEmpty()) {
-                map.put(int[].class, intArrayFields.toArray(new Field[0]));
+            if (intArrayFields != null) {
+                map.put(int[].class, intArrayFields.toArray(tmp));
             }
 
-            if (!longArrayFields.isEmpty()) {
-                map.put(long[].class, longArrayFields.toArray(new Field[0]));
+            if (longArrayFields != null) {
+                map.put(long[].class, longArrayFields.toArray(tmp));
             }
 
-            if (!floatArrayFields.isEmpty()) {
-                map.put(float[].class, floatArrayFields.toArray(new Field[0]));
+            if (floatArrayFields != null) {
+                map.put(float[].class, floatArrayFields.toArray(tmp));
             }
 
-            if (!doubleArrayFields.isEmpty()) {
-                map.put(double[].class, doubleArrayFields.toArray(new Field[0]));
+            if (doubleArrayFields != null) {
+                map.put(double[].class, doubleArrayFields.toArray(tmp));
             }
 
-            if (!stringArrayFields.isEmpty()) {
-                map.put(String[].class, stringArrayFields.toArray(new Field[0]));
+            if (stringArrayFields != null) {
+                map.put(String[].class, stringArrayFields.toArray(tmp));
             }
             fieldCache.put(packetClass, map);
         }
@@ -535,12 +503,11 @@ public class WrappedPacket implements WrapperPacketReader, WrapperPacketWriter {
                     cached.put(type, typeFields.toArray(new Field[0]));
                 }
             }
-
-        }
-        try {
-            return cached.get(type)[index].get(packet);
-        } catch (IllegalAccessException e) {
-            e.printStackTrace();
+            try {
+                return cached.get(type)[index].get(packet);
+            } catch (IllegalAccessException e) {
+                e.printStackTrace();
+            }
         }
         throw new WrapperFieldNotFoundException(packetClass, type, index);
     }
@@ -624,6 +591,19 @@ public class WrappedPacket implements WrapperPacketReader, WrapperPacketWriter {
             return fields[index];
         }
         return null;
+    }
+
+    private List<Field> getFields(Class<?> type, Field[] fields) {
+        List<Field> ret = null;
+        for(Field field : fields) {
+            if(field.getType() == type) {
+                if (ret == null) {
+                    ret = new ArrayList<>();
+                }
+                ret.add(field);
+            }
+        }
+        return ret;
     }
 
 }
