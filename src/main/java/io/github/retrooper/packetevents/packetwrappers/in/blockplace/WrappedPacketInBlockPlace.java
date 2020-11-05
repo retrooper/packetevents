@@ -24,6 +24,7 @@
 
 package io.github.retrooper.packetevents.packetwrappers.in.blockplace;
 
+import io.github.retrooper.packetevents.enums.Direction;
 import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
 import io.github.retrooper.packetevents.utils.server.ServerVersion;
 import org.bukkit.entity.Player;
@@ -32,106 +33,72 @@ import org.bukkit.inventory.ItemStack;
 
 public final class WrappedPacketInBlockPlace extends WrappedPacket {
     private static boolean isHigherThan_v_1_8_8, isHigherThan_v_1_7_10;
-    private WrappedPacket cachedWrappedPacket;
 
-    public WrappedPacketInBlockPlace(final Player player, final Object packet) {
-        super(player, packet);
+    public WrappedPacketInBlockPlace(final Object packet) {
+        super(packet);
     }
 
     public static void load() {
         isHigherThan_v_1_8_8 = version.isHigherThan(ServerVersion.v_1_8_8);
         isHigherThan_v_1_7_10 = version.isHigherThan(ServerVersion.v_1_7_10);
-        if (isHigherThan_v_1_7_10) {
-            WrappedPacketInBlockPlace_1_8.load();
+        if (isHigherThan_v_1_8_8) {
+            WrappedPacketInBlockPlace_1_9.load();
         }
     }
 
-    public Player getPlayer() {
-        return player;
+    public Direction getDirection() {
+        if(isHigherThan_v_1_8_8) {
+            WrappedPacketInBlockPlace_1_9 blockPlace_1_9 = new WrappedPacketInBlockPlace_1_9(packet);
+            return Direction.valueOf(((Enum)blockPlace_1_9.getEnumDirectionObject()).name());
+        }
+        else if(isHigherThan_v_1_7_10) {
+            WrappedPacketInBlockPlace_1_8 blockPlace_1_8 = new WrappedPacketInBlockPlace_1_8(packet);
+            return Direction.values()[blockPlace_1_8.getFace()];
+        }
+        else {
+            WrappedPacketInBlockPlace_1_7_10 blockPlace_1_7_10 = new WrappedPacketInBlockPlace_1_7_10(packet);
+            return Direction.values()[blockPlace_1_7_10.face];
+        }
     }
 
     public int getX() {
         if (isHigherThan_v_1_8_8) {
-            if (cachedWrappedPacket == null) {
-                WrappedPacketInBlockPlace_1_9 blockPlace_1_9 = new WrappedPacketInBlockPlace_1_9(getPlayer(), packet);
-                cachedWrappedPacket = blockPlace_1_9;
-                return blockPlace_1_9.getBlock().getX();
-            }
-            return ((WrappedPacketInBlockPlace_1_9)cachedWrappedPacket).getBlock().getX();
+            WrappedPacketInBlockPlace_1_9 blockPlace_1_9 = new WrappedPacketInBlockPlace_1_9(packet);
+            return blockPlace_1_9.getX();
         } else if (isHigherThan_v_1_7_10) {
-           if(cachedWrappedPacket == null) {
-               WrappedPacketInBlockPlace_1_8 blockPlace_1_8 = new WrappedPacketInBlockPlace_1_8(packet);
-               cachedWrappedPacket = blockPlace_1_8;
-               return blockPlace_1_8.getX();
-           }
+            WrappedPacketInBlockPlace_1_8 blockPlace_1_8 = new WrappedPacketInBlockPlace_1_8(packet);
+            return blockPlace_1_8.getX();
         } else {
             WrappedPacketInBlockPlace_1_7_10 blockPlace_1_7_10 = new WrappedPacketInBlockPlace_1_7_10(packet);
             return blockPlace_1_7_10.x;
         }
-        return 0;
     }
 
     public int getY() {
         if (isHigherThan_v_1_8_8) {
-            if (cachedWrappedPacket == null) {
-                WrappedPacketInBlockPlace_1_9 blockPlace_1_9 = new WrappedPacketInBlockPlace_1_9(getPlayer(), packet);
-                cachedWrappedPacket = blockPlace_1_9;
-                return blockPlace_1_9.getBlock().getY();
-            }
-            return ((WrappedPacketInBlockPlace_1_9)cachedWrappedPacket).getBlock().getX();
+            WrappedPacketInBlockPlace_1_9 blockPlace_1_9 = new WrappedPacketInBlockPlace_1_9(packet);
+            return blockPlace_1_9.getY();
+
         } else if (isHigherThan_v_1_7_10) {
-            if(cachedWrappedPacket == null) {
-                WrappedPacketInBlockPlace_1_8 blockPlace_1_8 = new WrappedPacketInBlockPlace_1_8(packet);
-                cachedWrappedPacket = blockPlace_1_8;
-                return blockPlace_1_8.getY();
-            }
+            WrappedPacketInBlockPlace_1_8 blockPlace_1_8 = new WrappedPacketInBlockPlace_1_8(packet);
+            return blockPlace_1_8.getY();
         } else {
             WrappedPacketInBlockPlace_1_7_10 blockPlace_1_7_10 = new WrappedPacketInBlockPlace_1_7_10(packet);
             return blockPlace_1_7_10.y;
         }
-        return 0;
     }
 
     public int getZ() {
         if (isHigherThan_v_1_8_8) {
-            if (cachedWrappedPacket == null) {
-                WrappedPacketInBlockPlace_1_9 blockPlace_1_9 = new WrappedPacketInBlockPlace_1_9(getPlayer(), packet);
-                cachedWrappedPacket = blockPlace_1_9;
-                return blockPlace_1_9.getBlock().getZ();
-            }
-            return ((WrappedPacketInBlockPlace_1_9)cachedWrappedPacket).getBlock().getX();
+            WrappedPacketInBlockPlace_1_9 blockPlace_1_9 = new WrappedPacketInBlockPlace_1_9(packet);
+            return blockPlace_1_9.getZ();
         } else if (isHigherThan_v_1_7_10) {
-            if(cachedWrappedPacket == null) {
-                WrappedPacketInBlockPlace_1_8 blockPlace_1_8 = new WrappedPacketInBlockPlace_1_8(packet);
-                cachedWrappedPacket = blockPlace_1_8;
-                return blockPlace_1_8.getZ();
-            }
+            WrappedPacketInBlockPlace_1_8 blockPlace_1_8 = new WrappedPacketInBlockPlace_1_8(packet);
+            return blockPlace_1_8.getZ();
         } else {
             WrappedPacketInBlockPlace_1_7_10 blockPlace_1_7_10 = new WrappedPacketInBlockPlace_1_7_10(packet);
             return blockPlace_1_7_10.z;
         }
-        return 0;
-    }
-
-    public ItemStack getItemStack() {
-        if (isHigherThan_v_1_8_8) {
-            if (cachedWrappedPacket == null) {
-                WrappedPacketInBlockPlace_1_9 blockPlace_1_9 = new WrappedPacketInBlockPlace_1_9(getPlayer(), packet);
-                cachedWrappedPacket = blockPlace_1_9;
-                return new ItemStack(blockPlace_1_9.getBlock().getType());
-            }
-            return new ItemStack(((WrappedPacketInBlockPlace_1_9)cachedWrappedPacket).getBlock().getType());
-        } else if (isHigherThan_v_1_7_10) {
-            if(cachedWrappedPacket == null) {
-                WrappedPacketInBlockPlace_1_8 blockPlace_1_8 = new WrappedPacketInBlockPlace_1_8(packet);
-                cachedWrappedPacket = blockPlace_1_8;
-                return blockPlace_1_8.getItemStack();
-            }
-        } else {
-            WrappedPacketInBlockPlace_1_7_10 blockPlace_1_7_10 = new WrappedPacketInBlockPlace_1_7_10(packet);
-            return blockPlace_1_7_10.itemStack;
-        }
-        return null;
     }
 
 }

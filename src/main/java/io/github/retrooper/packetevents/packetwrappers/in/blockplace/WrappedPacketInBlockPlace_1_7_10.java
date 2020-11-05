@@ -25,13 +25,12 @@
 package io.github.retrooper.packetevents.packetwrappers.in.blockplace;
 
 import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
-import net.minecraft.server.v1_7_R4.PacketPlayInBlockPlace;
 import org.bukkit.inventory.ItemStack;
 
 final class WrappedPacketInBlockPlace_1_7_10 extends WrappedPacket {
     public int x, y, z;
     public ItemStack itemStack;
-    public int blockFace;
+    public int face;
 
     WrappedPacketInBlockPlace_1_7_10(final Object packet) {
         super(packet);
@@ -40,13 +39,14 @@ final class WrappedPacketInBlockPlace_1_7_10 extends WrappedPacket {
 
     @Override
     protected void setup() {
-        final PacketPlayInBlockPlace blockPlace = (PacketPlayInBlockPlace) packet;
+        final net.minecraft.server.v1_7_R4.PacketPlayInBlockPlace blockPlace =
+                (net.minecraft.server.v1_7_R4.PacketPlayInBlockPlace) packet;
 
         x = blockPlace.c();
         y = blockPlace.d();
         z = blockPlace.e();
 
-        this.blockFace = blockPlace.d();
+        this.face = blockPlace.d();
 
         net.minecraft.server.v1_7_R4.ItemStack stack = blockPlace.getItemStack();
         this.itemStack = org.bukkit.craftbukkit.v1_7_R4.inventory.CraftItemStack.asBukkitCopy(stack);

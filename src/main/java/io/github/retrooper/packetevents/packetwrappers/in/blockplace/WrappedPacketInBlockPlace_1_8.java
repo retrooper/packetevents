@@ -32,60 +32,53 @@ import org.bukkit.inventory.ItemStack;
 import java.lang.reflect.InvocationTargetException;
 
 final class WrappedPacketInBlockPlace_1_8 extends WrappedPacket {
-    private static Class<?> blockPositionClass;
-    private static Class<?> blockPositionSuperClass;
     private Object blockPosObj;
 
     WrappedPacketInBlockPlace_1_8(final Object packet) {
         super(packet);
     }
 
-    protected static void load() {
-        try {
-            blockPositionClass = NMSUtils.getNMSClass("BlockPosition");
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
-        }
-        blockPositionSuperClass = blockPositionClass.getSuperclass();
-    }
-
     public int getX() {
         if(blockPosObj == null) {
-            blockPosObj = new WrappedPacket(packet).readObject(0, blockPositionClass);
+            blockPosObj = readObject(0, NMSUtils.blockPosClass);
         }
         try {
-            return (int)Reflection.getMethod(blockPositionSuperClass, "getX", 0).invoke(blockPosObj);
+            return (int) Reflection.getMethod(blockPosObj.getClass().getSuperclass(), "getX", 0).invoke(blockPosObj);
         } catch (IllegalAccessException | InvocationTargetException e) {
             e.printStackTrace();
         }
-        return 0;
+        return -1;
     }
 
     public int getY() {
         if(blockPosObj == null) {
-            blockPosObj = new WrappedPacket(packet).readObject(0, blockPositionClass);
+            blockPosObj = readObject(0, NMSUtils.blockPosClass);
         }
         try {
-            return (int)Reflection.getMethod(blockPositionSuperClass, "getY", 0).invoke(blockPosObj);
+            return (int) Reflection.getMethod(blockPosObj.getClass().getSuperclass(), "getY", 0).invoke(blockPosObj);
         } catch (IllegalAccessException | InvocationTargetException e) {
             e.printStackTrace();
         }
-        return 0;
+        return -1;
     }
 
     public int getZ() {
         if(blockPosObj == null) {
-            blockPosObj = new WrappedPacket(packet).readObject(0, blockPositionClass);
+            blockPosObj = readObject(0, NMSUtils.blockPosClass);
         }
         try {
-            return (int)Reflection.getMethod(blockPositionSuperClass, "getZ", 0).invoke(blockPosObj);
+            return (int) Reflection.getMethod(blockPosObj.getClass().getSuperclass(), "getZ", 0).invoke(blockPosObj);
         } catch (IllegalAccessException | InvocationTargetException e) {
             e.printStackTrace();
         }
-        return 0;
+        return -1;
     }
 
     public ItemStack getItemStack() {
         return NMSUtils.toBukkitItemStack(readObject(0, NMSUtils.nmsItemStackClass));
+    }
+
+    public int getFace() {
+        return readInt(0);
     }
 }

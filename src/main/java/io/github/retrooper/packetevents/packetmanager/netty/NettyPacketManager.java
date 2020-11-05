@@ -33,7 +33,7 @@ import java.util.concurrent.Executors;
 
 public class NettyPacketManager {
     public static final boolean v1_7_nettyMode;
-    public static final ExecutorService executorService = Executors.newFixedThreadPool(Math.max(Runtime.getRuntime().availableProcessors(), 64));
+    public static final ExecutorService executorService = Executors.newSingleThreadExecutor();
 
     static {
         boolean v1_7_nettyMode1;

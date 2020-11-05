@@ -39,11 +39,12 @@ import io.github.retrooper.packetevents.event.priority.PacketEventPriority;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 public class ProtocolLibAPIListener {
-    public static void registerProtocolLibListener(PacketListener listener, ConcurrentLinkedQueue<Method> methods) {
+    public static void registerProtocolLibListener(PacketListener listener, List<Method> methods) {
         if (ProtocolLibUtils.isAvailable()) {
             for (Method m : methods) {
                 if (m.getParameterTypes()[0].equals(PacketReceiveEvent.class)) {

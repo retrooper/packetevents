@@ -27,11 +27,17 @@ package io.github.retrooper.packetevents.example;
 import io.github.retrooper.packetevents.PacketEvents;
 import io.github.retrooper.packetevents.event.PacketListener;
 import io.github.retrooper.packetevents.event.annotation.PacketHandler;
+import io.github.retrooper.packetevents.event.impl.PacketLoginEvent;
 import io.github.retrooper.packetevents.event.impl.PacketReceiveEvent;
+import io.github.retrooper.packetevents.event.impl.PacketSendEvent;
+import io.github.retrooper.packetevents.event.impl.PacketStatusEvent;
 import io.github.retrooper.packetevents.packettype.PacketType;
+import io.github.retrooper.packetevents.packetwrappers.in.blockdig.WrappedPacketInBlockDig;
+import io.github.retrooper.packetevents.packetwrappers.in.blockplace.WrappedPacketInBlockPlace;
 import io.github.retrooper.packetevents.packetwrappers.in.chat.WrappedPacketInChat;
 import io.github.retrooper.packetevents.utils.player.ClientVersion;
 import io.github.retrooper.packetevents.utils.server.ServerVersion;
+import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 
 public class MainExample extends JavaPlugin implements PacketListener {
@@ -49,4 +55,5 @@ public class MainExample extends JavaPlugin implements PacketListener {
         PacketEvents.getAPI().getEventManager().registerListener(this);
         PacketEvents.init(this);
     }
+
 }

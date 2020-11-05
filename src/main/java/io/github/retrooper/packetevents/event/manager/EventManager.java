@@ -27,23 +27,29 @@ package io.github.retrooper.packetevents.event.manager;
 import io.github.retrooper.packetevents.PacketEvents;
 import io.github.retrooper.packetevents.event.PacketEvent;
 import io.github.retrooper.packetevents.event.PacketListener;
+import io.github.retrooper.packetevents.event.PacketListenerDynamic;
 import io.github.retrooper.packetevents.event.annotation.PacketHandler;
 import io.github.retrooper.packetevents.event.eventtypes.CancellableEvent;
+import io.github.retrooper.packetevents.event.impl.*;
 import io.github.retrooper.packetevents.event.priority.PacketEventPriority;
 import io.github.retrooper.packetevents.utils.protocollib.ProtocolLibAPIListener;
 import io.github.retrooper.packetevents.utils.protocollib.ProtocolLibUtils;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 public final class EventManager {
-    private final ConcurrentHashMap<PacketListener, ConcurrentLinkedQueue<Method>> registeredMethods = new ConcurrentHashMap<>();
-
+    private final Map<PacketListener, List<Method>> staticRegisteredMethods = new HashMap<>();
     public void callEvent(final PacketEvent e) {
-        for (final PacketListener listener : registeredMethods.keySet()) {
-            ConcurrentLinkedQueue<Method> methods = registeredMethods.get(listener);
+        //STATIC LISTENERS
+        for (final PacketListener listener : staticRegisteredMethods.keySet()) {
+            List<Method> methods = staticRegisteredMethods.get(listener);
             final boolean[] isCancelled = {false};
             final byte[] eventPriority = {PacketEventPriority.LOWEST};
             for (Method method : methods) {
@@ -64,17 +70,13 @@ public final class EventManager {
                             isCancelled[0] = ce.isCancelled();
                         }
                     }
-                    if (e instanceof CancellableEvent) {
-                        CancellableEvent cancellableEvent = (CancellableEvent) e;
-                        cancellableEvent.setCancelled(isCancelled[0]);
-                    }
                 }
             }
         }
     }
 
     public void registerListener(final PacketListener listener) {
-        final ConcurrentLinkedQueue<Method> methods = new ConcurrentLinkedQueue<>();
+        final List<Method> methods = new ArrayList<>();
         for (final Method m : listener.getClass().getDeclaredMethods()) {
             if (!m.isAccessible()) {
                 m.setAccessible(true);
@@ -90,7 +92,7 @@ public final class EventManager {
                     && PacketEvents.getSettings().shouldUseProtocolLibIfAvailable()) {
                 ProtocolLibAPIListener.registerProtocolLibListener(listener, methods);
             } else {
-                registeredMethods.put(listener, methods);
+                staticRegisteredMethods.put(listener, methods);
             }
         }
     }
@@ -102,7 +104,7 @@ public final class EventManager {
     }
 
     public void unregisterListener(final PacketListener e) {
-        registeredMethods.remove(e);
+        staticRegisteredMethods.remove(e);
     }
 
     public void unregisterListeners(final PacketListener... listeners) {
@@ -112,10 +114,10 @@ public final class EventManager {
     }
 
     public void unregisterAllListeners() {
-        registeredMethods.clear();
+        staticRegisteredMethods.clear();
     }
 
     public boolean isRegistered(final PacketListener listener) {
-        return registeredMethods.containsKey(listener);
+        return staticRegisteredMethods.containsKey(listener);
     }
 }

@@ -29,9 +29,10 @@ import io.github.retrooper.packetevents.utils.reflection.SubclassUtil;
 
 public class PacketTypeClasses {
     public static class Status {
-        public static Class<?> PING, PONG, SERVER_INFO;
+        public static Class<?> IN_START, PING, PONG, SERVER_INFO;
 
         public static void load() {
+            IN_START = NMSUtils.getNMSClassWithoutException("PacketStatusInStart");
             PING = NMSUtils.getNMSClassWithoutException("PacketStatusInPing");
             PONG = NMSUtils.getNMSClassWithoutException("PacketStatusOutPong");
             SERVER_INFO = NMSUtils.getNMSClassWithoutException("PacketStatusOutServerInfo");
@@ -45,7 +46,7 @@ public class PacketTypeClasses {
 
         public static void load() {
             HANDSHAKE = NMSUtils.getNMSClassWithoutException("PacketHandshakingInSetProtocol");
-            //In and Out custom payload login packets have been here since AROUND 1.13.2?
+            //In and Out custom payload login packets have been here since AROUND 1.13.2.
             IN_CUSTOM_PAYLOAD = NMSUtils.getNMSClassWithoutException("PacketLoginInCustomPayload");
             OUT_CUSTOM_PAYLOAD = NMSUtils.getNMSClassWithoutException("PacketLoginOutCustomPayload");
             IN_START = NMSUtils.getNMSClassWithoutException("PacketLoginInStart");

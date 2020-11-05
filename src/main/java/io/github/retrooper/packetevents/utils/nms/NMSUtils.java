@@ -49,7 +49,8 @@ public final class NMSUtils {
     public static String nettyPrefix = "io.netty";
     public static Class<?> nmsEntityClass, minecraftServerClass, craftWorldClass, playerInteractManagerClass, entityPlayerClass, playerConnectionClass, craftServerClass,
             craftPlayerClass, serverConnectionClass, craftEntityClass,
-            craftItemStack, nmsItemStackClass, networkManagerClass, nettyChannelClass, gameProfileClass, iChatBaseComponentClass;
+            craftItemStack, nmsItemStackClass, networkManagerClass, nettyChannelClass, gameProfileClass, iChatBaseComponentClass,
+            blockPosClass, enumDirectionClass;
     private static Method craftWorldGetHandle;
     private static Method getCraftPlayerHandle;
     private static Method getCraftEntityHandle;
@@ -93,7 +94,8 @@ public final class NMSUtils {
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
         }
-
+        blockPosClass = NMSUtils.getNMSClassWithoutException("BlockPosition");
+        enumDirectionClass = NMSUtils.getNMSClassWithoutException("EnumDirection");
         //METHODS
         try {
             getCraftPlayerHandle = craftPlayerClass.getMethod("getHandle");

@@ -22,36 +22,49 @@
  * SOFTWARE.
  */
 
-package io.github.retrooper.packetevents.enums;
+package io.github.retrooper.packetevents.event;
 
-public enum Direction {
-    /**
-     * -Y offset
-     */
-    DOWN,
+import io.github.retrooper.packetevents.event.annotation.PacketHandler;
+import io.github.retrooper.packetevents.event.impl.*;
 
-    /**
-     * +Y offset
-     */
-    UP,
+public abstract class PacketListenerDynamic {
+    @PacketHandler
+    public void onPacketReceive(PacketReceiveEvent event) {
 
-    /**
-     * -Z offset
-     */
-    NORTH,
+    }
 
-    /**
-     * +Z offset
-     */
-    SOUTH,
+    @PacketHandler
+    public void onPacketSend(PacketSendEvent event) {
 
-    /**
-     * -X offset
-     */
-    WEST,
+    }
 
-    /**
-     * +X offset
-     */
-    EAST;
+    @PacketHandler
+    public void onPacketStatus(PacketStatusEvent event) {
+
+    }
+
+    @PacketHandler
+    public void onPacketLogin(PacketLoginEvent event) {
+
+    }
+
+    @PacketHandler
+    public void onPlayerInject(PlayerInjectEvent event) {
+
+    }
+
+    @PacketHandler
+    public void onPlayerEject(PlayerEjectEvent event) {
+
+    }
+
+    @PacketHandler
+    public void onPostPacketReceive(PostPacketReceiveEvent event) {
+
+    }
+
+    @PacketHandler
+    public void onPostPacketSend(PostPacketSendEvent event) {
+
+    }
 }

@@ -136,28 +136,25 @@ public class PacketManager {
     }
 
     public void ejectChannel(Object channel) {
-        if(!PacketEvents.getSettings().shouldEjectAsync()) {
-           ejectChannelSync(channel);
-        }
-        else {
+        if (!PacketEvents.getSettings().shouldEjectAsync()) {
+            ejectChannelSync(channel);
+        } else {
             ejectChannelAsync(channel);
         }
     }
 
     public void ejectChannelSync(Object channel) {
-        if(tinyProtocolMode) {
+        if (tinyProtocolMode) {
             tinyProtocol.ejectChannelSync(channel);
-        }
-        else {
+        } else {
             nettyProtocol.ejectChannelSync(channel);
         }
     }
 
     public void ejectChannelAsync(Object channel) {
-        if(tinyProtocolMode) {
+        if (tinyProtocolMode) {
             tinyProtocol.ejectChannelAsync(channel);
-        }
-        else {
+        } else {
             nettyProtocol.ejectChannelAsync(channel);
         }
     }
@@ -172,7 +169,7 @@ public class PacketManager {
 
     public boolean canInject(Player player) {
         Object channel = NMSUtils.getChannel(player);
-        if(channel == null) {
+        if (channel == null) {
             return true;
         }
         return !queuedEjectionChannels.contains(channel);
@@ -183,70 +180,65 @@ public class PacketManager {
     }
 
     public Object read(Player player, Object channel, Object packet) {
-        switch (ClassUtil.getClassSimpleName(packet.getClass())) {
-            case "PacketHandshakingInSetProtocol":
-            case "PacketLoginInCustomPayload":
-            case "PacketLoginInStart":
-            case "PacketLoginInEncryptionBegin":
-                final PacketLoginEvent packetLoginEvent = new PacketLoginEvent(channel, packet);
-                PacketEvents.getAPI().getEventManager().callEvent(packetLoginEvent);
-                interceptLogin(packetLoginEvent);
-                if (packetLoginEvent.isCancelled()) {
-                    packet = null;
-                }
-                break;
-            case "PacketStatusInPing":
+        if (player == null) {
+            String simpleClassName = ClassUtil.getClassSimpleName(packet.getClass());
+            //Status packet
+            if (simpleClassName.startsWith("PacketS")) {
                 final PacketStatusEvent packetStatusEvent = new PacketStatusEvent(channel, packet);
                 PacketEvents.getAPI().getEventManager().callEvent(packetStatusEvent);
                 interceptStatus(packetStatusEvent);
                 if (packetStatusEvent.isCancelled()) {
                     packet = null;
                 }
-                break;
-            default:
-                final PacketReceiveEvent packetReceiveEvent = new PacketReceiveEvent(player, packet);
-                PacketEvents.getAPI().getEventManager().callEvent(packetReceiveEvent);
-                interceptRead(packetReceiveEvent);
-                if (packetReceiveEvent.isCancelled()) {
+            } else {
+                //Login packet
+                final PacketLoginEvent packetLoginEvent = new PacketLoginEvent(channel, packet);
+                PacketEvents.getAPI().getEventManager().callEvent(packetLoginEvent);
+                interceptLogin(packetLoginEvent);
+                if (packetLoginEvent.isCancelled()) {
                     packet = null;
                 }
-                break;
+            }
+        } else {
+            final PacketReceiveEvent packetReceiveEvent = new PacketReceiveEvent(player, packet);
+            PacketEvents.getAPI().getEventManager().callEvent(packetReceiveEvent);
+            interceptRead(packetReceiveEvent);
+            if (packetReceiveEvent.isCancelled()) {
+                packet = null;
+            }
         }
         return packet;
     }
 
     public Object write(Player player, Object channel, Object packet) {
-        switch (ClassUtil.getClassSimpleName(packet.getClass())) {
-            case "PacketLoginOutDisconnect":
-            case "PacketLoginOutEncryptionBegin":
-            case "PacketLoginOutSetCompression":
-            case "PacketLoginOutSuccess":
-                final PacketLoginEvent packetLoginEvent = new PacketLoginEvent(channel, packet);
-                PacketEvents.getAPI().getEventManager().callEvent(packetLoginEvent);
-                interceptLogin(packetLoginEvent);
-                if (packetLoginEvent.isCancelled()) {
-                    packet = null;
-                }
-                break;
-            case "PacketStatusOutPong":
-            case "PacketStatusOutServerInfo":
+        if (player == null) {
+            String simpleClassName = ClassUtil.getClassSimpleName(packet.getClass());
+            //Status packet
+            if (simpleClassName.startsWith("PacketS")) {
                 final PacketStatusEvent packetStatusEvent = new PacketStatusEvent(channel, packet);
                 PacketEvents.getAPI().getEventManager().callEvent(packetStatusEvent);
                 interceptStatus(packetStatusEvent);
                 if (packetStatusEvent.isCancelled()) {
                     packet = null;
                 }
-                break;
-            default:
-                final PacketSendEvent packetSendEvent = new PacketSendEvent(player, packet);
-                PacketEvents.getAPI().getEventManager().callEvent(packetSendEvent);
-                interceptWrite(packetSendEvent);
-                if (packetSendEvent.isCancelled()) {
+            }
+            //Login packet
+            else {
+                final PacketLoginEvent packetLoginEvent = new PacketLoginEvent(channel, packet);
+                PacketEvents.getAPI().getEventManager().callEvent(packetLoginEvent);
+                interceptLogin(packetLoginEvent);
+                if (packetLoginEvent.isCancelled()) {
                     packet = null;
                 }
-                break;
+            }
+        } else {
+            final PacketSendEvent packetSendEvent = new PacketSendEvent(player, packet);
+            PacketEvents.getAPI().getEventManager().callEvent(packetSendEvent);
+            interceptWrite(packetSendEvent);
+            if (packetSendEvent.isCancelled()) {
+                packet = null;
+            }
         }
-
         return packet;
     }
 

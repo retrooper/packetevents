@@ -65,31 +65,18 @@ import java.util.Map;
 public class WrappedPacket implements WrapperPacketReader, WrapperPacketWriter {
     private static final Map<Class<?>, Map<Class<?>, Field[]>> fieldCache = new HashMap<>();
     public static ServerVersion version;
-    protected final Player player;
     protected Object packet;
     private Class<?> packetClass;
 
     public WrappedPacket() {
-        this.player = null;
+
     }
 
     public WrappedPacket(final Object packet) {
         this(packet, packet.getClass());
     }
 
-    public WrappedPacket(final Object packet, final Class<?> packetClass) {
-        this(null, packet, packetClass);
-    }
-
-    public WrappedPacket(final Player player, final Object packet) {
-        this(player, packet, packet.getClass());
-    }
-
-    public WrappedPacket(final Player player, final Object packet, Class<?> packetClass) {
-        if (packet == null) {
-            this.player = null;
-            return;
-        }
+    public WrappedPacket(final Object packet, Class<?> packetClass) {
         if (packet.getClass().getSuperclass().equals(PacketTypeClasses.Client.FLYING)) {
             packetClass = PacketTypeClasses.Client.FLYING;
         } else if (packet.getClass().getSuperclass().equals(PacketTypeClasses.Server.ENTITY)) {
@@ -189,7 +176,6 @@ public class WrappedPacket implements WrapperPacketReader, WrapperPacketWriter {
             }
             fieldCache.put(packetClass, map);
         }
-        this.player = player;
         this.packet = packet;
         setup();
     }

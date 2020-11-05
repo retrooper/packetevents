@@ -28,8 +28,11 @@ import io.github.retrooper.packetevents.enums.Direction;
 import io.github.retrooper.packetevents.packettype.PacketTypeClasses;
 import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
 import io.github.retrooper.packetevents.utils.nms.NMSUtils;
+import io.github.retrooper.packetevents.utils.reflection.Reflection;
 import io.github.retrooper.packetevents.utils.reflection.SubclassUtil;
 import io.github.retrooper.packetevents.utils.server.ServerVersion;
+
+import java.lang.reflect.InvocationTargetException;
 
 public final class WrappedPacketInBlockDig extends WrappedPacket {
     private static Class<?> blockDigClass, blockPositionClass, enumDirectionClass, digTypeClass;
@@ -75,8 +78,12 @@ public final class WrappedPacketInBlockDig extends WrappedPacket {
             if(blockPosObj == null) {
                 blockPosObj = readObject(0, blockPositionClass);
             }
-            WrappedPacket blockPosWrapper = new WrappedPacket(blockPosObj);
-            return blockPosWrapper.readInt(0);
+            try {
+                return (int) Reflection.getMethod(blockPosObj.getClass().getSuperclass(), "getX", 0).invoke(blockPosObj);
+            } catch (IllegalAccessException | InvocationTargetException e) {
+                e.printStackTrace();
+            }
+            return -1;
         }
     }
 
@@ -92,8 +99,12 @@ public final class WrappedPacketInBlockDig extends WrappedPacket {
             if(blockPosObj == null) {
                 blockPosObj = readObject(0, blockPositionClass);
             }
-            WrappedPacket blockPosWrapper = new WrappedPacket(blockPosObj);
-            return blockPosWrapper.readInt(1);
+            try {
+                return (int) Reflection.getMethod(blockPosObj.getClass().getSuperclass(), "getY", 0).invoke(blockPosObj);
+            } catch (IllegalAccessException | InvocationTargetException e) {
+                e.printStackTrace();
+            }
+            return -1;
         }
     }
 
@@ -109,19 +120,22 @@ public final class WrappedPacketInBlockDig extends WrappedPacket {
             if(blockPosObj == null) {
                 blockPosObj = readObject(0, blockPositionClass);
             }
-            WrappedPacket blockPosWrapper = new WrappedPacket(blockPosObj);
-            return blockPosWrapper.readInt(2);
+            try {
+                return (int) Reflection.getMethod(blockPosObj.getClass().getSuperclass(), "getZ", 0).invoke(blockPosObj);
+            } catch (IllegalAccessException | InvocationTargetException e) {
+                e.printStackTrace();
+            }
+            return -1;
         }
     }
 
     /**
-     * Get the direction
-     * Is Direction.NULL on 1.7.10 FOR NOW
+     * Get the direction / Get the face.
      * @return Direction
      */
     public Direction getDirection() {
         if(isVersionLowerThan_v_1_8) {
-            return Direction.NULL;
+            return Direction.values()[readInt(3)];
         }
         else {
             if(enumDirObj == null) {
