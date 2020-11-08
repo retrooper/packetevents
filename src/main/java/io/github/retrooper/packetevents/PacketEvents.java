@@ -139,12 +139,7 @@ public final class PacketEvents implements Listener {
             }
 
             if (settings.shouldCheckForUpdates()) {
-                Future<?> future = NettyPacketManager.executorService.submit(new Runnable() {
-                    @Override
-                    public void run() {
-                        new UpdateChecker().handleUpdate();
-                    }
-                });
+                Future<?> future = NettyPacketManager.executorService.submit(() -> new UpdateChecker().handleUpdate());
             }
 
             if (getAPI().getServerUtils().isBungeeCordEnabled()) {

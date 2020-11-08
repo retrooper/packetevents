@@ -51,7 +51,6 @@ public class PacketManager {
     public final TinyProtocol tinyProtocol;
     public final NettyPacketManager nettyProtocol;
     private final HashMap<UUID, Long> keepAliveMap = new HashMap<>();
-    public final ConcurrentLinkedQueue<Object> queuedEjectionChannels = new ConcurrentLinkedQueue<>();
 
     public PacketManager(Plugin plugin, boolean tinyProtocolMode) {
         this.plugin = plugin;
@@ -71,10 +70,6 @@ public class PacketManager {
         } else {
             injectPlayerSync(player);
         }
-    }
-
-    public void schedulePlayerEjection(Player player) {
-        queuedEjectionChannels.add(NMSUtils.getChannel(player));
     }
 
     public void ejectPlayer(Player player) {
@@ -168,11 +163,7 @@ public class PacketManager {
     }
 
     public boolean canInject(Player player) {
-        Object channel = NMSUtils.getChannel(player);
-        if (channel == null) {
-            return true;
-        }
-        return !queuedEjectionChannels.contains(channel);
+       return true;
     }
 
     public String getNettyHandlerName() {

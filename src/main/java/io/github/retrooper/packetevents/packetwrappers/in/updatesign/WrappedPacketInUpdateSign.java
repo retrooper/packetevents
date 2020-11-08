@@ -117,7 +117,7 @@ public class WrappedPacketInUpdateSign extends WrappedPacket {
             return readStringArray(0);
         } else {
             //1.8 uses this for example
-            Object[] iChatComponents = readObjectArray(0, iChatBaseComponentClass);
+            Object[] iChatComponents = (Object[]) readAnyObject(1);
             String[] lines = new String[iChatComponents.length];
             for (int i = 0; i < iChatComponents.length; i++) {
                 lines[i] = WrappedPacketOutChat.
