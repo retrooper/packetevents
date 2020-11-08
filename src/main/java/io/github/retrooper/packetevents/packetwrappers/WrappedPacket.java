@@ -47,6 +47,7 @@ import io.github.retrooper.packetevents.packetwrappers.out.entityvelocity.Wrappe
 import io.github.retrooper.packetevents.packetwrappers.out.experience.WrappedPacketOutExperience;
 import io.github.retrooper.packetevents.packetwrappers.out.explosion.WrappedPacketOutExplosion;
 import io.github.retrooper.packetevents.packetwrappers.out.gamestatechange.WrappedPacketOutGameStateChange;
+import io.github.retrooper.packetevents.packetwrappers.out.helditemslot.WrappedPacketOutHeldItemSlot;
 import io.github.retrooper.packetevents.packetwrappers.out.keepalive.WrappedPacketOutKeepAlive;
 import io.github.retrooper.packetevents.packetwrappers.out.kickdisconnect.WrappedPacketOutKickDisconnect;
 import io.github.retrooper.packetevents.packetwrappers.out.position.WrappedPacketOutPosition;
@@ -54,7 +55,6 @@ import io.github.retrooper.packetevents.packetwrappers.out.transaction.WrappedPa
 import io.github.retrooper.packetevents.packetwrappers.out.updatehealth.WrappedPacketOutUpdateHealth;
 import io.github.retrooper.packetevents.utils.reflection.ClassUtil;
 import io.github.retrooper.packetevents.utils.server.ServerVersion;
-import org.bukkit.entity.Player;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
@@ -65,31 +65,18 @@ import java.util.Map;
 public class WrappedPacket implements WrapperPacketReader, WrapperPacketWriter {
     private static final Map<Class<?>, Map<Class<?>, Field[]>> fieldCache = new HashMap<>();
     public static ServerVersion version;
-    protected final Player player;
     protected Object packet;
     private Class<?> packetClass;
 
     public WrappedPacket() {
-        this.player = null;
+
     }
 
     public WrappedPacket(final Object packet) {
         this(packet, packet.getClass());
     }
 
-    public WrappedPacket(final Object packet, final Class<?> packetClass) {
-        this(null, packet, packetClass);
-    }
-
-    public WrappedPacket(final Player player, final Object packet) {
-        this(player, packet, packet.getClass());
-    }
-
-    public WrappedPacket(final Player player, final Object packet, Class<?> packetClass) {
-        if (packet == null) {
-            this.player = null;
-            return;
-        }
+    public WrappedPacket(final Object packet, Class<?> packetClass) {
         if (packet.getClass().getSuperclass().equals(PacketTypeClasses.Client.FLYING)) {
             packetClass = PacketTypeClasses.Client.FLYING;
         } else if (packet.getClass().getSuperclass().equals(PacketTypeClasses.Server.ENTITY)) {
@@ -106,20 +93,33 @@ public class WrappedPacket implements WrapperPacketReader, WrapperPacketWriter {
             List<Field> boolFields = getFields(boolean.class, declaredFields);
             List<Field> byteFields = getFields(byte.class, declaredFields);
             List<Field> shortFields = getFields(short.class, declaredFields);
-            List<Field> intFields = getFields(int.class, declaredFields);;
-            List<Field> longFields = getFields(long.class, declaredFields);;
-            List<Field> floatFields = getFields(float.class, declaredFields);;
-            List<Field> doubleFields = getFields(double.class, declaredFields);;
-            List<Field> stringFields = getFields(String.class, declaredFields);;
+            List<Field> intFields = getFields(int.class, declaredFields);
+            ;
+            List<Field> longFields = getFields(long.class, declaredFields);
+            ;
+            List<Field> floatFields = getFields(float.class, declaredFields);
+            ;
+            List<Field> doubleFields = getFields(double.class, declaredFields);
+            ;
+            List<Field> stringFields = getFields(String.class, declaredFields);
+            ;
 
-            List<Field> boolArrayFields = getFields(boolean[].class, declaredFields);;
-            List<Field> byteArrayFields = getFields(byte[].class, declaredFields);;
-            List<Field> shortArrayFields = getFields(short[].class, declaredFields);;
-            List<Field> intArrayFields = getFields(int[].class, declaredFields);;
-            List<Field> longArrayFields = getFields(long[].class, declaredFields);;
-            List<Field> floatArrayFields = getFields(float[].class, declaredFields);;
-            List<Field> doubleArrayFields = getFields(double[].class, declaredFields);;
-            List<Field> stringArrayFields = getFields(String[].class, declaredFields);;
+            List<Field> boolArrayFields = getFields(boolean[].class, declaredFields);
+            ;
+            List<Field> byteArrayFields = getFields(byte[].class, declaredFields);
+            ;
+            List<Field> shortArrayFields = getFields(short[].class, declaredFields);
+            ;
+            List<Field> intArrayFields = getFields(int[].class, declaredFields);
+            ;
+            List<Field> longArrayFields = getFields(long[].class, declaredFields);
+            ;
+            List<Field> floatArrayFields = getFields(float[].class, declaredFields);
+            ;
+            List<Field> doubleArrayFields = getFields(double[].class, declaredFields);
+            ;
+            List<Field> stringArrayFields = getFields(String[].class, declaredFields);
+            ;
 
             Field[] tmp = new Field[0];
 
@@ -189,7 +189,6 @@ public class WrappedPacket implements WrapperPacketReader, WrapperPacketWriter {
             }
             fieldCache.put(packetClass, map);
         }
-        this.player = player;
         this.packet = packet;
         setup();
     }
@@ -224,6 +223,7 @@ public class WrappedPacket implements WrapperPacketReader, WrapperPacketWriter {
         WrappedPacketOutExplosion.load();
         WrappedPacketOutEntityStatus.load();
         WrappedPacketOutExperience.load();
+        WrappedPacketOutHeldItemSlot.load();
     }
 
     protected void setup() {
@@ -468,7 +468,7 @@ public class WrappedPacket implements WrapperPacketReader, WrapperPacketWriter {
 
     @Override
     public String readString(int index) {
-       return (String) read(String.class, index);
+        return (String) read(String.class, index);
     }
 
     public Object readAnyObject(int index) {
@@ -513,7 +513,14 @@ public class WrappedPacket implements WrapperPacketReader, WrapperPacketWriter {
     }
 
     public Object[] readObjectArray(int index, Class<?> type) {
-        return (Object[]) readObject(index, type);
+        if (type.equals(String.class)) {
+            return readStringArray(index);
+        }
+        try {
+            return (Object[]) readObject(index, getArrayClass(type));
+        } catch (ClassNotFoundException e) {
+            throw new IllegalStateException("PacketEvents failed to find the array class of type " + type.getName());
+        }
     }
 
     @Override
@@ -558,7 +565,7 @@ public class WrappedPacket implements WrapperPacketReader, WrapperPacketWriter {
 
     private void write(Class<?> type, int index, Object value) throws WrapperFieldNotFoundException {
         Field field = getField(type, index);
-        if(field == null) {
+        if (field == null) {
             throw new WrapperFieldNotFoundException(packetClass, type, index);
         }
         try {
@@ -570,7 +577,7 @@ public class WrappedPacket implements WrapperPacketReader, WrapperPacketWriter {
 
     private Object read(Class<?> type, int index) throws WrapperFieldNotFoundException {
         Field field = getField(type, index);
-        if(field == null) {
+        if (field == null) {
             throw new WrapperFieldNotFoundException(packetClass, type, index);
         }
         try {
@@ -595,8 +602,8 @@ public class WrappedPacket implements WrapperPacketReader, WrapperPacketWriter {
 
     private List<Field> getFields(Class<?> type, Field[] fields) {
         List<Field> ret = null;
-        for(Field field : fields) {
-            if(field.getType() == type) {
+        for (Field field : fields) {
+            if (field.getType() == type) {
                 if (ret == null) {
                     ret = new ArrayList<>();
                 }
@@ -606,4 +613,32 @@ public class WrappedPacket implements WrapperPacketReader, WrapperPacketWriter {
         return ret;
     }
 
+    private Class<?> getArrayClass(Class<?> componentType) throws ClassNotFoundException {
+        ClassLoader classLoader = componentType.getClassLoader();
+        String name;
+        if (componentType.isArray()) {
+            // just add a leading "["
+            name = "[" + componentType.getName();
+        } else if (componentType == boolean.class) {
+            name = "[Z";
+        } else if (componentType == byte.class) {
+            name = "[B";
+        } else if (componentType == char.class) {
+            name = "[C";
+        } else if (componentType == double.class) {
+            name = "[D";
+        } else if (componentType == float.class) {
+            name = "[F";
+        } else if (componentType == int.class) {
+            name = "[I";
+        } else if (componentType == long.class) {
+            name = "[J";
+        } else if (componentType == short.class) {
+            name = "[S";
+        } else {
+            // must be an object non-array class
+            name = "[L" + componentType.getName() + ";";
+        }
+        return classLoader != null ? classLoader.loadClass(name) : Class.forName(name);
+    }
 }

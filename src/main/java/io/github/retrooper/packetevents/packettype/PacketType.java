@@ -30,9 +30,10 @@ import java.util.Map;
 public class PacketType {
     public static class Status {
         public static final Map<Class<?>, Byte> packetIds = new HashMap<>();
-        public static final byte PING = 0, PONG = 1, SERVER_INFO = 2;
+        public static final byte IN_START = 0, PING = 1, PONG = 2, SERVER_INFO = 3;
 
         public static void init() {
+            packetIds.put(PacketTypeClasses.Status.IN_START, IN_START);
             packetIds.put(PacketTypeClasses.Status.PING, PING);
             packetIds.put(PacketTypeClasses.Status.PONG, PONG);
             packetIds.put(PacketTypeClasses.Status.SERVER_INFO, SERVER_INFO);

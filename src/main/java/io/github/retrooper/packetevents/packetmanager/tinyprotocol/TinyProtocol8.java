@@ -1,21 +1,3 @@
-/*
- * This file is part of Hawk Anticheat.
- * Copyright (C) 2018 Hawk Development Team
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <https://www.gnu.org/licenses/>.
- */
-
 package io.github.retrooper.packetevents.packetmanager.tinyprotocol;
 
 import com.google.common.collect.Lists;
@@ -28,12 +10,13 @@ import io.github.retrooper.packetevents.packetmanager.tinyprotocol.Reflection.Me
 import io.netty.channel.*;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
-import org.bukkit.event.HandlerList;
-import org.bukkit.event.Listener;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.NoSuchElementException;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Level;
 
@@ -61,14 +44,21 @@ public class TinyProtocol8 {
     private static final Class<Object> serverConnectionClass = Reflection.getUntypedClass("{nms}.ServerConnection");
     private static final FieldAccessor<Object> getMinecraftServer = Reflection.getField("{obc}.CraftServer", minecraftServerClass, 0);
     private static final FieldAccessor<Object> getServerConnection = Reflection.getField(minecraftServerClass, serverConnectionClass, 0);
-    private static final MethodInvoker getNetworkMarkers = Reflection.getTypedMethod(serverConnectionClass, null, List.class, serverConnectionClass);
+    private static final MethodInvoker getNetworkMarkers;
 
     // Packets we have to intercept
     private static final Class<?> PACKET_LOGIN_IN_START = Reflection.getMinecraftClass("PacketLoginInStart");
-    private static final Class<?> PACKET_HANDSHAKING_IN_SET_PROTOCOL = Reflection.getMinecraftClass("PacketHandshakingInSetProtocol");
     private static final FieldAccessor<GameProfile> getGameProfile = Reflection.getField(PACKET_LOGIN_IN_START, GameProfile.class, 0);
-    private static final FieldAccessor<Integer> protocolId = Reflection.getField(PACKET_HANDSHAKING_IN_SET_PROTOCOL, int.class, 0);
-    private static final FieldAccessor<Enum> protocolType = Reflection.getField(PACKET_HANDSHAKING_IN_SET_PROTOCOL, Enum.class, 0);
+
+    static {
+        MethodInvoker tempNetworkMarkers;
+        try {
+            tempNetworkMarkers = Reflection.getTypedMethod(serverConnectionClass, null, List.class, serverConnectionClass);
+        } catch (Exception ex) {
+            tempNetworkMarkers = null;
+        }
+        getNetworkMarkers = tempNetworkMarkers;
+    }
 
     // Speedup channel/protocol lookup
     private final Map<String, Channel> channelLookup = new MapMaker().weakValues().makeMap();
@@ -134,7 +124,7 @@ public class TinyProtocol8 {
                         }
                     }
                 } catch (Exception e) {
-                    plugin.getLogger().log(Level.SEVERE, "Cannot inject incomming channel " + channel, e);
+                    plugin.getLogger().log(Level.SEVERE, "Cannot inject incoming channel " + channel, e);
                 }
             }
 
@@ -175,7 +165,11 @@ public class TinyProtocol8 {
         boolean looking = true;
 
         // We need to synchronize against this list
-        networkManagers = (List<Object>) getNetworkMarkers.invoke(null, serverConnection);
+        if(getNetworkMarkers != null) {
+        networkManagers = (List<Object>) getNetworkMarkers.invoke(null, serverConnection);}
+        else {
+            networkManagers = new ArrayList<>();
+        }
         createServerChannelHandler();
 
         // Find the correct list, or implicitly throw an exception
@@ -376,7 +370,7 @@ public class TinyProtocol8 {
             if (interceptor == null) {
                 interceptor = new PacketInterceptor();
                 final PacketInterceptor pi = interceptor;
-                NettyPacketManager.executorService.execute(new Runnable() {
+                PacketEvents.packetHandlingExecutorService.execute(new Runnable() {
                     @Override
                     public void run() {
                         channel.pipeline().addBefore("packet_handler", handlerName, pi);
@@ -426,12 +420,13 @@ public class TinyProtocol8 {
     }
 
     public void ejectChannelSync(Object ch) {
-        uninjectChannel((Channel)ch);
+        uninjectChannel((Channel) ch);
     }
 
     public void ejectChannelAsync(Object ch) {
-        uninjectChannelAsync((Channel)ch);
+        uninjectChannelAsync((Channel) ch);
     }
+
     /**
      * Uninject a specific channel.
      * <p>
@@ -446,7 +441,7 @@ public class TinyProtocol8 {
 
     public void uninjectChannelAsync(Channel channel) {
         // See ChannelInjector in ProtocolLib, line 590
-        NettyPacketManager.executorService.execute(new Runnable() {
+        PacketEvents.packetHandlingExecutorService.execute(new Runnable() {
             @Override
             public void run() {
                 channel.pipeline().remove(handlerName);

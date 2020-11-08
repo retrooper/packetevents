@@ -26,20 +26,84 @@ package io.github.retrooper.packetevents.packetwrappers.in.blockplace;
 
 
 import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
-import io.github.retrooper.packetevents.utils.BlockIteratorUtils;
-import org.bukkit.block.Block;
-import org.bukkit.entity.Player;
+import io.github.retrooper.packetevents.utils.nms.NMSUtils;
+import io.github.retrooper.packetevents.utils.reflection.Reflection;
+
+import java.lang.reflect.InvocationTargetException;
 
 final class WrappedPacketInBlockPlace_1_9 extends WrappedPacket {
-    public WrappedPacketInBlockPlace_1_9(final Player player, final Object packet) {
-        super(player, packet);
+    private Object blockPosObj;
+    private static Class<?> movingObjectPositionBlockClass;
+
+    public static void load() {
+        movingObjectPositionBlockClass = NMSUtils.getNMSClassWithoutException("MovingObjectPositionBlock");
     }
 
-    public Player getPlayer() {
-        return this.player;
+    public WrappedPacketInBlockPlace_1_9(final Object packet) {
+        super(packet);
     }
 
-    public Block getBlock() {
-        return BlockIteratorUtils.getBlockLookingAt(getPlayer(),3);
+    public int getX() {
+        if (blockPosObj == null) {
+            if (movingObjectPositionBlockClass == null) {
+                blockPosObj = readObject(0, NMSUtils.blockPosClass);
+            } else {
+                Object movingObjectPos = readObject(0, movingObjectPositionBlockClass);
+                WrappedPacket movingObjectPosWrapper = new WrappedPacket(movingObjectPos);
+                blockPosObj = movingObjectPosWrapper.readObject(0, NMSUtils.blockPosClass);
+            }
+        }
+        try {
+            return (int) Reflection.getMethod(blockPosObj.getClass().getSuperclass(), "getX", 0).invoke(blockPosObj);
+        } catch (IllegalAccessException | InvocationTargetException e) {
+            e.printStackTrace();
+        }
+        return -1;
+    }
+
+    public int getY() {
+        if (blockPosObj == null) {
+            if (movingObjectPositionBlockClass == null) {
+                blockPosObj = readObject(0, NMSUtils.blockPosClass);
+            } else {
+                Object movingObjectPos = readObject(0, movingObjectPositionBlockClass);
+                WrappedPacket movingObjectPosWrapper = new WrappedPacket(movingObjectPos);
+                blockPosObj = movingObjectPosWrapper.readObject(0, NMSUtils.blockPosClass);
+            }
+        }
+        try {
+            return (int) Reflection.getMethod(blockPosObj.getClass().getSuperclass(), "getY", 0).invoke(blockPosObj);
+        } catch (IllegalAccessException | InvocationTargetException e) {
+            e.printStackTrace();
+        }
+        return -1;
+    }
+
+    public int getZ() {
+        if (blockPosObj == null) {
+            if (movingObjectPositionBlockClass == null) {
+                blockPosObj = readObject(0, NMSUtils.blockPosClass);
+            } else {
+                Object movingObjectPos = readObject(0, movingObjectPositionBlockClass);
+                WrappedPacket movingObjectPosWrapper = new WrappedPacket(movingObjectPos);
+                blockPosObj = movingObjectPosWrapper.readObject(0, NMSUtils.blockPosClass);
+            }
+        }
+        try {
+            return (int) Reflection.getMethod(blockPosObj.getClass().getSuperclass(), "getZ", 0).invoke(blockPosObj);
+        } catch (IllegalAccessException | InvocationTargetException e) {
+            e.printStackTrace();
+        }
+        return -1;
+    }
+
+    public Object getEnumDirectionObject() {
+        if (movingObjectPositionBlockClass == null) {
+            return readObject(0, NMSUtils.enumDirectionClass);
+        } else {
+            Object movingObjectPos = readObject(0, movingObjectPositionBlockClass);
+            WrappedPacket movingObjectPosWrapper = new WrappedPacket(movingObjectPos);
+            return movingObjectPosWrapper.readObject(0, NMSUtils.enumDirectionClass);
+        }
     }
 }

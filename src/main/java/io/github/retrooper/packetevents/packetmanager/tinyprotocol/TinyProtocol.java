@@ -24,7 +24,6 @@
 
 package io.github.retrooper.packetevents.packetmanager.tinyprotocol;
 
-import io.github.retrooper.packetevents.PacketEvents;
 import io.github.retrooper.packetevents.packetmanager.netty.NettyPacketManager;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;

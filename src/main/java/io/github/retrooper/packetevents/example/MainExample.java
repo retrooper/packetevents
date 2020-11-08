@@ -28,10 +28,13 @@ import io.github.retrooper.packetevents.PacketEvents;
 import io.github.retrooper.packetevents.event.PacketListener;
 import io.github.retrooper.packetevents.event.annotation.PacketHandler;
 import io.github.retrooper.packetevents.event.impl.PacketReceiveEvent;
+import io.github.retrooper.packetevents.event.impl.PlayerEjectEvent;
+import io.github.retrooper.packetevents.event.impl.PlayerInjectEvent;
 import io.github.retrooper.packetevents.packettype.PacketType;
 import io.github.retrooper.packetevents.packetwrappers.in.chat.WrappedPacketInChat;
-import io.github.retrooper.packetevents.utils.player.ClientVersion;
+import io.github.retrooper.packetevents.packetwrappers.out.helditemslot.WrappedPacketOutHeldItemSlot;
 import io.github.retrooper.packetevents.utils.server.ServerVersion;
+import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
 
 public class MainExample extends JavaPlugin implements PacketListener {
@@ -43,10 +46,15 @@ public class MainExample extends JavaPlugin implements PacketListener {
 
     @Override
     public void onEnable() {
-        PacketEvents.getSettings().injectAsync(true).ejectAsync(true)
-                .backupServerVersion(ServerVersion.v_1_7_10).
-                useProtocolLibIfAvailable(true).checkForUpdates(true).injectEarly(true);
+        PacketEvents.getSettings().injectAsync(true).ejectAsync(true).
+                backupServerVersion(ServerVersion.v_1_7_10).useProtocolLibIfAvailable(true).
+                checkForUpdates(true).injectEarly(true).packetHandlingThreadCount(1);
         PacketEvents.getAPI().getEventManager().registerListener(this);
         PacketEvents.init(this);
+    }
+
+    @Override
+    public void onDisable() {
+        PacketEvents.stop();
     }
 }

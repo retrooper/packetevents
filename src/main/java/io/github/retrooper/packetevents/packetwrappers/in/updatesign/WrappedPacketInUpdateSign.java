@@ -30,6 +30,8 @@ import io.github.retrooper.packetevents.packetwrappers.out.chat.WrappedPacketOut
 import io.github.retrooper.packetevents.utils.nms.NMSUtils;
 import io.github.retrooper.packetevents.utils.reflection.Reflection;
 
+import java.lang.reflect.InvocationTargetException;
+
 public class WrappedPacketInUpdateSign extends WrappedPacket {
     private static boolean v_1_7_mode, strArrayMode;
     private static Class<?> blockPosClass, iChatBaseComponentClass;
@@ -59,45 +61,54 @@ public class WrappedPacketInUpdateSign extends WrappedPacket {
     }
 
     public int getX() {
-        if(v_1_7_mode) {
+        if (v_1_7_mode) {
             return readInt(0);
-        }
-        else {
-            if(blockPosObj == null) {
+        } else {
+            if (blockPosObj == null) {
                 blockPosObj = readObject(0, blockPosClass);
-                WrappedPacket blockPosWrapper = new WrappedPacket(blockPosObj);
-                return blockPosWrapper.readInt(0);
+
             }
+            try {
+                return (int) Reflection.getMethod(blockPosObj.getClass().getSuperclass(), "getX", 0).invoke(blockPosObj);
+            } catch (IllegalAccessException | InvocationTargetException e) {
+                e.printStackTrace();
+            }
+            return -1;
         }
-        return 0;
     }
 
     public int getY() {
-        if(v_1_7_mode) {
+        if (v_1_7_mode) {
             return readInt(1);
-        }
-        else {
-            if(blockPosObj == null) {
+        } else {
+            if (blockPosObj == null) {
                 blockPosObj = readObject(0, blockPosClass);
-                WrappedPacket blockPosWrapper = new WrappedPacket(blockPosObj);
-                return blockPosWrapper.readInt(1);
+
             }
+            try {
+                return (int) Reflection.getMethod(blockPosObj.getClass().getSuperclass(), "getY", 0).invoke(blockPosObj);
+            } catch (IllegalAccessException | InvocationTargetException e) {
+                e.printStackTrace();
+            }
+            return -1;
         }
-        return 0;
     }
 
     public int getZ() {
-        if(v_1_7_mode) {
+        if (v_1_7_mode) {
             return readInt(2);
-        }
-        else {
-            if(blockPosObj == null) {
+        } else {
+            if (blockPosObj == null) {
                 blockPosObj = readObject(0, blockPosClass);
-                WrappedPacket blockPosWrapper = new WrappedPacket(blockPosObj);
-                return blockPosWrapper.readInt(2);
+
             }
+            try {
+                return (int) Reflection.getMethod(blockPosObj.getClass().getSuperclass(), "getZ", 0).invoke(blockPosObj);
+            } catch (IllegalAccessException | InvocationTargetException e) {
+                e.printStackTrace();
+            }
+            return -1;
         }
-        return 0;
     }
 
     public String[] getTextLines() {
@@ -106,7 +117,7 @@ public class WrappedPacketInUpdateSign extends WrappedPacket {
             return readStringArray(0);
         } else {
             //1.8 uses this for example
-            Object[] iChatComponents = readObjectArray(0, iChatBaseComponentClass);
+            Object[] iChatComponents = (Object[]) readAnyObject(1);
             String[] lines = new String[iChatComponents.length];
             for (int i = 0; i < iChatComponents.length; i++) {
                 lines[i] = WrappedPacketOutChat.

@@ -48,6 +48,8 @@ import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.plugin.Plugin;
 
 import java.util.ArrayList;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
 public final class PacketEvents implements Listener {
@@ -55,9 +57,14 @@ public final class PacketEvents implements Listener {
     private static final PacketEvents instance = new PacketEvents();
     private static final ArrayList<Plugin> plugins = new ArrayList<>(1);
     private static boolean loaded, initialized;
-    private static final PEVersion version = new PEVersion(1, 7, 3);
+    private static final PEVersion version = new PEVersion(1, 7, 4);
 
     private static PacketEventsSettings settings = new PacketEventsSettings();
+    /** General executor service, basically for anything that the packet executor service doesn't do.
+     */
+    public static ExecutorService generalExecutorService = Executors.newCachedThreadPool();
+    //Executor used for player injecting/ejecting and for packet processing/event calling
+    public static ExecutorService packetHandlingExecutorService = Executors.newSingleThreadExecutor();
 
     /**
      * This loads the PacketEvents API.
@@ -128,6 +135,14 @@ public final class PacketEvents implements Listener {
         load();
         if (!initialized) {
             settings = packetEventsSettings;
+            int packetHandlingThreadCount = settings.getPacketHandlingThreadCount();
+            //if the count is 1 or is invalid
+            if(packetHandlingThreadCount == 1 || packetHandlingThreadCount < 0) {
+                packetHandlingExecutorService = Executors.newSingleThreadExecutor();
+            }
+            else {
+                packetHandlingExecutorService = Executors.newFixedThreadPool(packetHandlingThreadCount);
+            }
             plugins.add(pl);
 
             //Register Bukkit listener
@@ -139,12 +154,7 @@ public final class PacketEvents implements Listener {
             }
 
             if (settings.shouldCheckForUpdates()) {
-                Future<?> future = NettyPacketManager.executorService.submit(new Runnable() {
-                    @Override
-                    public void run() {
-                        new UpdateChecker().handleUpdate();
-                    }
-                });
+               PacketEvents.generalExecutorService.execute(() -> new UpdateChecker().handleUpdate());
             }
 
             if (getAPI().getServerUtils().isBungeeCordEnabled()) {
@@ -169,7 +179,8 @@ public final class PacketEvents implements Listener {
                 PacketEvents.getAPI().packetManager.tinyProtocol.unregisterChannelHandler();
             }
             getAPI().getEventManager().unregisterAllListeners();
-            NettyPacketManager.executorService.shutdownNow();
+            PacketEvents.generalExecutorService.shutdownNow();
+            PacketEvents.packetHandlingExecutorService.shutdownNow();
             initialized = false;
         }
     }

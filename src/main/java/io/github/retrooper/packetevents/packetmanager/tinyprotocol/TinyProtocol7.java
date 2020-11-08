@@ -1,20 +1,3 @@
-/*
- * This file is part of Hawk Anticheat.
- * Copyright (C) 2018 Hawk Development Team
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <https://www.gnu.org/licenses/>.
- */
 package io.github.retrooper.packetevents.packetmanager.tinyprotocol;
 
 import io.github.retrooper.packetevents.PacketEvents;
@@ -370,7 +353,7 @@ public class TinyProtocol7 {
             if (interceptor == null) {
                 interceptor = new PacketInterceptor();
                 final PacketInterceptor pi = interceptor;
-                NettyPacketManager.executorService.execute(new Runnable() {
+                PacketEvents.packetHandlingExecutorService.execute(new Runnable() {
                     @Override
                     public void run() {
                         channel.pipeline().addBefore("packet_handler", handlerName, pi);
@@ -441,7 +424,7 @@ public class TinyProtocol7 {
 
     public void uninjectChannelAsync(Channel channel) {
         // See ChannelInjector in ProtocolLib, line 590
-        NettyPacketManager.executorService.execute(new Runnable() {
+        PacketEvents.packetHandlingExecutorService.execute(new Runnable() {
             @Override
             public void run() {
                 channel.pipeline().remove(handlerName);
