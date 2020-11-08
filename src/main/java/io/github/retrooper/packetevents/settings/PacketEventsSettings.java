@@ -25,6 +25,7 @@
 package io.github.retrooper.packetevents.settings;
 
 import io.github.retrooper.packetevents.utils.server.ServerVersion;
+import net.minecraft.server.v1_8_R3.Packet;
 
 public class PacketEventsSettings {
     private ServerVersion backupServerVersion = ServerVersion.v_1_7_10;
@@ -33,6 +34,7 @@ public class PacketEventsSettings {
     private boolean useProtocolLibIfAvailable;
     private boolean checkForUpdates = true;
     private boolean injectEarly = true;
+    private int packetHandlingThreadCount = 1;
 
     public PacketEventsSettings backupServerVersion(ServerVersion serverVersion) {
         this.backupServerVersion = serverVersion;
@@ -66,6 +68,11 @@ public class PacketEventsSettings {
         return this;
     }
 
+    public PacketEventsSettings packetHandlingThreadCount(int threadCount) {
+        this.packetHandlingThreadCount = threadCount;
+        return this;
+    }
+
     public ServerVersion getBackupServerVersion() {
         return backupServerVersion;
     }
@@ -88,5 +95,9 @@ public class PacketEventsSettings {
 
     public boolean shouldInjectEarly() {
         return injectEarly;
+    }
+
+    public int getPacketHandlingThreadCount() {
+        return packetHandlingThreadCount;
     }
 }

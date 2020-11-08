@@ -46,9 +46,9 @@ public class MainExample extends JavaPlugin implements PacketListener {
 
     @Override
     public void onEnable() {
-        PacketEvents.getSettings().injectAsync(true).ejectAsync(true)
-                .backupServerVersion(ServerVersion.v_1_7_10).
-                useProtocolLibIfAvailable(true).checkForUpdates(true).injectEarly(true);
+        PacketEvents.getSettings().injectAsync(true).ejectAsync(true).
+                backupServerVersion(ServerVersion.v_1_7_10).useProtocolLibIfAvailable(true).
+                checkForUpdates(true).injectEarly(true).packetHandlingThreadCount(1);
         PacketEvents.getAPI().getEventManager().registerListener(this);
         PacketEvents.init(this);
     }

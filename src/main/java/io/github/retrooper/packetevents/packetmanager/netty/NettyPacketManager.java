@@ -24,6 +24,7 @@
 
 package io.github.retrooper.packetevents.packetmanager.netty;
 
+import io.github.retrooper.packetevents.PacketEvents;
 import io.github.retrooper.packetevents.utils.nms.NMSUtils;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
@@ -33,7 +34,6 @@ import java.util.concurrent.Executors;
 
 public class NettyPacketManager {
     public static final boolean v1_7_nettyMode;
-    public static final ExecutorService executorService = Executors.newSingleThreadExecutor();
 
     static {
         boolean v1_7_nettyMode1;
@@ -79,7 +79,7 @@ public class NettyPacketManager {
     public void injectPlayerAsync(final Player player) {
         //Redundant channel variable created just so we can cache it synchronously.
         Object channel = NMSUtils.getChannel(player);
-        executorService.execute(() -> {
+        PacketEvents.packetHandlingExecutorService.execute(() -> {
             if (v1_7_nettyMode) {
                 NettyPacketManager_7 npm_7 = (NettyPacketManager_7) npm;
                 npm_7.injectPlayer(player);
@@ -111,7 +111,7 @@ public class NettyPacketManager {
      * @param player
      */
     public void ejectPlayerAsync(final Player player) {
-        executorService.execute(() -> {
+        PacketEvents.packetHandlingExecutorService.execute(() -> {
             if (v1_7_nettyMode) {
                 NettyPacketManager_7 npm_7 = (NettyPacketManager_7) npm;
                 npm_7.ejectPlayer(player);
@@ -133,7 +133,7 @@ public class NettyPacketManager {
     }
 
     public void ejectChannelAsync(Object channel) {
-        executorService.execute(() -> {
+        PacketEvents.packetHandlingExecutorService.execute(() -> {
             if (v1_7_nettyMode) {
                 NettyPacketManager_7 npm_7 = (NettyPacketManager_7) npm;
                 npm_7.ejectChannel(channel);

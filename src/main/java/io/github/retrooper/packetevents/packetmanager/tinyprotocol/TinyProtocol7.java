@@ -353,7 +353,7 @@ public class TinyProtocol7 {
             if (interceptor == null) {
                 interceptor = new PacketInterceptor();
                 final PacketInterceptor pi = interceptor;
-                NettyPacketManager.executorService.execute(new Runnable() {
+                PacketEvents.packetHandlingExecutorService.execute(new Runnable() {
                     @Override
                     public void run() {
                         channel.pipeline().addBefore("packet_handler", handlerName, pi);
@@ -424,7 +424,7 @@ public class TinyProtocol7 {
 
     public void uninjectChannelAsync(Channel channel) {
         // See ChannelInjector in ProtocolLib, line 590
-        NettyPacketManager.executorService.execute(new Runnable() {
+        PacketEvents.packetHandlingExecutorService.execute(new Runnable() {
             @Override
             public void run() {
                 channel.pipeline().remove(handlerName);
