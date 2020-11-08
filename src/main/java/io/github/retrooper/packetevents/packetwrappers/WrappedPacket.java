@@ -491,7 +491,8 @@ public class WrappedPacket implements WrapperPacketReader, WrapperPacketWriter {
     public Object readObject(int index, Class<?> type) {
         Map<Class<?>, Field[]> cached = fieldCache.get(packetClass);
         if (cached != null) {
-            if (!cached.containsKey(type)) {
+            Field[] cachedFields = cached.get(type);
+            if (cachedFields == null) {
                 List<Field> typeFields = new ArrayList<>();
                 for (Field f : packetClass.getDeclaredFields()) {
                     f.setAccessible(true);
@@ -501,10 +502,14 @@ public class WrappedPacket implements WrapperPacketReader, WrapperPacketWriter {
                 }
                 if (!typeFields.isEmpty()) {
                     cached.put(type, typeFields.toArray(new Field[0]));
+                    cachedFields = cached.get(type);
+                }
+                else {
+                    throw new WrapperFieldNotFoundException("The class you are trying to read fields from does not contain any fields!");
                 }
             }
             try {
-                return cached.get(type)[index].get(packet);
+                return cachedFields[index].get(packet);
             } catch (IllegalAccessException e) {
                 e.printStackTrace();
             }
@@ -601,12 +606,9 @@ public class WrappedPacket implements WrapperPacketReader, WrapperPacketWriter {
     }
 
     private List<Field> getFields(Class<?> type, Field[] fields) {
-        List<Field> ret = null;
+        List<Field> ret = new ArrayList<>();
         for (Field field : fields) {
             if (field.getType() == type) {
-                if (ret == null) {
-                    ret = new ArrayList<>();
-                }
                 ret.add(field);
             }
         }

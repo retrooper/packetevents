@@ -27,8 +27,6 @@ package io.github.retrooper.packetevents.packetwrappers.in.blockplace;
 import io.github.retrooper.packetevents.enums.Direction;
 import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
 import io.github.retrooper.packetevents.utils.server.ServerVersion;
-import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
 
 
 public final class WrappedPacketInBlockPlace extends WrappedPacket {
@@ -41,21 +39,17 @@ public final class WrappedPacketInBlockPlace extends WrappedPacket {
     public static void load() {
         isHigherThan_v_1_8_8 = version.isHigherThan(ServerVersion.v_1_8_8);
         isHigherThan_v_1_7_10 = version.isHigherThan(ServerVersion.v_1_7_10);
-        if (isHigherThan_v_1_8_8) {
-            WrappedPacketInBlockPlace_1_9.load();
-        }
+        WrappedPacketInBlockPlace_1_9.load();
     }
 
     public Direction getDirection() {
-        if(isHigherThan_v_1_8_8) {
+        if (isHigherThan_v_1_8_8) {
             WrappedPacketInBlockPlace_1_9 blockPlace_1_9 = new WrappedPacketInBlockPlace_1_9(packet);
-            return Direction.valueOf(((Enum)blockPlace_1_9.getEnumDirectionObject()).name());
-        }
-        else if(isHigherThan_v_1_7_10) {
+            return Direction.valueOf(((Enum) blockPlace_1_9.getEnumDirectionObject()).name());
+        } else if (isHigherThan_v_1_7_10) {
             WrappedPacketInBlockPlace_1_8 blockPlace_1_8 = new WrappedPacketInBlockPlace_1_8(packet);
             return Direction.values()[blockPlace_1_8.getFace()];
-        }
-        else {
+        } else {
             WrappedPacketInBlockPlace_1_7_10 blockPlace_1_7_10 = new WrappedPacketInBlockPlace_1_7_10(packet);
             return Direction.values()[blockPlace_1_7_10.face];
         }
