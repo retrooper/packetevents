@@ -238,8 +238,14 @@ public final class PacketEvents implements Listener {
         //So we leave bungee alone
         if (!PacketEvents.getAPI().getServerUtils().isBungeeCordEnabled()) {
             if (VersionLookupUtils.isDependencyAvailable()) {
-                ClientVersion version = ClientVersion.getClientVersion(VersionLookupUtils.getProtocolVersion(e.getPlayer()));
-                PacketEvents.getAPI().getPlayerUtils().clientVersionsMap.put(channel, version);
+                try {
+                    ClientVersion version = ClientVersion.getClientVersion(VersionLookupUtils.getProtocolVersion(e.getPlayer()));
+                    PacketEvents.getAPI().getPlayerUtils().clientVersionsMap.put(channel, version);
+                }
+                catch(Exception ex) {
+
+                }
+
             }
         }
         if (!PacketEvents.getSettings().shouldInjectEarly()) {
