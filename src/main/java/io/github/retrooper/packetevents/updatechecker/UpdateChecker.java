@@ -37,30 +37,31 @@ import java.net.URLConnection;
 
 public class UpdateChecker {
     public void handleUpdate() {
+        inform("Checking for an update, please wait...");
         PEVersion localVersion = PacketEvents.getVersion();
         try {
             String line = readLatestVersion();
             PEVersion newVersion = new PEVersion(line);
             if (localVersion.isOlder(newVersion)) {
-                inform("[PacketEvents] There is an update available for the PacketEvents API! (" + newVersion.toString() + ")");
+                inform("There is an update available for the PacketEvents API! Your build: (" + localVersion.toString() + ") | Update: (" + newVersion.toString() + ")");
             }
             else if(localVersion.equals(newVersion)) {
-                inform("[PacketEvents] You are on the latest released version of PacketEvents. (" + newVersion.toString() + ")");
+                inform("You are on the latest released version of PacketEvents. Your build: (" + newVersion.toString() + ")");
             }
             else if(localVersion.isNewer(newVersion)) {
-                inform("[PacketEvents] You are on a dev or pre released build of PacketEvents. Your build: (" + localVersion.toString() + ") | Last released build: (" + newVersion.toString() + ")");
+                inform("You are on a dev or pre released build of PacketEvents. Your build: (" + localVersion.toString() + ") | Last released build: (" + newVersion.toString() + ")");
             }
-        } catch (IOException ignored) {
-            report("[PacketEvents] We failed to find the latest released version of PacketEvents. Your build: ("  + localVersion.toString() + ")");
+        } catch (IOException exception) {
+            report("We failed to find the latest released version of PacketEvents. Your build: ("  + localVersion.toString() + ")");
         }
     }
 
     private void inform(String message) {
-        Bukkit.getLogger().info(message);
+        Bukkit.getLogger().info("[PacketEvents] " + message);
     }
 
     private void report(String message) {
-        Bukkit.getLogger().info(ChatColor.DARK_RED + message);
+        Bukkit.getLogger().info(ChatColor.DARK_RED + "[PacketEvents] " + message);
     }
 
     private String readLatestVersion() throws IOException {
@@ -68,7 +69,6 @@ public class UpdateChecker {
         connection.addRequestProperty("User-Agent", "Mozilla/4.0");
 
         BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
-
         return reader.readLine();
     }
 }

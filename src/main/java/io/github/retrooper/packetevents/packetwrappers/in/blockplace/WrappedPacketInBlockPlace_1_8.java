@@ -40,38 +40,39 @@ final class WrappedPacketInBlockPlace_1_8 extends WrappedPacket {
 
     public int getX() {
         if(blockPosObj == null) {
-            blockPosObj = readObject(0, NMSUtils.blockPosClass);
+            blockPosObj = readObject(1, NMSUtils.blockPosClass);
         }
         try {
             return (int) Reflection.getMethod(blockPosObj.getClass().getSuperclass(), "getX", 0).invoke(blockPosObj);
         } catch (IllegalAccessException | InvocationTargetException e) {
             e.printStackTrace();
         }
-        return -1;
+        return 0;
     }
+    
 
     public int getY() {
         if(blockPosObj == null) {
-            blockPosObj = readObject(0, NMSUtils.blockPosClass);
+            blockPosObj = readObject(1, NMSUtils.blockPosClass);
         }
         try {
             return (int) Reflection.getMethod(blockPosObj.getClass().getSuperclass(), "getY", 0).invoke(blockPosObj);
         } catch (IllegalAccessException | InvocationTargetException e) {
             e.printStackTrace();
         }
-        return -1;
+        return 0;
     }
 
     public int getZ() {
         if(blockPosObj == null) {
-            blockPosObj = readObject(0, NMSUtils.blockPosClass);
+            blockPosObj = readObject(1, NMSUtils.blockPosClass);
         }
         try {
             return (int) Reflection.getMethod(blockPosObj.getClass().getSuperclass(), "getZ", 0).invoke(blockPosObj);
         } catch (IllegalAccessException | InvocationTargetException e) {
             e.printStackTrace();
         }
-        return -1;
+        return 0;
     }
 
     public ItemStack getItemStack() {
