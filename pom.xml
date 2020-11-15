@@ -122,21 +122,6 @@
             <version>4.5.0</version>
             <scope>provided</scope>
         </dependency>
-
-        <dependency>
-            <groupId>us.myles</groupId>
-            <artifactId>viaversion</artifactId>
-            <version>3.0.1</version>
-            <scope>provided</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>com.github.ProtocolSupport</groupId>
-            <artifactId>ProtocolSupport</artifactId>
-            <version>4fdd683</version>
-            <scope>provided</scope>
-        </dependency>
-
         <dependency>
             <groupId>org.spigotmc</groupId>
             <artifactId>spigot-api</artifactId>

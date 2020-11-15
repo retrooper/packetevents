@@ -27,7 +27,6 @@ package io.github.retrooper.packetevents;
 import io.github.retrooper.packetevents.bungee.BungeePluginMessageListener;
 import io.github.retrooper.packetevents.event.PacketEvent;
 import io.github.retrooper.packetevents.packetmanager.PacketManager;
-import io.github.retrooper.packetevents.packetmanager.netty.NettyPacketManager;
 import io.github.retrooper.packetevents.packettype.PacketTypeClasses;
 import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
 import io.github.retrooper.packetevents.settings.PacketEventsSettings;
@@ -37,10 +36,11 @@ import io.github.retrooper.packetevents.utils.nms.NMSUtils;
 import io.github.retrooper.packetevents.utils.player.ClientVersion;
 import io.github.retrooper.packetevents.utils.server.PEVersion;
 import io.github.retrooper.packetevents.utils.server.ServerVersion;
-import io.github.retrooper.packetevents.utils.versionlookup.VersionLookupUtils;
+import io.github.retrooper.packetevents.utils.v_1_7_10.ProtocolVersionAccessor_v_1_7;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerLoginEvent;
@@ -214,7 +214,7 @@ public final class PacketEvents implements Listener {
         return version;
     }
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.LOW)
     public void onLogin(PlayerLoginEvent e) {
         if (PacketEvents.getSettings().shouldInjectEarly()) {
             assert getAPI().packetManager.tinyProtocol != null;
@@ -228,26 +228,14 @@ public final class PacketEvents implements Listener {
         }
     }
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.LOW)
     public void onJoin(final PlayerJoinEvent e) {
-        if (!VersionLookupUtils.hasHandledLoadedDependencies()) {
-            VersionLookupUtils.handleLoadedDependencies();
+        if(PacketEvents.getAPI().getServerUtils().getVersion() == ServerVersion.v_1_7_10) {
+            Object channel = NMSUtils.getChannel(e.getPlayer());
+            ClientVersion version = ClientVersion.getClientVersion(ProtocolVersionAccessor_v_1_7.getProtocolVersion(e.getPlayer()));
+            PacketEvents.getAPI().getPlayerUtils().clientVersionsMap.put(channel, version);
         }
-        Object channel = NMSUtils.getChannel(e.getPlayer());
         //Waiting for the BungeeCord server to send their plugin message with your version,
-        //So we leave bungee alone
-        if (!PacketEvents.getAPI().getServerUtils().isBungeeCordEnabled()) {
-            if (VersionLookupUtils.isDependencyAvailable()) {
-                try {
-                    ClientVersion version = ClientVersion.getClientVersion(VersionLookupUtils.getProtocolVersion(e.getPlayer()));
-                    PacketEvents.getAPI().getPlayerUtils().clientVersionsMap.put(channel, version);
-                }
-                catch(Exception ex) {
-
-                }
-
-            }
-        }
         if (!PacketEvents.getSettings().shouldInjectEarly()) {
             if (getAPI().packetManager.canInject(e.getPlayer())) {
                 PacketEvents.getAPI().packetManager.injectPlayer(e.getPlayer());
@@ -256,7 +244,7 @@ public final class PacketEvents implements Listener {
     }
 
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.HIGHEST)
     public void onQuit(final PlayerQuitEvent e) {
         PacketEvents.getAPI().getPlayerUtils().clientVersionsMap.remove(e.getPlayer().getUniqueId());
     }
