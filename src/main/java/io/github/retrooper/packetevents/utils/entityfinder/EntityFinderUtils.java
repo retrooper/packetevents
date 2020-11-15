@@ -25,6 +25,7 @@
 package io.github.retrooper.packetevents.utils.entityfinder;
 
 import io.github.retrooper.packetevents.annotations.Nullable;
+import io.github.retrooper.packetevents.exceptions.PacketEventsNMSCachedEntityNotFoundException;
 import io.github.retrooper.packetevents.utils.nms.NMSUtils;
 import io.github.retrooper.packetevents.utils.server.ServerVersion;
 import org.bukkit.Bukkit;
@@ -72,7 +73,7 @@ public final class EntityFinderUtils {
                 return entity;
             }
         }
-        return null;
+        throw new PacketEventsNMSCachedEntityNotFoundException(id);
     }
 
     /**
@@ -88,7 +89,7 @@ public final class EntityFinderUtils {
         } catch (IllegalAccessException | InvocationTargetException e) {
             e.printStackTrace();
         }
-        return null;
+        throw new PacketEventsNMSCachedEntityNotFoundException(id);
     }
 
     public static Object getNMSEntityByIdWithWorld(final World world, final int id) {
@@ -112,6 +113,9 @@ public final class EntityFinderUtils {
         } catch (IllegalAccessException | InvocationTargetException e) {
             e.printStackTrace();
         }
+        if(nmsEntity == null) {
+            throw new PacketEventsNMSCachedEntityNotFoundException(id);
+        }
         return nmsEntity;
     }
 
@@ -133,7 +137,7 @@ public final class EntityFinderUtils {
         } catch (IllegalAccessException | InvocationTargetException e) {
             e.printStackTrace();
         }
-        return null;
+        throw new PacketEventsNMSCachedEntityNotFoundException(id);
     }
 
     /**

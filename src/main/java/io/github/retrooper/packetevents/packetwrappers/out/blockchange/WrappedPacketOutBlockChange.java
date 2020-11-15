@@ -22,29 +22,32 @@
  * SOFTWARE.
  */
 
-package io.github.retrooper.packetevents.example;
+package io.github.retrooper.packetevents.packetwrappers.out.blockchange;
 
-import io.github.retrooper.packetevents.PacketEvents;
-import io.github.retrooper.packetevents.utils.server.ServerVersion;
-import org.bukkit.plugin.java.JavaPlugin;
+import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
 
-public class MainExample extends JavaPlugin {
-
-    @Override
-    public void onLoad() {
-        PacketEvents.load();
+class WrappedPacketOutBlockChange extends WrappedPacket {
+    public WrappedPacketOutBlockChange(Object packet) {
+        super(packet);
     }
-
+//to-do load
     @Override
-    public void onEnable() {
-        PacketEvents.getSettings().injectAsync(true).ejectAsync(true)
-                .backupServerVersion(ServerVersion.v_1_7_10).checkForUpdates(true).injectEarly(true).
-                packetHandlingThreadCount(1);
-        PacketEvents.init(this);
-    }
+    protected void setup() {
+        //1.7 - int, int, int, Block, int data
+        //1.8+ - BlockPosition, IBlockData
 
-    @Override
-    public void onDisable() {
-        PacketEvents.stop();
+        //Constructors
+        //1.7 - int, int, int, World
+
+        //1.8->~1.12.2(World, BlockPosition)
+
+        //~1.13->~1.14(IBlockAccess, BlockPosition)
+        //1.16+(BlockPosition, IBlockData)
+        net.minecraft.server.v1_7_R4.PacketPlayOutBlockChange bc;
+        net.minecraft.server.v1_8_R3.PacketPlayOutBlockChange bc1;
+        net.minecraft.server.v1_9_R1.PacketPlayOutBlockChange bc2;
+        net.minecraft.server.v1_12_R1.PacketPlayOutBlockChange bc3;
+        net.minecraft.server.v1_13_R2.PacketPlayOutBlockChange bc4;
+        net.minecraft.server.v1_16_R2.PacketPlayOutBlockChange bc5;
     }
 }
