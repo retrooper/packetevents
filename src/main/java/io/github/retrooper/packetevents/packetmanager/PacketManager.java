@@ -30,16 +30,14 @@ import io.github.retrooper.packetevents.packetmanager.netty.NettyPacketManager;
 import io.github.retrooper.packetevents.packetmanager.tinyprotocol.TinyProtocol;
 import io.github.retrooper.packetevents.packettype.PacketType;
 import io.github.retrooper.packetevents.packetwrappers.login.in.WrappedPacketLoginHandshake;
-import io.github.retrooper.packetevents.utils.nms.NMSUtils;
 import io.github.retrooper.packetevents.utils.player.ClientVersion;
 import io.github.retrooper.packetevents.utils.reflection.ClassUtil;
-import io.github.retrooper.packetevents.utils.versionlookup.VersionLookupUtils;
+import io.github.retrooper.packetevents.utils.server.ServerVersion;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 
 import java.util.HashMap;
 import java.util.UUID;
-import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class PacketManager {
@@ -269,7 +267,7 @@ public class PacketManager {
             long timestamp = keepAliveMap.getOrDefault(uuid, event.getTimestamp());
             long currentTime = event.getTimestamp();
             long ping = currentTime - timestamp;
-            long smoothedPing = ((PacketEvents.getAPI().getPlayerUtils().getSmoothedPing(event.getPlayer()) * 3) + ping) / 4;
+            long smoothedPing = (PacketEvents.getAPI().getPlayerUtils().getSmoothedPing(event.getPlayer()) * 3 + ping) / 4;
             PacketEvents.getAPI().getPlayerUtils().playerPingMap.put(uuid, (short) ping);
             PacketEvents.getAPI().getPlayerUtils().playerSmoothedPingMap.put(uuid, (short) smoothedPing);
         }
@@ -282,13 +280,12 @@ public class PacketManager {
     }
 
     private void interceptLogin(PacketLoginEvent event) {
-        if (event.getPacketId() == PacketType.Login.HANDSHAKE) {
-            if (!VersionLookupUtils.isDependencyAvailable()) {
+        if (event.getPacketId() == PacketType.Login.HANDSHAKE &&
+        PacketEvents.getAPI().getServerUtils().getVersion() != ServerVersion.v_1_7_10) {
                 WrappedPacketLoginHandshake handshake = new WrappedPacketLoginHandshake(event.getNMSPacket());
                 int protocolVersion = handshake.getProtocolVersion();
                 ClientVersion version = ClientVersion.getClientVersion(protocolVersion);
                 PacketEvents.getAPI().getPlayerUtils().clientVersionsMap.put(event.getChannel(), version);
-            }
         }
     }
 

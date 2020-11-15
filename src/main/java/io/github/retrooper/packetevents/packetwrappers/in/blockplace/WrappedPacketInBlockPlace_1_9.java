@@ -58,7 +58,7 @@ final class WrappedPacketInBlockPlace_1_9 extends WrappedPacket {
         } catch (IllegalAccessException | InvocationTargetException e) {
             e.printStackTrace();
         }
-        return -1;
+        return 0;
     }
 
     public int getY() {
@@ -76,7 +76,7 @@ final class WrappedPacketInBlockPlace_1_9 extends WrappedPacket {
         } catch (IllegalAccessException | InvocationTargetException e) {
             e.printStackTrace();
         }
-        return -1;
+        return 0;
     }
 
     public int getZ() {
@@ -94,7 +94,7 @@ final class WrappedPacketInBlockPlace_1_9 extends WrappedPacket {
         } catch (IllegalAccessException | InvocationTargetException e) {
             e.printStackTrace();
         }
-        return -1;
+        return 0;
     }
 
     public Object getEnumDirectionObject() {

@@ -22,19 +22,20 @@
  * SOFTWARE.
  */
 
-package io.github.retrooper.packetevents.utils.viaversion;
+package io.github.retrooper.packetevents.exceptions;
 
-import org.bukkit.entity.Player;
-import us.myles.ViaVersion.api.Via;
+import io.github.retrooper.packetevents.event.PacketListener;
+import io.github.retrooper.packetevents.utils.reflection.ClassUtil;
 
-import java.util.UUID;
+import java.lang.reflect.Method;
 
-class ViaAPIAccessor {
-    public static int getProtocolVersion(final Player player) {
-        return getProtocolVersion(player.getUniqueId());
+public class PacketEventsMethodAccessException extends RuntimeException {
+    public PacketEventsMethodAccessException(String message) {
+        super(message);
     }
 
-    public static int getProtocolVersion(final UUID uuid) {
-        return Via.getAPI().getPlayerVersion(uuid);
+    public PacketEventsMethodAccessException(Method method, PacketListener listener) {
+        this("PacketEvents failed to access the "
+                + method.getName() + " method in " + ClassUtil.getClassSimpleName(listener.getClass()));
     }
 }

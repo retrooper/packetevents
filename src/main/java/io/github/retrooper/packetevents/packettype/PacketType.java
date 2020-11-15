@@ -39,11 +39,12 @@ public class PacketType {
             packetIds.put(PacketTypeClasses.Status.SERVER_INFO, SERVER_INFO);
         }
     }
+
     public static class Login {
         public static final Map<Class<?>, Byte> packetIds = new HashMap<>();
         public static final byte HANDSHAKE = 0,
-        IN_CUSTOM_PAYLOAD = 1, OUT_CUSTOM_PAYLOAD = 2,IN_START = 3, IN_ENCRYPTION_BEGIN = 4,
-        DISCONNECT = 5, OUT_ENCRYPTION_BEGIN = 6, OUT_SUCCESS = 7;
+                IN_CUSTOM_PAYLOAD = 1, OUT_CUSTOM_PAYLOAD = 2, IN_START = 3, IN_ENCRYPTION_BEGIN = 4,
+                DISCONNECT = 5, OUT_ENCRYPTION_BEGIN = 6, OUT_SUCCESS = 7;
 
         public static void init() {
             packetIds.put(PacketTypeClasses.Login.HANDSHAKE, HANDSHAKE);

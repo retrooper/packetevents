@@ -47,7 +47,7 @@ final class WrappedPacketInBlockPlace_1_8 extends WrappedPacket {
         } catch (IllegalAccessException | InvocationTargetException e) {
             e.printStackTrace();
         }
-        return -1;
+        return 0;
     }
     
 
@@ -60,7 +60,7 @@ final class WrappedPacketInBlockPlace_1_8 extends WrappedPacket {
         } catch (IllegalAccessException | InvocationTargetException e) {
             e.printStackTrace();
         }
-        return -1;
+        return 0;
     }
 
     public int getZ() {
@@ -72,7 +72,7 @@ final class WrappedPacketInBlockPlace_1_8 extends WrappedPacket {
         } catch (IllegalAccessException | InvocationTargetException e) {
             e.printStackTrace();
         }
-        return -1;
+        return 0;
     }
 
     public ItemStack getItemStack() {

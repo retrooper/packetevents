@@ -22,12 +22,14 @@
  * SOFTWARE.
  */
 
-package io.github.retrooper.packetevents.utils.protocollib;
+package io.github.retrooper.packetevents.exceptions;
 
-import org.bukkit.Bukkit;
+public class PacketEventsNMSCachedEntityNotFoundException extends RuntimeException {
+    public PacketEventsNMSCachedEntityNotFoundException(String message) {
+        super(message);
+    }
 
-public class ProtocolLibUtils {
-    public static boolean isAvailable() {
-        return Bukkit.getPluginManager().isPluginEnabled("ProtocolLib");
+    public PacketEventsNMSCachedEntityNotFoundException(int entityID) {
+        this("PacketEvents failed to find an entity with ID " + entityID + " in NMS' entity cache map!");
     }
 }

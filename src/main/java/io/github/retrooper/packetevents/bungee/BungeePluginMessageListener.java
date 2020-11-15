@@ -35,7 +35,7 @@ import org.bukkit.plugin.messaging.PluginMessageListener;
 import java.util.UUID;
 
 public class BungeePluginMessageListener implements PluginMessageListener {
-    public static String tagName = "packetevents";
+    public static String tagName = "packetevents:channel";
 
     @Override
     public void onPluginMessageReceived(String tag, Player player, byte[] bytes) {

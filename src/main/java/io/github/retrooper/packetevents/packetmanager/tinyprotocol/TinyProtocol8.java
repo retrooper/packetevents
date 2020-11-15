@@ -4,7 +4,6 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.MapMaker;
 import com.mojang.authlib.GameProfile;
 import io.github.retrooper.packetevents.PacketEvents;
-import io.github.retrooper.packetevents.packetmanager.netty.NettyPacketManager;
 import io.github.retrooper.packetevents.packetmanager.tinyprotocol.Reflection.FieldAccessor;
 import io.github.retrooper.packetevents.packetmanager.tinyprotocol.Reflection.MethodInvoker;
 import io.netty.channel.*;
@@ -165,9 +164,9 @@ public class TinyProtocol8 {
         boolean looking = true;
 
         // We need to synchronize against this list
-        if(getNetworkMarkers != null) {
-        networkManagers = (List<Object>) getNetworkMarkers.invoke(null, serverConnection);}
-        else {
+        if (getNetworkMarkers != null) {
+            networkManagers = (List<Object>) getNetworkMarkers.invoke(null, serverConnection);
+        } else {
             networkManagers = new ArrayList<>();
         }
         createServerChannelHandler();
@@ -502,11 +501,7 @@ public class TinyProtocol8 {
             final Channel channel = ctx.channel();
             handleLoginStart(channel, msg);
 
-            try {
-                msg = onPacketInAsync(player, channel, msg);
-            } catch (Exception e) {
-                plugin.getLogger().log(Level.SEVERE, "Error in onPacketInAsync().", e);
-            }
+            msg = onPacketInAsync(player, channel, msg);
 
             if (msg != null) {
                 super.channelRead(ctx, msg);
@@ -516,11 +511,7 @@ public class TinyProtocol8 {
 
         @Override
         public void write(ChannelHandlerContext ctx, Object msg, ChannelPromise promise) throws Exception {
-            try {
-                msg = onPacketOutAsync(player, ctx.channel(), msg);
-            } catch (Exception e) {
-                plugin.getLogger().log(Level.SEVERE, "Error in onPacketOutAsync().", e);
-            }
+            msg = onPacketOutAsync(player, ctx.channel(), msg);
 
             if (msg != null) {
                 super.write(ctx, msg, promise);

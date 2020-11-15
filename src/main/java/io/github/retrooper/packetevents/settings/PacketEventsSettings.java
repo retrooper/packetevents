@@ -31,7 +31,6 @@ public class PacketEventsSettings {
     private ServerVersion backupServerVersion = ServerVersion.v_1_7_10;
     private boolean injectAsync = true;
     private boolean ejectAsync = true;
-    private boolean useProtocolLibIfAvailable;
     private boolean checkForUpdates = true;
     private boolean injectEarly = true;
     private int packetHandlingThreadCount = 1;
@@ -49,11 +48,6 @@ public class PacketEventsSettings {
 
     public PacketEventsSettings ejectAsync(boolean ejectAsync) {
         this.ejectAsync = ejectAsync;
-        return this;
-    }
-
-    public PacketEventsSettings useProtocolLibIfAvailable(boolean useProtocolLibIfAvailable) {
-        this.useProtocolLibIfAvailable = useProtocolLibIfAvailable;
         return this;
     }
 
@@ -83,10 +77,6 @@ public class PacketEventsSettings {
 
     public boolean shouldEjectAsync() {
         return ejectAsync;
-    }
-
-    public boolean shouldUseProtocolLibIfAvailable() {
-        return useProtocolLibIfAvailable;
     }
 
     public boolean shouldCheckForUpdates() {

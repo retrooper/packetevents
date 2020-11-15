@@ -1,7 +1,6 @@
 package io.github.retrooper.packetevents.packetmanager.tinyprotocol;
 
 import io.github.retrooper.packetevents.PacketEvents;
-import io.github.retrooper.packetevents.packetmanager.netty.NettyPacketManager;
 import io.github.retrooper.packetevents.packetmanager.tinyprotocol.Reflection.FieldAccessor;
 import io.github.retrooper.packetevents.packetmanager.tinyprotocol.Reflection.MethodInvoker;
 import net.minecraft.util.com.google.common.collect.Lists;
@@ -10,12 +9,12 @@ import net.minecraft.util.com.mojang.authlib.GameProfile;
 import net.minecraft.util.io.netty.channel.*;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
-import org.bukkit.event.HandlerList;
-import org.bukkit.event.Listener;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
 
-import java.util.*;
+import java.util.List;
+import java.util.Map;
+import java.util.NoSuchElementException;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Level;
 
@@ -403,11 +402,11 @@ public class TinyProtocol7 {
     }
 
     public void ejectChannelSync(Object ch) {
-        uninjectChannel((Channel)ch);
+        uninjectChannel((Channel) ch);
     }
 
     public void ejectChannelAsync(Object ch) {
-        uninjectChannelAsync((Channel)ch);
+        uninjectChannelAsync((Channel) ch);
     }
 
     /**
@@ -471,11 +470,7 @@ public class TinyProtocol7 {
             final Channel channel = ctx.channel();
             handleLoginStart(channel, msg);
 
-            try {
-                msg = onPacketInAsync(player, channel, msg);
-            } catch (Exception e) {
-                plugin.getLogger().log(Level.SEVERE, "Error in onPacketInAsync().", e);
-            }
+            msg = onPacketInAsync(player, channel, msg);
 
             if (msg != null) {
                 super.channelRead(ctx, msg);
@@ -485,12 +480,7 @@ public class TinyProtocol7 {
 
         @Override
         public void write(ChannelHandlerContext ctx, Object msg, ChannelPromise promise) throws Exception {
-            try {
-                msg = onPacketOutAsync(player, ctx.channel(), msg);
-            } catch (Exception e) {
-                plugin.getLogger().log(Level.SEVERE, "Error in onPacketOutAsync().", e);
-            }
-
+            msg = onPacketOutAsync(player, ctx.channel(), msg);
             if (msg != null) {
                 super.write(ctx, msg, promise);
                 PacketEvents.getAPI().packetManager.postWrite(player, msg);

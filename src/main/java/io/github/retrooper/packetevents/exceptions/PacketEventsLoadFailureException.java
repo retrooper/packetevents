@@ -22,18 +22,14 @@
  * SOFTWARE.
  */
 
-package io.github.retrooper.packetevents.utils.viaversion;
+package io.github.retrooper.packetevents.exceptions;
 
-import org.bukkit.Bukkit;
-import org.bukkit.entity.Player;
-
-
-public class ViaUtils {
-    public static int getProtocolVersion(final Player player) {
-        return ViaAPIAccessor.getProtocolVersion(player);
+public class PacketEventsLoadFailureException extends RuntimeException {
+    public PacketEventsLoadFailureException(String message) {
+        super(message);
     }
 
-    public static boolean isAvailable() {
-        return Bukkit.getPluginManager().isPluginEnabled("ViaVersion");
+    public PacketEventsLoadFailureException() {
+        this("PacketEvents failed to successfully load...");
     }
 }

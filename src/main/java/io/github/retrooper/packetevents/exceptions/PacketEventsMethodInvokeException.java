@@ -22,17 +22,20 @@
  * SOFTWARE.
  */
 
-package io.github.retrooper.packetevents.utils.protocolsupport;
+package io.github.retrooper.packetevents.exceptions;
 
-import org.bukkit.Bukkit;
-import org.bukkit.entity.Player;
+import io.github.retrooper.packetevents.event.PacketListener;
+import io.github.retrooper.packetevents.utils.reflection.ClassUtil;
 
-public class ProtocolSupportUtils {
-    public static boolean isAvailable() {
-        return Bukkit.getPluginManager().isPluginEnabled("ProtocolSupport");
+import java.lang.reflect.Method;
+
+public class PacketEventsMethodInvokeException extends RuntimeException {
+    public PacketEventsMethodInvokeException(String message) {
+        super(message);
     }
 
-    public static int getProtocolVersion(final Player player) {
-        return ProtocolSupportAPIAccessor.getProtocolVersion(player);
+    public PacketEventsMethodInvokeException(Method method, PacketListener listener) {
+        this("PacketEvents failed to call the " + method.getName() + " method in "
+                + ClassUtil.getClassSimpleName(listener.getClass()));
     }
 }

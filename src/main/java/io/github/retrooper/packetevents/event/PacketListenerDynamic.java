@@ -22,13 +22,44 @@
  * SOFTWARE.
  */
 
-package io.github.retrooper.packetevents.utils.protocolsupport;
+package io.github.retrooper.packetevents.event;
 
-import org.bukkit.entity.Player;
-import protocolsupport.api.ProtocolSupportAPI;
+import io.github.retrooper.packetevents.event.impl.*;
 
-class ProtocolSupportAPIAccessor {
-    public static int getProtocolVersion(final Player player) {
-        return ProtocolSupportAPI.getProtocolVersion(player).getId();
+public abstract class PacketListenerDynamic {
+    private final byte priority;
+    public PacketListenerDynamic(final byte priority) {
+        this.priority = priority;
+    }
+
+    public final byte getPriority() {
+        return priority;
+    }
+
+    public void onPacketStatus(PacketStatusEvent event) {
+    }
+
+    public void onPacketLogin(PacketLoginEvent event) {
+    }
+
+    public void onPacketReceive(PacketReceiveEvent event) {
+    }
+
+    public void onPacketSend(PacketSendEvent event) {
+    }
+
+    public void onPostPacketReceive(PostPacketReceiveEvent event) {
+    }
+
+    public void onPostPacketSend(PostPacketSendEvent event) {
+    }
+
+    public void onPlayerInject(PlayerInjectEvent event) {
+    }
+
+    public void onPlayerEject(PlayerEjectEvent event) {
+    }
+
+    public void onPacketEvent(PacketEvent event) {
     }
 }
