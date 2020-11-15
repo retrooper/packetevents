@@ -39,9 +39,10 @@ public class PacketTypeClasses {
             PacketType.Status.init();
         }
     }
+
     public static class Login {
-        public static Class<?>  HANDSHAKE,
-                IN_CUSTOM_PAYLOAD, OUT_CUSTOM_PAYLOAD,IN_START, IN_ENCRYPTION_BEGIN,
+        public static Class<?> HANDSHAKE,
+                IN_CUSTOM_PAYLOAD, OUT_CUSTOM_PAYLOAD, IN_START, IN_ENCRYPTION_BEGIN,
                 DISCONNECT, OUT_ENCRYPTION_BEGIN, OUT_SUCCESS;
 
         public static void load() {

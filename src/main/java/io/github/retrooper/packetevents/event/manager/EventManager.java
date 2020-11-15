@@ -31,8 +31,11 @@ import io.github.retrooper.packetevents.event.annotation.PacketHandler;
 import io.github.retrooper.packetevents.event.eventtypes.CancellableEvent;
 import io.github.retrooper.packetevents.event.impl.*;
 import io.github.retrooper.packetevents.event.priority.PacketEventPriority;
+import io.github.retrooper.packetevents.exceptions.PacketEventsMethodAccessException;
+import io.github.retrooper.packetevents.exceptions.PacketEventsMethodInvokeException;
 import io.github.retrooper.packetevents.utils.protocollib.ProtocolLibAPIListener;
 import io.github.retrooper.packetevents.utils.protocollib.ProtocolLibUtils;
+import io.github.retrooper.packetevents.utils.reflection.ClassUtil;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -59,8 +62,11 @@ public final class EventManager {
                     PacketHandler annotation = method.getAnnotation(PacketHandler.class);
                     try {
                         method.invoke(listener, e);
-                    } catch (IllegalAccessException | InvocationTargetException ex) {
-                        ex.printStackTrace();
+                    } catch (IllegalAccessException ex) {
+                        throw new PacketEventsMethodAccessException(method, listener);
+                    }
+                    catch(InvocationTargetException ex) {
+                        throw new PacketEventsMethodInvokeException(method, listener);
                     }
                     if (e instanceof CancellableEvent) {
                         CancellableEvent ce = (CancellableEvent) e;

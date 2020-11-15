@@ -26,6 +26,7 @@ package io.github.retrooper.packetevents;
 
 import io.github.retrooper.packetevents.bungee.BungeePluginMessageListener;
 import io.github.retrooper.packetevents.event.PacketEvent;
+import io.github.retrooper.packetevents.exceptions.PacketEventsLoadFailureException;
 import io.github.retrooper.packetevents.packetmanager.PacketManager;
 import io.github.retrooper.packetevents.packettype.PacketTypeClasses;
 import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
@@ -57,12 +58,13 @@ public final class PacketEvents implements Listener {
     private static final PacketEvents instance = new PacketEvents();
     private static final ArrayList<Plugin> plugins = new ArrayList<>(1);
     private static boolean loaded, initialized;
-    private static final PEVersion version = new PEVersion(1, 7, 5);
+    private static final PEVersion version = new PEVersion(1, 7, 6);
 
     private static PacketEventsSettings settings = new PacketEventsSettings();
-    /** General executor service, basically for anything that the packet executor service doesn't do.
+    /**
+     * General executor service, basically for anything that the packet executor service doesn't do.
      */
-    public static ExecutorService generalExecutorService = Executors.newCachedThreadPool();
+    public static ExecutorService generalExecutorService = Executors.newSingleThreadExecutor();
     //Executor used for player injecting/ejecting and for packet processing/event calling
     public static ExecutorService packetHandlingExecutorService = Executors.newSingleThreadExecutor();
 
@@ -105,7 +107,7 @@ public final class PacketEvents implements Listener {
 
                 WrappedPacket.loadAllWrappers();
             } catch (Exception ex) {
-                throw new IllegalStateException("PacketEvents failed to successfully load...", ex);
+                throw new PacketEventsLoadFailureException();
             }
             loaded = true;
         }
