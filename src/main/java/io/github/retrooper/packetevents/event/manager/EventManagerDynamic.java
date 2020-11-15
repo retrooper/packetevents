@@ -43,7 +43,7 @@ class EventManagerDynamic {
 
     public void callEvent(PacketEvent event) {
         boolean isCancelled = false;
-        for (byte i = PacketEventPriority.LOWEST; i < PacketEventPriority.MONITOR; i++) {
+        for (byte i = PacketEventPriority.LOWEST; i <= PacketEventPriority.MONITOR; i++) {
             if (map.get(i) != null) {
                 for (PacketListenerDynamic listener : map.get(i)) {
                     try {

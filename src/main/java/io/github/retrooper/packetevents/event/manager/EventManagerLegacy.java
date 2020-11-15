@@ -43,7 +43,7 @@ class EventManagerLegacy {
 
     public void callEvent(PacketEvent event) {
         boolean isCancelled = false;
-        for (byte i = PacketEventPriority.LOWEST; i < PacketEventPriority.MONITOR; i++) {
+        for (byte i = PacketEventPriority.LOWEST; i <= PacketEventPriority.MONITOR; i++) {
             if (map.get(i) != null) {
                 for (PacketListener listener : map.get(i).keySet()) {
                     if (map.get(i).get(listener) != null) {
