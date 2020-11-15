@@ -22,14 +22,44 @@
  * SOFTWARE.
  */
 
-package io.github.retrooper.packetevents.event.annotation;
+package io.github.retrooper.packetevents.event;
 
-import io.github.retrooper.packetevents.event.priority.PacketEventPriority;
+import io.github.retrooper.packetevents.event.impl.*;
 
-import java.lang.annotation.*;
+public abstract class PacketListenerDynamic {
+    private final byte priority;
+    public PacketListenerDynamic(final byte priority) {
+        this.priority = priority;
+    }
 
-@Target({ElementType.METHOD})
-@Retention(RetentionPolicy.RUNTIME)
-public @interface PacketHandler {
-    byte priority() default PacketEventPriority.NORMAL;
+    public final byte getPriority() {
+        return priority;
+    }
+
+    public void onPacketStatus(PacketStatusEvent event) {
+    }
+
+    public void onPacketLogin(PacketLoginEvent event) {
+    }
+
+    public void onPacketReceive(PacketReceiveEvent event) {
+    }
+
+    public void onPacketSend(PacketSendEvent event) {
+    }
+
+    public void onPostPacketReceive(PostPacketReceiveEvent event) {
+    }
+
+    public void onPostPacketSend(PostPacketSendEvent event) {
+    }
+
+    public void onPlayerInject(PlayerInjectEvent event) {
+    }
+
+    public void onPlayerEject(PlayerEjectEvent event) {
+    }
+
+    public void onPacketEvent(PacketEvent event) {
+    }
 }

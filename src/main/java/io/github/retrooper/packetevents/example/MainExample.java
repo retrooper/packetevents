@@ -26,10 +26,15 @@ package io.github.retrooper.packetevents.example;
 
 import io.github.retrooper.packetevents.PacketEvents;
 import io.github.retrooper.packetevents.event.PacketListener;
+import io.github.retrooper.packetevents.event.PacketListenerDynamic;
+import io.github.retrooper.packetevents.event.annotation.PacketHandler;
+import io.github.retrooper.packetevents.event.impl.PacketReceiveEvent;
+import io.github.retrooper.packetevents.event.priority.PacketEventPriority;
+import io.github.retrooper.packetevents.packettype.PacketType;
 import io.github.retrooper.packetevents.utils.server.ServerVersion;
 import org.bukkit.plugin.java.JavaPlugin;
 
-public class MainExample extends JavaPlugin implements PacketListener {
+public class MainExample extends JavaPlugin  {
 
     @Override
     public void onLoad() {
@@ -42,7 +47,36 @@ public class MainExample extends JavaPlugin implements PacketListener {
                 .backupServerVersion(ServerVersion.v_1_7_10).
                 useProtocolLibIfAvailable(true).checkForUpdates(true).injectEarly(true).
                 packetHandlingThreadCount(1);
-        PacketEvents.getAPI().getEventManager().registerListener(this);
+
+        PacketListenerDynamic listener= new PacketListenerDynamic(PacketEventPriority.NORMAL) {
+            @Override
+            public void onPacketReceive(PacketReceiveEvent event) {
+                if(event.getPacketId() == PacketType.Client.CHAT) {
+                    event.getPlayer().sendMessage("You spoke second!");
+                }
+            }
+        };
+        PacketEvents.getAPI().getEventManager().registerListener(listener);
+
+        PacketListenerDynamic listener1= new PacketListenerDynamic(PacketEventPriority.LOWEST) {
+            @Override
+            public void onPacketReceive(PacketReceiveEvent event) {
+                if(event.getPacketId() == PacketType.Client.CHAT) {
+                    event.getPlayer().sendMessage("You spoke first!");
+                }
+            }
+        };
+        PacketEvents.getAPI().getEventManager().registerListener(listener1);
+
+        PacketListenerDynamic listener2= new PacketListenerDynamic(PacketEventPriority.MONITOR) {
+            @Override
+            public void onPacketReceive(PacketReceiveEvent event) {
+                if(event.getPacketId() == PacketType.Client.CHAT) {
+                    event.getPlayer().sendMessage("You spoke last!");
+                }
+            }
+        };
+        PacketEvents.getAPI().getEventManager().registerListener(listener2);
         PacketEvents.init(this);
     }
 

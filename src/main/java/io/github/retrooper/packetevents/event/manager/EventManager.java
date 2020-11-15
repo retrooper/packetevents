@@ -24,105 +24,57 @@
 
 package io.github.retrooper.packetevents.event.manager;
 
-import io.github.retrooper.packetevents.PacketEvents;
 import io.github.retrooper.packetevents.event.PacketEvent;
 import io.github.retrooper.packetevents.event.PacketListener;
-import io.github.retrooper.packetevents.event.annotation.PacketHandler;
-import io.github.retrooper.packetevents.event.eventtypes.CancellableEvent;
-import io.github.retrooper.packetevents.event.impl.*;
-import io.github.retrooper.packetevents.event.priority.PacketEventPriority;
-import io.github.retrooper.packetevents.exceptions.PacketEventsMethodAccessException;
-import io.github.retrooper.packetevents.exceptions.PacketEventsMethodInvokeException;
-import io.github.retrooper.packetevents.utils.protocollib.ProtocolLibAPIListener;
-import io.github.retrooper.packetevents.utils.protocollib.ProtocolLibUtils;
-import io.github.retrooper.packetevents.utils.reflection.ClassUtil;
-
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentLinkedQueue;
+import io.github.retrooper.packetevents.event.PacketListenerDynamic;
 
 public final class EventManager {
-    private final Map<PacketListener, List<Method>> staticRegisteredMethods = new HashMap<>();
-    public void callEvent(final PacketEvent e) {
-        //STATIC LISTENERS
-        for (final PacketListener listener : staticRegisteredMethods.keySet()) {
-            List<Method> methods = staticRegisteredMethods.get(listener);
-            final boolean[] isCancelled = {false};
-            final byte[] eventPriority = {PacketEventPriority.LOWEST};
-            for (Method method : methods) {
-                Class<?> parameterType = method.getParameterTypes()[0];
-                if (parameterType.equals(PacketEvent.class)
-                        || parameterType.isInstance(e)) {
+    private final EventManagerLegacy legacyEventManager = new EventManagerLegacy();
+    private final EventManagerDynamic dynamicEventManager = new EventManagerDynamic();
 
-                    PacketHandler annotation = method.getAnnotation(PacketHandler.class);
-                    try {
-                        method.invoke(listener, e);
-                    } catch (IllegalAccessException ex) {
-                        throw new PacketEventsMethodAccessException(method, listener);
-                    }
-                    catch(InvocationTargetException ex) {
-                        throw new PacketEventsMethodInvokeException(method, listener);
-                    }
-                    if (e instanceof CancellableEvent) {
-                        CancellableEvent ce = (CancellableEvent) e;
-                        if (annotation.priority() >= eventPriority[0]) {
-                            eventPriority[0] = annotation.priority();
-                            isCancelled[0] = ce.isCancelled();
-                        }
-                    }
-                }
-            }
-        }
+    public void callEvent(PacketEvent event) {
+        dynamicEventManager.callEvent(event);
+        legacyEventManager.callEvent(event);
     }
 
-    public void registerListener(final PacketListener listener) {
-        final List<Method> methods = new ArrayList<>();
-        for (final Method m : listener.getClass().getDeclaredMethods()) {
-            if (!m.isAccessible()) {
-                m.setAccessible(true);
-            }
-            if (m.isAnnotationPresent(PacketHandler.class)
-                    && m.getParameterTypes().length == 1) {
-                methods.add(m);
-            }
-        }
-
-        if (!methods.isEmpty()) {
-            if (ProtocolLibUtils.isAvailable()
-                    && PacketEvents.getSettings().shouldUseProtocolLibIfAvailable()) {
-                ProtocolLibAPIListener.registerProtocolLibListener(listener, methods);
-            } else {
-                staticRegisteredMethods.put(listener, methods);
-            }
-        }
+    @Deprecated
+    public void registerListener(PacketListener listener) {
+        legacyEventManager.registerListener(listener);
     }
 
-    public void registerListeners(final PacketListener... listeners) {
-        for (final PacketListener listener : listeners) {
-            registerListener(listener);
-        }
+    @Deprecated
+    public void registerListeners(PacketListener... listeners) {
+        legacyEventManager.registerListeners(listeners);
     }
 
-    public void unregisterListener(final PacketListener e) {
-        staticRegisteredMethods.remove(e);
+    @Deprecated
+    public void unregisterListener(PacketListener listener) {
+        legacyEventManager.unregisterListener(listener);
     }
 
-    public void unregisterListeners(final PacketListener... listeners) {
-        for (final PacketListener listener : listeners) {
-            unregisterListener(listener);
-        }
+    @Deprecated
+    public void unregisterListeners(PacketListener... listeners) {
+        legacyEventManager.unregisterListeners(listeners);
+    }
+
+    public void registerListener(PacketListenerDynamic listener) {
+        dynamicEventManager.registerListener(listener);
+    }
+
+    public void registerListeners(PacketListenerDynamic... listeners) {
+        dynamicEventManager.registerListeners(listeners);
+    }
+
+    public void unregisterListener(PacketListenerDynamic listener) {
+        dynamicEventManager.unregisterListener(listener);
+    }
+
+    public void unregisterListeners(PacketListenerDynamic... listeners) {
+        dynamicEventManager.unregisterListeners(listeners);
     }
 
     public void unregisterAllListeners() {
-        staticRegisteredMethods.clear();
-    }
-
-    public boolean isRegistered(final PacketListener listener) {
-        return staticRegisteredMethods.containsKey(listener);
+        dynamicEventManager.unregisterAllListeners();
+        legacyEventManager.unregisterAllListeners();
     }
 }
