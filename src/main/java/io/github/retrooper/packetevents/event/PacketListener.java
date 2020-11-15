@@ -28,5 +28,6 @@ package io.github.retrooper.packetevents.event;
  * A Packet listener.
  * Implement this interface in your listeners.
  */
+@Deprecated
 public interface PacketListener {
 }

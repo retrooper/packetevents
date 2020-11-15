@@ -34,6 +34,7 @@ import io.github.retrooper.packetevents.exceptions.PacketEventsMethodInvokeExcep
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -85,6 +86,7 @@ class EventManagerLegacy {
                     map.put(annotation.priority(), new HashMap<>());
                     insideMap = map.get(annotation.priority());
                 }
+                insideMap.computeIfAbsent(listener, k -> new ArrayList<>());
                 insideMap.get(listener).add(method);
             }
         }

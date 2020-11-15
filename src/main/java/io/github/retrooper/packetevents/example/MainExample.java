@@ -34,7 +34,7 @@ import io.github.retrooper.packetevents.packettype.PacketType;
 import io.github.retrooper.packetevents.utils.server.ServerVersion;
 import org.bukkit.plugin.java.JavaPlugin;
 
-public class MainExample extends JavaPlugin  {
+public class MainExample extends JavaPlugin implements PacketListener {
 
     @Override
     public void onLoad() {
@@ -47,41 +47,33 @@ public class MainExample extends JavaPlugin  {
                 .backupServerVersion(ServerVersion.v_1_7_10).
                 useProtocolLibIfAvailable(true).checkForUpdates(true).injectEarly(true).
                 packetHandlingThreadCount(1);
-
-        PacketListenerDynamic listener= new PacketListenerDynamic(PacketEventPriority.NORMAL) {
-            @Override
-            public void onPacketReceive(PacketReceiveEvent event) {
-                if(event.getPacketId() == PacketType.Client.CHAT) {
-                    event.getPlayer().sendMessage("You spoke second!");
-                }
-            }
-        };
-        PacketEvents.getAPI().getEventManager().registerListener(listener);
-
-        PacketListenerDynamic listener1= new PacketListenerDynamic(PacketEventPriority.LOWEST) {
-            @Override
-            public void onPacketReceive(PacketReceiveEvent event) {
-                if(event.getPacketId() == PacketType.Client.CHAT) {
-                    event.getPlayer().sendMessage("You spoke first!");
-                }
-            }
-        };
-        PacketEvents.getAPI().getEventManager().registerListener(listener1);
-
-        PacketListenerDynamic listener2= new PacketListenerDynamic(PacketEventPriority.MONITOR) {
-            @Override
-            public void onPacketReceive(PacketReceiveEvent event) {
-                if(event.getPacketId() == PacketType.Client.CHAT) {
-                    event.getPlayer().sendMessage("You spoke last!");
-                }
-            }
-        };
-        PacketEvents.getAPI().getEventManager().registerListener(listener2);
+        PacketEvents.getAPI().getEventManager().registerListener(this);
         PacketEvents.init(this);
     }
 
     @Override
     public void onDisable() {
         PacketEvents.stop();
+    }
+
+    @PacketHandler(priority = 3)
+    public void onReceive(PacketReceiveEvent event) {
+        if(event.getPacketId() == PacketType.Client.CHAT) {
+            event.getPlayer().sendMessage("You spoke last!");
+        }
+    }
+
+    @PacketHandler(priority = 1)
+    public void onReceive2(PacketReceiveEvent event) {
+        if(event.getPacketId() == PacketType.Client.CHAT) {
+            event.getPlayer().sendMessage("You spoke second!");
+        }
+    }
+
+    @PacketHandler(priority = 0)
+    public void onReceive3(PacketReceiveEvent event) {
+        if(event.getPacketId() == PacketType.Client.CHAT) {
+            event.getPlayer().sendMessage("You spoke first!");
+        }
     }
 }
