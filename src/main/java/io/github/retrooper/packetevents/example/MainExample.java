@@ -44,8 +44,7 @@ public class MainExample extends JavaPlugin implements PacketListener {
     @Override
     public void onEnable() {
         PacketEvents.getSettings().injectAsync(true).ejectAsync(true)
-                .backupServerVersion(ServerVersion.v_1_7_10).
-                useProtocolLibIfAvailable(true).checkForUpdates(true).injectEarly(true).
+                .backupServerVersion(ServerVersion.v_1_7_10).checkForUpdates(true).injectEarly(true).
                 packetHandlingThreadCount(1);
         PacketEvents.getAPI().getEventManager().registerListener(this);
         PacketEvents.init(this);
@@ -54,26 +53,5 @@ public class MainExample extends JavaPlugin implements PacketListener {
     @Override
     public void onDisable() {
         PacketEvents.stop();
-    }
-
-    @PacketHandler(priority = 3)
-    public void onReceive(PacketReceiveEvent event) {
-        if(event.getPacketId() == PacketType.Client.CHAT) {
-            event.getPlayer().sendMessage("You spoke last!");
-        }
-    }
-
-    @PacketHandler(priority = 1)
-    public void onReceive2(PacketReceiveEvent event) {
-        if(event.getPacketId() == PacketType.Client.CHAT) {
-            event.getPlayer().sendMessage("You spoke second!");
-        }
-    }
-
-    @PacketHandler(priority = 0)
-    public void onReceive3(PacketReceiveEvent event) {
-        if(event.getPacketId() == PacketType.Client.CHAT) {
-            event.getPlayer().sendMessage("You spoke first!");
-        }
     }
 }

@@ -26,7 +26,6 @@ package io.github.retrooper.packetevents.event.manager;
 
 import io.github.retrooper.packetevents.event.PacketEvent;
 import io.github.retrooper.packetevents.event.PacketListenerDynamic;
-import io.github.retrooper.packetevents.event.annotation.PacketHandler;
 import io.github.retrooper.packetevents.event.eventtypes.CancellableEvent;
 import io.github.retrooper.packetevents.event.impl.*;
 import io.github.retrooper.packetevents.event.priority.PacketEventPriority;
@@ -66,16 +65,15 @@ class EventManagerDynamic {
                             listener.onPlayerEject((PlayerEjectEvent) event);
                         }
 
-                    }
-                    catch(Exception ex) {
+                    } catch (Exception ex) {
                         throw new PacketEventsMethodInvokeException("PacketEvents " +
                                 "failed to call an event method in the " +
                                 "dynamic packet listener. Event type: "
                                 + ClassUtil.getClassSimpleName(event.getClass()));
                     }
 
-                    if(event instanceof CancellableEvent) {
-                        CancellableEvent ce = (CancellableEvent)event;
+                    if (event instanceof CancellableEvent) {
+                        CancellableEvent ce = (CancellableEvent) event;
                         isCancelled = ce.isCancelled();
                     }
                 }
@@ -88,12 +86,12 @@ class EventManagerDynamic {
     }
 
     public void registerListener(PacketListenerDynamic listener) {
-        List<PacketListenerDynamic> listeners = map.get(listener.getPriority());
-        if(listeners == null) {
-            map.put(listener.getPriority(), new ArrayList<>());
-            listeners = map.get(listener.getPriority());
-        }
-        listeners.add(listener);
+            List<PacketListenerDynamic> listeners = map.get(listener.getPriority());
+            if (listeners == null) {
+                map.put(listener.getPriority(), new ArrayList<>());
+                listeners = map.get(listener.getPriority());
+            }
+            listeners.add(listener);
     }
 
     public void registerListeners(PacketListenerDynamic... listeners) {
@@ -104,7 +102,7 @@ class EventManagerDynamic {
 
     public void unregisterListener(PacketListenerDynamic listener) {
         List<PacketListenerDynamic> listeners = map.get(listener.getPriority());
-        if(listeners == null) {
+        if (listeners == null) {
             return;
         }
         listeners.remove(listener);

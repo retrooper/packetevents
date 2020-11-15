@@ -29,8 +29,6 @@ import io.github.retrooper.packetevents.event.PacketListener;
 import io.github.retrooper.packetevents.event.annotation.PacketHandler;
 import io.github.retrooper.packetevents.event.eventtypes.CancellableEvent;
 import io.github.retrooper.packetevents.event.priority.PacketEventPriority;
-import io.github.retrooper.packetevents.exceptions.PacketEventsMethodAccessException;
-import io.github.retrooper.packetevents.exceptions.PacketEventsMethodInvokeException;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -40,77 +38,75 @@ import java.util.List;
 import java.util.Map;
 
 class EventManagerLegacy {
-    private final Map<Byte, Map<PacketListener, List<Method>>> map = new HashMap<>();
-
-    public void callEvent(PacketEvent event) {
+    private final Map<PacketListener, List<Method>> staticRegisteredMethods = new HashMap<>();
+    public void callEvent(final PacketEvent e) {
         boolean isCancelled = false;
-        for (byte i = PacketEventPriority.LOWEST; i <= PacketEventPriority.MONITOR; i++) {
-            if (map.get(i) != null) {
-                for (PacketListener listener : map.get(i).keySet()) {
-                    if (map.get(i).get(listener) != null) {
-                        for (Method method : map.get(i).get(listener)) {
-                            try {
-                                method.invoke(listener, event);
-                            } catch (IllegalAccessException ex) {
-                                throw new PacketEventsMethodAccessException(method, listener);
-                            } catch (InvocationTargetException ex) {
-                                throw new PacketEventsMethodInvokeException(method, listener);
-                            }
-                            if (event instanceof CancellableEvent) {
-                                CancellableEvent ce = (CancellableEvent) event;
-                                isCancelled = ce.isCancelled();
-                            }
+        byte eventPriority = PacketEventPriority.LOWEST;
+        //STATIC LISTENERS
+        for (final PacketListener listener : staticRegisteredMethods.keySet()) {
+            List<Method> methods = staticRegisteredMethods.get(listener);
+
+            for (Method method : methods) {
+                Class<?> parameterType = method.getParameterTypes()[0];
+                if (parameterType.equals(PacketEvent.class)
+                        || parameterType.isInstance(e)) {
+
+                    PacketHandler annotation = method.getAnnotation(PacketHandler.class);
+                    try {
+                        method.invoke(listener, e);
+                    } catch (IllegalAccessException | InvocationTargetException ex) {
+                        ex.printStackTrace();
+                    }
+                    if (e instanceof CancellableEvent) {
+                        CancellableEvent ce = (CancellableEvent) e;
+                        if (annotation.priority() >= eventPriority) {
+                            eventPriority = annotation.priority();
+                            isCancelled = ce.isCancelled();
                         }
                     }
                 }
             }
         }
-        if (event instanceof CancellableEvent) {
-            CancellableEvent ce = (CancellableEvent) event;
+        if(e instanceof CancellableEvent) {
+            CancellableEvent ce = (CancellableEvent)e;
             ce.setCancelled(isCancelled);
         }
     }
 
-    public void registerListener(PacketListener listener) {
-        for (Method method : listener.getClass().getDeclaredMethods()) {
-            if (!method.isAccessible()) {
-                method.setAccessible(true);
+    public void registerListener(final PacketListener listener) {
+        final List<Method> methods = new ArrayList<>();
+        for (final Method m : listener.getClass().getDeclaredMethods()) {
+            if (!m.isAccessible()) {
+                m.setAccessible(true);
             }
-            if (method.isAnnotationPresent(PacketHandler.class)
-                    && method.getParameterTypes().length == 1 &&
-                    (PacketEvent.class.equals(method.getParameterTypes()[0])
-                            || PacketEvent.class.isAssignableFrom(method.getParameterTypes()[0]))) {
-                PacketHandler annotation = method.getAnnotation(PacketHandler.class);
-                Map<PacketListener, List<Method>> insideMap = map.get(annotation.priority());
-                if (insideMap == null) {
-                    map.put(annotation.priority(), new HashMap<>());
-                    insideMap = map.get(annotation.priority());
-                }
-                insideMap.computeIfAbsent(listener, k -> new ArrayList<>());
-                insideMap.get(listener).add(method);
+            if (m.isAnnotationPresent(PacketHandler.class)
+                    && m.getParameterTypes().length == 1) {
+                methods.add(m);
             }
+        }
+
+        if (!methods.isEmpty()) {
+            staticRegisteredMethods.put(listener, methods);
         }
     }
 
-    public void registerListeners(PacketListener... listeners) {
-        for (PacketListener listener : listeners) {
+    public void registerListeners(final PacketListener... listeners) {
+        for (final PacketListener listener : listeners) {
             registerListener(listener);
         }
     }
 
-    public void unregisterListener(PacketListener listener) {
-        for (Map<PacketListener, List<Method>> insideMap : map.values()) {
-            insideMap.remove(listener);
-        }
+    public void unregisterListener(final PacketListener e) {
+        staticRegisteredMethods.remove(e);
     }
 
-    public void unregisterListeners(PacketListener... listeners) {
-        for (PacketListener listener : listeners) {
+    public void unregisterListeners(final PacketListener... listeners) {
+        for (final PacketListener listener : listeners) {
             unregisterListener(listener);
         }
     }
 
     public void unregisterAllListeners() {
-        map.clear();
+        staticRegisteredMethods.clear();
     }
 }
