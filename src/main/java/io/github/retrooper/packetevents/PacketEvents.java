@@ -49,6 +49,7 @@ import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.plugin.Plugin;
 
 import java.util.ArrayList;
+import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
@@ -57,9 +58,8 @@ public final class PacketEvents implements Listener {
     private static final PacketEventsAPI packetEventsAPI = new PacketEventsAPI();
     private static final PacketEvents instance = new PacketEvents();
     private static final ArrayList<Plugin> plugins = new ArrayList<>(1);
-    private static boolean loaded, initialized;
-    private static final PEVersion version = new PEVersion(1, 7, 6);
-
+    private static boolean loading, loaded, initialized, initializing;
+    private static final PEVersion version = new PEVersion(1, 7, 7);
     private static PacketEventsSettings settings = new PacketEventsSettings();
     /**
      * General executor service, basically for anything that the packet executor service doesn't do.
@@ -88,7 +88,8 @@ public final class PacketEvents implements Listener {
      * All PacketEvents' wrappers are setup and do all loading they need to do.
      */
     public static void load() {
-        if (!loaded) {
+        if (!loaded && !loading) {
+            loading = true;
             ServerVersion version = ServerVersion.getVersion();
             WrappedPacket.version = version;
             PacketEvent.version = version;
@@ -107,9 +108,11 @@ public final class PacketEvents implements Listener {
 
                 WrappedPacket.loadAllWrappers();
             } catch (Exception ex) {
+                loading = false;
                 throw new PacketEventsLoadFailureException();
             }
             loaded = true;
+            loading = false;
         }
 
     }
@@ -135,14 +138,14 @@ public final class PacketEvents implements Listener {
      */
     public static void init(final Plugin pl, PacketEventsSettings packetEventsSettings) {
         load();
-        if (!initialized) {
+        if (!initialized && !initializing) {
+            initializing = true;
             settings = packetEventsSettings;
             int packetHandlingThreadCount = settings.getPacketHandlingThreadCount();
             //if the count is 1 or is invalid
-            if(packetHandlingThreadCount == 1 || packetHandlingThreadCount < 0) {
+            if (packetHandlingThreadCount == 1 || packetHandlingThreadCount < 0) {
                 packetHandlingExecutorService = Executors.newSingleThreadExecutor();
-            }
-            else {
+            } else {
                 packetHandlingExecutorService = Executors.newFixedThreadPool(packetHandlingThreadCount);
             }
             plugins.add(pl);
@@ -152,11 +155,17 @@ public final class PacketEvents implements Listener {
             PacketEvents.getAPI().packetManager = new PacketManager(plugins.get(0), settings.shouldInjectEarly());
 
             for (final Player p : Bukkit.getOnlinePlayers()) {
-                getAPI().getPlayerUtils().injectPlayer(p);
+                try {
+                    getAPI().getPlayerUtils().injectPlayer(p);
+                } catch (Exception ex) {
+                    p.kickPlayer("Failed to inject you, please rejoin the server!");
+                }
             }
 
             if (settings.shouldCheckForUpdates()) {
-               PacketEvents.generalExecutorService.execute(() -> new UpdateChecker().handleUpdate());
+                Future<?> future =
+                        PacketEvents.generalExecutorService
+                                .submit(() -> new UpdateChecker().handleUpdate());
             }
 
             if (getAPI().getServerUtils().isBungeeCordEnabled()) {
@@ -165,6 +174,7 @@ public final class PacketEvents implements Listener {
             }
 
             initialized = true;
+            initializing = false;
         }
     }
 
@@ -221,9 +231,7 @@ public final class PacketEvents implements Listener {
         if (PacketEvents.getSettings().shouldInjectEarly()) {
             assert getAPI().packetManager.tinyProtocol != null;
             try {
-                if (getAPI().packetManager.canInject(e.getPlayer())) {
-                    getAPI().packetManager.injectPlayer(e.getPlayer());
-                }
+                getAPI().packetManager.injectPlayer(e.getPlayer());
             } catch (Exception ex) {
                 e.disallow(PlayerLoginEvent.Result.KICK_OTHER, "We are unable to inject you. Please try again!");
             }
@@ -232,15 +240,17 @@ public final class PacketEvents implements Listener {
 
     @EventHandler(priority = EventPriority.LOW)
     public void onJoin(final PlayerJoinEvent e) {
-        if(PacketEvents.getAPI().getServerUtils().getVersion() == ServerVersion.v_1_7_10) {
+        if (PacketEvents.getAPI().getServerUtils().getVersion() == ServerVersion.v_1_7_10) {
             Object channel = NMSUtils.getChannel(e.getPlayer());
             ClientVersion version = ClientVersion.getClientVersion(ProtocolVersionAccessor_v_1_7.getProtocolVersion(e.getPlayer()));
             PacketEvents.getAPI().getPlayerUtils().clientVersionsMap.put(channel, version);
         }
         //Waiting for the BungeeCord server to send their plugin message with your version,
         if (!PacketEvents.getSettings().shouldInjectEarly()) {
-            if (getAPI().packetManager.canInject(e.getPlayer())) {
+            try {
                 PacketEvents.getAPI().packetManager.injectPlayer(e.getPlayer());
+            } catch (Exception ex) {
+                e.getPlayer().kickPlayer("There was an issue injecting you. Please try again!");
             }
         }
     }

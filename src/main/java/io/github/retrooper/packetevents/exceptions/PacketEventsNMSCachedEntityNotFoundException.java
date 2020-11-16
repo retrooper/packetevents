@@ -30,6 +30,6 @@ public class PacketEventsNMSCachedEntityNotFoundException extends RuntimeExcepti
     }
 
     public PacketEventsNMSCachedEntityNotFoundException(int entityID) {
-        this("PacketEvents failed to find an entity with ID " + entityID + " in NMS' entity cache map!");
+        this("PacketEvents failed to find an entity with ID " + entityID + "!");
     }
 }
