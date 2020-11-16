@@ -79,7 +79,7 @@ public final class WrappedPacketOutChat extends WrappedPacket implements Sendabl
 
     public WrappedPacketOutChat(String message, ChatPosition chatPosition, UUID uuid) {
         this.uuid = uuid;
-        this.message = message;
+        this.message = fromStringToJSON(message);
         this.chatPosition = chatPosition;
     }
 

@@ -95,8 +95,10 @@ public class PacketManager {
         PacketEvents.getAPI().getEventManager().callEvent(injectEvent);
         if (!injectEvent.isCancelled()) {
             if (tinyProtocolMode) {
+                assert tinyProtocol != null;
                 tinyProtocol.injectPlayerAsync(player);
             } else {
+                assert nettyProtocol != null;
                 nettyProtocol.injectPlayerAsync(player);
             }
         }
@@ -158,10 +160,6 @@ public class PacketManager {
         } else {
             nettyProtocol.sendPacket(channel, packet);
         }
-    }
-
-    public boolean canInject(Player player) {
-       return true;
     }
 
     public String getNettyHandlerName() {

@@ -55,6 +55,7 @@ public final class NMSUtils {
     private static Method getCraftPlayerHandle;
     private static Method getCraftEntityHandle;
     private static Method asBukkitCopy;
+    private static Method getBukkitEntity;
     private static Field entityPlayerPingField, playerConnectionField;
 
     public static final HashMap<UUID, Object> channelCache = new HashMap<>();
@@ -102,6 +103,7 @@ public final class NMSUtils {
             getCraftEntityHandle = craftEntityClass.getMethod("getHandle");
             asBukkitCopy = craftItemStack.getMethod("asBukkitCopy", nmsItemStackClass);
             craftWorldGetHandle = craftWorldClass.getMethod("getHandle");
+            getBukkitEntity =  nmsEntityClass.getMethod("getBukkitEntity");
         } catch (NoSuchMethodException e) {
             e.printStackTrace();
         }
@@ -190,6 +192,15 @@ public final class NMSUtils {
         final Object craftEntity = craftEntityClass.cast(entity);
         try {
             return getCraftEntityHandle.invoke(craftEntity);
+        } catch (IllegalAccessException | InvocationTargetException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    public static Entity getBukkitEntity(final Object nmsEntity) {
+        try {
+            return (Entity) getBukkitEntity.invoke(nmsEntity);
         } catch (IllegalAccessException | InvocationTargetException e) {
             e.printStackTrace();
         }

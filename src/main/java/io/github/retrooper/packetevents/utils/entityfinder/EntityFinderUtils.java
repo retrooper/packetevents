@@ -40,10 +40,8 @@ public final class EntityFinderUtils {
     public static ServerVersion version;
     private static Class<?> worldServerClass;
     private static Class<?> craftWorldClass;
-    private static Class<?> entityClass;
     private static Method getEntityByIdMethod;
     private static Method craftWorldGetHandle;
-    private static Method getBukkitEntity;
 
     private static boolean isServerVersion_v_1_8_x;
 
@@ -52,15 +50,13 @@ public final class EntityFinderUtils {
         try {
             worldServerClass = NMSUtils.getNMSClass("WorldServer");
             craftWorldClass = NMSUtils.getOBCClass("CraftWorld");
-            entityClass = NMSUtils.getNMSClass("Entity");
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
         }
 
         try {
-            getEntityByIdMethod = worldServerClass.getMethod(getEntityByIDMethodName(), int.class);
+            getEntityByIdMethod = worldServerClass.getMethod(isServerVersion_v_1_8_x ? "a" : "getEntity", int.class);
             craftWorldGetHandle = craftWorldClass.getMethod("getHandle");
-            getBukkitEntity = entityClass.getMethod("getBukkitEntity");
         } catch (NoSuchMethodException e) {
             e.printStackTrace();
         }
@@ -73,6 +69,14 @@ public final class EntityFinderUtils {
                 return entity;
             }
         }
+        //Entity has not been found in the NMS entity cache map...
+        for(World world : Bukkit.getWorlds()) {
+            for(Entity entity : world.getEntities()) {
+                if(entity.getEntityId() == id) {
+                    return NMSUtils.getNMSEntity(entity);
+                }
+            }
+        }
         throw new PacketEventsNMSCachedEntityNotFoundException(id);
     }
 
@@ -83,11 +87,19 @@ public final class EntityFinderUtils {
      * @return Entity
      */
     public static Entity getEntityById(final int id) {
-        Object nmsEntity = getNMSEntityById(id);
-        try {
-            return (Entity) getBukkitEntity.invoke(nmsEntity);
-        } catch (IllegalAccessException | InvocationTargetException e) {
-            e.printStackTrace();
+        for (final World world : Bukkit.getWorlds()) {
+            final Object entity = getNMSEntityByIdWithWorld(world, id);
+            if (entity != null) {
+                return NMSUtils.getBukkitEntity(entity);
+            }
+        }
+        //Entity has not been found in the NMS entity cache map...
+        for(World world : Bukkit.getWorlds()) {
+            for(Entity entity : world.getEntities()) {
+                if(entity.getEntityId() == id) {
+                    return entity;
+                }
+            }
         }
         throw new PacketEventsNMSCachedEntityNotFoundException(id);
     }
@@ -98,25 +110,19 @@ public final class EntityFinderUtils {
         } else if (craftWorldClass == null) {
             throw new IllegalStateException("PacketEvents failed to locate the CraftWorld class.");
         }
-        Object craftWorld = craftWorldClass.cast(world);
-
         Object worldServer = null;
         try {
-            worldServer = craftWorldGetHandle.invoke(craftWorld);
+            worldServer = craftWorldGetHandle.invoke(world);
         } catch (IllegalAccessException | InvocationTargetException e) {
             e.printStackTrace();
         }
 
-        Object nmsEntity = null;
         try {
-            nmsEntity = getEntityByIdMethod.invoke(worldServer, id);
+            return getEntityByIdMethod.invoke(worldServer, id);
         } catch (IllegalAccessException | InvocationTargetException e) {
             e.printStackTrace();
         }
-        if(nmsEntity == null) {
-            throw new PacketEventsNMSCachedEntityNotFoundException(id);
-        }
-        return nmsEntity;
+       return null;
     }
 
     /**
@@ -129,27 +135,6 @@ public final class EntityFinderUtils {
     @Nullable
     public static Entity getEntityByIdWithWorld(final World world, final int id) {
         Object nmsEntity = getNMSEntityByIdWithWorld(world, id);
-        if (nmsEntity == null) {
-            return null;
-        }
-        try {
-            return (Entity) getBukkitEntity.invoke(nmsEntity);
-        } catch (IllegalAccessException | InvocationTargetException e) {
-            e.printStackTrace();
-        }
-        throw new PacketEventsNMSCachedEntityNotFoundException(id);
-    }
-
-    /**
-     * This is the name of the method that returns the NMS entity when you pass in its ID.
-     * On 1.8-1.8.8 the function name is called 'a', on 1.7.10 and 1.9 and above the name is called 'getEntity'.
-     *
-     * @return entity by ID method name
-     */
-    public static String getEntityByIDMethodName() {
-        if (isServerVersion_v_1_8_x) {
-            return "a";
-        }
-        return "getEntity";
+        return NMSUtils.getBukkitEntity(nmsEntity);
     }
 }
