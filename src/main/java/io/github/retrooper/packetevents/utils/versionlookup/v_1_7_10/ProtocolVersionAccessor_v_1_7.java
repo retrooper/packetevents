@@ -22,7 +22,7 @@
  * SOFTWARE.
  */
 
-package io.github.retrooper.packetevents.utils.v_1_7_10;
+package io.github.retrooper.packetevents.utils.versionlookup.v_1_7_10;
 
 import org.bukkit.entity.Player;
 

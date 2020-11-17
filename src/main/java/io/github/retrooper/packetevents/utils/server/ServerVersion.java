@@ -38,7 +38,7 @@ public enum ServerVersion {
 	v_1_11_2((short) 316), v_1_12((short) 335), v_1_12_1((short) 338), v_1_12_2((short) 340), v_1_13((short) 393),
 	v_1_13_1((short) 401), v_1_13_2((short) 404), v_1_14((short) 477), v_1_14_1((short) 480), v_1_14_2((short) 485),
 	v_1_14_3((short) 490), v_1_14_4((short) 498), v_1_15((short) 573), v_1_15_1((short) 575), v_1_15_2((short) 578),
-	v_1_16((short) 735), v_1_16_1((short) 736), v_1_16_2((short) 751), v_1_16_3((short) 753), ERROR((short) -1), EMPTY((short) -1);
+	v_1_16((short) 735), v_1_16_1((short) 736), v_1_16_2((short) 751), v_1_16_3((short) 753), v_1_16_4((short)754),ERROR((short) -1);
 
 	private static final String nmsVersionSuffix = Bukkit.getServer().getClass().getPackage().getName()
 			.replace(".", ",").split(",")[3];
@@ -57,6 +57,9 @@ public enum ServerVersion {
 	private static ServerVersion getVersionNoCache() {
 		if (reversedValues[0] == null) {
 			reversedValues = ServerVersion.reverse(values());
+		}
+		if(reversedValues == null) {
+			throw new IllegalStateException("Failed to reverse the ServerVersion enum constant values.");
 		}
 		for (final ServerVersion val : reversedValues) {
 			String valName = val.name().substring(2).replace("_", ".");
@@ -125,7 +128,7 @@ public enum ServerVersion {
 	 * @return True if the supplied version is lower or equal, false if it is higher
 	 *         than the server's version.
 	 */
-	public boolean isAtLeast(final ServerVersion version) {
+	public boolean isHigherThanOrEquals(final ServerVersion version) {
 		return protocolId >= version.protocolId;
 	}
 
@@ -149,7 +152,7 @@ public enum ServerVersion {
 	 * @return True if the supplied version is higher or equal, false if it is lower
 	 *         than the server's version.
 	 */
-	public boolean isAtMost(final ServerVersion version) {
+	public boolean isLowerThanOrEquals(final ServerVersion version) {
 		return version.protocolId >= protocolId;
 	}
 }

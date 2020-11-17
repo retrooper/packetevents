@@ -41,9 +41,6 @@ import java.util.UUID;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class PacketManager {
-
-    private static final AtomicInteger handlerID = new AtomicInteger();
-    private final int handlerNumber = handlerID.getAndIncrement();
     private final Plugin plugin;
     private final boolean tinyProtocolMode;
     public final TinyProtocol tinyProtocol;
@@ -57,8 +54,8 @@ public class PacketManager {
             tinyProtocol = new TinyProtocol(plugin);
             nettyProtocol = null;
         } else {
-            tinyProtocol = null;
             nettyProtocol = new NettyPacketManager(plugin);
+            tinyProtocol = null;
         }
     }
 
@@ -163,7 +160,7 @@ public class PacketManager {
     }
 
     public String getNettyHandlerName() {
-        return "pe-" + plugin.getName() + "-" + handlerNumber;
+        return "pe-" + plugin.getName();
     }
 
     public Object read(Player player, Object channel, Object packet) {
@@ -278,12 +275,13 @@ public class PacketManager {
     }
 
     private void interceptLogin(PacketLoginEvent event) {
-        if (event.getPacketId() == PacketType.Login.HANDSHAKE &&
-        PacketEvents.getAPI().getServerUtils().getVersion() != ServerVersion.v_1_7_10) {
-                WrappedPacketLoginHandshake handshake = new WrappedPacketLoginHandshake(event.getNMSPacket());
-                int protocolVersion = handshake.getProtocolVersion();
-                ClientVersion version = ClientVersion.getClientVersion(protocolVersion);
-                PacketEvents.getAPI().getPlayerUtils().clientVersionsMap.put(event.getChannel(), version);
+        if (event.getPacketId() == PacketType.Login.HANDSHAKE
+                && PacketEvents.getAPI().getServerUtils().getVersion() != ServerVersion.v_1_7_10
+                && !PacketEvents.getAPI().getServerUtils().isBungeeCordEnabled()) {
+            WrappedPacketLoginHandshake handshake = new WrappedPacketLoginHandshake(event.getNMSPacket());
+            int protocolVersion = handshake.getProtocolVersion();
+            ClientVersion version = ClientVersion.getClientVersion(protocolVersion);
+            PacketEvents.getAPI().getPlayerUtils().clientVersionsMap.put(event.getChannel(), version);
         }
     }
 
