@@ -53,7 +53,8 @@ public enum ClientVersion {
     v_1_16_1(736),
     v_1_16_2(751),
     v_1_16_3(753),
-    HIGHER_THAN_SUPPORTED_VERSIONS(754),
+    v_1_16_4(754),
+    HIGHER_THAN_SUPPORTED_VERSIONS(755),
     /**
      * Pre releases just aren't supported, we would end up with so many enum constants.
      */
@@ -65,6 +66,7 @@ public enum ClientVersion {
 
     private static final int lowestSupportedProtocolVersion = 5;
     private static final int highestSupportedProtocolVersion = 753;
+
     ClientVersion(int protocolVersion) {
         this.protocolVersion = protocolVersion;
     }
@@ -94,24 +96,21 @@ public enum ClientVersion {
     }
 
     public static ClientVersion getClientVersion(int protocolVersion) {
-        if(protocolVersion == -1) {
-          return ClientVersion.UNRESOLVED;
+        if (protocolVersion == -1) {
+            return ClientVersion.UNRESOLVED;
         }
-        for(ClientVersion version : ClientVersion.values()) {
-            if(version.protocolVersion > protocolVersion) {
+        for (ClientVersion version : ClientVersion.values()) {
+            if (version.protocolVersion > protocolVersion) {
                 break;
-            }
-            else if(version.protocolVersion == protocolVersion) {
+            } else if (version.protocolVersion == protocolVersion) {
                 return version;
             }
         }
-        if(protocolVersion < lowestSupportedProtocolVersion) {
+        if (protocolVersion < lowestSupportedProtocolVersion) {
             return LOWER_THAN_SUPPORTED_VERSIONS;
-        }
-        else if(protocolVersion > highestSupportedProtocolVersion) {
+        } else if (protocolVersion > highestSupportedProtocolVersion) {
             return HIGHER_THAN_SUPPORTED_VERSIONS;
-        }
-        else if(protocolVersion > lowestSupportedProtocolVersion
+        } else if (protocolVersion > lowestSupportedProtocolVersion
                 && protocolVersion < highestSupportedProtocolVersion) {
             return ANY_PRE_RELEASE_VERSION;
         }

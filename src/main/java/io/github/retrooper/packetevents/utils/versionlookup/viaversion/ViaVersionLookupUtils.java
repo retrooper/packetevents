@@ -22,35 +22,18 @@
  * SOFTWARE.
  */
 
-package io.github.retrooper.packetevents.example;
+package io.github.retrooper.packetevents.utils.versionlookup.viaversion;
 
-import io.github.retrooper.packetevents.PacketEvents;
-import io.github.retrooper.packetevents.event.PacketListenerDynamic;
-import io.github.retrooper.packetevents.event.impl.PacketReceiveEvent;
-import io.github.retrooper.packetevents.event.priority.PacketEventPriority;
-import io.github.retrooper.packetevents.packettype.PacketType;
-import io.github.retrooper.packetevents.packetwrappers.in.chat.WrappedPacketInChat;
-import io.github.retrooper.packetevents.utils.player.ClientVersion;
-import io.github.retrooper.packetevents.utils.server.ServerVersion;
-import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.Bukkit;
+import org.bukkit.entity.Player;
+import us.myles.ViaVersion.api.Via;
 
-public class MainExample extends JavaPlugin {
-
-    @Override
-    public void onLoad() {
-        PacketEvents.load();
+public class ViaVersionLookupUtils {
+    public static boolean isAvailable() {
+        return Bukkit.getPluginManager().isPluginEnabled("ViaVersion");
     }
 
-    @Override
-    public void onEnable() {
-        PacketEvents.getSettings().injectAsync(true).ejectAsync(true)
-                .backupServerVersion(ServerVersion.v_1_7_10).checkForUpdates(true).injectEarly(true).
-                packetHandlingThreadCount(1);
-        PacketEvents.init(this);
-    }
-
-    @Override
-    public void onDisable() {
-        PacketEvents.stop();
+    public static int getProtocolVersion(Player player) {
+        return Via.getAPI().getPlayerVersion(player.getUniqueId());
     }
 }

@@ -25,7 +25,6 @@
 package io.github.retrooper.packetevents.settings;
 
 import io.github.retrooper.packetevents.utils.server.ServerVersion;
-import net.minecraft.server.v1_8_R3.Packet;
 
 public class PacketEventsSettings {
     private ServerVersion backupServerVersion = ServerVersion.v_1_7_10;

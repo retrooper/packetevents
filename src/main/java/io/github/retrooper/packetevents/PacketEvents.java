@@ -37,7 +37,8 @@ import io.github.retrooper.packetevents.utils.nms.NMSUtils;
 import io.github.retrooper.packetevents.utils.player.ClientVersion;
 import io.github.retrooper.packetevents.utils.server.PEVersion;
 import io.github.retrooper.packetevents.utils.server.ServerVersion;
-import io.github.retrooper.packetevents.utils.v_1_7_10.ProtocolVersionAccessor_v_1_7;
+import io.github.retrooper.packetevents.utils.versionlookup.VersionLookupUtils;
+import io.github.retrooper.packetevents.utils.versionlookup.v_1_7_10.ProtocolVersionAccessor_v_1_7;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -49,7 +50,6 @@ import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.plugin.Plugin;
 
 import java.util.ArrayList;
-import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
@@ -58,8 +58,8 @@ public final class PacketEvents implements Listener {
     private static final PacketEventsAPI packetEventsAPI = new PacketEventsAPI();
     private static final PacketEvents instance = new PacketEvents();
     private static final ArrayList<Plugin> plugins = new ArrayList<>(1);
-    private static boolean loading, loaded, initialized, initializing;
-    private static final PEVersion version = new PEVersion(1, 7, 7);
+    private static boolean loading, loaded, initialized, initializing, uninitializing;
+    private static final PEVersion version = new PEVersion(1, 7, 8);
     private static PacketEventsSettings settings = new PacketEventsSettings();
     /**
      * General executor service, basically for anything that the packet executor service doesn't do.
@@ -182,7 +182,8 @@ public final class PacketEvents implements Listener {
      *
      */
     public static void stop() {
-        if (initialized) {
+        if (initialized && !uninitializing) {
+            uninitializing = true;
             for (Player player : Bukkit.getOnlinePlayers()) {
                 PacketEvents.getAPI().packetManager.ejectPlayer(player);
             }
@@ -194,6 +195,7 @@ public final class PacketEvents implements Listener {
             PacketEvents.generalExecutorService.shutdownNow();
             PacketEvents.packetHandlingExecutorService.shutdownNow();
             initialized = false;
+            uninitializing = true;
         }
     }
 
@@ -240,9 +242,13 @@ public final class PacketEvents implements Listener {
 
     @EventHandler(priority = EventPriority.LOW)
     public void onJoin(final PlayerJoinEvent e) {
+        Object channel = NMSUtils.getChannel(e.getPlayer());
         if (PacketEvents.getAPI().getServerUtils().getVersion() == ServerVersion.v_1_7_10) {
-            Object channel = NMSUtils.getChannel(e.getPlayer());
             ClientVersion version = ClientVersion.getClientVersion(ProtocolVersionAccessor_v_1_7.getProtocolVersion(e.getPlayer()));
+            PacketEvents.getAPI().getPlayerUtils().clientVersionsMap.put(channel, version);
+        } else if (VersionLookupUtils.isDependencyAvailable()) {
+            int protocolVersion = VersionLookupUtils.getProtocolVersion(e.getPlayer());
+            ClientVersion version = ClientVersion.getClientVersion(protocolVersion);
             PacketEvents.getAPI().getPlayerUtils().clientVersionsMap.put(channel, version);
         }
         //Waiting for the BungeeCord server to send their plugin message with your version,
@@ -258,6 +264,7 @@ public final class PacketEvents implements Listener {
 
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onQuit(final PlayerQuitEvent e) {
-        PacketEvents.getAPI().getPlayerUtils().clientVersionsMap.remove(e.getPlayer().getUniqueId());
+        Object channel = NMSUtils.getChannelNoCache(e.getPlayer());
+        PacketEvents.getAPI().getPlayerUtils().clientVersionsMap.remove(channel);
     }
 }

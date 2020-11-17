@@ -38,11 +38,7 @@ public final class WrappedPacketInUseEntity extends WrappedPacket {
     }
 
     public static void load() {
-        //System.out.println("USE ENTITY HAS BEEN LOADED BROOOIOII");
         Class<?> useEntityClass = NMSUtils.getNMSClassWithoutException("PacketPlayInUseEntity");
-        /*if(useEntityClass == null) {
-            System.out.println("failed to init use entity wtfffff");
-        }*/
         try {
             enumEntityUseActionClass = NMSUtils.getNMSClass("EnumEntityUseAction");
         } catch (ClassNotFoundException e) {
