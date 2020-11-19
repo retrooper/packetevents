@@ -24,7 +24,6 @@
 
 package io.github.retrooper.packetevents;
 
-import io.github.retrooper.packetevents.bungee.BungeePluginMessageListener;
 import io.github.retrooper.packetevents.event.PacketEvent;
 import io.github.retrooper.packetevents.exceptions.PacketEventsLoadFailureException;
 import io.github.retrooper.packetevents.packetmanager.PacketManager;
@@ -167,12 +166,6 @@ public final class PacketEvents implements Listener {
                         PacketEvents.generalExecutorService
                                 .submit(() -> new UpdateChecker().handleUpdate());
             }
-
-            if (getAPI().getServerUtils().isBungeeCordEnabled()) {
-                Bukkit.getMessenger().registerOutgoingPluginChannel(plugins.get(0), "BungeeCord");
-                Bukkit.getServer().getMessenger().registerIncomingPluginChannel(plugins.get(0), BungeePluginMessageListener.tagName, new BungeePluginMessageListener());
-            }
-
             initialized = true;
             initializing = false;
         }

@@ -25,7 +25,7 @@
 package io.github.retrooper.packetevents.utils.entityfinder;
 
 import io.github.retrooper.packetevents.annotations.Nullable;
-import io.github.retrooper.packetevents.exceptions.PacketEventsNMSCachedEntityNotFoundException;
+import io.github.retrooper.packetevents.exceptions.PacketEventsEntityByIDNotFoundException;
 import io.github.retrooper.packetevents.utils.nms.NMSUtils;
 import io.github.retrooper.packetevents.utils.server.ServerVersion;
 import org.bukkit.Bukkit;
@@ -77,7 +77,7 @@ public final class EntityFinderUtils {
                 }
             }
         }
-        throw new PacketEventsNMSCachedEntityNotFoundException(id);
+        throw new PacketEventsEntityByIDNotFoundException(id);
     }
 
     /**
@@ -101,7 +101,7 @@ public final class EntityFinderUtils {
                 }
             }
         }
-        throw new PacketEventsNMSCachedEntityNotFoundException(id);
+        throw new PacketEventsEntityByIDNotFoundException(id);
     }
 
     public static Object getNMSEntityByIdWithWorld(final World world, final int id) {

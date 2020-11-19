@@ -31,10 +31,12 @@ public class ClassUtil {
     private static final Map<String, String> classSimpleNameCache = new HashMap<>();
 
     public static String getClassSimpleName(Class<?> cls) {
-        String simpleClassName = classSimpleNameCache.get(cls.getName());
-        if(simpleClassName == null) {
-            String name = simpleClassName = cls.getSimpleName();
-            classSimpleNameCache.put(cls.getName(), name);
+        final String className = cls.getName();
+        final String simpleClassName;
+        if (!classSimpleNameCache.containsKey(className)) {
+            classSimpleNameCache.put(className, simpleClassName = cls.getSimpleName());
+        } else {
+            simpleClassName = classSimpleNameCache.get(className);
         }
         return simpleClassName;
     }

@@ -69,7 +69,7 @@ class EventManagerDynamic {
                         throw new PacketEventsMethodInvokeException("PacketEvents " +
                                 "failed to call an event method in the " +
                                 "dynamic packet listener. Event type: "
-                                + ClassUtil.getClassSimpleName(event.getClass()));
+                                + ClassUtil.getClassSimpleName(event.getClass()), ex);
                     }
 
                     if (event instanceof CancellableEvent) {

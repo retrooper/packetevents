@@ -25,14 +25,7 @@
 package io.github.retrooper.packetevents.example;
 
 import io.github.retrooper.packetevents.PacketEvents;
-import io.github.retrooper.packetevents.event.PacketListenerDynamic;
-import io.github.retrooper.packetevents.event.impl.PacketReceiveEvent;
-import io.github.retrooper.packetevents.event.priority.PacketEventPriority;
-import io.github.retrooper.packetevents.packettype.PacketType;
-import io.github.retrooper.packetevents.packetwrappers.in.chat.WrappedPacketInChat;
-import io.github.retrooper.packetevents.packetwrappers.in.useentity.WrappedPacketInUseEntity;
 import io.github.retrooper.packetevents.utils.server.ServerVersion;
-import org.bukkit.entity.Entity;
 import org.bukkit.plugin.java.JavaPlugin;
 
 public class MainExample extends JavaPlugin {
@@ -48,27 +41,6 @@ public class MainExample extends JavaPlugin {
         PacketEvents.getSettings().injectAsync(true).ejectAsync(true)
                 .backupServerVersion(ServerVersion.v_1_7_10).checkForUpdates(true).injectEarly(true).
                 packetHandlingThreadCount(1);
-        PacketEvents.getAPI().getEventManager()
-                .registerListener(new PacketListenerDynamic(PacketEventPriority.LOWEST) {
-                    @Override
-                    public void onPacketReceive(PacketReceiveEvent event) {
-                        if (event.getPacketId() == PacketType.Client.CHAT) {
-                            WrappedPacketInChat chat = new WrappedPacketInChat(event.getNMSPacket());
-                            String message = chat.getMessage();
-                            if (message.equals("packetevents toggle debug")) {
-                                enabled = !enabled;
-                                event.getPlayer().sendMessage("Toggled packetevents debug plugin " + (enabled ? "on" : "off") + ".");
-                            }
-                        }
-                        if (event.getPacketId() == PacketType.Client.USE_ENTITY) {
-                            if (enabled) {
-                                WrappedPacketInUseEntity ue = new WrappedPacketInUseEntity(event.getNMSPacket());
-                                Entity entity = ue.getEntity();
-                                event.getPlayer().sendMessage("Target Entity Name: " + entity.getName());
-                            }
-                        }
-                    }
-                });
         PacketEvents.init(this);
     }
 

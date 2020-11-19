@@ -24,12 +24,12 @@
 
 package io.github.retrooper.packetevents.exceptions;
 
-public class PacketEventsNMSCachedEntityNotFoundException extends RuntimeException {
-    public PacketEventsNMSCachedEntityNotFoundException(String message) {
+public class PacketEventsEntityByIDNotFoundException extends RuntimeException {
+    public PacketEventsEntityByIDNotFoundException(String message) {
         super(message);
     }
 
-    public PacketEventsNMSCachedEntityNotFoundException(int entityID) {
+    public PacketEventsEntityByIDNotFoundException(int entityID) {
         this("PacketEvents failed to find an entity with ID " + entityID + "!");
     }
 }
