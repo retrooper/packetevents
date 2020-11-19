@@ -33,7 +33,7 @@ import org.bukkit.entity.Player;
 public class PostPacketReceiveEvent extends PacketEvent implements PlayerEvent {
     private final Player player;
     private final Object packet;
-
+    private byte packetID = -1;
     public PostPacketReceiveEvent(final Player player, final Object packet) {
         this.player = player;
         this.packet = packet;
@@ -70,6 +70,9 @@ public class PostPacketReceiveEvent extends PacketEvent implements PlayerEvent {
      * @return packet id
      */
     public byte getPacketId() {
-        return PacketType.Client.packetIds.getOrDefault(packet.getClass(), (byte) -1);
+        if(packetID == -1) {
+            packetID = PacketType.Client.packetIds.getOrDefault(packet.getClass(), (byte) -1);
+        }
+        return packetID;
     }
 }

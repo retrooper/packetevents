@@ -57,11 +57,11 @@ public class UpdateChecker {
     }
 
     private void inform(String message) {
-        Bukkit.getLogger().info("[PacketEvents] " + message);
+        System.out.println("[PacketEvents] " + message);
     }
 
     private void report(String message) {
-        Bukkit.getLogger().info(ChatColor.DARK_RED + "[PacketEvents] " + message);
+        Bukkit.getConsoleSender().sendMessage(ChatColor.DARK_RED + "[PacketEvents] " + message);
     }
 
     private String readLatestVersion() throws IOException {

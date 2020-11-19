@@ -33,6 +33,7 @@ public class PacketStatusEvent extends PacketEvent implements CancellableEvent {
     private final Object channel;
     private final Object packet;
     private boolean cancelled;
+    private byte packetID = -1;
 
     public PacketStatusEvent(final Object channel, final Object packet) {
         this.channel = channel;
@@ -68,7 +69,10 @@ public class PacketStatusEvent extends PacketEvent implements CancellableEvent {
      * @return packet id
      */
     public byte getPacketId() {
-        return PacketType.Status.packetIds.getOrDefault(packet.getClass(), (byte) -1);
+        if (packetID == -1) {
+            packetID = PacketType.Status.packetIds.getOrDefault(packet.getClass(), (byte) -1);
+        }
+        return packetID;
     }
 
     @Override

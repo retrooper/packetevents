@@ -33,6 +33,7 @@ import org.bukkit.entity.Player;
 public class PostPacketSendEvent extends PacketEvent implements PlayerEvent {
     private final Player player;
     private final Object packet;
+    private byte packetID = -1;
 
     public PostPacketSendEvent(final Player player, final Object packet) {
         this.player = player;
@@ -41,6 +42,7 @@ public class PostPacketSendEvent extends PacketEvent implements PlayerEvent {
 
     /**
      * Get the packet sender
+     *
      * @return player
      */
     @Override
@@ -51,6 +53,7 @@ public class PostPacketSendEvent extends PacketEvent implements PlayerEvent {
     /**
      * Get the packet's name (NMS packet class simple name).
      * The class simple name is cached.
+     *
      * @return Name of the packet
      */
     public String getPacketName() {
@@ -59,6 +62,7 @@ public class PostPacketSendEvent extends PacketEvent implements PlayerEvent {
 
     /**
      * Get the raw packet object
+     *
      * @return packet object
      */
     public Object getNMSPacket() {
@@ -67,9 +71,13 @@ public class PostPacketSendEvent extends PacketEvent implements PlayerEvent {
 
     /**
      * Get the ID of the packet
+     *
      * @return packet id
      */
     public byte getPacketId() {
-        return PacketType.Server.packetIds.getOrDefault(packet.getClass(), (byte) -1);
+        if (packetID == -1) {
+            packetID = PacketType.Server.packetIds.getOrDefault(packet.getClass(), (byte) -1);
+        }
+        return packetID;
     }
 }

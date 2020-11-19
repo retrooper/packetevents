@@ -134,6 +134,7 @@
             <groupId>com.github.ProtocolSupport</groupId>
             <artifactId>ProtocolSupport</artifactId>
             <version>3d24efeda6</version>
+            <scope>provided</scope>
         </dependency>
 
         <dependency>
