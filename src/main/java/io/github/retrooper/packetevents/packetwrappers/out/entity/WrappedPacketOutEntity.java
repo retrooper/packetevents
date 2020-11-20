@@ -44,7 +44,7 @@ public class WrappedPacketOutEntity extends WrappedPacket implements SendableWra
     private Entity entity;
     private boolean isListening;
     private static Constructor<?> entityPacketConstructor;
-    private int entityID;
+    private int entityID = -1;
     private double deltaX, deltaY, deltaZ;
     private byte pitch, yaw;
     private boolean onGround;
