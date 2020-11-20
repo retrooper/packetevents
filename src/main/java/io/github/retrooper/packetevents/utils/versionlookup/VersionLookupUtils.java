@@ -36,10 +36,11 @@ public class VersionLookupUtils {
     }
 
     public static int getProtocolVersion(Player player) {
-        if (ViaVersionLookupUtils.isAvailable()) {
-            return ViaVersionLookupUtils.getProtocolVersion(player);
-        } else if (ProtocolSupportVersionLookupUtils.isAvailable()) {
+        //Prioritize ProtocolSupport as ViaVersion uses ProtocolSupport if protocolsupport is available.
+        if (ProtocolSupportVersionLookupUtils.isAvailable()) {
             return ProtocolSupportVersionLookupUtils.getProtocolVersion(player);
+        } else if (ViaVersionLookupUtils.isAvailable()) {
+            return ViaVersionLookupUtils.getProtocolVersion(player);
         } else if (ProtocolLibVersionLookupUtils.isAvailable()) {
             return ProtocolLibVersionLookupUtils.getProtocolVersion(player);
         }

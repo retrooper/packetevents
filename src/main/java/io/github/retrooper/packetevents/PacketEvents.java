@@ -108,7 +108,7 @@ public final class PacketEvents implements Listener {
                 WrappedPacket.loadAllWrappers();
             } catch (Exception ex) {
                 loading = false;
-                throw new PacketEventsLoadFailureException();
+                throw new PacketEventsLoadFailureException(ex);
             }
             loaded = true;
             loading = false;
@@ -184,6 +184,7 @@ public final class PacketEvents implements Listener {
             if (PacketEvents.getAPI().packetManager.tinyProtocol != null) {
                 PacketEvents.getAPI().packetManager.tinyProtocol.unregisterChannelHandler();
             }
+
             getAPI().getEventManager().unregisterAllListeners();
             PacketEvents.generalExecutorService.shutdownNow();
             PacketEvents.packetHandlingExecutorService.shutdownNow();
@@ -194,6 +195,18 @@ public final class PacketEvents implements Listener {
 
     public static boolean hasLoaded() {
         return loaded;
+    }
+
+    public static boolean isLoading() {
+        return loading;
+    }
+
+    public static boolean isInitializing() {
+        return initializing;
+    }
+
+    public static boolean isUninitializing() {
+        return uninitializing;
     }
 
     public static boolean isInitialized() {
