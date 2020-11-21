@@ -66,10 +66,7 @@ class EventManagerDynamic {
                         }
 
                     } catch (Exception ex) {
-                        throw new PacketEventsMethodInvokeException("PacketEvents " +
-                                "failed to call an event method in the " +
-                                "dynamic packet listener. Event type: "
-                                + ClassUtil.getClassSimpleName(event.getClass()), ex);
+                        ex.printStackTrace();
                     }
 
                     if (event instanceof CancellableEvent) {
