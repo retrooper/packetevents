@@ -97,14 +97,10 @@ public class WrappedPacketOutEntityTeleport extends WrappedPacket implements Sen
     }
 
     public int getEntityId() {
-        if (listeningMode) {
-            if (entityID != -1) {
-                return readInt(0);
-            } else {
-                return entityID = readInt(0);
-            }
-        } else {
+        if (entityID != -1) {
             return entityID;
+        } else {
+            return entityID = readInt(0);
         }
     }
 
