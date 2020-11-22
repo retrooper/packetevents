@@ -246,7 +246,7 @@ public final class PacketEvents implements Listener {
         }
     }
 
-    @EventHandler(priority = EventPriority.LOW)
+    @EventHandler(priority = EventPriority.HIGH)
     public void onJoin(final PlayerJoinEvent e) {
         Object channel = NMSUtils.getChannel(e.getPlayer());
         if (PacketEvents.getAPI().getServerUtils().getVersion() == ServerVersion.v_1_7_10) {
