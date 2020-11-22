@@ -122,4 +122,14 @@ public class TinyProtocol {
     public void unregisterChannelHandler() {
 
     }
+
+    public void handleQueuedKicks() {
+        if (NettyPacketManager.v1_7_nettyMode) {
+            TinyProtocol7 tp7 = (TinyProtocol7) tinyProt;
+            tp7.handleQueuedKicks();
+        } else {
+            TinyProtocol8 tp8 = (TinyProtocol8) tinyProt;
+            tp8.handleQueuedKicks();
+        }
+    }
 }

@@ -6,6 +6,7 @@ import com.mojang.authlib.GameProfile;
 import io.github.retrooper.packetevents.PacketEvents;
 import io.github.retrooper.packetevents.packetmanager.tinyprotocol.Reflection.FieldAccessor;
 import io.github.retrooper.packetevents.packetmanager.tinyprotocol.Reflection.MethodInvoker;
+import io.github.retrooper.packetevents.packetwrappers.out.kickdisconnect.WrappedPacketOutKickDisconnect;
 import io.netty.channel.*;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -16,6 +17,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
+import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Level;
 
@@ -70,6 +72,8 @@ public class TinyProtocol8 {
     private ChannelInboundHandlerAdapter serverChannelHandler;
     private ChannelInitializer<Channel> beginInitProtocol;
     private ChannelInitializer<Channel> endInitProtocol;
+
+    public final ConcurrentLinkedQueue<Channel> queueingChannelKicks = new ConcurrentLinkedQueue<>();
 
     // Current handler name
     private final String handlerName;
@@ -372,7 +376,14 @@ public class TinyProtocol8 {
                 PacketEvents.packetHandlingExecutorService.execute(new Runnable() {
                     @Override
                     public void run() {
-                        channel.pipeline().addBefore("packet_handler", handlerName, pi);
+                        try {
+                            channel.pipeline().addBefore("packet_handler", handlerName, pi);
+                        }
+                        catch(Exception ex) {
+                            //kick them
+                            Object packet = new WrappedPacketOutKickDisconnect("We unfortunately failed to inject you. Please try rejoining!").asNMSPacket();
+                            sendPacket(channel, packet);
+                        }
                     }
                 });
             }
@@ -483,6 +494,13 @@ public class TinyProtocol8 {
 
             // Clean up Bukkit
             unregisterChannelHandler();
+        }
+    }
+
+    public void handleQueuedKicks() {
+        for(Channel channel : queueingChannelKicks) {
+            Object packet = new WrappedPacketOutKickDisconnect("We failed to inject you. Please try rejoining!").asNMSPacket();
+            sendPacket(channel, packet);
         }
     }
 
