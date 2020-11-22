@@ -245,16 +245,21 @@ public final class PacketEvents implements Listener {
             }
         }
     }
-
     @EventHandler(priority = EventPriority.HIGH)
+    public void onJoinDelayed(PlayerJoinEvent e) {
+        Object channel = NMSUtils.getChannel(e.getPlayer());
+        if (VersionLookupUtils.isDependencyAvailable() && PacketEvents.getAPI().getServerUtils().getVersion() != ServerVersion.v_1_7_10) {
+            int protocolVersion = VersionLookupUtils.getProtocolVersion(e.getPlayer());
+            ClientVersion version = ClientVersion.getClientVersion(protocolVersion);
+            PacketEvents.getAPI().getPlayerUtils().clientVersionsMap.put(channel, version);
+        }
+    }
+
+    @EventHandler(priority = EventPriority.LOW)
     public void onJoin(final PlayerJoinEvent e) {
         Object channel = NMSUtils.getChannel(e.getPlayer());
         if (PacketEvents.getAPI().getServerUtils().getVersion() == ServerVersion.v_1_7_10) {
             ClientVersion version = ClientVersion.getClientVersion(ProtocolVersionAccessor_v_1_7.getProtocolVersion(e.getPlayer()));
-            PacketEvents.getAPI().getPlayerUtils().clientVersionsMap.put(channel, version);
-        } else if (VersionLookupUtils.isDependencyAvailable()) {
-            int protocolVersion = VersionLookupUtils.getProtocolVersion(e.getPlayer());
-            ClientVersion version = ClientVersion.getClientVersion(protocolVersion);
             PacketEvents.getAPI().getPlayerUtils().clientVersionsMap.put(channel, version);
         }
         //Waiting for the BungeeCord server to send their plugin message with your version,
