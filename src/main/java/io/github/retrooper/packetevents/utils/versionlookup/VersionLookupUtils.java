@@ -36,7 +36,7 @@ public class VersionLookupUtils {
     }
 
     public static int getProtocolVersion(Player player) {
-        //Prioritize ProtocolSupport as ViaVersion uses ProtocolSupport if protocolsupport is available.
+        //Prioritize ProtocolSupport as ViaVersion uses ProtocolSupport if ProtocolSupport is available.
         if (ProtocolSupportVersionLookupUtils.isAvailable()) {
             return ProtocolSupportVersionLookupUtils.getProtocolVersion(player);
         } else if (ViaVersionLookupUtils.isAvailable()) {
