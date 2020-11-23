@@ -258,7 +258,7 @@ public final class PacketEvents implements Listener {
             ClientVersion version = ClientVersion.getClientVersion(protocolVersion);
             PacketEvents.getAPI().getPlayerUtils().clientVersionsMap.put(channel, version);
         }
-        //Waiting for the BungeeCord server to send their plugin message with your version,
+
         if (!PacketEvents.getSettings().shouldInjectEarly()) {
             try {
                 PacketEvents.getAPI().packetManager.injectPlayer(e.getPlayer());
