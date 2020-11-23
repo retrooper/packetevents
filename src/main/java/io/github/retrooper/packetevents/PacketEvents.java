@@ -25,6 +25,7 @@
 package io.github.retrooper.packetevents;
 
 import io.github.retrooper.packetevents.event.PacketEvent;
+import io.github.retrooper.packetevents.event.impl.PostPlayerInjectEvent;
 import io.github.retrooper.packetevents.exceptions.PacketEventsLoadFailureException;
 import io.github.retrooper.packetevents.packetmanager.PacketManager;
 import io.github.retrooper.packetevents.packettype.PacketTypeClasses;
@@ -265,9 +266,13 @@ public final class PacketEvents implements Listener {
         if (!PacketEvents.getSettings().shouldInjectEarly()) {
             try {
                 PacketEvents.getAPI().packetManager.injectPlayer(e.getPlayer());
+                PacketEvents.getAPI().getEventManager().callEvent(new PostPlayerInjectEvent(e.getPlayer()));
             } catch (Exception ex) {
                 e.getPlayer().kickPlayer("There was an issue injecting you. Please try again!");
             }
+        }
+        else {
+            PacketEvents.getAPI().getEventManager().callEvent(new PostPlayerInjectEvent(e.getPlayer()));
         }
     }
 
