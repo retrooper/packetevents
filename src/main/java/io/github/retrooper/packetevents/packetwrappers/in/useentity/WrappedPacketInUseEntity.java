@@ -26,11 +26,12 @@ package io.github.retrooper.packetevents.packetwrappers.in.useentity;
 
 import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
 import io.github.retrooper.packetevents.utils.nms.NMSUtils;
+import io.github.retrooper.packetevents.utils.player.ClientHand;
 import io.github.retrooper.packetevents.utils.reflection.SubclassUtil;
 import org.bukkit.entity.Entity;
 
 public final class WrappedPacketInUseEntity extends WrappedPacket {
-    private static Class<?> enumEntityUseActionClass;
+    private static Class<?> enumEntityUseActionClass, enumHandClass;
     private Entity entity;
     private int entityID = -1;
     public WrappedPacketInUseEntity(final Object packet) {
@@ -39,10 +40,12 @@ public final class WrappedPacketInUseEntity extends WrappedPacket {
 
     public static void load() {
         Class<?> useEntityClass = NMSUtils.getNMSClassWithoutException("PacketPlayInUseEntity");
+        enumHandClass = NMSUtils.getNMSClassWithoutException("EnumHand");
         try {
             enumEntityUseActionClass = NMSUtils.getNMSClass("EnumEntityUseAction");
         } catch (ClassNotFoundException e) {
             //That is fine, it is probably a subclass
+            assert useEntityClass != null;
             enumEntityUseActionClass = SubclassUtil.getSubClass(useEntityClass, "EnumEntityUseAction");
         }
     }

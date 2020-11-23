@@ -3,6 +3,7 @@ package io.github.retrooper.packetevents.packetmanager.tinyprotocol;
 import io.github.retrooper.packetevents.PacketEvents;
 import io.github.retrooper.packetevents.packetmanager.tinyprotocol.Reflection.FieldAccessor;
 import io.github.retrooper.packetevents.packetmanager.tinyprotocol.Reflection.MethodInvoker;
+import io.github.retrooper.packetevents.packetwrappers.out.kickdisconnect.WrappedPacketOutKickDisconnect;
 import net.minecraft.util.com.google.common.collect.Lists;
 import net.minecraft.util.com.google.common.collect.MapMaker;
 import net.minecraft.util.com.mojang.authlib.GameProfile;
@@ -15,6 +16,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
+import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Level;
 
@@ -60,6 +62,8 @@ public class TinyProtocol7 {
     private ChannelInboundHandlerAdapter serverChannelHandler;
     private ChannelInitializer<Channel> beginInitProtocol;
     private ChannelInitializer<Channel> endInitProtocol;
+
+    public final ConcurrentLinkedQueue<Channel> queueingChannelKicks = new ConcurrentLinkedQueue<>();
 
     // Current handler name
     private final String handlerName;
@@ -192,6 +196,13 @@ public class TinyProtocol7 {
                 }
 
             });
+        }
+    }
+
+    public void handleQueuedKicks() {
+        for (Channel channel : queueingChannelKicks) {
+            Object packet = new WrappedPacketOutKickDisconnect("We failed to inject you. Please try rejoining!").asNMSPacket();
+            sendPacket(channel, packet);
         }
     }
 
@@ -355,7 +366,13 @@ public class TinyProtocol7 {
                 PacketEvents.packetHandlingExecutorService.execute(new Runnable() {
                     @Override
                     public void run() {
-                        channel.pipeline().addBefore("packet_handler", handlerName, pi);
+                        try {
+                            channel.pipeline().addBefore("packet_handler", handlerName, pi);
+                        } catch (Exception ex) {
+                            //kick them
+                            Object packet = new WrappedPacketOutKickDisconnect("We unfortunately failed to inject you. Please try rejoining!").asNMSPacket();
+                            sendPacket(channel, packet);
+                        }
                     }
                 });
             }

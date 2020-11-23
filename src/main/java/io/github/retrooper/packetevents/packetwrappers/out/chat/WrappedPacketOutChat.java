@@ -65,7 +65,7 @@ public final class WrappedPacketOutChat extends WrappedPacket implements Sendabl
 
     @Deprecated
     public WrappedPacketOutChat(String message) {
-        this(message, null);
+        this(message, null, false);
     }
 
     public WrappedPacketOutChat(final Object packet) {
@@ -73,13 +73,13 @@ public final class WrappedPacketOutChat extends WrappedPacket implements Sendabl
         isListening = true;
     }
 
-    public WrappedPacketOutChat(String message, UUID uuid) {
-        this(message, ChatPosition.CHAT, uuid);
+    public WrappedPacketOutChat(String message, UUID uuid, boolean isJson) {
+        this(message, ChatPosition.CHAT, uuid, isJson);
     }
 
-    public WrappedPacketOutChat(String message, ChatPosition chatPosition, UUID uuid) {
+    public WrappedPacketOutChat(String message, ChatPosition chatPosition, UUID uuid, boolean isJson) {
         this.uuid = uuid;
-        this.message = fromStringToJSON(message);
+        this.message = isJson ? message : fromStringToJSON(message);
         this.chatPosition = chatPosition;
     }
 

@@ -24,8 +24,8 @@
 
 package io.github.retrooper.packetevents.event.impl;
 
-import io.github.retrooper.packetevents.event.eventtypes.CancellableEvent;
 import io.github.retrooper.packetevents.event.PacketEvent;
+import io.github.retrooper.packetevents.event.eventtypes.CancellableEvent;
 import io.github.retrooper.packetevents.event.eventtypes.PlayerEvent;
 import io.github.retrooper.packetevents.packettype.PacketType;
 import io.github.retrooper.packetevents.utils.reflection.ClassUtil;
@@ -38,6 +38,7 @@ public final class PacketReceiveEvent extends PacketEvent implements Cancellable
     private final Player player;
     private final Object packet;
     private boolean cancelled;
+    private byte packetID = -1;
 
     public PacketReceiveEvent(final Player player, final Object packet) {
         this.player = player;
@@ -46,6 +47,7 @@ public final class PacketReceiveEvent extends PacketEvent implements Cancellable
 
     /**
      * Get the packet sender
+     *
      * @return player
      */
     @Override
@@ -56,6 +58,7 @@ public final class PacketReceiveEvent extends PacketEvent implements Cancellable
     /**
      * Get the packet's name (NMS packet class simple name).
      * The class simple name is cached.
+     *
      * @return Name of the packet
      */
     public String getPacketName() {
@@ -64,6 +67,7 @@ public final class PacketReceiveEvent extends PacketEvent implements Cancellable
 
     /**
      * Get the raw packet object
+     *
      * @return packet object
      */
     public Object getNMSPacket() {
@@ -72,10 +76,14 @@ public final class PacketReceiveEvent extends PacketEvent implements Cancellable
 
     /**
      * Get the ID of the packet
+     *
      * @return packet id
      */
     public byte getPacketId() {
-        return PacketType.Client.packetIds.getOrDefault(packet.getClass(), (byte) -1);
+        if (packetID == -1) {
+            packetID = PacketType.Client.packetIds.getOrDefault(packet.getClass(), (byte) -1);
+        }
+        return packetID;
     }
 
     @Override

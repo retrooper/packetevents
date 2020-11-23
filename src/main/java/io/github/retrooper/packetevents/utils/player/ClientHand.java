@@ -22,14 +22,9 @@
  * SOFTWARE.
  */
 
-package io.github.retrooper.packetevents.exceptions;
+package io.github.retrooper.packetevents.utils.player;
 
-public class PacketEventsNMSCachedEntityNotFoundException extends RuntimeException {
-    public PacketEventsNMSCachedEntityNotFoundException(String message) {
-        super(message);
-    }
-
-    public PacketEventsNMSCachedEntityNotFoundException(int entityID) {
-        this("PacketEvents failed to find an entity with ID " + entityID + "!");
-    }
+public enum ClientHand {
+    MAIN_HAND,
+    OFF_HAND;
 }

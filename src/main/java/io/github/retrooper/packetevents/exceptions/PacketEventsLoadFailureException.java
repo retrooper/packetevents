@@ -29,7 +29,15 @@ public class PacketEventsLoadFailureException extends RuntimeException {
         super(message);
     }
 
+    public PacketEventsLoadFailureException(String message, Throwable cause) {
+        super(message, cause);
+    }
+
     public PacketEventsLoadFailureException() {
         this("PacketEvents failed to successfully load...");
+    }
+
+    public PacketEventsLoadFailureException(Throwable cause) {
+        this("PacketEvents failed to successfully load...", cause);
     }
 }

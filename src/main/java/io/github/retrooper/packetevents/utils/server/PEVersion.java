@@ -24,6 +24,7 @@
 
 package io.github.retrooper.packetevents.utils.server;
 
+import java.util.Arrays;
 import java.util.List;
 
 
@@ -67,44 +68,54 @@ public class PEVersion {
     }
 
     public boolean isNewer(PEVersion other) {
+        //Our equals check is quite cheap.
+        //If they are equal, then they aren't older nor newer
+        if (equals(other)) {
+            return false;
+        }
         //The version length if guaranteed to be 4.
         for (int i = 0; i < version.length; i++) {
-            if (version[i] > other.getVersionAsByteArray()[i]) {
+            if (version[i] > other.getVersion()[i]) {
                 return true;
-            } else if (version[i] < other.getVersionAsByteArray()[i]) {
+            } else if (version[i] < other.getVersion()[i]) {
                 return false;
             }
         }
-        //If they are equal, they aren't newer nor older.
         return false;
+    }
+
+    public boolean equals(PEVersion version) {
+        return Arrays.equals(getVersion(), version.getVersion());
     }
 
     public boolean isOlder(PEVersion other) {
+        //Our equals check is quite cheap.
+        //If they are equal, then they aren't older nor newer
+        if (equals(other)) {
+            return false;
+        }
         //The version length if guaranteed to be 4.
         for (int i = 0; i < version.length; i++) {
-            if (version[i] < other.getVersionAsByteArray()[i]) {
+            if (version[i] < other.getVersion()[i]) {
                 return true;
-            } else if (version[i] > other.getVersionAsByteArray()[i]) {
+            } else if (version[i] > other.getVersion()[i]) {
                 return false;
             }
         }
-        //If they are equal, they aren't newer nor older.
         return false;
     }
 
-    // TODO: Remove "AsByteArray"
-    public final int[] getVersionAsByteArray() {
+    public final int[] getVersion() {
         return version;
     }
 
-    // TODO: Remove "AsByteArray"
-    public final int[] getVersionAsByteArrayShortened() {
+    public final int[] getVersionShortened() {
         int length = 2;
-        if(version[2] != 0) {
-         length++;   
+        if (version[2] != 0) {
+            length++;
         }
-        if(version[3] != 0) {
-         length++;   
+        if (version[3] != 0) {
+            length++;
         }
         int[] shortened = new int[length];
         System.arraycopy(version, 0, shortened, 0, length);
@@ -121,7 +132,7 @@ public class PEVersion {
 
     @Override
     public String toString() {
-        int[] shortenedVersion = getVersionAsByteArrayShortened();
+        int[] shortenedVersion = getVersionShortened();
         StringBuilder text = new StringBuilder();
         for (int v : shortenedVersion) {
             text.append(".").append(v);

@@ -34,8 +34,17 @@ public class PacketEventsMethodInvokeException extends RuntimeException {
         super(message);
     }
 
+    public PacketEventsMethodInvokeException(String message, Throwable cause) {
+        super(message, cause);
+    }
+
     public PacketEventsMethodInvokeException(Method method, PacketListener listener) {
         this("PacketEvents failed to call the " + method.getName() + " method in "
                 + ClassUtil.getClassSimpleName(listener.getClass()));
+    }
+
+    public PacketEventsMethodInvokeException(Method method, PacketListener listener, Throwable cause) {
+        this("PacketEvents failed to call the " + method.getName() + " method in "
+                + ClassUtil.getClassSimpleName(listener.getClass()), cause);
     }
 }

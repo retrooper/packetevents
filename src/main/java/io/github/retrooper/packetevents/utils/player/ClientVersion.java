@@ -64,8 +64,8 @@ public enum ClientVersion {
 
     private final int protocolVersion;
 
-    private static final int lowestSupportedProtocolVersion = 5;
-    private static final int highestSupportedProtocolVersion = 753;
+    private static final int lowestSupportedProtocolVersion = LOWER_THAN_SUPPORTED_VERSIONS.protocolVersion;
+    private static final int highestSupportedProtocolVersion = HIGHER_THAN_SUPPORTED_VERSIONS.protocolVersion;
 
     ClientVersion(int protocolVersion) {
         this.protocolVersion = protocolVersion;
@@ -106,14 +106,12 @@ public enum ClientVersion {
                 return version;
             }
         }
-        if (protocolVersion < lowestSupportedProtocolVersion) {
+        if (protocolVersion <= lowestSupportedProtocolVersion) {
             return LOWER_THAN_SUPPORTED_VERSIONS;
-        } else if (protocolVersion > highestSupportedProtocolVersion) {
+        } else if (protocolVersion >= highestSupportedProtocolVersion) {
             return HIGHER_THAN_SUPPORTED_VERSIONS;
-        } else if (protocolVersion > lowestSupportedProtocolVersion
-                && protocolVersion < highestSupportedProtocolVersion) {
+        } else {
             return ANY_PRE_RELEASE_VERSION;
         }
-        return UNRESOLVED;
     }
 }

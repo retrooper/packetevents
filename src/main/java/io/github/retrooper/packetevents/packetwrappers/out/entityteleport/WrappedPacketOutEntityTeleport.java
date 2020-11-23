@@ -41,7 +41,7 @@ public class WrappedPacketOutEntityTeleport extends WrappedPacket implements Sen
     private static final float rotationMultiplier = 256.0F / 360.0F;
     private static Constructor<?> constructor;
     private Entity entity = null;
-    private int entityID;
+    private int entityID = -1;
     private double x, y, z;
     private float yaw, pitch;
     private boolean onGround;
@@ -97,14 +97,10 @@ public class WrappedPacketOutEntityTeleport extends WrappedPacket implements Sen
     }
 
     public int getEntityId() {
-        if (listeningMode) {
-            if (entityID != -1) {
-                return readInt(0);
-            } else {
-                return entityID = readInt(0);
-            }
-        } else {
+        if (entityID != -1) {
             return entityID;
+        } else {
+            return entityID = readInt(0);
         }
     }
 

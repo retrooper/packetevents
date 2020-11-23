@@ -31,17 +31,18 @@ import org.bukkit.entity.Player;
 
 public class VersionLookupUtils {
     public static boolean isDependencyAvailable() {
-        return ViaVersionLookupUtils.isAvailable() || ProtocolSupportVersionLookupUtils.isAvailable()
-                || ProtocolLibVersionLookupUtils.isAvailable();
+        return ViaVersionLookupUtils.isAvailable()
+                || ProtocolLibVersionLookupUtils.isAvailable()
+                || ProtocolSupportVersionLookupUtils.isAvailable();
     }
 
     public static int getProtocolVersion(Player player) {
         if (ViaVersionLookupUtils.isAvailable()) {
             return ViaVersionLookupUtils.getProtocolVersion(player);
-        } else if (ProtocolSupportVersionLookupUtils.isAvailable()) {
-            return ProtocolSupportVersionLookupUtils.getProtocolVersion(player);
         } else if (ProtocolLibVersionLookupUtils.isAvailable()) {
             return ProtocolLibVersionLookupUtils.getProtocolVersion(player);
+        } else if (ProtocolSupportVersionLookupUtils.isAvailable()) {
+            return ProtocolSupportVersionLookupUtils.getProtocolVersion(player);
         }
         return -1;
     }

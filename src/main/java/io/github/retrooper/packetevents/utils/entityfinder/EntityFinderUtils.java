@@ -25,7 +25,6 @@
 package io.github.retrooper.packetevents.utils.entityfinder;
 
 import io.github.retrooper.packetevents.annotations.Nullable;
-import io.github.retrooper.packetevents.exceptions.PacketEventsNMSCachedEntityNotFoundException;
 import io.github.retrooper.packetevents.utils.nms.NMSUtils;
 import io.github.retrooper.packetevents.utils.server.ServerVersion;
 import org.bukkit.Bukkit;
@@ -36,105 +35,87 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
 public final class EntityFinderUtils {
-    @Nullable
     public static ServerVersion version;
     private static Class<?> worldServerClass;
     private static Class<?> craftWorldClass;
+    private static Class<?> entityClass;
     private static Method getEntityByIdMethod;
     private static Method craftWorldGetHandle;
+    private static Method getBukkitEntity;
 
     private static boolean isServerVersion_v_1_8_x;
 
     public static void load() {
-        isServerVersion_v_1_8_x = version.isHigherThan(ServerVersion.v_1_7_10) && version.isLowerThan(ServerVersion.v_1_9);
         try {
             worldServerClass = NMSUtils.getNMSClass("WorldServer");
             craftWorldClass = NMSUtils.getOBCClass("CraftWorld");
+            entityClass = NMSUtils.getNMSClass("Entity");
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
         }
 
         try {
-            getEntityByIdMethod = worldServerClass.getMethod(isServerVersion_v_1_8_x ? "a" : "getEntity", int.class);
+            getEntityByIdMethod = worldServerClass.getMethod((version.getProtocolVersion() == (short) 47)
+                    ? "a" : "getEntity", int.class);
             craftWorldGetHandle = craftWorldClass.getMethod("getHandle");
+            getBukkitEntity = entityClass.getMethod("getBukkitEntity");
         } catch (NoSuchMethodException e) {
             e.printStackTrace();
         }
     }
 
-    public static Object getNMSEntityById(final int id) {
-        for (final World world : Bukkit.getWorlds()) {
-            final Object entity = getNMSEntityByIdWithWorld(world, id);
-            if (entity != null) {
-                return entity;
-            }
-        }
-        //Entity has not been found in the NMS entity cache map...
-        for(World world : Bukkit.getWorlds()) {
-            for(Entity entity : world.getEntities()) {
-                if(entity.getEntityId() == id) {
-                    return NMSUtils.getNMSEntity(entity);
-                }
-            }
-        }
-        throw new PacketEventsNMSCachedEntityNotFoundException(id);
-    }
-
     /**
      * Get an entity by their ID.
-     *
      * @param id
      * @return Entity
      */
     public static Entity getEntityById(final int id) {
         for (final World world : Bukkit.getWorlds()) {
-            final Object entity = getNMSEntityByIdWithWorld(world, id);
+            final Entity entity = getEntityByIdWithWorld(world, id);
             if (entity != null) {
-                return NMSUtils.getBukkitEntity(entity);
+                return entity;
             }
         }
-        //Entity has not been found in the NMS entity cache map...
-        for(World world : Bukkit.getWorlds()) {
-            for(Entity entity : world.getEntities()) {
-                if(entity.getEntityId() == id) {
-                    return entity;
-                }
-            }
-        }
-        throw new PacketEventsNMSCachedEntityNotFoundException(id);
-    }
-
-    public static Object getNMSEntityByIdWithWorld(final World world, final int id) {
-        if (world == null) {
-            return null;
-        } else if (craftWorldClass == null) {
-            throw new IllegalStateException("PacketEvents failed to locate the CraftWorld class.");
-        }
-        Object worldServer = null;
-        try {
-            worldServer = craftWorldGetHandle.invoke(world);
-        } catch (IllegalAccessException | InvocationTargetException e) {
-            e.printStackTrace();
-        }
-
-        try {
-            return getEntityByIdMethod.invoke(worldServer, id);
-        } catch (IllegalAccessException | InvocationTargetException e) {
-            e.printStackTrace();
-        }
-       return null;
+        return  null;
     }
 
     /**
      * Get an entity by their ID, guaranteed to be in the specified world.
-     *
      * @param world
      * @param id
      * @return Entity
      */
     @Nullable
     public static Entity getEntityByIdWithWorld(final World world, final int id) {
-        Object nmsEntity = getNMSEntityByIdWithWorld(world, id);
-        return NMSUtils.getBukkitEntity(nmsEntity);
+        if (world == null) {
+            return null;
+        }
+        else if(craftWorldClass == null) {
+            throw new IllegalStateException("PacketEvents failed to locate the CraftWorld class.");
+        }
+        Object craftWorld = craftWorldClass.cast(world);
+
+        Object worldServer = null;
+        try {
+            worldServer = craftWorldGetHandle.invoke(craftWorld);
+        } catch (IllegalAccessException | InvocationTargetException e) {
+            e.printStackTrace();
+        }
+
+        Object nmsEntity = null;
+        try {
+            nmsEntity = getEntityByIdMethod.invoke(worldServer, id);
+        } catch (IllegalAccessException | InvocationTargetException e) {
+            e.printStackTrace();
+        }
+        if (nmsEntity == null) {
+            return null;
+        }
+        try {
+            return (Entity) getBukkitEntity.invoke(nmsEntity);
+        } catch (IllegalAccessException | InvocationTargetException e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 }

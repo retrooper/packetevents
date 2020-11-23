@@ -38,6 +38,7 @@ public final class PacketSendEvent extends PacketEvent implements CancellableEve
     private final Player player;
     private final Object packet;
     private boolean cancelled;
+    private byte packetID = -1;
 
     public PacketSendEvent(final Player player, final Object packet) {
         this.player = player;
@@ -65,7 +66,10 @@ public final class PacketSendEvent extends PacketEvent implements CancellableEve
      * @return packet id
      */
     public byte getPacketId() {
-        return PacketType.Server.packetIds.getOrDefault(packet.getClass(), (byte) -1);
+        if(packetID == -1) {
+            packetID = PacketType.Server.packetIds.getOrDefault(packet.getClass(), (byte) -1);
+        }
+        return packetID;
     }
 
     /**

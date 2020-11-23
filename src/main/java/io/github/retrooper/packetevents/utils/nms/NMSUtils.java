@@ -170,14 +170,6 @@ public final class NMSUtils {
         return "f";
     }
 
-    public static Object getNMSEntityById(final int id) {
-        return EntityFinderUtils.getNMSEntityById(id);
-    }
-
-    public static Object getNMSEntityByIdWithWorld(final World world, final int id) {
-        return EntityFinderUtils.getNMSEntityByIdWithWorld(world, id);
-    }
-
     @Nullable
     public static Entity getEntityById(final int id) {
         return EntityFinderUtils.getEntityById(id);

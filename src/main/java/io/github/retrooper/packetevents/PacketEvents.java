@@ -24,8 +24,8 @@
 
 package io.github.retrooper.packetevents;
 
-import io.github.retrooper.packetevents.bungee.BungeePluginMessageListener;
 import io.github.retrooper.packetevents.event.PacketEvent;
+import io.github.retrooper.packetevents.event.impl.PostPlayerInjectEvent;
 import io.github.retrooper.packetevents.exceptions.PacketEventsLoadFailureException;
 import io.github.retrooper.packetevents.packetmanager.PacketManager;
 import io.github.retrooper.packetevents.packettype.PacketTypeClasses;
@@ -52,14 +52,13 @@ import org.bukkit.plugin.Plugin;
 import java.util.ArrayList;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
 
 public final class PacketEvents implements Listener {
     private static final PacketEventsAPI packetEventsAPI = new PacketEventsAPI();
     private static final PacketEvents instance = new PacketEvents();
     private static final ArrayList<Plugin> plugins = new ArrayList<>(1);
     private static boolean loading, loaded, initialized, initializing, uninitializing;
-    private static final PEVersion version = new PEVersion(1, 7, 8);
+    private static final PEVersion version = new PEVersion(1, 7, 9);
     private static PacketEventsSettings settings = new PacketEventsSettings();
     /**
      * General executor service, basically for anything that the packet executor service doesn't do.
@@ -109,7 +108,7 @@ public final class PacketEvents implements Listener {
                 WrappedPacket.loadAllWrappers();
             } catch (Exception ex) {
                 loading = false;
-                throw new PacketEventsLoadFailureException();
+                throw new PacketEventsLoadFailureException(ex);
             }
             loaded = true;
             loading = false;
@@ -163,16 +162,14 @@ public final class PacketEvents implements Listener {
             }
 
             if (settings.shouldCheckForUpdates()) {
-                Future<?> future =
-                        PacketEvents.generalExecutorService
-                                .submit(() -> new UpdateChecker().handleUpdate());
-            }
+                PacketEvents.generalExecutorService.execute(new Runnable() {
+                    @Override
+                    public void run() {
+                        new UpdateChecker().handleUpdate();
+                    }
+                });
 
-            if (getAPI().getServerUtils().isBungeeCordEnabled()) {
-                Bukkit.getMessenger().registerOutgoingPluginChannel(plugins.get(0), "BungeeCord");
-                Bukkit.getServer().getMessenger().registerIncomingPluginChannel(plugins.get(0), BungeePluginMessageListener.tagName, new BungeePluginMessageListener());
             }
-
             initialized = true;
             initializing = false;
         }
@@ -191,6 +188,7 @@ public final class PacketEvents implements Listener {
             if (PacketEvents.getAPI().packetManager.tinyProtocol != null) {
                 PacketEvents.getAPI().packetManager.tinyProtocol.unregisterChannelHandler();
             }
+
             getAPI().getEventManager().unregisterAllListeners();
             PacketEvents.generalExecutorService.shutdownNow();
             PacketEvents.packetHandlingExecutorService.shutdownNow();
@@ -201,6 +199,18 @@ public final class PacketEvents implements Listener {
 
     public static boolean hasLoaded() {
         return loaded;
+    }
+
+    public static boolean isLoading() {
+        return loading;
+    }
+
+    public static boolean isInitializing() {
+        return initializing;
+    }
+
+    public static boolean isUninitializing() {
+        return uninitializing;
     }
 
     public static boolean isInitialized() {
@@ -240,24 +250,29 @@ public final class PacketEvents implements Listener {
         }
     }
 
-    @EventHandler(priority = EventPriority.LOW)
+    @EventHandler(priority = EventPriority.HIGH)
     public void onJoin(final PlayerJoinEvent e) {
         Object channel = NMSUtils.getChannel(e.getPlayer());
         if (PacketEvents.getAPI().getServerUtils().getVersion() == ServerVersion.v_1_7_10) {
             ClientVersion version = ClientVersion.getClientVersion(ProtocolVersionAccessor_v_1_7.getProtocolVersion(e.getPlayer()));
             PacketEvents.getAPI().getPlayerUtils().clientVersionsMap.put(channel, version);
-        } else if (VersionLookupUtils.isDependencyAvailable()) {
+        }
+        else if(VersionLookupUtils.isDependencyAvailable()) {
             int protocolVersion = VersionLookupUtils.getProtocolVersion(e.getPlayer());
             ClientVersion version = ClientVersion.getClientVersion(protocolVersion);
             PacketEvents.getAPI().getPlayerUtils().clientVersionsMap.put(channel, version);
         }
-        //Waiting for the BungeeCord server to send their plugin message with your version,
+
         if (!PacketEvents.getSettings().shouldInjectEarly()) {
             try {
                 PacketEvents.getAPI().packetManager.injectPlayer(e.getPlayer());
+                PacketEvents.getAPI().getEventManager().callEvent(new PostPlayerInjectEvent(e.getPlayer()));
             } catch (Exception ex) {
                 e.getPlayer().kickPlayer("There was an issue injecting you. Please try again!");
             }
+        }
+        else {
+            PacketEvents.getAPI().getEventManager().callEvent(new PostPlayerInjectEvent(e.getPlayer()));
         }
     }
 

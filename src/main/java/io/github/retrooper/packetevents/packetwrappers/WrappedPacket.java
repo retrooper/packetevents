@@ -94,99 +94,42 @@ public class WrappedPacket implements WrapperPacketReader, WrapperPacketWriter {
             List<Field> byteFields = getFields(byte.class, declaredFields);
             List<Field> shortFields = getFields(short.class, declaredFields);
             List<Field> intFields = getFields(int.class, declaredFields);
-            ;
             List<Field> longFields = getFields(long.class, declaredFields);
-            ;
             List<Field> floatFields = getFields(float.class, declaredFields);
-            ;
             List<Field> doubleFields = getFields(double.class, declaredFields);
-            ;
             List<Field> stringFields = getFields(String.class, declaredFields);
-            ;
 
             List<Field> boolArrayFields = getFields(boolean[].class, declaredFields);
-            ;
             List<Field> byteArrayFields = getFields(byte[].class, declaredFields);
-            ;
             List<Field> shortArrayFields = getFields(short[].class, declaredFields);
-            ;
             List<Field> intArrayFields = getFields(int[].class, declaredFields);
-            ;
             List<Field> longArrayFields = getFields(long[].class, declaredFields);
-            ;
             List<Field> floatArrayFields = getFields(float[].class, declaredFields);
-            ;
             List<Field> doubleArrayFields = getFields(double[].class, declaredFields);
-            ;
             List<Field> stringArrayFields = getFields(String[].class, declaredFields);
-            ;
+
 
             Field[] tmp = new Field[0];
 
             Map<Class<?>, Field[]> map = new HashMap<>();
-            if (boolFields != null) {
-                map.put(boolean.class, boolFields.toArray(tmp));
-            }
 
-            if (byteFields != null) {
-                map.put(byte.class, byteFields.toArray(tmp));
-            }
+            map.put(boolean.class, boolFields.toArray(tmp));
+            map.put(byte.class, byteFields.toArray(tmp));
+            map.put(short.class, shortFields.toArray(tmp));
+            map.put(int.class, intFields.toArray(tmp));
+            map.put(long.class, longFields.toArray(tmp));
+            map.put(float.class, floatFields.toArray(tmp));
+            map.put(double.class, doubleFields.toArray(tmp));
 
-            if (shortFields != null) {
-                map.put(short.class, shortFields.toArray(tmp));
-            }
-
-            if (intFields != null) {
-                map.put(int.class, intFields.toArray(tmp));
-            }
-
-            if (longFields != null) {
-                map.put(long.class, longFields.toArray(tmp));
-            }
-
-            if (floatFields != null) {
-                map.put(float.class, floatFields.toArray(tmp));
-            }
-
-            if (doubleFields != null) {
-                map.put(double.class, doubleFields.toArray(tmp));
-            }
-
-            if (stringFields != null) {
-                map.put(String.class, stringFields.toArray(tmp));
-            }
-
-            if (boolArrayFields != null) {
-                map.put(boolean[].class, boolArrayFields.toArray(tmp));
-            }
-
-            if (byteArrayFields != null) {
-                map.put(byte[].class, byteArrayFields.toArray(tmp));
-            }
-
-            if (shortArrayFields != null) {
-                map.put(short[].class, shortArrayFields.toArray(tmp));
-            }
-
-            if (intArrayFields != null) {
-                map.put(int[].class, intArrayFields.toArray(tmp));
-            }
-
-            if (longArrayFields != null) {
-                map.put(long[].class, longArrayFields.toArray(tmp));
-            }
-
-            if (floatArrayFields != null) {
-                map.put(float[].class, floatArrayFields.toArray(tmp));
-            }
-
-            if (doubleArrayFields != null) {
-                map.put(double[].class, doubleArrayFields.toArray(tmp));
-            }
-
-            if (stringArrayFields != null) {
-                map.put(String[].class, stringArrayFields.toArray(tmp));
-            }
+            map.put(String.class, stringFields.toArray(tmp));
+            map.put(boolean[].class, boolArrayFields.toArray(tmp));
+            map.put(byte[].class, byteArrayFields.toArray(tmp));
+            map.put(short[].class, shortArrayFields.toArray(tmp));
+            map.put(int[].class, intArrayFields.toArray(tmp));
+            map.put(long[].class, longArrayFields.toArray(tmp));
+            map.put(float[].class, floatArrayFields.toArray(tmp));
+            map.put(double[].class, doubleArrayFields.toArray(tmp));
+            map.put(String[].class, stringArrayFields.toArray(tmp));
             fieldCache.put(packetClass, map);
         }
         this.packet = packet;
@@ -503,8 +446,7 @@ public class WrappedPacket implements WrapperPacketReader, WrapperPacketWriter {
                 if (!typeFields.isEmpty()) {
                     cached.put(type, typeFields.toArray(new Field[0]));
                     cachedFields = cached.get(type);
-                }
-                else {
+                } else {
                     throw new WrapperFieldNotFoundException("The class you are trying to read fields from does not contain any fields!");
                 }
             }
@@ -515,6 +457,32 @@ public class WrappedPacket implements WrapperPacketReader, WrapperPacketWriter {
             }
         }
         throw new WrapperFieldNotFoundException(packetClass, type, index);
+    }
+
+    public boolean doesObjectExist(int index, Class<?> type) {
+        Map<Class<?>, Field[]> cached = fieldCache.get(packetClass);
+        if (cached != null) {
+            Field[] cachedFields = cached.get(type);
+            if (cachedFields == null) {
+                List<Field> typeFields = new ArrayList<>();
+                for (Field f : packetClass.getDeclaredFields()) {
+                    f.setAccessible(true);
+                    if (f.getType().equals(type)) {
+                        typeFields.add(f);
+                    }
+                }
+                if (!typeFields.isEmpty()) {
+                    cached.put(type, typeFields.toArray(new Field[0]));
+                    cachedFields = cached.get(type);
+                } else {
+                    return false;
+                }
+            }
+            if (cachedFields == null) {
+                return false;
+            } else return index <= cachedFields.length + 1;
+        }
+        return false;
     }
 
     public Object[] readObjectArray(int index, Class<?> type) {

@@ -22,34 +22,31 @@
  * SOFTWARE.
  */
 
-package io.github.retrooper.packetevents.bungee;
+package io.github.retrooper.packetevents.event.impl;
 
-import com.google.common.io.ByteArrayDataInput;
-import com.google.common.io.ByteStreams;
 import io.github.retrooper.packetevents.PacketEvents;
+import io.github.retrooper.packetevents.event.PacketEvent;
+import io.github.retrooper.packetevents.event.eventtypes.PlayerEvent;
 import io.github.retrooper.packetevents.utils.nms.NMSUtils;
 import io.github.retrooper.packetevents.utils.player.ClientVersion;
 import org.bukkit.entity.Player;
-import org.bukkit.plugin.messaging.PluginMessageListener;
 
-import java.util.UUID;
-
-public class BungeePluginMessageListener implements PluginMessageListener {
-    public static String tagName = "packetevents:channel";
-
-    @Override
-    public void onPluginMessageReceived(String tag, Player player, byte[] bytes) {
-        if (tag.equals(tagName)) {
-            ByteArrayDataInput in = ByteStreams.newDataInput(bytes);
-            if (in.readUTF().equals("version")) {
-                String uuidString = in.readUTF();
-                Object channel = NMSUtils.getChannel(player);
-                short protocolVersion = in.readShort();
-                ClientVersion version = ClientVersion.getClientVersion(protocolVersion);
-                PacketEvents.getAPI().getPlayerUtils().clientVersionsMap.put(channel, version);
-            }
-        }
+public class PostPlayerInjectEvent extends PacketEvent implements PlayerEvent {
+    private final Player player;
+    public PostPlayerInjectEvent(Player player) {
+        this.player = player;
     }
 
+    @Override
+    public Player getPlayer() {
+        return player;
+    }
 
+    public Object getChannel() {
+        return NMSUtils.getChannel(player);
+    }
+
+    public ClientVersion getClientVersion() {
+        return PacketEvents.getAPI().getPlayerUtils().clientVersionsMap.get(getChannel());
+    }
 }
