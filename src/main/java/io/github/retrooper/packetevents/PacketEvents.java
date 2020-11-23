@@ -57,7 +57,7 @@ public final class PacketEvents implements Listener {
     private static final PacketEvents instance = new PacketEvents();
     private static final ArrayList<Plugin> plugins = new ArrayList<>(1);
     private static boolean loading, loaded, initialized, initializing, uninitializing;
-    private static final PEVersion version = new PEVersion(1, 7, 8);
+    private static final PEVersion version = new PEVersion(1, 7, 9);
     private static PacketEventsSettings settings = new PacketEventsSettings();
     /**
      * General executor service, basically for anything that the packet executor service doesn't do.
