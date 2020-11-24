@@ -25,7 +25,6 @@
 package io.github.retrooper.packetevents.utils.player;
 
 public enum ClientVersion {
-    LOWER_THAN_SUPPORTED_VERSIONS(4),
     v_1_7_10(5),
     v_1_8(47),
     v_1_9(107),
@@ -54,7 +53,8 @@ public enum ClientVersion {
     v_1_16_2(751),
     v_1_16_3(753),
     v_1_16_4(754),
-    HIGHER_THAN_SUPPORTED_VERSIONS(755),
+    LOWER_THAN_SUPPORTED_VERSIONS(v_1_7_10.protocolVersion - 1),
+    HIGHER_THAN_SUPPORTED_VERSIONS(v_1_16_4.protocolVersion + 1),
     /**
      * Pre releases just aren't supported, we would end up with so many enum constants.
      */
@@ -62,16 +62,16 @@ public enum ClientVersion {
 
     UNRESOLVED(-1);
 
-    private final int protocolVersion;
+    private final short protocolVersion;
 
     private static final int lowestSupportedProtocolVersion = LOWER_THAN_SUPPORTED_VERSIONS.protocolVersion;
     private static final int highestSupportedProtocolVersion = HIGHER_THAN_SUPPORTED_VERSIONS.protocolVersion;
 
     ClientVersion(int protocolVersion) {
-        this.protocolVersion = protocolVersion;
+        this.protocolVersion = (short)protocolVersion;
     }
 
-    public int getProtocolVersion() {
+    public short getProtocolVersion() {
         return protocolVersion;
     }
 

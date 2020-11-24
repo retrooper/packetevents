@@ -38,7 +38,6 @@ import org.bukkit.plugin.Plugin;
 
 import java.util.HashMap;
 import java.util.UUID;
-import java.util.concurrent.atomic.AtomicInteger;
 
 public class PacketManager {
     private final Plugin plugin;
@@ -278,10 +277,12 @@ public class PacketManager {
         if (event.getPacketId() == PacketType.Login.HANDSHAKE
                 && PacketEvents.getAPI().getServerUtils().getVersion() != ServerVersion.v_1_7_10
                 && !PacketEvents.getAPI().getServerUtils().isBungeeCordEnabled()) {
-            WrappedPacketLoginHandshake handshake = new WrappedPacketLoginHandshake(event.getNMSPacket());
-            int protocolVersion = handshake.getProtocolVersion();
-            ClientVersion version = ClientVersion.getClientVersion(protocolVersion);
-            PacketEvents.getAPI().getPlayerUtils().clientVersionsMap.put(event.getChannel(), version);
+            if (!PacketEvents.getAPI().getPlayerUtils().clientVersionsMap.containsKey(event.getChannel())) {
+                WrappedPacketLoginHandshake handshake = new WrappedPacketLoginHandshake(event.getNMSPacket());
+                int protocolVersion = handshake.getProtocolVersion();
+                ClientVersion version = ClientVersion.getClientVersion(protocolVersion);
+                PacketEvents.getAPI().getPlayerUtils().clientVersionsMap.put(event.getChannel(), version);
+            }
         }
     }
 
