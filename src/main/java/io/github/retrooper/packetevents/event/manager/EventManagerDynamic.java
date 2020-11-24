@@ -29,8 +29,6 @@ import io.github.retrooper.packetevents.event.PacketListenerDynamic;
 import io.github.retrooper.packetevents.event.eventtypes.CancellableEvent;
 import io.github.retrooper.packetevents.event.impl.*;
 import io.github.retrooper.packetevents.event.priority.PacketEventPriority;
-import io.github.retrooper.packetevents.exceptions.PacketEventsMethodInvokeException;
-import io.github.retrooper.packetevents.utils.reflection.ClassUtil;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -59,6 +57,8 @@ class EventManagerDynamic {
                             listener.onPostPacketReceive((PostPacketReceiveEvent) event);
                         } else if (event instanceof PostPacketSendEvent) {
                             listener.onPostPacketSend((PostPacketSendEvent) event);
+                        } else if (event instanceof PostPlayerInjectEvent) {
+                            listener.onPostPlayerInject((PostPlayerInjectEvent) event);
                         } else if (event instanceof PlayerInjectEvent) {
                             listener.onPlayerInject((PlayerInjectEvent) event);
                         } else if (event instanceof PlayerEjectEvent) {
@@ -83,12 +83,12 @@ class EventManagerDynamic {
     }
 
     public void registerListener(PacketListenerDynamic listener) {
-            List<PacketListenerDynamic> listeners = map.get(listener.getPriority());
-            if (listeners == null) {
-                map.put(listener.getPriority(), new ArrayList<>());
-                listeners = map.get(listener.getPriority());
-            }
-            listeners.add(listener);
+        List<PacketListenerDynamic> listeners = map.get(listener.getPriority());
+        if (listeners == null) {
+            map.put(listener.getPriority(), new ArrayList<>());
+            listeners = map.get(listener.getPriority());
+        }
+        listeners.add(listener);
     }
 
     public void registerListeners(PacketListenerDynamic... listeners) {

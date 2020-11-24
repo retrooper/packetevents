@@ -54,6 +54,10 @@ public abstract class PacketListenerDynamic {
     public void onPostPacketSend(PostPacketSendEvent event) {
     }
 
+    public void onPostPlayerInject(PostPlayerInjectEvent event) {
+
+    }
+
     public void onPlayerInject(PlayerInjectEvent event) {
     }
 
