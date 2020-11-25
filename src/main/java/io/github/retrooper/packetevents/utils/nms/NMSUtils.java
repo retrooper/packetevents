@@ -136,8 +136,7 @@ public final class NMSUtils {
 
     public static double[] recentTPS() throws IllegalAccessException, InvocationTargetException {
         final Object minecraftServerObj = getMinecraftServerInstance();
-        WrappedPacket minecraftServerWrapper = new WrappedPacket(minecraftServerObj);
-        return minecraftServerWrapper.readDoubleArray(0);
+        return (double[]) Reflection.getField(minecraftServerClass, double[].class, 0).get(minecraftServerObj);
     }
 
     public static Class<?> getNMSClass(String name) throws ClassNotFoundException {
