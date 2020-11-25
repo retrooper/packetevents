@@ -25,7 +25,7 @@
 package io.github.retrooper.packetevents.updatechecker;
 
 import io.github.retrooper.packetevents.PacketEvents;
-import io.github.retrooper.packetevents.utils.server.PEVersion;
+import io.github.retrooper.packetevents.utils.version.PEVersion;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 
@@ -47,9 +47,9 @@ public class UpdateChecker {
             return;
         }
         PEVersion newVersion = new PEVersion(line);
-        if (localVersion.isOlder(newVersion)) {
+        if (localVersion.isOlderThan(newVersion)) {
             inform("[PacketEvents] There is an update available for the PacketEvents API! Your build: (" + localVersion.toString() + ") | Latest released build: (" + newVersion.toString() + ")");
-        } else if (localVersion.isNewer(newVersion)) {
+        } else if (localVersion.isNewerThan(newVersion)) {
             inform("[PacketEvents] You are on a dev or pre released build of PacketEvents. Your build: (" + localVersion.toString() + ") | Latest released build: (" + newVersion.toString() + ")");
         }
         else if (localVersion.equals(newVersion)) {
