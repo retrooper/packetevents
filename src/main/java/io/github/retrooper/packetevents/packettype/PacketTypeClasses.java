@@ -41,20 +41,26 @@ public class PacketTypeClasses {
     }
 
     public static class Login {
-        public static Class<?> HANDSHAKE,
-                IN_CUSTOM_PAYLOAD, OUT_CUSTOM_PAYLOAD, IN_START, IN_ENCRYPTION_BEGIN,
-                DISCONNECT, OUT_ENCRYPTION_BEGIN, OUT_SUCCESS;
+        public static class Client {
+            public static Class<?> HANDSHAKE, CUSTOM_PAYLOAD, START, ENCRYPTION_BEGIN;
+        }
+
+        public static class Server {
+            public static Class<?> CUSTOM_PAYLOAD, DISCONNECT, ENCRYPTION_BEGIN, SUCCESS, SET_COMPRESSION;
+        }
 
         public static void load() {
-            HANDSHAKE = NMSUtils.getNMSClassWithoutException("PacketHandshakingInSetProtocol");
+            Client.HANDSHAKE = NMSUtils.getNMSClassWithoutException("PacketHandshakingInSetProtocol");
             //In and Out custom payload login packets have been here since AROUND 1.13.2.
-            IN_CUSTOM_PAYLOAD = NMSUtils.getNMSClassWithoutException("PacketLoginInCustomPayload");
-            OUT_CUSTOM_PAYLOAD = NMSUtils.getNMSClassWithoutException("PacketLoginOutCustomPayload");
-            IN_START = NMSUtils.getNMSClassWithoutException("PacketLoginInStart");
-            IN_ENCRYPTION_BEGIN = NMSUtils.getNMSClassWithoutException("PacketLoginInEncryptionBegin");
-            DISCONNECT = NMSUtils.getNMSClassWithoutException("PacketLoginOutDisconnect");
-            OUT_ENCRYPTION_BEGIN = NMSUtils.getNMSClassWithoutException("PacketLoginOutEncryptionBegin");
-            OUT_SUCCESS = NMSUtils.getNMSClassWithoutException("PacketLoginOutSuccess");
+            Client.CUSTOM_PAYLOAD = NMSUtils.getNMSClassWithoutException("PacketLoginInCustomPayload");
+            Client.START = NMSUtils.getNMSClassWithoutException("PacketLoginInStart");
+            Client.ENCRYPTION_BEGIN = NMSUtils.getNMSClassWithoutException("PacketLoginInEncryptionBegin");
+
+            Server.CUSTOM_PAYLOAD = NMSUtils.getNMSClassWithoutException("PacketLoginOutCustomPayload");
+            Server.DISCONNECT = NMSUtils.getNMSClassWithoutException("PacketLoginOutDisconnect");
+            Server.ENCRYPTION_BEGIN = NMSUtils.getNMSClassWithoutException("PacketLoginOutEncryptionBegin");
+            Server.SUCCESS = NMSUtils.getNMSClassWithoutException("PacketLoginOutSuccess");
+            Server.SET_COMPRESSION = NMSUtils.getNMSClassWithoutException("PacketLoginOutSetCompression");
             PacketType.Login.init();
         }
     }

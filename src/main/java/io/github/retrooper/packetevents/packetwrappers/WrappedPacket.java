@@ -36,6 +36,9 @@ import io.github.retrooper.packetevents.packetwrappers.in.settings.WrappedPacket
 import io.github.retrooper.packetevents.packetwrappers.in.updatesign.WrappedPacketInUpdateSign;
 import io.github.retrooper.packetevents.packetwrappers.in.useentity.WrappedPacketInUseEntity;
 import io.github.retrooper.packetevents.packetwrappers.in.windowclick.WrappedPacketInWindowClick;
+import io.github.retrooper.packetevents.packetwrappers.login.in.WrappedPacketLoginInCustomPayload;
+import io.github.retrooper.packetevents.packetwrappers.login.out.WrappedPacketLoginOutCustomPayload;
+import io.github.retrooper.packetevents.packetwrappers.login.out.WrappedPacketLoginOutSetCompression;
 import io.github.retrooper.packetevents.packetwrappers.out.abilities.WrappedPacketOutAbilities;
 import io.github.retrooper.packetevents.packetwrappers.out.animation.WrappedPacketOutAnimation;
 import io.github.retrooper.packetevents.packetwrappers.out.chat.WrappedPacketOutChat;
@@ -137,6 +140,13 @@ public class WrappedPacket implements WrapperPacketReader, WrapperPacketWriter {
     }
 
     public static void loadAllWrappers() {
+        //LOGIN SERVER BOUND
+        WrappedPacketLoginInCustomPayload.load();
+
+        //LOGIN CLIENT BOUND
+        WrappedPacketLoginOutCustomPayload.load();
+        WrappedPacketLoginOutSetCompression.load();
+
         //SERVER BOUND
         WrappedPacketInBlockDig.load();
         WrappedPacketInBlockPlace.load();

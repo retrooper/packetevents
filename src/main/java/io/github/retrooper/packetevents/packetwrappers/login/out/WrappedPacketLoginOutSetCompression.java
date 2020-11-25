@@ -24,18 +24,54 @@
 
 package io.github.retrooper.packetevents.packetwrappers.login.out;
 
+import io.github.retrooper.packetevents.packettype.PacketTypeClasses;
+import io.github.retrooper.packetevents.packetwrappers.SendableWrapper;
 import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
 
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
+
 //This packet does not exist on 1.7.10
-public class WrappedPacketLoginOutSetCompression extends WrappedPacket {
+public class WrappedPacketLoginOutSetCompression extends WrappedPacket implements SendableWrapper {
+    private static Constructor<?> constructor;
+
+    public static void load() {
+        try {
+            if (PacketTypeClasses.Login.Server.SET_COMPRESSION != null) {
+                constructor = PacketTypeClasses.Login.Server.SET_COMPRESSION.getConstructor(int.class);
+            }
+        } catch (NoSuchMethodException e) {
+            //probably 1.7.10
+        }
+    }
+
+    private int threshold;
+
     public WrappedPacketLoginOutSetCompression(Object packet) {
         super(packet);
+    }
+
+    public WrappedPacketLoginOutSetCompression(int threshold) {
+        this.threshold = threshold;
     }
 
     /**
      * Maximum size of a packet before it can be compressed.
      */
     public int getThreshold() {
-        return readInt(0);
+        if (packet != null) {
+            return readInt(0);
+        }
+        return threshold;
+    }
+
+    @Override
+    public Object asNMSPacket() {
+        try {
+            return constructor.newInstance(threshold);
+        } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 }

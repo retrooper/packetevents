@@ -54,15 +54,13 @@ public class WrappedPacketOutCustomPayload extends WrappedPacket implements Send
 
         try {
             byteBufClass = NMSUtils.getNettyClass("buffer.ByteBuf");
-        } catch (ClassNotFoundException ignored) {
-
+        } catch (ClassNotFoundException e) {
+e.printStackTrace();
         }
         try {
             packetDataSerializerConstructor = packetDataSerializerClass.getConstructor(byteBufClass);
-        } catch (NullPointerException e) {
-            //Nothing
-        } catch (NoSuchMethodException e) {
-            //also nothing
+        } catch (NullPointerException | NoSuchMethodException e) {
+            e.printStackTrace();
         }
 
         try {
@@ -70,7 +68,7 @@ public class WrappedPacketOutCustomPayload extends WrappedPacket implements Send
                 minecraftKeyConstructor = minecraftKeyClass.getConstructor(String.class);
             }
         } catch (NoSuchMethodException e) {
-            //Nothing
+            e.printStackTrace();
         }
 
         //Constructors:
@@ -93,7 +91,6 @@ public class WrappedPacketOutCustomPayload extends WrappedPacket implements Send
                 //That's fine, just an even newer version
                 try {
                     //Minecraft key exists
-
                     for (int i = 0; i < packetClass.getDeclaredFields().length; i++) {
                         Field f = packetClass.getDeclaredFields()[i];
                         if (!Modifier.isStatic(f.getModifiers())) {
@@ -153,8 +150,8 @@ public class WrappedPacketOutCustomPayload extends WrappedPacket implements Send
     }
 
     public String getTag() {
-        if(isListening) {
-            switch(constructorMode) {
+        if (isListening) {
+            switch (constructorMode) {
                 case 0:
                 case 1:
                     return readString(0);
@@ -163,16 +160,14 @@ public class WrappedPacketOutCustomPayload extends WrappedPacket implements Send
                     WrappedPacket minecraftKeyWrapper = new WrappedPacket(minecraftKey);
                     return minecraftKeyWrapper.readString(1);
             }
+            return null;
         }
-        else {
-            return tag;
-        }
-        return null;
+        return tag;
     }
 
     public byte[] getData() {
-        if(isListening) {
-            switch(constructorMode) {
+        if (isListening) {
+            switch (constructorMode) {
                 case 0:
                     return readByteArray(0);
                 case 1:
@@ -184,11 +179,9 @@ public class WrappedPacketOutCustomPayload extends WrappedPacket implements Send
 
                     return ByteBufUtil.getBytes(byteBuf);
             }
+            return new byte[0];
         }
-        else {
-            return data;
-        }
-        return null;
+        return data;
     }
 
     @Override

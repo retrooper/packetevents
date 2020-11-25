@@ -42,19 +42,26 @@ public class PacketType {
 
     public static class Login {
         public static final Map<Class<?>, Byte> packetIds = new HashMap<>();
-        public static final byte HANDSHAKE = 0,
-                IN_CUSTOM_PAYLOAD = 1, OUT_CUSTOM_PAYLOAD = 2, IN_START = 3, IN_ENCRYPTION_BEGIN = 4,
-                DISCONNECT = 5, OUT_ENCRYPTION_BEGIN = 6, OUT_SUCCESS = 7;
+        public static class Client {
+            public static final byte HANDSHAKE = 0, CUSTOM_PAYLOAD = 1, START = 2, ENCRYPTION_BEGIN = 3;
+        }
+
+        public static class Server {
+            public static final byte CUSTOM_PAYLOAD = 4, DISCONNECT = 5, ENCRYPTION_BEGIN = 6, SUCCESS = 7, SET_COMPRESSION = 8;
+        }
+
 
         public static void init() {
-            packetIds.put(PacketTypeClasses.Login.HANDSHAKE, HANDSHAKE);
-            packetIds.put(PacketTypeClasses.Login.IN_CUSTOM_PAYLOAD, IN_CUSTOM_PAYLOAD);
-            packetIds.put(PacketTypeClasses.Login.OUT_CUSTOM_PAYLOAD, OUT_CUSTOM_PAYLOAD);
-            packetIds.put(PacketTypeClasses.Login.IN_START, IN_START);
-            packetIds.put(PacketTypeClasses.Login.IN_ENCRYPTION_BEGIN, IN_ENCRYPTION_BEGIN);
-            packetIds.put(PacketTypeClasses.Login.DISCONNECT, DISCONNECT);
-            packetIds.put(PacketTypeClasses.Login.OUT_ENCRYPTION_BEGIN, OUT_ENCRYPTION_BEGIN);
-            packetIds.put(PacketTypeClasses.Login.OUT_SUCCESS, OUT_SUCCESS);
+            packetIds.put(PacketTypeClasses.Login.Client.HANDSHAKE, Client.HANDSHAKE);
+            packetIds.put(PacketTypeClasses.Login.Client.CUSTOM_PAYLOAD, Client.CUSTOM_PAYLOAD);
+            packetIds.put(PacketTypeClasses.Login.Client.START, Client.START);
+            packetIds.put(PacketTypeClasses.Login.Client.ENCRYPTION_BEGIN, Client.ENCRYPTION_BEGIN);
+
+            packetIds.put(PacketTypeClasses.Login.Server.CUSTOM_PAYLOAD, Server.CUSTOM_PAYLOAD);
+            packetIds.put(PacketTypeClasses.Login.Server.DISCONNECT,Server.DISCONNECT);
+            packetIds.put(PacketTypeClasses.Login.Server.ENCRYPTION_BEGIN, Server.ENCRYPTION_BEGIN);
+            packetIds.put(PacketTypeClasses.Login.Server.SUCCESS, Server.SUCCESS);
+            packetIds.put(PacketTypeClasses.Login.Server.SET_COMPRESSION, Server.SET_COMPRESSION);
         }
     }
 
