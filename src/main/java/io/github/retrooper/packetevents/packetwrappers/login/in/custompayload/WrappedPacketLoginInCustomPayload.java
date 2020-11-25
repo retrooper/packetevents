@@ -22,19 +22,46 @@
  * SOFTWARE.
  */
 
-package io.github.retrooper.packetevents.packetwrappers.login.out;
+package io.github.retrooper.packetevents.packetwrappers.login.in.custompayload;
 
 import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
-import io.github.retrooper.packetevents.utils.gameprofile.GameProfileUtil;
-import io.github.retrooper.packetevents.utils.gameprofile.WrappedGameProfile;
+import io.github.retrooper.packetevents.utils.bytebuf.ByteBufUtil;
 import io.github.retrooper.packetevents.utils.nms.NMSUtils;
 
-public class WrappedPacketLoginOutSuccess extends WrappedPacket {
-    public WrappedPacketLoginOutSuccess(Object packet) {
+/**
+ * This packet exists since 1.13.2
+ */
+public class WrappedPacketLoginInCustomPayload extends WrappedPacket {
+    private static Class<?> byteBufClass;
+    private static Class<?> packetDataSerializerClass;
+
+    public static void load() {
+        packetDataSerializerClass = NMSUtils.getNMSClassWithoutException("PacketDataSerializer");
+        try {
+            byteBufClass = NMSUtils.getNettyClass("buffer.ByteBuf");
+        } catch (ClassNotFoundException ignored) {
+        }
+    }
+
+    public WrappedPacketLoginInCustomPayload(Object packet) {
         super(packet);
     }
 
-    public WrappedGameProfile getGameProfile() {
-        return GameProfileUtil.getWrappedGameProfile(readObject(0, NMSUtils.gameProfileClass));
+    public int getMessageId() {
+        return readInt(0);
+    }
+
+    /* TODO wrappers
+     * net.minecraft.server.v1_16_R2.PacketLoginOutCustomPayload outCP;
+     * net.minecraft.server.v1_16_R2.PacketPlayOutLogin outLogin;
+     * Find out about the Status Response packet
+     */
+
+    public byte[] getData() {
+        Object dataSerializer = readObject(0, packetDataSerializerClass);
+        WrappedPacket byteBufWrapper = new WrappedPacket(dataSerializer);
+        Object byteBuf = byteBufWrapper.readObject(0, byteBufClass);
+        return ByteBufUtil.getBytes(byteBuf);
     }
 }
+

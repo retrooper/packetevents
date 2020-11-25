@@ -22,20 +22,19 @@
  * SOFTWARE.
  */
 
-package io.github.retrooper.packetevents.packetwrappers.login.in;
+package io.github.retrooper.packetevents.packetwrappers.login.out.disconnect;
 
 import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
+import io.github.retrooper.packetevents.packetwrappers.out.chat.WrappedPacketOutChat;
+import io.github.retrooper.packetevents.utils.nms.NMSUtils;
 
-public class WrapppedPacketLoginInEncryptionBegin extends WrappedPacket {
-    public WrapppedPacketLoginInEncryptionBegin(Object packet) {
+public class WrappedPacketLoginOutDisconnect extends WrappedPacket {
+    public WrappedPacketLoginOutDisconnect(Object packet) {
         super(packet);
     }
 
-    public byte[] getPublicKey() {
-        return readByteArray(0);
-    }
-
-    public byte[] getVerifyToken() {
-        return readByteArray(1);
+    public String getReason() {
+        Object iChatBaseComponent = readObject(0, NMSUtils.iChatBaseComponentClass);
+        return WrappedPacketOutChat.toStringFromIChatBaseComponent(iChatBaseComponent);
     }
 }

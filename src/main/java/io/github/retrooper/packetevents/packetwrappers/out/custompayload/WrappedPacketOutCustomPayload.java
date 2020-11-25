@@ -39,23 +39,19 @@ public class WrappedPacketOutCustomPayload extends WrappedPacket implements Send
     private static Constructor<?> constructor;
     private static Constructor<?> packetDataSerializerConstructor;
     private static Constructor<?> minecraftKeyConstructor;
-    private static Class<?> byteBufClass;
-    private static Class<?> packetDataSerializerClass;
-    private static Class<?> minecraftKeyClass;
+    private static Class<?> byteBufClass, packetDataSerializerClass, minecraftKeyClass;
     private static int minecraftKeyIndexInClass;
 
     private static byte constructorMode = 0;
-    private boolean isListening = false;
 
     public static void load() {
         Class<?> packetClass = PacketTypeClasses.Server.CUSTOM_PAYLOAD;
         packetDataSerializerClass = NMSUtils.getNMSClassWithoutException("PacketDataSerializer");
         minecraftKeyClass = NMSUtils.getNMSClassWithoutException("MinecraftKey");
-
         try {
             byteBufClass = NMSUtils.getNettyClass("buffer.ByteBuf");
         } catch (ClassNotFoundException e) {
-e.printStackTrace();
+            e.printStackTrace();
         }
         try {
             packetDataSerializerConstructor = packetDataSerializerClass.getConstructor(byteBufClass);
@@ -118,39 +114,10 @@ e.printStackTrace();
 
     public WrappedPacketOutCustomPayload(Object packet) {
         super(packet);
-        isListening = true;
-    }
-
-    @Override
-    protected void setup() {
-        switch (constructorMode) {
-            case 0:
-                this.tag = readString(0);
-                this.data = readByteArray(0);
-                break;
-            case 1:
-                this.tag = readString(0);
-                Object dataSerializer = readObject(0, packetDataSerializerClass);
-                WrappedPacket byteBufWrapper = new WrappedPacket(dataSerializer);
-
-                Object byteBuf = byteBufWrapper.readObject(0, byteBufClass);
-
-                this.data = ByteBufUtil.getBytes(byteBuf);
-                break;
-            case 2:
-                Object minecraftKey = readObject(minecraftKeyIndexInClass, minecraftKeyClass);
-                WrappedPacket minecraftKeyWrapper = new WrappedPacket(minecraftKey);
-                this.tag = minecraftKeyWrapper.readString(1);
-                Object dataSerializer2 = readObject(0, packetDataSerializerClass);
-                WrappedPacket byteBuf2Wrapper = new WrappedPacket(dataSerializer2);
-                Object byteBuf2 = byteBuf2Wrapper.readObject(0, byteBufClass);
-                this.data = ByteBufUtil.getBytes(byteBuf2);
-                break;
-        }
     }
 
     public String getTag() {
-        if (isListening) {
+        if (packet != null) {
             switch (constructorMode) {
                 case 0:
                 case 1:
@@ -166,7 +133,7 @@ e.printStackTrace();
     }
 
     public byte[] getData() {
-        if (isListening) {
+        if (packet != null) {
             switch (constructorMode) {
                 case 0:
                     return readByteArray(0);

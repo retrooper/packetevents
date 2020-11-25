@@ -25,7 +25,6 @@
 package io.github.retrooper.packetevents.example;
 
 import io.github.retrooper.packetevents.PacketEvents;
-import io.github.retrooper.packetevents.utils.server.ServerVersion;
 import org.bukkit.plugin.java.JavaPlugin;
 
 public class MainExample extends JavaPlugin {
@@ -36,10 +35,7 @@ public class MainExample extends JavaPlugin {
 
     @Override
     public void onEnable() {
-        PacketEvents.getSettings().injectAsync(true)
-                .ejectAsync(true).backupServerVersion(ServerVersion.v_1_7_10)
-                .checkForUpdates(true).injectEarly(true)
-                .packetHandlingThreadCount(1);
+        //We use default settings
         PacketEvents.init(this);
     }
 

@@ -29,7 +29,7 @@ import io.github.retrooper.packetevents.event.impl.*;
 import io.github.retrooper.packetevents.packetmanager.netty.NettyPacketManager;
 import io.github.retrooper.packetevents.packetmanager.tinyprotocol.TinyProtocol;
 import io.github.retrooper.packetevents.packettype.PacketType;
-import io.github.retrooper.packetevents.packetwrappers.login.in.WrappedPacketLoginHandshake;
+import io.github.retrooper.packetevents.packetwrappers.login.in.handshake.WrappedPacketLoginInHandshake;
 import io.github.retrooper.packetevents.utils.player.ClientVersion;
 import io.github.retrooper.packetevents.utils.reflection.ClassUtil;
 import io.github.retrooper.packetevents.utils.server.ServerVersion;
@@ -226,31 +226,18 @@ public class PacketManager {
     }
 
     public void postRead(Player player, Object packet) {
-        switch (ClassUtil.getClassSimpleName(packet.getClass())) {
-            case "PacketHandshakingInSetProtocol":
-            case "PacketLoginInCustomPayload":
-            case "PacketLoginInStart":
-            case "PacketLoginInEncryptionBegin":
-            case "PacketStatusInPing":
-                break;
-            default:
-                PacketEvents.getAPI().getEventManager().callEvent(new PostPacketReceiveEvent(player, packet));
-                break;
+        if (player != null) {
+            PostPacketReceiveEvent event = new PostPacketReceiveEvent(player, packet);
+            PacketEvents.getAPI().getEventManager().callEvent(event);
+            interceptPostRead(event);
         }
     }
 
     public void postWrite(Player player, Object packet) {
-        switch (ClassUtil.getClassSimpleName(packet.getClass())) {
-            case "PacketLoginOutDisconnect":
-            case "PacketLoginOutEncryptionBegin":
-            case "PacketLoginOutSetCompression":
-            case "PacketLoginOutSuccess":
-            case "PacketStatusOutPong":
-            case "PacketStatusOutServerInfo":
-                break;
-            default:
-                PacketEvents.getAPI().getEventManager().callEvent(new PostPacketSendEvent(player, packet));
-                break;
+        if (player != null) {
+            PostPacketSendEvent event = new PostPacketSendEvent(player, packet);
+            PacketEvents.getAPI().getEventManager().callEvent(event);
+            interceptPostSend(event);
         }
     }
 
@@ -268,21 +255,18 @@ public class PacketManager {
     }
 
     private void interceptWrite(PacketSendEvent event) {
-        if (event.getPacketId() == PacketType.Server.KEEP_ALIVE) {
-            keepAliveMap.put(event.getPlayer().getUniqueId(), event.getTimestamp());
-        }
+
     }
 
     private void interceptLogin(PacketLoginEvent event) {
-        if (event.getPacketId() == PacketType.Login.HANDSHAKE
+        if (event.getPacketId() == PacketType.Login.Client.HANDSHAKE
                 && PacketEvents.getAPI().getServerUtils().getVersion() != ServerVersion.v_1_7_10
-                && !PacketEvents.getAPI().getServerUtils().isBungeeCordEnabled()) {
-            if (!PacketEvents.getAPI().getPlayerUtils().clientVersionsMap.containsKey(event.getChannel())) {
-                WrappedPacketLoginHandshake handshake = new WrappedPacketLoginHandshake(event.getNMSPacket());
-                int protocolVersion = handshake.getProtocolVersion();
-                ClientVersion version = ClientVersion.getClientVersion(protocolVersion);
-                PacketEvents.getAPI().getPlayerUtils().clientVersionsMap.put(event.getChannel(), version);
-            }
+                && !PacketEvents.getAPI().getServerUtils().isBungeeCordEnabled() &&
+                !PacketEvents.getAPI().getPlayerUtils().clientVersionsMap.containsKey(event.getChannel())) {
+            WrappedPacketLoginInHandshake handshake = new WrappedPacketLoginInHandshake(event.getNMSPacket());
+            int protocolVersion = handshake.getProtocolVersion();
+            ClientVersion version = ClientVersion.getClientVersion(protocolVersion);
+            PacketEvents.getAPI().getPlayerUtils().clientVersionsMap.put(event.getChannel(), version);
         }
     }
 
@@ -290,4 +274,13 @@ public class PacketManager {
 
     }
 
+    private void interceptPostRead(PostPacketReceiveEvent event) {
+
+    }
+
+    private void interceptPostSend(PostPacketSendEvent event) {
+        if (event.getPacketId() == PacketType.Server.KEEP_ALIVE) {
+            keepAliveMap.put(event.getPlayer().getUniqueId(), event.getTimestamp());
+        }
+    }
 }

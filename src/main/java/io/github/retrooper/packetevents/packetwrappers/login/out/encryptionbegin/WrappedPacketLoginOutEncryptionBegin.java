@@ -22,16 +22,26 @@
  * SOFTWARE.
  */
 
-package io.github.retrooper.packetevents.packetwrappers.status;
+package io.github.retrooper.packetevents.packetwrappers.login.out.encryptionbegin;
 
 import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
 
-public class WrappedPacketStatusPing extends WrappedPacket {
-    public WrappedPacketStatusPing(Object packet) {
+import java.security.PublicKey;
+
+public class WrappedPacketLoginOutEncryptionBegin extends WrappedPacket {
+    public WrappedPacketLoginOutEncryptionBegin(Object packet) {
         super(packet);
     }
 
-    public long getPayload() {
-        return readLong(0);
+    public String getEncodedString() {
+        return readString(0);
+    }
+
+    public PublicKey getPublicKey() {
+        return (PublicKey) readObject(1, PublicKey.class);
+    }
+
+    public byte[] getByteArray() {
+        return readByteArray(0);
     }
 }

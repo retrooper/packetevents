@@ -33,6 +33,7 @@ public class PacketEventsSettings {
     private boolean checkForUpdates = true;
     private boolean injectEarly = true;
     private int packetHandlingThreadCount = 1;
+    private String injectionFailureMessage = "We were unable to inject you. Please try again!";
 
     public PacketEventsSettings backupServerVersion(ServerVersion serverVersion) {
         this.backupServerVersion = serverVersion;
@@ -66,6 +67,11 @@ public class PacketEventsSettings {
         return this;
     }
 
+    public PacketEventsSettings injectionFailureMessage(String message) {
+        this.injectionFailureMessage = message;
+        return this;
+    }
+
     public ServerVersion getBackupServerVersion() {
         return backupServerVersion;
     }
@@ -88,5 +94,9 @@ public class PacketEventsSettings {
 
     public int getPacketHandlingThreadCount() {
         return packetHandlingThreadCount;
+    }
+
+    public String getInjectionFailureMessage() {
+        return injectionFailureMessage;
     }
 }

@@ -24,19 +24,28 @@
 
 package io.github.retrooper.packetevents.packettype;
 
+import io.github.retrooper.packetevents.PacketEvents;
+import io.github.retrooper.packetevents.utils.server.ServerVersion;
+
 import java.util.HashMap;
 import java.util.Map;
 
 public class PacketType {
     public static class Status {
         public static final Map<Class<?>, Byte> packetIds = new HashMap<>();
-        public static final byte IN_START = 0, PING = 1, PONG = 2, SERVER_INFO = 3;
+        public static class Client {
+            public static final byte START = 0, PING = 1;
+        }
+
+        public static class Server {
+            public static final byte PONG = 2, SERVER_INFO = 3;
+        }
 
         public static void init() {
-            packetIds.put(PacketTypeClasses.Status.IN_START, IN_START);
-            packetIds.put(PacketTypeClasses.Status.PING, PING);
-            packetIds.put(PacketTypeClasses.Status.PONG, PONG);
-            packetIds.put(PacketTypeClasses.Status.SERVER_INFO, SERVER_INFO);
+            packetIds.put(PacketTypeClasses.Status.Client.START, Client.START);
+            packetIds.put(PacketTypeClasses.Status.Client.PING, Client.PING);
+            packetIds.put(PacketTypeClasses.Status.Server.PONG, Server.PONG);
+            packetIds.put(PacketTypeClasses.Status.Server.SERVER_INFO, Server.SERVER_INFO);
         }
     }
 
@@ -143,6 +152,13 @@ public class PacketType {
                         || packetID == POSITION
                         || packetID == POSITION_LOOK
                         || packetID == LOOK;
+            }
+
+            public static boolean isBlockPlace(final byte packetID) {
+                final ServerVersion version = PacketEvents.getAPI().getServerUtils().getVersion();
+                return (version.isHigherThan(ServerVersion.v_1_8_8)) ?
+                        packetID == Client.USE_ITEM
+                        : packetID == Client.BLOCK_PLACE;
             }
         }
     }

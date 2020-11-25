@@ -29,13 +29,19 @@ import io.github.retrooper.packetevents.utils.reflection.SubclassUtil;
 
 public class PacketTypeClasses {
     public static class Status {
-        public static Class<?> IN_START, PING, PONG, SERVER_INFO;
+        public static class Client {
+            public static Class<?> START, PING;
+        }
+
+        public static class Server {
+            public static Class<?> PONG, SERVER_INFO;
+        }
 
         public static void load() {
-            IN_START = NMSUtils.getNMSClassWithoutException("PacketStatusInStart");
-            PING = NMSUtils.getNMSClassWithoutException("PacketStatusInPing");
-            PONG = NMSUtils.getNMSClassWithoutException("PacketStatusOutPong");
-            SERVER_INFO = NMSUtils.getNMSClassWithoutException("PacketStatusOutServerInfo");
+            Client.START = NMSUtils.getNMSClassWithoutException("PacketStatusInStart");
+            Client.PING = NMSUtils.getNMSClassWithoutException("PacketStatusInPing");
+            Server.PONG = NMSUtils.getNMSClassWithoutException("PacketStatusOutPong");
+            Server.SERVER_INFO = NMSUtils.getNMSClassWithoutException("PacketStatusOutServerInfo");
             PacketType.Status.init();
         }
     }

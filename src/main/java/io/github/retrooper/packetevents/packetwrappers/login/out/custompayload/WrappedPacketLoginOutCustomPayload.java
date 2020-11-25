@@ -22,7 +22,7 @@
  * SOFTWARE.
  */
 
-package io.github.retrooper.packetevents.packetwrappers.login.out;
+package io.github.retrooper.packetevents.packetwrappers.login.out.custompayload;
 
 import io.github.retrooper.packetevents.packettype.PacketTypeClasses;
 import io.github.retrooper.packetevents.packetwrappers.SendableWrapper;
@@ -31,9 +31,7 @@ import io.github.retrooper.packetevents.utils.bytebuf.ByteBufUtil;
 import io.github.retrooper.packetevents.utils.nms.NMSUtils;
 
 import java.lang.reflect.Constructor;
-import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Modifier;
 
 public class WrappedPacketLoginOutCustomPayload extends WrappedPacket implements SendableWrapper {
     private static Constructor<?> constructor;
@@ -42,46 +40,36 @@ public class WrappedPacketLoginOutCustomPayload extends WrappedPacket implements
     private static Class<?> byteBufClass;
     private static Class<?> packetDataSerializerClass;
     private static Class<?> minecraftKeyClass;
-    private static int minecraftKeyIndexInClass;
-
-    private static byte constructorMode = 0;
 
     public static void load() {
-        Class<?> packetClass = PacketTypeClasses.Server.CUSTOM_PAYLOAD;
-        packetDataSerializerClass = NMSUtils.getNMSClassWithoutException("PacketDataSerializer");
-        minecraftKeyClass = NMSUtils.getNMSClassWithoutException("MinecraftKey");
+        Class<?> packetClass = PacketTypeClasses.Login.Server.CUSTOM_PAYLOAD;
+        if (packetClass != null) {
+            packetDataSerializerClass = NMSUtils.getNMSClassWithoutException("PacketDataSerializer");
+            minecraftKeyClass = NMSUtils.getNMSClassWithoutException("MinecraftKey");
 
-        try {
-            byteBufClass = NMSUtils.getNettyClass("buffer.ByteBuf");
-        } catch (ClassNotFoundException ex) {
-            ex.printStackTrace();
-        }
-        try {
-            packetDataSerializerConstructor = packetDataSerializerClass.getConstructor(byteBufClass);
-        } catch (NullPointerException | NoSuchMethodException e) {
-            e.printStackTrace();
-        }
-        try {
-            if (minecraftKeyClass != null) {
-                minecraftKeyConstructor = minecraftKeyClass.getConstructor(String.class);
+            try {
+                byteBufClass = NMSUtils.getNettyClass("buffer.ByteBuf");
+            } catch (ClassNotFoundException ex) {
+                ex.printStackTrace();
             }
-        } catch (NoSuchMethodException e) {
-            e.printStackTrace();
-        }
-        try {
-            //Minecraft key exists
-
-            for (int i = 0; i < packetClass.getDeclaredFields().length; i++) {
-                Field f = packetClass.getDeclaredFields()[i];
-                if (!Modifier.isStatic(f.getModifiers())) {
-                    minecraftKeyIndexInClass = i;
-                    break;
+            try {
+                packetDataSerializerConstructor = packetDataSerializerClass.getConstructor(byteBufClass);
+            } catch (NullPointerException | NoSuchMethodException e) {
+                e.printStackTrace();
+            }
+            try {
+                if (minecraftKeyClass != null) {
+                    minecraftKeyConstructor = minecraftKeyClass.getConstructor(String.class);
                 }
+            } catch (NoSuchMethodException e) {
+                e.printStackTrace();
             }
-            constructor = packetClass.getConstructor(minecraftKeyClass, packetDataSerializerClass);
-            constructorMode = 2;
-        } catch (NoSuchMethodException e3) {
-            throw new IllegalStateException("PacketEvents is unable to resolve the PacketPlayOutCustomPayload constructor.");
+
+            try {
+                constructor = packetClass.getConstructor(minecraftKeyClass, packetDataSerializerClass);
+            } catch (NoSuchMethodException e3) {
+                throw new IllegalStateException("PacketEvents is unable to resolve the PacketPlayOutCustomPayload constructor.");
+            }
         }
     }
 
@@ -102,19 +90,11 @@ public class WrappedPacketLoginOutCustomPayload extends WrappedPacket implements
 
     public String getChannelName() {
         if (packet != null) {
-            switch (constructorMode) {
-                case 0:
-                case 1:
-                    return readString(0);
-                case 2:
-                    Object minecraftKey = readObject(minecraftKeyIndexInClass, minecraftKeyClass);
-                    WrappedPacket minecraftKeyWrapper = new WrappedPacket(minecraftKey);
-                    return minecraftKeyWrapper.readString(1);
-            }
-        } else {
-            return channelName;
+            Object minecraftKey = readObject(0, minecraftKeyClass);
+            WrappedPacket minecraftKeyWrapper = new WrappedPacket(minecraftKey);
+            return minecraftKeyWrapper.readString(1);
         }
-        return null;
+        return channelName;
     }
 
     public byte[] getData() {

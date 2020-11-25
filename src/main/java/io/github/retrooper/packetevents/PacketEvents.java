@@ -50,6 +50,7 @@ import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.plugin.Plugin;
 
 import java.util.ArrayList;
+import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -157,7 +158,7 @@ public final class PacketEvents implements Listener {
                 try {
                     getAPI().getPlayerUtils().injectPlayer(p);
                 } catch (Exception ex) {
-                    p.kickPlayer("Failed to inject you, please rejoin the server!");
+                    p.kickPlayer(PacketEvents.getSettings().getInjectionFailureMessage());
                 }
             }
 
@@ -245,7 +246,7 @@ public final class PacketEvents implements Listener {
             try {
                 getAPI().packetManager.injectPlayer(e.getPlayer());
             } catch (Exception ex) {
-                e.disallow(PlayerLoginEvent.Result.KICK_OTHER, "We are unable to inject you. Please try again!");
+                e.disallow(PlayerLoginEvent.Result.KICK_OTHER, PacketEvents.getSettings().getInjectionFailureMessage());
             }
         }
     }
@@ -266,12 +267,14 @@ public final class PacketEvents implements Listener {
         if (!PacketEvents.getSettings().shouldInjectEarly()) {
             try {
                 PacketEvents.getAPI().packetManager.injectPlayer(e.getPlayer());
+                //The injection has succeeded if we reach to this point.
                 PacketEvents.getAPI().getEventManager().callEvent(new PostPlayerInjectEvent(e.getPlayer()));
             } catch (Exception ex) {
-                e.getPlayer().kickPlayer("There was an issue injecting you. Please try again!");
+                e.getPlayer().kickPlayer(PacketEvents.getSettings().getInjectionFailureMessage());
             }
         }
         else {
+            //We have already injected them.
             PacketEvents.getAPI().getEventManager().callEvent(new PostPlayerInjectEvent(e.getPlayer()));
         }
     }
@@ -279,7 +282,10 @@ public final class PacketEvents implements Listener {
 
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onQuit(final PlayerQuitEvent e) {
+        UUID uuid = e.getPlayer().getUniqueId();
         Object channel = NMSUtils.getChannelNoCache(e.getPlayer());
         PacketEvents.getAPI().getPlayerUtils().clientVersionsMap.remove(channel);
+        PacketEvents.getAPI().getPlayerUtils().playerPingMap.remove(uuid);
+        PacketEvents.getAPI().getPlayerUtils().playerSmoothedPingMap.remove(uuid);
     }
 }

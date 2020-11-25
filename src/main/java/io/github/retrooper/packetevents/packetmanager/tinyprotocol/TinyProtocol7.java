@@ -363,18 +363,21 @@ public class TinyProtocol7 {
             if (interceptor == null) {
                 interceptor = new PacketInterceptor();
                 final PacketInterceptor pi = interceptor;
+                boolean[] success = {true};
                 PacketEvents.packetHandlingExecutorService.execute(new Runnable() {
                     @Override
                     public void run() {
                         try {
                             channel.pipeline().addBefore("packet_handler", handlerName, pi);
                         } catch (Exception ex) {
-                            //kick them
-                            Object packet = new WrappedPacketOutKickDisconnect("We unfortunately failed to inject you. Please try rejoining!").asNMSPacket();
-                            sendPacket(channel, packet);
+                            success[0] = false;
                         }
                     }
                 });
+
+                if(!success[0]) {
+                    throw new IllegalStateException("Failed to inject");
+                }
             }
 
             return interceptor;

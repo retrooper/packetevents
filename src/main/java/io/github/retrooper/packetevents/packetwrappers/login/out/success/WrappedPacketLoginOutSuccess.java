@@ -22,15 +22,15 @@
  * SOFTWARE.
  */
 
-package io.github.retrooper.packetevents.packetwrappers.login.in;
+package io.github.retrooper.packetevents.packetwrappers.login.out.success;
 
 import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
 import io.github.retrooper.packetevents.utils.gameprofile.GameProfileUtil;
 import io.github.retrooper.packetevents.utils.gameprofile.WrappedGameProfile;
 import io.github.retrooper.packetevents.utils.nms.NMSUtils;
 
-public class WrappedPacketLoginInStart extends WrappedPacket {
-    public WrappedPacketLoginInStart(Object packet) {
+public class WrappedPacketLoginOutSuccess extends WrappedPacket {
+    public WrappedPacketLoginOutSuccess(Object packet) {
         super(packet);
     }
 

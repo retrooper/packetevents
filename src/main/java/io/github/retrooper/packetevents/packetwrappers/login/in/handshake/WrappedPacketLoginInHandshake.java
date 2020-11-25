@@ -22,12 +22,12 @@
  * SOFTWARE.
  */
 
-package io.github.retrooper.packetevents.packetwrappers.login.in;
+package io.github.retrooper.packetevents.packetwrappers.login.in.handshake;
 
 import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
 
-public class WrappedPacketLoginHandshake extends WrappedPacket {
-    public WrappedPacketLoginHandshake(Object packet) {
+public class WrappedPacketLoginInHandshake extends WrappedPacket {
+    public WrappedPacketLoginInHandshake(Object packet) {
         super(packet);
     }
 
