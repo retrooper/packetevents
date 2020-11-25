@@ -43,7 +43,7 @@ public class PEVersion {
         }
     }
 
-    public int compare(PEVersion version) {
+    public int compareTo(PEVersion version) {
         int localLength = versionIntArray.length;
         int oppositeLength = version.versionIntArray.length;
         int length = Math.max(versionIntArray.length, version.versionIntArray.length);
@@ -64,11 +64,11 @@ public class PEVersion {
     }
 
     public boolean isNewerThan(PEVersion version) {
-        return compare(version) == 1;
+        return compareTo(version) == 1;
     }
 
     public boolean isOlderThan(PEVersion version) {
-        return compare(version) == -1;
+        return compareTo(version) == -1;
     }
 
     public int[] asArray() {
@@ -84,8 +84,8 @@ public class PEVersion {
     }
 
     @Override
-    protected Object clone() throws CloneNotSupportedException {
-        return super.clone();
+    protected Object clone() {
+        return new PEVersion(this.versionIntArray);
     }
 
     @Override
