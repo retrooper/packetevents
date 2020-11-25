@@ -103,8 +103,8 @@ public final class PlayerUtils {
 
     /**
      * Send a {@link SendableWrapper} wrapper to a player.
-     * @param player
-     * @param sendableWrapper
+     * @param player Target player
+     * @param sendableWrapper Wrapper
      */
     public void sendPacket(final Player player, final SendableWrapper sendableWrapper) {
         PacketEvents.getAPI().packetManager.sendPacket(NMSUtils.getChannel(player), sendableWrapper.asNMSPacket());
@@ -112,10 +112,28 @@ public final class PlayerUtils {
 
     /**
      * Send a raw NMS packet to a player.
-     * @param player
-     * @param nmsPacket
+     * @param player Target player
+     * @param nmsPacket Raw packet
      */
-    public void sendNMSPacket(final Player player, Object nmsPacket) {
+    public void sendNMSPacket(final Player player, final Object nmsPacket) {
         PacketEvents.getAPI().packetManager.sendPacket(NMSUtils.getChannel(player), nmsPacket);
+    }
+
+    /**
+     * Send a {@link SendableWrapper} wrapper to a netty channel.
+     * @param channel Target netty channel
+     * @param sendableWrapper Wrapper
+     */
+    public void sendPacket(final Object channel, final SendableWrapper sendableWrapper){
+        PacketEvents.getAPI().packetManager.sendPacket(channel, sendableWrapper.asNMSPacket());
+    }
+
+    /**
+     * Send a raw NMS packet to a netty channel.
+     * @param channel Target netty channel
+     * @param packet Raw packet
+     */
+    public void sendNMSPacket(final Object channel, final Object packet){
+        PacketEvents.getAPI().packetManager.sendPacket(channel, packet);
     }
 }
