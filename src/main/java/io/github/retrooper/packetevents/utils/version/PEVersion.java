@@ -82,9 +82,8 @@ public class PEVersion {
         }
         return false;
     }
-
-    @Override
-    protected Object clone() {
+    
+    public PEVersion clone() {
         return new PEVersion(this.versionIntArray);
     }
 

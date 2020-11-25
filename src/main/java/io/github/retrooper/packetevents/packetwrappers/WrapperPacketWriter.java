@@ -42,4 +42,6 @@ public interface WrapperPacketWriter {
     void writeDouble(int index, double value);
 
     void writeString(int index, String value);
+
+    void writeObject(int index, Object object);
 }

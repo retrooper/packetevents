@@ -546,6 +546,11 @@ public class WrappedPacket implements WrapperPacketReader, WrapperPacketWriter {
         write(String.class, index, value);
     }
 
+    @Override
+    public void writeObject(int index, Object object) {
+        write(object.getClass(), index, object);
+    }
+
     private void write(Class<?> type, int index, Object value) throws WrapperFieldNotFoundException {
         Field field = getField(type, index);
         if (field == null) {

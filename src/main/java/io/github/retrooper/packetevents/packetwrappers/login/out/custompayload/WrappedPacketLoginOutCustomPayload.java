@@ -46,15 +46,17 @@ public class WrappedPacketLoginOutCustomPayload extends WrappedPacket implements
         if (packetClass != null) {
             packetDataSerializerClass = NMSUtils.getNMSClassWithoutException("PacketDataSerializer");
             minecraftKeyClass = NMSUtils.getNMSClassWithoutException("MinecraftKey");
-
             try {
                 byteBufClass = NMSUtils.getNettyClass("buffer.ByteBuf");
             } catch (ClassNotFoundException ex) {
                 ex.printStackTrace();
             }
+
             try {
-                packetDataSerializerConstructor = packetDataSerializerClass.getConstructor(byteBufClass);
-            } catch (NullPointerException | NoSuchMethodException e) {
+                if (packetDataSerializerClass != null) {
+                    packetDataSerializerConstructor = packetDataSerializerClass.getConstructor(byteBufClass);
+                }
+            } catch (NoSuchMethodException e) {
                 e.printStackTrace();
             }
             try {
@@ -66,7 +68,7 @@ public class WrappedPacketLoginOutCustomPayload extends WrappedPacket implements
             }
 
             try {
-                constructor = packetClass.getConstructor(minecraftKeyClass, packetDataSerializerClass);
+                constructor = packetClass.getConstructor();
             } catch (NoSuchMethodException e3) {
                 throw new IllegalStateException("PacketEvents is unable to resolve the PacketPlayOutCustomPayload constructor.");
             }
@@ -113,7 +115,13 @@ public class WrappedPacketLoginOutCustomPayload extends WrappedPacket implements
         try {
             Object minecraftKey = minecraftKeyConstructor.newInstance(channelName);
             Object dataSerializer = packetDataSerializerConstructor.newInstance(byteBufObject);
-            return constructor.newInstance(minecraftKey, dataSerializer);
+
+            Object packetInstance = constructor.newInstance();
+            WrappedPacket packetWrapper = new WrappedPacket(packetInstance);
+            packetWrapper.writeInt(0, messageID);
+            packetWrapper.writeObject(0, minecraftKey);
+            packetWrapper.writeObject(0, dataSerializer);
+            return packetInstance;
         } catch (InstantiationException | InvocationTargetException | IllegalAccessException e) {
             e.printStackTrace();
         }
