@@ -82,7 +82,8 @@ public class PEVersion {
         }
         return false;
     }
-    
+
+    @Override
     public PEVersion clone() {
         return new PEVersion(this.versionIntArray);
     }

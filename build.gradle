@@ -1,0 +1,47 @@
+plugins {
+    id 'java'
+}
+
+group 'io.github.retrooper'
+version '1.7.9'
+
+repositories {
+    mavenCentral()
+    //spigot repos
+    maven { url = 'https://oss.sonatype.org/content/repositories/snapshots' }
+    maven { url = 'https://hub.spigotmc.org/nexus/content/repositories/snapshots/' }
+
+    //jitpack repo
+    maven { url = 'https://jitpack.io/' }
+
+    //funkemunky repo
+    maven { url = 'https://nexus.funkemunky.cc/content/repositories/releases/' }
+
+    //viaversion repo
+    maven { url = 'https://repo.viaversion.com/' }
+
+    //protocollib repo
+    maven { url = 'https://repo.dmulloy2.net/nexus/repository/public/' }
+}
+
+dependencies {
+    //spigot api
+    compileOnly 'org.spigotmc:spigot-api:1.8.8-R0.1-SNAPSHOT'
+
+    //viaversion
+    compileOnly 'us.myles:viaversion:3.0.1'
+
+    //protocollib
+    compileOnly 'com.comphenix.protocol:ProtocolLib:4.5.0'
+
+    //protocolsupport
+    compileOnly 'com.github.ProtocolSupport:ProtocolSupport:3d24efeda6'
+
+    //spigot (including nms)
+    compileOnly 'org.github.spigot:1.7.10:1.7.10'
+    compileOnly 'org.github.spigot:1.8.8:1.8.8'
+    compileOnly 'org.github.spigot:1.9:1.9'
+    compileOnly 'org.github.spigot:1.12.2:1.12.2'
+    compileOnly 'org.github.spigot:1.13.2:1.13.2'
+    compileOnly 'org.github.spigot:1.16.2:1.16.2'
+}
