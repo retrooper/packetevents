@@ -46,7 +46,7 @@ public class PEVersion {
     public int compareTo(PEVersion version) {
         int localLength = versionIntArray.length;
         int oppositeLength = version.versionIntArray.length;
-        int length = Math.max(versionIntArray.length, version.versionIntArray.length);
+        int length = Math.max(localLength, oppositeLength);
         for (int i = 0; i < length; i++) {
             int localInteger = i < localLength ? versionIntArray[i] : 0;
             int oppositeInteger = i < oppositeLength ? version.versionIntArray[i] : 0;
