@@ -48,8 +48,9 @@ public enum SystemOS {
 
     public static String[] getOperatingSystemNames() {
         final SystemOS[] values = values();
-        final String[] arr = new String[values.length - 1];
-        for (int i = 0; i < values.length - 1; i++) {
+        final int length = values.length - 1;
+        final String[] arr = new String[length];
+        for (int i = 0; i < length; i++) {
             arr[i] = values[i].name();
         }
         return arr;
