@@ -43,6 +43,9 @@ import java.util.UUID;
  */
 @Beta
 public final class WrappedPacketOutChat extends WrappedPacket implements SendableWrapper {
+    private static final HashMap<ChatPosition, Byte> cachedChatPositions = new HashMap<>();
+    private static final HashMap<Byte, ChatPosition> cachedChatPositionIntegers = new HashMap<>();
+    private static final HashMap<String, Byte> cachedChatMessageTypeIntegers = new HashMap<>();
     private static Constructor<?> chatClassConstructor;
     private static Class<?> packetClass, iChatBaseComponentClass, chatSerializerClass, chatMessageTypeEnum;
     private static Method chatMessageTypeCreatorMethod;
@@ -51,13 +54,9 @@ public final class WrappedPacketOutChat extends WrappedPacket implements Sendabl
     //2 = IChatBaseComponent, ChatMessageType
     //3 = IChatBaseComponent, ChatMessageType, UUID
     private static byte constructorMode;
-
     //0 = Byte
     //1 = Byte, Boolean
     private static byte chatTypeMessageEnumConstructorMode;
-    private static final HashMap<ChatPosition, Byte> cachedChatPositions = new HashMap<>();
-    private static final HashMap<Byte, ChatPosition> cachedChatPositionIntegers = new HashMap<>();
-    private static final HashMap<String, Byte> cachedChatMessageTypeIntegers = new HashMap<>();
     private String message;
     private ChatPosition chatPosition;
     private UUID uuid;
@@ -82,11 +81,6 @@ public final class WrappedPacketOutChat extends WrappedPacket implements Sendabl
         this.message = isJson ? message : fromStringToJSON(message);
         this.chatPosition = chatPosition;
     }
-
-    public enum ChatPosition {
-        CHAT, SYSTEM_MESSAGE, GAME_INFO
-    }
-
 
     public static void load() {
         try {
@@ -234,10 +228,11 @@ public final class WrappedPacketOutChat extends WrappedPacket implements Sendabl
 
     /**
      * Get the message.
+     *
      * @return Get String Message
      */
     public String getMessage() {
-        if(isListening) {
+        if (isListening) {
             final Object iChatBaseObj = readObject(0, iChatBaseComponentClass);
 
             try {
@@ -247,21 +242,21 @@ public final class WrappedPacketOutChat extends WrappedPacket implements Sendabl
                 e.printStackTrace();
             }
             return null;
-        }
-        else {
+        } else {
             return message;
         }
     }
 
     /**
      * Get the chat position.
-     *
+     * <p>
      * On 1.7.10, Only CHAT and SYSTEM_MESSAGE exist.
      * If an invalid chat position is sent, it will be defaulted it to CHAT.
+     *
      * @return ChatPosition
      */
     public ChatPosition getChatPosition() {
-        if(isListening) {
+        if (isListening) {
             byte chatPosInteger = 0;
             switch (constructorMode) {
                 case 0:
@@ -277,10 +272,13 @@ public final class WrappedPacketOutChat extends WrappedPacket implements Sendabl
                     break;
             }
             return cachedChatPositionIntegers.get(chatPosInteger);
-        }
-        else {
+        } else {
             return chatPosition;
         }
+    }
+
+    public enum ChatPosition {
+        CHAT, SYSTEM_MESSAGE, GAME_INFO
     }
 
 }

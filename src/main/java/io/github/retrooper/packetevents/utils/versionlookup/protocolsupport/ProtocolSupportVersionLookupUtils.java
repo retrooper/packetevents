@@ -32,7 +32,7 @@ public class ProtocolSupportVersionLookupUtils {
     public static boolean isAvailable() {
         return Bukkit.getPluginManager().isPluginEnabled("ProtocolSupport");
     }
-    
+
     public static int getProtocolVersion(Player player) {
         return ProtocolSupportAPI.getProtocolVersion(player).getId();
     }

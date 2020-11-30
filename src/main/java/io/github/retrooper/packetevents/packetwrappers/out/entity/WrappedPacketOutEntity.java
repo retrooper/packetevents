@@ -41,9 +41,9 @@ public class WrappedPacketOutEntity extends WrappedPacket implements SendableWra
     private static double dXYZDivisor;
     private static int yawByteIndex;
     private static int pitchByteIndex = 1;
+    private static Constructor<?> entityPacketConstructor;
     private Entity entity;
     private boolean isListening;
-    private static Constructor<?> entityPacketConstructor;
     private int entityID = -1;
     private double deltaX, deltaY, deltaZ;
     private byte pitch, yaw;
@@ -64,7 +64,7 @@ public class WrappedPacketOutEntity extends WrappedPacket implements SendableWra
         this.yaw = yaw;
         this.onGround = onGround;
         //Get entity player then pass it into the packetplayoutnamedentityspawn!
-      //  net.minecraft.server.v1_7_R4.EntityPlayer cp = null;
+        //  net.minecraft.server.v1_7_R4.EntityPlayer cp = null;
         //net.minecraft.server.v1_7_R4.PacketPlayOutNamedEntitySpawn es = new net.minecraft.server.v1_7_R4.PacketPlayOutNamedEntitySpawn(cp);
     }
 
@@ -235,21 +235,21 @@ public class WrappedPacketOutEntity extends WrappedPacket implements SendableWra
         try {
             Object packetInstance = entityPacketConstructor.newInstance(entityID);
             WrappedPacket wrapper = new WrappedPacket(packetInstance);
-            switch(mode) {
+            switch (mode) {
                 case 0:
-                    wrapper.writeByte(0, (byte)(deltaX * dXYZDivisor));
-                    wrapper.writeByte(1, (byte)(deltaY * dXYZDivisor));
-                    wrapper.writeByte(2, (byte)(deltaZ * dXYZDivisor));
+                    wrapper.writeByte(0, (byte) (deltaX * dXYZDivisor));
+                    wrapper.writeByte(1, (byte) (deltaY * dXYZDivisor));
+                    wrapper.writeByte(2, (byte) (deltaZ * dXYZDivisor));
                     break;
                 case 1:
-                    wrapper.writeInt(1, (int)(deltaX * dXYZDivisor));
-                    wrapper.writeInt(2, (int)(deltaY * dXYZDivisor));
-                    wrapper.writeInt(3, (int)(deltaZ * dXYZDivisor));
+                    wrapper.writeInt(1, (int) (deltaX * dXYZDivisor));
+                    wrapper.writeInt(2, (int) (deltaY * dXYZDivisor));
+                    wrapper.writeInt(3, (int) (deltaZ * dXYZDivisor));
                     break;
                 case 2:
-                    wrapper.writeShort(0, (short)(deltaX * dXYZDivisor));
-                    wrapper.writeShort(1, (short)(deltaY * dXYZDivisor));
-                    wrapper.writeShort(2, (short)(deltaZ * dXYZDivisor));
+                    wrapper.writeShort(0, (short) (deltaX * dXYZDivisor));
+                    wrapper.writeShort(1, (short) (deltaY * dXYZDivisor));
+                    wrapper.writeShort(2, (short) (deltaZ * dXYZDivisor));
                     break;
             }
             wrapper.writeByte(yawByteIndex, yaw);

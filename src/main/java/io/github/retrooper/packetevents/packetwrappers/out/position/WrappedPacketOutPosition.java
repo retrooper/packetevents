@@ -27,19 +27,19 @@ package io.github.retrooper.packetevents.packetwrappers.out.position;
 import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
 
 public final class WrappedPacketOutPosition extends WrappedPacket {
+    private final boolean isListening = true;
     private double x;
     private double y;
     private double z;
     private float yaw;
     private float pitch;
 
-    private final boolean isListening = true;
-
     public WrappedPacketOutPosition(Object packet) {
         super(packet);
     }
 
-    public static void load() {}
+    public static void load() {
+    }
 
     @Override
     protected void setup() {
@@ -54,65 +54,65 @@ public final class WrappedPacketOutPosition extends WrappedPacket {
 
     /**
      * Get the X position.
+     *
      * @return Get X Position
      */
     public double getX() {
-        if(isListening) {
+        if (isListening) {
             return readDouble(0);
-        }
-        else {
+        } else {
             return x;
         }
     }
 
     /**
      * Get the Y position.
+     *
      * @return Get Y Position
      */
     public double getY() {
-        if(isListening) {
+        if (isListening) {
             return readDouble(1);
-        }
-        else {
+        } else {
             return y;
         }
     }
 
     /**
      * Get the Z position.
+     *
      * @return Get Z Position
      */
     public double getZ() {
-        if(isListening) {
+        if (isListening) {
             return readDouble(2);
-        }
-        else {
+        } else {
             return z;
         }
     }
 
     /**
      * Get the Yaw.
+     *
      * @return Get Yaw
      */
     public float getYaw() {
-        if(isListening) {
+        if (isListening) {
             return readFloat(0);
-        }
-        else {
+        } else {
             return yaw;
         }
     }
 
     /**
      * Get the Pitch,
+     *
      * @return Get Pitch
      */
     public float getPitch() {
-        if(isListening) {
+        if (isListening) {
             return readFloat(1);
-        }
-        else {
+        } else {
             return pitch;
         }
     }

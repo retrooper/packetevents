@@ -35,6 +35,7 @@ import org.bukkit.entity.Player;
 
 public class PostPlayerInjectEvent extends PacketEvent implements PlayerEvent {
     private final Player player;
+
     public PostPlayerInjectEvent(Player player) {
         this.player = player;
     }

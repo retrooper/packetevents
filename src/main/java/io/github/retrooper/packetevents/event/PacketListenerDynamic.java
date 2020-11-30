@@ -28,6 +28,7 @@ import io.github.retrooper.packetevents.event.impl.*;
 
 public abstract class PacketListenerDynamic {
     private final byte priority;
+
     public PacketListenerDynamic(final byte priority) {
         this.priority = priority;
     }

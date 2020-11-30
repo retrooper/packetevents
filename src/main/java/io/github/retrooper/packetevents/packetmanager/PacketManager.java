@@ -40,10 +40,10 @@ import java.util.HashMap;
 import java.util.UUID;
 
 public class PacketManager {
-    private final Plugin plugin;
-    private final boolean tinyProtocolMode;
     public final TinyProtocol tinyProtocol;
     public final NettyPacketManager nettyProtocol;
+    private final Plugin plugin;
+    private final boolean tinyProtocolMode;
     private final HashMap<UUID, Long> keepAliveMap = new HashMap<>();
 
     public PacketManager(Plugin plugin, boolean tinyProtocolMode) {

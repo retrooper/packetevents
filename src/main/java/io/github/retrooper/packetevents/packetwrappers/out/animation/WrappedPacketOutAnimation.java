@@ -36,11 +36,10 @@ import java.util.HashMap;
 import java.util.Map;
 
 public final class WrappedPacketOutAnimation extends WrappedPacket implements SendableWrapper {
-    private static Class<?> nmsEntityClass;
-    private static Constructor<?> animationConstructor;
-
     private static final Map<Integer, EntityAnimationType> cachedAnimationIDS = new HashMap<>();
     private static final Map<EntityAnimationType, Integer> cachedAnimations = new HashMap<>();
+    private static Class<?> nmsEntityClass;
+    private static Constructor<?> animationConstructor;
     private Entity entity;
     private int entityID = -1;
     private EntityAnimationType type;

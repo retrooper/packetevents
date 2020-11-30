@@ -30,19 +30,17 @@ import java.util.UUID;
 
 public class GameProfileUtil {
     public static Object getGameProfile(UUID uuid, String username) {
-        if(NettyPacketManager.v1_7_nettyMode) {
+        if (NettyPacketManager.v1_7_nettyMode) {
             return GameProfileUtil_7.getGameProfile(uuid, username);
-        }
-        else {
+        } else {
             return GameProfileUtil_8.getGameProfile(uuid, username);
         }
     }
 
     public static WrappedGameProfile getWrappedGameProfile(Object gameProfile) {
-        if(NettyPacketManager.v1_7_nettyMode) {
+        if (NettyPacketManager.v1_7_nettyMode) {
             return GameProfileUtil_7.getWrappedGameProfile(gameProfile);
-        }
-        else {
+        } else {
             return GameProfileUtil_8.getWrappedGameProfile(gameProfile);
         }
     }

@@ -48,9 +48,9 @@ public class SubclassUtil {
 
     public static Class<?> getSubClass(Class<?> cls, Annotation annotation, int index) {
         int currentIndex = 0;
-        for(Class<?> subClass : cls.getDeclaredClasses()) {
-            if(subClass.getAnnotation(annotation.getClass()) != null) {
-                if(index == currentIndex++) {
+        for (Class<?> subClass : cls.getDeclaredClasses()) {
+            if (subClass.getAnnotation(annotation.getClass()) != null) {
+                if (index == currentIndex++) {
                     return subClass;
                 }
             }

@@ -38,6 +38,10 @@ public class WrappedPacketInUpdateSign extends WrappedPacket {
 
     private Object blockPosObj;
 
+    public WrappedPacketInUpdateSign(Object packet) {
+        super(packet);
+    }
+
     public static void load() {
         v_1_7_mode = Reflection.getField(PacketTypeClasses.Client.UPDATE_SIGN, int.class, 0) != null;
         strArrayMode = Reflection.getField(PacketTypeClasses.Client.UPDATE_SIGN, String[].class, 0) != null;
@@ -54,10 +58,6 @@ public class WrappedPacketInUpdateSign extends WrappedPacket {
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
         }
-    }
-
-    public WrappedPacketInUpdateSign(Object packet) {
-        super(packet);
     }
 
     public int getX() {

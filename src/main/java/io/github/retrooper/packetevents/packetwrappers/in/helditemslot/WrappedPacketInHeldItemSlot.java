@@ -33,6 +33,7 @@ public final class WrappedPacketInHeldItemSlot extends WrappedPacket {
 
     /**
      * Get the index of the item we currently have in hand.
+     *
      * @return Item in hand Index
      */
     public int getCurrentSelectedSlot() {

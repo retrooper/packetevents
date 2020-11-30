@@ -34,7 +34,7 @@ class GameProfileUtil_8 {
     }
 
     public static WrappedGameProfile getWrappedGameProfile(Object gameProfile) {
-        GameProfile gp = (GameProfile)gameProfile;
+        GameProfile gp = (GameProfile) gameProfile;
         return new WrappedGameProfile(gp.getId(), gp.getName(), gp.isLegacy());
     }
 }

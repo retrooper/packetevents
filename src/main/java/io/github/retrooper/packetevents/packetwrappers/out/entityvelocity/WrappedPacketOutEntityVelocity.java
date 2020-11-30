@@ -139,11 +139,10 @@ public final class WrappedPacketOutEntityVelocity extends WrappedPacket implemen
      * @return Get Velocity Y
      */
     public double getVelocityY() {
-        if(isListening) {
-        return readInt(2) / 8000.0D;
-    }
-    else {
-        return velocityY;
+        if (isListening) {
+            return readInt(2) / 8000.0D;
+        } else {
+            return velocityY;
         }
     }
 
@@ -153,11 +152,10 @@ public final class WrappedPacketOutEntityVelocity extends WrappedPacket implemen
      * @return Get Velocity Z
      */
     public double getVelocityZ() {
-        if(isListening) {
-        return readInt(3) / 8000.0D;
-    }
-    else {
-        return velocityZ;
+        if (isListening) {
+            return readInt(3) / 8000.0D;
+        } else {
+            return velocityZ;
         }
     }
 

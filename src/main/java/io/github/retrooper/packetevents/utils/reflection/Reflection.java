@@ -90,8 +90,8 @@ public final class Reflection {
 
     public static Method getMethod(Class<?> cls, Class<?> returning, int index, Class<?>... params) {
         int currentIndex = 0;
-        for(Method m : getMethods(cls)) {
-            if(Arrays.equals(m.getParameterTypes(), params) && m.getReturnType().equals(returning) && index == currentIndex++) {
+        for (Method m : getMethods(cls)) {
+            if (Arrays.equals(m.getParameterTypes(), params) && m.getReturnType().equals(returning) && index == currentIndex++) {
                 return m;
             }
         }

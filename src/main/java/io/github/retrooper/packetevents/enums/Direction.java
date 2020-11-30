@@ -28,34 +28,34 @@ public enum Direction {
     /**
      * -Y offset
      */
-    DOWN((short)0),
+    DOWN((short) 0),
 
     /**
      * +Y offset
      */
-    UP((short)1),
+    UP((short) 1),
 
     /**
      * -Z offset
      */
-    NORTH((short)2),
+    NORTH((short) 2),
 
     /**
      * +Z offset
      */
-    SOUTH((short)3),
+    SOUTH((short) 3),
 
     /**
      * -X offset
      */
-    WEST((short)4),
+    WEST((short) 4),
 
     /**
      * +X offset
      */
-    EAST((short)5),
-    
-    OTHER((short)255);
+    EAST((short) 5),
+
+    OTHER((short) 255);
 
     final short value;
 
@@ -64,8 +64,8 @@ public enum Direction {
     }
 
     public static Direction getDirection(final short value) {
-        for(Direction direction : values()) {
-            if(direction.value == value) {
+        for (Direction direction : values()) {
+            if (direction.value == value) {
                 return direction;
             }
         }

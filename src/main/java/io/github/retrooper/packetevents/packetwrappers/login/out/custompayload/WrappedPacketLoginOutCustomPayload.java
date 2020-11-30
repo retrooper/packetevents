@@ -40,6 +40,12 @@ public class WrappedPacketLoginOutCustomPayload extends WrappedPacket implements
     private static Class<?> byteBufClass;
     private static Class<?> packetDataSerializerClass;
     private static Class<?> minecraftKeyClass;
+    private int messageID;
+    private String channelName;
+    private byte[] data;
+    public WrappedPacketLoginOutCustomPayload(Object packet) {
+        super(packet);
+    }
 
     public static void load() {
         Class<?> packetClass = PacketTypeClasses.Login.Server.CUSTOM_PAYLOAD;
@@ -73,14 +79,6 @@ public class WrappedPacketLoginOutCustomPayload extends WrappedPacket implements
                 throw new IllegalStateException("PacketEvents is unable to resolve the PacketPlayOutCustomPayload constructor.");
             }
         }
-    }
-
-    private int messageID;
-    private String channelName;
-    private byte[] data;
-
-    public WrappedPacketLoginOutCustomPayload(Object packet) {
-        super(packet);
     }
 
     public int getMessageId() {

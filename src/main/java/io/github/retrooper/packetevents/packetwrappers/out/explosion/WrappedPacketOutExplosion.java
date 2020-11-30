@@ -37,6 +37,27 @@ import java.util.List;
 
 public class WrappedPacketOutExplosion extends WrappedPacket implements SendableWrapper {
     private static Constructor<?> chunkPosConstructor, blockPosConstructor, packetConstructor, vec3dConstructor;
+    private boolean isListening = false;
+    private double x, y, z;
+    private float strength;
+    private List<Vector3i> records;
+    private float playerMotionX, playerMotionY, playerMotionZ;
+    public WrappedPacketOutExplosion(Object packet) {
+        super(packet);
+        isListening = true;
+    }
+
+    public WrappedPacketOutExplosion(double x, double y, double z, float strength, List<Vector3i> records,
+                                     float playerMotionX, float playerMotionY, float playerMotionZ) {
+        this.x = x;
+        this.y = y;
+        this.z = z;
+        this.strength = strength;
+        this.records = records;
+        this.playerMotionX = playerMotionX;
+        this.playerMotionY = playerMotionY;
+        this.playerMotionZ = playerMotionZ;
+    }
 
     public static void load() {
         Class<?> chunkPosClass = NMSUtils.getNMSClassWithoutException("ChunkPosition");
@@ -61,29 +82,6 @@ public class WrappedPacketOutExplosion extends WrappedPacket implements Sendable
         } catch (NoSuchMethodException e) {
             e.printStackTrace();
         }
-    }
-
-    private boolean isListening = false;
-    private double x, y, z;
-    private float strength;
-    private List<Vector3i> records;
-    private float playerMotionX, playerMotionY, playerMotionZ;
-
-    public WrappedPacketOutExplosion(Object packet) {
-        super(packet);
-        isListening = true;
-    }
-
-    public WrappedPacketOutExplosion(double x, double y, double z, float strength, List<Vector3i> records,
-                                     float playerMotionX, float playerMotionY, float playerMotionZ) {
-        this.x = x;
-        this.y = y;
-        this.z = z;
-        this.strength = strength;
-        this.records = records;
-        this.playerMotionX = playerMotionX;
-        this.playerMotionY = playerMotionY;
-        this.playerMotionZ = playerMotionZ;
     }
 
     public double getX() {

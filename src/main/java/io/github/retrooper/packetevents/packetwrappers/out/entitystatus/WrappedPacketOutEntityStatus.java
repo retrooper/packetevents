@@ -35,20 +35,9 @@ import java.lang.reflect.InvocationTargetException;
 
 public class WrappedPacketOutEntityStatus extends WrappedPacket implements SendableWrapper {
     private static Constructor<?> packetConstructor;
-
-    public static void load() {
-        try {
-            packetConstructor =
-                    PacketTypeClasses.Server.ENTITY_STATUS.getConstructor(NMSUtils.nmsEntityClass, byte.class);
-        } catch (NoSuchMethodException e) {
-            e.printStackTrace();
-        }
-    }
-
     private Entity entity;
     private byte status;
     private int entityID = -1;
-
     public WrappedPacketOutEntityStatus(Object packet) {
         super(packet);
     }
@@ -62,6 +51,15 @@ public class WrappedPacketOutEntityStatus extends WrappedPacket implements Senda
     public WrappedPacketOutEntityStatus(int entityID, byte status) {
         this.entityID = entityID;
         this.status = status;
+    }
+
+    public static void load() {
+        try {
+            packetConstructor =
+                    PacketTypeClasses.Server.ENTITY_STATUS.getConstructor(NMSUtils.nmsEntityClass, byte.class);
+        } catch (NoSuchMethodException e) {
+            e.printStackTrace();
+        }
     }
 
     public int getEntityId() {

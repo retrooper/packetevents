@@ -44,7 +44,7 @@ public final class PlayerInjectEvent extends PacketEvent implements CancellableE
     }
 
     public PlayerInjectEvent(final Player player, boolean isAsync) {
-        this.player= player;
+        this.player = player;
         this.async = isAsync;
     }
 

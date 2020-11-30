@@ -33,6 +33,7 @@ public final class WrappedPacketInAbilities extends WrappedPacket {
     public WrappedPacketInAbilities(Object packet) {
         super(packet);
     }
+
     /**
      * This will return null if the server version is not available in 1.16.x and above
      *

@@ -31,7 +31,7 @@ public class WrappedPacketInFlying extends WrappedPacket {
     public WrappedPacketInFlying(Object packet) {
         super(packet);
     }
-    
+
     public double getX() {
         return readDouble(0);
     }

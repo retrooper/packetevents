@@ -43,6 +43,16 @@ public class WrappedPacketOutCustomPayload extends WrappedPacket implements Send
     private static int minecraftKeyIndexInClass;
 
     private static byte constructorMode = 0;
+    private String tag;
+    private byte[] data;
+    public WrappedPacketOutCustomPayload(String tag, byte[] data) {
+        this.tag = tag;
+        this.data = data;
+    }
+
+    public WrappedPacketOutCustomPayload(Object packet) {
+        super(packet);
+    }
 
     public static void load() {
         Class<?> packetClass = PacketTypeClasses.Server.CUSTOM_PAYLOAD;
@@ -101,19 +111,6 @@ public class WrappedPacketOutCustomPayload extends WrappedPacket implements Send
                 }
             }
         }
-    }
-
-    private String tag;
-    private byte[] data;
-
-    public WrappedPacketOutCustomPayload(String tag, byte[] data) {
-        this.tag = tag;
-        this.data = data;
-    }
-
-
-    public WrappedPacketOutCustomPayload(Object packet) {
-        super(packet);
     }
 
     public String getTag() {

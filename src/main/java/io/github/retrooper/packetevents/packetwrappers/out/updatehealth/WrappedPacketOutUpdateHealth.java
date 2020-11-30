@@ -99,10 +99,9 @@ public final class WrappedPacketOutUpdateHealth extends WrappedPacket implements
      * @return Get Food
      */
     public int getFood() {
-        if(isListening) {
+        if (isListening) {
             return readInt(0);
-        }
-        else {
+        } else {
             return food;
         }
     }

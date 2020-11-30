@@ -35,16 +35,16 @@ public class WrappedPacketLoginInCustomPayload extends WrappedPacket {
     private static Class<?> byteBufClass;
     private static Class<?> packetDataSerializerClass;
 
+    public WrappedPacketLoginInCustomPayload(Object packet) {
+        super(packet);
+    }
+
     public static void load() {
         packetDataSerializerClass = NMSUtils.getNMSClassWithoutException("PacketDataSerializer");
         try {
             byteBufClass = NMSUtils.getNettyClass("buffer.ByteBuf");
         } catch (ClassNotFoundException ignored) {
         }
-    }
-
-    public WrappedPacketLoginInCustomPayload(Object packet) {
-        super(packet);
     }
 
     public int getMessageId() {

@@ -62,17 +62,12 @@ public enum ClientVersion {
 
     UNRESOLVED(-1);
 
-    private final short protocolVersion;
-
     private static final int lowestSupportedProtocolVersion = LOWER_THAN_SUPPORTED_VERSIONS.protocolVersion;
     private static final int highestSupportedProtocolVersion = HIGHER_THAN_SUPPORTED_VERSIONS.protocolVersion;
+    private final short protocolVersion;
 
     ClientVersion(int protocolVersion) {
-        this.protocolVersion = (short)protocolVersion;
-    }
-
-    public short getProtocolVersion() {
-        return protocolVersion;
+        this.protocolVersion = (short) protocolVersion;
     }
 
     public static boolean isHigherThan(ClientVersion a, ClientVersion b) {
@@ -81,18 +76,6 @@ public enum ClientVersion {
 
     public static boolean isLowerThan(ClientVersion a, ClientVersion b) {
         return a.getProtocolVersion() < b.getProtocolVersion();
-    }
-
-    public boolean isHigherThan(ClientVersion target) {
-        return protocolVersion > target.getProtocolVersion();
-    }
-
-    public boolean isLowerThan(ClientVersion target) {
-        return protocolVersion < target.getProtocolVersion();
-    }
-
-    public boolean equals(ClientVersion target) {
-        return protocolVersion == target.getProtocolVersion();
     }
 
     public static ClientVersion getClientVersion(int protocolVersion) {
@@ -113,5 +96,21 @@ public enum ClientVersion {
         } else {
             return ANY_PRE_RELEASE_VERSION;
         }
+    }
+
+    public short getProtocolVersion() {
+        return protocolVersion;
+    }
+
+    public boolean isHigherThan(ClientVersion target) {
+        return protocolVersion > target.getProtocolVersion();
+    }
+
+    public boolean isLowerThan(ClientVersion target) {
+        return protocolVersion < target.getProtocolVersion();
+    }
+
+    public boolean equals(ClientVersion target) {
+        return protocolVersion == target.getProtocolVersion();
     }
 }

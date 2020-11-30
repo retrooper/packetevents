@@ -36,10 +36,9 @@ public class ByteBufUtil {
     }
 
     public static byte[] getBytes(Object byteBuf) {
-        if(NettyPacketManager.v1_7_nettyMode) {
+        if (NettyPacketManager.v1_7_nettyMode) {
             return ByteBufUtil_7.getBytes(byteBuf);
-        }
-        else {
+        } else {
             return ByteBufUtil_8.getBytes(byteBuf);
         }
     }

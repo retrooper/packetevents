@@ -32,6 +32,7 @@ import java.lang.reflect.InvocationTargetException;
 public final class ServerUtils {
     /**
      * Get the server version.
+     *
      * @return Get Server Version
      */
     public ServerVersion getVersion() {
@@ -40,6 +41,7 @@ public final class ServerUtils {
 
     /**
      * Get recent TPS array from NMS.
+     *
      * @return Get Recent TPS
      */
     public double[] getRecentTPS() {
@@ -53,6 +55,7 @@ public final class ServerUtils {
 
     /**
      * Get the current TPS.
+     *
      * @return Get Current TPS
      */
     public double getTPS() {
@@ -61,6 +64,7 @@ public final class ServerUtils {
 
     /**
      * Get the operating system of the local machine
+     *
      * @return Get Operating System
      */
     public SystemOS getOS() {

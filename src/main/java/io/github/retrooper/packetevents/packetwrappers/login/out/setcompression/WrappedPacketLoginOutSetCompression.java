@@ -34,6 +34,15 @@ import java.lang.reflect.InvocationTargetException;
 //This packet does not exist on 1.7.10
 public class WrappedPacketLoginOutSetCompression extends WrappedPacket implements SendableWrapper {
     private static Constructor<?> constructor;
+    private int threshold;
+
+    public WrappedPacketLoginOutSetCompression(Object packet) {
+        super(packet);
+    }
+
+    public WrappedPacketLoginOutSetCompression(int threshold) {
+        this.threshold = threshold;
+    }
 
     public static void load() {
         try {
@@ -43,16 +52,6 @@ public class WrappedPacketLoginOutSetCompression extends WrappedPacket implement
         } catch (NoSuchMethodException e) {
             //probably 1.7.10
         }
-    }
-
-    private int threshold;
-
-    public WrappedPacketLoginOutSetCompression(Object packet) {
-        super(packet);
-    }
-
-    public WrappedPacketLoginOutSetCompression(int threshold) {
-        this.threshold = threshold;
     }
 
     /**

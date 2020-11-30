@@ -115,6 +115,7 @@ public class WrappedPacketInWindowClick extends WrappedPacket {
 
     /**
      * Get the Window ID.
+     *
      * @return Get Window ID
      */
     public int getWindowID() {
@@ -123,6 +124,7 @@ public class WrappedPacketInWindowClick extends WrappedPacket {
 
     /**
      * Get the Window slot.
+     *
      * @return Get Window Slot
      */
     public int getWindowSlot() {
@@ -131,6 +133,7 @@ public class WrappedPacketInWindowClick extends WrappedPacket {
 
     /**
      * Get the Window button.
+     *
      * @return Get Window Button
      */
     public int getWindowButton() {
@@ -139,6 +142,7 @@ public class WrappedPacketInWindowClick extends WrappedPacket {
 
     /**
      * Get the action number.
+     *
      * @return Get Action Number
      */
     public short getActionNumber() {
@@ -147,6 +151,7 @@ public class WrappedPacketInWindowClick extends WrappedPacket {
 
     /**
      * Get the window click type.
+     *
      * @return Get Window Click Type
      */
     public WindowClickType getWindowClickType() {
@@ -172,6 +177,7 @@ public class WrappedPacketInWindowClick extends WrappedPacket {
 
     /**
      * Get the Window mode.
+     *
      * @return Get Window Mode.
      */
     public int getMode() {
@@ -184,6 +190,7 @@ public class WrappedPacketInWindowClick extends WrappedPacket {
 
     /**
      * Get the clicked item.
+     *
      * @return Get Clicked ItemStack
      */
     public ItemStack getClickedItem() {

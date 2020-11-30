@@ -43,9 +43,10 @@ import java.util.HashMap;
 import java.util.UUID;
 
 public final class NMSUtils {
-    public static ServerVersion version;
+    public static final HashMap<UUID, Object> channelCache = new HashMap<>();
     private static final String nmsDir = ServerVersion.getNMSDirectory();
     private static final String obcDir = ServerVersion.getOBCDirectory();
+    public static ServerVersion version;
     public static String nettyPrefix = "io.netty";
     public static Class<?> nmsEntityClass, minecraftServerClass, craftWorldClass, playerInteractManagerClass, entityPlayerClass, playerConnectionClass, craftServerClass,
             craftPlayerClass, serverConnectionClass, craftEntityClass,
@@ -57,8 +58,6 @@ public final class NMSUtils {
     private static Method asBukkitCopy;
     private static Method getBukkitEntity;
     private static Field entityPlayerPingField, playerConnectionField;
-
-    public static final HashMap<UUID, Object> channelCache = new HashMap<>();
 
     public static void load() {
         try {
@@ -103,7 +102,7 @@ public final class NMSUtils {
             getCraftEntityHandle = craftEntityClass.getMethod("getHandle");
             asBukkitCopy = craftItemStack.getMethod("asBukkitCopy", nmsItemStackClass);
             craftWorldGetHandle = craftWorldClass.getMethod("getHandle");
-            getBukkitEntity =  nmsEntityClass.getMethod("getBukkitEntity");
+            getBukkitEntity = nmsEntityClass.getMethod("getBukkitEntity");
         } catch (NoSuchMethodException e) {
             e.printStackTrace();
         }

@@ -56,6 +56,7 @@ public final class PacketSendEvent extends PacketEvent implements CancellableEve
     /**
      * Get the packet's name (NMS packet class simple name).
      * The class simple name is cached.
+     *
      * @return Name of the packet
      */
     public String getPacketName() {
@@ -68,7 +69,7 @@ public final class PacketSendEvent extends PacketEvent implements CancellableEve
      * @return packet id
      */
     public byte getPacketId() {
-        if(packetID == -1) {
+        if (packetID == -1) {
             packetID = PacketType.Server.packetIds.getOrDefault(packet.getClass(), (byte) -1);
         }
         return packetID;

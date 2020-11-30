@@ -32,12 +32,14 @@ public interface CancellableEvent {
 
     /**
      * Has the event been cancelled?
+     *
      * @return is event cancelled
      */
     boolean isCancelled();
 
     /**
      * Cancel or proceed with the event.
+     *
      * @param val
      */
     void setCancelled(boolean val);

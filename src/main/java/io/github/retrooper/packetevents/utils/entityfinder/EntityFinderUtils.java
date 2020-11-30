@@ -66,6 +66,7 @@ public final class EntityFinderUtils {
 
     /**
      * Get an entity by their ID.
+     *
      * @param id
      * @return Entity
      */
@@ -76,11 +77,12 @@ public final class EntityFinderUtils {
                 return entity;
             }
         }
-        return  null;
+        return null;
     }
 
     /**
      * Get an entity by their ID, guaranteed to be in the specified world.
+     *
      * @param world
      * @param id
      * @return Entity
@@ -89,8 +91,7 @@ public final class EntityFinderUtils {
     public static Entity getEntityByIdWithWorld(final World world, final int id) {
         if (world == null) {
             return null;
-        }
-        else if(craftWorldClass == null) {
+        } else if (craftWorldClass == null) {
             throw new IllegalStateException("PacketEvents failed to locate the CraftWorld class.");
         }
         Object craftWorld = craftWorldClass.cast(world);

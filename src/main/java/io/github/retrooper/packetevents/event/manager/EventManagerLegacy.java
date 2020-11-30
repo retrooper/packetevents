@@ -39,6 +39,7 @@ import java.util.Map;
 
 class EventManagerLegacy {
     private final Map<PacketListener, List<Method>> staticRegisteredMethods = new HashMap<>();
+
     public void callEvent(final PacketEvent e) {
         boolean isCancelled = false;
         byte eventPriority = PacketEventPriority.LOWEST;
@@ -67,8 +68,8 @@ class EventManagerLegacy {
                 }
             }
         }
-        if(e instanceof CancellableEvent) {
-            CancellableEvent ce = (CancellableEvent)e;
+        if (e instanceof CancellableEvent) {
+            CancellableEvent ce = (CancellableEvent) e;
             ce.setCancelled(isCancelled);
         }
     }

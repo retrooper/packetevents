@@ -51,11 +51,9 @@ public class UpdateChecker {
             inform("[PacketEvents] There is an update available for the PacketEvents API! Your build: (" + localVersion.toString() + ") | Latest released build: (" + newVersion.toString() + ")");
         } else if (localVersion.isNewerThan(newVersion)) {
             inform("[PacketEvents] You are on a dev or pre released build of PacketEvents. Your build: (" + localVersion.toString() + ") | Latest released build: (" + newVersion.toString() + ")");
-        }
-        else if (localVersion.equals(newVersion)) {
+        } else if (localVersion.equals(newVersion)) {
             inform("[PacketEvents] You are on the latest released version of PacketEvents. (" + newVersion.toString() + ")");
-        }
-        else {
+        } else {
             report("[PacketEvents] Something went wrong while checking for an update. Your build: (" + localVersion.toString() + ") | Latest released build: (" + newVersion.toString() + ")");
         }
     }

@@ -37,8 +37,10 @@ final class NettyPacketManager_7 {
     NettyPacketManager_7() {
 
     }
+
     /**
      * Inject a player using 1.7.10's netty import location
+     *
      * @param player
      */
     public void injectPlayer(final Player player) {
@@ -55,7 +57,7 @@ final class NettyPacketManager_7 {
 
             @Override
             public void write(ChannelHandlerContext ctx, Object msg, ChannelPromise promise) throws Exception {
-                Object packet = PacketEvents.get().packetManager.write(player, ctx.channel(),msg);
+                Object packet = PacketEvents.get().packetManager.write(player, ctx.channel(), msg);
                 if (packet == null) {
                     return;
                 }
@@ -73,10 +75,10 @@ final class NettyPacketManager_7 {
         ejectChannel(channel);
     }
 
-   public void ejectChannel(Object ch) {
+    public void ejectChannel(Object ch) {
         Channel channel = (Channel) ch;
         channel.pipeline().remove(PacketEvents.get().packetManager.getNettyHandlerName());
-   }
+    }
 
     public void sendPacket(Object rawChannel, Object packet) {
         Channel channel = (Channel) rawChannel;

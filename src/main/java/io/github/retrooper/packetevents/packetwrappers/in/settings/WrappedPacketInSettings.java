@@ -144,7 +144,7 @@ public class WrappedPacketInSettings extends WrappedPacket {
      * @return Is the skin part enabled
      */
     public boolean isDisplaySkinPartEnabled(DisplayedSkinPart part) {
-        if(displayedSkinParts.isEmpty()) {
+        if (displayedSkinParts.isEmpty()) {
             displayedSkinParts = getDisplayedSkinPartsMap();
         }
         //1.7.10, we will default the other skin parts to return false.

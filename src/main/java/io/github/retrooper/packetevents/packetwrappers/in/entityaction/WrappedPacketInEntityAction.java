@@ -70,13 +70,14 @@ public final class WrappedPacketInEntityAction extends WrappedPacket {
         cachedPlayerActionIDs.put(7, PlayerAction.OPEN_INVENTORY); //horse interaction
 
     }
+
     /**
      * Lookup the associated entity by the ID that was sent in the packet.
      *
      * @return Entity
      */
     public Entity getEntity() {
-        if(entity == null) {
+        if (entity == null) {
             return entity = NMSUtils.getEntityById(getEntityId());
         }
         return entity;
@@ -90,7 +91,7 @@ public final class WrappedPacketInEntityAction extends WrappedPacket {
      * @return Entity ID
      */
     public int getEntityId() {
-        if(entityId == -1) {
+        if (entityId == -1) {
             entityId = readInt(0);
         }
         return entityId;

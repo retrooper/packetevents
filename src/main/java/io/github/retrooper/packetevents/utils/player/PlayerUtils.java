@@ -25,7 +25,6 @@
 package io.github.retrooper.packetevents.utils.player;
 
 import io.github.retrooper.packetevents.PacketEvents;
-import io.github.retrooper.packetevents.event.PacketEvent;
 import io.github.retrooper.packetevents.event.impl.PlayerEjectEvent;
 import io.github.retrooper.packetevents.packetwrappers.SendableWrapper;
 import io.github.retrooper.packetevents.utils.nms.NMSUtils;
@@ -46,6 +45,7 @@ public final class PlayerUtils {
     /**
      * Use reflection to read the ping value NMS calculates for the player.
      * NMS smooths the player ping.
+     *
      * @param player
      * @return Get NMS smoothed Player Ping
      */
@@ -55,27 +55,29 @@ public final class PlayerUtils {
 
     /**
      * Use the ping PacketEvents calculates for the player. (Updates every incoming Keep Alive packet)
+     *
      * @param player Player
      * @return Get Ping
      */
     public short getPing(final Player player) {
-        return playerPingMap.getOrDefault(player.getUniqueId(), (short)0);
+        return playerPingMap.getOrDefault(player.getUniqueId(), (short) 0);
     }
 
     public short getSmoothedPing(final Player player) {
-        return playerSmoothedPingMap.getOrDefault(player.getUniqueId(), (short)0);
+        return playerSmoothedPingMap.getOrDefault(player.getUniqueId(), (short) 0);
     }
 
     public short getPing(UUID uuid) {
-        return playerPingMap.getOrDefault(uuid, (short)0);
+        return playerPingMap.getOrDefault(uuid, (short) 0);
     }
 
     public short getSmoothedPing(UUID uuid) {
-        return playerSmoothedPingMap.getOrDefault(uuid, (short)0);
+        return playerSmoothedPingMap.getOrDefault(uuid, (short) 0);
     }
 
     /**
      * Get the client version by a player object.
+     *
      * @param player
      * @return Get Client Version
      */
@@ -85,17 +87,19 @@ public final class PlayerUtils {
 
     /**
      * Inject a player.
-     *
+     * <p>
      * (This also calls the {@link io.github.retrooper.packetevents.event.impl.PlayerInjectEvent})
+     *
      * @param player
      */
     public void injectPlayer(final Player player) {
-       PacketEvents.get().packetManager.injectPlayer(player);
+        PacketEvents.get().packetManager.injectPlayer(player);
     }
 
     /**
      * Eject a player.
      * (This also calls the {@link PlayerEjectEvent})
+     *
      * @param player
      */
     public void ejectPlayer(final Player player) {
@@ -104,7 +108,8 @@ public final class PlayerUtils {
 
     /**
      * Send a {@link SendableWrapper} wrapper to a player.
-     * @param player Target player
+     *
+     * @param player          Target player
      * @param sendableWrapper Wrapper
      */
     public void sendPacket(final Player player, final SendableWrapper sendableWrapper) {
@@ -113,7 +118,8 @@ public final class PlayerUtils {
 
     /**
      * Send a raw NMS packet to a player.
-     * @param player Target player
+     *
+     * @param player    Target player
      * @param nmsPacket Raw packet
      */
     public void sendNMSPacket(final Player player, final Object nmsPacket) {
@@ -122,19 +128,21 @@ public final class PlayerUtils {
 
     /**
      * Send a {@link SendableWrapper} wrapper to a netty channel.
-     * @param channel Target netty channel
+     *
+     * @param channel         Target netty channel
      * @param sendableWrapper Wrapper
      */
-    public void sendPacket(final Object channel, final SendableWrapper sendableWrapper){
+    public void sendPacket(final Object channel, final SendableWrapper sendableWrapper) {
         PacketEvents.get().packetManager.sendPacket(channel, sendableWrapper.asNMSPacket());
     }
 
     /**
      * Send a raw NMS packet to a netty channel.
+     *
      * @param channel Target netty channel
-     * @param packet Raw packet
+     * @param packet  Raw packet
      */
-    public void sendNMSPacket(final Object channel, final Object packet){
+    public void sendNMSPacket(final Object channel, final Object packet) {
         PacketEvents.get().packetManager.sendPacket(channel, packet);
     }
 }

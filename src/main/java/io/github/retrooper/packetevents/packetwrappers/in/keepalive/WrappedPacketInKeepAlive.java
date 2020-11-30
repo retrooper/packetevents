@@ -42,16 +42,16 @@ public final class WrappedPacketInKeepAlive extends WrappedPacket {
 
     /**
      * Get the ID response from the client.
-     *
+     * <p>
      * You may cast this down to an int if you are on 1.7.10 - 1.12.2.
      * On 1.13.2 - 1.16.3 a long is sent.
+     *
      * @return response ID
      */
     public long getId() {
-        if(!integerPresentInIndex0) {
+        if (!integerPresentInIndex0) {
             return readLong(0);
-        }
-        else {
+        } else {
             return readInt(0);
         }
     }

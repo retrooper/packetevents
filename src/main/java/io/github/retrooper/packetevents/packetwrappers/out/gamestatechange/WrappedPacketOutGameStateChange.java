@@ -36,16 +36,27 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 
 public class WrappedPacketOutGameStateChange extends WrappedPacket implements SendableWrapper {
-    private int reason;
-    private double value;
-
     private static Constructor<?> packetConstructor, reasonClassConstructor;
     private static Class<?> reasonClassType;
-
     private static boolean reasonIntMode;
     private static boolean valueFloatMode;
-
+    private int reason;
+    private double value;
     private boolean isListening = false;
+
+    public WrappedPacketOutGameStateChange(Object packet) {
+        super(packet);
+        isListening = true;
+    }
+
+    public WrappedPacketOutGameStateChange(int reason, double value) {
+        this.reason = reason;
+        this.value = value;
+    }
+
+    public WrappedPacketOutGameStateChange(int reason, float value) {
+        this(reason, (double) value);
+    }
 
     public static void load() {
         reasonClassType = SubclassUtil.getSubClass(PacketTypeClasses.Server.GAME_STATE_CHANGE, "a");
@@ -81,20 +92,6 @@ public class WrappedPacketOutGameStateChange extends WrappedPacket implements Se
 
     }
 
-    public WrappedPacketOutGameStateChange(Object packet) {
-        super(packet);
-        isListening = true;
-    }
-
-    public WrappedPacketOutGameStateChange(int reason, double value) {
-        this.reason = reason;
-        this.value = value;
-    }
-
-    public WrappedPacketOutGameStateChange(int reason, float value) {
-        this(reason, (double) value);
-    }
-
     public int getReason() {
         if (isListening) {
             if (reasonIntMode) {
@@ -115,14 +112,13 @@ public class WrappedPacketOutGameStateChange extends WrappedPacket implements Se
     }
 
     public double getValue() {
-        if(isListening) {
+        if (isListening) {
             if (valueFloatMode) {
                 return readFloat(0);
             } else {
                 return readDouble(0);
             }
-        }
-        else {
+        } else {
             return value;
         }
     }

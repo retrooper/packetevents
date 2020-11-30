@@ -54,7 +54,7 @@ public final class WrappedPacketInClientCommand extends WrappedPacket {
      * @return ClientCommand
      */
     public ClientCommand getClientCommand() {
-        if(enumObj == null) {
+        if (enumObj == null) {
             enumObj = readObject(0, enumClientCommandClass);
         }
         return ClientCommand.valueOf(enumObj.toString());

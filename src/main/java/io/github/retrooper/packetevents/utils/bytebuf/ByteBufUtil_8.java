@@ -33,7 +33,7 @@ class ByteBufUtil_8 {
     }
 
     public static byte[] getBytes(Object byteBuf) {
-        ByteBuf bb = (ByteBuf)byteBuf;
+        ByteBuf bb = (ByteBuf) byteBuf;
         byte[] bytes;
         if (bb.hasArray()) {
             bytes = bb.array();

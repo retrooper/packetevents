@@ -39,7 +39,7 @@ final class WrappedPacketInBlockPlace_1_8 extends WrappedPacket {
     }
 
     public int getX() {
-        if(blockPosObj == null) {
+        if (blockPosObj == null) {
             blockPosObj = readObject(1, NMSUtils.blockPosClass);
         }
         try {
@@ -49,10 +49,10 @@ final class WrappedPacketInBlockPlace_1_8 extends WrappedPacket {
         }
         return 0;
     }
-    
+
 
     public int getY() {
-        if(blockPosObj == null) {
+        if (blockPosObj == null) {
             blockPosObj = readObject(1, NMSUtils.blockPosClass);
         }
         try {
@@ -64,7 +64,7 @@ final class WrappedPacketInBlockPlace_1_8 extends WrappedPacket {
     }
 
     public int getZ() {
-        if(blockPosObj == null) {
+        if (blockPosObj == null) {
             blockPosObj = readObject(1, NMSUtils.blockPosClass);
         }
         try {

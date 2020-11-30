@@ -2,7 +2,7 @@ name: Generate and deploy JavaDocs
 
 on:
   release:
-    types: [published]
+    types: [ published ]
 
 jobs:
   build:
@@ -10,21 +10,21 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v2
-    - name: Set up JDK 1.8
-      uses: actions/setup-java@v1
-      with:
-        java-version: 1.8
-    - name: Build with Maven
-      run: mvn install
-    - name: List target/apidocs
-      run: ls target/apidocs
-    - name: GitHub Pages
-      uses: crazy-max/ghaction-github-pages@v2.1.2
-      env:
-        GH_PAT: ${{ secrets.GH_PAT }}
-      with:
-        target_branch: javadocs
-        keep_history: true
-        build_dir: target/apidocs
-        commit_message: Update JavaDocs
+      - uses: actions/checkout@v2
+      - name: Set up JDK 1.8
+        uses: actions/setup-java@v1
+        with:
+          java-version: 1.8
+      - name: Build with Maven
+        run: mvn install
+      - name: List target/apidocs
+        run: ls target/apidocs
+      - name: GitHub Pages
+        uses: crazy-max/ghaction-github-pages@v2.1.2
+        env:
+          GH_PAT: ${{ secrets.GH_PAT }}
+        with:
+          target_branch: javadocs
+          keep_history: true
+          build_dir: target/apidocs
+          commit_message: Update JavaDocs

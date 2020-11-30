@@ -35,16 +35,35 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 
 public class WrappedPacketOutEntityTeleport extends WrappedPacket implements SendableWrapper {
+    private static final float rotationMultiplier = 256.0F / 360.0F;
     private static boolean legacyVersionMode;
     private static boolean ultraLegacyVersionMode;
-    private boolean listeningMode = false;
-    private static final float rotationMultiplier = 256.0F / 360.0F;
     private static Constructor<?> constructor;
+    private boolean listeningMode = false;
     private Entity entity = null;
     private int entityID = -1;
     private double x, y, z;
     private float yaw, pitch;
     private boolean onGround;
+
+    public WrappedPacketOutEntityTeleport(Object packet) {
+        super(packet);
+        listeningMode = true;
+    }
+
+    public WrappedPacketOutEntityTeleport(int entityID, Location loc, boolean onGround) {
+        this(entityID, loc.getX(), loc.getY(), loc.getZ(), loc.getYaw(), loc.getPitch(), onGround);
+    }
+
+    public WrappedPacketOutEntityTeleport(int entityID, double x, double y, double z, float yaw, float pitch, boolean onGround) {
+        this.entityID = entityID;
+        this.x = x;
+        this.y = y;
+        this.z = z;
+        this.yaw = yaw;
+        this.pitch = pitch;
+        this.onGround = onGround;
+    }
 
     public static void load() {
         Class<?> packetClass = PacketTypeClasses.Server.ENTITY_TELEPORT;
@@ -70,27 +89,13 @@ public class WrappedPacketOutEntityTeleport extends WrappedPacket implements Sen
         }
     }
 
-    public WrappedPacketOutEntityTeleport(Object packet) {
-        super(packet);
-        listeningMode = true;
-    }
-
-    public WrappedPacketOutEntityTeleport(int entityID, Location loc, boolean onGround) {
-        this(entityID, loc.getX(), loc.getY(), loc.getZ(), loc.getYaw(), loc.getPitch(), onGround);
-    }
-
-    public WrappedPacketOutEntityTeleport(int entityID, double x, double y, double z, float yaw, float pitch, boolean onGround) {
-        this.entityID = entityID;
-        this.x = x;
-        this.y = y;
-        this.z = z;
-        this.yaw = yaw;
-        this.pitch = pitch;
-        this.onGround = onGround;
+    private static int floor(double value) {
+        int i = (int) value;
+        return value < (double) i ? i - 1 : i;
     }
 
     public Entity getEntity() {
-        if(entity == null) {
+        if (entity == null) {
             entity = NMSUtils.getEntityById(getEntityId());
         }
         return entity;
@@ -206,10 +211,5 @@ public class WrappedPacketOutEntityTeleport extends WrappedPacket implements Sen
         } else {
             return (readByte(1) / rotationMultiplier);
         }
-    }
-
-    private static int floor(double value) {
-        int i = (int) value;
-        return value < (double) i ? i - 1 : i;
     }
 }

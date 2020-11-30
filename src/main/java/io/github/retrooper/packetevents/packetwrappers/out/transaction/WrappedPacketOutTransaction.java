@@ -37,6 +37,7 @@ public class WrappedPacketOutTransaction extends WrappedPacket implements Sendab
     private short actionNumber;
     private boolean accepted;
     private boolean isListening = false;
+
     public WrappedPacketOutTransaction(final Object packet) {
         super(packet);
         isListening = true;
@@ -61,39 +62,39 @@ public class WrappedPacketOutTransaction extends WrappedPacket implements Sendab
 
     /**
      * Get the Window ID.
+     *
      * @return Get Window ID
      */
     public int getWindowId() {
-        if(isListening) {
+        if (isListening) {
             return readInt(0);
-        }
-        else {
+        } else {
             return windowId;
         }
     }
 
     /**
      * Get the action number.
+     *
      * @return Get Action Number
      */
     public short getActionNumber() {
-        if(isListening) {
+        if (isListening) {
             return readShort(0);
-        }
-        else {
+        } else {
             return actionNumber;
         }
     }
 
     /**
      * Has the transaction packet been accepted?
+     *
      * @return Is Accepted
      */
     public boolean isAccepted() {
-        if(isListening) {
+        if (isListening) {
             return readBoolean(0);
-        }
-        else {
+        } else {
             return accepted;
         }
     }

@@ -36,6 +36,7 @@ public class PostPacketReceiveEvent extends PacketEvent implements PlayerEvent {
     private final Player player;
     private final Object packet;
     private byte packetID = -1;
+
     public PostPacketReceiveEvent(final Player player, final Object packet) {
         this.player = player;
         this.packet = packet;
@@ -43,6 +44,7 @@ public class PostPacketReceiveEvent extends PacketEvent implements PlayerEvent {
 
     /**
      * Get the packet sender
+     *
      * @return player
      */
     @Override
@@ -53,6 +55,7 @@ public class PostPacketReceiveEvent extends PacketEvent implements PlayerEvent {
     /**
      * Get the packet's name (NMS packet class simple name).
      * The class simple name is cached.
+     *
      * @return Name of the packet
      */
     public String getPacketName() {
@@ -61,6 +64,7 @@ public class PostPacketReceiveEvent extends PacketEvent implements PlayerEvent {
 
     /**
      * Get the raw packet object
+     *
      * @return packet object
      */
     public Object getNMSPacket() {
@@ -69,10 +73,11 @@ public class PostPacketReceiveEvent extends PacketEvent implements PlayerEvent {
 
     /**
      * Get the ID of the packet
+     *
      * @return packet id
      */
     public byte getPacketId() {
-        if(packetID == -1) {
+        if (packetID == -1) {
             packetID = PacketType.Client.packetIds.getOrDefault(packet.getClass(), (byte) -1);
         }
         return packetID;

@@ -33,15 +33,8 @@ import java.lang.reflect.InvocationTargetException;
 
 public class WrappedPacketOutHeldItemSlot extends WrappedPacket implements SendableWrapper {
     private static Constructor<?> packetConstructor;
-    public static void load() {
-        try {
-            packetConstructor = PacketTypeClasses.Server.HELD_ITEM_SLOT.getConstructor(int.class);
-        } catch (NoSuchMethodException e) {
-            e.printStackTrace();
-        }
-    }
-
     private int slot;
+
     public WrappedPacketOutHeldItemSlot(Object packet) {
         super(packet);
     }
@@ -50,8 +43,16 @@ public class WrappedPacketOutHeldItemSlot extends WrappedPacket implements Senda
         this.slot = slot;
     }
 
+    public static void load() {
+        try {
+            packetConstructor = PacketTypeClasses.Server.HELD_ITEM_SLOT.getConstructor(int.class);
+        } catch (NoSuchMethodException e) {
+            e.printStackTrace();
+        }
+    }
+
     public int getCurrentSelectedSlot() {
-        if(packet == null){
+        if (packet == null) {
             return slot;
         }
         return readInt(0);
@@ -62,8 +63,8 @@ public class WrappedPacketOutHeldItemSlot extends WrappedPacket implements Senda
         try {
             return packetConstructor.newInstance(slot);
         } catch (InstantiationException |
-                 IllegalAccessException |
-                 InvocationTargetException e) {
+                IllegalAccessException |
+                InvocationTargetException e) {
             e.printStackTrace();
         }
         return null;

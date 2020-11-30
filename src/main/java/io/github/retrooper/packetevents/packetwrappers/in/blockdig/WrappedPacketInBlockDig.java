@@ -68,14 +68,14 @@ public final class WrappedPacketInBlockDig extends WrappedPacket {
 
     /**
      * Get X position of the block
+     *
      * @return Block Position X
      */
     public int getX() {
-        if(isVersionLowerThan_v_1_8) {
+        if (isVersionLowerThan_v_1_8) {
             return readInt(0);
-        }
-        else {
-            if(blockPosObj == null) {
+        } else {
+            if (blockPosObj == null) {
                 blockPosObj = readObject(0, blockPositionClass);
             }
             try {
@@ -89,14 +89,14 @@ public final class WrappedPacketInBlockDig extends WrappedPacket {
 
     /**
      * Get Y position of the block
+     *
      * @return Block Position Y
      */
     public int getY() {
-        if(isVersionLowerThan_v_1_8) {
+        if (isVersionLowerThan_v_1_8) {
             return readInt(1);
-        }
-        else {
-            if(blockPosObj == null) {
+        } else {
+            if (blockPosObj == null) {
                 blockPosObj = readObject(0, blockPositionClass);
             }
             try {
@@ -110,14 +110,14 @@ public final class WrappedPacketInBlockDig extends WrappedPacket {
 
     /**
      * Get Z position of the block
+     *
      * @return Block Position Z
      */
     public int getZ() {
-        if(isVersionLowerThan_v_1_8) {
+        if (isVersionLowerThan_v_1_8) {
             return readInt(2);
-        }
-        else {
-            if(blockPosObj == null) {
+        } else {
+            if (blockPosObj == null) {
                 blockPosObj = readObject(0, blockPositionClass);
             }
             try {
@@ -131,30 +131,30 @@ public final class WrappedPacketInBlockDig extends WrappedPacket {
 
     /**
      * Get the direction / Get the face.
+     *
      * @return Direction
      */
     public Direction getDirection() {
-        if(isVersionLowerThan_v_1_8) {
-            return Direction.getDirection((short)readInt(3));
-        }
-        else {
-            if(enumDirObj == null) {
+        if (isVersionLowerThan_v_1_8) {
+            return Direction.getDirection((short) readInt(3));
+        } else {
+            if (enumDirObj == null) {
                 enumDirObj = readObject(0, enumDirectionClass);
             }
-            return Direction.valueOf(((Enum)enumDirObj).name());
+            return Direction.valueOf(((Enum) enumDirObj).name());
         }
     }
 
     /**
      * Get the PlayerDigType enum sent in this packet.
+     *
      * @return Dig Type
      */
     public PlayerDigType getDigType() {
-        if(isVersionLowerThan_v_1_8) {
+        if (isVersionLowerThan_v_1_8) {
             return PlayerDigType.values()[readInt(4)];
-        }
-        else {
-            return PlayerDigType.valueOf(((Enum)readObject(0, digTypeClass)).name());
+        } else {
+            return PlayerDigType.valueOf(((Enum) readObject(0, digTypeClass)).name());
         }
     }
 
@@ -167,6 +167,6 @@ public final class WrappedPacketInBlockDig extends WrappedPacket {
         RELEASE_USE_ITEM,
         SWAP_HELD_ITEMS,
         SWAP_ITEM_WITH_OFFHAND,
-        UNKNOWN;
+        UNKNOWN
     }
 }

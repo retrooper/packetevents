@@ -50,26 +50,20 @@ public class TinyProtocol7 {
     private static final Class<?> PACKET_LOGIN_IN_START = Reflection.getMinecraftClass("PacketLoginInStart");
     private static final Class<?> PACKET_HANDSHAKING_IN_SET_PROTOCOL = Reflection.getMinecraftClass("PacketHandshakingInSetProtocol");
     private static final FieldAccessor<GameProfile> getGameProfile = Reflection.getField(PACKET_LOGIN_IN_START, GameProfile.class, 0);
-
+    public final ConcurrentLinkedQueue<Channel> queueingChannelKicks = new ConcurrentLinkedQueue<>();
     // Speedup channel/protocol lookup
     private final Map<String, Channel> channelLookup = new MapMaker().weakValues().makeMap();
-
-    // List of network markers
-    private List<Object> networkManagers;
-
     // Injected channel handlers
     private final List<Channel> serverChannels = Lists.newArrayList();
+    // Current handler name
+    private final String handlerName;
+    protected volatile boolean closed;
+    protected Plugin plugin;
+    // List of network markers
+    private List<Object> networkManagers;
     private ChannelInboundHandlerAdapter serverChannelHandler;
     private ChannelInitializer<Channel> beginInitProtocol;
     private ChannelInitializer<Channel> endInitProtocol;
-
-    public final ConcurrentLinkedQueue<Channel> queueingChannelKicks = new ConcurrentLinkedQueue<>();
-
-    // Current handler name
-    private final String handlerName;
-
-    protected volatile boolean closed;
-    protected Plugin plugin;
 
     /**
      * Construct a new instance of TinyProtocol, and start intercepting packets for all connected clients and future clients.
@@ -375,7 +369,7 @@ public class TinyProtocol7 {
                     }
                 });
 
-                if(!success[0]) {
+                if (!success[0]) {
                     throw new IllegalStateException("Failed to inject");
                 }
             }

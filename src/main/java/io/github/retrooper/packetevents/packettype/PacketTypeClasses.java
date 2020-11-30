@@ -29,14 +29,6 @@ import io.github.retrooper.packetevents.utils.reflection.SubclassUtil;
 
 public class PacketTypeClasses {
     public static class Status {
-        public static class Client {
-            public static Class<?> START, PING;
-        }
-
-        public static class Server {
-            public static Class<?> PONG, SERVER_INFO;
-        }
-
         public static void load() {
             Client.START = NMSUtils.getNMSClassWithoutException("PacketStatusInStart");
             Client.PING = NMSUtils.getNMSClassWithoutException("PacketStatusInPing");
@@ -44,17 +36,17 @@ public class PacketTypeClasses {
             Server.SERVER_INFO = NMSUtils.getNMSClassWithoutException("PacketStatusOutServerInfo");
             PacketType.Status.init();
         }
-    }
 
-    public static class Login {
         public static class Client {
-            public static Class<?> HANDSHAKE, CUSTOM_PAYLOAD, START, ENCRYPTION_BEGIN;
+            public static Class<?> START, PING;
         }
 
         public static class Server {
-            public static Class<?> CUSTOM_PAYLOAD, DISCONNECT, ENCRYPTION_BEGIN, SUCCESS, SET_COMPRESSION;
+            public static Class<?> PONG, SERVER_INFO;
         }
+    }
 
+    public static class Login {
         public static void load() {
             Client.HANDSHAKE = NMSUtils.getNMSClassWithoutException("PacketHandshakingInSetProtocol");
             //In and Out custom payload login packets have been here since AROUND 1.13.2.
@@ -68,6 +60,14 @@ public class PacketTypeClasses {
             Server.SUCCESS = NMSUtils.getNMSClassWithoutException("PacketLoginOutSuccess");
             Server.SET_COMPRESSION = NMSUtils.getNMSClassWithoutException("PacketLoginOutSetCompression");
             PacketType.Login.init();
+        }
+
+        public static class Client {
+            public static Class<?> HANDSHAKE, CUSTOM_PAYLOAD, START, ENCRYPTION_BEGIN;
+        }
+
+        public static class Server {
+            public static Class<?> CUSTOM_PAYLOAD, DISCONNECT, ENCRYPTION_BEGIN, SUCCESS, SET_COMPRESSION;
         }
     }
 

@@ -61,25 +61,20 @@ public class TinyProtocol8 {
         getNetworkMarkers = tempNetworkMarkers;
     }
 
+    public final ConcurrentLinkedQueue<Channel> queueingChannelKicks = new ConcurrentLinkedQueue<>();
     // Speedup channel/protocol lookup
     private final Map<String, Channel> channelLookup = new MapMaker().weakValues().makeMap();
-
-    // List of network markers
-    private List<Object> networkManagers;
-
     // Injected channel handlers
     private final List<Channel> serverChannels = Lists.newArrayList();
+    // Current handler name
+    private final String handlerName;
+    protected volatile boolean closed;
+    protected Plugin plugin;
+    // List of network markers
+    private List<Object> networkManagers;
     private ChannelInboundHandlerAdapter serverChannelHandler;
     private ChannelInitializer<Channel> beginInitProtocol;
     private ChannelInitializer<Channel> endInitProtocol;
-
-    public final ConcurrentLinkedQueue<Channel> queueingChannelKicks = new ConcurrentLinkedQueue<>();
-
-    // Current handler name
-    private final String handlerName;
-
-    protected volatile boolean closed;
-    protected Plugin plugin;
 
     /**
      * Construct a new instance of TinyProtocol, and start intercepting packets for all connected clients and future clients.
@@ -379,13 +374,12 @@ public class TinyProtocol8 {
                     public void run() {
                         try {
                             channel.pipeline().addBefore("packet_handler", handlerName, pi);
-                        }
-                        catch(Exception ex) {
+                        } catch (Exception ex) {
                             success[0] = false;
                         }
                     }
                 });
-                if(!success[0]) {
+                if (!success[0]) {
                     throw new IllegalStateException("Failed to inject");
                 }
             }
@@ -500,7 +494,7 @@ public class TinyProtocol8 {
     }
 
     public void handleQueuedKicks() {
-        for(Channel channel : queueingChannelKicks) {
+        for (Channel channel : queueingChannelKicks) {
             Object packet = new WrappedPacketOutKickDisconnect("We failed to inject you. Please try rejoining!").asNMSPacket();
             sendPacket(channel, packet);
         }

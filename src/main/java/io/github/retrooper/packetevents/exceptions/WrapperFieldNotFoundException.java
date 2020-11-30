@@ -26,7 +26,7 @@ package io.github.retrooper.packetevents.exceptions;
 
 import io.github.retrooper.packetevents.utils.reflection.ClassUtil;
 
-public class WrapperFieldNotFoundException extends RuntimeException{
+public class WrapperFieldNotFoundException extends RuntimeException {
     public WrapperFieldNotFoundException(String message) {
         super(message);
     }

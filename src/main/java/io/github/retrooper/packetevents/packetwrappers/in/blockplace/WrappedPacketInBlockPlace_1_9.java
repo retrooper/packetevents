@@ -32,15 +32,15 @@ import io.github.retrooper.packetevents.utils.reflection.Reflection;
 import java.lang.reflect.InvocationTargetException;
 
 final class WrappedPacketInBlockPlace_1_9 extends WrappedPacket {
-    private Object blockPosObj;
     private static Class<?> movingObjectPositionBlockClass;
-
-    public static void load() {
-        movingObjectPositionBlockClass = NMSUtils.getNMSClassWithoutException("MovingObjectPositionBlock");
-    }
+    private Object blockPosObj;
 
     public WrappedPacketInBlockPlace_1_9(final Object packet) {
         super(packet);
+    }
+
+    public static void load() {
+        movingObjectPositionBlockClass = NMSUtils.getNMSClassWithoutException("MovingObjectPositionBlock");
     }
 
     public int getX() {

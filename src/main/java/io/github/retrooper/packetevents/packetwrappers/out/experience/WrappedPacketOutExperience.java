@@ -33,18 +33,8 @@ import java.lang.reflect.InvocationTargetException;
 
 public class WrappedPacketOutExperience extends WrappedPacket implements SendableWrapper {
     private static Constructor<?> packetConstructor;
-    public static void load() {
-        try {
-            packetConstructor = PacketTypeClasses.Server.EXPERIENCE.getConstructor(float.class,
-                    int.class, int.class);
-        } catch (NoSuchMethodException e) {
-            e.printStackTrace();
-        }
-    }
-
     private float expBar;
     private int expLevel, totalExp;
-
     public WrappedPacketOutExperience(Object packet) {
         super(packet);
     }
@@ -54,6 +44,15 @@ public class WrappedPacketOutExperience extends WrappedPacket implements Sendabl
         this.expBar = experienceBar;
         this.expLevel = experienceLevel;
         this.totalExp = totalExperience;
+    }
+
+    public static void load() {
+        try {
+            packetConstructor = PacketTypeClasses.Server.EXPERIENCE.getConstructor(float.class,
+                    int.class, int.class);
+        } catch (NoSuchMethodException e) {
+            e.printStackTrace();
+        }
     }
 
     public float getExperienceBar() {

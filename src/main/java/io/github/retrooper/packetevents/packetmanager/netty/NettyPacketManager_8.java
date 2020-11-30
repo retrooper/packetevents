@@ -37,15 +37,17 @@ final class NettyPacketManager_8 {
     NettyPacketManager_8() {
 
     }
+
     /**
      * Inject a player with 1.8+ netty import location.
+     *
      * @param player
      */
     public void injectPlayer(final Player player) {
         final ChannelDuplexHandler channelDuplexHandler = new ChannelDuplexHandler() {
             @Override
             public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
-                Object packet = PacketEvents.get().packetManager.read(player, ctx.channel(),msg);
+                Object packet = PacketEvents.get().packetManager.read(player, ctx.channel(), msg);
                 if (packet == null) {
                     return;
                 }
@@ -55,7 +57,7 @@ final class NettyPacketManager_8 {
 
             @Override
             public void write(ChannelHandlerContext ctx, Object msg, ChannelPromise promise) throws Exception {
-                Object packet = PacketEvents.get().packetManager.write(player, ctx.channel(),msg);
+                Object packet = PacketEvents.get().packetManager.write(player, ctx.channel(), msg);
                 if (packet == null) {
                     return;
                 }
@@ -69,6 +71,7 @@ final class NettyPacketManager_8 {
 
     /**
      * Eject a player with 1.8+ netty import location.
+     *
      * @param player
      */
     public void ejectPlayer(final Player player) {
@@ -77,12 +80,12 @@ final class NettyPacketManager_8 {
     }
 
     public void ejectChannel(Object channel) {
-        Channel ch = (Channel)channel;
+        Channel ch = (Channel) channel;
         ch.pipeline().remove(PacketEvents.get().packetManager.getNettyHandlerName());
     }
 
     public void sendPacket(Object rawChannel, Object packet) {
-        Channel channel = (Channel)rawChannel;
+        Channel channel = (Channel) rawChannel;
         channel.pipeline().writeAndFlush(packet);
     }
 }

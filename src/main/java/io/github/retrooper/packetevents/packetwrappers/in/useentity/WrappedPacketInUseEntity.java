@@ -34,6 +34,7 @@ public final class WrappedPacketInUseEntity extends WrappedPacket {
     private static Class<?> enumEntityUseActionClass, enumHandClass;
     private Entity entity;
     private int entityID = -1;
+
     public WrappedPacketInUseEntity(final Object packet) {
         super(packet);
     }
@@ -53,10 +54,11 @@ public final class WrappedPacketInUseEntity extends WrappedPacket {
 
     /**
      * Lookup the associated entity by the ID that was sent in the packet.
+     *
      * @return Entity
      */
     public Entity getEntity() {
-        if(entity != null) {
+        if (entity != null) {
             return entity;
         }
         return entity = NMSUtils.getEntityById(getEntityID());
@@ -66,19 +68,20 @@ public final class WrappedPacketInUseEntity extends WrappedPacket {
      * Get the ID of the entity.
      * If you do not want to use {@link #getEntity()},
      * you lookup the entity by yourself with this entity ID.
+     *
      * @return Entity ID
      */
     public int getEntityID() {
-        if(entityID != -1) {
+        if (entityID != -1) {
             return entityID;
-        }
-        else {
+        } else {
             return entityID = readInt(0);
         }
     }
 
     /**
      * Get the associated action.
+     *
      * @return Get EntityUseAction
      */
     public EntityUseAction getAction() {

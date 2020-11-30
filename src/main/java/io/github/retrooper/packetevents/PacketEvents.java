@@ -59,23 +59,22 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 public final class PacketEvents implements Listener, EventManager {
+    private static PacketEvents instance;
     private final ArrayList<Plugin> plugins = new ArrayList<>(1);
-    private boolean loading, loaded, initialized, initializing, stopping;
     private final PEVersion version = new PEVersion(1, 7, 9);
-    private PacketEventsSettings settings = new PacketEventsSettings();
+    private final EventManager eventManager = new PEEventManager();
+    private final PlayerUtils playerUtils = new PlayerUtils();
+    private final ServerUtils serverUtils = new ServerUtils();
     /**
      * General executor service, basically for anything that the packet executor service doesn't do.
      */
     public ExecutorService generalExecutorService = Executors.newSingleThreadExecutor();
     //Executor used for player injecting/ejecting and for packet processing/event calling
     public ExecutorService packetHandlingExecutorService = Executors.newSingleThreadExecutor();
-
     public PacketManager packetManager = null;
+    private boolean loading, loaded, initialized, initializing, stopping;
+    private PacketEventsSettings settings = new PacketEventsSettings();
 
-    private final EventManager eventManager = new PEEventManager();
-    private final PlayerUtils playerUtils = new PlayerUtils();
-    private final ServerUtils serverUtils = new ServerUtils();
-    private static PacketEvents instance;
     public static PacketEvents create() {
         return PacketEvents.instance = new PacketEvents();
     }
@@ -281,8 +280,7 @@ public final class PacketEvents implements Listener, EventManager {
         if (getServerUtils().getVersion() == ServerVersion.v_1_7_10) {
             ClientVersion version = ClientVersion.getClientVersion(ProtocolVersionAccessor_v_1_7.getProtocolVersion(e.getPlayer()));
             getPlayerUtils().clientVersionsMap.put(channel, version);
-        }
-        else if(VersionLookupUtils.isDependencyAvailable()) {
+        } else if (VersionLookupUtils.isDependencyAvailable()) {
             int protocolVersion = VersionLookupUtils.getProtocolVersion(e.getPlayer());
             ClientVersion version = ClientVersion.getClientVersion(protocolVersion);
             getPlayerUtils().clientVersionsMap.put(channel, version);
@@ -296,8 +294,7 @@ public final class PacketEvents implements Listener, EventManager {
             } catch (Exception ex) {
                 e.getPlayer().kickPlayer(getSettings().getInjectionFailureMessage());
             }
-        }
-        else {
+        } else {
             //We have already injected them.
             getEventManager().callEvent(new PostPlayerInjectEvent(e.getPlayer()));
         }

@@ -27,7 +27,8 @@ package io.github.retrooper.packetevents.packetwrappers.out.entitymetadata;
 import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
 
 public class WrappedPacketOutEntityMetadata extends WrappedPacket {
-    private boolean isListening;
+    private final boolean isListening;
+
     public WrappedPacketOutEntityMetadata(Object packet) {
         super(packet);
         isListening = true;
