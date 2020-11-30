@@ -72,7 +72,7 @@ public class PacketTypeClasses {
     }
 
     public static class Client {
-        private static final String c = "PacketPlayIn";
+        private static final String PREFIX = "PacketPlayIn";
         public static Class<?> FLYING, POSITION, POSITION_LOOK, LOOK, CLIENT_COMMAND,
                 TRANSACTION, BLOCK_DIG, ENTITY_ACTION, USE_ENTITY,
                 WINDOW_CLICK, STEER_VEHICLE, CUSTOM_PAYLOAD, ARM_ANIMATION,
@@ -89,70 +89,70 @@ public class PacketTypeClasses {
          * Initiate all server-bound packet classes.
          */
         public static void load() {
-            FLYING = NMSUtils.getNMSClassWithoutException(c + "Flying");
+            FLYING = NMSUtils.getNMSClassWithoutException(PREFIX + "Flying");
             try {
-                POSITION = NMSUtils.getNMSClass(c + "Position");
-                POSITION_LOOK = NMSUtils.getNMSClass(c + "PositionLook");
-                LOOK = NMSUtils.getNMSClass(c + "Look");
+                POSITION = NMSUtils.getNMSClass(PREFIX + "Position");
+                POSITION_LOOK = NMSUtils.getNMSClass(PREFIX + "PositionLook");
+                LOOK = NMSUtils.getNMSClass(PREFIX + "Look");
             } catch (ClassNotFoundException e) {
-                POSITION = SubclassUtil.getSubClass(FLYING, c + "Position");
-                POSITION_LOOK = SubclassUtil.getSubClass(FLYING, c + "PositionLook");
-                LOOK = SubclassUtil.getSubClass(FLYING, c + "Look");
+                POSITION = SubclassUtil.getSubClass(FLYING, PREFIX + "Position");
+                POSITION_LOOK = SubclassUtil.getSubClass(FLYING, PREFIX + "PositionLook");
+                LOOK = SubclassUtil.getSubClass(FLYING, PREFIX + "Look");
             }
 
             try {
-                SETTINGS = NMSUtils.getNMSClass(c + "Settings");
-                ENCHANT_ITEM = NMSUtils.getNMSClass(c + "EnchantItem");
+                SETTINGS = NMSUtils.getNMSClass(PREFIX + "Settings");
+                ENCHANT_ITEM = NMSUtils.getNMSClass(PREFIX + "EnchantItem");
 
-                CLIENT_COMMAND = NMSUtils.getNMSClass(c + "ClientCommand");
-                TRANSACTION = NMSUtils.getNMSClass(c + "Transaction");
-                BLOCK_DIG = NMSUtils.getNMSClass(c + "BlockDig");
-                ENTITY_ACTION = NMSUtils.getNMSClass(c + "EntityAction");
-                USE_ENTITY = NMSUtils.getNMSClass(c + "UseEntity");
-                WINDOW_CLICK = NMSUtils.getNMSClass(c + "WindowClick");
-                STEER_VEHICLE = NMSUtils.getNMSClass(c + "SteerVehicle");
-                CUSTOM_PAYLOAD = NMSUtils.getNMSClass(c + "CustomPayload");
-                ARM_ANIMATION = NMSUtils.getNMSClass(c + "ArmAnimation");
-                ABILITIES = NMSUtils.getNMSClass(c + "Abilities");
-                HELD_ITEM_SLOT = NMSUtils.getNMSClass(c + "HeldItemSlot");
-                CLOSE_WINDOW = NMSUtils.getNMSClass(c + "CloseWindow");
-                TAB_COMPLETE = NMSUtils.getNMSClass(c + "TabComplete");
-                CHAT = NMSUtils.getNMSClass(c + "Chat");
-                SET_CREATIVE_SLOT = NMSUtils.getNMSClass(c + "SetCreativeSlot");
-                KEEP_ALIVE = NMSUtils.getNMSClass(c + "KeepAlive");
-                UPDATE_SIGN = NMSUtils.getNMSClassWithoutException(c + "UpdateSign");
+                CLIENT_COMMAND = NMSUtils.getNMSClass(PREFIX + "ClientCommand");
+                TRANSACTION = NMSUtils.getNMSClass(PREFIX + "Transaction");
+                BLOCK_DIG = NMSUtils.getNMSClass(PREFIX + "BlockDig");
+                ENTITY_ACTION = NMSUtils.getNMSClass(PREFIX + "EntityAction");
+                USE_ENTITY = NMSUtils.getNMSClass(PREFIX + "UseEntity");
+                WINDOW_CLICK = NMSUtils.getNMSClass(PREFIX + "WindowClick");
+                STEER_VEHICLE = NMSUtils.getNMSClass(PREFIX + "SteerVehicle");
+                CUSTOM_PAYLOAD = NMSUtils.getNMSClass(PREFIX + "CustomPayload");
+                ARM_ANIMATION = NMSUtils.getNMSClass(PREFIX + "ArmAnimation");
+                ABILITIES = NMSUtils.getNMSClass(PREFIX + "Abilities");
+                HELD_ITEM_SLOT = NMSUtils.getNMSClass(PREFIX + "HeldItemSlot");
+                CLOSE_WINDOW = NMSUtils.getNMSClass(PREFIX + "CloseWindow");
+                TAB_COMPLETE = NMSUtils.getNMSClass(PREFIX + "TabComplete");
+                CHAT = NMSUtils.getNMSClass(PREFIX + "Chat");
+                SET_CREATIVE_SLOT = NMSUtils.getNMSClass(PREFIX + "SetCreativeSlot");
+                KEEP_ALIVE = NMSUtils.getNMSClass(PREFIX + "KeepAlive");
+                UPDATE_SIGN = NMSUtils.getNMSClassWithoutException(PREFIX + "UpdateSign");
 
-                TELEPORT_ACCEPT = NMSUtils.getNMSClassWithoutException(c + "TeleportAccept");
-                TILE_NBT_QUERY = NMSUtils.getNMSClassWithoutException(c + "TileNBTQuery");
-                DIFFICULTY_CHANGE = NMSUtils.getNMSClassWithoutException(c + "DifficultyChange");
-                B_EDIT = NMSUtils.getNMSClassWithoutException(c + "BEdit");
-                ENTITY_NBT_QUERY = NMSUtils.getNMSClassWithoutException(c + "EntityNBTQuery");
-                JIGSAW_GENERATE = NMSUtils.getNMSClassWithoutException(c + "JigsawGenerate");
-                DIFFICULTY_LOCK = NMSUtils.getNMSClassWithoutException(c + "DifficultyLock");
-                VEHICLE_MOVE = NMSUtils.getNMSClassWithoutException(c + "VehicleMove");
-                BOAT_MOVE = NMSUtils.getNMSClassWithoutException(c + "BoatMove");
-                PICK_ITEM = NMSUtils.getNMSClassWithoutException(c + "PickItem");
-                AUTO_RECIPE = NMSUtils.getNMSClassWithoutException(c + "AutoRecipe");
-                RECIPE_DISPLAYED = NMSUtils.getNMSClassWithoutException(c + "RecipeDisplayed");
-                ITEM_NAME = NMSUtils.getNMSClassWithoutException(c + "ItemName");
+                TELEPORT_ACCEPT = NMSUtils.getNMSClassWithoutException(PREFIX + "TeleportAccept");
+                TILE_NBT_QUERY = NMSUtils.getNMSClassWithoutException(PREFIX + "TileNBTQuery");
+                DIFFICULTY_CHANGE = NMSUtils.getNMSClassWithoutException(PREFIX + "DifficultyChange");
+                B_EDIT = NMSUtils.getNMSClassWithoutException(PREFIX + "BEdit");
+                ENTITY_NBT_QUERY = NMSUtils.getNMSClassWithoutException(PREFIX + "EntityNBTQuery");
+                JIGSAW_GENERATE = NMSUtils.getNMSClassWithoutException(PREFIX + "JigsawGenerate");
+                DIFFICULTY_LOCK = NMSUtils.getNMSClassWithoutException(PREFIX + "DifficultyLock");
+                VEHICLE_MOVE = NMSUtils.getNMSClassWithoutException(PREFIX + "VehicleMove");
+                BOAT_MOVE = NMSUtils.getNMSClassWithoutException(PREFIX + "BoatMove");
+                PICK_ITEM = NMSUtils.getNMSClassWithoutException(PREFIX + "PickItem");
+                AUTO_RECIPE = NMSUtils.getNMSClassWithoutException(PREFIX + "AutoRecipe");
+                RECIPE_DISPLAYED = NMSUtils.getNMSClassWithoutException(PREFIX + "RecipeDisplayed");
+                ITEM_NAME = NMSUtils.getNMSClassWithoutException(PREFIX + "ItemName");
                 //1.8+
-                RESOURCE_PACK_STATUS = NMSUtils.getNMSClassWithoutException(c + "ResourcePackStatus");
+                RESOURCE_PACK_STATUS = NMSUtils.getNMSClassWithoutException(PREFIX + "ResourcePackStatus");
 
-                ADVANCEMENTS = NMSUtils.getNMSClassWithoutException(c + "Advancements");
-                TR_SEL = NMSUtils.getNMSClassWithoutException(c + "TrSel");
-                BEACON = NMSUtils.getNMSClassWithoutException(c + "Beacon");
-                SET_COMMAND_BLOCK = NMSUtils.getNMSClassWithoutException(c + "SetCommandBlock");
-                SET_COMMAND_MINECART = NMSUtils.getNMSClassWithoutException(c + "SetCommandMinecart");
-                SET_JIGSAW = NMSUtils.getNMSClassWithoutException(c + "SetJigsaw");
-                STRUCT = NMSUtils.getNMSClassWithoutException(c + "Struct");
-                SPECTATE = NMSUtils.getNMSClassWithoutException(c + "Spectate");
+                ADVANCEMENTS = NMSUtils.getNMSClassWithoutException(PREFIX + "Advancements");
+                TR_SEL = NMSUtils.getNMSClassWithoutException(PREFIX + "TrSel");
+                BEACON = NMSUtils.getNMSClassWithoutException(PREFIX + "Beacon");
+                SET_COMMAND_BLOCK = NMSUtils.getNMSClassWithoutException(PREFIX + "SetCommandBlock");
+                SET_COMMAND_MINECART = NMSUtils.getNMSClassWithoutException(PREFIX + "SetCommandMinecart");
+                SET_JIGSAW = NMSUtils.getNMSClassWithoutException(PREFIX + "SetJigsaw");
+                STRUCT = NMSUtils.getNMSClassWithoutException(PREFIX + "Struct");
+                SPECTATE = NMSUtils.getNMSClassWithoutException(PREFIX + "Spectate");
             } catch (ClassNotFoundException e) {
                 e.printStackTrace();
             }
 
             try {
-                BLOCK_PLACE = NMSUtils.getNMSClass(c + "BlockPlace");
-                USE_ITEM = NMSUtils.getNMSClass(c + "UseItem");
+                BLOCK_PLACE = NMSUtils.getNMSClass(PREFIX + "BlockPlace");
+                USE_ITEM = NMSUtils.getNMSClass(PREFIX + "UseItem");
             } catch (ClassNotFoundException ignored) {
 
             }
