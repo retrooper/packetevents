@@ -34,22 +34,22 @@ public class TinyProtocol7 {
     private static final AtomicInteger ID = new AtomicInteger();
 
     // Used in order to lookup a channel
-    private static final MethodInvoker getPlayerHandle = Reflection.getMethod("{obc}.entity.CraftPlayer", "getHandle");
-    private static final FieldAccessor<Object> getConnection = Reflection.getField("{nms}.EntityPlayer", "playerConnection", Object.class);
-    private static final FieldAccessor<Object> getManager = Reflection.getField("{nms}.PlayerConnection", "networkManager", Object.class);
-    private static final FieldAccessor<Channel> getChannel = Reflection.getField("{nms}.NetworkManager", Channel.class, 0);
+    private static final MethodInvoker GET_PLAYER_HANDLE = Reflection.getMethod("{obc}.entity.CraftPlayer", "getHandle");
+    private static final FieldAccessor<Object> GET_CONNECTION = Reflection.getField("{nms}.EntityPlayer", "playerConnection", Object.class);
+    private static final FieldAccessor<Object> GET_MANAGER = Reflection.getField("{nms}.PlayerConnection", "networkManager", Object.class);
+    private static final FieldAccessor<Channel> GET_CHANNEL = Reflection.getField("{nms}.NetworkManager", Channel.class, 0);
 
     // Looking up ServerConnection
-    private static final Class<Object> minecraftServerClass = Reflection.getUntypedClass("{nms}.MinecraftServer");
-    private static final Class<Object> serverConnectionClass = Reflection.getUntypedClass("{nms}.ServerConnection");
-    private static final FieldAccessor<Object> getMinecraftServer = Reflection.getField("{obc}.CraftServer", minecraftServerClass, 0);
-    private static final FieldAccessor<Object> getServerConnection = Reflection.getField(minecraftServerClass, serverConnectionClass, 0);
-    private static final MethodInvoker getNetworkMarkers = Reflection.getTypedMethod(serverConnectionClass, null, List.class, serverConnectionClass);
+    private static final Class<Object> MINECRAFT_SERVER_CLASS = Reflection.getUntypedClass("{nms}.MinecraftServer");
+    private static final Class<Object> SERVER_CONNECTION_CLASS = Reflection.getUntypedClass("{nms}.ServerConnection");
+    private static final FieldAccessor<Object> GET_MINECRAFT_SERVER = Reflection.getField("{obc}.CraftServer", MINECRAFT_SERVER_CLASS, 0);
+    private static final FieldAccessor<Object> GET_SERVER_CONNECTION = Reflection.getField(MINECRAFT_SERVER_CLASS, SERVER_CONNECTION_CLASS, 0);
+    private static final MethodInvoker GET_NETWORK_MARKERS = Reflection.getTypedMethod(SERVER_CONNECTION_CLASS, null, List.class, SERVER_CONNECTION_CLASS);
 
     // Packets we have to intercept
     private static final Class<?> PACKET_LOGIN_IN_START = Reflection.getMinecraftClass("PacketLoginInStart");
-    private static final Class<?> PACKET_HANDSHAKING_IN_SET_PROTOCOL = Reflection.getMinecraftClass("PacketHandshakingInSetProtocol");
-    private static final FieldAccessor<GameProfile> getGameProfile = Reflection.getField(PACKET_LOGIN_IN_START, GameProfile.class, 0);
+    // private static final Class<?> PACKET_HANDSHAKING_IN_SET_PROTOCOL = Reflection.getMinecraftClass("PacketHandshakingInSetProtocol");
+    private static final FieldAccessor<GameProfile> GET_GAME_PROFILE = Reflection.getField(PACKET_LOGIN_IN_START, GameProfile.class, 0);
     public final ConcurrentLinkedQueue<Channel> queueingChannelKicks = new ConcurrentLinkedQueue<>();
     // Speedup channel/protocol lookup
     private final Map<String, Channel> channelLookup = new MapMaker().weakValues().makeMap();
@@ -144,12 +144,12 @@ public class TinyProtocol7 {
 
     @SuppressWarnings("unchecked")
     private void registerChannelHandler() {
-        Object mcServer = getMinecraftServer.get(Bukkit.getServer());
-        Object serverConnection = getServerConnection.get(mcServer);
+        Object mcServer = GET_MINECRAFT_SERVER.get(Bukkit.getServer());
+        Object serverConnection = GET_SERVER_CONNECTION.get(mcServer);
         boolean looking = true;
 
         // We need to synchronize against this list
-        networkManagers = (List<Object>) getNetworkMarkers.invoke(null, serverConnection);
+        networkManagers = (List<Object>) GET_NETWORK_MARKERS.invoke(null, serverConnection);
         createServerChannelHandler();
 
         // Find the correct list, or implicitly throw an exception
@@ -392,10 +392,10 @@ public class TinyProtocol7 {
 
         // Lookup channel again
         if (channel == null) {
-            Object connection = getConnection.get(getPlayerHandle.invoke(player));
-            Object manager = getManager.get(connection);
+            Object connection = GET_CONNECTION.get(GET_PLAYER_HANDLE.invoke(player));
+            Object manager = GET_MANAGER.get(connection);
 
-            channelLookup.put(player.getName(), channel = getChannel.get(manager));
+            channelLookup.put(player.getName(), channel = GET_CHANNEL.get(manager));
         }
 
         return channel;
@@ -503,7 +503,7 @@ public class TinyProtocol7 {
 
         private void handleLoginStart(Channel channel, Object packet) {
             if (PACKET_LOGIN_IN_START.isInstance(packet)) {
-                GameProfile profile = getGameProfile.get(packet);
+                GameProfile profile = GET_GAME_PROFILE.get(packet);
                 channelLookup.put(profile.getName(), channel);
             }
         }
