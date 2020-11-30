@@ -28,10 +28,16 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class ClassUtil {
-    private static final Map<String, String> CLASS_SIMPLE_NAME_CACHE = new HashMap<>();
+    private static final Map<String, String> classSimpleNameCache = new HashMap<>();
 
     public static String getClassSimpleName(Class<?> cls) {
         final String className = cls.getName();
-        return CLASS_SIMPLE_NAME_CACHE.computeIfAbsent(className, k -> cls.getSimpleName());
+        final String simpleClassName;
+        if (!classSimpleNameCache.containsKey(className)) {
+            classSimpleNameCache.put(className, simpleClassName = cls.getSimpleName());
+        } else {
+            simpleClassName = classSimpleNameCache.get(className);
+        }
+        return simpleClassName;
     }
 }
