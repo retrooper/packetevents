@@ -25,12 +25,14 @@
 package io.github.retrooper.packetevents.event;
 
 
+import io.github.retrooper.packetevents.PacketEvents;
+import io.github.retrooper.packetevents.event.eventtypes.CallableEvent;
 import io.github.retrooper.packetevents.utils.server.ServerVersion;
 
 /**
  * An event in the PacketEvents EventManager system.
  */
-public abstract class PacketEvent {
+public abstract class PacketEvent implements CallableEvent {
     public static ServerVersion version;
     private long timestamp = System.currentTimeMillis();
 
@@ -45,5 +47,9 @@ public abstract class PacketEvent {
 
     public void setTimestamp(long timestamp) {
         this.timestamp = timestamp;
+    }
+
+    public void callPacketEvent(PacketListenerDynamic listener) {
+        listener.onPacketEvent(this);
     }
 }

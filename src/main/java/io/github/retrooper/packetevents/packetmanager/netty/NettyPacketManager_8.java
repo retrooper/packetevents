@@ -45,26 +45,26 @@ final class NettyPacketManager_8 {
         final ChannelDuplexHandler channelDuplexHandler = new ChannelDuplexHandler() {
             @Override
             public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
-                Object packet = PacketEvents.getAPI().packetManager.read(player, ctx.channel(),msg);
+                Object packet = PacketEvents.get().packetManager.read(player, ctx.channel(),msg);
                 if (packet == null) {
                     return;
                 }
                 super.channelRead(ctx, msg);
-                PacketEvents.getAPI().packetManager.postRead(player, packet);
+                PacketEvents.get().packetManager.postRead(player, packet);
             }
 
             @Override
             public void write(ChannelHandlerContext ctx, Object msg, ChannelPromise promise) throws Exception {
-                Object packet = PacketEvents.getAPI().packetManager.write(player, ctx.channel(),msg);
+                Object packet = PacketEvents.get().packetManager.write(player, ctx.channel(),msg);
                 if (packet == null) {
                     return;
                 }
                 super.write(ctx, msg, promise);
-                PacketEvents.getAPI().packetManager.postWrite(player, packet);
+                PacketEvents.get().packetManager.postWrite(player, packet);
             }
         };
         final ChannelPipeline pipeline = ((Channel) NMSUtils.getChannel(player)).pipeline();
-        pipeline.addBefore("packet_handler", PacketEvents.getAPI().packetManager.getNettyHandlerName(), channelDuplexHandler);
+        pipeline.addBefore("packet_handler", PacketEvents.get().packetManager.getNettyHandlerName(), channelDuplexHandler);
     }
 
     /**
@@ -73,13 +73,12 @@ final class NettyPacketManager_8 {
      */
     public void ejectPlayer(final Player player) {
         final Channel channel = (Channel) NMSUtils.getChannel(player);
-        assert channel != null;
         ejectChannel(channel);
     }
 
     public void ejectChannel(Object channel) {
         Channel ch = (Channel)channel;
-        ch.pipeline().remove(PacketEvents.getAPI().packetManager.getNettyHandlerName());
+        ch.pipeline().remove(PacketEvents.get().packetManager.getNettyHandlerName());
     }
 
     public void sendPacket(Object rawChannel, Object packet) {

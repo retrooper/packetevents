@@ -144,7 +144,7 @@ public class PacketType {
             /**
              * Is the packet an instance of the PacketPlayInFlying packet?
              *
-             * @param packetID
+             * @param packetID Packet ID
              * @return packetID == FLYING or POSITION or POSITION_LOOK or LOOK
              */
             public static boolean isInstanceOfFlying(final byte packetID) {
@@ -155,8 +155,8 @@ public class PacketType {
             }
 
             public static boolean isBlockPlace(final byte packetID) {
-                final ServerVersion version = PacketEvents.getAPI().getServerUtils().getVersion();
-                return (version.isHigherThan(ServerVersion.v_1_8_8)) ?
+                final ServerVersion version = PacketEvents.get().getServerUtils().getVersion();
+                return version.isHigherThan(ServerVersion.v_1_8_8) ?
                         packetID == Client.USE_ITEM
                         : packetID == Client.BLOCK_PLACE;
             }

@@ -24,7 +24,10 @@
 
 package io.github.retrooper.packetevents.event.impl;
 
+import io.github.retrooper.packetevents.PacketEvents;
 import io.github.retrooper.packetevents.event.PacketEvent;
+import io.github.retrooper.packetevents.event.PacketListenerDynamic;
+import io.github.retrooper.packetevents.event.eventtypes.CallableEvent;
 import io.github.retrooper.packetevents.event.eventtypes.CancellableEvent;
 import io.github.retrooper.packetevents.packettype.PacketType;
 import io.github.retrooper.packetevents.utils.reflection.ClassUtil;
@@ -32,7 +35,7 @@ import io.github.retrooper.packetevents.utils.reflection.ClassUtil;
 /**
  * This event is called when we receive a login packet.
  */
-public class PacketLoginEvent extends PacketEvent implements CancellableEvent {
+public class PacketLoginEvent extends PacketEvent implements CancellableEvent, CallableEvent {
     private final Object channel;
     private final Object packet;
     private boolean cancelled;
@@ -92,5 +95,10 @@ public class PacketLoginEvent extends PacketEvent implements CancellableEvent {
     @Override
     public void setCancelled(boolean value) {
         cancelled = value;
+    }
+
+    @Override
+    public void call(PacketListenerDynamic listener) {
+        listener.onPacketLogin(this);
     }
 }

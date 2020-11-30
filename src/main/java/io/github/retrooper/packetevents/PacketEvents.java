@@ -26,6 +26,8 @@ package io.github.retrooper.packetevents;
 
 import io.github.retrooper.packetevents.event.PacketEvent;
 import io.github.retrooper.packetevents.event.impl.PostPlayerInjectEvent;
+import io.github.retrooper.packetevents.event.manager.EventManager;
+import io.github.retrooper.packetevents.event.manager.PEEventManager;
 import io.github.retrooper.packetevents.exceptions.PacketEventsLoadFailureException;
 import io.github.retrooper.packetevents.packetmanager.PacketManager;
 import io.github.retrooper.packetevents.packettype.PacketTypeClasses;
@@ -35,6 +37,8 @@ import io.github.retrooper.packetevents.updatechecker.UpdateChecker;
 import io.github.retrooper.packetevents.utils.entityfinder.EntityFinderUtils;
 import io.github.retrooper.packetevents.utils.nms.NMSUtils;
 import io.github.retrooper.packetevents.utils.player.ClientVersion;
+import io.github.retrooper.packetevents.utils.player.PlayerUtils;
+import io.github.retrooper.packetevents.utils.server.ServerUtils;
 import io.github.retrooper.packetevents.utils.version.PEVersion;
 import io.github.retrooper.packetevents.utils.server.ServerVersion;
 import io.github.retrooper.packetevents.utils.versionlookup.VersionLookupUtils;
@@ -54,19 +58,31 @@ import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-public final class PacketEvents implements Listener {
-    private static final PacketEventsAPI packetEventsAPI = new PacketEventsAPI();
-    private static final PacketEvents instance = new PacketEvents();
-    private static final ArrayList<Plugin> plugins = new ArrayList<>(1);
-    private static boolean loading, loaded, initialized, initializing, uninitializing;
-    private static final PEVersion version = new PEVersion(1, 7, 9);
-    private static PacketEventsSettings settings = new PacketEventsSettings();
+public final class PacketEvents implements Listener, EventManager {
+    private final ArrayList<Plugin> plugins = new ArrayList<>(1);
+    private boolean loading, loaded, initialized, initializing, stopping;
+    private final PEVersion version = new PEVersion(1, 7, 9);
+    private PacketEventsSettings settings = new PacketEventsSettings();
     /**
      * General executor service, basically for anything that the packet executor service doesn't do.
      */
-    public static ExecutorService generalExecutorService = Executors.newSingleThreadExecutor();
+    public ExecutorService generalExecutorService = Executors.newSingleThreadExecutor();
     //Executor used for player injecting/ejecting and for packet processing/event calling
-    public static ExecutorService packetHandlingExecutorService = Executors.newSingleThreadExecutor();
+    public ExecutorService packetHandlingExecutorService = Executors.newSingleThreadExecutor();
+
+    public PacketManager packetManager = null;
+
+    private final EventManager eventManager = new PEEventManager();
+    private final PlayerUtils playerUtils = new PlayerUtils();
+    private final ServerUtils serverUtils = new ServerUtils();
+    private static PacketEvents instance;
+    public static PacketEvents create() {
+        return PacketEvents.instance = new PacketEvents();
+    }
+
+    public static PacketEvents get() {
+        return instance;
+    }
 
     /**
      * This loads the PacketEvents API.
@@ -87,7 +103,7 @@ public final class PacketEvents implements Listener {
      * Wrappers:
      * All PacketEvents' wrappers are setup and do all loading they need to do.
      */
-    public static void load() {
+    public void load() {
         if (!loaded && !loading) {
             loading = true;
             ServerVersion version = ServerVersion.getVersion();
@@ -117,11 +133,11 @@ public final class PacketEvents implements Listener {
 
     }
 
-    public static void loadSettings(PacketEventsSettings settings) {
-        PacketEvents.settings = settings;
+    public void loadSettings(PacketEventsSettings settings) {
+        this.settings = settings;
     }
 
-    public static void init(final Plugin plugin) {
+    public void init(final Plugin plugin) {
         init(plugin, settings);
     }
 
@@ -136,7 +152,7 @@ public final class PacketEvents implements Listener {
      *
      * @param pl JavaPlugin instance
      */
-    public static void init(final Plugin pl, PacketEventsSettings packetEventsSettings) {
+    public void init(final Plugin pl, PacketEventsSettings packetEventsSettings) {
         load();
         if (!initialized && !initializing) {
             initializing = true;
@@ -151,19 +167,19 @@ public final class PacketEvents implements Listener {
             plugins.add(pl);
 
             //Register Bukkit listener
-            Bukkit.getPluginManager().registerEvents(instance, plugins.get(0));
-            PacketEvents.getAPI().packetManager = new PacketManager(plugins.get(0), settings.shouldInjectEarly());
+            Bukkit.getPluginManager().registerEvents(this, plugins.get(0));
+            packetManager = new PacketManager(plugins.get(0), settings.shouldInjectEarly());
 
             for (final Player p : Bukkit.getOnlinePlayers()) {
                 try {
-                    getAPI().getPlayerUtils().injectPlayer(p);
+                    getPlayerUtils().injectPlayer(p);
                 } catch (Exception ex) {
-                    p.kickPlayer(PacketEvents.getSettings().getInjectionFailureMessage());
+                    p.kickPlayer(getSettings().getInjectionFailureMessage());
                 }
             }
 
             if (settings.shouldCheckForUpdates()) {
-                PacketEvents.generalExecutorService.execute(new Runnable() {
+                generalExecutorService.execute(new Runnable() {
                     @Override
                     public void run() {
                         new UpdateChecker().handleUpdate();
@@ -179,50 +195,46 @@ public final class PacketEvents implements Listener {
     /**
      *
      */
-    public static void stop() {
-        if (initialized && !uninitializing) {
-            uninitializing = true;
+    public void stop() {
+        if (initialized && !stopping) {
+            stopping = true;
             for (Player player : Bukkit.getOnlinePlayers()) {
-                PacketEvents.getAPI().packetManager.ejectPlayer(player);
+                packetManager.ejectPlayer(player);
             }
 
-            if (PacketEvents.getAPI().packetManager.tinyProtocol != null) {
-                PacketEvents.getAPI().packetManager.tinyProtocol.unregisterChannelHandler();
+            if (packetManager.tinyProtocol != null) {
+                packetManager.tinyProtocol.unregisterChannelHandler();
             }
 
-            getAPI().getEventManager().unregisterAllListeners();
-            PacketEvents.generalExecutorService.shutdownNow();
-            PacketEvents.packetHandlingExecutorService.shutdownNow();
+            getEventManager().unregisterAllListeners();
+            generalExecutorService.shutdownNow();
+            packetHandlingExecutorService.shutdownNow();
             initialized = false;
-            uninitializing = true;
+            stopping = true;
         }
     }
 
-    public static boolean hasLoaded() {
+    public boolean hasLoaded() {
         return loaded;
     }
 
-    public static boolean isLoading() {
+    public boolean isLoading() {
         return loading;
     }
 
-    public static boolean isInitializing() {
+    public boolean isInitializing() {
         return initializing;
     }
 
-    public static boolean isUninitializing() {
-        return uninitializing;
+    public boolean isStopping() {
+        return stopping;
     }
 
-    public static boolean isInitialized() {
+    public boolean isInitialized() {
         return initialized;
     }
 
-    public static PacketEventsAPI getAPI() {
-        return packetEventsAPI;
-    }
-
-    public static ArrayList<Plugin> getPlugins() {
+    public ArrayList<Plugin> getPlugins() {
         return plugins;
     }
 
@@ -231,22 +243,34 @@ public final class PacketEvents implements Listener {
      *
      * @return Configure some settings for the API
      */
-    public static PacketEventsSettings getSettings() {
+    public PacketEventsSettings getSettings() {
         return settings;
     }
 
-    public static PEVersion getVersion() {
+    public PEVersion getVersion() {
         return version;
     }
 
+    public EventManager getEventManager() {
+        return eventManager;
+    }
+
+    public PlayerUtils getPlayerUtils() {
+        return playerUtils;
+    }
+
+    public ServerUtils getServerUtils() {
+        return serverUtils;
+    }
+
+
     @EventHandler(priority = EventPriority.LOW)
     public void onLogin(PlayerLoginEvent e) {
-        if (PacketEvents.getSettings().shouldInjectEarly()) {
-            assert getAPI().packetManager.tinyProtocol != null;
+        if (getSettings().shouldInjectEarly()) {
             try {
-                getAPI().packetManager.injectPlayer(e.getPlayer());
+                packetManager.injectPlayer(e.getPlayer());
             } catch (Exception ex) {
-                e.disallow(PlayerLoginEvent.Result.KICK_OTHER, PacketEvents.getSettings().getInjectionFailureMessage());
+                e.disallow(PlayerLoginEvent.Result.KICK_OTHER, getSettings().getInjectionFailureMessage());
             }
         }
     }
@@ -254,28 +278,28 @@ public final class PacketEvents implements Listener {
     @EventHandler(priority = EventPriority.HIGH)
     public void onJoin(final PlayerJoinEvent e) {
         Object channel = NMSUtils.getChannel(e.getPlayer());
-        if (PacketEvents.getAPI().getServerUtils().getVersion() == ServerVersion.v_1_7_10) {
+        if (getServerUtils().getVersion() == ServerVersion.v_1_7_10) {
             ClientVersion version = ClientVersion.getClientVersion(ProtocolVersionAccessor_v_1_7.getProtocolVersion(e.getPlayer()));
-            PacketEvents.getAPI().getPlayerUtils().clientVersionsMap.put(channel, version);
+            getPlayerUtils().clientVersionsMap.put(channel, version);
         }
         else if(VersionLookupUtils.isDependencyAvailable()) {
             int protocolVersion = VersionLookupUtils.getProtocolVersion(e.getPlayer());
             ClientVersion version = ClientVersion.getClientVersion(protocolVersion);
-            PacketEvents.getAPI().getPlayerUtils().clientVersionsMap.put(channel, version);
+            getPlayerUtils().clientVersionsMap.put(channel, version);
         }
 
-        if (!PacketEvents.getSettings().shouldInjectEarly()) {
+        if (!getSettings().shouldInjectEarly()) {
             try {
-                PacketEvents.getAPI().packetManager.injectPlayer(e.getPlayer());
+                packetManager.injectPlayer(e.getPlayer());
                 //The injection has succeeded if we reach to this point.
-                PacketEvents.getAPI().getEventManager().callEvent(new PostPlayerInjectEvent(e.getPlayer()));
+                getEventManager().callEvent(new PostPlayerInjectEvent(e.getPlayer()));
             } catch (Exception ex) {
-                e.getPlayer().kickPlayer(PacketEvents.getSettings().getInjectionFailureMessage());
+                e.getPlayer().kickPlayer(getSettings().getInjectionFailureMessage());
             }
         }
         else {
             //We have already injected them.
-            PacketEvents.getAPI().getEventManager().callEvent(new PostPlayerInjectEvent(e.getPlayer()));
+            getEventManager().callEvent(new PostPlayerInjectEvent(e.getPlayer()));
         }
     }
 
@@ -284,8 +308,8 @@ public final class PacketEvents implements Listener {
     public void onQuit(final PlayerQuitEvent e) {
         UUID uuid = e.getPlayer().getUniqueId();
         Object channel = NMSUtils.getChannelNoCache(e.getPlayer());
-        PacketEvents.getAPI().getPlayerUtils().clientVersionsMap.remove(channel);
-        PacketEvents.getAPI().getPlayerUtils().playerPingMap.remove(uuid);
-        PacketEvents.getAPI().getPlayerUtils().playerSmoothedPingMap.remove(uuid);
+        getPlayerUtils().clientVersionsMap.remove(channel);
+        getPlayerUtils().playerPingMap.remove(uuid);
+        getPlayerUtils().playerSmoothedPingMap.remove(uuid);
     }
 }

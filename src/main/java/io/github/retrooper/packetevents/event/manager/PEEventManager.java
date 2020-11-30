@@ -22,53 +22,9 @@
  * SOFTWARE.
  */
 
-package io.github.retrooper.packetevents.enums;
+package io.github.retrooper.packetevents.event.manager;
 
-public enum Direction {
-    /**
-     * -Y offset
-     */
-    DOWN((short)0),
-
-    /**
-     * +Y offset
-     */
-    UP((short)1),
-
-    /**
-     * -Z offset
-     */
-    NORTH((short)2),
-
-    /**
-     * +Z offset
-     */
-    SOUTH((short)3),
-
-    /**
-     * -X offset
-     */
-    WEST((short)4),
-
-    /**
-     * +X offset
-     */
-    EAST((short)5),
-    
-    OTHER((short)255);
-
-    final short value;
-
-    Direction(final short value) {
-        this.value = value;
-    }
-
-    public static Direction getDirection(final short value) {
-        for(Direction direction : values()) {
-            if(direction.value == value) {
-                return direction;
-            }
-        }
-        return OTHER;
-    }
+public class PEEventManager implements EventManager {
+    public static final EventManagerLegacy legacyEventManager = new EventManagerLegacy();
+    public static final EventManagerDynamic dynamicEventManager = new EventManagerDynamic();
 }

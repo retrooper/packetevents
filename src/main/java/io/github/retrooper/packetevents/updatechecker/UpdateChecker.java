@@ -37,7 +37,7 @@ import java.net.URLConnection;
 
 public class UpdateChecker {
     public void handleUpdate() {
-        PEVersion localVersion = PacketEvents.getVersion();
+        PEVersion localVersion = PacketEvents.get().getVersion();
         inform("[PacketEvents] Checking for an update, please wait...");
         String line;
         try {

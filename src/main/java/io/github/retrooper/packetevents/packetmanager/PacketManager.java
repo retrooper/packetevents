@@ -59,7 +59,7 @@ public class PacketManager {
     }
 
     public void injectPlayer(Player player) {
-        if (PacketEvents.getSettings().shouldInjectAsync()) {
+        if (PacketEvents.get().getSettings().shouldInjectAsync()) {
             injectPlayerAsync(player);
         } else {
             injectPlayerSync(player);
@@ -67,7 +67,7 @@ public class PacketManager {
     }
 
     public void ejectPlayer(Player player) {
-        if (PacketEvents.getSettings().shouldEjectAsync()) {
+        if (PacketEvents.get().getSettings().shouldEjectAsync()) {
             ejectPlayerAsync(player);
         } else {
             ejectPlayerSync(player);
@@ -76,7 +76,7 @@ public class PacketManager {
 
     public void injectPlayerSync(Player player) {
         PlayerInjectEvent injectEvent = new PlayerInjectEvent(player, false);
-        PacketEvents.getAPI().getEventManager().callEvent(injectEvent);
+        PacketEvents.get().getEventManager().callEvent(injectEvent);
         if (!injectEvent.isCancelled()) {
             if (tinyProtocolMode) {
                 tinyProtocol.injectPlayer(player);
@@ -88,7 +88,7 @@ public class PacketManager {
 
     public void injectPlayerAsync(Player player) {
         PlayerInjectEvent injectEvent = new PlayerInjectEvent(player, true);
-        PacketEvents.getAPI().getEventManager().callEvent(injectEvent);
+        PacketEvents.get().getEventManager().callEvent(injectEvent);
         if (!injectEvent.isCancelled()) {
             if (tinyProtocolMode) {
                 assert tinyProtocol != null;
@@ -102,7 +102,7 @@ public class PacketManager {
 
     public void ejectPlayerSync(Player player) {
         PlayerEjectEvent ejectEvent = new PlayerEjectEvent(player, false);
-        PacketEvents.getAPI().getEventManager().callEvent(ejectEvent);
+        PacketEvents.get().getEventManager().callEvent(ejectEvent);
         if (!ejectEvent.isCancelled()) {
             keepAliveMap.remove(player.getUniqueId());
             if (tinyProtocolMode) {
@@ -115,7 +115,7 @@ public class PacketManager {
 
     public void ejectPlayerAsync(Player player) {
         PlayerEjectEvent ejectEvent = new PlayerEjectEvent(player, true);
-        PacketEvents.getAPI().getEventManager().callEvent(ejectEvent);
+        PacketEvents.get().getEventManager().callEvent(ejectEvent);
         if (!ejectEvent.isCancelled()) {
             keepAliveMap.remove(player.getUniqueId());
             if (tinyProtocolMode) {
@@ -127,7 +127,7 @@ public class PacketManager {
     }
 
     public void ejectChannel(Object channel) {
-        if (!PacketEvents.getSettings().shouldEjectAsync()) {
+        if (!PacketEvents.get().getSettings().shouldEjectAsync()) {
             ejectChannelSync(channel);
         } else {
             ejectChannelAsync(channel);
@@ -168,7 +168,7 @@ public class PacketManager {
             //Status packet
             if (simpleClassName.startsWith("PacketS")) {
                 final PacketStatusEvent packetStatusEvent = new PacketStatusEvent(channel, packet);
-                PacketEvents.getAPI().getEventManager().callEvent(packetStatusEvent);
+                PacketEvents.get().getEventManager().callEvent(packetStatusEvent);
                 interceptStatus(packetStatusEvent);
                 if (packetStatusEvent.isCancelled()) {
                     packet = null;
@@ -176,7 +176,7 @@ public class PacketManager {
             } else {
                 //Login packet
                 final PacketLoginEvent packetLoginEvent = new PacketLoginEvent(channel, packet);
-                PacketEvents.getAPI().getEventManager().callEvent(packetLoginEvent);
+                PacketEvents.get().getEventManager().callEvent(packetLoginEvent);
                 interceptLogin(packetLoginEvent);
                 if (packetLoginEvent.isCancelled()) {
                     packet = null;
@@ -184,7 +184,7 @@ public class PacketManager {
             }
         } else {
             final PacketReceiveEvent packetReceiveEvent = new PacketReceiveEvent(player, packet);
-            PacketEvents.getAPI().getEventManager().callEvent(packetReceiveEvent);
+            PacketEvents.get().getEventManager().callEvent(packetReceiveEvent);
             interceptRead(packetReceiveEvent);
             if (packetReceiveEvent.isCancelled()) {
                 packet = null;
@@ -199,7 +199,7 @@ public class PacketManager {
             //Status packet
             if (simpleClassName.startsWith("PacketS")) {
                 final PacketStatusEvent packetStatusEvent = new PacketStatusEvent(channel, packet);
-                PacketEvents.getAPI().getEventManager().callEvent(packetStatusEvent);
+                PacketEvents.get().getEventManager().callEvent(packetStatusEvent);
                 interceptStatus(packetStatusEvent);
                 if (packetStatusEvent.isCancelled()) {
                     packet = null;
@@ -208,7 +208,7 @@ public class PacketManager {
             //Login packet
             else {
                 final PacketLoginEvent packetLoginEvent = new PacketLoginEvent(channel, packet);
-                PacketEvents.getAPI().getEventManager().callEvent(packetLoginEvent);
+                PacketEvents.get().getEventManager().callEvent(packetLoginEvent);
                 interceptLogin(packetLoginEvent);
                 if (packetLoginEvent.isCancelled()) {
                     packet = null;
@@ -216,7 +216,7 @@ public class PacketManager {
             }
         } else {
             final PacketSendEvent packetSendEvent = new PacketSendEvent(player, packet);
-            PacketEvents.getAPI().getEventManager().callEvent(packetSendEvent);
+            PacketEvents.get().getEventManager().callEvent(packetSendEvent);
             interceptWrite(packetSendEvent);
             if (packetSendEvent.isCancelled()) {
                 packet = null;
@@ -228,7 +228,7 @@ public class PacketManager {
     public void postRead(Player player, Object packet) {
         if (player != null) {
             PostPacketReceiveEvent event = new PostPacketReceiveEvent(player, packet);
-            PacketEvents.getAPI().getEventManager().callEvent(event);
+            PacketEvents.get().getEventManager().callEvent(event);
             interceptPostRead(event);
         }
     }
@@ -236,7 +236,7 @@ public class PacketManager {
     public void postWrite(Player player, Object packet) {
         if (player != null) {
             PostPacketSendEvent event = new PostPacketSendEvent(player, packet);
-            PacketEvents.getAPI().getEventManager().callEvent(event);
+            PacketEvents.get().getEventManager().callEvent(event);
             interceptPostSend(event);
         }
     }
@@ -248,9 +248,9 @@ public class PacketManager {
             long timestamp = keepAliveMap.getOrDefault(uuid, event.getTimestamp());
             long currentTime = event.getTimestamp();
             long ping = currentTime - timestamp;
-            long smoothedPing = (PacketEvents.getAPI().getPlayerUtils().getSmoothedPing(event.getPlayer()) * 3 + ping) / 4;
-            PacketEvents.getAPI().getPlayerUtils().playerPingMap.put(uuid, (short) ping);
-            PacketEvents.getAPI().getPlayerUtils().playerSmoothedPingMap.put(uuid, (short) smoothedPing);
+            long smoothedPing = (PacketEvents.get().getPlayerUtils().getSmoothedPing(event.getPlayer()) * 3 + ping) / 4;
+            PacketEvents.get().getPlayerUtils().playerPingMap.put(uuid, (short) ping);
+            PacketEvents.get().getPlayerUtils().playerSmoothedPingMap.put(uuid, (short) smoothedPing);
         }
     }
 
@@ -260,13 +260,13 @@ public class PacketManager {
 
     private void interceptLogin(PacketLoginEvent event) {
         if (event.getPacketId() == PacketType.Login.Client.HANDSHAKE
-                && PacketEvents.getAPI().getServerUtils().getVersion() != ServerVersion.v_1_7_10
-                && !PacketEvents.getAPI().getServerUtils().isBungeeCordEnabled() &&
-                !PacketEvents.getAPI().getPlayerUtils().clientVersionsMap.containsKey(event.getChannel())) {
+                && PacketEvents.get().getServerUtils().getVersion() != ServerVersion.v_1_7_10
+                && !PacketEvents.get().getServerUtils().isBungeeCordEnabled() &&
+                !PacketEvents.get().getPlayerUtils().clientVersionsMap.containsKey(event.getChannel())) {
             WrappedPacketLoginInHandshake handshake = new WrappedPacketLoginInHandshake(event.getNMSPacket());
             int protocolVersion = handshake.getProtocolVersion();
             ClientVersion version = ClientVersion.getClientVersion(protocolVersion);
-            PacketEvents.getAPI().getPlayerUtils().clientVersionsMap.put(event.getChannel(), version);
+            PacketEvents.get().getPlayerUtils().clientVersionsMap.put(event.getChannel(), version);
         }
     }
 

@@ -24,6 +24,8 @@
 
 package io.github.retrooper.packetevents.event.impl;
 
+import io.github.retrooper.packetevents.event.PacketListenerDynamic;
+import io.github.retrooper.packetevents.event.eventtypes.CallableEvent;
 import io.github.retrooper.packetevents.event.eventtypes.CancellableEvent;
 import io.github.retrooper.packetevents.event.PacketEvent;
 import io.github.retrooper.packetevents.event.eventtypes.PlayerEvent;
@@ -99,6 +101,11 @@ public final class PacketSendEvent extends PacketEvent implements CancellableEve
     @Override
     public void setCancelled(boolean value) {
         cancelled = value;
+    }
+
+    @Override
+    public void call(PacketListenerDynamic listener) {
+        listener.onPacketSend(this);
     }
 }
 

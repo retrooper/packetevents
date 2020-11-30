@@ -135,7 +135,7 @@ public final class WrappedPacketInBlockDig extends WrappedPacket {
      */
     public Direction getDirection() {
         if(isVersionLowerThan_v_1_8) {
-            return Direction.values()[readInt(3)];
+            return Direction.getDirection((short)readInt(3));
         }
         else {
             if(enumDirObj == null) {
@@ -167,6 +167,6 @@ public final class WrappedPacketInBlockDig extends WrappedPacket {
         RELEASE_USE_ITEM,
         SWAP_HELD_ITEMS,
         SWAP_ITEM_WITH_OFFHAND,
-        WRONG_PACKET
+        UNKNOWN;
     }
 }

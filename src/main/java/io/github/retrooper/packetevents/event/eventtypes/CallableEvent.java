@@ -22,38 +22,11 @@
  * SOFTWARE.
  */
 
-package io.github.retrooper.packetevents.event.impl;
+package io.github.retrooper.packetevents.event.eventtypes;
 
-import io.github.retrooper.packetevents.PacketEvents;
 import io.github.retrooper.packetevents.event.PacketEvent;
 import io.github.retrooper.packetevents.event.PacketListenerDynamic;
-import io.github.retrooper.packetevents.event.eventtypes.CallableEvent;
-import io.github.retrooper.packetevents.event.eventtypes.PlayerEvent;
-import io.github.retrooper.packetevents.utils.nms.NMSUtils;
-import io.github.retrooper.packetevents.utils.player.ClientVersion;
-import org.bukkit.entity.Player;
 
-public class PostPlayerInjectEvent extends PacketEvent implements PlayerEvent {
-    private final Player player;
-    public PostPlayerInjectEvent(Player player) {
-        this.player = player;
-    }
-
-    @Override
-    public Player getPlayer() {
-        return player;
-    }
-
-    public Object getChannel() {
-        return NMSUtils.getChannel(player);
-    }
-
-    public ClientVersion getClientVersion() {
-        return PacketEvents.get().getPlayerUtils().clientVersionsMap.get(getChannel());
-    }
-
-    @Override
-    public void call(PacketListenerDynamic listener) {
-        listener.onPostPlayerInject(this);
-    }
+public interface CallableEvent {
+    void call(PacketListenerDynamic listener);
 }

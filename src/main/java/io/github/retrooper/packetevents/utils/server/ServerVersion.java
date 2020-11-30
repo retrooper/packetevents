@@ -67,8 +67,8 @@ public enum ServerVersion {
 				return val;
 			}
 		}
-		if(PacketEvents.getSettings().getBackupServerVersion() != null) {
-            return PacketEvents.getSettings().getBackupServerVersion();
+		if(PacketEvents.get().getSettings().getBackupServerVersion() != null) {
+            return PacketEvents.get().getSettings().getBackupServerVersion();
         }
 		return ERROR;
 	}

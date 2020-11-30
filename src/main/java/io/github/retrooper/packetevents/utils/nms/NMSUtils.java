@@ -227,7 +227,7 @@ public final class NMSUtils {
     }
 
     public static Object getChannel(final Player player) {
-        if (PacketEvents.getAPI().packetManager.tinyProtocol == null) {
+        if (PacketEvents.get().packetManager.tinyProtocol == null) {
             UUID uuid = player.getUniqueId();
             Object channel = channelCache.get(uuid);
             if (channel == null) {
@@ -237,16 +237,16 @@ public final class NMSUtils {
             }
             return channel;
         } else {
-            return PacketEvents.getAPI().packetManager.tinyProtocol.getChannel(player);
+            return PacketEvents.get().packetManager.tinyProtocol.getChannel(player);
         }
     }
 
     public static Object getChannelNoCache(final Player player) {
-        if (PacketEvents.getAPI().packetManager.tinyProtocol == null) {
+        if (PacketEvents.get().packetManager.tinyProtocol == null) {
             WrappedPacket wrapper = new WrappedPacket(getNetworkManager(player));
             return wrapper.readObject(0, nettyChannelClass);
         } else {
-            return PacketEvents.getAPI().packetManager.tinyProtocol.getChannel(player);
+            return PacketEvents.get().packetManager.tinyProtocol.getChannel(player);
         }
     }
 

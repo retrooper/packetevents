@@ -233,7 +233,7 @@ public class TinyProtocol8 {
      * @return The packet to send instead, or NULL to cancel the transmission.
      */
     public Object onPacketOutAsync(Player receiver, Channel channel, Object packet) {
-        return PacketEvents.getAPI().packetManager.write(receiver, channel, packet);
+        return PacketEvents.get().packetManager.write(receiver, channel, packet);
     }
 
     /**
@@ -247,7 +247,7 @@ public class TinyProtocol8 {
      * @return The packet to recieve instead, or NULL to cancel.
      */
     public Object onPacketInAsync(Player sender, Channel channel, Object packet) {
-        return PacketEvents.getAPI().packetManager.read(sender, channel, packet);
+        return PacketEvents.get().packetManager.read(sender, channel, packet);
     }
 
     /**
@@ -374,7 +374,7 @@ public class TinyProtocol8 {
                 interceptor = new PacketInterceptor();
                 final PacketInterceptor pi = interceptor;
                 final boolean[] success = {true};
-                PacketEvents.packetHandlingExecutorService.execute(new Runnable() {
+                PacketEvents.get().packetHandlingExecutorService.execute(new Runnable() {
                     @Override
                     public void run() {
                         try {
@@ -453,7 +453,7 @@ public class TinyProtocol8 {
 
     public void uninjectChannelAsync(Channel channel) {
         // See ChannelInjector in ProtocolLib, line 590
-        PacketEvents.packetHandlingExecutorService.execute(new Runnable() {
+        PacketEvents.get().packetHandlingExecutorService.execute(new Runnable() {
             @Override
             public void run() {
                 channel.pipeline().remove(handlerName);
@@ -525,7 +525,7 @@ public class TinyProtocol8 {
 
             if (msg != null) {
                 super.channelRead(ctx, msg);
-                PacketEvents.getAPI().packetManager.postRead(player, msg);
+                PacketEvents.get().packetManager.postRead(player, msg);
             }
         }
 
@@ -535,7 +535,7 @@ public class TinyProtocol8 {
 
             if (msg != null) {
                 super.write(ctx, msg, promise);
-                PacketEvents.getAPI().packetManager.postWrite(player, msg);
+                PacketEvents.get().packetManager.postWrite(player, msg);
             }
         }
 

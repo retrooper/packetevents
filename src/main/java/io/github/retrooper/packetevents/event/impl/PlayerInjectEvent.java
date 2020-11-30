@@ -24,6 +24,8 @@
 
 package io.github.retrooper.packetevents.event.impl;
 
+import io.github.retrooper.packetevents.event.PacketListenerDynamic;
+import io.github.retrooper.packetevents.event.eventtypes.CallableEvent;
 import io.github.retrooper.packetevents.event.eventtypes.CancellableEvent;
 import io.github.retrooper.packetevents.event.PacketEvent;
 import io.github.retrooper.packetevents.event.eventtypes.PlayerEvent;
@@ -73,5 +75,10 @@ public final class PlayerInjectEvent extends PacketEvent implements CancellableE
 
     public boolean isAsync() {
         return async;
+    }
+
+    @Override
+    public void call(PacketListenerDynamic listener) {
+        listener.onPlayerInject(this);
     }
 }

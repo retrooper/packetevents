@@ -79,7 +79,7 @@ public class NettyPacketManager {
     public void injectPlayerAsync(final Player player) {
         //Redundant channel variable created just so we can cache it synchronously.
         Object channel = NMSUtils.getChannel(player);
-        PacketEvents.packetHandlingExecutorService.execute(() -> {
+        PacketEvents.get().packetHandlingExecutorService.execute(() -> {
             if (v1_7_nettyMode) {
                 NettyPacketManager_7 npm_7 = (NettyPacketManager_7) npm;
                 npm_7.injectPlayer(player);
@@ -111,7 +111,7 @@ public class NettyPacketManager {
      * @param player
      */
     public void ejectPlayerAsync(final Player player) {
-        PacketEvents.packetHandlingExecutorService.execute(() -> {
+        PacketEvents.get().packetHandlingExecutorService.execute(() -> {
             if (v1_7_nettyMode) {
                 NettyPacketManager_7 npm_7 = (NettyPacketManager_7) npm;
                 npm_7.ejectPlayer(player);
@@ -133,7 +133,7 @@ public class NettyPacketManager {
     }
 
     public void ejectChannelAsync(Object channel) {
-        PacketEvents.packetHandlingExecutorService.execute(() -> {
+        PacketEvents.get().packetHandlingExecutorService.execute(() -> {
             if (v1_7_nettyMode) {
                 NettyPacketManager_7 npm_7 = (NettyPacketManager_7) npm;
                 npm_7.ejectChannel(channel);

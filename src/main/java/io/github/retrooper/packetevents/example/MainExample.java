@@ -25,22 +25,26 @@
 package io.github.retrooper.packetevents.example;
 
 import io.github.retrooper.packetevents.PacketEvents;
+import io.github.retrooper.packetevents.event.PacketListenerDynamic;
+import io.github.retrooper.packetevents.event.impl.PacketReceiveEvent;
+import io.github.retrooper.packetevents.packettype.PacketType;
 import org.bukkit.plugin.java.JavaPlugin;
 
 public class MainExample extends JavaPlugin {
+
     @Override
     public void onLoad() {
-        PacketEvents.load();
+        PacketEvents.create().load();
     }
 
     @Override
     public void onEnable() {
         //We use default settings
-        PacketEvents.init(this);
+        PacketEvents.get().init(this);
     }
 
     @Override
     public void onDisable() {
-        PacketEvents.stop();
+        PacketEvents.get().stop();
     }
 }

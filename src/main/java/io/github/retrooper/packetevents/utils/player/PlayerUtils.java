@@ -25,6 +25,7 @@
 package io.github.retrooper.packetevents.utils.player;
 
 import io.github.retrooper.packetevents.PacketEvents;
+import io.github.retrooper.packetevents.event.PacketEvent;
 import io.github.retrooper.packetevents.event.impl.PlayerEjectEvent;
 import io.github.retrooper.packetevents.packetwrappers.SendableWrapper;
 import io.github.retrooper.packetevents.utils.nms.NMSUtils;
@@ -89,7 +90,7 @@ public final class PlayerUtils {
      * @param player
      */
     public void injectPlayer(final Player player) {
-       PacketEvents.getAPI().packetManager.injectPlayer(player);
+       PacketEvents.get().packetManager.injectPlayer(player);
     }
 
     /**
@@ -98,7 +99,7 @@ public final class PlayerUtils {
      * @param player
      */
     public void ejectPlayer(final Player player) {
-        PacketEvents.getAPI().packetManager.ejectPlayer(player);
+        PacketEvents.get().packetManager.ejectPlayer(player);
     }
 
     /**
@@ -107,7 +108,7 @@ public final class PlayerUtils {
      * @param sendableWrapper Wrapper
      */
     public void sendPacket(final Player player, final SendableWrapper sendableWrapper) {
-        PacketEvents.getAPI().packetManager.sendPacket(NMSUtils.getChannel(player), sendableWrapper.asNMSPacket());
+        PacketEvents.get().packetManager.sendPacket(NMSUtils.getChannel(player), sendableWrapper.asNMSPacket());
     }
 
     /**
@@ -116,7 +117,7 @@ public final class PlayerUtils {
      * @param nmsPacket Raw packet
      */
     public void sendNMSPacket(final Player player, final Object nmsPacket) {
-        PacketEvents.getAPI().packetManager.sendPacket(NMSUtils.getChannel(player), nmsPacket);
+        PacketEvents.get().packetManager.sendPacket(NMSUtils.getChannel(player), nmsPacket);
     }
 
     /**
@@ -125,7 +126,7 @@ public final class PlayerUtils {
      * @param sendableWrapper Wrapper
      */
     public void sendPacket(final Object channel, final SendableWrapper sendableWrapper){
-        PacketEvents.getAPI().packetManager.sendPacket(channel, sendableWrapper.asNMSPacket());
+        PacketEvents.get().packetManager.sendPacket(channel, sendableWrapper.asNMSPacket());
     }
 
     /**
@@ -134,6 +135,6 @@ public final class PlayerUtils {
      * @param packet Raw packet
      */
     public void sendNMSPacket(final Object channel, final Object packet){
-        PacketEvents.getAPI().packetManager.sendPacket(channel, packet);
+        PacketEvents.get().packetManager.sendPacket(channel, packet);
     }
 }

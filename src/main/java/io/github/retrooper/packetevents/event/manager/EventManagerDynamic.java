@@ -26,6 +26,7 @@ package io.github.retrooper.packetevents.event.manager;
 
 import io.github.retrooper.packetevents.event.PacketEvent;
 import io.github.retrooper.packetevents.event.PacketListenerDynamic;
+import io.github.retrooper.packetevents.event.eventtypes.CallableEvent;
 import io.github.retrooper.packetevents.event.eventtypes.CancellableEvent;
 import io.github.retrooper.packetevents.event.impl.*;
 import io.github.retrooper.packetevents.event.priority.PacketEventPriority;
@@ -44,27 +45,8 @@ class EventManagerDynamic {
             if (map.get(i) != null) {
                 for (PacketListenerDynamic listener : map.get(i)) {
                     try {
-                        listener.onPacketEvent(event);
-                        if (event instanceof PacketStatusEvent) {
-                            listener.onPacketStatus((PacketStatusEvent) event);
-                        } else if (event instanceof PacketLoginEvent) {
-                            listener.onPacketLogin((PacketLoginEvent) event);
-                        } else if (event instanceof PacketReceiveEvent) {
-                            listener.onPacketReceive((PacketReceiveEvent) event);
-                        } else if (event instanceof PacketSendEvent) {
-                            listener.onPacketSend((PacketSendEvent) event);
-                        } else if (event instanceof PostPacketReceiveEvent) {
-                            listener.onPostPacketReceive((PostPacketReceiveEvent) event);
-                        } else if (event instanceof PostPacketSendEvent) {
-                            listener.onPostPacketSend((PostPacketSendEvent) event);
-                        } else if (event instanceof PostPlayerInjectEvent) {
-                            listener.onPostPlayerInject((PostPlayerInjectEvent) event);
-                        } else if (event instanceof PlayerInjectEvent) {
-                            listener.onPlayerInject((PlayerInjectEvent) event);
-                        } else if (event instanceof PlayerEjectEvent) {
-                            listener.onPlayerEject((PlayerEjectEvent) event);
-                        }
-
+                        event.callPacketEvent(listener);
+                        event.call(listener);
                     } catch (Exception ex) {
                         ex.printStackTrace();
                     }
