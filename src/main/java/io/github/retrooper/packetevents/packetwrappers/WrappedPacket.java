@@ -66,7 +66,8 @@ import java.util.List;
 import java.util.Map;
 
 public class WrappedPacket implements WrapperPacketReader, WrapperPacketWriter {
-    private static final Map<Class<?>, Map<Class<?>, Field[]>> fieldCache = new HashMap<>();
+    private static final Map<Class<?>, Map<Class<?>, Field[]>> FIELD_CACHE = new HashMap<>();
+    private static final Field[] EMPTY_FIELD_ARRAY = new Field[0];
     public static ServerVersion version;
     protected Object packet;
     private Class<?> packetClass;
@@ -88,7 +89,7 @@ public class WrappedPacket implements WrapperPacketReader, WrapperPacketWriter {
         this.packetClass = packetClass;
 
 
-        if (!fieldCache.containsKey(packetClass)) {
+        if (!FIELD_CACHE.containsKey(packetClass)) {
             final Field[] declaredFields = packetClass.getDeclaredFields();
             for (Field f : declaredFields) {
                 f.setAccessible(true);
@@ -112,7 +113,7 @@ public class WrappedPacket implements WrapperPacketReader, WrapperPacketWriter {
             List<Field> stringArrayFields = getFields(String[].class, declaredFields);
 
 
-            Field[] tmp = new Field[0];
+            Field[] tmp = EMPTY_FIELD_ARRAY;
 
             Map<Class<?>, Field[]> map = new HashMap<>();
 
@@ -133,7 +134,7 @@ public class WrappedPacket implements WrapperPacketReader, WrapperPacketWriter {
             map.put(float[].class, floatArrayFields.toArray(tmp));
             map.put(double[].class, doubleArrayFields.toArray(tmp));
             map.put(String[].class, stringArrayFields.toArray(tmp));
-            fieldCache.put(packetClass, map);
+            FIELD_CACHE.put(packetClass, map);
         }
         this.packet = packet;
         setup();
@@ -220,7 +221,7 @@ public class WrappedPacket implements WrapperPacketReader, WrapperPacketWriter {
 
     @Override
     public boolean[] readBooleanArray(int index) {
-        Map<Class<?>, Field[]> cached = fieldCache.get(packetClass);
+        Map<Class<?>, Field[]> cached = FIELD_CACHE.get(packetClass);
         if (cached != null) {
             try {
                 return (boolean[]) cached.get(boolean[].class)[index].get(packet);
@@ -246,7 +247,7 @@ public class WrappedPacket implements WrapperPacketReader, WrapperPacketWriter {
 
     @Override
     public byte[] readByteArray(int index) {
-        Map<Class<?>, Field[]> cached = fieldCache.get(packetClass);
+        Map<Class<?>, Field[]> cached = FIELD_CACHE.get(packetClass);
         if (cached != null) {
             try {
                 return (byte[]) cached.get(byte[].class)[index].get(packet);
@@ -272,7 +273,7 @@ public class WrappedPacket implements WrapperPacketReader, WrapperPacketWriter {
 
     @Override
     public short[] readShortArray(int index) {
-        Map<Class<?>, Field[]> cached = fieldCache.get(packetClass);
+        Map<Class<?>, Field[]> cached = FIELD_CACHE.get(packetClass);
         if (cached != null) {
             try {
                 return (short[]) cached.get(short[].class)[index].get(packet);
@@ -298,7 +299,7 @@ public class WrappedPacket implements WrapperPacketReader, WrapperPacketWriter {
 
     @Override
     public int[] readIntArray(int index) {
-        Map<Class<?>, Field[]> cached = fieldCache.get(packetClass);
+        Map<Class<?>, Field[]> cached = FIELD_CACHE.get(packetClass);
         if (cached != null) {
             try {
                 return (int[]) cached.get(int[].class)[index].get(packet);
@@ -324,7 +325,7 @@ public class WrappedPacket implements WrapperPacketReader, WrapperPacketWriter {
 
     @Override
     public long[] readLongArray(int index) {
-        Map<Class<?>, Field[]> cached = fieldCache.get(packetClass);
+        Map<Class<?>, Field[]> cached = FIELD_CACHE.get(packetClass);
         if (cached != null) {
             try {
                 return (long[]) cached.get(long[].class)[index].get(packet);
@@ -350,7 +351,7 @@ public class WrappedPacket implements WrapperPacketReader, WrapperPacketWriter {
 
     @Override
     public float[] readFloatArray(int index) {
-        Map<Class<?>, Field[]> cached = fieldCache.get(packetClass);
+        Map<Class<?>, Field[]> cached = FIELD_CACHE.get(packetClass);
         if (cached != null) {
             try {
                 return (float[]) cached.get(float[].class)[index].get(packet);
@@ -376,7 +377,7 @@ public class WrappedPacket implements WrapperPacketReader, WrapperPacketWriter {
 
     @Override
     public double[] readDoubleArray(int index) {
-        Map<Class<?>, Field[]> cached = fieldCache.get(packetClass);
+        Map<Class<?>, Field[]> cached = FIELD_CACHE.get(packetClass);
         if (cached != null) {
             try {
                 return (double[]) cached.get(double[].class)[index].get(packet);
@@ -402,7 +403,7 @@ public class WrappedPacket implements WrapperPacketReader, WrapperPacketWriter {
 
     @Override
     public String[] readStringArray(int index) {
-        Map<Class<?>, Field[]> cached = fieldCache.get(packetClass);
+        Map<Class<?>, Field[]> cached = FIELD_CACHE.get(packetClass);
         if (cached != null) {
             try {
                 Object[] array = (Object[]) cached.get(String[].class)[index].get(packet);
@@ -442,7 +443,7 @@ public class WrappedPacket implements WrapperPacketReader, WrapperPacketWriter {
     }
 
     public Object readObject(int index, Class<?> type) {
-        Map<Class<?>, Field[]> cached = fieldCache.get(packetClass);
+        Map<Class<?>, Field[]> cached = FIELD_CACHE.get(packetClass);
         if (cached != null) {
             Field[] cachedFields = cached.get(type);
             if (cachedFields == null) {
@@ -454,7 +455,7 @@ public class WrappedPacket implements WrapperPacketReader, WrapperPacketWriter {
                     }
                 }
                 if (!typeFields.isEmpty()) {
-                    cached.put(type, typeFields.toArray(new Field[0]));
+                    cached.put(type, typeFields.toArray(EMPTY_FIELD_ARRAY));
                     cachedFields = cached.get(type);
                 } else {
                     throw new WrapperFieldNotFoundException("The class you are trying to read fields from does not contain any fields!");
@@ -470,7 +471,7 @@ public class WrappedPacket implements WrapperPacketReader, WrapperPacketWriter {
     }
 
     public boolean doesObjectExist(int index, Class<?> type) {
-        Map<Class<?>, Field[]> cached = fieldCache.get(packetClass);
+        Map<Class<?>, Field[]> cached = FIELD_CACHE.get(packetClass);
         if (cached != null) {
             Field[] cachedFields = cached.get(type);
             if (cachedFields == null) {
@@ -482,7 +483,7 @@ public class WrappedPacket implements WrapperPacketReader, WrapperPacketWriter {
                     }
                 }
                 if (!typeFields.isEmpty()) {
-                    cached.put(type, typeFields.toArray(new Field[0]));
+                    cached.put(type, typeFields.toArray(EMPTY_FIELD_ARRAY));
                     cachedFields = cached.get(type);
                 } else {
                     return false;
@@ -577,7 +578,7 @@ public class WrappedPacket implements WrapperPacketReader, WrapperPacketWriter {
     }
 
     private Field getField(Class<?> type, int index) {
-        Map<Class<?>, Field[]> cached = fieldCache.get(packetClass);
+        Map<Class<?>, Field[]> cached = FIELD_CACHE.get(packetClass);
         if (cached == null) {
             return null;
         }
