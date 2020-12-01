@@ -305,5 +305,6 @@ public final class PacketEvents implements Listener, EventManager {
         getPlayerUtils().clientVersionsMap.remove(channel);
         getPlayerUtils().playerPingMap.remove(uuid);
         getPlayerUtils().playerSmoothedPingMap.remove(uuid);
+        packetManager.ejectPlayer(e.getPlayer());
     }
 }

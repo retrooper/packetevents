@@ -76,8 +76,9 @@ public class PacketManager {
     public Object getChannel(String name) {
         Object channel = channelMap.get(name);
         if(channel == null) {
-            channelMap.put(name, NMSUtils.getChannel(Bukkit.getPlayer(name)));
-            return channelMap.get(name);
+            channel = NMSUtils.getChannel(Bukkit.getPlayer(name));
+            channelMap.put(name, channel);
+            return channel;
         }
         return channel;
     }
@@ -132,6 +133,8 @@ public class PacketManager {
             } else {
                 Objects.requireNonNull(lateInjector).ejectPlayerSync(player);
             }
+            firstPacketCache.remove(getChannel(player.getName()));
+            channelMap.remove(player.getName());
         }
     }
 
@@ -145,6 +148,8 @@ public class PacketManager {
             } else {
                 Objects.requireNonNull(lateInjector).ejectPlayerAsync(player);
             }
+            firstPacketCache.remove(getChannel(player.getName()));
+            channelMap.remove(player.getName());
         }
     }
 
