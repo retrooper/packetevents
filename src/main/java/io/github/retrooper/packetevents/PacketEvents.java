@@ -156,10 +156,13 @@ public final class PacketEvents implements Listener, EventManager {
         if (!initialized && !initializing) {
             initializing = true;
             settings = packetEventsSettings;
+            if(settings.getPacketHandlingThreadCount() < 1) {
+                settings.packetHandlingThreadCount(1);
+            }
             settings.lock();
             int packetHandlingThreadCount = settings.getPacketHandlingThreadCount();
             //if the count is 1 or is invalid
-            if (packetHandlingThreadCount == 1 || packetHandlingThreadCount < 0) {
+            if (packetHandlingThreadCount == 1) {
                 packetHandlingExecutorService = Executors.newSingleThreadExecutor();
             } else {
                 packetHandlingExecutorService = Executors.newFixedThreadPool(packetHandlingThreadCount);
@@ -288,14 +291,9 @@ public final class PacketEvents implements Listener, EventManager {
         if (!getSettings().shouldInjectEarly()) {
             try {
                 packetManager.injectPlayer(e.getPlayer());
-                //The injection has succeeded if we reach to this point.
-                getEventManager().callEvent(new PostPlayerInjectEvent(e.getPlayer()));
             } catch (Exception ex) {
                 e.getPlayer().kickPlayer(getSettings().getInjectionFailureMessage());
             }
-        } else {
-            //We have already injected them.
-            getEventManager().callEvent(new PostPlayerInjectEvent(e.getPlayer()));
         }
     }
 

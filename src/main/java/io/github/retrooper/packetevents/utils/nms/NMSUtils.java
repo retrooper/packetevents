@@ -137,9 +137,8 @@ public final class NMSUtils {
     }
 
     public static double[] recentTPS() {
-        final Object minecraftServerObj = getMinecraftServerInstance();
-        WrappedPacket mcServerWrapper = new WrappedPacket(minecraftServerObj);
-        return mcServerWrapper.readDoubleArray(0);
+        return Reflection.getFieldInstance(minecraftServerClass, double[].class, 0, getMinecraftServerInstance());
+
     }
 
     public static Class<?> getNMSClass(String name) throws ClassNotFoundException {

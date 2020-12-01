@@ -41,6 +41,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 
 import java.util.HashMap;
+import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
@@ -51,8 +52,8 @@ public class PacketManager {
     private final Plugin plugin;
     private final boolean earlyInjectMode;
     private final HashMap<UUID, Long> keepAliveMap = new HashMap<>();
-    private final ConcurrentHashMap<String, Object> channelMap = new ConcurrentHashMap<>();
-
+    private final Map<String, Object> channelMap = new ConcurrentHashMap<>();
+    private final Map<Object, Boolean> firstPacketCache;
     public PacketManager(Plugin plugin, boolean earlyInjectMode) {
         this.plugin = plugin;
         this.earlyInjectMode = earlyInjectMode;
@@ -63,6 +64,12 @@ public class PacketManager {
         } else {
             lateInjector = new LateChannelInjector(plugin);
             earlyInjector = null;
+        }
+        if(PacketEvents.get().getSettings().getPacketHandlingThreadCount() == 1) {
+            firstPacketCache = new HashMap<>();
+        }
+        else {
+            firstPacketCache = new ConcurrentHashMap<>();
         }
     }
 
@@ -178,6 +185,11 @@ public class PacketManager {
                 }
             }
         } else {
+            Boolean firstPacket = firstPacketCache.get(channel);
+            if(firstPacket == null){
+                firstPacketCache.put(channel, true);
+                PacketEvents.get().getEventManager().callEvent(new PostPlayerInjectEvent(player));
+            }
             final PacketReceiveEvent packetReceiveEvent = new PacketReceiveEvent(player, packet);
             PacketEvents.get().getEventManager().callEvent(packetReceiveEvent);
             interceptRead(packetReceiveEvent);
@@ -210,6 +222,11 @@ public class PacketManager {
                 }
             }
         } else {
+            Boolean firstPacket = firstPacketCache.get(channel);
+            if(firstPacket == null){
+                firstPacketCache.put(channel, true);
+                PacketEvents.get().getEventManager().callEvent(new PostPlayerInjectEvent(player));
+            }
             final PacketSendEvent packetSendEvent = new PacketSendEvent(player, packet);
             PacketEvents.get().getEventManager().callEvent(packetSendEvent);
             interceptWrite(packetSendEvent);

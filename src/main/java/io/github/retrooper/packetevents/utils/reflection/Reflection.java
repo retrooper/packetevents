@@ -51,6 +51,22 @@ public final class Reflection {
         return null;
     }
 
+    public static <T> T getFieldInstance(final Class<?> cls, final Class<T> dataType, final int index, Object instance){
+        int currentIndex = 0;
+        for (final Field f : getFields(cls)) {
+            if (f.getType().equals(dataType)) {
+                if (currentIndex++ == index) {
+                    try {
+                        return (T) f.get(instance);
+                    } catch (IllegalAccessException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        }
+        return null;
+    }
+
     @Deprecated
     public static Field getField(final Class<?> cls, final Class<?> dataType, final int index) {
         int currentIndex = 0;
