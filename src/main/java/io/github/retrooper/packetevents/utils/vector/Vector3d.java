@@ -22,19 +22,35 @@
  * SOFTWARE.
  */
 
-package io.github.retrooper.packetevents.packetwrappers.login.out.disconnect;
+package io.github.retrooper.packetevents.utils.vector;
 
-import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
-import io.github.retrooper.packetevents.packetwrappers.play.out.chat.WrappedPacketOutChat;
-import io.github.retrooper.packetevents.utils.nms.NMSUtils;
+public class Vector3d {
+    public double x, y, z;
 
-public class WrappedPacketLoginOutDisconnect extends WrappedPacket {
-    public WrappedPacketLoginOutDisconnect(Object packet) {
-        super(packet);
+    public Vector3d() {
     }
 
-    public String getReason() {
-        Object iChatBaseComponent = readObject(0, NMSUtils.iChatBaseComponentClass);
-        return WrappedPacketOutChat.toStringFromIChatBaseComponent(iChatBaseComponent);
+    public Vector3d(double x, double y, double z) {
+        this.x = x;
+        this.y = y;
+        this.z = z;
+    }
+
+    public Vector3d(double[] coordinates) {
+        x = coordinates[0];
+        y = coordinates[1];
+        z = coordinates[2];
+    }
+
+    public double getX() {
+        return x;
+    }
+
+    public double getY() {
+        return y;
+    }
+
+    public double getZ() {
+        return z;
     }
 }

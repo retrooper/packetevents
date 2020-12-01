@@ -22,19 +22,52 @@
  * SOFTWARE.
  */
 
-package io.github.retrooper.packetevents.packetwrappers.login.out.disconnect;
+package io.github.retrooper.packetevents.packetwrappers.play.in.steervehicle;
 
 import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
-import io.github.retrooper.packetevents.packetwrappers.play.out.chat.WrappedPacketOutChat;
-import io.github.retrooper.packetevents.utils.nms.NMSUtils;
 
-public class WrappedPacketLoginOutDisconnect extends WrappedPacket {
-    public WrappedPacketLoginOutDisconnect(Object packet) {
+public class WrappedPacketInSteerVehicle extends WrappedPacket {
+    public WrappedPacketInSteerVehicle(Object packet) {
         super(packet);
     }
 
-    public String getReason() {
-        Object iChatBaseComponent = readObject(0, NMSUtils.iChatBaseComponentClass);
-        return WrappedPacketOutChat.toStringFromIChatBaseComponent(iChatBaseComponent);
+    /**
+     * Get the side value.
+     * <p>
+     * If positive, they are moving to the left, if negative, they are moving to the right.
+     *
+     * @return Side Value
+     */
+    public float getSideValue() {
+        return readFloat(0);
+    }
+
+    /**
+     * Get the forward value.
+     * <p>
+     * If positive, they are moving forward, if negative, they are moving backwards.
+     *
+     * @return Forward Value
+     */
+    public float getForwardValue() {
+        return readFloat(1);
+    }
+
+    /**
+     * Is a Jump
+     *
+     * @return Is Jump
+     */
+    public boolean isJump() {
+        return readBoolean(0);
+    }
+
+    /**
+     * Is an unmount
+     *
+     * @return Is Unmounting
+     */
+    public boolean isUnmount() {
+        return readBoolean(1);
     }
 }

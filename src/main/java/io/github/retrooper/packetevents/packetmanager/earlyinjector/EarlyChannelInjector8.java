@@ -1,0 +1,191 @@
+/*
+ * MIT License
+ *
+ * Copyright (c) 2020 retrooper
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+
+package io.github.retrooper.packetevents.packetmanager.earlyinjector;
+
+import io.github.retrooper.packetevents.PacketEvents;
+import io.github.retrooper.packetevents.packetmanager.ChannelInjector;
+import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
+import io.github.retrooper.packetevents.utils.nms.NMSUtils;
+import io.netty.channel.*;
+import org.bukkit.entity.Player;
+import org.bukkit.plugin.Plugin;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.NoSuchElementException;
+
+public class EarlyChannelInjector8 implements ChannelInjector {
+    private final Plugin plugin;
+    private ChannelInitializer<Channel> firstChannelInitializer;
+    private ChannelInitializer<Channel> secondChannelInitializer;
+    private ChannelInboundHandler channelHandler;
+    private List<Channel> serverChannels = new ArrayList<>();
+
+    public EarlyChannelInjector8(final Plugin plugin) {
+        this.plugin = plugin;
+    }
+
+    public void startup() {
+        Object serverConnection = NMSUtils.getMinecraftServerConnection();
+        firstChannelInitializer = new ChannelInitializer<Channel>() {
+            @Override
+            protected void initChannel(final Channel channel) throws Exception {
+                PacketEvents.get().packetHandlingExecutorService.execute(new Runnable() {
+                    @Override
+                    public void run() {
+                        injectChannel(channel);
+                    }
+                });
+            }
+        };
+        secondChannelInitializer = new ChannelInitializer<Channel>() {
+            @Override
+            protected void initChannel(Channel channel) throws Exception {
+                channel.pipeline().addLast(firstChannelInitializer);
+            }
+        };
+
+        channelHandler = new ChannelInboundHandlerAdapter() {
+            @Override
+            public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
+                Channel channel = (Channel) msg;
+                channel.pipeline().addFirst(secondChannelInitializer);
+                ctx.fireChannelRead(msg);
+            }
+        };
+
+        for (int i = 0; true; i++) {
+            WrappedPacket serverConnectionWrapper = new WrappedPacket(serverConnection);
+            try {
+                List<Object> serverChannelList = (List<Object>) serverConnectionWrapper.readObject(i, List.class);
+                for (Object serverChannel : serverChannelList) {
+                    if (serverChannel instanceof ChannelFuture) {
+                        Channel channel = ((ChannelFuture) serverChannel).channel();
+
+                        serverChannels.add(channel);
+                        channel.pipeline().addFirst(channelHandler);
+                        break;
+                    }
+                }
+            } catch (Exception ex) {
+                break;
+            }
+        }
+    }
+
+    public void close() {
+        PacketEvents.get().packetHandlingExecutorService.execute(new Runnable() {
+            @Override
+            public void run() {
+                for (Channel channel : serverChannels) {
+                    try {
+                        channel.pipeline().remove(channelHandler);
+                    } catch (NoSuchElementException ignored) {
+
+                    }
+                }
+            }
+        });
+    }
+
+    public PlayerChannelInterceptor injectChannel(Object ch) {
+        Channel channel = (Channel) ch;
+        String handlerName = getNettyHandlerName(plugin);
+        PlayerChannelInterceptor interceptor = (PlayerChannelInterceptor) channel.pipeline().get(handlerName);
+        if (interceptor == null) {
+            interceptor = new PlayerChannelInterceptor();
+            channel.pipeline().addBefore("packet_handler", handlerName, interceptor);
+        }
+        return interceptor;
+    }
+
+    public void ejectChannel(Object ch) {
+        Channel channel = (Channel) ch;
+        String handlerName = getNettyHandlerName(plugin);
+        channel.pipeline().get(handlerName);
+    }
+
+    @Override
+    public void injectPlayerSync(Player player) {
+        Channel channel = (Channel) PacketEvents.get().packetManager.getChannel(player.getName());
+        injectChannel(channel).player = player;
+    }
+
+    @Override
+    public void ejectPlayerSync(Player player) {
+        Channel channel = (Channel) PacketEvents.get().packetManager.getChannel(player.getName());
+        ejectChannel(channel);
+    }
+
+    @Override
+    public void injectPlayerAsync(Player player) {
+        PacketEvents.get().packetHandlingExecutorService.execute(new Runnable() {
+            @Override
+            public void run() {
+                Channel channel = (Channel) PacketEvents.get().packetManager.getChannel(player.getName());
+                injectChannel(channel).player = player;
+            }
+        });
+    }
+
+    @Override
+    public void ejectPlayerAsync(Player player) {
+        PacketEvents.get().packetHandlingExecutorService.execute(new Runnable() {
+            @Override
+            public void run() {
+                Channel channel = (Channel) PacketEvents.get().packetManager.getChannel(player.getName());
+                ejectChannel(channel);
+            }
+        });
+    }
+
+    @Override
+    public void sendPacket(Object ch, Object packet) {
+        Channel channel = (Channel) ch;
+        channel.writeAndFlush(packet);
+    }
+
+    public class PlayerChannelInterceptor extends ChannelDuplexHandler {
+        public volatile Player player;
+
+        @Override
+        public void channelRead(final ChannelHandlerContext ctx, Object packet) throws Exception {
+            packet = PacketEvents.get().packetManager.read(player, ctx.channel(), packet);
+            if (packet != null) {
+                super.channelRead(ctx, packet);
+                PacketEvents.get().packetManager.postRead(player, packet);
+            }
+        }
+
+        @Override
+        public void write(final ChannelHandlerContext ctx, Object packet, final ChannelPromise promise) throws Exception {
+            packet = PacketEvents.get().packetManager.write(player, ctx.channel(), packet);
+            if (packet != null) {
+                super.write(ctx, packet, promise);
+                PacketEvents.get().packetManager.postWrite(player, packet);
+            }
+        }
+    }
+}

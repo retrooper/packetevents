@@ -156,6 +156,7 @@ public final class PacketEvents implements Listener, EventManager {
         if (!initialized && !initializing) {
             initializing = true;
             settings = packetEventsSettings;
+            settings.lock();
             int packetHandlingThreadCount = settings.getPacketHandlingThreadCount();
             //if the count is 1 or is invalid
             if (packetHandlingThreadCount == 1 || packetHandlingThreadCount < 0) {
@@ -201,15 +202,13 @@ public final class PacketEvents implements Listener, EventManager {
                 packetManager.ejectPlayer(player);
             }
 
-            if (packetManager.tinyProtocol != null) {
-                packetManager.tinyProtocol.unregisterChannelHandler();
-            }
+            packetManager.close();
 
             getEventManager().unregisterAllListeners();
             generalExecutorService.shutdownNow();
             packetHandlingExecutorService.shutdownNow();
             initialized = false;
-            stopping = true;
+            stopping = false;
         }
     }
 
@@ -304,7 +303,7 @@ public final class PacketEvents implements Listener, EventManager {
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onQuit(final PlayerQuitEvent e) {
         UUID uuid = e.getPlayer().getUniqueId();
-        Object channel = NMSUtils.getChannelNoCache(e.getPlayer());
+        Object channel = packetManager.getChannel(e.getPlayer().getName());
         getPlayerUtils().clientVersionsMap.remove(channel);
         getPlayerUtils().playerPingMap.remove(uuid);
         getPlayerUtils().playerSmoothedPingMap.remove(uuid);

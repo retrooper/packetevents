@@ -24,11 +24,11 @@
 
 package io.github.retrooper.packetevents.utils.bytebuf;
 
-import io.github.retrooper.packetevents.packetmanager.netty.NettyPacketManager;
+import io.github.retrooper.packetevents.packetmanager.lateinjector.LateChannelInjector;
 
 public class ByteBufUtil {
     public static Object copiedBuffer(byte[] bytes) {
-        if (NettyPacketManager.v1_7_nettyMode) {
+        if (LateChannelInjector.v1_7_nettyMode) {
             return ByteBufUtil_7.copiedBuffer(bytes);
         } else {
             return ByteBufUtil_8.copiedBuffer(bytes);
@@ -36,7 +36,7 @@ public class ByteBufUtil {
     }
 
     public static byte[] getBytes(Object byteBuf) {
-        if (NettyPacketManager.v1_7_nettyMode) {
+        if (LateChannelInjector.v1_7_nettyMode) {
             return ByteBufUtil_7.getBytes(byteBuf);
         } else {
             return ByteBufUtil_8.getBytes(byteBuf);

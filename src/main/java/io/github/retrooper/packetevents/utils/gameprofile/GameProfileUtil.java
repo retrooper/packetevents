@@ -24,13 +24,13 @@
 
 package io.github.retrooper.packetevents.utils.gameprofile;
 
-import io.github.retrooper.packetevents.packetmanager.netty.NettyPacketManager;
+import io.github.retrooper.packetevents.packetmanager.lateinjector.LateChannelInjector;
 
 import java.util.UUID;
 
 public class GameProfileUtil {
     public static Object getGameProfile(UUID uuid, String username) {
-        if (NettyPacketManager.v1_7_nettyMode) {
+        if (LateChannelInjector.v1_7_nettyMode) {
             return GameProfileUtil_7.getGameProfile(uuid, username);
         } else {
             return GameProfileUtil_8.getGameProfile(uuid, username);
@@ -38,7 +38,7 @@ public class GameProfileUtil {
     }
 
     public static WrappedGameProfile getWrappedGameProfile(Object gameProfile) {
-        if (NettyPacketManager.v1_7_nettyMode) {
+        if (LateChannelInjector.v1_7_nettyMode) {
             return GameProfileUtil_7.getWrappedGameProfile(gameProfile);
         } else {
             return GameProfileUtil_8.getWrappedGameProfile(gameProfile);

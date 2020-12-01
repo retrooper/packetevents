@@ -22,19 +22,50 @@
  * SOFTWARE.
  */
 
-package io.github.retrooper.packetevents.packetwrappers.login.out.disconnect;
+package io.github.retrooper.packetevents.packetwrappers.play.in.flying;
+
 
 import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
-import io.github.retrooper.packetevents.packetwrappers.play.out.chat.WrappedPacketOutChat;
-import io.github.retrooper.packetevents.utils.nms.NMSUtils;
+import io.github.retrooper.packetevents.utils.vector.Vector3d;
 
-public class WrappedPacketLoginOutDisconnect extends WrappedPacket {
-    public WrappedPacketLoginOutDisconnect(Object packet) {
+public class WrappedPacketInFlying extends WrappedPacket {
+    public WrappedPacketInFlying(Object packet) {
         super(packet);
     }
 
-    public String getReason() {
-        Object iChatBaseComponent = readObject(0, NMSUtils.iChatBaseComponentClass);
-        return WrappedPacketOutChat.toStringFromIChatBaseComponent(iChatBaseComponent);
+    public double getX() {
+        return readDouble(0);
+    }
+
+    public double getY() {
+        return readDouble(1);
+    }
+
+    public double getZ() {
+        return readDouble(2);
+    }
+
+    public Vector3d getPosition() {
+        return new Vector3d(getX(), getY(), getZ());
+    }
+
+    public float getYaw() {
+        return readFloat(0);
+    }
+
+    public float getPitch() {
+        return readFloat(1);
+    }
+
+    public boolean isOnGround() {
+        return readBoolean(0);
+    }
+
+    public final boolean isPosition() {
+        return readBoolean(1);
+    }
+
+    public final boolean isLook() {
+        return readBoolean(2);
     }
 }

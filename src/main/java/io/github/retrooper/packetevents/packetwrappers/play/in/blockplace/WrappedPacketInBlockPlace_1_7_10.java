@@ -22,19 +22,33 @@
  * SOFTWARE.
  */
 
-package io.github.retrooper.packetevents.packetwrappers.login.out.disconnect;
+package io.github.retrooper.packetevents.packetwrappers.play.in.blockplace;
 
 import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
-import io.github.retrooper.packetevents.packetwrappers.play.out.chat.WrappedPacketOutChat;
-import io.github.retrooper.packetevents.utils.nms.NMSUtils;
+import org.bukkit.inventory.ItemStack;
 
-public class WrappedPacketLoginOutDisconnect extends WrappedPacket {
-    public WrappedPacketLoginOutDisconnect(Object packet) {
+final class WrappedPacketInBlockPlace_1_7_10 extends WrappedPacket {
+    public int x, y, z;
+    public ItemStack itemStack;
+    public int face;
+
+    WrappedPacketInBlockPlace_1_7_10(final Object packet) {
         super(packet);
     }
 
-    public String getReason() {
-        Object iChatBaseComponent = readObject(0, NMSUtils.iChatBaseComponentClass);
-        return WrappedPacketOutChat.toStringFromIChatBaseComponent(iChatBaseComponent);
+
+    @Override
+    protected void setup() {
+        final net.minecraft.server.v1_7_R4.PacketPlayInBlockPlace blockPlace =
+                (net.minecraft.server.v1_7_R4.PacketPlayInBlockPlace) packet;
+
+        x = blockPlace.c();
+        y = blockPlace.d();
+        z = blockPlace.e();
+
+        this.face = blockPlace.d();
+
+        net.minecraft.server.v1_7_R4.ItemStack stack = blockPlace.getItemStack();
+        this.itemStack = org.bukkit.craftbukkit.v1_7_R4.inventory.CraftItemStack.asBukkitCopy(stack);
     }
 }

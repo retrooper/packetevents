@@ -27,8 +27,6 @@ package io.github.retrooper.packetevents.utils.server;
 import io.github.retrooper.packetevents.utils.nms.NMSUtils;
 import org.spigotmc.SpigotConfig;
 
-import java.lang.reflect.InvocationTargetException;
-
 public final class ServerUtils {
     /**
      * Get the server version.
@@ -45,12 +43,7 @@ public final class ServerUtils {
      * @return Get Recent TPS
      */
     public double[] getRecentTPS() {
-        try {
-            return NMSUtils.recentTPS();
-        } catch (IllegalAccessException | InvocationTargetException e) {
-            e.printStackTrace();
-        }
-        return new double[0];
+        return NMSUtils.recentTPS();
     }
 
     /**

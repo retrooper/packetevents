@@ -42,15 +42,15 @@ public class Vector3i {
         z = coordinates[2];
     }
 
-    public final int getX() {
+    public int getX() {
         return x;
     }
 
-    public final int getY() {
+    public int getY() {
         return y;
     }
 
-    public final int getZ() {
+    public int getZ() {
         return z;
     }
 }

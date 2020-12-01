@@ -22,19 +22,37 @@
  * SOFTWARE.
  */
 
-package io.github.retrooper.packetevents.packetwrappers.login.out.disconnect;
+package io.github.retrooper.packetevents.packetwrappers.play.in.keepalive;
 
+import io.github.retrooper.packetevents.packettype.PacketTypeClasses;
 import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
-import io.github.retrooper.packetevents.packetwrappers.play.out.chat.WrappedPacketOutChat;
-import io.github.retrooper.packetevents.utils.nms.NMSUtils;
+import io.github.retrooper.packetevents.utils.reflection.Reflection;
 
-public class WrappedPacketLoginOutDisconnect extends WrappedPacket {
-    public WrappedPacketLoginOutDisconnect(Object packet) {
+public final class WrappedPacketInKeepAlive extends WrappedPacket {
+    private static boolean integerPresentInIndex0;
+
+    public WrappedPacketInKeepAlive(final Object packet) {
         super(packet);
     }
 
-    public String getReason() {
-        Object iChatBaseComponent = readObject(0, NMSUtils.iChatBaseComponentClass);
-        return WrappedPacketOutChat.toStringFromIChatBaseComponent(iChatBaseComponent);
+    public static void load() {
+        Class<?> packetClass = PacketTypeClasses.Client.KEEP_ALIVE;
+        integerPresentInIndex0 = Reflection.getField(packetClass, int.class, 0) != null;
+    }
+
+    /**
+     * Get the ID response from the client.
+     * <p>
+     * You may cast this down to an int if you are on 1.7.10 - 1.12.2.
+     * On 1.13.2 - 1.16.3 a long is sent.
+     *
+     * @return response ID
+     */
+    public long getId() {
+        if (!integerPresentInIndex0) {
+            return readLong(0);
+        } else {
+            return readInt(0);
+        }
     }
 }

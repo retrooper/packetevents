@@ -27,6 +27,7 @@ package io.github.retrooper.packetevents.settings;
 import io.github.retrooper.packetevents.utils.server.ServerVersion;
 
 public class PacketEventsSettings {
+    private boolean locked = false;
     private ServerVersion backupServerVersion = ServerVersion.v_1_7_10;
     private boolean injectAsync = true;
     private boolean ejectAsync = true;
@@ -35,40 +36,57 @@ public class PacketEventsSettings {
     private int packetHandlingThreadCount = 1;
     private String injectionFailureMessage = "We were unable to inject you. Please try again!";
 
+    public void lock() {
+        this.locked = true;
+    }
+
     public PacketEventsSettings backupServerVersion(ServerVersion serverVersion) {
-        this.backupServerVersion = serverVersion;
+        if (!locked) {
+            this.backupServerVersion = serverVersion;
+        }
         return this;
     }
 
 
     public PacketEventsSettings injectAsync(boolean injectAsync) {
-        this.injectAsync = injectAsync;
+        if (!locked) {
+            this.injectAsync = injectAsync;
+        }
         return this;
     }
 
     public PacketEventsSettings ejectAsync(boolean ejectAsync) {
-        this.ejectAsync = ejectAsync;
+        if (!locked) {
+            this.ejectAsync = ejectAsync;
+        }
         return this;
     }
 
     public PacketEventsSettings checkForUpdates(boolean checkForUpdates) {
-        this.checkForUpdates = checkForUpdates;
+        if (!locked) {
+            this.checkForUpdates = checkForUpdates;
+        }
         return this;
     }
 
 
     public PacketEventsSettings injectEarly(boolean injectEarly) {
-        this.injectEarly = injectEarly;
+        if (!locked) {
+            this.injectEarly = injectEarly;
+        }
         return this;
     }
-
     public PacketEventsSettings packetHandlingThreadCount(int threadCount) {
-        this.packetHandlingThreadCount = threadCount;
+        if (!locked) {
+            this.packetHandlingThreadCount = threadCount;
+        }
         return this;
     }
 
     public PacketEventsSettings injectionFailureMessage(String message) {
-        this.injectionFailureMessage = message;
+        if (!locked) {
+            this.injectionFailureMessage = message;
+        }
         return this;
     }
 

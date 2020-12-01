@@ -22,19 +22,48 @@
  * SOFTWARE.
  */
 
-package io.github.retrooper.packetevents.packetwrappers.login.out.disconnect;
+package io.github.retrooper.packetevents.packetwrappers.play.in.clientcommand;
 
+import io.github.retrooper.packetevents.packettype.PacketTypeClasses;
 import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
-import io.github.retrooper.packetevents.packetwrappers.play.out.chat.WrappedPacketOutChat;
 import io.github.retrooper.packetevents.utils.nms.NMSUtils;
+import io.github.retrooper.packetevents.utils.reflection.SubclassUtil;
 
-public class WrappedPacketLoginOutDisconnect extends WrappedPacket {
-    public WrappedPacketLoginOutDisconnect(Object packet) {
+public final class WrappedPacketInClientCommand extends WrappedPacket {
+    private static Class<?> enumClientCommandClass;
+    private Object enumObj;
+
+    public WrappedPacketInClientCommand(Object packet) {
         super(packet);
     }
 
-    public String getReason() {
-        Object iChatBaseComponent = readObject(0, NMSUtils.iChatBaseComponentClass);
-        return WrappedPacketOutChat.toStringFromIChatBaseComponent(iChatBaseComponent);
+    public static void load() {
+        Class<?> packetClass = PacketTypeClasses.Client.CLIENT_COMMAND;
+
+        try {
+            enumClientCommandClass = NMSUtils.getNMSClass("EnumClientCommand");
+        } catch (ClassNotFoundException e) {
+            //Probably a subclass
+            enumClientCommandClass = SubclassUtil.getSubClass(packetClass, "EnumClientCommand");
+        }
     }
+
+    /**
+     * Get the Client Command enum sent in the packet
+     *
+     * @return ClientCommand
+     */
+    public ClientCommand getClientCommand() {
+        if (enumObj == null) {
+            enumObj = readObject(0, enumClientCommandClass);
+        }
+        return ClientCommand.valueOf(enumObj.toString());
+    }
+
+    public enum ClientCommand {
+        PERFORM_RESPAWN,
+        REQUEST_STATS,
+        OPEN_INVENTORY_ACHIEVEMENT
+    }
+
 }

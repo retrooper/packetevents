@@ -26,36 +26,53 @@ package io.github.retrooper.packetevents.packetmanager;
 
 import io.github.retrooper.packetevents.PacketEvents;
 import io.github.retrooper.packetevents.event.impl.*;
-import io.github.retrooper.packetevents.packetmanager.netty.NettyPacketManager;
-import io.github.retrooper.packetevents.packetmanager.tinyprotocol.TinyProtocol;
+import io.github.retrooper.packetevents.packetmanager.earlyinjector.EarlyChannelInjector;
+import io.github.retrooper.packetevents.packetmanager.lateinjector.LateChannelInjector;
 import io.github.retrooper.packetevents.packettype.PacketType;
 import io.github.retrooper.packetevents.packetwrappers.login.in.handshake.WrappedPacketLoginInHandshake;
+import io.github.retrooper.packetevents.packetwrappers.login.in.start.WrappedPacketLoginInStart;
+import io.github.retrooper.packetevents.utils.gameprofile.WrappedGameProfile;
+import io.github.retrooper.packetevents.utils.nms.NMSUtils;
 import io.github.retrooper.packetevents.utils.player.ClientVersion;
 import io.github.retrooper.packetevents.utils.reflection.ClassUtil;
 import io.github.retrooper.packetevents.utils.server.ServerVersion;
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 
 import java.util.HashMap;
+import java.util.Objects;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class PacketManager {
-    public final TinyProtocol tinyProtocol;
-    public final NettyPacketManager nettyProtocol;
+    public final EarlyChannelInjector earlyInjector;
+    public final LateChannelInjector lateInjector;
     private final Plugin plugin;
-    private final boolean tinyProtocolMode;
+    private final boolean earlyInjectMode;
     private final HashMap<UUID, Long> keepAliveMap = new HashMap<>();
+    private final ConcurrentHashMap<String, Object> channelMap = new ConcurrentHashMap<>();
 
-    public PacketManager(Plugin plugin, boolean tinyProtocolMode) {
+    public PacketManager(Plugin plugin, boolean earlyInjectMode) {
         this.plugin = plugin;
-        this.tinyProtocolMode = tinyProtocolMode;
-        if (tinyProtocolMode) {
-            tinyProtocol = new TinyProtocol(plugin);
-            nettyProtocol = null;
+        this.earlyInjectMode = earlyInjectMode;
+        if (earlyInjectMode) {
+            earlyInjector = new EarlyChannelInjector(plugin);
+            earlyInjector.startup();
+            lateInjector = null;
         } else {
-            nettyProtocol = new NettyPacketManager(plugin);
-            tinyProtocol = null;
+            lateInjector = new LateChannelInjector(plugin);
+            earlyInjector = null;
         }
+    }
+
+    public Object getChannel(String name) {
+        Object channel = channelMap.get(name);
+        if(channel == null) {
+            channelMap.put(name, NMSUtils.getChannel(Bukkit.getPlayer(name)));
+            return channelMap.get(name);
+        }
+        return channel;
     }
 
     public void injectPlayer(Player player) {
@@ -78,10 +95,10 @@ public class PacketManager {
         PlayerInjectEvent injectEvent = new PlayerInjectEvent(player, false);
         PacketEvents.get().getEventManager().callEvent(injectEvent);
         if (!injectEvent.isCancelled()) {
-            if (tinyProtocolMode) {
-                tinyProtocol.injectPlayer(player);
+            if (earlyInjectMode) {
+                earlyInjector.injectPlayerSync(player);
             } else {
-                nettyProtocol.injectPlayer(player);
+                lateInjector.injectPlayerSync(player);
             }
         }
     }
@@ -90,12 +107,10 @@ public class PacketManager {
         PlayerInjectEvent injectEvent = new PlayerInjectEvent(player, true);
         PacketEvents.get().getEventManager().callEvent(injectEvent);
         if (!injectEvent.isCancelled()) {
-            if (tinyProtocolMode) {
-                assert tinyProtocol != null;
-                tinyProtocol.injectPlayerAsync(player);
+            if (earlyInjectMode) {
+                Objects.requireNonNull(earlyInjector).injectPlayerAsync(player);
             } else {
-                assert nettyProtocol != null;
-                nettyProtocol.injectPlayerAsync(player);
+                Objects.requireNonNull(lateInjector).injectPlayerAsync(player);
             }
         }
     }
@@ -105,10 +120,10 @@ public class PacketManager {
         PacketEvents.get().getEventManager().callEvent(ejectEvent);
         if (!ejectEvent.isCancelled()) {
             keepAliveMap.remove(player.getUniqueId());
-            if (tinyProtocolMode) {
-                tinyProtocol.ejectPlayer(player);
+            if (earlyInjectMode) {
+                Objects.requireNonNull(earlyInjector).ejectPlayerSync(player);
             } else {
-                nettyProtocol.ejectPlayer(player);
+                Objects.requireNonNull(lateInjector).ejectPlayerSync(player);
             }
         }
     }
@@ -118,48 +133,20 @@ public class PacketManager {
         PacketEvents.get().getEventManager().callEvent(ejectEvent);
         if (!ejectEvent.isCancelled()) {
             keepAliveMap.remove(player.getUniqueId());
-            if (tinyProtocolMode) {
-                tinyProtocol.ejectPlayerAsync(player);
+            if (earlyInjectMode) {
+                Objects.requireNonNull(earlyInjector).ejectPlayerAsync(player);
             } else {
-                nettyProtocol.ejectPlayerAsync(player);
+                Objects.requireNonNull(lateInjector).ejectPlayerAsync(player);
             }
         }
     }
 
-    public void ejectChannel(Object channel) {
-        if (!PacketEvents.get().getSettings().shouldEjectAsync()) {
-            ejectChannelSync(channel);
-        } else {
-            ejectChannelAsync(channel);
-        }
-    }
-
-    public void ejectChannelSync(Object channel) {
-        if (tinyProtocolMode) {
-            tinyProtocol.ejectChannelSync(channel);
-        } else {
-            nettyProtocol.ejectChannelSync(channel);
-        }
-    }
-
-    public void ejectChannelAsync(Object channel) {
-        if (tinyProtocolMode) {
-            tinyProtocol.ejectChannelAsync(channel);
-        } else {
-            nettyProtocol.ejectChannelAsync(channel);
-        }
-    }
-
     public void sendPacket(Object channel, Object packet) {
-        if (tinyProtocolMode) {
-            tinyProtocol.sendPacket(channel, packet);
+        if (earlyInjectMode) {
+            earlyInjector.sendPacket(channel, packet);
         } else {
-            nettyProtocol.sendPacket(channel, packet);
+            lateInjector.sendPacket(channel, packet);
         }
-    }
-
-    public String getNettyHandlerName() {
-        return "pe-" + plugin.getName();
     }
 
     public Object read(Player player, Object channel, Object packet) {
@@ -180,6 +167,14 @@ public class PacketManager {
                 interceptLogin(packetLoginEvent);
                 if (packetLoginEvent.isCancelled()) {
                     packet = null;
+                }
+                else {
+                    //Cache the channel
+                    if(packetLoginEvent.getPacketId() == PacketType.Login.Client.START) {
+                        WrappedPacketLoginInStart startWrapper = new WrappedPacketLoginInStart(packetLoginEvent.getNMSPacket());
+                        WrappedGameProfile gameProfile = startWrapper.getGameProfile();
+                        channelMap.put(gameProfile.name, channel);
+                    }
                 }
             }
         } else {
@@ -281,6 +276,12 @@ public class PacketManager {
     private void interceptPostSend(PostPacketSendEvent event) {
         if (event.getPacketId() == PacketType.Server.KEEP_ALIVE) {
             keepAliveMap.put(event.getPlayer().getUniqueId(), event.getTimestamp());
+        }
+    }
+
+    public void close() {
+        if(earlyInjectMode) {
+            earlyInjector.close();
         }
     }
 }

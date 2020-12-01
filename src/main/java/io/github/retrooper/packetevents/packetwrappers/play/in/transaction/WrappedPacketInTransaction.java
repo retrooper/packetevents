@@ -22,19 +22,39 @@
  * SOFTWARE.
  */
 
-package io.github.retrooper.packetevents.packetwrappers.login.out.disconnect;
+package io.github.retrooper.packetevents.packetwrappers.play.in.transaction;
 
 import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
-import io.github.retrooper.packetevents.packetwrappers.play.out.chat.WrappedPacketOutChat;
-import io.github.retrooper.packetevents.utils.nms.NMSUtils;
 
-public class WrappedPacketLoginOutDisconnect extends WrappedPacket {
-    public WrappedPacketLoginOutDisconnect(Object packet) {
+public final class WrappedPacketInTransaction extends WrappedPacket {
+    public WrappedPacketInTransaction(final Object packet) {
         super(packet);
     }
 
-    public String getReason() {
-        Object iChatBaseComponent = readObject(0, NMSUtils.iChatBaseComponentClass);
-        return WrappedPacketOutChat.toStringFromIChatBaseComponent(iChatBaseComponent);
+    /**
+     * Get the window ID.
+     *
+     * @return Window ID
+     */
+    public int getWindowId() {
+        return readInt(0);
+    }
+
+    /**
+     * Get the action number.
+     *
+     * @return Action number
+     */
+    public short getActionNumber() {
+        return readShort(0);
+    }
+
+    /**
+     * Is transaction accepted.
+     *
+     * @return Transaction Accepted
+     */
+    public boolean isAccepted() {
+        return readBoolean(0);
     }
 }

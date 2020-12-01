@@ -22,19 +22,23 @@
  * SOFTWARE.
  */
 
-package io.github.retrooper.packetevents.packetwrappers.login.out.disconnect;
+package io.github.retrooper.packetevents.packetmanager;
 
-import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
-import io.github.retrooper.packetevents.packetwrappers.play.out.chat.WrappedPacketOutChat;
-import io.github.retrooper.packetevents.utils.nms.NMSUtils;
+import org.bukkit.entity.Player;
+import org.bukkit.plugin.Plugin;
 
-public class WrappedPacketLoginOutDisconnect extends WrappedPacket {
-    public WrappedPacketLoginOutDisconnect(Object packet) {
-        super(packet);
-    }
+public interface ChannelInjector {
+    void injectPlayerSync(Player player);
 
-    public String getReason() {
-        Object iChatBaseComponent = readObject(0, NMSUtils.iChatBaseComponentClass);
-        return WrappedPacketOutChat.toStringFromIChatBaseComponent(iChatBaseComponent);
+    void ejectPlayerSync(Player player);
+
+    void injectPlayerAsync(Player player);
+
+    void ejectPlayerAsync(Player player);
+
+    void sendPacket(Object channel, Object packet);
+
+    default String getNettyHandlerName(final Plugin plugin) {
+        return "pe-" + plugin.getName();
     }
 }

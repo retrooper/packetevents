@@ -30,6 +30,7 @@ import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
 import io.github.retrooper.packetevents.utils.entityfinder.EntityFinderUtils;
 import io.github.retrooper.packetevents.utils.reflection.Reflection;
 import io.github.retrooper.packetevents.utils.server.ServerVersion;
+import org.bukkit.Bukkit;
 import org.bukkit.Server;
 import org.bukkit.World;
 import org.bukkit.entity.Entity;
@@ -40,6 +41,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.HashMap;
+import java.util.Objects;
 import java.util.UUID;
 
 public final class NMSUtils {
@@ -116,26 +118,28 @@ public final class NMSUtils {
         }
     }
 
-    public static Object getMinecraftServerInstance() throws InvocationTargetException, IllegalAccessException {
-        return Reflection.getMethod(minecraftServerClass, "getServer", 0).invoke(null);
+    public static Object getMinecraftServerInstance() {
+        try {
+            return Reflection.getField(craftServerClass, minecraftServerClass, 0).get(Bukkit.getServer());
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 
     public static Object getMinecraftServerConnection() {
-        WrappedPacket wrapper = null;
         try {
-            wrapper = new WrappedPacket(getMinecraftServerInstance());
-        } catch (InvocationTargetException | IllegalAccessException e) {
+            return Reflection.getField(minecraftServerClass, serverConnectionClass, 0).get(getMinecraftServerInstance());
+        } catch (IllegalAccessException e) {
             e.printStackTrace();
         }
-        if (wrapper == null) {
-            return null;
-        }
-        return wrapper.readObject(0, serverConnectionClass);
+        return null;
     }
 
-    public static double[] recentTPS() throws IllegalAccessException, InvocationTargetException {
+    public static double[] recentTPS() {
         final Object minecraftServerObj = getMinecraftServerInstance();
-        return (double[]) Reflection.getField(minecraftServerClass, double[].class, 0).get(minecraftServerObj);
+        WrappedPacket mcServerWrapper = new WrappedPacket(minecraftServerObj);
+        return mcServerWrapper.readDoubleArray(0);
     }
 
     public static Class<?> getNMSClass(String name) throws ClassNotFoundException {
@@ -157,16 +161,6 @@ public final class NMSUtils {
 
     public static Class<?> getNettyClass(String name) throws ClassNotFoundException {
         return Class.forName(nettyPrefix + "." + name);
-    }
-
-    public static String getChannelFutureListFieldName() {
-        if (version.isLowerThan(ServerVersion.v_1_8)) {
-            return "e";
-        }
-        if (version.isLowerThan(ServerVersion.v_1_13)) {
-            return "g";
-        }
-        return "f";
     }
 
     @Nullable
@@ -226,27 +220,8 @@ public final class NMSUtils {
     }
 
     public static Object getChannel(final Player player) {
-        if (PacketEvents.get().packetManager.tinyProtocol == null) {
-            UUID uuid = player.getUniqueId();
-            Object channel = channelCache.get(uuid);
-            if (channel == null) {
-                Object newChannel = getChannelNoCache(player);
-                channelCache.put(uuid, newChannel);
-                return newChannel;
-            }
-            return channel;
-        } else {
-            return PacketEvents.get().packetManager.tinyProtocol.getChannel(player);
-        }
-    }
-
-    public static Object getChannelNoCache(final Player player) {
-        if (PacketEvents.get().packetManager.tinyProtocol == null) {
-            WrappedPacket wrapper = new WrappedPacket(getNetworkManager(player));
-            return wrapper.readObject(0, nettyChannelClass);
-        } else {
-            return PacketEvents.get().packetManager.tinyProtocol.getChannel(player);
-        }
+        WrappedPacket wrapper = new WrappedPacket(getNetworkManager(player));
+        return wrapper.readObject(0, nettyChannelClass);
     }
 
     public static int getPlayerPing(final Player player) {
@@ -288,7 +263,7 @@ public final class NMSUtils {
     public static Object createNewEntityPlayer(Server server, World world, Object gameProfile) {
         Object nmsServer = convertBukkitServerToNMSServer(server);
         Object nmsWorld = convertBukkitWorldToNMSWorld(world);
-        return privateCreateNewEntityPlayer(nmsServer, nmsWorld, gameProfile);
+        return privateCreateNewEntityPlayer(nmsServer, Objects.requireNonNull(nmsWorld), gameProfile);
     }
 
     private static Object privateCreateNewEntityPlayer(Object nmsServer, Object nmsWorld, Object gameProfile) {
