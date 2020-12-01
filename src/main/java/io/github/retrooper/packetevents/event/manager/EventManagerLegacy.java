@@ -36,13 +36,21 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
+@Deprecated
 class EventManagerLegacy {
     private final Map<PacketListener, List<Method>> staticRegisteredMethods = new HashMap<>();
 
+    @Deprecated
     public void callEvent(final PacketEvent e) {
+        callEvent(e, PacketEventPriority.LOWEST);
+    }
+
+    @Deprecated
+    public void callEvent(final PacketEvent event, byte eventPriority) {
         boolean isCancelled = false;
-        byte eventPriority = PacketEventPriority.LOWEST;
+        if (event instanceof CancellableEvent) {
+            isCancelled = ((CancellableEvent) event).isCancelled();
+        }
         //STATIC LISTENERS
         for (final PacketListener listener : staticRegisteredMethods.keySet()) {
             List<Method> methods = staticRegisteredMethods.get(listener);
@@ -50,16 +58,16 @@ class EventManagerLegacy {
             for (Method method : methods) {
                 Class<?> parameterType = method.getParameterTypes()[0];
                 if (parameterType.equals(PacketEvent.class)
-                        || parameterType.isInstance(e)) {
+                        || parameterType.isInstance(event)) {
 
                     PacketHandler annotation = method.getAnnotation(PacketHandler.class);
                     try {
-                        method.invoke(listener, e);
+                        method.invoke(listener, event);
                     } catch (IllegalAccessException | InvocationTargetException ex) {
                         ex.printStackTrace();
                     }
-                    if (e instanceof CancellableEvent) {
-                        CancellableEvent ce = (CancellableEvent) e;
+                    if (event instanceof CancellableEvent) {
+                        CancellableEvent ce = (CancellableEvent) event;
                         if (annotation.priority() >= eventPriority) {
                             eventPriority = annotation.priority();
                             isCancelled = ce.isCancelled();
@@ -68,12 +76,13 @@ class EventManagerLegacy {
                 }
             }
         }
-        if (e instanceof CancellableEvent) {
-            CancellableEvent ce = (CancellableEvent) e;
+        if (event instanceof CancellableEvent) {
+            CancellableEvent ce = (CancellableEvent) event;
             ce.setCancelled(isCancelled);
         }
     }
 
+    @Deprecated
     public void registerListener(final PacketListener listener) {
         final List<Method> methods = new ArrayList<>();
         for (final Method m : listener.getClass().getDeclaredMethods()) {
@@ -91,22 +100,26 @@ class EventManagerLegacy {
         }
     }
 
+    @Deprecated
     public void registerListeners(final PacketListener... listeners) {
         for (final PacketListener listener : listeners) {
             registerListener(listener);
         }
     }
 
+    @Deprecated
     public void unregisterListener(final PacketListener e) {
         staticRegisteredMethods.remove(e);
     }
 
+    @Deprecated
     public void unregisterListeners(final PacketListener... listeners) {
         for (final PacketListener listener : listeners) {
             unregisterListener(listener);
         }
     }
 
+    @Deprecated
     public void unregisterAllListeners() {
         staticRegisteredMethods.clear();
     }

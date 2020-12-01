@@ -39,10 +39,15 @@ import java.util.Map;
 class EventManagerDynamic {
     private final Map<Byte, List<PacketListenerDynamic>> map = new HashMap<>();
 
-    public void callEvent(PacketEvent event) {
+    public void callEvent(final PacketEvent event) {
         boolean isCancelled = false;
+        if(event instanceof CancellableEvent) {
+            isCancelled = ((CancellableEvent)event).isCancelled();
+        }
+        byte maxReachedEventPriority = PacketEventPriority.LOWEST;
         for (byte i = PacketEventPriority.LOWEST; i <= PacketEventPriority.MONITOR; i++) {
             if (map.get(i) != null) {
+                maxReachedEventPriority = i;
                 for (PacketListenerDynamic listener : map.get(i)) {
                     try {
                         event.callPacketEvent(listener);
@@ -62,6 +67,8 @@ class EventManagerDynamic {
             CancellableEvent ce = (CancellableEvent) event;
             ce.setCancelled(isCancelled);
         }
+
+        PEEventManager.legacyEventManager.callEvent(event, maxReachedEventPriority);
     }
 
     public void registerListener(PacketListenerDynamic listener) {

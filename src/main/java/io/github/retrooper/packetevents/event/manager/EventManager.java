@@ -30,8 +30,8 @@ import io.github.retrooper.packetevents.event.PacketListenerDynamic;
 
 public interface EventManager {
     default void callEvent(PacketEvent event) {
+        //The dynamic event manager calls the legacy event manager.
         PEEventManager.dynamicEventManager.callEvent(event);
-        PEEventManager.legacyEventManager.callEvent(event);
     }
 
     @Deprecated
