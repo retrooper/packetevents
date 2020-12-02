@@ -120,7 +120,7 @@ public final class NMSUtils {
 
     public static Object getMinecraftServerInstance() {
         try {
-            return Reflection.getField(craftServerClass, minecraftServerClass, 0).get(Bukkit.getServer());
+           return Reflection.getMethod(minecraftServerClass, "getServer", 0).invoke(null);
         } catch (IllegalAccessException e) {
             e.printStackTrace();
         }
