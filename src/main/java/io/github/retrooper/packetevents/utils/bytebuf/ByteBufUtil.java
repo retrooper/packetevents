@@ -24,7 +24,7 @@
 
 package io.github.retrooper.packetevents.utils.bytebuf;
 
-import io.github.retrooper.packetevents.packetmanager.lateinjector.LateChannelInjector;
+import io.github.retrooper.packetevents.injector.lateinjector.LateChannelInjector;
 
 public class ByteBufUtil {
     public static Object copiedBuffer(byte[] bytes) {

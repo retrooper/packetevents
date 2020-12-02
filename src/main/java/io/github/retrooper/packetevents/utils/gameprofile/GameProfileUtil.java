@@ -24,7 +24,7 @@
 
 package io.github.retrooper.packetevents.utils.gameprofile;
 
-import io.github.retrooper.packetevents.packetmanager.lateinjector.LateChannelInjector;
+import io.github.retrooper.packetevents.injector.lateinjector.LateChannelInjector;
 
 import java.util.UUID;
 

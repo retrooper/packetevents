@@ -22,13 +22,13 @@
  * SOFTWARE.
  */
 
-package io.github.retrooper.packetevents.packetmanager.earlyinjector;
+package io.github.retrooper.packetevents.injector.earlyinjector;
 
 import io.github.retrooper.packetevents.PacketEvents;
-import io.github.retrooper.packetevents.packetmanager.ChannelInjector;
+import io.github.retrooper.packetevents.injector.ChannelInjector;
 import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
 import io.github.retrooper.packetevents.utils.nms.NMSUtils;
-import io.netty.channel.*;
+import net.minecraft.util.io.netty.channel.*;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 
@@ -36,40 +36,55 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
 
-public class EarlyChannelInjector8 implements ChannelInjector {
+class EarlyChannelInjector7 implements ChannelInjector {
     private final Plugin plugin;
     private ChannelInitializer<Channel> firstChannelInitializer;
     private ChannelInitializer<Channel> secondChannelInitializer;
-    private ChannelInboundHandler channelHandler;
-    private List<Channel> serverChannels = new ArrayList<>();
+    private final List<Channel> serverChannels = new ArrayList<>();
+    private ChannelInboundHandlerAdapter channelHandler;
+    private List<Object> networkMarkers;
 
-    public EarlyChannelInjector8(final Plugin plugin) {
+    public EarlyChannelInjector7(final Plugin plugin) {
         this.plugin = plugin;
     }
 
     public void startup() {
         Object serverConnection = NMSUtils.getMinecraftServerConnection();
+        networkMarkers = NMSUtils.getNetworkMarkers(serverConnection);
         firstChannelInitializer = new ChannelInitializer<Channel>() {
             @Override
-            protected void initChannel(final Channel channel) throws Exception {
-                PacketEvents.get().packetHandlingExecutorService.execute(new Runnable() {
-                    @Override
-                    public void run() {
-                        injectChannel(channel);
-                    }
-                });
+            protected void initChannel(final Channel channel) {
+                synchronized (networkMarkers) {
+                    PacketEvents.get().packetHandlingExecutorService.execute(new Runnable() {
+                        @Override
+                        public void run() {
+                            channel.eventLoop().execute(new Runnable() {
+                                @Override
+                                public void run() {
+                                    try {
+                                        injectChannel(channel);
+                                    }
+                                    catch(Exception ex) {
+                                        channel.disconnect();
+                                    }
+                                }
+                            });
+                        }
+                    });
+                }
             }
         };
+
         secondChannelInitializer = new ChannelInitializer<Channel>() {
             @Override
-            protected void initChannel(Channel channel) throws Exception {
+            protected void initChannel(Channel channel) {
                 channel.pipeline().addLast(firstChannelInitializer);
             }
         };
 
         channelHandler = new ChannelInboundHandlerAdapter() {
             @Override
-            public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
+            public void channelRead(ChannelHandlerContext ctx, Object msg) {
                 Channel channel = (Channel) msg;
                 channel.pipeline().addFirst(secondChannelInitializer);
                 ctx.fireChannelRead(msg);
@@ -167,7 +182,7 @@ public class EarlyChannelInjector8 implements ChannelInjector {
         channel.writeAndFlush(packet);
     }
 
-    public class PlayerChannelInterceptor extends ChannelDuplexHandler {
+    public static class PlayerChannelInterceptor extends ChannelDuplexHandler {
         public volatile Player player;
 
         @Override

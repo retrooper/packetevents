@@ -40,9 +40,7 @@ import org.bukkit.inventory.ItemStack;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.HashMap;
-import java.util.Objects;
-import java.util.UUID;
+import java.util.*;
 
 public final class NMSUtils {
     public static final HashMap<UUID, Object> channelCache = new HashMap<>();
@@ -231,6 +229,20 @@ public final class NMSUtils {
             e.printStackTrace();
         }
         return -1;
+    }
+
+    public static List<Object> getNetworkMarkers() {
+       return getNetworkMarkers(getMinecraftServerConnection());
+    }
+
+    public static List<Object> getNetworkMarkers(Object serverConnectionInstance) {
+        Method method = Reflection.getMethod(serverConnectionClass, List.class, 0, serverConnectionClass);
+        try {
+            return (List<Object>) method.invoke(null, serverConnectionInstance);
+        } catch (IllegalAccessException | InvocationTargetException e) {
+            e.printStackTrace();
+        }
+        return new ArrayList<>();
     }
 
     public static ItemStack toBukkitItemStack(final Object nmsItemstack) {

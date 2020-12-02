@@ -22,7 +22,7 @@
  * SOFTWARE.
  */
 
-package io.github.retrooper.packetevents.packetmanager.lateinjector;
+package io.github.retrooper.packetevents.injector.lateinjector;
 
 import io.github.retrooper.packetevents.utils.nms.NMSUtils;
 import org.bukkit.entity.Player;

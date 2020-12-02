@@ -22,22 +22,20 @@
  * SOFTWARE.
  */
 
-package io.github.retrooper.packetevents.packetmanager.lateinjector;
+package io.github.retrooper.packetevents.injector.lateinjector;
 
 import io.github.retrooper.packetevents.PacketEvents;
-import io.github.retrooper.packetevents.packetmanager.ChannelInjector;
-import io.github.retrooper.packetevents.utils.nms.NMSUtils;
-import net.minecraft.util.io.netty.channel.Channel;
-import net.minecraft.util.io.netty.channel.ChannelDuplexHandler;
-import net.minecraft.util.io.netty.channel.ChannelHandlerContext;
-import net.minecraft.util.io.netty.channel.ChannelPipeline;
-import net.minecraft.util.io.netty.channel.ChannelPromise;
+import io.github.retrooper.packetevents.injector.ChannelInjector;
+import io.netty.channel.Channel;
+import io.netty.channel.ChannelDuplexHandler;
+import io.netty.channel.ChannelHandlerContext;
+import io.netty.channel.ChannelPromise;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 
-class LateChannelInjector7 implements ChannelInjector {
+class LateChannelInjector8 implements ChannelInjector {
     private final Plugin plugin;
-    public LateChannelInjector7(final Plugin plugin) {
+    public LateChannelInjector8(final Plugin plugin) {
         this.plugin = plugin;
     }
     @Override

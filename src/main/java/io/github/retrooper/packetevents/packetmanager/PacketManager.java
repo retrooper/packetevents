@@ -26,8 +26,8 @@ package io.github.retrooper.packetevents.packetmanager;
 
 import io.github.retrooper.packetevents.PacketEvents;
 import io.github.retrooper.packetevents.event.impl.*;
-import io.github.retrooper.packetevents.packetmanager.earlyinjector.EarlyChannelInjector;
-import io.github.retrooper.packetevents.packetmanager.lateinjector.LateChannelInjector;
+import io.github.retrooper.packetevents.injector.earlyinjector.EarlyChannelInjector;
+import io.github.retrooper.packetevents.injector.lateinjector.LateChannelInjector;
 import io.github.retrooper.packetevents.packettype.PacketType;
 import io.github.retrooper.packetevents.packetwrappers.login.in.handshake.WrappedPacketLoginInHandshake;
 import io.github.retrooper.packetevents.packetwrappers.login.in.start.WrappedPacketLoginInStart;

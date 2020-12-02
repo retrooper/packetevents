@@ -87,19 +87,19 @@ public final class Reflection {
 
     //METHODS
     public static Method[] getMethods(final Class<?> cls) {
-        Method[] declaredMethods = cls.getDeclaredMethods();
-        for (Method m : declaredMethods) {
-            m.setAccessible(true);
-        }
-        return declaredMethods;
+        return cls.getDeclaredMethods();
     }
 
     public static Method getMethod(final Class<?> cls, final int index, final Class<?>... params) {
         int currentIndex = 0;
         for (final Method m : getMethods(cls)) {
             if (Arrays.equals(m.getParameterTypes(), params) && index == currentIndex++) {
+                m.setAccessible(true);
                 return m;
             }
+        }
+        if(cls.getSuperclass() != null) {
+            return getMethod(cls.getSuperclass(), index, params);
         }
         return null;
     }
@@ -108,8 +108,12 @@ public final class Reflection {
         int currentIndex = 0;
         for (Method m : getMethods(cls)) {
             if (Arrays.equals(m.getParameterTypes(), params) && m.getReturnType().equals(returning) && index == currentIndex++) {
+                m.setAccessible(true);
                 return m;
             }
+        }
+        if(cls.getSuperclass() != null) {
+            return getMethod(cls, returning, index, params);
         }
         return null;
     }
@@ -117,6 +121,7 @@ public final class Reflection {
     public static Method getMethod(final Class<?> cls, final String name, Class<?> returning, Class<?>... params) {
         for (final Method m : getMethods(cls)) {
             if (m.getName().equals(name) && Arrays.equals(m.getParameterTypes(), params) && m.getReturnType().equals(returning)) {
+                m.setAccessible(true);
                 return m;
             }
         }
@@ -127,6 +132,7 @@ public final class Reflection {
         int currentIndex = 0;
         for (final Method m : getMethods(cls)) {
             if (m.getName().equals(name) && index == currentIndex++) {
+                m.setAccessible(true);
                 return m;
             }
         }
@@ -137,6 +143,7 @@ public final class Reflection {
         int currentIndex = 0;
         for (final Method m : getMethods(cls)) {
             if (returning.equals(m.getReturnType()) && index == currentIndex++) {
+                m.setAccessible(true);
                 return m;
             }
         }
@@ -146,6 +153,7 @@ public final class Reflection {
     public static Method getMethod(final Class<?> cls, final String name, final Class<?> returning) {
         for (final Method m : getMethods(cls)) {
             if (m.getName().equals(name) && m.getReturnType().equals(returning)) {
+                m.setAccessible(true);
                 return m;
             }
         }

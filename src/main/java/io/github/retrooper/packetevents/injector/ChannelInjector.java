@@ -22,7 +22,7 @@
  * SOFTWARE.
  */
 
-package io.github.retrooper.packetevents.packetmanager;
+package io.github.retrooper.packetevents.injector;
 
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
