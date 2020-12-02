@@ -38,6 +38,7 @@ public class WrappedPacketOutEntityStatus extends WrappedPacket implements Senda
     private Entity entity;
     private byte status;
     private int entityID = -1;
+
     public WrappedPacketOutEntityStatus(Object packet) {
         super(packet);
     }

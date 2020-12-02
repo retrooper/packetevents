@@ -153,42 +153,38 @@ public final class PacketEvents implements Listener, EventManager {
      */
     public void init(final Plugin pl, PacketEventsSettings packetEventsSettings) {
         load();
-        if (!initialized && !initializing) {
-            initializing = true;
-            settings = packetEventsSettings;
-            int packetHandlingThreadCount = settings.getPacketHandlingThreadCount();
-            //if the count is 1 or is invalid
-            if (packetHandlingThreadCount == 1 || packetHandlingThreadCount < 0) {
-                packetHandlingExecutorService = Executors.newSingleThreadExecutor();
-            } else {
-                packetHandlingExecutorService = Executors.newFixedThreadPool(packetHandlingThreadCount);
+        if (initialized || initializing) return;
+
+        initializing = true;
+        settings = packetEventsSettings;
+
+        int packetHandlingThreadCount = settings.getPacketHandlingThreadCount();
+
+        //if the count is 1 or is invalid
+        if (packetHandlingThreadCount <= 1 || packetHandlingThreadCount > Runtime.getRuntime().availableProcessors()) {
+            packetHandlingExecutorService = Executors.newSingleThreadExecutor();
+        } else packetHandlingExecutorService = Executors.newFixedThreadPool(packetHandlingThreadCount);
+
+        plugins.add(pl);
+
+        //Register Bukkit listener
+        Bukkit.getPluginManager().registerEvents(this, plugins.get(0));
+
+        packetManager = new PacketManager(plugins.get(0), settings.shouldInjectEarly());
+
+        for (final Player p : Bukkit.getOnlinePlayers()) {
+            try {
+                getPlayerUtils().injectPlayer(p);
+            } catch (Exception ex) {
+                p.kickPlayer(getSettings().getInjectionFailureMessage());
             }
-            plugins.add(pl);
-
-            //Register Bukkit listener
-            Bukkit.getPluginManager().registerEvents(this, plugins.get(0));
-            packetManager = new PacketManager(plugins.get(0), settings.shouldInjectEarly());
-
-            for (final Player p : Bukkit.getOnlinePlayers()) {
-                try {
-                    getPlayerUtils().injectPlayer(p);
-                } catch (Exception ex) {
-                    p.kickPlayer(getSettings().getInjectionFailureMessage());
-                }
-            }
-
-            if (settings.shouldCheckForUpdates()) {
-                generalExecutorService.execute(new Runnable() {
-                    @Override
-                    public void run() {
-                        new UpdateChecker().handleUpdate();
-                    }
-                });
-
-            }
-            initialized = true;
-            initializing = false;
         }
+
+        if (settings.shouldCheckForUpdates()) {
+            generalExecutorService.execute(() -> new UpdateChecker().handleUpdate());
+        }
+        initialized = true;
+        initializing = false;
     }
 
     /**

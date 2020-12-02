@@ -25,7 +25,6 @@
 package io.github.retrooper.packetevents.utils.version;
 
 import java.util.Arrays;
-import java.util.List;
 
 
 public class PEVersion {

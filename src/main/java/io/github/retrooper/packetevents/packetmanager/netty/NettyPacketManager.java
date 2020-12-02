@@ -29,9 +29,6 @@ import io.github.retrooper.packetevents.utils.nms.NMSUtils;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-
 public class NettyPacketManager {
     public static final boolean v1_7_nettyMode;
 

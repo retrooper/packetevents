@@ -25,7 +25,14 @@
 package io.github.retrooper.packetevents.packetmanager;
 
 import io.github.retrooper.packetevents.PacketEvents;
-import io.github.retrooper.packetevents.event.impl.*;
+import io.github.retrooper.packetevents.event.impl.PacketLoginEvent;
+import io.github.retrooper.packetevents.event.impl.PacketReceiveEvent;
+import io.github.retrooper.packetevents.event.impl.PacketSendEvent;
+import io.github.retrooper.packetevents.event.impl.PacketStatusEvent;
+import io.github.retrooper.packetevents.event.impl.PlayerEjectEvent;
+import io.github.retrooper.packetevents.event.impl.PlayerInjectEvent;
+import io.github.retrooper.packetevents.event.impl.PostPacketReceiveEvent;
+import io.github.retrooper.packetevents.event.impl.PostPacketSendEvent;
 import io.github.retrooper.packetevents.packetmanager.netty.NettyPacketManager;
 import io.github.retrooper.packetevents.packetmanager.tinyprotocol.TinyProtocol;
 import io.github.retrooper.packetevents.packettype.PacketType;

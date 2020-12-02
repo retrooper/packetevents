@@ -43,6 +43,7 @@ public class WrappedPacketLoginOutCustomPayload extends WrappedPacket implements
     private int messageID;
     private String channelName;
     private byte[] data;
+
     public WrappedPacketLoginOutCustomPayload(Object packet) {
         super(packet);
     }

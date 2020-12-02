@@ -1,13 +1,13 @@
 package io.github.retrooper.packetevents.packetmanager.tinyprotocol;
 
+import org.bukkit.Bukkit;
+
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import org.bukkit.Bukkit;
 
 /**
  * An utility class that simplifies reflection in Bukkit plugins.
@@ -21,6 +21,7 @@ public final class Reflection {
     private static final String VERSION = OBC_PREFIX.replace("org.bukkit.craftbukkit", "").replace(".", "");
     // Variable replacement
     private static final Pattern MATCH_VARIABLE = Pattern.compile("\\{([^\\}]+)\\}");
+
     private Reflection() {
         // Seal class
     }

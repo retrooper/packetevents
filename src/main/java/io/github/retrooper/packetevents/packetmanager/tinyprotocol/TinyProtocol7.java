@@ -7,7 +7,14 @@ import io.github.retrooper.packetevents.packetwrappers.out.kickdisconnect.Wrappe
 import net.minecraft.util.com.google.common.collect.Lists;
 import net.minecraft.util.com.google.common.collect.MapMaker;
 import net.minecraft.util.com.mojang.authlib.GameProfile;
-import net.minecraft.util.io.netty.channel.*;
+import net.minecraft.util.io.netty.channel.Channel;
+import net.minecraft.util.io.netty.channel.ChannelDuplexHandler;
+import net.minecraft.util.io.netty.channel.ChannelFuture;
+import net.minecraft.util.io.netty.channel.ChannelHandlerContext;
+import net.minecraft.util.io.netty.channel.ChannelInboundHandlerAdapter;
+import net.minecraft.util.io.netty.channel.ChannelInitializer;
+import net.minecraft.util.io.netty.channel.ChannelPipeline;
+import net.minecraft.util.io.netty.channel.ChannelPromise;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;

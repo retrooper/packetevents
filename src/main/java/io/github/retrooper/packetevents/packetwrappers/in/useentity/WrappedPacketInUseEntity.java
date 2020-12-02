@@ -26,7 +26,6 @@ package io.github.retrooper.packetevents.packetwrappers.in.useentity;
 
 import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
 import io.github.retrooper.packetevents.utils.nms.NMSUtils;
-import io.github.retrooper.packetevents.utils.player.ClientHand;
 import io.github.retrooper.packetevents.utils.reflection.SubclassUtil;
 import org.bukkit.entity.Entity;
 

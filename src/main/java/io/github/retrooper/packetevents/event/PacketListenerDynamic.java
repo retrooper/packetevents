@@ -24,7 +24,15 @@
 
 package io.github.retrooper.packetevents.event;
 
-import io.github.retrooper.packetevents.event.impl.*;
+import io.github.retrooper.packetevents.event.impl.PacketLoginEvent;
+import io.github.retrooper.packetevents.event.impl.PacketReceiveEvent;
+import io.github.retrooper.packetevents.event.impl.PacketSendEvent;
+import io.github.retrooper.packetevents.event.impl.PacketStatusEvent;
+import io.github.retrooper.packetevents.event.impl.PlayerEjectEvent;
+import io.github.retrooper.packetevents.event.impl.PlayerInjectEvent;
+import io.github.retrooper.packetevents.event.impl.PostPacketReceiveEvent;
+import io.github.retrooper.packetevents.event.impl.PostPacketSendEvent;
+import io.github.retrooper.packetevents.event.impl.PostPlayerInjectEvent;
 
 public abstract class PacketListenerDynamic {
     private final byte priority;

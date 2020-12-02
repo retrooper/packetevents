@@ -36,12 +36,19 @@ import java.net.URL;
 import java.net.URLConnection;
 
 public class UpdateChecker {
+
+    private static final String URL = "https://api.spigotmc.org/legacy/update.php?resource=80279";
+
     public void handleUpdate() {
         PEVersion localVersion = PacketEvents.get().getVersion();
         inform("[PacketEvents] Checking for an update, please wait...");
         String line;
         try {
-            line = readLatestVersion();
+            URLConnection connection = new URL(URL).openConnection();
+            connection.addRequestProperty("User-Agent", "Mozilla/4.0");
+            BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+            line = reader.readLine();
+            reader.close();
         } catch (IOException exception) {
             report("[PacketEvents] We failed to find the latest released version of PacketEvents. Your build: (" + localVersion.toString() + ")");
             return;
@@ -64,14 +71,5 @@ public class UpdateChecker {
 
     private void report(String message) {
         Bukkit.getLogger().info(ChatColor.DARK_RED + message);
-    }
-
-    private String readLatestVersion() throws IOException {
-        URLConnection connection = new URL("https://api.spigotmc.org/legacy/update.php?resource=80279").openConnection();
-        connection.addRequestProperty("User-Agent", "Mozilla/4.0");
-        BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
-        String line = reader.readLine();
-        reader.close();
-        return line;
     }
 }
