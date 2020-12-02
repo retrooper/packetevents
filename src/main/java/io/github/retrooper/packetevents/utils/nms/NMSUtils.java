@@ -121,7 +121,7 @@ public final class NMSUtils {
     public static Object getMinecraftServerInstance() {
         try {
            return Reflection.getMethod(minecraftServerClass, "getServer", 0).invoke(null);
-        } catch (IllegalAccessException e) {
+        } catch (IllegalAccessException | InvocationTargetException e) {
             e.printStackTrace();
         }
         return null;
