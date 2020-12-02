@@ -75,13 +75,13 @@ public class LateChannelInjector {
     public void injectPlayerAsync(final Player player) {
         //Redundant channel variable created just so we can cache it synchronously.
         Object channel = NMSUtils.getChannel(player);
-            if (v1_7_nettyMode) {
-                LateChannelInjector7 npm_7 = (LateChannelInjector7) npm;
-                npm_7.injectPlayerAsync(player);
-            } else {
-                LateChannelInjector8 npm_8 = (LateChannelInjector8) npm;
-                npm_8.injectPlayerAsync(player);
-            }
+        if (v1_7_nettyMode) {
+            LateChannelInjector7 npm_7 = (LateChannelInjector7) npm;
+            npm_7.injectPlayerAsync(player);
+        } else {
+            LateChannelInjector8 npm_8 = (LateChannelInjector8) npm;
+            npm_8.injectPlayerAsync(player);
+        }
     }
 
     /**
@@ -105,13 +105,13 @@ public class LateChannelInjector {
      * @param player
      */
     public void ejectPlayerAsync(final Player player) {
-            if (v1_7_nettyMode) {
-                LateChannelInjector7 npm_7 = (LateChannelInjector7) npm;
-                npm_7.ejectPlayerAsync(player);
-            } else {
-                LateChannelInjector8 npm_8 = (LateChannelInjector8) npm;
-                npm_8.ejectPlayerAsync(player);
-            }
+        if (v1_7_nettyMode) {
+            LateChannelInjector7 npm_7 = (LateChannelInjector7) npm;
+            npm_7.ejectPlayerAsync(player);
+        } else {
+            LateChannelInjector8 npm_8 = (LateChannelInjector8) npm;
+            npm_8.ejectPlayerAsync(player);
+        }
     }
 
     public void sendPacket(Object channel, Object packet) {

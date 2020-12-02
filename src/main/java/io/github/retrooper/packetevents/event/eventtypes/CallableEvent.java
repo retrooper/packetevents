@@ -24,7 +24,6 @@
 
 package io.github.retrooper.packetevents.event.eventtypes;
 
-import io.github.retrooper.packetevents.event.PacketEvent;
 import io.github.retrooper.packetevents.event.PacketListenerDynamic;
 
 public interface CallableEvent {

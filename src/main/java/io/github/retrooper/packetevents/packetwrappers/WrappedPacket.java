@@ -26,6 +26,9 @@ package io.github.retrooper.packetevents.packetwrappers;
 
 import io.github.retrooper.packetevents.exceptions.WrapperFieldNotFoundException;
 import io.github.retrooper.packetevents.packettype.PacketTypeClasses;
+import io.github.retrooper.packetevents.packetwrappers.login.in.custompayload.WrappedPacketLoginInCustomPayload;
+import io.github.retrooper.packetevents.packetwrappers.login.out.custompayload.WrappedPacketLoginOutCustomPayload;
+import io.github.retrooper.packetevents.packetwrappers.login.out.setcompression.WrappedPacketLoginOutSetCompression;
 import io.github.retrooper.packetevents.packetwrappers.play.in.blockdig.WrappedPacketInBlockDig;
 import io.github.retrooper.packetevents.packetwrappers.play.in.blockplace.WrappedPacketInBlockPlace;
 import io.github.retrooper.packetevents.packetwrappers.play.in.clientcommand.WrappedPacketInClientCommand;
@@ -36,9 +39,6 @@ import io.github.retrooper.packetevents.packetwrappers.play.in.settings.WrappedP
 import io.github.retrooper.packetevents.packetwrappers.play.in.updatesign.WrappedPacketInUpdateSign;
 import io.github.retrooper.packetevents.packetwrappers.play.in.useentity.WrappedPacketInUseEntity;
 import io.github.retrooper.packetevents.packetwrappers.play.in.windowclick.WrappedPacketInWindowClick;
-import io.github.retrooper.packetevents.packetwrappers.login.in.custompayload.WrappedPacketLoginInCustomPayload;
-import io.github.retrooper.packetevents.packetwrappers.login.out.custompayload.WrappedPacketLoginOutCustomPayload;
-import io.github.retrooper.packetevents.packetwrappers.login.out.setcompression.WrappedPacketLoginOutSetCompression;
 import io.github.retrooper.packetevents.packetwrappers.play.out.abilities.WrappedPacketOutAbilities;
 import io.github.retrooper.packetevents.packetwrappers.play.out.animation.WrappedPacketOutAnimation;
 import io.github.retrooper.packetevents.packetwrappers.play.out.chat.WrappedPacketOutChat;

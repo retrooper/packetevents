@@ -38,9 +38,9 @@ import java.util.NoSuchElementException;
 
 public class EarlyChannelInjector8 implements ChannelInjector {
     private final Plugin plugin;
+    private final List<Channel> serverChannels = new ArrayList<>();
     private ChannelInitializer<Channel> firstChannelInitializer;
     private ChannelInitializer<Channel> secondChannelInitializer;
-    private final List<Channel> serverChannels = new ArrayList<>();
     private ChannelInboundHandlerAdapter channelHandler;
     private List<Object> networkMarkers;
 

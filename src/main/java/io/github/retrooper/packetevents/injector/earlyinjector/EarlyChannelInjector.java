@@ -35,81 +35,74 @@ public class EarlyChannelInjector implements ChannelInjector {
     private EarlyChannelInjector7 injector7;
     private EarlyChannelInjector8 injector8;
     private boolean outdatedInjectorMode = false;
+
     public EarlyChannelInjector(final Plugin plugin) {
         this.plugin = plugin;
-        if(PacketEvents.get().getServerUtils().getVersion() == ServerVersion.v_1_7_10) {
+        if (PacketEvents.get().getServerUtils().getVersion() == ServerVersion.v_1_7_10) {
             injector7 = new EarlyChannelInjector7(plugin);
             this.outdatedInjectorMode = true;
-        }
-        else {
+        } else {
             injector8 = new EarlyChannelInjector8(plugin);
         }
     }
 
     public void startup() {
-        if(outdatedInjectorMode) {
+        if (outdatedInjectorMode) {
             injector7.startup();
-        }
-        else {
+        } else {
             injector8.startup();
         }
     }
 
     public void close() {
-        if(outdatedInjectorMode) {
+        if (outdatedInjectorMode) {
             injector7.close();
-        }
-        else {
+        } else {
             injector8.close();
         }
     }
 
     @Override
     public void injectPlayerSync(Player player) {
-        if(outdatedInjectorMode) {
+        if (outdatedInjectorMode) {
             injector7.injectPlayerSync(player);
-        }
-        else {
+        } else {
             injector8.injectPlayerSync(player);
         }
     }
 
     @Override
     public void ejectPlayerSync(Player player) {
-        if(outdatedInjectorMode) {
+        if (outdatedInjectorMode) {
             injector7.ejectPlayerSync(player);
-        }
-        else {
+        } else {
             injector8.ejectPlayerSync(player);
         }
     }
 
     @Override
     public void injectPlayerAsync(Player player) {
-        if(outdatedInjectorMode) {
+        if (outdatedInjectorMode) {
             injector7.injectPlayerAsync(player);
-        }
-        else {
+        } else {
             injector8.injectPlayerAsync(player);
         }
     }
 
     @Override
     public void ejectPlayerAsync(Player player) {
-        if(outdatedInjectorMode) {
+        if (outdatedInjectorMode) {
             injector7.ejectPlayerAsync(player);
-        }
-        else {
+        } else {
             injector8.ejectPlayerAsync(player);
         }
     }
 
     @Override
     public void sendPacket(Object channel, Object packet) {
-        if(outdatedInjectorMode) {
+        if (outdatedInjectorMode) {
             injector7.sendPacket(channel, packet);
-        }
-        else {
+        } else {
             injector8.sendPacket(channel, packet);
         }
     }

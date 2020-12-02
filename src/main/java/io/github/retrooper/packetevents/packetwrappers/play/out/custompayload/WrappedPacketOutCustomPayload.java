@@ -45,6 +45,7 @@ public class WrappedPacketOutCustomPayload extends WrappedPacket implements Send
     private static byte constructorMode = 0;
     private String tag;
     private byte[] data;
+
     public WrappedPacketOutCustomPayload(String tag, byte[] data) {
         this.tag = tag;
         this.data = data;

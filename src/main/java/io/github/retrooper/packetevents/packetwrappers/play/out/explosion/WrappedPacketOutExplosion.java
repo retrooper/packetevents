@@ -43,6 +43,7 @@ public class WrappedPacketOutExplosion extends WrappedPacket implements Sendable
     private float strength;
     private List<Vector3i> records;
     private float playerMotionX, playerMotionY, playerMotionZ;
+
     public WrappedPacketOutExplosion(Object packet) {
         super(packet);
         isListening = true;

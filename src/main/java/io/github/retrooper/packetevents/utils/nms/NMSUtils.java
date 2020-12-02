@@ -24,13 +24,11 @@
 
 package io.github.retrooper.packetevents.utils.nms;
 
-import io.github.retrooper.packetevents.PacketEvents;
 import io.github.retrooper.packetevents.annotations.Nullable;
 import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
 import io.github.retrooper.packetevents.utils.entityfinder.EntityFinderUtils;
 import io.github.retrooper.packetevents.utils.reflection.Reflection;
 import io.github.retrooper.packetevents.utils.server.ServerVersion;
-import org.bukkit.Bukkit;
 import org.bukkit.Server;
 import org.bukkit.World;
 import org.bukkit.entity.Entity;
@@ -118,7 +116,7 @@ public final class NMSUtils {
 
     public static Object getMinecraftServerInstance() {
         try {
-           return Reflection.getMethod(minecraftServerClass, "getServer", 0).invoke(null);
+            return Reflection.getMethod(minecraftServerClass, "getServer", 0).invoke(null);
         } catch (IllegalAccessException | InvocationTargetException e) {
             e.printStackTrace();
         }
@@ -232,7 +230,7 @@ public final class NMSUtils {
     }
 
     public static List<Object> getNetworkMarkers() {
-       return getNetworkMarkers(getMinecraftServerConnection());
+        return getNetworkMarkers(getMinecraftServerConnection());
     }
 
     public static List<Object> getNetworkMarkers(Object serverConnectionInstance) {

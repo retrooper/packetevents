@@ -51,7 +51,7 @@ public final class Reflection {
         return null;
     }
 
-    public static <T> T getFieldInstance(final Class<?> cls, final Class<T> dataType, final int index, Object instance){
+    public static <T> T getFieldInstance(final Class<?> cls, final Class<T> dataType, final int index, Object instance) {
         int currentIndex = 0;
         for (final Field f : getFields(cls)) {
             if (f.getType().equals(dataType)) {
@@ -98,7 +98,7 @@ public final class Reflection {
                 return m;
             }
         }
-        if(cls.getSuperclass() != null) {
+        if (cls.getSuperclass() != null) {
             return getMethod(cls.getSuperclass(), index, params);
         }
         return null;
@@ -112,7 +112,7 @@ public final class Reflection {
                 return m;
             }
         }
-        if(cls.getSuperclass() != null) {
+        if (cls.getSuperclass() != null) {
             return getMethod(cls, returning, index, params);
         }
         return null;

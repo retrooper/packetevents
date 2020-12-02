@@ -25,7 +25,6 @@
 package io.github.retrooper.packetevents;
 
 import io.github.retrooper.packetevents.event.PacketEvent;
-import io.github.retrooper.packetevents.event.impl.PostPlayerInjectEvent;
 import io.github.retrooper.packetevents.event.manager.EventManager;
 import io.github.retrooper.packetevents.event.manager.PEEventManager;
 import io.github.retrooper.packetevents.exceptions.PacketEventsLoadFailureException;
@@ -39,8 +38,8 @@ import io.github.retrooper.packetevents.utils.nms.NMSUtils;
 import io.github.retrooper.packetevents.utils.player.ClientVersion;
 import io.github.retrooper.packetevents.utils.player.PlayerUtils;
 import io.github.retrooper.packetevents.utils.server.ServerUtils;
-import io.github.retrooper.packetevents.utils.version.PEVersion;
 import io.github.retrooper.packetevents.utils.server.ServerVersion;
+import io.github.retrooper.packetevents.utils.version.PEVersion;
 import io.github.retrooper.packetevents.utils.versionlookup.VersionLookupUtils;
 import io.github.retrooper.packetevents.utils.versionlookup.v_1_7_10.ProtocolVersionAccessor_v_1_7;
 import org.bukkit.Bukkit;
@@ -156,7 +155,7 @@ public final class PacketEvents implements Listener, EventManager {
         if (!initialized && !initializing) {
             initializing = true;
             settings = packetEventsSettings;
-            if(settings.getPacketHandlingThreadCount() < 1) {
+            if (settings.getPacketHandlingThreadCount() < 1) {
                 settings.packetHandlingThreadCount(1);
             }
             settings.lock();

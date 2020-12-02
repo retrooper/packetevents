@@ -35,6 +35,7 @@ public class WrappedPacketOutExperience extends WrappedPacket implements Sendabl
     private static Constructor<?> packetConstructor;
     private float expBar;
     private int expLevel, totalExp;
+
     public WrappedPacketOutExperience(Object packet) {
         super(packet);
     }

@@ -42,10 +42,10 @@ public class MainExample extends JavaPlugin {
         //We use default settings
         PacketEvents.get().init(this);
 
-        PacketEvents.get().getEventManager().registerListener(new PacketListenerDynamic((byte)0) {
+        PacketEvents.get().getEventManager().registerListener(new PacketListenerDynamic((byte) 0) {
             @Override
             public void onPacketReceive(PacketReceiveEvent event) {
-                if(event.getPacketId() == PacketType.Client.USE_ENTITY) {
+                if (event.getPacketId() == PacketType.Client.USE_ENTITY) {
                     event.getPlayer().sendMessage("yo");
                 }
             }

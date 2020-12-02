@@ -76,6 +76,7 @@ public class PacketEventsSettings {
         }
         return this;
     }
+
     public PacketEventsSettings packetHandlingThreadCount(int threadCount) {
         if (!locked) {
             this.packetHandlingThreadCount = threadCount;

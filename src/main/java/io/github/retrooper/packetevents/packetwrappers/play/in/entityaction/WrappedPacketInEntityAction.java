@@ -25,10 +25,10 @@
 package io.github.retrooper.packetevents.packetwrappers.play.in.entityaction;
 
 import io.github.retrooper.packetevents.annotations.Nullable;
-import io.github.retrooper.packetevents.utils.server.ServerVersion;
 import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
 import io.github.retrooper.packetevents.utils.nms.NMSUtils;
 import io.github.retrooper.packetevents.utils.reflection.SubclassUtil;
+import io.github.retrooper.packetevents.utils.server.ServerVersion;
 import org.bukkit.entity.Entity;
 
 import java.util.HashMap;

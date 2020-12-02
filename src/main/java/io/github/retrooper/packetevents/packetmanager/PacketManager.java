@@ -54,6 +54,7 @@ public class PacketManager {
     private final HashMap<UUID, Long> keepAliveMap = new HashMap<>();
     private final Map<String, Object> channelMap = new ConcurrentHashMap<>();
     private final Map<Object, Boolean> firstPacketCache;
+
     public PacketManager(Plugin plugin, boolean earlyInjectMode) {
         this.plugin = plugin;
         this.earlyInjectMode = earlyInjectMode;
@@ -65,17 +66,16 @@ public class PacketManager {
             lateInjector = new LateChannelInjector(plugin);
             earlyInjector = null;
         }
-        if(PacketEvents.get().getSettings().getPacketHandlingThreadCount() == 1) {
+        if (PacketEvents.get().getSettings().getPacketHandlingThreadCount() == 1) {
             firstPacketCache = new HashMap<>();
-        }
-        else {
+        } else {
             firstPacketCache = new ConcurrentHashMap<>();
         }
     }
 
     public Object getChannel(String name) {
         Object channel = channelMap.get(name);
-        if(channel == null) {
+        if (channel == null) {
             channel = NMSUtils.getChannel(Bukkit.getPlayer(name));
             channelMap.put(name, channel);
             return channel;
@@ -179,10 +179,9 @@ public class PacketManager {
                 interceptLogin(packetLoginEvent);
                 if (packetLoginEvent.isCancelled()) {
                     packet = null;
-                }
-                else {
+                } else {
                     //Cache the channel
-                    if(packetLoginEvent.getPacketId() == PacketType.Login.Client.START) {
+                    if (packetLoginEvent.getPacketId() == PacketType.Login.Client.START) {
                         WrappedPacketLoginInStart startWrapper = new WrappedPacketLoginInStart(packetLoginEvent.getNMSPacket());
                         WrappedGameProfile gameProfile = startWrapper.getGameProfile();
                         channelMap.put(gameProfile.name, channel);
@@ -191,7 +190,7 @@ public class PacketManager {
             }
         } else {
             Boolean firstPacket = firstPacketCache.get(channel);
-            if(firstPacket == null){
+            if (firstPacket == null) {
                 firstPacketCache.put(channel, true);
                 PacketEvents.get().getEventManager().callEvent(new PostPlayerInjectEvent(player));
             }
@@ -228,7 +227,7 @@ public class PacketManager {
             }
         } else {
             Boolean firstPacket = firstPacketCache.get(channel);
-            if(firstPacket == null){
+            if (firstPacket == null) {
                 firstPacketCache.put(channel, true);
                 PacketEvents.get().getEventManager().callEvent(new PostPlayerInjectEvent(player));
             }
@@ -302,7 +301,7 @@ public class PacketManager {
     }
 
     public void close() {
-        if(earlyInjectMode) {
+        if (earlyInjectMode) {
             earlyInjector.close();
         }
     }

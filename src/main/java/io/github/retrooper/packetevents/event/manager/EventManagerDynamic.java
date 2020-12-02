@@ -26,9 +26,7 @@ package io.github.retrooper.packetevents.event.manager;
 
 import io.github.retrooper.packetevents.event.PacketEvent;
 import io.github.retrooper.packetevents.event.PacketListenerDynamic;
-import io.github.retrooper.packetevents.event.eventtypes.CallableEvent;
 import io.github.retrooper.packetevents.event.eventtypes.CancellableEvent;
-import io.github.retrooper.packetevents.event.impl.*;
 import io.github.retrooper.packetevents.event.priority.PacketEventPriority;
 
 import java.util.ArrayList;
@@ -41,8 +39,8 @@ class EventManagerDynamic {
 
     public void callEvent(final PacketEvent event) {
         boolean isCancelled = false;
-        if(event instanceof CancellableEvent) {
-            isCancelled = ((CancellableEvent)event).isCancelled();
+        if (event instanceof CancellableEvent) {
+            isCancelled = ((CancellableEvent) event).isCancelled();
         }
         byte maxReachedEventPriority = PacketEventPriority.LOWEST;
         for (byte i = PacketEventPriority.LOWEST; i <= PacketEventPriority.MONITOR; i++) {

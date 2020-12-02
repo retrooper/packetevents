@@ -35,9 +35,11 @@ import org.bukkit.plugin.Plugin;
 
 class LateChannelInjector7 implements ChannelInjector {
     private final Plugin plugin;
+
     public LateChannelInjector7(final Plugin plugin) {
         this.plugin = plugin;
     }
+
     @Override
     public void injectPlayerSync(Player player) {
         final ChannelDuplexHandler channelDuplexHandler = new ChannelDuplexHandler() {
