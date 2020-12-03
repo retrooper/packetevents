@@ -24,7 +24,6 @@
 
 package io.github.retrooper.packetevents.packetwrappers.play.in.abilities;
 
-import io.github.retrooper.packetevents.annotations.Nullable;
 import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
 
 public final class WrappedPacketInAbilities extends WrappedPacket {
@@ -39,7 +38,6 @@ public final class WrappedPacketInAbilities extends WrappedPacket {
      * @return Whether the player is vulnerable to damage or not.
      */
     @Deprecated
-    @Nullable
     public boolean isVulnerable() {
         return readBoolean(0);
     }
@@ -54,7 +52,6 @@ public final class WrappedPacketInAbilities extends WrappedPacket {
      * @return Whether or not the player can fly.
      */
     @Deprecated
-    @Nullable
     public boolean isFlightAllowed() {
         return readBoolean(2);
     }
@@ -65,7 +62,6 @@ public final class WrappedPacketInAbilities extends WrappedPacket {
      * @return Whether or not the player can break blocks instantly.
      */
     @Deprecated
-    @Nullable
     public boolean canInstantlyBuild() {
         return readBoolean(3);
     }
@@ -76,7 +72,6 @@ public final class WrappedPacketInAbilities extends WrappedPacket {
      * @return The speed at which the player can fly, as a float.
      */
     @Deprecated
-    @Nullable
     public float getFlySpeed() {
         return readFloat(0);
     }
@@ -87,7 +82,6 @@ public final class WrappedPacketInAbilities extends WrappedPacket {
      * @return The speed at which the player can walk, as a float.
      */
     @Deprecated
-    @Nullable
     public float getWalkSpeed() {
         return readFloat(1);
     }

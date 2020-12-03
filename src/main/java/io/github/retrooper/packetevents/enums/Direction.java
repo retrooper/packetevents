@@ -24,7 +24,13 @@
 
 package io.github.retrooper.packetevents.enums;
 
-public enum Direction {
+/**
+ * The {@code direction} enum represents the face of a block being hit/placed.
+ * @see <a href="https://wiki.vg/Protocol#Player_Digging">https://wiki.vg/Protocol#Player_Digging</a>
+ * @author retrooper
+ * @since 1.7.8
+ */
+public enum Direction {//TODO test
     /**
      * -Y offset
      */
@@ -57,15 +63,23 @@ public enum Direction {
 
     OTHER((short) 255);
 
-    final short value;
+    final byte value;
 
-    Direction(final short value) {
-        this.value = value;
+    Direction(short value) {
+        if(value > 255) {
+            value = 255;
+        }
+        this.value = (byte)value;
+    }
+
+    public short getValue() {
+        return (short) (value & 0xFF);
     }
 
     public static Direction getDirection(final short value) {
+        byte compressedValue = (byte)value;
         for (Direction direction : values()) {
-            if (direction.value == value) {
+            if (direction.value == compressedValue) {
                 return direction;
             }
         }

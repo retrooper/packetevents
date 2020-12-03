@@ -32,7 +32,15 @@ import io.github.retrooper.packetevents.packettype.PacketType;
 import io.github.retrooper.packetevents.utils.reflection.ClassUtil;
 
 /**
- * This event is called when we receive a login packet.
+ * The {@code PacketLoginEvent} event is fired whenever the a LOGIN packet is received from a client
+ * or when the server wants to send a LOGIN packet to the client.
+ * This class implements {@link CancellableEvent} and {@link CallableEvent}.
+ * The {@code PacketLoginEvent} does not have to do with a bukkit player object due to
+ * the player object being null in this state.
+ * Use the {@link #getChannel()} to identify who sends the packet.
+ * @see <a href="https://wiki.vg/Protocol#Login">https://wiki.vg/Protocol#Login</a>
+ * @author retrooper
+ * @since 1.7
  */
 public class PacketLoginEvent extends PacketEvent implements CancellableEvent, CallableEvent {
     private final Object channel;
@@ -44,14 +52,33 @@ public class PacketLoginEvent extends PacketEvent implements CancellableEvent, C
         this.packet = packet;
     }
 
+    /**
+     * This method returns the netty channel of the packet sender or receiver as an object.
+     * If the packet is client-bound(server-sided) then it will return the channel of the packet receiver.
+     * If the packet is server-bound(client-sided) then it will return the channel of the packet sender.
+     * You can use that in all cases, it will NOT return the netty channel of the server.
+     * The reason it is returned as an object and not with the netty channel import is
+     * to maintain 1.7.10 support as 1.7.10 refactored netty to another location.
+     * You can use this netty channel to identify who sent the packet.
+     * For example:
+     * <p>
+     * {@code} Map < Object, Integer > protocolVersionCache = new HashMap < Object, Integer >();
+     * </p>
+     * @return Netty channel of the packet sender/receiver.
+     */
     public Object getChannel() {
         return channel;
     }
 
     /**
-     * Get the packet's name (NMS packet class simple name).
-     * The class simple name is cached.
-     *
+     * This method returns the name of the packet.
+     * To get the name of the packet we get the class of the packet and then the name of the class.
+     * We use java's simple name method.
+     * @see Class#getSimpleName()
+     * We cache the simple name after the first call to improve performance.
+     * It is not recommended to call this method unless you NEED it.
+     * If you are comparing packet types, use the {@link PacketType} byte system.
+     * You would only need the packet name if packet type system doesn't contain your desired packet yet.
      * @return Name of the packet
      */
     public String getPacketName() {
@@ -59,18 +86,23 @@ public class PacketLoginEvent extends PacketEvent implements CancellableEvent, C
     }
 
     /**
-     * Get the raw packet object
-     *
-     * @return packet object
+     * Get minecraft's encoded or decoded packet object.
+     * This may be the encoded or the decoded packet, as this event is fired
+     * whether the packet is sent by the server or by the client.
+     * PacketEvents uses this object in the packet wrappers to read the fields.
+     * @return Minecraft's encoded/decoded packet object.
      */
     public Object getNMSPacket() {
         return packet;
     }
 
     /**
-     * Get the ID of the packet
-     *
-     * @return packet id
+     * Each binding in each packet state has their own constants.
+     * Example Usage:
+     * <p>
+     *     {@code if (getPacketId() == PacketType.Login.Client.HANDSHAKE) }
+     * </p>
+     * @return Packet ID
      */
     public byte getPacketId() {
         return PacketType.Login.packetIds.getOrDefault(packet.getClass(), (byte) -1);

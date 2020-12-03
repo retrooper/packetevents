@@ -27,7 +27,10 @@ package io.github.retrooper.packetevents.event.eventtypes;
 import org.bukkit.entity.Player;
 
 /**
- * Event having to do with a player.
+ * Every event that has to do with a player is recommended to implement this interface.
+ * @see io.github.retrooper.packetevents.event.impl.PacketReceiveEvent
+ * @author retrooper
+ * @since 1.6.9
  */
 public interface PlayerEvent {
     /**

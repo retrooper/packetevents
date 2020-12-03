@@ -29,7 +29,7 @@ import io.github.retrooper.packetevents.event.PacketListenerDynamic;
 import io.github.retrooper.packetevents.event.eventtypes.CancellableEvent;
 import io.github.retrooper.packetevents.packettype.PacketType;
 import io.github.retrooper.packetevents.utils.reflection.ClassUtil;
-
+//TODO document this event and the other events below and packages below
 public class PacketStatusEvent extends PacketEvent implements CancellableEvent {
     private final Object channel;
     private final Object packet;

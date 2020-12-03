@@ -59,10 +59,6 @@ public class PEVersion {
         return 0;
     }
 
-    public boolean equals(PEVersion version) {
-        return Arrays.equals(versionIntArray, version.versionIntArray);
-    }
-
     public boolean isNewerThan(PEVersion version) {
         return compareTo(version) == 1;
     }
@@ -78,7 +74,7 @@ public class PEVersion {
     @Override
     public boolean equals(Object obj) {
         if (obj instanceof PEVersion) {
-            return equals((PEVersion) obj);
+            return Arrays.equals(versionIntArray, ((PEVersion)obj).versionIntArray);
         }
         return false;
     }
