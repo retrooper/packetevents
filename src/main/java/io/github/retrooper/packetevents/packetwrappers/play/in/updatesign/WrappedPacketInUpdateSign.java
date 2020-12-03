@@ -35,7 +35,7 @@ import java.lang.reflect.InvocationTargetException;
 
 public class WrappedPacketInUpdateSign extends WrappedPacket {
     private static boolean v_1_7_mode, strArrayMode;
-    private static Class<?> blockPosClass, iChatBaseComponentClass;
+    private static Class<?> blockPosClass;
 
     private Object blockPosObj;
 
@@ -54,11 +54,6 @@ public class WrappedPacketInUpdateSign extends WrappedPacket {
                 e.printStackTrace();
             }
         }
-        try {
-            iChatBaseComponentClass = NMSUtils.getNMSClass("IChatBaseComponent");
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
-        }
     }
 
     public int getX() {
@@ -67,7 +62,6 @@ public class WrappedPacketInUpdateSign extends WrappedPacket {
         } else {
             if (blockPosObj == null) {
                 blockPosObj = readObject(0, blockPosClass);
-
             }
             try {
                 return (int) Reflection.getMethod(blockPosObj.getClass().getSuperclass(), "getX", 0).invoke(blockPosObj);
@@ -84,7 +78,6 @@ public class WrappedPacketInUpdateSign extends WrappedPacket {
         } else {
             if (blockPosObj == null) {
                 blockPosObj = readObject(0, blockPosClass);
-
             }
             try {
                 return (int) Reflection.getMethod(blockPosObj.getClass().getSuperclass(), "getY", 0).invoke(blockPosObj);
@@ -101,7 +94,6 @@ public class WrappedPacketInUpdateSign extends WrappedPacket {
         } else {
             if (blockPosObj == null) {
                 blockPosObj = readObject(0, blockPosClass);
-
             }
             try {
                 return (int) Reflection.getMethod(blockPosObj.getClass().getSuperclass(), "getZ", 0).invoke(blockPosObj);

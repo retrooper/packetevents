@@ -28,7 +28,6 @@ import io.github.retrooper.packetevents.PacketEvents;
 import io.github.retrooper.packetevents.enums.Hand;
 import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
 import io.github.retrooper.packetevents.utils.nms.NMSUtils;
-import io.github.retrooper.packetevents.utils.reflection.Reflection;
 import io.github.retrooper.packetevents.utils.reflection.SubclassUtil;
 import io.github.retrooper.packetevents.utils.server.ServerVersion;
 import io.github.retrooper.packetevents.utils.vector.Vector3d;
@@ -40,7 +39,7 @@ public final class WrappedPacketInUseEntity extends WrappedPacket {
     private static Class<?> enumEntityUseActionClass, enumHandClass;
     private Entity entity;
     private EntityUseAction action;
-    private int entityID = -1;
+    private int entityId = -1;
 
     public WrappedPacketInUseEntity(final Object packet) {
         super(packet);
@@ -83,11 +82,10 @@ public final class WrappedPacketInUseEntity extends WrappedPacket {
      * @return Entity ID
      */
     public int getEntityId() {
-        if (entityID != -1) {
-            return entityID;
-        } else {
-            return entityID = readInt(0);
+        if (entityId != -1) {
+            return entityId;
         }
+        return entityId = readInt(0);
     }
 
     public Vector3d getTarget() {

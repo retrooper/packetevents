@@ -36,7 +36,9 @@ import io.github.retrooper.packetevents.utils.vector.Vector3d;
 import java.lang.reflect.InvocationTargetException;
 
 public final class WrappedPacketInBlockDig extends WrappedPacket {
-    private static Class<?> blockDigClass, blockPositionClass, enumDirectionClass, digTypeClass;
+    private static Class<?> blockPositionClass;
+    private static Class<?> enumDirectionClass;
+    private static Class<?> digTypeClass;
     private static boolean isVersionLowerThan_v_1_8;
     private Object blockPosObj;
     private Object enumDirObj;
@@ -46,7 +48,7 @@ public final class WrappedPacketInBlockDig extends WrappedPacket {
     }
 
     public static void load() {
-        blockDigClass = PacketTypeClasses.Client.BLOCK_DIG;
+        Class<?> blockDigClass = PacketTypeClasses.Client.BLOCK_DIG;
         try {
             if (version.isHigherThan(ServerVersion.v_1_7_10)) {
                 blockPositionClass = NMSUtils.getNMSClass("BlockPosition");
