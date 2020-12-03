@@ -24,14 +24,22 @@
 
 package io.github.retrooper.packetevents.packetwrappers.play.in.useentity;
 
+import io.github.retrooper.packetevents.PacketEvents;
+import io.github.retrooper.packetevents.enums.Hand;
 import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
 import io.github.retrooper.packetevents.utils.nms.NMSUtils;
+import io.github.retrooper.packetevents.utils.reflection.Reflection;
 import io.github.retrooper.packetevents.utils.reflection.SubclassUtil;
+import io.github.retrooper.packetevents.utils.server.ServerVersion;
+import io.github.retrooper.packetevents.utils.vector.Vector3d;
 import org.bukkit.entity.Entity;
+
+import java.util.Objects;
 
 public final class WrappedPacketInUseEntity extends WrappedPacket {
     private static Class<?> enumEntityUseActionClass, enumHandClass;
     private Entity entity;
+    private EntityUseAction action;
     private int entityID = -1;
 
     public WrappedPacketInUseEntity(final Object packet) {
@@ -40,13 +48,17 @@ public final class WrappedPacketInUseEntity extends WrappedPacket {
 
     public static void load() {
         Class<?> useEntityClass = NMSUtils.getNMSClassWithoutException("PacketPlayInUseEntity");
-        enumHandClass = NMSUtils.getNMSClassWithoutException("EnumHand");
+        try {
+            enumHandClass = NMSUtils.getNMSClass("EnumHand");
+        } catch (ClassNotFoundException e) {
+            enumHandClass = SubclassUtil.getSubClass(Objects.requireNonNull(useEntityClass), "EnumHand");
+            e.printStackTrace();
+        }
         try {
             enumEntityUseActionClass = NMSUtils.getNMSClass("EnumEntityUseAction");
         } catch (ClassNotFoundException e) {
             //That is fine, it is probably a subclass
-            assert useEntityClass != null;
-            enumEntityUseActionClass = SubclassUtil.getSubClass(useEntityClass, "EnumEntityUseAction");
+            enumEntityUseActionClass = SubclassUtil.getSubClass(Objects.requireNonNull(useEntityClass), "EnumEntityUseAction");
         }
     }
 
@@ -60,7 +72,7 @@ public final class WrappedPacketInUseEntity extends WrappedPacket {
         if (entity != null) {
             return entity;
         }
-        return entity = NMSUtils.getEntityById(getEntityID());
+        return entity = NMSUtils.getEntityById(getEntityId());
     }
 
     /**
@@ -70,12 +82,22 @@ public final class WrappedPacketInUseEntity extends WrappedPacket {
      *
      * @return Entity ID
      */
-    public int getEntityID() {
+    public int getEntityId() {
         if (entityID != -1) {
             return entityID;
         } else {
             return entityID = readInt(0);
         }
+    }
+
+    public Vector3d getTarget() {
+        if (getAction() == EntityUseAction.INTERACT_AT
+                && PacketEvents.get().getServerUtils().getVersion() != ServerVersion.v_1_7_10) {
+            Object vec3DObj = readObject(0, NMSUtils.vec3DClass);
+            WrappedPacket vec3DWrapper = new WrappedPacket(vec3DObj);
+            return new Vector3d(vec3DWrapper.readDouble(0), vec3DWrapper.readDouble(1), vec3DWrapper.readDouble(2));
+        }
+        return Vector3d.INVALID;
     }
 
     /**
@@ -84,11 +106,27 @@ public final class WrappedPacketInUseEntity extends WrappedPacket {
      * @return Get EntityUseAction
      */
     public EntityUseAction getAction() {
-        final Object useActionEnum = readObject(0, enumEntityUseActionClass);
-        return EntityUseAction.valueOf(useActionEnum.toString());
+        if (action == null) {
+            final Object useActionEnum = readObject(0, enumEntityUseActionClass);
+            return action = EntityUseAction.valueOf(useActionEnum.toString());
+        }
+        return action;
+    }
+
+    public Hand getHand() {
+        if((getAction() == EntityUseAction.INTERACT || getAction() == EntityUseAction.INTERACT_AT)
+                && PacketEvents.get().getServerUtils().getVersion().isHigherThan(ServerVersion.v_1_8_8)) {
+            Object enumHandObj = readObject(0, enumHandClass);
+            //Should actually never be null, but we will handle such a case
+            if(enumHandObj == null) {
+                return Hand.MAIN_HAND;
+            }
+            return Hand.valueOf(Objects.requireNonNull(enumHandObj).toString());
+        }
+        return Hand.MAIN_HAND;
     }
 
     public enum EntityUseAction {
-        INTERACT, INTERACT_AT, ATTACK, INVALID
+        INTERACT, INTERACT_AT, ATTACK
     }
 }

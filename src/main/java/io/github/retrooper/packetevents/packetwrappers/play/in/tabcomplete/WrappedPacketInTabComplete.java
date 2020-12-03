@@ -22,43 +22,16 @@
  * SOFTWARE.
  */
 
-package io.github.retrooper.packetevents.packetwrappers;
+package io.github.retrooper.packetevents.packetwrappers.play.in.tabcomplete;
 
-public interface WrapperPacketReader {
+import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
 
-    boolean readBoolean(int index);
+public class WrappedPacketInTabComplete extends WrappedPacket {
+    public WrappedPacketInTabComplete(Object packet) {
+        super(packet);
+    }
 
-    byte readByte(int index);
-
-    short readShort(int index);
-
-    int readInt(int index);
-
-    long readLong(int index);
-
-    float readFloat(int index);
-
-    double readDouble(int index);
-
-    boolean[] readBooleanArray(int index);
-
-    byte[] readByteArray(int index);
-
-    short[] readShortArray(int index);
-
-    int[] readIntArray(int index);
-
-    long[] readLongArray(int index);
-
-    float[] readFloatArray(int index);
-
-    double[] readDoubleArray(int index);
-
-    String[] readStringArray(int index);
-
-    String readString(int index);
-
-    Object readObject(int index, Class<?> type);
-
-    Object readAnyObject(int index);
+    public String getText() {
+        return readString(0);
+    }
 }

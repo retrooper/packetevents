@@ -25,6 +25,7 @@
 package io.github.retrooper.packetevents.utils.vector;
 
 public class Vector3d {
+    public static final Vector3d INVALID = new Vector3d(-1, -1, -1);
     public double x, y, z;
 
     public Vector3d() {
@@ -52,5 +53,19 @@ public class Vector3d {
 
     public double getZ() {
         return z;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if(obj instanceof Vector3d) {
+            Vector3d vec = (Vector3d) obj;
+            return x == vec.x && y == vec.y && z == vec.z;
+        }
+        return false;
+    }
+
+    @Override
+    public Vector3d clone()  {
+        return new Vector3d(x, y, z);
     }
 }

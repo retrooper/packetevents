@@ -49,7 +49,7 @@ public final class NMSUtils {
     public static Class<?> nmsEntityClass, minecraftServerClass, craftWorldClass, playerInteractManagerClass, entityPlayerClass, playerConnectionClass, craftServerClass,
             craftPlayerClass, serverConnectionClass, craftEntityClass,
             craftItemStack, nmsItemStackClass, networkManagerClass, nettyChannelClass, gameProfileClass, iChatBaseComponentClass,
-            blockPosClass, enumDirectionClass;
+            blockPosClass, enumDirectionClass, vec3DClass;
     private static Method craftWorldGetHandle;
     private static Method getCraftPlayerHandle;
     private static Method getCraftEntityHandle;
@@ -89,6 +89,7 @@ public final class NMSUtils {
                 gameProfileClass = Class.forName("net.minecraft.util.com.mojang.authlib.GameProfile");
             }
             iChatBaseComponentClass = NMSUtils.getNMSClass("IChatBaseComponent");
+            vec3DClass = NMSUtils.getNMSClass("Vec3D");
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
         }
