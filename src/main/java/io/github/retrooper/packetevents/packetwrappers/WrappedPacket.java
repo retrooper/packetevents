@@ -204,18 +204,11 @@ public class WrappedPacket implements WrapperPacketReader, WrapperPacketWriter {
 
     @Override
     public String[] readStringArray(int index) {
-        Field field = getField(String[].class, 0);
-        try {
-            Object[] array = (Object[]) field.get(packet);
-            int len = array.length;
-            String[] stringArray = new String[len];
-            for (int i = 0; i < len; i++) {
-                stringArray[i] = array[i].toString();
-            }
-            return stringArray;
-        } catch (IllegalAccessException | NullPointerException e) {
-            throw new WrapperFieldNotFoundException(packetClass, String[].class, index);
-        }
+        String[] array = read(index, String[].class);
+        int length = array.length;
+        String[] copy = new String[length];
+        System.arraycopy(array, 0, copy, 0, length);
+        return copy;
     }
 
     @Override
@@ -255,116 +248,56 @@ public class WrappedPacket implements WrapperPacketReader, WrapperPacketWriter {
 
     @Override
     public void writeBoolean(int index, boolean value) {
-        Field field = getField(boolean.class, index);
-        if (field == null) {
-            throw new WrapperFieldNotFoundException(packetClass, boolean.class, index);
-        }
-        try {
-            field.setBoolean(packet, value);
-        } catch (IllegalAccessException | NullPointerException e) {
-            e.printStackTrace();
-        }
+        write(boolean.class, index, value);
     }
 
     @Override
     public void writeByte(int index, byte value) {
-        Field field = getField(byte.class, index);
-        if (field == null) {
-            throw new WrapperFieldNotFoundException(packetClass, byte.class, index);
-        }
-        try {
-            field.setByte(packet, value);
-        } catch (IllegalAccessException | NullPointerException e) {
-            e.printStackTrace();
-        }
+        write(byte.class, index, value);
     }
 
     @Override
     public void writeShort(int index, short value) {
-        Field field = getField(short.class, index);
-        if (field == null) {
-            throw new WrapperFieldNotFoundException(packetClass, short.class, index);
-        }
-        try {
-            field.setShort(packet, value);
-        } catch (IllegalAccessException | NullPointerException e) {
-            e.printStackTrace();
-        }
+        write(short.class, index, value);
     }
 
     @Override
     public void writeInt(int index, int value) {
-        Field field = getField(int.class, index);
-        if (field == null) {
-            throw new WrapperFieldNotFoundException(packetClass, int.class, index);
-        }
-        try {
-            field.setInt(packet, value);
-        } catch (IllegalAccessException | NullPointerException e) {
-            e.printStackTrace();
-        }
+        write(int.class, index, value);
     }
 
     @Override
     public void writeLong(int index, long value) {
-        Field field = getField(long.class, index);
-        if (field == null) {
-            throw new WrapperFieldNotFoundException(packetClass, long.class, index);
-        }
-        try {
-            field.setLong(packet, value);
-        } catch (IllegalAccessException | NullPointerException e) {
-            e.printStackTrace();
-        }
+        write(long.class, index, value);
     }
 
     @Override
     public void writeFloat(int index, float value) {
-        Field field = getField(float.class, index);
-        if (field == null) {
-            throw new WrapperFieldNotFoundException(packetClass, float.class, index);
-        }
-        try {
-            field.setFloat(packet, value);
-        } catch (IllegalAccessException | NullPointerException e) {
-            e.printStackTrace();
-        }
+        write(float.class, index, value);
     }
 
     @Override
     public void writeDouble(int index, double value) {
-        Field field = getField(double.class, index);
-        if (field == null) {
-            throw new WrapperFieldNotFoundException(packetClass, double.class, index);
-        }
-        try {
-            field.setDouble(packet, value);
-        } catch (IllegalAccessException | NullPointerException e) {
-            e.printStackTrace();
-        }
+        write(double.class, index, value);
     }
 
     @Override
     public void writeString(int index, String value) {
-        Field field = getField(String.class, index);
-        if (field == null) {
-            throw new WrapperFieldNotFoundException(packetClass, String.class, index);
-        }
-        try {
-            field.set(packet, value);
-        } catch (IllegalAccessException | NullPointerException e) {
-            e.printStackTrace();
-        }
+        write(String.class, index, value);
     }
 
     @Override
-    public void writeObject(int index, Object object) {
-        Field field = getField(object.getClass(), index);
+    public void writeObject(int index, Object value) {
+        write(value.getClass(), index, value);
+    }
+
+    private void write(Class<?> type, int index, Object value) throws WrapperFieldNotFoundException {
+        Field field = getField(type, index);
         if (field == null) {
-            throw new WrapperFieldNotFoundException(packetClass, object.getClass(), index);
+            throw new WrapperFieldNotFoundException(packetClass, type, index);
         }
         try {
-            field.set(packet, object);
+            field.set(packet, value);
         } catch (IllegalAccessException | NullPointerException e) {
             e.printStackTrace();
         }
