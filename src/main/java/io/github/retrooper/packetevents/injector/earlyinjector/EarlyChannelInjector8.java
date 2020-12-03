@@ -137,13 +137,13 @@ public class EarlyChannelInjector8 implements ChannelInjector {
 
     @Override
     public void injectPlayerSync(Player player) {
-        Channel channel = (Channel) PacketEvents.get().packetManager.getChannel(player.getName());
+        Channel channel = (Channel) PacketEvents.get().packetHandlerInternal.getChannel(player.getName());
         injectChannel(channel).player = player;
     }
 
     @Override
     public void ejectPlayerSync(Player player) {
-        Channel channel = (Channel) PacketEvents.get().packetManager.getChannel(player.getName());
+        Channel channel = (Channel) PacketEvents.get().packetHandlerInternal.getChannel(player.getName());
         ejectChannel(channel);
     }
 
@@ -152,7 +152,7 @@ public class EarlyChannelInjector8 implements ChannelInjector {
         PacketEvents.get().packetHandlingExecutorService.execute(new Runnable() {
             @Override
             public void run() {
-                Channel channel = (Channel) PacketEvents.get().packetManager.getChannel(player.getName());
+                Channel channel = (Channel) PacketEvents.get().packetHandlerInternal.getChannel(player.getName());
                 injectChannel(channel).player = player;
             }
         });
@@ -163,7 +163,7 @@ public class EarlyChannelInjector8 implements ChannelInjector {
         PacketEvents.get().packetHandlingExecutorService.execute(new Runnable() {
             @Override
             public void run() {
-                Channel channel = (Channel) PacketEvents.get().packetManager.getChannel(player.getName());
+                Channel channel = (Channel) PacketEvents.get().packetHandlerInternal.getChannel(player.getName());
                 ejectChannel(channel);
             }
         });
@@ -180,19 +180,19 @@ public class EarlyChannelInjector8 implements ChannelInjector {
 
         @Override
         public void channelRead(final ChannelHandlerContext ctx, Object packet) throws Exception {
-            packet = PacketEvents.get().packetManager.read(player, ctx.channel(), packet);
+            packet = PacketEvents.get().packetHandlerInternal.read(player, ctx.channel(), packet);
             if (packet != null) {
                 super.channelRead(ctx, packet);
-                PacketEvents.get().packetManager.postRead(player, packet);
+                PacketEvents.get().packetHandlerInternal.postRead(player, packet);
             }
         }
 
         @Override
         public void write(final ChannelHandlerContext ctx, Object packet, final ChannelPromise promise) throws Exception {
-            packet = PacketEvents.get().packetManager.write(player, ctx.channel(), packet);
+            packet = PacketEvents.get().packetHandlerInternal.write(player, ctx.channel(), packet);
             if (packet != null) {
                 super.write(ctx, packet, promise);
-                PacketEvents.get().packetManager.postWrite(player, packet);
+                PacketEvents.get().packetHandlerInternal.postWrite(player, packet);
             }
         }
     }

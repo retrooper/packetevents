@@ -22,7 +22,7 @@
  * SOFTWARE.
  */
 
-package io.github.retrooper.packetevents.packetmanager;
+package io.github.retrooper.packetevents.handler;
 
 import io.github.retrooper.packetevents.PacketEvents;
 import io.github.retrooper.packetevents.event.impl.*;
@@ -46,7 +46,7 @@ import java.util.Objects;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
-public class PacketManager {
+public class PacketHandlerInternal {
     public final EarlyChannelInjector earlyInjector;
     public final LateChannelInjector lateInjector;
     private final Plugin plugin;
@@ -55,7 +55,7 @@ public class PacketManager {
     private final Map<String, Object> channelMap = new ConcurrentHashMap<>();
     private final Map<Object, Boolean> firstPacketCache;
 
-    public PacketManager(Plugin plugin, boolean earlyInjectMode) {
+    public PacketHandlerInternal(Plugin plugin, boolean earlyInjectMode) {
         this.plugin = plugin;
         this.earlyInjectMode = earlyInjectMode;
         if (earlyInjectMode) {

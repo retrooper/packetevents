@@ -39,7 +39,6 @@ public final class WrappedPacketInClientCommand extends WrappedPacket {
 
     public static void load() {
         Class<?> packetClass = PacketTypeClasses.Client.CLIENT_COMMAND;
-
         try {
             enumClientCommandClass = NMSUtils.getNMSClass("EnumClientCommand");
         } catch (ClassNotFoundException e) {
@@ -63,6 +62,8 @@ public final class WrappedPacketInClientCommand extends WrappedPacket {
     public enum ClientCommand {
         PERFORM_RESPAWN,
         REQUEST_STATS,
+
+        //This field doesn't exist on 1.16
         OPEN_INVENTORY_ACHIEVEMENT
     }
 

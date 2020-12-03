@@ -24,7 +24,6 @@
 
 package io.github.retrooper.packetevents.packetwrappers.play.out.chat;
 
-import io.github.retrooper.packetevents.annotations.Beta;
 import io.github.retrooper.packetevents.packettype.PacketTypeClasses;
 import io.github.retrooper.packetevents.packetwrappers.SendableWrapper;
 import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
@@ -38,10 +37,6 @@ import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.UUID;
 
-/**
- * This wrapper MIGHT not be stable
- */
-@Beta
 public final class WrappedPacketOutChat extends WrappedPacket implements SendableWrapper {
     private static final HashMap<ChatPosition, Byte> cachedChatPositions = new HashMap<>();
     private static final HashMap<Byte, ChatPosition> cachedChatPositionIntegers = new HashMap<>();

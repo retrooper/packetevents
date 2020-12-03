@@ -25,13 +25,9 @@
 package io.github.retrooper.packetevents.example;
 
 import io.github.retrooper.packetevents.PacketEvents;
-import io.github.retrooper.packetevents.event.PacketListenerDynamic;
-import io.github.retrooper.packetevents.event.impl.PacketReceiveEvent;
-import io.github.retrooper.packetevents.packettype.PacketType;
 import org.bukkit.plugin.java.JavaPlugin;
 
 public class MainExample extends JavaPlugin {
-
     @Override
     public void onLoad() {
         PacketEvents.create().load();
@@ -41,15 +37,6 @@ public class MainExample extends JavaPlugin {
     public void onEnable() {
         //We use default settings
         PacketEvents.get().init(this);
-
-        PacketEvents.get().getEventManager().registerListener(new PacketListenerDynamic((byte) 0) {
-            @Override
-            public void onPacketReceive(PacketReceiveEvent event) {
-                if (event.getPacketId() == PacketType.Client.USE_ENTITY) {
-                    event.getPlayer().sendMessage("yo");
-                }
-            }
-        });
     }
 
     @Override

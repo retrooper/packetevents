@@ -24,7 +24,6 @@
 
 package io.github.retrooper.packetevents.packetwrappers.play.in.abilities;
 
-import io.github.retrooper.packetevents.annotations.NotNull;
 import io.github.retrooper.packetevents.annotations.Nullable;
 import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
 
@@ -45,7 +44,6 @@ public final class WrappedPacketInAbilities extends WrappedPacket {
         return readBoolean(0);
     }
 
-    @NotNull
     public boolean isFlying() {
         return readBoolean(1);
     }

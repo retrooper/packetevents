@@ -45,31 +45,31 @@ class LateChannelInjector7 implements ChannelInjector {
         final ChannelDuplexHandler channelDuplexHandler = new ChannelDuplexHandler() {
             @Override
             public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
-                Object packet = PacketEvents.get().packetManager.read(player, ctx.channel(), msg);
+                Object packet = PacketEvents.get().packetHandlerInternal.read(player, ctx.channel(), msg);
                 if (packet == null) {
                     return;
                 }
                 super.channelRead(ctx, msg);
-                PacketEvents.get().packetManager.postRead(player, packet);
+                PacketEvents.get().packetHandlerInternal.postRead(player, packet);
             }
 
             @Override
             public void write(ChannelHandlerContext ctx, Object msg, ChannelPromise promise) throws Exception {
-                Object packet = PacketEvents.get().packetManager.write(player, ctx.channel(), msg);
+                Object packet = PacketEvents.get().packetHandlerInternal.write(player, ctx.channel(), msg);
                 if (packet == null) {
                     return;
                 }
                 super.write(ctx, msg, promise);
-                PacketEvents.get().packetManager.postWrite(player, packet);
+                PacketEvents.get().packetHandlerInternal.postWrite(player, packet);
             }
         };
-        final Channel channel = (Channel) PacketEvents.get().packetManager.getChannel(player.getName());
+        final Channel channel = (Channel) PacketEvents.get().packetHandlerInternal.getChannel(player.getName());
         channel.pipeline().addBefore("packet_handler", getNettyHandlerName(plugin), channelDuplexHandler);
     }
 
     @Override
     public void ejectPlayerSync(Player player) {
-        final Channel channel = (Channel) PacketEvents.get().packetManager.getChannel(player.getName());
+        final Channel channel = (Channel) PacketEvents.get().packetHandlerInternal.getChannel(player.getName());
         channel.pipeline().remove(getNettyHandlerName(plugin));
     }
 
@@ -88,7 +88,7 @@ class LateChannelInjector7 implements ChannelInjector {
         PacketEvents.get().packetHandlingExecutorService.execute(new Runnable() {
             @Override
             public void run() {
-                final Channel channel = (Channel) PacketEvents.get().packetManager.getChannel(player.getName());
+                final Channel channel = (Channel) PacketEvents.get().packetHandlerInternal.getChannel(player.getName());
                 channel.pipeline().remove(getNettyHandlerName(plugin));
             }
         });
