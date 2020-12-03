@@ -70,7 +70,7 @@ public final class PacketEvents implements Listener, EventManager {
     public ExecutorService generalExecutorService = Executors.newSingleThreadExecutor();
     //Executor used for player injecting/ejecting and for packet processing/event calling
     public ExecutorService packetHandlingExecutorService = Executors.newSingleThreadExecutor();
-    public PacketHandlerInternal packetHandlerInternal = null;
+    public PacketHandlerInternal packetHandlerInternal;
     private boolean loading, loaded, initialized, initializing, stopping;
     private PacketEventsSettings settings = new PacketEventsSettings();
 
@@ -169,8 +169,9 @@ public final class PacketEvents implements Listener, EventManager {
             plugins.add(pl);
 
             //Register Bukkit listener
-            Bukkit.getPluginManager().registerEvents(this, plugins.get(0));
-            packetHandlerInternal = new PacketHandlerInternal(plugins.get(0), settings.shouldInjectEarly());
+            final Plugin plugin = plugins.get(0);
+            Bukkit.getPluginManager().registerEvents(this, plugin);
+            packetHandlerInternal = new PacketHandlerInternal(plugin, settings.shouldInjectEarly());
 
             for (final Player p : Bukkit.getOnlinePlayers()) {
                 try {
