@@ -134,72 +134,37 @@ public class WrappedPacket implements WrapperPacketReader, WrapperPacketWriter {
 
     @Override
     public boolean readBoolean(int index) {
-        Field field = getField(boolean.class, index);
-        try {
-            return field.getBoolean(packet);
-        } catch (IllegalAccessException | NullPointerException e) {
-            throw new WrapperFieldNotFoundException(packetClass, boolean.class, index);
-        }
+        return read(index, boolean.class);
     }
 
     @Override
     public byte readByte(int index) {
-        Field field = getField(byte.class, index);
-        try {
-            return field.getByte(packet);
-        } catch (IllegalAccessException | NullPointerException e) {
-            throw new WrapperFieldNotFoundException(packetClass, byte.class, index);
-        }
+        return read(index, byte.class);
     }
 
     @Override
     public short readShort(int index) {
-        Field field = getField(short.class, index);
-        try {
-            return field.getShort(packet);
-        } catch (IllegalAccessException | NullPointerException e) {
-            throw new WrapperFieldNotFoundException(packetClass, boolean.class, index);
-        }
+        return read(index, short.class);
     }
 
     @Override
     public int readInt(int index) {
-        Field field = getField(int.class, index);
-        try {
-            return field.getInt(packet);
-        } catch (IllegalAccessException | NullPointerException e) {
-            throw new WrapperFieldNotFoundException(packetClass, int.class, index);
-        }
+        return read(index, int.class);
     }
 
     @Override
     public long readLong(int index) {
-        Field field = getField(long.class, index);
-        try {
-            return field.getLong(packet);
-        } catch (IllegalAccessException | NullPointerException e) {
-            throw new WrapperFieldNotFoundException(packetClass, long.class, index);
-        }
+        return read(index, long.class);
     }
 
     @Override
     public float readFloat(int index) {
-        Field field = getField(float.class, index);
-        try {
-            return field.getFloat(packet);
-        } catch (IllegalAccessException | NullPointerException e) {
-            throw new WrapperFieldNotFoundException(packetClass, float.class, index);
-        }
+       return read(index, float.class);
     }
 
     @Override
     public double readDouble(int index) {
-        Field field = getField(double.class, index);
-        try {
-            return field.getDouble(packet);
-        } catch (IllegalAccessException | NullPointerException e) {
-            throw new WrapperFieldNotFoundException(packetClass, double.class, index);
-        }
+       return read(index, double.class);
     }
 
     @Override
@@ -276,15 +241,10 @@ public class WrappedPacket implements WrapperPacketReader, WrapperPacketWriter {
     }
 
     public Object readObject(int index, Class<?> type) {
-        Field field = getField(type, index);
-        try {
-            return field.get(packet);
-        } catch (IllegalAccessException | NullPointerException e) {
-            throw new WrapperFieldNotFoundException(packetClass, type, index);
-        }
+        return read(index, type);
     }
 
-    private <T> T read(int index, Class<? extends T> type) {
+    public <T> T read(int index, Class<? extends T> type) {
         Field field = getField(type, index);
         try {
             return (T) field.get(packet);
