@@ -112,8 +112,8 @@ public final class Reflection {
                 return m;
             }
         }
-        if (cls.getSuperclass() != null) {
-            return getMethod(cls, returning, index, params);
+        if (cls.getSuperclass() != null && !cls.getSuperclass().equals(Object.class)) {
+            return getMethod(cls.getSuperclass(), returning, index, params);
         }
         return null;
     }

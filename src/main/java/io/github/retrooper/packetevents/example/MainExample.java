@@ -25,12 +25,6 @@
 package io.github.retrooper.packetevents.example;
 
 import io.github.retrooper.packetevents.PacketEvents;
-import io.github.retrooper.packetevents.event.PacketListenerDynamic;
-import io.github.retrooper.packetevents.event.impl.PacketReceiveEvent;
-import io.github.retrooper.packetevents.event.priority.PacketEventPriority;
-import io.github.retrooper.packetevents.packettype.PacketType;
-import io.github.retrooper.packetevents.packetwrappers.play.in.chat.WrappedPacketInChat;
-import io.github.retrooper.packetevents.utils.player.ClientVersion;
 import org.bukkit.plugin.java.JavaPlugin;
 
 public class MainExample extends JavaPlugin {
