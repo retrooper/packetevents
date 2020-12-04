@@ -38,6 +38,7 @@ public class CommandManager implements CommandExecutor {
     }
 
     public void register(Class<?> clazz) {
+
         for (Method method : clazz.getDeclaredMethods()) {
             method.setAccessible(true);
             if (method.isAnnotationPresent(Command.class)
