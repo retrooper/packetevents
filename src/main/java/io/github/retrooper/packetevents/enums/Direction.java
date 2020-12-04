@@ -73,9 +73,9 @@ public enum Direction {
         return value;
     }
 
-    public static Direction getDirection(byte val) {
+    public static Direction fromId(byte value) {
         for (Direction direction : values()) {
-            if (direction.value == val) {
+            if (direction.value == value) {
                 return direction;
             }
         }

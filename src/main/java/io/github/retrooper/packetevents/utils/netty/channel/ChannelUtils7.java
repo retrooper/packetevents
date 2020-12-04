@@ -27,7 +27,6 @@ package io.github.retrooper.packetevents.utils.netty.channel;
 import net.minecraft.util.io.netty.channel.Channel;
 
 import java.net.InetSocketAddress;
-import java.net.SocketAddress;
 
 public class ChannelUtils7 {
     public static InetSocketAddress getSocketAddress(Object ch) {

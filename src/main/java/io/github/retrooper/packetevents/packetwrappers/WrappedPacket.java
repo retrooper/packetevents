@@ -60,7 +60,10 @@ import io.github.retrooper.packetevents.utils.reflection.ClassUtil;
 import io.github.retrooper.packetevents.utils.server.ServerVersion;
 
 import java.lang.reflect.Field;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class WrappedPacket implements WrapperPacketReader, WrapperPacketWriter {
     private static final Map<Class<?>, Map<Class<?>, Field[]>> FIELD_CACHE = new HashMap<>();

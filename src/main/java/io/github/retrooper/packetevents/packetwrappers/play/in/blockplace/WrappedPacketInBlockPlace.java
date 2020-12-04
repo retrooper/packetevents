@@ -49,10 +49,10 @@ public final class WrappedPacketInBlockPlace extends WrappedPacket {
             return Direction.valueOf(((Enum) blockPlace_1_9.getEnumDirectionObject()).name());
         } else if (isHigherThan_v_1_7_10) {
             WrappedPacketInBlockPlace_1_8 blockPlace_1_8 = new WrappedPacketInBlockPlace_1_8(packet);
-            return Direction.getDirection((byte) blockPlace_1_8.getFace());
+            return Direction.fromId((byte) blockPlace_1_8.getFace());
         } else {
             WrappedPacketInBlockPlace_1_7_10 blockPlace_1_7_10 = new WrappedPacketInBlockPlace_1_7_10(packet);
-            return Direction.getDirection((byte) blockPlace_1_7_10.face);
+            return Direction.fromId((byte) blockPlace_1_7_10.face);
         }
     }
 
