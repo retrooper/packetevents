@@ -67,7 +67,7 @@ public class ProtocolLibInternalListener {
                 Player player = event.getPlayer();
                 InetSocketAddress address = player.getAddress();
                 Object nmsPacket = event.getPacket().getHandle();
-                event.setReadOnly(true);
+                event.setReadOnly(false);
                 io.github.retrooper.packetevents.event.PacketEvent peEvent = null;
                 if (event.getPacketType().getProtocol().equals(PacketType.Protocol.PLAY)) {
                     peEvent = new PacketReceiveEvent(player, nmsPacket);
@@ -89,7 +89,7 @@ public class ProtocolLibInternalListener {
                 Player player = event.getPlayer();
                 InetSocketAddress address = player.getAddress();
                 Object nmsPacket = event.getPacket().getHandle();
-                event.setReadOnly(true);
+                event.setReadOnly(false);
                 io.github.retrooper.packetevents.event.PacketEvent peEvent = null;
                 if (event.getPacketType().getProtocol().equals(PacketType.Protocol.PLAY)) {
                     peEvent = new PacketSendEvent(player, nmsPacket);
