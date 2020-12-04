@@ -35,10 +35,7 @@ public interface NMSPacketEvent {
     /**
      * This method returns the name of the packet.
      * To get the name of the packet we get the class of the packet and then the name of the class.
-     * We use this method to get the class name.
-     *
-     * @see Class#getSimpleName()
-     *
+     * See also: {@link Class#getSimpleName()}
      * We cache the name after the first call to improve performance.
      * Java 8 does not cache the name.
      * It is not recommended to call this method unless you NEED it.
