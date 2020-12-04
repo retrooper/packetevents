@@ -26,15 +26,21 @@ package io.github.retrooper.packetevents.event.eventtypes;
 
 import io.github.retrooper.packetevents.packettype.PacketType;
 
+/**
+ * The {@code NMSPacketEvent} interface represents an event that has to do with an actual packet.
+ * Don't mix this up with {@link io.github.retrooper.packetevents.event.PacketEvent}.
+ * The PacketEvent class represents an event that belongs to PacketEvent's packet system.
+ */
 public interface NMSPacketEvent {
     /**
      * This method returns the name of the packet.
      * To get the name of the packet we get the class of the packet and then the name of the class.
-     * We use java's simple name method.
+     * We use this method to get the class name.
      *
      * @see Class#getSimpleName()
      *
-     * We cache the simple name after the first call to improve performance.
+     * We cache the name after the first call to improve performance.
+     * Java 8 does not cache the name.
      * It is not recommended to call this method unless you NEED it.
      * If you are comparing packet types, use the {@link PacketType} byte system.
      * You would only need the packet name if packet type system doesn't contain your desired packet yet.
