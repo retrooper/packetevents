@@ -50,8 +50,7 @@ public final class WrappedPacketInUseEntity extends WrappedPacket {
         try {
             enumHandClass = NMSUtils.getNMSClass("EnumHand");
         } catch (ClassNotFoundException e) {
-            enumHandClass = SubclassUtil.getSubClass(Objects.requireNonNull(useEntityClass), "EnumHand");
-            e.printStackTrace();
+            //Probably a 1.7.10 or 1.8.x server
         }
         try {
             enumEntityUseActionClass = NMSUtils.getNMSClass("EnumEntityUseAction");
