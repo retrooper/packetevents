@@ -25,7 +25,7 @@
 package io.github.retrooper.packetevents.packetwrappers.login.in.custompayload;
 
 import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
-import io.github.retrooper.packetevents.utils.bytebuf.ByteBufUtil;
+import io.github.retrooper.packetevents.utils.netty.bytebuf.ByteBufUtil;
 import io.github.retrooper.packetevents.utils.nms.NMSUtils;
 
 /**

@@ -22,25 +22,16 @@
  * SOFTWARE.
  */
 
-package io.github.retrooper.packetevents.example;
+package io.github.retrooper.packetevents.utils.netty.channel;
 
-import io.github.retrooper.packetevents.PacketEvents;
-import org.bukkit.plugin.java.JavaPlugin;
+import net.minecraft.util.io.netty.channel.Channel;
 
-public class MainExample extends JavaPlugin {
-    @Override
-    public void onLoad() {
-        PacketEvents.create().load();
-    }
+import java.net.InetSocketAddress;
+import java.net.SocketAddress;
 
-    @Override
-    public void onEnable() {
-        //We use default settings
-        PacketEvents.get().init(this);
-    }
-
-    @Override
-    public void onDisable() {
-        PacketEvents.get().stop();
+public class ChannelUtils7 {
+    public static InetSocketAddress getSocketAddress(Object ch) {
+        Channel channel = (Channel)ch;
+        return ((InetSocketAddress)channel.remoteAddress());
     }
 }

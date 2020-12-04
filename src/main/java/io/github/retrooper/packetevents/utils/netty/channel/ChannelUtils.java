@@ -22,25 +22,21 @@
  * SOFTWARE.
  */
 
-package io.github.retrooper.packetevents.utils.bytebuf;
+package io.github.retrooper.packetevents.utils.netty.channel;
 
-import io.netty.buffer.ByteBuf;
-import io.netty.buffer.Unpooled;
+import io.github.retrooper.packetevents.PacketEvents;
+import io.github.retrooper.packetevents.utils.nms.NMSUtils;
+import io.github.retrooper.packetevents.utils.server.ServerVersion;
 
-class ByteBufUtil_8 {
-    public static Object copiedBuffer(byte[] bytes) {
-        return Unpooled.copiedBuffer(bytes);
-    }
+import java.net.InetSocketAddress;
 
-    public static byte[] getBytes(Object byteBuf) {
-        ByteBuf bb = (ByteBuf) byteBuf;
-        byte[] bytes;
-        if (bb.hasArray()) {
-            bytes = bb.array();
-        } else {
-            bytes = new byte[bb.readableBytes()];
-            bb.getBytes(bb.readerIndex(), bytes);
+public class ChannelUtils {
+    public static InetSocketAddress getSocketAddress(Object ch) {
+        if(PacketEvents.get().getServerUtils().getVersion() == ServerVersion.v_1_7_10) {
+            return ChannelUtils7.getSocketAddress(ch);
         }
-        return bytes;
+        else {
+            return ChannelUtils8.getSocketAddress(ch);
+        }
     }
 }

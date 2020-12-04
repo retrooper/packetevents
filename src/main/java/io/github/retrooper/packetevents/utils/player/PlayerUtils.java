@@ -30,6 +30,7 @@ import io.github.retrooper.packetevents.packetwrappers.SendableWrapper;
 import io.github.retrooper.packetevents.utils.nms.NMSUtils;
 import org.bukkit.entity.Player;
 
+import java.net.InetSocketAddress;
 import java.util.HashMap;
 import java.util.UUID;
 
@@ -40,7 +41,7 @@ public final class PlayerUtils {
     /**
      * This map stores each player's client version.
      */
-    public final HashMap<Object, ClientVersion> clientVersionsMap = new HashMap<>();
+    public final HashMap<InetSocketAddress, ClientVersion> clientVersionsMap = new HashMap<>();
 
     /**
      * Use reflection to read the ping value NMS calculates for the player.
@@ -82,7 +83,7 @@ public final class PlayerUtils {
      * @return Get Client Version
      */
     public ClientVersion getClientVersion(final Player player) {
-        return clientVersionsMap.get(NMSUtils.getChannel(player));
+        return clientVersionsMap.get(player.getAddress());
     }
 
     /**

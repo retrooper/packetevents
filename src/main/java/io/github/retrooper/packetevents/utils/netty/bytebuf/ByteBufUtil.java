@@ -22,7 +22,7 @@
  * SOFTWARE.
  */
 
-package io.github.retrooper.packetevents.utils.bytebuf;
+package io.github.retrooper.packetevents.utils.netty.bytebuf;
 
 import io.github.retrooper.packetevents.injector.lateinjector.LateChannelInjector;
 

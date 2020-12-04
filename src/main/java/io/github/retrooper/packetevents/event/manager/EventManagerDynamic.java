@@ -24,10 +24,13 @@
 
 package io.github.retrooper.packetevents.event.manager;
 
+import io.github.retrooper.packetevents.PacketEvents;
 import io.github.retrooper.packetevents.event.PacketEvent;
 import io.github.retrooper.packetevents.event.PacketListenerDynamic;
 import io.github.retrooper.packetevents.event.eventtypes.CancellableEvent;
 import io.github.retrooper.packetevents.event.priority.PacketEventPriority;
+import io.github.retrooper.packetevents.handler.ProtocolLibInternalListener;
+import io.github.retrooper.packetevents.utils.versionlookup.protocollib.ProtocolLibVersionLookupUtils;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -70,12 +73,17 @@ class EventManagerDynamic {
     }
 
     public void registerListener(PacketListenerDynamic listener) {
-        List<PacketListenerDynamic> listeners = map.get(listener.getPriority());
-        if (listeners == null) {
-            map.put(listener.getPriority(), new ArrayList<>());
-            listeners = map.get(listener.getPriority());
+        if (PacketEvents.get().getSettings().shouldUseProtocolLibIfAvailable()
+                && ProtocolLibVersionLookupUtils.isAvailable()) {
+            ProtocolLibInternalListener.registerInternalListener(listener);
+        } else {
+            List<PacketListenerDynamic> listeners = map.get(listener.getPriority());
+            if (listeners == null) {
+                map.put(listener.getPriority(), new ArrayList<>());
+                listeners = map.get(listener.getPriority());
+            }
+            listeners.add(listener);
         }
-        listeners.add(listener);
     }
 
     public void registerListeners(PacketListenerDynamic... listeners) {
@@ -85,11 +93,16 @@ class EventManagerDynamic {
     }
 
     public void unregisterListener(PacketListenerDynamic listener) {
-        List<PacketListenerDynamic> listeners = map.get(listener.getPriority());
-        if (listeners == null) {
-            return;
+        if (PacketEvents.get().getSettings().shouldUseProtocolLibIfAvailable()
+                && ProtocolLibVersionLookupUtils.isAvailable()) {
+            ProtocolLibInternalListener.unregisterInternalListener(listener);
+        } else {
+            List<PacketListenerDynamic> listeners = map.get(listener.getPriority());
+            if (listeners == null) {
+                return;
+            }
+            listeners.remove(listener);
         }
-        listeners.remove(listener);
     }
 
     public void unregisterListeners(PacketListenerDynamic... listeners) {
@@ -100,5 +113,9 @@ class EventManagerDynamic {
 
     public void unregisterAllListeners() {
         map.clear();
+        if(PacketEvents.get().getSettings().shouldUseProtocolLibIfAvailable()
+                && ProtocolLibVersionLookupUtils.isAvailable()) {
+            ProtocolLibInternalListener.unregisterAllListeners();
+        }
     }
 }

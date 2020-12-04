@@ -279,11 +279,11 @@ public class PacketHandlerInternal {
         if (event.getPacketId() == PacketType.Login.Client.HANDSHAKE
                 && PacketEvents.get().getServerUtils().getVersion() != ServerVersion.v_1_7_10
                 && !PacketEvents.get().getServerUtils().isBungeeCordEnabled() &&
-                !PacketEvents.get().getPlayerUtils().clientVersionsMap.containsKey(event.getChannel())) {
+                !PacketEvents.get().getPlayerUtils().clientVersionsMap.containsKey(event.getSocketAddress())) {
             WrappedPacketLoginInHandshake handshake = new WrappedPacketLoginInHandshake(event.getNMSPacket());
             int protocolVersion = handshake.getProtocolVersion();
             ClientVersion version = ClientVersion.getClientVersion(protocolVersion);
-            PacketEvents.get().getPlayerUtils().clientVersionsMap.put(event.getChannel(), version);
+            PacketEvents.get().getPlayerUtils().clientVersionsMap.put(event.getSocketAddress(), version);
         }
     }
 

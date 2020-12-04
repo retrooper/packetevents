@@ -33,11 +33,13 @@ public class PacketEventsSettings {
     private boolean ejectAsync = true;
     private boolean checkForUpdates = true;
     private boolean injectEarly = true;
+    private boolean useProtocolIfAvailable = true;
     private int packetHandlingThreadCount = 1;
     private String injectionFailureMessage = "We were unable to inject you. Please try again!";
 
-    public void lock() {
+    public PacketEventsSettings lock() {
         this.locked = true;
+        return this;
     }
 
     public PacketEventsSettings backupServerVersion(ServerVersion serverVersion) {
@@ -91,6 +93,13 @@ public class PacketEventsSettings {
         return this;
     }
 
+    public PacketEventsSettings useProtocolLibIfAvailable(boolean value) {
+        if (!locked) {
+            this.useProtocolIfAvailable = value;
+        }
+        return this;
+    }
+
     public ServerVersion getBackupServerVersion() {
         return backupServerVersion;
     }
@@ -117,5 +126,9 @@ public class PacketEventsSettings {
 
     public String getInjectionFailureMessage() {
         return injectionFailureMessage;
+    }
+
+    public boolean shouldUseProtocolLibIfAvailable() {
+        return useProtocolIfAvailable;
     }
 }

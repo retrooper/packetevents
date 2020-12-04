@@ -70,7 +70,7 @@ public final class PacketEvents implements Listener, EventManager {
     public ExecutorService generalExecutorService = Executors.newSingleThreadExecutor();
     //Executor used for player injecting/ejecting and for packet processing/event calling
     public ExecutorService packetHandlingExecutorService = Executors.newSingleThreadExecutor();
-    public PacketHandlerInternal packetHandlerInternal;
+    public PacketHandlerInternal packetHandlerInternal = null;
     private boolean loading, loaded, initialized, initializing, stopping;
     private PacketEventsSettings settings = new PacketEventsSettings();
 
@@ -173,11 +173,13 @@ public final class PacketEvents implements Listener, EventManager {
             Bukkit.getPluginManager().registerEvents(this, plugin);
             packetHandlerInternal = new PacketHandlerInternal(plugin, settings.shouldInjectEarly());
 
-            for (final Player p : Bukkit.getOnlinePlayers()) {
-                try {
-                    getPlayerUtils().injectPlayer(p);
-                } catch (Exception ex) {
-                    p.kickPlayer(getSettings().getInjectionFailureMessage());
+            if (!settings.shouldUseProtocolLibIfAvailable()) {
+                for (final Player p : Bukkit.getOnlinePlayers()) {
+                    try {
+                        getPlayerUtils().injectPlayer(p);
+                    } catch (Exception ex) {
+                        p.kickPlayer(getSettings().getInjectionFailureMessage());
+                    }
                 }
             }
 
@@ -201,10 +203,11 @@ public final class PacketEvents implements Listener, EventManager {
     public void stop() {
         if (initialized && !stopping) {
             stopping = true;
-            for (Player player : Bukkit.getOnlinePlayers()) {
-                packetHandlerInternal.ejectPlayer(player);
+            if (!PacketEvents.get().getSettings().shouldUseProtocolLibIfAvailable()) {
+                for (Player player : Bukkit.getOnlinePlayers()) {
+                    packetHandlerInternal.ejectPlayer(player);
+                }
             }
-
             packetHandlerInternal.close();
 
             getEventManager().unregisterAllListeners();
@@ -267,7 +270,7 @@ public final class PacketEvents implements Listener, EventManager {
 
     @EventHandler(priority = EventPriority.LOW)
     public void onLogin(PlayerLoginEvent e) {
-        if (getSettings().shouldInjectEarly()) {
+        if (getSettings().shouldInjectEarly() && !getSettings().shouldUseProtocolLibIfAvailable()) {
             try {
                 packetHandlerInternal.injectPlayer(e.getPlayer());
             } catch (Exception ex) {
@@ -278,17 +281,16 @@ public final class PacketEvents implements Listener, EventManager {
 
     @EventHandler(priority = EventPriority.HIGH)
     public void onJoin(final PlayerJoinEvent e) {
-        Object channel = NMSUtils.getChannel(e.getPlayer());
         if (getServerUtils().getVersion() == ServerVersion.v_1_7_10) {
             ClientVersion version = ClientVersion.getClientVersion(ProtocolVersionAccessor_v_1_7.getProtocolVersion(e.getPlayer()));
-            getPlayerUtils().clientVersionsMap.put(channel, version);
+            getPlayerUtils().clientVersionsMap.put(e.getPlayer().getAddress(), version);
         } else if (VersionLookupUtils.isDependencyAvailable()) {
             int protocolVersion = VersionLookupUtils.getProtocolVersion(e.getPlayer());
             ClientVersion version = ClientVersion.getClientVersion(protocolVersion);
-            getPlayerUtils().clientVersionsMap.put(channel, version);
+            getPlayerUtils().clientVersionsMap.put(e.getPlayer().getAddress(), version);
         }
 
-        if (!getSettings().shouldInjectEarly()) {
+        if (!getSettings().shouldInjectEarly() && !getSettings().shouldUseProtocolLibIfAvailable()) {
             try {
                 packetHandlerInternal.injectPlayer(e.getPlayer());
             } catch (Exception ex) {
@@ -301,8 +303,7 @@ public final class PacketEvents implements Listener, EventManager {
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onQuit(final PlayerQuitEvent e) {
         UUID uuid = e.getPlayer().getUniqueId();
-        Object channel = packetHandlerInternal.getChannel(e.getPlayer().getName());
-        getPlayerUtils().clientVersionsMap.remove(channel);
+        getPlayerUtils().clientVersionsMap.remove(e.getPlayer().getAddress());
         getPlayerUtils().playerPingMap.remove(uuid);
         getPlayerUtils().playerSmoothedPingMap.remove(uuid);
         packetHandlerInternal.ejectPlayer(e.getPlayer());

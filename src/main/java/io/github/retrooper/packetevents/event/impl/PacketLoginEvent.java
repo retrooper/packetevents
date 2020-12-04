@@ -30,7 +30,10 @@ import io.github.retrooper.packetevents.event.eventtypes.CallableEvent;
 import io.github.retrooper.packetevents.event.eventtypes.CancellableEvent;
 import io.github.retrooper.packetevents.event.eventtypes.NMSPacketEvent;
 import io.github.retrooper.packetevents.packettype.PacketType;
+import io.github.retrooper.packetevents.utils.netty.channel.ChannelUtils;
 import io.github.retrooper.packetevents.utils.reflection.ClassUtil;
+
+import java.net.InetSocketAddress;
 
 /**
  * The {@code PacketLoginEvent} event is fired whenever the a LOGIN packet is received from a client
@@ -38,38 +41,28 @@ import io.github.retrooper.packetevents.utils.reflection.ClassUtil;
  * This class implements {@link CancellableEvent}.
  * The {@code PacketLoginEvent} does not have to do with a bukkit player object due to
  * the player object being null in this state.
- * Use the {@link #getChannel()} to identify who sends the packet.
+ * Use the {@link #getSocketAddress()} to identify who sends the packet.
  * @see <a href="https://wiki.vg/Protocol#Login">https://wiki.vg/Protocol#Login</a>
  * @author retrooper
  * @since 1.7
  */
 public class PacketLoginEvent extends PacketEvent implements NMSPacketEvent, CancellableEvent, CallableEvent {
-    private final Object channel;
+    private final InetSocketAddress socketAddress;
     private final Object packet;
     private boolean cancelled;
 
     public PacketLoginEvent(final Object channel, final Object packet) {
-        this.channel = channel;
+        this.socketAddress = ChannelUtils.getSocketAddress(channel);
         this.packet = packet;
     }
 
-    /**
-     * This method returns the netty channel of the packet sender or receiver as an object.
-     * If the packet is client-bound(server-sided) then it will return the channel of the packet receiver.
-     * If the packet is server-bound(client-sided) then it will return the channel of the packet sender.
-     * You can use that in all cases, it will NOT return the netty channel of the server.
-     * The reason it is returned as an object and not with the netty channel import is
-     * to maintain 1.7.10 support as 1.7.10 refactored netty to another location.
-     * You can use this netty channel to identify who sent the packet.
-     * For example:
-     * <p>
-     * {@code Map < Object, Integer > protocolVersionCache = new HashMap < Object, Integer >();}
-     * {@code protocolVersionCache.put(event.getChannel(), protocolVersion);}
-     * </p>
-     * @return Netty channel of the packet sender/receiver.
-     */
-    public Object getChannel() {
-        return channel;
+    public PacketLoginEvent(final InetSocketAddress socketAddress, final Object packet) {
+        this.socketAddress = socketAddress;
+        this.packet = packet;
+    }
+
+    public InetSocketAddress getSocketAddress() {
+        return socketAddress;
     }
 
 
