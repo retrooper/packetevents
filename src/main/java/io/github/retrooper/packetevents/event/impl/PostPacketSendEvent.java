@@ -26,6 +26,7 @@ package io.github.retrooper.packetevents.event.impl;
 
 import io.github.retrooper.packetevents.event.PacketEvent;
 import io.github.retrooper.packetevents.event.PacketListenerDynamic;
+import io.github.retrooper.packetevents.event.eventtypes.NMSPacketEvent;
 import io.github.retrooper.packetevents.event.eventtypes.PlayerEvent;
 import io.github.retrooper.packetevents.packettype.PacketType;
 import io.github.retrooper.packetevents.utils.reflection.ClassUtil;
@@ -41,7 +42,7 @@ import org.bukkit.entity.Player;
  * @author retrooper
  * @since 1.7
  */
-public class PostPacketSendEvent extends PacketEvent implements PlayerEvent {
+public class PostPacketSendEvent extends PacketEvent implements NMSPacketEvent, PlayerEvent {
     private final Player player;
     private final Object packet;
     private byte packetID = -1;
@@ -61,26 +62,12 @@ public class PostPacketSendEvent extends PacketEvent implements PlayerEvent {
         return player;
     }
 
-    /**
-     * This method returns the name of the packet.
-     * To get the name of the packet we get the class of the packet and then the name of the class.
-     * We use java's simple name method.
-     * @see Class#getSimpleName()
-     * We cache the simple name after the first call to improve performance.
-     * It is not recommended to call this method unless you NEED it.
-     * If you are comparing packet types, use the {@link PacketType} byte system.
-     * You would only need the packet name if packet type system doesn't contain your desired packet yet.
-     * @return Name of the packet.
-     */
+    @Override
     public String getPacketName() {
         return ClassUtil.getClassSimpleName(packet.getClass());
     }
 
-    /**
-     * Get minecraft's encoded packet object.
-     * PacketEvents uses this object in the packet wrappers to read the fields.
-     * @return Minecraft's encoded packet object.
-     */
+    @Override
     public Object getNMSPacket() {
         return packet;
     }

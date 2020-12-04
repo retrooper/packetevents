@@ -28,6 +28,7 @@ import io.github.retrooper.packetevents.event.PacketEvent;
 import io.github.retrooper.packetevents.event.PacketListenerDynamic;
 import io.github.retrooper.packetevents.event.eventtypes.CallableEvent;
 import io.github.retrooper.packetevents.event.eventtypes.CancellableEvent;
+import io.github.retrooper.packetevents.event.eventtypes.NMSPacketEvent;
 import io.github.retrooper.packetevents.packettype.PacketType;
 import io.github.retrooper.packetevents.utils.reflection.ClassUtil;
 
@@ -42,7 +43,7 @@ import io.github.retrooper.packetevents.utils.reflection.ClassUtil;
  * @author retrooper
  * @since 1.7
  */
-public class PacketLoginEvent extends PacketEvent implements CancellableEvent, CallableEvent {
+public class PacketLoginEvent extends PacketEvent implements NMSPacketEvent, CancellableEvent, CallableEvent {
     private final Object channel;
     private final Object packet;
     private boolean cancelled;
@@ -71,28 +72,13 @@ public class PacketLoginEvent extends PacketEvent implements CancellableEvent, C
         return channel;
     }
 
-    /**
-     * This method returns the name of the packet.
-     * To get the name of the packet we get the class of the packet and then the name of the class.
-     * We use java's simple name method.
-     * @see Class#getSimpleName()
-     * We cache the simple name after the first call to improve performance.
-     * It is not recommended to call this method unless you NEED it.
-     * If you are comparing packet types, use the {@link PacketType} byte system.
-     * You would only need the packet name if packet type system doesn't contain your desired packet yet.
-     * @return Name of the packet.
-     */
+
+    @Override
     public String getPacketName() {
         return ClassUtil.getClassSimpleName(packet.getClass());
     }
 
-    /**
-     * Get minecraft's encoded or decoded packet object.
-     * This may be the encoded or the decoded packet, as this event is fired
-     * whether the packet is sent by the server or by the client.
-     * PacketEvents uses this object in the packet wrappers to read the fields.
-     * @return Minecraft's encoded/decoded packet object.
-     */
+    @Override
     public Object getNMSPacket() {
         return packet;
     }
