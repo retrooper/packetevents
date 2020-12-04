@@ -25,6 +25,11 @@
 package io.github.retrooper.packetevents.example;
 
 import io.github.retrooper.packetevents.PacketEvents;
+import io.github.retrooper.packetevents.event.PacketListenerDynamic;
+import io.github.retrooper.packetevents.event.impl.PacketReceiveEvent;
+import io.github.retrooper.packetevents.event.priority.PacketEventPriority;
+import io.github.retrooper.packetevents.packettype.PacketType;
+import io.github.retrooper.packetevents.packetwrappers.play.in.blockplace.WrappedPacketInBlockPlace;
 import org.bukkit.plugin.java.JavaPlugin;
 
 public class MainExample extends JavaPlugin {
@@ -37,6 +42,15 @@ public class MainExample extends JavaPlugin {
     public void onEnable() {
         //We use default settings
         PacketEvents.get().init(this);
+        PacketEvents.get().getEventManager().registerListener(new PacketListenerDynamic(PacketEventPriority.LOWEST) {
+            @Override
+            public void onPacketReceive(PacketReceiveEvent event) {
+                if (event.getPacketId() == PacketType.Play.Client.BLOCK_PLACE) {
+                    WrappedPacketInBlockPlace bp = new WrappedPacketInBlockPlace(event.getNMSPacket());
+                    event.getPlayer().sendMessage("Direction: " + bp.getDirection());
+                }
+            }
+        });
     }
 
     @Override

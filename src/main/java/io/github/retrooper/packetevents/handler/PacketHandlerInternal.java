@@ -76,7 +76,8 @@ public class PacketHandlerInternal {
     public Object getChannel(String name) {
         Object channel = channelMap.get(name);
         if (channel == null) {
-            channel = NMSUtils.getChannel(Bukkit.getPlayer(name));
+            Player player = Bukkit.getPlayer(name);
+            channel = NMSUtils.getChannel(player);
             channelMap.put(name, channel);
             return channel;
         }

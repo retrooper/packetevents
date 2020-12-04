@@ -62,8 +62,8 @@ public enum ClientVersion {
 
     UNRESOLVED(-1);
 
-    private static final int lowestSupportedProtocolVersion = LOWER_THAN_SUPPORTED_VERSIONS.protocolVersion;
-    private static final int highestSupportedProtocolVersion = HIGHER_THAN_SUPPORTED_VERSIONS.protocolVersion;
+    private static final short lowestSupportedProtocolVersion = (short) (LOWER_THAN_SUPPORTED_VERSIONS.protocolVersion + 1);
+    private static final short highestSupportedProtocolVersion = (short) (HIGHER_THAN_SUPPORTED_VERSIONS.protocolVersion - 1);
     private final short protocolVersion;
 
     ClientVersion(int protocolVersion) {
@@ -71,11 +71,11 @@ public enum ClientVersion {
     }
 
     public static boolean isHigherThan(ClientVersion a, ClientVersion b) {
-        return a.getProtocolVersion() > b.getProtocolVersion();
+        return a.isHigherThan(b);
     }
 
     public static boolean isLowerThan(ClientVersion a, ClientVersion b) {
-        return a.getProtocolVersion() < b.getProtocolVersion();
+        return a.isLowerThan(b);
     }
 
     public static ClientVersion getClientVersion(int protocolVersion) {

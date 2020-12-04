@@ -25,6 +25,7 @@
 package io.github.retrooper.packetevents.utils.vector;
 
 public class Vector3i {
+    public static final Vector3i INVALID = new Vector3i(-1, -1, -1);
     public int x, y, z;
 
     public Vector3i() {

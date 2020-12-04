@@ -27,7 +27,7 @@ package io.github.retrooper.packetevents.event.manager;
 import io.github.retrooper.packetevents.event.PacketEvent;
 import io.github.retrooper.packetevents.event.PacketListener;
 import io.github.retrooper.packetevents.event.PacketListenerDynamic;
-
+//TODO document this and all classes below
 public interface EventManager {
     default EventManager callEvent(PacketEvent event) {
         //The dynamic event manager calls the legacy event manager.

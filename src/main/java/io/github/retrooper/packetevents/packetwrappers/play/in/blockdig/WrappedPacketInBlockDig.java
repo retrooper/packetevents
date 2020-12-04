@@ -143,10 +143,13 @@ public final class WrappedPacketInBlockDig extends WrappedPacket {
      */
     public Direction getDirection() {
         if (isVersionLowerThan_v_1_8) {
-            return Direction.getDirection((short) readInt(3));
+            return Direction.getDirection((byte) readInt(3));
         } else {
             if (enumDirObj == null) {
                 enumDirObj = readObject(0, enumDirectionClass);
+                if(enumDirObj == null) {
+                    return Direction.OTHER;
+                }
             }
             return Direction.valueOf(((Enum) enumDirObj).name());
         }

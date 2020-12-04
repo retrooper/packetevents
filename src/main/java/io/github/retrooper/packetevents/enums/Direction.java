@@ -30,56 +30,52 @@ package io.github.retrooper.packetevents.enums;
  * @author retrooper
  * @since 1.7.8
  */
-public enum Direction {//TODO test
+public enum Direction {
     /**
      * -Y offset
      */
-    DOWN((short) 0),
+    DOWN((byte) 0),
 
     /**
      * +Y offset
      */
-    UP((short) 1),
+    UP((byte) 1),
 
     /**
      * -Z offset
      */
-    NORTH((short) 2),
+    NORTH((byte) 2),
 
     /**
      * +Z offset
      */
-    SOUTH((short) 3),
+    SOUTH((byte) 3),
 
     /**
      * -X offset
      */
-    WEST((short) 4),
+    WEST((byte) 4),
 
     /**
      * +X offset
      */
-    EAST((short) 5),
+    EAST( (byte)5),
 
-    OTHER((short) 255);
+    OTHER(Byte.MIN_VALUE);
 
     final byte value;
 
-    Direction(short value) {
-        if(value > 255) {
-            value = 255;
-        }
-        this.value = (byte)value;
+    Direction(byte value) {
+        this.value = value;
     }
 
     public short getValue() {
-        return (short) (value & 0xFF);
+        return value;
     }
 
-    public static Direction getDirection(final short value) {
-        byte compressedValue = (byte)value;
+    public static Direction getDirection(final byte val) {
         for (Direction direction : values()) {
-            if (direction.value == compressedValue) {
+            if (direction.value == val) {
                 return direction;
             }
         }
