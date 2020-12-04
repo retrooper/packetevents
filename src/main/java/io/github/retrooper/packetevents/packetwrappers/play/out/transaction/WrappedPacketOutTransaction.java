@@ -51,7 +51,7 @@ public class WrappedPacketOutTransaction extends WrappedPacket implements Sendab
     }
 
     public static void load() {
-        Class<?> packetClass = PacketTypeClasses.Server.TRANSACTION;
+        Class<?> packetClass = PacketTypeClasses.Play.Server.TRANSACTION;
 
         try {
             packetConstructor = packetClass.getConstructor(int.class, short.class, boolean.class);

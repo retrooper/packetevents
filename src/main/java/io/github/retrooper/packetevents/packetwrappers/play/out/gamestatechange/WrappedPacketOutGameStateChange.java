@@ -59,7 +59,7 @@ public class WrappedPacketOutGameStateChange extends WrappedPacket implements Se
     }
 
     public static void load() {
-        reasonClassType = SubclassUtil.getSubClass(PacketTypeClasses.Server.GAME_STATE_CHANGE, "a");
+        reasonClassType = SubclassUtil.getSubClass(PacketTypeClasses.Play.Server.GAME_STATE_CHANGE, "a");
         if (reasonClassType != null) {
             try {
                 reasonClassConstructor = reasonClassType.getConstructor(int.class);
@@ -69,7 +69,7 @@ public class WrappedPacketOutGameStateChange extends WrappedPacket implements Se
 
         }
         reasonIntMode = reasonClassType == null;
-        valueFloatMode = Reflection.getField(PacketTypeClasses.Server.GAME_STATE_CHANGE, double.class, 0) == null;
+        valueFloatMode = Reflection.getField(PacketTypeClasses.Play.Server.GAME_STATE_CHANGE, double.class, 0) == null;
 
         try {
             Class<?> valueClassType;
@@ -82,7 +82,7 @@ public class WrappedPacketOutGameStateChange extends WrappedPacket implements Se
             if (reasonClassType == null) {
                 reasonClassType = int.class;
             }
-            packetConstructor = PacketTypeClasses.Server.GAME_STATE_CHANGE.getConstructor(reasonClassType, valueClassType);
+            packetConstructor = PacketTypeClasses.Play.Server.GAME_STATE_CHANGE.getConstructor(reasonClassType, valueClassType);
             reasonClassType = null;
         } catch (NullPointerException e) {
             Bukkit.getConsoleSender().sendMessage(ChatColor.RED + "PacketEvents failed to find the constructor for the outbound Game state packet wrapper.");

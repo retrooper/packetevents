@@ -57,7 +57,7 @@ public final class WrappedPacketOutUpdateHealth extends WrappedPacket implements
     }
 
     public static void load() {
-        Class<?> packetClass = PacketTypeClasses.Server.UPDATE_HEALTH;
+        Class<?> packetClass = PacketTypeClasses.Play.Server.UPDATE_HEALTH;
 
         try {
             packetConstructor = packetClass.getConstructor(float.class, int.class, float.class);

@@ -29,45 +29,52 @@ import io.github.retrooper.packetevents.utils.reflection.SubclassUtil;
 
 public class PacketTypeClasses {
     public static class Status {
-        public static void load() {
-            Client.START = NMSUtils.getNMSClassWithoutException("PacketStatusInStart");
-            Client.PING = NMSUtils.getNMSClassWithoutException("PacketStatusInPing");
-            Server.PONG = NMSUtils.getNMSClassWithoutException("PacketStatusOutPong");
-            Server.SERVER_INFO = NMSUtils.getNMSClassWithoutException("PacketStatusOutServerInfo");
-            PacketType.Status.init();
-        }
-
         public static class Client {
             public static Class<?> START, PING;
+
+            public static void load() {
+                Client.START = NMSUtils.getNMSClassWithoutException("PacketStatusInStart");
+                Client.PING = NMSUtils.getNMSClassWithoutException("PacketStatusInPing");
+                PacketType.Status.Client.init();
+            }
         }
 
         public static class Server {
             public static Class<?> PONG, SERVER_INFO;
+
+            public static void load() {
+                Server.PONG = NMSUtils.getNMSClassWithoutException("PacketStatusOutPong");
+                Server.SERVER_INFO = NMSUtils.getNMSClassWithoutException("PacketStatusOutServerInfo");
+                PacketType.Status.Server.init();
+            }
         }
     }
 
     public static class Login {
-        public static void load() {
-            Client.HANDSHAKE = NMSUtils.getNMSClassWithoutException("PacketHandshakingInSetProtocol");
-            //In and Out custom payload login packets have been here since AROUND 1.13.2.
-            Client.CUSTOM_PAYLOAD = NMSUtils.getNMSClassWithoutException("PacketLoginInCustomPayload");
-            Client.START = NMSUtils.getNMSClassWithoutException("PacketLoginInStart");
-            Client.ENCRYPTION_BEGIN = NMSUtils.getNMSClassWithoutException("PacketLoginInEncryptionBegin");
-
-            Server.CUSTOM_PAYLOAD = NMSUtils.getNMSClassWithoutException("PacketLoginOutCustomPayload");
-            Server.DISCONNECT = NMSUtils.getNMSClassWithoutException("PacketLoginOutDisconnect");
-            Server.ENCRYPTION_BEGIN = NMSUtils.getNMSClassWithoutException("PacketLoginOutEncryptionBegin");
-            Server.SUCCESS = NMSUtils.getNMSClassWithoutException("PacketLoginOutSuccess");
-            Server.SET_COMPRESSION = NMSUtils.getNMSClassWithoutException("PacketLoginOutSetCompression");
-            PacketType.Login.init();
-        }
-
         public static class Client {
             public static Class<?> HANDSHAKE, CUSTOM_PAYLOAD, START, ENCRYPTION_BEGIN;
+
+            public static void load() {
+                Client.HANDSHAKE = NMSUtils.getNMSClassWithoutException("PacketHandshakingInSetProtocol");
+                //In and Out custom payload login packets have been here since AROUND 1.13.2.
+                Client.CUSTOM_PAYLOAD = NMSUtils.getNMSClassWithoutException("PacketLoginInCustomPayload");
+                Client.START = NMSUtils.getNMSClassWithoutException("PacketLoginInStart");
+                Client.ENCRYPTION_BEGIN = NMSUtils.getNMSClassWithoutException("PacketLoginInEncryptionBegin");
+                PacketType.Login.Client.init();
+            }
         }
 
         public static class Server {
             public static Class<?> CUSTOM_PAYLOAD, DISCONNECT, ENCRYPTION_BEGIN, SUCCESS, SET_COMPRESSION;
+
+            public static void load() {
+                Server.CUSTOM_PAYLOAD = NMSUtils.getNMSClassWithoutException("PacketLoginOutCustomPayload");
+                Server.DISCONNECT = NMSUtils.getNMSClassWithoutException("PacketLoginOutDisconnect");
+                Server.ENCRYPTION_BEGIN = NMSUtils.getNMSClassWithoutException("PacketLoginOutEncryptionBegin");
+                Server.SUCCESS = NMSUtils.getNMSClassWithoutException("PacketLoginOutSuccess");
+                Server.SET_COMPRESSION = NMSUtils.getNMSClassWithoutException("PacketLoginOutSetCompression");
+                PacketType.Login.Server.init();
+            }
         }
     }
 

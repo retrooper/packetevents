@@ -50,7 +50,7 @@ public final class WrappedPacketOutKickDisconnect extends WrappedPacket implemen
     }
 
     public static void load() {
-        Class<?> packetClass = PacketTypeClasses.Server.KICK_DISCONNECT;
+        Class<?> packetClass = PacketTypeClasses.Play.Server.KICK_DISCONNECT;
         try {
             iChatBaseComponentClass = NMSUtils.getNMSClass("IChatBaseComponent");
         } catch (ClassNotFoundException e) {

@@ -48,7 +48,7 @@ public class WrappedPacketOutKeepAlive extends WrappedPacket implements Sendable
     }
 
     public static void load() {
-        Class<?> packetClass = PacketTypeClasses.Server.KEEP_ALIVE;
+        Class<?> packetClass = PacketTypeClasses.Play.Server.KEEP_ALIVE;
         integerMode = Reflection.getField(packetClass, int.class, 0) != null;
 
         if (integerMode) {

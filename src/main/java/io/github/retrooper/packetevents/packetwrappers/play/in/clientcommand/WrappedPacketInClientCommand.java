@@ -38,7 +38,7 @@ public final class WrappedPacketInClientCommand extends WrappedPacket {
     }
 
     public static void load() {
-        Class<?> packetClass = PacketTypeClasses.Client.CLIENT_COMMAND;
+        Class<?> packetClass = PacketTypeClasses.Play.Client.CLIENT_COMMAND;
         try {
             enumClientCommandClass = NMSUtils.getNMSClass("EnumClientCommand");
         } catch (ClassNotFoundException e) {

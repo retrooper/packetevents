@@ -24,7 +24,6 @@
 
 package io.github.retrooper.packetevents.packetwrappers.play.in.settings;
 
-import io.github.retrooper.packetevents.annotations.Nullable;
 import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
 import io.github.retrooper.packetevents.utils.nms.NMSUtils;
 import io.github.retrooper.packetevents.utils.reflection.SubclassUtil;
@@ -112,7 +111,6 @@ public class WrappedPacketInSettings extends WrappedPacket {
      *
      * @return A map with a Skin Parts as a key, and a boolean as a value.
      */
-    @Nullable
     public HashMap<DisplayedSkinPart, Boolean> getDisplayedSkinPartsMap() {
         if (displayedSkinParts.isEmpty()) {
             if (isLowerThan_v_1_8) {

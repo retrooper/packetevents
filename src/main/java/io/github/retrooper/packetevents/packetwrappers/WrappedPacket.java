@@ -78,10 +78,10 @@ public class WrappedPacket implements WrapperPacketReader, WrapperPacketWriter {
     }
 
     public WrappedPacket(final Object packet, Class<?> packetClass) {
-        if (packetClass.getSuperclass().equals(PacketTypeClasses.Client.FLYING)) {
-            packetClass = PacketTypeClasses.Client.FLYING;
-        } else if (packetClass.getSuperclass().equals(PacketTypeClasses.Server.ENTITY)) {
-            packetClass = PacketTypeClasses.Server.ENTITY;
+        if (packetClass.getSuperclass().equals(PacketTypeClasses.Play.Client.FLYING)) {
+            packetClass = PacketTypeClasses.Play.Client.FLYING;
+        } else if (packetClass.getSuperclass().equals(PacketTypeClasses.Play.Server.ENTITY)) {
+            packetClass = PacketTypeClasses.Play.Server.ENTITY;
         }
         this.packetClass = packetClass;
         this.packet = packet;

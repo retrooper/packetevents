@@ -75,7 +75,7 @@ public class WrappedPacketOutEntity extends WrappedPacket implements SendableWra
     }
 
     public static void load() {
-        Class<?> packetClass = PacketTypeClasses.Server.ENTITY;
+        Class<?> packetClass = PacketTypeClasses.Play.Server.ENTITY;
 
         Field dxField = Reflection.getField(packetClass, 1);
         assert dxField != null;

@@ -56,7 +56,7 @@ public class WrappedPacketOutCustomPayload extends WrappedPacket implements Send
     }
 
     public static void load() {
-        Class<?> packetClass = PacketTypeClasses.Server.CUSTOM_PAYLOAD;
+        Class<?> packetClass = PacketTypeClasses.Play.Server.CUSTOM_PAYLOAD;
         packetDataSerializerClass = NMSUtils.getNMSClassWithoutException("PacketDataSerializer");
         minecraftKeyClass = NMSUtils.getNMSClassWithoutException("MinecraftKey");
         try {

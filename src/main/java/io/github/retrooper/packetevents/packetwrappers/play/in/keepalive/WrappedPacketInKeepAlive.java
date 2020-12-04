@@ -36,7 +36,7 @@ public final class WrappedPacketInKeepAlive extends WrappedPacket {
     }
 
     public static void load() {
-        Class<?> packetClass = PacketTypeClasses.Client.KEEP_ALIVE;
+        Class<?> packetClass = PacketTypeClasses.Play.Client.KEEP_ALIVE;
         integerPresentInIndex0 = Reflection.getField(packetClass, int.class, 0) != null;
     }
 

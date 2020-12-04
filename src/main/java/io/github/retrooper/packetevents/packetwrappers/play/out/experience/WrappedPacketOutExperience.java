@@ -49,7 +49,7 @@ public class WrappedPacketOutExperience extends WrappedPacket implements Sendabl
 
     public static void load() {
         try {
-            packetConstructor = PacketTypeClasses.Server.EXPERIENCE.getConstructor(float.class,
+            packetConstructor = PacketTypeClasses.Play.Server.EXPERIENCE.getConstructor(float.class,
                     int.class, int.class);
         } catch (NoSuchMethodException e) {
             e.printStackTrace();

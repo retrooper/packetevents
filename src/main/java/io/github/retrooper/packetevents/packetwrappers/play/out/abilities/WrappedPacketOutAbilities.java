@@ -54,7 +54,7 @@ public final class WrappedPacketOutAbilities extends WrappedPacket implements Se
     }
 
     public static void load() {
-        Class<?> packetClass = PacketTypeClasses.Server.ABILITIES;
+        Class<?> packetClass = PacketTypeClasses.Play.Server.ABILITIES;
 
         try {
             packetConstructor = packetClass.getConstructor(PlayerAbilitiesUtils.playerAbilitiesClass);

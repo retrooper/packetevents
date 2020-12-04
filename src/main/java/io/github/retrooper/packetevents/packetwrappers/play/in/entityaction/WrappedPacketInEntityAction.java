@@ -24,7 +24,6 @@
 
 package io.github.retrooper.packetevents.packetwrappers.play.in.entityaction;
 
-import io.github.retrooper.packetevents.annotations.Nullable;
 import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
 import io.github.retrooper.packetevents.utils.nms.NMSUtils;
 import io.github.retrooper.packetevents.utils.reflection.SubclassUtil;
@@ -36,7 +35,6 @@ import java.util.HashMap;
 public final class WrappedPacketInEntityAction extends WrappedPacket {
     private static final HashMap<String, PlayerAction> cachedPlayerActionNames = new HashMap<>();
     private static final HashMap<Integer, PlayerAction> cachedPlayerActionIDs = new HashMap<>();
-    @Nullable
     private static Class<?> enumPlayerActionClass;
     private static boolean isLowerThan_v_1_8;
     private Entity entity;

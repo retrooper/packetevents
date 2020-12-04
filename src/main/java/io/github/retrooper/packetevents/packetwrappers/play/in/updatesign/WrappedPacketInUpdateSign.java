@@ -44,8 +44,8 @@ public class WrappedPacketInUpdateSign extends WrappedPacket {
     }
 
     public static void load() {
-        v_1_7_mode = Reflection.getField(PacketTypeClasses.Client.UPDATE_SIGN, int.class, 0) != null;
-        strArrayMode = Reflection.getField(PacketTypeClasses.Client.UPDATE_SIGN, String[].class, 0) != null;
+        v_1_7_mode = Reflection.getField(PacketTypeClasses.Play.Client.UPDATE_SIGN, int.class, 0) != null;
+        strArrayMode = Reflection.getField(PacketTypeClasses.Play.Client.UPDATE_SIGN, String[].class, 0) != null;
 
         try {
             blockPosClass = NMSUtils.getNMSClass("BlockPosition");

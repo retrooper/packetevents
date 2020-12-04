@@ -70,7 +70,7 @@ public final class WrappedPacketOutEntityVelocity extends WrappedPacket implemen
      * 1.14+ use int, Vec3D style
      */
     public static void load() {
-        Class<?> velocityClass = PacketTypeClasses.Server.ENTITY_VELOCITY;
+        Class<?> velocityClass = PacketTypeClasses.Play.Server.ENTITY_VELOCITY;
         if (version.isHigherThan(ServerVersion.v_1_13_2)) {
             try {
                 vec3dClass = NMSUtils.getNMSClass("Vec3D");

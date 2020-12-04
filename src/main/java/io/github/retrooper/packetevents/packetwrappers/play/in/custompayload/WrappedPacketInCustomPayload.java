@@ -40,7 +40,7 @@ public final class WrappedPacketInCustomPayload extends WrappedPacket {
     }
 
     public static void load() {
-        Class<?> packetClass = PacketTypeClasses.Client.CUSTOM_PAYLOAD;
+        Class<?> packetClass = PacketTypeClasses.Play.Client.CUSTOM_PAYLOAD;
         strPresent = Reflection.getField(packetClass, String.class, 0) != null;
         byteArrayPresent = Reflection.getField(packetClass, byte[].class, 0) != null;
         packetDataSerializerClass = NMSUtils.getNMSClassWithoutException("PacketDataSerializer");

@@ -113,10 +113,10 @@ public final class PacketEvents implements Listener, EventManager {
             try {
                 NMSUtils.load();
 
-                PacketTypeClasses.Client.load();
-                PacketTypeClasses.Server.load();
-                PacketTypeClasses.Login.load();
-                PacketTypeClasses.Status.load();
+                PacketTypeClasses.Play.Client.load();
+                PacketTypeClasses.Play.Server.load();
+                PacketTypeClasses.Login.Client.load();
+                PacketTypeClasses.Status.Server.load();
 
                 EntityFinderUtils.load();
 

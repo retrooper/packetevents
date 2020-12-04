@@ -45,7 +45,7 @@ public class WrappedPacketOutHeldItemSlot extends WrappedPacket implements Senda
 
     public static void load() {
         try {
-            packetConstructor = PacketTypeClasses.Server.HELD_ITEM_SLOT.getConstructor(int.class);
+            packetConstructor = PacketTypeClasses.Play.Server.HELD_ITEM_SLOT.getConstructor(int.class);
         } catch (NoSuchMethodException e) {
             e.printStackTrace();
         }

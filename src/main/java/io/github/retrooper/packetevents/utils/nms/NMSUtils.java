@@ -24,7 +24,6 @@
 
 package io.github.retrooper.packetevents.utils.nms;
 
-import io.github.retrooper.packetevents.annotations.Nullable;
 import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
 import io.github.retrooper.packetevents.utils.entityfinder.EntityFinderUtils;
 import io.github.retrooper.packetevents.utils.reflection.Reflection;
@@ -159,12 +158,10 @@ public final class NMSUtils {
         return Class.forName(nettyPrefix + "." + name);
     }
 
-    @Nullable
     public static Entity getEntityById(final int id) {
         return EntityFinderUtils.getEntityById(id);
     }
 
-    @Nullable
     public static Entity getEntityByIdWithWorld(final World world, final int id) {
         return EntityFinderUtils.getEntityByIdWithWorld(world, id);
     }

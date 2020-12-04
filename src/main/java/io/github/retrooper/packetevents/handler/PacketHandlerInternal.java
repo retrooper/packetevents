@@ -259,7 +259,7 @@ public class PacketHandlerInternal {
 
 
     private void interceptRead(PacketReceiveEvent event) {
-        if (event.getPacketId() == PacketType.Client.KEEP_ALIVE) {
+        if (event.getPacketId() == PacketType.Play.Client.KEEP_ALIVE) {
             UUID uuid = event.getPlayer().getUniqueId();
             long timestamp = keepAliveMap.getOrDefault(uuid, event.getTimestamp());
             long currentTime = event.getTimestamp();
@@ -295,7 +295,7 @@ public class PacketHandlerInternal {
     }
 
     private void interceptPostSend(PostPacketSendEvent event) {
-        if (event.getPacketId() == PacketType.Server.KEEP_ALIVE) {
+        if (event.getPacketId() == PacketType.Play.Server.KEEP_ALIVE) {
             keepAliveMap.put(event.getPlayer().getUniqueId(), event.getTimestamp());
         }
     }

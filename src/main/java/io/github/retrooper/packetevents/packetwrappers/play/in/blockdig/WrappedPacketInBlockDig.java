@@ -48,7 +48,7 @@ public final class WrappedPacketInBlockDig extends WrappedPacket {
     }
 
     public static void load() {
-        Class<?> blockDigClass = PacketTypeClasses.Client.BLOCK_DIG;
+        Class<?> blockDigClass = PacketTypeClasses.Play.Client.BLOCK_DIG;
         try {
             if (version.isHigherThan(ServerVersion.v_1_7_10)) {
                 blockPositionClass = NMSUtils.getNMSClass("BlockPosition");

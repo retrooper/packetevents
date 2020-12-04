@@ -52,7 +52,7 @@ public class WrappedPacketInWindowClick extends WrappedPacket {
     }
 
     public static void load() {
-        Class<?> packetClass = PacketTypeClasses.Client.WINDOW_CLICK;
+        Class<?> packetClass = PacketTypeClasses.Play.Client.WINDOW_CLICK;
         invClickTypeClass = NMSUtils.getNMSClassWithoutException("InventoryClickType");
 
         INV_CLICK_TYPE_CACHE.put("PICKUP", 0);

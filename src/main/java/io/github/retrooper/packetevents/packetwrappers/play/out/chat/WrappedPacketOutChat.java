@@ -79,7 +79,7 @@ public final class WrappedPacketOutChat extends WrappedPacket implements Sendabl
 
     public static void load() {
         try {
-            packetClass = PacketTypeClasses.Server.CHAT;
+            packetClass = PacketTypeClasses.Play.Server.CHAT;
             iChatBaseComponentClass = NMSUtils.getNMSClass("IChatBaseComponent");
         } catch (ClassNotFoundException e) {
             e.printStackTrace();

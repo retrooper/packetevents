@@ -57,7 +57,7 @@ public class WrappedPacketOutEntityStatus extends WrappedPacket implements Senda
     public static void load() {
         try {
             packetConstructor =
-                    PacketTypeClasses.Server.ENTITY_STATUS.getConstructor(NMSUtils.nmsEntityClass, byte.class);
+                    PacketTypeClasses.Play.Server.ENTITY_STATUS.getConstructor(NMSUtils.nmsEntityClass, byte.class);
         } catch (NoSuchMethodException e) {
             e.printStackTrace();
         }

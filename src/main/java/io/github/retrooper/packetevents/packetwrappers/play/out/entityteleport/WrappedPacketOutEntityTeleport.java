@@ -67,7 +67,7 @@ public class WrappedPacketOutEntityTeleport extends WrappedPacket implements Sen
     }
 
     public static void load() {
-        Class<?> packetClass = PacketTypeClasses.Server.ENTITY_TELEPORT;
+        Class<?> packetClass = PacketTypeClasses.Play.Server.ENTITY_TELEPORT;
         try {
             constructor = packetClass.getConstructor(int.class, int.class, int.class, int.class, byte.class, byte.class, boolean.class, boolean.class);
             ultraLegacyVersionMode = true;

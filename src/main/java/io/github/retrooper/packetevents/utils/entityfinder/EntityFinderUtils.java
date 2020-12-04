@@ -24,7 +24,6 @@
 
 package io.github.retrooper.packetevents.utils.entityfinder;
 
-import io.github.retrooper.packetevents.annotations.Nullable;
 import io.github.retrooper.packetevents.utils.nms.NMSUtils;
 import io.github.retrooper.packetevents.utils.server.ServerVersion;
 import org.bukkit.Bukkit;
@@ -87,7 +86,6 @@ public final class EntityFinderUtils {
      * @param id
      * @return Entity
      */
-    @Nullable
     public static Entity getEntityByIdWithWorld(final World world, final int id) {
         if (world == null) {
             return null;
