@@ -34,7 +34,7 @@ import io.github.retrooper.packetevents.utils.reflection.ClassUtil;
 /**
  * The {@code PacketLoginEvent} event is fired whenever the a LOGIN packet is received from a client
  * or when the server wants to send a LOGIN packet to the client.
- * This class implements {@link CancellableEvent} and {@link CallableEvent}.
+ * This class implements {@link CancellableEvent}.
  * The {@code PacketLoginEvent} does not have to do with a bukkit player object due to
  * the player object being null in this state.
  * Use the {@link #getChannel()} to identify who sends the packet.
@@ -62,7 +62,8 @@ public class PacketLoginEvent extends PacketEvent implements CancellableEvent, C
      * You can use this netty channel to identify who sent the packet.
      * For example:
      * <p>
-     * {@code} Map < Object, Integer > protocolVersionCache = new HashMap < Object, Integer >();
+     * {@code Map < Object, Integer > protocolVersionCache = new HashMap < Object, Integer >();}
+     * {@code protocolVersionCache.put(event.getChannel(), protocolVersion);}
      * </p>
      * @return Netty channel of the packet sender/receiver.
      */
@@ -79,7 +80,7 @@ public class PacketLoginEvent extends PacketEvent implements CancellableEvent, C
      * It is not recommended to call this method unless you NEED it.
      * If you are comparing packet types, use the {@link PacketType} byte system.
      * You would only need the packet name if packet type system doesn't contain your desired packet yet.
-     * @return Name of the packet
+     * @return Name of the packet.
      */
     public String getPacketName() {
         return ClassUtil.getClassSimpleName(packet.getClass());
@@ -102,7 +103,7 @@ public class PacketLoginEvent extends PacketEvent implements CancellableEvent, C
      * <p>
      *     {@code if (getPacketId() == PacketType.Login.Client.HANDSHAKE) }
      * </p>
-     * @return Packet ID
+     * @return Packet ID.
      */
     public byte getPacketId() {
         return PacketType.Login.packetIds.getOrDefault(packet.getClass(), (byte) -1);

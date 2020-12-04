@@ -30,7 +30,17 @@ import io.github.retrooper.packetevents.event.eventtypes.PlayerEvent;
 import io.github.retrooper.packetevents.packettype.PacketType;
 import io.github.retrooper.packetevents.utils.reflection.ClassUtil;
 import org.bukkit.entity.Player;
-
+/**
+ * The {@code PostPacketSendEvent} event is fired after minecraft processes
+ * a PLAY client-bound packet.
+ * You cannot cancel this event since minecraft already processed this packet.
+ * If the incoming packet was cancelled, resulting in it not being processed by minecraft,
+ * this event won't be called.
+ * This event assures you that the {@link PacketReceiveEvent} event wasn't cancelled.
+ * @see <a href="https://wiki.vg/Protocol#Clientbound_4">https://wiki.vg/Protocol#Clientbound_4</a>
+ * @author retrooper
+ * @since 1.7
+ */
 public class PostPacketSendEvent extends PacketEvent implements PlayerEvent {
     private final Player player;
     private final Object packet;
@@ -42,9 +52,9 @@ public class PostPacketSendEvent extends PacketEvent implements PlayerEvent {
     }
 
     /**
-     * Get the packet sender
-     *
-     * @return player
+     * This method returns the bukkit player object of the packet sender.
+     * The player object is guaranteed to NOT be null.
+     * @return Packet receiver.
      */
     @Override
     public Player getPlayer() {
@@ -52,32 +62,40 @@ public class PostPacketSendEvent extends PacketEvent implements PlayerEvent {
     }
 
     /**
-     * Get the packet's name (NMS packet class simple name).
-     * The class simple name is cached.
-     *
-     * @return Name of the packet
+     * This method returns the name of the packet.
+     * To get the name of the packet we get the class of the packet and then the name of the class.
+     * We use java's simple name method.
+     * @see Class#getSimpleName()
+     * We cache the simple name after the first call to improve performance.
+     * It is not recommended to call this method unless you NEED it.
+     * If you are comparing packet types, use the {@link PacketType} byte system.
+     * You would only need the packet name if packet type system doesn't contain your desired packet yet.
+     * @return Name of the packet.
      */
     public String getPacketName() {
         return ClassUtil.getClassSimpleName(packet.getClass());
     }
 
     /**
-     * Get the raw packet object
-     *
-     * @return packet object
+     * Get minecraft's encoded packet object.
+     * PacketEvents uses this object in the packet wrappers to read the fields.
+     * @return Minecraft's encoded packet object.
      */
     public Object getNMSPacket() {
         return packet;
     }
 
     /**
-     * Get the ID of the packet
-     *
-     * @return packet id
+     * Each binding in each packet state has their own constants.
+     * Example Usage:
+     * <p>
+     *     {@code if (getPacketId() == PacketType.Play.Server.KEEP_ALIVE) }
+     * </p>
+     * @return Packet ID.
      */
     public byte getPacketId() {
         if (packetID == -1) {
-            packetID = PacketType.Server.packetIds.getOrDefault(packet.getClass(), (byte) -1);
+            packetID = PacketType.Play.Server.packetIds.getOrDefault(packet.getClass(), (byte) -1);
         }
         return packetID;
     }

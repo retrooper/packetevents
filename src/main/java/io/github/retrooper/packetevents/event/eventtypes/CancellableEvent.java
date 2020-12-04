@@ -47,7 +47,7 @@ public interface CancellableEvent {
     /**
      * Cancel or proceed with the event.
      *
-     * @param val
+     * @param val Is the event cancelled
      */
     void setCancelled(boolean val);
 

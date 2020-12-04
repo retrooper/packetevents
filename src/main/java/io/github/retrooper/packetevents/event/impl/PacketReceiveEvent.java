@@ -26,7 +26,6 @@ package io.github.retrooper.packetevents.event.impl;
 
 import io.github.retrooper.packetevents.event.PacketEvent;
 import io.github.retrooper.packetevents.event.PacketListenerDynamic;
-import io.github.retrooper.packetevents.event.eventtypes.CallableEvent;
 import io.github.retrooper.packetevents.event.eventtypes.CancellableEvent;
 import io.github.retrooper.packetevents.event.eventtypes.PlayerEvent;
 import io.github.retrooper.packetevents.packettype.PacketType;
@@ -36,9 +35,12 @@ import org.bukkit.entity.Player;
 /**
  * The {@code PacketReceiveEvent} event is fired whenever the a PLAY packet is
  * received from any connected client.
- * This class implements {@link CancellableEvent} and {@link CallableEvent}.
- * @see <a href="https://wiki.vg/Protocol#Play">https://wiki.vg/Protocol#Play</a>
+ * Cancelling this event will result in preventing minecraft from processing the incoming packet.
+ * It would be as if the player never sent the packet from the server's view.
+ * This class implements {@link CancellableEvent} and {@link PlayerEvent}.
+ *
  * @author retrooper
+ * @see <a href="https://wiki.vg/Protocol#Play">https://wiki.vg/Protocol#Play</a>
  * @since 1.2.6
  */
 public final class PacketReceiveEvent extends PacketEvent implements CancellableEvent, PlayerEvent {
@@ -55,7 +57,7 @@ public final class PacketReceiveEvent extends PacketEvent implements Cancellable
     /**
      * This method returns the bukkit player object of the packet sender.
      * The player object is guaranteed to NOT be null.
-     * @return Packet sender
+     * @return Packet sender.
      */
     @Override
     public Player getPlayer() {
@@ -71,7 +73,7 @@ public final class PacketReceiveEvent extends PacketEvent implements Cancellable
      * It is not recommended to call this method unless you NEED it.
      * If you are comparing packet types, use the {@link PacketType} byte system.
      * You would only need the packet name if packet type system doesn't contain your desired packet yet.
-     * @return Name of the packet
+     * @return Name of the packet.
      */
     public String getPacketName() {
         return ClassUtil.getClassSimpleName(packet.getClass());
@@ -90,13 +92,13 @@ public final class PacketReceiveEvent extends PacketEvent implements Cancellable
      * Each binding in each packet state has their own constants.
      * Example Usage:
      * <p>
-     *     {@code if (getPacketId() == PacketType.Client.USE_ENTITY) }
+     *     {@code if (getPacketId() == PacketType.Play.Client.USE_ENTITY) }
      * </p>
-     * @return Packet ID
+     * @return Packet ID.
      */
     public byte getPacketId() {
         if (packetID == -1) {
-            packetID = PacketType.Client.packetIds.getOrDefault(packet.getClass(), (byte) -1);
+            packetID = PacketType.Play.Client.packetIds.getOrDefault(packet.getClass(), (byte) -1);
         }
         return packetID;
     }

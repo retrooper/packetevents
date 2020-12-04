@@ -35,7 +35,9 @@ import org.bukkit.entity.Player;
 
 /**
  * The {@code PacketSendEvent} event is fired whenever the a PLAY packet is about to be sent.
- * This class implements {@link CancellableEvent} and {@link CallableEvent}.
+ * This class implements {@link CancellableEvent} and {@link PlayerEvent}.
+ * Cancelling this event will result in preventing minecraft from sending the packet.
+ * The player won't receive the packet if you cancel it.
  * @see <a href="https://wiki.vg/Protocol#Play">https://wiki.vg/Protocol#Play</a>
  * @author retrooper
  * @since 1.2.6
@@ -55,7 +57,7 @@ public final class PacketSendEvent extends PacketEvent implements CancellableEve
     /**
      * This method returns the bukkit player object of the packet receiver.
      * The player object is guaranteed to NOT be null.
-     * @return Packet receiver
+     * @return Packet receiver.
      */
     @Override
     public Player getPlayer() {
@@ -71,7 +73,7 @@ public final class PacketSendEvent extends PacketEvent implements CancellableEve
      * It is not recommended to call this method unless you NEED it.
      * If you are comparing packet types, use the {@link PacketType} byte system.
      * You would only need the packet name if packet type system doesn't contain your desired packet yet.
-     * @return Name of the packet
+     * @return Name of the packet.
      */
     public String getPacketName() {
         return ClassUtil.getClassSimpleName(packet.getClass());
@@ -90,13 +92,13 @@ public final class PacketSendEvent extends PacketEvent implements CancellableEve
      * Each binding in each packet state has their own constants.
      * Example Usage:
      * <p>
-     *     {@code if (getPacketId() == PacketType.Server.KEEP_ALIVE) }
+     *     {@code if (getPacketId() == PacketType.Play.Server.KEEP_ALIVE) }
      * </p>
-     * @return Packet ID
+     * @return Packet ID.
      */
     public byte getPacketId() {
         if (packetID == -1) {
-            packetID = PacketType.Server.packetIds.getOrDefault(packet.getClass(), (byte) -1);
+            packetID = PacketType.Play.Server.packetIds.getOrDefault(packet.getClass(), (byte) -1);
         }
         return packetID;
     }

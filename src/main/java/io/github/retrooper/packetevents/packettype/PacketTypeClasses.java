@@ -71,17 +71,18 @@ public class PacketTypeClasses {
         }
     }
 
-    public static class Client {
-        private static final String c = "PacketPlayIn";
-        public static Class<?> FLYING, POSITION, POSITION_LOOK, LOOK, CLIENT_COMMAND,
-                TRANSACTION, BLOCK_DIG, ENTITY_ACTION, USE_ENTITY,
-                WINDOW_CLICK, STEER_VEHICLE, CUSTOM_PAYLOAD, ARM_ANIMATION,
-                BLOCK_PLACE, USE_ITEM, ABILITIES, HELD_ITEM_SLOT,
-                CLOSE_WINDOW, TAB_COMPLETE, CHAT, SET_CREATIVE_SLOT,
-                KEEP_ALIVE, SETTINGS, ENCHANT_ITEM, TELEPORT_ACCEPT,
-                TILE_NBT_QUERY, DIFFICULTY_CHANGE, B_EDIT, ENTITY_NBT_QUERY,
-                JIGSAW_GENERATE, DIFFICULTY_LOCK, VEHICLE_MOVE, BOAT_MOVE, PICK_ITEM,
-                AUTO_RECIPE, RECIPE_DISPLAYED, ITEM_NAME, RESOURCE_PACK_STATUS,
+    public static class Play {
+        public static class Client {
+            private static final String c = "PacketPlayIn";
+            public static Class<?> FLYING, POSITION, POSITION_LOOK, LOOK, CLIENT_COMMAND,
+                    TRANSACTION, BLOCK_DIG, ENTITY_ACTION, USE_ENTITY,
+                    WINDOW_CLICK, STEER_VEHICLE, CUSTOM_PAYLOAD, ARM_ANIMATION,
+                    BLOCK_PLACE, USE_ITEM, ABILITIES, HELD_ITEM_SLOT,
+                    CLOSE_WINDOW, TAB_COMPLETE, CHAT, SET_CREATIVE_SLOT,
+                    KEEP_ALIVE, SETTINGS, ENCHANT_ITEM, TELEPORT_ACCEPT,
+                    TILE_NBT_QUERY, DIFFICULTY_CHANGE, B_EDIT, ENTITY_NBT_QUERY,
+                    JIGSAW_GENERATE, DIFFICULTY_LOCK, VEHICLE_MOVE, BOAT_MOVE, PICK_ITEM,
+                    AUTO_RECIPE, RECIPE_DISPLAYED, ITEM_NAME, RESOURCE_PACK_STATUS,
                 ADVANCEMENTS, TR_SEL, BEACON, SET_COMMAND_BLOCK,
                 SET_COMMAND_MINECART, SET_JIGSAW, STRUCT, UPDATE_SIGN, SPECTATE;
 
@@ -157,7 +158,7 @@ public class PacketTypeClasses {
 
             }
 
-            PacketType.Client.init();
+            PacketType.Play.Client.init();
         }
     }
 
@@ -291,8 +292,9 @@ public class PacketTypeClasses {
             RECIPE_UPDATE = NMSUtils.getNMSClassWithoutException(s + "RecipeUpdate");
             TAGS = NMSUtils.getNMSClassWithoutException(s + "Tags");
             MAP_CHUNK_BULK = NMSUtils.getNMSClassWithoutException(s + "MapChunkBulk");
-            PacketType.Server.init();
+            PacketType.Play.Server.init();
         }
+    }
     }
 
 }

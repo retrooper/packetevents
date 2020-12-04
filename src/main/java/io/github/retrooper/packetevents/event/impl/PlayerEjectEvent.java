@@ -24,14 +24,22 @@
 
 package io.github.retrooper.packetevents.event.impl;
 
+import io.github.retrooper.packetevents.PacketEvents;
 import io.github.retrooper.packetevents.event.PacketEvent;
 import io.github.retrooper.packetevents.event.PacketListenerDynamic;
+import io.github.retrooper.packetevents.event.eventtypes.CallableEvent;
 import io.github.retrooper.packetevents.event.eventtypes.CancellableEvent;
 import io.github.retrooper.packetevents.event.eventtypes.PlayerEvent;
+import io.github.retrooper.packetevents.settings.PacketEventsSettings;
 import org.bukkit.entity.Player;
 
 /**
- * This event is called each time you eject a player.
+ * The {@code PlayerEjectEvent} event is fired whenever a player is ejected.
+ * A player is ejected by PacketEvents whenever they quit the server.
+ * This class implements {@link CancellableEvent} and {@link PlayerEvent}.
+ * @see <a href="https://github.com/retrooper/packetevents/blob/dev/src/main/java/io/github/retrooper/packetevents/handler/PacketHandlerInternal.java">https://github.com/retrooper/packetevents/blob/dev/src/main/java/io/github/retrooper/packetevents/handler/PacketHandlerInternal.java</a>
+ * @author retrooper
+ * @since 1.6.9
  */
 public final class PlayerEjectEvent extends PacketEvent implements CancellableEvent, PlayerEvent {
     private final Player player;
@@ -68,11 +76,24 @@ public final class PlayerEjectEvent extends PacketEvent implements CancellableEv
         cancelled = value;
     }
 
+    /**
+     * This method returns the bukkit player object of the player being ejected.
+     * The player object is guaranteed to NOT be null.
+     * @return Ejected player.
+     */
     @Override
     public Player getPlayer() {
         return player;
     }
 
+    /**
+     * This method returns if the event has been called asynchronously.
+     * If the {@link PacketEventsSettings#shouldEjectAsync()} is enabled, the event will be called asynchronously
+     * and the player will be ejected asynchronously.
+     * The {@link PacketEventsSettings} can be accessed here:
+     * @see PacketEvents#getSettings()
+     * @return Is the ejection asynchronous.
+     */
     public boolean isAsync() {
         return async;
     }
