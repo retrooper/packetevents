@@ -40,9 +40,8 @@ import java.lang.reflect.Method;
 import java.util.*;
 
 public final class NMSUtils {
-    public static final HashMap<UUID, Object> channelCache = new HashMap<>();
-    private static final String nmsDir = ServerVersion.getNMSDirectory();
-    private static final String obcDir = ServerVersion.getOBCDirectory();
+    private static final String NMS_DIR = ServerVersion.getNMSDirectory() + ".";
+    private static final String OBC_DIR = ServerVersion.getOBCDirectory() + ".";
     public static ServerVersion version;
     public static String nettyPrefix = "io.netty";
     public static Class<?> nmsEntityClass, minecraftServerClass, craftWorldClass, playerInteractManagerClass, entityPlayerClass, playerConnectionClass, craftServerClass,
@@ -55,6 +54,8 @@ public final class NMSUtils {
     private static Method asBukkitCopy;
     private static Method getBukkitEntity;
     private static Field entityPlayerPingField, playerConnectionField;
+    private static Object minecraftServer;
+    private static Object minecraftServerConnection;
 
     public static void load() {
         try {
@@ -115,30 +116,33 @@ public final class NMSUtils {
     }
 
     public static Object getMinecraftServerInstance() {
-        try {
-            return Reflection.getMethod(minecraftServerClass, "getServer", 0).invoke(null);
-        } catch (IllegalAccessException | InvocationTargetException e) {
-            e.printStackTrace();
+        if(minecraftServer == null) {
+            try {
+                minecraftServer = Reflection.getMethod(minecraftServerClass, "getServer", 0).invoke(null);
+            } catch (IllegalAccessException | InvocationTargetException e) {
+                e.printStackTrace();
+            }
         }
-        return null;
+        return minecraftServer;
     }
 
     public static Object getMinecraftServerConnection() {
-        try {
-            return Reflection.getField(minecraftServerClass, serverConnectionClass, 0).get(getMinecraftServerInstance());
-        } catch (IllegalAccessException e) {
-            e.printStackTrace();
+        if(minecraftServerConnection == null) {
+            try {
+                minecraftServerConnection = Reflection.getField(minecraftServerClass, serverConnectionClass, 0).get(getMinecraftServerInstance());
+            } catch (IllegalAccessException e) {
+                e.printStackTrace();
+            }
         }
-        return null;
+        return minecraftServerConnection;
     }
 
     public static double[] recentTPS() {
-        return Reflection.getFieldInstance(minecraftServerClass, double[].class, 0, getMinecraftServerInstance());
-
+        return new WrappedPacket(getMinecraftServerInstance(), minecraftServerClass).readDoubleArray(0);
     }
 
     public static Class<?> getNMSClass(String name) throws ClassNotFoundException {
-        return Class.forName(nmsDir + "." + name);
+        return Class.forName(NMS_DIR + name);
     }
 
     public static Class<?> getNMSClassWithoutException(String name) {
@@ -151,7 +155,7 @@ public final class NMSUtils {
     }
 
     public static Class<?> getOBCClass(String name) throws ClassNotFoundException {
-        return Class.forName(obcDir + "." + name);
+        return Class.forName(OBC_DIR + name);
     }
 
     public static Class<?> getNettyClass(String name) throws ClassNotFoundException {
