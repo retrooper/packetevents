@@ -132,7 +132,9 @@ public class EarlyChannelInjector8 implements ChannelInjector {
     public void ejectChannel(Object ch) {
         Channel channel = (Channel) ch;
         String handlerName = getNettyHandlerName(plugin);
-        channel.pipeline().get(handlerName);
+        if (channel.pipeline().get(handlerName) != null) {
+            channel.pipeline().remove(handlerName);
+        }
     }
 
     @Override

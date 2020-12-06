@@ -29,7 +29,6 @@ import io.github.retrooper.packetevents.event.PacketEvent;
 import io.github.retrooper.packetevents.event.PacketListenerDynamic;
 import io.github.retrooper.packetevents.event.eventtypes.CancellableEvent;
 import io.github.retrooper.packetevents.event.priority.PacketEventPriority;
-import io.github.retrooper.packetevents.handler.ProtocolLibInternalListener;
 import io.github.retrooper.packetevents.utils.versionlookup.protocollib.ProtocolLibVersionLookupUtils;
 
 import java.util.ArrayList;
@@ -73,17 +72,12 @@ class EventManagerDynamic {
     }
 
     public void registerListener(PacketListenerDynamic listener) {
-        if (PacketEvents.get().getSettings().shouldUseProtocolLibIfAvailable()
-                && ProtocolLibVersionLookupUtils.isAvailable()) {
-            ProtocolLibInternalListener.registerInternalListener(listener);
-        } else {
             List<PacketListenerDynamic> listeners = map.get(listener.getPriority());
             if (listeners == null) {
                 map.put(listener.getPriority(), new ArrayList<>());
                 listeners = map.get(listener.getPriority());
             }
             listeners.add(listener);
-        }
     }
 
     public void registerListeners(PacketListenerDynamic... listeners) {
@@ -93,16 +87,11 @@ class EventManagerDynamic {
     }
 
     public void unregisterListener(PacketListenerDynamic listener) {
-        if (PacketEvents.get().getSettings().shouldUseProtocolLibIfAvailable()
-                && ProtocolLibVersionLookupUtils.isAvailable()) {
-            ProtocolLibInternalListener.unregisterInternalListener(listener);
-        } else {
             List<PacketListenerDynamic> listeners = map.get(listener.getPriority());
             if (listeners == null) {
                 return;
             }
             listeners.remove(listener);
-        }
     }
 
     public void unregisterListeners(PacketListenerDynamic... listeners) {
@@ -113,9 +102,5 @@ class EventManagerDynamic {
 
     public void unregisterAllListeners() {
         map.clear();
-        if(PacketEvents.get().getSettings().shouldUseProtocolLibIfAvailable()
-                && ProtocolLibVersionLookupUtils.isAvailable()) {
-            ProtocolLibInternalListener.unregisterAllListeners();
-        }
     }
 }

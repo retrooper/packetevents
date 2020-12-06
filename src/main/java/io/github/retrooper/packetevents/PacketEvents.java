@@ -41,7 +41,6 @@ import io.github.retrooper.packetevents.utils.server.ServerUtils;
 import io.github.retrooper.packetevents.utils.server.ServerVersion;
 import io.github.retrooper.packetevents.utils.version.PEVersion;
 import io.github.retrooper.packetevents.utils.versionlookup.VersionLookupUtils;
-import io.github.retrooper.packetevents.utils.versionlookup.protocollib.ProtocolLibVersionLookupUtils;
 import io.github.retrooper.packetevents.utils.versionlookup.v_1_7_10.ProtocolVersionAccessor_v_1_7;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -173,9 +172,6 @@ public final class PacketEvents implements Listener, EventManager {
             final Plugin plugin = plugins.get(0);
             Bukkit.getPluginManager().registerEvents(this, plugin);
             packetHandlerInternal = new PacketHandlerInternal(plugin, settings.shouldInjectEarly());
-
-            if (!settings.shouldUseProtocolLibIfAvailable()
-                    || !ProtocolLibVersionLookupUtils.isAvailable()) {
                 for (final Player p : Bukkit.getOnlinePlayers()) {
                     try {
                         getPlayerUtils().injectPlayer(p);
@@ -183,7 +179,6 @@ public final class PacketEvents implements Listener, EventManager {
                         p.kickPlayer(getSettings().getInjectionFailureMessage());
                     }
                 }
-            }
 
             if (settings.shouldCheckForUpdates()) {
                 generalExecutorService.execute(new Runnable() {
@@ -204,13 +199,9 @@ public final class PacketEvents implements Listener, EventManager {
      */
     public void stop() {
         if (initialized && !stopping) {
-            stopping = true;
-            if (!settings.shouldUseProtocolLibIfAvailable()
-                    || !ProtocolLibVersionLookupUtils.isAvailable()) {
                 for (Player player : Bukkit.getOnlinePlayers()) {
                     packetHandlerInternal.ejectPlayer(player);
                 }
-            }
             packetHandlerInternal.close();
 
             getEventManager().unregisterAllListeners();
@@ -273,8 +264,7 @@ public final class PacketEvents implements Listener, EventManager {
 
     @EventHandler(priority = EventPriority.LOW)
     public void onLogin(PlayerLoginEvent e) {
-        if (getSettings().shouldInjectEarly() && (!getSettings().shouldUseProtocolLibIfAvailable()
-                || !ProtocolLibVersionLookupUtils.isAvailable())) {
+        if (getSettings().shouldInjectEarly()) {
             try {
                 packetHandlerInternal.injectPlayer(e.getPlayer());
             } catch (Exception ex) {
@@ -294,8 +284,7 @@ public final class PacketEvents implements Listener, EventManager {
             getPlayerUtils().clientVersionsMap.put(e.getPlayer().getAddress(), version);
         }
 
-        if (!getSettings().shouldInjectEarly() && (!getSettings().shouldUseProtocolLibIfAvailable()
-                || !ProtocolLibVersionLookupUtils.isAvailable())) {
+        if (!getSettings().shouldInjectEarly()) {
             try {
                 packetHandlerInternal.injectPlayer(e.getPlayer());
             } catch (Exception ex) {
@@ -311,9 +300,6 @@ public final class PacketEvents implements Listener, EventManager {
         getPlayerUtils().clientVersionsMap.remove(e.getPlayer().getAddress());
         getPlayerUtils().playerPingMap.remove(uuid);
         getPlayerUtils().playerSmoothedPingMap.remove(uuid);
-        if (!settings.shouldUseProtocolLibIfAvailable()
-                || !ProtocolLibVersionLookupUtils.isAvailable()) {
             packetHandlerInternal.ejectPlayer(e.getPlayer());
-        }
     }
 }
