@@ -59,7 +59,7 @@ public enum Direction {
     /**
      * +X offset
      */
-    EAST( (byte)5),
+    EAST((byte) 5),
 
     OTHER(Byte.MIN_VALUE);
 
@@ -69,13 +69,13 @@ public enum Direction {
         this.value = value;
     }
 
-    public short getValue() {
+    public byte getValue() {
         return value;
     }
 
-    public static Direction getDirection(final byte val) {
+    public static Direction fromId(byte value) {
         for (Direction direction : values()) {
-            if (direction.value == val) {
+            if (direction.value == value) {
                 return direction;
             }
         }

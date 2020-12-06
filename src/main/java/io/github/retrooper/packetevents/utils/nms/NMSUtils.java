@@ -28,8 +28,6 @@ import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
 import io.github.retrooper.packetevents.utils.entityfinder.EntityFinderUtils;
 import io.github.retrooper.packetevents.utils.reflection.Reflection;
 import io.github.retrooper.packetevents.utils.server.ServerVersion;
-import org.bukkit.Server;
-import org.bukkit.World;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -37,32 +35,32 @@ import org.bukkit.inventory.ItemStack;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
 
 public final class NMSUtils {
-    public static final HashMap<UUID, Object> channelCache = new HashMap<>();
-    private static final String nmsDir = ServerVersion.getNMSDirectory();
-    private static final String obcDir = ServerVersion.getOBCDirectory();
+    private static final String NMS_DIR = ServerVersion.getNMSDirectory() + ".";
+    private static final String OBC_DIR = ServerVersion.getOBCDirectory() + ".";
     public static ServerVersion version;
-    public static String nettyPrefix = "io.netty";
+    private static String nettyPrefix = "io.netty.";
     public static Class<?> nmsEntityClass, minecraftServerClass, craftWorldClass, playerInteractManagerClass, entityPlayerClass, playerConnectionClass, craftServerClass,
             craftPlayerClass, serverConnectionClass, craftEntityClass,
             craftItemStack, nmsItemStackClass, networkManagerClass, nettyChannelClass, gameProfileClass, iChatBaseComponentClass,
             blockPosClass, enumDirectionClass, vec3DClass;
-    private static Method craftWorldGetHandle;
     private static Method getCraftPlayerHandle;
     private static Method getCraftEntityHandle;
     private static Method asBukkitCopy;
-    private static Method getBukkitEntity;
     private static Field entityPlayerPingField, playerConnectionField;
+    private static Object minecraftServer;
+    private static Object minecraftServerConnection;
 
     public static void load() {
         try {
-            Class.forName(nettyPrefix + ".channel.Channel");
+            Class.forName(nettyPrefix + "channel.Channel");
         } catch (ClassNotFoundException e) {
-            nettyPrefix = "net.minecraft.util.io.netty";
+            nettyPrefix = "net.minecraft.util.io.netty.";
             try {
-                Class.forName(nettyPrefix + ".channel.Channel");
+                Class.forName(nettyPrefix + "channel.Channel");
             } catch (ClassNotFoundException e2) {
                 throw new IllegalStateException("PacketEvents failed to locate Netty's location.");
             }
@@ -99,13 +97,9 @@ public final class NMSUtils {
             getCraftPlayerHandle = craftPlayerClass.getMethod("getHandle");
             getCraftEntityHandle = craftEntityClass.getMethod("getHandle");
             asBukkitCopy = craftItemStack.getMethod("asBukkitCopy", nmsItemStackClass);
-            craftWorldGetHandle = craftWorldClass.getMethod("getHandle");
-            getBukkitEntity = nmsEntityClass.getMethod("getBukkitEntity");
         } catch (NoSuchMethodException e) {
             e.printStackTrace();
         }
-
-
         try {
             entityPlayerPingField = entityPlayerClass.getField("ping");
             playerConnectionField = entityPlayerClass.getField("playerConnection");
@@ -115,30 +109,33 @@ public final class NMSUtils {
     }
 
     public static Object getMinecraftServerInstance() {
-        try {
-            return Reflection.getMethod(minecraftServerClass, "getServer", 0).invoke(null);
-        } catch (IllegalAccessException | InvocationTargetException e) {
-            e.printStackTrace();
+        if(minecraftServer == null) {
+            try {
+                minecraftServer = Reflection.getMethod(minecraftServerClass, "getServer", 0).invoke(null);
+            } catch (IllegalAccessException | InvocationTargetException e) {
+                e.printStackTrace();
+            }
         }
-        return null;
+        return minecraftServer;
     }
 
     public static Object getMinecraftServerConnection() {
-        try {
-            return Reflection.getField(minecraftServerClass, serverConnectionClass, 0).get(getMinecraftServerInstance());
-        } catch (IllegalAccessException e) {
-            e.printStackTrace();
+        if(minecraftServerConnection == null) {
+            try {
+                minecraftServerConnection = Reflection.getField(minecraftServerClass, serverConnectionClass, 0).get(getMinecraftServerInstance());
+            } catch (IllegalAccessException e) {
+                e.printStackTrace();
+            }
         }
-        return null;
+        return minecraftServerConnection;
     }
 
     public static double[] recentTPS() {
-        return Reflection.getFieldInstance(minecraftServerClass, double[].class, 0, getMinecraftServerInstance());
-
+        return new WrappedPacket(getMinecraftServerInstance(), minecraftServerClass).readDoubleArray(0);
     }
 
     public static Class<?> getNMSClass(String name) throws ClassNotFoundException {
-        return Class.forName(nmsDir + "." + name);
+        return Class.forName(NMS_DIR + name);
     }
 
     public static Class<?> getNMSClassWithoutException(String name) {
@@ -151,34 +148,21 @@ public final class NMSUtils {
     }
 
     public static Class<?> getOBCClass(String name) throws ClassNotFoundException {
-        return Class.forName(obcDir + "." + name);
+        return Class.forName(OBC_DIR + name);
     }
 
     public static Class<?> getNettyClass(String name) throws ClassNotFoundException {
-        return Class.forName(nettyPrefix + "." + name);
+        return Class.forName(nettyPrefix + name);
     }
 
     public static Entity getEntityById(final int id) {
         return EntityFinderUtils.getEntityById(id);
     }
 
-    public static Entity getEntityByIdWithWorld(final World world, final int id) {
-        return EntityFinderUtils.getEntityByIdWithWorld(world, id);
-    }
-
     public static Object getNMSEntity(final Entity entity) {
         final Object craftEntity = craftEntityClass.cast(entity);
         try {
             return getCraftEntityHandle.invoke(craftEntity);
-        } catch (IllegalAccessException | InvocationTargetException e) {
-            e.printStackTrace();
-        }
-        return null;
-    }
-
-    public static Entity getBukkitEntity(final Object nmsEntity) {
-        try {
-            return (Entity) getBukkitEntity.invoke(nmsEntity);
         } catch (IllegalAccessException | InvocationTargetException e) {
             e.printStackTrace();
         }
@@ -227,10 +211,6 @@ public final class NMSUtils {
         return -1;
     }
 
-    public static List<Object> getNetworkMarkers() {
-        return getNetworkMarkers(getMinecraftServerConnection());
-    }
-
     public static List<Object> getNetworkMarkers(Object serverConnectionInstance) {
         Method method = Reflection.getMethod(serverConnectionClass, List.class, 0, serverConnectionClass);
         try {
@@ -241,55 +221,13 @@ public final class NMSUtils {
         return new ArrayList<>();
     }
 
-    public static ItemStack toBukkitItemStack(final Object nmsItemstack) {
+    public static ItemStack toBukkitItemStack(final Object nmsItemStack) {
         try {
-            return (ItemStack) asBukkitCopy.invoke(null, nmsItemstack);
+            return (ItemStack) asBukkitCopy.invoke(null, nmsItemStack);
         } catch (IllegalAccessException | InvocationTargetException e) {
             e.printStackTrace();
         }
         return null;
     }
 
-    public static Object convertBukkitServerToNMSServer(Server server) {
-        Object craftServer = craftServerClass.cast(server);
-        WrappedPacket wrapper = new WrappedPacket(craftServer);
-        return wrapper.readObject(0, minecraftServerClass);
-    }
-
-    public static Object convertBukkitWorldToNMSWorld(World world) {
-        Object craftWorld = craftWorldClass.cast(world);
-
-        try {
-            return craftWorldGetHandle.invoke(craftWorld);
-        } catch (IllegalAccessException | InvocationTargetException e) {
-            e.printStackTrace();
-        }
-        return null;
-    }
-
-    public static Object createNewEntityPlayer(Server server, World world, Object gameProfile) {
-        Object nmsServer = convertBukkitServerToNMSServer(server);
-        Object nmsWorld = convertBukkitWorldToNMSWorld(world);
-        return privateCreateNewEntityPlayer(nmsServer, Objects.requireNonNull(nmsWorld), gameProfile);
-    }
-
-    private static Object privateCreateNewEntityPlayer(Object nmsServer, Object nmsWorld, Object gameProfile) {
-        Object playerInteractManager = null;
-        try {
-            playerInteractManager = playerInteractManagerClass.getConstructor(nmsWorld.getClass()).newInstance(nmsWorld);
-        } catch (InstantiationException | IllegalAccessException
-                | InvocationTargetException | NoSuchMethodException e) {
-            e.printStackTrace();
-        }
-
-        try {
-            return entityPlayerClass.getConstructor(nmsServer.getClass(), nmsWorld.getClass(),
-                    gameProfile.getClass(), playerConnectionClass).
-                    newInstance(nmsServer, nmsWorld, gameProfile, playerInteractManager);
-        } catch (InstantiationException | IllegalAccessException
-                | InvocationTargetException | NoSuchMethodException e) {
-            e.printStackTrace();
-        }
-        return null;
-    }
 }

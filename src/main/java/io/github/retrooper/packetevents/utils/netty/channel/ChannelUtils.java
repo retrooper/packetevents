@@ -25,7 +25,6 @@
 package io.github.retrooper.packetevents.utils.netty.channel;
 
 import io.github.retrooper.packetevents.PacketEvents;
-import io.github.retrooper.packetevents.utils.nms.NMSUtils;
 import io.github.retrooper.packetevents.utils.server.ServerVersion;
 
 import java.net.InetSocketAddress;
