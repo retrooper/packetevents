@@ -28,6 +28,7 @@ import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
 import io.github.retrooper.packetevents.utils.entityfinder.EntityFinderUtils;
 import io.github.retrooper.packetevents.utils.reflection.Reflection;
 import io.github.retrooper.packetevents.utils.server.ServerVersion;
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -42,23 +43,23 @@ public final class NMSUtils {
     private static final String NMS_DIR = ServerVersion.getNMSDirectory() + ".";
     private static final String OBC_DIR = ServerVersion.getOBCDirectory() + ".";
     public static ServerVersion version;
-    private static String nettyPrefix = "io.netty.";
+    private static String nettyPrefix = "net.minecraft.util.io.netty.";
     public static Class<?> nmsEntityClass, minecraftServerClass, craftWorldClass, playerInteractManagerClass, entityPlayerClass, playerConnectionClass, craftServerClass,
             craftPlayerClass, serverConnectionClass, craftEntityClass,
             craftItemStack, nmsItemStackClass, networkManagerClass, nettyChannelClass, gameProfileClass, iChatBaseComponentClass,
-            blockPosClass, enumDirectionClass, vec3DClass;
+            blockPosClass, enumDirectionClass, vec3DClass, channelFutureClass;
     private static Method getCraftPlayerHandle;
     private static Method getCraftEntityHandle;
     private static Method asBukkitCopy;
     private static Field entityPlayerPingField, playerConnectionField;
-    private static Object minecraftServer;
-    private static Object minecraftServerConnection;
+    private static Object minecraftServer = null;
+    private static Object minecraftServerConnection = null;
 
     public static void load() {
         try {
             Class.forName(nettyPrefix + "channel.Channel");
         } catch (ClassNotFoundException e) {
-            nettyPrefix = "net.minecraft.util.io.netty.";
+            nettyPrefix = "io.netty.";
             try {
                 Class.forName(nettyPrefix + "channel.Channel");
             } catch (ClassNotFoundException e2) {
@@ -67,6 +68,7 @@ public final class NMSUtils {
         }
         try {
             nettyChannelClass = getNettyClass("channel.Channel");
+            channelFutureClass = getNettyClass("channel.ChannelFuture");
             nmsEntityClass = getNMSClass("Entity");
             minecraftServerClass = getNMSClass("MinecraftServer");
             craftWorldClass = getOBCClass("CraftWorld");
@@ -111,8 +113,9 @@ public final class NMSUtils {
     public static Object getMinecraftServerInstance() {
         if(minecraftServer == null) {
             try {
-                minecraftServer = Reflection.getMethod(minecraftServerClass, "getServer", 0).invoke(null);
-            } catch (IllegalAccessException | InvocationTargetException e) {
+                Field f = Reflection.getField(craftServerClass, minecraftServerClass, 0);
+                return f.get(Bukkit.getServer());
+            } catch (IllegalAccessException e) {
                 e.printStackTrace();
             }
         }
@@ -211,14 +214,25 @@ public final class NMSUtils {
         return -1;
     }
 
-    public static List<Object> getNetworkMarkers(Object serverConnectionInstance) {
-        Method method = Reflection.getMethod(serverConnectionClass, List.class, 0, serverConnectionClass);
-        try {
-            return (List<Object>) method.invoke(null, serverConnectionInstance);
-        } catch (IllegalAccessException | InvocationTargetException e) {
-            e.printStackTrace();
-        }
-        return new ArrayList<>();
+    public static List<Object> getNetworkMarkers() {
+        WrappedPacket serverConnectionWrapper = new WrappedPacket(getMinecraftServerConnection());
+       for(int i = 0; true; i++) {
+           try {
+               List<Object> list = (List<Object>) serverConnectionWrapper.readObject(i, List.class);
+               for (Object obj : list) {
+                   if (!obj.getClass().isAssignableFrom(channelFutureClass)) {
+                       return list;
+                   }
+                   else {
+                       break;
+                   }
+               }
+           }
+           catch(Exception ex) {
+               break;
+           }
+       }
+       return new ArrayList<>();
     }
 
     public static ItemStack toBukkitItemStack(final Object nmsItemStack) {

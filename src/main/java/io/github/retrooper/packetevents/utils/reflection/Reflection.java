@@ -30,7 +30,6 @@ import java.lang.reflect.Method;
 import java.util.Arrays;
 
 public final class Reflection {
-
     //FIELDS
     @Deprecated
     public static Field[] getFields(Class<?> cls) {
@@ -48,13 +47,16 @@ public final class Reflection {
                 return f;
             }
         }
+        if (cls.getSuperclass() != null) {
+            return getField(cls.getSuperclass(), name);
+        }
         return null;
     }
 
     public static <T> T getFieldInstance(final Class<?> cls, final Class<T> dataType, final int index, Object instance) {
         int currentIndex = 0;
         for (final Field f : getFields(cls)) {
-            if (f.getType().equals(dataType)) {
+            if (dataType.isAssignableFrom(f.getType())) {
                 if (currentIndex++ == index) {
                     try {
                         return (T) f.get(instance);
@@ -64,6 +66,9 @@ public final class Reflection {
                 }
             }
         }
+        if (cls.getSuperclass() != null) {
+            return getFieldInstance(cls.getSuperclass(), dataType, index, instance);
+        }
         return null;
     }
 
@@ -71,18 +76,28 @@ public final class Reflection {
     public static Field getField(final Class<?> cls, final Class<?> dataType, final int index) {
         int currentIndex = 0;
         for (final Field f : getFields(cls)) {
-            if (f.getType().equals(dataType)) {
+            if (dataType.isAssignableFrom(f.getType())) {
                 if (currentIndex++ == index) {
                     return f;
                 }
             }
+        }
+        if (cls.getSuperclass() != null) {
+            return getField(cls.getSuperclass(), dataType, index);
         }
         return null;
     }
 
     @Deprecated
     public static Field getField(final Class<?> cls, final int index) {
-        return getFields(cls)[index];
+        try {
+            return getFields(cls)[index];
+        } catch (Exception ex) {
+            if (cls.getSuperclass() != null) {
+                return getFields(cls.getSuperclass())[index];
+            }
+        }
+        return null;
     }
 
     //METHODS
@@ -107,23 +122,30 @@ public final class Reflection {
     public static Method getMethod(Class<?> cls, Class<?> returning, int index, Class<?>... params) {
         int currentIndex = 0;
         for (Method m : getMethods(cls)) {
-            if (Arrays.equals(m.getParameterTypes(), params) && m.getReturnType().equals(returning) && index == currentIndex++) {
+            if (Arrays.equals(m.getParameterTypes(), params)
+                    && (returning == null || m.getReturnType().equals(returning))
+                    && index == currentIndex++) {
                 m.setAccessible(true);
                 return m;
             }
         }
-        if (cls.getSuperclass() != null && !cls.getSuperclass().equals(Object.class)) {
-            return getMethod(cls.getSuperclass(), returning, index, params);
+        if (cls.getSuperclass() != null) {
+            return getMethod(cls.getSuperclass(), null, index, params);
         }
         return null;
     }
 
     public static Method getMethod(final Class<?> cls, final String name, Class<?> returning, Class<?>... params) {
         for (final Method m : getMethods(cls)) {
-            if (m.getName().equals(name) && Arrays.equals(m.getParameterTypes(), params) && m.getReturnType().equals(returning)) {
+            if (m.getName().equals(name)
+                    && Arrays.equals(m.getParameterTypes(), params) &&
+                    (returning == null || m.getReturnType().equals(returning))) {
                 m.setAccessible(true);
                 return m;
             }
+        }
+        if (cls.getSuperclass() != null) {
+            return getMethod(cls.getSuperclass(), name, null, params);
         }
         return null;
     }
@@ -136,26 +158,36 @@ public final class Reflection {
                 return m;
             }
         }
+        if (cls.getSuperclass() != null) {
+            return getMethod(cls.getSuperclass(), name, index);
+        }
         return null;
     }
 
     public static Method getMethod(final Class<?> cls, final Class<?> returning, final int index) {
         int currentIndex = 0;
         for (final Method m : getMethods(cls)) {
-            if (returning.equals(m.getReturnType()) && index == currentIndex++) {
+            if ((returning == null || m.getReturnType().equals(returning)) && index == currentIndex++) {
                 m.setAccessible(true);
                 return m;
             }
+        }
+        if (cls.getSuperclass() != null) {
+            return getMethod(cls.getSuperclass(), returning, index);
         }
         return null;
     }
 
     public static Method getMethod(final Class<?> cls, final String name, final Class<?> returning) {
         for (final Method m : getMethods(cls)) {
-            if (m.getName().equals(name) && m.getReturnType().equals(returning)) {
+            if (m.getName().equals(name)
+                    && (returning == null || m.getReturnType().equals(returning))) {
                 m.setAccessible(true);
                 return m;
             }
+        }
+        if (cls.getSuperclass() != null) {
+            return getMethod(cls.getSuperclass(), name, returning);
         }
         return null;
     }

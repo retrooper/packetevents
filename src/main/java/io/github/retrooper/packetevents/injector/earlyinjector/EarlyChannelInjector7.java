@@ -49,8 +49,7 @@ class EarlyChannelInjector7 implements ChannelInjector {
     }
 
     public void startup() {
-        Object serverConnection = NMSUtils.getMinecraftServerConnection();
-        networkMarkers = NMSUtils.getNetworkMarkers(serverConnection);
+        networkMarkers = NMSUtils.getNetworkMarkers();
         firstChannelInitializer = new ChannelInitializer<Channel>() {
             @Override
             protected void initChannel(final Channel channel) {
@@ -89,9 +88,8 @@ class EarlyChannelInjector7 implements ChannelInjector {
                 ctx.fireChannelRead(msg);
             }
         };
-
+        WrappedPacket serverConnectionWrapper = new WrappedPacket(NMSUtils.getMinecraftServerConnection());
         for (int i = 0; true; i++) {
-            WrappedPacket serverConnectionWrapper = new WrappedPacket(serverConnection);
             try {
                 List<Object> serverChannelList = (List<Object>) serverConnectionWrapper.readObject(i, List.class);
                 for (Object serverChannel : serverChannelList) {
