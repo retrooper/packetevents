@@ -44,6 +44,7 @@ public class MainExample extends JavaPlugin {
 
     @Override
     public void onDisable() {
+
         PacketEvents.get().stop();
     }
 }

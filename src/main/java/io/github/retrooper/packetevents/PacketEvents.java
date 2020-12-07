@@ -283,7 +283,6 @@ public final class PacketEvents implements Listener, EventManager {
             ClientVersion version = ClientVersion.getClientVersion(protocolVersion);
             getPlayerUtils().clientVersionsMap.put(e.getPlayer().getAddress(), version);
         }
-
         if (!getSettings().shouldInjectEarly()) {
             try {
                 packetHandlerInternal.injectPlayer(e.getPlayer());
