@@ -36,7 +36,7 @@ public class MainExample extends JavaPlugin {
 
     @Override
     public void onEnable() {
-        /**
+        /*
          * We created the instance in the onLoad method
          */
         PacketEvents.get().init(this);

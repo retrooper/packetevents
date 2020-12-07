@@ -31,11 +31,8 @@ import io.github.retrooper.packetevents.injector.lateinjector.LateChannelInjecto
 import io.github.retrooper.packetevents.packettype.PacketType;
 import io.github.retrooper.packetevents.packettype.PacketTypeClasses;
 import io.github.retrooper.packetevents.packetwrappers.login.in.handshake.WrappedPacketLoginInHandshake;
-import io.github.retrooper.packetevents.packetwrappers.login.in.start.WrappedPacketLoginInStart;
-import io.github.retrooper.packetevents.utils.gameprofile.WrappedGameProfile;
 import io.github.retrooper.packetevents.utils.nms.NMSUtils;
 import io.github.retrooper.packetevents.utils.player.ClientVersion;
-import io.github.retrooper.packetevents.utils.reflection.ClassUtil;
 import io.github.retrooper.packetevents.utils.server.ServerVersion;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -173,8 +170,7 @@ public class PacketHandlerInternal {
                     packet = null;
                 }
                 return packet;
-            }
-            else if(isServerBoundLoginPacket(packet)) {
+            } else if (isServerBoundLoginPacket(packet)) {
                 final PacketLoginEvent packetLoginEvent = new PacketLoginEvent(channel, packet);
                 PacketEvents.get().getEventManager().callEvent(packetLoginEvent);
                 interceptLogin(packetLoginEvent);
@@ -184,10 +180,12 @@ public class PacketHandlerInternal {
                 return packet;
             }
         }
-        Boolean firstPacket = firstPacketCache.get(channel);
-        if (firstPacket == null) {
-            firstPacketCache.put(channel, true);
-            PacketEvents.get().getEventManager().callEvent(new PostPlayerInjectEvent(player));
+        else {
+            Boolean firstPacket = firstPacketCache.get(channel);
+            if (firstPacket == null) {
+                firstPacketCache.put(channel, true);
+                PacketEvents.get().getEventManager().callEvent(new PostPlayerInjectEvent(player));
+            }
         }
         final PacketReceiveEvent packetReceiveEvent = new PacketReceiveEvent(player, channel, packet);
         PacketEvents.get().getEventManager().callEvent(packetReceiveEvent);
@@ -209,8 +207,7 @@ public class PacketHandlerInternal {
                     packet = null;
                 }
                 return packet;
-            }
-            else if(isClientBoundLoginPacket(packet)) {
+            } else if (isClientBoundLoginPacket(packet)) {
                 final PacketLoginEvent packetLoginEvent = new PacketLoginEvent(channel, packet);
                 PacketEvents.get().getEventManager().callEvent(packetLoginEvent);
                 interceptLogin(packetLoginEvent);
@@ -220,10 +217,12 @@ public class PacketHandlerInternal {
                 return packet;
             }
         }
-        Boolean firstPacket = firstPacketCache.get(channel);
-        if (firstPacket == null) {
-            firstPacketCache.put(channel, true);
-            PacketEvents.get().getEventManager().callEvent(new PostPlayerInjectEvent(player));
+        else {
+            Boolean firstPacket = firstPacketCache.get(channel);
+            if (firstPacket == null) {
+                firstPacketCache.put(channel, true);
+                PacketEvents.get().getEventManager().callEvent(new PostPlayerInjectEvent(player));
+            }
         }
         final PacketSendEvent packetSendEvent = new PacketSendEvent(player, channel, packet);
         PacketEvents.get().getEventManager().callEvent(packetSendEvent);
