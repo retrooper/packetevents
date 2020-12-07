@@ -24,12 +24,10 @@
 
 package io.github.retrooper.packetevents.event.manager;
 
-import io.github.retrooper.packetevents.PacketEvents;
 import io.github.retrooper.packetevents.event.PacketEvent;
 import io.github.retrooper.packetevents.event.PacketListenerDynamic;
 import io.github.retrooper.packetevents.event.eventtypes.CancellableEvent;
 import io.github.retrooper.packetevents.event.priority.PacketEventPriority;
-import io.github.retrooper.packetevents.utils.versionlookup.protocollib.ProtocolLibVersionLookupUtils;
 
 import java.util.ArrayList;
 import java.util.HashMap;
