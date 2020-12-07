@@ -73,8 +73,6 @@ public class LateChannelInjector {
      * @param player
      */
     public void injectPlayerAsync(final Player player) {
-        //Redundant channel variable created just so we can cache it synchronously.
-        Object channel = NMSUtils.getChannel(player);
         if (v1_7_nettyMode) {
             LateChannelInjector7 npm_7 = (LateChannelInjector7) npm;
             npm_7.injectPlayerAsync(player);

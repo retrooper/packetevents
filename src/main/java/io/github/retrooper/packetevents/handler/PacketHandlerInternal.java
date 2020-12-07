@@ -29,12 +29,10 @@ import io.github.retrooper.packetevents.event.impl.*;
 import io.github.retrooper.packetevents.injector.earlyinjector.EarlyChannelInjector;
 import io.github.retrooper.packetevents.injector.lateinjector.LateChannelInjector;
 import io.github.retrooper.packetevents.packettype.PacketType;
+import io.github.retrooper.packetevents.packettype.PacketTypeClasses;
 import io.github.retrooper.packetevents.packetwrappers.login.in.handshake.WrappedPacketLoginInHandshake;
-import io.github.retrooper.packetevents.packetwrappers.login.in.start.WrappedPacketLoginInStart;
-import io.github.retrooper.packetevents.utils.gameprofile.WrappedGameProfile;
 import io.github.retrooper.packetevents.utils.nms.NMSUtils;
 import io.github.retrooper.packetevents.utils.player.ClientVersion;
-import io.github.retrooper.packetevents.utils.reflection.ClassUtil;
 import io.github.retrooper.packetevents.utils.server.ServerVersion;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -51,9 +49,9 @@ public class PacketHandlerInternal {
     public final LateChannelInjector lateInjector;
     private final Plugin plugin;
     private final boolean earlyInjectMode;
-    private final HashMap<UUID, Long> keepAliveMap = new HashMap<>();
-    private final Map<String, Object> channelMap = new ConcurrentHashMap<>();
-    private final Map<Object, Boolean> firstPacketCache;
+    public final HashMap<UUID, Long> keepAliveMap = new HashMap<>();
+    public final Map<String, Object> channelMap = new ConcurrentHashMap<>();
+    public final Map<Object, Boolean> firstPacketCache;
 
     public PacketHandlerInternal(Plugin plugin, boolean earlyInjectMode) {
         this.plugin = plugin;
@@ -101,7 +99,8 @@ public class PacketHandlerInternal {
     }
 
     public void injectPlayerSync(Player player) {
-        PlayerInjectEvent injectEvent = new PlayerInjectEvent(player, false);
+        Object channel = PacketEvents.get().packetHandlerInternal.getChannel(player.getName());
+        PlayerInjectEvent injectEvent = new PlayerInjectEvent(player, channel,false);
         PacketEvents.get().getEventManager().callEvent(injectEvent);
         if (!injectEvent.isCancelled()) {
             if (earlyInjectMode) {
@@ -113,7 +112,8 @@ public class PacketHandlerInternal {
     }
 
     public void injectPlayerAsync(Player player) {
-        PlayerInjectEvent injectEvent = new PlayerInjectEvent(player, true);
+        Object channel = PacketEvents.get().packetHandlerInternal.getChannel(player.getName());
+        PlayerInjectEvent injectEvent = new PlayerInjectEvent(player, channel, true);
         PacketEvents.get().getEventManager().callEvent(injectEvent);
         if (!injectEvent.isCancelled()) {
             if (earlyInjectMode) {
@@ -128,12 +128,12 @@ public class PacketHandlerInternal {
         PlayerEjectEvent ejectEvent = new PlayerEjectEvent(player, false);
         PacketEvents.get().getEventManager().callEvent(ejectEvent);
         if (!ejectEvent.isCancelled()) {
-            keepAliveMap.remove(player.getUniqueId());
             if (earlyInjectMode) {
                 Objects.requireNonNull(earlyInjector).ejectPlayerSync(player);
             } else {
                 Objects.requireNonNull(lateInjector).ejectPlayerSync(player);
             }
+            keepAliveMap.remove(player.getUniqueId());
             firstPacketCache.remove(getChannel(player.getName()));
             channelMap.remove(player.getName());
         }
@@ -143,14 +143,11 @@ public class PacketHandlerInternal {
         PlayerEjectEvent ejectEvent = new PlayerEjectEvent(player, true);
         PacketEvents.get().getEventManager().callEvent(ejectEvent);
         if (!ejectEvent.isCancelled()) {
-            keepAliveMap.remove(player.getUniqueId());
             if (earlyInjectMode) {
                 Objects.requireNonNull(earlyInjector).ejectPlayerAsync(player);
             } else {
                 Objects.requireNonNull(lateInjector).ejectPlayerAsync(player);
             }
-            firstPacketCache.remove(getChannel(player.getName()));
-            channelMap.remove(player.getName());
         }
     }
 
@@ -163,96 +160,115 @@ public class PacketHandlerInternal {
     }
 
     public Object read(Player player, Object channel, Object packet) {
-        if (player == null) {
-            String simpleClassName = ClassUtil.getClassSimpleName(packet.getClass());
-            //Status packet
-            if (simpleClassName.startsWith("PacketS")) {
+        if(player == null) {
+            //Might be login or status packet?
+            if(isServerBoundStatusPacket(packet)) {
                 final PacketStatusEvent packetStatusEvent = new PacketStatusEvent(channel, packet);
                 PacketEvents.get().getEventManager().callEvent(packetStatusEvent);
                 interceptStatus(packetStatusEvent);
                 if (packetStatusEvent.isCancelled()) {
                     packet = null;
                 }
-            } else {
-                //Login packet
+                return packet;
+            } else if (isServerBoundLoginPacket(packet)) {
                 final PacketLoginEvent packetLoginEvent = new PacketLoginEvent(channel, packet);
                 PacketEvents.get().getEventManager().callEvent(packetLoginEvent);
                 interceptLogin(packetLoginEvent);
                 if (packetLoginEvent.isCancelled()) {
                     packet = null;
-                } else {
-                    //Cache the channel
-                    if (packetLoginEvent.getPacketId() == PacketType.Login.Client.START) {
-                        WrappedPacketLoginInStart startWrapper = new WrappedPacketLoginInStart(packetLoginEvent.getNMSPacket());
-                        WrappedGameProfile gameProfile = startWrapper.getGameProfile();
-                        channelMap.put(gameProfile.name, channel);
-                    }
                 }
+                return packet;
             }
-        } else {
+        }
+        else {
             Boolean firstPacket = firstPacketCache.get(channel);
             if (firstPacket == null) {
                 firstPacketCache.put(channel, true);
                 PacketEvents.get().getEventManager().callEvent(new PostPlayerInjectEvent(player));
             }
-            final PacketReceiveEvent packetReceiveEvent = new PacketReceiveEvent(player, packet);
-            PacketEvents.get().getEventManager().callEvent(packetReceiveEvent);
-            interceptRead(packetReceiveEvent);
-            if (packetReceiveEvent.isCancelled()) {
-                packet = null;
-            }
+        }
+        final PacketReceiveEvent packetReceiveEvent = new PacketReceiveEvent(player, channel, packet);
+        PacketEvents.get().getEventManager().callEvent(packetReceiveEvent);
+        interceptRead(packetReceiveEvent);
+        if (packetReceiveEvent.isCancelled()) {
+            packet = null;
         }
         return packet;
     }
 
     public Object write(Player player, Object channel, Object packet) {
-        if (player == null) {
-            String simpleClassName = ClassUtil.getClassSimpleName(packet.getClass());
-            //Status packet
-            if (simpleClassName.startsWith("PacketS")) {
+        if(player == null) {
+            //Might be login or status packet?
+            if(isClientBoundStatusPacket(packet)) {
                 final PacketStatusEvent packetStatusEvent = new PacketStatusEvent(channel, packet);
                 PacketEvents.get().getEventManager().callEvent(packetStatusEvent);
                 interceptStatus(packetStatusEvent);
                 if (packetStatusEvent.isCancelled()) {
                     packet = null;
                 }
-            }
-            //Login packet
-            else {
+                return packet;
+            } else if (isClientBoundLoginPacket(packet)) {
                 final PacketLoginEvent packetLoginEvent = new PacketLoginEvent(channel, packet);
                 PacketEvents.get().getEventManager().callEvent(packetLoginEvent);
                 interceptLogin(packetLoginEvent);
                 if (packetLoginEvent.isCancelled()) {
                     packet = null;
                 }
+                return packet;
             }
-        } else {
+        }
+        else {
             Boolean firstPacket = firstPacketCache.get(channel);
             if (firstPacket == null) {
                 firstPacketCache.put(channel, true);
                 PacketEvents.get().getEventManager().callEvent(new PostPlayerInjectEvent(player));
             }
-            final PacketSendEvent packetSendEvent = new PacketSendEvent(player, packet);
-            PacketEvents.get().getEventManager().callEvent(packetSendEvent);
-            interceptWrite(packetSendEvent);
-            if (packetSendEvent.isCancelled()) {
-                packet = null;
-            }
+        }
+        final PacketSendEvent packetSendEvent = new PacketSendEvent(player, channel, packet);
+        PacketEvents.get().getEventManager().callEvent(packetSendEvent);
+        interceptWrite(packetSendEvent);
+        if (packetSendEvent.isCancelled()) {
+            packet = null;
         }
         return packet;
     }
 
-    public void postRead(Player player, Object packet) {
+    private boolean isServerBoundStatusPacket(Object packet) {
+        return PacketTypeClasses.Status.Client.START.equals(packet.getClass())
+                || PacketTypeClasses.Status.Client.PING.equals(packet.getClass());
+    }
+
+    private boolean isServerBoundLoginPacket(Object packet) {
+        return PacketTypeClasses.Login.Client.CUSTOM_PAYLOAD.equals(packet.getClass())
+                || PacketTypeClasses.Login.Client.HANDSHAKE.equals(packet.getClass())
+                || PacketTypeClasses.Login.Client.START.equals(packet.getClass())
+                || PacketTypeClasses.Login.Client.ENCRYPTION_BEGIN.equals(packet.getClass());
+    }
+
+    private boolean isClientBoundStatusPacket(Object packet) {
+        return PacketTypeClasses.Status.Server.SERVER_INFO.equals(packet.getClass())
+                || PacketTypeClasses.Status.Server.PONG.equals(packet.getClass());
+    }
+
+    private boolean isClientBoundLoginPacket(Object packet) {
+        return PacketTypeClasses.Login.Server.CUSTOM_PAYLOAD.equals(packet.getClass())
+                || PacketTypeClasses.Login.Server.DISCONNECT.equals(packet.getClass())
+                || PacketTypeClasses.Login.Server.ENCRYPTION_BEGIN.equals(packet.getClass())
+                || PacketTypeClasses.Login.Server.SET_COMPRESSION.equals(packet.getClass())
+                || PacketTypeClasses.Login.Server.SUCCESS.equals(packet.getClass());
+    }
+
+    public void postRead(Player player, Object channel, Object packet) {
         if (player != null) {
-            PostPacketReceiveEvent event = new PostPacketReceiveEvent(player, packet);
+            PostPacketReceiveEvent event = new PostPacketReceiveEvent(player, channel, packet);
             PacketEvents.get().getEventManager().callEvent(event);
             interceptPostRead(event);
         }
     }
 
-    public void postWrite(Player player, Object packet) {
+    public void postWrite(Player player, Object channel, Object packet) {
         if (player != null) {
-            PostPacketSendEvent event = new PostPacketSendEvent(player, packet);
+            PostPacketSendEvent event = new PostPacketSendEvent(player, channel, packet);
             PacketEvents.get().getEventManager().callEvent(event);
             interceptPostSend(event);
         }

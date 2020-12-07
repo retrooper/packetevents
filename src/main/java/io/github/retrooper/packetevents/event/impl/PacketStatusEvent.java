@@ -31,6 +31,7 @@ import io.github.retrooper.packetevents.event.eventtypes.NMSPacketEvent;
 import io.github.retrooper.packetevents.packettype.PacketType;
 import io.github.retrooper.packetevents.utils.netty.channel.ChannelUtils;
 import io.github.retrooper.packetevents.utils.reflection.ClassUtil;
+import org.jetbrains.annotations.NotNull;
 
 import java.net.InetSocketAddress;
 
@@ -49,7 +50,7 @@ public class PacketStatusEvent extends PacketEvent implements NMSPacketEvent, Ca
     private final InetSocketAddress socketAddress;
     private final Object packet;
     private boolean cancelled;
-    private byte packetID = -1;
+    private byte packetID = -2;
 
     public PacketStatusEvent(final Object channel, final Object packet) {
         this.socketAddress = ChannelUtils.getSocketAddress(channel);
@@ -61,16 +62,25 @@ public class PacketStatusEvent extends PacketEvent implements NMSPacketEvent, Ca
         this.packet = packet;
     }
 
+    /**
+     * Socket address of the associated client.
+     * This socket address will never be null.
+     * @return Socket address of the client.
+     */
+    @NotNull
+    @Override
     public InetSocketAddress getSocketAddress() {
         return socketAddress;
     }
 
 
+    @NotNull
     @Override
     public String getPacketName() {
         return ClassUtil.getClassSimpleName(packet.getClass());
     }
 
+    @NotNull
     @Override
     public Object getNMSPacket() {
         return packet;
@@ -84,6 +94,7 @@ public class PacketStatusEvent extends PacketEvent implements NMSPacketEvent, Ca
      * </p>
      * @return Packet ID.
      */
+    @Override
     public byte getPacketId() {
         if (packetID == -1) {
             packetID = PacketType.Status.packetIds.getOrDefault(packet.getClass(), (byte) -1);

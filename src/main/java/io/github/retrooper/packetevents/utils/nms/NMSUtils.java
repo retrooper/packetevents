@@ -52,8 +52,8 @@ public final class NMSUtils {
     private static Method getCraftEntityHandle;
     private static Method asBukkitCopy;
     private static Field entityPlayerPingField, playerConnectionField;
-    private static Object minecraftServer;
-    private static Object minecraftServerConnection;
+    private static Object minecraftServer = null;
+    private static Object minecraftServerConnection = null;
 
     public static void load() {
         try {
@@ -113,8 +113,8 @@ public final class NMSUtils {
     public static Object getMinecraftServerInstance() {
         if(minecraftServer == null) {
             try {
-                Field field = Reflection.getField(craftServerClass, minecraftServerClass, 0);
-                minecraftServer = field.get(Bukkit.getServer());
+                Field f = Reflection.getField(craftServerClass, minecraftServerClass, 0);
+                return minecraftServer = f.get(Bukkit.getServer());
             } catch (IllegalAccessException e) {
                 e.printStackTrace();
             }
@@ -228,7 +228,7 @@ public final class NMSUtils {
                    }
                }
            }
-           catch(Exception e) {
+           catch(Exception ex) {
                break;
            }
        }

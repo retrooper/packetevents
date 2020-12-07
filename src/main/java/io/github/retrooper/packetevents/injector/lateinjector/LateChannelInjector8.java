@@ -50,7 +50,7 @@ class LateChannelInjector8 implements ChannelInjector {
                     return;
                 }
                 super.channelRead(ctx, msg);
-                PacketEvents.get().packetHandlerInternal.postRead(player, packet);
+                PacketEvents.get().packetHandlerInternal.postRead(player, ctx.channel(), packet);
             }
 
             @Override
@@ -60,7 +60,7 @@ class LateChannelInjector8 implements ChannelInjector {
                     return;
                 }
                 super.write(ctx, msg, promise);
-                PacketEvents.get().packetHandlerInternal.postWrite(player, packet);
+                PacketEvents.get().packetHandlerInternal.postWrite(player, ctx.channel(), packet);
             }
         };
         final Channel channel = (Channel) PacketEvents.get().packetHandlerInternal.getChannel(player.getName());
@@ -70,7 +70,9 @@ class LateChannelInjector8 implements ChannelInjector {
     @Override
     public void ejectPlayerSync(Player player) {
         final Channel channel = (Channel) PacketEvents.get().packetHandlerInternal.getChannel(player.getName());
-        channel.pipeline().remove(getNettyHandlerName(plugin));
+        if (channel.pipeline().get(getNettyHandlerName(plugin)) != null) {
+            channel.pipeline().remove(getNettyHandlerName(plugin));
+        }
     }
 
     @Override
@@ -89,7 +91,12 @@ class LateChannelInjector8 implements ChannelInjector {
             @Override
             public void run() {
                 final Channel channel = (Channel) PacketEvents.get().packetHandlerInternal.getChannel(player.getName());
-                channel.pipeline().remove(getNettyHandlerName(plugin));
+                if (channel.pipeline().get(getNettyHandlerName(plugin)) != null) {
+                    channel.pipeline().remove(getNettyHandlerName(plugin));
+                }
+                PacketEvents.get().packetHandlerInternal.keepAliveMap.remove(player.getUniqueId());
+                PacketEvents.get().packetHandlerInternal.firstPacketCache.remove(channel);
+                PacketEvents.get().packetHandlerInternal.channelMap.remove(player.getName());
             }
         });
     }

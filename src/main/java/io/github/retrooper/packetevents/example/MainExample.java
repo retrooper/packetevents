@@ -30,17 +30,21 @@ import org.bukkit.plugin.java.JavaPlugin;
 public class MainExample extends JavaPlugin {
     @Override
     public void onLoad() {
+        //We use default settings
         PacketEvents.create().load();
     }
 
     @Override
     public void onEnable() {
-        //We use default settings
+        /*
+         * We created the instance in the onLoad method
+         */
         PacketEvents.get().init(this);
     }
 
     @Override
     public void onDisable() {
+
         PacketEvents.get().stop();
     }
 }
