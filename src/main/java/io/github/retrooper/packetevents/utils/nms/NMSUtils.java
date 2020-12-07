@@ -114,7 +114,7 @@ public final class NMSUtils {
         if(minecraftServer == null) {
             try {
                 Field f = Reflection.getField(craftServerClass, minecraftServerClass, 0);
-                return f.get(Bukkit.getServer());
+                return minecraftServer = f.get(Bukkit.getServer());
             } catch (IllegalAccessException e) {
                 e.printStackTrace();
             }
