@@ -296,10 +296,6 @@ public final class PacketEvents implements Listener, EventManager {
 
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onQuit(final PlayerQuitEvent e) {
-        UUID uuid = e.getPlayer().getUniqueId();
-        getPlayerUtils().clientVersionsMap.remove(e.getPlayer().getAddress());
-        getPlayerUtils().playerPingMap.remove(uuid);
-        getPlayerUtils().playerSmoothedPingMap.remove(uuid);
-            packetHandlerInternal.ejectPlayer(e.getPlayer());
+        packetHandlerInternal.ejectPlayer(e.getPlayer());
     }
 }

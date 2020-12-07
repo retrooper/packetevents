@@ -31,6 +31,7 @@ import io.github.retrooper.packetevents.event.eventtypes.CancellableEvent;
 import io.github.retrooper.packetevents.event.eventtypes.PlayerEvent;
 import io.github.retrooper.packetevents.settings.PacketEventsSettings;
 import org.bukkit.entity.Player;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * The {@code PlayerEjectEvent} event is fired whenever a player is ejected.
@@ -48,11 +49,6 @@ public final class PlayerEjectEvent extends PacketEvent implements CancellableEv
     public PlayerEjectEvent(final Player player, final boolean isAsync) {
         this.player = player;
         this.async = isAsync;
-    }
-
-    public PlayerEjectEvent(final Player player) {
-        this.player = player;
-        this.async = true; //default value
     }
 
     @Override
@@ -80,6 +76,7 @@ public final class PlayerEjectEvent extends PacketEvent implements CancellableEv
      * The player object is guaranteed to NOT be null.
      * @return Ejected player.
      */
+    @NotNull
     @Override
     public Player getPlayer() {
         return player;

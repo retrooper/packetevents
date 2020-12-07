@@ -32,6 +32,7 @@ import io.github.retrooper.packetevents.event.eventtypes.NMSPacketEvent;
 import io.github.retrooper.packetevents.packettype.PacketType;
 import io.github.retrooper.packetevents.utils.netty.channel.ChannelUtils;
 import io.github.retrooper.packetevents.utils.reflection.ClassUtil;
+import org.jetbrains.annotations.NotNull;
 
 import java.net.InetSocketAddress;
 
@@ -50,6 +51,7 @@ public class PacketLoginEvent extends PacketEvent implements NMSPacketEvent, Can
     private final InetSocketAddress socketAddress;
     private final Object packet;
     private boolean cancelled;
+    private byte packetID = -2;
 
     public PacketLoginEvent(final Object channel, final Object packet) {
         this.socketAddress = ChannelUtils.getSocketAddress(channel);
@@ -61,16 +63,25 @@ public class PacketLoginEvent extends PacketEvent implements NMSPacketEvent, Can
         this.packet = packet;
     }
 
+    /**
+     * Socket address of the associated client.
+     * This socket address will never be null.
+     * @return Socket address of the client.
+     */
+    @NotNull
+    @Override
     public InetSocketAddress getSocketAddress() {
         return socketAddress;
     }
 
 
+    @NotNull
     @Override
     public String getPacketName() {
         return ClassUtil.getClassSimpleName(packet.getClass());
     }
 
+    @NotNull
     @Override
     public Object getNMSPacket() {
         return packet;
@@ -80,12 +91,17 @@ public class PacketLoginEvent extends PacketEvent implements NMSPacketEvent, Can
      * Each binding in each packet state has their own constants.
      * Example Usage:
      * <p>
-     *     {@code if (getPacketId() == PacketType.Login.Client.HANDSHAKE) }
+     * {@code if (getPacketId() == PacketType.Login.Client.HANDSHAKE) }
      * </p>
+     *
      * @return Packet ID.
      */
+    @Override
     public byte getPacketId() {
-        return PacketType.Login.packetIds.getOrDefault(packet.getClass(), (byte) -1);
+        if (packetID == -2) {
+            packetID = PacketType.Login.packetIds.getOrDefault(packet.getClass(), (byte) -1);
+        }
+        return packetID;
     }
 
     @Override

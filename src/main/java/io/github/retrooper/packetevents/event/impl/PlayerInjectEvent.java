@@ -30,7 +30,12 @@ import io.github.retrooper.packetevents.event.PacketListenerDynamic;
 import io.github.retrooper.packetevents.event.eventtypes.CancellableEvent;
 import io.github.retrooper.packetevents.event.eventtypes.PlayerEvent;
 import io.github.retrooper.packetevents.settings.PacketEventsSettings;
+import io.github.retrooper.packetevents.utils.netty.channel.ChannelUtils;
 import org.bukkit.entity.Player;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
+import java.net.InetSocketAddress;
 
 /**
  * The {@code PlayerInjectEvent} event is fired whenever a player is injected.
@@ -42,15 +47,13 @@ import org.bukkit.entity.Player;
  */
 public final class PlayerInjectEvent extends PacketEvent implements CancellableEvent, PlayerEvent {
     private final Player player;
+    private final InetSocketAddress address;
     private final boolean async;
     private boolean cancelled;
 
-    public PlayerInjectEvent(final Player player) {
-        this(player, false);
-    }
-
-    public PlayerInjectEvent(final Player player, boolean isAsync) {
+    public PlayerInjectEvent(final Player player, final Object channel, final boolean isAsync) {
         this.player = player;
+        this.address = ChannelUtils.getSocketAddress(channel);
         this.async = isAsync;
     }
 
@@ -76,11 +79,22 @@ public final class PlayerInjectEvent extends PacketEvent implements CancellableE
 
     /**
      * This method returns the bukkit player object of the player being injected.
+     * This player might be null.
      * @return Injected Player.
      */
+    @Nullable
     @Override
     public Player getPlayer() {
         return player;
+    }
+
+    /**
+     * This method returns the socket address injecting player.
+     * @return Socket address of the injecting player.
+     */
+    @NotNull
+    public InetSocketAddress getSocketAddress() {
+        return address;
     }
 
     /**

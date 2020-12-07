@@ -30,7 +30,8 @@ import org.bukkit.plugin.java.JavaPlugin;
 public class MainExample extends JavaPlugin {
     @Override
     public void onLoad() {
-        PacketEvents.create().load();
+        PacketEvents.create().getSettings().injectEarly(false);
+        PacketEvents.get().load();
     }
 
     @Override

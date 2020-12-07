@@ -31,6 +31,10 @@ import io.github.retrooper.packetevents.event.eventtypes.CancellableEvent;
 import io.github.retrooper.packetevents.event.eventtypes.PlayerEvent;
 import io.github.retrooper.packetevents.utils.player.ClientVersion;
 import org.bukkit.entity.Player;
+import org.jetbrains.annotations.NotNull;
+
+import java.net.InetSocketAddress;
+
 /**
  * The {@code PostPlayerInjectEvent} event is fired after a player is successfully injected.
  * One thing to note is PacketEvents can never predict if an injection will be successful before injecting.
@@ -57,9 +61,10 @@ public class PostPlayerInjectEvent extends PacketEvent implements PlayerEvent {
 
     /**
      * This method returns the bukkit player object of the player that has been injected.
-     * The player is guaranteed to NOT be null.
+     * The player is guaranteed to not be null.
      * @return Injected Player.
      */
+    @NotNull
     @Override
     public Player getPlayer() {
         return player;
@@ -69,6 +74,7 @@ public class PostPlayerInjectEvent extends PacketEvent implements PlayerEvent {
      * This method returns the cached netty channel of the player.
      * @return Netty channel of the injected player.
      */
+    @NotNull
     public Object getChannel() {
         return PacketEvents.get().packetHandlerInternal.getChannel(player.getName());
     }
@@ -79,7 +85,7 @@ public class PostPlayerInjectEvent extends PacketEvent implements PlayerEvent {
      * @return ClientVersion of injected player.
      */
     public ClientVersion getClientVersion() {
-        return PacketEvents.get().getPlayerUtils().clientVersionsMap.get(getChannel());
+        return PacketEvents.get().getPlayerUtils().clientVersionsMap.get(player.getAddress());
     }
 
     @Override

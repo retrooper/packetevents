@@ -29,8 +29,14 @@ import io.github.retrooper.packetevents.event.PacketListenerDynamic;
 import io.github.retrooper.packetevents.event.eventtypes.NMSPacketEvent;
 import io.github.retrooper.packetevents.event.eventtypes.PlayerEvent;
 import io.github.retrooper.packetevents.packettype.PacketType;
+import io.github.retrooper.packetevents.utils.netty.channel.ChannelUtils;
 import io.github.retrooper.packetevents.utils.reflection.ClassUtil;
 import org.bukkit.entity.Player;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
+import java.net.InetSocketAddress;
+
 /**
  * The {@code PostPacketSendEvent} event is fired after minecraft processes
  * a PLAY client-bound packet.
@@ -44,29 +50,48 @@ import org.bukkit.entity.Player;
  */
 public class PostPacketSendEvent extends PacketEvent implements NMSPacketEvent, PlayerEvent {
     private final Player player;
+    private final InetSocketAddress address;
     private final Object packet;
-    private byte packetID = -1;
+    private byte packetID = -2;
 
-    public PostPacketSendEvent(final Player player, final Object packet) {
+    public PostPacketSendEvent(final Player player, final Object channel, final Object packet) {
         this.player = player;
+        this.address = ChannelUtils.getSocketAddress(channel);
         this.packet = packet;
     }
 
     /**
      * This method returns the bukkit player object of the packet sender.
-     * The player object is guaranteed to NOT be null.
+     * The player object is might be null during early packets.
+     *
      * @return Packet receiver.
      */
+    @Nullable
     @Override
     public Player getPlayer() {
         return player;
     }
 
+    /**
+     * This method returns the socket address of the packet receiver.
+     * This address if guaranteed to never be null.
+     * You could use this to identify who is sending packets
+     * whenever the player object is null.
+     * @return Packet receiver's socket address.
+     */
+    @NotNull
+    @Override
+    public InetSocketAddress getSocketAddress() {
+        return address;
+    }
+
+    @NotNull
     @Override
     public String getPacketName() {
         return ClassUtil.getClassSimpleName(packet.getClass());
     }
 
+    @NotNull
     @Override
     public Object getNMSPacket() {
         return packet;
@@ -80,8 +105,9 @@ public class PostPacketSendEvent extends PacketEvent implements NMSPacketEvent, 
      * </p>
      * @return Packet ID.
      */
+    @Override
     public byte getPacketId() {
-        if (packetID == -1) {
+        if (packetID == -2) {
             packetID = PacketType.Play.Server.packetIds.getOrDefault(packet.getClass(), (byte) -1);
         }
         return packetID;

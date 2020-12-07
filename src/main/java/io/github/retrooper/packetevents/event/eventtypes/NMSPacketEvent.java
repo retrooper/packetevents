@@ -26,6 +26,8 @@ package io.github.retrooper.packetevents.event.eventtypes;
 
 import io.github.retrooper.packetevents.packettype.PacketType;
 
+import java.net.InetSocketAddress;
+
 /**
  * The {@code NMSPacketEvent} interface represents an event that has to do with an actual packet.
  * Don't mix this up with {@link io.github.retrooper.packetevents.event.PacketEvent}.
@@ -50,4 +52,16 @@ public interface NMSPacketEvent {
      * @return NMS object.
      */
     Object getNMSPacket();
+
+    /**
+     * Get the Packet ID.
+     * @return Packet ID.
+     */
+    byte getPacketId();
+
+    /**
+     * Get the associated player's socket address.
+     * @return Socket address of the associated player.
+     */
+    InetSocketAddress getSocketAddress();
 }

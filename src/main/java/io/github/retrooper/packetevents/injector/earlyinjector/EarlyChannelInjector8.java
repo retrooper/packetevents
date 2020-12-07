@@ -166,6 +166,9 @@ public class EarlyChannelInjector8 implements ChannelInjector {
             public void run() {
                 Channel channel = (Channel) PacketEvents.get().packetHandlerInternal.getChannel(player.getName());
                 ejectChannel(channel);
+                PacketEvents.get().packetHandlerInternal.keepAliveMap.remove(player.getUniqueId());
+                PacketEvents.get().packetHandlerInternal.firstPacketCache.remove(channel);
+                PacketEvents.get().packetHandlerInternal.channelMap.remove(player.getName());
             }
         });
     }
@@ -184,7 +187,7 @@ public class EarlyChannelInjector8 implements ChannelInjector {
             packet = PacketEvents.get().packetHandlerInternal.read(player, ctx.channel(), packet);
             if (packet != null) {
                 super.channelRead(ctx, packet);
-                PacketEvents.get().packetHandlerInternal.postRead(player, packet);
+                PacketEvents.get().packetHandlerInternal.postRead(player, ctx.channel(), packet);
             }
         }
 
@@ -193,7 +196,7 @@ public class EarlyChannelInjector8 implements ChannelInjector {
             packet = PacketEvents.get().packetHandlerInternal.write(player, ctx.channel(), packet);
             if (packet != null) {
                 super.write(ctx, packet, promise);
-                PacketEvents.get().packetHandlerInternal.postWrite(player, packet);
+                PacketEvents.get().packetHandlerInternal.postWrite(player, ctx.channel(), packet);
             }
         }
     }
