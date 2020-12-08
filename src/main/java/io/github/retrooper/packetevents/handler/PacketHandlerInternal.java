@@ -47,14 +47,12 @@ import java.util.concurrent.ConcurrentHashMap;
 public class PacketHandlerInternal {
     public final EarlyChannelInjector earlyInjector;
     public final LateChannelInjector lateInjector;
-    private final Plugin plugin;
     private final boolean earlyInjectMode;
     public final HashMap<UUID, Long> keepAliveMap = new HashMap<>();
     public final Map<String, Object> channelMap = new ConcurrentHashMap<>();
     public final Map<Object, Boolean> firstPacketCache;
 
     public PacketHandlerInternal(Plugin plugin, boolean earlyInjectMode) {
-        this.plugin = plugin;
         this.earlyInjectMode = earlyInjectMode;
         if (earlyInjectMode) {
             earlyInjector = new EarlyChannelInjector(plugin);
@@ -181,8 +179,7 @@ public class PacketHandlerInternal {
             }
         }
         else {
-            Boolean firstPacket = firstPacketCache.get(channel);
-            if (firstPacket == null) {
+            if (!firstPacketCache.containsKey(channel)) {
                 firstPacketCache.put(channel, true);
                 PacketEvents.get().getEventManager().callEvent(new PostPlayerInjectEvent(player));
             }
@@ -218,8 +215,7 @@ public class PacketHandlerInternal {
             }
         }
         else {
-            Boolean firstPacket = firstPacketCache.get(channel);
-            if (firstPacket == null) {
+            if (!firstPacketCache.containsKey(channel)) {
                 firstPacketCache.put(channel, true);
                 PacketEvents.get().getEventManager().callEvent(new PostPlayerInjectEvent(player));
             }

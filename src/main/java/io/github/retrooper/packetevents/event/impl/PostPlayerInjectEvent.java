@@ -33,8 +33,6 @@ import io.github.retrooper.packetevents.utils.player.ClientVersion;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
-import java.net.InetSocketAddress;
-
 /**
  * The {@code PostPlayerInjectEvent} event is fired after a player is successfully injected.
  * One thing to note is PacketEvents can never predict if an injection will be successful before injecting.

@@ -31,13 +31,11 @@ import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 
 public class EarlyChannelInjector implements ChannelInjector {
-    private final Plugin plugin;
     private EarlyChannelInjector7 injector7;
     private EarlyChannelInjector8 injector8;
     private boolean outdatedInjectorMode = false;
 
     public EarlyChannelInjector(final Plugin plugin) {
-        this.plugin = plugin;
         if (PacketEvents.get().getServerUtils().getVersion() == ServerVersion.v_1_7_10) {
             injector7 = new EarlyChannelInjector7(plugin);
             this.outdatedInjectorMode = true;
