@@ -103,18 +103,13 @@ public class EarlyChannelInjector8 implements ChannelInjector {
     }
 
     public void close() {
-        PacketEvents.get().packetHandlingExecutorService.execute(new Runnable() {
-            @Override
-            public void run() {
-                for (Channel channel : serverChannels) {
-                    try {
-                        channel.pipeline().remove(channelHandler);
-                    } catch (NoSuchElementException ignored) {
+        for (Channel channel : serverChannels) {
+            try {
+                channel.pipeline().remove(channelHandler);
+            } catch (NoSuchElementException ignored) {
 
-                    }
-                }
             }
-        });
+        }
     }
 
     public PlayerChannelInterceptor injectChannel(Object ch) {
@@ -146,6 +141,7 @@ public class EarlyChannelInjector8 implements ChannelInjector {
     public void ejectPlayerSync(Player player) {
         Channel channel = (Channel) PacketEvents.get().packetHandlerInternal.getChannel(player.getName());
         ejectChannel(channel);
+        PacketEvents.get().getPlayerUtils().clientVersionsMap.remove(player.getAddress());
     }
 
     @Override
@@ -169,6 +165,7 @@ public class EarlyChannelInjector8 implements ChannelInjector {
                 PacketEvents.get().packetHandlerInternal.keepAliveMap.remove(player.getUniqueId());
                 PacketEvents.get().packetHandlerInternal.firstPacketCache.remove(channel);
                 PacketEvents.get().packetHandlerInternal.channelMap.remove(player.getName());
+                PacketEvents.get().getPlayerUtils().clientVersionsMap.remove(player.getAddress());
             }
         });
     }
@@ -179,7 +176,7 @@ public class EarlyChannelInjector8 implements ChannelInjector {
         channel.writeAndFlush(packet);
     }
 
-    public class PlayerChannelInterceptor extends ChannelDuplexHandler {
+    public static class PlayerChannelInterceptor extends ChannelDuplexHandler {
         public volatile Player player;
 
         @Override

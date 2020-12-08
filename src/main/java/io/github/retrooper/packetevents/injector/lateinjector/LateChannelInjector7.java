@@ -72,6 +72,7 @@ class LateChannelInjector7 implements ChannelInjector {
         final Channel channel = (Channel) PacketEvents.get().packetHandlerInternal.getChannel(player.getName());
         if(channel.pipeline().get(getNettyHandlerName(plugin)) != null) {
         channel.pipeline().remove(getNettyHandlerName(plugin));}
+        PacketEvents.get().getPlayerUtils().clientVersionsMap.remove(player.getAddress());
     }
 
     @Override
@@ -96,6 +97,7 @@ class LateChannelInjector7 implements ChannelInjector {
                 PacketEvents.get().packetHandlerInternal.keepAliveMap.remove(player.getUniqueId());
                 PacketEvents.get().packetHandlerInternal.firstPacketCache.remove(channel);
                 PacketEvents.get().packetHandlerInternal.channelMap.remove(player.getName());
+                PacketEvents.get().getPlayerUtils().clientVersionsMap.remove(player.getAddress());
             }
         });
     }

@@ -62,6 +62,15 @@ public class EarlyChannelInjector implements ChannelInjector {
         }
     }
 
+    public void closeAsync() {
+        PacketEvents.get().packetHandlingExecutorService.execute(new Runnable() {
+            @Override
+            public void run() {
+                close();
+            }
+        });
+    }
+
     @Override
     public void injectPlayerSync(Player player) {
         if (outdatedInjectorMode) {

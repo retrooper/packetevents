@@ -42,6 +42,7 @@ import io.github.retrooper.packetevents.utils.server.ServerVersion;
 import io.github.retrooper.packetevents.utils.version.PEVersion;
 import io.github.retrooper.packetevents.utils.versionlookup.VersionLookupUtils;
 import io.github.retrooper.packetevents.utils.versionlookup.v_1_7_10.ProtocolVersionAccessor_v_1_7;
+import io.github.retrooper.packetevents.utils.versionlookup.viaversion.ViaVersionLookupUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -53,7 +54,6 @@ import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.plugin.Plugin;
 
 import java.util.ArrayList;
-import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -279,9 +279,22 @@ public final class PacketEvents implements Listener, EventManager {
             ClientVersion version = ClientVersion.getClientVersion(ProtocolVersionAccessor_v_1_7.getProtocolVersion(e.getPlayer()));
             getPlayerUtils().clientVersionsMap.put(e.getPlayer().getAddress(), version);
         } else if (VersionLookupUtils.isDependencyAvailable()) {
-            int protocolVersion = VersionLookupUtils.getProtocolVersion(e.getPlayer());
-            ClientVersion version = ClientVersion.getClientVersion(protocolVersion);
-            getPlayerUtils().clientVersionsMap.put(e.getPlayer().getAddress(), version);
+            if (ViaVersionLookupUtils.isAvailable()) {
+                Bukkit.getScheduler().scheduleSyncDelayedTask(plugins.get(0), new Runnable() {
+                    @Override
+                    public void run() {
+                        int protocolVersion = VersionLookupUtils.getProtocolVersion(e.getPlayer());
+                        ClientVersion version = ClientVersion.getClientVersion(protocolVersion);
+                        getPlayerUtils().clientVersionsMap.put(e.getPlayer().getAddress(), version);
+                    }
+                }, 2L); //ViaBackwards/Rewind require us to check atleast 1 tick after PlayerJoinEvent
+            } else {
+                int protocolVersion = VersionLookupUtils.getProtocolVersion(e.getPlayer());
+                if (protocolVersion != -1) {
+                    ClientVersion version = ClientVersion.getClientVersion(protocolVersion);
+                    getPlayerUtils().clientVersionsMap.put(e.getPlayer().getAddress(), version);
+                }
+            }
         }
         if (!getSettings().shouldInjectEarly()) {
             try {

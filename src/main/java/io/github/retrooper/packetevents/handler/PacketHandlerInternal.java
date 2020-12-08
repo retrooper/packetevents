@@ -277,13 +277,15 @@ public class PacketHandlerInternal {
 
     private void interceptRead(PacketReceiveEvent event) {
         if (event.getPacketId() == PacketType.Play.Client.KEEP_ALIVE) {
-            UUID uuid = event.getPlayer().getUniqueId();
-            long timestamp = keepAliveMap.getOrDefault(uuid, event.getTimestamp());
-            long currentTime = event.getTimestamp();
-            long ping = currentTime - timestamp;
-            long smoothedPing = (PacketEvents.get().getPlayerUtils().getSmoothedPing(event.getPlayer()) * 3 + ping) / 4;
-            PacketEvents.get().getPlayerUtils().playerPingMap.put(uuid, (short) ping);
-            PacketEvents.get().getPlayerUtils().playerSmoothedPingMap.put(uuid, (short) smoothedPing);
+            if (event.getPlayer() != null) {
+                UUID uuid = event.getPlayer().getUniqueId();
+                long timestamp = keepAliveMap.getOrDefault(uuid, event.getTimestamp());
+                long currentTime = event.getTimestamp();
+                long ping = currentTime - timestamp;
+                long smoothedPing = (PacketEvents.get().getPlayerUtils().getSmoothedPing(event.getPlayer()) * 3 + ping) / 4;
+                PacketEvents.get().getPlayerUtils().playerPingMap.put(uuid, (short) ping);
+                PacketEvents.get().getPlayerUtils().playerSmoothedPingMap.put(uuid, (short) smoothedPing);
+            }
         }
     }
 
@@ -313,7 +315,9 @@ public class PacketHandlerInternal {
 
     private void interceptPostSend(PostPacketSendEvent event) {
         if (event.getPacketId() == PacketType.Play.Server.KEEP_ALIVE) {
-            keepAliveMap.put(event.getPlayer().getUniqueId(), event.getTimestamp());
+            if (event.getPlayer() != null) {
+                keepAliveMap.put(event.getPlayer().getUniqueId(), event.getTimestamp());
+            }
         }
     }
 

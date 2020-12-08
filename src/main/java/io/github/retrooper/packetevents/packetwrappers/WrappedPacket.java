@@ -29,6 +29,7 @@ import io.github.retrooper.packetevents.packettype.PacketTypeClasses;
 import io.github.retrooper.packetevents.packetwrappers.login.in.custompayload.WrappedPacketLoginInCustomPayload;
 import io.github.retrooper.packetevents.packetwrappers.login.out.custompayload.WrappedPacketLoginOutCustomPayload;
 import io.github.retrooper.packetevents.packetwrappers.login.out.setcompression.WrappedPacketLoginOutSetCompression;
+import io.github.retrooper.packetevents.packetwrappers.play.in.abilities.WrappedPacketInAbilities;
 import io.github.retrooper.packetevents.packetwrappers.play.in.blockdig.WrappedPacketInBlockDig;
 import io.github.retrooper.packetevents.packetwrappers.play.in.blockplace.WrappedPacketInBlockPlace;
 import io.github.retrooper.packetevents.packetwrappers.play.in.clientcommand.WrappedPacketInClientCommand;
@@ -110,6 +111,7 @@ public class WrappedPacket implements WrapperPacketReader, WrapperPacketWriter {
         WrappedPacketInUseEntity.load();
         WrappedPacketInUpdateSign.load();
         WrappedPacketInWindowClick.load();
+        WrappedPacketInAbilities.load();
 
         //CLIENTBOUND
         WrappedPacketOutAbilities.load();
