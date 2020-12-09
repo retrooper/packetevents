@@ -79,7 +79,7 @@ public final class PlayerInjectEvent extends PacketEvent implements CancellableE
 
     /**
      * This method returns the bukkit player object of the player being injected.
-     * This player might be null.
+     * This player might not be fully initialized.
      * @return Injected Player.
      */
     @Nullable

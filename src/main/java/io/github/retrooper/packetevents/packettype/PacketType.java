@@ -300,7 +300,7 @@ public class PacketType {
                 /**
                  * Is the packet an instance of the PacketPlayOutEntity packet?
                  *
-                 * @param packetID
+                 * @param packetID Packet ID
                  * @return packetID == ENTITY or REL_ENTITY_MOVE or REL_ENTITY_MOVE_LOOK or ENTITY_LOOK
                  */
                 public static boolean isInstanceOfEntity(final byte packetID) {

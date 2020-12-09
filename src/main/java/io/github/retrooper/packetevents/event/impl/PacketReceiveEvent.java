@@ -67,7 +67,7 @@ public final class PacketReceiveEvent extends PacketEvent implements NMSPacketEv
      * The player object might be null during early packets.
      * @return Packet sender.
      */
-    @Nullable
+    @NotNull
     @Override
     public Player getPlayer() {
         return player;

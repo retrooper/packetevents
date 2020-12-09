@@ -26,8 +26,8 @@ package io.github.retrooper.packetevents.utils.nms;
 
 import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
 import io.github.retrooper.packetevents.utils.entityfinder.EntityFinderUtils;
-import io.github.retrooper.packetevents.utils.reflection.Reflection;
 import io.github.retrooper.packetevents.utils.server.ServerVersion;
+import io.github.retrooper.packetevents.utils.reflection.Reflection;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
@@ -36,7 +36,6 @@ import org.bukkit.inventory.ItemStack;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.ArrayList;
 import java.util.List;
 
 public final class NMSUtils {
@@ -113,8 +112,8 @@ public final class NMSUtils {
     public static Object getMinecraftServerInstance() {
         if(minecraftServer == null) {
             try {
-                Field field = Reflection.getField(craftServerClass, minecraftServerClass, 0);
-                minecraftServer = field.get(Bukkit.getServer());
+                minecraftServer = Reflection.getField(craftServerClass, minecraftServerClass, 0)
+                        .get(Bukkit.getServer());
             } catch (IllegalAccessException e) {
                 e.printStackTrace();
             }
@@ -215,22 +214,29 @@ public final class NMSUtils {
     }
 
     public static List<Object> getNetworkMarkers() {
+        Method method = Reflection.getMethod(serverConnectionClass, List.class, 0, serverConnectionClass);
+        if (method != null) {
+            try {
+                return (List<Object>) method.invoke(null, getMinecraftServerConnection());
+            } catch (Exception ignored) {
+
+            }
+        }
         WrappedPacket serverConnectionWrapper = new WrappedPacket(getMinecraftServerConnection());
-       for(int i = 0; true; i++) {
-           try {
-               List<Object> list = (List<Object>) serverConnectionWrapper.readObject(i, List.class);
-               for (Object obj : list) {
-                   if (!obj.getClass().isAssignableFrom(channelFutureClass)) {
-                       return list;
-                   }
-                       break;
-               }
-           }
-           catch(Exception e) {
-               break;
-           }
-       }
-       return new ArrayList<>();
+        for (int i = 0; true; i++) {
+            try {
+                List<Object> list = (List<Object>) serverConnectionWrapper.readObject(i, List.class);
+                for (Object obj : list) {
+                    if (!obj.getClass().isAssignableFrom(channelFutureClass)) {
+                        return list;
+                    }
+                    break;
+                }
+            } catch (Exception e) {
+                break;
+            }
+        }
+        throw new IllegalStateException("Failed to locate the network managers!");
     }
 
     public static ItemStack toBukkitItemStack(final Object nmsItemStack) {

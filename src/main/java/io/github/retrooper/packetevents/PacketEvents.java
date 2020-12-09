@@ -149,6 +149,7 @@ public final class PacketEvents implements Listener, EventManager {
      * Registers this class as a Bukkit listener to inject/eject players.
      *
      * @param pl JavaPlugin instance
+     * @param packetEventsSettings settings
      */
     public void init(final Plugin pl, PacketEventsSettings packetEventsSettings) {
         load();

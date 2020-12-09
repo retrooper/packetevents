@@ -68,7 +68,7 @@ public final class PacketSendEvent extends PacketEvent implements NMSPacketEvent
      *
      * @return Packet receiver.
      */
-    @Nullable
+    @NotNull
     @Override
     public Player getPlayer() {
         return player;

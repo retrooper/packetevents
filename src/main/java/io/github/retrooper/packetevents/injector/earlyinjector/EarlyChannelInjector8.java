@@ -53,7 +53,21 @@ public class EarlyChannelInjector8 implements ChannelInjector {
         firstChannelInitializer = new ChannelInitializer<Channel>() {
             @Override
             protected void initChannel(final Channel channel) {
+                if(networkMarkers != null) {
                 synchronized (networkMarkers) {
+                    channel.eventLoop().execute(new Runnable() {
+                        @Override
+                        public void run() {
+                            try {
+                                injectChannel(channel);
+                            } catch (Exception ex) {
+                                channel.disconnect();
+                            }
+                        }
+                    });
+                }
+                }
+                else {
                     channel.eventLoop().execute(new Runnable() {
                         @Override
                         public void run() {

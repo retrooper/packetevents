@@ -51,26 +51,29 @@ class EarlyChannelInjector7 implements ChannelInjector {
     public void startup() {
         networkMarkers = NMSUtils.getNetworkMarkers();
         firstChannelInitializer = new ChannelInitializer<Channel>() {
-            @Override
-            protected void initChannel(final Channel channel) {
-                synchronized (networkMarkers) {
-                    PacketEvents.get().packetHandlingExecutorService.execute(new Runnable() {
-                        @Override
-                        public void run() {
+                @Override
+                protected void initChannel(final Channel channel) {
+                    if(networkMarkers != null) {
+                        synchronized (networkMarkers) {
                             channel.eventLoop().execute(new Runnable() {
-                                @Override
-                                public void run() {
-                                    try {
-                                        injectChannel(channel);
-                                    } catch (Exception ex) {
-                                        channel.disconnect();
+                                @Override public void run() {
+                                    try { injectChannel(channel);
+                                } catch (Exception ex) { channel.disconnect();
                                     }
                                 }
                             });
                         }
-                    });
+                    } else {
+                        channel.eventLoop().execute(new Runnable() {
+                            @Override public void run() {
+                                try { injectChannel(channel);
+                                } catch (Exception ex)
+                                { channel.disconnect();
+                                }
+                            }
+                        });
+                    }
                 }
-            }
         };
 
         secondChannelInitializer = new ChannelInitializer<Channel>() {
