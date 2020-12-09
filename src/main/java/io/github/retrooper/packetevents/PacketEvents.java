@@ -58,7 +58,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 public final class PacketEvents implements Listener, EventManager {
-    private static PacketEvents instance = null;
+    private static PacketEvents instance;
     private final ArrayList<Plugin> plugins = new ArrayList<>(1);
     private final PEVersion version = new PEVersion(1, 7, 9);
     private final EventManager eventManager = new PEEventManager();
@@ -75,7 +75,7 @@ public final class PacketEvents implements Listener, EventManager {
     private PacketEventsSettings settings = new PacketEventsSettings();
 
     public static PacketEvents create() {
-        return PacketEvents.instance = new PacketEvents();
+        return instance = new PacketEvents();
     }
 
     public static PacketEvents get() {
@@ -264,7 +264,7 @@ public final class PacketEvents implements Listener, EventManager {
 
 
     @EventHandler(priority = EventPriority.LOW)
-    public void onLogin(PlayerLoginEvent e) {
+    public void onLogin(final PlayerLoginEvent e) {
         if (getSettings().shouldInjectEarly()) {
             try {
                 packetHandlerInternal.injectPlayer(e.getPlayer());

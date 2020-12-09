@@ -29,59 +29,60 @@ import io.github.retrooper.packetevents.event.PacketListener;
 import io.github.retrooper.packetevents.event.PacketListenerDynamic;
 //TODO document this and all classes below
 public interface EventManager {
+
     default EventManager callEvent(PacketEvent event) {
         //The dynamic event manager calls the legacy event manager.
-        PEEventManager.dynamicEventManager.callEvent(event);
+        PEEventManager.EVENT_MANAGER_DYNAMIC.callEvent(event);
         return this;
     }
 
     @Deprecated
     default EventManager registerListener(PacketListener listener) {
-        PEEventManager.legacyEventManager.registerListener(listener);
+        PEEventManager.EVENT_MANAGER_LEGACY.registerListener(listener);
         return this;
     }
 
     @Deprecated
     default EventManager registerListeners(PacketListener... listeners) {
-        PEEventManager.legacyEventManager.registerListeners(listeners);
+        PEEventManager.EVENT_MANAGER_LEGACY.registerListeners(listeners);
         return this;
     }
 
     @Deprecated
     default EventManager unregisterListener(PacketListener listener) {
-        PEEventManager.legacyEventManager.unregisterListener(listener);
+        PEEventManager.EVENT_MANAGER_LEGACY.unregisterListener(listener);
         return this;
     }
 
     @Deprecated
     default EventManager unregisterListeners(PacketListener... listeners) {
-        PEEventManager.legacyEventManager.unregisterListeners(listeners);
+        PEEventManager.EVENT_MANAGER_LEGACY.unregisterListeners(listeners);
         return this;
     }
 
     default EventManager registerListener(PacketListenerDynamic listener) {
-        PEEventManager.dynamicEventManager.registerListener(listener);
+        PEEventManager.EVENT_MANAGER_DYNAMIC.registerListener(listener);
         return this;
     }
 
     default EventManager registerListeners(PacketListenerDynamic... listeners) {
-        PEEventManager.dynamicEventManager.registerListeners(listeners);
+        PEEventManager.EVENT_MANAGER_DYNAMIC.registerListeners(listeners);
         return this;
     }
 
     default EventManager unregisterListener(PacketListenerDynamic listener) {
-        PEEventManager.dynamicEventManager.unregisterListener(listener);
+        PEEventManager.EVENT_MANAGER_DYNAMIC.unregisterListener(listener);
         return this;
     }
 
     default EventManager unregisterListeners(PacketListenerDynamic... listeners) {
-        PEEventManager.dynamicEventManager.unregisterListeners(listeners);
+        PEEventManager.EVENT_MANAGER_DYNAMIC.unregisterListeners(listeners);
         return this;
     }
 
     default EventManager unregisterAllListeners() {
-        PEEventManager.dynamicEventManager.unregisterAllListeners();
-        PEEventManager.legacyEventManager.unregisterAllListeners();
+        PEEventManager.EVENT_MANAGER_DYNAMIC.unregisterAllListeners();
+        PEEventManager.EVENT_MANAGER_LEGACY.unregisterAllListeners();
         return this;
     }
 }

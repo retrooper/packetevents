@@ -29,7 +29,6 @@ import io.github.retrooper.packetevents.event.impl.*;
 import io.github.retrooper.packetevents.injector.earlyinjector.EarlyChannelInjector;
 import io.github.retrooper.packetevents.injector.lateinjector.LateChannelInjector;
 import io.github.retrooper.packetevents.packettype.PacketType;
-import io.github.retrooper.packetevents.packettype.PacketTypeClasses;
 import io.github.retrooper.packetevents.packetwrappers.login.in.handshake.WrappedPacketLoginInHandshake;
 import io.github.retrooper.packetevents.packetwrappers.login.in.start.WrappedPacketLoginInStart;
 import io.github.retrooper.packetevents.utils.gameprofile.WrappedGameProfile;
@@ -41,7 +40,6 @@ import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 
-import java.net.InetSocketAddress;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;

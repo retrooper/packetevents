@@ -66,7 +66,7 @@ class EventManagerDynamic {
             ce.setCancelled(isCancelled);
         }
 
-        PEEventManager.legacyEventManager.callEvent(event, maxReachedEventPriority);
+        PEEventManager.EVENT_MANAGER_LEGACY.callEvent(event, maxReachedEventPriority);
     }
 
     public void registerListener(PacketListenerDynamic listener) {
