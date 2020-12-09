@@ -322,4 +322,10 @@ public class PacketHandlerInternal {
             earlyInjector.close();
         }
     }
+
+    public void closeAsync() {
+        if(earlyInjectMode) {
+            earlyInjector.closeAsync();
+        }
+    }
 }

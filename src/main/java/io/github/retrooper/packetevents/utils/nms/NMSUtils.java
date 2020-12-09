@@ -223,9 +223,7 @@ public final class NMSUtils {
                    if (!obj.getClass().isAssignableFrom(channelFutureClass)) {
                        return list;
                    }
-                   else {
                        break;
-                   }
                }
            }
            catch(Exception e) {

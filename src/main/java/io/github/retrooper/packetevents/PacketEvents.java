@@ -58,7 +58,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 public final class PacketEvents implements Listener, EventManager {
-    private static PacketEvents instance;
+    private static PacketEvents instance = null;
     private final ArrayList<Plugin> plugins = new ArrayList<>(1);
     private final PEVersion version = new PEVersion(1, 7, 9);
     private final EventManager eventManager = new PEEventManager();

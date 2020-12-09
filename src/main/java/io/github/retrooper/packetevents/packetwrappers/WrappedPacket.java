@@ -321,10 +321,10 @@ public class WrappedPacket implements WrapperPacketReader, WrapperPacketWriter {
     private Field[] getFields(Class<?> type, Field[] fields) {
         List<Field> ret = new ArrayList<>();
         for (Field field : fields) {
-            if (!field.isAccessible()) {
-                field.setAccessible(true);
-            }
-            if (field.getType() == type) {
+            if (field.getType().equals(type)) {
+                if (!field.isAccessible()) {
+                    field.setAccessible(true);
+                }
                 ret.add(field);
             }
         }

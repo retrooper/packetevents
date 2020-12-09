@@ -40,6 +40,30 @@ public class MainExample extends JavaPlugin {
          * We created the instance in the onLoad method
          */
         PacketEvents.get().init(this);
+        /**
+         *  PacketEvents.get().getEventManager().registerListener(new PacketListenerDynamic() {
+         *             @Override
+         *             public void onPacketLogin(PacketLoginEvent event) {
+         *                 if (event.getPacketId() == PacketType.Login.Client.HANDSHAKE) {
+         *                     WrappedPacketLoginInHandshake handshake = new WrappedPacketLoginInHandshake(event.getNMSPacket());
+         *                     System.out.println("IP: " + event.getSocketAddress().getHostName() + " sent protocol: " + handshake.getProtocolVersion());
+         *                 }
+         *             }
+         *
+         *             @Override
+         *             public void onPacketReceive(PacketReceiveEvent event) {
+         *                 if (event.getPacketId() == PacketType.Play.Client.CHAT) {
+         *                     WrappedPacketInChat chat = new WrappedPacketInChat(event.getNMSPacket());
+         *                     if (chat.getMessage().equalsIgnoreCase("version")) {
+         *                         if (event.getPlayer() != null) {
+         *                             event.getPlayer().sendMessage("Your version is " +
+         *                                     PacketEvents.get().getPlayerUtils().getClientVersion(event.getPlayer()));
+         *                         }
+         *                     }
+         *                 }
+         *             }
+         *         });
+         */
     }
 
     @Override
