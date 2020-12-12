@@ -54,8 +54,8 @@ public class PacketHandlerInternal {
     private final boolean earlyInjectMode;
     public final HashMap<UUID, Long> keepAliveMap = new HashMap<>();
     public final Map<String, Object> channelMap = new ConcurrentHashMap<>();
-    public final Map<Object, Boolean> firstPacketCache;
-
+    public final Map<Object, Long> channelTimePassed = new ConcurrentHashMap<>();
+    public volatile long minimumPostPlayerInjectDeltaTime = 0L;
     public PacketHandlerInternal(Plugin plugin, boolean earlyInjectMode) {
         this.earlyInjectMode = earlyInjectMode;
         if (earlyInjectMode) {
@@ -65,11 +65,6 @@ public class PacketHandlerInternal {
         } else {
             lateInjector = new LateChannelInjector(plugin);
             earlyInjector = null;
-        }
-        if (PacketEvents.get().getSettings().getPacketHandlingThreadCount() == 1) {
-            firstPacketCache = new HashMap<>();
-        } else {
-            firstPacketCache = new ConcurrentHashMap<>();
         }
     }
 
@@ -136,7 +131,7 @@ public class PacketHandlerInternal {
                 Objects.requireNonNull(lateInjector).ejectPlayerSync(player);
             }
             keepAliveMap.remove(player.getUniqueId());
-            firstPacketCache.remove(getChannel(player.getName()));
+            channelTimePassed.remove(getChannel(player.getName()));
             channelMap.remove(player.getName());
         }
     }
@@ -189,10 +184,13 @@ public class PacketHandlerInternal {
                 }
             }
         } else {
-            Boolean firstPacket = firstPacketCache.get(channel);
-            if (firstPacket == null) {
-                firstPacketCache.put(channel, true);
-                PacketEvents.get().getEventManager().callEvent(new PostPlayerInjectEvent(player));
+            Long minTicksPassed = channelTimePassed.get(channel);
+            if(minTicksPassed != null && minTicksPassed != -1L) {
+                long deltaTime = System.currentTimeMillis() - minTicksPassed;
+                if(deltaTime >= minimumPostPlayerInjectDeltaTime) {
+                    PacketEvents.get().getEventManager().callEvent(new PostPlayerInjectEvent(player));
+                    channelTimePassed.put(channel, -1L);
+                }
             }
             final PacketReceiveEvent packetReceiveEvent = new PacketReceiveEvent(player, channel, packet);
             PacketEvents.get().getEventManager().callEvent(packetReceiveEvent);
@@ -226,10 +224,13 @@ public class PacketHandlerInternal {
                 }
             }
         } else {
-            Boolean firstPacket = firstPacketCache.get(channel);
-            if (firstPacket == null) {
-                firstPacketCache.put(channel, true);
-                PacketEvents.get().getEventManager().callEvent(new PostPlayerInjectEvent(player));
+            Long minTicksPassed = channelTimePassed.get(channel);
+            if(minTicksPassed != null && minTicksPassed != -1L) {
+                long deltaTime = System.currentTimeMillis() - minTicksPassed;
+                if(deltaTime >= minimumPostPlayerInjectDeltaTime) {
+                    PacketEvents.get().getEventManager().callEvent(new PostPlayerInjectEvent(player));
+                    channelTimePassed.put(channel, -1L);
+                }
             }
             final PacketSendEvent packetSendEvent = new PacketSendEvent(player, channel, packet);
             PacketEvents.get().getEventManager().callEvent(packetSendEvent);

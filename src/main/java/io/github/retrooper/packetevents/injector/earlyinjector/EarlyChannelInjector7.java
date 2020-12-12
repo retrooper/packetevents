@@ -170,7 +170,7 @@ class EarlyChannelInjector7 implements ChannelInjector {
                 Channel channel = (Channel) PacketEvents.get().packetHandlerInternal.getChannel(player.getName());
                 ejectChannel(channel);
                 PacketEvents.get().packetHandlerInternal.keepAliveMap.remove(player.getUniqueId());
-                PacketEvents.get().packetHandlerInternal.firstPacketCache.remove(channel);
+                PacketEvents.get().packetHandlerInternal.channelTimePassed.remove(channel);
                 PacketEvents.get().packetHandlerInternal.channelMap.remove(player.getName());
                 PacketEvents.get().getPlayerUtils().clientVersionsMap.remove(player.getAddress());
             }

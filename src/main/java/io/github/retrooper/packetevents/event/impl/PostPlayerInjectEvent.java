@@ -30,8 +30,10 @@ import io.github.retrooper.packetevents.event.PacketListenerDynamic;
 import io.github.retrooper.packetevents.event.eventtypes.CancellableEvent;
 import io.github.retrooper.packetevents.event.eventtypes.PlayerEvent;
 import io.github.retrooper.packetevents.utils.player.ClientVersion;
+import io.github.retrooper.packetevents.utils.versionlookup.VersionLookupUtils;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * The {@code PostPlayerInjectEvent} event is fired after a player is successfully injected.
@@ -54,6 +56,13 @@ public class PostPlayerInjectEvent extends PacketEvent implements PlayerEvent {
     private final Player player;
 
     public PostPlayerInjectEvent(Player player) {
+        if (VersionLookupUtils.isDependencyAvailable()) {
+            int protocolVersion = VersionLookupUtils.getProtocolVersion(player);
+            if (protocolVersion != -1) {
+                ClientVersion version = ClientVersion.getClientVersion(protocolVersion);
+                PacketEvents.get().getPlayerUtils().clientVersionsMap.put(player.getAddress(), version);
+            }
+        }
         this.player = player;
     }
 
@@ -82,6 +91,7 @@ public class PostPlayerInjectEvent extends PacketEvent implements PlayerEvent {
      * @see ClientVersion
      * @return ClientVersion of injected player.
      */
+    @Nullable
     public ClientVersion getClientVersion() {
         return PacketEvents.get().getPlayerUtils().clientVersionsMap.get(player.getAddress());
     }

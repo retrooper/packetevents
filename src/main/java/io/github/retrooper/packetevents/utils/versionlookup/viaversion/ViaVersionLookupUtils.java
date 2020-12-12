@@ -27,6 +27,11 @@ package io.github.retrooper.packetevents.utils.versionlookup.viaversion;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import us.myles.ViaVersion.api.Via;
+import us.myles.ViaVersion.api.data.UserConnection;
+
+import java.net.InetSocketAddress;
+import java.util.Objects;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class ViaVersionLookupUtils {
     public static boolean isAvailable() {

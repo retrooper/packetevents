@@ -34,11 +34,13 @@ import java.lang.annotation.Target;
 /**
  * This is what you override your event listener with on the old event system.
  * You can specify the event priority of the listener method.
+ * @deprecated Was used for the old event system, the new one doesn't need this anymore.
  * @author retrooper
  * @since 1.0
  */
 @Target({ElementType.METHOD})
 @Retention(RetentionPolicy.RUNTIME)
+@Deprecated
 public @interface PacketHandler {
     byte priority() default PacketEventPriority.NORMAL;
 }
