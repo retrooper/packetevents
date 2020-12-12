@@ -26,8 +26,8 @@ package io.github.retrooper.packetevents.utils.nms;
 
 import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
 import io.github.retrooper.packetevents.utils.entityfinder.EntityFinderUtils;
-import io.github.retrooper.packetevents.utils.server.ServerVersion;
 import io.github.retrooper.packetevents.utils.reflection.Reflection;
+import io.github.retrooper.packetevents.utils.server.ServerVersion;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;

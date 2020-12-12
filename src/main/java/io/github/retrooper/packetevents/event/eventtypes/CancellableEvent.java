@@ -55,11 +55,13 @@ public interface CancellableEvent {
      * Cancel the event.
      * You can achieve the same result by just using {@link #setCancelled(boolean)}
      */
+    @Deprecated
     void cancel();
 
     /**
      * Uncancel the event.
      * You can achieve the same result by just using {@link #setCancelled(boolean)}
      */
+    @Deprecated
     void uncancel();
 }
