@@ -39,13 +39,25 @@ import java.util.Map;
 
 @Deprecated
 class EventManagerLegacy {
+    /**
+     * Map storing all all legacy packet event listeners.
+     * The key is an individual listener, the values are the key's event methods.
+     */
     private final Map<PacketListener, List<Method>> staticRegisteredMethods = new HashMap<>();
 
-    @Deprecated
-    public void callEvent(final PacketEvent e) {
-        callEvent(e, PacketEventPriority.LOWEST);
-    }
-
+    /**
+     * Call a PacketEvent with the legacy event manager.
+     * This method processes the event on all legacy packet event listeners.
+     * This method is actually called by {@link EventManagerDynamic#callEvent(PacketEvent)} as the
+     * if you mix the two event systems, the dynamic listeners are always processed first and pass
+     * their highest reached event priority that this legacy one has to beat/reach to be able to cancel
+     * the event.
+     * This downside of this system is the event listeners aren't executed in any particular order, just
+     * in the order they were registered.
+     * This system is also slower than the other event system.
+     * @param event {@link PacketEvent}
+     * @param eventPriority Priority the legacy listeners should beat to decide cancellation of the event.
+     */
     @Deprecated
     public void callEvent(final PacketEvent event, byte eventPriority) {
         boolean isCancelled = false;
@@ -82,7 +94,11 @@ class EventManagerLegacy {
             ce.setCancelled(isCancelled);
         }
     }
-
+    /**
+     * Register a legacy packet event listener.
+     * Not recommended to use the deprecated event listener.
+     * @param listener {@link PacketListener}
+     */
     @Deprecated
     public void registerListener(final PacketListener listener) {
         final List<Method> methods = new ArrayList<>();
@@ -101,6 +117,11 @@ class EventManagerLegacy {
         }
     }
 
+    /**
+     * Register multiple legacy packet event listeners with one method.
+     * Not recommended to use the deprecated event listener.
+     * @param listeners {@link PacketListener}
+     */
     @Deprecated
     public void registerListeners(final PacketListener... listeners) {
         for (final PacketListener listener : listeners) {
@@ -108,11 +129,21 @@ class EventManagerLegacy {
         }
     }
 
+    /**
+     * Unregister a legacy packet event listener.
+     * Not recommended to use the deprecated event listener.
+     * @param listener {@link PacketListener}
+     */
     @Deprecated
-    public void unregisterListener(final PacketListener e) {
-        staticRegisteredMethods.remove(e);
+    public void unregisterListener(final PacketListener listener) {
+        staticRegisteredMethods.remove(listener);
     }
 
+    /**
+     * Unregister multiple legacy packet event listeners with one method.
+     * Not recommended to use the deprecated event listener.
+     * @param listeners {@link PacketListener}
+     */
     @Deprecated
     public void unregisterListeners(final PacketListener... listeners) {
         for (final PacketListener listener : listeners) {
@@ -120,6 +151,9 @@ class EventManagerLegacy {
         }
     }
 
+    /**
+     * Unregister all legacy packet event listeners.
+     */
     @Deprecated
     public void unregisterAllListeners() {
         staticRegisteredMethods.clear();

@@ -109,7 +109,6 @@ public final class PacketEvents implements Listener, EventManager {
             loading = true;
             ServerVersion version = ServerVersion.getVersion();
             WrappedPacket.version = version;
-            PacketEvent.version = version;
             NMSUtils.version = version;
             EntityFinderUtils.version = version;
 

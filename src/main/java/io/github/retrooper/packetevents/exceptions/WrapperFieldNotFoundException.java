@@ -26,6 +26,14 @@ package io.github.retrooper.packetevents.exceptions;
 
 import io.github.retrooper.packetevents.utils.reflection.ClassUtil;
 
+/**
+ * An exception thrown by PacketEvents when a wrapper fails
+ * to find a field.
+ * @see io.github.retrooper.packetevents.packetwrappers.WrappedPacket#read(int, Class) 
+ * @see io.github.retrooper.packetevents.packetwrappers.WrappedPacket#write(Class, int, Object)
+ * @author retrooper
+ * @since 1.6.9
+ */
 public class WrapperFieldNotFoundException extends RuntimeException {
     public WrapperFieldNotFoundException(String message) {
         super(message);

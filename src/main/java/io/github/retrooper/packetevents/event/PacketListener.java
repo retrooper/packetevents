@@ -25,8 +25,12 @@
 package io.github.retrooper.packetevents.event;
 
 /**
- * A Packet listener.
- * Implement this interface in your listeners.
+ * The legacy Packet listener.
+ * Implement this interface in your listener if you are using the legacy event system.
+ * @deprecated There is a new and better listener for the new event system.
+ * @see PacketListenerDynamic
+ * @author retrooper
+ * @since 1.2.6
  */
 @Deprecated
 public interface PacketListener {

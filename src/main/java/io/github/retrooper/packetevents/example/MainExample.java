@@ -30,7 +30,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 public class MainExample extends JavaPlugin {
     @Override
     public void onLoad() {
-        //We use default settings
+        //We use default settings. You always want to specify the settings before loading.
         PacketEvents.create().load();
     }
 

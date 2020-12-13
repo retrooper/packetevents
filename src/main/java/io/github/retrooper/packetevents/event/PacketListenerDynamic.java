@@ -27,6 +27,14 @@ package io.github.retrooper.packetevents.event;
 import io.github.retrooper.packetevents.event.impl.*;
 import io.github.retrooper.packetevents.event.priority.PacketEventPriority;
 
+/**
+ * Dynamic packet event listener.
+ * Implement whatever event method you need.
+ * Nothing will happen if you don't implement an event method.
+ *
+ * @author retrooper
+ * @since 1.7.7
+ */
 public abstract class PacketListenerDynamic {
     private final byte priority;
 

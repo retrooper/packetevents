@@ -35,8 +35,23 @@ import java.util.List;
 import java.util.Map;
 
 class EventManagerDynamic {
+    /**
+     * Map storing all dynamic packet event listeners.
+     * The key is the dynamic packet listener event priority, the value is a list of the dynamic packet listeners having that priority.
+     * Priorities count for the whole listener, not just one event method in the listener.
+     */
     private final Map<Byte, List<PacketListenerDynamic>> map = new HashMap<>();
 
+    /**
+     * Call the PacketEvent.
+     * This method processes the event on all the registered dynamic packet event listeners.
+     * The {@link PacketEventPriority#LOWEST} prioritized listeners will be processing first,
+     * the {@link PacketEventPriority#MONITOR} will be processing last and can
+     * be the final decider whether the event has been cancelled or not.
+     * This call event also calls the legacy event manager call event.
+     * @see EventManagerLegacy#callEvent(PacketEvent, byte)
+     * @param event {@link PacketEvent}
+     */
     public void callEvent(final PacketEvent event) {
         boolean isCancelled = false;
         if (event instanceof CancellableEvent) {
@@ -69,6 +84,10 @@ class EventManagerDynamic {
         PEEventManager.EVENT_MANAGER_LEGACY.callEvent(event, maxReachedEventPriority);
     }
 
+    /**
+     * Register the dynamic packet event listener.
+     * @param listener {@link PacketListenerDynamic}
+     */
     public void registerListener(PacketListenerDynamic listener) {
             List<PacketListenerDynamic> listeners = map.get(listener.getPriority());
             if (listeners == null) {
@@ -77,13 +96,19 @@ class EventManagerDynamic {
             }
             listeners.add(listener);
     }
-
+    /**
+     * Register multiple dynamic packet event listeners with one method.
+     * @param listeners {@link PacketListenerDynamic}
+     */
     public void registerListeners(PacketListenerDynamic... listeners) {
         for (PacketListenerDynamic listener : listeners) {
             registerListener(listener);
         }
     }
-
+    /**
+     * Unregister the dynamic packet event listener.
+     * @param listener {@link PacketListenerDynamic}
+     */
     public void unregisterListener(PacketListenerDynamic listener) {
             List<PacketListenerDynamic> listeners = map.get(listener.getPriority());
             if (listeners == null) {
@@ -92,12 +117,20 @@ class EventManagerDynamic {
             listeners.remove(listener);
     }
 
+    /**
+     * Unregister multiple dynamic packet event listeners with one method.
+     * @param listeners {@link PacketListenerDynamic}
+     * @return Same event manager instance.
+     */
     public void unregisterListeners(PacketListenerDynamic... listeners) {
         for (PacketListenerDynamic listener : listeners) {
             unregisterListener(listener);
         }
     }
 
+    /**
+     * Unregister all dynamic packet event listeners.
+     */
     public void unregisterAllListeners() {
         map.clear();
     }

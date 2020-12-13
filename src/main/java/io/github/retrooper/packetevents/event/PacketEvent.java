@@ -29,21 +29,26 @@ import io.github.retrooper.packetevents.event.eventtypes.CallableEvent;
 import io.github.retrooper.packetevents.utils.server.ServerVersion;
 
 /**
- * An event in the PacketEvents EventManager system.
+ * An event in both of PacketEvents' event systems.
+ * @author retrooper
+ * @since 1.2.6
  */
 public abstract class PacketEvent implements CallableEvent {
-    public static ServerVersion version;
     private long timestamp = System.currentTimeMillis();
 
     /**
-     * Timestamp of the packet
-     *
-     * @return timestamp in milliseconds
+     * Timestamp of when the PacketEvent was created.
+     * Basically timestamp of the packet.
+     * @return Packet timestamp in milliseconds.
      */
     public long getTimestamp() {
         return timestamp;
     }
 
+    /**
+     * Setter for the timestamp.
+     * @param timestamp Packet timestamp in milliseconds.
+     */
     public void setTimestamp(long timestamp) {
         this.timestamp = timestamp;
     }

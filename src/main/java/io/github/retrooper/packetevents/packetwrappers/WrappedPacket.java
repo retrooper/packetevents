@@ -296,7 +296,7 @@ public class WrappedPacket implements WrapperPacketReader, WrapperPacketWriter {
         write(value.getClass(), index, value);
     }
 
-    private void write(Class<?> type, int index, Object value) throws WrapperFieldNotFoundException {
+    public void write(Class<?> type, int index, Object value) throws WrapperFieldNotFoundException {
         Field field = getField(type, index);
         if (field == null) {
             throw new WrapperFieldNotFoundException(packetClass, type, index);

@@ -24,11 +24,61 @@
 
 package io.github.retrooper.packetevents.event.priority;
 
+/**
+ * Event priority bytes for the new and legacy event system.
+ * Please use these constant variables, as it is possible that the
+ * values of the bytes might change.
+ * @author retrooper
+ * @since 1.6.9
+ */
 public interface PacketEventPriority {
+    /**
+     * The weakest event priority.
+     * The first to be processed(IN THE DYNAMIC EVENT SYSTEM ONLY).
+     * Use this if you need to be the first processing the event and
+     * need no power in cancelling an event or preventing an event cancellation.
+     */
     byte LOWEST = 0;
+
+    /**
+     * A weak event priority.
+     * Second to be processed(IN THE DYNAMIC EVENT SYSTEM ONLY).
+     * Use this if you would prefer to be one of the first to process the event,
+     * but don't mind if some other listener processes before you.
+     */
     byte LOW = 1;
+
+    /**
+     * Default event priority.
+     * Third to be processed(IN THE DYNAMIC EVENT SYSTEM ONLY).
+     * Use this if you don't really care/know when you process or just want to
+     * be in the middle.
+     */
     byte NORMAL = 2;
+
+    /**
+     * Higher than the {@link PacketEventPriority#NORMAL} event priority.
+     * Fourth to be processed(IN THE DYNAMIC EVENT SYSTEM ONLY).
+     * Use this if you want to process before the default event prioritized listeners.
+     */
     byte HIGH = 3;
+
+    /**
+     * Second most powerful event priority.
+     * Fifth to be processed(IN THE DYNAMIC EVENT SYSTEM ONLY).
+     * Use this if you prefer to be one of the last to process,
+     * but don't mind if some other listener really needs to process after you.
+     * Also use this if you prefer deciding if the event cancelled or not, but don't
+     * mind if some other listener urgently needs to decide over you.
+     * {@link PacketEventPriority#MONITOR} is rarely ever recommended to use.
+     */
     byte HIGHEST = 4;
+
+    /**
+     * Most powerful event priority.
+     * Last(Sixth) to be processed(IN THE DYNAMIC EVENT SYSTEM ONLY).
+     * Use this if you urgently need to be the last to process or urgently need to decide if the event cancelled or not.
+     * This is rarely recommended.
+     */
     byte MONITOR = 5;
 }
