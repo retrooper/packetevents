@@ -191,8 +191,8 @@ public class PacketHandlerInternal {
             if(minTicksPassed != null && minTicksPassed != -1L) {
                 long deltaTime = System.currentTimeMillis() - minTicksPassed;
                 if(deltaTime >= minimumPostPlayerInjectDeltaTime) {
-                    PacketEvents.get().getEventManager().callEvent(new PostPlayerInjectEvent(player));
                     channelTimePassed.put(channel, -1L);
+                    PacketEvents.get().getEventManager().callEvent(new PostPlayerInjectEvent(player));
                 }
             }
             protocolState = 2;
@@ -237,9 +237,9 @@ public class PacketHandlerInternal {
             Long minTicksPassed = channelTimePassed.get(channel);
             if(minTicksPassed != null && minTicksPassed != -1L) {
                 long deltaTime = System.currentTimeMillis() - minTicksPassed;
-                if(deltaTime >= minimumPostPlayerInjectDeltaTime) {
-                    PacketEvents.get().getEventManager().callEvent(new PostPlayerInjectEvent(player));
+                if (deltaTime >= minimumPostPlayerInjectDeltaTime) {
                     channelTimePassed.put(channel, -1L);
+                    PacketEvents.get().getEventManager().callEvent(new PostPlayerInjectEvent(player));
                 }
             }
             protocolState = 2;
