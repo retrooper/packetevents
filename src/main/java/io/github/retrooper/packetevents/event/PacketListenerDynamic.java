@@ -42,22 +42,30 @@ public abstract class PacketListenerDynamic {
         return priority;
     }
 
-    public void onPacketStatus(PacketStatusEvent event) {
+    public void onPacketStatusReceive(PacketStatusReceiveEvent event) {
+
     }
 
-    public void onPacketLogin(PacketLoginEvent event) {
+    public void onPacketStatusSend(PacketStatusSendEvent event) {
     }
 
-    public void onPacketReceive(PacketReceiveEvent event) {
+    public void onPacketLoginReceive(PacketLoginReceiveEvent event) {
     }
 
-    public void onPacketSend(PacketSendEvent event) {
+    public void onPacketLoginSend(PacketLoginSendEvent event) {
+
     }
 
-    public void onPostPacketReceive(PostPacketReceiveEvent event) {
+    public void onPacketPlayReceive(PacketPlayReceiveEvent event) {
     }
 
-    public void onPostPacketSend(PostPacketSendEvent event) {
+    public void onPacketPlaySend(PacketPlaySendEvent event) {
+    }
+
+    public void onPostPacketPlayReceive(PostPacketPlayReceiveEvent event) {
+    }
+
+    public void onPostPacketPlaySend(PostPacketPlaySendEvent event) {
     }
 
     public void onPostPlayerInject(PostPlayerInjectEvent event) {

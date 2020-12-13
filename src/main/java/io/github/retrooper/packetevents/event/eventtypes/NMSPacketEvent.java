@@ -48,10 +48,16 @@ public interface NMSPacketEvent {
     String getPacketName();
 
     /**
-     * Get the NMS object.
-     * @return NMS object.
+     * Get the NMS packet.
+     * @return Get NMS packet.
      */
     Object getNMSPacket();
+
+    /**
+     * Update the NMS Packet.
+     * @param packet NMS Object
+     */
+    void setNMSPacket(final Object packet);
 
     /**
      * Get the Packet ID.

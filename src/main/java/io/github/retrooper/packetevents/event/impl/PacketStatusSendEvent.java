@@ -36,28 +36,27 @@ import org.jetbrains.annotations.NotNull;
 import java.net.InetSocketAddress;
 
 /**
- * The {@code PacketStatusEvent} event is fired whenever the a STATUS packet is received from a client
- * or when the server wants to send a STATUS packet to the client.
+ * The {@code PacketStatusSendEvent} event is fired whenever the server wants to send a STATUS packet to the client.
  * This class implements {@link CancellableEvent}.
- * The {@code PacketStatusEvent} does not have to do with a bukkit player object due to
+ * The {@code PacketStatusSendEvent} does not have to do with a bukkit player object due to
  * the player object being null in this state.
  * Use the {@link #getSocketAddress()} to identify who sends the packet.
  * @see <a href="https://wiki.vg/Protocol#Status">https://wiki.vg/Protocol#Status</a>
  * @author retrooper
- * @since 1.7
+ * @since 1.8
  */
-public class PacketStatusEvent extends PacketEvent implements NMSPacketEvent, CancellableEvent {
+public class PacketStatusSendEvent extends PacketEvent implements NMSPacketEvent, CancellableEvent {
     private final InetSocketAddress socketAddress;
-    private final Object packet;
+    private Object packet;
     private boolean cancelled;
     private byte packetID = -2;
 
-    public PacketStatusEvent(final Object channel, final Object packet) {
+    public PacketStatusSendEvent(final Object channel, final Object packet) {
         this.socketAddress = ChannelUtils.getSocketAddress(channel);
         this.packet = packet;
     }
 
-    public PacketStatusEvent(final InetSocketAddress socketAddress, final Object packet) {
+    public PacketStatusSendEvent(final InetSocketAddress socketAddress, final Object packet) {
         this.socketAddress = socketAddress;
         this.packet = packet;
     }
@@ -86,18 +85,23 @@ public class PacketStatusEvent extends PacketEvent implements NMSPacketEvent, Ca
         return packet;
     }
 
+    @Override
+    public void setNMSPacket(Object packet) {
+        this.packet = packet;
+    }
+
     /**
      * Each binding in each packet state has their own constants.
      * Example Usage:
      * <p>
-     *     {@code if (getPacketId() == PacketType.Status.Client.PING) }
+     *     {@code if (getPacketId() == PacketType.Status.Server.PONG) }
      * </p>
      * @return Packet ID.
      */
     @Override
     public byte getPacketId() {
         if (packetID == -1) {
-            packetID = PacketType.Status.packetIds.getOrDefault(packet.getClass(), (byte) -1);
+            packetID = PacketType.Status.Server.packetIds.getOrDefault(packet.getClass(), (byte) -1);
         }
         return packetID;
     }
@@ -124,6 +128,6 @@ public class PacketStatusEvent extends PacketEvent implements NMSPacketEvent, Ca
 
     @Override
     public void call(PacketListenerDynamic listener) {
-        listener.onPacketStatus(this);
+        listener.onPacketStatusSend(this);
     }
 }

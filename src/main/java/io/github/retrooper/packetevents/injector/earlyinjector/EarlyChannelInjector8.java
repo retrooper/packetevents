@@ -195,19 +195,27 @@ public class EarlyChannelInjector8 implements ChannelInjector {
 
         @Override
         public void channelRead(final ChannelHandlerContext ctx, Object packet) throws Exception {
-            packet = PacketEvents.get().packetHandlerInternal.read(player, ctx.channel(), packet);
+            Object[] data = PacketEvents.get().packetHandlerInternal.read(player, ctx.channel(), packet);
+            packet = data[0];
+            final byte protocolState = (byte) data[1];
             if (packet != null) {
                 super.channelRead(ctx, packet);
-                PacketEvents.get().packetHandlerInternal.postRead(player, ctx.channel(), packet);
+                if (protocolState == 2) {
+                    PacketEvents.get().packetHandlerInternal.postRead(player, ctx.channel(), packet);
+                }
             }
         }
 
         @Override
         public void write(final ChannelHandlerContext ctx, Object packet, final ChannelPromise promise) throws Exception {
-            packet = PacketEvents.get().packetHandlerInternal.write(player, ctx.channel(), packet);
+            Object[] data = PacketEvents.get().packetHandlerInternal.write(player, ctx.channel(), packet);
+            packet = data[0];
+            final byte protocolState = (byte) data[1];
             if (packet != null) {
                 super.write(ctx, packet, promise);
-                PacketEvents.get().packetHandlerInternal.postWrite(player, ctx.channel(), packet);
+                if (protocolState == 2) {
+                    PacketEvents.get().packetHandlerInternal.postWrite(player, ctx.channel(), packet);
+                }
             }
         }
     }

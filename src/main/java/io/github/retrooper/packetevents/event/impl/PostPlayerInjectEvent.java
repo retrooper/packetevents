@@ -29,11 +29,14 @@ import io.github.retrooper.packetevents.event.PacketEvent;
 import io.github.retrooper.packetevents.event.PacketListenerDynamic;
 import io.github.retrooper.packetevents.event.eventtypes.CancellableEvent;
 import io.github.retrooper.packetevents.event.eventtypes.PlayerEvent;
+import io.github.retrooper.packetevents.utils.netty.channel.ChannelUtils;
 import io.github.retrooper.packetevents.utils.player.ClientVersion;
 import io.github.retrooper.packetevents.utils.versionlookup.VersionLookupUtils;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+
+import java.net.InetSocketAddress;
 
 /**
  * The {@code PostPlayerInjectEvent} event is fired after a player is successfully injected.
@@ -84,6 +87,11 @@ public class PostPlayerInjectEvent extends PacketEvent implements PlayerEvent {
     @NotNull
     public Object getChannel() {
         return PacketEvents.get().packetHandlerInternal.getChannel(player.getName());
+    }
+
+    @NotNull
+    public InetSocketAddress getSocketAddress() {
+        return ChannelUtils.getSocketAddress(getChannel());
     }
 
     /**

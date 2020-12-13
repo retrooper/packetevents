@@ -24,11 +24,12 @@
 
 package io.github.retrooper.packetevents.event.eventtypes;
 
+import io.github.retrooper.packetevents.event.impl.PacketPlayReceiveEvent;
 import org.bukkit.entity.Player;
 
 /**
  * Every event that has an associated player is recommended to implement this interface.
- * @see io.github.retrooper.packetevents.event.impl.PacketReceiveEvent
+ * @see PacketPlayReceiveEvent
  * @author retrooper
  * @since 1.6.9
  */

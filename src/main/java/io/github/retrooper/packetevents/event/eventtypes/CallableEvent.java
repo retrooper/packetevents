@@ -26,6 +26,7 @@ package io.github.retrooper.packetevents.event.eventtypes;
 
 import io.github.retrooper.packetevents.event.PacketEvent;
 import io.github.retrooper.packetevents.event.PacketListenerDynamic;
+import io.github.retrooper.packetevents.event.impl.PacketPlayReceiveEvent;
 
 /**
  * The {@link PacketEvent} implements this interface.
@@ -33,7 +34,7 @@ import io.github.retrooper.packetevents.event.PacketListenerDynamic;
  * If you are making a custom event, don't implement this.
  * The {@link PacketListenerDynamic#onPacketEvent(PacketEvent)} method is called for every event,
  * including custom events.
- * @see io.github.retrooper.packetevents.event.impl.PacketReceiveEvent
+ * @see PacketPlayReceiveEvent
  * @author retrooper
  * @since 1.8
  */

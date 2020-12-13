@@ -81,6 +81,10 @@ public final class PacketEvents implements Listener, EventManager {
         return instance;
     }
 
+    public static void set(final PacketEvents instance) {
+        PacketEvents.instance = instance;
+    }
+
     /**
      * This loads the PacketEvents API.
      * <p>

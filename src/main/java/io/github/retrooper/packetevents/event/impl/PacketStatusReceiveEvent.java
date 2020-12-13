@@ -1,0 +1,133 @@
+/*
+ * MIT License
+ *
+ * Copyright (c) 2020 retrooper
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+
+package io.github.retrooper.packetevents.event.impl;
+
+import io.github.retrooper.packetevents.event.PacketEvent;
+import io.github.retrooper.packetevents.event.PacketListenerDynamic;
+import io.github.retrooper.packetevents.event.eventtypes.CancellableEvent;
+import io.github.retrooper.packetevents.event.eventtypes.NMSPacketEvent;
+import io.github.retrooper.packetevents.packettype.PacketType;
+import io.github.retrooper.packetevents.utils.netty.channel.ChannelUtils;
+import io.github.retrooper.packetevents.utils.reflection.ClassUtil;
+import org.jetbrains.annotations.NotNull;
+
+import java.net.InetSocketAddress;
+
+/**
+ * The {@code PacketStatusReceiveEvent} event is fired whenever the server receives a STATUS packet from a client.
+ * This class implements {@link CancellableEvent}.
+ * The {@code PacketStatusSendEvent} does not have to do with a bukkit player object due to
+ * the player object being null in this state.
+ * Use the {@link #getSocketAddress()} to identify who sends the packet.
+ * @see <a href="https://wiki.vg/Protocol#Status">https://wiki.vg/Protocol#Status</a>
+ * @author retrooper
+ * @since 1.8
+ */
+public class PacketStatusReceiveEvent extends PacketEvent implements NMSPacketEvent, CancellableEvent {
+    private final InetSocketAddress socketAddress;
+    private Object packet;
+    private boolean cancelled;
+    private byte packetID = -2;
+
+    public PacketStatusReceiveEvent(final Object channel, final Object packet) {
+        this.socketAddress = ChannelUtils.getSocketAddress(channel);
+        this.packet = packet;
+    }
+
+    public PacketStatusReceiveEvent(final InetSocketAddress socketAddress, final Object packet) {
+        this.socketAddress = socketAddress;
+        this.packet = packet;
+    }
+
+    /**
+     * Socket address of the associated client.
+     * This socket address will never be null.
+     * @return Socket address of the client.
+     */
+    @NotNull
+    @Override
+    public InetSocketAddress getSocketAddress() {
+        return socketAddress;
+    }
+
+
+    @NotNull
+    @Override
+    public String getPacketName() {
+        return ClassUtil.getClassSimpleName(packet.getClass());
+    }
+
+    @NotNull
+    @Override
+    public Object getNMSPacket() {
+        return packet;
+    }
+
+    @Override
+    public void setNMSPacket(Object packet) {
+        this.packet = packet;
+    }
+
+    /**
+     * Each binding in each packet state has their own constants.
+     * Example Usage:
+     * <p>
+     *     {@code if (getPacketId() == PacketType.Status.Client.PING) }
+     * </p>
+     * @return Packet ID.
+     */
+    @Override
+    public byte getPacketId() {
+        if (packetID == -1) {
+            packetID = PacketType.Status.Client.packetIds.getOrDefault(packet.getClass(), (byte) -1);
+        }
+        return packetID;
+    }
+
+    @Override
+    public void cancel() {
+        cancelled = true;
+    }
+
+    @Override
+    public void uncancel() {
+        cancelled = false;
+    }
+
+    @Override
+    public boolean isCancelled() {
+        return cancelled;
+    }
+
+    @Override
+    public void setCancelled(boolean value) {
+        cancelled = value;
+    }
+
+    @Override
+    public void call(PacketListenerDynamic listener) {
+        listener.onPacketStatusReceive(this);
+    }
+}

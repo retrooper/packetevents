@@ -26,54 +26,65 @@ package io.github.retrooper.packetevents.event.impl;
 
 import io.github.retrooper.packetevents.event.PacketEvent;
 import io.github.retrooper.packetevents.event.PacketListenerDynamic;
-import io.github.retrooper.packetevents.event.eventtypes.CallableEvent;
 import io.github.retrooper.packetevents.event.eventtypes.CancellableEvent;
 import io.github.retrooper.packetevents.event.eventtypes.NMSPacketEvent;
+import io.github.retrooper.packetevents.event.eventtypes.PlayerEvent;
 import io.github.retrooper.packetevents.packettype.PacketType;
 import io.github.retrooper.packetevents.utils.netty.channel.ChannelUtils;
 import io.github.retrooper.packetevents.utils.reflection.ClassUtil;
+import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
 import java.net.InetSocketAddress;
 
 /**
- * The {@code PacketLoginEvent} event is fired whenever the a LOGIN packet is received from a client
- * or when the server wants to send a LOGIN packet to the client.
- * This class implements {@link CancellableEvent}.
- * The {@code PacketLoginEvent} does not have to do with a bukkit player object due to
- * the player object being null in this state.
- * Use the {@link #getSocketAddress()} to identify who sends the packet.
- * @see <a href="https://wiki.vg/Protocol#Login">https://wiki.vg/Protocol#Login</a>
+ * The {@code PacketPlaySendEvent} event is fired whenever the a PLAY packet is about to be sent.
+ * This class implements {@link CancellableEvent} and {@link PlayerEvent}.
+ * Cancelling this event will result in preventing minecraft from sending the packet.
+ * The player won't receive the packet if you cancel it.
+ *
  * @author retrooper
- * @since 1.7
+ * @see <a href="https://wiki.vg/Protocol#Play">https://wiki.vg/Protocol#Play</a>
+ * @since 1.2.6
  */
-public class PacketLoginEvent extends PacketEvent implements NMSPacketEvent, CancellableEvent, CallableEvent {
-    private final InetSocketAddress socketAddress;
-    private final Object packet;
+public final class PacketPlaySendEvent extends PacketEvent implements NMSPacketEvent, CancellableEvent, PlayerEvent {
+    private final Player player;
+    private final InetSocketAddress address;
+    private Object packet;
     private boolean cancelled;
     private byte packetID = -2;
 
-    public PacketLoginEvent(final Object channel, final Object packet) {
-        this.socketAddress = ChannelUtils.getSocketAddress(channel);
+    public PacketPlaySendEvent(final Player player, final Object channel, final Object packet) {
+        this.player = player;
+        this.address = ChannelUtils.getSocketAddress(channel);
         this.packet = packet;
-    }
-
-    public PacketLoginEvent(final InetSocketAddress socketAddress, final Object packet) {
-        this.socketAddress = socketAddress;
-        this.packet = packet;
+        this.cancelled = false;
     }
 
     /**
-     * Socket address of the associated client.
-     * This socket address will never be null.
-     * @return Socket address of the client.
+     * This method returns the bukkit player object of the packet receiver.
+     * The player object might be null during early packets.
+     *
+     * @return Packet receiver.
+     */
+    @NotNull
+    @Override
+    public Player getPlayer() {
+        return player;
+    }
+
+    /**
+     * This method returns the socket address of the packet receiver.
+     * This address if guaranteed to never be null.
+     * You could use this to identify who is sending packets
+     * whenever the player object is null.
+     * @return Packet receiver's socket address.
      */
     @NotNull
     @Override
     public InetSocketAddress getSocketAddress() {
-        return socketAddress;
+        return address;
     }
-
 
     @NotNull
     @Override
@@ -87,19 +98,23 @@ public class PacketLoginEvent extends PacketEvent implements NMSPacketEvent, Can
         return packet;
     }
 
+    @Override
+    public void setNMSPacket(Object packet) {
+        this.packet = packet;
+    }
+
     /**
      * Each binding in each packet state has their own constants.
      * Example Usage:
      * <p>
-     * {@code if (getPacketId() == PacketType.Login.Client.HANDSHAKE) }
+     *     {@code if (getPacketId() == PacketType.Play.Server.KEEP_ALIVE) }
      * </p>
-     *
      * @return Packet ID.
      */
     @Override
     public byte getPacketId() {
         if (packetID == -2) {
-            packetID = PacketType.Login.packetIds.getOrDefault(packet.getClass(), (byte) -1);
+            packetID = PacketType.Play.Server.packetIds.getOrDefault(packet.getClass(), (byte) -1);
         }
         return packetID;
     }
@@ -126,6 +141,7 @@ public class PacketLoginEvent extends PacketEvent implements NMSPacketEvent, Can
 
     @Override
     public void call(PacketListenerDynamic listener) {
-        listener.onPacketLogin(this);
+        listener.onPacketPlaySend(this);
     }
 }
+

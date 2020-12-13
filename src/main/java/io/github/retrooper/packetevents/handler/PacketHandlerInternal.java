@@ -154,28 +154,33 @@ public class PacketHandlerInternal {
         }
     }
 
-    public Object read(Player player, Object channel, Object packet) {
+    public Object[] read(Player player, Object channel, Object packet) {
+        final byte protocolState;
         if (player == null) {
             String simpleClassName = ClassUtil.getClassSimpleName(packet.getClass());
             //Status packet
             if (simpleClassName.startsWith("PacketS")) {
-                final PacketStatusEvent packetStatusEvent = new PacketStatusEvent(channel, packet);
-                PacketEvents.get().getEventManager().callEvent(packetStatusEvent);
-                interceptStatus(packetStatusEvent);
-                if (packetStatusEvent.isCancelled()) {
+                protocolState = 0;
+                final PacketStatusReceiveEvent event = new PacketStatusReceiveEvent(channel, packet);
+                PacketEvents.get().getEventManager().callEvent(event);
+                packet = event.getNMSPacket();
+                interceptStatusReceive(event);
+                if (event.isCancelled()) {
                     packet = null;
                 }
             } else {
+                protocolState = 1;
                 //Login packet
-                final PacketLoginEvent packetLoginEvent = new PacketLoginEvent(channel, packet);
-                PacketEvents.get().getEventManager().callEvent(packetLoginEvent);
-                interceptLogin(packetLoginEvent);
-                if (packetLoginEvent.isCancelled()) {
+                final PacketLoginReceiveEvent event = new PacketLoginReceiveEvent(channel, packet);
+                PacketEvents.get().getEventManager().callEvent(event);
+                packet = event.getNMSPacket();
+                interceptLoginReceive(event);
+                if (event.isCancelled()) {
                     packet = null;
                 } else {
                     //Cache the channel
-                    if (packetLoginEvent.getPacketId() == PacketType.Login.Client.START) {
-                        WrappedPacketLoginInStart startWrapper = new WrappedPacketLoginInStart(packetLoginEvent.getNMSPacket());
+                    if (event.getPacketId() == PacketType.Login.Client.START) {
+                        WrappedPacketLoginInStart startWrapper = new WrappedPacketLoginInStart(event.getNMSPacket());
                         WrappedGameProfile gameProfile = startWrapper.getGameProfile();
                         channelMap.put(gameProfile.name, channel);
                     }
@@ -190,34 +195,41 @@ public class PacketHandlerInternal {
                     channelTimePassed.put(channel, -1L);
                 }
             }
-            final PacketReceiveEvent packetReceiveEvent = new PacketReceiveEvent(player, channel, packet);
-            PacketEvents.get().getEventManager().callEvent(packetReceiveEvent);
-            interceptRead(packetReceiveEvent);
-            if (packetReceiveEvent.isCancelled()) {
+            protocolState = 2;
+            final PacketPlayReceiveEvent event = new PacketPlayReceiveEvent(player, channel, packet);
+            PacketEvents.get().getEventManager().callEvent(event);
+            packet = event.getNMSPacket();
+            interceptRead(event);
+            if (event.isCancelled()) {
                 packet = null;
             }
         }
-        return packet;
+        return new Object[]{packet, protocolState};
     }
 
-    public Object write(Player player, Object channel, Object packet) {
+    public Object[] write(Player player, Object channel, Object packet) {
+        final byte protocolState;
         if (player == null) {
             String simpleClassName = ClassUtil.getClassSimpleName(packet.getClass());
             //Status packet
             if (simpleClassName.startsWith("PacketS")) {
-                final PacketStatusEvent packetStatusEvent = new PacketStatusEvent(channel, packet);
-                PacketEvents.get().getEventManager().callEvent(packetStatusEvent);
-                interceptStatus(packetStatusEvent);
-                if (packetStatusEvent.isCancelled()) {
+                protocolState = 0;
+                final PacketStatusSendEvent event = new PacketStatusSendEvent(channel, packet);
+                PacketEvents.get().getEventManager().callEvent(event);
+                packet = event.getNMSPacket();
+                interceptStatusSend(event);
+                if (event.isCancelled()) {
                     packet = null;
                 }
             }
             //Login packet
             else {
-                final PacketLoginEvent packetLoginEvent = new PacketLoginEvent(channel, packet);
-                PacketEvents.get().getEventManager().callEvent(packetLoginEvent);
-                interceptLogin(packetLoginEvent);
-                if (packetLoginEvent.isCancelled()) {
+                protocolState = 1;
+                final PacketLoginSendEvent event = new PacketLoginSendEvent(channel, packet);
+                PacketEvents.get().getEventManager().callEvent(event);
+                packet = event.getNMSPacket();
+                interceptLoginSend(event);
+                if (event.isCancelled()) {
                     packet = null;
                 }
             }
@@ -230,52 +242,52 @@ public class PacketHandlerInternal {
                     channelTimePassed.put(channel, -1L);
                 }
             }
-            final PacketSendEvent packetSendEvent = new PacketSendEvent(player, channel, packet);
-            PacketEvents.get().getEventManager().callEvent(packetSendEvent);
-            interceptWrite(packetSendEvent);
-            if (packetSendEvent.isCancelled()) {
+            protocolState = 2;
+            final PacketPlaySendEvent event = new PacketPlaySendEvent(player, channel, packet);
+            PacketEvents.get().getEventManager().callEvent(event);
+            packet = event.getNMSPacket();
+            interceptWrite(event);
+            if (event.isCancelled()) {
                 packet = null;
             }
         }
-        return packet;
+        return new Object[] {packet, protocolState};
     }
 
     public void postRead(Player player, Object channel, Object packet) {
         if (player != null) {
-            PostPacketReceiveEvent event = new PostPacketReceiveEvent(player, channel, packet);
+            PostPacketPlayReceiveEvent event = new PostPacketPlayReceiveEvent(player, channel, packet);
             PacketEvents.get().getEventManager().callEvent(event);
-            interceptPostRead(event);
+            interceptPostPlayReceive(event);
         }
     }
 
     public void postWrite(Player player, Object channel, Object packet) {
         if (player != null) {
-            PostPacketSendEvent event = new PostPacketSendEvent(player, channel, packet);
+            PostPacketPlaySendEvent event = new PostPacketPlaySendEvent(player, channel, packet);
             PacketEvents.get().getEventManager().callEvent(event);
-            interceptPostSend(event);
+            interceptPostPlaySend(event);
         }
     }
 
 
-    private void interceptRead(PacketReceiveEvent event) {
+    private void interceptRead(PacketPlayReceiveEvent event) {
         if (event.getPacketId() == PacketType.Play.Client.KEEP_ALIVE) {
-            if (event.getPlayer() != null) {
-                UUID uuid = event.getPlayer().getUniqueId();
-                long timestamp = keepAliveMap.getOrDefault(uuid, event.getTimestamp());
-                long currentTime = event.getTimestamp();
-                long ping = currentTime - timestamp;
-                long smoothedPing = (PacketEvents.get().getPlayerUtils().getSmoothedPing(event.getPlayer()) * 3 + ping) / 4;
-                PacketEvents.get().getPlayerUtils().playerPingMap.put(uuid, (short) ping);
-                PacketEvents.get().getPlayerUtils().playerSmoothedPingMap.put(uuid, (short) smoothedPing);
-            }
+            UUID uuid = event.getPlayer().getUniqueId();
+            long timestamp = keepAliveMap.getOrDefault(uuid, event.getTimestamp());
+            long currentTime = event.getTimestamp();
+            long ping = currentTime - timestamp;
+            long smoothedPing = (PacketEvents.get().getPlayerUtils().getSmoothedPing(event.getPlayer()) * 3 + ping) / 4;
+            PacketEvents.get().getPlayerUtils().playerPingMap.put(uuid, (short) ping);
+            PacketEvents.get().getPlayerUtils().playerSmoothedPingMap.put(uuid, (short) smoothedPing);
         }
     }
 
-    private void interceptWrite(PacketSendEvent event) {
+    private void interceptWrite(PacketPlaySendEvent event) {
 
     }
 
-    private void interceptLogin(PacketLoginEvent event) {
+    private void interceptLoginReceive(PacketLoginReceiveEvent event) {
         if (event.getPacketId() == PacketType.Login.Client.HANDSHAKE
                 && PacketEvents.get().getServerUtils().getVersion() != ServerVersion.v_1_7_10
                 && !PacketEvents.get().getServerUtils().isBungeeCordEnabled() &&
@@ -287,15 +299,23 @@ public class PacketHandlerInternal {
         }
     }
 
-    private void interceptStatus(PacketStatusEvent event) {
+    private void interceptLoginSend(PacketLoginSendEvent event) {
 
     }
 
-    private void interceptPostRead(PostPacketReceiveEvent event) {
+    private void interceptStatusReceive(PacketStatusReceiveEvent event) {
 
     }
 
-    private void interceptPostSend(PostPacketSendEvent event) {
+    private void interceptStatusSend(PacketStatusSendEvent event) {
+
+    }
+
+    private void interceptPostPlayReceive(PostPacketPlayReceiveEvent event) {
+
+    }
+
+    private void interceptPostPlaySend(PostPacketPlaySendEvent event) {
         if (event.getPacketId() == PacketType.Play.Server.KEEP_ALIVE) {
             if (event.getPlayer() != null) {
                 keepAliveMap.put(event.getPlayer().getUniqueId(), event.getTimestamp());

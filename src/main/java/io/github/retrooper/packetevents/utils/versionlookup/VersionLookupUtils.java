@@ -39,10 +39,10 @@ public class VersionLookupUtils {
     public static int getProtocolVersion(Player player) {
         if (ViaVersionLookupUtils.isAvailable()) {
             return ViaVersionLookupUtils.getProtocolVersion(player);
-        } else if (ProtocolLibVersionLookupUtils.isAvailable()) {
-            return ProtocolLibVersionLookupUtils.getProtocolVersion(player);
         } else if (ProtocolSupportVersionLookupUtils.isAvailable()) {
             return ProtocolSupportVersionLookupUtils.getProtocolVersion(player);
+        } else if (ProtocolLibVersionLookupUtils.isAvailable()) {
+            return ProtocolLibVersionLookupUtils.getProtocolVersion(player);
         }
         return -1;
     }

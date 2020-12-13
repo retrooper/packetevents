@@ -26,6 +26,7 @@ package io.github.retrooper.packetevents.event.impl;
 
 import io.github.retrooper.packetevents.event.PacketEvent;
 import io.github.retrooper.packetevents.event.PacketListenerDynamic;
+import io.github.retrooper.packetevents.event.eventtypes.CancellableEvent;
 import io.github.retrooper.packetevents.event.eventtypes.NMSPacketEvent;
 import io.github.retrooper.packetevents.event.eventtypes.PlayerEvent;
 import io.github.retrooper.packetevents.packettype.PacketType;
@@ -33,28 +34,28 @@ import io.github.retrooper.packetevents.utils.netty.channel.ChannelUtils;
 import io.github.retrooper.packetevents.utils.reflection.ClassUtil;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import java.net.InetSocketAddress;
 
 /**
- * The {@code PostPacketReceiveEvent} event is fired after minecraft processes
- * a PLAY server-bound packet.
- * You cannot cancel this event since minecraft already processed this packet.
- * If the incoming packet was cancelled, resulting in it not being processed by minecraft,
- * this event won't be called.
- * This event assures you that the {@link PacketReceiveEvent} event wasn't cancelled.
- * @see <a href="https://wiki.vg/Protocol#Serverbound_4">https://wiki.vg/Protocol#Serverbound_4</a>
+ * The {@code PacketPlayReceiveEvent} event is fired whenever the a PLAY packet is
+ * received from any connected client.
+ * Cancelling this event will result in preventing minecraft from processing the incoming packet.
+ * It would be as if the player never sent the packet from the server's view.
+ * This class implements {@link CancellableEvent} and {@link PlayerEvent}.
+ *
  * @author retrooper
- * @since 1.7
+ * @see <a href="https://wiki.vg/Protocol#Play">https://wiki.vg/Protocol#Play</a>
+ * @since 1.2.6
  */
-public class PostPacketReceiveEvent extends PacketEvent implements NMSPacketEvent, PlayerEvent {
+public final class PacketPlayReceiveEvent extends PacketEvent implements NMSPacketEvent,CancellableEvent, PlayerEvent {
     private final Player player;
     private final InetSocketAddress address;
-    private final Object packet;
+    private Object packet;
+    private boolean cancelled;
     private byte packetID = -2;
 
-    public PostPacketReceiveEvent(final Player player, final Object channel, final Object packet) {
+    public PacketPlayReceiveEvent(final Player player, final Object channel, final Object packet) {
         this.player = player;
         this.address = ChannelUtils.getSocketAddress(channel);
         this.packet = packet;
@@ -65,7 +66,7 @@ public class PostPacketReceiveEvent extends PacketEvent implements NMSPacketEven
      * The player object might be null during early packets.
      * @return Packet sender.
      */
-    @Nullable
+    @NotNull
     @Override
     public Player getPlayer() {
         return player;
@@ -96,11 +97,16 @@ public class PostPacketReceiveEvent extends PacketEvent implements NMSPacketEven
         return packet;
     }
 
+    @Override
+    public void setNMSPacket(Object packet) {
+        this.packet = packet;
+    }
+
     /**
      * Each binding in each packet state has their own constants.
      * Example Usage:
      * <p>
-     *     {@code if (getPacketId() == PacketType.Play.Client.ARM_ANIMATION) }
+     *     {@code if (getPacketId() == PacketType.Play.Client.USE_ENTITY) }
      * </p>
      * @return Packet ID.
      */
@@ -113,7 +119,27 @@ public class PostPacketReceiveEvent extends PacketEvent implements NMSPacketEven
     }
 
     @Override
+    public void cancel() {
+        cancelled = true;
+    }
+
+    @Override
+    public void uncancel() {
+        cancelled = false;
+    }
+
+    @Override
+    public boolean isCancelled() {
+        return cancelled;
+    }
+
+    @Override
+    public void setCancelled(boolean value) {
+        cancelled = value;
+    }
+
+    @Override
     public void call(PacketListenerDynamic listener) {
-        listener.onPostPacketReceive(this);
+        listener.onPacketPlayReceive(this);
     }
 }
