@@ -36,9 +36,9 @@ import io.github.retrooper.packetevents.event.priority.PacketEventPriority;
  * @since 1.7.7
  */
 public abstract class PacketListenerDynamic {
-    private final byte priority;
+    private final PacketEventPriority priority;
 
-    public PacketListenerDynamic(final byte priority) {
+    public PacketListenerDynamic(final PacketEventPriority priority) {
         this.priority = priority;
     }
 
@@ -46,7 +46,7 @@ public abstract class PacketListenerDynamic {
         this.priority = PacketEventPriority.NORMAL;
     }
 
-    public final byte getPriority() {
+    public final PacketEventPriority getPriority() {
         return priority;
     }
 

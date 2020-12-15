@@ -22,25 +22,17 @@
  * SOFTWARE.
  */
 
-package io.github.retrooper.packetevents.event.annotation;
+package io.github.retrooper.packetevents.packetwrappers.play.in.closewindow;
 
-import io.github.retrooper.packetevents.event.priority.PacketEventPriority;
+import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
 
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+public class WrappedPacketInCloseWindow extends WrappedPacket {
+    public WrappedPacketInCloseWindow(Object packet) {
+        super(packet);
+    }
 
-/**
- * This is what you override your event listener with on the old event system.
- * You can specify the event priority of the listener method.
- * @deprecated Was used for the old event system, the new one doesn't need this anymore.
- * @author retrooper
- * @since 1.0
- */
-@Target({ElementType.METHOD})
-@Retention(RetentionPolicy.RUNTIME)
-@Deprecated
-public @interface PacketHandler {
-    byte priority() default 2;
+    //0 for player inv.
+    public int getWindowId() {
+        return readInt(0);
+    }
 }

@@ -161,7 +161,6 @@ public final class WrappedPacketOutChat extends WrappedPacket implements Sendabl
     }
 
     public static Object toIChatBaseComponent(String msg) {
-         net.minecraft.server.v1_16_R2.PacketPlayOutChat c;
         try {
             return Reflection.getMethod(chatSerializerClass, 0, String.class).invoke(null, msg);
         } catch (IllegalAccessException | InvocationTargetException e) {

@@ -24,7 +24,6 @@
 
 package io.github.retrooper.packetevents.event.manager;
 
-import io.github.retrooper.packetevents.PacketEvents;
 import io.github.retrooper.packetevents.event.PacketEvent;
 import io.github.retrooper.packetevents.event.PacketListenerDynamic;
 import io.github.retrooper.packetevents.event.eventtypes.CancellableEvent;
@@ -58,8 +57,9 @@ class EventManagerDynamic {
         if (event instanceof CancellableEvent) {
             isCancelled = ((CancellableEvent) event).isCancelled();
         }
-        byte maxReachedEventPriority = PacketEventPriority.LOWEST;
-        for (byte i = PacketEventPriority.LOWEST; i <= PacketEventPriority.MONITOR; i++) {
+        byte maxReachedEventPriority = PacketEventPriority.LOWEST.getPriorityValue();
+        //LOWEST.getPriorityValue()
+        for (byte i = maxReachedEventPriority; i <= PacketEventPriority.MONITOR.getPriorityValue(); i++) {
             if (map.get(i) != null) {
                 maxReachedEventPriority = i;
                 for (PacketListenerDynamic listener : map.get(i)) {
@@ -90,13 +90,12 @@ class EventManagerDynamic {
      * @param listener {@link PacketListenerDynamic}
      */
     public void registerListener(PacketListenerDynamic listener) {
-       // System.out.println("LISTENER CREATED ON " + PacketEvents.get().getPlugins().get(0).getName());
-            List<PacketListenerDynamic> listeners = map.get(listener.getPriority());
-            if (listeners == null) {
-                map.put(listener.getPriority(), new ArrayList<>());
-                listeners = map.get(listener.getPriority());
-            }
-            listeners.add(listener);
+        List<PacketListenerDynamic> listeners = map.get(listener.getPriority().getPriorityValue());
+        if (listeners == null) {
+            map.put(listener.getPriority().getPriorityValue(), new ArrayList<>());
+            listeners = map.get(listener.getPriority().getPriorityValue());
+        }
+        listeners.add(listener);
     }
     /**
      * Register multiple dynamic packet event listeners with one method.
@@ -112,7 +111,7 @@ class EventManagerDynamic {
      * @param listener {@link PacketListenerDynamic}
      */
     public void unregisterListener(PacketListenerDynamic listener) {
-            List<PacketListenerDynamic> listeners = map.get(listener.getPriority());
+            List<PacketListenerDynamic> listeners = map.get(listener.getPriority().getPriorityValue());
             if (listeners == null) {
                 return;
             }
@@ -122,7 +121,6 @@ class EventManagerDynamic {
     /**
      * Unregister multiple dynamic packet event listeners with one method.
      * @param listeners {@link PacketListenerDynamic}
-     * @return Same event manager instance.
      */
     public void unregisterListeners(PacketListenerDynamic... listeners) {
         for (PacketListenerDynamic listener : listeners) {

@@ -43,6 +43,7 @@ import io.github.retrooper.packetevents.packetwrappers.play.in.windowclick.Wrapp
 import io.github.retrooper.packetevents.packetwrappers.play.out.abilities.WrappedPacketOutAbilities;
 import io.github.retrooper.packetevents.packetwrappers.play.out.animation.WrappedPacketOutAnimation;
 import io.github.retrooper.packetevents.packetwrappers.play.out.chat.WrappedPacketOutChat;
+import io.github.retrooper.packetevents.packetwrappers.play.out.closewindow.WrappedPacketOutCloseWindow;
 import io.github.retrooper.packetevents.packetwrappers.play.out.custompayload.WrappedPacketOutCustomPayload;
 import io.github.retrooper.packetevents.packetwrappers.play.out.entity.WrappedPacketOutEntity;
 import io.github.retrooper.packetevents.packetwrappers.play.out.entitystatus.WrappedPacketOutEntityStatus;
@@ -55,6 +56,7 @@ import io.github.retrooper.packetevents.packetwrappers.play.out.helditemslot.Wra
 import io.github.retrooper.packetevents.packetwrappers.play.out.keepalive.WrappedPacketOutKeepAlive;
 import io.github.retrooper.packetevents.packetwrappers.play.out.kickdisconnect.WrappedPacketOutKickDisconnect;
 import io.github.retrooper.packetevents.packetwrappers.play.out.position.WrappedPacketOutPosition;
+import io.github.retrooper.packetevents.packetwrappers.play.out.resourcepacksend.WrappedPacketOutResourcePackSend;
 import io.github.retrooper.packetevents.packetwrappers.play.out.transaction.WrappedPacketOutTransaction;
 import io.github.retrooper.packetevents.packetwrappers.play.out.updatehealth.WrappedPacketOutUpdateHealth;
 import io.github.retrooper.packetevents.utils.reflection.ClassUtil;
@@ -131,6 +133,8 @@ public class WrappedPacket implements WrapperPacketReader, WrapperPacketWriter {
         WrappedPacketOutEntityStatus.load();
         WrappedPacketOutExperience.load();
         WrappedPacketOutHeldItemSlot.load();
+        WrappedPacketOutResourcePackSend.load();
+        WrappedPacketOutCloseWindow.load();
     }
 
     protected void setup() {

@@ -31,14 +31,14 @@ package io.github.retrooper.packetevents.event.priority;
  * @author retrooper
  * @since 1.6.9
  */
-public interface PacketEventPriority {
+public enum PacketEventPriority {
     /**
      * The weakest event priority.
      * The first to be processed(IN THE DYNAMIC EVENT SYSTEM ONLY).
      * Use this if you need to be the first processing the event and
      * need no power in cancelling an event or preventing an event cancellation.
      */
-    byte LOWEST = 0;
+    LOWEST((byte)0),
 
     /**
      * A weak event priority.
@@ -46,7 +46,7 @@ public interface PacketEventPriority {
      * Use this if you would prefer to be one of the first to process the event,
      * but don't mind if some other listener processes before you.
      */
-    byte LOW = 1;
+    LOW((byte)1),
 
     /**
      * Default event priority.
@@ -54,14 +54,14 @@ public interface PacketEventPriority {
      * Use this if you don't really care/know when you process or just want to
      * be in the middle.
      */
-    byte NORMAL = 2;
+    NORMAL((byte)2),
 
     /**
      * Higher than the {@link PacketEventPriority#NORMAL} event priority.
      * Fourth to be processed(IN THE DYNAMIC EVENT SYSTEM ONLY).
      * Use this if you want to process before the default event prioritized listeners.
      */
-    byte HIGH = 3;
+    HIGH((byte)3),
 
     /**
      * Second most powerful event priority.
@@ -72,7 +72,7 @@ public interface PacketEventPriority {
      * mind if some other listener urgently needs to decide over you.
      * {@link PacketEventPriority#MONITOR} is rarely ever recommended to use.
      */
-    byte HIGHEST = 4;
+    HIGHEST((byte)4),
 
     /**
      * Most powerful event priority.
@@ -80,5 +80,23 @@ public interface PacketEventPriority {
      * Use this if you urgently need to be the last to process or urgently need to decide if the event cancelled or not.
      * This is rarely recommended.
      */
-    byte MONITOR = 5;
+    MONITOR((byte)5);
+
+    final byte priorityValue;
+    PacketEventPriority(byte priorityValue) {
+        this.priorityValue = priorityValue;
+    }
+
+    public byte getPriorityValue() {
+        return priorityValue;
+    }
+
+    public static PacketEventPriority getPacketEventPriority(final byte bytePriority) {
+        for(PacketEventPriority priority : values()) {
+            if(priority.priorityValue == bytePriority) {
+                return priority;
+            }
+        }
+        return NORMAL;
+    }
 }

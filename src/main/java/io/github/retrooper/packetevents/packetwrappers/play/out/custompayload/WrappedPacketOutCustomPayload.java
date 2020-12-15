@@ -64,10 +64,11 @@ public class WrappedPacketOutCustomPayload extends WrappedPacket implements Send
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
         }
+
         try {
             packetDataSerializerConstructor = packetDataSerializerClass.getConstructor(byteBufClass);
         } catch (NullPointerException | NoSuchMethodException e) {
-            e.printStackTrace();
+            //For some reason some 1.7.10 spigots don't have this constructor although its on normal spigot 1.7.10???
         }
 
         try {
