@@ -24,7 +24,6 @@
 
 package io.github.retrooper.packetevents;
 
-import io.github.retrooper.packetevents.event.PacketEvent;
 import io.github.retrooper.packetevents.event.manager.EventManager;
 import io.github.retrooper.packetevents.event.manager.PEEventManager;
 import io.github.retrooper.packetevents.exceptions.PacketEventsLoadFailureException;
@@ -51,6 +50,7 @@ import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerLoginEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.plugin.Plugin;
+import org.bukkit.plugin.ServicePriority;
 
 import java.util.ArrayList;
 import java.util.concurrent.ExecutorService;
@@ -73,38 +73,22 @@ public final class PacketEvents implements Listener, EventManager {
     private boolean loading, loaded, initialized, initializing, stopping;
     private PacketEventsSettings settings = new PacketEventsSettings();
 
-    public static PacketEvents create() {
-        return instance = new PacketEvents();
+    public static PacketEvents create(final Plugin plugin) {
+        if (!Bukkit.getServicesManager().isProvidedFor(PacketEvents.class)) {
+            instance = new PacketEvents();
+            Bukkit.getServicesManager().register(PacketEvents.class, instance,
+                    plugin, ServicePriority.Normal);
+            return instance;
+        }
+        return instance = Bukkit.getServicesManager().load(PacketEvents.class);
     }
 
     public static PacketEvents get() {
         return instance;
     }
 
-    public static void set(final PacketEvents instance) {
-        PacketEvents.instance = instance;
-    }
 
-    /**
-     * This loads the PacketEvents API.
-     * <p>
-     * ServerVersion:
-     * In this method we detect and cache the server version.
-     * <p>
-     * NMSUtils:
-     * We setup some NMS utilities.
-     * <p>
-     * Packet ID System:
-     * All the packet classes we will be needing are cached in a Map with an integer ID.
-     * <p>
-     * Version Lookup Utils:
-     * We setup the client protocol version system.
-     * We check if ViaVersion, ProtocolSupport or ProtocolLib is present.
-     * <p>
-     * Wrappers:
-     * All PacketEvents' wrappers are setup and do all loading they need to do.
-     */
-    public void load() {
+    public boolean load() {
         if (!loaded && !loading) {
             loading = true;
             ServerVersion version = ServerVersion.getVersion();
@@ -129,16 +113,17 @@ public final class PacketEvents implements Listener, EventManager {
             }
             loaded = true;
             loading = false;
+            return true;
         }
-
+        return false;
     }
 
     public void loadSettings(PacketEventsSettings settings) {
         this.settings = settings;
     }
 
-    public void init(final Plugin plugin) {
-        init(plugin, settings);
+    public boolean init(final Plugin plugin) {
+        return init(plugin, settings);
     }
 
     /**
@@ -153,7 +138,7 @@ public final class PacketEvents implements Listener, EventManager {
      * @param pl JavaPlugin instance
      * @param packetEventsSettings settings
      */
-    public void init(final Plugin pl, PacketEventsSettings packetEventsSettings) {
+    public boolean init(final Plugin pl, PacketEventsSettings packetEventsSettings) {
         load();
         if (!initialized && !initializing) {
             initializing = true;
@@ -194,7 +179,9 @@ public final class PacketEvents implements Listener, EventManager {
             }
             initialized = true;
             initializing = false;
+            return true;
         }
+        return false;
     }
 
     /**

@@ -31,7 +31,9 @@ public class MainExample extends JavaPlugin {
     @Override
     public void onLoad() {
         //We use default settings. You always want to specify the settings before loading.
-        PacketEvents.create().load();
+        boolean success = PacketEvents.create(this).load();
+        //PacketEvents won't load again, if it
+        //is already being loaded or has loaded and the load method will return false.
     }
 
     @Override
@@ -39,7 +41,10 @@ public class MainExample extends JavaPlugin {
         /*
          * We created the instance in the onLoad method
          */
-        PacketEvents.get().init(this);
+        boolean success = PacketEvents.get().init(this);
+        //Similarly to the load method, packetevents won't initialize again
+        //if it is already initializing or has initialized.
+        //The method returns whether it initialized.
     }
 
     @Override

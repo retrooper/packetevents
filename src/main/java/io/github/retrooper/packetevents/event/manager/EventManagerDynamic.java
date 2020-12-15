@@ -24,6 +24,7 @@
 
 package io.github.retrooper.packetevents.event.manager;
 
+import io.github.retrooper.packetevents.PacketEvents;
 import io.github.retrooper.packetevents.event.PacketEvent;
 import io.github.retrooper.packetevents.event.PacketListenerDynamic;
 import io.github.retrooper.packetevents.event.eventtypes.CancellableEvent;
@@ -89,6 +90,7 @@ class EventManagerDynamic {
      * @param listener {@link PacketListenerDynamic}
      */
     public void registerListener(PacketListenerDynamic listener) {
+       // System.out.println("LISTENER CREATED ON " + PacketEvents.get().getPlugins().get(0).getName());
             List<PacketListenerDynamic> listeners = map.get(listener.getPriority());
             if (listeners == null) {
                 map.put(listener.getPriority(), new ArrayList<>());
