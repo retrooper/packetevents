@@ -188,7 +188,7 @@ public class PacketType {
                 SCOREBOARD_SCORE = 77, SPAWN_POSITION = 78, UPDATE_TIME = 79, TITLE = 80,
                 ENTITY_SOUND = 81, NAMED_SOUND_EFFECT = 82, STOP_SOUND = 83, PLAYER_LIST_HEADER_FOOTER = 84,
                 NBT_QUERY = 85, COLLECT = 86, ENTITY_TELEPORT = 87, ADVANCEMENTS = 88, UPDATE_ATTRIBUTES = 89,
-                ENTITY_EFFECT = 90, RECIPE_UPDATE = 91, TAGS = 92, MAP_CHUNK_BULK = 93;
+                ENTITY_EFFECT = 90, RECIPE_UPDATE = 91, TAGS = 92, MAP_CHUNK_BULK = 93, NAMED_ENTITY_SPAWN = 94;
 
         public static void init() {
             packetIds.put(PacketTypeClasses.Server.SPAWN_ENTITY, SPAWN_ENTITY);
@@ -287,6 +287,7 @@ public class PacketType {
             packetIds.put(PacketTypeClasses.Server.RECIPE_UPDATE, RECIPE_UPDATE);
             packetIds.put(PacketTypeClasses.Server.TAGS, TAGS);
             packetIds.put(PacketTypeClasses.Server.MAP_CHUNK_BULK, MAP_CHUNK_BULK);
+            packetIds.put(PacketTypeClasses.Play.Server.NAMED_ENTITY_SPAWN, NAMED_ENTITY_SPAWN);
         }
 
         public static class Util {
