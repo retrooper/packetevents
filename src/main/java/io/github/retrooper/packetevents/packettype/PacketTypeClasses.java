@@ -192,7 +192,7 @@ public class PacketTypeClasses {
                     SCOREBOARD_SCORE, SPAWN_POSITION, UPDATE_TIME, TITLE,
                     ENTITY_SOUND, NAMED_SOUND_EFFECT, STOP_SOUND, PLAYER_LIST_HEADER_FOOTER,
                     NBT_QUERY, COLLECT, ENTITY_TELEPORT, ADVANCEMENTS, UPDATE_ATTRIBUTES,
-                    ENTITY_EFFECT, RECIPE_UPDATE, TAGS, MAP_CHUNK_BULK;
+                    ENTITY_EFFECT, RECIPE_UPDATE, TAGS, MAP_CHUNK_BULK, NAMED_ENTITY_SPAWN;
 
             /**
              * Initiate all client-bound packet classes.
@@ -298,6 +298,7 @@ public class PacketTypeClasses {
                 RECIPE_UPDATE = NMSUtils.getNMSClassWithoutException(s + "RecipeUpdate");
                 TAGS = NMSUtils.getNMSClassWithoutException(s + "Tags");
                 MAP_CHUNK_BULK = NMSUtils.getNMSClassWithoutException(s + "MapChunkBulk");
+                NAMED_ENTITY_SPAWN = NMSUtils.getNMSClassWithoutException(s + "NamedEntitySpawn");
                 PacketType.Play.Server.init();
             }
         }
