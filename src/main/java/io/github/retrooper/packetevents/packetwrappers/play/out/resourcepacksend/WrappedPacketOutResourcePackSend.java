@@ -54,11 +54,12 @@ public class WrappedPacketOutResourcePackSend extends WrappedPacket implements S
     }
 
     public static void load() {
-        
         try {
-            packetConstructor = PacketTypeClasses.Play.Server.RESOURCE_PACK_SEND.getConstructor(String.class, String.class);
+            if (PacketTypeClasses.Play.Server.RESOURCE_PACK_SEND != null) {
+                packetConstructor = PacketTypeClasses.Play.Server.RESOURCE_PACK_SEND.getConstructor(String.class, String.class);
+            }
         } catch (NoSuchMethodException e) {
-            
+            e.printStackTrace();
         }
     }
 
