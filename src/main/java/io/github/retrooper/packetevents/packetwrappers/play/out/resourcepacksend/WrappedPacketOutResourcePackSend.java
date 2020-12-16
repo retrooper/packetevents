@@ -58,7 +58,7 @@ public class WrappedPacketOutResourcePackSend extends WrappedPacket implements S
         try {
             packetConstructor = PacketTypeClasses.Play.Server.RESOURCE_PACK_SEND.getConstructor(String.class, String.class);
         } catch (NoSuchMethodException e) {
-            if(!(version.equals(ServerVersion.v_1_7_10)) {
+            if(!(version.equals(ServerVersion.v_1_7_10))) {
                 e.printStackTrace();
             }
         }
