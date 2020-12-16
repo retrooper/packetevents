@@ -26,7 +26,6 @@ package io.github.retrooper.packetevents.event;
 
 
 import io.github.retrooper.packetevents.event.eventtypes.CallableEvent;
-import io.github.retrooper.packetevents.utils.server.ServerVersion;
 
 /**
  * An event in both of PacketEvents' event systems.

@@ -64,7 +64,7 @@ public class PacketHandlerInternal {
     public final HashMap<UUID, Long> keepAliveMap = new HashMap<>();
     public final Map<String, Object> channelMap = new ConcurrentHashMap<>();
     public final Map<Object, Long> channelTimePassed = new ConcurrentHashMap<>();
-    public volatile long minimumPostPlayerInjectDeltaTime = 0L;
+    public volatile long minimumPostPlayerInjectDeltaTime;
     public PacketHandlerInternal(Plugin plugin, boolean earlyInjectMode) {
         this.earlyInjectMode = earlyInjectMode;
         if (earlyInjectMode) {
@@ -132,7 +132,7 @@ public class PacketHandlerInternal {
      * Do this if you want to stop listening to a user's packets.
      * PacketEvents already ejects a player when the bukkit
      * {@link org.bukkit.event.player.PlayerQuitEvent} is called.
-     * @param player
+     * @param player Target player.
      */
     public void ejectPlayer(Player player) {
         if (PacketEvents.get().getSettings().shouldEjectAsync()) {

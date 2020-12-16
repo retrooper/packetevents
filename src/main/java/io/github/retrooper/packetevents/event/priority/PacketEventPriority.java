@@ -46,7 +46,7 @@ public enum PacketEventPriority {
      * Use this if you would prefer to be one of the first to process the event,
      * but don't mind if some other listener processes before you.
      */
-    LOW((byte)1),
+    LOW((byte) 1),
 
     /**
      * Default event priority.
@@ -54,14 +54,14 @@ public enum PacketEventPriority {
      * Use this if you don't really care/know when you process or just want to
      * be in the middle.
      */
-    NORMAL((byte)2),
+    NORMAL((byte) 2),
 
     /**
      * Higher than the {@link PacketEventPriority#NORMAL} event priority.
      * Fourth to be processed(IN THE DYNAMIC EVENT SYSTEM ONLY).
      * Use this if you want to process before the default event prioritized listeners.
      */
-    HIGH((byte)3),
+    HIGH((byte) 3),
 
     /**
      * Second most powerful event priority.
@@ -72,7 +72,7 @@ public enum PacketEventPriority {
      * mind if some other listener urgently needs to decide over you.
      * {@link PacketEventPriority#MONITOR} is rarely ever recommended to use.
      */
-    HIGHEST((byte)4),
+    HIGHEST((byte) 4),
 
     /**
      * Most powerful event priority.
@@ -80,9 +80,10 @@ public enum PacketEventPriority {
      * Use this if you urgently need to be the last to process or urgently need to decide if the event cancelled or not.
      * This is rarely recommended.
      */
-    MONITOR((byte)5);
+    MONITOR((byte) 5);
 
     final byte priorityValue;
+
     PacketEventPriority(byte priorityValue) {
         this.priorityValue = priorityValue;
     }

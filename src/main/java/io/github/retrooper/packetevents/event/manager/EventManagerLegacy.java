@@ -28,7 +28,6 @@ import io.github.retrooper.packetevents.event.PacketEvent;
 import io.github.retrooper.packetevents.event.PacketListener;
 import io.github.retrooper.packetevents.event.annotation.PacketHandler;
 import io.github.retrooper.packetevents.event.eventtypes.CancellableEvent;
-import io.github.retrooper.packetevents.event.priority.PacketEventPriority;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;

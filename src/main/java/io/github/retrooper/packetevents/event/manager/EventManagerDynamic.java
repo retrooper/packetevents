@@ -60,14 +60,15 @@ class EventManagerDynamic {
         byte maxReachedEventPriority = PacketEventPriority.LOWEST.getPriorityValue();
         //LOWEST.getPriorityValue()
         for (byte i = maxReachedEventPriority; i <= PacketEventPriority.MONITOR.getPriorityValue(); i++) {
-            if (map.get(i) != null) {
+            List<PacketListenerDynamic> cached = map.get(i);
+            if (cached != null) {
                 maxReachedEventPriority = i;
-                for (PacketListenerDynamic listener : map.get(i)) {
+                for (PacketListenerDynamic listener : cached) {
                     try {
                         event.callPacketEvent(listener);
                         event.call(listener);
-                    } catch (Exception ex) {
-                        ex.printStackTrace();
+                    } catch (Exception e) {
+                        e.printStackTrace();
                     }
 
                     if (event instanceof CancellableEvent) {
@@ -90,11 +91,7 @@ class EventManagerDynamic {
      * @param listener {@link PacketListenerDynamic}
      */
     public void registerListener(PacketListenerDynamic listener) {
-        List<PacketListenerDynamic> listeners = map.get(listener.getPriority().getPriorityValue());
-        if (listeners == null) {
-            map.put(listener.getPriority().getPriorityValue(), new ArrayList<>());
-            listeners = map.get(listener.getPriority().getPriorityValue());
-        }
+        List<PacketListenerDynamic> listeners = map.computeIfAbsent(listener.getPriority().getPriorityValue(), k -> new ArrayList<>());
         listeners.add(listener);
     }
     /**
@@ -111,11 +108,11 @@ class EventManagerDynamic {
      * @param listener {@link PacketListenerDynamic}
      */
     public void unregisterListener(PacketListenerDynamic listener) {
-            List<PacketListenerDynamic> listeners = map.get(listener.getPriority().getPriorityValue());
-            if (listeners == null) {
-                return;
-            }
-            listeners.remove(listener);
+        List<PacketListenerDynamic> listeners = map.get(listener.getPriority().getPriorityValue());
+        if (listeners == null) {
+            return;
+        }
+        listeners.remove(listener);
     }
 
     /**

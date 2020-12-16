@@ -24,8 +24,6 @@
 
 package io.github.retrooper.packetevents.event.annotation;
 
-import io.github.retrooper.packetevents.event.priority.PacketEventPriority;
-
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
