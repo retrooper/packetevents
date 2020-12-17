@@ -156,6 +156,7 @@ public class EarlyChannelInjector8 implements ChannelInjector {
         Channel channel = (Channel) PacketEvents.get().packetHandlerInternal.getChannel(player.getName());
         ejectChannel(channel);
         PacketEvents.get().getPlayerUtils().clientVersionsMap.remove(player.getAddress());
+        PacketEvents.get().getPlayerUtils().tempClientVersionMap.remove(player.getAddress());
     }
 
     @Override
@@ -180,6 +181,7 @@ public class EarlyChannelInjector8 implements ChannelInjector {
                 PacketEvents.get().packetHandlerInternal.channelTimePassed.remove(channel);
                 PacketEvents.get().packetHandlerInternal.channelMap.remove(player.getName());
                 PacketEvents.get().getPlayerUtils().clientVersionsMap.remove(player.getAddress());
+                PacketEvents.get().getPlayerUtils().tempClientVersionMap.remove(player.getAddress());
             }
         });
     }
@@ -195,27 +197,19 @@ public class EarlyChannelInjector8 implements ChannelInjector {
 
         @Override
         public void channelRead(final ChannelHandlerContext ctx, Object packet) throws Exception {
-            Object[] data = PacketEvents.get().packetHandlerInternal.read(player, ctx.channel(), packet);
-            packet = data[0];
-            final byte protocolState = (byte) data[1];
+            packet = PacketEvents.get().packetHandlerInternal.read(player, ctx.channel(), packet);
             if (packet != null) {
                 super.channelRead(ctx, packet);
-                if (protocolState == 2) {
-                    PacketEvents.get().packetHandlerInternal.postRead(player, ctx.channel(), packet);
-                }
+                PacketEvents.get().packetHandlerInternal.postRead(player, ctx.channel(), packet);
             }
         }
 
         @Override
         public void write(final ChannelHandlerContext ctx, Object packet, final ChannelPromise promise) throws Exception {
-            Object[] data = PacketEvents.get().packetHandlerInternal.write(player, ctx.channel(), packet);
-            packet = data[0];
-            final byte protocolState = (byte) data[1];
+            packet = PacketEvents.get().packetHandlerInternal.write(player, ctx.channel(), packet);
             if (packet != null) {
                 super.write(ctx, packet, promise);
-                if (protocolState == 2) {
-                    PacketEvents.get().packetHandlerInternal.postWrite(player, ctx.channel(), packet);
-                }
+                PacketEvents.get().packetHandlerInternal.postWrite(player, ctx.channel(), packet);
             }
         }
     }

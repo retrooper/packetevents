@@ -235,15 +235,12 @@ public class PacketHandlerInternal {
      * @param player Packet sender.
      * @param channel Packet sender's netty channel.
      * @param packet NMS Packet.
-     * @return Object array, first index is the NMS Packet and the second index is the protocol state(STATUS=0,LOGIN=1,PLAY=2).
      */
-    public Object[] read(Player player, Object channel, Object packet) {
-        final byte protocolState;
+    public Object read(Player player, Object channel, Object packet) {
         if (player == null) {
             String simpleClassName = ClassUtil.getClassSimpleName(packet.getClass());
             //Status packet
             if (simpleClassName.startsWith("PacketS")) {
-                protocolState = 0;
                 final PacketStatusReceiveEvent event = new PacketStatusReceiveEvent(channel, packet);
                 PacketEvents.get().getEventManager().callEvent(event);
                 packet = event.getNMSPacket();
@@ -252,7 +249,6 @@ public class PacketHandlerInternal {
                     packet = null;
                 }
             } else {
-                protocolState = 1;
                 //Login packet
                 final PacketLoginReceiveEvent event = new PacketLoginReceiveEvent(channel, packet);
                 PacketEvents.get().getEventManager().callEvent(event);
@@ -278,7 +274,6 @@ public class PacketHandlerInternal {
                     PacketEvents.get().getEventManager().callEvent(new PostPlayerInjectEvent(player));
                 }
             }
-            protocolState = 2;
             final PacketPlayReceiveEvent event = new PacketPlayReceiveEvent(player, channel, packet);
             PacketEvents.get().getEventManager().callEvent(event);
             packet = event.getNMSPacket();
@@ -287,23 +282,21 @@ public class PacketHandlerInternal {
                 packet = null;
             }
         }
-        return new Object[]{packet, protocolState};
+        return packet;
     }
 
     /**
      * Make PacketEvents process an outgoing packet.
+     * The NMS Packet will be null when netty should cancel a packet.
      * @param player Packet receiver.
      * @param channel Packet receiver's netty channel.
      * @param packet NMS Packet.
-     * @return Object array, first index is the NMS Packet and the second index is the protocol state(STATUS=0,LOGIN=1,PLAY=2).
      */
-    public Object[] write(Player player, Object channel, Object packet) {
-        final byte protocolState;
+    public Object write(Player player, Object channel, Object packet) {
         if (player == null) {
             String simpleClassName = ClassUtil.getClassSimpleName(packet.getClass());
             //Status packet
             if (simpleClassName.startsWith("PacketS")) {
-                protocolState = 0;
                 final PacketStatusSendEvent event = new PacketStatusSendEvent(channel, packet);
                 PacketEvents.get().getEventManager().callEvent(event);
                 packet = event.getNMSPacket();
@@ -314,7 +307,6 @@ public class PacketHandlerInternal {
             }
             //Login packet
             else {
-                protocolState = 1;
                 final PacketLoginSendEvent event = new PacketLoginSendEvent(channel, packet);
                 PacketEvents.get().getEventManager().callEvent(event);
                 packet = event.getNMSPacket();
@@ -332,7 +324,6 @@ public class PacketHandlerInternal {
                     PacketEvents.get().getEventManager().callEvent(new PostPlayerInjectEvent(player));
                 }
             }
-            protocolState = 2;
             final PacketPlaySendEvent event = new PacketPlaySendEvent(player, channel, packet);
             PacketEvents.get().getEventManager().callEvent(event);
             packet = event.getNMSPacket();
@@ -341,7 +332,7 @@ public class PacketHandlerInternal {
                 packet = null;
             }
         }
-        return new Object[] {packet, protocolState};
+        return packet;
     }
 
     /**
@@ -353,6 +344,7 @@ public class PacketHandlerInternal {
      */
     public void postRead(Player player, Object channel, Object packet) {
         if (player != null) {
+            //Since player != null check is done, status and login packets won't come passed this point.
             PostPacketPlayReceiveEvent event = new PostPacketPlayReceiveEvent(player, channel, packet);
             PacketEvents.get().getEventManager().callEvent(event);
             interceptPostPlayReceive(event);
@@ -370,6 +362,7 @@ public class PacketHandlerInternal {
      */
     public void postWrite(Player player, Object channel, Object packet) {
         if (player != null) {
+            //Since player != null check is done, status and login packets won't come passed this point.
             PostPacketPlaySendEvent event = new PostPacketPlaySendEvent(player, channel, packet);
             PacketEvents.get().getEventManager().callEvent(event);
             interceptPostPlaySend(event);
@@ -405,14 +398,11 @@ public class PacketHandlerInternal {
      * @param event LOGIN server-bound packet event.
      */
     private void interceptLoginReceive(PacketLoginReceiveEvent event) {
-        if (event.getPacketId() == PacketType.Login.Client.HANDSHAKE
-                && PacketEvents.get().getServerUtils().getVersion() != ServerVersion.v_1_7_10
-                && !PacketEvents.get().getServerUtils().isBungeeCordEnabled() &&
-                !PacketEvents.get().getPlayerUtils().clientVersionsMap.containsKey(event.getSocketAddress())) {
+        if (event.getPacketId() == PacketType.Login.Client.HANDSHAKE) {
             WrappedPacketLoginInHandshake handshake = new WrappedPacketLoginInHandshake(event.getNMSPacket());
             int protocolVersion = handshake.getProtocolVersion();
             ClientVersion version = ClientVersion.getClientVersion(protocolVersion);
-            PacketEvents.get().getPlayerUtils().clientVersionsMap.put(event.getSocketAddress(), version);
+            PacketEvents.get().getPlayerUtils().tempClientVersionMap.put(event.getSocketAddress(), version);
         }
     }
 

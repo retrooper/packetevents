@@ -52,6 +52,7 @@ import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.ServicePriority;
 
+import java.net.InetSocketAddress;
 import java.util.ArrayList;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -265,9 +266,16 @@ public final class PacketEvents implements Listener, EventManager {
 
     @EventHandler(priority = EventPriority.HIGH)
     public void onJoin(final PlayerJoinEvent e) {
+        InetSocketAddress socketAddress = e.getPlayer().getAddress();
         if (getServerUtils().getVersion() == ServerVersion.v_1_7_10) {
             ClientVersion version = ClientVersion.getClientVersion(ProtocolVersionAccessor_v_1_7.getProtocolVersion(e.getPlayer()));
-            getPlayerUtils().clientVersionsMap.put(e.getPlayer().getAddress(), version);
+            if(version == ClientVersion.UNRESOLVED || version == null) {
+                version = getPlayerUtils().tempClientVersionMap.get(socketAddress);
+                if(version == null) {
+                    version = ClientVersion.UNRESOLVED;
+                }
+            }
+            getPlayerUtils().clientVersionsMap.put(socketAddress, version);
         } else if (VersionLookupUtils.isDependencyAvailable()) {
             if (Bukkit.getPluginManager().isPluginEnabled("ViaBackwards") || Bukkit.getPluginManager().isPluginEnabled("ViaRewind")) {
                 packetHandlerInternal.minimumPostPlayerInjectDeltaTime = 100L;

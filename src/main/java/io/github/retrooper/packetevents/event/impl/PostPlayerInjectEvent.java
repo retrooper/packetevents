@@ -61,10 +61,17 @@ public class PostPlayerInjectEvent extends PacketEvent implements PlayerEvent {
     public PostPlayerInjectEvent(Player player) {
         if (VersionLookupUtils.isDependencyAvailable()) {
             int protocolVersion = VersionLookupUtils.getProtocolVersion(player);
+            ClientVersion version;
             if (protocolVersion != -1) {
-                ClientVersion version = ClientVersion.getClientVersion(protocolVersion);
-                PacketEvents.get().getPlayerUtils().clientVersionsMap.put(player.getAddress(), version);
+                version = ClientVersion.getClientVersion(protocolVersion); }
+            else {
+                version = PacketEvents.get().getPlayerUtils().tempClientVersionMap.get(player.getAddress());
+                if(version == null) {
+                    version = ClientVersion.UNRESOLVED;
+                }
             }
+            PacketEvents.get().getPlayerUtils().clientVersionsMap.put(player.getAddress(), version);
+
         }
         this.player = player;
     }
