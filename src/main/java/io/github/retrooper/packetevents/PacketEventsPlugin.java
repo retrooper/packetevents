@@ -22,12 +22,15 @@
  * SOFTWARE.
  */
 
-package io.github.retrooper.packetevents.example;
+package io.github.retrooper.packetevents;
 
-import io.github.retrooper.packetevents.PacketEvents;
+import io.github.retrooper.packetevents.event.PacketListenerDynamic;
+import io.github.retrooper.packetevents.event.impl.PacketPlaySendEvent;
+import io.github.retrooper.packetevents.packettype.PacketType;
+import io.github.retrooper.packetevents.packetwrappers.play.out.openwindow.WrappedPacketOutOpenWindow;
 import org.bukkit.plugin.java.JavaPlugin;
 
-public class MainExample extends JavaPlugin {
+public class PacketEventsPlugin extends JavaPlugin {
     @Override
     public void onLoad() {
         //We use default settings. You always want to specify the settings before loading.
@@ -44,7 +47,22 @@ public class MainExample extends JavaPlugin {
         boolean success = PacketEvents.get().init(this);
         //Similarly to the load method, packetevents won't initialize again
         //if it is already initializing or has initialized.
-        //The method returns whether it initialized.
+        //The method returns whether it initialized
+
+        PacketEvents.get().getEventManager().registerListener(new PacketListenerDynamic() {
+            @Override
+            public void onPacketPlaySend(PacketPlaySendEvent event) {
+                if (event.getPacketId() == PacketType.Play.Server.OPEN_WINDOW) {
+                    WrappedPacketOutOpenWindow ow = new WrappedPacketOutOpenWindow(event.getNMSPacket());
+                    int windowID = ow.getWindowId();
+                    int windowSize = ow.getWindowType();
+                    String title = ow.getWindowTitle();
+
+                    event.getPlayer().sendMessage("Window ID: " + windowID + ", Window Size: " + windowSize
+                            + ", Window Title: " + title);
+                }
+            }
+        });
     }
 
     @Override

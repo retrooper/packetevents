@@ -30,11 +30,38 @@ import io.github.retrooper.packetevents.utils.server.ServerVersion;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 
+/**
+ * Early channel injector.
+ * This is an injector that injects the player a bit earlier than the {@link io.github.retrooper.packetevents.injector.lateinjector.LateChannelInjector}.
+ * Injecting earlier can allow us to listen to the LOGIN and STATUS packets.
+ * PacketEvents internally need the LOGIN HANDSHAKING packet to resolve client version independently.
+ * If some supported dependencies are available, PacketEvents will always prioritize them
+ * and use their API.
+ * @see io.github.retrooper.packetevents.injector.lateinjector.LateChannelInjector
+ * @author retrooper
+ * @since 1.8
+ */
 public class EarlyChannelInjector implements ChannelInjector {
+    /**
+     * 1.7.10 channel injector as the netty package is different on 1.7.10.
+     */
     private EarlyChannelInjector7 injector7;
+    /**
+     * 1.8 and above channel injector.
+     */
     private EarlyChannelInjector8 injector8;
+
+    /**
+     * A boolean storing which one to use.
+     * If true, we are using the 1.7.10 injector,
+     * if false, we are using the 1.8 (and above) injector.
+     */
     private boolean outdatedInjectorMode = false;
 
+    /**
+     * Constructor, we require the Bukkit Plugin instance.
+     * @param plugin Plugin
+     */
     public EarlyChannelInjector(final Plugin plugin) {
         if (PacketEvents.get().getServerUtils().getVersion() == ServerVersion.v_1_7_10) {
             injector7 = new EarlyChannelInjector7(plugin);
@@ -44,6 +71,10 @@ public class EarlyChannelInjector implements ChannelInjector {
         }
     }
 
+    /**
+     * Add our channel handler into minecraft's channel handler list.
+     * Access the minecraft network managers to synchronize against them.
+     */
     public void startup() {
         if (outdatedInjectorMode) {
             injector7.startup();
@@ -52,6 +83,9 @@ public class EarlyChannelInjector implements ChannelInjector {
         }
     }
 
+    /**
+     * Remove our channel handler from minecraft's channel handler list.
+     */
     public void close() {
         if (outdatedInjectorMode) {
             injector7.close();
@@ -60,6 +94,9 @@ public class EarlyChannelInjector implements ChannelInjector {
         }
     }
 
+    /**
+     * Asynchronously remove our channel handler from minecraft's channel handler list.
+     */
     public void closeAsync() {
         PacketEvents.get().packetHandlingExecutorService.execute(new Runnable() {
             @Override
@@ -69,6 +106,11 @@ public class EarlyChannelInjector implements ChannelInjector {
         });
     }
 
+    /**
+     * Inject a player synchronously.
+     * @param player Target player.
+     * @see io.github.retrooper.packetevents.handler.PacketHandlerInternal#injectPlayerSync(Player)
+     */
     @Override
     public void injectPlayerSync(Player player) {
         if (outdatedInjectorMode) {
@@ -78,6 +120,11 @@ public class EarlyChannelInjector implements ChannelInjector {
         }
     }
 
+    /**
+     * Eject a player synchronously.
+     * @param player Target player.
+     * @see io.github.retrooper.packetevents.handler.PacketHandlerInternal#ejectPlayerSync(Player)
+     */
     @Override
     public void ejectPlayerSync(Player player) {
         if (outdatedInjectorMode) {
@@ -87,6 +134,11 @@ public class EarlyChannelInjector implements ChannelInjector {
         }
     }
 
+    /**
+     * Inject a player asynchronously.
+     * @param player Target player.
+     * @see io.github.retrooper.packetevents.handler.PacketHandlerInternal#injectPlayerAsync(Player)
+     */
     @Override
     public void injectPlayerAsync(Player player) {
         if (outdatedInjectorMode) {
@@ -95,7 +147,11 @@ public class EarlyChannelInjector implements ChannelInjector {
             injector8.injectPlayerAsync(player);
         }
     }
-
+    /**
+     * Eject a player asynchronously.
+     * @param player Target player.
+     * @see io.github.retrooper.packetevents.handler.PacketHandlerInternal#ejectPlayerAsync(Player)
+     */
     @Override
     public void ejectPlayerAsync(Player player) {
         if (outdatedInjectorMode) {
@@ -105,6 +161,11 @@ public class EarlyChannelInjector implements ChannelInjector {
         }
     }
 
+    /**
+     * Send an NMS Packet to a netty channel.
+     * @param channel Netty channel as Object as netty import is not the same on 1.7.10.
+     * @param packet NMS Packet.
+     */
     @Override
     public void sendPacket(Object channel, Object packet) {
         if (outdatedInjectorMode) {
