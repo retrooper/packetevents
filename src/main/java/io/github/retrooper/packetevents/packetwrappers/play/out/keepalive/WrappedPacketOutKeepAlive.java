@@ -90,13 +90,13 @@ public class WrappedPacketOutKeepAlive extends WrappedPacket implements Sendable
     public Object asNMSPacket() {
         if (integerMode) {
             try {
-                return keepAliveConstructor.newInstance(id);
+                return keepAliveConstructor.newInstance((int)id);
             } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
                 e.printStackTrace();
             }
         } else {
             try {
-                return keepAliveConstructor.newInstance(id);
+                return keepAliveConstructor.newInstance((long)id);
             } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
                 e.printStackTrace();
             }
