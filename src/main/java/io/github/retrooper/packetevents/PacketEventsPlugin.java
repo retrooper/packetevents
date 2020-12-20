@@ -51,17 +51,6 @@ public class PacketEventsPlugin extends JavaPlugin {
          * If we end up not initializing or fail to initialize, the method will return false.
          */
         boolean successful = PacketEvents.get().init(this);
-
-        PacketEvents.get().registerListener(new PacketListenerDynamic() {
-            @Override
-            public void onPacketPlayReceive(PacketPlayReceiveEvent event) {
-                if(event.getPacketId() == PacketType.Play.Client.USE_ENTITY) {
-                    WrappedPacketInUseEntity ue = new WrappedPacketInUseEntity(event.getNMSPacket());
-                    Entity entity = ue.getEntity();
-                    event.getPlayer().sendMessage("you attacked " + entity.getName());
-                }
-            }
-        });
     }
 
     @Override
