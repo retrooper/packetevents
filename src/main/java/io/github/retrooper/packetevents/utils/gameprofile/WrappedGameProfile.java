@@ -26,6 +26,12 @@ package io.github.retrooper.packetevents.utils.gameprofile;
 
 import java.util.UUID;
 
+/**
+ * Wrapper for the Player Game Profile.
+ *
+ * @author retrooper
+ * @since 1.7
+ */
 public class WrappedGameProfile {
     public UUID id;
     public String name;

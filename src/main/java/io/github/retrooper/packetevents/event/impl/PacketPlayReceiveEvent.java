@@ -30,6 +30,7 @@ import io.github.retrooper.packetevents.event.eventtypes.CancellableEvent;
 import io.github.retrooper.packetevents.event.eventtypes.NMSPacketEvent;
 import io.github.retrooper.packetevents.event.eventtypes.PlayerEvent;
 import io.github.retrooper.packetevents.packettype.PacketType;
+import io.github.retrooper.packetevents.packetwrappers.NMSPacket;
 import io.github.retrooper.packetevents.utils.netty.channel.ChannelUtils;
 import io.github.retrooper.packetevents.utils.reflection.ClassUtil;
 import org.bukkit.entity.Player;
@@ -51,11 +52,11 @@ import java.net.InetSocketAddress;
 public final class PacketPlayReceiveEvent extends PacketEvent implements NMSPacketEvent,CancellableEvent, PlayerEvent {
     private final Player player;
     private final InetSocketAddress address;
-    private Object packet;
+    private NMSPacket packet;
     private boolean cancelled;
     private byte packetID = -2;
 
-    public PacketPlayReceiveEvent(final Player player, final Object channel, final Object packet) {
+    public PacketPlayReceiveEvent(final Player player, final Object channel, final NMSPacket packet) {
         this.player = player;
         this.address = ChannelUtils.getSocketAddress(channel);
         this.packet = packet;
@@ -86,19 +87,20 @@ public final class PacketPlayReceiveEvent extends PacketEvent implements NMSPack
     }
 
     @NotNull
+    @Deprecated
     @Override
     public String getPacketName() {
-        return ClassUtil.getClassSimpleName(packet.getClass());
+        return ClassUtil.getClassSimpleName(packet.getRawNMSPacket().getClass());
     }
 
     @NotNull
     @Override
-    public Object getNMSPacket() {
+    public NMSPacket getNMSPacket() {
         return packet;
     }
 
     @Override
-    public void setNMSPacket(Object packet) {
+    public void setNMSPacket(NMSPacket packet) {
         this.packet = packet;
     }
 

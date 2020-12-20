@@ -25,6 +25,7 @@
 package io.github.retrooper.packetevents.packetwrappers.play.in.blockplace;
 
 
+import io.github.retrooper.packetevents.packetwrappers.NMSPacket;
 import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
 import io.github.retrooper.packetevents.utils.nms.NMSUtils;
 import io.github.retrooper.packetevents.utils.reflection.Reflection;
@@ -35,11 +36,12 @@ final class WrappedPacketInBlockPlace_1_9 extends WrappedPacket {
     private static Class<?> movingObjectPositionBlockClass;
     private Object blockPosObj;
 
-    public WrappedPacketInBlockPlace_1_9(final Object packet) {
+    public WrappedPacketInBlockPlace_1_9(final NMSPacket packet) {
         super(packet);
     }
 
-    public static void load() {
+    @Override
+    protected void load() {
         movingObjectPositionBlockClass = NMSUtils.getNMSClassWithoutException("MovingObjectPositionBlock");
     }
 
@@ -49,7 +51,7 @@ final class WrappedPacketInBlockPlace_1_9 extends WrappedPacket {
                 blockPosObj = readObject(0, NMSUtils.blockPosClass);
             } else {
                 Object movingObjectPos = readObject(0, movingObjectPositionBlockClass);
-                WrappedPacket movingObjectPosWrapper = new WrappedPacket(movingObjectPos);
+                WrappedPacket movingObjectPosWrapper = new WrappedPacket(new NMSPacket(movingObjectPos));
                 blockPosObj = movingObjectPosWrapper.readObject(0, NMSUtils.blockPosClass);
             }
         }
@@ -67,7 +69,7 @@ final class WrappedPacketInBlockPlace_1_9 extends WrappedPacket {
                 blockPosObj = readObject(0, NMSUtils.blockPosClass);
             } else {
                 Object movingObjectPos = readObject(0, movingObjectPositionBlockClass);
-                WrappedPacket movingObjectPosWrapper = new WrappedPacket(movingObjectPos);
+                WrappedPacket movingObjectPosWrapper = new WrappedPacket(new NMSPacket(movingObjectPos));
                 blockPosObj = movingObjectPosWrapper.readObject(0, NMSUtils.blockPosClass);
             }
         }
@@ -85,7 +87,7 @@ final class WrappedPacketInBlockPlace_1_9 extends WrappedPacket {
                 blockPosObj = readObject(0, NMSUtils.blockPosClass);
             } else {
                 Object movingObjectPos = readObject(0, movingObjectPositionBlockClass);
-                WrappedPacket movingObjectPosWrapper = new WrappedPacket(movingObjectPos);
+                WrappedPacket movingObjectPosWrapper = new WrappedPacket(new NMSPacket(movingObjectPos));
                 blockPosObj = movingObjectPosWrapper.readObject(0, NMSUtils.blockPosClass);
             }
         }
@@ -102,7 +104,7 @@ final class WrappedPacketInBlockPlace_1_9 extends WrappedPacket {
             return readObject(0, NMSUtils.enumDirectionClass);
         } else {
             Object movingObjectPos = readObject(0, movingObjectPositionBlockClass);
-            WrappedPacket movingObjectPosWrapper = new WrappedPacket(movingObjectPos);
+            WrappedPacket movingObjectPosWrapper = new WrappedPacket(new NMSPacket(movingObjectPos));
             return movingObjectPosWrapper.readObject(0, NMSUtils.enumDirectionClass);
         }
     }

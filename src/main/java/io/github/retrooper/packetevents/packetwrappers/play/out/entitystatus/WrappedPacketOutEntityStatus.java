@@ -25,6 +25,7 @@
 package io.github.retrooper.packetevents.packetwrappers.play.out.entitystatus;
 
 import io.github.retrooper.packetevents.packettype.PacketTypeClasses;
+import io.github.retrooper.packetevents.packetwrappers.NMSPacket;
 import io.github.retrooper.packetevents.packetwrappers.SendableWrapper;
 import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
 import io.github.retrooper.packetevents.utils.nms.NMSUtils;
@@ -39,7 +40,7 @@ public class WrappedPacketOutEntityStatus extends WrappedPacket implements Senda
     private byte status;
     private int entityID = -1;
 
-    public WrappedPacketOutEntityStatus(Object packet) {
+    public WrappedPacketOutEntityStatus(NMSPacket packet) {
         super(packet);
     }
 
@@ -54,7 +55,8 @@ public class WrappedPacketOutEntityStatus extends WrappedPacket implements Senda
         this.status = status;
     }
 
-    public static void load() {
+    @Override
+protected void load() {
         try {
             packetConstructor =
                     PacketTypeClasses.Play.Server.ENTITY_STATUS.getConstructor(NMSUtils.nmsEntityClass, byte.class);
@@ -92,7 +94,7 @@ public class WrappedPacketOutEntityStatus extends WrappedPacket implements Senda
     @Override
     public Object asNMSPacket() {
         try {
-            return packetConstructor.newInstance(NMSUtils.getNMSEntity(getEntity()), status);
+            return packetConstructor.newInstance(NMSUtils.getNMSEntity(getEntity()), getEntityStatus());
         } catch (InstantiationException | InvocationTargetException
                 | IllegalAccessException e) {
             e.printStackTrace();

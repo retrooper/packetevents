@@ -33,22 +33,21 @@ import org.bukkit.entity.Entity;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
+/**
+ * Internal utility class to find entities by their Entity ID.
+ * @author retrooper
+ * @since 1.6.8
+ */
 public final class EntityFinderUtils {
     public static ServerVersion version;
     private static Class<?> worldServerClass;
-    private static Class<?> craftWorldClass;
-    private static Class<?> entityClass;
     private static Method getEntityByIdMethod;
     private static Method craftWorldGetHandle;
     private static Method getBukkitEntity;
 
-    private static boolean isServerVersion_v_1_8_x;
-
     public static void load() {
         try {
             worldServerClass = NMSUtils.getNMSClass("WorldServer");
-            craftWorldClass = NMSUtils.getOBCClass("CraftWorld");
-            entityClass = NMSUtils.getNMSClass("Entity");
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
         }
@@ -56,8 +55,9 @@ public final class EntityFinderUtils {
         try {
             getEntityByIdMethod = worldServerClass.getMethod((version.getProtocolVersion() == (short) 47)
                     ? "a" : "getEntity", int.class);
-            craftWorldGetHandle = craftWorldClass.getMethod("getHandle");
-            getBukkitEntity = entityClass.getMethod("getBukkitEntity");
+
+            craftWorldGetHandle = NMSUtils.craftWorldClass.getMethod("getHandle");
+            getBukkitEntity = NMSUtils.nmsEntityClass.getMethod("getBukkitEntity");
         } catch (NoSuchMethodException e) {
             e.printStackTrace();
         }
@@ -65,9 +65,8 @@ public final class EntityFinderUtils {
 
     /**
      * Get an entity by their ID.
-     *
-     * @param id
-     * @return Entity
+     * @param id Entity ID
+     * @return Bukkit Entity.
      */
     public static Entity getEntityById(final int id) {
         for (final World world : Bukkit.getWorlds()) {
@@ -81,18 +80,17 @@ public final class EntityFinderUtils {
 
     /**
      * Get an entity by their ID, guaranteed to be in the specified world.
-     *
-     * @param world
-     * @param id
-     * @return Entity
+     * @param world Bukkit world.
+     * @param id Entity ID.
+     * @return Bukkit Entity.
      */
     public static Entity getEntityByIdWithWorld(final World world, final int id) {
         if (world == null) {
             return null;
-        } else if (craftWorldClass == null) {
+        } else if (NMSUtils.craftWorldClass == null) {
             throw new IllegalStateException("PacketEvents failed to locate the CraftWorld class.");
         }
-        Object craftWorld = craftWorldClass.cast(world);
+        Object craftWorld = NMSUtils.craftWorldClass.cast(world);
 
         Object worldServer = null;
         try {

@@ -25,6 +25,7 @@
 package io.github.retrooper.packetevents.packetwrappers.play.in.windowclick;
 
 import io.github.retrooper.packetevents.packettype.PacketTypeClasses;
+import io.github.retrooper.packetevents.packetwrappers.NMSPacket;
 import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
 import io.github.retrooper.packetevents.utils.nms.NMSUtils;
 import io.github.retrooper.packetevents.utils.reflection.Reflection;
@@ -39,19 +40,14 @@ public class WrappedPacketInWindowClick extends WrappedPacket {
     private static final HashMap<Integer, ArrayList<WindowClickType>> WINDOW_CLICK_TYPE_CACHE = new HashMap<>();
     private static Class<?> invClickTypeClass;
     private static boolean isClickModePrimitive;
-    // TODO: All the fields below are useless cuz there is never a value assigned to them - change this
-    // private int id;
-    private int slot;
-    private int button;
-    // private short actionNumber;
-    private int mode;
-    // private ItemStack clickedItem;
 
-    public WrappedPacketInWindowClick(Object packet) {
+
+    public WrappedPacketInWindowClick(NMSPacket packet) {
         super(packet);
     }
 
-    public static void load() {
+    @Override
+    protected void load() {
         Class<?> packetClass = PacketTypeClasses.Play.Client.WINDOW_CLICK;
         invClickTypeClass = NMSUtils.getNMSClassWithoutException("InventoryClickType");
 
@@ -118,7 +114,7 @@ public class WrappedPacketInWindowClick extends WrappedPacket {
      *
      * @return Get Window ID
      */
-    public int getWindowID() {
+    public int getWindowId() {
         return readInt(0);
     }
 
@@ -155,24 +151,26 @@ public class WrappedPacketInWindowClick extends WrappedPacket {
      * @return Get Window Click Type
      */
     public WindowClickType getWindowClickType() {
+        int mode = getMode();
         if (WINDOW_CLICK_TYPE_CACHE.get(mode) == null) {
             return WindowClickType.UNKNOWN;
         }
-        if (button + 1 > WINDOW_CLICK_TYPE_CACHE.size()) {
+        int windowButton = getWindowButton();
+        if (windowButton + 1 > WINDOW_CLICK_TYPE_CACHE.size()) {
             return WindowClickType.UNKNOWN;
         }
 
-        // TODO: This has no use cuz the fields used are never getting assigned a value to them
         if (mode == 4) {
-            if (slot == -999) {
-                if (button == 0) {
+            int windowSlot = getWindowSlot();
+            if (windowSlot == -999) {
+                if (windowButton == 0) {
                     return WindowClickType.LEFT_CLICK_OUTSIDE_WINDOW_HOLDING_NOTHING;
-                } else if (button == 1) {
+                } else if (windowButton == 1) {
                     return WindowClickType.RIGHT_CLICK_OUTSIDE_WINDOW_HOLDING_NOTHING;
                 }
             }
         }
-        return WINDOW_CLICK_TYPE_CACHE.get(mode).get(button);
+        return WINDOW_CLICK_TYPE_CACHE.get(mode).get(windowButton);
     }
 
     /**

@@ -25,6 +25,7 @@
 package io.github.retrooper.packetevents.packetwrappers.play.out.experience;
 
 import io.github.retrooper.packetevents.packettype.PacketTypeClasses;
+import io.github.retrooper.packetevents.packetwrappers.NMSPacket;
 import io.github.retrooper.packetevents.packetwrappers.SendableWrapper;
 import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
 
@@ -36,7 +37,7 @@ public class WrappedPacketOutExperience extends WrappedPacket implements Sendabl
     private float expBar;
     private int expLevel, totalExp;
 
-    public WrappedPacketOutExperience(Object packet) {
+    public WrappedPacketOutExperience(NMSPacket packet) {
         super(packet);
     }
 
@@ -47,7 +48,8 @@ public class WrappedPacketOutExperience extends WrappedPacket implements Sendabl
         this.totalExp = totalExperience;
     }
 
-    public static void load() {
+    @Override
+protected void load() {
         try {
             packetConstructor = PacketTypeClasses.Play.Server.EXPERIENCE.getConstructor(float.class,
                     int.class, int.class);
@@ -84,7 +86,7 @@ public class WrappedPacketOutExperience extends WrappedPacket implements Sendabl
     @Override
     public Object asNMSPacket() {
         try {
-            return packetConstructor.newInstance(expBar, expLevel, totalExp);
+            return packetConstructor.newInstance(getExperienceBar(), getExperienceLevel(), getTotalExperience());
         } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
             e.printStackTrace();
         }

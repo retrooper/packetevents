@@ -25,11 +25,12 @@
 package io.github.retrooper.packetevents.packetwrappers.play.in.flying;
 
 
+import io.github.retrooper.packetevents.packetwrappers.NMSPacket;
 import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
 import io.github.retrooper.packetevents.utils.vector.Vector3d;
 
 public class WrappedPacketInFlying extends WrappedPacket {
-    public WrappedPacketInFlying(Object packet) {
+    public WrappedPacketInFlying(NMSPacket packet) {
         super(packet);
     }
 
@@ -43,10 +44,6 @@ public class WrappedPacketInFlying extends WrappedPacket {
 
     public double getZ() {
         return readDouble(2);
-    }
-
-    public Vector3d getPosition() {
-        return new Vector3d(getX(), getY(), getZ());
     }
 
     public float getYaw() {

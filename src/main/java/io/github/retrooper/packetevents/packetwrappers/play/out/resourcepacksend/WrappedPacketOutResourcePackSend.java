@@ -25,6 +25,7 @@
 package io.github.retrooper.packetevents.packetwrappers.play.out.resourcepacksend;
 
 import io.github.retrooper.packetevents.packettype.PacketTypeClasses;
+import io.github.retrooper.packetevents.packetwrappers.NMSPacket;
 import io.github.retrooper.packetevents.packetwrappers.SendableWrapper;
 import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
 import io.github.retrooper.packetevents.utils.server.ServerVersion;
@@ -37,7 +38,7 @@ public class WrappedPacketOutResourcePackSend extends WrappedPacket implements S
     private String url;
     private String hash;
 
-    public WrappedPacketOutResourcePackSend(Object packet) {
+    public WrappedPacketOutResourcePackSend(NMSPacket packet) {
         super(packet);
     }
 
@@ -53,7 +54,8 @@ public class WrappedPacketOutResourcePackSend extends WrappedPacket implements S
         this.hash = hash;
     }
 
-    public static void load() {
+    @Override
+protected void load() {
         try {
             if (PacketTypeClasses.Play.Server.RESOURCE_PACK_SEND != null) {
                 packetConstructor = PacketTypeClasses.Play.Server.RESOURCE_PACK_SEND.getConstructor(String.class, String.class);
@@ -80,7 +82,7 @@ public class WrappedPacketOutResourcePackSend extends WrappedPacket implements S
     @Override
     public Object asNMSPacket() {
         try {
-            return packetConstructor.newInstance(url, hash);
+            return packetConstructor.newInstance(getUrl(), getHash());
         } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
             e.printStackTrace();
         }

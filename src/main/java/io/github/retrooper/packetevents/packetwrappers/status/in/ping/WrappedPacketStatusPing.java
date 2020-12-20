@@ -24,10 +24,11 @@
 
 package io.github.retrooper.packetevents.packetwrappers.status.in.ping;
 
+import io.github.retrooper.packetevents.packetwrappers.NMSPacket;
 import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
 
 public class WrappedPacketStatusPing extends WrappedPacket {
-    public WrappedPacketStatusPing(Object packet) {
+    public WrappedPacketStatusPing(NMSPacket packet) {
         super(packet);
     }
 

@@ -24,6 +24,7 @@
 
 package io.github.retrooper.packetevents.utils.nms;
 
+import io.github.retrooper.packetevents.packetwrappers.NMSPacket;
 import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
 import io.github.retrooper.packetevents.utils.entityfinder.EntityFinderUtils;
 import io.github.retrooper.packetevents.utils.reflection.Reflection;
@@ -133,7 +134,7 @@ public final class NMSUtils {
     }
 
     public static double[] recentTPS() {
-        return new WrappedPacket(getMinecraftServerInstance(), minecraftServerClass).readDoubleArray(0);
+        return new WrappedPacket(new NMSPacket(getMinecraftServerInstance()), minecraftServerClass).readDoubleArray(0);
     }
 
     public static Class<?> getNMSClass(String name) throws ClassNotFoundException {
@@ -194,12 +195,12 @@ public final class NMSUtils {
     }
 
     public static Object getNetworkManager(final Player player) {
-        WrappedPacket wrapper = new WrappedPacket(getPlayerConnection(player));
+        WrappedPacket wrapper = new WrappedPacket(new NMSPacket(getPlayerConnection(player)));
         return wrapper.readObject(0, networkManagerClass);
     }
 
     public static Object getChannel(final Player player) {
-        WrappedPacket wrapper = new WrappedPacket(getNetworkManager(player));
+        WrappedPacket wrapper = new WrappedPacket(new NMSPacket(getNetworkManager(player)));
         return wrapper.readObject(0, nettyChannelClass);
     }
 
@@ -222,7 +223,7 @@ public final class NMSUtils {
 
             }
         }
-        WrappedPacket serverConnectionWrapper = new WrappedPacket(getMinecraftServerConnection());
+        WrappedPacket serverConnectionWrapper = new WrappedPacket(new NMSPacket(getMinecraftServerConnection()));
         for (int i = 0; true; i++) {
             try {
                 List<Object> list = (List<Object>) serverConnectionWrapper.readObject(i, List.class);

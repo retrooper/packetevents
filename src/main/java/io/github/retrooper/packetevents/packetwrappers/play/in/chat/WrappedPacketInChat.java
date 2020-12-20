@@ -24,10 +24,11 @@
 
 package io.github.retrooper.packetevents.packetwrappers.play.in.chat;
 
+import io.github.retrooper.packetevents.packetwrappers.NMSPacket;
 import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
 
 public final class WrappedPacketInChat extends WrappedPacket {
-    public WrappedPacketInChat(Object packet) {
+    public WrappedPacketInChat(NMSPacket packet) {
         super(packet);
     }
 

@@ -28,6 +28,7 @@ import io.github.retrooper.packetevents.event.manager.EventManager;
 import io.github.retrooper.packetevents.event.manager.PEEventManager;
 import io.github.retrooper.packetevents.exceptions.PacketEventsLoadFailureException;
 import io.github.retrooper.packetevents.handler.PacketHandlerInternal;
+import io.github.retrooper.packetevents.packettype.PacketType;
 import io.github.retrooper.packetevents.packettype.PacketTypeClasses;
 import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
 import io.github.retrooper.packetevents.settings.PacketEventsSettings;
@@ -66,10 +67,13 @@ public final class PacketEvents implements Listener, EventManager {
     private final ServerUtils serverUtils = new ServerUtils();
     /**
      * General executor service, basically for anything that the packet executor service doesn't do.
+     * For example update checking when you initialize packetevents.
      */
     public ExecutorService generalExecutorService = Executors.newSingleThreadExecutor();
-    //Executor used for player injecting/ejecting and for packet processing/event calling
-    public ExecutorService packetHandlingExecutorService = Executors.newSingleThreadExecutor();
+
+    //Executor used for player injecting/ejecting.
+    public ExecutorService injectAndEjectExecutorService = Executors.newSingleThreadExecutor();
+
     public PacketHandlerInternal packetHandlerInternal = null;
     private boolean loading, loaded, initialized, initializing, stopping;
     private PacketEventsSettings settings = new PacketEventsSettings();
@@ -106,8 +110,6 @@ public final class PacketEvents implements Listener, EventManager {
                 PacketTypeClasses.Status.Server.load();
 
                 EntityFinderUtils.load();
-
-                WrappedPacket.loadAllWrappers();
             } catch (Exception ex) {
                 loading = false;
                 throw new PacketEventsLoadFailureException(ex);
@@ -144,30 +146,27 @@ public final class PacketEvents implements Listener, EventManager {
         if (!initialized && !initializing) {
             initializing = true;
             settings = packetEventsSettings;
-            if (settings.getPacketHandlingThreadCount() < 1) {
-                settings.packetHandlingThreadCount(1);
+            if (settings.getInjectAndEjectThreadCount() < 1) {
+                settings.injectAndEjectThreadCount(1);
             }
             settings.lock();
-            int packetHandlingThreadCount = settings.getPacketHandlingThreadCount();
-            //if the count is 1 or is invalid
-            if (packetHandlingThreadCount == 1) {
-                packetHandlingExecutorService = Executors.newSingleThreadExecutor();
-            } else {
-                packetHandlingExecutorService = Executors.newFixedThreadPool(packetHandlingThreadCount);
-            }
+
+            int injectAndEjectThreadCount = settings.getInjectAndEjectThreadCount();
+            injectAndEjectExecutorService.shutdownNow();
+            injectAndEjectExecutorService = Executors.newFixedThreadPool(injectAndEjectThreadCount);
             plugins.add(pl);
 
             //Register Bukkit listener
             final Plugin plugin = plugins.get(0);
             Bukkit.getPluginManager().registerEvents(this, plugin);
             packetHandlerInternal = new PacketHandlerInternal(plugin, settings.shouldInjectEarly());
-                for (final Player p : Bukkit.getOnlinePlayers()) {
-                    try {
-                        getPlayerUtils().injectPlayer(p);
-                    } catch (Exception ex) {
-                        p.kickPlayer(getSettings().getInjectionFailureMessage());
-                    }
+            for (final Player p : Bukkit.getOnlinePlayers()) {
+                try {
+                    getPlayerUtils().injectPlayer(p);
+                } catch (Exception ex) {
+                    p.kickPlayer(getSettings().getInjectionFailureMessage());
                 }
+            }
 
             if (settings.shouldCheckForUpdates()) {
                 generalExecutorService.execute(new Runnable() {
@@ -197,7 +196,7 @@ public final class PacketEvents implements Listener, EventManager {
 
             getEventManager().unregisterAllListeners();
             generalExecutorService.shutdownNow();
-            packetHandlingExecutorService.shutdownNow();
+            injectAndEjectExecutorService.shutdownNow();
             initialized = false;
             stopping = false;
         }
@@ -267,7 +266,12 @@ public final class PacketEvents implements Listener, EventManager {
     @EventHandler(priority = EventPriority.HIGH)
     public void onJoin(final PlayerJoinEvent e) {
         InetSocketAddress socketAddress = e.getPlayer().getAddress();
-        if (getServerUtils().getVersion() == ServerVersion.v_1_7_10) {
+        if (VersionLookupUtils.isDependencyAvailable()) {
+            if (Bukkit.getPluginManager().isPluginEnabled("ViaBackwards") || Bukkit.getPluginManager().isPluginEnabled("ViaRewind")) {
+                packetHandlerInternal.minimumPostPlayerInjectDeltaTime = 100L;
+            }
+        }
+        else if (getServerUtils().getVersion() == ServerVersion.v_1_7_10) {
             ClientVersion version = ClientVersion.getClientVersion(ProtocolVersionAccessor_v_1_7.getProtocolVersion(e.getPlayer()));
             if(version == ClientVersion.UNRESOLVED || version == null) {
                 version = getPlayerUtils().tempClientVersionMap.get(socketAddress);
@@ -276,10 +280,6 @@ public final class PacketEvents implements Listener, EventManager {
                 }
             }
             getPlayerUtils().clientVersionsMap.put(socketAddress, version);
-        } else if (VersionLookupUtils.isDependencyAvailable()) {
-            if (Bukkit.getPluginManager().isPluginEnabled("ViaBackwards") || Bukkit.getPluginManager().isPluginEnabled("ViaRewind")) {
-                packetHandlerInternal.minimumPostPlayerInjectDeltaTime = 100L;
-            }
         }
         packetHandlerInternal.channelTimePassed.put(packetHandlerInternal.getChannel(e.getPlayer().getName()),
                 System.currentTimeMillis());

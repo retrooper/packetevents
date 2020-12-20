@@ -25,6 +25,7 @@
 package io.github.retrooper.packetevents.packetwrappers.play.in.blockplace;
 
 import io.github.retrooper.packetevents.enums.Direction;
+import io.github.retrooper.packetevents.packetwrappers.NMSPacket;
 import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
 import io.github.retrooper.packetevents.utils.server.ServerVersion;
 import io.github.retrooper.packetevents.utils.vector.Vector3d;
@@ -33,14 +34,14 @@ import io.github.retrooper.packetevents.utils.vector.Vector3d;
 public final class WrappedPacketInBlockPlace extends WrappedPacket {
     private static boolean isHigherThan_v_1_8_8, isHigherThan_v_1_7_10;
 
-    public WrappedPacketInBlockPlace(final Object packet) {
+    public WrappedPacketInBlockPlace(final NMSPacket packet) {
         super(packet);
     }
 
-    public static void load() {
+    @Override
+    protected void load() {
         isHigherThan_v_1_8_8 = version.isHigherThan(ServerVersion.v_1_8_8);
         isHigherThan_v_1_7_10 = version.isHigherThan(ServerVersion.v_1_7_10);
-        WrappedPacketInBlockPlace_1_9.load();
     }
 
     public Direction getDirection() {
@@ -96,7 +97,4 @@ public final class WrappedPacketInBlockPlace extends WrappedPacket {
         }
     }
 
-    public Vector3d getPosition() {
-        return new Vector3d(getX(), getY(), getZ());
-    }
 }

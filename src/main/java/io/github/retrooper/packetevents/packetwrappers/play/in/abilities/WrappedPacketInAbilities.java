@@ -25,17 +25,20 @@
 package io.github.retrooper.packetevents.packetwrappers.play.in.abilities;
 
 import io.github.retrooper.packetevents.packettype.PacketTypeClasses;
+import io.github.retrooper.packetevents.packetwrappers.NMSPacket;
 import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
 import io.github.retrooper.packetevents.utils.reflection.Reflection;
 
 public final class WrappedPacketInAbilities extends WrappedPacket {
     private static boolean v_1_16_Mode = false;
-    public static void load() {
-        v_1_16_Mode = Reflection.getField(PacketTypeClasses.Play.Client.ABILITIES, boolean.class, 1) == null;
+
+    public WrappedPacketInAbilities(NMSPacket packet) {
+        super(packet);
     }
 
-    public WrappedPacketInAbilities(Object packet) {
-        super(packet);
+    @Override
+    protected void load() {
+        v_1_16_Mode = Reflection.getField(PacketTypeClasses.Play.Client.ABILITIES, boolean.class, 1) == null;
     }
 
     /**

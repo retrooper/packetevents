@@ -25,9 +25,11 @@
 package io.github.retrooper.packetevents.event.priority;
 
 /**
- * Event priority bytes for the new and legacy event system.
- * Please use these constant variables, as it is possible that the
- * values of the bytes might change.
+ * Event priority enum for the new event system.
+ * The event priority counts for the whole {@link io.github.retrooper.packetevents.event.PacketListenerDynamic}
+ * and not for just one event.
+ * The priority can be specified in the PacketListenerDynamic constructor.
+ * If you don't specify a priority in the constructor, it will use the {@link #NORMAL} priority.
  * @author retrooper
  * @since 1.6.9
  */
@@ -77,7 +79,8 @@ public enum PacketEventPriority {
     /**
      * Most powerful event priority.
      * Last(Sixth) to be processed(IN THE DYNAMIC EVENT SYSTEM ONLY).
-     * Use this if you urgently need to be the last to process or urgently need to decide if the event cancelled or not.
+     * Use this if you urgently need to be the last to process
+     * or urgently need to be the final decider whether the event has cancelled or not.
      * This is rarely recommended.
      */
     MONITOR((byte) 5);

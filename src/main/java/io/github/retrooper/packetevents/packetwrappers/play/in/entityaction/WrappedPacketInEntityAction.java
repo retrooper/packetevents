@@ -24,6 +24,8 @@
 
 package io.github.retrooper.packetevents.packetwrappers.play.in.entityaction;
 
+import io.github.retrooper.packetevents.packettype.PacketTypeClasses;
+import io.github.retrooper.packetevents.packetwrappers.NMSPacket;
 import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
 import io.github.retrooper.packetevents.utils.nms.NMSUtils;
 import io.github.retrooper.packetevents.utils.reflection.SubclassUtil;
@@ -40,15 +42,15 @@ public final class WrappedPacketInEntityAction extends WrappedPacket {
     private Entity entity;
     private int entityId = -1;
 
-    public WrappedPacketInEntityAction(final Object packet) {
+    public WrappedPacketInEntityAction(final NMSPacket packet) {
         super(packet);
     }
 
-    public static void load() {
-        Class<?> entityActionClass = NMSUtils.getNMSClassWithoutException("PacketPlayInEntityAction");
+    @Override
+protected void load() {
         isLowerThan_v_1_8 = version.isLowerThan(ServerVersion.v_1_8);
         if (!isLowerThan_v_1_8) {
-            enumPlayerActionClass = SubclassUtil.getSubClass(entityActionClass, "EnumPlayerAction");
+            enumPlayerActionClass = SubclassUtil.getSubClass(PacketTypeClasses.Play.Client.ENTITY_ACTION, "EnumPlayerAction");
         }
         //All the already existing values
         for (PlayerAction val : PlayerAction.values()) {

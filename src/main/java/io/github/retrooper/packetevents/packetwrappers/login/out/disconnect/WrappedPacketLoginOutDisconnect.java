@@ -24,12 +24,13 @@
 
 package io.github.retrooper.packetevents.packetwrappers.login.out.disconnect;
 
+import io.github.retrooper.packetevents.packetwrappers.NMSPacket;
 import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
 import io.github.retrooper.packetevents.packetwrappers.play.out.chat.WrappedPacketOutChat;
 import io.github.retrooper.packetevents.utils.nms.NMSUtils;
 
 public class WrappedPacketLoginOutDisconnect extends WrappedPacket {
-    public WrappedPacketLoginOutDisconnect(Object packet) {
+    public WrappedPacketLoginOutDisconnect(NMSPacket packet) {
         super(packet);
     }
 

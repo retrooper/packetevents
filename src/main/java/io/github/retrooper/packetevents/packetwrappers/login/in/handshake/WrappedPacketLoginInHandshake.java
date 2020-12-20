@@ -24,10 +24,11 @@
 
 package io.github.retrooper.packetevents.packetwrappers.login.in.handshake;
 
+import io.github.retrooper.packetevents.packetwrappers.NMSPacket;
 import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
 
 public class WrappedPacketLoginInHandshake extends WrappedPacket {
-    public WrappedPacketLoginInHandshake(Object packet) {
+    public WrappedPacketLoginInHandshake(NMSPacket packet) {
         super(packet);
     }
 

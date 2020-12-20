@@ -25,6 +25,7 @@
 package io.github.retrooper.packetevents.packetwrappers.play.out.entity;
 
 import io.github.retrooper.packetevents.packettype.PacketTypeClasses;
+import io.github.retrooper.packetevents.packetwrappers.NMSPacket;
 import io.github.retrooper.packetevents.packetwrappers.SendableWrapper;
 import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
 import io.github.retrooper.packetevents.utils.nms.NMSUtils;
@@ -35,6 +36,7 @@ import org.bukkit.entity.Entity;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
+import java.util.Objects;
 
 public class WrappedPacketOutEntity extends WrappedPacket implements SendableWrapper {
     //Byte = 1.7.10->1.8.8, Int = 1.9->1.15.x, Short = 1.16.x
@@ -44,15 +46,15 @@ public class WrappedPacketOutEntity extends WrappedPacket implements SendableWra
     private static int pitchByteIndex = 1;
     private static Constructor<?> entityPacketConstructor;
     private Entity entity;
-    private boolean isListening;
+
     private int entityID = -1;
     private double deltaX, deltaY, deltaZ;
     private byte pitch, yaw;
     private boolean onGround;
 
-    public WrappedPacketOutEntity(Object packet) {
+    public WrappedPacketOutEntity(NMSPacket packet) {
         super(packet);
-        isListening = true;
+
     }
 
     public WrappedPacketOutEntity(int entityID, double deltaX, double deltaY, double deltaZ,
@@ -74,12 +76,12 @@ public class WrappedPacketOutEntity extends WrappedPacket implements SendableWra
         this(entity.getEntityId(), deltaX, deltaY, deltaZ, pitch, yaw, onGround);
     }
 
-    public static void load() {
+    @Override
+    protected void load() {
         Class<?> packetClass = PacketTypeClasses.Play.Server.ENTITY;
 
         Field dxField = Reflection.getField(packetClass, 1);
-        assert dxField != null;
-        if (dxField.equals(Reflection.getField(packetClass, byte.class, 0))) {
+        if (Objects.requireNonNull(dxField).equals(Reflection.getField(packetClass, byte.class, 0))) {
             mode = 0;
             yawByteIndex = 3;
             pitchByteIndex = 4;
@@ -108,7 +110,7 @@ public class WrappedPacketOutEntity extends WrappedPacket implements SendableWra
      * @return Get Byte Pitch
      */
     public byte getPitch() {
-        if (isListening) {
+        if (packet != null) {
             return readByte(pitchByteIndex);
         } else {
             return pitch;
@@ -121,7 +123,7 @@ public class WrappedPacketOutEntity extends WrappedPacket implements SendableWra
      * @return Get Byte Yaw
      */
     public byte getYaw() {
-        if (isListening) {
+        if (packet != null) {
             return readByte(yawByteIndex);
         } else {
             return yaw;
@@ -134,7 +136,7 @@ public class WrappedPacketOutEntity extends WrappedPacket implements SendableWra
      * @return Delta X
      */
     public double getDeltaX() {
-        if (isListening) {
+        if (packet != null) {
             switch (mode) {
                 case 0:
                     return readByte(0) / dXYZDivisor;
@@ -155,7 +157,7 @@ public class WrappedPacketOutEntity extends WrappedPacket implements SendableWra
      * @return Delta Y
      */
     public double getDeltaY() {
-        if (isListening) {
+        if (packet != null) {
             switch (mode) {
                 case 0:
                     return readByte(1) / dXYZDivisor;
@@ -176,7 +178,7 @@ public class WrappedPacketOutEntity extends WrappedPacket implements SendableWra
      * @return Delta Z
      */
     public double getDeltaZ() {
-        if (isListening) {
+        if (packet != null) {
             switch (mode) {
                 case 0:
                     return readByte(2) / dXYZDivisor;
@@ -228,7 +230,7 @@ public class WrappedPacketOutEntity extends WrappedPacket implements SendableWra
      * @return On Ground
      */
     public boolean isOnGround() {
-        if (isListening) {
+        if (packet != null) {
             return readBoolean(0);
         } else {
             return onGround;
@@ -239,7 +241,7 @@ public class WrappedPacketOutEntity extends WrappedPacket implements SendableWra
     public Object asNMSPacket() {
         try {
             Object packetInstance = entityPacketConstructor.newInstance(entityID);
-            WrappedPacket wrapper = new WrappedPacket(packetInstance);
+            WrappedPacket wrapper = new WrappedPacket(new NMSPacket(packetInstance));
             switch (mode) {
                 case 0:
                     wrapper.writeByte(0, (byte) (deltaX * dXYZDivisor));

@@ -24,10 +24,11 @@
 
 package io.github.retrooper.packetevents.packetwrappers.status.out.pong;
 
+import io.github.retrooper.packetevents.packetwrappers.NMSPacket;
 import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
 
 public class WrappedPacketStatusPong extends WrappedPacket {
-    public WrappedPacketStatusPong(Object packet) {
+    public WrappedPacketStatusPong(NMSPacket packet) {
         super(packet);
     }
 

@@ -25,6 +25,7 @@
 package io.github.retrooper.packetevents.packetwrappers.play.in.custompayload;
 
 import io.github.retrooper.packetevents.packettype.PacketTypeClasses;
+import io.github.retrooper.packetevents.packetwrappers.NMSPacket;
 import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
 import io.github.retrooper.packetevents.utils.netty.bytebuf.ByteBufUtil;
 import io.github.retrooper.packetevents.utils.nms.NMSUtils;
@@ -35,11 +36,12 @@ public final class WrappedPacketInCustomPayload extends WrappedPacket {
 
     private static boolean strPresent, byteArrayPresent;
 
-    public WrappedPacketInCustomPayload(Object packet) {
+    public WrappedPacketInCustomPayload(NMSPacket packet) {
         super(packet);
     }
 
-    public static void load() {
+    @Override
+    protected void load() {
         Class<?> packetClass = PacketTypeClasses.Play.Client.CUSTOM_PAYLOAD;
         strPresent = Reflection.getField(packetClass, String.class, 0) != null;
         byteArrayPresent = Reflection.getField(packetClass, byte[].class, 0) != null;
@@ -62,7 +64,7 @@ public final class WrappedPacketInCustomPayload extends WrappedPacket {
             return readString(0);
         } else {
             Object minecraftKey = readObject(0, nmsMinecraftKey);
-            WrappedPacket minecraftKeyWrapper = new WrappedPacket(minecraftKey);
+            WrappedPacket minecraftKeyWrapper = new WrappedPacket(new NMSPacket(minecraftKey));
             return minecraftKeyWrapper.readString(1);
         }
     }
@@ -72,7 +74,7 @@ public final class WrappedPacketInCustomPayload extends WrappedPacket {
             return readByteArray(0);
         } else {
             Object dataSerializer = readObject(0, packetDataSerializerClass);
-            WrappedPacket byteBufWrapper = new WrappedPacket(dataSerializer);
+            WrappedPacket byteBufWrapper = new WrappedPacket(new NMSPacket(dataSerializer));
 
             Object byteBuf = byteBufWrapper.readObject(0, byteBufClass);
 

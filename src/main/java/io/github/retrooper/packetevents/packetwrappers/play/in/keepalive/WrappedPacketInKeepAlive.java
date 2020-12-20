@@ -25,17 +25,19 @@
 package io.github.retrooper.packetevents.packetwrappers.play.in.keepalive;
 
 import io.github.retrooper.packetevents.packettype.PacketTypeClasses;
+import io.github.retrooper.packetevents.packetwrappers.NMSPacket;
 import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
 import io.github.retrooper.packetevents.utils.reflection.Reflection;
 
 public final class WrappedPacketInKeepAlive extends WrappedPacket {
     private static boolean integerPresentInIndex0;
 
-    public WrappedPacketInKeepAlive(final Object packet) {
+    public WrappedPacketInKeepAlive(final NMSPacket packet) {
         super(packet);
     }
 
-    public static void load() {
+    @Override
+    protected void load() {
         Class<?> packetClass = PacketTypeClasses.Play.Client.KEEP_ALIVE;
         integerPresentInIndex0 = Reflection.getField(packetClass, int.class, 0) != null;
     }

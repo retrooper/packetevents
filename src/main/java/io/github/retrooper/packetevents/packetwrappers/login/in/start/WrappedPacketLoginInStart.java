@@ -24,13 +24,14 @@
 
 package io.github.retrooper.packetevents.packetwrappers.login.in.start;
 
+import io.github.retrooper.packetevents.packetwrappers.NMSPacket;
 import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
 import io.github.retrooper.packetevents.utils.gameprofile.GameProfileUtil;
 import io.github.retrooper.packetevents.utils.gameprofile.WrappedGameProfile;
 import io.github.retrooper.packetevents.utils.nms.NMSUtils;
 
 public class WrappedPacketLoginInStart extends WrappedPacket {
-    public WrappedPacketLoginInStart(Object packet) {
+    public WrappedPacketLoginInStart(NMSPacket packet) {
         super(packet);
     }
 

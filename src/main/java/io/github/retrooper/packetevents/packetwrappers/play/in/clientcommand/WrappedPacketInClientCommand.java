@@ -25,6 +25,7 @@
 package io.github.retrooper.packetevents.packetwrappers.play.in.clientcommand;
 
 import io.github.retrooper.packetevents.packettype.PacketTypeClasses;
+import io.github.retrooper.packetevents.packetwrappers.NMSPacket;
 import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
 import io.github.retrooper.packetevents.utils.nms.NMSUtils;
 import io.github.retrooper.packetevents.utils.reflection.SubclassUtil;
@@ -33,11 +34,12 @@ public final class WrappedPacketInClientCommand extends WrappedPacket {
     private static Class<?> enumClientCommandClass;
     private Object enumObj;
 
-    public WrappedPacketInClientCommand(Object packet) {
+    public WrappedPacketInClientCommand(NMSPacket packet) {
         super(packet);
     }
 
-    public static void load() {
+    @Override
+protected void load() {
         Class<?> packetClass = PacketTypeClasses.Play.Client.CLIENT_COMMAND;
         try {
             enumClientCommandClass = NMSUtils.getNMSClass("EnumClientCommand");

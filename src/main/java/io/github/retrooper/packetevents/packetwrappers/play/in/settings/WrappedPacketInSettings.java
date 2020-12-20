@@ -24,6 +24,7 @@
 
 package io.github.retrooper.packetevents.packetwrappers.play.in.settings;
 
+import io.github.retrooper.packetevents.packetwrappers.NMSPacket;
 import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
 import io.github.retrooper.packetevents.utils.nms.NMSUtils;
 import io.github.retrooper.packetevents.utils.reflection.SubclassUtil;
@@ -38,11 +39,12 @@ public class WrappedPacketInSettings extends WrappedPacket {
     private Object chatVisibilityEnumObj;
     private HashMap<DisplayedSkinPart, Boolean> displayedSkinParts = new HashMap<>();
 
-    public WrappedPacketInSettings(final Object packet) {
+    public WrappedPacketInSettings(final NMSPacket packet) {
         super(packet);
     }
 
-    public static void load() {
+    @Override
+protected void load() {
 
         isLowerThan_v_1_8 = version.isLowerThan(ServerVersion.v_1_8);
 

@@ -24,18 +24,16 @@
 
 package io.github.retrooper.packetevents.packetwrappers.play.out.entitymetadata;
 
+import io.github.retrooper.packetevents.packetwrappers.NMSPacket;
 import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
 
 public class WrappedPacketOutEntityMetadata extends WrappedPacket {
-    private final boolean isListening;
-
-    public WrappedPacketOutEntityMetadata(Object packet) {
+    public WrappedPacketOutEntityMetadata(NMSPacket packet) {
         super(packet);
-        isListening = true;
     }
 
     public int getEntityId() {
-        if (isListening) {
+        if (packet != null) {
             return readInt(0);
         } else {
             return 0;

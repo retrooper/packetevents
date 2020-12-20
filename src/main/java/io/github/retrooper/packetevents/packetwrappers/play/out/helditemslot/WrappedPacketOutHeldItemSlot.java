@@ -25,6 +25,7 @@
 package io.github.retrooper.packetevents.packetwrappers.play.out.helditemslot;
 
 import io.github.retrooper.packetevents.packettype.PacketTypeClasses;
+import io.github.retrooper.packetevents.packetwrappers.NMSPacket;
 import io.github.retrooper.packetevents.packetwrappers.SendableWrapper;
 import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
 
@@ -35,7 +36,7 @@ public class WrappedPacketOutHeldItemSlot extends WrappedPacket implements Senda
     private static Constructor<?> packetConstructor;
     private int slot;
 
-    public WrappedPacketOutHeldItemSlot(Object packet) {
+    public WrappedPacketOutHeldItemSlot(NMSPacket packet) {
         super(packet);
     }
 
@@ -43,7 +44,8 @@ public class WrappedPacketOutHeldItemSlot extends WrappedPacket implements Senda
         this.slot = slot;
     }
 
-    public static void load() {
+    @Override
+protected void load() {
         try {
             packetConstructor = PacketTypeClasses.Play.Server.HELD_ITEM_SLOT.getConstructor(int.class);
         } catch (NoSuchMethodException e) {

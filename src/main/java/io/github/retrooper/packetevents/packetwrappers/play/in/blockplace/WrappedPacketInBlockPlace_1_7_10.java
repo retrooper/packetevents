@@ -24,6 +24,7 @@
 
 package io.github.retrooper.packetevents.packetwrappers.play.in.blockplace;
 
+import io.github.retrooper.packetevents.packetwrappers.NMSPacket;
 import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
 import org.bukkit.inventory.ItemStack;
 
@@ -32,15 +33,10 @@ final class WrappedPacketInBlockPlace_1_7_10 extends WrappedPacket {
     public ItemStack itemStack;
     public int face;
 
-    WrappedPacketInBlockPlace_1_7_10(final Object packet) {
+    WrappedPacketInBlockPlace_1_7_10(final NMSPacket packet) {
         super(packet);
-    }
-
-
-    @Override
-    protected void setup() {
         final net.minecraft.server.v1_7_R4.PacketPlayInBlockPlace blockPlace =
-                (net.minecraft.server.v1_7_R4.PacketPlayInBlockPlace) packet;
+                (net.minecraft.server.v1_7_R4.PacketPlayInBlockPlace) packet.getRawNMSPacket();
 
         x = blockPlace.c();
         y = blockPlace.d();

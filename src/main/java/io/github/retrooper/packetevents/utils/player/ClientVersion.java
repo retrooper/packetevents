@@ -24,6 +24,15 @@
 
 package io.github.retrooper.packetevents.utils.player;
 
+/**
+ * Client Version.
+ * This is a nice tool for minecraft's protocol versions.
+ * You won't have to memorize the protocol version, just memorize the client version
+ * as the version you see in the minecraft launcher.
+ * @see <a href="https://wiki.vg/Protocol_version_numbers">https://wiki.vg/Protocol_version_numbers</a>
+ * @author retrooper
+ * @since 1.6.9
+ */
 public enum ClientVersion {
     v_1_7_10(5),
     v_1_8(47),
@@ -70,14 +79,11 @@ public enum ClientVersion {
         this.protocolVersion = (short) protocolVersion;
     }
 
-    public static boolean isHigherThan(ClientVersion a, ClientVersion b) {
-        return a.isHigherThan(b);
-    }
-
-    public static boolean isLowerThan(ClientVersion a, ClientVersion b) {
-        return a.isLowerThan(b);
-    }
-
+    /**
+     * Get a ClientVersion enum by protocol version.
+     * @param protocolVersion Protocol version.
+     * @return ClientVersion
+     */
     public static ClientVersion getClientVersion(int protocolVersion) {
         if (protocolVersion == -1) {
             return ClientVersion.UNRESOLVED;
@@ -98,19 +104,66 @@ public enum ClientVersion {
         }
     }
 
+    /**
+     * Protocol version of this client version.
+     * @return Protocol version.
+     */
     public short getProtocolVersion() {
         return protocolVersion;
     }
 
+    /**
+     * Is this client version newer than the compared client version?
+     * This method simply checks if this client version's protocol version is greater than
+     * the compared client version's protocol version.
+     * @param target Compared client version.
+     * @return Is this client version newer than the compared client version.
+     */
     public boolean isHigherThan(ClientVersion target) {
-        return protocolVersion > target.getProtocolVersion();
+        return protocolVersion > target.protocolVersion && (target != UNRESOLVED && this != UNRESOLVED);
     }
 
+    /**
+     * Is this client version newer than or equal to the compared client version?
+     * This method simply checks if this client version's protocol version is newer than or equal to
+     * the compared client version's protocol version.
+     * @param target Compared client version.
+     * @return Is this client version newer than or equal to the compared client version.
+     */
+    public boolean isHigherThanOrEquals(ClientVersion target) {
+        return protocolVersion >= target.protocolVersion && (target != UNRESOLVED & this != UNRESOLVED);
+    }
+
+    /**
+     * Is this client version older than the compared client version?
+     * This method simply checks if this client version's protocol version is less than
+     * the compared client version's protocol version.
+     * @param target Compared client version.
+     * @return Is this client version older than the compared client version.
+     */
     public boolean isLowerThan(ClientVersion target) {
-        return protocolVersion < target.getProtocolVersion();
+        return protocolVersion < target.protocolVersion && (target != UNRESOLVED && this != UNRESOLVED);
     }
 
+    /**
+     * Is this client version older than or equal to the compared client version?
+     * This method simply checks if this client version's protocol version is older than or equal to
+     * the compared client version's protocol version.
+     * @param target Compared client version.
+     * @return Is this client version older than or equal to the compared client version.
+     */
+    public boolean isLowerThanOrEquals(ClientVersion target) {
+        return protocolVersion <= target.protocolVersion && (target != UNRESOLVED && this != UNRESOLVED);
+    }
+
+    /**
+     * Is this client version equal to the compared client version.
+     * This method simply checks if this client version's protocol version
+     * is equal to the compared client version's protocol version.
+     * @param target Compared
+     * @return Is this client version equal to the compared client version.
+     */
     public boolean equals(ClientVersion target) {
-        return protocolVersion == target.getProtocolVersion();
+        return protocolVersion == target.protocolVersion;
     }
 }

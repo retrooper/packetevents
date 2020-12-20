@@ -26,6 +26,7 @@ package io.github.retrooper.packetevents.packetwrappers.play.in.blockdig;
 
 import io.github.retrooper.packetevents.enums.Direction;
 import io.github.retrooper.packetevents.packettype.PacketTypeClasses;
+import io.github.retrooper.packetevents.packetwrappers.NMSPacket;
 import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
 import io.github.retrooper.packetevents.utils.nms.NMSUtils;
 import io.github.retrooper.packetevents.utils.reflection.Reflection;
@@ -43,11 +44,12 @@ public final class WrappedPacketInBlockDig extends WrappedPacket {
     private Object blockPosObj;
     private Object enumDirObj;
 
-    public WrappedPacketInBlockDig(Object packet) {
+    public WrappedPacketInBlockDig(NMSPacket packet) {
         super(packet);
     }
 
-    public static void load() {
+    @Override
+    protected void load() {
         Class<?> blockDigClass = PacketTypeClasses.Play.Client.BLOCK_DIG;
         try {
             if (version.isHigherThan(ServerVersion.v_1_7_10)) {
@@ -67,10 +69,6 @@ public final class WrappedPacketInBlockDig extends WrappedPacket {
                 digTypeClass = SubclassUtil.getSubClass(blockDigClass, "EnumPlayerDigType");
             }
         }
-    }
-
-    public Vector3d getPosition() {
-        return new Vector3d(getX(), getY(), getZ());
     }
 
     /**

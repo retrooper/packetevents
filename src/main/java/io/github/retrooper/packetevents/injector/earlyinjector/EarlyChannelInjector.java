@@ -98,7 +98,7 @@ public class EarlyChannelInjector implements ChannelInjector {
      * Asynchronously remove our channel handler from minecraft's channel handler list.
      */
     public void closeAsync() {
-        PacketEvents.get().packetHandlingExecutorService.execute(new Runnable() {
+        PacketEvents.get().injectAndEjectExecutorService.execute(new Runnable() {
             @Override
             public void run() {
                 close();

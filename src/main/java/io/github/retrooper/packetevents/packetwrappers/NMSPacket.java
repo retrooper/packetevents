@@ -22,18 +22,21 @@
  * SOFTWARE.
  */
 
-package io.github.retrooper.packetevents.utils.versionlookup.protocollib;
+package io.github.retrooper.packetevents.packetwrappers;
 
-import com.comphenix.protocol.ProtocolLibrary;
-import org.bukkit.Bukkit;
-import org.bukkit.entity.Player;
+import io.github.retrooper.packetevents.utils.reflection.ClassUtil;
 
-public class ProtocolLibVersionLookupUtils {
-    public static boolean isAvailable() {
-        return Bukkit.getPluginManager().isPluginEnabled("ProtocolLib");
+public class NMSPacket {
+    private final Object rawNMSPacket;
+    public NMSPacket(Object rawNMSPacket) {
+        this.rawNMSPacket = rawNMSPacket;
     }
 
-    public static int getProtocolVersion(Player player) {
-        return ProtocolLibrary.getProtocolManager().getProtocolVersion(player);
+    public Object getRawNMSPacket() {
+        return rawNMSPacket;
+    }
+
+    public String getName() {
+        return ClassUtil.getClassSimpleName(rawNMSPacket.getClass());
     }
 }

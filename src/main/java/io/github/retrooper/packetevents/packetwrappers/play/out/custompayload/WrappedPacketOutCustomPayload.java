@@ -25,6 +25,7 @@
 package io.github.retrooper.packetevents.packetwrappers.play.out.custompayload;
 
 import io.github.retrooper.packetevents.packettype.PacketTypeClasses;
+import io.github.retrooper.packetevents.packetwrappers.NMSPacket;
 import io.github.retrooper.packetevents.packetwrappers.SendableWrapper;
 import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
 import io.github.retrooper.packetevents.utils.netty.bytebuf.ByteBufUtil;
@@ -51,11 +52,12 @@ public class WrappedPacketOutCustomPayload extends WrappedPacket implements Send
         this.data = data;
     }
 
-    public WrappedPacketOutCustomPayload(Object packet) {
+    public WrappedPacketOutCustomPayload(NMSPacket packet) {
         super(packet);
     }
 
-    public static void load() {
+    @Override
+protected void load() {
         Class<?> packetClass = PacketTypeClasses.Play.Server.CUSTOM_PAYLOAD;
         packetDataSerializerClass = NMSUtils.getNMSClassWithoutException("PacketDataSerializer");
         minecraftKeyClass = NMSUtils.getNMSClassWithoutException("MinecraftKey");
@@ -123,7 +125,7 @@ public class WrappedPacketOutCustomPayload extends WrappedPacket implements Send
                     return readString(0);
                 case 2:
                     Object minecraftKey = readObject(minecraftKeyIndexInClass, minecraftKeyClass);
-                    WrappedPacket minecraftKeyWrapper = new WrappedPacket(minecraftKey);
+                    WrappedPacket minecraftKeyWrapper = new WrappedPacket(new NMSPacket(minecraftKey));
                     return minecraftKeyWrapper.readString(1);
             }
             return null;
@@ -139,7 +141,7 @@ public class WrappedPacketOutCustomPayload extends WrappedPacket implements Send
                 case 1:
                 case 2:
                     Object dataSerializer = readObject(0, packetDataSerializerClass);
-                    WrappedPacket byteBufWrapper = new WrappedPacket(dataSerializer);
+                    WrappedPacket byteBufWrapper = new WrappedPacket(new NMSPacket(dataSerializer));
 
                     Object byteBuf = byteBufWrapper.readObject(0, byteBufClass);
 
@@ -152,11 +154,12 @@ public class WrappedPacketOutCustomPayload extends WrappedPacket implements Send
 
     @Override
     public Object asNMSPacket() {
+        byte[] data = getData();
         Object byteBufObject = ByteBufUtil.copiedBuffer(data);
         switch (constructorMode) {
             case 0:
                 try {
-                    return constructor.newInstance(tag, data);
+                    return constructor.newInstance(getTag(), data);
                 } catch (InstantiationException | InvocationTargetException | IllegalAccessException e) {
                     e.printStackTrace();
                 }
@@ -172,7 +175,7 @@ public class WrappedPacketOutCustomPayload extends WrappedPacket implements Send
             case 2:
 
                 try {
-                    Object minecraftKey = minecraftKeyConstructor.newInstance(tag);
+                    Object minecraftKey = minecraftKeyConstructor.newInstance(getTag());
                     Object dataSerializer = packetDataSerializerConstructor.newInstance(byteBufObject);
                     return constructor.newInstance(minecraftKey, dataSerializer);
                 } catch (InstantiationException | InvocationTargetException | IllegalAccessException e) {

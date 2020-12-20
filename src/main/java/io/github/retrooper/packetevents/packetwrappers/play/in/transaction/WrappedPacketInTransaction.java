@@ -24,10 +24,11 @@
 
 package io.github.retrooper.packetevents.packetwrappers.play.in.transaction;
 
+import io.github.retrooper.packetevents.packetwrappers.NMSPacket;
 import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
 
 public final class WrappedPacketInTransaction extends WrappedPacket {
-    public WrappedPacketInTransaction(final Object packet) {
+    public WrappedPacketInTransaction(final NMSPacket packet) {
         super(packet);
     }
 

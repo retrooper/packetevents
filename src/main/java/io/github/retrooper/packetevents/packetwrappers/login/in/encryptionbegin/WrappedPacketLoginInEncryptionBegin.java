@@ -24,10 +24,11 @@
 
 package io.github.retrooper.packetevents.packetwrappers.login.in.encryptionbegin;
 
+import io.github.retrooper.packetevents.packetwrappers.NMSPacket;
 import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
 
-public class WrapppedPacketLoginInEncryptionBegin extends WrappedPacket {
-    public WrapppedPacketLoginInEncryptionBegin(Object packet) {
+public class WrappedPacketLoginInEncryptionBegin extends WrappedPacket {
+    public WrappedPacketLoginInEncryptionBegin(NMSPacket packet) {
         super(packet);
     }
 

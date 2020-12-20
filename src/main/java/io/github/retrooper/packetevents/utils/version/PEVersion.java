@@ -26,14 +26,31 @@ package io.github.retrooper.packetevents.utils.version;
 
 import java.util.Arrays;
 
-
+/**
+ * PacketEvents version.
+ * This class represents a PacketEvents version, but you can use it for your own projects as a software version util if you wish.
+ * @author retrooper
+ * @since 1.8
+ */
 public class PEVersion {
+    /**
+     * Array containing the digits in the version.
+     * For example, "1.8.9" will be stored as {1, 8, 9} in an array.
+     */
     private final int[] versionIntArray;
 
+    /**
+     * Specify your version using an array.
+     * @param version Array version.
+     */
     public PEVersion(final int... version) {
         this.versionIntArray = version;
     }
 
+    /**
+     * Specify your version using a string, for example: "1.8.9".
+     * @param version String version.
+     */
     public PEVersion(final String version) {
         String[] versionIntegers = version.split("\\.");
         int length = versionIntegers.length;
@@ -43,6 +60,18 @@ public class PEVersion {
         }
     }
 
+    /**
+     * Compare to another PEVersion.
+     * If we are newer than the compared version,
+     * this method will return 1.
+     * If we are older than the compared version,
+     * this method will return -1.
+     * If we are equal to the compared version,
+     * this method will return 0.
+     * Similar to {@link Integer#compareTo(Integer)}.
+     * @param version
+     * @return Comparing to another Version.
+     */
     public int compareTo(PEVersion version) {
         int localLength = versionIntArray.length;
         int oppositeLength = version.versionIntArray.length;
@@ -59,18 +88,38 @@ public class PEVersion {
         return 0;
     }
 
+    /**
+     * Does the {@link #compareTo(PEVersion)} return 1?
+     * @param version Compared version.
+     * @return Is this newer than the compared version.
+     */
     public boolean isNewerThan(PEVersion version) {
         return compareTo(version) == 1;
     }
 
+    /**
+     * Does the {@link #compareTo(PEVersion)} return -1?
+     * @param version Compared version.
+     * @return Is this older than the compared version.
+     */
     public boolean isOlderThan(PEVersion version) {
         return compareTo(version) == -1;
     }
 
+    /**
+     * Represented as an array.
+     * @return Array version.
+     */
     public int[] asArray() {
         return versionIntArray;
     }
 
+    /**
+     * Is this version equal to the compared object.
+     * The object must be a PEVersion and the array values must be equal.
+     * @param obj Compared object.
+     * @return Are they equal?
+     */
     @Override
     public boolean equals(Object obj) {
         if (obj instanceof PEVersion) {
@@ -79,11 +128,19 @@ public class PEVersion {
         return false;
     }
 
+    /**
+     * Clone the PEVersion.
+     * @return A clone.
+     */
     @Override
     public PEVersion clone() {
         return new PEVersion(this.versionIntArray);
     }
 
+    /**
+     * Represent the version as a string.
+     * @return String representation.
+     */
     @Override
     public String toString() {
         StringBuilder asString = new StringBuilder(Integer.toString(versionIntArray[0]));

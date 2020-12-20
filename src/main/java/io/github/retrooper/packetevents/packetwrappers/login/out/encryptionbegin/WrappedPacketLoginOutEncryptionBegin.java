@@ -24,12 +24,13 @@
 
 package io.github.retrooper.packetevents.packetwrappers.login.out.encryptionbegin;
 
+import io.github.retrooper.packetevents.packetwrappers.NMSPacket;
 import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
 
 import java.security.PublicKey;
 
 public class WrappedPacketLoginOutEncryptionBegin extends WrappedPacket {
-    public WrappedPacketLoginOutEncryptionBegin(Object packet) {
+    public WrappedPacketLoginOutEncryptionBegin(NMSPacket packet) {
         super(packet);
     }
 

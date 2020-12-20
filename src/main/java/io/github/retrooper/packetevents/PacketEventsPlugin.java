@@ -24,26 +24,44 @@
 
 package io.github.retrooper.packetevents;
 
+import io.github.retrooper.packetevents.event.PacketListenerDynamic;
+import io.github.retrooper.packetevents.event.impl.PacketPlayReceiveEvent;
+import io.github.retrooper.packetevents.packettype.PacketType;
+import io.github.retrooper.packetevents.packetwrappers.play.in.useentity.WrappedPacketInUseEntity;
+import org.bukkit.entity.Entity;
 import org.bukkit.plugin.java.JavaPlugin;
 
 public class PacketEventsPlugin extends JavaPlugin {
+    //TODO document some internal utils in the utils package, the packet type in the package type package and all packet wrappers....
     @Override
     public void onLoad() {
-        //We use default settings. You always want to specify the settings before loading.
-        boolean success = PacketEvents.create(this).load();
-        //PacketEvents won't load again, if it
-        //is already being loaded or has loaded and the load method will return false.
+        /*
+         * We use default settings. You should always specify the settings before loading.
+         * PacketEvents won't load again if it has already loaded or is already loading.
+         * If that is the case, the method will return false.
+         */
+        boolean successful = PacketEvents.create(this).load();
     }
 
     @Override
     public void onEnable() {
         /*
-         * We created the instance in the onLoad method
+         * We created the instance in the onLoad method.
+         * If another PacketEvents user has already initialized, we won't initialize again.
+         * If we end up not initializing or fail to initialize, the method will return false.
          */
-        boolean success = PacketEvents.get().init(this);
-        //Similarly to the load method, packetevents won't initialize again
-        //if it is already initializing or has initialized.
-        //The method returns whether it initialized
+        boolean successful = PacketEvents.get().init(this);
+
+        PacketEvents.get().registerListener(new PacketListenerDynamic() {
+            @Override
+            public void onPacketPlayReceive(PacketPlayReceiveEvent event) {
+                if(event.getPacketId() == PacketType.Play.Client.USE_ENTITY) {
+                    WrappedPacketInUseEntity ue = new WrappedPacketInUseEntity(event.getNMSPacket());
+                    Entity entity = ue.getEntity();
+                    event.getPlayer().sendMessage("you attacked " + entity.getName());
+                }
+            }
+        });
     }
 
     @Override

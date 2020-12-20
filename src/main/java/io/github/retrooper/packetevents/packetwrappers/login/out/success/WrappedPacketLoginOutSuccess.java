@@ -24,13 +24,14 @@
 
 package io.github.retrooper.packetevents.packetwrappers.login.out.success;
 
+import io.github.retrooper.packetevents.packetwrappers.NMSPacket;
 import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
 import io.github.retrooper.packetevents.utils.gameprofile.GameProfileUtil;
 import io.github.retrooper.packetevents.utils.gameprofile.WrappedGameProfile;
 import io.github.retrooper.packetevents.utils.nms.NMSUtils;
 
 public class WrappedPacketLoginOutSuccess extends WrappedPacket {
-    public WrappedPacketLoginOutSuccess(Object packet) {
+    public WrappedPacketLoginOutSuccess(NMSPacket packet) {
         super(packet);
     }
 

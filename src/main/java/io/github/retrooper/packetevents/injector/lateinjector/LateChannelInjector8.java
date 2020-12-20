@@ -77,7 +77,7 @@ class LateChannelInjector8 implements ChannelInjector {
 
     @Override
     public void injectPlayerAsync(Player player) {
-        PacketEvents.get().packetHandlingExecutorService.execute(new Runnable() {
+        PacketEvents.get().injectAndEjectExecutorService.execute(new Runnable() {
             @Override
             public void run() {
                 injectPlayerSync(player);
@@ -87,7 +87,7 @@ class LateChannelInjector8 implements ChannelInjector {
 
     @Override
     public void ejectPlayerAsync(Player player) {
-        PacketEvents.get().packetHandlingExecutorService.execute(new Runnable() {
+        PacketEvents.get().injectAndEjectExecutorService.execute(new Runnable() {
             @Override
             public void run() {
                 final Channel channel = (Channel) PacketEvents.get().packetHandlerInternal.getChannel(player.getName());

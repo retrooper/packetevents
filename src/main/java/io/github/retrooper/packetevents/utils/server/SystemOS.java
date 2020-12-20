@@ -24,12 +24,22 @@
 
 package io.github.retrooper.packetevents.utils.server;
 
+/**
+ * System Operating system.
+ * @author retrooper
+ * @since 1.7
+ */
 public enum SystemOS {
     WINDOWS, MACOS, LINUX, OTHER;
 
     private static SystemOS value;
 
-    private static SystemOS getOS() {
+    /**
+     * Get the server's operating system.
+     * This method will NOT cache.
+     * @return Operating System.
+     */
+    public static SystemOS getOSNoCache() {
         final String os = System.getProperty("os.name");
         for (final String osName : getOperatingSystemNames()) {
             if (os.toLowerCase().contains(osName.toLowerCase())) {
@@ -39,14 +49,34 @@ public enum SystemOS {
         return OTHER;
     }
 
-    public static SystemOS getOperatingSystem() {
-        if (value == null) {
-            value = getOS();
+    /**
+     * Get the server's operating system.
+     * This method will CACHE for you.
+     * @return Operating System.
+     */
+    public static SystemOS getOS() {
+        if(value == null) {
+            value = getOSNoCache();
         }
         return value;
     }
 
-    public static String[] getOperatingSystemNames() {
+    /**
+     * Get the server's operating system.
+     * This method will CACHE for you.
+     * @deprecated Use {@link #getOS()}, method renamed.
+     * @return Operating System.
+     */
+    @Deprecated
+    public static SystemOS getOperatingSystem() {
+        return getOS();
+    }
+
+    /**
+     * Internally used method to get the names of all operating systems.
+     * @return Operating system names array.
+     */
+    private static String[] getOperatingSystemNames() {
         final SystemOS[] values = values();
         final int valuesLength = values.length - 1;
         final String[] arr = new String[valuesLength];

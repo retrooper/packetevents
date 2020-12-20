@@ -24,6 +24,7 @@
 
 package io.github.retrooper.packetevents.packetwrappers.play.out.explosion;
 
+import io.github.retrooper.packetevents.packetwrappers.NMSPacket;
 import io.github.retrooper.packetevents.packetwrappers.SendableWrapper;
 import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
 import io.github.retrooper.packetevents.utils.nms.NMSUtils;
@@ -38,15 +39,14 @@ import java.util.List;
 
 public class WrappedPacketOutExplosion extends WrappedPacket implements SendableWrapper {
     private static Constructor<?> chunkPosConstructor, blockPosConstructor, packetConstructor, vec3dConstructor;
-    private boolean isListening = false;
+
     private double x, y, z;
     private float strength;
     private List<Vector3i> records;
     private float playerMotionX, playerMotionY, playerMotionZ;
 
-    public WrappedPacketOutExplosion(Object packet) {
+    public WrappedPacketOutExplosion(NMSPacket packet) {
         super(packet);
-        isListening = true;
     }
 
     public WrappedPacketOutExplosion(double x, double y, double z, float strength, List<Vector3i> records,
@@ -61,7 +61,8 @@ public class WrappedPacketOutExplosion extends WrappedPacket implements Sendable
         this.playerMotionZ = playerMotionZ;
     }
 
-    public static void load() {
+    @Override
+protected void load() {
         Class<?> chunkPosClass = NMSUtils.getNMSClassWithoutException("ChunkPosition");
         Class<?> blockPosClass = NMSUtils.getNMSClassWithoutException("BlockPosition");
         Class<?> packetClass = NMSUtils.getNMSClassWithoutException("PacketPlayOutExplosion");
@@ -87,7 +88,7 @@ public class WrappedPacketOutExplosion extends WrappedPacket implements Sendable
     }
 
     public double getX() {
-        if (isListening) {
+        if (packet != null) {
             return readDouble(0);
         } else {
             return x;
@@ -95,7 +96,7 @@ public class WrappedPacketOutExplosion extends WrappedPacket implements Sendable
     }
 
     public double getY() {
-        if (isListening) {
+        if (packet != null) {
             return readDouble(1);
         } else {
             return y;
@@ -103,19 +104,16 @@ public class WrappedPacketOutExplosion extends WrappedPacket implements Sendable
     }
 
     public double getZ() {
-        if (isListening) {
+        if (packet != null) {
             return readDouble(2);
         } else {
             return z;
         }
     }
 
-    public Vector3d getPosition() {
-        return new Vector3d(getX(), getY(), getZ());
-    }
 
     public float getStrength() {
-        if (isListening) {
+        if (packet != null) {
             return readFloat(0);
         } else {
             return strength;
@@ -123,14 +121,14 @@ public class WrappedPacketOutExplosion extends WrappedPacket implements Sendable
     }
 
     public List<Vector3i> getRecords() {
-        if (isListening) {
+        if (packet != null) {
             List<Vector3i> recordsList = new ArrayList<>();
             List<?> rawRecordsList = (List<?>) readObject(0, List.class);
             if (rawRecordsList.isEmpty()) {
                 return new ArrayList<>();
             }
             for (Object position : rawRecordsList) {
-                WrappedPacket posWrapper = new WrappedPacket(position);
+                WrappedPacket posWrapper = new WrappedPacket(new NMSPacket(position));
                 recordsList.add(new Vector3i(posWrapper.readInt(0), posWrapper.readInt(1), posWrapper.readInt(2)));
             }
             return recordsList;
@@ -140,7 +138,7 @@ public class WrappedPacketOutExplosion extends WrappedPacket implements Sendable
     }
 
     public float getPlayerMotionX() {
-        if (isListening) {
+        if (packet != null) {
             return readFloat(1);
         } else {
             return playerMotionX;
@@ -148,7 +146,7 @@ public class WrappedPacketOutExplosion extends WrappedPacket implements Sendable
     }
 
     public float getPlayerMotionY() {
-        if (isListening) {
+        if (packet != null) {
             return readFloat(2);
         } else {
             return playerMotionY;
@@ -156,22 +154,18 @@ public class WrappedPacketOutExplosion extends WrappedPacket implements Sendable
     }
 
     public float getPlayerMotionZ() {
-        if (isListening) {
+        if (packet != null) {
             return readFloat(3);
         } else {
             return playerMotionZ;
         }
     }
 
-    public Vector3d getPlayerMotion() {
-        return new Vector3d(getPlayerMotionX(), getPlayerMotionY(), getPlayerMotionZ());
-    }
-
     @Override
     public Object asNMSPacket() {
         if (version.equals(ServerVersion.v_1_7_10)) {
             List<Object> chunkPositions = new ArrayList<>();
-            for (Vector3i vec : records) {
+            for (Vector3i vec : getRecords()) {
                 try {
                     chunkPositions.add(chunkPosConstructor.newInstance(vec.x, vec.y, vec.z));
                 } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
@@ -179,15 +173,15 @@ public class WrappedPacketOutExplosion extends WrappedPacket implements Sendable
                 }
             }
             try {
-                Object vec = vec3dConstructor.newInstance(playerMotionX, playerMotionY, playerMotionZ);
-                return packetConstructor.newInstance(x, y, z, strength, chunkPositions, vec);
+                Object vec = vec3dConstructor.newInstance(getPlayerMotionX(), getPlayerMotionY(), getPlayerMotionZ());
+                return packetConstructor.newInstance(getX(), getY(), getZ(), getStrength(), chunkPositions, vec);
             } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
                 e.printStackTrace();
             }
 
         } else {
             List<Object> blockPositions = new ArrayList<>();
-            for (Vector3i vec : records) {
+            for (Vector3i vec : getRecords()) {
                 try {
                     blockPositions.add(blockPosConstructor.newInstance(vec.x, vec.y, vec.z));
                 } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
@@ -195,8 +189,8 @@ public class WrappedPacketOutExplosion extends WrappedPacket implements Sendable
                 }
             }
             try {
-                Object vec = vec3dConstructor.newInstance(playerMotionX, playerMotionY, playerMotionZ);
-                return packetConstructor.newInstance(x, y, z, strength, blockPositions, vec);
+                Object vec = vec3dConstructor.newInstance(getPlayerMotionX(), getPlayerMotionY(), getPlayerMotionZ());
+                return packetConstructor.newInstance(getX(), getY(), getZ(), getStrength(), blockPositions, vec);
             } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
                 e.printStackTrace();
             }

@@ -25,6 +25,7 @@
 package io.github.retrooper.packetevents.packetwrappers.play.out.animation;
 
 import io.github.retrooper.packetevents.packettype.PacketTypeClasses;
+import io.github.retrooper.packetevents.packetwrappers.NMSPacket;
 import io.github.retrooper.packetevents.packetwrappers.SendableWrapper;
 import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
 import io.github.retrooper.packetevents.utils.nms.NMSUtils;
@@ -38,35 +39,33 @@ import java.util.Map;
 public final class WrappedPacketOutAnimation extends WrappedPacket implements SendableWrapper {
     private static final Map<Integer, EntityAnimationType> cachedAnimationIDS = new HashMap<>();
     private static final Map<EntityAnimationType, Integer> cachedAnimations = new HashMap<>();
-    private static Class<?> nmsEntityClass;
     private static Constructor<?> animationConstructor;
     private Entity entity;
     private int entityID = -1;
     private EntityAnimationType type;
-    private boolean isListening = false;
 
-    public WrappedPacketOutAnimation(final Object packet) {
+    public WrappedPacketOutAnimation(final NMSPacket packet) {
         super(packet);
-        isListening = true;
     }
 
     public WrappedPacketOutAnimation(final Entity target, final EntityAnimationType type) {
-        super();
         this.entityID = target.getEntityId();
         this.entity = target;
         this.type = type;
     }
 
-    public static void load() {
+    public WrappedPacketOutAnimation(final int entityID, final EntityAnimationType type) {
+        this.entityID = entityID;
+        this.entity = null;
+        this.type = type;
+    }
+
+    @Override
+    protected void load() {
         Class<?> animationClass = PacketTypeClasses.Play.Server.ANIMATION;
-        try {
-            nmsEntityClass = NMSUtils.getNMSClass("Entity");
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
-        }
 
         try {
-            animationConstructor = animationClass.getConstructor(nmsEntityClass, int.class);
+            animationConstructor = animationClass.getConstructor(NMSUtils.nmsEntityClass, int.class);
         } catch (NoSuchMethodException e) {
             e.printStackTrace();
         }
@@ -117,7 +116,7 @@ public final class WrappedPacketOutAnimation extends WrappedPacket implements Se
      * @return Get Entity Animation Type
      */
     public EntityAnimationType getAnimationType() {
-        if (isListening) {
+        if (packet != null) {
             return cachedAnimationIDS.get(readInt(1));
         } else {
             return type;
@@ -126,8 +125,8 @@ public final class WrappedPacketOutAnimation extends WrappedPacket implements Se
 
     @Override
     public Object asNMSPacket() {
-        final Object nmsEntity = NMSUtils.getNMSEntity(this.entity);
-        final int index = cachedAnimations.get(type);
+        final Object nmsEntity = NMSUtils.getNMSEntity(getEntity());
+        final int index = cachedAnimations.get(getAnimationType());
         try {
             return animationConstructor.newInstance(nmsEntity, index);
         } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {

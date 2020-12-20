@@ -28,10 +28,15 @@ import io.github.retrooper.packetevents.PacketEvents;
 import org.bukkit.Bukkit;
 
 /**
+ * Server Version.
+ * This is a nice tool for minecraft's protocol versions.
+ * You won't have to memorize the protocol version, just memorize the server version
+ * as the version you see on the release.
+ * @see <a href="https://wiki.vg/Protocol_version_numbers">https://wiki.vg/Protocol_version_numbers</a>
  * @author retrooper
+ * @since 1.6.9
  */
 public enum ServerVersion {
-
     v_1_7_10((short) 5), v_1_8((short) 47), v_1_8_3((short) 47), v_1_8_4((short) 47), v_1_8_5((short) 47),
     v_1_8_6((short) 47), v_1_8_7((short) 47), v_1_8_8((short) 47), v_1_9((short) 107), v_1_9_2((short) 109),
     v_1_9_4((short) 110), v_1_10((short) 210), v_1_10_2((short) 210), v_1_11((short) 315), v_1_11_1((short) 316),
@@ -44,15 +49,15 @@ public enum ServerVersion {
             .replace(".", ",").split(",")[3];
     public static ServerVersion[] reversedValues = new ServerVersion[values().length];
     private static ServerVersion cachedVersion;
-    private final short protocolId;
+    private final short protocolVersion;
 
     ServerVersion(short protocolId) {
-        this.protocolId = protocolId;
+        this.protocolVersion = protocolId;
     }
 
     private static ServerVersion getVersionNoCache() {
         if (reversedValues[0] == null) {
-            reversedValues = ServerVersion.reverse(values());
+            reversedValues = ServerVersion.reverse();
         }
         if (reversedValues == null) {
             throw new IllegalStateException("Failed to reverse the ServerVersion enum constant values.");
@@ -69,6 +74,12 @@ public enum ServerVersion {
         return ERROR;
     }
 
+    /**
+     * Get the server version.
+     * If PacketEvents has already attempted resolving, return the cached version.
+     * If PacketEvents hasn't already attempted resolving, it will resolve it, cache it and return the version.
+     * @return Server Version. (possibly cached)
+     */
     public static ServerVersion getVersion() {
         if (cachedVersion == null) {
             cachedVersion = getVersionNoCache();
@@ -76,8 +87,12 @@ public enum ServerVersion {
         return cachedVersion;
     }
 
-    public static ServerVersion[] reverse(final ServerVersion[] arr) {
-        ServerVersion[] array = arr.clone();
+    /**
+     * The values in this enum in reverse.
+     * @return Reversed server version enum values.
+     */
+    private static ServerVersion[] reverse() {
+        ServerVersion[] array = values().clone();
         if (array == null) {
             return null;
         }
@@ -92,67 +107,67 @@ public enum ServerVersion {
         return array;
     }
 
-    public static String getNmsSuffix() {
+    public static String getNMSSuffix() {
         return NMS_VERSION_SUFFIX;
     }
 
     public static String getNMSDirectory() {
-        return "net.minecraft.server." + getNmsSuffix();
+        return "net.minecraft.server." + getNMSSuffix();
     }
 
     public static String getOBCDirectory() {
-        return "org.bukkit.craftbukkit." + getNmsSuffix();
+        return "org.bukkit.craftbukkit." + getNMSSuffix();
     }
 
+    /**
+     * Get this server version's protocol version.
+     * @return Protocol version.
+     */
     public short getProtocolVersion() {
-        return protocolId;
+        return protocolVersion;
     }
 
     /**
-     * Returns if the current version is more up to date than the argument passed
-     * version
-     *
-     * @param version The version to compare to the server's value.
-     * @return True if the supplied version is lower, false if it is equal or higher
-     * than the server's version.
+     * Is this server version newer than the compared server version?
+     * This method simply checks if this server version's protocol version is greater than
+     * the compared server version's protocol version.
+     * @param target Compared server version.
+     * @return Is this server version newer than the compared server version.
      */
-    public boolean isHigherThan(final ServerVersion version) {
-        return protocolId > version.protocolId;
+    public boolean isHigherThan(final ServerVersion target) {
+        return protocolVersion > target.protocolVersion;
     }
 
     /**
-     * Returns if the current version is more up to date than the argument passed
-     * version
-     *
-     * @param version The version to compare to the server's value.
-     * @return True if the supplied version is lower or equal, false if it is higher
-     * than the server's version.
+     * Is this server version newer than or equal to the compared server version?
+     * This method simply checks if this server version's protocol version is greater than or equal to
+     * the compared server version's protocol version.
+     * @param target Compared server version.
+     * @return Is this server version newer than or equal to the compared server version.
      */
-    public boolean isHigherThanOrEquals(final ServerVersion version) {
-        return protocolId >= version.protocolId;
+    public boolean isHigherThanOrEquals(final ServerVersion target) {
+        return protocolVersion >= target.protocolVersion;
     }
 
     /**
-     * Returns if the current version is more older than the argument passed
-     * version
-     *
-     * @param version The version to compare to the server's value.
-     * @return True if the supplied version is higher, false if it is equal or lower
-     * than the server's version.
+     * Is this server version older than the compared server version?
+     * This method simply checks if this server version's protocol version is less than
+     * the compared server version's protocol version.
+     * @param target Compared server version.
+     * @return Is this server version older than the compared server version.
      */
-    public boolean isLowerThan(final ServerVersion version) {
-        return version.protocolId > protocolId;
+    public boolean isLowerThan(final ServerVersion target) {
+        return protocolVersion < target.protocolVersion;
     }
 
     /**
-     * Returns if the current version is more older than the argument passed
-     * version
-     *
-     * @param version The version to compare to the server's value.
-     * @return True if the supplied version is higher or equal, false if it is lower
-     * than the server's version.
+     * Is this server version older than or equal to the compared server version?
+     * This method simply checks if this server version's protocol version is older than or equal to
+     * the compared server version's protocol version.
+     * @param target Compared server version.
+     * @return Is this server version older than or equal to the compared server version.
      */
-    public boolean isLowerThanOrEquals(final ServerVersion version) {
-        return version.protocolId >= protocolId;
+    public boolean isLowerThanOrEquals(final ServerVersion target) {
+        return protocolVersion <= target.protocolVersion;
     }
 }

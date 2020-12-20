@@ -25,6 +25,7 @@
 package io.github.retrooper.packetevents.packetwrappers.play.out.kickdisconnect;
 
 import io.github.retrooper.packetevents.packettype.PacketTypeClasses;
+import io.github.retrooper.packetevents.packetwrappers.NMSPacket;
 import io.github.retrooper.packetevents.packetwrappers.SendableWrapper;
 import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
 import io.github.retrooper.packetevents.packetwrappers.play.out.chat.WrappedPacketOutChat;
@@ -37,19 +38,19 @@ public final class WrappedPacketOutKickDisconnect extends WrappedPacket implemen
     private static Class<?> iChatBaseComponentClass;
     private static Constructor<?> kickDisconnectConstructor;
     private String kickMessage;
-    private boolean isListening;
 
-    public WrappedPacketOutKickDisconnect(final Object packet) {
+
+    public WrappedPacketOutKickDisconnect(final NMSPacket packet) {
         super(packet);
-        isListening = true;
     }
 
     public WrappedPacketOutKickDisconnect(final String kickMessage) {
-        super();
+
         this.kickMessage = kickMessage;
     }
 
-    public static void load() {
+    @Override
+protected void load() {
         Class<?> packetClass = PacketTypeClasses.Play.Server.KICK_DISCONNECT;
         try {
             iChatBaseComponentClass = NMSUtils.getNMSClass("IChatBaseComponent");
@@ -70,7 +71,7 @@ public final class WrappedPacketOutKickDisconnect extends WrappedPacket implemen
      * @return Get Kick Message
      */
     public String getKickMessage() {
-        if (isListening) {
+        if (packet != null) {
             Object iChatBaseComponentObject = readObject(0, iChatBaseComponentClass);
             return WrappedPacketOutChat.toStringFromIChatBaseComponent(iChatBaseComponentObject);
         } else {
@@ -81,7 +82,7 @@ public final class WrappedPacketOutKickDisconnect extends WrappedPacket implemen
     @Override
     public Object asNMSPacket() {
         try {
-            return kickDisconnectConstructor.newInstance(WrappedPacketOutChat.toIChatBaseComponent(WrappedPacketOutChat.fromStringToJSON(kickMessage)));
+            return kickDisconnectConstructor.newInstance(WrappedPacketOutChat.toIChatBaseComponent(WrappedPacketOutChat.fromStringToJSON(getKickMessage())));
         } catch (InstantiationException | InvocationTargetException | IllegalAccessException e) {
             e.printStackTrace();
         }

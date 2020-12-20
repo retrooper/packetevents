@@ -70,21 +70,22 @@ import java.util.List;
 import java.util.Map;
 
 public class WrappedPacket implements WrapperPacketReader, WrapperPacketWriter {
+    private static final Map<Class<? extends WrappedPacket>, Boolean> loadedWrappers = new HashMap<>();
     private static final Map<Class<?>, Map<Class<?>, Field[]>> FIELD_CACHE = new HashMap<>();
     private static final Field[] EMPTY_FIELD_ARRAY = new Field[0];
     public static ServerVersion version;
-    protected Object packet;
+    protected NMSPacket packet;
     private Class<?> packetClass;
 
     public WrappedPacket() {
 
     }
 
-    public WrappedPacket(final Object packet) {
-        this(packet, packet.getClass());
+    public WrappedPacket(final NMSPacket packet) {
+        this(packet, packet.getRawNMSPacket().getClass());
     }
 
-    public WrappedPacket(final Object packet, Class<?> packetClass) {
+    public WrappedPacket(final NMSPacket packet, Class<?> packetClass) {
         if (packetClass.getSuperclass().equals(PacketTypeClasses.Play.Client.FLYING)) {
             packetClass = PacketTypeClasses.Play.Client.FLYING;
         } else if (packetClass.getSuperclass().equals(PacketTypeClasses.Play.Server.ENTITY)) {
@@ -92,56 +93,16 @@ public class WrappedPacket implements WrapperPacketReader, WrapperPacketWriter {
         }
         this.packetClass = packetClass;
         this.packet = packet;
-        setup();
+        if(!loadedWrappers.containsKey(getClass())) {
+            load();
+            loadedWrappers.put(getClass(), true);
+        }
     }
 
-    public static void loadAllWrappers() {
-        //LOGIN SERVER BOUND
-        WrappedPacketLoginInCustomPayload.load();
-
-        //LOGIN CLIENT BOUND
-        WrappedPacketLoginOutCustomPayload.load();
-        WrappedPacketLoginOutSetCompression.load();
-
-        //SERVER BOUND
-        WrappedPacketInBlockDig.load();
-        WrappedPacketInBlockPlace.load();
-        WrappedPacketInClientCommand.load();
-        WrappedPacketInCustomPayload.load();
-        WrappedPacketInEntityAction.load();
-        WrappedPacketInKeepAlive.load();
-        WrappedPacketInSettings.load();
-        WrappedPacketInUseEntity.load();
-        WrappedPacketInUpdateSign.load();
-        WrappedPacketInWindowClick.load();
-        WrappedPacketInAbilities.load();
-
-        //CLIENTBOUND
-        WrappedPacketOutAbilities.load();
-        WrappedPacketOutAnimation.load();
-        WrappedPacketOutChat.load();
-        WrappedPacketOutEntity.load();
-        WrappedPacketOutEntityVelocity.load();
-        WrappedPacketOutEntityTeleport.load();
-        WrappedPacketOutKeepAlive.load();
-        WrappedPacketOutKickDisconnect.load();
-        WrappedPacketOutPosition.load();
-        WrappedPacketOutTransaction.load();
-        WrappedPacketOutUpdateHealth.load();
-        WrappedPacketOutGameStateChange.load();
-        WrappedPacketOutCustomPayload.load();
-        WrappedPacketOutExplosion.load();
-        WrappedPacketOutEntityStatus.load();
-        WrappedPacketOutExperience.load();
-        WrappedPacketOutHeldItemSlot.load();
-        WrappedPacketOutResourcePackSend.load();
-        WrappedPacketOutCloseWindow.load();
-        WrappedPacketOutOpenWindow.load();
-    }
-
-    protected void setup() {
+    protected void load() {
 
     }
+
 
     @Override
     public boolean readBoolean(int index) {
@@ -216,10 +177,11 @@ public class WrappedPacket implements WrapperPacketReader, WrapperPacketWriter {
     @Override
     public String[] readStringArray(int index) {
         String[] array = read(index, String[].class);
-        int length = array.length;
-        String[] copy = new String[length];
-        System.arraycopy(array, 0, copy, 0, length);
-        return copy;
+        return array;
+        //int length = array.length;
+        //String[] copy = new String[length];
+        //System.arraycopy(array, 0, copy, 0, length);
+        //return copy;
     }
 
     @Override
@@ -234,7 +196,7 @@ public class WrappedPacket implements WrapperPacketReader, WrapperPacketWriter {
                 f.setAccessible(true);
             }
             try {
-                return f.get(packet);
+                return f.get(packet.getRawNMSPacket());
             } catch (IllegalAccessException | NullPointerException | ArrayIndexOutOfBoundsException e) {
                 e.printStackTrace();
             }
@@ -251,7 +213,7 @@ public class WrappedPacket implements WrapperPacketReader, WrapperPacketWriter {
     public <T> T read(int index, Class<? extends T> type) {
         Field field = getField(type, index);
         try {
-            return (T) field.get(packet);
+            return (T) field.get(packet.getRawNMSPacket());
         } catch (IllegalAccessException | NullPointerException e) {
             throw new WrapperFieldNotFoundException(packetClass, type, index);
         }
@@ -308,7 +270,7 @@ public class WrappedPacket implements WrapperPacketReader, WrapperPacketWriter {
             throw new WrapperFieldNotFoundException(packetClass, type, index);
         }
         try {
-            field.set(packet, value);
+            field.set(packet.getRawNMSPacket(), value);
         } catch (IllegalAccessException | NullPointerException e) {
             e.printStackTrace();
         }

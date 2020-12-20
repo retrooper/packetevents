@@ -29,6 +29,7 @@ import io.github.retrooper.packetevents.event.PacketListenerDynamic;
 import io.github.retrooper.packetevents.event.eventtypes.CancellableEvent;
 import io.github.retrooper.packetevents.event.eventtypes.NMSPacketEvent;
 import io.github.retrooper.packetevents.packettype.PacketType;
+import io.github.retrooper.packetevents.packetwrappers.NMSPacket;
 import io.github.retrooper.packetevents.utils.netty.channel.ChannelUtils;
 import io.github.retrooper.packetevents.utils.reflection.ClassUtil;
 import org.jetbrains.annotations.NotNull;
@@ -47,16 +48,16 @@ import java.net.InetSocketAddress;
  */
 public class PacketStatusSendEvent extends PacketEvent implements NMSPacketEvent, CancellableEvent {
     private final InetSocketAddress socketAddress;
-    private Object packet;
+    private NMSPacket packet;
     private boolean cancelled;
     private byte packetID = -2;
 
-    public PacketStatusSendEvent(final Object channel, final Object packet) {
+    public PacketStatusSendEvent(final Object channel, final NMSPacket packet) {
         this.socketAddress = ChannelUtils.getSocketAddress(channel);
         this.packet = packet;
     }
 
-    public PacketStatusSendEvent(final InetSocketAddress socketAddress, final Object packet) {
+    public PacketStatusSendEvent(final InetSocketAddress socketAddress, final NMSPacket packet) {
         this.socketAddress = socketAddress;
         this.packet = packet;
     }
@@ -74,19 +75,20 @@ public class PacketStatusSendEvent extends PacketEvent implements NMSPacketEvent
 
 
     @NotNull
+    @Deprecated
     @Override
     public String getPacketName() {
-        return ClassUtil.getClassSimpleName(packet.getClass());
+        return ClassUtil.getClassSimpleName(packet.getRawNMSPacket().getClass());
     }
 
     @NotNull
     @Override
-    public Object getNMSPacket() {
+    public NMSPacket getNMSPacket() {
         return packet;
     }
 
     @Override
-    public void setNMSPacket(Object packet) {
+    public void setNMSPacket(NMSPacket packet) {
         this.packet = packet;
     }
 

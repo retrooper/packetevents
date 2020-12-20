@@ -25,6 +25,7 @@
 package io.github.retrooper.packetevents.packetwrappers.login.out.setcompression;
 
 import io.github.retrooper.packetevents.packettype.PacketTypeClasses;
+import io.github.retrooper.packetevents.packetwrappers.NMSPacket;
 import io.github.retrooper.packetevents.packetwrappers.SendableWrapper;
 import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
 
@@ -36,7 +37,7 @@ public class WrappedPacketLoginOutSetCompression extends WrappedPacket implement
     private static Constructor<?> constructor;
     private int threshold;
 
-    public WrappedPacketLoginOutSetCompression(Object packet) {
+    public WrappedPacketLoginOutSetCompression(NMSPacket packet) {
         super(packet);
     }
 
@@ -44,7 +45,8 @@ public class WrappedPacketLoginOutSetCompression extends WrappedPacket implement
         this.threshold = threshold;
     }
 
-    public static void load() {
+    @Override
+    protected void load() {
         try {
             if (PacketTypeClasses.Login.Server.SET_COMPRESSION != null) {
                 constructor = PacketTypeClasses.Login.Server.SET_COMPRESSION.getConstructor(int.class);

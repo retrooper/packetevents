@@ -24,33 +24,19 @@
 
 package io.github.retrooper.packetevents.packetwrappers.play.out.position;
 
+import io.github.retrooper.packetevents.packetwrappers.NMSPacket;
 import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
 import io.github.retrooper.packetevents.utils.vector.Vector3d;
 
 public final class WrappedPacketOutPosition extends WrappedPacket {
-    private final boolean isListening = true;
     private double x;
     private double y;
     private double z;
     private float yaw;
     private float pitch;
 
-    public WrappedPacketOutPosition(Object packet) {
+    public WrappedPacketOutPosition(NMSPacket packet) {
         super(packet);
-    }
-
-    public static void load() {
-    }
-
-    @Override
-    protected void setup() {
-        //TODO boolean onGround and flags
-        this.x = readDouble(0);
-        this.y = readDouble(1);
-        this.z = readDouble(2);
-
-        this.yaw = readFloat(0);
-        this.pitch = readFloat(1);
     }
 
     /**
@@ -59,7 +45,7 @@ public final class WrappedPacketOutPosition extends WrappedPacket {
      * @return Get X Position
      */
     public double getX() {
-        if (isListening) {
+        if (packet != null) {
             return readDouble(0);
         } else {
             return x;
@@ -72,7 +58,7 @@ public final class WrappedPacketOutPosition extends WrappedPacket {
      * @return Get Y Position
      */
     public double getY() {
-        if (isListening) {
+        if (packet != null) {
             return readDouble(1);
         } else {
             return y;
@@ -85,16 +71,13 @@ public final class WrappedPacketOutPosition extends WrappedPacket {
      * @return Get Z Position
      */
     public double getZ() {
-        if (isListening) {
+        if (packet != null) {
             return readDouble(2);
         } else {
             return z;
         }
     }
 
-    public Vector3d getPosition() {
-        return new Vector3d(getX(), getY(), getZ());
-    }
 
     /**
      * Get the Yaw.
@@ -102,7 +85,7 @@ public final class WrappedPacketOutPosition extends WrappedPacket {
      * @return Get Yaw
      */
     public float getYaw() {
-        if (isListening) {
+        if (packet != null) {
             return readFloat(0);
         } else {
             return yaw;
@@ -115,7 +98,7 @@ public final class WrappedPacketOutPosition extends WrappedPacket {
      * @return Get Pitch
      */
     public float getPitch() {
-        if (isListening) {
+        if (packet != null) {
             return readFloat(1);
         } else {
             return pitch;

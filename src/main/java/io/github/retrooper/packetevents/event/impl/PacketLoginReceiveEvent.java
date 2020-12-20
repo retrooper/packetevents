@@ -30,6 +30,7 @@ import io.github.retrooper.packetevents.event.eventtypes.CallableEvent;
 import io.github.retrooper.packetevents.event.eventtypes.CancellableEvent;
 import io.github.retrooper.packetevents.event.eventtypes.NMSPacketEvent;
 import io.github.retrooper.packetevents.packettype.PacketType;
+import io.github.retrooper.packetevents.packetwrappers.NMSPacket;
 import io.github.retrooper.packetevents.utils.netty.channel.ChannelUtils;
 import io.github.retrooper.packetevents.utils.reflection.ClassUtil;
 import org.jetbrains.annotations.NotNull;
@@ -48,16 +49,16 @@ import java.net.InetSocketAddress;
  */
 public class PacketLoginReceiveEvent extends PacketEvent implements NMSPacketEvent, CancellableEvent, CallableEvent {
     private final InetSocketAddress socketAddress;
-    private Object packet;
+    private NMSPacket packet;
     private boolean cancelled;
     private byte packetID = -2;
 
-    public PacketLoginReceiveEvent(final Object channel, final Object packet) {
+    public PacketLoginReceiveEvent(final Object channel, final NMSPacket packet) {
         this.socketAddress = ChannelUtils.getSocketAddress(channel);
         this.packet = packet;
     }
 
-    public PacketLoginReceiveEvent(final InetSocketAddress socketAddress, final Object packet) {
+    public PacketLoginReceiveEvent(final InetSocketAddress socketAddress, final NMSPacket packet) {
         this.socketAddress = socketAddress;
         this.packet = packet;
     }
@@ -75,19 +76,20 @@ public class PacketLoginReceiveEvent extends PacketEvent implements NMSPacketEve
 
 
     @NotNull
+    @Deprecated
     @Override
     public String getPacketName() {
-        return ClassUtil.getClassSimpleName(packet.getClass());
+        return ClassUtil.getClassSimpleName(packet.getRawNMSPacket().getClass());
     }
 
     @NotNull
     @Override
-    public Object getNMSPacket() {
+    public NMSPacket getNMSPacket() {
         return packet;
     }
 
     @Override
-    public void setNMSPacket(final Object packet) {
+    public void setNMSPacket(final NMSPacket packet) {
         this.packet = packet;
     }
 

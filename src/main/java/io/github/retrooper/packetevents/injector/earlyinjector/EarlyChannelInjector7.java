@@ -26,6 +26,7 @@ package io.github.retrooper.packetevents.injector.earlyinjector;
 
 import io.github.retrooper.packetevents.PacketEvents;
 import io.github.retrooper.packetevents.injector.ChannelInjector;
+import io.github.retrooper.packetevents.packetwrappers.NMSPacket;
 import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
 import io.github.retrooper.packetevents.utils.nms.NMSUtils;
 import net.minecraft.util.io.netty.channel.*;
@@ -36,18 +37,58 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
 
+/**
+ * 1.7.10 Spigot Early channel injector.
+ * This is an early injector {@link EarlyChannelInjector} for 1.7.10 spigot servers.
+ * The netty import on spigot changed since 1.8.
+ * So we needed to make a new class using the older import location to support 1.7.10.
+ * This is why we also commonly use a java {@link Object} class when it comes to netty channels
+ * in some classes to maintain support for both netty imports.
+ *
+ * @author retrooper
+ * @since 1.8
+ */
 class EarlyChannelInjector7 implements ChannelInjector {
+    /**
+     * Bukkit plugin instance that we use to generate a unique netty handler name.
+     */
     private final Plugin plugin;
+
+    /**
+     * Netty minecraft server channels.
+     */
     private final List<Channel> serverChannels = new ArrayList<>();
+
+    /**
+     * First channel initializer.
+     * Used to inject incoming channels.
+     */
     private ChannelInitializer<Channel> firstChannelInitializer;
+
+    /**
+     * Second channel initializer.
+     */
     private ChannelInitializer<Channel> secondChannelInitializer;
+
+    /**
+     * Channel handler.
+     */
     private ChannelInboundHandlerAdapter channelHandler;
+
+    /**
+     * Network managers.
+     */
     private List<Object> networkMarkers;
 
     public EarlyChannelInjector7(final Plugin plugin) {
         this.plugin = plugin;
     }
 
+    /**
+     * Access minecraft's network managers to synchronize against as they interfere with our channel injection.
+     * Initiate the channel initializers and the channel handler.
+     * Access minecraft's server channels and add our own.
+     */
     public void startup() {
         networkMarkers = NMSUtils.getNetworkMarkers();
         firstChannelInitializer = new ChannelInitializer<Channel>() {
@@ -55,20 +96,23 @@ class EarlyChannelInjector7 implements ChannelInjector {
                 protected void initChannel(final Channel channel) {
                     if(networkMarkers != null) {
                         synchronized (networkMarkers) {
-                            channel.eventLoop().execute(new Runnable() {
-                                @Override public void run() {
+                            //channel.eventLoop().execute
+                            PacketEvents.get().injectAndEjectExecutorService.execute(new Runnable() {
+                                @Override
+                                public void run() {
                                     try { injectChannel(channel);
-                                } catch (Exception ex) { channel.disconnect();
+                                    } catch (Exception ex) { channel.disconnect();
                                     }
                                 }
                             });
                         }
                     } else {
-                        channel.eventLoop().execute(new Runnable() {
-                            @Override public void run() {
+                        //channel.eventLoop().execute
+                        PacketEvents.get().injectAndEjectExecutorService.execute(new Runnable() {
+                            @Override
+                            public void run() {
                                 try { injectChannel(channel);
-                                } catch (Exception ex)
-                                { channel.disconnect();
+                                } catch (Exception ex) { channel.disconnect();
                                 }
                             }
                         });
@@ -91,16 +135,23 @@ class EarlyChannelInjector7 implements ChannelInjector {
                 ctx.fireChannelRead(msg);
             }
         };
-        WrappedPacket serverConnectionWrapper = new WrappedPacket(NMSUtils.getMinecraftServerConnection());
-        for (int i = 0; true; i++) {
+
+        //Wrapper for the minecraft server connection.
+        WrappedPacket serverConnectionWrapper = new WrappedPacket(new NMSPacket(NMSUtils.getMinecraftServerConnection()));
+        boolean searching = true;
+        for (int i = 0; searching; i++) {
             try {
+                //Get the list.
                 List<Object> serverChannelList = (List<Object>) serverConnectionWrapper.readObject(i, List.class);
                 for (Object serverChannel : serverChannelList) {
+                    //Is this the server channel list?
                     if (serverChannel instanceof ChannelFuture) {
+                        //Yes it is...
                         Channel channel = ((ChannelFuture) serverChannel).channel();
                         serverChannels.add(channel);
+                        //Add our channel handler to all the server channel pipelines.
                         channel.pipeline().addFirst(channelHandler);
-                        break;
+                        searching = false;
                     }
                 }
             } catch (Exception ex) {
@@ -109,6 +160,9 @@ class EarlyChannelInjector7 implements ChannelInjector {
         }
     }
 
+    /**
+     * Remove our channel handler from all server channel pipelines from the current thread.
+     */
     public void close() {
         for (Channel channel : serverChannels) {
             try {
@@ -119,6 +173,12 @@ class EarlyChannelInjector7 implements ChannelInjector {
         }
     }
 
+    /**
+     * Inject a netty channel to listen to packets.
+     * If already injected, get the channel interceptor.
+     * @param ch Netty channel.
+     * @return {@link PlayerChannelInterceptor}
+     */
     public PlayerChannelInterceptor injectChannel(Object ch) {
         Channel channel = (Channel) ch;
         String handlerName = getNettyHandlerName(plugin);
@@ -130,6 +190,10 @@ class EarlyChannelInjector7 implements ChannelInjector {
         return interceptor;
     }
 
+    /**
+     * Eject a netty channel.
+     * @param ch Netty channel.
+     */
     public void ejectChannel(Object ch) {
         Channel channel = (Channel) ch;
         String handlerName = getNettyHandlerName(plugin);
@@ -138,12 +202,20 @@ class EarlyChannelInjector7 implements ChannelInjector {
         }
     }
 
+    /**
+     * Inject a player on the current thread.
+     * @param player Target player.
+     */
     @Override
     public void injectPlayerSync(Player player) {
         Channel channel = (Channel) PacketEvents.get().packetHandlerInternal.getChannel(player.getName());
         injectChannel(channel).player = player;
     }
 
+    /**
+     * Eject a player on the current thread.
+     * @param player Target player.
+     */
     @Override
     public void ejectPlayerSync(Player player) {
         Channel channel = (Channel) PacketEvents.get().packetHandlerInternal.getChannel(player.getName());
@@ -152,9 +224,13 @@ class EarlyChannelInjector7 implements ChannelInjector {
         PacketEvents.get().getPlayerUtils().tempClientVersionMap.remove(player.getAddress());
     }
 
+    /**
+     * Inject a player on our custom inject and eject (fixed) thread pool (=asynchronously).
+     * @param player Target player.
+     */
     @Override
     public void injectPlayerAsync(Player player) {
-        PacketEvents.get().packetHandlingExecutorService.execute(new Runnable() {
+        PacketEvents.get().injectAndEjectExecutorService.execute(new Runnable() {
             @Override
             public void run() {
                 Channel channel = (Channel) PacketEvents.get().packetHandlerInternal.getChannel(player.getName());
@@ -163,9 +239,13 @@ class EarlyChannelInjector7 implements ChannelInjector {
         });
     }
 
+    /**
+     * Eject a player on our custom inject and eject (fixed) thread pool (=asynchronously).
+     * @param player Target player.
+     */
     @Override
     public void ejectPlayerAsync(Player player) {
-        PacketEvents.get().packetHandlingExecutorService.execute(new Runnable() {
+        PacketEvents.get().injectAndEjectExecutorService.execute(new Runnable() {
             @Override
             public void run() {
                 Channel channel = (Channel) PacketEvents.get().packetHandlerInternal.getChannel(player.getName());
@@ -179,15 +259,36 @@ class EarlyChannelInjector7 implements ChannelInjector {
         });
     }
 
+    /**
+     * Send a raw NMS packet to a netty channel.
+     * @param ch Netty channel.
+     * @param packet Raw NMS Packet.
+     */
     @Override
     public void sendPacket(Object ch, Object packet) {
         Channel channel = (Channel) ch;
         channel.writeAndFlush(packet);
     }
 
+    /**
+     * Player channel interceptor.
+     * @author retrooper
+     * @since 1.8
+     */
     public static class PlayerChannelInterceptor extends ChannelDuplexHandler {
+        /**
+         * Associated player.
+         * This is null until you inject the player.
+         * (We inject the PLAYER by PlayerLoginEvent or PlayerJoinEvent depending on your settings)
+         */
         public volatile Player player;
 
+        /**
+         * Incoming packet interception.
+         * @param ctx Netty channel handler context.
+         * @param packet Raw NMS Packet.
+         * @throws Exception Possible exception.
+         */
         @Override
         public void channelRead(final ChannelHandlerContext ctx, Object packet) throws Exception {
             packet = PacketEvents.get().packetHandlerInternal.read(player, ctx.channel(), packet);
@@ -197,6 +298,13 @@ class EarlyChannelInjector7 implements ChannelInjector {
             }
         }
 
+        /**
+         * Outgoing packet interception.
+         * @param ctx Netty channel handler context.
+         * @param packet Raw NMS Packet
+         * @param promise Netty channel promise.
+         * @throws Exception Possible exception.
+         */
         @Override
         public void write(final ChannelHandlerContext ctx, Object packet, final ChannelPromise promise) throws Exception {
             packet = PacketEvents.get().packetHandlerInternal.write(player, ctx.channel(), packet);

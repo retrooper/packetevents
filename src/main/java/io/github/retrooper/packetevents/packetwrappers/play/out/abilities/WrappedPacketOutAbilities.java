@@ -25,6 +25,7 @@
 package io.github.retrooper.packetevents.packetwrappers.play.out.abilities;
 
 import io.github.retrooper.packetevents.packettype.PacketTypeClasses;
+import io.github.retrooper.packetevents.packetwrappers.NMSPacket;
 import io.github.retrooper.packetevents.packetwrappers.SendableWrapper;
 import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
 
@@ -33,18 +34,15 @@ import java.lang.reflect.InvocationTargetException;
 
 public final class WrappedPacketOutAbilities extends WrappedPacket implements SendableWrapper {
     private static Constructor<?> packetConstructor;
-    private boolean isListening;
     private boolean vulnerable, flying, allowFlight, instantBuild;
     private float flySpeed, walkSpeed;
 
-    public WrappedPacketOutAbilities(final Object packet) {
+    public WrappedPacketOutAbilities(final NMSPacket packet) {
         super(packet);
-        isListening = true;
     }
 
     public WrappedPacketOutAbilities(final boolean isVulnerable, final boolean isFlying, final boolean allowFlight, final boolean canBuildInstantly,
                                      final float flySpeed, final float walkSpeed) {
-        super();
         this.vulnerable = isVulnerable;
         this.flying = isFlying;
         this.allowFlight = allowFlight;
@@ -53,7 +51,8 @@ public final class WrappedPacketOutAbilities extends WrappedPacket implements Se
         this.walkSpeed = walkSpeed;
     }
 
-    public static void load() {
+    @Override
+protected void load() {
         Class<?> packetClass = PacketTypeClasses.Play.Server.ABILITIES;
 
         try {
@@ -69,7 +68,7 @@ public final class WrappedPacketOutAbilities extends WrappedPacket implements Se
      * @return Is Vulnerable
      */
     public boolean isVulnerable() {
-        if (isListening) {
+        if (packet != null) {
             return readBoolean(0);
         } else {
             return vulnerable;
@@ -82,7 +81,7 @@ public final class WrappedPacketOutAbilities extends WrappedPacket implements Se
      * @return Is Flying
      */
     public boolean isFlying() {
-        if (isListening) {
+        if (packet != null) {
             return readBoolean(1);
         } else {
             return flying;
@@ -95,7 +94,7 @@ public final class WrappedPacketOutAbilities extends WrappedPacket implements Se
      * @return Is Allowed To Fly
      */
     public boolean isFlightAllowed() {
-        if (isListening) {
+        if (packet != null) {
             return readBoolean(2);
         } else {
             return allowFlight;
@@ -108,7 +107,7 @@ public final class WrappedPacketOutAbilities extends WrappedPacket implements Se
      * @return Is Allowed To Build Instantly
      */
     public boolean canInstantlyBuild() {
-        if (isListening) {
+        if (packet != null) {
             return readBoolean(3);
         } else {
             return instantBuild;
@@ -121,7 +120,7 @@ public final class WrappedPacketOutAbilities extends WrappedPacket implements Se
      * @return Get Fly Speed
      */
     public float getFlySpeed() {
-        if (isListening) {
+        if (packet != null) {
             return readFloat(0);
         } else {
             return flySpeed;
@@ -134,7 +133,7 @@ public final class WrappedPacketOutAbilities extends WrappedPacket implements Se
      * @return Get Walk Speed
      */
     public float getWalkSpeed() {
-        if (isListening) {
+        if (packet != null) {
             return readFloat(1);
         } else {
             return walkSpeed;
@@ -144,7 +143,7 @@ public final class WrappedPacketOutAbilities extends WrappedPacket implements Se
     @Override
     public Object asNMSPacket() {
         try {
-            return packetConstructor.newInstance(PlayerAbilitiesUtils.getPlayerAbilities(vulnerable, flying, allowFlight, instantBuild, flySpeed, walkSpeed));
+            return packetConstructor.newInstance(PlayerAbilitiesUtils.getPlayerAbilities(isVulnerable(), isFlying(), isFlightAllowed(), canInstantlyBuild(), getFlySpeed(), getWalkSpeed()));
         } catch (InstantiationException | InvocationTargetException | IllegalAccessException e) {
             e.printStackTrace();
         }

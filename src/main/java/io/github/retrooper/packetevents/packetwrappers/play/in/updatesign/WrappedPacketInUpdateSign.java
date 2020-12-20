@@ -25,6 +25,7 @@
 package io.github.retrooper.packetevents.packetwrappers.play.in.updatesign;
 
 import io.github.retrooper.packetevents.packettype.PacketTypeClasses;
+import io.github.retrooper.packetevents.packetwrappers.NMSPacket;
 import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
 import io.github.retrooper.packetevents.packetwrappers.play.out.chat.WrappedPacketOutChat;
 import io.github.retrooper.packetevents.utils.nms.NMSUtils;
@@ -39,11 +40,12 @@ public class WrappedPacketInUpdateSign extends WrappedPacket {
 
     private Object blockPosObj;
 
-    public WrappedPacketInUpdateSign(Object packet) {
+    public WrappedPacketInUpdateSign(NMSPacket packet) {
         super(packet);
     }
 
-    public static void load() {
+    @Override
+protected void load() {
         v_1_7_mode = Reflection.getField(PacketTypeClasses.Play.Client.UPDATE_SIGN, int.class, 0) != null;
         strArrayMode = Reflection.getField(PacketTypeClasses.Play.Client.UPDATE_SIGN, String[].class, 0) != null;
 
@@ -102,10 +104,6 @@ public class WrappedPacketInUpdateSign extends WrappedPacket {
             }
             return -1;
         }
-    }
-
-    public Vector3d getPosition() {
-        return new Vector3d(getX(), getY(), getZ());
     }
 
     public String[] getTextLines() {

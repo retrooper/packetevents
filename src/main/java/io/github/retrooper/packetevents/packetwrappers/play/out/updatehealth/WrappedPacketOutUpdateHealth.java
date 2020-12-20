@@ -25,6 +25,7 @@
 package io.github.retrooper.packetevents.packetwrappers.play.out.updatehealth;
 
 import io.github.retrooper.packetevents.packettype.PacketTypeClasses;
+import io.github.retrooper.packetevents.packetwrappers.NMSPacket;
 import io.github.retrooper.packetevents.packetwrappers.SendableWrapper;
 import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
 
@@ -35,11 +36,10 @@ public final class WrappedPacketOutUpdateHealth extends WrappedPacket implements
     private static Constructor<?> packetConstructor;
     private float health, foodSaturation;
     private int food;
-    private boolean isListening;
 
-    public WrappedPacketOutUpdateHealth(final Object packet) {
+
+    public WrappedPacketOutUpdateHealth(final NMSPacket packet) {
         super(packet);
-        isListening = true;
     }
 
     /**
@@ -50,13 +50,13 @@ public final class WrappedPacketOutUpdateHealth extends WrappedPacket implements
      * @param foodSaturation Seems to vary from 0.0 to 5.0 in integer increments
      */
     public WrappedPacketOutUpdateHealth(final float health, final int food, final float foodSaturation) {
-        super();
         this.health = health;
         this.food = food;
         this.foodSaturation = foodSaturation;
     }
 
-    public static void load() {
+    @Override
+protected void load() {
         Class<?> packetClass = PacketTypeClasses.Play.Server.UPDATE_HEALTH;
 
         try {
@@ -72,7 +72,7 @@ public final class WrappedPacketOutUpdateHealth extends WrappedPacket implements
      * @return Get Health
      */
     public float getHealth() {
-        if (isListening) {
+        if (packet != null) {
             return readFloat(0);
         } else {
             return health;
@@ -85,7 +85,7 @@ public final class WrappedPacketOutUpdateHealth extends WrappedPacket implements
      * @return Get Food Saturation
      */
     public float getFoodSaturation() {
-        if (isListening) {
+        if (packet != null) {
             return readFloat(1);
         } else {
             return foodSaturation;
@@ -98,7 +98,7 @@ public final class WrappedPacketOutUpdateHealth extends WrappedPacket implements
      * @return Get Food
      */
     public int getFood() {
-        if (isListening) {
+        if (packet != null) {
             return readInt(0);
         } else {
             return food;
@@ -108,7 +108,7 @@ public final class WrappedPacketOutUpdateHealth extends WrappedPacket implements
     @Override
     public Object asNMSPacket() {
         try {
-            return packetConstructor.newInstance(health, food, foodSaturation);
+            return packetConstructor.newInstance(getHealth(), getFood(), getFoodSaturation());
         } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
             e.printStackTrace();
         }

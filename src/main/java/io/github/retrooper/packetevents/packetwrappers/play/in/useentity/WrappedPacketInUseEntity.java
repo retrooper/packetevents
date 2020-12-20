@@ -26,6 +26,7 @@ package io.github.retrooper.packetevents.packetwrappers.play.in.useentity;
 
 import io.github.retrooper.packetevents.PacketEvents;
 import io.github.retrooper.packetevents.enums.Hand;
+import io.github.retrooper.packetevents.packetwrappers.NMSPacket;
 import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
 import io.github.retrooper.packetevents.utils.nms.NMSUtils;
 import io.github.retrooper.packetevents.utils.reflection.SubclassUtil;
@@ -41,11 +42,12 @@ public final class WrappedPacketInUseEntity extends WrappedPacket {
     private EntityUseAction action;
     private int entityId = -1;
 
-    public WrappedPacketInUseEntity(final Object packet) {
+    public WrappedPacketInUseEntity(final NMSPacket packet) {
         super(packet);
     }
 
-    public static void load() {
+    @Override
+protected void load() {
         Class<?> useEntityClass = NMSUtils.getNMSClassWithoutException("PacketPlayInUseEntity");
         try {
             enumHandClass = NMSUtils.getNMSClass("EnumHand");
@@ -91,7 +93,7 @@ public final class WrappedPacketInUseEntity extends WrappedPacket {
         if (getAction() == EntityUseAction.INTERACT_AT
                 && PacketEvents.get().getServerUtils().getVersion() != ServerVersion.v_1_7_10) {
             Object vec3DObj = readObject(0, NMSUtils.vec3DClass);
-            WrappedPacket vec3DWrapper = new WrappedPacket(vec3DObj);
+            WrappedPacket vec3DWrapper = new WrappedPacket(new NMSPacket(vec3DObj));
             return new Vector3d(vec3DWrapper.readDouble(0), vec3DWrapper.readDouble(1), vec3DWrapper.readDouble(2));
         }
         return Vector3d.INVALID;

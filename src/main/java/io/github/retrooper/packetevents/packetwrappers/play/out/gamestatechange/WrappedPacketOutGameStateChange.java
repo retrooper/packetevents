@@ -25,6 +25,7 @@
 package io.github.retrooper.packetevents.packetwrappers.play.out.gamestatechange;
 
 import io.github.retrooper.packetevents.packettype.PacketTypeClasses;
+import io.github.retrooper.packetevents.packetwrappers.NMSPacket;
 import io.github.retrooper.packetevents.packetwrappers.SendableWrapper;
 import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
 import io.github.retrooper.packetevents.utils.reflection.Reflection;
@@ -42,11 +43,10 @@ public class WrappedPacketOutGameStateChange extends WrappedPacket implements Se
     private static boolean valueFloatMode;
     private int reason;
     private double value;
-    private boolean isListening = false;
 
-    public WrappedPacketOutGameStateChange(Object packet) {
+
+    public WrappedPacketOutGameStateChange(NMSPacket packet) {
         super(packet);
-        isListening = true;
     }
 
     public WrappedPacketOutGameStateChange(int reason, double value) {
@@ -58,7 +58,8 @@ public class WrappedPacketOutGameStateChange extends WrappedPacket implements Se
         this(reason, (double) value);
     }
 
-    public static void load() {
+    @Override
+protected void load() {
         reasonClassType = SubclassUtil.getSubClass(PacketTypeClasses.Play.Server.GAME_STATE_CHANGE, "a");
         if (reasonClassType != null) {
             try {
@@ -93,7 +94,7 @@ public class WrappedPacketOutGameStateChange extends WrappedPacket implements Se
     }
 
     public int getReason() {
-        if (isListening) {
+        if (packet != null) {
             if (reasonIntMode) {
                 return readInt(0);
             } else {
@@ -112,7 +113,7 @@ public class WrappedPacketOutGameStateChange extends WrappedPacket implements Se
     }
 
     public double getValue() {
-        if (isListening) {
+        if (packet != null) {
             if (valueFloatMode) {
                 return readFloat(0);
             } else {
@@ -128,9 +129,9 @@ public class WrappedPacketOutGameStateChange extends WrappedPacket implements Se
         if (reasonClassType == null) {
             try {
                 if (valueFloatMode) {
-                    return packetConstructor.newInstance(reason, (float) value);
+                    return packetConstructor.newInstance(getReason(), (float) getValue());
                 } else {
-                    return packetConstructor.newInstance(reason, value);
+                    return packetConstructor.newInstance(getReason(), getValue());
                 }
             } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
                 e.printStackTrace();
@@ -138,15 +139,15 @@ public class WrappedPacketOutGameStateChange extends WrappedPacket implements Se
         } else {
             Object reasonObject = null;
             try {
-                reasonObject = reasonClassConstructor.newInstance(reason);
+                reasonObject = reasonClassConstructor.newInstance(getReason());
             } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
                 e.printStackTrace();
             }
             try {
                 if (valueFloatMode) {
-                    return packetConstructor.newInstance(reasonObject, (float) value);
+                    return packetConstructor.newInstance(reasonObject, (float) getValue());
                 } else {
-                    return packetConstructor.newInstance(reasonObject, value);
+                    return packetConstructor.newInstance(reasonObject, getValue());
                 }
             } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
                 e.printStackTrace();

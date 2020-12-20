@@ -24,10 +24,11 @@
 
 package io.github.retrooper.packetevents.packetwrappers.play.in.steervehicle;
 
+import io.github.retrooper.packetevents.packetwrappers.NMSPacket;
 import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
 
 public class WrappedPacketInSteerVehicle extends WrappedPacket {
-    public WrappedPacketInSteerVehicle(Object packet) {
+    public WrappedPacketInSteerVehicle(NMSPacket packet) {
         super(packet);
     }
 

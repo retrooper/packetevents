@@ -25,6 +25,7 @@
 package io.github.retrooper.packetevents.packetwrappers.login.out.custompayload;
 
 import io.github.retrooper.packetevents.packettype.PacketTypeClasses;
+import io.github.retrooper.packetevents.packetwrappers.NMSPacket;
 import io.github.retrooper.packetevents.packetwrappers.SendableWrapper;
 import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
 import io.github.retrooper.packetevents.utils.netty.bytebuf.ByteBufUtil;
@@ -44,11 +45,12 @@ public class WrappedPacketLoginOutCustomPayload extends WrappedPacket implements
     private String channelName;
     private byte[] data;
 
-    public WrappedPacketLoginOutCustomPayload(Object packet) {
+    public WrappedPacketLoginOutCustomPayload(NMSPacket packet) {
         super(packet);
     }
 
-    public static void load() {
+    @Override
+    protected void load() {
         Class<?> packetClass = PacketTypeClasses.Login.Server.CUSTOM_PAYLOAD;
         if (packetClass != null) {
             packetDataSerializerClass = NMSUtils.getNMSClassWithoutException("PacketDataSerializer");
@@ -92,7 +94,7 @@ public class WrappedPacketLoginOutCustomPayload extends WrappedPacket implements
     public String getChannelName() {
         if (packet != null) {
             Object minecraftKey = readObject(0, minecraftKeyClass);
-            WrappedPacket minecraftKeyWrapper = new WrappedPacket(minecraftKey);
+            WrappedPacket minecraftKeyWrapper = new WrappedPacket(new NMSPacket(minecraftKey));
             return minecraftKeyWrapper.readString(1);
         }
         return channelName;
@@ -101,7 +103,7 @@ public class WrappedPacketLoginOutCustomPayload extends WrappedPacket implements
     public byte[] getData() {
         if (packet != null) {
             Object dataSerializer = readObject(0, packetDataSerializerClass);
-            WrappedPacket byteBufWrapper = new WrappedPacket(dataSerializer);
+            WrappedPacket byteBufWrapper = new WrappedPacket(new NMSPacket(dataSerializer));
             Object byteBuf = byteBufWrapper.readObject(0, byteBufClass);
             return ByteBufUtil.getBytes(byteBuf);
         }
@@ -116,7 +118,7 @@ public class WrappedPacketLoginOutCustomPayload extends WrappedPacket implements
             Object dataSerializer = packetDataSerializerConstructor.newInstance(byteBufObject);
 
             Object packetInstance = constructor.newInstance();
-            WrappedPacket packetWrapper = new WrappedPacket(packetInstance);
+            WrappedPacket packetWrapper = new WrappedPacket(new NMSPacket(packetInstance));
             packetWrapper.writeInt(0, messageID);
             packetWrapper.writeObject(0, minecraftKey);
             packetWrapper.writeObject(0, dataSerializer);

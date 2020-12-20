@@ -29,6 +29,7 @@ import io.github.retrooper.packetevents.event.impl.*;
 import io.github.retrooper.packetevents.injector.earlyinjector.EarlyChannelInjector;
 import io.github.retrooper.packetevents.injector.lateinjector.LateChannelInjector;
 import io.github.retrooper.packetevents.packettype.PacketType;
+import io.github.retrooper.packetevents.packetwrappers.NMSPacket;
 import io.github.retrooper.packetevents.packetwrappers.login.in.handshake.WrappedPacketLoginInHandshake;
 import io.github.retrooper.packetevents.packetwrappers.login.in.start.WrappedPacketLoginInStart;
 import io.github.retrooper.packetevents.settings.PacketEventsSettings;
@@ -57,7 +58,6 @@ import java.util.concurrent.ConcurrentHashMap;
  * @since 1.7.9
  */
 public class PacketHandlerInternal {
-    //TODO document all classes below this package ordered alphabetically
     public final EarlyChannelInjector earlyInjector;
     public final LateChannelInjector lateInjector;
     private final boolean earlyInjectMode;
@@ -241,7 +241,7 @@ public class PacketHandlerInternal {
             String simpleClassName = ClassUtil.getClassSimpleName(packet.getClass());
             //Status packet
             if (simpleClassName.startsWith("PacketS")) {
-                final PacketStatusReceiveEvent event = new PacketStatusReceiveEvent(channel, packet);
+                final PacketStatusReceiveEvent event = new PacketStatusReceiveEvent(channel, new NMSPacket(packet));
                 PacketEvents.get().getEventManager().callEvent(event);
                 packet = event.getNMSPacket();
                 interceptStatusReceive(event);
@@ -250,7 +250,7 @@ public class PacketHandlerInternal {
                 }
             } else {
                 //Login packet
-                final PacketLoginReceiveEvent event = new PacketLoginReceiveEvent(channel, packet);
+                final PacketLoginReceiveEvent event = new PacketLoginReceiveEvent(channel, new NMSPacket(packet));
                 PacketEvents.get().getEventManager().callEvent(event);
                 packet = event.getNMSPacket();
                 interceptLoginReceive(event);
@@ -274,7 +274,7 @@ public class PacketHandlerInternal {
                     PacketEvents.get().getEventManager().callEvent(new PostPlayerInjectEvent(player));
                 }
             }
-            final PacketPlayReceiveEvent event = new PacketPlayReceiveEvent(player, channel, packet);
+            final PacketPlayReceiveEvent event = new PacketPlayReceiveEvent(player, channel, new NMSPacket(packet));
             PacketEvents.get().getEventManager().callEvent(event);
             packet = event.getNMSPacket();
             interceptRead(event);
@@ -297,7 +297,7 @@ public class PacketHandlerInternal {
             String simpleClassName = ClassUtil.getClassSimpleName(packet.getClass());
             //Status packet
             if (simpleClassName.startsWith("PacketS")) {
-                final PacketStatusSendEvent event = new PacketStatusSendEvent(channel, packet);
+                final PacketStatusSendEvent event = new PacketStatusSendEvent(channel, new NMSPacket(packet));
                 PacketEvents.get().getEventManager().callEvent(event);
                 packet = event.getNMSPacket();
                 interceptStatusSend(event);
@@ -307,7 +307,7 @@ public class PacketHandlerInternal {
             }
             //Login packet
             else {
-                final PacketLoginSendEvent event = new PacketLoginSendEvent(channel, packet);
+                final PacketLoginSendEvent event = new PacketLoginSendEvent(channel, new NMSPacket(packet));
                 PacketEvents.get().getEventManager().callEvent(event);
                 packet = event.getNMSPacket();
                 interceptLoginSend(event);
@@ -324,7 +324,7 @@ public class PacketHandlerInternal {
                     PacketEvents.get().getEventManager().callEvent(new PostPlayerInjectEvent(player));
                 }
             }
-            final PacketPlaySendEvent event = new PacketPlaySendEvent(player, channel, packet);
+            final PacketPlaySendEvent event = new PacketPlaySendEvent(player, channel, new NMSPacket(packet));
             PacketEvents.get().getEventManager().callEvent(event);
             packet = event.getNMSPacket();
             interceptWrite(event);
@@ -345,7 +345,7 @@ public class PacketHandlerInternal {
     public void postRead(Player player, Object channel, Object packet) {
         if (player != null) {
             //Since player != null check is done, status and login packets won't come passed this point.
-            PostPacketPlayReceiveEvent event = new PostPacketPlayReceiveEvent(player, channel, packet);
+            PostPacketPlayReceiveEvent event = new PostPacketPlayReceiveEvent(player, channel, new NMSPacket(packet));
             PacketEvents.get().getEventManager().callEvent(event);
             interceptPostPlayReceive(event);
         }
@@ -363,7 +363,7 @@ public class PacketHandlerInternal {
     public void postWrite(Player player, Object channel, Object packet) {
         if (player != null) {
             //Since player != null check is done, status and login packets won't come passed this point.
-            PostPacketPlaySendEvent event = new PostPacketPlaySendEvent(player, channel, packet);
+            PostPacketPlaySendEvent event = new PostPacketPlaySendEvent(player, channel, new NMSPacket(packet));
             PacketEvents.get().getEventManager().callEvent(event);
             interceptPostPlaySend(event);
         }

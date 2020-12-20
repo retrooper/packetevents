@@ -24,11 +24,12 @@
 
 package io.github.retrooper.packetevents.packetwrappers.play.in.vehiclemove;
 
+import io.github.retrooper.packetevents.packetwrappers.NMSPacket;
 import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
 import io.github.retrooper.packetevents.utils.vector.Vector3d;
 
 public class WrappedPacketInVehicleMove extends WrappedPacket {
-    public WrappedPacketInVehicleMove(Object packet) {
+    public WrappedPacketInVehicleMove(NMSPacket packet) {
         super(packet);
     }
 
@@ -42,10 +43,6 @@ public class WrappedPacketInVehicleMove extends WrappedPacket {
 
     public double getZ() {
         return readDouble(2);
-    }
-
-    public Vector3d getPosition() {
-        return new Vector3d(getX(), getY(), getZ());
     }
 
     public float getYaw() {

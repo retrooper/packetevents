@@ -25,6 +25,7 @@
 package io.github.retrooper.packetevents.packetwrappers.play.out.transaction;
 
 import io.github.retrooper.packetevents.packettype.PacketTypeClasses;
+import io.github.retrooper.packetevents.packetwrappers.NMSPacket;
 import io.github.retrooper.packetevents.packetwrappers.SendableWrapper;
 import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
 
@@ -33,24 +34,24 @@ import java.lang.reflect.InvocationTargetException;
 
 public class WrappedPacketOutTransaction extends WrappedPacket implements SendableWrapper {
     private static Constructor<?> packetConstructor;
-    private int windowId;
+    private int windowID;
     private short actionNumber;
     private boolean accepted;
-    private boolean isListening = false;
 
-    public WrappedPacketOutTransaction(final Object packet) {
+
+    public WrappedPacketOutTransaction(final NMSPacket packet) {
         super(packet);
-        isListening = true;
+
     }
 
-    public WrappedPacketOutTransaction(final int windowId, final short actionNumber, final boolean accepted) {
-        super();
-        this.windowId = windowId;
+    public WrappedPacketOutTransaction(final int windowID, final short actionNumber, final boolean accepted) {
+        this.windowID = windowID;
         this.actionNumber = actionNumber;
         this.accepted = accepted;
     }
 
-    public static void load() {
+    @Override
+protected void load() {
         Class<?> packetClass = PacketTypeClasses.Play.Server.TRANSACTION;
 
         try {
@@ -66,10 +67,10 @@ public class WrappedPacketOutTransaction extends WrappedPacket implements Sendab
      * @return Get Window ID
      */
     public int getWindowId() {
-        if (isListening) {
+        if (packet != null) {
             return readInt(0);
         } else {
-            return windowId;
+            return windowID;
         }
     }
 
@@ -79,7 +80,7 @@ public class WrappedPacketOutTransaction extends WrappedPacket implements Sendab
      * @return Get Action Number
      */
     public short getActionNumber() {
-        if (isListening) {
+        if (packet != null) {
             return readShort(0);
         } else {
             return actionNumber;
@@ -92,7 +93,7 @@ public class WrappedPacketOutTransaction extends WrappedPacket implements Sendab
      * @return Is Accepted
      */
     public boolean isAccepted() {
-        if (isListening) {
+        if (packet != null) {
             return readBoolean(0);
         } else {
             return accepted;
@@ -102,7 +103,7 @@ public class WrappedPacketOutTransaction extends WrappedPacket implements Sendab
     @Override
     public Object asNMSPacket() {
         try {
-            return packetConstructor.newInstance(windowId, actionNumber, accepted);
+            return packetConstructor.newInstance(getWindowId(), getActionNumber(), isAccepted());
         } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
             e.printStackTrace();
         }

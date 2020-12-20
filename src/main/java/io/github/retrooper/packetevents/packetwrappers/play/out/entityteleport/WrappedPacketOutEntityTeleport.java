@@ -25,6 +25,7 @@
 package io.github.retrooper.packetevents.packetwrappers.play.out.entityteleport;
 
 import io.github.retrooper.packetevents.packettype.PacketTypeClasses;
+import io.github.retrooper.packetevents.packetwrappers.NMSPacket;
 import io.github.retrooper.packetevents.packetwrappers.SendableWrapper;
 import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
 import io.github.retrooper.packetevents.utils.nms.NMSUtils;
@@ -47,7 +48,7 @@ public class WrappedPacketOutEntityTeleport extends WrappedPacket implements Sen
     private float yaw, pitch;
     private boolean onGround;
 
-    public WrappedPacketOutEntityTeleport(Object packet) {
+    public WrappedPacketOutEntityTeleport(NMSPacket packet) {
         super(packet);
         listeningMode = true;
     }
@@ -66,7 +67,8 @@ public class WrappedPacketOutEntityTeleport extends WrappedPacket implements Sen
         this.onGround = onGround;
     }
 
-    public static void load() {
+    @Override
+protected void load() {
         Class<?> packetClass = PacketTypeClasses.Play.Server.ENTITY_TELEPORT;
         try {
             constructor = packetClass.getConstructor(int.class, int.class, int.class, int.class, byte.class, byte.class, boolean.class, boolean.class);
@@ -146,9 +148,6 @@ public class WrappedPacketOutEntityTeleport extends WrappedPacket implements Sen
         }
     }
 
-    public Vector3d getPosition() {
-        return new Vector3d(getX(), getY(), getZ());
-    }
 
     public float getYaw() {
         if (!listeningMode) {
@@ -193,7 +192,7 @@ public class WrappedPacketOutEntityTeleport extends WrappedPacket implements Sen
                 e.printStackTrace();
             }
 
-            WrappedPacket instanceWrapper = new WrappedPacket(instance);
+            WrappedPacket instanceWrapper = new WrappedPacket(new NMSPacket(instance));
             instanceWrapper.writeInt(0, entityID);
             instanceWrapper.writeDouble(0, x);
             instanceWrapper.writeDouble(1, y);

@@ -24,10 +24,11 @@
 
 package io.github.retrooper.packetevents.packetwrappers.play.in.helditemslot;
 
+import io.github.retrooper.packetevents.packetwrappers.NMSPacket;
 import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
 
 public final class WrappedPacketInHeldItemSlot extends WrappedPacket {
-    public WrappedPacketInHeldItemSlot(Object packet) {
+    public WrappedPacketInHeldItemSlot(NMSPacket packet) {
         super(packet);
     }
 

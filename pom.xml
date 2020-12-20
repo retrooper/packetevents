@@ -138,13 +138,6 @@
         </dependency>
 
         <dependency>
-            <groupId>com.comphenix.protocol</groupId>
-            <artifactId>ProtocolLib</artifactId>
-            <version>4.5.0</version>
-            <scope>provided</scope>
-        </dependency>
-
-        <dependency>
             <groupId>us.myles</groupId>
             <artifactId>viaversion</artifactId>
             <version>3.2.0</version>

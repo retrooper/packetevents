@@ -24,33 +24,37 @@
 
 package io.github.retrooper.packetevents.packetwrappers.play.out.abilities;
 
+import io.github.retrooper.packetevents.packetwrappers.NMSPacket;
 import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
 import io.github.retrooper.packetevents.utils.nms.NMSUtils;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
+import java.util.Objects;
 
 final class PlayerAbilitiesUtils {
     public static Class<?> playerAbilitiesClass;
     public static Constructor<?> playerAbilitiesConstructor;
 
-    static {
-        try {
-            playerAbilitiesClass = NMSUtils.getNMSClass("PlayerAbilities");
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
-        }
-        try {
-            playerAbilitiesConstructor = playerAbilitiesClass.getConstructor();
-        } catch (NoSuchMethodException e) {
-            e.printStackTrace();
-        }
-    }
-
     public static Object getPlayerAbilities(final boolean isVulnerable, final boolean isFlying, final boolean allowFlight, final boolean canBuildInstantly,
                                             final float flySpeed, final float walkSpeed) throws IllegalAccessException, InvocationTargetException, InstantiationException {
-        final Object instance = playerAbilitiesConstructor.newInstance();
-        WrappedPacket wrapper = new WrappedPacket(instance);
+
+        if(playerAbilitiesClass == null) {
+            try {
+                playerAbilitiesClass = NMSUtils.getNMSClass("PlayerAbilities");
+            } catch (ClassNotFoundException e) {
+                e.printStackTrace();
+            }
+        }
+        if(playerAbilitiesConstructor == null && playerAbilitiesClass != null) {
+            try {
+                playerAbilitiesConstructor = playerAbilitiesClass.getConstructor();
+            } catch (NoSuchMethodException e) {
+                e.printStackTrace();
+            }
+        }
+        final Object instance = Objects.requireNonNull(playerAbilitiesConstructor).newInstance();
+        WrappedPacket wrapper = new WrappedPacket(new NMSPacket(instance));
         wrapper.writeBoolean(0, isVulnerable);
         wrapper.writeBoolean(1, isFlying);
         wrapper.writeBoolean(2, allowFlight);

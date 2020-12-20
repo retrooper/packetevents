@@ -29,6 +29,12 @@ import io.github.retrooper.packetevents.injector.lateinjector.LateChannelInjecto
 import java.util.UUID;
 
 public class GameProfileUtil {
+    /**
+     * Create a new game profile with the specified arguments.
+     * @param uuid Player UUID.
+     * @param username Player username.
+     * @return Mojang Game Profile Object.
+     */
     public static Object getGameProfile(UUID uuid, String username) {
         if (LateChannelInjector.v1_7_nettyMode) {
             return GameProfileUtil_7.getGameProfile(uuid, username);
@@ -37,6 +43,11 @@ public class GameProfileUtil {
         }
     }
 
+    /**
+     * Create a wrapper over a Mojang Game Profile.
+     * @param gameProfile Mojang Game Profile.
+     * @return {@link WrappedGameProfile}
+     */
     public static WrappedGameProfile getWrappedGameProfile(Object gameProfile) {
         if (LateChannelInjector.v1_7_nettyMode) {
             return GameProfileUtil_7.getWrappedGameProfile(gameProfile);

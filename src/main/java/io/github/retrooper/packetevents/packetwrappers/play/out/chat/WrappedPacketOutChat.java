@@ -25,6 +25,7 @@
 package io.github.retrooper.packetevents.packetwrappers.play.out.chat;
 
 import io.github.retrooper.packetevents.packettype.PacketTypeClasses;
+import io.github.retrooper.packetevents.packetwrappers.NMSPacket;
 import io.github.retrooper.packetevents.packetwrappers.SendableWrapper;
 import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
 import io.github.retrooper.packetevents.utils.nms.NMSUtils;
@@ -49,22 +50,12 @@ public final class WrappedPacketOutChat extends WrappedPacket implements Sendabl
     //2 = IChatBaseComponent, ChatMessageType
     //3 = IChatBaseComponent, ChatMessageType, UUID
     private static byte constructorMode;
-    //0 = Byte
-    //1 = Byte, Boolean
-    private static byte chatTypeMessageEnumConstructorMode;
     private String message;
     private ChatPosition chatPosition;
     private UUID uuid;
-    private boolean isListening = false;
 
-    @Deprecated
-    public WrappedPacketOutChat(String message) {
-        this(message, null, false);
-    }
-
-    public WrappedPacketOutChat(final Object packet) {
+    public WrappedPacketOutChat(final NMSPacket packet) {
         super(packet);
-        isListening = true;
     }
 
     public WrappedPacketOutChat(String message, UUID uuid, boolean isJson) {
@@ -77,7 +68,8 @@ public final class WrappedPacketOutChat extends WrappedPacket implements Sendabl
         this.chatPosition = chatPosition;
     }
 
-    public static void load() {
+    @Override
+    protected void load() {
         try {
             packetClass = PacketTypeClasses.Play.Server.CHAT;
             iChatBaseComponentClass = NMSUtils.getNMSClass("IChatBaseComponent");
@@ -171,48 +163,40 @@ public final class WrappedPacketOutChat extends WrappedPacket implements Sendabl
 
     @Override
     public Object asNMSPacket() {
-        int integerChatPos = cachedChatPositions.get(chatPosition);
+        int integerChatPos = cachedChatPositions.get(getChatPosition());
         Object chatMessageTypeInstance = null;
         if (chatMessageTypeEnum != null) {
-            if (chatTypeMessageEnumConstructorMode == 0) {
                 try {
                     chatMessageTypeInstance = chatMessageTypeCreatorMethod.invoke(null, (byte) integerChatPos);
                 } catch (IllegalAccessException | InvocationTargetException e) {
                     e.printStackTrace();
                 }
-            } else if (chatTypeMessageEnumConstructorMode == 1) {
-                try {
-                    chatMessageTypeInstance = chatMessageTypeCreatorMethod.invoke(null, (byte) integerChatPos);
-                } catch (IllegalAccessException | InvocationTargetException e) {
-                    e.printStackTrace();
-                }
-            }
         }
         switch (constructorMode) {
             case 0:
                 try {
-                    return chatClassConstructor.newInstance(toIChatBaseComponent(this.message), (byte) integerChatPos);
+                    return chatClassConstructor.newInstance(toIChatBaseComponent(getMessage()), (byte) integerChatPos);
                 } catch (InstantiationException | InvocationTargetException | IllegalAccessException e) {
                     e.printStackTrace();
                 }
                 break;
             case 1:
                 try {
-                    return chatClassConstructor.newInstance(toIChatBaseComponent(this.message), integerChatPos);
+                    return chatClassConstructor.newInstance(toIChatBaseComponent(getMessage()), integerChatPos);
                 } catch (InstantiationException | InvocationTargetException | IllegalAccessException e) {
                     e.printStackTrace();
                 }
                 break;
             case 2:
                 try {
-                    return chatClassConstructor.newInstance(toIChatBaseComponent(this.message), chatMessageTypeInstance);
+                    return chatClassConstructor.newInstance(toIChatBaseComponent(getMessage()), chatMessageTypeInstance);
                 } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
                     e.printStackTrace();
                 }
                 break;
             case 3:
                 try {
-                    return chatClassConstructor.newInstance(toIChatBaseComponent(this.message), chatMessageTypeInstance, uuid);
+                    return chatClassConstructor.newInstance(toIChatBaseComponent(getMessage()), chatMessageTypeInstance, uuid);
                 } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
                     e.printStackTrace();
                 }
@@ -227,7 +211,7 @@ public final class WrappedPacketOutChat extends WrappedPacket implements Sendabl
      * @return Get String Message
      */
     public String getMessage() {
-        if (isListening) {
+        if (packet != null) {
             final Object iChatBaseObj = readObject(0, iChatBaseComponentClass);
 
             try {
@@ -251,7 +235,7 @@ public final class WrappedPacketOutChat extends WrappedPacket implements Sendabl
      * @return ChatPosition
      */
     public ChatPosition getChatPosition() {
-        if (isListening) {
+        if (packet != null) {
             byte chatPosInteger = 0;
             switch (constructorMode) {
                 case 0:

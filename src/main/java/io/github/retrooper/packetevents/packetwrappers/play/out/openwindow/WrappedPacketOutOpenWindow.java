@@ -25,6 +25,7 @@
 package io.github.retrooper.packetevents.packetwrappers.play.out.openwindow;
 
 import io.github.retrooper.packetevents.packettype.PacketTypeClasses;
+import io.github.retrooper.packetevents.packetwrappers.NMSPacket;
 import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
 import io.github.retrooper.packetevents.packetwrappers.play.out.chat.WrappedPacketOutChat;
 import io.github.retrooper.packetevents.utils.nms.NMSUtils;
@@ -37,7 +38,7 @@ public class WrappedPacketOutOpenWindow extends WrappedPacket {
     private int windowSize;
     private String windowTitle;
 
-    public WrappedPacketOutOpenWindow(Object packet) {
+    public WrappedPacketOutOpenWindow(NMSPacket packet) {
         super(packet);
     }
 
@@ -47,7 +48,8 @@ public class WrappedPacketOutOpenWindow extends WrappedPacket {
         this.windowTitle = windowTitle;
     }
 
-    public static void load() {
+    @Override
+protected void load() {
         //Older versions (like 1.13.2 and lower) contain a String,
         legacyMode = Reflection.getField(PacketTypeClasses.Play.Server.OPEN_WINDOW, String.class, 0) != null;
         //1.7.10

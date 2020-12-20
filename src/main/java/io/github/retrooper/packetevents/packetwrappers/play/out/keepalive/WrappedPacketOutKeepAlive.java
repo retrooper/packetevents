@@ -25,6 +25,7 @@
 package io.github.retrooper.packetevents.packetwrappers.play.out.keepalive;
 
 import io.github.retrooper.packetevents.packettype.PacketTypeClasses;
+import io.github.retrooper.packetevents.packetwrappers.NMSPacket;
 import io.github.retrooper.packetevents.packetwrappers.SendableWrapper;
 import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
 import io.github.retrooper.packetevents.utils.reflection.Reflection;
@@ -36,18 +37,18 @@ public class WrappedPacketOutKeepAlive extends WrappedPacket implements Sendable
     private static Constructor<?> keepAliveConstructor;
     private static boolean integerMode;
     private long id;
-    private boolean isListening;
 
-    public WrappedPacketOutKeepAlive(Object packet) {
+
+    public WrappedPacketOutKeepAlive(NMSPacket packet) {
         super(packet);
-        isListening = true;
     }
 
     public WrappedPacketOutKeepAlive(long id) {
         this.id = id;
     }
 
-    public static void load() {
+    @Override
+protected void load() {
         Class<?> packetClass = PacketTypeClasses.Play.Server.KEEP_ALIVE;
         integerMode = Reflection.getField(packetClass, int.class, 0) != null;
 
@@ -75,7 +76,7 @@ public class WrappedPacketOutKeepAlive extends WrappedPacket implements Sendable
      * @return Get Keep Alive ID
      */
     public long getId() {
-        if (isListening) {
+        if (packet != null) {
             if (integerMode) {
                 return readInt(0);
             } else {
@@ -90,13 +91,13 @@ public class WrappedPacketOutKeepAlive extends WrappedPacket implements Sendable
     public Object asNMSPacket() {
         if (integerMode) {
             try {
-                return keepAliveConstructor.newInstance((int)id);
+                return keepAliveConstructor.newInstance((int)getId());
             } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
                 e.printStackTrace();
             }
         } else {
             try {
-                return keepAliveConstructor.newInstance((long)id);
+                return keepAliveConstructor.newInstance((long)getId());
             } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
                 e.printStackTrace();
             }

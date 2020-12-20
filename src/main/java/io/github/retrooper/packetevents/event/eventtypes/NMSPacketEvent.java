@@ -25,6 +25,8 @@
 package io.github.retrooper.packetevents.event.eventtypes;
 
 import io.github.retrooper.packetevents.packettype.PacketType;
+import io.github.retrooper.packetevents.packetwrappers.NMSPacket;
+import org.jetbrains.annotations.NotNull;
 
 import java.net.InetSocketAddress;
 
@@ -47,19 +49,20 @@ public interface NMSPacketEvent {
      * You would only need the packet name if packet type system doesn't contain your desired packet yet.
      * @return Name of the packet.
      */
+    @Deprecated
     String getPacketName();
 
     /**
      * Get the NMS packet.
      * @return Get NMS packet.
      */
-    Object getNMSPacket();
+    NMSPacket getNMSPacket();
 
     /**
      * Update the NMS Packet.
      * @param packet NMS Object
      */
-    void setNMSPacket(final Object packet);
+    void setNMSPacket(final NMSPacket packet);
 
     /**
      * Get the Packet ID.

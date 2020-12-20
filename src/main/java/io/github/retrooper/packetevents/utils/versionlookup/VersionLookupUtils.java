@@ -24,7 +24,6 @@
 
 package io.github.retrooper.packetevents.utils.versionlookup;
 
-import io.github.retrooper.packetevents.utils.versionlookup.protocollib.ProtocolLibVersionLookupUtils;
 import io.github.retrooper.packetevents.utils.versionlookup.protocolsupport.ProtocolSupportVersionLookupUtils;
 import io.github.retrooper.packetevents.utils.versionlookup.viaversion.ViaVersionLookupUtils;
 import org.bukkit.entity.Player;
@@ -32,7 +31,6 @@ import org.bukkit.entity.Player;
 public class VersionLookupUtils {
     public static boolean isDependencyAvailable() {
         return ViaVersionLookupUtils.isAvailable()
-                || ProtocolLibVersionLookupUtils.isAvailable()
                 || ProtocolSupportVersionLookupUtils.isAvailable();
     }
 
@@ -41,8 +39,6 @@ public class VersionLookupUtils {
             return ViaVersionLookupUtils.getProtocolVersion(player);
         } else if (ProtocolSupportVersionLookupUtils.isAvailable()) {
             return ProtocolSupportVersionLookupUtils.getProtocolVersion(player);
-        } else if (ProtocolLibVersionLookupUtils.isAvailable()) {
-            return ProtocolLibVersionLookupUtils.getProtocolVersion(player);
         }
         return -1;
     }

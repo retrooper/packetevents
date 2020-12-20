@@ -25,6 +25,7 @@
 package io.github.retrooper.packetevents.packetwrappers.play.out.entityvelocity;
 
 import io.github.retrooper.packetevents.packettype.PacketTypeClasses;
+import io.github.retrooper.packetevents.packetwrappers.NMSPacket;
 import io.github.retrooper.packetevents.packetwrappers.SendableWrapper;
 import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
 import io.github.retrooper.packetevents.utils.nms.NMSUtils;
@@ -37,16 +38,14 @@ import java.lang.reflect.InvocationTargetException;
 
 public final class WrappedPacketOutEntityVelocity extends WrappedPacket implements SendableWrapper {
     private static Constructor<?> velocityConstructor, vec3dConstructor;
-    private static Class<?> vec3dClass;
     private static boolean isVec3dPresent;
     private int entityID = -1;
     private double velocityX, velocityY, velocityZ;
     private Entity entity;
-    private boolean isListening;
 
-    public WrappedPacketOutEntityVelocity(final Object packet) {
+
+    public WrappedPacketOutEntityVelocity(final NMSPacket packet) {
         super(packet);
-        isListening = true;
     }
 
     public WrappedPacketOutEntityVelocity(final Entity entity, final double velocityX, final double velocityY, final double velocityZ) {
@@ -69,25 +68,18 @@ public final class WrappedPacketOutEntityVelocity extends WrappedPacket implemen
      * 1.7.10 -&gt; 1.13.2 use int, double, double, double style,
      * 1.14+ use int, Vec3D style
      */
-    public static void load() {
+    @Override
+protected void load() {
         Class<?> velocityClass = PacketTypeClasses.Play.Server.ENTITY_VELOCITY;
-        if (version.isHigherThan(ServerVersion.v_1_13_2)) {
-            try {
-                vec3dClass = NMSUtils.getNMSClass("Vec3D");
-            } catch (ClassNotFoundException e) {
-                e.printStackTrace();
-            }
-        }
-
         try {
             velocityConstructor = velocityClass.getConstructor(int.class, double.class, double.class, double.class);
         } catch (NoSuchMethodException e) {
             //That is fine, just a newer version
             try {
-                velocityConstructor = velocityClass.getConstructor(int.class, vec3dClass);
+                velocityConstructor = velocityClass.getConstructor(int.class, NMSUtils.vec3DClass);
                 isVec3dPresent = true;
                 //vec3d constructor
-                vec3dConstructor = vec3dClass.getConstructor(double.class, double.class, double.class);
+                vec3dConstructor = NMSUtils.vec3DClass.getConstructor(double.class, double.class, double.class);
             } catch (NoSuchMethodException e2) {
                 e2.printStackTrace();
             }
@@ -127,7 +119,7 @@ public final class WrappedPacketOutEntityVelocity extends WrappedPacket implemen
      * @return Get Velocity X
      */
     public double getVelocityX() {
-        if (isListening) {
+        if (packet != null) {
             return readInt(1) / 8000.0D;
         } else {
             return velocityX;
@@ -140,7 +132,7 @@ public final class WrappedPacketOutEntityVelocity extends WrappedPacket implemen
      * @return Get Velocity Y
      */
     public double getVelocityY() {
-        if (isListening) {
+        if (packet != null) {
             return readInt(2) / 8000.0D;
         } else {
             return velocityY;
@@ -153,28 +145,24 @@ public final class WrappedPacketOutEntityVelocity extends WrappedPacket implemen
      * @return Get Velocity Z
      */
     public double getVelocityZ() {
-        if (isListening) {
+        if (packet != null) {
             return readInt(3) / 8000.0D;
         } else {
             return velocityZ;
         }
     }
 
-    public Vector3d getVelocity() {
-        return new Vector3d(getVelocityX(), getVelocityY(), getVelocityZ());
-    }
-
     @Override
     public Object asNMSPacket() {
         if (!isVec3dPresent) {
             try {
-                return velocityConstructor.newInstance(entityID, velocityX, velocityY, velocityZ);
+                return velocityConstructor.newInstance(getEntityId(), getVelocityX(), getVelocityY(), getVelocityZ());
             } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
                 e.printStackTrace();
             }
         } else {
             try {
-                return velocityConstructor.newInstance(entityID, vec3dConstructor.newInstance(velocityX, velocityY, velocityZ));
+                return velocityConstructor.newInstance(entityID, vec3dConstructor.newInstance(getVelocityX(), getVelocityY(), getVelocityZ()));
             } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
                 e.printStackTrace();
             }

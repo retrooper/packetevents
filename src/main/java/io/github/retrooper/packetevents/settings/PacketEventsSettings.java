@@ -26,21 +26,78 @@ package io.github.retrooper.packetevents.settings;
 
 import io.github.retrooper.packetevents.utils.server.ServerVersion;
 
+/**
+ * Packet Events' settings.
+ *
+ * @author retrooper
+ * @since 1.5.8
+ */
 public class PacketEventsSettings {
+    /**
+     * This boolean stores whether the settings class is locked.
+     * Is this boolean is set to true, any of the setters won't work.
+     * This setting is locked when initializing PacketEvents.
+     */
     private boolean locked = false;
+
+    /**
+     * This is the server version PacketEvents should use when detecting
+     * the server version fails using the Bukkit API.
+     * For some reason, this usually the case on 1.7.10 spigot forks.
+     * They probably mess up somewhere.
+     */
     private ServerVersion backupServerVersion = ServerVersion.v_1_7_10;
+
+    /**
+     * This boolean stores if PacketEvents should inject a player asynchronously.
+     */
     private boolean injectAsync = true;
+
+    /**
+     * This boolean stores if PacketEvents should eject a player asynchronously.
+     */
     private boolean ejectAsync = true;
+
+    /**
+     * This boolean stores if PacketEvents should check for updates,
+     * and give you a notice in the console.
+     */
     private boolean checkForUpdates = true;
+
+    /**
+     * This boolean stores if PacketEvents should inject a player earlier using the {@code EarlyChannelInjector}.
+     * Allowing us to listen to the LOGIN and STATUS packets and detect client version independently.
+     * @see io.github.retrooper.packetevents.injector.earlyinjector.EarlyChannelInjector
+     */
     private boolean injectEarly = true;
-    private int packetHandlingThreadCount = 1;
+
+    /**
+     * This int stores how many threads should use to inject and eject a player.
+     * The same threads are used to inject the netty channel!
+     */
+    private int injectEjectThreadCount = 1;
+
+    /**
+     * What should the kick message be when PacketEvents fails to inject a player and kicks them.
+     */
     private String injectionFailureMessage = "We were unable to inject you. Please try again!";
 
+    /**
+     * This method locks the settings.
+     * Sets the {@link #locked} field to true.
+     * @return This instance.
+     */
     public PacketEventsSettings lock() {
         this.locked = true;
         return this;
     }
 
+    /**
+     * Setter for the {@link #backupServerVersion} field.
+     * Only succeeds if the settings class isn't locked.
+     * @param serverVersion Server Version
+     * @return This instance.
+     */
     public PacketEventsSettings backupServerVersion(ServerVersion serverVersion) {
         if (!locked) {
             this.backupServerVersion = serverVersion;
@@ -48,7 +105,12 @@ public class PacketEventsSettings {
         return this;
     }
 
-
+    /**
+     * Setter for the {@link #injectAsync} field.
+     * Only succeeds if the settings class isn't locked.
+     * @param injectAsync Player injection async?
+     * @return This instance.
+     */
     public PacketEventsSettings injectAsync(boolean injectAsync) {
         if (!locked) {
             this.injectAsync = injectAsync;
@@ -56,6 +118,12 @@ public class PacketEventsSettings {
         return this;
     }
 
+    /**
+     * Setter for the {@link #ejectAsync} field.
+     * Only succeeds if the settings class isn't locked.
+     * @param ejectAsync Player and netty channel ejection async?
+     * @return This instance.
+     */
     public PacketEventsSettings ejectAsync(boolean ejectAsync) {
         if (!locked) {
             this.ejectAsync = ejectAsync;
@@ -63,6 +131,12 @@ public class PacketEventsSettings {
         return this;
     }
 
+    /**
+     * Setter for the {@link #checkForUpdates} field.
+     * Only succeeds if the settings class isn't locked.
+     * @param checkForUpdates Should we check for updates?
+     * @return This instance.
+     */
     public PacketEventsSettings checkForUpdates(boolean checkForUpdates) {
         if (!locked) {
             this.checkForUpdates = checkForUpdates;
@@ -70,7 +144,12 @@ public class PacketEventsSettings {
         return this;
     }
 
-
+    /**
+     * Setter for the {@link #injectEarly} field.
+     * Only succeeds if the settings class isn't locked.
+     * @param injectEarly Use the {@link io.github.retrooper.packetevents.injector.earlyinjector.EarlyChannelInjector}?
+     * @return This instance.
+     */
     public PacketEventsSettings injectEarly(boolean injectEarly) {
         if (!locked) {
             this.injectEarly = injectEarly;
@@ -78,13 +157,31 @@ public class PacketEventsSettings {
         return this;
     }
 
-    public PacketEventsSettings packetHandlingThreadCount(int threadCount) {
-        if (!locked) {
-            this.packetHandlingThreadCount = threadCount;
+    /**
+     * Setter for the {@link #injectEjectThreadCount} field.
+     * Only succeeds if the settings class isn't locked.
+     * @param threadCount How many threads?
+     * @return This instance.
+     */
+    public PacketEventsSettings injectAndEjectThreadCount(int threadCount) {
+        if(!locked) {
+            this.injectEjectThreadCount = threadCount;
         }
         return this;
     }
 
+    @Deprecated
+    public PacketEventsSettings packetHandlingThreadCount(int threadCount) {
+        //Nothing... unsupported, might be removed
+        return this;
+    }
+
+    /**
+     * Setter for the {@link #injectionFailureMessage} field.
+     * Only succeeds if the settings class isn't locked.
+     * @param message Kick message for an injection failure.
+     * @return This instance.
+     */
     public PacketEventsSettings injectionFailureMessage(String message) {
         if (!locked) {
             this.injectionFailureMessage = message;
@@ -92,30 +189,59 @@ public class PacketEventsSettings {
         return this;
     }
 
+    /**
+     * Is the settings class locked?
+     * @return Getter for {@link #locked}
+     */
+    public boolean isLocked() {
+        return locked;
+    }
+
+    /**
+     * Getter for {@link #backupServerVersion}
+     */
     public ServerVersion getBackupServerVersion() {
         return backupServerVersion;
     }
 
+    /**
+     * Getter for {@link #injectAsync}
+     */
     public boolean shouldInjectAsync() {
         return injectAsync;
     }
 
+    /**
+     * Getter for {@link #ejectAsync}
+     */
     public boolean shouldEjectAsync() {
         return ejectAsync;
     }
 
+    /**
+     * Getter for {@link #checkForUpdates}
+     */
     public boolean shouldCheckForUpdates() {
         return checkForUpdates;
     }
 
+    /**
+     * Getter for {@link #injectEarly}
+     */
     public boolean shouldInjectEarly() {
         return injectEarly;
     }
 
-    public int getPacketHandlingThreadCount() {
-        return packetHandlingThreadCount;
+    /**
+     * Getter for {@link #injectEjectThreadCount}
+     */
+    public int getInjectAndEjectThreadCount() {
+        return injectEjectThreadCount;
     }
 
+    /**
+     * Getter for {@link #injectionFailureMessage}
+     */
     public String getInjectionFailureMessage() {
         return injectionFailureMessage;
     }

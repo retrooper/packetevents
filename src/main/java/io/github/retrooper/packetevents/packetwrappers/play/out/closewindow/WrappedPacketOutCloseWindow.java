@@ -25,6 +25,7 @@
 package io.github.retrooper.packetevents.packetwrappers.play.out.closewindow;
 
 import io.github.retrooper.packetevents.packettype.PacketTypeClasses;
+import io.github.retrooper.packetevents.packetwrappers.NMSPacket;
 import io.github.retrooper.packetevents.packetwrappers.SendableWrapper;
 import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
 
@@ -35,7 +36,8 @@ public class WrappedPacketOutCloseWindow extends WrappedPacket implements Sendab
     private int windowID;
 
     private static Constructor<?> constructor;
-    public static void load() {
+    @Override
+protected void load() {
         try {
             constructor = PacketTypeClasses.Play.Server.CLOSE_WINDOW.getConstructor(int.class);
         } catch (NoSuchMethodException e) {
@@ -43,7 +45,7 @@ public class WrappedPacketOutCloseWindow extends WrappedPacket implements Sendab
         }
     }
 
-    public WrappedPacketOutCloseWindow(Object packet) {
+    public WrappedPacketOutCloseWindow(NMSPacket packet) {
         super(packet);
     }
 
@@ -61,7 +63,7 @@ public class WrappedPacketOutCloseWindow extends WrappedPacket implements Sendab
     @Override
     public Object asNMSPacket() {
         try {
-            return constructor.newInstance(windowID);
+            return constructor.newInstance(getWindowId());
         } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
             e.printStackTrace();
         }

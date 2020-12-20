@@ -24,10 +24,11 @@
 
 package io.github.retrooper.packetevents.packetwrappers.play.in.tabcomplete;
 
+import io.github.retrooper.packetevents.packetwrappers.NMSPacket;
 import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
 
 public class WrappedPacketInTabComplete extends WrappedPacket {
-    public WrappedPacketInTabComplete(Object packet) {
+    public WrappedPacketInTabComplete(NMSPacket packet) {
         super(packet);
     }
 

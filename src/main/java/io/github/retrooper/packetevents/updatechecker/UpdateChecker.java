@@ -35,37 +35,58 @@ import java.io.InputStreamReader;
 import java.net.URL;
 import java.net.URLConnection;
 
+/**
+ * PacketEvents update checker.
+ * @author retrooper
+ * @since 1.6.9
+ */
 public class UpdateChecker {
+    /**
+     * Check for an update and log in the console.
+     */
     public void handleUpdate() {
         PEVersion localVersion = PacketEvents.get().getVersion();
-        inform("[PacketEvents] Checking for an update, please wait...");
+        inform("[packetevents] Checking for an update, please wait...");
         String line;
         try {
             line = readLatestVersion();
         } catch (IOException exception) {
-            report("[PacketEvents] We failed to find the latest released version of PacketEvents. Your build: (" + localVersion.toString() + ")");
+            report("[packetevents] We failed to find the latest released version of PacketEvents. Your build: (" + localVersion.toString() + ")");
             return;
         }
         PEVersion newVersion = new PEVersion(line);
         if (localVersion.isOlderThan(newVersion)) {
-            inform("[PacketEvents] There is an update available for the PacketEvents API! Your build: (" + localVersion.toString() + ") | Latest released build: (" + newVersion.toString() + ")");
+            inform("[packetevents] There is an update available for the PacketEvents API! Your build: (" + localVersion.toString() + ") | Latest released build: (" + newVersion.toString() + ")");
         } else if (localVersion.isNewerThan(newVersion)) {
-            inform("[PacketEvents] You are on a dev or pre released build of PacketEvents. Your build: (" + localVersion.toString() + ") | Latest released build: (" + newVersion.toString() + ")");
+            inform("[packetevents] You are on a dev or pre released build of PacketEvents. Your build: (" + localVersion.toString() + ") | Latest released build: (" + newVersion.toString() + ")");
         } else if (localVersion.equals(newVersion)) {
-            inform("[PacketEvents] You are on the latest released version of PacketEvents. (" + newVersion.toString() + ")");
+            inform("[packetevents] You are on the latest released version of PacketEvents. (" + newVersion.toString() + ")");
         } else {
-            report("[PacketEvents] Something went wrong while checking for an update. Your build: (" + localVersion.toString() + ") | Latest released build: (" + newVersion.toString() + ")");
+            report("[packetevents] Something went wrong while checking for an update. Your build: (" + localVersion.toString() + ") | Latest released build: (" + newVersion.toString() + ")");
         }
     }
 
+    /**
+     * Log a positive message in the console.
+     * @param message Message
+     */
     private void inform(String message) {
         Bukkit.getLogger().info(message);
     }
 
+    /**
+     * Log a negative message in the console.
+     * @param message Message
+     */
     private void report(String message) {
         Bukkit.getLogger().info(ChatColor.DARK_RED + message);
     }
 
+    /**
+     * Find the latest PacketEvents version as a string.
+     * @return Version as a String(like "1.8")
+     * @throws IOException Exception if something fails.
+     */
     private String readLatestVersion() throws IOException {
         URLConnection connection = new URL("https://api.spigotmc.org/legacy/update.php?resource=80279").openConnection();
         connection.addRequestProperty("User-Agent", "Mozilla/4.0");

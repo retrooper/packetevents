@@ -24,10 +24,11 @@
 
 package io.github.retrooper.packetevents.packetwrappers.play.in.closewindow;
 
+import io.github.retrooper.packetevents.packetwrappers.NMSPacket;
 import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
 
 public class WrappedPacketInCloseWindow extends WrappedPacket {
-    public WrappedPacketInCloseWindow(Object packet) {
+    public WrappedPacketInCloseWindow(NMSPacket packet) {
         super(packet);
     }
 
