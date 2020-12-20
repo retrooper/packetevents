@@ -1,10 +1,10 @@
 # packetevents 
 
-A spigot Packet API with some nice utlities.
+A Spigof Packet API with some nice utilities.
 
 ## About
 
-This API is **only** supported on Spigot servers and has been tested to work on these Spigot forks: Paper, Tuinity, Purpur
+This API is **only** guaranteed to work on these Spigot forks: Paper, Tuinity, Purpur
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
@@ -22,3 +22,6 @@ JavaDoc
 
 https://retrooper.github.io/packetevents
 
+Website 
+
+https://packetevents.github.io
