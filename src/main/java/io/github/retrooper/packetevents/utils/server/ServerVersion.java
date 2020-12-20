@@ -92,7 +92,7 @@ public enum ServerVersion {
      * @return Reversed server version enum values.
      */
     private static ServerVersion[] reverse() {
-        ServerVersion[] array = values().clone();
+        ServerVersion[] array = values();
         if (array == null) {
             return null;
         }
