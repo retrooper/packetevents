@@ -8,7 +8,7 @@ This API is **only** guaranteed to work on these Spigot forks: Paper, Tuinity, P
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-[![Contributor Covenant](https://img.shields.io/badge/Contributor%20Covenant-v2.0%20adopted-ff69b4.svg)](code_of_conduct.md)
+[![Contributor Covenant](https://img.shields.io/badge/Contributor%20Covenant-v2.0%20adopted-ff69b4.svg)](CONTRIBUTOR_CODE_OF_CONDUCT.md)
 
 Our discord server: https://discord.me/packetevents
 
