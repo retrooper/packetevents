@@ -275,7 +275,6 @@ public final class PacketEvents implements Listener, EventManager {
             try {
                 packetHandlerInternal.injectPlayer(e.getPlayer());
             } catch (Exception ex) {
-                ex.printStackTrace();
                 e.disallow(PlayerLoginEvent.Result.KICK_OTHER, getSettings().getInjectionFailureMessage());
             }
         }
