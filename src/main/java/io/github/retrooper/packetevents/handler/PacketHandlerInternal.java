@@ -243,7 +243,7 @@ public class PacketHandlerInternal {
             if (simpleClassName.startsWith("PacketS")) {
                 final PacketStatusReceiveEvent event = new PacketStatusReceiveEvent(channel, new NMSPacket(packet));
                 PacketEvents.get().getEventManager().callEvent(event);
-                packet = event.getNMSPacket();
+                packet = event.getNMSPacket().getRawNMSPacket();
                 interceptStatusReceive(event);
                 if (event.isCancelled()) {
                     packet = null;
@@ -252,11 +252,12 @@ public class PacketHandlerInternal {
                 //Login packet
                 final PacketLoginReceiveEvent event = new PacketLoginReceiveEvent(channel, new NMSPacket(packet));
                 PacketEvents.get().getEventManager().callEvent(event);
-                packet = event.getNMSPacket();
+                packet = event.getNMSPacket().getRawNMSPacket();
                 interceptLoginReceive(event);
                 if (event.isCancelled()) {
                     packet = null;
-                } else {
+                }
+                else {
                     //Cache the channel
                     if (event.getPacketId() == PacketType.Login.Client.START) {
                         WrappedPacketLoginInStart startWrapper = new WrappedPacketLoginInStart(event.getNMSPacket());
@@ -276,7 +277,7 @@ public class PacketHandlerInternal {
             }
             final PacketPlayReceiveEvent event = new PacketPlayReceiveEvent(player, channel, new NMSPacket(packet));
             PacketEvents.get().getEventManager().callEvent(event);
-            packet = event.getNMSPacket();
+            packet = event.getNMSPacket().getRawNMSPacket();
             interceptRead(event);
             if (event.isCancelled()) {
                 packet = null;
@@ -299,7 +300,7 @@ public class PacketHandlerInternal {
             if (simpleClassName.startsWith("PacketS")) {
                 final PacketStatusSendEvent event = new PacketStatusSendEvent(channel, new NMSPacket(packet));
                 PacketEvents.get().getEventManager().callEvent(event);
-                packet = event.getNMSPacket();
+                packet = event.getNMSPacket().getRawNMSPacket();
                 interceptStatusSend(event);
                 if (event.isCancelled()) {
                     packet = null;
@@ -309,7 +310,7 @@ public class PacketHandlerInternal {
             else {
                 final PacketLoginSendEvent event = new PacketLoginSendEvent(channel, new NMSPacket(packet));
                 PacketEvents.get().getEventManager().callEvent(event);
-                packet = event.getNMSPacket();
+                packet = event.getNMSPacket().getRawNMSPacket();
                 interceptLoginSend(event);
                 if (event.isCancelled()) {
                     packet = null;
@@ -326,7 +327,7 @@ public class PacketHandlerInternal {
             }
             final PacketPlaySendEvent event = new PacketPlaySendEvent(player, channel, new NMSPacket(packet));
             PacketEvents.get().getEventManager().callEvent(event);
-            packet = event.getNMSPacket();
+            packet = event.getNMSPacket().getRawNMSPacket();
             interceptWrite(event);
             if (event.isCancelled()) {
                 packet = null;

@@ -24,6 +24,7 @@
 
 package io.github.retrooper.packetevents.settings;
 
+import io.github.retrooper.packetevents.event.threadmode.PacketListenerThreadMode;
 import io.github.retrooper.packetevents.utils.server.ServerVersion;
 
 /**
@@ -76,6 +77,15 @@ public class PacketEventsSettings {
      * The same threads are used to inject the netty channel!
      */
     private int injectEjectThreadCount = 1;
+
+    /**
+     * How many threads should PacketEvents use to process your event listeners
+     * if your listener's PacketListenerThread is set to
+     * {@link PacketListenerThreadMode#PACKETEVENTS}
+     *
+     *
+     */
+    private int packetProcessingThreadCount = -1;
 
     /**
      * What should the kick message be when PacketEvents fails to inject a player and kicks them.
@@ -170,9 +180,16 @@ public class PacketEventsSettings {
         return this;
     }
 
-    @Deprecated
-    public PacketEventsSettings packetHandlingThreadCount(int threadCount) {
-        //Nothing... unsupported, might be removed
+    /**
+     * Setter for the {@link #packetProcessingThreadCount} field.
+     * Only succeeds if the setting class isn't locked.
+     * @param threadCount How many threads?
+     * @return This instance.
+     */
+    public PacketEventsSettings packetProcessingThreadCount(int threadCount) {
+        if(!locked) {
+            this.packetProcessingThreadCount = threadCount;
+        }
         return this;
     }
 
@@ -198,49 +215,64 @@ public class PacketEventsSettings {
     }
 
     /**
-     * Getter for {@link #backupServerVersion}
+     * Backup server version.
+     * @return Getter for {@link #backupServerVersion}
      */
     public ServerVersion getBackupServerVersion() {
         return backupServerVersion;
     }
 
     /**
-     * Getter for {@link #injectAsync}
+     * Should we inject a player async?
+     * @return Getter for {@link #injectAsync}
      */
     public boolean shouldInjectAsync() {
         return injectAsync;
     }
 
     /**
-     * Getter for {@link #ejectAsync}
+     * Should we eject a player async?
+     * @return Getter for {@link #ejectAsync}
      */
     public boolean shouldEjectAsync() {
         return ejectAsync;
     }
 
     /**
-     * Getter for {@link #checkForUpdates}
+     * Should we check for updates?
+     * @return Getter for {@link #checkForUpdates}
      */
     public boolean shouldCheckForUpdates() {
         return checkForUpdates;
     }
 
     /**
-     * Getter for {@link #injectEarly}
+     * Should we inject a player earlier with the {@link io.github.retrooper.packetevents.injector.earlyinjector.EarlyChannelInjector}
+     * @return Getter for {@link #injectEarly}
      */
     public boolean shouldInjectEarly() {
         return injectEarly;
     }
 
     /**
-     * Getter for {@link #injectEjectThreadCount}
+     * Injection and ejection executor service thread count(if async).
+     * @return Getter for {@link #injectEjectThreadCount}
      */
     public int getInjectAndEjectThreadCount() {
         return injectEjectThreadCount;
     }
 
     /**
-     * Getter for {@link #injectionFailureMessage}
+     * Packet processing executor service thread count(if not on the NETTY threads).
+     * @return Getter for {@link #packetProcessingThreadCount}
+     */
+    public int getPacketProcessingThreadCount() {
+        return packetProcessingThreadCount;
+    }
+
+    /**
+     * Injection failure message.
+     * @return Getter for {@link #injectionFailureMessage}
      */
     public String getInjectionFailureMessage() {
         return injectionFailureMessage;

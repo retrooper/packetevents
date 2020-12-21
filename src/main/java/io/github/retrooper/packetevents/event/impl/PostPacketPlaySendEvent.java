@@ -115,7 +115,7 @@ public class PostPacketPlaySendEvent extends PacketEvent implements NMSPacketEve
     @Override
     public byte getPacketId() {
         if (packetID == -2) {
-            packetID = PacketType.Play.Server.packetIds.getOrDefault(packet.getClass(), (byte) -1);
+            packetID = PacketType.Play.Server.packetIds.getOrDefault(packet.getRawNMSPacket().getClass(), (byte) -1);
         }
         return packetID;
     }

@@ -67,12 +67,14 @@ public final class PacketEvents implements Listener, EventManager {
     private final ServerUtils serverUtils = new ServerUtils();
     /**
      * General executor service, basically for anything that the packet executor service doesn't do.
-     * For example update checking when you initialize packetevents.
+     * For example update checking when you initialize PacketEvents.
      */
     public ExecutorService generalExecutorService = Executors.newSingleThreadExecutor();
 
     //Executor used for player injecting/ejecting.
     public ExecutorService injectAndEjectExecutorService = Executors.newSingleThreadExecutor();
+
+    public ExecutorService packetProcessingExecutorService = Executors.newSingleThreadExecutor();
 
     public PacketHandlerInternal packetHandlerInternal = null;
     private boolean loading, loaded, initialized, initializing, stopping;
@@ -149,11 +151,20 @@ public final class PacketEvents implements Listener, EventManager {
             if (settings.getInjectAndEjectThreadCount() < 1) {
                 settings.injectAndEjectThreadCount(1);
             }
+            if(settings.getPacketProcessingThreadCount() < -1) {
+                settings.packetProcessingThreadCount(-1);
+            }
             settings.lock();
 
             int injectAndEjectThreadCount = settings.getInjectAndEjectThreadCount();
             injectAndEjectExecutorService.shutdownNow();
             injectAndEjectExecutorService = Executors.newFixedThreadPool(injectAndEjectThreadCount);
+
+            int packetProcessingThreadCount = settings.getPacketProcessingThreadCount();
+            packetProcessingExecutorService.shutdownNow();
+            if(packetProcessingThreadCount != -1) {
+                packetProcessingExecutorService = Executors.newFixedThreadPool(packetProcessingThreadCount);
+            }
             plugins.add(pl);
 
             //Register Bukkit listener
@@ -222,8 +233,13 @@ public final class PacketEvents implements Listener, EventManager {
         return initialized;
     }
 
+    @Deprecated
     public ArrayList<Plugin> getPlugins() {
         return plugins;
+    }
+
+    public Plugin getPlugin() {
+        return plugins.get(0);
     }
 
     /**
@@ -258,6 +274,7 @@ public final class PacketEvents implements Listener, EventManager {
             try {
                 packetHandlerInternal.injectPlayer(e.getPlayer());
             } catch (Exception ex) {
+                ex.printStackTrace();
                 e.disallow(PlayerLoginEvent.Result.KICK_OTHER, getSettings().getInjectionFailureMessage());
             }
         }

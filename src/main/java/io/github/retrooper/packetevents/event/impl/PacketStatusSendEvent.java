@@ -103,7 +103,7 @@ public class PacketStatusSendEvent extends PacketEvent implements NMSPacketEvent
     @Override
     public byte getPacketId() {
         if (packetID == -1) {
-            packetID = PacketType.Status.Server.packetIds.getOrDefault(packet.getClass(), (byte) -1);
+            packetID = PacketType.Status.Server.packetIds.getOrDefault(packet.getRawNMSPacket().getClass(), (byte) -1);
         }
         return packetID;
     }

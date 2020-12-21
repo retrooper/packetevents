@@ -95,8 +95,7 @@ public class EarlyChannelInjector8 implements ChannelInjector {
             protected void initChannel(final Channel channel) {
                 if(networkMarkers != null) {
                     synchronized (networkMarkers) {
-                        //channel.eventLoop().execute
-                        PacketEvents.get().injectAndEjectExecutorService.execute(new Runnable() {
+                        channel.eventLoop().execute(new Runnable() {
                             @Override
                             public void run() {
                                 try { injectChannel(channel);
@@ -106,8 +105,7 @@ public class EarlyChannelInjector8 implements ChannelInjector {
                         });
                     }
                 } else {
-                    //channel.eventLoop().execute
-                    PacketEvents.get().injectAndEjectExecutorService.execute(new Runnable() {
+                    channel.eventLoop().execute(new Runnable() {
                         @Override
                         public void run() {
                             try { injectChannel(channel);

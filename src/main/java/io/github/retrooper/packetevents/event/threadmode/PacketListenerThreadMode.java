@@ -22,37 +22,29 @@
  * SOFTWARE.
  */
 
-package io.github.retrooper.packetevents.event;
-
-
-import io.github.retrooper.packetevents.event.eventtypes.CallableEvent;
+package io.github.retrooper.packetevents.event.threadmode;
 
 /**
- * An event in both of PacketEvents' event systems.
- * @author retrooper
- * @since 1.2.6
+ * What threads should PacketEvents use to process your dynamic packet event listener?
+ * By default it will process them on the netty threads, but you may have PacketEvents process them
+ * on PacketEvents' own allocated threads.
+ * The fixed thread count of the threads can be assigned in the PacketEventsSettings with the
+ * {@link io.github.retrooper.packetevents.settings.PacketEventsSettings#packetProcessingThreadCount(int)} setting
  */
-public abstract class PacketEvent implements CallableEvent {
-    private long timestamp = System.currentTimeMillis();
-
+public enum PacketListenerThreadMode {
     /**
-     * Timestamp of when the PacketEvent was created.
-     * Basically timestamp of the packet.
-     * @return Packet timestamp in milliseconds.
+     * Your listener's event3
      */
-    public long getTimestamp() {
-        return timestamp;
+    NETTY((byte)0),
+
+    PACKETEVENTS((byte)1);
+
+    private final byte id;
+    PacketListenerThreadMode(final byte id) {
+        this.id = id;
     }
 
-    /**
-     * Setter for the timestamp.
-     * @param timestamp Packet timestamp in milliseconds.
-     */
-    public void setTimestamp(final long timestamp) {
-        this.timestamp = timestamp;
-    }
-
-    public void callPacketEvent(final PacketListenerDynamic listener) {
-        listener.onPacketEvent(this);
+    public final byte getId() {
+        return id;
     }
 }

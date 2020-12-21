@@ -105,7 +105,7 @@ public class PacketLoginSendEvent extends PacketEvent implements NMSPacketEvent,
     @Override
     public byte getPacketId() {
         if (packetID == -2) {
-            packetID = PacketType.Login.Server.packetIds.getOrDefault(packet.getClass(), (byte) -1);
+            packetID = PacketType.Login.Server.packetIds.getOrDefault(packet.getRawNMSPacket().getClass(), (byte) -1);
         }
         return packetID;
     }
