@@ -59,8 +59,8 @@ We recommend using a dependency manager.
 [![](https://jitpack.io/v/retrooper/packetevents.svg)](https://jitpack.io/#retrooper/packetevents)
 
 #### 2. Using as an external pre-built dependency.
-* Download the [latest build from SpigotMC](https://www.spigotmc.org/resources/packetevents-api.80279/)\
-* Add PacketEvents as a depend or soft-depend to your plugin.yml like this:\
+* Download the [latest build from SpigotMC](https://www.spigotmc.org/resources/packetevents-api.80279/)
+* Add PacketEvents as a depend or soft-depend to your plugin.yml like this:
 ```yml
 depend: [packetevents]
 ```
