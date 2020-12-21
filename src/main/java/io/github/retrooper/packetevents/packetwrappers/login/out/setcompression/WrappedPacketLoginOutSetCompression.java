@@ -75,4 +75,9 @@ public class WrappedPacketLoginOutSetCompression extends WrappedPacket implement
         }
         return null;
     }
+
+    @Override
+    public boolean isSupported() {
+        return PacketTypeClasses.Login.Server.SET_COMPRESSION != null;
+    }
 }

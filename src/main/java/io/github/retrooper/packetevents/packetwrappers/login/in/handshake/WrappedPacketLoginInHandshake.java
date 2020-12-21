@@ -24,6 +24,7 @@
 
 package io.github.retrooper.packetevents.packetwrappers.login.in.handshake;
 
+import io.github.retrooper.packetevents.packettype.PacketTypeClasses;
 import io.github.retrooper.packetevents.packetwrappers.NMSPacket;
 import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
 
@@ -42,5 +43,10 @@ public class WrappedPacketLoginInHandshake extends WrappedPacket {
 
     public int getPort() {
         return readInt(1);
+    }
+
+    @Override
+    public boolean isSupported() {
+        return PacketTypeClasses.Login.Client.HANDSHAKE != null;
     }
 }

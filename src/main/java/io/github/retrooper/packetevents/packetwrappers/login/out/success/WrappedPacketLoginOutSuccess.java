@@ -24,6 +24,7 @@
 
 package io.github.retrooper.packetevents.packetwrappers.login.out.success;
 
+import io.github.retrooper.packetevents.packettype.PacketTypeClasses;
 import io.github.retrooper.packetevents.packetwrappers.NMSPacket;
 import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
 import io.github.retrooper.packetevents.utils.gameprofile.GameProfileUtil;
@@ -37,5 +38,10 @@ public class WrappedPacketLoginOutSuccess extends WrappedPacket {
 
     public WrappedGameProfile getGameProfile() {
         return GameProfileUtil.getWrappedGameProfile(readObject(0, NMSUtils.gameProfileClass));
+    }
+
+    @Override
+    public boolean isSupported() {
+        return PacketTypeClasses.Login.Server.SUCCESS != null;
     }
 }

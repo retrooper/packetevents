@@ -24,6 +24,7 @@
 
 package io.github.retrooper.packetevents.packetwrappers.login.out.disconnect;
 
+import io.github.retrooper.packetevents.packettype.PacketTypeClasses;
 import io.github.retrooper.packetevents.packetwrappers.NMSPacket;
 import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
 import io.github.retrooper.packetevents.packetwrappers.play.out.chat.WrappedPacketOutChat;
@@ -37,5 +38,10 @@ public class WrappedPacketLoginOutDisconnect extends WrappedPacket {
     public String getReason() {
         Object iChatBaseComponent = readObject(0, NMSUtils.iChatBaseComponentClass);
         return WrappedPacketOutChat.toStringFromIChatBaseComponent(iChatBaseComponent);
+    }
+
+    @Override
+    public boolean isSupported() {
+        return PacketTypeClasses.Login.Server.DISCONNECT != null;
     }
 }

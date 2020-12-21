@@ -22,49 +22,59 @@
  * SOFTWARE.
  */
 
-package io.github.retrooper.packetevents.packetwrappers.login.in.custompayload;
+package io.github.retrooper.packetevents.packetwrappers.play.out.updatetime;
 
 import io.github.retrooper.packetevents.packettype.PacketTypeClasses;
 import io.github.retrooper.packetevents.packetwrappers.NMSPacket;
+import io.github.retrooper.packetevents.packetwrappers.SendableWrapper;
 import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
-import io.github.retrooper.packetevents.utils.netty.bytebuf.ByteBufUtil;
-import io.github.retrooper.packetevents.utils.nms.NMSUtils;
-import io.github.retrooper.packetevents.utils.server.ServerVersion;
 
-/**
- * This packet exists since 1.13
- */
-public class WrappedPacketLoginInCustomPayload extends WrappedPacket {
-    private static Class<?> byteBufClass;
-    private static Class<?> packetDataSerializerClass;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 
-    public WrappedPacketLoginInCustomPayload(NMSPacket packet) {
+public class WrappedPacketOutUpdateTime extends WrappedPacket implements SendableWrapper {
+    private static Constructor<?> packetConstructor;
+    private long worldAgeTicks;
+    private long timeOfDayTicks;
+    public WrappedPacketOutUpdateTime(NMSPacket packet) {
         super(packet);
+    }
+
+    public WrappedPacketOutUpdateTime(long worldAgeTicks, long timeOfDayTicks) {
+        this.worldAgeTicks = worldAgeTicks;
+        this.timeOfDayTicks = timeOfDayTicks;
     }
 
     @Override
     protected void load() {
-        packetDataSerializerClass = NMSUtils.getNMSClassWithoutException("PacketDataSerializer");
         try {
-            byteBufClass = NMSUtils.getNettyClass("buffer.ByteBuf");
-        } catch (ClassNotFoundException ignored) {
+            packetConstructor = PacketTypeClasses.Play.Server.UPDATE_TIME.getConstructor(long.class, long.class, boolean.class);
+        } catch (NoSuchMethodException e) {
+            e.printStackTrace();
         }
     }
 
-    public int getMessageId() {
-        return readInt(0);
+    public long getWorldAgeTicks() {
+        if(packet != null) {
+            return readLong(0);
+        }
+        return worldAgeTicks;
     }
 
-    public byte[] getData() {
-        Object dataSerializer = readObject(0, packetDataSerializerClass);
-        WrappedPacket byteBufWrapper = new WrappedPacket(new NMSPacket(dataSerializer));
-        Object byteBuf = byteBufWrapper.readObject(0, byteBufClass);
-        return ByteBufUtil.getBytes(byteBuf);
+    public long getTimeOfDayTicks() {
+        if(packet != null) {
+            return readLong(1);
+        }
+        return timeOfDayTicks;
     }
 
     @Override
-    public boolean isSupported() {
-        return version.isHigherThan(ServerVersion.v_1_12_2);
+    public Object asNMSPacket() {
+        try {
+            return packetConstructor.newInstance(getWorldAgeTicks(), getTimeOfDayTicks(), true);
+        } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 }
-

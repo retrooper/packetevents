@@ -128,4 +128,9 @@ public class WrappedPacketLoginOutCustomPayload extends WrappedPacket implements
         }
         return null;
     }
+
+    @Override
+    public boolean isSupported() {
+        return PacketTypeClasses.Login.Server.CUSTOM_PAYLOAD != null;
+    }
 }

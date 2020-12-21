@@ -28,6 +28,9 @@ import java.lang.annotation.Annotation;
 
 public class SubclassUtil {
     public static Class<?> getSubClass(Class<?> cls, String name) {
+        if(cls == null) {
+            return null;
+        }
         for (Class<?> subClass : cls.getDeclaredClasses()) {
             if (ClassUtil.getClassSimpleName(subClass).equals(name)) {
                 return subClass;
@@ -37,6 +40,9 @@ public class SubclassUtil {
     }
 
     public static Class<?> getSubClass(Class<?> cls, int index) {
+        if(cls == null) {
+            return null;
+        }
         int currentIndex = 0;
         for (Class<?> subClass : cls.getDeclaredClasses()) {
             if (index == currentIndex++) {

@@ -80,6 +80,7 @@ public final class PacketEvents implements Listener, EventManager {
     private boolean loading, loaded, initialized, initializing, stopping;
     private PacketEventsSettings settings = new PacketEventsSettings();
 
+
     public static PacketEvents create(final Plugin plugin) {
         if (!Bukkit.getServicesManager().isProvidedFor(PacketEvents.class)) {
             instance = new PacketEvents();

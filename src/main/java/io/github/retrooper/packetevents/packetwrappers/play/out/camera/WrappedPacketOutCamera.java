@@ -22,49 +22,59 @@
  * SOFTWARE.
  */
 
-package io.github.retrooper.packetevents.packetwrappers.login.in.custompayload;
+package io.github.retrooper.packetevents.packetwrappers.play.out.camera;
 
 import io.github.retrooper.packetevents.packettype.PacketTypeClasses;
 import io.github.retrooper.packetevents.packetwrappers.NMSPacket;
+import io.github.retrooper.packetevents.packetwrappers.SendableWrapper;
 import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
-import io.github.retrooper.packetevents.utils.netty.bytebuf.ByteBufUtil;
-import io.github.retrooper.packetevents.utils.nms.NMSUtils;
 import io.github.retrooper.packetevents.utils.server.ServerVersion;
 
-/**
- * This packet exists since 1.13
- */
-public class WrappedPacketLoginInCustomPayload extends WrappedPacket {
-    private static Class<?> byteBufClass;
-    private static Class<?> packetDataSerializerClass;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 
-    public WrappedPacketLoginInCustomPayload(NMSPacket packet) {
+public class WrappedPacketOutCamera extends WrappedPacket implements SendableWrapper {
+    private static Constructor<?> packetConstructor;
+    private int cameraID;
+    public WrappedPacketOutCamera(NMSPacket packet) {
         super(packet);
+    }
+
+    public WrappedPacketOutCamera(int cameraID) {
+        this.cameraID = cameraID;
     }
 
     @Override
     protected void load() {
-        packetDataSerializerClass = NMSUtils.getNMSClassWithoutException("PacketDataSerializer");
         try {
-            byteBufClass = NMSUtils.getNettyClass("buffer.ByteBuf");
-        } catch (ClassNotFoundException ignored) {
+            packetConstructor = PacketTypeClasses.Play.Server.CAMERA.getConstructor();
+        } catch (NoSuchMethodException e) {
+            e.printStackTrace();
         }
     }
 
-    public int getMessageId() {
-        return readInt(0);
+    public int getCameraId() {
+        if(packet != null) {
+            return readInt(0);
+        }
+        return cameraID;
     }
 
-    public byte[] getData() {
-        Object dataSerializer = readObject(0, packetDataSerializerClass);
-        WrappedPacket byteBufWrapper = new WrappedPacket(new NMSPacket(dataSerializer));
-        Object byteBuf = byteBufWrapper.readObject(0, byteBufClass);
-        return ByteBufUtil.getBytes(byteBuf);
+    @Override
+    public Object asNMSPacket() {
+        Object packetInstance = null;
+        try {
+            packetInstance = packetConstructor.newInstance();
+        } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
+            e.printStackTrace();
+        }
+        WrappedPacket packetWrapper = new WrappedPacket(new NMSPacket(packetInstance));
+        packetWrapper.writeInt(0, getCameraId());
+        return packetInstance;
     }
 
     @Override
     public boolean isSupported() {
-        return version.isHigherThan(ServerVersion.v_1_12_2);
+        return version.isHigherThan(ServerVersion.v_1_7_10);
     }
 }
-

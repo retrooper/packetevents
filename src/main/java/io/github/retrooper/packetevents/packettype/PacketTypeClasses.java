@@ -94,7 +94,7 @@ public class PacketTypeClasses {
                     SET_COMMAND_MINECART, SET_JIGSAW, STRUCT, UPDATE_SIGN, SPECTATE;
 
             /**
-             * Initiate all server-bound packet classes.
+             * Initiate all server-bound play packet classes.
              */
             public static void load() {
                 FLYING = NMSUtils.getNMSClassWithoutException(PREFIX + "Flying");

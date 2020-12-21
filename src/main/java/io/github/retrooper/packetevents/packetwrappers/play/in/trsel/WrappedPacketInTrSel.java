@@ -22,27 +22,17 @@
  * SOFTWARE.
  */
 
-package io.github.retrooper.packetevents.packetwrappers.login.in.encryptionbegin;
+package io.github.retrooper.packetevents.packetwrappers.play.in.trsel;
 
-import io.github.retrooper.packetevents.packettype.PacketTypeClasses;
 import io.github.retrooper.packetevents.packetwrappers.NMSPacket;
 import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
 
-public class WrappedPacketLoginInEncryptionBegin extends WrappedPacket {
-    public WrappedPacketLoginInEncryptionBegin(NMSPacket packet) {
+public class WrappedPacketInTrSel extends WrappedPacket {
+    public WrappedPacketInTrSel(NMSPacket packet) {
         super(packet);
     }
 
-    public byte[] getPublicKey() {
-        return readByteArray(0);
-    }
-
-    public byte[] getVerifyToken() {
-        return readByteArray(1);
-    }
-
-    @Override
-    public boolean isSupported() {
-        return PacketTypeClasses.Login.Client.ENCRYPTION_BEGIN != null;
+    public int getSlot() {
+        return readInt(0);
     }
 }

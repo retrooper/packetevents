@@ -25,26 +25,58 @@
 package io.github.retrooper.packetevents.packettype;
 
 import io.github.retrooper.packetevents.PacketEvents;
+import io.github.retrooper.packetevents.event.eventtypes.NMSPacketEvent;
 import io.github.retrooper.packetevents.utils.server.ServerVersion;
 
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * Packet Type IDs.
+ * This is the Packet ID system, it is recommended to use this over packet comparisons by packet name.
+ * This is also faster than comparing packet names.
+ * @author retrooper
+ * @since 1.6.8
+ */
 public class PacketType {
+    /**
+     * Status Packet IDs.
+     * @see <a href="https://wiki.vg/Protocol#Status">https://wiki.vg/Protocol#Status</a>
+     * @author retrooper
+     * @since 1.7
+     */
     public static class Status {
+        /**
+         * Server-bound (client-sided) Status Packet IDs.
+         * @see <a href="https://wiki.vg/Protocol#Serverbound_2">https://wiki.vg/Protocol#Serverbound_2</a>
+         * @author retrooper
+         * @since 1.8
+         */
         public static class Client {
             public static final byte START = 0, PING = 1;
             public static final Map<Class<?>, Byte> packetIds = new HashMap<>();
 
+            /**
+             * Load the server-bound status Packet IDs.
+             */
             public static void init() {
                 packetIds.put(PacketTypeClasses.Status.Client.START, Client.START);
                 packetIds.put(PacketTypeClasses.Status.Client.PING, Client.PING);
             }
         }
-
+        /**
+         * Client-bound (server-sided) Status Packet IDs.
+         *  @see <a href="https://wiki.vg/Protocol#Clientbound_2">https://wiki.vg/Protocol#Clientbound_2</a>
+         * @author retrooper
+         * @since 1.8
+         */
         public static class Server {
             public static final byte PONG = 0, SERVER_INFO = 1;
             public static final Map<Class<?>, Byte> packetIds = new HashMap<>();
+
+            /**
+             * Load the client-bound Status Packet IDs.
+             */
             public static void init() {
                 packetIds.put(PacketTypeClasses.Status.Server.PONG, Server.PONG);
                 packetIds.put(PacketTypeClasses.Status.Server.SERVER_INFO, Server.SERVER_INFO);
@@ -52,10 +84,26 @@ public class PacketType {
         }
     }
 
+    /**
+     * Login Packet IDs.
+     * @see <a href="https://wiki.vg/Protocol#Login">https://wiki.vg/Protocol#Login</a>
+     * @author retrooper
+     * @since 1.7
+     */
     public static class Login {
+        /**
+         * Server-bound (client-sided) Login Packet IDs.
+         * @see <a href="https://wiki.vg/Protocol#Serverbound_3">https://wiki.vg/Protocol#Serverbound_3</a>
+         * @author retrooper
+         * @since 1.8
+         */
         public static class Client {
             public static final Map<Class<?>, Byte> packetIds = new HashMap<>();
             public static final byte HANDSHAKE = 0, CUSTOM_PAYLOAD = 1, START = 2, ENCRYPTION_BEGIN = 3;
+
+            /**
+             * Load the server-bound Login Packet IDs.
+             */
             public static void init() {
                 packetIds.put(PacketTypeClasses.Login.Client.HANDSHAKE, Client.HANDSHAKE);
                 packetIds.put(PacketTypeClasses.Login.Client.CUSTOM_PAYLOAD, Client.CUSTOM_PAYLOAD);
@@ -63,10 +111,19 @@ public class PacketType {
                 packetIds.put(PacketTypeClasses.Login.Client.ENCRYPTION_BEGIN, Client.ENCRYPTION_BEGIN);
             }
         }
-
+        /**
+         * Client-bound (server-sided) Login Packet IDs.
+         * @see <a href="https://wiki.vg/Protocol#Clientbound_3">https://wiki.vg/Protocol#Clientbound_3</a>
+         * @author retrooper
+         * @since 1.8
+         */
         public static class Server {
             public static final Map<Class<?>, Byte> packetIds = new HashMap<>();
             public static final byte CUSTOM_PAYLOAD = 0, DISCONNECT = 1, ENCRYPTION_BEGIN = 2, SUCCESS = 3, SET_COMPRESSION = 4;
+
+            /**
+             * Load the client-bound Login Packet IDs.
+             */
             public static void init() {
                 packetIds.put(PacketTypeClasses.Login.Server.CUSTOM_PAYLOAD, Server.CUSTOM_PAYLOAD);
                 packetIds.put(PacketTypeClasses.Login.Server.DISCONNECT, Server.DISCONNECT);
@@ -76,9 +133,19 @@ public class PacketType {
             }
         }
     }
-
+    /**
+     * Play Packet IDs.
+     * @see <a href="https://wiki.vg/Protocol#Play">https://wiki.vg/Protocol#Play</a>
+     * @author retrooper
+     * @since 1.8
+     */
     public static class Play {
-
+        /**
+         * Server-bound (client-sided) Play Packet IDs.
+         * @see <a href="https://wiki.vg/Protocol#Serverbound_4">https://wiki.vg/Protocol#Serverbound_4</a>
+         * @author retrooper
+         * @since 1.8
+         */
         public static class Client {
             public static final Map<Class<?>, Byte> packetIds = new HashMap<>();
             public static final byte TELEPORT_ACCEPT = 0,
@@ -95,6 +162,9 @@ public class PacketType {
                     STRUCT = 41, UPDATE_SIGN = 42, ARM_ANIMATION = 43, SPECTATE = 44,
                     USE_ITEM = 45, BLOCK_PLACE = 46;
 
+            /**
+             * Load the server-bound Play Packet IDs.
+             */
             public static void init() {
                 packetIds.put(PacketTypeClasses.Play.Client.TELEPORT_ACCEPT, TELEPORT_ACCEPT);
                 packetIds.put(PacketTypeClasses.Play.Client.TILE_NBT_QUERY, TILE_NBT_QUERY);
@@ -145,12 +215,18 @@ public class PacketType {
                 packetIds.put(PacketTypeClasses.Play.Client.BLOCK_PLACE, BLOCK_PLACE);
             }
 
+            /**
+             * Server-bound Play Packet Type utility.
+             * Save a few lines of code by using this.
+             * @author retrooper
+             * @since 1.8
+             */
             public static class Util {
                 /**
-                 * Is the packet an instance of the PacketPlayInFlying packet?
-                 *
-                 * @param packetID Packet ID
-                 * @return packetID == FLYING or POSITION or POSITION_LOOK or LOOK
+                 * Is the play packet a PacketPlayInFlying, PacketPlayInPosition, PacketPlayInPositionLook
+                 * or a PacketPlayInLook packet?
+                 * @param packetID Play Packet ID.
+                 * @return Is the Packet ID an instance of the PacketPlayInFlying packet?
                  */
                 public static boolean isInstanceOfFlying(final byte packetID) {
                     return packetID == FLYING
@@ -158,7 +234,19 @@ public class PacketType {
                             || packetID == POSITION_LOOK
                             || packetID == LOOK;
                 }
-
+                /**
+                 * Is this the packet where the client places a block?
+                 * On 1.7.10 -> 1.8.8 the client sends a PacketPlayInBlockPlace packet when actually placing the block.
+                 * On 1.9 -> now the client sends a PacketPlayInUseItem packet when placing the block and the
+                 * PacketPlayInBlockPlace has a different use.
+                 * This method is a nice utility supporting all these versions letting you know
+                 * if the client played a block.
+                 * The {@link io.github.retrooper.packetevents.packetwrappers.play.in.blockplace.WrappedPacketInBlockPlace} wrapper
+                 * only works on an actual block place.
+                 * Use this method before using the wrapper to support all minecraft versions.
+                 * @param packetID Play Packet ID.
+                 * @return Has the client placed a block?
+                 */
                 public static boolean isBlockPlace(final byte packetID) {
                     final ServerVersion version = PacketEvents.get().getServerUtils().getVersion();
                     return version.isHigherThan(ServerVersion.v_1_8_8) ?
@@ -167,7 +255,12 @@ public class PacketType {
                 }
             }
         }
-
+        /**
+         * Client-bound (server-sided) Play Packet IDs.
+         * @see <a href="https://wiki.vg/Protocol#Clientbound_4">https://wiki.vg/Protocol#Clientbound_4</a>
+         * @author retrooper
+         * @since 1.8
+         */
         public static class Server {
             public static final Map<Class<?>, Byte> packetIds = new HashMap<>();
             public static final byte SPAWN_ENTITY = 0, SPAWN_ENTITY_EXPERIENCE_ORB = 1, SPAWN_ENTITY_WEATHER = 2, SPAWN_ENTITY_LIVING = 3,
@@ -194,6 +287,9 @@ public class PacketType {
                     NBT_QUERY = 85, COLLECT = 86, ENTITY_TELEPORT = 87, ADVANCEMENTS = 88, UPDATE_ATTRIBUTES = 89,
                     ENTITY_EFFECT = 90, RECIPE_UPDATE = 91, TAGS = 92, MAP_CHUNK_BULK = 93, NAMED_ENTITY_SPAWN = 94;
 
+            /**
+             * Load the client-bound Play Packet IDs.
+             */
             public static void init() {
                 packetIds.put(PacketTypeClasses.Play.Server.SPAWN_ENTITY, SPAWN_ENTITY);
                 packetIds.put(PacketTypeClasses.Play.Server.SPAWN_ENTITY_EXPERIENCE_ORB, SPAWN_ENTITY_EXPERIENCE_ORB);
@@ -294,12 +390,18 @@ public class PacketType {
                 packetIds.put(PacketTypeClasses.Play.Server.NAMED_ENTITY_SPAWN, NAMED_ENTITY_SPAWN);
             }
 
+            /**
+             * Client-bound Play Packet Type utility.
+             * Save a few lines of code by using this.
+             * @author retrooper
+             * @since 1.8
+             */
             public static class Util {
                 /**
-                 * Is the packet an instance of the PacketPlayOutEntity packet?
-                 *
-                 * @param packetID Packet ID
-                 * @return packetID == ENTITY or REL_ENTITY_MOVE or REL_ENTITY_MOVE_LOOK or ENTITY_LOOK
+                 * Is the play packet a PacketPlayOutEntity, PacketPlayOutRelEntityMove, PacketPlayOutRelEntityMoveLook
+                 * or a PacketPlayOutEntityLook packet?
+                 * @param packetID Play Packet ID.
+                 * @return Is the Packet ID an instance of the PacketPlayOutEntity packet?
                  */
                 public static boolean isInstanceOfEntity(final byte packetID) {
                     return packetID == ENTITY || packetID == REL_ENTITY_MOVE ||

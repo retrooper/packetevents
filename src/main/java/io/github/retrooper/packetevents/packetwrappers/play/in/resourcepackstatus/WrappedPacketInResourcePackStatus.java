@@ -22,27 +22,40 @@
  * SOFTWARE.
  */
 
-package io.github.retrooper.packetevents.packetwrappers.login.in.encryptionbegin;
+package io.github.retrooper.packetevents.packetwrappers.play.in.resourcepackstatus;
 
 import io.github.retrooper.packetevents.packettype.PacketTypeClasses;
 import io.github.retrooper.packetevents.packetwrappers.NMSPacket;
 import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
+import io.github.retrooper.packetevents.utils.reflection.SubclassUtil;
+import io.github.retrooper.packetevents.utils.server.ServerVersion;
 
-public class WrappedPacketLoginInEncryptionBegin extends WrappedPacket {
-    public WrappedPacketLoginInEncryptionBegin(NMSPacket packet) {
+public class WrappedPacketInResourcePackStatus extends WrappedPacket {
+    private static Class<?> enumResourcePackStatusClass;
+
+    public WrappedPacketInResourcePackStatus(NMSPacket packet) {
         super(packet);
     }
 
-    public byte[] getPublicKey() {
-        return readByteArray(0);
+    @Override
+    protected void load() {
+        enumResourcePackStatusClass = SubclassUtil.getSubClass(PacketTypeClasses.Play.Client.RESOURCE_PACK_STATUS, "EnumResourcePackStatus");
     }
 
-    public byte[] getVerifyToken() {
-        return readByteArray(1);
+    public ResourcePackStatus getStatus() {
+        Object enumObj = readObject(0, enumResourcePackStatusClass);
+        return ResourcePackStatus.valueOf(enumObj.toString());
+    }
+
+    public enum ResourcePackStatus {
+        SUCCESSFULLY_LOADED,
+        DECLINED,
+        FAILED_DOWNLOAD,
+        ACCEPTED;
     }
 
     @Override
     public boolean isSupported() {
-        return PacketTypeClasses.Login.Client.ENCRYPTION_BEGIN != null;
+        return version.isHigherThan(ServerVersion.v_1_7_10);
     }
 }

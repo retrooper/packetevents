@@ -24,6 +24,7 @@
 
 package io.github.retrooper.packetevents.packetwrappers.login.out.encryptionbegin;
 
+import io.github.retrooper.packetevents.packettype.PacketTypeClasses;
 import io.github.retrooper.packetevents.packetwrappers.NMSPacket;
 import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
 
@@ -44,5 +45,10 @@ public class WrappedPacketLoginOutEncryptionBegin extends WrappedPacket {
 
     public byte[] getByteArray() {
         return readByteArray(0);
+    }
+
+    @Override
+    public boolean isSupported() {
+        return PacketTypeClasses.Login.Server.ENCRYPTION_BEGIN != null;
     }
 }

@@ -24,6 +24,7 @@
 
 package io.github.retrooper.packetevents.settings;
 
+import io.github.retrooper.packetevents.event.PacketListenerDynamic;
 import io.github.retrooper.packetevents.event.threadmode.PacketListenerThreadMode;
 import io.github.retrooper.packetevents.utils.server.ServerVersion;
 
@@ -74,16 +75,13 @@ public class PacketEventsSettings {
 
     /**
      * This int stores how many threads should use to inject and eject a player.
-     * The same threads are used to inject the netty channel!
      */
     private int injectEjectThreadCount = 1;
 
     /**
      * How many threads should PacketEvents use to process your event listeners
-     * if your listener's PacketListenerThread is set to
-     * {@link PacketListenerThreadMode#PACKETEVENTS}
-     *
-     *
+     * if your listener's PacketListenerThread
+     * {@link PacketListenerDynamic#getThreadMode()} is set to {@link PacketListenerThreadMode#PACKETEVENTS}.
      */
     private int packetProcessingThreadCount = -1;
 
