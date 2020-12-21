@@ -34,8 +34,8 @@ It is amazing that you want to take an extra step to contribute a change to the 
 hopefully benefit the majority of users.
 Before taking this step, please read the Contributor Code Of Conduct. (click on the badge above)
 Please also read [this](CONTRIBUTING.md) if you consider contributing.
-Our discord server has a role for contributors.
-Learn more about it on our discord server...
+Our discord server has a role for contributors.\
+[Learn more about it in our discord server](https://discord.me/packetevents)
 
 ### Forking
 We also appreciate forks.
@@ -43,8 +43,8 @@ It is always great news to us knowing someone is building their own API off of t
 If you are developing a feature that is only going to benefit you and not the majority of the community,
 please do not contribute!
 Make a fork instead!
-Our discord server has a discord role for forkers.
-Learn more about it in our discord server...
+Our discord server has a discord role for forkers.\
+[Learn more about it in our discord server](https://discord.me/packetevents)
 
 ### Compilation
 PacketEvents is built with Maven and all past releases have always used maven.
@@ -53,7 +53,7 @@ It should be easier for most people to contribute if we use Maven too.
 Just because PacketEvents is built with Maven doesn't mean you can't use other dependency managers to use the API.
 
 ### Setup
-You can either use the API with a dependency manager(like Maven or Gradle) or compile it yourself with the source code.
+You can either use the API with a dependency manager(like Maven or Gradle), depend on a pre-built build or compile it yourself with the source code.
 We recommend using a dependency manager.
 #### 1. Using a dependency manager
 [![](https://jitpack.io/v/retrooper/packetevents.svg)](https://jitpack.io/#retrooper/packetevents)\n
