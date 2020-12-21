@@ -56,21 +56,21 @@ Just because PacketEvents is built with Maven doesn't mean you can't use other d
 You can either use the API with a dependency manager(like Maven or Gradle), depend on a pre-built build or compile it yourself with the source code.
 We recommend using a dependency manager.
 #### 1. Using a dependency manager
-[![](https://jitpack.io/v/retrooper/packetevents.svg)](https://jitpack.io/#retrooper/packetevents)\n
+[![](https://jitpack.io/v/retrooper/packetevents.svg)](https://jitpack.io/#retrooper/packetevents)
 
 #### 2. Using as an external pre-built dependency.
-* Download the [latest build from SpigotMC](https://www.spigotmc.org/resources/packetevents-api.80279/)
-* Add PacketEvents as a depend or soft-depend to your plugin.yml like this:
+* Download the [latest build from SpigotMC](https://www.spigotmc.org/resources/packetevents-api.80279/)\
+* Add PacketEvents as a depend or soft-depend to your plugin.yml like this:\
 ```yml
 depend: [packetevents]
 ```
-Your customers are now required to download this external pre-built dependency on their minecraft server.
+Your customers are now required to download this external pre-built dependency on their minecraft server.\
 It is an API and a Bukkit plugin at the same time.
 The version of the pre-built dependency is recommended to be the same as the version
 of the API you used in your plugins incase there have been API changes.
 
 #### 3. Compiling source code.
-When compiling the source code yourself, you are required to use Maven. (unless you switch yourself)
+When compiling the source code yourself, you are required to use Maven. (unless you switch yourself)\
 We currently do not have a guide showing you how to do this, but it should be self explanatory if you know what you are doing.
 
 ### Author
