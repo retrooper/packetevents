@@ -67,7 +67,7 @@ depend: [packetevents]
 Your customers are now required to download this external pre-built dependency on their minecraft server.\
 It is an API and a Bukkit plugin at the same time.
 The version of the pre-built dependency is recommended to be the same as the version
-of the API you used in your plugins incase there have been API changes.
+of the API you used in your plugin incase there have been API changes.
 
 #### 3. Compiling source code.
 When compiling the source code yourself, you are required to use Maven. (unless you switch yourself)\
