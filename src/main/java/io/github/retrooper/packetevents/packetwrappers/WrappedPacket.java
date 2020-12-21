@@ -78,7 +78,12 @@ public class WrappedPacket implements WrapperPacketReader, WrapperPacketWriter {
     private Class<?> packetClass;
 
     public WrappedPacket() {
-
+        packet = null;
+        packetClass = null;
+        if(!loadedWrappers.containsKey(getClass())) {
+            load();
+            loadedWrappers.put(getClass(), true);
+        }
     }
 
     public WrappedPacket(final NMSPacket packet) {
