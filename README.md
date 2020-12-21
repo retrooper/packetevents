@@ -32,7 +32,7 @@ PacketEvents is an open source project.
 We appreciate contributions.
 It is amazing that you want to take an extra step to contribute a change to the API that will
 hopefully benefit the majority of users.
-Before taking this step, please read the Contributor code of conduct. (click on the badge above)
+Before taking this step, please read the Contributor Code Of Conduct. (click on the badge above)
 Please also read [this](CONTRIBUTING.md) if you consider contributing.
 Our discord server has a role for contributors.
 Learn more about it on our discord server...
