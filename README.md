@@ -23,12 +23,12 @@ and they all work together.
 ### Licensing
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)\
 PacketEvents is licensed under the MIT License.
-We give you a lot of control over your product.
+We intentionally selected this license compared to stricter options.\
 [Summary of the license](https://tldrlegal.com/license/mit-license)
 
 ### Contributing
 [![Contributor Covenant](https://img.shields.io/badge/Contributor%20Covenant-v2.0%20adopted-ff69b4.svg)](CONTRIBUTOR_CODE_OF_CONDUCT.md)\
-PacketEvents is an open source projects.
+PacketEvents is an open source project.
 We appreciate contributions.
 It is amazing that you want to take an extra step to contribute a change to the API that will
 hopefully benefit the majority of users.
