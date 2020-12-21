@@ -12,7 +12,7 @@ The second one (recommended) prioritizes performance.
 PacketEvents listens to its community. 
 Many users love shading the API into their plugin, so that their customers won't need to
 download the API as an external dependency.
-We have gone out of our way to support multiple plugins shading the API(resulting in duplicate PacketEvents APIs)
+We have gone out of our way to support multiple plugins shading the API (resulting in duplicate PacketEvents APIs)
 and they all work together.
 
 ### Resources
