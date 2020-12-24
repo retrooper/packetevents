@@ -75,7 +75,6 @@ class EventManagerDynamic {
                         nettyThreadListeners.add(listener);
                     }
                 }
-                if (nettyThreadListeners.size() != 0) {
                     for (PacketListenerDynamic listener : nettyThreadListeners) {
                         event.callPacketEvent(listener);
                         event.call(listener);
@@ -85,7 +84,6 @@ class EventManagerDynamic {
                             isCancelled[0] = ce.isCancelled();
                         }
                     }
-                }
 
                 if (packetEventsThreadListeners.size() != 0) {
                     PacketEvents.get().packetProcessingExecutorService

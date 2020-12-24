@@ -83,25 +83,9 @@ public final class PacketEvents implements Listener, EventManager {
     });
 
     //Executor used for player injecting/ejecting.
-    public ExecutorService injectAndEjectExecutorService = Executors.newSingleThreadExecutor(new ThreadFactory() {
+    public ExecutorService injectAndEjectExecutorService;//Initiated in init method
 
-        private final AtomicInteger id = new AtomicInteger();
-
-        @Override
-        public Thread newThread(@NotNull Runnable r) {
-            return new Thread(r, "PacketEvents-inject #" + id.getAndIncrement());
-        }
-    });
-
-    public ExecutorService packetProcessingExecutorService = Executors.newSingleThreadExecutor(new ThreadFactory() {
-
-        private final AtomicInteger id = new AtomicInteger();
-
-        @Override
-        public Thread newThread(@NotNull Runnable r) {
-            return new Thread(r, "PacketEvents-process #" + id.getAndIncrement());
-        }
-    });
+    public ExecutorService packetProcessingExecutorService;//Initiated in init method
 
     public PacketHandlerInternal packetHandlerInternal = null;
     private boolean loading, loaded, initialized, initializing, stopping;
@@ -185,14 +169,26 @@ public final class PacketEvents implements Listener, EventManager {
             settings.lock();
 
             int injectAndEjectThreadCount = settings.getInjectAndEjectThreadCount();
-            injectAndEjectExecutorService.shutdownNow();
-            injectAndEjectExecutorService = Executors.newFixedThreadPool(injectAndEjectThreadCount);
+            injectAndEjectExecutorService = Executors.newFixedThreadPool(injectAndEjectThreadCount, new ThreadFactory() {
+
+                private final AtomicInteger id = new AtomicInteger();
+
+                @Override
+                public Thread newThread(@NotNull Runnable r) {
+                    return new Thread(r, "PacketEvents-inject-eject #" + id.getAndIncrement());
+                }
+            });
 
             int packetProcessingThreadCount = settings.getPacketProcessingThreadCount();
-            packetProcessingExecutorService.shutdownNow();
-            if(packetProcessingThreadCount != -1) {
-                packetProcessingExecutorService = Executors.newFixedThreadPool(packetProcessingThreadCount);
-            }
+            packetProcessingExecutorService = Executors.newFixedThreadPool(packetProcessingThreadCount, new ThreadFactory() {
+
+                private final AtomicInteger id = new AtomicInteger();
+
+                @Override
+                public Thread newThread(@NotNull Runnable r) {
+                    return new Thread(r, "PacketEvents-process #" + id.getAndIncrement());
+                }
+            });
             plugins.add(pl);
 
             //Register Bukkit listener

@@ -27,29 +27,18 @@ package io.github.retrooper.packetevents;
 import org.bukkit.plugin.java.JavaPlugin;
 
 public class PacketEventsPlugin extends JavaPlugin {
-    //TODO document all packet wrappers....
     @Override
     public void onLoad() {
-        /*
-         * We use default settings. You should always specify the settings before loading.
-         * PacketEvents won't load again if it has already loaded or is already loading.
-         * If that is the case, the method will return false.
-         */
-        boolean successful = PacketEvents.create(this).load();
+
     }
 
     @Override
     public void onEnable() {
-        /*
-         * We created the instance in the onLoad method.
-         * If another PacketEvents user has already initialized, we won't initialize again.
-         * If we end up not initializing or fail to initialize, the method will return false.
-         */
-        boolean successful = PacketEvents.get().init(this);
+
     }
 
     @Override
     public void onDisable() {
-        PacketEvents.get().stop();
+
     }
 }
