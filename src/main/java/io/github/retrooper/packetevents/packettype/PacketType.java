@@ -236,8 +236,8 @@ public class PacketType {
                 }
                 /**
                  * Is this the packet where the client places a block?
-                 * On 1.7.10 -> 1.8.8 the client sends a PacketPlayInBlockPlace packet when actually placing the block.
-                 * On 1.9 -> now the client sends a PacketPlayInUseItem packet when placing the block and the
+                 * On 1.7.10 - 1.8.8 the client sends a PacketPlayInBlockPlace packet when actually placing the block.
+                 * On 1.9 - now the client sends a PacketPlayInUseItem packet when placing the block and the
                  * PacketPlayInBlockPlace has a different use.
                  * This method is a nice utility supporting all these versions letting you know
                  * if the client played a block.

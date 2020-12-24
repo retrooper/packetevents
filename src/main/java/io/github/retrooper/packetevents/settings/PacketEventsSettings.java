@@ -24,8 +24,6 @@
 
 package io.github.retrooper.packetevents.settings;
 
-import io.github.retrooper.packetevents.event.PacketListenerDynamic;
-import io.github.retrooper.packetevents.event.threadmode.PacketListenerThreadMode;
 import io.github.retrooper.packetevents.utils.server.ServerVersion;
 
 /**
@@ -77,13 +75,6 @@ public class PacketEventsSettings {
      * This int stores how many threads should use to inject and eject a player.
      */
     private int injectEjectThreadCount = 1;
-
-    /**
-     * How many threads should PacketEvents use to process your event listeners
-     * if your listener's PacketListenerThread
-     * {@link PacketListenerDynamic#getThreadMode()} is set to {@link PacketListenerThreadMode#PACKETEVENTS}.
-     */
-    private int packetProcessingThreadCount = -1;
 
     /**
      * What should the kick message be when PacketEvents fails to inject a player and kicks them.
@@ -179,19 +170,6 @@ public class PacketEventsSettings {
     }
 
     /**
-     * Setter for the {@link #packetProcessingThreadCount} field.
-     * Only succeeds if the setting class isn't locked.
-     * @param threadCount How many threads?
-     * @return This instance.
-     */
-    public PacketEventsSettings packetProcessingThreadCount(int threadCount) {
-        if(!locked) {
-            this.packetProcessingThreadCount = threadCount;
-        }
-        return this;
-    }
-
-    /**
      * Setter for the {@link #injectionFailureMessage} field.
      * Only succeeds if the settings class isn't locked.
      * @param message Kick message for an injection failure.
@@ -258,14 +236,6 @@ public class PacketEventsSettings {
      */
     public int getInjectAndEjectThreadCount() {
         return injectEjectThreadCount;
-    }
-
-    /**
-     * Packet processing executor service thread count(if not on the NETTY threads).
-     * @return Getter for {@link #packetProcessingThreadCount}
-     */
-    public int getPacketProcessingThreadCount() {
-        return packetProcessingThreadCount;
     }
 
     /**

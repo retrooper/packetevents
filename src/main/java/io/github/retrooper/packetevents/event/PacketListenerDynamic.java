@@ -26,7 +26,6 @@ package io.github.retrooper.packetevents.event;
 
 import io.github.retrooper.packetevents.event.impl.*;
 import io.github.retrooper.packetevents.event.priority.PacketEventPriority;
-import io.github.retrooper.packetevents.event.threadmode.PacketListenerThreadMode;
 
 /**
  * Dynamic packet event listener.
@@ -38,31 +37,17 @@ import io.github.retrooper.packetevents.event.threadmode.PacketListenerThreadMod
  */
 public abstract class PacketListenerDynamic {
     private final PacketEventPriority priority;
-    private final PacketListenerThreadMode threadMode;
-
-    public PacketListenerDynamic(final PacketEventPriority priority, final PacketListenerThreadMode threadMode) {
-        this.priority = priority;
-        this.threadMode = threadMode;
-    }
-
-    public PacketListenerDynamic(PacketListenerThreadMode threadMode) {
-        this(PacketEventPriority.NORMAL, threadMode);
-    }
 
     public PacketListenerDynamic(final PacketEventPriority priority) {
-        this(priority, PacketListenerThreadMode.NETTY);
+        this.priority = priority;
     }
 
     public PacketListenerDynamic() {
-        this(PacketEventPriority.NORMAL, PacketListenerThreadMode.NETTY);
+        this(PacketEventPriority.NORMAL);
     }
 
     public PacketEventPriority getPriority() {
         return priority;
-    }
-
-    public PacketListenerThreadMode getThreadMode() {
-        return threadMode;
     }
 
     public void onPacketStatusReceive(PacketStatusReceiveEvent event) {

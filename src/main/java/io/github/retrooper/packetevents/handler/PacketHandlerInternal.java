@@ -235,6 +235,7 @@ public class PacketHandlerInternal {
      * @param player Packet sender.
      * @param channel Packet sender's netty channel.
      * @param packet NMS Packet.
+     * @return NMS Packet, null if the event was cancelled.
      */
     public Object read(Player player, Object channel, Object packet) {
         if (player == null) {
@@ -292,6 +293,7 @@ public class PacketHandlerInternal {
      * @param player Packet receiver.
      * @param channel Packet receiver's netty channel.
      * @param packet NMS Packet.
+     * @return NMS Packet, null if the event was cancelled.
      */
     public Object write(Player player, Object channel, Object packet) {
         if (player == null) {

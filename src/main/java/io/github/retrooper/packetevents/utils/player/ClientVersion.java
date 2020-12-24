@@ -24,6 +24,8 @@
 
 package io.github.retrooper.packetevents.utils.player;
 
+import org.jetbrains.annotations.NotNull;
+
 /**
  * Client Version.
  * This is a nice tool for minecraft's protocol versions.
@@ -84,6 +86,7 @@ public enum ClientVersion {
      * @param protocolVersion Protocol version.
      * @return ClientVersion
      */
+    @NotNull
     public static ClientVersion getClientVersion(int protocolVersion) {
         if (protocolVersion == -1) {
             return ClientVersion.UNRESOLVED;

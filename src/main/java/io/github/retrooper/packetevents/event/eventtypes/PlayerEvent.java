@@ -36,6 +36,7 @@ import org.bukkit.entity.Player;
 public interface PlayerEvent {
     /**
      * Associated player.
+     * @return Player.
      */
     Player getPlayer();
 }

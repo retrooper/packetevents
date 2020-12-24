@@ -85,8 +85,6 @@ public final class PacketEvents implements Listener, EventManager {
     //Executor used for player injecting/ejecting.
     public ExecutorService injectAndEjectExecutorService;//Initiated in init method
 
-    public ExecutorService packetProcessingExecutorService;//Initiated in init method
-
     public PacketHandlerInternal packetHandlerInternal = null;
     private boolean loading, loaded, initialized, initializing, stopping;
     private PacketEventsSettings settings = new PacketEventsSettings();
@@ -143,18 +141,6 @@ public final class PacketEvents implements Listener, EventManager {
         return init(plugin, settings);
     }
 
-    /**
-     * Initiates PacketEvents
-     * <p>
-     * Loading:
-     * Loads PacketEvents if you haven't already.
-     * <p>
-     * Registering:
-     * Registers this class as a Bukkit listener to inject/eject players.
-     *
-     * @param pl JavaPlugin instance
-     * @param packetEventsSettings settings
-     */
     public boolean init(final Plugin pl, PacketEventsSettings packetEventsSettings) {
         load();
         if (!initialized && !initializing) {
@@ -162,9 +148,6 @@ public final class PacketEvents implements Listener, EventManager {
             settings = packetEventsSettings;
             if (settings.getInjectAndEjectThreadCount() < 1) {
                 settings.injectAndEjectThreadCount(1);
-            }
-            if(settings.getPacketProcessingThreadCount() < -1) {
-                settings.packetProcessingThreadCount(-1);
             }
             settings.lock();
 
@@ -176,17 +159,6 @@ public final class PacketEvents implements Listener, EventManager {
                 @Override
                 public Thread newThread(@NotNull Runnable r) {
                     return new Thread(r, "PacketEvents-inject-eject #" + id.getAndIncrement());
-                }
-            });
-
-            int packetProcessingThreadCount = settings.getPacketProcessingThreadCount();
-            packetProcessingExecutorService = Executors.newFixedThreadPool(packetProcessingThreadCount, new ThreadFactory() {
-
-                private final AtomicInteger id = new AtomicInteger();
-
-                @Override
-                public Thread newThread(@NotNull Runnable r) {
-                    return new Thread(r, "PacketEvents-process #" + id.getAndIncrement());
                 }
             });
             plugins.add(pl);
@@ -313,7 +285,7 @@ public final class PacketEvents implements Listener, EventManager {
         }
         else if (getServerUtils().getVersion() == ServerVersion.v_1_7_10) {
             ClientVersion version = ClientVersion.getClientVersion(ProtocolVersionAccessor_v_1_7.getProtocolVersion(e.getPlayer()));
-            if(version == ClientVersion.UNRESOLVED || version == null) {
+            if(version == ClientVersion.UNRESOLVED) {
                 version = getPlayerUtils().tempClientVersionMap.get(socketAddress);
                 if(version == null) {
                     version = ClientVersion.UNRESOLVED;
