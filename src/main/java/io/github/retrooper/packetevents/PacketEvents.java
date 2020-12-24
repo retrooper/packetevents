@@ -52,11 +52,14 @@ import org.bukkit.event.player.PlayerLoginEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.ServicePriority;
+import org.jetbrains.annotations.NotNull;
 
 import java.net.InetSocketAddress;
 import java.util.ArrayList;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.ThreadFactory;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public final class PacketEvents implements Listener, EventManager {
     private static PacketEvents instance;
@@ -69,12 +72,36 @@ public final class PacketEvents implements Listener, EventManager {
      * General executor service, basically for anything that the packet executor service doesn't do.
      * For example update checking when you initialize PacketEvents.
      */
-    public ExecutorService generalExecutorService = Executors.newSingleThreadExecutor();
+    public ExecutorService generalExecutorService = Executors.newSingleThreadExecutor(new ThreadFactory() {
+
+        private final AtomicInteger id = new AtomicInteger();
+
+        @Override
+        public Thread newThread(@NotNull Runnable r) {
+            return new Thread(r, "PacketEvents-general #" + id.getAndIncrement());
+        }
+    });
 
     //Executor used for player injecting/ejecting.
-    public ExecutorService injectAndEjectExecutorService = Executors.newSingleThreadExecutor();
+    public ExecutorService injectAndEjectExecutorService = Executors.newSingleThreadExecutor(new ThreadFactory() {
 
-    public ExecutorService packetProcessingExecutorService = Executors.newSingleThreadExecutor();
+        private final AtomicInteger id = new AtomicInteger();
+
+        @Override
+        public Thread newThread(@NotNull Runnable r) {
+            return new Thread(r, "PacketEvents-inject #" + id.getAndIncrement());
+        }
+    });
+
+    public ExecutorService packetProcessingExecutorService = Executors.newSingleThreadExecutor(new ThreadFactory() {
+
+        private final AtomicInteger id = new AtomicInteger();
+
+        @Override
+        public Thread newThread(@NotNull Runnable r) {
+            return new Thread(r, "PacketEvents-process #" + id.getAndIncrement());
+        }
+    });
 
     public PacketHandlerInternal packetHandlerInternal = null;
     private boolean loading, loaded, initialized, initializing, stopping;
