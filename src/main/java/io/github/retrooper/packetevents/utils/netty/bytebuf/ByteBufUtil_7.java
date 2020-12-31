@@ -32,6 +32,7 @@ class ByteBufUtil_7 {
         return Unpooled.copiedBuffer(bytes);
     }
 
+    // TODO: Check if we should apply the same release fix here like we did in the 8 version of this class!
     public static byte[] getBytes(Object byteBuf) {
         ByteBuf bb = (ByteBuf) byteBuf;
         byte[] bytes;

@@ -28,6 +28,7 @@ import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 
 class ByteBufUtil_8 {
+
     public static Object copiedBuffer(byte[] bytes) {
         return Unpooled.copiedBuffer(bytes);
     }
@@ -35,11 +36,19 @@ class ByteBufUtil_8 {
     public static byte[] getBytes(Object byteBuf) {
         ByteBuf bb = (ByteBuf) byteBuf;
         byte[] bytes;
+        boolean release = false;
+        if(bb.refCnt() < 1) {
+            bb.retain(); // TODO: Try find a better solution cuz retaining a buffer which was already released is not recommended!
+            release = true;
+        }
         if (bb.hasArray()) {
             bytes = bb.array();
         } else {
             bytes = new byte[bb.readableBytes()];
             bb.getBytes(bb.readerIndex(), bytes);
+        }
+        if(release) {
+            bb.release();
         }
         return bytes;
     }
