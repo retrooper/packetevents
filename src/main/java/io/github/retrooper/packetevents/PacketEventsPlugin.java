@@ -24,21 +24,25 @@
 
 package io.github.retrooper.packetevents;
 
+import io.github.retrooper.packetevents.event.PacketListenerDynamic;
+import io.github.retrooper.packetevents.event.impl.PacketPlayReceiveEvent;
+import io.github.retrooper.packetevents.utils.player.ClientVersion;
 import org.bukkit.plugin.java.JavaPlugin;
 
 public class PacketEventsPlugin extends JavaPlugin {
+    //ENTITY METADATA, BLOCKCHANGE
     @Override
     public void onLoad() {
-
+        PacketEvents.create(this).load();
     }
 
     @Override
     public void onEnable() {
-
+        PacketEvents.get().init(this);
     }
 
     @Override
     public void onDisable() {
-
+        PacketEvents.get().terminate();
     }
 }

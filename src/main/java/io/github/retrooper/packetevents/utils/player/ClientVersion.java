@@ -71,6 +71,8 @@ public enum ClientVersion {
      */
     ANY_PRE_RELEASE_VERSION(0),
 
+    TEMP_UNRESOLVED(-1),
+
     UNRESOLVED(-1);
 
     private static final short lowestSupportedProtocolVersion = (short) (LOWER_THAN_SUPPORTED_VERSIONS.protocolVersion + 1);
