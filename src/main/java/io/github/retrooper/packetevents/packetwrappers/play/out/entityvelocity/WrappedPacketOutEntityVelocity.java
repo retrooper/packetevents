@@ -29,8 +29,6 @@ import io.github.retrooper.packetevents.packetwrappers.NMSPacket;
 import io.github.retrooper.packetevents.packetwrappers.SendableWrapper;
 import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
 import io.github.retrooper.packetevents.utils.nms.NMSUtils;
-import io.github.retrooper.packetevents.utils.server.ServerVersion;
-import io.github.retrooper.packetevents.utils.vector.Vector3d;
 import org.bukkit.entity.Entity;
 
 import java.lang.reflect.Constructor;

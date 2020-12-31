@@ -25,7 +25,6 @@
 package io.github.retrooper.packetevents.packettype;
 
 import io.github.retrooper.packetevents.PacketEvents;
-import io.github.retrooper.packetevents.event.eventtypes.NMSPacketEvent;
 import io.github.retrooper.packetevents.utils.server.ServerVersion;
 
 import java.util.HashMap;

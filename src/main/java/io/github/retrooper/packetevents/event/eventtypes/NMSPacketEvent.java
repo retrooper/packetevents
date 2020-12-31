@@ -26,7 +26,6 @@ package io.github.retrooper.packetevents.event.eventtypes;
 
 import io.github.retrooper.packetevents.packettype.PacketType;
 import io.github.retrooper.packetevents.packetwrappers.NMSPacket;
-import org.jetbrains.annotations.NotNull;
 
 import java.net.InetSocketAddress;
 

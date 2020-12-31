@@ -26,7 +26,6 @@ package io.github.retrooper.packetevents.packetwrappers.play.out.position;
 
 import io.github.retrooper.packetevents.packetwrappers.NMSPacket;
 import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
-import io.github.retrooper.packetevents.utils.vector.Vector3d;
 
 public final class WrappedPacketOutPosition extends WrappedPacket {
     private double x;

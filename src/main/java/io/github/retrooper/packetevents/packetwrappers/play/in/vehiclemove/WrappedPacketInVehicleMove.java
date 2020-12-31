@@ -26,7 +26,6 @@ package io.github.retrooper.packetevents.packetwrappers.play.in.vehiclemove;
 
 import io.github.retrooper.packetevents.packetwrappers.NMSPacket;
 import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
-import io.github.retrooper.packetevents.utils.vector.Vector3d;
 
 public class WrappedPacketInVehicleMove extends WrappedPacket {
     public WrappedPacketInVehicleMove(NMSPacket packet) {

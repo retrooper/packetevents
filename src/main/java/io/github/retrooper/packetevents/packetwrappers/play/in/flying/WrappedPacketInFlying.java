@@ -27,7 +27,6 @@ package io.github.retrooper.packetevents.packetwrappers.play.in.flying;
 
 import io.github.retrooper.packetevents.packetwrappers.NMSPacket;
 import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
-import io.github.retrooper.packetevents.utils.vector.Vector3d;
 
 public class WrappedPacketInFlying extends WrappedPacket {
     public WrappedPacketInFlying(NMSPacket packet) {

@@ -28,7 +28,6 @@ import io.github.retrooper.packetevents.event.manager.EventManager;
 import io.github.retrooper.packetevents.event.manager.PEEventManager;
 import io.github.retrooper.packetevents.exceptions.PacketEventsLoadFailureException;
 import io.github.retrooper.packetevents.handler.PacketHandlerInternal;
-import io.github.retrooper.packetevents.packettype.PacketType;
 import io.github.retrooper.packetevents.packettype.PacketTypeClasses;
 import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
 import io.github.retrooper.packetevents.settings.PacketEventsSettings;
@@ -74,11 +73,9 @@ public final class PacketEvents implements Listener, EventManager {
      */
     public ExecutorService generalExecutorService = Executors.newSingleThreadExecutor(new ThreadFactory() {
 
-        private final AtomicInteger id = new AtomicInteger();
-
         @Override
         public Thread newThread(@NotNull Runnable r) {
-            return new Thread(r, "PacketEvents-general #" + id.getAndIncrement());
+            return new Thread(r, "PacketEvents-general");
         }
     });
 

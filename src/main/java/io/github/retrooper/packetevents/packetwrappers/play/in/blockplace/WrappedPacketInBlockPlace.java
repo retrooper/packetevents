@@ -28,7 +28,6 @@ import io.github.retrooper.packetevents.enums.Direction;
 import io.github.retrooper.packetevents.packetwrappers.NMSPacket;
 import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
 import io.github.retrooper.packetevents.utils.server.ServerVersion;
-import io.github.retrooper.packetevents.utils.vector.Vector3d;
 
 
 public final class WrappedPacketInBlockPlace extends WrappedPacket {
