@@ -24,6 +24,7 @@
 
 package io.github.retrooper.packetevents.packetwrappers.login.out.custompayload;
 
+import io.github.retrooper.packetevents.PacketEvents;
 import io.github.retrooper.packetevents.packettype.PacketTypeClasses;
 import io.github.retrooper.packetevents.packetwrappers.NMSPacket;
 import io.github.retrooper.packetevents.packetwrappers.SendableWrapper;
@@ -105,14 +106,14 @@ public class WrappedPacketLoginOutCustomPayload extends WrappedPacket implements
             Object dataSerializer = readObject(0, packetDataSerializerClass);
             WrappedPacket byteBufWrapper = new WrappedPacket(new NMSPacket(dataSerializer));
             Object byteBuf = byteBufWrapper.readObject(0, byteBufClass);
-            return ByteBufUtil.getBytes(byteBuf);
+            return PacketEvents.get().getByteBufUtil().getBytes(byteBuf);
         }
         return data;
     }
 
     @Override
     public Object asNMSPacket() {
-        Object byteBufObject = ByteBufUtil.copiedBuffer(data);
+        Object byteBufObject = PacketEvents.get().getByteBufUtil().wrappedBuffer(data);
         try {
             Object minecraftKey = minecraftKeyConstructor.newInstance(channelName);
             Object dataSerializer = packetDataSerializerConstructor.newInstance(byteBufObject);

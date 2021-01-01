@@ -24,6 +24,7 @@
 
 package io.github.retrooper.packetevents.packetwrappers.login.in.custompayload;
 
+import io.github.retrooper.packetevents.PacketEvents;
 import io.github.retrooper.packetevents.packetwrappers.NMSPacket;
 import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
 import io.github.retrooper.packetevents.utils.netty.bytebuf.ByteBufUtil;
@@ -58,7 +59,7 @@ public class WrappedPacketLoginInCustomPayload extends WrappedPacket {
         Object dataSerializer = readObject(0, packetDataSerializerClass);
         WrappedPacket byteBufWrapper = new WrappedPacket(new NMSPacket(dataSerializer));
         Object byteBuf = byteBufWrapper.readObject(0, byteBufClass);
-        return ByteBufUtil.getBytes(byteBuf);
+        return PacketEvents.get().getByteBufUtil().getBytes(byteBuf);
     }
 
     @Override

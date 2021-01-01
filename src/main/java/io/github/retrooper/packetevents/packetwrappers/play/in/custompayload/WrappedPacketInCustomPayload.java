@@ -24,6 +24,7 @@
 
 package io.github.retrooper.packetevents.packetwrappers.play.in.custompayload;
 
+import io.github.retrooper.packetevents.PacketEvents;
 import io.github.retrooper.packetevents.packettype.PacketTypeClasses;
 import io.github.retrooper.packetevents.packetwrappers.NMSPacket;
 import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
@@ -78,7 +79,7 @@ public final class WrappedPacketInCustomPayload extends WrappedPacket {
 
             Object byteBuf = byteBufWrapper.readObject(0, byteBufClass);
 
-            return ByteBufUtil.getBytes(byteBuf);
+            return PacketEvents.get().getByteBufUtil().getBytes(byteBuf);
         }
     }
 }

@@ -28,11 +28,15 @@ import io.github.retrooper.packetevents.event.manager.EventManager;
 import io.github.retrooper.packetevents.event.manager.PEEventManager;
 import io.github.retrooper.packetevents.exceptions.PacketEventsLoadFailureException;
 import io.github.retrooper.packetevents.handler.PacketHandlerInternal;
+import io.github.retrooper.packetevents.injector.lateinjector.LateChannelInjector;
 import io.github.retrooper.packetevents.packettype.PacketTypeClasses;
 import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
 import io.github.retrooper.packetevents.settings.PacketEventsSettings;
 import io.github.retrooper.packetevents.updatechecker.UpdateChecker;
 import io.github.retrooper.packetevents.utils.entityfinder.EntityFinderUtils;
+import io.github.retrooper.packetevents.utils.netty.bytebuf.ByteBufUtil;
+import io.github.retrooper.packetevents.utils.netty.bytebuf.ByteBufUtil_7;
+import io.github.retrooper.packetevents.utils.netty.bytebuf.ByteBufUtil_8;
 import io.github.retrooper.packetevents.utils.nms.NMSUtils;
 import io.github.retrooper.packetevents.utils.player.ClientVersion;
 import io.github.retrooper.packetevents.utils.player.PlayerUtils;
@@ -54,15 +58,14 @@ import org.bukkit.plugin.ServicePriority;
 import org.jetbrains.annotations.NotNull;
 
 import java.net.InetSocketAddress;
-import java.util.ArrayList;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public final class PacketEvents implements Listener, EventManager {
+
     private static PacketEvents instance;
-    private final ArrayList<Plugin> plugins = new ArrayList<>(1);
     private final PEVersion version = new PEVersion(1, 7, 9);
     private final EventManager eventManager = new PEEventManager();
     private final PlayerUtils playerUtils = new PlayerUtils();
@@ -71,20 +74,15 @@ public final class PacketEvents implements Listener, EventManager {
      * General executor service, basically for anything that the packet executor service doesn't do.
      * For example update checking when you initialize PacketEvents.
      */
-    public ExecutorService generalExecutorService = Executors.newSingleThreadExecutor(new ThreadFactory() {
-
-        @Override
-        public Thread newThread(@NotNull Runnable r) {
-            return new Thread(r, "PacketEvents-general");
-        }
-    });
+    public ExecutorService generalExecutorService = Executors.newSingleThreadExecutor(r -> new Thread(r, "PacketEvents-general"));
 
     //Executor used for player injecting/ejecting.
     public ExecutorService injectAndEjectExecutorService;//Initiated in init method
 
-    public PacketHandlerInternal packetHandlerInternal = null;
+    public PacketHandlerInternal packetHandlerInternal;
     private boolean loading, loaded, initialized, initializing, stopping;
     private PacketEventsSettings settings = new PacketEventsSettings();
+    private final ByteBufUtil byteBufUtil = LateChannelInjector.v1_7_nettyMode ? new ByteBufUtil_7() : new ByteBufUtil_8();
 
 
     public static PacketEvents create(final Plugin plugin) {
@@ -158,10 +156,9 @@ public final class PacketEvents implements Listener, EventManager {
                     return new Thread(r, "PacketEvents-inject-eject #" + id.getAndIncrement());
                 }
             });
-            plugins.add(pl);
 
             //Register Bukkit listener
-            final Plugin plugin = plugins.get(0);
+            final Plugin plugin = PacketEventsPlugin.getInstance();
             Bukkit.getPluginManager().registerEvents(this, plugin);
             packetHandlerInternal = new PacketHandlerInternal(plugin, settings.shouldInjectEarly());
             for (final Player p : Bukkit.getOnlinePlayers()) {
@@ -173,12 +170,7 @@ public final class PacketEvents implements Listener, EventManager {
             }
 
             if (settings.shouldCheckForUpdates()) {
-                generalExecutorService.execute(new Runnable() {
-                    @Override
-                    public void run() {
-                        new UpdateChecker().handleUpdate();
-                    }
-                });
+                generalExecutorService.execute(() -> new UpdateChecker().handleUpdate());
 
             }
             initialized = true;
@@ -226,13 +218,8 @@ public final class PacketEvents implements Listener, EventManager {
         return initialized;
     }
 
-    @Deprecated
-    public ArrayList<Plugin> getPlugins() {
-        return plugins;
-    }
-
     public Plugin getPlugin() {
-        return plugins.get(0);
+        return PacketEventsPlugin.getInstance();
     }
 
     /**
@@ -260,6 +247,9 @@ public final class PacketEvents implements Listener, EventManager {
         return serverUtils;
     }
 
+    public ByteBufUtil getByteBufUtil() {
+        return byteBufUtil;
+    }
 
     @EventHandler(priority = EventPriority.LOW)
     public void onLogin(final PlayerLoginEvent e) {
@@ -306,4 +296,5 @@ public final class PacketEvents implements Listener, EventManager {
     public void onQuit(final PlayerQuitEvent e) {
         packetHandlerInternal.ejectPlayer(e.getPlayer());
     }
+
 }
