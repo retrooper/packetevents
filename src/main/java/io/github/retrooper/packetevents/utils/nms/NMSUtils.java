@@ -48,7 +48,7 @@ public final class NMSUtils {
     public static Class<?> nmsEntityClass, minecraftServerClass, craftWorldClass, playerInteractManagerClass, entityPlayerClass, playerConnectionClass, craftServerClass,
             craftPlayerClass, serverConnectionClass, craftEntityClass,
             craftItemStack, nmsItemStackClass, networkManagerClass, nettyChannelClass, gameProfileClass, iChatBaseComponentClass,
-            blockPosClass, enumDirectionClass, vec3DClass, channelFutureClass;
+            blockPosClass, enumDirectionClass, vec3DClass, channelFutureClass, blockClass, iBlockDataClass;
     private static Method getCraftPlayerHandle;
     private static Method getCraftEntityHandle;
     private static Method asBukkitCopy;
@@ -68,6 +68,8 @@ public final class NMSUtils {
             }
         }
         try {
+            blockClass = getNMSClass("Block");
+            iBlockDataClass = getNMSClass("IBlockData");
             nettyChannelClass = getNettyClass("channel.Channel");
             channelFutureClass = getNettyClass("channel.ChannelFuture");
             nmsEntityClass = getNMSClass("Entity");

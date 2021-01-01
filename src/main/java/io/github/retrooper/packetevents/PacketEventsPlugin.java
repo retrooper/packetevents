@@ -30,7 +30,6 @@ import io.github.retrooper.packetevents.utils.player.ClientVersion;
 import org.bukkit.plugin.java.JavaPlugin;
 
 public class PacketEventsPlugin extends JavaPlugin {
-    //ENTITY METADATA, BLOCKCHANGE
     @Override
     public void onLoad() {
         PacketEvents.create(this).load();

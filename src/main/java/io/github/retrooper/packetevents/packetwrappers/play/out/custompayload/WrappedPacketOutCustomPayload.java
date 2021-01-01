@@ -144,7 +144,6 @@ protected void load() {
                     WrappedPacket byteBufWrapper = new WrappedPacket(new NMSPacket(dataSerializer));
 
                     Object byteBuf = byteBufWrapper.readObject(0, byteBufClass);
-
                     return ByteBufUtil.getBytes(byteBuf);
             }
             return new byte[0];
