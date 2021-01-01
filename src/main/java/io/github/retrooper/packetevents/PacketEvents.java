@@ -45,6 +45,7 @@ import io.github.retrooper.packetevents.utils.server.ServerVersion;
 import io.github.retrooper.packetevents.utils.version.PEVersion;
 import io.github.retrooper.packetevents.utils.versionlookup.VersionLookupUtils;
 import io.github.retrooper.packetevents.utils.versionlookup.v_1_7_10.ProtocolVersionAccessor_v_1_7;
+import io.github.retrooper.packetevents.utils.versionlookup.viaversion.ViaVersionLookupUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -180,14 +181,11 @@ public final class PacketEvents implements Listener, EventManager {
         return false;
     }
 
-    /**
-     *
-     */
-    public void stop() {
+    public void terminate() {
         if (initialized && !stopping) {
-                for (Player player : Bukkit.getOnlinePlayers()) {
-                    packetHandlerInternal.ejectPlayer(player);
-                }
+            for (Player player : Bukkit.getOnlinePlayers()) {
+                packetHandlerInternal.ejectPlayer(player);
+            }
             packetHandlerInternal.close();
 
             getEventManager().unregisterAllListeners();
@@ -196,6 +194,11 @@ public final class PacketEvents implements Listener, EventManager {
             initialized = false;
             stopping = false;
         }
+    }
+
+    @Deprecated
+    public void stop() {
+        terminate();
     }
 
     public boolean hasLoaded() {
@@ -264,24 +267,29 @@ public final class PacketEvents implements Listener, EventManager {
 
     @EventHandler(priority = EventPriority.HIGH)
     public void onJoin(final PlayerJoinEvent e) {
-        InetSocketAddress socketAddress = e.getPlayer().getAddress();
-        if (VersionLookupUtils.isDependencyAvailable()) {
-            if (Bukkit.getPluginManager().isPluginEnabled("ViaBackwards") || Bukkit.getPluginManager().isPluginEnabled("ViaRewind")) {
-                packetHandlerInternal.minimumPostPlayerInjectDeltaTime = 100L;
-            }
+        final InetSocketAddress address = e.getPlayer().getAddress();
+        if (ViaVersionLookupUtils.isAvailable()) {
+            PacketEvents.get().getPlayerUtils().clientVersionsMap.put(e.getPlayer().getAddress(), ClientVersion.TEMP_UNRESOLVED);
+            Bukkit.getScheduler().scheduleSyncDelayedTask(getPlugin(), new Runnable() {
+                @Override
+                public void run() {
+                    int protocolVersion = VersionLookupUtils.getProtocolVersion(e.getPlayer());
+                    ClientVersion version = ClientVersion.getClientVersion(protocolVersion);
+                    PacketEvents.get().getPlayerUtils().clientVersionsMap.put(address, version);
+                }
+            }, 1L);
         }
         else if (getServerUtils().getVersion() == ServerVersion.v_1_7_10) {
             ClientVersion version = ClientVersion.getClientVersion(ProtocolVersionAccessor_v_1_7.getProtocolVersion(e.getPlayer()));
             if(version == ClientVersion.UNRESOLVED) {
-                version = getPlayerUtils().tempClientVersionMap.get(socketAddress);
+                version = getPlayerUtils().tempClientVersionMap.get(address);
                 if(version == null) {
                     version = ClientVersion.UNRESOLVED;
                 }
             }
-            getPlayerUtils().clientVersionsMap.put(socketAddress, version);
+            getPlayerUtils().clientVersionsMap.put(address, version);
         }
-        packetHandlerInternal.channelTimePassed.put(packetHandlerInternal.getChannel(e.getPlayer().getName()),
-                System.currentTimeMillis());
+
         if (!getSettings().shouldInjectEarly()) {
             try {
                 packetHandlerInternal.injectPlayer(e.getPlayer());

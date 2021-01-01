@@ -95,7 +95,6 @@ class LateChannelInjector8 implements ChannelInjector {
                     channel.pipeline().remove(getNettyHandlerName(plugin));
                 }
                 PacketEvents.get().packetHandlerInternal.keepAliveMap.remove(player.getUniqueId());
-                PacketEvents.get().packetHandlerInternal.channelTimePassed.remove(channel);
                 PacketEvents.get().packetHandlerInternal.channelMap.remove(player.getName());
                 PacketEvents.get().getPlayerUtils().clientVersionsMap.remove(player.getAddress());
                 PacketEvents.get().getPlayerUtils().tempClientVersionMap.remove(player.getAddress());

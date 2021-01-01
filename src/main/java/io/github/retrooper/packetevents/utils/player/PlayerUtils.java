@@ -27,7 +27,9 @@ package io.github.retrooper.packetevents.utils.player;
 import io.github.retrooper.packetevents.PacketEvents;
 import io.github.retrooper.packetevents.packetwrappers.SendableWrapper;
 import io.github.retrooper.packetevents.utils.nms.NMSUtils;
+import io.github.retrooper.packetevents.utils.versionlookup.VersionLookupUtils;
 import org.bukkit.entity.Player;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.net.InetSocketAddress;
@@ -84,6 +86,7 @@ public final class PlayerUtils {
     /**
      * Use reflection to read the ping value NMS calculates for the player.
      * NMS smooths the player ping.
+     *
      * @param player Target player.
      * @return NMS smoothed ping.
      */
@@ -93,6 +96,7 @@ public final class PlayerUtils {
 
     /**
      * Use the ping PacketEvents calculates for the player. (Updates every incoming Keep Alive packet)
+     *
      * @param player Target player.
      * @return Non-smoothed ping.
      */
@@ -103,6 +107,7 @@ public final class PlayerUtils {
 
     /**
      * Use the ping PacketEvents calculates and smooths in the same way NMS does (Updates every incoming Keep Alive packet)
+     *
      * @param player Target player.
      * @return Smoothed ping.
      */
@@ -113,6 +118,7 @@ public final class PlayerUtils {
 
     /**
      * Use the ping PacketEvents calculates for the player. (Updates every incoming Keep Alive packet)
+     *
      * @param uuid Target player UUID.
      * @return Non-smoothed ping.
      */
@@ -122,6 +128,7 @@ public final class PlayerUtils {
 
     /**
      * Use the ping PacketEvents calculates and smooths in the same way NMS does (Updates every incoming Keep Alive packet)
+     *
      * @param uuid Target player UUID.
      * @return Smoothed ping.
      */
@@ -131,24 +138,34 @@ public final class PlayerUtils {
 
     /**
      * Get a player's client version.
-     * @see #clientVersionsMap
+     *
      * @param player Target player.
      * @return Client Version.
-     */
-    @Nullable
-    public ClientVersion getClientVersion(final Player player) {
-        return getClientVersion(player.getAddress());
-    }
-
-    /**
-     * Get a player's client version by their socket address.
      * @see #clientVersionsMap
-     * @param address Target player address.
-     * @return Client Version.
      */
-    @Nullable
-    public ClientVersion getClientVersion(final InetSocketAddress address) {
-        return clientVersionsMap.get(address);
+    @NotNull
+    public ClientVersion getClientVersion(final Player player) {
+        ClientVersion version = clientVersionsMap.get(player.getAddress());
+        if (version == null) {
+            if (VersionLookupUtils.isDependencyAvailable()) {
+                try {
+                    version = ClientVersion.getClientVersion(VersionLookupUtils.getProtocolVersion(player));
+                    clientVersionsMap.put(player.getAddress(), version);
+                } catch (Exception ex) {
+                    version = null;
+                }
+                //Try again the next time
+                return ClientVersion.UNRESOLVED;
+            } else {
+                version = tempClientVersionMap.get(player.getAddress());
+                if (version == null) {
+                    version = ClientVersion.UNRESOLVED;
+                }
+                clientVersionsMap.put(player.getAddress(), version);
+                //Unfortunately don't know what to do, this should never be the case though...
+            }
+        }
+        return version;
     }
 
     /**
@@ -157,6 +174,7 @@ public final class PlayerUtils {
      * event and if the event gets cancelled, this action will cancel too.
      * The injection action and event call will be async or sync depending on the PacketEvents settings.
      * Recommended to use this as this most likely won't ever change/refactor compared to using our internal utils.
+     *
      * @param player Target player.
      */
     public void injectPlayer(final Player player) {
@@ -169,6 +187,7 @@ public final class PlayerUtils {
      * event and if the event gets cancelled, this action will cancel too.
      * The ejection action and event call will be async or sync depending on the PacketEvents settings.
      * Recommended to use this as this most likely won't ever change/refactor compared to using our internal utils.
+     *
      * @param player Target player.
      */
     public void ejectPlayer(final Player player) {
@@ -177,7 +196,8 @@ public final class PlayerUtils {
 
     /**
      * Send a client-bound(server-sided) wrapper that supports sending to a player.
-     * @param player Packet receiver.
+     *
+     * @param player  Packet receiver.
      * @param wrapper Client-bound wrapper supporting sending.
      */
     public void sendPacket(final Player player, final SendableWrapper wrapper) {
@@ -186,6 +206,7 @@ public final class PlayerUtils {
 
     /**
      * Send a client-bound(server-sided) raw NMS Packet without any wrapper to a player.
+     *
      * @param player Packet receiver.
      * @param packet Client-bound raw NMS packet.
      */
@@ -195,6 +216,7 @@ public final class PlayerUtils {
 
     /**
      * Send a client-bound(server-sided) wrapper that supports sending to a netty channel.
+     *
      * @param channel Netty channel as object(due to package changes)
      * @param wrapper Client-bound raw NMS packet.
      */
@@ -204,8 +226,9 @@ public final class PlayerUtils {
 
     /**
      * Send a client-bound(server-sided) raw NMS Packet without any wrapper to a netty channel.
+     *
      * @param channel Netty channel as object(due to package changes)
-     * @param packet Client-bound raw NMS packet.
+     * @param packet  Client-bound raw NMS packet.
      */
     public void sendNMSPacket(final Object channel, final Object packet) {
         PacketEvents.get().packetHandlerInternal.sendPacket(channel, packet);

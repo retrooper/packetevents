@@ -62,8 +62,6 @@ public class PacketHandlerInternal {
     private final boolean earlyInjectMode;
     public final HashMap<UUID, Long> keepAliveMap = new HashMap<>();
     public final Map<String, Object> channelMap = new ConcurrentHashMap<>();
-    public final Map<Object, Long> channelTimePassed = new ConcurrentHashMap<>();
-    public volatile long minimumPostPlayerInjectDeltaTime;
     public PacketHandlerInternal(Plugin plugin, boolean earlyInjectMode) {
         this.earlyInjectMode = earlyInjectMode;
         if (earlyInjectMode) {
@@ -192,7 +190,6 @@ public class PacketHandlerInternal {
                 Objects.requireNonNull(lateInjector).ejectPlayerSync(player);
             }
             keepAliveMap.remove(player.getUniqueId());
-            channelTimePassed.remove(getChannel(player.getName()));
             channelMap.remove(player.getName());
         }
     }
@@ -267,14 +264,6 @@ public class PacketHandlerInternal {
                 }
             }
         } else {
-            Long minTicksPassed = channelTimePassed.get(channel);
-            if(minTicksPassed != null && minTicksPassed != -1L) {
-                long deltaTime = System.currentTimeMillis() - minTicksPassed;
-                if(deltaTime >= minimumPostPlayerInjectDeltaTime) {
-                    channelTimePassed.put(channel, -1L);
-                    PacketEvents.get().getEventManager().callEvent(new PostPlayerInjectEvent(player));
-                }
-            }
             final PacketPlayReceiveEvent event = new PacketPlayReceiveEvent(player, channel, new NMSPacket(packet));
             PacketEvents.get().getEventManager().callEvent(event);
             packet = event.getNMSPacket().getRawNMSPacket();
@@ -318,14 +307,6 @@ public class PacketHandlerInternal {
                 }
             }
         } else {
-            Long minTicksPassed = channelTimePassed.get(channel);
-            if(minTicksPassed != null && minTicksPassed != -1L) {
-                long deltaTime = System.currentTimeMillis() - minTicksPassed;
-                if (deltaTime >= minimumPostPlayerInjectDeltaTime) {
-                    channelTimePassed.put(channel, -1L);
-                    PacketEvents.get().getEventManager().callEvent(new PostPlayerInjectEvent(player));
-                }
-            }
             final PacketPlaySendEvent event = new PacketPlaySendEvent(player, channel, new NMSPacket(packet));
             PacketEvents.get().getEventManager().callEvent(event);
             packet = event.getNMSPacket().getRawNMSPacket();

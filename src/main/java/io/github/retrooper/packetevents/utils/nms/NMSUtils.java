@@ -30,6 +30,7 @@ import io.github.retrooper.packetevents.utils.entityfinder.EntityFinderUtils;
 import io.github.retrooper.packetevents.utils.reflection.Reflection;
 import io.github.retrooper.packetevents.utils.server.ServerVersion;
 import org.bukkit.Bukkit;
+import org.bukkit.World;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -111,7 +112,7 @@ public final class NMSUtils {
     }
 
     public static Object getMinecraftServerInstance() {
-        if(minecraftServer == null) {
+        if (minecraftServer == null) {
             try {
                 minecraftServer = Reflection.getField(craftServerClass, minecraftServerClass, 0)
                         .get(Bukkit.getServer());
@@ -123,7 +124,7 @@ public final class NMSUtils {
     }
 
     public static Object getMinecraftServerConnection() {
-        if(minecraftServerConnection == null) {
+        if (minecraftServerConnection == null) {
             try {
                 minecraftServerConnection = Reflection.getField(minecraftServerClass, serverConnectionClass, 0).get(getMinecraftServerInstance());
             } catch (IllegalAccessException e) {
@@ -159,7 +160,18 @@ public final class NMSUtils {
     }
 
     public static Entity getEntityById(final int id) {
-        return EntityFinderUtils.getEntityById(id);
+        Entity entity = EntityFinderUtils.getEntityById(id);
+        if (entity == null) {
+            for (World world : Bukkit.getWorlds()) {
+                for (Entity e : world.getEntities()) {
+                    if (e.getEntityId() == id) {
+                        entity = e;
+                        break;
+                    }
+                }
+            }
+        }
+        return entity;
     }
 
     public static Object getNMSEntity(final Entity entity) {
