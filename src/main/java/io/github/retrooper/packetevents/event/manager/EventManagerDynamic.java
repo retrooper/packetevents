@@ -37,7 +37,7 @@ class EventManagerDynamic {
      * The key is the dynamic packet listener event priority, the value is a list of the dynamic packet listeners having that priority.
      * Priorities count for the whole listener, not just one event method in the listener.
      */
-    private final Map<Byte, HashSet<PacketListenerDynamic>> map = new HashMap<>();
+    private final Map<Byte, Set<PacketListenerDynamic>> map = new HashMap<>();
 
     /**
      * Call the PacketEvent.
@@ -57,7 +57,7 @@ class EventManagerDynamic {
         byte maxReachedEventPriority = PacketEventPriority.LOWEST.getPriorityValue();
         //LOWEST.getPriorityValue()
         for (byte i = maxReachedEventPriority; i <= PacketEventPriority.MONITOR.getPriorityValue(); i++) {
-            HashSet<PacketListenerDynamic> cached = map.get(i);
+            Set<PacketListenerDynamic> cached = map.get(i);
             if (cached != null) {
                 maxReachedEventPriority = i;
                 for (PacketListenerDynamic listener : cached) {
@@ -83,7 +83,7 @@ class EventManagerDynamic {
      * @param listener {@link PacketListenerDynamic}
      */
     public void registerListener(PacketListenerDynamic listener) {
-        HashSet<PacketListenerDynamic> listeners = map.computeIfAbsent(listener.getPriority().getPriorityValue(), k -> new HashSet<>());
+        Set<PacketListenerDynamic> listeners = map.computeIfAbsent(listener.getPriority().getPriorityValue(), k -> new HashSet<>());
         listeners.add(listener);
     }
     /**
@@ -100,7 +100,7 @@ class EventManagerDynamic {
      * @param listener {@link PacketListenerDynamic}
      */
     public void unregisterListener(PacketListenerDynamic listener) {
-        HashSet<PacketListenerDynamic> listeners = map.get(listener.getPriority().getPriorityValue());
+        Set<PacketListenerDynamic> listeners = map.get(listener.getPriority().getPriorityValue());
         if (listeners == null) {
             return;
         }
