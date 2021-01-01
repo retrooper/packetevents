@@ -33,16 +33,17 @@ public class PacketEventsPlugin extends JavaPlugin {
     @Override
     public void onLoad() {
         instance = this;
+        PacketEvents.create(this).load();
     }
 
     @Override
     public void onEnable() {
-
+        PacketEvents.get().init(this);
     }
 
     @Override
     public void onDisable() {
-
+        PacketEvents.get().terminate();
     }
 
     protected static PacketEventsPlugin getInstance() {
