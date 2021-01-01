@@ -24,6 +24,7 @@
 
 package io.github.retrooper.packetevents;
 
+import io.github.retrooper.packetevents.event.impl.PostPlayerInjectEvent;
 import io.github.retrooper.packetevents.event.manager.EventManager;
 import io.github.retrooper.packetevents.event.manager.PEEventManager;
 import io.github.retrooper.packetevents.exceptions.PacketEventsLoadFailureException;
@@ -268,7 +269,8 @@ public final class PacketEvents implements Listener, EventManager {
     @EventHandler(priority = EventPriority.HIGH)
     public void onJoin(final PlayerJoinEvent e) {
         final InetSocketAddress address = e.getPlayer().getAddress();
-        if (ViaVersionLookupUtils.isAvailable()) {
+        boolean viaAvailable = ViaVersionLookupUtils.isAvailable();
+        if (viaAvailable) {
             PacketEvents.get().getPlayerUtils().clientVersionsMap.put(e.getPlayer().getAddress(), ClientVersion.TEMP_UNRESOLVED);
             Bukkit.getScheduler().scheduleSyncDelayedTask(getPlugin(), new Runnable() {
                 @Override
@@ -276,6 +278,7 @@ public final class PacketEvents implements Listener, EventManager {
                     int protocolVersion = VersionLookupUtils.getProtocolVersion(e.getPlayer());
                     ClientVersion version = ClientVersion.getClientVersion(protocolVersion);
                     PacketEvents.get().getPlayerUtils().clientVersionsMap.put(address, version);
+                    PacketEvents.get().getEventManager().callEvent(new PostPlayerInjectEvent(e.getPlayer()));
                 }
             }, 1L);
         }
@@ -293,6 +296,9 @@ public final class PacketEvents implements Listener, EventManager {
         if (!getSettings().shouldInjectEarly()) {
             try {
                 packetHandlerInternal.injectPlayer(e.getPlayer());
+                if(!viaAvailable) {
+                    PacketEvents.get().getEventManager().callEvent(new PostPlayerInjectEvent(e.getPlayer()));
+                }
             } catch (Exception ex) {
                 e.getPlayer().kickPlayer(getSettings().getInjectionFailureMessage());
             }

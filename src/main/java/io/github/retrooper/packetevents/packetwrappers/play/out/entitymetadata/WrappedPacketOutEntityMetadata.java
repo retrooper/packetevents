@@ -26,10 +26,28 @@ package io.github.retrooper.packetevents.packetwrappers.play.out.entitymetadata;
 
 import io.github.retrooper.packetevents.packetwrappers.NMSPacket;
 import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
+import io.github.retrooper.packetevents.utils.nms.NMSUtils;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
+import java.util.ArrayList;
+import java.util.List;
 
+/**
+ * UNFINISHED, DO NOT USE
+ */
 public class WrappedPacketOutEntityMetadata extends WrappedPacket {
+    private static Constructor<?> watchableObjectConstructor;
     public WrappedPacketOutEntityMetadata(NMSPacket packet) {
         super(packet);
+    }
+
+    @Override
+    protected void load() {
+        try {
+            watchableObjectConstructor = NMSUtils.watchableObjectClass.getConstructor(int.class, int.class, Object.class);
+        } catch (NoSuchMethodException e) {
+            e.printStackTrace();
+        }
     }
 
     public int getEntityId() {
@@ -37,6 +55,59 @@ public class WrappedPacketOutEntityMetadata extends WrappedPacket {
             return readInt(0);
         } else {
             return 0;
+        }
+    }
+
+    public List<WrappedWatchableObject> getWatchableObjects() {
+        List<Object> nmsWatchables = (List<Object>) readObject(0, List.class);
+        List<WrappedWatchableObject> watchableObjects = new ArrayList<>();
+        for (Object nmsWatchable : nmsWatchables) {
+            watchableObjects.add(new WrappedWatchableObject(nmsWatchable));
+        }
+        return watchableObjects;
+    }
+
+    public static class WrappedWatchableObject {
+        private final int type;
+        private final int index;
+        private Object value;
+
+        public WrappedWatchableObject(int type, int index, Object value) {
+            this.type = type;
+            this.index = index;
+            this.value = value;
+        }
+
+        public WrappedWatchableObject(Object nmsWatchableObject) {
+            WrappedPacket watchableWrapper = new WrappedPacket(new NMSPacket(nmsWatchableObject));
+            this.type = watchableWrapper.readInt(0);
+            this.index = watchableWrapper.readInt(1);
+            this.value = watchableWrapper.readObject(0, Object.class);
+        }
+
+        public int getType() {
+            return type;
+        }
+
+        public int getIndex() {
+            return index;
+        }
+
+        public Object getValue() {
+            return value;
+        }
+
+        public void setValue(Object value) {
+            this.value = value;
+        }
+
+        public Object asMojangWatchableObject() {
+            try {
+                return watchableObjectConstructor.newInstance(type, index, value);
+            } catch (InstantiationException | InvocationTargetException | IllegalAccessException e) {
+                e.printStackTrace();
+            }
+            return null;
         }
     }
 }

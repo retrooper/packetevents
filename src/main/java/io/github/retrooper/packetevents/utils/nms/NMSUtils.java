@@ -28,6 +28,7 @@ import io.github.retrooper.packetevents.packetwrappers.NMSPacket;
 import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
 import io.github.retrooper.packetevents.utils.entityfinder.EntityFinderUtils;
 import io.github.retrooper.packetevents.utils.reflection.Reflection;
+import io.github.retrooper.packetevents.utils.reflection.SubclassUtil;
 import io.github.retrooper.packetevents.utils.server.ServerVersion;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
@@ -48,7 +49,7 @@ public final class NMSUtils {
     public static Class<?> nmsEntityClass, minecraftServerClass, craftWorldClass, playerInteractManagerClass, entityPlayerClass, playerConnectionClass, craftServerClass,
             craftPlayerClass, serverConnectionClass, craftEntityClass,
             craftItemStack, nmsItemStackClass, networkManagerClass, nettyChannelClass, gameProfileClass, iChatBaseComponentClass,
-            blockPosClass, enumDirectionClass, vec3DClass, channelFutureClass, blockClass, iBlockDataClass;
+            blockPosClass, enumDirectionClass, vec3DClass, channelFutureClass, blockClass, iBlockDataClass, watchableObjectClass, nmsWorldClass;
     private static Method getCraftPlayerHandle;
     private static Method getCraftEntityHandle;
     private static Method asBukkitCopy;
@@ -68,8 +69,6 @@ public final class NMSUtils {
             }
         }
         try {
-            blockClass = getNMSClass("Block");
-            iBlockDataClass = getNMSClass("IBlockData");
             nettyChannelClass = getNettyClass("channel.Channel");
             channelFutureClass = getNettyClass("channel.ChannelFuture");
             nmsEntityClass = getNMSClass("Entity");
@@ -85,6 +84,22 @@ public final class NMSUtils {
             nmsItemStackClass = getNMSClass("ItemStack");
             networkManagerClass = getNMSClass("NetworkManager");
             playerInteractManagerClass = getNMSClass("PlayerInteractManager");
+            blockClass = getNMSClass("Block");
+            iBlockDataClass = getNMSClass("IBlockData");
+            nmsWorldClass = getNMSClass("World");
+            try {
+                watchableObjectClass = getNMSClass("WatchableObject");
+            }
+            catch (Exception ex) {
+                try {
+                    Class<?> dataWatcher = getNMSClass("DataWatcher");
+                    watchableObjectClass = SubclassUtil.getSubClass(dataWatcher, 0);
+                }
+                catch (Exception ex2) {
+                    //1.9+
+                    //ignore
+                }
+            }
             try {
                 gameProfileClass = Class.forName("com.mojang.authlib.GameProfile");
             } catch (ClassNotFoundException e) {
