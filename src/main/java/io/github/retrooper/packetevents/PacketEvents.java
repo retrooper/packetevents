@@ -66,12 +66,12 @@ import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public final class PacketEvents implements Listener, EventManager {
-
     private static PacketEvents instance;
     private final PEVersion version = new PEVersion(1, 7, 9);
     private final EventManager eventManager = new PEEventManager();
     private final PlayerUtils playerUtils = new PlayerUtils();
     private final ServerUtils serverUtils = new ServerUtils();
+    private static Plugin plugin;
     /**
      * General executor service, basically for anything that the packet executor service doesn't do.
      * For example update checking when you initialize PacketEvents.
@@ -160,7 +160,7 @@ public final class PacketEvents implements Listener, EventManager {
             });
 
             //Register Bukkit listener
-            final Plugin plugin = PacketEventsPlugin.getInstance();
+            plugin = pl;
             Bukkit.getPluginManager().registerEvents(this, plugin);
             packetHandlerInternal = new PacketHandlerInternal(plugin, settings.shouldInjectEarly());
             for (final Player p : Bukkit.getOnlinePlayers()) {
@@ -223,7 +223,7 @@ public final class PacketEvents implements Listener, EventManager {
     }
 
     public Plugin getPlugin() {
-        return PacketEventsPlugin.getInstance();
+        return plugin;
     }
 
     /**
