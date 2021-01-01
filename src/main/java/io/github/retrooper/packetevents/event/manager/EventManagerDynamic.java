@@ -29,10 +29,7 @@ import io.github.retrooper.packetevents.event.PacketListenerDynamic;
 import io.github.retrooper.packetevents.event.eventtypes.CancellableEvent;
 import io.github.retrooper.packetevents.event.priority.PacketEventPriority;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 class EventManagerDynamic {
     /**
@@ -40,7 +37,7 @@ class EventManagerDynamic {
      * The key is the dynamic packet listener event priority, the value is a list of the dynamic packet listeners having that priority.
      * Priorities count for the whole listener, not just one event method in the listener.
      */
-    private final Map<Byte, List<PacketListenerDynamic>> map = new HashMap<>();
+    private final Map<Byte, HashSet<PacketListenerDynamic>> map = new HashMap<>();
 
     /**
      * Call the PacketEvent.
@@ -60,7 +57,7 @@ class EventManagerDynamic {
         byte maxReachedEventPriority = PacketEventPriority.LOWEST.getPriorityValue();
         //LOWEST.getPriorityValue()
         for (byte i = maxReachedEventPriority; i <= PacketEventPriority.MONITOR.getPriorityValue(); i++) {
-            List<PacketListenerDynamic> cached = map.get(i);
+            HashSet<PacketListenerDynamic> cached = map.get(i);
             if (cached != null) {
                 maxReachedEventPriority = i;
                 for (PacketListenerDynamic listener : cached) {
@@ -86,7 +83,7 @@ class EventManagerDynamic {
      * @param listener {@link PacketListenerDynamic}
      */
     public void registerListener(PacketListenerDynamic listener) {
-        List<PacketListenerDynamic> listeners = map.computeIfAbsent(listener.getPriority().getPriorityValue(), k -> new ArrayList<>());
+        HashSet<PacketListenerDynamic> listeners = map.computeIfAbsent(listener.getPriority().getPriorityValue(), k -> new HashSet<>());
         listeners.add(listener);
     }
     /**
@@ -103,7 +100,7 @@ class EventManagerDynamic {
      * @param listener {@link PacketListenerDynamic}
      */
     public void unregisterListener(PacketListenerDynamic listener) {
-        List<PacketListenerDynamic> listeners = map.get(listener.getPriority().getPriorityValue());
+        HashSet<PacketListenerDynamic> listeners = map.get(listener.getPriority().getPriorityValue());
         if (listeners == null) {
             return;
         }
