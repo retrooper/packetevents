@@ -27,13 +27,14 @@ package io.github.retrooper.packetevents.utils.netty.bytebuf;
 import net.minecraft.util.io.netty.buffer.ByteBuf;
 import net.minecraft.util.io.netty.buffer.Unpooled;
 
-class ByteBufUtil_7 {
-    public static Object copiedBuffer(byte[] bytes) {
-        return Unpooled.copiedBuffer(bytes);
+public final class ByteBufUtil_7 implements ByteBufUtil {
+    
+    public Object wrappedBuffer(byte[] bytes) {
+        return Unpooled.wrappedBuffer(bytes);
     }
 
     // TODO: Check if we should apply the same release fix here like we did in the 8 version of this class!
-    public static byte[] getBytes(Object byteBuf) {
+    public byte[] getBytes(Object byteBuf) {
         ByteBuf bb = (ByteBuf) byteBuf;
         byte[] bytes;
         if (bb.hasArray()) {

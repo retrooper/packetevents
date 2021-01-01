@@ -24,6 +24,7 @@
 
 package io.github.retrooper.packetevents.packetwrappers.play.out.custompayload;
 
+import io.github.retrooper.packetevents.PacketEvents;
 import io.github.retrooper.packetevents.packettype.PacketTypeClasses;
 import io.github.retrooper.packetevents.packetwrappers.NMSPacket;
 import io.github.retrooper.packetevents.packetwrappers.SendableWrapper;
@@ -144,7 +145,8 @@ protected void load() {
                     WrappedPacket byteBufWrapper = new WrappedPacket(new NMSPacket(dataSerializer));
 
                     Object byteBuf = byteBufWrapper.readObject(0, byteBufClass);
-                    return ByteBufUtil.getBytes(byteBuf);
+
+                    return PacketEvents.get().getByteBufUtil().getBytes(byteBuf);
             }
             return new byte[0];
         }
@@ -154,7 +156,7 @@ protected void load() {
     @Override
     public Object asNMSPacket() {
         byte[] data = getData();
-        Object byteBufObject = ByteBufUtil.copiedBuffer(data);
+        Object byteBufObject = PacketEvents.get().getByteBufUtil().wrappedBuffer(data);
         switch (constructorMode) {
             case 0:
                 try {
