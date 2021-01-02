@@ -114,11 +114,13 @@ public final class NMSUtils {
             e.printStackTrace();
         }
         blockPosClass = NMSUtils.getNMSClassWithoutException("BlockPosition");
-
         try {
             blockPosConstructor = blockPosClass.getConstructor(double.class, double.class, double.class);
         } catch (NoSuchMethodException e) {
             e.printStackTrace();
+        }
+        catch (NullPointerException e) {
+            //Probably 1.7.10 as BlockPosition doesn't exist on 1.7.10
         }
 
         enumDirectionClass = NMSUtils.getNMSClassWithoutException("EnumDirection");
