@@ -102,6 +102,7 @@ public class EarlyChannelInjector8 implements ChannelInjector {
                                 try {
                                     injectChannel(channel);
                                 } catch (Exception ex) {
+                                    //Failed
                                     channel.disconnect();
                                 }
                             }
@@ -114,6 +115,7 @@ public class EarlyChannelInjector8 implements ChannelInjector {
                             try {
                                 injectChannel(channel);
                             } catch (Exception ex) {
+                                //Failed
                                 channel.disconnect();
                             }
                         }
@@ -186,7 +188,12 @@ public class EarlyChannelInjector8 implements ChannelInjector {
         PlayerChannelInterceptor interceptor = (PlayerChannelInterceptor) channel.pipeline().get(handlerName);
         if (interceptor == null) {
             interceptor = new PlayerChannelInterceptor();
-            channel.pipeline().addBefore("packet_handler", handlerName, interceptor);
+            if (channel.pipeline().get("packet_handler") != null) {
+                channel.pipeline().addBefore("packet_handler", handlerName, interceptor);
+            }
+            else {
+                throw new IllegalStateException("Failed to inject an incoming channel due to \"packet_handler\" not being added to the pipeline! Let them rejoin!");
+            }
         }
         return interceptor;
     }

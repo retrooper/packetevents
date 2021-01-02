@@ -33,6 +33,8 @@ import io.netty.channel.ChannelPromise;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 
+import java.util.NoSuchElementException;
+
 class LateChannelInjector8 implements ChannelInjector {
     private final Plugin plugin;
 
@@ -69,7 +71,12 @@ class LateChannelInjector8 implements ChannelInjector {
     public void ejectPlayerSync(Player player) {
         final Channel channel = (Channel) PacketEvents.get().packetHandlerInternal.getChannel(player.getName());
         if (channel.pipeline().get(getNettyHandlerName(plugin)) != null) {
-            channel.pipeline().remove(getNettyHandlerName(plugin));
+            try {
+                channel.pipeline().remove(getNettyHandlerName(plugin));
+            }
+            catch(NoSuchElementException ignored) {
+
+            }
         }
         PacketEvents.get().getPlayerUtils().clientVersionsMap.remove(player.getAddress());
         PacketEvents.get().getPlayerUtils().tempClientVersionMap.remove(player.getAddress());
@@ -92,7 +99,12 @@ class LateChannelInjector8 implements ChannelInjector {
             public void run() {
                 final Channel channel = (Channel) PacketEvents.get().packetHandlerInternal.getChannel(player.getName());
                 if (channel.pipeline().get(getNettyHandlerName(plugin)) != null) {
-                    channel.pipeline().remove(getNettyHandlerName(plugin));
+                    try {
+                        channel.pipeline().remove(getNettyHandlerName(plugin));
+                    }
+                    catch (NoSuchElementException ignored) {
+
+                    }
                 }
                 PacketEvents.get().packetHandlerInternal.keepAliveMap.remove(player.getUniqueId());
                 PacketEvents.get().packetHandlerInternal.channelMap.remove(player.getName());
