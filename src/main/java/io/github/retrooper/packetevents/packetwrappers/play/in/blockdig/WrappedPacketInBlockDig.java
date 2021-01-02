@@ -144,7 +144,7 @@ public final class WrappedPacketInBlockDig extends WrappedPacket {
         } else {
             if (enumDirObj == null) {
                 enumDirObj = readObject(0, enumDirectionClass);
-                if(enumDirObj == null) {
+                if (enumDirObj == null) {
                     return Direction.OTHER;
                 }
             }

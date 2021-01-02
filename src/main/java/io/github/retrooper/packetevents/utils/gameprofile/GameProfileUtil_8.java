@@ -30,12 +30,14 @@ import java.util.UUID;
 
 /**
  * 1.8 (and above) Mojang Game Profile util using the 1.8 (and above) Mojang API import location.
+ *
  * @author retrooper
  * @since 1.6.8.2
  */
 class GameProfileUtil_8 {
     /**
      * Create a new Mojang Game Profile object using the 1.8 (and above) Mojang API import.
+     *
      * @param uuid
      * @param username
      * @return 1.8 (and above) Mojang Game Profile.
@@ -46,6 +48,7 @@ class GameProfileUtil_8 {
 
     /**
      * Create a Wrapper for the Mojang Game Profile object.
+     *
      * @param gameProfile Mojang Game profile
      * @return {@link WrappedGameProfile}
      */

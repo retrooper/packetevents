@@ -32,8 +32,9 @@ import org.bukkit.Bukkit;
  * This is a nice tool for minecraft's protocol versions.
  * You won't have to memorize the protocol version, just memorize the server version
  * as the version you see on the release.
- * @see <a href="https://wiki.vg/Protocol_version_numbers">https://wiki.vg/Protocol_version_numbers</a>
+ *
  * @author retrooper
+ * @see <a href="https://wiki.vg/Protocol_version_numbers">https://wiki.vg/Protocol_version_numbers</a>
  * @since 1.6.9
  */
 public enum ServerVersion {
@@ -78,6 +79,7 @@ public enum ServerVersion {
      * Get the server version.
      * If PacketEvents has already attempted resolving, return the cached version.
      * If PacketEvents hasn't already attempted resolving, it will resolve it, cache it and return the version.
+     *
      * @return Server Version. (possibly cached)
      */
     public static ServerVersion getVersion() {
@@ -89,6 +91,7 @@ public enum ServerVersion {
 
     /**
      * The values in this enum in reverse.
+     *
      * @return Reversed server version enum values.
      */
     private static ServerVersion[] reverse() {
@@ -121,6 +124,7 @@ public enum ServerVersion {
 
     /**
      * Get this server version's protocol version.
+     *
      * @return Protocol version.
      */
     public short getProtocolVersion() {
@@ -131,6 +135,7 @@ public enum ServerVersion {
      * Is this server version newer than the compared server version?
      * This method simply checks if this server version's protocol version is greater than
      * the compared server version's protocol version.
+     *
      * @param target Compared server version.
      * @return Is this server version newer than the compared server version.
      */
@@ -142,6 +147,7 @@ public enum ServerVersion {
      * Is this server version newer than or equal to the compared server version?
      * This method simply checks if this server version's protocol version is greater than or equal to
      * the compared server version's protocol version.
+     *
      * @param target Compared server version.
      * @return Is this server version newer than or equal to the compared server version.
      */
@@ -153,6 +159,7 @@ public enum ServerVersion {
      * Is this server version older than the compared server version?
      * This method simply checks if this server version's protocol version is less than
      * the compared server version's protocol version.
+     *
      * @param target Compared server version.
      * @return Is this server version older than the compared server version.
      */
@@ -164,6 +171,7 @@ public enum ServerVersion {
      * Is this server version older than or equal to the compared server version?
      * This method simply checks if this server version's protocol version is older than or equal to
      * the compared server version's protocol version.
+     *
      * @param target Compared server version.
      * @return Is this server version older than or equal to the compared server version.
      */

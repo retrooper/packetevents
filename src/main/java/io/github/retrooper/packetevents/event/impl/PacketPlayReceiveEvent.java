@@ -49,7 +49,7 @@ import java.net.InetSocketAddress;
  * @see <a href="https://wiki.vg/Protocol#Play">https://wiki.vg/Protocol#Play</a>
  * @since 1.2.6
  */
-public final class PacketPlayReceiveEvent extends PacketEvent implements NMSPacketEvent,CancellableEvent, PlayerEvent {
+public final class PacketPlayReceiveEvent extends PacketEvent implements NMSPacketEvent, CancellableEvent, PlayerEvent {
     private final Player player;
     private final InetSocketAddress address;
     private NMSPacket packet;
@@ -65,6 +65,7 @@ public final class PacketPlayReceiveEvent extends PacketEvent implements NMSPack
     /**
      * This method returns the bukkit player object of the packet sender.
      * The player object might be null during early packets.
+     *
      * @return Packet sender.
      */
     @NotNull
@@ -78,6 +79,7 @@ public final class PacketPlayReceiveEvent extends PacketEvent implements NMSPack
      * This address if guaranteed to never be null.
      * You could use this to identify who is sending packets
      * whenever the player object is null.
+     *
      * @return Packet sender's socket address.
      */
     @NotNull
@@ -108,8 +110,9 @@ public final class PacketPlayReceiveEvent extends PacketEvent implements NMSPack
      * Each binding in each packet state has their own constants.
      * Example Usage:
      * <p>
-     *     {@code if (getPacketId() == PacketType.Play.Client.USE_ENTITY) }
+     * {@code if (getPacketId() == PacketType.Play.Client.USE_ENTITY) }
      * </p>
+     *
      * @return Packet ID.
      */
     @Override

@@ -31,7 +31,8 @@ import java.util.UUID;
 public class GameProfileUtil {
     /**
      * Create a new game profile with the specified arguments.
-     * @param uuid Player UUID.
+     *
+     * @param uuid     Player UUID.
      * @param username Player username.
      * @return Mojang Game Profile Object.
      */
@@ -45,6 +46,7 @@ public class GameProfileUtil {
 
     /**
      * Create a wrapper over a Mojang Game Profile.
+     *
      * @param gameProfile Mojang Game Profile.
      * @return {@link WrappedGameProfile}
      */

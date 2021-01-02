@@ -44,7 +44,7 @@ public class WrappedPacketInSettings extends WrappedPacket {
     }
 
     @Override
-protected void load() {
+    protected void load() {
 
         isLowerThan_v_1_8 = version.isLowerThan(ServerVersion.v_1_8);
 

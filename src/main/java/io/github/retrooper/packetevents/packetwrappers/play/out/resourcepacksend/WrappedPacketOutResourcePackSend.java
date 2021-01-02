@@ -55,7 +55,7 @@ public class WrappedPacketOutResourcePackSend extends WrappedPacket implements S
     }
 
     @Override
-protected void load() {
+    protected void load() {
         try {
             if (PacketTypeClasses.Play.Server.RESOURCE_PACK_SEND != null) {
                 packetConstructor = PacketTypeClasses.Play.Server.RESOURCE_PACK_SEND.getConstructor(String.class, String.class);

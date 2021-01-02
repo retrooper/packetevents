@@ -37,8 +37,9 @@ import org.jetbrains.annotations.NotNull;
  * The {@code PlayerEjectEvent} event is fired whenever a player is ejected.
  * A player is ejected by PacketEvents whenever they quit the server.
  * This class implements {@link CancellableEvent} and {@link PlayerEvent}.
- * @see <a href="https://github.com/retrooper/packetevents/blob/dev/src/main/java/io/github/retrooper/packetevents/handler/PacketHandlerInternal.java">https://github.com/retrooper/packetevents/blob/dev/src/main/java/io/github/retrooper/packetevents/handler/PacketHandlerInternal.java</a>
+ *
  * @author retrooper
+ * @see <a href="https://github.com/retrooper/packetevents/blob/dev/src/main/java/io/github/retrooper/packetevents/handler/PacketHandlerInternal.java">https://github.com/retrooper/packetevents/blob/dev/src/main/java/io/github/retrooper/packetevents/handler/PacketHandlerInternal.java</a>
  * @since 1.6.9
  */
 public final class PlayerEjectEvent extends PacketEvent implements CancellableEvent, PlayerEvent {
@@ -74,6 +75,7 @@ public final class PlayerEjectEvent extends PacketEvent implements CancellableEv
     /**
      * This method returns the bukkit player object of the player being ejected.
      * The player object is guaranteed to NOT be null.
+     *
      * @return Ejected player.
      */
     @NotNull
@@ -87,8 +89,9 @@ public final class PlayerEjectEvent extends PacketEvent implements CancellableEv
      * If the {@link PacketEventsSettings#shouldEjectAsync()} is enabled, the event will be called asynchronously
      * and the player will be ejected asynchronously.
      * The {@link PacketEventsSettings} can be accessed here:
-     * @see PacketEvents#getSettings()
+     *
      * @return Is the ejection asynchronous.
+     * @see PacketEvents#getSettings()
      */
     public boolean isAsync() {
         return async;

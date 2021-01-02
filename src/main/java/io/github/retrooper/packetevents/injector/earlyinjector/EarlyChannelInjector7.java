@@ -92,30 +92,34 @@ class EarlyChannelInjector7 implements ChannelInjector {
     public void startup() {
         networkMarkers = NMSUtils.getNetworkMarkers();
         firstChannelInitializer = new ChannelInitializer<Channel>() {
-                @Override
-                protected void initChannel(final Channel channel) {
-                    if(networkMarkers != null) {
-                        synchronized (networkMarkers) {
-                            channel.eventLoop().execute(new Runnable() {
-                                @Override
-                                public void run() {
-                                    try { injectChannel(channel);
-                                    } catch (Exception ex) { channel.disconnect();
-                                    }
-                                }
-                            });
-                        }
-                    } else {
+            @Override
+            protected void initChannel(final Channel channel) {
+                if (networkMarkers != null) {
+                    synchronized (networkMarkers) {
                         channel.eventLoop().execute(new Runnable() {
                             @Override
                             public void run() {
-                                try { injectChannel(channel);
-                                } catch (Exception ex) { channel.disconnect();
+                                try {
+                                    injectChannel(channel);
+                                } catch (Exception ex) {
+                                    channel.disconnect();
                                 }
                             }
                         });
                     }
+                } else {
+                    channel.eventLoop().execute(new Runnable() {
+                        @Override
+                        public void run() {
+                            try {
+                                injectChannel(channel);
+                            } catch (Exception ex) {
+                                channel.disconnect();
+                            }
+                        }
+                    });
                 }
+            }
         };
 
         secondChannelInitializer = new ChannelInitializer<Channel>() {
@@ -174,6 +178,7 @@ class EarlyChannelInjector7 implements ChannelInjector {
     /**
      * Inject a netty channel to listen to packets.
      * If already injected, get the channel interceptor.
+     *
      * @param ch Netty channel.
      * @return {@link PlayerChannelInterceptor}
      */
@@ -190,18 +195,20 @@ class EarlyChannelInjector7 implements ChannelInjector {
 
     /**
      * Eject a netty channel.
+     *
      * @param ch Netty channel.
      */
     public void ejectChannel(Object ch) {
         Channel channel = (Channel) ch;
         String handlerName = getNettyHandlerName(plugin);
-        if(channel.pipeline().get(handlerName) != null) {
+        if (channel.pipeline().get(handlerName) != null) {
             channel.pipeline().remove(handlerName);
         }
     }
 
     /**
      * Inject a player on the current thread.
+     *
      * @param player Target player.
      */
     @Override
@@ -212,6 +219,7 @@ class EarlyChannelInjector7 implements ChannelInjector {
 
     /**
      * Eject a player on the current thread.
+     *
      * @param player Target player.
      */
     @Override
@@ -224,6 +232,7 @@ class EarlyChannelInjector7 implements ChannelInjector {
 
     /**
      * Inject a player on our custom inject and eject (fixed) thread pool (=asynchronously).
+     *
      * @param player Target player.
      */
     @Override
@@ -239,6 +248,7 @@ class EarlyChannelInjector7 implements ChannelInjector {
 
     /**
      * Eject a player on our custom inject and eject (fixed) thread pool (=asynchronously).
+     *
      * @param player Target player.
      */
     @Override
@@ -258,7 +268,8 @@ class EarlyChannelInjector7 implements ChannelInjector {
 
     /**
      * Send a raw NMS packet to a netty channel.
-     * @param ch Netty channel.
+     *
+     * @param ch     Netty channel.
      * @param packet Raw NMS Packet.
      */
     @Override
@@ -269,6 +280,7 @@ class EarlyChannelInjector7 implements ChannelInjector {
 
     /**
      * Player channel interceptor.
+     *
      * @author retrooper
      * @since 1.8
      */
@@ -282,7 +294,8 @@ class EarlyChannelInjector7 implements ChannelInjector {
 
         /**
          * Incoming packet interception.
-         * @param ctx Netty channel handler context.
+         *
+         * @param ctx    Netty channel handler context.
          * @param packet Raw NMS Packet.
          * @throws Exception Possible exception.
          */
@@ -297,8 +310,9 @@ class EarlyChannelInjector7 implements ChannelInjector {
 
         /**
          * Outgoing packet interception.
-         * @param ctx Netty channel handler context.
-         * @param packet Raw NMS Packet
+         *
+         * @param ctx     Netty channel handler context.
+         * @param packet  Raw NMS Packet
          * @param promise Netty channel promise.
          * @throws Exception Possible exception.
          */

@@ -49,7 +49,7 @@ public class WrappedPacketOutExperience extends WrappedPacket implements Sendabl
     }
 
     @Override
-protected void load() {
+    protected void load() {
         try {
             packetConstructor = PacketTypeClasses.Play.Server.EXPERIENCE.getConstructor(float.class,
                     int.class, int.class);

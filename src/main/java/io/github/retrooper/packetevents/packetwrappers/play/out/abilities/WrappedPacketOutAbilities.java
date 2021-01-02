@@ -52,7 +52,7 @@ public final class WrappedPacketOutAbilities extends WrappedPacket implements Se
     }
 
     @Override
-protected void load() {
+    protected void load() {
         Class<?> packetClass = PacketTypeClasses.Play.Server.ABILITIES;
 
         try {

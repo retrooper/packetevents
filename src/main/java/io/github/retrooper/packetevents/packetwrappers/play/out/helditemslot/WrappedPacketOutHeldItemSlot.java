@@ -45,7 +45,7 @@ public class WrappedPacketOutHeldItemSlot extends WrappedPacket implements Senda
     }
 
     @Override
-protected void load() {
+    protected void load() {
         try {
             packetConstructor = PacketTypeClasses.Play.Server.HELD_ITEM_SLOT.getConstructor(int.class);
         } catch (NoSuchMethodException e) {

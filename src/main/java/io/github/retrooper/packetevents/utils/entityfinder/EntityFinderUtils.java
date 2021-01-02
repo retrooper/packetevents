@@ -35,6 +35,7 @@ import java.lang.reflect.Method;
 
 /**
  * Internal utility class to find entities by their Entity ID.
+ *
  * @author retrooper
  * @since 1.6.8
  */
@@ -65,6 +66,7 @@ public final class EntityFinderUtils {
 
     /**
      * Get an entity by their ID.
+     *
      * @param id Entity ID
      * @return Bukkit Entity.
      */
@@ -80,8 +82,9 @@ public final class EntityFinderUtils {
 
     /**
      * Get an entity by their ID, guaranteed to be in the specified world.
+     *
      * @param world Bukkit world.
-     * @param id Entity ID.
+     * @param id    Entity ID.
      * @return Bukkit Entity.
      */
     public static Entity getEntityByIdWithWorld(final World world, final int id) {

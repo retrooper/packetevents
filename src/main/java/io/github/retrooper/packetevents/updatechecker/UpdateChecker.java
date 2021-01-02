@@ -37,6 +37,7 @@ import java.net.URLConnection;
 
 /**
  * PacketEvents update checker.
+ *
  * @author retrooper
  * @since 1.6.9
  */
@@ -68,6 +69,7 @@ public class UpdateChecker {
 
     /**
      * Log a positive message in the console.
+     *
      * @param message Message
      */
     private void inform(String message) {
@@ -76,6 +78,7 @@ public class UpdateChecker {
 
     /**
      * Log a negative message in the console.
+     *
      * @param message Message
      */
     private void report(String message) {
@@ -84,6 +87,7 @@ public class UpdateChecker {
 
     /**
      * Find the latest PacketEvents version as a string.
+     *
      * @return Version as a String(like "1.8")
      * @throws IOException Exception if something fails.
      */

@@ -61,7 +61,7 @@ public class WrappedPacketOutExplosion extends WrappedPacket implements Sendable
     }
 
     @Override
-protected void load() {
+    protected void load() {
         Class<?> chunkPosClass = NMSUtils.getNMSClassWithoutException("ChunkPosition");
         Class<?> blockPosClass = NMSUtils.getNMSClassWithoutException("BlockPosition");
         Class<?> packetClass = NMSUtils.getNMSClassWithoutException("PacketPlayOutExplosion");

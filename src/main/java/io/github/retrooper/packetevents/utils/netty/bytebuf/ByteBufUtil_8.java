@@ -37,7 +37,7 @@ public final class ByteBufUtil_8 implements ByteBufUtil {
         ByteBuf bb = (ByteBuf) byteBuf;
         byte[] bytes;
         boolean release = false;
-        if(bb.refCnt() < 1) {
+        if (bb.refCnt() < 1) {
             bb.retain(); // TODO: Try find a better solution cuz retaining a buffer which was already released is not recommended!
             release = true;
         }
@@ -47,7 +47,7 @@ public final class ByteBufUtil_8 implements ByteBufUtil {
             bytes = new byte[bb.readableBytes()];
             bb.getBytes(bb.readerIndex(), bytes);
         }
-        if(release) {
+        if (release) {
             bb.release();
         }
         return bytes;

@@ -29,7 +29,6 @@ import io.github.retrooper.packetevents.packettype.PacketTypeClasses;
 import io.github.retrooper.packetevents.packetwrappers.NMSPacket;
 import io.github.retrooper.packetevents.packetwrappers.SendableWrapper;
 import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
-import io.github.retrooper.packetevents.utils.netty.bytebuf.ByteBufUtil;
 import io.github.retrooper.packetevents.utils.nms.NMSUtils;
 
 import java.lang.reflect.Constructor;
@@ -58,7 +57,7 @@ public class WrappedPacketOutCustomPayload extends WrappedPacket implements Send
     }
 
     @Override
-protected void load() {
+    protected void load() {
         Class<?> packetClass = PacketTypeClasses.Play.Server.CUSTOM_PAYLOAD;
         packetDataSerializerClass = NMSUtils.getNMSClassWithoutException("PacketDataSerializer");
         minecraftKeyClass = NMSUtils.getNMSClassWithoutException("MinecraftKey");

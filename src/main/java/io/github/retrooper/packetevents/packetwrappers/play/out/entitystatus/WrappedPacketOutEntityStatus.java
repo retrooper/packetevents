@@ -56,7 +56,7 @@ public class WrappedPacketOutEntityStatus extends WrappedPacket implements Senda
     }
 
     @Override
-protected void load() {
+    protected void load() {
         try {
             packetConstructor =
                     PacketTypeClasses.Play.Server.ENTITY_STATUS.getConstructor(NMSUtils.nmsEntityClass, byte.class);

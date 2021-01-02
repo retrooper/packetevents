@@ -26,6 +26,7 @@ package io.github.retrooper.packetevents.utils.server;
 
 /**
  * System Operating system.
+ *
  * @author retrooper
  * @since 1.7
  */
@@ -37,6 +38,7 @@ public enum SystemOS {
     /**
      * Get the server's operating system.
      * This method will NOT cache.
+     *
      * @return Operating System.
      */
     public static SystemOS getOSNoCache() {
@@ -52,10 +54,11 @@ public enum SystemOS {
     /**
      * Get the server's operating system.
      * This method will CACHE for you.
+     *
      * @return Operating System.
      */
     public static SystemOS getOS() {
-        if(value == null) {
+        if (value == null) {
             value = getOSNoCache();
         }
         return value;
@@ -64,8 +67,9 @@ public enum SystemOS {
     /**
      * Get the server's operating system.
      * This method will CACHE for you.
-     * @deprecated Use {@link #getOS()}, method renamed.
+     *
      * @return Operating System.
+     * @deprecated Use {@link #getOS()}, method renamed.
      */
     @Deprecated
     public static SystemOS getOperatingSystem() {
@@ -74,6 +78,7 @@ public enum SystemOS {
 
     /**
      * Internally used method to get the names of all operating systems.
+     *
      * @return Operating system names array.
      */
     private static String[] getOperatingSystemNames() {

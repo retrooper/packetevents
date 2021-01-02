@@ -29,6 +29,7 @@ import io.github.retrooper.packetevents.event.eventtypes.CallableEvent;
 
 /**
  * An event in both of PacketEvents' event systems.
+ *
  * @author retrooper
  * @since 1.2.6
  */
@@ -38,6 +39,7 @@ public abstract class PacketEvent implements CallableEvent {
     /**
      * Timestamp of when the PacketEvent was created.
      * Basically timestamp of the packet.
+     *
      * @return Packet timestamp in milliseconds.
      */
     public long getTimestamp() {
@@ -46,6 +48,7 @@ public abstract class PacketEvent implements CallableEvent {
 
     /**
      * Setter for the timestamp.
+     *
      * @param timestamp Packet timestamp in milliseconds.
      */
     public void setTimestamp(final long timestamp) {

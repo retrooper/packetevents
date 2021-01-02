@@ -26,6 +26,7 @@ package io.github.retrooper.packetevents.event.manager;
 
 /**
  * Class storing a static instance of the dynamic and the legacy event manager.
+ *
  * @author retrooper
  * @since 1.8
  */

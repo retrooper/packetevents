@@ -166,11 +166,11 @@ public final class WrappedPacketOutChat extends WrappedPacket implements Sendabl
         int integerChatPos = cachedChatPositions.get(getChatPosition());
         Object chatMessageTypeInstance = null;
         if (chatMessageTypeEnum != null) {
-                try {
-                    chatMessageTypeInstance = chatMessageTypeCreatorMethod.invoke(null, (byte) integerChatPos);
-                } catch (IllegalAccessException | InvocationTargetException e) {
-                    e.printStackTrace();
-                }
+            try {
+                chatMessageTypeInstance = chatMessageTypeCreatorMethod.invoke(null, (byte) integerChatPos);
+            } catch (IllegalAccessException | InvocationTargetException e) {
+                e.printStackTrace();
+            }
         }
         switch (constructorMode) {
             case 0:

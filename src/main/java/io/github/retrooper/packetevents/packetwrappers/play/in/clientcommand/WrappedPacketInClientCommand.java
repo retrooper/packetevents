@@ -39,7 +39,7 @@ public final class WrappedPacketInClientCommand extends WrappedPacket {
     }
 
     @Override
-protected void load() {
+    protected void load() {
         Class<?> packetClass = PacketTypeClasses.Play.Client.CLIENT_COMMAND;
         try {
             enumClientCommandClass = NMSUtils.getNMSClass("EnumClientCommand");

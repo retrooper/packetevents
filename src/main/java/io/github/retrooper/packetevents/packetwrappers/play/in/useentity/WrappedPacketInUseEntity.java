@@ -34,6 +34,7 @@ import io.github.retrooper.packetevents.utils.server.ServerVersion;
 import io.github.retrooper.packetevents.utils.vector.Vector3d;
 import org.bukkit.entity.Entity;
 
+import javax.annotation.Nullable;
 import java.util.Objects;
 
 public final class WrappedPacketInUseEntity extends WrappedPacket {
@@ -47,7 +48,7 @@ public final class WrappedPacketInUseEntity extends WrappedPacket {
     }
 
     @Override
-protected void load() {
+    protected void load() {
         Class<?> useEntityClass = NMSUtils.getNMSClassWithoutException("PacketPlayInUseEntity");
         try {
             enumHandClass = NMSUtils.getNMSClass("EnumHand");
@@ -104,20 +105,24 @@ protected void load() {
      *
      * @return Get EntityUseAction
      */
+    @Nullable
     public EntityUseAction getAction() {
         if (action == null) {
             final Object useActionEnum = readObject(0, enumEntityUseActionClass);
+            if(useActionEnum == null) {
+                return null; //possibly on 1.7.10
+            }
             return action = EntityUseAction.valueOf(useActionEnum.toString());
         }
         return action;
     }
 
     public Hand getHand() {
-        if((getAction() == EntityUseAction.INTERACT || getAction() == EntityUseAction.INTERACT_AT)
+        if ((getAction() == EntityUseAction.INTERACT || getAction() == EntityUseAction.INTERACT_AT)
                 && PacketEvents.get().getServerUtils().getVersion().isHigherThan(ServerVersion.v_1_8_8)) {
             Object enumHandObj = readObject(0, enumHandClass);
             //Should actually never be null, but we will handle such a case
-            if(enumHandObj == null) {
+            if (enumHandObj == null) {
                 return Hand.MAIN_HAND;
             }
             return Hand.valueOf(Objects.requireNonNull(enumHandObj).toString());
@@ -126,6 +131,6 @@ protected void load() {
     }
 
     public enum EntityUseAction {
-        INTERACT, INTERACT_AT, ATTACK
+        INTERACT, INTERACT_AT, ATTACK;
     }
 }

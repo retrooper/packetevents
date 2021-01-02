@@ -29,7 +29,10 @@ import io.github.retrooper.packetevents.event.PacketListenerDynamic;
 import io.github.retrooper.packetevents.event.eventtypes.CancellableEvent;
 import io.github.retrooper.packetevents.event.priority.PacketEventPriority;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 
 class EventManagerDynamic {
     /**
@@ -46,8 +49,9 @@ class EventManagerDynamic {
      * the {@link PacketEventPriority#MONITOR} will be processing last and can
      * be the final decider whether the event has been cancelled or not.
      * This call event also calls the legacy event manager call event.
-     * @see EventManagerLegacy#callEvent(PacketEvent, byte)
+     *
      * @param event {@link PacketEvent}
+     * @see EventManagerLegacy#callEvent(PacketEvent, byte)
      */
     public void callEvent(final PacketEvent event) {
         final boolean[] isCancelled = {false};
@@ -80,14 +84,17 @@ class EventManagerDynamic {
 
     /**
      * Register the dynamic packet event listener.
+     *
      * @param listener {@link PacketListenerDynamic}
      */
     public void registerListener(PacketListenerDynamic listener) {
         Set<PacketListenerDynamic> listeners = map.computeIfAbsent(listener.getPriority().getPriorityValue(), k -> new HashSet<>());
         listeners.add(listener);
     }
+
     /**
      * Register multiple dynamic packet event listeners with one method.
+     *
      * @param listeners {@link PacketListenerDynamic}
      */
     public void registerListeners(PacketListenerDynamic... listeners) {
@@ -95,8 +102,10 @@ class EventManagerDynamic {
             registerListener(listener);
         }
     }
+
     /**
      * Unregister the dynamic packet event listener.
+     *
      * @param listener {@link PacketListenerDynamic}
      */
     public void unregisterListener(PacketListenerDynamic listener) {
@@ -109,6 +118,7 @@ class EventManagerDynamic {
 
     /**
      * Unregister multiple dynamic packet event listeners with one method.
+     *
      * @param listeners {@link PacketListenerDynamic}
      */
     public void unregisterListeners(PacketListenerDynamic... listeners) {

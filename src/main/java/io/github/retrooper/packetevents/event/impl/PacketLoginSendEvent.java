@@ -43,8 +43,9 @@ import java.net.InetSocketAddress;
  * The {@code PacketLoginSendEvent} does not have to do with a bukkit player object due to
  * the player object being null in this state.
  * Use the {@link #getSocketAddress()} to identify who sends the packet.
- * @see <a href="https://wiki.vg/Protocol#Login">https://wiki.vg/Protocol#Login</a>
+ *
  * @author retrooper
+ * @see <a href="https://wiki.vg/Protocol#Login">https://wiki.vg/Protocol#Login</a>
  * @since 1.8
  */
 public class PacketLoginSendEvent extends PacketEvent implements NMSPacketEvent, CancellableEvent, CallableEvent {
@@ -66,6 +67,7 @@ public class PacketLoginSendEvent extends PacketEvent implements NMSPacketEvent,
     /**
      * Socket address of the associated client.
      * This socket address will never be null.
+     *
      * @return Socket address of the client.
      */
     @NotNull

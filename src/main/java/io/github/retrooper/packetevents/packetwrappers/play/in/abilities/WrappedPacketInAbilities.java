@@ -48,19 +48,19 @@ public final class WrappedPacketInAbilities extends WrappedPacket {
      */
     @Deprecated
     public boolean isVulnerable() throws UnsupportedOperationException {
-        if(v_1_16_Mode) {
+        if (v_1_16_Mode) {
             throw new UnsupportedOperationException("This field does not exist on your version!");
         }
         return readBoolean(0);
     }
 
     public boolean isFlying() {
-        if(v_1_16_Mode) {
+        if (v_1_16_Mode) {
             return readBoolean(0);
+        } else {
+            return readBoolean(1);
         }
-        else {
-        return readBoolean(1);
-    }}
+    }
 
     /**
      * This will return null if the server version is not available in 1.16.x and above
@@ -69,7 +69,7 @@ public final class WrappedPacketInAbilities extends WrappedPacket {
      */
     @Deprecated
     public boolean isFlightAllowed() {
-        if(v_1_16_Mode) {
+        if (v_1_16_Mode) {
             throw new UnsupportedOperationException("This field does not exist on your version!");
         }
         return readBoolean(2);
@@ -82,7 +82,7 @@ public final class WrappedPacketInAbilities extends WrappedPacket {
      */
     @Deprecated
     public boolean canInstantlyBuild() {
-        if(v_1_16_Mode) {
+        if (v_1_16_Mode) {
             throw new UnsupportedOperationException("This field does not exist on your version!");
         }
         return readBoolean(3);
@@ -95,7 +95,7 @@ public final class WrappedPacketInAbilities extends WrappedPacket {
      */
     @Deprecated
     public float getFlySpeed() {
-        if(v_1_16_Mode) {
+        if (v_1_16_Mode) {
             throw new UnsupportedOperationException("This field does not exist on your version!");
         }
         return readFloat(0);
@@ -108,7 +108,7 @@ public final class WrappedPacketInAbilities extends WrappedPacket {
      */
     @Deprecated
     public float getWalkSpeed() {
-        if(v_1_16_Mode) {
+        if (v_1_16_Mode) {
             throw new UnsupportedOperationException("This field does not exist on your version!");
         }
         return readFloat(1);

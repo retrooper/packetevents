@@ -31,7 +31,6 @@ import io.github.retrooper.packetevents.event.eventtypes.CancellableEvent;
 import io.github.retrooper.packetevents.event.eventtypes.PlayerEvent;
 import io.github.retrooper.packetevents.utils.netty.channel.ChannelUtils;
 import io.github.retrooper.packetevents.utils.player.ClientVersion;
-import io.github.retrooper.packetevents.utils.versionlookup.VersionLookupUtils;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -44,8 +43,9 @@ import java.net.InetSocketAddress;
  * Make sure you do null checks in your packet listeners as this might be called a bit later.
  * A player is injected by PacketEvents whenever they join the server.
  * This class implements {@link CancellableEvent} and {@link PlayerEvent}.
- * @see <a href="https://github.com/retrooper/packetevents/blob/dev/src/main/java/io/github/retrooper/packetevents/handler/PacketHandlerInternal.java">https://github.com/retrooper/packetevents/blob/dev/src/main/java/io/github/retrooper/packetevents/handler/PacketHandlerInternal.java</a>
+ *
  * @author retrooper
+ * @see <a href="https://github.com/retrooper/packetevents/blob/dev/src/main/java/io/github/retrooper/packetevents/handler/PacketHandlerInternal.java">https://github.com/retrooper/packetevents/blob/dev/src/main/java/io/github/retrooper/packetevents/handler/PacketHandlerInternal.java</a>
  * @since 1.3
  */
 public class PostPlayerInjectEvent extends PacketEvent implements PlayerEvent {
@@ -58,6 +58,7 @@ public class PostPlayerInjectEvent extends PacketEvent implements PlayerEvent {
     /**
      * This method returns the bukkit player object of the player that has been injected.
      * The player is guaranteed to not be null.
+     *
      * @return Injected Player.
      */
     @NotNull
@@ -68,6 +69,7 @@ public class PostPlayerInjectEvent extends PacketEvent implements PlayerEvent {
 
     /**
      * This method returns the cached netty channel of the player.
+     *
      * @return Netty channel of the injected player.
      */
     @NotNull
@@ -82,8 +84,9 @@ public class PostPlayerInjectEvent extends PacketEvent implements PlayerEvent {
 
     /**
      * This method returns the ClientVersion of the injected player.
-     * @see ClientVersion
+     *
      * @return ClientVersion of injected player.
+     * @see ClientVersion
      */
     @Nullable
     public ClientVersion getClientVersion() {

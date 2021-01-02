@@ -31,11 +31,13 @@ import io.github.retrooper.packetevents.utils.reflection.Reflection;
 import io.github.retrooper.packetevents.utils.reflection.SubclassUtil;
 import io.github.retrooper.packetevents.utils.server.ServerVersion;
 import org.bukkit.Bukkit;
+import org.bukkit.Server;
 import org.bukkit.World;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -46,12 +48,14 @@ public final class NMSUtils {
     private static final String OBC_DIR = ServerVersion.getOBCDirectory() + ".";
     public static ServerVersion version;
     private static String nettyPrefix = "net.minecraft.util.io.netty.";
+    public static Constructor<?> blockPosConstructor;
     public static Class<?> nmsEntityClass, minecraftServerClass, craftWorldClass, playerInteractManagerClass, entityPlayerClass, playerConnectionClass, craftServerClass,
             craftPlayerClass, serverConnectionClass, craftEntityClass,
             craftItemStack, nmsItemStackClass, networkManagerClass, nettyChannelClass, gameProfileClass, iChatBaseComponentClass,
             blockPosClass, enumDirectionClass, vec3DClass, channelFutureClass, blockClass, iBlockDataClass, watchableObjectClass, nmsWorldClass;
     private static Method getCraftPlayerHandle;
     private static Method getCraftEntityHandle;
+    private static Method getCraftWorldHandle;
     private static Method asBukkitCopy;
     private static Field entityPlayerPingField, playerConnectionField;
     private static Object minecraftServer;
@@ -85,17 +89,16 @@ public final class NMSUtils {
             networkManagerClass = getNMSClass("NetworkManager");
             playerInteractManagerClass = getNMSClass("PlayerInteractManager");
             blockClass = getNMSClass("Block");
-            iBlockDataClass = getNMSClass("IBlockData");
+            //IBlockData doesn't exist on 1.7.10
+            iBlockDataClass = getNMSClassWithoutException("IBlockData");
             nmsWorldClass = getNMSClass("World");
             try {
                 watchableObjectClass = getNMSClass("WatchableObject");
-            }
-            catch (Exception ex) {
+            } catch (Exception ex) {
                 try {
                     Class<?> dataWatcher = getNMSClass("DataWatcher");
                     watchableObjectClass = SubclassUtil.getSubClass(dataWatcher, 0);
-                }
-                catch (Exception ex2) {
+                } catch (Exception ex2) {
                     //1.9+
                     //ignore
                 }
@@ -111,11 +114,19 @@ public final class NMSUtils {
             e.printStackTrace();
         }
         blockPosClass = NMSUtils.getNMSClassWithoutException("BlockPosition");
+
+        try {
+            blockPosConstructor = blockPosClass.getConstructor(double.class, double.class, double.class);
+        } catch (NoSuchMethodException e) {
+            e.printStackTrace();
+        }
+
         enumDirectionClass = NMSUtils.getNMSClassWithoutException("EnumDirection");
         //METHODS
         try {
             getCraftPlayerHandle = craftPlayerClass.getMethod("getHandle");
             getCraftEntityHandle = craftEntityClass.getMethod("getHandle");
+            getCraftWorldHandle = craftWorldClass.getMethod("getHandle");
             asBukkitCopy = craftItemStack.getMethod("asBukkitCopy", nmsItemStackClass);
         } catch (NoSuchMethodException e) {
             e.printStackTrace();
@@ -278,4 +289,28 @@ public final class NMSUtils {
         return null;
     }
 
+    public static Object convertBukkitServerToNMSServer(Server server) {
+        Object craftServer = craftServerClass.cast(server);
+        WrappedPacket wrapper = new WrappedPacket(new NMSPacket(craftServer));
+        return wrapper.readObject(0, minecraftServerClass);
+    }
+
+    public static Object convertBukkitWorldToNMSWorld(World world) {
+        Object craftWorld = craftWorldClass.cast(world);
+        try {
+            return getCraftWorldHandle.invoke(craftWorld);
+        } catch (IllegalAccessException | InvocationTargetException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    public static Object generateNMSBlockPos(double x, double y, double z) {
+        try {
+            return blockPosConstructor.newInstance(x, y, z);
+        } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
 }

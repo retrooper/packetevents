@@ -30,6 +30,7 @@ package io.github.retrooper.packetevents.event.priority;
  * and not for just one event.
  * The priority can be specified in the PacketListenerDynamic constructor.
  * If you don't specify a priority in the constructor, it will use the {@link #NORMAL} priority.
+ *
  * @author retrooper
  * @since 1.6.9
  */
@@ -40,7 +41,7 @@ public enum PacketEventPriority {
      * Use this if you need to be the first processing the event and
      * need no power in cancelling an event or preventing an event cancellation.
      */
-    LOWEST((byte)0),
+    LOWEST((byte) 0),
 
     /**
      * A weak event priority.
@@ -96,8 +97,8 @@ public enum PacketEventPriority {
     }
 
     public static PacketEventPriority getPacketEventPriority(final byte bytePriority) {
-        for(PacketEventPriority priority : values()) {
-            if(priority.priorityValue == bytePriority) {
+        for (PacketEventPriority priority : values()) {
+            if (priority.priorityValue == bytePriority) {
                 return priority;
             }
         }

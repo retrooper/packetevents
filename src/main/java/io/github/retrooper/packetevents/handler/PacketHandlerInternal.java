@@ -52,8 +52,9 @@ import java.util.concurrent.ConcurrentHashMap;
  * For example injecting, channel caching, internal processing, packet sending....
  * This class is only meant to be used internally.
  * This could end up being refactored or renamed without a deprecation as it is only meant to be used internally.
- * @see <a href="http://netty.io">http://netty.io</a>
+ *
  * @author retrooper
+ * @see <a href="http://netty.io">http://netty.io</a>
  * @since 1.7.9
  */
 public class PacketHandlerInternal {
@@ -62,6 +63,7 @@ public class PacketHandlerInternal {
     private final boolean earlyInjectMode;
     public final HashMap<UUID, Long> keepAliveMap = new HashMap<>();
     public final Map<String, Object> channelMap = new ConcurrentHashMap<>();
+
     public PacketHandlerInternal(Plugin plugin, boolean earlyInjectMode) {
         this.earlyInjectMode = earlyInjectMode;
         if (earlyInjectMode) {
@@ -85,10 +87,11 @@ public class PacketHandlerInternal {
      * If PacketEvents couldn't cache(when you have {@link PacketEventsSettings#shouldInjectEarly()} set to false),
      * PacketEvents will use some reflection to see if CraftBukkit has the netty channel.
      * If you access this before the START login packet was sent, you will for sure experience issues.
-     * @see <a href="https://wiki.vg/Protocol#Login_Start">https://wiki.vg/Protocol#Login_Start</a>
-     * @see Player#getName()
+     *
      * @param name Target player name.
      * @return Netty channel of a player by their name.
+     * @see <a href="https://wiki.vg/Protocol#Login_Start">https://wiki.vg/Protocol#Login_Start</a>
+     * @see Player#getName()
      */
     public Object getChannel(String name) {
         Object channel = channelMap.get(name);
@@ -111,6 +114,7 @@ public class PacketHandlerInternal {
      * PacketEvents already injects a player when the bukkit
      * {@link org.bukkit.event.player.PlayerJoinEvent} or {@link org.bukkit.event.player.PlayerLoginEvent}
      * is called, depending on your {@link PacketEventsSettings#shouldInjectEarly()} setting is set to.
+     *
      * @param player Target bukkit player.
      */
     public void injectPlayer(Player player) {
@@ -129,6 +133,7 @@ public class PacketHandlerInternal {
      * Do this if you want to stop listening to a user's packets.
      * PacketEvents already ejects a player when the bukkit
      * {@link org.bukkit.event.player.PlayerQuitEvent} is called.
+     *
      * @param player Target player.
      */
     public void ejectPlayer(Player player) {
@@ -141,12 +146,13 @@ public class PacketHandlerInternal {
 
     /**
      * Synchronously inject a player.
-     * @see #injectPlayer(Player)
+     *
      * @param player Target player.
+     * @see #injectPlayer(Player)
      */
     public void injectPlayerSync(Player player) {
         Object channel = PacketEvents.get().packetHandlerInternal.getChannel(player.getName());
-        PlayerInjectEvent injectEvent = new PlayerInjectEvent(player, channel,false);
+        PlayerInjectEvent injectEvent = new PlayerInjectEvent(player, channel, false);
         PacketEvents.get().getEventManager().callEvent(injectEvent);
         if (!injectEvent.isCancelled()) {
             if (earlyInjectMode) {
@@ -159,8 +165,9 @@ public class PacketHandlerInternal {
 
     /**
      * Asynchronously inject a player.
-     * @see #injectPlayer(Player)
+     *
      * @param player Target player.
+     * @see #injectPlayer(Player)
      */
     public void injectPlayerAsync(Player player) {
         Object channel = PacketEvents.get().packetHandlerInternal.getChannel(player.getName());
@@ -177,8 +184,9 @@ public class PacketHandlerInternal {
 
     /**
      * Synchronously eject a player.
-     * @see #ejectPlayer(Player) 
+     *
      * @param player Target player.
+     * @see #ejectPlayer(Player)
      */
     public void ejectPlayerSync(Player player) {
         PlayerEjectEvent ejectEvent = new PlayerEjectEvent(player, false);
@@ -196,8 +204,9 @@ public class PacketHandlerInternal {
 
     /**
      * Asynchronously eject a player.
-     * @see #ejectPlayer(Player)
+     *
      * @param player Target player.
+     * @see #ejectPlayer(Player)
      */
     public void ejectPlayerAsync(Player player) {
         PlayerEjectEvent ejectEvent = new PlayerEjectEvent(player, true);
@@ -215,8 +224,9 @@ public class PacketHandlerInternal {
      * Write and flush a packet to a netty channel.
      * This netty channel is an object as 1.7.10 and 1.8 and above
      * have different netty package locations.
+     *
      * @param channel Netty channel.
-     * @param packet NMS Packet.
+     * @param packet  NMS Packet.
      */
     public void sendPacket(Object channel, Object packet) {
         if (earlyInjectMode) {
@@ -228,9 +238,10 @@ public class PacketHandlerInternal {
 
     /**
      * Make PacketEvents process an incoming packet.
-     * @param player Packet sender.
+     *
+     * @param player  Packet sender.
      * @param channel Packet sender's netty channel.
-     * @param packet NMS Packet.
+     * @param packet  NMS Packet.
      * @return NMS Packet, null if the event was cancelled.
      */
     public Object read(Player player, Object channel, Object packet) {
@@ -253,8 +264,7 @@ public class PacketHandlerInternal {
                 interceptLoginReceive(event);
                 if (event.isCancelled()) {
                     packet = null;
-                }
-                else {
+                } else {
                     //Cache the channel
                     if (event.getPacketId() == PacketType.Login.Client.START) {
                         WrappedPacketLoginInStart startWrapper = new WrappedPacketLoginInStart(event.getNMSPacket());
@@ -278,9 +288,10 @@ public class PacketHandlerInternal {
     /**
      * Make PacketEvents process an outgoing packet.
      * The NMS Packet will be null when netty should cancel a packet.
-     * @param player Packet receiver.
+     *
+     * @param player  Packet receiver.
      * @param channel Packet receiver's netty channel.
-     * @param packet NMS Packet.
+     * @param packet  NMS Packet.
      * @return NMS Packet, null if the event was cancelled.
      */
     public Object write(Player player, Object channel, Object packet) {
@@ -321,9 +332,10 @@ public class PacketHandlerInternal {
     /**
      * Make PacketEvents process an incoming PLAY packet after minecraft has processed it.
      * As minecraft has already processed the packet, we cannot cancel the action, nor the event.
-     * @param player Packet sender.
+     *
+     * @param player  Packet sender.
      * @param channel Netty channel of the packet sender.
-     * @param packet NMS Packet.
+     * @param packet  NMS Packet.
      */
     public void postRead(Player player, Object channel, Object packet) {
         if (player != null) {
@@ -339,9 +351,10 @@ public class PacketHandlerInternal {
      * This doesn't necessarily mean the client already received the packet,
      * but the server has sent it for sure by this time.
      * As minecraft has already processed the packet, we cannot cancel the action, nor the event.
-     * @param player Packet receiver.
+     *
+     * @param player  Packet receiver.
      * @param channel Netty channel of the packet receiver.
-     * @param packet NMS Packet.
+     * @param packet  NMS Packet.
      */
     public void postWrite(Player player, Object channel, Object packet) {
         if (player != null) {
@@ -354,6 +367,7 @@ public class PacketHandlerInternal {
 
     /**
      * Internal processing of an incoming PLAY packet.
+     *
      * @param event PLAY server-bound packet event.
      */
     private void interceptRead(PacketPlayReceiveEvent event) {
@@ -370,6 +384,7 @@ public class PacketHandlerInternal {
 
     /**
      * Internal processing of an outgoing PLAY packet.
+     *
      * @param event PLAY client-bound packet event.
      */
     private void interceptWrite(PacketPlaySendEvent event) {
@@ -378,6 +393,7 @@ public class PacketHandlerInternal {
 
     /**
      * Internal processing of an incoming LOGIN packet.
+     *
      * @param event LOGIN server-bound packet event.
      */
     private void interceptLoginReceive(PacketLoginReceiveEvent event) {
@@ -391,6 +407,7 @@ public class PacketHandlerInternal {
 
     /**
      * Internal processing of an outgoing LOGIN packet.
+     *
      * @param event client-bound LOGIN packet event.
      */
     private void interceptLoginSend(PacketLoginSendEvent event) {
@@ -399,6 +416,7 @@ public class PacketHandlerInternal {
 
     /**
      * Internal processing of an incoming STATUS packet.
+     *
      * @param event server-bound STATUS packet event.
      */
     private void interceptStatusReceive(PacketStatusReceiveEvent event) {
@@ -407,6 +425,7 @@ public class PacketHandlerInternal {
 
     /**
      * Internal processing of an outgoing STATUS packet.
+     *
      * @param event client-bound STATUS packet event.
      */
     private void interceptStatusSend(PacketStatusSendEvent event) {
@@ -415,6 +434,7 @@ public class PacketHandlerInternal {
 
     /**
      * Internal processing of a packet that has already been processed by minecraft.
+     *
      * @param event post server-bound play packet event.
      */
     private void interceptPostPlayReceive(PostPacketPlayReceiveEvent event) {
@@ -424,6 +444,7 @@ public class PacketHandlerInternal {
     /**
      * Internal processing of a packet that has already been sent to a client.
      * Doesn't necessarily mean the client has received it yet.
+     *
      * @param event post client-bound play packet event.
      */
     private void interceptPostPlaySend(PostPacketPlaySendEvent event) {
@@ -452,7 +473,7 @@ public class PacketHandlerInternal {
      * PacketEvents already unregisters them in the {@link PacketEvents#stop()} method.
      */
     public void closeAsync() {
-        if(earlyInjectMode) {
+        if (earlyInjectMode) {
             earlyInjector.closeAsync();
         }
     }

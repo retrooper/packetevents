@@ -79,6 +79,7 @@ public final class PacketPlaySendEvent extends PacketEvent implements NMSPacketE
      * This address if guaranteed to never be null.
      * You could use this to identify who is sending packets
      * whenever the player object is null.
+     *
      * @return Packet receiver's socket address.
      */
     @NotNull
@@ -109,8 +110,9 @@ public final class PacketPlaySendEvent extends PacketEvent implements NMSPacketE
      * Each binding in each packet state has their own constants.
      * Example Usage:
      * <p>
-     *     {@code if (getPacketId() == PacketType.Play.Server.KEEP_ALIVE) }
+     * {@code if (getPacketId() == PacketType.Play.Server.KEEP_ALIVE) }
      * </p>
+     *
      * @return Packet ID.
      */
     @Override

@@ -34,21 +34,24 @@ import java.util.Map;
  * Packet Type IDs.
  * This is the Packet ID system, it is recommended to use this over packet comparisons by packet name.
  * This is also faster than comparing packet names.
+ *
  * @author retrooper
  * @since 1.6.8
  */
 public class PacketType {
     /**
      * Status Packet IDs.
-     * @see <a href="https://wiki.vg/Protocol#Status">https://wiki.vg/Protocol#Status</a>
+     *
      * @author retrooper
+     * @see <a href="https://wiki.vg/Protocol#Status">https://wiki.vg/Protocol#Status</a>
      * @since 1.7
      */
     public static class Status {
         /**
          * Server-bound (client-sided) Status Packet IDs.
-         * @see <a href="https://wiki.vg/Protocol#Serverbound_2">https://wiki.vg/Protocol#Serverbound_2</a>
+         *
          * @author retrooper
+         * @see <a href="https://wiki.vg/Protocol#Serverbound_2">https://wiki.vg/Protocol#Serverbound_2</a>
          * @since 1.8
          */
         public static class Client {
@@ -63,10 +66,12 @@ public class PacketType {
                 packetIds.put(PacketTypeClasses.Status.Client.PING, Client.PING);
             }
         }
+
         /**
          * Client-bound (server-sided) Status Packet IDs.
-         *  @see <a href="https://wiki.vg/Protocol#Clientbound_2">https://wiki.vg/Protocol#Clientbound_2</a>
+         *
          * @author retrooper
+         * @see <a href="https://wiki.vg/Protocol#Clientbound_2">https://wiki.vg/Protocol#Clientbound_2</a>
          * @since 1.8
          */
         public static class Server {
@@ -85,15 +90,17 @@ public class PacketType {
 
     /**
      * Login Packet IDs.
-     * @see <a href="https://wiki.vg/Protocol#Login">https://wiki.vg/Protocol#Login</a>
+     *
      * @author retrooper
+     * @see <a href="https://wiki.vg/Protocol#Login">https://wiki.vg/Protocol#Login</a>
      * @since 1.7
      */
     public static class Login {
         /**
          * Server-bound (client-sided) Login Packet IDs.
-         * @see <a href="https://wiki.vg/Protocol#Serverbound_3">https://wiki.vg/Protocol#Serverbound_3</a>
+         *
          * @author retrooper
+         * @see <a href="https://wiki.vg/Protocol#Serverbound_3">https://wiki.vg/Protocol#Serverbound_3</a>
          * @since 1.8
          */
         public static class Client {
@@ -110,10 +117,12 @@ public class PacketType {
                 packetIds.put(PacketTypeClasses.Login.Client.ENCRYPTION_BEGIN, Client.ENCRYPTION_BEGIN);
             }
         }
+
         /**
          * Client-bound (server-sided) Login Packet IDs.
-         * @see <a href="https://wiki.vg/Protocol#Clientbound_3">https://wiki.vg/Protocol#Clientbound_3</a>
+         *
          * @author retrooper
+         * @see <a href="https://wiki.vg/Protocol#Clientbound_3">https://wiki.vg/Protocol#Clientbound_3</a>
          * @since 1.8
          */
         public static class Server {
@@ -132,17 +141,20 @@ public class PacketType {
             }
         }
     }
+
     /**
      * Play Packet IDs.
-     * @see <a href="https://wiki.vg/Protocol#Play">https://wiki.vg/Protocol#Play</a>
+     *
      * @author retrooper
+     * @see <a href="https://wiki.vg/Protocol#Play">https://wiki.vg/Protocol#Play</a>
      * @since 1.8
      */
     public static class Play {
         /**
          * Server-bound (client-sided) Play Packet IDs.
-         * @see <a href="https://wiki.vg/Protocol#Serverbound_4">https://wiki.vg/Protocol#Serverbound_4</a>
+         *
          * @author retrooper
+         * @see <a href="https://wiki.vg/Protocol#Serverbound_4">https://wiki.vg/Protocol#Serverbound_4</a>
          * @since 1.8
          */
         public static class Client {
@@ -217,6 +229,7 @@ public class PacketType {
             /**
              * Server-bound Play Packet Type utility.
              * Save a few lines of code by using this.
+             *
              * @author retrooper
              * @since 1.8
              */
@@ -224,6 +237,7 @@ public class PacketType {
                 /**
                  * Is the play packet a PacketPlayInFlying, PacketPlayInPosition, PacketPlayInPositionLook
                  * or a PacketPlayInLook packet?
+                 *
                  * @param packetID Play Packet ID.
                  * @return Is the Packet ID an instance of the PacketPlayInFlying packet?
                  */
@@ -233,6 +247,7 @@ public class PacketType {
                             || packetID == POSITION_LOOK
                             || packetID == LOOK;
                 }
+
                 /**
                  * Is this the packet where the client places a block?
                  * On 1.7.10 - 1.8.8 the client sends a PacketPlayInBlockPlace packet when actually placing the block.
@@ -243,6 +258,7 @@ public class PacketType {
                  * The {@link io.github.retrooper.packetevents.packetwrappers.play.in.blockplace.WrappedPacketInBlockPlace} wrapper
                  * only works on an actual block place.
                  * Use this method before using the wrapper to support all minecraft versions.
+                 *
                  * @param packetID Play Packet ID.
                  * @return Has the client placed a block?
                  */
@@ -254,10 +270,12 @@ public class PacketType {
                 }
             }
         }
+
         /**
          * Client-bound (server-sided) Play Packet IDs.
-         * @see <a href="https://wiki.vg/Protocol#Clientbound_4">https://wiki.vg/Protocol#Clientbound_4</a>
+         *
          * @author retrooper
+         * @see <a href="https://wiki.vg/Protocol#Clientbound_4">https://wiki.vg/Protocol#Clientbound_4</a>
          * @since 1.8
          */
         public static class Server {
@@ -392,6 +410,7 @@ public class PacketType {
             /**
              * Client-bound Play Packet Type utility.
              * Save a few lines of code by using this.
+             *
              * @author retrooper
              * @since 1.8
              */
@@ -399,6 +418,7 @@ public class PacketType {
                 /**
                  * Is the play packet a PacketPlayOutEntity, PacketPlayOutRelEntityMove, PacketPlayOutRelEntityMoveLook
                  * or a PacketPlayOutEntityLook packet?
+                 *
                  * @param packetID Play Packet ID.
                  * @return Is the Packet ID an instance of the PacketPlayOutEntity packet?
                  */

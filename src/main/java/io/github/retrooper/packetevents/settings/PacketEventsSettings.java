@@ -67,6 +67,7 @@ public class PacketEventsSettings {
     /**
      * This boolean stores if PacketEvents should inject a player earlier using the {@code EarlyChannelInjector}.
      * Allowing us to listen to the LOGIN and STATUS packets and detect client version independently.
+     *
      * @see io.github.retrooper.packetevents.injector.earlyinjector.EarlyChannelInjector
      */
     private boolean injectEarly = true;
@@ -84,6 +85,7 @@ public class PacketEventsSettings {
     /**
      * This method locks the settings.
      * Sets the {@link #locked} field to true.
+     *
      * @return This instance.
      */
     public PacketEventsSettings lock() {
@@ -94,6 +96,7 @@ public class PacketEventsSettings {
     /**
      * Setter for the {@link #backupServerVersion} field.
      * Only succeeds if the settings class isn't locked.
+     *
      * @param serverVersion Server Version
      * @return This instance.
      */
@@ -107,6 +110,7 @@ public class PacketEventsSettings {
     /**
      * Setter for the {@link #injectAsync} field.
      * Only succeeds if the settings class isn't locked.
+     *
      * @param injectAsync Player injection async?
      * @return This instance.
      */
@@ -120,6 +124,7 @@ public class PacketEventsSettings {
     /**
      * Setter for the {@link #ejectAsync} field.
      * Only succeeds if the settings class isn't locked.
+     *
      * @param ejectAsync Player and netty channel ejection async?
      * @return This instance.
      */
@@ -133,6 +138,7 @@ public class PacketEventsSettings {
     /**
      * Setter for the {@link #checkForUpdates} field.
      * Only succeeds if the settings class isn't locked.
+     *
      * @param checkForUpdates Should we check for updates?
      * @return This instance.
      */
@@ -146,6 +152,7 @@ public class PacketEventsSettings {
     /**
      * Setter for the {@link #injectEarly} field.
      * Only succeeds if the settings class isn't locked.
+     *
      * @param injectEarly Use the {@link io.github.retrooper.packetevents.injector.earlyinjector.EarlyChannelInjector}?
      * @return This instance.
      */
@@ -159,11 +166,12 @@ public class PacketEventsSettings {
     /**
      * Setter for the {@link #injectEjectThreadCount} field.
      * Only succeeds if the settings class isn't locked.
+     *
      * @param threadCount How many threads?
      * @return This instance.
      */
     public PacketEventsSettings injectAndEjectThreadCount(int threadCount) {
-        if(!locked) {
+        if (!locked) {
             this.injectEjectThreadCount = threadCount;
         }
         return this;
@@ -172,6 +180,7 @@ public class PacketEventsSettings {
     /**
      * Setter for the {@link #injectionFailureMessage} field.
      * Only succeeds if the settings class isn't locked.
+     *
      * @param message Kick message for an injection failure.
      * @return This instance.
      */
@@ -184,6 +193,7 @@ public class PacketEventsSettings {
 
     /**
      * Is the settings class locked?
+     *
      * @return Getter for {@link #locked}
      */
     public boolean isLocked() {
@@ -192,6 +202,7 @@ public class PacketEventsSettings {
 
     /**
      * Backup server version.
+     *
      * @return Getter for {@link #backupServerVersion}
      */
     public ServerVersion getBackupServerVersion() {
@@ -200,6 +211,7 @@ public class PacketEventsSettings {
 
     /**
      * Should we inject a player async?
+     *
      * @return Getter for {@link #injectAsync}
      */
     public boolean shouldInjectAsync() {
@@ -208,6 +220,7 @@ public class PacketEventsSettings {
 
     /**
      * Should we eject a player async?
+     *
      * @return Getter for {@link #ejectAsync}
      */
     public boolean shouldEjectAsync() {
@@ -216,6 +229,7 @@ public class PacketEventsSettings {
 
     /**
      * Should we check for updates?
+     *
      * @return Getter for {@link #checkForUpdates}
      */
     public boolean shouldCheckForUpdates() {
@@ -224,6 +238,7 @@ public class PacketEventsSettings {
 
     /**
      * Should we inject a player earlier with the {@link io.github.retrooper.packetevents.injector.earlyinjector.EarlyChannelInjector}
+     *
      * @return Getter for {@link #injectEarly}
      */
     public boolean shouldInjectEarly() {
@@ -232,6 +247,7 @@ public class PacketEventsSettings {
 
     /**
      * Injection and ejection executor service thread count(if async).
+     *
      * @return Getter for {@link #injectEjectThreadCount}
      */
     public int getInjectAndEjectThreadCount() {
@@ -240,6 +256,7 @@ public class PacketEventsSettings {
 
     /**
      * Injection failure message.
+     *
      * @return Getter for {@link #injectionFailureMessage}
      */
     public String getInjectionFailureMessage() {

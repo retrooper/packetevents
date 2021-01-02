@@ -42,8 +42,9 @@ import java.net.InetSocketAddress;
  * The {@code PacketStatusSendEvent} does not have to do with a bukkit player object due to
  * the player object being null in this state.
  * Use the {@link #getSocketAddress()} to identify who sends the packet.
- * @see <a href="https://wiki.vg/Protocol#Status">https://wiki.vg/Protocol#Status</a>
+ *
  * @author retrooper
+ * @see <a href="https://wiki.vg/Protocol#Status">https://wiki.vg/Protocol#Status</a>
  * @since 1.8
  */
 public class PacketStatusSendEvent extends PacketEvent implements NMSPacketEvent, CancellableEvent {
@@ -65,6 +66,7 @@ public class PacketStatusSendEvent extends PacketEvent implements NMSPacketEvent
     /**
      * Socket address of the associated client.
      * This socket address will never be null.
+     *
      * @return Socket address of the client.
      */
     @NotNull
@@ -96,8 +98,9 @@ public class PacketStatusSendEvent extends PacketEvent implements NMSPacketEvent
      * Each binding in each packet state has their own constants.
      * Example Usage:
      * <p>
-     *     {@code if (getPacketId() == PacketType.Status.Server.PONG) }
+     * {@code if (getPacketId() == PacketType.Status.Server.PONG) }
      * </p>
+     *
      * @return Packet ID.
      */
     @Override

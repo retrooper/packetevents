@@ -60,6 +60,7 @@ public class Vector3d {
 
     /**
      * Constructor allowing you to set the values.
+     *
      * @param x X
      * @param y Y
      * @param z Z
@@ -75,13 +76,13 @@ public class Vector3d {
      * X will be set to the first index of an array(if it exists, otherwise 0).
      * Y will be set to the second index of an array(if it exists, otherwise 0).
      * Z will be set to the third index of an array(if it exists, otherwise 0).
+     *
      * @param array Array.
      */
     public Vector3d(double[] array) {
         if (array.length > 0) {
             x = array[0];
-        }
-        else {
+        } else {
             x = 0;
             y = 0;
             z = 0;
@@ -89,22 +90,21 @@ public class Vector3d {
         }
         if (array.length > 1) {
             y = array[1];
-        }
-        else {
+        } else {
             y = 0;
             z = 0;
             return;
         }
         if (array.length > 2) {
             z = array[2];
-        }
-        else {
+        } else {
             z = 0;
         }
     }
 
     /**
      * Getter for X.
+     *
      * @return Get X.
      */
     public double getX() {
@@ -113,6 +113,7 @@ public class Vector3d {
 
     /**
      * Getter for Y.
+     *
      * @return Get Y.
      */
     public double getY() {
@@ -121,6 +122,7 @@ public class Vector3d {
 
     /**
      * Getter for Z.
+     *
      * @return Get Z.
      */
     public double getZ() {
@@ -130,28 +132,29 @@ public class Vector3d {
     /**
      * Is the object we are comparing to equal to us?
      * It must be of type Vector3d or Vector3i and all values must be equal to the values in this class.
+     *
      * @param obj Compared object.
      * @return Are they equal?
      */
     @Override
     public boolean equals(Object obj) {
-        if(obj instanceof Vector3d) {
+        if (obj instanceof Vector3d) {
             Vector3d vec = (Vector3d) obj;
             return x == vec.x && y == vec.y && z == vec.z;
-        }
-        else if(obj instanceof Vector3i) {
+        } else if (obj instanceof Vector3i) {
             Vector3i vec = (Vector3i) obj;
-            return x == (double)vec.x && y == (double)vec.y && z == (double)vec.z;
+            return x == (double) vec.x && y == (double) vec.y && z == (double) vec.z;
         }
         return false;
     }
 
     /**
      * Simply clone an instance of this class.
+     *
      * @return Clone.
      */
     @Override
-    public Vector3d clone()  {
+    public Vector3d clone() {
         return new Vector3d(x, y, z);
     }
 }

@@ -28,6 +28,7 @@ import io.github.retrooper.packetevents.utils.reflection.ClassUtil;
 
 public class NMSPacket {
     private final Object rawNMSPacket;
+
     public NMSPacket(Object rawNMSPacket) {
         this.rawNMSPacket = rawNMSPacket;
     }

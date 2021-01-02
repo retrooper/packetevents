@@ -36,8 +36,9 @@ public class WrappedPacketOutCloseWindow extends WrappedPacket implements Sendab
     private int windowID;
 
     private static Constructor<?> constructor;
+
     @Override
-protected void load() {
+    protected void load() {
         try {
             constructor = PacketTypeClasses.Play.Server.CLOSE_WINDOW.getConstructor(int.class);
         } catch (NoSuchMethodException e) {
@@ -54,7 +55,7 @@ protected void load() {
     }
 
     public int getWindowId() {
-        if(packet != null) {
+        if (packet != null) {
             return readInt(0);
         }
         return windowID;

@@ -33,6 +33,7 @@ import java.net.InetSocketAddress;
  * The {@code NMSPacketEvent} interface represents an event that has to do with an actual packet.
  * Don't mix this up with {@link io.github.retrooper.packetevents.event.PacketEvent}.
  * The PacketEvent class represents an event that belongs to PacketEvent's packet system.
+ *
  * @author retrooper
  * @since 1.8
  */
@@ -46,6 +47,7 @@ public interface NMSPacketEvent {
      * It is not recommended to call this method unless you NEED it.
      * If you are comparing packet types, use the {@link PacketType} byte system.
      * You would only need the packet name if packet type system doesn't contain your desired packet yet.
+     *
      * @return Name of the packet.
      */
     @Deprecated
@@ -53,24 +55,28 @@ public interface NMSPacketEvent {
 
     /**
      * Get the NMS packet.
+     *
      * @return Get NMS packet.
      */
     NMSPacket getNMSPacket();
 
     /**
      * Update the NMS Packet.
+     *
      * @param packet NMS Object
      */
     void setNMSPacket(final NMSPacket packet);
 
     /**
      * Get the Packet ID.
+     *
      * @return Packet ID.
      */
     byte getPacketId();
 
     /**
      * Get the associated player's socket address.
+     *
      * @return Socket address of the associated player.
      */
     InetSocketAddress getSocketAddress();

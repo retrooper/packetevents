@@ -48,7 +48,7 @@ public class WrappedPacketOutKeepAlive extends WrappedPacket implements Sendable
     }
 
     @Override
-protected void load() {
+    protected void load() {
         Class<?> packetClass = PacketTypeClasses.Play.Server.KEEP_ALIVE;
         integerMode = Reflection.getField(packetClass, int.class, 0) != null;
 
@@ -91,13 +91,13 @@ protected void load() {
     public Object asNMSPacket() {
         if (integerMode) {
             try {
-                return keepAliveConstructor.newInstance((int)getId());
+                return keepAliveConstructor.newInstance((int) getId());
             } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
                 e.printStackTrace();
             }
         } else {
             try {
-                return keepAliveConstructor.newInstance((long)getId());
+                return keepAliveConstructor.newInstance(getId());
             } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
                 e.printStackTrace();
             }

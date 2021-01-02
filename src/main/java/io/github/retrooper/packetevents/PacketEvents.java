@@ -281,12 +281,11 @@ public final class PacketEvents implements Listener, EventManager {
                     PacketEvents.get().getEventManager().callEvent(new PostPlayerInjectEvent(e.getPlayer()));
                 }
             }, 1L);
-        }
-        else if (getServerUtils().getVersion() == ServerVersion.v_1_7_10) {
+        } else if (getServerUtils().getVersion() == ServerVersion.v_1_7_10) {
             ClientVersion version = ClientVersion.getClientVersion(ProtocolVersionAccessor_v_1_7.getProtocolVersion(e.getPlayer()));
-            if(version == ClientVersion.UNRESOLVED) {
+            if (version == ClientVersion.UNRESOLVED) {
                 version = getPlayerUtils().tempClientVersionMap.get(address);
-                if(version == null) {
+                if (version == null) {
                     version = ClientVersion.UNRESOLVED;
                 }
             }
@@ -297,15 +296,14 @@ public final class PacketEvents implements Listener, EventManager {
             try {
                 packetHandlerInternal.injectPlayer(e.getPlayer());
                 //Injection was successful as no exception was thrown...
-                if(!viaAvailable) {
+                if (!viaAvailable) {
                     PacketEvents.get().getEventManager().callEvent(new PostPlayerInjectEvent(e.getPlayer()));
                 }
             } catch (Exception ex) {
                 e.getPlayer().kickPlayer(getSettings().getInjectionFailureMessage());
             }
-        }
-        else {
-            if(!viaAvailable) {
+        } else {
+            if (!viaAvailable) {
                 PacketEvents.get().getEventManager().callEvent(new PostPlayerInjectEvent(e.getPlayer()));
             }
         }

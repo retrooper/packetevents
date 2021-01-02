@@ -51,7 +51,7 @@ public class WrappedPacketOutTransaction extends WrappedPacket implements Sendab
     }
 
     @Override
-protected void load() {
+    protected void load() {
         Class<?> packetClass = PacketTypeClasses.Play.Server.TRANSACTION;
 
         try {

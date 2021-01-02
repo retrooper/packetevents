@@ -27,6 +27,7 @@ package io.github.retrooper.packetevents.packetwrappers.play.out.entitymetadata;
 import io.github.retrooper.packetevents.packetwrappers.NMSPacket;
 import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
 import io.github.retrooper.packetevents.utils.nms.NMSUtils;
+
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
@@ -37,6 +38,7 @@ import java.util.List;
  */
 public class WrappedPacketOutEntityMetadata extends WrappedPacket {
     private static Constructor<?> watchableObjectConstructor;
+
     public WrappedPacketOutEntityMetadata(NMSPacket packet) {
         super(packet);
     }

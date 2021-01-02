@@ -49,7 +49,7 @@ public class WrappedPacketOutOpenWindow extends WrappedPacket {
     }
 
     @Override
-protected void load() {
+    protected void load() {
         //Older versions (like 1.13.2 and lower) contain a String,
         legacyMode = Reflection.getField(PacketTypeClasses.Play.Server.OPEN_WINDOW, String.class, 0) != null;
         //1.7.10

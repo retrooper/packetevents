@@ -28,7 +28,7 @@ import java.lang.annotation.Annotation;
 
 public class SubclassUtil {
     public static Class<?> getSubClass(Class<?> cls, String name) {
-        if(cls == null) {
+        if (cls == null) {
             return null;
         }
         for (Class<?> subClass : cls.getDeclaredClasses()) {
@@ -40,7 +40,7 @@ public class SubclassUtil {
     }
 
     public static Class<?> getSubClass(Class<?> cls, int index) {
-        if(cls == null) {
+        if (cls == null) {
             return null;
         }
         int currentIndex = 0;

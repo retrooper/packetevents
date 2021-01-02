@@ -45,8 +45,9 @@ import java.net.InetSocketAddress;
  * If the incoming packet was cancelled, resulting in it not being processed by minecraft,
  * this event won't be called.
  * This event assures you that the {@link PacketPlayReceiveEvent} event wasn't cancelled.
- * @see <a href="https://wiki.vg/Protocol#Serverbound_4">https://wiki.vg/Protocol#Serverbound_4</a>
+ *
  * @author retrooper
+ * @see <a href="https://wiki.vg/Protocol#Serverbound_4">https://wiki.vg/Protocol#Serverbound_4</a>
  * @since 1.7
  */
 public class PostPacketPlayReceiveEvent extends PacketEvent implements NMSPacketEvent, PlayerEvent {
@@ -64,6 +65,7 @@ public class PostPacketPlayReceiveEvent extends PacketEvent implements NMSPacket
     /**
      * This method returns the bukkit player object of the packet sender.
      * The player object might be null during early packets.
+     *
      * @return Packet sender.
      */
     @Nullable
@@ -77,6 +79,7 @@ public class PostPacketPlayReceiveEvent extends PacketEvent implements NMSPacket
      * This address if guaranteed to never be null.
      * You could use this to identify who is sending packets
      * whenever the player object is null.
+     *
      * @return Packet sender's socket address.
      */
     @NotNull

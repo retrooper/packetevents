@@ -39,14 +39,14 @@ final class PlayerAbilitiesUtils {
     public static Object getPlayerAbilities(final boolean isVulnerable, final boolean isFlying, final boolean allowFlight, final boolean canBuildInstantly,
                                             final float flySpeed, final float walkSpeed) throws IllegalAccessException, InvocationTargetException, InstantiationException {
 
-        if(playerAbilitiesClass == null) {
+        if (playerAbilitiesClass == null) {
             try {
                 playerAbilitiesClass = NMSUtils.getNMSClass("PlayerAbilities");
             } catch (ClassNotFoundException e) {
                 e.printStackTrace();
             }
         }
-        if(playerAbilitiesConstructor == null && playerAbilitiesClass != null) {
+        if (playerAbilitiesConstructor == null && playerAbilitiesClass != null) {
             try {
                 playerAbilitiesConstructor = playerAbilitiesClass.getConstructor();
             } catch (NoSuchMethodException e) {

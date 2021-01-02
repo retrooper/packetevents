@@ -29,6 +29,7 @@ import java.util.Arrays;
 /**
  * PacketEvents version.
  * This class represents a PacketEvents version, but you can use it for your own projects as a software version util if you wish.
+ *
  * @author retrooper
  * @since 1.8
  */
@@ -41,6 +42,7 @@ public class PEVersion {
 
     /**
      * Specify your version using an array.
+     *
      * @param version Array version.
      */
     public PEVersion(final int... version) {
@@ -49,6 +51,7 @@ public class PEVersion {
 
     /**
      * Specify your version using a string, for example: "1.8.9".
+     *
      * @param version String version.
      */
     public PEVersion(final String version) {
@@ -69,6 +72,7 @@ public class PEVersion {
      * If we are equal to the compared version,
      * this method will return 0.
      * Similar to {@link Integer#compareTo(Integer)}.
+     *
      * @param version
      * @return Comparing to another Version.
      */
@@ -90,6 +94,7 @@ public class PEVersion {
 
     /**
      * Does the {@link #compareTo(PEVersion)} return 1?
+     *
      * @param version Compared version.
      * @return Is this newer than the compared version.
      */
@@ -99,6 +104,7 @@ public class PEVersion {
 
     /**
      * Does the {@link #compareTo(PEVersion)} return -1?
+     *
      * @param version Compared version.
      * @return Is this older than the compared version.
      */
@@ -108,6 +114,7 @@ public class PEVersion {
 
     /**
      * Represented as an array.
+     *
      * @return Array version.
      */
     public int[] asArray() {
@@ -117,19 +124,21 @@ public class PEVersion {
     /**
      * Is this version equal to the compared object.
      * The object must be a PEVersion and the array values must be equal.
+     *
      * @param obj Compared object.
      * @return Are they equal?
      */
     @Override
     public boolean equals(Object obj) {
         if (obj instanceof PEVersion) {
-            return Arrays.equals(versionIntArray, ((PEVersion)obj).versionIntArray);
+            return Arrays.equals(versionIntArray, ((PEVersion) obj).versionIntArray);
         }
         return false;
     }
 
     /**
      * Clone the PEVersion.
+     *
      * @return A clone.
      */
     @Override
@@ -139,6 +148,7 @@ public class PEVersion {
 
     /**
      * Represent the version as a string.
+     *
      * @return String representation.
      */
     @Override

@@ -31,10 +31,9 @@ import java.net.InetSocketAddress;
 
 public class ChannelUtils {
     public static InetSocketAddress getSocketAddress(Object ch) {
-        if(PacketEvents.get().getServerUtils().getVersion() == ServerVersion.v_1_7_10) {
+        if (PacketEvents.get().getServerUtils().getVersion() == ServerVersion.v_1_7_10) {
             return ChannelUtils7.getSocketAddress(ch);
-        }
-        else {
+        } else {
             return ChannelUtils8.getSocketAddress(ch);
         }
     }

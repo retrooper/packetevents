@@ -41,12 +41,12 @@ public class WrappedPacket implements WrapperPacketReader, WrapperPacketWriter {
     private static final Field[] EMPTY_FIELD_ARRAY = new Field[0];
     public static ServerVersion version;
     protected NMSPacket packet;
-    private Class<?> packetClass;
+    private final Class<?> packetClass;
 
     public WrappedPacket() {
         packet = null;
         packetClass = null;
-        if(!loadedWrappers.containsKey(getClass())) {
+        if (!loadedWrappers.containsKey(getClass())) {
             load();
             loadedWrappers.put(getClass(), true);
         }
@@ -64,7 +64,7 @@ public class WrappedPacket implements WrapperPacketReader, WrapperPacketWriter {
         }
         this.packetClass = packetClass;
         this.packet = packet;
-        if(!loadedWrappers.containsKey(getClass())) {
+        if (!loadedWrappers.containsKey(getClass())) {
             load();
             loadedWrappers.put(getClass(), true);
         }
@@ -102,12 +102,12 @@ public class WrappedPacket implements WrapperPacketReader, WrapperPacketWriter {
 
     @Override
     public float readFloat(int index) {
-       return read(index, float.class);
+        return read(index, float.class);
     }
 
     @Override
     public double readDouble(int index) {
-       return read(index, double.class);
+        return read(index, double.class);
     }
 
     @Override
@@ -122,7 +122,7 @@ public class WrappedPacket implements WrapperPacketReader, WrapperPacketWriter {
 
     @Override
     public short[] readShortArray(int index) {
-       return read(index, short[].class);
+        return read(index, short[].class);
     }
 
     @Override
@@ -157,7 +157,7 @@ public class WrappedPacket implements WrapperPacketReader, WrapperPacketWriter {
 
     @Override
     public String readString(int index) {
-       return read(index, String.class);
+        return read(index, String.class);
     }
 
     public Object readAnyObject(int index) {

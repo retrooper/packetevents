@@ -34,14 +34,16 @@ import io.github.retrooper.packetevents.event.impl.PacketPlayReceiveEvent;
  * Cancelling the event means the action assosiated with the event will be cancelled.
  * For example, cancelling the {@link PacketPlayReceiveEvent}
  * will prevent minecraft from processing the incoming packet.
- * @see PacketPlayReceiveEvent
+ *
  * @author retrooper
+ * @see PacketPlayReceiveEvent
  * @since 1.7
  */
 public interface CancellableEvent {
 
     /**
      * This method returns if the event will be cancelled.
+     *
      * @return Will the event be cancelled.
      */
     boolean isCancelled();

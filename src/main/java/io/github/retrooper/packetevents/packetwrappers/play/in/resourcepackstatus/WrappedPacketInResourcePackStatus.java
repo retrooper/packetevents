@@ -51,7 +51,7 @@ public class WrappedPacketInResourcePackStatus extends WrappedPacket {
         SUCCESSFULLY_LOADED,
         DECLINED,
         FAILED_DOWNLOAD,
-        ACCEPTED;
+        ACCEPTED
     }
 
     @Override

@@ -26,8 +26,9 @@ package io.github.retrooper.packetevents.enums;
 
 /**
  * The {@code Hand} enum represents what hand was used in an interaction.
- * @see <a href="https://wiki.vg/Protocol#Open_Book">https://wiki.vg/Protocol#Open_Book</a>
+ *
  * @author retrooper
+ * @see <a href="https://wiki.vg/Protocol#Open_Book">https://wiki.vg/Protocol#Open_Book</a>
  * @since 1.8
  */
 public enum Hand {

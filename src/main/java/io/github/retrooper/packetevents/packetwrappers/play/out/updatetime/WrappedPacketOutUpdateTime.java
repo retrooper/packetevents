@@ -36,6 +36,7 @@ public class WrappedPacketOutUpdateTime extends WrappedPacket implements Sendabl
     private static Constructor<?> packetConstructor;
     private long worldAgeTicks;
     private long timeOfDayTicks;
+
     public WrappedPacketOutUpdateTime(NMSPacket packet) {
         super(packet);
     }
@@ -55,14 +56,14 @@ public class WrappedPacketOutUpdateTime extends WrappedPacket implements Sendabl
     }
 
     public long getWorldAgeTicks() {
-        if(packet != null) {
+        if (packet != null) {
             return readLong(0);
         }
         return worldAgeTicks;
     }
 
     public long getTimeOfDayTicks() {
-        if(packet != null) {
+        if (packet != null) {
             return readLong(1);
         }
         return timeOfDayTicks;

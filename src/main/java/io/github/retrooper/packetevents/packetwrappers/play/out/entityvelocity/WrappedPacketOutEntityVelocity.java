@@ -67,7 +67,7 @@ public final class WrappedPacketOutEntityVelocity extends WrappedPacket implemen
      * 1.14+ use int, Vec3D style
      */
     @Override
-protected void load() {
+    protected void load() {
         Class<?> velocityClass = PacketTypeClasses.Play.Server.ENTITY_VELOCITY;
         try {
             velocityConstructor = velocityClass.getConstructor(int.class, double.class, double.class, double.class);

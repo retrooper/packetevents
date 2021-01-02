@@ -26,8 +26,9 @@ package io.github.retrooper.packetevents.enums;
 
 /**
  * The {@code direction} enum represents the face of a block being hit/placed.
- * @see <a href="https://wiki.vg/Protocol#Player_Digging">https://wiki.vg/Protocol#Player_Digging</a>
+ *
  * @author retrooper
+ * @see <a href="https://wiki.vg/Protocol#Player_Digging">https://wiki.vg/Protocol#Player_Digging</a>
  * @since 1.7.8
  */
 public enum Direction {

@@ -28,7 +28,7 @@ import net.minecraft.util.io.netty.buffer.ByteBuf;
 import net.minecraft.util.io.netty.buffer.Unpooled;
 
 public final class ByteBufUtil_7 implements ByteBufUtil {
-    
+
     public Object wrappedBuffer(byte[] bytes) {
         return Unpooled.wrappedBuffer(bytes);
     }

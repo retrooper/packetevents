@@ -36,6 +36,7 @@ import java.lang.reflect.InvocationTargetException;
 public class WrappedPacketOutCamera extends WrappedPacket implements SendableWrapper {
     private static Constructor<?> packetConstructor;
     private int cameraID;
+
     public WrappedPacketOutCamera(NMSPacket packet) {
         super(packet);
     }
@@ -54,7 +55,7 @@ public class WrappedPacketOutCamera extends WrappedPacket implements SendableWra
     }
 
     public int getCameraId() {
-        if(packet != null) {
+        if (packet != null) {
             return readInt(0);
         }
         return cameraID;

@@ -37,8 +37,9 @@ import org.bukkit.plugin.Plugin;
  * PacketEvents internally need the LOGIN HANDSHAKING packet to resolve client version independently.
  * If some supported dependencies are available, PacketEvents will always prioritize them
  * and use their API.
- * @see io.github.retrooper.packetevents.injector.lateinjector.LateChannelInjector
+ *
  * @author retrooper
+ * @see io.github.retrooper.packetevents.injector.lateinjector.LateChannelInjector
  * @since 1.8
  */
 public class EarlyChannelInjector implements ChannelInjector {
@@ -60,6 +61,7 @@ public class EarlyChannelInjector implements ChannelInjector {
 
     /**
      * Constructor, we require the Bukkit Plugin instance.
+     *
      * @param plugin Plugin
      */
     public EarlyChannelInjector(final Plugin plugin) {
@@ -108,6 +110,7 @@ public class EarlyChannelInjector implements ChannelInjector {
 
     /**
      * Inject a player synchronously.
+     *
      * @param player Target player.
      * @see io.github.retrooper.packetevents.handler.PacketHandlerInternal#injectPlayerSync(Player)
      */
@@ -122,6 +125,7 @@ public class EarlyChannelInjector implements ChannelInjector {
 
     /**
      * Eject a player synchronously.
+     *
      * @param player Target player.
      * @see io.github.retrooper.packetevents.handler.PacketHandlerInternal#ejectPlayerSync(Player)
      */
@@ -136,6 +140,7 @@ public class EarlyChannelInjector implements ChannelInjector {
 
     /**
      * Inject a player asynchronously.
+     *
      * @param player Target player.
      * @see io.github.retrooper.packetevents.handler.PacketHandlerInternal#injectPlayerAsync(Player)
      */
@@ -147,8 +152,10 @@ public class EarlyChannelInjector implements ChannelInjector {
             injector8.injectPlayerAsync(player);
         }
     }
+
     /**
      * Eject a player asynchronously.
+     *
      * @param player Target player.
      * @see io.github.retrooper.packetevents.handler.PacketHandlerInternal#ejectPlayerAsync(Player)
      */
@@ -163,8 +170,9 @@ public class EarlyChannelInjector implements ChannelInjector {
 
     /**
      * Send an NMS Packet to a netty channel.
+     *
      * @param channel Netty channel as Object as netty import is not the same on 1.7.10.
-     * @param packet NMS Packet.
+     * @param packet  NMS Packet.
      */
     @Override
     public void sendPacket(Object channel, Object packet) {

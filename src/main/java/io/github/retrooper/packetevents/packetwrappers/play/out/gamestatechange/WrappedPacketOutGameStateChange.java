@@ -59,7 +59,7 @@ public class WrappedPacketOutGameStateChange extends WrappedPacket implements Se
     }
 
     @Override
-protected void load() {
+    protected void load() {
         reasonClassType = SubclassUtil.getSubClass(PacketTypeClasses.Play.Server.GAME_STATE_CHANGE, "a");
         if (reasonClassType != null) {
             try {

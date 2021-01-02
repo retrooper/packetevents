@@ -54,7 +54,8 @@ class EventManagerLegacy {
      * This downside of this system is the event listeners aren't executed in any particular order, just
      * in the order they were registered.
      * This system is also slower than the other event system.
-     * @param event {@link PacketEvent}
+     *
+     * @param event         {@link PacketEvent}
      * @param eventPriority Priority the legacy listeners should beat to decide cancellation of the event.
      */
     @Deprecated
@@ -93,9 +94,11 @@ class EventManagerLegacy {
             ce.setCancelled(isCancelled);
         }
     }
+
     /**
      * Register a legacy packet event listener.
      * Not recommended to use the deprecated event listener.
+     *
      * @param listener {@link PacketListener}
      */
     @Deprecated
@@ -119,6 +122,7 @@ class EventManagerLegacy {
     /**
      * Register multiple legacy packet event listeners with one method.
      * Not recommended to use the deprecated event listener.
+     *
      * @param listeners {@link PacketListener}
      */
     @Deprecated
@@ -131,6 +135,7 @@ class EventManagerLegacy {
     /**
      * Unregister a legacy packet event listener.
      * Not recommended to use the deprecated event listener.
+     *
      * @param listener {@link PacketListener}
      */
     @Deprecated
@@ -141,6 +146,7 @@ class EventManagerLegacy {
     /**
      * Unregister multiple legacy packet event listeners with one method.
      * Not recommended to use the deprecated event listener.
+     *
      * @param listeners {@link PacketListener}
      */
     @Deprecated

@@ -41,8 +41,9 @@ import java.net.InetSocketAddress;
  * The {@code PlayerInjectEvent} event is fired whenever a player is injected.
  * A player is injected by PacketEvents whenever they join the server.
  * This class implements {@link CancellableEvent} and {@link PlayerEvent}.
- * @see <a href="https://github.com/retrooper/packetevents/blob/dev/src/main/java/io/github/retrooper/packetevents/handler/PacketHandlerInternal.java">https://github.com/retrooper/packetevents/blob/dev/src/main/java/io/github/retrooper/packetevents/handler/PacketHandlerInternal.java</a>
+ *
  * @author retrooper
+ * @see <a href="https://github.com/retrooper/packetevents/blob/dev/src/main/java/io/github/retrooper/packetevents/handler/PacketHandlerInternal.java">https://github.com/retrooper/packetevents/blob/dev/src/main/java/io/github/retrooper/packetevents/handler/PacketHandlerInternal.java</a>
  * @since 1.6.9
  */
 public final class PlayerInjectEvent extends PacketEvent implements CancellableEvent, PlayerEvent {
@@ -80,6 +81,7 @@ public final class PlayerInjectEvent extends PacketEvent implements CancellableE
     /**
      * This method returns the bukkit player object of the player being injected.
      * This player might not be fully initialized.
+     *
      * @return Injected Player.
      */
     @Nullable
@@ -90,6 +92,7 @@ public final class PlayerInjectEvent extends PacketEvent implements CancellableE
 
     /**
      * This method returns the socket address injecting player.
+     *
      * @return Socket address of the injecting player.
      */
     @NotNull
@@ -102,8 +105,9 @@ public final class PlayerInjectEvent extends PacketEvent implements CancellableE
      * If the {@link PacketEventsSettings#shouldInjectAsync()} is enabled, the event will be called asynchronously
      * and the player will be injected asynchronously.
      * The {@link PacketEventsSettings} can be accessed here:
-     * @see PacketEvents#getSettings()
+     *
      * @return Is the injection asynchronous.
+     * @see PacketEvents#getSettings()
      */
     public boolean isAsync() {
         return async;
