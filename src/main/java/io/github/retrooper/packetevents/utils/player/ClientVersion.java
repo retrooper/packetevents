@@ -189,8 +189,9 @@ public enum ClientVersion {
     public boolean isPreRelease() {
         if (protocolVersion > lowestSupportedProtocolVersion && protocolVersion < highestSupportedProtocolVersion) {
             //We don't have to iterate through the LOWEST and the HIGHEST supported version anymore...
-            for (int i = 1; i < values().length - 1; i++) {
-                if (this.protocolVersion == values()[i].protocolVersion) {
+            final ClientVersion[] versions = values();
+            for (int i = 1; i < versions.length - 1; i++) {
+                if (protocolVersion == versions[i].protocolVersion) {
                     return true;
                 }
             }
