@@ -296,11 +296,17 @@ public final class PacketEvents implements Listener, EventManager {
         if (!getSettings().shouldInjectEarly()) {
             try {
                 packetHandlerInternal.injectPlayer(e.getPlayer());
+                //Injection was successful as no exception was thrown...
                 if(!viaAvailable) {
                     PacketEvents.get().getEventManager().callEvent(new PostPlayerInjectEvent(e.getPlayer()));
                 }
             } catch (Exception ex) {
                 e.getPlayer().kickPlayer(getSettings().getInjectionFailureMessage());
+            }
+        }
+        else {
+            if(!viaAvailable) {
+                PacketEvents.get().getEventManager().callEvent(new PostPlayerInjectEvent(e.getPlayer()));
             }
         }
     }
@@ -310,5 +316,4 @@ public final class PacketEvents implements Listener, EventManager {
     public void onQuit(final PlayerQuitEvent e) {
         packetHandlerInternal.ejectPlayer(e.getPlayer());
     }
-
 }

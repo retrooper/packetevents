@@ -28,26 +28,18 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 public class PacketEventsPlugin extends JavaPlugin {
 
-    private static PacketEventsPlugin instance;
-
     @Override
     public void onLoad() {
-        instance = this;
-        PacketEvents.create(this).load();
+
     }
 
     @Override
     public void onEnable() {
-        PacketEvents.get().init(this);
+
     }
 
     @Override
     public void onDisable() {
-        PacketEvents.get().terminate();
-    }
 
-    protected static PacketEventsPlugin getInstance() {
-        return instance;
     }
-
 }

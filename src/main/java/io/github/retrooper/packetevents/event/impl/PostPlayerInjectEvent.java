@@ -39,16 +39,9 @@ import org.jetbrains.annotations.Nullable;
 import java.net.InetSocketAddress;
 
 /**
- * The {@code PostPlayerInjectEvent} event is fired after a player is successfully injected.
- * One thing to note is PacketEvents can never predict if an injection will be successful before injecting.
- * Older versions used to call this event right after the injection.
+ * The {@code PostPlayerInjectEvent} event is fired after a successful injection.
  * If you are on an older version of PacketEvents DON'T use this to register player data.
- * The issue was the PacketReceiveEvent and PacketSendEvent could be called before this event resulting in your
- * player data not being initiated(null).
- * To fix this what we do is whenever we receive the FIRST or send the FIRST packet to a player, we call this event right before doing that.
- * This event is called asynchronously always.
- * It is not recommended to register player data using this event unless you know what you are doing.
- * This event assures you that the player was successfully injected.
+ * Make sure you do null checks in your packet listeners as this might be called a bit later.
  * A player is injected by PacketEvents whenever they join the server.
  * This class implements {@link CancellableEvent} and {@link PlayerEvent}.
  * @see <a href="https://github.com/retrooper/packetevents/blob/dev/src/main/java/io/github/retrooper/packetevents/handler/PacketHandlerInternal.java">https://github.com/retrooper/packetevents/blob/dev/src/main/java/io/github/retrooper/packetevents/handler/PacketHandlerInternal.java</a>
@@ -59,22 +52,6 @@ public class PostPlayerInjectEvent extends PacketEvent implements PlayerEvent {
     private final Player player;
 
     public PostPlayerInjectEvent(Player player) {
-        if (VersionLookupUtils.isDependencyAvailable()) {
-            int protocolVersion = VersionLookupUtils.getProtocolVersion(player);
-            ClientVersion version;
-            if (protocolVersion != -1) {
-                version = ClientVersion.getClientVersion(protocolVersion);
-            } else {
-                version = PacketEvents.get().getPlayerUtils().tempClientVersionMap.get(player.getAddress());
-                if (version == null) {
-                    version = ClientVersion.UNRESOLVED;
-                }
-            }
-            PacketEvents.get().getPlayerUtils().clientVersionsMap.put(player.getAddress(), version);
-        } else {
-            ClientVersion version = PacketEvents.get().getPlayerUtils().tempClientVersionMap.get(player.getAddress());
-            PacketEvents.get().getPlayerUtils().clientVersionsMap.put(player.getAddress(), version);
-        }
         this.player = player;
     }
 

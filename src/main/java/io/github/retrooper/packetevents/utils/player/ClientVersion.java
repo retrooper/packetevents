@@ -31,8 +31,9 @@ import org.jetbrains.annotations.NotNull;
  * This is a nice tool for minecraft's protocol versions.
  * You won't have to memorize the protocol version, just memorize the client version
  * as the version you see in the minecraft launcher.
- * @see <a href="https://wiki.vg/Protocol_version_numbers">https://wiki.vg/Protocol_version_numbers</a>
+ *
  * @author retrooper
+ * @see <a href="https://wiki.vg/Protocol_version_numbers">https://wiki.vg/Protocol_version_numbers</a>
  * @since 1.6.9
  */
 public enum ClientVersion {
@@ -68,16 +69,20 @@ public enum ClientVersion {
     HIGHER_THAN_SUPPORTED_VERSIONS(v_1_16_4.protocolVersion + 1),
     /**
      * Pre releases just aren't supported, we would end up with so many enum constants.
+     * This constant assures you they are on a pre release.
      */
     ANY_PRE_RELEASE_VERSION(0),
 
+    /**
+     *
+     */
     TEMP_UNRESOLVED(-1),
 
     UNRESOLVED(-1);
 
     private static final short lowestSupportedProtocolVersion = (short) (LOWER_THAN_SUPPORTED_VERSIONS.protocolVersion + 1);
     private static final short highestSupportedProtocolVersion = (short) (HIGHER_THAN_SUPPORTED_VERSIONS.protocolVersion - 1);
-    private final short protocolVersion;
+    private short protocolVersion;
 
     ClientVersion(int protocolVersion) {
         this.protocolVersion = (short) protocolVersion;
@@ -85,6 +90,7 @@ public enum ClientVersion {
 
     /**
      * Get a ClientVersion enum by protocol version.
+     *
      * @param protocolVersion Protocol version.
      * @return ClientVersion
      */
@@ -93,24 +99,27 @@ public enum ClientVersion {
         if (protocolVersion == -1) {
             return ClientVersion.UNRESOLVED;
         }
-        for (ClientVersion version : ClientVersion.values()) {
+        for (ClientVersion version : values()) {
             if (version.protocolVersion > protocolVersion) {
                 break;
             } else if (version.protocolVersion == protocolVersion) {
                 return version;
             }
         }
-        if (protocolVersion <= lowestSupportedProtocolVersion) {
+        if (protocolVersion < lowestSupportedProtocolVersion) {
             return LOWER_THAN_SUPPORTED_VERSIONS;
-        } else if (protocolVersion >= highestSupportedProtocolVersion) {
+        } else if (protocolVersion > highestSupportedProtocolVersion) {
             return HIGHER_THAN_SUPPORTED_VERSIONS;
         } else {
-            return ANY_PRE_RELEASE_VERSION;
+            ClientVersion v = TEMP_UNRESOLVED;
+            v.protocolVersion = (short) protocolVersion;
+            return v;
         }
     }
 
     /**
      * Protocol version of this client version.
+     *
      * @return Protocol version.
      */
     public short getProtocolVersion() {
@@ -121,6 +130,7 @@ public enum ClientVersion {
      * Is this client version newer than the compared client version?
      * This method simply checks if this client version's protocol version is greater than
      * the compared client version's protocol version.
+     *
      * @param target Compared client version.
      * @return Is this client version newer than the compared client version.
      */
@@ -132,6 +142,7 @@ public enum ClientVersion {
      * Is this client version newer than or equal to the compared client version?
      * This method simply checks if this client version's protocol version is newer than or equal to
      * the compared client version's protocol version.
+     *
      * @param target Compared client version.
      * @return Is this client version newer than or equal to the compared client version.
      */
@@ -143,6 +154,7 @@ public enum ClientVersion {
      * Is this client version older than the compared client version?
      * This method simply checks if this client version's protocol version is less than
      * the compared client version's protocol version.
+     *
      * @param target Compared client version.
      * @return Is this client version older than the compared client version.
      */
@@ -154,6 +166,7 @@ public enum ClientVersion {
      * Is this client version older than or equal to the compared client version?
      * This method simply checks if this client version's protocol version is older than or equal to
      * the compared client version's protocol version.
+     *
      * @param target Compared client version.
      * @return Is this client version older than or equal to the compared client version.
      */
@@ -165,10 +178,23 @@ public enum ClientVersion {
      * Is this client version equal to the compared client version.
      * This method simply checks if this client version's protocol version
      * is equal to the compared client version's protocol version.
+     *
      * @param target Compared
      * @return Is this client version equal to the compared client version.
      */
     public boolean equals(ClientVersion target) {
         return protocolVersion == target.protocolVersion;
+    }
+
+    public boolean isPreRelease() {
+        if (protocolVersion > lowestSupportedProtocolVersion && protocolVersion < highestSupportedProtocolVersion) {
+            //We don't have to iterate through the LOWEST and the HIGHEST supported version anymore...
+            for (int i = 1; i < values().length - 1; i++) {
+                if (this.protocolVersion == values()[i].protocolVersion) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 }
