@@ -33,6 +33,7 @@ import io.github.retrooper.packetevents.utils.reflection.SubclassUtil;
 import io.github.retrooper.packetevents.utils.server.ServerVersion;
 import io.github.retrooper.packetevents.utils.vector.Vector3d;
 import org.bukkit.entity.Entity;
+import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nullable;
 import java.util.Objects;
@@ -105,13 +106,12 @@ public final class WrappedPacketInUseEntity extends WrappedPacket {
      *
      * @return Get EntityUseAction
      */
-    @Nullable
     public EntityUseAction getAction() {
         if (action == null) {
             final Object useActionEnum = readObject(0, enumEntityUseActionClass);
             if (useActionEnum == null) {
-                //1.7.10 spigot
-                return null;
+                //ur spigot sucks bruh, unfortunately some spigots have such a bug?
+                return EntityUseAction.INTERACT;
             }
             return action = EntityUseAction.valueOf(useActionEnum.toString());
         }
