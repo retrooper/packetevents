@@ -32,7 +32,10 @@ public class WrappedPacketOutBlockChange extends WrappedPacket implements Sendab
     }
 
     public WrappedPacketOutBlockChange(int blockPosX, int blockPosY, int blockPosZ, World world) {
-
+        this.blockPosX = blockPosX;
+        this.blockPosY = blockPosY;
+        this.blockPosZ = blockPosZ;
+        this.world = world;
     }
 
     @Override
