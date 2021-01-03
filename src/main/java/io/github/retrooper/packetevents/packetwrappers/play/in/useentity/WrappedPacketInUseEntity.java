@@ -109,8 +109,9 @@ public final class WrappedPacketInUseEntity extends WrappedPacket {
     public EntityUseAction getAction() {
         if (action == null) {
             final Object useActionEnum = readObject(0, enumEntityUseActionClass);
-            if(useActionEnum == null) {
-                return null; //possibly on 1.7.10
+            if (useActionEnum == null) {
+                //1.7.10 spigot
+                return null;
             }
             return action = EntityUseAction.valueOf(useActionEnum.toString());
         }
