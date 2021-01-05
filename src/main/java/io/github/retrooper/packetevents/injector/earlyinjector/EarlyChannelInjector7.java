@@ -192,8 +192,7 @@ class EarlyChannelInjector7 implements ChannelInjector {
             interceptor = new PlayerChannelInterceptor();
             if (channel.pipeline().get("packet_handler") != null) {
                 channel.pipeline().addBefore("packet_handler", handlerName, interceptor);
-            }
-            else {
+            } else {
                 throw new IllegalStateException("Failed to inject an incoming channel due to \"packet_handler\" not being added to the pipeline! Let them rejoin!");
             }
         }

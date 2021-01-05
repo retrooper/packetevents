@@ -44,7 +44,6 @@ public class WrappedPacketOutKeepAlive extends WrappedPacket implements Sendable
     }
 
     public WrappedPacketOutKeepAlive(long id) {
-        super();
         this.id = id;
     }
 

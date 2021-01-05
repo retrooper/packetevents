@@ -50,13 +50,13 @@ public final class NMSUtils {
     private static String nettyPrefix = "net.minecraft.util.io.netty.";
     public static Constructor<?> blockPosConstructor;
     public static Class<?> nmsEntityClass, minecraftServerClass, craftWorldClass, playerInteractManagerClass, entityPlayerClass, playerConnectionClass, craftServerClass,
-            craftPlayerClass, serverConnectionClass, craftEntityClass,
-            craftItemStack, nmsItemStackClass, networkManagerClass, nettyChannelClass, gameProfileClass, iChatBaseComponentClass,
-            blockPosClass, enumDirectionClass, vec3DClass, channelFutureClass, blockClass, iBlockDataClass, watchableObjectClass, nmsWorldClass;
+            craftPlayerClass, serverConnectionClass, craftEntityClass, nmsItemStackClass, networkManagerClass, nettyChannelClass, gameProfileClass, iChatBaseComponentClass,
+            blockPosClass, enumDirectionClass, vec3DClass, channelFutureClass, blockClass, iBlockDataClass, watchableObjectClass, nmsWorldClass, craftItemStackClass;
     private static Method getCraftPlayerHandle;
     private static Method getCraftEntityHandle;
     private static Method getCraftWorldHandle;
     private static Method asBukkitCopy;
+    private static Method asNMSCopy;
     private static Field entityPlayerPingField, playerConnectionField;
     private static Object minecraftServer;
     private static Object minecraftServerConnection;
@@ -84,7 +84,7 @@ public final class NMSUtils {
             playerConnectionClass = getNMSClass("PlayerConnection");
             serverConnectionClass = getNMSClass("ServerConnection");
             craftEntityClass = getOBCClass("entity.CraftEntity");
-            craftItemStack = getOBCClass("inventory.CraftItemStack");
+            craftItemStackClass = getOBCClass("inventory.CraftItemStack");
             nmsItemStackClass = getNMSClass("ItemStack");
             networkManagerClass = getNMSClass("NetworkManager");
             playerInteractManagerClass = getNMSClass("PlayerInteractManager");
@@ -130,7 +130,8 @@ public final class NMSUtils {
             getCraftPlayerHandle = craftPlayerClass.getMethod("getHandle");
             getCraftEntityHandle = craftEntityClass.getMethod("getHandle");
             getCraftWorldHandle = craftWorldClass.getMethod("getHandle");
-            asBukkitCopy = craftItemStack.getMethod("asBukkitCopy", nmsItemStackClass);
+            asBukkitCopy = craftItemStackClass.getMethod("asBukkitCopy", nmsItemStackClass);
+            asNMSCopy = craftItemStackClass.getMethod("asNMSCopy", ItemStack.class);
         } catch (NoSuchMethodException e) {
             e.printStackTrace();
         }
@@ -286,6 +287,15 @@ public final class NMSUtils {
     public static ItemStack toBukkitItemStack(final Object nmsItemStack) {
         try {
             return (ItemStack) asBukkitCopy.invoke(null, nmsItemStack);
+        } catch (IllegalAccessException | InvocationTargetException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    public static Object toNMSItemStack(final ItemStack stack) {
+        try {
+            return asNMSCopy.invoke(null, stack);
         } catch (IllegalAccessException | InvocationTargetException e) {
             e.printStackTrace();
         }

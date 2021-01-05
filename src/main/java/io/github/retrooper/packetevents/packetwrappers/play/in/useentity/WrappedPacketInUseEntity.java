@@ -33,9 +33,7 @@ import io.github.retrooper.packetevents.utils.reflection.SubclassUtil;
 import io.github.retrooper.packetevents.utils.server.ServerVersion;
 import io.github.retrooper.packetevents.utils.vector.Vector3d;
 import org.bukkit.entity.Entity;
-import org.jetbrains.annotations.NotNull;
 
-import javax.annotation.Nullable;
 import java.util.Objects;
 
 public final class WrappedPacketInUseEntity extends WrappedPacket {
@@ -132,6 +130,6 @@ public final class WrappedPacketInUseEntity extends WrappedPacket {
     }
 
     public enum EntityUseAction {
-        INTERACT, INTERACT_AT, ATTACK;
+        INTERACT, INTERACT_AT, ATTACK
     }
 }

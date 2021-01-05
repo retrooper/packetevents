@@ -73,8 +73,7 @@ class LateChannelInjector8 implements ChannelInjector {
         if (channel.pipeline().get(getNettyHandlerName(plugin)) != null) {
             try {
                 channel.pipeline().remove(getNettyHandlerName(plugin));
-            }
-            catch(NoSuchElementException ignored) {
+            } catch (NoSuchElementException ignored) {
 
             }
         }
@@ -101,8 +100,7 @@ class LateChannelInjector8 implements ChannelInjector {
                 if (channel.pipeline().get(getNettyHandlerName(plugin)) != null) {
                     try {
                         channel.pipeline().remove(getNettyHandlerName(plugin));
-                    }
-                    catch (NoSuchElementException ignored) {
+                    } catch (NoSuchElementException ignored) {
 
                     }
                 }

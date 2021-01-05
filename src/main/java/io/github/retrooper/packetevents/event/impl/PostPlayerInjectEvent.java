@@ -40,6 +40,7 @@ import java.net.InetSocketAddress;
 /**
  * The {@code PostPlayerInjectEvent} event is fired after a successful injection.
  * If you are on an older version of PacketEvents DON'T use this to register player data.
+ * This event will be called asynchronously.
  * Make sure you do null checks in your packet listeners as this might be called a bit later.
  * A player is injected by PacketEvents whenever they join the server.
  * This class implements {@link CancellableEvent} and {@link PlayerEvent}.

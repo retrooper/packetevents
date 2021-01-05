@@ -277,7 +277,7 @@ public final class PacketEvents implements Listener, EventManager {
         boolean viaAvailable = ViaVersionLookupUtils.isAvailable();
         if (viaAvailable) {
             PacketEvents.get().getPlayerUtils().clientVersionsMap.put(e.getPlayer().getAddress(), ClientVersion.TEMP_UNRESOLVED);
-            Bukkit.getScheduler().scheduleSyncDelayedTask(getPlugin(), new Runnable() {
+            Bukkit.getScheduler().runTaskLaterAsynchronously(getPlugin(), new Runnable() {
                 @Override
                 public void run() {
                     int protocolVersion = VersionLookupUtils.getProtocolVersion(e.getPlayer());
