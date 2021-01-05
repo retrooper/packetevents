@@ -31,7 +31,8 @@ import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
 import io.github.retrooper.packetevents.utils.nms.NMSUtils;
 import io.github.retrooper.packetevents.utils.reflection.Reflection;
 import io.github.retrooper.packetevents.utils.reflection.SubclassUtil;
-import org.bukkit.ChatColor;
+import net.md_5.bungee.api.chat.BaseComponent;
+import net.md_5.bungee.chat.ComponentSerializer;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
@@ -262,12 +263,8 @@ public final class WrappedPacketOutChat extends WrappedPacket implements Sendabl
     }
 
     public static class Util {
-        public static WrappedPacketOutChat createHoverMessagePacket(UUID uuid, String message, String hoverMessage) {
-            String json =  "{text:\"" + message + "\",extra:["
-                    + "{text:\"" + "" + "\",hoverEvent:"
-                    + "{action:\"show_text\",value:"
-                    + "{text:\"" + hoverMessage + "\"}}";
-            return new WrappedPacketOutChat(json, uuid, true);
+        public static WrappedPacketOutChat createHoverMessagePacket(UUID uuid, BaseComponent component) {
+            return new WrappedPacketOutChat(ComponentSerializer.toString(component), uuid, true);
         }
 
         public static WrappedPacketOutChat createNormalMessagePacket(UUID uuid, ChatPosition position, String message) {
