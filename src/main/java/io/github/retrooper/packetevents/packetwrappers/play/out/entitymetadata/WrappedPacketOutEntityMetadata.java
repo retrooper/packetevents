@@ -33,10 +33,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * UNFINISHED, DO NOT USE
- */
-public class WrappedPacketOutEntityMetadata extends WrappedPacket {
+class WrappedPacketOutEntityMetadata extends WrappedPacket {
     private static Constructor<?> watchableObjectConstructor;
 
     public WrappedPacketOutEntityMetadata(NMSPacket packet) {
@@ -73,6 +70,7 @@ public class WrappedPacketOutEntityMetadata extends WrappedPacket {
         private final int type;
         private final int index;
         private Object value;
+        private Object mojangWatchableObj;
 
         public WrappedWatchableObject(int type, int index, Object value) {
             this.type = type;
@@ -85,6 +83,7 @@ public class WrappedPacketOutEntityMetadata extends WrappedPacket {
             this.type = watchableWrapper.readInt(0);
             this.index = watchableWrapper.readInt(1);
             this.value = watchableWrapper.readObject(0, Object.class);
+            this.mojangWatchableObj = nmsWatchableObject;
         }
 
         public int getType() {
@@ -101,9 +100,17 @@ public class WrappedPacketOutEntityMetadata extends WrappedPacket {
 
         public void setValue(Object value) {
             this.value = value;
+            mojangWatchableObj = getMojangWatchableObjNoCache();
         }
 
-        public Object asMojangWatchableObject() {
+        public Object getMojangWatchableObj() {
+            if (mojangWatchableObj == null) {
+                mojangWatchableObj = getMojangWatchableObjNoCache();
+            }
+            return mojangWatchableObj;
+        }
+
+        public Object getMojangWatchableObjNoCache() {
             try {
                 return watchableObjectConstructor.newInstance(type, index, value);
             } catch (InstantiationException | InvocationTargetException | IllegalAccessException e) {

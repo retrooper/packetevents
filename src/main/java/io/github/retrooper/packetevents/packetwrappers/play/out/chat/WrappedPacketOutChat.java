@@ -31,6 +31,7 @@ import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
 import io.github.retrooper.packetevents.utils.nms.NMSUtils;
 import io.github.retrooper.packetevents.utils.reflection.Reflection;
 import io.github.retrooper.packetevents.utils.reflection.SubclassUtil;
+import org.bukkit.ChatColor;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
@@ -258,6 +259,24 @@ public final class WrappedPacketOutChat extends WrappedPacket implements Sendabl
 
     public enum ChatPosition {
         CHAT, SYSTEM_MESSAGE, GAME_INFO
+    }
+
+    public static class Util {
+        public static WrappedPacketOutChat createHoverableMessagePacket(UUID uuid) {
+            String prefix = "owner";
+            String name = "retrooper";
+            String message = ChatColor.RED + "Nice msg bro";
+            String json = "{text:\"" + prefix + "\",extra:["
+                    + "{text:\"" + name + "\",hoverEvent:"
+                    + "{action:\"show_text\",value:"
+                    + "{text:\"" + "Rank: " + "Someone tell me how to get the rank here pls?" + "\"}},extra:["
+                    + "{text:\"" + ": " + message + "\"}]}]}";
+            return new WrappedPacketOutChat(json, ChatPosition.CHAT, uuid, true);
+        }
+
+        public static WrappedPacketOutChat createNormalMessagePacket(UUID uuid, ChatPosition pos, String message) {
+            return new WrappedPacketOutChat(message, pos, uuid, false);
+        }
     }
 
 }
