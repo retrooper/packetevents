@@ -263,7 +263,7 @@ public final class WrappedPacketOutChat extends WrappedPacket implements Sendabl
 
     public static class Util {
         public static WrappedPacketOutChat createHoverMessagePacket(UUID uuid, ChatPosition position, String message, String hoverMessage) {
-            String json = "{action:\"show_text\",value:"
+            String json = "hoverEvent:\" {action:\"show_text\",value:"
                     + "{text:\"" + hoverMessage + "\"}},extra:["
                     + "{text:\"" + ": " + message + "\"}]}]}";
             return new WrappedPacketOutChat(json, ChatPosition.CHAT, uuid, true);
