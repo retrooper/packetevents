@@ -34,10 +34,11 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class WrappedPacket implements WrapperPacketReader, WrapperPacketWriter {
-    private static final Map<Class<? extends WrappedPacket>, Boolean> loadedWrappers = new HashMap<>();
-    private static final Map<Class<?>, Map<Class<?>, Field[]>> FIELD_CACHE = new HashMap<>();
+    private static final Map<Class<? extends WrappedPacket>, Boolean> loadedWrappers = new ConcurrentHashMap<>();
+    private static final Map<Class<?>, Map<Class<?>, Field[]>> FIELD_CACHE = new ConcurrentHashMap<>();
     private static final Field[] EMPTY_FIELD_ARRAY = new Field[0];
     public static ServerVersion version;
     protected NMSPacket packet;
