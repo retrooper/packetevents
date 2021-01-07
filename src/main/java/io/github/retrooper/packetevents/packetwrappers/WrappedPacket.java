@@ -37,7 +37,8 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class WrappedPacket implements WrapperPacketReader, WrapperPacketWriter {
-    private static final Map<Class<? extends WrappedPacket>, Boolean> loadedWrappers = new ConcurrentHashMap<>();
+
+    private static final Map<Class<? extends WrappedPacket>, Boolean> LOADED_WRAPPERS = new ConcurrentHashMap<>();
     private static final Map<Class<?>, Map<Class<?>, Field[]>> FIELD_CACHE = new ConcurrentHashMap<>();
     private static final Field[] EMPTY_FIELD_ARRAY = new Field[0];
     public static ServerVersion version;
@@ -47,10 +48,7 @@ public class WrappedPacket implements WrapperPacketReader, WrapperPacketWriter {
     public WrappedPacket() {
         packet = null;
         packetClass = null;
-        if (!loadedWrappers.containsKey(getClass())) {
-            load();
-            loadedWrappers.put(getClass(), true);
-        }
+        load0();
     }
 
     public WrappedPacket(final NMSPacket packet) {
@@ -65,9 +63,14 @@ public class WrappedPacket implements WrapperPacketReader, WrapperPacketWriter {
         }
         this.packetClass = packetClass;
         this.packet = packet;
-        if (!loadedWrappers.containsKey(getClass())) {
+        load0();
+    }
+
+    private void load0() {
+        final Class<? extends WrappedPacket> clazz = getClass();
+        if (!LOADED_WRAPPERS.containsKey(clazz)) {
             load();
-            loadedWrappers.put(getClass(), true);
+            LOADED_WRAPPERS.put(clazz, true);
         }
     }
 
@@ -148,12 +151,7 @@ public class WrappedPacket implements WrapperPacketReader, WrapperPacketWriter {
 
     @Override
     public String[] readStringArray(int index) {
-        String[] array = read(index, String[].class);
-        return array;
-        //int length = array.length;
-        //String[] copy = new String[length];
-        //System.arraycopy(array, 0, copy, 0, length);
-        //return copy;
+        return read(index, String[].class); // Can we be sure that returning the original array is okay?
     }
 
     @Override
@@ -182,6 +180,7 @@ public class WrappedPacket implements WrapperPacketReader, WrapperPacketWriter {
         return read(index, type);
     }
 
+    @SuppressWarnings("unchecked")
     public <T> T read(int index, Class<? extends T> type) {
         Field field = getField(type, index);
         try {
@@ -250,11 +249,7 @@ public class WrappedPacket implements WrapperPacketReader, WrapperPacketWriter {
 
     private Field getField(Class<?> type, int index) {
         Map<Class<?>, Field[]> cached = FIELD_CACHE.computeIfAbsent(packetClass, k -> new HashMap<>());
-        Field[] fields = cached.get(type);
-        if (fields == null) {
-            fields = getFields(type, packetClass.getDeclaredFields());
-            cached.put(type, fields);
-        }
+        Field[] fields = cached.computeIfAbsent(type, typeClass -> getFields(typeClass, packetClass.getDeclaredFields()));
         return fields[index];
     }
 
@@ -271,7 +266,7 @@ public class WrappedPacket implements WrapperPacketReader, WrapperPacketWriter {
         return ret.toArray(EMPTY_FIELD_ARRAY);
     }
 
-    //Does the server version support reading/sending this packet?
+    // Does the server version support reading/sending this packet?
     public boolean isSupported() {
         return true;
     }
