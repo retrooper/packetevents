@@ -26,8 +26,7 @@ package io.github.retrooper.packetevents.handler;
 
 import io.github.retrooper.packetevents.PacketEvents;
 import io.github.retrooper.packetevents.event.impl.*;
-import io.github.retrooper.packetevents.injector.earlyinjector.EarlyChannelInjector;
-import io.github.retrooper.packetevents.injector.lateinjector.LateChannelInjector;
+import io.github.retrooper.packetevents.injector.GlobalChannelInjector;
 import io.github.retrooper.packetevents.packettype.PacketType;
 import io.github.retrooper.packetevents.packetwrappers.NMSPacket;
 import io.github.retrooper.packetevents.packetwrappers.login.in.handshake.WrappedPacketLoginInHandshake;
@@ -58,22 +57,15 @@ import java.util.concurrent.ConcurrentHashMap;
  * @since 1.7.9
  */
 public class PacketHandlerInternal {
-    public final EarlyChannelInjector earlyInjector;
-    public final LateChannelInjector lateInjector;
+    public final GlobalChannelInjector injector;
     private final boolean earlyInjectMode;
     public final HashMap<UUID, Long> keepAliveMap = new HashMap<>();
     public final Map<String, Object> channelMap = new ConcurrentHashMap<>();
 
     public PacketHandlerInternal(Plugin plugin, boolean earlyInjectMode) {
         this.earlyInjectMode = earlyInjectMode;
-        if (earlyInjectMode) {
-            earlyInjector = new EarlyChannelInjector(plugin);
-            earlyInjector.startup();
-            lateInjector = null;
-        } else {
-            lateInjector = new LateChannelInjector(plugin);
-            earlyInjector = null;
-        }
+        injector = new GlobalChannelInjector();
+        injector.prepare();
     }
 
     /**
@@ -155,11 +147,7 @@ public class PacketHandlerInternal {
         PlayerInjectEvent injectEvent = new PlayerInjectEvent(player, channel, false);
         PacketEvents.get().getEventManager().callEvent(injectEvent);
         if (!injectEvent.isCancelled()) {
-            if (earlyInjectMode) {
-                earlyInjector.injectPlayerSync(player);
-            } else {
-                lateInjector.injectPlayerSync(player);
-            }
+            injector.injectPlayerSync(player);
         }
     }
 
@@ -174,11 +162,7 @@ public class PacketHandlerInternal {
         PlayerInjectEvent injectEvent = new PlayerInjectEvent(player, channel, true);
         PacketEvents.get().getEventManager().callEvent(injectEvent);
         if (!injectEvent.isCancelled()) {
-            if (earlyInjectMode) {
-                Objects.requireNonNull(earlyInjector).injectPlayerAsync(player);
-            } else {
-                Objects.requireNonNull(lateInjector).injectPlayerAsync(player);
-            }
+            injector.injectPlayerAsync(player);
         }
     }
 
@@ -192,11 +176,7 @@ public class PacketHandlerInternal {
         PlayerEjectEvent ejectEvent = new PlayerEjectEvent(player, false);
         PacketEvents.get().getEventManager().callEvent(ejectEvent);
         if (!ejectEvent.isCancelled()) {
-            if (earlyInjectMode) {
-                Objects.requireNonNull(earlyInjector).ejectPlayerSync(player);
-            } else {
-                Objects.requireNonNull(lateInjector).ejectPlayerSync(player);
-            }
+            injector.ejectPlayerSync(player);
             keepAliveMap.remove(player.getUniqueId());
             channelMap.remove(player.getName());
         }
@@ -212,11 +192,7 @@ public class PacketHandlerInternal {
         PlayerEjectEvent ejectEvent = new PlayerEjectEvent(player, true);
         PacketEvents.get().getEventManager().callEvent(ejectEvent);
         if (!ejectEvent.isCancelled()) {
-            if (earlyInjectMode) {
-                Objects.requireNonNull(earlyInjector).ejectPlayerAsync(player);
-            } else {
-                Objects.requireNonNull(lateInjector).ejectPlayerAsync(player);
-            }
+            injector.ejectPlayerAsync(player);
         }
     }
 
@@ -229,11 +205,7 @@ public class PacketHandlerInternal {
      * @param packet  NMS Packet.
      */
     public void sendPacket(Object channel, Object packet) {
-        if (earlyInjectMode) {
-            earlyInjector.sendPacket(channel, packet);
-        } else {
-            lateInjector.sendPacket(channel, packet);
-        }
+        injector.sendPacket(channel, packet);
     }
 
     /**
@@ -460,10 +432,8 @@ public class PacketHandlerInternal {
      * calling this close method will unregister the channel handlers it registered when the plugin enabled.
      * PacketEvents already unregisters them in the {@link PacketEvents#stop()} method.
      */
-    public void close() {
-        if (earlyInjectMode) {
-            earlyInjector.close();
-        }
+    public void cleanup() {
+        injector.cleanup();
     }
 
     /**
@@ -472,9 +442,7 @@ public class PacketHandlerInternal {
      * ASYNCHRONOUSLY.
      * PacketEvents already unregisters them in the {@link PacketEvents#stop()} method.
      */
-    public void closeAsync() {
-        if (earlyInjectMode) {
-            earlyInjector.closeAsync();
-        }
+    public void cleanupAsync() {
+        injector.cleanupAsync();
     }
 }

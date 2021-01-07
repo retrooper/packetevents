@@ -44,6 +44,15 @@ import java.lang.reflect.Method;
 import java.util.List;
 
 public final class NMSUtils {
+    public static boolean legacyNettyImportMode;
+    static {
+        try {
+            Class.forName("net.minecraft.util.io.netty.channel.Channel");
+            legacyNettyImportMode = true;
+        } catch (ClassNotFoundException e) {
+            legacyNettyImportMode = false;
+        }
+    }
     private static final String NMS_DIR = ServerVersion.getNMSDirectory() + ".";
     private static final String OBC_DIR = ServerVersion.getOBCDirectory() + ".";
     public static ServerVersion version;

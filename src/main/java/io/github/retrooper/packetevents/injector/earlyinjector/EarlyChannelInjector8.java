@@ -25,13 +25,11 @@
 package io.github.retrooper.packetevents.injector.earlyinjector;
 
 import io.github.retrooper.packetevents.PacketEvents;
-import io.github.retrooper.packetevents.injector.ChannelInjector;
 import io.github.retrooper.packetevents.packetwrappers.NMSPacket;
 import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
 import io.github.retrooper.packetevents.utils.nms.NMSUtils;
 import io.netty.channel.*;
 import org.bukkit.entity.Player;
-import org.bukkit.plugin.Plugin;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -39,7 +37,7 @@ import java.util.NoSuchElementException;
 
 /**
  * 1.8 (and above) Spigot Early channel injector.
- * This is an early injector {@link EarlyChannelInjector} for 1.8 (and above) spigot servers.
+ * This is an early injector for 1.8 (and above) spigot servers.
  * The netty import on spigot changed since 1.8.
  * So we needed to make separate classes for the 1.7.10 and the 1.8+ injector.
  * This is why we also commonly use a java {@link Object} class when it comes to netty channels
@@ -48,12 +46,7 @@ import java.util.NoSuchElementException;
  * @author retrooper
  * @since 1.8
  */
-public class EarlyChannelInjector8 implements ChannelInjector {
-    /**
-     * Bukkit plugin instance that we use to generate a unique netty handler name.
-     */
-    private final Plugin plugin;
-
+public class EarlyChannelInjector8 implements EarlyInjector {
     /**
      * Netty minecraft server channels.
      */
@@ -80,16 +73,13 @@ public class EarlyChannelInjector8 implements ChannelInjector {
      */
     private List<Object> networkMarkers;
 
-    public EarlyChannelInjector8(final Plugin plugin) {
-        this.plugin = plugin;
-    }
-
     /**
      * Access minecraft's network managers to synchronize against as they interfere with our channel injection.
      * Initiate the channel initializers and the channel handler.
      * Access minecraft's server channels and add our own.
      */
-    public void startup() {
+    @Override
+    public void prepare() {
         networkMarkers = NMSUtils.getNetworkMarkers();
         firstChannelInitializer = new ChannelInitializer<Channel>() {
             @Override
@@ -165,7 +155,8 @@ public class EarlyChannelInjector8 implements ChannelInjector {
     /**
      * Remove our channel handler from all server channel pipelines from the current thread.
      */
-    public void close() {
+    @Override
+    public void cleanup() {
         for (Channel channel : serverChannels) {
             try {
                 channel.pipeline().remove(channelHandler);
@@ -182,9 +173,10 @@ public class EarlyChannelInjector8 implements ChannelInjector {
      * @param ch Netty channel.
      * @return {@link PlayerChannelInterceptor}
      */
+    @Override
     public PlayerChannelInterceptor injectChannel(Object ch) {
         Channel channel = (Channel) ch;
-        String handlerName = getNettyHandlerName(plugin);
+        String handlerName = PacketEvents.get().getHandlerName();
         PlayerChannelInterceptor interceptor = (PlayerChannelInterceptor) channel.pipeline().get(handlerName);
         if (interceptor == null) {
             interceptor = new PlayerChannelInterceptor();
@@ -202,9 +194,10 @@ public class EarlyChannelInjector8 implements ChannelInjector {
      *
      * @param ch Netty channel.
      */
+    @Override
     public void ejectChannel(Object ch) {
         Channel channel = (Channel) ch;
-        String handlerName = getNettyHandlerName(plugin);
+        String handlerName = PacketEvents.get().getHandlerName();
         if (channel.pipeline().get(handlerName) != null) {
             channel.pipeline().remove(handlerName);
         }

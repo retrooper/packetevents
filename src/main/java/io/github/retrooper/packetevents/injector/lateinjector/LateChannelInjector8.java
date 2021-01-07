@@ -25,23 +25,15 @@
 package io.github.retrooper.packetevents.injector.lateinjector;
 
 import io.github.retrooper.packetevents.PacketEvents;
-import io.github.retrooper.packetevents.injector.ChannelInjector;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelDuplexHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelPromise;
 import org.bukkit.entity.Player;
-import org.bukkit.plugin.Plugin;
 
 import java.util.NoSuchElementException;
 
-class LateChannelInjector8 implements ChannelInjector {
-    private final Plugin plugin;
-
-    public LateChannelInjector8(final Plugin plugin) {
-        this.plugin = plugin;
-    }
-
+public class LateChannelInjector8 implements LateInjector {
     @Override
     public void injectPlayerSync(Player player) {
         final ChannelDuplexHandler channelDuplexHandler = new ChannelDuplexHandler() {
@@ -64,15 +56,15 @@ class LateChannelInjector8 implements ChannelInjector {
             }
         };
         final Channel channel = (Channel) PacketEvents.get().packetHandlerInternal.getChannel(player.getName());
-        channel.pipeline().addBefore("packet_handler", getNettyHandlerName(plugin), channelDuplexHandler);
+        channel.pipeline().addBefore("packet_handler", PacketEvents.get().getHandlerName(), channelDuplexHandler);
     }
 
     @Override
     public void ejectPlayerSync(Player player) {
         final Channel channel = (Channel) PacketEvents.get().packetHandlerInternal.getChannel(player.getName());
-        if (channel.pipeline().get(getNettyHandlerName(plugin)) != null) {
+        if (channel.pipeline().get(PacketEvents.get().getHandlerName()) != null) {
             try {
-                channel.pipeline().remove(getNettyHandlerName(plugin));
+                channel.pipeline().remove(PacketEvents.get().getHandlerName());
             } catch (NoSuchElementException ignored) {
 
             }
@@ -97,9 +89,9 @@ class LateChannelInjector8 implements ChannelInjector {
             @Override
             public void run() {
                 final Channel channel = (Channel) PacketEvents.get().packetHandlerInternal.getChannel(player.getName());
-                if (channel.pipeline().get(getNettyHandlerName(plugin)) != null) {
+                if (channel.pipeline().get(PacketEvents.get().getHandlerName()) != null) {
                     try {
-                        channel.pipeline().remove(getNettyHandlerName(plugin));
+                        channel.pipeline().remove(PacketEvents.get().getHandlerName());
                     } catch (NoSuchElementException ignored) {
 
                     }
@@ -112,6 +104,7 @@ class LateChannelInjector8 implements ChannelInjector {
         });
     }
 
+    @Override
     public void sendPacket(Object rawChannel, Object packet) {
         Channel channel = (Channel) rawChannel;
         channel.pipeline().writeAndFlush(packet);

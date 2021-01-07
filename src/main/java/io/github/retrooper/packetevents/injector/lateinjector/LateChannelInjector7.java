@@ -25,21 +25,13 @@
 package io.github.retrooper.packetevents.injector.lateinjector;
 
 import io.github.retrooper.packetevents.PacketEvents;
-import io.github.retrooper.packetevents.injector.ChannelInjector;
 import net.minecraft.util.io.netty.channel.Channel;
 import net.minecraft.util.io.netty.channel.ChannelDuplexHandler;
 import net.minecraft.util.io.netty.channel.ChannelHandlerContext;
 import net.minecraft.util.io.netty.channel.ChannelPromise;
 import org.bukkit.entity.Player;
-import org.bukkit.plugin.Plugin;
 
-class LateChannelInjector7 implements ChannelInjector {
-    private final Plugin plugin;
-
-    public LateChannelInjector7(final Plugin plugin) {
-        this.plugin = plugin;
-    }
-
+public class LateChannelInjector7 implements LateInjector {
     @Override
     public void injectPlayerSync(Player player) {
         final ChannelDuplexHandler channelDuplexHandler = new ChannelDuplexHandler() {
@@ -62,14 +54,14 @@ class LateChannelInjector7 implements ChannelInjector {
             }
         };
         final Channel channel = (Channel) PacketEvents.get().packetHandlerInternal.getChannel(player.getName());
-        channel.pipeline().addBefore("packet_handler", getNettyHandlerName(plugin), channelDuplexHandler);
+        channel.pipeline().addBefore("packet_handler", PacketEvents.get().getHandlerName(), channelDuplexHandler);
     }
 
     @Override
     public void ejectPlayerSync(Player player) {
         final Channel channel = (Channel) PacketEvents.get().packetHandlerInternal.getChannel(player.getName());
-        if (channel.pipeline().get(getNettyHandlerName(plugin)) != null) {
-            channel.pipeline().remove(getNettyHandlerName(plugin));
+        if (channel.pipeline().get(PacketEvents.get().getHandlerName()) != null) {
+            channel.pipeline().remove(PacketEvents.get().getHandlerName());
         }
         PacketEvents.get().getPlayerUtils().clientVersionsMap.remove(player.getAddress());
         PacketEvents.get().getPlayerUtils().tempClientVersionMap.remove(player.getAddress());
@@ -91,8 +83,8 @@ class LateChannelInjector7 implements ChannelInjector {
             @Override
             public void run() {
                 final Channel channel = (Channel) PacketEvents.get().packetHandlerInternal.getChannel(player.getName());
-                if (channel.pipeline().get(getNettyHandlerName(plugin)) != null) {
-                    channel.pipeline().remove(getNettyHandlerName(plugin));
+                if (channel.pipeline().get(PacketEvents.get().getHandlerName()) != null) {
+                    channel.pipeline().remove(PacketEvents.get().getHandlerName());
                 }
                 PacketEvents.get().packetHandlerInternal.keepAliveMap.remove(player.getUniqueId());
                 PacketEvents.get().packetHandlerInternal.channelMap.remove(player.getName());
@@ -102,6 +94,7 @@ class LateChannelInjector7 implements ChannelInjector {
         });
     }
 
+    @Override
     public void sendPacket(Object rawChannel, Object packet) {
         Channel channel = (Channel) rawChannel;
         channel.pipeline().writeAndFlush(packet);

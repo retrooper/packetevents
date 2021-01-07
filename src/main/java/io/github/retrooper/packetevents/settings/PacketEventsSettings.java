@@ -65,10 +65,10 @@ public class PacketEventsSettings {
     private boolean checkForUpdates = true;
 
     /**
-     * This boolean stores if PacketEvents should inject a player earlier using the {@code EarlyChannelInjector}.
+     * This boolean stores if PacketEvents should inject a player earlier using the {@code EarlyInjector}.
      * Allowing us to listen to the LOGIN and STATUS packets and detect client version independently.
      *
-     * @see io.github.retrooper.packetevents.injector.earlyinjector.EarlyChannelInjector
+     * @see io.github.retrooper.packetevents.injector.earlyinjector.EarlyInjector
      */
     private boolean injectEarly = true;
 
@@ -153,7 +153,7 @@ public class PacketEventsSettings {
      * Setter for the {@link #injectEarly} field.
      * Only succeeds if the settings class isn't locked.
      *
-     * @param injectEarly Use the {@link io.github.retrooper.packetevents.injector.earlyinjector.EarlyChannelInjector}?
+     * @param injectEarly Use the early injection method.
      * @return This instance.
      */
     public PacketEventsSettings injectEarly(boolean injectEarly) {
@@ -237,7 +237,7 @@ public class PacketEventsSettings {
     }
 
     /**
-     * Should we inject a player earlier with the {@link io.github.retrooper.packetevents.injector.earlyinjector.EarlyChannelInjector}
+     * Should we inject a player earlier with the early injection method?
      *
      * @return Getter for {@link #injectEarly}
      */

@@ -73,7 +73,7 @@ public class PEVersion {
      * this method will return 0.
      * Similar to {@link Integer#compareTo(Integer)}.
      *
-     * @param version
+     * @param version Compared version
      * @return Comparing to another Version.
      */
     public int compareTo(PEVersion version) {

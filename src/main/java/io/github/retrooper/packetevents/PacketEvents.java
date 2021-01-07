@@ -29,7 +29,6 @@ import io.github.retrooper.packetevents.event.manager.EventManager;
 import io.github.retrooper.packetevents.event.manager.PEEventManager;
 import io.github.retrooper.packetevents.exceptions.PacketEventsLoadFailureException;
 import io.github.retrooper.packetevents.handler.PacketHandlerInternal;
-import io.github.retrooper.packetevents.injector.lateinjector.LateChannelInjector;
 import io.github.retrooper.packetevents.packettype.PacketTypeClasses;
 import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
 import io.github.retrooper.packetevents.settings.PacketEventsSettings;
@@ -47,12 +46,6 @@ import io.github.retrooper.packetevents.utils.version.PEVersion;
 import io.github.retrooper.packetevents.utils.versionlookup.VersionLookupUtils;
 import io.github.retrooper.packetevents.utils.versionlookup.v_1_7_10.ProtocolVersionAccessor_v_1_7;
 import io.github.retrooper.packetevents.utils.versionlookup.viaversion.ViaVersionLookupUtils;
-import net.md_5.bungee.api.chat.BaseComponent;
-import net.md_5.bungee.api.chat.ClickEvent;
-import net.md_5.bungee.api.chat.HoverEvent;
-import net.md_5.bungee.api.chat.TextComponent;
-import net.md_5.bungee.chat.BaseComponentSerializer;
-import net.md_5.bungee.chat.ComponentSerializer;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -90,7 +83,7 @@ public final class PacketEvents implements Listener, EventManager {
     public PacketHandlerInternal packetHandlerInternal;
     private boolean loading, loaded, initialized, initializing, stopping;
     private PacketEventsSettings settings = new PacketEventsSettings();
-    private final ByteBufUtil byteBufUtil = LateChannelInjector.v1_7_nettyMode ? new ByteBufUtil_7() : new ByteBufUtil_8();
+    private final ByteBufUtil byteBufUtil = NMSUtils.legacyNettyImportMode ? new ByteBufUtil_7() : new ByteBufUtil_8();
 
 
     public static PacketEvents create(final Plugin plugin) {
@@ -198,7 +191,7 @@ public final class PacketEvents implements Listener, EventManager {
             for (Player player : Bukkit.getOnlinePlayers()) {
                 packetHandlerInternal.ejectPlayer(player);
             }
-            packetHandlerInternal.close();
+            packetHandlerInternal.cleanup();
 
             getEventManager().unregisterAllListeners();
             generalExecutorService.shutdownNow();
@@ -264,6 +257,10 @@ public final class PacketEvents implements Listener, EventManager {
 
     public ByteBufUtil getByteBufUtil() {
         return byteBufUtil;
+    }
+
+    public String getHandlerName() {
+        return "pe-" + plugin.getName();
     }
 
     @EventHandler(priority = EventPriority.LOW)

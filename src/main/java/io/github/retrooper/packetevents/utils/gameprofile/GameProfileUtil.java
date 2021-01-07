@@ -24,7 +24,7 @@
 
 package io.github.retrooper.packetevents.utils.gameprofile;
 
-import io.github.retrooper.packetevents.injector.lateinjector.LateChannelInjector;
+import io.github.retrooper.packetevents.utils.nms.NMSUtils;
 
 import java.util.UUID;
 
@@ -37,7 +37,7 @@ public class GameProfileUtil {
      * @return Mojang Game Profile Object.
      */
     public static Object getGameProfile(UUID uuid, String username) {
-        if (LateChannelInjector.v1_7_nettyMode) {
+        if (NMSUtils.legacyNettyImportMode) {
             return GameProfileUtil_7.getGameProfile(uuid, username);
         } else {
             return GameProfileUtil_8.getGameProfile(uuid, username);
@@ -51,7 +51,7 @@ public class GameProfileUtil {
      * @return {@link WrappedGameProfile}
      */
     public static WrappedGameProfile getWrappedGameProfile(Object gameProfile) {
-        if (LateChannelInjector.v1_7_nettyMode) {
+        if (NMSUtils.legacyNettyImportMode) {
             return GameProfileUtil_7.getWrappedGameProfile(gameProfile);
         } else {
             return GameProfileUtil_8.getWrappedGameProfile(gameProfile);
