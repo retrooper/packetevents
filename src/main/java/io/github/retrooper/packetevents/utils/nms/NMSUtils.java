@@ -216,6 +216,7 @@ public final class NMSUtils {
     }
 
     public static Object getNMSEntity(final Entity entity) {
+
         final Object craftEntity = craftEntityClass.cast(entity);
         try {
             return getCraftEntityHandle.invoke(craftEntity);
