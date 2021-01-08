@@ -91,7 +91,7 @@ public class PostPlayerInjectEvent extends PacketEvent implements PlayerEvent {
      */
     @Nullable
     public ClientVersion getClientVersion() {
-        return PacketEvents.get().getPlayerUtils().clientVersionsMap.get(player.getAddress());
+        return PacketEvents.get().getPlayerUtils().getClientVersion(player);
     }
 
     @Override
