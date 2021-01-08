@@ -36,7 +36,7 @@ class EventManagerDynamic {
      * All listeners ordered by their priority.
      * The most low priority ones are at the begging of the list and the most high priority ones are at the end.
      */
-    private List<PacketListenerDynamic> listeners = new ArrayList<>();
+    private final List<PacketListenerDynamic> listeners = new ArrayList<>();
 
     /**
      * Call the PacketEvent.
