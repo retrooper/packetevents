@@ -90,10 +90,10 @@ class EventManagerDynamic {
                 listeners.add(listener);
                 break;
             } else if (otherPriorityValue == priorityValue) {
-                listeners.add(i, listener);
+                listeners.add(i + 1, listener);
                 break;
             } else if (otherPriorityValue > priorityValue) {
-                listeners.add(i - 1, listener);
+                listeners.add(i, listener);
                 break;
             }
         }
