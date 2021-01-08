@@ -430,7 +430,7 @@ public class PacketHandlerInternal {
     /**
      * If you are using the EarlyInjector,
      * calling this close method will unregister the channel handlers it registered when the plugin enabled.
-     * PacketEvents already unregisters them in the {@link PacketEvents#stop()} method.
+     * PacketEvents already unregisters them in the {@link PacketEvents#terminate()} method.
      */
     public void cleanup() {
         injector.cleanup();
@@ -440,7 +440,7 @@ public class PacketHandlerInternal {
      * If you are using the EarlyInjector,
      * calling this close method will unregister the channel handlers it registered when the plugin enabled
      * ASYNCHRONOUSLY.
-     * PacketEvents already unregisters them in the {@link PacketEvents#stop()} method.
+     * PacketEvents already unregisters them in the {@link PacketEvents#terminate()} method.
      */
     public void cleanupAsync() {
         injector.cleanupAsync();

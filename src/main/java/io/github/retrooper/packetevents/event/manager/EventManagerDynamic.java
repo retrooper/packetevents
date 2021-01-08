@@ -79,6 +79,10 @@ class EventManagerDynamic {
      */
     public void registerListener(final PacketListenerDynamic listener) {
         final byte priorityValue = listener.getPriority().getPriorityValue();
+        if (listeners.isEmpty()) {
+            listeners.add(listener);
+            return;
+        }
         for (int i = 0; i < listeners.size(); i++) {
             PacketListenerDynamic other = listeners.get(i);
             byte otherPriorityValue = other.getPriority().getPriorityValue();
