@@ -28,6 +28,7 @@ import io.github.retrooper.packetevents.PacketEvents;
 import io.github.retrooper.packetevents.event.impl.*;
 import io.github.retrooper.packetevents.injector.GlobalChannelInjector;
 import io.github.retrooper.packetevents.packettype.PacketType;
+import io.github.retrooper.packetevents.packettype.PacketTypeClasses;
 import io.github.retrooper.packetevents.packetwrappers.NMSPacket;
 import io.github.retrooper.packetevents.packetwrappers.login.in.handshake.WrappedPacketLoginInHandshake;
 import io.github.retrooper.packetevents.packetwrappers.login.in.start.WrappedPacketLoginInStart;
@@ -211,6 +212,11 @@ public class PacketHandlerInternal {
      * @return NMS Packet, null if the event was cancelled.
      */
     public Object read(Player player, Object channel, Object packet) {
+        if (PacketTypeClasses.Login.Client.START.equals(packet.getClass())) {
+            WrappedPacketLoginInStart startWrapper = new WrappedPacketLoginInStart(new NMSPacket(packet));
+            WrappedGameProfile gameProfile = startWrapper.getGameProfile();
+            channelMap.put(gameProfile.name, channel);
+        }
         if (player == null) {
             String simpleClassName = ClassUtil.getClassSimpleName(packet.getClass());
             //Status packet
@@ -225,11 +231,11 @@ public class PacketHandlerInternal {
             } else {
                 //Login packet
                 final PacketLoginReceiveEvent event = new PacketLoginReceiveEvent(channel, new NMSPacket(packet));//Cache the channel
-                if (event.getPacketId() == PacketType.Login.Client.START) {
-                    WrappedPacketLoginInStart startWrapper = new WrappedPacketLoginInStart(event.getNMSPacket());
-                    WrappedGameProfile gameProfile = startWrapper.getGameProfile();
-                    channelMap.put(gameProfile.name, channel);
-                }
+                //f (event.getPacketId() == PacketType.Login.Client.START) {
+                  //  WrappedPacketLoginInStart startWrapper = new WrappedPacketLoginInStart(event.getNMSPacket());
+                    //WrappedGameProfile gameProfile = startWrapper.getGameProfile();
+                    //channelMap.put(gameProfile.name, channel);
+                //}
                 PacketEvents.get().getEventManager().callEvent(event);
                 packet = event.getNMSPacket().getRawNMSPacket();
                 interceptLoginReceive(event);
