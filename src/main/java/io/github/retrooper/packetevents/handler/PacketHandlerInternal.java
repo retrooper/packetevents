@@ -43,6 +43,7 @@ import org.bukkit.plugin.Plugin;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
+import java.util.WeakHashMap;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -58,7 +59,7 @@ import java.util.concurrent.ConcurrentHashMap;
 public class PacketHandlerInternal {
     public final GlobalChannelInjector injector;
     public final HashMap<UUID, Long> keepAliveMap = new HashMap<>();
-    public final Map<String, Object> channelMap = new ConcurrentHashMap<>();
+    public final Map<String, Object> channelMap = new WeakHashMap<>();
 
     public PacketHandlerInternal(Plugin plugin) {
         injector = new GlobalChannelInjector();
@@ -88,7 +89,6 @@ public class PacketHandlerInternal {
         if (channel == null) {
             channel = NMSUtils.getChannel(player);
             channelMap.put(name, channel);
-            return channel;
         }
         return channel;
     }

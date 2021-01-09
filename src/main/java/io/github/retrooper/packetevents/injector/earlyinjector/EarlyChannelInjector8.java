@@ -177,16 +177,19 @@ public class EarlyChannelInjector8 implements EarlyInjector {
     public PlayerChannelInterceptor injectChannel(Object ch) {
         Channel channel = (Channel) ch;
         String handlerName = PacketEvents.get().getHandlerName();
-        PlayerChannelInterceptor interceptor = (PlayerChannelInterceptor) channel.pipeline().get(handlerName);
-        if (interceptor == null) {
-            interceptor = new PlayerChannelInterceptor();
-            if (channel.pipeline().get("packet_handler") != null) {
-                channel.pipeline().addBefore("packet_handler", handlerName, interceptor);
-            } else {
-                throw new IllegalStateException("Failed to inject an incoming channel due to \"packet_handler\" not being added to the pipeline! Let them rejoin!");
+        try {
+            PlayerChannelInterceptor interceptor = (PlayerChannelInterceptor) channel.pipeline().get(handlerName);
+            if (interceptor == null) {
+                interceptor = new PlayerChannelInterceptor();
+                if (channel.pipeline().get("packet_handler") != null) {
+                    channel.pipeline().addBefore("packet_handler", handlerName, interceptor);
+                }
             }
+            return interceptor;
+        } catch (IllegalArgumentException ex) {
+            //Let us try again
+            return (PlayerChannelInterceptor) channel.pipeline().get(handlerName);
         }
-        return interceptor;
     }
 
     /**

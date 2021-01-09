@@ -266,11 +266,11 @@ public final class PacketEvents implements Listener, EventManager {
     @EventHandler(priority = EventPriority.LOWEST)
     public void onLogin(final PlayerLoginEvent e) {
         if (getSettings().shouldInjectEarly()) {
-            try {
+    //        try {
                 packetHandlerInternal.injectPlayer(e.getPlayer());
-            } catch (Exception ex) {
-                e.disallow(PlayerLoginEvent.Result.KICK_OTHER, getSettings().getInjectionFailureMessage());
-            }
+//            } catch (Exception ex) {
+                //e.disallow(PlayerLoginEvent.Result.KICK_OTHER, getSettings().getInjectionFailureMessage());
+  //          }
         }
     }
 
