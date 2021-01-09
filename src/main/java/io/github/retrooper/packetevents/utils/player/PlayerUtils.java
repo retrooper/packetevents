@@ -151,9 +151,8 @@ public final class PlayerUtils {
                     version = ClientVersion.getClientVersion(VersionLookupUtils.getProtocolVersion(player));
                     clientVersionsMap.put(player.getAddress(), version);
                 } catch (Exception ex) {
-                    version = null;
+                    version = null;//Try again the next time
                 }
-                //Try again the next time
                 return ClientVersion.UNRESOLVED;
             } else {
                 version = tempClientVersionMap.get(player.getAddress());

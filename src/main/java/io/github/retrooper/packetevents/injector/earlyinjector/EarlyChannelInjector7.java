@@ -213,7 +213,7 @@ public class EarlyChannelInjector7 implements EarlyInjector {
      */
     @Override
     public void injectPlayerSync(Player player) {
-        Channel channel = (Channel) PacketEvents.get().packetHandlerInternal.getChannel(player.getName());
+        Channel channel = (Channel) PacketEvents.get().packetHandlerInternal.getChannel(player);
         injectChannel(channel).player = player;
     }
 
@@ -224,7 +224,7 @@ public class EarlyChannelInjector7 implements EarlyInjector {
      */
     @Override
     public void ejectPlayerSync(Player player) {
-        Channel channel = (Channel) PacketEvents.get().packetHandlerInternal.getChannel(player.getName());
+        Channel channel = (Channel) PacketEvents.get().packetHandlerInternal.getChannel(player);
         ejectChannel(channel);
         PacketEvents.get().getPlayerUtils().clientVersionsMap.remove(player.getAddress());
         PacketEvents.get().getPlayerUtils().tempClientVersionMap.remove(player.getAddress());
@@ -240,7 +240,7 @@ public class EarlyChannelInjector7 implements EarlyInjector {
         PacketEvents.get().injectAndEjectExecutorService.execute(new Runnable() {
             @Override
             public void run() {
-                Channel channel = (Channel) PacketEvents.get().packetHandlerInternal.getChannel(player.getName());
+                Channel channel = (Channel) PacketEvents.get().packetHandlerInternal.getChannel(player);
                 injectChannel(channel).player = player;
             }
         });
@@ -256,7 +256,7 @@ public class EarlyChannelInjector7 implements EarlyInjector {
         PacketEvents.get().injectAndEjectExecutorService.execute(new Runnable() {
             @Override
             public void run() {
-                Channel channel = (Channel) PacketEvents.get().packetHandlerInternal.getChannel(player.getName());
+                Channel channel = (Channel) PacketEvents.get().packetHandlerInternal.getChannel(player);
                 ejectChannel(channel);
                 PacketEvents.get().packetHandlerInternal.keepAliveMap.remove(player.getUniqueId());
                 PacketEvents.get().packetHandlerInternal.channelMap.remove(player.getName());

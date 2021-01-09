@@ -75,7 +75,7 @@ public class PostPlayerInjectEvent extends PacketEvent implements PlayerEvent {
      */
     @NotNull
     public Object getChannel() {
-        return PacketEvents.get().packetHandlerInternal.getChannel(player.getName());
+        return PacketEvents.get().packetHandlerInternal.getChannel(player);
     }
 
     @NotNull

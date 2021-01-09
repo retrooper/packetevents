@@ -80,15 +80,15 @@ public class PacketHandlerInternal {
      * PacketEvents will use some reflection to see if CraftBukkit has the netty channel.
      * If you access this before the START login packet was sent, you will for sure experience issues.
      *
-     * @param name Target player name.
+     * @param player Target player.
      * @return Netty channel of a player by their name.
      * @see <a href="https://wiki.vg/Protocol#Login_Start">https://wiki.vg/Protocol#Login_Start</a>
      * @see Player#getName()
      */
-    public Object getChannel(String name) {
+    public Object getChannel(Player player) {
+        String name = player.getName();
         Object channel = channelMap.get(name);
         if (channel == null) {
-            Player player = Bukkit.getPlayer(name);
             channel = NMSUtils.getChannel(player);
             channelMap.put(name, channel);
             return channel;
@@ -100,7 +100,7 @@ public class PacketHandlerInternal {
      * Inject a player.
      * Executed synchronously or asynchronously depending on what you have the associated setting set to.
      * Injecting a player is basically pairing the cached netty channel
-     * {@link #getChannel(String)} to a bukkit player object.
+     * {@link #getChannel(Player)} to a bukkit player object.
      * Bukkit initializes the {@link Player} object some time after
      * we inject the netty channel, so we need to pair the two.
      * PacketEvents already injects a player when the bukkit
@@ -121,7 +121,7 @@ public class PacketHandlerInternal {
      * Eject a player.
      * Executed synchronously or asynchronously depending on what you have the associated setting set to.
      * Ejecting a player is basically unpairing the cached netty channel
-     * {@link #getChannel(String)} from the bukkit player.
+     * {@link #getChannel(Player)} from the bukkit player.
      * Do this if you want to stop listening to a user's packets.
      * PacketEvents already ejects a player when the bukkit
      * {@link org.bukkit.event.player.PlayerQuitEvent} is called.
@@ -143,7 +143,7 @@ public class PacketHandlerInternal {
      * @see #injectPlayer(Player)
      */
     public void injectPlayerSync(Player player) {
-        Object channel = PacketEvents.get().packetHandlerInternal.getChannel(player.getName());
+        Object channel = PacketEvents.get().packetHandlerInternal.getChannel(player);
         PlayerInjectEvent injectEvent = new PlayerInjectEvent(player, channel, false);
         PacketEvents.get().getEventManager().callEvent(injectEvent);
         if (!injectEvent.isCancelled()) {
@@ -158,7 +158,7 @@ public class PacketHandlerInternal {
      * @see #injectPlayer(Player)
      */
     public void injectPlayerAsync(Player player) {
-        Object channel = PacketEvents.get().packetHandlerInternal.getChannel(player.getName());
+        Object channel = PacketEvents.get().packetHandlerInternal.getChannel(player);
         PlayerInjectEvent injectEvent = new PlayerInjectEvent(player, channel, true);
         PacketEvents.get().getEventManager().callEvent(injectEvent);
         if (!injectEvent.isCancelled()) {
