@@ -36,13 +36,11 @@ import io.github.retrooper.packetevents.utils.gameprofile.WrappedGameProfile;
 import io.github.retrooper.packetevents.utils.nms.NMSUtils;
 import io.github.retrooper.packetevents.utils.player.ClientVersion;
 import io.github.retrooper.packetevents.utils.reflection.ClassUtil;
-import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Objects;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -58,12 +56,10 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class PacketHandlerInternal {
     public final GlobalChannelInjector injector;
-    private final boolean earlyInjectMode;
     public final HashMap<UUID, Long> keepAliveMap = new HashMap<>();
     public final Map<String, Object> channelMap = new ConcurrentHashMap<>();
 
-    public PacketHandlerInternal(Plugin plugin, boolean earlyInjectMode) {
-        this.earlyInjectMode = earlyInjectMode;
+    public PacketHandlerInternal(Plugin plugin) {
         injector = new GlobalChannelInjector();
         injector.prepare();
     }
@@ -143,8 +139,7 @@ public class PacketHandlerInternal {
      * @see #injectPlayer(Player)
      */
     public void injectPlayerSync(Player player) {
-        Object channel = PacketEvents.get().packetHandlerInternal.getChannel(player);
-        PlayerInjectEvent injectEvent = new PlayerInjectEvent(player, channel, false);
+        PlayerInjectEvent injectEvent = new PlayerInjectEvent(player, false);
         PacketEvents.get().getEventManager().callEvent(injectEvent);
         if (!injectEvent.isCancelled()) {
             injector.injectPlayerSync(player);
@@ -158,8 +153,7 @@ public class PacketHandlerInternal {
      * @see #injectPlayer(Player)
      */
     public void injectPlayerAsync(Player player) {
-        Object channel = PacketEvents.get().packetHandlerInternal.getChannel(player);
-        PlayerInjectEvent injectEvent = new PlayerInjectEvent(player, channel, true);
+        PlayerInjectEvent injectEvent = new PlayerInjectEvent(player, true);
         PacketEvents.get().getEventManager().callEvent(injectEvent);
         if (!injectEvent.isCancelled()) {
             injector.injectPlayerAsync(player);

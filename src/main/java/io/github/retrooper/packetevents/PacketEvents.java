@@ -166,7 +166,7 @@ public final class PacketEvents implements Listener, EventManager {
             //Register Bukkit listener
             plugin = pl;
             Bukkit.getPluginManager().registerEvents(this, plugin);
-            packetHandlerInternal = new PacketHandlerInternal(plugin, settings.shouldInjectEarly());
+            packetHandlerInternal = new PacketHandlerInternal(plugin);
             for (final Player p : Bukkit.getOnlinePlayers()) {
                 try {
                     getPlayerUtils().injectPlayer(p);
@@ -263,7 +263,7 @@ public final class PacketEvents implements Listener, EventManager {
         return "pe-" + plugin.getName();
     }
 
-    @EventHandler(priority = EventPriority.LOW)
+    @EventHandler(priority = EventPriority.LOWEST)
     public void onLogin(final PlayerLoginEvent e) {
         if (getSettings().shouldInjectEarly()) {
             try {
