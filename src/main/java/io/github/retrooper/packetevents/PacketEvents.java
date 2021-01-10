@@ -269,7 +269,18 @@ public final class PacketEvents implements Listener, EventManager {
             try {
                 packetHandlerInternal.injectPlayer(e.getPlayer());
             } catch (Exception ex) {
-                e.disallow(PlayerLoginEvent.Result.KICK_OTHER, getSettings().getInjectionFailureMessage());
+                Bukkit.getScheduler().runTaskLaterAsynchronously(getPlugin(), new Runnable() {
+                    @Override
+                    public void run() {
+                        try {
+                            packetHandlerInternal.injectPlayer(e.getPlayer());
+                        }
+                        catch (Exception ex) {
+                            e.disallow(PlayerLoginEvent.Result.KICK_OTHER, getSettings().getInjectionFailureMessage());
+                            ex.printStackTrace();
+                        }
+                    }
+                }, 1L);
             }
         }
     }

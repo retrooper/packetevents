@@ -5,20 +5,17 @@ import io.github.retrooper.packetevents.injector.earlyinjector.EarlyChannelInjec
 import io.github.retrooper.packetevents.injector.earlyinjector.EarlyChannelInjector8;
 import io.github.retrooper.packetevents.injector.lateinjector.LateChannelInjector7;
 import io.github.retrooper.packetevents.injector.lateinjector.LateChannelInjector8;
-import io.github.retrooper.packetevents.injector.tinyprotocol.TinyProtocol;
 import io.github.retrooper.packetevents.utils.nms.NMSUtils;
 import org.bukkit.entity.Player;
 
 public class GlobalChannelInjector implements ChannelInjector {
-    private ChannelInjector injector;
-    private TinyProtocol tiny;
+    private final ChannelInjector injector;
 
     public GlobalChannelInjector() {
         boolean legacy = NMSUtils.legacyNettyImportMode;
         //Early injector
         if (PacketEvents.get().getSettings().shouldInjectEarly()) {
             injector = legacy ? new EarlyChannelInjector7() : new EarlyChannelInjector8();
-            tiny = new TinyProtocol(PacketEvents.get().getPlugin());
         }
         //Late injector
         else {
@@ -28,18 +25,12 @@ public class GlobalChannelInjector implements ChannelInjector {
 
     @Override
     public void prepare() {
-        if (!PacketEvents.get().getSettings().shouldInjectEarly()) {
-            injector.prepare();
-        }
+        injector.prepare();
     }
 
     @Override
     public void cleanup() {
-        if (PacketEvents.get().getSettings().shouldInjectEarly()) {
-            tiny.unregisterChannelHandler();
-        } else {
-            injector.cleanup();
-        }
+        injector.cleanup();
     }
 
     @Override
@@ -49,46 +40,26 @@ public class GlobalChannelInjector implements ChannelInjector {
 
     @Override
     public void injectPlayerSync(Player player) {
-        if (PacketEvents.get().getSettings().shouldInjectEarly()) {
-            tiny.injectPlayer(player);
-        } else {
-            injector.injectPlayerSync(player);
-        }
+        injector.injectPlayerSync(player);
     }
 
     @Override
     public void ejectPlayerSync(Player player) {
-        if (PacketEvents.get().getSettings().shouldInjectEarly()) {
-            tiny.ejectPlayer(player);
-        } else {
-            injector.ejectPlayerSync(player);
-        }
+        injector.ejectPlayerSync(player);
     }
 
     @Override
     public void injectPlayerAsync(Player player) {
-        if (PacketEvents.get().getSettings().shouldInjectEarly()) {
-            tiny.injectPlayerAsync(player);
-        } else {
-            injector.injectPlayerAsync(player);
-        }
+        injector.injectPlayerAsync(player);
     }
 
     @Override
     public void ejectPlayerAsync(Player player) {
-        if (PacketEvents.get().getSettings().shouldInjectEarly()) {
-            tiny.ejectPlayerAsync(player);
-        } else {
-            injector.ejectPlayerAsync(player);
-        }
+        injector.ejectPlayerAsync(player);
     }
 
     @Override
     public void sendPacket(Object channel, Object rawNMSPacket) {
-        if (PacketEvents.get().getSettings().shouldInjectEarly()) {
-            tiny.sendPacket(channel, rawNMSPacket);
-        } else {
-            injector.sendPacket(channel, rawNMSPacket);
-        }
+        injector.sendPacket(channel, rawNMSPacket);
     }
 }

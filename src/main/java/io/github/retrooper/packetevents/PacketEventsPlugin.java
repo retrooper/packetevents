@@ -24,35 +24,27 @@
 
 package io.github.retrooper.packetevents;
 
-import io.github.retrooper.packetevents.event.PacketListenerDynamic;
-import io.github.retrooper.packetevents.event.impl.PacketPlayReceiveEvent;
-import io.github.retrooper.packetevents.packettype.PacketType;
-import io.github.retrooper.packetevents.packetwrappers.play.in.keepalive.WrappedPacketInKeepAlive;
 import org.bukkit.plugin.java.JavaPlugin;
 
 public class PacketEventsPlugin extends JavaPlugin {
 
     @Override
     public void onLoad() {
-        PacketEvents.create(this).getSettings().injectAsync(false);
-        PacketEvents.get().load();
+
     }
 
     @Override
     public void onEnable() {
-        PacketEvents.get().init(this);
-        PacketEvents.get().registerListener(new PacketListenerDynamic() {
-            @Override
-            public void onPacketPlayReceive(PacketPlayReceiveEvent event) {
-                if (event.getPacketId() == PacketType.Play.Client.KEEP_ALIVE) {
-                    event.getPlayer().sendMessage(new WrappedPacketInKeepAlive(event.getNMSPacket()).getId() + " is id");
-                }
-            }
-        });
+        if (PacketEvents.get() == null) {
+            PacketEvents.create(this).load();
+            PacketEvents.get().init(this);
+        }
     }
 
     @Override
     public void onDisable() {
-        PacketEvents.get().terminate();
+        if (PacketEvents.get() != null) {
+            PacketEvents.get().terminate();
+        }
     }
 }
