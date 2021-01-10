@@ -28,6 +28,17 @@ import io.github.retrooper.packetevents.utils.nms.NMSUtils;
 import io.github.retrooper.packetevents.utils.reflection.SubclassUtil;
 
 public class PacketTypeClasses {
+    public static void load() {
+        //PLAY
+        PacketTypeClasses.Play.Client.load();
+        PacketTypeClasses.Play.Server.load();
+        //LOGIN
+        PacketTypeClasses.Login.Client.load();
+        PacketTypeClasses.Login.Server.load();
+        //STATUS
+        PacketTypeClasses.Status.Client.load();
+        PacketTypeClasses.Status.Server.load();
+    }
     public static class Status {
         public static class Client {
             public static Class<?> START, PING;
