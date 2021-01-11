@@ -24,42 +24,30 @@
 
 package io.github.retrooper.packetevents.event.impl;
 
-import io.github.retrooper.packetevents.event.PacketEvent;
 import io.github.retrooper.packetevents.event.PacketListenerDynamic;
 import io.github.retrooper.packetevents.event.eventtypes.CancellableEvent;
-import io.github.retrooper.packetevents.event.eventtypes.NMSPacketEvent;
+import io.github.retrooper.packetevents.event.eventtypes.CancellableNMSPacketEvent;
 import io.github.retrooper.packetevents.event.eventtypes.PlayerEvent;
 import io.github.retrooper.packetevents.packettype.PacketType;
 import io.github.retrooper.packetevents.packetwrappers.NMSPacket;
-import io.github.retrooper.packetevents.utils.netty.channel.ChannelUtils;
-import io.github.retrooper.packetevents.utils.reflection.ClassUtil;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
-
-import java.net.InetSocketAddress;
 
 /**
  * The {@code PacketPlayReceiveEvent} event is fired whenever the a PLAY packet is
  * received from any connected client.
  * Cancelling this event will result in preventing minecraft from processing the incoming packet.
  * It would be as if the player never sent the packet from the server's view.
- * This class implements {@link CancellableEvent} and {@link PlayerEvent}.
  *
  * @author retrooper
  * @see <a href="https://wiki.vg/Protocol#Play">https://wiki.vg/Protocol#Play</a>
  * @since 1.2.6
  */
-public final class PacketPlayReceiveEvent extends PacketEvent implements NMSPacketEvent, CancellableEvent, PlayerEvent {
+public final class PacketPlayReceiveEvent extends CancellableNMSPacketEvent implements PlayerEvent {
     private final Player player;
-    private final InetSocketAddress address;
-    private NMSPacket packet;
-    private boolean cancelled;
-    private byte packetID = -2;
-
     public PacketPlayReceiveEvent(final Player player, final Object channel, final NMSPacket packet) {
+        super(channel, packet);
         this.player = player;
-        this.address = ChannelUtils.getSocketAddress(channel);
-        this.packet = packet;
     }
 
     /**
@@ -82,29 +70,6 @@ public final class PacketPlayReceiveEvent extends PacketEvent implements NMSPack
      *
      * @return Packet sender's socket address.
      */
-    @NotNull
-    @Override
-    public InetSocketAddress getSocketAddress() {
-        return address;
-    }
-
-    @NotNull
-    @Deprecated
-    @Override
-    public String getPacketName() {
-        return ClassUtil.getClassSimpleName(packet.getRawNMSPacket().getClass());
-    }
-
-    @NotNull
-    @Override
-    public NMSPacket getNMSPacket() {
-        return packet;
-    }
-
-    @Override
-    public void setNMSPacket(NMSPacket packet) {
-        this.packet = packet;
-    }
 
     /**
      * Each binding in each packet state has their own constants.
@@ -117,30 +82,7 @@ public final class PacketPlayReceiveEvent extends PacketEvent implements NMSPack
      */
     @Override
     public byte getPacketId() {
-        if (packetID == -2) {
-            packetID = PacketType.Play.Client.packetIds.getOrDefault(packet.getRawNMSPacket().getClass(), (byte) -1);
-        }
-        return packetID;
-    }
-
-    @Override
-    public void cancel() {
-        cancelled = true;
-    }
-
-    @Override
-    public void uncancel() {
-        cancelled = false;
-    }
-
-    @Override
-    public boolean isCancelled() {
-        return cancelled;
-    }
-
-    @Override
-    public void setCancelled(boolean value) {
-        cancelled = value;
+        return PacketType.Play.Client.packetIds.getOrDefault(packet.getRawNMSPacket().getClass(), (byte) -1);
     }
 
     @Override

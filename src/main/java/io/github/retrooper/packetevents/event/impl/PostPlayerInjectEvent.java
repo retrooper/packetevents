@@ -40,10 +40,10 @@ import java.net.InetSocketAddress;
 /**
  * The {@code PostPlayerInjectEvent} event is fired after a successful injection.
  * If you are on an older version of PacketEvents DON'T use this to register player data.
- * This event will be called asynchronously.
+ * This event might be called asynchronously and sometimes synchronously.
+ * Use the {@link #isAsync()} method to figure out if is being called sync or async.
  * Make sure you do null checks in your packet listeners as this might be called a bit later.
  * A player is injected by PacketEvents whenever they join the server.
- * This class implements {@link CancellableEvent} and {@link PlayerEvent}.
  *
  * @author retrooper
  * @see <a href="https://github.com/retrooper/packetevents/blob/dev/src/main/java/io/github/retrooper/packetevents/handler/PacketHandlerInternal.java">https://github.com/retrooper/packetevents/blob/dev/src/main/java/io/github/retrooper/packetevents/handler/PacketHandlerInternal.java</a>
@@ -51,9 +51,10 @@ import java.net.InetSocketAddress;
  */
 public class PostPlayerInjectEvent extends PacketEvent implements PlayerEvent {
     private final Player player;
-
-    public PostPlayerInjectEvent(Player player) {
+    private final boolean async;
+    public PostPlayerInjectEvent(Player player, boolean async) {
         this.player = player;
+        this.async = async;
     }
 
     /**
@@ -92,6 +93,14 @@ public class PostPlayerInjectEvent extends PacketEvent implements PlayerEvent {
     @Nullable
     public ClientVersion getClientVersion() {
         return PacketEvents.get().getPlayerUtils().getClientVersion(player);
+    }
+
+    /**
+     * Has the event been called async or sync?
+     * @return Was the event call in an async context?
+     */
+    public boolean isAsync() {
+        return async;
     }
 
     @Override

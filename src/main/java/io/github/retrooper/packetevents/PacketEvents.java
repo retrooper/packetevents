@@ -290,7 +290,7 @@ public final class PacketEvents implements Listener, EventManager {
                     int protocolVersion = VersionLookupUtils.getProtocolVersion(e.getPlayer());
                     ClientVersion version = ClientVersion.getClientVersion(protocolVersion);
                     PacketEvents.get().getPlayerUtils().clientVersionsMap.put(address, version);
-                    PacketEvents.get().getEventManager().callEvent(new PostPlayerInjectEvent(e.getPlayer()));
+                    PacketEvents.get().getEventManager().callEvent(new PostPlayerInjectEvent(e.getPlayer(), true));
                 }
             }, 1L);
         } else if (getServerUtils().getVersion() == ServerVersion.v_1_7_10) {
@@ -309,14 +309,14 @@ public final class PacketEvents implements Listener, EventManager {
                 packetHandlerInternal.injectPlayer(e.getPlayer());
                 //Injection was successful as no exception was thrown...
                 if (!viaAvailable) {
-                    PacketEvents.get().getEventManager().callEvent(new PostPlayerInjectEvent(e.getPlayer()));
+                    PacketEvents.get().getEventManager().callEvent(new PostPlayerInjectEvent(e.getPlayer(), false));
                 }
             } catch (Exception ex) {
                 e.getPlayer().kickPlayer(getSettings().getInjectionFailureMessage());
             }
         } else {
             if (!viaAvailable) {
-                PacketEvents.get().getEventManager().callEvent(new PostPlayerInjectEvent(e.getPlayer()));
+                PacketEvents.get().getEventManager().callEvent(new PostPlayerInjectEvent(e.getPlayer(), false));
             }
         }
     }

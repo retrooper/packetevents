@@ -24,22 +24,16 @@
 
 package io.github.retrooper.packetevents.event.impl;
 
-import io.github.retrooper.packetevents.event.PacketEvent;
 import io.github.retrooper.packetevents.event.PacketListenerDynamic;
-import io.github.retrooper.packetevents.event.eventtypes.CallableEvent;
 import io.github.retrooper.packetevents.event.eventtypes.CancellableEvent;
-import io.github.retrooper.packetevents.event.eventtypes.NMSPacketEvent;
+import io.github.retrooper.packetevents.event.eventtypes.CancellableNMSPacketEvent;
 import io.github.retrooper.packetevents.packettype.PacketType;
 import io.github.retrooper.packetevents.packetwrappers.NMSPacket;
-import io.github.retrooper.packetevents.utils.netty.channel.ChannelUtils;
-import io.github.retrooper.packetevents.utils.reflection.ClassUtil;
-import org.jetbrains.annotations.NotNull;
 
 import java.net.InetSocketAddress;
 
 /**
  * The {@code PacketLoginSendEvent} event is fired whenever the a LOGIN packet is being planned to be sent to the client.
- * This class implements {@link CancellableEvent}.
  * The {@code PacketLoginSendEvent} does not have to do with a bukkit player object due to
  * the player object being null in this state.
  * Use the {@link #getSocketAddress()} to identify who sends the packet.
@@ -48,88 +42,18 @@ import java.net.InetSocketAddress;
  * @see <a href="https://wiki.vg/Protocol#Login">https://wiki.vg/Protocol#Login</a>
  * @since 1.8
  */
-public class PacketLoginSendEvent extends PacketEvent implements NMSPacketEvent, CancellableEvent, CallableEvent {
-    private final InetSocketAddress socketAddress;
-    private NMSPacket packet;
-    private boolean cancelled;
-    private byte packetID = -2;
-
-    public PacketLoginSendEvent(final Object channel, final NMSPacket packet) {
-        this.socketAddress = ChannelUtils.getSocketAddress(channel);
-        this.packet = packet;
+public class PacketLoginSendEvent extends CancellableNMSPacketEvent {
+    public PacketLoginSendEvent(Object channel, NMSPacket packet) {
+        super(channel, packet);
     }
 
-    public PacketLoginSendEvent(final InetSocketAddress socketAddress, final NMSPacket packet) {
-        this.socketAddress = socketAddress;
-        this.packet = packet;
+    public PacketLoginSendEvent(InetSocketAddress address, NMSPacket packet) {
+        super(address, packet);
     }
 
-    /**
-     * Socket address of the associated client.
-     * This socket address will never be null.
-     *
-     * @return Socket address of the client.
-     */
-    @NotNull
-    @Override
-    public InetSocketAddress getSocketAddress() {
-        return socketAddress;
-    }
-
-
-    @NotNull
-    @Deprecated
-    @Override
-    public String getPacketName() {
-        return ClassUtil.getClassSimpleName(packet.getRawNMSPacket().getClass());
-    }
-
-    @NotNull
-    @Override
-    public NMSPacket getNMSPacket() {
-        return packet;
-    }
-
-    @Override
-    public void setNMSPacket(final NMSPacket packet) {
-        this.packet = packet;
-    }
-
-    /**
-     * Each binding in each packet state has their own constants.
-     * Example Usage:
-     * <p>
-     * {@code if (getPacketId() == PacketType.Login.Server.SUCCESS) }
-     * </p>
-     *
-     * @return Packet ID.
-     */
     @Override
     public byte getPacketId() {
-        if (packetID == -2) {
-            packetID = PacketType.Login.Server.packetIds.getOrDefault(packet.getRawNMSPacket().getClass(), (byte) -1);
-        }
-        return packetID;
-    }
-
-    @Override
-    public void cancel() {
-        cancelled = true;
-    }
-
-    @Override
-    public void uncancel() {
-        cancelled = false;
-    }
-
-    @Override
-    public boolean isCancelled() {
-        return cancelled;
-    }
-
-    @Override
-    public void setCancelled(boolean value) {
-        cancelled = value;
+        return PacketType.Login.Server.packetIds.getOrDefault(packet.getRawNMSPacket().getClass(), (byte) -1);
     }
 
     @Override

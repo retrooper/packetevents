@@ -50,16 +50,12 @@ import java.net.InetSocketAddress;
  * @see <a href="https://wiki.vg/Protocol#Clientbound_4">https://wiki.vg/Protocol#Clientbound_4</a>
  * @since 1.7
  */
-public class PostPacketPlaySendEvent extends PacketEvent implements NMSPacketEvent, PlayerEvent {
+public class PostPacketPlaySendEvent extends NMSPacketEvent implements PlayerEvent {
     private final Player player;
-    private final InetSocketAddress address;
-    private NMSPacket packet;
-    private byte packetID = -2;
 
     public PostPacketPlaySendEvent(final Player player, final Object channel, final NMSPacket packet) {
+        super(channel, packet);
         this.player = player;
-        this.address = ChannelUtils.getSocketAddress(channel);
-        this.packet = packet;
     }
 
     /**
@@ -75,38 +71,6 @@ public class PostPacketPlaySendEvent extends PacketEvent implements NMSPacketEve
     }
 
     /**
-     * This method returns the socket address of the packet receiver.
-     * This address if guaranteed to never be null.
-     * You could use this to identify who is sending packets
-     * whenever the player object is null.
-     *
-     * @return Packet receiver's socket address.
-     */
-    @NotNull
-    @Override
-    public InetSocketAddress getSocketAddress() {
-        return address;
-    }
-
-    @NotNull
-    @Deprecated
-    @Override
-    public String getPacketName() {
-        return ClassUtil.getClassSimpleName(packet.getRawNMSPacket().getClass());
-    }
-
-    @NotNull
-    @Override
-    public NMSPacket getNMSPacket() {
-        return packet;
-    }
-
-    @Override
-    public void setNMSPacket(NMSPacket packet) {
-        this.packet = packet;
-    }
-
-    /**
      * Each binding in each packet state has their own constants.
      * Example Usage:
      * <p>
@@ -117,10 +81,7 @@ public class PostPacketPlaySendEvent extends PacketEvent implements NMSPacketEve
      */
     @Override
     public byte getPacketId() {
-        if (packetID == -2) {
-            packetID = PacketType.Play.Server.packetIds.getOrDefault(packet.getRawNMSPacket().getClass(), (byte) -1);
-        }
-        return packetID;
+        return PacketType.Play.Server.packetIds.getOrDefault(packet.getRawNMSPacket().getClass(), (byte) -1);
     }
 
     @Override
