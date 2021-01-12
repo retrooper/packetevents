@@ -186,6 +186,11 @@ public enum ClientVersion {
         return protocolVersion == target.protocolVersion;
     }
 
+    /**
+     * Is this client version a pre release?
+     * This method checks if this version is a pre release.
+     * @return Is pre release
+     */
     public boolean isPreRelease() {
         if (protocolVersion > lowestSupportedProtocolVersion && protocolVersion < highestSupportedProtocolVersion) {
             //We don't have to iterate through the LOWEST and the HIGHEST supported version anymore...
@@ -197,5 +202,14 @@ public enum ClientVersion {
             }
         }
         return false;
+    }
+
+    /**
+     * Is this client version resolved?
+     * This method checks if the version is not equal to TEMP_UNRESOLVED or UNRESOLVED.
+     * @return Is resolved
+     */
+    public boolean isResoled() {
+        return this != TEMP_UNRESOLVED && this != UNRESOLVED;
     }
 }
