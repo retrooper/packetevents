@@ -47,23 +47,23 @@ public class UpdateChecker {
      */
     public void handleUpdate() {
         PEVersion localVersion = PacketEvents.get().getVersion();
-        inform("[packetevents] Checking for an update, please wait...");
+        inform("Checking for an update, please wait...");
         String line;
         try {
             line = readLatestVersion();
         } catch (IOException exception) {
-            report("[packetevents] We failed to find the latest released version of PacketEvents. Your build: (" + localVersion.toString() + ")");
+            report("We failed to find the latest released version of PacketEvents. Your build: (" + localVersion.toString() + ")");
             return;
         }
         PEVersion newVersion = new PEVersion(line);
         if (localVersion.isOlderThan(newVersion)) {
-            inform("[packetevents] There is an update available for the PacketEvents API! Your build: (" + localVersion.toString() + ") | Latest released build: (" + newVersion.toString() + ")");
+            inform("There is an update available for the PacketEvents API! Your build: (" + localVersion.toString() + ") | Latest released build: (" + newVersion.toString() + ")");
         } else if (localVersion.isNewerThan(newVersion)) {
-            inform("[packetevents] You are on a dev or pre released build of PacketEvents. Your build: (" + localVersion.toString() + ") | Latest released build: (" + newVersion.toString() + ")");
+            inform("You are on a dev or pre released build of PacketEvents. Your build: (" + localVersion.toString() + ") | Latest released build: (" + newVersion.toString() + ")");
         } else if (localVersion.equals(newVersion)) {
-            inform("[packetevents] You are on the latest released version of PacketEvents. (" + newVersion.toString() + ")");
+            inform("You are on the latest released version of PacketEvents. (" + newVersion.toString() + ")");
         } else {
-            report("[packetevents] Something went wrong while checking for an update. Your build: (" + localVersion.toString() + ") | Latest released build: (" + newVersion.toString() + ")");
+            report("Something went wrong while checking for an update. Your build: (" + localVersion.toString() + ") | Latest released build: (" + newVersion.toString() + ")");
         }
     }
 
@@ -73,7 +73,7 @@ public class UpdateChecker {
      * @param message Message
      */
     private void inform(String message) {
-        Bukkit.getLogger().info(message);
+        Bukkit.getLogger().info("[packetevents] " + message);
     }
 
     /**
@@ -82,7 +82,7 @@ public class UpdateChecker {
      * @param message Message
      */
     private void report(String message) {
-        Bukkit.getLogger().info(ChatColor.DARK_RED + message);
+        Bukkit.getLogger().warning(ChatColor.DARK_RED + "[packetevents] " + message);
     }
 
     /**
