@@ -64,6 +64,12 @@ public final class WrappedPacketOutChat extends WrappedPacket implements Sendabl
         this(message, ChatPosition.CHAT, uuid, isJson);
     }
 
+
+
+    public WrappedPacketOutChat(BaseComponent component, ChatPosition pos, UUID uuid) {
+        this(ComponentSerializer.toString(component), pos, uuid, true);
+    }
+
     public WrappedPacketOutChat(String message, ChatPosition chatPosition, UUID uuid, boolean isJson) {
         this.uuid = uuid;
         this.message = isJson ? message : fromStringToJSON(message);
@@ -261,15 +267,4 @@ public final class WrappedPacketOutChat extends WrappedPacket implements Sendabl
     public enum ChatPosition {
         CHAT, SYSTEM_MESSAGE, GAME_INFO
     }
-
-    public static class Util {
-        public static WrappedPacketOutChat createHoverMessagePacket(UUID uuid, BaseComponent component) {
-            return new WrappedPacketOutChat(ComponentSerializer.toString(component), uuid, true);
-        }
-
-        public static WrappedPacketOutChat createNormalMessagePacket(UUID uuid, ChatPosition position, String message) {
-            return new WrappedPacketOutChat(message, position, uuid, false);
-        }
-    }
-
 }
