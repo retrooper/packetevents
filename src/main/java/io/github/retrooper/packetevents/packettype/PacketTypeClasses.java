@@ -39,6 +39,7 @@ public class PacketTypeClasses {
         PacketTypeClasses.Status.Client.load();
         PacketTypeClasses.Status.Server.load();
     }
+
     public static class Status {
         public static class Client {
             public static Class<?> START, PING;

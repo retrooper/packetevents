@@ -29,7 +29,8 @@ import io.github.retrooper.packetevents.event.PacketListenerDynamic;
 import io.github.retrooper.packetevents.event.eventtypes.CancellableEvent;
 import io.github.retrooper.packetevents.event.priority.PacketEventPriority;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
 
 class EventManagerDynamic {
     /**

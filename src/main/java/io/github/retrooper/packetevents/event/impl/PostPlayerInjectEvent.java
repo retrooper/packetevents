@@ -27,7 +27,6 @@ package io.github.retrooper.packetevents.event.impl;
 import io.github.retrooper.packetevents.PacketEvents;
 import io.github.retrooper.packetevents.event.PacketEvent;
 import io.github.retrooper.packetevents.event.PacketListenerDynamic;
-import io.github.retrooper.packetevents.event.eventtypes.CancellableEvent;
 import io.github.retrooper.packetevents.event.eventtypes.PlayerEvent;
 import io.github.retrooper.packetevents.utils.netty.channel.ChannelUtils;
 import io.github.retrooper.packetevents.utils.player.ClientVersion;
@@ -52,6 +51,7 @@ import java.net.InetSocketAddress;
 public class PostPlayerInjectEvent extends PacketEvent implements PlayerEvent {
     private final Player player;
     private final boolean async;
+
     public PostPlayerInjectEvent(Player player, boolean async) {
         this.player = player;
         this.async = async;
@@ -97,6 +97,7 @@ public class PostPlayerInjectEvent extends PacketEvent implements PlayerEvent {
 
     /**
      * Has the event been called async or sync?
+     *
      * @return Was the event call in an async context?
      */
     public boolean isAsync() {

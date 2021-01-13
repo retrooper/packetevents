@@ -24,20 +24,13 @@
 
 package io.github.retrooper.packetevents.event.impl;
 
-import io.github.retrooper.packetevents.event.PacketEvent;
 import io.github.retrooper.packetevents.event.PacketListenerDynamic;
-import io.github.retrooper.packetevents.event.eventtypes.CancellableEvent;
 import io.github.retrooper.packetevents.event.eventtypes.CancellableNMSPacketEvent;
-import io.github.retrooper.packetevents.event.eventtypes.NMSPacketEvent;
 import io.github.retrooper.packetevents.event.eventtypes.PlayerEvent;
 import io.github.retrooper.packetevents.packettype.PacketType;
 import io.github.retrooper.packetevents.packetwrappers.NMSPacket;
-import io.github.retrooper.packetevents.utils.netty.channel.ChannelUtils;
-import io.github.retrooper.packetevents.utils.reflection.ClassUtil;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
-
-import java.net.InetSocketAddress;
 
 /**
  * The {@code PacketPlaySendEvent} event is fired whenever the a PLAY packet is about to be sent.
@@ -79,7 +72,7 @@ public final class PacketPlaySendEvent extends CancellableNMSPacketEvent impleme
      */
     @Override
     public byte getPacketId() {
-        return PacketType.Play.Server.packetIds.getOrDefault(packet.getRawNMSPacket().getClass(), (byte) -1);
+        return PacketType.Play.Server.packetIds.getOrDefault(packet.getRawNMSPacket().getClass(), PacketType.INVALID);
     }
 
     @Override

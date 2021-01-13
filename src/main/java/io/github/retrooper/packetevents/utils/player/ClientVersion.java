@@ -189,6 +189,7 @@ public enum ClientVersion {
     /**
      * Is this client version a pre release?
      * This method checks if this version is a pre release.
+     *
      * @return Is pre release
      */
     public boolean isPreRelease() {
@@ -207,6 +208,7 @@ public enum ClientVersion {
     /**
      * Is this client version resolved?
      * This method checks if the version is not equal to TEMP_UNRESOLVED or UNRESOLVED.
+     *
      * @return Is resolved
      */
     public boolean isResoled() {

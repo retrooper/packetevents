@@ -40,6 +40,11 @@ import java.util.Map;
  */
 public class PacketType {
     /**
+     * If a Packet Type could not be resolved, it will be set to the current value of this constant.
+     * This value may change over the versions so it is important to use the variable and not hard code its value.
+     */
+    public static final byte INVALID = -1;
+    /**
      * Status Packet IDs.
      *
      * @author retrooper

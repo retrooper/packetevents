@@ -75,7 +75,7 @@ public class PostPacketPlayReceiveEvent extends NMSPacketEvent implements Player
      */
     @Override
     public byte getPacketId() {
-        return PacketType.Play.Client.packetIds.getOrDefault(packet.getRawNMSPacket().getClass(), (byte) -1);
+        return PacketType.Play.Client.packetIds.getOrDefault(packet.getRawNMSPacket().getClass(), PacketType.INVALID);
     }
 
     @Override

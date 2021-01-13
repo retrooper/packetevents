@@ -25,7 +25,6 @@
 package io.github.retrooper.packetevents.event.impl;
 
 import io.github.retrooper.packetevents.event.PacketListenerDynamic;
-import io.github.retrooper.packetevents.event.eventtypes.CancellableEvent;
 import io.github.retrooper.packetevents.event.eventtypes.CancellableNMSPacketEvent;
 import io.github.retrooper.packetevents.packettype.PacketType;
 import io.github.retrooper.packetevents.packetwrappers.NMSPacket;
@@ -53,7 +52,7 @@ public class PacketLoginSendEvent extends CancellableNMSPacketEvent {
 
     @Override
     public byte getPacketId() {
-        return PacketType.Login.Server.packetIds.getOrDefault(packet.getRawNMSPacket().getClass(), (byte) -1);
+        return PacketType.Login.Server.packetIds.getOrDefault(packet.getRawNMSPacket().getClass(), PacketType.INVALID);
     }
 
     @Override

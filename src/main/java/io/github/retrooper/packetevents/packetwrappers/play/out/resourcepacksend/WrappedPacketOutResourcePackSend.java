@@ -46,7 +46,7 @@ public class WrappedPacketOutResourcePackSend extends WrappedPacket implements S
      * Unfinished docs
      * Hash may not be longer than 40 characters.
      *
-     * @param url URL
+     * @param url  URL
      * @param hash Hash
      */
     public WrappedPacketOutResourcePackSend(String url, String hash) {

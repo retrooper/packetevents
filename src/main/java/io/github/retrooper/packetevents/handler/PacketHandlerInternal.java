@@ -232,9 +232,9 @@ public class PacketHandlerInternal {
                 //Login packet
                 final PacketLoginReceiveEvent event = new PacketLoginReceiveEvent(channel, new NMSPacket(packet));//Cache the channel
                 //f (event.getPacketId() == PacketType.Login.Client.START) {
-                  //  WrappedPacketLoginInStart startWrapper = new WrappedPacketLoginInStart(event.getNMSPacket());
-                    //WrappedGameProfile gameProfile = startWrapper.getGameProfile();
-                    //channelMap.put(gameProfile.name, channel);
+                //  WrappedPacketLoginInStart startWrapper = new WrappedPacketLoginInStart(event.getNMSPacket());
+                //WrappedGameProfile gameProfile = startWrapper.getGameProfile();
+                //channelMap.put(gameProfile.name, channel);
                 //}
                 PacketEvents.get().getEventManager().callEvent(event);
                 packet = event.getNMSPacket().getRawNMSPacket();

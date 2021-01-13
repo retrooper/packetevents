@@ -41,11 +41,12 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.ArrayList;
 import java.util.List;
 
 public final class NMSUtils {
     public static boolean legacyNettyImportMode;
- 
+
     private static final String NMS_DIR = ServerVersion.getNMSDirectory() + ".";
     private static final String OBC_DIR = ServerVersion.getOBCDirectory() + ".";
     public static ServerVersion version;
@@ -202,8 +203,10 @@ public final class NMSUtils {
     public static Entity getEntityById(final int id) {
         Entity entity = EntityFinderUtils.getEntityById(id);
         if (entity == null) {
-            for (World world : Bukkit.getWorlds()) {
-                for (Entity e : world.getEntities()) {
+            List<World> worlds = new ArrayList<>(Bukkit.getWorlds());
+            for (World world : worlds) {
+                List<Entity> entities = new ArrayList<>(world.getEntities());
+                for (Entity e : entities) {
                     if (e.getEntityId() == id) {
                         entity = e;
                         break;

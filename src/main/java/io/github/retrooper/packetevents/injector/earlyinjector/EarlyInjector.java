@@ -1,6 +1,5 @@
 package io.github.retrooper.packetevents.injector.earlyinjector;
 
-import io.github.retrooper.packetevents.PacketEvents;
 import io.github.retrooper.packetevents.injector.ChannelInjector;
 
 public interface EarlyInjector extends ChannelInjector {

@@ -63,7 +63,7 @@ public class PacketStatusSendEvent extends CancellableNMSPacketEvent {
      */
     @Override
     public byte getPacketId() {
-        return PacketType.Status.Server.packetIds.getOrDefault(packet.getRawNMSPacket().getClass(), (byte) -1);
+        return PacketType.Status.Server.packetIds.getOrDefault(packet.getRawNMSPacket().getClass(), PacketType.INVALID);
     }
 
     @Override

@@ -65,7 +65,6 @@ public final class WrappedPacketOutChat extends WrappedPacket implements Sendabl
     }
 
 
-
     public WrappedPacketOutChat(BaseComponent component, ChatPosition pos, UUID uuid) {
         this(ComponentSerializer.toString(component), pos, uuid, true);
     }

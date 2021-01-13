@@ -6,6 +6,7 @@ import java.net.InetSocketAddress;
 
 public abstract class CancellableNMSPacketEvent extends NMSPacketEvent implements CancellableEvent {
     private boolean cancelled;
+
     public CancellableNMSPacketEvent(Object channel, NMSPacket packet) {
         super(channel, packet);
     }

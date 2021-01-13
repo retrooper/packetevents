@@ -1,20 +1,19 @@
 package io.github.retrooper.packetevents.packetwrappers.play.out.worldparticles;
 
 import io.github.retrooper.packetevents.packetwrappers.NMSPacket;
-import io.github.retrooper.packetevents.packetwrappers.SendableWrapper;
 import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
 import io.github.retrooper.packetevents.utils.nms.NMSUtils;
 import io.github.retrooper.packetevents.utils.reflection.Reflection;
 import io.github.retrooper.packetevents.utils.server.ServerVersion;
 import org.jetbrains.annotations.Nullable;
 
-import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
 public class WrappedPacketOutWorldParticles extends WrappedPacket {
     private static Class<?> particleEnumClass;
     private static Method particleEnumGetNameMethod;
+
     public WrappedPacketOutWorldParticles(NMSPacket packet) {
         super(packet);
     }

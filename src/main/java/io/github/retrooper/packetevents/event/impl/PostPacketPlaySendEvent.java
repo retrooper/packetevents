@@ -24,19 +24,13 @@
 
 package io.github.retrooper.packetevents.event.impl;
 
-import io.github.retrooper.packetevents.event.PacketEvent;
 import io.github.retrooper.packetevents.event.PacketListenerDynamic;
 import io.github.retrooper.packetevents.event.eventtypes.NMSPacketEvent;
 import io.github.retrooper.packetevents.event.eventtypes.PlayerEvent;
 import io.github.retrooper.packetevents.packettype.PacketType;
 import io.github.retrooper.packetevents.packetwrappers.NMSPacket;
-import io.github.retrooper.packetevents.utils.netty.channel.ChannelUtils;
-import io.github.retrooper.packetevents.utils.reflection.ClassUtil;
 import org.bukkit.entity.Player;
-import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-
-import java.net.InetSocketAddress;
 
 /**
  * The {@code PostPacketPlaySendEvent} event is fired after minecraft processes
@@ -81,7 +75,7 @@ public class PostPacketPlaySendEvent extends NMSPacketEvent implements PlayerEve
      */
     @Override
     public byte getPacketId() {
-        return PacketType.Play.Server.packetIds.getOrDefault(packet.getRawNMSPacket().getClass(), (byte) -1);
+        return PacketType.Play.Server.packetIds.getOrDefault(packet.getRawNMSPacket().getClass(), PacketType.INVALID);
     }
 
     @Override
