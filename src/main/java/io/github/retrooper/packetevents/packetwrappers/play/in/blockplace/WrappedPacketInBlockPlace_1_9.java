@@ -100,6 +100,7 @@ final class WrappedPacketInBlockPlace_1_9 extends WrappedPacket {
     }
 
     public Object getEnumDirectionObject() {
+        net.minecraft.server.v1_9_R1.PacketPlayInUseItem ui;
         if (movingObjectPositionBlockClass == null) {
             return readObject(0, NMSUtils.enumDirectionClass);
         } else {

@@ -31,42 +31,40 @@ package io.github.retrooper.packetevents.enums;
  * @see <a href="https://wiki.vg/Protocol#Player_Digging">https://wiki.vg/Protocol#Player_Digging</a>
  * @since 1.7.8
  */
-public enum Direction {
+public class Direction {
     /**
      * -Y offset
      */
-    DOWN((byte) 0),
+    public static final Direction DOWN =  new Direction((byte)0);
 
     /**
      * +Y offset
      */
-    UP((byte) 1),
+    public static final Direction UP = new Direction((byte)1);
 
     /**
      * -Z offset
      */
-    NORTH((byte) 2),
+    public static final Direction NORTH = new Direction((byte)2);
 
     /**
      * +Z offset
      */
-    SOUTH((byte) 3),
+    public static final Direction SOUTH = new Direction((byte)3);
 
     /**
      * -X offset
      */
-    WEST((byte) 4),
+    public static final Direction WEST = new Direction((byte)4);
 
     /**
      * +X offset
      */
-    EAST((byte) 5),
+    public static final Direction EAST = new Direction((byte)5);
 
-    OTHER(Byte.MIN_VALUE);
+    private final byte value;
 
-    final byte value;
-
-    Direction(byte value) {
+    public Direction(byte value) {
         this.value = value;
     }
 
@@ -74,12 +72,35 @@ public enum Direction {
         return value;
     }
 
-    public static Direction fromId(byte value) {
-        for (Direction direction : values()) {
-            if (direction.value == value) {
-                return direction;
-            }
+    public boolean isInvalid() {
+        return value < 0 || value > 5;
+    }
+
+    public Direction clone()  {
+        try {
+            return (Direction) super.clone();
+        } catch (CloneNotSupportedException e) {
+            e.printStackTrace();
         }
-        return OTHER;
+        return null;
+    }
+
+    public static Direction getFromName(String name) {
+        switch (name) {
+            case "DOWN":
+                return DOWN.clone();
+            case "UP":
+                return UP.clone();
+            case "NORTH":
+                return NORTH.clone();
+            case "SOUTH":
+                return SOUTH.clone();
+            case "WEST":
+                return WEST.clone();
+            case "EAST":
+                return EAST.clone();
+            default:
+                return null;
+        }
     }
 }

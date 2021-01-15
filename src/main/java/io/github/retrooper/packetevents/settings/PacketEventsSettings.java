@@ -33,24 +33,8 @@ import io.github.retrooper.packetevents.utils.server.ServerVersion;
  * @since 1.5.8
  */
 public class PacketEventsSettings {
-    /**
-     * This boolean stores whether the settings class is locked.
-     * Is this boolean is set to true, any of the setters won't work.
-     * This setting is locked when initializing PacketEvents.
-     */
     private boolean locked = false;
-
-    /**
-     * This is the server version PacketEvents should use when detecting
-     * the server version fails using the Bukkit API.
-     * For some reason, this usually the case on 1.7.10 spigot forks.
-     * They probably mess up somewhere.
-     */
     private ServerVersion backupServerVersion = ServerVersion.v_1_7_10;
-
-    /**
-     * This boolean stores if PacketEvents should inject a player asynchronously.
-     */
     private boolean injectAsync = true;
 
     /**
@@ -84,9 +68,7 @@ public class PacketEventsSettings {
 
     /**
      * This method locks the settings.
-     * Sets the {@link #locked} field to true.
-     *
-     * @return This instance.
+     * If the settings are locked, you won't be able to modify any settings using the setters.
      */
     public PacketEventsSettings lock() {
         this.locked = true;
@@ -94,11 +76,12 @@ public class PacketEventsSettings {
     }
 
     /**
-     * Setter for the {@link #backupServerVersion} field.
-     * Only succeeds if the settings class isn't locked.
-     *
-     * @param serverVersion Server Version
-     * @return This instance.
+     * This is the server version PacketEvents should assume the server is when detecting
+     * the server version fails using the Bukkit API.
+     * This seems to be most common on 1.7.10 paper forks.
+     * They probably mess up somewhere.
+     * @param serverVersion ServerVersion
+     * @return Settings instance.
      */
     public PacketEventsSettings backupServerVersion(ServerVersion serverVersion) {
         if (!locked) {
@@ -108,11 +91,9 @@ public class PacketEventsSettings {
     }
 
     /**
-     * Setter for the {@link #injectAsync} field.
-     * Only succeeds if the settings class isn't locked.
-     *
-     * @param injectAsync Player injection async?
-     * @return This instance.
+     * This is decides if PacketEvents should inject users on internal executor or on the main thread.
+     * @param injectAsync Value
+     * @return Settings instance.
      */
     public PacketEventsSettings injectAsync(boolean injectAsync) {
         if (!locked) {
@@ -122,11 +103,9 @@ public class PacketEventsSettings {
     }
 
     /**
-     * Setter for the {@link #ejectAsync} field.
-     * Only succeeds if the settings class isn't locked.
-     *
-     * @param ejectAsync Player and netty channel ejection async?
-     * @return This instance.
+     * This is decides if PacketEvents should eject users on internal executor or on the main thread.
+     * @param ejectAsync Value
+     * @return Settings instance.
      */
     public PacketEventsSettings ejectAsync(boolean ejectAsync) {
         if (!locked) {
@@ -136,11 +115,9 @@ public class PacketEventsSettings {
     }
 
     /**
-     * Setter for the {@link #checkForUpdates} field.
-     * Only succeeds if the settings class isn't locked.
-     *
-     * @param checkForUpdates Should we check for updates?
-     * @return This instance.
+     * This decides if PacketEvents should check for updates and notify when your server starts.
+     * @param checkForUpdates Value
+     * @return Settings instance.
      */
     public PacketEventsSettings checkForUpdates(boolean checkForUpdates) {
         if (!locked) {
@@ -150,11 +127,11 @@ public class PacketEventsSettings {
     }
 
     /**
-     * Setter for the {@link #injectEarly} field.
-     * Only succeeds if the settings class isn't locked.
-     *
-     * @param injectEarly Use the early injection method.
-     * @return This instance.
+     * This decides if PacketEvents should inject users earlier than usual,
+     * resulting in us being able to resolve client versions without the need of any dependencies.
+     * We end up using a different injection method which isn't supported on a few spigot forks.
+     * @param injectEarly Value
+     * @return Settings instance.
      */
     public PacketEventsSettings injectEarly(boolean injectEarly) {
         if (!locked) {
@@ -164,10 +141,9 @@ public class PacketEventsSettings {
     }
 
     /**
-     * Setter for the {@link #injectEjectThreadCount} field.
-     * Only succeeds if the settings class isn't locked.
-     *
-     * @param threadCount How many threads?
+     * Thread count for the injection/ejection executor service.
+     * Basically how many threads should we use for injection and ejection.
+     * @param threadCount Value
      * @return This instance.
      */
     public PacketEventsSettings injectAndEjectThreadCount(int threadCount) {
@@ -178,11 +154,12 @@ public class PacketEventsSettings {
     }
 
     /**
-     * Setter for the {@link #injectionFailureMessage} field.
-     * Only succeeds if the settings class isn't locked.
-     *
-     * @param message Kick message for an injection failure.
-     * @return This instance.
+     * When PacketEvents fails to inject a user, we kick them for security reasons.
+     * We inject to be able to process their packets.
+     * Us failing to inject will cause us to not detecting their packets which can be a major issue.
+     * What should the kick message be when we kick them?
+     * @param message Value
+     * @return Settings instance.
      */
     public PacketEventsSettings injectionFailureMessage(String message) {
         if (!locked) {
@@ -192,9 +169,9 @@ public class PacketEventsSettings {
     }
 
     /**
-     * Is the settings class locked?
-     *
-     * @return Getter for {@link #locked}
+     * Are the settings locked?
+     * @see #lock()
+     * @return Is locked.
      */
     public boolean isLocked() {
         return locked;

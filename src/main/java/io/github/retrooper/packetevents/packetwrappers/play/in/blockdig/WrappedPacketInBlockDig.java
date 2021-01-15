@@ -32,6 +32,7 @@ import io.github.retrooper.packetevents.utils.nms.NMSUtils;
 import io.github.retrooper.packetevents.utils.reflection.Reflection;
 import io.github.retrooper.packetevents.utils.reflection.SubclassUtil;
 import io.github.retrooper.packetevents.utils.server.ServerVersion;
+import org.jetbrains.annotations.Nullable;
 
 import java.lang.reflect.InvocationTargetException;
 
@@ -138,17 +139,18 @@ public final class WrappedPacketInBlockDig extends WrappedPacket {
      *
      * @return Direction
      */
+    @Nullable
     public Direction getDirection() {
         if (isVersionLowerThan_v_1_8) {
-            return Direction.fromId((byte) readInt(3));
+            return new Direction((byte) readInt(3));
         } else {
             if (enumDirObj == null) {
                 enumDirObj = readObject(0, enumDirectionClass);
                 if (enumDirObj == null) {
-                    return Direction.OTHER;
+                    return null;
                 }
             }
-            return Direction.valueOf(((Enum) enumDirObj).name());
+            return Direction.getFromName(((Enum) enumDirObj).name());
         }
     }
 
