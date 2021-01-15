@@ -111,9 +111,7 @@ public enum ClientVersion {
         } else if (protocolVersion > highestSupportedProtocolVersion) {
             return HIGHER_THAN_SUPPORTED_VERSIONS;
         } else {
-            ClientVersion v = TEMP_UNRESOLVED;
-            v.protocolVersion = (short) protocolVersion;
-            return v;
+            return UNRESOLVED;
         }
     }
 

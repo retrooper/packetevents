@@ -44,6 +44,7 @@ import io.github.retrooper.packetevents.utils.server.ServerUtils;
 import io.github.retrooper.packetevents.utils.server.ServerVersion;
 import io.github.retrooper.packetevents.utils.version.PEVersion;
 import io.github.retrooper.packetevents.utils.versionlookup.VersionLookupUtils;
+import io.github.retrooper.packetevents.utils.versionlookup.protocollib.ProtocolLibVersionLookupUtils;
 import io.github.retrooper.packetevents.utils.versionlookup.v_1_7_10.ProtocolVersionAccessor_v_1_7;
 import io.github.retrooper.packetevents.utils.versionlookup.viaversion.ViaVersionLookupUtils;
 import org.bukkit.Bukkit;
@@ -308,6 +309,10 @@ public final class PacketEvents implements Listener, EventManager {
                 packetHandlerInternal.injectPlayer(e.getPlayer());
                 //Injection was successful as no exception was thrown...
                 if (!viaAvailable) {
+                    if (ProtocolLibVersionLookupUtils.isAvailable()) {
+                        ClientVersion version = ClientVersion.getClientVersion(ProtocolLibVersionLookupUtils.getProtocolVersion(e.getPlayer()));
+                        PacketEvents.get().getPlayerUtils().clientVersionsMap.put(address, version);
+                    }
                     PacketEvents.get().getEventManager().callEvent(new PostPlayerInjectEvent(e.getPlayer(), false));
                 }
             } catch (Exception ex) {
