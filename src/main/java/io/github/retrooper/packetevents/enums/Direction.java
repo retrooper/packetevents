@@ -76,13 +76,8 @@ public class Direction {
         return value < 0 || value > 5;
     }
 
-    public Direction clone()  {
-        try {
-            return (Direction) super.clone();
-        } catch (CloneNotSupportedException e) {
-            e.printStackTrace();
-        }
-        return null;
+    public Direction clone() {
+        return new Direction(value);
     }
 
     public static Direction getFromName(String name) {
