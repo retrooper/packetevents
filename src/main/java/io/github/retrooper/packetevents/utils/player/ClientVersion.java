@@ -38,33 +38,45 @@ import org.jetbrains.annotations.NotNull;
  */
 public enum ClientVersion {
     v_1_7_10(5),
+
     v_1_8(47),
     v_1_9(107),
+
     v_1_9_1(108),
     v_1_9_2(109),
-    v_1_9_3(110),
+    v_1_9_3_OR_4(110),
+
     v_1_10(210),
     v_1_11(315),
-    v_1_11_1(316),
+    v_1_11_1_OR_2(316),
+
     v_1_12(335),
     v_1_12_1(338),
     v_1_12_2(340),
+
     v_1_13(393),
     v_1_13_1(401),
     v_1_13_2(404),
+
     v_1_14(477),
     v_1_14_1(480),
     v_1_14_2(485),
     v_1_14_3(490),
     v_1_14_4(498),
+
     v_1_15(573),
     v_1_15_1(575),
     v_1_15_2(578),
+
     v_1_16(735),
     v_1_16_1(736),
     v_1_16_2(751),
     v_1_16_3(753),
+
+    @Deprecated
     v_1_16_4(754),
+    v_1_16_4_OR_5(754),
+
     LOWER_THAN_SUPPORTED_VERSIONS(v_1_7_10.protocolVersion - 1),
     HIGHER_THAN_SUPPORTED_VERSIONS(v_1_16_4.protocolVersion + 1),
     /**
@@ -82,7 +94,7 @@ public enum ClientVersion {
 
     private static final short lowestSupportedProtocolVersion = (short) (LOWER_THAN_SUPPORTED_VERSIONS.protocolVersion + 1);
     private static final short highestSupportedProtocolVersion = (short) (HIGHER_THAN_SUPPORTED_VERSIONS.protocolVersion - 1);
-    private short protocolVersion;
+    private final short protocolVersion;
 
     ClientVersion(int protocolVersion) {
         this.protocolVersion = (short) protocolVersion;
@@ -99,6 +111,11 @@ public enum ClientVersion {
         if (protocolVersion == -1) {
             return ClientVersion.UNRESOLVED;
         }
+        if (protocolVersion < lowestSupportedProtocolVersion) {
+            return LOWER_THAN_SUPPORTED_VERSIONS;
+        } else if (protocolVersion > highestSupportedProtocolVersion) {
+            return HIGHER_THAN_SUPPORTED_VERSIONS;
+        }
         for (ClientVersion version : values()) {
             if (version.protocolVersion > protocolVersion) {
                 break;
@@ -106,13 +123,7 @@ public enum ClientVersion {
                 return version;
             }
         }
-        if (protocolVersion < lowestSupportedProtocolVersion) {
-            return LOWER_THAN_SUPPORTED_VERSIONS;
-        } else if (protocolVersion > highestSupportedProtocolVersion) {
-            return HIGHER_THAN_SUPPORTED_VERSIONS;
-        } else {
-            return UNRESOLVED;
-        }
+        return UNRESOLVED;
     }
 
     /**
