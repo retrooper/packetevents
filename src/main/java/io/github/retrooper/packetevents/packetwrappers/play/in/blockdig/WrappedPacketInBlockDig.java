@@ -24,7 +24,7 @@
 
 package io.github.retrooper.packetevents.packetwrappers.play.in.blockdig;
 
-import io.github.retrooper.packetevents.enums.Direction;
+import io.github.retrooper.packetevents.utils.player.Direction;
 import io.github.retrooper.packetevents.packettype.PacketTypeClasses;
 import io.github.retrooper.packetevents.packetwrappers.NMSPacket;
 import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;

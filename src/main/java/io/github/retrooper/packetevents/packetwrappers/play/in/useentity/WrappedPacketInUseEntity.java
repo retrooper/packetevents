@@ -25,7 +25,7 @@
 package io.github.retrooper.packetevents.packetwrappers.play.in.useentity;
 
 import io.github.retrooper.packetevents.PacketEvents;
-import io.github.retrooper.packetevents.enums.Hand;
+import io.github.retrooper.packetevents.utils.player.Hand;
 import io.github.retrooper.packetevents.packetwrappers.NMSPacket;
 import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
 import io.github.retrooper.packetevents.utils.nms.NMSUtils;

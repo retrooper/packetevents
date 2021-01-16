@@ -22,7 +22,7 @@
  * SOFTWARE.
  */
 
-package io.github.retrooper.packetevents.enums;
+package io.github.retrooper.packetevents.utils.player;
 
 /**
  * The {@code direction} enum represents the face of a block being hit/placed.
