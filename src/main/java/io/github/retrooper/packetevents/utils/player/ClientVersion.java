@@ -26,6 +26,9 @@ package io.github.retrooper.packetevents.utils.player;
 
 import org.jetbrains.annotations.NotNull;
 
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * Client Version.
  * This is a nice tool for minecraft's protocol versions.
@@ -78,23 +81,24 @@ public enum ClientVersion {
     v_1_16_4_OR_5(754),
 
     LOWER_THAN_SUPPORTED_VERSIONS(v_1_7_10.protocolVersion - 1),
-    HIGHER_THAN_SUPPORTED_VERSIONS(v_1_16_4.protocolVersion + 1),
+    HIGHER_THAN_SUPPORTED_VERSIONS(v_1_16_4_OR_5.protocolVersion + 1),
     /**
      * Pre releases just aren't supported, we would end up with so many enum constants.
      * This constant assures you they are on a pre release.
      */
     ANY_PRE_RELEASE_VERSION(0),
 
-    /**
-     *
-     */
     TEMP_UNRESOLVED(-1),
 
-    UNRESOLVED(-1);
+    UNRESOLVED(-1),
+
+    UNKNOWN(-1);
 
     private static final short lowestSupportedProtocolVersion = (short) (LOWER_THAN_SUPPORTED_VERSIONS.protocolVersion + 1);
     private static final short highestSupportedProtocolVersion = (short) (HIGHER_THAN_SUPPORTED_VERSIONS.protocolVersion - 1);
-    private final short protocolVersion;
+
+    private static final Map<Short, ClientVersion> clientVersionCache = new HashMap<>();
+    private short protocolVersion;
 
     ClientVersion(int protocolVersion) {
         this.protocolVersion = (short) protocolVersion;
@@ -107,23 +111,42 @@ public enum ClientVersion {
      * @return ClientVersion
      */
     @NotNull
-    public static ClientVersion getClientVersion(int protocolVersion) {
+    public static ClientVersion getClientVersion(short protocolVersion) {
         if (protocolVersion == -1) {
             return ClientVersion.UNRESOLVED;
-        }
-        if (protocolVersion < lowestSupportedProtocolVersion) {
+        } else if (protocolVersion < lowestSupportedProtocolVersion) {
             return LOWER_THAN_SUPPORTED_VERSIONS;
         } else if (protocolVersion > highestSupportedProtocolVersion) {
             return HIGHER_THAN_SUPPORTED_VERSIONS;
-        }
-        for (ClientVersion version : values()) {
-            if (version.protocolVersion > protocolVersion) {
-                break;
-            } else if (version.protocolVersion == protocolVersion) {
-                return version;
+        } else {
+            ClientVersion cached = clientVersionCache.get(protocolVersion);
+            if (cached == null) {
+                for (ClientVersion version : values()) {
+                    if (version.protocolVersion > protocolVersion) {
+                       break;
+                    } else if (version.protocolVersion == protocolVersion) {
+                        //Cache for next time
+                        clientVersionCache.put(protocolVersion, version);
+                        return version;
+                    }
+                }
+                cached = UNKNOWN;
+                cached.protocolVersion = protocolVersion;
             }
+            return cached;
         }
-        return UNRESOLVED;
+    }
+
+
+    /**
+     * Get a ClientVersion enum by protocol version.
+     *
+     * @param protocolVersion Protocol version.
+     * @return ClientVersion
+     */
+    @NotNull
+    public static ClientVersion getClientVersion(int protocolVersion) {
+        return getClientVersion((short) protocolVersion);
     }
 
     /**
