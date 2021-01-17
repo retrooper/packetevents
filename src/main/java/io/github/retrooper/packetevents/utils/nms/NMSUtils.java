@@ -70,17 +70,9 @@ public final class NMSUtils {
             legacyNettyImportMode = true;
         } catch (ClassNotFoundException e) {
             legacyNettyImportMode = false;
-        }
-        try {
-            Class.forName(nettyPrefix + "channel.Channel");
-        } catch (ClassNotFoundException e) {
             nettyPrefix = "io.netty.";
-            try {
-                Class.forName(nettyPrefix + "channel.Channel");
-            } catch (ClassNotFoundException e2) {
-                throw new IllegalStateException("PacketEvents failed to locate Netty's location.");
-            }
         }
+
         try {
             nettyChannelClass = getNettyClass("channel.Channel");
             channelFutureClass = getNettyClass("channel.ChannelFuture");
@@ -113,9 +105,9 @@ public final class NMSUtils {
                 }
             }
             try {
-                gameProfileClass = Class.forName("com.mojang.authlib.GameProfile");
-            } catch (ClassNotFoundException e) {
                 gameProfileClass = Class.forName("net.minecraft.util.com.mojang.authlib.GameProfile");
+            } catch (ClassNotFoundException e) {
+                gameProfileClass = Class.forName("com.mojang.authlib.GameProfile");
             }
             iChatBaseComponentClass = NMSUtils.getNMSClass("IChatBaseComponent");
             vec3DClass = NMSUtils.getNMSClass("Vec3D");
