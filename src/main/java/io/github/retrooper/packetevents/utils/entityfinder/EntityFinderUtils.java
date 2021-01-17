@@ -60,7 +60,14 @@ public final class EntityFinderUtils {
             craftWorldGetHandle = NMSUtils.craftWorldClass.getMethod("getHandle");
             getBukkitEntity = NMSUtils.nmsEntityClass.getMethod("getBukkitEntity");
         } catch (NoSuchMethodException e) {
-            e.printStackTrace();
+            try {
+                getEntityByIdMethod = worldServerClass.getMethod("getEntity", int.class);
+
+                craftWorldGetHandle = NMSUtils.craftWorldClass.getMethod("getHandle");
+                getBukkitEntity = NMSUtils.nmsEntityClass.getMethod("getBukkitEntity");
+            } catch (NoSuchMethodException ex) {
+                ex.printStackTrace();
+            }
         }
     }
 
