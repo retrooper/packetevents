@@ -28,6 +28,7 @@ import io.github.retrooper.packetevents.PacketEvents;
 import io.github.retrooper.packetevents.packetwrappers.NMSPacket;
 import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
 import io.github.retrooper.packetevents.utils.nms.NMSUtils;
+import io.github.retrooper.packetevents.utils.server.ServerVersion;
 import io.netty.channel.*;
 import org.bukkit.entity.Player;
 
@@ -86,27 +87,30 @@ public class EarlyChannelInjector8 implements EarlyInjector {
             protected void initChannel(final Channel channel) {
                 if (networkMarkers != null) {
                     synchronized (networkMarkers) {
-                        channel.eventLoop().execute(new Runnable() {
-                            @Override
-                            public void run() {
-                                try {
+                        if (PacketEvents.get().getServerUtils().getVersion().isHigherThan(ServerVersion.v_1_11_2)) {
+                            channel.eventLoop().execute(new Runnable() {
+                                @Override
+                                public void run() {
                                     injectChannel(channel);
-                                } catch (Exception ex) {
-                                    //Failed
-                                    channel.disconnect();
                                 }
-                            }
-                        });
+                            });
+                        } else {
+                            injectChannel(channel);
+                        }
                     }
                 } else {
                     channel.eventLoop().execute(new Runnable() {
                         @Override
                         public void run() {
-                            try {
+                            if (PacketEvents.get().getServerUtils().getVersion().isHigherThan(ServerVersion.v_1_11_2)) {
+                                channel.eventLoop().execute(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        injectChannel(channel);
+                                    }
+                                });
+                            } else {
                                 injectChannel(channel);
-                            } catch (Exception ex) {
-                                //Failed
-                                channel.disconnect();
                             }
                         }
                     });
@@ -176,7 +180,7 @@ public class EarlyChannelInjector8 implements EarlyInjector {
     @Override
     public PlayerChannelInterceptor injectChannel(Object ch) {
         Channel channel = (Channel) ch;
-        String handlerName = PacketEvents.get().getHandlerName();
+        String handlerName = PacketEvents.HANDLER_NAME;
         try {
             PlayerChannelInterceptor interceptor = (PlayerChannelInterceptor) channel.pipeline().get(handlerName);
             if (interceptor == null) {
@@ -200,7 +204,7 @@ public class EarlyChannelInjector8 implements EarlyInjector {
     @Override
     public void ejectChannel(Object ch) {
         Channel channel = (Channel) ch;
-        String handlerName = PacketEvents.get().getHandlerName();
+        String handlerName = PacketEvents.HANDLER_NAME;
         if (channel.pipeline().get(handlerName) != null) {
             channel.pipeline().remove(handlerName);
         }

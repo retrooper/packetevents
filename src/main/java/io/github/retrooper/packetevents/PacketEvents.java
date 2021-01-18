@@ -72,6 +72,7 @@ public final class PacketEvents implements Listener, EventManager {
     private final PlayerUtils playerUtils = new PlayerUtils();
     private final ServerUtils serverUtils = new ServerUtils();
     private static Plugin plugin;
+    public static String HANDLER_NAME;
     /**
      * General executor service, basically for anything that the packet executor service doesn't do.
      * For example update checking when you initialize PacketEvents.
@@ -160,6 +161,7 @@ public final class PacketEvents implements Listener, EventManager {
             //Register Bukkit listener
             plugin = pl;
             Bukkit.getPluginManager().registerEvents(this, plugin);
+            HANDLER_NAME = "pe-" + plugin.getName();
             packetHandlerInternal = new PacketHandlerInternal(plugin);
             for (final Player p : Bukkit.getOnlinePlayers()) {
                 try {
@@ -251,10 +253,6 @@ public final class PacketEvents implements Listener, EventManager {
 
     public ByteBufUtil getByteBufUtil() {
         return byteBufUtil;
-    }
-
-    public String getHandlerName() {
-        return "pe-" + plugin.getName();
     }
 
     @EventHandler(priority = EventPriority.LOWEST)

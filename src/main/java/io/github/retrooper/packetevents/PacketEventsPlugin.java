@@ -24,6 +24,10 @@
 
 package io.github.retrooper.packetevents;
 
+import io.github.retrooper.packetevents.event.PacketListenerDynamic;
+import io.github.retrooper.packetevents.event.impl.PacketPlayReceiveEvent;
+import io.github.retrooper.packetevents.packettype.PacketType;
+import io.github.retrooper.packetevents.packetwrappers.play.in.chat.WrappedPacketInChat;
 import org.bukkit.plugin.java.JavaPlugin;
 
 public class PacketEventsPlugin extends JavaPlugin {
@@ -36,7 +40,25 @@ public class PacketEventsPlugin extends JavaPlugin {
     @Override
     public void onEnable() {
         if (PacketEvents.get() == null) {
-            PacketEvents.create(this).init(this);
+            PacketEvents.create(this);
+            PacketEvents.get().getSettings().injectAsync(false);
+            int counter = 0;
+            counter = PacketEvents.get().load() ? counter + 1 : counter;
+            counter = PacketEvents.get().init(this) ? counter + 1 : counter;
+
+            if (counter == 2) {
+                System.out.println("PE started successfully");
+            }
+            PacketEvents.get().registerListener(new PacketListenerDynamic() {
+                @Override
+                public void onPacketPlayReceive(PacketPlayReceiveEvent event) {
+                    if (event.getPacketId() == PacketType.Play.Client.CHAT) {
+                        if (new WrappedPacketInChat(event.getNMSPacket()).getMessage().equals("yo")) {
+                            event.getPlayer().sendMessage(PacketEvents.get().getPlayerUtils().getClientVersion(event.getPlayer()).toString());
+                        }
+                    }
+                }
+            });
         }
     }
 

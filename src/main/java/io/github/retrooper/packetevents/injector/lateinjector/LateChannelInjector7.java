@@ -54,14 +54,14 @@ public class LateChannelInjector7 implements LateInjector {
             }
         };
         final Channel channel = (Channel) PacketEvents.get().packetHandlerInternal.getChannel(player);
-        channel.pipeline().addBefore("packet_handler", PacketEvents.get().getHandlerName(), channelDuplexHandler);
+        channel.pipeline().addBefore("packet_handler", PacketEvents.HANDLER_NAME, channelDuplexHandler);
     }
 
     @Override
     public void ejectPlayerSync(Player player) {
         final Channel channel = (Channel) PacketEvents.get().packetHandlerInternal.getChannel(player);
-        if (channel.pipeline().get(PacketEvents.get().getHandlerName()) != null) {
-            channel.pipeline().remove(PacketEvents.get().getHandlerName());
+        if (channel.pipeline().get(PacketEvents.HANDLER_NAME) != null) {
+            channel.pipeline().remove(PacketEvents.HANDLER_NAME);
         }
         PacketEvents.get().getPlayerUtils().clientVersionsMap.remove(player.getAddress());
         PacketEvents.get().getPlayerUtils().tempClientVersionMap.remove(player.getAddress());
@@ -83,8 +83,8 @@ public class LateChannelInjector7 implements LateInjector {
             @Override
             public void run() {
                 final Channel channel = (Channel) PacketEvents.get().packetHandlerInternal.getChannel(player);
-                if (channel.pipeline().get(PacketEvents.get().getHandlerName()) != null) {
-                    channel.pipeline().remove(PacketEvents.get().getHandlerName());
+                if (channel.pipeline().get(PacketEvents.HANDLER_NAME) != null) {
+                    channel.pipeline().remove(PacketEvents.HANDLER_NAME);
                 }
                 PacketEvents.get().packetHandlerInternal.keepAliveMap.remove(player.getUniqueId());
                 PacketEvents.get().packetHandlerInternal.channelMap.remove(player.getName());
