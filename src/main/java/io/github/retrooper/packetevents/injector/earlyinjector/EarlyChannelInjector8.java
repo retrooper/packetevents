@@ -180,7 +180,7 @@ public class EarlyChannelInjector8 implements EarlyInjector {
     @Override
     public PlayerChannelInterceptor injectChannel(Object ch) {
         Channel channel = (Channel) ch;
-        String handlerName = PacketEvents.HANDLER_NAME;
+        final String handlerName = PacketEvents.handlerName;
         try {
             PlayerChannelInterceptor interceptor = (PlayerChannelInterceptor) channel.pipeline().get(handlerName);
             if (interceptor == null) {
@@ -204,7 +204,7 @@ public class EarlyChannelInjector8 implements EarlyInjector {
     @Override
     public void ejectChannel(Object ch) {
         Channel channel = (Channel) ch;
-        String handlerName = PacketEvents.HANDLER_NAME;
+        String handlerName = PacketEvents.handlerName;
         if (channel.pipeline().get(handlerName) != null) {
             channel.pipeline().remove(handlerName);
         }

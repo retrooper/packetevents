@@ -56,15 +56,15 @@ public class LateChannelInjector8 implements LateInjector {
             }
         };
         final Channel channel = (Channel) PacketEvents.get().packetHandlerInternal.getChannel(player);
-        channel.pipeline().addBefore("packet_handler", PacketEvents.HANDLER_NAME, channelDuplexHandler);
+        channel.pipeline().addBefore("packet_handler", PacketEvents.handlerName, channelDuplexHandler);
     }
 
     @Override
     public void ejectPlayerSync(Player player) {
         final Channel channel = (Channel) PacketEvents.get().packetHandlerInternal.getChannel(player);
-        if (channel.pipeline().get(PacketEvents.HANDLER_NAME) != null) {
+        if (channel.pipeline().get(PacketEvents.handlerName) != null) {
             try {
-                channel.pipeline().remove(PacketEvents.HANDLER_NAME);
+                channel.pipeline().remove(PacketEvents.handlerName);
             } catch (NoSuchElementException ignored) {
 
             }
@@ -89,9 +89,9 @@ public class LateChannelInjector8 implements LateInjector {
             @Override
             public void run() {
                 final Channel channel = (Channel) PacketEvents.get().packetHandlerInternal.getChannel(player);
-                if (channel.pipeline().get(PacketEvents.HANDLER_NAME) != null) {
+                if (channel.pipeline().get(PacketEvents.handlerName) != null) {
                     try {
-                        channel.pipeline().remove(PacketEvents.HANDLER_NAME);
+                        channel.pipeline().remove(PacketEvents.handlerName);
                     } catch (NoSuchElementException ignored) {
 
                     }

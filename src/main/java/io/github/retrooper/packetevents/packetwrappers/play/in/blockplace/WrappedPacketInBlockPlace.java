@@ -24,9 +24,9 @@
 
 package io.github.retrooper.packetevents.packetwrappers.play.in.blockplace;
 
-import io.github.retrooper.packetevents.utils.player.Direction;
 import io.github.retrooper.packetevents.packetwrappers.NMSPacket;
 import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
+import io.github.retrooper.packetevents.utils.player.Direction;
 import io.github.retrooper.packetevents.utils.server.ServerVersion;
 import org.jetbrains.annotations.Nullable;
 
