@@ -38,13 +38,7 @@ public class PacketEventsPlugin extends JavaPlugin {
         if (PacketEvents.get() == null) {
             PacketEvents.create(this);
             PacketEvents.get().getSettings().injectAsync(false);
-            int counter = 0;
-            counter = PacketEvents.get().load() ? counter + 1 : counter;
-            counter = PacketEvents.get().init(this) ? counter + 1 : counter;
-
-            if (counter == 2) {
-                System.out.println("PE started successfully");
-            }
+            PacketEvents.get().init(this);
         }
     }
 
