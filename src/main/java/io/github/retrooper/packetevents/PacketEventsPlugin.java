@@ -37,7 +37,7 @@ public class PacketEventsPlugin extends JavaPlugin {
     public void onEnable() {
         if (PacketEvents.get() == null) {
             PacketEvents.create(this);
-            PacketEvents.get().getSettings().injectAsync(false);
+            PacketEvents.get().load();
             PacketEvents.get().init(this);
         }
     }

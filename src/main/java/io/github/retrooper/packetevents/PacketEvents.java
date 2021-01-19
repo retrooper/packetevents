@@ -103,7 +103,7 @@ public final class PacketEvents implements Listener, EventManager {
     }
 
 
-    public boolean load() {
+    public void load() {
         if (!loaded && !loading) {
             loading = true;
             ServerVersion version = ServerVersion.getVersion();
@@ -124,20 +124,18 @@ public final class PacketEvents implements Listener, EventManager {
             }
             loaded = true;
             loading = false;
-            return true;
         }
-        return false;
     }
 
     public void loadSettings(PacketEventsSettings settings) {
         this.settings = settings;
     }
 
-    public boolean init(final Plugin plugin) {
-        return init(plugin, settings);
+    public void init(final Plugin plugin) {
+        init(plugin, settings);
     }
 
-    public boolean init(final Plugin pl, PacketEventsSettings packetEventsSettings) {
+    public void init(final Plugin pl, PacketEventsSettings packetEventsSettings) {
         load();
         if (!initialized && !initializing) {
             initializing = true;
@@ -177,9 +175,7 @@ public final class PacketEvents implements Listener, EventManager {
             }
             initialized = true;
             initializing = false;
-            return true;
         }
-        return false;
     }
 
     public void terminate() {
