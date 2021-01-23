@@ -102,6 +102,11 @@ public final class PacketEvents implements Listener, EventManager {
         return instance;
     }
 
+    @Deprecated
+    public static PacketEvents getAPI() {
+        return instance;
+    }
+
 
     public void load() {
         if (!loaded && !loading) {
