@@ -58,8 +58,13 @@ class EventManagerDynamic {
         byte highestReachedPriority = PacketEventPriority.LOWEST.getPriorityValue();
         for (PacketListenerDynamic listener : listeners) {
             highestReachedPriority = listener.getPriority().getPriorityValue();
-            event.callPacketEvent(listener);
-            event.call(listener);
+            try {
+                event.callPacketEvent(listener);
+                event.call(listener);
+            }
+            catch (Exception ex) {
+                throw new IllegalStateException("PacketEvents found an exception while calling a packet listener.", ex);
+            }
             if (event instanceof CancellableEvent) {
                 CancellableEvent ce = (CancellableEvent) event;
                 cancel = ce.isCancelled();
