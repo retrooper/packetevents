@@ -50,7 +50,7 @@ public final class NMSUtils {
     private static final String NMS_DIR = ServerVersion.getNMSDirectory() + ".";
     private static final String OBC_DIR = ServerVersion.getOBCDirectory() + ".";
     public static ServerVersion version;
-    private static String nettyPrefix = "net.minecraft.util.io.netty.";
+    private static String nettyPrefix;
     public static Constructor<?> blockPosConstructor;
     public static Class<?> nmsEntityClass, minecraftServerClass, craftWorldClass, playerInteractManagerClass, entityPlayerClass, playerConnectionClass, craftServerClass,
             craftPlayerClass, serverConnectionClass, craftEntityClass, nmsItemStackClass, networkManagerClass, nettyChannelClass, gameProfileClass, iChatBaseComponentClass,
@@ -65,12 +65,32 @@ public final class NMSUtils {
     private static Object minecraftServerConnection;
 
     public static void load() {
-        try {
-            Class.forName("net.minecraft.util.io.netty.channel.Channel");
+        String legacyNettyPrefix = "net.minecraft.util.io.netty.";
+        String newNettyPrefix = "io.netty.";
+        if (version.isHigherThan(ServerVersion.v_1_7_10)) {
             legacyNettyImportMode = true;
-        } catch (ClassNotFoundException e) {
+            nettyPrefix = newNettyPrefix;
+        }
+        else {
             legacyNettyImportMode = false;
-            nettyPrefix = "io.netty.";
+            nettyPrefix = legacyNettyPrefix;
+        }
+
+        try {
+            //Test if the selected netty location is valid
+            Object chnl = getNettyClass("channel.Channel");
+        }
+        catch (ClassNotFoundException ex) {
+            System.err.println("[packetevents] Failed to locate the default netty package location for your server version. Searching...");
+            //Time to correct the netty location
+            if (legacyNettyImportMode) {
+                legacyNettyImportMode = false;
+                nettyPrefix = newNettyPrefix;
+            }
+            else {
+                legacyNettyImportMode = true;
+                nettyPrefix = legacyNettyPrefix;
+            }
         }
 
         try {

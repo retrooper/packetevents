@@ -37,8 +37,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 public final class WrappedPacketOutAnimation extends WrappedPacket implements SendableWrapper {
-    private static final Map<Integer, EntityAnimationType> cachedAnimationIDS = new HashMap<>();
-    private static final Map<EntityAnimationType, Integer> cachedAnimations = new HashMap<>();
     private static Constructor<?> animationConstructor;
     private Entity entity;
     private int entityID = -1;
@@ -69,19 +67,6 @@ public final class WrappedPacketOutAnimation extends WrappedPacket implements Se
         } catch (NoSuchMethodException e) {
             e.printStackTrace();
         }
-        cachedAnimationIDS.put(0, EntityAnimationType.SWING_MAIN_ARM);
-        cachedAnimationIDS.put(1, EntityAnimationType.TAKE_DAMAGE);
-        cachedAnimationIDS.put(2, EntityAnimationType.LEAVE_BED);
-        cachedAnimationIDS.put(3, EntityAnimationType.SWING_OFFHAND);
-        cachedAnimationIDS.put(4, EntityAnimationType.CRITICAL_EFFECT);
-        cachedAnimationIDS.put(5, EntityAnimationType.MAGIC_CRITICAL_EFFECT);
-
-        cachedAnimations.put(EntityAnimationType.SWING_MAIN_ARM, 0);
-        cachedAnimations.put(EntityAnimationType.TAKE_DAMAGE, 1);
-        cachedAnimations.put(EntityAnimationType.LEAVE_BED, 2);
-        cachedAnimations.put(EntityAnimationType.SWING_OFFHAND, 3);
-        cachedAnimations.put(EntityAnimationType.CRITICAL_EFFECT, 4);
-        cachedAnimations.put(EntityAnimationType.MAGIC_CRITICAL_EFFECT, 5);
     }
 
     /**
@@ -117,7 +102,8 @@ public final class WrappedPacketOutAnimation extends WrappedPacket implements Se
      */
     public EntityAnimationType getAnimationType() {
         if (packet != null) {
-            return cachedAnimationIDS.get(readInt(1));
+            byte id = (byte)readInt(1);
+            return EntityAnimationType.getById(id);
         } else {
             return type;
         }
@@ -126,7 +112,7 @@ public final class WrappedPacketOutAnimation extends WrappedPacket implements Se
     @Override
     public Object asNMSPacket() {
         final Object nmsEntity = NMSUtils.getNMSEntity(getEntity());
-        final int index = cachedAnimations.get(getAnimationType());
+        final int index = getAnimationType().id;
         try {
             return animationConstructor.newInstance(nmsEntity, index);
         } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
@@ -136,6 +122,21 @@ public final class WrappedPacketOutAnimation extends WrappedPacket implements Se
     }
 
     public enum EntityAnimationType {
-        SWING_MAIN_ARM, TAKE_DAMAGE, LEAVE_BED, SWING_OFFHAND, CRITICAL_EFFECT, MAGIC_CRITICAL_EFFECT
+        SWING_MAIN_ARM((byte) 0), TAKE_DAMAGE((byte) 1), LEAVE_BED((byte) 2),
+        SWING_OFFHAND((byte) 3), CRITICAL_EFFECT((byte) 4), MAGIC_CRITICAL_EFFECT((byte) 5);
+
+        final byte id;
+
+        EntityAnimationType(byte id) {
+            this.id = id;
+        }
+
+        public byte getId() {
+            return id;
+        }
+
+        public static EntityAnimationType getById(byte id) {
+            return values()[id]; //id is at the same time the index
+        }
     }
 }
