@@ -31,10 +31,11 @@ import java.util.Map;
 
 /**
  * Client Version.
- * This is a nice tool for minecraft's protocol versions.
+ * This is a nice tool for minecraft's client protocol versions.
  * You won't have to memorize the protocol version, just memorize the client version
  * as the version you see in the minecraft launcher.
- *
+ * Some enum constants may represent two or more versions as there have been cases where some versions have the same protocol version due to no protocol changes.
+ * We added a comment over those enum constants so check it out.
  * @author retrooper
  * @see <a href="https://wiki.vg/Protocol_version_numbers">https://wiki.vg/Protocol_version_numbers</a>
  * @since 1.6.9
@@ -47,11 +48,17 @@ public enum ClientVersion {
 
     v_1_9_1(108),
     v_1_9_2(109),
-    v_1_9_3_OR_4(110),
+    /**
+     * 1.9.3 or 1.9.4 as they have the same protocol version.
+     */
+    v_1_9_3(110),
 
     v_1_10(210),
     v_1_11(315),
-    v_1_11_1_OR_2(316),
+    /**
+     * 1.11.1 or 1.11.2 as they have the same protocol version.
+     */
+    v_1_11_1(316),
 
     v_1_12(335),
     v_1_12_1(338),
@@ -74,14 +81,13 @@ public enum ClientVersion {
     v_1_16(735),
     v_1_16_1(736),
     v_1_16_2(751),
+    /**
+     * 1.16.4 or 1.16.5 as they have the same protocol version.
+     */
     v_1_16_3(753),
 
-    @Deprecated
-    v_1_16_4(754),
-    v_1_16_4_OR_5(754),
-
     LOWER_THAN_SUPPORTED_VERSIONS(v_1_7_10.protocolVersion - 1),
-    HIGHER_THAN_SUPPORTED_VERSIONS(v_1_16_4_OR_5.protocolVersion + 1),
+    HIGHER_THAN_SUPPORTED_VERSIONS(v_1_16_3.protocolVersion + 1),
     /**
      * Pre releases just aren't supported, we would end up with so many enum constants.
      * This constant assures you they are on a pre release.
