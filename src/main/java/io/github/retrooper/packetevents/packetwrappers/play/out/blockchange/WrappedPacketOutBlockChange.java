@@ -36,8 +36,8 @@ import org.bukkit.World;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-
-public class WrappedPacketOutBlockChange extends WrappedPacket implements SendableWrapper {
+//TODO finish
+class WrappedPacketOutBlockChange extends WrappedPacket implements SendableWrapper {
     private static Constructor<?> packetConstructor;
     private static Method iBlockDataMethodCache = null;
     private static Method getBlockIdMethodCache = null;
