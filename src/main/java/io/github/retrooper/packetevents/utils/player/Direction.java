@@ -24,6 +24,8 @@
 
 package io.github.retrooper.packetevents.utils.player;
 
+import java.util.Objects;
+
 /**
  * The {@code direction} enum represents the face of a block being hit/placed.
  *
@@ -80,7 +82,12 @@ public class Direction {
         return new Direction(value);
     }
 
+    @Deprecated
     public static Direction getFromName(String name) {
+        return getByName(name);
+    }
+
+    public static Direction getByName(String name) {
         switch (name) {
             case "DOWN":
                 return DOWN.clone();
@@ -97,5 +104,14 @@ public class Direction {
             default:
                 return null;
         }
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (o instanceof Direction) {
+            Direction direction = (Direction) o;
+            return value == direction.value;
+        }
+        return false;
     }
 }

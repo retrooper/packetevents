@@ -48,7 +48,7 @@ public final class WrappedPacketInBlockPlace extends WrappedPacket {
     public Direction getDirection() {
         if (isHigherThan_v_1_8_8) {
             WrappedPacketInBlockPlace_1_9 blockPlace_1_9 = new WrappedPacketInBlockPlace_1_9(packet);
-            return Direction.getFromName(((Enum) blockPlace_1_9.getEnumDirectionObject()).name());
+            return Direction.getByName(((Enum) blockPlace_1_9.getEnumDirectionObject()).name());
         } else if (isHigherThan_v_1_7_10) {
             WrappedPacketInBlockPlace_1_8 blockPlace_1_8 = new WrappedPacketInBlockPlace_1_8(packet);
             return new Direction((byte) blockPlace_1_8.getFace());
