@@ -32,7 +32,6 @@ import io.github.retrooper.packetevents.utils.netty.channel.ChannelUtils;
 import io.github.retrooper.packetevents.utils.player.ClientVersion;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import java.net.InetSocketAddress;
 
@@ -90,7 +89,7 @@ public class PostPlayerInjectEvent extends PacketEvent implements PlayerEvent {
      * @return ClientVersion of injected player.
      * @see ClientVersion
      */
-    @Nullable
+    @NotNull
     public ClientVersion getClientVersion() {
         return PacketEvents.get().getPlayerUtils().getClientVersion(player);
     }
