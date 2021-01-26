@@ -59,7 +59,6 @@ import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.ServicePriority;
 import org.jetbrains.annotations.NotNull;
 
-import java.lang.ref.WeakReference;
 import java.net.InetSocketAddress;
 import java.util.UUID;
 import java.util.concurrent.ExecutorService;
@@ -168,7 +167,7 @@ public final class PacketEvents implements Listener, EventManager {
             plugin = pl;
             Bukkit.getPluginManager().registerEvents(this, plugin);
             handlerName = "pe-" + plugin.getName();
-            packetHandlerInternal = new PacketHandlerInternal(plugin);
+            packetHandlerInternal = new PacketHandlerInternal();
             for (final Player p : Bukkit.getOnlinePlayers()) {
                 try {
                     getPlayerUtils().injectPlayer(p);
