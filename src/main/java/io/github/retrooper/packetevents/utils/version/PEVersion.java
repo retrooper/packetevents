@@ -130,6 +130,9 @@ public class PEVersion {
      */
     @Override
     public boolean equals(Object obj) {
+        if (obj == null) {
+            return false;
+        }
         if (obj instanceof PEVersion) {
             return Arrays.equals(versionIntArray, ((PEVersion) obj).versionIntArray);
         }

@@ -73,13 +73,9 @@ public final class PacketEvents implements Listener, EventManager {
     private final EventManager eventManager = new PEEventManager();
     private final PlayerUtils playerUtils = new PlayerUtils();
     private final ServerUtils serverUtils = new ServerUtils();
+    private final UpdateChecker updateChecker = new UpdateChecker();
     private static Plugin plugin;
     public static String handlerName;
-    /**
-     * General executor service, basically for anything that the packet executor service doesn't do.
-     * For example update checking when you initialize PacketEvents.
-     */
-    public ExecutorService generalExecutorService = Executors.newSingleThreadExecutor(r -> new Thread(r, "PacketEvents-general"));
 
     //Executor used for player injecting/ejecting.
     public ExecutorService injectAndEjectExecutorService;//Initiated in init method
@@ -177,8 +173,13 @@ public final class PacketEvents implements Listener, EventManager {
             }
 
             if (settings.shouldCheckForUpdates()) {
-                generalExecutorService.execute(() -> new UpdateChecker().handleUpdate());
-
+                Thread thread = new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        UpdateChecker.UpdateCheckerStatus status = updateChecker.checkForUpdate();
+                    }
+                }, "PacketEvents-general");
+                thread.start();
             }
             initialized = true;
             initializing = false;
@@ -193,13 +194,16 @@ public final class PacketEvents implements Listener, EventManager {
             packetHandlerInternal.cleanup();
 
             getEventManager().unregisterAllListeners();
-            generalExecutorService.shutdownNow();
             injectAndEjectExecutorService.shutdownNow();
             initialized = false;
             terminating = false;
         }
     }
 
+    /**
+     * Use {@link #terminate()}. This is deprecated
+     * @deprecated "Stop" might be misleading and "terminate" sounds better I guess...
+     */
     @Deprecated
     public void stop() {
         terminate();
@@ -261,6 +265,10 @@ public final class PacketEvents implements Listener, EventManager {
 
     public ByteBufUtil getByteBufUtil() {
         return byteBufUtil;
+    }
+
+    public UpdateChecker getUpdateChecker() {
+        return updateChecker;
     }
 
     @EventHandler(priority = EventPriority.LOWEST)
