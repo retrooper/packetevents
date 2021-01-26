@@ -81,13 +81,14 @@ public enum ClientVersion {
     v_1_16(735),
     v_1_16_1(736),
     v_1_16_2(751),
+    v_1_16_3(753),
     /**
      * 1.16.4 or 1.16.5 as they have the same protocol version.
      */
-    v_1_16_3(753),
+    v_1_16_4(754),
 
     LOWER_THAN_SUPPORTED_VERSIONS(v_1_7_10.protocolVersion - 1),
-    HIGHER_THAN_SUPPORTED_VERSIONS(v_1_16_3.protocolVersion + 1),
+    HIGHER_THAN_SUPPORTED_VERSIONS(v_1_16_4.protocolVersion + 1),
     /**
      * Pre releases just aren't supported, we would end up with so many enum constants.
      * This constant assures you they are on a pre release.
