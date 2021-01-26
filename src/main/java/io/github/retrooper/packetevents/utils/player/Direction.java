@@ -24,8 +24,6 @@
 
 package io.github.retrooper.packetevents.utils.player;
 
-import java.util.Objects;
-
 /**
  * The {@code direction} enum represents the face of a block being hit/placed.
  *

@@ -38,7 +38,6 @@ import io.github.retrooper.packetevents.utils.nms.NMSUtils;
 import io.github.retrooper.packetevents.utils.player.ClientVersion;
 import io.github.retrooper.packetevents.utils.reflection.ClassUtil;
 import org.bukkit.entity.Player;
-import org.bukkit.plugin.Plugin;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -57,12 +56,11 @@ import java.util.concurrent.ConcurrentHashMap;
  * @since 1.7.9
  */
 public class PacketHandlerInternal {
-    public final GlobalChannelInjector injector;
-    public final HashMap<UUID, Long> keepAliveMap = new HashMap<>();
+    public final GlobalChannelInjector injector = new GlobalChannelInjector();
+    public final Map<UUID, Long> keepAliveMap = new HashMap<>();
     public final Map<String, Object> channelMap = new WeakHashMap<>();
 
-    public PacketHandlerInternal(Plugin plugin) {
-        injector = new GlobalChannelInjector();
+    public PacketHandlerInternal() {
         injector.prepare();
     }
 

@@ -33,8 +33,6 @@ import org.bukkit.entity.Entity;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
-import java.util.HashMap;
-import java.util.Map;
 
 public final class WrappedPacketOutAnimation extends WrappedPacket implements SendableWrapper {
     private static Constructor<?> animationConstructor;
