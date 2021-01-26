@@ -33,7 +33,9 @@ import org.jetbrains.annotations.NotNull;
 
 import java.net.InetSocketAddress;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Useful player utilities.
@@ -42,10 +44,12 @@ import java.util.UUID;
  * @since 1.6.8
  */
 public final class PlayerUtils {
+    public final Map<UUID, Long> loginTime = new ConcurrentHashMap<>();
+
     /**
      * This is where the most recent non-smoothed player ping that PacketEvents calculates is stored.
      */
-    public final HashMap<UUID, Short> playerPingMap = new HashMap<>();
+    public final Map<UUID, Integer> playerPingMap = new HashMap<>();
 
     /**
      * This is where the most recent smoothed player ping that PacketEvents calculates is stored.
@@ -53,7 +57,7 @@ public final class PlayerUtils {
      * Use this to receive a smoothed ping value.
      * PacketEvents smooths in the same way minecraft does.
      */
-    public final HashMap<UUID, Short> playerSmoothedPingMap = new HashMap<>();
+    public final Map<UUID, Integer> playerSmoothedPingMap = new HashMap<>();
 
     /**
      * This map stores the client version of a player only when it has been confirmed.
@@ -99,9 +103,8 @@ public final class PlayerUtils {
      * @param player Target player.
      * @return Non-smoothed ping.
      */
-    @Deprecated
-    public short getPing(final Player player) {
-        return playerPingMap.getOrDefault(player.getUniqueId(), (short) 0);
+    public int getPing(final Player player) {
+        return getPing(player.getUniqueId());
     }
 
     /**
@@ -110,9 +113,8 @@ public final class PlayerUtils {
      * @param player Target player.
      * @return Smoothed ping.
      */
-    @Deprecated
-    public short getSmoothedPing(final Player player) {
-        return playerSmoothedPingMap.getOrDefault(player.getUniqueId(), (short) 0);
+    public int getSmoothedPing(final Player player) {
+      return getSmoothedPing(player.getUniqueId());
     }
 
     /**
@@ -121,8 +123,14 @@ public final class PlayerUtils {
      * @param uuid Target player UUID.
      * @return Non-smoothed ping.
      */
-    public short getPing(UUID uuid) {
-        return playerPingMap.getOrDefault(uuid, (short) 0);
+    public int getPing(UUID uuid) {
+        Integer ping = playerPingMap.get(uuid);
+        if (ping == null) {
+            long joinTime = loginTime.get(uuid);
+            System.out.println("LOL: " + (System.currentTimeMillis() - joinTime));
+            return (int) (System.currentTimeMillis() -  joinTime);
+        }
+        return ping;
     }
 
     /**
@@ -131,8 +139,13 @@ public final class PlayerUtils {
      * @param uuid Target player UUID.
      * @return Smoothed ping.
      */
-    public short getSmoothedPing(UUID uuid) {
-        return playerSmoothedPingMap.getOrDefault(uuid, (short) 0);
+    public int getSmoothedPing(UUID uuid) {
+        Integer smoothedPing = playerSmoothedPingMap.get(uuid);
+        if (smoothedPing == null) {
+            long joinTime = loginTime.get(uuid);
+            return (int) (System.currentTimeMillis() - joinTime);
+        }
+        return smoothedPing;
     }
 
     /**

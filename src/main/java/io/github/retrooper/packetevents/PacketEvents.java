@@ -61,12 +61,14 @@ import org.jetbrains.annotations.NotNull;
 
 import java.lang.ref.WeakReference;
 import java.net.InetSocketAddress;
+import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public final class PacketEvents implements Listener, EventManager {
+    //TODO Joining while banned allegedly causes player injection exceptions
     private static PacketEvents instance;
     private final PEVersion version = new PEVersion(1, 7, 9, 1);
     private final EventManager eventManager = new PEEventManager();
@@ -84,7 +86,7 @@ public final class PacketEvents implements Listener, EventManager {
     public ExecutorService injectAndEjectExecutorService;//Initiated in init method
 
     public PacketHandlerInternal packetHandlerInternal;
-    private boolean loading, loaded, initialized, initializing, stopping;
+    private boolean loading, loaded, initialized, initializing, terminating;
     private PacketEventsSettings settings = new PacketEventsSettings();
     private final ByteBufUtil byteBufUtil = NMSUtils.legacyNettyImportMode ? new ByteBufUtil_7() : new ByteBufUtil_8();
 
@@ -185,7 +187,7 @@ public final class PacketEvents implements Listener, EventManager {
     }
 
     public void terminate() {
-        if (initialized && !stopping) {
+        if (initialized && !terminating) {
             for (Player player : Bukkit.getOnlinePlayers()) {
                 packetHandlerInternal.ejectPlayer(player);
             }
@@ -195,7 +197,7 @@ public final class PacketEvents implements Listener, EventManager {
             generalExecutorService.shutdownNow();
             injectAndEjectExecutorService.shutdownNow();
             initialized = false;
-            stopping = false;
+            terminating = false;
         }
     }
 
@@ -216,8 +218,13 @@ public final class PacketEvents implements Listener, EventManager {
         return initializing;
     }
 
+    @Deprecated
     public boolean isStopping() {
-        return stopping;
+        return terminating;
+    }
+
+    public boolean isTerminating() {
+        return terminating;
     }
 
     public boolean isInitialized() {
@@ -272,6 +279,7 @@ public final class PacketEvents implements Listener, EventManager {
     public void onJoin(final PlayerJoinEvent e) {
         final InetSocketAddress address = e.getPlayer().getAddress();
         boolean viaAvailable = ViaVersionLookupUtils.isAvailable();
+        PacketEvents.get().getPlayerUtils().loginTime.put(e.getPlayer().getUniqueId(), System.currentTimeMillis());
         if (viaAvailable) {
             PacketEvents.get().getPlayerUtils().clientVersionsMap.put(e.getPlayer().getAddress(), ClientVersion.TEMP_UNRESOLVED);
             Bukkit.getScheduler().runTaskLaterAsynchronously(getPlugin(), new Runnable() {
@@ -318,6 +326,10 @@ public final class PacketEvents implements Listener, EventManager {
 
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onQuit(final PlayerQuitEvent e) {
+        UUID uuid = e.getPlayer().getUniqueId();
         packetHandlerInternal.ejectPlayer(e.getPlayer());
+        PacketEvents.get().getPlayerUtils().loginTime.remove(uuid);
+        PacketEvents.get().getPlayerUtils().playerPingMap.remove(uuid);
+        PacketEvents.get().getPlayerUtils().playerSmoothedPingMap.remove(uuid);
     }
 }

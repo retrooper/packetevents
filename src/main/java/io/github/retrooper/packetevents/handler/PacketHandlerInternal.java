@@ -342,14 +342,14 @@ public class PacketHandlerInternal {
      */
     private void interceptRead(PacketPlayReceiveEvent event) {
         if (event.getPacketId() == PacketType.Play.Client.KEEP_ALIVE) {
-            UUID uuid = event.getPlayer().getUniqueId();
-            long timestamp = keepAliveMap.getOrDefault(uuid, event.getTimestamp());
-            long currentTime = event.getTimestamp();
-            long ping = currentTime - timestamp;
-            long smoothedPing = (PacketEvents.get().getPlayerUtils().getSmoothedPing(event.getPlayer()) * 3 + ping) / 4;
-            PacketEvents.get().getPlayerUtils().playerPingMap.put(uuid, (short) ping);
-            PacketEvents.get().getPlayerUtils().playerSmoothedPingMap.put(uuid, (short) smoothedPing);
-        }
+                UUID uuid = event.getPlayer().getUniqueId();
+                long timestamp = keepAliveMap.getOrDefault(uuid, event.getTimestamp());
+                long currentTime = event.getTimestamp();
+                long ping = currentTime - timestamp;
+                long smoothedPing = (PacketEvents.get().getPlayerUtils().getSmoothedPing(event.getPlayer().getUniqueId()) * 3L + ping) / 4;
+                PacketEvents.get().getPlayerUtils().playerPingMap.put(uuid, (int) ping);
+                PacketEvents.get().getPlayerUtils().playerSmoothedPingMap.put(uuid, (int) smoothedPing);
+            }
     }
 
     /**
