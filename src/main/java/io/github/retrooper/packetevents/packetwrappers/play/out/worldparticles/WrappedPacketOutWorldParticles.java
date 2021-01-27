@@ -34,9 +34,9 @@ public class WrappedPacketOutWorldParticles extends WrappedPacket {
 
     public Particle getParticle() {
         String particleName;
-        if (version.isLowerThan(ServerVersion.v_1_8)) {
+        if (version.isOlderThan(ServerVersion.v_1_8)) {
             particleName = readString(0);
-        } else if (version.isLowerThan(ServerVersion.v_1_13)) {//TODO civ
+        } else if (version.isOlderThan(ServerVersion.v_1_13)) {//TODO civ
             Object particleEnumObj = readObject(0, particleEnumClass);
             particleName = particleEnumObj.toString();
         } else {

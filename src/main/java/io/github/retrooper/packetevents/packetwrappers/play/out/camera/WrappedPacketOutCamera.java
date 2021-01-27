@@ -76,6 +76,6 @@ public class WrappedPacketOutCamera extends WrappedPacket implements SendableWra
 
     @Override
     public boolean isSupported() {
-        return version.isHigherThan(ServerVersion.v_1_7_10);
+        return version.isNewerThan(ServerVersion.v_1_7_10);
     }
 }

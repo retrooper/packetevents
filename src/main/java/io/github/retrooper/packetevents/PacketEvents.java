@@ -67,7 +67,7 @@ import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public final class PacketEvents implements Listener, EventManager {
-    //TODO Joining while banned allegedly causes player injection exceptions
+    //TODO Do what you just did to server version, to the client version enum, finish unfinished wrappers
     private static PacketEvents instance;
     private final PEVersion version = new PEVersion(1, 7, 9, 1);
     private final EventManager eventManager = new PEEventManager();
@@ -84,7 +84,6 @@ public final class PacketEvents implements Listener, EventManager {
     private boolean loading, loaded, initialized, initializing, terminating;
     private PacketEventsSettings settings = new PacketEventsSettings();
     private final ByteBufUtil byteBufUtil = NMSUtils.legacyNettyImportMode ? new ByteBufUtil_7() : new ByteBufUtil_8();
-
 
     public static PacketEvents create(final Plugin plugin) {
         if (!Bukkit.getServicesManager().isProvidedFor(PacketEvents.class)) {
@@ -178,7 +177,7 @@ public final class PacketEvents implements Listener, EventManager {
                     public void run() {
                         UpdateChecker.UpdateCheckerStatus status = updateChecker.checkForUpdate();
                     }
-                }, "PacketEvents-general");
+                }, "PacketEvents-update-check-thread");
                 thread.start();
             }
             initialized = true;

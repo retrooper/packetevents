@@ -52,14 +52,14 @@ public final class WrappedPacketInBlockDig extends WrappedPacket {
     protected void load() {
         Class<?> blockDigClass = PacketTypeClasses.Play.Client.BLOCK_DIG;
         try {
-            if (version.isHigherThan(ServerVersion.v_1_7_10)) {
+            if (version.isNewerThan(ServerVersion.v_1_7_10)) {
                 blockPositionClass = NMSUtils.getNMSClass("BlockPosition");
                 enumDirectionClass = NMSUtils.getNMSClass("EnumDirection");
             }
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
         }
-        isVersionLowerThan_v_1_8 = version.isLowerThan(ServerVersion.v_1_8);
+        isVersionLowerThan_v_1_8 = version.isOlderThan(ServerVersion.v_1_8);
 
         if (version != ServerVersion.v_1_7_10) {
             try {

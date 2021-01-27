@@ -67,7 +67,7 @@ public final class NMSUtils {
     public static void load() {
         String legacyNettyPrefix = "net.minecraft.util.io.netty.";
         String newNettyPrefix = "io.netty.";
-        if (version.isHigherThan(ServerVersion.v_1_7_10)) {
+        if (version.isNewerThan(ServerVersion.v_1_7_10)) {
             legacyNettyImportMode = false;
             nettyPrefix = newNettyPrefix;
         }

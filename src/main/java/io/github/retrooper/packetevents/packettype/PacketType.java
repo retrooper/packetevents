@@ -269,7 +269,7 @@ public class PacketType {
                  */
                 public static boolean isBlockPlace(final byte packetID) {
                     final ServerVersion version = PacketEvents.get().getServerUtils().getVersion();
-                    return version.isHigherThan(ServerVersion.v_1_8_8) ?
+                    return version.isNewerThan(ServerVersion.v_1_8_8) ?
                             packetID == Client.USE_ITEM
                             : packetID == Client.BLOCK_PLACE;
                 }

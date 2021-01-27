@@ -80,7 +80,7 @@ public class UpdateChecker {
     }
 
     public String getLatestReleasedVersion() {
-        if (PacketEvents.get().getServerUtils().getVersion().isLowerThan(ServerVersion.v_1_8)) {
+        if (PacketEvents.get().getServerUtils().getVersion().isOlderThan(ServerVersion.v_1_8)) {
             return LowLevelUpdateChecker7.getLatestRelease();
         } else {
             return LowLevelUpdateChecker8.getLatestRelease();
@@ -88,19 +88,16 @@ public class UpdateChecker {
     }
 
     /**
-     * Check for an update and log in the console.
+     * Check for an update and log in the console (ALL DONE ON THE CURRENT THREAD).
      */
     public UpdateCheckerStatus checkForUpdate() {
         PEVersion localVersion = PacketEvents.get().getVersion();
         inform("Checking for an update, please wait...");
-        String versionStr;
         PEVersion newVersion;
         try {
-            versionStr = getLatestReleasedVersion();
-            newVersion = new PEVersion(versionStr);
+            newVersion = new PEVersion(getLatestReleasedVersion());
         } catch (Exception ex) {
             newVersion = null;
-
         }
         if (newVersion != null && localVersion.isOlderThan(newVersion)) {
             inform("There is an update available for the PacketEvents API! Your build: (" + localVersion.toString() + ") | Latest released build: (" + newVersion.toString() + ")");

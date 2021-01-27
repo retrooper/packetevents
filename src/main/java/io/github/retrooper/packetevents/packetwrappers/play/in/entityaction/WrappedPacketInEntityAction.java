@@ -48,7 +48,7 @@ public final class WrappedPacketInEntityAction extends WrappedPacket {
 
     @Override
     protected void load() {
-        isLowerThan_v_1_8 = version.isLowerThan(ServerVersion.v_1_8);
+        isLowerThan_v_1_8 = version.isOlderThan(ServerVersion.v_1_8);
         if (!isLowerThan_v_1_8) {
             enumPlayerActionClass = SubclassUtil.getSubClass(PacketTypeClasses.Play.Client.ENTITY_ACTION, "EnumPlayerAction");
         }

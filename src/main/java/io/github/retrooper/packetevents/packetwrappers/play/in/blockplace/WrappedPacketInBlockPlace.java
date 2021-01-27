@@ -39,8 +39,8 @@ public final class WrappedPacketInBlockPlace extends WrappedPacket {
 
     @Override
     protected void load() {
-        isHigherThan_v_1_8_8 = version.isHigherThan(ServerVersion.v_1_8_8);
-        isHigherThan_v_1_7_10 = version.isHigherThan(ServerVersion.v_1_7_10);
+        isHigherThan_v_1_8_8 = version.isNewerThan(ServerVersion.v_1_8_8);
+        isHigherThan_v_1_7_10 = version.isNewerThan(ServerVersion.v_1_7_10);
     }
 
     public byte getDirection() {

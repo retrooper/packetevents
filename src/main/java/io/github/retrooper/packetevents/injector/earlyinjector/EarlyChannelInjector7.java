@@ -91,7 +91,7 @@ public class EarlyChannelInjector7 implements EarlyInjector {
                         channel.eventLoop().execute(new Runnable() {
                             @Override
                             public void run() {
-                                if (PacketEvents.get().getServerUtils().getVersion().isHigherThan(ServerVersion.v_1_11_2)) {
+                                if (PacketEvents.get().getServerUtils().getVersion().isNewerThan(ServerVersion.v_1_11_2)) {
                                     channel.eventLoop().execute(new Runnable() {
                                         @Override
                                         public void run() {
@@ -108,7 +108,7 @@ public class EarlyChannelInjector7 implements EarlyInjector {
                     channel.eventLoop().execute(new Runnable() {
                         @Override
                         public void run() {
-                            if (PacketEvents.get().getServerUtils().getVersion().isHigherThan(ServerVersion.v_1_11_2)) {
+                            if (PacketEvents.get().getServerUtils().getVersion().isNewerThan(ServerVersion.v_1_11_2)) {
                                 channel.eventLoop().execute(new Runnable() {
                                     @Override
                                     public void run() {

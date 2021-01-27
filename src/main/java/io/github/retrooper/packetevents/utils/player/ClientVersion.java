@@ -213,17 +213,6 @@ public enum ClientVersion {
         return protocolVersion <= target.protocolVersion && (target != UNRESOLVED && this != UNRESOLVED);
     }
 
-    /**
-     * Is this client version equal to the compared client version.
-     * This method simply checks if this client version's protocol version
-     * is equal to the compared client version's protocol version.
-     *
-     * @param target Compared
-     * @return Is this client version equal to the compared client version.
-     */
-    public boolean equals(ClientVersion target) {
-        return protocolVersion == target.protocolVersion;
-    }
 
     /**
      * Is this client version a pre release?

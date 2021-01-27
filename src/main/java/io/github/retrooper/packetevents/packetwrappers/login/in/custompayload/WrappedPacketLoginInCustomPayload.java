@@ -63,7 +63,7 @@ public class WrappedPacketLoginInCustomPayload extends WrappedPacket {
 
     @Override
     public boolean isSupported() {
-        return version.isHigherThan(ServerVersion.v_1_12_2);
+        return version.isNewerThan(ServerVersion.v_1_12_2);
     }
 }
 
