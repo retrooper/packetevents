@@ -28,7 +28,6 @@ import io.github.retrooper.packetevents.packetwrappers.NMSPacket;
 import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
 import io.github.retrooper.packetevents.utils.player.Direction;
 import io.github.retrooper.packetevents.utils.server.ServerVersion;
-import org.jetbrains.annotations.Nullable;
 
 
 public final class WrappedPacketInBlockPlace extends WrappedPacket {
@@ -44,17 +43,16 @@ public final class WrappedPacketInBlockPlace extends WrappedPacket {
         isHigherThan_v_1_7_10 = version.isHigherThan(ServerVersion.v_1_7_10);
     }
 
-    @Nullable
-    public Direction getDirection() {
+    public byte getDirection() {
         if (isHigherThan_v_1_8_8) {
             WrappedPacketInBlockPlace_1_9 blockPlace_1_9 = new WrappedPacketInBlockPlace_1_9(packet);
             return Direction.getByName(((Enum) blockPlace_1_9.getEnumDirectionObject()).name());
         } else if (isHigherThan_v_1_7_10) {
             WrappedPacketInBlockPlace_1_8 blockPlace_1_8 = new WrappedPacketInBlockPlace_1_8(packet);
-            return new Direction((byte) blockPlace_1_8.getFace());
+            return (byte) blockPlace_1_8.getFace();
         } else {
             WrappedPacketInBlockPlace_1_7_10 blockPlace_1_7_10 = new WrappedPacketInBlockPlace_1_7_10(packet);
-            return new Direction((byte) blockPlace_1_7_10.face);
+            return (byte) blockPlace_1_7_10.face;
         }
     }
 

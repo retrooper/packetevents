@@ -139,16 +139,14 @@ public final class WrappedPacketInBlockDig extends WrappedPacket {
      *
      * @return Direction
      */
-    @Nullable
-    public Direction getDirection() {
-        net.minecraft.server.v1_7_R4.PacketPlayInBlockDig bd;
+    public byte getDirection() {
         if (isVersionLowerThan_v_1_8) {
-            return new Direction((byte) readInt(3));
+            return(byte) readInt(3);
         } else {
             if (enumDirObj == null) {
                 enumDirObj = readObject(0, enumDirectionClass);
                 if (enumDirObj == null) {
-                    return null;
+                    return -1; //errorr
                 }
             }
             return Direction.getByName(((Enum) enumDirObj).name());

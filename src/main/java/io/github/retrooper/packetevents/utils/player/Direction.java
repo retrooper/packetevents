@@ -35,81 +35,54 @@ public class Direction {
     /**
      * -Y offset
      */
-    public static final Direction DOWN =  new Direction((byte)0);
+    public static final byte DOWN =  0;
 
     /**
      * +Y offset
      */
-    public static final Direction UP = new Direction((byte)1);
+    public static final byte UP = 1;
 
     /**
      * -Z offset
      */
-    public static final Direction NORTH = new Direction((byte)2);
+    public static final byte NORTH = 2;
 
     /**
      * +Z offset
      */
-    public static final Direction SOUTH = new Direction((byte)3);
+    public static final byte SOUTH = 3;
 
     /**
      * -X offset
      */
-    public static final Direction WEST = new Direction((byte)4);
+    public static final byte WEST = 4;
 
     /**
      * +X offset
      */
-    public static final Direction EAST = new Direction((byte)5);
-
-    private final byte value;
-
-    public Direction(byte value) {
-        this.value = value;
-    }
-
-    public byte getValue() {
-        return value;
-    }
-
-    public boolean isInvalid() {
-        return value < 0 || value > 5;
-    }
-
-    public Direction clone() {
-        return new Direction(value);
-    }
+    public static final byte EAST = 5;
 
     @Deprecated
-    public static Direction getFromName(String name) {
+    public static byte getFromName(String name) {
         return getByName(name);
     }
 
-    public static Direction getByName(String name) {
-        switch (name) {
+    public static byte getByName(String name) {
+        switch (name.toUpperCase()) {
             case "DOWN":
-                return DOWN.clone();
+                return DOWN;
             case "UP":
-                return UP.clone();
+                return UP;
             case "NORTH":
-                return NORTH.clone();
+                return NORTH;
             case "SOUTH":
-                return SOUTH.clone();
+                return SOUTH;
             case "WEST":
-                return WEST.clone();
+                return WEST;
             case "EAST":
-                return EAST.clone();
+                return EAST;
             default:
-                return null;
+                return -1;
         }
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (o instanceof Direction) {
-            Direction direction = (Direction) o;
-            return value == direction.value;
-        }
-        return false;
     }
 }
