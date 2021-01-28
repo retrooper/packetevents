@@ -144,9 +144,10 @@ public enum ServerVersion {
         * We first check if this is the case, if the protocol versions aren't the same, we can just use the protocol versions
         * to compare the server versions.
         */
-        if (target.protocolVersion != protocolVersion) {
+        if (target.protocolVersion != protocolVersion || this == target) {
             return protocolVersion > target.protocolVersion;
         }
+
         /*
          * The server versions unfortunately have the same protocol version.
          * We need to look at this "reversedValues" variable.
@@ -155,10 +156,7 @@ public enum ServerVersion {
          * The first one we find in the array is the newer version.
          */
         for (ServerVersion version : reversedValues) {
-            if (target == this) {
-                return true;
-            }
-            else if (version == target) {
+            if (version == target) {
                 return false;
             }
         }
@@ -179,7 +177,7 @@ public enum ServerVersion {
          * We first check if this is the case, if the protocol versions aren't the same, we can just use the protocol versions
          * to compare the server versions.
          */
-        if (target.protocolVersion != protocolVersion) {
+        if (target.protocolVersion != protocolVersion || this == target) {
             return protocolVersion < target.protocolVersion;
         }
         /*
