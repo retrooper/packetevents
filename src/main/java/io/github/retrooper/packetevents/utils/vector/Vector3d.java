@@ -157,4 +157,9 @@ public class Vector3d {
     public Vector3d clone() {
         return new Vector3d(x, y, z);
     }
+
+    @Override
+    public String toString() {
+        return "X: " + x + ", Y: " + y + "Z: " + z;
+    }
 }

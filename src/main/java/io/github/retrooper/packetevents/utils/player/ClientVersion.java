@@ -173,8 +173,9 @@ public enum ClientVersion {
      * @param target Compared client version.
      * @return Is this client version newer than the compared client version.
      */
-    public boolean isHigherThan(ClientVersion target) {
-        return protocolVersion > target.protocolVersion && (target != UNRESOLVED && this != UNRESOLVED);
+    public boolean isNewerThan(ClientVersion target) {
+        return protocolVersion > target.protocolVersion &&
+                (target != UNRESOLVED && this != UNRESOLVED && target != TEMP_UNRESOLVED && this != TEMP_UNRESOLVED);
     }
 
     /**
@@ -185,8 +186,8 @@ public enum ClientVersion {
      * @param target Compared client version.
      * @return Is this client version newer than or equal to the compared client version.
      */
-    public boolean isHigherThanOrEquals(ClientVersion target) {
-        return protocolVersion >= target.protocolVersion && (target != UNRESOLVED & this != UNRESOLVED);
+    public boolean isNewerThanOrEquals(ClientVersion target) {
+        return this == target || isNewerThan(target);
     }
 
     /**
@@ -197,8 +198,9 @@ public enum ClientVersion {
      * @param target Compared client version.
      * @return Is this client version older than the compared client version.
      */
-    public boolean isLowerThan(ClientVersion target) {
-        return protocolVersion < target.protocolVersion && (target != UNRESOLVED && this != UNRESOLVED);
+    public boolean isOlderThan(ClientVersion target) {
+        return protocolVersion < target.protocolVersion &&
+                (target != UNRESOLVED && this != UNRESOLVED && target != TEMP_UNRESOLVED && this != TEMP_UNRESOLVED);
     }
 
     /**
@@ -209,8 +211,52 @@ public enum ClientVersion {
      * @param target Compared client version.
      * @return Is this client version older than or equal to the compared client version.
      */
+    public boolean isOlderThanOrEquals(ClientVersion target) {
+        return this == target || isOlderThan(target);
+    }
+
+    /**
+     * Deprecated, please use {@link #isNewerThan(ClientVersion)}
+     * @deprecated Rename...
+     * @param target Compared client version.
+     * @return Is this client version newer than the compared client version.
+     */
+    @Deprecated
+    public boolean isHigherThan(ClientVersion target) {
+        return isNewerThan(target);
+    }
+
+    /**
+     * Deprecated, please use {@link #isNewerThanOrEquals(ClientVersion)}
+     * @deprecated Rename...
+     * @param target Compared client version.
+     * @return Is this client version newer than or equal to the compared client version.
+     */
+    @Deprecated
+    public boolean isHigherThanOrEquals(ClientVersion target) {
+        return isNewerThanOrEquals(target);
+    }
+
+    /**
+     * Deprecated, please use {@link #isOlderThan(ClientVersion)}
+     * @deprecated Rename...
+     * @param target Compared client version.
+     * @return Is this client version older than the compared client version.
+     */
+    @Deprecated
+    public boolean isLowerThan(ClientVersion target) {
+        return isOlderThan(target);
+    }
+
+    /**
+     * Deprecated, please use {@link #isOlderThanOrEquals(ClientVersion)}
+     * @deprecated Rename...
+     * @param target Compared client version.
+     * @return Is this client version older than or equal to the compared client version.
+     */
+    @Deprecated
     public boolean isLowerThanOrEquals(ClientVersion target) {
-        return protocolVersion <= target.protocolVersion && (target != UNRESOLVED && this != UNRESOLVED);
+        return isOlderThanOrEquals(target);
     }
 
 

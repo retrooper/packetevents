@@ -24,6 +24,7 @@
 
 package io.github.retrooper.packetevents.event.manager;
 
+import io.github.retrooper.packetevents.PacketEvents;
 import io.github.retrooper.packetevents.event.PacketEvent;
 import io.github.retrooper.packetevents.event.PacketListenerDynamic;
 import io.github.retrooper.packetevents.event.eventtypes.CancellableEvent;
@@ -31,6 +32,7 @@ import io.github.retrooper.packetevents.event.priority.PacketEventPriority;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
 
 class EventManagerDynamic {
     /**
@@ -63,7 +65,8 @@ class EventManagerDynamic {
                 event.call(listener);
             }
             catch (Exception ex) {
-                throw new IllegalStateException("PacketEvents found an exception while calling a packet listener.", ex);
+                PacketEvents.get().getPlugin().getLogger()
+                        .log(Level.SEVERE, "PacketEvents found an exception while calling a packet listener.", ex);
             }
             if (event instanceof CancellableEvent) {
                 CancellableEvent ce = (CancellableEvent) event;

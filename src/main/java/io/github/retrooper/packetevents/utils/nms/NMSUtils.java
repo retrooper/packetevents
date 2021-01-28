@@ -120,8 +120,7 @@ public final class NMSUtils {
                     Class<?> dataWatcher = getNMSClass("DataWatcher");
                     watchableObjectClass = SubclassUtil.getSubClass(dataWatcher, 0);
                 } catch (Exception ex2) {
-                    //1.9+
-                    //ignore
+                    //TODO 1.9+ support
                 }
             }
             try {

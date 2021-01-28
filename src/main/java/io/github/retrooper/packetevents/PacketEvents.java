@@ -67,7 +67,7 @@ import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public final class PacketEvents implements Listener, EventManager {
-    //TODO Do what you just did to server version, to the client version enum, finish unfinished wrappers
+    //TODO finish unfinished wrappers
     private static PacketEvents instance;
     private final PEVersion version = new PEVersion(1, 7, 9, 1);
     private final EventManager eventManager = new PEEventManager();
