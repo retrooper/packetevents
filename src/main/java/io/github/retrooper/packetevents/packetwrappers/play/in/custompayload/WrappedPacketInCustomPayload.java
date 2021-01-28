@@ -32,7 +32,7 @@ import io.github.retrooper.packetevents.utils.nms.NMSUtils;
 import io.github.retrooper.packetevents.utils.reflection.Reflection;
 
 public final class WrappedPacketInCustomPayload extends WrappedPacket {
-    private static Class<?> nmsMinecraftKey, packetDataSerializerClass, byteBufClass;
+    private static Class<?> packetDataSerializerClass, byteBufClass;
 
     private static boolean strPresent, byteArrayPresent;
 
@@ -51,21 +51,14 @@ public final class WrappedPacketInCustomPayload extends WrappedPacket {
         } catch (ClassNotFoundException ignored) {
 
         }
-        try {
-            //Only on 1.13+
-            nmsMinecraftKey = NMSUtils.getNMSClass("MinecraftKey");
-        } catch (ClassNotFoundException e) {
-            //Its okay, this means they are on versions 1.7.10 - 1.12.2
-        }
     }
 
     public String getTag() {
         if (strPresent) {
             return readString(0);
         } else {
-            Object minecraftKey = readObject(0, nmsMinecraftKey);
-            WrappedPacket minecraftKeyWrapper = new WrappedPacket(new NMSPacket(minecraftKey));
-            return minecraftKeyWrapper.readString(1);
+            Object minecraftKey = readObject(0, NMSUtils.minecraftKeyClass);
+            return NMSUtils.getStringFromMinecraftKey(minecraftKey);
         }
     }
 

@@ -51,10 +51,11 @@ public final class NMSUtils {
     private static final String OBC_DIR = ServerVersion.getOBCDirectory() + ".";
     public static ServerVersion version;
     private static String nettyPrefix;
-    public static Constructor<?> blockPosConstructor;
+    public static Constructor<?> blockPosConstructor, minecraftKeyConstructor;
     public static Class<?> nmsEntityClass, minecraftServerClass, craftWorldClass, playerInteractManagerClass, entityPlayerClass, playerConnectionClass, craftServerClass,
             craftPlayerClass, serverConnectionClass, craftEntityClass, nmsItemStackClass, networkManagerClass, nettyChannelClass, gameProfileClass, iChatBaseComponentClass,
-            blockPosClass, enumDirectionClass, vec3DClass, channelFutureClass, blockClass, iBlockDataClass, watchableObjectClass, nmsWorldClass, craftItemStackClass;
+            blockPosClass, enumDirectionClass, vec3DClass, channelFutureClass, blockClass, iBlockDataClass, watchableObjectClass, nmsWorldClass, craftItemStackClass,
+            soundEffectClass, minecraftKeyClass;
     private static Method getCraftPlayerHandle;
     private static Method getCraftEntityHandle;
     private static Method getCraftWorldHandle;
@@ -113,6 +114,8 @@ public final class NMSUtils {
             //IBlockData doesn't exist on 1.7.10
             iBlockDataClass = getNMSClassWithoutException("IBlockData");
             nmsWorldClass = getNMSClass("World");
+            soundEffectClass = getNMSClassWithoutException("SoundEffect");
+            minecraftKeyClass = getNMSClassWithoutException("MinecraftKey");
             try {
                 watchableObjectClass = getNMSClass("WatchableObject");
             } catch (Exception ex) {
@@ -152,6 +155,10 @@ public final class NMSUtils {
             getCraftWorldHandle = craftWorldClass.getMethod("getHandle");
             asBukkitCopy = craftItemStackClass.getMethod("asBukkitCopy", nmsItemStackClass);
             asNMSCopy = craftItemStackClass.getMethod("asNMSCopy", ItemStack.class);
+
+            if (minecraftKeyClass != null) {
+                minecraftKeyConstructor = minecraftKeyClass.getConstructor(String.class);
+            }
         } catch (NoSuchMethodException e) {
             e.printStackTrace();
         }
@@ -344,6 +351,20 @@ public final class NMSUtils {
     public static Object generateNMSBlockPos(double x, double y, double z) {
         try {
             return blockPosConstructor.newInstance(x, y, z);
+        } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    public static String getStringFromMinecraftKey(Object minecraftKey) {
+        WrappedPacket minecraftKeyWrapper = new WrappedPacket(new NMSPacket(minecraftKey));
+        return minecraftKeyWrapper.readString(1);
+    }
+
+    public static Object generateMinecraftKey(String text) {
+        try {
+            return minecraftKeyConstructor.newInstance(text);
         } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
             e.printStackTrace();
         }

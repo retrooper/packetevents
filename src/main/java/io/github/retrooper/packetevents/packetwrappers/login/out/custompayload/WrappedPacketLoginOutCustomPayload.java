@@ -37,10 +37,8 @@ import java.lang.reflect.InvocationTargetException;
 public class WrappedPacketLoginOutCustomPayload extends WrappedPacket implements SendableWrapper {
     private static Constructor<?> constructor;
     private static Constructor<?> packetDataSerializerConstructor;
-    private static Constructor<?> minecraftKeyConstructor;
     private static Class<?> byteBufClass;
     private static Class<?> packetDataSerializerClass;
-    private static Class<?> minecraftKeyClass;
     private int messageID;
     private String channelName;
     private byte[] data;
@@ -54,7 +52,6 @@ public class WrappedPacketLoginOutCustomPayload extends WrappedPacket implements
         Class<?> packetClass = PacketTypeClasses.Login.Server.CUSTOM_PAYLOAD;
         if (packetClass != null) {
             packetDataSerializerClass = NMSUtils.getNMSClassWithoutException("PacketDataSerializer");
-            minecraftKeyClass = NMSUtils.getNMSClassWithoutException("MinecraftKey");
             try {
                 byteBufClass = NMSUtils.getNettyClass("buffer.ByteBuf");
             } catch (ClassNotFoundException ex) {
@@ -64,13 +61,6 @@ public class WrappedPacketLoginOutCustomPayload extends WrappedPacket implements
             try {
                 if (packetDataSerializerClass != null) {
                     packetDataSerializerConstructor = packetDataSerializerClass.getConstructor(byteBufClass);
-                }
-            } catch (NoSuchMethodException e) {
-                e.printStackTrace();
-            }
-            try {
-                if (minecraftKeyClass != null) {
-                    minecraftKeyConstructor = minecraftKeyClass.getConstructor(String.class);
                 }
             } catch (NoSuchMethodException e) {
                 e.printStackTrace();
@@ -93,9 +83,8 @@ public class WrappedPacketLoginOutCustomPayload extends WrappedPacket implements
 
     public String getChannelName() {
         if (packet != null) {
-            Object minecraftKey = readObject(0, minecraftKeyClass);
-            WrappedPacket minecraftKeyWrapper = new WrappedPacket(new NMSPacket(minecraftKey));
-            return minecraftKeyWrapper.readString(1);
+            Object minecraftKey = readObject(0, NMSUtils.minecraftKeyClass);
+           return NMSUtils.getStringFromMinecraftKey(minecraftKey);
         }
         return channelName;
     }
@@ -114,9 +103,8 @@ public class WrappedPacketLoginOutCustomPayload extends WrappedPacket implements
     public Object asNMSPacket() {
         Object byteBufObject = PacketEvents.get().getByteBufUtil().wrappedBuffer(data);
         try {
-            Object minecraftKey = minecraftKeyConstructor.newInstance(channelName);
+            Object minecraftKey = NMSUtils.generateMinecraftKey(channelName);
             Object dataSerializer = packetDataSerializerConstructor.newInstance(byteBufObject);
-
             Object packetInstance = constructor.newInstance();
             WrappedPacket packetWrapper = new WrappedPacket(new NMSPacket(packetInstance));
             packetWrapper.writeInt(0, messageID);

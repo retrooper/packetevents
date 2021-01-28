@@ -39,8 +39,7 @@ import java.lang.reflect.Modifier;
 public class WrappedPacketOutCustomPayload extends WrappedPacket implements SendableWrapper {
     private static Constructor<?> constructor;
     private static Constructor<?> packetDataSerializerConstructor;
-    private static Constructor<?> minecraftKeyConstructor;
-    private static Class<?> byteBufClass, packetDataSerializerClass, minecraftKeyClass;
+    private static Class<?> byteBufClass, packetDataSerializerClass;
     private static int minecraftKeyIndexInClass;
 
     private static byte constructorMode = 0;
@@ -60,7 +59,6 @@ public class WrappedPacketOutCustomPayload extends WrappedPacket implements Send
     protected void load() {
         Class<?> packetClass = PacketTypeClasses.Play.Server.CUSTOM_PAYLOAD;
         packetDataSerializerClass = NMSUtils.getNMSClassWithoutException("PacketDataSerializer");
-        minecraftKeyClass = NMSUtils.getNMSClassWithoutException("MinecraftKey");
         try {
             byteBufClass = NMSUtils.getNettyClass("buffer.ByteBuf");
         } catch (ClassNotFoundException e) {
@@ -71,14 +69,6 @@ public class WrappedPacketOutCustomPayload extends WrappedPacket implements Send
             packetDataSerializerConstructor = packetDataSerializerClass.getConstructor(byteBufClass);
         } catch (NullPointerException | NoSuchMethodException e) {
             //For some reason some 1.7.10 spigots don't have this constructor although its on normal spigot 1.7.10???
-        }
-
-        try {
-            if (minecraftKeyClass != null) {
-                minecraftKeyConstructor = minecraftKeyClass.getConstructor(String.class);
-            }
-        } catch (NoSuchMethodException e) {
-            e.printStackTrace();
         }
 
         //Constructors:
@@ -108,7 +98,7 @@ public class WrappedPacketOutCustomPayload extends WrappedPacket implements Send
                             break;
                         }
                     }
-                    constructor = packetClass.getConstructor(minecraftKeyClass, packetDataSerializerClass);
+                    constructor = packetClass.getConstructor(NMSUtils.minecraftKeyClass, packetDataSerializerClass);
                     constructorMode = 2;
                 } catch (NoSuchMethodException e3) {
                     throw new IllegalStateException("PacketEvents is unable to resolve the PacketPlayOutCustomPayload constructor.");
@@ -124,9 +114,8 @@ public class WrappedPacketOutCustomPayload extends WrappedPacket implements Send
                 case 1:
                     return readString(0);
                 case 2:
-                    Object minecraftKey = readObject(minecraftKeyIndexInClass, minecraftKeyClass);
-                    WrappedPacket minecraftKeyWrapper = new WrappedPacket(new NMSPacket(minecraftKey));
-                    return minecraftKeyWrapper.readString(1);
+                    Object minecraftKey = readObject(minecraftKeyIndexInClass, NMSUtils.minecraftKeyClass);
+                    return NMSUtils.getStringFromMinecraftKey(minecraftKey);
             }
             return null;
         }
@@ -167,7 +156,7 @@ public class WrappedPacketOutCustomPayload extends WrappedPacket implements Send
             case 1:
                 try {
                     Object dataSerializer = packetDataSerializerConstructor.newInstance(byteBufObject);
-                    return constructor.newInstance(tag, dataSerializer);
+                    return constructor.newInstance(getTag(), dataSerializer);
                 } catch (InstantiationException | InvocationTargetException | IllegalAccessException e) {
                     e.printStackTrace();
                 }
@@ -175,7 +164,7 @@ public class WrappedPacketOutCustomPayload extends WrappedPacket implements Send
             case 2:
 
                 try {
-                    Object minecraftKey = minecraftKeyConstructor.newInstance(getTag());
+                    Object minecraftKey = NMSUtils.generateMinecraftKey(getTag());
                     Object dataSerializer = packetDataSerializerConstructor.newInstance(byteBufObject);
                     return constructor.newInstance(minecraftKey, dataSerializer);
                 } catch (InstantiationException | InvocationTargetException | IllegalAccessException e) {
