@@ -25,7 +25,7 @@
 package io.github.retrooper.packetevents.utils.player;
 
 /**
- * The {@code direction} enum represents the face of a block being hit/placed.
+ * The {@code Direction} class contains constants for the different valid faces in the minecraft protocol.
  *
  * @author retrooper
  * @see <a href="https://wiki.vg/Protocol#Player_Digging">https://wiki.vg/Protocol#Player_Digging</a>

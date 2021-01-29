@@ -40,6 +40,7 @@ public class PacketEventsPlugin extends JavaPlugin {
             PacketEvents.get().load();
             PacketEvents.get().init(this);
         }
+
     }
 
     @Override

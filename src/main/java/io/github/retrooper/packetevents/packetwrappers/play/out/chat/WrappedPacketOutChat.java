@@ -33,6 +33,7 @@ import io.github.retrooper.packetevents.utils.reflection.Reflection;
 import io.github.retrooper.packetevents.utils.reflection.SubclassUtil;
 import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.chat.ComponentSerializer;
+import org.jetbrains.annotations.Nullable;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
@@ -41,9 +42,6 @@ import java.util.HashMap;
 import java.util.UUID;
 
 public final class WrappedPacketOutChat extends WrappedPacket implements SendableWrapper {
-    private static final HashMap<ChatPosition, Byte> cachedChatPositions = new HashMap<>();
-    private static final HashMap<Byte, ChatPosition> cachedChatPositionIntegers = new HashMap<>();
-    private static final HashMap<String, Byte> cachedChatMessageTypeIntegers = new HashMap<>();
     private static Constructor<?> chatClassConstructor;
     private static Class<?> packetClass, iChatBaseComponentClass, chatSerializerClass, chatMessageTypeEnum;
     private static Method chatMessageTypeCreatorMethod;
@@ -64,6 +62,9 @@ public final class WrappedPacketOutChat extends WrappedPacket implements Sendabl
         this(message, ChatPosition.CHAT, uuid, isJson);
     }
 
+    public WrappedPacketOutChat(BaseComponent component, UUID uuid) {
+        this(component, ChatPosition.CHAT, uuid);
+    }
 
     public WrappedPacketOutChat(BaseComponent component, ChatPosition pos, UUID uuid) {
         this(ComponentSerializer.toString(component), pos, uuid, true);
@@ -126,23 +127,17 @@ public final class WrappedPacketOutChat extends WrappedPacket implements Sendabl
                     chatClassConstructor = packetClass.getConstructor(iChatBaseComponentClass, int.class);
                     constructorMode = 1;
                 } catch (NoSuchMethodException e2) {
-                    e2.printStackTrace();
+                    try {
+                        //Some weird 1.7.10 spigots remove that int parameter for no reason, I won't keep adding support for any more spigots and might stop
+                        //accepting pull requests for support for spigots breaking things that normal spigot has.
+                        chatClassConstructor = packetClass.getConstructor(iChatBaseComponentClass);
+                        constructorMode = -1;
+                    } catch (NoSuchMethodException noSuchMethodException) {
+                        noSuchMethodException.printStackTrace();
+                    }
                 }
             }
         }
-
-        cachedChatPositions.put(ChatPosition.CHAT, (byte) 0);
-        cachedChatPositions.put(ChatPosition.SYSTEM_MESSAGE, (byte) 1);
-        cachedChatPositions.put(ChatPosition.GAME_INFO, (byte) 2);
-
-        cachedChatPositionIntegers.put((byte) 0, ChatPosition.CHAT);
-        cachedChatPositionIntegers.put((byte) 1, ChatPosition.SYSTEM_MESSAGE);
-        cachedChatPositionIntegers.put((byte) 2, ChatPosition.GAME_INFO);
-
-
-        cachedChatMessageTypeIntegers.put("CHAT", (byte) 0);
-        cachedChatMessageTypeIntegers.put("SYSTEM", (byte) 1);
-        cachedChatMessageTypeIntegers.put("GAME_INFO", (byte) 2);
 
     }
 
@@ -170,26 +165,33 @@ public final class WrappedPacketOutChat extends WrappedPacket implements Sendabl
 
     @Override
     public Object asNMSPacket() {
-        int integerChatPos = cachedChatPositions.get(getChatPosition());
+        byte chatPos = getChatPosition().position;
         Object chatMessageTypeInstance = null;
         if (chatMessageTypeEnum != null) {
             try {
-                chatMessageTypeInstance = chatMessageTypeCreatorMethod.invoke(null, (byte) integerChatPos);
+                chatMessageTypeInstance = chatMessageTypeCreatorMethod.invoke(null, chatPos);
             } catch (IllegalAccessException | InvocationTargetException e) {
                 e.printStackTrace();
             }
         }
         switch (constructorMode) {
+            case -1:
+                try {
+                    return chatClassConstructor.newInstance(toIChatBaseComponent(getMessage()));
+                }
+                catch (InstantiationException | InvocationTargetException | IllegalAccessException e) {
+                    e.printStackTrace();
+                }
             case 0:
                 try {
-                    return chatClassConstructor.newInstance(toIChatBaseComponent(getMessage()), (byte) integerChatPos);
+                    return chatClassConstructor.newInstance(toIChatBaseComponent(getMessage()), chatPos);
                 } catch (InstantiationException | InvocationTargetException | IllegalAccessException e) {
                     e.printStackTrace();
                 }
                 break;
             case 1:
                 try {
-                    return chatClassConstructor.newInstance(toIChatBaseComponent(getMessage()), integerChatPos);
+                    return chatClassConstructor.newInstance(toIChatBaseComponent(getMessage()), (int)chatPos);
                 } catch (InstantiationException | InvocationTargetException | IllegalAccessException e) {
                     e.printStackTrace();
                 }
@@ -243,27 +245,47 @@ public final class WrappedPacketOutChat extends WrappedPacket implements Sendabl
      */
     public ChatPosition getChatPosition() {
         if (packet != null) {
-            byte chatPosInteger = 0;
+            byte chatPositionValue;
             switch (constructorMode) {
+                case -1:
+                    chatPositionValue = ChatPosition.CHAT.position;
+                    break;
                 case 0:
-                    chatPosInteger = readByte(0);
+                    chatPositionValue = readByte(0);
                     break;
                 case 1:
-                    chatPosInteger = (byte) readInt(0);
+                    chatPositionValue = (byte) readInt(0);
                     break;
                 case 2:
                 case 3:
                     Object chatTypeEnumInstance = readObject(0, chatMessageTypeEnum);
-                    chatPosInteger = cachedChatMessageTypeIntegers.get(chatTypeEnumInstance.toString());
+                    return ChatPosition.valueOf(chatTypeEnumInstance.toString());
+                default:
+                    chatPositionValue = 0;
                     break;
             }
-            return cachedChatPositionIntegers.get(chatPosInteger);
+            return ChatPosition.getByPositionValue(chatPositionValue);
         } else {
             return chatPosition;
         }
     }
 
     public enum ChatPosition {
-        CHAT, SYSTEM_MESSAGE, GAME_INFO
+        CHAT((byte)0),
+        SYSTEM_MESSAGE((byte)1),
+        GAME_INFO((byte)2);
+
+        final byte position;
+        ChatPosition(byte position) {
+            this.position = position;
+        }
+
+        public byte getPositionValue() {
+            return position;
+        }
+
+        public static ChatPosition getByPositionValue(byte position) {
+            return values()[position];
+        }
     }
 }
