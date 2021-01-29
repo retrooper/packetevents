@@ -9,8 +9,8 @@ import org.jetbrains.annotations.Nullable;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-
-public class WrappedPacketOutWorldParticles extends WrappedPacket {
+//TODO test and finish
+class WrappedPacketOutWorldParticles extends WrappedPacket {
     private static Class<?> particleEnumClass;
     private static Method particleEnumGetNameMethod;
 
