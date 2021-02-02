@@ -32,7 +32,6 @@ import io.github.retrooper.packetevents.utils.player.Direction;
 import io.github.retrooper.packetevents.utils.reflection.Reflection;
 import io.github.retrooper.packetevents.utils.reflection.SubclassUtil;
 import io.github.retrooper.packetevents.utils.server.ServerVersion;
-import org.jetbrains.annotations.Nullable;
 
 import java.lang.reflect.InvocationTargetException;
 
