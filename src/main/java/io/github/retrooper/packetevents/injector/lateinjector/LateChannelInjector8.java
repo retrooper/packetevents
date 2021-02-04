@@ -39,29 +39,29 @@ public class LateChannelInjector8 implements LateInjector {
         final ChannelDuplexHandler channelDuplexHandler = new ChannelDuplexHandler() {
             @Override
             public void channelRead(ChannelHandlerContext ctx, Object packet) throws Exception {
-                packet = PacketEvents.get().packetHandlerInternal.read(player, ctx.channel(), packet);
+                packet = PacketEvents.get().packetProcessorInternal.read(player, ctx.channel(), packet);
                 if (packet != null) {
                     super.channelRead(ctx, packet);
-                    PacketEvents.get().packetHandlerInternal.postRead(player, ctx.channel(), packet);
+                    PacketEvents.get().packetProcessorInternal.postRead(player, ctx.channel(), packet);
                 }
             }
 
             @Override
             public void write(ChannelHandlerContext ctx, Object packet, ChannelPromise promise) throws Exception {
-                packet = PacketEvents.get().packetHandlerInternal.write(player, ctx.channel(), packet);
+                packet = PacketEvents.get().packetProcessorInternal.write(player, ctx.channel(), packet);
                 if (packet != null) {
                     super.write(ctx, packet, promise);
-                    PacketEvents.get().packetHandlerInternal.postWrite(player, ctx.channel(), packet);
+                    PacketEvents.get().packetProcessorInternal.postWrite(player, ctx.channel(), packet);
                 }
             }
         };
-        final Channel channel = (Channel) PacketEvents.get().packetHandlerInternal.getChannel(player);
+        final Channel channel = (Channel) PacketEvents.get().packetProcessorInternal.getChannel(player);
         channel.pipeline().addBefore("packet_handler", PacketEvents.handlerName, channelDuplexHandler);
     }
 
     @Override
     public void ejectPlayerSync(Player player) {
-        final Channel channel = (Channel) PacketEvents.get().packetHandlerInternal.getChannel(player);
+        final Channel channel = (Channel) PacketEvents.get().packetProcessorInternal.getChannel(player);
         if (channel.pipeline().get(PacketEvents.handlerName) != null) {
             try {
                 channel.pipeline().remove(PacketEvents.handlerName);
@@ -88,7 +88,7 @@ public class LateChannelInjector8 implements LateInjector {
         PacketEvents.get().injectAndEjectExecutorService.execute(new Runnable() {
             @Override
             public void run() {
-                final Channel channel = (Channel) PacketEvents.get().packetHandlerInternal.getChannel(player);
+                final Channel channel = (Channel) PacketEvents.get().packetProcessorInternal.getChannel(player);
                 if (channel.pipeline().get(PacketEvents.handlerName) != null) {
                     try {
                         channel.pipeline().remove(PacketEvents.handlerName);
@@ -96,8 +96,8 @@ public class LateChannelInjector8 implements LateInjector {
 
                     }
                 }
-                PacketEvents.get().packetHandlerInternal.keepAliveMap.remove(player.getUniqueId());
-                PacketEvents.get().packetHandlerInternal.channelMap.remove(player.getName());
+                PacketEvents.get().packetProcessorInternal.keepAliveMap.remove(player.getUniqueId());
+                PacketEvents.get().packetProcessorInternal.channelMap.remove(player.getName());
                 PacketEvents.get().getPlayerUtils().clientVersionsMap.remove(player.getAddress());
                 PacketEvents.get().getPlayerUtils().tempClientVersionMap.remove(player.getAddress());
             }

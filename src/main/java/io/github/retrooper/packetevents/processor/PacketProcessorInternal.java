@@ -22,7 +22,7 @@
  * SOFTWARE.
  */
 
-package io.github.retrooper.packetevents.handler;
+package io.github.retrooper.packetevents.processor;
 
 import io.github.retrooper.packetevents.PacketEvents;
 import io.github.retrooper.packetevents.event.impl.*;
@@ -55,12 +55,12 @@ import java.util.concurrent.ConcurrentHashMap;
  * @see <a href="http://netty.io">http://netty.io</a>
  * @since 1.7.9
  */
-public class PacketHandlerInternal {
+public class PacketProcessorInternal {
     public final GlobalChannelInjector injector = new GlobalChannelInjector();
     public final Map<UUID, Long> keepAliveMap = new HashMap<>();
     public final Map<String, Object> channelMap = new WeakHashMap<>();
 
-    public PacketHandlerInternal() {
+    public PacketProcessorInternal() {
         injector.prepare();
     }
 

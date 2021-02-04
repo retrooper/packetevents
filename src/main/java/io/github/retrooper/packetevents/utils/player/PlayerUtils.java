@@ -189,7 +189,7 @@ public final class PlayerUtils {
      * @param player Target player.
      */
     public void injectPlayer(final Player player) {
-        PacketEvents.get().packetHandlerInternal.injectPlayer(player);
+        PacketEvents.get().packetProcessorInternal.injectPlayer(player);
     }
 
     /**
@@ -202,7 +202,7 @@ public final class PlayerUtils {
      * @param player Target player.
      */
     public void ejectPlayer(final Player player) {
-        PacketEvents.get().packetHandlerInternal.ejectPlayer(player);
+        PacketEvents.get().packetProcessorInternal.ejectPlayer(player);
     }
 
     /**
@@ -212,7 +212,7 @@ public final class PlayerUtils {
      * @param wrapper Client-bound wrapper supporting sending.
      */
     public void sendPacket(final Player player, final SendableWrapper wrapper) {
-        PacketEvents.get().packetHandlerInternal.sendPacket(NMSUtils.getChannel(player), wrapper.asNMSPacket());
+        PacketEvents.get().packetProcessorInternal.sendPacket(NMSUtils.getChannel(player), wrapper.asNMSPacket());
     }
 
     /**
@@ -222,7 +222,7 @@ public final class PlayerUtils {
      * @param packet Client-bound raw NMS packet.
      */
     public void sendNMSPacket(final Player player, final Object packet) {
-        PacketEvents.get().packetHandlerInternal.sendPacket(NMSUtils.getChannel(player), packet);
+        PacketEvents.get().packetProcessorInternal.sendPacket(NMSUtils.getChannel(player), packet);
     }
 
     /**
@@ -232,7 +232,7 @@ public final class PlayerUtils {
      * @param wrapper Client-bound raw NMS packet.
      */
     public void sendPacket(final Object channel, final SendableWrapper wrapper) {
-        PacketEvents.get().packetHandlerInternal.sendPacket(channel, wrapper.asNMSPacket());
+        PacketEvents.get().packetProcessorInternal.sendPacket(channel, wrapper.asNMSPacket());
     }
 
     /**
@@ -242,6 +242,6 @@ public final class PlayerUtils {
      * @param packet  Client-bound raw NMS packet.
      */
     public void sendNMSPacket(final Object channel, final Object packet) {
-        PacketEvents.get().packetHandlerInternal.sendPacket(channel, packet);
+        PacketEvents.get().packetProcessorInternal.sendPacket(channel, packet);
     }
 }

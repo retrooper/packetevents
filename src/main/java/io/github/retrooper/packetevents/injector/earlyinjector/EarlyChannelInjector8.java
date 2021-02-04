@@ -217,7 +217,7 @@ public class EarlyChannelInjector8 implements EarlyInjector {
      */
     @Override
     public void injectPlayerSync(Player player) {
-        Channel channel = (Channel) PacketEvents.get().packetHandlerInternal.getChannel(player);
+        Channel channel = (Channel) PacketEvents.get().packetProcessorInternal.getChannel(player);
         injectChannel(channel).player = player;
     }
 
@@ -228,7 +228,7 @@ public class EarlyChannelInjector8 implements EarlyInjector {
      */
     @Override
     public void ejectPlayerSync(Player player) {
-        Channel channel = (Channel) PacketEvents.get().packetHandlerInternal.getChannel(player);
+        Channel channel = (Channel) PacketEvents.get().packetProcessorInternal.getChannel(player);
         ejectChannel(channel);
         PacketEvents.get().getPlayerUtils().clientVersionsMap.remove(player.getAddress());
         PacketEvents.get().getPlayerUtils().tempClientVersionMap.remove(player.getAddress());
@@ -244,7 +244,7 @@ public class EarlyChannelInjector8 implements EarlyInjector {
         PacketEvents.get().injectAndEjectExecutorService.execute(new Runnable() {
             @Override
             public void run() {
-                Channel channel = (Channel) PacketEvents.get().packetHandlerInternal.getChannel(player);
+                Channel channel = (Channel) PacketEvents.get().packetProcessorInternal.getChannel(player);
                 injectChannel(channel).player = player;
             }
         });
@@ -260,10 +260,10 @@ public class EarlyChannelInjector8 implements EarlyInjector {
         PacketEvents.get().injectAndEjectExecutorService.execute(new Runnable() {
             @Override
             public void run() {
-                Channel channel = (Channel) PacketEvents.get().packetHandlerInternal.getChannel(player);
+                Channel channel = (Channel) PacketEvents.get().packetProcessorInternal.getChannel(player);
                 ejectChannel(channel);
-                PacketEvents.get().packetHandlerInternal.keepAliveMap.remove(player.getUniqueId());
-                PacketEvents.get().packetHandlerInternal.channelMap.remove(player.getName());
+                PacketEvents.get().packetProcessorInternal.keepAliveMap.remove(player.getUniqueId());
+                PacketEvents.get().packetProcessorInternal.channelMap.remove(player.getName());
                 PacketEvents.get().getPlayerUtils().clientVersionsMap.remove(player.getAddress());
                 PacketEvents.get().getPlayerUtils().tempClientVersionMap.remove(player.getAddress());
             }
@@ -305,10 +305,10 @@ public class EarlyChannelInjector8 implements EarlyInjector {
          */
         @Override
         public void channelRead(final ChannelHandlerContext ctx, Object packet) throws Exception {
-            packet = PacketEvents.get().packetHandlerInternal.read(player, ctx.channel(), packet);
+            packet = PacketEvents.get().packetProcessorInternal.read(player, ctx.channel(), packet);
             if (packet != null) {
                 super.channelRead(ctx, packet);
-                PacketEvents.get().packetHandlerInternal.postRead(player, ctx.channel(), packet);
+                PacketEvents.get().packetProcessorInternal.postRead(player, ctx.channel(), packet);
             }
         }
 
@@ -322,10 +322,10 @@ public class EarlyChannelInjector8 implements EarlyInjector {
          */
         @Override
         public void write(final ChannelHandlerContext ctx, Object packet, final ChannelPromise promise) throws Exception {
-            packet = PacketEvents.get().packetHandlerInternal.write(player, ctx.channel(), packet);
+            packet = PacketEvents.get().packetProcessorInternal.write(player, ctx.channel(), packet);
             if (packet != null) {
                 super.write(ctx, packet, promise);
-                PacketEvents.get().packetHandlerInternal.postWrite(player, ctx.channel(), packet);
+                PacketEvents.get().packetProcessorInternal.postWrite(player, ctx.channel(), packet);
             }
         }
     }

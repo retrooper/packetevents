@@ -151,7 +151,7 @@ public class WrappedPacket implements WrapperPacketReader, WrapperPacketWriter {
 
     @Override
     public String[] readStringArray(int index) {
-        return read(index, String[].class); // Can we be sure that returning the original array is okay?
+        return read(index, String[].class); // JavaImpact: Can we be sure that returning the original array is okay? retrooper: Yes
     }
 
     @Override

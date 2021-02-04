@@ -43,16 +43,16 @@ public final class WrappedPacketInBlockPlace extends WrappedPacket {
         isHigherThan_v_1_7_10 = version.isNewerThan(ServerVersion.v_1_7_10);
     }
 
-    public byte getDirection() {
+    public Direction getDirection() {
         if (isHigherThan_v_1_8_8) {
             WrappedPacketInBlockPlace_1_9 blockPlace_1_9 = new WrappedPacketInBlockPlace_1_9(packet);
-            return Direction.getByName(((Enum) blockPlace_1_9.getEnumDirectionObject()).name());
+            return Direction.valueOf(((Enum) blockPlace_1_9.getEnumDirectionObject()).name());
         } else if (isHigherThan_v_1_7_10) {
             WrappedPacketInBlockPlace_1_8 blockPlace_1_8 = new WrappedPacketInBlockPlace_1_8(packet);
-            return (byte) blockPlace_1_8.getFace();
+            return Direction.values()[blockPlace_1_8.getFace()];
         } else {
             WrappedPacketInBlockPlace_1_7_10 blockPlace_1_7_10 = new WrappedPacketInBlockPlace_1_7_10(packet);
-            return (byte) blockPlace_1_7_10.face;
+            return Direction.values()[blockPlace_1_7_10.face];
         }
     }
 

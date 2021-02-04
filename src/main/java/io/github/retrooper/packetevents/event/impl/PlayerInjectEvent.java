@@ -54,7 +54,7 @@ public final class PlayerInjectEvent extends PacketEvent implements CancellableE
 
     public PlayerInjectEvent(final Player player, final boolean isAsync) {
         this.player = player;
-        this.address = ChannelUtils.getSocketAddress(PacketEvents.get().packetHandlerInternal.getChannel(player));
+        this.address = ChannelUtils.getSocketAddress(PacketEvents.get().packetProcessorInternal.getChannel(player));
         this.async = isAsync;
     }
 

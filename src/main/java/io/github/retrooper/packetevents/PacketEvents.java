@@ -28,7 +28,7 @@ import io.github.retrooper.packetevents.event.impl.PostPlayerInjectEvent;
 import io.github.retrooper.packetevents.event.manager.EventManager;
 import io.github.retrooper.packetevents.event.manager.PEEventManager;
 import io.github.retrooper.packetevents.exceptions.PacketEventsLoadFailureException;
-import io.github.retrooper.packetevents.handler.PacketHandlerInternal;
+import io.github.retrooper.packetevents.processor.PacketProcessorInternal;
 import io.github.retrooper.packetevents.packettype.PacketTypeClasses;
 import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
 import io.github.retrooper.packetevents.settings.PacketEventsSettings;
@@ -80,7 +80,7 @@ public final class PacketEvents implements Listener, EventManager {
     //Executor used for player injecting/ejecting.
     public ExecutorService injectAndEjectExecutorService;//Initiated in init method
 
-    public PacketHandlerInternal packetHandlerInternal;
+    public PacketProcessorInternal packetProcessorInternal;
     private boolean loading, loaded, initialized, initializing, terminating;
     private PacketEventsSettings settings = new PacketEventsSettings();
     private final ByteBufUtil byteBufUtil = NMSUtils.legacyNettyImportMode ? new ByteBufUtil_7() : new ByteBufUtil_8();
@@ -162,7 +162,7 @@ public final class PacketEvents implements Listener, EventManager {
             plugin = pl;
             Bukkit.getPluginManager().registerEvents(this, plugin);
             handlerName = "pe-" + plugin.getName();
-            packetHandlerInternal = new PacketHandlerInternal();
+            packetProcessorInternal = new PacketProcessorInternal();
             for (final Player p : Bukkit.getOnlinePlayers()) {
                 try {
                     getPlayerUtils().injectPlayer(p);
@@ -188,9 +188,9 @@ public final class PacketEvents implements Listener, EventManager {
     public void terminate() {
         if (initialized && !terminating) {
             for (Player player : Bukkit.getOnlinePlayers()) {
-                packetHandlerInternal.ejectPlayer(player);
+                packetProcessorInternal.ejectPlayer(player);
             }
-            packetHandlerInternal.cleanup();
+            packetProcessorInternal.cleanup();
 
             getEventManager().unregisterAllListeners();
             injectAndEjectExecutorService.shutdownNow();
@@ -274,7 +274,7 @@ public final class PacketEvents implements Listener, EventManager {
     public void onLogin(final PlayerLoginEvent e) {
         if (getSettings().shouldInjectEarly()) {
             try {
-                packetHandlerInternal.injectPlayer(e.getPlayer());
+                packetProcessorInternal.injectPlayer(e.getPlayer());
             } catch (Exception ex) {
                e.disallow(PlayerLoginEvent.Result.KICK_OTHER, PacketEvents.get().getSettings().getInjectionFailureMessage());
             }
@@ -310,7 +310,7 @@ public final class PacketEvents implements Listener, EventManager {
 
         if (!getSettings().shouldInjectEarly()) {
             try {
-                packetHandlerInternal.injectPlayer(e.getPlayer());
+                packetProcessorInternal.injectPlayer(e.getPlayer());
                 //Injection was successful as no exception was thrown...
                 if (!viaAvailable) {
                     if (ProtocolLibVersionLookupUtils.isAvailable()) {
@@ -333,7 +333,7 @@ public final class PacketEvents implements Listener, EventManager {
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onQuit(final PlayerQuitEvent e) {
         UUID uuid = e.getPlayer().getUniqueId();
-        packetHandlerInternal.ejectPlayer(e.getPlayer());
+        packetProcessorInternal.ejectPlayer(e.getPlayer());
         instance.getPlayerUtils().loginTime.remove(uuid);
         instance.getPlayerUtils().playerPingMap.remove(uuid);
         instance.getPlayerUtils().playerSmoothedPingMap.remove(uuid);

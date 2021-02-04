@@ -31,58 +31,40 @@ package io.github.retrooper.packetevents.utils.player;
  * @see <a href="https://wiki.vg/Protocol#Player_Digging">https://wiki.vg/Protocol#Player_Digging</a>
  * @since 1.7.8
  */
-public class Direction {
+public enum Direction {
     /**
      * -Y offset
      */
-    public static final byte DOWN =  0;
+    DOWN,
 
     /**
      * +Y offset
      */
-    public static final byte UP = 1;
+    UP,
 
     /**
      * -Z offset
      */
-    public static final byte NORTH = 2;
+    NORTH,
 
     /**
      * +Z offset
      */
-    public static final byte SOUTH = 3;
+    SOUTH,
 
     /**
      * -X offset
      */
-    public static final byte WEST = 4;
+    WEST,
 
     /**
      * +X offset
      */
-    public static final byte EAST = 5;
+    EAST,
 
-    @Deprecated
-    public static byte getFromName(String name) {
-        return getByName(name);
-    }
+    INVALID;
 
-    public static byte getByName(String name) {
-        switch (name.toUpperCase()) {
-            case "DOWN":
-                return DOWN;
-            case "UP":
-                return UP;
-            case "NORTH":
-                return NORTH;
-            case "SOUTH":
-                return SOUTH;
-            case "WEST":
-                return WEST;
-            case "EAST":
-                return EAST;
-            default:
-                return -1;
-        }
+    public byte getFaceValue() {
+        return (byte) ordinal();
     }
 }
