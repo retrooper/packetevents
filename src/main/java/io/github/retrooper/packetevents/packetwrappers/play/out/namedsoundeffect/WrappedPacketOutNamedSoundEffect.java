@@ -5,18 +5,13 @@ import io.github.retrooper.packetevents.packetwrappers.SendableWrapper;
 import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
 import io.github.retrooper.packetevents.utils.nms.NMSUtils;
 import io.github.retrooper.packetevents.utils.reflection.Reflection;
+import io.github.retrooper.packetevents.utils.server.ServerVersion;
 
-//TODO finish
+//TODO test
 class WrappedPacketOutNamedSoundEffect extends WrappedPacket implements SendableWrapper {
     private static boolean soundEffectVarExists;
     public WrappedPacketOutNamedSoundEffect(NMSPacket packet) {
         super(packet);
-        /*net.minecraft.server.v1_7_R4.PacketPlayOutNamedSoundEffect nse1;
-        net.minecraft.server.v1_8_R3.PacketPlayOutNamedSoundEffect nse2;
-        net.minecraft.server.v1_9_R1.PacketPlayOutNamedSoundEffect nse3;
-        net.minecraft.server.v1_12_R1.PacketPlayOutNamedSoundEffect nse4;
-        net.minecraft.server.v1_13_R2.PacketPlayOutNamedSoundEffect nse5;
-        net.minecraft.server.v1_16_R2.PacketPlayOutNamedSoundEffect nse6;*/
     }
 
     @Override
@@ -41,4 +36,29 @@ class WrappedPacketOutNamedSoundEffect extends WrappedPacket implements Sendable
         }
     }
 
+    public double getEffectPositionX() {
+        return readInt(0) / 8.0D;
+    }
+
+    public double getEffectPositionY() {
+        return readInt(1) / 8.0D;
+    }
+
+    public double getEffectPositionZ() {
+        return readInt(2) / 8.0D;
+    }
+
+    //Might be more than 1.0 on some older versions
+    public float getVolume(){
+        return readFloat(0);
+    }
+
+    public float getPitch() {
+        if (version.isOlderThan(ServerVersion.v_1_10)) {
+            return readInt(1);
+        }
+        else {
+            return readFloat(1);
+        }
+    }
 }

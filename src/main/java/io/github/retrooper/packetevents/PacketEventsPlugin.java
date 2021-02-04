@@ -27,6 +27,7 @@ package io.github.retrooper.packetevents;
 import org.bukkit.plugin.java.JavaPlugin;
 
 public class PacketEventsPlugin extends JavaPlugin {
+    private static PacketEventsPlugin INSTANCE;
 
     @Override
     public void onLoad() {
@@ -35,6 +36,7 @@ public class PacketEventsPlugin extends JavaPlugin {
 
     @Override
     public void onEnable() {
+        INSTANCE = this;
         if (PacketEvents.get() == null) {
             PacketEvents.create(this);
             PacketEvents.get().load();
