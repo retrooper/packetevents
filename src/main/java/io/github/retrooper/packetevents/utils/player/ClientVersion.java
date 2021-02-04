@@ -26,6 +26,7 @@ package io.github.retrooper.packetevents.utils.player;
 
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -101,10 +102,12 @@ public enum ClientVersion {
 
     UNKNOWN(-1);
 
-    private static final short lowestSupportedProtocolVersion = (short) (LOWER_THAN_SUPPORTED_VERSIONS.protocolVersion + 1);
-    private static final short highestSupportedProtocolVersion = (short) (HIGHER_THAN_SUPPORTED_VERSIONS.protocolVersion - 1);
+    private static final short LOWEST_SUPPORTED_PROTOCOL_VERSION = (short) (LOWER_THAN_SUPPORTED_VERSIONS.protocolVersion + 1);
+    private static final short HIGHEST_SUPPORTED_PROTOCOL_VERSION = (short) (HIGHER_THAN_SUPPORTED_VERSIONS.protocolVersion - 1);
 
     private static final Map<Short, ClientVersion> clientVersionCache = new HashMap<>();
+    private static final int[] CLIENT_VERSIONS = new int[] { 5, 47, 107, 108, 109, 110, 210, 315, 316, 335, 338,
+            340, 393, 401, 404, 477, 480, 485, 490, 498, 573, 575, 578, 735, 736, 751, 753, 754 };
     private short protocolVersion;
 
     ClientVersion(int protocolVersion) {
@@ -121,9 +124,9 @@ public enum ClientVersion {
     public static ClientVersion getClientVersion(short protocolVersion) {
         if (protocolVersion == -1) {
             return ClientVersion.UNRESOLVED;
-        } else if (protocolVersion < lowestSupportedProtocolVersion) {
+        } else if (protocolVersion < LOWEST_SUPPORTED_PROTOCOL_VERSION) {
             return LOWER_THAN_SUPPORTED_VERSIONS;
-        } else if (protocolVersion > highestSupportedProtocolVersion) {
+        } else if (protocolVersion > HIGHEST_SUPPORTED_PROTOCOL_VERSION) {
             return HIGHER_THAN_SUPPORTED_VERSIONS;
         } else {
             ClientVersion cached = clientVersionCache.get(protocolVersion);
@@ -267,16 +270,11 @@ public enum ClientVersion {
      * @return Is pre release
      */
     public boolean isPreRelease() {
-        if (protocolVersion > lowestSupportedProtocolVersion && protocolVersion < highestSupportedProtocolVersion) {
+        if (protocolVersion > LOWEST_SUPPORTED_PROTOCOL_VERSION && protocolVersion < HIGHEST_SUPPORTED_PROTOCOL_VERSION) {
             //We don't have to iterate through the LOWEST and the HIGHEST supported version anymore...
-            final ClientVersion[] versions = values();
-            for (int i = 1; i < versions.length - 1; i++) {
-                if (protocolVersion == versions[i].protocolVersion) {
-                    return true;
-                }
-            }
+            return Arrays.binarySearch(CLIENT_VERSIONS, protocolVersion) < 0;
         }
-        return false;
+        return true;
     }
 
     /**

@@ -33,7 +33,7 @@ import io.github.retrooper.packetevents.utils.server.ServerVersion;
  * @since 1.5.8
  */
 public class PacketEventsSettings {
-    private boolean locked = false;
+    private boolean locked;
     private ServerVersion backupServerVersion = ServerVersion.v_1_7_10;
     private boolean injectAsync = true;
 

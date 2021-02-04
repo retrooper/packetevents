@@ -33,12 +33,10 @@ import io.github.retrooper.packetevents.utils.reflection.Reflection;
 import io.github.retrooper.packetevents.utils.reflection.SubclassUtil;
 import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.chat.ComponentSerializer;
-import org.jetbrains.annotations.Nullable;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.HashMap;
 import java.util.UUID;
 
 public final class WrappedPacketOutChat extends WrappedPacket implements SendableWrapper {
