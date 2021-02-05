@@ -31,7 +31,7 @@ import io.github.retrooper.packetevents.utils.server.ServerVersion;
 
 
 public final class WrappedPacketInBlockPlace extends WrappedPacket {
-    private static boolean isHigherThan_v_1_8_8, isHigherThan_v_1_7_10;
+    private static boolean isHigherThan_v_1_8_8, isHigherThan_v_1_7_10, isOlderThan_v_1_9;
 
     public WrappedPacketInBlockPlace(final NMSPacket packet) {
         super(packet);
@@ -41,6 +41,7 @@ public final class WrappedPacketInBlockPlace extends WrappedPacket {
     protected void load() {
         isHigherThan_v_1_8_8 = version.isNewerThan(ServerVersion.v_1_8_8);
         isHigherThan_v_1_7_10 = version.isNewerThan(ServerVersion.v_1_7_10);
+        isOlderThan_v_1_9 = version.isOlderThan(ServerVersion.v_1_9);
     }
 
     public Direction getDirection() {
@@ -73,7 +74,6 @@ public final class WrappedPacketInBlockPlace extends WrappedPacket {
         if (isHigherThan_v_1_8_8) {
             WrappedPacketInBlockPlace_1_9 blockPlace_1_9 = new WrappedPacketInBlockPlace_1_9(packet);
             return blockPlace_1_9.getY();
-
         } else if (isHigherThan_v_1_7_10) {
             WrappedPacketInBlockPlace_1_8 blockPlace_1_8 = new WrappedPacketInBlockPlace_1_8(packet);
             return blockPlace_1_8.getY();
@@ -96,4 +96,63 @@ public final class WrappedPacketInBlockPlace extends WrappedPacket {
         }
     }
 
+    /**
+     * Returns the cursorX value from the packet inputted.
+     * Only supported from 1.7 to 1.8.8.
+     *
+     * @return cursorX from PacketPlayInBlockPlace
+     */
+    public float getCursorX() {
+        if (isOlderThan_v_1_9) {
+            if (isHigherThan_v_1_7_10) {
+                WrappedPacketInBlockPlace_1_8 blockPlace_1_8 = new WrappedPacketInBlockPlace_1_8(packet);
+                return blockPlace_1_8.getCursorX();
+            } else {
+                WrappedPacketInBlockPlace_1_7_10 blockPlace_1_7_10 = new WrappedPacketInBlockPlace_1_7_10(packet);
+                return blockPlace_1_7_10.cursorX;
+            }
+        } else {
+            throw new UnsupportedOperationException("Operation WrappedPacketInBlockPlace#getCursorX is not available for versions higher than 1.8.8");
+        }
+    }
+
+    /**
+     * Returns the cursorY value from the packet inputted.
+     * Only supported from 1.7 to 1.8.8.
+     *
+     * @return cursorY from PacketPlayInBlockPlace
+     */
+    public float getCursorY() {
+        if (isOlderThan_v_1_9) {
+            if (isHigherThan_v_1_7_10) {
+                WrappedPacketInBlockPlace_1_8 blockPlace_1_8 = new WrappedPacketInBlockPlace_1_8(packet);
+                return blockPlace_1_8.getCursorY();
+            } else {
+                WrappedPacketInBlockPlace_1_7_10 blockPlace_1_7_10 = new WrappedPacketInBlockPlace_1_7_10(packet);
+                return blockPlace_1_7_10.cursorY;
+            }
+        } else {
+            throw new UnsupportedOperationException("Operation WrappedPacketInBlockPlace#getCursorY is not available for versions higher than 1.8.8");
+        }
+    }
+
+    /**
+     * Returns the cursorZ value from the packet inputted.
+     * Only supported from 1.7 to 1.8.8.
+     *
+     * @return cursorZ from PacketPlayInBlockPlace
+     */
+    public float getCursorZ() {
+        if (isOlderThan_v_1_9) {
+            if (isHigherThan_v_1_7_10) {
+                WrappedPacketInBlockPlace_1_8 blockPlace_1_8 = new WrappedPacketInBlockPlace_1_8(packet);
+                return blockPlace_1_8.getCursorZ();
+            } else {
+                WrappedPacketInBlockPlace_1_7_10 blockPlace_1_7_10 = new WrappedPacketInBlockPlace_1_7_10(packet);
+                return blockPlace_1_7_10.cursorZ;
+            }
+        } else {
+            throw new UnsupportedOperationException("Operation WrappedPacketInBlockPlace#getCursorZ is not available for versions higher than 1.8.8");
+        }
+    }
 }

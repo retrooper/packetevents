@@ -32,6 +32,7 @@ final class WrappedPacketInBlockPlace_1_7_10 extends WrappedPacket {
     public int x, y, z;
     public ItemStack itemStack;
     public int face;
+    public float cursorX, cursorY, cursorZ;
 
     WrappedPacketInBlockPlace_1_7_10(final NMSPacket packet) {
         super(packet);
@@ -46,5 +47,9 @@ final class WrappedPacketInBlockPlace_1_7_10 extends WrappedPacket {
 
         net.minecraft.server.v1_7_R4.ItemStack stack = blockPlace.getItemStack();
         this.itemStack = org.bukkit.craftbukkit.v1_7_R4.inventory.CraftItemStack.asBukkitCopy(stack);
+
+        cursorX = blockPlace.h();
+        cursorY = blockPlace.i();
+        cursorZ = blockPlace.j();
     }
 }

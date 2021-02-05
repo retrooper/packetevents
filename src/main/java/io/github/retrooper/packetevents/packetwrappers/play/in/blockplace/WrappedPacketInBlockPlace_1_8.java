@@ -83,4 +83,16 @@ final class WrappedPacketInBlockPlace_1_8 extends WrappedPacket {
     public int getFace() {
         return readInt(0);
     }
+
+    public float getCursorX() {
+        return readFloat(0);
+    }
+
+    public float getCursorY() {
+        return readFloat(1);
+    }
+
+    public float getCursorZ() {
+        return readFloat(2);
+    }
 }
