@@ -62,9 +62,37 @@ public enum Direction {
      */
     EAST,
 
+    /**
+     * Face is set to 255
+     */
+    OTHER((short)255),
+
+    /**
+     * Should not happen.... Invalid value?
+     */
     INVALID;
 
-    public byte getFaceValue() {
-        return (byte) ordinal();
+    short face;
+
+    Direction(short face) {
+        this.face = face;
+    }
+
+    Direction() {
+        this.face = (short) ordinal();
+    }
+
+    public static Direction getDirection(int face) {
+        if (face == 255) {
+            return OTHER;
+        }
+        else if (face < 0 || face > 5) {
+            return INVALID;
+        }
+        return values()[face];
+    }
+
+    public short getFaceValue() {
+        return face;
     }
 }

@@ -101,6 +101,7 @@
             <version>20.1.0</version>
             <scope>compile</scope>
         </dependency>
+
         <dependency>
             <groupId>org.github.spigot</groupId>
             <artifactId>1.16.2</artifactId>
@@ -117,8 +118,22 @@
 
         <dependency>
             <groupId>org.github.spigot</groupId>
+            <artifactId>1.13</artifactId>
+            <version>1.13</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.github.spigot</groupId>
             <artifactId>1.12.2</artifactId>
             <version>1.12.2</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.github.spigot</groupId>
+            <artifactId>1.9.4</artifactId>
+            <version>1.9.4</version>
             <scope>provided</scope>
         </dependency>
 
