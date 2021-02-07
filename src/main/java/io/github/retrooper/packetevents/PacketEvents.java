@@ -69,7 +69,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 public final class PacketEvents implements Listener, EventManager {
     //TODO finish unfinished wrappers
     private static PacketEvents instance;
-    private final PEVersion version = new PEVersion(1, 7, 9, 1);
+    private final PEVersion version = new PEVersion(1, 7, 9, 3);
     private final EventManager eventManager = new PEEventManager();
     private final PlayerUtils playerUtils = new PlayerUtils();
     private final ServerUtils serverUtils = new ServerUtils();
