@@ -221,6 +221,13 @@ public class EarlyChannelInjector8 implements EarlyInjector {
         injectChannel(channel).player = player;
     }
 
+    @Override
+    public void injectPlayersSync(List<Player> players) {
+        for (Player player : players) {
+            injectPlayersSync(players);
+        }
+    }
+
     /**
      * Eject a player on the current thread.
      *
@@ -232,6 +239,13 @@ public class EarlyChannelInjector8 implements EarlyInjector {
         ejectChannel(channel);
         PacketEvents.get().getPlayerUtils().clientVersionsMap.remove(player.getAddress());
         PacketEvents.get().getPlayerUtils().tempClientVersionMap.remove(player.getAddress());
+    }
+
+    @Override
+    public void ejectPlayersSync(List<Player> players) {
+        for (Player player : players) {
+            ejectPlayersSync(players);
+        }
     }
 
     /**
@@ -246,6 +260,19 @@ public class EarlyChannelInjector8 implements EarlyInjector {
             public void run() {
                 Channel channel = (Channel) PacketEvents.get().packetProcessorInternal.getChannel(player);
                 injectChannel(channel).player = player;
+            }
+        });
+    }
+
+    @Override
+    public void injectPlayersAsync(List<Player> players) {
+        PacketEvents.get().injectAndEjectExecutorService.execute(new Runnable() {
+            @Override
+            public void run() {
+                for (Player player : players) {
+                    Channel channel = (Channel) PacketEvents.get().packetProcessorInternal.getChannel(player);
+                    injectChannel(channel).player = player;
+                }
             }
         });
     }
@@ -268,6 +295,24 @@ public class EarlyChannelInjector8 implements EarlyInjector {
                 PacketEvents.get().getPlayerUtils().tempClientVersionMap.remove(player.getAddress());
             }
         });
+    }
+
+    @Override
+    public void ejectPlayersAsync(List<Player> players) {
+        PacketEvents.get().injectAndEjectExecutorService.execute(new Runnable() {
+            @Override
+            public void run() {
+                for (Player player : players) {
+                    Channel channel = (Channel) PacketEvents.get().packetProcessorInternal.getChannel(player);
+                    ejectChannel(channel);
+                    PacketEvents.get().packetProcessorInternal.keepAliveMap.remove(player.getUniqueId());
+                    PacketEvents.get().packetProcessorInternal.channelMap.remove(player.getName());
+                    PacketEvents.get().getPlayerUtils().clientVersionsMap.remove(player.getAddress());
+                    PacketEvents.get().getPlayerUtils().tempClientVersionMap.remove(player.getAddress());
+                }
+            }
+        });
+
     }
 
     /**

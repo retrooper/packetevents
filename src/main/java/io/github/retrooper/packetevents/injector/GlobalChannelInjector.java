@@ -8,6 +8,8 @@ import io.github.retrooper.packetevents.injector.lateinjector.LateChannelInjecto
 import io.github.retrooper.packetevents.utils.nms.NMSUtils;
 import org.bukkit.entity.Player;
 
+import java.util.List;
+
 public class GlobalChannelInjector implements ChannelInjector {
     private final ChannelInjector injector;
 
@@ -44,8 +46,18 @@ public class GlobalChannelInjector implements ChannelInjector {
     }
 
     @Override
+    public void injectPlayersSync(List<Player> players) {
+        injector.injectPlayersSync(players);
+    }
+
+    @Override
     public void ejectPlayerSync(Player player) {
         injector.ejectPlayerSync(player);
+    }
+
+    @Override
+    public void ejectPlayersSync(List<Player> players) {
+        injector.ejectPlayersSync(players);
     }
 
     @Override
@@ -54,8 +66,18 @@ public class GlobalChannelInjector implements ChannelInjector {
     }
 
     @Override
+    public void injectPlayersAsync(List<Player> players) {
+        injector.injectPlayersAsync(players);
+    }
+
+    @Override
     public void ejectPlayerAsync(Player player) {
         injector.ejectPlayerAsync(player);
+    }
+
+    @Override
+    public void ejectPlayersAsync(List<Player> players) {
+        injector.ejectPlayersAsync(players);
     }
 
     @Override

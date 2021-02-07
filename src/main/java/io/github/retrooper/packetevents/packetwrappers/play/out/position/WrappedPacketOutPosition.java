@@ -26,16 +26,55 @@ package io.github.retrooper.packetevents.packetwrappers.play.out.position;
 
 import io.github.retrooper.packetevents.packetwrappers.NMSPacket;
 import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
+import io.github.retrooper.packetevents.utils.server.ServerVersion;
 
+import java.util.HashSet;
+import java.util.Set;
+//TODO support sending
 public final class WrappedPacketOutPosition extends WrappedPacket {
     private double x;
     private double y;
     private double z;
     private float yaw;
     private float pitch;
+    private final Set<PlayerTeleportFlags> relativeFlags = new HashSet<>();
 
     public WrappedPacketOutPosition(NMSPacket packet) {
         super(packet);
+    }
+
+    protected Set<PlayerTeleportFlags> getRelativeFlags() {
+        if (relativeFlags.isEmpty()) {
+            if (version.isOlderThan(ServerVersion.v_1_8)) {
+                byte relativeBitMask = readByte(0);
+
+                if ((relativeBitMask & 0x01) != 0) {
+                    relativeFlags.add(PlayerTeleportFlags.X);
+                }
+
+                if ((relativeBitMask & 0x02) != 0) {
+                    relativeFlags.add(PlayerTeleportFlags.Y);
+                }
+
+                if ((relativeBitMask & 0x04) != 0) {
+                    relativeFlags.add(PlayerTeleportFlags.Z);
+                }
+
+                if ((relativeBitMask & 0x08) != 0) {
+                    relativeFlags.add(PlayerTeleportFlags.Y_ROT);
+                }
+
+                if ((relativeBitMask & 0x10) != 0) {
+                    relativeFlags.add(PlayerTeleportFlags.X_ROT);
+                }
+            } else {
+                Set<Enum> set = (Set<Enum>) readObject(0, Set.class);
+                for (Enum e : set) {
+                    relativeFlags.add(PlayerTeleportFlags.valueOf(e.name()));
+                }
+            }
+        }
+        return relativeFlags;
     }
 
     /**
@@ -77,6 +116,25 @@ public final class WrappedPacketOutPosition extends WrappedPacket {
         }
     }
 
+    public boolean isRelativeX() {
+        return getRelativeFlags().contains(PlayerTeleportFlags.X);
+    }
+
+    public boolean isRelativeY() {
+        return getRelativeFlags().contains(PlayerTeleportFlags.Y);
+    }
+
+    public boolean isRelativeZ() {
+        return getRelativeFlags().contains(PlayerTeleportFlags.Z);
+    }
+
+    public boolean isRelativeYaw() {
+        return getRelativeFlags().contains(PlayerTeleportFlags.X_ROT);
+    }
+
+    public boolean isRelativePitch() {
+        return getRelativeFlags().contains(PlayerTeleportFlags.Y_ROT);
+    }
 
     /**
      * Get the Yaw.
@@ -101,6 +159,28 @@ public final class WrappedPacketOutPosition extends WrappedPacket {
             return readFloat(1);
         } else {
             return pitch;
+        }
+    }
+
+    public enum PlayerTeleportFlags {
+        X,
+        Y,
+        Z,
+        Y_ROT,
+        X_ROT;
+
+        byte flagValue;
+
+        PlayerTeleportFlags() {
+            flagValue = (byte) ordinal();
+        }
+
+        PlayerTeleportFlags(byte flagValue) {
+            this.flagValue = flagValue;
+        }
+
+        public byte getFlagValue() {
+            return flagValue;
         }
     }
 }

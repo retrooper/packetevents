@@ -187,9 +187,13 @@ public final class PacketEvents implements Listener, EventManager {
 
     public void terminate() {
         if (initialized && !terminating) {
-            for (Player player : Bukkit.getOnlinePlayers()) {
-                packetProcessorInternal.ejectPlayer(player);
+            if (!PacketEvents.get().getSettings().shouldEjectAsync()) {
+                for (Player player : Bukkit.getOnlinePlayers()) {
+                    packetProcessorInternal.ejectPlayer(player);
+                }
             }
+            //This might be a little complicated to explain. This is just to support server killing. If we eject async users run into issues on a server kill (never recommended btw)
+            //so we just don't eject and therefore sacrifice reload support.
             packetProcessorInternal.cleanup();
 
             getEventManager().unregisterAllListeners();

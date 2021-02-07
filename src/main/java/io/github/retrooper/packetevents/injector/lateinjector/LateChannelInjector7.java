@@ -31,6 +31,8 @@ import net.minecraft.util.io.netty.channel.ChannelHandlerContext;
 import net.minecraft.util.io.netty.channel.ChannelPromise;
 import org.bukkit.entity.Player;
 
+import java.util.List;
+
 public class LateChannelInjector7 implements LateInjector {
     @Override
     public void injectPlayerSync(Player player) {
@@ -58,6 +60,13 @@ public class LateChannelInjector7 implements LateInjector {
     }
 
     @Override
+    public void injectPlayersSync(List<Player> players) {
+        for (Player player : players) {
+            injectPlayerSync(player);
+        }
+    }
+
+    @Override
     public void ejectPlayerSync(Player player) {
         final Channel channel = (Channel) PacketEvents.get().packetProcessorInternal.getChannel(player);
         if (channel.pipeline().get(PacketEvents.handlerName) != null) {
@@ -68,11 +77,30 @@ public class LateChannelInjector7 implements LateInjector {
     }
 
     @Override
+    public void ejectPlayersSync(List<Player> players) {
+        for (Player player : players) {
+            ejectPlayerSync(player);
+        }
+    }
+
+    @Override
     public void injectPlayerAsync(Player player) {
         PacketEvents.get().injectAndEjectExecutorService.execute(new Runnable() {
             @Override
             public void run() {
                 injectPlayerSync(player);
+            }
+        });
+    }
+
+    @Override
+    public void injectPlayersAsync(List<Player> players) {
+        PacketEvents.get().injectAndEjectExecutorService.execute(new Runnable() {
+            @Override
+            public void run() {
+                for (Player player : players) {
+                    injectPlayerSync(player);
+                }
             }
         });
     }
@@ -90,6 +118,25 @@ public class LateChannelInjector7 implements LateInjector {
                 PacketEvents.get().packetProcessorInternal.channelMap.remove(player.getName());
                 PacketEvents.get().getPlayerUtils().clientVersionsMap.remove(player.getAddress());
                 PacketEvents.get().getPlayerUtils().tempClientVersionMap.remove(player.getAddress());
+            }
+        });
+    }
+
+    @Override
+    public void ejectPlayersAsync(List<Player> players) {
+        PacketEvents.get().injectAndEjectExecutorService.execute(new Runnable() {
+            @Override
+            public void run() {
+                for (Player player : players) {
+                    final Channel channel = (Channel) PacketEvents.get().packetProcessorInternal.getChannel(player);
+                    if (channel.pipeline().get(PacketEvents.handlerName) != null) {
+                        channel.pipeline().remove(PacketEvents.handlerName);
+                    }
+                    PacketEvents.get().packetProcessorInternal.keepAliveMap.remove(player.getUniqueId());
+                    PacketEvents.get().packetProcessorInternal.channelMap.remove(player.getName());
+                    PacketEvents.get().getPlayerUtils().clientVersionsMap.remove(player.getAddress());
+                    PacketEvents.get().getPlayerUtils().tempClientVersionMap.remove(player.getAddress());
+                }
             }
         });
     }
