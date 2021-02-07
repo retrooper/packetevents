@@ -37,9 +37,13 @@ import io.github.retrooper.packetevents.utils.gameprofile.WrappedGameProfile;
 import io.github.retrooper.packetevents.utils.nms.NMSUtils;
 import io.github.retrooper.packetevents.utils.player.ClientVersion;
 import io.github.retrooper.packetevents.utils.reflection.ClassUtil;
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
+import java.util.WeakHashMap;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -83,7 +87,9 @@ public class PacketProcessorInternal {
         Object channel = channelMap.get(name);
         if (channel == null) {
             channel = NMSUtils.getChannel(player);
-            channelMap.put(name, channel);
+            if (channel != null) {
+                channelMap.put(name, channel);
+            }
         }
         return channel;
     }
@@ -107,6 +113,24 @@ public class PacketProcessorInternal {
         } else {
             injectPlayerSync(player);
         }
+    }
+
+    public void rescheduleInjectPlayer(Player player, long deltaTicks) {
+        Bukkit.getScheduler().runTaskLaterAsynchronously(PacketEvents.get().getPlugin(), new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    Thread.sleep(deltaTicks * 50);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                try {
+                    injectPlayerSync(player);
+                } catch (IllegalStateException ex) {
+                    PacketEvents.get().getSettings().getInjectionFailureAction().accept(player);
+                }
+            }
+        }, deltaTicks);
     }
 
     /**
@@ -337,14 +361,14 @@ public class PacketProcessorInternal {
      */
     private void interceptRead(PacketPlayReceiveEvent event) {
         if (event.getPacketId() == PacketType.Play.Client.KEEP_ALIVE) {
-                UUID uuid = event.getPlayer().getUniqueId();
-                long timestamp = keepAliveMap.getOrDefault(uuid, event.getTimestamp());
-                long currentTime = event.getTimestamp();
-                long ping = currentTime - timestamp;
-                long smoothedPing = (PacketEvents.get().getPlayerUtils().getSmoothedPing(event.getPlayer().getUniqueId()) * 3L + ping) / 4;
-                PacketEvents.get().getPlayerUtils().playerPingMap.put(uuid, (int) ping);
-                PacketEvents.get().getPlayerUtils().playerSmoothedPingMap.put(uuid, (int) smoothedPing);
-            }
+            UUID uuid = event.getPlayer().getUniqueId();
+            long timestamp = keepAliveMap.getOrDefault(uuid, event.getTimestamp());
+            long currentTime = event.getTimestamp();
+            long ping = currentTime - timestamp;
+            long smoothedPing = (PacketEvents.get().getPlayerUtils().getSmoothedPing(event.getPlayer().getUniqueId()) * 3L + ping) / 4;
+            PacketEvents.get().getPlayerUtils().playerPingMap.put(uuid, (int) ping);
+            PacketEvents.get().getPlayerUtils().playerSmoothedPingMap.put(uuid, (int) smoothedPing);
+        }
     }
 
     /**

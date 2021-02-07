@@ -26,6 +26,7 @@ package io.github.retrooper.packetevents.event;
 
 import io.github.retrooper.packetevents.event.impl.*;
 import io.github.retrooper.packetevents.event.priority.PacketEventPriority;
+import io.github.retrooper.packetevents.utils.immutableset.ImmutableSetCustom;
 
 /**
  * Dynamic packet event listener.
@@ -37,17 +38,66 @@ import io.github.retrooper.packetevents.event.priority.PacketEventPriority;
  */
 public abstract class PacketListenerDynamic {
     private final PacketEventPriority priority;
+    public ImmutableSetCustom<Byte> serverSidedStatusAllowance;
+    public ImmutableSetCustom<Byte> serverSidedLoginAllowance;
+    public ImmutableSetCustom<Byte> serverSidedPlayAllowance;
+
+    public ImmutableSetCustom<Byte> clientSidedStatusAllowance;
+    public ImmutableSetCustom<Byte> clientSidedLoginAllowance;
+    public ImmutableSetCustom<Byte> clientSidedPlayAllowance;
 
     public PacketListenerDynamic(final PacketEventPriority priority) {
         this.priority = priority;
+        this.serverSidedStatusAllowance = null;
+        this.serverSidedLoginAllowance = null;
+        this.serverSidedPlayAllowance = null;
+
+        this.clientSidedStatusAllowance = null;
+        this.clientSidedLoginAllowance = null;
+        this.clientSidedPlayAllowance = null;
     }
+
 
     public PacketListenerDynamic() {
         this(PacketEventPriority.NORMAL);
     }
 
-    public PacketEventPriority getPriority() {
+    public final PacketEventPriority getPriority() {
         return priority;
+    }
+
+    public final void addServerSidedStatusFilter(Byte... statusPacketIDs) {
+        this.serverSidedStatusAllowance = new ImmutableSetCustom<>(statusPacketIDs);
+    }
+
+    public final void addServerSidedLoginFilter(Byte... loginPacketIDs) {
+        this.serverSidedLoginAllowance = new ImmutableSetCustom<>(loginPacketIDs);
+    }
+
+    public final void addServerSidedPlayFilter(Byte... playPacketIDs) {
+        this.serverSidedPlayAllowance = new ImmutableSetCustom<>(playPacketIDs);
+    }
+
+    public final void addClientSidedStatusFilter(Byte... statusPacketIDs) {
+        this.clientSidedStatusAllowance = new ImmutableSetCustom<>(statusPacketIDs);
+    }
+
+    public final void addClientSidedLoginFilter(Byte... loginPacketIDs) {
+        this.clientSidedLoginAllowance = new ImmutableSetCustom<>(loginPacketIDs);
+    }
+
+    public final void addClientSidedPlayFilter(Byte... playPacketIDs) {
+        this.clientSidedPlayAllowance = new ImmutableSetCustom<>(playPacketIDs);
+    }
+
+    public final void filterAll() {
+        this.serverSidedStatusAllowance = new ImmutableSetCustom<>();
+        this.serverSidedLoginAllowance = new ImmutableSetCustom<>();
+        this.serverSidedPlayAllowance = new ImmutableSetCustom<>();
+
+        this.clientSidedStatusAllowance = new ImmutableSetCustom<>();
+        this.clientSidedLoginAllowance = new ImmutableSetCustom<>();
+        this.clientSidedPlayAllowance = new ImmutableSetCustom<>();
     }
 
     public void onPacketStatusReceive(PacketStatusReceiveEvent event) {
@@ -86,6 +136,7 @@ public abstract class PacketListenerDynamic {
     public void onPlayerEject(PlayerEjectEvent event) {
     }
 
-    public void onPacketEvent(PacketEvent event) {
+    public void onPacketEventExternal(PacketEvent event) {
+
     }
 }

@@ -61,7 +61,9 @@ class EventManagerDynamic {
         for (PacketListenerDynamic listener : listeners) {
             highestReachedPriority = listener.getPriority().getPriorityValue();
             try {
-                event.callPacketEvent(listener);
+                if (!event.isInbuilt()) {
+                    event.callPacketEventExternal(listener);
+                }
                 event.call(listener);
             }
             catch (Exception ex) {

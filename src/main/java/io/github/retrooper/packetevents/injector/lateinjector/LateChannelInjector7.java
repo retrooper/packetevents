@@ -32,6 +32,7 @@ import net.minecraft.util.io.netty.channel.ChannelPromise;
 import org.bukkit.entity.Player;
 
 import java.util.List;
+import java.util.NoSuchElementException;
 
 public class LateChannelInjector7 implements LateInjector {
     @Override
@@ -112,7 +113,12 @@ public class LateChannelInjector7 implements LateInjector {
             public void run() {
                 final Channel channel = (Channel) PacketEvents.get().packetProcessorInternal.getChannel(player);
                 if (channel.pipeline().get(PacketEvents.handlerName) != null) {
-                    channel.pipeline().remove(PacketEvents.handlerName);
+                    try {
+                        channel.pipeline().remove(PacketEvents.handlerName);
+                    }
+                    catch (NoSuchElementException ignored) {
+                        //Doesn't matter
+                    }
                 }
                 PacketEvents.get().packetProcessorInternal.keepAliveMap.remove(player.getUniqueId());
                 PacketEvents.get().packetProcessorInternal.channelMap.remove(player.getName());

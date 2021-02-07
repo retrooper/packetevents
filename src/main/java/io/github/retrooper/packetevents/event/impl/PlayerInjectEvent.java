@@ -95,7 +95,7 @@ public final class PlayerInjectEvent extends PacketEvent implements CancellableE
      *
      * @return Socket address of the injecting player.
      */
-    @NotNull
+    @Nullable
     public InetSocketAddress getSocketAddress() {
         return address;
     }
@@ -116,5 +116,10 @@ public final class PlayerInjectEvent extends PacketEvent implements CancellableE
     @Override
     public void call(PacketListenerDynamic listener) {
         listener.onPlayerInject(this);
+    }
+
+    @Override
+    public boolean isInbuilt() {
+        return true;
     }
 }

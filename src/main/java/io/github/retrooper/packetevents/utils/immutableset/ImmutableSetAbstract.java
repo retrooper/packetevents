@@ -22,22 +22,8 @@
  * SOFTWARE.
  */
 
-package io.github.retrooper.packetevents.utils.netty.channel;
+package io.github.retrooper.packetevents.utils.immutableset;
 
-import io.github.retrooper.packetevents.PacketEvents;
-import io.github.retrooper.packetevents.utils.server.ServerVersion;
-
-import java.net.InetSocketAddress;
-
-public class ChannelUtils {
-    public static InetSocketAddress getSocketAddress(Object ch) {
-        if (ch == null) {
-            return null;
-        }
-        if (PacketEvents.get().getServerUtils().getVersion() == ServerVersion.v_1_7_10) {
-            return ChannelUtils7.getSocketAddress(ch);
-        } else {
-            return ChannelUtils8.getSocketAddress(ch);
-        }
-    }
+abstract class ImmutableSetAbstract<T> {
+    public abstract boolean contains(T element);
 }

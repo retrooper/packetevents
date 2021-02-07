@@ -80,6 +80,8 @@ public class PostPacketPlayReceiveEvent extends NMSPacketEvent implements Player
 
     @Override
     public void call(PacketListenerDynamic listener) {
-        listener.onPostPacketPlayReceive(this);
+        if (listener.clientSidedPlayAllowance == null || listener.clientSidedPlayAllowance.contains(getPacketId())) {
+            listener.onPostPacketPlayReceive(this);
+        }
     }
 }

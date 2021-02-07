@@ -183,6 +183,7 @@ public final class NMSUtils {
     }
 
     public static Object getMinecraftServerConnection() {
+        net.minecraft.server.v1_8_R3.ServerConnection sv;
         if (minecraftServerConnection == null) {
             try {
                 minecraftServerConnection = Reflection.getField(minecraftServerClass, serverConnectionClass, 0).get(getMinecraftServerInstance());
@@ -251,8 +252,9 @@ public final class NMSUtils {
     }
 
     public static Object getEntityPlayer(final Player player) {
+        Object craftPlayer = getCraftPlayer(player);
         try {
-            return getCraftPlayerHandle.invoke(getCraftPlayer(player));
+            return getCraftPlayerHandle.invoke(craftPlayer);
         } catch (IllegalAccessException | InvocationTargetException e) {
             e.printStackTrace();
         }
@@ -260,8 +262,12 @@ public final class NMSUtils {
     }
 
     public static Object getPlayerConnection(final Player player) {
+        Object entityPlayer = getEntityPlayer(player);
+        if (entityPlayer == null) {
+            return null;
+        }
         try {
-            return playerConnectionField.get(getEntityPlayer(player));
+            return playerConnectionField.get(entityPlayer);
         } catch (IllegalAccessException e) {
             e.printStackTrace();
         }
@@ -269,12 +275,20 @@ public final class NMSUtils {
     }
 
     public static Object getNetworkManager(final Player player) {
-        WrappedPacket wrapper = new WrappedPacket(new NMSPacket(getPlayerConnection(player)));
+        Object playerConnection = getPlayerConnection(player);
+        if (playerConnection == null) {
+            return null;
+        }
+        WrappedPacket wrapper = new WrappedPacket(new NMSPacket(playerConnection));
         return wrapper.readObject(0, networkManagerClass);
     }
 
     public static Object getChannel(final Player player) {
-        WrappedPacket wrapper = new WrappedPacket(new NMSPacket(getNetworkManager(player)));
+        Object networkManager = getNetworkManager(player);
+        if (networkManager == null) {
+            return null;
+        }
+        WrappedPacket wrapper = new WrappedPacket(new NMSPacket(networkManager));
         return wrapper.readObject(0, nettyChannelClass);
     }
 

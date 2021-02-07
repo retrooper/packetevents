@@ -22,22 +22,33 @@
  * SOFTWARE.
  */
 
-package io.github.retrooper.packetevents.utils.netty.channel;
+package io.github.retrooper.packetevents.utils.immutableset;
 
-import io.github.retrooper.packetevents.PacketEvents;
-import io.github.retrooper.packetevents.utils.server.ServerVersion;
+import com.google.common.collect.ImmutableSet;
 
-import java.net.InetSocketAddress;
+import java.util.List;
 
-public class ChannelUtils {
-    public static InetSocketAddress getSocketAddress(Object ch) {
-        if (ch == null) {
-            return null;
+class ImmutableSet_8<T> extends ImmutableSetAbstract<T> {
+    private final ImmutableSet<T> immutableSet;
+
+    public ImmutableSet_8() {
+        this.immutableSet = ImmutableSet.<T>builder().build();
+    }
+
+    public ImmutableSet_8(List<T> data) {
+        this.immutableSet = ImmutableSet.<T>builder().addAll(data).build();
+    }
+
+    public ImmutableSet_8(T... data) {
+        ImmutableSet.Builder<T> builder = ImmutableSet.<T>builder();
+        for (T value : data) {
+            builder.add(value);
         }
-        if (PacketEvents.get().getServerUtils().getVersion() == ServerVersion.v_1_7_10) {
-            return ChannelUtils7.getSocketAddress(ch);
-        } else {
-            return ChannelUtils8.getSocketAddress(ch);
-        }
+        this.immutableSet = builder.build();
+    }
+
+    @Override
+    public boolean contains(T element) {
+        return immutableSet.contains(element);
     }
 }

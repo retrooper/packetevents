@@ -107,4 +107,9 @@ public class PostPlayerInjectEvent extends PacketEvent implements PlayerEvent {
     public void call(PacketListenerDynamic listener) {
         listener.onPostPlayerInject(this);
     }
+
+    @Override
+    public boolean isInbuilt() {
+        return true;
+    }
 }

@@ -77,7 +77,9 @@ public final class PacketPlaySendEvent extends CancellableNMSPacketEvent impleme
 
     @Override
     public void call(PacketListenerDynamic listener) {
-        listener.onPacketPlaySend(this);
+        if (listener.serverSidedPlayAllowance == null || listener.serverSidedPlayAllowance.contains(getPacketId())) {
+            listener.onPacketPlaySend(this);
+        }
     }
 }
 

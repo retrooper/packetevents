@@ -101,4 +101,9 @@ public final class PlayerEjectEvent extends PacketEvent implements CancellableEv
     public void call(PacketListenerDynamic listener) {
         listener.onPlayerEject(this);
     }
+
+    @Override
+    public boolean isInbuilt() {
+        return true;
+    }
 }

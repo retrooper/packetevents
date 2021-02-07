@@ -28,13 +28,13 @@ import io.github.retrooper.packetevents.PacketEvents;
 import io.github.retrooper.packetevents.packetwrappers.NMSPacket;
 import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
 import io.github.retrooper.packetevents.utils.nms.NMSUtils;
-import io.github.retrooper.packetevents.utils.server.ServerVersion;
 import io.netty.channel.*;
 import org.bukkit.entity.Player;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.concurrent.Future;
 
 /**
  * 1.8 (and above) Spigot Early channel injector.
@@ -82,41 +82,23 @@ public class EarlyChannelInjector8 implements EarlyInjector {
     @Override
     public void prepare() {
         networkMarkers = NMSUtils.getNetworkMarkers();
+        if (networkMarkers == null) {
+            networkMarkers = new ArrayList<>();
+        }
         firstChannelInitializer = new ChannelInitializer<Channel>() {
             @Override
             protected void initChannel(final Channel channel) {
-                if (networkMarkers != null) {
-                    synchronized (networkMarkers) {
-                        if (PacketEvents.get().getServerUtils().getVersion().isNewerThan(ServerVersion.v_1_11_2)) {
-                            channel.eventLoop().execute(new Runnable() {
-                                @Override
-                                public void run() {
-                                    injectChannel(channel);
-                                }
-                            });
-                        } else {
-                            injectChannel(channel);
-                        }
-                    }
-                } else {
+                synchronized (networkMarkers) {
                     channel.eventLoop().execute(new Runnable() {
                         @Override
                         public void run() {
-                            if (PacketEvents.get().getServerUtils().getVersion().isNewerThan(ServerVersion.v_1_11_2)) {
-                                channel.eventLoop().execute(new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        injectChannel(channel);
-                                    }
-                                });
-                            } else {
-                                injectChannel(channel);
-                            }
+                            injectChannel(channel);
                         }
                     });
                 }
             }
         };
+
         secondChannelInitializer = new ChannelInitializer<Channel>() {
             @Override
             protected void initChannel(Channel channel) {
@@ -180,6 +162,11 @@ public class EarlyChannelInjector8 implements EarlyInjector {
     @Override
     public PlayerChannelInterceptor injectChannel(Object ch) {
         Channel channel = (Channel) ch;
+        if (channel == null) {
+            return null;
+        } else if (channel.pipeline() == null) {
+            return null;
+        }
         final String handlerName = PacketEvents.handlerName;
         try {
             PlayerChannelInterceptor interceptor = (PlayerChannelInterceptor) channel.pipeline().get(handlerName);
@@ -206,7 +193,12 @@ public class EarlyChannelInjector8 implements EarlyInjector {
         Channel channel = (Channel) ch;
         String handlerName = PacketEvents.handlerName;
         if (channel.pipeline().get(handlerName) != null) {
-            channel.pipeline().remove(handlerName);
+            try {
+                channel.pipeline().remove(handlerName);
+            }
+            catch (NoSuchElementException ignored) {
+                //Doesn't matter
+            }
         }
     }
 
@@ -218,13 +210,17 @@ public class EarlyChannelInjector8 implements EarlyInjector {
     @Override
     public void injectPlayerSync(Player player) {
         Channel channel = (Channel) PacketEvents.get().packetProcessorInternal.getChannel(player);
-        injectChannel(channel).player = player;
+        if (channel != null) {
+            injectChannel(channel).player = player;
+        } else {
+            throw new IllegalStateException("Channel of " + player.getName() + " is null!");
+        }
     }
 
     @Override
     public void injectPlayersSync(List<Player> players) {
         for (Player player : players) {
-            injectPlayersSync(players);
+            injectPlayerSync(player);
         }
     }
 
@@ -244,7 +240,7 @@ public class EarlyChannelInjector8 implements EarlyInjector {
     @Override
     public void ejectPlayersSync(List<Player> players) {
         for (Player player : players) {
-            ejectPlayersSync(players);
+            ejectPlayerSync(player);
         }
     }
 
@@ -259,7 +255,11 @@ public class EarlyChannelInjector8 implements EarlyInjector {
             @Override
             public void run() {
                 Channel channel = (Channel) PacketEvents.get().packetProcessorInternal.getChannel(player);
-                injectChannel(channel).player = player;
+                if (channel != null) {
+                    injectChannel(channel).player = player;
+                } else {
+                    PacketEvents.get().packetProcessorInternal.rescheduleInjectPlayer(player,  20L);
+                }
             }
         });
     }
@@ -270,8 +270,17 @@ public class EarlyChannelInjector8 implements EarlyInjector {
             @Override
             public void run() {
                 for (Player player : players) {
-                    Channel channel = (Channel) PacketEvents.get().packetProcessorInternal.getChannel(player);
-                    injectChannel(channel).player = player;
+                    PacketEvents.get().injectAndEjectExecutorService.execute(new Runnable() {
+                        @Override
+                        public void run() {
+                            Channel channel = (Channel) PacketEvents.get().packetProcessorInternal.getChannel(player);
+                            if (channel != null) {
+                                injectChannel(channel).player = player;
+                            } else {
+                                PacketEvents.get().packetProcessorInternal.rescheduleInjectPlayer(player,  20L);
+                            }
+                        }
+                    });
                 }
             }
         });

@@ -22,22 +22,43 @@
  * SOFTWARE.
  */
 
-package io.github.retrooper.packetevents.utils.netty.channel;
+package io.github.retrooper.packetevents.utils.immutableset;
 
 import io.github.retrooper.packetevents.PacketEvents;
 import io.github.retrooper.packetevents.utils.server.ServerVersion;
 
-import java.net.InetSocketAddress;
+import java.util.List;
 
-public class ChannelUtils {
-    public static InetSocketAddress getSocketAddress(Object ch) {
-        if (ch == null) {
-            return null;
+public class ImmutableSetCustom<T> {
+    private final ImmutableSetAbstract<T> immutableSetAbstract;
+    public ImmutableSetCustom() {
+        if (PacketEvents.get().getServerUtils().getVersion().isOlderThan(ServerVersion.v_1_8)) {
+            immutableSetAbstract = new ImmutableSet_7<T>();
         }
-        if (PacketEvents.get().getServerUtils().getVersion() == ServerVersion.v_1_7_10) {
-            return ChannelUtils7.getSocketAddress(ch);
-        } else {
-            return ChannelUtils8.getSocketAddress(ch);
+        else {
+            immutableSetAbstract = new ImmutableSet_8<T>();
         }
+    }
+
+    public ImmutableSetCustom(List<T> data) {
+        if (PacketEvents.get().getServerUtils().getVersion().isOlderThan(ServerVersion.v_1_8)) {
+            immutableSetAbstract = new ImmutableSet_7<T>(data);
+        }
+        else {
+            immutableSetAbstract = new ImmutableSet_8<T>(data);
+        }
+    }
+
+    public ImmutableSetCustom(T... data) {
+        if (PacketEvents.get().getServerUtils().getVersion().isOlderThan(ServerVersion.v_1_8)) {
+            immutableSetAbstract = new ImmutableSet_7<T>(data);
+        }
+        else {
+            immutableSetAbstract = new ImmutableSet_8<T>(data);
+        }
+    }
+
+    public boolean contains(T element) {
+        return immutableSetAbstract.contains(element);
     }
 }

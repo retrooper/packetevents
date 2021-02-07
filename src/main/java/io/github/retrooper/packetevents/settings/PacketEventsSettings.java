@@ -24,7 +24,12 @@
 
 package io.github.retrooper.packetevents.settings;
 
+import io.github.retrooper.packetevents.PacketEvents;
 import io.github.retrooper.packetevents.utils.server.ServerVersion;
+import org.bukkit.Bukkit;
+import org.bukkit.entity.Player;
+
+import java.util.function.Consumer;
 
 /**
  * Packet Events' settings.
@@ -62,9 +67,19 @@ public class PacketEventsSettings {
     private int injectEjectThreadCount = 1;
 
     /**
-     * What should the kick message be when PacketEvents fails to inject a player and kicks them.
+     * This is the reaction that happens when we fail to inject a player. By default we will kick.
      */
-    private String injectionFailureMessage = "We were unable to inject you. Please try again!";
+    private Consumer<Player> injectionFailureReaction = new Consumer<Player>() {
+        @Override
+        public void accept(Player player) {
+            Bukkit.getScheduler().runTask(PacketEvents.get().getPlugin(), new Runnable() {
+                @Override
+                public void run() {
+                    player.kickPlayer("Failed to inject you. Please try rejoining!");
+                }
+            });
+        }
+    };
 
     /**
      * This method locks the settings.
@@ -80,6 +95,7 @@ public class PacketEventsSettings {
      * the server version fails using the Bukkit API.
      * This seems to be most common on 1.7.10 paper forks.
      * They probably mess up somewhere.
+     *
      * @param serverVersion ServerVersion
      * @return Settings instance.
      */
@@ -92,6 +108,7 @@ public class PacketEventsSettings {
 
     /**
      * This is decides if PacketEvents should inject users on internal executor or on the main thread.
+     *
      * @param injectAsync Value
      * @return Settings instance.
      */
@@ -104,6 +121,7 @@ public class PacketEventsSettings {
 
     /**
      * This is decides if PacketEvents should eject users on internal executor or on the main thread.
+     *
      * @param ejectAsync Value
      * @return Settings instance.
      */
@@ -116,6 +134,7 @@ public class PacketEventsSettings {
 
     /**
      * This decides if PacketEvents should check for updates and notify when your server starts.
+     *
      * @param checkForUpdates Value
      * @return Settings instance.
      */
@@ -130,6 +149,7 @@ public class PacketEventsSettings {
      * This decides if PacketEvents should inject users earlier than usual,
      * resulting in us being able to resolve client versions without the need of any dependencies.
      * We end up using a different injection method which isn't supported on a few spigot forks.
+     *
      * @param injectEarly Value
      * @return Settings instance.
      */
@@ -143,6 +163,7 @@ public class PacketEventsSettings {
     /**
      * Thread count for the injection/ejection executor service.
      * Basically how many threads should we use for injection and ejection.
+     *
      * @param threadCount Value
      * @return This instance.
      */
@@ -154,24 +175,24 @@ public class PacketEventsSettings {
     }
 
     /**
-     * When PacketEvents fails to inject a user, we kick them for security reasons.
-     * We inject to be able to process their packets.
-     * Us failing to inject will cause us to not detecting their packets which can be a major issue.
-     * What should the kick message be when we kick them?
-     * @param message Value
+     * When PacketEvents fails to inject a user, it schedules a re-injection and if that fails, we will execute your function.
+     * By default we will kick the user. You can modify the action. Make sure you note that this action will be called off the main thread.
+     *
+     * @param consumer Value
      * @return Settings instance.
      */
-    public PacketEventsSettings injectionFailureMessage(String message) {
+    public PacketEventsSettings injectionFailureReaction(Consumer<Player> consumer) {
         if (!locked) {
-            this.injectionFailureMessage = message;
+            this.injectionFailureReaction = consumer;
         }
         return this;
     }
 
     /**
      * Are the settings locked?
-     * @see #lock()
+     *
      * @return Is locked.
+     * @see #lock()
      */
     public boolean isLocked() {
         return locked;
@@ -232,11 +253,11 @@ public class PacketEventsSettings {
     }
 
     /**
-     * Injection failure message.
+     * Injection failure reaction.
      *
-     * @return Getter for {@link #injectionFailureMessage}
+     * @return Getter for {@link #injectionFailureReaction}
      */
-    public String getInjectionFailureMessage() {
-        return injectionFailureMessage;
+    public Consumer<Player> getInjectionFailureAction() {
+        return injectionFailureReaction;
     }
 }

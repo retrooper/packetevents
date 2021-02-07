@@ -66,6 +66,8 @@ public class PacketLoginReceiveEvent extends CancellableNMSPacketEvent {
 
     @Override
     public void call(PacketListenerDynamic listener) {
-        listener.onPacketLoginReceive(this);
+        if (listener.clientSidedLoginAllowance == null || listener.clientSidedLoginAllowance.contains(getPacketId())) {
+            listener.onPacketLoginReceive(this);
+        }
     }
 }

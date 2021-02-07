@@ -68,6 +68,8 @@ public class PacketStatusSendEvent extends CancellableNMSPacketEvent {
 
     @Override
     public void call(PacketListenerDynamic listener) {
-        listener.onPacketStatusSend(this);
+        if (listener.serverSidedStatusAllowance == null || listener.serverSidedStatusAllowance.contains(getPacketId())) {
+            listener.onPacketStatusSend(this);
+        }
     }
 }

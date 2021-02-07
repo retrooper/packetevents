@@ -105,4 +105,9 @@ public abstract class NMSPacketEvent extends PacketEvent implements CallableEven
      * @return Packet ID.
      */
     public abstract byte getPacketId();
+
+    @Override
+    public boolean isInbuilt() {
+        return true;
+    }
 }

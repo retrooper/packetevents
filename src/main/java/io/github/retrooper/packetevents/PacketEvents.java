@@ -167,7 +167,7 @@ public final class PacketEvents implements Listener, EventManager {
                 try {
                     getPlayerUtils().injectPlayer(p);
                 } catch (Exception ex) {
-                    p.kickPlayer(getSettings().getInjectionFailureMessage());
+                    packetProcessorInternal.rescheduleInjectPlayer(p, 20L);
                 }
             }
 
@@ -280,7 +280,7 @@ public final class PacketEvents implements Listener, EventManager {
             try {
                 packetProcessorInternal.injectPlayer(e.getPlayer());
             } catch (Exception ex) {
-               e.disallow(PlayerLoginEvent.Result.KICK_OTHER, PacketEvents.get().getSettings().getInjectionFailureMessage());
+                packetProcessorInternal.rescheduleInjectPlayer(e.getPlayer(), 20L); //Reschedule to inject one second later
             }
         }
     }
@@ -324,7 +324,7 @@ public final class PacketEvents implements Listener, EventManager {
                     PacketEvents.get().getEventManager().callEvent(new PostPlayerInjectEvent(e.getPlayer(), false));
                 }
             } catch (Exception ex) {
-                e.getPlayer().kickPlayer(getSettings().getInjectionFailureMessage());
+                packetProcessorInternal.rescheduleInjectPlayer(e.getPlayer(), 20L);
             }
         } else {
             if (!viaAvailable) {

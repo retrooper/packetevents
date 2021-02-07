@@ -24,6 +24,9 @@
 
 package io.github.retrooper.packetevents;
 
+import io.github.retrooper.packetevents.event.PacketListenerDynamic;
+import io.github.retrooper.packetevents.event.impl.PacketPlayReceiveEvent;
+import io.github.retrooper.packetevents.packettype.PacketType;
 import org.bukkit.plugin.java.JavaPlugin;
 
 public class PacketEventsPlugin extends JavaPlugin {
@@ -40,6 +43,19 @@ public class PacketEventsPlugin extends JavaPlugin {
             PacketEvents.create(this);
             PacketEvents.get().load();
             PacketEvents.get().init(this);
+            PacketListenerDynamic listener = new PacketListenerDynamic() {
+                @Override
+                public void onPacketPlayReceive(PacketPlayReceiveEvent event) {
+                    if (event.getPacketId() == PacketType.Play.Client.USE_ENTITY) {
+                        event.getPlayer().sendMessage("nice hit");
+                    } else if (event.getPacketId() == PacketType.Play.Client.CHAT) {
+                        event.getPlayer().sendMessage(PacketEvents.get().getPlayerUtils().getClientVersion(event.getPlayer()).toString());
+                    }
+                }
+            };
+            listener.filterAll();
+            listener.addClientSidedPlayFilter(PacketType.Play.Client.USE_ENTITY);
+            PacketEvents.get().getEventManager().registerListener(listener);
         }
 
     }
