@@ -67,27 +67,57 @@ public abstract class PacketListenerDynamic {
     }
 
     public final void addServerSidedStatusFilter(Byte... statusPacketIDs) {
-        this.serverSidedStatusAllowance = new ImmutableSetCustom<>(statusPacketIDs);
+        if (this.serverSidedStatusAllowance == null) {
+            this.serverSidedStatusAllowance = new ImmutableSetCustom<>(statusPacketIDs);
+        }
+        else {
+            this.serverSidedStatusAllowance.addAll(statusPacketIDs);
+        }
     }
 
     public final void addServerSidedLoginFilter(Byte... loginPacketIDs) {
-        this.serverSidedLoginAllowance = new ImmutableSetCustom<>(loginPacketIDs);
+        if (this.serverSidedLoginAllowance == null) {
+            this.serverSidedLoginAllowance = new ImmutableSetCustom<>(loginPacketIDs);
+        }
+        else {
+            this.serverSidedLoginAllowance.addAll(loginPacketIDs);
+        }
     }
 
     public final void addServerSidedPlayFilter(Byte... playPacketIDs) {
-        this.serverSidedPlayAllowance = new ImmutableSetCustom<>(playPacketIDs);
+        if (this.serverSidedPlayAllowance == null) {
+            this.serverSidedPlayAllowance = new ImmutableSetCustom<>(playPacketIDs);
+        }
+        else {
+            this.serverSidedPlayAllowance.addAll(playPacketIDs);
+        }
     }
 
     public final void addClientSidedStatusFilter(Byte... statusPacketIDs) {
-        this.clientSidedStatusAllowance = new ImmutableSetCustom<>(statusPacketIDs);
+        if (this.clientSidedStatusAllowance == null) {
+            this.clientSidedStatusAllowance = new ImmutableSetCustom<>(statusPacketIDs);
+        }
+        else {
+            this.clientSidedStatusAllowance.addAll(statusPacketIDs);
+        }
     }
 
     public final void addClientSidedLoginFilter(Byte... loginPacketIDs) {
-        this.clientSidedLoginAllowance = new ImmutableSetCustom<>(loginPacketIDs);
+        if (this.clientSidedLoginAllowance == null) {
+            this.clientSidedLoginAllowance = new ImmutableSetCustom<>(loginPacketIDs);
+        }
+        else {
+            this.clientSidedLoginAllowance.addAll(loginPacketIDs);
+        }
     }
 
     public final void addClientSidedPlayFilter(Byte... playPacketIDs) {
-        this.clientSidedPlayAllowance = new ImmutableSetCustom<>(playPacketIDs);
+        if (this.clientSidedPlayAllowance == null) {
+            this.clientSidedPlayAllowance = new ImmutableSetCustom<>(playPacketIDs);
+        }
+        else {
+            this.clientSidedPlayAllowance.addAll(playPacketIDs);
+        }
     }
 
     public final void filterAll() {
@@ -131,6 +161,7 @@ public abstract class PacketListenerDynamic {
     }
 
     public void onPlayerInject(PlayerInjectEvent event) {
+
     }
 
     public void onPlayerEject(PlayerEjectEvent event) {

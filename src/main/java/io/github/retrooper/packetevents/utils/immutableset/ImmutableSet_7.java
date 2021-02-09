@@ -26,10 +26,12 @@ package io.github.retrooper.packetevents.utils.immutableset;
 
 import net.minecraft.util.com.google.common.collect.ImmutableSet;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 class ImmutableSet_7<T> extends ImmutableSetAbstract<T> {
-    private final ImmutableSet<T> immutableSet;
+    private ImmutableSet<T> immutableSet;
 
     public ImmutableSet_7() {
         this.immutableSet = ImmutableSet.<T>builder().build();
@@ -50,5 +52,17 @@ class ImmutableSet_7<T> extends ImmutableSetAbstract<T> {
     @Override
     public boolean contains(T element) {
         return immutableSet.contains(element);
+    }
+
+    @Override
+    public void add(T element) {
+        List<T> elements = new ArrayList<>(immutableSet);
+        immutableSet = ImmutableSet.<T>builder().addAll(elements).add(element).build();
+    }
+
+    @Override
+    public void addAll(T... elements) {
+        List<T> localElements = new ArrayList<>(immutableSet);
+        immutableSet = ImmutableSet.<T>builder().addAll(localElements).addAll(Arrays.asList(elements)).build();
     }
 }

@@ -116,21 +116,26 @@ public class PacketProcessorInternal {
     }
 
     public void rescheduleInjectPlayer(Player player, long deltaTicks) {
-        Bukkit.getScheduler().runTaskLaterAsynchronously(PacketEvents.get().getPlugin(), new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    Thread.sleep(deltaTicks * 50);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
+        if (PacketEvents.get().getSettings().shouldRescheduleInjections()) {
+            Bukkit.getScheduler().runTaskLaterAsynchronously(PacketEvents.get().getPlugin(), new Runnable() {
+                @Override
+                public void run() {
+                    try {
+                        Thread.sleep(deltaTicks * 50);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                    try {
+                        injectPlayerSync(player);
+                    } catch (IllegalStateException ex) {
+                        PacketEvents.get().getSettings().getInjectionFailureAction().accept(player);
+                    }
                 }
-                try {
-                    injectPlayerSync(player);
-                } catch (IllegalStateException ex) {
-                    PacketEvents.get().getSettings().getInjectionFailureAction().accept(player);
-                }
-            }
-        }, deltaTicks);
+            }, deltaTicks);
+        }
+        else {
+            PacketEvents.get().getSettings().getInjectionFailureAction().accept(player);
+        }
     }
 
     /**

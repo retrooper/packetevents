@@ -54,11 +54,8 @@ public class PostPacketPlaySendEvent extends NMSPacketEvent implements PlayerEve
 
     /**
      * This method returns the bukkit player object of the packet sender.
-     * The player object is might be null during early packets.
-     *
      * @return Packet receiver.
      */
-    @Nullable
     @Override
     public Player getPlayer() {
         return player;

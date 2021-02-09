@@ -145,29 +145,6 @@ public interface EventManager {
     }
 
     /**
-     * Unregister the dynamic event listener.
-     *
-     * @param listener {@link PacketListenerDynamic}
-     * @return Same event manager instance.
-     */
-    default EventManager unregisterListener(PacketListenerDynamic listener) {
-        PEEventManager.EVENT_MANAGER_DYNAMIC.unregisterListener(listener);
-        return this;
-    }
-
-    /**
-     * Unregister multiple dynamic event listeners with one method.
-     * Recommended to use the dynamic event listener.
-     *
-     * @param listeners {@link PacketListenerDynamic}
-     * @return Same event manager instance.
-     */
-    default EventManager unregisterListeners(PacketListenerDynamic... listeners) {
-        PEEventManager.EVENT_MANAGER_DYNAMIC.unregisterListeners(listeners);
-        return this;
-    }
-
-    /**
      * Unregister all registered event listeners.
      * All the deprecated and the dynamic listeners will be unregistered.
      *

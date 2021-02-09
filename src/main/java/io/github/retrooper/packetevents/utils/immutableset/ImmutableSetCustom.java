@@ -58,7 +58,16 @@ public class ImmutableSetCustom<T> {
         }
     }
 
+
     public boolean contains(T element) {
         return immutableSetAbstract.contains(element);
+    }
+
+    public void add(T element) {
+        immutableSetAbstract.add(element);
+    }
+
+    public void addAll(T... elements) {
+        immutableSetAbstract.addAll(elements);
     }
 }

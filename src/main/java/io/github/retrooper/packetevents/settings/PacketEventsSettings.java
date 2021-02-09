@@ -67,6 +67,12 @@ public class PacketEventsSettings {
     private int injectEjectThreadCount = 1;
 
     /**
+     * This stores whether we should attempt to re-inject a user on an injection failure.
+     * Recommended to be toggled ON. Having this on will require ViaVersion, ProtocolSupport.
+     */
+    private boolean injectionRescheduling = false;
+
+    /**
      * This is the reaction that happens when we fail to inject a player. By default we will kick.
      */
     private Consumer<Player> injectionFailureReaction = new Consumer<Player>() {
@@ -174,6 +180,13 @@ public class PacketEventsSettings {
         return this;
     }
 
+    public PacketEventsSettings injectionRescheduling(boolean value) {
+        if (!locked) {
+            this.injectionRescheduling = value;
+        }
+        return this;
+    }
+
     /**
      * When PacketEvents fails to inject a user, it schedules a re-injection and if that fails, we will execute your function.
      * By default we will kick the user. You can modify the action. Make sure you note that this action will be called off the main thread.
@@ -250,6 +263,10 @@ public class PacketEventsSettings {
      */
     public int getInjectAndEjectThreadCount() {
         return injectEjectThreadCount;
+    }
+
+    public boolean shouldRescheduleInjections() {
+        return injectionRescheduling;
     }
 
     /**

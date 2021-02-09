@@ -28,6 +28,7 @@ import io.github.retrooper.packetevents.PacketEvents;
 import io.github.retrooper.packetevents.packetwrappers.SendableWrapper;
 import io.github.retrooper.packetevents.utils.nms.NMSUtils;
 import io.github.retrooper.packetevents.utils.versionlookup.VersionLookupUtils;
+import io.github.retrooper.packetevents.utils.versionlookup.protocollib.ProtocolLibVersionLookupUtils;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
@@ -127,7 +128,6 @@ public final class PlayerUtils {
         Integer ping = playerPingMap.get(uuid);
         if (ping == null) {
             long joinTime = loginTime.get(uuid);
-            System.out.println("LOL: " + (System.currentTimeMillis() - joinTime));
             return (int) (System.currentTimeMillis() -  joinTime);
         }
         return ping;
@@ -170,6 +170,16 @@ public final class PlayerUtils {
             } else {
                 version = tempClientVersionMap.get(player.getAddress());
                 if (version == null) {
+                    if (ProtocolLibVersionLookupUtils.isAvailable()) {
+                        try {
+                            version = ClientVersion.getClientVersion(ProtocolLibVersionLookupUtils.getProtocolVersion(player));
+                            clientVersionsMap.put(player.getAddress(), version);
+                        }
+                        catch (Exception ex) {
+                            //Try ask the dependency again the next time, for now it is temporarily unresolved...
+                        }
+                        return ClientVersion.TEMP_UNRESOLVED;
+                    }
                     version = ClientVersion.UNRESOLVED;
                 }
                 clientVersionsMap.put(player.getAddress(), version);

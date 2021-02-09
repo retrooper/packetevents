@@ -67,7 +67,7 @@ import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public final class PacketEvents implements Listener, EventManager {
-    //TODO finish unfinished wrappers
+    //TODO finish unfinished wrappers, fix concurrent mod exception when registering listeners
     private static PacketEvents instance;
     private final PEVersion version = new PEVersion(1, 7, 9, 3);
     private final EventManager eventManager = new PEEventManager();
