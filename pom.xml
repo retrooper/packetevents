@@ -6,7 +6,7 @@
 
     <groupId>io.github.retrooper</groupId>
     <artifactId>packetevents</artifactId>
-    <version>1.8-PRE-3</version>
+    <version>1.8-pre-4</version>
     <build>
         <plugins>
             <plugin>

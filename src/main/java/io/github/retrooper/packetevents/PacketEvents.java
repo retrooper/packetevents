@@ -28,9 +28,9 @@ import io.github.retrooper.packetevents.event.impl.PostPlayerInjectEvent;
 import io.github.retrooper.packetevents.event.manager.EventManager;
 import io.github.retrooper.packetevents.event.manager.PEEventManager;
 import io.github.retrooper.packetevents.exceptions.PacketEventsLoadFailureException;
-import io.github.retrooper.packetevents.processor.PacketProcessorInternal;
 import io.github.retrooper.packetevents.packettype.PacketTypeClasses;
 import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
+import io.github.retrooper.packetevents.processor.PacketProcessorInternal;
 import io.github.retrooper.packetevents.settings.PacketEventsSettings;
 import io.github.retrooper.packetevents.updatechecker.UpdateChecker;
 import io.github.retrooper.packetevents.utils.entityfinder.EntityFinderUtils;
@@ -69,7 +69,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 public final class PacketEvents implements Listener, EventManager {
     //TODO finish unfinished wrappers, fix concurrent mod exception when registering listeners
     private static PacketEvents instance;
-    private final PEVersion version = new PEVersion(1, 7, 9, 3);
+    private final PEVersion version = new PEVersion(1, 7, 9, 4);
     private final EventManager eventManager = new PEEventManager();
     private final PlayerUtils playerUtils = new PlayerUtils();
     private final ServerUtils serverUtils = new ServerUtils();
@@ -187,10 +187,8 @@ public final class PacketEvents implements Listener, EventManager {
 
     public void terminate() {
         if (initialized && !terminating) {
-            if (!PacketEvents.get().getSettings().shouldEjectAsync()) {
-                for (Player player : Bukkit.getOnlinePlayers()) {
-                    packetProcessorInternal.ejectPlayer(player);
-                }
+            for (Player player : Bukkit.getOnlinePlayers()) {
+                packetProcessorInternal.ejectPlayer(player);
             }
             //This might be a little complicated to explain. This is just to support server killing. If we eject async users run into issues on a server kill (never recommended btw)
             //so we just don't eject and therefore sacrifice reload support.
@@ -205,6 +203,7 @@ public final class PacketEvents implements Listener, EventManager {
 
     /**
      * Use {@link #terminate()}. This is deprecated
+     *
      * @deprecated "Stop" might be misleading and "terminate" sounds better I guess...
      */
     @Deprecated
