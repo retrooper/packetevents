@@ -6,6 +6,7 @@ import java.util.List;
 // todo: Rename everything to make sense
 // todo: ChatSerializer
 // todo: google bad for some reason (don't import from com.google)
+// todo: from IChatBaseComponent and implementations (NMS shit)
 public interface WIChatBaseComponent extends Iterable<WIChatBaseComponent> {
     WIChatBaseComponent setChatModifier(WChatModifier var1);
 
