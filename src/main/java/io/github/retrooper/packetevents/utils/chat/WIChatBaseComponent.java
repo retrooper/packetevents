@@ -5,6 +5,7 @@ import java.util.List;
 // todo: WChatComponentKeybind WChatComponentScore WChatComponentSelector WChatMessage
 // todo: Rename everything to make sense
 // todo: ChatSerializer
+// todo: google bad for some reason (don't import from com.google)
 public interface WIChatBaseComponent extends Iterable<WIChatBaseComponent> {
     WIChatBaseComponent setChatModifier(WChatModifier var1);
 
