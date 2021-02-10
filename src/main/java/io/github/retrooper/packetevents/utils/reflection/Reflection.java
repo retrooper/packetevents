@@ -158,7 +158,7 @@ public final class Reflection {
     }
 
     public static Method getMethod(final Class<?> cls, final String name, final Class<?> returning) {
-        for (final Method m : getDeclaredMethodsInOrder(cls)) {
+        for (final Method m : cls.getMethods()) { // no order needed... I don't think (hope not)
             if (m.getName().equals(name)
                     && (returning == null || m.getReturnType().equals(returning))) {
                 m.setAccessible(true);
@@ -281,4 +281,6 @@ public final class Reflection {
 
         return methods;
     }
+
+    // todo: getDeclairedFields
 }

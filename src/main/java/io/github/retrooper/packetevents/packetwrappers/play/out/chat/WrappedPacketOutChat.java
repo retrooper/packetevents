@@ -42,7 +42,7 @@ import java.util.UUID;
 public final class WrappedPacketOutChat extends WrappedPacket implements SendableWrapper {
     private static Constructor<?> chatClassConstructor;
     private static Class<?> packetClass, iChatBaseComponentClass, chatSerializerClass, chatMessageTypeEnum;
-    private static Method chatMessageTypeCreatorMethod;
+    private static Method chatMessageTypeCreatorMethod, getMessageMethod, chatFromStringMethod;
     //0 = IChatBaseComponent, Byte
     //1 = IChatBaseComponent, Int
     //2 = IChatBaseComponent, ChatMessageType
@@ -82,6 +82,9 @@ public final class WrappedPacketOutChat extends WrappedPacket implements Sendabl
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
         }
+
+        getMessageMethod = Reflection.getMethod(iChatBaseComponentClass, String.class, 0);
+        chatFromStringMethod = Reflection.getMethod(chatSerializerClass, 0, String.class);
 
         //In 1.8.3+ the ChatSerializer class is declared in the IChatBaseComponent class, so we have to handle that
         try {
@@ -145,7 +148,7 @@ public final class WrappedPacketOutChat extends WrappedPacket implements Sendabl
 
     public static String toStringFromIChatBaseComponent(Object obj) {
         try {
-            return Reflection.getMethod(iChatBaseComponentClass, String.class, 0).invoke(obj).toString();
+            return getMessageMethod.invoke(obj).toString();
         } catch (IllegalAccessException | InvocationTargetException e) {
             e.printStackTrace();
         }
@@ -154,7 +157,7 @@ public final class WrappedPacketOutChat extends WrappedPacket implements Sendabl
 
     public static Object toIChatBaseComponent(String msg) {
         try {
-            return Reflection.getMethod(chatSerializerClass, 0, String.class).invoke(null, msg);
+            return chatFromStringMethod.invoke(null, msg);
         } catch (IllegalAccessException | InvocationTargetException e) {
             e.printStackTrace();
         }
@@ -222,7 +225,7 @@ public final class WrappedPacketOutChat extends WrappedPacket implements Sendabl
             final Object iChatBaseObj = readObject(0, iChatBaseComponentClass);
 
             try {
-                Object contentString = Reflection.getMethod(iChatBaseComponentClass, String.class, 0).invoke(iChatBaseObj);
+                Object contentString = getMessageMethod.invoke(iChatBaseObj);
                 return contentString.toString();
             } catch (IllegalAccessException | InvocationTargetException e) {
                 e.printStackTrace();
