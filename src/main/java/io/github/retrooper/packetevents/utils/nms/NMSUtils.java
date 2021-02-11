@@ -61,6 +61,8 @@ public final class NMSUtils {
     private static Method getCraftWorldHandle;
     private static Method asBukkitCopy;
     private static Method asNMSCopy;
+    private static Method getServerMarkers;
+    private static boolean useGetServerMarkers;
     private static Field entityPlayerPingField, playerConnectionField;
     private static Object minecraftServer;
     private static Object minecraftServerConnection;
@@ -75,7 +77,7 @@ public final class NMSUtils {
         else {
             legacyNettyImportMode = true;
             nettyPrefix = legacyNettyPrefix;
-        }
+        }Reflection.getMethod(serverConnectionClass, List.class, 0, serverConnectionClass);
 
         try {
             //Test if the selected netty location is valid
@@ -165,6 +167,8 @@ public final class NMSUtils {
         try {
             entityPlayerPingField = entityPlayerClass.getField("ping");
             playerConnectionField = entityPlayerClass.getField("playerConnection");
+            getServerMarkers = Reflection.getMethod(serverConnectionClass, List.class, 0, serverConnectionClass);
+            useGetServerMarkers = getServerMarkers != null;
         } catch (NoSuchFieldException e) {
             e.printStackTrace();
         }
@@ -183,7 +187,6 @@ public final class NMSUtils {
     }
 
     public static Object getMinecraftServerConnection() {
-        net.minecraft.server.v1_8_R3.ServerConnection sv;
         if (minecraftServerConnection == null) {
             try {
                 minecraftServerConnection = Reflection.getField(minecraftServerClass, serverConnectionClass, 0).get(getMinecraftServerInstance());
@@ -303,10 +306,9 @@ public final class NMSUtils {
     }
 
     public static List<Object> getNetworkMarkers() {
-        Method method = Reflection.getMethod(serverConnectionClass, List.class, 0, serverConnectionClass);
-        if (method != null) {
+        if (useGetServerMarkers) {
             try {
-                return (List<Object>) method.invoke(null, getMinecraftServerConnection());
+                return (List<Object>) getServerMarkers.invoke(null, getMinecraftServerConnection());
             } catch (Exception ignored) {
 
             }
