@@ -27,8 +27,6 @@ package io.github.retrooper.packetevents;
 import org.bukkit.plugin.java.JavaPlugin;
 
 public class PacketEventsPlugin extends JavaPlugin {
-//TODO do what cleanups you did to Direction enum, to all others
-
     @Override
     public void onLoad() {
 
