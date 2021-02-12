@@ -33,7 +33,7 @@ import io.github.retrooper.packetevents.utils.reflection.Reflection;
 import io.github.retrooper.packetevents.utils.reflection.SubclassUtil;
 import io.github.retrooper.packetevents.utils.server.ServerVersion;
 
-import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.*;
 
 public final class WrappedPacketInBlockDig extends WrappedPacket {
     private static Class<?> blockPositionClass;
@@ -83,7 +83,7 @@ public final class WrappedPacketInBlockDig extends WrappedPacket {
                 blockPosObj = readObject(0, blockPositionClass);
             }
             try {
-                return (int) Reflection.getMethod(blockPosObj.getClass().getSuperclass(), "getX", 0).invoke(blockPosObj);
+                return (int) NMSUtils.getBlockPosX.invoke(blockPosObj);
             } catch (IllegalAccessException | InvocationTargetException e) {
                 e.printStackTrace();
             }
@@ -104,7 +104,7 @@ public final class WrappedPacketInBlockDig extends WrappedPacket {
                 blockPosObj = readObject(0, blockPositionClass);
             }
             try {
-                return (int) Reflection.getMethod(blockPosObj.getClass().getSuperclass(), "getY", 0).invoke(blockPosObj);
+                return (int) NMSUtils.getBlockPosY.invoke(blockPosObj);
             } catch (IllegalAccessException | InvocationTargetException e) {
                 e.printStackTrace();
             }
@@ -125,7 +125,7 @@ public final class WrappedPacketInBlockDig extends WrappedPacket {
                 blockPosObj = readObject(0, blockPositionClass);
             }
             try {
-                return (int) Reflection.getMethod(blockPosObj.getClass().getSuperclass(), "getZ", 0).invoke(blockPosObj);
+                return (int) NMSUtils.getBlockPosZ.invoke(blockPosObj);
             } catch (IllegalAccessException | InvocationTargetException e) {
                 e.printStackTrace();
             }
