@@ -24,23 +24,17 @@
 
 package io.github.retrooper.packetevents.packetwrappers.play.in.blockplace;
 
-import io.github.retrooper.packetevents.packetwrappers.NMSPacket;
-import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
+import io.github.retrooper.packetevents.packetwrappers.*;
 import io.github.retrooper.packetevents.utils.nms.NMSUtils;
-import io.github.retrooper.packetevents.utils.reflection.Reflection;
 import org.bukkit.inventory.ItemStack;
 
-import java.lang.reflect.*;
+import java.lang.reflect.InvocationTargetException;
 
 final class WrappedPacketInBlockPlace_1_8 extends WrappedPacket {
     private Object blockPosObj;
 
     WrappedPacketInBlockPlace_1_8(final NMSPacket packet) {
         super(packet);
-    }
-
-    @Override
-    protected void load() {
     }
 
     public int getX() {
