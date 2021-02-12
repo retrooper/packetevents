@@ -25,13 +25,12 @@
 package io.github.retrooper.packetevents.packetwrappers.play.in.updatesign;
 
 import io.github.retrooper.packetevents.packettype.PacketTypeClasses;
-import io.github.retrooper.packetevents.packetwrappers.NMSPacket;
-import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
+import io.github.retrooper.packetevents.packetwrappers.*;
 import io.github.retrooper.packetevents.packetwrappers.play.out.chat.WrappedPacketOutChat;
 import io.github.retrooper.packetevents.utils.nms.NMSUtils;
 import io.github.retrooper.packetevents.utils.reflection.Reflection;
 
-import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.*;
 
 public class WrappedPacketInUpdateSign extends WrappedPacket {
     private static boolean v_1_7_mode, strArrayMode;
@@ -65,7 +64,7 @@ public class WrappedPacketInUpdateSign extends WrappedPacket {
                 blockPosObj = readObject(0, blockPosClass);
             }
             try {
-                return (int) Reflection.getMethod(blockPosObj.getClass().getSuperclass(), "getX", 0).invoke(blockPosObj);
+                return (int) NMSUtils.getBlockPosX.invoke(blockPosObj);
             } catch (IllegalAccessException | InvocationTargetException e) {
                 e.printStackTrace();
             }
@@ -81,7 +80,7 @@ public class WrappedPacketInUpdateSign extends WrappedPacket {
                 blockPosObj = readObject(0, blockPosClass);
             }
             try {
-                return (int) Reflection.getMethod(blockPosObj.getClass().getSuperclass(), "getY", 0).invoke(blockPosObj);
+                return (int) NMSUtils.getBlockPosY.invoke(blockPosObj);
             } catch (IllegalAccessException | InvocationTargetException e) {
                 e.printStackTrace();
             }
@@ -97,7 +96,7 @@ public class WrappedPacketInUpdateSign extends WrappedPacket {
                 blockPosObj = readObject(0, blockPosClass);
             }
             try {
-                return (int) Reflection.getMethod(blockPosObj.getClass().getSuperclass(), "getZ", 0).invoke(blockPosObj);
+                return (int) NMSUtils.getBlockPosZ.invoke(blockPosObj);
             } catch (IllegalAccessException | InvocationTargetException e) {
                 e.printStackTrace();
             }
@@ -115,7 +114,7 @@ public class WrappedPacketInUpdateSign extends WrappedPacket {
             String[] lines = new String[iChatComponents.length];
             for (int i = 0; i < iChatComponents.length; i++) {
                 lines[i] = WrappedPacketOutChat.
-                        toStringFromIChatBaseComponent(iChatComponents[i]);
+                  toStringFromIChatBaseComponent(iChatComponents[i]);
             }
             return lines;
         }
