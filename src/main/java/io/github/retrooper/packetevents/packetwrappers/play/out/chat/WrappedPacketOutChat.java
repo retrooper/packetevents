@@ -82,9 +82,10 @@ public final class WrappedPacketOutChat extends WrappedPacket implements Sendabl
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
         }
-
-        getMessageMethod = Reflection.getMethod(iChatBaseComponentClass, String.class, 0);
-        chatFromStringMethod = Reflection.getMethod(chatSerializerClass, 0, String.class);
+        getMessageMethod = Reflection.getMethodCheckContainsString(iChatBaseComponentClass, "c", String.class);
+        if (getMessageMethod == null) {
+            getMessageMethod = Reflection.getMethodCheckContainsString(iChatBaseComponentClass, "Plain", String.class);
+        }
 
         //In 1.8.3+ the ChatSerializer class is declared in the IChatBaseComponent class, so we have to handle that
         try {
@@ -93,6 +94,8 @@ public final class WrappedPacketOutChat extends WrappedPacket implements Sendabl
             //That is fine, it is probably a subclass
             chatSerializerClass = SubclassUtil.getSubClass(iChatBaseComponentClass, "ChatSerializer");
         }
+
+        chatFromStringMethod = Reflection.getMethod(chatSerializerClass, 0, String.class);
 
 
         boolean isVeryOutdated = false;

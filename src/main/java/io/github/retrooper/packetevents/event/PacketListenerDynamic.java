@@ -121,12 +121,36 @@ public abstract class PacketListenerDynamic {
     }
 
     public final void filterAll() {
-        this.serverSidedStatusAllowance = new ImmutableSetCustom<>();
-        this.serverSidedLoginAllowance = new ImmutableSetCustom<>();
-        this.serverSidedPlayAllowance = new ImmutableSetCustom<>();
+        filterServerSidedStatus();
+        filterServerSidedLogin();
+        filterServerSidedPlay();
 
+        filterClientSidedStatus();
+        filterClientSidedLogin();
+        filterClientSidedPlay();
+    }
+
+    public final void filterServerSidedStatus() {
+        this.serverSidedStatusAllowance = new ImmutableSetCustom<>();
+    }
+
+    public final void filterServerSidedLogin() {
+        this.serverSidedLoginAllowance = new ImmutableSetCustom<>();
+    }
+
+    public final void filterServerSidedPlay() {
+        this.serverSidedPlayAllowance = new ImmutableSetCustom<>();
+    }
+
+    public final void filterClientSidedStatus() {
         this.clientSidedStatusAllowance = new ImmutableSetCustom<>();
+    }
+
+    public final void filterClientSidedLogin() {
         this.clientSidedLoginAllowance = new ImmutableSetCustom<>();
+    }
+
+    public final void filterClientSidedPlay() {
         this.clientSidedPlayAllowance = new ImmutableSetCustom<>();
     }
 

@@ -77,7 +77,7 @@ public final class NMSUtils {
         else {
             legacyNettyImportMode = true;
             nettyPrefix = legacyNettyPrefix;
-        }Reflection.getMethod(serverConnectionClass, List.class, 0, serverConnectionClass);
+        }
 
         try {
             //Test if the selected netty location is valid
