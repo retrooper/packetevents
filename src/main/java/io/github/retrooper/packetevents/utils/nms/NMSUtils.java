@@ -56,6 +56,7 @@ public final class NMSUtils {
             craftPlayerClass, serverConnectionClass, craftEntityClass, nmsItemStackClass, networkManagerClass, nettyChannelClass, gameProfileClass, iChatBaseComponentClass,
             blockPosClass, enumDirectionClass, vec3DClass, channelFutureClass, blockClass, iBlockDataClass, watchableObjectClass, nmsWorldClass, craftItemStackClass,
             soundEffectClass, minecraftKeyClass;
+    public static Method getBlockPosX, getBlockPosY, getBlockPosZ;
     private static Method getCraftPlayerHandle;
     private static Method getCraftEntityHandle;
     private static Method getCraftWorldHandle;
@@ -172,6 +173,9 @@ public final class NMSUtils {
         } catch (NoSuchFieldException e) {
             e.printStackTrace();
         }
+        getBlockPosX = Reflection.getMethod(NMSUtils.blockPosClass.getSuperclass(), "getX", 0);
+        getBlockPosY = Reflection.getMethod(NMSUtils.blockPosClass.getSuperclass(), "getY", 0);
+        getBlockPosZ = Reflection.getMethod(NMSUtils.blockPosClass.getSuperclass(), "getZ", 0);
     }
 
     public static Object getMinecraftServerInstance() {

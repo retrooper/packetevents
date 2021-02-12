@@ -24,10 +24,8 @@
 
 package io.github.retrooper.packetevents.packetwrappers.play.in.blockplace;
 
-import io.github.retrooper.packetevents.packetwrappers.NMSPacket;
-import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
+import io.github.retrooper.packetevents.packetwrappers.*;
 import io.github.retrooper.packetevents.utils.nms.NMSUtils;
-import io.github.retrooper.packetevents.utils.reflection.Reflection;
 import org.bukkit.inventory.ItemStack;
 
 import java.lang.reflect.InvocationTargetException;
@@ -44,7 +42,7 @@ final class WrappedPacketInBlockPlace_1_8 extends WrappedPacket {
             blockPosObj = readObject(1, NMSUtils.blockPosClass);
         }
         try {
-            return (int) Reflection.getMethod(blockPosObj.getClass().getSuperclass(), "getX", 0).invoke(blockPosObj);
+            return (int) NMSUtils.getBlockPosX.invoke(blockPosObj);
         } catch (IllegalAccessException | InvocationTargetException e) {
             e.printStackTrace();
         }
@@ -57,7 +55,7 @@ final class WrappedPacketInBlockPlace_1_8 extends WrappedPacket {
             blockPosObj = readObject(1, NMSUtils.blockPosClass);
         }
         try {
-            return (int) Reflection.getMethod(blockPosObj.getClass().getSuperclass(), "getY", 0).invoke(blockPosObj);
+            return (int) NMSUtils.getBlockPosY.invoke(blockPosObj);
         } catch (IllegalAccessException | InvocationTargetException e) {
             e.printStackTrace();
         }
@@ -69,7 +67,7 @@ final class WrappedPacketInBlockPlace_1_8 extends WrappedPacket {
             blockPosObj = readObject(1, NMSUtils.blockPosClass);
         }
         try {
-            return (int) Reflection.getMethod(blockPosObj.getClass().getSuperclass(), "getZ", 0).invoke(blockPosObj);
+            return (int) NMSUtils.getBlockPosZ.invoke(blockPosObj);
         } catch (IllegalAccessException | InvocationTargetException e) {
             e.printStackTrace();
         }

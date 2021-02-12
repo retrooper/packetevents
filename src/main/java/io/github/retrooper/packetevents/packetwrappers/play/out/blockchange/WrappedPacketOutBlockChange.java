@@ -100,7 +100,7 @@ public class WrappedPacketOutBlockChange extends WrappedPacket implements Sendab
                     blockPosObj = readObject(0, NMSUtils.blockPosClass);
                 }
                 try {
-                    return (int) Reflection.getMethod(blockPosObj.getClass().getSuperclass(), "getX", 0).invoke(blockPosObj);
+                    return (int) NMSUtils.getBlockPosX.invoke(blockPosObj);
                 } catch (IllegalAccessException | InvocationTargetException e) {
                     e.printStackTrace();
                 }
@@ -120,7 +120,7 @@ public class WrappedPacketOutBlockChange extends WrappedPacket implements Sendab
                     blockPosObj = readObject(0, NMSUtils.blockPosClass);
                 }
                 try {
-                    return (int) Reflection.getMethod(blockPosObj.getClass().getSuperclass(), "getY", 0).invoke(blockPosObj);
+                    return (int) NMSUtils.getBlockPosY.invoke(blockPosObj);
                 } catch (IllegalAccessException | InvocationTargetException e) {
                     e.printStackTrace();
                 }
@@ -140,7 +140,7 @@ public class WrappedPacketOutBlockChange extends WrappedPacket implements Sendab
                     blockPosObj = readObject(0, NMSUtils.blockPosClass);
                 }
                 try {
-                    return (int) Reflection.getMethod(blockPosObj.getClass().getSuperclass(), "getZ", 0).invoke(blockPosObj);
+                    return (int) NMSUtils.getBlockPosZ.invoke(blockPosObj);
                 } catch (IllegalAccessException | InvocationTargetException e) {
                     e.printStackTrace();
                 }
