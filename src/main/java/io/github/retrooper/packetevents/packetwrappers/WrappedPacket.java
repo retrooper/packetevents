@@ -24,17 +24,22 @@
 
 package io.github.retrooper.packetevents.packetwrappers;
 
+import io.github.retrooper.packetevents.PacketEvents;
+import io.github.retrooper.packetevents.event.annotation.PacketHandler;
 import io.github.retrooper.packetevents.exceptions.WrapperFieldNotFoundException;
+import io.github.retrooper.packetevents.exceptions.WrapperUnsupportedUsageException;
 import io.github.retrooper.packetevents.packettype.PacketTypeClasses;
 import io.github.retrooper.packetevents.utils.reflection.ClassUtil;
 import io.github.retrooper.packetevents.utils.server.ServerVersion;
 
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 import java.lang.reflect.Field;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.logging.Level;
 
 public class WrappedPacket implements WrapperPacketReader, WrapperPacketWriter {
 
@@ -67,9 +72,19 @@ public class WrappedPacket implements WrapperPacketReader, WrapperPacketWriter {
     }
 
     private void load0() {
+        if (!isSupported()) {
+            throw new WrapperUnsupportedUsageException(getClass());
+        }
         final Class<? extends WrappedPacket> clazz = getClass();
         if (!LOADED_WRAPPERS.containsKey(clazz)) {
-            load();
+            try {
+                load();
+            }
+            catch (Exception ex) {
+                String wrapperName = ClassUtil.getClassSimpleName(getClass());
+                PacketEvents.get().getPlugin().getLogger()
+                        .log(Level.SEVERE, "PacketEvents found an exception while loading the " + wrapperName + " packet wrapper. Please report this bug! Tell us about your server version, spigot and code(of you using the wrapper)", ex);
+            }
             LOADED_WRAPPERS.put(clazz, true);
         }
     }
@@ -266,8 +281,26 @@ public class WrappedPacket implements WrapperPacketReader, WrapperPacketWriter {
         return ret.toArray(EMPTY_FIELD_ARRAY);
     }
 
-    // Does the server version support reading/sending this packet?
+    /**
+     * Does the local server version support reading at-least one field with this packet wrapper?
+     * If it does, we can label this wrapper to be supported on the local server version.
+     * One example where it would not be supported would be if the packet the wrapper is wrapping doesn't even exist on the local server version.
+     * @return Is the wrapper supported on the local server version?
+     */
     public boolean isSupported() {
         return true;
+    }
+
+    /**
+     * If a method in a wrapper is annotated with this, it means it isn't supported on all server versions.
+     * It not being supported by all server versions can lead to exceptions. Make sure you always decompile a wrapper getter before using it.
+     * This annotation will specify what versions are supported.
+     * @author retrooper
+     * @since 1.8
+     */
+    @Target({ElementType.METHOD})
+    @Retention(RetentionPolicy.RUNTIME)
+    public @interface SupportedVersions {
+        ServerVersion[] versions() default {};
     }
 }

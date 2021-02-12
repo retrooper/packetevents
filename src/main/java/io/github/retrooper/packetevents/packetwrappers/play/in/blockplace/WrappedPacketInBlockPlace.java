@@ -97,11 +97,14 @@ public final class WrappedPacketInBlockPlace extends WrappedPacket {
     }
 
     /**
-     * Returns the cursorX value from the packet inputted.
-     * Only supported from 1.7 to 1.8.8.
+     * Get the X position of the crosshair on the block.
+     * Only supported on versions 1.7.10 to 1.8.8.
      *
      * @return cursorX from PacketPlayInBlockPlace
      */
+    @SupportedVersions(versions = {ServerVersion.v_1_7_10, ServerVersion.v_1_8, ServerVersion.v_1_8_3,
+            ServerVersion.v_1_8_4, ServerVersion.v_1_8_5, ServerVersion.v_1_8_6, ServerVersion.v_1_8_7,
+            ServerVersion.v_1_8_8})
     public float getCursorX() {
         if (isOlderThan_v_1_9) {
             if (isHigherThan_v_1_7_10) {
@@ -117,11 +120,14 @@ public final class WrappedPacketInBlockPlace extends WrappedPacket {
     }
 
     /**
-     * Returns the cursorY value from the packet inputted.
-     * Only supported from 1.7 to 1.8.8.
+     * Get the Y position of the crosshair on the block.
+     * Only supported on versions 1.7.10 to 1.8.8.
      *
      * @return cursorY from PacketPlayInBlockPlace
      */
+    @SupportedVersions(versions = {ServerVersion.v_1_7_10, ServerVersion.v_1_8, ServerVersion.v_1_8_3,
+            ServerVersion.v_1_8_4, ServerVersion.v_1_8_5, ServerVersion.v_1_8_6, ServerVersion.v_1_8_7,
+            ServerVersion.v_1_8_8})
     public float getCursorY() {
         if (isOlderThan_v_1_9) {
             if (isHigherThan_v_1_7_10) {
@@ -137,11 +143,14 @@ public final class WrappedPacketInBlockPlace extends WrappedPacket {
     }
 
     /**
-     * Returns the cursorZ value from the packet inputted.
-     * Only supported from 1.7 to 1.8.8.
+     * Get the Z position of the crosshair on the block.
+     * Only supported on versions 1.7 to 1.8.8.
      *
      * @return cursorZ from PacketPlayInBlockPlace
      */
+    @SupportedVersions(versions = {ServerVersion.v_1_7_10, ServerVersion.v_1_8, ServerVersion.v_1_8_3,
+            ServerVersion.v_1_8_4, ServerVersion.v_1_8_5, ServerVersion.v_1_8_6, ServerVersion.v_1_8_7,
+            ServerVersion.v_1_8_8})
     public float getCursorZ() {
         if (isOlderThan_v_1_9) {
             if (isHigherThan_v_1_7_10) {

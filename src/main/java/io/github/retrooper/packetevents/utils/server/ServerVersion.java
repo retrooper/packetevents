@@ -45,7 +45,7 @@ public enum ServerVersion {
     v_1_13_1((short) 401), v_1_13_2((short) 404), v_1_14((short) 477), v_1_14_1((short) 480), v_1_14_2((short) 485),
     v_1_14_3((short) 490), v_1_14_4((short) 498), v_1_15((short) 573), v_1_15_1((short) 575), v_1_15_2((short) 578),
     v_1_16((short) 735), v_1_16_1((short) 736), v_1_16_2((short) 751), v_1_16_3((short) 753), v_1_16_4((short) 754),
-    v_1_16_5((short)754), ERROR((short) -1);
+    v_1_16_5((short) 754), ERROR((short) -1);
 
     private static final String NMS_VERSION_SUFFIX = Bukkit.getServer().getClass().getPackage().getName()
             .replace(".", ",").split(",")[3];
@@ -139,11 +139,11 @@ public enum ServerVersion {
      */
     public boolean isNewerThan(ServerVersion target) {
         /*
-        * Some server versions have the same protocol version in the minecraft protocol.
-        * We still need this method to work in such cases.
-        * We first check if this is the case, if the protocol versions aren't the same, we can just use the protocol versions
-        * to compare the server versions.
-        */
+         * Some server versions have the same protocol version in the minecraft protocol.
+         * We still need this method to work in such cases.
+         * We first check if this is the case, if the protocol versions aren't the same, we can just use the protocol versions
+         * to compare the server versions.
+         */
         if (target.protocolVersion != protocolVersion || this == target) {
             return protocolVersion > target.protocolVersion;
         }
@@ -162,6 +162,7 @@ public enum ServerVersion {
         }
         return false;
     }
+
     /**
      * Is this server version older than the compared server version?
      * This method simply checks if this server version's protocol version is less than
@@ -186,12 +187,11 @@ public enum ServerVersion {
          * The first one we find in the array is the newer version.
          */
         for (ServerVersion version : values()) {
-           if (version == this) {
-               return true;
-           }
-           else if (version == target) {
-               return false;
-           }
+            if (version == this) {
+                return true;
+            } else if (version == target) {
+                return false;
+            }
         }
         return false;
     }
@@ -222,9 +222,10 @@ public enum ServerVersion {
 
     /**
      * Deprecated, please use {@link #isNewerThan(ServerVersion)}
-     * @deprecated Rename...
+     *
      * @param target Compared version.
      * @return Is this server version newer than the compared server version.
+     * @deprecated Rename...
      **/
     @Deprecated
     public boolean isHigherThan(final ServerVersion target) {
@@ -233,9 +234,10 @@ public enum ServerVersion {
 
     /**
      * Deprecated, Please use {@link #isNewerThanOrEquals(ServerVersion)}
-     * @deprecated Rename...
+     *
      * @param target Compared server version.
      * @return Is this server version newer than or equal to the compared server version.
+     * @deprecated Rename...
      */
     @Deprecated
     public boolean isHigherThanOrEquals(final ServerVersion target) {
@@ -244,9 +246,10 @@ public enum ServerVersion {
 
     /**
      * Deprecated... Please use {@link #isOlderThan(ServerVersion)}
-     * @deprecated Rename....
+     *
      * @param target Compared server version.
      * @return Is this server version older than the compared server version.
+     * @deprecated Rename....
      */
     @Deprecated
     public boolean isLowerThan(final ServerVersion target) {
@@ -255,9 +258,10 @@ public enum ServerVersion {
 
     /**
      * Deprecated, please use {@link #isOlderThanOrEquals(ServerVersion)}
-     * @deprecated Rename...
+     *
      * @param target Compared server version.
      * @return Is this server version older than or equal to the compared server version.
+     * @deprecated Rename...
      */
     @Deprecated
     public boolean isLowerThanOrEquals(final ServerVersion target) {

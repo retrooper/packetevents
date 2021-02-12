@@ -84,6 +84,7 @@ final class WrappedPacketInBlockPlace_1_8 extends WrappedPacket {
         return readInt(0);
     }
 
+
     public float getCursorX() {
         return readFloat(0);
     }
