@@ -33,12 +33,10 @@ import io.github.retrooper.packetevents.event.priority.PacketEventPriority;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.logging.Level;
 
 class EventManagerDynamic {
-    private final Map<Byte, ConcurrentLinkedQueue<PacketListenerDynamic>> listenersMap = new ConcurrentHashMap<>();
-    private final boolean[] usedPriorities = new boolean[PacketEventPriority.values().length];
+    private final Map<Byte, HashSet<PacketListenerDynamic>> listenersMap = new ConcurrentHashMap<>();
 
     /**
      * Call the PacketEvent.
@@ -58,8 +56,9 @@ class EventManagerDynamic {
         }
         byte highestReachedPriority = PacketEventPriority.LOWEST.getPriorityValue();
         for (byte priority = PacketEventPriority.LOWEST.getPriorityValue(); priority <= PacketEventPriority.MONITOR.getPriorityValue(); priority++) {
-            if (usedPriorities[priority]) {
-                for (PacketListenerDynamic listener : listenersMap.get(priority)) {
+            HashSet<PacketListenerDynamic> listeners = listenersMap.get(priority);
+            if (listeners != null) {
+                for (PacketListenerDynamic listener : listeners) {
                     try {
                         if (!event.isInbuilt()) {
                             event.callPacketEventExternal(listener);
@@ -91,10 +90,9 @@ class EventManagerDynamic {
      */
     public synchronized void registerListener(final PacketListenerDynamic listener) {
         byte priority = listener.getPriority().getPriorityValue();
-        ConcurrentLinkedQueue<PacketListenerDynamic> listenerSet = listenersMap.get(priority);
+        HashSet<PacketListenerDynamic> listenerSet = listenersMap.get(priority);
         if (listenerSet == null) {
-            listenerSet = new ConcurrentLinkedQueue<>();
-            usedPriorities[priority] = true;
+            listenerSet = new HashSet<>();
         }
         listenerSet.add(listener);
         listenersMap.put(priority, listenerSet);
