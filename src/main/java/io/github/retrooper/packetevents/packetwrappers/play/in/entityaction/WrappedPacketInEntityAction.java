@@ -86,7 +86,7 @@ public final class WrappedPacketInEntityAction extends WrappedPacket {
     public PlayerAction getAction() {
         if (isLowerThan_v_1_8) {
             byte animationIndex = (byte) readInt(1);
-            return PlayerAction.getByActionValue(animationIndex);
+            return PlayerAction.getByActionValue((byte) (animationIndex - 1));
         } else {
             final Object enumObj = readObject(0, enumPlayerActionClass);
             return PlayerAction.getByName(enumObj.toString());

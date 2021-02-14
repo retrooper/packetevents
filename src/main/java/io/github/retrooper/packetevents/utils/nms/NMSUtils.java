@@ -231,8 +231,7 @@ public final class NMSUtils {
         if (entity == null) {
             List<World> worlds = new ArrayList<>(Bukkit.getWorlds());
             for (World world : worlds) {
-                List<Entity> entities = new ArrayList<>(world.getEntities());
-                for (Entity e : entities) {
+                for (Entity e : world.getEntities()) {
                     if (e.getEntityId() == id) {
                         entity = e;
                         break;
