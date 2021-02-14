@@ -127,7 +127,10 @@ public final class PlayerUtils {
     public int getPing(UUID uuid) {
         Integer ping = playerPingMap.get(uuid);
         if (ping == null) {
-            long joinTime = loginTime.get(uuid);
+            Long joinTime = loginTime.get(uuid);
+            if (joinTime == null) {
+                return 0; //TODO insert login time at plagerloginevent not playerjoinevent as i do atm iirc
+            }
             return (int) (System.currentTimeMillis() -  joinTime);
         }
         return ping;
@@ -142,7 +145,10 @@ public final class PlayerUtils {
     public int getSmoothedPing(UUID uuid) {
         Integer smoothedPing = playerSmoothedPingMap.get(uuid);
         if (smoothedPing == null) {
-            long joinTime = loginTime.get(uuid);
+            Long joinTime = loginTime.get(uuid);
+            if (joinTime == null) {
+                return 0;
+            }
             return (int) (System.currentTimeMillis() - joinTime);
         }
         return smoothedPing;

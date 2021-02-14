@@ -121,11 +121,6 @@ public class PacketProcessorInternal {
                 @Override
                 public void run() {
                     try {
-                        Thread.sleep(deltaTicks * 50);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-                    try {
                         injectPlayerSync(player);
                     } catch (IllegalStateException ex) {
                         PacketEvents.get().getSettings().getInjectionFailureAction().accept(player);
