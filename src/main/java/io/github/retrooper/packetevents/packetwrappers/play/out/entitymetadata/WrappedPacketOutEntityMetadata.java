@@ -24,92 +24,99 @@
 
 package io.github.retrooper.packetevents.packetwrappers.play.out.entitymetadata;
 
-import io.github.retrooper.packetevents.packetwrappers.NMSPacket;
-import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
-import io.github.retrooper.packetevents.utils.nms.NMSUtils;
-
-import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;
 
+import io.github.retrooper.packetevents.packetwrappers.NMSPacket;
+import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
+
 /**
- * UNFINISHED, DO NOT USE
+ * A PacketPlayOutEntityMetadata.
+ * Update metadata properties for an existing entity.
+ * Any properties not included are left unchanged.
+ *
+ * @author SteelPhoenix
  */
 public class WrappedPacketOutEntityMetadata extends WrappedPacket {
-    private static Constructor<?> watchableObjectConstructor;
 
-    public WrappedPacketOutEntityMetadata(NMSPacket packet) {
-        super(packet);
-    }
+	public WrappedPacketOutEntityMetadata(NMSPacket packet) {
+		super(packet);
+	}
 
-    @Override
-    protected void load() {
-        try {
-            watchableObjectConstructor = NMSUtils.watchableObjectClass.getConstructor(int.class, int.class, Object.class);
-        } catch (NoSuchMethodException e) {
-            e.printStackTrace();
-        }
-    }
+	// TODO: PacketPlayOutEntityMetadata constructors
 
-    public int getEntityId() {
-        if (packet != null) {
-            return readInt(0);
-        } else {
-            return 0;
-        }
-    }
+	/**
+	 * Get the entity ID.
+	 *
+	 * @return the current value.
+	 */
+	public int getEntityId() {
+    	return readInt(0);
+	}
 
-    public List<WrappedWatchableObject> getWatchableObjects() {
-        List<Object> nmsWatchables = (List<Object>) readObject(0, List.class);
-        List<WrappedWatchableObject> watchableObjects = new ArrayList<>();
-        for (Object nmsWatchable : nmsWatchables) {
-            watchableObjects.add(new WrappedWatchableObject(nmsWatchable));
-        }
-        return watchableObjects;
-    }
+	/**
+	 * Set the entity ID.
+	 *
+	 * @param value New value.
+	 */
+	public void setEntityId(int value) {
+		writeInt(0, value);
+	}
 
-    public static class WrappedWatchableObject {
-        private final int type;
-        private final int index;
-        private Object value;
+	/**
+	 * Get the entity metadata.
+	 * Note that null values are preserved.
+	 *
+	 * @return the current value.
+	 */
+	public List<WrappedWatchableObject> getWatchableObjects() {
+		// We assume this is the right type
+		List<?> nms = (List<?>) readObject(0, List.class);
 
-        public WrappedWatchableObject(int type, int index, Object value) {
-            this.type = type;
-            this.index = index;
-            this.value = value;
-        }
+		// Wrap
+		// We assume every element can be wrapped
+		List<WrappedWatchableObject> watchableObjects = new ArrayList<>();
+		for (Object nmsWatchable : nms) {
+			watchableObjects.add(new WrappedWatchableObject(nmsWatchable));
+		}
 
-        public WrappedWatchableObject(Object nmsWatchableObject) {
-            WrappedPacket watchableWrapper = new WrappedPacket(new NMSPacket(nmsWatchableObject));
-            this.type = watchableWrapper.readInt(0);
-            this.index = watchableWrapper.readInt(1);
-            this.value = watchableWrapper.readObject(0, Object.class);
-        }
+		return watchableObjects;
+	}
 
-        public int getType() {
-            return type;
-        }
+	/**
+	 * Set the entity metadata.
+	 * Note that null values are preserved.
+	 *
+	 * @param value New value.
+	 */
+	@SuppressWarnings("unchecked")
+	public void setWatchableObjects(List<WrappedWatchableObject> value) {
+		// Preconditions
+		if (value == null) {
+			throw new NullPointerException("Object cannot be null");
+		}
 
-        public int getIndex() {
-            return index;
-        }
+		// Try to maintain list type if possible
+		List<Object> list;
+		try {
+			list = value.getClass().newInstance();
+		} catch (ReflectiveOperationException | SecurityException exception) {
+			list = new ArrayList<>();
+		}
 
-        public Object getValue() {
-            return value;
-        }
+		for (WrappedWatchableObject wrappedWatchable : value) {
+			// Handle nulls
+			if (wrappedWatchable == null) {
+				list.add(null);
+			}
 
-        public void setValue(Object value) {
-            this.value = value;
-        }
+			// Only add if a raw object is set
+			Object nms = wrappedWatchable.getRaw();
+			if (nms != null) {
+				list.add(nms);
+			}
+		}
 
-        public Object asMojangWatchableObject() {
-            try {
-                return watchableObjectConstructor.newInstance(type, index, value);
-            } catch (InstantiationException | InvocationTargetException | IllegalAccessException e) {
-                e.printStackTrace();
-            }
-            return null;
-        }
-    }
+		write(List.class, 0, list);
+	}
 }
