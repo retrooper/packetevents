@@ -164,11 +164,7 @@ public final class PacketEvents implements Listener, EventManager {
             handlerName = "pe-" + plugin.getName();
             packetProcessorInternal = new PacketProcessorInternal();
             for (final Player p : Bukkit.getOnlinePlayers()) {
-                try {
-                    getPlayerUtils().injectPlayer(p);
-                } catch (Exception ex) {
-                    packetProcessorInternal.rescheduleInjectPlayer(p, 20L);
-                }
+                getPlayerUtils().injectPlayer(p);
             }
 
             if (settings.shouldCheckForUpdates()) {
@@ -275,12 +271,9 @@ public final class PacketEvents implements Listener, EventManager {
 
     @EventHandler(priority = EventPriority.LOWEST)
     public void onLogin(final PlayerLoginEvent e) {
+        final Player player = e.getPlayer();
         if (getSettings().shouldInjectEarly()) {
-            try {
-                packetProcessorInternal.injectPlayer(e.getPlayer());
-            } catch (Exception ex) {
-                packetProcessorInternal.rescheduleInjectPlayer(e.getPlayer(), 20L); //Reschedule to inject one second later
-            }
+            packetProcessorInternal.injectPlayer(player);
         }
     }
 
@@ -312,18 +305,14 @@ public final class PacketEvents implements Listener, EventManager {
         }
 
         if (!getSettings().shouldInjectEarly()) {
-            try {
-                packetProcessorInternal.injectPlayer(e.getPlayer());
-                //Injection was successful as no exception was thrown...
-                if (!viaAvailable) {
-                    if (ProtocolLibVersionLookupUtils.isAvailable()) {
-                        ClientVersion version = ClientVersion.getClientVersion(ProtocolLibVersionLookupUtils.getProtocolVersion(e.getPlayer()));
-                        PacketEvents.get().getPlayerUtils().clientVersionsMap.put(address, version);
-                    }
-                    PacketEvents.get().getEventManager().callEvent(new PostPlayerInjectEvent(e.getPlayer(), false));
+            packetProcessorInternal.injectPlayer(e.getPlayer());
+            //Injection was successful as no exception was thrown...
+            if (!viaAvailable) {
+                if (ProtocolLibVersionLookupUtils.isAvailable()) {
+                    ClientVersion version = ClientVersion.getClientVersion(ProtocolLibVersionLookupUtils.getProtocolVersion(e.getPlayer()));
+                    PacketEvents.get().getPlayerUtils().clientVersionsMap.put(address, version);
                 }
-            } catch (Exception ex) {
-                packetProcessorInternal.rescheduleInjectPlayer(e.getPlayer(), 20L);
+                PacketEvents.get().getEventManager().callEvent(new PostPlayerInjectEvent(e.getPlayer(), false));
             }
         } else {
             if (!viaAvailable) {

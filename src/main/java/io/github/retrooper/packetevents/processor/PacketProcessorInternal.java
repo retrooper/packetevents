@@ -115,24 +115,6 @@ public class PacketProcessorInternal {
         }
     }
 
-    public void rescheduleInjectPlayer(Player player, long deltaTicks) {
-        if (PacketEvents.get().getSettings().shouldRescheduleInjections()) {
-            Bukkit.getScheduler().runTaskLaterAsynchronously(PacketEvents.get().getPlugin(), new Runnable() {
-                @Override
-                public void run() {
-                    try {
-                        injectPlayerSync(player);
-                    } catch (IllegalStateException ex) {
-                        PacketEvents.get().getSettings().getInjectionFailureAction().accept(player);
-                    }
-                }
-            }, deltaTicks);
-        }
-        else {
-            PacketEvents.get().getSettings().getInjectionFailureAction().accept(player);
-        }
-    }
-
     /**
      * Eject a player.
      * Executed synchronously or asynchronously depending on what you have the associated setting set to.
@@ -231,10 +213,12 @@ public class PacketProcessorInternal {
      * @return NMS Packet, null if the event was cancelled.
      */
     public Object read(Player player, Object channel, Object packet) {
+        System.out.print("GOT: " + packet.getClass().getSimpleName());
         if (PacketTypeClasses.Login.Client.START.equals(packet.getClass())) {
             WrappedPacketLoginInStart startWrapper = new WrappedPacketLoginInStart(new NMSPacket(packet));
             WrappedGameProfile gameProfile = startWrapper.getGameProfile();
             channelMap.put(gameProfile.name, channel);
+            System.err.println("CHANNEL CACHED!!!!!!!!111");
         }
         if (player == null) {
             String simpleClassName = ClassUtil.getClassSimpleName(packet.getClass());

@@ -27,7 +27,6 @@ package io.github.retrooper.packetevents;
 import io.github.retrooper.packetevents.event.PacketListenerDynamic;
 import io.github.retrooper.packetevents.event.impl.PacketPlayReceiveEvent;
 import io.github.retrooper.packetevents.packettype.PacketType;
-import io.github.retrooper.packetevents.packetwrappers.play.in.chat.WrappedPacketInChat;
 import org.bukkit.plugin.java.JavaPlugin;
 
 public class PacketEventsPlugin extends JavaPlugin {
@@ -40,15 +39,14 @@ public class PacketEventsPlugin extends JavaPlugin {
     public void onEnable() {
         if (PacketEvents.get() == null) {
             PacketEvents.create(this);
-            PacketEvents.get().getSettings().injectionRescheduling(false);
+            PacketEvents.get().getSettings().injectAsync(false).ejectAsync(false);
             PacketEvents.get().load();
             PacketEvents.get().init(this);
             PacketEvents.get().registerListener(new PacketListenerDynamic() {
                 @Override
                 public void onPacketPlayReceive(PacketPlayReceiveEvent event) {
                     if (event.getPacketId() == PacketType.Play.Client.CHAT) {
-                        WrappedPacketInChat chat = new WrappedPacketInChat(event.getNMSPacket());
-                        String message = chat.getMessage();
+                        event.getPlayer().sendMessage(PacketEvents.get().getPlayerUtils().getClientVersion(event.getPlayer()).toString());
                     }
                 }
             });

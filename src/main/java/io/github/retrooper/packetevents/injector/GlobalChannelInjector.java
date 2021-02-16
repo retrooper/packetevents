@@ -1,87 +1,90 @@
 package io.github.retrooper.packetevents.injector;
 
 import io.github.retrooper.packetevents.PacketEvents;
-import io.github.retrooper.packetevents.injector.earlyinjector.EarlyChannelInjector7;
-import io.github.retrooper.packetevents.injector.earlyinjector.EarlyChannelInjector8;
-import io.github.retrooper.packetevents.injector.lateinjector.LateChannelInjector7;
-import io.github.retrooper.packetevents.injector.lateinjector.LateChannelInjector8;
+import io.github.retrooper.packetevents.injector.early.channelinitializer.modern.EarlyChannelInjector8;
 import io.github.retrooper.packetevents.utils.nms.NMSUtils;
+import io.netty.channel.Channel;
 import org.bukkit.entity.Player;
 
 import java.util.List;
 
 public class GlobalChannelInjector implements ChannelInjector {
-    private final ChannelInjector injector;
+    //  private final ChannelInjector injector;
+    private EarlyChannelInjector8 channelInjector;
 
     public GlobalChannelInjector() {
         boolean legacy = NMSUtils.legacyNettyImportMode;
         //Early injector
-        if (PacketEvents.get().getSettings().shouldInjectEarly()) {
-            injector = legacy ? new EarlyChannelInjector7() : new EarlyChannelInjector8();
-        }
+        // if (PacketEvents.get().getSettings().shouldInjectEarly()) {
+        //   injector = legacy ? new EarlyChannelInjector7() : new EarlyChannelInjector8();
+        //}
         //Late injector
-        else {
-            injector = legacy ? new LateChannelInjector7() : new LateChannelInjector8();
-        }
+        //else {
+        //  injector = legacy ? new LateChannelInjector7() : new LateChannelInjector8();
+        //}
+        channelInjector = new EarlyChannelInjector8();
     }
 
     @Override
     public void prepare() {
-        injector.prepare();
+        channelInjector.inject();
     }
 
     @Override
     public void cleanup() {
-        injector.cleanup();
+        channelInjector.eject();
     }
 
     @Override
     public void cleanupAsync() {
-        injector.cleanupAsync();
+        //
     }
 
     @Override
     public void injectPlayerSync(Player player) {
-        injector.injectPlayerSync(player);
+        Object channel = PacketEvents.get().packetProcessorInternal.getChannel(player);
+        channelInjector.updatePlayerObject(player, channel);
     }
 
     @Override
     public void injectPlayersSync(List<Player> players) {
-        injector.injectPlayersSync(players);
+
     }
 
     @Override
     public void ejectPlayerSync(Player player) {
-        injector.ejectPlayerSync(player);
+
     }
 
     @Override
     public void ejectPlayersSync(List<Player> players) {
-        injector.ejectPlayersSync(players);
+
     }
 
     @Override
     public void injectPlayerAsync(Player player) {
-        injector.injectPlayerAsync(player);
+        Object channel = PacketEvents.get().packetProcessorInternal.getChannel(player);
+        channelInjector.updatePlayerObject(player, channel);
     }
 
     @Override
     public void injectPlayersAsync(List<Player> players) {
-        injector.injectPlayersAsync(players);
+        //injector.injectPlayersAsync(players);
     }
 
     @Override
     public void ejectPlayerAsync(Player player) {
-        injector.ejectPlayerAsync(player);
+
     }
 
     @Override
     public void ejectPlayersAsync(List<Player> players) {
-        injector.ejectPlayersAsync(players);
+
     }
 
     @Override
-    public void sendPacket(Object channel, Object rawNMSPacket) {
-        injector.sendPacket(channel, rawNMSPacket);
+    public void sendPacket(Object ch, Object rawNMSPacket) {
+        Channel channel = (Channel) ch;
+        channel.write(rawNMSPacket);
     }
 }
