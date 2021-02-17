@@ -45,8 +45,6 @@ import io.github.retrooper.packetevents.utils.server.ServerUtils;
 import io.github.retrooper.packetevents.utils.server.ServerVersion;
 import io.github.retrooper.packetevents.utils.version.PEVersion;
 import io.github.retrooper.packetevents.utils.versionlookup.VersionLookupUtils;
-import io.github.retrooper.packetevents.utils.versionlookup.protocollib.ProtocolLibVersionLookupUtils;
-import io.github.retrooper.packetevents.utils.versionlookup.v_1_7_10.ProtocolVersionAccessor_v_1_7;
 import io.github.retrooper.packetevents.utils.versionlookup.viaversion.ViaVersionLookupUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -58,14 +56,9 @@ import org.bukkit.event.player.PlayerLoginEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.ServicePriority;
-import org.jetbrains.annotations.NotNull;
 
 import java.net.InetSocketAddress;
 import java.util.UUID;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ThreadFactory;
-import java.util.concurrent.atomic.AtomicInteger;
 
 public final class PacketEvents implements Listener, EventManager {
     //TODO finish unfinished wrappers
@@ -122,6 +115,7 @@ public final class PacketEvents implements Listener, EventManager {
                 loading = false;
                 throw new PacketEventsLoadFailureException(ex);
             }
+
             loaded = true;
             loading = false;
         }
@@ -147,7 +141,9 @@ public final class PacketEvents implements Listener, EventManager {
             plugin = pl;
             Bukkit.getPluginManager().registerEvents(this, plugin);
             handlerName = "pe-" + plugin.getName();
+
             packetProcessorInternal = new PacketProcessorInternal();
+
             injector = new GlobalChannelInjector();
             injector.inject();
             for (final Player p : Bukkit.getOnlinePlayers()) {
@@ -173,8 +169,7 @@ public final class PacketEvents implements Listener, EventManager {
             for (Player player : Bukkit.getOnlinePlayers()) {
                 injector.ejectPlayer(player);
             }
-            //This might be a little complicated to explain. This is just to support server killing. If we eject async users run into issues on a server kill (never recommended btw)
-            //so we just don't eject and therefore sacrifice reload support.
+
             injector.eject();
 
             getEventManager().unregisterAllListeners();
@@ -279,31 +274,15 @@ public final class PacketEvents implements Listener, EventManager {
                     PacketEvents.get().getEventManager().callEvent(new PostPlayerInjectEvent(e.getPlayer(), true));
                 }
             }, 1L);
-        } else if (getServerUtils().getVersion() == ServerVersion.v_1_7_10) {
-            ClientVersion version = ClientVersion.getClientVersion(ProtocolVersionAccessor_v_1_7.getProtocolVersion(e.getPlayer()));
-            if (version == ClientVersion.UNRESOLVED) {
-                version = getPlayerUtils().tempClientVersionMap.get(address);
-                if (version == null) {
-                    version = ClientVersion.UNRESOLVED;
-                }
-            }
-            getPlayerUtils().clientVersionsMap.put(address, version);
         }
 
         if (getSettings().shouldUseCompatibilityInjector()) {
             injector.injectPlayer(e.getPlayer());
-            //Injection was successful as no exception was thrown...
-            if (!viaAvailable) {
-                if (ProtocolLibVersionLookupUtils.isAvailable()) {
-                    ClientVersion version = ClientVersion.getClientVersion(ProtocolLibVersionLookupUtils.getProtocolVersion(e.getPlayer()));
-                    PacketEvents.get().getPlayerUtils().clientVersionsMap.put(address, version);
-                }
-                PacketEvents.get().getEventManager().callEvent(new PostPlayerInjectEvent(e.getPlayer(), false));
-            }
-        } else {
-            if (!viaAvailable) {
-                PacketEvents.get().getEventManager().callEvent(new PostPlayerInjectEvent(e.getPlayer(), false));
-            }
+        }
+
+        //ViaVersion isn't available, we can already call the post player inject event.
+        if (!viaAvailable) {
+            PacketEvents.get().getEventManager().callEvent(new PostPlayerInjectEvent(e.getPlayer(), false));
         }
     }
 

@@ -26,14 +26,13 @@ package io.github.retrooper.packetevents.processor;
 
 import io.github.retrooper.packetevents.PacketEvents;
 import io.github.retrooper.packetevents.event.impl.*;
-import io.github.retrooper.packetevents.injector.GlobalChannelInjector;
+import io.github.retrooper.packetevents.injector.earlyinjector.EarlyInjector;
 import io.github.retrooper.packetevents.packettype.PacketType;
-import io.github.retrooper.packetevents.packettype.PacketTypeClasses;
 import io.github.retrooper.packetevents.packetwrappers.NMSPacket;
 import io.github.retrooper.packetevents.packetwrappers.login.in.handshake.WrappedPacketLoginInHandshake;
 import io.github.retrooper.packetevents.packetwrappers.login.in.start.WrappedPacketLoginInStart;
-import io.github.retrooper.packetevents.settings.PacketEventsSettings;
 import io.github.retrooper.packetevents.utils.gameprofile.WrappedGameProfile;
+import io.github.retrooper.packetevents.utils.netty.channel.ChannelUtils;
 import io.github.retrooper.packetevents.utils.nms.NMSUtils;
 import io.github.retrooper.packetevents.utils.player.ClientVersion;
 import io.github.retrooper.packetevents.utils.reflection.ClassUtil;
@@ -43,14 +42,10 @@ import org.bukkit.entity.Player;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
-import java.util.WeakHashMap;
-import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * Internal manager of everything related to packets.
- * For example injecting, channel caching, internal processing, packet sending....
- * This class is only meant to be used internally.
- * This could end up being refactored or renamed without a deprecation as it is only meant to be used internally.
+ * Internal packet processor.
+ * This class mainly manages channel caching and internal processing. Do NOT use this class, it is only meant to be used internally.
  *
  * @author retrooper
  * @see <a href="http://netty.io">http://netty.io</a>
@@ -58,7 +53,7 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class PacketProcessorInternal {
     public final Map<UUID, Long> keepAliveMap = new HashMap<>();
-    public final Map<String, Object> channelMap = new WeakHashMap<>();
+    public final Map<String, Object> channelMap = new HashMap<>();
 
     public Object getChannel(Player player) {
         String name = player.getName();
@@ -73,7 +68,8 @@ public class PacketProcessorInternal {
     }
 
     /**
-     * Make PacketEvents process an incoming packet.
+     * Force PacketEvents to process an incoming packet.
+     * This method could be used to spoof an incoming packet to the PacketEvents API.
      *
      * @param player  Packet sender.
      * @param channel Packet sender's netty channel.
@@ -81,52 +77,53 @@ public class PacketProcessorInternal {
      * @return NMS Packet, null if the event was cancelled.
      */
     public Object read(Player player, Object channel, Object packet) {
-        if (PacketTypeClasses.Login.Client.START.equals(packet.getClass())) {
-            WrappedPacketLoginInStart startWrapper = new WrappedPacketLoginInStart(new NMSPacket(packet));
-            WrappedGameProfile gameProfile = startWrapper.getGameProfile();
-            channelMap.put(gameProfile.name, channel);
-        }
-        if (player == null) {
-            String simpleClassName = ClassUtil.getClassSimpleName(packet.getClass());
-            //Status packet
-            if (simpleClassName.startsWith("PacketS")) {
-                final PacketStatusReceiveEvent event = new PacketStatusReceiveEvent(channel, new NMSPacket(packet));
+        switch (getPacketState(packet)) {
+            case STATUS:
+                PacketStatusReceiveEvent statusEvent = new PacketStatusReceiveEvent(channel, new NMSPacket(packet));
+                PacketEvents.get().getEventManager().callEvent(statusEvent);
+                //Apply modifications to the packet
+                packet = statusEvent.getNMSPacket().getRawNMSPacket();
+                interceptStatusReceive(statusEvent);
+                if (statusEvent.isCancelled()) {
+                    //Set the packet to null if the event was cancelled
+                    packet = null;
+                }
+                break;
+            case LOGIN:
+                PacketLoginReceiveEvent loginEvent = new PacketLoginReceiveEvent(channel, new NMSPacket(packet));//Cache the channel
+                if (loginEvent.getPacketId() == PacketType.Login.Client.START) {
+                    WrappedPacketLoginInStart startWrapper = new WrappedPacketLoginInStart(loginEvent.getNMSPacket());
+                    WrappedGameProfile gameProfile = startWrapper.getGameProfile();
+                    channelMap.put(gameProfile.name, channel);
+                   /* if (PacketEvents.get().injector instanceof EarlyInjector) {
+                        ((EarlyInjector) PacketEvents.get().injector).updatePlayerObject(Bukkit.getPlayer(gameProfile.id), channel);
+                        System.out.println("injected");
+                    }*/
+                    System.out.println("NETTY CHANNEL CACHED!");
+                }
+                PacketEvents.get().getEventManager().callEvent(loginEvent);
+                packet = loginEvent.getNMSPacket().getRawNMSPacket();
+                interceptLoginReceive(loginEvent);
+                if (loginEvent.isCancelled()) {
+                    packet = null;
+                }
+                break;
+            case PLAY:
+                PacketPlayReceiveEvent event = new PacketPlayReceiveEvent(player, channel, new NMSPacket(packet));
                 PacketEvents.get().getEventManager().callEvent(event);
                 packet = event.getNMSPacket().getRawNMSPacket();
-                interceptStatusReceive(event);
+                interceptRead(event);
                 if (event.isCancelled()) {
                     packet = null;
                 }
-            } else {
-                //Login packet
-                final PacketLoginReceiveEvent event = new PacketLoginReceiveEvent(channel, new NMSPacket(packet));//Cache the channel
-                //f (event.getPacketId() == PacketType.Login.Client.START) {
-                //  WrappedPacketLoginInStart startWrapper = new WrappedPacketLoginInStart(event.getNMSPacket());
-                //WrappedGameProfile gameProfile = startWrapper.getGameProfile();
-                //channelMap.put(gameProfile.name, channel);
-                //}
-                PacketEvents.get().getEventManager().callEvent(event);
-                packet = event.getNMSPacket().getRawNMSPacket();
-                interceptLoginReceive(event);
-                if (event.isCancelled()) {
-                    packet = null;
-                }
-            }
-        } else {
-            final PacketPlayReceiveEvent event = new PacketPlayReceiveEvent(player, channel, new NMSPacket(packet));
-            PacketEvents.get().getEventManager().callEvent(event);
-            packet = event.getNMSPacket().getRawNMSPacket();
-            interceptRead(event);
-            if (event.isCancelled()) {
-                packet = null;
-            }
+                break;
         }
         return packet;
     }
 
     /**
-     * Make PacketEvents process an outgoing packet.
-     * The NMS Packet will be null when netty should cancel a packet.
+     * Force PacketEvents to process an outgoing packet.
+     * This method could be used to spoof an outgoing packet to the PacketEvents API.
      *
      * @param player  Packet receiver.
      * @param channel Packet receiver's netty channel.
@@ -134,36 +131,34 @@ public class PacketProcessorInternal {
      * @return NMS Packet, null if the event was cancelled.
      */
     public Object write(Player player, Object channel, Object packet) {
-        if (player == null) {
-            String simpleClassName = ClassUtil.getClassSimpleName(packet.getClass());
-            //Status packet
-            if (simpleClassName.startsWith("PacketS")) {
-                final PacketStatusSendEvent event = new PacketStatusSendEvent(channel, new NMSPacket(packet));
-                PacketEvents.get().getEventManager().callEvent(event);
-                packet = event.getNMSPacket().getRawNMSPacket();
-                interceptStatusSend(event);
-                if (event.isCancelled()) {
+        switch (getPacketState(packet)) {
+            case STATUS:
+                PacketStatusSendEvent statusEvent = new PacketStatusSendEvent(channel, new NMSPacket(packet));
+                PacketEvents.get().getEventManager().callEvent(statusEvent);
+                packet = statusEvent.getNMSPacket().getRawNMSPacket();
+                interceptStatusSend(statusEvent);
+                if (statusEvent.isCancelled()) {
                     packet = null;
                 }
-            }
-            //Login packet
-            else {
-                final PacketLoginSendEvent event = new PacketLoginSendEvent(channel, new NMSPacket(packet));
-                PacketEvents.get().getEventManager().callEvent(event);
-                packet = event.getNMSPacket().getRawNMSPacket();
-                interceptLoginSend(event);
-                if (event.isCancelled()) {
+                break;
+            case LOGIN:
+                PacketLoginSendEvent loginEvent = new PacketLoginSendEvent(channel, new NMSPacket(packet));
+                PacketEvents.get().getEventManager().callEvent(loginEvent);
+                packet = loginEvent.getNMSPacket().getRawNMSPacket();
+                interceptLoginSend(loginEvent);
+                if (loginEvent.isCancelled()) {
                     packet = null;
                 }
-            }
-        } else {
-            final PacketPlaySendEvent event = new PacketPlaySendEvent(player, channel, new NMSPacket(packet));
-            PacketEvents.get().getEventManager().callEvent(event);
-            packet = event.getNMSPacket().getRawNMSPacket();
-            interceptWrite(event);
-            if (event.isCancelled()) {
-                packet = null;
-            }
+                break;
+            case PLAY:
+                PacketPlaySendEvent playEvent = new PacketPlaySendEvent(player, channel, new NMSPacket(packet));
+                PacketEvents.get().getEventManager().callEvent(playEvent);
+                packet = playEvent.getNMSPacket().getRawNMSPacket();
+                interceptWrite(playEvent);
+                if (playEvent.isCancelled()) {
+                    packet = null;
+                }
+                break;
         }
         return packet;
     }
@@ -177,7 +172,7 @@ public class PacketProcessorInternal {
      * @param packet  NMS Packet.
      */
     public void postRead(Player player, Object channel, Object packet) {
-        if (player != null) {
+        if (getPacketState(packet) == PacketType.State.PLAY) {
             //Since player != null check is done, status and login packets won't come passed this point.
             PostPacketPlayReceiveEvent event = new PostPacketPlayReceiveEvent(player, channel, new NMSPacket(packet));
             PacketEvents.get().getEventManager().callEvent(event);
@@ -196,7 +191,7 @@ public class PacketProcessorInternal {
      * @param packet  NMS Packet.
      */
     public void postWrite(Player player, Object channel, Object packet) {
-        if (player != null) {
+        if (getPacketState(packet) == PacketType.State.PLAY) {
             //Since player != null check is done, status and login packets won't come passed this point.
             PostPacketPlaySendEvent event = new PostPacketPlaySendEvent(player, channel, new NMSPacket(packet));
             PacketEvents.get().getEventManager().callEvent(event);
@@ -241,6 +236,7 @@ public class PacketProcessorInternal {
             int protocolVersion = handshake.getProtocolVersion();
             ClientVersion version = ClientVersion.getClientVersion(protocolVersion);
             PacketEvents.get().getPlayerUtils().tempClientVersionMap.put(event.getSocketAddress(), version);
+            System.out.println("PROTOCOL VERSION CACHED!");
         }
     }
 
@@ -291,6 +287,17 @@ public class PacketProcessorInternal {
             if (event.getPlayer() != null) {
                 keepAliveMap.put(event.getPlayer().getUniqueId(), event.getTimestamp());
             }
+        }
+    }
+
+    private PacketType.State getPacketState(Object packet) {
+        String packetName = ClassUtil.getClassSimpleName(packet.getClass());
+        if (packetName.startsWith("PacketS")) {
+            return PacketType.State.STATUS;
+        } else if (packetName.startsWith("PacketP")) {
+            return PacketType.State.PLAY;
+        } else {
+            return PacketType.State.LOGIN;
         }
     }
 }

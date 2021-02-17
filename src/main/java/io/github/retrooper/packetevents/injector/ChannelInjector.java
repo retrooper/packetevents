@@ -11,5 +11,7 @@ public interface ChannelInjector {
 
     void ejectPlayer(Player player);
 
+    boolean hasInjected(Player player);
+
     void sendPacket(Object channel, Object rawNMSPacket);
 }

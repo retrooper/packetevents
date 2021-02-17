@@ -39,6 +39,9 @@ import java.util.Map;
  * @since 1.6.8
  */
 public class PacketType {
+    public enum State {
+        PLAY, LOGIN, STATUS;
+    }
     /**
      * If a Packet Type could not be resolved, it will be set to the current value of this constant.
      * This value may change over the versions so it is important to use the variable and not hard code its value.

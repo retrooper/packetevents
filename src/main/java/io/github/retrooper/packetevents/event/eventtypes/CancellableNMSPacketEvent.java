@@ -16,16 +16,6 @@ public abstract class CancellableNMSPacketEvent extends NMSPacketEvent implement
     }
 
     @Override
-    public void cancel() {
-        cancelled = true;
-    }
-
-    @Override
-    public void uncancel() {
-        cancelled = false;
-    }
-
-    @Override
     public boolean isCancelled() {
         return cancelled;
     }

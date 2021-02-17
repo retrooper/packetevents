@@ -117,6 +117,19 @@ public class EarlyChannelInjectorLegacy implements EarlyInjector {
     }
 
     @Override
+    public boolean hasInjected(Player player) {
+        Object channel = PacketEvents.get().packetProcessorInternal.getChannel(player);
+        if (channel == null) {
+            return false;
+        }
+        PlayerChannelHandlerLegacy handler = getHandler(channel);
+        if (handler == null) {
+            return false;
+        }
+        return handler.player != null;
+    }
+
+    @Override
     public void sendPacket(Object ch, Object rawNMSPacket) {
         Channel channel = (Channel)ch;
         channel.writeAndFlush(rawNMSPacket);
@@ -133,7 +146,8 @@ public class EarlyChannelInjectorLegacy implements EarlyInjector {
         }
     }
 
-    private void updatePlayerObject(Player player, Object rawChannel) {
+    @Override
+    public void updatePlayerObject(Player player, Object rawChannel) {
         PlayerChannelHandlerLegacy handler = getHandler(rawChannel);
         if (handler != null) {
             handler.player = player;

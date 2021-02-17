@@ -31,7 +31,6 @@ import java.util.Arrays;
 
 public final class Reflection {
     //FIELDS
-    @Deprecated
     public static Field[] getFields(Class<?> cls) {
         Field[] declaredFields = cls.getDeclaredFields();
         for (Field f : declaredFields) {
@@ -40,7 +39,6 @@ public final class Reflection {
         return declaredFields;
     }
 
-    @Deprecated
     public static Field getField(final Class<?> cls, final String name) {
         for (final Field f : getFields(cls)) {
             if (f.getName().equals(name)) {
@@ -53,7 +51,6 @@ public final class Reflection {
         return null;
     }
 
-    @Deprecated
     public static Field getField(final Class<?> cls, final Class<?> dataType, final int index) {
         int currentIndex = 0;
         for (final Field f : getFields(cls)) {
@@ -69,7 +66,6 @@ public final class Reflection {
         return null;
     }
 
-    @Deprecated
     public static Field getField(final Class<?> cls, final int index) {
         try {
             return getFields(cls)[index];

@@ -1,10 +1,10 @@
 package io.github.retrooper.packetevents.injector;
 
 import io.github.retrooper.packetevents.PacketEvents;
+import io.github.retrooper.packetevents.event.impl.PlayerEjectEvent;
 import io.github.retrooper.packetevents.event.impl.PlayerInjectEvent;
 import io.github.retrooper.packetevents.injector.earlyinjector.legacy.EarlyChannelInjectorLegacy;
 import io.github.retrooper.packetevents.injector.earlyinjector.modern.EarlyChannelInjector;
-import io.github.retrooper.packetevents.injector.lateinjector.LateInjector;
 import io.github.retrooper.packetevents.injector.lateinjector.legacy.LateChannelInjectorLegacy;
 import io.github.retrooper.packetevents.injector.lateinjector.modern.LateChannelInjector;
 import io.github.retrooper.packetevents.utils.nms.NMSUtils;
@@ -15,7 +15,7 @@ public class GlobalChannelInjector implements ChannelInjector {
 
     public GlobalChannelInjector() {
         boolean legacy = NMSUtils.legacyNettyImportMode;
-        if (PacketEvents.get().getSettings().shouldUseCompatibilityInjector()) {
+        if (!PacketEvents.get().getSettings().shouldUseCompatibilityInjector()) {
             injector = legacy ? new EarlyChannelInjectorLegacy() : new EarlyChannelInjector();
         } else {
             injector = legacy ? new LateChannelInjectorLegacy() : new LateChannelInjector();
@@ -24,7 +24,6 @@ public class GlobalChannelInjector implements ChannelInjector {
 
     @Override
     public void inject() {
-        //TODO support cancelling inject event with early injector.
         injector.inject();
     }
 
@@ -35,20 +34,25 @@ public class GlobalChannelInjector implements ChannelInjector {
 
     @Override
     public void injectPlayer(Player player) {
-        if (injector instanceof LateInjector) {
-            PlayerInjectEvent injectEvent = new PlayerInjectEvent(player);
-            PacketEvents.get().callEvent(injectEvent);
-            if (!injectEvent.isCancelled()) {
-                injector.injectPlayer(player);
-            }
-        } else {
+        PlayerInjectEvent injectEvent = new PlayerInjectEvent(player);
+        PacketEvents.get().callEvent(injectEvent);
+        if (!injectEvent.isCancelled()) {
             injector.injectPlayer(player);
         }
     }
 
     @Override
     public void ejectPlayer(Player player) {
-        injector.ejectPlayer(player);
+        PlayerEjectEvent ejectEvent = new PlayerEjectEvent(player);
+        PacketEvents.get().callEvent(ejectEvent);
+        if (!ejectEvent.isCancelled()) {
+            injector.ejectPlayer(player);
+        }
+    }
+
+    @Override
+    public boolean hasInjected(Player player) {
+        return injector.hasInjected(player);
     }
 
     @Override

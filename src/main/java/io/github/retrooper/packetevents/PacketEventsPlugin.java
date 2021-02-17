@@ -26,6 +26,8 @@ package io.github.retrooper.packetevents;
 
 import io.github.retrooper.packetevents.event.PacketListenerDynamic;
 import io.github.retrooper.packetevents.event.impl.PacketPlayReceiveEvent;
+import io.github.retrooper.packetevents.event.impl.PlayerInjectEvent;
+import io.github.retrooper.packetevents.event.impl.PostPlayerInjectEvent;
 import io.github.retrooper.packetevents.packettype.PacketType;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -47,6 +49,17 @@ public class PacketEventsPlugin extends JavaPlugin {
                     if (event.getPacketId() == PacketType.Play.Client.CHAT) {
                         event.getPlayer().sendMessage(PacketEvents.get().getPlayerUtils().getClientVersion(event.getPlayer()).toString());
                     }
+                }
+
+                @Override
+                public void onPlayerInject(PlayerInjectEvent event) {
+                   // event.setCancelled(true);
+                   // System.out.println("CANCELLED WE DONT WANNA LISTEN TO UR BS MF");
+                }
+
+                @Override
+                public void onPostPlayerInject(PostPlayerInjectEvent event) {
+                    event.getPlayer().sendMessage(PacketEvents.get().getPlayerUtils().getClientVersion(event.getPlayer()) + ", im curious...");
                 }
             });
         }

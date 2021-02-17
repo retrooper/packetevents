@@ -49,22 +49,11 @@ import java.net.InetSocketAddress;
 public final class PlayerInjectEvent extends PacketEvent implements CancellableEvent, PlayerEvent {
     private final Player player;
     private final InetSocketAddress address;
-    private final boolean async = false;
     private boolean cancelled;
 
     public PlayerInjectEvent(final Player player) {
         this.player = player;
         this.address = ChannelUtils.getSocketAddress(PacketEvents.get().packetProcessorInternal.getChannel(player));
-    }
-
-    @Override
-    public void cancel() {
-        cancelled = true;
-    }
-
-    @Override
-    public void uncancel() {
-        cancelled = false;
     }
 
     @Override

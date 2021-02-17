@@ -48,6 +48,8 @@ public class PEChannelInitializerLegacy extends ChannelInitializer<SocketChannel
     protected void initChannel(SocketChannel socketChannel) throws Exception {
         initChannelMethod.invoke(oldChannelInitializer, socketChannel);
         PlayerChannelHandlerLegacy channelHandler = new PlayerChannelHandlerLegacy();
-        socketChannel.pipeline().addBefore("packet_handler", PacketEvents.handlerName, channelHandler);
+        if (socketChannel.pipeline().get("packet_handler") != null) {
+            socketChannel.pipeline().addBefore("packet_handler", PacketEvents.handlerName, channelHandler);
+        }
     }
 }

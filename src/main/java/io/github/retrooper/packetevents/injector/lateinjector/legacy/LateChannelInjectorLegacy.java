@@ -81,6 +81,12 @@ public class LateChannelInjectorLegacy implements LateInjector {
         PacketEvents.get().getPlayerUtils().tempClientVersionMap.remove(player.getAddress());
     }
 
+    @Override
+    public boolean hasInjected(Player player) {
+        Channel channel = (Channel) PacketEvents.get().packetProcessorInternal.getChannel(player);
+        return channel.pipeline().get(PacketEvents.handlerName) != null;
+    }
+
 
     @Override
     public void sendPacket(Object rawChannel, Object packet) {

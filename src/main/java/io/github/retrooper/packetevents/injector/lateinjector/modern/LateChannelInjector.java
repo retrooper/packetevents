@@ -88,6 +88,12 @@ public class LateChannelInjector implements LateInjector {
     }
 
     @Override
+    public boolean hasInjected(Player player) {
+        Channel channel = (Channel) PacketEvents.get().packetProcessorInternal.getChannel(player);
+        return channel.pipeline().get(PacketEvents.handlerName) != null;
+    }
+
+    @Override
     public void sendPacket(Object rawChannel, Object packet) {
         Channel channel = (Channel) rawChannel;
         channel.pipeline().writeAndFlush(packet);

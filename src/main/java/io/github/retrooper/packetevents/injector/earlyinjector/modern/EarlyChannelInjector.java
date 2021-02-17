@@ -38,8 +38,10 @@ import org.bukkit.entity.Player;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.List;
+
 /**
  * Early channel injector for all server versions higher than 1.7.10.
+ *
  * @author retrooper, Thomazz
  * @since 1.8
  */
@@ -78,12 +80,15 @@ public class EarlyChannelInjector implements EarlyInjector {
                             ChannelInitializer<?> oldChannelInitializer = (ChannelInitializer<?>) bootstrapAcceptorField.get(bootstrapAcceptor);
                             ChannelInitializer<?> channelInitializer = new PEChannelInitializer(oldChannelInitializer);
 
-                            //REMOVE FINAL MODIFIER
+                            //Remove final modifier
                             Field modifiersField = Field.class.getDeclaredField("modifiers");
                             modifiersField.setAccessible(true);
                             modifiersField.setInt(bootstrapAcceptorField, bootstrapAcceptorField.getModifiers() & ~Modifier.FINAL);
+
+                            //Replace the old channel initializer with our own.
                             bootstrapAcceptorField.set(bootstrapAcceptor, channelInitializer);
                             searching = false;
+                            System.out.println("Finished successful injection...");
                         }
                     }
                 }
@@ -102,12 +107,29 @@ public class EarlyChannelInjector implements EarlyInjector {
     @Override
     public void injectPlayer(Player player) {
         Object channel = PacketEvents.get().packetProcessorInternal.getChannel(player);
-        updatePlayerObject(player, channel);
+        if (channel != null) {
+            updatePlayerObject(player, channel);
+        } else {
+            System.out.println("Channel is null...");
+        }
     }
 
     @Override
     public void ejectPlayer(Player player) {
 
+    }
+
+    @Override
+    public boolean hasInjected(Player player) {
+        Object channel = PacketEvents.get().packetProcessorInternal.getChannel(player);
+        if (channel == null) {
+            return false;
+        }
+        PlayerChannelHandler handler = getHandler(channel);
+        if (handler == null) {
+            return false;
+        }
+        return handler.player != null;
     }
 
     @Override
@@ -126,7 +148,8 @@ public class EarlyChannelInjector implements EarlyInjector {
         }
     }
 
-    private void updatePlayerObject(Player player, Object rawChannel) {
+    @Override
+    public void updatePlayerObject(Player player, Object rawChannel) {
         PlayerChannelHandler handler = getHandler(rawChannel);
         if (handler != null) {
             handler.player = player;

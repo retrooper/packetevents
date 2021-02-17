@@ -28,7 +28,6 @@ import io.github.retrooper.packetevents.PacketEvents;
 import io.github.retrooper.packetevents.packetwrappers.SendableWrapper;
 import io.github.retrooper.packetevents.utils.nms.NMSUtils;
 import io.github.retrooper.packetevents.utils.versionlookup.VersionLookupUtils;
-import io.github.retrooper.packetevents.utils.versionlookup.protocollib.ProtocolLibVersionLookupUtils;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
@@ -67,7 +66,7 @@ public final class PlayerUtils {
      * Why do we need to do this?
      * Plugins like ViaVersion modify the Handshaking packet containing the protocol version
      * to allow the client to join.
-     * Plugins that listen to the handshaking packet will receive the modified protocol version (=server version).
+     * Plugins that listen to the handshaking packet will receive the modified protocol version. (=server version)
      * So we have to go out of our way and use the API of ViaVersion or such similar plugins
      * to have support for client version resolving.
      * I can't do this for every single plugin like ViaVersion, so for now ViaVersion, ViaBackwards and ViaRewind are
@@ -165,31 +164,25 @@ public final class PlayerUtils {
     public ClientVersion getClientVersion(final Player player) {
         ClientVersion version = clientVersionsMap.get(player.getAddress());
         if (version == null) {
+            //Prioritize ViaVersion and ProtocolSupport as they modify the protocol version in the packet we access it from.
+            //We are forced to use their API.
             if (VersionLookupUtils.isDependencyAvailable()) {
                 try {
                     version = ClientVersion.getClientVersion(VersionLookupUtils.getProtocolVersion(player));
                     clientVersionsMap.put(player.getAddress(), version);
                 } catch (Exception ex) {
                     //Try ask the dependency again the next time, for now it is temporarily unresolved...
+                    //Temporary unresolved, there is still hope, the dependency has thrown an exception.
                 }
                 return ClientVersion.TEMP_UNRESOLVED;
             } else {
+                //We can trust the version we retrieved from the packet.
                 version = tempClientVersionMap.get(player.getAddress());
                 if (version == null) {
-                    if (ProtocolLibVersionLookupUtils.isAvailable()) {
-                        try {
-                            version = ClientVersion.getClientVersion(ProtocolLibVersionLookupUtils.getProtocolVersion(player));
-                            clientVersionsMap.put(player.getAddress(), version);
-                        }
-                        catch (Exception ex) {
-                            //Try ask the dependency again the next time, for now it is temporarily unresolved...
-                        }
-                        return ClientVersion.TEMP_UNRESOLVED;
-                    }
+                    //We failed to retrieve the version from the packet and no dependency is available.
                     version = ClientVersion.UNRESOLVED;
                 }
                 clientVersionsMap.put(player.getAddress(), version);
-                //Unfortunately don't know what to do, this should never be the case though...
             }
         }
         return version;
@@ -232,6 +225,16 @@ public final class PlayerUtils {
     }
 
     /**
+     * Send a client-bound(server-sided) wrapper that supports sending to a netty channel.
+     *
+     * @param channel Netty channel as object(due to netty package changes)
+     * @param wrapper Client-bound raw NMS packet.
+     */
+    public void sendPacket(Object channel, SendableWrapper wrapper) {
+        PacketEvents.get().injector.sendPacket(channel, wrapper.asNMSPacket());
+    }
+
+    /**
      * Send a client-bound(server-sided) raw NMS Packet without any wrapper to a player.
      *
      * @param player Packet receiver.
@@ -242,19 +245,9 @@ public final class PlayerUtils {
     }
 
     /**
-     * Send a client-bound(server-sided) wrapper that supports sending to a netty channel.
-     *
-     * @param channel Netty channel as object(due to package changes)
-     * @param wrapper Client-bound raw NMS packet.
-     */
-    public void sendPacket(Object channel, SendableWrapper wrapper) {
-        PacketEvents.get().injector.sendPacket(channel, wrapper.asNMSPacket());
-    }
-
-    /**
      * Send a client-bound(server-sided) raw NMS Packet without any wrapper to a netty channel.
      *
-     * @param channel Netty channel as object(due to package changes)
+     * @param channel Netty channel as object(due to netty package changes)
      * @param packet  Client-bound raw NMS packet.
      */
     public void sendNMSPacket(Object channel, Object packet) {

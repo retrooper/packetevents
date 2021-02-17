@@ -48,6 +48,12 @@ public class PEChannelInitializer extends ChannelInitializer<SocketChannel> {
     protected void initChannel(SocketChannel socketChannel) throws Exception {
         initChannelMethod.invoke(oldChannelInitializer, socketChannel);
         PlayerChannelHandler channelHandler = new PlayerChannelHandler();
-        socketChannel.pipeline().addBefore("packet_handler", PacketEvents.handlerName, channelHandler);
+        if (socketChannel.pipeline().get("packet_handler") != null) {
+            socketChannel.pipeline().addBefore("packet_handler", PacketEvents.handlerName, channelHandler);
+            System.out.println("Successfully added our handler before \"packet_handler\"!");
+        }
+        else {
+            System.out.println("Failed to add our handler before \"packet_handler\"");
+        }
     }
 }
