@@ -24,14 +24,17 @@
 
 package io.github.retrooper.packetevents.packetwrappers.play.in.blockplace;
 
+import io.github.retrooper.packetevents.exceptions.WrapperFieldNotFoundException;
 import io.github.retrooper.packetevents.packetwrappers.NMSPacket;
 import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
 import io.github.retrooper.packetevents.utils.player.Direction;
+import io.github.retrooper.packetevents.utils.player.Hand;
 import io.github.retrooper.packetevents.utils.server.ServerVersion;
 
 
 public final class WrappedPacketInBlockPlace extends WrappedPacket {
     private static boolean isHigherThan_v_1_8_8, isHigherThan_v_1_7_10, isOlderThan_v_1_9;
+    private static int handEnumIndex;
 
     public WrappedPacketInBlockPlace(final NMSPacket packet) {
         super(packet);
@@ -42,17 +45,34 @@ public final class WrappedPacketInBlockPlace extends WrappedPacket {
         isHigherThan_v_1_8_8 = version.isNewerThan(ServerVersion.v_1_8_8);
         isHigherThan_v_1_7_10 = version.isNewerThan(ServerVersion.v_1_7_10);
         isOlderThan_v_1_9 = version.isOlderThan(ServerVersion.v_1_9);
+        try {
+            Enum<?> handEnum = read(1, Enum.class);
+            handEnumIndex = 1;
+        }
+        catch (WrapperFieldNotFoundException ex) {
+            handEnumIndex = 0;//Most likely a newer version
+        }
+    }
+
+    public Hand getHand() {
+        if (version.isOlderThan(ServerVersion.v_1_9)) {
+            return Hand.MAIN_HAND;
+        }
+        else {
+            String enumStr = read(handEnumIndex, Enum.class).name();
+            return Hand.valueOf(enumStr);
+        }
     }
 
     public Direction getDirection() {
         if (isHigherThan_v_1_8_8) {
-            WrappedPacketInBlockPlace_1_9 blockPlace_1_9 = new WrappedPacketInBlockPlace_1_9(packet);
+            WrappedPacketInBlockPlace_1_9 blockPlace_1_9 = new WrappedPacketInBlockPlace_1_9(new NMSPacket(packet.getRawNMSPacket()));
             return Direction.valueOf(((Enum) blockPlace_1_9.getEnumDirectionObject()).name());
         } else if (isHigherThan_v_1_7_10) {
-            WrappedPacketInBlockPlace_1_8 blockPlace_1_8 = new WrappedPacketInBlockPlace_1_8(packet);
+            WrappedPacketInBlockPlace_1_8 blockPlace_1_8 = new WrappedPacketInBlockPlace_1_8(new NMSPacket(packet.getRawNMSPacket()));
             return Direction.getDirection(blockPlace_1_8.getFace());
         } else {
-            WrappedPacketInBlockPlace_1_7_10 blockPlace_1_7_10 = new WrappedPacketInBlockPlace_1_7_10(packet);
+            WrappedPacketInBlockPlace_1_7_10 blockPlace_1_7_10 = new WrappedPacketInBlockPlace_1_7_10(new NMSPacket(packet.getRawNMSPacket()));
             return Direction.getDirection(blockPlace_1_7_10.face);
         }
     }
