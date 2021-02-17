@@ -44,21 +44,17 @@ import java.util.List;
 public class EarlyChannelInjector8 implements Injector {
     @Override
     public void inject() {
-        System.out.println("Injection procedure started...");
         Object serverConnection = NMSUtils.getMinecraftServerConnection();
         WrappedPacket serverConnectionWrapper = new WrappedPacket(new NMSPacket(serverConnection));
         boolean searching = true;
         for (int i = 0; searching; i++) {
             try {
-                System.out.println("Still searching...");
                 //Get the list.
                 List<Object> serverChannelList = (List<Object>) serverConnectionWrapper.readObject(i, List.class);
                 synchronized (serverChannelList) {
                     for (Object serverChannel : serverChannelList) {
-                        System.out.println("Iterating through a server channel...");
                         //Is this the server channel list?
                         if (serverChannel instanceof ChannelFuture) {
-                            System.out.print("Found it...");
                             //Yes it is...
                             Channel channel = ((ChannelFuture) serverChannel).channel();
                             List<String> channelHandlerNames = channel.pipeline().names();
@@ -87,7 +83,6 @@ public class EarlyChannelInjector8 implements Injector {
                             modifiersField.setAccessible(true);
                             modifiersField.setInt(bootstrapAcceptorField, bootstrapAcceptorField.getModifiers() & ~Modifier.FINAL);
                             bootstrapAcceptorField.set(bootstrapAcceptor, channelInitializer);
-                            System.out.println("Replaced old channel initializer with our new one!\n}");
                             searching = false;
                         }
                     }
@@ -97,7 +92,6 @@ public class EarlyChannelInjector8 implements Injector {
                 break;
             }
         }
-        System.out.print("Finished injecting...");
     }
 
     @Override
@@ -118,10 +112,8 @@ public class EarlyChannelInjector8 implements Injector {
 
     public void updatePlayerObject(Player player, Object rawChannel) {
         PlayerChannelHandler8 handler = getHandler(rawChannel);
-        System.out.print("Updating player object...");
         if (handler != null) {
             handler.player = player;
-            System.out.println("Updated player object!");
         }
     }
 }

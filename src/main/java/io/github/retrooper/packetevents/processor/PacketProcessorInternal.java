@@ -213,12 +213,10 @@ public class PacketProcessorInternal {
      * @return NMS Packet, null if the event was cancelled.
      */
     public Object read(Player player, Object channel, Object packet) {
-        System.out.print("GOT: " + packet.getClass().getSimpleName());
         if (PacketTypeClasses.Login.Client.START.equals(packet.getClass())) {
             WrappedPacketLoginInStart startWrapper = new WrappedPacketLoginInStart(new NMSPacket(packet));
             WrappedGameProfile gameProfile = startWrapper.getGameProfile();
             channelMap.put(gameProfile.name, channel);
-            System.err.println("CHANNEL CACHED!!!!!!!!111");
         }
         if (player == null) {
             String simpleClassName = ClassUtil.getClassSimpleName(packet.getClass());

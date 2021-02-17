@@ -40,12 +40,12 @@ import java.util.function.Consumer;
 public class PacketEventsSettings {
     private boolean locked;
     private ServerVersion backupServerVersion = ServerVersion.v_1_7_10;
-    private boolean injectAsync = true;
+    private boolean injectAsync = false;
 
     /**
      * This boolean stores if PacketEvents should eject a player asynchronously.
      */
-    private boolean ejectAsync = true;
+    private boolean ejectAsync = false;
 
     /**
      * This boolean stores if PacketEvents should check for updates,
