@@ -22,7 +22,7 @@
  * SOFTWARE.
  */
 
-package io.github.retrooper.packetevents.injector.early.channelinitializer.modern;
+package io.github.retrooper.packetevents.injector.earlyinjector.modern;
 
 import io.github.retrooper.packetevents.PacketEvents;
 import io.github.retrooper.packetevents.utils.reflection.Reflection;
@@ -31,10 +31,11 @@ import io.netty.channel.socket.SocketChannel;
 
 import java.lang.reflect.Method;
 
-public class PEChannelInitializer8 extends ChannelInitializer<SocketChannel> {
+public class PEChannelInitializer extends ChannelInitializer<SocketChannel> {
     private final ChannelInitializer<?> oldChannelInitializer;
     private Method initChannelMethod;
-    public PEChannelInitializer8(ChannelInitializer<?> oldChannelInitializer) {
+
+    public PEChannelInitializer(ChannelInitializer<?> oldChannelInitializer) {
         this.oldChannelInitializer = oldChannelInitializer;
         load();
     }
@@ -46,7 +47,7 @@ public class PEChannelInitializer8 extends ChannelInitializer<SocketChannel> {
     @Override
     protected void initChannel(SocketChannel socketChannel) throws Exception {
         initChannelMethod.invoke(oldChannelInitializer, socketChannel);
-        PlayerChannelHandler8 channelHandler = new PlayerChannelHandler8();
+        PlayerChannelHandler channelHandler = new PlayerChannelHandler();
         socketChannel.pipeline().addBefore("packet_handler", PacketEvents.handlerName, channelHandler);
     }
 }

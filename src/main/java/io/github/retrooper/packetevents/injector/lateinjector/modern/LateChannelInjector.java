@@ -22,9 +22,10 @@
  * SOFTWARE.
  */
 
-package io.github.retrooper.packetevents.injector.lateinjector;
+package io.github.retrooper.packetevents.injector.lateinjector.modern;
 
 import io.github.retrooper.packetevents.PacketEvents;
+import io.github.retrooper.packetevents.injector.lateinjector.LateInjector;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelDuplexHandler;
 import io.netty.channel.ChannelHandlerContext;
@@ -34,9 +35,19 @@ import org.bukkit.entity.Player;
 import java.util.List;
 import java.util.NoSuchElementException;
 
-public class LateChannelInjector8 implements LateInjector {
+public class LateChannelInjector implements LateInjector {
     @Override
-    public void injectPlayerSync(Player player) {
+    public void inject() {
+
+    }
+
+    @Override
+    public void eject() {
+
+    }
+
+    @Override
+    public void injectPlayer(Player player) {
         final ChannelDuplexHandler channelDuplexHandler = new ChannelDuplexHandler() {
             @Override
             public void channelRead(ChannelHandlerContext ctx, Object packet) throws Exception {
@@ -61,14 +72,7 @@ public class LateChannelInjector8 implements LateInjector {
     }
 
     @Override
-    public void injectPlayersSync(List<Player> players) {
-        for (Player player : players) {
-            injectPlayerSync(player);
-        }
-    }
-
-    @Override
-    public void ejectPlayerSync(Player player) {
+    public void ejectPlayer(Player player) {
         final Channel channel = (Channel) PacketEvents.get().packetProcessorInternal.getChannel(player);
         if (channel.pipeline().get(PacketEvents.handlerName) != null) {
             try {
@@ -77,82 +81,10 @@ public class LateChannelInjector8 implements LateInjector {
 
             }
         }
+        PacketEvents.get().packetProcessorInternal.keepAliveMap.remove(player.getUniqueId());
+        PacketEvents.get().packetProcessorInternal.channelMap.remove(player.getName());
         PacketEvents.get().getPlayerUtils().clientVersionsMap.remove(player.getAddress());
         PacketEvents.get().getPlayerUtils().tempClientVersionMap.remove(player.getAddress());
-    }
-
-    @Override
-    public void ejectPlayersSync(List<Player> players) {
-        for (Player player : players) {
-            ejectPlayersSync(players);
-        }
-    }
-
-    @Override
-    public void injectPlayerAsync(Player player) {
-        PacketEvents.get().injectAndEjectExecutorService.execute(new Runnable() {
-            @Override
-            public void run() {
-                injectPlayerSync(player);
-            }
-        });
-    }
-
-    @Override
-    public void injectPlayersAsync(List<Player> players) {
-        PacketEvents.get().injectAndEjectExecutorService.execute(new Runnable() {
-            @Override
-            public void run() {
-                 for (Player player : players) {
-                    injectPlayerSync(player);
-                }
-            }
-        });
-
-    }
-
-    @Override
-    public void ejectPlayerAsync(Player player) {
-        PacketEvents.get().injectAndEjectExecutorService.execute(new Runnable() {
-            @Override
-            public void run() {
-                final Channel channel = (Channel) PacketEvents.get().packetProcessorInternal.getChannel(player);
-                if (channel.pipeline().get(PacketEvents.handlerName) != null) {
-                    try {
-                        channel.pipeline().remove(PacketEvents.handlerName);
-                    } catch (NoSuchElementException ignored) {
-
-                    }
-                }
-                PacketEvents.get().packetProcessorInternal.keepAliveMap.remove(player.getUniqueId());
-                PacketEvents.get().packetProcessorInternal.channelMap.remove(player.getName());
-                PacketEvents.get().getPlayerUtils().clientVersionsMap.remove(player.getAddress());
-                PacketEvents.get().getPlayerUtils().tempClientVersionMap.remove(player.getAddress());
-            }
-        });
-    }
-
-    @Override
-    public void ejectPlayersAsync(List<Player> players) {
-        PacketEvents.get().injectAndEjectExecutorService.execute(new Runnable() {
-            @Override
-            public void run() {
-                for (Player player : players) {
-                    final Channel channel = (Channel) PacketEvents.get().packetProcessorInternal.getChannel(player);
-                    if (channel.pipeline().get(PacketEvents.handlerName) != null) {
-                        try {
-                            channel.pipeline().remove(PacketEvents.handlerName);
-                        } catch (NoSuchElementException ignored) {
-
-                        }
-                    }
-                    PacketEvents.get().packetProcessorInternal.keepAliveMap.remove(player.getUniqueId());
-                    PacketEvents.get().packetProcessorInternal.channelMap.remove(player.getName());
-                    PacketEvents.get().getPlayerUtils().clientVersionsMap.remove(player.getAddress());
-                    PacketEvents.get().getPlayerUtils().tempClientVersionMap.remove(player.getAddress());
-                }
-            }
-        });
     }
 
     @Override

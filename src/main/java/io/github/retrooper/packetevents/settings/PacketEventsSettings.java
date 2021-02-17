@@ -40,12 +40,6 @@ import java.util.function.Consumer;
 public class PacketEventsSettings {
     private boolean locked;
     private ServerVersion backupServerVersion = ServerVersion.v_1_7_10;
-    private boolean injectAsync = false;
-
-    /**
-     * This boolean stores if PacketEvents should eject a player asynchronously.
-     */
-    private boolean ejectAsync = false;
 
     /**
      * This boolean stores if PacketEvents should check for updates,
@@ -54,30 +48,12 @@ public class PacketEventsSettings {
     private boolean checkForUpdates = true;
 
     /**
-     * This boolean stores if PacketEvents should inject a player earlier using the {@code EarlyInjector}.
-     * Allowing us to listen to the LOGIN and STATUS packets and detect client version independently.
+     * This boolean stores if PacketEvents should inject a player earlier using the {@code LateInjector}.
+     * We also call it the "compatibility injector", because it should actually be compatible with everything.
+     * Using this injector prevents us from listening to packets during the early packet-states. (such as LOGIN and STATUS state)
+     * PacketEvents requires these early states to be able to detect client versions of players without the help of any dependencies!
      */
-    private boolean injectEarly = true;
-
-    /**
-     * This int stores how many threads should use to inject and eject a player.
-     */
-    private int injectEjectThreadCount = 1;
-
-    /**
-     * This is the reaction that happens when we fail to inject a player. By default we will kick.
-     */
-    private Consumer<Player> injectionFailureReaction = new Consumer<Player>() {
-        @Override
-        public void accept(Player player) {
-            Bukkit.getScheduler().runTask(PacketEvents.get().getPlugin(), new Runnable() {
-                @Override
-                public void run() {
-                    player.kickPlayer("Failed to inject you. Please try rejoining!");
-                }
-            });
-        }
-    };
+    private boolean compatInjector = false;
 
     /**
      * This method locks the settings.
@@ -105,32 +81,6 @@ public class PacketEventsSettings {
     }
 
     /**
-     * This is decides if PacketEvents should inject users on internal executor or on the main thread.
-     *
-     * @param injectAsync Value
-     * @return Settings instance.
-     */
-    public PacketEventsSettings injectAsync(boolean injectAsync) {
-        if (!locked) {
-            this.injectAsync = injectAsync;
-        }
-        return this;
-    }
-
-    /**
-     * This is decides if PacketEvents should eject users on internal executor or on the main thread.
-     *
-     * @param ejectAsync Value
-     * @return Settings instance.
-     */
-    public PacketEventsSettings ejectAsync(boolean ejectAsync) {
-        if (!locked) {
-            this.ejectAsync = ejectAsync;
-        }
-        return this;
-    }
-
-    /**
      * This decides if PacketEvents should check for updates and notify when your server starts.
      *
      * @param checkForUpdates Value
@@ -148,40 +98,12 @@ public class PacketEventsSettings {
      * resulting in us being able to resolve client versions without the need of any dependencies.
      * We end up using a different injection method which isn't supported on a few spigot forks.
      *
-     * @param injectEarly Value
+     * @param compatInjector Value
      * @return Settings instance.
      */
-    public PacketEventsSettings injectEarly(boolean injectEarly) {
+    public PacketEventsSettings compatInjector(boolean compatInjector) {
         if (!locked) {
-            this.injectEarly = injectEarly;
-        }
-        return this;
-    }
-
-    /**
-     * Thread count for the injection/ejection executor service.
-     * Basically how many threads should we use for injection and ejection.
-     *
-     * @param threadCount Value
-     * @return This instance.
-     */
-    public PacketEventsSettings injectAndEjectThreadCount(int threadCount) {
-        if (!locked) {
-            this.injectEjectThreadCount = threadCount;
-        }
-        return this;
-    }
-
-    /**
-     * When PacketEvents fails to inject a user, it schedules a re-injection and if that fails, we will execute your function.
-     * By default we will kick the user. You can modify the action. Make sure you note that this action will be called off the main thread.
-     *
-     * @param consumer Value
-     * @return Settings instance.
-     */
-    public PacketEventsSettings injectionFailureReaction(Consumer<Player> consumer) {
-        if (!locked) {
-            this.injectionFailureReaction = consumer;
+            this.compatInjector = compatInjector;
         }
         return this;
     }
@@ -206,24 +128,6 @@ public class PacketEventsSettings {
     }
 
     /**
-     * Should we inject a player async?
-     *
-     * @return Getter for {@link #injectAsync}
-     */
-    public boolean shouldInjectAsync() {
-        return injectAsync;
-    }
-
-    /**
-     * Should we eject a player async?
-     *
-     * @return Getter for {@link #ejectAsync}
-     */
-    public boolean shouldEjectAsync() {
-        return ejectAsync;
-    }
-
-    /**
      * Should we check for updates?
      *
      * @return Getter for {@link #checkForUpdates}
@@ -233,28 +137,11 @@ public class PacketEventsSettings {
     }
 
     /**
-     * Should we inject a player earlier with the early injection method?
+     * Should we use the {@code LateInjector}(aka. "Compatibility Injector") with the sacrifice of a few features.
      *
-     * @return Getter for {@link #injectEarly}
+     * @return Getter for {@link #compatInjector}
      */
-    public boolean shouldInjectEarly() {
-        return injectEarly;
-    }
-
-    /**
-     * Injection and ejection executor service thread count(if async).
-     *
-     * @return Getter for {@link #injectEjectThreadCount}
-     */
-    public int getInjectAndEjectThreadCount() {
-        return injectEjectThreadCount;
-    }
-    /**
-     * Injection failure reaction.
-     *
-     * @return Getter for {@link #injectionFailureReaction}
-     */
-    public Consumer<Player> getInjectionFailureAction() {
-        return injectionFailureReaction;
+    public boolean shouldUseCompatibilityInjector() {
+        return compatInjector;
     }
 }

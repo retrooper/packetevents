@@ -22,15 +22,13 @@
  * SOFTWARE.
  */
 
-package io.github.retrooper.packetevents.injector.early.channelinitializer.modern;
+package io.github.retrooper.packetevents.injector.earlyinjector.modern;
 
 import io.github.retrooper.packetevents.PacketEvents;
-import io.github.retrooper.packetevents.injector.early.channelinitializer.Injector;
+import io.github.retrooper.packetevents.injector.earlyinjector.EarlyInjector;
 import io.github.retrooper.packetevents.packetwrappers.NMSPacket;
 import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
 import io.github.retrooper.packetevents.utils.nms.NMSUtils;
-import io.github.retrooper.packetevents.utils.reflection.Reflection;
-import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelHandler;
@@ -40,8 +38,12 @@ import org.bukkit.entity.Player;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.List;
-
-public class EarlyChannelInjector8 implements Injector {
+/**
+ * Early channel injector for all server versions higher than 1.7.10.
+ * @author retrooper, Thomazz
+ * @since 1.8
+ */
+public class EarlyChannelInjector implements EarlyInjector {
     @Override
     public void inject() {
         Object serverConnection = NMSUtils.getMinecraftServerConnection();
@@ -67,16 +69,14 @@ public class EarlyChannelInjector8 implements Injector {
                                     bootstrapAcceptor = handler;
                                     bootstrapAcceptorField = field;
                                     bootstrapAcceptorField.setAccessible(true);
-                                    System.out.println("Found the bootstrap acceptor");
-                                }
-                                catch (Exception ex) {
+                                } catch (Exception ex) {
 
                                 }
                             }
 
 
                             ChannelInitializer<?> oldChannelInitializer = (ChannelInitializer<?>) bootstrapAcceptorField.get(bootstrapAcceptor);
-                            ChannelInitializer<?> channelInitializer = new PEChannelInitializer8(oldChannelInitializer);
+                            ChannelInitializer<?> channelInitializer = new PEChannelInitializer(oldChannelInitializer);
 
                             //REMOVE FINAL MODIFIER
                             Field modifiersField = Field.class.getDeclaredField("modifiers");
@@ -99,19 +99,35 @@ public class EarlyChannelInjector8 implements Injector {
 
     }
 
-    public PlayerChannelHandler8 getHandler(Object rawChannel) {
+    @Override
+    public void injectPlayer(Player player) {
+        Object channel = PacketEvents.get().packetProcessorInternal.getChannel(player);
+        updatePlayerObject(player, channel);
+    }
+
+    @Override
+    public void ejectPlayer(Player player) {
+
+    }
+
+    @Override
+    public void sendPacket(Object ch, Object rawNMSPacket) {
+        Channel channel = (Channel) ch;
+        channel.writeAndFlush(rawNMSPacket);
+    }
+
+    private PlayerChannelHandler getHandler(Object rawChannel) {
         Channel channel = (Channel) rawChannel;
         ChannelHandler handler = channel.pipeline().get(PacketEvents.handlerName);
-        if (handler instanceof PlayerChannelHandler8) {
-            return (PlayerChannelHandler8) handler;
-        }
-        else {
+        if (handler instanceof PlayerChannelHandler) {
+            return (PlayerChannelHandler) handler;
+        } else {
             return null;
         }
     }
 
-    public void updatePlayerObject(Player player, Object rawChannel) {
-        PlayerChannelHandler8 handler = getHandler(rawChannel);
+    private void updatePlayerObject(Player player, Object rawChannel) {
+        PlayerChannelHandler handler = getHandler(rawChannel);
         if (handler != null) {
             handler.player = player;
         }

@@ -22,7 +22,7 @@
  * SOFTWARE.
  */
 
-package io.github.retrooper.packetevents.injector.early.channelinitializer.modern;
+package io.github.retrooper.packetevents.injector.earlyinjector.modern;
 
 import io.github.retrooper.packetevents.PacketEvents;
 import io.netty.channel.ChannelDuplexHandler;
@@ -30,7 +30,7 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelPromise;
 import org.bukkit.entity.Player;
 
-public class PlayerChannelHandler8 extends ChannelDuplexHandler {
+public class PlayerChannelHandler extends ChannelDuplexHandler {
     /**
      * Associated player.
      * This is null until you inject the player.

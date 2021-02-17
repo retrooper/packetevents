@@ -57,31 +57,9 @@ import java.util.concurrent.ConcurrentHashMap;
  * @since 1.7.9
  */
 public class PacketProcessorInternal {
-    public final GlobalChannelInjector injector = new GlobalChannelInjector();
     public final Map<UUID, Long> keepAliveMap = new HashMap<>();
     public final Map<String, Object> channelMap = new WeakHashMap<>();
 
-    public PacketProcessorInternal() {
-        injector.prepare();
-    }
-
-    /**
-     * Get a player's netty channel object with their name.
-     * This netty channel object is cached in a {@link ConcurrentHashMap} as the value and
-     * the name is the key.
-     * We cache the name and the channel quite early infact,
-     * once we receive the {@link PacketType.Login.Client#START} packet(which contains the game profile)
-     * and the game profile contains the player name.
-     * The wrapper for that packet is {@link WrappedPacketLoginInStart}.
-     * If PacketEvents couldn't cache(when you have {@link PacketEventsSettings#shouldInjectEarly()} set to false),
-     * PacketEvents will use some reflection to see if CraftBukkit has the netty channel.
-     * If you access this before the START login packet was sent, you will for sure experience issues.
-     *
-     * @param player Target player.
-     * @return Netty channel of a player by their name.
-     * @see <a href="https://wiki.vg/Protocol#Login_Start">https://wiki.vg/Protocol#Login_Start</a>
-     * @see Player#getName()
-     */
     public Object getChannel(Player player) {
         String name = player.getName();
         Object channel = channelMap.get(name);
@@ -92,116 +70,6 @@ public class PacketProcessorInternal {
             }
         }
         return channel;
-    }
-
-    /**
-     * Inject a player.
-     * Executed synchronously or asynchronously depending on what you have the associated setting set to.
-     * Injecting a player is basically pairing the cached netty channel
-     * {@link #getChannel(Player)} to a bukkit player object.
-     * Bukkit initializes the {@link Player} object some time after
-     * we inject the netty channel, so we need to pair the two.
-     * PacketEvents already injects a player when the bukkit
-     * {@link org.bukkit.event.player.PlayerJoinEvent} or {@link org.bukkit.event.player.PlayerLoginEvent}
-     * is called, depending on your {@link PacketEventsSettings#shouldInjectEarly()} setting is set to.
-     *
-     * @param player Target bukkit player.
-     */
-    public void injectPlayer(Player player) {
-        if (PacketEvents.get().getSettings().shouldInjectAsync()) {
-            injectPlayerAsync(player);
-        } else {
-            injectPlayerSync(player);
-        }
-    }
-
-    /**
-     * Eject a player.
-     * Executed synchronously or asynchronously depending on what you have the associated setting set to.
-     * Ejecting a player is basically unpairing the cached netty channel
-     * {@link #getChannel(Player)} from the bukkit player.
-     * Do this if you want to stop listening to a user's packets.
-     * PacketEvents already ejects a player when the bukkit
-     * {@link org.bukkit.event.player.PlayerQuitEvent} is called.
-     *
-     * @param player Target player.
-     */
-    public void ejectPlayer(Player player) {
-        if (PacketEvents.get().getSettings().shouldEjectAsync()) {
-            ejectPlayerAsync(player);
-        } else {
-            ejectPlayerSync(player);
-        }
-    }
-
-    /**
-     * Synchronously inject a player.
-     *
-     * @param player Target player.
-     * @see #injectPlayer(Player)
-     */
-    public void injectPlayerSync(Player player) {
-        PlayerInjectEvent injectEvent = new PlayerInjectEvent(player, false);
-        PacketEvents.get().getEventManager().callEvent(injectEvent);
-        if (!injectEvent.isCancelled()) {
-            injector.injectPlayerSync(player);
-        }
-    }
-
-    /**
-     * Asynchronously inject a player.
-     *
-     * @param player Target player.
-     * @see #injectPlayer(Player)
-     */
-    public void injectPlayerAsync(Player player) {
-        PlayerInjectEvent injectEvent = new PlayerInjectEvent(player, true);
-        PacketEvents.get().getEventManager().callEvent(injectEvent);
-        if (!injectEvent.isCancelled()) {
-            injector.injectPlayerAsync(player);
-        }
-    }
-
-    /**
-     * Synchronously eject a player.
-     *
-     * @param player Target player.
-     * @see #ejectPlayer(Player)
-     */
-    public void ejectPlayerSync(Player player) {
-        PlayerEjectEvent ejectEvent = new PlayerEjectEvent(player, false);
-        PacketEvents.get().getEventManager().callEvent(ejectEvent);
-        if (!ejectEvent.isCancelled()) {
-            injector.ejectPlayerSync(player);
-            keepAliveMap.remove(player.getUniqueId());
-            channelMap.remove(player.getName());
-        }
-    }
-
-    /**
-     * Asynchronously eject a player.
-     *
-     * @param player Target player.
-     * @see #ejectPlayer(Player)
-     */
-    public void ejectPlayerAsync(Player player) {
-        PlayerEjectEvent ejectEvent = new PlayerEjectEvent(player, true);
-        PacketEvents.get().getEventManager().callEvent(ejectEvent);
-        if (!ejectEvent.isCancelled()) {
-            injector.ejectPlayerAsync(player);
-        }
-    }
-
-    /**
-     * Write and flush a packet to a netty channel.
-     * This netty channel is an object as 1.7.10 and 1.8 and above
-     * have different netty package locations.
-     *
-     * @param channel Netty channel.
-     * @param packet  NMS Packet.
-     */
-    public void sendPacket(Object channel, Object packet) {
-        injector.sendPacket(channel, packet);
     }
 
     /**
@@ -424,24 +292,5 @@ public class PacketProcessorInternal {
                 keepAliveMap.put(event.getPlayer().getUniqueId(), event.getTimestamp());
             }
         }
-    }
-
-    /**
-     * If you are using the EarlyInjector,
-     * calling this close method will unregister the channel handlers it registered when the plugin enabled.
-     * PacketEvents already unregisters them in the {@link PacketEvents#terminate()} method.
-     */
-    public void cleanup() {
-        injector.cleanup();
-    }
-
-    /**
-     * If you are using the EarlyInjector,
-     * calling this close method will unregister the channel handlers it registered when the plugin enabled
-     * ASYNCHRONOUSLY.
-     * PacketEvents already unregisters them in the {@link PacketEvents#terminate()} method.
-     */
-    public void cleanupAsync() {
-        injector.cleanupAsync();
     }
 }

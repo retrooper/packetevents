@@ -22,10 +22,10 @@
  * SOFTWARE.
  */
 
-package io.github.retrooper.packetevents.injector.early.channelinitializer;
+package io.github.retrooper.packetevents.injector.earlyinjector;
 
-public interface Injector {
-    void inject();
+import io.github.retrooper.packetevents.injector.ChannelInjector;
 
-    void eject();
+public interface EarlyInjector extends ChannelInjector {
+
 }

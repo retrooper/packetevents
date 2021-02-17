@@ -1,90 +1,58 @@
 package io.github.retrooper.packetevents.injector;
 
 import io.github.retrooper.packetevents.PacketEvents;
-import io.github.retrooper.packetevents.injector.early.channelinitializer.modern.EarlyChannelInjector8;
+import io.github.retrooper.packetevents.event.impl.PlayerInjectEvent;
+import io.github.retrooper.packetevents.injector.earlyinjector.legacy.EarlyChannelInjectorLegacy;
+import io.github.retrooper.packetevents.injector.earlyinjector.modern.EarlyChannelInjector;
+import io.github.retrooper.packetevents.injector.lateinjector.LateInjector;
+import io.github.retrooper.packetevents.injector.lateinjector.legacy.LateChannelInjectorLegacy;
+import io.github.retrooper.packetevents.injector.lateinjector.modern.LateChannelInjector;
 import io.github.retrooper.packetevents.utils.nms.NMSUtils;
-import io.netty.channel.Channel;
 import org.bukkit.entity.Player;
 
-import java.util.List;
-
 public class GlobalChannelInjector implements ChannelInjector {
-    //  private final ChannelInjector injector;
-    private EarlyChannelInjector8 channelInjector;
+    private final ChannelInjector injector;
 
     public GlobalChannelInjector() {
         boolean legacy = NMSUtils.legacyNettyImportMode;
-        //Early injector
-        // if (PacketEvents.get().getSettings().shouldInjectEarly()) {
-        //   injector = legacy ? new EarlyChannelInjector7() : new EarlyChannelInjector8();
-        //}
-        //Late injector
-        //else {
-        //  injector = legacy ? new LateChannelInjector7() : new LateChannelInjector8();
-        //}
-        channelInjector = new EarlyChannelInjector8();
+        if (PacketEvents.get().getSettings().shouldUseCompatibilityInjector()) {
+            injector = legacy ? new EarlyChannelInjectorLegacy() : new EarlyChannelInjector();
+        } else {
+            injector = legacy ? new LateChannelInjectorLegacy() : new LateChannelInjector();
+        }
     }
 
     @Override
-    public void prepare() {
-        channelInjector.inject();
+    public void inject() {
+        //TODO support cancelling inject event with early injector.
+        injector.inject();
     }
 
     @Override
-    public void cleanup() {
-        channelInjector.eject();
+    public void eject() {
+        injector.eject();
     }
 
     @Override
-    public void cleanupAsync() {
-        //
+    public void injectPlayer(Player player) {
+        if (injector instanceof LateInjector) {
+            PlayerInjectEvent injectEvent = new PlayerInjectEvent(player);
+            PacketEvents.get().callEvent(injectEvent);
+            if (!injectEvent.isCancelled()) {
+                injector.injectPlayer(player);
+            }
+        } else {
+            injector.injectPlayer(player);
+        }
     }
 
     @Override
-    public void injectPlayerSync(Player player) {
-        Object channel = PacketEvents.get().packetProcessorInternal.getChannel(player);
-        channelInjector.updatePlayerObject(player, channel);
-    }
-
-    @Override
-    public void injectPlayersSync(List<Player> players) {
-
-    }
-
-    @Override
-    public void ejectPlayerSync(Player player) {
-
-    }
-
-    @Override
-    public void ejectPlayersSync(List<Player> players) {
-
-    }
-
-    @Override
-    public void injectPlayerAsync(Player player) {
-        Object channel = PacketEvents.get().packetProcessorInternal.getChannel(player);
-        channelInjector.updatePlayerObject(player, channel);
-    }
-
-    @Override
-    public void injectPlayersAsync(List<Player> players) {
-        //injector.injectPlayersAsync(players);
-    }
-
-    @Override
-    public void ejectPlayerAsync(Player player) {
-
-    }
-
-    @Override
-    public void ejectPlayersAsync(List<Player> players) {
-
+    public void ejectPlayer(Player player) {
+        injector.ejectPlayer(player);
     }
 
     @Override
     public void sendPacket(Object ch, Object rawNMSPacket) {
-        Channel channel = (Channel) ch;
-        channel.write(rawNMSPacket);
+        injector.sendPacket(ch, rawNMSPacket);
     }
 }
