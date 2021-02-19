@@ -7,6 +7,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
+import io.github.retrooper.packetevents.packetwrappers.NMSPacket;
+import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
@@ -18,18 +20,19 @@ import io.github.retrooper.packetevents.utils.nms.NMSUtils;
  *
  * @author SteelPhoenix
  */
-public class WrappedWatchableObject extends AbstractWrapper {
+public class WrappedWatchableObject extends WrappedPacket {
 
-	private static final Class<?> TYPE;
-	private static final Field VALUE;
-	private static final Field DIRTY;
-	private static final Field INDEX;
-	private static final Field DWOBJECT;
-	private static final Constructor<?> CONSTRUCTOR;
-	private static final String[] NMS_ALIASES = {"DataWatcher$Item", "DataWatcher$WatchableObject", "WatchableObject"};
+	private static Class<?> TYPE;
+	private static Field VALUE;
+	private static Field DIRTY;
+	private static Field INDEX;
+	private static Field DWOBJECT;
+	private static Constructor<?> CONSTRUCTOR;
+	private static String[] NMS_ALIASES = {"DataWatcher$Item", "DataWatcher$WatchableObject", "WatchableObject"};
 	private static final Map<Class<?>, Integer> ID_MAP = new HashMap<>();
 
-	static {
+	@Override
+	protected void load() {
 		// WHY ARE THERE NO REFLECTION HELPERS REEEEEEEEEEEEEEEEEEEEEEE
 
 		// Data watcher item
@@ -149,7 +152,7 @@ public class WrappedWatchableObject extends AbstractWrapper {
 	}
 
 	public WrappedWatchableObject(Object nms) {
-		super(TYPE, nms);
+		super(new NMSPacket(nms));
 	}
 
 	public WrappedWatchableObject(DataWatcherObject object, Object value) {
@@ -165,7 +168,7 @@ public class WrappedWatchableObject extends AbstractWrapper {
 		if (DataWatcherObject.isPresent()) {
 			Object value;
 			try {
-				value = DWOBJECT.get(getRaw());
+				value = DWOBJECT.get(packet.getRawNMSPacket());
 			} catch (IllegalArgumentException | IllegalAccessException exception) {
 				// TODO: Proper exception handling
 				throw new RuntimeException("Could not read field value", exception);
@@ -179,7 +182,7 @@ public class WrappedWatchableObject extends AbstractWrapper {
 		}
 
 		try {
-			return (int) INDEX.get(getRaw());
+			return (int) INDEX.get(packet.getRawNMSPacket());
 		} catch (IllegalArgumentException | IllegalAccessException exception) {
 			// TODO: Proper exception handling
 			throw new RuntimeException("Could not read field value", exception);
@@ -194,7 +197,7 @@ public class WrappedWatchableObject extends AbstractWrapper {
 	 */
 	public Object getValueRaw() {
 		try {
-			return VALUE.get(getRaw());
+			return VALUE.get(packet.getRawNMSPacket());
 		} catch (IllegalArgumentException | IllegalAccessException exception) {
 			// TODO: Proper exception handling
 			throw new RuntimeException("Could not read field value", exception);
@@ -208,7 +211,7 @@ public class WrappedWatchableObject extends AbstractWrapper {
 	 */
 	public void setValueRaw(Object value) {
 		try {
-			VALUE.set(getRaw(), value);
+			VALUE.set(packet.getRawNMSPacket(), value);
 		} catch (IllegalArgumentException | IllegalAccessException exception) {
 			// TODO: Proper exception handling
 			throw new RuntimeException("Could not write field value", exception);
@@ -225,7 +228,7 @@ public class WrappedWatchableObject extends AbstractWrapper {
 	@Deprecated
 	public boolean isDirty() {
 		try {
-			return (boolean) DIRTY.get(getRaw());
+			return (boolean) DIRTY.get(packet.getRawNMSPacket());
 		} catch (IllegalArgumentException | IllegalAccessException exception) {
 			// TODO: Proper exception handling
 			throw new RuntimeException("Could not read field value", exception);
@@ -242,7 +245,7 @@ public class WrappedWatchableObject extends AbstractWrapper {
 	@Deprecated
 	public void setDirty(boolean value) {
 		try {
-			DIRTY.set(getRaw(), value);
+			DIRTY.set(packet.getRawNMSPacket(), value);
 		} catch (IllegalArgumentException | IllegalAccessException exception) {
 			// TODO: Proper exception handling
 			throw new RuntimeException("Could not write field value", exception);
@@ -306,6 +309,9 @@ public class WrappedWatchableObject extends AbstractWrapper {
 			// TODO: Proper exception handling
 			throw new RuntimeException("Could not invoke constructor", exception);
 		}
+	}
 
+	public Object getRaw() {
+		return packet.getRawNMSPacket();
 	}
 }

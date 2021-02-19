@@ -24,11 +24,13 @@
 
 package io.github.retrooper.packetevents.packetwrappers.play.out.entitymetadata;
 
+import io.github.retrooper.packetevents.packetwrappers.NMSPacket;
+import io.github.retrooper.packetevents.packetwrappers.SendableWrapper;
+import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
+import org.bukkit.entity.Entity;
+
 import java.util.ArrayList;
 import java.util.List;
-
-import io.github.retrooper.packetevents.packetwrappers.NMSPacket;
-import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
 
 /**
  * A PacketPlayOutEntityMetadata.
@@ -39,84 +41,111 @@ import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
  */
 public class WrappedPacketOutEntityMetadata extends WrappedPacket {
 
-	public WrappedPacketOutEntityMetadata(NMSPacket packet) {
-		super(packet);
-	}
+    public WrappedPacketOutEntityMetadata(NMSPacket packet) {
+        super(packet);
+    }
 
-	// TODO: PacketPlayOutEntityMetadata constructors
+    private int entityID;
+    private List<WrappedWatchableObject> watchableObjects;
 
-	/**
-	 * Get the entity ID.
-	 *
-	 * @return the current value.
-	 */
-	public int getEntityId() {
-    	return readInt(0);
-	}
+    public WrappedPacketOutEntityMetadata(int entityID, List<WrappedWatchableObject> watchableObjects) {
+        this.entityID = entityID;
+        this.watchableObjects = watchableObjects;
+    }
 
-	/**
-	 * Set the entity ID.
-	 *
-	 * @param value New value.
-	 */
-	public void setEntityId(int value) {
-		writeInt(0, value);
-	}
+    public WrappedPacketOutEntityMetadata(Entity entity, List<WrappedWatchableObject> watchableObjects) {
+        this.entityID = entity.getEntityId();
+        this.watchableObjects = watchableObjects;
+    }
 
-	/**
-	 * Get the entity metadata.
-	 * Note that null values are preserved.
-	 *
-	 * @return the current value.
-	 */
-	public List<WrappedWatchableObject> getWatchableObjects() {
-		// We assume this is the right type
-		List<?> nms = (List<?>) readObject(0, List.class);
+    /**
+     * Get the entity ID.
+     *
+     * @return the current value.
+     */
+    public int getEntityId() {
+        if (packet != null) {
+            return readInt(0);
+        } else {
+            return entityID;
+        }
+    }
 
-		// Wrap
-		// We assume every element can be wrapped
-		List<WrappedWatchableObject> watchableObjects = new ArrayList<>();
-		for (Object nmsWatchable : nms) {
-			watchableObjects.add(new WrappedWatchableObject(nmsWatchable));
-		}
+    /**
+     * Set the entity ID.
+     *
+     * @param value New value.
+     */
+    public void setEntityId(int value) {
+        if (packet != null) {
+            writeInt(0, value);
+        } else {
+            this.entityID = entityID;
+        }
+    }
 
-		return watchableObjects;
-	}
+    /**
+     * Get the entity metadata.
+     * Note that null values are preserved.
+     *
+     * @return the current value.
+     */
+    public List<WrappedWatchableObject> getWatchableObjects() {
+        if (packet != null) {
+            // We assume this is the right type
+            List<?> nms = (List<?>) readObject(0, List.class);
 
-	/**
-	 * Set the entity metadata.
-	 * Note that null values are preserved.
-	 *
-	 * @param value New value.
-	 */
-	@SuppressWarnings("unchecked")
-	public void setWatchableObjects(List<WrappedWatchableObject> value) {
-		// Preconditions
-		if (value == null) {
-			throw new NullPointerException("Object cannot be null");
-		}
+            // Wrap
+            // We assume every element can be wrapped
+            List<WrappedWatchableObject> watchableObjects = new ArrayList<>();
+            for (Object nmsWatchable : nms) {
+                watchableObjects.add(new WrappedWatchableObject(nmsWatchable));
+            }
 
-		// Try to maintain list type if possible
-		List<Object> list;
-		try {
-			list = value.getClass().newInstance();
-		} catch (ReflectiveOperationException | SecurityException exception) {
-			list = new ArrayList<>();
-		}
+            return watchableObjects;
+        } else {
+            return watchableObjects;
+        }
+    }
 
-		for (WrappedWatchableObject wrappedWatchable : value) {
-			// Handle nulls
-			if (wrappedWatchable == null) {
-				list.add(null);
-			}
+    /**
+     * Set the entity metadata.
+     * Note that null values are preserved.
+     *
+     * @param value New value.
+     */
+    @SuppressWarnings("unchecked")
+    public void setWatchableObjects(List<WrappedWatchableObject> value) {
+        if (packet != null) {
+            // Preconditions
+            if (value == null) {
+                throw new NullPointerException("Object cannot be null");
+            }
 
-			// Only add if a raw object is set
-			Object nms = wrappedWatchable.getRaw();
-			if (nms != null) {
-				list.add(nms);
-			}
-		}
+            // Try to maintain list type if possible
+            List<Object> list;
+            try {
+                list = value.getClass().newInstance();
+            } catch (ReflectiveOperationException | SecurityException exception) {
+                list = new ArrayList<>();
+            }
 
-		write(List.class, 0, list);
-	}
+            for (WrappedWatchableObject wrappedWatchable : value) {
+                // Handle nulls
+                if (wrappedWatchable == null) {
+                    list.add(null);
+                }
+
+                // Only add if a raw object is set
+                Object nms = wrappedWatchable.getRaw();
+                if (nms != null) {
+                    list.add(nms);
+                }
+            }
+
+            write(List.class, 0, list);
+        } else {
+            this.watchableObjects = value;
+        }
+    }
 }

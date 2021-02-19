@@ -1,7 +1,7 @@
 package io.github.retrooper.packetevents.packetwrappers.play.out.entitymetadata;
 
-import java.util.function.Supplier;
-
+import io.github.retrooper.packetevents.packetwrappers.NMSPacket;
+import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
 import io.github.retrooper.packetevents.utils.nms.NMSUtils;
 
 /**
@@ -11,68 +11,63 @@ import io.github.retrooper.packetevents.utils.nms.NMSUtils;
  *
  * @author SteelPhoenix
  */
-public class WrappedDataWatcherSerializer extends AbstractWrapper {
+public class WrappedDataWatcherSerializer {
 
-	// Look at this beautiful code
-	// That's what you get for not including proper reflection helpers
-	// TODO: Move to static initializer
-	public static final Class<?> TYPE = ((Supplier<Class<?>>) (() -> {
-		try {
-			return NMSUtils.getNMSClass("DataWatcherSerializer");
-		} catch (ClassNotFoundException exception) {
-			return null;
-		}
-	})).get();
+    public static final Class<?> TYPE = NMSUtils.getNMSClassWithoutException("DataWatcherSerializer");
 
-	private final Class<?> type;
-	private final boolean optional;
+    private final Class<?> type;
+    private final boolean optional;
+    private Object raw;
 
-	private WrappedDataWatcherSerializer(Object nms, Class<?> type, boolean optional) {
-		super(TYPE, nms);
+    private WrappedDataWatcherSerializer(Object nms, Class<?> type, boolean optional) {
+        this.raw = nms;
+        this.type = type;
+        this.optional = optional;
+    }
 
-		this.type = type;
-		this.optional = optional;
-	}
+    /**
+     * Get the serializer type.
+     *
+     * @return the serializer type.
+     */
+    public Class<?> getType() {
+        return type;
+    }
 
-	/**
-	 * Get the serializer type.
-	 *
-	 * @return the serializer type.
-	 */
-	public Class<?> getType() {
-		return type;
-	}
+    /**
+     * Get if the value is wrapped in an {@link java.util.Optional}.
+     *
+     * @return if the value is an optional.
+     */
+    public boolean isOptional() {
+        return optional;
+    }
 
-	/**
-	 * Get if the value is wrapped in an {@link java.util.Optional}.
-	 *
-	 * @return if the value is an optional.
-	 */
-	public boolean isOptional() {
-		return optional;
-	}
+    /**
+     * Get if the wrapped class exists.
+     *
+     * @return if the wrapped class is present.
+     */
+    public static boolean isPresent() {
+        return TYPE != null;
+    }
 
-	/**
-	 * Get if the wrapped class exists.
-	 *
-	 * @return if the wrapped class is present.
-	 */
-	public static boolean isPresent() {
-		return TYPE != null;
-	}
+    public Object getRaw() {
+        return raw;
+    }
 
-	/**
-	 * Wrap a DataWatcherSerializer.
-	 *
-	 * @param nms Handle.
-	 * @param type Type it serializes.
-	 * @param optional If the return type is wrapped in an optional.
-	 * @return the wrapped instance.
-	 */
-	public static WrappedDataWatcherSerializer of(Object nms, Class<?> type, boolean optional) {
-		if (!isPresent()) {
-			throw new UnsupportedOperationException("DataWatcherSerializer does not exist in this minecraft version");
-		}
-		return new WrappedDataWatcherSerializer(nms, type, optional);
-	}
+    /**
+     * Wrap a DataWatcherSerializer.
+     *
+     * @param nms      Handle.
+     * @param type     Type it serializes.
+     * @param optional If the return type is wrapped in an optional.
+     * @return the wrapped instance.
+     */
+    public static WrappedDataWatcherSerializer of(Object nms, Class<?> type, boolean optional) {
+        if (!isPresent()) {
+            throw new UnsupportedOperationException("DataWatcherSerializer does not exist in this minecraft version");
+        }
+        return new WrappedDataWatcherSerializer(nms, type, optional);
+    }
 }
