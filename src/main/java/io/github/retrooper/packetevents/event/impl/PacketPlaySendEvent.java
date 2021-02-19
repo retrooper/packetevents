@@ -24,23 +24,16 @@
 
 package io.github.retrooper.packetevents.event.impl;
 
-import io.github.retrooper.packetevents.event.PacketEvent;
 import io.github.retrooper.packetevents.event.PacketListenerDynamic;
-import io.github.retrooper.packetevents.event.eventtypes.CancellableEvent;
-import io.github.retrooper.packetevents.event.eventtypes.NMSPacketEvent;
+import io.github.retrooper.packetevents.event.eventtypes.CancellableNMSPacketEvent;
 import io.github.retrooper.packetevents.event.eventtypes.PlayerEvent;
 import io.github.retrooper.packetevents.packettype.PacketType;
 import io.github.retrooper.packetevents.packetwrappers.NMSPacket;
-import io.github.retrooper.packetevents.utils.netty.channel.ChannelUtils;
-import io.github.retrooper.packetevents.utils.reflection.ClassUtil;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
-import java.net.InetSocketAddress;
-
 /**
  * The {@code PacketPlaySendEvent} event is fired whenever the a PLAY packet is about to be sent.
- * This class implements {@link CancellableEvent} and {@link PlayerEvent}.
  * Cancelling this event will result in preventing minecraft from sending the packet.
  * The player won't receive the packet if you cancel it.
  *
@@ -48,18 +41,12 @@ import java.net.InetSocketAddress;
  * @see <a href="https://wiki.vg/Protocol#Play">https://wiki.vg/Protocol#Play</a>
  * @since 1.2.6
  */
-public final class PacketPlaySendEvent extends PacketEvent implements NMSPacketEvent, CancellableEvent, PlayerEvent {
+public final class PacketPlaySendEvent extends CancellableNMSPacketEvent implements PlayerEvent {
     private final Player player;
-    private final InetSocketAddress address;
-    private NMSPacket packet;
-    private boolean cancelled;
-    private byte packetID = -2;
 
     public PacketPlaySendEvent(final Player player, final Object channel, final NMSPacket packet) {
+        super(channel, packet);
         this.player = player;
-        this.address = ChannelUtils.getSocketAddress(channel);
-        this.packet = packet;
-        this.cancelled = false;
     }
 
     /**
@@ -75,38 +62,6 @@ public final class PacketPlaySendEvent extends PacketEvent implements NMSPacketE
     }
 
     /**
-     * This method returns the socket address of the packet receiver.
-     * This address if guaranteed to never be null.
-     * You could use this to identify who is sending packets
-     * whenever the player object is null.
-     *
-     * @return Packet receiver's socket address.
-     */
-    @NotNull
-    @Override
-    public InetSocketAddress getSocketAddress() {
-        return address;
-    }
-
-    @NotNull
-    @Deprecated
-    @Override
-    public String getPacketName() {
-        return ClassUtil.getClassSimpleName(packet.getRawNMSPacket().getClass());
-    }
-
-    @NotNull
-    @Override
-    public NMSPacket getNMSPacket() {
-        return packet;
-    }
-
-    @Override
-    public void setNMSPacket(NMSPacket packet) {
-        this.packet = packet;
-    }
-
-    /**
      * Each binding in each packet state has their own constants.
      * Example Usage:
      * <p>
@@ -117,35 +72,14 @@ public final class PacketPlaySendEvent extends PacketEvent implements NMSPacketE
      */
     @Override
     public byte getPacketId() {
-        if (packetID == -2) {
-            packetID = PacketType.Play.Server.packetIds.getOrDefault(packet.getRawNMSPacket().getClass(), (byte) -1);
-        }
-        return packetID;
-    }
-
-    @Override
-    public void cancel() {
-        cancelled = true;
-    }
-
-    @Override
-    public void uncancel() {
-        cancelled = false;
-    }
-
-    @Override
-    public boolean isCancelled() {
-        return cancelled;
-    }
-
-    @Override
-    public void setCancelled(boolean value) {
-        cancelled = value;
+        return PacketType.Play.Server.packetIds.getOrDefault(packet.getRawNMSPacket().getClass(), PacketType.INVALID);
     }
 
     @Override
     public void call(PacketListenerDynamic listener) {
-        listener.onPacketPlaySend(this);
+        if (listener.serverSidedPlayAllowance == null || listener.serverSidedPlayAllowance.contains(getPacketId())) {
+            listener.onPacketPlaySend(this);
+        }
     }
 }
 

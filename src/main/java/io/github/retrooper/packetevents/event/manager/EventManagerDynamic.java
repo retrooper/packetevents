@@ -24,23 +24,19 @@
 
 package io.github.retrooper.packetevents.event.manager;
 
+import io.github.retrooper.packetevents.PacketEvents;
 import io.github.retrooper.packetevents.event.PacketEvent;
 import io.github.retrooper.packetevents.event.PacketListenerDynamic;
 import io.github.retrooper.packetevents.event.eventtypes.CancellableEvent;
 import io.github.retrooper.packetevents.event.priority.PacketEventPriority;
 
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.logging.Level;
 
 class EventManagerDynamic {
-    /**
-     * Map storing all dynamic packet event listeners.
-     * The key is the dynamic packet listener event priority, the value is a list of the dynamic packet listeners having that priority.
-     * Priorities count for the whole listener, not just one event method in the listener.
-     */
-    private final Map<Byte, Set<PacketListenerDynamic>> map = new HashMap<>();
+    private final Map<Byte, HashSet<PacketListenerDynamic>> listenersMap = new ConcurrentHashMap<>();
 
     /**
      * Call the PacketEvent.
@@ -54,32 +50,37 @@ class EventManagerDynamic {
      * @see EventManagerLegacy#callEvent(PacketEvent, byte)
      */
     public void callEvent(final PacketEvent event) {
-        final boolean[] isCancelled = {false};
+        boolean cancel = false;
         if (event instanceof CancellableEvent) {
-            isCancelled[0] = ((CancellableEvent) event).isCancelled();
+            cancel = ((CancellableEvent) event).isCancelled();
         }
-        byte maxReachedEventPriority = PacketEventPriority.LOWEST.getPriorityValue();
-        //LOWEST.getPriorityValue()
-        for (byte i = maxReachedEventPriority; i <= PacketEventPriority.MONITOR.getPriorityValue(); i++) {
-            Set<PacketListenerDynamic> cached = map.get(i);
-            if (cached != null) {
-                maxReachedEventPriority = i;
-                for (PacketListenerDynamic listener : cached) {
-                    event.callPacketEvent(listener);
-                    event.call(listener);
+        byte highestReachedPriority = PacketEventPriority.LOWEST.getPriorityValue();
+        for (byte priority = PacketEventPriority.LOWEST.getPriorityValue(); priority <= PacketEventPriority.MONITOR.getPriorityValue(); priority++) {
+            HashSet<PacketListenerDynamic> listeners = listenersMap.get(priority);
+            if (listeners != null) {
+                for (PacketListenerDynamic listener : listeners) {
+                    try {
+                        if (!event.isInbuilt()) {
+                            event.callPacketEventExternal(listener);
+                        }
+                        event.call(listener);
+                    } catch (Exception ex) {
+                        PacketEvents.get().getPlugin().getLogger()
+                                .log(Level.SEVERE, "PacketEvents found an exception while calling a packet listener.", ex);
+                    }
                     if (event instanceof CancellableEvent) {
                         CancellableEvent ce = (CancellableEvent) event;
-                        isCancelled[0] = ce.isCancelled();
+                        cancel = ce.isCancelled();
+                        highestReachedPriority = priority;
                     }
+                }
+                if (event instanceof CancellableEvent) {
+                    CancellableEvent ce = (CancellableEvent) event;
+                    ce.setCancelled(cancel);
                 }
             }
         }
-        if (event instanceof CancellableEvent) {
-            CancellableEvent ce = (CancellableEvent) event;
-            ce.setCancelled(isCancelled[0]);
-        }
-
-        PEEventManager.EVENT_MANAGER_LEGACY.callEvent(event, maxReachedEventPriority);
+        PEEventManager.EVENT_MANAGER_LEGACY.callEvent(event, highestReachedPriority);
     }
 
     /**
@@ -87,9 +88,14 @@ class EventManagerDynamic {
      *
      * @param listener {@link PacketListenerDynamic}
      */
-    public void registerListener(PacketListenerDynamic listener) {
-        Set<PacketListenerDynamic> listeners = map.computeIfAbsent(listener.getPriority().getPriorityValue(), k -> new HashSet<>());
-        listeners.add(listener);
+    public synchronized void registerListener(final PacketListenerDynamic listener) {
+        byte priority = listener.getPriority().getPriorityValue();
+        HashSet<PacketListenerDynamic> listenerSet = listenersMap.get(priority);
+        if (listenerSet == null) {
+            listenerSet = new HashSet<>();
+        }
+        listenerSet.add(listener);
+        listenersMap.put(priority, listenerSet);
     }
 
     /**
@@ -97,40 +103,16 @@ class EventManagerDynamic {
      *
      * @param listeners {@link PacketListenerDynamic}
      */
-    public void registerListeners(PacketListenerDynamic... listeners) {
+    public synchronized void registerListeners(PacketListenerDynamic... listeners) {
         for (PacketListenerDynamic listener : listeners) {
             registerListener(listener);
         }
     }
 
     /**
-     * Unregister the dynamic packet event listener.
-     *
-     * @param listener {@link PacketListenerDynamic}
-     */
-    public void unregisterListener(PacketListenerDynamic listener) {
-        Set<PacketListenerDynamic> listeners = map.get(listener.getPriority().getPriorityValue());
-        if (listeners == null) {
-            return;
-        }
-        listeners.remove(listener);
-    }
-
-    /**
-     * Unregister multiple dynamic packet event listeners with one method.
-     *
-     * @param listeners {@link PacketListenerDynamic}
-     */
-    public void unregisterListeners(PacketListenerDynamic... listeners) {
-        for (PacketListenerDynamic listener : listeners) {
-            unregisterListener(listener);
-        }
-    }
-
-    /**
      * Unregister all dynamic packet event listeners.
      */
-    public void unregisterAllListeners() {
-        map.clear();
+    public synchronized void unregisterAllListeners() {
+        listenersMap.clear();
     }
 }

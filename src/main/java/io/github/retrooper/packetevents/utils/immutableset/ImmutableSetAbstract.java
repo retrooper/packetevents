@@ -22,13 +22,12 @@
  * SOFTWARE.
  */
 
-package io.github.retrooper.packetevents.utils.versionlookup.v_1_7_10;
+package io.github.retrooper.packetevents.utils.immutableset;
 
-import org.bukkit.entity.Player;
+abstract class ImmutableSetAbstract<T> {
+    public abstract boolean contains(T element);
 
-public class ProtocolVersionAccessor_v_1_7 {
-    public static int getProtocolVersion(Player player) {
-        net.minecraft.server.v1_7_R4.EntityPlayer entityPlayer = ((org.bukkit.craftbukkit.v1_7_R4.entity.CraftPlayer) player).getHandle();
-        return entityPlayer.playerConnection.networkManager.getVersion();
-    }
+    public abstract void add(T element);
+
+    public abstract void addAll(T... element);
 }

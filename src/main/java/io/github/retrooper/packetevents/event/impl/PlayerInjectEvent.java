@@ -49,23 +49,11 @@ import java.net.InetSocketAddress;
 public final class PlayerInjectEvent extends PacketEvent implements CancellableEvent, PlayerEvent {
     private final Player player;
     private final InetSocketAddress address;
-    private final boolean async;
     private boolean cancelled;
 
-    public PlayerInjectEvent(final Player player, final Object channel, final boolean isAsync) {
+    public PlayerInjectEvent(final Player player) {
         this.player = player;
-        this.address = ChannelUtils.getSocketAddress(channel);
-        this.async = isAsync;
-    }
-
-    @Override
-    public void cancel() {
-        cancelled = true;
-    }
-
-    @Override
-    public void uncancel() {
-        cancelled = false;
+        this.address = ChannelUtils.getSocketAddress(PacketEvents.get().packetProcessorInternal.getChannel(player));
     }
 
     @Override
@@ -95,26 +83,26 @@ public final class PlayerInjectEvent extends PacketEvent implements CancellableE
      *
      * @return Socket address of the injecting player.
      */
-    @NotNull
+    @Nullable
     public InetSocketAddress getSocketAddress() {
         return address;
     }
 
     /**
-     * This method returns if the event has been called asynchronously.
-     * If the {@link PacketEventsSettings#shouldInjectAsync()} is enabled, the event will be called asynchronously
-     * and the player will be injected asynchronously.
-     * The {@link PacketEventsSettings} can be accessed here:
-     *
-     * @return Is the injection asynchronous.
-     * @see PacketEvents#getSettings()
+     * @deprecated Will always be false
      */
+    @Deprecated
     public boolean isAsync() {
-        return async;
+        return false;
     }
 
     @Override
     public void call(PacketListenerDynamic listener) {
         listener.onPlayerInject(this);
+    }
+
+    @Override
+    public boolean isInbuilt() {
+        return true;
     }
 }

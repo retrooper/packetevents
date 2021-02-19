@@ -158,4 +158,9 @@ public class Vector3i {
     public Vector3i clone() {
         return new Vector3i(x, y, z);
     }
+
+    @Override
+    public String toString() {
+        return "X: " + x + ", Y: " + y + "Z: " + z;
+    }
 }

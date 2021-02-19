@@ -54,18 +54,4 @@ public interface CancellableEvent {
      * @param val Is the event cancelled
      */
     void setCancelled(boolean val);
-
-    /**
-     * Cancel the event.
-     * You can achieve the same result by just using {@link #setCancelled(boolean)}
-     */
-    @Deprecated
-    void cancel();
-
-    /**
-     * Uncancel the event.
-     * You can achieve the same result by just using {@link #setCancelled(boolean)}
-     */
-    @Deprecated
-    void uncancel();
 }

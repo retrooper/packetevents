@@ -22,7 +22,7 @@
  * SOFTWARE.
  */
 
-package io.github.retrooper.packetevents.enums;
+package io.github.retrooper.packetevents.utils.player;
 
 /**
  * The {@code Hand} enum represents what hand was used in an interaction.

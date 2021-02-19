@@ -96,7 +96,7 @@ public enum PacketEventPriority {
         return priorityValue;
     }
 
-    public static PacketEventPriority getPacketEventPriority(final byte bytePriority) {
+    public static PacketEventPriority getPacketEventPriority(byte bytePriority) {
         for (PacketEventPriority priority : values()) {
             if (priority.priorityValue == bytePriority) {
                 return priority;

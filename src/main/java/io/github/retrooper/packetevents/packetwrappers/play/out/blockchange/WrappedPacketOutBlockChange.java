@@ -31,15 +31,16 @@ import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
 import io.github.retrooper.packetevents.utils.nms.NMSUtils;
 import io.github.retrooper.packetevents.utils.reflection.Reflection;
 import io.github.retrooper.packetevents.utils.server.ServerVersion;
+import org.bukkit.Location;
 import org.bukkit.World;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
+//TODO TEST ON 1.7.10
 public class WrappedPacketOutBlockChange extends WrappedPacket implements SendableWrapper {
     private static Constructor<?> packetConstructor;
-    private static Method iBlockDataMethodCache = null;
     private static Method getBlockIdMethodCache = null;
     private static Method getNMSWorldTypeMethodCache = null;
     private Object blockPosObj = null;
@@ -47,23 +48,33 @@ public class WrappedPacketOutBlockChange extends WrappedPacket implements Sendab
     private int blockPosX;
     private int blockPosY;
     private int blockPosZ;
-    public World world;
+    private World world;
 
     public WrappedPacketOutBlockChange(NMSPacket packet) {
         super(packet);
     }
 
-    public WrappedPacketOutBlockChange(int blockPosX, int blockPosY, int blockPosZ, World world) {
+    public WrappedPacketOutBlockChange(World world, int blockPosX, int blockPosY, int blockPosZ) {
         this.blockPosX = blockPosX;
         this.blockPosY = blockPosY;
         this.blockPosZ = blockPosZ;
         this.world = world;
     }
 
+    public WrappedPacketOutBlockChange(Location location) {
+        this.blockPosX = location.getBlockX();
+        this.blockPosY = location.getBlockY();
+        this.blockPosZ = location.getBlockZ();
+        this.world = location.getWorld();
+    }
+
     @Override
     protected void load() {
-        iBlockDataMethodCache = Reflection.getMethod(NMSUtils.iBlockDataClass, NMSUtils.blockClass, 0);
-        getBlockIdMethodCache = Reflection.getMethod(NMSUtils.blockClass, "getId", 0);
+        getBlockIdMethodCache = Reflection.getMethod(NMSUtils.blockClass, "getCombinedId", int.class, NMSUtils.iBlockDataClass);
+        if (getBlockIdMethodCache == null) {
+            //1.7.10
+            getBlockIdMethodCache = Reflection.getMethod(NMSUtils.blockClass, "getId", int.class, NMSUtils.blockClass);
+        }
         getNMSWorldTypeMethodCache = Reflection.getMethod(NMSUtils.nmsWorldClass, "getType", 0);
         if (version.equals(ServerVersion.v_1_7_10)) {
             try {
@@ -82,14 +93,14 @@ public class WrappedPacketOutBlockChange extends WrappedPacket implements Sendab
 
     public int getBlockX() {
         if (packet != null) {
-            if (version.equals(ServerVersion.v_1_7_10)) {
+            if (version.isOlderThan(ServerVersion.v_1_8)) {
                 return readInt(0);
             } else {
                 if (blockPosObj == null) {
                     blockPosObj = readObject(0, NMSUtils.blockPosClass);
                 }
                 try {
-                    return (int) Reflection.getMethod(blockPosObj.getClass().getSuperclass(), "getX", 0).invoke(blockPosObj);
+                    return (int) NMSUtils.getBlockPosX.invoke(blockPosObj);
                 } catch (IllegalAccessException | InvocationTargetException e) {
                     e.printStackTrace();
                 }
@@ -109,7 +120,7 @@ public class WrappedPacketOutBlockChange extends WrappedPacket implements Sendab
                     blockPosObj = readObject(0, NMSUtils.blockPosClass);
                 }
                 try {
-                    return (int) Reflection.getMethod(blockPosObj.getClass().getSuperclass(), "getY", 0).invoke(blockPosObj);
+                    return (int) NMSUtils.getBlockPosY.invoke(blockPosObj);
                 } catch (IllegalAccessException | InvocationTargetException e) {
                     e.printStackTrace();
                 }
@@ -129,7 +140,7 @@ public class WrappedPacketOutBlockChange extends WrappedPacket implements Sendab
                     blockPosObj = readObject(0, NMSUtils.blockPosClass);
                 }
                 try {
-                    return (int) Reflection.getMethod(blockPosObj.getClass().getSuperclass(), "getZ", 0).invoke(blockPosObj);
+                    return (int) NMSUtils.getBlockPosZ.invoke(blockPosObj);
                 } catch (IllegalAccessException | InvocationTargetException e) {
                     e.printStackTrace();
                 }
@@ -141,28 +152,27 @@ public class WrappedPacketOutBlockChange extends WrappedPacket implements Sendab
     }
 
     public int getBlockId() {
-        Object nmsBlock = null;
-        if (version.equals(ServerVersion.v_1_7_10)) {
-            nmsBlock = readObject(0, NMSUtils.blockClass);
-        } else {
-            Object iBlockDataObj = readObject(0, NMSUtils.iBlockDataClass);
+        if (version.isOlderThan(ServerVersion.v_1_8)) {
+            Object nmsBlock = readObject(0, NMSUtils.blockClass);
             try {
-                nmsBlock = iBlockDataMethodCache.invoke(iBlockDataObj);
+                return (int) getBlockIdMethodCache.invoke(null, nmsBlock);
             } catch (IllegalAccessException | InvocationTargetException e) {
                 e.printStackTrace();
             }
-        }
-        try {
-            return (int) getBlockIdMethodCache.invoke(nmsBlock);
-        } catch (IllegalAccessException | InvocationTargetException e) {
-            e.printStackTrace();
+        } else {
+            Object iBlockDataObj = readObject(0, NMSUtils.iBlockDataClass);
+            try {
+                return (int) getBlockIdMethodCache.invoke(null, iBlockDataObj);
+            } catch (IllegalAccessException | InvocationTargetException e) {
+                e.printStackTrace();
+            }
         }
         return -1;
     }
 
     @Override
     public Object asNMSPacket() {
-        if (version.equals(ServerVersion.v_1_7_10)) {
+        if (version.isOlderThan(ServerVersion.v_1_8)) {
             try {
                 Object nmsWorld = NMSUtils.convertBukkitWorldToNMSWorld(world);
                 return packetConstructor.newInstance(getBlockX(), getBlockY(), getBlockZ(), nmsWorld);

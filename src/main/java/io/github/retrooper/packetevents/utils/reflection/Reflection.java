@@ -31,7 +31,6 @@ import java.util.Arrays;
 
 public final class Reflection {
     //FIELDS
-    @Deprecated
     public static Field[] getFields(Class<?> cls) {
         Field[] declaredFields = cls.getDeclaredFields();
         for (Field f : declaredFields) {
@@ -40,7 +39,6 @@ public final class Reflection {
         return declaredFields;
     }
 
-    @Deprecated
     public static Field getField(final Class<?> cls, final String name) {
         for (final Field f : getFields(cls)) {
             if (f.getName().equals(name)) {
@@ -53,7 +51,6 @@ public final class Reflection {
         return null;
     }
 
-    @Deprecated
     public static Field getField(final Class<?> cls, final Class<?> dataType, final int index) {
         int currentIndex = 0;
         for (final Field f : getFields(cls)) {
@@ -69,7 +66,6 @@ public final class Reflection {
         return null;
     }
 
-    @Deprecated
     public static Field getField(final Class<?> cls, final int index) {
         try {
             return getFields(cls)[index];
@@ -82,13 +78,9 @@ public final class Reflection {
     }
 
     //METHODS
-    public static Method[] getMethods(final Class<?> cls) {
-        return cls.getDeclaredMethods();
-    }
-
     public static Method getMethod(final Class<?> cls, final int index, final Class<?>... params) {
         int currentIndex = 0;
-        for (final Method m : getMethods(cls)) {
+        for (final Method m : cls.getDeclaredMethods()) {
             if (Arrays.equals(m.getParameterTypes(), params) && index == currentIndex++) {
                 m.setAccessible(true);
                 return m;
@@ -102,7 +94,7 @@ public final class Reflection {
 
     public static Method getMethod(Class<?> cls, Class<?> returning, int index, Class<?>... params) {
         int currentIndex = 0;
-        for (Method m : getMethods(cls)) {
+        for (Method m : cls.getDeclaredMethods()) {
             if (Arrays.equals(m.getParameterTypes(), params)
                     && (returning == null || m.getReturnType().equals(returning))
                     && index == currentIndex++) {
@@ -117,7 +109,7 @@ public final class Reflection {
     }
 
     public static Method getMethod(final Class<?> cls, final String name, Class<?> returning, Class<?>... params) {
-        for (final Method m : getMethods(cls)) {
+        for (final Method m : cls.getDeclaredMethods()) {
             if (m.getName().equals(name)
                     && Arrays.equals(m.getParameterTypes(), params) &&
                     (returning == null || m.getReturnType().equals(returning))) {
@@ -133,7 +125,7 @@ public final class Reflection {
 
     public static Method getMethod(final Class<?> cls, final String name, final int index) {
         int currentIndex = 0;
-        for (final Method m : getMethods(cls)) {
+        for (final Method m : cls.getDeclaredMethods()) {
             if (m.getName().equals(name) && index == currentIndex++) {
                 m.setAccessible(true);
                 return m;
@@ -147,7 +139,7 @@ public final class Reflection {
 
     public static Method getMethod(final Class<?> cls, final Class<?> returning, final int index) {
         int currentIndex = 0;
-        for (final Method m : getMethods(cls)) {
+        for (final Method m : cls.getDeclaredMethods()) {
             if ((returning == null || m.getReturnType().equals(returning)) && index == currentIndex++) {
                 m.setAccessible(true);
                 return m;
@@ -159,8 +151,21 @@ public final class Reflection {
         return null;
     }
 
+    public static Method getMethodCheckContainsString(Class<?> cls, String nameContainsThisStr, Class<?> returning) {
+        for (Method m : cls.getDeclaredMethods()) {
+            if (m.getName().contains(nameContainsThisStr) && (returning == null || m.getReturnType().equals(returning))) {
+                m.setAccessible(true);
+                return m;
+            }
+        }
+        if (cls.getSuperclass() != null) {
+            return getMethodCheckContainsString(cls.getSuperclass(), nameContainsThisStr, returning);
+        }
+        return null;
+    }
+
     public static Method getMethod(final Class<?> cls, final String name, final Class<?> returning) {
-        for (final Method m : getMethods(cls)) {
+        for (final Method m : cls.getDeclaredMethods()) {
             if (m.getName().equals(name)
                     && (returning == null || m.getReturnType().equals(returning))) {
                 m.setAccessible(true);

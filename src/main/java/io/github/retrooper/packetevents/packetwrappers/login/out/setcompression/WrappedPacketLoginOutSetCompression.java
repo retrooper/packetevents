@@ -58,6 +58,8 @@ public class WrappedPacketLoginOutSetCompression extends WrappedPacket implement
 
     /**
      * Maximum size of a packet before it can be compressed.
+     *
+     * @return threshold Threshold
      */
     public int getThreshold() {
         if (packet != null) {

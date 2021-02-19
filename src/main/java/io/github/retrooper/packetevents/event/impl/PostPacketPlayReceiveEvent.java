@@ -24,19 +24,13 @@
 
 package io.github.retrooper.packetevents.event.impl;
 
-import io.github.retrooper.packetevents.event.PacketEvent;
 import io.github.retrooper.packetevents.event.PacketListenerDynamic;
 import io.github.retrooper.packetevents.event.eventtypes.NMSPacketEvent;
 import io.github.retrooper.packetevents.event.eventtypes.PlayerEvent;
 import io.github.retrooper.packetevents.packettype.PacketType;
 import io.github.retrooper.packetevents.packetwrappers.NMSPacket;
-import io.github.retrooper.packetevents.utils.netty.channel.ChannelUtils;
-import io.github.retrooper.packetevents.utils.reflection.ClassUtil;
 import org.bukkit.entity.Player;
-import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-
-import java.net.InetSocketAddress;
 
 /**
  * The {@code PostPacketPlayReceiveEvent} event is fired after minecraft processes
@@ -50,60 +44,21 @@ import java.net.InetSocketAddress;
  * @see <a href="https://wiki.vg/Protocol#Serverbound_4">https://wiki.vg/Protocol#Serverbound_4</a>
  * @since 1.7
  */
-public class PostPacketPlayReceiveEvent extends PacketEvent implements NMSPacketEvent, PlayerEvent {
+public class PostPacketPlayReceiveEvent extends NMSPacketEvent implements PlayerEvent {
     private final Player player;
-    private final InetSocketAddress address;
-    private NMSPacket packet;
-    private byte packetID = -2;
 
     public PostPacketPlayReceiveEvent(final Player player, final Object channel, final NMSPacket packet) {
+        super(channel, packet);
         this.player = player;
-        this.address = ChannelUtils.getSocketAddress(channel);
-        this.packet = packet;
     }
 
     /**
      * This method returns the bukkit player object of the packet sender.
-     * The player object might be null during early packets.
-     *
      * @return Packet sender.
      */
-    @Nullable
     @Override
     public Player getPlayer() {
         return player;
-    }
-
-    /**
-     * This method returns the socket address of the packet sender.
-     * This address if guaranteed to never be null.
-     * You could use this to identify who is sending packets
-     * whenever the player object is null.
-     *
-     * @return Packet sender's socket address.
-     */
-    @NotNull
-    @Override
-    public InetSocketAddress getSocketAddress() {
-        return address;
-    }
-
-    @NotNull
-    @Deprecated
-    @Override
-    public String getPacketName() {
-        return ClassUtil.getClassSimpleName(packet.getRawNMSPacket().getClass());
-    }
-
-    @NotNull
-    @Override
-    public NMSPacket getNMSPacket() {
-        return packet;
-    }
-
-    @Override
-    public void setNMSPacket(NMSPacket packet) {
-        this.packet = packet;
     }
 
     /**
@@ -117,14 +72,13 @@ public class PostPacketPlayReceiveEvent extends PacketEvent implements NMSPacket
      */
     @Override
     public byte getPacketId() {
-        if (packetID == -2) {
-            packetID = PacketType.Play.Client.packetIds.getOrDefault(packet.getRawNMSPacket().getClass(), (byte) -1);
-        }
-        return packetID;
+        return PacketType.Play.Client.packetIds.getOrDefault(packet.getRawNMSPacket().getClass(), PacketType.INVALID);
     }
 
     @Override
     public void call(PacketListenerDynamic listener) {
-        listener.onPostPacketPlayReceive(this);
+        if (listener.clientSidedPlayAllowance == null || listener.clientSidedPlayAllowance.contains(getPacketId())) {
+            listener.onPostPacketPlayReceive(this);
+        }
     }
 }

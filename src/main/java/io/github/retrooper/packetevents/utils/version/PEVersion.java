@@ -73,7 +73,7 @@ public class PEVersion {
      * this method will return 0.
      * Similar to {@link Integer#compareTo(Integer)}.
      *
-     * @param version
+     * @param version Compared version
      * @return Comparing to another Version.
      */
     public int compareTo(PEVersion version) {
@@ -130,6 +130,9 @@ public class PEVersion {
      */
     @Override
     public boolean equals(Object obj) {
+        if (obj == null) {
+            return false;
+        }
         if (obj instanceof PEVersion) {
             return Arrays.equals(versionIntArray, ((PEVersion) obj).versionIntArray);
         }
@@ -153,10 +156,10 @@ public class PEVersion {
      */
     @Override
     public String toString() {
-        StringBuilder asString = new StringBuilder(Integer.toString(versionIntArray[0]));
+        StringBuilder sb = new StringBuilder(versionIntArray.length * 2 - 1).append(versionIntArray[0]);
         for (int i = 1; i < versionIntArray.length; i++) {
-            asString.append(".").append(versionIntArray[i]);
+            sb.append(".").append(versionIntArray[i]);
         }
-        return asString.toString();
+        return sb.toString();
     }
 }

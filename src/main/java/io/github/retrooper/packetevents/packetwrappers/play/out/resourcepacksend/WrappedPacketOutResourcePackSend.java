@@ -46,8 +46,8 @@ public class WrappedPacketOutResourcePackSend extends WrappedPacket implements S
      * Unfinished docs
      * Hash may not be longer than 40 characters.
      *
-     * @param url
-     * @param hash
+     * @param url  URL
+     * @param hash Hash
      */
     public WrappedPacketOutResourcePackSend(String url, String hash) {
         this.url = url;
@@ -91,6 +91,6 @@ public class WrappedPacketOutResourcePackSend extends WrappedPacket implements S
 
     @Override
     public boolean isSupported() {
-        return version.isHigherThan(ServerVersion.v_1_7_10);
+        return version.isNewerThan(ServerVersion.v_1_7_10);
     }
 }

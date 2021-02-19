@@ -26,6 +26,7 @@ package io.github.retrooper.packetevents.event;
 
 import io.github.retrooper.packetevents.event.impl.*;
 import io.github.retrooper.packetevents.event.priority.PacketEventPriority;
+import io.github.retrooper.packetevents.utils.immutableset.ImmutableSetCustom;
 
 /**
  * Dynamic packet event listener.
@@ -37,55 +38,132 @@ import io.github.retrooper.packetevents.event.priority.PacketEventPriority;
  */
 public abstract class PacketListenerDynamic {
     private final PacketEventPriority priority;
+    public ImmutableSetCustom<Byte> serverSidedStatusAllowance;
+    public ImmutableSetCustom<Byte> serverSidedLoginAllowance;
+    public ImmutableSetCustom<Byte> serverSidedPlayAllowance;
+
+    public ImmutableSetCustom<Byte> clientSidedStatusAllowance;
+    public ImmutableSetCustom<Byte> clientSidedLoginAllowance;
+    public ImmutableSetCustom<Byte> clientSidedPlayAllowance;
 
     public PacketListenerDynamic(final PacketEventPriority priority) {
         this.priority = priority;
+        this.serverSidedStatusAllowance = null;
+        this.serverSidedLoginAllowance = null;
+        this.serverSidedPlayAllowance = null;
+
+        this.clientSidedStatusAllowance = null;
+        this.clientSidedLoginAllowance = null;
+        this.clientSidedPlayAllowance = null;
     }
+
 
     public PacketListenerDynamic() {
         this(PacketEventPriority.NORMAL);
     }
 
-    public PacketEventPriority getPriority() {
+    public final PacketEventPriority getPriority() {
         return priority;
     }
 
-    public void onPacketStatusReceive(PacketStatusReceiveEvent event) {
-
+    public final void addServerSidedStatusFilter(Byte... statusPacketIDs) {
+        if (this.serverSidedStatusAllowance == null) {
+            this.serverSidedStatusAllowance = new ImmutableSetCustom<>(statusPacketIDs);
+        }
+        else {
+            this.serverSidedStatusAllowance.addAll(statusPacketIDs);
+        }
     }
 
-    public void onPacketStatusSend(PacketStatusSendEvent event) {
+    public final void addServerSidedLoginFilter(Byte... loginPacketIDs) {
+        if (this.serverSidedLoginAllowance == null) {
+            this.serverSidedLoginAllowance = new ImmutableSetCustom<>(loginPacketIDs);
+        }
+        else {
+            this.serverSidedLoginAllowance.addAll(loginPacketIDs);
+        }
     }
 
-    public void onPacketLoginReceive(PacketLoginReceiveEvent event) {
+    public final void addServerSidedPlayFilter(Byte... playPacketIDs) {
+        if (this.serverSidedPlayAllowance == null) {
+            this.serverSidedPlayAllowance = new ImmutableSetCustom<>(playPacketIDs);
+        }
+        else {
+            this.serverSidedPlayAllowance.addAll(playPacketIDs);
+        }
     }
 
-    public void onPacketLoginSend(PacketLoginSendEvent event) {
-
+    public final void addClientSidedStatusFilter(Byte... statusPacketIDs) {
+        if (this.clientSidedStatusAllowance == null) {
+            this.clientSidedStatusAllowance = new ImmutableSetCustom<>(statusPacketIDs);
+        }
+        else {
+            this.clientSidedStatusAllowance.addAll(statusPacketIDs);
+        }
     }
 
-    public void onPacketPlayReceive(PacketPlayReceiveEvent event) {
+    public final void addClientSidedLoginFilter(Byte... loginPacketIDs) {
+        if (this.clientSidedLoginAllowance == null) {
+            this.clientSidedLoginAllowance = new ImmutableSetCustom<>(loginPacketIDs);
+        }
+        else {
+            this.clientSidedLoginAllowance.addAll(loginPacketIDs);
+        }
     }
 
-    public void onPacketPlaySend(PacketPlaySendEvent event) {
+    public final void addClientSidedPlayFilter(Byte... playPacketIDs) {
+        if (this.clientSidedPlayAllowance == null) {
+            this.clientSidedPlayAllowance = new ImmutableSetCustom<>(playPacketIDs);
+        }
+        else {
+            this.clientSidedPlayAllowance.addAll(playPacketIDs);
+        }
     }
 
-    public void onPostPacketPlayReceive(PostPacketPlayReceiveEvent event) {
+    public final void filterAll() {
+        filterServerSidedStatus();
+        filterServerSidedLogin();
+        filterServerSidedPlay();
+
+        filterClientSidedStatus();
+        filterClientSidedLogin();
+        filterClientSidedPlay();
     }
 
-    public void onPostPacketPlaySend(PostPacketPlaySendEvent event) {
+    public final void filterServerSidedStatus() {
+        this.serverSidedStatusAllowance = new ImmutableSetCustom<>();
     }
 
-    public void onPostPlayerInject(PostPlayerInjectEvent event) {
-
+    public final void filterServerSidedLogin() {
+        this.serverSidedLoginAllowance = new ImmutableSetCustom<>();
     }
 
-    public void onPlayerInject(PlayerInjectEvent event) {
+    public final void filterServerSidedPlay() {
+        this.serverSidedPlayAllowance = new ImmutableSetCustom<>();
     }
 
-    public void onPlayerEject(PlayerEjectEvent event) {
+    public final void filterClientSidedStatus() {
+        this.clientSidedStatusAllowance = new ImmutableSetCustom<>();
     }
 
-    public void onPacketEvent(PacketEvent event) {
+    public final void filterClientSidedLogin() {
+        this.clientSidedLoginAllowance = new ImmutableSetCustom<>();
     }
+
+    public final void filterClientSidedPlay() {
+        this.clientSidedPlayAllowance = new ImmutableSetCustom<>();
+    }
+
+    public void onPacketStatusReceive(PacketStatusReceiveEvent event) {}
+    public void onPacketStatusSend(PacketStatusSendEvent event) {}
+    public void onPacketLoginReceive(PacketLoginReceiveEvent event) {}
+    public void onPacketLoginSend(PacketLoginSendEvent event) {}
+    public void onPacketPlayReceive(PacketPlayReceiveEvent event) {}
+    public void onPacketPlaySend(PacketPlaySendEvent event) {}
+    public void onPostPacketPlayReceive(PostPacketPlayReceiveEvent event) {}
+    public void onPostPacketPlaySend(PostPacketPlaySendEvent event) {}
+    public void onPostPlayerInject(PostPlayerInjectEvent event) {}
+    public void onPlayerInject(PlayerInjectEvent event) {}
+    public void onPlayerEject(PlayerEjectEvent event) {}
+    public void onPacketEventExternal(PacketEvent event) {}
 }

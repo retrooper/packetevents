@@ -24,7 +24,12 @@
 
 package io.github.retrooper.packetevents.settings;
 
+import io.github.retrooper.packetevents.PacketEvents;
 import io.github.retrooper.packetevents.utils.server.ServerVersion;
+import org.bukkit.Bukkit;
+import org.bukkit.entity.Player;
+
+import java.util.function.Consumer;
 
 /**
  * Packet Events' settings.
@@ -33,30 +38,8 @@ import io.github.retrooper.packetevents.utils.server.ServerVersion;
  * @since 1.5.8
  */
 public class PacketEventsSettings {
-    /**
-     * This boolean stores whether the settings class is locked.
-     * Is this boolean is set to true, any of the setters won't work.
-     * This setting is locked when initializing PacketEvents.
-     */
-    private boolean locked = false;
-
-    /**
-     * This is the server version PacketEvents should use when detecting
-     * the server version fails using the Bukkit API.
-     * For some reason, this usually the case on 1.7.10 spigot forks.
-     * They probably mess up somewhere.
-     */
+    private boolean locked;
     private ServerVersion backupServerVersion = ServerVersion.v_1_7_10;
-
-    /**
-     * This boolean stores if PacketEvents should inject a player asynchronously.
-     */
-    private boolean injectAsync = true;
-
-    /**
-     * This boolean stores if PacketEvents should eject a player asynchronously.
-     */
-    private boolean ejectAsync = true;
 
     /**
      * This boolean stores if PacketEvents should check for updates,
@@ -65,28 +48,16 @@ public class PacketEventsSettings {
     private boolean checkForUpdates = true;
 
     /**
-     * This boolean stores if PacketEvents should inject a player earlier using the {@code EarlyChannelInjector}.
-     * Allowing us to listen to the LOGIN and STATUS packets and detect client version independently.
-     *
-     * @see io.github.retrooper.packetevents.injector.earlyinjector.EarlyChannelInjector
+     * This boolean stores if PacketEvents should inject a player earlier using the {@code LateInjector}.
+     * We also call it the "compatibility injector", because it should actually be compatible with everything.
+     * Using this injector prevents us from listening to packets during the early packet-states. (such as LOGIN and STATUS state)
+     * PacketEvents requires these early states to be able to detect client versions of players without the help of any dependencies!
      */
-    private boolean injectEarly = true;
-
-    /**
-     * This int stores how many threads should use to inject and eject a player.
-     */
-    private int injectEjectThreadCount = 1;
-
-    /**
-     * What should the kick message be when PacketEvents fails to inject a player and kicks them.
-     */
-    private String injectionFailureMessage = "We were unable to inject you. Please try again!";
+    private boolean compatInjector = false;
 
     /**
      * This method locks the settings.
-     * Sets the {@link #locked} field to true.
-     *
-     * @return This instance.
+     * If the settings are locked, you won't be able to modify any settings using the setters.
      */
     public PacketEventsSettings lock() {
         this.locked = true;
@@ -94,11 +65,13 @@ public class PacketEventsSettings {
     }
 
     /**
-     * Setter for the {@link #backupServerVersion} field.
-     * Only succeeds if the settings class isn't locked.
+     * This is the server version PacketEvents should assume the server is when detecting
+     * the server version fails using the Bukkit API.
+     * This seems to be most common on 1.7.10 paper forks.
+     * They probably mess up somewhere.
      *
-     * @param serverVersion Server Version
-     * @return This instance.
+     * @param serverVersion ServerVersion
+     * @return Settings instance.
      */
     public PacketEventsSettings backupServerVersion(ServerVersion serverVersion) {
         if (!locked) {
@@ -108,39 +81,10 @@ public class PacketEventsSettings {
     }
 
     /**
-     * Setter for the {@link #injectAsync} field.
-     * Only succeeds if the settings class isn't locked.
+     * This decides if PacketEvents should check for updates and notify when your server starts.
      *
-     * @param injectAsync Player injection async?
-     * @return This instance.
-     */
-    public PacketEventsSettings injectAsync(boolean injectAsync) {
-        if (!locked) {
-            this.injectAsync = injectAsync;
-        }
-        return this;
-    }
-
-    /**
-     * Setter for the {@link #ejectAsync} field.
-     * Only succeeds if the settings class isn't locked.
-     *
-     * @param ejectAsync Player and netty channel ejection async?
-     * @return This instance.
-     */
-    public PacketEventsSettings ejectAsync(boolean ejectAsync) {
-        if (!locked) {
-            this.ejectAsync = ejectAsync;
-        }
-        return this;
-    }
-
-    /**
-     * Setter for the {@link #checkForUpdates} field.
-     * Only succeeds if the settings class isn't locked.
-     *
-     * @param checkForUpdates Should we check for updates?
-     * @return This instance.
+     * @param checkForUpdates Value
+     * @return Settings instance.
      */
     public PacketEventsSettings checkForUpdates(boolean checkForUpdates) {
         if (!locked) {
@@ -150,51 +94,25 @@ public class PacketEventsSettings {
     }
 
     /**
-     * Setter for the {@link #injectEarly} field.
-     * Only succeeds if the settings class isn't locked.
+     * This decides if PacketEvents should inject users earlier than usual,
+     * resulting in us being able to resolve client versions without the need of any dependencies.
+     * We end up using a different injection method which isn't supported on a few spigot forks.
      *
-     * @param injectEarly Use the {@link io.github.retrooper.packetevents.injector.earlyinjector.EarlyChannelInjector}?
-     * @return This instance.
+     * @param compatInjector Value
+     * @return Settings instance.
      */
-    public PacketEventsSettings injectEarly(boolean injectEarly) {
+    public PacketEventsSettings compatInjector(boolean compatInjector) {
         if (!locked) {
-            this.injectEarly = injectEarly;
+            this.compatInjector = compatInjector;
         }
         return this;
     }
 
     /**
-     * Setter for the {@link #injectEjectThreadCount} field.
-     * Only succeeds if the settings class isn't locked.
+     * Are the settings locked?
      *
-     * @param threadCount How many threads?
-     * @return This instance.
-     */
-    public PacketEventsSettings injectAndEjectThreadCount(int threadCount) {
-        if (!locked) {
-            this.injectEjectThreadCount = threadCount;
-        }
-        return this;
-    }
-
-    /**
-     * Setter for the {@link #injectionFailureMessage} field.
-     * Only succeeds if the settings class isn't locked.
-     *
-     * @param message Kick message for an injection failure.
-     * @return This instance.
-     */
-    public PacketEventsSettings injectionFailureMessage(String message) {
-        if (!locked) {
-            this.injectionFailureMessage = message;
-        }
-        return this;
-    }
-
-    /**
-     * Is the settings class locked?
-     *
-     * @return Getter for {@link #locked}
+     * @return Is locked.
+     * @see #lock()
      */
     public boolean isLocked() {
         return locked;
@@ -210,24 +128,6 @@ public class PacketEventsSettings {
     }
 
     /**
-     * Should we inject a player async?
-     *
-     * @return Getter for {@link #injectAsync}
-     */
-    public boolean shouldInjectAsync() {
-        return injectAsync;
-    }
-
-    /**
-     * Should we eject a player async?
-     *
-     * @return Getter for {@link #ejectAsync}
-     */
-    public boolean shouldEjectAsync() {
-        return ejectAsync;
-    }
-
-    /**
      * Should we check for updates?
      *
      * @return Getter for {@link #checkForUpdates}
@@ -237,29 +137,11 @@ public class PacketEventsSettings {
     }
 
     /**
-     * Should we inject a player earlier with the {@link io.github.retrooper.packetevents.injector.earlyinjector.EarlyChannelInjector}
+     * Should we use the {@code LateInjector}(aka. "Compatibility Injector") with the sacrifice of a few features.
      *
-     * @return Getter for {@link #injectEarly}
+     * @return Getter for {@link #compatInjector}
      */
-    public boolean shouldInjectEarly() {
-        return injectEarly;
-    }
-
-    /**
-     * Injection and ejection executor service thread count(if async).
-     *
-     * @return Getter for {@link #injectEjectThreadCount}
-     */
-    public int getInjectAndEjectThreadCount() {
-        return injectEjectThreadCount;
-    }
-
-    /**
-     * Injection failure message.
-     *
-     * @return Getter for {@link #injectionFailureMessage}
-     */
-    public String getInjectionFailureMessage() {
-        return injectionFailureMessage;
+    public boolean shouldUseCompatibilityInjector() {
+        return compatInjector;
     }
 }

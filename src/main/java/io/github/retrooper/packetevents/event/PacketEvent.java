@@ -55,7 +55,9 @@ public abstract class PacketEvent implements CallableEvent {
         this.timestamp = timestamp;
     }
 
-    public void callPacketEvent(final PacketListenerDynamic listener) {
-        listener.onPacketEvent(this);
+    public void callPacketEventExternal(final PacketListenerDynamic listener) {
+        listener.onPacketEventExternal(this);
     }
+
+    public abstract boolean isInbuilt();
 }

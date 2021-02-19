@@ -28,10 +28,10 @@ import io.github.retrooper.packetevents.event.impl.PostPlayerInjectEvent;
 import io.github.retrooper.packetevents.event.manager.EventManager;
 import io.github.retrooper.packetevents.event.manager.PEEventManager;
 import io.github.retrooper.packetevents.exceptions.PacketEventsLoadFailureException;
-import io.github.retrooper.packetevents.handler.PacketHandlerInternal;
-import io.github.retrooper.packetevents.injector.lateinjector.LateChannelInjector;
+import io.github.retrooper.packetevents.injector.GlobalChannelInjector;
 import io.github.retrooper.packetevents.packettype.PacketTypeClasses;
 import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
+import io.github.retrooper.packetevents.processor.PacketProcessorInternal;
 import io.github.retrooper.packetevents.settings.PacketEventsSettings;
 import io.github.retrooper.packetevents.updatechecker.UpdateChecker;
 import io.github.retrooper.packetevents.utils.entityfinder.EntityFinderUtils;
@@ -45,7 +45,6 @@ import io.github.retrooper.packetevents.utils.server.ServerUtils;
 import io.github.retrooper.packetevents.utils.server.ServerVersion;
 import io.github.retrooper.packetevents.utils.version.PEVersion;
 import io.github.retrooper.packetevents.utils.versionlookup.VersionLookupUtils;
-import io.github.retrooper.packetevents.utils.versionlookup.v_1_7_10.ProtocolVersionAccessor_v_1_7;
 import io.github.retrooper.packetevents.utils.versionlookup.viaversion.ViaVersionLookupUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -57,35 +56,25 @@ import org.bukkit.event.player.PlayerLoginEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.ServicePriority;
-import org.jetbrains.annotations.NotNull;
 
 import java.net.InetSocketAddress;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ThreadFactory;
-import java.util.concurrent.atomic.AtomicInteger;
+import java.util.UUID;
 
 public final class PacketEvents implements Listener, EventManager {
+    //TODO finish unfinished wrappers
     private static PacketEvents instance;
-    private final PEVersion version = new PEVersion(1, 7, 9);
+    private final PEVersion version = new PEVersion(1, 7, 9, 5);
     private final EventManager eventManager = new PEEventManager();
     private final PlayerUtils playerUtils = new PlayerUtils();
     private final ServerUtils serverUtils = new ServerUtils();
+    private final UpdateChecker updateChecker = new UpdateChecker();
     private static Plugin plugin;
-    /**
-     * General executor service, basically for anything that the packet executor service doesn't do.
-     * For example update checking when you initialize PacketEvents.
-     */
-    public ExecutorService generalExecutorService = Executors.newSingleThreadExecutor(r -> new Thread(r, "PacketEvents-general"));
-
-    //Executor used for player injecting/ejecting.
-    public ExecutorService injectAndEjectExecutorService;//Initiated in init method
-
-    public PacketHandlerInternal packetHandlerInternal;
-    private boolean loading, loaded, initialized, initializing, stopping;
+    public static String handlerName;
+    public PacketProcessorInternal packetProcessorInternal;
+    public GlobalChannelInjector injector;
+    private boolean loading, loaded, initialized, initializing, terminating;
     private PacketEventsSettings settings = new PacketEventsSettings();
-    private final ByteBufUtil byteBufUtil = LateChannelInjector.v1_7_nettyMode ? new ByteBufUtil_7() : new ByteBufUtil_8();
-
+    private final ByteBufUtil byteBufUtil = NMSUtils.legacyNettyImportMode ? new ByteBufUtil_7() : new ByteBufUtil_8();
 
     public static PacketEvents create(final Plugin plugin) {
         if (!Bukkit.getServicesManager().isProvidedFor(PacketEvents.class)) {
@@ -101,8 +90,13 @@ public final class PacketEvents implements Listener, EventManager {
         return instance;
     }
 
+    @Deprecated
+    public static PacketEvents getAPI() {
+        return get();
+    }
 
-    public boolean load() {
+
+    public void load() {
         if (!loaded && !loading) {
             loading = true;
             ServerVersion version = ServerVersion.getVersion();
@@ -113,95 +107,83 @@ public final class PacketEvents implements Listener, EventManager {
             try {
                 NMSUtils.load();
 
-                //PLAY
-                PacketTypeClasses.Play.Client.load();
-                PacketTypeClasses.Play.Server.load();
-                //LOGIN
-                PacketTypeClasses.Login.Client.load();
-                PacketTypeClasses.Login.Server.load();
-                //STATUS
-                PacketTypeClasses.Status.Client.load();
-                PacketTypeClasses.Status.Server.load();
+                //Load all classes
+                PacketTypeClasses.load();
 
                 EntityFinderUtils.load();
             } catch (Exception ex) {
                 loading = false;
                 throw new PacketEventsLoadFailureException(ex);
             }
+
+            injector = new GlobalChannelInjector();
+            injector.inject();
+
             loaded = true;
             loading = false;
-            return true;
         }
-        return false;
     }
 
     public void loadSettings(PacketEventsSettings settings) {
         this.settings = settings;
     }
 
-    public boolean init(final Plugin plugin) {
-        return init(plugin, settings);
+    public void init(final Plugin plugin) {
+        init(plugin, settings);
     }
 
-    public boolean init(final Plugin pl, PacketEventsSettings packetEventsSettings) {
+    public void init(final Plugin pl, PacketEventsSettings packetEventsSettings) {
         load();
         if (!initialized && !initializing) {
             initializing = true;
             settings = packetEventsSettings;
-            if (settings.getInjectAndEjectThreadCount() < 1) {
-                settings.injectAndEjectThreadCount(1);
-            }
             settings.lock();
 
-            int injectAndEjectThreadCount = settings.getInjectAndEjectThreadCount();
-            injectAndEjectExecutorService = Executors.newFixedThreadPool(injectAndEjectThreadCount, new ThreadFactory() {
-
-                private final AtomicInteger id = new AtomicInteger();
-
-                @Override
-                public Thread newThread(@NotNull Runnable r) {
-                    return new Thread(r, "PacketEvents-inject-eject #" + id.getAndIncrement());
-                }
-            });
 
             //Register Bukkit listener
             plugin = pl;
             Bukkit.getPluginManager().registerEvents(this, plugin);
-            packetHandlerInternal = new PacketHandlerInternal(plugin, settings.shouldInjectEarly());
+            handlerName = "pe-" + plugin.getName();
+
+            packetProcessorInternal = new PacketProcessorInternal();
+
             for (final Player p : Bukkit.getOnlinePlayers()) {
-                try {
-                    getPlayerUtils().injectPlayer(p);
-                } catch (Exception ex) {
-                    p.kickPlayer(getSettings().getInjectionFailureMessage());
-                }
+                getPlayerUtils().injectPlayer(p);
             }
 
             if (settings.shouldCheckForUpdates()) {
-                generalExecutorService.execute(() -> new UpdateChecker().handleUpdate());
-
+                Thread thread = new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        UpdateChecker.UpdateCheckerStatus status = updateChecker.checkForUpdate();
+                    }
+                }, "PacketEvents-update-check-thread");
+                thread.start();
             }
             initialized = true;
             initializing = false;
-            return true;
         }
-        return false;
     }
 
     public void terminate() {
-        if (initialized && !stopping) {
+        if (initialized && !terminating) {
             for (Player player : Bukkit.getOnlinePlayers()) {
-                packetHandlerInternal.ejectPlayer(player);
+                injector.ejectPlayer(player);
             }
-            packetHandlerInternal.close();
+
+            injector.eject();
 
             getEventManager().unregisterAllListeners();
-            generalExecutorService.shutdownNow();
-            injectAndEjectExecutorService.shutdownNow();
             initialized = false;
-            stopping = false;
+            terminating = false;
         }
     }
 
+    /**
+     * Use {@link #terminate()}. This is deprecated
+     *
+     * @deprecated "Stop" might be misleading and "terminate" sounds better I guess...
+     */
     @Deprecated
     public void stop() {
         terminate();
@@ -219,8 +201,13 @@ public final class PacketEvents implements Listener, EventManager {
         return initializing;
     }
 
+    @Deprecated
     public boolean isStopping() {
-        return stopping;
+        return terminating;
+    }
+
+    public boolean isTerminating() {
+        return terminating;
     }
 
     public boolean isInitialized() {
@@ -260,14 +247,15 @@ public final class PacketEvents implements Listener, EventManager {
         return byteBufUtil;
     }
 
-    @EventHandler(priority = EventPriority.LOW)
+    public UpdateChecker getUpdateChecker() {
+        return updateChecker;
+    }
+
+    @EventHandler(priority = EventPriority.LOWEST)
     public void onLogin(final PlayerLoginEvent e) {
-        if (getSettings().shouldInjectEarly()) {
-            try {
-                packetHandlerInternal.injectPlayer(e.getPlayer());
-            } catch (Exception ex) {
-                e.disallow(PlayerLoginEvent.Result.KICK_OTHER, getSettings().getInjectionFailureMessage());
-            }
+        final Player player = e.getPlayer();
+        if (!getSettings().shouldUseCompatibilityInjector()) {
+            injector.injectPlayer(player);
         }
     }
 
@@ -275,6 +263,7 @@ public final class PacketEvents implements Listener, EventManager {
     public void onJoin(final PlayerJoinEvent e) {
         final InetSocketAddress address = e.getPlayer().getAddress();
         boolean viaAvailable = ViaVersionLookupUtils.isAvailable();
+        PacketEvents.get().getPlayerUtils().loginTime.put(e.getPlayer().getUniqueId(), System.currentTimeMillis());
         if (viaAvailable) {
             PacketEvents.get().getPlayerUtils().clientVersionsMap.put(e.getPlayer().getAddress(), ClientVersion.TEMP_UNRESOLVED);
             Bukkit.getScheduler().runTaskLaterAsynchronously(getPlugin(), new Runnable() {
@@ -283,40 +272,28 @@ public final class PacketEvents implements Listener, EventManager {
                     int protocolVersion = VersionLookupUtils.getProtocolVersion(e.getPlayer());
                     ClientVersion version = ClientVersion.getClientVersion(protocolVersion);
                     PacketEvents.get().getPlayerUtils().clientVersionsMap.put(address, version);
-                    PacketEvents.get().getEventManager().callEvent(new PostPlayerInjectEvent(e.getPlayer()));
+                    PacketEvents.get().getEventManager().callEvent(new PostPlayerInjectEvent(e.getPlayer(), true));
                 }
             }, 1L);
-        } else if (getServerUtils().getVersion() == ServerVersion.v_1_7_10) {
-            ClientVersion version = ClientVersion.getClientVersion(ProtocolVersionAccessor_v_1_7.getProtocolVersion(e.getPlayer()));
-            if (version == ClientVersion.UNRESOLVED) {
-                version = getPlayerUtils().tempClientVersionMap.get(address);
-                if (version == null) {
-                    version = ClientVersion.UNRESOLVED;
-                }
-            }
-            getPlayerUtils().clientVersionsMap.put(address, version);
         }
 
-        if (!getSettings().shouldInjectEarly()) {
-            try {
-                packetHandlerInternal.injectPlayer(e.getPlayer());
-                //Injection was successful as no exception was thrown...
-                if (!viaAvailable) {
-                    PacketEvents.get().getEventManager().callEvent(new PostPlayerInjectEvent(e.getPlayer()));
-                }
-            } catch (Exception ex) {
-                e.getPlayer().kickPlayer(getSettings().getInjectionFailureMessage());
-            }
-        } else {
-            if (!viaAvailable) {
-                PacketEvents.get().getEventManager().callEvent(new PostPlayerInjectEvent(e.getPlayer()));
-            }
+        if (getSettings().shouldUseCompatibilityInjector()) {
+            injector.injectPlayer(e.getPlayer());
+        }
+
+        //ViaVersion isn't available, we can already call the post player inject event.
+        if (!viaAvailable) {
+            PacketEvents.get().getEventManager().callEvent(new PostPlayerInjectEvent(e.getPlayer(), false));
         }
     }
 
 
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onQuit(final PlayerQuitEvent e) {
-        packetHandlerInternal.ejectPlayer(e.getPlayer());
+        UUID uuid = e.getPlayer().getUniqueId();
+        injector.ejectPlayer(e.getPlayer());
+        instance.getPlayerUtils().loginTime.remove(uuid);
+        instance.getPlayerUtils().playerPingMap.remove(uuid);
+        instance.getPlayerUtils().playerSmoothedPingMap.remove(uuid);
     }
 }

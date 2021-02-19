@@ -25,6 +25,7 @@
 package io.github.retrooper.packetevents.updatechecker;
 
 import io.github.retrooper.packetevents.PacketEvents;
+import io.github.retrooper.packetevents.utils.server.ServerVersion;
 import io.github.retrooper.packetevents.utils.version.PEVersion;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -42,28 +43,74 @@ import java.net.URLConnection;
  * @since 1.6.9
  */
 public class UpdateChecker {
+
     /**
-     * Check for an update and log in the console.
+     * Result of an update check.
+     *
+     * @author retrooper
+     * @since 1.8
      */
-    public void handleUpdate() {
-        PEVersion localVersion = PacketEvents.get().getVersion();
-        inform("[packetevents] Checking for an update, please wait...");
-        String line;
-        try {
-            line = readLatestVersion();
-        } catch (IOException exception) {
-            report("[packetevents] We failed to find the latest released version of PacketEvents. Your build: (" + localVersion.toString() + ")");
-            return;
-        }
-        PEVersion newVersion = new PEVersion(line);
-        if (localVersion.isOlderThan(newVersion)) {
-            inform("[packetevents] There is an update available for the PacketEvents API! Your build: (" + localVersion.toString() + ") | Latest released build: (" + newVersion.toString() + ")");
-        } else if (localVersion.isNewerThan(newVersion)) {
-            inform("[packetevents] You are on a dev or pre released build of PacketEvents. Your build: (" + localVersion.toString() + ") | Latest released build: (" + newVersion.toString() + ")");
-        } else if (localVersion.equals(newVersion)) {
-            inform("[packetevents] You are on the latest released version of PacketEvents. (" + newVersion.toString() + ")");
+    public enum UpdateCheckerStatus {
+        /**
+         * Your build is outdated, an update is available.
+         */
+        OUTDATED,
+        /**
+         * You are on a dev or pre-released build. Not on the latest release.
+         */
+        PRE_RELEASE,
+        /**
+         * Your build is up to date.
+         */
+        UP_TO_DATE,
+        /**
+         * Failed to check for an update. There might be an issue with your connection, if your connection seems to be fine make sure to contact me.
+         * It could have been a mistake from my end when naming a release.
+         */
+        FAILED;
+    }
+
+    protected static String getLatestReleaseJson() throws IOException {
+        URLConnection connection = new URL("https://api.github.com/repos/retrooper/packetevents/releases/latest").openConnection();
+        connection.addRequestProperty("User-Agent", "Mozilla/4.0");
+        BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+        String line = reader.readLine();
+        reader.close();
+        return line;
+    }
+
+    public String getLatestReleasedVersion() {
+        if (PacketEvents.get().getServerUtils().getVersion().isOlderThan(ServerVersion.v_1_8)) {
+            return LowLevelUpdateChecker7.getLatestRelease();
         } else {
-            report("[packetevents] Something went wrong while checking for an update. Your build: (" + localVersion.toString() + ") | Latest released build: (" + newVersion.toString() + ")");
+            return LowLevelUpdateChecker8.getLatestRelease();
+        }
+    }
+
+    /**
+     * Check for an update and log in the console (ALL DONE ON THE CURRENT THREAD).
+     */
+    public UpdateCheckerStatus checkForUpdate() {
+        PEVersion localVersion = PacketEvents.get().getVersion();
+        inform("Checking for an update, please wait...");
+        PEVersion newVersion;
+        try {
+            newVersion = new PEVersion(getLatestReleasedVersion());
+        } catch (Exception ex) {
+            newVersion = null;
+        }
+        if (newVersion != null && localVersion.isOlderThan(newVersion)) {
+            inform("There is an update available for the PacketEvents API! Your build: (" + localVersion.toString() + ") | Latest released build: (" + newVersion.toString() + ")");
+            return UpdateCheckerStatus.OUTDATED;
+        } else if (newVersion != null && localVersion.isNewerThan(newVersion)) {
+            inform("You are on a dev or pre released build of PacketEvents. Your build: (" + localVersion.toString() + ") | Latest released build: (" + newVersion.toString() + ")");
+            return UpdateCheckerStatus.PRE_RELEASE;
+        } else if (localVersion.equals(newVersion)) { //No NPE will occur, don't worry :D
+            inform("You are on the latest released version of PacketEvents. (" + newVersion.toString() + ")");
+            return UpdateCheckerStatus.UP_TO_DATE;
+        } else {
+            report("Something went wrong while checking for an update. Your build: (" + localVersion.toString() + ") | Latest released build: (" + newVersion.toString() + ")");
+            return UpdateCheckerStatus.FAILED;
         }
     }
 
@@ -73,7 +120,7 @@ public class UpdateChecker {
      * @param message Message
      */
     private void inform(String message) {
-        Bukkit.getLogger().info(message);
+        Bukkit.getLogger().info("[packetevents] " + message);
     }
 
     /**
@@ -82,21 +129,6 @@ public class UpdateChecker {
      * @param message Message
      */
     private void report(String message) {
-        Bukkit.getLogger().info(ChatColor.DARK_RED + message);
-    }
-
-    /**
-     * Find the latest PacketEvents version as a string.
-     *
-     * @return Version as a String(like "1.8")
-     * @throws IOException Exception if something fails.
-     */
-    private String readLatestVersion() throws IOException {
-        URLConnection connection = new URL("https://api.spigotmc.org/legacy/update.php?resource=80279").openConnection();
-        connection.addRequestProperty("User-Agent", "Mozilla/4.0");
-        BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
-        String line = reader.readLine();
-        reader.close();
-        return line;
+        Bukkit.getLogger().warning(ChatColor.DARK_RED + "[packetevents] " + message);
     }
 }

@@ -39,6 +39,14 @@ import java.util.Map;
  * @since 1.6.8
  */
 public class PacketType {
+    public enum State {
+        PLAY, LOGIN, STATUS;
+    }
+    /**
+     * If a Packet Type could not be resolved, it will be set to the current value of this constant.
+     * This value may change over the versions so it is important to use the variable and not hard code its value.
+     */
+    public static final byte INVALID = -1;
     /**
      * Status Packet IDs.
      *
@@ -264,9 +272,9 @@ public class PacketType {
                  */
                 public static boolean isBlockPlace(final byte packetID) {
                     final ServerVersion version = PacketEvents.get().getServerUtils().getVersion();
-                    return version.isHigherThan(ServerVersion.v_1_8_8) ?
-                            packetID == Client.USE_ITEM
-                            : packetID == Client.BLOCK_PLACE;
+                    return version.isNewerThan(ServerVersion.v_1_8_8) ?
+                            packetID == PacketType.Play.Client.USE_ITEM
+                            : packetID == PacketType.Play.Client.BLOCK_PLACE;
                 }
             }
         }

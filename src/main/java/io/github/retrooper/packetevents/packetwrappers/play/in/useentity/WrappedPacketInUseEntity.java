@@ -25,10 +25,10 @@
 package io.github.retrooper.packetevents.packetwrappers.play.in.useentity;
 
 import io.github.retrooper.packetevents.PacketEvents;
-import io.github.retrooper.packetevents.enums.Hand;
 import io.github.retrooper.packetevents.packetwrappers.NMSPacket;
 import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
 import io.github.retrooper.packetevents.utils.nms.NMSUtils;
+import io.github.retrooper.packetevents.utils.player.Hand;
 import io.github.retrooper.packetevents.utils.reflection.SubclassUtil;
 import io.github.retrooper.packetevents.utils.server.ServerVersion;
 import io.github.retrooper.packetevents.utils.vector.Vector3d;
@@ -118,7 +118,7 @@ public final class WrappedPacketInUseEntity extends WrappedPacket {
 
     public Hand getHand() {
         if ((getAction() == EntityUseAction.INTERACT || getAction() == EntityUseAction.INTERACT_AT)
-                && PacketEvents.get().getServerUtils().getVersion().isHigherThan(ServerVersion.v_1_8_8)) {
+                && PacketEvents.get().getServerUtils().getVersion().isNewerThan(ServerVersion.v_1_8_8)) {
             Object enumHandObj = readObject(0, enumHandClass);
             //Should actually never be null, but we will handle such a case
             if (enumHandObj == null) {

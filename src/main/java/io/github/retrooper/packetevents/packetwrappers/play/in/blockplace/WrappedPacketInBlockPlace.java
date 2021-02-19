@@ -24,14 +24,18 @@
 
 package io.github.retrooper.packetevents.packetwrappers.play.in.blockplace;
 
-import io.github.retrooper.packetevents.enums.Direction;
+import io.github.retrooper.packetevents.exceptions.WrapperFieldNotFoundException;
 import io.github.retrooper.packetevents.packetwrappers.NMSPacket;
 import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
+import io.github.retrooper.packetevents.utils.nms.NMSUtils;
+import io.github.retrooper.packetevents.utils.player.Direction;
+import io.github.retrooper.packetevents.utils.player.Hand;
 import io.github.retrooper.packetevents.utils.server.ServerVersion;
 
 
 public final class WrappedPacketInBlockPlace extends WrappedPacket {
-    private static boolean isHigherThan_v_1_8_8, isHigherThan_v_1_7_10;
+    private static boolean isHigherThan_v_1_8_8, isHigherThan_v_1_7_10, isOlderThan_v_1_9;
+    private static int handEnumIndex;
 
     public WrappedPacketInBlockPlace(final NMSPacket packet) {
         super(packet);
@@ -39,20 +43,38 @@ public final class WrappedPacketInBlockPlace extends WrappedPacket {
 
     @Override
     protected void load() {
-        isHigherThan_v_1_8_8 = version.isHigherThan(ServerVersion.v_1_8_8);
-        isHigherThan_v_1_7_10 = version.isHigherThan(ServerVersion.v_1_7_10);
+        isHigherThan_v_1_8_8 = version.isNewerThan(ServerVersion.v_1_8_8);
+        isHigherThan_v_1_7_10 = version.isNewerThan(ServerVersion.v_1_7_10);
+        isOlderThan_v_1_9 = version.isOlderThan(ServerVersion.v_1_9);
+        try {
+            Object handEnum = readObject(1, NMSUtils.enumHandClass);
+            handEnumIndex = 1;
+        }
+        catch (Exception ex) {
+            handEnumIndex = 0;//Most likely a newer version
+        }
+    }
+
+    public Hand getHand() {
+        if (version.isOlderThan(ServerVersion.v_1_9)) {
+            return Hand.MAIN_HAND;
+        }
+        else {
+            Object enumHandObj = read(handEnumIndex, NMSUtils.enumHandClass);
+            return Hand.valueOf(enumHandObj.toString());
+        }
     }
 
     public Direction getDirection() {
         if (isHigherThan_v_1_8_8) {
-            WrappedPacketInBlockPlace_1_9 blockPlace_1_9 = new WrappedPacketInBlockPlace_1_9(packet);
+            WrappedPacketInBlockPlace_1_9 blockPlace_1_9 = new WrappedPacketInBlockPlace_1_9(new NMSPacket(packet.getRawNMSPacket()));
             return Direction.valueOf(((Enum) blockPlace_1_9.getEnumDirectionObject()).name());
         } else if (isHigherThan_v_1_7_10) {
-            WrappedPacketInBlockPlace_1_8 blockPlace_1_8 = new WrappedPacketInBlockPlace_1_8(packet);
-            return Direction.fromId((byte) blockPlace_1_8.getFace());
+            WrappedPacketInBlockPlace_1_8 blockPlace_1_8 = new WrappedPacketInBlockPlace_1_8(new NMSPacket(packet.getRawNMSPacket()));
+            return Direction.getDirection(blockPlace_1_8.getFace());
         } else {
-            WrappedPacketInBlockPlace_1_7_10 blockPlace_1_7_10 = new WrappedPacketInBlockPlace_1_7_10(packet);
-            return Direction.fromId((byte) blockPlace_1_7_10.face);
+            WrappedPacketInBlockPlace_1_7_10 blockPlace_1_7_10 = new WrappedPacketInBlockPlace_1_7_10(new NMSPacket(packet.getRawNMSPacket()));
+            return Direction.getDirection(blockPlace_1_7_10.face);
         }
     }
 
@@ -73,7 +95,6 @@ public final class WrappedPacketInBlockPlace extends WrappedPacket {
         if (isHigherThan_v_1_8_8) {
             WrappedPacketInBlockPlace_1_9 blockPlace_1_9 = new WrappedPacketInBlockPlace_1_9(packet);
             return blockPlace_1_9.getY();
-
         } else if (isHigherThan_v_1_7_10) {
             WrappedPacketInBlockPlace_1_8 blockPlace_1_8 = new WrappedPacketInBlockPlace_1_8(packet);
             return blockPlace_1_8.getY();
@@ -96,4 +117,72 @@ public final class WrappedPacketInBlockPlace extends WrappedPacket {
         }
     }
 
+    /**
+     * Get the X position of the crosshair on the block.
+     * Only supported on versions 1.7.10 to 1.8.8.
+     *
+     * @return cursorX from PacketPlayInBlockPlace
+     */
+    @SupportedVersions(versions = {ServerVersion.v_1_7_10, ServerVersion.v_1_8, ServerVersion.v_1_8_3,
+            ServerVersion.v_1_8_4, ServerVersion.v_1_8_5, ServerVersion.v_1_8_6, ServerVersion.v_1_8_7,
+            ServerVersion.v_1_8_8})
+    public float getCursorX() {
+        if (isOlderThan_v_1_9) {
+            if (isHigherThan_v_1_7_10) {
+                WrappedPacketInBlockPlace_1_8 blockPlace_1_8 = new WrappedPacketInBlockPlace_1_8(packet);
+                return blockPlace_1_8.getCursorX();
+            } else {
+                WrappedPacketInBlockPlace_1_7_10 blockPlace_1_7_10 = new WrappedPacketInBlockPlace_1_7_10(packet);
+                return blockPlace_1_7_10.cursorX;
+            }
+        } else {
+            throw new UnsupportedOperationException("Operation WrappedPacketInBlockPlace#getCursorX is not available for versions higher than 1.8.8");
+        }
+    }
+
+    /**
+     * Get the Y position of the crosshair on the block.
+     * Only supported on versions 1.7.10 to 1.8.8.
+     *
+     * @return cursorY from PacketPlayInBlockPlace
+     */
+    @SupportedVersions(versions = {ServerVersion.v_1_7_10, ServerVersion.v_1_8, ServerVersion.v_1_8_3,
+            ServerVersion.v_1_8_4, ServerVersion.v_1_8_5, ServerVersion.v_1_8_6, ServerVersion.v_1_8_7,
+            ServerVersion.v_1_8_8})
+    public float getCursorY() {
+        if (isOlderThan_v_1_9) {
+            if (isHigherThan_v_1_7_10) {
+                WrappedPacketInBlockPlace_1_8 blockPlace_1_8 = new WrappedPacketInBlockPlace_1_8(packet);
+                return blockPlace_1_8.getCursorY();
+            } else {
+                WrappedPacketInBlockPlace_1_7_10 blockPlace_1_7_10 = new WrappedPacketInBlockPlace_1_7_10(packet);
+                return blockPlace_1_7_10.cursorY;
+            }
+        } else {
+            throw new UnsupportedOperationException("Operation WrappedPacketInBlockPlace#getCursorY is not available for versions higher than 1.8.8");
+        }
+    }
+
+    /**
+     * Get the Z position of the crosshair on the block.
+     * Only supported on versions 1.7 to 1.8.8.
+     *
+     * @return cursorZ from PacketPlayInBlockPlace
+     */
+    @SupportedVersions(versions = {ServerVersion.v_1_7_10, ServerVersion.v_1_8, ServerVersion.v_1_8_3,
+            ServerVersion.v_1_8_4, ServerVersion.v_1_8_5, ServerVersion.v_1_8_6, ServerVersion.v_1_8_7,
+            ServerVersion.v_1_8_8})
+    public float getCursorZ() {
+        if (isOlderThan_v_1_9) {
+            if (isHigherThan_v_1_7_10) {
+                WrappedPacketInBlockPlace_1_8 blockPlace_1_8 = new WrappedPacketInBlockPlace_1_8(packet);
+                return blockPlace_1_8.getCursorZ();
+            } else {
+                WrappedPacketInBlockPlace_1_7_10 blockPlace_1_7_10 = new WrappedPacketInBlockPlace_1_7_10(packet);
+                return blockPlace_1_7_10.cursorZ;
+            }
+        } else {
+            throw new UnsupportedOperationException("Operation WrappedPacketInBlockPlace#getCursorZ is not available for versions higher than 1.8.8");
+        }
+    }
 }

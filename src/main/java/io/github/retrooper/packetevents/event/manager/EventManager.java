@@ -28,6 +28,14 @@ import io.github.retrooper.packetevents.PacketEvents;
 import io.github.retrooper.packetevents.event.PacketEvent;
 import io.github.retrooper.packetevents.event.PacketListener;
 import io.github.retrooper.packetevents.event.PacketListenerDynamic;
+import io.github.retrooper.packetevents.event.annotation.PacketHandler;
+import io.github.retrooper.packetevents.event.eventtypes.CancellableEvent;
+import io.github.retrooper.packetevents.event.priority.PacketEventPriority;
+
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.util.*;
+import java.util.logging.Level;
 
 /**
  * This is the event manager interface.
@@ -133,29 +141,6 @@ public interface EventManager {
      */
     default EventManager registerListeners(PacketListenerDynamic... listeners) {
         PEEventManager.EVENT_MANAGER_DYNAMIC.registerListeners(listeners);
-        return this;
-    }
-
-    /**
-     * Unregister the dynamic event listener.
-     *
-     * @param listener {@link PacketListenerDynamic}
-     * @return Same event manager instance.
-     */
-    default EventManager unregisterListener(PacketListenerDynamic listener) {
-        PEEventManager.EVENT_MANAGER_DYNAMIC.unregisterListener(listener);
-        return this;
-    }
-
-    /**
-     * Unregister multiple dynamic event listeners with one method.
-     * Recommended to use the dynamic event listener.
-     *
-     * @param listeners {@link PacketListenerDynamic}
-     * @return Same event manager instance.
-     */
-    default EventManager unregisterListeners(PacketListenerDynamic... listeners) {
-        PEEventManager.EVENT_MANAGER_DYNAMIC.unregisterListeners(listeners);
         return this;
     }
 

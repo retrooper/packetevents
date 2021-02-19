@@ -24,20 +24,46 @@
 
 package io.github.retrooper.packetevents.event.eventtypes;
 
+import io.github.retrooper.packetevents.event.PacketEvent;
 import io.github.retrooper.packetevents.packettype.PacketType;
 import io.github.retrooper.packetevents.packetwrappers.NMSPacket;
+import io.github.retrooper.packetevents.utils.netty.channel.ChannelUtils;
+import io.github.retrooper.packetevents.utils.reflection.ClassUtil;
 
 import java.net.InetSocketAddress;
 
 /**
- * The {@code NMSPacketEvent} interface represents an event that has to do with an actual packet.
+ * The {@code NMSPacketEvent} abstract class represents an event that has to do with an actual packet.
  * Don't mix this up with {@link io.github.retrooper.packetevents.event.PacketEvent}.
  * The PacketEvent class represents an event that belongs to PacketEvent's packet system.
  *
  * @author retrooper
  * @since 1.8
  */
-public interface NMSPacketEvent {
+public abstract class NMSPacketEvent extends PacketEvent implements CallableEvent {
+    private final InetSocketAddress socketAddress;
+    protected NMSPacket packet;
+    protected boolean cancelled;
+
+    public NMSPacketEvent(Object channel, NMSPacket packet) {
+        this.socketAddress = ChannelUtils.getSocketAddress(channel);
+        this.packet = packet;
+    }
+
+    public NMSPacketEvent(InetSocketAddress address, NMSPacket packet) {
+        this.socketAddress = address;
+        this.packet = packet;
+    }
+
+    /**
+     * Get the associated player's socket address.
+     *
+     * @return Socket address of the associated player.
+     */
+    public final InetSocketAddress getSocketAddress() {
+        return socketAddress;
+    }
+
     /**
      * This method returns the name of the packet.
      * To get the name of the packet we get the class of the packet and then the name of the class.
@@ -51,33 +77,37 @@ public interface NMSPacketEvent {
      * @return Name of the packet.
      */
     @Deprecated
-    String getPacketName();
+    public final String getPacketName() {
+        return ClassUtil.getClassSimpleName(packet.getRawNMSPacket().getClass());
+    }
 
     /**
      * Get the NMS packet.
      *
      * @return Get NMS packet.
      */
-    NMSPacket getNMSPacket();
+    public final NMSPacket getNMSPacket() {
+        return packet;
+    }
 
     /**
      * Update the NMS Packet.
      *
      * @param packet NMS Object
      */
-    void setNMSPacket(final NMSPacket packet);
+    public final void setNMSPacket(NMSPacket packet) {
+        this.packet = packet;
+    }
 
     /**
      * Get the Packet ID.
      *
      * @return Packet ID.
      */
-    byte getPacketId();
+    public abstract byte getPacketId();
 
-    /**
-     * Get the associated player's socket address.
-     *
-     * @return Socket address of the associated player.
-     */
-    InetSocketAddress getSocketAddress();
+    @Override
+    public boolean isInbuilt() {
+        return true;
+    }
 }

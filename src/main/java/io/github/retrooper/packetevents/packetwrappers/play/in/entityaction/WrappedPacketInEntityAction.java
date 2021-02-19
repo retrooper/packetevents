@@ -31,12 +31,9 @@ import io.github.retrooper.packetevents.utils.nms.NMSUtils;
 import io.github.retrooper.packetevents.utils.reflection.SubclassUtil;
 import io.github.retrooper.packetevents.utils.server.ServerVersion;
 import org.bukkit.entity.Entity;
-
-import java.util.HashMap;
+import org.jetbrains.annotations.Nullable;
 
 public final class WrappedPacketInEntityAction extends WrappedPacket {
-    private static final HashMap<String, PlayerAction> cachedPlayerActionNames = new HashMap<>();
-    private static final HashMap<Integer, PlayerAction> cachedPlayerActionIDs = new HashMap<>();
     private static Class<?> enumPlayerActionClass;
     private static boolean isLowerThan_v_1_8;
     private Entity entity;
@@ -48,27 +45,10 @@ public final class WrappedPacketInEntityAction extends WrappedPacket {
 
     @Override
     protected void load() {
-        isLowerThan_v_1_8 = version.isLowerThan(ServerVersion.v_1_8);
+        isLowerThan_v_1_8 = version.isOlderThan(ServerVersion.v_1_8);
         if (!isLowerThan_v_1_8) {
             enumPlayerActionClass = SubclassUtil.getSubClass(PacketTypeClasses.Play.Client.ENTITY_ACTION, "EnumPlayerAction");
         }
-        //All the already existing values
-        for (PlayerAction val : PlayerAction.values()) {
-            cachedPlayerActionNames.put(val.name(), val);
-        }
-
-        cachedPlayerActionNames.put("PRESS_SHIFT_KEY", PlayerAction.START_SNEAKING);
-        cachedPlayerActionNames.put("RELEASE_SHIFT_KEY", PlayerAction.STOP_SNEAKING);
-        cachedPlayerActionNames.put("RIDING_JUMP", PlayerAction.START_RIDING_JUMP);
-
-        cachedPlayerActionIDs.put(1, PlayerAction.START_SNEAKING);
-        cachedPlayerActionIDs.put(2, PlayerAction.STOP_SNEAKING);
-        cachedPlayerActionIDs.put(3, PlayerAction.STOP_SLEEPING);
-        cachedPlayerActionIDs.put(4, PlayerAction.START_SPRINTING);
-        cachedPlayerActionIDs.put(5, PlayerAction.STOP_SPRINTING);
-        cachedPlayerActionIDs.put(6, PlayerAction.START_RIDING_JUMP); //riding jump
-        cachedPlayerActionIDs.put(7, PlayerAction.OPEN_INVENTORY); //horse interaction
-
     }
 
     /**
@@ -92,6 +72,7 @@ public final class WrappedPacketInEntityAction extends WrappedPacket {
      */
     public int getEntityId() {
         if (entityId == -1) {
+            net.minecraft.server.v1_8_R3.PacketPlayInEntityAction ea;
             entityId = readInt(0);
         }
         return entityId;
@@ -104,12 +85,11 @@ public final class WrappedPacketInEntityAction extends WrappedPacket {
      */
     public PlayerAction getAction() {
         if (isLowerThan_v_1_8) {
-            int animationIndex = readInt(1);
-            return cachedPlayerActionIDs.get(animationIndex);
+            byte animationIndex = (byte) readInt(1);
+            return PlayerAction.getByActionValue((byte) (animationIndex - 1));
         } else {
             final Object enumObj = readObject(0, enumPlayerActionClass);
-            final String enumValueName = enumObj.toString();
-            return cachedPlayerActionNames.get(enumValueName);
+            return PlayerAction.getByName(enumObj.toString());
         }
     }
 
@@ -127,15 +107,66 @@ public final class WrappedPacketInEntityAction extends WrappedPacket {
     }
 
     public enum PlayerAction {
-        START_SNEAKING,
-        STOP_SNEAKING,
-        STOP_SLEEPING,
-        START_SPRINTING,
-        STOP_SPRINTING,
-        START_RIDING_JUMP,
-        STOP_RIDING_JUMP,
-        OPEN_INVENTORY,
-        START_FALL_FLYING
+        START_SNEAKING((byte) 0, "PRESS_SHIFT_KEY"),
+        STOP_SNEAKING((byte) 1, "RELEASE_SHIFT_KEY"),
+        STOP_SLEEPING((byte) 2),
+        START_SPRINTING((byte) 3),
+        STOP_SPRINTING((byte) 4),
+        START_RIDING_JUMP((byte) 5),
+        STOP_RIDING_JUMP((byte) 6),
+        OPEN_INVENTORY((byte) 7),
+        START_FALL_FLYING((byte) 8),
+        /**
+         * Removed in minecraft server version 1.9.
+         * This constant will only work on 1.7.10-1.8
+         */
+        @Deprecated
+        RIDING_JUMP((byte) 5);
+
+        final byte actionID;
+        final String alias;
+
+        PlayerAction(byte actionID) {
+            this.actionID = actionID;
+            this.alias = "empty";
+        }
+
+        PlayerAction(byte actionID, String alias) {
+            this.actionID = actionID;
+            this.alias = alias;
+        }
+
+        public byte getActionValue() {
+            return actionID;
+        }
+
+        @Nullable
+        public static PlayerAction getByActionValue(byte value) {
+            if (version.isOlderThan(ServerVersion.v_1_9)) {
+                if (value == RIDING_JUMP.actionID) {
+                    return RIDING_JUMP;
+                } else {
+                    for (PlayerAction action : values()) {
+                        if (action.actionID == value) {
+                            return action;
+                        }
+                    }
+                }
+            } else {
+                return values()[value];
+            }
+            return null;
+        }
+
+        @Nullable
+        public static PlayerAction getByName(String name) {
+            for (PlayerAction action : values()) {
+                if (action.name().equals(name) || action.alias.equals(name)) {
+                    return action;
+                }
+            }
+            return null;
+        }
     }
 
 }

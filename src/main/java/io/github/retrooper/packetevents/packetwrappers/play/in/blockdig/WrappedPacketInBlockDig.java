@@ -24,16 +24,16 @@
 
 package io.github.retrooper.packetevents.packetwrappers.play.in.blockdig;
 
-import io.github.retrooper.packetevents.enums.Direction;
 import io.github.retrooper.packetevents.packettype.PacketTypeClasses;
 import io.github.retrooper.packetevents.packetwrappers.NMSPacket;
 import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
 import io.github.retrooper.packetevents.utils.nms.NMSUtils;
+import io.github.retrooper.packetevents.utils.player.Direction;
 import io.github.retrooper.packetevents.utils.reflection.Reflection;
 import io.github.retrooper.packetevents.utils.reflection.SubclassUtil;
 import io.github.retrooper.packetevents.utils.server.ServerVersion;
 
-import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.*;
 
 public final class WrappedPacketInBlockDig extends WrappedPacket {
     private static Class<?> blockPositionClass;
@@ -51,14 +51,14 @@ public final class WrappedPacketInBlockDig extends WrappedPacket {
     protected void load() {
         Class<?> blockDigClass = PacketTypeClasses.Play.Client.BLOCK_DIG;
         try {
-            if (version.isHigherThan(ServerVersion.v_1_7_10)) {
+            if (version.isNewerThan(ServerVersion.v_1_7_10)) {
                 blockPositionClass = NMSUtils.getNMSClass("BlockPosition");
                 enumDirectionClass = NMSUtils.getNMSClass("EnumDirection");
             }
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
         }
-        isVersionLowerThan_v_1_8 = version.isLowerThan(ServerVersion.v_1_8);
+        isVersionLowerThan_v_1_8 = version.isOlderThan(ServerVersion.v_1_8);
 
         if (version != ServerVersion.v_1_7_10) {
             try {
@@ -83,7 +83,7 @@ public final class WrappedPacketInBlockDig extends WrappedPacket {
                 blockPosObj = readObject(0, blockPositionClass);
             }
             try {
-                return (int) Reflection.getMethod(blockPosObj.getClass().getSuperclass(), "getX", 0).invoke(blockPosObj);
+                return (int) NMSUtils.getBlockPosX.invoke(blockPosObj);
             } catch (IllegalAccessException | InvocationTargetException e) {
                 e.printStackTrace();
             }
@@ -104,7 +104,7 @@ public final class WrappedPacketInBlockDig extends WrappedPacket {
                 blockPosObj = readObject(0, blockPositionClass);
             }
             try {
-                return (int) Reflection.getMethod(blockPosObj.getClass().getSuperclass(), "getY", 0).invoke(blockPosObj);
+                return (int) NMSUtils.getBlockPosY.invoke(blockPosObj);
             } catch (IllegalAccessException | InvocationTargetException e) {
                 e.printStackTrace();
             }
@@ -125,7 +125,7 @@ public final class WrappedPacketInBlockDig extends WrappedPacket {
                 blockPosObj = readObject(0, blockPositionClass);
             }
             try {
-                return (int) Reflection.getMethod(blockPosObj.getClass().getSuperclass(), "getZ", 0).invoke(blockPosObj);
+                return (int) NMSUtils.getBlockPosZ.invoke(blockPosObj);
             } catch (IllegalAccessException | InvocationTargetException e) {
                 e.printStackTrace();
             }
@@ -140,12 +140,12 @@ public final class WrappedPacketInBlockDig extends WrappedPacket {
      */
     public Direction getDirection() {
         if (isVersionLowerThan_v_1_8) {
-            return Direction.fromId((byte) readInt(3));
+            return Direction.getDirection(readInt(3));
         } else {
             if (enumDirObj == null) {
                 enumDirObj = readObject(0, enumDirectionClass);
                 if (enumDirObj == null) {
-                    return Direction.OTHER;
+                    return Direction.INVALID;
                 }
             }
             return Direction.valueOf(((Enum) enumDirObj).name());
@@ -172,7 +172,13 @@ public final class WrappedPacketInBlockDig extends WrappedPacket {
         DROP_ALL_ITEMS,
         DROP_ITEM,
         RELEASE_USE_ITEM,
+        
+        /**
+         * Doesn't exist on the newest versions.
+         */
+        @Deprecated
         SWAP_HELD_ITEMS,
+
         SWAP_ITEM_WITH_OFFHAND,
         UNKNOWN
     }

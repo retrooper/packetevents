@@ -31,9 +31,8 @@ import io.github.retrooper.packetevents.event.eventtypes.CancellableEvent;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
+import java.util.HashSet;
 import java.util.Map;
 
 @Deprecated
@@ -42,7 +41,8 @@ class EventManagerLegacy {
      * Map storing all all legacy packet event listeners.
      * The key is an individual listener, the values are the key's event methods.
      */
-    private final Map<PacketListener, List<Method>> staticRegisteredMethods = new HashMap<>();
+
+    private final Map<PacketListener, HashSet<Method>> staticRegisteredMethods = new HashMap<>();
 
     /**
      * Call a PacketEvent with the legacy event manager.
@@ -66,7 +66,7 @@ class EventManagerLegacy {
         }
         //STATIC LISTENERS
         for (final PacketListener listener : staticRegisteredMethods.keySet()) {
-            List<Method> methods = staticRegisteredMethods.get(listener);
+            HashSet<Method> methods = staticRegisteredMethods.get(listener);
 
             for (Method method : methods) {
                 Class<?> parameterType = method.getParameterTypes()[0];
@@ -103,7 +103,7 @@ class EventManagerLegacy {
      */
     @Deprecated
     public void registerListener(final PacketListener listener) {
-        final List<Method> methods = new ArrayList<>();
+        final HashSet<Method> methods = new HashSet<>();
         for (final Method m : listener.getClass().getDeclaredMethods()) {
             if (!m.isAccessible()) {
                 m.setAccessible(true);

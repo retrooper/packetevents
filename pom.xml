@@ -6,7 +6,7 @@
 
     <groupId>io.github.retrooper</groupId>
     <artifactId>packetevents</artifactId>
-    <version>1.7.9</version>
+    <version>1.8-pre-5</version>
     <build>
         <plugins>
             <plugin>
@@ -22,6 +22,8 @@
                         <configuration>
                             <minimizeJar>true</minimizeJar>
                             <createDependencyReducedPom>false</createDependencyReducedPom>
+                            <createTestSourcesJar>false</createTestSourcesJar>
+                            <shadedArtifactAttached>false</shadedArtifactAttached>
                         </configuration>
                     </execution>
                 </executions>
@@ -34,18 +36,20 @@
                     <target>8</target>
                 </configuration>
             </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-javadoc-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <id>attach-javadocs</id>
-                        <goals>
-                            <goal>jar</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
+            <!--
+             <plugin>
+                 <groupId>org.apache.maven.plugins</groupId>
+                 <artifactId>maven-javadoc-plugin</artifactId>
+                 <executions>
+                     <execution>
+                         <id>attach-javadocs</id>
+                         <goals>
+                             <goal>jar</goal>
+                         </goals>
+                     </execution>
+                 </executions>
+             </plugin>
+             -->
         </plugins>
         <resources>
             <resource>
@@ -80,10 +84,6 @@
             <url>https://repo.viaversion.com</url>
         </repository>
         <repository>
-            <id>dmulloy2-repo</id>
-            <url>https://repo.dmulloy2.net/nexus/repository/public/</url>
-        </repository>
-        <repository>
             <id>sonotype</id>
             <url>https://oss.sonatype.org/content/repositories/releases/</url>
         </repository>
@@ -97,6 +97,7 @@
             <version>20.1.0</version>
             <scope>compile</scope>
         </dependency>
+
         <dependency>
             <groupId>org.github.spigot</groupId>
             <artifactId>1.16.2</artifactId>
@@ -113,8 +114,22 @@
 
         <dependency>
             <groupId>org.github.spigot</groupId>
+            <artifactId>1.13</artifactId>
+            <version>1.13</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.github.spigot</groupId>
             <artifactId>1.12.2</artifactId>
             <version>1.12.2</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.github.spigot</groupId>
+            <artifactId>1.9.4</artifactId>
+            <version>1.9.4</version>
             <scope>provided</scope>
         </dependency>
 

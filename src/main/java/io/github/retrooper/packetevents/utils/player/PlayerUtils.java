@@ -33,7 +33,9 @@ import org.jetbrains.annotations.NotNull;
 
 import java.net.InetSocketAddress;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Useful player utilities.
@@ -42,10 +44,12 @@ import java.util.UUID;
  * @since 1.6.8
  */
 public final class PlayerUtils {
+    public final Map<UUID, Long> loginTime = new ConcurrentHashMap<>();
+
     /**
      * This is where the most recent non-smoothed player ping that PacketEvents calculates is stored.
      */
-    public final HashMap<UUID, Short> playerPingMap = new HashMap<>();
+    public final Map<UUID, Integer> playerPingMap = new HashMap<>();
 
     /**
      * This is where the most recent smoothed player ping that PacketEvents calculates is stored.
@@ -53,7 +57,7 @@ public final class PlayerUtils {
      * Use this to receive a smoothed ping value.
      * PacketEvents smooths in the same way minecraft does.
      */
-    public final HashMap<UUID, Short> playerSmoothedPingMap = new HashMap<>();
+    public final Map<UUID, Integer> playerSmoothedPingMap = new HashMap<>();
 
     /**
      * This map stores the client version of a player only when it has been confirmed.
@@ -62,7 +66,7 @@ public final class PlayerUtils {
      * Why do we need to do this?
      * Plugins like ViaVersion modify the Handshaking packet containing the protocol version
      * to allow the client to join.
-     * Plugins that listen to the handshaking packet will receive the modified protocol version (=server version).
+     * Plugins that listen to the handshaking packet will receive the modified protocol version. (=server version)
      * So we have to go out of our way and use the API of ViaVersion or such similar plugins
      * to have support for client version resolving.
      * I can't do this for every single plugin like ViaVersion, so for now ViaVersion, ViaBackwards and ViaRewind are
@@ -99,9 +103,8 @@ public final class PlayerUtils {
      * @param player Target player.
      * @return Non-smoothed ping.
      */
-    @Deprecated
-    public short getPing(final Player player) {
-        return playerPingMap.getOrDefault(player.getUniqueId(), (short) 0);
+    public int getPing(final Player player) {
+        return getPing(player.getUniqueId());
     }
 
     /**
@@ -110,9 +113,8 @@ public final class PlayerUtils {
      * @param player Target player.
      * @return Smoothed ping.
      */
-    @Deprecated
-    public short getSmoothedPing(final Player player) {
-        return playerSmoothedPingMap.getOrDefault(player.getUniqueId(), (short) 0);
+    public int getSmoothedPing(final Player player) {
+      return getSmoothedPing(player.getUniqueId());
     }
 
     /**
@@ -121,8 +123,16 @@ public final class PlayerUtils {
      * @param uuid Target player UUID.
      * @return Non-smoothed ping.
      */
-    public short getPing(UUID uuid) {
-        return playerPingMap.getOrDefault(uuid, (short) 0);
+    public int getPing(UUID uuid) {
+        Integer ping = playerPingMap.get(uuid);
+        if (ping == null) {
+            Long joinTime = loginTime.get(uuid);
+            if (joinTime == null) {
+                return 0; //TODO insert login time at plagerloginevent not playerjoinevent as i do atm iirc
+            }
+            return (int) (System.currentTimeMillis() -  joinTime);
+        }
+        return ping;
     }
 
     /**
@@ -131,8 +141,16 @@ public final class PlayerUtils {
      * @param uuid Target player UUID.
      * @return Smoothed ping.
      */
-    public short getSmoothedPing(UUID uuid) {
-        return playerSmoothedPingMap.getOrDefault(uuid, (short) 0);
+    public int getSmoothedPing(UUID uuid) {
+        Integer smoothedPing = playerSmoothedPingMap.get(uuid);
+        if (smoothedPing == null) {
+            Long joinTime = loginTime.get(uuid);
+            if (joinTime == null) {
+                return 0;
+            }
+            return (int) (System.currentTimeMillis() - joinTime);
+        }
+        return smoothedPing;
     }
 
     /**
@@ -146,22 +164,25 @@ public final class PlayerUtils {
     public ClientVersion getClientVersion(final Player player) {
         ClientVersion version = clientVersionsMap.get(player.getAddress());
         if (version == null) {
+            //Prioritize ViaVersion and ProtocolSupport as they modify the protocol version in the packet we access it from.
+            //We are forced to use their API.
             if (VersionLookupUtils.isDependencyAvailable()) {
                 try {
                     version = ClientVersion.getClientVersion(VersionLookupUtils.getProtocolVersion(player));
                     clientVersionsMap.put(player.getAddress(), version);
                 } catch (Exception ex) {
-                    version = null;
+                    //Try ask the dependency again the next time, for now it is temporarily unresolved...
+                    //Temporary unresolved, there is still hope, the dependency has thrown an exception.
                 }
-                //Try again the next time
-                return ClientVersion.UNRESOLVED;
+                return ClientVersion.TEMP_UNRESOLVED;
             } else {
+                //We can trust the version we retrieved from the packet.
                 version = tempClientVersionMap.get(player.getAddress());
                 if (version == null) {
+                    //We failed to retrieve the version from the packet and no dependency is available.
                     version = ClientVersion.UNRESOLVED;
                 }
                 clientVersionsMap.put(player.getAddress(), version);
-                //Unfortunately don't know what to do, this should never be the case though...
             }
         }
         return version;
@@ -177,7 +198,7 @@ public final class PlayerUtils {
      * @param player Target player.
      */
     public void injectPlayer(final Player player) {
-        PacketEvents.get().packetHandlerInternal.injectPlayer(player);
+        PacketEvents.get().injector.injectPlayer(player);
     }
 
     /**
@@ -190,7 +211,7 @@ public final class PlayerUtils {
      * @param player Target player.
      */
     public void ejectPlayer(final Player player) {
-        PacketEvents.get().packetHandlerInternal.ejectPlayer(player);
+        PacketEvents.get().injector.ejectPlayer(player);
     }
 
     /**
@@ -200,7 +221,17 @@ public final class PlayerUtils {
      * @param wrapper Client-bound wrapper supporting sending.
      */
     public void sendPacket(final Player player, final SendableWrapper wrapper) {
-        PacketEvents.get().packetHandlerInternal.sendPacket(NMSUtils.getChannel(player), wrapper.asNMSPacket());
+        PacketEvents.get().injector.sendPacket(NMSUtils.getChannel(player), wrapper.asNMSPacket());
+    }
+
+    /**
+     * Send a client-bound(server-sided) wrapper that supports sending to a netty channel.
+     *
+     * @param channel Netty channel as object(due to netty package changes)
+     * @param wrapper Client-bound raw NMS packet.
+     */
+    public void sendPacket(Object channel, SendableWrapper wrapper) {
+        PacketEvents.get().injector.sendPacket(channel, wrapper.asNMSPacket());
     }
 
     /**
@@ -209,27 +240,17 @@ public final class PlayerUtils {
      * @param player Packet receiver.
      * @param packet Client-bound raw NMS packet.
      */
-    public void sendNMSPacket(final Player player, final Object packet) {
-        PacketEvents.get().packetHandlerInternal.sendPacket(NMSUtils.getChannel(player), packet);
-    }
-
-    /**
-     * Send a client-bound(server-sided) wrapper that supports sending to a netty channel.
-     *
-     * @param channel Netty channel as object(due to package changes)
-     * @param wrapper Client-bound raw NMS packet.
-     */
-    public void sendPacket(final Object channel, final SendableWrapper wrapper) {
-        PacketEvents.get().packetHandlerInternal.sendPacket(channel, wrapper.asNMSPacket());
+    public void sendNMSPacket(Player player, Object packet) {
+        PacketEvents.get().injector.sendPacket(NMSUtils.getChannel(player), packet);
     }
 
     /**
      * Send a client-bound(server-sided) raw NMS Packet without any wrapper to a netty channel.
      *
-     * @param channel Netty channel as object(due to package changes)
+     * @param channel Netty channel as object(due to netty package changes)
      * @param packet  Client-bound raw NMS packet.
      */
-    public void sendNMSPacket(final Object channel, final Object packet) {
-        PacketEvents.get().packetHandlerInternal.sendPacket(channel, packet);
+    public void sendNMSPacket(Object channel, Object packet) {
+        PacketEvents.get().injector.sendPacket(channel, packet);
     }
 }

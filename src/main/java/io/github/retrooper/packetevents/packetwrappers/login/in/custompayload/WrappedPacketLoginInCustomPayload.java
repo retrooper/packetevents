@@ -30,9 +30,6 @@ import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
 import io.github.retrooper.packetevents.utils.nms.NMSUtils;
 import io.github.retrooper.packetevents.utils.server.ServerVersion;
 
-/**
- * This packet exists since 1.13
- */
 public class WrappedPacketLoginInCustomPayload extends WrappedPacket {
     private static Class<?> byteBufClass;
     private static Class<?> packetDataSerializerClass;
@@ -63,7 +60,7 @@ public class WrappedPacketLoginInCustomPayload extends WrappedPacket {
 
     @Override
     public boolean isSupported() {
-        return version.isHigherThan(ServerVersion.v_1_12_2);
+        return version.isNewerThan(ServerVersion.v_1_12_2);
     }
 }
 

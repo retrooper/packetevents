@@ -61,7 +61,7 @@ public final class ServerUtils {
      * @return Get Operating System
      */
     public SystemOS getOS() {
-        return SystemOS.getOperatingSystem();
+        return SystemOS.getOS();
     }
 
     public boolean isBungeeCordEnabled() {

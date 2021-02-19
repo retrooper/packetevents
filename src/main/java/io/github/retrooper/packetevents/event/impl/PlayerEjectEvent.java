@@ -24,12 +24,10 @@
 
 package io.github.retrooper.packetevents.event.impl;
 
-import io.github.retrooper.packetevents.PacketEvents;
 import io.github.retrooper.packetevents.event.PacketEvent;
 import io.github.retrooper.packetevents.event.PacketListenerDynamic;
 import io.github.retrooper.packetevents.event.eventtypes.CancellableEvent;
 import io.github.retrooper.packetevents.event.eventtypes.PlayerEvent;
-import io.github.retrooper.packetevents.settings.PacketEventsSettings;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
@@ -44,22 +42,10 @@ import org.jetbrains.annotations.NotNull;
  */
 public final class PlayerEjectEvent extends PacketEvent implements CancellableEvent, PlayerEvent {
     private final Player player;
-    private final boolean async;
     private boolean cancelled;
 
-    public PlayerEjectEvent(final Player player, final boolean isAsync) {
+    public PlayerEjectEvent(final Player player) {
         this.player = player;
-        this.async = isAsync;
-    }
-
-    @Override
-    public void cancel() {
-        cancelled = true;
-    }
-
-    @Override
-    public void uncancel() {
-        cancelled = false;
     }
 
     @Override
@@ -85,20 +71,21 @@ public final class PlayerEjectEvent extends PacketEvent implements CancellableEv
     }
 
     /**
-     * This method returns if the event has been called asynchronously.
-     * If the {@link PacketEventsSettings#shouldEjectAsync()} is enabled, the event will be called asynchronously
-     * and the player will be ejected asynchronously.
-     * The {@link PacketEventsSettings} can be accessed here:
-     *
-     * @return Is the ejection asynchronous.
-     * @see PacketEvents#getSettings()
+     * @return Is the event called async?
+     * @deprecated Now always false
      */
+    @Deprecated
     public boolean isAsync() {
-        return async;
+        return false;
     }
 
     @Override
     public void call(PacketListenerDynamic listener) {
         listener.onPlayerEject(this);
+    }
+
+    @Override
+    public boolean isInbuilt() {
+        return true;
     }
 }

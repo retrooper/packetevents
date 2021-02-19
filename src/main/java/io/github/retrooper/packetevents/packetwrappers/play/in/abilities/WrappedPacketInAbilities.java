@@ -30,7 +30,7 @@ import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
 import io.github.retrooper.packetevents.utils.reflection.Reflection;
 
 public final class WrappedPacketInAbilities extends WrappedPacket {
-    private static boolean v_1_16_Mode = false;
+    private static boolean v_1_16_Mode;
 
     public WrappedPacketInAbilities(NMSPacket packet) {
         super(packet);
@@ -55,11 +55,7 @@ public final class WrappedPacketInAbilities extends WrappedPacket {
     }
 
     public boolean isFlying() {
-        if (v_1_16_Mode) {
-            return readBoolean(0);
-        } else {
-            return readBoolean(1);
-        }
+        return readBoolean(v_1_16_Mode ? 0 : 1);
     }
 
     /**

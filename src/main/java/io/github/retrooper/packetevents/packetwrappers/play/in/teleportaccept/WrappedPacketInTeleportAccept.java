@@ -22,64 +22,17 @@
  * SOFTWARE.
  */
 
-package io.github.retrooper.packetevents.enums;
+package io.github.retrooper.packetevents.packetwrappers.play.in.teleportaccept;
 
-/**
- * The {@code direction} enum represents the face of a block being hit/placed.
- *
- * @author retrooper
- * @see <a href="https://wiki.vg/Protocol#Player_Digging">https://wiki.vg/Protocol#Player_Digging</a>
- * @since 1.7.8
- */
-public enum Direction {
-    /**
-     * -Y offset
-     */
-    DOWN((byte) 0),
+import io.github.retrooper.packetevents.packetwrappers.NMSPacket;
+import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
 
-    /**
-     * +Y offset
-     */
-    UP((byte) 1),
-
-    /**
-     * -Z offset
-     */
-    NORTH((byte) 2),
-
-    /**
-     * +Z offset
-     */
-    SOUTH((byte) 3),
-
-    /**
-     * -X offset
-     */
-    WEST((byte) 4),
-
-    /**
-     * +X offset
-     */
-    EAST((byte) 5),
-
-    OTHER(Byte.MIN_VALUE);
-
-    final byte value;
-
-    Direction(byte value) {
-        this.value = value;
+public class WrappedPacketInTeleportAccept extends WrappedPacket {
+    public WrappedPacketInTeleportAccept(NMSPacket packet) {
+        super(packet);
     }
 
-    public byte getValue() {
-        return value;
-    }
-
-    public static Direction fromId(byte value) {
-        for (Direction direction : values()) {
-            if (direction.value == value) {
-                return direction;
-            }
-        }
-        return OTHER;
+    public int getTeleportId() {
+        return readInt(0);
     }
 }

@@ -60,7 +60,14 @@ public final class EntityFinderUtils {
             craftWorldGetHandle = NMSUtils.craftWorldClass.getMethod("getHandle");
             getBukkitEntity = NMSUtils.nmsEntityClass.getMethod("getBukkitEntity");
         } catch (NoSuchMethodException e) {
-            e.printStackTrace();
+            try {
+                getEntityByIdMethod = worldServerClass.getMethod("getEntity", int.class);
+
+                craftWorldGetHandle = NMSUtils.craftWorldClass.getMethod("getHandle");
+                getBukkitEntity = NMSUtils.nmsEntityClass.getMethod("getBukkitEntity");
+            } catch (NoSuchMethodException ex) {
+                ex.printStackTrace();
+            }
         }
     }
 
@@ -95,23 +102,14 @@ public final class EntityFinderUtils {
         }
         Object craftWorld = NMSUtils.craftWorldClass.cast(world);
 
-        Object worldServer = null;
+        Object worldServer;
+        Object nmsEntity;
         try {
             worldServer = craftWorldGetHandle.invoke(craftWorld);
-        } catch (IllegalAccessException | InvocationTargetException e) {
-            e.printStackTrace();
-        }
-
-        Object nmsEntity = null;
-        try {
             nmsEntity = getEntityByIdMethod.invoke(worldServer, id);
-        } catch (IllegalAccessException | InvocationTargetException e) {
-            e.printStackTrace();
-        }
-        if (nmsEntity == null) {
-            return null;
-        }
-        try {
+            if (nmsEntity == null) {
+                return null;
+            }
             return (Entity) getBukkitEntity.invoke(nmsEntity);
         } catch (IllegalAccessException | InvocationTargetException e) {
             e.printStackTrace();

@@ -41,5 +41,5 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 @Deprecated
 public @interface PacketHandler {
-    byte priority() default 2;
+    byte priority() default 2; //NORMAL priority value
 }
