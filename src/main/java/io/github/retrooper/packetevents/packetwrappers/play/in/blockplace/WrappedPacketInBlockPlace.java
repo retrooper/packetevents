@@ -27,6 +27,7 @@ package io.github.retrooper.packetevents.packetwrappers.play.in.blockplace;
 import io.github.retrooper.packetevents.exceptions.WrapperFieldNotFoundException;
 import io.github.retrooper.packetevents.packetwrappers.NMSPacket;
 import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
+import io.github.retrooper.packetevents.utils.nms.NMSUtils;
 import io.github.retrooper.packetevents.utils.player.Direction;
 import io.github.retrooper.packetevents.utils.player.Hand;
 import io.github.retrooper.packetevents.utils.server.ServerVersion;
@@ -46,10 +47,10 @@ public final class WrappedPacketInBlockPlace extends WrappedPacket {
         isHigherThan_v_1_7_10 = version.isNewerThan(ServerVersion.v_1_7_10);
         isOlderThan_v_1_9 = version.isOlderThan(ServerVersion.v_1_9);
         try {
-            Enum<?> handEnum = read(1, Enum.class);
+            Object handEnum = readObject(1, NMSUtils.enumHandClass);
             handEnumIndex = 1;
         }
-        catch (WrapperFieldNotFoundException ex) {
+        catch (Exception ex) {
             handEnumIndex = 0;//Most likely a newer version
         }
     }
@@ -59,8 +60,8 @@ public final class WrappedPacketInBlockPlace extends WrappedPacket {
             return Hand.MAIN_HAND;
         }
         else {
-            String enumStr = read(handEnumIndex, Enum.class).name();
-            return Hand.valueOf(enumStr);
+            Object enumHandObj = read(handEnumIndex, NMSUtils.enumHandClass);
+            return Hand.valueOf(enumHandObj.toString());
         }
     }
 

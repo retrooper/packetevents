@@ -63,7 +63,7 @@ import java.util.UUID;
 public final class PacketEvents implements Listener, EventManager {
     //TODO finish unfinished wrappers
     private static PacketEvents instance;
-    private final PEVersion version = new PEVersion(1, 7, 9, 4);
+    private final PEVersion version = new PEVersion(1, 7, 9, 5);
     private final EventManager eventManager = new PEEventManager();
     private final PlayerUtils playerUtils = new PlayerUtils();
     private final ServerUtils serverUtils = new ServerUtils();
@@ -116,6 +116,9 @@ public final class PacketEvents implements Listener, EventManager {
                 throw new PacketEventsLoadFailureException(ex);
             }
 
+            injector = new GlobalChannelInjector();
+            injector.inject();
+
             loaded = true;
             loading = false;
         }
@@ -144,8 +147,6 @@ public final class PacketEvents implements Listener, EventManager {
 
             packetProcessorInternal = new PacketProcessorInternal();
 
-            injector = new GlobalChannelInjector();
-            injector.inject();
             for (final Player p : Bukkit.getOnlinePlayers()) {
                 getPlayerUtils().injectPlayer(p);
             }

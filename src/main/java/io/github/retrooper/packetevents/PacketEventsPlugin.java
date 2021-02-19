@@ -24,45 +24,22 @@
 
 package io.github.retrooper.packetevents;
 
-import io.github.retrooper.packetevents.event.PacketListenerDynamic;
-import io.github.retrooper.packetevents.event.impl.PacketPlayReceiveEvent;
-import io.github.retrooper.packetevents.event.impl.PlayerInjectEvent;
-import io.github.retrooper.packetevents.event.impl.PostPlayerInjectEvent;
-import io.github.retrooper.packetevents.packettype.PacketType;
 import org.bukkit.plugin.java.JavaPlugin;
 
 public class PacketEventsPlugin extends JavaPlugin {
-    @Override
-    public void onLoad() {
+    public PacketEventsPlugin() {
 
     }
 
     @Override
+    public void onLoad() {
+        PacketEvents.create(this);
+        PacketEvents.get().load();
+    }
+
+    @Override
     public void onEnable() {
-        if (PacketEvents.get() == null) {
-            PacketEvents.create(this);
-            PacketEvents.get().load();
-            PacketEvents.get().init(this);
-            PacketEvents.get().registerListener(new PacketListenerDynamic() {
-                @Override
-                public void onPacketPlayReceive(PacketPlayReceiveEvent event) {
-                    if (event.getPacketId() == PacketType.Play.Client.CHAT) {
-                        event.getPlayer().sendMessage(PacketEvents.get().getPlayerUtils().getClientVersion(event.getPlayer()).toString());
-                    }
-                }
-
-                @Override
-                public void onPlayerInject(PlayerInjectEvent event) {
-                   // event.setCancelled(true);
-                   // System.out.println("CANCELLED WE DONT WANNA LISTEN TO UR BS MF");
-                }
-
-                @Override
-                public void onPostPlayerInject(PostPlayerInjectEvent event) {
-                    event.getPlayer().sendMessage(PacketEvents.get().getPlayerUtils().getClientVersion(event.getPlayer()) + ", im curious...");
-                }
-            });
-        }
+        PacketEvents.get().init(this);
     }
 
     @Override

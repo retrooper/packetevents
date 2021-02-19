@@ -55,7 +55,7 @@ public final class NMSUtils {
     public static Class<?> nmsEntityClass, minecraftServerClass, craftWorldClass, playerInteractManagerClass, entityPlayerClass, playerConnectionClass, craftServerClass,
             craftPlayerClass, serverConnectionClass, craftEntityClass, nmsItemStackClass, networkManagerClass, nettyChannelClass, gameProfileClass, iChatBaseComponentClass,
             blockPosClass, enumDirectionClass, vec3DClass, channelFutureClass, blockClass, iBlockDataClass, watchableObjectClass, nmsWorldClass, craftItemStackClass,
-            soundEffectClass, minecraftKeyClass;
+            soundEffectClass, minecraftKeyClass, enumHandClass;
     public static Method getBlockPosX, getBlockPosY, getBlockPosZ;
     private static Method getCraftPlayerHandle;
     private static Method getCraftEntityHandle;
@@ -176,6 +176,7 @@ public final class NMSUtils {
         getBlockPosX = Reflection.getMethod(NMSUtils.blockPosClass.getSuperclass(), "getX", 0);
         getBlockPosY = Reflection.getMethod(NMSUtils.blockPosClass.getSuperclass(), "getY", 0);
         getBlockPosZ = Reflection.getMethod(NMSUtils.blockPosClass.getSuperclass(), "getZ", 0);
+        enumHandClass = getNMSClassWithoutException("EnumHand");
     }
 
     public static Object getMinecraftServerInstance() {
@@ -308,6 +309,25 @@ public final class NMSUtils {
         return -1;
     }
 
+    public static List<Object> getNetworkManagers() {
+        WrappedPacket serverConnectionWrapper = new WrappedPacket(new NMSPacket(getMinecraftServerConnection()));
+        boolean searching = true;
+        for (int i = 0; searching; i++) {
+            try {
+                List<Object> list = (List<Object>) serverConnectionWrapper.readObject(0, List.class);
+                for (Object obj : list) {
+                    if (obj.getClass().isAssignableFrom(networkManagerClass)) {
+                        return list;
+                    }
+                }
+            }
+            catch (Exception ex) {
+                break;
+            }
+        }
+        throw new IllegalStateException("Could not find network managers!");
+    }
+
     public static List<Object> getNetworkMarkers() {
         if (useGetServerMarkers) {
             try {
@@ -330,7 +350,7 @@ public final class NMSUtils {
                 break;
             }
         }
-        throw new IllegalStateException("Failed to locate the network managers!");
+        throw new IllegalStateException("Failed to locate the network markers!");
     }
 
     public static ItemStack toBukkitItemStack(final Object nmsItemStack) {
