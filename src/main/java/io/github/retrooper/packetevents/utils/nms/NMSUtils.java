@@ -173,9 +173,12 @@ public final class NMSUtils {
         } catch (NoSuchFieldException e) {
             e.printStackTrace();
         }
-        getBlockPosX = Reflection.getMethod(NMSUtils.blockPosClass.getSuperclass(), "getX", 0);
-        getBlockPosY = Reflection.getMethod(NMSUtils.blockPosClass.getSuperclass(), "getY", 0);
-        getBlockPosZ = Reflection.getMethod(NMSUtils.blockPosClass.getSuperclass(), "getZ", 0);
+        //Incase its null, these methods are not needed and would cause errors
+        if (blockPosClass != null) {
+            getBlockPosX = Reflection.getMethod(NMSUtils.blockPosClass.getSuperclass(), "getX", 0);
+            getBlockPosY = Reflection.getMethod(NMSUtils.blockPosClass.getSuperclass(), "getY", 0);
+            getBlockPosZ = Reflection.getMethod(NMSUtils.blockPosClass.getSuperclass(), "getZ", 0);
+        }
         enumHandClass = getNMSClassWithoutException("EnumHand");
     }
 
