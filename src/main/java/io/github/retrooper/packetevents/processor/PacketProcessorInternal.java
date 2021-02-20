@@ -77,7 +77,7 @@ public class PacketProcessorInternal {
      * @return NMS Packet, null if the event was cancelled.
      */
     public Object read(Player player, Object channel, Object packet) {
-        switch (getPacketState(packet)) {
+        switch (getPacketState(player, packet)) {
             case STATUS:
                 PacketStatusReceiveEvent statusEvent = new PacketStatusReceiveEvent(channel, new NMSPacket(packet));
                 PacketEvents.get().getEventManager().callEvent(statusEvent);
@@ -95,11 +95,6 @@ public class PacketProcessorInternal {
                     WrappedPacketLoginInStart startWrapper = new WrappedPacketLoginInStart(loginEvent.getNMSPacket());
                     WrappedGameProfile gameProfile = startWrapper.getGameProfile();
                     channelMap.put(gameProfile.name, channel);
-                   /* if (PacketEvents.get().injector instanceof EarlyInjector) {
-                        ((EarlyInjector) PacketEvents.get().injector).updatePlayerObject(Bukkit.getPlayer(gameProfile.id), channel);
-                        System.out.println("injected");
-                    }*/
-                    System.out.println("NETTY CHANNEL CACHED!");
                 }
                 PacketEvents.get().getEventManager().callEvent(loginEvent);
                 packet = loginEvent.getNMSPacket().getRawNMSPacket();
@@ -131,7 +126,7 @@ public class PacketProcessorInternal {
      * @return NMS Packet, null if the event was cancelled.
      */
     public Object write(Player player, Object channel, Object packet) {
-        switch (getPacketState(packet)) {
+        switch (getPacketState(player, packet)) {
             case STATUS:
                 PacketStatusSendEvent statusEvent = new PacketStatusSendEvent(channel, new NMSPacket(packet));
                 PacketEvents.get().getEventManager().callEvent(statusEvent);
@@ -172,7 +167,7 @@ public class PacketProcessorInternal {
      * @param packet  NMS Packet.
      */
     public void postRead(Player player, Object channel, Object packet) {
-        if (getPacketState(packet) == PacketType.State.PLAY) {
+        if (getPacketState(player, packet) == PacketType.State.PLAY) {
             //Since player != null check is done, status and login packets won't come passed this point.
             PostPacketPlayReceiveEvent event = new PostPacketPlayReceiveEvent(player, channel, new NMSPacket(packet));
             PacketEvents.get().getEventManager().callEvent(event);
@@ -191,7 +186,7 @@ public class PacketProcessorInternal {
      * @param packet  NMS Packet.
      */
     public void postWrite(Player player, Object channel, Object packet) {
-        if (getPacketState(packet) == PacketType.State.PLAY) {
+        if (getPacketState(player, packet) == PacketType.State.PLAY) {
             //Since player != null check is done, status and login packets won't come passed this point.
             PostPacketPlaySendEvent event = new PostPacketPlaySendEvent(player, channel, new NMSPacket(packet));
             PacketEvents.get().getEventManager().callEvent(event);
@@ -290,14 +285,19 @@ public class PacketProcessorInternal {
         }
     }
 
-    private PacketType.State getPacketState(Object packet) {
-        String packetName = ClassUtil.getClassSimpleName(packet.getClass());
-        if (packetName.startsWith("PacketS")) {
-            return PacketType.State.STATUS;
-        } else if (packetName.startsWith("PacketP")) {
+    private PacketType.State getPacketState(Player player, Object packet) {
+        if (player != null) {
             return PacketType.State.PLAY;
-        } else {
-            return PacketType.State.LOGIN;
+        }
+        else {
+            String packetName = ClassUtil.getClassSimpleName(packet.getClass());
+            if (packetName.startsWith("PacketS")) {
+                return PacketType.State.STATUS;
+            } else if (packetName.startsWith("PacketP")) {
+                return PacketType.State.PLAY;
+            } else {
+                return PacketType.State.LOGIN;
+            }
         }
     }
 }

@@ -28,23 +28,25 @@ import io.github.retrooper.packetevents.PacketEvents;
 import io.github.retrooper.packetevents.injector.earlyinjector.EarlyInjector;
 import io.github.retrooper.packetevents.packetwrappers.NMSPacket;
 import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
+import io.github.retrooper.packetevents.utils.list.ListWrapper;
 import io.github.retrooper.packetevents.utils.nms.NMSUtils;
-import io.github.retrooper.packetevents.utils.reflection.Reflection;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelInitializer;
 import org.bukkit.entity.Player;
+import org.jetbrains.annotations.NotNull;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
-import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 
 /**
  * Early channel injector for all server versions higher than 1.7.10.
- *
- * @author retrooper, Thomazz
+ * Thank you ViaVersion.
+ * https://github.com/ViaVersion/ViaVersion/tree/master/bukkit/src/main/java/us/myles/ViaVersion/bukkit/platform/BukkitViaInjector.java
+ * @author retrooper, Thomazz, ViaVersion
  * @since 1.8
  */
 public class EarlyChannelInjector implements EarlyInjector {
@@ -57,38 +59,26 @@ public class EarlyChannelInjector implements EarlyInjector {
             try {
                 //Get the list.
                 List<Object> serverChannelList = (List<Object>) serverConnectionWrapper.readObject(i, List.class);
-                synchronized (serverChannelList) {
+                List listWrapper = new ListWrapper(serverChannelList) {
+                    @Override
+                    public void processAdd(Object o) {
+                        if (o instanceof ChannelFuture) {
+                            try {
+                                injectChannelFuture((ChannelFuture) o);
+                            }
+                            catch (Exception ex) {
+                                ex.printStackTrace();
+                            }
+                        }
+                    }
+                };
+
+                synchronized (listWrapper) {
                     for (Object serverChannel : serverChannelList) {
-                        //Is this the server channel list?
+                        //Is this the server channel future list?
                         if (serverChannel instanceof ChannelFuture) {
                             //Yes it is...
-                            Channel channel = ((ChannelFuture) serverChannel).channel();
-                            List<String> channelHandlerNames = channel.pipeline().names();
-                            ChannelHandler bootstrapAcceptor = null;
-                            Field bootstrapAcceptorField = null;
-                            for (String handlerName : channelHandlerNames) {
-                                ChannelHandler handler = channel.pipeline().get(handlerName);
-                                try {
-                                    Field field = handler.getClass().getDeclaredField("childHandler");
-                                    bootstrapAcceptor = handler;
-                                    bootstrapAcceptorField = field;
-                                    bootstrapAcceptorField.setAccessible(true);
-                                } catch (Exception ex) {
-
-                                }
-                            }
-
-
-                            ChannelInitializer<?> oldChannelInitializer = (ChannelInitializer<?>) bootstrapAcceptorField.get(bootstrapAcceptor);
-                            ChannelInitializer<?> channelInitializer = new PEChannelInitializer(oldChannelInitializer);
-
-                            //Remove final modifier
-                            Field modifiersField = Field.class.getDeclaredField("modifiers");
-                            modifiersField.setAccessible(true);
-                            modifiersField.setInt(bootstrapAcceptorField, bootstrapAcceptorField.getModifiers() & ~Modifier.FINAL);
-
-                            //Replace the old channel initializer with our own.
-                            bootstrapAcceptorField.set(bootstrapAcceptor, channelInitializer);
+                            injectChannelFuture((ChannelFuture) serverChannel);
                             searching = false;
                             System.out.println("Finished successful injection...");
                         }
@@ -98,6 +88,53 @@ public class EarlyChannelInjector implements EarlyInjector {
                 ex.printStackTrace();
                 break;
             }
+        }
+    }
+
+    private void injectChannelFuture(ChannelFuture channelFuture) {
+        List<String> channelHandlerNames = channelFuture.channel().pipeline().names();
+        ChannelHandler bootstrapAcceptor = null;
+        Field bootstrapAcceptorField = null;
+        for (String handlerName : channelHandlerNames) {
+            ChannelHandler handler = channelFuture.channel().pipeline().get(handlerName);
+            try {
+                Field field = handler.getClass().getDeclaredField("childHandler");
+                bootstrapAcceptor = handler;
+                bootstrapAcceptorField = field;
+                bootstrapAcceptorField.setAccessible(true);
+            } catch (Exception ex) {
+
+            }
+        }
+
+
+        ChannelInitializer<?> oldChannelInitializer = null;
+        try {
+            oldChannelInitializer = (ChannelInitializer<?>) bootstrapAcceptorField.get(bootstrapAcceptor);
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        }
+        ChannelInitializer<?> channelInitializer = new PEChannelInitializer(oldChannelInitializer);
+
+        //Remove final modifier
+        Field modifiersField = null;
+        try {
+            modifiersField = Field.class.getDeclaredField("modifiers");
+        } catch (NoSuchFieldException e) {
+            e.printStackTrace();
+        }
+        modifiersField.setAccessible(true);
+        try {
+            modifiersField.setInt(bootstrapAcceptorField, bootstrapAcceptorField.getModifiers() & ~Modifier.FINAL);
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        }
+
+        //Replace the old channel initializer with our own.
+        try {
+            bootstrapAcceptorField.set(bootstrapAcceptor, channelInitializer);
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
         }
     }
 
