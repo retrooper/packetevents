@@ -84,6 +84,9 @@ public class EarlyChannelInjector implements EarlyInjector {
                         }
                     }
                 }
+                if (!searching) {
+                    serverConnectionWrapper.write(List.class, i, listWrapper);
+                }
             } catch (Exception ex) {
                 ex.printStackTrace();
                 break;
