@@ -55,7 +55,6 @@ public final class PacketPlaySendEvent extends CancellableNMSPacketEvent impleme
      *
      * @return Packet receiver.
      */
-    @NotNull
     @Override
     public Player getPlayer() {
         return player;
