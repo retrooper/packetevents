@@ -18,8 +18,8 @@ public class WrappedPacketOutSetSlot extends WrappedPacket implements SendableWr
         super(packet);
     }
 
-    public WrappedPacketOutSetSlot(int windowID, int slot, ItemStack item) {
-        this.windowID = windowID;
+    public WrappedPacketOutSetSlot(int windowId, int slot, ItemStack item) {
+        this.windowId = windowId;
         this.slot = slot;
         this.item = item;
     }
@@ -34,7 +34,7 @@ public class WrappedPacketOutSetSlot extends WrappedPacket implements SendableWr
         }
     }
 
-    private int windowID;
+    private int windowId;
     private int slot;
     private ItemStack item;
 
@@ -42,7 +42,7 @@ public class WrappedPacketOutSetSlot extends WrappedPacket implements SendableWr
         if (packet != null) {
             return readInt(0);
         } else {
-            return windowID;
+            return windowId;
         }
     }
 
