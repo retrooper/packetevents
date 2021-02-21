@@ -27,6 +27,7 @@ package io.github.retrooper.packetevents.utils.reflection;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.util.Arrays;
 
 public final class Reflection {
@@ -176,5 +177,21 @@ public final class Reflection {
             return getMethod(cls.getSuperclass(), name, returning);
         }
         return null;
+    }
+
+    public static void getFieldWithoutFinalModifier(Field field) {
+        //Remove final modifier
+        Field modifiersField = null;
+        try {
+            modifiersField = Field.class.getDeclaredField("modifiers");
+        } catch (NoSuchFieldException e) {
+            e.printStackTrace();
+        }
+        modifiersField.setAccessible(true);
+        try {
+            modifiersField.setInt(field, field.getModifiers() & ~Modifier.FINAL);
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        }
     }
 }

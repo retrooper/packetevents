@@ -27,26 +27,20 @@ package io.github.retrooper.packetevents;
 import io.github.retrooper.packetevents.event.PacketListenerDynamic;
 import io.github.retrooper.packetevents.event.impl.PacketLoginReceiveEvent;
 import io.github.retrooper.packetevents.event.impl.PacketPlayReceiveEvent;
-import io.github.retrooper.packetevents.event.impl.PacketPlaySendEvent;
 import io.github.retrooper.packetevents.packettype.PacketType;
 import io.github.retrooper.packetevents.packetwrappers.login.in.handshake.WrappedPacketLoginInHandshake;
-import io.github.retrooper.packetevents.packetwrappers.play.in.updatesign.WrappedPacketInUpdateSign;
 import io.github.retrooper.packetevents.packetwrappers.play.in.useentity.WrappedPacketInUseEntity;
-import io.github.retrooper.packetevents.packetwrappers.play.out.entitymetadata.WrappedPacketOutEntityMetadata;
-import io.github.retrooper.packetevents.packetwrappers.play.out.entitymetadata.WrappedWatchableObject;
 import org.bukkit.plugin.java.JavaPlugin;
-
-import java.util.List;
 
 public class PacketEventsPlugin extends JavaPlugin {
     public PacketEventsPlugin() {
-
+        PacketEvents.create(this);
+        PacketEvents.get().load();
     }
 
     @Override
     public void onLoad() {
-        PacketEvents.create(this);
-        PacketEvents.get().load();
+
     }
 
     @Override
