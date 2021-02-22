@@ -250,6 +250,46 @@ public class WrappedPacket implements WrapperPacketReader, WrapperPacketWriter {
         write(value.getClass(), index, value);
     }
 
+    @Override
+    public void writeBooleanArray(int index, boolean[] array) {
+        write(boolean[].class, index, array);
+    }
+
+    @Override
+    public void writeByteArray(int index, byte[] value) {
+        write(byte[].class, index, value);
+    }
+
+    @Override
+    public void writeShortArray(int index, short[] value) {
+        write(short[].class, index, value);
+    }
+
+    @Override
+    public void writeIntArray(int index, int[] value) {
+        write(int[].class, index, value);
+    }
+
+    @Override
+    public void writeLongArray(int index, long[] value) {
+        write(long[].class, index, value);
+    }
+
+    @Override
+    public void writeFloatArray(int index, float[] value) {
+        write(float[].class, index, value);
+    }
+
+    @Override
+    public void writeDoubleArray(int index, double[] value) {
+        write(double[].class, index, value);
+    }
+
+    @Override
+    public void writeStringArray(int index, String[] value) {
+        write(String[].class, index, value);
+    }
+
     public void write(Class<?> type, int index, Object value) throws WrapperFieldNotFoundException {
         Field field = getField(type, index);
         if (field == null) {

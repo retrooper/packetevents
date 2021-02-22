@@ -43,5 +43,22 @@ public interface WrapperPacketWriter {
 
     void writeString(int index, String value);
 
+    //ARRAYS
+    void writeBooleanArray(int index, boolean[] array);
+
+    void writeByteArray(int index, byte[] value);
+
+    void writeShortArray(int index, short[] value);
+
+    void writeIntArray(int index, int[] value);
+
+    void writeLongArray(int index, long[] value);
+
+    void writeFloatArray(int index, float[] value);
+
+    void writeDoubleArray(int index, double[] value);
+
+    void writeStringArray(int index, String[] value);
+
     void writeObject(int index, Object object);
 }

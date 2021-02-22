@@ -41,6 +41,14 @@ public class WrappedPacketLoginInEncryptionBegin extends WrappedPacket {
         return readByteArray(1);
     }
 
+    public void setPublicKey(byte[] key) {
+        writeByteArray(0, key);
+    }
+
+    public void setVerifyToken(byte[] token) {
+        writeByteArray(1, token);
+    }
+
     @Override
     public boolean isSupported() {
         return PacketTypeClasses.Login.Client.ENCRYPTION_BEGIN != null;

@@ -58,6 +58,18 @@ public class WrappedPacketLoginInCustomPayload extends WrappedPacket {
         return PacketEvents.get().getByteBufUtil().getBytes(byteBuf);
     }
 
+    public void setMessageId(int id) {
+        writeInt(0, id);
+    }
+
+    //TODO bytebufututil setBytes method, make this method public once that is done
+    void setData(byte[] data) {
+        Object dataSerializer = readObject(0, packetDataSerializerClass);
+        WrappedPacket byteBufWrapper = new WrappedPacket(new NMSPacket(dataSerializer));
+        Object byteBuf = byteBufWrapper.readObject(0, byteBufClass);
+
+    }
+
     @Override
     public boolean isSupported() {
         return version.isNewerThan(ServerVersion.v_1_12_2);

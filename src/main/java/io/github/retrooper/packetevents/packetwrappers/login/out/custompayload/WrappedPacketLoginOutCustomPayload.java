@@ -99,6 +99,33 @@ public class WrappedPacketLoginOutCustomPayload extends WrappedPacket implements
         return data;
     }
 
+    public void setMessageId(int messageID) {
+        if (packet != null) {
+            writeInt(0, messageID);
+        }
+        else {
+            this.messageID = messageID;
+        }
+    }
+
+    public void setChannelName(String channelName) {
+        if (packet != null) {
+            Object minecraftKey = NMSUtils.generateMinecraftKey(channelName);
+            writeObject(0, minecraftKey);
+        }
+        else {
+            this.channelName = channelName;
+        }
+    }
+
+    //TODO bytebufututil setBytes method, make this method public once that is done
+    void setData(byte[] data) {
+        Object dataSerializer = readObject(0, packetDataSerializerClass);
+        WrappedPacket byteBufWrapper = new WrappedPacket(new NMSPacket(dataSerializer));
+        Object byteBuf = byteBufWrapper.readObject(0, byteBufClass);
+
+    }
+
     @Override
     public Object asNMSPacket() {
         Object byteBufObject = PacketEvents.get().getByteBufUtil().wrappedBuffer(data);

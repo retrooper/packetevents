@@ -62,7 +62,7 @@ import java.net.InetSocketAddress;
 import java.util.UUID;
 
 public final class PacketEvents implements Listener, EventManager {
-    //TODO finish unfinished wrappers
+    //TODO finish unfinished wrappers, document every single wrapper, add setters to every single wrapper
     private static PacketEvents instance;
     private final PEVersion version = new PEVersion(1, 7, 9, 5);
     private final EventManager eventManager = new PEEventManager();

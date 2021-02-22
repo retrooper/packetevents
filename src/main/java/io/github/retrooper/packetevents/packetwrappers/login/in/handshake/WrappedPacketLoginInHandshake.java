@@ -37,12 +37,24 @@ public class WrappedPacketLoginInHandshake extends WrappedPacket {
         return readInt(0);
     }
 
+    public int getPort() {
+        return readInt(1);
+    }
+
     public String getHostName() {
         return readString(0);
     }
 
-    public int getPort() {
-        return readInt(1);
+    public void setProtocolVersion(int protocolVersion) {
+        writeInt(0, protocolVersion);
+    }
+
+    public void setPort(int port) {
+        writeInt(1, port);
+    }
+
+    public void setHostName(String hostName) {
+        writeString(0, hostName);
     }
 
     @Override
