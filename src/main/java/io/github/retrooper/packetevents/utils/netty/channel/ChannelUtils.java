@@ -29,7 +29,7 @@ import io.github.retrooper.packetevents.utils.server.ServerVersion;
 
 import java.net.InetSocketAddress;
 
-public class ChannelUtils {
+public final class ChannelUtils {
     public static InetSocketAddress getSocketAddress(Object ch) {
         if (ch == null) {
             return null;

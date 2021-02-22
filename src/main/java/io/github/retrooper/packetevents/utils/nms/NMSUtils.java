@@ -314,8 +314,7 @@ public final class NMSUtils {
 
     public static List<Object> getNetworkManagers() {
         WrappedPacket serverConnectionWrapper = new WrappedPacket(new NMSPacket(getMinecraftServerConnection()));
-        boolean searching = true;
-        for (int i = 0; searching; i++) {
+        while(true) {
             try {
                 List<Object> list = (List<Object>) serverConnectionWrapper.readObject(0, List.class);
                 for (Object obj : list) {

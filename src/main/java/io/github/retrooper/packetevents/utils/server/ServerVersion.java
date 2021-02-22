@@ -49,7 +49,8 @@ public enum ServerVersion {
 
     private static final String NMS_VERSION_SUFFIX = Bukkit.getServer().getClass().getPackage().getName()
             .replace(".", ",").split(",")[3];
-    public static ServerVersion[] reversedValues = new ServerVersion[values().length];
+    private static final ServerVersion[] VALUES = values();
+    public static ServerVersion[] reversedValues = new ServerVersion[VALUES.length];
     private static ServerVersion cachedVersion;
     private final short protocolVersion;
 
@@ -186,7 +187,7 @@ public enum ServerVersion {
          * We look at all enum constants in the ServerVersion enum in the order they have been defined in.
          * The first one we find in the array is the newer version.
          */
-        for (ServerVersion version : values()) {
+        for (ServerVersion version : VALUES) {
             if (version == this) {
                 return true;
             } else if (version == target) {

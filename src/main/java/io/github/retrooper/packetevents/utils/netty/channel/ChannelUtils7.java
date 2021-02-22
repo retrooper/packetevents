@@ -28,7 +28,7 @@ import net.minecraft.util.io.netty.channel.Channel;
 
 import java.net.InetSocketAddress;
 
-public class ChannelUtils7 {
+public final class ChannelUtils7 {
     public static InetSocketAddress getSocketAddress(Object ch) {
         Channel channel = (Channel) ch;
         return ((InetSocketAddress) channel.remoteAddress());

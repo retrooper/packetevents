@@ -24,6 +24,8 @@
 
 package io.github.retrooper.packetevents.utils.server;
 
+import java.util.Locale;
+
 /**
  * System Operating system.
  *
@@ -31,8 +33,10 @@ package io.github.retrooper.packetevents.utils.server;
  * @since 1.7
  */
 public enum SystemOS {
+    
     WINDOWS, MACOS, LINUX, OTHER;
 
+    private static final SystemOS[] VALUES = values();
     private static SystemOS value;
 
     /**
@@ -42,10 +46,10 @@ public enum SystemOS {
      * @return Operating System.
      */
     public static SystemOS getOSNoCache() {
-        final String os = System.getProperty("os.name");
-        for (final String osName : getOperatingSystemNames()) {
-            if (os.toLowerCase().contains(osName.toLowerCase())) {
-                return SystemOS.valueOf(osName);
+        final String os = System.getProperty("os.name").toLowerCase();
+        for (SystemOS sysos : VALUES) {
+            if (os.contains(sysos.name().toLowerCase())) {
+                return sysos;
             }
         }
         return OTHER;
@@ -76,18 +80,4 @@ public enum SystemOS {
         return getOS();
     }
 
-    /**
-     * Internally used method to get the names of all operating systems.
-     *
-     * @return Operating system names array.
-     */
-    private static String[] getOperatingSystemNames() {
-        final SystemOS[] values = values();
-        final int valuesLength = values.length - 1;
-        final String[] arr = new String[valuesLength];
-        for (int i = 0; i < valuesLength; i++) {
-            arr[i] = values[i].name();
-        }
-        return arr;
-    }
 }

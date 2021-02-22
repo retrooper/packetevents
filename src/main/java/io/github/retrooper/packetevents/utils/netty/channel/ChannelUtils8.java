@@ -28,7 +28,7 @@ import io.netty.channel.Channel;
 
 import java.net.InetSocketAddress;
 
-public class ChannelUtils8 {
+public final class ChannelUtils8 {
     public static InetSocketAddress getSocketAddress(Object ch) {
         Channel channel = (Channel) ch;
         return ((InetSocketAddress) channel.remoteAddress());
