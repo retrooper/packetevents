@@ -314,12 +314,12 @@ public final class NMSUtils {
 
     public static List<Object> getNetworkManagers() {
         WrappedPacket serverConnectionWrapper = new WrappedPacket(new NMSPacket(getMinecraftServerConnection()));
-        while(true) {
+        for (int i = 0; true; i++) {
             try {
-                List<Object> list = (List<Object>) serverConnectionWrapper.readObject(0, List.class);
+                List<?> list = (List<?>) serverConnectionWrapper.readObject(i,  List.class);
                 for (Object obj : list) {
                     if (obj.getClass().isAssignableFrom(networkManagerClass)) {
-                        return list;
+                        return (List<Object>) list;
                     }
                 }
             }
@@ -328,31 +328,6 @@ public final class NMSUtils {
             }
         }
         throw new IllegalStateException("Could not find network managers!");
-    }
-
-    public static List<Object> getNetworkMarkers() {
-        if (useGetServerMarkers) {
-            try {
-                return (List<Object>) getServerMarkers.invoke(null, getMinecraftServerConnection());
-            } catch (Exception ignored) {
-
-            }
-        }
-        WrappedPacket serverConnectionWrapper = new WrappedPacket(new NMSPacket(getMinecraftServerConnection()));
-        for (int i = 0; true; i++) {
-            try {
-                List<Object> list = (List<Object>) serverConnectionWrapper.readObject(i, List.class);
-                for (Object obj : list) {
-                    if (!obj.getClass().isAssignableFrom(channelFutureClass)) {
-                        return list;
-                    }
-                    break;
-                }
-            } catch (Exception e) {
-                break;
-            }
-        }
-        throw new IllegalStateException("Failed to locate the network markers!");
     }
 
     public static ItemStack toBukkitItemStack(final Object nmsItemStack) {
