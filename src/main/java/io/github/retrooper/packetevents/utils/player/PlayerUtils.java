@@ -105,16 +105,6 @@ public final class PlayerUtils {
     public void ejectPlayer(final Player player) {
         PacketEvents.get().packetManager.ejectPlayer(player);
     }
-    
-     /**
-     * Check if player is injected inside PacketEvents.
-     *
-     * @param player  Target player.
-     */
-
-    public boolean isPlayerInjected(final Player player) {
-        return PacketEvents.get().injector.hasInjected(player);
-    }
 
     /**
      * Send a {@link SendableWrapper} wrapper to a player.
