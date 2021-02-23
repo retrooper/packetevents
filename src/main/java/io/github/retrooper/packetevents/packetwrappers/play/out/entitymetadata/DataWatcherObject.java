@@ -1,11 +1,11 @@
 package io.github.retrooper.packetevents.packetwrappers.play.out.entitymetadata;
 
+import io.github.retrooper.packetevents.utils.nms.NMSUtils;
+
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.util.function.Supplier;
-
-import io.github.retrooper.packetevents.utils.nms.NMSUtils;
 
 /**
  * A data watcher object.

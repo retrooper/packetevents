@@ -25,7 +25,6 @@
 package io.github.retrooper.packetevents.packetwrappers.play.out.entitymetadata;
 
 import io.github.retrooper.packetevents.packetwrappers.NMSPacket;
-import io.github.retrooper.packetevents.packetwrappers.SendableWrapper;
 import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
 import org.bukkit.entity.Entity;
 

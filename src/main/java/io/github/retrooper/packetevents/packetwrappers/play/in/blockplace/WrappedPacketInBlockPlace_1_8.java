@@ -24,7 +24,8 @@
 
 package io.github.retrooper.packetevents.packetwrappers.play.in.blockplace;
 
-import io.github.retrooper.packetevents.packetwrappers.*;
+import io.github.retrooper.packetevents.packetwrappers.NMSPacket;
+import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
 import io.github.retrooper.packetevents.utils.nms.NMSUtils;
 import org.bukkit.inventory.ItemStack;
 

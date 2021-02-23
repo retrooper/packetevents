@@ -1,7 +1,5 @@
 package io.github.retrooper.packetevents.packetwrappers.play.out.entitymetadata;
 
-import io.github.retrooper.packetevents.packetwrappers.NMSPacket;
-import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
 import io.github.retrooper.packetevents.utils.nms.NMSUtils;
 
 /**

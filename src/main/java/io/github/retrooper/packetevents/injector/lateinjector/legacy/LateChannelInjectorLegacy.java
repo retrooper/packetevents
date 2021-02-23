@@ -32,9 +32,6 @@ import net.minecraft.util.io.netty.channel.ChannelHandlerContext;
 import net.minecraft.util.io.netty.channel.ChannelPromise;
 import org.bukkit.entity.Player;
 
-import java.util.List;
-import java.util.NoSuchElementException;
-
 public class LateChannelInjectorLegacy implements LateInjector {
     @Override
     public void inject() {

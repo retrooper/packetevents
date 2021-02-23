@@ -24,8 +24,6 @@
 
 package io.github.retrooper.packetevents.utils.server;
 
-import java.util.Locale;
-
 /**
  * System Operating system.
  *

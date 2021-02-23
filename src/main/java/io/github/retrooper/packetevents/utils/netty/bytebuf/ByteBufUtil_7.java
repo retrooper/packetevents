@@ -26,6 +26,7 @@ package io.github.retrooper.packetevents.utils.netty.bytebuf;
 
 import net.minecraft.util.io.netty.buffer.ByteBuf;
 import net.minecraft.util.io.netty.buffer.Unpooled;
+import net.minecraft.util.io.netty.util.internal.EmptyArrays;
 
 public final class ByteBufUtil_7 implements ByteBufUtil {
 
@@ -33,9 +34,11 @@ public final class ByteBufUtil_7 implements ByteBufUtil {
         return Unpooled.wrappedBuffer(bytes);
     }
 
-    // TODO: Check if we should apply the same release fix here like we did in the 8 version of this class!
     public byte[] getBytes(Object byteBuf) {
         ByteBuf bb = (ByteBuf) byteBuf;
+        if(bb.refCnt() < 1) {
+            return EmptyArrays.EMPTY_BYTES;
+        }
         byte[] bytes;
         if (bb.hasArray()) {
             bytes = bb.array();

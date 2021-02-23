@@ -24,12 +24,7 @@
 
 package io.github.retrooper.packetevents.settings;
 
-import io.github.retrooper.packetevents.PacketEvents;
 import io.github.retrooper.packetevents.utils.server.ServerVersion;
-import org.bukkit.Bukkit;
-import org.bukkit.entity.Player;
-
-import java.util.function.Consumer;
 
 /**
  * Packet Events' settings.

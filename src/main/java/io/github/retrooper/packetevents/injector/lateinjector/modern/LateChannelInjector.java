@@ -32,7 +32,6 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelPromise;
 import org.bukkit.entity.Player;
 
-import java.util.List;
 import java.util.NoSuchElementException;
 
 public class LateChannelInjector implements LateInjector {

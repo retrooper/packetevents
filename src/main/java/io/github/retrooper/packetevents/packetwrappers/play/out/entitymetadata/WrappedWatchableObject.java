@@ -1,19 +1,18 @@
 package io.github.retrooper.packetevents.packetwrappers.play.out.entitymetadata;
 
+import io.github.retrooper.packetevents.exceptions.WrapperFieldNotFoundException;
+import io.github.retrooper.packetevents.packetwrappers.NMSPacket;
+import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
+import io.github.retrooper.packetevents.utils.nms.NMSUtils;
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
+
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
-
-import io.github.retrooper.packetevents.packetwrappers.NMSPacket;
-import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
-import org.apache.commons.lang3.builder.EqualsBuilder;
-import org.apache.commons.lang3.builder.HashCodeBuilder;
-
-import io.github.retrooper.packetevents.exceptions.WrapperFieldNotFoundException;
-import io.github.retrooper.packetevents.utils.nms.NMSUtils;
 
 /**
  * A WatchableObject.

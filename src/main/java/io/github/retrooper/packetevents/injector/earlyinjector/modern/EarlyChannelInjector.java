@@ -38,7 +38,6 @@ import io.netty.channel.socket.SocketChannel;
 import org.bukkit.entity.Player;
 
 import java.lang.reflect.Field;
-import java.lang.reflect.Modifier;
 import java.util.*;
 
 /**
