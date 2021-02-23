@@ -235,7 +235,6 @@ public class EarlyChannelInjector implements EarlyInjector {
         if (channel != null) {
             updatePlayerObject(player, channel);
         } else {
-            System.out.println("Channel is null, kicking player out...");
             Bukkit.getScheduler().runTaskLater(PacketEvents.get().getPlugin(), () -> {
                 player.kickPlayer("We were unable to inject you, please reconnect.");
             }, 20L);
