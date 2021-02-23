@@ -25,10 +25,14 @@
 package io.github.retrooper.packetevents.utils.reflection;
 
 
+import org.jetbrains.annotations.Nullable;
+
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 public final class Reflection {
     //FIELDS
@@ -79,10 +83,21 @@ public final class Reflection {
     }
 
     //METHODS
+    public static List<Method> getMethods(Class<?> cls, String name, Class<?>... params) {
+        List<Method> methods = new ArrayList<>();
+        for (Method m : cls.getDeclaredMethods()) {
+            if ((params == null || Arrays.equals(m.getParameterTypes(), params)) && name.equals(m.getName())) {
+                m.setAccessible(true);
+                methods.add(m);
+            }
+        }
+        return methods;
+    }
+
     public static Method getMethod(final Class<?> cls, final int index, final Class<?>... params) {
         int currentIndex = 0;
         for (final Method m : cls.getDeclaredMethods()) {
-            if (Arrays.equals(m.getParameterTypes(), params) && index == currentIndex++) {
+            if ((params == null || Arrays.equals(m.getParameterTypes(), params)) && index == currentIndex++) {
                 m.setAccessible(true);
                 return m;
             }

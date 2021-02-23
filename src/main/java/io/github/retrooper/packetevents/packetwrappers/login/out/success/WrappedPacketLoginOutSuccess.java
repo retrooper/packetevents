@@ -40,6 +40,11 @@ public class WrappedPacketLoginOutSuccess extends WrappedPacket {
         return GameProfileUtil.getWrappedGameProfile(readObject(0, NMSUtils.gameProfileClass));
     }
 
+    //TODO convert wrappedgameprofile to mojang game profile!
+    void setGameProfile(WrappedGameProfile gameProfile) {
+
+    }
+
     @Override
     public boolean isSupported() {
         return PacketTypeClasses.Login.Server.SUCCESS != null;

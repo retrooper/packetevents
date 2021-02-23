@@ -29,6 +29,7 @@ import io.github.retrooper.packetevents.exceptions.WrapperFieldNotFoundException
 import io.github.retrooper.packetevents.exceptions.WrapperUnsupportedUsageException;
 import io.github.retrooper.packetevents.packettype.PacketTypeClasses;
 import io.github.retrooper.packetevents.utils.reflection.ClassUtil;
+import io.github.retrooper.packetevents.utils.reflection.Reflection;
 import io.github.retrooper.packetevents.utils.server.ServerVersion;
 
 import java.lang.annotation.ElementType;
@@ -36,10 +37,8 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 import java.lang.reflect.Field;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.lang.reflect.Method;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
 
@@ -81,8 +80,7 @@ public class WrappedPacket implements WrapperPacketReader, WrapperPacketWriter {
         if (!LOADED_WRAPPERS.containsKey(clazz)) {
             try {
                 load();
-            }
-            catch (Exception ex) {
+            } catch (Exception ex) {
                 String wrapperName = ClassUtil.getClassSimpleName(getClass());
                 PacketEvents.get().getPlugin().getLogger()
                         .log(Level.SEVERE, "PacketEvents found an exception while loading the " + wrapperName + " packet wrapper. Please report this bug! Tell us about your server version, spigot and code(of you using the wrapper)", ex);
@@ -93,6 +91,61 @@ public class WrappedPacket implements WrapperPacketReader, WrapperPacketWriter {
 
     protected void load() {
 
+    }
+
+    //TODO Annotate all field wrapper methods with SupportedVersions annotation that call this method.
+    //TODO finish this method
+    protected void throwUnsupportedOperation() throws UnsupportedOperationException {
+        final String currentMethodName = "throwUnsupportedOperation";
+        StackTraceElement[] stackTraceElements = Thread.currentThread().getStackTrace();
+        int stackTraceElementIndex = 2;
+        for (int i = 0; i < stackTraceElements.length; i++) {
+            StackTraceElement element = stackTraceElements[i];
+            if (element.getMethodName().equals(currentMethodName)) {
+                stackTraceElementIndex = i + 1; //It is the next method
+                break;
+            }
+        }
+        StackTraceElement stackTraceElement = stackTraceElements[stackTraceElementIndex];
+        String methodName = stackTraceElement.getMethodName();
+        List<Method> possibleMethods = Reflection.getMethods(getClass(), methodName, null);
+        Method method = null;
+        for (Method m : possibleMethods) {
+            if (m.isAnnotationPresent(SupportedVersions.class)) {
+                method = m;
+                break;
+            }
+        }
+        if (method == null) {
+            throw new UnsupportedOperationException("PacketEvents failed to access your requested field. This field is not supported on your server version. Failed to lookup the server versions this field supports...");
+        } else {
+            SupportedVersions supportedVersions = method.getAnnotation(SupportedVersions.class);
+            List<ServerVersion> versionList = new ArrayList<>();
+            List<ServerVersion[]> rangeList = new ArrayList<>();
+
+            ServerVersion[] temp = new ServerVersion[2];
+            for (int i = 0; i < supportedVersions.ranges().length; i++) {
+                if ((i + 1) % 2 == 0) {
+                    temp[1] = supportedVersions.ranges()[i];
+                    rangeList.add(temp);
+                } else {
+                    temp[0] = supportedVersions.ranges()[i];
+                }
+            }
+
+            //TODO convert an array with elements, into a list of arrays, each array in the list must have 2 elements. THis code i attempted doesn't work properly. (NOTE: When you use 4 elements for example)
+            for (ServerVersion[] range : rangeList) {
+                int firstOrdinal = range[0].ordinal();
+                int lastOrdinal = range[range.length - 1].ordinal();
+                for (int ordinal = firstOrdinal; ordinal < lastOrdinal + 1; ordinal++) {
+                    ServerVersion value = ServerVersion.values()[ordinal];
+                    versionList.add(value);
+                    System.out.println("value: " + value);
+                }
+            }
+            String supportedVersionsMsg = Arrays.toString(versionList.toArray(new ServerVersion[0]));
+            throw new UnsupportedOperationException("PacketEvents failed to access your requested field. This field is not supported on your server version. (" + PacketEvents.get().getServerUtils().getVersion() + ")\n This field is only supported on these server versions: " + supportedVersionsMsg);
+        }
     }
 
 
@@ -327,6 +380,7 @@ public class WrappedPacket implements WrapperPacketReader, WrapperPacketWriter {
      * Does the local server version support reading at-least one field with this packet wrapper?
      * If it does, we can label this wrapper to be supported on the local server version.
      * One example where it would not be supported would be if the packet the wrapper is wrapping doesn't even exist on the local server version.
+     *
      * @return Is the wrapper supported on the local server version?
      */
     public boolean isSupported() {
@@ -337,12 +391,13 @@ public class WrappedPacket implements WrapperPacketReader, WrapperPacketWriter {
      * If a method in a wrapper is annotated with this, it means it isn't supported on all server versions.
      * It not being supported by all server versions can lead to exceptions. Make sure you always decompile a wrapper getter before using it.
      * This annotation will specify what versions are supported.
+     *
      * @author retrooper
      * @since 1.8
      */
     @Target({ElementType.METHOD})
     @Retention(RetentionPolicy.RUNTIME)
     public @interface SupportedVersions {
-        ServerVersion[] versions() default {};
+        ServerVersion[] ranges() default {};
     }
 }

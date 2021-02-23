@@ -30,6 +30,8 @@ import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
 import io.github.retrooper.packetevents.utils.nms.NMSUtils;
 import io.github.retrooper.packetevents.utils.server.ServerVersion;
 
+import java.lang.reflect.Method;
+
 public class WrappedPacketLoginInCustomPayload extends WrappedPacket {
     private static Class<?> byteBufClass;
     private static Class<?> packetDataSerializerClass;

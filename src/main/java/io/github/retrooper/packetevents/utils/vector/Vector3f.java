@@ -23,40 +23,38 @@
  */
 
 package io.github.retrooper.packetevents.utils.vector;
-
 /**
- * 3D int Vector.
+ * 3D float Vector.
  * This vector can represent coordinates, angles, or anything you want.
  * You can use this to represent an array if you really want.
- * PacketEvents usually uses this for block positions as they don't need any decimals.
  *
  * @author retrooper
- * @since 1.7
+ * @since 1.8
  */
-public class Vector3i {
+public class Vector3f {
     /**
      * This is the invalid vector.
      * In wrappers, when a vector is null in the actual packet, PacketEvents will set our high level vector X,Y,Z values
      * to -1 to avoid null pointer exceptions.
      */
-    public static final Vector3i INVALID = new Vector3i(-1, -1, -1);
+    public static final Vector3f INVALID = new Vector3f(-1, -1, -1);
     /**
      * X (coordinate/angle/whatever you wish)
      */
-    public int x;
+    public float x;
     /**
      * Y (coordinate/angle/whatever you wish)
      */
-    public int y;
+    public float y;
     /**
      * Z (coordinate/angle/whatever you wish)
      */
-    public int z;
+    public float z;
 
     /**
      * Default constructor setting all coordinates/angles/values to their default values (=0).
      */
-    public Vector3i() {
+    public Vector3f() {
     }
 
     /**
@@ -66,7 +64,7 @@ public class Vector3i {
      * @param y Y
      * @param z Z
      */
-    public Vector3i(int x, int y, int z) {
+    public Vector3f(float x, float y, float z) {
         this.x = x;
         this.y = y;
         this.z = z;
@@ -80,7 +78,7 @@ public class Vector3i {
      *
      * @param array Array.
      */
-    public Vector3i(int[] array) {
+    public Vector3f(float[] array) {
         if (array.length > 0) {
             x = array[0];
         } else {
@@ -108,7 +106,7 @@ public class Vector3i {
      *
      * @return Get X.
      */
-    public int getX() {
+    public float getX() {
         return x;
     }
 
@@ -117,7 +115,7 @@ public class Vector3i {
      *
      * @return Get Y.
      */
-    public int getY() {
+    public float getY() {
         return y;
     }
 
@@ -126,7 +124,7 @@ public class Vector3i {
      *
      * @return Get Z.
      */
-    public int getZ() {
+    public float getZ() {
         return z;
     }
 
@@ -139,16 +137,16 @@ public class Vector3i {
      */
     @Override
     public boolean equals(Object obj) {
-        if (obj instanceof Vector3i) {
-            Vector3i vec = (Vector3i) obj;
-            return x == vec.x && y == vec.y && z == vec.z;
-        } else if (obj instanceof Vector3d) {
-            Vector3d vec = (Vector3d) obj;
-            return x == vec.x && y == vec.y && z == vec.z;
-        }
-        else if (obj instanceof Vector3f) {
+        if (obj instanceof Vector3f) {
             Vector3f vec = (Vector3f) obj;
             return x == vec.x && y == vec.y && z == vec.z;
+        }
+        else if (obj instanceof Vector3d) {
+            Vector3d vec = (Vector3d) obj;
+            return x == vec.x && y == vec.y && z == vec.z;
+        } else if (obj instanceof Vector3i) {
+            Vector3i vec = (Vector3i) obj;
+            return x == (double) vec.x && y == (double) vec.y && z == (double) vec.z;
         }
         return false;
     }
@@ -159,8 +157,8 @@ public class Vector3i {
      * @return Clone.
      */
     @Override
-    public Vector3i clone() {
-        return new Vector3i(x, y, z);
+    public Vector3d clone() {
+        return new Vector3d(x, y, z);
     }
 
     @Override
@@ -168,3 +166,4 @@ public class Vector3i {
         return "X: " + x + ", Y: " + y + "Z: " + z;
     }
 }
+

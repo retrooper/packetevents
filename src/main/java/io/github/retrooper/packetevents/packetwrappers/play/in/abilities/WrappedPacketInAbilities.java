@@ -28,6 +28,7 @@ import io.github.retrooper.packetevents.packettype.PacketTypeClasses;
 import io.github.retrooper.packetevents.packetwrappers.NMSPacket;
 import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
 import io.github.retrooper.packetevents.utils.reflection.Reflection;
+import io.github.retrooper.packetevents.utils.server.ServerVersion;
 
 public final class WrappedPacketInAbilities extends WrappedPacket {
     private static boolean v_1_16_Mode;
@@ -41,21 +42,33 @@ public final class WrappedPacketInAbilities extends WrappedPacket {
         v_1_16_Mode = Reflection.getField(PacketTypeClasses.Play.Client.ABILITIES, boolean.class, 1) == null;
     }
 
+    public boolean isFlying() {
+        return readBoolean(v_1_16_Mode ? 0 : 1);
+    }
+
+    public void setFlying(boolean flying) {
+        writeBoolean(v_1_16_Mode ? 0 : 1, flying);
+    }
+
     /**
      * This will return null if the server version is not available in 1.16.x and above
      *
      * @return Whether the player is vulnerable to damage or not.
      */
-    @Deprecated
+    @SupportedVersions(ranges = {ServerVersion.v_1_7_10, ServerVersion.v_1_15_2})
     public boolean isVulnerable() throws UnsupportedOperationException {
         if (v_1_16_Mode) {
-            throw new UnsupportedOperationException("This field does not exist on your version!");
+            throwUnsupportedOperation();
         }
         return readBoolean(0);
     }
 
-    public boolean isFlying() {
-        return readBoolean(v_1_16_Mode ? 0 : 1);
+    @SupportedVersions(ranges = {ServerVersion.v_1_7_10, ServerVersion.v_1_15_2})
+    public void setVulnerable(boolean vulnerable) throws UnsupportedOperationException {
+        if (v_1_16_Mode) {
+            throwUnsupportedOperation();
+        }
+        writeBoolean(0, vulnerable);
     }
 
     /**
@@ -63,12 +76,20 @@ public final class WrappedPacketInAbilities extends WrappedPacket {
      *
      * @return Whether or not the player can fly.
      */
-    @Deprecated
-    public boolean isFlightAllowed() {
+    @SupportedVersions(ranges = {ServerVersion.v_1_7_10, ServerVersion.v_1_15_2})
+    public boolean isFlightAllowed() throws UnsupportedOperationException {
         if (v_1_16_Mode) {
-            throw new UnsupportedOperationException("This field does not exist on your version!");
+            throwUnsupportedOperation();
         }
         return readBoolean(2);
+    }
+
+    @SupportedVersions(ranges = {ServerVersion.v_1_7_10, ServerVersion.v_1_15_2})
+    public void setFlightAllowed(boolean flightAllowed) throws UnsupportedOperationException {
+        if (v_1_16_Mode) {
+            throwUnsupportedOperation();
+        }
+        writeBoolean(2, flightAllowed);
     }
 
     /**
@@ -76,12 +97,20 @@ public final class WrappedPacketInAbilities extends WrappedPacket {
      *
      * @return Whether or not the player can break blocks instantly.
      */
-    @Deprecated
-    public boolean canInstantlyBuild() {
+    @SupportedVersions(ranges = {ServerVersion.v_1_7_10, ServerVersion.v_1_15_2})
+    public boolean canInstantlyBuild() throws UnsupportedOperationException {
         if (v_1_16_Mode) {
-            throw new UnsupportedOperationException("This field does not exist on your version!");
+            throwUnsupportedOperation();
         }
         return readBoolean(3);
+    }
+
+    @SupportedVersions(ranges = {ServerVersion.v_1_7_10, ServerVersion.v_1_15_2})
+    public void setCanInstantlyBuild(boolean canInstantlyBuild) throws UnsupportedOperationException {
+        if (v_1_16_Mode) {
+            throwUnsupportedOperation();
+        }
+        writeBoolean(3, canInstantlyBuild);
     }
 
     /**
@@ -89,12 +118,20 @@ public final class WrappedPacketInAbilities extends WrappedPacket {
      *
      * @return The speed at which the player can fly, as a float.
      */
-    @Deprecated
-    public float getFlySpeed() {
+    @SupportedVersions(ranges = {ServerVersion.v_1_7_10, ServerVersion.v_1_15_2})
+    public float getFlySpeed() throws UnsupportedOperationException {
         if (v_1_16_Mode) {
-            throw new UnsupportedOperationException("This field does not exist on your version!");
+            throwUnsupportedOperation();
         }
         return readFloat(0);
+    }
+
+    @SupportedVersions(ranges = {ServerVersion.v_1_7_10, ServerVersion.v_1_15_2})
+    public void setFlySpeed(float flySpeed) throws UnsupportedOperationException {
+        if (v_1_16_Mode) {
+            throwUnsupportedOperation();
+        }
+        writeFloat(0, flySpeed);
     }
 
     /**
@@ -102,11 +139,19 @@ public final class WrappedPacketInAbilities extends WrappedPacket {
      *
      * @return The speed at which the player can walk, as a float.
      */
-    @Deprecated
-    public float getWalkSpeed() {
+    @SupportedVersions(ranges = {ServerVersion.v_1_7_10, ServerVersion.v_1_15_2})
+    public float getWalkSpeed() throws UnsupportedOperationException {
         if (v_1_16_Mode) {
-            throw new UnsupportedOperationException("This field does not exist on your version!");
+            throwUnsupportedOperation();
         }
         return readFloat(1);
+    }
+
+    @SupportedVersions(ranges = {ServerVersion.v_1_7_10, ServerVersion.v_1_15_2})
+    public void setWalkSpeed(float walkSpeed) throws UnsupportedOperationException {
+        if (v_1_16_Mode) {
+            throwUnsupportedOperation();
+        }
+        writeFloat(1, walkSpeed);
     }
 }

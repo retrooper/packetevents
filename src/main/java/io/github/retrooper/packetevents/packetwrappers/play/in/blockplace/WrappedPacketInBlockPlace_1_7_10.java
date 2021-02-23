@@ -26,30 +26,68 @@ package io.github.retrooper.packetevents.packetwrappers.play.in.blockplace;
 
 import io.github.retrooper.packetevents.packetwrappers.NMSPacket;
 import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
+import io.github.retrooper.packetevents.utils.nms.NMSUtils;
+import io.github.retrooper.packetevents.utils.vector.Vector3f;
+import io.github.retrooper.packetevents.utils.vector.Vector3i;
 import org.bukkit.inventory.ItemStack;
 
 final class WrappedPacketInBlockPlace_1_7_10 extends WrappedPacket {
-    public int x, y, z;
-    public ItemStack itemStack;
-    public int face;
-    public float cursorX, cursorY, cursorZ;
+    private final net.minecraft.server.v1_7_R4.PacketPlayInBlockPlace blockPlace;
 
     WrappedPacketInBlockPlace_1_7_10(final NMSPacket packet) {
         super(packet);
-        final net.minecraft.server.v1_7_R4.PacketPlayInBlockPlace blockPlace =
+        blockPlace =
                 (net.minecraft.server.v1_7_R4.PacketPlayInBlockPlace) packet.getRawNMSPacket();
+    }
 
-        x = blockPlace.c();
-        y = blockPlace.d();
-        z = blockPlace.e();
+    public Vector3i getBlockPosition() {
+        return new Vector3i(blockPlace.c(), blockPlace.d(), blockPlace.e());
+    }
 
-        this.face = blockPlace.d();
+    public void setBlockPosition(Vector3i blockPos) {
+        Vector3i currentBlockPos = getBlockPosition();
+        if (blockPos.x != currentBlockPos.x) {
+            writeInt(0, blockPos.x);
+        }
+        if (blockPos.y != currentBlockPos.y) {
+            writeInt(1, blockPos.y);
+        }
+        if (blockPos.z != currentBlockPos.z) {
+            writeInt(2, blockPos.z);
+        }
+    }
 
-        net.minecraft.server.v1_7_R4.ItemStack stack = blockPlace.getItemStack();
-        this.itemStack = org.bukkit.craftbukkit.v1_7_R4.inventory.CraftItemStack.asBukkitCopy(stack);
+    public int getFace() {
+        return blockPlace.getFace();
+    }
 
-        cursorX = blockPlace.h();
-        cursorY = blockPlace.i();
-        cursorZ = blockPlace.j();
+    public void setFace(int face) {
+        writeInt(3, face);
+    }
+
+    public ItemStack getItemStack() {
+        return org.bukkit.craftbukkit.v1_7_R4.inventory.CraftItemStack.asBukkitCopy(blockPlace.getItemStack());
+    }
+
+    public void setItemStack(ItemStack stack) {
+        Object nmsItemStack = org.bukkit.craftbukkit.v1_7_R4.inventory.CraftItemStack.asNMSCopy(stack);
+        writeObject(0, nmsItemStack);
+    }
+
+    public Vector3f getCursorPosition() {
+        return new Vector3f(blockPlace.h(), blockPlace.i(), blockPlace.j());
+    }
+
+    public void setCursorPosition(Vector3f cursorPos) {
+        Vector3f currentCursorPos = getCursorPosition();
+        if (cursorPos.x != currentCursorPos.x) {
+            writeFloat(0, cursorPos.x);
+        }
+        if (cursorPos.y != currentCursorPos.y) {
+            writeFloat(1, cursorPos.y);
+        }
+        if (cursorPos.z != currentCursorPos.z) {
+            writeFloat(2, cursorPos.z);
+        }
     }
 }

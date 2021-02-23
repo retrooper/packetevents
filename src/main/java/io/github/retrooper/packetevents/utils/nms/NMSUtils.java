@@ -54,16 +54,15 @@ public final class NMSUtils {
     public static Constructor<?> blockPosConstructor, minecraftKeyConstructor;
     public static Class<?> nmsEntityClass, minecraftServerClass, craftWorldClass, playerInteractManagerClass, entityPlayerClass, playerConnectionClass, craftServerClass,
             craftPlayerClass, serverConnectionClass, craftEntityClass, nmsItemStackClass, networkManagerClass, nettyChannelClass, gameProfileClass, iChatBaseComponentClass,
-            blockPosClass, enumDirectionClass, vec3DClass, channelFutureClass, blockClass, iBlockDataClass, watchableObjectClass, nmsWorldClass, craftItemStackClass,
-            soundEffectClass, minecraftKeyClass, enumHandClass;
+            blockPosClass, vec3DClass, channelFutureClass, blockClass, iBlockDataClass, watchableObjectClass, nmsWorldClass, craftItemStackClass,
+            soundEffectClass, minecraftKeyClass;
+    public static Class<? extends Enum<?>> enumDirectionClass, enumHandClass;
     public static Method getBlockPosX, getBlockPosY, getBlockPosZ;
     private static Method getCraftPlayerHandle;
     private static Method getCraftEntityHandle;
     private static Method getCraftWorldHandle;
     private static Method asBukkitCopy;
     private static Method asNMSCopy;
-    private static Method getServerMarkers;
-    private static boolean useGetServerMarkers;
     private static Field entityPlayerPingField, playerConnectionField;
     private static Object minecraftServer;
     private static Object minecraftServerConnection;
@@ -85,7 +84,7 @@ public final class NMSUtils {
             Object chnl = getNettyClass("channel.Channel");
         }
         catch (ClassNotFoundException ex) {
-            System.err.println("[packetevents] Failed to locate the default netty package location for your server version. Searching...");
+            System.err.println("[packetevents] Failed to locate the netty package location for your server version. Searching...");
             //Time to correct the netty location
             if (legacyNettyImportMode) {
                 legacyNettyImportMode = false;
@@ -150,7 +149,7 @@ public final class NMSUtils {
         }
 
 
-        enumDirectionClass = NMSUtils.getNMSClassWithoutException("EnumDirection");
+        enumDirectionClass = (Class<? extends Enum<?>>) NMSUtils.getNMSClassWithoutException("EnumDirection");
         //METHODS
         try {
             getCraftPlayerHandle = craftPlayerClass.getMethod("getHandle");
@@ -168,8 +167,6 @@ public final class NMSUtils {
         try {
             entityPlayerPingField = entityPlayerClass.getField("ping");
             playerConnectionField = entityPlayerClass.getField("playerConnection");
-            getServerMarkers = Reflection.getMethod(serverConnectionClass, List.class, 0, serverConnectionClass);
-            useGetServerMarkers = getServerMarkers != null;
         } catch (NoSuchFieldException e) {
             e.printStackTrace();
         }
@@ -179,7 +176,7 @@ public final class NMSUtils {
             getBlockPosY = Reflection.getMethod(NMSUtils.blockPosClass.getSuperclass(), "getY", 0);
             getBlockPosZ = Reflection.getMethod(NMSUtils.blockPosClass.getSuperclass(), "getZ", 0);
         }
-        enumHandClass = getNMSClassWithoutException("EnumHand");
+        enumHandClass = (Class<Enum<?>>) getNMSClassWithoutException("EnumHand");
     }
 
     public static Object getMinecraftServerInstance() {

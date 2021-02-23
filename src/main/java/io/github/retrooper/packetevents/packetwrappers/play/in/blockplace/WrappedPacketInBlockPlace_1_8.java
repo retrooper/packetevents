@@ -27,52 +27,35 @@ package io.github.retrooper.packetevents.packetwrappers.play.in.blockplace;
 import io.github.retrooper.packetevents.packetwrappers.NMSPacket;
 import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
 import io.github.retrooper.packetevents.utils.nms.NMSUtils;
+import io.github.retrooper.packetevents.utils.vector.Vector3f;
+import io.github.retrooper.packetevents.utils.vector.Vector3i;
 import org.bukkit.inventory.ItemStack;
 
 import java.lang.reflect.InvocationTargetException;
 
 final class WrappedPacketInBlockPlace_1_8 extends WrappedPacket {
-    private Object blockPosObj;
 
     WrappedPacketInBlockPlace_1_8(final NMSPacket packet) {
         super(packet);
     }
 
-    public int getX() {
-        if (blockPosObj == null) {
-            blockPosObj = readObject(1, NMSUtils.blockPosClass);
-        }
+    public Vector3i getBlockPosition() {
+        Vector3i blockPos = new Vector3i();
+
+        Object blockPosObj = readObject(1, NMSUtils.blockPosClass);
         try {
-            return (int) NMSUtils.getBlockPosX.invoke(blockPosObj);
+            blockPos.x = (int) NMSUtils.getBlockPosX.invoke(blockPosObj);
+            blockPos.y = (int) NMSUtils.getBlockPosY.invoke(blockPosObj);
+            blockPos.z = (int) NMSUtils.getBlockPosZ.invoke(blockPosObj);
         } catch (IllegalAccessException | InvocationTargetException e) {
             e.printStackTrace();
         }
-        return 0;
+        return blockPos;
     }
 
-
-    public int getY() {
-        if (blockPosObj == null) {
-            blockPosObj = readObject(1, NMSUtils.blockPosClass);
-        }
-        try {
-            return (int) NMSUtils.getBlockPosY.invoke(blockPosObj);
-        } catch (IllegalAccessException | InvocationTargetException e) {
-            e.printStackTrace();
-        }
-        return 0;
-    }
-
-    public int getZ() {
-        if (blockPosObj == null) {
-            blockPosObj = readObject(1, NMSUtils.blockPosClass);
-        }
-        try {
-            return (int) NMSUtils.getBlockPosZ.invoke(blockPosObj);
-        } catch (IllegalAccessException | InvocationTargetException e) {
-            e.printStackTrace();
-        }
-        return 0;
+    public void setBlockPosition(Vector3i blockPos) {
+        Object blockPosObj = NMSUtils.generateNMSBlockPos(blockPos.x, blockPos.y, blockPos.z);
+        write(NMSUtils.blockPosClass, 1, blockPosObj);
     }
 
     public ItemStack getItemStack() {
@@ -83,16 +66,17 @@ final class WrappedPacketInBlockPlace_1_8 extends WrappedPacket {
         return readInt(0);
     }
 
-
-    public float getCursorX() {
-        return readFloat(0);
+    public void setFace(int face) {
+        writeInt(0, face);
     }
 
-    public float getCursorY() {
-        return readFloat(1);
+    public Vector3f getCursorPosition() {
+        return new Vector3f(readFloat(0), readFloat(1), readFloat(2));
     }
 
-    public float getCursorZ() {
-        return readFloat(2);
+    public void setCursorPosition(Vector3f cursorPos) {
+        writeFloat(0, cursorPos.x);
+        writeFloat(1, cursorPos.y);
+        writeFloat(2, cursorPos.z);
     }
 }

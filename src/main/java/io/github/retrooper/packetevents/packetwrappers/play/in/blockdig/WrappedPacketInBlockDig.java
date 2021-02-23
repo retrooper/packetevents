@@ -27,20 +27,18 @@ package io.github.retrooper.packetevents.packetwrappers.play.in.blockdig;
 import io.github.retrooper.packetevents.packettype.PacketTypeClasses;
 import io.github.retrooper.packetevents.packetwrappers.NMSPacket;
 import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
+import io.github.retrooper.packetevents.utils.enums.EnumUtil;
 import io.github.retrooper.packetevents.utils.nms.NMSUtils;
 import io.github.retrooper.packetevents.utils.player.Direction;
 import io.github.retrooper.packetevents.utils.reflection.SubclassUtil;
 import io.github.retrooper.packetevents.utils.server.ServerVersion;
+import io.github.retrooper.packetevents.utils.vector.Vector3i;
 
 import java.lang.reflect.InvocationTargetException;
 
 public final class WrappedPacketInBlockDig extends WrappedPacket {
-    private static Class<?> blockPositionClass;
-    private static Class<?> enumDirectionClass;
-    private static Class<?> digTypeClass;
+    private static Class<? extends Enum<?>> digTypeClass;
     private static boolean isVersionLowerThan_v_1_8;
-    private Object blockPosObj;
-    private Object enumDirObj;
 
     public WrappedPacketInBlockDig(NMSPacket packet) {
         super(packet);
@@ -49,86 +47,47 @@ public final class WrappedPacketInBlockDig extends WrappedPacket {
     @Override
     protected void load() {
         Class<?> blockDigClass = PacketTypeClasses.Play.Client.BLOCK_DIG;
-        try {
-            if (version.isNewerThan(ServerVersion.v_1_7_10)) {
-                blockPositionClass = NMSUtils.getNMSClass("BlockPosition");
-                enumDirectionClass = NMSUtils.getNMSClass("EnumDirection");
-            }
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
-        }
         isVersionLowerThan_v_1_8 = version.isOlderThan(ServerVersion.v_1_8);
 
         if (version != ServerVersion.v_1_7_10) {
             try {
-                digTypeClass = NMSUtils.getNMSClass("EnumPlayerDigType");
+                digTypeClass = (Class<? extends Enum<?>>) NMSUtils.getNMSClass("EnumPlayerDigType");
             } catch (ClassNotFoundException e) {
                 //It is probably a subclass
-                digTypeClass = SubclassUtil.getSubClass(blockDigClass, "EnumPlayerDigType");
+                digTypeClass = (Class<? extends Enum<?>>) SubclassUtil.getSubClass(blockDigClass, "EnumPlayerDigType");
             }
         }
     }
 
-    /**
-     * Get X position of the block
-     *
-     * @return Block Position X
-     */
-    public int getX() {
+    public Vector3i getBlockPosition() {
+        int x = 0;
+        int y = 0;
+        int z = 0;
         if (isVersionLowerThan_v_1_8) {
-            return readInt(0);
+            x = readInt(0);
+            y = readInt(1);
+            z = readInt(2);
         } else {
-            if (blockPosObj == null) {
-                blockPosObj = readObject(0, blockPositionClass);
-            }
+            Object blockPosObj = readObject(0, NMSUtils.blockPosClass);
             try {
-                return (int) NMSUtils.getBlockPosX.invoke(blockPosObj);
+                x = (int) NMSUtils.getBlockPosX.invoke(blockPosObj);
+                y = (int) NMSUtils.getBlockPosY.invoke(blockPosObj);
+                z = (int) NMSUtils.getBlockPosZ.invoke(blockPosObj);
             } catch (IllegalAccessException | InvocationTargetException e) {
                 e.printStackTrace();
             }
-            return -1;
         }
+        return new Vector3i(x, y, z);
     }
 
-    /**
-     * Get Y position of the block
-     *
-     * @return Block Position Y
-     */
-    public int getY() {
+    public void setBlockPosition(Vector3i blockPos) {
         if (isVersionLowerThan_v_1_8) {
-            return readInt(1);
+            writeInt(0, blockPos.x);
+            writeInt(1, blockPos.y);
+            writeInt(2, blockPos.z);
         } else {
-            if (blockPosObj == null) {
-                blockPosObj = readObject(0, blockPositionClass);
-            }
-            try {
-                return (int) NMSUtils.getBlockPosY.invoke(blockPosObj);
-            } catch (IllegalAccessException | InvocationTargetException e) {
-                e.printStackTrace();
-            }
-            return -1;
-        }
-    }
-
-    /**
-     * Get Z position of the block
-     *
-     * @return Block Position Z
-     */
-    public int getZ() {
-        if (isVersionLowerThan_v_1_8) {
-            return readInt(2);
-        } else {
-            if (blockPosObj == null) {
-                blockPosObj = readObject(0, blockPositionClass);
-            }
-            try {
-                return (int) NMSUtils.getBlockPosZ.invoke(blockPosObj);
-            } catch (IllegalAccessException | InvocationTargetException e) {
-                e.printStackTrace();
-            }
-            return -1;
+            Object blockPosObj = NMSUtils.generateNMSBlockPos(blockPos.x, blockPos.y, blockPos.z);
+            write(NMSUtils.blockPosClass, 0, blockPosObj);
         }
     }
 
@@ -141,13 +100,17 @@ public final class WrappedPacketInBlockDig extends WrappedPacket {
         if (isVersionLowerThan_v_1_8) {
             return Direction.getDirection(readInt(3));
         } else {
-            if (enumDirObj == null) {
-                enumDirObj = readObject(0, enumDirectionClass);
-                if (enumDirObj == null) {
-                    return Direction.INVALID;
-                }
-            }
-            return Direction.valueOf(((Enum) enumDirObj).name());
+            Enum<?> enumDir = (Enum<?>) readObject(0, NMSUtils.enumDirectionClass);
+            return Direction.valueOf(enumDir.name());
+        }
+    }
+
+    public void setDirection(Direction direction) {
+        if (isVersionLowerThan_v_1_8) {
+            writeInt(3, direction.getFaceValue());
+        } else {
+            Enum<?> enumConst = EnumUtil.valueOf(NMSUtils.enumDirectionClass, direction.name());
+            write(NMSUtils.enumDirectionClass, 0, enumConst);
         }
     }
 
@@ -164,6 +127,16 @@ public final class WrappedPacketInBlockDig extends WrappedPacket {
         }
     }
 
+    public void setDigType(PlayerDigType type) {
+        if (isVersionLowerThan_v_1_8) {
+            writeInt(4, type.ordinal());
+        }
+        else {
+            Enum<?> enumConst = EnumUtil.valueOf(digTypeClass, type.name());
+            write(digTypeClass, 0, enumConst);
+        }
+    }
+
     public enum PlayerDigType {
         START_DESTROY_BLOCK,
         ABORT_DESTROY_BLOCK,
@@ -171,7 +144,7 @@ public final class WrappedPacketInBlockDig extends WrappedPacket {
         DROP_ALL_ITEMS,
         DROP_ITEM,
         RELEASE_USE_ITEM,
-        
+
         /**
          * Doesn't exist on the newest versions.
          */

@@ -121,6 +121,14 @@ public enum ServerVersion {
         return "org.bukkit.craftbukkit." + getNMSSuffix();
     }
 
+    public static ServerVersion getLatest() {
+        return reversedValues[0];
+    }
+
+    public static ServerVersion getOldest() {
+        return values()[0];
+    }
+
     /**
      * Get this server version's protocol version.
      *

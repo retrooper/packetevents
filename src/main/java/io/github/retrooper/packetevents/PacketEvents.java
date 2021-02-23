@@ -61,7 +61,7 @@ import java.net.InetSocketAddress;
 import java.util.UUID;
 
 public final class PacketEvents implements Listener, EventManager {
-    //TODO finish unfinished wrappers, document every single wrapper, add setters to every single wrapper
+    //TODO finish unfinished wrappers, add setters to every single wrapper, once the modern early injector is finished push its changes to the legacy injector.
     private static PacketEvents instance;
     private final PEVersion version = new PEVersion(1, 7, 9, 5);
     private final EventManager eventManager = new PEEventManager();

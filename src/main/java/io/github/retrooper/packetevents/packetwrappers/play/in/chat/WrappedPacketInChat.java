@@ -32,12 +32,11 @@ public final class WrappedPacketInChat extends WrappedPacket {
         super(packet);
     }
 
-    /**
-     * Get the message.
-     *
-     * @return Chat Message
-     */
     public String getMessage() {
         return readString(0);
+    }
+
+    public void setMessage(String message) {
+        writeString(0, message);
     }
 }

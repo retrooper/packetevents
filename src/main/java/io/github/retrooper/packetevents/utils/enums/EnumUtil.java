@@ -22,31 +22,15 @@
  * SOFTWARE.
  */
 
-package io.github.retrooper.packetevents.packetwrappers.login.out.disconnect;
+package io.github.retrooper.packetevents.utils.enums;
 
-import io.github.retrooper.packetevents.packettype.PacketTypeClasses;
-import io.github.retrooper.packetevents.packetwrappers.NMSPacket;
-import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
-import io.github.retrooper.packetevents.packetwrappers.play.out.chat.WrappedPacketOutChat;
-import io.github.retrooper.packetevents.utils.nms.NMSUtils;
-
-public class WrappedPacketLoginOutDisconnect extends WrappedPacket {
-    public WrappedPacketLoginOutDisconnect(NMSPacket packet) {
-        super(packet);
-    }
-
-    public String getReason() {
-        Object iChatBaseComponent = readObject(0, NMSUtils.iChatBaseComponentClass);
-        return WrappedPacketOutChat.toStringFromIChatBaseComponent(iChatBaseComponent);
-    }
-
-    public void setReason(String reason) {
-        Object iChatBaseComponent = WrappedPacketOutChat.toIChatBaseComponent(reason);
-        writeObject(0, iChatBaseComponent);
-    }
-
-    @Override
-    public boolean isSupported() {
-        return PacketTypeClasses.Login.Server.DISCONNECT != null;
+public class EnumUtil {
+    public static Enum<?> valueOf(Class<? extends Enum<?>> cls, String constantName) {
+        for (Enum<?> enumConstant : cls.getEnumConstants()) {
+            if (enumConstant.name().equals(constantName)) {
+                return enumConstant;
+            }
+        }
+        return null;
     }
 }

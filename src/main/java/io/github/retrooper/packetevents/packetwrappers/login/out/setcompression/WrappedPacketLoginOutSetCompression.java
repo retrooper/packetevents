@@ -28,6 +28,7 @@ import io.github.retrooper.packetevents.packettype.PacketTypeClasses;
 import io.github.retrooper.packetevents.packetwrappers.NMSPacket;
 import io.github.retrooper.packetevents.packetwrappers.SendableWrapper;
 import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
+import io.github.retrooper.packetevents.utils.server.ServerVersion;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
@@ -68,10 +69,19 @@ public class WrappedPacketLoginOutSetCompression extends WrappedPacket implement
         return threshold;
     }
 
+    public void setThreshold(int threshold) {
+        if (packet != null) {
+            writeInt(0, threshold);
+        }
+        else {
+            this.threshold = threshold;
+        }
+    }
+
     @Override
     public Object asNMSPacket() {
         try {
-            return constructor.newInstance(threshold);
+            return constructor.newInstance(getThreshold());
         } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
             e.printStackTrace();
         }
@@ -80,6 +90,6 @@ public class WrappedPacketLoginOutSetCompression extends WrappedPacket implement
 
     @Override
     public boolean isSupported() {
-        return PacketTypeClasses.Login.Server.SET_COMPRESSION != null;
+        return version.isNewerThan(ServerVersion.v_1_7_10);
     }
 }

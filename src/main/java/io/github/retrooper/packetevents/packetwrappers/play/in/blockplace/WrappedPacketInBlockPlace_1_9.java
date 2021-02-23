@@ -27,13 +27,16 @@ package io.github.retrooper.packetevents.packetwrappers.play.in.blockplace;
 
 import io.github.retrooper.packetevents.packetwrappers.NMSPacket;
 import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
+import io.github.retrooper.packetevents.utils.enums.EnumUtil;
 import io.github.retrooper.packetevents.utils.nms.NMSUtils;
+import io.github.retrooper.packetevents.utils.player.Direction;
+import io.github.retrooper.packetevents.utils.vector.Vector3i;
 
 import java.lang.reflect.InvocationTargetException;
 
 final class WrappedPacketInBlockPlace_1_9 extends WrappedPacket {
     private static Class<?> movingObjectPositionBlockClass;
-    private Object blockPosObj;
+    private Object movingObjPos;
 
     public WrappedPacketInBlockPlace_1_9(final NMSPacket packet) {
         super(packet);
@@ -44,67 +47,65 @@ final class WrappedPacketInBlockPlace_1_9 extends WrappedPacket {
         movingObjectPositionBlockClass = NMSUtils.getNMSClassWithoutException("MovingObjectPositionBlock");
     }
 
-    public int getX() {
-        if (blockPosObj == null) {
-            if (movingObjectPositionBlockClass == null) {
-                blockPosObj = readObject(0, NMSUtils.blockPosClass);
-            } else {
-                Object movingObjectPos = readObject(0, movingObjectPositionBlockClass);
-                WrappedPacket movingObjectPosWrapper = new WrappedPacket(new NMSPacket(movingObjectPos));
-                blockPosObj = movingObjectPosWrapper.readObject(0, NMSUtils.blockPosClass);
-            }
-        }
-        try {
-            return (int) NMSUtils.getBlockPosX.invoke(blockPosObj);
-        } catch (IllegalAccessException | InvocationTargetException e) {
-            e.printStackTrace();
-        }
-        return 0;
-    }
-
-    public int getY() {
-        if (blockPosObj == null) {
-            if (movingObjectPositionBlockClass == null) {
-                blockPosObj = readObject(0, NMSUtils.blockPosClass);
-            } else {
-                Object movingObjectPos = readObject(0, movingObjectPositionBlockClass);
-                WrappedPacket movingObjectPosWrapper = new WrappedPacket(new NMSPacket(movingObjectPos));
-                blockPosObj = movingObjectPosWrapper.readObject(0, NMSUtils.blockPosClass);
-            }
-        }
-        try {
-            return (int) NMSUtils.getBlockPosY.invoke(blockPosObj);
-        } catch (IllegalAccessException | InvocationTargetException e) {
-            e.printStackTrace();
-        }
-        return 0;
-    }
-
-    public int getZ() {
-        if (blockPosObj == null) {
-            if (movingObjectPositionBlockClass == null) {
-                blockPosObj = readObject(0, NMSUtils.blockPosClass);
-            } else {
-                Object movingObjectPos = readObject(0, movingObjectPositionBlockClass);
-                WrappedPacket movingObjectPosWrapper = new WrappedPacket(new NMSPacket(movingObjectPos));
-                blockPosObj = movingObjectPosWrapper.readObject(0, NMSUtils.blockPosClass);
-            }
-        }
-        try {
-            return (int) NMSUtils.getBlockPosZ.invoke(blockPosObj);
-        } catch (IllegalAccessException | InvocationTargetException e) {
-            e.printStackTrace();
-        }
-        return 0;
-    }
-
-    public Object getEnumDirectionObject() {
+    public Vector3i getBlockPosition() {
+        Vector3i blockPos = new Vector3i();
+        Object blockPosObj;
         if (movingObjectPositionBlockClass == null) {
-            return readObject(0, NMSUtils.enumDirectionClass);
+            blockPosObj = readObject(0, NMSUtils.blockPosClass);
         } else {
-            Object movingObjectPos = readObject(0, movingObjectPositionBlockClass);
-            WrappedPacket movingObjectPosWrapper = new WrappedPacket(new NMSPacket(movingObjectPos));
-            return movingObjectPosWrapper.readObject(0, NMSUtils.enumDirectionClass);
+            if (movingObjPos == null) {
+                movingObjPos = readObject(0, movingObjectPositionBlockClass);
+            }
+            WrappedPacket movingObjectPosWrapper = new WrappedPacket(new NMSPacket(movingObjPos));
+            blockPosObj = movingObjectPosWrapper.readObject(0, NMSUtils.blockPosClass);
+        }
+        try {
+            blockPos.x = (int) NMSUtils.getBlockPosX.invoke(blockPosObj);
+            blockPos.y = (int) NMSUtils.getBlockPosY.invoke(blockPosObj);
+            blockPos.z = (int) NMSUtils.getBlockPosZ.invoke(blockPosObj);
+        } catch (IllegalAccessException | InvocationTargetException e) {
+            e.printStackTrace();
+        }
+        return blockPos;
+    }
+
+    public void setBlockPosition(Vector3i blockPos) {
+        Object blockPosObj = NMSUtils.generateNMSBlockPos(blockPos.x, blockPos.y, blockPos.z);
+        if (movingObjectPositionBlockClass == null) {
+            write(NMSUtils.blockPosClass, 0, blockPosObj);
+        } else {
+            if (movingObjPos == null) {
+                movingObjPos = readObject(0, movingObjectPositionBlockClass);
+            }
+            WrappedPacket movingObjectPosWrapper = new WrappedPacket(new NMSPacket(movingObjPos));
+            movingObjectPosWrapper.write(NMSUtils.blockPosClass, 0, blockPos);
+        }
+    }
+
+    public Direction getDirection() {
+        Enum<?> enumConst;
+        if (movingObjectPositionBlockClass == null) {
+            enumConst = (Enum<?>) readObject(0, NMSUtils.enumDirectionClass);
+        } else {
+            if (movingObjPos == null) {
+                movingObjPos = readObject(0, movingObjectPositionBlockClass);
+            }
+            WrappedPacket movingObjectPosWrapper = new WrappedPacket(new NMSPacket(movingObjPos));
+            enumConst = (Enum<?>) movingObjectPosWrapper.readObject(0, NMSUtils.enumDirectionClass);
+        }
+        return Direction.valueOf(enumConst.name());
+    }
+
+    public void setDirection(Direction direction) {
+        Enum<?> enumConst = EnumUtil.valueOf(NMSUtils.enumDirectionClass, direction.name());
+        if (movingObjectPositionBlockClass == null) {
+            write( NMSUtils.enumDirectionClass, 0, enumConst);
+        } else {
+            if (movingObjPos == null) {
+                movingObjPos = readObject(0, movingObjectPositionBlockClass);
+            }
+            WrappedPacket movingObjectPosWrapper = new WrappedPacket(new NMSPacket(movingObjPos));
+            movingObjectPosWrapper.write(NMSUtils.enumDirectionClass, 0, enumConst);
         }
     }
 }

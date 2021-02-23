@@ -43,8 +43,20 @@ public class WrappedPacketLoginOutEncryptionBegin extends WrappedPacket {
         return (PublicKey) readObject(1, PublicKey.class);
     }
 
-    public byte[] getByteArray() {
+    public byte[] getVerifyToken() {
         return readByteArray(0);
+    }
+
+    public void setEncodedString(String encodedString) {
+        writeString(0, encodedString);
+    }
+
+    public void setPublicKey(PublicKey key) {
+        writeObject(0, key);
+    }
+
+    public void setVerifyToken(byte[] verifyToken) {
+        writeByteArray(0, verifyToken);
     }
 
     @Override

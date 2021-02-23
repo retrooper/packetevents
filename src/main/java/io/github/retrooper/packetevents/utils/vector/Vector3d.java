@@ -141,7 +141,12 @@ public class Vector3d {
         if (obj instanceof Vector3d) {
             Vector3d vec = (Vector3d) obj;
             return x == vec.x && y == vec.y && z == vec.z;
-        } else if (obj instanceof Vector3i) {
+        }
+        else if (obj instanceof Vector3f) {
+            Vector3f vec = (Vector3f) obj;
+            return x == vec.x && y == vec.y && z == vec.z;
+        }
+        else if (obj instanceof Vector3i) {
             Vector3i vec = (Vector3i) obj;
             return x == (double) vec.x && y == (double) vec.y && z == (double) vec.z;
         }
