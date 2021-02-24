@@ -88,13 +88,11 @@ public class WrappedPacketInSettings extends WrappedPacket {
         write(chatVisibilityEnumClass, 0, enumConst);
     }
 
-    //TODO find better name
-    public boolean isChatColors() {
+    public boolean isChatColored() {
         return readBoolean(0);
     }
 
-    //TODO find better name
-    public void setIsChatColors(boolean chatColors) {
+    public void setIsChatColored(boolean chatColors) {
         writeBoolean(0, chatColors);
     }
 

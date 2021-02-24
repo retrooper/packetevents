@@ -28,7 +28,7 @@ import java.util.Arrays;
 
 /**
  * PacketEvents version.
- * This class represents a PacketEvents version, but you can use it for your own projects as a software version util if you wish.
+ * This class represents a PacketEvents version.
  *
  * @author retrooper
  * @since 1.8
