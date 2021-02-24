@@ -26,6 +26,7 @@ package io.github.retrooper.packetevents.packetwrappers.play.in.settings;
 
 import io.github.retrooper.packetevents.packetwrappers.NMSPacket;
 import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
+import io.github.retrooper.packetevents.utils.enums.EnumUtil;
 import io.github.retrooper.packetevents.utils.nms.NMSUtils;
 import io.github.retrooper.packetevents.utils.reflection.SubclassUtil;
 import io.github.retrooper.packetevents.utils.server.ServerVersion;
@@ -33,7 +34,7 @@ import io.github.retrooper.packetevents.utils.server.ServerVersion;
 import java.util.HashMap;
 
 public class WrappedPacketInSettings extends WrappedPacket {
-    private static Class<?> chatVisibilityEnumClass;
+    private static Class<? extends Enum<?>> chatVisibilityEnumClass;
 
     private static boolean isLowerThan_v_1_8;
     private Object chatVisibilityEnumObj;
@@ -45,35 +46,31 @@ public class WrappedPacketInSettings extends WrappedPacket {
 
     @Override
     protected void load() {
-
         isLowerThan_v_1_8 = version.isOlderThan(ServerVersion.v_1_8);
 
         try {
-            chatVisibilityEnumClass = NMSUtils.getNMSClass("EnumChatVisibility");
+            chatVisibilityEnumClass = (Class<? extends Enum<?>>) NMSUtils.getNMSClass("EnumChatVisibility");
         } catch (ClassNotFoundException e) {
             Class<?> entityHumanClass = NMSUtils.getNMSClassWithoutException("EntityHuman");
             //They are just on an outdated version
-            assert entityHumanClass != null;
-            chatVisibilityEnumClass = SubclassUtil.getSubClass(entityHumanClass, "EnumChatVisibility");
+            chatVisibilityEnumClass = (Class<? extends Enum<?>>) SubclassUtil.getSubClass(entityHumanClass, "EnumChatVisibility");
         }
     }
 
-    /**
-     * Get language client setting
-     *
-     * @return String Locale
-     */
     public String getLocale() {
         return readString(0);
     }
 
-    /**
-     * Get client view distance.
-     *
-     * @return View Distance
-     */
+    public void setLocale(String locale) {
+        writeString(0, locale);
+    }
+
     public int getViewDistance() {
         return readInt(0);
+    }
+
+    public void setViewDistance(int viewDistance) {
+        writeInt(0, viewDistance);
     }
 
     /**
@@ -82,37 +79,27 @@ public class WrappedPacketInSettings extends WrappedPacket {
      * @return Chat Visibility
      */
     public ChatVisibility getChatVisibility() {
-        if (chatVisibilityEnumObj == null) {
-            chatVisibilityEnumObj = readObject(0, chatVisibilityEnumClass);
-        }
-        String enumValueAsString = chatVisibilityEnumObj.toString();
-        if (enumValueAsString.equals("FULL")) {
-            return ChatVisibility.ENABLED;
-        } else if (enumValueAsString.equals("SYSTEM")) {
-            return ChatVisibility.COMMANDS_ONLY;
-        } else {
-            return ChatVisibility.HIDDEN;
-        }
+          Enum<?> enumConst = (Enum<?>) readObject(0, chatVisibilityEnumClass);
+         return ChatVisibility.valueOf(enumConst.name());
     }
 
-    /**
-     * Is chat colors
-     *
-     * @return Chat Colors
-     */
+    public void setChatVisibility(ChatVisibility visibility) {
+        Enum<?> enumConst = EnumUtil.valueByIndex(chatVisibilityEnumClass, visibility.ordinal()); //Ordinal is faster than name comparison.
+        write(chatVisibilityEnumClass, 0, enumConst);
+    }
+
+    //TODO find better name
     public boolean isChatColors() {
         return readBoolean(0);
     }
 
-    /**
-     * Get Displayed skin parts.
-     * <p>
-     * It is possible for some keys to not exist.
-     * If that is the case, the server version is 1.7.10.
-     * 1.7.10 only sends the cape skin part.
-     *
-     * @return A map with a Skin Parts as a key, and a boolean as a value.
-     */
+    //TODO find better name
+    public void setIsChatColors(boolean chatColors) {
+        writeBoolean(0, chatColors);
+    }
+
+
+    //TODO make setter for this :c
     public HashMap<DisplayedSkinPart, Boolean> getDisplayedSkinPartsMap() {
         if (displayedSkinParts.isEmpty()) {
             if (isLowerThan_v_1_8) {
@@ -134,15 +121,7 @@ public class WrappedPacketInSettings extends WrappedPacket {
         return displayedSkinParts;
     }
 
-    /**
-     * Is the skin part enabled.
-     * <p>
-     * On 1.7.10, some skin parts will default to 'false' as 1.7.10
-     * only sends the 'cape' skin part.
-     *
-     * @param part The skin part to check the status of.
-     * @return Is the skin part enabled
-     */
+    //TODO instead of returning false on 1.7.10 for non-existing skin parts, find out their real value on 1.7.10(although they aren't modifyable)
     public boolean isDisplaySkinPartEnabled(DisplayedSkinPart part) {
         if (displayedSkinParts.isEmpty()) {
             displayedSkinParts = getDisplayedSkinPartsMap();
@@ -153,18 +132,37 @@ public class WrappedPacketInSettings extends WrappedPacket {
         }
         return displayedSkinParts.get(part);
     }
+//TODO finish this
+   /* public void setIsDisplaySKinPartEnabled(DisplayedSkinPart part, boolean enabled) throws UnsupportedOperationException {
+        if (displayedSkinParts.isEmpty()) {
+            displayedSkinParts = getDisplayedSkinPartsMap();
+        }
 
-    /**
-     * Enum for the client chat visibility setting
-     */
+        if (!displayedSkinParts.containsKey(part)) {
+            throwUnsupportedOperation(part);
+        }
+
+        displayedSkinParts.put(part, enabled);
+    }*/
+
     public enum ChatVisibility {
-        ENABLED, COMMANDS_ONLY, HIDDEN
+        FULL, SYSTEM, HIDDEN
     }
 
-    /**
-     * Enum for the client displayed skin parts settings
-     */
     public enum DisplayedSkinPart {
-        CAPE, JACKET, LEFT_SLEEVE, RIGHT_SLEEVE, LEFT_PANTS, RIGHT_PANTS, HAT
+        CAPE,
+
+        @SupportedVersions(ranges = {ServerVersion.v_1_8, ServerVersion.v_1_16_5})
+        JACKET,
+        @SupportedVersions(ranges = {ServerVersion.v_1_8, ServerVersion.v_1_16_5})
+        LEFT_SLEEVE,
+        @SupportedVersions(ranges = {ServerVersion.v_1_8, ServerVersion.v_1_16_5})
+        RIGHT_SLEEVE,
+        @SupportedVersions(ranges = {ServerVersion.v_1_8, ServerVersion.v_1_16_5})
+        LEFT_PANTS,
+        @SupportedVersions(ranges = {ServerVersion.v_1_8, ServerVersion.v_1_16_5})
+        RIGHT_PANTS,
+        @SupportedVersions(ranges = {ServerVersion.v_1_8, ServerVersion.v_1_16_5})
+        HAT
     }
 }

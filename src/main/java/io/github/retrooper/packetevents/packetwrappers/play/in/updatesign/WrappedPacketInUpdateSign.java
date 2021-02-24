@@ -30,14 +30,13 @@ import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
 import io.github.retrooper.packetevents.packetwrappers.play.out.chat.WrappedPacketOutChat;
 import io.github.retrooper.packetevents.utils.nms.NMSUtils;
 import io.github.retrooper.packetevents.utils.reflection.Reflection;
+import io.github.retrooper.packetevents.utils.vector.Vector3i;
 
 import java.lang.reflect.InvocationTargetException;
 
 public class WrappedPacketInUpdateSign extends WrappedPacket {
     private static boolean v_1_7_mode, strArrayMode;
     private static Class<?> blockPosClass;
-
-    private Object blockPosObj;
 
     public WrappedPacketInUpdateSign(NMSPacket packet) {
         super(packet);
@@ -57,67 +56,57 @@ public class WrappedPacketInUpdateSign extends WrappedPacket {
         }
     }
 
-    public int getX() {
+    public Vector3i getBlockPosition() {
+        int x = 0;
+        int y = 0;
+        int z = 0;
         if (v_1_7_mode) {
-            return readInt(0);
+            x = readInt(0);
+            y = readInt(1);
+            z = readInt(2);
+
         } else {
-            if (blockPosObj == null) {
-                blockPosObj = readObject(0, blockPosClass);
-            }
+            Object blockPosObj = readObject(0, blockPosClass);
             try {
-                return (int) NMSUtils.getBlockPosX.invoke(blockPosObj);
+                x = (int) NMSUtils.getBlockPosX.invoke(blockPosObj);
+                y = (int) NMSUtils.getBlockPosY.invoke(blockPosObj);
+                z = (int) NMSUtils.getBlockPosZ.invoke(blockPosObj);
             } catch (IllegalAccessException | InvocationTargetException e) {
                 e.printStackTrace();
             }
-            return -1;
         }
+        return new Vector3i(x, y, z);
     }
 
-    public int getY() {
+    public void setBlockPosition(Vector3i blockPos) {
         if (v_1_7_mode) {
-            return readInt(1);
+            writeInt(0, blockPos.x);
+            writeInt(1, blockPos.y);
+            writeInt(2, blockPos.z);
         } else {
-            if (blockPosObj == null) {
-                blockPosObj = readObject(0, blockPosClass);
-            }
-            try {
-                return (int) NMSUtils.getBlockPosY.invoke(blockPosObj);
-            } catch (IllegalAccessException | InvocationTargetException e) {
-                e.printStackTrace();
-            }
-            return -1;
-        }
-    }
-
-    public int getZ() {
-        if (v_1_7_mode) {
-            return readInt(2);
-        } else {
-            if (blockPosObj == null) {
-                blockPosObj = readObject(0, blockPosClass);
-            }
-            try {
-                return (int) NMSUtils.getBlockPosZ.invoke(blockPosObj);
-            } catch (IllegalAccessException | InvocationTargetException e) {
-                e.printStackTrace();
-            }
-            return -1;
+            Object blockPosObj = NMSUtils.generateNMSBlockPos(blockPos.x, blockPos.y, blockPos.z);
+            write(NMSUtils.blockPosClass, 0, blockPosObj);
         }
     }
 
     public String[] getTextLines() {
         if (strArrayMode) {
-            //1.7.10 and the newest versions use this
+            //1.7.10
             return readStringArray(0);
         } else {
-            //1.8 uses this for example
+            //1.8 and above
             Object[] iChatComponents = (Object[]) readAnyObject(1);
-            String[] lines = new String[iChatComponents.length];
-            for (int i = 0; i < iChatComponents.length; i++) {
-                lines[i] = WrappedPacketOutChat.
-                  toStringFromIChatBaseComponent(iChatComponents[i]);
-            }
-            return lines;
+            return WrappedPacketOutChat.toStringArrayFromIChatBaseComponentArray(iChatComponents);
+        }
+    }
+
+    public void setTextLines(String[] lines) {
+        if (strArrayMode) {
+            writeStringArray(0, lines);
+        }
+        else {
+            Object[] iChatComponents = WrappedPacketOutChat.toIChatBaseComponentArray(lines);
+            writeAnyObject(1, iChatComponents);
         }
     }
 }

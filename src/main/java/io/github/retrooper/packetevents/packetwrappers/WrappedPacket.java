@@ -93,6 +93,42 @@ public class WrappedPacket implements WrapperPacketReader, WrapperPacketWriter {
 
     }
 
+    protected void throwUnsupportedOperation(Enum<?> enumConst) throws UnsupportedOperationException {
+        Class<?> enumConstClass= enumConst.getClass();
+        Field field = null;
+        try {
+            field = enumConstClass.getField(enumConst.name());
+        } catch (NoSuchFieldException e) {
+            e.printStackTrace();
+        }
+        if (field.isAnnotationPresent(SupportedVersions.class)) {
+            SupportedVersions supportedVersions = field.getAnnotation(SupportedVersions.class);
+            List<ServerVersion> versionList = new ArrayList<>();
+            List<ServerVersion[]> rangeList = new ArrayList<>();
+
+            ServerVersion[] temp = new ServerVersion[2];
+            for (int i = 0; i < supportedVersions.ranges().length; i++) {
+                if ((i + 1) % 2 == 0) {
+                    temp[1] = supportedVersions.ranges()[i];
+                    rangeList.add(temp);
+                } else {
+                    temp[0] = supportedVersions.ranges()[i];
+                }
+            }
+
+            for (ServerVersion[] range : rangeList) {
+                int firstOrdinal = range[0].ordinal();
+                int lastOrdinal = range[range.length - 1].ordinal();
+                for (int ordinal = firstOrdinal; ordinal < lastOrdinal + 1; ordinal++) {
+                    ServerVersion value = ServerVersion.values()[ordinal];
+                    versionList.add(value);
+                }
+            }
+            String supportedVersionsMsg = Arrays.toString(versionList.toArray(new ServerVersion[0]));
+            throw new UnsupportedOperationException("PacketEvents failed to use the " + enumConst.name() + " enum constant in the " + enumConstClass.getSimpleName() + " enum. This enum constant is not supported on your server version. (" + PacketEvents.get().getServerUtils().getVersion() + ")\n This enum constant is only supported on these server versions: " + supportedVersionsMsg);
+        }
+    }
+
     //TODO Annotate all field wrapper methods with SupportedVersions annotation that call this method.
     //TODO finish this method
     protected void throwUnsupportedOperation() throws UnsupportedOperationException {
@@ -255,7 +291,7 @@ public class WrappedPacket implements WrapperPacketReader, WrapperPacketWriter {
         Field field = getField(type, index);
         try {
             return (T) field.get(packet.getRawNMSPacket());
-        } catch (IllegalAccessException | NullPointerException e) {
+        } catch (IllegalAccessException | NullPointerException | ArrayIndexOutOfBoundsException e) {
             throw new WrapperFieldNotFoundException(packetClass, type, index);
         }
     }
@@ -345,6 +381,22 @@ public class WrappedPacket implements WrapperPacketReader, WrapperPacketWriter {
         write(String[].class, index, value);
     }
 
+    public void writeAnyObject(int index, Object value) {
+        try {
+            Field f = packetClass.getDeclaredFields()[index];
+            if (!f.isAccessible()) {
+                f.setAccessible(true);
+            }
+            try {
+                f.set(packet.getRawNMSPacket(), value);
+            } catch (IllegalAccessException | NullPointerException e) {
+                e.printStackTrace();
+            }
+        } catch (ArrayIndexOutOfBoundsException e) {
+            throw new WrapperFieldNotFoundException("PacketEvents failed to find any field indexed " + index + " in the " + ClassUtil.getClassSimpleName(packetClass) + " class!");
+        }
+    }
+
     public void write(Class<?> type, int index, Object value) throws WrapperFieldNotFoundException {
         Field field = getField(type, index);
         if (field == null) {
@@ -395,7 +447,7 @@ public class WrappedPacket implements WrapperPacketReader, WrapperPacketWriter {
      * @author retrooper
      * @since 1.8
      */
-    @Target({ElementType.METHOD})
+    @Target({ElementType.METHOD, ElementType.FIELD})
     @Retention(RetentionPolicy.RUNTIME)
     public @interface SupportedVersions {
         ServerVersion[] ranges() default {};

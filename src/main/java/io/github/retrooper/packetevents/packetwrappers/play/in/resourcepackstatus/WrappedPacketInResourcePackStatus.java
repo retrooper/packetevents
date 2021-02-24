@@ -27,11 +27,12 @@ package io.github.retrooper.packetevents.packetwrappers.play.in.resourcepackstat
 import io.github.retrooper.packetevents.packettype.PacketTypeClasses;
 import io.github.retrooper.packetevents.packetwrappers.NMSPacket;
 import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
+import io.github.retrooper.packetevents.utils.enums.EnumUtil;
 import io.github.retrooper.packetevents.utils.reflection.SubclassUtil;
 import io.github.retrooper.packetevents.utils.server.ServerVersion;
 
 public class WrappedPacketInResourcePackStatus extends WrappedPacket {
-    private static Class<?> enumResourcePackStatusClass;
+    private static Class<? extends Enum<?>> enumResourcePackStatusClass;
 
     public WrappedPacketInResourcePackStatus(NMSPacket packet) {
         super(packet);
@@ -39,12 +40,17 @@ public class WrappedPacketInResourcePackStatus extends WrappedPacket {
 
     @Override
     protected void load() {
-        enumResourcePackStatusClass = SubclassUtil.getSubClass(PacketTypeClasses.Play.Client.RESOURCE_PACK_STATUS, "EnumResourcePackStatus");
+        enumResourcePackStatusClass = (Class<? extends Enum<?>>) SubclassUtil.getSubClass(PacketTypeClasses.Play.Client.RESOURCE_PACK_STATUS, "EnumResourcePackStatus");
     }
 
     public ResourcePackStatus getStatus() {
-        Object enumObj = readObject(0, enumResourcePackStatusClass);
-        return ResourcePackStatus.valueOf(enumObj.toString());
+        Enum<?> enumConst = (Enum<?>) readObject(0, enumResourcePackStatusClass);
+        return ResourcePackStatus.valueOf(enumConst.name());
+    }
+
+    public void setStatus(ResourcePackStatus status) {
+        Enum<?> enumConst = EnumUtil.valueOf(enumResourcePackStatusClass, status.name());
+        write(enumResourcePackStatusClass, 0, enumConst);
     }
 
     public enum ResourcePackStatus {

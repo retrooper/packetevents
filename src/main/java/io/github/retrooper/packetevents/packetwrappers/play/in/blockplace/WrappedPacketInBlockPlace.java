@@ -33,10 +33,11 @@ import io.github.retrooper.packetevents.utils.player.Hand;
 import io.github.retrooper.packetevents.utils.server.ServerVersion;
 import io.github.retrooper.packetevents.utils.vector.Vector3f;
 import io.github.retrooper.packetevents.utils.vector.Vector3i;
+import org.bukkit.inventory.ItemStack;
 
 
 public final class WrappedPacketInBlockPlace extends WrappedPacket {
-    private static boolean isHigherThan_v_1_8_8, isHigherThan_v_1_7_10, isOlderThan_v_1_9;
+    private static boolean newerThan_v_1_8_8, newerThan_v_1_7_10;
     private static int handEnumIndex;
 
     public WrappedPacketInBlockPlace(final NMSPacket packet) {
@@ -45,14 +46,12 @@ public final class WrappedPacketInBlockPlace extends WrappedPacket {
 
     @Override
     protected void load() {
-        isHigherThan_v_1_8_8 = version.isNewerThan(ServerVersion.v_1_8_8);
-        isHigherThan_v_1_7_10 = version.isNewerThan(ServerVersion.v_1_7_10);
-        isOlderThan_v_1_9 = version.isOlderThan(ServerVersion.v_1_9);
+        newerThan_v_1_7_10 = version.isNewerThan(ServerVersion.v_1_7_10);
+        newerThan_v_1_8_8 = version.isNewerThan(ServerVersion.v_1_8_8);
         try {
             Object handEnum = readObject(1, NMSUtils.enumHandClass);
             handEnumIndex = 1;
-        }
-        catch (Exception ex) {
+        } catch (Exception ex) {
             handEnumIndex = 0;//Most likely a newer version
         }
     }
@@ -60,8 +59,7 @@ public final class WrappedPacketInBlockPlace extends WrappedPacket {
     public Hand getHand() {
         if (version.isOlderThan(ServerVersion.v_1_9)) {
             return Hand.MAIN_HAND;
-        }
-        else {
+        } else {
             Enum<?> enumConst = read(handEnumIndex, NMSUtils.enumHandClass);
             return Hand.valueOf(enumConst.name());
         }
@@ -76,10 +74,10 @@ public final class WrappedPacketInBlockPlace extends WrappedPacket {
     }
 
     public Direction getDirection() {
-        if (isHigherThan_v_1_8_8) {
+        if (newerThan_v_1_8_8) {
             WrappedPacketInBlockPlace_1_9 blockPlace_1_9 = new WrappedPacketInBlockPlace_1_9(new NMSPacket(packet.getRawNMSPacket()));
             return blockPlace_1_9.getDirection();
-        } else if (isHigherThan_v_1_7_10) {
+        } else if (newerThan_v_1_7_10) {
             WrappedPacketInBlockPlace_1_8 blockPlace_1_8 = new WrappedPacketInBlockPlace_1_8(new NMSPacket(packet.getRawNMSPacket()));
             return Direction.getDirection(blockPlace_1_8.getFace());
         } else {
@@ -89,10 +87,10 @@ public final class WrappedPacketInBlockPlace extends WrappedPacket {
     }
 
     public void setDirection(Direction direction) {
-        if (isHigherThan_v_1_8_8) {
+        if (newerThan_v_1_8_8) {
             WrappedPacketInBlockPlace_1_9 blockPlace_1_9 = new WrappedPacketInBlockPlace_1_9(new NMSPacket(packet.getRawNMSPacket()));
             blockPlace_1_9.setDirection(direction);
-        } else if (isHigherThan_v_1_7_10) {
+        } else if (newerThan_v_1_7_10) {
             WrappedPacketInBlockPlace_1_8 blockPlace_1_8 = new WrappedPacketInBlockPlace_1_8(new NMSPacket(packet.getRawNMSPacket()));
             blockPlace_1_8.setFace(direction.getFaceValue());
         } else {
@@ -103,10 +101,10 @@ public final class WrappedPacketInBlockPlace extends WrappedPacket {
 
     public Vector3i getBlockPosition() {
         Vector3i blockPos = new Vector3i();
-        if (isHigherThan_v_1_8_8) {
+        if (newerThan_v_1_8_8) {
             WrappedPacketInBlockPlace_1_9 blockPlace_1_9 = new WrappedPacketInBlockPlace_1_9(packet);
-           blockPos = blockPlace_1_9.getBlockPosition();
-        } else if (isHigherThan_v_1_7_10) {
+            blockPos = blockPlace_1_9.getBlockPosition();
+        } else if (newerThan_v_1_7_10) {
             WrappedPacketInBlockPlace_1_8 blockPlace_1_8 = new WrappedPacketInBlockPlace_1_8(packet);
             blockPos = blockPlace_1_8.getBlockPosition();
         } else {
@@ -118,34 +116,61 @@ public final class WrappedPacketInBlockPlace extends WrappedPacket {
 
     @SupportedVersions(ranges = {ServerVersion.v_1_7_10, ServerVersion.v_1_8_8})
     public Vector3f getCursorPosition() throws UnsupportedOperationException {
-        if (isOlderThan_v_1_9) {
-            if (isHigherThan_v_1_7_10) {
-                WrappedPacketInBlockPlace_1_8 blockPlace_1_8 = new WrappedPacketInBlockPlace_1_8(packet);
-                return blockPlace_1_8.getCursorPosition();
-            } else {
-                WrappedPacketInBlockPlace_1_7_10 blockPlace_1_7_10 = new WrappedPacketInBlockPlace_1_7_10(packet);
-                return blockPlace_1_7_10.getCursorPosition();
-            }
-        } else {
+        if (newerThan_v_1_8_8) {
             throwUnsupportedOperation();
-            //Should never be reached
             return Vector3f.INVALID;
+        }
+        else if (newerThan_v_1_7_10) {
+            WrappedPacketInBlockPlace_1_8 blockPlace_1_8 = new WrappedPacketInBlockPlace_1_8(packet);
+            return blockPlace_1_8.getCursorPosition();
+        } else {
+            WrappedPacketInBlockPlace_1_7_10 blockPlace_1_7_10 = new WrappedPacketInBlockPlace_1_7_10(packet);
+            return blockPlace_1_7_10.getCursorPosition();
         }
     }
 
     @SupportedVersions(ranges = {ServerVersion.v_1_7_10, ServerVersion.v_1_8_8})
     public void setCursorPosition(Vector3f cursorPos) throws UnsupportedOperationException {
-        if (isOlderThan_v_1_9) {
-            if (isHigherThan_v_1_7_10) {
-                WrappedPacketInBlockPlace_1_8 blockPlace_1_8 = new WrappedPacketInBlockPlace_1_8(packet);
-                blockPlace_1_8.setCursorPosition(cursorPos);
-            } else {
-                WrappedPacketInBlockPlace_1_7_10 blockPlace_1_7_10 = new WrappedPacketInBlockPlace_1_7_10(packet);
-                blockPlace_1_7_10.setCursorPosition(cursorPos);
-            }
-        } else {
+        if (newerThan_v_1_8_8) {
             throwUnsupportedOperation();
+        }
+        else if (newerThan_v_1_7_10) {
+            WrappedPacketInBlockPlace_1_8 blockPlace_1_8 = new WrappedPacketInBlockPlace_1_8(packet);
+            blockPlace_1_8.setCursorPosition(cursorPos);
+        } else {
+            WrappedPacketInBlockPlace_1_7_10 blockPlace_1_7_10 = new WrappedPacketInBlockPlace_1_7_10(packet);
+            blockPlace_1_7_10.setCursorPosition(cursorPos);
         }
     }
 
+    @SupportedVersions(ranges = {ServerVersion.v_1_7_10, ServerVersion.v_1_8_8})
+    public ItemStack getItemStack() throws UnsupportedOperationException {
+        if (newerThan_v_1_8_8) {
+            throwUnsupportedOperation();
+            return null;
+        }
+        else if (newerThan_v_1_7_10) {
+            WrappedPacketInBlockPlace_1_8 blockPlace_1_8 = new WrappedPacketInBlockPlace_1_8(packet);
+            return blockPlace_1_8.getItemStack();
+        }
+        else {
+            WrappedPacketInBlockPlace_1_7_10 blockPlace_1_7_10 = new WrappedPacketInBlockPlace_1_7_10(packet);
+            return blockPlace_1_7_10.getItemStack();
+        }
+    }
+
+    @SupportedVersions(ranges = {ServerVersion.v_1_7_10, ServerVersion.v_1_8_8})
+    public void setItemStack(ItemStack stack) throws UnsupportedOperationException {
+        if (newerThan_v_1_8_8) {
+            throwUnsupportedOperation();
+        }
+        else if (newerThan_v_1_7_10) {
+            WrappedPacketInBlockPlace_1_8 blockPlace_1_8 = new WrappedPacketInBlockPlace_1_8(packet);
+            blockPlace_1_8.setItemStack(stack);
+        }
+        else {
+            WrappedPacketInBlockPlace_1_7_10 blockPlace_1_7_10 = new WrappedPacketInBlockPlace_1_7_10(packet);
+            blockPlace_1_7_10.setItemStack(stack);
+        }
+    }
 }

@@ -29,7 +29,10 @@ import io.github.retrooper.packetevents.event.eventtypes.CancellableNMSPacketEve
 import io.github.retrooper.packetevents.event.eventtypes.PlayerEvent;
 import io.github.retrooper.packetevents.packettype.PacketType;
 import io.github.retrooper.packetevents.packetwrappers.NMSPacket;
+import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
 import org.bukkit.entity.Player;
+
+import java.util.Optional;
 
 /**
  * The {@code PacketPlaySendEvent} event is fired whenever the a PLAY packet is about to be sent.
@@ -57,6 +60,19 @@ public final class PacketPlaySendEvent extends CancellableNMSPacketEvent impleme
     @Override
     public Player getPlayer() {
         return player;
+    }
+
+    public Optional<Integer> getEntityId() {
+        WrappedPacket packet = new WrappedPacket(getNMSPacket());
+        Optional<Integer> optional = Optional.empty();
+        try {
+            int entityID = packet.readInt(0);
+            optional = Optional.of(entityID);
+        }
+        catch (Exception ex) {
+
+        }
+        return optional;
     }
 
     /**

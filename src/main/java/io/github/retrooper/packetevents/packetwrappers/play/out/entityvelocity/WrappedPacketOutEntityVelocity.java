@@ -35,7 +35,7 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 
 public final class WrappedPacketOutEntityVelocity extends WrappedPacket implements SendableWrapper {
-    private static Constructor<?> velocityConstructor, vec3dConstructor;
+    private static Constructor<?> velocityConstructor;
     private static boolean isVec3dPresent;
     private int entityID = -1;
     private double velocityX, velocityY, velocityZ;
@@ -77,7 +77,6 @@ public final class WrappedPacketOutEntityVelocity extends WrappedPacket implemen
                 velocityConstructor = velocityClass.getConstructor(int.class, NMSUtils.vec3DClass);
                 isVec3dPresent = true;
                 //vec3d constructor
-                vec3dConstructor = NMSUtils.vec3DClass.getConstructor(double.class, double.class, double.class);
             } catch (NoSuchMethodException e2) {
                 e2.printStackTrace();
             }
@@ -160,7 +159,7 @@ public final class WrappedPacketOutEntityVelocity extends WrappedPacket implemen
             }
         } else {
             try {
-                return velocityConstructor.newInstance(entityID, vec3dConstructor.newInstance(getVelocityX(), getVelocityY(), getVelocityZ()));
+                return velocityConstructor.newInstance(entityID, NMSUtils.generateVec3D(getVelocityX(), getVelocityY(), getVelocityZ()));
             } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
                 e.printStackTrace();
             }

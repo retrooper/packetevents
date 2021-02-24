@@ -36,4 +36,8 @@ public class WrappedPacketInCloseWindow extends WrappedPacket {
     public int getWindowId() {
         return readInt(0);
     }
+
+    public void setWindowId(int windowID) {
+        writeInt(0, windowID);
+    }
 }

@@ -37,4 +37,8 @@ public class WrappedPacketInSpectate extends WrappedPacket {
     public UUID getUUID() {
         return (UUID) readObject(0, UUID.class);
     }
+
+    public void setUUID(UUID uuid) {
+        writeObject(0, uuid);
+    }
 }

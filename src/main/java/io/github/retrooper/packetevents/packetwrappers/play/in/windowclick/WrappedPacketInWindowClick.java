@@ -27,6 +27,7 @@ package io.github.retrooper.packetevents.packetwrappers.play.in.windowclick;
 import io.github.retrooper.packetevents.packettype.PacketTypeClasses;
 import io.github.retrooper.packetevents.packetwrappers.NMSPacket;
 import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
+import io.github.retrooper.packetevents.utils.enums.EnumUtil;
 import io.github.retrooper.packetevents.utils.nms.NMSUtils;
 import io.github.retrooper.packetevents.utils.reflection.Reflection;
 import org.bukkit.inventory.ItemStack;
@@ -36,9 +37,8 @@ import java.util.Arrays;
 import java.util.HashMap;
 
 public class WrappedPacketInWindowClick extends WrappedPacket {
-    private static final HashMap<String, Integer> INV_CLICK_TYPE_CACHE = new HashMap<>();
     private static final HashMap<Integer, ArrayList<WindowClickType>> WINDOW_CLICK_TYPE_CACHE = new HashMap<>();
-    private static Class<?> invClickTypeClass;
+    private static Class<? extends Enum<?>> invClickTypeClass;
     private static boolean isClickModePrimitive;
 
 
@@ -49,15 +49,7 @@ public class WrappedPacketInWindowClick extends WrappedPacket {
     @Override
     protected void load() {
         Class<?> packetClass = PacketTypeClasses.Play.Client.WINDOW_CLICK;
-        invClickTypeClass = NMSUtils.getNMSClassWithoutException("InventoryClickType");
-
-        INV_CLICK_TYPE_CACHE.put("PICKUP", 0);
-        INV_CLICK_TYPE_CACHE.put("QUICK_MOVE", 1);
-        INV_CLICK_TYPE_CACHE.put("SWAP", 2);
-        INV_CLICK_TYPE_CACHE.put("CLONE", 3);
-        INV_CLICK_TYPE_CACHE.put("THROW", 4);
-        INV_CLICK_TYPE_CACHE.put("QUICK_CRAFT", 5);
-        INV_CLICK_TYPE_CACHE.put("PICKUP_ALL", 6);
+        invClickTypeClass = (Class<? extends Enum<?>>) NMSUtils.getNMSClassWithoutException("InventoryClickType");
 
         //MODE 0
         WINDOW_CLICK_TYPE_CACHE.put(0, getArrayListOfWindowClickTypes(WindowClickType.LEFT_MOUSE_CLICK,
@@ -100,7 +92,6 @@ public class WrappedPacketInWindowClick extends WrappedPacket {
 
         WINDOW_CLICK_TYPE_CACHE.put(6, getArrayListOfWindowClickTypes(WindowClickType.DOUBLE_CLICK));
         isClickModePrimitive = Reflection.getField(packetClass, int.class, 3) != null;
-        invClickTypeClass = NMSUtils.getNMSClassWithoutException("InventoryClickType");
     }
 
     private static ArrayList<WindowClickType> getArrayListOfWindowClickTypes(WindowClickType... types) {
@@ -109,47 +100,39 @@ public class WrappedPacketInWindowClick extends WrappedPacket {
         return arrayList;
     }
 
-    /**
-     * Get the Window ID.
-     *
-     * @return Get Window ID
-     */
     public int getWindowId() {
         return readInt(0);
     }
 
-    /**
-     * Get the Window slot.
-     *
-     * @return Get Window Slot
-     */
+    public void setWindowId(int windowID) {
+        writeInt(0, windowID);
+    }
+
     public int getWindowSlot() {
         return readInt(1);
     }
 
-    /**
-     * Get the Window button.
-     *
-     * @return Get Window Button
-     */
+    public void setWindowSlot(int slot) {
+        writeInt(1, slot);
+    }
+
     public int getWindowButton() {
         return readInt(2);
     }
 
-    /**
-     * Get the action number.
-     *
-     * @return Get Action Number
-     */
+    public void setWindowButton(int button) {
+        writeInt(2, button);
+    }
+
     public short getActionNumber() {
         return readShort(0);
     }
 
-    /**
-     * Get the window click type.
-     *
-     * @return Get Window Click Type
-     */
+    public void setActionNumber(short actionNumber) {
+        writeShort(0, actionNumber);
+    }
+
+    @Deprecated
     public WindowClickType getWindowClickType() {
         int mode = getMode();
         if (WINDOW_CLICK_TYPE_CACHE.get(mode) == null) {
@@ -173,16 +156,21 @@ public class WrappedPacketInWindowClick extends WrappedPacket {
         return WINDOW_CLICK_TYPE_CACHE.get(mode).get(windowButton);
     }
 
-    /**
-     * Get the Window mode.
-     *
-     * @return Get Window Mode.
-     */
     public int getMode() {
         if (isClickModePrimitive) {
             return readInt(3);
         } else {
-            return INV_CLICK_TYPE_CACHE.get(readObject(5, invClickTypeClass).toString());
+            Enum<?> enumConst = (Enum<?>) readObject(0, invClickTypeClass);
+            return enumConst.ordinal();
+        }
+    }
+
+    public void setMode(int mode) {
+        if (isClickModePrimitive) {
+            writeInt(3, mode);
+        } else {
+            Enum<?> enumConst = EnumUtil.valueByIndex(invClickTypeClass, mode);
+            write(invClickTypeClass, 0, enumConst);
         }
     }
 
@@ -191,11 +179,17 @@ public class WrappedPacketInWindowClick extends WrappedPacket {
      *
      * @return Get Clicked ItemStack
      */
-    public ItemStack getClickedItem() {
+    public ItemStack getClickedItemStack() {
         Object nmsItemStack = readObject(0, NMSUtils.nmsItemStackClass);
         return NMSUtils.toBukkitItemStack(nmsItemStack);
     }
 
+    public void setClickedItemStack(ItemStack stack) {
+        Object nmsItemStack = NMSUtils.toNMSItemStack(stack);
+        write(NMSUtils.nmsItemStackClass, 0, nmsItemStack);
+    }
+
+    @Deprecated
     public enum WindowClickType {
         LEFT_MOUSE_CLICK, RIGHT_MOUSE_CLICK,
         SHIFT_LEFT_MOUSE_CLICK, SHIFT_RIGHT_MOUSE_CLICK,

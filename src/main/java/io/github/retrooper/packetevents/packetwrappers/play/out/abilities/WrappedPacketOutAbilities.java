@@ -28,12 +28,15 @@ import io.github.retrooper.packetevents.packettype.PacketTypeClasses;
 import io.github.retrooper.packetevents.packetwrappers.NMSPacket;
 import io.github.retrooper.packetevents.packetwrappers.SendableWrapper;
 import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
+import io.github.retrooper.packetevents.utils.nms.NMSUtils;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
+import java.util.Objects;
 
 public final class WrappedPacketOutAbilities extends WrappedPacket implements SendableWrapper {
-    private static Constructor<?> packetConstructor;
+    private static Constructor<?> packetConstructor, playerAbilitiesConstructor;
+    private static Class<?> playerAbilitiesClass;
     private boolean vulnerable, flying, allowFlight, instantBuild;
     private float flySpeed, walkSpeed;
 
@@ -54,19 +57,27 @@ public final class WrappedPacketOutAbilities extends WrappedPacket implements Se
     @Override
     protected void load() {
         Class<?> packetClass = PacketTypeClasses.Play.Server.ABILITIES;
+        try {
+            playerAbilitiesClass = NMSUtils.getNMSClass("PlayerAbilities");
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+
+        if (playerAbilitiesClass != null) {
+            try {
+                playerAbilitiesConstructor = playerAbilitiesClass.getConstructor();
+            } catch (NoSuchMethodException e) {
+                e.printStackTrace();
+            }
+        }
 
         try {
-            packetConstructor = packetClass.getConstructor(PlayerAbilitiesUtils.playerAbilitiesClass);
+            packetConstructor = packetClass.getConstructor(playerAbilitiesClass);
         } catch (NoSuchMethodException e) {
             e.printStackTrace();
         }
     }
 
-    /**
-     * Should the client be vulnerable?
-     *
-     * @return Is Vulnerable
-     */
     public boolean isVulnerable() {
         if (packet != null) {
             return readBoolean(0);
@@ -75,11 +86,15 @@ public final class WrappedPacketOutAbilities extends WrappedPacket implements Se
         }
     }
 
-    /**
-     * Should the client be flying?
-     *
-     * @return Is Flying
-     */
+    public void setIsVulnerable(boolean isVulnerable) {
+        if (packet != null) {
+            writeBoolean(0, isVulnerable);
+        }
+        else {
+            this.vulnerable = isVulnerable;
+        }
+    }
+
     public boolean isFlying() {
         if (packet != null) {
             return readBoolean(1);
@@ -88,11 +103,15 @@ public final class WrappedPacketOutAbilities extends WrappedPacket implements Se
         }
     }
 
-    /**
-     * Should the client be allowed to fly?
-     *
-     * @return Is Allowed To Fly
-     */
+    public void setIsFlying(boolean isFlying) {
+        if (packet != null) {
+            writeBoolean(1, isFlying);
+        }
+        else {
+            this.flying = isFlying;
+        }
+    }
+
     public boolean isFlightAllowed() {
         if (packet != null) {
             return readBoolean(2);
@@ -101,12 +120,16 @@ public final class WrappedPacketOutAbilities extends WrappedPacket implements Se
         }
     }
 
-    /**
-     * Should the client be able to build instantly?
-     *
-     * @return Is Allowed To Build Instantly
-     */
-    public boolean canInstantlyBuild() {
+    public void setIsFlightAllowed(boolean isFlightAllowed) {
+        if (packet != null) {
+            writeBoolean(2, isFlightAllowed);
+        }
+        else {
+            this.allowFlight = isFlightAllowed;
+        }
+    }
+
+    public boolean canBuildInstantly() {
         if (packet != null) {
             return readBoolean(3);
         } else {
@@ -114,11 +137,15 @@ public final class WrappedPacketOutAbilities extends WrappedPacket implements Se
         }
     }
 
-    /**
-     * Get the client's defined fly speed.
-     *
-     * @return Get Fly Speed
-     */
+    public void setCanBuildInstantly(boolean canBuildInstantly) {
+        if (packet != null) {
+            writeBoolean(3, canBuildInstantly);
+        }
+        else {
+            this.instantBuild = canBuildInstantly;
+        }
+    }
+
     public float getFlySpeed() {
         if (packet != null) {
             return readFloat(0);
@@ -127,11 +154,15 @@ public final class WrappedPacketOutAbilities extends WrappedPacket implements Se
         }
     }
 
-    /**
-     * Get the client's defined walk speed.
-     *
-     * @return Get Walk Speed
-     */
+    public void setFlySpeed(float flySpeed) {
+        if (packet != null) {
+            writeFloat(0, flySpeed);
+        }
+        else {
+            this.flySpeed = flySpeed;
+        }
+    }
+
     public float getWalkSpeed() {
         if (packet != null) {
             return readFloat(1);
@@ -140,10 +171,36 @@ public final class WrappedPacketOutAbilities extends WrappedPacket implements Se
         }
     }
 
+    public void setWalkSpeed(float walkSpeed) {
+        if (packet != null) {
+            writeFloat(1, walkSpeed);
+        }
+        else {
+            this.walkSpeed =walkSpeed;
+        }
+    }
+
+    private Object getPlayerAbilities(boolean vulnerable, boolean flying, boolean flightAllowed, boolean canBuildInstantly, float flySpeed, float walkSpeed) {
+        Object instance = null;
+        try {
+            instance = playerAbilitiesConstructor.newInstance();
+        } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
+            e.printStackTrace();
+        }
+        WrappedPacket wrapper = new WrappedPacket(new NMSPacket(instance));
+        wrapper.writeBoolean(0, vulnerable);
+        wrapper.writeBoolean(1, flying);
+        wrapper.writeBoolean(2, flightAllowed);
+        wrapper.writeBoolean(3, canBuildInstantly);
+        wrapper.writeFloat(0, flySpeed);
+        wrapper.writeFloat(1, walkSpeed);
+        return instance;
+    }
+
     @Override
     public Object asNMSPacket() {
         try {
-            return packetConstructor.newInstance(PlayerAbilitiesUtils.getPlayerAbilities(isVulnerable(), isFlying(), isFlightAllowed(), canInstantlyBuild(), getFlySpeed(), getWalkSpeed()));
+            return packetConstructor.newInstance(getPlayerAbilities(isVulnerable(), isFlying(), isFlightAllowed(), canBuildInstantly(), getFlySpeed(), getWalkSpeed()));
         } catch (InstantiationException | InvocationTargetException | IllegalAccessException e) {
             e.printStackTrace();
         }

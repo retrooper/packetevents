@@ -32,43 +32,35 @@ public class WrappedPacketInSteerVehicle extends WrappedPacket {
         super(packet);
     }
 
-    /**
-     * Get the side value.
-     * <p>
-     * If positive, they are moving to the left, if negative, they are moving to the right.
-     *
-     * @return Side Value
-     */
     public float getSideValue() {
         return readFloat(0);
     }
 
-    /**
-     * Get the forward value.
-     * <p>
-     * If positive, they are moving forward, if negative, they are moving backwards.
-     *
-     * @return Forward Value
-     */
+    public void setSideValue(float value) {
+        writeFloat(0, value);
+    }
+
     public float getForwardValue() {
         return readFloat(1);
     }
 
-    /**
-     * Is a Jump
-     *
-     * @return Is Jump
-     */
+    public void setForwardValue(float value) {
+        writeFloat(1, value);
+    }
+
     public boolean isJump() {
         return readBoolean(0);
     }
 
-    /**
-     * Is an unmount
-     *
-     * @return Is Unmounting
-     */
-    public boolean isUnmount() {
+    public void setIsJump(boolean isJump) {
+        writeBoolean(0, isJump);
+    }
+
+    public boolean isDismount() {
         return readBoolean(1);
+    }
+
+    public void setIsDismount(boolean isDismount) {
+        writeBoolean(1, isDismount);
     }
 }

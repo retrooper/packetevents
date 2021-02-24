@@ -36,19 +36,39 @@ public class WrappedPacketInVehicleMove extends WrappedPacket {
         return readDouble(0);
     }
 
+    public void setX(double x) {
+        writeDouble(0, x);
+    }
+
     public double getY() {
         return readDouble(1);
+    }
+
+    public void setY(double y) {
+        writeDouble(1, y);
     }
 
     public double getZ() {
         return readDouble(2);
     }
 
+    public void setZ(double z) {
+        writeDouble(2, z);
+    }
+
     public float getYaw() {
         return readFloat(0);
     }
 
+    public void setYaw(float yaw) {
+        writeFloat(0, yaw);
+    }
+
     public float getPitch() {
         return readFloat(1);
+    }
+
+    public void setPitch(float pitch) {
+        writeFloat(1, pitch);
     }
 }

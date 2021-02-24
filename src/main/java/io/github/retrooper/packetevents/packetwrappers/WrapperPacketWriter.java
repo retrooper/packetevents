@@ -61,4 +61,6 @@ public interface WrapperPacketWriter {
     void writeStringArray(int index, String[] value);
 
     void writeObject(int index, Object object);
+
+    void writeAnyObject(int index, Object value);
 }

@@ -27,6 +27,7 @@ package io.github.retrooper.packetevents.packetwrappers.play.in.entityaction;
 import io.github.retrooper.packetevents.packettype.PacketTypeClasses;
 import io.github.retrooper.packetevents.packetwrappers.NMSPacket;
 import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
+import io.github.retrooper.packetevents.utils.enums.EnumUtil;
 import io.github.retrooper.packetevents.utils.nms.NMSUtils;
 import io.github.retrooper.packetevents.utils.reflection.SubclassUtil;
 import io.github.retrooper.packetevents.utils.server.ServerVersion;
@@ -34,10 +35,11 @@ import org.bukkit.entity.Entity;
 import org.jetbrains.annotations.Nullable;
 
 public final class WrappedPacketInEntityAction extends WrappedPacket {
-    private static Class<?> enumPlayerActionClass;
-    private static boolean isLowerThan_v_1_8;
+    private static Class<? extends Enum<?>> enumPlayerActionClass;
+    private static boolean olderThan_v_1_8;
+    private static boolean newerThan_v_1_8_8;
     private Entity entity;
-    private int entityId = -1;
+    private int entityID = -1;
 
     public WrappedPacketInEntityAction(final NMSPacket packet) {
         super(packet);
@@ -45,17 +47,13 @@ public final class WrappedPacketInEntityAction extends WrappedPacket {
 
     @Override
     protected void load() {
-        isLowerThan_v_1_8 = version.isOlderThan(ServerVersion.v_1_8);
-        if (!isLowerThan_v_1_8) {
-            enumPlayerActionClass = SubclassUtil.getSubClass(PacketTypeClasses.Play.Client.ENTITY_ACTION, "EnumPlayerAction");
+        olderThan_v_1_8 = version.isOlderThan(ServerVersion.v_1_8);
+        newerThan_v_1_8_8 = version.isNewerThan(ServerVersion.v_1_8_8);
+        if (!olderThan_v_1_8) {
+            enumPlayerActionClass = (Class<? extends Enum<?>>) SubclassUtil.getSubClass(PacketTypeClasses.Play.Client.ENTITY_ACTION, "EnumPlayerAction");
         }
     }
 
-    /**
-     * Lookup the associated entity by the ID that was sent in the packet.
-     *
-     * @return Entity
-     */
     public Entity getEntity() {
         if (entity == null) {
             return entity = NMSUtils.getEntityById(getEntityId());
@@ -63,46 +61,69 @@ public final class WrappedPacketInEntityAction extends WrappedPacket {
         return entity;
     }
 
-    /**
-     * Get the ID of the entity.
-     * If you do not want to use {@link #getEntity()},
-     * you lookup the entity by yourself with this entity ID.
-     *
-     * @return Entity ID
-     */
+    public void setEntity(Entity entity) {
+        setEntityId(entity.getEntityId());
+        this.entity = entity;
+    }
+
     public int getEntityId() {
-        if (entityId == -1) {
-            net.minecraft.server.v1_8_R3.PacketPlayInEntityAction ea;
-            entityId = readInt(0);
+        if (entityID == -1) {
+            entityID = readInt(0);
         }
-        return entityId;
+        return entityID;
     }
 
-    /**
-     * Get the player action.
-     *
-     * @return Player Action
-     */
+    public void setEntityId(int entityID) {
+        writeInt(0, this.entityID = entityID);
+        this.entity = null;
+    }
+
     public PlayerAction getAction() {
-        if (isLowerThan_v_1_8) {
-            byte animationIndex = (byte) readInt(1);
-            return PlayerAction.getByActionValue((byte) (animationIndex - 1));
+        if (olderThan_v_1_8) {
+            int animationIndex = readInt(1) - 1;
+            return PlayerAction.getByActionValue((byte) (animationIndex));
         } else {
-            final Object enumObj = readObject(0, enumPlayerActionClass);
-            return PlayerAction.getByName(enumObj.toString());
+            Enum<?> enumConst = (Enum<?>) readObject(0, enumPlayerActionClass);
+            return PlayerAction.getByName(enumConst.name());
         }
     }
 
-    /**
-     * Get the jump boost integer.
-     *
-     * @return Jump Boost
-     */
+    public void setAction(PlayerAction action) throws UnsupportedOperationException {
+        if (olderThan_v_1_8) {
+            byte animationIndex = action.actionID;
+            writeInt(1, animationIndex + 1);
+        } else {
+            Enum<?> enumConst;
+            if (newerThan_v_1_8_8) {
+                if (action == PlayerAction.RIDING_JUMP) {
+                    throwUnsupportedOperation(action);
+                }
+                enumConst = EnumUtil.valueByIndex(enumPlayerActionClass, action.ordinal());
+
+            } else {
+                enumConst = EnumUtil.valueOf(enumPlayerActionClass, action.name());
+                if (enumConst == null) {
+                    enumConst = EnumUtil.valueOf(enumPlayerActionClass, action.alias);
+                }
+            }
+            write(enumPlayerActionClass, 0, enumConst);
+        }
+    }
+
     public int getJumpBoost() {
-        if (isLowerThan_v_1_8) {
+        if (olderThan_v_1_8) {
             return readInt(2);
         } else {
             return readInt(1);
+        }
+    }
+
+    public void setJumpBoost(int jumpBoost) {
+        if (olderThan_v_1_8) {
+            writeInt(2, jumpBoost);
+        }
+        else {
+            writeInt(1, jumpBoost);
         }
     }
 
@@ -116,10 +137,12 @@ public final class WrappedPacketInEntityAction extends WrappedPacket {
         STOP_RIDING_JUMP((byte) 6),
         OPEN_INVENTORY((byte) 7),
         START_FALL_FLYING((byte) 8),
+
         /**
          * Removed in minecraft server version 1.9.
          * This constant will only work on 1.7.10-1.8
          */
+        @SupportedVersions(ranges = {ServerVersion.v_1_7_10, ServerVersion.v_1_8_8})
         @Deprecated
         RIDING_JUMP((byte) 5);
 

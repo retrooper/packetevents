@@ -35,35 +35,21 @@ public class WrappedPacketInSetCreativeSlot extends WrappedPacket {
         super(packet);
     }
 
-    /**
-     * Get the clicked slot
-     *
-     * @return the slot
-     */
     public int getSlot() {
         return readInt(0);
     }
 
-    /**
-     * Set the clicked slot
-     *
-     * @param value the slot
-     */
     public void setSlot(int value) {
         writeInt(0, value);
     }
 
-    /**
-     * Get the clicked item
-     *
-     * @return the clicked item
-     */
     public ItemStack getClickedItem() {
         Object nmsItemStack = readObject(0, NMSUtils.nmsItemStackClass);
         return NMSUtils.toBukkitItemStack(nmsItemStack);
     }
 
     public void setClickedItem(ItemStack stack) {
-        write(NMSUtils.nmsItemStackClass, 0, NMSUtils.toNMSItemStack(stack));
+        Object nmsItemStack = NMSUtils.toNMSItemStack(stack);
+        write(NMSUtils.nmsItemStackClass, 0, nmsItemStack);
     }
 }

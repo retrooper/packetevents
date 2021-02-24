@@ -30,6 +30,7 @@ import io.github.retrooper.packetevents.utils.entityfinder.EntityFinderUtils;
 import io.github.retrooper.packetevents.utils.reflection.Reflection;
 import io.github.retrooper.packetevents.utils.reflection.SubclassUtil;
 import io.github.retrooper.packetevents.utils.server.ServerVersion;
+import io.github.retrooper.packetevents.utils.vector.Vector3d;
 import org.bukkit.Bukkit;
 import org.bukkit.Server;
 import org.bukkit.World;
@@ -51,7 +52,7 @@ public final class NMSUtils {
     private static final String OBC_DIR = ServerVersion.getOBCDirectory() + ".";
     public static ServerVersion version;
     private static String nettyPrefix;
-    public static Constructor<?> blockPosConstructor, minecraftKeyConstructor;
+    public static Constructor<?> blockPosConstructor, minecraftKeyConstructor, vec3DConstructor;
     public static Class<?> nmsEntityClass, minecraftServerClass, craftWorldClass, playerInteractManagerClass, entityPlayerClass, playerConnectionClass, craftServerClass,
             craftPlayerClass, serverConnectionClass, craftEntityClass, nmsItemStackClass, networkManagerClass, nettyChannelClass, gameProfileClass, iChatBaseComponentClass,
             blockPosClass, vec3DClass, channelFutureClass, blockClass, iBlockDataClass, watchableObjectClass, nmsWorldClass, craftItemStackClass,
@@ -143,6 +144,9 @@ public final class NMSUtils {
             //If null, it is 1.7.10
             if (blockPosClass != null) {
                 blockPosConstructor = blockPosClass.getConstructor(double.class, double.class, double.class);
+            }
+            if (vec3DClass != null) {
+                vec3DConstructor = NMSUtils.vec3DClass.getConstructor(double.class, double.class, double.class);
             }
         } catch (NoSuchMethodException e) {
             e.printStackTrace();
@@ -378,6 +382,15 @@ public final class NMSUtils {
     public static Object generateMinecraftKey(String text) {
         try {
             return minecraftKeyConstructor.newInstance(text);
+        } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    public static Object generateVec3D(double x, double y, double z) {
+        try {
+            return vec3DConstructor.newInstance(x, y, z);
         } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
             e.printStackTrace();
         }

@@ -36,7 +36,15 @@ public class WrappedPacketInEnchantItem extends WrappedPacket {
         return readInt(0);
     }
 
+    public void setWindowId(int windowID) {
+        writeInt(0, windowID);
+    }
+
     public int getButton() {
         return readInt(1);
+    }
+
+    public void setButton(int button) {
+        writeInt(1, button);
     }
 }

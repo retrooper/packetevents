@@ -158,6 +158,22 @@ public final class WrappedPacketOutChat extends WrappedPacket implements Sendabl
         return null;
     }
 
+    public static String[] toStringArrayFromIChatBaseComponentArray(Object[] obj) {
+        String[] strArray = new String[obj.length];
+        for (int i = 0; i < strArray.length; i++) {
+            strArray[i] = toStringFromIChatBaseComponent(obj[i]);
+        }
+        return strArray;
+    }
+
+    public static Object[] toIChatBaseComponentArray(String[] messages) {
+        Object[] array = new Object[messages.length];
+        for (int i = 0; i < array.length; i++) {
+            array[i] = toIChatBaseComponent(messages[i]);
+        }
+        return array;
+    }
+
     public static Object toIChatBaseComponent(String msg) {
         try {
             return chatFromStringMethod.invoke(null, msg);

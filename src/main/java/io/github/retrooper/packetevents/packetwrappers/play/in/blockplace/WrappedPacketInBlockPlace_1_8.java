@@ -62,6 +62,11 @@ final class WrappedPacketInBlockPlace_1_8 extends WrappedPacket {
         return NMSUtils.toBukkitItemStack(readObject(0, NMSUtils.nmsItemStackClass));
     }
 
+    public void setItemStack(ItemStack stack) {
+        Object nmsItemStack = NMSUtils.toNMSItemStack(stack);
+        write(NMSUtils.nmsItemStackClass, 0, nmsItemStack);
+    }
+
     public int getFace() {
         return readInt(0);
     }

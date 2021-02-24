@@ -62,6 +62,16 @@ public final class WrappedPacketInCustomPayload extends WrappedPacket {
         }
     }
 
+    public void setTag(String tag) {
+        if (strPresent) {
+            writeString(0, tag);
+        }
+        else {
+            Object minecraftKey = NMSUtils.generateMinecraftKey(tag);
+            write(NMSUtils.minecraftKeyClass, 0, minecraftKey);
+        }
+    }
+
     public byte[] getData() {
         if (byteArrayPresent) {
             return readByteArray(0);
@@ -72,6 +82,15 @@ public final class WrappedPacketInCustomPayload extends WrappedPacket {
             Object byteBuf = byteBufWrapper.readObject(0, byteBufClass);
 
             return PacketEvents.get().getByteBufUtil().getBytes(byteBuf);
+        }
+    }
+
+    void setData(byte[] data) {
+        if (byteArrayPresent) {
+            writeByteArray(0, data);
+        }
+        else {
+            //TODO make setbytes method in bytebufutil
         }
     }
 }

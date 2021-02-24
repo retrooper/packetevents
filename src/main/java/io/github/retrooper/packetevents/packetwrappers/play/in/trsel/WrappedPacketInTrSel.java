@@ -35,4 +35,8 @@ public class WrappedPacketInTrSel extends WrappedPacket {
     public int getSlot() {
         return readInt(0);
     }
+
+    public void setSlot(int slot) {
+        writeInt(0, slot);
+    }
 }

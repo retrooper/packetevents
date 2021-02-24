@@ -62,6 +62,8 @@ import java.util.UUID;
 
 public final class PacketEvents implements Listener, EventManager {
     //TODO finish unfinished wrappers, add setters to every single wrapper, once the modern early injector is finished push its changes to the legacy injector.
+    //TODO: make setters for all client-bound play wrappers and all wrappers in status state.
+    //TODO: make HANDSHAKING its own state
     private static PacketEvents instance;
     private final PEVersion version = new PEVersion(1, 7, 9, 5);
     private final EventManager eventManager = new PEEventManager();

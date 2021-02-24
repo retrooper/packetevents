@@ -32,30 +32,27 @@ public final class WrappedPacketInTransaction extends WrappedPacket {
         super(packet);
     }
 
-    /**
-     * Get the window ID.
-     *
-     * @return Window ID
-     */
     public int getWindowId() {
         return readInt(0);
     }
 
-    /**
-     * Get the action number.
-     *
-     * @return Action number
-     */
+    public void setWindowId(int windowID) {
+        writeInt(0, windowID);
+    }
+
     public short getActionNumber() {
         return readShort(0);
     }
 
-    /**
-     * Is transaction accepted.
-     *
-     * @return Transaction Accepted
-     */
+    public void setActionNumber(short actionNumber) {
+        writeShort(0, actionNumber);
+    }
+
     public boolean isAccepted() {
         return readBoolean(0);
+    }
+
+    public void setIsAccepted(boolean isAccepted) {
+        writeBoolean(0, isAccepted);
     }
 }

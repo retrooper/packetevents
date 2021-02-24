@@ -11,4 +11,8 @@ public class WrappedPacketInItemName extends WrappedPacket {
     public String getItemName() {
         return readString(0);
     }
+
+    public void setItemName(String itemName) {
+        writeString(0, itemName);
+    }
 }

@@ -33,4 +33,8 @@ public class EnumUtil {
         }
         return null;
     }
+
+    public static Enum<?> valueByIndex(Class<? extends Enum<?>> cls, int index) {
+       return cls.getEnumConstants()[index];
+    }
 }

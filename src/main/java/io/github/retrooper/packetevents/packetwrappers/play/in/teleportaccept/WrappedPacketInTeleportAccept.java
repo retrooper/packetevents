@@ -35,4 +35,8 @@ public class WrappedPacketInTeleportAccept extends WrappedPacket {
     public int getTeleportId() {
         return readInt(0);
     }
+
+    public void setTeleportId(int teleportId) {
+        writeInt(0, teleportId);
+    }
 }

@@ -35,4 +35,8 @@ public class WrappedPacketInTabComplete extends WrappedPacket {
     public String getText() {
         return readString(0);
     }
+
+    public void setText(String text) {
+        writeString(0, text);
+    }
 }

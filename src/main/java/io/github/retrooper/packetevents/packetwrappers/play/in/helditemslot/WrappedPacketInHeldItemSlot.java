@@ -32,13 +32,11 @@ public final class WrappedPacketInHeldItemSlot extends WrappedPacket {
         super(packet);
     }
 
-    /**
-     * Get the index of the item we currently have in hand.
-     *
-     * @return Item in hand Index
-     */
     public int getCurrentSelectedSlot() {
         return readInt(0);
     }
 
+    public void setCurrentSelectedSlot(int slot) {
+        writeInt(0, slot);
+    }
 }

@@ -37,31 +37,63 @@ public class WrappedPacketInFlying extends WrappedPacket {
         return readDouble(0);
     }
 
+    public void setX(double x) {
+        writeDouble(0, x);
+    }
+
     public double getY() {
         return readDouble(1);
+    }
+
+    public void setY(double y) {
+        writeDouble(1, y);
     }
 
     public double getZ() {
         return readDouble(2);
     }
 
+    public void setZ(double z) {
+        writeDouble(2, z);
+    }
+
     public float getYaw() {
         return readFloat(0);
+    }
+
+    public void setYaw(float yaw) {
+        writeFloat(0, yaw);
     }
 
     public float getPitch() {
         return readFloat(1);
     }
 
+    public void setPitch(float pitch) {
+        writeFloat(1,pitch);
+    }
+
     public boolean isOnGround() {
         return readBoolean(0);
     }
 
-    public final boolean isPosition() {
+    public void setIsOnGround(boolean onGround) {
+        writeBoolean(0, onGround);
+    }
+
+    public boolean isPosition() {
         return readBoolean(1);
     }
 
-    public final boolean isLook() {
+    public void setIsPosition(boolean isPosition) {
+        writeBoolean(1, isPosition);
+    }
+
+    public boolean isLook() {
         return readBoolean(2);
+    }
+
+    public void setIsLook(boolean isLook) {
+        writeBoolean(2, isLook);
     }
 }

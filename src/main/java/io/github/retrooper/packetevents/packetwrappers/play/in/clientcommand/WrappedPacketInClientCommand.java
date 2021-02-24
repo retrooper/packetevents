@@ -27,12 +27,13 @@ package io.github.retrooper.packetevents.packetwrappers.play.in.clientcommand;
 import io.github.retrooper.packetevents.packettype.PacketTypeClasses;
 import io.github.retrooper.packetevents.packetwrappers.NMSPacket;
 import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
+import io.github.retrooper.packetevents.utils.enums.EnumUtil;
 import io.github.retrooper.packetevents.utils.nms.NMSUtils;
 import io.github.retrooper.packetevents.utils.reflection.SubclassUtil;
+import io.github.retrooper.packetevents.utils.server.ServerVersion;
 
 public final class WrappedPacketInClientCommand extends WrappedPacket {
-    private static Class<?> enumClientCommandClass;
-    private Object enumObj;
+    private static Class<? extends Enum<?>> enumClientCommandClass;
 
     public WrappedPacketInClientCommand(NMSPacket packet) {
         super(packet);
@@ -42,10 +43,10 @@ public final class WrappedPacketInClientCommand extends WrappedPacket {
     protected void load() {
         Class<?> packetClass = PacketTypeClasses.Play.Client.CLIENT_COMMAND;
         try {
-            enumClientCommandClass = NMSUtils.getNMSClass("EnumClientCommand");
+            enumClientCommandClass = (Class<? extends Enum<?>>) NMSUtils.getNMSClass("EnumClientCommand");
         } catch (ClassNotFoundException e) {
             //Probably a subclass
-            enumClientCommandClass = SubclassUtil.getSubClass(packetClass, "EnumClientCommand");
+            enumClientCommandClass = (Class<? extends Enum<?>>) SubclassUtil.getSubClass(packetClass, "EnumClientCommand");
         }
     }
 
@@ -55,17 +56,25 @@ public final class WrappedPacketInClientCommand extends WrappedPacket {
      * @return ClientCommand
      */
     public ClientCommand getClientCommand() {
-        if (enumObj == null) {
-            enumObj = readObject(0, enumClientCommandClass);
+        Enum<?> emumConst = (Enum<?>) readObject(0, enumClientCommandClass);
+        return ClientCommand.valueOf(emumConst.name());
+    }
+
+    public void setClientCommand(ClientCommand command) throws UnsupportedOperationException {
+        if (command == ClientCommand.OPEN_INVENTORY_ACHIEVEMENT && version.isNewerThan(ServerVersion.v_1_16)) {
+            throwUnsupportedOperation(command);
         }
-        return ClientCommand.valueOf(enumObj.toString());
+        Enum<?> enumConst = EnumUtil.valueOf(enumClientCommandClass, command.name());
+        write(enumClientCommandClass, 0, enumConst);
     }
 
     public enum ClientCommand {
         PERFORM_RESPAWN,
         REQUEST_STATS,
 
-        //This field doesn't exist on 1.16
+        //This enum constant only exists on 1.7.10 -> 1.15.2
+        @SupportedVersions(ranges = {ServerVersion.v_1_7_10, ServerVersion.v_1_15_2})
+        @Deprecated
         OPEN_INVENTORY_ACHIEVEMENT
     }
 

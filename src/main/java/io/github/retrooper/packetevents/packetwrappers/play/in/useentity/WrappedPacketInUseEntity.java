@@ -27,6 +27,7 @@ package io.github.retrooper.packetevents.packetwrappers.play.in.useentity;
 import io.github.retrooper.packetevents.PacketEvents;
 import io.github.retrooper.packetevents.packetwrappers.NMSPacket;
 import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
+import io.github.retrooper.packetevents.utils.enums.EnumUtil;
 import io.github.retrooper.packetevents.utils.nms.NMSUtils;
 import io.github.retrooper.packetevents.utils.player.Hand;
 import io.github.retrooper.packetevents.utils.reflection.SubclassUtil;
@@ -37,10 +38,10 @@ import org.bukkit.entity.Entity;
 import java.util.Objects;
 
 public final class WrappedPacketInUseEntity extends WrappedPacket {
-    private static Class<?> enumEntityUseActionClass, enumHandClass;
+    private static Class<? extends Enum<?>> enumEntityUseActionClass, enumHandClass;
     private Entity entity;
     private EntityUseAction action;
-    private int entityId = -1;
+    private int entityID = -1;
 
     public WrappedPacketInUseEntity(final NMSPacket packet) {
         super(packet);
@@ -50,24 +51,18 @@ public final class WrappedPacketInUseEntity extends WrappedPacket {
     protected void load() {
         Class<?> useEntityClass = NMSUtils.getNMSClassWithoutException("PacketPlayInUseEntity");
         try {
-            enumHandClass = NMSUtils.getNMSClass("EnumHand");
+            enumHandClass = (Class<? extends Enum<?>>) NMSUtils.getNMSClass("EnumHand");
         } catch (ClassNotFoundException e) {
             //Probably a 1.7.10 or 1.8.x server
         }
         try {
-            enumEntityUseActionClass = NMSUtils.getNMSClass("EnumEntityUseAction");
+            enumEntityUseActionClass = (Class<? extends Enum<?>>) NMSUtils.getNMSClass("EnumEntityUseAction");
         } catch (ClassNotFoundException e) {
             //That is fine, it is probably a subclass
-            enumEntityUseActionClass = SubclassUtil.getSubClass(Objects.requireNonNull(useEntityClass), "EnumEntityUseAction");
+            enumEntityUseActionClass = (Class<? extends Enum<?>>) SubclassUtil.getSubClass(Objects.requireNonNull(useEntityClass), "EnumEntityUseAction");
         }
     }
 
-
-    /**
-     * Lookup the associated entity by the ID that was sent in the packet.
-     *
-     * @return Entity
-     */
     public Entity getEntity() {
         if (entity != null) {
             return entity;
@@ -75,45 +70,68 @@ public final class WrappedPacketInUseEntity extends WrappedPacket {
         return entity = NMSUtils.getEntityById(getEntityId());
     }
 
-    /**
-     * Get the ID of the entity.
-     * If you do not want to use {@link #getEntity()},
-     * you lookup the entity by yourself with this entity ID.
-     *
-     * @return Entity ID
-     */
-    public int getEntityId() {
-        if (entityId != -1) {
-            return entityId;
-        }
-        return entityId = readInt(0);
+    public void setEntity(Entity entity) {
+        setEntityId(entity.getEntityId());
+        this.entity = entity;
     }
 
-    public Vector3d getTarget() {
-        if (getAction() == EntityUseAction.INTERACT_AT
-                && PacketEvents.get().getServerUtils().getVersion() != ServerVersion.v_1_7_10) {
+    public int getEntityId() {
+        if (entityID != -1) {
+            return entityID;
+        }
+        return entityID = readInt(0);
+    }
+
+    public void setEntityId(int entityID) {
+        writeInt(0, this.entityID = entityID);
+        this.entity = null;
+    }
+
+    @SupportedVersions(ranges = {ServerVersion.v_1_8, ServerVersion.v_1_16_5})
+    public Vector3d getTarget() throws UnsupportedOperationException {
+        if (PacketEvents.get().getServerUtils().getVersion() == ServerVersion.v_1_7_10) {
+            throwUnsupportedOperation();
+            return Vector3d.INVALID;
+        }
+        //We are certain we are on a 1.8 (or higher) server.
+        if (getAction() == EntityUseAction.INTERACT_AT) {
             Object vec3DObj = readObject(0, NMSUtils.vec3DClass);
             WrappedPacket vec3DWrapper = new WrappedPacket(new NMSPacket(vec3DObj));
             return new Vector3d(vec3DWrapper.readDouble(0), vec3DWrapper.readDouble(1), vec3DWrapper.readDouble(2));
         }
-        return Vector3d.INVALID;
+        else {
+            return Vector3d.INVALID;
+        }
     }
 
-    /**
-     * Get the associated action.
-     *
-     * @return Get EntityUseAction
-     */
+    @SupportedVersions(ranges = {ServerVersion.v_1_8, ServerVersion.v_1_16_5})
+    public void setTarget(Vector3d target) throws UnsupportedOperationException {
+        if (PacketEvents.get().getServerUtils().getVersion() == ServerVersion.v_1_7_10) {
+            throwUnsupportedOperation();
+        }
+        //We are certain we are on a 1.8 (or higher) server.
+        if (getAction() == EntityUseAction.INTERACT_AT) {
+            Object vec3DObj = NMSUtils.generateVec3D(target.x, target.y, target.z);
+            write(NMSUtils.vec3DClass, 0, vec3DObj);
+        }
+    }
+
     public EntityUseAction getAction() {
         if (action == null) {
-            final Object useActionEnum = readObject(0, enumEntityUseActionClass);
+            Enum<?> useActionEnum = (Enum<?>) readObject(0, enumEntityUseActionClass);
             if (useActionEnum == null) {
-                //ur spigot sucks bruh, unfortunately some spigots have such a bug?
+                //This happens on some weird spigots apparently? Not sure why this field is null.
                 return EntityUseAction.INTERACT;
             }
-            return action = EntityUseAction.valueOf(useActionEnum.toString());
+            return action = EntityUseAction.valueOf(useActionEnum.name());
         }
         return action;
+    }
+
+    public void setAction(EntityUseAction action) {
+        this.action = action;
+        Enum<?> enumConst = EnumUtil.valueOf(enumEntityUseActionClass, action.name());
+        write(enumEntityUseActionClass, 0, enumConst);
     }
 
     public Hand getHand() {
@@ -127,6 +145,17 @@ public final class WrappedPacketInUseEntity extends WrappedPacket {
             return Hand.valueOf(Objects.requireNonNull(enumHandObj).toString());
         }
         return Hand.MAIN_HAND;
+    }
+
+    @SupportedVersions(ranges = {ServerVersion.v_1_9, ServerVersion.v_1_16_5})
+    public void setHand(Hand hand) throws UnsupportedOperationException {
+        if (PacketEvents.get().getServerUtils().getVersion().isOlderThan(ServerVersion.v_1_9)) {
+            throwUnsupportedOperation();
+        }
+        else if (getAction() == EntityUseAction.INTERACT || getAction() == EntityUseAction.INTERACT_AT) {
+            Enum<?> enumConst = EnumUtil.valueOf(enumHandClass, hand.name());
+            write(enumHandClass, 0, enumConst);
+        }
     }
 
     public enum EntityUseAction {
