@@ -44,8 +44,6 @@ public class PacketEventsPlugin extends JavaPlugin {
 
     @Override
     public void onDisable() {
-        if (PacketEvents.get() != null) {
-            PacketEvents.get().terminate();
-        }
+        PacketEvents.get().terminate();
     }
 }

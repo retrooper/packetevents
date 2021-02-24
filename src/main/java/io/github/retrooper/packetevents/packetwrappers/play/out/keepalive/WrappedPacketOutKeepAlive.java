@@ -67,14 +67,6 @@ public class WrappedPacketOutKeepAlive extends WrappedPacket implements Sendable
         }
     }
 
-    /**
-     * Get the Keep Alive ID.
-     * <p>
-     * You may cast this down to an int if you are on 1.7.10 - 1.12.2.
-     * On 1.13.2 - 1.16.3 a long is sent.
-     *
-     * @return Get Keep Alive ID
-     */
     public long getId() {
         if (packet != null) {
             if (integerMode) {
@@ -84,6 +76,16 @@ public class WrappedPacketOutKeepAlive extends WrappedPacket implements Sendable
             }
         } else {
             return id;
+        }
+    }
+
+    public void setId(long id) throws UnsupportedOperationException {
+        if (packet != null) {
+            if (integerMode) {
+                if (id < Integer.MIN_VALUE || id > Integer.MAX_VALUE) {
+                    throw new UnsupportedOperationException("PacketEvents failed to set the Keep Alive ID in WrappedPacketOutKeepAlive. Your server version does not support IDs outside the range of an int primitive type. Your Keep Alive ID seems to be in the range of a long primitive type.");
+                }
+            }
         }
     }
 

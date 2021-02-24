@@ -112,8 +112,6 @@ public class WrappedPacket implements WrapperPacketReader, WrapperPacketWriter {
         }
     }
 
-    //TODO Annotate all field wrapper methods with SupportedVersions annotation that call this method.
-    //TODO finish this method
     protected void throwUnsupportedOperation() throws UnsupportedOperationException {
         final String currentMethodName = "throwUnsupportedOperation";
         StackTraceElement[] stackTraceElements = Thread.currentThread().getStackTrace();
@@ -432,7 +430,7 @@ public class WrappedPacket implements WrapperPacketReader, WrapperPacketWriter {
      * @author retrooper
      * @since 1.8
      */
-    @Target({ElementType.METHOD, ElementType.FIELD})
+    @Target({ElementType.METHOD, ElementType.FIELD, ElementType.CONSTRUCTOR})
     @Retention(RetentionPolicy.RUNTIME)
     public @interface SupportedVersions {
         ServerVersion[] ranges() default {};

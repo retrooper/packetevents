@@ -63,6 +63,16 @@ public class WrappedPacketOutOpenWindow extends WrappedPacket {
         return windowID;
     }
 
+    public void setWindowId(int windowID) {
+        if (packet != null) {
+            writeInt(0, windowID);
+        }
+        else {
+            this.windowID = windowID;
+        }
+    }
+
+    //TODO huh, find a better solution and make a setter for this method
     public int getWindowType() {
         if (packet != null) {
             if (legacyMode && !ultraLegacyMode) {
@@ -85,6 +95,19 @@ public class WrappedPacketOutOpenWindow extends WrappedPacket {
         return windowTitle;
     }
 
+    public void setWindowTitle(String title) {
+        if (packet != null) {
+            if (ultraLegacyMode) {
+                writeString(0, title);
+            }
+            else {
+                Object iChatBaseComponent = NMSUtils.generateIChatBaseComponent(title);
+                write(NMSUtils.iChatBaseComponentClass, 0, iChatBaseComponent);
+            }
+        }
+    }
+
+    //TODO remove
     public int getWindowTypeFromString(String type) {
         switch (type) {
             case "minecraft:chest":

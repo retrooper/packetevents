@@ -24,52 +24,161 @@
 
 package io.github.retrooper.packetevents.packetwrappers.play.out.position;
 
+import io.github.retrooper.packetevents.packettype.PacketTypeClasses;
 import io.github.retrooper.packetevents.packetwrappers.NMSPacket;
+import io.github.retrooper.packetevents.packetwrappers.SendableWrapper;
 import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
+import io.github.retrooper.packetevents.utils.enums.EnumUtil;
+import io.github.retrooper.packetevents.utils.reflection.SubclassUtil;
 import io.github.retrooper.packetevents.utils.server.ServerVersion;
 
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.util.HashSet;
 import java.util.Set;
-//TODO support sending
-public final class WrappedPacketOutPosition extends WrappedPacket {
+//TODO test
+public final class WrappedPacketOutPosition extends WrappedPacket implements SendableWrapper {
+    private static Constructor<?> packetConstructor;
+    private static byte constructorMode = 0;
+    private static Class<? extends Enum<?>> enumPlayerTeleportFlagsClass;
     private double x;
     private double y;
     private double z;
     private float yaw;
     private float pitch;
-    private final Set<PlayerTeleportFlags> relativeFlags = new HashSet<>();
+
+    @Deprecated
+    private boolean onGround;
+
+    private final Set<PlayerTeleportFlags> relativeFlags;
 
     public WrappedPacketOutPosition(NMSPacket packet) {
         super(packet);
+        relativeFlags = new HashSet<>();
     }
 
-    protected Set<PlayerTeleportFlags> getRelativeFlags() {
+    @SupportedVersions(ranges = {ServerVersion.v_1_7_10, ServerVersion.v_1_7_10})
+    @Deprecated
+    public WrappedPacketOutPosition(double x, double y, double z, float yaw, float pitch, boolean onGround, Set<PlayerTeleportFlags> relativeFlags) {
+        if (version.isNewerThan(ServerVersion.v_1_7_10)) {
+            throw new UnsupportedOperationException("PacketEvents detected an unsupported operation. Your chosen constructor for the WrappedPacketOutPosition is only supported on 1.7.10 spigot servers!");
+        }
+        this.x = x;
+        this.y = y;
+        this.z = z;
+        this.yaw = yaw;
+        this.pitch = pitch;
+        this.onGround = onGround;
+        this.relativeFlags = relativeFlags;
+    }
+
+    public WrappedPacketOutPosition(double x, double y, double z, float yaw, float pitch, Set<PlayerTeleportFlags> relativeFlags) {
+        this.x = x;
+        this.y = y;
+        this.z = z;
+        this.yaw = yaw;
+        this.pitch = pitch;
+        this.relativeFlags = relativeFlags;
+    }
+
+    @Override
+    protected void load() {
+        enumPlayerTeleportFlagsClass = (Class<? extends Enum<?>>) SubclassUtil.getSubClass(PacketTypeClasses.Play.Server.POSITION, "EnumPlayerTeleportFlags");
+        try {
+            //1.7.10
+            packetConstructor = PacketTypeClasses.Play.Server.POSITION.getConstructor(double.class, double.class, double.class, float.class, float.class, boolean.class, byte.class);
+        } catch (NoSuchMethodException e) {
+            constructorMode = 1;
+            try {
+                //1.8 and above
+                packetConstructor = PacketTypeClasses.Play.Server.POSITION.getConstructor(double.class, double.class, double.class, float.class, float.class, Set.class);
+            } catch (NoSuchMethodException e2) {
+                e2.printStackTrace();
+            }
+        }
+    }
+
+    @SupportedVersions(ranges = {ServerVersion.v_1_7_10, ServerVersion.v_1_7_10})
+    @Deprecated
+    public boolean isOnGround() throws UnsupportedOperationException {
+        if (packet != null) {
+            if (version.isNewerThan(ServerVersion.v_1_7_10)) {
+                throwUnsupportedOperation();
+            }
+            return readBoolean(0);
+        } else {
+            return onGround;
+        }
+    }
+
+    @SupportedVersions(ranges = {ServerVersion.v_1_7_10, ServerVersion.v_1_7_10})
+    @Deprecated
+    public void setIsOnGround(boolean onGround) {
+        if (packet != null) {
+            if (version.isNewerThan(ServerVersion.v_1_7_10)) {
+                throwUnsupportedOperation();
+            }
+            writeBoolean(0, onGround);
+        } else {
+            this.onGround = onGround;
+        }
+    }
+
+    public byte getRelativeFlagsMask() {
+        byte relativeMask = 0;
+        if (version.isOlderThan(ServerVersion.v_1_8)) {
+            relativeMask = readByte(0);
+        } else {
+            Set<PlayerTeleportFlags> flags = getRelativeFlags();
+            if (flags.contains(PlayerTeleportFlags.X)) {
+                relativeMask |= 0x01;
+            }
+
+            if (flags.contains(PlayerTeleportFlags.Y)) {
+                relativeMask |= 0x02;
+            }
+
+            if (flags.contains(PlayerTeleportFlags.Z)) {
+                relativeMask |= 0x04;
+            }
+
+            if (flags.contains(PlayerTeleportFlags.Y_ROT)) {
+                relativeMask |= 0x08;
+            }
+
+            if (flags.contains(PlayerTeleportFlags.X_ROT)) {
+                relativeMask |= 0x10;
+            }
+        }
+        return relativeMask;
+    }
+
+    public Set<PlayerTeleportFlags> getRelativeFlags() {
         if (relativeFlags.isEmpty()) {
             if (version.isOlderThan(ServerVersion.v_1_8)) {
                 byte relativeBitMask = readByte(0);
-
-                if ((relativeBitMask & 0x01) != 0) {
+                if ((relativeBitMask & 0x01) == 0x01) {
                     relativeFlags.add(PlayerTeleportFlags.X);
                 }
 
-                if ((relativeBitMask & 0x02) != 0) {
+                if ((relativeBitMask & 0x02) == 0x02) {
                     relativeFlags.add(PlayerTeleportFlags.Y);
                 }
 
-                if ((relativeBitMask & 0x04) != 0) {
+                if ((relativeBitMask & 0x04) == 0x04) {
                     relativeFlags.add(PlayerTeleportFlags.Z);
                 }
 
-                if ((relativeBitMask & 0x08) != 0) {
+                if ((relativeBitMask & 0x08) == 0x08) {
                     relativeFlags.add(PlayerTeleportFlags.Y_ROT);
                 }
 
-                if ((relativeBitMask & 0x10) != 0) {
+                if ((relativeBitMask & 0x10) == 0x10) {
                     relativeFlags.add(PlayerTeleportFlags.X_ROT);
                 }
             } else {
-                Set<Enum> set = (Set<Enum>) readObject(0, Set.class);
-                for (Enum e : set) {
+                Set<Enum<?>> set = (Set<Enum<?>>) readObject(0, Set.class);
+                for (Enum<?> e : set) {
                     relativeFlags.add(PlayerTeleportFlags.valueOf(e.name()));
                 }
             }
@@ -77,11 +186,40 @@ public final class WrappedPacketOutPosition extends WrappedPacket {
         return relativeFlags;
     }
 
-    /**
-     * Get the X position.
-     *
-     * @return Get X Position
-     */
+    public void setRelativeFlags(Set<PlayerTeleportFlags> flags) {
+        if (version.isOlderThan(ServerVersion.v_1_8)) {
+            byte relativeBitMask = 0;
+
+            if (flags.contains(PlayerTeleportFlags.X)) {
+                relativeBitMask |= 0x01;
+            }
+
+            if (flags.contains(PlayerTeleportFlags.Y)) {
+                relativeBitMask |= 0x02;
+            }
+
+            if (flags.contains(PlayerTeleportFlags.Z)) {
+                relativeBitMask |= 0x04;
+            }
+
+            if (flags.contains(PlayerTeleportFlags.Y_ROT)) {
+                relativeBitMask |= 0x08;
+            }
+
+            if (flags.contains(PlayerTeleportFlags.X_ROT)) {
+                relativeBitMask |= 0x10;
+            }
+
+            writeByte(0, relativeBitMask);
+        } else {
+            Set<Enum<?>> nmsRelativeFlags = new HashSet<>();
+            for (PlayerTeleportFlags flag : flags) {
+                nmsRelativeFlags.add(EnumUtil.valueOf(enumPlayerTeleportFlagsClass, flag.name()));
+            }
+            write(Set.class, 0, nmsRelativeFlags);
+        }
+    }
+
     public double getX() {
         if (packet != null) {
             return readDouble(0);
@@ -90,11 +228,14 @@ public final class WrappedPacketOutPosition extends WrappedPacket {
         }
     }
 
-    /**
-     * Get the Y position.
-     *
-     * @return Get Y Position
-     */
+    public void setX(double x) {
+        if (packet != null) {
+            writeDouble(0, x);
+        } else {
+            this.x = x;
+        }
+    }
+
     public double getY() {
         if (packet != null) {
             return readDouble(1);
@@ -103,11 +244,14 @@ public final class WrappedPacketOutPosition extends WrappedPacket {
         }
     }
 
-    /**
-     * Get the Z position.
-     *
-     * @return Get Z Position
-     */
+    public void setY(double y) {
+        if (packet != null) {
+            writeDouble(1, y);
+        } else {
+            this.y = y;
+        }
+    }
+
     public double getZ() {
         if (packet != null) {
             return readDouble(2);
@@ -116,31 +260,14 @@ public final class WrappedPacketOutPosition extends WrappedPacket {
         }
     }
 
-    public boolean isRelativeX() {
-        return getRelativeFlags().contains(PlayerTeleportFlags.X);
+    public void setZ(double z) {
+        if (packet != null) {
+            writeDouble(2, z);
+        } else {
+            this.z = z;
+        }
     }
 
-    public boolean isRelativeY() {
-        return getRelativeFlags().contains(PlayerTeleportFlags.Y);
-    }
-
-    public boolean isRelativeZ() {
-        return getRelativeFlags().contains(PlayerTeleportFlags.Z);
-    }
-
-    public boolean isRelativeYaw() {
-        return getRelativeFlags().contains(PlayerTeleportFlags.X_ROT);
-    }
-
-    public boolean isRelativePitch() {
-        return getRelativeFlags().contains(PlayerTeleportFlags.Y_ROT);
-    }
-
-    /**
-     * Get the Yaw.
-     *
-     * @return Get Yaw
-     */
     public float getYaw() {
         if (packet != null) {
             return readFloat(0);
@@ -149,17 +276,52 @@ public final class WrappedPacketOutPosition extends WrappedPacket {
         }
     }
 
-    /**
-     * Get the Pitch,
-     *
-     * @return Get Pitch
-     */
+    public void setYaw(float yaw) {
+        if (packet != null) {
+            writeFloat(0, yaw);
+        } else {
+            this.yaw = yaw;
+        }
+    }
+
     public float getPitch() {
         if (packet != null) {
             return readFloat(1);
         } else {
             return pitch;
         }
+    }
+
+    public void setPitch(float pitch) {
+        if (packet != null) {
+            writeFloat(1, pitch);
+        } else {
+            this.pitch = pitch;
+        }
+    }
+
+    @Override
+    public Object asNMSPacket() {
+        if (constructorMode == 0) {
+            //1.7.10
+            try {
+                return packetConstructor.newInstance(getX(), getY(), getZ(), getYaw(), getPitch(), isOnGround(), getRelativeFlagsMask());
+            } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
+                e.printStackTrace();
+            }
+        } else {
+            //1.8 and the rest
+            Set<Object> nmsRelativeFlags = new HashSet<>();
+            for (PlayerTeleportFlags flag : getRelativeFlags()) {
+                nmsRelativeFlags.add(EnumUtil.valueOf(enumPlayerTeleportFlagsClass, flag.name()));
+            }
+            try {
+                return packetConstructor.newInstance(getX(), getY(), getZ(), getYaw(), getPitch(), nmsRelativeFlags);
+            } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
+                e.printStackTrace();
+            }
+        }
+        return null;
     }
 
     public enum PlayerTeleportFlags {
@@ -169,18 +331,8 @@ public final class WrappedPacketOutPosition extends WrappedPacket {
         Y_ROT,
         X_ROT;
 
-        byte flagValue;
-
         PlayerTeleportFlags() {
-            flagValue = (byte) ordinal();
-        }
 
-        PlayerTeleportFlags(byte flagValue) {
-            this.flagValue = flagValue;
-        }
-
-        public byte getFlagValue() {
-            return flagValue;
         }
     }
 }

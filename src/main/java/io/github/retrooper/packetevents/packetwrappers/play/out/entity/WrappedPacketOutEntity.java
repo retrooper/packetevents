@@ -241,11 +241,7 @@ public class WrappedPacketOutEntity extends WrappedPacket implements SendableWra
         }
     }
 
-    /**
-     * Lookup the associated entity by the ID that was sent in the packet.
-     *
-     * @return Entity
-     */
+
     public Entity getEntity() {
         if (entity != null) {
             return entity;
@@ -253,13 +249,11 @@ public class WrappedPacketOutEntity extends WrappedPacket implements SendableWra
         return entity = NMSUtils.getEntityById(getEntityId());
     }
 
-    /**
-     * Get the ID of the entity.
-     * If you do not want to use {@link #getEntity()},
-     * you lookup the entity by yourself with this entity ID.
-     *
-     * @return Entity ID
-     */
+   public void setEntity(Entity entity) {
+        setEntityId(entity.getEntityId());
+        this.entity = entity;
+   }
+
     public int getEntityId() {
         if (entityID != -1) {
             return entityID;
@@ -268,11 +262,16 @@ public class WrappedPacketOutEntity extends WrappedPacket implements SendableWra
         }
     }
 
-    /**
-     * Is the entity on the ground?
-     *
-     * @return On Ground
-     */
+    public void setEntityId(int entityID) {
+        if (packet != null) {
+            writeInt(0, this.entityID = entityID);
+        }
+        else {
+            this.entityID = entityID;
+        }
+        this.entity = null;
+    }
+
     public boolean isOnGround() {
         if (packet != null) {
             return readBoolean(0);
@@ -281,26 +280,38 @@ public class WrappedPacketOutEntity extends WrappedPacket implements SendableWra
         }
     }
 
+    public void setIsOnGround(boolean onGround) {
+        if (packet != null) {
+            writeBoolean(0, onGround);
+        }
+        else {
+            this.onGround = onGround;
+        }
+    }
+
     @Override
     public Object asNMSPacket() {
         try {
             Object packetInstance = entityPacketConstructor.newInstance(entityID);
+            int dx = (int) (getDeltaX() * dXYZDivisor);
+            int dy = (int) (getDeltaY() * dXYZDivisor);
+            int dz = (int) (getDeltaZ() * dXYZDivisor);
             WrappedPacket wrapper = new WrappedPacket(new NMSPacket(packetInstance));
             switch (mode) {
                 case 0:
-                    wrapper.writeByte(0, (byte) (deltaX * dXYZDivisor));
-                    wrapper.writeByte(1, (byte) (deltaY * dXYZDivisor));
-                    wrapper.writeByte(2, (byte) (deltaZ * dXYZDivisor));
+                    wrapper.writeByte(0, (byte) dx);
+                    wrapper.writeByte(1, (byte) dy);
+                    wrapper.writeByte(2, (byte) dz);
                     break;
                 case 1:
-                    wrapper.writeInt(1, (int) (deltaX * dXYZDivisor));
-                    wrapper.writeInt(2, (int) (deltaY * dXYZDivisor));
-                    wrapper.writeInt(3, (int) (deltaZ * dXYZDivisor));
+                    wrapper.writeInt(1, dx);
+                    wrapper.writeInt(2, dy);
+                    wrapper.writeInt(3, dz);
                     break;
                 case 2:
-                    wrapper.writeShort(0, (short) (deltaX * dXYZDivisor));
-                    wrapper.writeShort(1, (short) (deltaY * dXYZDivisor));
-                    wrapper.writeShort(2, (short) (deltaZ * dXYZDivisor));
+                    wrapper.writeShort(0, (short) dx);
+                    wrapper.writeShort(1, (short) dy);
+                    wrapper.writeShort(2, (short) dz);
                     break;
             }
             wrapper.writeByte(yawByteIndex, yaw);

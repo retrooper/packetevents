@@ -40,9 +40,9 @@ public class WrappedPacketLoginInStart extends WrappedPacket {
         return GameProfileUtil.getWrappedGameProfile(readObject(0, NMSUtils.gameProfileClass));
     }
 
-    //TODO create a util to convert a wrapped game profile to a mojang game profile
-    void setGameProfile(WrappedGameProfile gameProfile) {
-
+    public void setGameProfile(WrappedGameProfile wrappedGameProfile) {
+        Object gameProfile = GameProfileUtil.getGameProfile(wrappedGameProfile.id, wrappedGameProfile.name);
+        write(NMSUtils.gameProfileClass, 0, gameProfile);
     }
 
     @Override

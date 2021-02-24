@@ -18,6 +18,7 @@ public abstract class DataWatcherObject {
 
 	// Look at this beautiful code
 	// That's what you get for not including proper reflection helpers
+	// retrooper edit: lol
 	// TODO: Move to static initializer
 	public static final Class<?> TYPE = ((Supplier<Class<?>>) (() -> {
 		try {

@@ -54,7 +54,7 @@ public final class NMSUtils {
     public static Constructor<?> blockPosConstructor, minecraftKeyConstructor, vec3DConstructor;
     public static Class<?> nmsEntityClass, minecraftServerClass, craftWorldClass, playerInteractManagerClass, entityPlayerClass, playerConnectionClass, craftServerClass,
             craftPlayerClass, serverConnectionClass, craftEntityClass, nmsItemStackClass, networkManagerClass, nettyChannelClass, gameProfileClass, iChatBaseComponentClass,
-            blockPosClass, vec3DClass, channelFutureClass, blockClass, iBlockDataClass, watchableObjectClass, nmsWorldClass, craftItemStackClass,
+            blockPosClass, vec3DClass, channelFutureClass, blockClass, iBlockDataClass, nmsWorldClass, craftItemStackClass,
             soundEffectClass, minecraftKeyClass, chatSerializerClass;
     public static Class<? extends Enum<?>> enumDirectionClass, enumHandClass;
     public static Method getBlockPosX, getBlockPosY, getBlockPosZ;
@@ -117,16 +117,6 @@ public final class NMSUtils {
             nmsWorldClass = getNMSClass("World");
             soundEffectClass = getNMSClassWithoutException("SoundEffect");
             minecraftKeyClass = getNMSClassWithoutException("MinecraftKey");
-            try {
-                watchableObjectClass = getNMSClass("WatchableObject");
-            } catch (Exception ex) {
-                try {
-                    Class<?> dataWatcher = getNMSClass("DataWatcher");
-                    watchableObjectClass = SubclassUtil.getSubClass(dataWatcher, 0);
-                } catch (Exception ex2) {
-                    //TODO 1.9+ support
-                }
-            }
             try {
                 gameProfileClass = Class.forName("net.minecraft.util.com.mojang.authlib.GameProfile");
             } catch (ClassNotFoundException e) {

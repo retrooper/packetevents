@@ -34,8 +34,8 @@ import java.lang.reflect.InvocationTargetException;
 
 public class WrappedPacketOutExperience extends WrappedPacket implements SendableWrapper {
     private static Constructor<?> packetConstructor;
-    private float expBar;
-    private int expLevel, totalExp;
+    private float experienceBar;
+    private int experienceLevel, totalExperience;
 
     public WrappedPacketOutExperience(NMSPacket packet) {
         super(packet);
@@ -43,9 +43,9 @@ public class WrappedPacketOutExperience extends WrappedPacket implements Sendabl
 
     public WrappedPacketOutExperience(float experienceBar, int experienceLevel,
                                       int totalExperience) {
-        this.expBar = experienceBar;
-        this.expLevel = experienceLevel;
-        this.totalExp = totalExperience;
+        this.experienceBar = experienceBar;
+        this.experienceLevel = experienceLevel;
+        this.totalExperience = totalExperience;
     }
 
     @Override
@@ -59,27 +59,54 @@ public class WrappedPacketOutExperience extends WrappedPacket implements Sendabl
     }
 
     public float getExperienceBar() {
-        if (packet == null) {
-            return expBar;
-        } else {
-            //constructor = float, int, int
+        if (packet != null) {
             return readFloat(0);
+        } else {
+            return experienceBar;
+        }
+    }
+
+    public void setExperienceBar(float experienceBar) {
+        if (packet != null) {
+            writeFloat(0, experienceBar);
+        }
+        else {
+            this.experienceBar = experienceBar;
         }
     }
 
     public int getExperienceLevel() {
-        if (packet == null) {
-            return expLevel;
-        } else {
+        if (packet != null) {
             return readInt(0);
+        } else {
+            return experienceLevel;
+        }
+    }
+
+    public void setExperienceLevel(int experienceLevel) {
+        if (packet != null) {
+            writeInt(0, experienceLevel);
+        }
+        else {
+            this.experienceLevel = experienceLevel;
         }
     }
 
     public int getTotalExperience() {
-        if (packet == null) {
-            return totalExp;
-        } else {
+        if (packet != null) {
             return readInt(1);
+        }
+        else {
+            return totalExperience;
+        }
+    }
+
+    public void setTotalExperience(int totalExperience) {
+        if (packet != null) {
+            writeInt(1, totalExperience);
+        }
+        else {
+            this.totalExperience = totalExperience;
         }
     }
 

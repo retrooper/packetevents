@@ -100,16 +100,27 @@ public class WrappedPacketOutGameStateChange extends WrappedPacket implements Se
             } else {
                 //this packet is obfuscated quite strongly(1.16), so we must do this
                 Object reasonObject = readObject(12, reasonClassType);
-                try {
-                    return Reflection.getField(reasonClassType, int.class, 0).getInt(reasonObject);
-                } catch (IllegalAccessException e) {
-                    e.printStackTrace();
-                }
+                WrappedPacket reasonObjWrapper = new WrappedPacket(new NMSPacket(reasonObject));
+                return reasonObjWrapper.readInt(0);
             }
         } else {
             return reason;
         }
-        return 0;
+    }
+
+    public void setReason(int reason) {
+        if (packet != null) {
+            if (reasonIntMode) {
+                writeInt(0, reason);
+            } else {
+                //this packet is obfuscated quite strongly(1.16), so we must do this
+                Object reasonObj = readObject(12, reasonClassType);
+                WrappedPacket reasonObjWrapper = new WrappedPacket(new NMSPacket(reasonObj));
+                reasonObjWrapper.writeInt(0, reason);
+            }
+        } else {
+            this.reason = reason;
+        }
     }
 
     public double getValue() {
@@ -121,6 +132,20 @@ public class WrappedPacketOutGameStateChange extends WrappedPacket implements Se
             }
         } else {
             return value;
+        }
+    }
+
+    public void setValue(double value) {
+        if (packet != null) {
+            if (valueFloatMode) {
+                writeFloat(0, (float) value);
+            }
+            else {
+                writeDouble(0, value);
+            }
+        }
+        else {
+            this.value = value;
         }
     }
 

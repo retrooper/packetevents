@@ -72,11 +72,29 @@ public class WrappedPacketOutResourcePackSend extends WrappedPacket implements S
         return url;
     }
 
+    public void setUrl(String url) {
+        if (packet != null) {
+            writeString(0, url);
+        }
+        else {
+            this.url = url;
+        }
+    }
+
     public String getHash() {
         if (packet != null) {
             return readString(1);
         }
         return hash;
+    }
+
+    public void setHash(String hash) {
+        if (packet != null) {
+            writeString(1, hash);
+        }
+        else {
+            this.hash = hash;
+        }
     }
 
     @Override

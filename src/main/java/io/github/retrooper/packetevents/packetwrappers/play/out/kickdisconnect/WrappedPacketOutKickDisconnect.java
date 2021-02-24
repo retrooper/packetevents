@@ -35,7 +35,6 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 
 public final class WrappedPacketOutKickDisconnect extends WrappedPacket implements SendableWrapper {
-    private static Class<?> iChatBaseComponentClass;
     private static Constructor<?> kickDisconnectConstructor;
     private String kickMessage;
 
@@ -52,30 +51,30 @@ public final class WrappedPacketOutKickDisconnect extends WrappedPacket implemen
     @Override
     protected void load() {
         Class<?> packetClass = PacketTypeClasses.Play.Server.KICK_DISCONNECT;
-        try {
-            iChatBaseComponentClass = NMSUtils.getNMSClass("IChatBaseComponent");
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
-        }
 
         try {
-            kickDisconnectConstructor = packetClass.getConstructor(iChatBaseComponentClass);
+            kickDisconnectConstructor = packetClass.getConstructor(NMSUtils.iChatBaseComponentClass);
         } catch (NoSuchMethodException e) {
             e.printStackTrace();
         }
     }
 
-    /**
-     * Get the kick message.
-     *
-     * @return Get Kick Message
-     */
     public String getKickMessage() {
         if (packet != null) {
-            Object iChatBaseComponentObject = readObject(0, iChatBaseComponentClass);
+            Object iChatBaseComponentObject = readObject(0, NMSUtils.iChatBaseComponentClass);
             return NMSUtils.readIChatBaseComponent(iChatBaseComponentObject);
         } else {
             return kickMessage;
+        }
+    }
+
+    public void setKickMessage(String message) {
+        if (packet != null) {
+            Object iChatBaseComponent = NMSUtils.generateIChatBaseComponent(message);
+            write(NMSUtils.iChatBaseComponentClass, 0, iChatBaseComponent);
+        }
+        else {
+            this.kickMessage = message;
         }
     }
 

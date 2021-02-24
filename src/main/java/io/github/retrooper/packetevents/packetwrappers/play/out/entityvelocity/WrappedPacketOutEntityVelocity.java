@@ -41,7 +41,6 @@ public final class WrappedPacketOutEntityVelocity extends WrappedPacket implemen
     private double velocityX, velocityY, velocityZ;
     private Entity entity;
 
-
     public WrappedPacketOutEntityVelocity(final NMSPacket packet) {
         super(packet);
     }
@@ -61,11 +60,6 @@ public final class WrappedPacketOutEntityVelocity extends WrappedPacket implemen
         this.velocityZ = velZ;
     }
 
-    /**
-     * Velocity Constructor parameter types:
-     * 1.7.10 -&gt; 1.13.2 use int, double, double, double style,
-     * 1.14+ use int, Vec3D style
-     */
     @Override
     protected void load() {
         Class<?> velocityClass = PacketTypeClasses.Play.Server.ENTITY_VELOCITY;
@@ -84,11 +78,6 @@ public final class WrappedPacketOutEntityVelocity extends WrappedPacket implemen
         }
     }
 
-    /**
-     * Lookup the associated entity by the ID that was sent in the packet.
-     *
-     * @return Entity
-     */
     public Entity getEntity() {
         if (entity != null) {
             return entity;
@@ -96,13 +85,11 @@ public final class WrappedPacketOutEntityVelocity extends WrappedPacket implemen
         return entity = NMSUtils.getEntityById(getEntityId());
     }
 
-    /**
-     * Get the ID of the entity.
-     * If you do not want to use {@link #getEntity()},
-     * you lookup the entity by yourself with this entity ID.
-     *
-     * @return Entity ID
-     */
+    public void setEntity(Entity entity) {
+        setEntityId(entity.getEntityId());
+        this.entity = null;
+    }
+
     public int getEntityId() {
         if (entityID != -1) {
             return entityID;
@@ -110,11 +97,16 @@ public final class WrappedPacketOutEntityVelocity extends WrappedPacket implemen
         return entityID = readInt(0);
     }
 
-    /**
-     * Get the Velocity X
-     *
-     * @return Get Velocity X
-     */
+    public void setEntityId(int entityID) {
+        if (packet != null) {
+            writeInt(0, this.entityID = entityID);
+        }
+        else {
+            this.entityID = entityID;
+        }
+        this.entity = null;
+    }
+
     public double getVelocityX() {
         if (packet != null) {
             return readInt(1) / 8000.0D;
@@ -123,11 +115,15 @@ public final class WrappedPacketOutEntityVelocity extends WrappedPacket implemen
         }
     }
 
-    /**
-     * Get the Velocity Y
-     *
-     * @return Get Velocity Y
-     */
+    public void setVelocityX(double x) {
+        if (packet != null) {
+            writeInt(1, (int) (x * 8000.0D));
+        }
+        else {
+            this.velocityX = x;
+        }
+    }
+
     public double getVelocityY() {
         if (packet != null) {
             return readInt(2) / 8000.0D;
@@ -136,16 +132,23 @@ public final class WrappedPacketOutEntityVelocity extends WrappedPacket implemen
         }
     }
 
-    /**
-     * Get the Velocity Z
-     *
-     * @return Get Velocity Z
-     */
+    public void setVelocityY(double y) {
+        if (packet != null) {
+            writeInt(2, (int) (y * 8000.0D));
+        }
+    }
+
     public double getVelocityZ() {
         if (packet != null) {
             return readInt(3) / 8000.0D;
         } else {
             return velocityZ;
+        }
+    }
+
+    public void setVelocityZ(double z) {
+        if (packet != null) {
+            writeInt(3, (int) (z * 8000.0D));
         }
     }
 

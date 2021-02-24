@@ -78,6 +78,7 @@ public class WrappedPacketOutSetSlot extends WrappedPacket implements SendableWr
         }
     }
 
+
     public int getSlot() {
         if (packet != null) {
             return readInt(1);
@@ -115,7 +116,8 @@ public class WrappedPacketOutSetSlot extends WrappedPacket implements SendableWr
 
     public void setItemStack(ItemStack itemStack) {
         if (packet != null) {
-            writeObject(0, NMSUtils.toNMSItemStack(itemStack));
+            Object nmsItemStack = NMSUtils.toNMSItemStack(itemStack);
+            writeObject(0, nmsItemStack);
         }
         else {
             this.itemStack = itemStack;

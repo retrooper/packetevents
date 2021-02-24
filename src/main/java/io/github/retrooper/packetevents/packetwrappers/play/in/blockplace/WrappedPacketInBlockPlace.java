@@ -115,6 +115,7 @@ public final class WrappedPacketInBlockPlace extends WrappedPacket {
     }
 
     @SupportedVersions(ranges = {ServerVersion.v_1_7_10, ServerVersion.v_1_8_8})
+    @Deprecated
     public Vector3f getCursorPosition() throws UnsupportedOperationException {
         if (newerThan_v_1_8_8) {
             throwUnsupportedOperation();
@@ -130,6 +131,7 @@ public final class WrappedPacketInBlockPlace extends WrappedPacket {
     }
 
     @SupportedVersions(ranges = {ServerVersion.v_1_7_10, ServerVersion.v_1_8_8})
+    @Deprecated
     public void setCursorPosition(Vector3f cursorPos) throws UnsupportedOperationException {
         if (newerThan_v_1_8_8) {
             throwUnsupportedOperation();

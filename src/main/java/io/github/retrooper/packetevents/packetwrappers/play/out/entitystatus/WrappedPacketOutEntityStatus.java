@@ -76,6 +76,16 @@ public class WrappedPacketOutEntityStatus extends WrappedPacket implements Senda
         }
     }
 
+    public void setEntityId(int entityID) {
+        if (packet != null) {
+            writeInt(0, this.entityID = entityID);
+        }
+        else {
+            this.entityID = entityID;
+        }
+        this.entity = null;
+    }
+
     public Entity getEntity() {
         if (entity == null) {
             return entity = NMSUtils.getEntityById(getEntityId());
@@ -83,18 +93,34 @@ public class WrappedPacketOutEntityStatus extends WrappedPacket implements Senda
         return entity;
     }
 
+    public void setEntity(Entity entity) {
+        setEntityId(entity.getEntityId());
+        this.entity = entity;
+    }
+
     public byte getEntityStatus() {
-        if (packet == null) {
-            return status;
-        } else {
+        if (packet != null) {
             return readByte(0);
+        }
+        else {
+            return status;
+        }
+    }
+
+    public void setEntityStatus(byte status) {
+        if (packet != null) {
+            writeByte(0, status);
+        }
+        else {
+            this.status = status;
         }
     }
 
     @Override
     public Object asNMSPacket() {
         try {
-            return packetConstructor.newInstance(NMSUtils.getNMSEntity(getEntity()), getEntityStatus());
+            Object nmsEntity = NMSUtils.getNMSEntity(getEntity());
+            return packetConstructor.newInstance(nmsEntity, getEntityStatus());
         } catch (InstantiationException | InvocationTargetException
                 | IllegalAccessException e) {
             e.printStackTrace();

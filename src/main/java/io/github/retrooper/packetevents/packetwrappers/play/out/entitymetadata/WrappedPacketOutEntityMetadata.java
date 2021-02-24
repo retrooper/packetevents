@@ -37,6 +37,7 @@ import java.util.List;
  * Any properties not included are left unchanged.
  *
  * @author SteelPhoenix
+ * @since 1.8
  */
 public class WrappedPacketOutEntityMetadata extends WrappedPacket {
 

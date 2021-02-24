@@ -56,6 +56,7 @@ public final class WrappedPacketInAbilities extends WrappedPacket {
      * @return Whether the player is vulnerable to damage or not.
      */
     @SupportedVersions(ranges = {ServerVersion.v_1_7_10, ServerVersion.v_1_15_2})
+    @Deprecated
     public boolean isVulnerable() throws UnsupportedOperationException {
         if (v_1_16_Mode) {
             throwUnsupportedOperation();
@@ -64,6 +65,7 @@ public final class WrappedPacketInAbilities extends WrappedPacket {
     }
 
     @SupportedVersions(ranges = {ServerVersion.v_1_7_10, ServerVersion.v_1_15_2})
+    @Deprecated
     public void setVulnerable(boolean vulnerable) throws UnsupportedOperationException {
         if (v_1_16_Mode) {
             throwUnsupportedOperation();
@@ -77,6 +79,7 @@ public final class WrappedPacketInAbilities extends WrappedPacket {
      * @return Whether or not the player can fly.
      */
     @SupportedVersions(ranges = {ServerVersion.v_1_7_10, ServerVersion.v_1_15_2})
+    @Deprecated
     public boolean isFlightAllowed() throws UnsupportedOperationException {
         if (v_1_16_Mode) {
             throwUnsupportedOperation();
@@ -85,6 +88,7 @@ public final class WrappedPacketInAbilities extends WrappedPacket {
     }
 
     @SupportedVersions(ranges = {ServerVersion.v_1_7_10, ServerVersion.v_1_15_2})
+    @Deprecated
     public void setFlightAllowed(boolean flightAllowed) throws UnsupportedOperationException {
         if (v_1_16_Mode) {
             throwUnsupportedOperation();
@@ -98,6 +102,7 @@ public final class WrappedPacketInAbilities extends WrappedPacket {
      * @return Whether or not the player can break blocks instantly.
      */
     @SupportedVersions(ranges = {ServerVersion.v_1_7_10, ServerVersion.v_1_15_2})
+    @Deprecated
     public boolean canInstantlyBuild() throws UnsupportedOperationException {
         if (v_1_16_Mode) {
             throwUnsupportedOperation();
@@ -106,6 +111,7 @@ public final class WrappedPacketInAbilities extends WrappedPacket {
     }
 
     @SupportedVersions(ranges = {ServerVersion.v_1_7_10, ServerVersion.v_1_15_2})
+    @Deprecated
     public void setCanInstantlyBuild(boolean canInstantlyBuild) throws UnsupportedOperationException {
         if (v_1_16_Mode) {
             throwUnsupportedOperation();
@@ -119,6 +125,7 @@ public final class WrappedPacketInAbilities extends WrappedPacket {
      * @return The speed at which the player can fly, as a float.
      */
     @SupportedVersions(ranges = {ServerVersion.v_1_7_10, ServerVersion.v_1_15_2})
+    @Deprecated
     public float getFlySpeed() throws UnsupportedOperationException {
         if (v_1_16_Mode) {
             throwUnsupportedOperation();
@@ -127,6 +134,7 @@ public final class WrappedPacketInAbilities extends WrappedPacket {
     }
 
     @SupportedVersions(ranges = {ServerVersion.v_1_7_10, ServerVersion.v_1_15_2})
+    @Deprecated
     public void setFlySpeed(float flySpeed) throws UnsupportedOperationException {
         if (v_1_16_Mode) {
             throwUnsupportedOperation();
@@ -140,6 +148,7 @@ public final class WrappedPacketInAbilities extends WrappedPacket {
      * @return The speed at which the player can walk, as a float.
      */
     @SupportedVersions(ranges = {ServerVersion.v_1_7_10, ServerVersion.v_1_15_2})
+    @Deprecated
     public float getWalkSpeed() throws UnsupportedOperationException {
         if (v_1_16_Mode) {
             throwUnsupportedOperation();
@@ -148,6 +157,7 @@ public final class WrappedPacketInAbilities extends WrappedPacket {
     }
 
     @SupportedVersions(ranges = {ServerVersion.v_1_7_10, ServerVersion.v_1_15_2})
+    @Deprecated
     public void setWalkSpeed(float walkSpeed) throws UnsupportedOperationException {
         if (v_1_16_Mode) {
             throwUnsupportedOperation();

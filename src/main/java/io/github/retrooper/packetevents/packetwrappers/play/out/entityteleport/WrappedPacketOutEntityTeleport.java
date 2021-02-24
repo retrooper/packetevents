@@ -40,7 +40,6 @@ public class WrappedPacketOutEntityTeleport extends WrappedPacket implements Sen
     private static boolean legacyVersionMode;
     private static boolean ultraLegacyVersionMode;
     private static Constructor<?> constructor;
-    private boolean listeningMode = false;
     private Entity entity = null;
     private int entityID = -1;
     private double x, y, z;
@@ -49,7 +48,6 @@ public class WrappedPacketOutEntityTeleport extends WrappedPacket implements Sen
 
     public WrappedPacketOutEntityTeleport(NMSPacket packet) {
         super(packet);
-        listeningMode = true;
     }
 
     public WrappedPacketOutEntityTeleport(int entityID, Location loc, boolean onGround) {
@@ -103,6 +101,11 @@ public class WrappedPacketOutEntityTeleport extends WrappedPacket implements Sen
         return entity;
     }
 
+    public void setEntity(Entity entity) {
+        setEntityId(entity.getEntityId());
+        this.entity = entity;
+    }
+
     public int getEntityId() {
         if (entityID != -1) {
             return entityID;
@@ -111,56 +114,143 @@ public class WrappedPacketOutEntityTeleport extends WrappedPacket implements Sen
         }
     }
 
-    public double getX() {
-        if (!listeningMode) {
-            return x;
+    public void setEntityId(int entityID) {
+        if (packet != null) {
+            writeInt(0, this.entityID = entityID);
         } else {
+            this.entityID = entityID;
+        }
+        this.entity = null;
+    }
+
+    public double getX() {
+        if (packet != null) {
             if (legacyVersionMode) {
                 return readInt(1) / 32.0D;
             } else {
                 return readDouble(0);
             }
+        } else {
+            return x;
+        }
+    }
+
+    public void setX(double x) {
+        if (packet != null) {
+            if (legacyVersionMode) {
+                writeInt(1, floor(x * 32.0D));
+            }
+            else {
+                writeDouble(0, x);
+            }
+        }
+        else {
+            this.x = x;
         }
     }
 
     public double getY() {
-        if (!listeningMode) {
-            return y;
-        } else {
+        if (packet != null) {
             if (legacyVersionMode) {
                 return readInt(2) / 32.0D;
             } else {
                 return readDouble(1);
             }
+        } else {
+            return y;
+        }
+    }
+
+    public void setY(double y) {
+        if (packet != null) {
+            if (legacyVersionMode) {
+                writeInt(2, floor(y * 32.0D));
+            }
+            else {
+                writeDouble(1, y);
+            }
+        }
+        else {
+            this.y = y;
         }
     }
 
     public double getZ() {
-        if (!listeningMode) {
-            return z;
-        } else {
+        if (packet != null) {
             if (legacyVersionMode) {
                 return readInt(3) / 32.0D;
             } else {
                 return readDouble(2);
             }
+        } else {
+            return z;
+        }
+    }
+
+    public void setZ(double z) {
+        if (packet != null) {
+            if (legacyVersionMode) {
+                writeInt(3, floor(z * 32.0D));
+            }
+            else {
+                writeDouble(2, z);
+            }
+        }
+        else {
+            this.z = z;
         }
     }
 
 
     public float getYaw() {
-        if (!listeningMode) {
-            return yaw;
-        } else {
+        if (packet != null) {
             return (readByte(0) / rotationMultiplier);
+        } else {
+            return yaw;
+        }
+    }
+
+    public void setYaw(float yaw) {
+        if (packet != null) {
+            writeByte(0, (byte) (yaw * rotationMultiplier));
+        }
+        else {
+            this.yaw = yaw;
+        }
+    }
+
+    public float getPitch() {
+        if (packet != null) {
+            return (readByte(1) / rotationMultiplier);
+        }
+        else {
+            return pitch;
+        }
+    }
+
+    public void setPitch(float pitch) {
+        if (packet != null) {
+            writeByte(1, (byte) (pitch * rotationMultiplier));
+        }
+        else {
+            this.pitch = pitch;
         }
     }
 
     public boolean isOnGround() {
-        if (listeningMode) {
+        if (packet != null) {
             return readBoolean(0);
         } else {
             return onGround;
+        }
+    }
+
+    public void setIsOnGround(boolean onGround) {
+        if (packet != null) {
+            writeBoolean(0, onGround);
+        }
+        else {
+            this.onGround = onGround;
         }
     }
 
@@ -206,13 +296,5 @@ public class WrappedPacketOutEntityTeleport extends WrappedPacket implements Sen
             return instance;
         }
         return null;
-    }
-
-    public float getPitch() {
-        if (listeningMode) {
-            return pitch;
-        } else {
-            return (readByte(1) / rotationMultiplier);
-        }
     }
 }

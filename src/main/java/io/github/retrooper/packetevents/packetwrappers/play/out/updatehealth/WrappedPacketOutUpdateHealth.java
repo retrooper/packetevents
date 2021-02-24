@@ -37,18 +37,10 @@ public final class WrappedPacketOutUpdateHealth extends WrappedPacket implements
     private float health, foodSaturation;
     private int food;
 
-
     public WrappedPacketOutUpdateHealth(final NMSPacket packet) {
         super(packet);
     }
 
-    /**
-     * See https://wiki.vg/Protocol#Update_Health
-     *
-     * @param health         0 or less = dead, 20 = full HP
-     * @param food           0–20
-     * @param foodSaturation Seems to vary from 0.0 to 5.0 in integer increments
-     */
     public WrappedPacketOutUpdateHealth(final float health, final int food, final float foodSaturation) {
         this.health = health;
         this.food = food;
@@ -66,11 +58,6 @@ public final class WrappedPacketOutUpdateHealth extends WrappedPacket implements
         }
     }
 
-    /**
-     * Get health value.
-     *
-     * @return Get Health
-     */
     public float getHealth() {
         if (packet != null) {
             return readFloat(0);
@@ -79,11 +66,15 @@ public final class WrappedPacketOutUpdateHealth extends WrappedPacket implements
         }
     }
 
-    /**
-     * Get food saturation value.
-     *
-     * @return Get Food Saturation
-     */
+    public void setHealth(float health) {
+        if (packet != null) {
+            writeFloat(0, health);
+        }
+        else {
+            this.health = health;
+        }
+    }
+
     public float getFoodSaturation() {
         if (packet != null) {
             return readFloat(1);
@@ -92,16 +83,29 @@ public final class WrappedPacketOutUpdateHealth extends WrappedPacket implements
         }
     }
 
-    /**
-     * Get food value.
-     *
-     * @return Get Food
-     */
+    public void setFoodSaturation(float foodSaturation) {
+        if (packet != null) {
+            writeFloat(0, foodSaturation);
+        }
+        else {
+            this.foodSaturation = foodSaturation;
+        }
+    }
+
     public int getFood() {
         if (packet != null) {
             return readInt(0);
         } else {
             return food;
+        }
+    }
+
+    public void setFood(int food) {
+        if (packet != null) {
+            writeInt(0, food);
+        }
+        else {
+            this.food = food;
         }
     }
 

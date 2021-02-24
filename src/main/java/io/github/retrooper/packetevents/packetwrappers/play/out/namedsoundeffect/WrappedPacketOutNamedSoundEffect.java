@@ -6,7 +6,7 @@ import io.github.retrooper.packetevents.utils.nms.NMSUtils;
 import io.github.retrooper.packetevents.utils.reflection.Reflection;
 import io.github.retrooper.packetevents.utils.server.ServerVersion;
 
-//TODO test
+//TODO finish wrapper and TEST and make sendable
 class WrappedPacketOutNamedSoundEffect extends WrappedPacket {
     private static boolean soundEffectVarExists;
 
@@ -30,16 +30,40 @@ class WrappedPacketOutNamedSoundEffect extends WrappedPacket {
         }
     }
 
+    public void setSoundEffectName(String name) {
+        if (soundEffectVarExists) {
+            Object soundEffect = readObject(0, NMSUtils.soundEffectClass);
+            WrappedPacket soundEffectWrapper = new WrappedPacket(new NMSPacket(soundEffect));
+            Object minecraftKey = NMSUtils.generateMinecraftKey(name);
+            soundEffectWrapper.write(NMSUtils.minecraftKeyClass, 0, minecraftKey);
+        }
+        else {
+            writeString(0, name);
+        }
+    }
+
     public double getEffectPositionX() {
         return readInt(0) / 8.0D;
+    }
+
+    public void setEffectPositionX(double x) {
+        writeInt(0, (int) (x * 8.0D));
     }
 
     public double getEffectPositionY() {
         return readInt(1) / 8.0D;
     }
 
+    public void setEffectPositionY(double y) {
+        writeInt(1, (int) (y * 8.0D));
+    }
+
     public double getEffectPositionZ() {
         return readInt(2) / 8.0D;
+    }
+
+    public void setEffectPositionZ(double z) {
+        writeInt(2, (int) (z * 8.0D));
     }
 
     //Might be more than 1.0 on some older versions
@@ -47,11 +71,33 @@ class WrappedPacketOutNamedSoundEffect extends WrappedPacket {
         return readFloat(0);
     }
 
+    public void setVolume(float volume) {
+        writeFloat(0, volume);
+    }
+
     public float getPitch() {
         if (version.isOlderThan(ServerVersion.v_1_10)) {
             return readInt(1);
         } else {
             return readFloat(1);
+        }
+    }
+
+    public void setPitch(float pitch) {
+        if (version.isOlderThan(ServerVersion.v_1_10)) {
+            writeInt(1, (int) pitch);
+        }
+        else {
+            writeFloat(1, pitch);
+        }
+    }
+
+    public void setPitch(int pitch) {
+        if (version.isOlderThan(ServerVersion.v_1_10)) {
+            writeInt(1, pitch);
+        }
+        else {
+            writeFloat(1, pitch);
         }
     }
 }

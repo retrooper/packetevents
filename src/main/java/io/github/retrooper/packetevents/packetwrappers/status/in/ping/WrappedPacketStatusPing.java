@@ -35,4 +35,8 @@ public class WrappedPacketStatusPing extends WrappedPacket {
     public long getPayload() {
         return readLong(0);
     }
+
+    public void setPayload(long payload) {
+        writeLong(0, payload);
+    }
 }

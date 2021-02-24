@@ -94,6 +94,14 @@ public class WrappedPacketOutExplosion extends WrappedPacket implements Sendable
         }
     }
 
+    public void setX(double x) {
+        if (packet != null) {
+            writeDouble(0, x);
+        } else {
+            this.x = x;
+        }
+    }
+
     public double getY() {
         if (packet != null) {
             return readDouble(1);
@@ -102,11 +110,27 @@ public class WrappedPacketOutExplosion extends WrappedPacket implements Sendable
         }
     }
 
+    public void setY(double y) {
+        if (packet != null) {
+            writeDouble(1, y);
+        } else {
+            this.y = y;
+        }
+    }
+
     public double getZ() {
         if (packet != null) {
             return readDouble(2);
         } else {
             return z;
+        }
+    }
+
+    public void setZ(double z) {
+        if (packet != null) {
+            writeDouble(2, z);
+        } else {
+            this.z = z;
         }
     }
 
@@ -119,6 +143,14 @@ public class WrappedPacketOutExplosion extends WrappedPacket implements Sendable
         }
     }
 
+    public void setStrength(float strength) {
+        if (packet != null) {
+            writeFloat(0, strength);
+        } else {
+            this.strength = strength;
+        }
+    }
+
     public List<Vector3i> getRecords() {
         if (packet != null) {
             List<Vector3i> recordsList = new ArrayList<>();
@@ -128,11 +160,33 @@ public class WrappedPacketOutExplosion extends WrappedPacket implements Sendable
             }
             for (Object position : rawRecordsList) {
                 WrappedPacket posWrapper = new WrappedPacket(new NMSPacket(position));
-                recordsList.add(new Vector3i(posWrapper.readInt(0), posWrapper.readInt(1), posWrapper.readInt(2)));
+                int x = posWrapper.readInt(0);
+                int y = posWrapper.readInt(1);
+                int z = posWrapper.readInt(2);
+                recordsList.add(new Vector3i(x, y, z));
             }
             return recordsList;
         } else {
             return records;
+        }
+    }
+
+    public void setRecords(List<Vector3i> records) {
+        if (packet != null) {
+            List<Object> nmsRecordsList = new ArrayList<>();
+            for (Vector3i record : records) {
+                Object[] arguments = {record.x, record.y, record.z};
+                Object position = null; //construct position
+                try {
+                    position = version.isNewerThan(ServerVersion.v_1_7_10) ? blockPosConstructor.newInstance(arguments) : chunkPosConstructor.newInstance(arguments);
+                } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
+                    e.printStackTrace();
+                }
+                nmsRecordsList.add(position);
+            }
+            write(List.class, 0, nmsRecordsList);
+        } else {
+            this.records = records;
         }
     }
 
@@ -144,11 +198,27 @@ public class WrappedPacketOutExplosion extends WrappedPacket implements Sendable
         }
     }
 
+    public void setPlayerMotionX(float playerMotionX) {
+        if (packet != null) {
+            writeFloat(1, playerMotionX);
+        } else {
+            this.playerMotionX = playerMotionX;
+        }
+    }
+
     public float getPlayerMotionY() {
         if (packet != null) {
             return readFloat(2);
         } else {
             return playerMotionY;
+        }
+    }
+
+    public void setPlayerMotionY(float playerMotionY) {
+        if (packet != null) {
+            writeFloat(2, playerMotionY);
+        } else {
+            this.playerMotionY = playerMotionY;
         }
     }
 
@@ -160,39 +230,34 @@ public class WrappedPacketOutExplosion extends WrappedPacket implements Sendable
         }
     }
 
+    public void setPlayerMotionZ(float playerMotionZ) {
+        if (packet != null) {
+            writeFloat(3, playerMotionZ);
+        } else {
+            this.playerMotionZ = playerMotionZ;
+        }
+    }
+
     @Override
     public Object asNMSPacket() {
-        if (version.equals(ServerVersion.v_1_7_10)) {
-            List<Object> chunkPositions = new ArrayList<>();
-            for (Vector3i vec : getRecords()) {
-                try {
-                    chunkPositions.add(chunkPosConstructor.newInstance(vec.x, vec.y, vec.z));
-                } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
-                    e.printStackTrace();
-                }
-            }
+        List<Object> positions = new ArrayList<>();
+        for (Vector3i record : getRecords()) {
+            Object[] arguments = {record.x, record.y, record.z};
+            Object position = null;
             try {
-                Object vec = vec3dConstructor.newInstance(getPlayerMotionX(), getPlayerMotionY(), getPlayerMotionZ());
-                return packetConstructor.newInstance(getX(), getY(), getZ(), getStrength(), chunkPositions, vec);
+                position = version.isNewerThan(ServerVersion.v_1_7_10) ? blockPosConstructor.newInstance(arguments)
+                        : chunkPosConstructor.newInstance(arguments);
             } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
                 e.printStackTrace();
             }
+            positions.add(position);
 
-        } else {
-            List<Object> blockPositions = new ArrayList<>();
-            for (Vector3i vec : getRecords()) {
-                try {
-                    blockPositions.add(blockPosConstructor.newInstance(vec.x, vec.y, vec.z));
-                } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
-                    e.printStackTrace();
-                }
-            }
-            try {
-                Object vec = vec3dConstructor.newInstance(getPlayerMotionX(), getPlayerMotionY(), getPlayerMotionZ());
-                return packetConstructor.newInstance(getX(), getY(), getZ(), getStrength(), blockPositions, vec);
-            } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
-                e.printStackTrace();
-            }
+        }
+        try {
+            Object vec = vec3dConstructor.newInstance(getPlayerMotionX(), getPlayerMotionY(), getPlayerMotionZ());
+            return packetConstructor.newInstance(getX(), getY(), getZ(), getStrength(), positions, vec);
+        } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
+            e.printStackTrace();
         }
         return null;
     }
