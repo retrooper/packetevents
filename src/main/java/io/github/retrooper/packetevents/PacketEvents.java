@@ -63,7 +63,6 @@ import java.util.UUID;
 public final class PacketEvents implements Listener, EventManager {
     //TODO finish unfinished wrappers, add setters to every single wrapper, once the modern early injector is finished push its changes to the legacy injector.
     //TODO: make setters for all client-bound play wrappers and all wrappers in status state.
-    //TODO: make HANDSHAKING its own state
     private static PacketEvents instance;
     private final PEVersion version = new PEVersion(1, 7, 9, 5);
     private final EventManager eventManager = new PEEventManager();
@@ -157,7 +156,33 @@ public final class PacketEvents implements Listener, EventManager {
                 Thread thread = new Thread(new Runnable() {
                     @Override
                     public void run() {
+                        PacketEvents.get().getPlugin().getLogger().info("[packetevents] Checking for an update, please wait...");
                         UpdateChecker.UpdateCheckerStatus status = updateChecker.checkForUpdate();
+                        int seconds = 5;
+                        for (int i = 0; i < 5; i++) {
+                            if (status == UpdateChecker.UpdateCheckerStatus.FAILED) {
+                                PacketEvents.get().getPlugin().getLogger().severe("[packetevents] Checking for an update again in " + seconds + " seconds...");
+                                try {
+                                    Thread.sleep(seconds * 1000L);
+                                } catch (InterruptedException e) {
+                                    e.printStackTrace();
+                                }
+
+                                seconds *= 2;
+
+                                status = updateChecker.checkForUpdate();
+
+                                if (i == 4) {
+                                    PacketEvents.get().getPlugin().getLogger().severe("[packetevents] PacketEvents failed to check for an update. No longer retrying.");
+                                    break;
+                                }
+                            }
+                            else {
+                                break;
+                            }
+
+                        }
+
                     }
                 }, "PacketEvents-update-check-thread");
                 thread.start();

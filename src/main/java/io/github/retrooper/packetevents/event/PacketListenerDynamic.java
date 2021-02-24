@@ -43,6 +43,7 @@ public abstract class PacketListenerDynamic {
     public ImmutableSetCustom<Byte> serverSidedPlayAllowance;
 
     public ImmutableSetCustom<Byte> clientSidedStatusAllowance;
+    public ImmutableSetCustom<Byte> clientSidedHandshakeAllowance;
     public ImmutableSetCustom<Byte> clientSidedLoginAllowance;
     public ImmutableSetCustom<Byte> clientSidedPlayAllowance;
 
@@ -53,6 +54,7 @@ public abstract class PacketListenerDynamic {
         this.serverSidedPlayAllowance = null;
 
         this.clientSidedStatusAllowance = null;
+        this.clientSidedHandshakeAllowance = null;
         this.clientSidedLoginAllowance = null;
         this.clientSidedPlayAllowance = null;
     }
@@ -102,6 +104,15 @@ public abstract class PacketListenerDynamic {
         }
     }
 
+    public final void addClientSidedHandshakeFilter(Byte... handshakePacketIDs) {
+        if (this.clientSidedHandshakeAllowance == null) {
+            this.clientSidedHandshakeAllowance = new ImmutableSetCustom<>(handshakePacketIDs);
+        }
+        else {
+            this.clientSidedHandshakeAllowance.addAll(handshakePacketIDs);
+        }
+    }
+
     public final void addClientSidedLoginFilter(Byte... loginPacketIDs) {
         if (this.clientSidedLoginAllowance == null) {
             this.clientSidedLoginAllowance = new ImmutableSetCustom<>(loginPacketIDs);
@@ -126,6 +137,7 @@ public abstract class PacketListenerDynamic {
         filterServerSidedPlay();
 
         filterClientSidedStatus();
+        filterClientSidedHandshake();
         filterClientSidedLogin();
         filterClientSidedPlay();
     }
@@ -146,6 +158,10 @@ public abstract class PacketListenerDynamic {
         this.clientSidedStatusAllowance = new ImmutableSetCustom<>();
     }
 
+    public final void filterClientSidedHandshake() {
+        this.clientSidedHandshakeAllowance = new ImmutableSetCustom<>();
+    }
+
     public final void filterClientSidedLogin() {
         this.clientSidedLoginAllowance = new ImmutableSetCustom<>();
     }
@@ -156,6 +172,7 @@ public abstract class PacketListenerDynamic {
 
     public void onPacketStatusReceive(PacketStatusReceiveEvent event) {}
     public void onPacketStatusSend(PacketStatusSendEvent event) {}
+    public void onPacketHandshakeReceiveEvent(PacketHandshakeReceiveEvent event) {}
     public void onPacketLoginReceive(PacketLoginReceiveEvent event) {}
     public void onPacketLoginSend(PacketLoginSendEvent event) {}
     public void onPacketPlayReceive(PacketPlayReceiveEvent event) {}

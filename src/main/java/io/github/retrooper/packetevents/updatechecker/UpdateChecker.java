@@ -92,7 +92,6 @@ public class UpdateChecker {
      */
     public UpdateCheckerStatus checkForUpdate() {
         PEVersion localVersion = PacketEvents.get().getVersion();
-        inform("Checking for an update, please wait...");
         PEVersion newVersion;
         try {
             newVersion = new PEVersion(getLatestReleasedVersion());

@@ -103,29 +103,12 @@ public class WrappedPacket implements WrapperPacketReader, WrapperPacketWriter {
         }
         if (field.isAnnotationPresent(SupportedVersions.class)) {
             SupportedVersions supportedVersions = field.getAnnotation(SupportedVersions.class);
-            List<ServerVersion> versionList = new ArrayList<>();
-            List<ServerVersion[]> rangeList = new ArrayList<>();
-
-            ServerVersion[] temp = new ServerVersion[2];
-            for (int i = 0; i < supportedVersions.ranges().length; i++) {
-                if ((i + 1) % 2 == 0) {
-                    temp[1] = supportedVersions.ranges()[i];
-                    rangeList.add(temp);
-                } else {
-                    temp[0] = supportedVersions.ranges()[i];
-                }
-            }
-
-            for (ServerVersion[] range : rangeList) {
-                int firstOrdinal = range[0].ordinal();
-                int lastOrdinal = range[range.length - 1].ordinal();
-                for (int ordinal = firstOrdinal; ordinal < lastOrdinal + 1; ordinal++) {
-                    ServerVersion value = ServerVersion.values()[ordinal];
-                    versionList.add(value);
-                }
-            }
+            List<ServerVersion> versionList = parseSupportedVersionsAnnotation(supportedVersions);
             String supportedVersionsMsg = Arrays.toString(versionList.toArray(new ServerVersion[0]));
             throw new UnsupportedOperationException("PacketEvents failed to use the " + enumConst.name() + " enum constant in the " + enumConstClass.getSimpleName() + " enum. This enum constant is not supported on your server version. (" + PacketEvents.get().getServerUtils().getVersion() + ")\n This enum constant is only supported on these server versions: " + supportedVersionsMsg);
+        }
+        else {
+            throw new UnsupportedOperationException("PacketEvents failed to use the " + enumConst.name() + " enum constant in the " + enumConstClass.getSimpleName() + " enum. This enum constant is not supported on your server version. (" + PacketEvents.get().getServerUtils().getVersion() + ")\n Failed to find out what server versions this enum constant is supported on.");
         }
     }
 
@@ -156,32 +139,34 @@ public class WrappedPacket implements WrapperPacketReader, WrapperPacketWriter {
             throw new UnsupportedOperationException("PacketEvents failed to access your requested field. This field is not supported on your server version. Failed to lookup the server versions this field supports...");
         } else {
             SupportedVersions supportedVersions = method.getAnnotation(SupportedVersions.class);
-            List<ServerVersion> versionList = new ArrayList<>();
-            List<ServerVersion[]> rangeList = new ArrayList<>();
+            List<ServerVersion> versionList = parseSupportedVersionsAnnotation(supportedVersions);
 
-            ServerVersion[] temp = new ServerVersion[2];
-            for (int i = 0; i < supportedVersions.ranges().length; i++) {
-                if ((i + 1) % 2 == 0) {
-                    temp[1] = supportedVersions.ranges()[i];
-                    rangeList.add(temp);
-                } else {
-                    temp[0] = supportedVersions.ranges()[i];
-                }
-            }
-
-            //TODO convert an array with elements, into a list of arrays, each array in the list must have 2 elements. THis code i attempted doesn't work properly. (NOTE: When you use 4 elements for example)
-            for (ServerVersion[] range : rangeList) {
-                int firstOrdinal = range[0].ordinal();
-                int lastOrdinal = range[range.length - 1].ordinal();
-                for (int ordinal = firstOrdinal; ordinal < lastOrdinal + 1; ordinal++) {
-                    ServerVersion value = ServerVersion.values()[ordinal];
-                    versionList.add(value);
-                    System.out.println("value: " + value);
-                }
-            }
             String supportedVersionsMsg = Arrays.toString(versionList.toArray(new ServerVersion[0]));
             throw new UnsupportedOperationException("PacketEvents failed to access your requested field. This field is not supported on your server version. (" + PacketEvents.get().getServerUtils().getVersion() + ")\n This field is only supported on these server versions: " + supportedVersionsMsg);
         }
+    }
+
+    private List<ServerVersion> parseSupportedVersionsAnnotation(SupportedVersions supportedVersions) {
+        List<ServerVersion> versionList = new ArrayList<>();
+        for (int i = 0; i < supportedVersions.ranges().length; i += 2) {
+            ServerVersion first = supportedVersions.ranges()[i];
+            ServerVersion last = supportedVersions.ranges()[i + 1];
+            if (first == last) {
+                versionList.add(first);
+                continue;
+            }
+            else if (first == ServerVersion.ERROR) {
+                first = ServerVersion.getOldest();
+            }
+            else if (last == ServerVersion.ERROR) {
+                last = ServerVersion.getLatest();
+            }
+            for (int ordinal = first.ordinal(); ordinal < last.ordinal() + 1; ordinal++) {
+                ServerVersion value = ServerVersion.values()[ordinal];
+                versionList.add(value);
+            }
+        }
+        return versionList;
     }
 
 

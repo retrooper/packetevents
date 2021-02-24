@@ -40,7 +40,7 @@ import java.util.Map;
  */
 public class PacketType {
     public enum State {
-        PLAY, LOGIN, STATUS;
+        STATUS, HANDSHAKING, LOGIN, PLAY;
     }
     /**
      * If a Packet Type could not be resolved, it will be set to the current value of this constant.
@@ -96,6 +96,17 @@ public class PacketType {
         }
     }
 
+    public static class Handshaking {
+        public static class Client {
+            public static final Map<Class<?>, Byte> packetIds = new HashMap<>();
+            public static final byte HANDSHAKE = 0;
+
+            public static void init() {
+                packetIds.put(PacketTypeClasses.Handshaking.Client.HANDSHAKE, Client.HANDSHAKE);
+            }
+        }
+    }
+
     /**
      * Login Packet IDs.
      *
@@ -113,13 +124,12 @@ public class PacketType {
          */
         public static class Client {
             public static final Map<Class<?>, Byte> packetIds = new HashMap<>();
-            public static final byte HANDSHAKE = 0, CUSTOM_PAYLOAD = 1, START = 2, ENCRYPTION_BEGIN = 3;
+            public static final byte CUSTOM_PAYLOAD = 0, START = 1, ENCRYPTION_BEGIN = 2;
 
             /**
              * Load the server-bound Login Packet IDs.
              */
             public static void init() {
-                packetIds.put(PacketTypeClasses.Login.Client.HANDSHAKE, Client.HANDSHAKE);
                 packetIds.put(PacketTypeClasses.Login.Client.CUSTOM_PAYLOAD, Client.CUSTOM_PAYLOAD);
                 packetIds.put(PacketTypeClasses.Login.Client.START, Client.START);
                 packetIds.put(PacketTypeClasses.Login.Client.ENCRYPTION_BEGIN, Client.ENCRYPTION_BEGIN);

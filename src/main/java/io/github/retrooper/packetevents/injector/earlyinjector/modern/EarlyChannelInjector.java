@@ -96,8 +96,6 @@ public class EarlyChannelInjector implements EarlyInjector {
                             }
                         }
                     }
-
-                    System.out.println("Finished successful injection...");
                 }
             }
         } catch (Exception ex) {

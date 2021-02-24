@@ -28,7 +28,7 @@ import io.github.retrooper.packetevents.PacketEvents;
 import io.github.retrooper.packetevents.event.impl.*;
 import io.github.retrooper.packetevents.packettype.PacketType;
 import io.github.retrooper.packetevents.packetwrappers.NMSPacket;
-import io.github.retrooper.packetevents.packetwrappers.login.in.handshake.WrappedPacketLoginInHandshake;
+import io.github.retrooper.packetevents.packetwrappers.handshaking.handshake.WrappedPacketHandshakingInHandshake;
 import io.github.retrooper.packetevents.packetwrappers.login.in.start.WrappedPacketLoginInStart;
 import io.github.retrooper.packetevents.utils.gameprofile.WrappedGameProfile;
 import io.github.retrooper.packetevents.utils.nms.NMSUtils;
@@ -80,8 +80,21 @@ public class PacketProcessorInternal {
                 PacketEvents.get().getEventManager().callEvent(statusEvent);
                 //Apply modifications to the packet
                 packet = statusEvent.getNMSPacket().getRawNMSPacket();
+                //Process internally
                 interceptStatusReceive(statusEvent);
                 if (statusEvent.isCancelled()) {
+                    //Set the packet to null if the event was cancelled
+                    packet = null;
+                }
+                break;
+            case HANDSHAKING:
+                PacketHandshakeReceiveEvent handshakeEvent = new PacketHandshakeReceiveEvent(channel, new NMSPacket(packet));
+                PacketEvents.get().getEventManager().callEvent(handshakeEvent);
+                //Apply modifications to the packet
+                packet = handshakeEvent.getNMSPacket().getRawNMSPacket();
+                //Process internally
+                interceptHandshakeReceive(handshakeEvent);
+                if (handshakeEvent.isCancelled()) {
                     //Set the packet to null if the event was cancelled
                     packet = null;
                 }
@@ -104,7 +117,7 @@ public class PacketProcessorInternal {
                 PacketPlayReceiveEvent event = new PacketPlayReceiveEvent(player, channel, new NMSPacket(packet));
                 PacketEvents.get().getEventManager().callEvent(event);
                 packet = event.getNMSPacket().getRawNMSPacket();
-                interceptRead(event);
+                interceptPlayReceive(event);
                 if (event.isCancelled()) {
                     packet = null;
                 }
@@ -146,7 +159,7 @@ public class PacketProcessorInternal {
                 PacketPlaySendEvent playEvent = new PacketPlaySendEvent(player, channel, new NMSPacket(packet));
                 PacketEvents.get().getEventManager().callEvent(playEvent);
                 packet = playEvent.getNMSPacket().getRawNMSPacket();
-                interceptWrite(playEvent);
+                interceptPlaySend(playEvent);
                 if (playEvent.isCancelled()) {
                     packet = null;
                 }
@@ -196,15 +209,17 @@ public class PacketProcessorInternal {
      *
      * @param event PLAY server-bound packet event.
      */
-    private void interceptRead(PacketPlayReceiveEvent event) {
-        if (event.getPacketId() == PacketType.Play.Client.KEEP_ALIVE) {
-            UUID uuid = event.getPlayer().getUniqueId();
-            long timestamp = keepAliveMap.getOrDefault(uuid, event.getTimestamp());
-            long currentTime = event.getTimestamp();
-            long ping = currentTime - timestamp;
-            long smoothedPing = (PacketEvents.get().getPlayerUtils().getSmoothedPing(event.getPlayer().getUniqueId()) * 3L + ping) / 4;
-            PacketEvents.get().getPlayerUtils().playerPingMap.put(uuid, (int) ping);
-            PacketEvents.get().getPlayerUtils().playerSmoothedPingMap.put(uuid, (int) smoothedPing);
+    private void interceptPlayReceive(PacketPlayReceiveEvent event) {
+        if (event.getPlayer() != null) {
+            if (event.getPacketId() == PacketType.Play.Client.KEEP_ALIVE) {
+                UUID uuid = event.getPlayer().getUniqueId();
+                long timestamp = keepAliveMap.getOrDefault(uuid, event.getTimestamp());
+                long currentTime = event.getTimestamp();
+                long ping = currentTime - timestamp;
+                long smoothedPing = (PacketEvents.get().getPlayerUtils().getSmoothedPing(event.getPlayer().getUniqueId()) * 3L + ping) / 4;
+                PacketEvents.get().getPlayerUtils().playerPingMap.put(uuid, (int) ping);
+                PacketEvents.get().getPlayerUtils().playerSmoothedPingMap.put(uuid, (int) smoothedPing);
+            }
         }
     }
 
@@ -213,7 +228,7 @@ public class PacketProcessorInternal {
      *
      * @param event PLAY client-bound packet event.
      */
-    private void interceptWrite(PacketPlaySendEvent event) {
+    private void interceptPlaySend(PacketPlaySendEvent event) {
 
     }
 
@@ -223,13 +238,7 @@ public class PacketProcessorInternal {
      * @param event LOGIN server-bound packet event.
      */
     private void interceptLoginReceive(PacketLoginReceiveEvent event) {
-        if (event.getPacketId() == PacketType.Login.Client.HANDSHAKE) {
-            WrappedPacketLoginInHandshake handshake = new WrappedPacketLoginInHandshake(event.getNMSPacket());
-            int protocolVersion = handshake.getProtocolVersion();
-            ClientVersion version = ClientVersion.getClientVersion(protocolVersion);
-            PacketEvents.get().getPlayerUtils().tempClientVersionMap.put(event.getSocketAddress(), version);
-            System.out.println("PROTOCOL VERSION CACHED!");
-        }
+
     }
 
     /**
@@ -240,6 +249,21 @@ public class PacketProcessorInternal {
     private void interceptLoginSend(PacketLoginSendEvent event) {
 
     }
+
+    /**
+     * Internal processing of an incoming HANDSHAKE packet.
+     *
+     * @param event server-bound HANDSHAKE packet event.
+     */
+    private void interceptHandshakeReceive(PacketHandshakeReceiveEvent event) {
+        if (event.getPacketId() == PacketType.Handshaking.Client.HANDSHAKE) {
+            WrappedPacketHandshakingInHandshake handshake = new WrappedPacketHandshakingInHandshake(event.getNMSPacket());
+            int protocolVersion = handshake.getProtocolVersion();
+            ClientVersion version = ClientVersion.getClientVersion(protocolVersion);
+            PacketEvents.get().getPlayerUtils().tempClientVersionMap.put(event.getSocketAddress(), version);
+        }
+    }
+
 
     /**
      * Internal processing of an incoming STATUS packet.
@@ -285,15 +309,16 @@ public class PacketProcessorInternal {
     private PacketType.State getPacketState(Player player, Object packet) {
         if (player != null) {
             return PacketType.State.PLAY;
-        }
-        else {
-            String packetName = ClassUtil.getClassSimpleName(packet.getClass());
-            if (packetName.startsWith("PacketS")) {
-                return PacketType.State.STATUS;
-            } else if (packetName.startsWith("PacketP")) {
-                return PacketType.State.PLAY;
-            } else {
+        } else {
+            String packetName = ClassUtil.getClassSimpleName(packet.getClass());//Cached string name so it is faster
+            if (packetName.startsWith("PacketH")) {
+                return PacketType.State.HANDSHAKING;
+            } else if (packetName.startsWith("PacketL")) {
                 return PacketType.State.LOGIN;
+            } else if (packetName.startsWith("PacketS")) {
+                return PacketType.State.STATUS;
+            } else {
+                return PacketType.State.PLAY;
             }
         }
     }

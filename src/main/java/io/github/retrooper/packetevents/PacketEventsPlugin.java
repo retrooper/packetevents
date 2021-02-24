@@ -24,13 +24,6 @@
 
 package io.github.retrooper.packetevents;
 
-import io.github.retrooper.packetevents.event.PacketListenerDynamic;
-import io.github.retrooper.packetevents.event.impl.PacketLoginReceiveEvent;
-import io.github.retrooper.packetevents.event.impl.PacketPlayReceiveEvent;
-import io.github.retrooper.packetevents.packettype.PacketType;
-import io.github.retrooper.packetevents.packetwrappers.login.in.handshake.WrappedPacketLoginInHandshake;
-import io.github.retrooper.packetevents.packetwrappers.play.in.abilities.WrappedPacketInAbilities;
-import io.github.retrooper.packetevents.packetwrappers.play.in.useentity.WrappedPacketInUseEntity;
 import org.bukkit.plugin.java.JavaPlugin;
 
 public class PacketEventsPlugin extends JavaPlugin {
@@ -47,28 +40,6 @@ public class PacketEventsPlugin extends JavaPlugin {
     @Override
     public void onEnable() {
         PacketEvents.get().init(this);
-        PacketEvents.get().registerListener(new PacketListenerDynamic() {
-            @Override
-            public void onPacketLoginReceive(PacketLoginReceiveEvent event) {
-                if (event.getPacketId() == PacketType.Login.Client.HANDSHAKE) {
-                    WrappedPacketLoginInHandshake handshake = new WrappedPacketLoginInHandshake(event.getNMSPacket());
-                    System.out.println("PROTOCOL VERSION: " + handshake.getProtocolVersion() + ", received from " + handshake.getHostName() + ":" + handshake.getPort());
-                }
-            }
-
-            @Override
-            public void onPacketPlayReceive(PacketPlayReceiveEvent event) {
-                if (event.getPacketId() == PacketType.Play.Client.USE_ENTITY) {
-                    WrappedPacketInUseEntity ue = new WrappedPacketInUseEntity(event.getNMSPacket());
-                    event.getPlayer().sendMessage("ue: " + ue.getEntity().getName());
-                }
-                else if (event.getPacketId() == PacketType.Play.Client.ABILITIES) {
-                    WrappedPacketInAbilities abilities = new WrappedPacketInAbilities(event.getNMSPacket());
-                    float flySpeed = abilities.getFlySpeed();
-                    event.getPlayer().sendMessage("fly speed: " + flySpeed);
-                }
-            }
-        });
     }
 
     @Override

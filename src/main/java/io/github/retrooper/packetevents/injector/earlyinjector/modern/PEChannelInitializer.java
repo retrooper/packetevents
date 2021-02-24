@@ -54,10 +54,6 @@ public class PEChannelInitializer extends ChannelInitializer<SocketChannel> {
         PlayerChannelHandler channelHandler = new PlayerChannelHandler();
         if (socketChannel.pipeline().get("packet_handler") != null) {
             socketChannel.pipeline().addBefore("packet_handler", PacketEvents.handlerName, channelHandler);
-            System.out.println("Successfully added our handler before \"packet_handler\"!");
-        }
-        else {
-            System.out.println("Failed to add our handler before \"packet_handler\"");
         }
     }
 }

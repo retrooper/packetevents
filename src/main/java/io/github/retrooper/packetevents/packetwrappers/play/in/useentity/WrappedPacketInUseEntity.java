@@ -87,7 +87,7 @@ public final class WrappedPacketInUseEntity extends WrappedPacket {
         this.entity = null;
     }
 
-    @SupportedVersions(ranges = {ServerVersion.v_1_8, ServerVersion.v_1_16_5})
+    @SupportedVersions(ranges = {ServerVersion.v_1_8, ServerVersion.ERROR})
     public Vector3d getTarget() throws UnsupportedOperationException {
         if (PacketEvents.get().getServerUtils().getVersion() == ServerVersion.v_1_7_10) {
             throwUnsupportedOperation();
@@ -104,7 +104,7 @@ public final class WrappedPacketInUseEntity extends WrappedPacket {
         }
     }
 
-    @SupportedVersions(ranges = {ServerVersion.v_1_8, ServerVersion.v_1_16_5})
+    @SupportedVersions(ranges = {ServerVersion.v_1_8, ServerVersion.ERROR})
     public void setTarget(Vector3d target) throws UnsupportedOperationException {
         if (PacketEvents.get().getServerUtils().getVersion() == ServerVersion.v_1_7_10) {
             throwUnsupportedOperation();
@@ -147,7 +147,7 @@ public final class WrappedPacketInUseEntity extends WrappedPacket {
         return Hand.MAIN_HAND;
     }
 
-    @SupportedVersions(ranges = {ServerVersion.v_1_9, ServerVersion.v_1_16_5})
+    @SupportedVersions(ranges = {ServerVersion.v_1_9, ServerVersion.ERROR})
     public void setHand(Hand hand) throws UnsupportedOperationException {
         if (PacketEvents.get().getServerUtils().getVersion().isOlderThan(ServerVersion.v_1_9)) {
             throwUnsupportedOperation();

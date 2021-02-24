@@ -152,17 +152,17 @@ public class WrappedPacketInSettings extends WrappedPacket {
     public enum DisplayedSkinPart {
         CAPE,
 
-        @SupportedVersions(ranges = {ServerVersion.v_1_8, ServerVersion.v_1_16_5})
+        @SupportedVersions(ranges = {ServerVersion.v_1_8, ServerVersion.ERROR})
         JACKET,
-        @SupportedVersions(ranges = {ServerVersion.v_1_8, ServerVersion.v_1_16_5})
+        @SupportedVersions(ranges = {ServerVersion.v_1_8, ServerVersion.ERROR})
         LEFT_SLEEVE,
-        @SupportedVersions(ranges = {ServerVersion.v_1_8, ServerVersion.v_1_16_5})
+        @SupportedVersions(ranges = {ServerVersion.v_1_8, ServerVersion.ERROR})
         RIGHT_SLEEVE,
-        @SupportedVersions(ranges = {ServerVersion.v_1_8, ServerVersion.v_1_16_5})
+        @SupportedVersions(ranges = {ServerVersion.v_1_8, ServerVersion.ERROR})
         LEFT_PANTS,
-        @SupportedVersions(ranges = {ServerVersion.v_1_8, ServerVersion.v_1_16_5})
+        @SupportedVersions(ranges = {ServerVersion.v_1_8, ServerVersion.ERROR})
         RIGHT_PANTS,
-        @SupportedVersions(ranges = {ServerVersion.v_1_8, ServerVersion.v_1_16_5})
+        @SupportedVersions(ranges = {ServerVersion.v_1_8, ServerVersion.ERROR})
         HAT
     }
 }

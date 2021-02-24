@@ -50,11 +50,7 @@ public final class WrappedPacketInClientCommand extends WrappedPacket {
         }
     }
 
-    /**
-     * Get the Client Command enum sent in the packet
-     *
-     * @return ClientCommand
-     */
+
     public ClientCommand getClientCommand() {
         Enum<?> emumConst = (Enum<?>) readObject(0, enumClientCommandClass);
         return ClientCommand.valueOf(emumConst.name());

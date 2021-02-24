@@ -29,15 +29,17 @@ import io.github.retrooper.packetevents.utils.reflection.SubclassUtil;
 
 public class PacketTypeClasses {
     public static void load() {
-        //PLAY
-        PacketTypeClasses.Play.Client.load();
-        PacketTypeClasses.Play.Server.load();
-        //LOGIN
-        PacketTypeClasses.Login.Client.load();
-        PacketTypeClasses.Login.Server.load();
         //STATUS
         PacketTypeClasses.Status.Client.load();
         PacketTypeClasses.Status.Server.load();
+        //HANDSHAKING
+        PacketTypeClasses.Handshaking.Client.load();
+        //LOGIN
+        PacketTypeClasses.Login.Client.load();
+        PacketTypeClasses.Login.Server.load();
+        //PLAY
+        PacketTypeClasses.Play.Client.load();
+        PacketTypeClasses.Play.Server.load();
     }
 
     public static class Status {
@@ -62,12 +64,22 @@ public class PacketTypeClasses {
         }
     }
 
-    public static class Login {
+    public static class Handshaking {
         public static class Client {
-            public static Class<?> HANDSHAKE, CUSTOM_PAYLOAD, START, ENCRYPTION_BEGIN;
+            public static Class<?> HANDSHAKE;
 
             public static void load() {
-                Client.HANDSHAKE = NMSUtils.getNMSClassWithoutException("PacketHandshakingInSetProtocol");
+                Handshaking.Client.HANDSHAKE = NMSUtils.getNMSClassWithoutException("PacketHandshakingInSetProtocol");
+                PacketType.Handshaking.Client.init();
+            }
+        }
+    }
+
+    public static class Login {
+        public static class Client {
+            public static Class<?> CUSTOM_PAYLOAD, START, ENCRYPTION_BEGIN;
+
+            public static void load() {
                 //In and Out custom payload login packets have been here since AROUND 1.13.2.
                 Client.CUSTOM_PAYLOAD = NMSUtils.getNMSClassWithoutException("PacketLoginInCustomPayload");
                 Client.START = NMSUtils.getNMSClassWithoutException("PacketLoginInStart");

@@ -54,7 +54,7 @@ public class PacketLoginReceiveEvent extends CancellableNMSPacketEvent {
      * Each binding in each packet state has their own constants.
      * Example Usage:
      * <p>
-     * {@code if (getPacketId() == PacketType.Login.Client.HANDSHAKE) }
+     * {@code if (getPacketId() == PacketType.Login.Client.START) }
      * </p>
      *
      * @return Packet ID.

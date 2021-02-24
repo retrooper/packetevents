@@ -30,6 +30,7 @@ import io.github.retrooper.packetevents.event.eventtypes.PlayerEvent;
 import io.github.retrooper.packetevents.packettype.PacketType;
 import io.github.retrooper.packetevents.packetwrappers.NMSPacket;
 import org.bukkit.entity.Player;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * The {@code PacketPlayReceiveEvent} event is fired whenever the a PLAY packet is
@@ -55,6 +56,7 @@ public final class PacketPlayReceiveEvent extends CancellableNMSPacketEvent impl
      *
      * @return Packet sender.
      */
+    @Nullable
     @Override
     public Player getPlayer() {
         return player;

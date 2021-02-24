@@ -22,14 +22,14 @@
  * SOFTWARE.
  */
 
-package io.github.retrooper.packetevents.packetwrappers.login.in.handshake;
+package io.github.retrooper.packetevents.packetwrappers.handshaking.handshake;
 
 import io.github.retrooper.packetevents.packettype.PacketTypeClasses;
 import io.github.retrooper.packetevents.packetwrappers.NMSPacket;
 import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
 
-public class WrappedPacketLoginInHandshake extends WrappedPacket {
-    public WrappedPacketLoginInHandshake(NMSPacket packet) {
+public class WrappedPacketHandshakingInHandshake extends WrappedPacket {
+    public WrappedPacketHandshakingInHandshake(NMSPacket packet) {
         super(packet);
     }
 
@@ -59,6 +59,6 @@ public class WrappedPacketLoginInHandshake extends WrappedPacket {
 
     @Override
     public boolean isSupported() {
-        return PacketTypeClasses.Login.Client.HANDSHAKE != null;
+        return PacketTypeClasses.Handshaking.Client.HANDSHAKE != null;
     }
 }
