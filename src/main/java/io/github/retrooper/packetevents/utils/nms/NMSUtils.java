@@ -30,7 +30,6 @@ import io.github.retrooper.packetevents.utils.entityfinder.EntityFinderUtils;
 import io.github.retrooper.packetevents.utils.reflection.Reflection;
 import io.github.retrooper.packetevents.utils.reflection.SubclassUtil;
 import io.github.retrooper.packetevents.utils.server.ServerVersion;
-import io.github.retrooper.packetevents.utils.vector.Vector3d;
 import org.bukkit.Bukkit;
 import org.bukkit.Server;
 import org.bukkit.World;
@@ -56,7 +55,7 @@ public final class NMSUtils {
     public static Class<?> nmsEntityClass, minecraftServerClass, craftWorldClass, playerInteractManagerClass, entityPlayerClass, playerConnectionClass, craftServerClass,
             craftPlayerClass, serverConnectionClass, craftEntityClass, nmsItemStackClass, networkManagerClass, nettyChannelClass, gameProfileClass, iChatBaseComponentClass,
             blockPosClass, vec3DClass, channelFutureClass, blockClass, iBlockDataClass, watchableObjectClass, nmsWorldClass, craftItemStackClass,
-            soundEffectClass, minecraftKeyClass;
+            soundEffectClass, minecraftKeyClass, chatSerializerClass;
     public static Class<? extends Enum<?>> enumDirectionClass, enumHandClass;
     public static Method getBlockPosX, getBlockPosY, getBlockPosZ;
     private static Method getCraftPlayerHandle;
@@ -64,6 +63,8 @@ public final class NMSUtils {
     private static Method getCraftWorldHandle;
     private static Method asBukkitCopy;
     private static Method asNMSCopy;
+    private static Method getMessageMethod;
+    private static Method chatFromStringMethod;
     private static Field entityPlayerPingField, playerConnectionField;
     private static Object minecraftServer;
     private static Object minecraftServerConnection;
@@ -74,8 +75,7 @@ public final class NMSUtils {
         if (version.isNewerThan(ServerVersion.v_1_7_10)) {
             legacyNettyImportMode = false;
             nettyPrefix = newNettyPrefix;
-        }
-        else {
+        } else {
             legacyNettyImportMode = true;
             nettyPrefix = legacyNettyPrefix;
         }
@@ -83,15 +83,13 @@ public final class NMSUtils {
         try {
             //Test if the selected netty location is valid
             Object chnl = getNettyClass("channel.Channel");
-        }
-        catch (ClassNotFoundException ex) {
+        } catch (ClassNotFoundException ex) {
             System.err.println("[packetevents] Failed to locate the netty package location for your server version. Searching...");
             //Time to correct the netty location
             if (legacyNettyImportMode) {
                 legacyNettyImportMode = false;
                 nettyPrefix = newNettyPrefix;
-            }
-            else {
+            } else {
                 legacyNettyImportMode = true;
                 nettyPrefix = legacyNettyPrefix;
             }
@@ -161,6 +159,20 @@ public final class NMSUtils {
             getCraftWorldHandle = craftWorldClass.getMethod("getHandle");
             asBukkitCopy = craftItemStackClass.getMethod("asBukkitCopy", nmsItemStackClass);
             asNMSCopy = craftItemStackClass.getMethod("asNMSCopy", ItemStack.class);
+            getMessageMethod = Reflection.getMethodCheckContainsString(iChatBaseComponentClass, "c", String.class);
+            if (getMessageMethod == null) {
+                getMessageMethod = Reflection.getMethodCheckContainsString(iChatBaseComponentClass, "Plain", String.class);
+            }
+
+            //In 1.8.3+ the ChatSerializer class is declared in the IChatBaseComponent class, so we have to handle that
+            try {
+                chatSerializerClass = NMSUtils.getNMSClass("ChatSerializer");
+            } catch (ClassNotFoundException e) {
+                //That is fine, it is probably a subclass
+                chatSerializerClass = SubclassUtil.getSubClass(iChatBaseComponentClass, "ChatSerializer");
+            }
+
+            chatFromStringMethod = Reflection.getMethod(chatSerializerClass, 0, String.class);
 
             if (minecraftKeyClass != null) {
                 minecraftKeyConstructor = minecraftKeyClass.getConstructor(String.class);
@@ -317,14 +329,13 @@ public final class NMSUtils {
         WrappedPacket serverConnectionWrapper = new WrappedPacket(new NMSPacket(getMinecraftServerConnection()));
         for (int i = 0; true; i++) {
             try {
-                List<?> list = (List<?>) serverConnectionWrapper.readObject(i,  List.class);
+                List<?> list = (List<?>) serverConnectionWrapper.readObject(i, List.class);
                 for (Object obj : list) {
                     if (obj.getClass().isAssignableFrom(networkManagerClass)) {
                         return (List<Object>) list;
                     }
                 }
-            }
-            catch (Exception ex) {
+            } catch (Exception ex) {
                 break;
             }
         }
@@ -363,6 +374,44 @@ public final class NMSUtils {
             e.printStackTrace();
         }
         return null;
+    }
+
+    public static Object generateIChatBaseComponent(String text) {
+        try {
+            return chatFromStringMethod.invoke(null, text);
+        } catch (IllegalAccessException | InvocationTargetException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    public static Object[] generateIChatBaseComponents(String... texts) {
+        Object[] components = new Object[texts.length];
+        for (int i = 0; i < components.length; i++) {
+            components[i] = generateIChatBaseComponent(texts[i]);
+        }
+        return components;
+    }
+
+    public static String readIChatBaseComponent(Object iChatBaseComponent) {
+        try {
+            return getMessageMethod.invoke(iChatBaseComponent).toString();
+        } catch (IllegalAccessException | InvocationTargetException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    public static String[] readIChatBaseComponents(Object... components) {
+        String[] texts = new String[components.length];
+        for (int i = 0; i < texts.length; i++) {
+            texts[i] = readIChatBaseComponent(components[i]);
+        }
+        return texts;
+    }
+
+    public static String fromStringToJSON(String message) {
+        return "{\"text\": \"" + message + "\"}";
     }
 
     public static Object generateNMSBlockPos(double x, double y, double z) {

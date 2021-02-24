@@ -96,7 +96,7 @@ public class WrappedPacketInUpdateSign extends WrappedPacket {
         } else {
             //1.8 and above
             Object[] iChatComponents = (Object[]) readAnyObject(1);
-            return WrappedPacketOutChat.toStringArrayFromIChatBaseComponentArray(iChatComponents);
+            return NMSUtils.readIChatBaseComponents(iChatComponents);
         }
     }
 
@@ -105,7 +105,7 @@ public class WrappedPacketInUpdateSign extends WrappedPacket {
             writeStringArray(0, lines);
         }
         else {
-            Object[] iChatComponents = WrappedPacketOutChat.toIChatBaseComponentArray(lines);
+            Object[] iChatComponents = NMSUtils.generateIChatBaseComponents(lines);
             writeAnyObject(1, iChatComponents);
         }
     }

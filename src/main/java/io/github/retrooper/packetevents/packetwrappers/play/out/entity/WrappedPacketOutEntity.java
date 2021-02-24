@@ -104,11 +104,6 @@ public class WrappedPacketOutEntity extends WrappedPacket implements SendableWra
 
     }
 
-    /**
-     * Get the pitch.
-     *
-     * @return Get Byte Pitch
-     */
     public byte getPitch() {
         if (packet != null) {
             return readByte(pitchByteIndex);
@@ -117,11 +112,14 @@ public class WrappedPacketOutEntity extends WrappedPacket implements SendableWra
         }
     }
 
-    /**
-     * Get the Yaw.
-     *
-     * @return Get Byte Yaw
-     */
+    public void setPitch(byte pitch) {
+        if (packet != null) {
+            writeByte(pitchByteIndex, pitch);
+        } else {
+            this.pitch = pitch;
+        }
+    }
+
     public byte getYaw() {
         if (packet != null) {
             return readByte(yawByteIndex);
@@ -130,11 +128,12 @@ public class WrappedPacketOutEntity extends WrappedPacket implements SendableWra
         }
     }
 
-    /**
-     * Get the Delta X
-     *
-     * @return Delta X
-     */
+    public void setYaw(byte yaw) {
+        if (packet != null) {
+            writeByte(yawByteIndex, yaw);
+        }
+    }
+
     public double getDeltaX() {
         if (packet != null) {
             switch (mode) {
@@ -144,18 +143,34 @@ public class WrappedPacketOutEntity extends WrappedPacket implements SendableWra
                     return readInt(1) / dXYZDivisor;
                 case 2:
                     return readShort(0) / dXYZDivisor;
+                default:
+                    return -1;
             }
         } else {
             return deltaX;
         }
-        return 0.0;
     }
 
-    /**
-     * Get the Delta Y
-     *
-     * @return Delta Y
-     */
+    public void setDeltaX(double deltaX) {
+        if (packet != null) {
+            int dx = (int) (deltaX * dXYZDivisor);
+            switch (mode) {
+                case 0:
+                    writeByte(0, (byte) dx);
+                    break;
+                case 1:
+                    writeInt(1, dx);
+                    break;
+                case 2:
+                    writeShort(0, (short) dx);
+                    break;
+            }
+        }
+        else {
+            this.deltaX = deltaX;
+        }
+    }
+
     public double getDeltaY() {
         if (packet != null) {
             switch (mode) {
@@ -165,18 +180,34 @@ public class WrappedPacketOutEntity extends WrappedPacket implements SendableWra
                     return readInt(2) / dXYZDivisor;
                 case 2:
                     return readShort(1) / dXYZDivisor;
+                default:
+                    return -1;
             }
         } else {
             return deltaY;
         }
-        return 0.0;
     }
 
-    /**
-     * Get the Delta Z
-     *
-     * @return Delta Z
-     */
+    public void setDeltaY(double deltaY) {
+        if (packet != null) {
+            int dy = (int) (deltaY * dXYZDivisor);
+            switch (mode) {
+                case 0:
+                    writeByte(1, (byte) dy);
+                    break;
+                case 1:
+                    writeInt(2, dy);
+                    break;
+                case 2:
+                    writeShort(1, (short) dy);
+                    break;
+            }
+        }
+        else {
+            this.deltaY = deltaY;
+        }
+    }
+
     public double getDeltaZ() {
         if (packet != null) {
             switch (mode) {
@@ -186,15 +217,28 @@ public class WrappedPacketOutEntity extends WrappedPacket implements SendableWra
                     return readInt(3) / dXYZDivisor;
                 case 2:
                     return readShort(2) / dXYZDivisor;
+                default:
+                    return -1;
             }
         } else {
             return deltaZ;
         }
-        return 0.0;
     }
 
-    public Vector3d getDeltaPosition() {
-        return new Vector3d(getDeltaX(), getDeltaY(), getDeltaZ());
+    public void setDeltaZ(double deltaZ) {
+        int dz = (int) (deltaZ * dXYZDivisor);
+        if (packet != null) {
+            switch (mode) {
+                case 0:
+                    writeByte(2, (byte) dz);
+                case 1:
+                    writeInt(3, dz);
+                case 2:
+                    writeShort(2, (short) dz);
+            }
+        } else {
+            this.deltaZ =  deltaZ;
+        }
     }
 
     /**

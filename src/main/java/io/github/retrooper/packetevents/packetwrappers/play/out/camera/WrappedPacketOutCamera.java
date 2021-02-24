@@ -61,6 +61,15 @@ public class WrappedPacketOutCamera extends WrappedPacket implements SendableWra
         return cameraID;
     }
 
+    public void setCameraId(int cameraID) {
+        if (packet != null) {
+            writeInt(0, cameraID);
+        }
+        else {
+            this.cameraID = cameraID;
+        }
+    }
+
     @Override
     public Object asNMSPacket() {
         Object packetInstance = null;

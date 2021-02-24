@@ -61,6 +61,15 @@ public class WrappedPacketOutCloseWindow extends WrappedPacket implements Sendab
         return windowID;
     }
 
+    public void setWindowId(int windowID) {
+        if (packet != null) {
+            writeInt(0, windowID);
+        }
+        else {
+            this.windowID = windowID;
+        }
+    }
+
     @Override
     public Object asNMSPacket() {
         try {

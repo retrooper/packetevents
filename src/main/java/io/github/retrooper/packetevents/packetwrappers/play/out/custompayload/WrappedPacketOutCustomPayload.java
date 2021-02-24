@@ -122,6 +122,22 @@ public class WrappedPacketOutCustomPayload extends WrappedPacket implements Send
         return tag;
     }
 
+    public void setTag(String tag) {
+        if (packet != null) {
+            switch (constructorMode) {
+                case 0:
+                case 1:
+                    writeString(0, tag);
+                case 2:
+                    Object minecraftKey = NMSUtils.generateMinecraftKey(tag);
+                    write(NMSUtils.minecraftKeyClass, minecraftKeyIndexInClass, minecraftKey);
+            }
+        }
+        else {
+            this.tag = tag;
+        }
+    }
+
     public byte[] getData() {
         if (packet != null) {
             switch (constructorMode) {
@@ -139,6 +155,28 @@ public class WrappedPacketOutCustomPayload extends WrappedPacket implements Send
             return new byte[0];
         }
         return data;
+    }
+
+    //TODO finish this method, set bytes in bytebufutil
+    void setData(byte[] data) {
+        if (packet != null) {
+            switch (constructorMode) {
+                case 0:
+                    writeByteArray(0, data);
+                case 1:
+                case 2:
+                    Object dataSerializer = readObject(0, packetDataSerializerClass);
+                    WrappedPacket byteBufWrapper = new WrappedPacket(new NMSPacket(dataSerializer));
+
+                    Object byteBuf = byteBufWrapper.readObject(0, byteBufClass);
+
+                    //TODO FINISH PacketEvents.get().getByteBufUtil().getBytes(byteBuf);
+            }
+
+        }
+        else {
+            this.data = data;
+        }
     }
 
     @Override

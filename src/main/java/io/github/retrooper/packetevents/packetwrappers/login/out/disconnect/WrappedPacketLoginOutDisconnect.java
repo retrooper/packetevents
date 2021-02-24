@@ -37,11 +37,11 @@ public class WrappedPacketLoginOutDisconnect extends WrappedPacket {
 
     public String getReason() {
         Object iChatBaseComponent = readObject(0, NMSUtils.iChatBaseComponentClass);
-        return WrappedPacketOutChat.toStringFromIChatBaseComponent(iChatBaseComponent);
+        return NMSUtils.readIChatBaseComponent(iChatBaseComponent);
     }
 
     public void setReason(String reason) {
-        Object iChatBaseComponent = WrappedPacketOutChat.toIChatBaseComponent(reason);
+        Object iChatBaseComponent = NMSUtils.generateIChatBaseComponent(reason);
         writeObject(0, iChatBaseComponent);
     }
 

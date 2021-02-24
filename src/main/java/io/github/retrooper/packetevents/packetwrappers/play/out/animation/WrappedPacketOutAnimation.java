@@ -67,11 +67,6 @@ public final class WrappedPacketOutAnimation extends WrappedPacket implements Se
         }
     }
 
-    /**
-     * Lookup the associated entity by the ID that was sent in the packet.
-     *
-     * @return Entity
-     */
     public Entity getEntity() {
         if (entity != null) {
             return entity;
@@ -79,25 +74,30 @@ public final class WrappedPacketOutAnimation extends WrappedPacket implements Se
         return entity = NMSUtils.getEntityById(getEntityId());
     }
 
-    /**
-     * Get the ID of the entity.
-     * If you do not want to use {@link #getEntity()},
-     * you lookup the entity by yourself with this entity ID.
-     *
-     * @return Entity ID
-     */
+    public void setEntity(Entity entity) {
+        setEntityId(entity.getEntityId());
+        this.entity = entity;
+    }
+
     public int getEntityId() {
-        if (entityID == -1) {
-            entityID = readInt(0);
+        if (packet != null) {
+            if (entityID == -1) {
+                entityID = readInt(0);
+            }
         }
         return entityID;
     }
 
-    /**
-     * Get the entity animation type.
-     *
-     * @return Get Entity Animation Type
-     */
+    public void setEntityId(int entityID) {
+        if (packet != null) {
+            writeInt(0, this.entityID = entityID);
+        }
+        else {
+            this.entityID = entityID;
+        }
+        this.entity = null;
+    }
+
     public EntityAnimationType getAnimationType() {
         if (packet != null) {
             byte id = (byte)readInt(1);
@@ -107,10 +107,19 @@ public final class WrappedPacketOutAnimation extends WrappedPacket implements Se
         }
     }
 
+    public void setAnimationType(EntityAnimationType type) {
+        if (packet != null) {
+            writeInt(1, type.ordinal());
+        }
+        else {
+            this.type = type;
+        }
+    }
+
     @Override
     public Object asNMSPacket() {
         final Object nmsEntity = NMSUtils.getNMSEntity(getEntity());
-        final int index = getAnimationType().id;
+        final int index = getAnimationType().ordinal();
         try {
             return animationConstructor.newInstance(nmsEntity, index);
         } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
@@ -120,17 +129,11 @@ public final class WrappedPacketOutAnimation extends WrappedPacket implements Se
     }
 
     public enum EntityAnimationType {
-        SWING_MAIN_ARM((byte) 0), TAKE_DAMAGE((byte) 1), LEAVE_BED((byte) 2),
-        SWING_OFFHAND((byte) 3), CRITICAL_EFFECT((byte) 4), MAGIC_CRITICAL_EFFECT((byte) 5);
+        SWING_MAIN_ARM, TAKE_DAMAGE, LEAVE_BED,
+        SWING_OFFHAND, CRITICAL_EFFECT, MAGIC_CRITICAL_EFFECT;
 
-        final byte id;
+        EntityAnimationType() {
 
-        EntityAnimationType(byte id) {
-            this.id = id;
-        }
-
-        public byte getId() {
-            return id;
         }
 
         public static EntityAnimationType getById(byte id) {

@@ -80,7 +80,7 @@ public class WrappedPacketOutOpenWindow extends WrappedPacket {
                 return readString(0);
             }
             Object iChatBaseComp = readObject(0, NMSUtils.iChatBaseComponentClass);
-            return WrappedPacketOutChat.toStringFromIChatBaseComponent(iChatBaseComp);
+            return NMSUtils.readIChatBaseComponent(iChatBaseComp);
         }
         return windowTitle;
     }

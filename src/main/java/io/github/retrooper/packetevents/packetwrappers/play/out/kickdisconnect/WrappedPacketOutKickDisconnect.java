@@ -73,7 +73,7 @@ public final class WrappedPacketOutKickDisconnect extends WrappedPacket implemen
     public String getKickMessage() {
         if (packet != null) {
             Object iChatBaseComponentObject = readObject(0, iChatBaseComponentClass);
-            return WrappedPacketOutChat.toStringFromIChatBaseComponent(iChatBaseComponentObject);
+            return NMSUtils.readIChatBaseComponent(iChatBaseComponentObject);
         } else {
             return kickMessage;
         }
@@ -82,7 +82,7 @@ public final class WrappedPacketOutKickDisconnect extends WrappedPacket implemen
     @Override
     public Object asNMSPacket() {
         try {
-            return kickDisconnectConstructor.newInstance(WrappedPacketOutChat.toIChatBaseComponent(WrappedPacketOutChat.fromStringToJSON(getKickMessage())));
+            return kickDisconnectConstructor.newInstance(NMSUtils.generateIChatBaseComponent(NMSUtils.fromStringToJSON(getKickMessage())));
         } catch (InstantiationException | InvocationTargetException | IllegalAccessException e) {
             e.printStackTrace();
         }

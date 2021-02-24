@@ -41,8 +41,8 @@ import java.util.UUID;
 
 public final class WrappedPacketOutChat extends WrappedPacket implements SendableWrapper {
     private static Constructor<?> chatClassConstructor;
-    private static Class<?> packetClass, iChatBaseComponentClass, chatSerializerClass, chatMessageTypeEnum;
-    private static Method chatMessageTypeCreatorMethod, getMessageMethod, chatFromStringMethod;
+    private static Class<?> packetClass, iChatBaseComponentClass, chatMessageTypeEnum;
+    private static Method chatMessageTypeCreatorMethod;
     //0 = IChatBaseComponent, Byte
     //1 = IChatBaseComponent, Int
     //2 = IChatBaseComponent, ChatMessageType
@@ -70,7 +70,7 @@ public final class WrappedPacketOutChat extends WrappedPacket implements Sendabl
 
     public WrappedPacketOutChat(String message, ChatPosition chatPosition, UUID uuid, boolean isJson) {
         this.uuid = uuid;
-        this.message = isJson ? message : fromStringToJSON(message);
+        this.message = isJson ? message : NMSUtils.fromStringToJSON(message);
         this.chatPosition = chatPosition;
     }
 
@@ -82,21 +82,6 @@ public final class WrappedPacketOutChat extends WrappedPacket implements Sendabl
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
         }
-        getMessageMethod = Reflection.getMethodCheckContainsString(iChatBaseComponentClass, "c", String.class);
-        if (getMessageMethod == null) {
-            getMessageMethod = Reflection.getMethodCheckContainsString(iChatBaseComponentClass, "Plain", String.class);
-        }
-
-        //In 1.8.3+ the ChatSerializer class is declared in the IChatBaseComponent class, so we have to handle that
-        try {
-            chatSerializerClass = NMSUtils.getNMSClass("ChatSerializer");
-        } catch (ClassNotFoundException e) {
-            //That is fine, it is probably a subclass
-            chatSerializerClass = SubclassUtil.getSubClass(iChatBaseComponentClass, "ChatSerializer");
-        }
-
-        chatFromStringMethod = Reflection.getMethod(chatSerializerClass, 0, String.class);
-
 
         boolean isVeryOutdated = false;
         try {
@@ -145,47 +130,9 @@ public final class WrappedPacketOutChat extends WrappedPacket implements Sendabl
 
     }
 
-    public static String fromStringToJSON(String message) {
-        return "{\"text\": \"" + message + "\"}";
-    }
-
-    public static String toStringFromIChatBaseComponent(Object obj) {
-        try {
-            return getMessageMethod.invoke(obj).toString();
-        } catch (IllegalAccessException | InvocationTargetException e) {
-            e.printStackTrace();
-        }
-        return null;
-    }
-
-    public static String[] toStringArrayFromIChatBaseComponentArray(Object[] obj) {
-        String[] strArray = new String[obj.length];
-        for (int i = 0; i < strArray.length; i++) {
-            strArray[i] = toStringFromIChatBaseComponent(obj[i]);
-        }
-        return strArray;
-    }
-
-    public static Object[] toIChatBaseComponentArray(String[] messages) {
-        Object[] array = new Object[messages.length];
-        for (int i = 0; i < array.length; i++) {
-            array[i] = toIChatBaseComponent(messages[i]);
-        }
-        return array;
-    }
-
-    public static Object toIChatBaseComponent(String msg) {
-        try {
-            return chatFromStringMethod.invoke(null, msg);
-        } catch (IllegalAccessException | InvocationTargetException e) {
-            e.printStackTrace();
-        }
-        return null;
-    }
-
     @Override
     public Object asNMSPacket() {
-        byte chatPos = getChatPosition().position;
+        byte chatPos = (byte) getChatPosition().ordinal();
         Object chatMessageTypeInstance = null;
         if (chatMessageTypeEnum != null) {
             try {
@@ -197,35 +144,35 @@ public final class WrappedPacketOutChat extends WrappedPacket implements Sendabl
         switch (constructorMode) {
             case -1:
                 try {
-                    return chatClassConstructor.newInstance(toIChatBaseComponent(getMessage()));
+                    return chatClassConstructor.newInstance(NMSUtils.generateIChatBaseComponent(getMessage()));
                 }
                 catch (InstantiationException | InvocationTargetException | IllegalAccessException e) {
                     e.printStackTrace();
                 }
             case 0:
                 try {
-                    return chatClassConstructor.newInstance(toIChatBaseComponent(getMessage()), chatPos);
+                    return chatClassConstructor.newInstance(NMSUtils.generateIChatBaseComponent(getMessage()), chatPos);
                 } catch (InstantiationException | InvocationTargetException | IllegalAccessException e) {
                     e.printStackTrace();
                 }
                 break;
             case 1:
                 try {
-                    return chatClassConstructor.newInstance(toIChatBaseComponent(getMessage()), (int)chatPos);
+                    return chatClassConstructor.newInstance(NMSUtils.generateIChatBaseComponent(getMessage()), (int)chatPos);
                 } catch (InstantiationException | InvocationTargetException | IllegalAccessException e) {
                     e.printStackTrace();
                 }
                 break;
             case 2:
                 try {
-                    return chatClassConstructor.newInstance(toIChatBaseComponent(getMessage()), chatMessageTypeInstance);
+                    return chatClassConstructor.newInstance(NMSUtils.generateIChatBaseComponent(getMessage()), chatMessageTypeInstance);
                 } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
                     e.printStackTrace();
                 }
                 break;
             case 3:
                 try {
-                    return chatClassConstructor.newInstance(toIChatBaseComponent(getMessage()), chatMessageTypeInstance, uuid);
+                    return chatClassConstructor.newInstance(NMSUtils.generateIChatBaseComponent(getMessage()), chatMessageTypeInstance, uuid);
                 } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
                     e.printStackTrace();
                 }
@@ -242,14 +189,7 @@ public final class WrappedPacketOutChat extends WrappedPacket implements Sendabl
     public String getMessage() {
         if (packet != null) {
             final Object iChatBaseObj = readObject(0, iChatBaseComponentClass);
-
-            try {
-                Object contentString = getMessageMethod.invoke(iChatBaseObj);
-                return contentString.toString();
-            } catch (IllegalAccessException | InvocationTargetException e) {
-                e.printStackTrace();
-            }
-            return null;
+            return NMSUtils.readIChatBaseComponent(iChatBaseObj);
         } else {
             return message;
         }
@@ -268,7 +208,7 @@ public final class WrappedPacketOutChat extends WrappedPacket implements Sendabl
             byte chatPositionValue;
             switch (constructorMode) {
                 case -1:
-                    chatPositionValue = ChatPosition.CHAT.position;
+                    chatPositionValue = (byte) ChatPosition.CHAT.ordinal();
                     break;
                 case 0:
                     chatPositionValue = readByte(0);
@@ -291,17 +231,11 @@ public final class WrappedPacketOutChat extends WrappedPacket implements Sendabl
     }
 
     public enum ChatPosition {
-        CHAT((byte)0),
-        SYSTEM_MESSAGE((byte)1),
-        GAME_INFO((byte)2);
+        CHAT,
+        SYSTEM_MESSAGE,
+        GAME_INFO;
 
-        final byte position;
-        ChatPosition(byte position) {
-            this.position = position;
-        }
-
-        public byte getPositionValue() {
-            return position;
+        ChatPosition() {
         }
 
         public static ChatPosition getByPositionValue(byte position) {
