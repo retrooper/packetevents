@@ -29,4 +29,7 @@ public interface ByteBufUtil {
     Object wrappedBuffer(byte[] bytes);
 
     byte[] getBytes(Object byteBuf);
+
+    void setBytes(Object byteBuf, byte[] bytes);
+
 }

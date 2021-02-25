@@ -48,4 +48,18 @@ public final class ByteBufUtil_8 implements ByteBufUtil {
         }
         return bytes;
     }
+
+    public void setBytes(Object byteBuf, byte[] bytes) {
+        final ByteBuf bb = (ByteBuf) byteBuf;
+        if(bb.refCnt() < 1) {
+            System.out.println("Validity check failed.");
+            return;
+        }
+        final int bytesLength = bytes.length;
+        if(bb.capacity() < bytesLength) {
+            bb.capacity(bytesLength);
+        }
+        bb.setBytes(0, bytes);
+    }
+
 }
