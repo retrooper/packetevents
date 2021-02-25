@@ -61,7 +61,7 @@ import java.net.InetSocketAddress;
 import java.util.UUID;
 
 public final class PacketEvents implements Listener, EventManager {
-    //TODO finish unfinished wrappers, add last few setters to some wrappers, once the modern early injector is finished push its changes to the legacy injector.
+    //TODO finish unfinished wrappers, add last few setters to some wrappers. make a pre release, remove getTarget in use enitty in example
     private static PacketEvents instance;
     private final PEVersion version = new PEVersion(1, 7, 9, 5);
     private final EventManager eventManager = new PEEventManager();
@@ -81,6 +81,7 @@ public final class PacketEvents implements Listener, EventManager {
             instance = new PacketEvents();
             Bukkit.getServicesManager().register(PacketEvents.class, instance,
                     plugin, ServicePriority.Normal);
+            PacketEvents.plugin = plugin;
             return instance;
         }
         return instance = Bukkit.getServicesManager().load(PacketEvents.class);
@@ -103,6 +104,7 @@ public final class PacketEvents implements Listener, EventManager {
             WrappedPacket.version = version;
             NMSUtils.version = version;
             EntityFinderUtils.version = version;
+            handlerName = "pe-" + plugin.getName();
 
             try {
                 NMSUtils.load();
@@ -139,11 +141,7 @@ public final class PacketEvents implements Listener, EventManager {
             settings = packetEventsSettings;
             settings.lock();
 
-
-            //Register Bukkit listener
-            plugin = pl;
             Bukkit.getPluginManager().registerEvents(this, plugin);
-            handlerName = "pe-" + plugin.getName();
 
             packetProcessorInternal = new PacketProcessorInternal();
 
@@ -287,28 +285,40 @@ public final class PacketEvents implements Listener, EventManager {
 
     @EventHandler(priority = EventPriority.HIGH)
     public void onJoin(final PlayerJoinEvent e) {
-        final InetSocketAddress address = e.getPlayer().getAddress();
-        boolean viaAvailable = ViaVersionLookupUtils.isAvailable();
-        PacketEvents.get().getPlayerUtils().loginTime.put(e.getPlayer().getUniqueId(), System.currentTimeMillis());
-        if (viaAvailable) {
-            PacketEvents.get().getPlayerUtils().clientVersionsMap.put(e.getPlayer().getAddress(), ClientVersion.TEMP_UNRESOLVED);
+        Player player = e.getPlayer();
+        final InetSocketAddress address = player.getAddress();
+        boolean dependencyAvailable = VersionLookupUtils.isDependencyAvailable();
+        PacketEvents.get().getPlayerUtils().loginTime.put(player.getUniqueId(), System.currentTimeMillis());
+        if (dependencyAvailable) {
+            PacketEvents.get().getPlayerUtils().clientVersionsMap.put(player.getAddress(), ClientVersion.TEMP_UNRESOLVED);
             Bukkit.getScheduler().runTaskLaterAsynchronously(getPlugin(), new Runnable() {
                 @Override
                 public void run() {
-                    int protocolVersion = VersionLookupUtils.getProtocolVersion(e.getPlayer());
-                    ClientVersion version = ClientVersion.getClientVersion(protocolVersion);
-                    PacketEvents.get().getPlayerUtils().clientVersionsMap.put(address, version);
-                    PacketEvents.get().getEventManager().callEvent(new PostPlayerInjectEvent(e.getPlayer(), true));
+                    int protocolVersion;
+                    try {
+                        protocolVersion = VersionLookupUtils.getProtocolVersion(player);
+                    }
+                    catch (Exception ex) {
+                        protocolVersion = -1;
+                    }
+                    if (protocolVersion != -1) {
+                        ClientVersion version = ClientVersion.getClientVersion(protocolVersion);
+                        PacketEvents.get().getPlayerUtils().clientVersionsMap.put(address, version);
+                    }
+
+                    PacketEvents.get().getEventManager().callEvent(new PostPlayerInjectEvent(player, true));
                 }
             }, 1L);
         }
 
-        if (getSettings().shouldUseCompatibilityInjector()) {
-            injector.injectPlayer(e.getPlayer());
+        boolean shouldInject = getSettings().shouldUseCompatibilityInjector() || !(injector.hasInjected(e.getPlayer()));
+        //Inject now if we are using the compatibility-injector or inject if the early injector failed to inject them.
+        if (shouldInject) {
+            injector.injectPlayer(player);
         }
 
-        //ViaVersion isn't available, we can already call the post player inject event.
-        if (!viaAvailable) {
+        //Dependency isn't available, we can already call the post player inject event.
+        if (!dependencyAvailable) {
             PacketEvents.get().getEventManager().callEvent(new PostPlayerInjectEvent(e.getPlayer(), false));
         }
     }

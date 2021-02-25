@@ -27,14 +27,10 @@ package io.github.retrooper.packetevents;
 import org.bukkit.plugin.java.JavaPlugin;
 
 public class PacketEventsPlugin extends JavaPlugin {
-    public PacketEventsPlugin() {
-        PacketEvents.create(this);
-        PacketEvents.get().load();
-    }
-
     @Override
     public void onLoad() {
-
+        PacketEvents.create(this);
+        PacketEvents.get().load();
     }
 
     @Override

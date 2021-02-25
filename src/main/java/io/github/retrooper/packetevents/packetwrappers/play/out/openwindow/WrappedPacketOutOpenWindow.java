@@ -30,22 +30,21 @@ import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
 import io.github.retrooper.packetevents.packetwrappers.play.out.chat.WrappedPacketOutChat;
 import io.github.retrooper.packetevents.utils.nms.NMSUtils;
 import io.github.retrooper.packetevents.utils.reflection.Reflection;
+import io.github.retrooper.packetevents.utils.server.ServerVersion;
 
 public class WrappedPacketOutOpenWindow extends WrappedPacket {
     private static boolean legacyMode = false;
     private static boolean ultraLegacyMode = false;
     private int windowID;
-    private int windowSize;
+    private int windowTypeID;
+
+    @Deprecated
+    private String windowType;
+
     private String windowTitle;
 
     public WrappedPacketOutOpenWindow(NMSPacket packet) {
         super(packet);
-    }
-
-    public WrappedPacketOutOpenWindow(int windowID, int windowSize, String windowTitle) {
-        this.windowID = windowID;
-        this.windowSize = windowSize;
-        this.windowTitle = windowTitle;
     }
 
     @Override
@@ -72,16 +71,46 @@ public class WrappedPacketOutOpenWindow extends WrappedPacket {
         }
     }
 
-    //TODO huh, find a better solution and make a setter for this method
-    public int getWindowType() {
+    @SupportedVersions(ranges = {ServerVersion.v_1_7_10, ServerVersion.v_1_7_10,
+    ServerVersion.v_1_16, ServerVersion.ERROR})
+    public int getInventoryTypeId() throws UnsupportedOperationException {
         if (packet != null) {
             if (legacyMode && !ultraLegacyMode) {
-                String windowType = readString(0);
-                return getWindowTypeFromString(windowType);
+                throwUnsupportedOperation();
             }
             return readInt(1);
         }
-        return windowSize;
+        else {
+            return windowTypeID;
+        }
+    }
+    @SupportedVersions(ranges = {ServerVersion.v_1_7_10, ServerVersion.v_1_7_10,
+            ServerVersion.v_1_16, ServerVersion.ERROR})
+    public void setInventoryTypeId(int inventoryTypeID) {
+        if (packet != null) {
+            if (legacyMode && !ultraLegacyMode) {
+                throwUnsupportedOperation();
+            }
+            writeInt(1, inventoryTypeID);
+        }
+        else {
+            this.windowTypeID = inventoryTypeID;
+        }
+    }
+
+    @SupportedVersions(ranges = {ServerVersion.v_1_8, ServerVersion.v_1_13_2})
+    @Deprecated
+    public String getInventoryType() throws UnsupportedOperationException {
+        if (packet != null) {
+            if (!legacyMode || ultraLegacyMode) {
+                throwUnsupportedOperation();
+            }
+            return readString(0);
+
+        }
+        else {
+            return windowType;
+        }
     }
 
     public String getWindowTitle() {

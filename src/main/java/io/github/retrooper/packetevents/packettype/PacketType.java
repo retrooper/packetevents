@@ -96,13 +96,19 @@ public class PacketType {
         }
     }
 
+    /**
+     * Handshaking Packet IDs.
+     * @author retrooper
+     * @see <a href="https://wiki.vg/Protocol#Handshaking">https://wiki.vg/Protocol#Handshaking</a>
+     * @since 1.8
+     */
     public static class Handshaking {
         public static class Client {
             public static final Map<Class<?>, Byte> packetIds = new HashMap<>();
-            public static final byte HANDSHAKE = 0;
+            public static final byte SET_PROTOCOL = 0;
 
             public static void init() {
-                packetIds.put(PacketTypeClasses.Handshaking.Client.HANDSHAKE, Client.HANDSHAKE);
+                packetIds.put(PacketTypeClasses.Handshaking.Client.SET_PROTOCOL, Client.SET_PROTOCOL);
             }
         }
     }

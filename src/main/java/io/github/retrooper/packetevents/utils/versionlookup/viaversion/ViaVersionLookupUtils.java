@@ -30,7 +30,7 @@ import us.myles.ViaVersion.api.Via;
 
 public class ViaVersionLookupUtils {
     public static boolean isAvailable() {
-        return Bukkit.getPluginManager().isPluginEnabled("ViaVersion");
+        return Bukkit.getPluginManager().getPlugin("ViaVersion") != null;
     }
 
     public static int getProtocolVersion(Player player) {

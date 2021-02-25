@@ -44,6 +44,10 @@ public class PEChannelInitializerLegacy extends ChannelInitializer<SocketChannel
         initChannelMethod = Reflection.getMethod(oldChannelInitializer.getClass(), "initChannel", 0);
     }
 
+    public ChannelInitializer<?> getOldChannelInitializer() {
+        return oldChannelInitializer;
+    }
+
     @Override
     protected void initChannel(SocketChannel socketChannel) throws Exception {
         initChannelMethod.invoke(oldChannelInitializer, socketChannel);

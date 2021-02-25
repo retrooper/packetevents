@@ -28,13 +28,15 @@ import io.github.retrooper.packetevents.PacketEvents;
 import io.github.retrooper.packetevents.event.impl.*;
 import io.github.retrooper.packetevents.packettype.PacketType;
 import io.github.retrooper.packetevents.packetwrappers.NMSPacket;
-import io.github.retrooper.packetevents.packetwrappers.handshaking.handshake.WrappedPacketHandshakingInHandshake;
+import io.github.retrooper.packetevents.packetwrappers.handshaking.setprotocol.WrappedPacketHandshakingInSetProtocol;
 import io.github.retrooper.packetevents.packetwrappers.login.in.start.WrappedPacketLoginInStart;
 import io.github.retrooper.packetevents.utils.gameprofile.WrappedGameProfile;
+import io.github.retrooper.packetevents.utils.netty.channel.ChannelUtils;
 import io.github.retrooper.packetevents.utils.nms.NMSUtils;
 import io.github.retrooper.packetevents.utils.player.ClientVersion;
 import io.github.retrooper.packetevents.utils.reflection.ClassUtil;
 import org.bukkit.entity.Player;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -74,7 +76,11 @@ public class PacketProcessorInternal {
      * @return NMS Packet, null if the event was cancelled.
      */
     public Object read(Player player, Object channel, Object packet) {
-        switch (getPacketState(player, packet)) {
+        PacketType.State state = getPacketState(player, packet);
+        if (state == null) {
+            return packet;
+        }
+        switch (state) {
             case STATUS:
                 PacketStatusReceiveEvent statusEvent = new PacketStatusReceiveEvent(channel, new NMSPacket(packet));
                 PacketEvents.get().getEventManager().callEvent(statusEvent);
@@ -136,7 +142,11 @@ public class PacketProcessorInternal {
      * @return NMS Packet, null if the event was cancelled.
      */
     public Object write(Player player, Object channel, Object packet) {
-        switch (getPacketState(player, packet)) {
+        PacketType.State state = getPacketState(player, packet);
+        if (state == null) {
+            return packet;
+        }
+        switch (state) {
             case STATUS:
                 PacketStatusSendEvent statusEvent = new PacketStatusSendEvent(channel, new NMSPacket(packet));
                 PacketEvents.get().getEventManager().callEvent(statusEvent);
@@ -256,8 +266,8 @@ public class PacketProcessorInternal {
      * @param event server-bound HANDSHAKE packet event.
      */
     private void interceptHandshakeReceive(PacketHandshakeReceiveEvent event) {
-        if (event.getPacketId() == PacketType.Handshaking.Client.HANDSHAKE) {
-            WrappedPacketHandshakingInHandshake handshake = new WrappedPacketHandshakingInHandshake(event.getNMSPacket());
+        if (event.getPacketId() == PacketType.Handshaking.Client.SET_PROTOCOL) {
+            WrappedPacketHandshakingInSetProtocol handshake = new WrappedPacketHandshakingInSetProtocol(event.getNMSPacket());
             int protocolVersion = handshake.getProtocolVersion();
             ClientVersion version = ClientVersion.getClientVersion(protocolVersion);
             PacketEvents.get().getPlayerUtils().tempClientVersionMap.put(event.getSocketAddress(), version);
@@ -306,6 +316,7 @@ public class PacketProcessorInternal {
         }
     }
 
+    @Nullable
     private PacketType.State getPacketState(Player player, Object packet) {
         if (player != null) {
             return PacketType.State.PLAY;
@@ -318,7 +329,7 @@ public class PacketProcessorInternal {
             } else if (packetName.startsWith("PacketS")) {
                 return PacketType.State.STATUS;
             } else {
-                return PacketType.State.PLAY;
+                return null;
             }
         }
     }

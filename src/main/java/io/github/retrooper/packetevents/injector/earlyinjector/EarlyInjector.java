@@ -29,4 +29,6 @@ import org.bukkit.entity.Player;
 
 public interface EarlyInjector extends ChannelInjector {
     void updatePlayerObject(Player player, Object channel);
+
+    boolean isBound();
 }

@@ -66,10 +66,10 @@ public class PacketTypeClasses {
 
     public static class Handshaking {
         public static class Client {
-            public static Class<?> HANDSHAKE;
+            public static Class<?> SET_PROTOCOL;
 
             public static void load() {
-                Handshaking.Client.HANDSHAKE = NMSUtils.getNMSClassWithoutException("PacketHandshakingInSetProtocol");
+                Handshaking.Client.SET_PROTOCOL = NMSUtils.getNMSClassWithoutException("PacketHandshakingInSetProtocol");
                 PacketType.Handshaking.Client.init();
             }
         }

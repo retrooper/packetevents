@@ -30,7 +30,7 @@ import protocolsupport.api.ProtocolSupportAPI;
 
 public class ProtocolSupportVersionLookupUtils {
     public static boolean isAvailable() {
-        return Bukkit.getPluginManager().isPluginEnabled("ProtocolSupport");
+        return Bukkit.getPluginManager().getPlugin("ProtocolSupport") != null;
     }
 
     public static int getProtocolVersion(Player player) {

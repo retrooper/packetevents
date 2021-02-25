@@ -31,6 +31,7 @@ import io.github.retrooper.packetevents.packettype.PacketType;
 import io.github.retrooper.packetevents.packetwrappers.NMSPacket;
 import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
 import org.bukkit.entity.Player;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Optional;
@@ -58,7 +59,7 @@ public final class PacketPlaySendEvent extends CancellableNMSPacketEvent impleme
      *
      * @return Packet receiver.
      */
-    @Nullable
+    @NotNull
     @Override
     public Player getPlayer() {
         return player;

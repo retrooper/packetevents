@@ -65,8 +65,7 @@ public final class WrappedPacketInCustomPayload extends WrappedPacket {
     public void setTag(String tag) {
         if (strPresent) {
             writeString(0, tag);
-        }
-        else {
+        } else {
             Object minecraftKey = NMSUtils.generateMinecraftKey(tag);
             write(NMSUtils.minecraftKeyClass, 0, minecraftKey);
         }
@@ -77,20 +76,23 @@ public final class WrappedPacketInCustomPayload extends WrappedPacket {
             return readByteArray(0);
         } else {
             Object dataSerializer = readObject(0, packetDataSerializerClass);
-            WrappedPacket byteBufWrapper = new WrappedPacket(new NMSPacket(dataSerializer));
+            WrappedPacket dataSerializerWrapper = new WrappedPacket(new NMSPacket(dataSerializer));
 
-            Object byteBuf = byteBufWrapper.readObject(0, byteBufClass);
+            Object byteBuf = dataSerializerWrapper.readObject(0, byteBufClass);
 
             return PacketEvents.get().getByteBufUtil().getBytes(byteBuf);
         }
     }
 
-    void setData(byte[] data) {
+    public void setData(byte[] data) {
         if (byteArrayPresent) {
             writeByteArray(0, data);
-        }
-        else {
-            //TODO make setbytes method in bytebufutil
+        } else {
+            Object dataSerializer = readObject(0, packetDataSerializerClass);
+            WrappedPacket dataSerializerWrapper = new WrappedPacket(new NMSPacket(dataSerializer));
+
+            Object byteBuf = dataSerializerWrapper.readObject(0, byteBufClass);
+            PacketEvents.get().getByteBufUtil().setBytes(byteBuf, data);
         }
     }
 }

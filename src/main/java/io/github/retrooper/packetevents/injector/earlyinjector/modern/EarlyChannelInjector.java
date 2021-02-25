@@ -26,10 +26,13 @@ package io.github.retrooper.packetevents.injector.earlyinjector.modern;
 
 import io.github.retrooper.packetevents.PacketEvents;
 import io.github.retrooper.packetevents.injector.earlyinjector.EarlyInjector;
+import io.github.retrooper.packetevents.packetwrappers.NMSPacket;
+import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
 import io.github.retrooper.packetevents.utils.list.ConcurrentList;
 import io.github.retrooper.packetevents.utils.list.ListWrapper;
 import io.github.retrooper.packetevents.utils.nms.NMSUtils;
 import io.github.retrooper.packetevents.utils.reflection.Reflection;
+import io.github.retrooper.packetevents.utils.versionlookup.protocolsupport.ProtocolSupportVersionLookupUtils;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelHandler;
@@ -37,6 +40,7 @@ import io.netty.channel.ChannelInitializer;
 import io.netty.channel.socket.SocketChannel;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
+import org.bukkit.plugin.PluginDescriptionFile;
 
 import java.lang.reflect.Field;
 import java.util.*;
@@ -52,6 +56,7 @@ import java.util.*;
 public class EarlyChannelInjector implements EarlyInjector {
     private final List<ChannelFuture> injectedFutures = new ArrayList<>();
     private final List<Map<Field, Object>> injectedLists = new ArrayList<>();
+
     @Override
     public void inject() {
         try {
@@ -90,8 +95,7 @@ public class EarlyChannelInjector implements EarlyInjector {
                             if (serverChannel instanceof ChannelFuture) {
                                 //Yes it is...
                                 injectChannelFuture((ChannelFuture) serverChannel);
-                            }
-                            else {
+                            } else {
                                 break;//Wrong list
                             }
                         }
@@ -102,7 +106,29 @@ public class EarlyChannelInjector implements EarlyInjector {
             PacketEvents.get().getPlugin().getLogger().severe("PacketEvents failed to inject!");
             ex.printStackTrace();
         }
+
+        //Player channels might have been registered already. Let us add our handlers. We are a little late though.
+        //This only happens when you join extremely early on older versions of minecraft.
+        List<Object> networkManagers = NMSUtils.getNetworkManagers();
+        synchronized (networkManagers) {
+            for (Object networkManager : networkManagers) {
+                WrappedPacket networkManagerWrapper = new WrappedPacket(new NMSPacket(networkManager));
+                Channel channel = (Channel) networkManagerWrapper.readObject(0, NMSUtils.nettyChannelClass);
+                if (channel == null) {
+                    continue;
+                }
+
+                if (channel.pipeline().get("packet_handler") != null) {
+                    channel.pipeline().addBefore("packet_handler", PacketEvents.handlerName, new PlayerChannelHandler());
+                }
+            }
+        }
+
+        if (ProtocolSupportVersionLookupUtils.isAvailable()) {
+            patchLists();
+        }
     }
+
 
     private void injectChannelFuture(ChannelFuture channelFuture) {
         List<String> channelHandlerNames = channelFuture.channel().pipeline().names();
@@ -111,32 +137,45 @@ public class EarlyChannelInjector implements EarlyInjector {
         for (String handlerName : channelHandlerNames) {
             ChannelHandler handler = channelFuture.channel().pipeline().get(handlerName);
             try {
-                Field field = handler.getClass().getDeclaredField("childHandler");
-                bootstrapAcceptor = handler;
-                bootstrapAcceptorField = field;
+                bootstrapAcceptorField = handler.getClass().getDeclaredField("childHandler");
                 bootstrapAcceptorField.setAccessible(true);
+                bootstrapAcceptorField.get(handler);
+                bootstrapAcceptor = handler;
             } catch (Exception ex) {
 
             }
         }
 
+        if (bootstrapAcceptor == null) {
+            bootstrapAcceptor = channelFuture.channel().pipeline().first();
+        }
+
         ChannelInitializer<?> oldChannelInitializer = null;
         try {
             oldChannelInitializer = (ChannelInitializer<?>) bootstrapAcceptorField.get(bootstrapAcceptor);
-        } catch (IllegalAccessException e) {
-            e.printStackTrace();
-        }
-        ChannelInitializer<?> channelInitializer = new PEChannelInitializer(oldChannelInitializer);
 
-        Reflection.getFieldWithoutFinalModifier(bootstrapAcceptorField);
+            ChannelInitializer<?> channelInitializer = new PEChannelInitializer(oldChannelInitializer);
 
-        //Replace the old channel initializer with our own.
-        try {
+            Reflection.getFieldWithoutFinalModifier(bootstrapAcceptorField);
+
+            //Replace the old channel initializer with our own.
             bootstrapAcceptorField.set(bootstrapAcceptor, channelInitializer);
+            injectedFutures.add(channelFuture);
         } catch (IllegalAccessException e) {
-            e.printStackTrace();
+            ClassLoader cl = bootstrapAcceptor.getClass().getClassLoader();
+            if (cl.getClass().getName().equals("org.bukkit.plugin.java.PluginClassLoader")) {
+                PluginDescriptionFile yaml = null;
+                try {
+                    yaml = (PluginDescriptionFile) PluginDescriptionFile.class.getDeclaredField("description").get(cl);
+                } catch (IllegalAccessException | NoSuchFieldException e2) {
+                    e2.printStackTrace();
+                }
+                System.err.println("PacketEvents failed to inject, because of " + bootstrapAcceptor.getClass().getName() + ", you might want to try running without " + yaml.getName() + "?");
+            } else {
+                System.err.println("PacketEvents failed to find core component 'childHandler', please check your plugins. issue: " + bootstrapAcceptor.getClass().getName());
+            }
         }
-        injectedFutures.add(channelFuture);
+
     }
 
     public void patchLists() {
@@ -233,10 +272,6 @@ public class EarlyChannelInjector implements EarlyInjector {
         Object channel = PacketEvents.get().packetProcessorInternal.getChannel(player);
         if (channel != null) {
             updatePlayerObject(player, channel);
-        } else {
-            Bukkit.getScheduler().runTaskLater(PacketEvents.get().getPlugin(), () -> {
-                player.kickPlayer("We were unable to inject you, please reconnect.");
-            }, 20L);
         }
     }
 
@@ -252,10 +287,7 @@ public class EarlyChannelInjector implements EarlyInjector {
             return false;
         }
         PlayerChannelHandler handler = getHandler(channel);
-        if (handler == null) {
-            return false;
-        }
-        return handler.player != null;
+        return handler != null && handler.player != null;
     }
 
     @Override
@@ -280,5 +312,33 @@ public class EarlyChannelInjector implements EarlyInjector {
         if (handler != null) {
             handler.player = player;
         }
+    }
+
+    @Override
+    public boolean isBound() {
+        try {
+            Object connection = NMSUtils.getMinecraftServerConnection();
+            if (connection == null) {
+                return false;
+            }
+            for (Field field : connection.getClass().getDeclaredFields()) {
+                field.setAccessible(true);
+                final Object value = field.get(connection);
+                if (value instanceof List) {
+                    // Inject the list
+                    synchronized (value) {
+                        for (Object o : (List) value) {
+                            if (o instanceof ChannelFuture) {
+                                return true;
+                            } else {
+                                break; // not the right list.
+                            }
+                        }
+                    }
+                }
+            }
+        } catch (Exception e) {
+        }
+        return false;
     }
 }

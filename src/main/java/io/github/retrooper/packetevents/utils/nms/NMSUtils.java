@@ -134,7 +134,8 @@ public final class NMSUtils {
                 blockPosConstructor = blockPosClass.getConstructor(double.class, double.class, double.class);
             }
             if (vec3DClass != null) {
-                vec3DConstructor = NMSUtils.vec3DClass.getConstructor(double.class, double.class, double.class);
+                vec3DConstructor = NMSUtils.vec3DClass.getDeclaredConstructor(double.class, double.class, double.class);
+                vec3DConstructor.setAccessible(true);
             }
         } catch (NoSuchMethodException e) {
             e.printStackTrace();
@@ -329,7 +330,8 @@ public final class NMSUtils {
                 break;
             }
         }
-        throw new IllegalStateException("Could not find network managers!");
+
+        return (List<Object>) serverConnectionWrapper.readObject(1, List.class);
     }
 
     public static ItemStack toBukkitItemStack(final Object nmsItemStack) {

@@ -33,8 +33,7 @@ import org.bukkit.entity.Player;
 public class PlayerChannelHandler extends ChannelDuplexHandler {
     /**
      * Associated player.
-     * This is null until you inject the player.
-     * (We inject the PLAYER by PlayerLoginEvent or PlayerJoinEvent depending on your settings)
+     * This is null until we inject the player.
      */
     public volatile Player player;
 
