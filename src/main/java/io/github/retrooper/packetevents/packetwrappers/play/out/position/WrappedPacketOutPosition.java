@@ -130,51 +130,36 @@ public final class WrappedPacketOutPosition extends WrappedPacket implements Sen
             relativeMask = readByte(0);
         } else {
             Set<PlayerTeleportFlags> flags = getRelativeFlags();
-            if (flags.contains(PlayerTeleportFlags.X)) {
-                relativeMask |= 0x01;
-            }
-
-            if (flags.contains(PlayerTeleportFlags.Y)) {
-                relativeMask |= 0x02;
-            }
-
-            if (flags.contains(PlayerTeleportFlags.Z)) {
-                relativeMask |= 0x04;
-            }
-
-            if (flags.contains(PlayerTeleportFlags.Y_ROT)) {
-                relativeMask |= 0x08;
-            }
-
-            if (flags.contains(PlayerTeleportFlags.X_ROT)) {
-                relativeMask |= 0x10;
+            for (PlayerTeleportFlags flag : flags) {
+                relativeMask |= flag.maskFlag;
             }
         }
         return relativeMask;
+    }
+
+    public void setRelativeFlagsMask(byte mask) {
+        if (version.isOlderThan(ServerVersion.v_1_8)) {
+            writeByte(0, mask);
+        }
+        else {
+            Set<Enum<?>> nmsRelativeFlags = new HashSet<>();
+            for (PlayerTeleportFlags flag : PlayerTeleportFlags.values()) {
+                if ((mask & flag.maskFlag) == flag.maskFlag) {
+                    nmsRelativeFlags.add(EnumUtil.valueOf(enumPlayerTeleportFlagsClass, flag.name()));
+                }
+            }
+            write(Set.class, 0, nmsRelativeFlags);
+        }
     }
 
     public Set<PlayerTeleportFlags> getRelativeFlags() {
         if (relativeFlags.isEmpty()) {
             if (version.isOlderThan(ServerVersion.v_1_8)) {
                 byte relativeBitMask = readByte(0);
-                if ((relativeBitMask & 0x01) == 0x01) {
-                    relativeFlags.add(PlayerTeleportFlags.X);
-                }
-
-                if ((relativeBitMask & 0x02) == 0x02) {
-                    relativeFlags.add(PlayerTeleportFlags.Y);
-                }
-
-                if ((relativeBitMask & 0x04) == 0x04) {
-                    relativeFlags.add(PlayerTeleportFlags.Z);
-                }
-
-                if ((relativeBitMask & 0x08) == 0x08) {
-                    relativeFlags.add(PlayerTeleportFlags.Y_ROT);
-                }
-
-                if ((relativeBitMask & 0x10) == 0x10) {
-                    relativeFlags.add(PlayerTeleportFlags.X_ROT);
+                for (PlayerTeleportFlags flag : PlayerTeleportFlags.values()) {
+                    if ((relativeBitMask & flag.maskFlag) == flag.maskFlag) {
+                        relativeFlags.add(flag);
+                    }
                 }
             } else {
                 Set<Enum<?>> set = (Set<Enum<?>>) readObject(0, Set.class);
@@ -189,27 +174,9 @@ public final class WrappedPacketOutPosition extends WrappedPacket implements Sen
     public void setRelativeFlags(Set<PlayerTeleportFlags> flags) {
         if (version.isOlderThan(ServerVersion.v_1_8)) {
             byte relativeBitMask = 0;
-
-            if (flags.contains(PlayerTeleportFlags.X)) {
-                relativeBitMask |= 0x01;
+            for (PlayerTeleportFlags flag : flags) {
+                relativeBitMask |= flag.maskFlag;
             }
-
-            if (flags.contains(PlayerTeleportFlags.Y)) {
-                relativeBitMask |= 0x02;
-            }
-
-            if (flags.contains(PlayerTeleportFlags.Z)) {
-                relativeBitMask |= 0x04;
-            }
-
-            if (flags.contains(PlayerTeleportFlags.Y_ROT)) {
-                relativeBitMask |= 0x08;
-            }
-
-            if (flags.contains(PlayerTeleportFlags.X_ROT)) {
-                relativeBitMask |= 0x10;
-            }
-
             writeByte(0, relativeBitMask);
         } else {
             Set<Enum<?>> nmsRelativeFlags = new HashSet<>();
@@ -325,14 +292,16 @@ public final class WrappedPacketOutPosition extends WrappedPacket implements Sen
     }
 
     public enum PlayerTeleportFlags {
-        X,
-        Y,
-        Z,
-        Y_ROT,
-        X_ROT;
+        X(0x01),
+        Y(0x02),
+        Z(0x04),
+        Y_ROT(0x08),
+        X_ROT(0x10);
 
-        PlayerTeleportFlags() {
-
+        PlayerTeleportFlags(int maskFlag) {
+this.maskFlag = (byte) maskFlag;
         }
+
+        byte maskFlag;
     }
 }

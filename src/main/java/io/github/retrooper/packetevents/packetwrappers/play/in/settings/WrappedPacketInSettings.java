@@ -31,14 +31,14 @@ import io.github.retrooper.packetevents.utils.nms.NMSUtils;
 import io.github.retrooper.packetevents.utils.reflection.SubclassUtil;
 import io.github.retrooper.packetevents.utils.server.ServerVersion;
 
-import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Set;
 
 public class WrappedPacketInSettings extends WrappedPacket {
     private static Class<? extends Enum<?>> chatVisibilityEnumClass;
 
     private static boolean isLowerThan_v_1_8;
     private Object chatVisibilityEnumObj;
-    private HashMap<DisplayedSkinPart, Boolean> displayedSkinParts = new HashMap<>();
 
     public WrappedPacketInSettings(final NMSPacket packet) {
         super(packet);
@@ -79,8 +79,8 @@ public class WrappedPacketInSettings extends WrappedPacket {
      * @return Chat Visibility
      */
     public ChatVisibility getChatVisibility() {
-          Enum<?> enumConst = (Enum<?>) readObject(0, chatVisibilityEnumClass);
-         return ChatVisibility.valueOf(enumConst.name());
+        Enum<?> enumConst = (Enum<?>) readObject(0, chatVisibilityEnumClass);
+        return ChatVisibility.valueOf(enumConst.name());
     }
 
     public void setChatVisibility(ChatVisibility visibility) {
@@ -96,71 +96,71 @@ public class WrappedPacketInSettings extends WrappedPacket {
         writeBoolean(0, chatColors);
     }
 
+    public byte getDisplaySkinPartsMask() {
+        byte mask = 0;
+        if (isLowerThan_v_1_8) {
+            boolean capeEnabled = readBoolean(1);
+            if (capeEnabled) {
+                mask |= 0x01;
+            }
+        } else {
+            mask = (byte) readInt(1);
+        }
+        return mask;
+    }
 
-    //TODO make setter for this :c
-    public HashMap<DisplayedSkinPart, Boolean> getDisplayedSkinPartsMap() {
-        if (displayedSkinParts.isEmpty()) {
-            if (isLowerThan_v_1_8) {
-                //in 1.7.10 only the cape display skin part is sent
-                boolean capeEnabled = readBoolean(1);
-                displayedSkinParts.put(DisplayedSkinPart.CAPE, capeEnabled);
-            } else {
-                //in 1.8, all the skin parts are sent
-                int skinPartFlags = readInt(1);
-                displayedSkinParts.put(DisplayedSkinPart.CAPE, (skinPartFlags & 0x01) != 0);
-                displayedSkinParts.put(DisplayedSkinPart.JACKET, (skinPartFlags & 0x02) != 0);
-                displayedSkinParts.put(DisplayedSkinPart.LEFT_SLEEVE, (skinPartFlags & 0x04) != 0);
-                displayedSkinParts.put(DisplayedSkinPart.RIGHT_SLEEVE, (skinPartFlags & 0x08) != 0);
-                displayedSkinParts.put(DisplayedSkinPart.LEFT_PANTS, (skinPartFlags & 0x10) != 0);
-                displayedSkinParts.put(DisplayedSkinPart.RIGHT_PANTS, (skinPartFlags & 0x20) != 0);
-                displayedSkinParts.put(DisplayedSkinPart.HAT, (skinPartFlags & 0x40) != 0);
+    public void setDisplaySkinPartsMask(byte mask) {
+        if (isLowerThan_v_1_8) {
+            boolean capeEnabled = (mask & 0x01) == 0x01;
+            writeBoolean(1, capeEnabled);
+        } else {
+            writeInt(1, mask);
+        }
+    }
+
+    public Set<DisplayedSkinPart> getDisplayedSkinParts() {
+        Set<DisplayedSkinPart> displayedSkinParts = new HashSet<>();
+        byte mask = getDisplaySkinPartsMask();
+        for (DisplayedSkinPart part : DisplayedSkinPart.values()) {
+            if ((mask & part.maskFlag) == part.maskFlag) {
+                displayedSkinParts.add(part);
             }
         }
         return displayedSkinParts;
     }
 
-    //TODO instead of returning false on 1.7.10 for non-existing skin parts, find out their real value on 1.7.10(although they aren't modifyable)
-    public boolean isDisplaySkinPartEnabled(DisplayedSkinPart part) {
-        if (displayedSkinParts.isEmpty()) {
-            displayedSkinParts = getDisplayedSkinPartsMap();
+    public void setDisplayedSkinParts(Set<DisplayedSkinPart> displayedSkinParts) {
+        byte mask = 0;
+        for (DisplayedSkinPart part : displayedSkinParts) {
+            mask |= part.maskFlag;
         }
-        //1.7.10, we will default the other skin parts to return false.
-        if (!displayedSkinParts.containsKey(part)) {
-            return false;
-        }
-        return displayedSkinParts.get(part);
+        setDisplaySkinPartsMask(mask);
     }
-//TODO finish this
-   /* public void setIsDisplaySKinPartEnabled(DisplayedSkinPart part, boolean enabled) throws UnsupportedOperationException {
-        if (displayedSkinParts.isEmpty()) {
-            displayedSkinParts = getDisplayedSkinPartsMap();
-        }
-
-        if (!displayedSkinParts.containsKey(part)) {
-            throwUnsupportedOperation(part);
-        }
-
-        displayedSkinParts.put(part, enabled);
-    }*/
 
     public enum ChatVisibility {
         FULL, SYSTEM, HIDDEN
     }
 
     public enum DisplayedSkinPart {
-        CAPE,
+        CAPE(0x01),
 
         @SupportedVersions(ranges = {ServerVersion.v_1_8, ServerVersion.ERROR})
-        JACKET,
+        JACKET(0x02),
         @SupportedVersions(ranges = {ServerVersion.v_1_8, ServerVersion.ERROR})
-        LEFT_SLEEVE,
+        LEFT_SLEEVE(0x04),
         @SupportedVersions(ranges = {ServerVersion.v_1_8, ServerVersion.ERROR})
-        RIGHT_SLEEVE,
+        RIGHT_SLEEVE(0x08),
         @SupportedVersions(ranges = {ServerVersion.v_1_8, ServerVersion.ERROR})
-        LEFT_PANTS,
+        LEFT_PANTS(0x10),
         @SupportedVersions(ranges = {ServerVersion.v_1_8, ServerVersion.ERROR})
-        RIGHT_PANTS,
+        RIGHT_PANTS(0x20),
         @SupportedVersions(ranges = {ServerVersion.v_1_8, ServerVersion.ERROR})
-        HAT
+        HAT(0x40);
+
+        DisplayedSkinPart(int maskFlag) {
+            this.maskFlag = (byte) maskFlag;
+        }
+
+        byte maskFlag;
     }
 }
