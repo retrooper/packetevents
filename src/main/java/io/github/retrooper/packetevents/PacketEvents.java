@@ -61,7 +61,7 @@ import java.net.InetSocketAddress;
 import java.util.UUID;
 
 public final class PacketEvents implements Listener, EventManager {
-    //TODO finish unfinished wrappers, add last few setters to some wrappers. make a pre release, remove getTarget in use entity in example
+    //TODO finish unfinished wrappers. make a pre release, remove getTarget in use entity in example
     private static PacketEvents instance;
     private final PEVersion version = new PEVersion(1, 7, 9, 5);
     private final EventManager eventManager = new PEEventManager();
