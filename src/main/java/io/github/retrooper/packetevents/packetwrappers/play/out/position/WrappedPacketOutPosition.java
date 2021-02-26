@@ -36,7 +36,6 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.HashSet;
 import java.util.Set;
-//TODO test
 public final class WrappedPacketOutPosition extends WrappedPacket implements SendableWrapper {
     private static Constructor<?> packetConstructor;
     private static byte constructorMode = 0;

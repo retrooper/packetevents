@@ -169,7 +169,6 @@ public class WrappedWatchableObject extends WrappedPacket {
 			try {
 				value = DWOBJECT.get(packet.getRawNMSPacket());
 			} catch (IllegalArgumentException | IllegalAccessException exception) {
-				// TODO: Proper exception handling
 				throw new RuntimeException("Could not read field value", exception);
 			}
 
@@ -183,7 +182,7 @@ public class WrappedWatchableObject extends WrappedPacket {
 		try {
 			return (int) INDEX.get(packet.getRawNMSPacket());
 		} catch (IllegalArgumentException | IllegalAccessException exception) {
-			// TODO: Proper exception handling
+
 			throw new RuntimeException("Could not read field value", exception);
 		}
 	}
@@ -198,7 +197,7 @@ public class WrappedWatchableObject extends WrappedPacket {
 		try {
 			return VALUE.get(packet.getRawNMSPacket());
 		} catch (IllegalArgumentException | IllegalAccessException exception) {
-			// TODO: Proper exception handling
+
 			throw new RuntimeException("Could not read field value", exception);
 		}
 	}
@@ -212,7 +211,6 @@ public class WrappedWatchableObject extends WrappedPacket {
 		try {
 			VALUE.set(packet.getRawNMSPacket(), value);
 		} catch (IllegalArgumentException | IllegalAccessException exception) {
-			// TODO: Proper exception handling
 			throw new RuntimeException("Could not write field value", exception);
 		}
 	}
@@ -229,7 +227,7 @@ public class WrappedWatchableObject extends WrappedPacket {
 		try {
 			return (boolean) DIRTY.get(packet.getRawNMSPacket());
 		} catch (IllegalArgumentException | IllegalAccessException exception) {
-			// TODO: Proper exception handling
+
 			throw new RuntimeException("Could not read field value", exception);
 		}
 	}
@@ -246,7 +244,7 @@ public class WrappedWatchableObject extends WrappedPacket {
 		try {
 			DIRTY.set(packet.getRawNMSPacket(), value);
 		} catch (IllegalArgumentException | IllegalAccessException exception) {
-			// TODO: Proper exception handling
+
 			throw new RuntimeException("Could not write field value", exception);
 		}
 	}
@@ -296,7 +294,7 @@ public class WrappedWatchableObject extends WrappedPacket {
 			try {
 				return CONSTRUCTOR.newInstance(object.getRaw(), value);
 			} catch (InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException exception) {
-				// TODO: Proper exception handling
+
 				throw new RuntimeException("Could not invoke constructor", exception);
 			}
 		}
@@ -305,7 +303,7 @@ public class WrappedWatchableObject extends WrappedPacket {
 			return CONSTRUCTOR.newInstance(Optional.ofNullable(ID_MAP.get(value.getClass()))
 					.orElseThrow(() -> new IllegalArgumentException("Unknown type: " + value.getClass())), object.getIndex(), value);
 		} catch (InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException exception) {
-			// TODO: Proper exception handling
+
 			throw new RuntimeException("Could not invoke constructor", exception);
 		}
 	}

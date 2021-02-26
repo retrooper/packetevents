@@ -212,16 +212,13 @@ public class EarlyChannelInjectorLegacy implements EarlyInjector {
             ChannelHandler bootstrapAcceptor = null;
             // Pick best
             for (String name : names) {
-                ChannelHandler handler = future.channel().pipeline().get(name);
                 try {
+                ChannelHandler handler = future.channel().pipeline().get(name);
                     if (childHandlerField == null) {
                         childHandlerField = handler.getClass().getDeclaredField("childHandler");
                         childHandlerField.setAccessible(true);
                     }
-                } catch (NoSuchFieldException e) {
-                    e.printStackTrace();
-                }
-                try {
+
                     ChannelInitializer<SocketChannel> oldInit = (ChannelInitializer<SocketChannel>) childHandlerField.get(handler);
                     if (oldInit instanceof PEChannelInitializerLegacy) {
                         bootstrapAcceptor = handler;

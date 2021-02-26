@@ -86,7 +86,7 @@ public class WrappedPacketOutOpenWindow extends WrappedPacket {
     }
     @SupportedVersions(ranges = {ServerVersion.v_1_7_10, ServerVersion.v_1_7_10,
             ServerVersion.v_1_16, ServerVersion.ERROR})
-    public void setInventoryTypeId(int inventoryTypeID) {
+    public void setInventoryTypeId(int inventoryTypeID) throws UnsupportedOperationException {
         if (packet != null) {
             if (legacyMode && !ultraLegacyMode) {
                 throwUnsupportedOperation();
@@ -134,53 +134,5 @@ public class WrappedPacketOutOpenWindow extends WrappedPacket {
                 write(NMSUtils.iChatBaseComponentClass, 0, iChatBaseComponent);
             }
         }
-    }
-
-    //TODO remove
-    public int getWindowTypeFromString(String type) {
-        switch (type) {
-            case "minecraft:chest":
-            case "minecraft:container":
-                return 2;
-            case "minecraft:dropper":
-            case "minecraft:dispenser":
-                return 6;
-            case "minecraft:anvil":
-                return 7;
-            case "minecraft:beacon":
-                return 8;
-            case "minecraft:blast_furnace":
-                return 9;
-            case "minecraft:brewing_stand":
-                return 10;
-            case "minecraft:crafting":
-            case "minecraft:crafting_table":
-                return 11;
-            case "minecraft:enchantment":
-            case "minecraft:enchanting_table":
-                return 12;
-            case "minecraft:furnace":
-                return 13;
-            case "minecraft:grindstone":
-                return 14;
-            case "minecraft:hopper":
-                return 15;
-            case "minecraft:lectern":
-                return 16;
-            case "minecraft:loom":
-                return 17;
-            case "minecraft:merchant":
-                return 18;
-            case "minecraft:shulker_box":
-                return 19;
-            case "minecraft:smoker":
-                return 21;
-            case "minecraft:cartography":
-            case "minecraft:cartography_table":
-                return 22;
-            case "minecraft:stonecutter":
-                return 23;
-        }
-        return -1;
     }
 }

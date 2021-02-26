@@ -61,7 +61,7 @@ import java.net.InetSocketAddress;
 import java.util.UUID;
 
 public final class PacketEvents implements Listener, EventManager {
-    //TODO finish unfinished wrappers, add last few setters to some wrappers. make a pre release, remove getTarget in use enitty in example
+    //TODO finish unfinished wrappers, add last few setters to some wrappers. make a pre release, remove getTarget in use entity in example
     private static PacketEvents instance;
     private final PEVersion version = new PEVersion(1, 7, 9, 5);
     private final EventManager eventManager = new PEEventManager();
@@ -74,7 +74,7 @@ public final class PacketEvents implements Listener, EventManager {
     public GlobalChannelInjector injector;
     private boolean loading, loaded, initialized, initializing, terminating;
     private PacketEventsSettings settings = new PacketEventsSettings();
-    private final ByteBufUtil byteBufUtil = NMSUtils.legacyNettyImportMode ? new ByteBufUtil_7() : new ByteBufUtil_8();
+    private ByteBufUtil byteBufUtil;
 
     public static PacketEvents create(final Plugin plugin) {
         if (!Bukkit.getServicesManager().isProvidedFor(PacketEvents.class)) {
@@ -117,6 +117,8 @@ public final class PacketEvents implements Listener, EventManager {
                 loading = false;
                 throw new PacketEventsLoadFailureException(ex);
             }
+
+            byteBufUtil = NMSUtils.legacyNettyImportMode ? new ByteBufUtil_7() : new ByteBufUtil_8();
 
             injector = new GlobalChannelInjector();
             injector.inject();

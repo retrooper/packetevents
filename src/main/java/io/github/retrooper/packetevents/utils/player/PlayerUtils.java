@@ -130,7 +130,7 @@ public final class PlayerUtils {
         if (ping == null) {
             Long joinTime = loginTime.get(uuid);
             if (joinTime == null) {
-                return 0; //TODO insert login time at plagerloginevent not playerjoinevent as i do atm iirc
+                return 0;
             }
             return (int) (System.currentTimeMillis() -  joinTime);
         }

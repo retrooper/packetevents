@@ -72,7 +72,6 @@ public abstract class DataWatcherObject {
 			try {
 				return new WrappedDataWatcherObject(CONSTRUCTOR.newInstance(index, serializer == null ? null : serializer.getRaw()));
 			} catch (InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException exception) {
-				// TODO: Proper exception handling
 				throw new RuntimeException("Could not invoke constructor", exception);
 			}
 		}
@@ -138,7 +137,6 @@ public abstract class DataWatcherObject {
 			try {
 				return (int) INDEX.get(raw);
 			} catch (IllegalArgumentException | IllegalAccessException exception) {
-				// TODO: Proper exception handling
 				throw new RuntimeException("Could not read field value", exception);
 			}
 		}
@@ -149,7 +147,6 @@ public abstract class DataWatcherObject {
 			try {
 				handle = SERIALIZER.get(raw);
 			} catch (IllegalArgumentException | IllegalAccessException exception) {
-				// TODO: Proper exception handling
 				throw new RuntimeException("Could not read field value", exception);
 			}
 
