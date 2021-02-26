@@ -45,7 +45,6 @@ import io.github.retrooper.packetevents.utils.server.ServerUtils;
 import io.github.retrooper.packetevents.utils.server.ServerVersion;
 import io.github.retrooper.packetevents.utils.version.PEVersion;
 import io.github.retrooper.packetevents.utils.versionlookup.VersionLookupUtils;
-import io.github.retrooper.packetevents.utils.versionlookup.viaversion.ViaVersionLookupUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -175,8 +174,7 @@ public final class PacketEvents implements Listener, EventManager {
                                     PacketEvents.get().getPlugin().getLogger().severe("[packetevents] PacketEvents failed to check for an update. No longer retrying.");
                                     break;
                                 }
-                            }
-                            else {
+                            } else {
                                 break;
                             }
 
@@ -299,8 +297,7 @@ public final class PacketEvents implements Listener, EventManager {
                     int protocolVersion;
                     try {
                         protocolVersion = VersionLookupUtils.getProtocolVersion(player);
-                    }
-                    catch (Exception ex) {
+                    } catch (Exception ex) {
                         protocolVersion = -1;
                     }
                     if (protocolVersion != -1) {
