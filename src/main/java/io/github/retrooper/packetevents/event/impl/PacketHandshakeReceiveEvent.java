@@ -42,7 +42,7 @@ public class PacketHandshakeReceiveEvent extends CancellableNMSPacketEvent {
     @Override
     public void call(PacketListenerDynamic listener) {
         if (listener.clientSidedLoginAllowance == null || listener.clientSidedLoginAllowance.contains(getPacketId())) {
-            listener.onPacketHandshakeReceiveEvent(this);
+            listener.onPacketHandshakeReceive(this);
         }
     }
 }

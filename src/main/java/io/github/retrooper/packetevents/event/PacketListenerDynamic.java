@@ -172,7 +172,7 @@ public abstract class PacketListenerDynamic {
 
     public void onPacketStatusReceive(PacketStatusReceiveEvent event) {}
     public void onPacketStatusSend(PacketStatusSendEvent event) {}
-    public void onPacketHandshakeReceiveEvent(PacketHandshakeReceiveEvent event) {}
+    public void onPacketHandshakeReceive(PacketHandshakeReceiveEvent event) {}
     public void onPacketLoginReceive(PacketLoginReceiveEvent event) {}
     public void onPacketLoginSend(PacketLoginSendEvent event) {}
     public void onPacketPlayReceive(PacketPlayReceiveEvent event) {}
