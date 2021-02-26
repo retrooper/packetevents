@@ -165,6 +165,6 @@ public class Vector3i {
 
     @Override
     public String toString() {
-        return "X: " + x + ", Y: " + y + "Z: " + z;
+        return "X: " + x + ", Y: " + y + ", Z: " + z;
     }
 }

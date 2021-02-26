@@ -30,7 +30,9 @@ import io.github.retrooper.packetevents.utils.entityfinder.EntityFinderUtils;
 import io.github.retrooper.packetevents.utils.reflection.Reflection;
 import io.github.retrooper.packetevents.utils.reflection.SubclassUtil;
 import io.github.retrooper.packetevents.utils.server.ServerVersion;
+import net.minecraft.server.v1_8_R3.Block;
 import org.bukkit.Bukkit;
+import org.bukkit.Material;
 import org.bukkit.Server;
 import org.bukkit.World;
 import org.bukkit.entity.Entity;
@@ -55,7 +57,7 @@ public final class NMSUtils {
     public static Class<?> nmsEntityClass, minecraftServerClass, craftWorldClass, playerInteractManagerClass, entityPlayerClass, playerConnectionClass, craftServerClass,
             craftPlayerClass, serverConnectionClass, craftEntityClass, nmsItemStackClass, networkManagerClass, nettyChannelClass, gameProfileClass, iChatBaseComponentClass,
             blockPosClass, vec3DClass, channelFutureClass, blockClass, iBlockDataClass, nmsWorldClass, craftItemStackClass,
-            soundEffectClass, minecraftKeyClass, chatSerializerClass;
+            soundEffectClass, minecraftKeyClass, chatSerializerClass, craftMagicNumbersClass;
     public static Class<? extends Enum<?>> enumDirectionClass, enumHandClass;
     public static Method getBlockPosX, getBlockPosY, getBlockPosZ;
     private static Method getCraftPlayerHandle;
@@ -65,6 +67,8 @@ public final class NMSUtils {
     private static Method asNMSCopy;
     private static Method getMessageMethod;
     private static Method chatFromStringMethod;
+    private static Method getMaterialFromNMSBlock;
+    private static Method getNMSBlockFromMaterial;
     private static Field entityPlayerPingField, playerConnectionField;
     private static Object minecraftServer;
     private static Object minecraftServerConnection;
@@ -163,12 +167,19 @@ public final class NMSUtils {
                 chatSerializerClass = SubclassUtil.getSubClass(iChatBaseComponentClass, "ChatSerializer");
             }
 
+            craftMagicNumbersClass = NMSUtils.getOBCClass("util.CraftMagicNumbers");
+
             chatFromStringMethod = Reflection.getMethod(chatSerializerClass, 0, String.class);
+
+            getMaterialFromNMSBlock = Reflection.getMethod(craftMagicNumbersClass, "getMaterial", Material.class, NMSUtils.blockClass);
+            getNMSBlockFromMaterial = Reflection.getMethod(craftMagicNumbersClass, "getBlock", NMSUtils.blockClass, Material.class);
 
             if (minecraftKeyClass != null) {
                 minecraftKeyConstructor = minecraftKeyClass.getConstructor(String.class);
             }
         } catch (NoSuchMethodException e) {
+            e.printStackTrace();
+        } catch (ClassNotFoundException e) {
             e.printStackTrace();
         }
         try {
@@ -433,6 +444,24 @@ public final class NMSUtils {
         try {
             return vec3DConstructor.newInstance(x, y, z);
         } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    public static Material getMaterialFromNMSBlock(Object nmsBlock) {
+        try {
+            return (Material) getMaterialFromNMSBlock.invoke(null, nmsBlock);
+        } catch (IllegalAccessException | InvocationTargetException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    public static Object getNMSBlockFromMaterial(Material material) {
+        try {
+            return getNMSBlockFromMaterial.invoke(null, material);
+        } catch (IllegalAccessException | InvocationTargetException e) {
             e.printStackTrace();
         }
         return null;
