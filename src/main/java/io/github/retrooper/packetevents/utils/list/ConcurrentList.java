@@ -31,7 +31,7 @@ import java.util.*;
  * Created by wea_ondara licensed under MIT
  * Taken from https://github.com/weaondara/BungeePerms/blob/master/src/main/java/net/alpenblock/bungeeperms/util/ConcurrentList.java
  * Same license as in LICENSE
- * @author ViaVersion
+ * @author wea_ondara
  */
 public class ConcurrentList<E> extends ArrayList<E> {
     private final Object lock = new Object();
