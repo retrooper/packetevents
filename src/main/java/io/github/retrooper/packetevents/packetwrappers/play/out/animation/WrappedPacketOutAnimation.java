@@ -91,8 +91,7 @@ public final class WrappedPacketOutAnimation extends WrappedPacket implements Se
     public void setEntityId(int entityID) {
         if (packet != null) {
             writeInt(0, this.entityID = entityID);
-        }
-        else {
+        } else {
             this.entityID = entityID;
         }
         this.entity = null;
@@ -100,7 +99,7 @@ public final class WrappedPacketOutAnimation extends WrappedPacket implements Se
 
     public EntityAnimationType getAnimationType() {
         if (packet != null) {
-            byte id = (byte)readInt(1);
+            byte id = (byte) readInt(1);
             return EntityAnimationType.getById(id);
         } else {
             return type;
@@ -110,8 +109,7 @@ public final class WrappedPacketOutAnimation extends WrappedPacket implements Se
     public void setAnimationType(EntityAnimationType type) {
         if (packet != null) {
             writeInt(1, type.ordinal());
-        }
-        else {
+        } else {
             this.type = type;
         }
     }

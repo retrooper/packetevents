@@ -28,11 +28,9 @@ import io.github.retrooper.packetevents.PacketEvents;
 import io.github.retrooper.packetevents.injector.earlyinjector.EarlyInjector;
 import io.github.retrooper.packetevents.packetwrappers.NMSPacket;
 import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
-import io.github.retrooper.packetevents.utils.list.ConcurrentList;
 import io.github.retrooper.packetevents.utils.list.ListWrapper;
 import io.github.retrooper.packetevents.utils.nms.NMSUtils;
 import io.github.retrooper.packetevents.utils.reflection.Reflection;
-import io.github.retrooper.packetevents.utils.versionlookup.protocolsupport.ProtocolSupportVersionLookupUtils;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelHandler;
@@ -42,7 +40,10 @@ import org.bukkit.entity.Player;
 import org.bukkit.plugin.PluginDescriptionFile;
 
 import java.lang.reflect.Field;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Early channel injector for all server versions higher than 1.7.10.
@@ -205,7 +206,7 @@ public class EarlyChannelInjector implements EarlyInjector {
                 Reflection.getFieldWithoutFinalModifier(childHandlerField);
                 ChannelInitializer<SocketChannel> oldInit = (ChannelInitializer<SocketChannel>) childHandlerField.get(bootstrapAcceptor);
                 if (oldInit instanceof PEChannelInitializer) {
-                    childHandlerField.set(bootstrapAcceptor, ((PEChannelInitializer) oldInit));
+                    childHandlerField.set(bootstrapAcceptor, oldInit);
                     childHandlerField.set(bootstrapAcceptor, ((PEChannelInitializer) oldInit).getOldChannelInitializer());
                 }
             } catch (Exception e) {

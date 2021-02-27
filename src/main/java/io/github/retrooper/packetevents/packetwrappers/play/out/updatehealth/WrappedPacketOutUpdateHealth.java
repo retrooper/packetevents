@@ -69,8 +69,7 @@ public final class WrappedPacketOutUpdateHealth extends WrappedPacket implements
     public void setHealth(float health) {
         if (packet != null) {
             writeFloat(0, health);
-        }
-        else {
+        } else {
             this.health = health;
         }
     }
@@ -86,8 +85,7 @@ public final class WrappedPacketOutUpdateHealth extends WrappedPacket implements
     public void setFoodSaturation(float foodSaturation) {
         if (packet != null) {
             writeFloat(0, foodSaturation);
-        }
-        else {
+        } else {
             this.foodSaturation = foodSaturation;
         }
     }
@@ -103,8 +101,7 @@ public final class WrappedPacketOutUpdateHealth extends WrappedPacket implements
     public void setFood(int food) {
         if (packet != null) {
             writeInt(0, food);
-        }
-        else {
+        } else {
             this.food = food;
         }
     }

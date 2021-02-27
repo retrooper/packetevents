@@ -70,8 +70,7 @@ public class WrappedPacketOutTransaction extends WrappedPacket implements Sendab
     public void setWindowId(int windowID) {
         if (packet != null) {
             writeInt(0, windowID);
-        }
-        else {
+        } else {
             this.windowID = windowID;
         }
     }
@@ -87,8 +86,7 @@ public class WrappedPacketOutTransaction extends WrappedPacket implements Sendab
     public void setActionNumber(short actionNumber) {
         if (packet != null) {
             writeShort(0, actionNumber);
-        }
-        else {
+        } else {
             this.actionNumber = actionNumber;
         }
     }
@@ -101,11 +99,10 @@ public class WrappedPacketOutTransaction extends WrappedPacket implements Sendab
         }
     }
 
-    public void setIsAccepted(boolean isAccepted) {
+    public void setAccepted(boolean isAccepted) {
         if (packet != null) {
             writeBoolean(0, isAccepted);
-        }
-        else {
+        } else {
             this.accepted = isAccepted;
         }
     }

@@ -40,17 +40,22 @@ public class WrappedPacketInResourcePackStatus extends WrappedPacket {
 
     @Override
     protected void load() {
-        enumResourcePackStatusClass = (Class<? extends Enum<?>>) SubclassUtil.getSubClass(PacketTypeClasses.Play.Client.RESOURCE_PACK_STATUS, "EnumResourcePackStatus");
+        enumResourcePackStatusClass = SubclassUtil.getEnumSubClass(PacketTypeClasses.Play.Client.RESOURCE_PACK_STATUS, "EnumResourcePackStatus");
     }
 
     public ResourcePackStatus getStatus() {
-        Enum<?> enumConst = (Enum<?>) readObject(0, enumResourcePackStatusClass);
+        Enum<?> enumConst = readEnumConstant(0, enumResourcePackStatusClass);
         return ResourcePackStatus.valueOf(enumConst.name());
     }
 
     public void setStatus(ResourcePackStatus status) {
         Enum<?> enumConst = EnumUtil.valueOf(enumResourcePackStatusClass, status.name());
-        write(enumResourcePackStatusClass, 0, enumConst);
+        writeEnumConstant(0, enumConst);
+    }
+
+    @Override
+    public boolean isSupported() {
+        return version.isNewerThan(ServerVersion.v_1_7_10);
     }
 
     public enum ResourcePackStatus {
@@ -58,10 +63,5 @@ public class WrappedPacketInResourcePackStatus extends WrappedPacket {
         DECLINED,
         FAILED_DOWNLOAD,
         ACCEPTED
-    }
-
-    @Override
-    public boolean isSupported() {
-        return version.isNewerThan(ServerVersion.v_1_7_10);
     }
 }

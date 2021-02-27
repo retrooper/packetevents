@@ -3,13 +3,11 @@ package io.github.retrooper.packetevents.injector;
 import io.github.retrooper.packetevents.PacketEvents;
 import io.github.retrooper.packetevents.event.impl.PlayerEjectEvent;
 import io.github.retrooper.packetevents.event.impl.PlayerInjectEvent;
-import io.github.retrooper.packetevents.injector.earlyinjector.EarlyInjector;
 import io.github.retrooper.packetevents.injector.earlyinjector.legacy.EarlyChannelInjectorLegacy;
 import io.github.retrooper.packetevents.injector.earlyinjector.modern.EarlyChannelInjector;
 import io.github.retrooper.packetevents.injector.lateinjector.legacy.LateChannelInjectorLegacy;
 import io.github.retrooper.packetevents.injector.lateinjector.modern.LateChannelInjector;
 import io.github.retrooper.packetevents.utils.nms.NMSUtils;
-import io.github.retrooper.packetevents.utils.versionlookup.protocolsupport.ProtocolSupportVersionLookupUtils;
 import org.bukkit.entity.Player;
 
 public class GlobalChannelInjector implements ChannelInjector {

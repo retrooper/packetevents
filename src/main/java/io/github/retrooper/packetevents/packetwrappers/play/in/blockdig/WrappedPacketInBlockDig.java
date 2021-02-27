@@ -51,10 +51,10 @@ public final class WrappedPacketInBlockDig extends WrappedPacket {
 
         if (version != ServerVersion.v_1_7_10) {
             try {
-                digTypeClass = (Class<? extends Enum<?>>) NMSUtils.getNMSClass("EnumPlayerDigType");
+                digTypeClass = NMSUtils.getNMSEnumClass("EnumPlayerDigType");
             } catch (ClassNotFoundException e) {
                 //It is probably a subclass
-                digTypeClass = (Class<? extends Enum<?>>) SubclassUtil.getSubClass(blockDigClass, "EnumPlayerDigType");
+                digTypeClass = SubclassUtil.getEnumSubClass(blockDigClass, "EnumPlayerDigType");
             }
         }
     }
@@ -100,7 +100,7 @@ public final class WrappedPacketInBlockDig extends WrappedPacket {
         if (isVersionLowerThan_v_1_8) {
             return Direction.getDirection(readInt(3));
         } else {
-            Enum<?> enumDir = (Enum<?>) readObject(0, NMSUtils.enumDirectionClass);
+            Enum<?> enumDir = readEnumConstant(0, NMSUtils.enumDirectionClass);
             return Direction.valueOf(enumDir.name());
         }
     }
@@ -123,15 +123,14 @@ public final class WrappedPacketInBlockDig extends WrappedPacket {
         if (isVersionLowerThan_v_1_8) {
             return PlayerDigType.values()[readInt(4)];
         } else {
-            return PlayerDigType.valueOf(((Enum) readObject(0, digTypeClass)).name());
+            return PlayerDigType.valueOf(readObject(0, digTypeClass).name());
         }
     }
 
     public void setDigType(PlayerDigType type) {
         if (isVersionLowerThan_v_1_8) {
             writeInt(4, type.ordinal());
-        }
-        else {
+        } else {
             Enum<?> enumConst = EnumUtil.valueOf(digTypeClass, type.name());
             write(digTypeClass, 0, enumConst);
         }

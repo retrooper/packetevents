@@ -64,6 +64,11 @@ public class WrappedPacketOutEntityTeleport extends WrappedPacket implements Sen
         this.onGround = onGround;
     }
 
+    private static int floor(double value) {
+        int i = (int) value;
+        return value < (double) i ? i - 1 : i;
+    }
+
     @Override
     protected void load() {
         Class<?> packetClass = PacketTypeClasses.Play.Server.ENTITY_TELEPORT;
@@ -87,11 +92,6 @@ public class WrappedPacketOutEntityTeleport extends WrappedPacket implements Sen
             }
 
         }
-    }
-
-    private static int floor(double value) {
-        int i = (int) value;
-        return value < (double) i ? i - 1 : i;
     }
 
     public Entity getEntity() {
@@ -139,12 +139,10 @@ public class WrappedPacketOutEntityTeleport extends WrappedPacket implements Sen
         if (packet != null) {
             if (legacyVersionMode) {
                 writeInt(1, floor(x * 32.0D));
-            }
-            else {
+            } else {
                 writeDouble(0, x);
             }
-        }
-        else {
+        } else {
             this.x = x;
         }
     }
@@ -165,12 +163,10 @@ public class WrappedPacketOutEntityTeleport extends WrappedPacket implements Sen
         if (packet != null) {
             if (legacyVersionMode) {
                 writeInt(2, floor(y * 32.0D));
-            }
-            else {
+            } else {
                 writeDouble(1, y);
             }
-        }
-        else {
+        } else {
             this.y = y;
         }
     }
@@ -191,12 +187,10 @@ public class WrappedPacketOutEntityTeleport extends WrappedPacket implements Sen
         if (packet != null) {
             if (legacyVersionMode) {
                 writeInt(3, floor(z * 32.0D));
-            }
-            else {
+            } else {
                 writeDouble(2, z);
             }
-        }
-        else {
+        } else {
             this.z = z;
         }
     }
@@ -213,8 +207,7 @@ public class WrappedPacketOutEntityTeleport extends WrappedPacket implements Sen
     public void setYaw(float yaw) {
         if (packet != null) {
             writeByte(0, (byte) (yaw * rotationMultiplier));
-        }
-        else {
+        } else {
             this.yaw = yaw;
         }
     }
@@ -222,8 +215,7 @@ public class WrappedPacketOutEntityTeleport extends WrappedPacket implements Sen
     public float getPitch() {
         if (packet != null) {
             return (readByte(1) / rotationMultiplier);
-        }
-        else {
+        } else {
             return pitch;
         }
     }
@@ -231,8 +223,7 @@ public class WrappedPacketOutEntityTeleport extends WrappedPacket implements Sen
     public void setPitch(float pitch) {
         if (packet != null) {
             writeByte(1, (byte) (pitch * rotationMultiplier));
-        }
-        else {
+        } else {
             this.pitch = pitch;
         }
     }
@@ -245,11 +236,10 @@ public class WrappedPacketOutEntityTeleport extends WrappedPacket implements Sen
         }
     }
 
-    public void setIsOnGround(boolean onGround) {
+    public void setOnGround(boolean onGround) {
         if (packet != null) {
             writeBoolean(0, onGround);
-        }
-        else {
+        } else {
             this.onGround = onGround;
         }
     }

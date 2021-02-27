@@ -51,15 +51,15 @@ public final class WrappedPacketInUseEntity extends WrappedPacket {
     protected void load() {
         Class<?> useEntityClass = NMSUtils.getNMSClassWithoutException("PacketPlayInUseEntity");
         try {
-            enumHandClass = (Class<? extends Enum<?>>) NMSUtils.getNMSClass("EnumHand");
+            enumHandClass = NMSUtils.getNMSEnumClass("EnumHand");
         } catch (ClassNotFoundException e) {
             //Probably a 1.7.10 or 1.8.x server
         }
         try {
-            enumEntityUseActionClass = (Class<? extends Enum<?>>) NMSUtils.getNMSClass("EnumEntityUseAction");
+            enumEntityUseActionClass = NMSUtils.getNMSEnumClass("EnumEntityUseAction");
         } catch (ClassNotFoundException e) {
             //That is fine, it is probably a subclass
-            enumEntityUseActionClass = (Class<? extends Enum<?>>) SubclassUtil.getSubClass(Objects.requireNonNull(useEntityClass), "EnumEntityUseAction");
+            enumEntityUseActionClass = SubclassUtil.getEnumSubClass(useEntityClass, "EnumEntityUseAction");
         }
     }
 
@@ -98,8 +98,7 @@ public final class WrappedPacketInUseEntity extends WrappedPacket {
             Object vec3DObj = readObject(0, NMSUtils.vec3DClass);
             WrappedPacket vec3DWrapper = new WrappedPacket(new NMSPacket(vec3DObj));
             return new Vector3d(vec3DWrapper.readDouble(0), vec3DWrapper.readDouble(1), vec3DWrapper.readDouble(2));
-        }
-        else {
+        } else {
             return Vector3d.INVALID;
         }
     }
@@ -118,7 +117,7 @@ public final class WrappedPacketInUseEntity extends WrappedPacket {
 
     public EntityUseAction getAction() {
         if (action == null) {
-            Enum<?> useActionEnum = (Enum<?>) readObject(0, enumEntityUseActionClass);
+            Enum<?> useActionEnum = readEnumConstant(0, enumEntityUseActionClass);
             if (useActionEnum == null) {
                 //This happens on some weird spigots apparently? Not sure why this field is null.
                 return EntityUseAction.INTERACT;
@@ -131,7 +130,7 @@ public final class WrappedPacketInUseEntity extends WrappedPacket {
     public void setAction(EntityUseAction action) {
         this.action = action;
         Enum<?> enumConst = EnumUtil.valueOf(enumEntityUseActionClass, action.name());
-        write(enumEntityUseActionClass, 0, enumConst);
+        writeEnumConstant(0, enumConst);
     }
 
     public Hand getHand() {
@@ -151,10 +150,9 @@ public final class WrappedPacketInUseEntity extends WrappedPacket {
     public void setHand(Hand hand) throws UnsupportedOperationException {
         if (PacketEvents.get().getServerUtils().getVersion().isOlderThan(ServerVersion.v_1_9)) {
             throwUnsupportedOperation();
-        }
-        else if (getAction() == EntityUseAction.INTERACT || getAction() == EntityUseAction.INTERACT_AT) {
+        } else if (getAction() == EntityUseAction.INTERACT || getAction() == EntityUseAction.INTERACT_AT) {
             Enum<?> enumConst = EnumUtil.valueOf(enumHandClass, hand.name());
-            write(enumHandClass, 0, enumConst);
+            writeEnumConstant(0, enumConst);
         }
     }
 

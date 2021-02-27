@@ -27,7 +27,6 @@ package io.github.retrooper.packetevents.packetwrappers.play.in.updatesign;
 import io.github.retrooper.packetevents.packettype.PacketTypeClasses;
 import io.github.retrooper.packetevents.packetwrappers.NMSPacket;
 import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
-import io.github.retrooper.packetevents.packetwrappers.play.out.chat.WrappedPacketOutChat;
 import io.github.retrooper.packetevents.utils.nms.NMSUtils;
 import io.github.retrooper.packetevents.utils.reflection.Reflection;
 import io.github.retrooper.packetevents.utils.vector.Vector3i;
@@ -103,8 +102,7 @@ public class WrappedPacketInUpdateSign extends WrappedPacket {
     public void setTextLines(String[] lines) {
         if (strArrayMode) {
             writeStringArray(0, lines);
-        }
-        else {
+        } else {
             Object[] iChatComponents = NMSUtils.generateIChatBaseComponents(lines);
             writeAnyObject(1, iChatComponents);
         }

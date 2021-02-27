@@ -28,7 +28,6 @@ import io.github.retrooper.packetevents.packettype.PacketTypeClasses;
 import io.github.retrooper.packetevents.packetwrappers.NMSPacket;
 import io.github.retrooper.packetevents.packetwrappers.SendableWrapper;
 import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
-import io.github.retrooper.packetevents.packetwrappers.play.out.chat.WrappedPacketOutChat;
 import io.github.retrooper.packetevents.utils.nms.NMSUtils;
 
 import java.lang.reflect.Constructor;
@@ -72,8 +71,7 @@ public final class WrappedPacketOutKickDisconnect extends WrappedPacket implemen
         if (packet != null) {
             Object iChatBaseComponent = NMSUtils.generateIChatBaseComponent(message);
             write(NMSUtils.iChatBaseComponentClass, 0, iChatBaseComponent);
-        }
-        else {
+        } else {
             this.kickMessage = message;
         }
     }

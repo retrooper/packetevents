@@ -72,8 +72,7 @@ public class WrappedPacketLoginOutSetCompression extends WrappedPacket implement
     public void setThreshold(int threshold) {
         if (packet != null) {
             writeInt(0, threshold);
-        }
-        else {
+        } else {
             this.threshold = threshold;
         }
     }

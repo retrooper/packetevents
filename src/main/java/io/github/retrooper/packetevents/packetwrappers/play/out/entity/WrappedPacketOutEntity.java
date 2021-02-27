@@ -30,7 +30,6 @@ import io.github.retrooper.packetevents.packetwrappers.SendableWrapper;
 import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
 import io.github.retrooper.packetevents.utils.nms.NMSUtils;
 import io.github.retrooper.packetevents.utils.reflection.Reflection;
-import io.github.retrooper.packetevents.utils.vector.Vector3d;
 import org.bukkit.entity.Entity;
 
 import java.lang.reflect.Constructor;
@@ -66,9 +65,6 @@ public class WrappedPacketOutEntity extends WrappedPacket implements SendableWra
         this.pitch = pitch;
         this.yaw = yaw;
         this.onGround = onGround;
-        //Get entity player then pass it into the packetplayoutnamedentityspawn!
-        //  net.minecraft.server.v1_7_R4.EntityPlayer cp = null;
-        //net.minecraft.server.v1_7_R4.PacketPlayOutNamedEntitySpawn es = new net.minecraft.server.v1_7_R4.PacketPlayOutNamedEntitySpawn(cp);
     }
 
     public WrappedPacketOutEntity(Entity entity, double deltaX, double deltaY, double deltaZ,
@@ -165,8 +161,7 @@ public class WrappedPacketOutEntity extends WrappedPacket implements SendableWra
                     writeShort(0, (short) dx);
                     break;
             }
-        }
-        else {
+        } else {
             this.deltaX = deltaX;
         }
     }
@@ -202,8 +197,7 @@ public class WrappedPacketOutEntity extends WrappedPacket implements SendableWra
                     writeShort(1, (short) dy);
                     break;
             }
-        }
-        else {
+        } else {
             this.deltaY = deltaY;
         }
     }
@@ -237,7 +231,7 @@ public class WrappedPacketOutEntity extends WrappedPacket implements SendableWra
                     writeShort(2, (short) dz);
             }
         } else {
-            this.deltaZ =  deltaZ;
+            this.deltaZ = deltaZ;
         }
     }
 
@@ -249,10 +243,10 @@ public class WrappedPacketOutEntity extends WrappedPacket implements SendableWra
         return entity = NMSUtils.getEntityById(getEntityId());
     }
 
-   public void setEntity(Entity entity) {
+    public void setEntity(Entity entity) {
         setEntityId(entity.getEntityId());
         this.entity = entity;
-   }
+    }
 
     public int getEntityId() {
         if (entityID != -1) {
@@ -265,8 +259,7 @@ public class WrappedPacketOutEntity extends WrappedPacket implements SendableWra
     public void setEntityId(int entityID) {
         if (packet != null) {
             writeInt(0, this.entityID = entityID);
-        }
-        else {
+        } else {
             this.entityID = entityID;
         }
         this.entity = null;
@@ -280,11 +273,10 @@ public class WrappedPacketOutEntity extends WrappedPacket implements SendableWra
         }
     }
 
-    public void setIsOnGround(boolean onGround) {
+    public void setOnGround(boolean onGround) {
         if (packet != null) {
             writeBoolean(0, onGround);
-        }
-        else {
+        } else {
             this.onGround = onGround;
         }
     }

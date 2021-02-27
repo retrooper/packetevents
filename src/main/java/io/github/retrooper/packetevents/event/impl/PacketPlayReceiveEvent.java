@@ -31,7 +31,6 @@ import io.github.retrooper.packetevents.packettype.PacketType;
 import io.github.retrooper.packetevents.packetwrappers.NMSPacket;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 /**
  * The {@code PacketPlayReceiveEvent} event is fired whenever the a PLAY packet is
@@ -62,15 +61,6 @@ public final class PacketPlayReceiveEvent extends CancellableNMSPacketEvent impl
     public Player getPlayer() {
         return player;
     }
-
-    /**
-     * This method returns the socket address of the packet sender.
-     * This address if guaranteed to never be null.
-     * You could use this to identify who is sending packets
-     * whenever the player object is null.
-     *
-     * @return Packet sender's socket address.
-     */
 
     /**
      * Each binding in each packet state has their own constants.

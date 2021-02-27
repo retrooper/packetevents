@@ -24,43 +24,102 @@
 
 package io.github.retrooper.packetevents.packetwrappers.play.out.openwindowhorse;
 
+import io.github.retrooper.packetevents.packettype.PacketTypeClasses;
 import io.github.retrooper.packetevents.packetwrappers.NMSPacket;
+import io.github.retrooper.packetevents.packetwrappers.SendableWrapper;
 import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
 import io.github.retrooper.packetevents.utils.server.ServerVersion;
 
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
+
 /**
  * Wrapper for the OpenWindowHorse packet.
- * TODO make sendable
- * @author Tecnio
+ *
+ * @author retrooper, Tecnio
  * @since 1.8
  */
-public final class WrappedPacketOutOpenWindowHorse extends WrappedPacket {
+public final class WrappedPacketOutOpenWindowHorse extends WrappedPacket implements SendableWrapper {
+    private static Constructor<?> packetConstructor;
+    private int windowID;
+    private int slotCount;
+    private int entityID;
+
     public WrappedPacketOutOpenWindowHorse(NMSPacket packet) {
         super(packet);
     }
 
+    @Override
+    protected void load() {
+        try {
+            packetConstructor = PacketTypeClasses.Play.Server.OPEN_WINDOW_HORSE.getConstructor(int.class, int.class, int.class);
+        } catch (NoSuchMethodException e) {
+            e.printStackTrace();
+        }
+    }
+
     public int getWindowId() {
-        return readInt(0);
+        if (packet != null) {
+            return readInt(0);
+        }
+        else {
+            return windowID;
+        }
+    }
+
+    public void setWindowId(int windowID) {
+        if (packet != null) {
+            writeInt(0, windowID);
+        }
+        else {
+            this.windowID = windowID;
+        }
     }
 
     public int getSlotCount() {
-        return readInt(1);
-    }
-
-    public int getEntityId() {
-        return readInt(2);
-    }
-
-    public void setWindowId(int windowId) {
-        writeInt(0, windowId);
+        if (packet != null) {
+            return readInt(1);
+        }
+        else {
+            return slotCount;
+        }
     }
 
     public void setSlotCount(int slotCount) {
-        writeInt(1, slotCount);
+        if (packet != null) {
+            writeInt(1, slotCount);
+        }
+        else {
+            this.slotCount = slotCount;
+        }
     }
 
-    public void setEntityId(int entityId) {
-        writeInt(2, entityId);
+    public int getEntityId() {
+        if (packet != null) {
+            return readInt(2);
+        }
+        else {
+            return entityID;
+        }
+    }
+
+    public void setEntityId(int entityID) {
+        if (packet != null) {
+            writeInt(2, entityID);
+        }
+        else {
+            this.entityID = entityID;
+        }
+    }
+
+    @Override
+    public Object asNMSPacket() {
+        try {
+            return packetConstructor.newInstance(getWindowId(),getSlotCount(), getEntityId());
+        } catch (InstantiationException | InvocationTargetException | IllegalAccessException e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 
     @Override

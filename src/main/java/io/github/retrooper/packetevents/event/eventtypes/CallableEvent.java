@@ -32,7 +32,7 @@ import io.github.retrooper.packetevents.event.impl.PacketPlayReceiveEvent;
  * The {@link PacketEvent} implements this interface.
  * Every inbuilt event should implement the {@link #call(PacketListenerDynamic)} method.
  * If you are making a custom event, don't implement this.
- * The {@link PacketListenerDynamic#onPacketEvent(PacketEvent)} method is called for every event,
+ * The {@link PacketListenerDynamic#onPacketEventExternal(PacketEvent)} method is called for every event that is not in-built.
  * including custom events.
  *
  * @author retrooper

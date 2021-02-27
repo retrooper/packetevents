@@ -60,15 +60,15 @@ import java.net.InetSocketAddress;
 import java.util.UUID;
 
 public final class PacketEvents implements Listener, EventManager {
-    //TODO finish unfinished wrappers, fix packetplayoutposition on 1.16 with new constr argument
+    public static String handlerName;
+    //TODO finish unfinished wrappers
     private static PacketEvents instance;
+    private static Plugin plugin;
     private final PEVersion version = new PEVersion(1, 7, 9, 5);
     private final EventManager eventManager = new PEEventManager();
     private final PlayerUtils playerUtils = new PlayerUtils();
     private final ServerUtils serverUtils = new ServerUtils();
     private final UpdateChecker updateChecker = new UpdateChecker();
-    private static Plugin plugin;
-    public static String handlerName;
     public PacketProcessorInternal packetProcessorInternal;
     public GlobalChannelInjector injector;
     private boolean loading, loaded, initialized, initializing, terminating;
@@ -151,36 +151,33 @@ public final class PacketEvents implements Listener, EventManager {
             }
 
             if (settings.shouldCheckForUpdates()) {
-                Thread thread = new Thread(new Runnable() {
-                    @Override
-                    public void run() {
-                        PacketEvents.get().getPlugin().getLogger().info("[packetevents] Checking for an update, please wait...");
-                        UpdateChecker.UpdateCheckerStatus status = updateChecker.checkForUpdate();
-                        int seconds = 5;
-                        for (int i = 0; i < 5; i++) {
-                            if (status == UpdateChecker.UpdateCheckerStatus.FAILED) {
-                                PacketEvents.get().getPlugin().getLogger().severe("[packetevents] Checking for an update again in " + seconds + " seconds...");
-                                try {
-                                    Thread.sleep(seconds * 1000L);
-                                } catch (InterruptedException e) {
-                                    e.printStackTrace();
-                                }
-
-                                seconds *= 2;
-
-                                status = updateChecker.checkForUpdate();
-
-                                if (i == 4) {
-                                    PacketEvents.get().getPlugin().getLogger().severe("[packetevents] PacketEvents failed to check for an update. No longer retrying.");
-                                    break;
-                                }
-                            } else {
-                                break;
+                Thread thread = new Thread(() -> {
+                    PacketEvents.get().getPlugin().getLogger().info("[packetevents] Checking for an update, please wait...");
+                    UpdateChecker.UpdateCheckerStatus status = updateChecker.checkForUpdate();
+                    int seconds = 5;
+                    for (int i = 0; i < 5; i++) {
+                        if (status == UpdateChecker.UpdateCheckerStatus.FAILED) {
+                            PacketEvents.get().getPlugin().getLogger().severe("[packetevents] Checking for an update again in " + seconds + " seconds...");
+                            try {
+                                Thread.sleep(seconds * 1000L);
+                            } catch (InterruptedException e) {
+                                e.printStackTrace();
                             }
 
+                            seconds *= 2;
+
+                            status = updateChecker.checkForUpdate();
+
+                            if (i == 4) {
+                                PacketEvents.get().getPlugin().getLogger().severe("[packetevents] PacketEvents failed to check for an update. No longer retrying.");
+                                break;
+                            }
+                        } else {
+                            break;
                         }
 
                     }
+
                 }, "PacketEvents-update-check-thread");
                 thread.start();
             }
@@ -291,22 +288,19 @@ public final class PacketEvents implements Listener, EventManager {
         PacketEvents.get().getPlayerUtils().loginTime.put(player.getUniqueId(), System.currentTimeMillis());
         if (dependencyAvailable) {
             PacketEvents.get().getPlayerUtils().clientVersionsMap.put(player.getAddress(), ClientVersion.TEMP_UNRESOLVED);
-            Bukkit.getScheduler().runTaskLaterAsynchronously(getPlugin(), new Runnable() {
-                @Override
-                public void run() {
-                    int protocolVersion;
-                    try {
-                        protocolVersion = VersionLookupUtils.getProtocolVersion(player);
-                    } catch (Exception ex) {
-                        protocolVersion = -1;
-                    }
-                    if (protocolVersion != -1) {
-                        ClientVersion version = ClientVersion.getClientVersion(protocolVersion);
-                        PacketEvents.get().getPlayerUtils().clientVersionsMap.put(address, version);
-                    }
-
-                    PacketEvents.get().getEventManager().callEvent(new PostPlayerInjectEvent(player, true));
+            Bukkit.getScheduler().runTaskLaterAsynchronously(getPlugin(), () -> {
+                int protocolVersion;
+                try {
+                    protocolVersion = VersionLookupUtils.getProtocolVersion(player);
+                } catch (Exception ex) {
+                    protocolVersion = -1;
                 }
+                if (protocolVersion != -1) {
+                    ClientVersion version = ClientVersion.getClientVersion(protocolVersion);
+                    PacketEvents.get().getPlayerUtils().clientVersionsMap.put(address, version);
+                }
+
+                PacketEvents.get().getEventManager().callEvent(new PostPlayerInjectEvent(player, true));
             }, 1L);
         }
 

@@ -32,7 +32,6 @@ import io.github.retrooper.packetevents.utils.nms.NMSUtils;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
-import java.util.Objects;
 
 public final class WrappedPacketOutAbilities extends WrappedPacket implements SendableWrapper {
     private static Constructor<?> packetConstructor, playerAbilitiesConstructor;
@@ -86,11 +85,10 @@ public final class WrappedPacketOutAbilities extends WrappedPacket implements Se
         }
     }
 
-    public void setIsVulnerable(boolean isVulnerable) {
+    public void setVulnerable(boolean isVulnerable) {
         if (packet != null) {
             writeBoolean(0, isVulnerable);
-        }
-        else {
+        } else {
             this.vulnerable = isVulnerable;
         }
     }
@@ -103,11 +101,10 @@ public final class WrappedPacketOutAbilities extends WrappedPacket implements Se
         }
     }
 
-    public void setIsFlying(boolean isFlying) {
+    public void setFlying(boolean isFlying) {
         if (packet != null) {
             writeBoolean(1, isFlying);
-        }
-        else {
+        } else {
             this.flying = isFlying;
         }
     }
@@ -120,11 +117,10 @@ public final class WrappedPacketOutAbilities extends WrappedPacket implements Se
         }
     }
 
-    public void setIsFlightAllowed(boolean isFlightAllowed) {
+    public void setFlightAllowed(boolean isFlightAllowed) {
         if (packet != null) {
             writeBoolean(2, isFlightAllowed);
-        }
-        else {
+        } else {
             this.allowFlight = isFlightAllowed;
         }
     }
@@ -140,8 +136,7 @@ public final class WrappedPacketOutAbilities extends WrappedPacket implements Se
     public void setCanBuildInstantly(boolean canBuildInstantly) {
         if (packet != null) {
             writeBoolean(3, canBuildInstantly);
-        }
-        else {
+        } else {
             this.instantBuild = canBuildInstantly;
         }
     }
@@ -157,8 +152,7 @@ public final class WrappedPacketOutAbilities extends WrappedPacket implements Se
     public void setFlySpeed(float flySpeed) {
         if (packet != null) {
             writeFloat(0, flySpeed);
-        }
-        else {
+        } else {
             this.flySpeed = flySpeed;
         }
     }
@@ -174,9 +168,8 @@ public final class WrappedPacketOutAbilities extends WrappedPacket implements Se
     public void setWalkSpeed(float walkSpeed) {
         if (packet != null) {
             writeFloat(1, walkSpeed);
-        }
-        else {
-            this.walkSpeed =walkSpeed;
+        } else {
+            this.walkSpeed = walkSpeed;
         }
     }
 

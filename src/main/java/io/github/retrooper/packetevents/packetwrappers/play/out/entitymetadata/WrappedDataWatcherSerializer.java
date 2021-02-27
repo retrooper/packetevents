@@ -15,12 +15,36 @@ public class WrappedDataWatcherSerializer {
 
     private final Class<?> type;
     private final boolean optional;
-    private Object raw;
+    private final Object raw;
 
     private WrappedDataWatcherSerializer(Object nms, Class<?> type, boolean optional) {
         this.raw = nms;
         this.type = type;
         this.optional = optional;
+    }
+
+    /**
+     * Get if the wrapped class exists.
+     *
+     * @return if the wrapped class is present.
+     */
+    public static boolean isPresent() {
+        return TYPE != null;
+    }
+
+    /**
+     * Wrap a DataWatcherSerializer.
+     *
+     * @param nms      Handle.
+     * @param type     Type it serializes.
+     * @param optional If the return type is wrapped in an optional.
+     * @return the wrapped instance.
+     */
+    public static WrappedDataWatcherSerializer of(Object nms, Class<?> type, boolean optional) {
+        if (!isPresent()) {
+            throw new UnsupportedOperationException("DataWatcherSerializer does not exist in this minecraft version");
+        }
+        return new WrappedDataWatcherSerializer(nms, type, optional);
     }
 
     /**
@@ -41,31 +65,7 @@ public class WrappedDataWatcherSerializer {
         return optional;
     }
 
-    /**
-     * Get if the wrapped class exists.
-     *
-     * @return if the wrapped class is present.
-     */
-    public static boolean isPresent() {
-        return TYPE != null;
-    }
-
     public Object getRaw() {
         return raw;
-    }
-
-    /**
-     * Wrap a DataWatcherSerializer.
-     *
-     * @param nms      Handle.
-     * @param type     Type it serializes.
-     * @param optional If the return type is wrapped in an optional.
-     * @return the wrapped instance.
-     */
-    public static WrappedDataWatcherSerializer of(Object nms, Class<?> type, boolean optional) {
-        if (!isPresent()) {
-            throw new UnsupportedOperationException("DataWatcherSerializer does not exist in this minecraft version");
-        }
-        return new WrappedDataWatcherSerializer(nms, type, optional);
     }
 }

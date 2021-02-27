@@ -52,7 +52,7 @@ public final class WrappedPacketInTransaction extends WrappedPacket {
         return readBoolean(0);
     }
 
-    public void setIsAccepted(boolean isAccepted) {
+    public void setAccepted(boolean isAccepted) {
         writeBoolean(0, isAccepted);
     }
 }

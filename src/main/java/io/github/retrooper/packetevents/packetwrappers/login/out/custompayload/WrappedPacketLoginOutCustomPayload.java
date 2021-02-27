@@ -81,12 +81,29 @@ public class WrappedPacketLoginOutCustomPayload extends WrappedPacket implements
         return messageID;
     }
 
+    public void setMessageId(int messageID) {
+        if (packet != null) {
+            writeInt(0, messageID);
+        } else {
+            this.messageID = messageID;
+        }
+    }
+
     public String getChannelName() {
         if (packet != null) {
             Object minecraftKey = readObject(0, NMSUtils.minecraftKeyClass);
-           return NMSUtils.getStringFromMinecraftKey(minecraftKey);
+            return NMSUtils.getStringFromMinecraftKey(minecraftKey);
         }
         return channelName;
+    }
+
+    public void setChannelName(String channelName) {
+        if (packet != null) {
+            Object minecraftKey = NMSUtils.generateMinecraftKey(channelName);
+            writeObject(0, minecraftKey);
+        } else {
+            this.channelName = channelName;
+        }
     }
 
     public byte[] getData() {
@@ -97,25 +114,6 @@ public class WrappedPacketLoginOutCustomPayload extends WrappedPacket implements
             return PacketEvents.get().getByteBufUtil().getBytes(byteBuf);
         }
         return data;
-    }
-
-    public void setMessageId(int messageID) {
-        if (packet != null) {
-            writeInt(0, messageID);
-        }
-        else {
-            this.messageID = messageID;
-        }
-    }
-
-    public void setChannelName(String channelName) {
-        if (packet != null) {
-            Object minecraftKey = NMSUtils.generateMinecraftKey(channelName);
-            writeObject(0, minecraftKey);
-        }
-        else {
-            this.channelName = channelName;
-        }
     }
 
     public void setData(byte[] data) {

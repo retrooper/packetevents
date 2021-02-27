@@ -38,8 +38,8 @@ class GameProfileUtil_7 {
     /**
      * Create a new Mojang Game Profile object using the 1.7.10 Mojang API import.
      *
-     * @param uuid
-     * @param username
+     * @param uuid UUID
+     * @param username Username
      * @return 1.7.10 Mojang Game Profile.
      */
     public static Object getGameProfile(UUID uuid, String username) {

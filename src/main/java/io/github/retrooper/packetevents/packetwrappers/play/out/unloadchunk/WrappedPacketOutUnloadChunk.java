@@ -24,35 +24,86 @@
 
 package io.github.retrooper.packetevents.packetwrappers.play.out.unloadchunk;
 
+import io.github.retrooper.packetevents.packettype.PacketTypeClasses;
 import io.github.retrooper.packetevents.packetwrappers.NMSPacket;
+import io.github.retrooper.packetevents.packetwrappers.SendableWrapper;
 import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
 import io.github.retrooper.packetevents.utils.server.ServerVersion;
 
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
+
 /**
  * Wrapper for the UnloadChunk packet.
- * TODO make sendable
- * @author Tecnio
+ *
+ * @author retrooper, Tecnio
  * @since 1.8
  */
-public final class WrappedPacketOutUnloadChunk extends WrappedPacket {
+public final class WrappedPacketOutUnloadChunk extends WrappedPacket implements SendableWrapper {
+    private static Constructor<?> packetConstructor;
+    private int chunkX, chunkZ;
     public WrappedPacketOutUnloadChunk(NMSPacket packet) {
         super(packet);
     }
 
+    public WrappedPacketOutUnloadChunk(int chunkX, int chunkZ) {
+        this.chunkX = chunkX;
+        this.chunkZ = chunkZ;
+    }
+
+    @Override
+    protected void load() {
+        try {
+            packetConstructor = PacketTypeClasses.Play.Server.UNLOAD_CHUNK.getConstructor(int.class, int.class);
+        } catch (NoSuchMethodException e) {
+            e.printStackTrace();
+        }
+    }
+
     public int getChunkX() {
-        return readInt(0);
+        if (packet != null) {
+            return readInt(0);
+        }
+        else {
+            return chunkX;
+        }
+    }
+
+    public void setChunkX(int chunkX) {
+        if (packet != null) {
+            writeInt(0, chunkX);
+        }
+        else {
+            this.chunkX = chunkX;
+        }
     }
 
     public int getChunkZ() {
-        return readInt(1);
+        if (packet != null) {
+            return readInt(1);
+        }
+        else {
+            return chunkZ;
+        }
     }
 
-    public void setChunkX(int x) {
-        writeInt(0, x);
+    public void setChunkZ(int chunkZ) {
+        if (packet != null) {
+            writeInt(1, chunkZ);
+        }
+        else {
+            this.chunkZ = chunkZ;
+        }
     }
 
-    public void setChunkZ(int z) {
-        writeInt(1, z);
+    @Override
+    public Object asNMSPacket() {
+        try {
+            return packetConstructor.newInstance(getChunkX(), getChunkZ());
+        } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 
     @Override

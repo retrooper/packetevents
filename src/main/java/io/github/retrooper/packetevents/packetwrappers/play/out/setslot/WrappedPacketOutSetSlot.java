@@ -57,8 +57,6 @@ public class WrappedPacketOutSetSlot extends WrappedPacket implements SendableWr
     }
 
 
-
-
     @Override
     protected void load() {
         Class<?> packetClass = PacketTypeClasses.Play.Server.SET_SLOT;
@@ -78,12 +76,27 @@ public class WrappedPacketOutSetSlot extends WrappedPacket implements SendableWr
         }
     }
 
+    public void setWindowId(int windowID) {
+        if (packet != null) {
+            writeInt(0, windowID);
+        } else {
+            this.windowID = windowID;
+        }
+    }
 
     public int getSlot() {
         if (packet != null) {
             return readInt(1);
         } else {
             return slot;
+        }
+    }
+
+    public void setSlot(int slot) {
+        if (packet != null) {
+            writeInt(1, slot);
+        } else {
+            this.slot = slot;
         }
     }
 
@@ -96,30 +109,11 @@ public class WrappedPacketOutSetSlot extends WrappedPacket implements SendableWr
         }
     }
 
-    public void setWindowId(int windowID) {
-        if (packet != null) {
-            writeInt(0, windowID);
-        }
-        else {
-            this.windowID = windowID;
-        }
-    }
-
-    public void setSlot(int slot) {
-        if (packet != null) {
-            writeInt(1, slot);
-        }
-        else {
-            this.slot = slot;
-        }
-    }
-
     public void setItemStack(ItemStack itemStack) {
         if (packet != null) {
             Object nmsItemStack = NMSUtils.toNMSItemStack(itemStack);
             writeObject(0, nmsItemStack);
-        }
-        else {
+        } else {
             this.itemStack = itemStack;
         }
     }

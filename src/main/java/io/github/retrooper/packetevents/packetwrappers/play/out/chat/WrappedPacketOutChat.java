@@ -30,7 +30,6 @@ import io.github.retrooper.packetevents.packetwrappers.SendableWrapper;
 import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
 import io.github.retrooper.packetevents.utils.nms.NMSUtils;
 import io.github.retrooper.packetevents.utils.reflection.Reflection;
-import io.github.retrooper.packetevents.utils.reflection.SubclassUtil;
 import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.chat.ComponentSerializer;
 
@@ -145,8 +144,7 @@ public final class WrappedPacketOutChat extends WrappedPacket implements Sendabl
             case -1:
                 try {
                     return chatClassConstructor.newInstance(NMSUtils.generateIChatBaseComponent(getMessage()));
-                }
-                catch (InstantiationException | InvocationTargetException | IllegalAccessException e) {
+                } catch (InstantiationException | InvocationTargetException | IllegalAccessException e) {
                     e.printStackTrace();
                 }
             case 0:
@@ -158,7 +156,7 @@ public final class WrappedPacketOutChat extends WrappedPacket implements Sendabl
                 break;
             case 1:
                 try {
-                    return chatClassConstructor.newInstance(NMSUtils.generateIChatBaseComponent(getMessage()), (int)chatPos);
+                    return chatClassConstructor.newInstance(NMSUtils.generateIChatBaseComponent(getMessage()), (int) chatPos);
                 } catch (InstantiationException | InvocationTargetException | IllegalAccessException e) {
                     e.printStackTrace();
                 }

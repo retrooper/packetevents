@@ -85,13 +85,13 @@ final class WrappedPacketInBlockPlace_1_9 extends WrappedPacket {
     public Direction getDirection() {
         Enum<?> enumConst;
         if (movingObjectPositionBlockClass == null) {
-            enumConst = (Enum<?>) readObject(0, NMSUtils.enumDirectionClass);
+            enumConst = readEnumConstant(0, NMSUtils.enumDirectionClass);
         } else {
             if (movingObjPos == null) {
                 movingObjPos = readObject(0, movingObjectPositionBlockClass);
             }
             WrappedPacket movingObjectPosWrapper = new WrappedPacket(new NMSPacket(movingObjPos));
-            enumConst = (Enum<?>) movingObjectPosWrapper.readObject(0, NMSUtils.enumDirectionClass);
+            enumConst = movingObjectPosWrapper.readEnumConstant(0, NMSUtils.enumDirectionClass);
         }
         return Direction.valueOf(enumConst.name());
     }
@@ -99,13 +99,13 @@ final class WrappedPacketInBlockPlace_1_9 extends WrappedPacket {
     public void setDirection(Direction direction) {
         Enum<?> enumConst = EnumUtil.valueOf(NMSUtils.enumDirectionClass, direction.name());
         if (movingObjectPositionBlockClass == null) {
-            write( NMSUtils.enumDirectionClass, 0, enumConst);
+            writeEnumConstant(0, enumConst);
         } else {
             if (movingObjPos == null) {
                 movingObjPos = readObject(0, movingObjectPositionBlockClass);
             }
             WrappedPacket movingObjectPosWrapper = new WrappedPacket(new NMSPacket(movingObjPos));
-            movingObjectPosWrapper.write(NMSUtils.enumDirectionClass, 0, enumConst);
+            movingObjectPosWrapper.writeEnumConstant(0, enumConst);
         }
     }
 }

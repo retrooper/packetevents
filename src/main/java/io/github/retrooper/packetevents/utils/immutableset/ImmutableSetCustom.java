@@ -31,30 +31,29 @@ import java.util.List;
 
 public class ImmutableSetCustom<T> {
     private final ImmutableSetAbstract<T> immutableSetAbstract;
+
     public ImmutableSetCustom() {
         if (PacketEvents.get().getServerUtils().getVersion().isOlderThan(ServerVersion.v_1_8)) {
-            immutableSetAbstract = new ImmutableSet_7<T>();
-        }
-        else {
-            immutableSetAbstract = new ImmutableSet_8<T>();
+            immutableSetAbstract = new ImmutableSet_7<>();
+        } else {
+            immutableSetAbstract = new ImmutableSet_8<>();
         }
     }
 
     public ImmutableSetCustom(List<T> data) {
         if (PacketEvents.get().getServerUtils().getVersion().isOlderThan(ServerVersion.v_1_8)) {
-            immutableSetAbstract = new ImmutableSet_7<T>(data);
-        }
-        else {
-            immutableSetAbstract = new ImmutableSet_8<T>(data);
+            immutableSetAbstract = new ImmutableSet_7<>(data);
+        } else {
+            immutableSetAbstract = new ImmutableSet_8<>(data);
         }
     }
 
+    @SafeVarargs
     public ImmutableSetCustom(T... data) {
         if (PacketEvents.get().getServerUtils().getVersion().isOlderThan(ServerVersion.v_1_8)) {
-            immutableSetAbstract = new ImmutableSet_7<T>(data);
-        }
-        else {
-            immutableSetAbstract = new ImmutableSet_8<T>(data);
+            immutableSetAbstract = new ImmutableSet_7<>(data);
+        } else {
+            immutableSetAbstract = new ImmutableSet_8<>(data);
         }
     }
 
@@ -67,7 +66,8 @@ public class ImmutableSetCustom<T> {
         immutableSetAbstract.add(element);
     }
 
-    public void addAll(T... elements) {
+    @SafeVarargs
+    public final void addAll(T... elements) {
         immutableSetAbstract.addAll(elements);
     }
 }

@@ -65,8 +65,7 @@ public class WrappedPacketOutUpdateTime extends WrappedPacket implements Sendabl
     public void setWorldAgeTicks(long ticks) {
         if (packet != null) {
             writeLong(0, ticks);
-        }
-        else {
+        } else {
             this.worldAgeTicks = ticks;
         }
     }
@@ -81,8 +80,7 @@ public class WrappedPacketOutUpdateTime extends WrappedPacket implements Sendabl
     public void setTimeOfDayTicks(long ticks) {
         if (packet != null) {
             writeLong(1, ticks);
-        }
-        else {
+        } else {
             this.timeOfDayTicks = ticks;
         }
     }

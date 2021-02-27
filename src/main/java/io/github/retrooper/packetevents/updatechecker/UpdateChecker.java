@@ -44,32 +44,6 @@ import java.net.URLConnection;
  */
 public class UpdateChecker {
 
-    /**
-     * Result of an update check.
-     *
-     * @author retrooper
-     * @since 1.8
-     */
-    public enum UpdateCheckerStatus {
-        /**
-         * Your build is outdated, an update is available.
-         */
-        OUTDATED,
-        /**
-         * You are on a dev or pre-released build. Not on the latest release.
-         */
-        PRE_RELEASE,
-        /**
-         * Your build is up to date.
-         */
-        UP_TO_DATE,
-        /**
-         * Failed to check for an update. There might be an issue with your connection, if your connection seems to be fine make sure to contact me.
-         * It could have been a mistake from my end when naming a release.
-         */
-        FAILED;
-    }
-
     protected static String getLatestReleaseJson() throws IOException {
         URLConnection connection = new URL("https://api.github.com/repos/retrooper/packetevents/releases/latest").openConnection();
         connection.addRequestProperty("User-Agent", "Mozilla/4.0");
@@ -129,5 +103,31 @@ public class UpdateChecker {
      */
     private void report(String message) {
         Bukkit.getLogger().warning(ChatColor.DARK_RED + "[packetevents] " + message);
+    }
+
+    /**
+     * Result of an update check.
+     *
+     * @author retrooper
+     * @since 1.8
+     */
+    public enum UpdateCheckerStatus {
+        /**
+         * Your build is outdated, an update is available.
+         */
+        OUTDATED,
+        /**
+         * You are on a dev or pre-released build. Not on the latest release.
+         */
+        PRE_RELEASE,
+        /**
+         * Your build is up to date.
+         */
+        UP_TO_DATE,
+        /**
+         * Failed to check for an update. There might be an issue with your connection, if your connection seems to be fine make sure to contact me.
+         * It could have been a mistake from my end when naming a release.
+         */
+        FAILED
     }
 }

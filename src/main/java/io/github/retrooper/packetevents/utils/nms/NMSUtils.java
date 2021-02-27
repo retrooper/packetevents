@@ -30,7 +30,6 @@ import io.github.retrooper.packetevents.utils.entityfinder.EntityFinderUtils;
 import io.github.retrooper.packetevents.utils.reflection.Reflection;
 import io.github.retrooper.packetevents.utils.reflection.SubclassUtil;
 import io.github.retrooper.packetevents.utils.server.ServerVersion;
-import net.minecraft.server.v1_8_R3.Block;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.Server;
@@ -47,12 +46,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 public final class NMSUtils {
-    public static boolean legacyNettyImportMode;
-
     private static final String NMS_DIR = ServerVersion.getNMSDirectory() + ".";
     private static final String OBC_DIR = ServerVersion.getOBCDirectory() + ".";
+    public static boolean legacyNettyImportMode;
     public static ServerVersion version;
-    private static String nettyPrefix;
     public static Constructor<?> blockPosConstructor, minecraftKeyConstructor, vec3DConstructor;
     public static Class<?> nmsEntityClass, minecraftServerClass, craftWorldClass, playerInteractManagerClass, entityPlayerClass, playerConnectionClass, craftServerClass,
             craftPlayerClass, serverConnectionClass, craftEntityClass, nmsItemStackClass, networkManagerClass, nettyChannelClass, gameProfileClass, iChatBaseComponentClass,
@@ -60,6 +57,7 @@ public final class NMSUtils {
             soundEffectClass, minecraftKeyClass, chatSerializerClass, craftMagicNumbersClass;
     public static Class<? extends Enum<?>> enumDirectionClass, enumHandClass;
     public static Method getBlockPosX, getBlockPosY, getBlockPosZ;
+    private static String nettyPrefix;
     private static Method getCraftPlayerHandle;
     private static Method getCraftEntityHandle;
     private static Method getCraftWorldHandle;
@@ -146,7 +144,7 @@ public final class NMSUtils {
         }
 
 
-        enumDirectionClass = (Class<? extends Enum<?>>) NMSUtils.getNMSClassWithoutException("EnumDirection");
+        enumDirectionClass = NMSUtils.getNMSEnumClassWithoutException("EnumDirection");
         //METHODS
         try {
             getCraftPlayerHandle = craftPlayerClass.getMethod("getHandle");
@@ -177,9 +175,7 @@ public final class NMSUtils {
             if (minecraftKeyClass != null) {
                 minecraftKeyConstructor = minecraftKeyClass.getConstructor(String.class);
             }
-        } catch (NoSuchMethodException e) {
-            e.printStackTrace();
-        } catch (ClassNotFoundException e) {
+        } catch (NoSuchMethodException | ClassNotFoundException e) {
             e.printStackTrace();
         }
         try {
@@ -226,6 +222,19 @@ public final class NMSUtils {
 
     public static Class<?> getNMSClass(String name) throws ClassNotFoundException {
         return Class.forName(NMS_DIR + name);
+    }
+
+    public static Class<? extends Enum<?>> getNMSEnumClass(String name) throws ClassNotFoundException {
+        return (Class<? extends Enum<?>>) Class.forName(NMS_DIR + name);
+    }
+
+    public static Class<? extends Enum<?>> getNMSEnumClassWithoutException(String name) {
+        try {
+            return (Class<? extends Enum<?>>) getNMSClass(name);
+        } catch (ClassNotFoundException e) {
+            return null;
+        }
+
     }
 
     public static Class<?> getNMSClassWithoutException(String name) {

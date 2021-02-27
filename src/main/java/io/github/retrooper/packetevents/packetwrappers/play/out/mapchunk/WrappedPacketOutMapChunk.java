@@ -2,8 +2,6 @@ package io.github.retrooper.packetevents.packetwrappers.play.out.mapchunk;
 
 import io.github.retrooper.packetevents.packetwrappers.NMSPacket;
 import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
-import net.minecraft.server.v1_8_R3.Block;
-import org.bukkit.Material;
 
 class WrappedPacketOutMapChunk extends WrappedPacket {
     public WrappedPacketOutMapChunk(NMSPacket packet) {

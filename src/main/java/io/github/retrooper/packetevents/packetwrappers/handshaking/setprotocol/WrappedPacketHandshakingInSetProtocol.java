@@ -38,20 +38,20 @@ public class WrappedPacketHandshakingInSetProtocol extends WrappedPacket {
         return readInt(0);
     }
 
-    public int getPort() {
-        return readInt(1);
-    }
-
-    public String getHostName() {
-        return readString(0);
-    }
-
     public void setProtocolVersion(int protocolVersion) {
         writeInt(0, protocolVersion);
     }
 
+    public int getPort() {
+        return readInt(1);
+    }
+
     public void setPort(int port) {
         writeInt(1, port);
+    }
+
+    public String getHostName() {
+        return readString(0);
     }
 
     public void setHostName(String hostName) {

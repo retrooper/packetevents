@@ -48,8 +48,8 @@ public class WrappedPacket implements WrapperPacketReader, WrapperPacketWriter {
     private static final Map<Class<?>, Map<Class<?>, Field[]>> FIELD_CACHE = new ConcurrentHashMap<>();
     private static final Field[] EMPTY_FIELD_ARRAY = new Field[0];
     public static ServerVersion version;
-    protected NMSPacket packet;
     private final Class<?> packetClass;
+    protected final NMSPacket packet;
 
     public WrappedPacket() {
         packet = null;
@@ -94,7 +94,7 @@ public class WrappedPacket implements WrapperPacketReader, WrapperPacketWriter {
     }
 
     protected void throwUnsupportedOperation(Enum<?> enumConst) throws UnsupportedOperationException {
-        Class<?> enumConstClass= enumConst.getClass();
+        Class<?> enumConstClass = enumConst.getClass();
         Field field = null;
         try {
             field = enumConstClass.getField(enumConst.name());
@@ -106,8 +106,7 @@ public class WrappedPacket implements WrapperPacketReader, WrapperPacketWriter {
             List<ServerVersion> versionList = parseSupportedVersionsAnnotation(supportedVersions);
             String supportedVersionsMsg = Arrays.toString(versionList.toArray(new ServerVersion[0]));
             throw new UnsupportedOperationException("PacketEvents failed to use the " + enumConst.name() + " enum constant in the " + enumConstClass.getSimpleName() + " enum. This enum constant is not supported on your server version. (" + PacketEvents.get().getServerUtils().getVersion() + ")\n This enum constant is only supported on these server versions: " + supportedVersionsMsg);
-        }
-        else {
+        } else {
             throw new UnsupportedOperationException("PacketEvents failed to use the " + enumConst.name() + " enum constant in the " + enumConstClass.getSimpleName() + " enum. This enum constant is not supported on your server version. (" + PacketEvents.get().getServerUtils().getVersion() + ")\n Failed to find out what server versions this enum constant is supported on.");
         }
     }
@@ -152,17 +151,12 @@ public class WrappedPacket implements WrapperPacketReader, WrapperPacketWriter {
             if (first == last) {
                 versionList.add(first);
                 continue;
-            }
-            else if (first == ServerVersion.ERROR) {
+            } else if (first == ServerVersion.ERROR) {
                 first = ServerVersion.getOldest();
-            }
-            else if (last == ServerVersion.ERROR) {
+            } else if (last == ServerVersion.ERROR) {
                 last = ServerVersion.getLatest();
             }
-            for (int ordinal = first.ordinal(); ordinal < last.ordinal() + 1; ordinal++) {
-                ServerVersion value = ServerVersion.values()[ordinal];
-                versionList.add(value);
-            }
+            versionList.addAll(Arrays.asList(ServerVersion.values()).subList(first.ordinal(), last.ordinal() + 1));
         }
         return versionList;
     }
@@ -248,6 +242,7 @@ public class WrappedPacket implements WrapperPacketReader, WrapperPacketWriter {
         return read(index, String.class);
     }
 
+    @Override
     public Object readAnyObject(int index) {
         try {
             Field f = packetClass.getDeclaredFields()[index];
@@ -265,7 +260,13 @@ public class WrappedPacket implements WrapperPacketReader, WrapperPacketWriter {
         return null;
     }
 
-    public Object readObject(int index, Class<?> type) {
+    @Override
+    public <T> T readObject(int index, Class<? extends T> type) {
+        return read(index, type);
+    }
+
+    @Override
+    public Enum<?> readEnumConstant(int index, Class<? extends Enum<?>> type) {
         return read(index, type);
     }
 
@@ -364,6 +365,7 @@ public class WrappedPacket implements WrapperPacketReader, WrapperPacketWriter {
         write(String[].class, index, value);
     }
 
+    @Override
     public void writeAnyObject(int index, Object value) {
         try {
             Field f = packetClass.getDeclaredFields()[index];
@@ -378,6 +380,11 @@ public class WrappedPacket implements WrapperPacketReader, WrapperPacketWriter {
         } catch (ArrayIndexOutOfBoundsException e) {
             throw new WrapperFieldNotFoundException("PacketEvents failed to find any field indexed " + index + " in the " + ClassUtil.getClassSimpleName(packetClass) + " class!");
         }
+    }
+
+    @Override
+    public void writeEnumConstant(int index, Enum<?> enumConstant) {
+        write(enumConstant.getClass(), index, enumConstant);
     }
 
     public void write(Class<?> type, int index, Object value) throws WrapperFieldNotFoundException {

@@ -32,7 +32,6 @@ import io.github.retrooper.packetevents.packetwrappers.NMSPacket;
 import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.Optional;
 
@@ -69,9 +68,8 @@ public final class PacketPlaySendEvent extends CancellableNMSPacketEvent impleme
         WrappedPacket packetWrapper = new WrappedPacket(packet);
         try {
             int entityID = packetWrapper.readInt(0);
-           return Optional.of(entityID);
-        }
-        catch (Exception ex) {
+            return Optional.of(entityID);
+        } catch (Exception ex) {
             return Optional.empty();
         }
     }

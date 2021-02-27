@@ -53,6 +53,7 @@ public class PostPacketPlaySendEvent extends NMSPacketEvent implements PlayerEve
 
     /**
      * This method returns the bukkit player object of the packet sender.
+     *
      * @return Packet receiver.
      */
     @Override

@@ -50,7 +50,7 @@ public final class WrappedPacketInEntityAction extends WrappedPacket {
         olderThan_v_1_8 = version.isOlderThan(ServerVersion.v_1_8);
         newerThan_v_1_8_8 = version.isNewerThan(ServerVersion.v_1_8_8);
         if (!olderThan_v_1_8) {
-            enumPlayerActionClass = (Class<? extends Enum<?>>) SubclassUtil.getSubClass(PacketTypeClasses.Play.Client.ENTITY_ACTION, "EnumPlayerAction");
+            enumPlayerActionClass = SubclassUtil.getEnumSubClass(PacketTypeClasses.Play.Client.ENTITY_ACTION, "EnumPlayerAction");
         }
     }
 
@@ -83,7 +83,7 @@ public final class WrappedPacketInEntityAction extends WrappedPacket {
             int animationIndex = readInt(1) - 1;
             return PlayerAction.getByActionValue((byte) (animationIndex));
         } else {
-            Enum<?> enumConst = (Enum<?>) readObject(0, enumPlayerActionClass);
+            Enum<?> enumConst = readEnumConstant(0, enumPlayerActionClass);
             return PlayerAction.getByName(enumConst.name());
         }
     }
@@ -106,7 +106,7 @@ public final class WrappedPacketInEntityAction extends WrappedPacket {
                     enumConst = EnumUtil.valueOf(enumPlayerActionClass, action.alias);
                 }
             }
-            write(enumPlayerActionClass, 0, enumConst);
+            writeEnumConstant(0, enumConst);
         }
     }
 
@@ -121,8 +121,7 @@ public final class WrappedPacketInEntityAction extends WrappedPacket {
     public void setJumpBoost(int jumpBoost) {
         if (olderThan_v_1_8) {
             writeInt(2, jumpBoost);
-        }
-        else {
+        } else {
             writeInt(1, jumpBoost);
         }
     }
@@ -159,10 +158,6 @@ public final class WrappedPacketInEntityAction extends WrappedPacket {
             this.alias = alias;
         }
 
-        public byte getActionValue() {
-            return actionID;
-        }
-
         @Nullable
         public static PlayerAction getByActionValue(byte value) {
             if (version.isOlderThan(ServerVersion.v_1_9)) {
@@ -189,6 +184,10 @@ public final class WrappedPacketInEntityAction extends WrappedPacket {
                 }
             }
             return null;
+        }
+
+        public byte getActionValue() {
+            return actionID;
         }
     }
 

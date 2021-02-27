@@ -30,6 +30,7 @@ import io.github.retrooper.packetevents.utils.server.ServerVersion;
 
 /**
  * Wrapper for the DifficultyLock packet.
+ *
  * @author Tecnio
  * @since 1.8
  */

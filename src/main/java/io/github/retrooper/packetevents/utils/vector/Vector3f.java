@@ -23,6 +23,7 @@
  */
 
 package io.github.retrooper.packetevents.utils.vector;
+
 /**
  * 3D float Vector.
  * This vector can represent coordinates, angles, or anything you want.
@@ -140,8 +141,7 @@ public class Vector3f {
         if (obj instanceof Vector3f) {
             Vector3f vec = (Vector3f) obj;
             return x == vec.x && y == vec.y && z == vec.z;
-        }
-        else if (obj instanceof Vector3d) {
+        } else if (obj instanceof Vector3d) {
             Vector3d vec = (Vector3d) obj;
             return x == vec.x && y == vec.y && z == vec.z;
         } else if (obj instanceof Vector3i) {
@@ -158,7 +158,12 @@ public class Vector3f {
      */
     @Override
     public Vector3d clone() {
-        return new Vector3d(x, y, z);
+        try {
+            super.clone();
+        } catch (CloneNotSupportedException e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 
     @Override

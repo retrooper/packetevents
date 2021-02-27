@@ -61,4 +61,6 @@ public interface WrapperPacketWriter {
     void writeObject(int index, Object object);
 
     void writeAnyObject(int index, Object value);
+
+    void writeEnumConstant(int index, Enum<?> enumConstant);
 }

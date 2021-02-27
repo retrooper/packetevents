@@ -30,6 +30,7 @@ import io.github.retrooper.packetevents.utils.server.ServerVersion;
 
 /**
  * Wrapper for the BoatMove packet.
+ *
  * @author Tecnio
  * @since 1.8
  */
@@ -42,12 +43,12 @@ public final class WrappedPacketInBoatMove extends WrappedPacket {
         return readBoolean(0);
     }
 
-    public boolean getRightPaddle() {
-        return readBoolean(1);
-    }
-
     public void setLeftPaddle(boolean turning) {
         writeBoolean(0, turning);
+    }
+
+    public boolean getRightPaddle() {
+        return readBoolean(1);
     }
 
     public void setRightPaddle(boolean turning) {

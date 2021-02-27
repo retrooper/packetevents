@@ -46,10 +46,16 @@ public class WrappedPacketInWindowClick extends WrappedPacket {
         super(packet);
     }
 
+    private static ArrayList<WindowClickType> getArrayListOfWindowClickTypes(WindowClickType... types) {
+        ArrayList<WindowClickType> arrayList = new ArrayList<>(types.length);
+        arrayList.addAll(Arrays.asList(types));
+        return arrayList;
+    }
+
     @Override
     protected void load() {
         Class<?> packetClass = PacketTypeClasses.Play.Client.WINDOW_CLICK;
-        invClickTypeClass = (Class<? extends Enum<?>>) NMSUtils.getNMSClassWithoutException("InventoryClickType");
+        invClickTypeClass = NMSUtils.getNMSEnumClassWithoutException("InventoryClickType");
 
         //MODE 0
         WINDOW_CLICK_TYPE_CACHE.put(0, getArrayListOfWindowClickTypes(WindowClickType.LEFT_MOUSE_CLICK,
@@ -92,12 +98,6 @@ public class WrappedPacketInWindowClick extends WrappedPacket {
 
         WINDOW_CLICK_TYPE_CACHE.put(6, getArrayListOfWindowClickTypes(WindowClickType.DOUBLE_CLICK));
         isClickModePrimitive = Reflection.getField(packetClass, int.class, 3) != null;
-    }
-
-    private static ArrayList<WindowClickType> getArrayListOfWindowClickTypes(WindowClickType... types) {
-        ArrayList<WindowClickType> arrayList = new ArrayList<WindowClickType>(types.length);
-        arrayList.addAll(Arrays.asList(types));
-        return arrayList;
     }
 
     public int getWindowId() {
@@ -160,7 +160,7 @@ public class WrappedPacketInWindowClick extends WrappedPacket {
         if (isClickModePrimitive) {
             return readInt(3);
         } else {
-            Enum<?> enumConst = (Enum<?>) readObject(0, invClickTypeClass);
+            Enum<?> enumConst = readEnumConstant(0, invClickTypeClass);
             return enumConst.ordinal();
         }
     }
@@ -170,7 +170,7 @@ public class WrappedPacketInWindowClick extends WrappedPacket {
             writeInt(3, mode);
         } else {
             Enum<?> enumConst = EnumUtil.valueByIndex(invClickTypeClass, mode);
-            write(invClickTypeClass, 0, enumConst);
+            writeEnumConstant(0, enumConst);
         }
     }
 

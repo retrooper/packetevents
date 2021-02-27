@@ -39,14 +39,16 @@ import java.util.Map;
  * @since 1.6.8
  */
 public class PacketType {
-    public enum State {
-        STATUS, HANDSHAKING, LOGIN, PLAY;
-    }
     /**
      * If a Packet Type could not be resolved, it will be set to the current value of this constant.
      * This value may change over the versions so it is important to use the variable and not hard code its value.
      */
     public static final byte INVALID = -1;
+
+    public enum State {
+        STATUS, HANDSHAKING, LOGIN, PLAY
+    }
+
     /**
      * Status Packet IDs.
      *
@@ -98,6 +100,7 @@ public class PacketType {
 
     /**
      * Handshaking Packet IDs.
+     *
      * @author retrooper
      * @see <a href="https://wiki.vg/Protocol#Handshaking">https://wiki.vg/Protocol#Handshaking</a>
      * @since 1.8

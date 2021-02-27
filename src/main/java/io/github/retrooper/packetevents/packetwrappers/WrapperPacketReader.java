@@ -58,7 +58,9 @@ public interface WrapperPacketReader {
 
     String readString(int index);
 
-    Object readObject(int index, Class<?> type);
+    <T> T readObject(int index, Class<? extends T> type);
+
+    Enum<?> readEnumConstant(int index, Class<? extends Enum<?>> type);
 
     Object readAnyObject(int index);
 }

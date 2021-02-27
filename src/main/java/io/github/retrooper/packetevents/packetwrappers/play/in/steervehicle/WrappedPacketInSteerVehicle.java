@@ -52,7 +52,7 @@ public class WrappedPacketInSteerVehicle extends WrappedPacket {
         return readBoolean(0);
     }
 
-    public void setIsJump(boolean isJump) {
+    public void setJump(boolean isJump) {
         writeBoolean(0, isJump);
     }
 
@@ -60,7 +60,7 @@ public class WrappedPacketInSteerVehicle extends WrappedPacket {
         return readBoolean(1);
     }
 
-    public void setIsDismount(boolean isDismount) {
+    public void setDismount(boolean isDismount) {
         writeBoolean(1, isDismount);
     }
 }

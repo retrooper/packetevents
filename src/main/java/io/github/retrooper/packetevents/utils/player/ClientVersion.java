@@ -37,6 +37,7 @@ import java.util.Map;
  * as the version you see in the minecraft launcher.
  * Some enum constants may represent two or more versions as there have been cases where some versions have the same protocol version due to no protocol changes.
  * We added a comment over those enum constants so check it out.
+ *
  * @author retrooper
  * @see <a href="https://wiki.vg/Protocol_version_numbers">https://wiki.vg/Protocol_version_numbers</a>
  * @since 1.6.9
@@ -106,8 +107,8 @@ public enum ClientVersion {
     private static final short HIGHEST_SUPPORTED_PROTOCOL_VERSION = (short) (HIGHER_THAN_SUPPORTED_VERSIONS.protocolVersion - 1);
 
     private static final Map<Short, ClientVersion> clientVersionCache = new HashMap<>();
-    private static final int[] CLIENT_VERSIONS = new int[] { 5, 47, 107, 108, 109, 110, 210, 315, 316, 335, 338,
-            340, 393, 401, 404, 477, 480, 485, 490, 498, 573, 575, 578, 735, 736, 751, 753, 754 };
+    private static final int[] CLIENT_VERSIONS = new int[]{5, 47, 107, 108, 109, 110, 210, 315, 316, 335, 338,
+            340, 393, 401, 404, 477, 480, 485, 490, 498, 573, 575, 578, 735, 736, 751, 753, 754};
     private short protocolVersion;
 
     ClientVersion(int protocolVersion) {
@@ -133,7 +134,7 @@ public enum ClientVersion {
             if (cached == null) {
                 for (ClientVersion version : values()) {
                     if (version.protocolVersion > protocolVersion) {
-                       break;
+                        break;
                     } else if (version.protocolVersion == protocolVersion) {
                         //Cache for next time
                         clientVersionCache.put(protocolVersion, version);
@@ -220,9 +221,10 @@ public enum ClientVersion {
 
     /**
      * Deprecated, please use {@link #isNewerThan(ClientVersion)}
-     * @deprecated Rename...
+     *
      * @param target Compared client version.
      * @return Is this client version newer than the compared client version.
+     * @deprecated Rename...
      */
     @Deprecated
     public boolean isHigherThan(ClientVersion target) {
@@ -231,9 +233,10 @@ public enum ClientVersion {
 
     /**
      * Deprecated, please use {@link #isNewerThanOrEquals(ClientVersion)}
-     * @deprecated Rename...
+     *
      * @param target Compared client version.
      * @return Is this client version newer than or equal to the compared client version.
+     * @deprecated Rename...
      */
     @Deprecated
     public boolean isHigherThanOrEquals(ClientVersion target) {
@@ -242,9 +245,10 @@ public enum ClientVersion {
 
     /**
      * Deprecated, please use {@link #isOlderThan(ClientVersion)}
-     * @deprecated Rename...
+     *
      * @param target Compared client version.
      * @return Is this client version older than the compared client version.
+     * @deprecated Rename...
      */
     @Deprecated
     public boolean isLowerThan(ClientVersion target) {
@@ -253,9 +257,10 @@ public enum ClientVersion {
 
     /**
      * Deprecated, please use {@link #isOlderThanOrEquals(ClientVersion)}
-     * @deprecated Rename...
+     *
      * @param target Compared client version.
      * @return Is this client version older than or equal to the compared client version.
+     * @deprecated Rename...
      */
     @Deprecated
     public boolean isLowerThanOrEquals(ClientVersion target) {

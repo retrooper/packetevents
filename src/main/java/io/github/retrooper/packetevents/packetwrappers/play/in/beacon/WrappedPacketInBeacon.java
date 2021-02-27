@@ -12,12 +12,12 @@ public class WrappedPacketInBeacon extends WrappedPacket {
         return readInt(0);
     }
 
-    public int getSecondaryEffect() {
-        return readInt(1);
-    }
-
     public void setPrimaryEffect(int primaryEffect) {
         writeInt(0, primaryEffect);
+    }
+
+    public int getSecondaryEffect() {
+        return readInt(1);
     }
 
     public void setSecondaryEffect(int secondaryEffect) {

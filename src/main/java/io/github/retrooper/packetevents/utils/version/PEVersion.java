@@ -146,7 +146,12 @@ public class PEVersion {
      */
     @Override
     public PEVersion clone() {
-        return new PEVersion(this.versionIntArray);
+        try {
+            return (PEVersion) super.clone();
+        } catch (CloneNotSupportedException e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 
     /**

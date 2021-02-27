@@ -69,8 +69,7 @@ public class WrappedPacketOutExperience extends WrappedPacket implements Sendabl
     public void setExperienceBar(float experienceBar) {
         if (packet != null) {
             writeFloat(0, experienceBar);
-        }
-        else {
+        } else {
             this.experienceBar = experienceBar;
         }
     }
@@ -86,8 +85,7 @@ public class WrappedPacketOutExperience extends WrappedPacket implements Sendabl
     public void setExperienceLevel(int experienceLevel) {
         if (packet != null) {
             writeInt(0, experienceLevel);
-        }
-        else {
+        } else {
             this.experienceLevel = experienceLevel;
         }
     }
@@ -95,8 +93,7 @@ public class WrappedPacketOutExperience extends WrappedPacket implements Sendabl
     public int getTotalExperience() {
         if (packet != null) {
             return readInt(1);
-        }
-        else {
+        } else {
             return totalExperience;
         }
     }
@@ -104,8 +101,7 @@ public class WrappedPacketOutExperience extends WrappedPacket implements Sendabl
     public void setTotalExperience(int totalExperience) {
         if (packet != null) {
             writeInt(1, totalExperience);
-        }
-        else {
+        } else {
             this.totalExperience = totalExperience;
         }
     }

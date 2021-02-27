@@ -31,7 +31,7 @@ package io.github.retrooper.packetevents.utils.server;
  * @since 1.7
  */
 public enum SystemOS {
-    
+
     WINDOWS, MACOS, LINUX, OTHER;
 
     private static final SystemOS[] VALUES = values();

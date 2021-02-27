@@ -120,8 +120,7 @@ public final class WrappedPacketInBlockPlace extends WrappedPacket {
         if (newerThan_v_1_8_8) {
             throwUnsupportedOperation();
             return Vector3f.INVALID;
-        }
-        else if (newerThan_v_1_7_10) {
+        } else if (newerThan_v_1_7_10) {
             WrappedPacketInBlockPlace_1_8 blockPlace_1_8 = new WrappedPacketInBlockPlace_1_8(packet);
             return blockPlace_1_8.getCursorPosition();
         } else {
@@ -135,8 +134,7 @@ public final class WrappedPacketInBlockPlace extends WrappedPacket {
     public void setCursorPosition(Vector3f cursorPos) throws UnsupportedOperationException {
         if (newerThan_v_1_8_8) {
             throwUnsupportedOperation();
-        }
-        else if (newerThan_v_1_7_10) {
+        } else if (newerThan_v_1_7_10) {
             WrappedPacketInBlockPlace_1_8 blockPlace_1_8 = new WrappedPacketInBlockPlace_1_8(packet);
             blockPlace_1_8.setCursorPosition(cursorPos);
         } else {
@@ -150,12 +148,10 @@ public final class WrappedPacketInBlockPlace extends WrappedPacket {
         if (newerThan_v_1_8_8) {
             throwUnsupportedOperation();
             return null;
-        }
-        else if (newerThan_v_1_7_10) {
+        } else if (newerThan_v_1_7_10) {
             WrappedPacketInBlockPlace_1_8 blockPlace_1_8 = new WrappedPacketInBlockPlace_1_8(packet);
             return blockPlace_1_8.getItemStack();
-        }
-        else {
+        } else {
             WrappedPacketInBlockPlace_1_7_10 blockPlace_1_7_10 = new WrappedPacketInBlockPlace_1_7_10(packet);
             return blockPlace_1_7_10.getItemStack();
         }
@@ -165,12 +161,10 @@ public final class WrappedPacketInBlockPlace extends WrappedPacket {
     public void setItemStack(ItemStack stack) throws UnsupportedOperationException {
         if (newerThan_v_1_8_8) {
             throwUnsupportedOperation();
-        }
-        else if (newerThan_v_1_7_10) {
+        } else if (newerThan_v_1_7_10) {
             WrappedPacketInBlockPlace_1_8 blockPlace_1_8 = new WrappedPacketInBlockPlace_1_8(packet);
             blockPlace_1_8.setItemStack(stack);
-        }
-        else {
+        } else {
             WrappedPacketInBlockPlace_1_7_10 blockPlace_1_7_10 = new WrappedPacketInBlockPlace_1_7_10(packet);
             blockPlace_1_7_10.setItemStack(stack);
         }

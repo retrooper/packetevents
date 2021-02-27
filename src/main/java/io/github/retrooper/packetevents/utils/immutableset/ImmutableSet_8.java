@@ -41,8 +41,9 @@ class ImmutableSet_8<T> extends ImmutableSetAbstract<T> {
         this.immutableSet = ImmutableSet.<T>builder().addAll(data).build();
     }
 
+    @SafeVarargs
     public ImmutableSet_8(T... data) {
-        ImmutableSet.Builder<T> builder = ImmutableSet.<T>builder();
+        ImmutableSet.Builder<T> builder = ImmutableSet.builder();
         for (T value : data) {
             builder.add(value);
         }
@@ -60,8 +61,9 @@ class ImmutableSet_8<T> extends ImmutableSetAbstract<T> {
         immutableSet = ImmutableSet.<T>builder().addAll(elements).add(element).build();
     }
 
+    @SafeVarargs
     @Override
-    public void addAll(T... elements) {
+    public final void addAll(T... elements) {
         List<T> localElements = new ArrayList<>(immutableSet);
         immutableSet = ImmutableSet.<T>builder().addAll(localElements).addAll(Arrays.asList(elements)).build();
     }

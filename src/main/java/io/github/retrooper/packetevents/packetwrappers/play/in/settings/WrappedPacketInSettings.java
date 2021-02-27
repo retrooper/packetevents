@@ -49,11 +49,11 @@ public class WrappedPacketInSettings extends WrappedPacket {
         isLowerThan_v_1_8 = version.isOlderThan(ServerVersion.v_1_8);
 
         try {
-            chatVisibilityEnumClass = (Class<? extends Enum<?>>) NMSUtils.getNMSClass("EnumChatVisibility");
+            chatVisibilityEnumClass = NMSUtils.getNMSEnumClass("EnumChatVisibility");
         } catch (ClassNotFoundException e) {
             Class<?> entityHumanClass = NMSUtils.getNMSClassWithoutException("EntityHuman");
             //They are just on an outdated version
-            chatVisibilityEnumClass = (Class<? extends Enum<?>>) SubclassUtil.getSubClass(entityHumanClass, "EnumChatVisibility");
+            chatVisibilityEnumClass = SubclassUtil.getEnumSubClass(entityHumanClass, "EnumChatVisibility");
         }
     }
 
@@ -73,26 +73,21 @@ public class WrappedPacketInSettings extends WrappedPacket {
         writeInt(0, viewDistance);
     }
 
-    /**
-     * Get Chat Visibility
-     *
-     * @return Chat Visibility
-     */
     public ChatVisibility getChatVisibility() {
-        Enum<?> enumConst = (Enum<?>) readObject(0, chatVisibilityEnumClass);
+        Enum<?> enumConst = readEnumConstant(0, chatVisibilityEnumClass);
         return ChatVisibility.valueOf(enumConst.name());
     }
 
     public void setChatVisibility(ChatVisibility visibility) {
         Enum<?> enumConst = EnumUtil.valueByIndex(chatVisibilityEnumClass, visibility.ordinal()); //Ordinal is faster than name comparison.
-        write(chatVisibilityEnumClass, 0, enumConst);
+        writeEnumConstant(0, enumConst);
     }
 
     public boolean isChatColored() {
         return readBoolean(0);
     }
 
-    public void setIsChatColored(boolean chatColors) {
+    public void setChatColored(boolean chatColors) {
         writeBoolean(0, chatColors);
     }
 
@@ -157,10 +152,10 @@ public class WrappedPacketInSettings extends WrappedPacket {
         @SupportedVersions(ranges = {ServerVersion.v_1_8, ServerVersion.ERROR})
         HAT(0x40);
 
+        final byte maskFlag;
+
         DisplayedSkinPart(int maskFlag) {
             this.maskFlag = (byte) maskFlag;
         }
-
-        byte maskFlag;
     }
 }

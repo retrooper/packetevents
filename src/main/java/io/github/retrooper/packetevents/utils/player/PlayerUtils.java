@@ -34,7 +34,6 @@ import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
 import java.net.InetSocketAddress;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
@@ -116,7 +115,7 @@ public final class PlayerUtils {
      * @return Smoothed ping.
      */
     public int getSmoothedPing(final Player player) {
-      return getSmoothedPing(player.getUniqueId());
+        return getSmoothedPing(player.getUniqueId());
     }
 
     /**
@@ -132,7 +131,7 @@ public final class PlayerUtils {
             if (joinTime == null) {
                 return 0;
             }
-            return (int) (System.currentTimeMillis() -  joinTime);
+            return (int) (System.currentTimeMillis() - joinTime);
         }
         return ping;
     }
@@ -184,8 +183,7 @@ public final class PlayerUtils {
                     //Handle 1.7.10, luckily 1.7.10 provides a method for us to access a player's protocol version(1.7.10 servers support 1.8 clients too)
                     if (PacketEvents.get().getServerUtils().getVersion().equals(ServerVersion.v_1_7_10)) {
                         protocolVersion = (short) SpigotVersionLookup_1_7.getProtocolVersion(player);
-                    }
-                    else {
+                    } else {
                         //We failed to retrieve the version from the packet and no dependency is available.
                         //We are pretty safe to assume the version is the same as the server, as ViaVersion AND ProtocolSupport could not be found.
                         protocolVersion = PacketEvents.get().getServerUtils().getVersion().getProtocolVersion();

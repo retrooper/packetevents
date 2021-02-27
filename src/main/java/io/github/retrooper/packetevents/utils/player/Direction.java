@@ -65,14 +65,14 @@ public enum Direction {
     /**
      * Face is set to 255
      */
-    OTHER((short)255),
+    OTHER((short) 255),
 
     /**
      * Should not happen.... Invalid value?
      */
     INVALID;
 
-    short face;
+    final short face;
 
     Direction(short face) {
         this.face = face;
@@ -85,8 +85,7 @@ public enum Direction {
     public static Direction getDirection(int face) {
         if (face == 255) {
             return OTHER;
-        }
-        else if (face < 0 || face > 5) {
+        } else if (face < 0 || face > 5) {
             return INVALID;
         }
         return values()[face];

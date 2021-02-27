@@ -24,6 +24,8 @@
 
 package io.github.retrooper.packetevents.utils.list;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
@@ -69,7 +71,7 @@ public abstract class ListWrapper implements List {
     }
 
     @Override
-    public Iterator iterator() {
+    public @NotNull Iterator iterator() {
         synchronized (this) {
             return listIterator();
         }
@@ -167,42 +169,42 @@ public abstract class ListWrapper implements List {
     }
 
     @Override
-    public ListIterator listIterator() {
+    public @NotNull ListIterator listIterator() {
         synchronized (this) {
             return this.list.listIterator();
         }
     }
 
     @Override
-    public ListIterator listIterator(int index) {
+    public @NotNull ListIterator listIterator(int index) {
         synchronized (this) {
             return this.list.listIterator(index);
         }
     }
 
     @Override
-    public List subList(int fromIndex, int toIndex) {
+    public @NotNull List subList(int fromIndex, int toIndex) {
         synchronized (this) {
             return this.list.subList(fromIndex, toIndex);
         }
     }
 
     @Override
-    public boolean retainAll(Collection c) {
+    public boolean retainAll(@NotNull Collection c) {
         synchronized (this) {
             return this.list.retainAll(c);
         }
     }
 
     @Override
-    public boolean removeAll(Collection c) {
+    public boolean removeAll(@NotNull Collection c) {
         synchronized (this) {
             return this.list.removeAll(c);
         }
     }
 
     @Override
-    public boolean containsAll(Collection c) {
+    public boolean containsAll(@NotNull Collection c) {
         synchronized (this) {
             return this.list.containsAll(c);
         }

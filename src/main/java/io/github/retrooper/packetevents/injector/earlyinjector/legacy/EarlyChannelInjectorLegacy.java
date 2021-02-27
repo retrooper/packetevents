@@ -28,11 +28,9 @@ import io.github.retrooper.packetevents.PacketEvents;
 import io.github.retrooper.packetevents.injector.earlyinjector.EarlyInjector;
 import io.github.retrooper.packetevents.packetwrappers.NMSPacket;
 import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
-import io.github.retrooper.packetevents.utils.list.ConcurrentList;
 import io.github.retrooper.packetevents.utils.list.ListWrapper;
 import io.github.retrooper.packetevents.utils.nms.NMSUtils;
 import io.github.retrooper.packetevents.utils.reflection.Reflection;
-import io.github.retrooper.packetevents.utils.versionlookup.protocolsupport.ProtocolSupportVersionLookupUtils;
 import net.minecraft.util.io.netty.channel.Channel;
 import net.minecraft.util.io.netty.channel.ChannelFuture;
 import net.minecraft.util.io.netty.channel.ChannelHandler;
@@ -42,7 +40,10 @@ import org.bukkit.entity.Player;
 import org.bukkit.plugin.PluginDescriptionFile;
 
 import java.lang.reflect.Field;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Early channel injector for 1.7.10 server versions.
@@ -182,7 +183,7 @@ public class EarlyChannelInjectorLegacy implements EarlyInjector {
             // Pick best
             for (String name : names) {
                 try {
-                ChannelHandler handler = future.channel().pipeline().get(name);
+                    ChannelHandler handler = future.channel().pipeline().get(name);
                     if (childHandlerField == null) {
                         childHandlerField = handler.getClass().getDeclaredField("childHandler");
                         childHandlerField.setAccessible(true);
@@ -205,7 +206,7 @@ public class EarlyChannelInjectorLegacy implements EarlyInjector {
                 Reflection.getFieldWithoutFinalModifier(childHandlerField);
                 ChannelInitializer<SocketChannel> oldInit = (ChannelInitializer<SocketChannel>) childHandlerField.get(bootstrapAcceptor);
                 if (oldInit instanceof PEChannelInitializerLegacy) {
-                    childHandlerField.set(bootstrapAcceptor, ((PEChannelInitializerLegacy) oldInit));
+                    childHandlerField.set(bootstrapAcceptor, oldInit);
                     childHandlerField.set(bootstrapAcceptor, ((PEChannelInitializerLegacy) oldInit).getOldChannelInitializer());
                 }
             } catch (Exception e) {

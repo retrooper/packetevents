@@ -41,12 +41,11 @@ import java.util.List;
  */
 public class WrappedPacketOutEntityMetadata extends WrappedPacket {
 
+    private int entityID;
+    private List<WrappedWatchableObject> watchableObjects;
     public WrappedPacketOutEntityMetadata(NMSPacket packet) {
         super(packet);
     }
-
-    private int entityID;
-    private List<WrappedWatchableObject> watchableObjects;
 
     public WrappedPacketOutEntityMetadata(int entityID, List<WrappedWatchableObject> watchableObjects) {
         this.entityID = entityID;
@@ -74,11 +73,11 @@ public class WrappedPacketOutEntityMetadata extends WrappedPacket {
     /**
      * Set the entity ID.
      *
-     * @param value New value.
+     * @param entityID New value.
      */
-    public void setEntityId(int value) {
+    public void setEntityId(int entityID) {
         if (packet != null) {
-            writeInt(0, value);
+            writeInt(0, entityID);
         } else {
             this.entityID = entityID;
         }

@@ -100,8 +100,7 @@ public final class WrappedPacketOutEntityVelocity extends WrappedPacket implemen
     public void setEntityId(int entityID) {
         if (packet != null) {
             writeInt(0, this.entityID = entityID);
-        }
-        else {
+        } else {
             this.entityID = entityID;
         }
         this.entity = null;
@@ -118,8 +117,7 @@ public final class WrappedPacketOutEntityVelocity extends WrappedPacket implemen
     public void setVelocityX(double x) {
         if (packet != null) {
             writeInt(1, (int) (x * 8000.0D));
-        }
-        else {
+        } else {
             this.velocityX = x;
         }
     }

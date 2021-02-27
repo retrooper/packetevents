@@ -33,9 +33,16 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 
 public class WrappedPacketOutCloseWindow extends WrappedPacket implements SendableWrapper {
+    private static Constructor<?> constructor;
     private int windowID;
 
-    private static Constructor<?> constructor;
+    public WrappedPacketOutCloseWindow(NMSPacket packet) {
+        super(packet);
+    }
+
+    public WrappedPacketOutCloseWindow(int windowID) {
+        this.windowID = windowID;
+    }
 
     @Override
     protected void load() {
@@ -44,14 +51,6 @@ public class WrappedPacketOutCloseWindow extends WrappedPacket implements Sendab
         } catch (NoSuchMethodException e) {
             e.printStackTrace();
         }
-    }
-
-    public WrappedPacketOutCloseWindow(NMSPacket packet) {
-        super(packet);
-    }
-
-    public WrappedPacketOutCloseWindow(int windowID) {
-        this.windowID = windowID;
     }
 
     public int getWindowId() {
@@ -64,8 +63,7 @@ public class WrappedPacketOutCloseWindow extends WrappedPacket implements Sendab
     public void setWindowId(int windowID) {
         if (packet != null) {
             writeInt(0, windowID);
-        }
-        else {
+        } else {
             this.windowID = windowID;
         }
     }

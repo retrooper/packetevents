@@ -71,8 +71,7 @@ public abstract class PacketListenerDynamic {
     public final void addServerSidedStatusFilter(Byte... statusPacketIDs) {
         if (this.serverSidedStatusAllowance == null) {
             this.serverSidedStatusAllowance = new ImmutableSetCustom<>(statusPacketIDs);
-        }
-        else {
+        } else {
             this.serverSidedStatusAllowance.addAll(statusPacketIDs);
         }
     }
@@ -80,8 +79,7 @@ public abstract class PacketListenerDynamic {
     public final void addServerSidedLoginFilter(Byte... loginPacketIDs) {
         if (this.serverSidedLoginAllowance == null) {
             this.serverSidedLoginAllowance = new ImmutableSetCustom<>(loginPacketIDs);
-        }
-        else {
+        } else {
             this.serverSidedLoginAllowance.addAll(loginPacketIDs);
         }
     }
@@ -89,8 +87,7 @@ public abstract class PacketListenerDynamic {
     public final void addServerSidedPlayFilter(Byte... playPacketIDs) {
         if (this.serverSidedPlayAllowance == null) {
             this.serverSidedPlayAllowance = new ImmutableSetCustom<>(playPacketIDs);
-        }
-        else {
+        } else {
             this.serverSidedPlayAllowance.addAll(playPacketIDs);
         }
     }
@@ -98,8 +95,7 @@ public abstract class PacketListenerDynamic {
     public final void addClientSidedStatusFilter(Byte... statusPacketIDs) {
         if (this.clientSidedStatusAllowance == null) {
             this.clientSidedStatusAllowance = new ImmutableSetCustom<>(statusPacketIDs);
-        }
-        else {
+        } else {
             this.clientSidedStatusAllowance.addAll(statusPacketIDs);
         }
     }
@@ -107,8 +103,7 @@ public abstract class PacketListenerDynamic {
     public final void addClientSidedHandshakeFilter(Byte... handshakePacketIDs) {
         if (this.clientSidedHandshakeAllowance == null) {
             this.clientSidedHandshakeAllowance = new ImmutableSetCustom<>(handshakePacketIDs);
-        }
-        else {
+        } else {
             this.clientSidedHandshakeAllowance.addAll(handshakePacketIDs);
         }
     }
@@ -116,8 +111,7 @@ public abstract class PacketListenerDynamic {
     public final void addClientSidedLoginFilter(Byte... loginPacketIDs) {
         if (this.clientSidedLoginAllowance == null) {
             this.clientSidedLoginAllowance = new ImmutableSetCustom<>(loginPacketIDs);
-        }
-        else {
+        } else {
             this.clientSidedLoginAllowance.addAll(loginPacketIDs);
         }
     }
@@ -125,8 +119,7 @@ public abstract class PacketListenerDynamic {
     public final void addClientSidedPlayFilter(Byte... playPacketIDs) {
         if (this.clientSidedPlayAllowance == null) {
             this.clientSidedPlayAllowance = new ImmutableSetCustom<>(playPacketIDs);
-        }
-        else {
+        } else {
             this.clientSidedPlayAllowance.addAll(playPacketIDs);
         }
     }
@@ -170,17 +163,42 @@ public abstract class PacketListenerDynamic {
         this.clientSidedPlayAllowance = new ImmutableSetCustom<>();
     }
 
-    public void onPacketStatusReceive(PacketStatusReceiveEvent event) {}
-    public void onPacketStatusSend(PacketStatusSendEvent event) {}
-    public void onPacketHandshakeReceive(PacketHandshakeReceiveEvent event) {}
-    public void onPacketLoginReceive(PacketLoginReceiveEvent event) {}
-    public void onPacketLoginSend(PacketLoginSendEvent event) {}
-    public void onPacketPlayReceive(PacketPlayReceiveEvent event) {}
-    public void onPacketPlaySend(PacketPlaySendEvent event) {}
-    public void onPostPacketPlayReceive(PostPacketPlayReceiveEvent event) {}
-    public void onPostPacketPlaySend(PostPacketPlaySendEvent event) {}
-    public void onPostPlayerInject(PostPlayerInjectEvent event) {}
-    public void onPlayerInject(PlayerInjectEvent event) {}
-    public void onPlayerEject(PlayerEjectEvent event) {}
-    public void onPacketEventExternal(PacketEvent event) {}
+    public void onPacketStatusReceive(PacketStatusReceiveEvent event) {
+    }
+
+    public void onPacketStatusSend(PacketStatusSendEvent event) {
+    }
+
+    public void onPacketHandshakeReceive(PacketHandshakeReceiveEvent event) {
+    }
+
+    public void onPacketLoginReceive(PacketLoginReceiveEvent event) {
+    }
+
+    public void onPacketLoginSend(PacketLoginSendEvent event) {
+    }
+
+    public void onPacketPlayReceive(PacketPlayReceiveEvent event) {
+    }
+
+    public void onPacketPlaySend(PacketPlaySendEvent event) {
+    }
+
+    public void onPostPacketPlayReceive(PostPacketPlayReceiveEvent event) {
+    }
+
+    public void onPostPacketPlaySend(PostPacketPlaySendEvent event) {
+    }
+
+    public void onPostPlayerInject(PostPlayerInjectEvent event) {
+    }
+
+    public void onPlayerInject(PlayerInjectEvent event) {
+    }
+
+    public void onPlayerEject(PlayerEjectEvent event) {
+    }
+
+    public void onPacketEventExternal(PacketEvent event) {
+    }
 }

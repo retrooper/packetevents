@@ -17,6 +17,15 @@ class WrappedPacketOutNamedSoundEffect extends WrappedPacket {
     @Override
     protected void load() {
         soundEffectVarExists = Reflection.getField(packet.getClass(), NMSUtils.soundEffectClass, 0) != null;
+        net.minecraft.server.v1_7_R4.PacketPlayOutNamedSoundEffect a0;
+        net.minecraft.server.v1_8_R3.PacketPlayOutNamedSoundEffect a1;
+        net.minecraft.server.v1_9_R1.PacketPlayOutNamedSoundEffect a2;
+        net.minecraft.server.v1_9_R2.PacketPlayOutNamedSoundEffect a3;
+        net.minecraft.server.v1_12_R1.PacketPlayOutNamedSoundEffect a4;
+        net.minecraft.server.v1_13_R1.PacketPlayOutNamedSoundEffect a5;
+        net.minecraft.server.v1_13_R2.PacketPlayOutNamedSoundEffect a6;
+        net.minecraft.server.v1_16_R2.PacketPlayOutNamedSoundEffect a7;
+
     }
 
     public String getSoundEffectName() {
@@ -36,8 +45,7 @@ class WrappedPacketOutNamedSoundEffect extends WrappedPacket {
             WrappedPacket soundEffectWrapper = new WrappedPacket(new NMSPacket(soundEffect));
             Object minecraftKey = NMSUtils.generateMinecraftKey(name);
             soundEffectWrapper.write(NMSUtils.minecraftKeyClass, 0, minecraftKey);
-        }
-        else {
+        } else {
             writeString(0, name);
         }
     }
@@ -86,8 +94,7 @@ class WrappedPacketOutNamedSoundEffect extends WrappedPacket {
     public void setPitch(float pitch) {
         if (version.isOlderThan(ServerVersion.v_1_10)) {
             writeInt(1, (int) pitch);
-        }
-        else {
+        } else {
             writeFloat(1, pitch);
         }
     }
@@ -95,8 +102,7 @@ class WrappedPacketOutNamedSoundEffect extends WrappedPacket {
     public void setPitch(int pitch) {
         if (version.isOlderThan(ServerVersion.v_1_10)) {
             writeInt(1, pitch);
-        }
-        else {
+        } else {
             writeFloat(1, pitch);
         }
     }

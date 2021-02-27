@@ -31,7 +31,6 @@ import io.github.retrooper.packetevents.packetwrappers.NMSPacket;
 import io.github.retrooper.packetevents.packetwrappers.handshaking.setprotocol.WrappedPacketHandshakingInSetProtocol;
 import io.github.retrooper.packetevents.packetwrappers.login.in.start.WrappedPacketLoginInStart;
 import io.github.retrooper.packetevents.utils.gameprofile.WrappedGameProfile;
-import io.github.retrooper.packetevents.utils.netty.channel.ChannelUtils;
 import io.github.retrooper.packetevents.utils.nms.NMSUtils;
 import io.github.retrooper.packetevents.utils.player.ClientVersion;
 import io.github.retrooper.packetevents.utils.reflection.ClassUtil;

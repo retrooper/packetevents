@@ -42,9 +42,7 @@ import java.lang.reflect.Method;
 
 public class WrappedPacketOutBlockChange extends WrappedPacket implements SendableWrapper {
     private static Constructor<?> packetConstructor;
-    private static Method getBlockIdMethodCache = null;
     private static Method getNMSBlockMethodCache = null;
-    private static Method getBlockByIdMethodCache = null;
     private static Method getNMSWorldTypeMethodCache = null;
 
 
@@ -78,6 +76,7 @@ public class WrappedPacketOutBlockChange extends WrappedPacket implements Sendab
         this(world, blockPos);
         this.material = material;
     }
+
     public WrappedPacketOutBlockChange(Location location, Material material) {
         this(location);
         this.material = material;
@@ -85,8 +84,6 @@ public class WrappedPacketOutBlockChange extends WrappedPacket implements Sendab
 
     @Override
     protected void load() {
-        getBlockIdMethodCache = Reflection.getMethod(NMSUtils.blockClass, "getId", int.class, NMSUtils.blockClass);
-        getBlockByIdMethodCache = Reflection.getMethod(NMSUtils.blockClass, "getById", null, int.class);
         getNMSBlockMethodCache = Reflection.getMethod(NMSUtils.iBlockDataClass, "getBlock", 0);
         getNMSWorldTypeMethodCache = Reflection.getMethod(NMSUtils.nmsWorldClass, "getType", 0);
         if (version.equals(ServerVersion.v_1_7_10)) {
@@ -164,7 +161,7 @@ public class WrappedPacketOutBlockChange extends WrappedPacket implements Sendab
                 }
             }
 
-          return NMSUtils.getMaterialFromNMSBlock(nmsBlock);
+            return NMSUtils.getMaterialFromNMSBlock(nmsBlock);
         } else {
             return material;
         }
@@ -209,14 +206,13 @@ public class WrappedPacketOutBlockChange extends WrappedPacket implements Sendab
                 blockChange = new WrappedPacketOutBlockChange(new NMSPacket(nmsPacket));
                 if (material != null) {
                     blockChange.setMaterial(material);
-                }
-                else {
+                } else {
                     Object nmsBlockPos = NMSUtils.generateNMSBlockPos(blockPosition.x, blockPosition.y, blockPosition.z);
                     Object nmsWorld = NMSUtils.convertBukkitWorldToNMSWorld(world);
                     Object nmsBlockData = getNMSWorldTypeMethodCache.invoke(nmsWorld, nmsBlockPos);
                     blockChange.write(NMSUtils.iBlockDataClass, 0, nmsBlockData);
                 }
-               blockChange.setBlockPosition(blockPosition);
+                blockChange.setBlockPosition(blockPosition);
 
             } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
                 e.printStackTrace();

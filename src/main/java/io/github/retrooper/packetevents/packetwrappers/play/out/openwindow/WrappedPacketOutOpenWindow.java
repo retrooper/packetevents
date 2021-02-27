@@ -27,7 +27,6 @@ package io.github.retrooper.packetevents.packetwrappers.play.out.openwindow;
 import io.github.retrooper.packetevents.packettype.PacketTypeClasses;
 import io.github.retrooper.packetevents.packetwrappers.NMSPacket;
 import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
-import io.github.retrooper.packetevents.packetwrappers.play.out.chat.WrappedPacketOutChat;
 import io.github.retrooper.packetevents.utils.nms.NMSUtils;
 import io.github.retrooper.packetevents.utils.reflection.Reflection;
 import io.github.retrooper.packetevents.utils.server.ServerVersion;
@@ -65,25 +64,24 @@ public class WrappedPacketOutOpenWindow extends WrappedPacket {
     public void setWindowId(int windowID) {
         if (packet != null) {
             writeInt(0, windowID);
-        }
-        else {
+        } else {
             this.windowID = windowID;
         }
     }
 
     @SupportedVersions(ranges = {ServerVersion.v_1_7_10, ServerVersion.v_1_7_10,
-    ServerVersion.v_1_16, ServerVersion.ERROR})
+            ServerVersion.v_1_16, ServerVersion.ERROR})
     public int getInventoryTypeId() throws UnsupportedOperationException {
         if (packet != null) {
             if (legacyMode && !ultraLegacyMode) {
                 throwUnsupportedOperation();
             }
             return readInt(1);
-        }
-        else {
+        } else {
             return windowTypeID;
         }
     }
+
     @SupportedVersions(ranges = {ServerVersion.v_1_7_10, ServerVersion.v_1_7_10,
             ServerVersion.v_1_16, ServerVersion.ERROR})
     public void setInventoryTypeId(int inventoryTypeID) throws UnsupportedOperationException {
@@ -92,8 +90,7 @@ public class WrappedPacketOutOpenWindow extends WrappedPacket {
                 throwUnsupportedOperation();
             }
             writeInt(1, inventoryTypeID);
-        }
-        else {
+        } else {
             this.windowTypeID = inventoryTypeID;
         }
     }
@@ -107,8 +104,7 @@ public class WrappedPacketOutOpenWindow extends WrappedPacket {
             }
             return readString(0);
 
-        }
-        else {
+        } else {
             return windowType;
         }
     }
@@ -128,8 +124,7 @@ public class WrappedPacketOutOpenWindow extends WrappedPacket {
         if (packet != null) {
             if (ultraLegacyMode) {
                 writeString(0, title);
-            }
-            else {
+            } else {
                 Object iChatBaseComponent = NMSUtils.generateIChatBaseComponent(title);
                 write(NMSUtils.iChatBaseComponentClass, 0, iChatBaseComponent);
             }

@@ -30,8 +30,6 @@ import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
 import io.github.retrooper.packetevents.utils.nms.NMSUtils;
 import io.github.retrooper.packetevents.utils.server.ServerVersion;
 
-import java.lang.reflect.Method;
-
 public class WrappedPacketLoginInCustomPayload extends WrappedPacket {
     private static Class<?> byteBufClass;
     private static Class<?> packetDataSerializerClass;
@@ -53,17 +51,16 @@ public class WrappedPacketLoginInCustomPayload extends WrappedPacket {
         return readInt(0);
     }
 
+    public void setMessageId(int id) {
+        writeInt(0, id);
+    }
+
     public byte[] getData() {
         Object dataSerializer = readObject(0, packetDataSerializerClass);
         WrappedPacket byteBufWrapper = new WrappedPacket(new NMSPacket(dataSerializer));
         Object byteBuf = byteBufWrapper.readObject(0, byteBufClass);
         return PacketEvents.get().getByteBufUtil().getBytes(byteBuf);
     }
-
-    public void setMessageId(int id) {
-        writeInt(0, id);
-    }
-
 
     public void setData(byte[] data) {
         Object dataSerializer = readObject(0, packetDataSerializerClass);

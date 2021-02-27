@@ -35,6 +35,6 @@ public class EnumUtil {
     }
 
     public static Enum<?> valueByIndex(Class<? extends Enum<?>> cls, int index) {
-       return cls.getEnumConstants()[index];
+        return cls.getEnumConstants()[index];
     }
 }

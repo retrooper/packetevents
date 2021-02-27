@@ -70,14 +70,14 @@ public class WrappedPacketInFlying extends WrappedPacket {
     }
 
     public void setPitch(float pitch) {
-        writeFloat(1,pitch);
+        writeFloat(1, pitch);
     }
 
     public boolean isOnGround() {
         return readBoolean(0);
     }
 
-    public void setIsOnGround(boolean onGround) {
+    public void setOnGround(boolean onGround) {
         writeBoolean(0, onGround);
     }
 

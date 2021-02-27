@@ -24,6 +24,8 @@
 
 package io.github.retrooper.packetevents.utils.list;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.lang.reflect.Field;
 import java.util.*;
 
@@ -31,6 +33,7 @@ import java.util.*;
  * Created by wea_ondara licensed under MIT
  * Taken from https://github.com/weaondara/BungeePerms/blob/master/src/main/java/net/alpenblock/bungeeperms/util/ConcurrentList.java
  * Same license as in LICENSE
+ *
  * @author wea_ondara
  */
 public class ConcurrentList<E> extends ArrayList<E> {
@@ -159,7 +162,7 @@ public class ConcurrentList<E> extends ArrayList<E> {
     }
 
     @Override
-    public List<E> subList(int fromIndex, int toIndex) {
+    public @NotNull List<E> subList(int fromIndex, int toIndex) {
         synchronized (lock) {
             return super.subList(fromIndex, toIndex);
         }
@@ -187,20 +190,20 @@ public class ConcurrentList<E> extends ArrayList<E> {
     }
 
     @Override
-    public ListIterator<E> listIterator() {
+    public @NotNull ListIterator<E> listIterator() {
         return new ListItr(0);
     }
 
     @Override
-    public Iterator<E> iterator() {
+    public @NotNull Iterator<E> iterator() {
         return new Itr();
     }
 
     private class Itr implements Iterator<E> {
 
+        final ConcurrentList l;
         protected int cursor;
         protected int lastRet;
-        final ConcurrentList l;
 
         public Itr() {
             cursor = 0;

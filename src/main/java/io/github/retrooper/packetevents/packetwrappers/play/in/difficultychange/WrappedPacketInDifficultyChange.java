@@ -31,6 +31,7 @@ import io.github.retrooper.packetevents.utils.nms.NMSUtils;
 
 /**
  * Wrapper for the DifficultyChange packet.
+ *
  * @author Tecnio
  * @since 1.8
  */
@@ -45,20 +46,20 @@ public final class WrappedPacketInDifficultyChange extends WrappedPacket {
     @Override
     protected void load() {
         try {
-            enumDifficultyClass = (Class<? extends Enum<?>>) NMSUtils.getNMSClass("EnumDifficulty");
-        } catch (Exception e) {
+            enumDifficultyClass = NMSUtils.getNMSEnumClass("EnumDifficulty");
+        } catch (ClassNotFoundException e) {
             e.printStackTrace();
         }
     }
 
     public Difficulty getDifficulty() {
-        Enum<?> enumConstant = (Enum<?>) readObject(0, enumDifficultyClass);
-        return Difficulty.values()[enumConstant.ordinal()] ;
+        Enum<?> enumConstant = readEnumConstant(0, enumDifficultyClass);
+        return Difficulty.values()[enumConstant.ordinal()];
     }
 
     public void setDifficulty(Difficulty difficulty) {
         Enum<?> enumConstant = EnumUtil.valueByIndex(enumDifficultyClass, difficulty.ordinal());
-        write(enumDifficultyClass, 0, enumConstant);
+        writeEnumConstant(0, enumConstant);
     }
 
     public enum Difficulty {

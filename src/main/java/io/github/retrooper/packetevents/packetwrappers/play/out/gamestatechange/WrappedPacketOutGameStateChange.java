@@ -139,12 +139,10 @@ public class WrappedPacketOutGameStateChange extends WrappedPacket implements Se
         if (packet != null) {
             if (valueFloatMode) {
                 writeFloat(0, (float) value);
-            }
-            else {
+            } else {
                 writeDouble(0, value);
             }
-        }
-        else {
+        } else {
             this.value = value;
         }
     }

@@ -79,8 +79,7 @@ public class WrappedPacketOutEntityStatus extends WrappedPacket implements Senda
     public void setEntityId(int entityID) {
         if (packet != null) {
             writeInt(0, this.entityID = entityID);
-        }
-        else {
+        } else {
             this.entityID = entityID;
         }
         this.entity = null;
@@ -101,8 +100,7 @@ public class WrappedPacketOutEntityStatus extends WrappedPacket implements Senda
     public byte getEntityStatus() {
         if (packet != null) {
             return readByte(0);
-        }
-        else {
+        } else {
             return status;
         }
     }
@@ -110,8 +108,7 @@ public class WrappedPacketOutEntityStatus extends WrappedPacket implements Senda
     public void setEntityStatus(byte status) {
         if (packet != null) {
             writeByte(0, status);
-        }
-        else {
+        } else {
             this.status = status;
         }
     }

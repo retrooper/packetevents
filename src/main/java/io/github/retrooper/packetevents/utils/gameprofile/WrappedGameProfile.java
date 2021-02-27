@@ -33,9 +33,9 @@ import java.util.UUID;
  * @since 1.7
  */
 public class WrappedGameProfile {
-    public UUID id;
-    public String name;
-    public boolean legacy;
+    public final UUID id;
+    public final String name;
+    public final boolean legacy;
 
     public WrappedGameProfile(UUID id, String name, boolean legacy) {
         this.id = id;

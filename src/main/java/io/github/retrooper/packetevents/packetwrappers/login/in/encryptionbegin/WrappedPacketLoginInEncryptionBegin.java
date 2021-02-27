@@ -37,12 +37,12 @@ public class WrappedPacketLoginInEncryptionBegin extends WrappedPacket {
         return readByteArray(0);
     }
 
-    public byte[] getVerifyToken() {
-        return readByteArray(1);
-    }
-
     public void setPublicKey(byte[] key) {
         writeByteArray(0, key);
+    }
+
+    public byte[] getVerifyToken() {
+        return readByteArray(1);
     }
 
     public void setVerifyToken(byte[] token) {

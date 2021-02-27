@@ -43,16 +43,16 @@ public final class WrappedPacketInClientCommand extends WrappedPacket {
     protected void load() {
         Class<?> packetClass = PacketTypeClasses.Play.Client.CLIENT_COMMAND;
         try {
-            enumClientCommandClass = (Class<? extends Enum<?>>) NMSUtils.getNMSClass("EnumClientCommand");
+            enumClientCommandClass = NMSUtils.getNMSEnumClass("EnumClientCommand");
         } catch (ClassNotFoundException e) {
             //Probably a subclass
-            enumClientCommandClass = (Class<? extends Enum<?>>) SubclassUtil.getSubClass(packetClass, "EnumClientCommand");
+            enumClientCommandClass = SubclassUtil.getEnumSubClass(packetClass, "EnumClientCommand");
         }
     }
 
 
     public ClientCommand getClientCommand() {
-        Enum<?> emumConst = (Enum<?>) readObject(0, enumClientCommandClass);
+        Enum<?> emumConst = readEnumConstant(0, enumClientCommandClass);
         return ClientCommand.valueOf(emumConst.name());
     }
 
@@ -61,7 +61,7 @@ public final class WrappedPacketInClientCommand extends WrappedPacket {
             throwUnsupportedOperation(command);
         }
         Enum<?> enumConst = EnumUtil.valueOf(enumClientCommandClass, command.name());
-        write(enumClientCommandClass, 0, enumConst);
+        writeEnumConstant(0, enumConst);
     }
 
     public enum ClientCommand {

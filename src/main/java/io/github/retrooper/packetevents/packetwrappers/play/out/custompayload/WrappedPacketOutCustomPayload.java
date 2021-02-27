@@ -132,8 +132,7 @@ public class WrappedPacketOutCustomPayload extends WrappedPacket implements Send
                     Object minecraftKey = NMSUtils.generateMinecraftKey(tag);
                     write(NMSUtils.minecraftKeyClass, minecraftKeyIndexInClass, minecraftKey);
             }
-        }
-        else {
+        } else {
             this.tag = tag;
         }
     }
@@ -171,8 +170,7 @@ public class WrappedPacketOutCustomPayload extends WrappedPacket implements Send
                     PacketEvents.get().getByteBufUtil().setBytes(byteBuf, data);
             }
 
-        }
-        else {
+        } else {
             this.data = data;
         }
     }
