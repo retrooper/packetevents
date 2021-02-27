@@ -25,7 +25,13 @@
 package io.github.retrooper.packetevents.injector.earlyinjector;
 
 import io.github.retrooper.packetevents.injector.ChannelInjector;
+import io.github.retrooper.packetevents.utils.list.ConcurrentList;
+import io.github.retrooper.packetevents.utils.nms.NMSUtils;
 import org.bukkit.entity.Player;
+
+import java.lang.reflect.Field;
+import java.util.Collection;
+import java.util.List;
 
 public interface EarlyInjector extends ChannelInjector {
     void updatePlayerObject(Player player, Object channel);

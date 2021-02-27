@@ -51,7 +51,7 @@ public final class PlayerUtils {
     /**
      * This is where the most recent non-smoothed player ping that PacketEvents calculates is stored.
      */
-    public final Map<UUID, Integer> playerPingMap = new HashMap<>();
+    public final Map<UUID, Integer> playerPingMap = new ConcurrentHashMap<>();
 
     /**
      * This is where the most recent smoothed player ping that PacketEvents calculates is stored.
@@ -59,7 +59,7 @@ public final class PlayerUtils {
      * Use this to receive a smoothed ping value.
      * PacketEvents smooths in the same way minecraft does.
      */
-    public final Map<UUID, Integer> playerSmoothedPingMap = new HashMap<>();
+    public final Map<UUID, Integer> playerSmoothedPingMap = new ConcurrentHashMap<>();
 
     /**
      * This map stores the client version of a player only when it has been confirmed.
@@ -75,7 +75,7 @@ public final class PlayerUtils {
      * guaranteed to work!
      * ProtocolSupport MIGHT work.
      */
-    public final HashMap<InetSocketAddress, ClientVersion> clientVersionsMap = new HashMap<>();
+    public final Map<InetSocketAddress, ClientVersion> clientVersionsMap = new ConcurrentHashMap<>();
 
     /**
      * This is a temporary client version.
@@ -86,7 +86,7 @@ public final class PlayerUtils {
      * ProtocolSupport compatibility might not work.
      * If ViaVersion or ProtocolSupport aren't available, we will trust this one.
      */
-    public final HashMap<InetSocketAddress, ClientVersion> tempClientVersionMap = new HashMap<>();
+    public final Map<InetSocketAddress, ClientVersion> tempClientVersionMap = new ConcurrentHashMap<>();
 
     /**
      * Use reflection to read the ping value NMS calculates for the player.

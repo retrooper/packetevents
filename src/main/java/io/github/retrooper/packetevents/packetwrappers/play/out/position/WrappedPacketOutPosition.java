@@ -89,6 +89,7 @@ public final class WrappedPacketOutPosition extends WrappedPacket implements Sen
         } catch (NoSuchMethodException e) {
             constructorMode = 1;
             try {
+                net.minecraft.server.v1_16_R2.PacketPlayOutPosition packetPlayOutPosition;
                 //1.8 and above
                 packetConstructor = PacketTypeClasses.Play.Server.POSITION.getConstructor(double.class, double.class, double.class, float.class, float.class, Set.class);
             } catch (NoSuchMethodException e2) {

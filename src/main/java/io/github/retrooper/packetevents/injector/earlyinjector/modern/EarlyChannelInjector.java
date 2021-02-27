@@ -122,10 +122,6 @@ public class EarlyChannelInjector implements EarlyInjector {
                 }
             }
         }
-
-        if (ProtocolSupportVersionLookupUtils.isAvailable()) {
-            patchLists();
-        }
     }
 
 
@@ -175,33 +171,6 @@ public class EarlyChannelInjector implements EarlyInjector {
             }
         }
 
-    }
-
-    public void patchLists() {
-        Object connection = NMSUtils.getMinecraftServerConnection();
-        if (connection == null) {
-            throw new IllegalStateException("Server connection is null?");
-        }
-
-        for (Field field : connection.getClass().getDeclaredFields()) {
-            field.setAccessible(true);
-            Object value = null;
-            try {
-                value = field.get(connection);
-            } catch (IllegalAccessException e) {
-                e.printStackTrace();
-            }
-            if (!(value instanceof List)) continue;
-            if (value instanceof ConcurrentList) continue;
-
-            ConcurrentList list = new ConcurrentList();
-            list.addAll((Collection) value);
-            try {
-                field.set(connection, list);
-            } catch (IllegalAccessException e) {
-                e.printStackTrace();
-            }
-        }
     }
 
     @Override
