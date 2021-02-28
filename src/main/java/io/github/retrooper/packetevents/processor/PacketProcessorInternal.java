@@ -317,6 +317,9 @@ public class PacketProcessorInternal {
 
     @Nullable
     private PacketType.State getPacketState(Player player, Object packet) {
+        if (packet == null) {
+            return null;
+        }
         if (player != null) {
             return PacketType.State.PLAY;
         } else {

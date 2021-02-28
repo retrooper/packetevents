@@ -30,6 +30,7 @@ import io.github.retrooper.packetevents.utils.entityfinder.EntityFinderUtils;
 import io.github.retrooper.packetevents.utils.reflection.Reflection;
 import io.github.retrooper.packetevents.utils.reflection.SubclassUtil;
 import io.github.retrooper.packetevents.utils.server.ServerVersion;
+import io.github.retrooper.packetevents.utils.vector.Vector3i;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.Server;
@@ -420,6 +421,15 @@ public final class NMSUtils {
             texts[i] = readIChatBaseComponent(components[i]);
         }
         return texts;
+    }
+
+    public static Vector3i readBlockPos(Object blockPos) {
+        try {
+            return new Vector3i((int)getBlockPosX.invoke(blockPos), (int)getBlockPosY.invoke(blockPos), (int)getBlockPosZ.invoke(blockPos));
+        } catch (IllegalAccessException | InvocationTargetException e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 
     public static String fromStringToJSON(String message) {

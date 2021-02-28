@@ -369,9 +369,7 @@ public class WrappedPacket implements WrapperPacketReader, WrapperPacketWriter {
     public void writeAnyObject(int index, Object value) {
         try {
             Field f = packetClass.getDeclaredFields()[index];
-            if (!f.isAccessible()) {
-                f.setAccessible(true);
-            }
+            Reflection.getFieldWithoutFinalModifier(f);
             try {
                 f.set(packet.getRawNMSPacket(), value);
             } catch (IllegalAccessException | NullPointerException e) {
@@ -389,6 +387,7 @@ public class WrappedPacket implements WrapperPacketReader, WrapperPacketWriter {
 
     public void write(Class<?> type, int index, Object value) throws WrapperFieldNotFoundException {
         Field field = getField(type, index);
+        Reflection.getFieldWithoutFinalModifier(field);
         if (field == null) {
             throw new WrapperFieldNotFoundException(packetClass, type, index);
         }
