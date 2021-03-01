@@ -59,5 +59,7 @@ public abstract class PacketEvent implements CallableEvent {
         listener.onPacketEventExternal(this);
     }
 
-    public abstract boolean isInbuilt();
+    public boolean isInbuilt() {
+        return false;
+    }
 }

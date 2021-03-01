@@ -11,9 +11,13 @@ import io.github.retrooper.packetevents.utils.nms.NMSUtils;
 import org.bukkit.entity.Player;
 
 public class GlobalChannelInjector implements ChannelInjector {
-    private final ChannelInjector injector;
+    private ChannelInjector injector;
 
     public GlobalChannelInjector() {
+
+    }
+
+    public void load() {
         boolean legacy = NMSUtils.legacyNettyImportMode;
         if (!PacketEvents.get().getSettings().shouldUseCompatibilityInjector()) {
             injector = legacy ? new EarlyChannelInjectorLegacy() : new EarlyChannelInjector();

@@ -24,13 +24,15 @@
 
 package io.github.retrooper.packetevents;
 
+import io.github.retrooper.packetevents.settings.PacketEventsSettings;
 import org.bukkit.plugin.java.JavaPlugin;
 
 public class PacketEventsPlugin extends JavaPlugin {
     @Override
     public void onLoad() {
         PacketEvents.create(this);
-        PacketEvents.get().load();
+        PacketEventsSettings settings = PacketEvents.get().getSettings();
+        PacketEvents.get().loadAsyncNewThread();
     }
 
     @Override

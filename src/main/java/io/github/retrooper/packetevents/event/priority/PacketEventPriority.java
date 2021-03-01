@@ -41,7 +41,7 @@ public enum PacketEventPriority {
      * Use this if you need to be the first processing the event and
      * need no power in cancelling an event or preventing an event cancellation.
      */
-    LOWEST((byte) 0),
+    LOWEST,
 
     /**
      * A weak event priority.
@@ -49,7 +49,7 @@ public enum PacketEventPriority {
      * Use this if you would prefer to be one of the first to process the event,
      * but don't mind if some other listener processes before you.
      */
-    LOW((byte) 1),
+    LOW,
 
     /**
      * Default event priority.
@@ -57,14 +57,14 @@ public enum PacketEventPriority {
      * Use this if you don't really care/know when you process or just want to
      * be in the middle.
      */
-    NORMAL((byte) 2),
+    NORMAL,
 
     /**
      * Higher than the {@link PacketEventPriority#NORMAL} event priority.
      * Fourth to be processed(IN THE DYNAMIC EVENT SYSTEM ONLY).
      * Use this if you want to process before the default event prioritized listeners.
      */
-    HIGH((byte) 3),
+    HIGH,
 
     /**
      * Second most powerful event priority.
@@ -75,7 +75,7 @@ public enum PacketEventPriority {
      * mind if some other listener urgently needs to decide over you.
      * {@link PacketEventPriority#MONITOR} is rarely ever recommended to use.
      */
-    HIGHEST((byte) 4),
+    HIGHEST,
 
     /**
      * Most powerful event priority.
@@ -84,24 +84,14 @@ public enum PacketEventPriority {
      * or urgently need to be the final decider whether the event has cancelled or not.
      * This is rarely recommended.
      */
-    MONITOR((byte) 5);
+    MONITOR;
 
-    final byte priorityValue;
-
-    PacketEventPriority(byte priorityValue) {
-        this.priorityValue = priorityValue;
-    }
 
     public static PacketEventPriority getPacketEventPriority(byte bytePriority) {
-        for (PacketEventPriority priority : values()) {
-            if (priority.priorityValue == bytePriority) {
-                return priority;
-            }
-        }
-        return NORMAL;
+        return values()[bytePriority];
     }
 
     public byte getPriorityValue() {
-        return priorityValue;
+        return (byte) ordinal();
     }
 }

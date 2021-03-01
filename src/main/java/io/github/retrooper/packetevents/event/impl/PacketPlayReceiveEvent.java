@@ -45,7 +45,7 @@ import org.jetbrains.annotations.NotNull;
 public final class PacketPlayReceiveEvent extends CancellableNMSPacketEvent implements PlayerEvent {
     private final Player player;
 
-    public PacketPlayReceiveEvent(final Player player, final Object channel, final NMSPacket packet) {
+    public PacketPlayReceiveEvent(Player player, Object channel, NMSPacket packet) {
         super(channel, packet);
         this.player = player;
     }

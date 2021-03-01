@@ -58,6 +58,11 @@ import org.bukkit.plugin.ServicePriority;
 
 import java.net.InetSocketAddress;
 import java.util.UUID;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 public final class PacketEvents implements Listener, EventManager {
     public static String handlerName;
@@ -69,9 +74,11 @@ public final class PacketEvents implements Listener, EventManager {
     private final PlayerUtils playerUtils = new PlayerUtils();
     private final ServerUtils serverUtils = new ServerUtils();
     private final UpdateChecker updateChecker = new UpdateChecker();
-    public PacketProcessorInternal packetProcessorInternal;
-    public GlobalChannelInjector injector;
-    private boolean loading, loaded, initialized, initializing, terminating;
+    public final PacketProcessorInternal packetProcessorInternal = new PacketProcessorInternal();
+    public final GlobalChannelInjector injector = new GlobalChannelInjector();
+    private volatile boolean loading, loaded;
+    private final AtomicBoolean injectedInjector = new AtomicBoolean(false);
+    private boolean initialized, initializing, terminating;
     private PacketEventsSettings settings = new PacketEventsSettings();
     private ByteBufUtil byteBufUtil;
 
@@ -119,12 +126,24 @@ public final class PacketEvents implements Listener, EventManager {
 
             byteBufUtil = NMSUtils.legacyNettyImportMode ? new ByteBufUtil_7() : new ByteBufUtil_8();
 
-            injector = new GlobalChannelInjector();
-            injector.inject();
+           if (!injectedInjector.get()) {
+                injector.load();
+                injector.inject();
+                System.out.println("Injected!");
+                injectedInjector.set(true);
+            }
 
             loaded = true;
             loading = false;
         }
+    }
+
+    public void loadAsyncNewThread() {
+        new Thread(this::load).start();
+    }
+
+    public void loadAsync(ExecutorService executorService) {
+        executorService.execute(this::load);
     }
 
     public void loadSettings(PacketEventsSettings settings) {
@@ -141,14 +160,6 @@ public final class PacketEvents implements Listener, EventManager {
             initializing = true;
             settings = packetEventsSettings;
             settings.lock();
-
-            Bukkit.getPluginManager().registerEvents(this, plugin);
-
-            packetProcessorInternal = new PacketProcessorInternal();
-
-            for (final Player p : Bukkit.getOnlinePlayers()) {
-                getPlayerUtils().injectPlayer(p);
-            }
 
             if (settings.shouldCheckForUpdates()) {
                 Thread thread = new Thread(() -> {
@@ -181,6 +192,15 @@ public final class PacketEvents implements Listener, EventManager {
                 }, "PacketEvents-update-check-thread");
                 thread.start();
             }
+
+            while (!injectedInjector.get()) {
+              ;
+            }
+            Bukkit.getPluginManager().registerEvents(this, plugin);
+            for (final Player p : Bukkit.getOnlinePlayers()) {
+                getPlayerUtils().injectPlayer(p);
+            }
+
             initialized = true;
             initializing = false;
         }
