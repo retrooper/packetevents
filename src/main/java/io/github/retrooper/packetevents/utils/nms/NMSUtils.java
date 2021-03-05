@@ -259,9 +259,9 @@ public final class NMSUtils {
 
     @Nullable
     public static Entity getEntityById(@Nullable World world, int id) {
-        Entity entity = EntityFinderUtils.getEntityById(world, id);
-        if (entity == null && world != null) {
-            try {
+        try {
+            Entity entity = EntityFinderUtils.getEntityById(world, id);
+            if (entity == null && world != null) {
                 List<World> worlds = new ArrayList<>(Bukkit.getWorlds());
                 for (World wrld : worlds) {
                     for (Entity e : wrld.getEntities()) {
@@ -272,11 +272,11 @@ public final class NMSUtils {
                     }
                 }
             }
-            catch (ConcurrentModificationException ex) {
-                return null;
-            }
+            return entity;
         }
-        return entity;
+        catch(Exception ex){
+            return null;
+        }
     }
 
     public static Object getNMSEntity(final Entity entity) {
@@ -433,7 +433,7 @@ public final class NMSUtils {
 
     public static Vector3i readBlockPos(Object blockPos) {
         try {
-            return new Vector3i((int)getBlockPosX.invoke(blockPos), (int)getBlockPosY.invoke(blockPos), (int)getBlockPosZ.invoke(blockPos));
+            return new Vector3i((int) getBlockPosX.invoke(blockPos), (int) getBlockPosY.invoke(blockPos), (int) getBlockPosZ.invoke(blockPos));
         } catch (IllegalAccessException | InvocationTargetException e) {
             e.printStackTrace();
         }
