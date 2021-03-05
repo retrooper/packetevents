@@ -25,6 +25,7 @@
 package io.github.retrooper.packetevents.injector.lateinjector.legacy;
 
 import io.github.retrooper.packetevents.PacketEvents;
+import io.github.retrooper.packetevents.event.impl.PostPlayerInjectEvent;
 import io.github.retrooper.packetevents.injector.lateinjector.LateInjector;
 import net.minecraft.util.io.netty.channel.Channel;
 import net.minecraft.util.io.netty.channel.ChannelDuplexHandler;
@@ -45,7 +46,7 @@ public class LateChannelInjectorLegacy implements LateInjector {
 
     @Override
     public void injectPlayer(Player player) {
-        final ChannelDuplexHandler channelDuplexHandler = new ChannelDuplexHandler() {
+        ChannelDuplexHandler channelDuplexHandler = new ChannelDuplexHandler() {
             @Override
             public void channelRead(ChannelHandlerContext ctx, Object packet) throws Exception {
                 packet = PacketEvents.get().packetProcessorInternal.read(player, ctx.channel(), packet);
@@ -64,18 +65,16 @@ public class LateChannelInjectorLegacy implements LateInjector {
                 }
             }
         };
-        final Channel channel = (Channel) PacketEvents.get().packetProcessorInternal.getChannel(player);
+        Channel channel = (Channel) PacketEvents.get().packetProcessorInternal.getChannel(player);
         channel.pipeline().addBefore("packet_handler", PacketEvents.handlerName, channelDuplexHandler);
     }
 
     @Override
     public void ejectPlayer(Player player) {
-        final Channel channel = (Channel) PacketEvents.get().packetProcessorInternal.getChannel(player);
+        Channel channel = (Channel) PacketEvents.get().packetProcessorInternal.getChannel(player);
         if (channel.pipeline().get(PacketEvents.handlerName) != null) {
             channel.pipeline().remove(PacketEvents.handlerName);
         }
-        PacketEvents.get().getPlayerUtils().clientVersionsMap.remove(player.getAddress());
-        PacketEvents.get().getPlayerUtils().tempClientVersionMap.remove(player.getAddress());
     }
 
     @Override
@@ -83,7 +82,6 @@ public class LateChannelInjectorLegacy implements LateInjector {
         Channel channel = (Channel) PacketEvents.get().packetProcessorInternal.getChannel(player);
         return channel.pipeline().get(PacketEvents.handlerName) != null;
     }
-
 
     @Override
     public void sendPacket(Object rawChannel, Object packet) {

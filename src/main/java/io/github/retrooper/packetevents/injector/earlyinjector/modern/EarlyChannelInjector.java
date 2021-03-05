@@ -25,6 +25,7 @@
 package io.github.retrooper.packetevents.injector.earlyinjector.modern;
 
 import io.github.retrooper.packetevents.PacketEvents;
+import io.github.retrooper.packetevents.event.impl.PostPlayerInjectEvent;
 import io.github.retrooper.packetevents.injector.earlyinjector.EarlyInjector;
 import io.github.retrooper.packetevents.packetwrappers.NMSPacket;
 import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
@@ -243,7 +244,12 @@ public class EarlyChannelInjector implements EarlyInjector {
 
     @Override
     public void ejectPlayer(Player player) {
-
+        Channel channel = (Channel) PacketEvents.get().packetProcessorInternal.getChannel(player);
+        if (channel != null) {
+            if (channel.pipeline().get(PacketEvents.handlerName) != null) {
+                channel.pipeline().remove(PacketEvents.handlerName);
+            }
+        }
     }
 
     @Override

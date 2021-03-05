@@ -38,12 +38,14 @@ import org.bukkit.World;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.jetbrains.annotations.Nullable;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.ConcurrentModificationException;
 import java.util.List;
 
 public final class NMSUtils {
@@ -255,17 +257,23 @@ public final class NMSUtils {
         return Class.forName(nettyPrefix + name);
     }
 
-    public static Entity getEntityById(final int id) {
-        Entity entity = EntityFinderUtils.getEntityById(id);
-        if (entity == null) {
-            List<World> worlds = new ArrayList<>(Bukkit.getWorlds());
-            for (World world : worlds) {
-                for (Entity e : world.getEntities()) {
-                    if (e.getEntityId() == id) {
-                        entity = e;
-                        break;
+    @Nullable
+    public static Entity getEntityById(@Nullable World world, int id) {
+        Entity entity = EntityFinderUtils.getEntityById(world, id);
+        if (entity == null && world != null) {
+            try {
+                List<World> worlds = new ArrayList<>(Bukkit.getWorlds());
+                for (World wrld : worlds) {
+                    for (Entity e : wrld.getEntities()) {
+                        if (e.getEntityId() == id) {
+                            entity = e;
+                            break;
+                        }
                     }
                 }
+            }
+            catch (ConcurrentModificationException ex) {
+                return null;
             }
         }
         return entity;

@@ -60,9 +60,6 @@ import java.net.InetSocketAddress;
 import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
 
 public final class PacketEvents implements Listener, EventManager {
     public static String handlerName;
@@ -77,7 +74,7 @@ public final class PacketEvents implements Listener, EventManager {
     public final PacketProcessorInternal packetProcessorInternal = new PacketProcessorInternal();
     public final GlobalChannelInjector injector = new GlobalChannelInjector();
     private volatile boolean loading, loaded;
-    private final AtomicBoolean injectedInjector = new AtomicBoolean(false);
+    private final AtomicBoolean injectorReady = new AtomicBoolean(false);
     private boolean initialized, initializing, terminating;
     private PacketEventsSettings settings = new PacketEventsSettings();
     private ByteBufUtil byteBufUtil;
@@ -126,11 +123,10 @@ public final class PacketEvents implements Listener, EventManager {
 
             byteBufUtil = NMSUtils.legacyNettyImportMode ? new ByteBufUtil_7() : new ByteBufUtil_8();
 
-           if (!injectedInjector.get()) {
+            if (!injectorReady.get()) {
                 injector.load();
                 injector.inject();
-                System.out.println("Injected!");
-                injectedInjector.set(true);
+                injectorReady.set(true);
             }
 
             loaded = true;
@@ -162,43 +158,23 @@ public final class PacketEvents implements Listener, EventManager {
             settings.lock();
 
             if (settings.shouldCheckForUpdates()) {
-                Thread thread = new Thread(() -> {
-                    PacketEvents.get().getPlugin().getLogger().info("[packetevents] Checking for an update, please wait...");
-                    UpdateChecker.UpdateCheckerStatus status = updateChecker.checkForUpdate();
-                    int seconds = 5;
-                    for (int i = 0; i < 5; i++) {
-                        if (status == UpdateChecker.UpdateCheckerStatus.FAILED) {
-                            PacketEvents.get().getPlugin().getLogger().severe("[packetevents] Checking for an update again in " + seconds + " seconds...");
-                            try {
-                                Thread.sleep(seconds * 1000L);
-                            } catch (InterruptedException e) {
-                                e.printStackTrace();
-                            }
-
-                            seconds *= 2;
-
-                            status = updateChecker.checkForUpdate();
-
-                            if (i == 4) {
-                                PacketEvents.get().getPlugin().getLogger().severe("[packetevents] PacketEvents failed to check for an update. No longer retrying.");
-                                break;
-                            }
-                        } else {
-                            break;
-                        }
-
-                    }
-
-                }, "PacketEvents-update-check-thread");
-                thread.start();
+                handleUpdateCheck();
             }
 
-            while (!injectedInjector.get()) {
-              ;
+            //We may not continue until the injector has been initialized!
+            while (!injectorReady.get()) {
+                ;
             }
             Bukkit.getPluginManager().registerEvents(this, plugin);
             for (final Player p : Bukkit.getOnlinePlayers()) {
-                getPlayerUtils().injectPlayer(p);
+                try {
+                    getPlayerUtils().injectPlayer(p);
+                    //IT IS NOT RECOMMENDED TO RELOAD!
+                    PacketEvents.get().getEventManager().callEvent(new PostPlayerInjectEvent(p, false));
+                }
+                catch (Exception ex) {
+                    p.kickPlayer("Please rejoin!");
+                }
             }
 
             initialized = true;
@@ -293,7 +269,7 @@ public final class PacketEvents implements Listener, EventManager {
     }
 
     @EventHandler(priority = EventPriority.LOWEST)
-    public void onLogin(final PlayerLoginEvent e) {
+    public void onLogin(PlayerLoginEvent e) {
         final Player player = e.getPlayer();
         if (!getSettings().shouldUseCompatibilityInjector()) {
             injector.injectPlayer(player);
@@ -301,28 +277,9 @@ public final class PacketEvents implements Listener, EventManager {
     }
 
     @EventHandler(priority = EventPriority.HIGH)
-    public void onJoin(final PlayerJoinEvent e) {
+    public void onJoin(PlayerJoinEvent e) {
         Player player = e.getPlayer();
-        final InetSocketAddress address = player.getAddress();
-        boolean dependencyAvailable = VersionLookupUtils.isDependencyAvailable();
-        PacketEvents.get().getPlayerUtils().loginTime.put(player.getUniqueId(), System.currentTimeMillis());
-        if (dependencyAvailable) {
-            PacketEvents.get().getPlayerUtils().clientVersionsMap.put(player.getAddress(), ClientVersion.TEMP_UNRESOLVED);
-            Bukkit.getScheduler().runTaskLaterAsynchronously(getPlugin(), () -> {
-                int protocolVersion;
-                try {
-                    protocolVersion = VersionLookupUtils.getProtocolVersion(player);
-                } catch (Exception ex) {
-                    protocolVersion = -1;
-                }
-                if (protocolVersion != -1) {
-                    ClientVersion version = ClientVersion.getClientVersion(protocolVersion);
-                    PacketEvents.get().getPlayerUtils().clientVersionsMap.put(address, version);
-                }
-
-                PacketEvents.get().getEventManager().callEvent(new PostPlayerInjectEvent(player, true));
-            }, 1L);
-        }
+        InetSocketAddress address = player.getAddress();
 
         boolean shouldInject = getSettings().shouldUseCompatibilityInjector() || !(injector.hasInjected(e.getPlayer()));
         //Inject now if we are using the compatibility-injector or inject if the early injector failed to inject them.
@@ -330,19 +287,72 @@ public final class PacketEvents implements Listener, EventManager {
             injector.injectPlayer(player);
         }
 
-        //Dependency isn't available, we can already call the post player inject event.
-        if (!dependencyAvailable) {
+        boolean dependencyAvailable = VersionLookupUtils.isDependencyAvailable();
+        PacketEvents.get().getPlayerUtils().loginTime.put(player.getUniqueId(), System.currentTimeMillis());
+        //A supported dependency is available, we need to first ask the dependency for the client version.
+        if (dependencyAvailable) {
+            Bukkit.getScheduler().runTaskLaterAsynchronously(getPlugin(), () -> {
+                try {
+                    int protocolVersion = VersionLookupUtils.getProtocolVersion(player);
+                    ClientVersion version = ClientVersion.getClientVersion(protocolVersion);
+                    PacketEvents.get().getPlayerUtils().clientVersionsMap.put(address, version);
+                } catch (Exception ignored) {
+
+                }
+                PacketEvents.get().getEventManager().callEvent(new PostPlayerInjectEvent(player, true));
+            }, 1L);
+        }
+        else {
+            //Dependency isn't available, we can already call the post player inject event.
             PacketEvents.get().getEventManager().callEvent(new PostPlayerInjectEvent(e.getPlayer(), false));
         }
     }
 
 
     @EventHandler(priority = EventPriority.HIGHEST)
-    public void onQuit(final PlayerQuitEvent e) {
-        UUID uuid = e.getPlayer().getUniqueId();
+    public void onQuit(PlayerQuitEvent e) {
+        Player player = e.getPlayer();
+        UUID uuid = player.getUniqueId();
+        InetSocketAddress address = player.getAddress();
         injector.ejectPlayer(e.getPlayer());
-        instance.getPlayerUtils().loginTime.remove(uuid);
-        instance.getPlayerUtils().playerPingMap.remove(uuid);
-        instance.getPlayerUtils().playerSmoothedPingMap.remove(uuid);
+        playerUtils.loginTime.remove(uuid);
+        playerUtils.playerPingMap.remove(uuid);
+        playerUtils.playerSmoothedPingMap.remove(uuid);
+        packetProcessorInternal.keepAliveMap.remove(uuid);
+        packetProcessorInternal.channelMap.remove(player.getName());
+        playerUtils.clientVersionsMap.remove(address);
+        playerUtils.tempClientVersionMap.remove(address);
+    }
+
+    private void handleUpdateCheck() {
+        Thread thread = new Thread(() -> {
+            PacketEvents.get().getPlugin().getLogger().info("[packetevents] Checking for an update, please wait...");
+            UpdateChecker.UpdateCheckerStatus status = updateChecker.checkForUpdate();
+            int seconds = 5;
+            for (int i = 0; i < 5; i++) {
+                if (status == UpdateChecker.UpdateCheckerStatus.FAILED) {
+                    PacketEvents.get().getPlugin().getLogger().severe("[packetevents] Checking for an update again in " + seconds + " seconds...");
+                    try {
+                        Thread.sleep(seconds * 1000L);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+
+                    seconds *= 2;
+
+                    status = updateChecker.checkForUpdate();
+
+                    if (i == 4) {
+                        PacketEvents.get().getPlugin().getLogger().severe("[packetevents] PacketEvents failed to check for an update. No longer retrying.");
+                        break;
+                    }
+                } else {
+                    break;
+                }
+
+            }
+
+        }, "PacketEvents-update-check-thread");
+        thread.start();
     }
 }

@@ -30,7 +30,9 @@ import io.github.retrooper.packetevents.packetwrappers.SendableWrapper;
 import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
 import io.github.retrooper.packetevents.utils.nms.NMSUtils;
 import org.bukkit.Location;
+import org.bukkit.World;
 import org.bukkit.entity.Entity;
+import org.jetbrains.annotations.Nullable;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
@@ -94,9 +96,15 @@ public class WrappedPacketOutEntityTeleport extends WrappedPacket implements Sen
         }
     }
 
+    @Nullable
     public Entity getEntity() {
+        return getEntity(null);
+    }
+
+    @Nullable
+    public Entity getEntity(@Nullable World world) {
         if (entity == null) {
-            entity = NMSUtils.getEntityById(getEntityId());
+            entity = NMSUtils.getEntityById(world, getEntityId());
         }
         return entity;
     }

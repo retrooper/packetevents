@@ -7,7 +7,9 @@ import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
 import io.github.retrooper.packetevents.utils.nms.NMSUtils;
 import io.github.retrooper.packetevents.utils.server.ServerVersion;
 import io.github.retrooper.packetevents.utils.vector.Vector3i;
+import org.bukkit.World;
 import org.bukkit.entity.Entity;
+import org.jetbrains.annotations.Nullable;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
@@ -62,11 +64,18 @@ public class WrappedPacketOutBlockBreakAnimation extends WrappedPacket implement
         } else {
             this.entityID = entityID;
         }
+        this.entity = null;
     }
 
+    @Nullable
     public Entity getEntity() {
+        return getEntity(null);
+    }
+
+    @Nullable
+    public Entity getEntity(@Nullable World world) {
         if (entity == null) {
-            entity = NMSUtils.getEntityById(getEntityId());
+            entity = NMSUtils.getEntityById(world, getEntityId());
         }
         return entity;
     }

@@ -28,10 +28,13 @@ import io.github.retrooper.packetevents.settings.PacketEventsSettings;
 import org.bukkit.plugin.java.JavaPlugin;
 
 public class PacketEventsPlugin extends JavaPlugin {
+
     @Override
     public void onLoad() {
         PacketEvents.create(this);
         PacketEventsSettings settings = PacketEvents.get().getSettings();
+        settings.compatInjector(true);
+        settings.checkForUpdates(false);
         PacketEvents.get().loadAsyncNewThread();
     }
 

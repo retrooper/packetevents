@@ -31,6 +31,7 @@ import io.github.retrooper.packetevents.utils.enums.EnumUtil;
 import io.github.retrooper.packetevents.utils.nms.NMSUtils;
 import io.github.retrooper.packetevents.utils.reflection.SubclassUtil;
 import io.github.retrooper.packetevents.utils.server.ServerVersion;
+import org.bukkit.World;
 import org.bukkit.entity.Entity;
 import org.jetbrains.annotations.Nullable;
 
@@ -54,9 +55,15 @@ public final class WrappedPacketInEntityAction extends WrappedPacket {
         }
     }
 
+    @Nullable
     public Entity getEntity() {
+        return getEntity(null);
+    }
+
+    @Nullable
+    public Entity getEntity(@Nullable World world) {
         if (entity == null) {
-            return entity = NMSUtils.getEntityById(getEntityId());
+            entity = NMSUtils.getEntityById(world, getEntityId());
         }
         return entity;
     }

@@ -77,11 +77,14 @@ public final class EntityFinderUtils {
      * @param id Entity ID
      * @return Bukkit Entity.
      */
-    public static Entity getEntityById(final int id) {
-        for (final World world : Bukkit.getWorlds()) {
-            final Entity entity = getEntityByIdWithWorld(world, id);
-            if (entity != null) {
-                return entity;
+    public static Entity getEntityById(World wrld, int id) {
+        Entity e = getEntityByIdWithWorld(wrld, id);
+        if (e == null) {
+            for (World world : Bukkit.getWorlds()) {
+                Entity entity = getEntityByIdWithWorld(world, id);
+                if (entity != null) {
+                    return entity;
+                }
             }
         }
         return null;

@@ -33,7 +33,9 @@ import io.github.retrooper.packetevents.utils.player.Hand;
 import io.github.retrooper.packetevents.utils.reflection.SubclassUtil;
 import io.github.retrooper.packetevents.utils.server.ServerVersion;
 import io.github.retrooper.packetevents.utils.vector.Vector3d;
+import org.bukkit.World;
 import org.bukkit.entity.Entity;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Objects;
 
@@ -63,11 +65,17 @@ public final class WrappedPacketInUseEntity extends WrappedPacket {
         }
     }
 
+    @Nullable
     public Entity getEntity() {
-        if (entity != null) {
-            return entity;
+        return getEntity(null);
+    }
+
+    @Nullable
+    public Entity getEntity(@Nullable World world) {
+        if (entity == null) {
+            entity = NMSUtils.getEntityById(world, getEntityId());
         }
-        return entity = NMSUtils.getEntityById(getEntityId());
+        return entity;
     }
 
     public void setEntity(Entity entity) {

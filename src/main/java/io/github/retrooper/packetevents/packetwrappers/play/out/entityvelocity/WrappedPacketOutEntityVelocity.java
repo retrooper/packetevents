@@ -29,7 +29,9 @@ import io.github.retrooper.packetevents.packetwrappers.NMSPacket;
 import io.github.retrooper.packetevents.packetwrappers.SendableWrapper;
 import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
 import io.github.retrooper.packetevents.utils.nms.NMSUtils;
+import org.bukkit.World;
 import org.bukkit.entity.Entity;
+import org.jetbrains.annotations.Nullable;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
@@ -78,11 +80,17 @@ public final class WrappedPacketOutEntityVelocity extends WrappedPacket implemen
         }
     }
 
+    @Nullable
     public Entity getEntity() {
-        if (entity != null) {
-            return entity;
+        return getEntity(null);
+    }
+
+    @Nullable
+    public Entity getEntity(@Nullable World world) {
+        if (entity == null) {
+            entity = NMSUtils.getEntityById(world, getEntityId());
         }
-        return entity = NMSUtils.getEntityById(getEntityId());
+        return entity;
     }
 
     public void setEntity(Entity entity) {
