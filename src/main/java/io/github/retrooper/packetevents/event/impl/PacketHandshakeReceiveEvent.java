@@ -25,20 +25,6 @@ public class PacketHandshakeReceiveEvent extends CancellableNMSPacketEvent {
         super(socketAddress, packet);
     }
 
-    /**
-     * Each binding in each packet state has their own constants.
-     * Example Usage:
-     * <p>
-     * {@code if (getPacketId() == PacketType.Handshake.Client.HANDSHAKE) }
-     * </p>
-     *
-     * @return Packet ID.
-     */
-    @Override
-    public byte getPacketId() {
-        return PacketType.Handshaking.Client.packetIds.getOrDefault(packet.getRawNMSPacket().getClass(), PacketType.INVALID);
-    }
-
     @Override
     public void call(PacketListenerDynamic listener) {
         if (listener.clientSidedLoginAllowance == null || listener.clientSidedLoginAllowance.contains(getPacketId())) {

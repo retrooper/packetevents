@@ -104,7 +104,9 @@ public abstract class NMSPacketEvent extends PacketEvent implements CallableEven
      *
      * @return Packet ID.
      */
-    public abstract byte getPacketId();
+    public byte getPacketId() {
+        return PacketType.packetIDMap.getOrDefault(packet.getRawNMSPacket().getClass(), PacketType.INVALID);
+    }
 
     @Override
     public boolean isInbuilt() {

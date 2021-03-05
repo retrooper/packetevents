@@ -29,6 +29,7 @@ import io.github.retrooper.packetevents.event.manager.EventManager;
 import io.github.retrooper.packetevents.event.manager.PEEventManager;
 import io.github.retrooper.packetevents.exceptions.PacketEventsLoadFailureException;
 import io.github.retrooper.packetevents.injector.GlobalChannelInjector;
+import io.github.retrooper.packetevents.packettype.PacketType;
 import io.github.retrooper.packetevents.packettype.PacketTypeClasses;
 import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
 import io.github.retrooper.packetevents.processor.PacketProcessorInternal;
@@ -112,8 +113,9 @@ public final class PacketEvents implements Listener, EventManager {
             try {
                 NMSUtils.load();
 
-                //Load all classes
                 PacketTypeClasses.load();
+
+                PacketType.load();
 
                 EntityFinderUtils.load();
             } catch (Exception ex) {

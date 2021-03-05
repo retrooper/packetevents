@@ -62,20 +62,6 @@ public final class PacketPlayReceiveEvent extends CancellableNMSPacketEvent impl
         return player;
     }
 
-    /**
-     * Each binding in each packet state has their own constants.
-     * Example Usage:
-     * <p>
-     * {@code if (getPacketId() == PacketType.Play.Client.USE_ENTITY) }
-     * </p>
-     *
-     * @return Packet ID.
-     */
-    @Override
-    public byte getPacketId() {
-        return PacketType.Play.Client.packetIds.getOrDefault(packet.getRawNMSPacket().getClass(), PacketType.INVALID);
-    }
-
     @Override
     public void call(PacketListenerDynamic listener) {
         if (listener.clientSidedPlayAllowance == null || listener.clientSidedPlayAllowance.contains(getPacketId())) {

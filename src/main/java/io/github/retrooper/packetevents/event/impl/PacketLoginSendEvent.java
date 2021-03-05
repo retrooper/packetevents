@@ -51,11 +51,6 @@ public class PacketLoginSendEvent extends CancellableNMSPacketEvent {
     }
 
     @Override
-    public byte getPacketId() {
-        return PacketType.Login.Server.packetIds.getOrDefault(packet.getRawNMSPacket().getClass(), PacketType.INVALID);
-    }
-
-    @Override
     public void call(PacketListenerDynamic listener) {
         if (listener.serverSidedLoginAllowance == null || listener.serverSidedLoginAllowance.contains(getPacketId())) {
             listener.onPacketLoginSend(this);

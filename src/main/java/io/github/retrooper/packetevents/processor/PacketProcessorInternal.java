@@ -26,6 +26,7 @@ package io.github.retrooper.packetevents.processor;
 
 import io.github.retrooper.packetevents.PacketEvents;
 import io.github.retrooper.packetevents.event.impl.*;
+import io.github.retrooper.packetevents.packettype.PacketState;
 import io.github.retrooper.packetevents.packettype.PacketType;
 import io.github.retrooper.packetevents.packetwrappers.NMSPacket;
 import io.github.retrooper.packetevents.packetwrappers.handshaking.setprotocol.WrappedPacketHandshakingInSetProtocol;
@@ -75,7 +76,7 @@ public class PacketProcessorInternal {
      * @return NMS Packet, null if the event was cancelled.
      */
     public Object read(Player player, Object channel, Object packet) {
-        PacketType.State state = getPacketState(player, packet);
+        PacketState state = getPacketState(player, packet);
         if (state == null) {
             return packet;
         }
@@ -141,7 +142,7 @@ public class PacketProcessorInternal {
      * @return NMS Packet, null if the event was cancelled.
      */
     public Object write(Player player, Object channel, Object packet) {
-        PacketType.State state = getPacketState(player, packet);
+        PacketState state = getPacketState(player, packet);
         if (state == null) {
             return packet;
         }
@@ -186,7 +187,7 @@ public class PacketProcessorInternal {
      * @param packet  NMS Packet.
      */
     public void postRead(Player player, Object channel, Object packet) {
-        if (getPacketState(player, packet) == PacketType.State.PLAY) {
+        if (getPacketState(player, packet) == PacketState.PLAY) {
             //Since player != null check is done, status and login packets won't come passed this point.
             PostPacketPlayReceiveEvent event = new PostPacketPlayReceiveEvent(player, channel, new NMSPacket(packet));
             PacketEvents.get().getEventManager().callEvent(event);
@@ -205,7 +206,7 @@ public class PacketProcessorInternal {
      * @param packet  NMS Packet.
      */
     public void postWrite(Player player, Object channel, Object packet) {
-        if (getPacketState(player, packet) == PacketType.State.PLAY) {
+        if (getPacketState(player, packet) == PacketState.PLAY) {
             //Since player != null check is done, status and login packets won't come passed this point.
             PostPacketPlaySendEvent event = new PostPacketPlaySendEvent(player, channel, new NMSPacket(packet));
             PacketEvents.get().getEventManager().callEvent(event);
@@ -316,20 +317,20 @@ public class PacketProcessorInternal {
     }
 
     @Nullable
-    private PacketType.State getPacketState(Player player, Object packet) {
+    private PacketState getPacketState(Player player, Object packet) {
         if (packet == null) {
             return null;
         }
         if (player != null) {
-            return PacketType.State.PLAY;
+            return PacketState.PLAY;
         } else {
             String packetName = ClassUtil.getClassSimpleName(packet.getClass());//Cached string name so it is faster
             if (packetName.startsWith("PacketH")) {
-                return PacketType.State.HANDSHAKING;
+                return PacketState.HANDSHAKING;
             } else if (packetName.startsWith("PacketL")) {
-                return PacketType.State.LOGIN;
+                return PacketState.LOGIN;
             } else if (packetName.startsWith("PacketS")) {
-                return PacketType.State.STATUS;
+                return PacketState.STATUS;
             } else {
                 return null;
             }

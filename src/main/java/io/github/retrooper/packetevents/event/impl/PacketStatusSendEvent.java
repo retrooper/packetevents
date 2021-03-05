@@ -52,19 +52,6 @@ public class PacketStatusSendEvent extends CancellableNMSPacketEvent {
         super(address, packet);
     }
 
-    /**
-     * Each binding in each packet state has their own constants.
-     * Example Usage:
-     * <p>
-     * {@code if (getPacketId() == PacketType.Status.Server.PONG) }
-     * </p>
-     *
-     * @return Packet ID.
-     */
-    @Override
-    public byte getPacketId() {
-        return PacketType.Status.Server.packetIds.getOrDefault(packet.getRawNMSPacket().getClass(), PacketType.INVALID);
-    }
 
     @Override
     public void call(PacketListenerDynamic listener) {

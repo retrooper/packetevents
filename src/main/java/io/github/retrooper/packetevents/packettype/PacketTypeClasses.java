@@ -49,7 +49,6 @@ public class PacketTypeClasses {
             public static void load() {
                 Client.START = NMSUtils.getNMSClassWithoutException("PacketStatusInStart");
                 Client.PING = NMSUtils.getNMSClassWithoutException("PacketStatusInPing");
-                PacketType.Status.Client.init();
             }
         }
 
@@ -59,7 +58,6 @@ public class PacketTypeClasses {
             public static void load() {
                 Server.PONG = NMSUtils.getNMSClassWithoutException("PacketStatusOutPong");
                 Server.SERVER_INFO = NMSUtils.getNMSClassWithoutException("PacketStatusOutServerInfo");
-                PacketType.Status.Server.init();
             }
         }
     }
@@ -70,7 +68,6 @@ public class PacketTypeClasses {
 
             public static void load() {
                 Handshaking.Client.SET_PROTOCOL = NMSUtils.getNMSClassWithoutException("PacketHandshakingInSetProtocol");
-                PacketType.Handshaking.Client.init();
             }
         }
     }
@@ -84,7 +81,6 @@ public class PacketTypeClasses {
                 Client.CUSTOM_PAYLOAD = NMSUtils.getNMSClassWithoutException("PacketLoginInCustomPayload");
                 Client.START = NMSUtils.getNMSClassWithoutException("PacketLoginInStart");
                 Client.ENCRYPTION_BEGIN = NMSUtils.getNMSClassWithoutException("PacketLoginInEncryptionBegin");
-                PacketType.Login.Client.init();
             }
         }
 
@@ -97,7 +93,6 @@ public class PacketTypeClasses {
                 Server.ENCRYPTION_BEGIN = NMSUtils.getNMSClassWithoutException("PacketLoginOutEncryptionBegin");
                 Server.SUCCESS = NMSUtils.getNMSClassWithoutException("PacketLoginOutSuccess");
                 Server.SET_COMPRESSION = NMSUtils.getNMSClassWithoutException("PacketLoginOutSetCompression");
-                PacketType.Login.Server.init();
             }
         }
     }
@@ -188,7 +183,6 @@ public class PacketTypeClasses {
                 } catch (ClassNotFoundException ignored) {
                 }
 
-                PacketType.Play.Client.init();
             }
         }
 
@@ -323,7 +317,6 @@ public class PacketTypeClasses {
                 TAGS = NMSUtils.getNMSClassWithoutException(s + "Tags");
                 MAP_CHUNK_BULK = NMSUtils.getNMSClassWithoutException(s + "MapChunkBulk");
                 NAMED_ENTITY_SPAWN = NMSUtils.getNMSClassWithoutException(s + "NamedEntitySpawn");
-                PacketType.Play.Server.init();
             }
         }
     }

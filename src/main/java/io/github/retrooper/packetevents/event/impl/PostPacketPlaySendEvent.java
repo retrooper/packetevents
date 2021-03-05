@@ -61,20 +61,6 @@ public class PostPacketPlaySendEvent extends NMSPacketEvent implements PlayerEve
         return player;
     }
 
-    /**
-     * Each binding in each packet state has their own constants.
-     * Example Usage:
-     * <p>
-     * {@code if (getPacketId() == PacketType.Play.Server.KEEP_ALIVE) }
-     * </p>
-     *
-     * @return Packet ID.
-     */
-    @Override
-    public byte getPacketId() {
-        return PacketType.Play.Server.packetIds.getOrDefault(packet.getRawNMSPacket().getClass(), PacketType.INVALID);
-    }
-
     @Override
     public void call(PacketListenerDynamic listener) {
         if (listener.serverSidedPlayAllowance == null || listener.serverSidedPlayAllowance.contains(getPacketId())) {

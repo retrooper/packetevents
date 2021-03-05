@@ -64,30 +64,6 @@ public final class PacketPlaySendEvent extends CancellableNMSPacketEvent impleme
         return player;
     }
 
-    public Optional<Integer> getEntityId() {
-        WrappedPacket packetWrapper = new WrappedPacket(packet);
-        try {
-            int entityID = packetWrapper.readInt(0);
-            return Optional.of(entityID);
-        } catch (Exception ex) {
-            return Optional.empty();
-        }
-    }
-
-    /**
-     * Each binding in each packet state has their own constants.
-     * Example Usage:
-     * <p>
-     * {@code if (getPacketId() == PacketType.Play.Server.KEEP_ALIVE) }
-     * </p>
-     *
-     * @return Packet ID.
-     */
-    @Override
-    public byte getPacketId() {
-        return PacketType.Play.Server.packetIds.getOrDefault(packet.getRawNMSPacket().getClass(), PacketType.INVALID);
-    }
-
     @Override
     public void call(PacketListenerDynamic listener) {
         if (listener.serverSidedPlayAllowance == null || listener.serverSidedPlayAllowance.contains(getPacketId())) {
