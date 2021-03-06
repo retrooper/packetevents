@@ -67,7 +67,7 @@ public final class PacketEvents implements Listener, EventManager {
     //TODO finish unfinished wrappers
     private static PacketEvents instance;
     private static Plugin plugin;
-    private final PEVersion version = new PEVersion(1, 7, 9, 7);
+    private final PEVersion version = new PEVersion(1, 7, 9, 8);
     private final EventManager eventManager = new PEEventManager();
     private final PlayerUtils playerUtils = new PlayerUtils();
     private final ServerUtils serverUtils = new ServerUtils();
@@ -109,7 +109,6 @@ public final class PacketEvents implements Listener, EventManager {
             NMSUtils.version = version;
             EntityFinderUtils.version = version;
             handlerName = "pe-" + plugin.getName();
-
             try {
                 NMSUtils.load();
 

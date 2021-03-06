@@ -49,7 +49,6 @@ public class PacketType {
     public static Map<Class<?>, Byte> packetIDMap = new HashMap<>();
 
     public static void load() {
-        byte byteID = INVALID + 1;//-127
         for (Class<?> cls : PacketType.class.getDeclaredClasses()) {
             Class<?> packetTypeClassesSubclass = SubclassUtil.getSubClass(PacketTypeClasses.class, cls.getSimpleName());
             for (Class<?> boundCls : cls.getDeclaredClasses()) {
@@ -58,23 +57,19 @@ public class PacketType {
                     String fieldName = f.getName();
                     Class<?> fieldType = f.getType();
                     if (fieldType.equals(byte.class)) {
-                        try {
-                            f.set(null, byteID);
-                        } catch (IllegalAccessException e) {
-                            e.printStackTrace();
-                        }
                         Field packetTypeClassesSubclassBoundField = null;
                         try {
                             packetTypeClassesSubclassBoundField = packetTypeClassesSubclassBoundClass.getDeclaredField(fieldName);
                         } catch (NoSuchFieldException e) {
                             e.printStackTrace();
                         }
+
                         try {
+                            byte byteID = f.getByte(null);
                             packetIDMap.put((Class<?>) packetTypeClassesSubclassBoundField.get(null), byteID);
                         } catch (IllegalAccessException e) {
                             e.printStackTrace();
                         }
-                        byteID++;
                     }
                 }
             }
@@ -99,7 +94,7 @@ public class PacketType {
          * @since 1.8
          */
         public static class Client {
-            public static byte START, PING;
+            public static final byte START = -127, PING = -126;
         }
 
         /**
@@ -110,7 +105,7 @@ public class PacketType {
          * @since 1.8
          */
         public static class Server {
-            public static byte PONG, SERVER_INFO;
+            public static final byte PONG = -125, SERVER_INFO = -124;
         }
     }
 
@@ -129,7 +124,7 @@ public class PacketType {
          * @since 1.8
          */
         public static class Client {
-            public static byte SET_PROTOCOL;
+            public static final byte SET_PROTOCOL = -123;
         }
     }
 
@@ -149,7 +144,7 @@ public class PacketType {
          * @since 1.8
          */
         public static class Client {
-            public static byte CUSTOM_PAYLOAD, START, ENCRYPTION_BEGIN;
+            public static final byte CUSTOM_PAYLOAD = -122, START = -121, ENCRYPTION_BEGIN = -120;
         }
 
         /**
@@ -160,7 +155,7 @@ public class PacketType {
          * @since 1.8
          */
         public static class Server {
-            public static byte CUSTOM_PAYLOAD, DISCONNECT, ENCRYPTION_BEGIN, SUCCESS, SET_COMPRESSION;
+            public static final byte CUSTOM_PAYLOAD = -119, DISCONNECT = -118, ENCRYPTION_BEGIN = -117, SUCCESS = -116, SET_COMPRESSION = -115;
         }
     }
 
@@ -180,19 +175,19 @@ public class PacketType {
          * @since 1.8
          */
         public static class Client {
-            public static byte TELEPORT_ACCEPT,
-                    TILE_NBT_QUERY, DIFFICULTY_CHANGE, CHAT, CLIENT_COMMAND,
-                    SETTINGS, TAB_COMPLETE, TRANSACTION, ENCHANT_ITEM,
-                    WINDOW_CLICK, CLOSE_WINDOW, CUSTOM_PAYLOAD, B_EDIT,
-                    ENTITY_NBT_QUERY, USE_ENTITY, JIGSAW_GENERATE, KEEP_ALIVE,
-                    DIFFICULTY_LOCK, POSITION, POSITION_LOOK, LOOK,
-                    FLYING, VEHICLE_MOVE, BOAT_MOVE, PICK_ITEM,
-                    AUTO_RECIPE, ABILITIES, BLOCK_DIG, ENTITY_ACTION,
-                    STEER_VEHICLE, RECIPE_DISPLAYED, ITEM_NAME, RESOURCE_PACK_STATUS,
-                    ADVANCEMENTS, TR_SEL, BEACON, HELD_ITEM_SLOT,
-                    SET_COMMAND_BLOCK, SET_COMMAND_MINECART, SET_CREATIVE_SLOT, SET_JIGSAW,
-                    STRUCT, UPDATE_SIGN, ARM_ANIMATION, SPECTATE,
-                    USE_ITEM, BLOCK_PLACE;
+            public static final byte TELEPORT_ACCEPT = -114,
+                    TILE_NBT_QUERY = -113, DIFFICULTY_CHANGE = -112, CHAT = -111, CLIENT_COMMAND = -110,
+                    SETTINGS = -109, TAB_COMPLETE = -108, TRANSACTION = -107, ENCHANT_ITEM = -106,
+                    WINDOW_CLICK = -105, CLOSE_WINDOW = -104, CUSTOM_PAYLOAD = -103, B_EDIT = -102,
+                    ENTITY_NBT_QUERY = -101, USE_ENTITY = -100, JIGSAW_GENERATE = -99, KEEP_ALIVE = -98,
+                    DIFFICULTY_LOCK = -97, POSITION = -96, POSITION_LOOK = -95, LOOK = -94,
+                    FLYING = -93, VEHICLE_MOVE = -92, BOAT_MOVE = -91, PICK_ITEM = -90,
+                    AUTO_RECIPE = -89, ABILITIES = -88, BLOCK_DIG = -87, ENTITY_ACTION = -86,
+                    STEER_VEHICLE = -85, RECIPE_DISPLAYED = -84, ITEM_NAME = -83, RESOURCE_PACK_STATUS = -82,
+                    ADVANCEMENTS = -81, TR_SEL = -80, BEACON = -79, HELD_ITEM_SLOT = -78,
+                    SET_COMMAND_BLOCK = -77, SET_COMMAND_MINECART = -76, SET_CREATIVE_SLOT = -75, SET_JIGSAW = -74,
+                    STRUCT = -73, UPDATE_SIGN = -72, ARM_ANIMATION = -71, SPECTATE = -70,
+                    USE_ITEM = -69, BLOCK_PLACE = -68;
 
             /**
              * Server-bound Play Packet Type utility.
@@ -247,29 +242,29 @@ public class PacketType {
          * @since 1.8
          */
         public static class Server {
-            public static byte SPAWN_ENTITY, SPAWN_ENTITY_EXPERIENCE_ORB, SPAWN_ENTITY_WEATHER, SPAWN_ENTITY_LIVING,
-                    SPAWN_ENTITY_PAINTING, SPAWN_ENTITY_SPAWN, ANIMATION, STATISTIC,
-                    BLOCK_BREAK, BLOCK_BREAK_ANIMATION, TILE_ENTITY_DATA, BLOCK_ACTION,
-                    BLOCK_CHANGE, BOSS, SERVER_DIFFICULTY, CHAT, MULTI_BLOCK_CHANGE,
-                    TAB_COMPLETE, COMMANDS, TRANSACTION, CLOSE_WINDOW,
-                    WINDOW_ITEMS, WINDOW_DATA, SET_SLOT, SET_COOLDOWN,
-                    CUSTOM_PAYLOAD, CUSTOM_SOUND_EFFECT, KICK_DISCONNECT, ENTITY_STATUS,
-                    EXPLOSION, UNLOAD_CHUNK, GAME_STATE_CHANGE, OPEN_WINDOW_HORSE,
-                    KEEP_ALIVE, MAP_CHUNK, WORLD_EVENT, WORLD_PARTICLES,
-                    LIGHT_UPDATE, LOGIN, MAP, OPEN_WINDOW_MERCHANT,
-                    REL_ENTITY_MOVE, REL_ENTITY_MOVE_LOOK, ENTITY_LOOK, ENTITY,
-                    VEHICLE_MOVE, OPEN_BOOK, OPEN_WINDOW, OPEN_SIGN_EDITOR,
-                    AUTO_RECIPE, ABILITIES, COMBAT_EVENT, PLAYER_INFO,
-                    LOOK_AT, POSITION, RECIPES, ENTITY_DESTROY,
-                    REMOVE_ENTITY_EFFECT, RESOURCE_PACK_SEND, RESPAWN, ENTITY_HEAD_ROTATION,
-                    SELECT_ADVANCEMENT_TAB, WORLD_BORDER, CAMERA, HELD_ITEM_SLOT,
-                    VIEW_CENTRE, VIEW_DISTANCE, SCOREBOARD_DISPLAY_OBJECTIVE, ENTITY_METADATA,
-                    ATTACH_ENTITY, ENTITY_VELOCITY, ENTITY_EQUIPMENT, EXPERIENCE,
-                    UPDATE_HEALTH, SCOREBOARD_OBJECTIVE, MOUNT, SCOREBOARD_TEAM,
-                    SCOREBOARD_SCORE, SPAWN_POSITION, UPDATE_TIME, TITLE,
-                    ENTITY_SOUND, NAMED_SOUND_EFFECT, STOP_SOUND, PLAYER_LIST_HEADER_FOOTER,
-                    NBT_QUERY, COLLECT, ENTITY_TELEPORT, ADVANCEMENTS, UPDATE_ATTRIBUTES,
-                    ENTITY_EFFECT, RECIPE_UPDATE, TAGS, MAP_CHUNK_BULK, NAMED_ENTITY_SPAWN;
+            public static final byte SPAWN_ENTITY = -67, SPAWN_ENTITY_EXPERIENCE_ORB = -66, SPAWN_ENTITY_WEATHER = -65, SPAWN_ENTITY_LIVING = -64,
+                    SPAWN_ENTITY_PAINTING = -63, SPAWN_ENTITY_SPAWN = -62, ANIMATION = -61, STATISTIC = -60,
+                    BLOCK_BREAK = -59, BLOCK_BREAK_ANIMATION = -58, TILE_ENTITY_DATA = -57, BLOCK_ACTION = -56,
+                    BLOCK_CHANGE = -55, BOSS = -54, SERVER_DIFFICULTY = -53, CHAT = -52, MULTI_BLOCK_CHANGE = -51,
+                    TAB_COMPLETE = -50, COMMANDS = -49, TRANSACTION = -48, CLOSE_WINDOW = -47,
+                    WINDOW_ITEMS = -46, WINDOW_DATA = -45, SET_SLOT = -44, SET_COOLDOWN = -43,
+                    CUSTOM_PAYLOAD = -42, CUSTOM_SOUND_EFFECT = -41, KICK_DISCONNECT = -40, ENTITY_STATUS = -39,
+                    EXPLOSION = -38, UNLOAD_CHUNK = -37, GAME_STATE_CHANGE = -36, OPEN_WINDOW_HORSE = -35,
+                    KEEP_ALIVE = -34, MAP_CHUNK = -33, WORLD_EVENT = -32, WORLD_PARTICLES = -31,
+                    LIGHT_UPDATE = -30, LOGIN = -29, MAP = -28, OPEN_WINDOW_MERCHANT = -27,
+                    REL_ENTITY_MOVE = -26, REL_ENTITY_MOVE_LOOK = -25, ENTITY_LOOK = -24, ENTITY = -23,
+                    VEHICLE_MOVE = -22, OPEN_BOOK = -21, OPEN_WINDOW = -20, OPEN_SIGN_EDITOR = -19,
+                    AUTO_RECIPE = -18, ABILITIES = -17, COMBAT_EVENT = -16, PLAYER_INFO = -15,
+                    LOOK_AT = -14, POSITION = -13, RECIPES = -12, ENTITY_DESTROY = -11,
+                    REMOVE_ENTITY_EFFECT = -10, RESOURCE_PACK_SEND = -9, RESPAWN = -8, ENTITY_HEAD_ROTATION = -7,
+                    SELECT_ADVANCEMENT_TAB = -6, WORLD_BORDER = -5, CAMERA = -4, HELD_ITEM_SLOT = -3,
+                    VIEW_CENTRE = -2, VIEW_DISTANCE = -1, SCOREBOARD_DISPLAY_OBJECTIVE = 0, ENTITY_METADATA = 1,
+                    ATTACH_ENTITY = 2, ENTITY_VELOCITY = 3, ENTITY_EQUIPMENT = 4, EXPERIENCE = 5,
+                    UPDATE_HEALTH = 6, SCOREBOARD_OBJECTIVE = 7, MOUNT = 8, SCOREBOARD_TEAM = 9,
+                    SCOREBOARD_SCORE = 10, SPAWN_POSITION = 11, UPDATE_TIME = 12, TITLE = 13,
+                    ENTITY_SOUND = 14, NAMED_SOUND_EFFECT = 15, STOP_SOUND = 16, PLAYER_LIST_HEADER_FOOTER = 17,
+                    NBT_QUERY = 18, COLLECT = 19, ENTITY_TELEPORT = 20, ADVANCEMENTS = 21, UPDATE_ATTRIBUTES = 22,
+                    ENTITY_EFFECT = 23, RECIPE_UPDATE = 24, TAGS = 25, MAP_CHUNK_BULK = 26, NAMED_ENTITY_SPAWN = 27;
 
             /**
              * Client-bound Play Packet Type utility.
