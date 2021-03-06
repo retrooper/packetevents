@@ -196,7 +196,7 @@ public final class Reflection {
         //Remove final modifier
         Field modifiersField = null;
         try {
-            modifiersField = Field.class.getDeclaredField("modifiers");
+            modifiersField = getModifiersField();
         } catch (NoSuchFieldException e) {
             e.printStackTrace();
         }
@@ -205,6 +205,28 @@ public final class Reflection {
             modifiersField.setInt(field, field.getModifiers() & ~Modifier.FINAL);
         } catch (IllegalAccessException e) {
             e.printStackTrace();
+        }
+    }
+
+    private static Field getModifiersField() throws NoSuchFieldException {
+        try {
+            //This should work on Java 8 - 11
+            return Field.class.getDeclaredField("modifiers");
+        } catch (NoSuchFieldException e) {
+            //Java 12 support!
+            try {
+                Method getDeclaredFields0 = Class.class.getDeclaredMethod("getDeclaredFields0", boolean.class);
+                getDeclaredFields0.setAccessible(true);
+                Field[] fields = (Field[]) getDeclaredFields0.invoke(Field.class, false);
+                for (Field field : fields) {
+                    if ("modifiers".equals(field.getName())) {
+                        return field;
+                    }
+                }
+            } catch (ReflectiveOperationException ex) {
+                e.addSuppressed(ex);
+            }
+            throw e;
         }
     }
 }

@@ -45,8 +45,7 @@ public class PacketEventsSettings {
     /**
      * This boolean stores if PacketEvents should inject a player earlier using the {@code LateInjector}.
      * We also call it the "compatibility injector", because it should actually be compatible with everything.
-     * Using this injector prevents us from listening to packets during the early packet-states. (such as LOGIN and STATUS state)
-     * PacketEvents requires these early states to be able to detect client versions of players without the help of any dependencies!
+     * Using this injector prevents us from listening to packets during the early packet-states. (STATUS, HANDSHAKING, LOGIN)
      */
     private boolean compatInjector = false;
 
