@@ -40,7 +40,7 @@ public class SubclassUtil {
             return null;
         }
         for (Class<?> subClass : cls.getDeclaredClasses()) {
-            if (ClassUtil.getClassSimpleName(subClass).equals(name)) {
+            if (subClass.getSimpleName().equals(name)) {
                 return subClass;
             }
         }

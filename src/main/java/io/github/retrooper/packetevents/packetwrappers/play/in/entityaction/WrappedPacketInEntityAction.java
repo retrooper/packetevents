@@ -37,7 +37,6 @@ import org.jetbrains.annotations.Nullable;
 
 public final class WrappedPacketInEntityAction extends WrappedPacket {
     private static Class<? extends Enum<?>> enumPlayerActionClass;
-    private static boolean olderThan_v_1_8;
     private static boolean newerThan_v_1_8_8;
     private Entity entity;
     private int entityID = -1;
@@ -48,11 +47,12 @@ public final class WrappedPacketInEntityAction extends WrappedPacket {
 
     @Override
     protected void load() {
-        olderThan_v_1_8 = version.isOlderThan(ServerVersion.v_1_8);
         newerThan_v_1_8_8 = version.isNewerThan(ServerVersion.v_1_8_8);
-        if (!olderThan_v_1_8) {
+        enumPlayerActionClass = NMSUtils.getNMSEnumClassWithoutException("EnumPlayerAction");
+        if (enumPlayerActionClass == null) {
             enumPlayerActionClass = SubclassUtil.getEnumSubClass(PacketTypeClasses.Play.Client.ENTITY_ACTION, "EnumPlayerAction");
         }
+
     }
 
     @Nullable
@@ -86,7 +86,7 @@ public final class WrappedPacketInEntityAction extends WrappedPacket {
     }
 
     public PlayerAction getAction() {
-        if (olderThan_v_1_8) {
+        if (enumPlayerActionClass == null) {
             int animationIndex = readInt(1) - 1;
             return PlayerAction.getByActionValue((byte) (animationIndex));
         } else {
@@ -96,7 +96,7 @@ public final class WrappedPacketInEntityAction extends WrappedPacket {
     }
 
     public void setAction(PlayerAction action) throws UnsupportedOperationException {
-        if (olderThan_v_1_8) {
+        if (enumPlayerActionClass == null) {
             byte animationIndex = action.actionID;
             writeInt(1, animationIndex + 1);
         } else {
@@ -118,7 +118,7 @@ public final class WrappedPacketInEntityAction extends WrappedPacket {
     }
 
     public int getJumpBoost() {
-        if (olderThan_v_1_8) {
+        if (enumPlayerActionClass == null) {
             return readInt(2);
         } else {
             return readInt(1);
@@ -126,7 +126,7 @@ public final class WrappedPacketInEntityAction extends WrappedPacket {
     }
 
     public void setJumpBoost(int jumpBoost) {
-        if (olderThan_v_1_8) {
+        if (enumPlayerActionClass == null) {
             writeInt(2, jumpBoost);
         } else {
             writeInt(1, jumpBoost);

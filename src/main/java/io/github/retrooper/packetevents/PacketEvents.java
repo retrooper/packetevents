@@ -175,7 +175,7 @@ public final class PacketEvents implements Listener, EventManager {
                     PacketEvents.get().getEventManager().callEvent(new PostPlayerInjectEvent(p, false));
                 }
                 catch (Exception ex) {
-                    p.kickPlayer("Please rejoin!");
+                    p.kickPlayer("Failed to inject... Please rejoin!");
                 }
             }
 
@@ -327,6 +327,7 @@ public final class PacketEvents implements Listener, EventManager {
         UUID uuid = player.getUniqueId();
         InetSocketAddress address = player.getAddress();
         injector.ejectPlayer(e.getPlayer());
+        //Cleanup user data
         playerUtils.loginTime.remove(uuid);
         playerUtils.playerPingMap.remove(uuid);
         playerUtils.playerSmoothedPingMap.remove(uuid);

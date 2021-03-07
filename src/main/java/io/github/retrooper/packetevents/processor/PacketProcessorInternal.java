@@ -188,7 +188,6 @@ public class PacketProcessorInternal {
      */
     public void postRead(Player player, Object channel, Object packet) {
         if (getPacketState(player, packet) == PacketState.PLAY) {
-            //Since player != null check is done, status and login packets won't come passed this point.
             PostPacketPlayReceiveEvent event = new PostPacketPlayReceiveEvent(player, channel, new NMSPacket(packet));
             PacketEvents.get().getEventManager().callEvent(event);
             interceptPostPlayReceive(event);
@@ -207,7 +206,6 @@ public class PacketProcessorInternal {
      */
     public void postWrite(Player player, Object channel, Object packet) {
         if (getPacketState(player, packet) == PacketState.PLAY) {
-            //Since player != null check is done, status and login packets won't come passed this point.
             PostPacketPlaySendEvent event = new PostPacketPlaySendEvent(player, channel, new NMSPacket(packet));
             PacketEvents.get().getEventManager().callEvent(event);
             interceptPostPlaySend(event);
@@ -220,16 +218,14 @@ public class PacketProcessorInternal {
      * @param event PLAY server-bound packet event.
      */
     private void interceptPlayReceive(PacketPlayReceiveEvent event) {
-        if (event.getPlayer() != null) {
-            if (event.getPacketId() == PacketType.Play.Client.KEEP_ALIVE) {
-                UUID uuid = event.getPlayer().getUniqueId();
-                long timestamp = keepAliveMap.getOrDefault(uuid, event.getTimestamp());
-                long currentTime = event.getTimestamp();
-                long ping = currentTime - timestamp;
-                long smoothedPing = (PacketEvents.get().getPlayerUtils().getSmoothedPing(event.getPlayer().getUniqueId()) * 3L + ping) / 4;
-                PacketEvents.get().getPlayerUtils().playerPingMap.put(uuid, (int) ping);
-                PacketEvents.get().getPlayerUtils().playerSmoothedPingMap.put(uuid, (int) smoothedPing);
-            }
+        if (event.getPacketId() == PacketType.Play.Client.KEEP_ALIVE) {
+            UUID uuid = event.getPlayer().getUniqueId();
+            long timestamp = keepAliveMap.getOrDefault(uuid, event.getTimestamp());
+            long currentTime = event.getTimestamp();
+            long ping = currentTime - timestamp;
+            long smoothedPing = (PacketEvents.get().getPlayerUtils().getSmoothedPing(event.getPlayer().getUniqueId()) * 3L + ping) / 4;
+            PacketEvents.get().getPlayerUtils().playerPingMap.put(uuid, (int) ping);
+            PacketEvents.get().getPlayerUtils().playerSmoothedPingMap.put(uuid, (int) smoothedPing);
         }
     }
 
