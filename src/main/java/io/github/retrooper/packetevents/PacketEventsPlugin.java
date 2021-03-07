@@ -40,7 +40,7 @@ public class PacketEventsPlugin extends JavaPlugin {
 
     @Override
     public void onEnable() {
-        PacketEvents.get().init(this);
+        PacketEvents.get().init();
     }
 
     @Override

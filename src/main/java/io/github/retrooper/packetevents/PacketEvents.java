@@ -147,11 +147,12 @@ public final class PacketEvents implements Listener, EventManager {
         this.settings = settings;
     }
 
-    public void init(final Plugin plugin) {
-        init(plugin, settings);
+    public void init() {
+        init(getSettings());
     }
 
-    public void init(final Plugin pl, PacketEventsSettings packetEventsSettings) {
+    public void init(PacketEventsSettings packetEventsSettings) {
+        //Load if we haven't loaded already
         load();
         if (!initialized && !initializing) {
             initializing = true;
@@ -181,6 +182,16 @@ public final class PacketEvents implements Listener, EventManager {
             initialized = true;
             initializing = false;
         }
+    }
+
+@Deprecated
+    public void init(Plugin plugin) {
+        init(plugin, settings);
+    }
+
+    @Deprecated
+    public void init(Plugin pl, PacketEventsSettings packetEventsSettings) {
+        init(packetEventsSettings);
     }
 
     public void terminate() {
