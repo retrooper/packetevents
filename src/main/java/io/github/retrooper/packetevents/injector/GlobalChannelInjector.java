@@ -10,6 +10,8 @@ import io.github.retrooper.packetevents.injector.lateinjector.modern.LateChannel
 import io.github.retrooper.packetevents.utils.nms.NMSUtils;
 import org.bukkit.entity.Player;
 
+import java.util.NoSuchElementException;
+
 public class GlobalChannelInjector implements ChannelInjector {
     private ChannelInjector injector;
 
@@ -50,7 +52,12 @@ public class GlobalChannelInjector implements ChannelInjector {
         PlayerEjectEvent ejectEvent = new PlayerEjectEvent(player);
         PacketEvents.get().callEvent(ejectEvent);
         if (!ejectEvent.isCancelled()) {
-            injector.ejectPlayer(player);
+            try {
+                injector.ejectPlayer(player);
+            }
+            catch (NoSuchElementException ignored) {
+                //We have already ejected them.
+            }
         }
     }
 
