@@ -126,7 +126,12 @@ public final class PacketEvents implements Listener, EventManager {
 
             if (!injectorReady.get()) {
                 injector.load();
-                injector.inject();
+                try {
+                    injector.inject();
+                }
+                catch (Exception ex) {
+                    ex.printStackTrace();
+                }
                 injectorReady.set(true);
             }
 
@@ -173,8 +178,7 @@ public final class PacketEvents implements Listener, EventManager {
                     getPlayerUtils().injectPlayer(p);
                     //IT IS NOT RECOMMENDED TO RELOAD!
                     PacketEvents.get().getEventManager().callEvent(new PostPlayerInjectEvent(p, false));
-                }
-                catch (Exception ex) {
+                } catch (Exception ex) {
                     p.kickPlayer("Failed to inject... Please rejoin!");
                 }
             }
@@ -184,7 +188,7 @@ public final class PacketEvents implements Listener, EventManager {
         }
     }
 
-@Deprecated
+    @Deprecated
     public void init(Plugin plugin) {
         init(plugin, settings);
     }
@@ -313,8 +317,7 @@ public final class PacketEvents implements Listener, EventManager {
                 }
                 PacketEvents.get().getEventManager().callEvent(new PostPlayerInjectEvent(player, true));
             }, 1L);
-        }
-        else {
+        } else {
             //Dependency isn't available, we can already call the post player inject event.
             PacketEvents.get().getEventManager().callEvent(new PostPlayerInjectEvent(e.getPlayer(), false));
         }

@@ -104,8 +104,7 @@ public class EarlyChannelInjector implements EarlyInjector {
                 }
             }
         } catch (Exception ex) {
-            PacketEvents.get().getPlugin().getLogger().severe("PacketEvents failed to inject!");
-            ex.printStackTrace();
+            throw new IllegalStateException("PacketEvents failed to inject!", ex);
         }
 
         //Player channels might have been registered already. Let us add our handlers. We are a little late though.

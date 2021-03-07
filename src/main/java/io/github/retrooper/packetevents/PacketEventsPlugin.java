@@ -33,7 +33,7 @@ public class PacketEventsPlugin extends JavaPlugin {
     public void onLoad() {
         PacketEvents.create(this);
         PacketEventsSettings settings = PacketEvents.get().getSettings();
-        settings.compatInjector(true);
+        settings.compatInjector(false);
         settings.checkForUpdates(false);
         PacketEvents.get().loadAsyncNewThread();
     }

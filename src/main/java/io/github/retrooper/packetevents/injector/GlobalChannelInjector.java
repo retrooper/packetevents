@@ -3,6 +3,7 @@ package io.github.retrooper.packetevents.injector;
 import io.github.retrooper.packetevents.PacketEvents;
 import io.github.retrooper.packetevents.event.impl.PlayerEjectEvent;
 import io.github.retrooper.packetevents.event.impl.PlayerInjectEvent;
+import io.github.retrooper.packetevents.injector.earlyinjector.EarlyInjector;
 import io.github.retrooper.packetevents.injector.earlyinjector.legacy.EarlyChannelInjectorLegacy;
 import io.github.retrooper.packetevents.injector.earlyinjector.modern.EarlyChannelInjector;
 import io.github.retrooper.packetevents.injector.lateinjector.legacy.LateChannelInjectorLegacy;
@@ -30,7 +31,18 @@ public class GlobalChannelInjector implements ChannelInjector {
 
     @Override
     public void inject() {
-        injector.inject();
+        try {
+            //Try inject...
+            injector.inject();
+        } catch (Exception ex) {
+            //Failed to inject! Let us revert to the compatibility injector and re-inject.
+            if (injector instanceof EarlyInjector) {
+                PacketEvents.get().getSettings().compatInjector(true);
+                load();
+                injector.inject();
+                throw new IllegalStateException("PacketEvents failed to inject with the Early Injector. Reverting to the Compatibility/Late Injector... Please report this!", ex);
+            }
+        }
     }
 
     @Override
@@ -54,8 +66,7 @@ public class GlobalChannelInjector implements ChannelInjector {
         if (!ejectEvent.isCancelled()) {
             try {
                 injector.ejectPlayer(player);
-            }
-            catch (NoSuchElementException ignored) {
+            } catch (NoSuchElementException ignored) {
                 //We have already ejected them.
             }
         }
