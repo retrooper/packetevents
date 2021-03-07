@@ -166,9 +166,9 @@ public class EarlyChannelInjector implements EarlyInjector {
                 } catch (IllegalAccessException | NoSuchFieldException e2) {
                     e2.printStackTrace();
                 }
-                System.err.println("PacketEvents failed to inject, because of " + bootstrapAcceptor.getClass().getName() + ", you might want to try running without " + yaml.getName() + "?");
+                throw new IllegalStateException("PacketEvents failed to inject, because of " + bootstrapAcceptor.getClass().getName() + ", you might want to try running without " + yaml.getName() + "?");
             } else {
-                System.err.println("PacketEvents failed to find core component 'childHandler', please check your plugins. issue: " + bootstrapAcceptor.getClass().getName());
+                throw new IllegalStateException("PacketEvents failed to find core component 'childHandler', please check your plugins. issue: " + bootstrapAcceptor.getClass().getName());
             }
         }
 
