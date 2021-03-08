@@ -28,6 +28,7 @@ import io.github.retrooper.packetevents.packetwrappers.NMSPacket;
 import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
 import io.github.retrooper.packetevents.utils.enums.EnumUtil;
 import io.github.retrooper.packetevents.utils.nms.NMSUtils;
+import io.github.retrooper.packetevents.utils.world.Difficulty;
 
 /**
  * Wrapper for the DifficultyChange packet.
@@ -60,12 +61,5 @@ public final class WrappedPacketInDifficultyChange extends WrappedPacket {
     public void setDifficulty(Difficulty difficulty) {
         Enum<?> enumConstant = EnumUtil.valueByIndex(enumDifficultyClass, difficulty.ordinal());
         writeEnumConstant(0, enumConstant);
-    }
-
-    public enum Difficulty {
-        PEACEFUL,
-        EASY,
-        NORMAL,
-        HARD
     }
 }

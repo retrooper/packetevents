@@ -25,6 +25,7 @@
 package io.github.retrooper.packetevents;
 
 import io.github.retrooper.packetevents.settings.PacketEventsSettings;
+import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 
 public class PacketEventsPlugin extends JavaPlugin {
