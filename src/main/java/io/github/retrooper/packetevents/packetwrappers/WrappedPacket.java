@@ -84,6 +84,7 @@ public class WrappedPacket implements WrapperPacketReader, WrapperPacketWriter {
                 String wrapperName = ClassUtil.getClassSimpleName(getClass());
                 PacketEvents.get().getPlugin().getLogger()
                         .log(Level.SEVERE, "PacketEvents found an exception while loading the " + wrapperName + " packet wrapper. Please report this bug! Tell us about your server version, spigot and code(of you using the wrapper)", ex);
+                LOADED_WRAPPERS.put(clazz, false);
             }
             LOADED_WRAPPERS.put(clazz, true);
         }
@@ -91,6 +92,10 @@ public class WrappedPacket implements WrapperPacketReader, WrapperPacketWriter {
 
     protected void load() {
 
+    }
+
+    protected boolean hasLoaded() {
+        return LOADED_WRAPPERS.getOrDefault(getClass(), false);
     }
 
     protected void throwUnsupportedOperation(Enum<?> enumConst) throws UnsupportedOperationException {

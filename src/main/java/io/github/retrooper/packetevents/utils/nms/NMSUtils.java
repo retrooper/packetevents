@@ -57,8 +57,8 @@ public final class NMSUtils {
     public static Class<?> nmsEntityClass, minecraftServerClass, craftWorldClass, playerInteractManagerClass, entityPlayerClass, playerConnectionClass, craftServerClass,
             craftPlayerClass, serverConnectionClass, craftEntityClass, nmsItemStackClass, networkManagerClass, nettyChannelClass, gameProfileClass, iChatBaseComponentClass,
             blockPosClass, vec3DClass, channelFutureClass, blockClass, iBlockDataClass, nmsWorldClass, craftItemStackClass,
-            soundEffectClass, minecraftKeyClass, chatSerializerClass, craftMagicNumbersClass;
-    public static Class<? extends Enum<?>> enumDirectionClass, enumHandClass;
+            soundEffectClass, minecraftKeyClass, chatSerializerClass, craftMagicNumbersClass, worldSettingsClass;
+    public static Class<? extends Enum<?>> enumDirectionClass, enumHandClass, enumGameModeClass;
     public static Method getBlockPosX, getBlockPosY, getBlockPosZ;
     private static String nettyPrefix;
     private static Method getCraftPlayerHandle;
@@ -193,7 +193,13 @@ public final class NMSUtils {
             getBlockPosY = Reflection.getMethod(NMSUtils.blockPosClass.getSuperclass(), "getY", 0);
             getBlockPosZ = Reflection.getMethod(NMSUtils.blockPosClass.getSuperclass(), "getZ", 0);
         }
-        enumHandClass = (Class<Enum<?>>) getNMSClassWithoutException("EnumHand");
+        worldSettingsClass = NMSUtils.getNMSClassWithoutException("WorldSettings");
+
+        enumHandClass = getNMSEnumClassWithoutException("EnumHand");
+        enumGameModeClass = NMSUtils.getNMSEnumClassWithoutException("EnumGamemode");
+        if (enumGameModeClass == null) {
+            enumGameModeClass = SubclassUtil.getEnumSubClass(worldSettingsClass, "EnumGamemode");
+        }
     }
 
     public static Object getMinecraftServerInstance() {
@@ -396,8 +402,11 @@ public final class NMSUtils {
         }
         return null;
     }
-
+@Nullable
     public static Object generateIChatBaseComponent(String text) {
+        if (text== null) {
+            return null;
+        }
         try {
             return chatFromStringMethod.invoke(null, text);
         } catch (IllegalAccessException | InvocationTargetException e) {
@@ -405,6 +414,7 @@ public final class NMSUtils {
         }
         return null;
     }
+
 
     public static Object[] generateIChatBaseComponents(String... texts) {
         Object[] components = new Object[texts.length];
@@ -414,7 +424,11 @@ public final class NMSUtils {
         return components;
     }
 
+    @Nullable
     public static String readIChatBaseComponent(Object iChatBaseComponent) {
+        if (iChatBaseComponent == null) {
+            return null;
+        }
         try {
             return getMessageMethod.invoke(iChatBaseComponent).toString();
         } catch (IllegalAccessException | InvocationTargetException e) {
@@ -441,6 +455,9 @@ public final class NMSUtils {
     }
 
     public static String fromStringToJSON(String message) {
+        if (message == null) {
+            return null;
+        }
         return "{\"text\": \"" + message + "\"}";
     }
 

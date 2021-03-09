@@ -31,11 +31,11 @@ import io.netty.channel.socket.SocketChannel;
 
 import java.lang.reflect.Method;
 
-public class PEChannelInitializer extends ChannelInitializer<SocketChannel> {
+public class PEChannelInitializerModern extends ChannelInitializer<SocketChannel> {
     private final ChannelInitializer<?> oldChannelInitializer;
     private Method initChannelMethod;
 
-    public PEChannelInitializer(ChannelInitializer<?> oldChannelInitializer) {
+    public PEChannelInitializerModern(ChannelInitializer<?> oldChannelInitializer) {
         this.oldChannelInitializer = oldChannelInitializer;
         load();
     }
@@ -51,7 +51,7 @@ public class PEChannelInitializer extends ChannelInitializer<SocketChannel> {
     @Override
     protected void initChannel(SocketChannel socketChannel) throws Exception {
         initChannelMethod.invoke(oldChannelInitializer, socketChannel);
-        PlayerChannelHandler channelHandler = new PlayerChannelHandler();
+        PlayerChannelHandlerModern channelHandler = new PlayerChannelHandlerModern();
         if (socketChannel.pipeline().get("packet_handler") != null) {
             socketChannel.pipeline().addBefore("packet_handler", PacketEvents.handlerName, channelHandler);
         }

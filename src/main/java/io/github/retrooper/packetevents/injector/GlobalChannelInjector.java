@@ -5,7 +5,7 @@ import io.github.retrooper.packetevents.event.impl.PlayerEjectEvent;
 import io.github.retrooper.packetevents.event.impl.PlayerInjectEvent;
 import io.github.retrooper.packetevents.injector.earlyinjector.EarlyInjector;
 import io.github.retrooper.packetevents.injector.earlyinjector.legacy.EarlyChannelInjectorLegacy;
-import io.github.retrooper.packetevents.injector.earlyinjector.modern.EarlyChannelInjector;
+import io.github.retrooper.packetevents.injector.earlyinjector.modern.EarlyChannelInjectorModern;
 import io.github.retrooper.packetevents.injector.lateinjector.legacy.LateChannelInjectorLegacy;
 import io.github.retrooper.packetevents.injector.lateinjector.modern.LateChannelInjector;
 import io.github.retrooper.packetevents.utils.nms.NMSUtils;
@@ -23,7 +23,7 @@ public class GlobalChannelInjector implements ChannelInjector {
     public void load() {
         boolean legacy = NMSUtils.legacyNettyImportMode;
         if (!PacketEvents.get().getSettings().shouldUseCompatibilityInjector()) {
-            injector = legacy ? new EarlyChannelInjectorLegacy() : new EarlyChannelInjector();
+            injector = legacy ? new EarlyChannelInjectorLegacy() : new EarlyChannelInjectorModern();
         } else {
             injector = legacy ? new LateChannelInjectorLegacy() : new LateChannelInjector();
         }

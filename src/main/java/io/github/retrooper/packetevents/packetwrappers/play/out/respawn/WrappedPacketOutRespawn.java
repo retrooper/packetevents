@@ -4,20 +4,18 @@ import io.github.retrooper.packetevents.packetwrappers.NMSPacket;
 import io.github.retrooper.packetevents.packetwrappers.SendableWrapper;
 import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
 import io.github.retrooper.packetevents.utils.nms.NMSUtils;
+import io.github.retrooper.packetevents.utils.player.GameMode;
 import io.github.retrooper.packetevents.utils.reflection.SubclassUtil;
 import io.github.retrooper.packetevents.utils.world.Difficulty;
 import io.github.retrooper.packetevents.utils.world.Dimension;
 import io.github.retrooper.packetevents.utils.server.ServerVersion;
 import io.github.retrooper.packetevents.utils.world.LevelType;
-import org.bukkit.GameMode;
 import org.jetbrains.annotations.Nullable;
 //TODO finish
 class WrappedPacketOutRespawn extends WrappedPacket implements SendableWrapper {
     private static Class<?> dimensionManagerClass;
-    private static Class<?> worldSettingsClass;
     private static Class<?> worldTypeClass;
     private static Class<? extends Enum<?>> enumDifficultyClass;
-    private static Class<? extends Enum<?>> enumGameModeClass;
     private Dimension dimension;
     private Difficulty difficulty;
     private GameMode gameMode;
@@ -29,14 +27,8 @@ class WrappedPacketOutRespawn extends WrappedPacket implements SendableWrapper {
     @Override
     protected void load() {
         dimensionManagerClass = NMSUtils.getNMSClassWithoutException("DimensionManager");
-        worldSettingsClass = NMSUtils.getNMSClassWithoutException("WorldSettings");
         worldTypeClass = NMSUtils.getNMSClassWithoutException("WorldType");
         enumDifficultyClass = NMSUtils.getNMSEnumClassWithoutException("EnumDifficulty");
-
-        enumGameModeClass = NMSUtils.getNMSEnumClassWithoutException("EnumGamemode");
-        if (enumGameModeClass == null) {
-            enumGameModeClass = SubclassUtil.getEnumSubClass(worldSettingsClass, "EnumGamemode");
-        }
     }
 
     public Dimension getDimension() {
@@ -67,7 +59,7 @@ class WrappedPacketOutRespawn extends WrappedPacket implements SendableWrapper {
     @Nullable
     public GameMode getGameMode() {
         if (packet != null) {
-            Enum<?> enumConst = readEnumConstant(0, enumGameModeClass);
+            Enum<?> enumConst = readEnumConstant(0, NMSUtils.enumGameModeClass);
             try {
                 return GameMode.valueOf(enumConst.name());
             }

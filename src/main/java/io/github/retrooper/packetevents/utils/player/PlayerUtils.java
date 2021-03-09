@@ -26,6 +26,8 @@ package io.github.retrooper.packetevents.utils.player;
 
 import io.github.retrooper.packetevents.PacketEvents;
 import io.github.retrooper.packetevents.packetwrappers.SendableWrapper;
+import io.github.retrooper.packetevents.packetwrappers.play.out.playerinfo.WrappedPacketOutPlayerInfo;
+import io.github.retrooper.packetevents.utils.gameprofile.WrappedGameProfile;
 import io.github.retrooper.packetevents.utils.nms.NMSUtils;
 import io.github.retrooper.packetevents.utils.server.ServerVersion;
 import io.github.retrooper.packetevents.utils.vector.Vector3d;
@@ -61,6 +63,11 @@ public final class PlayerUtils {
      * PacketEvents smooths in the same way minecraft does.
      */
     public final Map<UUID, Integer> playerSmoothedPingMap = new ConcurrentHashMap<>();
+
+    /**
+     * This map stores the wrapped game profiles for all users.
+     */
+    public final Map<UUID, WrappedGameProfile> gameProfileMap= new ConcurrentHashMap<>();
 
     /**
      * This map stores the client version of a player only when it has been confirmed.
@@ -265,5 +272,15 @@ public final class PlayerUtils {
      */
     public void sendNMSPacket(Object channel, Object packet) {
         PacketEvents.get().injector.sendPacket(channel, packet);
+    }
+
+    public WrappedGameProfile getGameProfile(Player player) {
+        UUID uuid = player.getUniqueId();
+        WrappedGameProfile gameProfile = gameProfileMap.get(uuid);
+        if (gameProfile == null) {
+            gameProfile = new WrappedGameProfile(player.getUniqueId(), player.getName(), false);
+            gameProfileMap.put(uuid, gameProfile);
+        }
+        return gameProfile;
     }
 }

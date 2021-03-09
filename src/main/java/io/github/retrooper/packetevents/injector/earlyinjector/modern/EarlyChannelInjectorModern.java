@@ -25,7 +25,6 @@
 package io.github.retrooper.packetevents.injector.earlyinjector.modern;
 
 import io.github.retrooper.packetevents.PacketEvents;
-import io.github.retrooper.packetevents.event.impl.PostPlayerInjectEvent;
 import io.github.retrooper.packetevents.injector.earlyinjector.EarlyInjector;
 import io.github.retrooper.packetevents.packetwrappers.NMSPacket;
 import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
@@ -54,7 +53,7 @@ import java.util.Map;
  * @author retrooper, Thomazz, ViaVersion
  * @since 1.8
  */
-public class EarlyChannelInjector implements EarlyInjector {
+public class EarlyChannelInjectorModern implements EarlyInjector {
     private final List<ChannelFuture> injectedFutures = new ArrayList<>();
     private final List<Map<Field, Object>> injectedLists = new ArrayList<>();
 
@@ -119,7 +118,7 @@ public class EarlyChannelInjector implements EarlyInjector {
                 }
 
                 if (channel.pipeline().get("packet_handler") != null) {
-                    channel.pipeline().addBefore("packet_handler", PacketEvents.handlerName, new PlayerChannelHandler());
+                    channel.pipeline().addBefore("packet_handler", PacketEvents.handlerName, new PlayerChannelHandlerModern());
                 }
             }
         }
@@ -150,7 +149,7 @@ public class EarlyChannelInjector implements EarlyInjector {
         try {
             oldChannelInitializer = (ChannelInitializer<?>) bootstrapAcceptorField.get(bootstrapAcceptor);
 
-            ChannelInitializer<?> channelInitializer = new PEChannelInitializer(oldChannelInitializer);
+            ChannelInitializer<?> channelInitializer = new PEChannelInitializerModern(oldChannelInitializer);
 
             Reflection.getFieldWithoutFinalModifier(bootstrapAcceptorField);
 
@@ -190,7 +189,7 @@ public class EarlyChannelInjector implements EarlyInjector {
                     }
 
                     ChannelInitializer<SocketChannel> oldInit = (ChannelInitializer<SocketChannel>) childHandlerField.get(handler);
-                    if (oldInit instanceof PEChannelInitializer) {
+                    if (oldInit instanceof PEChannelInitializerModern) {
                         bootstrapAcceptor = handler;
                     }
                 } catch (Exception e) {
@@ -205,9 +204,9 @@ public class EarlyChannelInjector implements EarlyInjector {
             try {
                 Reflection.getFieldWithoutFinalModifier(childHandlerField);
                 ChannelInitializer<SocketChannel> oldInit = (ChannelInitializer<SocketChannel>) childHandlerField.get(bootstrapAcceptor);
-                if (oldInit instanceof PEChannelInitializer) {
+                if (oldInit instanceof PEChannelInitializerModern) {
                     childHandlerField.set(bootstrapAcceptor, oldInit);
-                    childHandlerField.set(bootstrapAcceptor, ((PEChannelInitializer) oldInit).getOldChannelInitializer());
+                    childHandlerField.set(bootstrapAcceptor, ((PEChannelInitializerModern) oldInit).getOldChannelInitializer());
                 }
             } catch (Exception e) {
                 PacketEvents.get().getPlugin().getLogger().severe("PacketEvents failed to eject the injection handler! Please reboot!");
@@ -257,7 +256,7 @@ public class EarlyChannelInjector implements EarlyInjector {
         if (channel == null) {
             return false;
         }
-        PlayerChannelHandler handler = getHandler(channel);
+        PlayerChannelHandlerModern handler = getHandler(channel);
         return handler != null && handler.player != null;
     }
 
@@ -267,11 +266,11 @@ public class EarlyChannelInjector implements EarlyInjector {
         channel.writeAndFlush(rawNMSPacket);
     }
 
-    private PlayerChannelHandler getHandler(Object rawChannel) {
+    private PlayerChannelHandlerModern getHandler(Object rawChannel) {
         Channel channel = (Channel) rawChannel;
         ChannelHandler handler = channel.pipeline().get(PacketEvents.handlerName);
-        if (handler instanceof PlayerChannelHandler) {
-            return (PlayerChannelHandler) handler;
+        if (handler instanceof PlayerChannelHandlerModern) {
+            return (PlayerChannelHandlerModern) handler;
         } else {
             return null;
         }
@@ -279,7 +278,7 @@ public class EarlyChannelInjector implements EarlyInjector {
 
     @Override
     public void updatePlayerObject(Player player, Object rawChannel) {
-        PlayerChannelHandler handler = getHandler(rawChannel);
+        PlayerChannelHandlerModern handler = getHandler(rawChannel);
         if (handler != null) {
             handler.player = player;
         }

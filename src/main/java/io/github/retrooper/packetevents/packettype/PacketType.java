@@ -46,7 +46,7 @@ public class PacketType {
      * This value may change over the versions so it is important to use the variable and not hard code its value.
      */
     public static final byte INVALID = -128;
-    public static Map<Class<?>, Byte> packetIDMap = new HashMap<>();
+    public static final Map<Class<?>, Byte> packetIDMap = new HashMap<>();
 
     public static void load() {
         for (Class<?> cls : PacketType.class.getDeclaredClasses()) {

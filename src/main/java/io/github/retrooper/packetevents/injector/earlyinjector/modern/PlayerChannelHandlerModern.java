@@ -30,7 +30,7 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelPromise;
 import org.bukkit.entity.Player;
 
-public class PlayerChannelHandler extends ChannelDuplexHandler {
+public class PlayerChannelHandlerModern extends ChannelDuplexHandler {
     /**
      * Associated player.
      * This is null until we inject the player.

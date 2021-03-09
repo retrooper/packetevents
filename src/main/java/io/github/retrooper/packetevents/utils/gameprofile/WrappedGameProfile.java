@@ -43,6 +43,12 @@ public class WrappedGameProfile {
         this.legacy = legacy;
     }
 
+    public WrappedGameProfile(UUID id, String name) {
+        this.id = id;
+        this.name = name;
+        this.legacy = false;
+    }
+
     public UUID getId() {
         return id;
     }
