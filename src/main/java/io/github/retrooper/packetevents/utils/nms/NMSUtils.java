@@ -53,11 +53,11 @@ public final class NMSUtils {
     private static final String OBC_DIR = ServerVersion.getOBCDirectory() + ".";
     public static boolean legacyNettyImportMode;
     public static ServerVersion version;
-    public static Constructor<?> blockPosConstructor, minecraftKeyConstructor, vec3DConstructor;
+    public static Constructor<?> blockPosConstructor, minecraftKeyConstructor, vec3DConstructor, dataWatcherConstructor;
     public static Class<?> nmsEntityClass, minecraftServerClass, craftWorldClass, playerInteractManagerClass, entityPlayerClass, playerConnectionClass, craftServerClass,
             craftPlayerClass, serverConnectionClass, craftEntityClass, nmsItemStackClass, networkManagerClass, nettyChannelClass, gameProfileClass, iChatBaseComponentClass,
             blockPosClass, vec3DClass, channelFutureClass, blockClass, iBlockDataClass, nmsWorldClass, craftItemStackClass,
-            soundEffectClass, minecraftKeyClass, chatSerializerClass, craftMagicNumbersClass, worldSettingsClass;
+            soundEffectClass, minecraftKeyClass, chatSerializerClass, craftMagicNumbersClass, worldSettingsClass, worldServerClass, dataWatcherClass, nmsEntityHumanClass;
     public static Class<? extends Enum<?>> enumDirectionClass, enumHandClass, enumGameModeClass;
     public static Method getBlockPosX, getBlockPosY, getBlockPosZ;
     private static String nettyPrefix;
@@ -122,6 +122,9 @@ public final class NMSUtils {
             nmsWorldClass = getNMSClass("World");
             soundEffectClass = getNMSClassWithoutException("SoundEffect");
             minecraftKeyClass = getNMSClassWithoutException("MinecraftKey");
+            worldServerClass = getNMSClassWithoutException("WorldServer");
+            dataWatcherClass = getNMSClassWithoutException("DataWatcher");
+            nmsEntityHumanClass = getNMSClassWithoutException("EntityHuman");
             try {
                 gameProfileClass = Class.forName("net.minecraft.util.com.mojang.authlib.GameProfile");
             } catch (ClassNotFoundException e) {
@@ -141,6 +144,10 @@ public final class NMSUtils {
             if (vec3DClass != null) {
                 vec3DConstructor = NMSUtils.vec3DClass.getDeclaredConstructor(double.class, double.class, double.class);
                 vec3DConstructor.setAccessible(true);
+            }
+
+            if (dataWatcherClass != null) {
+                dataWatcherConstructor = dataWatcherClass.getConstructor(nmsEntityClass);
             }
         } catch (NoSuchMethodException e) {
             e.printStackTrace();
@@ -202,11 +209,11 @@ public final class NMSUtils {
         }
     }
 
-    public static Object getMinecraftServerInstance() {
+    public static Object getMinecraftServerInstance(Server server) {
         if (minecraftServer == null) {
             try {
                 minecraftServer = Reflection.getField(craftServerClass, minecraftServerClass, 0)
-                        .get(Bukkit.getServer());
+                        .get(server);
             } catch (IllegalAccessException e) {
                 e.printStackTrace();
             }
@@ -217,7 +224,7 @@ public final class NMSUtils {
     public static Object getMinecraftServerConnection() {
         if (minecraftServerConnection == null) {
             try {
-                minecraftServerConnection = Reflection.getField(minecraftServerClass, serverConnectionClass, 0).get(getMinecraftServerInstance());
+                minecraftServerConnection = Reflection.getField(minecraftServerClass, serverConnectionClass, 0).get(getMinecraftServerInstance(Bukkit.getServer()));
             } catch (IllegalAccessException e) {
                 e.printStackTrace();
             }
@@ -226,7 +233,7 @@ public final class NMSUtils {
     }
 
     public static double[] recentTPS() {
-        return new WrappedPacket(new NMSPacket(getMinecraftServerInstance()), minecraftServerClass).readDoubleArray(0);
+        return new WrappedPacket(new NMSPacket(getMinecraftServerInstance(Bukkit.getServer())), minecraftServerClass).readDoubleArray(0);
     }
 
     public static Class<?> getNMSClass(String name) throws ClassNotFoundException {
@@ -506,6 +513,16 @@ public final class NMSUtils {
         try {
             return getNMSBlockFromMaterial.invoke(null, material);
         } catch (IllegalAccessException | InvocationTargetException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    public static Object generateDataWatcher(Entity entity) {
+        Object nmsEntity  = null;
+        try {
+            return dataWatcherConstructor.newInstance(nmsEntity);
+        } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
             e.printStackTrace();
         }
         return null;
