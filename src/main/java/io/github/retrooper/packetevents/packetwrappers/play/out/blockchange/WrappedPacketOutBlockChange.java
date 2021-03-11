@@ -189,7 +189,7 @@ public class WrappedPacketOutBlockChange extends WrappedPacket implements Sendab
         Vector3i blockPosition = getBlockPosition();
         if (version.isOlderThan(ServerVersion.v_1_8)) {
             try {
-                Object nmsWorld = NMSUtils.convertBukkitWorldToNMSWorld(world);
+                Object nmsWorld = NMSUtils.convertBukkitWorldToWorldServer(world); //TODO civ, is it nms world or world server
 
                 nmsPacket = packetConstructor.newInstance(blockPosition.x, blockPosition.y, blockPosition.z, nmsWorld);
                 blockChange = new WrappedPacketOutBlockChange(new NMSPacket(nmsPacket));
@@ -208,8 +208,8 @@ public class WrappedPacketOutBlockChange extends WrappedPacket implements Sendab
                     blockChange.setMaterial(material);
                 } else {
                     Object nmsBlockPos = NMSUtils.generateNMSBlockPos(blockPosition.x, blockPosition.y, blockPosition.z);
-                    Object nmsWorld = NMSUtils.convertBukkitWorldToNMSWorld(world);
-                    Object nmsBlockData = getNMSWorldTypeMethodCache.invoke(nmsWorld, nmsBlockPos);
+                    Object worldServer = NMSUtils.convertBukkitWorldToWorldServer(world); //TODO civ, is it world server or nms world
+                    Object nmsBlockData = getNMSWorldTypeMethodCache.invoke(worldServer, nmsBlockPos);
                     blockChange.write(NMSUtils.iBlockDataClass, 0, nmsBlockData);
                 }
                 blockChange.setBlockPosition(blockPosition);

@@ -57,7 +57,7 @@ public final class NMSUtils {
     public static Class<?> nmsEntityClass, minecraftServerClass, craftWorldClass, playerInteractManagerClass, entityPlayerClass, playerConnectionClass, craftServerClass,
             craftPlayerClass, serverConnectionClass, craftEntityClass, nmsItemStackClass, networkManagerClass, nettyChannelClass, gameProfileClass, iChatBaseComponentClass,
             blockPosClass, vec3DClass, channelFutureClass, blockClass, iBlockDataClass, nmsWorldClass, craftItemStackClass,
-            soundEffectClass, minecraftKeyClass, chatSerializerClass, craftMagicNumbersClass, worldSettingsClass, worldServerClass, dataWatcherClass, nmsEntityHumanClass;
+            soundEffectClass, minecraftKeyClass, chatSerializerClass, craftMagicNumbersClass, worldSettingsClass, worldServerClass, dataWatcherClass, nmsEntityHumanClass, dedicatedServerClass;
     public static Class<? extends Enum<?>> enumDirectionClass, enumHandClass, enumGameModeClass;
     public static Method getBlockPosX, getBlockPosY, getBlockPosZ;
     private static String nettyPrefix;
@@ -125,6 +125,7 @@ public final class NMSUtils {
             worldServerClass = getNMSClassWithoutException("WorldServer");
             dataWatcherClass = getNMSClassWithoutException("DataWatcher");
             nmsEntityHumanClass = getNMSClassWithoutException("EntityHuman");
+            dedicatedServerClass = getNMSClassWithoutException("DedicatedServer");
             try {
                 gameProfileClass = Class.forName("net.minecraft.util.com.mojang.authlib.GameProfile");
             } catch (ClassNotFoundException e) {
@@ -397,10 +398,16 @@ public final class NMSUtils {
     public static Object convertBukkitServerToNMSServer(Server server) {
         Object craftServer = craftServerClass.cast(server);
         WrappedPacket wrapper = new WrappedPacket(new NMSPacket(craftServer));
-        return wrapper.readObject(0, minecraftServerClass);
+        try {
+            return wrapper.readObject(0, minecraftServerClass);
+        }
+        catch (Exception ex) {
+            wrapper.readObject(0, dedicatedServerClass);
+        }
+        return null;
     }
 
-    public static Object convertBukkitWorldToNMSWorld(World world) {
+    public static Object convertBukkitWorldToWorldServer(World world) {
         Object craftWorld = craftWorldClass.cast(world);
         try {
             return getCraftWorldHandle.invoke(craftWorld);
