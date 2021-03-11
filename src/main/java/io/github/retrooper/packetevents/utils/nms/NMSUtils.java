@@ -45,8 +45,10 @@ import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
-import java.util.ConcurrentModificationException;
 import java.util.List;
+import java.util.Random;
+import java.util.UUID;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public final class NMSUtils {
     private static final String NMS_DIR = ServerVersion.getNMSDirectory() + ".";
@@ -287,8 +289,7 @@ public final class NMSUtils {
                 }
             }
             return entity;
-        }
-        catch(Exception ex){
+        } catch (Exception ex) {
             return null;
         }
     }
@@ -400,8 +401,7 @@ public final class NMSUtils {
         WrappedPacket wrapper = new WrappedPacket(new NMSPacket(craftServer));
         try {
             return wrapper.readObject(0, minecraftServerClass);
-        }
-        catch (Exception ex) {
+        } catch (Exception ex) {
             wrapper.readObject(0, dedicatedServerClass);
         }
         return null;
@@ -416,9 +416,10 @@ public final class NMSUtils {
         }
         return null;
     }
-@Nullable
+
+    @Nullable
     public static Object generateIChatBaseComponent(String text) {
-        if (text== null) {
+        if (text == null) {
             return null;
         }
         try {
@@ -526,12 +527,38 @@ public final class NMSUtils {
     }
 
     public static Object generateDataWatcher(Entity entity) {
-        Object nmsEntity  = null;
+        Object nmsEntity = null;
         try {
             return dataWatcherConstructor.newInstance(nmsEntity);
         } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
             e.printStackTrace();
         }
         return null;
+    }
+
+    private static final ThreadLocal<Random> randomThreadLocal = ThreadLocal.withInitial(Random::new);
+
+    public static UUID generateUUID() {
+        long var1 = randomThreadLocal.get().nextLong() & -61441L | 16384L;
+        long var3 = randomThreadLocal.get().nextLong() & 4611686018427387903L | -9223372036854775808L;
+        return new UUID(var1, var3);
+    }
+
+    public static int generateEntityId() {
+        Field field = Reflection.getField(nmsEntityClass, "entityCount");
+        try {
+            if (field.getType().equals(AtomicInteger.class)) {
+                //Newer versions
+                AtomicInteger atomicInteger = (AtomicInteger) field.get(null);
+                return atomicInteger.incrementAndGet();
+            } else {
+                int id = field.getInt(null) + 1;
+                field.set(null, id);
+                return id;
+            }
+        } catch (IllegalAccessException ex) {
+            ex.printStackTrace();
+        }
+        throw new IllegalStateException("Failed to generate a new unique entity ID!");
     }
 }
