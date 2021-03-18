@@ -59,19 +59,19 @@ public class WrappedPacketOutEntity extends WrappedPacket implements SendableWra
     }
 
     public WrappedPacketOutEntity(int entityID, double deltaX, double deltaY, double deltaZ,
-                                  byte pitch, byte yaw, boolean onGround, boolean isLook) {
+                                  byte yaw, byte pitch, boolean onGround, boolean isLook) {
         this.entityID = entityID;
         this.deltaX = deltaX;
         this.deltaY = deltaY;
         this.deltaZ = deltaZ;
-        this.pitch = pitch;
         this.yaw = yaw;
+        this.pitch = pitch;
         this.onGround = onGround;
         this.isLook = isLook;
     }
 
     public WrappedPacketOutEntity(int entityID, double deltaX, double deltaY, double deltaZ,
-                                  byte pitch, byte yaw, boolean onGround) {
+                                  byte yaw, byte pitch, boolean onGround) {
         this.entityID = entityID;
         this.deltaX = deltaX;
         this.deltaY = deltaY;
@@ -83,13 +83,13 @@ public class WrappedPacketOutEntity extends WrappedPacket implements SendableWra
     }
 
     public WrappedPacketOutEntity(Entity entity, double deltaX, double deltaY, double deltaZ,
-                                  byte pitch, byte yaw, boolean onGround, boolean isLook) {
-        this(entity.getEntityId(), deltaX, deltaY, deltaZ, pitch, yaw, onGround, isLook);
+                                  byte yaw, byte pitch, boolean onGround, boolean isLook) {
+        this(entity.getEntityId(), deltaX, deltaY, deltaZ, yaw, pitch, onGround, isLook);
     }
 
     public WrappedPacketOutEntity(Entity entity, double deltaX, double deltaY, double deltaZ,
-                                  byte pitch, byte yaw, boolean onGround) {
-        this(entity.getEntityId(), deltaX, deltaY, deltaZ, pitch, yaw, onGround, false);
+                                  byte yaw, byte pitch, boolean onGround) {
+        this(entity.getEntityId(), deltaX, deltaY, deltaZ, yaw, pitch, onGround, false);
     }
 
     @Override
@@ -351,8 +351,8 @@ public class WrappedPacketOutEntity extends WrappedPacket implements SendableWra
             super(packet);
         }
 
-        public WrappedPacketOutEntityLook(int entityID, byte pitch, byte yaw, boolean onGround) {
-            super(entityID, 0, 0, 0, pitch, yaw, onGround, true);
+        public WrappedPacketOutEntityLook(int entityID, byte yaw, byte pitch, boolean onGround) {
+            super(entityID, 0, 0, 0, yaw, pitch, onGround, true);
         }
 
         @Override

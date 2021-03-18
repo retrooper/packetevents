@@ -22,13 +22,15 @@
  * SOFTWARE.
  */
 
-package io.github.retrooper.packetevents.injector.earlyinjector.legacy;
+package io.github.retrooper.packetevents.injector.handler.legacy;
 
 import io.github.retrooper.packetevents.PacketEvents;
 import net.minecraft.util.io.netty.channel.ChannelDuplexHandler;
 import net.minecraft.util.io.netty.channel.ChannelHandlerContext;
 import net.minecraft.util.io.netty.channel.ChannelPromise;
 import org.bukkit.entity.Player;
+
+import java.util.logging.Level;
 
 public class PlayerChannelHandlerLegacy extends ChannelDuplexHandler {
     /**
@@ -46,10 +48,15 @@ public class PlayerChannelHandlerLegacy extends ChannelDuplexHandler {
      */
     @Override
     public void channelRead(final ChannelHandlerContext ctx, Object packet) throws Exception {
-        packet = PacketEvents.get().packetProcessorInternal.read(player, ctx.channel(), packet);
-        if (packet != null) {
-            super.channelRead(ctx, packet);
-            PacketEvents.get().packetProcessorInternal.postRead(player, ctx.channel(), packet);
+        try {
+            packet = PacketEvents.get().packetProcessorInternal.read(player, ctx.channel(), packet);
+            if (packet != null) {
+                super.channelRead(ctx, packet);
+                PacketEvents.get().packetProcessorInternal.postRead(player, ctx.channel(), packet);
+            }
+        }
+        catch (Throwable t) {
+            PacketEvents.get().getPlugin().getLogger().log(Level.SEVERE, "Unable to handle an incoming packet ", t);
         }
     }
 
@@ -63,10 +70,15 @@ public class PlayerChannelHandlerLegacy extends ChannelDuplexHandler {
      */
     @Override
     public void write(final ChannelHandlerContext ctx, Object packet, final ChannelPromise promise) throws Exception {
-        packet = PacketEvents.get().packetProcessorInternal.write(player, ctx.channel(), packet);
-        if (packet != null) {
-            super.write(ctx, packet, promise);
-            PacketEvents.get().packetProcessorInternal.postWrite(player, ctx.channel(), packet);
+        try {
+            packet = PacketEvents.get().packetProcessorInternal.write(player, ctx.channel(), packet);
+            if (packet != null) {
+                super.write(ctx, packet, promise);
+                PacketEvents.get().packetProcessorInternal.postWrite(player, ctx.channel(), packet);
+            }
+        }
+        catch (Throwable t) {
+            PacketEvents.get().getPlugin().getLogger().log(Level.SEVERE, "Unable to handle an outgoing packet ", t);
         }
     }
 }

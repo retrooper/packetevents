@@ -166,6 +166,33 @@ public class Vector3d {
         return null;
     }
 
+    public Vector3d add(Vector3d target) {
+        Vector3d result = new Vector3d(x, y, z);
+        result.x += target.x;
+        result.y += target.y;
+        result.z += target.z;
+        return result;
+    }
+
+    public Vector3d subtract(Vector3d target) {
+        Vector3d result = new Vector3d(x, y, z);
+        result.x -= target.x;
+        result.y -= target.y;
+        result.z -= target.z;
+        return result;
+    }
+
+    public double distance(Vector3d target) {
+        return Math.sqrt(distanceSquared(target));
+    }
+
+    public double distanceSquared(Vector3d target) {
+        double distX = (x - target.x) * (x - target.x);
+        double distY = (y - target.y) * (y - target.y);
+        double distZ = (z - target.z) * (z - target.z);
+        return distX + distY + distZ;
+    }
+
     @Override
     public String toString() {
         return "X: " + x + ", Y: " + y + ", Z: " + z;

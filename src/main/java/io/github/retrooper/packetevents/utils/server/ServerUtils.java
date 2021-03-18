@@ -25,9 +25,11 @@
 package io.github.retrooper.packetevents.utils.server;
 
 import io.github.retrooper.packetevents.utils.nms.NMSUtils;
+import io.github.retrooper.packetevents.utils.npc.NPCManager;
 import org.spigotmc.SpigotConfig;
 
 public final class ServerUtils {
+    private final NPCManager npcManager = new NPCManager();
     /**
      * Get the server version.
      *
@@ -62,6 +64,14 @@ public final class ServerUtils {
      */
     public SystemOS getOS() {
         return SystemOS.getOS();
+    }
+
+    /**
+     * Get the NPC Manager.
+     * @return NPC Manager
+     */
+    public NPCManager getNPCManager() {
+        return npcManager;
     }
 
     public boolean isBungeeCordEnabled() {

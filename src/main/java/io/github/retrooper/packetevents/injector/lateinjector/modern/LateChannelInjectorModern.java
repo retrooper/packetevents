@@ -25,6 +25,7 @@
 package io.github.retrooper.packetevents.injector.lateinjector.modern;
 
 import io.github.retrooper.packetevents.PacketEvents;
+import io.github.retrooper.packetevents.injector.handler.modern.PlayerChannelHandlerModern;
 import io.github.retrooper.packetevents.injector.lateinjector.LateInjector;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelDuplexHandler;
@@ -34,7 +35,7 @@ import org.bukkit.entity.Player;
 
 import java.util.NoSuchElementException;
 
-public class LateChannelInjector implements LateInjector {
+public class LateChannelInjectorModern implements LateInjector {
     @Override
     public void inject() {
 
@@ -47,27 +48,9 @@ public class LateChannelInjector implements LateInjector {
 
     @Override
     public void injectPlayer(Player player) {
-        ChannelDuplexHandler channelDuplexHandler = new ChannelDuplexHandler() {
-            @Override
-            public void channelRead(ChannelHandlerContext ctx, Object packet) throws Exception {
-                packet = PacketEvents.get().packetProcessorInternal.read(player, ctx.channel(), packet);
-                if (packet != null) {
-                    super.channelRead(ctx, packet);
-                    PacketEvents.get().packetProcessorInternal.postRead(player, ctx.channel(), packet);
-                }
-            }
-
-            @Override
-            public void write(ChannelHandlerContext ctx, Object packet, ChannelPromise promise) throws Exception {
-                packet = PacketEvents.get().packetProcessorInternal.write(player, ctx.channel(), packet);
-                if (packet != null) {
-                    super.write(ctx, packet, promise);
-                    PacketEvents.get().packetProcessorInternal.postWrite(player, ctx.channel(), packet);
-                }
-            }
-        };
+        PlayerChannelHandlerModern playerChannelHandlerModern = new PlayerChannelHandlerModern();
         Channel channel = (Channel) PacketEvents.get().packetProcessorInternal.getChannel(player);
-        channel.pipeline().addBefore("packet_handler", PacketEvents.handlerName, channelDuplexHandler);
+        channel.pipeline().addBefore("packet_handler", PacketEvents.handlerName, playerChannelHandlerModern);
     }
 
     @Override
@@ -76,7 +59,7 @@ public class LateChannelInjector implements LateInjector {
         if (channel.pipeline().get(PacketEvents.handlerName) != null) {
             try {
                 channel.pipeline().remove(PacketEvents.handlerName);
-            } catch (NoSuchElementException ignored) {
+            } catch (Exception ignored) {
 
             }
         }

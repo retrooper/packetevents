@@ -26,6 +26,7 @@ package io.github.retrooper.packetevents.injector.earlyinjector.modern;
 
 import io.github.retrooper.packetevents.PacketEvents;
 import io.github.retrooper.packetevents.injector.earlyinjector.EarlyInjector;
+import io.github.retrooper.packetevents.injector.handler.modern.PlayerChannelHandlerModern;
 import io.github.retrooper.packetevents.packetwrappers.NMSPacket;
 import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
 import io.github.retrooper.packetevents.utils.list.ListWrapper;

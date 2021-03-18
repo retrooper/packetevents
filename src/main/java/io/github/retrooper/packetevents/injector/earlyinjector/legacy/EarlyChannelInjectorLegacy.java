@@ -25,8 +25,8 @@
 package io.github.retrooper.packetevents.injector.earlyinjector.legacy;
 
 import io.github.retrooper.packetevents.PacketEvents;
-import io.github.retrooper.packetevents.event.impl.PostPlayerInjectEvent;
 import io.github.retrooper.packetevents.injector.earlyinjector.EarlyInjector;
+import io.github.retrooper.packetevents.injector.handler.legacy.PlayerChannelHandlerLegacy;
 import io.github.retrooper.packetevents.packetwrappers.NMSPacket;
 import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
 import io.github.retrooper.packetevents.utils.list.ListWrapper;

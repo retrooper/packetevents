@@ -25,6 +25,7 @@
 package io.github.retrooper.packetevents.injector.earlyinjector.legacy;
 
 import io.github.retrooper.packetevents.PacketEvents;
+import io.github.retrooper.packetevents.injector.handler.legacy.PlayerChannelHandlerLegacy;
 import io.github.retrooper.packetevents.utils.reflection.Reflection;
 import net.minecraft.util.io.netty.channel.ChannelInitializer;
 import net.minecraft.util.io.netty.channel.socket.SocketChannel;

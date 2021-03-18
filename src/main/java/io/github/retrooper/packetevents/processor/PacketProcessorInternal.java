@@ -41,6 +41,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Internal packet processor.
@@ -51,8 +52,8 @@ import java.util.UUID;
  * @since 1.7.9
  */
 public class PacketProcessorInternal {
-    public final Map<UUID, Long> keepAliveMap = new HashMap<>();
-    public final Map<String, Object> channelMap = new HashMap<>();
+    public final Map<UUID, Long> keepAliveMap = new ConcurrentHashMap<>();
+    public final Map<String, Object> channelMap = new ConcurrentHashMap<>();
 
     public Object getChannel(Player player) {
         String name = player.getName();

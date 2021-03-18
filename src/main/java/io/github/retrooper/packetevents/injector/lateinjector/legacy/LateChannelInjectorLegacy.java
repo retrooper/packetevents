@@ -25,12 +25,9 @@
 package io.github.retrooper.packetevents.injector.lateinjector.legacy;
 
 import io.github.retrooper.packetevents.PacketEvents;
-import io.github.retrooper.packetevents.event.impl.PostPlayerInjectEvent;
+import io.github.retrooper.packetevents.injector.handler.legacy.PlayerChannelHandlerLegacy;
 import io.github.retrooper.packetevents.injector.lateinjector.LateInjector;
 import net.minecraft.util.io.netty.channel.Channel;
-import net.minecraft.util.io.netty.channel.ChannelDuplexHandler;
-import net.minecraft.util.io.netty.channel.ChannelHandlerContext;
-import net.minecraft.util.io.netty.channel.ChannelPromise;
 import org.bukkit.entity.Player;
 
 public class LateChannelInjectorLegacy implements LateInjector {
@@ -46,34 +43,21 @@ public class LateChannelInjectorLegacy implements LateInjector {
 
     @Override
     public void injectPlayer(Player player) {
-        ChannelDuplexHandler channelDuplexHandler = new ChannelDuplexHandler() {
-            @Override
-            public void channelRead(ChannelHandlerContext ctx, Object packet) throws Exception {
-                packet = PacketEvents.get().packetProcessorInternal.read(player, ctx.channel(), packet);
-                if (packet != null) {
-                    super.channelRead(ctx, packet);
-                    PacketEvents.get().packetProcessorInternal.postRead(player, ctx.channel(), packet);
-                }
-            }
-
-            @Override
-            public void write(ChannelHandlerContext ctx, Object packet, ChannelPromise promise) throws Exception {
-                packet = PacketEvents.get().packetProcessorInternal.write(player, ctx.channel(), packet);
-                if (packet != null) {
-                    super.write(ctx, packet, promise);
-                    PacketEvents.get().packetProcessorInternal.postWrite(player, ctx.channel(), packet);
-                }
-            }
-        };
+        PlayerChannelHandlerLegacy playerChannelHandlerLegacy = new PlayerChannelHandlerLegacy();
         Channel channel = (Channel) PacketEvents.get().packetProcessorInternal.getChannel(player);
-        channel.pipeline().addBefore("packet_handler", PacketEvents.handlerName, channelDuplexHandler);
+        channel.pipeline().addBefore("packet_handler", PacketEvents.handlerName, playerChannelHandlerLegacy);
     }
 
     @Override
     public void ejectPlayer(Player player) {
         Channel channel = (Channel) PacketEvents.get().packetProcessorInternal.getChannel(player);
         if (channel.pipeline().get(PacketEvents.handlerName) != null) {
-            channel.pipeline().remove(PacketEvents.handlerName);
+            try {
+                channel.pipeline().remove(PacketEvents.handlerName);
+            }
+            catch (Exception ignored) {
+
+            }
         }
     }
 
