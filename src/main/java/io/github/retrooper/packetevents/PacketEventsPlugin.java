@@ -28,6 +28,7 @@ import io.github.retrooper.packetevents.settings.PacketEventsSettings;
 import org.bukkit.plugin.java.JavaPlugin;
 
 public class PacketEventsPlugin extends JavaPlugin {
+    //TODO custom kb add perms kekw
     @Override
     public void onLoad() {
         PacketEvents.create(this);

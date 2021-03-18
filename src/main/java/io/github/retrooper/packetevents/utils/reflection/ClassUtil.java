@@ -24,11 +24,11 @@
 
 package io.github.retrooper.packetevents.utils.reflection;
 
-import java.util.HashMap;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.Map;
 
 public class ClassUtil {
-    private static final Map<String, String> CLASS_SIMPLE_NAME_CACHE = new HashMap<>();
+    private static final Map<String, String> CLASS_SIMPLE_NAME_CACHE = new ConcurrentHashMap<>();
 
     public static String getClassSimpleName(Class<?> cls) {
         final String className = cls.getName();
