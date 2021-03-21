@@ -56,7 +56,7 @@ public class PlayerChannelHandlerLegacy extends ChannelDuplexHandler {
             }
         }
         catch (Throwable t) {
-            PacketEvents.get().getPlugin().getLogger().log(Level.SEVERE, "Unable to handle an incoming packet ", t);
+            PacketEvents.get().getPlugin().getLogger().log(Level.SEVERE, "Unable to handle an incoming packet ", t.getMessage());
         }
     }
 
@@ -78,7 +78,7 @@ public class PlayerChannelHandlerLegacy extends ChannelDuplexHandler {
             }
         }
         catch (Throwable t) {
-            PacketEvents.get().getPlugin().getLogger().log(Level.SEVERE, "Unable to handle an outgoing packet ", t);
+            PacketEvents.get().getPlugin().getLogger().log(Level.SEVERE, "Unable to handle an outgoing packet ", t.getMessage());
         }
     }
 }
