@@ -200,10 +200,6 @@ public final class PacketEvents implements Listener, EventManager {
 
     public void terminate() {
         if (initialized && !terminating) {
-            for (Player player : Bukkit.getOnlinePlayers()) {
-                injector.ejectPlayer(player);
-            }
-
             injector.eject();
 
             getEventManager().unregisterAllListeners();
@@ -289,6 +285,7 @@ public final class PacketEvents implements Listener, EventManager {
         final Player player = e.getPlayer();
         if (!getSettings().shouldUseCompatibilityInjector()) {
             injector.injectPlayer(player);
+            System.out.println(e.getAddress().getHostName() + " was injected!");
         }
     }
 
@@ -329,7 +326,6 @@ public final class PacketEvents implements Listener, EventManager {
         Player player = e.getPlayer();
         UUID uuid = player.getUniqueId();
         InetSocketAddress address = player.getAddress();
-        injector.ejectPlayer(e.getPlayer());
         //Cleanup user data
         playerUtils.loginTime.remove(uuid);
         playerUtils.playerPingMap.remove(uuid);

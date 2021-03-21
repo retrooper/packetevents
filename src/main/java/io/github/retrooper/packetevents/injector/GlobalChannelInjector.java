@@ -40,7 +40,7 @@ public class GlobalChannelInjector implements ChannelInjector {
                 PacketEvents.get().getSettings().compatInjector(true);
                 load();
                 injector.inject();
-                throw new IllegalStateException("PacketEvents failed to inject with the Early Injector. Reverting to the Compatibility/Late Injector... Please report this!", ex);
+                PacketEvents.get().getPlugin().getLogger().warning("PacketEvents failed to inject with the Early Injector. Reverting to the Compatibility/Late Injector... This is just a warning, but please report this!");
             }
         }
     }
@@ -58,20 +58,6 @@ public class GlobalChannelInjector implements ChannelInjector {
             injector.injectPlayer(player);
         }
     }
-
-    @Override
-    public void ejectPlayer(Player player) {
-        PlayerEjectEvent ejectEvent = new PlayerEjectEvent(player);
-        PacketEvents.get().callEvent(ejectEvent);
-        if (!ejectEvent.isCancelled()) {
-            try {
-                injector.ejectPlayer(player);
-            } catch (NoSuchElementException ignored) {
-                //We have already ejected them.
-            }
-        }
-    }
-
     @Override
     public boolean hasInjected(Player player) {
         return injector.hasInjected(player);

@@ -268,6 +268,7 @@ public class PacketProcessorInternal {
             int protocolVersion = handshake.getProtocolVersion();
             ClientVersion version = ClientVersion.getClientVersion(protocolVersion);
             PacketEvents.get().getPlayerUtils().tempClientVersionMap.put(event.getSocketAddress(), version);
+            System.out.println("VERSION: " + version.name());
         }
     }
 

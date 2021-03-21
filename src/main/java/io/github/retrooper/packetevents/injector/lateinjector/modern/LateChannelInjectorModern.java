@@ -54,18 +54,6 @@ public class LateChannelInjectorModern implements LateInjector {
     }
 
     @Override
-    public void ejectPlayer(Player player) {
-        Channel channel = (Channel) PacketEvents.get().packetProcessorInternal.getChannel(player);
-        if (channel.pipeline().get(PacketEvents.handlerName) != null) {
-            try {
-                channel.pipeline().remove(PacketEvents.handlerName);
-            } catch (Exception ignored) {
-
-            }
-        }
-    }
-
-    @Override
     public boolean hasInjected(Player player) {
         Channel channel = (Channel) PacketEvents.get().packetProcessorInternal.getChannel(player);
         return channel.pipeline().get(PacketEvents.handlerName) != null;

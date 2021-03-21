@@ -243,16 +243,6 @@ public class EarlyChannelInjectorLegacy implements EarlyInjector {
     }
 
     @Override
-    public void ejectPlayer(Player player) {
-        Channel channel = (Channel) PacketEvents.get().packetProcessorInternal.getChannel(player);
-        if (channel != null) {
-            if (channel.pipeline().get(PacketEvents.handlerName) != null) {
-                channel.pipeline().remove(PacketEvents.handlerName);
-            }
-        }
-    }
-
-    @Override
     public boolean hasInjected(Player player) {
         Object channel = PacketEvents.get().packetProcessorInternal.getChannel(player);
         if (channel == null) {

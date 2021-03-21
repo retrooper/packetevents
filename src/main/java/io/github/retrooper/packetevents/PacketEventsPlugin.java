@@ -24,6 +24,9 @@
 
 package io.github.retrooper.packetevents;
 
+import io.github.retrooper.packetevents.event.PacketListenerDynamic;
+import io.github.retrooper.packetevents.event.impl.PacketPlayReceiveEvent;
+import io.github.retrooper.packetevents.packettype.PacketType;
 import io.github.retrooper.packetevents.settings.PacketEventsSettings;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -31,16 +34,19 @@ public class PacketEventsPlugin extends JavaPlugin {
     //TODO custom kb add perms kekw
     @Override
     public void onLoad() {
-        PacketEvents.create(this);
-        PacketEventsSettings settings = PacketEvents.get().getSettings();
+        //Return value of create is your PacketEvents instance.
+        PacketEvents instance = PacketEvents.create(this);
+        PacketEventsSettings settings = instance.getSettings();
         settings.compatInjector(false);
         settings.checkForUpdates(false);
-        PacketEvents.get().loadAsyncNewThread();
+        instance.loadAsyncNewThread();
     }
 
     @Override
     public void onEnable() {
+        //Other way to access your instance...
         PacketEvents.get().init();
+
     }
 
     @Override

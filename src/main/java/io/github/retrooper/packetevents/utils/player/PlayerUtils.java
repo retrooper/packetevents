@@ -222,19 +222,6 @@ public final class PlayerUtils {
     }
 
     /**
-     * High level player ejection method.
-     * This method will call the {@link io.github.retrooper.packetevents.event.impl.PlayerEjectEvent}
-     * event and if the event gets cancelled, this action will cancel too.
-     * The ejection action and event call will be async or sync depending on the PacketEvents settings.
-     * Recommended to use this as this most likely won't ever change/refactor compared to using our internal utils.
-     *
-     * @param player Target player.
-     */
-    public void ejectPlayer(final Player player) {
-        PacketEvents.get().injector.ejectPlayer(player);
-    }
-
-    /**
      * Send a client-bound(server-sided) wrapper that supports sending to a player.
      *
      * @param player  Packet receiver.
