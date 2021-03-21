@@ -285,7 +285,6 @@ public final class PacketEvents implements Listener, EventManager {
         final Player player = e.getPlayer();
         if (!getSettings().shouldUseCompatibilityInjector()) {
             injector.injectPlayer(player);
-            System.out.println(e.getAddress().getHostName() + " was injected!");
         }
     }
 
