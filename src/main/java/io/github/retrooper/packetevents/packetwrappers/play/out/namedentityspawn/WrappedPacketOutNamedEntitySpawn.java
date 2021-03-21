@@ -80,7 +80,7 @@ public class WrappedPacketOutNamedEntitySpawn extends WrappedPacket implements S
                 y = readDouble(1);
                 z = readDouble(2);
             } else {
-                x = readInt(1) / 32.0D; //TODO fix on 1.16, its doubles
+                x = readInt(1) / 32.0D;
                 y = readInt(2) / 32.0D;
                 z = readInt(3) / 32.0D;
             }

@@ -55,6 +55,9 @@ public final class Reflection {
     }
 
     public static Field getField(final Class<?> cls, final Class<?> dataType, final int index) {
+        if (dataType == null || cls == null) {
+            return null;
+        }
         int currentIndex = 0;
         for (final Field f : getFields(cls)) {
             if (dataType.isAssignableFrom(f.getType())) {
