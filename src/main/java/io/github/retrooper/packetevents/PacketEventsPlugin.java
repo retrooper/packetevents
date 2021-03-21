@@ -24,11 +24,6 @@
 
 package io.github.retrooper.packetevents;
 
-import io.github.retrooper.packetevents.event.PacketListenerDynamic;
-import io.github.retrooper.packetevents.event.impl.PacketPlayReceiveEvent;
-import io.github.retrooper.packetevents.event.impl.PacketPlaySendEvent;
-import io.github.retrooper.packetevents.packettype.PacketType;
-import io.github.retrooper.packetevents.packetwrappers.play.out.namedsoundeffect.WrappedPacketOutNamedSoundEffect;
 import io.github.retrooper.packetevents.settings.PacketEventsSettings;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -48,16 +43,6 @@ public class PacketEventsPlugin extends JavaPlugin {
     public void onEnable() {
         //Other way to access your instance...
         PacketEvents.get().init();
-        PacketEvents.get().registerListener(new PacketListenerDynamic() {
-            @Override
-            public void onPacketPlaySend(PacketPlaySendEvent event) {
-                if (event.getPacketId() == PacketType.Play.Server.NAMED_SOUND_EFFECT) {
-                    WrappedPacketOutNamedSoundEffect soundEffect = new WrappedPacketOutNamedSoundEffect(event.getNMSPacket());
-                    String name = soundEffect.getSoundEffectName();
-                    event.getPlayer().sendMessage("Name: " + name + ", Pitch: " + soundEffect.getPitch() + ", Volume: " + soundEffect.getVolume());
-                }
-            }
-        });
     }
 
     @Override

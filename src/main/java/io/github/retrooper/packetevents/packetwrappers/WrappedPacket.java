@@ -163,6 +163,7 @@ public class WrappedPacket implements WrapperPacketReader, WrapperPacketWriter {
             }
             versionList.addAll(Arrays.asList(ServerVersion.values()).subList(first.ordinal(), last.ordinal() + 1));
         }
+        versionList.remove(ServerVersion.ERROR);
         return versionList;
     }
 
