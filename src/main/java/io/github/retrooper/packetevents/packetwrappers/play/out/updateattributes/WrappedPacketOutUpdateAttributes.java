@@ -37,8 +37,6 @@ public class WrappedPacketOutUpdateAttributes extends WrappedPacket implements S
     }
 
 
-
-
     @Override
     protected void load() {
         try {

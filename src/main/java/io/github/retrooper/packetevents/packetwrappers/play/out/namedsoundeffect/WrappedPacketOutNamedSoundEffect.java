@@ -6,7 +6,6 @@ import io.github.retrooper.packetevents.packetwrappers.SendableWrapper;
 import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
 import io.github.retrooper.packetevents.utils.enums.EnumUtil;
 import io.github.retrooper.packetevents.utils.nms.NMSUtils;
-import io.github.retrooper.packetevents.utils.reflection.Reflection;
 import io.github.retrooper.packetevents.utils.server.ServerVersion;
 import io.github.retrooper.packetevents.utils.vector.Vector3d;
 import org.jetbrains.annotations.Nullable;
@@ -14,7 +13,6 @@ import org.jetbrains.annotations.Nullable;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 
-//TODO Test sending
 public class WrappedPacketOutNamedSoundEffect extends WrappedPacket implements SendableWrapper {
     private static Constructor<?> packetDefaultConstructor, soundEffectConstructor;
     private static Class<? extends Enum<?>> enumSoundCategoryClass;
@@ -29,15 +27,17 @@ public class WrappedPacketOutNamedSoundEffect extends WrappedPacket implements S
         super(packet);
     }
 
-    public WrappedPacketOutNamedSoundEffect(String soundEffectName, Vector3d effectPosition, float volume, float pitch) {
+    public WrappedPacketOutNamedSoundEffect(String soundEffectName, @Nullable SoundCategory soundCategory, Vector3d effectPosition, float volume, float pitch) {
         this.soundEffectName = soundEffectName;
+        this.soundCategory = soundCategory;
         this.effectPosition = effectPosition;
         this.volume = volume;
         this.pitch = pitch;
     }
 
-    public WrappedPacketOutNamedSoundEffect(String soundEffectName, double effectPositionX, double effectPositionY, double effectPositionZ, float volume, float pitch) {
+    public WrappedPacketOutNamedSoundEffect(String soundEffectName, @Nullable SoundCategory soundCategory, double effectPositionX, double effectPositionY, double effectPositionZ, float volume, float pitch) {
         this.soundEffectName = soundEffectName;
+        this.soundCategory = soundCategory;
         this.effectPosition = new Vector3d(effectPositionX, effectPositionY, effectPositionZ);
         this.volume = volume;
         this.pitch = pitch;
@@ -105,19 +105,20 @@ public class WrappedPacketOutNamedSoundEffect extends WrappedPacket implements S
         if (packet != null) {
             Enum<?> enumConst = readEnumConstant(0, enumSoundCategoryClass);
             return SoundCategory.getByName(enumConst.name());
-        }
-        else {
+        } else {
             return soundCategory;
         }
     }
 
     @SupportedVersions(ranges = {ServerVersion.v_1_9, ServerVersion.ERROR})
     public void setSoundCategory(SoundCategory soundCategory) {
+        if (version.isOlderThan(ServerVersion.v_1_9)) {
+            throwUnsupportedOperation();
+        }
         if (packet != null) {
             Enum<?> enumConst = EnumUtil.valueOf(enumSoundCategoryClass, soundCategory.name());
             writeEnumConstant(0, enumConst);
-        }
-        else {
+        } else {
             this.soundCategory = soundCategory;
         }
     }
@@ -135,11 +136,10 @@ public class WrappedPacketOutNamedSoundEffect extends WrappedPacket implements S
 
     public void setEffectPosition(Vector3d effectPosition) {
         if (packet != null) {
-            writeInt(0, (int)(effectPosition.x  / 8.0D));
-            writeInt(1, (int)(effectPosition.y  / 8.0D));
-            writeInt(2, (int)(effectPosition.z  / 8.0D));
-        }
-        else {
+            writeInt(0, (int) (effectPosition.x / 8.0D));
+            writeInt(1, (int) (effectPosition.y / 8.0D));
+            writeInt(2, (int) (effectPosition.z / 8.0D));
+        } else {
             this.effectPosition = effectPosition;
         }
     }
@@ -148,8 +148,7 @@ public class WrappedPacketOutNamedSoundEffect extends WrappedPacket implements S
     public float getVolume() {
         if (packet != null) {
             return readFloat(0);
-        }
-        else {
+        } else {
             return volume;
         }
     }
@@ -157,8 +156,7 @@ public class WrappedPacketOutNamedSoundEffect extends WrappedPacket implements S
     public void setVolume(float volume) {
         if (packet != null) {
             writeFloat(0, volume);
-        }
-        else {
+        } else {
             this.volume = volume;
         }
     }
@@ -170,8 +168,7 @@ public class WrappedPacketOutNamedSoundEffect extends WrappedPacket implements S
             } else {
                 return readFloat(1);
             }
-        }
-        else {
+        } else {
             return pitch;
         }
     }
@@ -183,8 +180,7 @@ public class WrappedPacketOutNamedSoundEffect extends WrappedPacket implements S
             } else {
                 writeFloat(1, pitch);
             }
-        }
-        else {
+        } else {
             this.pitch = pitch;
         }
     }
@@ -219,6 +215,7 @@ public class WrappedPacketOutNamedSoundEffect extends WrappedPacket implements S
         PLAYERS,
         AMBIENT,
         VOICE;
+
         @Nullable
         public static SoundCategory getByName(String name) {
             for (SoundCategory value : values()) {

@@ -184,17 +184,16 @@ public class WrappedPacketOutBlockChange extends WrappedPacket implements Sendab
 
     @Override
     public Object asNMSPacket() {
-        Object nmsPacket = null;
+        Object packetPlayOutBlockChangeInstance = null;
         WrappedPacketOutBlockChange blockChange;
         Vector3i blockPosition = getBlockPosition();
         if (version.isOlderThan(ServerVersion.v_1_8)) {
             try {
                 Object nmsWorld = NMSUtils.convertBukkitWorldToWorldServer(world);
-
-                nmsPacket = packetConstructor.newInstance(blockPosition.x, blockPosition.y, blockPosition.z, nmsWorld);
-                blockChange = new WrappedPacketOutBlockChange(new NMSPacket(nmsPacket));
-                if (material != null) {
-                    blockChange.setMaterial(material);
+                packetPlayOutBlockChangeInstance = packetConstructor.newInstance(blockPosition.x, blockPosition.y, blockPosition.z, nmsWorld);
+                blockChange = new WrappedPacketOutBlockChange(new NMSPacket(packetPlayOutBlockChangeInstance));
+                if (getMaterial() != null) {
+                    blockChange.setMaterial(getMaterial());
                 }
             } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
                 e.printStackTrace();
@@ -202,10 +201,10 @@ public class WrappedPacketOutBlockChange extends WrappedPacket implements Sendab
 
         } else {
             try {
-                nmsPacket = packetConstructor.newInstance();
-                blockChange = new WrappedPacketOutBlockChange(new NMSPacket(nmsPacket));
-                if (material != null) {
-                    blockChange.setMaterial(material);
+                packetPlayOutBlockChangeInstance = packetConstructor.newInstance();
+                blockChange = new WrappedPacketOutBlockChange(new NMSPacket(packetPlayOutBlockChangeInstance));
+                if (getMaterial() != null) {
+                    blockChange.setMaterial(getMaterial());
                 } else {
                     Object nmsBlockPos = NMSUtils.generateNMSBlockPos(blockPosition.x, blockPosition.y, blockPosition.z);
                     Object worldServer = NMSUtils.convertBukkitWorldToWorldServer(world);
@@ -218,6 +217,6 @@ public class WrappedPacketOutBlockChange extends WrappedPacket implements Sendab
                 e.printStackTrace();
             }
         }
-        return nmsPacket;
+        return packetPlayOutBlockChangeInstance;
     }
 }

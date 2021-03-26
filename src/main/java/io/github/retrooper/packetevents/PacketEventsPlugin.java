@@ -24,8 +24,14 @@
 
 package io.github.retrooper.packetevents;
 
+import io.github.retrooper.packetevents.event.PacketListenerDynamic;
+import io.github.retrooper.packetevents.event.impl.PacketPlaySendEvent;
+import io.github.retrooper.packetevents.packettype.PacketType;
+import io.github.retrooper.packetevents.packetwrappers.play.out.tabcomplete.WrappedPacketOutTabComplete;
 import io.github.retrooper.packetevents.settings.PacketEventsSettings;
 import org.bukkit.plugin.java.JavaPlugin;
+
+import java.util.Arrays;
 
 public class PacketEventsPlugin extends JavaPlugin {
     //TODO custom kb add perms kekw
@@ -41,6 +47,17 @@ public class PacketEventsPlugin extends JavaPlugin {
 
     @Override
     public void onEnable() {
+        PacketEvents.get().registerListener(new PacketListenerDynamic() {
+            @Override
+            public void onPacketPlaySend(PacketPlaySendEvent event) {
+                byte packetID = event.getPacketId();
+                if (packetID == PacketType.Play.Server.TAB_COMPLETE) {
+                    WrappedPacketOutTabComplete tabComplete = new WrappedPacketOutTabComplete(event.getNMSPacket());
+                    String[] matches = tabComplete.getMatches();
+                    event.getPlayer().sendMessage("Matches: " + Arrays.toString(matches));
+                }
+            }
+        });
         //Other way to access your instance...
         PacketEvents.get().init();
     }

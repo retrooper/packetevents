@@ -24,7 +24,6 @@
 
 package io.github.retrooper.packetevents.packetwrappers.handshaking.setprotocol;
 
-import io.github.retrooper.packetevents.packettype.PacketTypeClasses;
 import io.github.retrooper.packetevents.packetwrappers.NMSPacket;
 import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
 
@@ -56,10 +55,5 @@ public class WrappedPacketHandshakingInSetProtocol extends WrappedPacket {
 
     public void setHostName(String hostName) {
         writeString(0, hostName);
-    }
-
-    @Override
-    public boolean isSupported() {
-        return PacketTypeClasses.Handshaking.Client.SET_PROTOCOL != null;
     }
 }
