@@ -81,14 +81,28 @@ public final class PacketEvents implements Listener, EventManager {
     private ByteBufUtil byteBufUtil;
 
     public static PacketEvents create(final Plugin plugin) {
-        if (!Bukkit.getServicesManager().isProvidedFor(PacketEvents.class)) {
-            instance = new PacketEvents();
-            Bukkit.getServicesManager().register(PacketEvents.class, instance,
-                    plugin, ServicePriority.Normal);
-            PacketEvents.plugin = plugin;
+        if (Bukkit.isPrimaryThread()) {
+            //We are on the main thread
+            if (!Bukkit.getServicesManager().isProvidedFor(PacketEvents.class)) {
+                //We can register in the service manager.
+                instance = new PacketEvents();
+                Bukkit.getServicesManager().register(PacketEvents.class, instance,
+                        plugin, ServicePriority.Normal);
+                PacketEvents.plugin = plugin;
+                return instance;
+            }
+            else {
+                //We have already registered. Let us load what was registered.
+                return instance = Bukkit.getServicesManager().load(PacketEvents.class);
+            }
+        }
+        else {
+            //We are off thread, we cannot use the service manager.
+            if (instance == null) {
+                instance = new PacketEvents();
+            }
             return instance;
         }
-        return instance = Bukkit.getServicesManager().load(PacketEvents.class);
     }
 
     public static PacketEvents get() {

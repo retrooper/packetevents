@@ -24,8 +24,10 @@
 
 package io.github.retrooper.packetevents.packettype;
 
+import io.github.retrooper.packetevents.PacketEvents;
 import io.github.retrooper.packetevents.utils.nms.NMSUtils;
 import io.github.retrooper.packetevents.utils.reflection.SubclassUtil;
+import io.github.retrooper.packetevents.utils.server.ServerVersion;
 
 public class PacketTypeClasses {
     public static void load() {
@@ -77,8 +79,10 @@ public class PacketTypeClasses {
             public static Class<?> CUSTOM_PAYLOAD, START, ENCRYPTION_BEGIN;
 
             public static void load() {
-                //In and Out custom payload login packets have been here since AROUND 1.13.2.
-                Client.CUSTOM_PAYLOAD = NMSUtils.getNMSClassWithoutException("PacketLoginInCustomPayload");
+                //In and Out custom payload login packets have been here since 1.13
+                if (PacketEvents.get().getServerUtils().getVersion().isNewerThanOrEquals(ServerVersion.v_1_13)) {
+                    Client.CUSTOM_PAYLOAD = NMSUtils.getNMSClassWithoutException("PacketLoginInCustomPayload");
+                }
                 Client.START = NMSUtils.getNMSClassWithoutException("PacketLoginInStart");
                 Client.ENCRYPTION_BEGIN = NMSUtils.getNMSClassWithoutException("PacketLoginInEncryptionBegin");
             }
@@ -88,7 +92,10 @@ public class PacketTypeClasses {
             public static Class<?> CUSTOM_PAYLOAD, DISCONNECT, ENCRYPTION_BEGIN, SUCCESS, SET_COMPRESSION;
 
             public static void load() {
-                Server.CUSTOM_PAYLOAD = NMSUtils.getNMSClassWithoutException("PacketLoginOutCustomPayload");
+                //In and Out custom payload login packets have been here since 1.13
+                if (PacketEvents.get().getServerUtils().getVersion().isNewerThanOrEquals(ServerVersion.v_1_13)) {
+                    Server.CUSTOM_PAYLOAD = NMSUtils.getNMSClassWithoutException("PacketLoginOutCustomPayload");
+                }
                 Server.DISCONNECT = NMSUtils.getNMSClassWithoutException("PacketLoginOutDisconnect");
                 Server.ENCRYPTION_BEGIN = NMSUtils.getNMSClassWithoutException("PacketLoginOutEncryptionBegin");
                 Server.SUCCESS = NMSUtils.getNMSClassWithoutException("PacketLoginOutSuccess");

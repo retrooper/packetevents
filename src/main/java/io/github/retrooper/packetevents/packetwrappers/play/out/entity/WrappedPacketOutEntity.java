@@ -309,7 +309,6 @@ public class WrappedPacketOutEntity extends WrappedPacket implements SendableWra
         }
     }
 
-    //TODO civ through all versions
     public boolean isLook() {
         if (packet != null) {
             return readBoolean(1);
@@ -318,7 +317,6 @@ public class WrappedPacketOutEntity extends WrappedPacket implements SendableWra
         }
     }
 
-    //TODO civ through all versions
     public void setLook(boolean isLook) {
         if (packet != null) {
             writeBoolean(1, isLook);

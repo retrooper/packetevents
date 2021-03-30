@@ -29,6 +29,15 @@ class WrappedPacketOutRespawn extends WrappedPacket implements SendableWrapper {
         dimensionManagerClass = NMSUtils.getNMSClassWithoutException("DimensionManager");
         worldTypeClass = NMSUtils.getNMSClassWithoutException("WorldType");
         enumDifficultyClass = NMSUtils.getNMSEnumClassWithoutException("EnumDifficulty");
+        /*net.minecraft.server.v1_7_R4.PacketPlayOutRespawn a0;
+        net.minecraft.server.v1_8_R3.PacketPlayOutRespawn a1;
+        net.minecraft.server.v1_9_R1.PacketPlayOutRespawn a2;
+        net.minecraft.server.v1_9_R2.PacketPlayOutRespawn a3;
+        net.minecraft.server.v1_12_R1.PacketPlayOutRespawn a4;
+        net.minecraft.server.v1_13_R1.PacketPlayOutRespawn a5;
+        net.minecraft.server.v1_13_R2.PacketPlayOutRespawn a6;
+        net.minecraft.server.v1_16_R2.PacketPlayOutRespawn a7;*/
+
     }
 
     public Dimension getDimension() {
@@ -47,12 +56,15 @@ class WrappedPacketOutRespawn extends WrappedPacket implements SendableWrapper {
         }
     }
 /*
-    public Difficulty getDifficulty() {
+    public void setDimension(Dimension dimension) {
         if (packet != null) {
-            Enum<?> enumConst = readEnumConstant(0, enumDifficultyClass);
-            return Difficulty.values()[enumConst.ordinal()];
-        } else {
-            return difficulty;
+            if (version.isOlderThan(ServerVersion.v_1_13_2)) {
+                writeInt(0, dimension.getId());
+            } else {
+                Object dimensionManagerObject = readObject(0, dimensionManagerClass);
+                WrappedPacket dimensionManagerWrapper = new WrappedPacket(new NMSPacket(dimensionManagerObject));
+                dimensionID = dimensionManagerWrapper.readInt(0) - 1;
+            }
         }
     }*/
 
@@ -70,7 +82,7 @@ class WrappedPacketOutRespawn extends WrappedPacket implements SendableWrapper {
             return gameMode;
         }
     }
-/*
+
     public LevelType getLevelType() {
         if (packet != null) {
             //TODO
@@ -82,7 +94,7 @@ class WrappedPacketOutRespawn extends WrappedPacket implements SendableWrapper {
         else {
             return levelType;
         }
-    }*/
+    }
 
     @Override
     public Object asNMSPacket() {

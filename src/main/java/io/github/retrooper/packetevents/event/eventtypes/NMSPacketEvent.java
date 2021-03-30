@@ -44,15 +44,16 @@ public abstract class NMSPacketEvent extends PacketEvent implements CallableEven
     private final InetSocketAddress socketAddress;
     protected NMSPacket packet;
     protected boolean cancelled;
+    private final byte packetID;
 
     public NMSPacketEvent(Object channel, NMSPacket packet) {
-        this.socketAddress = ChannelUtils.getSocketAddress(channel);
-        this.packet = packet;
+        this(ChannelUtils.getSocketAddress(channel), packet);//Call the constructor below
     }
 
     public NMSPacketEvent(InetSocketAddress address, NMSPacket packet) {
         this.socketAddress = address;
         this.packet = packet;
+        packetID = PacketType.packetIDMap.getOrDefault(packet.getRawNMSPacket().getClass(), PacketType.INVALID);
     }
 
     /**
@@ -105,7 +106,7 @@ public abstract class NMSPacketEvent extends PacketEvent implements CallableEven
      * @return Packet ID.
      */
     public byte getPacketId() {
-        return PacketType.packetIDMap.getOrDefault(packet.getRawNMSPacket().getClass(), PacketType.INVALID);
+        return packetID;
     }
 
     @Override

@@ -25,6 +25,7 @@
 package io.github.retrooper.packetevents.packettype;
 
 import io.github.retrooper.packetevents.PacketEvents;
+import io.github.retrooper.packetevents.utils.reflection.Reflection;
 import io.github.retrooper.packetevents.utils.reflection.SubclassUtil;
 import io.github.retrooper.packetevents.utils.server.ServerVersion;
 
@@ -50,24 +51,16 @@ public class PacketType {
 
     public static void load() {
         for (Class<?> cls : PacketType.class.getDeclaredClasses()) {
-            Class<?> packetTypeClassesSubclass = SubclassUtil.getSubClass(PacketTypeClasses.class, cls.getSimpleName());
             for (Class<?> boundCls : cls.getDeclaredClasses()) {
-                Class<?> packetTypeClassesSubclassBoundClass = SubclassUtil.getSubClass(packetTypeClassesSubclass, boundCls.getSimpleName());
                 for (Field f : boundCls.getFields()) {
-                    String fieldName = f.getName();
-                    Class<?> fieldType = f.getType();
-                    if (fieldType.equals(byte.class)) {
-                        Field packetTypeClassesSubclassBoundField = null;
-                        try {
-                            packetTypeClassesSubclassBoundField = packetTypeClassesSubclassBoundClass.getDeclaredField(fieldName);
-                        } catch (NoSuchFieldException e) {
-                            e.printStackTrace();
-                        }
-
+                    if (f.getType().equals(byte.class)) {
                         try {
                             byte byteID = f.getByte(null);
-                            packetIDMap.put((Class<?>) packetTypeClassesSubclassBoundField.get(null), byteID);
-                        } catch (IllegalAccessException e) {
+                            Class<?> packetTypeClassesState = SubclassUtil.getSubClass(PacketTypeClasses.class, cls.getSimpleName());
+                            Class<?> packetTypeClassesStateBinding = SubclassUtil.getSubClass(packetTypeClassesState, boundCls.getSimpleName());
+                            Class<?> packetClass = (Class<?>) packetTypeClassesStateBinding.getDeclaredField(f.getName()).get(null);
+                            packetIDMap.put(packetClass, byteID);
+                        } catch (IllegalAccessException | NoSuchFieldException e) {
                             e.printStackTrace();
                         }
                     }
