@@ -138,7 +138,9 @@ public final class NMSUtils {
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
         }
-        blockPosClass = NMSUtils.getNMSClassWithoutException("BlockPosition");
+        if (version.isNewerThan(ServerVersion.v_1_7_10)) {
+            blockPosClass = NMSUtils.getNMSClassWithoutException("BlockPosition");
+        }
         try {
             //If null, it is 1.7.10
             if (blockPosClass != null) {

@@ -45,11 +45,10 @@ public class WrappedPacketInUpdateSign extends WrappedPacket {
     protected void load() {
         v_1_7_mode = Reflection.getField(PacketTypeClasses.Play.Client.UPDATE_SIGN, int.class, 0) != null;
         strArrayMode = Reflection.getField(PacketTypeClasses.Play.Client.UPDATE_SIGN, String[].class, 0) != null;
-
-        try {
-            blockPosClass = NMSUtils.getNMSClass("BlockPosition");
-        } catch (ClassNotFoundException e) {
-            if (!v_1_7_mode) {
+        if (!v_1_7_mode) {
+            try {
+                blockPosClass = NMSUtils.getNMSClass("BlockPosition");
+            } catch (ClassNotFoundException e) {
                 e.printStackTrace();
             }
         }
