@@ -48,7 +48,7 @@ public class PacketType {
     
     private static void insertPacketID(Class<?> cls, byte packetID) {
         if (cls != null) {
-            insertPacketID(cls, packetID);
+            packetIDMap.put(cls, packetID);
         }
     }
 
