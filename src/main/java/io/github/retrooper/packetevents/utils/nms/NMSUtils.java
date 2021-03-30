@@ -90,7 +90,7 @@ public final class NMSUtils {
         try {
             //Test if the selected netty location is valid
             Object chnl = getNettyClass("channel.Channel");
-        } catch (ClassNotFoundException ex) {
+        } catch (Exception ex) {
             System.err.println("[packetevents] Failed to locate the netty package location for your server version. Searching...");
             //Time to correct the netty location
             if (legacyNettyImportMode) {
@@ -190,7 +190,7 @@ public final class NMSUtils {
             if (minecraftKeyClass != null) {
                 minecraftKeyConstructor = minecraftKeyClass.getConstructor(String.class);
             }
-        } catch (NoSuchMethodException | ClassNotFoundException e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
         try {
@@ -252,7 +252,7 @@ public final class NMSUtils {
     public static Class<? extends Enum<?>> getNMSEnumClassWithoutException(String name) {
         try {
             return (Class<? extends Enum<?>>) getNMSClass(name);
-        } catch (ClassNotFoundException e) {
+        } catch (Exception e) {
             return null;
         }
 
@@ -261,7 +261,7 @@ public final class NMSUtils {
     public static Class<?> getNMSClassWithoutException(String name) {
         try {
             return getNMSClass(name);
-        } catch (ClassNotFoundException e) {
+        } catch (Exception e) {
             return null;
         }
 

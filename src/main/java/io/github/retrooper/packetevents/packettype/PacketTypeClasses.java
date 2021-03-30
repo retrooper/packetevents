@@ -99,7 +99,9 @@ public class PacketTypeClasses {
                 Server.DISCONNECT = NMSUtils.getNMSClassWithoutException("PacketLoginOutDisconnect");
                 Server.ENCRYPTION_BEGIN = NMSUtils.getNMSClassWithoutException("PacketLoginOutEncryptionBegin");
                 Server.SUCCESS = NMSUtils.getNMSClassWithoutException("PacketLoginOutSuccess");
-                Server.SET_COMPRESSION = NMSUtils.getNMSClassWithoutException("PacketLoginOutSetCompression");
+                if (PacketEvents.get().getServerUtils().getVersion().isNewerThan(ServerVersion.v_1_7_10)) {
+                    Server.SET_COMPRESSION = NMSUtils.getNMSClassWithoutException("PacketLoginOutSetCompression");
+                }
             }
         }
     }
@@ -128,7 +130,7 @@ public class PacketTypeClasses {
                     POSITION = NMSUtils.getNMSClass(PREFIX + "Position");
                     POSITION_LOOK = NMSUtils.getNMSClass(PREFIX + "PositionLook");
                     LOOK = NMSUtils.getNMSClass(PREFIX + "Look");
-                } catch (ClassNotFoundException e) {
+                } catch (Exception e) {
                     POSITION = SubclassUtil.getSubClass(FLYING, PREFIX + "Position");
                     POSITION_LOOK = SubclassUtil.getSubClass(FLYING, PREFIX + "PositionLook");
                     LOOK = SubclassUtil.getSubClass(FLYING, PREFIX + "Look");
@@ -180,14 +182,14 @@ public class PacketTypeClasses {
                     SET_JIGSAW = NMSUtils.getNMSClassWithoutException(PREFIX + "SetJigsaw");
                     STRUCT = NMSUtils.getNMSClassWithoutException(PREFIX + "Struct");
                     SPECTATE = NMSUtils.getNMSClassWithoutException(PREFIX + "Spectate");
-                } catch (ClassNotFoundException e) {
+                } catch (Exception e) {
                     e.printStackTrace();
                 }
 
                 try {
                     BLOCK_PLACE = NMSUtils.getNMSClass(PREFIX + "BlockPlace");
                     USE_ITEM = NMSUtils.getNMSClass(PREFIX + "UseItem");
-                } catch (ClassNotFoundException ignored) {
+                } catch (Exception ignored) {
                 }
 
             }
