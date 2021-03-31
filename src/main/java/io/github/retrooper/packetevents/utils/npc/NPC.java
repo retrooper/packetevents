@@ -69,7 +69,6 @@ public class NPC {
                         PacketEvents.get().getPlayerUtils().sendPacket(player, playerInfo);
                     }
                     spawnedForPlayerMap.remove(player.getUniqueId());
-                    net.minecraft.server.v1_16_R2.PacketPlayOutEntityHeadRotation ehr;
                 }
             }).get();
         } catch (InterruptedException | ExecutionException e) {
