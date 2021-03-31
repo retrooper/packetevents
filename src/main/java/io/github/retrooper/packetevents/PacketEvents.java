@@ -99,6 +99,7 @@ public final class PacketEvents implements Listener, EventManager {
         else {
             //We are off thread, we cannot use the service manager.
             if (instance == null) {
+                PacketEvents.plugin = plugin;
                 instance = new PacketEvents();
             }
             return instance;
@@ -186,11 +187,13 @@ public final class PacketEvents implements Listener, EventManager {
             while (!injectorReady.get()) {
                 ;
             }
+
+            //TODO work on reload support
             Bukkit.getPluginManager().registerEvents(this, plugin);
             for (final Player p : Bukkit.getOnlinePlayers()) {
                 try {
                     getPlayerUtils().injectPlayer(p);
-                    //IT IS NOT RECOMMENDED TO RELOAD!
+                    //PLEASE DONT RELOAD
                     PacketEvents.get().getEventManager().callEvent(new PostPlayerInjectEvent(p, false));
                 } catch (Exception ex) {
                     p.kickPlayer("Failed to inject... Please rejoin!");
@@ -214,6 +217,9 @@ public final class PacketEvents implements Listener, EventManager {
 
     public void terminate() {
         if (initialized && !terminating) {
+            for (Player p : Bukkit.getOnlinePlayers()) {
+                injector.ejectPlayer(p);
+            }
             injector.eject();
 
             getEventManager().unregisterAllListeners();

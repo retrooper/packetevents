@@ -58,6 +58,16 @@ public class GlobalChannelInjector implements ChannelInjector {
             injector.injectPlayer(player);
         }
     }
+
+    @Override
+    public void ejectPlayer(Player player) {
+        PlayerEjectEvent ejectEvent = new PlayerEjectEvent(player);
+        PacketEvents.get().callEvent(ejectEvent);
+        if (!ejectEvent.isCancelled()) {
+            injector.ejectPlayer(player);
+        }
+    }
+
     @Override
     public boolean hasInjected(Player player) {
         return injector.hasInjected(player);

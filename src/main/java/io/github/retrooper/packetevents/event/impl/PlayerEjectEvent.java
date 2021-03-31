@@ -33,7 +33,6 @@ import org.jetbrains.annotations.NotNull;
 
 /**
  * The {@code PlayerEjectEvent} event is fired whenever a player is ejected.
- * A player is ejected by PacketEvents whenever they quit the server.
  * This class implements {@link CancellableEvent} and {@link PlayerEvent}.
  *
  * @author retrooper

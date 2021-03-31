@@ -24,6 +24,9 @@
 
 package io.github.retrooper.packetevents;
 
+import io.github.retrooper.packetevents.event.PacketListenerDynamic;
+import io.github.retrooper.packetevents.event.impl.PacketPlayReceiveEvent;
+import io.github.retrooper.packetevents.packettype.PacketType;
 import io.github.retrooper.packetevents.settings.PacketEventsSettings;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -43,6 +46,12 @@ public class PacketEventsPlugin extends JavaPlugin {
     public void onEnable() {
         //Other way to access your instance...
         PacketEvents.get().init();
+        PacketEvents.get().registerListener(new PacketListenerDynamic() {
+            @Override
+            public void onPacketPlayReceive(PacketPlayReceiveEvent event) {
+                System.out.println("Nice");
+            }
+        });
     }
 
     @Override

@@ -141,6 +141,9 @@ public final class Reflection {
     }
 
     public static Method getMethod(final Class<?> cls, final String name, final int index) {
+        if (cls == null) {
+            return null;
+        }
         int currentIndex = 0;
         for (final Method m : cls.getDeclaredMethods()) {
             if (m.getName().equals(name) && index == currentIndex++) {
@@ -155,6 +158,9 @@ public final class Reflection {
     }
 
     public static Method getMethod(final Class<?> cls, final Class<?> returning, final int index) {
+        if (cls == null) {
+            return null;
+        }
         int currentIndex = 0;
         for (final Method m : cls.getDeclaredMethods()) {
             if ((returning == null || m.getReturnType().equals(returning)) && index == currentIndex++) {
@@ -169,6 +175,9 @@ public final class Reflection {
     }
 
     public static Method getMethodCheckContainsString(Class<?> cls, String nameContainsThisStr, Class<?> returning) {
+        if (cls == null) {
+            return null;
+        }
         for (Method m : cls.getDeclaredMethods()) {
             if (m.getName().contains(nameContainsThisStr) && (returning == null || m.getReturnType().equals(returning))) {
                 m.setAccessible(true);
@@ -182,6 +191,9 @@ public final class Reflection {
     }
 
     public static Method getMethod(final Class<?> cls, final String name, final Class<?> returning) {
+        if (cls == null) {
+            return null;
+        }
         for (final Method m : cls.getDeclaredMethods()) {
             if (m.getName().equals(name)
                     && (returning == null || m.getReturnType().equals(returning))) {
