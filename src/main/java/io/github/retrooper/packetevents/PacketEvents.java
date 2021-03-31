@@ -42,6 +42,7 @@ import io.github.retrooper.packetevents.utils.netty.bytebuf.ByteBufUtil_8;
 import io.github.retrooper.packetevents.utils.nms.NMSUtils;
 import io.github.retrooper.packetevents.utils.player.ClientVersion;
 import io.github.retrooper.packetevents.utils.player.PlayerUtils;
+import io.github.retrooper.packetevents.utils.reflection.Reflection;
 import io.github.retrooper.packetevents.utils.server.ServerUtils;
 import io.github.retrooper.packetevents.utils.server.ServerVersion;
 import io.github.retrooper.packetevents.utils.version.PEVersion;
@@ -56,7 +57,9 @@ import org.bukkit.event.player.PlayerLoginEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.ServicePriority;
+import org.spigotmc.SpigotConfig;
 
+import java.lang.reflect.Field;
 import java.net.InetSocketAddress;
 import java.util.UUID;
 import java.util.concurrent.ExecutorService;
@@ -125,6 +128,10 @@ public final class PacketEvents implements Listener, EventManager {
             EntityFinderUtils.version = version;
             handlerName = "pe-" + plugin.getName();
             try {
+                Field lateBindField = Reflection.getField(SpigotConfig.class, "lateBind");
+                if (lateBindField != null && lateBindField.getBoolean(null)) {
+                    throw new IllegalStateException("Please disable late-bind in your Spigot config, late-bind is not supported!");
+                }
                 NMSUtils.load();
 
                 PacketTypeClasses.load();

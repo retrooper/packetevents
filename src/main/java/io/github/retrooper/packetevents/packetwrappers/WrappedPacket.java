@@ -393,7 +393,7 @@ public class WrappedPacket implements WrapperPacketReader, WrapperPacketWriter {
 
     public void write(Class<?> type, int index, Object value) throws WrapperFieldNotFoundException {
         Field field = getField(type, index);
-        Reflection.getFieldWithoutFinalModifier(field);
+        //Reflection.getFieldWithoutFinalModifier(field);
         if (field == null) {
             throw new WrapperFieldNotFoundException(packetClass, type, index);
         }
@@ -407,7 +407,12 @@ public class WrappedPacket implements WrapperPacketReader, WrapperPacketWriter {
     private Field getField(Class<?> type, int index) {
         Map<Class<?>, Field[]> cached = FIELD_CACHE.computeIfAbsent(packetClass, k -> new ConcurrentHashMap<>());
         Field[] fields = cached.computeIfAbsent(type, typeClass -> getFields(typeClass, packetClass.getDeclaredFields()));
-        return fields[index];
+        if (fields.length >= index + 1) {
+            return fields[index];
+        }
+        else {
+            throw new WrapperFieldNotFoundException(packetClass, type, index);
+        }
     }
 
     private Field[] getFields(Class<?> type, Field[] fields) {
@@ -422,6 +427,7 @@ public class WrappedPacket implements WrapperPacketReader, WrapperPacketWriter {
         }
         return ret.toArray(EMPTY_FIELD_ARRAY);
     }
+
 
     /**
      * Does the local server version support reading at-least one field with this packet wrapper?
