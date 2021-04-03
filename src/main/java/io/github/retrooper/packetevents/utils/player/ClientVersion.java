@@ -106,7 +106,7 @@ public enum ClientVersion {
     private static final short LOWEST_SUPPORTED_PROTOCOL_VERSION = (short) (LOWER_THAN_SUPPORTED_VERSIONS.protocolVersion + 1);
     private static final short HIGHEST_SUPPORTED_PROTOCOL_VERSION = (short) (HIGHER_THAN_SUPPORTED_VERSIONS.protocolVersion - 1);
 
-    private static final Map<Short, ClientVersion> clientVersionCache = new HashMap<>();
+    private static final Map<Short, ClientVersion> CLIENT_VERSION_CACHE = new HashMap<>();
     private static final int[] CLIENT_VERSIONS = new int[]{5, 47, 107, 108, 109, 110, 210, 315, 316, 335, 338,
             340, 393, 401, 404, 477, 480, 485, 490, 498, 573, 575, 578, 735, 736, 751, 753, 754};
     private short protocolVersion;
@@ -130,14 +130,14 @@ public enum ClientVersion {
         } else if (protocolVersion > HIGHEST_SUPPORTED_PROTOCOL_VERSION) {
             return HIGHER_THAN_SUPPORTED_VERSIONS;
         } else {
-            ClientVersion cached = clientVersionCache.get(protocolVersion);
+            ClientVersion cached = CLIENT_VERSION_CACHE.get(protocolVersion);
             if (cached == null) {
                 for (ClientVersion version : values()) {
                     if (version.protocolVersion > protocolVersion) {
                         break;
                     } else if (version.protocolVersion == protocolVersion) {
                         //Cache for next time
-                        clientVersionCache.put(protocolVersion, version);
+                        CLIENT_VERSION_CACHE.put(protocolVersion, version);
                         return version;
                     }
                 }

@@ -29,7 +29,7 @@ public class NPC {
     private final WrappedGameProfile gameProfile;
     private Vector3d position;
     private float yaw, pitch;
-    private boolean onGround = false;
+    private boolean onGround;
     private final Map<UUID, Boolean> spawnedForPlayerMap = new ConcurrentHashMap<>();
 
     public NPC(String name) {

@@ -33,6 +33,19 @@ import java.util.Arrays;
 import java.util.List;
 
 public final class Reflection {
+
+    private static final Field MODIFIER_FIELD;
+
+    static {
+        Field modField = null;
+        try {
+            modField = getModifiersField();
+        } catch (NoSuchFieldException e) {
+            e.printStackTrace();
+        }
+        MODIFIER_FIELD = modField;
+    }
+
     //FIELDS
     public static Field[] getFields(Class<?> cls) {
         Field[] declaredFields = cls.getDeclaredFields();
@@ -43,8 +56,10 @@ public final class Reflection {
     }
 
     public static Field getField(final Class<?> cls, final String name) {
-        for (final Field f : getFields(cls)) {
+        for (Field f : getFields(cls)) {
             if (f.getName().equals(name)) {
+                f.setAccessible(true); // improving lookup speed by bypassing security checks -
+                                       // should be set individually in the future in critical regions and remove from here
                 return f;
             }
         }
@@ -59,9 +74,11 @@ public final class Reflection {
             return null;
         }
         int currentIndex = 0;
-        for (final Field f : getFields(cls)) {
+        for (Field f : getFields(cls)) {
             if (dataType.isAssignableFrom(f.getType())) {
                 if (currentIndex++ == index) {
+                    f.setAccessible(true); // improving lookup speed by bypassing security checks -
+                    // should be set individually in the future in critical regions and remove from here
                     return f;
                 }
             }
@@ -74,10 +91,16 @@ public final class Reflection {
 
     public static Field getField(final Class<?> cls, final int index) {
         try {
-            return getFields(cls)[index];
+            Field ret = getFields(cls)[index];
+            ret.setAccessible(true); // improving lookup speed by bypassing security checks -
+            // should be set individually in the future in critical regions and remove from here
+            return ret;
         } catch (Exception ex) {
             if (cls.getSuperclass() != null) {
-                return getFields(cls.getSuperclass())[index];
+                Field ret = getFields(cls.getSuperclass())[index];
+                ret.setAccessible(true); // improving lookup speed by bypassing security checks -
+                // should be set individually in the future in critical regions and remove from here
+                return ret;
             }
         }
         return null;
@@ -97,7 +120,7 @@ public final class Reflection {
 
     public static Method getMethod(final Class<?> cls, final int index, final Class<?>... params) {
         int currentIndex = 0;
-        for (final Method m : cls.getDeclaredMethods()) {
+        for (Method m : cls.getDeclaredMethods()) {
             if ((params == null || Arrays.equals(m.getParameterTypes(), params)) && index == currentIndex++) {
                 m.setAccessible(true);
                 return m;
@@ -126,7 +149,7 @@ public final class Reflection {
     }
 
     public static Method getMethod(final Class<?> cls, final String name, Class<?> returning, Class<?>... params) {
-        for (final Method m : cls.getDeclaredMethods()) {
+        for (Method m : cls.getDeclaredMethods()) {
             if (m.getName().equals(name)
                     && Arrays.equals(m.getParameterTypes(), params) &&
                     (returning == null || m.getReturnType().equals(returning))) {
@@ -145,7 +168,7 @@ public final class Reflection {
             return null;
         }
         int currentIndex = 0;
-        for (final Method m : cls.getDeclaredMethods()) {
+        for (Method m : cls.getDeclaredMethods()) {
             if (m.getName().equals(name) && index == currentIndex++) {
                 m.setAccessible(true);
                 return m;
@@ -162,7 +185,7 @@ public final class Reflection {
             return null;
         }
         int currentIndex = 0;
-        for (final Method m : cls.getDeclaredMethods()) {
+        for (Method m : cls.getDeclaredMethods()) {
             if ((returning == null || m.getReturnType().equals(returning)) && index == currentIndex++) {
                 m.setAccessible(true);
                 return m;
@@ -209,15 +232,8 @@ public final class Reflection {
 
     public static void getFieldWithoutFinalModifier(Field field) {
         //Remove final modifier
-        Field modifiersField = null;
         try {
-            modifiersField = getModifiersField();
-        } catch (NoSuchFieldException e) {
-            e.printStackTrace();
-        }
-        modifiersField.setAccessible(true);
-        try {
-            modifiersField.setInt(field, field.getModifiers() & ~Modifier.FINAL);
+            MODIFIER_FIELD.setInt(field, field.getModifiers() & ~Modifier.FINAL);
         } catch (IllegalAccessException e) {
             e.printStackTrace();
         }
@@ -235,6 +251,7 @@ public final class Reflection {
                 Field[] fields = (Field[]) getDeclaredFields0.invoke(Field.class, false);
                 for (Field field : fields) {
                     if ("modifiers".equals(field.getName())) {
+                        field.setAccessible(true);
                         return field;
                     }
                 }
