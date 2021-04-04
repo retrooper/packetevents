@@ -8,6 +8,10 @@ import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 
+/**
+ * @author yanjulang
+ * @since 1.8
+ */
 public class WrappedPacketOutEntityDestroy extends WrappedPacket implements SendableWrapper {
 
     private static Constructor<?> packetConstructor;
@@ -36,6 +40,13 @@ public class WrappedPacketOutEntityDestroy extends WrappedPacket implements Send
             return entityIds = readIntArray(0);
         } else {
             return entityIds;
+        }
+    }
+
+    public void setEntityIds(int... entityIds) {
+        this.entityIds = entityIds;
+        if (packet != null) {
+            writeIntArray(0, entityIds);
         }
     }
 
