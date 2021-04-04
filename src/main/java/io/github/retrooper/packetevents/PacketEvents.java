@@ -297,12 +297,12 @@ public final class PacketEvents implements Listener, EventManager {
 
     private void handleUpdateCheck() {
         Thread thread = new Thread(() -> {
-            PacketEvents.get().getPlugin().getLogger().info("[packetevents] Checking for an update, please wait...");
+            PacketEvents.get().getPlugin().getLogger().info("[PacketEvents] Checking for an update, please wait...");
             UpdateChecker.UpdateCheckerStatus status = updateChecker.checkForUpdate();
             int seconds = 5;
             for (int i = 0; i < 5; i++) {
                 if (status == UpdateChecker.UpdateCheckerStatus.FAILED) {
-                    PacketEvents.get().getPlugin().getLogger().severe("[packetevents] Checking for an update again in " + seconds + " seconds...");
+                    PacketEvents.get().getPlugin().getLogger().severe("[PacketEvents] Checking for an update again in " + seconds + " seconds...");
                     try {
                         Thread.sleep(seconds * 1000L);
                     } catch (InterruptedException e) {
@@ -314,7 +314,7 @@ public final class PacketEvents implements Listener, EventManager {
                     status = updateChecker.checkForUpdate();
 
                     if (i == 4) {
-                        PacketEvents.get().getPlugin().getLogger().severe("[packetevents] PacketEvents failed to check for an update. No longer retrying.");
+                        PacketEvents.get().getPlugin().getLogger().severe("[PacketEvents] PacketEvents failed to check for an update. No longer retrying.");
                         break;
                     }
                 } else {
@@ -326,4 +326,5 @@ public final class PacketEvents implements Listener, EventManager {
         }, "PacketEvents-update-check-thread");
         thread.start();
     }
+
 }
