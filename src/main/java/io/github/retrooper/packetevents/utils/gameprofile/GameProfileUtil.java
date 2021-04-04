@@ -29,13 +29,7 @@ import io.github.retrooper.packetevents.utils.nms.NMSUtils;
 import java.util.UUID;
 
 public class GameProfileUtil {
-    /**
-     * Create a new game profile with the specified arguments.
-     *
-     * @param uuid     Player UUID.
-     * @param username Player username.
-     * @return Mojang Game Profile Object.
-     */
+
     public static Object getGameProfile(UUID uuid, String username) {
         if (NMSUtils.legacyNettyImportMode) {
             return GameProfileUtil_7.getGameProfile(uuid, username);
@@ -44,17 +38,36 @@ public class GameProfileUtil {
         }
     }
 
-    /**
-     * Create a wrapper over a Mojang Game Profile.
-     *
-     * @param gameProfile Mojang Game Profile.
-     * @return {@link WrappedGameProfile}
-     */
+
     public static WrappedGameProfile getWrappedGameProfile(Object gameProfile) {
         if (NMSUtils.legacyNettyImportMode) {
             return GameProfileUtil_7.getWrappedGameProfile(gameProfile);
         } else {
             return GameProfileUtil_8.getWrappedGameProfile(gameProfile);
+        }
+    }
+
+    public static Object getProperty(String name, String value, String signature) {
+        if (NMSUtils.legacyNettyImportMode) {
+            return GameProfileUtil_7.getProperty(name, value, signature);
+        } else {
+            return GameProfileUtil_8.getProperty(name, value, signature);
+        }
+    }
+
+    public static WrappedProperty getWrappedProperty(Object property) {
+        if (NMSUtils.legacyNettyImportMode) {
+            return GameProfileUtil_7.getWrappedProperty(property);
+        } else {
+            return GameProfileUtil_8.getWrappedProperty(property);
+        }
+    }
+
+    public static Object getNewPropertyMap() {
+        if (NMSUtils.legacyNettyImportMode) {
+            return GameProfileUtil_7.getNewPropertyMap();
+        } else {
+            return GameProfileUtil_8.getNewPropertyMap();
         }
     }
 }

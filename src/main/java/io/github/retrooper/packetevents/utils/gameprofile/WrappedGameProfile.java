@@ -24,7 +24,9 @@
 
 package io.github.retrooper.packetevents.utils.gameprofile;
 
-import java.util.UUID;
+import io.github.retrooper.packetevents.utils.nms.NMSUtils;
+
+import java.util.*;
 
 /**
  * Wrapper for the Player Game Profile.
@@ -33,20 +35,13 @@ import java.util.UUID;
  * @since 1.7
  */
 public class WrappedGameProfile {
-    public final UUID id;
-    public final String name;
-    public final boolean legacy;
-
-    public WrappedGameProfile(UUID id, String name, boolean legacy) {
+    private final UUID id;
+    private final String name;
+    private final WrappedPropertyMapAbstract<String, WrappedProperty> wrappedProperty;
+    public WrappedGameProfile(UUID id, String name, Object propertMap) {
         this.id = id;
         this.name = name;
-        this.legacy = legacy;
-    }
-
-    public WrappedGameProfile(UUID id, String name) {
-        this.id = id;
-        this.name = name;
-        this.legacy = false;
+        wrappedProperty= NMSUtils.legacyNettyImportMode ? new WrappedPropertyMap7(propertMap) : new WrappedPropertyMap8(propertMap);
     }
 
     public UUID getId() {
@@ -57,8 +52,8 @@ public class WrappedGameProfile {
         return name;
     }
 
-    public boolean isLegacy() {
-        return legacy;
+    public WrappedPropertyMapAbstract<String, WrappedProperty> getProperties() {
+        return wrappedProperty;
     }
 
     public boolean isComplete() {

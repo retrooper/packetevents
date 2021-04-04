@@ -25,6 +25,8 @@
 package io.github.retrooper.packetevents.utils.reflection;
 
 
+import io.github.retrooper.packetevents.PacketEvents;
+
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
@@ -33,6 +35,8 @@ import java.util.Arrays;
 import java.util.List;
 
 public final class Reflection {
+    private static Field MODIFIER_FIELD;
+
     //FIELDS
     public static Field[] getFields(Class<?> cls) {
         Field[] declaredFields = cls.getDeclaredFields();
@@ -207,19 +211,31 @@ public final class Reflection {
         return null;
     }
 
-    public static void getFieldWithoutFinalModifier(Field field) {
-        //Remove final modifier
-        Field modifiersField = null;
+    public static void updateFinalField(Field field, Object instance, Object value) {
         try {
-            modifiersField = getModifiersField();
-        } catch (NoSuchFieldException e) {
-            e.printStackTrace();
+            field.setAccessible(true);
+            if (MODIFIER_FIELD == null) {
+                MODIFIER_FIELD = getModifiersField();
+
+            }MODIFIER_FIELD.setAccessible(true);
+            MODIFIER_FIELD.setInt(field, field.getModifiers() & ~Modifier.FINAL);
+            field.set(instance, value);
+        } catch (Exception ex) {
+            ex.printStackTrace();
         }
-        modifiersField.setAccessible(true);
+    }
+
+    public static void updateStaticFinalField(Field field, Object value) {
         try {
-            modifiersField.setInt(field, field.getModifiers() & ~Modifier.FINAL);
-        } catch (IllegalAccessException e) {
-            e.printStackTrace();
+            field.setAccessible(true);
+            if (MODIFIER_FIELD == null) {
+                MODIFIER_FIELD = getModifiersField();
+                MODIFIER_FIELD.setAccessible(true);
+            }
+            MODIFIER_FIELD.setInt(field, field.getModifiers() & ~Modifier.FINAL);
+            field.set(null, value);
+        } catch (Exception ex) {
+            ex.printStackTrace();
         }
     }
 
@@ -227,20 +243,22 @@ public final class Reflection {
         try {
             //This should work on Java 8 - 11
             return Field.class.getDeclaredField("modifiers");
-        } catch (NoSuchFieldException e) {
-            //Java 12 support!
+        } catch (Exception e) {
+            //Java 12 -> Java 15
             try {
                 Method getDeclaredFields0 = Class.class.getDeclaredMethod("getDeclaredFields0", boolean.class);
                 getDeclaredFields0.setAccessible(true);
                 Field[] fields = (Field[]) getDeclaredFields0.invoke(Field.class, false);
                 for (Field field : fields) {
                     if ("modifiers".equals(field.getName())) {
+                        field.setAccessible(true);
                         return field;
                     }
                 }
-            } catch (ReflectiveOperationException ex) {
-                e.addSuppressed(ex);
+            } catch (Exception ex) {
+                ex.printStackTrace();
             }
+            PacketEvents.get().getPlugin().getLogger().severe("PacketEvents failed to access modifiers field! You are most likely on Java 16. Java 16 support is still under development.");
             throw e;
         }
     }

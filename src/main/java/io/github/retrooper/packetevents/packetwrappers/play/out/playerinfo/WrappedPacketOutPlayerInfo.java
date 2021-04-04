@@ -135,7 +135,7 @@ public class WrappedPacketOutPlayerInfo extends WrappedPacket implements Sendabl
             if (version.isOlderThan(ServerVersion.v_1_8)) {
                 PlayerInfo playerInfo = playerInfoList.get(0);
                 writeString(0, playerInfo.username);
-                Object mojangGameProfile = GameProfileUtil.getGameProfile(playerInfo.gameProfile.id, playerInfo.gameProfile.name);
+                Object mojangGameProfile = GameProfileUtil.getGameProfile(playerInfo.gameProfile.getId(), playerInfo.gameProfile.getName());
                 writeObject(0, mojangGameProfile);
                 writeInt(1, playerInfo.gameMode.ordinal());
                 writeInt(2, playerInfo.ping);
@@ -144,7 +144,7 @@ public class WrappedPacketOutPlayerInfo extends WrappedPacket implements Sendabl
 
                 for (PlayerInfo playerInfo : playerInfoList) {
                     Object usernameIChatBaseComponent = NMSUtils.generateIChatBaseComponent(NMSUtils.fromStringToJSON(playerInfo.username));
-                    Object mojangGameProfile = GameProfileUtil.getGameProfile(playerInfo.gameProfile.id, playerInfo.gameProfile.name);
+                    Object mojangGameProfile = GameProfileUtil.getGameProfile(playerInfo.gameProfile.getId(), playerInfo.gameProfile.getName());
                     Enum<?> nmsGameModeEnumConstant = EnumUtil.valueOf(NMSUtils.enumGameModeClass, playerInfo.gameMode.name());
                     int ping = playerInfo.ping;
                     try {

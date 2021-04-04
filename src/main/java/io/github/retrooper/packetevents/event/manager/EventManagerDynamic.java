@@ -60,9 +60,6 @@ class EventManagerDynamic {
             if (listeners != null) {
                 for (PacketListenerDynamic listener : listeners) {
                     try {
-                        if (!event.isInbuilt()) {
-                            event.callPacketEventExternal(listener);
-                        }
                         event.call(listener);
                     } catch (Exception ex) {
                         PacketEvents.get().getPlugin().getLogger()

@@ -26,14 +26,12 @@ package io.github.retrooper.packetevents.utils.player;
 
 import io.github.retrooper.packetevents.PacketEvents;
 import io.github.retrooper.packetevents.packetwrappers.SendableWrapper;
-import io.github.retrooper.packetevents.packetwrappers.play.out.playerinfo.WrappedPacketOutPlayerInfo;
+import io.github.retrooper.packetevents.utils.gameprofile.GameProfileUtil;
 import io.github.retrooper.packetevents.utils.gameprofile.WrappedGameProfile;
 import io.github.retrooper.packetevents.utils.nms.NMSUtils;
 import io.github.retrooper.packetevents.utils.server.ServerVersion;
-import io.github.retrooper.packetevents.utils.vector.Vector3d;
 import io.github.retrooper.packetevents.utils.versionlookup.VersionLookupUtils;
 import io.github.retrooper.packetevents.utils.versionlookup.v_1_7_10.SpigotVersionLookup_1_7;
-import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
@@ -63,11 +61,6 @@ public final class PlayerUtils {
      * PacketEvents smooths in the same way minecraft does.
      */
     public final Map<UUID, Integer> playerSmoothedPingMap = new ConcurrentHashMap<>();
-
-    /**
-     * This map stores the wrapped game profiles for all users.
-     */
-    public final Map<UUID, WrappedGameProfile> gameProfileMap= new ConcurrentHashMap<>();
 
     /**
      * This map stores the client version of a player only when it has been confirmed.
@@ -262,12 +255,7 @@ public final class PlayerUtils {
     }
 
     public WrappedGameProfile getGameProfile(Player player) {
-        UUID uuid = player.getUniqueId();
-        WrappedGameProfile gameProfile = gameProfileMap.get(uuid);
-        if (gameProfile == null) {
-            gameProfile = new WrappedGameProfile(player.getUniqueId(), player.getName(), false);
-            gameProfileMap.put(uuid, gameProfile);
-        }
-        return gameProfile;
+        Object gameProfile = GameProfileUtil.getGameProfile(player.getUniqueId(), player.getName());
+        return GameProfileUtil.getWrappedGameProfile(gameProfile);
     }
 }

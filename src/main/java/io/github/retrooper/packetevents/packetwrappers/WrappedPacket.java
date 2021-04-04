@@ -38,7 +38,10 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
 
@@ -375,13 +378,8 @@ public class WrappedPacket implements WrapperPacketReader, WrapperPacketWriter {
     public void writeAnyObject(int index, Object value) {
         try {
             Field f = packetClass.getDeclaredFields()[index];
-            Reflection.getFieldWithoutFinalModifier(f);
-            try {
-                f.set(packet.getRawNMSPacket(), value);
-            } catch (IllegalAccessException | NullPointerException e) {
-                e.printStackTrace();
-            }
-        } catch (ArrayIndexOutOfBoundsException e) {
+            f.set(packet.getRawNMSPacket(), value);
+        } catch (Exception e) {
             throw new WrapperFieldNotFoundException("PacketEvents failed to find any field indexed " + index + " in the " + ClassUtil.getClassSimpleName(packetClass) + " class!");
         }
     }
@@ -409,8 +407,7 @@ public class WrappedPacket implements WrapperPacketReader, WrapperPacketWriter {
         Field[] fields = cached.computeIfAbsent(type, typeClass -> getFields(typeClass, packetClass.getDeclaredFields()));
         if (fields.length >= index + 1) {
             return fields[index];
-        }
-        else {
+        } else {
             throw new WrapperFieldNotFoundException(packetClass, type, index);
         }
     }

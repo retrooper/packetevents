@@ -7,6 +7,7 @@ import io.github.retrooper.packetevents.packetwrappers.play.out.entityheadrotati
 import io.github.retrooper.packetevents.packetwrappers.play.out.entityteleport.WrappedPacketOutEntityTeleport;
 import io.github.retrooper.packetevents.packetwrappers.play.out.namedentityspawn.WrappedPacketOutNamedEntitySpawn;
 import io.github.retrooper.packetevents.packetwrappers.play.out.playerinfo.WrappedPacketOutPlayerInfo;
+import io.github.retrooper.packetevents.utils.gameprofile.GameProfileUtil;
 import io.github.retrooper.packetevents.utils.gameprofile.WrappedGameProfile;
 import io.github.retrooper.packetevents.utils.nms.NMSUtils;
 import io.github.retrooper.packetevents.utils.player.GameMode;
@@ -36,7 +37,7 @@ public class NPC {
         this.name = name;
         this.entityID = NMSUtils.generateEntityId();
         this.uuid = NMSUtils.generateUUID();
-        this.gameProfile = new WrappedGameProfile(uuid, name);
+        this.gameProfile = new WrappedGameProfile(uuid, name, GameProfileUtil.getNewPropertyMap());
         this.position = new Vector3d(0, 0, 0);
         this.yaw = 0;
         this.pitch = 0;
@@ -46,7 +47,7 @@ public class NPC {
         this.name = name;
         this.entityID = NMSUtils.generateEntityId();
         this.uuid = NMSUtils.generateUUID();
-        this.gameProfile = new WrappedGameProfile(uuid, name);
+        this.gameProfile = new WrappedGameProfile(uuid, name, GameProfileUtil.getNewPropertyMap());
         this.position = position;
         this.yaw = yaw;
         this.pitch = pitch;

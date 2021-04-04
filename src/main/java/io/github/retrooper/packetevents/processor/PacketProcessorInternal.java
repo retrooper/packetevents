@@ -111,7 +111,7 @@ public class PacketProcessorInternal {
                 if (loginEvent.getPacketId() == PacketType.Login.Client.START) {
                     WrappedPacketLoginInStart startWrapper = new WrappedPacketLoginInStart(loginEvent.getNMSPacket());
                     WrappedGameProfile gameProfile = startWrapper.getGameProfile();
-                    channelMap.put(gameProfile.name, channel);
+                    channelMap.put(gameProfile.getName(), channel);
                 }
                 PacketEvents.get().getEventManager().callEvent(loginEvent);
                 packet = loginEvent.getNMSPacket().getRawNMSPacket();

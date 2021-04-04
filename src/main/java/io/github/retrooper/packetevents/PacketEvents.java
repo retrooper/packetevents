@@ -32,6 +32,7 @@ import io.github.retrooper.packetevents.injector.GlobalChannelInjector;
 import io.github.retrooper.packetevents.packettype.PacketType;
 import io.github.retrooper.packetevents.packettype.PacketTypeClasses;
 import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
+import io.github.retrooper.packetevents.processor.BukkitEventProcessorInternal;
 import io.github.retrooper.packetevents.processor.PacketProcessorInternal;
 import io.github.retrooper.packetevents.settings.PacketEventsSettings;
 import io.github.retrooper.packetevents.updatechecker.UpdateChecker;
@@ -40,28 +41,19 @@ import io.github.retrooper.packetevents.utils.netty.bytebuf.ByteBufUtil;
 import io.github.retrooper.packetevents.utils.netty.bytebuf.ByteBufUtil_7;
 import io.github.retrooper.packetevents.utils.netty.bytebuf.ByteBufUtil_8;
 import io.github.retrooper.packetevents.utils.nms.NMSUtils;
-import io.github.retrooper.packetevents.utils.player.ClientVersion;
 import io.github.retrooper.packetevents.utils.player.PlayerUtils;
 import io.github.retrooper.packetevents.utils.reflection.Reflection;
 import io.github.retrooper.packetevents.utils.server.ServerUtils;
 import io.github.retrooper.packetevents.utils.server.ServerVersion;
 import io.github.retrooper.packetevents.utils.version.PEVersion;
-import io.github.retrooper.packetevents.utils.versionlookup.VersionLookupUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
-import org.bukkit.event.EventHandler;
-import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
-import org.bukkit.event.player.PlayerJoinEvent;
-import org.bukkit.event.player.PlayerLoginEvent;
-import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.ServicePriority;
 import org.spigotmc.SpigotConfig;
 
 import java.lang.reflect.Field;
-import java.net.InetSocketAddress;
-import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -76,6 +68,7 @@ public final class PacketEvents implements Listener, EventManager {
     private final ServerUtils serverUtils = new ServerUtils();
     private final UpdateChecker updateChecker = new UpdateChecker();
     public final PacketProcessorInternal packetProcessorInternal = new PacketProcessorInternal();
+    public final BukkitEventProcessorInternal bukkitEventProcessorInternal = new BukkitEventProcessorInternal();
     public final GlobalChannelInjector injector = new GlobalChannelInjector();
     private volatile boolean loading, loaded;
     private final AtomicBoolean injectorReady = new AtomicBoolean(false);
@@ -93,13 +86,11 @@ public final class PacketEvents implements Listener, EventManager {
                         plugin, ServicePriority.Normal);
                 PacketEvents.plugin = plugin;
                 return instance;
-            }
-            else {
+            } else {
                 //We have already registered. Let us load what was registered.
                 return instance = Bukkit.getServicesManager().load(PacketEvents.class);
             }
-        }
-        else {
+        } else {
             //We are off thread, we cannot use the service manager.
             if (instance == null) {
                 PacketEvents.plugin = plugin;
@@ -150,8 +141,7 @@ public final class PacketEvents implements Listener, EventManager {
                 injector.load();
                 try {
                     injector.inject();
-                }
-                catch (Exception ex) {
+                } catch (Exception ex) {
                     ex.printStackTrace();
                 }
                 injectorReady.set(true);
@@ -195,12 +185,10 @@ public final class PacketEvents implements Listener, EventManager {
                 ;
             }
 
-            //TODO work on reload support
-            Bukkit.getPluginManager().registerEvents(this, plugin);
+            Bukkit.getPluginManager().registerEvents(bukkitEventProcessorInternal, plugin);
             for (final Player p : Bukkit.getOnlinePlayers()) {
                 try {
-                    getPlayerUtils().injectPlayer(p);
-                    //PLEASE DONT RELOAD
+                    injector.injectPlayer(p);
                     PacketEvents.get().getEventManager().callEvent(new PostPlayerInjectEvent(p, false));
                 } catch (Exception ex) {
                     p.kickPlayer("Failed to inject... Please rejoin!");
@@ -245,25 +233,25 @@ public final class PacketEvents implements Listener, EventManager {
         terminate();
     }
 
-    public boolean hasLoaded() {
-        return loaded;
-    }
-
     public boolean isLoading() {
         return loading;
     }
 
-    public boolean isInitializing() {
-        return initializing;
-    }
-
-    @Deprecated
-    public boolean isStopping() {
-        return terminating;
+    public boolean hasLoaded() {
+        return loaded;
     }
 
     public boolean isTerminating() {
         return terminating;
+    }
+
+    @Deprecated
+    public boolean isStopping() {
+        return isTerminating();
+    }
+
+    public boolean isInitializing() {
+        return initializing;
     }
 
     public boolean isInitialized() {
@@ -305,61 +293,6 @@ public final class PacketEvents implements Listener, EventManager {
 
     public UpdateChecker getUpdateChecker() {
         return updateChecker;
-    }
-
-    @EventHandler(priority = EventPriority.LOWEST)
-    public void onLogin(PlayerLoginEvent e) {
-        final Player player = e.getPlayer();
-        if (!getSettings().shouldUseCompatibilityInjector()) {
-            injector.injectPlayer(player);
-        }
-    }
-
-    @EventHandler(priority = EventPriority.HIGH)
-    public void onJoin(PlayerJoinEvent e) {
-        Player player = e.getPlayer();
-        InetSocketAddress address = player.getAddress();
-
-        boolean shouldInject = getSettings().shouldUseCompatibilityInjector() || !(injector.hasInjected(e.getPlayer()));
-        //Inject now if we are using the compatibility-injector or inject if the early injector failed to inject them.
-        if (shouldInject) {
-            injector.injectPlayer(player);
-        }
-
-        boolean dependencyAvailable = VersionLookupUtils.isDependencyAvailable();
-        PacketEvents.get().getPlayerUtils().loginTime.put(player.getUniqueId(), System.currentTimeMillis());
-        //A supported dependency is available, we need to first ask the dependency for the client version.
-        if (dependencyAvailable) {
-            Bukkit.getScheduler().runTaskLaterAsynchronously(getPlugin(), () -> {
-                try {
-                    int protocolVersion = VersionLookupUtils.getProtocolVersion(player);
-                    ClientVersion version = ClientVersion.getClientVersion(protocolVersion);
-                    PacketEvents.get().getPlayerUtils().clientVersionsMap.put(address, version);
-                } catch (Exception ignored) {
-
-                }
-                PacketEvents.get().getEventManager().callEvent(new PostPlayerInjectEvent(player, true));
-            }, 1L);
-        } else {
-            //Dependency isn't available, we can already call the post player inject event.
-            PacketEvents.get().getEventManager().callEvent(new PostPlayerInjectEvent(e.getPlayer(), false));
-        }
-    }
-
-
-    @EventHandler(priority = EventPriority.HIGHEST)
-    public void onQuit(PlayerQuitEvent e) {
-        Player player = e.getPlayer();
-        UUID uuid = player.getUniqueId();
-        InetSocketAddress address = player.getAddress();
-        //Cleanup user data
-        playerUtils.loginTime.remove(uuid);
-        playerUtils.playerPingMap.remove(uuid);
-        playerUtils.playerSmoothedPingMap.remove(uuid);
-        packetProcessorInternal.keepAliveMap.remove(uuid);
-        packetProcessorInternal.channelMap.remove(player.getName());
-        playerUtils.clientVersionsMap.remove(address);
-        playerUtils.tempClientVersionMap.remove(address);
     }
 
     private void handleUpdateCheck() {

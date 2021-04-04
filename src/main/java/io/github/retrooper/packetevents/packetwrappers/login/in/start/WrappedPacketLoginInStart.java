@@ -41,7 +41,7 @@ public class WrappedPacketLoginInStart extends WrappedPacket {
     }
 
     public void setGameProfile(WrappedGameProfile wrappedGameProfile) {
-        Object gameProfile = GameProfileUtil.getGameProfile(wrappedGameProfile.id, wrappedGameProfile.name);
+        Object gameProfile = GameProfileUtil.getGameProfile(wrappedGameProfile.getId(), wrappedGameProfile.getName());
         write(NMSUtils.gameProfileClass, 0, gameProfile);
     }
 

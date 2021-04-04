@@ -59,7 +59,7 @@ public final class NMSUtils {
     public static Class<?> nmsEntityClass, minecraftServerClass, craftWorldClass, playerInteractManagerClass, entityPlayerClass, playerConnectionClass, craftServerClass,
             craftPlayerClass, serverConnectionClass, craftEntityClass, nmsItemStackClass, networkManagerClass, nettyChannelClass, gameProfileClass, iChatBaseComponentClass,
             blockPosClass, vec3DClass, channelFutureClass, blockClass, iBlockDataClass, nmsWorldClass, craftItemStackClass,
-            soundEffectClass, minecraftKeyClass, chatSerializerClass, craftMagicNumbersClass, worldSettingsClass, worldServerClass, dataWatcherClass, nmsEntityHumanClass, dedicatedServerClass;
+            soundEffectClass, minecraftKeyClass, chatSerializerClass, craftMagicNumbersClass, worldSettingsClass, worldServerClass, dataWatcherClass, nmsEntityHumanClass, dedicatedServerClass, entityHumanClass;
     public static Class<? extends Enum<?>> enumDirectionClass, enumHandClass, enumGameModeClass;
     public static Method getBlockPosX, getBlockPosY, getBlockPosZ;
     private static String nettyPrefix;
@@ -111,6 +111,7 @@ public final class NMSUtils {
             craftPlayerClass = getOBCClass("entity.CraftPlayer");
             craftServerClass = getOBCClass("CraftServer");
             entityPlayerClass = getNMSClass("EntityPlayer");
+            entityHumanClass = getNMSClass("EntityHuman");
             playerConnectionClass = getNMSClass("PlayerConnection");
             serverConnectionClass = getNMSClass("ServerConnection");
             craftEntityClass = getOBCClass("entity.CraftEntity");

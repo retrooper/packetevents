@@ -25,6 +25,13 @@
 package io.github.retrooper.packetevents.utils.gameprofile;
 
 import com.mojang.authlib.GameProfile;
+import com.mojang.authlib.properties.Property;
+import com.mojang.authlib.properties.PropertyMap;
+import io.github.retrooper.packetevents.packetwrappers.NMSPacket;
+import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
+import io.github.retrooper.packetevents.utils.nms.NMSUtils;
+import org.bukkit.Bukkit;
+import org.bukkit.entity.Player;
 
 import java.util.UUID;
 
@@ -35,25 +42,34 @@ import java.util.UUID;
  * @since 1.6.8.2
  */
 class GameProfileUtil_8 {
-    /**
-     * Create a new Mojang Game Profile object using the 1.8 (and above) Mojang API import.
-     *
-     * @param uuid UUID
-     * @param username Username
-     * @return 1.8 (and above) Mojang Game Profile.
-     */
+
     public static Object getGameProfile(UUID uuid, String username) {
-        return new GameProfile(uuid, username);
+        Player player = Bukkit.getPlayer(uuid);
+        if (player != null) {
+            Object entityHuman = NMSUtils.entityHumanClass.cast(NMSUtils.getEntityPlayer(player));
+            WrappedPacket wrappedEntityPlayer = new WrappedPacket(new NMSPacket(entityHuman), NMSUtils.entityHumanClass);
+            return wrappedEntityPlayer.readObject(0, GameProfile.class);
+        }
+        else {
+            return new GameProfile(uuid, username);
+        }
     }
 
-    /**
-     * Create a Wrapper for the Mojang Game Profile object.
-     *
-     * @param gameProfile Mojang Game profile
-     * @return {@link WrappedGameProfile}
-     */
     public static WrappedGameProfile getWrappedGameProfile(Object gameProfile) {
         GameProfile gp = (GameProfile) gameProfile;
-        return new WrappedGameProfile(gp.getId(), gp.getName(), gp.isLegacy());
+        return new WrappedGameProfile(gp.getId(), gp.getName(), gp.getProperties());
+    }
+
+    public static Object getProperty(String name, String value, String signature) {
+        return new Property(name, value, signature);
+    }
+
+    public static WrappedProperty getWrappedProperty(Object property) {
+        Property prop = (Property) property;
+        return new WrappedProperty(prop.getName(), prop.getValue(), prop.getSignature());
+    }
+
+    public static Object getNewPropertyMap() {
+        return new PropertyMap();
     }
 }
