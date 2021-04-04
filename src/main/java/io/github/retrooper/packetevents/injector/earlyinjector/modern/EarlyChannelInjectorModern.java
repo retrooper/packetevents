@@ -137,16 +137,14 @@ public class EarlyChannelInjectorModern implements EarlyInjector {
                 bootstrapAcceptorField.setAccessible(true);
                 bootstrapAcceptorField.get(handler);
                 bootstrapAcceptor = handler;
-            } catch (Exception ex) {
-
-            }
+            } catch (Exception ignored) {}
         }
 
         if (bootstrapAcceptor == null) {
             bootstrapAcceptor = channelFuture.channel().pipeline().first();
         }
 
-        ChannelInitializer<?> oldChannelInitializer = null;
+        ChannelInitializer<?> oldChannelInitializer;
         try {
             oldChannelInitializer = (ChannelInitializer<?>) bootstrapAcceptorField.get(bootstrapAcceptor);
 
@@ -191,7 +189,7 @@ public class EarlyChannelInjectorModern implements EarlyInjector {
                     if (oldInit instanceof PEChannelInitializerModern) {
                         bootstrapAcceptor = handler;
                     }
-                } catch (Exception e) {
+                } catch (Exception ignored) {
                     // Not this one
                 }
             }
@@ -245,10 +243,7 @@ public class EarlyChannelInjectorModern implements EarlyInjector {
             Channel chnl = (Channel) channel;
             try {
                 chnl.pipeline().remove(PacketEvents.handlerName);
-            }
-            catch (Exception ex) {
-
-            }
+            } catch (Exception ignored) {}
         }
     }
 
@@ -309,8 +304,7 @@ public class EarlyChannelInjectorModern implements EarlyInjector {
                     }
                 }
             }
-        } catch (Exception e) {
-        }
+        } catch (Exception ignored) {}
         return false;
     }
 }
