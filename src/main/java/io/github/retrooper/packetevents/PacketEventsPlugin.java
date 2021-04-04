@@ -52,12 +52,6 @@ public class PacketEventsPlugin extends JavaPlugin {
     @Override
     public void onEnable() {
         //Other way to access your instance...
-        PacketEvents.get().registerListener(new PacketListenerDynamic() {
-            @Override
-            public void onPacketPlayReceive(PacketPlayReceiveEvent event) {
-
-            }
-        });
         PacketEvents.get().init();
     }
 
