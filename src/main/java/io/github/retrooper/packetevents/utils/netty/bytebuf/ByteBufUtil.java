@@ -25,11 +25,8 @@
 package io.github.retrooper.packetevents.utils.netty.bytebuf;
 
 public interface ByteBufUtil {
-
-    Object wrappedBuffer(byte[] bytes);
-
     byte[] getBytes(Object byteBuf);
 
-    void setBytes(Object byteBuf, byte[] bytes);
+    Object newByteBuf(byte[] data);
 
 }

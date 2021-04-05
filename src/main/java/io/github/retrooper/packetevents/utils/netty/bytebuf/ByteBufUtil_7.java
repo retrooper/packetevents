@@ -29,16 +29,8 @@ import net.minecraft.util.io.netty.buffer.Unpooled;
 import net.minecraft.util.io.netty.util.internal.EmptyArrays;
 
 public final class ByteBufUtil_7 implements ByteBufUtil {
-
-    public Object wrappedBuffer(byte[] bytes) {
-        return Unpooled.wrappedBuffer(bytes);
-    }
-
     public byte[] getBytes(Object byteBuf) {
-        final ByteBuf bb = (ByteBuf) byteBuf;
-        if (bb.refCnt() < 1) {
-            return EmptyArrays.EMPTY_BYTES;
-        }
+        ByteBuf bb = ((ByteBuf) byteBuf).copy();
         byte[] bytes;
         if (bb.hasArray()) {
             bytes = bb.array();
@@ -49,16 +41,7 @@ public final class ByteBufUtil_7 implements ByteBufUtil {
         return bytes;
     }
 
-    public void setBytes(Object byteBuf, byte[] bytes) {
-        final ByteBuf bb = (ByteBuf) byteBuf;
-        if (bb.refCnt() < 1) {
-            return;
-        }
-        final int bytesLength = bytes.length;
-        if (bb.capacity() < bytesLength) {
-            bb.capacity(bytesLength);
-        }
-        bb.setBytes(0, bytes);
+    public Object newByteBuf(byte[] bytes) {
+        return Unpooled.copiedBuffer(bytes);
     }
-
 }

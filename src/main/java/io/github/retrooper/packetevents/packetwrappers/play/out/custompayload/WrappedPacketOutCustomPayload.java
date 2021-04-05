@@ -166,8 +166,8 @@ public class WrappedPacketOutCustomPayload extends WrappedPacket implements Send
                     Object dataSerializer = readObject(0, packetDataSerializerClass);
                     WrappedPacket dataSerializerWrapper = new WrappedPacket(new NMSPacket(dataSerializer));
 
-                    Object byteBuf = dataSerializerWrapper.readObject(0, byteBufClass);
-                    PacketEvents.get().getByteBufUtil().setBytes(byteBuf, data);
+                    Object byteBuf = PacketEvents.get().getByteBufUtil().newByteBuf(data);
+                    dataSerializerWrapper.write(byteBufClass, 0, byteBuf);
             }
 
         } else {
@@ -178,7 +178,7 @@ public class WrappedPacketOutCustomPayload extends WrappedPacket implements Send
     @Override
     public Object asNMSPacket() {
         byte[] data = getData();
-        Object byteBufObject = PacketEvents.get().getByteBufUtil().wrappedBuffer(data);
+        Object byteBufObject = PacketEvents.get().getByteBufUtil().newByteBuf(data);
         switch (constructorMode) {
             case 0:
                 try {

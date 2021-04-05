@@ -119,13 +119,13 @@ public class WrappedPacketLoginOutCustomPayload extends WrappedPacket implements
     public void setData(byte[] data) {
         Object dataSerializer = readObject(0, packetDataSerializerClass);
         WrappedPacket dataSerializerWrapper = new WrappedPacket(new NMSPacket(dataSerializer));
-        Object byteBuf = dataSerializerWrapper.readObject(0, byteBufClass);
-        PacketEvents.get().getByteBufUtil().setBytes(byteBuf, data);
+        Object byteBuf = PacketEvents.get().getByteBufUtil().newByteBuf(data);
+        dataSerializerWrapper.write(byteBufClass,0, byteBuf);
     }
 
     @Override
     public Object asNMSPacket() {
-        Object byteBufObject = PacketEvents.get().getByteBufUtil().wrappedBuffer(data);
+        Object byteBufObject = PacketEvents.get().getByteBufUtil().newByteBuf(data);
         try {
             Object minecraftKey = NMSUtils.generateMinecraftKey(channelName);
             Object dataSerializer = packetDataSerializerConstructor.newInstance(byteBufObject);
