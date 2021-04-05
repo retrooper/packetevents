@@ -154,7 +154,8 @@ public class EarlyChannelInjectorLegacy implements EarlyInjector {
             ChannelInitializer<?> channelInitializer = new PEChannelInitializerLegacy(oldChannelInitializer);
 
             //Replace the old channel initializer with our own.
-            Reflection.updateFinalField(bootstrapAcceptorField, bootstrapAcceptor, channelInitializer);
+            bootstrapAcceptorField.setAccessible(true);
+            bootstrapAcceptorField.set(bootstrapAcceptor, channelInitializer);
 
             injectedFutures.add(channelFuture);
         } catch (IllegalAccessException e) {
@@ -205,8 +206,8 @@ public class EarlyChannelInjectorLegacy implements EarlyInjector {
             try {
                 ChannelInitializer<SocketChannel> oldInit = (ChannelInitializer<SocketChannel>) childHandlerField.get(bootstrapAcceptor);
                 if (oldInit instanceof PEChannelInitializerLegacy) {
-                    Reflection.updateFinalField(childHandlerField, bootstrapAcceptor, oldInit);
-                    Reflection.updateFinalField(childHandlerField,bootstrapAcceptor, ((PEChannelInitializerLegacy) oldInit).getOldChannelInitializer());
+                    childHandlerField.setAccessible(true);
+                    childHandlerField.set(bootstrapAcceptor, ((PEChannelInitializerLegacy) oldInit).getOldChannelInitializer());
                 }
             } catch (Exception e) {
                 PacketEvents.get().getPlugin().getLogger().severe("PacketEvents failed to eject the injection handler! Please reboot!");

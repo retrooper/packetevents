@@ -26,6 +26,7 @@ package io.github.retrooper.packetevents.injector.earlyinjector.modern;
 
 import io.github.retrooper.packetevents.PacketEvents;
 import io.github.retrooper.packetevents.injector.earlyinjector.EarlyInjector;
+import io.github.retrooper.packetevents.injector.earlyinjector.legacy.PEChannelInitializerLegacy;
 import io.github.retrooper.packetevents.injector.handler.modern.PlayerChannelHandlerModern;
 import io.github.retrooper.packetevents.packetwrappers.NMSPacket;
 import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
@@ -151,7 +152,8 @@ public class EarlyChannelInjectorModern implements EarlyInjector {
             ChannelInitializer<?> channelInitializer = new PEChannelInitializerModern(oldChannelInitializer);
 
             //Replace the old channel initializer with our own.
-            Reflection.updateFinalField(bootstrapAcceptorField, bootstrapAcceptor,  channelInitializer);
+            bootstrapAcceptorField.setAccessible(true);
+            bootstrapAcceptorField.set(bootstrapAcceptor, channelInitializer);
             injectedFutures.add(channelFuture);
         } catch (IllegalAccessException e) {
             ClassLoader cl = bootstrapAcceptor.getClass().getClassLoader();
@@ -201,8 +203,8 @@ public class EarlyChannelInjectorModern implements EarlyInjector {
             try {
                 ChannelInitializer<SocketChannel> oldInit = (ChannelInitializer<SocketChannel>) childHandlerField.get(bootstrapAcceptor);
                 if (oldInit instanceof PEChannelInitializerModern) {
-                    Reflection.updateFinalField(childHandlerField, bootstrapAcceptor, oldInit);
-                    Reflection.updateFinalField(childHandlerField, bootstrapAcceptor, ((PEChannelInitializerModern) oldInit).getOldChannelInitializer());
+                    childHandlerField.setAccessible(true);
+                    childHandlerField.set(bootstrapAcceptor, ((PEChannelInitializerModern) oldInit).getOldChannelInitializer());
                 }
             } catch (Exception e) {
                 PacketEvents.get().getPlugin().getLogger().severe("PacketEvents failed to eject the injection handler! Please reboot!");
