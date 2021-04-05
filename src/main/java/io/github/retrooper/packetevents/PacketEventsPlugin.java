@@ -24,21 +24,8 @@
 
 package io.github.retrooper.packetevents;
 
-import io.github.retrooper.packetevents.event.PacketListenerDynamic;
-import io.github.retrooper.packetevents.event.impl.PacketPlayReceiveEvent;
-import io.github.retrooper.packetevents.packettype.PacketType;
-import io.github.retrooper.packetevents.packetwrappers.play.in.custompayload.WrappedPacketInCustomPayload;
 import io.github.retrooper.packetevents.settings.PacketEventsSettings;
-import io.github.retrooper.packetevents.utils.gameprofile.WrappedGameProfile;
-import io.github.retrooper.packetevents.utils.gameprofile.WrappedProperty;
 import org.bukkit.plugin.java.JavaPlugin;
-
-import javax.net.ssl.HttpsURLConnection;
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
-import java.net.URL;
-import java.util.Arrays;
-import java.util.UUID;
 
 public class PacketEventsPlugin extends JavaPlugin {
     @Override
@@ -54,17 +41,6 @@ public class PacketEventsPlugin extends JavaPlugin {
     @Override
     public void onEnable() {
         //Other way to access your instance...
-        PacketEvents.get().registerListener(new PacketListenerDynamic() {
-            @Override
-            public void onPacketPlayReceive(PacketPlayReceiveEvent event) {
-                if (event.getPacketId() == PacketType.Play.Client.CUSTOM_PAYLOAD) {
-                    WrappedPacketInCustomPayload cp = new WrappedPacketInCustomPayload(event.getNMSPacket());
-                    String tag = cp.getTag();
-                    byte[] data = cp.getData();
-                    event.getPlayer().sendMessage("Tag: " + tag + ", Data: " + Arrays.toString(data));
-                }
-            }
-        });
         PacketEvents.get().init();
     }
 
