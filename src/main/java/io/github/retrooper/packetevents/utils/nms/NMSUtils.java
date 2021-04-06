@@ -341,7 +341,15 @@ public final class NMSUtils {
             return null;
         }
         WrappedPacket wrapper = new WrappedPacket(new NMSPacket(playerConnection));
-        return wrapper.readObject(0, networkManagerClass);
+        try {
+            return wrapper.readObject(0, networkManagerClass);
+        }
+        catch (Exception ex) {
+            //Support for some custom plugins.
+            playerConnection = wrapper.read(0, playerConnectionClass);
+            wrapper = new WrappedPacket(new NMSPacket(playerConnection));
+            return wrapper.readObject(0, networkManagerClass);
+        }
     }
 
     public static Object getChannel(final Player player) {
