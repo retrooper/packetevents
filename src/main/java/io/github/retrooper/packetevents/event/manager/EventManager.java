@@ -27,6 +27,7 @@ package io.github.retrooper.packetevents.event.manager;
 import io.github.retrooper.packetevents.PacketEvents;
 import io.github.retrooper.packetevents.event.PacketEvent;
 import io.github.retrooper.packetevents.event.PacketListener;
+import io.github.retrooper.packetevents.event.PacketListenerAbstract;
 import io.github.retrooper.packetevents.event.PacketListenerDynamic;
 
 /**
@@ -113,12 +114,37 @@ public interface EventManager {
     }
 
     /**
-     * Register the dynamic event listener.
+     * Register a PacketListenerDynamic listener.
      *
      * @param listener {@link PacketListenerDynamic}
      * @return Same event manager instance.
      */
+    @Deprecated
     default EventManager registerListener(PacketListenerDynamic listener) {
+        PEEventManager.EVENT_MANAGER_DYNAMIC.registerListener(listener);
+        return this;
+    }
+
+    /**
+     * Register multiple PacketListenerDynamic listeners.
+     *
+     * @param listeners {@link PacketListenerDynamic}
+     * @return Same event manager instance.
+     */
+    @Deprecated
+    default EventManager registerListeners(PacketListenerDynamic... listeners) {
+        PEEventManager.EVENT_MANAGER_DYNAMIC.registerListeners(listeners);
+        return this;
+    }
+
+
+    /**
+     * Register a PacketListenerAbstract listener.
+     *
+     * @param listener {@link PacketListenerAbstract}
+     * @return Same event manager instance.
+     */
+    default EventManager registerListener(PacketListenerAbstract listener) {
         if (listener != null) {
             PEEventManager.EVENT_MANAGER_DYNAMIC.registerListener(listener);
         }
@@ -126,12 +152,12 @@ public interface EventManager {
     }
 
     /**
-     * Register multiple dynamic event listeners with one method.
+     * Register multiple PacketListenerAbstract listeners.
      *
-     * @param listeners {@link PacketListenerDynamic}
+     * @param listeners {@link PacketListenerAbstract}
      * @return Same event manager instance.
      */
-    default EventManager registerListeners(PacketListenerDynamic... listeners) {
+    default EventManager registerListeners(PacketListenerAbstract... listeners) {
         PEEventManager.EVENT_MANAGER_DYNAMIC.registerListeners(listeners);
         return this;
     }

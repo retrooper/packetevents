@@ -24,10 +24,9 @@
 
 package io.github.retrooper.packetevents.event.impl;
 
-import io.github.retrooper.packetevents.event.PacketListenerDynamic;
+import io.github.retrooper.packetevents.event.PacketListenerAbstract;
 import io.github.retrooper.packetevents.event.eventtypes.CancellableNMSPacketEvent;
 import io.github.retrooper.packetevents.event.eventtypes.PlayerEvent;
-import io.github.retrooper.packetevents.packettype.PacketType;
 import io.github.retrooper.packetevents.packetwrappers.NMSPacket;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
@@ -63,7 +62,7 @@ public final class PacketPlayReceiveEvent extends CancellableNMSPacketEvent impl
     }
 
     @Override
-    public void call(PacketListenerDynamic listener) {
+    public void call(PacketListenerAbstract listener) {
         if (listener.clientSidedPlayAllowance == null || listener.clientSidedPlayAllowance.contains(getPacketId())) {
             listener.onPacketPlayReceive(this);
         }

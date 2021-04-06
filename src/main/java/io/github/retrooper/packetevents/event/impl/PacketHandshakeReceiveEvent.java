@@ -1,8 +1,7 @@
 package io.github.retrooper.packetevents.event.impl;
 
-import io.github.retrooper.packetevents.event.PacketListenerDynamic;
+import io.github.retrooper.packetevents.event.PacketListenerAbstract;
 import io.github.retrooper.packetevents.event.eventtypes.CancellableNMSPacketEvent;
-import io.github.retrooper.packetevents.packettype.PacketType;
 import io.github.retrooper.packetevents.packetwrappers.NMSPacket;
 
 import java.net.InetSocketAddress;
@@ -26,7 +25,7 @@ public class PacketHandshakeReceiveEvent extends CancellableNMSPacketEvent {
     }
 
     @Override
-    public void call(PacketListenerDynamic listener) {
+    public void call(PacketListenerAbstract listener) {
         if (listener.clientSidedLoginAllowance == null || listener.clientSidedLoginAllowance.contains(getPacketId())) {
             listener.onPacketHandshakeReceive(this);
         }

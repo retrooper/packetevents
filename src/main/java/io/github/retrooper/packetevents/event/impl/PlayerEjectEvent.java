@@ -25,7 +25,7 @@
 package io.github.retrooper.packetevents.event.impl;
 
 import io.github.retrooper.packetevents.event.PacketEvent;
-import io.github.retrooper.packetevents.event.PacketListenerDynamic;
+import io.github.retrooper.packetevents.event.PacketListenerAbstract;
 import io.github.retrooper.packetevents.event.eventtypes.CancellableEvent;
 import io.github.retrooper.packetevents.event.eventtypes.PlayerEvent;
 import org.bukkit.entity.Player;
@@ -79,7 +79,7 @@ public final class PlayerEjectEvent extends PacketEvent implements CancellableEv
     }
 
     @Override
-    public void call(PacketListenerDynamic listener) {
+    public void call(PacketListenerAbstract listener) {
         listener.onPlayerEject(this);
     }
 

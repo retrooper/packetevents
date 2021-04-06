@@ -26,9 +26,9 @@ package io.github.retrooper.packetevents.event.priority;
 
 /**
  * Event priority enum for the new event system.
- * The event priority counts for the whole {@link io.github.retrooper.packetevents.event.PacketListenerDynamic}
+ * The event priority counts for the whole {@link io.github.retrooper.packetevents.event.PacketListenerAbstract}
  * and not for just one event.
- * The priority can be specified in the PacketListenerDynamic constructor.
+ * The priority can be specified in the PacketListenerAbstract constructor.
  * If you don't specify a priority in the constructor, it will use the {@link #NORMAL} priority.
  *
  * @author retrooper

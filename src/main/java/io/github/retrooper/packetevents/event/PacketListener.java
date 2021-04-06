@@ -29,7 +29,7 @@ package io.github.retrooper.packetevents.event;
  * Implement this interface in your listener if you are using the legacy event system.
  *
  * @author retrooper
- * @see PacketListenerDynamic
+ * @see PacketListenerAbstract
  * @since 1.2.6
  * @deprecated There is a new and better listener for the new event system.
  */

@@ -26,7 +26,7 @@ package io.github.retrooper.packetevents.event.impl;
 
 import io.github.retrooper.packetevents.PacketEvents;
 import io.github.retrooper.packetevents.event.PacketEvent;
-import io.github.retrooper.packetevents.event.PacketListenerDynamic;
+import io.github.retrooper.packetevents.event.PacketListenerAbstract;
 import io.github.retrooper.packetevents.event.eventtypes.PlayerEvent;
 import io.github.retrooper.packetevents.utils.netty.channel.ChannelUtils;
 import io.github.retrooper.packetevents.utils.player.ClientVersion;
@@ -104,7 +104,7 @@ public class PostPlayerInjectEvent extends PacketEvent implements PlayerEvent {
     }
 
     @Override
-    public void call(PacketListenerDynamic listener) {
+    public void call(PacketListenerAbstract listener) {
         listener.onPostPlayerInject(this);
     }
 

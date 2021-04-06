@@ -26,7 +26,7 @@ package io.github.retrooper.packetevents.event.manager;
 
 import io.github.retrooper.packetevents.PacketEvents;
 import io.github.retrooper.packetevents.event.PacketEvent;
-import io.github.retrooper.packetevents.event.PacketListenerDynamic;
+import io.github.retrooper.packetevents.event.PacketListenerAbstract;
 import io.github.retrooper.packetevents.event.eventtypes.CancellableEvent;
 import io.github.retrooper.packetevents.event.priority.PacketEventPriority;
 
@@ -36,7 +36,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
 
 class EventManagerDynamic {
-    private final Map<Byte, HashSet<PacketListenerDynamic>> listenersMap = new ConcurrentHashMap<>();
+    private final Map<Byte, HashSet<PacketListenerAbstract>> listenersMap = new ConcurrentHashMap<>();
 
     /**
      * Call the PacketEvent.
@@ -56,9 +56,9 @@ class EventManagerDynamic {
         }
         byte highestReachedPriority = PacketEventPriority.LOWEST.getPriorityValue();
         for (byte priority = PacketEventPriority.LOWEST.getPriorityValue(); priority <= PacketEventPriority.MONITOR.getPriorityValue(); priority++) {
-            HashSet<PacketListenerDynamic> listeners = listenersMap.get(priority);
+            HashSet<PacketListenerAbstract> listeners = listenersMap.get(priority);
             if (listeners != null) {
-                for (PacketListenerDynamic listener : listeners) {
+                for (PacketListenerAbstract listener : listeners) {
                     try {
                         event.call(listener);
                     } catch (Exception ex) {
@@ -83,11 +83,11 @@ class EventManagerDynamic {
     /**
      * Register the dynamic packet event listener.
      *
-     * @param listener {@link PacketListenerDynamic}
+     * @param listener {@link PacketListenerAbstract}
      */
-    public synchronized void registerListener(final PacketListenerDynamic listener) {
+    public synchronized void registerListener(final PacketListenerAbstract listener) {
         byte priority = listener.getPriority().getPriorityValue();
-        HashSet<PacketListenerDynamic> listenerSet = listenersMap.get(priority);
+        HashSet<PacketListenerAbstract> listenerSet = listenersMap.get(priority);
         if (listenerSet == null) {
             listenerSet = new HashSet<>();
         }
@@ -98,10 +98,10 @@ class EventManagerDynamic {
     /**
      * Register multiple dynamic packet event listeners with one method.
      *
-     * @param listeners {@link PacketListenerDynamic}
+     * @param listeners {@link PacketListenerAbstract}
      */
-    public synchronized void registerListeners(PacketListenerDynamic... listeners) {
-        for (PacketListenerDynamic listener : listeners) {
+    public synchronized void registerListeners(PacketListenerAbstract... listeners) {
+        for (PacketListenerAbstract listener : listeners) {
             registerListener(listener);
         }
     }
