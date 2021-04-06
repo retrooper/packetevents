@@ -108,10 +108,13 @@ public class WrappedPacketLoginOutCustomPayload extends WrappedPacket implements
     }
 
     public void setData(byte[] data) {
+        PacketEvents.get().getByteBufUtil().setBytes(getBuffer(), data);
+    }
+
+    private Object getBuffer() {
         Object dataSerializer = readObject(0, NMSUtils.packetDataSerializerClass);
-        WrappedPacket dataSerializerWrapper = new WrappedPacket(new NMSPacket(dataSerializer));
-        Object byteBuf = PacketEvents.get().getByteBufUtil().newByteBuf(data);
-        dataSerializerWrapper.write(NMSUtils.byteBufClass,0, byteBuf);
+        WrappedPacket byteBufWrapper = new WrappedPacket(new NMSPacket(dataSerializer));
+        return byteBufWrapper.readObject(0, NMSUtils.byteBufClass);
     }
 
     @Override

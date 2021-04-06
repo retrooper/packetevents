@@ -182,8 +182,6 @@ public class WrappedPacketOutCustomPayload extends WrappedPacket implements Send
     @Override
     public Object asNMSPacket() {
         byte[] data = getData();
-        // TODO: Enjoy fixing this re! :D
-        /*Object byteBufObject = PacketEvents.get().getByteBufUtil().newByteBuf(data);
         switch (constructorMode) {
             case 0:
                 try {
@@ -194,7 +192,7 @@ public class WrappedPacketOutCustomPayload extends WrappedPacket implements Send
                 break;
             case 1:
                 try {
-                    Object dataSerializer = packetDataSerializerConstructor.newInstance(byteBufObject);
+                    Object dataSerializer = packetDataSerializerConstructor.newInstance(PacketEvents.get().getByteBufUtil().newByteBuf(data));
                     return constructor.newInstance(getTag(), dataSerializer);
                 } catch (InstantiationException | InvocationTargetException | IllegalAccessException e) {
                     e.printStackTrace();
@@ -204,13 +202,13 @@ public class WrappedPacketOutCustomPayload extends WrappedPacket implements Send
 
                 try {
                     Object minecraftKey = NMSUtils.generateMinecraftKey(getTag());
-                    Object dataSerializer = packetDataSerializerConstructor.newInstance(byteBufObject);
+                    Object dataSerializer = packetDataSerializerConstructor.newInstance(PacketEvents.get().getByteBufUtil().newByteBuf(data));
                     return constructor.newInstance(minecraftKey, dataSerializer);
                 } catch (InstantiationException | InvocationTargetException | IllegalAccessException e) {
                     e.printStackTrace();
                 }
                 break;
-        }*/
+        }
         return null;
     }
 }

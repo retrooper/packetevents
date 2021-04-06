@@ -24,10 +24,15 @@
 
 package io.github.retrooper.packetevents.utils.netty.bytebuf;
 
+import io.netty.buffer.Unpooled;
 import net.minecraft.util.io.netty.buffer.ByteBuf;
 import net.minecraft.util.io.netty.util.internal.EmptyArrays;
 
 public final class ByteBufUtil_7 implements ByteBufUtil {
+    @Override
+    public Object newByteBuf(byte[] data) {
+        return Unpooled.copiedBuffer(data);
+    }
 
     @Override
     public void retain(Object byteBuf) {

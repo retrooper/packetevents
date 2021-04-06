@@ -25,9 +25,14 @@
 package io.github.retrooper.packetevents.utils.netty.bytebuf;
 
 import io.netty.buffer.ByteBuf;
+import io.netty.buffer.Unpooled;
 import io.netty.util.internal.EmptyArrays;
 
 public final class ByteBufUtil_8 implements ByteBufUtil {
+    @Override
+    public Object newByteBuf(byte[] data) {
+        return Unpooled.copiedBuffer(data);
+    }
 
     @Override
     public void retain(Object byteBuf) {
