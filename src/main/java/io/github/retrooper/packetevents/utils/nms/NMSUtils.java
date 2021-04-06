@@ -340,14 +340,14 @@ public final class NMSUtils {
         if (playerConnection == null) {
             return null;
         }
-        WrappedPacket wrapper = new WrappedPacket(new NMSPacket(playerConnection));
+        WrappedPacket wrapper = new WrappedPacket(new NMSPacket(playerConnection), playerConnectionClass);
         try {
             return wrapper.readObject(0, networkManagerClass);
         }
         catch (Exception ex) {
             //Support for some custom plugins.
             playerConnection = wrapper.read(0, playerConnectionClass);
-            wrapper = new WrappedPacket(new NMSPacket(playerConnection));
+            wrapper = new WrappedPacket(new NMSPacket(playerConnection), playerConnectionClass);
             return wrapper.readObject(0, networkManagerClass);
         }
     }
