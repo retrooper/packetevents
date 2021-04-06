@@ -41,7 +41,7 @@ public class WrappedPacketOutCustomPayload extends WrappedPacket implements Send
     private static Constructor<?> packetDataSerializerConstructor;
     private static int minecraftKeyIndexInClass;
 
-    private static byte constructorMode = 0;
+    private static byte constructorMode;
     private String tag;
     private byte[] data;
 
@@ -136,12 +136,7 @@ public class WrappedPacketOutCustomPayload extends WrappedPacket implements Send
                     return readByteArray(0);
                 case 1:
                 case 2:
-                    Object dataSerializer = readObject(0, NMSUtils.packetDataSerializerClass);
-                    WrappedPacket byteBufWrapper = new WrappedPacket(new NMSPacket(dataSerializer));
-
-                    Object byteBuf = byteBufWrapper.readObject(0, NMSUtils.byteBufClass);
-
-                    return PacketEvents.get().getByteBufUtil().getBytes(byteBuf);
+                    return PacketEvents.get().getByteBufUtil().getBytes(getBuffer());
             }
             return new byte[0];
         }
@@ -156,11 +151,7 @@ public class WrappedPacketOutCustomPayload extends WrappedPacket implements Send
                     break;
                 case 1:
                 case 2:
-                    Object dataSerializer = readObject(0, NMSUtils.packetDataSerializerClass);
-                    WrappedPacket dataSerializerWrapper = new WrappedPacket(new NMSPacket(dataSerializer));
-
-                    Object byteBuf = PacketEvents.get().getByteBufUtil().newByteBuf(data);
-                    dataSerializerWrapper.write(NMSUtils.byteBufClass, 0, byteBuf);
+                    PacketEvents.get().getByteBufUtil().setBytes(getBuffer(), data);
                     break;
             }
 
@@ -169,10 +160,30 @@ public class WrappedPacketOutCustomPayload extends WrappedPacket implements Send
         }
     }
 
+    private Object getBuffer() {
+        Object dataSerializer = readObject(0, NMSUtils.packetDataSerializerClass);
+        WrappedPacket dataSerializerWrapper = new WrappedPacket(new NMSPacket(dataSerializer));
+
+        return dataSerializerWrapper.readObject(0, NMSUtils.byteBufClass);
+    }
+
+    public void retain() {
+        if (constructorMode != 0) {
+            PacketEvents.get().getByteBufUtil().retain(getBuffer());
+        }
+    }
+
+    public void release() {
+        if (constructorMode != 0) {
+            PacketEvents.get().getByteBufUtil().release(getBuffer());
+        }
+    }
+
     @Override
     public Object asNMSPacket() {
         byte[] data = getData();
-        Object byteBufObject = PacketEvents.get().getByteBufUtil().newByteBuf(data);
+        // TODO: Enjoy fixing this re! :D
+        /*Object byteBufObject = PacketEvents.get().getByteBufUtil().newByteBuf(data);
         switch (constructorMode) {
             case 0:
                 try {
@@ -199,7 +210,7 @@ public class WrappedPacketOutCustomPayload extends WrappedPacket implements Send
                     e.printStackTrace();
                 }
                 break;
-        }
+        }*/
         return null;
     }
 }

@@ -90,7 +90,7 @@ public final class NMSUtils {
 
         try {
             //Test if the selected netty location is valid
-            Object chnl = getNettyClass("channel.Channel");
+            getNettyClass("channel.Channel");
         } catch (Exception ex) {
             System.err.println("[packetevents] Failed to locate the netty package location for your server version. Searching...");
             //Time to correct the netty location

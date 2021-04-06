@@ -67,12 +67,7 @@ public final class WrappedPacketInCustomPayload extends WrappedPacket {
         if (byteArrayPresent) {
             return readByteArray(0);
         } else {
-            Object dataSerializer = readObject(0, NMSUtils.packetDataSerializerClass);
-            WrappedPacket dataSerializerWrapper = new WrappedPacket(new NMSPacket(dataSerializer));
-
-            Object byteBuf = dataSerializerWrapper.readObject(0, NMSUtils.byteBufClass);
-
-            return PacketEvents.get().getByteBufUtil().getBytes(byteBuf);
+            return PacketEvents.get().getByteBufUtil().getBytes(getBuffer());
         }
     }
 
@@ -80,11 +75,27 @@ public final class WrappedPacketInCustomPayload extends WrappedPacket {
         if (byteArrayPresent) {
             writeByteArray(0, data);
         } else {
-            Object dataSerializer = readObject(0, NMSUtils.packetDataSerializerClass);
-            WrappedPacket dataSerializerWrapper = new WrappedPacket(new NMSPacket(dataSerializer));
-
-            Object byteBuf = PacketEvents.get().getByteBufUtil().newByteBuf(data);
-            dataSerializerWrapper.write(NMSUtils.byteBufClass, 0, byteBuf);
+            PacketEvents.get().getByteBufUtil().setBytes(getBuffer(), data);
         }
     }
+
+    private Object getBuffer() {
+        Object dataSerializer = readObject(0, NMSUtils.packetDataSerializerClass);
+        WrappedPacket dataSerializerWrapper = new WrappedPacket(new NMSPacket(dataSerializer));
+
+        return dataSerializerWrapper.readObject(0, NMSUtils.byteBufClass);
+    }
+
+    public void retain() {
+        if (!byteArrayPresent) {
+            PacketEvents.get().getByteBufUtil().retain(getBuffer());
+        }
+    }
+
+    public void release() {
+        if (!byteArrayPresent) {
+            PacketEvents.get().getByteBufUtil().release(getBuffer());
+        }
+    }
+
 }

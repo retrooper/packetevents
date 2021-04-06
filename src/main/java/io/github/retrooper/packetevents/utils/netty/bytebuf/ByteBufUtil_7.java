@@ -25,12 +25,26 @@
 package io.github.retrooper.packetevents.utils.netty.bytebuf;
 
 import net.minecraft.util.io.netty.buffer.ByteBuf;
-import net.minecraft.util.io.netty.buffer.Unpooled;
 import net.minecraft.util.io.netty.util.internal.EmptyArrays;
 
 public final class ByteBufUtil_7 implements ByteBufUtil {
+
+    @Override
+    public void retain(Object byteBuf) {
+        ((ByteBuf) byteBuf).retain();
+    }
+
+    @Override
+    public void release(Object byteBuf) {
+        ((ByteBuf) byteBuf).release();
+    }
+
+    @Override
     public byte[] getBytes(Object byteBuf) {
-        ByteBuf bb = ((ByteBuf) byteBuf).copy();
+        final ByteBuf bb = (ByteBuf) byteBuf;
+        if (bb.refCnt() < 1) {
+            return EmptyArrays.EMPTY_BYTES;
+        }
         byte[] bytes;
         if (bb.hasArray()) {
             bytes = bb.array();
@@ -41,7 +55,17 @@ public final class ByteBufUtil_7 implements ByteBufUtil {
         return bytes;
     }
 
-    public Object newByteBuf(byte[] bytes) {
-        return Unpooled.copiedBuffer(bytes);
+    @Override
+    public void setBytes(Object byteBuf, byte[] bytes) {
+        final ByteBuf bb = (ByteBuf) byteBuf;
+        if (bb.refCnt() < 1) {
+            return;
+        }
+        final int bytesLength = bytes.length;
+        if (bb.capacity() < bytesLength) {
+            bb.capacity(bytesLength);
+        }
+        bb.setBytes(0, bytes);
     }
+
 }
