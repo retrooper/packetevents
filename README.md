@@ -9,8 +9,6 @@ PacketEvents is an open-source Packet API. It has many cross-version packet-wrap
 ### License
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)\
 PacketEvents is currently licensed under the MIT License.
-We intentionally selected this license compared to stricter options.
-[Summary of the license](https://tldrlegal.com/license/mit-license)
 
 ### Contributing/Forking
 [Learn more](https://github.com/retrooper/packetevents/wiki/2.-Contributing-and-Forking)\
