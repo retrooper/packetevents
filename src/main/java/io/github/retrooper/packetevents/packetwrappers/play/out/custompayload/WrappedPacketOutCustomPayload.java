@@ -39,7 +39,6 @@ import java.lang.reflect.Modifier;
 public class WrappedPacketOutCustomPayload extends WrappedPacket implements SendableWrapper {
     private static Constructor<?> constructor;
     private static Constructor<?> packetDataSerializerConstructor;
-    private static Class<?> byteBufClass;
     private static int minecraftKeyIndexInClass;
 
     private static byte constructorMode = 0;
@@ -59,13 +58,7 @@ public class WrappedPacketOutCustomPayload extends WrappedPacket implements Send
     protected void load() {
         Class<?> packetClass = PacketTypeClasses.Play.Server.CUSTOM_PAYLOAD;
         try {
-            byteBufClass = NMSUtils.getNettyClass("buffer.ByteBuf");
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
-        }
-
-        try {
-            packetDataSerializerConstructor = NMSUtils.packetDataSerializerClass.getConstructor(byteBufClass);
+            packetDataSerializerConstructor = NMSUtils.packetDataSerializerClass.getConstructor(NMSUtils.byteBufClass);
         } catch (NullPointerException | NoSuchMethodException e) {
             //For some reason some 1.7.10 spigots don't have this constructor although its on normal spigot 1.7.10???
         }
@@ -146,7 +139,7 @@ public class WrappedPacketOutCustomPayload extends WrappedPacket implements Send
                     Object dataSerializer = readObject(0, NMSUtils.packetDataSerializerClass);
                     WrappedPacket byteBufWrapper = new WrappedPacket(new NMSPacket(dataSerializer));
 
-                    Object byteBuf = byteBufWrapper.readObject(0, byteBufClass);
+                    Object byteBuf = byteBufWrapper.readObject(0, NMSUtils.byteBufClass);
 
                     return PacketEvents.get().getByteBufUtil().getBytes(byteBuf);
             }
@@ -167,7 +160,7 @@ public class WrappedPacketOutCustomPayload extends WrappedPacket implements Send
                     WrappedPacket dataSerializerWrapper = new WrappedPacket(new NMSPacket(dataSerializer));
 
                     Object byteBuf = PacketEvents.get().getByteBufUtil().newByteBuf(data);
-                    dataSerializerWrapper.write(byteBufClass, 0, byteBuf);
+                    dataSerializerWrapper.write(NMSUtils.byteBufClass, 0, byteBuf);
                     break;
             }
 

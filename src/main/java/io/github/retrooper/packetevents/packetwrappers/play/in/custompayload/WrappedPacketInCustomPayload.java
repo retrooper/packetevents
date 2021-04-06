@@ -32,8 +32,6 @@ import io.github.retrooper.packetevents.utils.nms.NMSUtils;
 import io.github.retrooper.packetevents.utils.reflection.Reflection;
 
 public final class WrappedPacketInCustomPayload extends WrappedPacket {
-    private static Class<?> byteBufClass;
-
     private static boolean strPresent, byteArrayPresent;
 
     public WrappedPacketInCustomPayload(NMSPacket packet) {
@@ -45,11 +43,6 @@ public final class WrappedPacketInCustomPayload extends WrappedPacket {
         Class<?> packetClass = PacketTypeClasses.Play.Client.CUSTOM_PAYLOAD;
         strPresent = Reflection.getField(packetClass, String.class, 0) != null;
         byteArrayPresent = Reflection.getField(packetClass, byte[].class, 0) != null;
-        try {
-            byteBufClass = NMSUtils.getNettyClass("buffer.ByteBuf");
-        } catch (ClassNotFoundException ignored) {
-
-        }
     }
 
     public String getTag() {
@@ -77,7 +70,7 @@ public final class WrappedPacketInCustomPayload extends WrappedPacket {
             Object dataSerializer = readObject(0, NMSUtils.packetDataSerializerClass);
             WrappedPacket dataSerializerWrapper = new WrappedPacket(new NMSPacket(dataSerializer));
 
-            Object byteBuf = dataSerializerWrapper.readObject(0, byteBufClass);
+            Object byteBuf = dataSerializerWrapper.readObject(0, NMSUtils.byteBufClass);
 
             return PacketEvents.get().getByteBufUtil().getBytes(byteBuf);
         }
@@ -91,7 +84,7 @@ public final class WrappedPacketInCustomPayload extends WrappedPacket {
             WrappedPacket dataSerializerWrapper = new WrappedPacket(new NMSPacket(dataSerializer));
 
             Object byteBuf = PacketEvents.get().getByteBufUtil().newByteBuf(data);
-            dataSerializerWrapper.write(byteBufClass, 0, byteBuf);
+            dataSerializerWrapper.write(NMSUtils.byteBufClass, 0, byteBuf);
         }
     }
 }
