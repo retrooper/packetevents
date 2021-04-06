@@ -17,7 +17,7 @@ We intentionally selected this license compared to stricter options.\
 Our discord server has a role for contributors and forkers.\
 
 ### Setup
-[Learn more](https://github.com/retrooper/packetevents/wiki/1.-Setup)\
+[Learn more](https://github.com/retrooper/packetevents/wiki/1.-Setup)
 
 ### Author
 PacketEvents was started by retrooper.
