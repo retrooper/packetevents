@@ -12,7 +12,7 @@ PacketEvents is currently licensed under the MIT License.
 
 ### Contributing/Forking
 [Learn more](https://github.com/retrooper/packetevents/wiki/2.-Contributing-and-Forking)\
-Our discord server has a role for contributors and forkers.\
+Our discord server has a role for contributors and forkers.
 
 ### Setup
 [Learn more](https://github.com/retrooper/packetevents/wiki/1.-Setup)
