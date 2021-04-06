@@ -75,8 +75,3 @@ We currently do not have a guide showing you how to do this, but it should be se
 
 ### Author
 PacketEvents was started by retrooper.
-This API was initially for his private anti-cheat he was developing just to test around with.
-He has quit anti-cheat development and is now prioritizing this API and a few other private projects.
-PacketEvents now has a handfull of contributors improving the API.
-Share the API, donate, contribute, fork.
-Thanks. 
