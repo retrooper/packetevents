@@ -59,7 +59,7 @@ public final class NMSUtils {
     public static Class<?> nmsEntityClass, minecraftServerClass, craftWorldClass, playerInteractManagerClass, entityPlayerClass, playerConnectionClass, craftServerClass,
             craftPlayerClass, serverConnectionClass, craftEntityClass, nmsItemStackClass, networkManagerClass, nettyChannelClass, gameProfileClass, iChatBaseComponentClass,
             blockPosClass, vec3DClass, channelFutureClass, blockClass, iBlockDataClass, nmsWorldClass, craftItemStackClass,
-            soundEffectClass, minecraftKeyClass, chatSerializerClass, craftMagicNumbersClass, worldSettingsClass, worldServerClass, dataWatcherClass, nmsEntityHumanClass, dedicatedServerClass, entityHumanClass;
+            soundEffectClass, minecraftKeyClass, chatSerializerClass, craftMagicNumbersClass, worldSettingsClass, worldServerClass, dataWatcherClass, nmsEntityHumanClass, dedicatedServerClass, entityHumanClass, packetDataSerializerClass;
     public static Class<? extends Enum<?>> enumDirectionClass, enumHandClass, enumGameModeClass;
     public static Method getBlockPosX, getBlockPosY, getBlockPosZ;
     private static String nettyPrefix;
@@ -129,6 +129,7 @@ public final class NMSUtils {
             dataWatcherClass = getNMSClassWithoutException("DataWatcher");
             nmsEntityHumanClass = getNMSClassWithoutException("EntityHuman");
             dedicatedServerClass = getNMSClassWithoutException("DedicatedServer");
+            packetDataSerializerClass = getNMSClassWithoutException("PacketDataSerializer");
             try {
                 gameProfileClass = Class.forName("net.minecraft.util.com.mojang.authlib.GameProfile");
             } catch (ClassNotFoundException e) {

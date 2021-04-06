@@ -39,7 +39,7 @@ import java.lang.reflect.Modifier;
 public class WrappedPacketOutCustomPayload extends WrappedPacket implements SendableWrapper {
     private static Constructor<?> constructor;
     private static Constructor<?> packetDataSerializerConstructor;
-    private static Class<?> byteBufClass, packetDataSerializerClass;
+    private static Class<?> byteBufClass;
     private static int minecraftKeyIndexInClass;
 
     private static byte constructorMode = 0;
@@ -58,7 +58,6 @@ public class WrappedPacketOutCustomPayload extends WrappedPacket implements Send
     @Override
     protected void load() {
         Class<?> packetClass = PacketTypeClasses.Play.Server.CUSTOM_PAYLOAD;
-        packetDataSerializerClass = NMSUtils.getNMSClassWithoutException("PacketDataSerializer");
         try {
             byteBufClass = NMSUtils.getNettyClass("buffer.ByteBuf");
         } catch (ClassNotFoundException e) {
@@ -66,7 +65,7 @@ public class WrappedPacketOutCustomPayload extends WrappedPacket implements Send
         }
 
         try {
-            packetDataSerializerConstructor = packetDataSerializerClass.getConstructor(byteBufClass);
+            packetDataSerializerConstructor = NMSUtils.packetDataSerializerClass.getConstructor(byteBufClass);
         } catch (NullPointerException | NoSuchMethodException e) {
             //For some reason some 1.7.10 spigots don't have this constructor although its on normal spigot 1.7.10???
         }
@@ -85,7 +84,7 @@ public class WrappedPacketOutCustomPayload extends WrappedPacket implements Send
         } catch (NoSuchMethodException e) {
             //That's fine, just a newer version
             try {
-                constructor = packetClass.getConstructor(String.class, packetDataSerializerClass);
+                constructor = packetClass.getConstructor(String.class, NMSUtils.packetDataSerializerClass);
                 constructorMode = 1;
             } catch (NoSuchMethodException e2) {
                 //That's fine, just an even newer version
@@ -98,7 +97,7 @@ public class WrappedPacketOutCustomPayload extends WrappedPacket implements Send
                             break;
                         }
                     }
-                    constructor = packetClass.getConstructor(NMSUtils.minecraftKeyClass, packetDataSerializerClass);
+                    constructor = packetClass.getConstructor(NMSUtils.minecraftKeyClass, NMSUtils.packetDataSerializerClass);
                     constructorMode = 2;
                 } catch (NoSuchMethodException e3) {
                     throw new IllegalStateException("PacketEvents is unable to resolve the PacketPlayOutCustomPayload constructor.");
@@ -144,7 +143,7 @@ public class WrappedPacketOutCustomPayload extends WrappedPacket implements Send
                     return readByteArray(0);
                 case 1:
                 case 2:
-                    Object dataSerializer = readObject(0, packetDataSerializerClass);
+                    Object dataSerializer = readObject(0, NMSUtils.packetDataSerializerClass);
                     WrappedPacket byteBufWrapper = new WrappedPacket(new NMSPacket(dataSerializer));
 
                     Object byteBuf = byteBufWrapper.readObject(0, byteBufClass);
@@ -161,13 +160,15 @@ public class WrappedPacketOutCustomPayload extends WrappedPacket implements Send
             switch (constructorMode) {
                 case 0:
                     writeByteArray(0, data);
+                    break;
                 case 1:
                 case 2:
-                    Object dataSerializer = readObject(0, packetDataSerializerClass);
+                    Object dataSerializer = readObject(0, NMSUtils.packetDataSerializerClass);
                     WrappedPacket dataSerializerWrapper = new WrappedPacket(new NMSPacket(dataSerializer));
 
                     Object byteBuf = PacketEvents.get().getByteBufUtil().newByteBuf(data);
                     dataSerializerWrapper.write(byteBufClass, 0, byteBuf);
+                    break;
             }
 
         } else {

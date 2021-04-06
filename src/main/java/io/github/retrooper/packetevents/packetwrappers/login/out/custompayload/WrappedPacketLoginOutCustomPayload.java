@@ -38,7 +38,6 @@ public class WrappedPacketLoginOutCustomPayload extends WrappedPacket implements
     private static Constructor<?> constructor;
     private static Constructor<?> packetDataSerializerConstructor;
     private static Class<?> byteBufClass;
-    private static Class<?> packetDataSerializerClass;
     private int messageID;
     private String channelName;
     private byte[] data;
@@ -51,7 +50,6 @@ public class WrappedPacketLoginOutCustomPayload extends WrappedPacket implements
     protected void load() {
         Class<?> packetClass = PacketTypeClasses.Login.Server.CUSTOM_PAYLOAD;
         if (packetClass != null) {
-            packetDataSerializerClass = NMSUtils.getNMSClassWithoutException("PacketDataSerializer");
             try {
                 byteBufClass = NMSUtils.getNettyClass("buffer.ByteBuf");
             } catch (ClassNotFoundException ex) {
@@ -59,8 +57,8 @@ public class WrappedPacketLoginOutCustomPayload extends WrappedPacket implements
             }
 
             try {
-                if (packetDataSerializerClass != null) {
-                    packetDataSerializerConstructor = packetDataSerializerClass.getConstructor(byteBufClass);
+                if (NMSUtils.packetDataSerializerClass != null) {
+                    packetDataSerializerConstructor = NMSUtils.packetDataSerializerClass.getConstructor(byteBufClass);
                 }
             } catch (NoSuchMethodException e) {
                 e.printStackTrace();
@@ -108,7 +106,7 @@ public class WrappedPacketLoginOutCustomPayload extends WrappedPacket implements
 
     public byte[] getData() {
         if (packet != null) {
-            Object dataSerializer = readObject(0, packetDataSerializerClass);
+            Object dataSerializer = readObject(0, NMSUtils.packetDataSerializerClass);
             WrappedPacket byteBufWrapper = new WrappedPacket(new NMSPacket(dataSerializer));
             Object byteBuf = byteBufWrapper.readObject(0, byteBufClass);
             return PacketEvents.get().getByteBufUtil().getBytes(byteBuf);
@@ -117,7 +115,7 @@ public class WrappedPacketLoginOutCustomPayload extends WrappedPacket implements
     }
 
     public void setData(byte[] data) {
-        Object dataSerializer = readObject(0, packetDataSerializerClass);
+        Object dataSerializer = readObject(0, NMSUtils.packetDataSerializerClass);
         WrappedPacket dataSerializerWrapper = new WrappedPacket(new NMSPacket(dataSerializer));
         Object byteBuf = PacketEvents.get().getByteBufUtil().newByteBuf(data);
         dataSerializerWrapper.write(byteBufClass,0, byteBuf);

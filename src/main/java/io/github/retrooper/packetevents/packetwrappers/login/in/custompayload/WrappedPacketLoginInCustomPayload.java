@@ -32,7 +32,6 @@ import io.github.retrooper.packetevents.utils.server.ServerVersion;
 
 public class WrappedPacketLoginInCustomPayload extends WrappedPacket {
     private static Class<?> byteBufClass;
-    private static Class<?> packetDataSerializerClass;
 
     public WrappedPacketLoginInCustomPayload(NMSPacket packet) {
         super(packet);
@@ -40,7 +39,6 @@ public class WrappedPacketLoginInCustomPayload extends WrappedPacket {
 
     @Override
     protected void load() {
-        packetDataSerializerClass = NMSUtils.getNMSClassWithoutException("PacketDataSerializer");
         try {
             byteBufClass = NMSUtils.getNettyClass("buffer.ByteBuf");
         } catch (ClassNotFoundException ignored) {
@@ -56,14 +54,14 @@ public class WrappedPacketLoginInCustomPayload extends WrappedPacket {
     }
 
     public byte[] getData() {
-        Object dataSerializer = readObject(0, packetDataSerializerClass);
+        Object dataSerializer = readObject(0, NMSUtils.packetDataSerializerClass);
         WrappedPacket byteBufWrapper = new WrappedPacket(new NMSPacket(dataSerializer));
         Object byteBuf = byteBufWrapper.readObject(0, byteBufClass);
         return PacketEvents.get().getByteBufUtil().getBytes(byteBuf);
     }
 
     public void setData(byte[] data) {
-        Object dataSerializer = readObject(0, packetDataSerializerClass);
+        Object dataSerializer = readObject(0, NMSUtils.packetDataSerializerClass);
         WrappedPacket dataSerializerWrapper = new WrappedPacket(new NMSPacket(dataSerializer));
         Object byteBuf = PacketEvents.get().getByteBufUtil().newByteBuf(data);
         dataSerializerWrapper.write(byteBufClass, 0, byteBuf);
