@@ -13,11 +13,11 @@ We intentionally selected this license compared to stricter options.\
 [Summary of the license](https://tldrlegal.com/license/mit-license)
 
 ### Contributing/Forking
-[![Learn more](https://github.com/retrooper/packetevents/wiki/2.-Contributing-and-Forking)\
+[Learn more](https://github.com/retrooper/packetevents/wiki/2.-Contributing-and-Forking)\
 Our discord server has a role for contributors and forkers.\
 
 ### Setup
-[![Learn more](https://github.com/retrooper/packetevents/wiki/1.-Setup)\
+[Learn more](https://github.com/retrooper/packetevents/wiki/1.-Setup)\
 
 ### Author
 PacketEvents was started by retrooper.
