@@ -29,9 +29,10 @@ import io.netty.buffer.Unpooled;
 import io.netty.util.internal.EmptyArrays;
 
 public final class ByteBufUtil_8 implements ByteBufUtil {
+
     @Override
     public Object newByteBuf(byte[] data) {
-        return Unpooled.copiedBuffer(data);
+        return Unpooled.wrappedBuffer(data);
     }
 
     @Override
