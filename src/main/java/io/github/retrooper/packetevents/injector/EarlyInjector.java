@@ -22,9 +22,8 @@
  * SOFTWARE.
  */
 
-package io.github.retrooper.packetevents.injector.earlyinjector;
+package io.github.retrooper.packetevents.injector;
 
-import io.github.retrooper.packetevents.injector.ChannelInjector;
 import org.bukkit.entity.Player;
 
 public interface EarlyInjector extends ChannelInjector {

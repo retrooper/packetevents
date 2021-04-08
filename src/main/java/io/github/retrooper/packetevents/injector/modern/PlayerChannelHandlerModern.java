@@ -22,20 +22,20 @@
  * SOFTWARE.
  */
 
-package io.github.retrooper.packetevents.injector.handler.legacy;
+package io.github.retrooper.packetevents.injector.modern;
 
 import io.github.retrooper.packetevents.PacketEvents;
-import net.minecraft.util.io.netty.channel.ChannelDuplexHandler;
-import net.minecraft.util.io.netty.channel.ChannelHandlerContext;
-import net.minecraft.util.io.netty.channel.ChannelPromise;
+import io.netty.channel.ChannelDuplexHandler;
+import io.netty.channel.ChannelHandlerContext;
+import io.netty.channel.ChannelPromise;
 import org.bukkit.entity.Player;
 
 import java.util.logging.Level;
 
-public class PlayerChannelHandlerLegacy extends ChannelDuplexHandler {
+public class PlayerChannelHandlerModern extends ChannelDuplexHandler {
     /**
      * Associated player.
-     * This is null until the player is injected.
+     * This is null until we inject the player.
      */
     public volatile Player player;
 

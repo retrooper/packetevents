@@ -25,6 +25,7 @@
 package io.github.retrooper.packetevents;
 
 import io.github.retrooper.packetevents.settings.PacketEventsSettings;
+import io.github.retrooper.packetevents.utils.server.ServerVersion;
 import org.bukkit.plugin.java.JavaPlugin;
 
 public class PacketEventsPlugin extends JavaPlugin {
@@ -33,9 +34,10 @@ public class PacketEventsPlugin extends JavaPlugin {
         //Return value of create is your PacketEvents instance.
         PacketEvents instance = PacketEvents.create(this);
         PacketEventsSettings settings = instance.getSettings();
-        settings.compatInjector(false);
-        settings.checkForUpdates(false);
-        instance.loadAsyncNewThread();
+        settings.fallbackServerVersion(ServerVersion.v_1_7_10)
+                .compatInjector(true)
+                .checkForUpdates(false);
+        PacketEvents.get().loadAsyncNewThread();
     }
 
     @Override

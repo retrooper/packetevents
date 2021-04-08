@@ -34,7 +34,7 @@ import io.github.retrooper.packetevents.utils.server.ServerVersion;
  */
 public class PacketEventsSettings {
     private boolean locked;
-    private ServerVersion backupServerVersion = ServerVersion.v_1_7_10;
+    private ServerVersion fallbackServerVersion = ServerVersion.v_1_7_10;
 
     /**
      * This boolean stores if PacketEvents should check for updates,
@@ -63,13 +63,28 @@ public class PacketEventsSettings {
      * the server version fails using the Bukkit API.
      * This seems to be most common on 1.7.10 paper forks.
      * They probably mess up somewhere.
-     *
+     * @deprecated Use {@link #getFallbackServerVersion()}
      * @param serverVersion ServerVersion
      * @return Settings instance.
      */
+    @Deprecated
     public PacketEventsSettings backupServerVersion(ServerVersion serverVersion) {
         if (!locked) {
-            this.backupServerVersion = serverVersion;
+            this.fallbackServerVersion = serverVersion;
+        }
+        return this;
+    }
+
+    /**
+     * This is the server version PacketEvents should assume the server is when detecting
+     * the server version fails using the Bukkit API.
+     * This seems to be most common on 1.7.10 paper forks.
+     * @param version ServerVersion
+     * @return Settings instance.
+     */
+    public PacketEventsSettings fallbackServerVersion(ServerVersion version) {
+        if (!locked) {
+            this.fallbackServerVersion = version;
         }
         return this;
     }
@@ -114,11 +129,20 @@ public class PacketEventsSettings {
 
     /**
      * Backup server version.
-     *
+     * @deprecated Use {@link #getFallbackServerVersion()}
      * @return Getter for {@link #backupServerVersion}
      */
+    @Deprecated
     public ServerVersion getBackupServerVersion() {
-        return backupServerVersion;
+        return fallbackServerVersion;
+    }
+
+    /**
+     * Fallback server version.
+     * @return Getter for {@link #backupServerVersion}
+     */
+    public ServerVersion getFallbackServerVersion() {
+        return fallbackServerVersion;
     }
 
     /**

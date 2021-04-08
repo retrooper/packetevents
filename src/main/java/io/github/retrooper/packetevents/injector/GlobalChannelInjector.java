@@ -3,15 +3,12 @@ package io.github.retrooper.packetevents.injector;
 import io.github.retrooper.packetevents.PacketEvents;
 import io.github.retrooper.packetevents.event.impl.PlayerEjectEvent;
 import io.github.retrooper.packetevents.event.impl.PlayerInjectEvent;
-import io.github.retrooper.packetevents.injector.earlyinjector.EarlyInjector;
-import io.github.retrooper.packetevents.injector.earlyinjector.legacy.EarlyChannelInjectorLegacy;
-import io.github.retrooper.packetevents.injector.earlyinjector.modern.EarlyChannelInjectorModern;
-import io.github.retrooper.packetevents.injector.lateinjector.legacy.LateChannelInjectorLegacy;
-import io.github.retrooper.packetevents.injector.lateinjector.modern.LateChannelInjectorModern;
+import io.github.retrooper.packetevents.injector.legacy.early.EarlyChannelInjectorLegacy;
+import io.github.retrooper.packetevents.injector.modern.early.EarlyChannelInjectorModern;
+import io.github.retrooper.packetevents.injector.legacy.late.LateChannelInjectorLegacy;
+import io.github.retrooper.packetevents.injector.modern.late.LateChannelInjectorModern;
 import io.github.retrooper.packetevents.utils.nms.NMSUtils;
 import org.bukkit.entity.Player;
-
-import java.util.NoSuchElementException;
 
 public class GlobalChannelInjector implements ChannelInjector {
     private ChannelInjector injector;

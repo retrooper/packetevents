@@ -22,15 +22,15 @@
  * SOFTWARE.
  */
 
-package io.github.retrooper.packetevents.injector.lateinjector.legacy;
+package io.github.retrooper.packetevents.injector.modern.late;
 
 import io.github.retrooper.packetevents.PacketEvents;
-import io.github.retrooper.packetevents.injector.handler.legacy.PlayerChannelHandlerLegacy;
-import io.github.retrooper.packetevents.injector.lateinjector.LateInjector;
-import net.minecraft.util.io.netty.channel.Channel;
+import io.github.retrooper.packetevents.injector.modern.PlayerChannelHandlerModern;
+import io.github.retrooper.packetevents.injector.LateInjector;
+import io.netty.channel.Channel;
 import org.bukkit.entity.Player;
 
-public class LateChannelInjectorLegacy implements LateInjector {
+public class LateChannelInjectorModern implements LateInjector {
     @Override
     public void inject() {
 
@@ -43,9 +43,10 @@ public class LateChannelInjectorLegacy implements LateInjector {
 
     @Override
     public void injectPlayer(Player player) {
-        PlayerChannelHandlerLegacy playerChannelHandlerLegacy = new PlayerChannelHandlerLegacy();
+        PlayerChannelHandlerModern playerChannelHandlerModern = new PlayerChannelHandlerModern();
+        playerChannelHandlerModern.player = player;
         Channel channel = (Channel) PacketEvents.get().packetProcessorInternal.getChannel(player);
-        channel.pipeline().addBefore("packet_handler", PacketEvents.handlerName, playerChannelHandlerLegacy);
+        channel.pipeline().addBefore("packet_handler", PacketEvents.handlerName, playerChannelHandlerModern);
     }
 
     @Override

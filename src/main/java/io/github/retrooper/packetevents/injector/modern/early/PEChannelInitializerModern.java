@@ -22,10 +22,10 @@
  * SOFTWARE.
  */
 
-package io.github.retrooper.packetevents.injector.earlyinjector.modern;
+package io.github.retrooper.packetevents.injector.modern.early;
 
 import io.github.retrooper.packetevents.PacketEvents;
-import io.github.retrooper.packetevents.injector.handler.modern.PlayerChannelHandlerModern;
+import io.github.retrooper.packetevents.injector.modern.PlayerChannelHandlerModern;
 import io.github.retrooper.packetevents.utils.reflection.Reflection;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.socket.SocketChannel;

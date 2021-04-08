@@ -22,16 +22,15 @@
  * SOFTWARE.
  */
 
-package io.github.retrooper.packetevents.injector.earlyinjector.legacy;
+package io.github.retrooper.packetevents.injector.legacy.early;
 
 import io.github.retrooper.packetevents.PacketEvents;
-import io.github.retrooper.packetevents.injector.earlyinjector.EarlyInjector;
-import io.github.retrooper.packetevents.injector.handler.legacy.PlayerChannelHandlerLegacy;
+import io.github.retrooper.packetevents.injector.EarlyInjector;
+import io.github.retrooper.packetevents.injector.legacy.PlayerChannelHandlerLegacy;
 import io.github.retrooper.packetevents.packetwrappers.NMSPacket;
 import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
 import io.github.retrooper.packetevents.utils.list.ListWrapper;
 import io.github.retrooper.packetevents.utils.nms.NMSUtils;
-import io.github.retrooper.packetevents.utils.reflection.Reflection;
 import net.minecraft.util.io.netty.channel.Channel;
 import net.minecraft.util.io.netty.channel.ChannelFuture;
 import net.minecraft.util.io.netty.channel.ChannelHandler;
