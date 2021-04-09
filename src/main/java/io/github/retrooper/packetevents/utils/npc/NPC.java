@@ -15,7 +15,6 @@ import io.github.retrooper.packetevents.utils.vector.Vector3d;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -64,9 +63,7 @@ public class NPC {
                 public void run() {
                     boolean spawned = spawnedForPlayerMap.getOrDefault(player.getUniqueId(), false);
                     if (spawned) {
-                        List<WrappedPacketOutPlayerInfo.PlayerInfo> playerInfoList = new ArrayList<>();
-                        playerInfoList.add(new WrappedPacketOutPlayerInfo.PlayerInfo(name, gameProfile, GameMode.SURVIVAL, 0));
-                        WrappedPacketOutPlayerInfo playerInfo = new WrappedPacketOutPlayerInfo(WrappedPacketOutPlayerInfo.PlayerInfoAction.REMOVE_PLAYER, playerInfoList);
+                        WrappedPacketOutPlayerInfo playerInfo = new WrappedPacketOutPlayerInfo(WrappedPacketOutPlayerInfo.PlayerInfoAction.REMOVE_PLAYER, new WrappedPacketOutPlayerInfo.PlayerInfo(name, gameProfile, GameMode.SURVIVAL, 0));
                         PacketEvents.get().getPlayerUtils().sendPacket(player, playerInfo);
                     }
                     spawnedForPlayerMap.remove(player.getUniqueId());
@@ -84,9 +81,7 @@ public class NPC {
                 CompletableFuture.runAsync(new Runnable() {
                     @Override
                     public void run() {
-                        List<WrappedPacketOutPlayerInfo.PlayerInfo> playerInfoList = new ArrayList<>();
-                        playerInfoList.add(new WrappedPacketOutPlayerInfo.PlayerInfo(name, gameProfile, GameMode.SURVIVAL, 0));
-                        WrappedPacketOutPlayerInfo playerInfo = new WrappedPacketOutPlayerInfo(WrappedPacketOutPlayerInfo.PlayerInfoAction.ADD_PLAYER, playerInfoList);
+                        WrappedPacketOutPlayerInfo playerInfo = new WrappedPacketOutPlayerInfo(WrappedPacketOutPlayerInfo.PlayerInfoAction.ADD_PLAYER, new WrappedPacketOutPlayerInfo.PlayerInfo(name, gameProfile, GameMode.SURVIVAL, 0));
                         PacketEvents.get().getPlayerUtils().sendPacket(player, playerInfo);
                     }
                 }).thenRunAsync(new Runnable() {
