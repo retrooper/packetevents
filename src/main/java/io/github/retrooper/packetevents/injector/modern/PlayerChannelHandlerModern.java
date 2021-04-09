@@ -39,13 +39,6 @@ public class PlayerChannelHandlerModern extends ChannelDuplexHandler {
      */
     public volatile Player player;
 
-    /**
-     * Incoming packet interception.
-     *
-     * @param ctx    Netty channel handler context.
-     * @param packet Raw NMS Packet.
-     * @throws Exception Possible exception.
-     */
     @Override
     public void channelRead(final ChannelHandlerContext ctx, Object packet) throws Exception {
         try {
@@ -60,14 +53,6 @@ public class PlayerChannelHandlerModern extends ChannelDuplexHandler {
         }
     }
 
-    /**
-     * Outgoing packet interception.
-     *
-     * @param ctx     Netty channel handler context.
-     * @param packet  Raw NMS Packet
-     * @param promise Netty channel promise.
-     * @throws Exception Possible exception.
-     */
     @Override
     public void write(final ChannelHandlerContext ctx, Object packet, final ChannelPromise promise) throws Exception {
         try {

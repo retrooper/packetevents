@@ -34,8 +34,9 @@ public class PacketEventsPlugin extends JavaPlugin {
         //Return value of create is your PacketEvents instance.
         PacketEvents instance = PacketEvents.create(this);
         PacketEventsSettings settings = instance.getSettings();
-        settings.fallbackServerVersion(ServerVersion.v_1_7_10)
-                .compatInjector(true)
+        settings
+                .fallbackServerVersion(ServerVersion.v_1_7_10)
+                .compatInjector(false)
                 .checkForUpdates(false);
         PacketEvents.get().loadAsyncNewThread();
     }

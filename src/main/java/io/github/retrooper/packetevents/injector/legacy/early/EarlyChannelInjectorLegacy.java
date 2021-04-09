@@ -247,8 +247,7 @@ public class EarlyChannelInjectorLegacy implements EarlyInjector {
             Channel chnl = (Channel) channel;
             try {
                 chnl.pipeline().remove(PacketEvents.handlerName);
-            }
-            catch (Exception ex) {
+            } catch (Exception ex) {
 
             }
         }
