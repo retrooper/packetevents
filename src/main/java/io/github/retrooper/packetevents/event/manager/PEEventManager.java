@@ -33,6 +33,6 @@ package io.github.retrooper.packetevents.event.manager;
 public class PEEventManager implements EventManager {
 
     public static final EventManagerLegacy EVENT_MANAGER_LEGACY = new EventManagerLegacy();
-    public static final EventManagerDynamic EVENT_MANAGER_DYNAMIC = new EventManagerDynamic();
+    public static final EventManagerModern EVENT_MANAGER_MODERN = new EventManagerModern();
 
 }

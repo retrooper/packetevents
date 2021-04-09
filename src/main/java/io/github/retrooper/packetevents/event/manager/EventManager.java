@@ -55,7 +55,7 @@ public interface EventManager {
      */
     default EventManager callEvent(PacketEvent event) {
         //The dynamic event manager calls the legacy event manager.
-        PEEventManager.EVENT_MANAGER_DYNAMIC.callEvent(event);
+        PEEventManager.EVENT_MANAGER_MODERN.callEvent(event);
         return this;
     }
 
@@ -121,7 +121,7 @@ public interface EventManager {
      */
     @Deprecated
     default EventManager registerListener(PacketListenerDynamic listener) {
-        PEEventManager.EVENT_MANAGER_DYNAMIC.registerListener(listener);
+        PEEventManager.EVENT_MANAGER_MODERN.registerListener(listener);
         return this;
     }
 
@@ -133,7 +133,7 @@ public interface EventManager {
      */
     @Deprecated
     default EventManager registerListeners(PacketListenerDynamic... listeners) {
-        PEEventManager.EVENT_MANAGER_DYNAMIC.registerListeners(listeners);
+        PEEventManager.EVENT_MANAGER_MODERN.registerListeners(listeners);
         return this;
     }
 
@@ -146,7 +146,7 @@ public interface EventManager {
      */
     default EventManager registerListener(PacketListenerAbstract listener) {
         if (listener != null) {
-            PEEventManager.EVENT_MANAGER_DYNAMIC.registerListener(listener);
+            PEEventManager.EVENT_MANAGER_MODERN.registerListener(listener);
         }
         return this;
     }
@@ -158,7 +158,7 @@ public interface EventManager {
      * @return Same event manager instance.
      */
     default EventManager registerListeners(PacketListenerAbstract... listeners) {
-        PEEventManager.EVENT_MANAGER_DYNAMIC.registerListeners(listeners);
+        PEEventManager.EVENT_MANAGER_MODERN.registerListeners(listeners);
         return this;
     }
 
@@ -169,7 +169,7 @@ public interface EventManager {
      * @return Same event manager instance.
      */
     default EventManager unregisterAllListeners() {
-        PEEventManager.EVENT_MANAGER_DYNAMIC.unregisterAllListeners();
+        PEEventManager.EVENT_MANAGER_MODERN.unregisterAllListeners();
         PEEventManager.EVENT_MANAGER_LEGACY.unregisterAllListeners();
         return this;
     }

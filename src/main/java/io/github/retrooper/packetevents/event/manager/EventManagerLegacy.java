@@ -47,7 +47,7 @@ class EventManagerLegacy {
     /**
      * Call a PacketEvent with the legacy event manager.
      * This method processes the event on all legacy packet event listeners.
-     * This method is actually called by {@link EventManagerDynamic#callEvent(PacketEvent)} as the
+     * This method is actually called by {@link EventManagerModern#callEvent(PacketEvent)} as the
      * if you mix the two event systems, the dynamic listeners are always processed first and pass
      * their highest reached event priority that this legacy one has to beat/reach to be able to cancel
      * the event.
