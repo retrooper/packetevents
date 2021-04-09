@@ -18,22 +18,22 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;
 
-//TODO finish wrapper
+//TODO test(especially sending)
 public class WrappedPacketOutPlayerInfo extends WrappedPacket implements SendableWrapper {
     private static Class<? extends Enum<?>> enumPlayerInfoActionClass;
     private static Class<?> playerInfoDataClass;
     private static Constructor<?> packetDefaultConstructor, playerInfoDataConstructor;
     private static byte constructorMode = 0;
     private PlayerInfoAction action;
-    private List<PlayerInfo> playerInfoList = new ArrayList<>();
+    private PlayerInfo[] playerInfoArray = new PlayerInfo[0];
 
     public WrappedPacketOutPlayerInfo(NMSPacket packet) {
         super(packet);
     }
 
-    public WrappedPacketOutPlayerInfo(PlayerInfoAction action, List<PlayerInfo> playerInfoList) {
+    public WrappedPacketOutPlayerInfo(PlayerInfoAction action, PlayerInfo... playerInfoArray) {
         this.action = action;
-        this.playerInfoList = playerInfoList;
+        this.playerInfoArray = playerInfoArray;
     }
 
     @Override
@@ -91,19 +91,20 @@ public class WrappedPacketOutPlayerInfo extends WrappedPacket implements Sendabl
         }
     }
 
-    public List<PlayerInfo> getPlayerInfo() {
+    public PlayerInfo[] getPlayerInfo() {
         if (packet != null) {
-            List<PlayerInfo> playerInfoList = new ArrayList<>();
+            PlayerInfo[] playerInfoArray = new PlayerInfo[1];
             if (version.isOlderThan(ServerVersion.v_1_8)) {
                 String username = readString(0);
                 Object mojangGameProfile = readObject(0, NMSUtils.gameProfileClass);
                 WrappedGameProfile gameProfile = GameProfileUtil.getWrappedGameProfile(mojangGameProfile);
                 GameMode gameMode = GameMode.values()[readInt(1)];
                 int ping = readInt(2);
-                playerInfoList.add(new PlayerInfo(username, gameProfile, gameMode, ping));
+                playerInfoArray[0] = new PlayerInfo(username, gameProfile, gameMode, ping);
             } else {
                 List<Object> nmsPlayerInfoDataList = readObject(0, List.class);
-                for (Object nmsPlayerInfoData : nmsPlayerInfoDataList) {
+                for (int i = 0; i < nmsPlayerInfoDataList.size(); i++) {
+                    Object nmsPlayerInfoData = nmsPlayerInfoDataList.get(i);
                     WrappedPacket nmsPlayerInfoDataWrapper = new WrappedPacket(new NMSPacket(nmsPlayerInfoData));
                     Object iChatBaseComponentName = nmsPlayerInfoDataWrapper.readObject(0, NMSUtils.iChatBaseComponentClass);
                     String username;
@@ -118,22 +119,22 @@ public class WrappedPacketOutPlayerInfo extends WrappedPacket implements Sendabl
                     Enum<?> nmsGameModeEnumConstant = nmsPlayerInfoDataWrapper.readEnumConstant(0, NMSUtils.enumGameModeClass);
                     GameMode gameMode = GameMode.valueOf(nmsGameModeEnumConstant.name());
                     int ping = nmsPlayerInfoDataWrapper.readInt(0);
-                    playerInfoList.add(new PlayerInfo(username, gameProfile, gameMode, ping));
+                    playerInfoArray[i] = new PlayerInfo(username, gameProfile, gameMode, ping);
                 }
             }
-            return playerInfoList;
+            return playerInfoArray;
         } else {
-            return playerInfoList;
+            return playerInfoArray;
         }
     }
 
-    public void setPlayerInfo(List<PlayerInfo> playerInfoList) throws UnsupportedOperationException {
-        if (version.isOlderThan(ServerVersion.v_1_8) && playerInfoList.size() > 1) {
+    public void setPlayerInfo(PlayerInfo... playerInfoArray) throws UnsupportedOperationException {
+        if (version.isOlderThan(ServerVersion.v_1_8) && playerInfoArray.length > 1) {
             throw new UnsupportedOperationException("The player info list size cannot be greater than 1 one 1.7.10 server versions!");
         }
         if (packet != null) {
             if (version.isOlderThan(ServerVersion.v_1_8)) {
-                PlayerInfo playerInfo = playerInfoList.get(0);
+                PlayerInfo playerInfo = playerInfoArray[0];
                 writeString(0, playerInfo.username);
                 Object mojangGameProfile = GameProfileUtil.getGameProfile(playerInfo.gameProfile.getId(), playerInfo.gameProfile.getName());
                 writeObject(0, mojangGameProfile);
@@ -142,7 +143,7 @@ public class WrappedPacketOutPlayerInfo extends WrappedPacket implements Sendabl
             } else {
                 List<Object> nmsPlayerInfoList = new ArrayList<>();
 
-                for (PlayerInfo playerInfo : playerInfoList) {
+                for (PlayerInfo playerInfo : playerInfoArray) {
                     Object usernameIChatBaseComponent = NMSUtils.generateIChatBaseComponent(NMSUtils.fromStringToJSON(playerInfo.username));
                     Object mojangGameProfile = GameProfileUtil.getGameProfile(playerInfo.gameProfile.getId(), playerInfo.gameProfile.getName());
                     Enum<?> nmsGameModeEnumConstant = EnumUtil.valueOf(NMSUtils.enumGameModeClass, playerInfo.gameMode.name());
@@ -161,7 +162,7 @@ public class WrappedPacketOutPlayerInfo extends WrappedPacket implements Sendabl
                 write(List.class, 0, nmsPlayerInfoList);
             }
         } else {
-            this.playerInfoList = playerInfoList;
+            this.playerInfoArray = playerInfoArray;
         }
     }
 
@@ -170,8 +171,8 @@ public class WrappedPacketOutPlayerInfo extends WrappedPacket implements Sendabl
         try {
             Object packetPlayOutPlayerInfoInstance = packetDefaultConstructor.newInstance();
             WrappedPacketOutPlayerInfo playerInfoWrapper = new WrappedPacketOutPlayerInfo(new NMSPacket(packetPlayOutPlayerInfoInstance));
-            List<PlayerInfo> playerInfos = getPlayerInfo();
-            if (!playerInfos.isEmpty()) {
+            PlayerInfo[] playerInfos = getPlayerInfo();
+            if (playerInfos.length != 0) {
                 playerInfoWrapper.setPlayerInfo(playerInfos);
             }
             playerInfoWrapper.setAction(getAction());

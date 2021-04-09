@@ -210,8 +210,12 @@ public final class PlayerUtils {
      *
      * @param player Target player.
      */
-    public void injectPlayer(final Player player) {
+    public void injectPlayer(Player player) {
         PacketEvents.get().injector.injectPlayer(player);
+    }
+
+    public void ejectPlayer(Player player) {
+        PacketEvents.get().injector.ejectPlayer(player);
     }
 
     /**
@@ -220,7 +224,7 @@ public final class PlayerUtils {
      * @param player  Packet receiver.
      * @param wrapper Client-bound wrapper supporting sending.
      */
-    public void sendPacket(final Player player, final SendableWrapper wrapper) {
+    public void sendPacket(Player player, SendableWrapper wrapper) {
         PacketEvents.get().injector.sendPacket(NMSUtils.getChannel(player), wrapper.asNMSPacket());
     }
 
