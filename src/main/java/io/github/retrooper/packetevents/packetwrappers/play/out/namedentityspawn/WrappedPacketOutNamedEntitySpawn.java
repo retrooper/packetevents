@@ -93,13 +93,13 @@ public class WrappedPacketOutNamedEntitySpawn extends WrappedPacket implements S
     public void setPosition(Vector3d position) {
         if (packet != null) {
             if (doublesPresent) {
-                writeDouble(0, position.x);
-                writeDouble(1, position.y);
-                writeDouble(2, position.z);
+                writeDouble(0, position.getX());
+                writeDouble(1, position.getY());
+                writeDouble(2, position.getZ());
             } else {
-                writeInt(1, (int) (position.x * 32.0D));
-                writeInt(2, (int) (position.y * 32.0D));
-                writeInt(3, (int) (position.z * 32.0D));
+                writeInt(1, (int) (position.getX() * 32.0D));
+                writeInt(2, (int) (position.getY() * 32.0D));
+                writeInt(3, (int) (position.getZ() * 32.0D));
             }
             writeByte(0, (byte) (yaw * rotationDividend));
             writeByte(1, (byte) (pitch * rotationDividend));

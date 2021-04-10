@@ -42,20 +42,23 @@ public class Vector3f {
     /**
      * X (coordinate/angle/whatever you wish)
      */
-    public float x;
+    protected float x;
     /**
      * Y (coordinate/angle/whatever you wish)
      */
-    public float y;
+    protected float y;
     /**
      * Z (coordinate/angle/whatever you wish)
      */
-    public float z;
+    protected float z;
 
     /**
      * Default constructor setting all coordinates/angles/values to their default values (=0).
      */
     public Vector3f() {
+        this.x = 0.0f;
+        this.y = 0.0f;
+        this.z = 0.0f;
     }
 
     /**
@@ -102,31 +105,28 @@ public class Vector3f {
         }
     }
 
-    /**
-     * Getter for X.
-     *
-     * @return Get X.
-     */
     public float getX() {
         return x;
     }
 
-    /**
-     * Getter for Y.
-     *
-     * @return Get Y.
-     */
     public float getY() {
         return y;
     }
 
-    /**
-     * Getter for Z.
-     *
-     * @return Get Z.
-     */
     public float getZ() {
         return z;
+    }
+
+    public void setX(float x) {
+        this.x = x;
+    }
+
+    public void setY(float y) {
+        this.y = y;
+    }
+
+    public void setZ(float z) {
+        this.z = z;
     }
 
     /**

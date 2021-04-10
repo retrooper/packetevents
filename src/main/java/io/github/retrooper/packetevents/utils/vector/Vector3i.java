@@ -24,6 +24,8 @@
 
 package io.github.retrooper.packetevents.utils.vector;
 
+import org.bukkit.Location;
+
 /**
  * 3D int Vector.
  * This vector can represent coordinates, angles, or anything you want.
@@ -43,20 +45,29 @@ public class Vector3i {
     /**
      * X (coordinate/angle/whatever you wish)
      */
-    public int x;
+    protected int x;
     /**
      * Y (coordinate/angle/whatever you wish)
      */
-    public int y;
+    protected int y;
     /**
      * Z (coordinate/angle/whatever you wish)
      */
-    public int z;
+    protected int z;
 
     /**
      * Default constructor setting all coordinates/angles/values to their default values (=0).
      */
     public Vector3i() {
+        this.x = 0;
+        this.y = 0;
+        this.z = 0;
+    }
+
+    public Vector3i(Location location) {
+        this.x = location.getBlockX();
+        this.y = location.getBlockY();
+        this.z = location.getBlockZ();
     }
 
     /**
@@ -103,31 +114,28 @@ public class Vector3i {
         }
     }
 
-    /**
-     * Getter for X.
-     *
-     * @return Get X.
-     */
     public int getX() {
         return x;
     }
 
-    /**
-     * Getter for Y.
-     *
-     * @return Get Y.
-     */
     public int getY() {
         return y;
     }
 
-    /**
-     * Getter for Z.
-     *
-     * @return Get Z.
-     */
     public int getZ() {
         return z;
+    }
+
+    public void setX(int x) {
+        this.x = x;
+    }
+
+    public void setY(int y) {
+        this.y = y;
+    }
+
+    public void setZ(int z) {
+        this.z = z;
     }
 
     /**

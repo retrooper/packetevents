@@ -3,6 +3,7 @@ package io.github.retrooper.packetevents.utils.npc;
 import io.github.retrooper.packetevents.PacketEvents;
 import io.github.retrooper.packetevents.packetwrappers.SendableWrapper;
 import io.github.retrooper.packetevents.packetwrappers.play.out.entity.WrappedPacketOutEntity;
+import io.github.retrooper.packetevents.packetwrappers.play.out.entitydestroy.WrappedPacketOutEntityDestroy;
 import io.github.retrooper.packetevents.packetwrappers.play.out.entityheadrotation.WrappedPacketOutEntityHeadRotation;
 import io.github.retrooper.packetevents.packetwrappers.play.out.entityteleport.WrappedPacketOutEntityTeleport;
 import io.github.retrooper.packetevents.packetwrappers.play.out.namedentityspawn.WrappedPacketOutNamedEntitySpawn;
@@ -57,20 +58,28 @@ public class NPC {
     }
 
     public void despawn(Player player) {
-        try {
-            CompletableFuture.runAsync(new Runnable() {
-                @Override
-                public void run() {
-                    boolean spawned = spawnedForPlayerMap.getOrDefault(player.getUniqueId(), false);
-                    if (spawned) {
+        boolean spawned = spawnedForPlayerMap.getOrDefault(player.getUniqueId(), false);
+        spawnedForPlayerMap.remove(player.getUniqueId());
+        if (spawned) {
+            try {
+                CompletableFuture.runAsync(new Runnable() {
+                    @Override
+                    public void run() {
                         WrappedPacketOutPlayerInfo playerInfo = new WrappedPacketOutPlayerInfo(WrappedPacketOutPlayerInfo.PlayerInfoAction.REMOVE_PLAYER, new WrappedPacketOutPlayerInfo.PlayerInfo(name, gameProfile, GameMode.SURVIVAL, 0));
                         PacketEvents.get().getPlayerUtils().sendPacket(player, playerInfo);
                     }
-                    spawnedForPlayerMap.remove(player.getUniqueId());
-                }
-            }).get();
-        } catch (InterruptedException | ExecutionException e) {
-            e.printStackTrace();
+                }).thenRunAsync(new Runnable() {
+                    @Override
+                    public void run() {
+                        WrappedPacketOutEntityDestroy wrappedPacketOutEntityDestroy = new WrappedPacketOutEntityDestroy(entityID);
+                        PacketEvents.get().getPlayerUtils().sendPacket(player, wrappedPacketOutEntityDestroy);
+                    }
+                })
+
+                        .get();
+            } catch (InterruptedException | ExecutionException e) {
+                e.printStackTrace();
+            }
         }
     }
 

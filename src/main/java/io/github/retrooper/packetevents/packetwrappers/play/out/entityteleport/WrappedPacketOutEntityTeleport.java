@@ -161,14 +161,14 @@ public class WrappedPacketOutEntityTeleport extends WrappedPacket implements Sen
     public void setPosition(Vector3d position) {
         if (packet != null) {
             if (legacyVersionMode) {
-                writeInt(1, floor(position.x * 32.0D));
-                writeInt(2, floor(position.y * 32.0D));
-                writeInt(3, floor(position.z * 32.0D));
+                writeInt(1, floor(position.getX() * 32.0D));
+                writeInt(2, floor(position.getY() * 32.0D));
+                writeInt(3, floor(position.getZ() * 32.0D));
             }
             else {
-                writeDouble(0, position.x);
-                writeDouble(1, position.y);
-                writeDouble(2, position.z);
+                writeDouble(0, position.getX());
+                writeDouble(1, position.getY());
+                writeDouble(2, position.getZ());
             }
         }
         else {
@@ -230,7 +230,7 @@ public class WrappedPacketOutEntityTeleport extends WrappedPacket implements Sen
         if (ultraLegacyVersionMode) {
             //1.7.10
             try {
-                return constructor.newInstance(entityID, floor(pos.x * 32.0D), floor(pos.y * 32.0D), floor(pos.z * 32.0D),
+                return constructor.newInstance(entityID, floor(pos.getX() * 32.0D), floor(pos.getY() * 32.0D), floor(pos.getZ() * 32.0D),
                         (byte) ((int) getYaw() * rotationMultiplier), (byte) (int) (getPitch() * rotationMultiplier), false, false);
             } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
                 e.printStackTrace();
@@ -238,7 +238,7 @@ public class WrappedPacketOutEntityTeleport extends WrappedPacket implements Sen
         } else if (legacyVersionMode) {
             //1.8.x
             try {
-                return constructor.newInstance(entityID, floor(pos.x * 32.0D), floor(pos.y * 32.0D), floor(pos.z * 32.0D),
+                return constructor.newInstance(entityID, floor(pos.getX() * 32.0D), floor(pos.getY() * 32.0D), floor(pos.getZ() * 32.0D),
                         (byte) ((int) getYaw() * rotationMultiplier), (byte) (int) (getPitch() * rotationMultiplier), false);
             } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
                 e.printStackTrace();

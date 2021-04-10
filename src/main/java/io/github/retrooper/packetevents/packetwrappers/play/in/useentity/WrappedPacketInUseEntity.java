@@ -118,7 +118,7 @@ public final class WrappedPacketInUseEntity extends WrappedPacket {
         }
         //We are certain we are on a 1.8 (or higher) server.
         if (getAction() == EntityUseAction.INTERACT_AT) {
-            Object vec3DObj = NMSUtils.generateVec3D(target.x, target.y, target.z);
+            Object vec3DObj = NMSUtils.generateVec3D(target.getX(), target.getY(), target.getZ());
             write(NMSUtils.vec3DClass, 0, vec3DObj);
         }
     }

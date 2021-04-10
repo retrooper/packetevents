@@ -24,6 +24,8 @@
 
 package io.github.retrooper.packetevents.utils.vector;
 
+import org.bukkit.Location;
+
 /**
  * 3D double Vector.
  * This vector can represent coordinates, angles, or anything you want.
@@ -42,20 +44,29 @@ public class Vector3d {
     /**
      * X (coordinate/angle/whatever you wish)
      */
-    public double x;
+    protected double x;
     /**
      * Y (coordinate/angle/whatever you wish)
      */
-    public double y;
+    protected double y;
     /**
      * Z (coordinate/angle/whatever you wish)
      */
-    public double z;
+    protected double z;
 
     /**
      * Default constructor setting all coordinates/angles/values to their default values (=0).
      */
     public Vector3d() {
+        this.x = 0.0;
+        this.y = 0.0;
+        this.z = 0.0;
+    }
+
+    public Vector3d(Location location) {
+        this.x = location.getX();
+        this.y = location.getY();
+        this.z = location.getZ();
     }
 
     /**
@@ -102,31 +113,28 @@ public class Vector3d {
         }
     }
 
-    /**
-     * Getter for X.
-     *
-     * @return Get X.
-     */
     public double getX() {
         return x;
     }
 
-    /**
-     * Getter for Y.
-     *
-     * @return Get Y.
-     */
     public double getY() {
         return y;
     }
 
-    /**
-     * Getter for Z.
-     *
-     * @return Get Z.
-     */
     public double getZ() {
         return z;
+    }
+
+    public void setX(double x) {
+        this.x = x;
+    }
+
+    public void setY(double y) {
+        this.y = y;
+    }
+
+    public void setZ(double z) {
+        this.z = z;
     }
 
     /**

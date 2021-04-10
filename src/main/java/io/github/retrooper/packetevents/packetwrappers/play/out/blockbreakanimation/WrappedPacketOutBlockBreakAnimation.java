@@ -89,9 +89,9 @@ public class WrappedPacketOutBlockBreakAnimation extends WrappedPacket implement
         if (packet != null) {
             Vector3i blockPosition = new Vector3i();
             if (version.isOlderThan(ServerVersion.v_1_8)) {
-                this.blockPosition.x = readInt(1);
-                this.blockPosition.y = readInt(2);
-                this.blockPosition.z = readInt(3);
+                this.blockPosition.setX(readInt(1));
+                this.blockPosition.setY(readInt(2));
+                this.blockPosition.setZ(readInt(3));
             } else {
                 Object blockPos = readObject(0, NMSUtils.blockPosClass);
                 this.blockPosition = NMSUtils.readBlockPos(blockPos);
@@ -105,11 +105,11 @@ public class WrappedPacketOutBlockBreakAnimation extends WrappedPacket implement
     public void setBlockPosition(Vector3i blockPosition) {
         if (packet != null) {
             if (version.isOlderThan(ServerVersion.v_1_8)) {
-                writeInt(1, blockPosition.x);
-                writeInt(2, blockPosition.y);
-                writeInt(3, blockPosition.z);
+                writeInt(1, blockPosition.getX());
+                writeInt(2, blockPosition.getY());
+                writeInt(3, blockPosition.getZ());
             } else {
-                Object blockPos = NMSUtils.generateNMSBlockPos(blockPosition.x, blockPosition.y, blockPosition.z);
+                Object blockPos = NMSUtils.generateNMSBlockPos(blockPosition.getX(), blockPosition.getY(), blockPosition.getZ());
                 write(NMSUtils.blockPosClass, 0, blockPos);
             }
         } else {
@@ -140,9 +140,9 @@ public class WrappedPacketOutBlockBreakAnimation extends WrappedPacket implement
         Vector3i blockPosition = getBlockPosition();
         try {
             if (version.isOlderThan(ServerVersion.v_1_8)) {
-                return packetConstructor.newInstance(getEntityId(), blockPosition.x, blockPosition.y, blockPosition.z, getDestroyStage());
+                return packetConstructor.newInstance(getEntityId(), blockPosition.getX(), blockPosition.getY(), blockPosition.getZ(), getDestroyStage());
             } else {
-                Object nmsBlockPos = NMSUtils.generateNMSBlockPos(blockPosition.x, blockPosition.y, blockPosition.z);
+                Object nmsBlockPos = NMSUtils.generateNMSBlockPos(blockPosition.getX(), blockPosition.getY(), blockPosition.getZ());
                 return packetConstructor.newInstance(getEntityId(), nmsBlockPos, getDestroyStage());
             }
         } catch (IllegalAccessException | InstantiationException | InvocationTargetException e) {

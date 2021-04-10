@@ -136,9 +136,9 @@ public class WrappedPacketOutNamedSoundEffect extends WrappedPacket implements S
 
     public void setEffectPosition(Vector3d effectPosition) {
         if (packet != null) {
-            writeInt(0, (int) (effectPosition.x / 8.0D));
-            writeInt(1, (int) (effectPosition.y / 8.0D));
-            writeInt(2, (int) (effectPosition.z / 8.0D));
+            writeInt(0, (int) (effectPosition.getX() / 8.0D));
+            writeInt(1, (int) (effectPosition.getY() / 8.0D));
+            writeInt(2, (int) (effectPosition.getZ() / 8.0D));
         } else {
             this.effectPosition = effectPosition;
         }

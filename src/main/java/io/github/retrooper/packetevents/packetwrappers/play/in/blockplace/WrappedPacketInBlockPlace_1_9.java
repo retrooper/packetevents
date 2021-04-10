@@ -60,9 +60,9 @@ final class WrappedPacketInBlockPlace_1_9 extends WrappedPacket {
             blockPosObj = movingObjectPosWrapper.readObject(0, NMSUtils.blockPosClass);
         }
         try {
-            blockPos.x = (int) NMSUtils.getBlockPosX.invoke(blockPosObj);
-            blockPos.y = (int) NMSUtils.getBlockPosY.invoke(blockPosObj);
-            blockPos.z = (int) NMSUtils.getBlockPosZ.invoke(blockPosObj);
+            blockPos.setX((int) NMSUtils.getBlockPosX.invoke(blockPosObj));
+            blockPos.setY((int) NMSUtils.getBlockPosY.invoke(blockPosObj));
+            blockPos.setZ((int) NMSUtils.getBlockPosZ.invoke(blockPosObj));
         } catch (IllegalAccessException | InvocationTargetException e) {
             e.printStackTrace();
         }
@@ -70,7 +70,7 @@ final class WrappedPacketInBlockPlace_1_9 extends WrappedPacket {
     }
 
     public void setBlockPosition(Vector3i blockPos) {
-        Object blockPosObj = NMSUtils.generateNMSBlockPos(blockPos.x, blockPos.y, blockPos.z);
+        Object blockPosObj = NMSUtils.generateNMSBlockPos(blockPos.getX(), blockPos.getY(), blockPos.getZ());
         if (movingObjectPositionBlockClass == null) {
             write(NMSUtils.blockPosClass, 0, blockPosObj);
         } else {

@@ -175,7 +175,7 @@ public class WrappedPacketOutExplosion extends WrappedPacket implements Sendable
         if (packet != null) {
             List<Object> nmsRecordsList = new ArrayList<>();
             for (Vector3i record : records) {
-                Object[] arguments = {record.x, record.y, record.z};
+                Object[] arguments = {record.getX(), record.getY(), record.getZ()};
                 Object position = null; //construct position
                 try {
                     position = version.isNewerThan(ServerVersion.v_1_7_10) ? blockPosConstructor.newInstance(arguments) : chunkPosConstructor.newInstance(arguments);
@@ -242,7 +242,7 @@ public class WrappedPacketOutExplosion extends WrappedPacket implements Sendable
     public Object asNMSPacket() {
         List<Object> positions = new ArrayList<>();
         for (Vector3i record : getRecords()) {
-            Object[] arguments = {record.x, record.y, record.z};
+            Object[] arguments = {record.getX(), record.getY(), record.getZ()};
             Object position = null;
             try {
                 position = version.isNewerThan(ServerVersion.v_1_7_10) ? blockPosConstructor.newInstance(arguments)
