@@ -29,6 +29,7 @@ import io.github.retrooper.packetevents.utils.server.ServerVersion;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.entity.Entity;
+import org.jetbrains.annotations.Nullable;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -77,6 +78,7 @@ public final class EntityFinderUtils {
      * @param id Entity ID
      * @return Bukkit Entity.
      */
+    @Nullable
     public static Entity getEntityById(World wrld, int id) {
         Entity e = getEntityByIdWithWorld(wrld, id);
         if (e == null) {

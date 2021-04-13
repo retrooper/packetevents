@@ -27,23 +27,19 @@ package io.github.retrooper.packetevents.packetwrappers.play.in.useentity;
 import io.github.retrooper.packetevents.PacketEvents;
 import io.github.retrooper.packetevents.packetwrappers.NMSPacket;
 import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
+import io.github.retrooper.packetevents.packetwrappers.api.helper.WrappedPacketEntityAbstraction;
 import io.github.retrooper.packetevents.utils.enums.EnumUtil;
 import io.github.retrooper.packetevents.utils.nms.NMSUtils;
 import io.github.retrooper.packetevents.utils.player.Hand;
 import io.github.retrooper.packetevents.utils.reflection.SubclassUtil;
 import io.github.retrooper.packetevents.utils.server.ServerVersion;
 import io.github.retrooper.packetevents.utils.vector.Vector3d;
-import org.bukkit.World;
-import org.bukkit.entity.Entity;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.Objects;
 
-public final class WrappedPacketInUseEntity extends WrappedPacket {
+public final class WrappedPacketInUseEntity extends WrappedPacketEntityAbstraction {
     private static Class<? extends Enum<?>> enumEntityUseActionClass, enumHandClass;
-    private Entity entity;
     private EntityUseAction action;
-    private int entityID = -1;
 
     public WrappedPacketInUseEntity(final NMSPacket packet) {
         super(packet);
@@ -63,36 +59,6 @@ public final class WrappedPacketInUseEntity extends WrappedPacket {
             //That is fine, it is probably a subclass
             enumEntityUseActionClass = SubclassUtil.getEnumSubClass(useEntityClass, "EnumEntityUseAction");
         }
-    }
-
-    @Nullable
-    public Entity getEntity() {
-        return getEntity(null);
-    }
-
-    @Nullable
-    public Entity getEntity(@Nullable World world) {
-        if (entity == null) {
-            entity = NMSUtils.getEntityById(world, getEntityId());
-        }
-        return entity;
-    }
-
-    public void setEntity(Entity entity) {
-        setEntityId(entity.getEntityId());
-        this.entity = entity;
-    }
-
-    public int getEntityId() {
-        if (entityID != -1) {
-            return entityID;
-        }
-        return entityID = readInt(0);
-    }
-
-    public void setEntityId(int entityID) {
-        writeInt(0, this.entityID = entityID);
-        this.entity = null;
     }
 
     @SupportedVersions(ranges = {ServerVersion.v_1_8, ServerVersion.ERROR})

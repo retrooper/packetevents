@@ -25,7 +25,7 @@
 package io.github.retrooper.packetevents.packetwrappers.play.out.entitymetadata;
 
 import io.github.retrooper.packetevents.packetwrappers.NMSPacket;
-import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
+import io.github.retrooper.packetevents.packetwrappers.api.helper.WrappedPacketEntityAbstraction;
 import org.bukkit.entity.Entity;
 
 import java.util.ArrayList;
@@ -39,9 +39,7 @@ import java.util.List;
  * @author SteelPhoenix
  * @since 1.8
  */
-public class WrappedPacketOutEntityMetadata extends WrappedPacket {
-
-    private int entityID;
+public class WrappedPacketOutEntityMetadata extends WrappedPacketEntityAbstraction {
     private List<WrappedWatchableObject> watchableObjects;
     public WrappedPacketOutEntityMetadata(NMSPacket packet) {
         super(packet);
@@ -57,31 +55,6 @@ public class WrappedPacketOutEntityMetadata extends WrappedPacket {
         this.watchableObjects = watchableObjects;
     }
 
-    /**
-     * Get the entity ID.
-     *
-     * @return the current value.
-     */
-    public int getEntityId() {
-        if (packet != null) {
-            return readInt(0);
-        } else {
-            return entityID;
-        }
-    }
-
-    /**
-     * Set the entity ID.
-     *
-     * @param entityID New value.
-     */
-    public void setEntityId(int entityID) {
-        if (packet != null) {
-            writeInt(0, entityID);
-        } else {
-            this.entityID = entityID;
-        }
-    }
 
     /**
      * Get the entity metadata.

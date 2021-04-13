@@ -26,29 +26,23 @@ package io.github.retrooper.packetevents.packetwrappers.play.out.entity;
 
 import io.github.retrooper.packetevents.packettype.PacketTypeClasses;
 import io.github.retrooper.packetevents.packetwrappers.NMSPacket;
-import io.github.retrooper.packetevents.packetwrappers.SendableWrapper;
-import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
-import io.github.retrooper.packetevents.utils.nms.NMSUtils;
+import io.github.retrooper.packetevents.packetwrappers.api.SendableWrapper;
+import io.github.retrooper.packetevents.packetwrappers.api.helper.WrappedPacketEntityAbstraction;
 import io.github.retrooper.packetevents.utils.reflection.Reflection;
-import org.bukkit.World;
 import org.bukkit.entity.Entity;
-import org.jetbrains.annotations.Nullable;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Objects;
 
-public class WrappedPacketOutEntity extends WrappedPacket implements SendableWrapper {
+public class WrappedPacketOutEntity extends WrappedPacketEntityAbstraction implements SendableWrapper {
     //Byte = 1.7.10->1.8.8, Int = 1.9->1.15.x, Short = 1.16.x
     private static byte mode; //byte = 0, int = 1, short = 2
     private static double dXYZDivisor;
     private static int yawByteIndex;
     private static int pitchByteIndex = 1;
     private static Constructor<?> entityPacketConstructor, entityRelMovePacketConstructor, entityLookConstructor, entityRelMoveLookConstructor;
-    private Entity entity;
-
-    private int entityID = -1;
     private double deltaX, deltaY, deltaZ;
     private byte pitch, yaw;
     private boolean onGround, isLook;
@@ -256,41 +250,6 @@ public class WrappedPacketOutEntity extends WrappedPacket implements SendableWra
         } else {
             this.deltaZ = deltaZ;
         }
-    }
-
-    @Nullable
-    public Entity getEntity() {
-        return getEntity(null);
-    }
-
-    @Nullable
-    public Entity getEntity(@Nullable World world) {
-        if (entity == null) {
-            entity = NMSUtils.getEntityById(world, getEntityId());
-        }
-        return entity;
-    }
-
-    public void setEntity(Entity entity) {
-        setEntityId(entity.getEntityId());
-        this.entity = entity;
-    }
-
-    public int getEntityId() {
-        if (packet != null) {
-            return readInt(0);
-        } else {
-            return entityID;
-        }
-    }
-
-    public void setEntityId(int entityID) {
-        if (packet != null) {
-            writeInt(0, entityID);
-        } else {
-            this.entityID = entityID;
-        }
-        this.entity = null;
     }
 
     public boolean isOnGround() {

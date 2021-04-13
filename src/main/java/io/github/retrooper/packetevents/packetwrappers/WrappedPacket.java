@@ -28,6 +28,8 @@ import io.github.retrooper.packetevents.PacketEvents;
 import io.github.retrooper.packetevents.exceptions.WrapperFieldNotFoundException;
 import io.github.retrooper.packetevents.exceptions.WrapperUnsupportedUsageException;
 import io.github.retrooper.packetevents.packettype.PacketTypeClasses;
+import io.github.retrooper.packetevents.packetwrappers.api.WrapperPacketReader;
+import io.github.retrooper.packetevents.packetwrappers.api.WrapperPacketWriter;
 import io.github.retrooper.packetevents.utils.reflection.ClassUtil;
 import io.github.retrooper.packetevents.utils.reflection.Reflection;
 import io.github.retrooper.packetevents.utils.server.ServerVersion;

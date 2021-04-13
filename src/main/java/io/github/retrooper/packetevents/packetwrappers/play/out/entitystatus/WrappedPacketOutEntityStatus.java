@@ -26,21 +26,17 @@ package io.github.retrooper.packetevents.packetwrappers.play.out.entitystatus;
 
 import io.github.retrooper.packetevents.packettype.PacketTypeClasses;
 import io.github.retrooper.packetevents.packetwrappers.NMSPacket;
-import io.github.retrooper.packetevents.packetwrappers.SendableWrapper;
-import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
+import io.github.retrooper.packetevents.packetwrappers.api.SendableWrapper;
+import io.github.retrooper.packetevents.packetwrappers.api.helper.WrappedPacketEntityAbstraction;
 import io.github.retrooper.packetevents.utils.nms.NMSUtils;
-import org.bukkit.World;
 import org.bukkit.entity.Entity;
-import org.jetbrains.annotations.Nullable;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 
-public class WrappedPacketOutEntityStatus extends WrappedPacket implements SendableWrapper {
+public class WrappedPacketOutEntityStatus extends WrappedPacketEntityAbstraction implements SendableWrapper {
     private static Constructor<?> packetConstructor;
-    private Entity entity;
     private byte status;
-    private int entityID = -1;
 
     public WrappedPacketOutEntityStatus(NMSPacket packet) {
         super(packet);
@@ -65,44 +61,6 @@ public class WrappedPacketOutEntityStatus extends WrappedPacket implements Senda
         } catch (NoSuchMethodException e) {
             e.printStackTrace();
         }
-    }
-
-    public int getEntityId() {
-        if (packet == null) {
-            if (entityID != -1) {
-                return entityID;
-            }
-            return entityID = readInt(0);
-        } else {
-            return entityID;
-        }
-    }
-
-    public void setEntityId(int entityID) {
-        if (packet != null) {
-            writeInt(0, this.entityID = entityID);
-        } else {
-            this.entityID = entityID;
-        }
-        this.entity = null;
-    }
-
-    @Nullable
-    public Entity getEntity() {
-        return getEntity(null);
-    }
-
-    @Nullable
-    public Entity getEntity(@Nullable World world) {
-        if (entity == null) {
-            return entity = NMSUtils.getEntityById(world, getEntityId());
-        }
-        return entity;
-    }
-
-    public void setEntity(Entity entity) {
-        setEntityId(entity.getEntityId());
-        this.entity = entity;
     }
 
     public byte getEntityStatus() {

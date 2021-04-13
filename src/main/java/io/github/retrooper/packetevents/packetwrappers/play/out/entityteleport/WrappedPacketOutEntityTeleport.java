@@ -26,25 +26,20 @@ package io.github.retrooper.packetevents.packetwrappers.play.out.entityteleport;
 
 import io.github.retrooper.packetevents.packettype.PacketTypeClasses;
 import io.github.retrooper.packetevents.packetwrappers.NMSPacket;
-import io.github.retrooper.packetevents.packetwrappers.SendableWrapper;
-import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
-import io.github.retrooper.packetevents.utils.nms.NMSUtils;
+import io.github.retrooper.packetevents.packetwrappers.api.SendableWrapper;
+import io.github.retrooper.packetevents.packetwrappers.api.helper.WrappedPacketEntityAbstraction;
 import io.github.retrooper.packetevents.utils.vector.Vector3d;
 import org.bukkit.Location;
-import org.bukkit.World;
 import org.bukkit.entity.Entity;
-import org.jetbrains.annotations.Nullable;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 
-public class WrappedPacketOutEntityTeleport extends WrappedPacket implements SendableWrapper {
+public class WrappedPacketOutEntityTeleport extends WrappedPacketEntityAbstraction implements SendableWrapper {
     private static final float rotationMultiplier = 256.0F / 360.0F;
     private static boolean legacyVersionMode;
     private static boolean ultraLegacyVersionMode;
     private static Constructor<?> constructor;
-    private Entity entity = null;
-    private int entityID = -1;
     private Vector3d position;
     private float yaw, pitch;
     private boolean onGround;
@@ -57,6 +52,10 @@ public class WrappedPacketOutEntityTeleport extends WrappedPacket implements Sen
         this(entityID, loc.getX(), loc.getY(), loc.getZ(), loc.getYaw(), loc.getPitch(), onGround);
     }
 
+    public WrappedPacketOutEntityTeleport(Entity entity, Location loc, boolean onGround) {
+        this(entity, loc.getX(), loc.getY(), loc.getZ(), loc.getYaw(), loc.getPitch(), onGround);
+    }
+
     public WrappedPacketOutEntityTeleport(int entityID, Vector3d position, float yaw, float pitch, boolean onGround) {
         this.entityID = entityID;
         this.position = position;
@@ -65,8 +64,26 @@ public class WrappedPacketOutEntityTeleport extends WrappedPacket implements Sen
         this.onGround = onGround;
     }
 
+    public WrappedPacketOutEntityTeleport(Entity entity, Vector3d position, float yaw, float pitch, boolean onGround) {
+        this.entityID = entity.getEntityId();
+        this.entity = entity;
+        this.position = position;
+        this.yaw = yaw;
+        this.pitch = pitch;
+        this.onGround = onGround;
+    }
+
     public WrappedPacketOutEntityTeleport(int entityID, double x, double y, double z, float yaw, float pitch, boolean onGround) {
         this.entityID = entityID;
+        this.position = new Vector3d(x, y, z);
+        this.yaw = yaw;
+        this.pitch = pitch;
+        this.onGround = onGround;
+    }
+
+    public WrappedPacketOutEntityTeleport(Entity entity, double x, double y, double z, float yaw, float pitch, boolean onGround) {
+        this.entityID = entity.getEntityId();
+        this.entity = entity;
         this.position = new Vector3d(x, y, z);
         this.yaw = yaw;
         this.pitch = pitch;
@@ -101,41 +118,6 @@ public class WrappedPacketOutEntityTeleport extends WrappedPacket implements Sen
             }
 
         }
-    }
-
-    @Nullable
-    public Entity getEntity() {
-        return getEntity(null);
-    }
-
-    @Nullable
-    public Entity getEntity(@Nullable World world) {
-        if (entity == null) {
-            entity = NMSUtils.getEntityById(world, getEntityId());
-        }
-        return entity;
-    }
-
-    public void setEntity(Entity entity) {
-        setEntityId(entity.getEntityId());
-        this.entity = entity;
-    }
-
-    public int getEntityId() {
-        if (entityID != -1) {
-            return entityID;
-        } else {
-            return entityID = readInt(0);
-        }
-    }
-
-    public void setEntityId(int entityID) {
-        if (packet != null) {
-            writeInt(0, this.entityID = entityID);
-        } else {
-            this.entityID = entityID;
-        }
-        this.entity = null;
     }
 
     public Vector3d getPosition() {

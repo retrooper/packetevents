@@ -38,8 +38,6 @@ import org.jetbrains.annotations.Nullable;
 public final class WrappedPacketInEntityAction extends WrappedPacket {
     private static Class<? extends Enum<?>> enumPlayerActionClass;
     private static boolean newerThan_v_1_8_8;
-    private Entity entity;
-    private int entityID = -1;
 
     public WrappedPacketInEntityAction(final NMSPacket packet) {
         super(packet);
@@ -53,36 +51,6 @@ public final class WrappedPacketInEntityAction extends WrappedPacket {
             enumPlayerActionClass = SubclassUtil.getEnumSubClass(PacketTypeClasses.Play.Client.ENTITY_ACTION, "EnumPlayerAction");
         }
 
-    }
-
-    @Nullable
-    public Entity getEntity() {
-        return getEntity(null);
-    }
-
-    @Nullable
-    public Entity getEntity(@Nullable World world) {
-        if (entity == null) {
-            entity = NMSUtils.getEntityById(world, getEntityId());
-        }
-        return entity;
-    }
-
-    public void setEntity(Entity entity) {
-        setEntityId(entity.getEntityId());
-        this.entity = entity;
-    }
-
-    public int getEntityId() {
-        if (entityID == -1) {
-            entityID = readInt(0);
-        }
-        return entityID;
-    }
-
-    public void setEntityId(int entityID) {
-        writeInt(0, this.entityID = entityID);
-        this.entity = null;
     }
 
     public PlayerAction getAction() {

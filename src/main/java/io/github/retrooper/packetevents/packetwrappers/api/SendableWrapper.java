@@ -22,7 +22,7 @@
  * SOFTWARE.
  */
 
-package io.github.retrooper.packetevents.packetwrappers;
+package io.github.retrooper.packetevents.packetwrappers.api;
 
 /**
  * This interface indicates that a packet wrapper supports being sent to a client.

@@ -56,7 +56,7 @@ public final class NMSUtils {
     public static boolean legacyNettyImportMode;
     public static ServerVersion version;
     public static Constructor<?> blockPosConstructor, minecraftKeyConstructor, vec3DConstructor, dataWatcherConstructor;
-    public static Class<?> nmsEntityClass, minecraftServerClass, craftWorldClass, playerInteractManagerClass, entityPlayerClass, playerConnectionClass, craftServerClass,
+    public static Class<?> mobEffectListClass, nmsEntityClass, minecraftServerClass, craftWorldClass, playerInteractManagerClass, entityPlayerClass, playerConnectionClass, craftServerClass,
             craftPlayerClass, serverConnectionClass, craftEntityClass, nmsItemStackClass, networkManagerClass, nettyChannelClass, gameProfileClass, iChatBaseComponentClass,
             blockPosClass, vec3DClass, channelFutureClass, blockClass, iBlockDataClass, nmsWorldClass, craftItemStackClass,
             soundEffectClass, minecraftKeyClass, chatSerializerClass, craftMagicNumbersClass, worldSettingsClass, worldServerClass, dataWatcherClass, nmsEntityHumanClass,
@@ -73,6 +73,8 @@ public final class NMSUtils {
     private static Method chatFromStringMethod;
     private static Method getMaterialFromNMSBlock;
     private static Method getNMSBlockFromMaterial;
+    private static Method getMobEffectListId;
+    private static Method getMobEffectListById;
     private static Field entityPlayerPingField, playerConnectionField;
     private static Object minecraftServer;
     private static Object minecraftServerConnection;
@@ -120,6 +122,7 @@ public final class NMSUtils {
             craftItemStackClass = getOBCClass("inventory.CraftItemStack");
             nmsItemStackClass = getNMSClass("ItemStack");
             networkManagerClass = getNMSClass("NetworkManager");
+            mobEffectListClass = getNMSClassWithoutException("MobEffectList");
             playerInteractManagerClass = getNMSClass("PlayerInteractManager");
             blockClass = getNMSClass("Block");
             //IBlockData doesn't exist on 1.7.10
@@ -196,6 +199,15 @@ public final class NMSUtils {
             }
         } catch (Exception e) {
             e.printStackTrace();
+        }
+
+        try {
+            if (mobEffectListClass != null) {
+                getMobEffectListId = mobEffectListClass.getMethod("getId", mobEffectListClass);
+                getMobEffectListById = mobEffectListClass.getMethod("fromId", int.class);
+            }
+        } catch (Exception ignored) {
+
         }
         try {
             entityPlayerPingField = entityPlayerClass.getField("ping");
@@ -283,7 +295,7 @@ public final class NMSUtils {
     public static Entity getEntityById(@Nullable World world, int id) {
         try {
             Entity entity = EntityFinderUtils.getEntityById(world, id);
-            if (entity == null && world != null) {
+            if (entity == null) {
                 List<World> worlds = new ArrayList<>(Bukkit.getWorlds());
                 for (World wrld : worlds) {
                     for (Entity e : wrld.getEntities()) {
@@ -346,8 +358,7 @@ public final class NMSUtils {
         WrappedPacket wrapper = new WrappedPacket(new NMSPacket(playerConnection), playerConnectionClass);
         try {
             return wrapper.readObject(0, networkManagerClass);
-        }
-        catch (Exception ex) {
+        } catch (Exception ex) {
             //Support for some custom plugins.
             playerConnection = wrapper.read(0, playerConnectionClass);
             wrapper = new WrappedPacket(new NMSPacket(playerConnection), playerConnectionClass);
@@ -574,5 +585,23 @@ public final class NMSUtils {
             ex.printStackTrace();
         }
         throw new IllegalStateException("Failed to generate a new unique entity ID!");
+    }
+
+    public static int getEffectId(Object nmsMobEffectList) {
+        try {
+            return (int) getMobEffectListId.invoke(null, nmsMobEffectList);
+        } catch (IllegalAccessException | InvocationTargetException e) {
+            e.printStackTrace();
+        }
+        return -1;
+    }
+
+    public static Object getMobEffectListById(int effectID) {
+        try {
+            return getMobEffectListById.invoke(null, effectID);
+        } catch (IllegalAccessException | InvocationTargetException e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 }

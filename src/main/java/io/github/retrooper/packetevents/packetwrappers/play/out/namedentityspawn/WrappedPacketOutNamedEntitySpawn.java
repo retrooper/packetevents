@@ -2,22 +2,22 @@ package io.github.retrooper.packetevents.packetwrappers.play.out.namedentityspaw
 
 import io.github.retrooper.packetevents.packettype.PacketTypeClasses;
 import io.github.retrooper.packetevents.packetwrappers.NMSPacket;
-import io.github.retrooper.packetevents.packetwrappers.SendableWrapper;
-import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
+import io.github.retrooper.packetevents.packetwrappers.api.SendableWrapper;
+import io.github.retrooper.packetevents.packetwrappers.api.helper.WrappedPacketEntityAbstraction;
 import io.github.retrooper.packetevents.utils.nms.NMSUtils;
 import io.github.retrooper.packetevents.utils.reflection.Reflection;
 import io.github.retrooper.packetevents.utils.vector.Vector3d;
 import org.bukkit.Location;
+import org.bukkit.entity.Entity;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.UUID;
 
-public class WrappedPacketOutNamedEntitySpawn extends WrappedPacket implements SendableWrapper {
+public class WrappedPacketOutNamedEntitySpawn extends WrappedPacketEntityAbstraction implements SendableWrapper {
     private static final float rotationDividend = 256.0F / 360.0F;
     private static boolean doublesPresent, dataWatcherPresent;
     private static Constructor<?> packetDefaultConstructor;
-    private int entityID;
     private UUID uuid;
     private Vector3d position;
     private float yaw, pitch;
@@ -34,8 +34,26 @@ public class WrappedPacketOutNamedEntitySpawn extends WrappedPacket implements S
         this.pitch = location.getPitch();
     }
 
+    public WrappedPacketOutNamedEntitySpawn(Entity entity, UUID uuid, Location location) {
+        this.entityID = entity.getEntityId();
+        this.entity = entity;
+        this.uuid = uuid;
+        this.position = new Vector3d(location.getX(), location.getY(), location.getZ());
+        this.yaw = location.getYaw();
+        this.pitch = location.getPitch();
+    }
+
     public WrappedPacketOutNamedEntitySpawn(int entityID, UUID uuid, Vector3d position, float yaw, float pitch) {
         this.entityID = entityID;
+        this.uuid = uuid;
+        this.position = position;
+        this.yaw = yaw;
+        this.pitch = pitch;
+    }
+
+    public WrappedPacketOutNamedEntitySpawn(Entity entity, UUID uuid, Vector3d position, float yaw, float pitch) {
+        this.entityID = entity.getEntityId();
+        this.entity = entity;
         this.uuid = uuid;
         this.position = position;
         this.yaw = yaw;
@@ -137,23 +155,6 @@ public class WrappedPacketOutNamedEntitySpawn extends WrappedPacket implements S
             writeByte(1, (byte) (pitch * rotationDividend));
         } else {
             this.pitch = pitch;
-        }
-    }
-
-
-    public int getEntityId() {
-        if (packet != null) {
-            return readInt(0);
-        } else {
-            return entityID;
-        }
-    }
-
-    public void setEntityId(int entityID) {
-        if (packet != null) {
-            writeInt(0, entityID);
-        } else {
-            this.entityID = entityID;
         }
     }
 

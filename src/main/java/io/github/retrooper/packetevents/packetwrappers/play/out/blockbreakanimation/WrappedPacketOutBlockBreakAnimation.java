@@ -2,22 +2,18 @@ package io.github.retrooper.packetevents.packetwrappers.play.out.blockbreakanima
 
 import io.github.retrooper.packetevents.packettype.PacketTypeClasses;
 import io.github.retrooper.packetevents.packetwrappers.NMSPacket;
-import io.github.retrooper.packetevents.packetwrappers.SendableWrapper;
-import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
+import io.github.retrooper.packetevents.packetwrappers.api.SendableWrapper;
+import io.github.retrooper.packetevents.packetwrappers.api.helper.WrappedPacketEntityAbstraction;
 import io.github.retrooper.packetevents.utils.nms.NMSUtils;
 import io.github.retrooper.packetevents.utils.server.ServerVersion;
 import io.github.retrooper.packetevents.utils.vector.Vector3i;
-import org.bukkit.World;
 import org.bukkit.entity.Entity;
-import org.jetbrains.annotations.Nullable;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 //TODO test
-public class WrappedPacketOutBlockBreakAnimation extends WrappedPacket implements SendableWrapper {
+public class WrappedPacketOutBlockBreakAnimation extends WrappedPacketEntityAbstraction implements SendableWrapper {
     private static Constructor<?> packetConstructor;
-    private int entityID;
-    private Entity entity;
     private Vector3i blockPosition;
     private int destroyStage;
 
@@ -49,40 +45,6 @@ public class WrappedPacketOutBlockBreakAnimation extends WrappedPacket implement
                 e2.printStackTrace();
             }
         }
-    }
-
-    public int getEntityId() {
-        if (entityID != -1) {
-            return entityID;
-        }
-        return entityID = readInt(0);
-    }
-
-    public void setEntityId(int entityID) {
-        if (packet != null) {
-            writeInt(0, this.entityID = entityID);
-        } else {
-            this.entityID = entityID;
-        }
-        this.entity = null;
-    }
-
-    @Nullable
-    public Entity getEntity() {
-        return getEntity(null);
-    }
-
-    @Nullable
-    public Entity getEntity(@Nullable World world) {
-        if (entity == null) {
-            entity = NMSUtils.getEntityById(world, getEntityId());
-        }
-        return entity;
-    }
-
-    public void setEntity(Entity entity) {
-        setEntityId(entity.getEntityId());
-        this.entity = entity;
     }
 
     public Vector3i getBlockPosition() {

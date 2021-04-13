@@ -26,20 +26,16 @@ package io.github.retrooper.packetevents.packetwrappers.play.out.animation;
 
 import io.github.retrooper.packetevents.packettype.PacketTypeClasses;
 import io.github.retrooper.packetevents.packetwrappers.NMSPacket;
-import io.github.retrooper.packetevents.packetwrappers.SendableWrapper;
-import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
+import io.github.retrooper.packetevents.packetwrappers.api.SendableWrapper;
+import io.github.retrooper.packetevents.packetwrappers.api.helper.WrappedPacketEntityAbstraction;
 import io.github.retrooper.packetevents.utils.nms.NMSUtils;
-import org.bukkit.World;
 import org.bukkit.entity.Entity;
-import org.jetbrains.annotations.Nullable;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 
-public final class WrappedPacketOutAnimation extends WrappedPacket implements SendableWrapper {
+public final class WrappedPacketOutAnimation extends WrappedPacketEntityAbstraction implements SendableWrapper {
     private static Constructor<?> animationConstructor;
-    private Entity entity;
-    private int entityID = -1;
     private EntityAnimationType type;
 
     public WrappedPacketOutAnimation(final NMSPacket packet) {
@@ -67,42 +63,6 @@ public final class WrappedPacketOutAnimation extends WrappedPacket implements Se
         } catch (NoSuchMethodException e) {
             e.printStackTrace();
         }
-    }
-
-    @Nullable
-    public Entity getEntity() {
-        return getEntity(null);
-    }
-
-    @Nullable
-    public Entity getEntity(@Nullable World world) {
-       if (entity == null) {
-           entity = NMSUtils.getEntityById(world, getEntityId());
-       }
-       return entity;
-    }
-
-    public void setEntity(Entity entity) {
-        setEntityId(entity.getEntityId());
-        this.entity = entity;
-    }
-
-    public int getEntityId() {
-        if (packet != null) {
-            if (entityID == -1) {
-                entityID = readInt(0);
-            }
-        }
-        return entityID;
-    }
-
-    public void setEntityId(int entityID) {
-        if (packet != null) {
-            writeInt(0, this.entityID = entityID);
-        } else {
-            this.entityID = entityID;
-        }
-        this.entity = null;
     }
 
     public EntityAnimationType getAnimationType() {

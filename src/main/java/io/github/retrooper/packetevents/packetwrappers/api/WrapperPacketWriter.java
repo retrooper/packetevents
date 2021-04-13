@@ -22,7 +22,7 @@
  * SOFTWARE.
  */
 
-package io.github.retrooper.packetevents.packetwrappers;
+package io.github.retrooper.packetevents.packetwrappers.api;
 
 public interface WrapperPacketWriter {
     void writeBoolean(int index, boolean value);

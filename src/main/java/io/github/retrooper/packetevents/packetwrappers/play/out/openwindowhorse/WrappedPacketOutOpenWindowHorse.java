@@ -26,8 +26,8 @@ package io.github.retrooper.packetevents.packetwrappers.play.out.openwindowhorse
 
 import io.github.retrooper.packetevents.packettype.PacketTypeClasses;
 import io.github.retrooper.packetevents.packetwrappers.NMSPacket;
-import io.github.retrooper.packetevents.packetwrappers.SendableWrapper;
-import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
+import io.github.retrooper.packetevents.packetwrappers.api.SendableWrapper;
+import io.github.retrooper.packetevents.packetwrappers.api.helper.WrappedPacketEntityAbstraction;
 import io.github.retrooper.packetevents.utils.server.ServerVersion;
 
 import java.lang.reflect.Constructor;
@@ -39,14 +39,13 @@ import java.lang.reflect.InvocationTargetException;
  * @author retrooper, Tecnio
  * @since 1.8
  */
-public final class WrappedPacketOutOpenWindowHorse extends WrappedPacket implements SendableWrapper {
+public final class WrappedPacketOutOpenWindowHorse extends WrappedPacketEntityAbstraction implements SendableWrapper {
     private static Constructor<?> packetConstructor;
     private int windowID;
     private int slotCount;
-    private int entityID;
 
     public WrappedPacketOutOpenWindowHorse(NMSPacket packet) {
-        super(packet);
+        super(packet, 2);
     }
 
     @Override
@@ -91,24 +90,6 @@ public final class WrappedPacketOutOpenWindowHorse extends WrappedPacket impleme
         }
         else {
             this.slotCount = slotCount;
-        }
-    }
-
-    public int getEntityId() {
-        if (packet != null) {
-            return readInt(2);
-        }
-        else {
-            return entityID;
-        }
-    }
-
-    public void setEntityId(int entityID) {
-        if (packet != null) {
-            writeInt(2, entityID);
-        }
-        else {
-            this.entityID = entityID;
         }
     }
 
