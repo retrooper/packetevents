@@ -164,7 +164,10 @@ public final class PlayerUtils {
      * @see #clientVersionsMap
      */
     @NotNull
-    public ClientVersion getClientVersion(final Player player) {
+    public ClientVersion getClientVersion(@NotNull final Player player) {
+        if (player.getAddress() == null) {
+            return ClientVersion.UNKNOWN;
+        }
         ClientVersion version = clientVersionsMap.get(player.getAddress());
         if (version == null) {
             //Prioritize asking ViaVersion and ProtocolSupport as they modify the protocol version in the packet we access it from.

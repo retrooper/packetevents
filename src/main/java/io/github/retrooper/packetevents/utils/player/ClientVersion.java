@@ -99,6 +99,7 @@ public enum ClientVersion {
 
     TEMP_UNRESOLVED(-1),
 
+    @Deprecated
     UNRESOLVED(-1),
 
     UNKNOWN(-1);
