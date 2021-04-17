@@ -60,7 +60,7 @@ public final class WrappedPacketInBlockPlace extends WrappedPacket {
         if (version.isOlderThan(ServerVersion.v_1_9)) {
             return Hand.MAIN_HAND;
         } else {
-            Enum<?> enumConst = read(handEnumIndex, NMSUtils.enumHandClass);
+            Enum<?> enumConst = readEnumConstant(handEnumIndex, NMSUtils.enumHandClass);
             return Hand.valueOf(enumConst.name());
         }
     }

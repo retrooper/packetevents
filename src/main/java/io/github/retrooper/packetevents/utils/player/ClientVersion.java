@@ -108,7 +108,7 @@ public enum ClientVersion {
     private static final short HIGHEST_SUPPORTED_PROTOCOL_VERSION = (short) (HIGHER_THAN_SUPPORTED_VERSIONS.protocolVersion - 1);
 
     private static final Map<Short, ClientVersion> CLIENT_VERSION_CACHE = new HashMap<>();
-    private static final int[] CLIENT_VERSIONS = new int[]{5, 47, 107, 108, 109, 110, 210, 315, 316, 335, 338,
+    private static final short[] CLIENT_VERSIONS = new short[]{5, 47, 107, 108, 109, 110, 210, 315, 316, 335, 338,
             340, 393, 401, 404, 477, 480, 485, 490, 498, 573, 575, 578, 735, 736, 751, 753, 754};
     private short protocolVersion;
 
@@ -123,7 +123,7 @@ public enum ClientVersion {
      * @return ClientVersion
      */
     @NotNull
-    public static ClientVersion getClientVersion(short protocolVersion) {
+    public static ClientVersion getClientVersion(int protocolVersion) {
         if (protocolVersion == -1) {
             return ClientVersion.UNRESOLVED;
         } else if (protocolVersion < LOWEST_SUPPORTED_PROTOCOL_VERSION) {
@@ -131,34 +131,22 @@ public enum ClientVersion {
         } else if (protocolVersion > HIGHEST_SUPPORTED_PROTOCOL_VERSION) {
             return HIGHER_THAN_SUPPORTED_VERSIONS;
         } else {
-            ClientVersion cached = CLIENT_VERSION_CACHE.get(protocolVersion);
+            ClientVersion cached = CLIENT_VERSION_CACHE.get((short)protocolVersion);
             if (cached == null) {
                 for (ClientVersion version : values()) {
                     if (version.protocolVersion > protocolVersion) {
                         break;
                     } else if (version.protocolVersion == protocolVersion) {
                         //Cache for next time
-                        CLIENT_VERSION_CACHE.put(protocolVersion, version);
+                        CLIENT_VERSION_CACHE.put((short)protocolVersion, version);
                         return version;
                     }
                 }
                 cached = UNKNOWN;
-                cached.protocolVersion = protocolVersion;
+                cached.protocolVersion = (short)protocolVersion;
             }
             return cached;
         }
-    }
-
-
-    /**
-     * Get a ClientVersion enum by protocol version.
-     *
-     * @param protocolVersion Protocol version.
-     * @return ClientVersion
-     */
-    @NotNull
-    public static ClientVersion getClientVersion(int protocolVersion) {
-        return getClientVersion((short) protocolVersion);
     }
 
     /**
