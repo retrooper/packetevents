@@ -44,15 +44,15 @@ public class Vector3d {
     /**
      * X (coordinate/angle/whatever you wish)
      */
-    protected double x;
+    public double x;
     /**
      * Y (coordinate/angle/whatever you wish)
      */
-    protected double y;
+    public double y;
     /**
      * Z (coordinate/angle/whatever you wish)
      */
-    protected double z;
+    public double z;
 
     /**
      * Default constructor setting all coordinates/angles/values to their default values (=0).

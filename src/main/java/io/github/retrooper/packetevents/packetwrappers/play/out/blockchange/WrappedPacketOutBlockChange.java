@@ -126,11 +126,11 @@ public class WrappedPacketOutBlockChange extends WrappedPacket implements Sendab
     public void setBlockPosition(Vector3i blockPos) {
         if (packet != null) {
             if (version.isOlderThan(ServerVersion.v_1_8)) {
-                writeInt(0, blockPos.getX());
-                writeInt(1, blockPos.getY());
-                writeInt(2, blockPos.getZ());
+                writeInt(0, blockPos.x);
+                writeInt(1, blockPos.y);
+                writeInt(2, blockPos.z);
             } else {
-                blockPosObj = NMSUtils.generateNMSBlockPos(blockPos.getX(), blockPos.getY(), blockPos.getZ());
+                blockPosObj = NMSUtils.generateNMSBlockPos(blockPos.x, blockPos.y, blockPos.z);
                 write(NMSUtils.blockPosClass, 0, blockPosObj);
             }
         } else {
@@ -181,7 +181,7 @@ public class WrappedPacketOutBlockChange extends WrappedPacket implements Sendab
         if (version.isOlderThan(ServerVersion.v_1_8)) {
             try {
                 Object nmsWorld = NMSUtils.convertBukkitWorldToWorldServer(world);
-                packetPlayOutBlockChangeInstance = packetConstructor.newInstance(blockPosition.getX(), blockPosition.getY(), blockPosition.getZ(), nmsWorld);
+                packetPlayOutBlockChangeInstance = packetConstructor.newInstance(blockPosition.x, blockPosition.y, blockPosition.z, nmsWorld);
                 blockChange = new WrappedPacketOutBlockChange(new NMSPacket(packetPlayOutBlockChangeInstance));
                 if (getMaterial() != null) {
                     blockChange.setMaterial(getMaterial());
@@ -197,7 +197,7 @@ public class WrappedPacketOutBlockChange extends WrappedPacket implements Sendab
                 if (getMaterial() != null) {
                     blockChange.setMaterial(getMaterial());
                 } else {
-                    Object nmsBlockPos = NMSUtils.generateNMSBlockPos(blockPosition.getX(), blockPosition.getY(), blockPosition.getZ());
+                    Object nmsBlockPos = NMSUtils.generateNMSBlockPos(blockPosition.x, blockPosition.y, blockPosition.z);
                     Object worldServer = NMSUtils.convertBukkitWorldToWorldServer(world);
                     Object nmsBlockData = getNMSWorldTypeMethodCache.invoke(worldServer, nmsBlockPos);
                     blockChange.write(NMSUtils.iBlockDataClass, 0, nmsBlockData);

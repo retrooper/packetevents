@@ -1,8 +1,8 @@
 package io.github.retrooper.packetevents.packetwrappers.play.out.worldparticles;
 
 import io.github.retrooper.packetevents.packetwrappers.NMSPacket;
-import io.github.retrooper.packetevents.packetwrappers.api.SendableWrapper;
 import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
+import io.github.retrooper.packetevents.packetwrappers.api.SendableWrapper;
 import io.github.retrooper.packetevents.utils.enums.EnumUtil;
 import io.github.retrooper.packetevents.utils.nms.NMSUtils;
 import io.github.retrooper.packetevents.utils.reflection.Reflection;
@@ -11,6 +11,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.Optional;
 
 //TODO finish this wrapper and test
 class WrappedPacketOutWorldParticles extends WrappedPacket implements SendableWrapper {
@@ -33,7 +34,7 @@ class WrappedPacketOutWorldParticles extends WrappedPacket implements SendableWr
     @Deprecated
     public WrappedPacketOutWorldParticles(Particle particle, float x, float y, float z, float offsetX, float offsetY, float offsetZ, float particleData, int particleCount) {
         this.particle = particle;
-        this.longDistance= false;//REDUNDANT, NOT USED ON 1.7.10
+        this.longDistance = false;//REDUNDANT, NOT USED ON 1.7.10
         this.x = x;
         this.y = y;
         this.z = z;
@@ -111,8 +112,7 @@ class WrappedPacketOutWorldParticles extends WrappedPacket implements SendableWr
                 Enum<?> enumConst = EnumUtil.valueByIndex((Class<? extends Enum<?>>) particleEnumClass, particle.ordinal());
                 writeEnumConstant(0, enumConst);
             }
-        }
-        else {
+        } else {
             this.particle = particle;
         }
     }
@@ -120,8 +120,7 @@ class WrappedPacketOutWorldParticles extends WrappedPacket implements SendableWr
     public float getX() {
         if (packet != null) {
             return readFloat(0);
-        }
-        else {
+        } else {
             return x;
         }
     }
@@ -129,8 +128,7 @@ class WrappedPacketOutWorldParticles extends WrappedPacket implements SendableWr
     public void setX(float x) {
         if (packet != null) {
             writeFloat(0, x);
-        }
-        else {
+        } else {
             this.x = x;
         }
     }
@@ -138,8 +136,7 @@ class WrappedPacketOutWorldParticles extends WrappedPacket implements SendableWr
     public float getY() {
         if (packet != null) {
             return readFloat(1);
-        }
-        else {
+        } else {
             return y;
         }
     }
@@ -147,8 +144,7 @@ class WrappedPacketOutWorldParticles extends WrappedPacket implements SendableWr
     public float getZ() {
         if (packet != null) {
             return readFloat(2);
-        }
-        else {
+        } else {
             return z;
         }
     }
@@ -156,8 +152,7 @@ class WrappedPacketOutWorldParticles extends WrappedPacket implements SendableWr
     public float getOffsetX() {
         if (packet != null) {
             return readFloat(3);
-        }
-        else {
+        } else {
             return offsetX;
         }
     }
@@ -165,8 +160,7 @@ class WrappedPacketOutWorldParticles extends WrappedPacket implements SendableWr
     public float getOffsetY() {
         if (packet != null) {
             return readFloat(4);
-        }
-        else {
+        } else {
             return offsetY;
         }
     }
@@ -174,8 +168,7 @@ class WrappedPacketOutWorldParticles extends WrappedPacket implements SendableWr
     public float getOffsetZ() {
         if (packet != null) {
             return readFloat(5);
-        }
-        else {
+        } else {
             return offsetZ;
         }
     }
@@ -183,8 +176,7 @@ class WrappedPacketOutWorldParticles extends WrappedPacket implements SendableWr
     public float getParticleData() {
         if (packet != null) {
             return readFloat(6);
-        }
-        else {
+        } else {
             return particleData;
         }
     }
@@ -192,62 +184,51 @@ class WrappedPacketOutWorldParticles extends WrappedPacket implements SendableWr
     public int getParticleCount() {
         if (packet != null) {
             return readInt(0);
-        }
-        else {
+        } else {
             return particleCount;
         }
     }
 
-    @SupportedVersions(ranges = {ServerVersion.v_1_8, ServerVersion.ERROR})
-    public int[] getData() throws UnsupportedOperationException {
+    public Optional<int[]> getData() {
         if (version.isOlderThan(ServerVersion.v_1_8)) {
-        throwUnsupportedOperation();
+            return Optional.empty();
         }
         if (packet != null) {
-
-            return readIntArray(0);
-        }
-        else {
-            return data;
+            return Optional.of(readIntArray(0));
+        } else {
+            return Optional.of(data);
         }
     }
 
-    @SupportedVersions(ranges = {ServerVersion.v_1_8, ServerVersion.ERROR})
-    public void setData(int[] data) throws UnsupportedOperationException {
+    public void setData(int[] data) {
         if (version.isOlderThan(ServerVersion.v_1_8)) {
-            throwUnsupportedOperation();
+            return;
         }
         if (packet != null) {
-
             writeIntArray(0, data);
-        }
-        else {
+        } else {
             this.data = data;
         }
     }
 
-    @SupportedVersions(ranges = {ServerVersion.v_1_8, ServerVersion.ERROR})
-    public boolean isLongDistance() throws UnsupportedOperationException {
+    public Optional<Boolean> isLongDistance() {
         if (version.isOlderThan(ServerVersion.v_1_8)) {
-        throwUnsupportedOperation();
-    }
-        if (packet != null) {
-            return readBoolean(0);
+            return Optional.empty();
         }
-        else {
-            return longDistance;
+        if (packet != null) {
+            return Optional.of(readBoolean(0));
+        } else {
+            return Optional.of(longDistance);
         }
     }
 
-    @SupportedVersions(ranges = {ServerVersion.v_1_8, ServerVersion.ERROR})
-    public void setLongDistance(boolean longDistance) throws UnsupportedOperationException {
+    public void setLongDistance(boolean longDistance) {
         if (version.isOlderThan(ServerVersion.v_1_8)) {
-            throwUnsupportedOperation();
+            return;
         }
         if (packet != null) {
             writeBoolean(0, longDistance);
-        }
-        else {
+        } else {
             this.longDistance = longDistance;
         }
     }

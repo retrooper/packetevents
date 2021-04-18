@@ -36,6 +36,7 @@ import io.github.retrooper.packetevents.utils.server.ServerVersion;
 import io.github.retrooper.packetevents.utils.vector.Vector3d;
 
 import java.util.Objects;
+import java.util.Optional;
 
 public final class WrappedPacketInUseEntity extends WrappedPacketEntityAbstraction {
     private static Class<? extends Enum<?>> enumEntityUseActionClass, enumHandClass;
@@ -61,30 +62,20 @@ public final class WrappedPacketInUseEntity extends WrappedPacketEntityAbstracti
         }
     }
 
-    @SupportedVersions(ranges = {ServerVersion.v_1_8, ServerVersion.ERROR})
-    public Vector3d getTarget() throws UnsupportedOperationException {
-        if (PacketEvents.get().getServerUtils().getVersion() == ServerVersion.v_1_7_10) {
-            throwUnsupportedOperation();
-            return Vector3d.INVALID;
+    public Optional<Vector3d> getTarget() {
+        if (PacketEvents.get().getServerUtils().getVersion() == ServerVersion.v_1_7_10
+                || getAction() != EntityUseAction.INTERACT_AT) {
+            return Optional.empty();
         }
-        //We are certain we are on a 1.8 (or higher) server.
-        if (getAction() == EntityUseAction.INTERACT_AT) {
-            Object vec3DObj = readObject(0, NMSUtils.vec3DClass);
-            WrappedPacket vec3DWrapper = new WrappedPacket(new NMSPacket(vec3DObj));
-            return new Vector3d(vec3DWrapper.readDouble(0), vec3DWrapper.readDouble(1), vec3DWrapper.readDouble(2));
-        } else {
-            return Vector3d.INVALID;
-        }
+        Object vec3DObj = readObject(0, NMSUtils.vec3DClass);
+        WrappedPacket vec3DWrapper = new WrappedPacket(new NMSPacket(vec3DObj));
+        return Optional.of(new Vector3d(vec3DWrapper.readDouble(0), vec3DWrapper.readDouble(1), vec3DWrapper.readDouble(2)));
     }
 
-    @SupportedVersions(ranges = {ServerVersion.v_1_8, ServerVersion.ERROR})
-    public void setTarget(Vector3d target) throws UnsupportedOperationException {
-        if (PacketEvents.get().getServerUtils().getVersion() == ServerVersion.v_1_7_10) {
-            throwUnsupportedOperation();
-        }
-        //We are certain we are on a 1.8 (or higher) server.
-        if (getAction() == EntityUseAction.INTERACT_AT) {
-            Object vec3DObj = NMSUtils.generateVec3D(target.getX(), target.getY(), target.getZ());
+    public void setTarget(Vector3d target) {
+        if (PacketEvents.get().getServerUtils().getVersion() != ServerVersion.v_1_7_10
+                && getAction() == EntityUseAction.INTERACT_AT) {
+            Object vec3DObj = NMSUtils.generateVec3D(target.x, target.y, target.z);
             write(NMSUtils.vec3DClass, 0, vec3DObj);
         }
     }
@@ -120,11 +111,10 @@ public final class WrappedPacketInUseEntity extends WrappedPacketEntityAbstracti
         return Hand.MAIN_HAND;
     }
 
-    @SupportedVersions(ranges = {ServerVersion.v_1_9, ServerVersion.ERROR})
-    public void setHand(Hand hand) throws UnsupportedOperationException {
-        if (PacketEvents.get().getServerUtils().getVersion().isOlderThan(ServerVersion.v_1_9)) {
-            throwUnsupportedOperation();
-        } else if (getAction() == EntityUseAction.INTERACT || getAction() == EntityUseAction.INTERACT_AT) {
+    public void setHand(Hand hand) {
+        if (PacketEvents.get().getServerUtils().getVersion().isNewerThanOrEquals(ServerVersion.v_1_9) &&
+                (getAction() == EntityUseAction.INTERACT || getAction() == EntityUseAction.INTERACT_AT)) {
+
             Enum<?> enumConst = EnumUtil.valueOf(enumHandClass, hand.name());
             writeEnumConstant(0, enumConst);
         }

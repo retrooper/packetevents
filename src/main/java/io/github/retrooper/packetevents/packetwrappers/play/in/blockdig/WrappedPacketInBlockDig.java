@@ -82,11 +82,11 @@ public final class WrappedPacketInBlockDig extends WrappedPacket {
 
     public void setBlockPosition(Vector3i blockPos) {
         if (isVersionLowerThan_v_1_8) {
-            writeInt(0, blockPos.getX());
-            writeInt(1, blockPos.getY());
-            writeInt(2, blockPos.getZ());
+            writeInt(0, blockPos.x);
+            writeInt(1, blockPos.y);
+            writeInt(2, blockPos.z);
         } else {
-            Object blockPosObj = NMSUtils.generateNMSBlockPos(blockPos.getX(), blockPos.getY(), blockPos.getZ());
+            Object blockPosObj = NMSUtils.generateNMSBlockPos(blockPos.x, blockPos.y, blockPos.z);
             write(NMSUtils.blockPosClass, 0, blockPosObj);
         }
     }

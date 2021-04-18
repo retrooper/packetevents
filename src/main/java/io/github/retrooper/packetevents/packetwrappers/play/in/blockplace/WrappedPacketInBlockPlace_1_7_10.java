@@ -45,14 +45,14 @@ final class WrappedPacketInBlockPlace_1_7_10 extends WrappedPacket {
 
     public void setBlockPosition(Vector3i blockPos) {
         Vector3i currentBlockPos = getBlockPosition();
-        if (blockPos.getX() != currentBlockPos.getX()) {
-            writeInt(0, blockPos.getY());
+        if (blockPos.x != currentBlockPos.x) {
+            writeInt(0, blockPos.x);
         }
-        if (blockPos.getY() != currentBlockPos.getY()) {
-            writeInt(1, blockPos.getY());
+        if (blockPos.y != currentBlockPos.y) {
+            writeInt(1, blockPos.y);
         }
-        if (blockPos.getZ() != currentBlockPos.getZ()) {
-            writeInt(2, blockPos.getZ());
+        if (blockPos.z != currentBlockPos.z) {
+            writeInt(2, blockPos.z);
         }
     }
 
@@ -79,14 +79,14 @@ final class WrappedPacketInBlockPlace_1_7_10 extends WrappedPacket {
 
     public void setCursorPosition(Vector3f cursorPos) {
         Vector3f currentCursorPos = getCursorPosition();
-        if (cursorPos.getX() != currentCursorPos.getX()) {
-            writeFloat(0, cursorPos.getX());
+        if (cursorPos.x != currentCursorPos.x) {
+            writeFloat(0, cursorPos.x);
         }
-        if (cursorPos.getY() != currentCursorPos.getY()) {
-            writeFloat(1, cursorPos.getY());
+        if (cursorPos.y != currentCursorPos.y) {
+            writeFloat(1, cursorPos.y);
         }
-        if (cursorPos.getZ() != currentCursorPos.getZ()) {
-            writeFloat(2, cursorPos.getZ());
+        if (cursorPos.z != currentCursorPos.z) {
+            writeFloat(2, cursorPos.z);
         }
     }
 }

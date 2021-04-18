@@ -130,7 +130,7 @@ public class WrappedPacketOutPlayerInfo extends WrappedPacket implements Sendabl
 
     public void setPlayerInfo(PlayerInfo... playerInfoArray) throws UnsupportedOperationException {
         if (version.isOlderThan(ServerVersion.v_1_8) && playerInfoArray.length > 1) {
-            throw new UnsupportedOperationException("The player info list size cannot be greater than 1 one 1.7.10 server versions!");
+            throw new UnsupportedOperationException("The player info list size cannot be greater than 1 on 1.7.10 server versions!");
         }
         if (packet != null) {
             if (version.isOlderThan(ServerVersion.v_1_8)) {

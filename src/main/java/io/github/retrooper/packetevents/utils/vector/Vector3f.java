@@ -42,15 +42,15 @@ public class Vector3f {
     /**
      * X (coordinate/angle/whatever you wish)
      */
-    protected float x;
+    public float x;
     /**
      * Y (coordinate/angle/whatever you wish)
      */
-    protected float y;
+    public float y;
     /**
      * Z (coordinate/angle/whatever you wish)
      */
-    protected float z;
+    public float z;
 
     /**
      * Default constructor setting all coordinates/angles/values to their default values (=0).

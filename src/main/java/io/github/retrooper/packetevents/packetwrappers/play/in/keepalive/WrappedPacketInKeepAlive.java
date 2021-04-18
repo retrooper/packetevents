@@ -50,12 +50,15 @@ public final class WrappedPacketInKeepAlive extends WrappedPacket {
         }
     }
 
-    public void setId(long id) throws UnsupportedOperationException {
+    public void setId(long id) {
         if (!integerPresentInIndex0) {
             writeLong(0, id);
         } else {
-            if (id > Integer.MAX_VALUE || id < Integer.MAX_VALUE) {
-                throw new UnsupportedOperationException("PacketEvents failed to set the Keep Alive ID in WrappedPacketInKeepAlive. Your server version does not support IDs outside the range of an int primitive type. Your Keep Alive ID seems to be in the range of a long primitive type.");
+            if (id > Integer.MAX_VALUE) {
+                id = Integer.MAX_VALUE;
+            }
+            else if (id < Integer.MIN_VALUE) {
+                id = Integer.MIN_VALUE;
             }
             writeInt(0, (int) id);
         }

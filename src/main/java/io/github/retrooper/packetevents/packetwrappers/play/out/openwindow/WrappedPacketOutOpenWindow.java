@@ -31,6 +31,8 @@ import io.github.retrooper.packetevents.utils.nms.NMSUtils;
 import io.github.retrooper.packetevents.utils.reflection.Reflection;
 import io.github.retrooper.packetevents.utils.server.ServerVersion;
 
+import java.util.Optional;
+
 public class WrappedPacketOutOpenWindow extends WrappedPacket {
     private static boolean legacyMode = false;
     private static boolean ultraLegacyMode = false;
@@ -69,25 +71,21 @@ public class WrappedPacketOutOpenWindow extends WrappedPacket {
         }
     }
 
-    @SupportedVersions(ranges = {ServerVersion.v_1_7_10, ServerVersion.v_1_7_10,
-            ServerVersion.v_1_16, ServerVersion.ERROR})
-    public int getInventoryTypeId() throws UnsupportedOperationException {
+    public Optional<Integer> getInventoryTypeId() {
         if (packet != null) {
             if (legacyMode && !ultraLegacyMode) {
-                throwUnsupportedOperation();
+                return Optional.empty();
             }
-            return readInt(1);
+            return Optional.of(readInt(1));
         } else {
-            return windowTypeID;
+            return Optional.of(windowTypeID);
         }
     }
 
-    @SupportedVersions(ranges = {ServerVersion.v_1_7_10, ServerVersion.v_1_7_10,
-            ServerVersion.v_1_16, ServerVersion.ERROR})
-    public void setInventoryTypeId(int inventoryTypeID) throws UnsupportedOperationException {
+    public void setInventoryTypeId(int inventoryTypeID) {
         if (packet != null) {
             if (legacyMode && !ultraLegacyMode) {
-                throwUnsupportedOperation();
+                return;
             }
             writeInt(1, inventoryTypeID);
         } else {
@@ -95,17 +93,15 @@ public class WrappedPacketOutOpenWindow extends WrappedPacket {
         }
     }
 
-    @SupportedVersions(ranges = {ServerVersion.v_1_8, ServerVersion.v_1_13_2})
-    @Deprecated
-    public String getInventoryType() throws UnsupportedOperationException {
+    public Optional<String> getInventoryType() {
         if (packet != null) {
             if (!legacyMode || ultraLegacyMode) {
-                throwUnsupportedOperation();
+                return Optional.empty();
             }
-            return readString(0);
+            return Optional.of(readString(0));
 
         } else {
-            return windowType;
+            return Optional.of(windowType);
         }
     }
 

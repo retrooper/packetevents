@@ -24,7 +24,12 @@
 
 package io.github.retrooper.packetevents;
 
+import io.github.retrooper.packetevents.event.PacketListenerAbstract;
+import io.github.retrooper.packetevents.event.impl.PacketPlayReceiveEvent;
+import io.github.retrooper.packetevents.packettype.PacketType;
+import io.github.retrooper.packetevents.packetwrappers.play.in.armanimation.WrappedPacketInArmAnimation;
 import io.github.retrooper.packetevents.settings.PacketEventsSettings;
+import io.github.retrooper.packetevents.utils.player.Hand;
 import io.github.retrooper.packetevents.utils.server.ServerVersion;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -44,6 +49,17 @@ public class PacketEventsPlugin extends JavaPlugin {
     @Override
     public void onEnable() {
         //Other way to access your instance...
+        PacketEvents.getAPI().registerListener(new PacketListenerAbstract() {
+            @Override
+            public void onPacketPlayReceive(PacketPlayReceiveEvent event) {
+                if (event.getPacketId() == PacketType.Play.Client.ARM_ANIMATION) {
+                    WrappedPacketInArmAnimation wrappedPacketInArmAnimation =
+                            new WrappedPacketInArmAnimation(event.getNMSPacket());
+                    Hand hand = wrappedPacketInArmAnimation.getHand();
+                    event.getPlayer().sendMessage("Hand: " + hand.name());
+                }
+            }
+        });
         PacketEvents.get().init();
     }
 

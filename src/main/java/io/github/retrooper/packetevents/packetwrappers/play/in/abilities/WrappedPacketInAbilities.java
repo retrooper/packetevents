@@ -30,6 +30,8 @@ import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
 import io.github.retrooper.packetevents.utils.reflection.Reflection;
 import io.github.retrooper.packetevents.utils.server.ServerVersion;
 
+import java.util.Optional;
+
 public final class WrappedPacketInAbilities extends WrappedPacket {
     private static boolean v_1_16_Mode;
 
@@ -50,118 +52,69 @@ public final class WrappedPacketInAbilities extends WrappedPacket {
         writeBoolean(v_1_16_Mode ? 0 : 1, flying);
     }
 
-    /**
-     * This will return null if the server version is not available in 1.16.x and above
-     *
-     * @return Whether the player is vulnerable to damage or not.
-     */
-    @SupportedVersions(ranges = {ServerVersion.v_1_7_10, ServerVersion.v_1_15_2})
-    @Deprecated
-    public boolean isVulnerable() throws UnsupportedOperationException {
+    public Optional<Boolean> isVulnerable() {
         if (v_1_16_Mode) {
-            throwUnsupportedOperation();
+            return Optional.empty();
         }
-        return readBoolean(0);
+        return Optional.of(readBoolean(0));
     }
 
-    @SupportedVersions(ranges = {ServerVersion.v_1_7_10, ServerVersion.v_1_15_2})
-    @Deprecated
-    public void setVulnerable(boolean vulnerable) throws UnsupportedOperationException {
-        if (v_1_16_Mode) {
-            throwUnsupportedOperation();
+    public void setVulnerable(boolean vulnerable) {
+        if (!v_1_16_Mode) {
+            writeBoolean(0, vulnerable);
         }
-        writeBoolean(0, vulnerable);
     }
 
-    /**
-     * This will return null if the server version is not available in 1.16.x and above
-     *
-     * @return Whether or not the player can fly.
-     */
-    @SupportedVersions(ranges = {ServerVersion.v_1_7_10, ServerVersion.v_1_15_2})
-    @Deprecated
-    public boolean isFlightAllowed() throws UnsupportedOperationException {
+
+    public Optional<Boolean> isFlightAllowed() {
         if (v_1_16_Mode) {
-            throwUnsupportedOperation();
+            return Optional.empty();
         }
-        return readBoolean(2);
+        return Optional.of(readBoolean(2));
     }
 
-    @SupportedVersions(ranges = {ServerVersion.v_1_7_10, ServerVersion.v_1_15_2})
-    @Deprecated
-    public void setFlightAllowed(boolean flightAllowed) throws UnsupportedOperationException {
-        if (v_1_16_Mode) {
-            throwUnsupportedOperation();
+    public void setFlightAllowed(boolean flightAllowed) {
+        if (!v_1_16_Mode) {
+            writeBoolean(2, flightAllowed);
         }
-        writeBoolean(2, flightAllowed);
     }
 
-    /**
-     * This will return null if the server version is not available in 1.16.x and above
-     *
-     * @return Whether or not the player can break blocks instantly.
-     */
-    @SupportedVersions(ranges = {ServerVersion.v_1_7_10, ServerVersion.v_1_15_2})
-    @Deprecated
-    public boolean canInstantlyBuild() throws UnsupportedOperationException {
+    public Optional<Boolean> canInstantlyBuild() {
         if (v_1_16_Mode) {
-            throwUnsupportedOperation();
+            return Optional.empty();
         }
-        return readBoolean(3);
+        return Optional.of(readBoolean(3));
     }
 
-    @SupportedVersions(ranges = {ServerVersion.v_1_7_10, ServerVersion.v_1_15_2})
-    @Deprecated
-    public void setCanInstantlyBuild(boolean canInstantlyBuild) throws UnsupportedOperationException {
-        if (v_1_16_Mode) {
-            throwUnsupportedOperation();
+    public void setCanInstantlyBuild(boolean canInstantlyBuild) {
+        if (!v_1_16_Mode) {
+            writeBoolean(3, canInstantlyBuild);
         }
-        writeBoolean(3, canInstantlyBuild);
     }
 
-    /**
-     * This will return null if the server version is not available in 1.16.x and above
-     *
-     * @return The speed at which the player can fly, as a float.
-     */
-    @SupportedVersions(ranges = {ServerVersion.v_1_7_10, ServerVersion.v_1_15_2})
-    @Deprecated
-    public float getFlySpeed() throws UnsupportedOperationException {
+    public Optional<Float> getFlySpeed() {
         if (v_1_16_Mode) {
-            throwUnsupportedOperation();
+            return Optional.empty();
         }
-        return readFloat(0);
+        return Optional.of(readFloat(0));
     }
 
-    @SupportedVersions(ranges = {ServerVersion.v_1_7_10, ServerVersion.v_1_15_2})
-    @Deprecated
-    public void setFlySpeed(float flySpeed) throws UnsupportedOperationException {
-        if (v_1_16_Mode) {
-            throwUnsupportedOperation();
+    public void setFlySpeed(float flySpeed) {
+        if (!v_1_16_Mode) {
+            writeFloat(0, flySpeed);
         }
-        writeFloat(0, flySpeed);
     }
 
-    /**
-     * This will return null if the server version is not available in 1.16.x and above
-     *
-     * @return The speed at which the player can walk, as a float.
-     */
-    @SupportedVersions(ranges = {ServerVersion.v_1_7_10, ServerVersion.v_1_15_2})
-    @Deprecated
-    public float getWalkSpeed() throws UnsupportedOperationException {
+    public Optional<Float> getWalkSpeed() {
         if (v_1_16_Mode) {
-            throwUnsupportedOperation();
+            return Optional.empty();
         }
-        return readFloat(1);
+        return Optional.of(readFloat(1));
     }
 
-    @SupportedVersions(ranges = {ServerVersion.v_1_7_10, ServerVersion.v_1_15_2})
-    @Deprecated
-    public void setWalkSpeed(float walkSpeed) throws UnsupportedOperationException {
-        if (v_1_16_Mode) {
-            throwUnsupportedOperation();
+    public void setWalkSpeed(float walkSpeed) {
+        if (!v_1_16_Mode) {
+            writeFloat(1, walkSpeed);
         }
-        writeFloat(1, walkSpeed);
     }
 }

@@ -26,24 +26,24 @@ package io.github.retrooper.packetevents.packetwrappers.play.out.position;
 
 import io.github.retrooper.packetevents.packettype.PacketTypeClasses;
 import io.github.retrooper.packetevents.packetwrappers.NMSPacket;
-import io.github.retrooper.packetevents.packetwrappers.api.SendableWrapper;
 import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
+import io.github.retrooper.packetevents.packetwrappers.api.SendableWrapper;
 import io.github.retrooper.packetevents.utils.enums.EnumUtil;
 import io.github.retrooper.packetevents.utils.reflection.SubclassUtil;
 import io.github.retrooper.packetevents.utils.server.ServerVersion;
+import io.github.retrooper.packetevents.utils.vector.Vector3d;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.HashSet;
+import java.util.Optional;
 import java.util.Set;
 
 public final class WrappedPacketOutPosition extends WrappedPacket implements SendableWrapper {
     private static Constructor<?> packetConstructor;
     private static byte constructorMode = 0;
     private static Class<? extends Enum<?>> enumPlayerTeleportFlagsClass;
-    private double x;
-    private double y;
-    private double z;
+    private Vector3d position;
     private float yaw;
     private float pitch;
     private Set<PlayerTeleportFlags> relativeFlags;
@@ -57,32 +57,33 @@ public final class WrappedPacketOutPosition extends WrappedPacket implements Sen
         relativeFlags = new HashSet<>();
     }
 
-    @SupportedVersions(ranges = {ServerVersion.v_1_7_10, ServerVersion.v_1_7_10})
     @Deprecated
     public WrappedPacketOutPosition(double x, double y, double z, float yaw, float pitch, boolean onGround, Set<PlayerTeleportFlags> relativeFlags) {
-        this.x = x;
-        this.y = y;
-        this.z = z;
+        this.position = new Vector3d(x, y, z);
         this.yaw = yaw;
         this.pitch = pitch;
         this.onGround = onGround;
         this.relativeFlags = relativeFlags;
     }
 
-    @SupportedVersions(ranges = {ServerVersion.v_1_8, ServerVersion.v_1_8_8})
+    @Deprecated
     public WrappedPacketOutPosition(double x, double y, double z, float yaw, float pitch, Set<PlayerTeleportFlags> relativeFlags) {
-        this.x = x;
-        this.y = y;
-        this.z = z;
+        this.position = new Vector3d(x, y, z);
         this.yaw = yaw;
         this.pitch = pitch;
         this.relativeFlags = relativeFlags;
     }
 
     public WrappedPacketOutPosition(double x, double y, double z, float yaw, float pitch, Set<PlayerTeleportFlags> relativeFlags, int teleportID) {
-        this.x = x;
-        this.y = y;
-        this.z = z;
+        this.position = new Vector3d(x, y, z);
+        this.yaw = yaw;
+        this.pitch = pitch;
+        this.relativeFlags = relativeFlags;
+        this.teleportID = teleportID;
+    }
+
+    public WrappedPacketOutPosition(Vector3d position, float yaw, float pitch, Set<PlayerTeleportFlags> relativeFlags, int teleportID) {
+        this.position = position;
         this.yaw = yaw;
         this.pitch = pitch;
         this.relativeFlags = relativeFlags;
@@ -111,26 +112,24 @@ public final class WrappedPacketOutPosition extends WrappedPacket implements Sen
         }
     }
 
-    @SupportedVersions(ranges = {ServerVersion.v_1_7_10, ServerVersion.v_1_7_10})
-    @Deprecated
-    public boolean isOnGround() throws UnsupportedOperationException {
+    public Optional<Boolean> isOnGround() {
+        if (version.isNewerThan(ServerVersion.v_1_7_10)) {
+            return Optional.empty();
+        }
         if (packet != null) {
-            if (version.isNewerThan(ServerVersion.v_1_7_10)) {
-                throwUnsupportedOperation();
-            }
-            return readBoolean(0);
+
+            return Optional.of(readBoolean(0));
         } else {
-            return onGround;
+            return Optional.of(onGround);
         }
     }
 
-    @SupportedVersions(ranges = {ServerVersion.v_1_7_10, ServerVersion.v_1_7_10})
-    @Deprecated
     public void setOnGround(boolean onGround) {
+        if (version.isNewerThan(ServerVersion.v_1_7_10)) {
+            return;
+        }
         if (packet != null) {
-            if (version.isNewerThan(ServerVersion.v_1_7_10)) {
-                throwUnsupportedOperation();
-            }
+
             writeBoolean(0, onGround);
         } else {
             this.onGround = onGround;
@@ -224,51 +223,26 @@ public final class WrappedPacketOutPosition extends WrappedPacket implements Sen
         }
     }
 
-    public double getX() {
+    public Vector3d getPosition() {
         if (packet != null) {
-            return readDouble(0);
-        } else {
-            return x;
+            double x = readDouble(0);
+            double y = readDouble(1);
+            double z = readDouble(2);
+            return new Vector3d(x, y, z);
+        }
+        else {
+            return position;
         }
     }
 
-    public void setX(double x) {
+    public void setPosition(Vector3d position) {
         if (packet != null) {
-            writeDouble(0, x);
-        } else {
-            this.x = x;
+            writeDouble(0, position.x);
+            writeDouble(1, position.y);
+            writeDouble(2, position.z);
         }
-    }
-
-    public double getY() {
-        if (packet != null) {
-            return readDouble(1);
-        } else {
-            return y;
-        }
-    }
-
-    public void setY(double y) {
-        if (packet != null) {
-            writeDouble(1, y);
-        } else {
-            this.y = y;
-        }
-    }
-
-    public double getZ() {
-        if (packet != null) {
-            return readDouble(2);
-        } else {
-            return z;
-        }
-    }
-
-    public void setZ(double z) {
-        if (packet != null) {
-            writeDouble(2, z);
-        } else {
-            this.z = z;
+        else {
+            this.position = position;
         }
     }
 
@@ -304,20 +278,21 @@ public final class WrappedPacketOutPosition extends WrappedPacket implements Sen
         }
     }
 
-    @SupportedVersions(ranges = {ServerVersion.v_1_9, ServerVersion.ERROR})
-    public int getTeleportId() throws UnsupportedOperationException {
+    public Optional<Integer> getTeleportId() {
         if (version.isOlderThan(ServerVersion.v_1_9)) {
-            throwUnsupportedOperation();
+            return Optional.empty();
         }
         if (packet != null) {
-            return readInt(0);
+            return Optional.of(readInt(0));
         } else {
-            return teleportID;
+            return Optional.of(teleportID);
         }
     }
 
-    @SupportedVersions(ranges = {ServerVersion.v_1_9, ServerVersion.ERROR})
-    public void setTeleportId(int teleportID) throws UnsupportedOperationException {
+    public void setTeleportId(int teleportID) {
+        if (version.isOlderThan(ServerVersion.v_1_9)) {
+            return;
+        }
         if (packet != null) {
             writeInt(0, teleportID);
         } else {
@@ -327,7 +302,6 @@ public final class WrappedPacketOutPosition extends WrappedPacket implements Sen
 
     @Override
     public Object asNMSPacket() {
-
         Set<Object> nmsRelativeFlags = new HashSet<>();
         if (constructorMode != 0) {
             for (PlayerTeleportFlags flag : getRelativeFlags()) {
@@ -335,15 +309,16 @@ public final class WrappedPacketOutPosition extends WrappedPacket implements Sen
             }
         }
         try {
+            Vector3d position = getPosition();
             switch (constructorMode) {
                 case 0:
                     //1.7.10
-                    return packetConstructor.newInstance(getX(), getY(), getZ(), getYaw(), getPitch(), isOnGround(), getRelativeFlagsMask());
+                    return packetConstructor.newInstance(position.x, position.y, position.z, getYaw(), getPitch(), isOnGround(), getRelativeFlagsMask());
                 case 1:
                     //1.8 -> 1.8.8
-                    return packetConstructor.newInstance(getX(), getY(), getZ(), getYaw(), getPitch(), nmsRelativeFlags);
+                    return packetConstructor.newInstance(position.x, position.y, position.z, getYaw(), getPitch(), nmsRelativeFlags);
                 case 2:
-                    return packetConstructor.newInstance(getX(), getY(), getZ(), getYaw(), getPitch(), nmsRelativeFlags, getTeleportId());
+                    return packetConstructor.newInstance(position.x, position.y, position.z, getYaw(), getPitch(), nmsRelativeFlags, getTeleportId());
             }
         } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
             e.printStackTrace();

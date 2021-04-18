@@ -10,8 +10,10 @@ import io.github.retrooper.packetevents.utils.server.ServerVersion;
 import io.github.retrooper.packetevents.utils.vector.Vector3d;
 import org.jetbrains.annotations.Nullable;
 
+import javax.management.openmbean.OpenDataException;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
+import java.util.Optional;
 
 public class WrappedPacketOutNamedSoundEffect extends WrappedPacket implements SendableWrapper {
     private static Constructor<?> packetDefaultConstructor, soundEffectConstructor;
@@ -96,24 +98,21 @@ public class WrappedPacketOutNamedSoundEffect extends WrappedPacket implements S
         }
     }
 
-    //1.9 -> latest
-    @SupportedVersions(ranges = {ServerVersion.v_1_9, ServerVersion.ERROR})
-    public SoundCategory getSoundCategory() throws UnsupportedOperationException {
+    public Optional<SoundCategory> getSoundCategory() {
         if (version.isOlderThan(ServerVersion.v_1_9)) {
-            throwUnsupportedOperation();
+            return Optional.empty();
         }
         if (packet != null) {
             Enum<?> enumConst = readEnumConstant(0, enumSoundCategoryClass);
-            return SoundCategory.getByName(enumConst.name());
+            return Optional.ofNullable(SoundCategory.getByName(enumConst.name()));
         } else {
-            return soundCategory;
+            return Optional.of(soundCategory);
         }
     }
 
-    @SupportedVersions(ranges = {ServerVersion.v_1_9, ServerVersion.ERROR})
     public void setSoundCategory(SoundCategory soundCategory) {
         if (version.isOlderThan(ServerVersion.v_1_9)) {
-            throwUnsupportedOperation();
+            return;
         }
         if (packet != null) {
             Enum<?> enumConst = EnumUtil.valueOf(enumSoundCategoryClass, soundCategory.name());
@@ -136,9 +135,9 @@ public class WrappedPacketOutNamedSoundEffect extends WrappedPacket implements S
 
     public void setEffectPosition(Vector3d effectPosition) {
         if (packet != null) {
-            writeInt(0, (int) (effectPosition.getX() / 8.0D));
-            writeInt(1, (int) (effectPosition.getY() / 8.0D));
-            writeInt(2, (int) (effectPosition.getZ() / 8.0D));
+            writeInt(0, (int) (effectPosition.x / 8.0D));
+            writeInt(1, (int) (effectPosition.y / 8.0D));
+            writeInt(2, (int) (effectPosition.z / 8.0D));
         } else {
             this.effectPosition = effectPosition;
         }
@@ -192,7 +191,7 @@ public class WrappedPacketOutNamedSoundEffect extends WrappedPacket implements S
             WrappedPacketOutNamedSoundEffect wrappedPacketOutNamedSoundEffect = new WrappedPacketOutNamedSoundEffect(new NMSPacket(packetPlayOutNamedSoundEffectInstance));
             wrappedPacketOutNamedSoundEffect.setSoundEffectName(getSoundEffectName());
             if (soundEffectVarExists) {
-                wrappedPacketOutNamedSoundEffect.setSoundCategory(getSoundCategory());
+                wrappedPacketOutNamedSoundEffect.setSoundCategory(getSoundCategory().get());
             }
             wrappedPacketOutNamedSoundEffect.setEffectPosition(getEffectPosition());
             wrappedPacketOutNamedSoundEffect.setPitch(getPitch());

@@ -45,15 +45,15 @@ public class Vector3i {
     /**
      * X (coordinate/angle/whatever you wish)
      */
-    protected int x;
+    public int x;
     /**
      * Y (coordinate/angle/whatever you wish)
      */
-    protected int y;
+    public int y;
     /**
      * Z (coordinate/angle/whatever you wish)
      */
-    protected int z;
+    public int z;
 
     /**
      * Default constructor setting all coordinates/angles/values to their default values (=0).

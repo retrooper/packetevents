@@ -103,7 +103,7 @@ public final class PacketEvents implements Listener, EventManager {
 
     @Deprecated
     public static PacketEvents getAPI() {
-        return get();
+        return instance;
     }
 
 

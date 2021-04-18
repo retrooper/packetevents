@@ -35,6 +35,8 @@ import io.github.retrooper.packetevents.utils.vector.Vector3f;
 import io.github.retrooper.packetevents.utils.vector.Vector3i;
 import org.bukkit.inventory.ItemStack;
 
+import java.util.Optional;
+
 
 public final class WrappedPacketInBlockPlace extends WrappedPacket {
     private static boolean newerThan_v_1_8_8, newerThan_v_1_7_10;
@@ -100,7 +102,7 @@ public final class WrappedPacketInBlockPlace extends WrappedPacket {
     }
 
     public Vector3i getBlockPosition() {
-        Vector3i blockPos = new Vector3i();
+        Vector3i blockPos;
         if (newerThan_v_1_8_8) {
             WrappedPacketInBlockPlace_1_9 blockPlace_1_9 = new WrappedPacketInBlockPlace_1_9(packet);
             blockPos = blockPlace_1_9.getBlockPosition();
@@ -114,26 +116,21 @@ public final class WrappedPacketInBlockPlace extends WrappedPacket {
         return blockPos;
     }
 
-    @SupportedVersions(ranges = {ServerVersion.v_1_7_10, ServerVersion.v_1_8_8})
-    @Deprecated
-    public Vector3f getCursorPosition() throws UnsupportedOperationException {
+    public Optional<Vector3f> getCursorPosition() {
         if (newerThan_v_1_8_8) {
-            throwUnsupportedOperation();
-            return Vector3f.INVALID;
+            return Optional.empty();
         } else if (newerThan_v_1_7_10) {
             WrappedPacketInBlockPlace_1_8 blockPlace_1_8 = new WrappedPacketInBlockPlace_1_8(packet);
-            return blockPlace_1_8.getCursorPosition();
+            return Optional.of(blockPlace_1_8.getCursorPosition());
         } else {
             WrappedPacketInBlockPlace_1_7_10 blockPlace_1_7_10 = new WrappedPacketInBlockPlace_1_7_10(packet);
-            return blockPlace_1_7_10.getCursorPosition();
+            return Optional.of(blockPlace_1_7_10.getCursorPosition());
         }
     }
 
-    @SupportedVersions(ranges = {ServerVersion.v_1_7_10, ServerVersion.v_1_8_8})
-    @Deprecated
-    public void setCursorPosition(Vector3f cursorPos) throws UnsupportedOperationException {
+    public void setCursorPosition(Vector3f cursorPos) {
         if (newerThan_v_1_8_8) {
-            throwUnsupportedOperation();
+
         } else if (newerThan_v_1_7_10) {
             WrappedPacketInBlockPlace_1_8 blockPlace_1_8 = new WrappedPacketInBlockPlace_1_8(packet);
             blockPlace_1_8.setCursorPosition(cursorPos);
@@ -143,24 +140,22 @@ public final class WrappedPacketInBlockPlace extends WrappedPacket {
         }
     }
 
-    @SupportedVersions(ranges = {ServerVersion.v_1_7_10, ServerVersion.v_1_8_8})
-    public ItemStack getItemStack() throws UnsupportedOperationException {
+    public Optional<ItemStack> getItemStack() {
         if (newerThan_v_1_8_8) {
-            throwUnsupportedOperation();
-            return null;
+            return Optional.empty();
         } else if (newerThan_v_1_7_10) {
             WrappedPacketInBlockPlace_1_8 blockPlace_1_8 = new WrappedPacketInBlockPlace_1_8(packet);
-            return blockPlace_1_8.getItemStack();
+            return Optional.of(blockPlace_1_8.getItemStack());
         } else {
             WrappedPacketInBlockPlace_1_7_10 blockPlace_1_7_10 = new WrappedPacketInBlockPlace_1_7_10(packet);
-            return blockPlace_1_7_10.getItemStack();
+            return Optional.of(blockPlace_1_7_10.getItemStack());
         }
     }
 
-    @SupportedVersions(ranges = {ServerVersion.v_1_7_10, ServerVersion.v_1_8_8})
-    public void setItemStack(ItemStack stack) throws UnsupportedOperationException {
+
+    public void setItemStack(ItemStack stack) {
         if (newerThan_v_1_8_8) {
-            throwUnsupportedOperation();
+
         } else if (newerThan_v_1_7_10) {
             WrappedPacketInBlockPlace_1_8 blockPlace_1_8 = new WrappedPacketInBlockPlace_1_8(packet);
             blockPlace_1_8.setItemStack(stack);

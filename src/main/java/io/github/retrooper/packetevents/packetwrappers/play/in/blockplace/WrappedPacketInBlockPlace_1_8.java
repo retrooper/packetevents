@@ -44,9 +44,9 @@ final class WrappedPacketInBlockPlace_1_8 extends WrappedPacket {
 
         Object blockPosObj = readObject(1, NMSUtils.blockPosClass);
         try {
-            blockPos.setX((int) NMSUtils.getBlockPosX.invoke(blockPosObj));
-            blockPos.setY((int) NMSUtils.getBlockPosY.invoke(blockPosObj));
-            blockPos.setZ((int) NMSUtils.getBlockPosZ.invoke(blockPosObj));
+            blockPos.x = (int)NMSUtils.getBlockPosX.invoke(blockPosObj);
+            blockPos.y = (int)NMSUtils.getBlockPosY.invoke(blockPosObj);
+            blockPos.z = (int)NMSUtils.getBlockPosZ.invoke(blockPosObj);
         } catch (IllegalAccessException | InvocationTargetException e) {
             e.printStackTrace();
         }
@@ -54,7 +54,7 @@ final class WrappedPacketInBlockPlace_1_8 extends WrappedPacket {
     }
 
     public void setBlockPosition(Vector3i blockPos) {
-        Object blockPosObj = NMSUtils.generateNMSBlockPos(blockPos.getX(), blockPos.getY(), blockPos.getZ());
+        Object blockPosObj = NMSUtils.generateNMSBlockPos(blockPos.z, blockPos.y, blockPos.z);
         write(NMSUtils.blockPosClass, 1, blockPosObj);
     }
 
@@ -80,8 +80,8 @@ final class WrappedPacketInBlockPlace_1_8 extends WrappedPacket {
     }
 
     public void setCursorPosition(Vector3f cursorPos) {
-        writeFloat(0, cursorPos.getX());
-        writeFloat(1, cursorPos.getY());
-        writeFloat(2, cursorPos.getZ());
+        writeFloat(0, cursorPos.x);
+        writeFloat(1, cursorPos.y);
+        writeFloat(2, cursorPos.z);
     }
 }
