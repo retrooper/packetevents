@@ -70,7 +70,7 @@ public class BukkitEventProcessorInternal implements Listener {
         PacketEvents.get().getPlayerUtils().tempClientVersionMap.remove(address);
 
         PacketEvents.get().packetProcessorInternal.keepAliveMap.remove(uuid);
-        PacketEvents.get().packetProcessorInternal.channelMap.remove(player.getName());
+        PacketEvents.get().packetProcessorInternal.channels.remove(player.getName());
 
     }
 }

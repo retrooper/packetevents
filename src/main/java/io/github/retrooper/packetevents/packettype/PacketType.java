@@ -28,6 +28,7 @@ import io.github.retrooper.packetevents.PacketEvents;
 import io.github.retrooper.packetevents.utils.server.ServerVersion;
 
 import java.util.HashMap;
+import java.util.IdentityHashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -45,7 +46,7 @@ public class PacketType {
      * This value may change over the versions so it is important to use the variable and not hard code its value.
      */
     public static final byte INVALID = -128;
-    public static final Map<Class<?>, Byte> packetIDMap = new HashMap<>();
+    public static final Map<Class<?>, Byte> packetIDMap = new IdentityHashMap<>();
     
     private static void insertPacketID(Class<?> cls, byte packetID) {
         if (cls != null) {

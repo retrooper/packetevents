@@ -28,10 +28,9 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.Map;
 
 public class ClassUtil {
-    private static final Map<String, String> CLASS_SIMPLE_NAME_CACHE = new ConcurrentHashMap<>();
+    private static final Map<Class<?>, String> CLASS_SIMPLE_NAME_CACHE = new ConcurrentHashMap<>();
 
     public static String getClassSimpleName(Class<?> cls) {
-        final String className = cls.getName();
-        return CLASS_SIMPLE_NAME_CACHE.computeIfAbsent(className, k -> cls.getSimpleName());
+        return CLASS_SIMPLE_NAME_CACHE.computeIfAbsent(cls, k -> cls.getSimpleName());
     }
 }

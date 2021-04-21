@@ -52,15 +52,15 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class PacketProcessorInternal {
     public final Map<UUID, Long> keepAliveMap = new ConcurrentHashMap<>();
-    public final Map<String, Object> channelMap = new ConcurrentHashMap<>();
+    public final Map<String, Object> channels = new ConcurrentHashMap<>();
 
     public Object getChannel(Player player) {
         String name = player.getName();
-        Object channel = channelMap.get(name);
+        Object channel = channels.get(name);
         if (channel == null) {
             channel = NMSUtils.getChannel(player);
             if (channel != null) {
-                channelMap.put(name, channel);
+                channels.put(name, channel);
             }
         }
         return channel;
@@ -110,7 +110,7 @@ public class PacketProcessorInternal {
                 if (loginEvent.getPacketId() == PacketType.Login.Client.START) {
                     WrappedPacketLoginInStart startWrapper = new WrappedPacketLoginInStart(loginEvent.getNMSPacket());
                     WrappedGameProfile gameProfile = startWrapper.getGameProfile();
-                    channelMap.put(gameProfile.getName(), channel);
+                    channels.put(gameProfile.getName(), channel);
                 }
                 PacketEvents.get().getEventManager().callEvent(loginEvent);
                 packet = loginEvent.getNMSPacket().getRawNMSPacket();
