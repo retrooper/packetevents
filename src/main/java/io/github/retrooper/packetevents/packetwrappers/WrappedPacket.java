@@ -140,7 +140,7 @@ public class WrappedPacket implements WrapperPacketReader, WrapperPacketWriter {
         }
         StackTraceElement stackTraceElement = stackTraceElements[stackTraceElementIndex];
         String methodName = stackTraceElement.getMethodName();
-        List<Method> possibleMethods = Reflection.getMethods(getClass(), methodName, null);
+        List<Method> possibleMethods = Reflection.getMethods(getClass(), methodName, (Class<?>) null);
         Method method = null;
         for (Method m : possibleMethods) {
             if (m.isAnnotationPresent(SupportedVersions.class)) {

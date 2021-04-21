@@ -28,6 +28,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.IdentityHashMap;
 import java.util.Map;
 
 /**
@@ -107,7 +108,7 @@ public enum ClientVersion {
     private static final short LOWEST_SUPPORTED_PROTOCOL_VERSION = (short) (LOWER_THAN_SUPPORTED_VERSIONS.protocolVersion + 1);
     private static final short HIGHEST_SUPPORTED_PROTOCOL_VERSION = (short) (HIGHER_THAN_SUPPORTED_VERSIONS.protocolVersion - 1);
 
-    private static final Map<Short, ClientVersion> CLIENT_VERSION_CACHE = new HashMap<>();
+    private static final Map<Short, ClientVersion> CLIENT_VERSION_CACHE = new IdentityHashMap<>();
     private static final short[] CLIENT_VERSIONS = new short[]{5, 47, 107, 108, 109, 110, 210, 315, 316, 335, 338,
             340, 393, 401, 404, 477, 480, 485, 490, 498, 573, 575, 578, 735, 736, 751, 753, 754};
     private short protocolVersion;

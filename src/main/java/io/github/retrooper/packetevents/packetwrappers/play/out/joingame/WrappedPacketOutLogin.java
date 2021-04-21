@@ -60,7 +60,7 @@ public class WrappedPacketOutLogin extends WrappedPacketEntityAbstraction {
 
     public int getMaxPlayers() {
         if (packet != null) {
-            //index 2 on legacy, index 1 on modern
+            //TODO index 2 on legacy, index 1 on modern
             int index = 2;
             return readInt(index);
         } else {
