@@ -30,9 +30,15 @@ import io.github.retrooper.packetevents.exceptions.WrapperUnsupportedUsageExcept
 import io.github.retrooper.packetevents.packettype.PacketTypeClasses;
 import io.github.retrooper.packetevents.packetwrappers.api.WrapperPacketReader;
 import io.github.retrooper.packetevents.packetwrappers.api.WrapperPacketWriter;
+import io.github.retrooper.packetevents.utils.enums.EnumUtil;
+import io.github.retrooper.packetevents.utils.nms.NMSUtils;
+import io.github.retrooper.packetevents.utils.player.GameMode;
 import io.github.retrooper.packetevents.utils.reflection.ClassUtil;
 import io.github.retrooper.packetevents.utils.reflection.Reflection;
 import io.github.retrooper.packetevents.utils.server.ServerVersion;
+import io.github.retrooper.packetevents.utils.world.Difficulty;
+import io.github.retrooper.packetevents.utils.world.Dimension;
+import org.bukkit.inventory.ItemStack;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -291,6 +297,7 @@ public class WrappedPacket implements WrapperPacketReader, WrapperPacketWriter {
         }
     }
 
+
     @Override
     public void writeBoolean(int index, boolean value) {
         write(boolean.class, index, value);
@@ -402,6 +409,58 @@ public class WrappedPacket implements WrapperPacketReader, WrapperPacketWriter {
         } catch (IllegalAccessException | NullPointerException e) {
             e.printStackTrace();
         }
+    }
+
+    public ItemStack readItemStack(int index) {
+        Object nmsItemStack = readObject(index, NMSUtils.nmsItemStackClass);
+        return NMSUtils.toBukkitItemStack(nmsItemStack);
+    }
+
+    public void writeItemStack(int index, ItemStack stack) {
+        Object nmsItemStack = NMSUtils.toNMSItemStack(stack);
+        write(NMSUtils.nmsItemStackClass, 0, nmsItemStack);
+    }
+
+    public GameMode readGameMode(int index) {
+        Enum<?> enumConst = readEnumConstant(index, NMSUtils.enumGameModeClass);
+        return GameMode.valueOf(enumConst.name());
+    }
+
+    public void writeGameMode(int index, GameMode gameMode) {
+        //TODO finish
+    }
+
+    public Dimension readDimension(int index, int dimensionIDLegacyIndex) {
+        int dimensionID;
+        if (version.isOlderThan(ServerVersion.v_1_13_2)) {
+            dimensionID = readInt(dimensionIDLegacyIndex);
+        } else {
+            Object dimensionManagerObject = readObject(index, NMSUtils.dimensionManagerClass);
+            WrappedPacket dimensionManagerWrapper = new WrappedPacket(new NMSPacket(dimensionManagerObject));
+            dimensionID = dimensionManagerWrapper.readInt(0) - 1;
+        }
+        return Dimension.getById(dimensionID);
+    }
+
+    public void writeDimension(int index, int dimensionIDLegacyIndex, Dimension dimension) {
+        if (version.isOlderThan(ServerVersion.v_1_13_2)) {
+            writeInt(dimensionIDLegacyIndex, dimension.getId());
+        } else {
+            Object dimensionManagerObject = readObject(index, NMSUtils.dimensionManagerClass);
+            WrappedPacket dimensionManagerWrapper = new WrappedPacket(new NMSPacket(dimensionManagerObject));
+            dimensionManagerWrapper.writeInt(0, dimension.getId() + 1);;
+        }
+    }
+
+
+    public Difficulty readDifficulty(int index) {
+        Enum<?> enumConstant = readEnumConstant(index, NMSUtils.enumDifficultyClass);
+        return Difficulty.values()[enumConstant.ordinal()];
+    }
+
+    public void writeDifficulty(int index, Difficulty difficulty) {
+        Enum<?> enumConstant = EnumUtil.valueByIndex(NMSUtils.enumDifficultyClass, difficulty.ordinal());
+        writeEnumConstant(index, enumConstant);
     }
 
     private Field getField(Class<?> type, int index) {

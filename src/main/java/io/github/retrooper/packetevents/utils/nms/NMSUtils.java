@@ -60,8 +60,8 @@ public final class NMSUtils {
             craftPlayerClass, serverConnectionClass, craftEntityClass, nmsItemStackClass, networkManagerClass, nettyChannelClass, gameProfileClass, iChatBaseComponentClass,
             blockPosClass, vec3DClass, channelFutureClass, blockClass, iBlockDataClass, nmsWorldClass, craftItemStackClass,
             soundEffectClass, minecraftKeyClass, chatSerializerClass, craftMagicNumbersClass, worldSettingsClass, worldServerClass, dataWatcherClass, nmsEntityHumanClass,
-            dedicatedServerClass, entityHumanClass, packetDataSerializerClass, byteBufClass;
-    public static Class<? extends Enum<?>> enumDirectionClass, enumHandClass, enumGameModeClass;
+            dedicatedServerClass, entityHumanClass, packetDataSerializerClass, byteBufClass, dimensionManagerClass;
+    public static Class<? extends Enum<?>> enumDirectionClass, enumHandClass, enumGameModeClass, enumDifficultyClass;
     public static Method getBlockPosX, getBlockPosY, getBlockPosZ;
     private static String nettyPrefix;
     private static Method getCraftPlayerHandle;
@@ -135,6 +135,7 @@ public final class NMSUtils {
             nmsEntityHumanClass = getNMSClassWithoutException("EntityHuman");
             dedicatedServerClass = getNMSClassWithoutException("DedicatedServer");
             packetDataSerializerClass = getNMSClassWithoutException("PacketDataSerializer");
+            dimensionManagerClass = NMSUtils.getNMSClassWithoutException("DimensionManager");
             try {
                 gameProfileClass = Class.forName("net.minecraft.util.com.mojang.authlib.GameProfile");
             } catch (ClassNotFoundException e) {
@@ -224,6 +225,7 @@ public final class NMSUtils {
         worldSettingsClass = NMSUtils.getNMSClassWithoutException("WorldSettings");
 
         enumHandClass = getNMSEnumClassWithoutException("EnumHand");
+        enumDifficultyClass = NMSUtils.getNMSEnumClassWithoutException("EnumDifficulty");
         enumGameModeClass = NMSUtils.getNMSEnumClassWithoutException("EnumGamemode");
         if (enumGameModeClass == null) {
             enumGameModeClass = SubclassUtil.getEnumSubClass(worldSettingsClass, "EnumGamemode");

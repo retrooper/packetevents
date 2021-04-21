@@ -31,33 +31,23 @@ import io.github.retrooper.packetevents.utils.vector.Vector3i;
 import org.bukkit.inventory.ItemStack;
 
 final class WrappedPacketInBlockPlace_1_7_10 extends WrappedPacket {
-    private final net.minecraft.server.v1_7_R4.PacketPlayInBlockPlace blockPlace;
-
     WrappedPacketInBlockPlace_1_7_10(final NMSPacket packet) {
         super(packet);
-        blockPlace =
-                (net.minecraft.server.v1_7_R4.PacketPlayInBlockPlace) packet.getRawNMSPacket();
     }
 
     public Vector3i getBlockPosition() {
-        return new Vector3i(blockPlace.c(), blockPlace.d(), blockPlace.e());
+        return new Vector3i(readInt(0), readInt(1), readInt(2));
     }
 
     public void setBlockPosition(Vector3i blockPos) {
         Vector3i currentBlockPos = getBlockPosition();
-        if (blockPos.x != currentBlockPos.x) {
-            writeInt(0, blockPos.x);
-        }
-        if (blockPos.y != currentBlockPos.y) {
-            writeInt(1, blockPos.y);
-        }
-        if (blockPos.z != currentBlockPos.z) {
-            writeInt(2, blockPos.z);
-        }
+        writeInt(0, blockPos.x);
+        writeInt(1, blockPos.y);
+        writeInt(2, blockPos.z);
     }
 
     public int getFace() {
-        return blockPlace.getFace();
+        return readInt(3);
     }
 
     public void setFace(int face) {
@@ -65,28 +55,20 @@ final class WrappedPacketInBlockPlace_1_7_10 extends WrappedPacket {
     }
 
     public ItemStack getItemStack() {
-        return org.bukkit.craftbukkit.v1_7_R4.inventory.CraftItemStack.asBukkitCopy(blockPlace.getItemStack());
+        return readItemStack(0);
     }
 
     public void setItemStack(ItemStack stack) {
-        Object nmsItemStack = org.bukkit.craftbukkit.v1_7_R4.inventory.CraftItemStack.asNMSCopy(stack);
-        writeObject(0, nmsItemStack);
+        writeItemStack(0, stack);
     }
 
     public Vector3f getCursorPosition() {
-        return new Vector3f(blockPlace.h(), blockPlace.i(), blockPlace.j());
+        return new Vector3f(readFloat(0), readFloat(1), readFloat(2));
     }
 
     public void setCursorPosition(Vector3f cursorPos) {
-        Vector3f currentCursorPos = getCursorPosition();
-        if (cursorPos.x != currentCursorPos.x) {
-            writeFloat(0, cursorPos.x);
-        }
-        if (cursorPos.y != currentCursorPos.y) {
-            writeFloat(1, cursorPos.y);
-        }
-        if (cursorPos.z != currentCursorPos.z) {
-            writeFloat(2, cursorPos.z);
-        }
+        writeFloat(0, cursorPos.x);
+        writeFloat(1, cursorPos.y);
+        writeFloat(2, cursorPos.z);
     }
 }

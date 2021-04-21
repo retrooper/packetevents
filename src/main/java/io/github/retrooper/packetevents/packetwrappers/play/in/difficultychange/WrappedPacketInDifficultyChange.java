@@ -26,8 +26,6 @@ package io.github.retrooper.packetevents.packetwrappers.play.in.difficultychange
 
 import io.github.retrooper.packetevents.packetwrappers.NMSPacket;
 import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
-import io.github.retrooper.packetevents.utils.enums.EnumUtil;
-import io.github.retrooper.packetevents.utils.nms.NMSUtils;
 import io.github.retrooper.packetevents.utils.world.Difficulty;
 
 /**
@@ -37,29 +35,16 @@ import io.github.retrooper.packetevents.utils.world.Difficulty;
  * @since 1.8
  */
 public final class WrappedPacketInDifficultyChange extends WrappedPacket {
-
-    private static Class<? extends Enum<?>> enumDifficultyClass;
-
     public WrappedPacketInDifficultyChange(NMSPacket packet) {
         super(packet);
     }
 
-    @Override
-    protected void load() {
-        try {
-            enumDifficultyClass = NMSUtils.getNMSEnumClass("EnumDifficulty");
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
-        }
-    }
 
     public Difficulty getDifficulty() {
-        Enum<?> enumConstant = readEnumConstant(0, enumDifficultyClass);
-        return Difficulty.values()[enumConstant.ordinal()];
+        return readDifficulty(0);
     }
 
     public void setDifficulty(Difficulty difficulty) {
-        Enum<?> enumConstant = EnumUtil.valueByIndex(enumDifficultyClass, difficulty.ordinal());
-        writeEnumConstant(0, enumConstant);
+        writeDifficulty(0, difficulty);
     }
 }

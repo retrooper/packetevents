@@ -10,7 +10,6 @@ class WrappedPacketOutMapChunk extends WrappedPacket {
 
     @Override
     protected void load() {
-        Object block = new net.minecraft.server.v1_8_R3.Block(null, null);
         net.minecraft.server.v1_7_R4.PacketPlayOutMapChunk a0;
         net.minecraft.server.v1_8_R3.PacketPlayOutMapChunk a1;
         net.minecraft.server.v1_9_R1.PacketPlayOutMapChunk a2;
