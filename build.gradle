@@ -14,7 +14,7 @@ repositories {
     }
 
     maven {
-        url = uri('https://jitpack.io')
+        url = uri('https://jitpack.io/')
     }
 
     maven {
@@ -22,7 +22,7 @@ repositories {
     }
 
     maven {
-        url = uri('https://repo.viaversion.com')
+        url = uri('https://repo.viaversion.com/')
     }
 
     maven {
