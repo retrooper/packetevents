@@ -1015,10 +1015,16 @@ public final class NMSUtils {
         try {
             return wrapper.readObject(0, networkManagerClass);
         } catch (Exception ex) {
-            //Support for some custom plugins.
-            playerConnection = wrapper.read(0, playerConnectionClass);
-            wrapper = new WrappedPacket(new NMSPacket(playerConnection), playerConnectionClass);
-            return wrapper.readObject(0, networkManagerClass);
+            wrapper = new WrappedPacket(new NMSPacket(playerConnection));
+            try {
+                return wrapper.readObject(0, networkManagerClass);
+            }
+            catch (Exception ex2) {
+                //Support for some custom plugins.
+                playerConnection = wrapper.read(0, playerConnectionClass);
+                wrapper = new WrappedPacket(new NMSPacket(playerConnection), playerConnectionClass);
+                return wrapper.readObject(0, networkManagerClass);
+            }
         }
     }
 
