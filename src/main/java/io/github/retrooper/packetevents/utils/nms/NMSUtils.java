@@ -832,6 +832,9 @@ public final class NMSUtils {
             getMessageMethod = Reflection.getMethodCheckContainsString(iChatBaseComponentClass, "c", String.class);
             if (getMessageMethod == null) {
                 getMessageMethod = Reflection.getMethodCheckContainsString(iChatBaseComponentClass, "Plain", String.class);
+                if (getMessageMethod == null) {
+                    getMessageMethod = Reflection.getMethodCheckContainsString(iChatBaseComponentClass, "String", String.class);
+                }
             }
 
             //In 1.8.3+ the ChatSerializer class is declared in the IChatBaseComponent class, so we have to handle that
