@@ -684,6 +684,8 @@ import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
 import io.github.retrooper.packetevents.utils.nms.NMSUtils;
 import io.github.retrooper.packetevents.utils.reflection.Reflection;
 import io.github.retrooper.packetevents.utils.reflection.SubclassUtil;
+import net.minecraft.server.v1_16_R2.AttributeBase;
+import net.minecraft.server.v1_16_R2.AttributeRanged;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
@@ -716,6 +718,13 @@ public class AttributeSnapshotWrapper extends WrappedPacket {
         if (attributeBaseClass == null) {
             attributeBaseClass = NMSUtils.getNMSClassWithoutException("AttributeBase");
         }
+        if (attributeSnapshotClass == null) {
+            attributeSnapshotClass = NMSUtils.getNMSClassWithoutException("AttributeSnapshot");
+            if (attributeSnapshotClass == null) {
+                attributeSnapshotClass = SubclassUtil.getSubClass(PacketTypeClasses.Play.Server.UPDATE_ATTRIBUTES, "AttributeSnapshot");
+            }
+        }
+
         if (attributeSnapshotConstructor == null) {
             try {
                 attributeSnapshotConstructor = attributeSnapshotClass.getConstructor(attributeBaseClass, double.class, Collection.class);
@@ -740,7 +749,7 @@ public class AttributeSnapshotWrapper extends WrappedPacket {
         }
         else {
             Object attributeBase = readObject(0, attributeBaseClass);
-            WrappedPacket attributeBaseWrapper = new WrappedPacket(new NMSPacket(attributeBase));
+            WrappedPacket attributeBaseWrapper = new WrappedPacket(new NMSPacket(attributeBase), attributeBaseClass);
             return attributeBaseWrapper.readString(0);
         }
     }
@@ -799,7 +808,10 @@ public class AttributeSnapshotWrapper extends WrappedPacket {
     public static AttributeSnapshotWrapper create(String key, double value, Collection<AttributeModifierWrapper> modifiers) {
         Object nmsAttributeSnapshot = null;
         if (attributeSnapshotClass == null) {
-            attributeSnapshotClass = SubclassUtil.getSubClass(PacketTypeClasses.Play.Server.UPDATE_ATTRIBUTES, "AttributeSnapshot");
+            attributeSnapshotClass = NMSUtils.getNMSClassWithoutException("AttributeSnapshot");
+            if (attributeSnapshotClass == null) {
+                attributeSnapshotClass = SubclassUtil.getSubClass(PacketTypeClasses.Play.Server.UPDATE_ATTRIBUTES, "AttributeSnapshot");
+            }
         }
         if (attributeSnapshotConstructor == null) {
             try {
