@@ -943,8 +943,8 @@ public class WrappedPacket implements WrapperPacketReader, WrapperPacketWriter {
 
     @SuppressWarnings("unchecked")
     public <T> T read(int index, Class<? extends T> type) {
-        Field field = getField(type, index);
         try {
+            Field field = getField(type, index);
             return (T) field.get(packet.getRawNMSPacket());
         } catch (IllegalAccessException | NullPointerException | ArrayIndexOutOfBoundsException e) {
             throw new WrapperFieldNotFoundException(packetClass, type, index);
