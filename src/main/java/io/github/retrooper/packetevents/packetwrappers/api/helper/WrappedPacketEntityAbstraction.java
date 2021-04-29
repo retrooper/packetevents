@@ -685,7 +685,6 @@ import org.bukkit.World;
 import org.bukkit.entity.Entity;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-
 public abstract class WrappedPacketEntityAbstraction extends WrappedPacket {
     private final int entityIDFieldIndex;
     protected Entity entity;

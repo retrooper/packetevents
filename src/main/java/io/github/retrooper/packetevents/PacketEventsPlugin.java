@@ -683,6 +683,10 @@ import io.github.retrooper.packetevents.utils.server.ServerVersion;
 import org.bukkit.plugin.java.JavaPlugin;
 
 public class PacketEventsPlugin extends JavaPlugin {
+    //TODO Make a new pre-release (pre-14), push to master,
+    //TODO try get javadocs to update (with gradle ;c check old maven code on master),
+    //TODO See if github license file name updates on the REPO
+    //TODO successfully shade jetbrains into your own package :D with gradle with shadowJar plugin
     @Override
     public void onLoad() {
         //Return value of create is your PacketEvents instance.
