@@ -686,8 +686,7 @@ import java.net.InetSocketAddress;
 
 /**
  * The {@code PacketLoginReceiveEvent} event is fired whenever the a LOGIN packet is received from a client.
- * The {@code PacketLoginReceiveEvent} does not have to do with a bukkit player object due to
- * the player object being null in this state.
+ * The {@code PacketLoginReceiveEvent} has no Bukkit player, the player object is null in this state.
  * Use the {@link #getSocketAddress()} to identify who sends the packet.
  *
  * @author retrooper

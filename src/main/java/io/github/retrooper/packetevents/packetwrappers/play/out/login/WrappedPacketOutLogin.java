@@ -681,6 +681,7 @@ package io.github.retrooper.packetevents.packetwrappers.play.out.login;
 import io.github.retrooper.packetevents.packetwrappers.NMSPacket;
 import io.github.retrooper.packetevents.packetwrappers.api.helper.WrappedPacketEntityAbstraction;
 import io.github.retrooper.packetevents.utils.player.GameMode;
+import io.github.retrooper.packetevents.utils.server.ServerVersion;
 
 /**
  * Make sendable and finish!
@@ -739,8 +740,12 @@ public class WrappedPacketOutLogin extends WrappedPacketEntityAbstraction {
     public int getMaxPlayers() {
         if (packet != null) {
             //TODO index 2 on legacy, index 1 on modern
-            int index = 2;
-            return readInt(index);
+            if (version.isNewerThan(ServerVersion.v_1_13_1)) {
+                return readInt(1);
+            }
+            else {
+                return readInt(2);
+            }
         } else {
             return -1;
         }

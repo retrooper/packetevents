@@ -708,7 +708,7 @@ public class PEChannelInitializerLegacy extends ChannelInitializer<SocketChannel
         initChannelMethod.invoke(oldChannelInitializer, socketChannel);
         PlayerChannelHandlerLegacy channelHandler = new PlayerChannelHandlerLegacy();
         if (socketChannel.pipeline().get("packet_handler") != null) {
-            socketChannel.pipeline().addBefore("packet_handler", PacketEvents.handlerName, channelHandler);
+            socketChannel.pipeline().addBefore("packet_handler", PacketEvents.get().getHandlerName(), channelHandler);
         }
     }
 }

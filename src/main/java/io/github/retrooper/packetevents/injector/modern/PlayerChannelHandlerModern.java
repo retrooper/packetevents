@@ -696,10 +696,10 @@ public class PlayerChannelHandlerModern extends ChannelDuplexHandler {
     @Override
     public void channelRead(final ChannelHandlerContext ctx, Object packet) throws Exception {
         try {
-            packet = PacketEvents.get().packetProcessorInternal.read(player, ctx.channel(), packet);
+            packet = PacketEvents.get().getInternalPacketProcessor().read(player, ctx.channel(), packet);
             if (packet != null) {
                 super.channelRead(ctx, packet);
-                PacketEvents.get().packetProcessorInternal.postRead(player, ctx.channel(), packet);
+                PacketEvents.get().getInternalPacketProcessor().postRead(player, ctx.channel(), packet);
             }
         }
         catch (Throwable t) {
@@ -710,10 +710,10 @@ public class PlayerChannelHandlerModern extends ChannelDuplexHandler {
     @Override
     public void write(final ChannelHandlerContext ctx, Object packet, final ChannelPromise promise) throws Exception {
         try {
-            packet = PacketEvents.get().packetProcessorInternal.write(player, ctx.channel(), packet);
+            packet = PacketEvents.get().getInternalPacketProcessor().write(player, ctx.channel(), packet);
             if (packet != null) {
                 super.write(ctx, packet, promise);
-                PacketEvents.get().packetProcessorInternal.postWrite(player, ctx.channel(), packet);
+                PacketEvents.get().getInternalPacketProcessor().postWrite(player, ctx.channel(), packet);
             }
         }
         catch (Throwable t) {

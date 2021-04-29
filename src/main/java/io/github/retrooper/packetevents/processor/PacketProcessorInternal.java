@@ -705,21 +705,6 @@ import java.util.concurrent.ConcurrentHashMap;
  * @since 1.7.9
  */
 public class PacketProcessorInternal {
-    public final Map<UUID, Long> keepAliveMap = new ConcurrentHashMap<>();
-    public final Map<String, Object> channels = new ConcurrentHashMap<>();
-
-    public Object getChannel(Player player) {
-        String name = player.getName();
-        Object channel = channels.get(name);
-        if (channel == null) {
-            channel = NMSUtils.getChannel(player);
-            if (channel != null) {
-                channels.put(name, channel);
-            }
-        }
-        return channel;
-    }
-
     /**
      * Force PacketEvents to process an incoming packet.
      * This method could be used to spoof an incoming packet to the PacketEvents API.
@@ -764,7 +749,7 @@ public class PacketProcessorInternal {
                 if (loginEvent.getPacketId() == PacketType.Login.Client.START) {
                     WrappedPacketLoginInStart startWrapper = new WrappedPacketLoginInStart(loginEvent.getNMSPacket());
                     WrappedGameProfile gameProfile = startWrapper.getGameProfile();
-                    channels.put(gameProfile.getName(), channel);
+                    PacketEvents.get().getPlayerUtils().channels.put(gameProfile.getName(), channel);
                 }
                 PacketEvents.get().getEventManager().callEvent(loginEvent);
                 packet = loginEvent.getNMSPacket().getRawNMSPacket();
@@ -874,7 +859,7 @@ public class PacketProcessorInternal {
     private void interceptPlayReceive(PacketPlayReceiveEvent event) {
         if (event.getPacketId() == PacketType.Play.Client.KEEP_ALIVE) {
             UUID uuid = event.getPlayer().getUniqueId();
-            long timestamp = keepAliveMap.getOrDefault(uuid, event.getTimestamp());
+            long timestamp = PacketEvents.get().getPlayerUtils().keepAliveMap.getOrDefault(uuid, event.getTimestamp());
             long currentTime = event.getTimestamp();
             long ping = currentTime - timestamp;
             long smoothedPing = (PacketEvents.get().getPlayerUtils().getSmoothedPing(event.getPlayer().getUniqueId()) * 3L + ping) / 4;
@@ -961,7 +946,7 @@ public class PacketProcessorInternal {
     private void interceptPostPlaySend(PostPacketPlaySendEvent event) {
         if (event.getPacketId() == PacketType.Play.Server.KEEP_ALIVE) {
             if (event.getPlayer() != null) {
-                keepAliveMap.put(event.getPlayer().getUniqueId(), event.getTimestamp());
+                PacketEvents.get().getPlayerUtils().keepAliveMap.put(event.getPlayer().getUniqueId(), event.getTimestamp());
             }
         }
     }

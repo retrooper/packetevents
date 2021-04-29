@@ -705,7 +705,7 @@ public final class PlayerInjectEvent extends PacketEvent implements CancellableE
 
     public PlayerInjectEvent(final Player player) {
         this.player = player;
-        this.address = ChannelUtils.getSocketAddress(PacketEvents.get().packetProcessorInternal.getChannel(player));
+        this.address = ChannelUtils.getSocketAddress(PacketEvents.get().getPlayerUtils().getChannel(player));
     }
 
     @Override

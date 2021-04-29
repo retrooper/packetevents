@@ -678,15 +678,18 @@
 
 package io.github.retrooper.packetevents;
 
+import io.github.retrooper.packetevents.event.PacketListenerAbstract;
+import io.github.retrooper.packetevents.event.impl.PacketPlayReceiveEvent;
+import io.github.retrooper.packetevents.packettype.PacketType;
+import io.github.retrooper.packetevents.packetwrappers.play.in.useentity.WrappedPacketInUseEntity;
 import io.github.retrooper.packetevents.settings.PacketEventsSettings;
 import io.github.retrooper.packetevents.utils.server.ServerVersion;
 import org.bukkit.plugin.java.JavaPlugin;
 
 public class PacketEventsPlugin extends JavaPlugin {
     //TODO Make a new pre-release (pre-14), push to master,
-    //TODO try get javadocs to update (with gradle ;c check old maven code on master),
-    //TODO See if github license file name updates on the REPO
     //TODO successfully shade jetbrains into your own package :D with gradle with shadowJar plugin
+    //TODO Remove all deprecations including the legacy event system in 1.8.1 release
     @Override
     public void onLoad() {
         //Return value of create is your PacketEvents instance.
@@ -702,6 +705,15 @@ public class PacketEventsPlugin extends JavaPlugin {
     @Override
     public void onEnable() {
         //Other way to access your instance...
+        PacketEvents.get().registerListener(new PacketListenerAbstract() {
+            @Override
+            public void onPacketPlayReceive(PacketPlayReceiveEvent event) {
+                if (event.getPacketId() == PacketType.Play.Client.USE_ENTITY) {
+                    WrappedPacketInUseEntity wrappedPacketInUseEntity = new WrappedPacketInUseEntity(event.getNMSPacket());
+                    event.getPlayer().sendMessage("nice name: " + wrappedPacketInUseEntity.getEntity(event.getPlayer().getWorld()));
+                }
+            }
+        });
         PacketEvents.get().init();
     }
 

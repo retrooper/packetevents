@@ -699,7 +699,7 @@ public class BukkitEventProcessorInternal implements Listener {
     public void onLogin(PlayerLoginEvent e) {
         final Player player = e.getPlayer();
         if (!PacketEvents.get().getSettings().shouldUseCompatibilityInjector()) {
-            PacketEvents.get().injector.injectPlayer(player);
+            PacketEvents.get().getInjector().injectPlayer(player);
         }
     }
 
@@ -708,10 +708,10 @@ public class BukkitEventProcessorInternal implements Listener {
         Player player = e.getPlayer();
         InetSocketAddress address = player.getAddress();
 
-        boolean shouldInject = PacketEvents.get().getSettings().shouldUseCompatibilityInjector() || !(PacketEvents.get().injector.hasInjected(e.getPlayer()));
+        boolean shouldInject = PacketEvents.get().getSettings().shouldUseCompatibilityInjector() || !(PacketEvents.get().getInjector().hasInjected(e.getPlayer()));
         //Inject now if we are using the compatibility-injector or inject if the early injector failed to inject them.
         if (shouldInject) {
-            PacketEvents.get().injector.injectPlayer(player);
+            PacketEvents.get().getInjector().injectPlayer(player);
         }
 
         boolean dependencyAvailable = VersionLookupUtils.isDependencyAvailable();
@@ -746,9 +746,8 @@ public class BukkitEventProcessorInternal implements Listener {
         PacketEvents.get().getPlayerUtils().playerSmoothedPingMap.remove(uuid);
         PacketEvents.get().getPlayerUtils().clientVersionsMap.remove(address);
         PacketEvents.get().getPlayerUtils().tempClientVersionMap.remove(address);
-
-        PacketEvents.get().packetProcessorInternal.keepAliveMap.remove(uuid);
-        PacketEvents.get().packetProcessorInternal.channels.remove(player.getName());
+        PacketEvents.get().getPlayerUtils().keepAliveMap.remove(uuid);
+        PacketEvents.get().getPlayerUtils().channels.remove(player.getName());
 
     }
 }

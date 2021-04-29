@@ -686,8 +686,7 @@ import java.net.InetSocketAddress;
 
 /**
  * The {@code PacketStatusReceiveEvent} event is fired whenever the server receives a STATUS packet from a client.
- * The {@code PacketStatusSendEvent} does not have to do with a bukkit player object due to
- * the player object being null in this state.
+ * The {@code PacketStatusSendEvent} has no Bukkit player, the player object is null in this state.
  * Use the {@link #getSocketAddress()} to identify who sends the packet.
  *
  * @author retrooper

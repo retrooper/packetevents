@@ -709,23 +709,28 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 public final class PacketEvents implements Listener, EventManager {
-    public static String handlerName;
-    //TODO finish unfinished wrappers
     private static PacketEvents instance;
     private static Plugin plugin;
+
+    private String handlerName;
     private final PEVersion version = new PEVersion(1, 7, 9, 13);
+    private PacketEventsSettings settings = new PacketEventsSettings();
+
     private final EventManager eventManager = new PEEventManager();
+
     private final PlayerUtils playerUtils = new PlayerUtils();
     private final ServerUtils serverUtils = new ServerUtils();
-    private final UpdateChecker updateChecker = new UpdateChecker();
-    public final PacketProcessorInternal packetProcessorInternal = new PacketProcessorInternal();
-    public final BukkitEventProcessorInternal bukkitEventProcessorInternal = new BukkitEventProcessorInternal();
-    public final GlobalChannelInjector injector = new GlobalChannelInjector();
-    private volatile boolean loading, loaded;
-    private final AtomicBoolean injectorReady = new AtomicBoolean(false);
-    private boolean initialized, initializing, terminating;
-    private PacketEventsSettings settings = new PacketEventsSettings();
     private ByteBufUtil byteBufUtil;
+    private final UpdateChecker updateChecker = new UpdateChecker();
+
+    private final PacketProcessorInternal packetProcessorInternal = new PacketProcessorInternal();
+    private final BukkitEventProcessorInternal bukkitEventProcessorInternal = new BukkitEventProcessorInternal();
+
+    private final GlobalChannelInjector injector = new GlobalChannelInjector();
+
+    private volatile boolean loading, loaded;
+    private final AtomicBoolean injectorReady = new AtomicBoolean();
+    private boolean initialized, initializing, terminating;
 
     public static PacketEvents create(final Plugin plugin) {
         if (Bukkit.isPrimaryThread()) {
@@ -827,7 +832,7 @@ public final class PacketEvents implements Listener, EventManager {
                 handleUpdateCheck();
             }
 
-            //We may not continue until the injector has been initialized!
+            //We must wait for the injector to initialize.
             while (!injectorReady.get()) {
                 ;
             }
@@ -909,11 +914,18 @@ public final class PacketEvents implements Listener, EventManager {
         return plugin;
     }
 
-    /**
-     * Get the PacketEvents settings.
-     *
-     * @return Configure some settings for the API
-     */
+    public GlobalChannelInjector getInjector() {
+        return injector;
+    }
+
+    public PacketProcessorInternal getInternalPacketProcessor() {
+        return packetProcessorInternal;
+    }
+
+    public String getHandlerName() {
+        return handlerName;
+    }
+
     public PacketEventsSettings getSettings() {
         return settings;
     }

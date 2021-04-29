@@ -691,12 +691,8 @@ import java.net.InetSocketAddress;
 
 /**
  * The {@code PostPlayerInjectEvent} event is fired after a successful injection.
- * If you are on an older version of PacketEvents DON'T use this to register player data.
- * This event might be called asynchronously and sometimes synchronously.
  * Use the {@link #isAsync()} method to figure out if is being called sync or async.
- * Make sure you do null checks in your packet listeners as this might be called a bit later.
- * A player is injected by PacketEvents whenever they join the server.
- *
+ * A player is injected by PacketEvents each time they join the server.
  * @author retrooper
  * @see <a href="https://github.com/retrooper/packetevents/blob/dev/src/main/java/io/github/retrooper/packetevents/handler/PacketHandlerInternal.java">https://github.com/retrooper/packetevents/blob/dev/src/main/java/io/github/retrooper/packetevents/handler/PacketHandlerInternal.java</a>
  * @since 1.3
@@ -729,7 +725,7 @@ public class PostPlayerInjectEvent extends PacketEvent implements PlayerEvent {
      */
     @NotNull
     public Object getChannel() {
-        return PacketEvents.get().packetProcessorInternal.getChannel(player);
+        return PacketEvents.get().getPlayerUtils().getChannel(player);
     }
 
     @NotNull

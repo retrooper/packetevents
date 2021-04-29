@@ -8,9 +8,13 @@ plugins {
     id 'maven-publish'
 }
 
-
+//gradle myJavadocs
 task myJavadocs(type: Javadoc) {
     source = sourceSets.main.allJava
+    File projectDir = getProjectDir()
+    File javadocsDir = new File(projectDir.getParentFile().getAbsolutePath() + "/docs");
+    javadocsDir.mkdirs()
+    setDestinationDir(javadocsDir)
 }
 
 repositories {

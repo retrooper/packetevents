@@ -688,8 +688,7 @@ import java.net.InetSocketAddress;
 /**
  * The {@code PacketStatusSendEvent} event is fired whenever the server wants to send a STATUS packet to the client.
  * This class implements {@link CancellableEvent}.
- * The {@code PacketStatusSendEvent} does not have to do with a bukkit player object due to
- * the player object being null in this state.
+ * The {@code PacketStatusSendEvent} has no Bukkit player, the player object is null in this state.
  * Use the {@link #getSocketAddress()} to identify who sends the packet.
  *
  * @author retrooper

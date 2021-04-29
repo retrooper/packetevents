@@ -692,6 +692,7 @@ import io.github.retrooper.packetevents.utils.reflection.Reflection;
 import io.github.retrooper.packetevents.utils.server.ServerVersion;
 import io.github.retrooper.packetevents.utils.world.Difficulty;
 import io.github.retrooper.packetevents.utils.world.Dimension;
+import net.minecraft.server.v1_7_R4.EnumAnimation;
 import org.bukkit.inventory.ItemStack;
 
 import java.lang.annotation.ElementType;
@@ -1081,7 +1082,8 @@ public class WrappedPacket implements WrapperPacketReader, WrapperPacketWriter {
     }
 
     public void writeGameMode(int index, GameMode gameMode) {
-        //TODO finish
+        Enum<?> enumConst = EnumUtil.valueOf(NMSUtils.enumGameModeClass, gameMode.name());
+        writeEnumConstant(index, enumConst);
     }
 
     public Dimension readDimension(int index, int dimensionIDLegacyIndex) {

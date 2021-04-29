@@ -685,13 +685,9 @@ import io.github.retrooper.packetevents.packetwrappers.NMSPacket;
 import org.bukkit.entity.Player;
 
 /**
- * The {@code PostPacketPlayReceiveEvent} event is fired after minecraft processes
- * a PLAY server-bound packet.
- * You cannot cancel this event since minecraft already processed/is processing this packet.
- * If the incoming packet was cancelled, resulting in it not being processed by minecraft,
- * this event won't be called.
- * This event assures you that the {@link PacketPlayReceiveEvent} event wasn't cancelled.
- *
+ * The {@code PostPacketPlayReceiveEvent} event is fired after all PacketEvents listeners finished processing
+ * the {@code PacketPlayReceiveEvent}. This event won't be called if the PacketPlayReceiveEvent event was cancelled.
+ * You cannot cancel this event.
  * @author retrooper
  * @see <a href="https://wiki.vg/Protocol#Serverbound_4">https://wiki.vg/Protocol#Serverbound_4</a>
  * @since 1.7

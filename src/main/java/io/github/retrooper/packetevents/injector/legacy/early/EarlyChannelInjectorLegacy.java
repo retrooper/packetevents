@@ -773,7 +773,7 @@ public class EarlyChannelInjectorLegacy implements EarlyInjector {
                 }
 
                 if (channel.pipeline().get("packet_handler") != null) {
-                    channel.pipeline().addBefore("packet_handler", PacketEvents.handlerName, new PlayerChannelHandlerLegacy());
+                    channel.pipeline().addBefore("packet_handler", PacketEvents.get().getHandlerName(), new PlayerChannelHandlerLegacy());
                 }
             }
         }
@@ -888,7 +888,7 @@ public class EarlyChannelInjectorLegacy implements EarlyInjector {
 
     @Override
     public void injectPlayer(Player player) {
-        Object channel = PacketEvents.get().packetProcessorInternal.getChannel(player);
+        Object channel = PacketEvents.get().getPlayerUtils().getChannel(player);
         if (channel != null) {
             updatePlayerObject(player, channel);
         }
@@ -896,11 +896,11 @@ public class EarlyChannelInjectorLegacy implements EarlyInjector {
 
     @Override
     public void ejectPlayer(Player player) {
-        Object channel = PacketEvents.get().packetProcessorInternal.getChannel(player);
+        Object channel = PacketEvents.get().getPlayerUtils().getChannel(player);
         if (channel != null) {
             Channel chnl = (Channel) channel;
             try {
-                chnl.pipeline().remove(PacketEvents.handlerName);
+                chnl.pipeline().remove(PacketEvents.get().getHandlerName());
             } catch (Exception ex) {
 
             }
@@ -909,7 +909,7 @@ public class EarlyChannelInjectorLegacy implements EarlyInjector {
 
     @Override
     public boolean hasInjected(Player player) {
-        Object channel = PacketEvents.get().packetProcessorInternal.getChannel(player);
+        Object channel = PacketEvents.get().getPlayerUtils().getChannel(player);
         if (channel == null) {
             return false;
         }
@@ -925,7 +925,7 @@ public class EarlyChannelInjectorLegacy implements EarlyInjector {
 
     private PlayerChannelHandlerLegacy getHandler(Object rawChannel) {
         Channel channel = (Channel) rawChannel;
-        ChannelHandler handler = channel.pipeline().get(PacketEvents.handlerName);
+        ChannelHandler handler = channel.pipeline().get(PacketEvents.get().getHandlerName());
         if (handler instanceof PlayerChannelHandlerLegacy) {
             return (PlayerChannelHandlerLegacy) handler;
         } else {

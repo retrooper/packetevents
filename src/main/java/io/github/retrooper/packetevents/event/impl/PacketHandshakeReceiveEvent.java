@@ -686,7 +686,7 @@ import java.net.InetSocketAddress;
 
 /**
  * The {@code PacketHandshakeReceiveEvent} event is fired whenever the a HANDSHAKE packet is received from a client.
- * The {@code PacketHandshakeReceiveEvent} does not have to do with a bukkit player object due to the player object being null in this state.
+ * The {@code PacketHandshakeReceiveEvent} has no Bukkit player, the player object is null in this state.
  * Use the {@link #getSocketAddress()} to identify who sends the packet.
  *
  * @author retrooper

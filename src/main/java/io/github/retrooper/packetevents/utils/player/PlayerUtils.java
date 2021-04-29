@@ -702,36 +702,11 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public final class PlayerUtils {
     public final Map<UUID, Long> loginTime = new ConcurrentHashMap<>();
-
-    /**
-     * This is where the most recent non-smoothed player ping that PacketEvents calculates is stored.
-     */
     public final Map<UUID, Integer> playerPingMap = new ConcurrentHashMap<>();
-
-    /**
-     * This is where the most recent smoothed player ping that PacketEvents calculates is stored.
-     * When accessing minecraft for a player's ping, minecraft will return a smoothed value.
-     * Use this to receive a smoothed ping value.
-     * PacketEvents smooths in the same way minecraft does.
-     */
     public final Map<UUID, Integer> playerSmoothedPingMap = new ConcurrentHashMap<>();
-
-    /**
-     * This map stores the client version of a player only when it has been confirmed.
-     * Since some plugins like ViaBackwards take around one tick from the PlayerJoinEvent to resolve a player's
-     * client version, we need to compare the version we stored from the packet and the one ViaBackwards specifies.
-     * Why do we need to do this?
-     * Plugins like ViaVersion modify the Handshaking packet containing the protocol version
-     * to allow the client to join.
-     * Plugins that listen to the handshaking packet will receive the modified protocol version. (=server version)
-     * So we have to go out of our way and use the API of ViaVersion or such similar plugins
-     * to have support for client version resolving.
-     * I can't do this for every single plugin like ViaVersion, so for now ViaVersion, ViaBackwards and ViaRewind are
-     * guaranteed to work!
-     * ProtocolSupport MIGHT work.
-     */
     public final Map<InetSocketAddress, ClientVersion> clientVersionsMap = new ConcurrentHashMap<>();
-
+    public final Map<UUID, Long> keepAliveMap = new ConcurrentHashMap<>();
+    public final Map<String, Object> channels = new ConcurrentHashMap<>();
     /**
      * This is a temporary client version.
      * This is the client version we receive from the handshaking packet.
@@ -868,11 +843,11 @@ public final class PlayerUtils {
      * @param player Target player.
      */
     public void injectPlayer(Player player) {
-        PacketEvents.get().injector.injectPlayer(player);
+        PacketEvents.get().getInjector().injectPlayer(player);
     }
 
     public void ejectPlayer(Player player) {
-        PacketEvents.get().injector.ejectPlayer(player);
+        PacketEvents.get().getInjector().ejectPlayer(player);
     }
 
     /**
@@ -882,7 +857,7 @@ public final class PlayerUtils {
      * @param wrapper Client-bound wrapper supporting sending.
      */
     public void sendPacket(Player player, SendableWrapper wrapper) {
-        PacketEvents.get().injector.sendPacket(NMSUtils.getChannel(player), wrapper.asNMSPacket());
+        PacketEvents.get().getInjector().sendPacket(getChannel(player), wrapper.asNMSPacket());
     }
 
     /**
@@ -892,7 +867,7 @@ public final class PlayerUtils {
      * @param wrapper Client-bound raw NMS packet.
      */
     public void sendPacket(Object channel, SendableWrapper wrapper) {
-        PacketEvents.get().injector.sendPacket(channel, wrapper.asNMSPacket());
+        PacketEvents.get().getInjector().sendPacket(channel, wrapper.asNMSPacket());
     }
 
     /**
@@ -902,7 +877,7 @@ public final class PlayerUtils {
      * @param packet Client-bound raw NMS packet.
      */
     public void sendNMSPacket(Player player, Object packet) {
-        PacketEvents.get().injector.sendPacket(NMSUtils.getChannel(player), packet);
+        PacketEvents.get().getInjector().sendPacket(getChannel(player), packet);
     }
 
     /**
@@ -912,11 +887,23 @@ public final class PlayerUtils {
      * @param packet  Client-bound raw NMS packet.
      */
     public void sendNMSPacket(Object channel, Object packet) {
-        PacketEvents.get().injector.sendPacket(channel, packet);
+        PacketEvents.get().getInjector().sendPacket(channel, packet);
     }
 
     public WrappedGameProfile getGameProfile(Player player) {
         Object gameProfile = GameProfileUtil.getGameProfile(player.getUniqueId(), player.getName());
         return GameProfileUtil.getWrappedGameProfile(gameProfile);
+    }
+
+    public Object getChannel(Player player) {
+        String name = player.getName();
+        Object channel = channels.get(name);
+        if (channel == null) {
+            channel = NMSUtils.getChannel(player);
+            if (channel != null) {
+                channels.put(name, channel);
+            }
+        }
+        return channel;
     }
 }
