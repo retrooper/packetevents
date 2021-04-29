@@ -678,10 +678,6 @@
 
 package io.github.retrooper.packetevents;
 
-import io.github.retrooper.packetevents.event.PacketListenerAbstract;
-import io.github.retrooper.packetevents.event.impl.PacketPlayReceiveEvent;
-import io.github.retrooper.packetevents.packettype.PacketType;
-import io.github.retrooper.packetevents.packetwrappers.play.in.useentity.WrappedPacketInUseEntity;
 import io.github.retrooper.packetevents.settings.PacketEventsSettings;
 import io.github.retrooper.packetevents.utils.server.ServerVersion;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -689,8 +685,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 public class PacketEventsPlugin extends JavaPlugin {
     //TODO Make a new pre-release (pre-14), push to master,
     //TODO Remove all deprecations including the legacy event system in 1.8.1 release
-    //TODO move away from direct access(1.7.10 direct access as funkemunky might take down the repo anytime)
-    //TODO finish remaining wrappers and test entitymetadata wrapper
+    //TODO finish remaining wrappers and finish entitymetadata wrapper
     @Override
     public void onLoad() {
         //Return value of create is your PacketEvents instance.
@@ -706,15 +701,6 @@ public class PacketEventsPlugin extends JavaPlugin {
     @Override
     public void onEnable() {
         //Other way to access your instance...
-        PacketEvents.get().registerListener(new PacketListenerAbstract() {
-            @Override
-            public void onPacketPlayReceive(PacketPlayReceiveEvent event) {
-                if (event.getPacketId() == PacketType.Play.Client.USE_ENTITY) {
-                    WrappedPacketInUseEntity wrappedPacketInUseEntity = new WrappedPacketInUseEntity(event.getNMSPacket());
-                    event.getPlayer().sendMessage("nice name: " + wrappedPacketInUseEntity.getEntity(event.getPlayer().getWorld()));
-                }
-            }
-        });
         PacketEvents.get().init();
     }
 

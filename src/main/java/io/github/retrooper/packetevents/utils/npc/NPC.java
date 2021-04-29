@@ -715,7 +715,7 @@ public class NPC {
         this.name = name;
         this.entityID = NMSUtils.generateEntityId();
         this.uuid = NMSUtils.generateUUID();
-        this.gameProfile = new WrappedGameProfile(uuid, name, GameProfileUtil.getNewPropertyMap());
+        this.gameProfile = new WrappedGameProfile(uuid, name);
         this.position = new Vector3d(0, 0, 0);
         this.yaw = 0;
         this.pitch = 0;
@@ -725,7 +725,7 @@ public class NPC {
         this.name = name;
         this.entityID = NMSUtils.generateEntityId();
         this.uuid = NMSUtils.generateUUID();
-        this.gameProfile = new WrappedGameProfile(uuid, name, GameProfileUtil.getNewPropertyMap());
+        this.gameProfile = new WrappedGameProfile(uuid, name);
         this.position = position;
         this.yaw = yaw;
         this.pitch = pitch;

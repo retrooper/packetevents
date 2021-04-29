@@ -693,14 +693,7 @@ public class WrappedPacketOutLogin extends WrappedPacketEntityAbstraction {
 
     @Override
     protected void load() {
-        net.minecraft.server.v1_7_R4.PacketPlayOutLogin a0;
-        net.minecraft.server.v1_8_R3.PacketPlayOutLogin a1;
-        net.minecraft.server.v1_9_R1.PacketPlayOutLogin a2;
-        net.minecraft.server.v1_9_R2.PacketPlayOutLogin a3;
-        net.minecraft.server.v1_12_R1.PacketPlayOutLogin a4;
-        net.minecraft.server.v1_13_R1.PacketPlayOutLogin a5;
-        net.minecraft.server.v1_13_R2.PacketPlayOutLogin a6;
-        net.minecraft.server.v1_16_R2.PacketPlayOutLogin a7;
+
     }
 
     public boolean isHardcore() {

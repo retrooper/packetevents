@@ -691,11 +691,9 @@ import java.util.*;
 public class WrappedGameProfile {
     private final UUID id;
     private final String name;
-    private final WrappedPropertyMapAbstract<String, WrappedProperty> wrappedProperty;
-    public WrappedGameProfile(UUID id, String name, Object propertMap) {
+    public WrappedGameProfile(UUID id, String name) {
         this.id = id;
         this.name = name;
-        wrappedProperty= NMSUtils.legacyNettyImportMode ? new WrappedPropertyMap7(propertMap) : new WrappedPropertyMap8(propertMap);
     }
 
     public UUID getId() {
@@ -706,9 +704,6 @@ public class WrappedGameProfile {
         return name;
     }
 
-    public WrappedPropertyMapAbstract<String, WrappedProperty> getProperties() {
-        return wrappedProperty;
-    }
 
     public boolean isComplete() {
         return id != null && !isBlank(name);

@@ -695,6 +695,10 @@ public class WrappedPacketOutViewDistance extends WrappedPacket implements Senda
         super(packet);
     }
 
+    public WrappedPacketOutViewDistance(int viewDistance) {
+        this.viewDistance = viewDistance;
+    }
+
     @Override
     protected void load() {
         try {
@@ -732,6 +736,6 @@ public class WrappedPacketOutViewDistance extends WrappedPacket implements Senda
 
     @Override
     public boolean isSupported() {
-        return version.isNewerThan(ServerVersion.v_1_13_2); //TODO civ
+        return version.isNewerThan(ServerVersion.v_1_13_2);
     }
 }

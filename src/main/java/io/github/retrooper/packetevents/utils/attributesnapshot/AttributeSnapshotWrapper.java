@@ -684,8 +684,6 @@ import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
 import io.github.retrooper.packetevents.utils.nms.NMSUtils;
 import io.github.retrooper.packetevents.utils.reflection.Reflection;
 import io.github.retrooper.packetevents.utils.reflection.SubclassUtil;
-import net.minecraft.server.v1_16_R2.AttributeBase;
-import net.minecraft.server.v1_16_R2.AttributeRanged;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;

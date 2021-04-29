@@ -696,7 +696,7 @@ class WrappedPacketOutWorldParticles extends WrappedPacket implements SendableWr
     private static Class<?> particleEnumClass;
     private static Method particleEnumGetNameMethod;
 
-    private Particle particle;
+    private String particleName;
     private boolean longDistance;
     private float x, y, z;
     private float offsetX, offsetY, offsetZ;
@@ -708,10 +708,9 @@ class WrappedPacketOutWorldParticles extends WrappedPacket implements SendableWr
         super(packet);
     }
 
-    @SupportedVersions(ranges = {ServerVersion.v_1_7_10, ServerVersion.v_1_7_10})
     @Deprecated
-    public WrappedPacketOutWorldParticles(Particle particle, float x, float y, float z, float offsetX, float offsetY, float offsetZ, float particleData, int particleCount) {
-        this.particle = particle;
+    public WrappedPacketOutWorldParticles(String particleName, float x, float y, float z, float offsetX, float offsetY, float offsetZ, float particleData, int particleCount) {
+        this.particleName = particleName;
         this.longDistance = false;//REDUNDANT, NOT USED ON 1.7.10
         this.x = x;
         this.y = y;
@@ -724,8 +723,8 @@ class WrappedPacketOutWorldParticles extends WrappedPacket implements SendableWr
         this.data = new int[particleCount];//REDUNDANT, NOT USED ON 1.7.10
     }
 
-    public WrappedPacketOutWorldParticles(Particle particle, boolean longDistance, float x, float y, float z, float offsetX, float offsetY, float offsetZ, float particleData, int particleCount, int[] data) {
-        this.particle = particle;
+    public WrappedPacketOutWorldParticles(String particleName, boolean longDistance, float x, float y, float z, float offsetX, float offsetY, float offsetZ, float particleData, int particleCount, int[] data) {
+        this.particleName = particleName;
         this.longDistance = longDistance;
         this.x = x;
         this.y = y;
@@ -740,15 +739,6 @@ class WrappedPacketOutWorldParticles extends WrappedPacket implements SendableWr
 
     @Override
     protected void load() {
-        net.minecraft.server.v1_7_R4.PacketPlayOutWorldParticles a0;
-        net.minecraft.server.v1_8_R3.PacketPlayOutWorldParticles a1;
-        net.minecraft.server.v1_9_R1.PacketPlayOutWorldParticles a2;
-        net.minecraft.server.v1_9_R2.PacketPlayOutWorldParticles a3;
-        net.minecraft.server.v1_12_R1.PacketPlayOutWorldParticles a4;
-        net.minecraft.server.v1_13_R1.PacketPlayOutWorldParticles a5;
-        net.minecraft.server.v1_13_R2.PacketPlayOutWorldParticles a6;
-        net.minecraft.server.v1_16_R2.PacketPlayOutWorldParticles a7;
-
         try {
             particleEnumClass = NMSUtils.getNMSClass("EnumParticle");
         } catch (ClassNotFoundException e) {
@@ -761,9 +751,9 @@ class WrappedPacketOutWorldParticles extends WrappedPacket implements SendableWr
         }
     }
 
-    public Particle getParticle() {
+    public String getParticleName() {
         if (packet != null) {
-            if (version.isNewerThan(ServerVersion.v_1_13)) { //TODO civ
+            if (version.isNewerThan(ServerVersion.v_1_12_1)) {
                 Object particleParamObj = readObject(0, particleEnumClass);
                 String particleName = null;
                 try {
@@ -771,27 +761,28 @@ class WrappedPacketOutWorldParticles extends WrappedPacket implements SendableWr
                 } catch (IllegalAccessException | InvocationTargetException e) {
                     e.printStackTrace();
                 }
-                return Particle.getParticleByName(particleName);
+                return particleName;
             } else {
+                //TODO Its in enum name on older versions, but minecraft:name on newer versions. so please find a good solution?
                 Enum<?> enumConst = readEnumConstant(0, (Class<? extends Enum<?>>) particleEnumClass);
-                return Particle.getParticleById(enumConst.ordinal());
+                return enumConst.name();
             }
         } else {
-            return particle;
+            return particleName;
         }
     }
 
     //TODO finish setter add 1.13+ support
-    void setParticle(Particle particle) {
+    void setParticle(String particleName) {
         if (packet != null) {
-            if (version.isNewerThan(ServerVersion.v_1_13)) { //TODO civ
+            if (version.isNewerThan(ServerVersion.v_1_12_1)) {
 
             } else {
-                Enum<?> enumConst = EnumUtil.valueByIndex((Class<? extends Enum<?>>) particleEnumClass, particle.ordinal());
+                Enum<?> enumConst = EnumUtil.valueOf((Class<? extends Enum<?>>) particleEnumClass, particleName);
                 writeEnumConstant(0, enumConst);
             }
         } else {
-            this.particle = particle;
+            this.particleName = particleName;
         }
     }
 
@@ -908,77 +899,6 @@ class WrappedPacketOutWorldParticles extends WrappedPacket implements SendableWr
             writeBoolean(0, longDistance);
         } else {
             this.longDistance = longDistance;
-        }
-    }
-
-    public enum Particle {
-        EXPLOSION_NORMAL("explode"),
-        EXPLOSION_LARGE("largeexplode"),
-        EXPLOSION_HUGE("hugeexplosion"),
-        FIREWORKS_SPARK("fireworksSpark"),
-        WATER_BUBBLE("bubble"),
-        WATER_SPLASH("splash"),
-        WATER_WAKE("wake"),
-        SUSPENDED("suspended"),
-        SUSPENDED_DEPTH("depthsuspend"),
-        CRIT("crit"),
-        CRIT_MAGIC("magicCrit"),
-        SMOKE_NORMAL("smoke"),
-        SMOKE_LARGE("largesmoke"),
-        SPELL("spell"),
-        SPELL_INSTANT("instantSpell"),
-        SPELL_MOB("mobSpell"),
-        SPELL_MOB_AMBIENT("mobSpellAmbient"),
-        SPELL_WITCH("witchMagic"),
-        DRIP_WATER("dripWater"),
-        DRIP_LAVA("dripLava"),
-        VILLAGER_ANGRY("angryVillager"),
-        VILLAGER_HAPPY("happyVillager"),
-        TOWN_AURA("townaura"),
-        NOTE("note"),
-        PORTAL("portal"),
-        ENCHANTMENT_TABLE("enchantmenttable"),
-        FLAME("flame"),
-        LAVA("lava"),
-        FOOTSTEP("footstep"),
-        CLOUD("cloud"),
-        REDSTONE("reddust"),
-        SNOWBALL("snowballpoof"),
-        SNOW_SHOVEL("snowshovel"),
-        SLIME("slime"),
-        HEART("heart"),
-        BARRIER("barrier"),
-        ITEM_CRACK("iconcrack"),
-        BLOCK_CRACK("blockcrack"),
-        BLOCK_DUST("blockdust"),
-        WATER_DROP("droplet"),
-        ITEM_TAKE("take"),
-        MOB_APPEARANCE("mobappearance"),
-        DRAGON_BREATH("dragonbreath"),
-        END_ROD("endRod"),
-        DAMAGE_INDICATOR("damageIndicator"),
-        SWEEP_ATTACK("sweepAttack");
-        private final String name;
-
-        Particle(String name) {
-            this.name = name;
-        }
-
-        public static Particle getParticleById(int id) {
-            return values()[id];
-        }
-
-        @Nullable
-        public static Particle getParticleByName(String name) {
-            if (name == null) {
-                return null;
-            }
-            for (Particle particle : values()) {
-                if (particle.name.equals(name) || particle.name().equals(name)) {
-                    return particle;
-                }
-            }
-            return null;
         }
     }
 

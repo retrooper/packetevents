@@ -710,14 +710,7 @@ class WrappedPacketOutTabComplete extends WrappedPacket {
         } catch (ClassNotFoundException e) {
             suggestionsClass = null;
         }
-       /* net.minecraft.server.v1_7_R4.PacketPlayOutTabComplete a0;
-        net.minecraft.server.v1_8_R3.PacketPlayOutTabComplete a1;
-        net.minecraft.server.v1_9_R1.PacketPlayOutTabComplete a2;
-        net.minecraft.server.v1_9_R2.PacketPlayOutTabComplete a3;
-        net.minecraft.server.v1_12_R1.PacketPlayOutTabComplete a4;
-        net.minecraft.server.v1_13_R1.PacketPlayOutTabComplete a5; //TODO, its cancer on 1.13
-        net.minecraft.server.v1_13_R2.PacketPlayOutTabComplete a6;
-        net.minecraft.server.v1_16_R2.PacketPlayOutTabComplete a7;*/
+      //TODO, its bad on 1.13
     }
 
     public int getTransactionId() {

@@ -750,8 +750,6 @@ public class WrappedWatchableObject extends WrappedPacket {
 
     @Override
     protected void load() {
-        // WHY ARE THERE NO REFLECTION HELPERS REEEEEEEEEEEEEEEEEEEEEEE
-
         // Data watcher item
         Class<?> clazz = null;
         for (String s : NMS_ALIASES) {

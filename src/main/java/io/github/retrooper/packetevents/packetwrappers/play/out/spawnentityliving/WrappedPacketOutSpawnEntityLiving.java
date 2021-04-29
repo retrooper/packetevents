@@ -676,12 +676,36 @@
  *
  */
 
-package io.github.retrooper.packetevents.utils.gameprofile;
+package io.github.retrooper.packetevents.packetwrappers.play.out.spawnentityliving;
 
-import java.util.Collection;
+import io.github.retrooper.packetevents.packetwrappers.NMSPacket;
+import io.github.retrooper.packetevents.packetwrappers.api.SendableWrapper;
+import io.github.retrooper.packetevents.packetwrappers.api.helper.WrappedPacketEntityAbstraction;
+//TODO finish
+class WrappedPacketOutSpawnEntityLiving extends WrappedPacketEntityAbstraction implements SendableWrapper {
+    public WrappedPacketOutSpawnEntityLiving(NMSPacket packet) {
+        super(packet);
+    }
 
-public interface WrappedPropertyMapAbstract<T, K> {
-    Collection<K> get(T key);
+    @Override
+    protected void load() {
+    }
+    /*
+    public Vector3d getPosition() {
+        if (packet != null) {
+            //2,3,4
+            int x = readInt(2);
+            int y = readInt(3);
+            int z = readInt(4);
+            return new Vector3d(x, y, z);
+        }
+        else {
+            return null;
+        }
+    }*/
 
-    void put(T key, K value);
+    @Override
+    public Object asNMSPacket() {
+        return null;
+    }
 }

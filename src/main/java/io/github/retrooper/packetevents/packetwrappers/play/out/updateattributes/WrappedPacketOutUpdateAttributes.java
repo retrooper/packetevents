@@ -691,7 +691,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-//TODO test the wrapper ;-;
 public class WrappedPacketOutUpdateAttributes extends WrappedPacketEntityAbstraction implements SendableWrapper {
     private static Constructor<?> packetConstructor;
     private List<AttributeSnapshotWrapper> properties;

@@ -696,7 +696,6 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;
 
-//TODO test(especially sending)
 public class WrappedPacketOutPlayerInfo extends WrappedPacket implements SendableWrapper {
     private static Class<? extends Enum<?>> enumPlayerInfoActionClass;
     private static Class<?> playerInfoDataClass;

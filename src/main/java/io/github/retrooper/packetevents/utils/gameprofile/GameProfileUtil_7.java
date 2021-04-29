@@ -678,12 +678,10 @@
 
 package io.github.retrooper.packetevents.utils.gameprofile;
 
-import com.mojang.authlib.properties.Property;
 import io.github.retrooper.packetevents.packetwrappers.NMSPacket;
 import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
 import io.github.retrooper.packetevents.utils.nms.NMSUtils;
 import net.minecraft.util.com.mojang.authlib.GameProfile;
-import net.minecraft.util.com.mojang.authlib.properties.PropertyMap;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
@@ -722,19 +720,6 @@ class GameProfileUtil_7 {
      */
     public static WrappedGameProfile getWrappedGameProfile(Object gameProfile) {
         GameProfile gp = (GameProfile) gameProfile;
-        return new WrappedGameProfile(gp.getId(), gp.getName(), gp.getProperties());
-    }
-
-    public static Object getProperty(String name, String value, String signature) {
-        return new Property(name, value, signature);
-    }
-
-    public static WrappedProperty getWrappedProperty(Object property) {
-        Property prop = (Property) property;
-        return new WrappedProperty(prop.getName(), prop.getValue(), prop.getSignature());
-    }
-
-    public static Object getNewPropertyMap() {
-        return new PropertyMap();
+        return new WrappedGameProfile(gp.getId(), gp.getName());
     }
 }

@@ -690,16 +690,5 @@ class WrappedPacketOutMultiBlockChange extends WrappedPacket {
 
     @Override
     protected void load() {
-        net.minecraft.server.v1_7_R4.PacketPlayOutMultiBlockChange a0;
-        net.minecraft.server.v1_8_R3.PacketPlayOutMultiBlockChange a1;
-        net.minecraft.server.v1_9_R1.PacketPlayOutMultiBlockChange a2;
-        net.minecraft.server.v1_9_R2.PacketPlayOutMultiBlockChange a3;
-        net.minecraft.server.v1_12_R1.PacketPlayOutMultiBlockChange a4;
-        net.minecraft.server.v1_13_R1.PacketPlayOutMultiBlockChange a5;
-        net.minecraft.server.v1_13_R2.PacketPlayOutMultiBlockChange a6;
-        net.minecraft.server.v1_16_R2.PacketPlayOutMultiBlockChange a7;
-
     }
-
-
 }
