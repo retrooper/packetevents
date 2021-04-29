@@ -692,7 +692,6 @@ import io.github.retrooper.packetevents.utils.reflection.Reflection;
 import io.github.retrooper.packetevents.utils.server.ServerVersion;
 import io.github.retrooper.packetevents.utils.world.Difficulty;
 import io.github.retrooper.packetevents.utils.world.Dimension;
-import net.minecraft.server.v1_7_R4.EnumAnimation;
 import org.bukkit.inventory.ItemStack;
 
 import java.lang.annotation.ElementType;

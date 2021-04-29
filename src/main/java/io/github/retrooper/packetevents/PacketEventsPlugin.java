@@ -688,8 +688,9 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 public class PacketEventsPlugin extends JavaPlugin {
     //TODO Make a new pre-release (pre-14), push to master,
-    //TODO successfully shade jetbrains into your own package :D with gradle with shadowJar plugin
     //TODO Remove all deprecations including the legacy event system in 1.8.1 release
+    //TODO move away from direct access(1.7.10 direct access as funkemunky might take down the repo anytime)
+    //TODO finish remaining wrappers and test entitymetadata wrapper
     @Override
     public void onLoad() {
         //Return value of create is your PacketEvents instance.

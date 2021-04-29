@@ -678,12 +678,29 @@
 
 package io.github.retrooper.packetevents.utils.versionlookup.v_1_7_10;
 
+import io.github.retrooper.packetevents.utils.nms.NMSUtils;
 import org.bukkit.entity.Player;
 
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+
 public class SpigotVersionLookup_1_7 {
+    private static Method getPlayerVersionMethod = null;
+
     public static int getProtocolVersion(Player player) {
-        //TODO switch to reflection and not direct access
-        net.minecraft.server.v1_7_R4.EntityPlayer entityPlayer = ((org.bukkit.craftbukkit.v1_7_R4.entity.CraftPlayer) player).getHandle();
-        return entityPlayer.playerConnection.networkManager.getVersion();
+        if (getPlayerVersionMethod == null) {
+            try {
+                getPlayerVersionMethod = NMSUtils.networkManagerClass.getMethod("getVersion");
+            } catch (NoSuchMethodException e) {
+                e.printStackTrace();
+            }
+        }
+        Object networkManager = NMSUtils.getNetworkManager(player);
+        try {
+            return (int) getPlayerVersionMethod.invoke(networkManager);
+        } catch (IllegalAccessException | InvocationTargetException e) {
+            e.printStackTrace();
+        }
+        return -1;
     }
 }
