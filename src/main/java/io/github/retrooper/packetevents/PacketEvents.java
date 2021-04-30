@@ -713,7 +713,7 @@ public final class PacketEvents implements Listener, EventManager {
     private static Plugin plugin;
 
     private String handlerName;
-    private final PEVersion version = new PEVersion(1, 7, 9, 13);
+    private final PEVersion version = new PEVersion(1, 7, 9, 14);
     private PacketEventsSettings settings = new PacketEventsSettings();
 
     private final EventManager eventManager = new PEEventManager();
