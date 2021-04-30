@@ -681,11 +681,9 @@ package io.github.retrooper.packetevents.packetwrappers.play.out.worldparticles;
 import io.github.retrooper.packetevents.packetwrappers.NMSPacket;
 import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
 import io.github.retrooper.packetevents.packetwrappers.api.SendableWrapper;
-import io.github.retrooper.packetevents.utils.enums.EnumUtil;
 import io.github.retrooper.packetevents.utils.nms.NMSUtils;
 import io.github.retrooper.packetevents.utils.reflection.Reflection;
 import io.github.retrooper.packetevents.utils.server.ServerVersion;
-import org.jetbrains.annotations.Nullable;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -693,8 +691,9 @@ import java.util.Optional;
 
 //TODO finish this wrapper and test
 class WrappedPacketOutWorldParticles extends WrappedPacket implements SendableWrapper {
-    private static Class<?> particleEnumClass;
-    private static Method particleEnumGetNameMethod;
+    private static Class<? extends Enum<?>> particleEnumClass;
+    private static Class<?> particleParamClass;
+    private static Method particleParamGetParticleMethod;
 
     private String particleName;
     private boolean longDistance;
@@ -739,14 +738,17 @@ class WrappedPacketOutWorldParticles extends WrappedPacket implements SendableWr
 
     @Override
     protected void load() {
-        try {
-            particleEnumClass = NMSUtils.getNMSClass("EnumParticle");
-        } catch (ClassNotFoundException e) {
+        if (version.isNewerThan(ServerVersion.v_1_7_10)) {
             try {
-                particleEnumClass = NMSUtils.getNMSClass("ParticleParam");
-                particleEnumGetNameMethod = Reflection.getMethod(particleEnumClass, String.class, 0);
-            } catch (ClassNotFoundException e2) {
-                throw new IllegalArgumentException("Failed to find the particle enum while loading the wrapper!");
+                particleEnumClass = NMSUtils.getNMSEnumClass("EnumParticle");
+            } catch (ClassNotFoundException e) {
+                try {
+                    particleParamClass = NMSUtils.getNMSClass("ParticleParam");
+                    Class<?> particleClass = NMSUtils.getNMSClass("Particle");
+                    particleParamGetParticleMethod = Reflection.getMethod(particleParamClass, particleClass, 0);
+                } catch (ClassNotFoundException e2) {
+                    e2.printStackTrace();
+                }
             }
         }
     }
@@ -754,32 +756,49 @@ class WrappedPacketOutWorldParticles extends WrappedPacket implements SendableWr
     public String getParticleName() {
         if (packet != null) {
             if (version.isNewerThan(ServerVersion.v_1_12_1)) {
-                Object particleParamObj = readObject(0, particleEnumClass);
-                String particleName = null;
+                Object particleParamObj = readObject(0, particleParamClass);
+                Object particleObj = null;
                 try {
-                    particleName = particleEnumGetNameMethod.invoke(particleParamObj).toString();
+                    particleObj = particleParamGetParticleMethod.invoke(particleParamObj);
                 } catch (IllegalAccessException | InvocationTargetException e) {
                     e.printStackTrace();
                 }
-                return particleName;
-            } else {
-                //TODO Its in enum name on older versions, but minecraft:name on newer versions. so please find a good solution?
-                Enum<?> enumConst = readEnumConstant(0, (Class<? extends Enum<?>>) particleEnumClass);
+                //TODO WHERE IS THE NAME ON NEWEST VERSIONS????? REE??????????
+                WrappedPacket wrappedParticleObject = new WrappedPacket(new NMSPacket(particleObj));
+                Object minecraftKey = wrappedParticleObject.readObject(0, NMSUtils.minecraftKeyClass);
+                return NMSUtils.getStringFromMinecraftKey(minecraftKey);
+            } else if (version.isNewerThan(ServerVersion.v_1_7_10)){
+                Enum<?> enumConst = readEnumConstant(0, particleEnumClass);
                 return enumConst.name();
+            }
+            else {
+                return readString(0);
             }
         } else {
             return particleName;
         }
     }
 
-    //TODO finish setter add 1.13+ support
+    //TODO incomplete
     void setParticle(String particleName) {
         if (packet != null) {
             if (version.isNewerThan(ServerVersion.v_1_12_1)) {
-
-            } else {
-                Enum<?> enumConst = EnumUtil.valueOf((Class<? extends Enum<?>>) particleEnumClass, particleName);
-                writeEnumConstant(0, enumConst);
+                Object particleParamObj = readObject(0, particleParamClass);
+                Object particleObj = null;
+                try {
+                    particleObj = particleParamGetParticleMethod.invoke(particleParamObj);
+                } catch (IllegalAccessException | InvocationTargetException e) {
+                    e.printStackTrace();
+                }
+                //TODO WHERE IS THE NAME ON NEWEST VERSIONS????? REE??????????
+                WrappedPacket wrappedParticleObject = new WrappedPacket(new NMSPacket(particleObj));
+                Object minecraftKey = NMSUtils.generateMinecraftKey(particleName);
+                wrappedParticleObject.write(NMSUtils.minecraftKeyClass, 0, minecraftKey);
+            } else if (version.isNewerThan(ServerVersion.v_1_7_10)){
+                //TODO with enum constant
+            }
+            else {
+                writeString(0, particleName);
             }
         } else {
             this.particleName = particleName;
