@@ -1118,6 +1118,14 @@ public class WrappedPacket implements WrapperPacketReader, WrapperPacketWriter {
         writeEnumConstant(index, enumConstant);
     }
 
+    public List<Object> readList(int index) {
+        return read(index, List.class);
+    }
+
+    public void writeList(int index, List<Object> list) {
+        write(List.class, index, list);
+    }
+
     private Field getField(Class<?> type, int index) {
         Map<Class<?>, Field[]> cached = FIELD_CACHE.computeIfAbsent(packetClass, k -> new ConcurrentHashMap<>());
         Field[] fields = cached.computeIfAbsent(type, typeClass -> getFields(typeClass, packetClass.getDeclaredFields()));

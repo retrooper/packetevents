@@ -680,98 +680,27 @@ package io.github.retrooper.packetevents.packetwrappers.play.out.entitymetadata;
 
 import io.github.retrooper.packetevents.packetwrappers.NMSPacket;
 import io.github.retrooper.packetevents.packetwrappers.api.helper.WrappedPacketEntityAbstraction;
-import org.bukkit.entity.Entity;
 
 import java.util.ArrayList;
 import java.util.List;
 
 /**
- * A PacketPlayOutEntityMetadata.
- * Update metadata properties for an existing entity.
- * Any properties not included are left unchanged.
- *
- * @author SteelPhoenix
+ * @author SteelPhoenix, retrooper
  * @since 1.8
+ * TODO Make sendable, allow modifying watchable objects. Test on 1.7.10
  */
 public class WrappedPacketOutEntityMetadata extends WrappedPacketEntityAbstraction {
-    private List<WrappedWatchableObject> watchableObjects;
     public WrappedPacketOutEntityMetadata(NMSPacket packet) {
         super(packet);
     }
 
-    public WrappedPacketOutEntityMetadata(int entityID, List<WrappedWatchableObject> watchableObjects) {
-        this.entityID = entityID;
-        this.watchableObjects = watchableObjects;
-    }
 
-    public WrappedPacketOutEntityMetadata(Entity entity, List<WrappedWatchableObject> watchableObjects) {
-        this.entityID = entity.getEntityId();
-        this.watchableObjects = watchableObjects;
-    }
-
-
-    /**
-     * Get the entity metadata.
-     * Note that null values are preserved.
-     *
-     * @return the current value.
-     */
     public List<WrappedWatchableObject> getWatchableObjects() {
-        if (packet != null) {
-            // We assume this is the right type
-            List<?> nms = (List<?>) readObject(0, List.class);
-
-            // Wrap
-            // We assume every element can be wrapped
-            List<WrappedWatchableObject> watchableObjects = new ArrayList<>();
-            for (Object nmsWatchable : nms) {
-                watchableObjects.add(new WrappedWatchableObject(nmsWatchable));
-            }
-
-            return watchableObjects;
-        } else {
-            return watchableObjects;
+        List<Object> nmsWatchableObjectList = readList(0);
+        List<WrappedWatchableObject> wrappedWatchableObjects = new ArrayList<>(nmsWatchableObjectList.size());
+        for (Object watchableObject : nmsWatchableObjectList) {
+            wrappedWatchableObjects.add(new WrappedWatchableObject(new NMSPacket(watchableObject)));
         }
-    }
-
-    /**
-     * Set the entity metadata.
-     * Note that null values are preserved.
-     *
-     * @param value New value.
-     */
-    @SuppressWarnings("unchecked")
-    public void setWatchableObjects(List<WrappedWatchableObject> value) {
-        if (packet != null) {
-            // Preconditions
-            if (value == null) {
-                throw new NullPointerException("Object cannot be null");
-            }
-
-            // Try to maintain list type if possible
-            List<Object> list;
-            try {
-                list = value.getClass().newInstance();
-            } catch (ReflectiveOperationException | SecurityException exception) {
-                list = new ArrayList<>();
-            }
-
-            for (WrappedWatchableObject wrappedWatchable : value) {
-                // Handle nulls
-                if (wrappedWatchable == null) {
-                    list.add(null);
-                }
-
-                // Only add if a raw object is set
-                Object nms = wrappedWatchable.getRaw();
-                if (nms != null) {
-                    list.add(nms);
-                }
-            }
-
-            write(List.class, 0, list);
-        } else {
-            this.watchableObjects = value;
-        }
+        return wrappedWatchableObjects;
     }
 }
