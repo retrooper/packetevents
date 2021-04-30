@@ -685,7 +685,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 public class PacketEventsPlugin extends JavaPlugin {
     //TODO Make a new pre-release (pre-14), push to master,
     //TODO Remove all deprecations including the legacy event system in 1.8.1 release
-    //TODO finish remaining wrappers and finish entitymetadata wrapper
+    //TODO finish remaining wrappers
     @Override
     public void onLoad() {
         //Return value of create is your PacketEvents instance.

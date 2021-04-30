@@ -682,13 +682,15 @@ import io.github.retrooper.packetevents.packetwrappers.NMSPacket;
 import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
 import io.github.retrooper.packetevents.utils.server.ServerVersion;
 
-import java.util.ArrayList;
 import java.util.List;
-//TODO finish, and find out why nothing triggers on 1.16????????
-class WrappedPacketOutTabComplete extends WrappedPacket {
+import java.util.Optional;
+
+//TODO Make sendable
+public class WrappedPacketOutTabComplete extends WrappedPacket {
     private static Class<?> suggestionsClass;
     private int transactionID;
     private String[] matches;
+
     public WrappedPacketOutTabComplete(NMSPacket packet) {
         super(packet);
     }
@@ -707,36 +709,39 @@ class WrappedPacketOutTabComplete extends WrappedPacket {
     protected void load() {
         try {
             suggestionsClass = Class.forName("com.mojang.brigadier.suggestion.Suggestions");
-        } catch (ClassNotFoundException e) {
-            suggestionsClass = null;
+        } catch (ClassNotFoundException ignored) {
+
         }
-      //TODO, its bad on 1.13
     }
 
-    public int getTransactionId() {
-        if (packet != null) {
-            return readInt(0);
-        }
-        else {
-            return transactionID;
+    public Optional<Integer> getTransactionId() {
+        if (version.isNewerThan(ServerVersion.v_1_12_2)) {
+            if (packet != null) {
+                return Optional.of(readInt(0));
+            } else {
+                return Optional.of(transactionID);
+            }
+        } else {
+            return Optional.empty();
         }
     }
 
     public void setTransactionId(int transactionID) {
-        if (packet != null) {
-            writeInt(0, transactionID);
-        }
-        else {
-            this.transactionID = transactionID;
+        if (version.isNewerThan(ServerVersion.v_1_12_2)) {
+            if (packet != null) {
+                writeInt(0, transactionID);
+            } else {
+                this.transactionID = transactionID;
+            }
         }
     }
 
     public String[] getMatches() {
         if (packet != null) {
-            if (version.isNewerThan(ServerVersion.v_1_13)) {
+            if (version.isNewerThan(ServerVersion.v_1_12_2)) {
                 Object suggestions = readObject(0, suggestionsClass);
                 WrappedPacket suggestionsWrapper = new WrappedPacket(new NMSPacket(suggestions));
-                List<Object> suggestionList = suggestionsWrapper.readObject(0, List.class);
+                List<Object> suggestionList = suggestionsWrapper.readList(0);
                 String[] matches = new String[suggestionList.size()];
                 for (int i = 0; i < matches.length; i++) {
                     Object suggestion = suggestionList.get(i);
@@ -748,36 +753,27 @@ class WrappedPacketOutTabComplete extends WrappedPacket {
             } else {
                 return readStringArray(0);
             }
-        }
-        else {
+        } else {
             return matches;
         }
     }
 
-    /*public void setMatches(String[] matches) {
+    public void setMatches(String[] matches) {
         if (packet != null) {
-            if (version.isNewerThan(ServerVersion.v_1_13)) {
-                //TODO
+            if (version.isNewerThan(ServerVersion.v_1_12_2)) {
                 Object suggestions = readObject(0, suggestionsClass);
                 WrappedPacket suggestionsWrapper = new WrappedPacket(new NMSPacket(suggestions));
-                List<?> suggestionsList = new ArrayList<>();
-                for (String match : matches) {
-                    Object suggestion =
-                }
-                List<Object> suggestionList = suggestionsWrapper.readObject(0, List.class);
-                String[] matches = new String[suggestionList.size()];
+                List<Object> suggestionList = suggestionsWrapper.readList(0);
                 for (int i = 0; i < matches.length; i++) {
                     Object suggestion = suggestionList.get(i);
                     WrappedPacket suggestionWrapper = new WrappedPacket(new NMSPacket(suggestion));
-                    matches[i] = suggestionWrapper.readString(0);
+                    suggestionWrapper.writeString(0, matches[i]);
                 }
-                return matches;
             } else {
                 writeStringArray(0, matches);
             }
-        }
-        else {
+        } else {
             this.matches = matches;
         }
-    }*/
+    }
 }
