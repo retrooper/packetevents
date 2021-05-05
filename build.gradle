@@ -46,6 +46,7 @@ repositories {
 
 dependencies {
     implementation 'org.jetbrains:annotations:20.1.0'
+    compileOnly 'org.github.spigot:1.16.2:1.16.2'
     compileOnly 'org.github.spigot:1.8.8:1.8.8'
     compileOnly 'org.github.spigot:1.7.10:1.7.10'
     compileOnly 'us.myles:viaversion:3.2.0'

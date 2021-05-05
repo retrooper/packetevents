@@ -676,35 +676,71 @@
  *
  */
 
-package io.github.retrooper.packetevents;
+package io.github.retrooper.packetevents.packetwrappers.play.out.mount;
 
-import io.github.retrooper.packetevents.settings.PacketEventsSettings;
-import io.github.retrooper.packetevents.utils.server.ServerVersion;
-import org.bukkit.plugin.java.JavaPlugin;
+import io.github.retrooper.packetevents.packettype.PacketTypeClasses;
+import io.github.retrooper.packetevents.packetwrappers.NMSPacket;
+import io.github.retrooper.packetevents.packetwrappers.api.SendableWrapper;
+import io.github.retrooper.packetevents.packetwrappers.api.helper.WrappedPacketEntityAbstraction;
+import org.bukkit.entity.Entity;
 
-public class PacketEventsPlugin extends JavaPlugin {
-    //TODO Remove all deprecations including the legacy event system in 1.8.1 release
-    //TODO finish remaining wrappers
-    @Override
-    public void onLoad() {
-        //Return value of create is your PacketEvents instance.
-        PacketEvents instance = PacketEvents.create(this);
-        PacketEventsSettings settings = instance.getSettings();
-        settings
-                .fallbackServerVersion(ServerVersion.v_1_7_10)
-                .compatInjector(false)
-                .checkForUpdates(false);
-        PacketEvents.get().loadAsyncNewThread();`
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
+
+public class WrappedPacketOutMount extends WrappedPacketEntityAbstraction implements SendableWrapper {
+    private static Constructor<?> packetDefaultConstructor;
+
+    private int[] passengerIDs;
+
+    public WrappedPacketOutMount(NMSPacket packet) {
+        super(packet);
+    }
+
+    public WrappedPacketOutMount(int entityID, int[] passengerIDs) {
+        setEntityId(entityID);
+        this.passengerIDs = passengerIDs;
+    }
+
+    public WrappedPacketOutMount(Entity entity, int[] passengerIDs) {
+        setEntity(entity);
+        this.passengerIDs = passengerIDs;
     }
 
     @Override
-    public void onEnable() {
-        //Other way to access your instance...
-        PacketEvents.get().init();
+    protected void load() {
+        try {
+            packetDefaultConstructor = PacketTypeClasses.Play.Server.MOUNT.getConstructor();
+        } catch (NoSuchMethodException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public int[] getPassengerIds() {
+        if (packet != null) {
+            return readIntArray(0);
+        } else {
+            return passengerIDs;
+        }
+    }
+
+    public void setPassengerIds(int[] passengerIDs) {
+        if (packet != null) {
+            writeIntArray(0, passengerIDs);
+        } else {
+            this.passengerIDs = passengerIDs;
+        }
     }
 
     @Override
-    public void onDisable() {
-        PacketEvents.get().terminate();
+    public Object asNMSPacket() {
+        Object packetInstance = null;
+        try {
+            packetInstance = packetDefaultConstructor.newInstance();
+        } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
+            e.printStackTrace();
+        }
+        WrappedPacketOutMount wrappedPacketOutMount = new WrappedPacketOutMount(new NMSPacket(packetInstance));
+        wrappedPacketOutMount.setPassengerIds(getPassengerIds());
+        return packetInstance;
     }
 }
