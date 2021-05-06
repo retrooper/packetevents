@@ -716,6 +716,7 @@ public class GlobalChannelInjector implements ChannelInjector {
                 load();
                 injector.inject();
                 PacketEvents.get().getPlugin().getLogger().warning("PacketEvents failed to inject with the Early Injector. Reverting to the Compatibility/Late Injector... This is just a warning, but please report this!");
+                ex.printStackTrace();
             }
         }
     }

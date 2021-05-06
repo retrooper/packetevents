@@ -685,6 +685,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 public class PacketEventsPlugin extends JavaPlugin {
     //TODO Remove all deprecations including the legacy event system in 1.8.1 release
     //TODO finish remaining wrappers
+    //TODO Add late-bind support for the modern injector, atm it reverts to compatibility injector
     @Override
     public void onLoad() {
         //Return value of create is your PacketEvents instance.
@@ -694,7 +695,7 @@ public class PacketEventsPlugin extends JavaPlugin {
                 .fallbackServerVersion(ServerVersion.v_1_7_10)
                 .compatInjector(false)
                 .checkForUpdates(false);
-        PacketEvents.get().loadAsyncNewThread();`
+        PacketEvents.get().loadAsyncNewThread();
     }
 
     @Override

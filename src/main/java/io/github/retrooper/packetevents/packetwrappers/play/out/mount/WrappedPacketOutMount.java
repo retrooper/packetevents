@@ -682,6 +682,7 @@ import io.github.retrooper.packetevents.packettype.PacketTypeClasses;
 import io.github.retrooper.packetevents.packetwrappers.NMSPacket;
 import io.github.retrooper.packetevents.packetwrappers.api.SendableWrapper;
 import io.github.retrooper.packetevents.packetwrappers.api.helper.WrappedPacketEntityAbstraction;
+import io.github.retrooper.packetevents.utils.server.ServerVersion;
 import org.bukkit.entity.Entity;
 
 import java.lang.reflect.Constructor;
@@ -729,6 +730,11 @@ public class WrappedPacketOutMount extends WrappedPacketEntityAbstraction implem
         } else {
             this.passengerIDs = passengerIDs;
         }
+    }
+
+    @Override
+    public boolean isSupported() {
+        return version.isNewerThan(ServerVersion.v_1_8_8);
     }
 
     @Override
