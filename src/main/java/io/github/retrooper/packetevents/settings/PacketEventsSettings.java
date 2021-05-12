@@ -704,6 +704,11 @@ public class PacketEventsSettings {
     private boolean compatInjector = false;
 
     /**
+     * Can PacketEvents collect server data like player count, java version, plugins, etc... anonymously and report to bStats?
+     */
+    private boolean bStatsEnabled = true;
+
+    /**
      * This method locks the settings.
      * If the settings are locked, you won't be able to modify any settings using the setters.
      */
@@ -752,6 +757,18 @@ public class PacketEventsSettings {
     public PacketEventsSettings checkForUpdates(boolean checkForUpdates) {
         if (!locked) {
             this.checkForUpdates = checkForUpdates;
+        }
+        return this;
+    }
+
+    /**
+     * This decides if PacketEvents should collect data anonymously and report to bStats.
+     * @param bStatsEnabled Value
+     * @return Settings isntance.
+     */
+    public PacketEventsSettings bStats(boolean bStatsEnabled) {
+        if (!locked) {
+            this.bStatsEnabled = bStatsEnabled;
         }
         return this;
     }
@@ -815,5 +832,13 @@ public class PacketEventsSettings {
      */
     public boolean shouldUseCompatibilityInjector() {
         return compatInjector;
+    }
+
+    /**
+     * Should we collect server data anonymously and report to bStats?
+     * @return Getter for {@link #bStatsEnabled}
+     */
+    public boolean isbStatsEnabled() {
+        return bStatsEnabled;
     }
 }

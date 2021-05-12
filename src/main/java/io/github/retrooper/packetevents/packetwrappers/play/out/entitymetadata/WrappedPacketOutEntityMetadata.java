@@ -687,7 +687,7 @@ import java.util.List;
 /**
  * @author SteelPhoenix, retrooper
  * @since 1.8
- * TODO Make sendable, allow modifying watchable objects. Test on 1.7.10
+ * TODO Make sendable, allow modifying watchable objects, test on 1.7.10
  */
 public class WrappedPacketOutEntityMetadata extends WrappedPacketEntityAbstraction {
     public WrappedPacketOutEntityMetadata(NMSPacket packet) {

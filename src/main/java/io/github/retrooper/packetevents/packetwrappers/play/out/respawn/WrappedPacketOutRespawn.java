@@ -686,9 +686,10 @@ import io.github.retrooper.packetevents.utils.player.GameMode;
 import io.github.retrooper.packetevents.utils.world.Difficulty;
 import io.github.retrooper.packetevents.utils.world.Dimension;
 import io.github.retrooper.packetevents.utils.world.LevelType;
+import org.bukkit.WorldType;
 
 //TODO finish and test
-class WrappedPacketOutRespawn extends WrappedPacket implements SendableWrapper {
+class WrappedPacketOutRespawn extends WrappedPacket {
     private static Class<?> worldTypeClass;
     private Dimension dimension;
     private Difficulty difficulty;
@@ -739,7 +740,7 @@ class WrappedPacketOutRespawn extends WrappedPacket implements SendableWrapper {
 
     public LevelType getLevelType() {
         if (packet != null) {
-            //TODO
+            //TODO finish
             Object worldTypeObject = readObject(0, worldTypeClass);
             WrappedPacket worldTypeWrapper = new WrappedPacket(new NMSPacket(worldTypeObject));
             String worldTypeName = worldTypeWrapper.readString(0);
@@ -747,10 +748,5 @@ class WrappedPacketOutRespawn extends WrappedPacket implements SendableWrapper {
         } else {
             return levelType;
         }
-    }
-
-    @Override
-    public Object asNMSPacket() {
-        return null;
     }
 }

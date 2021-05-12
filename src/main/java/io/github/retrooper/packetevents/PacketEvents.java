@@ -678,6 +678,7 @@
 
 package io.github.retrooper.packetevents;
 
+import io.github.retrooper.packetevents.bstats.Metrics;
 import io.github.retrooper.packetevents.event.impl.PostPlayerInjectEvent;
 import io.github.retrooper.packetevents.event.manager.EventManager;
 import io.github.retrooper.packetevents.event.manager.PEEventManager;
@@ -704,6 +705,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.ServicePriority;
+import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -830,6 +832,10 @@ public final class PacketEvents implements Listener, EventManager {
 
             if (settings.shouldCheckForUpdates()) {
                 handleUpdateCheck();
+            }
+
+            if (settings.isbStatsEnabled()) {
+                Metrics metrics = new Metrics((JavaPlugin) getPlugin(), 11327);
             }
 
             //We must wait for the injector to initialize.
