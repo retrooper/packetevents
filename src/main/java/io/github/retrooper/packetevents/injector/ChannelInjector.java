@@ -681,6 +681,10 @@ package io.github.retrooper.packetevents.injector;
 import org.bukkit.entity.Player;
 
 public interface ChannelInjector {
+    default boolean isBound() {
+        return true;
+    }
+
     void inject();
 
     void eject();

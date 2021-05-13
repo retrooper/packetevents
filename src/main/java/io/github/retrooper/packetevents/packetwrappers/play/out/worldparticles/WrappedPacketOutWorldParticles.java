@@ -680,21 +680,23 @@ package io.github.retrooper.packetevents.packetwrappers.play.out.worldparticles;
 
 import io.github.retrooper.packetevents.packetwrappers.NMSPacket;
 import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
-import io.github.retrooper.packetevents.packetwrappers.api.SendableWrapper;
 import io.github.retrooper.packetevents.utils.nms.NMSUtils;
 import io.github.retrooper.packetevents.utils.reflection.Reflection;
 import io.github.retrooper.packetevents.utils.server.ServerVersion;
+import org.jetbrains.annotations.Nullable;
 
+import javax.print.DocFlavor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.ConcurrentHashMap;
 
 //TODO finish this wrapper and test
-class WrappedPacketOutWorldParticles extends WrappedPacket implements SendableWrapper {
+public class WrappedPacketOutWorldParticles extends WrappedPacket {
     private static Class<? extends Enum<?>> particleEnumClass;
     private static Class<?> particleParamClass;
-    private static Method particleParamGetParticleMethod;
-
+    private static Method particleParamGetNameMethod;
     private String particleName;
     private boolean longDistance;
     private float x, y, z;
@@ -707,48 +709,14 @@ class WrappedPacketOutWorldParticles extends WrappedPacket implements SendableWr
         super(packet);
     }
 
-    @Deprecated
-    public WrappedPacketOutWorldParticles(String particleName, float x, float y, float z, float offsetX, float offsetY, float offsetZ, float particleData, int particleCount) {
-        this.particleName = particleName;
-        this.longDistance = false;//REDUNDANT, NOT USED ON 1.7.10
-        this.x = x;
-        this.y = y;
-        this.z = z;
-        this.offsetX = offsetX;
-        this.offsetY = offsetY;
-        this.offsetZ = offsetZ;
-        this.particleData = particleData;
-        this.particleCount = particleCount;
-        this.data = new int[particleCount];//REDUNDANT, NOT USED ON 1.7.10
-    }
-
-    public WrappedPacketOutWorldParticles(String particleName, boolean longDistance, float x, float y, float z, float offsetX, float offsetY, float offsetZ, float particleData, int particleCount, int[] data) {
-        this.particleName = particleName;
-        this.longDistance = longDistance;
-        this.x = x;
-        this.y = y;
-        this.z = z;
-        this.offsetX = offsetX;
-        this.offsetY = offsetY;
-        this.offsetZ = offsetZ;
-        this.particleData = particleData;
-        this.particleCount = particleCount;
-        this.data = data;
-    }
-
     @Override
     protected void load() {
         if (version.isNewerThan(ServerVersion.v_1_7_10)) {
             try {
                 particleEnumClass = NMSUtils.getNMSEnumClass("EnumParticle");
             } catch (ClassNotFoundException e) {
-                try {
-                    particleParamClass = NMSUtils.getNMSClass("ParticleParam");
-                    Class<?> particleClass = NMSUtils.getNMSClass("Particle");
-                    particleParamGetParticleMethod = Reflection.getMethod(particleParamClass, particleClass, 0);
-                } catch (ClassNotFoundException e2) {
-                    e2.printStackTrace();
-                }
+                particleParamClass = NMSUtils.getNMSClassWithoutException("ParticleParam");
+                particleParamGetNameMethod = Reflection.getMethod(particleParamClass, String.class, 0);
             }
         }
     }
@@ -757,51 +725,21 @@ class WrappedPacketOutWorldParticles extends WrappedPacket implements SendableWr
         if (packet != null) {
             if (version.isNewerThan(ServerVersion.v_1_12_1)) {
                 Object particleParamObj = readObject(0, particleParamClass);
-                Object particleObj = null;
+                String particleParamName = null;
                 try {
-                    particleObj = particleParamGetParticleMethod.invoke(particleParamObj);
+                    particleParamName = (String) particleParamGetNameMethod.invoke(particleParamObj);
                 } catch (IllegalAccessException | InvocationTargetException e) {
                     e.printStackTrace();
                 }
-                //TODO WHERE IS THE NAME ON NEWEST VERSIONS????? REE??????????
-                WrappedPacket wrappedParticleObject = new WrappedPacket(new NMSPacket(particleObj));
-                Object minecraftKey = wrappedParticleObject.readObject(0, NMSUtils.minecraftKeyClass);
-                return NMSUtils.getStringFromMinecraftKey(minecraftKey);
-            } else if (version.isNewerThan(ServerVersion.v_1_7_10)){
+                return particleParamName;
+            } else if (version.isNewerThan(ServerVersion.v_1_7_10)) {
                 Enum<?> enumConst = readEnumConstant(0, particleEnumClass);
-                return enumConst.name();
-            }
-            else {
-                return readString(0);
+                return "minecraft:" + enumConst.name();
+            } else {
+                return "minecraft:" + readString(0);
             }
         } else {
             return particleName;
-        }
-    }
-
-    //TODO incomplete
-    void setParticle(String particleName) {
-        if (packet != null) {
-            if (version.isNewerThan(ServerVersion.v_1_12_1)) {
-                Object particleParamObj = readObject(0, particleParamClass);
-                Object particleObj = null;
-                try {
-                    particleObj = particleParamGetParticleMethod.invoke(particleParamObj);
-                } catch (IllegalAccessException | InvocationTargetException e) {
-                    e.printStackTrace();
-                }
-                //TODO WHERE IS THE NAME ON NEWEST VERSIONS????? REE??????????
-                WrappedPacket wrappedParticleObject = new WrappedPacket(new NMSPacket(particleObj));
-                Object minecraftKey = NMSUtils.generateMinecraftKey(particleName);
-                wrappedParticleObject.write(NMSUtils.minecraftKeyClass, 0, minecraftKey);
-            } else if (version.isNewerThan(ServerVersion.v_1_7_10)){
-                //TODO with enum constant
-            }
-            else {
-                writeString(0, particleName);
-            }
-        } else {
-            this.particleName = particleName;
         }
     }
 
@@ -829,11 +767,29 @@ class WrappedPacketOutWorldParticles extends WrappedPacket implements SendableWr
         }
     }
 
+    public void setY(float y) {
+        if (packet != null) {
+            writeFloat(1, y);
+        }
+        else {
+            this.y = y;
+        }
+    }
+
     public float getZ() {
         if (packet != null) {
             return readFloat(2);
         } else {
             return z;
+        }
+    }
+
+    public void setZ(float z) {
+        if (packet != null) {
+            writeFloat(2, z);
+        }
+        else {
+            this.z = z;
         }
     }
 
@@ -845,11 +801,29 @@ class WrappedPacketOutWorldParticles extends WrappedPacket implements SendableWr
         }
     }
 
+    public void setOffsetX(float offsetX) {
+        if (packet != null) {
+            writeFloat(3, offsetX);
+        }
+        else {
+            this.offsetX = offsetX;
+        }
+    }
+
     public float getOffsetY() {
         if (packet != null) {
             return readFloat(4);
         } else {
             return offsetY;
+        }
+    }
+
+    public void setOffsetY(float offsetY) {
+        if (packet != null) {
+            writeFloat(4, offsetY);
+        }
+        else {
+            this.offsetY = offsetY;
         }
     }
 
@@ -861,6 +835,15 @@ class WrappedPacketOutWorldParticles extends WrappedPacket implements SendableWr
         }
     }
 
+    public void setOffsetZ(float offsetZ) {
+        if (packet != null) {
+            writeFloat(5, offsetZ);
+        }
+        else {
+            this.offsetZ = offsetZ;
+        }
+    }
+
     public float getParticleData() {
         if (packet != null) {
             return readFloat(6);
@@ -869,11 +852,29 @@ class WrappedPacketOutWorldParticles extends WrappedPacket implements SendableWr
         }
     }
 
+    public void setParticleData(float particleData) {
+        if (packet != null) {
+            writeFloat(6, particleData);
+        }
+        else {
+            this.particleData = particleData;
+        }
+    }
+
     public int getParticleCount() {
         if (packet != null) {
             return readInt(0);
         } else {
             return particleCount;
+        }
+    }
+
+    public void setParticleCount(int particleCount) {
+        if (packet != null) {
+            writeInt(0, particleCount);
+        }
+        else {
+            this.particleCount = particleCount;
         }
     }
 
@@ -920,9 +921,94 @@ class WrappedPacketOutWorldParticles extends WrappedPacket implements SendableWr
             this.longDistance = longDistance;
         }
     }
+/*
+    public enum Particle {
+        EXPLOSION_NORMAL("explode"),
+        EXPLOSION_LARGE("largeexplode"),
+        EXPLOSION_HUGE("hugeexplosion"),
+        FIREWORKS_SPARK("fireworksSpark"),
+        WATER_BUBBLE("bubble"),
+        WATER_SPLASH("splash"),
+        WATER_WAKE("wake"),
+        SUSPENDED("suspended"),
+        SUSPENDED_DEPTH("depthsuspend"),
+        CRIT("crit"),
+        CRIT_MAGIC("magicCrit"),
+        SMOKE_NORMAL("smoke"),
+        SMOKE_LARGE("largesmoke"),
+        SPELL("spell"),
+        SPELL_INSTANT("instantSpell"),
+        SPELL_MOB("mobSpell"),
+        SPELL_MOB_AMBIENT("mobSpellAmbient"),
+        SPELL_WITCH("witchMagic"),
+        DRIP_WATER("dripWater"),
+        DRIP_LAVA("dripLava"),
+        VILLAGER_ANGRY("angryVillager"),
+        VILLAGER_HAPPY("happyVillager"),
+        TOWN_AURA("townaura"),
+        NOTE("note"),
+        PORTAL("portal"),
+        ENCHANTMENT_TABLE("enchantmenttable"),
+        FLAME("flame"),
+        LAVA("lava"),
+        FOOTSTEP("footstep"),
+        CLOUD("cloud"),
+        REDSTONE("reddust"),
+        SNOWBALL("snowballpoof"),
+        SNOW_SHOVEL("snowshovel"),
+        SLIME("slime"),
+        HEART("heart"),
+        BARRIER("barrier"),
+        ITEM_CRACK("iconcrack"),
+        BLOCK_CRACK("blockcrack"),
+        BLOCK_DUST("blockdust"),
+        WATER_DROP("droplet"),
+        ITEM_TAKE("take"),
+        MOB_APPEARANCE("mobappearance"),
+        DRAGON_BREATH("dragonbreath"),
+        END_ROD("endRod"),
+        DAMAGE_INDICATOR("damageIndicator"),
+        SWEEP_ATTACK("sweepAttack"),
+        TOTEM_OF_UNDYING("totem_of_undying"),
+        UNDERWATER("underwater"),
+        SPLASH("splash"),
+        WITCH("witch"),
+        BUBBLE_POP("bubble_pop"),
+        CURRENT_DOWN("current_down"),
+        BUBBLE_COLUMN_UP("bubble_column_up"),
+        NAUTILUS("nautilus"),
+        DOLPHIN("dolphin"),
+        CAMPFIRE_COSY_SMOKE("campfire_cosy_smoke"),
+        DRIPPING_HONEY("dripping_honey"),
+        FALLING_HONEY("falling_honey"),
+        LANDING_HONEY("landing_honey"),
+        FALLING_NECTAR("falling_nectar"),
+        ASH("ash"),
+        CRIMSON_SPORE("crimson_spore"),
+        WARPED_SPORE("warped_spore"),
+        DRIPPING_OBSIDIAN_TEAR("dripping_obsidian_tear"),
+        FALLING_OBSIDIAN_TEAR("falling_obsidian_tear"),
+        LANDING_OBSIDIAN_TEAR("landing_obsidian_tear"),
+        REVERSE_PORTAL("reverse_portal"),
+        WHITE_ASH("white_ash");
+        public static final Particle[] VALUES = values();
+        private final String name;
 
-    @Override
-    public Object asNMSPacket() {
-        return null;
-    }
+        Particle(String name) {
+            this.name = name;
+        }
+
+        @Nullable
+        public static Particle getParticleByName(String name) {
+            if (name == null) {
+                return null;
+            }
+            for (Particle particle : values()) {
+                if (particle.name.equalsIgnoreCase(name) || particle.name().equalsIgnoreCase(name)) {
+                    return particle;
+                }
+            }
+            return null;
+        }
+    }*/
 }

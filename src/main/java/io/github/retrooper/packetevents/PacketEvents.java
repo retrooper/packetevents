@@ -733,6 +733,7 @@ public final class PacketEvents implements Listener, EventManager {
     private volatile boolean loading, loaded;
     private final AtomicBoolean injectorReady = new AtomicBoolean();
     private boolean initialized, initializing, terminating;
+    private boolean lateBind = false;
 
     public static PacketEvents create(final Plugin plugin) {
         if (Bukkit.isPrimaryThread()) {
@@ -793,10 +794,9 @@ public final class PacketEvents implements Listener, EventManager {
 
             if (!injectorReady.get()) {
                 injector.load();
-                try {
+                lateBind = !injector.isBound();
+                if (!lateBind) {
                     injector.inject();
-                } catch (Exception ex) {
-                    ex.printStackTrace();
                 }
                 injectorReady.set(true);
             }
@@ -839,19 +839,33 @@ public final class PacketEvents implements Listener, EventManager {
             }
 
             //We must wait for the injector to initialize.
+
+            //Wait for the injector to be ready.
             while (!injectorReady.get()) {
                 ;
             }
-
-            Bukkit.getPluginManager().registerEvents(bukkitEventProcessorInternal, plugin);
-            for (final Player p : Bukkit.getOnlinePlayers()) {
-                try {
-                    injector.injectPlayer(p);
-                    PacketEvents.get().getEventManager().callEvent(new PostPlayerInjectEvent(p, false));
-                } catch (Exception ex) {
-                    p.kickPlayer("Failed to inject... Please rejoin!");
+            Runnable postInjectTask = new Runnable() {
+                @Override
+                public void run() {
+                    Bukkit.getPluginManager().registerEvents(bukkitEventProcessorInternal, plugin);
+                    for (final Player p : Bukkit.getOnlinePlayers()) {
+                        try {
+                            injector.injectPlayer(p);
+                            PacketEvents.get().getEventManager().callEvent(new PostPlayerInjectEvent(p, false));
+                        } catch (Exception ex) {
+                            p.kickPlayer("Failed to inject... Please rejoin!");
+                        }
+                    }
                 }
+            };
+            if (lateBind) {
+                Bukkit.getScheduler().scheduleSyncDelayedTask(plugin, injector::inject);
+                Bukkit.getScheduler().scheduleSyncDelayedTask(plugin, postInjectTask);
             }
+            else {
+                postInjectTask.run();
+            }
+
 
             initialized = true;
             initializing = false;

@@ -682,18 +682,14 @@ import io.github.retrooper.packetevents.PacketEvents;
 import io.github.retrooper.packetevents.event.impl.PlayerEjectEvent;
 import io.github.retrooper.packetevents.event.impl.PlayerInjectEvent;
 import io.github.retrooper.packetevents.injector.legacy.early.EarlyChannelInjectorLegacy;
-import io.github.retrooper.packetevents.injector.modern.early.EarlyChannelInjectorModern;
 import io.github.retrooper.packetevents.injector.legacy.late.LateChannelInjectorLegacy;
+import io.github.retrooper.packetevents.injector.modern.early.EarlyChannelInjectorModern;
 import io.github.retrooper.packetevents.injector.modern.late.LateChannelInjectorModern;
 import io.github.retrooper.packetevents.utils.nms.NMSUtils;
 import org.bukkit.entity.Player;
 
-public class GlobalChannelInjector implements ChannelInjector {
+public class GlobalChannelInjector {
     private ChannelInjector injector;
-
-    public GlobalChannelInjector() {
-
-    }
 
     public void load() {
         boolean legacy = NMSUtils.legacyNettyImportMode;
@@ -704,7 +700,10 @@ public class GlobalChannelInjector implements ChannelInjector {
         }
     }
 
-    @Override
+    public boolean isBound() {
+        return injector.isBound();
+    }
+
     public void inject() {
         try {
             //Try inject...
@@ -721,12 +720,10 @@ public class GlobalChannelInjector implements ChannelInjector {
         }
     }
 
-    @Override
     public void eject() {
         injector.eject();
     }
 
-    @Override
     public void injectPlayer(Player player) {
         PlayerInjectEvent injectEvent = new PlayerInjectEvent(player);
         PacketEvents.get().callEvent(injectEvent);
@@ -735,7 +732,6 @@ public class GlobalChannelInjector implements ChannelInjector {
         }
     }
 
-    @Override
     public void ejectPlayer(Player player) {
         PlayerEjectEvent ejectEvent = new PlayerEjectEvent(player);
         PacketEvents.get().callEvent(ejectEvent);
@@ -744,12 +740,10 @@ public class GlobalChannelInjector implements ChannelInjector {
         }
     }
 
-    @Override
     public boolean hasInjected(Player player) {
         return injector.hasInjected(player);
     }
 
-    @Override
     public void sendPacket(Object ch, Object rawNMSPacket) {
         injector.sendPacket(ch, rawNMSPacket);
     }

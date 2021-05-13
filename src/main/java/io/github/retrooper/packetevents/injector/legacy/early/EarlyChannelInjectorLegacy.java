@@ -712,6 +712,34 @@ public class EarlyChannelInjectorLegacy implements EarlyInjector {
     private final List<Map<Field, Object>> injectedLists = new ArrayList<>();
 
     @Override
+    public boolean isBound() {
+        try {
+            Object connection = NMSUtils.getMinecraftServerConnection();
+            if (connection == null) {
+                return false;
+            }
+            for (Field field : connection.getClass().getDeclaredFields()) {
+                field.setAccessible(true);
+                final Object value = field.get(connection);
+                if (value instanceof List) {
+                    // Inject the list
+                    synchronized (value) {
+                        for (Object o : (List) value) {
+                            if (o instanceof ChannelFuture) {
+                                return true;
+                            } else {
+                                break; // not the right list.
+                            }
+                        }
+                    }
+                }
+            }
+        } catch (Exception e) {
+        }
+        return false;
+    }
+
+    @Override
     public void inject() {
         try {
             Object serverConnection = NMSUtils.getMinecraftServerConnection();
@@ -939,33 +967,5 @@ public class EarlyChannelInjectorLegacy implements EarlyInjector {
         if (handler != null) {
             handler.player = player;
         }
-    }
-
-    @Override
-    public boolean isBound() {
-        try {
-            Object connection = NMSUtils.getMinecraftServerConnection();
-            if (connection == null) {
-                return false;
-            }
-            for (Field field : connection.getClass().getDeclaredFields()) {
-                field.setAccessible(true);
-                final Object value = field.get(connection);
-                if (value instanceof List) {
-                    // Inject the list
-                    synchronized (value) {
-                        for (Object o : (List) value) {
-                            if (o instanceof ChannelFuture) {
-                                return true;
-                            } else {
-                                break; // not the right list.
-                            }
-                        }
-                    }
-                }
-            }
-        } catch (Exception e) {
-        }
-        return false;
     }
 }

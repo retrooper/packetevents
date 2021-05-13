@@ -712,6 +712,34 @@ public class EarlyChannelInjectorModern implements EarlyInjector {
     private final List<Map<Field, Object>> injectedLists = new ArrayList<>();
 
     @Override
+    public boolean isBound() {
+        try {
+            Object connection = NMSUtils.getMinecraftServerConnection();
+            if (connection == null) {
+                return false;
+            }
+            for (Field field : connection.getClass().getDeclaredFields()) {
+                field.setAccessible(true);
+                final Object value = field.get(connection);
+                if (value instanceof List) {
+                    // Inject the list
+                    synchronized (value) {
+                        for (Object o : (List) value) {
+                            if (o instanceof ChannelFuture) {
+                                return true;
+                            } else {
+                                break; // not the right list.
+                            }
+                        }
+                    }
+                }
+            }
+        } catch (Exception e) {
+        }
+        return false;
+    }
+
+    @Override
     public void inject() {
         try {
             Object serverConnection = NMSUtils.getMinecraftServerConnection();
@@ -790,7 +818,8 @@ public class EarlyChannelInjectorModern implements EarlyInjector {
                 bootstrapAcceptorField.setAccessible(true);
                 bootstrapAcceptorField.get(handler);
                 bootstrapAcceptor = handler;
-            } catch (Exception ignored) {}
+            } catch (Exception ignored) {
+            }
         }
 
         if (bootstrapAcceptor == null) {
@@ -897,7 +926,8 @@ public class EarlyChannelInjectorModern implements EarlyInjector {
             Channel chnl = (Channel) channel;
             try {
                 chnl.pipeline().remove(PacketEvents.get().getHandlerName());
-            } catch (Exception ignored) {}
+            } catch (Exception ignored) {
+            }
         }
     }
 
@@ -933,32 +963,5 @@ public class EarlyChannelInjectorModern implements EarlyInjector {
         if (handler != null) {
             handler.player = player;
         }
-    }
-
-    @Override
-    public boolean isBound() {
-        try {
-            Object connection = NMSUtils.getMinecraftServerConnection();
-            if (connection == null) {
-                return false;
-            }
-            for (Field field : connection.getClass().getDeclaredFields()) {
-                field.setAccessible(true);
-                final Object value = field.get(connection);
-                if (value instanceof List) {
-                    // Inject the list
-                    synchronized (value) {
-                        for (Object o : (List) value) {
-                            if (o instanceof ChannelFuture) {
-                                return true;
-                            } else {
-                                break; // not the right list.
-                            }
-                        }
-                    }
-                }
-            }
-        } catch (Exception ignored) {}
-        return false;
     }
 }
