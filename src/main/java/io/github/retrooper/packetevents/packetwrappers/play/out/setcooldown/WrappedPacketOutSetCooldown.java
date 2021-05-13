@@ -691,8 +691,8 @@ import java.util.HashMap;
 import java.util.IdentityHashMap;
 import java.util.Map;
 
-//TODO FINISH
-class WrappedPacketOutSetCooldown extends WrappedPacket implements SendableWrapper {
+//TODO TEST
+public class WrappedPacketOutSetCooldown extends WrappedPacket implements SendableWrapper {
     private static Constructor<?> packetConstructor;
     private static final Map<Short, EntityType> ID_MAP = new IdentityHashMap<>();
     private EntityType type;
