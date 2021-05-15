@@ -1118,6 +1118,16 @@ public class WrappedPacket implements WrapperPacketReader, WrapperPacketWriter {
         writeEnumConstant(index, enumConstant);
     }
 
+    public String readIChatBaseComponent(int index) {
+        Object iChatBaseComponent = readObject(index, NMSUtils.iChatBaseComponentClass);
+        return NMSUtils.readIChatBaseComponent(iChatBaseComponent);
+    }
+
+    public void writeIChatBaseComponent(int index, String content) {
+        Object iChatBaseComponent = NMSUtils.generateIChatBaseComponent(content);
+        write(NMSUtils.iChatBaseComponentClass, index, iChatBaseComponent);
+    }
+
     public List<Object> readList(int index) {
         return read(index, List.class);
     }
