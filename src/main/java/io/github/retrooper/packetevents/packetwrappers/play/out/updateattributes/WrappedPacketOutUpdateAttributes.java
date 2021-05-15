@@ -686,7 +686,6 @@ import io.github.retrooper.packetevents.utils.attributesnapshot.AttributeSnapsho
 import org.bukkit.entity.Entity;
 
 import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -745,17 +744,12 @@ public class WrappedPacketOutUpdateAttributes extends WrappedPacketEntityAbstrac
     }
 
     @Override
-    public Object asNMSPacket() {
+    public Object asNMSPacket() throws Exception {
         List<AttributeSnapshotWrapper> properties = getProperties();
         List<Object> nmsProperties = new ArrayList<>(properties.size());
         for (AttributeSnapshotWrapper property : properties) {
             nmsProperties.add(property.getNMSPacket().getRawNMSPacket());
         }
-        try {
-            return packetConstructor.newInstance(getEntityId(), nmsProperties);
-        } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
-            e.printStackTrace();
-        }
-        return null;
+        return packetConstructor.newInstance(getEntityId(), nmsProperties);
     }
 }

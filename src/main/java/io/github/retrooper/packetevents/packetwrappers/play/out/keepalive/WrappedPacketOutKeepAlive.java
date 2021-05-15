@@ -680,12 +680,11 @@ package io.github.retrooper.packetevents.packetwrappers.play.out.keepalive;
 
 import io.github.retrooper.packetevents.packettype.PacketTypeClasses;
 import io.github.retrooper.packetevents.packetwrappers.NMSPacket;
-import io.github.retrooper.packetevents.packetwrappers.api.SendableWrapper;
 import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
+import io.github.retrooper.packetevents.packetwrappers.api.SendableWrapper;
 import io.github.retrooper.packetevents.utils.reflection.Reflection;
 
 import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
 
 public class WrappedPacketOutKeepAlive extends WrappedPacket implements SendableWrapper {
     private static Constructor<?> keepAliveConstructor;
@@ -744,20 +743,11 @@ public class WrappedPacketOutKeepAlive extends WrappedPacket implements Sendable
     }
 
     @Override
-    public Object asNMSPacket() {
+    public Object asNMSPacket() throws Exception {
         if (integerMode) {
-            try {
-                return keepAliveConstructor.newInstance((int) getId());
-            } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
-                e.printStackTrace();
-            }
+            return keepAliveConstructor.newInstance((int) getId());
         } else {
-            try {
-                return keepAliveConstructor.newInstance(getId());
-            } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
-                e.printStackTrace();
-            }
+            return keepAliveConstructor.newInstance(getId());
         }
-        return null;
     }
 }

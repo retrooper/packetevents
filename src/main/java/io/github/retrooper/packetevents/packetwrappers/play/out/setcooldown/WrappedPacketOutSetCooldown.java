@@ -686,8 +686,6 @@ import io.github.retrooper.packetevents.utils.server.ServerVersion;
 import org.bukkit.entity.EntityType;
 
 import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
-import java.util.HashMap;
 import java.util.IdentityHashMap;
 import java.util.Map;
 
@@ -756,13 +754,8 @@ public class WrappedPacketOutSetCooldown extends WrappedPacket implements Sendab
     }
 
     @Override
-    public Object asNMSPacket() {
+    public Object asNMSPacket() throws Exception {
         Object nmsItem = NMSUtils.getNMSItemById(getType().getTypeId());
-        try {
-            return packetConstructor.newInstance(nmsItem, getCooldownTicks());
-        } catch (InstantiationException | InvocationTargetException | IllegalAccessException e) {
-            e.printStackTrace();
-        }
-        return null;
+        return packetConstructor.newInstance(nmsItem, getCooldownTicks());
     }
 }

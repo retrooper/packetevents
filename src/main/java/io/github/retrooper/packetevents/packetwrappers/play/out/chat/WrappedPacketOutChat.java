@@ -680,15 +680,14 @@ package io.github.retrooper.packetevents.packetwrappers.play.out.chat;
 
 import io.github.retrooper.packetevents.packettype.PacketTypeClasses;
 import io.github.retrooper.packetevents.packetwrappers.NMSPacket;
-import io.github.retrooper.packetevents.packetwrappers.api.SendableWrapper;
 import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
+import io.github.retrooper.packetevents.packetwrappers.api.SendableWrapper;
 import io.github.retrooper.packetevents.utils.nms.NMSUtils;
 import io.github.retrooper.packetevents.utils.reflection.Reflection;
 import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.chat.ComponentSerializer;
 
 import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.UUID;
 
@@ -784,53 +783,26 @@ public final class WrappedPacketOutChat extends WrappedPacket implements Sendabl
     }
 
     @Override
-    public Object asNMSPacket() {
+    public Object asNMSPacket() throws Exception {
         byte chatPos = (byte) getChatPosition().ordinal();
         Object chatMessageTypeInstance = null;
         if (chatMessageTypeEnum != null) {
-            try {
-                chatMessageTypeInstance = chatMessageTypeCreatorMethod.invoke(null, chatPos);
-            } catch (IllegalAccessException | InvocationTargetException e) {
-                e.printStackTrace();
-            }
+            chatMessageTypeInstance = chatMessageTypeCreatorMethod.invoke(null, chatPos);
         }
         switch (constructorMode) {
             case -1:
-                try {
-                    return chatClassConstructor.newInstance(NMSUtils.generateIChatBaseComponent(getMessage()));
-                } catch (InstantiationException | InvocationTargetException | IllegalAccessException e) {
-                    e.printStackTrace();
-                }
+                return chatClassConstructor.newInstance(NMSUtils.generateIChatBaseComponent(getMessage()));
             case 0:
-                try {
-                    return chatClassConstructor.newInstance(NMSUtils.generateIChatBaseComponent(getMessage()), chatPos);
-                } catch (InstantiationException | InvocationTargetException | IllegalAccessException e) {
-                    e.printStackTrace();
-                }
-                break;
+                return chatClassConstructor.newInstance(NMSUtils.generateIChatBaseComponent(getMessage()), chatPos);
             case 1:
-                try {
-                    return chatClassConstructor.newInstance(NMSUtils.generateIChatBaseComponent(getMessage()), (int) chatPos);
-                } catch (InstantiationException | InvocationTargetException | IllegalAccessException e) {
-                    e.printStackTrace();
-                }
-                break;
+                return chatClassConstructor.newInstance(NMSUtils.generateIChatBaseComponent(getMessage()), (int) chatPos);
             case 2:
-                try {
-                    return chatClassConstructor.newInstance(NMSUtils.generateIChatBaseComponent(getMessage()), chatMessageTypeInstance);
-                } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
-                    e.printStackTrace();
-                }
-                break;
+                return chatClassConstructor.newInstance(NMSUtils.generateIChatBaseComponent(getMessage()), chatMessageTypeInstance);
             case 3:
-                try {
-                    return chatClassConstructor.newInstance(NMSUtils.generateIChatBaseComponent(getMessage()), chatMessageTypeInstance, uuid);
-                } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
-                    e.printStackTrace();
-                }
-                break;
+                return chatClassConstructor.newInstance(NMSUtils.generateIChatBaseComponent(getMessage()), chatMessageTypeInstance, uuid);
+            default:
+                return null;
         }
-        return null;
     }
 
     /**

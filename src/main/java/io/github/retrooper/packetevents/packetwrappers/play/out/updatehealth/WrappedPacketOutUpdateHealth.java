@@ -680,11 +680,10 @@ package io.github.retrooper.packetevents.packetwrappers.play.out.updatehealth;
 
 import io.github.retrooper.packetevents.packettype.PacketTypeClasses;
 import io.github.retrooper.packetevents.packetwrappers.NMSPacket;
-import io.github.retrooper.packetevents.packetwrappers.api.SendableWrapper;
 import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
+import io.github.retrooper.packetevents.packetwrappers.api.SendableWrapper;
 
 import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
 
 public final class WrappedPacketOutUpdateHealth extends WrappedPacket implements SendableWrapper {
     private static Constructor<?> packetConstructor;
@@ -761,12 +760,7 @@ public final class WrappedPacketOutUpdateHealth extends WrappedPacket implements
     }
 
     @Override
-    public Object asNMSPacket() {
-        try {
-            return packetConstructor.newInstance(getHealth(), getFood(), getFoodSaturation());
-        } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
-            e.printStackTrace();
-        }
-        return null;
+    public Object asNMSPacket() throws Exception {
+        return packetConstructor.newInstance(getHealth(), getFood(), getFoodSaturation());
     }
 }

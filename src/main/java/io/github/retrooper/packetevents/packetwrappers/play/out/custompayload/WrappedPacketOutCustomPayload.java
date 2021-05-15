@@ -681,13 +681,12 @@ package io.github.retrooper.packetevents.packetwrappers.play.out.custompayload;
 import io.github.retrooper.packetevents.PacketEvents;
 import io.github.retrooper.packetevents.packettype.PacketTypeClasses;
 import io.github.retrooper.packetevents.packetwrappers.NMSPacket;
-import io.github.retrooper.packetevents.packetwrappers.api.SendableWrapper;
 import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
+import io.github.retrooper.packetevents.packetwrappers.api.SendableWrapper;
 import io.github.retrooper.packetevents.utils.nms.NMSUtils;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Modifier;
 
 public class WrappedPacketOutCustomPayload extends WrappedPacket implements SendableWrapper {
@@ -834,35 +833,21 @@ public class WrappedPacketOutCustomPayload extends WrappedPacket implements Send
     }
 
     @Override
-    public Object asNMSPacket() {
+    public Object asNMSPacket() throws Exception {
         byte[] data = getData();
+        Object dataSerializer;
         switch (constructorMode) {
             case 0:
-                try {
-                    return constructor.newInstance(getTag(), data);
-                } catch (InstantiationException | InvocationTargetException | IllegalAccessException e) {
-                    e.printStackTrace();
-                }
-                break;
+                return constructor.newInstance(getTag(), data);
             case 1:
-                try {
-                    Object dataSerializer = packetDataSerializerConstructor.newInstance(PacketEvents.get().getByteBufUtil().newByteBuf(data));
-                    return constructor.newInstance(getTag(), dataSerializer);
-                } catch (InstantiationException | InvocationTargetException | IllegalAccessException e) {
-                    e.printStackTrace();
-                }
-                break;
+                dataSerializer = packetDataSerializerConstructor.newInstance(PacketEvents.get().getByteBufUtil().newByteBuf(data));
+                return constructor.newInstance(getTag(), dataSerializer);
             case 2:
-
-                try {
-                    Object minecraftKey = NMSUtils.generateMinecraftKey(getTag());
-                    Object dataSerializer = packetDataSerializerConstructor.newInstance(PacketEvents.get().getByteBufUtil().newByteBuf(data));
-                    return constructor.newInstance(minecraftKey, dataSerializer);
-                } catch (InstantiationException | InvocationTargetException | IllegalAccessException e) {
-                    e.printStackTrace();
-                }
-                break;
+                Object minecraftKey = NMSUtils.generateMinecraftKey(getTag());
+                dataSerializer = packetDataSerializerConstructor.newInstance(PacketEvents.get().getByteBufUtil().newByteBuf(data));
+                return constructor.newInstance(minecraftKey, dataSerializer);
+            default:
+                return null;
         }
-        return null;
     }
 }

@@ -844,7 +844,7 @@ public class WrappedPacketOutPlayerInfo extends WrappedPacket implements Sendabl
     }
 
     @Override
-    public Object asNMSPacket() {
+    public Object asNMSPacket() throws Exception {
         try {
             Object packetPlayOutPlayerInfoInstance = packetDefaultConstructor.newInstance();
             WrappedPacketOutPlayerInfo playerInfoWrapper = new WrappedPacketOutPlayerInfo(new NMSPacket(packetPlayOutPlayerInfoInstance));

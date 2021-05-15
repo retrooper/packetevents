@@ -680,15 +680,14 @@ package io.github.retrooper.packetevents.packetwrappers.play.out.entitydestroy;
 
 import io.github.retrooper.packetevents.packettype.PacketTypeClasses;
 import io.github.retrooper.packetevents.packetwrappers.NMSPacket;
-import io.github.retrooper.packetevents.packetwrappers.api.SendableWrapper;
 import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
+import io.github.retrooper.packetevents.packetwrappers.api.SendableWrapper;
 import io.github.retrooper.packetevents.utils.nms.NMSUtils;
 import org.bukkit.World;
 import org.bukkit.entity.Entity;
 import org.jetbrains.annotations.Nullable;
 
 import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
 
 /**
  * @author yanjulang
@@ -699,6 +698,7 @@ public class WrappedPacketOutEntityDestroy extends WrappedPacket implements Send
     private static Constructor<?> packetConstructor;
     private int[] entityIds;
     private Entity[] entities;
+
     public WrappedPacketOutEntityDestroy(NMSPacket packet) {
         super(packet);
     }
@@ -764,13 +764,7 @@ public class WrappedPacketOutEntityDestroy extends WrappedPacket implements Send
     }
 
     @Override
-    public Object asNMSPacket() {
-        try {
-            return packetConstructor.newInstance((Object) entityIds);
-        } catch (InstantiationException | InvocationTargetException
-                | IllegalAccessException e) {
-            e.printStackTrace();
-        }
-        return null;
+    public Object asNMSPacket() throws Exception {
+        return packetConstructor.newInstance((Object) entityIds);
     }
 }

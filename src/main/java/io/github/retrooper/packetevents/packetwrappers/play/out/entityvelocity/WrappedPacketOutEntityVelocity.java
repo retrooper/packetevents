@@ -686,7 +686,6 @@ import io.github.retrooper.packetevents.utils.nms.NMSUtils;
 import org.bukkit.entity.Entity;
 
 import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
 
 public final class WrappedPacketOutEntityVelocity extends WrappedPacketEntityAbstraction implements SendableWrapper {
     private static Constructor<?> velocityConstructor;
@@ -775,21 +774,12 @@ public final class WrappedPacketOutEntityVelocity extends WrappedPacketEntityAbs
     }
 
     @Override
-    public Object asNMSPacket() {
+    public Object asNMSPacket() throws Exception {
         if (!isVec3dPresent) {
-            try {
-                return velocityConstructor.newInstance(getEntityId(), getVelocityX(), getVelocityY(), getVelocityZ());
-            } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
-                e.printStackTrace();
-            }
+            return velocityConstructor.newInstance(getEntityId(), getVelocityX(), getVelocityY(), getVelocityZ());
         } else {
-            try {
-                return velocityConstructor.newInstance(getEntityId(), NMSUtils.generateVec3D(getVelocityX(), getVelocityY(), getVelocityZ()));
-            } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
-                e.printStackTrace();
-            }
+            return velocityConstructor.newInstance(getEntityId(), NMSUtils.generateVec3D(getVelocityX(), getVelocityY(), getVelocityZ()));
         }
-        return null;
     }
 
 }

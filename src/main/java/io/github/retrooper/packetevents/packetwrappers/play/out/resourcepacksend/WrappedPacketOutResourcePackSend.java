@@ -680,12 +680,11 @@ package io.github.retrooper.packetevents.packetwrappers.play.out.resourcepacksen
 
 import io.github.retrooper.packetevents.packettype.PacketTypeClasses;
 import io.github.retrooper.packetevents.packetwrappers.NMSPacket;
-import io.github.retrooper.packetevents.packetwrappers.api.SendableWrapper;
 import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
+import io.github.retrooper.packetevents.packetwrappers.api.SendableWrapper;
 import io.github.retrooper.packetevents.utils.server.ServerVersion;
 
 import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
 
 public class WrappedPacketOutResourcePackSend extends WrappedPacket implements SendableWrapper {
     private static Constructor<?> packetConstructor;
@@ -750,17 +749,12 @@ public class WrappedPacketOutResourcePackSend extends WrappedPacket implements S
     }
 
     @Override
-    public Object asNMSPacket() {
-        try {
-            return packetConstructor.newInstance(getUrl(), getHash());
-        } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
-            e.printStackTrace();
-        }
-        return null;
+    public boolean isSupported() {
+        return version.isNewerThan(ServerVersion.v_1_7_10);
     }
 
     @Override
-    public boolean isSupported() {
-        return version.isNewerThan(ServerVersion.v_1_7_10);
+    public Object asNMSPacket() throws Exception {
+        return packetConstructor.newInstance(getUrl(), getHash());
     }
 }

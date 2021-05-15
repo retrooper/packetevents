@@ -681,8 +681,8 @@ package io.github.retrooper.packetevents.packetwrappers.play.out.spawnentitylivi
 import io.github.retrooper.packetevents.packetwrappers.NMSPacket;
 import io.github.retrooper.packetevents.packetwrappers.api.SendableWrapper;
 import io.github.retrooper.packetevents.packetwrappers.api.helper.WrappedPacketEntityAbstraction;
-//TODO finish
-class WrappedPacketOutSpawnEntityLiving extends WrappedPacketEntityAbstraction implements SendableWrapper {
+//TODO finish wrapper
+class WrappedPacketOutSpawnEntityLiving extends WrappedPacketEntityAbstraction {
     public WrappedPacketOutSpawnEntityLiving(NMSPacket packet) {
         super(packet);
     }
@@ -703,9 +703,4 @@ class WrappedPacketOutSpawnEntityLiving extends WrappedPacketEntityAbstraction i
             return null;
         }
     }*/
-
-    @Override
-    public Object asNMSPacket() {
-        return null;
-    }
 }

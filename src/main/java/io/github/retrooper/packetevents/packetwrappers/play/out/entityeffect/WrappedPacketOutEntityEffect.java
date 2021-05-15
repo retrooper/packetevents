@@ -686,7 +686,6 @@ import io.github.retrooper.packetevents.utils.server.ServerVersion;
 import org.bukkit.entity.Entity;
 
 import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
 import java.util.Optional;
 
 public class WrappedPacketOutEntityEffect extends WrappedPacketEntityAbstraction implements SendableWrapper {
@@ -760,7 +759,7 @@ public class WrappedPacketOutEntityEffect extends WrappedPacketEntityAbstraction
 
     public void setEffectId(int effectID) {
         if (packet != null) {
-            writeByte(0, (byte)(this.effectID = effectID));
+            writeByte(0, (byte) (this.effectID = effectID));
         } else {
             this.effectID = effectID;
         }
@@ -779,7 +778,7 @@ public class WrappedPacketOutEntityEffect extends WrappedPacketEntityAbstraction
 
     public void setAmplifier(int amplifier) {
         if (packet != null) {
-            writeByte(1, (byte)(this.amplifier = amplifier));
+            writeByte(1, (byte) (this.amplifier = amplifier));
         } else {
             this.amplifier = amplifier;
         }
@@ -931,21 +930,16 @@ public class WrappedPacketOutEntityEffect extends WrappedPacketEntityAbstraction
     }
 
     @Override
-    public Object asNMSPacket() {
-        try {
-            Object packetPlayOutEntityEffectInstance = packetDefaultConstructor.newInstance();
-            WrappedPacketOutEntityEffect wrappedPacketOutEntityEffect =
-                    new WrappedPacketOutEntityEffect(new NMSPacket(packetPlayOutEntityEffectInstance));
-            wrappedPacketOutEntityEffect.setEntityId(getEntityId());
-            wrappedPacketOutEntityEffect.setEffectId(getEffectId());
-            wrappedPacketOutEntityEffect.setAmplifier(getAmplifier());
-            wrappedPacketOutEntityEffect.setDuration(getDuration());
-            Optional<Byte> optionalByteMask = getByteMask();
-            optionalByteMask.ifPresent(wrappedPacketOutEntityEffect::setByteMask);
-            return packetPlayOutEntityEffectInstance;
-        } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
-            e.printStackTrace();
-        }
-        return null;
+    public Object asNMSPacket() throws Exception {
+        Object packetPlayOutEntityEffectInstance = packetDefaultConstructor.newInstance();
+        WrappedPacketOutEntityEffect wrappedPacketOutEntityEffect =
+                new WrappedPacketOutEntityEffect(new NMSPacket(packetPlayOutEntityEffectInstance));
+        wrappedPacketOutEntityEffect.setEntityId(getEntityId());
+        wrappedPacketOutEntityEffect.setEffectId(getEffectId());
+        wrappedPacketOutEntityEffect.setAmplifier(getAmplifier());
+        wrappedPacketOutEntityEffect.setDuration(getDuration());
+        Optional<Byte> optionalByteMask = getByteMask();
+        optionalByteMask.ifPresent(wrappedPacketOutEntityEffect::setByteMask);
+        return packetPlayOutEntityEffectInstance;
     }
 }

@@ -772,7 +772,7 @@ public class WrappedPacketLoginOutCustomPayload extends WrappedPacket implements
     }
 
     @Override
-    public Object asNMSPacket() {
+    public Object asNMSPacket() throws Exception {
         Object byteBufObject = PacketEvents.get().getByteBufUtil().newByteBuf(data);
         try {
             Object minecraftKey = NMSUtils.generateMinecraftKey(channelName);

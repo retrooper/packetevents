@@ -687,7 +687,6 @@ import org.bukkit.Location;
 import org.bukkit.entity.Entity;
 
 import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
 
 public class WrappedPacketOutEntityTeleport extends WrappedPacketEntityAbstraction implements SendableWrapper {
     private static final float rotationMultiplier = 256.0F / 360.0F;
@@ -781,15 +780,13 @@ public class WrappedPacketOutEntityTeleport extends WrappedPacketEntityAbstracti
                 x = readInt(1) / 32.0D;
                 y = readInt(2) / 32.0D;
                 z = readInt(3) / 32.0D;
-            }
-            else {
+            } else {
                 x = readDouble(0);
                 y = readDouble(1);
                 z = readDouble(2);
             }
             return new Vector3d(x, y, z);
-        }
-        else {
+        } else {
             return position;
         }
     }
@@ -800,14 +797,12 @@ public class WrappedPacketOutEntityTeleport extends WrappedPacketEntityAbstracti
                 writeInt(1, floor(position.x * 32.0D));
                 writeInt(2, floor(position.y * 32.0D));
                 writeInt(3, floor(position.z * 32.0D));
-            }
-            else {
+            } else {
                 writeDouble(0, position.x);
                 writeDouble(1, position.y);
                 writeDouble(2, position.z);
             }
-        }
-        else {
+        } else {
             this.position = position;
         }
     }
@@ -861,32 +856,19 @@ public class WrappedPacketOutEntityTeleport extends WrappedPacketEntityAbstracti
     }
 
     @Override
-    public Object asNMSPacket() {
+    public Object asNMSPacket() throws Exception {
         Vector3d pos = getPosition();
         if (ultraLegacyVersionMode) {
             //1.7.10
-            try {
-                return constructor.newInstance(entityID, floor(pos.x * 32.0D), floor(pos.y * 32.0D), floor(pos.z * 32.0D),
-                        (byte) ((int) getYaw() * rotationMultiplier), (byte) (int) (getPitch() * rotationMultiplier), false, false);
-            } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
-                e.printStackTrace();
-            }
+            return constructor.newInstance(entityID, floor(pos.x * 32.0D), floor(pos.y * 32.0D), floor(pos.z * 32.0D),
+                    (byte) ((int) getYaw() * rotationMultiplier), (byte) (int) (getPitch() * rotationMultiplier), false, false);
         } else if (legacyVersionMode) {
             //1.8.x
-            try {
-                return constructor.newInstance(entityID, floor(pos.x * 32.0D), floor(pos.y * 32.0D), floor(pos.z * 32.0D),
-                        (byte) ((int) getYaw() * rotationMultiplier), (byte) (int) (getPitch() * rotationMultiplier), false);
-            } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
-                e.printStackTrace();
-            }
+            return constructor.newInstance(entityID, floor(pos.x * 32.0D), floor(pos.y * 32.0D), floor(pos.z * 32.0D),
+                    (byte) ((int) getYaw() * rotationMultiplier), (byte) (int) (getPitch() * rotationMultiplier), false);
         } else {
             //newer versions
-            Object instance = null;
-            try {
-                instance = constructor.newInstance();
-            } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
-                e.printStackTrace();
-            }
+            Object instance = constructor.newInstance();
 
             WrappedPacketOutEntityTeleport instanceWrapper = new WrappedPacketOutEntityTeleport(new NMSPacket(instance));
             instanceWrapper.setEntityId(getEntityId());
@@ -900,6 +882,5 @@ public class WrappedPacketOutEntityTeleport extends WrappedPacketEntityAbstracti
             }
             return instance;
         }
-        return null;
     }
 }

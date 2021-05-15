@@ -732,7 +732,7 @@ public class WrappedPacketLoginOutSetCompression extends WrappedPacket implement
     }
 
     @Override
-    public Object asNMSPacket() {
+    public Object asNMSPacket() throws Exception {
         try {
             return constructor.newInstance(getThreshold());
         } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {

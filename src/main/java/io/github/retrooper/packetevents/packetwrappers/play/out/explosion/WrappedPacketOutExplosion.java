@@ -679,8 +679,8 @@
 package io.github.retrooper.packetevents.packetwrappers.play.out.explosion;
 
 import io.github.retrooper.packetevents.packetwrappers.NMSPacket;
-import io.github.retrooper.packetevents.packetwrappers.api.SendableWrapper;
 import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
+import io.github.retrooper.packetevents.packetwrappers.api.SendableWrapper;
 import io.github.retrooper.packetevents.utils.nms.NMSUtils;
 import io.github.retrooper.packetevents.utils.server.ServerVersion;
 import io.github.retrooper.packetevents.utils.vector.Vector3i;
@@ -893,26 +893,15 @@ public class WrappedPacketOutExplosion extends WrappedPacket implements Sendable
     }
 
     @Override
-    public Object asNMSPacket() {
+    public Object asNMSPacket() throws Exception {
         List<Object> positions = new ArrayList<>();
         for (Vector3i record : getRecords()) {
             Object[] arguments = {record.x, record.y, record.z};
-            Object position = null;
-            try {
-                position = version.isNewerThan(ServerVersion.v_1_7_10) ? blockPosConstructor.newInstance(arguments)
-                        : chunkPosConstructor.newInstance(arguments);
-            } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
-                e.printStackTrace();
-            }
+            Object position = version.isNewerThan(ServerVersion.v_1_7_10) ? blockPosConstructor.newInstance(arguments)
+                    : chunkPosConstructor.newInstance(arguments);
             positions.add(position);
-
         }
-        try {
-            Object vec = vec3dConstructor.newInstance(getPlayerMotionX(), getPlayerMotionY(), getPlayerMotionZ());
-            return packetConstructor.newInstance(getX(), getY(), getZ(), getStrength(), positions, vec);
-        } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
-            e.printStackTrace();
-        }
-        return null;
+        Object vec = vec3dConstructor.newInstance(getPlayerMotionX(), getPlayerMotionY(), getPlayerMotionZ());
+        return packetConstructor.newInstance(getX(), getY(), getZ(), getStrength(), positions, vec);
     }
 }

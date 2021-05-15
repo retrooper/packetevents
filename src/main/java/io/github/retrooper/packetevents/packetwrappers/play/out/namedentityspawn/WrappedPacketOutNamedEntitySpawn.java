@@ -689,7 +689,6 @@ import org.bukkit.Location;
 import org.bukkit.entity.Entity;
 
 import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
 import java.util.UUID;
 
 public class WrappedPacketOutNamedEntitySpawn extends WrappedPacketEntityAbstraction implements SendableWrapper {
@@ -837,24 +836,18 @@ public class WrappedPacketOutNamedEntitySpawn extends WrappedPacketEntityAbstrac
     }
 
     @Override
-    public Object asNMSPacket() {
-        try {
-            Object packetPlayOutNamedEntitySpawnInstance = packetDefaultConstructor.newInstance();
-            WrappedPacketOutNamedEntitySpawn wrappedPacketOutNamedEntitySpawn = new WrappedPacketOutNamedEntitySpawn(new NMSPacket(packetPlayOutNamedEntitySpawnInstance));
-            wrappedPacketOutNamedEntitySpawn.setEntityId(getEntityId());
-            wrappedPacketOutNamedEntitySpawn.setUUID(getUUID());
-            wrappedPacketOutNamedEntitySpawn.setPosition(getPosition());
-            wrappedPacketOutNamedEntitySpawn.setYaw(getYaw());
-            wrappedPacketOutNamedEntitySpawn.setPitch(getPitch());
-            if (dataWatcherPresent) {
-                wrappedPacketOutNamedEntitySpawn.write(NMSUtils.dataWatcherClass, 0, NMSUtils.generateDataWatcher(null));
-            }
-
-            return packetPlayOutNamedEntitySpawnInstance;
-
-        } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
-            e.printStackTrace();
+    public Object asNMSPacket() throws Exception {
+        Object packetPlayOutNamedEntitySpawnInstance = packetDefaultConstructor.newInstance();
+        WrappedPacketOutNamedEntitySpawn wrappedPacketOutNamedEntitySpawn = new WrappedPacketOutNamedEntitySpawn(new NMSPacket(packetPlayOutNamedEntitySpawnInstance));
+        wrappedPacketOutNamedEntitySpawn.setEntityId(getEntityId());
+        wrappedPacketOutNamedEntitySpawn.setUUID(getUUID());
+        wrappedPacketOutNamedEntitySpawn.setPosition(getPosition());
+        wrappedPacketOutNamedEntitySpawn.setYaw(getYaw());
+        wrappedPacketOutNamedEntitySpawn.setPitch(getPitch());
+        if (dataWatcherPresent) {
+            wrappedPacketOutNamedEntitySpawn.write(NMSUtils.dataWatcherClass, 0, NMSUtils.generateDataWatcher(null));
         }
-        return null;
+
+        return packetPlayOutNamedEntitySpawnInstance;
     }
 }

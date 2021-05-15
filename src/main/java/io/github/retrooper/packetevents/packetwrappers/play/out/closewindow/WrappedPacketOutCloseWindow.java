@@ -680,11 +680,10 @@ package io.github.retrooper.packetevents.packetwrappers.play.out.closewindow;
 
 import io.github.retrooper.packetevents.packettype.PacketTypeClasses;
 import io.github.retrooper.packetevents.packetwrappers.NMSPacket;
-import io.github.retrooper.packetevents.packetwrappers.api.SendableWrapper;
 import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
+import io.github.retrooper.packetevents.packetwrappers.api.SendableWrapper;
 
 import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
 
 public class WrappedPacketOutCloseWindow extends WrappedPacket implements SendableWrapper {
     private static Constructor<?> constructor;
@@ -723,12 +722,7 @@ public class WrappedPacketOutCloseWindow extends WrappedPacket implements Sendab
     }
 
     @Override
-    public Object asNMSPacket() {
-        try {
-            return constructor.newInstance(getWindowId());
-        } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
-            e.printStackTrace();
-        }
-        return null;
+    public Object asNMSPacket() throws Exception {
+        return constructor.newInstance(getWindowId());
     }
 }

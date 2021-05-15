@@ -687,7 +687,6 @@ import io.github.retrooper.packetevents.utils.server.ServerVersion;
 import org.bukkit.entity.Entity;
 
 import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
 
 public class WrappedPacketOutRemoveEntityEffect extends WrappedPacketEntityAbstraction implements SendableWrapper {
     private static Constructor<?> packetDefaultConstructor;
@@ -741,17 +740,12 @@ public class WrappedPacketOutRemoveEntityEffect extends WrappedPacketEntityAbstr
     }
 
     @Override
-    public Object asNMSPacket() {
-        try {
-            Object packetPlayOutRemoveEntityEffectInstance = packetDefaultConstructor.newInstance();
-            WrappedPacketOutRemoveEntityEffect wrappedPacketOutRemoveEntityEffect =
-                    new WrappedPacketOutRemoveEntityEffect(new NMSPacket(packetPlayOutRemoveEntityEffectInstance));
-            wrappedPacketOutRemoveEntityEffect.setEntityId(getEntityId());
-            wrappedPacketOutRemoveEntityEffect.setEffectId(getEffectId());
-            return packetPlayOutRemoveEntityEffectInstance;
-        } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
-            e.printStackTrace();
-        }
-        return null;
+    public Object asNMSPacket() throws Exception {
+        Object packetPlayOutRemoveEntityEffectInstance = packetDefaultConstructor.newInstance();
+        WrappedPacketOutRemoveEntityEffect wrappedPacketOutRemoveEntityEffect =
+                new WrappedPacketOutRemoveEntityEffect(new NMSPacket(packetPlayOutRemoveEntityEffectInstance));
+        wrappedPacketOutRemoveEntityEffect.setEntityId(getEntityId());
+        wrappedPacketOutRemoveEntityEffect.setEffectId(getEffectId());
+        return packetPlayOutRemoveEntityEffectInstance;
     }
 }

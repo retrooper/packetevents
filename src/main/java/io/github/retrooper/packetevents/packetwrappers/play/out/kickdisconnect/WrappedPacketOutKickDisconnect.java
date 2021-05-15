@@ -680,12 +680,11 @@ package io.github.retrooper.packetevents.packetwrappers.play.out.kickdisconnect;
 
 import io.github.retrooper.packetevents.packettype.PacketTypeClasses;
 import io.github.retrooper.packetevents.packetwrappers.NMSPacket;
-import io.github.retrooper.packetevents.packetwrappers.api.SendableWrapper;
 import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
+import io.github.retrooper.packetevents.packetwrappers.api.SendableWrapper;
 import io.github.retrooper.packetevents.utils.nms.NMSUtils;
 
 import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
 
 public final class WrappedPacketOutKickDisconnect extends WrappedPacket implements SendableWrapper {
     private static Constructor<?> kickDisconnectConstructor;
@@ -731,12 +730,7 @@ public final class WrappedPacketOutKickDisconnect extends WrappedPacket implemen
     }
 
     @Override
-    public Object asNMSPacket() {
-        try {
-            return kickDisconnectConstructor.newInstance(NMSUtils.generateIChatBaseComponent(NMSUtils.fromStringToJSON(getKickMessage())));
-        } catch (InstantiationException | InvocationTargetException | IllegalAccessException e) {
-            e.printStackTrace();
-        }
-        return null;
+    public Object asNMSPacket() throws Exception {
+        return kickDisconnectConstructor.newInstance(NMSUtils.generateIChatBaseComponent(NMSUtils.fromStringToJSON(getKickMessage())));
     }
 }

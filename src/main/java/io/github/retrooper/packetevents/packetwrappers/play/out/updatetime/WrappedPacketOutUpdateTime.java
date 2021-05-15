@@ -680,11 +680,10 @@ package io.github.retrooper.packetevents.packetwrappers.play.out.updatetime;
 
 import io.github.retrooper.packetevents.packettype.PacketTypeClasses;
 import io.github.retrooper.packetevents.packetwrappers.NMSPacket;
-import io.github.retrooper.packetevents.packetwrappers.api.SendableWrapper;
 import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
+import io.github.retrooper.packetevents.packetwrappers.api.SendableWrapper;
 
 import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
 
 public class WrappedPacketOutUpdateTime extends WrappedPacket implements SendableWrapper {
     private static Constructor<?> packetConstructor;
@@ -740,12 +739,7 @@ public class WrappedPacketOutUpdateTime extends WrappedPacket implements Sendabl
     }
 
     @Override
-    public Object asNMSPacket() {
-        try {
-            return packetConstructor.newInstance(getWorldAgeTicks(), getTimeOfDayTicks(), true);
-        } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
-            e.printStackTrace();
-        }
-        return null;
+    public Object asNMSPacket() throws Exception {
+        return packetConstructor.newInstance(getWorldAgeTicks(), getTimeOfDayTicks(), true);
     }
 }

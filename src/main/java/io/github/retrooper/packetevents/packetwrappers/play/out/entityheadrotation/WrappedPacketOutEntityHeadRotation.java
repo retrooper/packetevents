@@ -685,7 +685,6 @@ import io.github.retrooper.packetevents.packetwrappers.api.helper.WrappedPacketE
 import org.bukkit.entity.Entity;
 
 import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
 
 public class WrappedPacketOutEntityHeadRotation extends WrappedPacketEntityAbstraction implements SendableWrapper {
     private static Constructor<?> packetDefaultConstructor;
@@ -718,8 +717,7 @@ public class WrappedPacketOutEntityHeadRotation extends WrappedPacketEntityAbstr
     public byte getYaw() {
         if (packet != null) {
             return readByte(0);
-        }
-        else {
+        } else {
             return yaw;
         }
     }
@@ -727,23 +725,17 @@ public class WrappedPacketOutEntityHeadRotation extends WrappedPacketEntityAbstr
     public void setYaw(byte yaw) {
         if (packet != null) {
             writeByte(0, yaw);
-        }
-        else {
+        } else {
             this.yaw = yaw;
         }
     }
 
     @Override
-    public Object asNMSPacket() {
-        try {
-            Object packetInstance = packetDefaultConstructor.newInstance();
-            WrappedPacketOutEntityHeadRotation wrappedPacketOutEntityHeadRotation = new WrappedPacketOutEntityHeadRotation(new NMSPacket(packetInstance));
-            wrappedPacketOutEntityHeadRotation.setYaw(getYaw());
-            wrappedPacketOutEntityHeadRotation.setEntityId(getEntityId());
-            return packetInstance;
-        } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
-            e.printStackTrace();
-        }
-        return null;
+    public Object asNMSPacket() throws Exception {
+        Object packetInstance = packetDefaultConstructor.newInstance();
+        WrappedPacketOutEntityHeadRotation wrappedPacketOutEntityHeadRotation = new WrappedPacketOutEntityHeadRotation(new NMSPacket(packetInstance));
+        wrappedPacketOutEntityHeadRotation.setYaw(getYaw());
+        wrappedPacketOutEntityHeadRotation.setEntityId(getEntityId());
+        return packetInstance;
     }
 }

@@ -939,7 +939,7 @@ public class WrappedPacketOutEntity extends WrappedPacketEntityAbstraction imple
     }
 
     @Override
-    public Object asNMSPacket() {
+    public Object asNMSPacket() throws Exception {
         try {
             Object packetInstance = entityPacketConstructor.newInstance(getEntityId());
             WrappedPacketOutEntity wrapper = new WrappedPacketOutEntity(new NMSPacket(packetInstance));
@@ -977,20 +977,15 @@ public class WrappedPacketOutEntity extends WrappedPacketEntityAbstraction imple
         }
 
         @Override
-        public Object asNMSPacket() {
-            try {
-                Object packetInstance = entityLookConstructor.newInstance();
-                WrappedPacketOutEntityLook wrapper = new WrappedPacketOutEntityLook(new NMSPacket(packetInstance));
-                wrapper.setEntityId(getEntityId());
-                wrapper.setYaw(getYaw());
-                wrapper.setPitch(getPitch());
-                wrapper.setOnGround(isOnGround());
-                wrapper.setLook(true);
-                return packetInstance;
-            } catch (InstantiationException | InvocationTargetException | IllegalAccessException e) {
-                e.printStackTrace();
-            }
-            return null;
+        public Object asNMSPacket() throws Exception {
+            Object packetInstance = entityLookConstructor.newInstance();
+            WrappedPacketOutEntityLook wrapper = new WrappedPacketOutEntityLook(new NMSPacket(packetInstance));
+            wrapper.setEntityId(getEntityId());
+            wrapper.setYaw(getYaw());
+            wrapper.setPitch(getPitch());
+            wrapper.setOnGround(isOnGround());
+            wrapper.setLook(true);
+            return packetInstance;
         }
     }
 
@@ -1014,21 +1009,16 @@ public class WrappedPacketOutEntity extends WrappedPacketEntityAbstraction imple
         }
 
         @Override
-        public Object asNMSPacket() {
-            try {
-                Object packetInstance = entityRelMovePacketConstructor.newInstance();
-                WrappedPacketOutRelEntityMove wrapper = new WrappedPacketOutRelEntityMove(new NMSPacket(packetInstance));
-                wrapper.setEntityId(getEntityId());
-                wrapper.setDeltaX(getDeltaX());
-                wrapper.setDeltaY(getDeltaY());
-                wrapper.setDeltaZ(getDeltaZ());
-                wrapper.setOnGround(isOnGround());
-                wrapper.setLook(false);
-                return packetInstance;
-            } catch (InstantiationException | InvocationTargetException | IllegalAccessException e) {
-                e.printStackTrace();
-            }
-            return null;
+        public Object asNMSPacket() throws Exception {
+            Object packetInstance = entityRelMovePacketConstructor.newInstance();
+            WrappedPacketOutRelEntityMove wrapper = new WrappedPacketOutRelEntityMove(new NMSPacket(packetInstance));
+            wrapper.setEntityId(getEntityId());
+            wrapper.setDeltaX(getDeltaX());
+            wrapper.setDeltaY(getDeltaY());
+            wrapper.setDeltaZ(getDeltaZ());
+            wrapper.setOnGround(isOnGround());
+            wrapper.setLook(false);
+            return packetInstance;
         }
     }
 
@@ -1052,23 +1042,18 @@ public class WrappedPacketOutEntity extends WrappedPacketEntityAbstraction imple
         }
 
         @Override
-        public Object asNMSPacket() {
-            try {
-                Object packetInstance = entityRelMoveLookConstructor.newInstance();
-                WrappedPacketOutRelEntityMoveLook wrapper = new WrappedPacketOutRelEntityMoveLook(new NMSPacket(packetInstance));
-                wrapper.setEntityId(getEntityId());
-                wrapper.setDeltaX(getDeltaX());
-                wrapper.setDeltaY(getDeltaY());
-                wrapper.setDeltaZ(getDeltaZ());
-                wrapper.setYaw(getYaw());
-                wrapper.setPitch(getPitch());
-                wrapper.setOnGround(isOnGround());
-                wrapper.setLook(true);
-                return packetInstance;
-            } catch (InstantiationException | InvocationTargetException | IllegalAccessException e) {
-                e.printStackTrace();
-            }
-            return null;
+        public Object asNMSPacket() throws Exception {
+            Object packetInstance = entityRelMoveLookConstructor.newInstance();
+            WrappedPacketOutRelEntityMoveLook wrapper = new WrappedPacketOutRelEntityMoveLook(new NMSPacket(packetInstance));
+            wrapper.setEntityId(getEntityId());
+            wrapper.setDeltaX(getDeltaX());
+            wrapper.setDeltaY(getDeltaY());
+            wrapper.setDeltaZ(getDeltaZ());
+            wrapper.setYaw(getYaw());
+            wrapper.setPitch(getPitch());
+            wrapper.setOnGround(isOnGround());
+            wrapper.setLook(true);
+            return packetInstance;
         }
     }
 }

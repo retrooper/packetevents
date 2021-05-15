@@ -685,7 +685,6 @@ import io.github.retrooper.packetevents.packetwrappers.api.helper.WrappedPacketE
 import io.github.retrooper.packetevents.utils.server.ServerVersion;
 
 import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
 
 /**
  * Wrapper for the OpenWindowHorse packet.
@@ -714,8 +713,7 @@ public final class WrappedPacketOutOpenWindowHorse extends WrappedPacketEntityAb
     public int getWindowId() {
         if (packet != null) {
             return readInt(0);
-        }
-        else {
+        } else {
             return windowID;
         }
     }
@@ -723,8 +721,7 @@ public final class WrappedPacketOutOpenWindowHorse extends WrappedPacketEntityAb
     public void setWindowId(int windowID) {
         if (packet != null) {
             writeInt(0, windowID);
-        }
-        else {
+        } else {
             this.windowID = windowID;
         }
     }
@@ -732,8 +729,7 @@ public final class WrappedPacketOutOpenWindowHorse extends WrappedPacketEntityAb
     public int getSlotCount() {
         if (packet != null) {
             return readInt(1);
-        }
-        else {
+        } else {
             return slotCount;
         }
     }
@@ -741,24 +737,18 @@ public final class WrappedPacketOutOpenWindowHorse extends WrappedPacketEntityAb
     public void setSlotCount(int slotCount) {
         if (packet != null) {
             writeInt(1, slotCount);
-        }
-        else {
+        } else {
             this.slotCount = slotCount;
         }
     }
 
     @Override
-    public Object asNMSPacket() {
-        try {
-            return packetConstructor.newInstance(getWindowId(),getSlotCount(), getEntityId());
-        } catch (InstantiationException | InvocationTargetException | IllegalAccessException e) {
-            e.printStackTrace();
-        }
-        return null;
+    public boolean isSupported() {
+        return version.isNewerThan(ServerVersion.v_1_15_2);
     }
 
     @Override
-    public boolean isSupported() {
-        return version.isNewerThan(ServerVersion.v_1_15_2);
+    public Object asNMSPacket() throws Exception {
+        return packetConstructor.newInstance(getWindowId(), getSlotCount(), getEntityId());
     }
 }

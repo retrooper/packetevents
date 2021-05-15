@@ -686,7 +686,6 @@ import io.github.retrooper.packetevents.utils.server.ServerVersion;
 import org.bukkit.entity.Entity;
 
 import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
 
 public class WrappedPacketOutMount extends WrappedPacketEntityAbstraction implements SendableWrapper {
     private static Constructor<?> packetDefaultConstructor;
@@ -738,13 +737,8 @@ public class WrappedPacketOutMount extends WrappedPacketEntityAbstraction implem
     }
 
     @Override
-    public Object asNMSPacket() {
-        Object packetInstance = null;
-        try {
-            packetInstance = packetDefaultConstructor.newInstance();
-        } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
-            e.printStackTrace();
-        }
+    public Object asNMSPacket() throws Exception {
+        Object packetInstance = packetDefaultConstructor.newInstance();
         WrappedPacketOutMount wrappedPacketOutMount = new WrappedPacketOutMount(new NMSPacket(packetInstance));
         wrappedPacketOutMount.setPassengerIds(getPassengerIds());
         return packetInstance;

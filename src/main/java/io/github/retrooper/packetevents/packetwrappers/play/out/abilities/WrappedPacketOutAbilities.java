@@ -680,8 +680,8 @@ package io.github.retrooper.packetevents.packetwrappers.play.out.abilities;
 
 import io.github.retrooper.packetevents.packettype.PacketTypeClasses;
 import io.github.retrooper.packetevents.packetwrappers.NMSPacket;
-import io.github.retrooper.packetevents.packetwrappers.api.SendableWrapper;
 import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
+import io.github.retrooper.packetevents.packetwrappers.api.SendableWrapper;
 import io.github.retrooper.packetevents.utils.nms.NMSUtils;
 
 import java.lang.reflect.Constructor;
@@ -845,12 +845,7 @@ public final class WrappedPacketOutAbilities extends WrappedPacket implements Se
     }
 
     @Override
-    public Object asNMSPacket() {
-        try {
-            return packetConstructor.newInstance(getPlayerAbilities(isVulnerable(), isFlying(), isFlightAllowed(), canBuildInstantly(), getFlySpeed(), getWalkSpeed()));
-        } catch (InstantiationException | InvocationTargetException | IllegalAccessException e) {
-            e.printStackTrace();
-        }
-        return null;
+    public Object asNMSPacket() throws Exception {
+        return packetConstructor.newInstance(getPlayerAbilities(isVulnerable(), isFlying(), isFlightAllowed(), canBuildInstantly(), getFlySpeed(), getWalkSpeed()));
     }
 }

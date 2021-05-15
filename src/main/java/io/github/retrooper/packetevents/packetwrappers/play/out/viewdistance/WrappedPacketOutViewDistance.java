@@ -680,12 +680,11 @@ package io.github.retrooper.packetevents.packetwrappers.play.out.viewdistance;
 
 import io.github.retrooper.packetevents.packettype.PacketTypeClasses;
 import io.github.retrooper.packetevents.packetwrappers.NMSPacket;
-import io.github.retrooper.packetevents.packetwrappers.api.SendableWrapper;
 import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
+import io.github.retrooper.packetevents.packetwrappers.api.SendableWrapper;
 import io.github.retrooper.packetevents.utils.server.ServerVersion;
 
 import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
 
 public class WrappedPacketOutViewDistance extends WrappedPacket implements SendableWrapper {
     private static Constructor<?> packetConstructor;
@@ -725,13 +724,8 @@ public class WrappedPacketOutViewDistance extends WrappedPacket implements Senda
     }
 
     @Override
-    public Object asNMSPacket() {
-        try {
-            return packetConstructor.newInstance(getViewDistance());
-        } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
-            e.printStackTrace();
-        }
-        return null;
+    public Object asNMSPacket() throws Exception {
+        return packetConstructor.newInstance(getViewDistance());
     }
 
     @Override

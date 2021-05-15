@@ -680,16 +680,14 @@ package io.github.retrooper.packetevents.packetwrappers.play.out.gamestatechange
 
 import io.github.retrooper.packetevents.packettype.PacketTypeClasses;
 import io.github.retrooper.packetevents.packetwrappers.NMSPacket;
-import io.github.retrooper.packetevents.packetwrappers.api.SendableWrapper;
 import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
+import io.github.retrooper.packetevents.packetwrappers.api.SendableWrapper;
 import io.github.retrooper.packetevents.utils.reflection.Reflection;
 import io.github.retrooper.packetevents.utils.reflection.SubclassUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 
 import java.lang.reflect.Constructor;
-import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
 
 public class WrappedPacketOutGameStateChange extends WrappedPacket implements SendableWrapper {
     private static Constructor<?> packetConstructor, reasonClassConstructor;
@@ -798,34 +796,20 @@ public class WrappedPacketOutGameStateChange extends WrappedPacket implements Se
     }
 
     @Override
-    public Object asNMSPacket() {
+    public Object asNMSPacket() throws Exception {
         if (reasonClassType == null) {
-            try {
-                if (valueFloatMode) {
-                    return packetConstructor.newInstance(getReason(), (float) getValue());
-                } else {
-                    return packetConstructor.newInstance(getReason(), getValue());
-                }
-            } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
-                e.printStackTrace();
+            if (valueFloatMode) {
+                return packetConstructor.newInstance(getReason(), (float) getValue());
+            } else {
+                return packetConstructor.newInstance(getReason(), getValue());
             }
         } else {
-            Object reasonObject = null;
-            try {
-                reasonObject = reasonClassConstructor.newInstance(getReason());
-            } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
-                e.printStackTrace();
-            }
-            try {
-                if (valueFloatMode) {
-                    return packetConstructor.newInstance(reasonObject, (float) getValue());
-                } else {
-                    return packetConstructor.newInstance(reasonObject, getValue());
-                }
-            } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
-                e.printStackTrace();
+            Object reasonObject = reasonClassConstructor.newInstance(getReason());
+            if (valueFloatMode) {
+                return packetConstructor.newInstance(reasonObject, (float) getValue());
+            } else {
+                return packetConstructor.newInstance(reasonObject, getValue());
             }
         }
-        return null;
     }
 }

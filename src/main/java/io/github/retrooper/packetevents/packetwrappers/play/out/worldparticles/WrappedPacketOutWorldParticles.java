@@ -683,14 +683,10 @@ import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
 import io.github.retrooper.packetevents.utils.nms.NMSUtils;
 import io.github.retrooper.packetevents.utils.reflection.Reflection;
 import io.github.retrooper.packetevents.utils.server.ServerVersion;
-import org.jetbrains.annotations.Nullable;
 
-import javax.print.DocFlavor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.Map;
 import java.util.Optional;
-import java.util.concurrent.ConcurrentHashMap;
 
 //TODO finish this wrapper and test
 public class WrappedPacketOutWorldParticles extends WrappedPacket {
@@ -770,8 +766,7 @@ public class WrappedPacketOutWorldParticles extends WrappedPacket {
     public void setY(float y) {
         if (packet != null) {
             writeFloat(1, y);
-        }
-        else {
+        } else {
             this.y = y;
         }
     }
@@ -787,8 +782,7 @@ public class WrappedPacketOutWorldParticles extends WrappedPacket {
     public void setZ(float z) {
         if (packet != null) {
             writeFloat(2, z);
-        }
-        else {
+        } else {
             this.z = z;
         }
     }
@@ -804,8 +798,7 @@ public class WrappedPacketOutWorldParticles extends WrappedPacket {
     public void setOffsetX(float offsetX) {
         if (packet != null) {
             writeFloat(3, offsetX);
-        }
-        else {
+        } else {
             this.offsetX = offsetX;
         }
     }
@@ -821,8 +814,7 @@ public class WrappedPacketOutWorldParticles extends WrappedPacket {
     public void setOffsetY(float offsetY) {
         if (packet != null) {
             writeFloat(4, offsetY);
-        }
-        else {
+        } else {
             this.offsetY = offsetY;
         }
     }
@@ -838,8 +830,7 @@ public class WrappedPacketOutWorldParticles extends WrappedPacket {
     public void setOffsetZ(float offsetZ) {
         if (packet != null) {
             writeFloat(5, offsetZ);
-        }
-        else {
+        } else {
             this.offsetZ = offsetZ;
         }
     }
@@ -855,8 +846,7 @@ public class WrappedPacketOutWorldParticles extends WrappedPacket {
     public void setParticleData(float particleData) {
         if (packet != null) {
             writeFloat(6, particleData);
-        }
-        else {
+        } else {
             this.particleData = particleData;
         }
     }
@@ -872,8 +862,7 @@ public class WrappedPacketOutWorldParticles extends WrappedPacket {
     public void setParticleCount(int particleCount) {
         if (packet != null) {
             writeInt(0, particleCount);
-        }
-        else {
+        } else {
             this.particleCount = particleCount;
         }
     }
@@ -921,94 +910,4 @@ public class WrappedPacketOutWorldParticles extends WrappedPacket {
             this.longDistance = longDistance;
         }
     }
-/*
-    public enum Particle {
-        EXPLOSION_NORMAL("explode"),
-        EXPLOSION_LARGE("largeexplode"),
-        EXPLOSION_HUGE("hugeexplosion"),
-        FIREWORKS_SPARK("fireworksSpark"),
-        WATER_BUBBLE("bubble"),
-        WATER_SPLASH("splash"),
-        WATER_WAKE("wake"),
-        SUSPENDED("suspended"),
-        SUSPENDED_DEPTH("depthsuspend"),
-        CRIT("crit"),
-        CRIT_MAGIC("magicCrit"),
-        SMOKE_NORMAL("smoke"),
-        SMOKE_LARGE("largesmoke"),
-        SPELL("spell"),
-        SPELL_INSTANT("instantSpell"),
-        SPELL_MOB("mobSpell"),
-        SPELL_MOB_AMBIENT("mobSpellAmbient"),
-        SPELL_WITCH("witchMagic"),
-        DRIP_WATER("dripWater"),
-        DRIP_LAVA("dripLava"),
-        VILLAGER_ANGRY("angryVillager"),
-        VILLAGER_HAPPY("happyVillager"),
-        TOWN_AURA("townaura"),
-        NOTE("note"),
-        PORTAL("portal"),
-        ENCHANTMENT_TABLE("enchantmenttable"),
-        FLAME("flame"),
-        LAVA("lava"),
-        FOOTSTEP("footstep"),
-        CLOUD("cloud"),
-        REDSTONE("reddust"),
-        SNOWBALL("snowballpoof"),
-        SNOW_SHOVEL("snowshovel"),
-        SLIME("slime"),
-        HEART("heart"),
-        BARRIER("barrier"),
-        ITEM_CRACK("iconcrack"),
-        BLOCK_CRACK("blockcrack"),
-        BLOCK_DUST("blockdust"),
-        WATER_DROP("droplet"),
-        ITEM_TAKE("take"),
-        MOB_APPEARANCE("mobappearance"),
-        DRAGON_BREATH("dragonbreath"),
-        END_ROD("endRod"),
-        DAMAGE_INDICATOR("damageIndicator"),
-        SWEEP_ATTACK("sweepAttack"),
-        TOTEM_OF_UNDYING("totem_of_undying"),
-        UNDERWATER("underwater"),
-        SPLASH("splash"),
-        WITCH("witch"),
-        BUBBLE_POP("bubble_pop"),
-        CURRENT_DOWN("current_down"),
-        BUBBLE_COLUMN_UP("bubble_column_up"),
-        NAUTILUS("nautilus"),
-        DOLPHIN("dolphin"),
-        CAMPFIRE_COSY_SMOKE("campfire_cosy_smoke"),
-        DRIPPING_HONEY("dripping_honey"),
-        FALLING_HONEY("falling_honey"),
-        LANDING_HONEY("landing_honey"),
-        FALLING_NECTAR("falling_nectar"),
-        ASH("ash"),
-        CRIMSON_SPORE("crimson_spore"),
-        WARPED_SPORE("warped_spore"),
-        DRIPPING_OBSIDIAN_TEAR("dripping_obsidian_tear"),
-        FALLING_OBSIDIAN_TEAR("falling_obsidian_tear"),
-        LANDING_OBSIDIAN_TEAR("landing_obsidian_tear"),
-        REVERSE_PORTAL("reverse_portal"),
-        WHITE_ASH("white_ash");
-        public static final Particle[] VALUES = values();
-        private final String name;
-
-        Particle(String name) {
-            this.name = name;
-        }
-
-        @Nullable
-        public static Particle getParticleByName(String name) {
-            if (name == null) {
-                return null;
-            }
-            for (Particle particle : values()) {
-                if (particle.name.equalsIgnoreCase(name) || particle.name().equalsIgnoreCase(name)) {
-                    return particle;
-                }
-            }
-            return null;
-        }
-    }*/
 }

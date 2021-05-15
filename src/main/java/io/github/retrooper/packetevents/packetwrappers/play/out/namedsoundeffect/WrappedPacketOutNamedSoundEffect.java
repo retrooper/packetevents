@@ -680,15 +680,14 @@ package io.github.retrooper.packetevents.packetwrappers.play.out.namedsoundeffec
 
 import io.github.retrooper.packetevents.packettype.PacketTypeClasses;
 import io.github.retrooper.packetevents.packetwrappers.NMSPacket;
-import io.github.retrooper.packetevents.packetwrappers.api.SendableWrapper;
 import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
+import io.github.retrooper.packetevents.packetwrappers.api.SendableWrapper;
 import io.github.retrooper.packetevents.utils.enums.EnumUtil;
 import io.github.retrooper.packetevents.utils.nms.NMSUtils;
 import io.github.retrooper.packetevents.utils.server.ServerVersion;
 import io.github.retrooper.packetevents.utils.vector.Vector3d;
 import org.jetbrains.annotations.Nullable;
 
-import javax.management.openmbean.OpenDataException;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Optional;
@@ -863,22 +862,17 @@ public class WrappedPacketOutNamedSoundEffect extends WrappedPacket implements S
     }
 
     @Override
-    public Object asNMSPacket() {
-        try {
-            Object packetPlayOutNamedSoundEffectInstance = packetDefaultConstructor.newInstance();
-            WrappedPacketOutNamedSoundEffect wrappedPacketOutNamedSoundEffect = new WrappedPacketOutNamedSoundEffect(new NMSPacket(packetPlayOutNamedSoundEffectInstance));
-            wrappedPacketOutNamedSoundEffect.setSoundEffectName(getSoundEffectName());
-            if (soundEffectVarExists) {
-                wrappedPacketOutNamedSoundEffect.setSoundCategory(getSoundCategory().get());
-            }
-            wrappedPacketOutNamedSoundEffect.setEffectPosition(getEffectPosition());
-            wrappedPacketOutNamedSoundEffect.setPitch(getPitch());
-            wrappedPacketOutNamedSoundEffect.setVolume(getVolume());
-            return packetPlayOutNamedSoundEffectInstance;
-        } catch (InstantiationException | InvocationTargetException | IllegalAccessException e) {
-            e.printStackTrace();
+    public Object asNMSPacket() throws Exception {
+        Object packetPlayOutNamedSoundEffectInstance = packetDefaultConstructor.newInstance();
+        WrappedPacketOutNamedSoundEffect wrappedPacketOutNamedSoundEffect = new WrappedPacketOutNamedSoundEffect(new NMSPacket(packetPlayOutNamedSoundEffectInstance));
+        wrappedPacketOutNamedSoundEffect.setSoundEffectName(getSoundEffectName());
+        if (soundEffectVarExists) {
+            wrappedPacketOutNamedSoundEffect.setSoundCategory(getSoundCategory().get());
         }
-        return null;
+        wrappedPacketOutNamedSoundEffect.setEffectPosition(getEffectPosition());
+        wrappedPacketOutNamedSoundEffect.setPitch(getPitch());
+        wrappedPacketOutNamedSoundEffect.setVolume(getVolume());
+        return packetPlayOutNamedSoundEffectInstance;
     }
 
     public enum SoundCategory {

@@ -692,7 +692,6 @@ import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.Nullable;
 
 import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -753,8 +752,7 @@ public class WrappedPacketOutEntityEquipment extends WrappedPacketEntityAbstract
             for (EquipmentSlot slot : EquipmentSlot.values()) {
                 slot.id = (byte) slot.ordinal();
             }
-        }
-        else {
+        } else {
             EquipmentSlot.MAINHAND.id = 0;
             EquipmentSlot.OFFHAND.id = -1; //Invalid
             EquipmentSlot.BOOTS.id = 1;
@@ -769,10 +767,10 @@ public class WrappedPacketOutEntityEquipment extends WrappedPacketEntityAbstract
         if (packet != null) {
             byte id;
             if (version.isOlderThan(ServerVersion.v_1_9)) {
-                id = (byte)readInt(1);
+                id = (byte) readInt(1);
             } else {
                 Enum<?> nmsEnumItemSlot = readEnumConstant(0, enumItemSlotClass);
-                id = (byte)nmsEnumItemSlot.ordinal();
+                id = (byte) nmsEnumItemSlot.ordinal();
             }
             return EquipmentSlot.getById(id);
         } else {
@@ -808,6 +806,7 @@ public class WrappedPacketOutEntityEquipment extends WrappedPacketEntityAbstract
             this.legacyItemStack = itemStack;
         }
     }
+
     //1.16+ only methods
     private List<Pair<EquipmentSlot, ItemStack>> getListPair() {
         List<Object> listMojangPairObject = readList(0);
@@ -870,13 +869,8 @@ public class WrappedPacketOutEntityEquipment extends WrappedPacketEntityAbstract
     }
 
     @Override
-    public Object asNMSPacket() {
-        Object packetInstance = null;
-        try {
-            packetInstance = packetDefaultConstructor.newInstance();
-        } catch (InstantiationException | InvocationTargetException | IllegalAccessException e) {
-            e.printStackTrace();
-        }
+    public Object asNMSPacket() throws Exception {
+        Object packetInstance = packetDefaultConstructor.newInstance();
         WrappedPacketOutEntityEquipment wrappedPacketOutEntityEquipment = new WrappedPacketOutEntityEquipment(new NMSPacket(packetInstance));
         wrappedPacketOutEntityEquipment.setEntityId(getEntityId());
         wrappedPacketOutEntityEquipment.setEquipment(getEquipment());

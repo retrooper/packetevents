@@ -679,8 +679,10 @@
 package io.github.retrooper.packetevents.packetwrappers.api;
 
 /**
- * This interface indicates that a packet wrapper supports being sent to a client.
+ * Packet-Wrappers that can be sent to clients.
+ * @author retrooper
+ * //TODO since javadoc annotation
  */
 public interface SendableWrapper {
-    Object asNMSPacket();
+    Object asNMSPacket() throws Exception;
 }

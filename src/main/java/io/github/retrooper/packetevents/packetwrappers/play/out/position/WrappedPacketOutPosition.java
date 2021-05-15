@@ -688,7 +688,6 @@ import io.github.retrooper.packetevents.utils.server.ServerVersion;
 import io.github.retrooper.packetevents.utils.vector.Vector3d;
 
 import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
 import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
@@ -883,8 +882,7 @@ public final class WrappedPacketOutPosition extends WrappedPacket implements Sen
             double y = readDouble(1);
             double z = readDouble(2);
             return new Vector3d(x, y, z);
-        }
-        else {
+        } else {
             return position;
         }
     }
@@ -894,8 +892,7 @@ public final class WrappedPacketOutPosition extends WrappedPacket implements Sen
             writeDouble(0, position.x);
             writeDouble(1, position.y);
             writeDouble(2, position.z);
-        }
-        else {
+        } else {
             this.position = position;
         }
     }
@@ -955,27 +952,23 @@ public final class WrappedPacketOutPosition extends WrappedPacket implements Sen
     }
 
     @Override
-    public Object asNMSPacket() {
+    public Object asNMSPacket() throws Exception {
         Set<Object> nmsRelativeFlags = new HashSet<>();
         if (constructorMode != 0) {
             for (PlayerTeleportFlags flag : getRelativeFlags()) {
                 nmsRelativeFlags.add(EnumUtil.valueOf(enumPlayerTeleportFlagsClass, flag.name()));
             }
         }
-        try {
-            Vector3d position = getPosition();
-            switch (constructorMode) {
-                case 0:
-                    //1.7.10
-                    return packetConstructor.newInstance(position.x, position.y, position.z, getYaw(), getPitch(), isOnGround(), getRelativeFlagsMask());
-                case 1:
-                    //1.8 -> 1.8.8
-                    return packetConstructor.newInstance(position.x, position.y, position.z, getYaw(), getPitch(), nmsRelativeFlags);
-                case 2:
-                    return packetConstructor.newInstance(position.x, position.y, position.z, getYaw(), getPitch(), nmsRelativeFlags, getTeleportId());
-            }
-        } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
-            e.printStackTrace();
+        Vector3d position = getPosition();
+        switch (constructorMode) {
+            case 0:
+                //1.7.10
+                return packetConstructor.newInstance(position.x, position.y, position.z, getYaw(), getPitch(), isOnGround(), getRelativeFlagsMask());
+            case 1:
+                //1.8 -> 1.8.8
+                return packetConstructor.newInstance(position.x, position.y, position.z, getYaw(), getPitch(), nmsRelativeFlags);
+            case 2:
+                return packetConstructor.newInstance(position.x, position.y, position.z, getYaw(), getPitch(), nmsRelativeFlags, getTeleportId());
         }
         return null;
     }

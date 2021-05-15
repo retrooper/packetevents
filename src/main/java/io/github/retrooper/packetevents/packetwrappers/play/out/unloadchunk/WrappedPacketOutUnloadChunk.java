@@ -680,12 +680,11 @@ package io.github.retrooper.packetevents.packetwrappers.play.out.unloadchunk;
 
 import io.github.retrooper.packetevents.packettype.PacketTypeClasses;
 import io.github.retrooper.packetevents.packetwrappers.NMSPacket;
-import io.github.retrooper.packetevents.packetwrappers.api.SendableWrapper;
 import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
+import io.github.retrooper.packetevents.packetwrappers.api.SendableWrapper;
 import io.github.retrooper.packetevents.utils.server.ServerVersion;
 
 import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
 
 /**
  * Wrapper for the UnloadChunk packet.
@@ -696,6 +695,7 @@ import java.lang.reflect.InvocationTargetException;
 public final class WrappedPacketOutUnloadChunk extends WrappedPacket implements SendableWrapper {
     private static Constructor<?> packetConstructor;
     private int chunkX, chunkZ;
+
     public WrappedPacketOutUnloadChunk(NMSPacket packet) {
         super(packet);
     }
@@ -717,8 +717,7 @@ public final class WrappedPacketOutUnloadChunk extends WrappedPacket implements 
     public int getChunkX() {
         if (packet != null) {
             return readInt(0);
-        }
-        else {
+        } else {
             return chunkX;
         }
     }
@@ -726,8 +725,7 @@ public final class WrappedPacketOutUnloadChunk extends WrappedPacket implements 
     public void setChunkX(int chunkX) {
         if (packet != null) {
             writeInt(0, chunkX);
-        }
-        else {
+        } else {
             this.chunkX = chunkX;
         }
     }
@@ -735,8 +733,7 @@ public final class WrappedPacketOutUnloadChunk extends WrappedPacket implements 
     public int getChunkZ() {
         if (packet != null) {
             return readInt(1);
-        }
-        else {
+        } else {
             return chunkZ;
         }
     }
@@ -744,24 +741,18 @@ public final class WrappedPacketOutUnloadChunk extends WrappedPacket implements 
     public void setChunkZ(int chunkZ) {
         if (packet != null) {
             writeInt(1, chunkZ);
-        }
-        else {
+        } else {
             this.chunkZ = chunkZ;
         }
     }
 
     @Override
-    public Object asNMSPacket() {
-        try {
-            return packetConstructor.newInstance(getChunkX(), getChunkZ());
-        } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
-            e.printStackTrace();
-        }
-        return null;
+    public boolean isSupported() {
+        return version.isNewerThan(ServerVersion.v_1_8_8);
     }
 
     @Override
-    public boolean isSupported() {
-        return version.isNewerThan(ServerVersion.v_1_8_8);
+    public Object asNMSPacket() throws Exception {
+        return packetConstructor.newInstance(getChunkX(), getChunkZ());
     }
 }

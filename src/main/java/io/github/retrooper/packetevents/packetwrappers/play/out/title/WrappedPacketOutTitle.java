@@ -688,7 +688,6 @@ import io.github.retrooper.packetevents.utils.reflection.SubclassUtil;
 import io.github.retrooper.packetevents.utils.server.ServerVersion;
 
 import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
 
 public class WrappedPacketOutTitle extends WrappedPacket implements SendableWrapper {
     private static Class<? extends Enum<?>> enumTitleActionClass;
@@ -811,15 +810,10 @@ public class WrappedPacketOutTitle extends WrappedPacket implements SendableWrap
     }
 
     @Override
-    public Object asNMSPacket() {
-        try {
-            Enum<?> enumConst = EnumUtil.valueByIndex(enumTitleActionClass, getAction().ordinal());
-            return packetConstructor.newInstance(enumConst, NMSUtils.generateIChatBaseComponent(getText()),
-                    getFadeInTicks(), getStayTicks(), getFadeOutTicks());
-        } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
-            e.printStackTrace();
-        }
-        return null;
+    public Object asNMSPacket() throws Exception {
+        Enum<?> enumConst = EnumUtil.valueByIndex(enumTitleActionClass, getAction().ordinal());
+        return packetConstructor.newInstance(enumConst, NMSUtils.generateIChatBaseComponent(getText()),
+                getFadeInTicks(), getStayTicks(), getFadeOutTicks());
     }
 
     public enum TitleAction {

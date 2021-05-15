@@ -857,7 +857,12 @@ public final class PlayerUtils {
      * @param wrapper Client-bound wrapper supporting sending.
      */
     public void sendPacket(Player player, SendableWrapper wrapper) {
-        PacketEvents.get().getInjector().sendPacket(getChannel(player), wrapper.asNMSPacket());
+        try {
+            Object nmsPacket = wrapper.asNMSPacket();
+            PacketEvents.get().getInjector().sendPacket(getChannel(player), nmsPacket);
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
     }
 
     /**
@@ -867,7 +872,13 @@ public final class PlayerUtils {
      * @param wrapper Client-bound raw NMS packet.
      */
     public void sendPacket(Object channel, SendableWrapper wrapper) {
-        PacketEvents.get().getInjector().sendPacket(channel, wrapper.asNMSPacket());
+        try {
+            Object nmsPacket = wrapper.asNMSPacket();
+            PacketEvents.get().getInjector().sendPacket(channel, nmsPacket);
+        }
+        catch (Exception ex) {
+            ex.printStackTrace();
+        }
     }
 
     /**

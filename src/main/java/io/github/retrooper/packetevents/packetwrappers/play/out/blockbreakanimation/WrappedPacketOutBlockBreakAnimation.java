@@ -688,7 +688,7 @@ import io.github.retrooper.packetevents.utils.vector.Vector3i;
 import org.bukkit.entity.Entity;
 
 import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
+
 public class WrappedPacketOutBlockBreakAnimation extends WrappedPacketEntityAbstraction implements SendableWrapper {
     private static Constructor<?> packetConstructor;
     private Vector3i blockPosition;
@@ -775,18 +775,13 @@ public class WrappedPacketOutBlockBreakAnimation extends WrappedPacketEntityAbst
     }
 
     @Override
-    public Object asNMSPacket() {
+    public Object asNMSPacket() throws Exception {
         Vector3i blockPosition = getBlockPosition();
-        try {
-            if (version.isOlderThan(ServerVersion.v_1_8)) {
-                return packetConstructor.newInstance(getEntityId(), blockPosition.x, blockPosition.y, blockPosition.z, getDestroyStage());
-            } else {
-                Object nmsBlockPos = NMSUtils.generateNMSBlockPos(blockPosition.x, blockPosition.y, blockPosition.z);
-                return packetConstructor.newInstance(getEntityId(), nmsBlockPos, getDestroyStage());
-            }
-        } catch (IllegalAccessException | InstantiationException | InvocationTargetException e) {
-            e.printStackTrace();
+        if (version.isOlderThan(ServerVersion.v_1_8)) {
+            return packetConstructor.newInstance(getEntityId(), blockPosition.x, blockPosition.y, blockPosition.z, getDestroyStage());
+        } else {
+            Object nmsBlockPos = NMSUtils.generateNMSBlockPos(blockPosition.x, blockPosition.y, blockPosition.z);
+            return packetConstructor.newInstance(getEntityId(), nmsBlockPos, getDestroyStage());
         }
-        return null;
     }
 }

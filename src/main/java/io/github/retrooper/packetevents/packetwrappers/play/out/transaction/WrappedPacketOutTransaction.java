@@ -680,11 +680,10 @@ package io.github.retrooper.packetevents.packetwrappers.play.out.transaction;
 
 import io.github.retrooper.packetevents.packettype.PacketTypeClasses;
 import io.github.retrooper.packetevents.packetwrappers.NMSPacket;
-import io.github.retrooper.packetevents.packetwrappers.api.SendableWrapper;
 import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
+import io.github.retrooper.packetevents.packetwrappers.api.SendableWrapper;
 
 import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
 
 public class WrappedPacketOutTransaction extends WrappedPacket implements SendableWrapper {
     private static Constructor<?> packetConstructor;
@@ -762,13 +761,8 @@ public class WrappedPacketOutTransaction extends WrappedPacket implements Sendab
     }
 
     @Override
-    public Object asNMSPacket() {
-        try {
-            return packetConstructor.newInstance(getWindowId(), getActionNumber(), isAccepted());
-        } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
-            e.printStackTrace();
-        }
-        return null;
+    public Object asNMSPacket() throws Exception {
+        return packetConstructor.newInstance(getWindowId(), getActionNumber(), isAccepted());
     }
 
 }

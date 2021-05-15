@@ -686,7 +686,6 @@ import io.github.retrooper.packetevents.utils.nms.NMSUtils;
 import org.bukkit.entity.Entity;
 
 import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
 
 public class WrappedPacketOutEntityStatus extends WrappedPacketEntityAbstraction implements SendableWrapper {
     private static Constructor<?> packetConstructor;
@@ -734,14 +733,8 @@ public class WrappedPacketOutEntityStatus extends WrappedPacketEntityAbstraction
     }
 
     @Override
-    public Object asNMSPacket() {
-        try {
-            Object nmsEntity = NMSUtils.getNMSEntity(getEntity());
-            return packetConstructor.newInstance(nmsEntity, getEntityStatus());
-        } catch (InstantiationException | InvocationTargetException
-                | IllegalAccessException e) {
-            e.printStackTrace();
-        }
-        return null;
+    public Object asNMSPacket() throws Exception {
+        Object nmsEntity = NMSUtils.getNMSEntity(getEntity());
+        return packetConstructor.newInstance(nmsEntity, getEntityStatus());
     }
 }

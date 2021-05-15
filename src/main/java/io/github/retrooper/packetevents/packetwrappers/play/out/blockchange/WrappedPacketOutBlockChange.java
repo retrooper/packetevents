@@ -680,8 +680,8 @@ package io.github.retrooper.packetevents.packetwrappers.play.out.blockchange;
 
 import io.github.retrooper.packetevents.packettype.PacketTypeClasses;
 import io.github.retrooper.packetevents.packetwrappers.NMSPacket;
-import io.github.retrooper.packetevents.packetwrappers.api.SendableWrapper;
 import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
+import io.github.retrooper.packetevents.packetwrappers.api.SendableWrapper;
 import io.github.retrooper.packetevents.utils.nms.NMSUtils;
 import io.github.retrooper.packetevents.utils.reflection.Reflection;
 import io.github.retrooper.packetevents.utils.server.ServerVersion;
@@ -828,39 +828,31 @@ public class WrappedPacketOutBlockChange extends WrappedPacket implements Sendab
     }
 
     @Override
-    public Object asNMSPacket() {
-        Object packetPlayOutBlockChangeInstance = null;
+    public Object asNMSPacket() throws Exception {
+        Object packetPlayOutBlockChangeInstance;
         WrappedPacketOutBlockChange blockChange;
         Vector3i blockPosition = getBlockPosition();
         if (version.isOlderThan(ServerVersion.v_1_8)) {
-            try {
-                Object nmsWorld = NMSUtils.convertBukkitWorldToWorldServer(world);
-                packetPlayOutBlockChangeInstance = packetConstructor.newInstance(blockPosition.x, blockPosition.y, blockPosition.z, nmsWorld);
-                blockChange = new WrappedPacketOutBlockChange(new NMSPacket(packetPlayOutBlockChangeInstance));
-                if (getMaterial() != null) {
-                    blockChange.setMaterial(getMaterial());
-                }
-            } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
-                e.printStackTrace();
+            Object nmsWorld = NMSUtils.convertBukkitWorldToWorldServer(world);
+            packetPlayOutBlockChangeInstance = packetConstructor.newInstance(blockPosition.x, blockPosition.y, blockPosition.z, nmsWorld);
+            blockChange = new WrappedPacketOutBlockChange(new NMSPacket(packetPlayOutBlockChangeInstance));
+            if (getMaterial() != null) {
+                blockChange.setMaterial(getMaterial());
             }
 
         } else {
-            try {
-                packetPlayOutBlockChangeInstance = packetConstructor.newInstance();
-                blockChange = new WrappedPacketOutBlockChange(new NMSPacket(packetPlayOutBlockChangeInstance));
-                if (getMaterial() != null) {
-                    blockChange.setMaterial(getMaterial());
-                } else {
-                    Object nmsBlockPos = NMSUtils.generateNMSBlockPos(blockPosition.x, blockPosition.y, blockPosition.z);
-                    Object worldServer = NMSUtils.convertBukkitWorldToWorldServer(world);
-                    Object nmsBlockData = getNMSWorldTypeMethodCache.invoke(worldServer, nmsBlockPos);
-                    blockChange.write(NMSUtils.iBlockDataClass, 0, nmsBlockData);
-                }
-                blockChange.setBlockPosition(blockPosition);
-
-            } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
-                e.printStackTrace();
+            packetPlayOutBlockChangeInstance = packetConstructor.newInstance();
+            blockChange = new WrappedPacketOutBlockChange(new NMSPacket(packetPlayOutBlockChangeInstance));
+            if (getMaterial() != null) {
+                blockChange.setMaterial(getMaterial());
+            } else {
+                Object nmsBlockPos = NMSUtils.generateNMSBlockPos(blockPosition.x, blockPosition.y, blockPosition.z);
+                Object worldServer = NMSUtils.convertBukkitWorldToWorldServer(world);
+                Object nmsBlockData = getNMSWorldTypeMethodCache.invoke(worldServer, nmsBlockPos);
+                blockChange.write(NMSUtils.iBlockDataClass, 0, nmsBlockData);
             }
+            blockChange.setBlockPosition(blockPosition);
+
         }
         return packetPlayOutBlockChangeInstance;
     }
