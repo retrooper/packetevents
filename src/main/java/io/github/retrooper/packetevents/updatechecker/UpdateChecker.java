@@ -697,22 +697,18 @@ import java.net.URLConnection;
  * @since 1.6.9
  */
 public class UpdateChecker {
-
-    protected static String getLatestReleaseJson() throws IOException {
-        URLConnection connection = new URL("https://api.github.com/repos/retrooper/packetevents/releases/latest").openConnection();
-        connection.addRequestProperty("User-Agent", "Mozilla/4.0");
-        BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
-        String line = reader.readLine();
-        reader.close();
-        return line;
+    private final LowLevelUpdateChecker lowLevelUpdateChecker;
+    public UpdateChecker() {
+        if (PacketEvents.get().getServerUtils().getVersion().isOlderThan(ServerVersion.v_1_8)) {
+            lowLevelUpdateChecker = new LowLevelUpdateCheckerLegacy();
+        }
+        else {
+            lowLevelUpdateChecker = new LowLevelUpdateCheckerModern();
+        }
     }
 
-    public String getLatestReleasedVersion() {
-        if (PacketEvents.get().getServerUtils().getVersion().isOlderThan(ServerVersion.v_1_8)) {
-            return LowLevelUpdateChecker7.getLatestRelease();
-        } else {
-            return LowLevelUpdateChecker8.getLatestRelease();
-        }
+    public String checkLatestReleasedVersion() {
+        return lowLevelUpdateChecker.getLatestRelease();
     }
 
     /**
@@ -722,7 +718,7 @@ public class UpdateChecker {
         PEVersion localVersion = PacketEvents.get().getVersion();
         PEVersion newVersion;
         try {
-            newVersion = new PEVersion(getLatestReleasedVersion());
+            newVersion = new PEVersion(checkLatestReleasedVersion());
         } catch (Exception ex) {
             newVersion = null;
         }
@@ -732,7 +728,7 @@ public class UpdateChecker {
         } else if (newVersion != null && localVersion.isNewerThan(newVersion)) {
             inform("You are on a dev or pre released build of PacketEvents. Your build: (" + localVersion.toString() + ") | Latest released build: (" + newVersion.toString() + ")");
             return UpdateCheckerStatus.PRE_RELEASE;
-        } else if (localVersion.equals(newVersion)) { //No NPE will occur, don't worry :D
+        } else if (localVersion.equals(newVersion)) {
             inform("You are on the latest released version of PacketEvents. (" + newVersion.toString() + ")");
             return UpdateCheckerStatus.UP_TO_DATE;
         } else {

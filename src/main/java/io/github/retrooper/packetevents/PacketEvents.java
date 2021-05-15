@@ -723,7 +723,7 @@ public final class PacketEvents implements Listener, EventManager {
     private final PlayerUtils playerUtils = new PlayerUtils();
     private final ServerUtils serverUtils = new ServerUtils();
     private ByteBufUtil byteBufUtil;
-    private final UpdateChecker updateChecker = new UpdateChecker();
+    private UpdateChecker updateChecker;
 
     private final PacketProcessorInternal packetProcessorInternal = new PacketProcessorInternal();
     private final BukkitEventProcessorInternal bukkitEventProcessorInternal = new BukkitEventProcessorInternal();
@@ -791,10 +791,11 @@ public final class PacketEvents implements Listener, EventManager {
             }
 
             byteBufUtil = NMSUtils.legacyNettyImportMode ? new ByteBufUtil_7() : new ByteBufUtil_8();
-
+            updateChecker = new UpdateChecker();
             if (!injectorReady.get()) {
                 injector.load();
                 lateBind = !injector.isBound();
+                //If late-bind is enabled, we will inject a bit later.
                 if (!lateBind) {
                     injector.inject();
                 }
@@ -858,7 +859,9 @@ public final class PacketEvents implements Listener, EventManager {
                     }
                 }
             };
+
             if (lateBind) {
+                //If late-bind is enabled, we still need to inject (once all plugins are loaded).
                 Bukkit.getScheduler().scheduleSyncDelayedTask(plugin, injector::inject);
                 Bukkit.getScheduler().scheduleSyncDelayedTask(plugin, postInjectTask);
             }
@@ -884,11 +887,13 @@ public final class PacketEvents implements Listener, EventManager {
 
     public void terminate() {
         if (initialized && !terminating) {
+            //Eject all players
             for (Player p : Bukkit.getOnlinePlayers()) {
                 injector.ejectPlayer(p);
             }
+            //Eject the injector if needed
             injector.eject();
-
+            //Unregister all our listeners
             getEventManager().unregisterAllListeners();
             initialized = false;
             terminating = false;
@@ -976,12 +981,13 @@ public final class PacketEvents implements Listener, EventManager {
 
     private void handleUpdateCheck() {
         Thread thread = new Thread(() -> {
-            PacketEvents.get().getPlugin().getLogger().info("[PacketEvents] Checking for an update, please wait...");
+            PacketEvents.get().getPlugin().getLogger().info("[packetevents] Checking for an update, please wait...");
             UpdateChecker.UpdateCheckerStatus status = updateChecker.checkForUpdate();
             int seconds = 5;
-            for (int i = 0; i < 5; i++) {
+            int retryCount = 5;
+            for (int i = 0; i < retryCount; i++) {
                 if (status == UpdateChecker.UpdateCheckerStatus.FAILED) {
-                    PacketEvents.get().getPlugin().getLogger().severe("[PacketEvents] Checking for an update again in " + seconds + " seconds...");
+                    PacketEvents.get().getPlugin().getLogger().severe("[packetevents] Checking for an update again in " + seconds + " seconds...");
                     try {
                         Thread.sleep(seconds * 1000L);
                     } catch (InterruptedException e) {
@@ -992,8 +998,8 @@ public final class PacketEvents implements Listener, EventManager {
 
                     status = updateChecker.checkForUpdate();
 
-                    if (i == 4) {
-                        PacketEvents.get().getPlugin().getLogger().severe("[PacketEvents] PacketEvents failed to check for an update. No longer retrying.");
+                    if (i == (retryCount - 1)) {
+                        PacketEvents.get().getPlugin().getLogger().severe("[packetevents] PacketEvents failed to check for an update. No longer retrying.");
                         break;
                     }
                 } else {
@@ -1002,7 +1008,7 @@ public final class PacketEvents implements Listener, EventManager {
 
             }
 
-        }, "PacketEvents-update-check-thread");
+        }, "packetevents-update-check-thread");
         thread.start();
     }
 

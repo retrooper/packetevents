@@ -764,7 +764,7 @@ public class PacketEventsSettings {
     /**
      * This decides if PacketEvents should collect data anonymously and report to bStats.
      * @param bStatsEnabled Value
-     * @return Settings isntance.
+     * @return Settings instance.
      */
     public PacketEventsSettings bStats(boolean bStatsEnabled) {
         if (!locked) {

@@ -693,7 +693,7 @@ public class PacketEventsPlugin extends JavaPlugin {
         settings
                 .fallbackServerVersion(ServerVersion.v_1_7_10)
                 .compatInjector(false)
-                .checkForUpdates(false)
+                .checkForUpdates(true)
                 .bStats(true);
         PacketEvents.get().loadAsyncNewThread();
     }

@@ -676,28 +676,23 @@
  *
  */
 
-package io.github.retrooper.packetevents.packetwrappers.play.out.multiblockchange;
+package io.github.retrooper.packetevents.updatechecker;
 
-import io.github.retrooper.packetevents.packetwrappers.NMSPacket;
-import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.URL;
+import java.net.URLConnection;
 
-//TODO finish this wrapper
-class WrappedPacketOutMultiBlockChange extends WrappedPacket {
-
-    public WrappedPacketOutMultiBlockChange(NMSPacket packet) {
-        super(packet);
-    }
-
-    @Override
-    protected void load() {
-        net.minecraft.server.v1_7_R4.PacketPlayOutMultiBlockChange a0;
-        net.minecraft.server.v1_8_R3.PacketPlayOutMultiBlockChange a1;
-        net.minecraft.server.v1_9_R1.PacketPlayOutMultiBlockChange a2;
-        net.minecraft.server.v1_9_R2.PacketPlayOutMultiBlockChange a3;
-        net.minecraft.server.v1_12_R1.PacketPlayOutMultiBlockChange a4;
-        net.minecraft.server.v1_13_R1.PacketPlayOutMultiBlockChange a5;
-        net.minecraft.server.v1_13_R2.PacketPlayOutMultiBlockChange a6;
-        net.minecraft.server.v1_16_R2.PacketPlayOutMultiBlockChange a7;
-
+public interface LowLevelUpdateChecker {
+    String getLatestRelease();
+    
+    default String getLatestReleaseJson() throws IOException {
+        URLConnection connection = new URL("https://api.github.com/repos/retrooper/packetevents/releases/latest").openConnection();
+        connection.addRequestProperty("User-Agent", "Mozilla/4.0");
+        BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+        String line = reader.readLine();
+        reader.close();
+        return line;
     }
 }

@@ -683,11 +683,12 @@ import com.google.gson.JsonParser;
 
 import java.io.IOException;
 
-public class LowLevelUpdateChecker8 {
-    public static String getLatestRelease() {
+public class LowLevelUpdateCheckerModern implements LowLevelUpdateChecker {
+    @Override
+    public String getLatestRelease() {
         String jsonResponse;
         try {
-            jsonResponse = UpdateChecker.getLatestReleaseJson();
+            jsonResponse = getLatestReleaseJson();
         } catch (IOException e) {
             e.printStackTrace();
             throw new IllegalStateException("Failed to parse packetevents version!");
