@@ -678,16 +678,36 @@
 
 package io.github.retrooper.packetevents.packetwrappers.play.out.mapchunk;
 
+import io.github.retrooper.packetevents.packettype.PacketTypeClasses;
 import io.github.retrooper.packetevents.packetwrappers.NMSPacket;
 import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
+import io.github.retrooper.packetevents.utils.reflection.SubclassUtil;
+import io.github.retrooper.packetevents.utils.server.ServerVersion;
+
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
+
 //TODO finish wrapper
-class WrappedPacketOutMapChunk extends WrappedPacket {
+public class WrappedPacketOutMapChunk extends WrappedPacket {
+    private Class<?> chunkMapClass;
+    private Constructor<?> chunkMapConstructor;
+
     public WrappedPacketOutMapChunk(NMSPacket packet) {
         super(packet);
     }
 
+    private Object nmsChunkMap;
+
     @Override
     protected void load() {
+        if (version.isNewerThan(ServerVersion.v_1_7_10) && version.isOlderThan(ServerVersion.v_1_9)) {
+            chunkMapClass = SubclassUtil.getSubClass(PacketTypeClasses.Play.Server.MAP_CHUNK, "ChunkMap");
+            try {
+                chunkMapConstructor = chunkMapClass.getConstructor();
+            } catch (NoSuchMethodException e) {
+                e.printStackTrace();
+            }
+        }
         net.minecraft.server.v1_7_R4.PacketPlayOutMapChunk a0;
         net.minecraft.server.v1_8_R3.PacketPlayOutMapChunk a1;
         net.minecraft.server.v1_9_R1.PacketPlayOutMapChunk a2;
@@ -696,9 +716,90 @@ class WrappedPacketOutMapChunk extends WrappedPacket {
         net.minecraft.server.v1_13_R1.PacketPlayOutMapChunk a5;
         net.minecraft.server.v1_13_R2.PacketPlayOutMapChunk a6;
         net.minecraft.server.v1_16_R2.PacketPlayOutMapChunk a7;
-
-
     }
 
+
+    public int getChunkX() {
+        return readInt(0);
+    }
+
+    public void setChunkX(int chunkX) {
+        writeInt(0, chunkX);
+    }
+
+    public int getChunkZ() {
+        return readInt(1);
+    }
+
+    public void setChunkZ(int chunkZ) {
+        writeInt(1, chunkZ);
+    }
+
+    public int getPrimaryBitMap() {
+        if (version.isNewerThan(ServerVersion.v_1_7_10) && version.isOlderThan(ServerVersion.v_1_9)) {
+            if (nmsChunkMap == null) {
+                nmsChunkMap = readObject(0, chunkMapClass);
+            }
+            WrappedPacket nmsChunkMapWrapper = new WrappedPacket(new NMSPacket(nmsChunkMap));
+            return nmsChunkMapWrapper.readInt(0);
+        } else {
+            return readInt(2);
+        }
+    }
+
+    public void setPrimaryBitMap(int primaryBitMap) {
+        if (version.isNewerThan(ServerVersion.v_1_7_10) && version.isOlderThan(ServerVersion.v_1_9)) {
+            if (nmsChunkMap == null) {
+                try {
+                    nmsChunkMap = chunkMapConstructor.newInstance();
+                } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
+                    e.printStackTrace();
+                }
+            }
+            WrappedPacket nmsChunkMapWrapper = new WrappedPacket(new NMSPacket(nmsChunkMap));
+            nmsChunkMapWrapper.writeInt(0, primaryBitMap);
+            write(chunkMapClass, 0, nmsChunkMap);
+
+        } else {
+            writeInt(2, primaryBitMap);
+        }
+    }
+
+    public boolean isGroundUpContinuous() {
+        return readBoolean(0);
+    }
+
+    public void setGroundUpContinuous(boolean groundUpContinuous) {
+        writeBoolean(0, groundUpContinuous);
+    }
+
+    public byte[] getCompressedData() {
+        if (version.isNewerThan(ServerVersion.v_1_7_10) && version.isOlderThan(ServerVersion.v_1_9)) {
+            if (nmsChunkMap == null) {
+                nmsChunkMap = readObject(0, chunkMapClass);
+            }
+            WrappedPacket nmsChunkMapWrapper = new WrappedPacket(new NMSPacket(nmsChunkMap));
+            return nmsChunkMapWrapper.readByteArray(0);
+        } else {
+            return readByteArray(0);
+        }
+    }
+
+    public void setCompressedData(byte[] data) {
+        if (version.isNewerThan(ServerVersion.v_1_7_10) && version.isOlderThan(ServerVersion.v_1_9)) {
+            if (nmsChunkMap == null) {
+                try {
+                    nmsChunkMap = chunkMapConstructor.newInstance();
+                } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
+                    e.printStackTrace();
+                }
+            }
+            WrappedPacket nmsChunkMapWrapper = new WrappedPacket(new NMSPacket(nmsChunkMap));
+            nmsChunkMapWrapper.writeByteArray(0, data);
+            write(chunkMapClass, 0, nmsChunkMap);
+        } else {
+            writeByteArray(0, data);
+        }
+    }
 
 }
