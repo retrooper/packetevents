@@ -45,13 +45,15 @@ public class PaperChannelInjector {
 
         Class<?> holderClass = Class.forName("io.papermc.paper.network.ChannelInitializeListenerHolder");
         Method addListenerMethod = holderClass.getDeclaredMethod("addListener", Key.class, listenerClass);
-        addListenerMethod.invoke(null, Key.key(PacketEvents.get().getHandlerName(), "injector"), channelInitializeListener);
+        Key key = Key.key(PacketEvents.get().getPlugin().getName(),"injector");
+        addListenerMethod.invoke(null, key, channelInitializeListener);
     }
 
     public static void removePaperChannelInitializeListener() throws ReflectiveOperationException {
         Class<?> holderClass = Class.forName("io.papermc.paper.network.ChannelInitializeListenerHolder");
         Method addListenerMethod = holderClass.getDeclaredMethod("removeListener", Key.class);
-        addListenerMethod.invoke(null, Key.key(PacketEvents.get().getHandlerName(), "injector"));
+        Key key = Key.key(PacketEvents.get().getPlugin().getName(), "injector");
+        addListenerMethod.invoke(null, key);
     }
 
     private static boolean hasPaperInjectionMethod() {
