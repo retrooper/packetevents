@@ -1,6 +1,6 @@
 # packetevents
 
-[![](https://img.shields.io/badge/License-MIT-yellow.svg)](https://github.com/retrooper/packetevents/blob/dev/LICENSE)
+[![](https://img.shields.io/badge/License-GPLv3-yellow.svg)](https://github.com/retrooper/packetevents/blob/dev/LICENSE)
 [![](https://jitpack.io/v/retrooper/packetevents.svg)](https://jitpack.io/#retrooper/packetevents)
 
 PacketEvents is an open-source Packet API. It has many cross-version packet-wrappers. You can process incoming and outgoing packets on the server. You can even send packets with our packet-wrappers. We are here to save you a ton of time.
