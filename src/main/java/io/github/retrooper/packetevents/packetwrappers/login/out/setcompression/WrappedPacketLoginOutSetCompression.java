@@ -1,32 +1,28 @@
 /*
- * MIT License
+ * This file is part of packetevents - https://github.com/retrooper/packetevents
+ * Copyright (C) 2021 retrooper and contributors
  *
- * Copyright (c) 2020 retrooper
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
  *
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
  *
- * The above copyright notice and this permission notice shall be included in all
- * copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
- * SOFTWARE.
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
 package io.github.retrooper.packetevents.packetwrappers.login.out.setcompression;
 
 import io.github.retrooper.packetevents.packettype.PacketTypeClasses;
-import io.github.retrooper.packetevents.packetwrappers.SendableWrapper;
+import io.github.retrooper.packetevents.packetwrappers.NMSPacket;
 import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
+import io.github.retrooper.packetevents.packetwrappers.api.SendableWrapper;
+import io.github.retrooper.packetevents.utils.server.ServerVersion;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
@@ -36,7 +32,7 @@ public class WrappedPacketLoginOutSetCompression extends WrappedPacket implement
     private static Constructor<?> constructor;
     private int threshold;
 
-    public WrappedPacketLoginOutSetCompression(Object packet) {
+    public WrappedPacketLoginOutSetCompression(NMSPacket packet) {
         super(packet);
     }
 
@@ -44,7 +40,8 @@ public class WrappedPacketLoginOutSetCompression extends WrappedPacket implement
         this.threshold = threshold;
     }
 
-    public static void load() {
+    @Override
+    protected void load() {
         try {
             if (PacketTypeClasses.Login.Server.SET_COMPRESSION != null) {
                 constructor = PacketTypeClasses.Login.Server.SET_COMPRESSION.getConstructor(int.class);
@@ -56,6 +53,8 @@ public class WrappedPacketLoginOutSetCompression extends WrappedPacket implement
 
     /**
      * Maximum size of a packet before it can be compressed.
+     *
+     * @return threshold Threshold
      */
     public int getThreshold() {
         if (packet != null) {
@@ -64,13 +63,26 @@ public class WrappedPacketLoginOutSetCompression extends WrappedPacket implement
         return threshold;
     }
 
+    public void setThreshold(int threshold) {
+        if (packet != null) {
+            writeInt(0, threshold);
+        } else {
+            this.threshold = threshold;
+        }
+    }
+
     @Override
-    public Object asNMSPacket() {
+    public Object asNMSPacket() throws Exception {
         try {
-            return constructor.newInstance(threshold);
+            return constructor.newInstance(getThreshold());
         } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
             e.printStackTrace();
         }
         return null;
+    }
+
+    @Override
+    public boolean isSupported() {
+        return version.isNewerThan(ServerVersion.v_1_7_10);
     }
 }

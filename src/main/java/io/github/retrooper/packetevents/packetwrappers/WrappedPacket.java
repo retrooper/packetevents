@@ -1,429 +1,259 @@
 /*
- * MIT License
+ * This file is part of packetevents - https://github.com/retrooper/packetevents
+ * Copyright (C) 2021 retrooper and contributors
  *
- * Copyright (c) 2020 retrooper
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
  *
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
  *
- * The above copyright notice and this permission notice shall be included in all
- * copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
- * SOFTWARE.
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
 package io.github.retrooper.packetevents.packetwrappers;
 
+import io.github.retrooper.packetevents.PacketEvents;
 import io.github.retrooper.packetevents.exceptions.WrapperFieldNotFoundException;
+import io.github.retrooper.packetevents.exceptions.WrapperUnsupportedUsageException;
 import io.github.retrooper.packetevents.packettype.PacketTypeClasses;
-import io.github.retrooper.packetevents.packetwrappers.in.blockdig.WrappedPacketInBlockDig;
-import io.github.retrooper.packetevents.packetwrappers.in.blockplace.WrappedPacketInBlockPlace;
-import io.github.retrooper.packetevents.packetwrappers.in.clientcommand.WrappedPacketInClientCommand;
-import io.github.retrooper.packetevents.packetwrappers.in.custompayload.WrappedPacketInCustomPayload;
-import io.github.retrooper.packetevents.packetwrappers.in.entityaction.WrappedPacketInEntityAction;
-import io.github.retrooper.packetevents.packetwrappers.in.keepalive.WrappedPacketInKeepAlive;
-import io.github.retrooper.packetevents.packetwrappers.in.settings.WrappedPacketInSettings;
-import io.github.retrooper.packetevents.packetwrappers.in.updatesign.WrappedPacketInUpdateSign;
-import io.github.retrooper.packetevents.packetwrappers.in.useentity.WrappedPacketInUseEntity;
-import io.github.retrooper.packetevents.packetwrappers.in.windowclick.WrappedPacketInWindowClick;
-import io.github.retrooper.packetevents.packetwrappers.login.in.custompayload.WrappedPacketLoginInCustomPayload;
-import io.github.retrooper.packetevents.packetwrappers.login.out.custompayload.WrappedPacketLoginOutCustomPayload;
-import io.github.retrooper.packetevents.packetwrappers.login.out.setcompression.WrappedPacketLoginOutSetCompression;
-import io.github.retrooper.packetevents.packetwrappers.out.abilities.WrappedPacketOutAbilities;
-import io.github.retrooper.packetevents.packetwrappers.out.animation.WrappedPacketOutAnimation;
-import io.github.retrooper.packetevents.packetwrappers.out.chat.WrappedPacketOutChat;
-import io.github.retrooper.packetevents.packetwrappers.out.custompayload.WrappedPacketOutCustomPayload;
-import io.github.retrooper.packetevents.packetwrappers.out.entity.WrappedPacketOutEntity;
-import io.github.retrooper.packetevents.packetwrappers.out.entitystatus.WrappedPacketOutEntityStatus;
-import io.github.retrooper.packetevents.packetwrappers.out.entityteleport.WrappedPacketOutEntityTeleport;
-import io.github.retrooper.packetevents.packetwrappers.out.entityvelocity.WrappedPacketOutEntityVelocity;
-import io.github.retrooper.packetevents.packetwrappers.out.experience.WrappedPacketOutExperience;
-import io.github.retrooper.packetevents.packetwrappers.out.explosion.WrappedPacketOutExplosion;
-import io.github.retrooper.packetevents.packetwrappers.out.gamestatechange.WrappedPacketOutGameStateChange;
-import io.github.retrooper.packetevents.packetwrappers.out.helditemslot.WrappedPacketOutHeldItemSlot;
-import io.github.retrooper.packetevents.packetwrappers.out.keepalive.WrappedPacketOutKeepAlive;
-import io.github.retrooper.packetevents.packetwrappers.out.kickdisconnect.WrappedPacketOutKickDisconnect;
-import io.github.retrooper.packetevents.packetwrappers.out.position.WrappedPacketOutPosition;
-import io.github.retrooper.packetevents.packetwrappers.out.transaction.WrappedPacketOutTransaction;
-import io.github.retrooper.packetevents.packetwrappers.out.updatehealth.WrappedPacketOutUpdateHealth;
+import io.github.retrooper.packetevents.packetwrappers.api.WrapperPacketReader;
+import io.github.retrooper.packetevents.packetwrappers.api.WrapperPacketWriter;
+import io.github.retrooper.packetevents.utils.enums.EnumUtil;
+import io.github.retrooper.packetevents.utils.nms.NMSUtils;
+import io.github.retrooper.packetevents.utils.player.GameMode;
 import io.github.retrooper.packetevents.utils.reflection.ClassUtil;
+import io.github.retrooper.packetevents.utils.reflection.Reflection;
 import io.github.retrooper.packetevents.utils.server.ServerVersion;
+import io.github.retrooper.packetevents.utils.world.Difficulty;
+import io.github.retrooper.packetevents.utils.world.Dimension;
+import org.bukkit.inventory.ItemStack;
 
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.logging.Level;
 
 public class WrappedPacket implements WrapperPacketReader, WrapperPacketWriter {
-    private static final Map<Class<?>, Map<Class<?>, Field[]>> FIELD_CACHE = new HashMap<>();
+
+    private static final Map<Class<? extends WrappedPacket>, Boolean> LOADED_WRAPPERS = new ConcurrentHashMap<>();
+    private static final Map<Class<?>, Map<Class<?>, Field[]>> FIELD_CACHE = new ConcurrentHashMap<>();
+    private static final Field[] EMPTY_FIELD_ARRAY = new Field[0];
     public static ServerVersion version;
-    protected Object packet;
-    private Class<?> packetClass;
+    protected final NMSPacket packet;
+    private final Class<?> packetClass;
 
     public WrappedPacket() {
-
+        packet = null;
+        packetClass = null;
+        load0();
     }
 
-    public WrappedPacket(final Object packet) {
-        this(packet, packet.getClass());
+    public WrappedPacket(final NMSPacket packet) {
+        this(packet, packet.getRawNMSPacket().getClass());
     }
 
-    public WrappedPacket(final Object packet, Class<?> packetClass) {
-        if (packet.getClass().getSuperclass().equals(PacketTypeClasses.Client.FLYING)) {
-            packetClass = PacketTypeClasses.Client.FLYING;
-        } else if (packet.getClass().getSuperclass().equals(PacketTypeClasses.Server.ENTITY)) {
-            packetClass = PacketTypeClasses.Server.ENTITY;
+    public WrappedPacket(final NMSPacket packet, Class<?> packetClass) {
+        if (packetClass.getSuperclass().equals(PacketTypeClasses.Play.Client.FLYING)) {
+            packetClass = PacketTypeClasses.Play.Client.FLYING;
+        } else if (packetClass.getSuperclass().equals(PacketTypeClasses.Play.Server.ENTITY)) {
+            packetClass = PacketTypeClasses.Play.Server.ENTITY;
         }
         this.packetClass = packetClass;
-
-
-        if (!FIELD_CACHE.containsKey(packetClass)) {
-            final Field[] declaredFields = packetClass.getDeclaredFields();
-            for (Field f : declaredFields) {
-                f.setAccessible(true);
-            }
-            List<Field> boolFields = getFields(boolean.class, declaredFields);
-            List<Field> byteFields = getFields(byte.class, declaredFields);
-            List<Field> shortFields = getFields(short.class, declaredFields);
-            List<Field> intFields = getFields(int.class, declaredFields);
-            List<Field> longFields = getFields(long.class, declaredFields);
-            List<Field> floatFields = getFields(float.class, declaredFields);
-            List<Field> doubleFields = getFields(double.class, declaredFields);
-            List<Field> stringFields = getFields(String.class, declaredFields);
-
-            List<Field> boolArrayFields = getFields(boolean[].class, declaredFields);
-            List<Field> byteArrayFields = getFields(byte[].class, declaredFields);
-            List<Field> shortArrayFields = getFields(short[].class, declaredFields);
-            List<Field> intArrayFields = getFields(int[].class, declaredFields);
-            List<Field> longArrayFields = getFields(long[].class, declaredFields);
-            List<Field> floatArrayFields = getFields(float[].class, declaredFields);
-            List<Field> doubleArrayFields = getFields(double[].class, declaredFields);
-            List<Field> stringArrayFields = getFields(String[].class, declaredFields);
-
-
-            Field[] tmp = new Field[0];
-
-            Map<Class<?>, Field[]> map = new HashMap<>();
-
-            map.put(boolean.class, boolFields.toArray(tmp));
-            map.put(byte.class, byteFields.toArray(tmp));
-            map.put(short.class, shortFields.toArray(tmp));
-            map.put(int.class, intFields.toArray(tmp));
-            map.put(long.class, longFields.toArray(tmp));
-            map.put(float.class, floatFields.toArray(tmp));
-            map.put(double.class, doubleFields.toArray(tmp));
-
-            map.put(String.class, stringFields.toArray(tmp));
-            map.put(boolean[].class, boolArrayFields.toArray(tmp));
-            map.put(byte[].class, byteArrayFields.toArray(tmp));
-            map.put(short[].class, shortArrayFields.toArray(tmp));
-            map.put(int[].class, intArrayFields.toArray(tmp));
-            map.put(long[].class, longArrayFields.toArray(tmp));
-            map.put(float[].class, floatArrayFields.toArray(tmp));
-            map.put(double[].class, doubleArrayFields.toArray(tmp));
-            map.put(String[].class, stringArrayFields.toArray(tmp));
-            FIELD_CACHE.put(packetClass, map);
-        }
         this.packet = packet;
-        setup();
+        load0();
     }
 
-    public static void loadAllWrappers() {
-        //LOGIN SERVER BOUND
-        WrappedPacketLoginInCustomPayload.load();
-
-        //LOGIN CLIENT BOUND
-        WrappedPacketLoginOutCustomPayload.load();
-        WrappedPacketLoginOutSetCompression.load();
-
-        //SERVER BOUND
-        WrappedPacketInBlockDig.load();
-        WrappedPacketInBlockPlace.load();
-        WrappedPacketInClientCommand.load();
-        WrappedPacketInCustomPayload.load();
-        WrappedPacketInEntityAction.load();
-        WrappedPacketInKeepAlive.load();
-        WrappedPacketInSettings.load();
-        WrappedPacketInUseEntity.load();
-        WrappedPacketInUpdateSign.load();
-        WrappedPacketInWindowClick.load();
-
-        //CLIENTBOUND
-        WrappedPacketOutAbilities.load();
-        WrappedPacketOutAnimation.load();
-        WrappedPacketOutChat.load();
-        WrappedPacketOutEntity.load();
-        WrappedPacketOutEntityVelocity.load();
-        WrappedPacketOutEntityTeleport.load();
-        WrappedPacketOutKeepAlive.load();
-        WrappedPacketOutKickDisconnect.load();
-        WrappedPacketOutPosition.load();
-        WrappedPacketOutTransaction.load();
-        WrappedPacketOutUpdateHealth.load();
-        WrappedPacketOutGameStateChange.load();
-        WrappedPacketOutCustomPayload.load();
-        WrappedPacketOutExplosion.load();
-        WrappedPacketOutEntityStatus.load();
-        WrappedPacketOutExperience.load();
-        WrappedPacketOutHeldItemSlot.load();
+    private void load0() {
+        if (!isSupported()) {
+            throw new WrapperUnsupportedUsageException(getClass());
+        }
+        final Class<? extends WrappedPacket> clazz = getClass();
+        if (!LOADED_WRAPPERS.containsKey(clazz)) {
+            try {
+                load();
+            } catch (Exception ex) {
+                String wrapperName = ClassUtil.getClassSimpleName(getClass());
+                PacketEvents.get().getPlugin().getLogger()
+                        .log(Level.SEVERE, "PacketEvents found an exception while loading the " + wrapperName + " packet wrapper. Please report this bug! Tell us about your server version, spigot and code(of you using the wrapper)", ex);
+                LOADED_WRAPPERS.put(clazz, false);
+            }
+            LOADED_WRAPPERS.put(clazz, true);
+        }
     }
 
-    protected void setup() {
+    protected void load() {
 
     }
+
+    protected boolean hasLoaded() {
+        return LOADED_WRAPPERS.getOrDefault(getClass(), false);
+    }
+
+    protected void throwUnsupportedOperation(Enum<?> enumConst) throws UnsupportedOperationException {
+        Class<?> enumConstClass = enumConst.getClass();
+        Field field = null;
+        try {
+            field = enumConstClass.getField(enumConst.name());
+        } catch (NoSuchFieldException e) {
+            e.printStackTrace();
+        }
+        if (field.isAnnotationPresent(SupportedVersions.class)) {
+            SupportedVersions supportedVersions = field.getAnnotation(SupportedVersions.class);
+            List<ServerVersion> versionList = parseSupportedVersionsAnnotation(supportedVersions);
+            String supportedVersionsMsg = Arrays.toString(versionList.toArray(new ServerVersion[0]));
+            throw new UnsupportedOperationException("PacketEvents failed to use the " + enumConst.name() + " enum constant in the " + enumConstClass.getSimpleName() + " enum. This enum constant is not supported on your server version. (" + PacketEvents.get().getServerUtils().getVersion() + ")\n This enum constant is only supported on these server versions: " + supportedVersionsMsg);
+        } else {
+            throw new UnsupportedOperationException("PacketEvents failed to use the " + enumConst.name() + " enum constant in the " + enumConstClass.getSimpleName() + " enum. This enum constant is not supported on your server version. (" + PacketEvents.get().getServerUtils().getVersion() + ")\n Failed to find out what server versions this enum constant is supported on.");
+        }
+    }
+
+    protected void throwUnsupportedOperation() throws UnsupportedOperationException {
+        final String currentMethodName = "throwUnsupportedOperation";
+        StackTraceElement[] stackTraceElements = Thread.currentThread().getStackTrace();
+        int stackTraceElementIndex = 2;
+        for (int i = 0; i < stackTraceElements.length; i++) {
+            StackTraceElement element = stackTraceElements[i];
+            if (element.getMethodName().equals(currentMethodName)) {
+                stackTraceElementIndex = i + 1; //It is the next method
+                break;
+            }
+        }
+        StackTraceElement stackTraceElement = stackTraceElements[stackTraceElementIndex];
+        String methodName = stackTraceElement.getMethodName();
+        List<Method> possibleMethods = Reflection.getMethods(getClass(), methodName, (Class<?>) null);
+        Method method = null;
+        for (Method m : possibleMethods) {
+            if (m.isAnnotationPresent(SupportedVersions.class)) {
+                method = m;
+                break;
+            }
+        }
+        if (method == null) {
+            throw new UnsupportedOperationException("PacketEvents failed to access your requested field. This field is not supported on your server version. Failed to lookup the server versions this field supports...");
+        } else {
+            SupportedVersions supportedVersions = method.getAnnotation(SupportedVersions.class);
+            List<ServerVersion> versionList = parseSupportedVersionsAnnotation(supportedVersions);
+
+            String supportedVersionsMsg = Arrays.toString(versionList.toArray(new ServerVersion[0]));
+            throw new UnsupportedOperationException("PacketEvents failed to access your requested field. This field is not supported on your server version. (" + PacketEvents.get().getServerUtils().getVersion() + ")\n This field is only supported on these server versions: " + supportedVersionsMsg);
+        }
+    }
+
+    private List<ServerVersion> parseSupportedVersionsAnnotation(SupportedVersions supportedVersions) {
+        List<ServerVersion> versionList = new ArrayList<>();
+        for (int i = 0; i < supportedVersions.ranges().length; i += 2) {
+            ServerVersion first = supportedVersions.ranges()[i];
+            ServerVersion last = supportedVersions.ranges()[i + 1];
+            if (first == last) {
+                versionList.add(first);
+                continue;
+            } else if (first == ServerVersion.ERROR) {
+                first = ServerVersion.getOldest();
+            } else if (last == ServerVersion.ERROR) {
+                last = ServerVersion.getLatest();
+            }
+            versionList.addAll(Arrays.asList(ServerVersion.values()).subList(first.ordinal(), last.ordinal() + 1));
+        }
+        versionList.remove(ServerVersion.ERROR);
+        return versionList;
+    }
+
 
     @Override
     public boolean readBoolean(int index) {
-        return (boolean) read(boolean.class, index);
+        return read(index, boolean.class);
     }
 
     @Override
     public byte readByte(int index) {
-        return (byte) read(byte.class, index);
+        return read(index, byte.class);
     }
 
     @Override
     public short readShort(int index) {
-        return (short) read(short.class, index);
+        return read(index, short.class);
     }
 
     @Override
     public int readInt(int index) {
-        return (int) read(int.class, index);
+        return read(index, int.class);
     }
 
     @Override
     public long readLong(int index) {
-        return (long) read(long.class, index);
+        return read(index, long.class);
     }
 
     @Override
     public float readFloat(int index) {
-        return (float) read(float.class, index);
+        return read(index, float.class);
     }
 
     @Override
     public double readDouble(int index) {
-        return (double) read(double.class, index);
+        return read(index, double.class);
     }
 
     @Override
     public boolean[] readBooleanArray(int index) {
-        Map<Class<?>, Field[]> cached = FIELD_CACHE.get(packetClass);
-        if (cached != null) {
-            try {
-                return (boolean[]) cached.get(boolean[].class)[index].get(packet);
-            } catch (IllegalAccessException e) {
-                e.printStackTrace();
-            }
-        }
-        int currentIndex = 0;
-        for (Field f : packetClass.getDeclaredFields()) {
-            f.setAccessible(true);
-            if (boolean[].class.isAssignableFrom(f.getType())) {
-                if (index == currentIndex++) {
-                    try {
-                        return (boolean[]) f.get(packet);
-                    } catch (IllegalAccessException e) {
-                        e.printStackTrace();
-                    }
-                }
-            }
-        }
-        throw new WrapperFieldNotFoundException(packetClass, boolean[].class, index);
+        return read(index, boolean[].class);
     }
 
     @Override
     public byte[] readByteArray(int index) {
-        Map<Class<?>, Field[]> cached = FIELD_CACHE.get(packetClass);
-        if (cached != null) {
-            try {
-                return (byte[]) cached.get(byte[].class)[index].get(packet);
-            } catch (IllegalAccessException e) {
-                e.printStackTrace();
-            }
-        }
-        int currentIndex = 0;
-        for (Field f : packetClass.getDeclaredFields()) {
-            f.setAccessible(true);
-            if (byte[].class.isAssignableFrom(f.getType())) {
-                if (index == currentIndex++) {
-                    try {
-                        return (byte[]) f.get(packet);
-                    } catch (IllegalAccessException e) {
-                        e.printStackTrace();
-                    }
-                }
-            }
-        }
-        throw new WrapperFieldNotFoundException(packetClass, byte[].class, index);
+        return read(index, byte[].class);
     }
 
     @Override
     public short[] readShortArray(int index) {
-        Map<Class<?>, Field[]> cached = FIELD_CACHE.get(packetClass);
-        if (cached != null) {
-            try {
-                return (short[]) cached.get(short[].class)[index].get(packet);
-            } catch (IllegalAccessException e) {
-                e.printStackTrace();
-            }
-        }
-        int currentIndex = 0;
-        for (Field f : packetClass.getDeclaredFields()) {
-            f.setAccessible(true);
-            if (short[].class.isAssignableFrom(f.getType())) {
-                if (index == currentIndex++) {
-                    try {
-                        return (short[]) f.get(packet);
-                    } catch (IllegalAccessException e) {
-                        e.printStackTrace();
-                    }
-                }
-            }
-        }
-        throw new WrapperFieldNotFoundException(packetClass, short[].class, index);
+        return read(index, short[].class);
     }
 
     @Override
     public int[] readIntArray(int index) {
-        Map<Class<?>, Field[]> cached = FIELD_CACHE.get(packetClass);
-        if (cached != null) {
-            try {
-                return (int[]) cached.get(int[].class)[index].get(packet);
-            } catch (IllegalAccessException e) {
-                e.printStackTrace();
-            }
-        }
-        int currentIndex = 0;
-        for (Field f : packetClass.getDeclaredFields()) {
-            f.setAccessible(true);
-            if (int[].class.isAssignableFrom(f.getType())) {
-                if (index == currentIndex++) {
-                    try {
-                        return (int[]) f.get(packet);
-                    } catch (IllegalAccessException e) {
-                        e.printStackTrace();
-                    }
-                }
-            }
-        }
-        throw new WrapperFieldNotFoundException(packetClass, int[].class, index);
+        return read(index, int[].class);
     }
 
     @Override
     public long[] readLongArray(int index) {
-        Map<Class<?>, Field[]> cached = FIELD_CACHE.get(packetClass);
-        if (cached != null) {
-            try {
-                return (long[]) cached.get(long[].class)[index].get(packet);
-            } catch (IllegalAccessException e) {
-                e.printStackTrace();
-            }
-        }
-        int currentIndex = 0;
-        for (Field f : packetClass.getDeclaredFields()) {
-            f.setAccessible(true);
-            if (long[].class.isAssignableFrom(f.getType())) {
-                if (index == currentIndex++) {
-                    try {
-                        return (long[]) f.get(packet);
-                    } catch (IllegalAccessException e) {
-                        e.printStackTrace();
-                    }
-                }
-            }
-        }
-        throw new WrapperFieldNotFoundException(packetClass, long[].class, index);
+        return read(index, long[].class);
     }
 
     @Override
     public float[] readFloatArray(int index) {
-        Map<Class<?>, Field[]> cached = FIELD_CACHE.get(packetClass);
-        if (cached != null) {
-            try {
-                return (float[]) cached.get(float[].class)[index].get(packet);
-            } catch (IllegalAccessException e) {
-                e.printStackTrace();
-            }
-        }
-        int currentIndex = 0;
-        for (Field f : packetClass.getDeclaredFields()) {
-            f.setAccessible(true);
-            if (float.class.isAssignableFrom(f.getType())) {
-                if (index == currentIndex++) {
-                    try {
-                        return (float[]) f.get(packet);
-                    } catch (IllegalAccessException e) {
-                        e.printStackTrace();
-                    }
-                }
-            }
-        }
-        throw new WrapperFieldNotFoundException(packetClass, float[].class, index);
+        return read(index, float[].class);
     }
 
     @Override
     public double[] readDoubleArray(int index) {
-        Map<Class<?>, Field[]> cached = FIELD_CACHE.get(packetClass);
-        if (cached != null) {
-            try {
-                return (double[]) cached.get(double[].class)[index].get(packet);
-            } catch (IllegalAccessException e) {
-                e.printStackTrace();
-            }
-        }
-        int currentIndex = 0;
-        for (Field f : packetClass.getDeclaredFields()) {
-            f.setAccessible(true);
-            if (double[].class.isAssignableFrom(f.getType())) {
-                if (index == currentIndex++) {
-                    try {
-                        return (double[]) f.get(packet);
-                    } catch (IllegalAccessException e) {
-                        e.printStackTrace();
-                    }
-                }
-            }
-        }
-        throw new WrapperFieldNotFoundException(packetClass, double[].class, index);
+        return read(index, double[].class);
     }
 
     @Override
     public String[] readStringArray(int index) {
-        Map<Class<?>, Field[]> cached = FIELD_CACHE.get(packetClass);
-        if (cached != null) {
-            try {
-                Object[] array = (Object[]) cached.get(String[].class)[index].get(packet);
-                int len = array.length;
-                String[] stringArray = new String[len];
-                for (int i = 0; i < len; i++) {
-                    stringArray[i] = array[i].toString();
-                }
-                return stringArray;
-            } catch (IllegalAccessException e) {
-                e.printStackTrace();
-            }
-        }
-        throw new WrapperFieldNotFoundException(packetClass, String[].class, index);
+        return read(index, String[].class); // JavaImpact: Can we be sure that returning the original array is okay? retrooper: Yes
     }
 
     @Override
     public String readString(int index) {
-        return (String) read(String.class, index);
+        return read(index, String.class);
     }
 
+    @Override
     public Object readAnyObject(int index) {
         try {
             Field f = packetClass.getDeclaredFields()[index];
@@ -431,8 +261,8 @@ public class WrappedPacket implements WrapperPacketReader, WrapperPacketWriter {
                 f.setAccessible(true);
             }
             try {
-                return f.get(packet);
-            } catch (IllegalAccessException e) {
+                return f.get(packet.getRawNMSPacket());
+            } catch (IllegalAccessException | NullPointerException | ArrayIndexOutOfBoundsException e) {
                 e.printStackTrace();
             }
         } catch (ArrayIndexOutOfBoundsException e) {
@@ -441,70 +271,26 @@ public class WrappedPacket implements WrapperPacketReader, WrapperPacketWriter {
         return null;
     }
 
-    public Object readObject(int index, Class<?> type) {
-        Map<Class<?>, Field[]> cached = FIELD_CACHE.get(packetClass);
-        if (cached != null) {
-            Field[] cachedFields = cached.get(type);
-            if (cachedFields == null) {
-                List<Field> typeFields = new ArrayList<>();
-                for (Field f : packetClass.getDeclaredFields()) {
-                    f.setAccessible(true);
-                    if (f.getType().equals(type)) {
-                        typeFields.add(f);
-                    }
-                }
-                if (!typeFields.isEmpty()) {
-                    cached.put(type, typeFields.toArray(new Field[0]));
-                    cachedFields = cached.get(type);
-                } else {
-                    throw new WrapperFieldNotFoundException("The class you are trying to read fields from does not contain any fields!");
-                }
-            }
-            try {
-                return cachedFields[index].get(packet);
-            } catch (IllegalAccessException e) {
-                e.printStackTrace();
-            }
-        }
-        throw new WrapperFieldNotFoundException(packetClass, type, index);
+    @Override
+    public <T> T readObject(int index, Class<? extends T> type) {
+        return read(index, type);
     }
 
-    public boolean doesObjectExist(int index, Class<?> type) {
-        Map<Class<?>, Field[]> cached = FIELD_CACHE.get(packetClass);
-        if (cached != null) {
-            Field[] cachedFields = cached.get(type);
-            if (cachedFields == null) {
-                List<Field> typeFields = new ArrayList<>();
-                for (Field f : packetClass.getDeclaredFields()) {
-                    f.setAccessible(true);
-                    if (f.getType().equals(type)) {
-                        typeFields.add(f);
-                    }
-                }
-                if (!typeFields.isEmpty()) {
-                    cached.put(type, typeFields.toArray(new Field[0]));
-                    cachedFields = cached.get(type);
-                } else {
-                    return false;
-                }
-            }
-            if (cachedFields == null) {
-                return false;
-            } else return index <= cachedFields.length + 1;
-        }
-        return false;
+    @Override
+    public Enum<?> readEnumConstant(int index, Class<? extends Enum<?>> type) {
+        return read(index, type);
     }
 
-    public Object[] readObjectArray(int index, Class<?> type) {
-        if (type.equals(String.class)) {
-            return readStringArray(index);
-        }
+    @SuppressWarnings("unchecked")
+    public <T> T read(int index, Class<? extends T> type) {
         try {
-            return (Object[]) readObject(index, getArrayClass(type));
-        } catch (ClassNotFoundException e) {
-            throw new IllegalStateException("PacketEvents failed to find the array class of type " + type.getName());
+            Field field = getField(type, index);
+            return (T) field.get(packet.getRawNMSPacket());
+        } catch (IllegalAccessException | NullPointerException | ArrayIndexOutOfBoundsException e) {
+            throw new WrapperFieldNotFoundException(packetClass, type, index);
         }
     }
+
 
     @Override
     public void writeBoolean(int index, boolean value) {
@@ -547,83 +333,195 @@ public class WrappedPacket implements WrapperPacketReader, WrapperPacketWriter {
     }
 
     @Override
-    public void writeObject(int index, Object object) {
-        write(object.getClass(), index, object);
+    public void writeObject(int index, Object value) {
+        write(value.getClass(), index, value);
     }
 
-    private void write(Class<?> type, int index, Object value) throws WrapperFieldNotFoundException {
+    @Override
+    public void writeBooleanArray(int index, boolean[] array) {
+        write(boolean[].class, index, array);
+    }
+
+    @Override
+    public void writeByteArray(int index, byte[] value) {
+        write(byte[].class, index, value);
+    }
+
+    @Override
+    public void writeShortArray(int index, short[] value) {
+        write(short[].class, index, value);
+    }
+
+    @Override
+    public void writeIntArray(int index, int[] value) {
+        write(int[].class, index, value);
+    }
+
+    @Override
+    public void writeLongArray(int index, long[] value) {
+        write(long[].class, index, value);
+    }
+
+    @Override
+    public void writeFloatArray(int index, float[] value) {
+        write(float[].class, index, value);
+    }
+
+    @Override
+    public void writeDoubleArray(int index, double[] value) {
+        write(double[].class, index, value);
+    }
+
+    @Override
+    public void writeStringArray(int index, String[] value) {
+        write(String[].class, index, value);
+    }
+
+    @Override
+    public void writeAnyObject(int index, Object value) {
+        try {
+            Field f = packetClass.getDeclaredFields()[index];
+            f.set(packet.getRawNMSPacket(), value);
+        } catch (Exception e) {
+            throw new WrapperFieldNotFoundException("PacketEvents failed to find any field indexed " + index + " in the " + ClassUtil.getClassSimpleName(packetClass) + " class!");
+        }
+    }
+
+    @Override
+    public void writeEnumConstant(int index, Enum<?> enumConstant) {
+        write(enumConstant.getClass(), index, enumConstant);
+    }
+
+    public void write(Class<?> type, int index, Object value) throws WrapperFieldNotFoundException {
         Field field = getField(type, index);
+        //Reflection.getFieldWithoutFinalModifier(field);
         if (field == null) {
             throw new WrapperFieldNotFoundException(packetClass, type, index);
         }
         try {
-            field.set(packet, value);
-        } catch (IllegalAccessException e) {
+            field.set(packet.getRawNMSPacket(), value);
+        } catch (IllegalAccessException | NullPointerException e) {
             e.printStackTrace();
         }
     }
 
-    private Object read(Class<?> type, int index) throws WrapperFieldNotFoundException {
-        Field field = getField(type, index);
-        if (field == null) {
-            throw new WrapperFieldNotFoundException(packetClass, type, index);
+    public ItemStack readItemStack(int index) {
+        Object nmsItemStack = readObject(index, NMSUtils.nmsItemStackClass);
+        return NMSUtils.toBukkitItemStack(nmsItemStack);
+    }
+
+    public void writeItemStack(int index, ItemStack stack) {
+        Object nmsItemStack = NMSUtils.toNMSItemStack(stack);
+        write(NMSUtils.nmsItemStackClass, 0, nmsItemStack);
+    }
+
+    public GameMode readGameMode(int index) {
+        Enum<?> enumConst = readEnumConstant(index, NMSUtils.enumGameModeClass);
+        return GameMode.valueOf(enumConst.name());
+    }
+
+    public void writeGameMode(int index, GameMode gameMode) {
+        Enum<?> enumConst = EnumUtil.valueOf(NMSUtils.enumGameModeClass, gameMode.name());
+        writeEnumConstant(index, enumConst);
+    }
+
+    public Dimension readDimension(int index, int dimensionIDLegacyIndex) {
+        int dimensionID;
+        if (version.isOlderThan(ServerVersion.v_1_13_2)) {
+            dimensionID = readInt(dimensionIDLegacyIndex);
+        } else {
+            Object dimensionManagerObject = readObject(index, NMSUtils.dimensionManagerClass);
+            WrappedPacket dimensionManagerWrapper = new WrappedPacket(new NMSPacket(dimensionManagerObject));
+            dimensionID = dimensionManagerWrapper.readInt(0) - 1;
         }
-        try {
-            return field.get(packet);
-        } catch (IllegalAccessException e) {
-            e.printStackTrace();
+        return Dimension.getById(dimensionID);
+    }
+
+    public void writeDimension(int index, int dimensionIDLegacyIndex, Dimension dimension) {
+        if (version.isOlderThan(ServerVersion.v_1_13_2)) {
+            writeInt(dimensionIDLegacyIndex, dimension.getId());
+        } else {
+            Object dimensionManagerObject = readObject(index, NMSUtils.dimensionManagerClass);
+            WrappedPacket dimensionManagerWrapper = new WrappedPacket(new NMSPacket(dimensionManagerObject));
+            dimensionManagerWrapper.writeInt(0, dimension.getId() + 1);
         }
-        return null;
+    }
+
+
+    public Difficulty readDifficulty(int index) {
+        Enum<?> enumConstant = readEnumConstant(index, NMSUtils.enumDifficultyClass);
+        return Difficulty.values()[enumConstant.ordinal()];
+    }
+
+    public void writeDifficulty(int index, Difficulty difficulty) {
+        Enum<?> enumConstant = EnumUtil.valueByIndex(NMSUtils.enumDifficultyClass, difficulty.ordinal());
+        writeEnumConstant(index, enumConstant);
+    }
+
+    public String readIChatBaseComponent(int index) {
+        Object iChatBaseComponent = readObject(index, NMSUtils.iChatBaseComponentClass);
+        return NMSUtils.readIChatBaseComponent(iChatBaseComponent);
+    }
+
+    public void writeIChatBaseComponent(int index, String content) {
+        Object iChatBaseComponent = NMSUtils.generateIChatBaseComponent(content);
+        write(NMSUtils.iChatBaseComponentClass, index, iChatBaseComponent);
+    }
+
+    public List<Object> readList(int index) {
+        return read(index, List.class);
+    }
+
+    public void writeList(int index, List<Object> list) {
+        write(List.class, index, list);
     }
 
     private Field getField(Class<?> type, int index) {
-        Map<Class<?>, Field[]> cached = FIELD_CACHE.get(packetClass);
-        if (cached == null) {
-            return null;
-        }
-        Field[] fields = cached.get(type);
-        if (fields != null) {
+        Map<Class<?>, Field[]> cached = FIELD_CACHE.computeIfAbsent(packetClass, k -> new ConcurrentHashMap<>());
+        Field[] fields = cached.computeIfAbsent(type, typeClass -> getFields(typeClass, packetClass.getDeclaredFields()));
+        if (fields.length >= index + 1) {
             return fields[index];
+        } else {
+            throw new WrapperFieldNotFoundException(packetClass, type, index);
         }
-        return null;
     }
 
-    private List<Field> getFields(Class<?> type, Field[] fields) {
+    private Field[] getFields(Class<?> type, Field[] fields) {
         List<Field> ret = new ArrayList<>();
         for (Field field : fields) {
-            if (field.getType() == type) {
+            if (field.getType().equals(type)) {
+                if (!field.isAccessible()) {
+                    field.setAccessible(true);
+                }
                 ret.add(field);
             }
         }
-        return ret;
+        return ret.toArray(EMPTY_FIELD_ARRAY);
     }
 
-    private Class<?> getArrayClass(Class<?> componentType) throws ClassNotFoundException {
-        ClassLoader classLoader = componentType.getClassLoader();
-        String name;
-        if (componentType.isArray()) {
-            // just add a leading "["
-            name = "[" + componentType.getName();
-        } else if (componentType == boolean.class) {
-            name = "[Z";
-        } else if (componentType == byte.class) {
-            name = "[B";
-        } else if (componentType == char.class) {
-            name = "[C";
-        } else if (componentType == double.class) {
-            name = "[D";
-        } else if (componentType == float.class) {
-            name = "[F";
-        } else if (componentType == int.class) {
-            name = "[I";
-        } else if (componentType == long.class) {
-            name = "[J";
-        } else if (componentType == short.class) {
-            name = "[S";
-        } else {
-            // must be an object non-array class
-            name = "[L" + componentType.getName() + ";";
-        }
-        return classLoader != null ? classLoader.loadClass(name) : Class.forName(name);
+
+    /**
+     * Does the local server version support reading at-least one field with this packet wrapper?
+     * If it does, we can label this wrapper to be supported on the local server version.
+     * One example where it would not be supported would be if the packet the wrapper is wrapping doesn't even exist on the local server version.
+     *
+     * @return Is the wrapper supported on the local server version?
+     */
+    public boolean isSupported() {
+        return true;
+    }
+
+    /**
+     * If a method in a wrapper is annotated with this, it means it isn't supported on all server versions.
+     * It not being supported by all server versions can lead to exceptions. Make sure you always decompile a wrapper getter before using it.
+     * This annotation will specify what versions are supported.
+     *
+     * @author retrooper
+     * @since 1.8
+     */
+    @Target({ElementType.METHOD, ElementType.FIELD, ElementType.CONSTRUCTOR})
+    @Retention(RetentionPolicy.RUNTIME)
+    public @interface SupportedVersions {
+        ServerVersion[] ranges() default {};
     }
 }

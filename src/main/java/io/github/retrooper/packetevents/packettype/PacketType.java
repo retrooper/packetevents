@@ -1,25 +1,19 @@
 /*
- * MIT License
+ * This file is part of packetevents - https://github.com/retrooper/packetevents
+ * Copyright (C) 2021 retrooper and contributors
  *
- * Copyright (c) 2020 retrooper
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
  *
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
  *
- * The above copyright notice and this permission notice shall be included in all
- * copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
- * SOFTWARE.
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
 package io.github.retrooper.packetevents.packettype;
@@ -27,281 +21,430 @@ package io.github.retrooper.packetevents.packettype;
 import io.github.retrooper.packetevents.PacketEvents;
 import io.github.retrooper.packetevents.utils.server.ServerVersion;
 
-import java.util.HashMap;
+import java.util.IdentityHashMap;
 import java.util.Map;
 
+/**
+ * Packet Type IDs.
+ * This is the Packet ID system, it is recommended to use this over packet comparisons by packet name.
+ * This is also faster than comparing packet names.
+ *
+ * @author retrooper
+ * @since 1.6.8
+ */
 public class PacketType {
+    /**
+     * If a Packet Type could not be resolved, it will be set to the current value of this constant.
+     * This value may change over the versions so it is important to use the variable and not hard code its value.
+     */
+    public static final byte INVALID = -128;
+    public static final Map<Class<?>, Byte> packetIDMap = new IdentityHashMap<>();
+
+    private static void insertPacketID(Class<?> cls, byte packetID) {
+        if (cls != null) {
+            packetIDMap.put(cls, packetID);
+        }
+    }
+
+    public static void load() {
+        Status.Client.load();
+        Status.Server.load();
+
+        Handshaking.Client.load();
+
+        Login.Client.load();
+        Login.Server.load();
+
+        Play.Client.load();
+        Play.Server.load();
+    }
+
+    /**
+     * Status Packet IDs.
+     *
+     * @author retrooper
+     * @see <a href="https://wiki.vg/Protocol#Status">https://wiki.vg/Protocol#Status</a>
+     * @since 1.7
+     */
     public static class Status {
-        public static final Map<Class<?>, Byte> packetIds = new HashMap<>();
-
-        public static void init() {
-            packetIds.put(PacketTypeClasses.Status.Client.START, Client.START);
-            packetIds.put(PacketTypeClasses.Status.Client.PING, Client.PING);
-            packetIds.put(PacketTypeClasses.Status.Server.PONG, Server.PONG);
-            packetIds.put(PacketTypeClasses.Status.Server.SERVER_INFO, Server.SERVER_INFO);
-        }
-
+        /**
+         * Server-bound (client-sided) Status Packet IDs.
+         *
+         * @author retrooper
+         * @see <a href="https://wiki.vg/Protocol#Serverbound_2">https://wiki.vg/Protocol#Serverbound_2</a>
+         * @since 1.8
+         */
         public static class Client {
-            public static final byte START = 0, PING = 1;
+            public static final byte START = -127, PING = -126;
+
+            private static void load() {
+                insertPacketID(PacketTypeClasses.Status.Client.START, Client.START);
+                insertPacketID(PacketTypeClasses.Status.Client.PING, Client.PING);
+            }
         }
 
+        /**
+         * Client-bound (server-sided) Status Packet IDs.
+         *
+         * @author retrooper
+         * @see <a href="https://wiki.vg/Protocol#Clientbound_2">https://wiki.vg/Protocol#Clientbound_2</a>
+         * @since 1.8
+         */
         public static class Server {
-            public static final byte PONG = 2, SERVER_INFO = 3;
+            public static final byte PONG = -125, SERVER_INFO = -124;
+
+            private static void load() {
+                insertPacketID(PacketTypeClasses.Status.Server.PONG, Server.PONG);
+                insertPacketID(PacketTypeClasses.Status.Server.SERVER_INFO, Server.SERVER_INFO);
+            }
         }
     }
 
+    /**
+     * Handshaking Packet IDs.
+     *
+     * @author retrooper
+     * @see <a href="https://wiki.vg/Protocol#Handshaking">https://wiki.vg/Protocol#Handshaking</a>
+     * @since 1.8
+     */
+    public static class Handshaking {
+        /**
+         * Server-bound (client-sided) Handshaking Packet IDs.
+         *
+         * @author retrooper
+         * @since 1.8
+         */
+        public static class Client {
+            public static final byte SET_PROTOCOL = -123;
+
+            private static void load() {
+                insertPacketID(PacketTypeClasses.Handshaking.Client.SET_PROTOCOL, Client.SET_PROTOCOL);
+            }
+        }
+    }
+
+    /**
+     * Login Packet IDs.
+     *
+     * @author retrooper
+     * @see <a href="https://wiki.vg/Protocol#Login">https://wiki.vg/Protocol#Login</a>
+     * @since 1.7
+     */
     public static class Login {
-        public static final Map<Class<?>, Byte> packetIds = new HashMap<>();
-
-        public static void init() {
-            packetIds.put(PacketTypeClasses.Login.Client.HANDSHAKE, Client.HANDSHAKE);
-            packetIds.put(PacketTypeClasses.Login.Client.CUSTOM_PAYLOAD, Client.CUSTOM_PAYLOAD);
-            packetIds.put(PacketTypeClasses.Login.Client.START, Client.START);
-            packetIds.put(PacketTypeClasses.Login.Client.ENCRYPTION_BEGIN, Client.ENCRYPTION_BEGIN);
-
-            packetIds.put(PacketTypeClasses.Login.Server.CUSTOM_PAYLOAD, Server.CUSTOM_PAYLOAD);
-            packetIds.put(PacketTypeClasses.Login.Server.DISCONNECT, Server.DISCONNECT);
-            packetIds.put(PacketTypeClasses.Login.Server.ENCRYPTION_BEGIN, Server.ENCRYPTION_BEGIN);
-            packetIds.put(PacketTypeClasses.Login.Server.SUCCESS, Server.SUCCESS);
-            packetIds.put(PacketTypeClasses.Login.Server.SET_COMPRESSION, Server.SET_COMPRESSION);
-        }
-
+        /**
+         * Server-bound (client-sided) Login Packet IDs.
+         *
+         * @author retrooper
+         * @see <a href="https://wiki.vg/Protocol#Serverbound_3">https://wiki.vg/Protocol#Serverbound_3</a>
+         * @since 1.8
+         */
         public static class Client {
-            public static final byte HANDSHAKE = 0, CUSTOM_PAYLOAD = 1, START = 2, ENCRYPTION_BEGIN = 3;
+            public static final byte CUSTOM_PAYLOAD = -122, START = -121, ENCRYPTION_BEGIN = -120;
+
+            private static void load() {
+                insertPacketID(PacketTypeClasses.Login.Client.CUSTOM_PAYLOAD, Client.CUSTOM_PAYLOAD);
+                insertPacketID(PacketTypeClasses.Login.Client.START, Client.START);
+                insertPacketID(PacketTypeClasses.Login.Client.ENCRYPTION_BEGIN, Client.ENCRYPTION_BEGIN);
+            }
         }
 
+        /**
+         * Client-bound (server-sided) Login Packet IDs.
+         *
+         * @author retrooper
+         * @see <a href="https://wiki.vg/Protocol#Clientbound_3">https://wiki.vg/Protocol#Clientbound_3</a>
+         * @since 1.8
+         */
         public static class Server {
-            public static final byte CUSTOM_PAYLOAD = 4, DISCONNECT = 5, ENCRYPTION_BEGIN = 6, SUCCESS = 7, SET_COMPRESSION = 8;
+            public static final byte CUSTOM_PAYLOAD = -119, DISCONNECT = -118, ENCRYPTION_BEGIN = -117, SUCCESS = -116, SET_COMPRESSION = -115;
+
+            private static void load() {
+                insertPacketID(PacketTypeClasses.Login.Server.CUSTOM_PAYLOAD, Server.CUSTOM_PAYLOAD);
+                insertPacketID(PacketTypeClasses.Login.Server.DISCONNECT, Server.DISCONNECT);
+                insertPacketID(PacketTypeClasses.Login.Server.ENCRYPTION_BEGIN, Server.ENCRYPTION_BEGIN);
+                insertPacketID(PacketTypeClasses.Login.Server.SUCCESS, Server.SUCCESS);
+                insertPacketID(PacketTypeClasses.Login.Server.SET_COMPRESSION, Server.SET_COMPRESSION);
+            }
         }
     }
 
-    public static class Client {
-        public static final Map<Class<?>, Byte> packetIds = new HashMap<>();
-        public static final byte TELEPORT_ACCEPT = 0,
-                TILE_NBT_QUERY = 1, DIFFICULTY_CHANGE = 2, CHAT = 3, CLIENT_COMMAND = 4,
-                SETTINGS = 5, TAB_COMPLETE = 6, TRANSACTION = 7, ENCHANT_ITEM = 8,
-                WINDOW_CLICK = 9, CLOSE_WINDOW = 10, CUSTOM_PAYLOAD = 11, B_EDIT = 12,
-                ENTITY_NBT_QUERY = 13, USE_ENTITY = 14, JIGSAW_GENERATE = 15, KEEP_ALIVE = 16,
-                DIFFICULTY_LOCK = 17, POSITION = 18, POSITION_LOOK = 19, LOOK = 20,
-                FLYING = 21, VEHICLE_MOVE = 22, BOAT_MOVE = 23, PICK_ITEM = 24,
-                AUTO_RECIPE = 25, ABILITIES = 26, BLOCK_DIG = 27, ENTITY_ACTION = 28,
-                STEER_VEHICLE = 29, RECIPE_DISPLAYED = 30, ITEM_NAME = 31, RESOURCE_PACK_STATUS = 32,
-                ADVANCEMENTS = 33, TR_SEL = 34, BEACON = 35, HELD_ITEM_SLOT = 36,
-                SET_COMMAND_BLOCK = 37, SET_COMMAND_MINECART = 38, SET_CREATIVE_SLOT = 39, SET_JIGSAW = 40,
-                STRUCT = 41, UPDATE_SIGN = 42, ARM_ANIMATION = 43, SPECTATE = 44,
-                USE_ITEM = 45, BLOCK_PLACE = 46;
+    /**
+     * Play Packet IDs.
+     *
+     * @author retrooper
+     * @see <a href="https://wiki.vg/Protocol#Play">https://wiki.vg/Protocol#Play</a>
+     * @since 1.8
+     */
+    public static class Play {
+        /**
+         * Server-bound (client-sided) Play Packet IDs.
+         *
+         * @author retrooper
+         * @see <a href="https://wiki.vg/Protocol#Serverbound_4">https://wiki.vg/Protocol#Serverbound_4</a>
+         * @since 1.8
+         */
+        public static class Client {
+            public static final byte TELEPORT_ACCEPT = -114,
+                    TILE_NBT_QUERY = -113, DIFFICULTY_CHANGE = -112, CHAT = -111, CLIENT_COMMAND = -110,
+                    SETTINGS = -109, TAB_COMPLETE = -108, TRANSACTION = -107, ENCHANT_ITEM = -106,
+                    WINDOW_CLICK = -105, CLOSE_WINDOW = -104, CUSTOM_PAYLOAD = -103, B_EDIT = -102,
+                    ENTITY_NBT_QUERY = -101, USE_ENTITY = -100, JIGSAW_GENERATE = -99, KEEP_ALIVE = -98,
+                    DIFFICULTY_LOCK = -97, POSITION = -96, POSITION_LOOK = -95, LOOK = -94,
+                    FLYING = -93, VEHICLE_MOVE = -92, BOAT_MOVE = -91, PICK_ITEM = -90,
+                    AUTO_RECIPE = -89, ABILITIES = -88, BLOCK_DIG = -87, ENTITY_ACTION = -86,
+                    STEER_VEHICLE = -85, RECIPE_DISPLAYED = -84, ITEM_NAME = -83, RESOURCE_PACK_STATUS = -82,
+                    ADVANCEMENTS = -81, TR_SEL = -80, BEACON = -79, HELD_ITEM_SLOT = -78,
+                    SET_COMMAND_BLOCK = -77, SET_COMMAND_MINECART = -76, SET_CREATIVE_SLOT = -75, SET_JIGSAW = -74,
+                    STRUCT = -73, UPDATE_SIGN = -72, ARM_ANIMATION = -71, SPECTATE = -70,
+                    USE_ITEM = -69, BLOCK_PLACE = -68;
 
-        public static void init() {
-            packetIds.put(PacketTypeClasses.Client.TELEPORT_ACCEPT, TELEPORT_ACCEPT);
-            packetIds.put(PacketTypeClasses.Client.TILE_NBT_QUERY, TILE_NBT_QUERY);
-            packetIds.put(PacketTypeClasses.Client.DIFFICULTY_CHANGE, DIFFICULTY_CHANGE);
-            packetIds.put(PacketTypeClasses.Client.CHAT, CHAT);
-            packetIds.put(PacketTypeClasses.Client.CLIENT_COMMAND, CLIENT_COMMAND);
-            packetIds.put(PacketTypeClasses.Client.SETTINGS, SETTINGS);
-            packetIds.put(PacketTypeClasses.Client.TAB_COMPLETE, TAB_COMPLETE);
-            packetIds.put(PacketTypeClasses.Client.TRANSACTION, TRANSACTION);
-            packetIds.put(PacketTypeClasses.Client.ENCHANT_ITEM, ENCHANT_ITEM);
-            packetIds.put(PacketTypeClasses.Client.WINDOW_CLICK, WINDOW_CLICK);
-            packetIds.put(PacketTypeClasses.Client.CLOSE_WINDOW, CLOSE_WINDOW);
-            packetIds.put(PacketTypeClasses.Client.CUSTOM_PAYLOAD, CUSTOM_PAYLOAD);
-            packetIds.put(PacketTypeClasses.Client.B_EDIT, B_EDIT);
-            packetIds.put(PacketTypeClasses.Client.ENTITY_NBT_QUERY, ENTITY_NBT_QUERY);
-            packetIds.put(PacketTypeClasses.Client.USE_ENTITY, USE_ENTITY);
-            packetIds.put(PacketTypeClasses.Client.JIGSAW_GENERATE, JIGSAW_GENERATE);
-            packetIds.put(PacketTypeClasses.Client.KEEP_ALIVE, KEEP_ALIVE);
-            packetIds.put(PacketTypeClasses.Client.DIFFICULTY_LOCK, DIFFICULTY_LOCK);
-            packetIds.put(PacketTypeClasses.Client.POSITION, POSITION);
-            packetIds.put(PacketTypeClasses.Client.POSITION_LOOK, POSITION_LOOK);
-            packetIds.put(PacketTypeClasses.Client.LOOK, LOOK);
-            packetIds.put(PacketTypeClasses.Client.FLYING, FLYING);
-            packetIds.put(PacketTypeClasses.Client.VEHICLE_MOVE, VEHICLE_MOVE);
-            packetIds.put(PacketTypeClasses.Client.BOAT_MOVE, BOAT_MOVE);
-            packetIds.put(PacketTypeClasses.Client.PICK_ITEM, PICK_ITEM);
-            packetIds.put(PacketTypeClasses.Client.AUTO_RECIPE, AUTO_RECIPE);
-            packetIds.put(PacketTypeClasses.Client.ABILITIES, ABILITIES);
-            packetIds.put(PacketTypeClasses.Client.BLOCK_DIG, BLOCK_DIG);
-            packetIds.put(PacketTypeClasses.Client.ENTITY_ACTION, ENTITY_ACTION);
-            packetIds.put(PacketTypeClasses.Client.STEER_VEHICLE, STEER_VEHICLE);
-            packetIds.put(PacketTypeClasses.Client.RECIPE_DISPLAYED, RECIPE_DISPLAYED);
-            packetIds.put(PacketTypeClasses.Client.ITEM_NAME, ITEM_NAME);
-            packetIds.put(PacketTypeClasses.Client.RESOURCE_PACK_STATUS, RESOURCE_PACK_STATUS);
-            packetIds.put(PacketTypeClasses.Client.ADVANCEMENTS, ADVANCEMENTS);
-            packetIds.put(PacketTypeClasses.Client.TR_SEL, TR_SEL);
-            packetIds.put(PacketTypeClasses.Client.BEACON, BEACON);
-            packetIds.put(PacketTypeClasses.Client.HELD_ITEM_SLOT, HELD_ITEM_SLOT);
-            packetIds.put(PacketTypeClasses.Client.SET_COMMAND_BLOCK, SET_COMMAND_BLOCK);
-            packetIds.put(PacketTypeClasses.Client.SET_COMMAND_MINECART, SET_COMMAND_MINECART);
-            packetIds.put(PacketTypeClasses.Client.SET_CREATIVE_SLOT, SET_CREATIVE_SLOT);
-            packetIds.put(PacketTypeClasses.Client.SET_JIGSAW, SET_JIGSAW);
-            packetIds.put(PacketTypeClasses.Client.STRUCT, STRUCT);
-            packetIds.put(PacketTypeClasses.Client.UPDATE_SIGN, UPDATE_SIGN);
-            packetIds.put(PacketTypeClasses.Client.ARM_ANIMATION, ARM_ANIMATION);
-            packetIds.put(PacketTypeClasses.Client.SPECTATE, SPECTATE);
-            packetIds.put(PacketTypeClasses.Client.USE_ITEM, USE_ITEM);
-            packetIds.put(PacketTypeClasses.Client.BLOCK_PLACE, BLOCK_PLACE);
-        }
+            private static void load() {
+                insertPacketID(PacketTypeClasses.Play.Client.TELEPORT_ACCEPT, TELEPORT_ACCEPT);
+                insertPacketID(PacketTypeClasses.Play.Client.TILE_NBT_QUERY, TILE_NBT_QUERY);
+                insertPacketID(PacketTypeClasses.Play.Client.DIFFICULTY_CHANGE, DIFFICULTY_CHANGE);
+                insertPacketID(PacketTypeClasses.Play.Client.CHAT, CHAT);
+                insertPacketID(PacketTypeClasses.Play.Client.CLIENT_COMMAND, CLIENT_COMMAND);
+                insertPacketID(PacketTypeClasses.Play.Client.SETTINGS, SETTINGS);
+                insertPacketID(PacketTypeClasses.Play.Client.TAB_COMPLETE, TAB_COMPLETE);
+                insertPacketID(PacketTypeClasses.Play.Client.TRANSACTION, TRANSACTION);
+                insertPacketID(PacketTypeClasses.Play.Client.ENCHANT_ITEM, ENCHANT_ITEM);
+                insertPacketID(PacketTypeClasses.Play.Client.WINDOW_CLICK, WINDOW_CLICK);
+                insertPacketID(PacketTypeClasses.Play.Client.CLOSE_WINDOW, CLOSE_WINDOW);
+                insertPacketID(PacketTypeClasses.Play.Client.CUSTOM_PAYLOAD, CUSTOM_PAYLOAD);
+                insertPacketID(PacketTypeClasses.Play.Client.B_EDIT, B_EDIT);
+                insertPacketID(PacketTypeClasses.Play.Client.ENTITY_NBT_QUERY, ENTITY_NBT_QUERY);
+                insertPacketID(PacketTypeClasses.Play.Client.USE_ENTITY, USE_ENTITY);
+                insertPacketID(PacketTypeClasses.Play.Client.JIGSAW_GENERATE, JIGSAW_GENERATE);
+                insertPacketID(PacketTypeClasses.Play.Client.KEEP_ALIVE, KEEP_ALIVE);
+                insertPacketID(PacketTypeClasses.Play.Client.DIFFICULTY_LOCK, DIFFICULTY_LOCK);
+                insertPacketID(PacketTypeClasses.Play.Client.POSITION, POSITION);
+                insertPacketID(PacketTypeClasses.Play.Client.POSITION_LOOK, POSITION_LOOK);
+                insertPacketID(PacketTypeClasses.Play.Client.LOOK, LOOK);
+                insertPacketID(PacketTypeClasses.Play.Client.FLYING, FLYING);
+                insertPacketID(PacketTypeClasses.Play.Client.VEHICLE_MOVE, VEHICLE_MOVE);
+                insertPacketID(PacketTypeClasses.Play.Client.BOAT_MOVE, BOAT_MOVE);
+                insertPacketID(PacketTypeClasses.Play.Client.PICK_ITEM, PICK_ITEM);
+                insertPacketID(PacketTypeClasses.Play.Client.AUTO_RECIPE, AUTO_RECIPE);
+                insertPacketID(PacketTypeClasses.Play.Client.ABILITIES, ABILITIES);
+                insertPacketID(PacketTypeClasses.Play.Client.BLOCK_DIG, BLOCK_DIG);
+                insertPacketID(PacketTypeClasses.Play.Client.ENTITY_ACTION, ENTITY_ACTION);
+                insertPacketID(PacketTypeClasses.Play.Client.STEER_VEHICLE, STEER_VEHICLE);
+                insertPacketID(PacketTypeClasses.Play.Client.RECIPE_DISPLAYED, RECIPE_DISPLAYED);
+                insertPacketID(PacketTypeClasses.Play.Client.ITEM_NAME, ITEM_NAME);
+                insertPacketID(PacketTypeClasses.Play.Client.RESOURCE_PACK_STATUS, RESOURCE_PACK_STATUS);
+                insertPacketID(PacketTypeClasses.Play.Client.ADVANCEMENTS, ADVANCEMENTS);
+                insertPacketID(PacketTypeClasses.Play.Client.TR_SEL, TR_SEL);
+                insertPacketID(PacketTypeClasses.Play.Client.BEACON, BEACON);
+                insertPacketID(PacketTypeClasses.Play.Client.HELD_ITEM_SLOT, HELD_ITEM_SLOT);
+                insertPacketID(PacketTypeClasses.Play.Client.SET_COMMAND_BLOCK, SET_COMMAND_BLOCK);
+                insertPacketID(PacketTypeClasses.Play.Client.SET_COMMAND_MINECART, SET_COMMAND_MINECART);
+                insertPacketID(PacketTypeClasses.Play.Client.SET_CREATIVE_SLOT, SET_CREATIVE_SLOT);
+                insertPacketID(PacketTypeClasses.Play.Client.SET_JIGSAW, SET_JIGSAW);
+                insertPacketID(PacketTypeClasses.Play.Client.STRUCT, STRUCT);
+                insertPacketID(PacketTypeClasses.Play.Client.UPDATE_SIGN, UPDATE_SIGN);
+                insertPacketID(PacketTypeClasses.Play.Client.ARM_ANIMATION, ARM_ANIMATION);
+                insertPacketID(PacketTypeClasses.Play.Client.SPECTATE, SPECTATE);
+                insertPacketID(PacketTypeClasses.Play.Client.USE_ITEM, USE_ITEM);
+                insertPacketID(PacketTypeClasses.Play.Client.BLOCK_PLACE, BLOCK_PLACE);
+            }
 
-        public static class Util {
             /**
-             * Is the packet an instance of the PacketPlayInFlying packet?
+             * Server-bound Play Packet Type utility.
+             * Save a few lines of code by using this.
              *
-             * @param packetID Packet ID
-             * @return packetID == FLYING or POSITION or POSITION_LOOK or LOOK
+             * @author retrooper
+             * @since 1.8
              */
-            public static boolean isInstanceOfFlying(final byte packetID) {
-                return packetID == FLYING
-                        || packetID == POSITION
-                        || packetID == POSITION_LOOK
-                        || packetID == LOOK;
-            }
+            public static class Util {
+                /**
+                 * Is the play packet a PacketPlayInFlying, PacketPlayInPosition, PacketPlayInPositionLook
+                 * or a PacketPlayInLook packet?
+                 *
+                 * @param packetID Play Packet ID.
+                 * @return Is the Packet ID an instance of the PacketPlayInFlying packet?
+                 */
+                public static boolean isInstanceOfFlying(final byte packetID) {
+                    return packetID == FLYING
+                            || packetID == POSITION
+                            || packetID == POSITION_LOOK
+                            || packetID == LOOK;
+                }
 
-            public static boolean isBlockPlace(final byte packetID) {
-                final ServerVersion version = PacketEvents.get().getServerUtils().getVersion();
-                return version.isHigherThan(ServerVersion.v_1_8_8) ?
-                        packetID == Client.USE_ITEM
-                        : packetID == Client.BLOCK_PLACE;
+                /**
+                 * Is this the packet where the client places a block?
+                 * On 1.7.10 - 1.8.8 the client sends a PacketPlayInBlockPlace packet when actually placing the block.
+                 * On 1.9 - now the client sends a PacketPlayInUseItem packet when placing the block and the
+                 * PacketPlayInBlockPlace has a different use.
+                 * This method is a nice utility supporting all these versions letting you know
+                 * if the client played a block.
+                 * The {@link io.github.retrooper.packetevents.packetwrappers.play.in.blockplace.WrappedPacketInBlockPlace} wrapper
+                 * only works on an actual block place.
+                 * Use this method before using the wrapper to support all minecraft versions.
+                 *
+                 * @param packetID Play Packet ID.
+                 * @return Has the client placed a block?
+                 */
+                public static boolean isBlockPlace(final byte packetID) {
+                    final ServerVersion version = PacketEvents.get().getServerUtils().getVersion();
+                    return version.isNewerThan(ServerVersion.v_1_8_8) ?
+                            packetID == PacketType.Play.Client.USE_ITEM
+                            : packetID == PacketType.Play.Client.BLOCK_PLACE;
+                }
             }
         }
-    }
 
-    public static class Server {
-        public static final Map<Class<?>, Byte> packetIds = new HashMap<>();
-        public static final byte SPAWN_ENTITY = 0, SPAWN_ENTITY_EXPERIENCE_ORB = 1, SPAWN_ENTITY_WEATHER = 2, SPAWN_ENTITY_LIVING = 3,
-                SPAWN_ENTITY_PAINTING = 4, SPAWN_ENTITY_SPAWN = 5, ANIMATION = 6, STATISTIC = 7,
-                BLOCK_BREAK = 8, BLOCK_BREAK_ANIMATION = 9, TILE_ENTITY_DATA = 10, BLOCK_ACTION = 11,
-                BLOCK_CHANGE = 12, BOSS = 13, SERVER_DIFFICULTY = 14, CHAT = 15, MULTI_BLOCK_CHANGE = 16,
-                TAB_COMPLETE = 17, COMMANDS = 18, TRANSACTION = 19, CLOSE_WINDOW = 20,
-                WINDOW_ITEMS = 21, WINDOW_DATA = 22, SET_SLOT = 23, SET_COOLDOWN = 24,
-                CUSTOM_PAYLOAD = 25, CUSTOM_SOUND_EFFECT = 26, KICK_DISCONNECT = 27, ENTITY_STATUS = 28,
-                EXPLOSION = 29, UNLOAD_CHUNK = 30, GAME_STATE_CHANGE = 31, OPEN_WINDOW_HORSE = 32,
-                KEEP_ALIVE = 33, MAP_CHUNK = 34, WORLD_EVENT = 35, WORLD_PARTICLES = 36,
-                LIGHT_UPDATE = 37, LOGIN = 38, MAP = 39, OPEN_WINDOW_MERCHANT = 40,
-                REL_ENTITY_MOVE = 41, REL_ENTITY_MOVE_LOOK = 42, ENTITY_LOOK = 43, ENTITY = 44,
-                VEHICLE_MOVE = 45, OPEN_BOOK = 46, OPEN_WINDOW = 47, OPEN_SIGN_EDITOR = 48,
-                AUTO_RECIPE = 49, ABILITIES = 50, COMBAT_EVENT = 51, PLAYER_INFO = 52,
-                LOOK_AT = 53, POSITION = 54, RECIPES = 55, ENTITY_DESTROY = 56,
-                REMOVE_ENTITY_EFFECT = 57, RESOURCE_PACK_SEND = 58, RESPAWN = 59, ENTITY_HEAD_ROTATION = 60,
-                SELECT_ADVANCEMENT_TAB = 61, WORLD_BORDER = 62, CAMERA = 63, HELD_ITEM_SLOT = 64,
-                VIEW_CENTRE = 65, VIEW_DISTANCE = 66, SCOREBOARD_DISPLAY_OBJECTIVE = 67, ENTITY_METADATA = 68,
-                ATTACH_ENTITY = 69, ENTITY_VELOCITY = 70, ENTITY_EQUIPMENT = 71, EXPERIENCE = 72,
-                UPDATE_HEALTH = 73, SCOREBOARD_OBJECTIVE = 74, MOUNT = 75, SCOREBOARD_TEAM = 76,
-                SCOREBOARD_SCORE = 77, SPAWN_POSITION = 78, UPDATE_TIME = 79, TITLE = 80,
-                ENTITY_SOUND = 81, NAMED_SOUND_EFFECT = 82, STOP_SOUND = 83, PLAYER_LIST_HEADER_FOOTER = 84,
-                NBT_QUERY = 85, COLLECT = 86, ENTITY_TELEPORT = 87, ADVANCEMENTS = 88, UPDATE_ATTRIBUTES = 89,
-                ENTITY_EFFECT = 90, RECIPE_UPDATE = 91, TAGS = 92, MAP_CHUNK_BULK = 93;
+        /**
+         * Client-bound (server-sided) Play Packet IDs.
+         *
+         * @author retrooper
+         * @see <a href="https://wiki.vg/Protocol#Clientbound_4">https://wiki.vg/Protocol#Clientbound_4</a>
+         * @since 1.8
+         */
+        public static class Server {
+            public static final byte SPAWN_ENTITY = -67, SPAWN_ENTITY_EXPERIENCE_ORB = -66, SPAWN_ENTITY_WEATHER = -65, SPAWN_ENTITY_LIVING = -64,
+                    SPAWN_ENTITY_PAINTING = -63, SPAWN_ENTITY_SPAWN = -62, ANIMATION = -61, STATISTIC = -60,
+                    BLOCK_BREAK = -59, BLOCK_BREAK_ANIMATION = -58, TILE_ENTITY_DATA = -57, BLOCK_ACTION = -56,
+                    BLOCK_CHANGE = -55, BOSS = -54, SERVER_DIFFICULTY = -53, CHAT = -52, MULTI_BLOCK_CHANGE = -51,
+                    TAB_COMPLETE = -50, COMMANDS = -49, TRANSACTION = -48, CLOSE_WINDOW = -47,
+                    WINDOW_ITEMS = -46, WINDOW_DATA = -45, SET_SLOT = -44, SET_COOLDOWN = -43,
+                    CUSTOM_PAYLOAD = -42, CUSTOM_SOUND_EFFECT = -41, KICK_DISCONNECT = -40, ENTITY_STATUS = -39,
+                    EXPLOSION = -38, UNLOAD_CHUNK = -37, GAME_STATE_CHANGE = -36, OPEN_WINDOW_HORSE = -35,
+                    KEEP_ALIVE = -34, MAP_CHUNK = -33, WORLD_EVENT = -32, WORLD_PARTICLES = -31,
+                    LIGHT_UPDATE = -30, LOGIN = -29, MAP = -28, OPEN_WINDOW_MERCHANT = -27,
+                    REL_ENTITY_MOVE = -26, REL_ENTITY_MOVE_LOOK = -25, ENTITY_LOOK = -24, ENTITY = -23,
+                    VEHICLE_MOVE = -22, OPEN_BOOK = -21, OPEN_WINDOW = -20, OPEN_SIGN_EDITOR = -19,
+                    AUTO_RECIPE = -18, ABILITIES = -17, COMBAT_EVENT = -16, PLAYER_INFO = -15,
+                    LOOK_AT = -14, POSITION = -13, RECIPES = -12, ENTITY_DESTROY = -11,
+                    REMOVE_ENTITY_EFFECT = -10, RESOURCE_PACK_SEND = -9, RESPAWN = -8, ENTITY_HEAD_ROTATION = -7,
+                    SELECT_ADVANCEMENT_TAB = -6, WORLD_BORDER = -5, CAMERA = -4, HELD_ITEM_SLOT = -3,
+                    VIEW_CENTRE = -2, VIEW_DISTANCE = -1, SCOREBOARD_DISPLAY_OBJECTIVE = 0, ENTITY_METADATA = 1,
+                    ATTACH_ENTITY = 2, ENTITY_VELOCITY = 3, ENTITY_EQUIPMENT = 4, EXPERIENCE = 5,
+                    UPDATE_HEALTH = 6, SCOREBOARD_OBJECTIVE = 7, MOUNT = 8, SCOREBOARD_TEAM = 9,
+                    SCOREBOARD_SCORE = 10, SPAWN_POSITION = 11, UPDATE_TIME = 12, TITLE = 13,
+                    ENTITY_SOUND = 14, NAMED_SOUND_EFFECT = 15, STOP_SOUND = 16, PLAYER_LIST_HEADER_FOOTER = 17,
+                    NBT_QUERY = 18, COLLECT = 19, ENTITY_TELEPORT = 20, ADVANCEMENTS = 21, UPDATE_ATTRIBUTES = 22,
+                    ENTITY_EFFECT = 23, RECIPE_UPDATE = 24, TAGS = 25, MAP_CHUNK_BULK = 26, NAMED_ENTITY_SPAWN = 27;
 
-        public static void init() {
-            packetIds.put(PacketTypeClasses.Server.SPAWN_ENTITY, SPAWN_ENTITY);
-            packetIds.put(PacketTypeClasses.Server.SPAWN_ENTITY_EXPERIENCE_ORB, SPAWN_ENTITY_EXPERIENCE_ORB);
-            packetIds.put(PacketTypeClasses.Server.SPAWN_ENTITY_WEATHER, SPAWN_ENTITY_WEATHER);
-            packetIds.put(PacketTypeClasses.Server.SPAWN_ENTITY_LIVING, SPAWN_ENTITY_LIVING);
-            packetIds.put(PacketTypeClasses.Server.SPAWN_ENTITY_PAINTING, SPAWN_ENTITY_PAINTING);
-            packetIds.put(PacketTypeClasses.Server.SPAWN_ENTITY_SPAWN, SPAWN_ENTITY_SPAWN);
-            packetIds.put(PacketTypeClasses.Server.ANIMATION, ANIMATION);
-            packetIds.put(PacketTypeClasses.Server.STATISTIC, STATISTIC);
-            packetIds.put(PacketTypeClasses.Server.BLOCK_BREAK, BLOCK_BREAK);
-            packetIds.put(PacketTypeClasses.Server.BLOCK_BREAK_ANIMATION, BLOCK_BREAK_ANIMATION);
-            packetIds.put(PacketTypeClasses.Server.TILE_ENTITY_DATA, TILE_ENTITY_DATA);
-            packetIds.put(PacketTypeClasses.Server.BLOCK_ACTION, BLOCK_ACTION);
-            packetIds.put(PacketTypeClasses.Server.BLOCK_CHANGE, BLOCK_CHANGE);
-            packetIds.put(PacketTypeClasses.Server.BOSS, BOSS);
-            packetIds.put(PacketTypeClasses.Server.SPAWN_ENTITY, SPAWN_ENTITY);
-            packetIds.put(PacketTypeClasses.Server.SERVER_DIFFICULTY, SERVER_DIFFICULTY);
-            packetIds.put(PacketTypeClasses.Server.CHAT, CHAT);
-            packetIds.put(PacketTypeClasses.Server.MULTI_BLOCK_CHANGE, MULTI_BLOCK_CHANGE);
-            packetIds.put(PacketTypeClasses.Server.TAB_COMPLETE, TAB_COMPLETE);
-            packetIds.put(PacketTypeClasses.Server.COMMANDS, COMMANDS);
-            packetIds.put(PacketTypeClasses.Server.TRANSACTION, TRANSACTION);
-            packetIds.put(PacketTypeClasses.Server.CLOSE_WINDOW, CLOSE_WINDOW);
-            packetIds.put(PacketTypeClasses.Server.WINDOW_ITEMS, WINDOW_ITEMS);
-            packetIds.put(PacketTypeClasses.Server.WINDOW_DATA, WINDOW_DATA);
-            packetIds.put(PacketTypeClasses.Server.SET_SLOT, SET_SLOT);
-            packetIds.put(PacketTypeClasses.Server.SET_COOLDOWN, SET_COOLDOWN);
-            packetIds.put(PacketTypeClasses.Server.CUSTOM_PAYLOAD, CUSTOM_PAYLOAD);
-            packetIds.put(PacketTypeClasses.Server.CUSTOM_SOUND_EFFECT, CUSTOM_SOUND_EFFECT);
-            packetIds.put(PacketTypeClasses.Server.KICK_DISCONNECT, KICK_DISCONNECT);
-            packetIds.put(PacketTypeClasses.Server.ENTITY_STATUS, ENTITY_STATUS);
-            packetIds.put(PacketTypeClasses.Server.EXPLOSION, EXPLOSION);
-            packetIds.put(PacketTypeClasses.Server.UNLOAD_CHUNK, UNLOAD_CHUNK);
-            packetIds.put(PacketTypeClasses.Server.GAME_STATE_CHANGE, GAME_STATE_CHANGE);
-            packetIds.put(PacketTypeClasses.Server.OPEN_WINDOW_HORSE, OPEN_WINDOW_HORSE);
-            packetIds.put(PacketTypeClasses.Server.KEEP_ALIVE, KEEP_ALIVE);
-            packetIds.put(PacketTypeClasses.Server.MAP_CHUNK, MAP_CHUNK);
-            packetIds.put(PacketTypeClasses.Server.WORLD_EVENT, WORLD_EVENT);
-            packetIds.put(PacketTypeClasses.Server.WORLD_EVENT, SPAWN_ENTITY);
-            packetIds.put(PacketTypeClasses.Server.WORLD_PARTICLES, WORLD_PARTICLES);
-            packetIds.put(PacketTypeClasses.Server.LIGHT_UPDATE, LIGHT_UPDATE);
-            packetIds.put(PacketTypeClasses.Server.LOGIN, LOGIN);
-            packetIds.put(PacketTypeClasses.Server.MAP, MAP);
-            packetIds.put(PacketTypeClasses.Server.OPEN_WINDOW_MERCHANT, OPEN_WINDOW_MERCHANT);
-            packetIds.put(PacketTypeClasses.Server.REL_ENTITY_MOVE, REL_ENTITY_MOVE);
-            packetIds.put(PacketTypeClasses.Server.REL_ENTITY_MOVE_LOOK, REL_ENTITY_MOVE_LOOK);
-            packetIds.put(PacketTypeClasses.Server.ENTITY_LOOK, ENTITY_LOOK);
-            packetIds.put(PacketTypeClasses.Server.ENTITY, ENTITY);
-            packetIds.put(PacketTypeClasses.Server.VEHICLE_MOVE, VEHICLE_MOVE);
-            packetIds.put(PacketTypeClasses.Server.OPEN_BOOK, OPEN_BOOK);
-            packetIds.put(PacketTypeClasses.Server.OPEN_WINDOW, OPEN_WINDOW);
-            packetIds.put(PacketTypeClasses.Server.OPEN_SIGN_EDITOR, OPEN_SIGN_EDITOR);
-            packetIds.put(PacketTypeClasses.Server.AUTO_RECIPE, AUTO_RECIPE);
-            packetIds.put(PacketTypeClasses.Server.ABILITIES, ABILITIES);
-            packetIds.put(PacketTypeClasses.Server.COMBAT_EVENT, COMBAT_EVENT);
-            packetIds.put(PacketTypeClasses.Server.PLAYER_INFO, PLAYER_INFO);
-            packetIds.put(PacketTypeClasses.Server.LOOK_AT, LOOK_AT);
-            packetIds.put(PacketTypeClasses.Server.POSITION, POSITION);
-            packetIds.put(PacketTypeClasses.Server.RECIPES, RECIPES);
-            packetIds.put(PacketTypeClasses.Server.ENTITY_DESTROY, ENTITY_DESTROY);
-            packetIds.put(PacketTypeClasses.Server.REMOVE_ENTITY_EFFECT, REMOVE_ENTITY_EFFECT);
-            packetIds.put(PacketTypeClasses.Server.RESOURCE_PACK_SEND, RESOURCE_PACK_SEND);
-            packetIds.put(PacketTypeClasses.Server.RESPAWN, RESPAWN);
-            packetIds.put(PacketTypeClasses.Server.ENTITY_HEAD_ROTATION, ENTITY_HEAD_ROTATION);
-            packetIds.put(PacketTypeClasses.Server.SELECT_ADVANCEMENT_TAB, SELECT_ADVANCEMENT_TAB);
-            packetIds.put(PacketTypeClasses.Server.WORLD_BORDER, WORLD_BORDER);
-            packetIds.put(PacketTypeClasses.Server.CAMERA, CAMERA);
-            packetIds.put(PacketTypeClasses.Server.HELD_ITEM_SLOT, HELD_ITEM_SLOT);
-            packetIds.put(PacketTypeClasses.Server.VIEW_CENTRE, VIEW_CENTRE);
-            packetIds.put(PacketTypeClasses.Server.VIEW_DISTANCE, VIEW_DISTANCE);
-            packetIds.put(PacketTypeClasses.Server.SCOREBOARD_DISPLAY_OBJECTIVE, SCOREBOARD_DISPLAY_OBJECTIVE);
-            packetIds.put(PacketTypeClasses.Server.ENTITY_METADATA, ENTITY_METADATA);
-            packetIds.put(PacketTypeClasses.Server.ATTACH_ENTITY, ATTACH_ENTITY);
-            packetIds.put(PacketTypeClasses.Server.ENTITY_VELOCITY, ENTITY_VELOCITY);
-            packetIds.put(PacketTypeClasses.Server.ENTITY_EQUIPMENT, ENTITY_EQUIPMENT);
-            packetIds.put(PacketTypeClasses.Server.EXPERIENCE, EXPERIENCE);
-            packetIds.put(PacketTypeClasses.Server.UPDATE_HEALTH, UPDATE_HEALTH);
-            packetIds.put(PacketTypeClasses.Server.SCOREBOARD_OBJECTIVE, SCOREBOARD_OBJECTIVE);
-            packetIds.put(PacketTypeClasses.Server.MOUNT, MOUNT);
-            packetIds.put(PacketTypeClasses.Server.SCOREBOARD_TEAM, SCOREBOARD_TEAM);
-            packetIds.put(PacketTypeClasses.Server.SCOREBOARD_SCORE, SCOREBOARD_SCORE);
-            packetIds.put(PacketTypeClasses.Server.SPAWN_POSITION, SPAWN_POSITION);
-            packetIds.put(PacketTypeClasses.Server.UPDATE_TIME, UPDATE_TIME);
-            packetIds.put(PacketTypeClasses.Server.TITLE, TITLE);
-            packetIds.put(PacketTypeClasses.Server.ENTITY_SOUND, ENTITY_SOUND);
-            packetIds.put(PacketTypeClasses.Server.NAMED_SOUND_EFFECT, NAMED_SOUND_EFFECT);
-            packetIds.put(PacketTypeClasses.Server.STOP_SOUND, STOP_SOUND);
-            packetIds.put(PacketTypeClasses.Server.PLAYER_LIST_HEADER_FOOTER, PLAYER_LIST_HEADER_FOOTER);
-            packetIds.put(PacketTypeClasses.Server.NBT_QUERY, NBT_QUERY);
-            packetIds.put(PacketTypeClasses.Server.COLLECT, COLLECT);
-            packetIds.put(PacketTypeClasses.Server.ENTITY_TELEPORT, ENTITY_TELEPORT);
-            packetIds.put(PacketTypeClasses.Server.ADVANCEMENTS, ADVANCEMENTS);
-            packetIds.put(PacketTypeClasses.Server.UPDATE_ATTRIBUTES, UPDATE_ATTRIBUTES);
-            packetIds.put(PacketTypeClasses.Server.ENTITY_EFFECT, ENTITY_EFFECT);
-            packetIds.put(PacketTypeClasses.Server.RECIPE_UPDATE, RECIPE_UPDATE);
-            packetIds.put(PacketTypeClasses.Server.TAGS, TAGS);
-            packetIds.put(PacketTypeClasses.Server.MAP_CHUNK_BULK, MAP_CHUNK_BULK);
-        }
+            private static void load() {
+                insertPacketID(PacketTypeClasses.Play.Server.SPAWN_ENTITY, SPAWN_ENTITY);
+                insertPacketID(PacketTypeClasses.Play.Server.SPAWN_ENTITY_EXPERIENCE_ORB, SPAWN_ENTITY_EXPERIENCE_ORB);
+                insertPacketID(PacketTypeClasses.Play.Server.SPAWN_ENTITY_WEATHER, SPAWN_ENTITY_WEATHER);
+                insertPacketID(PacketTypeClasses.Play.Server.SPAWN_ENTITY_LIVING, SPAWN_ENTITY_LIVING);
+                insertPacketID(PacketTypeClasses.Play.Server.SPAWN_ENTITY_PAINTING, SPAWN_ENTITY_PAINTING);
+                insertPacketID(PacketTypeClasses.Play.Server.SPAWN_ENTITY_SPAWN, SPAWN_ENTITY_SPAWN);
+                insertPacketID(PacketTypeClasses.Play.Server.ANIMATION, ANIMATION);
+                insertPacketID(PacketTypeClasses.Play.Server.STATISTIC, STATISTIC);
+                insertPacketID(PacketTypeClasses.Play.Server.BLOCK_BREAK, BLOCK_BREAK);
+                insertPacketID(PacketTypeClasses.Play.Server.BLOCK_BREAK_ANIMATION, BLOCK_BREAK_ANIMATION);
+                insertPacketID(PacketTypeClasses.Play.Server.TILE_ENTITY_DATA, TILE_ENTITY_DATA);
+                insertPacketID(PacketTypeClasses.Play.Server.BLOCK_ACTION, BLOCK_ACTION);
+                insertPacketID(PacketTypeClasses.Play.Server.BLOCK_CHANGE, BLOCK_CHANGE);
+                insertPacketID(PacketTypeClasses.Play.Server.BOSS, BOSS);
+                insertPacketID(PacketTypeClasses.Play.Server.SPAWN_ENTITY, SPAWN_ENTITY);
+                insertPacketID(PacketTypeClasses.Play.Server.SERVER_DIFFICULTY, SERVER_DIFFICULTY);
+                insertPacketID(PacketTypeClasses.Play.Server.CHAT, CHAT);
+                insertPacketID(PacketTypeClasses.Play.Server.MULTI_BLOCK_CHANGE, MULTI_BLOCK_CHANGE);
+                insertPacketID(PacketTypeClasses.Play.Server.TAB_COMPLETE, TAB_COMPLETE);
+                insertPacketID(PacketTypeClasses.Play.Server.COMMANDS, COMMANDS);
+                insertPacketID(PacketTypeClasses.Play.Server.TRANSACTION, TRANSACTION);
+                insertPacketID(PacketTypeClasses.Play.Server.CLOSE_WINDOW, CLOSE_WINDOW);
+                insertPacketID(PacketTypeClasses.Play.Server.WINDOW_ITEMS, WINDOW_ITEMS);
+                insertPacketID(PacketTypeClasses.Play.Server.WINDOW_DATA, WINDOW_DATA);
+                insertPacketID(PacketTypeClasses.Play.Server.SET_SLOT, SET_SLOT);
+                insertPacketID(PacketTypeClasses.Play.Server.SET_COOLDOWN, SET_COOLDOWN);
+                insertPacketID(PacketTypeClasses.Play.Server.CUSTOM_PAYLOAD, CUSTOM_PAYLOAD);
+                insertPacketID(PacketTypeClasses.Play.Server.CUSTOM_SOUND_EFFECT, CUSTOM_SOUND_EFFECT);
+                insertPacketID(PacketTypeClasses.Play.Server.KICK_DISCONNECT, KICK_DISCONNECT);
+                insertPacketID(PacketTypeClasses.Play.Server.ENTITY_STATUS, ENTITY_STATUS);
+                insertPacketID(PacketTypeClasses.Play.Server.EXPLOSION, EXPLOSION);
+                insertPacketID(PacketTypeClasses.Play.Server.UNLOAD_CHUNK, UNLOAD_CHUNK);
+                insertPacketID(PacketTypeClasses.Play.Server.GAME_STATE_CHANGE, GAME_STATE_CHANGE);
+                insertPacketID(PacketTypeClasses.Play.Server.OPEN_WINDOW_HORSE, OPEN_WINDOW_HORSE);
+                insertPacketID(PacketTypeClasses.Play.Server.KEEP_ALIVE, KEEP_ALIVE);
+                insertPacketID(PacketTypeClasses.Play.Server.MAP_CHUNK, MAP_CHUNK);
+                insertPacketID(PacketTypeClasses.Play.Server.WORLD_EVENT, WORLD_EVENT);
+                insertPacketID(PacketTypeClasses.Play.Server.WORLD_EVENT, SPAWN_ENTITY);
+                insertPacketID(PacketTypeClasses.Play.Server.WORLD_PARTICLES, WORLD_PARTICLES);
+                insertPacketID(PacketTypeClasses.Play.Server.LIGHT_UPDATE, LIGHT_UPDATE);
+                insertPacketID(PacketTypeClasses.Play.Server.LOGIN, LOGIN);
+                insertPacketID(PacketTypeClasses.Play.Server.MAP, MAP);
+                insertPacketID(PacketTypeClasses.Play.Server.OPEN_WINDOW_MERCHANT, OPEN_WINDOW_MERCHANT);
+                insertPacketID(PacketTypeClasses.Play.Server.REL_ENTITY_MOVE, REL_ENTITY_MOVE);
+                insertPacketID(PacketTypeClasses.Play.Server.REL_ENTITY_MOVE_LOOK, REL_ENTITY_MOVE_LOOK);
+                insertPacketID(PacketTypeClasses.Play.Server.ENTITY_LOOK, ENTITY_LOOK);
+                insertPacketID(PacketTypeClasses.Play.Server.ENTITY, ENTITY);
+                insertPacketID(PacketTypeClasses.Play.Server.VEHICLE_MOVE, VEHICLE_MOVE);
+                insertPacketID(PacketTypeClasses.Play.Server.OPEN_BOOK, OPEN_BOOK);
+                insertPacketID(PacketTypeClasses.Play.Server.OPEN_WINDOW, OPEN_WINDOW);
+                insertPacketID(PacketTypeClasses.Play.Server.OPEN_SIGN_EDITOR, OPEN_SIGN_EDITOR);
+                insertPacketID(PacketTypeClasses.Play.Server.AUTO_RECIPE, AUTO_RECIPE);
+                insertPacketID(PacketTypeClasses.Play.Server.ABILITIES, ABILITIES);
+                insertPacketID(PacketTypeClasses.Play.Server.COMBAT_EVENT, COMBAT_EVENT);
+                insertPacketID(PacketTypeClasses.Play.Server.PLAYER_INFO, PLAYER_INFO);
+                insertPacketID(PacketTypeClasses.Play.Server.LOOK_AT, LOOK_AT);
+                insertPacketID(PacketTypeClasses.Play.Server.POSITION, POSITION);
+                insertPacketID(PacketTypeClasses.Play.Server.RECIPES, RECIPES);
+                insertPacketID(PacketTypeClasses.Play.Server.ENTITY_DESTROY, ENTITY_DESTROY);
+                insertPacketID(PacketTypeClasses.Play.Server.REMOVE_ENTITY_EFFECT, REMOVE_ENTITY_EFFECT);
+                insertPacketID(PacketTypeClasses.Play.Server.RESOURCE_PACK_SEND, RESOURCE_PACK_SEND);
+                insertPacketID(PacketTypeClasses.Play.Server.RESPAWN, RESPAWN);
+                insertPacketID(PacketTypeClasses.Play.Server.ENTITY_HEAD_ROTATION, ENTITY_HEAD_ROTATION);
+                insertPacketID(PacketTypeClasses.Play.Server.SELECT_ADVANCEMENT_TAB, SELECT_ADVANCEMENT_TAB);
+                insertPacketID(PacketTypeClasses.Play.Server.WORLD_BORDER, WORLD_BORDER);
+                insertPacketID(PacketTypeClasses.Play.Server.CAMERA, CAMERA);
+                insertPacketID(PacketTypeClasses.Play.Server.HELD_ITEM_SLOT, HELD_ITEM_SLOT);
+                insertPacketID(PacketTypeClasses.Play.Server.VIEW_CENTRE, VIEW_CENTRE);
+                insertPacketID(PacketTypeClasses.Play.Server.VIEW_DISTANCE, VIEW_DISTANCE);
+                insertPacketID(PacketTypeClasses.Play.Server.SCOREBOARD_DISPLAY_OBJECTIVE, SCOREBOARD_DISPLAY_OBJECTIVE);
+                insertPacketID(PacketTypeClasses.Play.Server.ENTITY_METADATA, ENTITY_METADATA);
+                insertPacketID(PacketTypeClasses.Play.Server.ATTACH_ENTITY, ATTACH_ENTITY);
+                insertPacketID(PacketTypeClasses.Play.Server.ENTITY_VELOCITY, ENTITY_VELOCITY);
+                insertPacketID(PacketTypeClasses.Play.Server.ENTITY_EQUIPMENT, ENTITY_EQUIPMENT);
+                insertPacketID(PacketTypeClasses.Play.Server.EXPERIENCE, EXPERIENCE);
+                insertPacketID(PacketTypeClasses.Play.Server.UPDATE_HEALTH, UPDATE_HEALTH);
+                insertPacketID(PacketTypeClasses.Play.Server.SCOREBOARD_OBJECTIVE, SCOREBOARD_OBJECTIVE);
+                insertPacketID(PacketTypeClasses.Play.Server.MOUNT, MOUNT);
+                insertPacketID(PacketTypeClasses.Play.Server.SCOREBOARD_TEAM, SCOREBOARD_TEAM);
+                insertPacketID(PacketTypeClasses.Play.Server.SCOREBOARD_SCORE, SCOREBOARD_SCORE);
+                insertPacketID(PacketTypeClasses.Play.Server.SPAWN_POSITION, SPAWN_POSITION);
+                insertPacketID(PacketTypeClasses.Play.Server.UPDATE_TIME, UPDATE_TIME);
+                insertPacketID(PacketTypeClasses.Play.Server.TITLE, TITLE);
+                insertPacketID(PacketTypeClasses.Play.Server.ENTITY_SOUND, ENTITY_SOUND);
+                insertPacketID(PacketTypeClasses.Play.Server.NAMED_SOUND_EFFECT, NAMED_SOUND_EFFECT);
+                insertPacketID(PacketTypeClasses.Play.Server.STOP_SOUND, STOP_SOUND);
+                insertPacketID(PacketTypeClasses.Play.Server.PLAYER_LIST_HEADER_FOOTER, PLAYER_LIST_HEADER_FOOTER);
+                insertPacketID(PacketTypeClasses.Play.Server.NBT_QUERY, NBT_QUERY);
+                insertPacketID(PacketTypeClasses.Play.Server.COLLECT, COLLECT);
+                insertPacketID(PacketTypeClasses.Play.Server.ENTITY_TELEPORT, ENTITY_TELEPORT);
+                insertPacketID(PacketTypeClasses.Play.Server.ADVANCEMENTS, ADVANCEMENTS);
+                insertPacketID(PacketTypeClasses.Play.Server.UPDATE_ATTRIBUTES, UPDATE_ATTRIBUTES);
+                insertPacketID(PacketTypeClasses.Play.Server.ENTITY_EFFECT, ENTITY_EFFECT);
+                insertPacketID(PacketTypeClasses.Play.Server.RECIPE_UPDATE, RECIPE_UPDATE);
+                insertPacketID(PacketTypeClasses.Play.Server.TAGS, TAGS);
+                insertPacketID(PacketTypeClasses.Play.Server.MAP_CHUNK_BULK, MAP_CHUNK_BULK);
+                insertPacketID(PacketTypeClasses.Play.Server.NAMED_ENTITY_SPAWN, NAMED_ENTITY_SPAWN);
+            }
 
-        public static class Util {
             /**
-             * Is the packet an instance of the PacketPlayOutEntity packet?
+             * Client-bound Play Packet Type utility.
+             * Save a few lines of code by using this.
              *
-             * @param packetID
-             * @return packetID == ENTITY or REL_ENTITY_MOVE or REL_ENTITY_MOVE_LOOK or ENTITY_LOOK
+             * @author retrooper
+             * @since 1.8
              */
-            public static boolean isInstanceOfEntity(final byte packetID) {
-                return packetID == ENTITY || packetID == REL_ENTITY_MOVE ||
-                        packetID == REL_ENTITY_MOVE_LOOK || packetID == ENTITY_LOOK;
+            public static class Util {
+                /**
+                 * Is the play packet a PacketPlayOutEntity, PacketPlayOutRelEntityMove, PacketPlayOutRelEntityMoveLook
+                 * or a PacketPlayOutEntityLook packet?
+                 *
+                 * @param packetID Play Packet ID.
+                 * @return Is the Packet ID an instance of the PacketPlayOutEntity packet?
+                 */
+                public static boolean isInstanceOfEntity(final byte packetID) {
+                    return packetID == ENTITY || packetID == REL_ENTITY_MOVE ||
+                            packetID == REL_ENTITY_MOVE_LOOK || packetID == ENTITY_LOOK;
+                }
             }
         }
     }
-
-
 }

@@ -1,58 +1,75 @@
 /*
- * MIT License
+ * This file is part of packetevents - https://github.com/retrooper/packetevents
+ * Copyright (C) 2021 retrooper and contributors
  *
- * Copyright (c) 2020 retrooper
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
  *
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
  *
- * The above copyright notice and this permission notice shall be included in all
- * copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
- * SOFTWARE.
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
 package io.github.retrooper.packetevents.utils.server;
 
+/**
+ * System Operating system.
+ *
+ * @author retrooper
+ * @since 1.7
+ */
 public enum SystemOS {
+
     WINDOWS, MACOS, LINUX, OTHER;
 
+    private static final SystemOS[] VALUES = values();
     private static SystemOS value;
 
-    private static SystemOS getOS() {
-        final String os = System.getProperty("os.name");
-        for (final String osName : getOperatingSystemNames()) {
-            if (os.toLowerCase().contains(osName.toLowerCase())) {
-                return SystemOS.valueOf(osName);
+    /**
+     * Get the server's operating system.
+     * This method will NOT cache.
+     *
+     * @return Operating System.
+     */
+    public static SystemOS getOSNoCache() {
+        final String os = System.getProperty("os.name").toLowerCase();
+        for (SystemOS sysos : VALUES) {
+            if (os.contains(sysos.name().toLowerCase())) {
+                return sysos;
             }
         }
         return OTHER;
     }
 
-    public static SystemOS getOperatingSystem() {
+    /**
+     * Get the server's operating system.
+     * This method will CACHE for you.
+     *
+     * @return Operating System.
+     */
+    public static SystemOS getOS() {
         if (value == null) {
-            value = getOS();
+            value = getOSNoCache();
         }
         return value;
     }
 
-    public static String[] getOperatingSystemNames() {
-        final SystemOS[] values = values();
-        final int length = values.length - 1;
-        final String[] arr = new String[length];
-        for (int i = 0; i < length; i++) {
-            arr[i] = values[i].name();
-        }
-        return arr;
+    /**
+     * Get the server's operating system.
+     * This method will CACHE for you.
+     *
+     * @return Operating System.
+     * @deprecated Use {@link #getOS()}, method renamed.
+     */
+    @Deprecated
+    public static SystemOS getOperatingSystem() {
+        return getOS();
     }
+
 }
