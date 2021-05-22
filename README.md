@@ -7,7 +7,7 @@ PacketEvents is an open-source Packet API. It has many cross-version packet-wrap
 
 ### Resources
 * [SpigotMC](https://www.spigotmc.org/resources/packetevents-api.80279/)
-* [JavaDoc](https://retrooper.github.io/packetevents)
+* [JavaDoc](https://packetevents.github.io/javadocs)
 
 ### Setup
 [Learn more](https://github.com/retrooper/packetevents/wiki/1.-Setup)
@@ -21,3 +21,6 @@ Our discord server has a role for contributors and forkers.
 
 ### Sponsorships
 [![](https://www.ej-technologies.com/images/product_banners/jprofiler_small.png)](https://www.ej-technologies.com/products/jprofiler/overview.html)
+
+### Statistics
+PacketEvents collects statistics anonymously through bStats. Participation is completely optional and you can opt-out at any time, although it is really helpful in figuring out what environments the plugin is running in (i.e. versions of Spigot, Java), so I can adjust development accordingly.
