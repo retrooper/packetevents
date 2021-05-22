@@ -56,7 +56,7 @@ public class EarlyChannelInjectorLegacy implements EarlyInjector {
                 if (value instanceof List) {
                     // Inject the list
                     synchronized (value) {
-                        for (Object o : (List) value) {
+                        for (Object o : (List<?>) value) {
                             if (o instanceof ChannelFuture) {
                                 return true;
                             } else {
@@ -66,7 +66,7 @@ public class EarlyChannelInjectorLegacy implements EarlyInjector {
                     }
                 }
             }
-        } catch (Exception e) {
+        } catch (Exception ignored) {
         }
         return false;
     }
@@ -85,7 +85,7 @@ public class EarlyChannelInjectorLegacy implements EarlyInjector {
                 }
                 if (value instanceof List) {
                     //Get the list.
-                    List listWrapper = new ListWrapper((List) value) {
+                    List<?> listWrapper = new ListWrapper((List<?>) value) {
                         @Override
                         public void processAdd(Object o) {
                             if (o instanceof ChannelFuture) {
@@ -104,7 +104,7 @@ public class EarlyChannelInjectorLegacy implements EarlyInjector {
                     field.set(serverConnection, listWrapper);
 
                     synchronized (listWrapper) {
-                        for (Object serverChannel : (List) value) {
+                        for (Object serverChannel : (List<?>) value) {
                             //Is this the server channel future list?
                             if (serverChannel instanceof ChannelFuture) {
                                 //Yes it is...
@@ -151,7 +151,7 @@ public class EarlyChannelInjectorLegacy implements EarlyInjector {
                 bootstrapAcceptorField.setAccessible(true);
                 bootstrapAcceptorField.get(handler);
                 bootstrapAcceptor = handler;
-            } catch (Exception ex) {
+            } catch (Exception ignored) {
 
             }
         }
@@ -258,10 +258,9 @@ public class EarlyChannelInjectorLegacy implements EarlyInjector {
     public void ejectPlayer(Player player) {
         Object channel = PacketEvents.get().getPlayerUtils().getChannel(player);
         if (channel != null) {
-            Channel chnl = (Channel) channel;
             try {
-                chnl.pipeline().remove(PacketEvents.get().getHandlerName());
-            } catch (Exception ex) {
+                ((Channel) channel).pipeline().remove(PacketEvents.get().getHandlerName());
+            } catch (Exception ignored) {
 
             }
         }

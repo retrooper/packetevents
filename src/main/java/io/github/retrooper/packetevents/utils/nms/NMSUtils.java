@@ -556,9 +556,8 @@ public final class NMSUtils {
     }
 
     public static Object generateDataWatcher(Entity entity) {
-        Object nmsEntity = null;
         try {
-            return dataWatcherConstructor.newInstance(nmsEntity);
+            return dataWatcherConstructor.newInstance(entity);
         } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
             e.printStackTrace();
         }
@@ -610,9 +609,7 @@ public final class NMSUtils {
     public static int getNMSItemId(Object nmsItem) {
         try {
             return (int) getItemId.invoke(null, nmsItem);
-        } catch (IllegalAccessException e) {
-            e.printStackTrace();
-        } catch (InvocationTargetException e) {
+        } catch (IllegalAccessException | InvocationTargetException e) {
             e.printStackTrace();
         }
         return -1;

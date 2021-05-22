@@ -42,8 +42,6 @@ public class WrappedPacketLoginInCustomPayload extends WrappedPacket {
     }
 
     public void setData(byte[] data) {
-        Object dataSerializer = readObject(0, NMSUtils.packetDataSerializerClass);
-        WrappedPacket dataSerializerWrapper = new WrappedPacket(new NMSPacket(dataSerializer));
         PacketEvents.get().getByteBufUtil().setBytes(getBuffer(), data);
     }
 
