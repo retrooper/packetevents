@@ -84,7 +84,7 @@ class WrappedPacketOutRespawn extends WrappedPacket {
         }
     }
 
-    public WorldType getWorldType() {
+    public WorldType getLevelType() {
         if (packet != null) {
             //TODO finish
             Object worldTypeObject = readObject(0, worldTypeClass);
