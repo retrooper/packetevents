@@ -73,8 +73,8 @@ public final class EntityFinderUtils {
      * @return Bukkit Entity.
      */
     @Nullable
-    public static Entity getEntityById(World wrld, int id) {
-        Entity e = getEntityByIdWithWorld(wrld, id);
+    public static Entity getEntityById(World origin, int id) {
+        Entity e = getEntityByIdWithWorld(origin, id);
         if (e == null) {
             for (World world : Bukkit.getWorlds()) {
                 Entity entity = getEntityByIdWithWorld(world, id);
@@ -93,19 +93,18 @@ public final class EntityFinderUtils {
      * @param id    Entity ID.
      * @return Bukkit Entity.
      */
-    public static Entity getEntityByIdWithWorld(final World world, final int id) {
+    public static Entity getEntityByIdWithWorld(World world, int id) {
         if (world == null) {
             return null;
-        } else if (NMSUtils.craftWorldClass == null) {
+        }
+        if (NMSUtils.craftWorldClass == null) {
             throw new IllegalStateException("PacketEvents failed to locate the CraftWorld class.");
         }
         Object craftWorld = NMSUtils.craftWorldClass.cast(world);
 
-        Object worldServer;
-        Object nmsEntity;
         try {
-            worldServer = craftWorldGetHandle.invoke(craftWorld);
-            nmsEntity = getEntityByIdMethod.invoke(worldServer, id);
+            Object worldServer = craftWorldGetHandle.invoke(craftWorld);
+            Object nmsEntity = getEntityByIdMethod.invoke(worldServer, id);
             if (nmsEntity == null) {
                 return null;
             }

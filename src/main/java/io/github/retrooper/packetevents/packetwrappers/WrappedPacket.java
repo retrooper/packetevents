@@ -96,7 +96,6 @@ public class WrappedPacket implements WrapperPacketReader, WrapperPacketWriter {
     }
 
     protected void load() {
-
     }
 
     protected boolean hasLoaded() {
@@ -412,7 +411,7 @@ public class WrappedPacket implements WrapperPacketReader, WrapperPacketWriter {
 
     public void writeItemStack(int index, ItemStack stack) {
         Object nmsItemStack = NMSUtils.toNMSItemStack(stack);
-        write(NMSUtils.nmsItemStackClass, 0, nmsItemStack);
+        write(NMSUtils.nmsItemStackClass, index, nmsItemStack);
     }
 
     public GameMode readGameMode(int index) {
