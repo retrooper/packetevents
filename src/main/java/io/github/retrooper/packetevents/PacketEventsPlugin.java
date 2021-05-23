@@ -45,6 +45,7 @@ public class PacketEventsPlugin extends JavaPlugin {
                 .checkForUpdates(true)
                 .bStats(true);
         PacketEvents.get().loadAsyncNewThread();
+        //u can do something here as it is loading
     }
 
     @Override

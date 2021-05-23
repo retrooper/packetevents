@@ -22,6 +22,7 @@ import io.github.retrooper.packetevents.packettype.PacketTypeClasses;
 import io.github.retrooper.packetevents.packetwrappers.NMSPacket;
 import io.github.retrooper.packetevents.packetwrappers.api.SendableWrapper;
 import io.github.retrooper.packetevents.packetwrappers.api.helper.WrappedPacketEntityAbstraction;
+import io.github.retrooper.packetevents.utils.math.MathUtils;
 import io.github.retrooper.packetevents.utils.server.ServerVersion;
 import io.github.retrooper.packetevents.utils.vector.Vector3d;
 import org.bukkit.entity.Entity;
@@ -80,8 +81,7 @@ public class WrappedPacketOutSpawnEntityLiving extends WrappedPacketEntityAbstra
         if (version.isNewerThan(ServerVersion.v_1_8_8)) {
             if (packet != null) {
                 return Optional.of(readObject(0, UUID.class));
-            }
-            else {
+            } else {
                 return Optional.of(uuid);
             }
         } else {
@@ -93,8 +93,7 @@ public class WrappedPacketOutSpawnEntityLiving extends WrappedPacketEntityAbstra
         if (version.isNewerThan(ServerVersion.v_1_8_8)) {
             if (packet != null) {
                 writeObject(0, uuid);
-            }
-            else {
+            } else {
                 this.uuid = uuid;
             }
         }
@@ -122,7 +121,7 @@ public class WrappedPacketOutSpawnEntityLiving extends WrappedPacketEntityAbstra
             double x;
             double y;
             double z;
-            //On 1.8.x and 1.7.10 the y is factored by 32
+            //On 1.8.x and 1.7.10 they are factored by 32
             if (version.isOlderThan(ServerVersion.v_1_9)) {
                 x = readInt(2) / 32.0;
                 y = readInt(3) / 32.0;
@@ -138,18 +137,13 @@ public class WrappedPacketOutSpawnEntityLiving extends WrappedPacketEntityAbstra
         }
     }
 
-    private int floor(double a) {
-        int result = (int) a;
-        return a < (double) result ? result - 1 : result;
-    }
-
     public void setPosition(Vector3d position) {
         if (packet != null) {
-            //On 1.8.x and 1.7.10 the y must be factored by 32
+            //On 1.8.x and 1.7.10 they must be factored by 32
             if (version.isOlderThan(ServerVersion.v_1_9)) {
-                writeInt(2, floor(position.x * 32.0));
-                writeInt(3, floor(position.y * 32.0));
-                writeInt(4, floor(position.z * 32.0));
+                writeInt(2, MathUtils.floor(position.x * 32.0));
+                writeInt(3, MathUtils.floor(position.y * 32.0));
+                writeInt(4, MathUtils.floor(position.z * 32.0));
             } else {
                 writeDouble(0, position.x);
                 writeDouble(1, position.y);
@@ -175,8 +169,7 @@ public class WrappedPacketOutSpawnEntityLiving extends WrappedPacketEntityAbstra
                 factoredVelZ = readInt(4);
             }
             return new Vector3d(factoredVelX / velocityFactor, factoredVelY / velocityFactor, factoredVelZ / velocityFactor);
-        }
-        else {
+        } else {
             return this.velocity;
         }
     }
@@ -195,8 +188,7 @@ public class WrappedPacketOutSpawnEntityLiving extends WrappedPacketEntityAbstra
                 writeInt(3, factoredVelY);
                 writeInt(4, factoredVelZ);
             }
-        }
-        else {
+        } else {
             this.velocity = velocity;
         }
     }
@@ -205,8 +197,7 @@ public class WrappedPacketOutSpawnEntityLiving extends WrappedPacketEntityAbstra
         if (packet != null) {
             byte factoredYaw = readByte(0);
             return factoredYaw / rotationFactor;
-        }
-        else {
+        } else {
             return yaw;
         }
     }
@@ -214,8 +205,7 @@ public class WrappedPacketOutSpawnEntityLiving extends WrappedPacketEntityAbstra
     public void setYaw(float yaw) {
         if (packet != null) {
             writeByte(0, (byte) ((int) (yaw * rotationFactor)));
-        }
-        else {
+        } else {
             this.yaw = yaw;
         }
     }
@@ -224,8 +214,7 @@ public class WrappedPacketOutSpawnEntityLiving extends WrappedPacketEntityAbstra
         if (packet != null) {
             byte factoredPitch = readByte(1);
             return factoredPitch / rotationFactor;
-        }
-        else {
+        } else {
             return pitch;
         }
     }
@@ -233,8 +222,7 @@ public class WrappedPacketOutSpawnEntityLiving extends WrappedPacketEntityAbstra
     public void setPitch(float pitch) {
         if (packet != null) {
             writeByte(1, (byte) ((int) (pitch * rotationFactor)));
-        }
-        else {
+        } else {
             this.pitch = pitch;
         }
     }
@@ -243,8 +231,7 @@ public class WrappedPacketOutSpawnEntityLiving extends WrappedPacketEntityAbstra
         if (packet != null) {
             byte factoredHeadPitch = readByte(2);
             return factoredHeadPitch / rotationFactor;
-        }
-        else {
+        } else {
             return this.headPitch;
         }
     }
@@ -252,8 +239,7 @@ public class WrappedPacketOutSpawnEntityLiving extends WrappedPacketEntityAbstra
     public void setHeadPitch(float headPitch) {
         if (packet != null) {
             writeByte(2, (byte) ((int) (headPitch * rotationFactor)));
-        }
-        else {
+        } else {
             this.headPitch = headPitch;
         }
     }

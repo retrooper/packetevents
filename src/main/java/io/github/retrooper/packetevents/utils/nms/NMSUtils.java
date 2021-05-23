@@ -214,7 +214,7 @@ public final class NMSUtils {
         } catch (NoSuchFieldException e) {
             e.printStackTrace();
         }
-        //Incase its null, these methods are not needed and would cause errors
+        //In case its null, these methods are not needed and would cause errors
         if (blockPosClass != null) {
             getBlockPosX = Reflection.getMethod(NMSUtils.blockPosClass.getSuperclass(), "getX", 0);
             getBlockPosY = Reflection.getMethod(NMSUtils.blockPosClass.getSuperclass(), "getY", 0);
