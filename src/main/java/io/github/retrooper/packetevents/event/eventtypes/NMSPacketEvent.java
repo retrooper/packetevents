@@ -60,11 +60,10 @@ public abstract class NMSPacketEvent extends PacketEvent implements CallableEven
     }
 
     /**
-     * This method returns the name of the packet.
-     * To get the name of the packet we get the class of the packet and then the name of the class.
+     * This method returns the NMS name of the packet.
+     * To get the name of the packet we get the class of the packet and then the simple name of the class.
      * See also: {@link Class#getSimpleName()}
      * We cache the name after the first call to improve performance.
-     * Java 8 does not cache the name.
      * It is not recommended to call this method unless you NEED it.
      * If you are comparing packet types, use the {@link PacketType} byte system.
      * You would only need the packet name if packet type system doesn't contain your desired packet yet.
