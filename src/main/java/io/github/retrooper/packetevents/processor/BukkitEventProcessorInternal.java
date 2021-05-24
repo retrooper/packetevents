@@ -21,6 +21,7 @@ package io.github.retrooper.packetevents.processor;
 import io.github.retrooper.packetevents.PacketEvents;
 import io.github.retrooper.packetevents.event.impl.PostPlayerInjectEvent;
 import io.github.retrooper.packetevents.utils.player.ClientVersion;
+import io.github.retrooper.packetevents.utils.player.PlayerUtils;
 import io.github.retrooper.packetevents.utils.versionlookup.VersionLookupUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -35,11 +36,14 @@ import java.net.InetSocketAddress;
 import java.util.UUID;
 
 public class BukkitEventProcessorInternal implements Listener {
+
+    private final PacketEvents packetEvents = PacketEvents.get();
+
     @EventHandler(priority = EventPriority.LOWEST)
     public void onLogin(PlayerLoginEvent e) {
         final Player player = e.getPlayer();
-        if (!PacketEvents.get().getSettings().shouldUseCompatibilityInjector()) {
-            PacketEvents.get().getInjector().injectPlayer(player);
+        if (!packetEvents.getSettings().shouldUseCompatibilityInjector()) {
+            packetEvents.getInjector().injectPlayer(player);
         }
     }
 
@@ -48,30 +52,30 @@ public class BukkitEventProcessorInternal implements Listener {
         Player player = e.getPlayer();
         InetSocketAddress address = player.getAddress();
 
-        boolean shouldInject = PacketEvents.get().getSettings().shouldUseCompatibilityInjector() || !(PacketEvents.get().getInjector().hasInjected(e.getPlayer()));
+        boolean shouldInject = packetEvents.getSettings().shouldUseCompatibilityInjector() || !(packetEvents.getInjector().hasInjected(player));
         //Inject now if we are using the compatibility-injector or inject if the early injector failed to inject them.
         if (shouldInject) {
-            PacketEvents.get().getInjector().injectPlayer(player);
+            packetEvents.getInjector().injectPlayer(player);
         }
 
         boolean dependencyAvailable = VersionLookupUtils.isDependencyAvailable();
-        PacketEvents.get().getPlayerUtils().loginTime.put(player.getUniqueId(), System.currentTimeMillis());
+        packetEvents.getPlayerUtils().loginTime.put(player.getUniqueId(), System.currentTimeMillis());
         //A supported dependency is available, we need to first ask the dependency for the client version.
         if (dependencyAvailable) {
             //We are resolving version one tick later for extra safety. Some dependencies throw exceptions if we throw too early.
-            Bukkit.getScheduler().runTaskLaterAsynchronously(PacketEvents.get().getPlugin(), () -> {
+            Bukkit.getScheduler().runTaskLaterAsynchronously(packetEvents.getPlugin(), () -> {
                 try {
                     int protocolVersion = VersionLookupUtils.getProtocolVersion(player);
                     ClientVersion version = ClientVersion.getClientVersion(protocolVersion);
-                    PacketEvents.get().getPlayerUtils().clientVersionsMap.put(address, version);
+                    packetEvents.getPlayerUtils().clientVersionsMap.put(address, version);
                 } catch (Exception ignored) {
 
                 }
-                PacketEvents.get().getEventManager().callEvent(new PostPlayerInjectEvent(player, true));
+                packetEvents.getEventManager().callEvent(new PostPlayerInjectEvent(player, true));
             }, 1L);
         } else {
             //Dependency isn't available, we can already call the post player inject event.
-            PacketEvents.get().getEventManager().callEvent(new PostPlayerInjectEvent(e.getPlayer(), false));
+            packetEvents.getEventManager().callEvent(new PostPlayerInjectEvent(player, false));
         }
     }
 
@@ -80,14 +84,16 @@ public class BukkitEventProcessorInternal implements Listener {
         Player player = e.getPlayer();
         UUID uuid = player.getUniqueId();
         InetSocketAddress address = player.getAddress();
-        //Cleanup user data
-        PacketEvents.get().getPlayerUtils().loginTime.remove(uuid);
-        PacketEvents.get().getPlayerUtils().playerPingMap.remove(uuid);
-        PacketEvents.get().getPlayerUtils().playerSmoothedPingMap.remove(uuid);
-        PacketEvents.get().getPlayerUtils().clientVersionsMap.remove(address);
-        PacketEvents.get().getPlayerUtils().tempClientVersionMap.remove(address);
-        PacketEvents.get().getPlayerUtils().keepAliveMap.remove(uuid);
-        PacketEvents.get().getPlayerUtils().channels.remove(player.getName());
 
+        PlayerUtils playerUtils = packetEvents.getPlayerUtils();
+
+        //Cleanup user data
+        playerUtils.loginTime.remove(uuid);
+        playerUtils.playerPingMap.remove(uuid);
+        playerUtils.playerSmoothedPingMap.remove(uuid);
+        playerUtils.clientVersionsMap.remove(address);
+        playerUtils.tempClientVersionMap.remove(address);
+        playerUtils.keepAliveMap.remove(uuid);
+        playerUtils.channels.remove(player.getName());
     }
 }

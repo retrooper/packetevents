@@ -46,9 +46,11 @@ import org.bukkit.event.Listener;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.ServicePriority;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.scheduler.BukkitScheduler;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.logging.Logger;
 
 public final class PacketEvents implements Listener, EventManager {
     private static PacketEvents instance;
@@ -191,9 +193,11 @@ public final class PacketEvents implements Listener, EventManager {
             };
 
             if (lateBind) {
+                BukkitScheduler bukkitScheduler = Bukkit.getScheduler();
+
                 //If late-bind is enabled, we still need to inject (after all plugins enabled).
-                Bukkit.getScheduler().scheduleSyncDelayedTask(plugin, injector::inject);
-                Bukkit.getScheduler().scheduleSyncDelayedTask(plugin, postInjectTask);
+                bukkitScheduler.scheduleSyncDelayedTask(plugin, injector::inject);
+                bukkitScheduler.scheduleSyncDelayedTask(plugin, postInjectTask);
             } else {
                 postInjectTask.run();
             }
@@ -310,7 +314,8 @@ public final class PacketEvents implements Listener, EventManager {
 
     private void handleUpdateCheck() {
         Thread thread = new Thread(() -> {
-            PacketEvents.get().getPlugin().getLogger().info("[packetevents] Checking for an update, please wait...");
+            Logger logger = PacketEvents.get().getPlugin().getLogger();
+            logger.info("[packetevents] Checking for an update, please wait...");
             UpdateChecker.UpdateCheckerStatus status = updateChecker.checkForUpdate();
             int seconds = 5;
             int retryCount = 5;
@@ -318,7 +323,7 @@ public final class PacketEvents implements Listener, EventManager {
                 if (status != UpdateChecker.UpdateCheckerStatus.FAILED) {
                     break;
                 }
-                PacketEvents.get().getPlugin().getLogger().severe("[packetevents] Checking for an update again in " + seconds + " seconds...");
+                logger.severe("[packetevents] Checking for an update again in " + seconds + " seconds...");
                 try {
                     Thread.sleep(seconds * 1000L);
                 } catch (InterruptedException e) {
@@ -330,7 +335,7 @@ public final class PacketEvents implements Listener, EventManager {
                 status = updateChecker.checkForUpdate();
 
                 if (i == (retryCount - 1)) {
-                    PacketEvents.get().getPlugin().getLogger().severe("[packetevents] PacketEvents failed to check for an update. No longer retrying.");
+                    logger.severe("[packetevents] PacketEvents failed to check for an update. No longer retrying.");
                     break;
                 }
 
