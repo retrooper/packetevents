@@ -142,15 +142,11 @@ public class WrappedPacketOutBlockAction extends WrappedPacket implements Sendab
 
     @Override
     public Object asNMSPacket() throws Exception {
-        final Object packetInstance;
-
         final Object nmsBlockPos = NMSUtils.generateNMSBlockPos(blockPos.getX(), blockPos.getY(), blockPos.getZ());
         final Object nmsBlock = NMSUtils.getNMSBlockFromMaterial(material);
 
-        packetInstance = packetConstructor.newInstance(
-            nmsBlockPos, nmsBlock, action, actionParam
+        return packetConstructor.newInstance(
+                nmsBlockPos, nmsBlock, action, actionParam
         );
-
-        return packetInstance;
     }
 }
