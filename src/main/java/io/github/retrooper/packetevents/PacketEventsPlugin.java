@@ -18,16 +18,8 @@
 
 package io.github.retrooper.packetevents;
 
-import io.github.retrooper.packetevents.event.PacketListenerAbstract;
-import io.github.retrooper.packetevents.event.impl.PacketPlayReceiveEvent;
-import io.github.retrooper.packetevents.event.impl.PacketPlaySendEvent;
-import io.github.retrooper.packetevents.packettype.PacketType;
-import io.github.retrooper.packetevents.packetwrappers.play.out.blockaction.WrappedPacketOutBlockAction;
 import io.github.retrooper.packetevents.settings.PacketEventsSettings;
 import io.github.retrooper.packetevents.utils.server.ServerVersion;
-import io.github.retrooper.packetevents.utils.vector.Vector3i;
-import org.bukkit.Bukkit;
-import org.bukkit.Material;
 import org.bukkit.plugin.java.JavaPlugin;
 
 public class PacketEventsPlugin extends JavaPlugin {
@@ -50,32 +42,6 @@ public class PacketEventsPlugin extends JavaPlugin {
     @Override
     public void onEnable() {
         PacketEvents.get().init();
-
-        PacketEvents.get().getEventManager().registerListener(new PacketListenerAbstract() {
-            @Override
-            public void onPacketPlayReceive(final PacketPlayReceiveEvent event) {
-                if (event.getPacketId() == PacketType.Play.Client.ARM_ANIMATION) {
-                    final WrappedPacketOutBlockAction wrapper = new WrappedPacketOutBlockAction(
-                        new Vector3i(221, 62, 167), 0, 9, Material.NOTE_BLOCK
-                    );
-
-                    PacketEvents.get().getPlayerUtils().sendPacket(event.getPlayer(), wrapper);
-                }
-            }
-
-            @Override
-            public void onPacketPlaySend(final PacketPlaySendEvent event) {
-                if (event.getPacketId() == PacketType.Play.Server.BLOCK_ACTION) {
-                    final WrappedPacketOutBlockAction wrapper = new WrappedPacketOutBlockAction(event.getNMSPacket());
-
-                    final Vector3i vector3i = wrapper.getBlockPosition();
-
-                    Bukkit.broadcastMessage("x: " + vector3i.getX() + " y: " + vector3i.getY() + " z: " + vector3i.getZ());
-                    Bukkit.broadcastMessage("action: " + wrapper.getActionId() + " actionParam: " + wrapper.getActionParam());
-                    Bukkit.broadcastMessage("type: " + wrapper.getBlockMaterial().toString());
-                }
-            }
-        });
     }
 
     @Override
