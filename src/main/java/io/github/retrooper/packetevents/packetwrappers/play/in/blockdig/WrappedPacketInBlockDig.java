@@ -54,24 +54,14 @@ public final class WrappedPacketInBlockDig extends WrappedPacket {
     }
 
     public Vector3i getBlockPosition() {
-        int x = 0;
-        int y = 0;
-        int z = 0;
         if (isVersionLowerThan_v_1_8) {
-            x = readInt(0);
-            y = readInt(1);
-            z = readInt(2);
+            int x = readInt(0);
+            int y = readInt(1);
+            int z = readInt(2);
+            return new Vector3i(x, y, z);
         } else {
-            Object blockPosObj = readObject(0, NMSUtils.blockPosClass);
-            try {
-                x = (int) NMSUtils.getBlockPosX.invoke(blockPosObj);
-                y = (int) NMSUtils.getBlockPosY.invoke(blockPosObj);
-                z = (int) NMSUtils.getBlockPosZ.invoke(blockPosObj);
-            } catch (IllegalAccessException | InvocationTargetException e) {
-                e.printStackTrace();
-            }
+            return readBlockPosition(0);
         }
-        return new Vector3i(x, y, z);
     }
 
     public void setBlockPosition(Vector3i blockPos) {
@@ -80,8 +70,7 @@ public final class WrappedPacketInBlockDig extends WrappedPacket {
             writeInt(1, blockPos.y);
             writeInt(2, blockPos.z);
         } else {
-            Object blockPosObj = NMSUtils.generateNMSBlockPos(blockPos.x, blockPos.y, blockPos.z);
-            write(NMSUtils.blockPosClass, 0, blockPosObj);
+            writeBlockPosition(0, blockPos);
         }
     }
 

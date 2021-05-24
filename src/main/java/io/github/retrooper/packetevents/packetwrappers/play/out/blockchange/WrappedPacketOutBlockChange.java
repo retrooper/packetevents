@@ -39,9 +39,6 @@ public class WrappedPacketOutBlockChange extends WrappedPacket implements Sendab
     private static Method getNMSBlockMethodCache = null;
     private static Method getNMSWorldTypeMethodCache = null;
 
-
-    private Object blockPosObj = null;
-
     private Vector3i blockPos;
     private World world;
     private Material material;
@@ -90,28 +87,16 @@ public class WrappedPacketOutBlockChange extends WrappedPacket implements Sendab
     }
 
     public Vector3i getBlockPosition() {
-
         if (packet != null) {
-            int x = 0;
-            int y = 0;
-            int z = 0;
             if (version.isOlderThan(ServerVersion.v_1_8)) {
-                x = readInt(0);
-                y = readInt(1);
-                z = readInt(2);
+                int x = readInt(0);
+                int y = readInt(1);
+                int z = readInt(2);
+                return new Vector3i(x, y, z);
+
             } else {
-                if (blockPosObj == null) {
-                    blockPosObj = readObject(0, NMSUtils.blockPosClass);
-                }
-                try {
-                    x = (int) NMSUtils.getBlockPosX.invoke(blockPosObj);
-                    y = (int) NMSUtils.getBlockPosY.invoke(blockPosObj);
-                    z = (int) NMSUtils.getBlockPosZ.invoke(blockPosObj);
-                } catch (IllegalAccessException | InvocationTargetException e) {
-                    e.printStackTrace();
-                }
+                return readBlockPosition(0);
             }
-            return new Vector3i(x, y, z);
         } else {
             return blockPos;
         }
@@ -124,8 +109,7 @@ public class WrappedPacketOutBlockChange extends WrappedPacket implements Sendab
                 writeInt(1, blockPos.y);
                 writeInt(2, blockPos.z);
             } else {
-                blockPosObj = NMSUtils.generateNMSBlockPos(blockPos.x, blockPos.y, blockPos.z);
-                write(NMSUtils.blockPosClass, 0, blockPosObj);
+                writeBlockPosition(0, blockPos);
             }
         } else {
             this.blockPos = blockPos;
@@ -145,7 +129,6 @@ public class WrappedPacketOutBlockChange extends WrappedPacket implements Sendab
                     e.printStackTrace();
                 }
             }
-
             return NMSUtils.getMaterialFromNMSBlock(nmsBlock);
         } else {
             return material;
@@ -186,7 +169,7 @@ public class WrappedPacketOutBlockChange extends WrappedPacket implements Sendab
             if (getMaterial() != null) {
                 blockChange.setMaterial(getMaterial());
             } else {
-                Object nmsBlockPos = NMSUtils.generateNMSBlockPos(blockPosition.x, blockPosition.y, blockPosition.z);
+                Object nmsBlockPos = NMSUtils.generateNMSBlockPos(blockPosition);
                 Object worldServer = NMSUtils.convertBukkitWorldToWorldServer(world);
                 Object nmsBlockData = getNMSWorldTypeMethodCache.invoke(worldServer, nmsBlockPos);
                 blockChange.write(NMSUtils.iBlockDataClass, 0, nmsBlockData);

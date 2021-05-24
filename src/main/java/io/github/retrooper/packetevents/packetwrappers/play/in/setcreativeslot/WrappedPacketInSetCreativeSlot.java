@@ -38,12 +38,10 @@ public class WrappedPacketInSetCreativeSlot extends WrappedPacket {
     }
 
     public ItemStack getClickedItem() {
-        Object nmsItemStack = readObject(0, NMSUtils.nmsItemStackClass);
-        return NMSUtils.toBukkitItemStack(nmsItemStack);
+        return readItemStack(0);
     }
 
     public void setClickedItem(ItemStack stack) {
-        Object nmsItemStack = NMSUtils.toNMSItemStack(stack);
-        write(NMSUtils.nmsItemStackClass, 0, nmsItemStack);
+        writeItemStack(0, stack);
     }
 }

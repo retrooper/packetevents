@@ -26,6 +26,7 @@ import io.github.retrooper.packetevents.utils.nms.NMSUtils;
 import io.github.retrooper.packetevents.utils.server.ServerVersion;
 import io.github.retrooper.packetevents.utils.vector.Vector3i;
 import org.bukkit.entity.Entity;
+import org.bukkit.entity.Player;
 
 import java.lang.reflect.Constructor;
 
@@ -66,16 +67,14 @@ public class WrappedPacketOutBlockBreakAnimation extends WrappedPacketEntityAbst
 
     public Vector3i getBlockPosition() {
         if (packet != null) {
-            Vector3i blockPosition = new Vector3i();
             if (version.isOlderThan(ServerVersion.v_1_8)) {
-                this.blockPosition.x = readInt(1);
-                this.blockPosition.y = readInt(2);
-                this.blockPosition.z = readInt(3);
+                int x = readInt(1);
+                int y = readInt(2);
+                int z = readInt(3);
+                return new Vector3i(x, y, z);
             } else {
-                Object blockPos = readObject(0, NMSUtils.blockPosClass);
-                this.blockPosition = NMSUtils.readBlockPos(blockPos);
+                return readBlockPosition(0);
             }
-            return blockPosition;
         } else {
             return this.blockPosition;
         }
@@ -88,8 +87,7 @@ public class WrappedPacketOutBlockBreakAnimation extends WrappedPacketEntityAbst
                 writeInt(2, blockPosition.y);
                 writeInt(3, blockPosition.z);
             } else {
-                Object blockPos = NMSUtils.generateNMSBlockPos(blockPosition.x, blockPosition.y, blockPosition.z);
-                write(NMSUtils.blockPosClass, 0, blockPos);
+                writeBlockPosition(0, blockPosition);
             }
         } else {
             this.blockPosition = blockPosition;
@@ -120,7 +118,7 @@ public class WrappedPacketOutBlockBreakAnimation extends WrappedPacketEntityAbst
         if (version.isOlderThan(ServerVersion.v_1_8)) {
             return packetConstructor.newInstance(getEntityId(), blockPosition.x, blockPosition.y, blockPosition.z, getDestroyStage());
         } else {
-            Object nmsBlockPos = NMSUtils.generateNMSBlockPos(blockPosition.x, blockPosition.y, blockPosition.z);
+            Object nmsBlockPos = NMSUtils.generateNMSBlockPos(blockPosition);
             return packetConstructor.newInstance(getEntityId(), nmsBlockPos, getDestroyStage());
         }
     }

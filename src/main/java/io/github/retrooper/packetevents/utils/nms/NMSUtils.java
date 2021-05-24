@@ -25,6 +25,7 @@ import io.github.retrooper.packetevents.utils.reflection.Reflection;
 import io.github.retrooper.packetevents.utils.reflection.SubclassUtil;
 import io.github.retrooper.packetevents.utils.server.ServerVersion;
 import io.github.retrooper.packetevents.utils.vector.Vector3i;
+import net.minecraft.server.v1_16_R2.BlockPosition;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.Server;
@@ -140,7 +141,7 @@ public final class NMSUtils {
         try {
             //If null, it is 1.7.10
             if (blockPosClass != null) {
-                blockPosConstructor = blockPosClass.getConstructor(double.class, double.class, double.class);
+                blockPosConstructor = blockPosClass.getConstructor(int.class, int.class, int.class);
             }
             if (vec3DClass != null) {
                 vec3DConstructor = NMSUtils.vec3DClass.getDeclaredConstructor(double.class, double.class, double.class);
@@ -489,15 +490,6 @@ public final class NMSUtils {
         return texts;
     }
 
-    public static Vector3i readBlockPos(Object blockPos) {
-        try {
-            return new Vector3i((int) getBlockPosX.invoke(blockPos), (int) getBlockPosY.invoke(blockPos), (int) getBlockPosZ.invoke(blockPos));
-        } catch (IllegalAccessException | InvocationTargetException e) {
-            e.printStackTrace();
-        }
-        return null;
-    }
-
     public static String fromStringToJSON(String message) {
         if (message == null) {
             return null;
@@ -505,9 +497,9 @@ public final class NMSUtils {
         return "{\"text\": \"" + message + "\"}";
     }
 
-    public static Object generateNMSBlockPos(double x, double y, double z) {
+    public static Object generateNMSBlockPos(Vector3i blockPosition) {
         try {
-            return blockPosConstructor.newInstance(x, y, z);
+            return blockPosConstructor.newInstance(blockPosition.x, blockPosition.y, blockPosition.z);
         } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
             e.printStackTrace();
         }

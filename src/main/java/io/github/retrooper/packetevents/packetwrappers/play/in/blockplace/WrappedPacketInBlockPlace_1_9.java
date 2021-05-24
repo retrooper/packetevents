@@ -64,7 +64,7 @@ final class WrappedPacketInBlockPlace_1_9 extends WrappedPacket {
     }
 
     public void setBlockPosition(Vector3i blockPos) {
-        Object blockPosObj = NMSUtils.generateNMSBlockPos(blockPos.x, blockPos.y, blockPos.z);
+        Object blockPosObj = NMSUtils.generateNMSBlockPos(blockPos);
         if (movingObjectPositionBlockClass == null) {
             write(NMSUtils.blockPosClass, 0, blockPosObj);
         } else {

@@ -174,23 +174,6 @@ public final class PlayerUtils {
     }
 
     /**
-     * High level player injection method.
-     * This method will call the {@link io.github.retrooper.packetevents.event.impl.PlayerInjectEvent}
-     * event and if the event gets cancelled, this action will cancel too.
-     * The injection action and event call will be async or sync depending on the PacketEvents settings.
-     * Recommended to use this as this most likely won't ever change/refactor compared to using our internal utils.
-     *
-     * @param player Target player.
-     */
-    public void injectPlayer(Player player) {
-        PacketEvents.get().getInjector().injectPlayer(player);
-    }
-
-    public void ejectPlayer(Player player) {
-        PacketEvents.get().getInjector().ejectPlayer(player);
-    }
-
-    /**
      * Send a client-bound(server-sided) wrapper that supports sending to a player.
      *
      * @param player  Packet receiver.

@@ -26,7 +26,7 @@ import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
 /**
- * The {@code PacketPlaySendEvent} event is fired whenever the a PLAY packet is about to be sent.
+ * The {@code PacketPlaySendEvent} event is fired whenever the a PLAY packet is about to be sent to a client.
  * Cancelling this event will result in preventing minecraft from sending the packet.
  * The player won't receive the packet if you cancel it.
  *

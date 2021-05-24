@@ -30,6 +30,7 @@ import io.github.retrooper.packetevents.utils.player.GameMode;
 import io.github.retrooper.packetevents.utils.reflection.ClassUtil;
 import io.github.retrooper.packetevents.utils.reflection.Reflection;
 import io.github.retrooper.packetevents.utils.server.ServerVersion;
+import io.github.retrooper.packetevents.utils.vector.Vector3i;
 import io.github.retrooper.packetevents.utils.world.Difficulty;
 import io.github.retrooper.packetevents.utils.world.Dimension;
 import org.bukkit.inventory.ItemStack;
@@ -39,6 +40,7 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -402,6 +404,24 @@ public class WrappedPacket implements WrapperPacketReader, WrapperPacketWriter {
         } catch (IllegalAccessException | NullPointerException e) {
             e.printStackTrace();
         }
+    }
+
+    public Vector3i readBlockPosition(int index) {
+        Object blockPosObj = readObject(index, NMSUtils.blockPosClass);
+        try {
+            int x = (int) NMSUtils.getBlockPosX.invoke(blockPosObj);
+            int y = (int) NMSUtils.getBlockPosY.invoke(blockPosObj);
+            int z = (int) NMSUtils.getBlockPosZ.invoke(blockPosObj);
+            return new Vector3i(x, y, z);
+        } catch (IllegalAccessException | InvocationTargetException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    public void writeBlockPosition(int index, Vector3i blockPosition) {
+        Object blockPosObj = NMSUtils.generateNMSBlockPos(blockPosition);
+        write(NMSUtils.blockPosClass, index, blockPosObj);
     }
 
     public ItemStack readItemStack(int index) {

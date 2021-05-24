@@ -84,7 +84,7 @@ public class WrappedPacketOutBlockAction extends WrappedPacket implements Sendab
 
     public void setBlockPosition(final Vector3i blockPos) {
         if (packet != null) {
-            final Object nmsBlockPos = NMSUtils.generateNMSBlockPos(blockPos.x, blockPos.y, blockPos.z);
+            final Object nmsBlockPos = NMSUtils.generateNMSBlockPos(blockPos);
             write(NMSUtils.blockPosClass, 0, nmsBlockPos);
         } else {
             this.blockPos = blockPos;
@@ -142,7 +142,7 @@ public class WrappedPacketOutBlockAction extends WrappedPacket implements Sendab
 
     @Override
     public Object asNMSPacket() throws Exception {
-        final Object nmsBlockPos = NMSUtils.generateNMSBlockPos(blockPos.getX(), blockPos.getY(), blockPos.getZ());
+        final Object nmsBlockPos = NMSUtils.generateNMSBlockPos(blockPos);
         final Object nmsBlock = NMSUtils.getNMSBlockFromMaterial(material);
 
         return packetConstructor.newInstance(

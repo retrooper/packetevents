@@ -20,12 +20,9 @@ package io.github.retrooper.packetevents.packetwrappers.play.in.blockplace;
 
 import io.github.retrooper.packetevents.packetwrappers.NMSPacket;
 import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
-import io.github.retrooper.packetevents.utils.nms.NMSUtils;
 import io.github.retrooper.packetevents.utils.vector.Vector3f;
 import io.github.retrooper.packetevents.utils.vector.Vector3i;
 import org.bukkit.inventory.ItemStack;
-
-import java.lang.reflect.InvocationTargetException;
 
 final class WrappedPacketInBlockPlace_1_8 extends WrappedPacket {
 
@@ -34,31 +31,19 @@ final class WrappedPacketInBlockPlace_1_8 extends WrappedPacket {
     }
 
     public Vector3i getBlockPosition() {
-        Vector3i blockPos = new Vector3i();
-
-        Object blockPosObj = readObject(1, NMSUtils.blockPosClass);
-        try {
-            blockPos.x = (int) NMSUtils.getBlockPosX.invoke(blockPosObj);
-            blockPos.y = (int) NMSUtils.getBlockPosY.invoke(blockPosObj);
-            blockPos.z = (int) NMSUtils.getBlockPosZ.invoke(blockPosObj);
-        } catch (IllegalAccessException | InvocationTargetException e) {
-            e.printStackTrace();
-        }
-        return blockPos;
+        return readBlockPosition(1);
     }
 
     public void setBlockPosition(Vector3i blockPos) {
-        Object blockPosObj = NMSUtils.generateNMSBlockPos(blockPos.z, blockPos.y, blockPos.z);
-        write(NMSUtils.blockPosClass, 1, blockPosObj);
+        writeBlockPosition(1, blockPos);
     }
 
     public ItemStack getItemStack() {
-        return NMSUtils.toBukkitItemStack(readObject(0, NMSUtils.nmsItemStackClass));
+        return readItemStack(0);
     }
 
     public void setItemStack(ItemStack stack) {
-        Object nmsItemStack = NMSUtils.toNMSItemStack(stack);
-        write(NMSUtils.nmsItemStackClass, 0, nmsItemStack);
+        writeItemStack(0, stack);
     }
 
     public int getFace() {

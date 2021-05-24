@@ -26,7 +26,7 @@ import io.github.retrooper.packetevents.packetwrappers.NMSPacket;
 import java.net.InetSocketAddress;
 
 /**
- * The {@code PacketStatusSendEvent} event is fired whenever the server wants to send a STATUS packet to the client.
+ * The {@code PacketStatusSendEvent} event is fired whenever the server wants to send a STATUS packet to a client.
  * This class implements {@link CancellableEvent}.
  * The {@code PacketStatusSendEvent} has no Bukkit player, the player object is null in this state.
  * Use the {@link #getSocketAddress()} to identify who sends the packet.

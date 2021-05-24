@@ -29,7 +29,6 @@ import java.lang.reflect.InvocationTargetException;
 
 public class WrappedPacketInUpdateSign extends WrappedPacket {
     private static boolean v_1_7_mode, strArrayMode;
-    private static Class<?> blockPosClass;
 
     public WrappedPacketInUpdateSign(NMSPacket packet) {
         super(packet);
@@ -39,35 +38,17 @@ public class WrappedPacketInUpdateSign extends WrappedPacket {
     protected void load() {
         v_1_7_mode = Reflection.getField(PacketTypeClasses.Play.Client.UPDATE_SIGN, int.class, 0) != null;
         strArrayMode = Reflection.getField(PacketTypeClasses.Play.Client.UPDATE_SIGN, String[].class, 0) != null;
-        if (!v_1_7_mode) {
-            try {
-                blockPosClass = NMSUtils.getNMSClass("BlockPosition");
-            } catch (ClassNotFoundException e) {
-                e.printStackTrace();
-            }
-        }
     }
 
     public Vector3i getBlockPosition() {
-        int x = 0;
-        int y = 0;
-        int z = 0;
         if (v_1_7_mode) {
-            x = readInt(0);
-            y = readInt(1);
-            z = readInt(2);
-
+            int x = readInt(0);
+            int y = readInt(1);
+            int z = readInt(2);
+            return new Vector3i(x, y, z);
         } else {
-            Object blockPosObj = readObject(0, blockPosClass);
-            try {
-                x = (int) NMSUtils.getBlockPosX.invoke(blockPosObj);
-                y = (int) NMSUtils.getBlockPosY.invoke(blockPosObj);
-                z = (int) NMSUtils.getBlockPosZ.invoke(blockPosObj);
-            } catch (IllegalAccessException | InvocationTargetException e) {
-                e.printStackTrace();
-            }
+            return readBlockPosition(0);
         }
-        return new Vector3i(x, y, z);
     }
 
     public void setBlockPosition(Vector3i blockPos) {
@@ -76,8 +57,7 @@ public class WrappedPacketInUpdateSign extends WrappedPacket {
             writeInt(1, blockPos.y);
             writeInt(2, blockPos.z);
         } else {
-            Object blockPosObj = NMSUtils.generateNMSBlockPos(blockPos.x, blockPos.y, blockPos.z);
-            write(NMSUtils.blockPosClass, 0, blockPosObj);
+            writeBlockPosition(0, blockPos);
         }
     }
 
