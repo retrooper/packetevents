@@ -123,7 +123,7 @@ public class WrappedPacketOutBlockAction extends WrappedPacket implements Sendab
         }
     }
 
-    public Material getBlockMaterial() {
+    public Material getBlockType() {
         if (packet != null) {
             return NMSUtils.getMaterialFromNMSBlock(readObject(0, NMSUtils.blockClass));
         } else {
@@ -131,7 +131,7 @@ public class WrappedPacketOutBlockAction extends WrappedPacket implements Sendab
         }
     }
 
-    public void setBlock(final Material material) {
+    public void setBlockType(final Material material) {
         if (packet != null) {
             final Object nmsBlock = NMSUtils.getNMSBlockFromMaterial(material);
             write(NMSUtils.blockClass, 0, nmsBlock);
