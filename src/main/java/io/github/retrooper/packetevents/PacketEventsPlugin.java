@@ -18,8 +18,13 @@
 
 package io.github.retrooper.packetevents;
 
+import io.github.retrooper.packetevents.event.PacketListenerAbstract;
+import io.github.retrooper.packetevents.event.impl.PacketPlayReceiveEvent;
+import io.github.retrooper.packetevents.packettype.PacketType;
+import io.github.retrooper.packetevents.packetwrappers.play.out.bedit.WrappedPacketInBEdit;
 import io.github.retrooper.packetevents.settings.PacketEventsSettings;
 import io.github.retrooper.packetevents.utils.server.ServerVersion;
+import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
 
 public class PacketEventsPlugin extends JavaPlugin {
@@ -42,6 +47,21 @@ public class PacketEventsPlugin extends JavaPlugin {
     @Override
     public void onEnable() {
         PacketEvents.get().init();
+
+        PacketEvents.get().getEventManager().registerListener(new PacketListenerAbstract() {
+            @Override
+            public void onPacketPlayReceive(final PacketPlayReceiveEvent event) {
+                if (event.getPacketId() == PacketType.Play.Client.B_EDIT) {
+                    final WrappedPacketInBEdit wrapper = new WrappedPacketInBEdit(event.getNMSPacket());
+
+                    Bukkit.broadcastMessage(wrapper.isSigning() + "");
+                    Bukkit.broadcastMessage(wrapper.getItemStack().toString());
+                    Bukkit.broadcastMessage(wrapper.getHand().name());
+                } else if (event.getPacketId() == PacketType.Play.Client.ARM_ANIMATION) {
+                    Bukkit.broadcastMessage("lol");
+                }
+            }
+        });
     }
 
     @Override
