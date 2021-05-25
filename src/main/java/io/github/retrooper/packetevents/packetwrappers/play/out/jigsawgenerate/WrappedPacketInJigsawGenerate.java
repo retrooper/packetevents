@@ -20,11 +20,23 @@ public class WrappedPacketInJigsawGenerate extends WrappedPacket {
         return readBlockPosition(0);
     }
 
+    public void setBlockPosition(final Vector3i blockPosition) {
+        writeBlockPosition(0, blockPosition);
+    }
+
     public int getLevels() {
         return readInt(0);
     }
 
+    public void setLevels(final int levels) {
+        writeInt(0, levels);
+    }
+
     public boolean isKeepingJigsaws() {
         return readBoolean(0);
+    }
+
+    public void setKeepingJigsaws(final boolean keepingJigsaws) {
+        writeBoolean(0, keepingJigsaws);
     }
 }
