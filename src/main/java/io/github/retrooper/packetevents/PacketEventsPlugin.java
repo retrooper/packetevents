@@ -23,8 +23,10 @@ import io.github.retrooper.packetevents.utils.server.ServerVersion;
 import org.bukkit.plugin.java.JavaPlugin;
 
 public class PacketEventsPlugin extends JavaPlugin {
-    //TODO Remove all deprecations including the legacy event system in 1.8.1 release
+    //TODO Check announcements for release plan
     //TODO finish remaining wrappers
+    //TODO add property map to game profile wrappers to allow users to change skins with packetevents
+    //TODO Check johanness' issue with early packets like a teleport one being missed
     @Override
     public void onLoad() {
         //Return value of create is your PacketEvents instance.
