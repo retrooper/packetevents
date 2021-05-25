@@ -2,6 +2,7 @@ package io.github.retrooper.packetevents.packetwrappers.play.out.bedit;
 
 import io.github.retrooper.packetevents.packetwrappers.NMSPacket;
 import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
+import io.github.retrooper.packetevents.utils.enums.EnumUtil;
 import io.github.retrooper.packetevents.utils.nms.NMSUtils;
 import io.github.retrooper.packetevents.utils.player.Hand;
 import io.github.retrooper.packetevents.utils.server.ServerVersion;
@@ -43,5 +44,13 @@ public class WrappedPacketInBEdit extends WrappedPacket {
         }
 
         return Optional.empty();
+    }
+
+    @SupportedVersions(ranges = {ServerVersion.v_1_13, ServerVersion.v_1_16_5})
+    public void setHand(final Hand hand) {
+        if (version.isNewerThanOrEquals(ServerVersion.v_1_13)) {
+            final Enum<?> enumConst = EnumUtil.valueOf(NMSUtils.enumHandClass, hand.name());
+            writeEnumConstant(0, enumConst);
+        }
     }
 }
