@@ -43,7 +43,7 @@ public class WrappedPacketInArmAnimation extends WrappedPacket {
         //Optimize to do nothing on legacy versions. The protocol of the legacy versions only support one hand, the main hand.
         if (version.isNewerThan(ServerVersion.v_1_8_8)) {
             Enum<?> enumConst = EnumUtil.valueOf(NMSUtils.enumHandClass, hand.name());
-            write(NMSUtils.enumHandClass, 0, enumConst);
+            writeEnumConstant(0, enumConst);
         }
     }
 }
