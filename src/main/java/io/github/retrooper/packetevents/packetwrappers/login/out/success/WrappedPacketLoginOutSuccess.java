@@ -21,23 +21,58 @@ package io.github.retrooper.packetevents.packetwrappers.login.out.success;
 import io.github.retrooper.packetevents.packettype.PacketTypeClasses;
 import io.github.retrooper.packetevents.packetwrappers.NMSPacket;
 import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
+import io.github.retrooper.packetevents.packetwrappers.api.SendableWrapper;
 import io.github.retrooper.packetevents.utils.gameprofile.GameProfileUtil;
 import io.github.retrooper.packetevents.utils.gameprofile.WrappedGameProfile;
 import io.github.retrooper.packetevents.utils.nms.NMSUtils;
 
-public class WrappedPacketLoginOutSuccess extends WrappedPacket {
-    public WrappedPacketLoginOutSuccess(NMSPacket packet) {
+import java.lang.reflect.Constructor;
+
+public class WrappedPacketLoginOutSuccess extends WrappedPacket implements SendableWrapper {
+
+    private WrappedGameProfile wrappedGameProfile;
+
+    private static Constructor<?> packetConstructor;
+
+    public WrappedPacketLoginOutSuccess(final NMSPacket packet) {
         super(packet);
     }
 
-    public WrappedGameProfile getGameProfile() {
-        return GameProfileUtil.getWrappedGameProfile(readObject(0, NMSUtils.gameProfileClass));
+    public WrappedPacketLoginOutSuccess(final WrappedGameProfile wrappedGameProfile) {
+        this.wrappedGameProfile = wrappedGameProfile;
     }
 
+    @Override
+    protected void load() {
+        try {
+            packetConstructor = PacketTypeClasses.Login.Server.SUCCESS.getConstructors()[1];
+        } catch (final Exception e) {
+            e.printStackTrace();
+        }
+    }
 
-    public void setGameProfile(WrappedGameProfile wrappedGameProfile) {
-        Object gameProfile = GameProfileUtil.getGameProfile(wrappedGameProfile.getId(), wrappedGameProfile.getName());
-        write(NMSUtils.gameProfileClass, 0, gameProfile);
+    public WrappedGameProfile getGameProfile() {
+        if (packet != null) {
+            return GameProfileUtil.getWrappedGameProfile(readObject(0, NMSUtils.gameProfileClass));
+        } else {
+            return this.wrappedGameProfile;
+        }
+    }
+
+    public void setGameProfile(final WrappedGameProfile wrappedGameProfile) {
+        if (packet != null) {
+            final Object gameProfile = GameProfileUtil.getGameProfile(wrappedGameProfile.getId(), wrappedGameProfile.getName());
+            write(NMSUtils.gameProfileClass, 0, gameProfile);
+        } else {
+            this.wrappedGameProfile = wrappedGameProfile;
+        }
+    }
+
+    @Override
+    public Object asNMSPacket() throws Exception {
+        return packetConstructor.newInstance(
+                GameProfileUtil.getGameProfile(wrappedGameProfile.getId(), wrappedGameProfile.getName())
+        );
     }
 
     @Override

@@ -21,21 +21,55 @@ package io.github.retrooper.packetevents.packetwrappers.login.out.disconnect;
 import io.github.retrooper.packetevents.packettype.PacketTypeClasses;
 import io.github.retrooper.packetevents.packetwrappers.NMSPacket;
 import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
+import io.github.retrooper.packetevents.packetwrappers.api.SendableWrapper;
 import io.github.retrooper.packetevents.utils.nms.NMSUtils;
 
-public class WrappedPacketLoginOutDisconnect extends WrappedPacket {
-    public WrappedPacketLoginOutDisconnect(NMSPacket packet) {
+import java.lang.reflect.Constructor;
+
+public class WrappedPacketLoginOutDisconnect extends WrappedPacket implements SendableWrapper {
+
+    private String reason;
+
+    private static Constructor<?> packetConstructor;
+
+    public WrappedPacketLoginOutDisconnect(final NMSPacket packet) {
         super(packet);
     }
 
-    public String getReason() {
-        Object iChatBaseComponent = readObject(0, NMSUtils.iChatBaseComponentClass);
-        return NMSUtils.readIChatBaseComponent(iChatBaseComponent);
+    public WrappedPacketLoginOutDisconnect(final String reason) {
+        this.reason = reason;
     }
 
-    public void setReason(String reason) {
-        Object iChatBaseComponent = NMSUtils.generateIChatBaseComponent(reason);
-        writeObject(0, iChatBaseComponent);
+    @Override
+    protected void load() {
+        try {
+            packetConstructor = PacketTypeClasses.Login.Server.DISCONNECT.getConstructors()[1];
+        } catch (final Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public String getReason() {
+        if (packet != null) {
+            return readIChatBaseComponent(0);
+        } else {
+            return this.reason;
+        }
+    }
+
+    public void setReason(final String reason) {
+        if (packet != null) {
+            writeIChatBaseComponent(0, reason);
+        } else {
+            this.reason = reason;
+        }
+    }
+
+    @Override
+    public Object asNMSPacket() throws Exception {
+        return packetConstructor.newInstance(
+                NMSUtils.generateIChatBaseComponent(this.reason)
+        );
     }
 
     @Override
