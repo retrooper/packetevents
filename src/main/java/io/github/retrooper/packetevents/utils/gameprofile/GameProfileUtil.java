@@ -19,6 +19,8 @@
 package io.github.retrooper.packetevents.utils.gameprofile;
 
 import io.github.retrooper.packetevents.utils.nms.NMSUtils;
+import io.github.retrooper.packetevents.utils.player.Skin;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.UUID;
 
@@ -38,6 +40,24 @@ public class GameProfileUtil {
             return GameProfileUtil_7.getWrappedGameProfile(gameProfile);
         } else {
             return GameProfileUtil_8.getWrappedGameProfile(gameProfile);
+        }
+    }
+
+    public static void setGameProfileSkin(Object gameProfile, Skin skin) {
+        if (NMSUtils.legacyNettyImportMode) {
+            GameProfileUtil_7.setGameProfileSkin(gameProfile, skin);
+        }
+        else {
+            GameProfileUtil_8.setGameProfileSkin(gameProfile, skin);
+        }
+    }
+
+    public static Skin getGameProfileSkin(Object gameProfile) {
+        if (NMSUtils.legacyNettyImportMode) {
+            return GameProfileUtil_7.getGameProfileSkin(gameProfile);
+        }
+        else {
+            return GameProfileUtil_8.getGameProfileSkin(gameProfile);
         }
     }
 }

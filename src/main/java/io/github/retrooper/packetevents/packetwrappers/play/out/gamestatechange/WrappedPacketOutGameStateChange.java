@@ -62,6 +62,9 @@ public class WrappedPacketOutGameStateChange extends WrappedPacket implements Se
             }
         }
         reasonIntMode = reasonClassType == null;
+        if (reasonIntMode) {
+            reasonClassType = int.class;
+        }
         valueFloatMode = Reflection.getField(PacketTypeClasses.Play.Server.GAME_STATE_CHANGE, double.class, 0) == null;
 
         try {

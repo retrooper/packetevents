@@ -19,9 +19,11 @@
 package io.github.retrooper.packetevents.utils.gameprofile;
 
 import com.mojang.authlib.GameProfile;
+import com.mojang.authlib.properties.Property;
 import io.github.retrooper.packetevents.packetwrappers.NMSPacket;
 import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
 import io.github.retrooper.packetevents.utils.nms.NMSUtils;
+import io.github.retrooper.packetevents.utils.player.Skin;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
@@ -49,5 +51,17 @@ class GameProfileUtil_8 {
     public static WrappedGameProfile getWrappedGameProfile(Object gameProfile) {
         GameProfile gp = (GameProfile) gameProfile;
         return new WrappedGameProfile(gp.getId(), gp.getName());
+    }
+
+    public static void setGameProfileSkin(Object gameProfile, Skin skin) {
+        GameProfile gp = (GameProfile) gameProfile;
+        gp.getProperties().put("textures", new Property(skin.getValue(), skin.getSignature()));
+    }
+
+    public static Skin getGameProfileSkin(Object gameProfile) {
+        Property property = ((GameProfile) gameProfile).getProperties().get("textures").iterator().next();
+        String value = property.getValue();
+        String signature = property.getSignature();
+        return new Skin(value, signature);
     }
 }

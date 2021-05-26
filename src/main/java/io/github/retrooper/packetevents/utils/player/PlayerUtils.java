@@ -20,18 +20,24 @@ package io.github.retrooper.packetevents.utils.player;
 
 import io.github.retrooper.packetevents.PacketEvents;
 import io.github.retrooper.packetevents.packetwrappers.api.SendableWrapper;
+import io.github.retrooper.packetevents.packetwrappers.play.out.entitydestroy.WrappedPacketOutEntityDestroy;
+import io.github.retrooper.packetevents.packetwrappers.play.out.namedentityspawn.WrappedPacketOutNamedEntitySpawn;
+import io.github.retrooper.packetevents.packetwrappers.play.out.playerinfo.WrappedPacketOutPlayerInfo;
 import io.github.retrooper.packetevents.utils.gameprofile.GameProfileUtil;
 import io.github.retrooper.packetevents.utils.gameprofile.WrappedGameProfile;
 import io.github.retrooper.packetevents.utils.nms.NMSUtils;
 import io.github.retrooper.packetevents.utils.server.ServerVersion;
 import io.github.retrooper.packetevents.utils.versionlookup.VersionLookupUtils;
 import io.github.retrooper.packetevents.utils.versionlookup.v_1_7_10.SpigotVersionLookup_1_7;
+import org.bukkit.Bukkit;
+import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
 import java.net.InetSocketAddress;
 import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -226,6 +232,39 @@ public final class PlayerUtils {
     public WrappedGameProfile getGameProfile(Player player) {
         Object gameProfile = GameProfileUtil.getGameProfile(player.getUniqueId(), player.getName());
         return GameProfileUtil.getWrappedGameProfile(gameProfile);
+    }
+//TODO FINISH CHANGE SKIN
+    private void changeSkin(Player player, Skin skin) {
+        Object gameProfile = NMSUtils.getGameProfile(player);
+        GameProfileUtil.setGameProfileSkin(gameProfile, skin);
+    }
+//TODO FINISH APPLY SKIN CAUSE NOW I AM INVISIBLE?
+    private void applySkinChangeAsync(Player player) {
+        Location location = player.getLocation();
+        WrappedGameProfile gameProfile = getGameProfile(player);
+        WrappedPacketOutPlayerInfo.PlayerInfo playerInfo = new WrappedPacketOutPlayerInfo.PlayerInfo(player.getName(), gameProfile, GameMode.SURVIVAL, 0);
+        CompletableFuture.runAsync(() -> {
+            System.out.println("STARTING");
+
+        }).thenRunAsync(() -> {
+            for (Player p : Bukkit.getOnlinePlayers()) {
+                WrappedPacketOutPlayerInfo removePlayerInfo = new WrappedPacketOutPlayerInfo(WrappedPacketOutPlayerInfo.PlayerInfoAction.REMOVE_PLAYER, playerInfo);
+                PacketEvents.get().getPlayerUtils().sendPacket(p, removePlayerInfo);
+                WrappedPacketOutEntityDestroy entityDestroy = new WrappedPacketOutEntityDestroy(player.getEntityId());
+                PacketEvents.get().getPlayerUtils().sendPacket(p, entityDestroy);
+                WrappedPacketOutNamedEntitySpawn namedEntitySpawn = new WrappedPacketOutNamedEntitySpawn(player.getEntityId(), player.getUniqueId(), location);
+                PacketEvents.get().getPlayerUtils().sendPacket(p, namedEntitySpawn);
+                WrappedPacketOutPlayerInfo addPlayerInfo = new WrappedPacketOutPlayerInfo(WrappedPacketOutPlayerInfo.PlayerInfoAction.ADD_PLAYER, playerInfo);
+                PacketEvents.get().getPlayerUtils().sendPacket(p, addPlayerInfo);
+            }
+        }).thenRunAsync(() -> {
+            System.out.println("DONE");
+        });
+    }
+
+    public Skin getSkin(Player player) {
+        Object gameProfile = NMSUtils.getGameProfile(player);
+        return GameProfileUtil.getGameProfileSkin(gameProfile);
     }
 
     public Object getChannel(Player player) {
