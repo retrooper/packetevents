@@ -234,7 +234,7 @@ public final class PlayerUtils {
         return GameProfileUtil.getWrappedGameProfile(gameProfile);
     }
 //TODO FINISH CHANGE SKIN
-    private void changeSkin(Player player, Skin skin) {
+    public void changeSkin(Player player, Skin skin) {
         Object gameProfile = NMSUtils.getGameProfile(player);
         GameProfileUtil.setGameProfileSkin(gameProfile, skin);
     }
@@ -242,20 +242,15 @@ public final class PlayerUtils {
     private void applySkinChangeAsync(Player player) {
         Location location = player.getLocation();
         WrappedGameProfile gameProfile = getGameProfile(player);
-        WrappedPacketOutPlayerInfo.PlayerInfo playerInfo = new WrappedPacketOutPlayerInfo.PlayerInfo(player.getName(), gameProfile, GameMode.SURVIVAL, 0);
         CompletableFuture.runAsync(() -> {
             System.out.println("STARTING");
 
         }).thenRunAsync(() -> {
             for (Player p : Bukkit.getOnlinePlayers()) {
-                WrappedPacketOutPlayerInfo removePlayerInfo = new WrappedPacketOutPlayerInfo(WrappedPacketOutPlayerInfo.PlayerInfoAction.REMOVE_PLAYER, playerInfo);
-                PacketEvents.get().getPlayerUtils().sendPacket(p, removePlayerInfo);
-                WrappedPacketOutEntityDestroy entityDestroy = new WrappedPacketOutEntityDestroy(player.getEntityId());
-                PacketEvents.get().getPlayerUtils().sendPacket(p, entityDestroy);
-                WrappedPacketOutNamedEntitySpawn namedEntitySpawn = new WrappedPacketOutNamedEntitySpawn(player.getEntityId(), player.getUniqueId(), location);
-                PacketEvents.get().getPlayerUtils().sendPacket(p, namedEntitySpawn);
-                WrappedPacketOutPlayerInfo addPlayerInfo = new WrappedPacketOutPlayerInfo(WrappedPacketOutPlayerInfo.PlayerInfoAction.ADD_PLAYER, playerInfo);
-                PacketEvents.get().getPlayerUtils().sendPacket(p, addPlayerInfo);
+                if (p.getEntityId() != player.getEntityId()) {
+                    WrappedPacketOutNamedEntitySpawn namedEntitySpawn = new WrappedPacketOutNamedEntitySpawn(player.getEntityId(), player.getUniqueId(), location);
+                    PacketEvents.get().getPlayerUtils().sendPacket(p, namedEntitySpawn);
+                }
             }
         }).thenRunAsync(() -> {
             System.out.println("DONE");
