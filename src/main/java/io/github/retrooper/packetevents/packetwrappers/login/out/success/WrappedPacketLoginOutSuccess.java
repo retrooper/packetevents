@@ -70,8 +70,9 @@ public class WrappedPacketLoginOutSuccess extends WrappedPacket implements Senda
 
     @Override
     public Object asNMSPacket() throws Exception {
+        WrappedGameProfile gp = getGameProfile();
         return packetConstructor.newInstance(
-                GameProfileUtil.getGameProfile(wrappedGameProfile.getId(), wrappedGameProfile.getName())
+                GameProfileUtil.getGameProfile(gp.getId(), gp.getName())
         );
     }
 

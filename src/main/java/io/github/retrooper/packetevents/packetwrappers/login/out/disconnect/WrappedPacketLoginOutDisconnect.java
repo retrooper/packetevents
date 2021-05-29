@@ -68,7 +68,7 @@ public class WrappedPacketLoginOutDisconnect extends WrappedPacket implements Se
     @Override
     public Object asNMSPacket() throws Exception {
         return packetConstructor.newInstance(
-                NMSUtils.generateIChatBaseComponent(this.reason)
+                NMSUtils.generateIChatBaseComponent(getReason())
         );
     }
 
