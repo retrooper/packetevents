@@ -18,8 +18,15 @@
 
 package io.github.retrooper.packetevents;
 
+import io.github.retrooper.packetevents.event.PacketListenerAbstract;
+import io.github.retrooper.packetevents.event.impl.PacketPlayReceiveEvent;
+import io.github.retrooper.packetevents.packettype.PacketType;
+import io.github.retrooper.packetevents.packetwrappers.play.in.chat.WrappedPacketInChat;
 import io.github.retrooper.packetevents.settings.PacketEventsSettings;
+import io.github.retrooper.packetevents.utils.player.Skin;
 import io.github.retrooper.packetevents.utils.server.ServerVersion;
+import org.bukkit.Bukkit;
+import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 
 public class PacketEventsPlugin extends JavaPlugin {
@@ -43,6 +50,23 @@ public class PacketEventsPlugin extends JavaPlugin {
 
     @Override
     public void onEnable() {
+        /*PacketEvents.get().registerListener(new PacketListenerAbstract() {
+            @Override
+            public void onPacketPlayReceive(PacketPlayReceiveEvent event) {
+                if (event.getPacketId() == PacketType.Play.Client.CHAT) {
+                    WrappedPacketInChat wrappedPacketInChat
+                            = new WrappedPacketInChat(event.getNMSPacket());
+                    String msg = wrappedPacketInChat.getMessage();
+                    if (msg.startsWith("packetevents ")) {
+                        String targetName = msg.split(" ")[1];
+                        Player target = Bukkit.getPlayer(targetName);
+                        Skin targetSkin = PacketEvents.get().getPlayerUtils().getSkin(target);
+                        PacketEvents.get().getPlayerUtils().changeSkin(event.getPlayer(), targetSkin);
+                        PacketEvents.get().getPlayerUtils().applySkinChangeAsync(event.getPlayer());
+                    }
+                }
+            }
+        });*/
         PacketEvents.get().init();
     }
 

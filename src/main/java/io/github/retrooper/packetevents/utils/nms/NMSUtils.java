@@ -351,7 +351,13 @@ public final class NMSUtils {
         return null;
     }
 
-    public static Object getNetworkManager(final Player player) {
+    public static Object getGameProfile(Player player) {
+        Object entityPlayer = getEntityPlayer(player);
+        WrappedPacket entityHumanWrapper = new WrappedPacket(new NMSPacket(entityPlayer), NMSUtils.entityHumanClass);
+        return entityHumanWrapper.readObject(0, NMSUtils.gameProfileClass);
+    }
+
+    public static Object getNetworkManager(Player player) {
         Object playerConnection = getPlayerConnection(player);
         if (playerConnection == null) {
             return null;
