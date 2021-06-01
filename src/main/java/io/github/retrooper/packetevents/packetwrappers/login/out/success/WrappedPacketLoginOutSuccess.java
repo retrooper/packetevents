@@ -30,9 +30,8 @@ import java.lang.reflect.Constructor;
 
 public class WrappedPacketLoginOutSuccess extends WrappedPacket implements SendableWrapper {
 
-    private WrappedGameProfile wrappedGameProfile;
-
     private static Constructor<?> packetConstructor;
+    private WrappedGameProfile wrappedGameProfile;
 
     public WrappedPacketLoginOutSuccess(final NMSPacket packet) {
         super(packet);

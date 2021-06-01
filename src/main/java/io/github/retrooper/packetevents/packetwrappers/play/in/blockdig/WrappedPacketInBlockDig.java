@@ -28,8 +28,6 @@ import io.github.retrooper.packetevents.utils.reflection.SubclassUtil;
 import io.github.retrooper.packetevents.utils.server.ServerVersion;
 import io.github.retrooper.packetevents.utils.vector.Vector3i;
 
-import java.lang.reflect.InvocationTargetException;
-
 public final class WrappedPacketInBlockDig extends WrappedPacket {
     private static Class<? extends Enum<?>> digTypeClass;
     private static boolean isVersionLowerThan_v_1_8;

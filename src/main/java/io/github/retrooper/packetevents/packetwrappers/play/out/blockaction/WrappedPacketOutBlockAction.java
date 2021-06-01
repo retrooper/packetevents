@@ -36,11 +36,10 @@ import java.lang.reflect.Constructor;
  */
 public class WrappedPacketOutBlockAction extends WrappedPacket implements SendableWrapper {
 
+    private static Constructor<?> packetConstructor;
     private Vector3i blockPos;
     private int action, actionParam;
     private Material material;
-
-    private static Constructor<?> packetConstructor;
 
     public WrappedPacketOutBlockAction(final NMSPacket packet) {
         super(packet);

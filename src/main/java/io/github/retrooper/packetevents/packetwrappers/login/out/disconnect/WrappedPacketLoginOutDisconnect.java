@@ -28,9 +28,8 @@ import java.lang.reflect.Constructor;
 
 public class WrappedPacketLoginOutDisconnect extends WrappedPacket implements SendableWrapper {
 
-    private String reason;
-
     private static Constructor<?> packetConstructor;
+    private String reason;
 
     public WrappedPacketLoginOutDisconnect(final NMSPacket packet) {
         super(packet);

@@ -33,12 +33,12 @@ public class Skin {
         return value;
     }
 
-    public String getSignature() {
-        return signature;
-    }
-
     public void setValue(String value) {
         this.value = value;
+    }
+
+    public String getSignature() {
+        return signature;
     }
 
     public void setSignature(String signature) {

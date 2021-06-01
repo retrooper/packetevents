@@ -27,7 +27,7 @@ public class MathUtils {
     }
 
     public static int floor(float value) {
-        int temp = (int)value;
-        return value < (float)temp ? temp - 1 : temp;
+        int temp = (int) value;
+        return value < (float) temp ? temp - 1 : temp;
     }
 }

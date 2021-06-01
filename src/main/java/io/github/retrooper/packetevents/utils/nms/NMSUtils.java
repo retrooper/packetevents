@@ -25,7 +25,6 @@ import io.github.retrooper.packetevents.utils.reflection.Reflection;
 import io.github.retrooper.packetevents.utils.reflection.SubclassUtil;
 import io.github.retrooper.packetevents.utils.server.ServerVersion;
 import io.github.retrooper.packetevents.utils.vector.Vector3i;
-import net.minecraft.server.v1_16_R2.BlockPosition;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.Server;

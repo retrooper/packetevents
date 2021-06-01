@@ -69,8 +69,19 @@ public enum ServerVersion {
                 return val;
             }
         }
-        if (PacketEvents.get().getSettings().getBackupServerVersion() != null) {
-            return PacketEvents.get().getSettings().getBackupServerVersion();
+        ServerVersion fallbackVersion = PacketEvents.get().getSettings().getFallbackServerVersion();
+        if (fallbackVersion != null) {
+            if (fallbackVersion == ServerVersion.v_1_7_10) {
+                try {
+                    Class.forName("net.minecraft.util.io.netty.buffer.ByteBuf");
+                }
+                catch (Exception ex) {
+                    //We will assume its 1.8.8
+                    fallbackVersion = ServerVersion.v_1_8_8;
+                }
+            }
+            PacketEvents.get().getPlugin().getLogger().warning("[packetevents] Your server software is preventing us from checking the server version. We will assume the server version is " + fallbackVersion.name() + "...");
+            return fallbackVersion;
         }
         return ERROR;
     }

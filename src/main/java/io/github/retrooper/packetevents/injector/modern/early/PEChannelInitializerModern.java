@@ -36,6 +36,13 @@ public class PEChannelInitializerModern extends ChannelInitializer<SocketChannel
         load();
     }
 
+    public static void postInitChannel(Channel channel) {
+        PlayerChannelHandlerModern channelHandler = new PlayerChannelHandlerModern();
+        if (channel.pipeline().get("packet_handler") != null) {
+            channel.pipeline().addBefore("packet_handler", PacketEvents.get().getHandlerName(), channelHandler);
+        }
+    }
+
     private void load() {
         initChannelMethod = Reflection.getMethod(oldChannelInitializer.getClass(), "initChannel", 0);
     }
@@ -48,12 +55,5 @@ public class PEChannelInitializerModern extends ChannelInitializer<SocketChannel
     protected void initChannel(SocketChannel socketChannel) throws Exception {
         initChannelMethod.invoke(oldChannelInitializer, socketChannel);
         postInitChannel(socketChannel);
-    }
-
-    public static void postInitChannel(Channel channel) {
-        PlayerChannelHandlerModern channelHandler = new PlayerChannelHandlerModern();
-        if (channel.pipeline().get("packet_handler") != null) {
-            channel.pipeline().addBefore("packet_handler", PacketEvents.get().getHandlerName(), channelHandler);
-        }
     }
 }

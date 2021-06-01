@@ -28,6 +28,7 @@ import io.github.retrooper.packetevents.utils.vector.Vector3d;
 
 import java.util.Optional;
 import java.util.UUID;
+
 //TODO Finish this wrapper
 class WrappedPacketOutSpawnEntity extends WrappedPacketEntityAbstraction {
     private static final float rotationFactor = 256.0F / 360.0F;

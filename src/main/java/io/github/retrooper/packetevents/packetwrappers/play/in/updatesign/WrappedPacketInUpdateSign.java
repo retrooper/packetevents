@@ -25,8 +25,6 @@ import io.github.retrooper.packetevents.utils.nms.NMSUtils;
 import io.github.retrooper.packetevents.utils.reflection.Reflection;
 import io.github.retrooper.packetevents.utils.vector.Vector3i;
 
-import java.lang.reflect.InvocationTargetException;
-
 public class WrappedPacketInUpdateSign extends WrappedPacket {
     private static boolean v_1_7_mode, strArrayMode;
 

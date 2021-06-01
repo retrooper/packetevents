@@ -20,9 +20,7 @@ package io.github.retrooper.packetevents.utils.player;
 
 import io.github.retrooper.packetevents.PacketEvents;
 import io.github.retrooper.packetevents.packetwrappers.api.SendableWrapper;
-import io.github.retrooper.packetevents.packetwrappers.play.out.entitydestroy.WrappedPacketOutEntityDestroy;
 import io.github.retrooper.packetevents.packetwrappers.play.out.namedentityspawn.WrappedPacketOutNamedEntitySpawn;
-import io.github.retrooper.packetevents.packetwrappers.play.out.playerinfo.WrappedPacketOutPlayerInfo;
 import io.github.retrooper.packetevents.utils.gameprofile.GameProfileUtil;
 import io.github.retrooper.packetevents.utils.gameprofile.WrappedGameProfile;
 import io.github.retrooper.packetevents.utils.nms.NMSUtils;
@@ -233,12 +231,14 @@ public final class PlayerUtils {
         Object gameProfile = GameProfileUtil.getGameProfile(player.getUniqueId(), player.getName());
         return GameProfileUtil.getWrappedGameProfile(gameProfile);
     }
-//TODO FINISH CHANGE SKIN
+
+    //TODO FINISH CHANGE SKIN
     public void changeSkin(Player player, Skin skin) {
         Object gameProfile = NMSUtils.getGameProfile(player);
         GameProfileUtil.setGameProfileSkin(gameProfile, skin);
     }
-//TODO FINISH APPLY SKIN CAUSE NOW I AM INVISIBLE?
+
+    //TODO FINISH APPLY SKIN CAUSE NOW I AM INVISIBLE?
     private void applySkinChangeAsync(Player player) {
         Location location = player.getLocation();
         WrappedGameProfile gameProfile = getGameProfile(player);

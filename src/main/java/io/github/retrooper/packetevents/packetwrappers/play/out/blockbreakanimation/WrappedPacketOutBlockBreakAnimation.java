@@ -26,7 +26,6 @@ import io.github.retrooper.packetevents.utils.nms.NMSUtils;
 import io.github.retrooper.packetevents.utils.server.ServerVersion;
 import io.github.retrooper.packetevents.utils.vector.Vector3i;
 import org.bukkit.entity.Entity;
-import org.bukkit.entity.Player;
 
 import java.lang.reflect.Constructor;
 

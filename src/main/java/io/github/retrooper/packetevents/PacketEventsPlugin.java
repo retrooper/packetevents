@@ -18,15 +18,8 @@
 
 package io.github.retrooper.packetevents;
 
-import io.github.retrooper.packetevents.event.PacketListenerAbstract;
-import io.github.retrooper.packetevents.event.impl.PacketPlayReceiveEvent;
-import io.github.retrooper.packetevents.packettype.PacketType;
-import io.github.retrooper.packetevents.packetwrappers.play.in.chat.WrappedPacketInChat;
 import io.github.retrooper.packetevents.settings.PacketEventsSettings;
-import io.github.retrooper.packetevents.utils.player.Skin;
 import io.github.retrooper.packetevents.utils.server.ServerVersion;
-import org.bukkit.Bukkit;
-import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 
 public class PacketEventsPlugin extends JavaPlugin {
