@@ -21,12 +21,12 @@ package io.github.retrooper.packetevents.injector.legacy.early;
 import io.github.retrooper.packetevents.PacketEvents;
 import io.github.retrooper.packetevents.injector.legacy.PlayerChannelHandlerLegacy;
 import io.github.retrooper.packetevents.utils.reflection.Reflection;
+import net.minecraft.util.io.netty.channel.Channel;
 import net.minecraft.util.io.netty.channel.ChannelInitializer;
-import net.minecraft.util.io.netty.channel.socket.SocketChannel;
 
 import java.lang.reflect.Method;
 
-public class PEChannelInitializerLegacy extends ChannelInitializer<SocketChannel> {
+public class PEChannelInitializerLegacy extends ChannelInitializer<Channel> {
     private final ChannelInitializer<?> oldChannelInitializer;
     private Method initChannelMethod;
 
@@ -44,11 +44,11 @@ public class PEChannelInitializerLegacy extends ChannelInitializer<SocketChannel
     }
 
     @Override
-    protected void initChannel(SocketChannel socketChannel) throws Exception {
-        initChannelMethod.invoke(oldChannelInitializer, socketChannel);
+    protected void initChannel(Channel channel) throws Exception {
+        initChannelMethod.invoke(oldChannelInitializer, channel);
         PlayerChannelHandlerLegacy channelHandler = new PlayerChannelHandlerLegacy();
-        if (socketChannel.pipeline().get("packet_handler") != null) {
-            socketChannel.pipeline().addBefore("packet_handler", PacketEvents.get().getHandlerName(), channelHandler);
+        if (channel.pipeline().get("packet_handler") != null) {
+            channel.pipeline().addBefore("packet_handler", PacketEvents.get().getHandlerName(), channelHandler);
         }
     }
 }

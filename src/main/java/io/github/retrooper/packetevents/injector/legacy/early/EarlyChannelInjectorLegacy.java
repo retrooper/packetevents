@@ -29,7 +29,6 @@ import net.minecraft.util.io.netty.channel.Channel;
 import net.minecraft.util.io.netty.channel.ChannelFuture;
 import net.minecraft.util.io.netty.channel.ChannelHandler;
 import net.minecraft.util.io.netty.channel.ChannelInitializer;
-import net.minecraft.util.io.netty.channel.socket.SocketChannel;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.PluginDescriptionFile;
 
@@ -203,7 +202,7 @@ public class EarlyChannelInjectorLegacy implements EarlyInjector {
                         childHandlerField.setAccessible(true);
                     }
 
-                    ChannelInitializer<SocketChannel> oldInit = (ChannelInitializer<SocketChannel>) childHandlerField.get(handler);
+                    ChannelInitializer<Channel> oldInit = (ChannelInitializer<Channel>) childHandlerField.get(handler);
                     if (oldInit instanceof PEChannelInitializerLegacy) {
                         bootstrapAcceptor = handler;
                     }
@@ -217,7 +216,7 @@ public class EarlyChannelInjectorLegacy implements EarlyInjector {
             }
 
             try {
-                ChannelInitializer<SocketChannel> oldInit = (ChannelInitializer<SocketChannel>) childHandlerField.get(bootstrapAcceptor);
+                ChannelInitializer<Channel> oldInit = (ChannelInitializer<Channel>) childHandlerField.get(bootstrapAcceptor);
                 if (oldInit instanceof PEChannelInitializerLegacy) {
                     childHandlerField.setAccessible(true);
                     childHandlerField.set(bootstrapAcceptor, ((PEChannelInitializerLegacy) oldInit).getOldChannelInitializer());
