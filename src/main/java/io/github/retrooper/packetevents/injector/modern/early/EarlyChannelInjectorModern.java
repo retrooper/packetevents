@@ -29,7 +29,6 @@ import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelInitializer;
-import io.netty.channel.socket.SocketChannel;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.PluginDescriptionFile;
 
@@ -212,7 +211,7 @@ public class EarlyChannelInjectorModern implements EarlyInjector {
                         childHandlerField.setAccessible(true);
                     }
 
-                    ChannelInitializer<SocketChannel> oldInit = (ChannelInitializer<SocketChannel>) childHandlerField.get(handler);
+                    ChannelInitializer<Channel> oldInit = (ChannelInitializer<Channel>) childHandlerField.get(handler);
                     if (oldInit instanceof PEChannelInitializerModern) {
                         bootstrapAcceptor = handler;
                     }
@@ -226,7 +225,7 @@ public class EarlyChannelInjectorModern implements EarlyInjector {
             }
 
             try {
-                ChannelInitializer<SocketChannel> oldInit = (ChannelInitializer<SocketChannel>) childHandlerField.get(bootstrapAcceptor);
+                ChannelInitializer<Channel> oldInit = (ChannelInitializer<Channel>) childHandlerField.get(bootstrapAcceptor);
                 if (oldInit instanceof PEChannelInitializerModern) {
                     childHandlerField.setAccessible(true);
                     childHandlerField.set(bootstrapAcceptor, ((PEChannelInitializerModern) oldInit).getOldChannelInitializer());
