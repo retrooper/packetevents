@@ -27,6 +27,8 @@ public class PacketEventsPlugin extends JavaPlugin {
     //TODO finish remaining wrappers
     //TODO add property map to game profile wrappers to allow users to change skins with packetevents
     //TODO Check johanness' issue with early packets like a teleport one being missed
+    //1.8.1 -  PacketListener will have all listener methods, packetlistenerabstract will implement it with filter system additionally.
+    //1.8.1 - PacketEventPriority -> PacketListenerPriority, each listener has its own priority and not per event. Name is misleading. Improve its javadocs too!
     @Override
     public void onLoad() {
         //Return value of create is your PacketEvents instance.

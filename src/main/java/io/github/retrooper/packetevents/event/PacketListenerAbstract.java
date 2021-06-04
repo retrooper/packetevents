@@ -20,6 +20,7 @@ package io.github.retrooper.packetevents.event;
 
 import io.github.retrooper.packetevents.event.impl.*;
 import io.github.retrooper.packetevents.event.priority.PacketEventPriority;
+import io.github.retrooper.packetevents.event.priority.PacketListenerPriority;
 import io.github.retrooper.packetevents.utils.immutableset.ImmutableSetCustom;
 
 /**
@@ -29,7 +30,7 @@ import io.github.retrooper.packetevents.utils.immutableset.ImmutableSetCustom;
  * @since 1.8
  */
 public abstract class PacketListenerAbstract {
-    private final PacketEventPriority priority;
+    private final PacketListenerPriority priority;
     public ImmutableSetCustom<Byte> serverSidedStatusAllowance;
     public ImmutableSetCustom<Byte> serverSidedLoginAllowance;
     public ImmutableSetCustom<Byte> serverSidedPlayAllowance;
@@ -39,7 +40,12 @@ public abstract class PacketListenerAbstract {
     public ImmutableSetCustom<Byte> clientSidedLoginAllowance;
     public ImmutableSetCustom<Byte> clientSidedPlayAllowance;
 
+    @Deprecated
     public PacketListenerAbstract(final PacketEventPriority priority) {
+        this(PacketListenerPriority.getByPriorityValue(priority.getPriorityValue()));
+    }
+
+    public PacketListenerAbstract(PacketListenerPriority priority) {
         this.priority = priority;
         this.serverSidedStatusAllowance = null;
         this.serverSidedLoginAllowance = null;
@@ -53,10 +59,10 @@ public abstract class PacketListenerAbstract {
 
 
     public PacketListenerAbstract() {
-        this(PacketEventPriority.NORMAL);
+        this(PacketListenerPriority.NORMAL);
     }
 
-    public final PacketEventPriority getPriority() {
+    public PacketListenerPriority getPriority() {
         return priority;
     }
 

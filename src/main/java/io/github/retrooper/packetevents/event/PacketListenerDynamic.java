@@ -19,6 +19,7 @@
 package io.github.retrooper.packetevents.event;
 
 import io.github.retrooper.packetevents.event.priority.PacketEventPriority;
+import io.github.retrooper.packetevents.event.priority.PacketListenerPriority;
 
 /**
  * Deprecated abstract PacketListener.
@@ -29,12 +30,17 @@ import io.github.retrooper.packetevents.event.priority.PacketEventPriority;
  */
 @Deprecated
 public abstract class PacketListenerDynamic extends PacketListenerAbstract {
+    @Deprecated
     public PacketListenerDynamic(final PacketEventPriority priority) {
+        super(priority);
+    }
+
+    public PacketListenerDynamic(PacketListenerPriority priority) {
         super(priority);
     }
 
 
     public PacketListenerDynamic() {
-        super(PacketEventPriority.NORMAL);
+        super(PacketListenerPriority.NORMAL);
     }
 }
