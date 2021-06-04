@@ -23,11 +23,10 @@ import io.github.retrooper.packetevents.injector.modern.PlayerChannelHandlerMode
 import io.github.retrooper.packetevents.utils.reflection.Reflection;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelInitializer;
-import io.netty.channel.socket.SocketChannel;
 
 import java.lang.reflect.Method;
 
-public class PEChannelInitializerModern extends ChannelInitializer<SocketChannel> {
+public class PEChannelInitializerModern extends ChannelInitializer<Channel> {
     private final ChannelInitializer<?> oldChannelInitializer;
     private Method initChannelMethod;
 
@@ -52,8 +51,8 @@ public class PEChannelInitializerModern extends ChannelInitializer<SocketChannel
     }
 
     @Override
-    protected void initChannel(SocketChannel socketChannel) throws Exception {
-        initChannelMethod.invoke(oldChannelInitializer, socketChannel);
-        postInitChannel(socketChannel);
+    protected void initChannel(Channel channel) throws Exception {
+        initChannelMethod.invoke(oldChannelInitializer, channel);
+        postInitChannel(channel);
     }
 }
