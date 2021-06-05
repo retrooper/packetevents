@@ -24,3 +24,6 @@ Our discord server has a role for contributors and forkers.
 
 ### Statistics
 PacketEvents collects statistics anonymously through bStats. Participation is completely optional and you can opt-out at any time, although it is really helpful in figuring out what environments the plugin is running in (i.e. versions of Spigot, Java), so I can adjust development accordingly.
+
+### Credit
+PacketEvents uses an injector that is extremely similar to ViaVersion's injector. I have included license and copyright holder notice in the files taken from ViaVersion. Thank you ViaVersion.
