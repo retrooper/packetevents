@@ -49,8 +49,8 @@ class EventManagerModern {
         if (event instanceof CancellableEvent) {
             cancel = ((CancellableEvent) event).isCancelled();
         }
-        byte highestReachedPriority = (byte) (PacketListenerPriority.LOWEST.getPriorityValue() - 1);
-        for (byte priority = PacketListenerPriority.LOWEST.getPriorityValue(); priority <= PacketListenerPriority.MONITOR.getPriorityValue(); priority++) {
+        byte highestReachedPriority = (byte) (PacketListenerPriority.LOWEST.getId() - 1);
+        for (byte priority = PacketListenerPriority.LOWEST.getId(); priority <= PacketListenerPriority.MONITOR.getId(); priority++) {
             HashSet<PacketListenerAbstract> listeners = listenersMap.get(priority);
             if (listeners != null) {
                 for (PacketListenerAbstract listener : listeners) {
@@ -85,7 +85,7 @@ class EventManagerModern {
      * @param listener {@link PacketListenerAbstract}
      */
     public synchronized void registerListener(final PacketListenerAbstract listener) {
-        byte priority = listener.getPriority().getPriorityValue();
+        byte priority = listener.getPriority().getId();
         HashSet<PacketListenerAbstract> listenerSet = listenersMap.get(priority);
         if (listenerSet == null) {
             listenerSet = new HashSet<>();

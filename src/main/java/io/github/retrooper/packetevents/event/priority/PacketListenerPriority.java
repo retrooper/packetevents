@@ -21,7 +21,9 @@
 package io.github.retrooper.packetevents.event.priority;
 
 /**
- * The priority of a packet listener.
+ * The priority of packet listeners affect the order they will be invoked in.
+ * The lowest priority listeners are invoked first, the most high ones are invoked last.
+ * The most high priority listener has the final decider on an event being cancelled.
  * This priority can be specified in the PacketListenerAbstract constructor.
  * If you don't specify a priority in the constructor, it will use the {@link #NORMAL} priority.
  *
@@ -30,62 +32,43 @@ package io.github.retrooper.packetevents.event.priority;
  */
 public enum PacketListenerPriority {
     /**
-     * The weakest listener priority.
-     * The first to be processed(IN THE DYNAMIC EVENT SYSTEM ONLY).
-     * Use this if you need to be the first processing the event and
-     * need no power in cancelling an event or preventing an event cancellation.
+     * Listener is of very low importance.
+     * This listener will be ran first.
      */
     LOWEST,
 
     /**
-     * A weak listener priority.
-     * Second to be processed(IN THE DYNAMIC EVENT SYSTEM ONLY).
-     * Use this if you would prefer to be one of the first to process the event,
-     * but don't mind if some other listener processes before you.
+     * Listener is of low importance.
      */
     LOW,
 
     /**
      * Default listener priority.
-     * Third to be processed(IN THE DYNAMIC EVENT SYSTEM ONLY).
-     * Use this if you don't really care/know when you process or just want to
-     * be in the middle.
+     * Listener is neither important nor unimportant and may run normally.
      */
     NORMAL,
 
     /**
-     * Higher than the {@link PacketListenerPriority#NORMAL} listener priority.
-     * Fourth to be processed(IN THE DYNAMIC EVENT SYSTEM ONLY).
-     * Use this if you want to process before the default event prioritized listeners.
+     * Listener is of high importance.
      */
     HIGH,
 
     /**
-     * Second most powerful listener priority.
-     * Fifth to be processed(IN THE DYNAMIC EVENT SYSTEM ONLY).
-     * Use this if you prefer to be one of the last to process,
-     * but don't mind if some other listener really needs to process after you.
-     * Also use this if you prefer deciding if the event cancelled or not, but don't
-     * mind if some other listener urgently needs to decide over you.
-     * {@link PacketListenerPriority#MONITOR} is rarely ever recommended to use.
+     * Listener is of critical importance and wants to decide the cancellation of an event.
      */
     HIGHEST,
 
     /**
-     * Most powerful listener priority.
-     * Last(Sixth) to be processed(IN THE DYNAMIC EVENT SYSTEM ONLY).
-     * Use this if you urgently need to be the last to process
-     * or urgently need to be the final decider whether the event has cancelled or not.
-     * This is rarely recommended.
+     * Listener is purely trying to decide the cancellation of an event.
+     * This listener should be ran last.
      */
     MONITOR;
 
-
-    public static PacketListenerPriority getByPriorityValue(byte priorityValue) {
-        return values()[priorityValue];
+    public static PacketListenerPriority getById(byte id) {
+        return values()[id];
     }
 
-    public byte getPriorityValue() {
+    public byte getId() {
         return (byte) ordinal();
     }
 }

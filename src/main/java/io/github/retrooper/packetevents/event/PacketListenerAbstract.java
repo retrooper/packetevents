@@ -42,7 +42,7 @@ public abstract class PacketListenerAbstract {
 
     @Deprecated
     public PacketListenerAbstract(final PacketEventPriority priority) {
-        this(PacketListenerPriority.getByPriorityValue(priority.getPriorityValue()));
+        this(PacketListenerPriority.getById(priority.getPriorityValue()));
     }
 
     public PacketListenerAbstract(PacketListenerPriority priority) {
