@@ -23,6 +23,8 @@ import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
 import io.github.retrooper.packetevents.packetwrappers.api.SendableWrapper;
 import io.github.retrooper.packetevents.utils.nms.NMSUtils;
 import io.github.retrooper.packetevents.utils.server.ServerVersion;
+import io.github.retrooper.packetevents.utils.vector.Vector3d;
+import io.github.retrooper.packetevents.utils.vector.Vector3f;
 import io.github.retrooper.packetevents.utils.vector.Vector3i;
 
 import java.lang.reflect.Constructor;
@@ -36,22 +38,34 @@ public class WrappedPacketOutExplosion extends WrappedPacket implements Sendable
     private double x, y, z;
     private float strength;
     private List<Vector3i> records;
-    private float playerMotionX, playerMotionY, playerMotionZ;
+    private float playerVelocityX, playerVelocityY, playerVelocityZ;
 
     public WrappedPacketOutExplosion(NMSPacket packet) {
         super(packet);
     }
 
+    public WrappedPacketOutExplosion(Vector3d position, float strength, List<Vector3i> records,
+                                     Vector3f playerVelocity) {
+        this.x = position.x;
+        this.y = position.y;
+        this.z = position.z;
+        this.strength = strength;
+        this.records = records;
+        this.playerVelocityX = playerVelocity.x;
+        this.playerVelocityY = playerVelocity.y;
+        this.playerVelocityZ = playerVelocity.z;
+    }
+
     public WrappedPacketOutExplosion(double x, double y, double z, float strength, List<Vector3i> records,
-                                     float playerMotionX, float playerMotionY, float playerMotionZ) {
+                                     float playerVelocityX, float playerVelocityY, float playerVelocityZ) {
         this.x = x;
         this.y = y;
         this.z = z;
         this.strength = strength;
         this.records = records;
-        this.playerMotionX = playerMotionX;
-        this.playerMotionY = playerMotionY;
-        this.playerMotionZ = playerMotionZ;
+        this.playerVelocityX = playerVelocityX;
+        this.playerVelocityY = playerVelocityY;
+        this.playerVelocityZ = playerVelocityZ;
     }
 
     @Override
@@ -80,6 +94,29 @@ public class WrappedPacketOutExplosion extends WrappedPacket implements Sendable
         }
     }
 
+    public Vector3d getPosition() {
+        if (packet != null) {
+            return new Vector3d(readDouble(0), readDouble(1), readDouble(2));
+        }
+        else {
+            return new Vector3d(x, y, z);
+        }
+    }
+
+    public void setPosition(Vector3d position) {
+        if (packet != null) {
+            writeDouble(0, position.x);
+            writeDouble(1, position.y);
+            writeDouble(2, position.z);
+        }
+        else {
+            this.x = position.x;
+            this.y = position.y;
+            this.z = position.z;
+        }
+    }
+
+    @Deprecated
     public double getX() {
         if (packet != null) {
             return readDouble(0);
@@ -88,6 +125,7 @@ public class WrappedPacketOutExplosion extends WrappedPacket implements Sendable
         }
     }
 
+    @Deprecated
     public void setX(double x) {
         if (packet != null) {
             writeDouble(0, x);
@@ -96,6 +134,7 @@ public class WrappedPacketOutExplosion extends WrappedPacket implements Sendable
         }
     }
 
+    @Deprecated
     public double getY() {
         if (packet != null) {
             return readDouble(1);
@@ -104,6 +143,7 @@ public class WrappedPacketOutExplosion extends WrappedPacket implements Sendable
         }
     }
 
+    @Deprecated
     public void setY(double y) {
         if (packet != null) {
             writeDouble(1, y);
@@ -112,6 +152,7 @@ public class WrappedPacketOutExplosion extends WrappedPacket implements Sendable
         }
     }
 
+    @Deprecated
     public double getZ() {
         if (packet != null) {
             return readDouble(2);
@@ -120,6 +161,7 @@ public class WrappedPacketOutExplosion extends WrappedPacket implements Sendable
         }
     }
 
+    @Deprecated
     public void setZ(double z) {
         if (packet != null) {
             writeDouble(2, z);
@@ -184,51 +226,80 @@ public class WrappedPacketOutExplosion extends WrappedPacket implements Sendable
         }
     }
 
+    public Vector3f getPlayerVelocity() {
+        if (packet != null) {
+            return new Vector3f(readFloat(1), readFloat(2), readFloat(3));
+        }
+        else {
+            return new Vector3f(playerVelocityX, playerVelocityY, playerVelocityZ);
+        }
+    }
+
+    public void setPlayerVelocity(Vector3f playerVelocity) {
+        if (packet != null) {
+            writeFloat(1, playerVelocity.x);
+            writeFloat(2, playerVelocity.y);
+            writeFloat(3, playerVelocity.z);
+        }
+        else {
+            this.playerVelocityX = playerVelocity.x;
+            this.playerVelocityY = playerVelocity.y;
+            this.playerVelocityZ = playerVelocity.z;
+        }
+    }
+
+    //TODO Cut off at 1.8.1, and once you cut off, you can optimize the methods above. Also optimize the position part.
+    @Deprecated
     public float getPlayerMotionX() {
         if (packet != null) {
             return readFloat(1);
         } else {
-            return playerMotionX;
+            return playerVelocityX;
         }
     }
 
+    @Deprecated
     public void setPlayerMotionX(float playerMotionX) {
         if (packet != null) {
             writeFloat(1, playerMotionX);
         } else {
-            this.playerMotionX = playerMotionX;
+            this.playerVelocityX = playerMotionX;
         }
     }
 
+    @Deprecated
     public float getPlayerMotionY() {
         if (packet != null) {
             return readFloat(2);
         } else {
-            return playerMotionY;
+            return playerVelocityY;
         }
     }
 
+    @Deprecated
     public void setPlayerMotionY(float playerMotionY) {
         if (packet != null) {
             writeFloat(2, playerMotionY);
         } else {
-            this.playerMotionY = playerMotionY;
+            this.playerVelocityY = playerMotionY;
         }
     }
 
+    @Deprecated
     public float getPlayerMotionZ() {
         if (packet != null) {
             return readFloat(3);
         } else {
-            return playerMotionZ;
+            return playerVelocityZ;
         }
     }
 
+    @Deprecated
     public void setPlayerMotionZ(float playerMotionZ) {
         if (packet != null) {
             writeFloat(3, playerMotionZ);
         } else {
-            this.playerMotionZ = playerMotionZ;
+            this.playerVelocityZ = playerMotionZ;
         }
     }
 
@@ -241,7 +312,9 @@ public class WrappedPacketOutExplosion extends WrappedPacket implements Sendable
                     : chunkPosConstructor.newInstance(arguments);
             positions.add(position);
         }
-        Object vec = vec3dConstructor.newInstance(getPlayerMotionX(), getPlayerMotionY(), getPlayerMotionZ());
-        return packetConstructor.newInstance(getX(), getY(), getZ(), getStrength(), positions, vec);
+        Vector3f velocity = getPlayerVelocity();
+        Vector3f pos = getPlayerVelocity();
+        Object vec = vec3dConstructor.newInstance(velocity.x, velocity.y, velocity.z);
+        return packetConstructor.newInstance(pos.x, pos.y, pos.z, getStrength(), positions, vec);
     }
 }

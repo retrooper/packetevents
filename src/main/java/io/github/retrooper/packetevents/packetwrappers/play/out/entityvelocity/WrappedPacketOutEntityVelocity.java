@@ -23,6 +23,7 @@ import io.github.retrooper.packetevents.packetwrappers.NMSPacket;
 import io.github.retrooper.packetevents.packetwrappers.api.SendableWrapper;
 import io.github.retrooper.packetevents.packetwrappers.api.helper.WrappedPacketEntityAbstraction;
 import io.github.retrooper.packetevents.utils.nms.NMSUtils;
+import io.github.retrooper.packetevents.utils.vector.Vector3d;
 import org.bukkit.entity.Entity;
 
 import java.lang.reflect.Constructor;
@@ -69,47 +70,79 @@ public final class WrappedPacketOutEntityVelocity extends WrappedPacketEntityAbs
         }
     }
 
+    public Vector3d getVelocity() {
+        if (packet != null) {
+            double velX = readInt(1) / 8000.0;
+            double velY = readInt(2) / 8000.0;
+            double velZ = readInt(3) / 8000.0;
+            return new Vector3d(velX, velY, velZ);
+        }
+        else {
+            return new Vector3d(velocityX, velocityY, velocityZ);
+        }
+    }
+
+    public void setVelocity(Vector3d velocity) {
+        if (packet != null) {
+            writeInt(1, (int) (velocity.x));
+            writeInt(2, (int) (velocity.y));
+            writeInt(3, (int) (velocity.z));
+        }
+        else {
+            this.velocityX = velocity.x;
+            this.velocityY = velocity.y;
+            this.velocityZ = velocity.z;
+        }
+    }
+
+    //TODO Cut off at 1.8.1 and optimize the methods above.
+    @Deprecated
     public double getVelocityX() {
         if (packet != null) {
-            return readInt(1) / 8000.0D;
+            return readInt(1) / 8000.0;
         } else {
             return velocityX;
         }
     }
 
+    @Deprecated
     public void setVelocityX(double x) {
         if (packet != null) {
-            writeInt(1, (int) (x * 8000.0D));
+            writeInt(1, (int) (x * 8000.0));
         } else {
             this.velocityX = x;
         }
     }
 
+    @Deprecated
     public double getVelocityY() {
         if (packet != null) {
-            return readInt(2) / 8000.0D;
+            return readInt(2) / 8000.0;
         } else {
             return velocityY;
         }
     }
 
+    @Deprecated
     public void setVelocityY(double y) {
         if (packet != null) {
-            writeInt(2, (int) (y * 8000.0D));
+            writeInt(2, (int) (y * 8000.0));
         }
     }
 
+    @Deprecated
     public double getVelocityZ() {
         if (packet != null) {
-            return readInt(3) / 8000.0D;
+            return readInt(3) / 8000.0;
         } else {
             return velocityZ;
         }
     }
 
+    @Deprecated
     public void setVelocityZ(double z) {
         if (packet != null) {
-            writeInt(3, (int) (z * 8000.0D));
+            writeInt(3, (int) (z * 8000.0));
         }
     }
 

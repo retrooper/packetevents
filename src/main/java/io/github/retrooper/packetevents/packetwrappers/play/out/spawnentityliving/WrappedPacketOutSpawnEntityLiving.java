@@ -34,7 +34,7 @@ import java.util.UUID;
 
 public class WrappedPacketOutSpawnEntityLiving extends WrappedPacketEntityAbstraction implements SendableWrapper {
     private static final float rotationFactor = 256.0F / 360.0F;
-    private static final double velocityFactor = 8000.0D;
+    private static final double velocityFactor = 8000.0;
     private static Constructor<?> packetDefaultConstructor;
 
     private Vector3d position, velocity;
