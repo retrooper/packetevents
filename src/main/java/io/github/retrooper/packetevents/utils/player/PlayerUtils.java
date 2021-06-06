@@ -20,6 +20,7 @@ package io.github.retrooper.packetevents.utils.player;
 
 import io.github.retrooper.packetevents.PacketEvents;
 import io.github.retrooper.packetevents.packetwrappers.api.SendableWrapper;
+import io.github.retrooper.packetevents.packetwrappers.play.out.entitydestroy.WrappedPacketOutEntityDestroy;
 import io.github.retrooper.packetevents.packetwrappers.play.out.namedentityspawn.WrappedPacketOutNamedEntitySpawn;
 import io.github.retrooper.packetevents.utils.gameprofile.GameProfileUtil;
 import io.github.retrooper.packetevents.utils.gameprofile.WrappedGameProfile;
@@ -28,8 +29,8 @@ import io.github.retrooper.packetevents.utils.server.ServerVersion;
 import io.github.retrooper.packetevents.utils.versionlookup.VersionLookupUtils;
 import io.github.retrooper.packetevents.utils.versionlookup.v_1_7_10.SpigotVersionLookup_1_7;
 import org.bukkit.Bukkit;
-import org.bukkit.Location;
 import org.bukkit.entity.Player;
+import org.bukkit.plugin.Plugin;
 import org.jetbrains.annotations.NotNull;
 
 import java.net.InetSocketAddress;
@@ -69,6 +70,7 @@ public final class PlayerUtils {
      * @param player Target player.
      * @return NMS smoothed ping.
      */
+    @Deprecated
     public int getNMSPing(final Player player) {
         return NMSUtils.getPlayerPing(player);
     }
@@ -79,7 +81,7 @@ public final class PlayerUtils {
      * @param player Target player.
      * @return Non-smoothed ping.
      */
-    public int getPing(final Player player) {
+    public int getPing(Player player) {
         return getPing(player.getUniqueId());
     }
 
@@ -89,16 +91,19 @@ public final class PlayerUtils {
      * @param player Target player.
      * @return Smoothed ping.
      */
+    @Deprecated
     public int getSmoothedPing(final Player player) {
         return getSmoothedPing(player.getUniqueId());
     }
 
+    //TODO Don't calculate ping internally, use NMS' smoothed ping. On 1.17 use the Player#getPing which you contributed.
     /**
      * Use the ping PacketEvents calculates for the player. (Updates every incoming Keep Alive packet)
-     *
+     * @deprecated Please use {@link #getPing(Player)}
      * @param uuid Target player UUID.
      * @return Non-smoothed ping.
      */
+    @Deprecated
     public int getPing(UUID uuid) {
         Integer ping = playerPingMap.get(uuid);
         if (ping == null) {
@@ -117,6 +122,7 @@ public final class PlayerUtils {
      * @param uuid Target player UUID.
      * @return Smoothed ping.
      */
+    @Deprecated
     public int getSmoothedPing(UUID uuid) {
         Integer smoothedPing = playerSmoothedPingMap.get(uuid);
         if (smoothedPing == null) {
@@ -238,20 +244,25 @@ public final class PlayerUtils {
         GameProfileUtil.setGameProfileSkin(gameProfile, skin);
     }
 
-    //TODO FINISH APPLY SKIN CAUSE NOW I AM INVISIBLE?
+    //TODO FINISH APPLY SKIN. ITS NOT WORKING?
     private void applySkinChangeAsync(Player player) {
-        Location location = player.getLocation();
-        WrappedGameProfile gameProfile = getGameProfile(player);
+        Plugin plugin = PacketEvents.get().getPlugin();
         CompletableFuture.runAsync(() -> {
             System.out.println("STARTING");
 
         }).thenRunAsync(() -> {
+            WrappedPacketOutEntityDestroy destroyPacket = new WrappedPacketOutEntityDestroy(player.getEntityId());
+            WrappedPacketOutNamedEntitySpawn spawnPacket = new WrappedPacketOutNamedEntitySpawn(player);
             for (Player p : Bukkit.getOnlinePlayers()) {
                 if (p.getEntityId() != player.getEntityId()) {
-                    WrappedPacketOutNamedEntitySpawn namedEntitySpawn = new WrappedPacketOutNamedEntitySpawn(player.getEntityId(), player.getUniqueId(), location);
-                    PacketEvents.get().getPlayerUtils().sendPacket(p, namedEntitySpawn);
+                    PacketEvents.get().getPlayerUtils().sendPacket(p, destroyPacket);
+                    PacketEvents.get().getPlayerUtils().sendPacket(p, spawnPacket);
+
+                    Bukkit.getServer().getScheduler().runTask(plugin,() -> p.hidePlayer(plugin, player));
+                    Bukkit.getServer().getScheduler().runTaskLater(plugin, () -> p.showPlayer(plugin, player), 4L);
                 }
             }
+
         }).thenRunAsync(() -> {
             System.out.println("DONE");
         });

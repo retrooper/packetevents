@@ -219,6 +219,13 @@ public class WrappedPacketOutPlayerInfo extends WrappedPacket implements Sendabl
             this.ping = ping;
         }
 
+        public PlayerInfo(@Nullable String username, WrappedGameProfile gameProfile, org.bukkit.GameMode gameMode, int ping) {
+            this.username = username;
+            this.gameProfile = gameProfile;
+            this.gameMode = GameMode.valueOf(gameMode.name());
+            this.ping = ping;
+        }
+
         public WrappedGameProfile getGameProfile() {
             return gameProfile;
         }

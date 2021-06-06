@@ -21,34 +21,21 @@ package io.github.retrooper.packetevents.packetwrappers.play.in.flying;
 
 import io.github.retrooper.packetevents.packetwrappers.NMSPacket;
 import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
+import io.github.retrooper.packetevents.utils.vector.Vector3d;
 
 public class WrappedPacketInFlying extends WrappedPacket {
     public WrappedPacketInFlying(NMSPacket packet) {
         super(packet);
     }
 
-    public double getX() {
-        return readDouble(0);
+    public Vector3d getPosition() {
+        return new Vector3d(readDouble(0), readDouble(1), readDouble(2));
     }
 
-    public void setX(double x) {
-        writeDouble(0, x);
-    }
-
-    public double getY() {
-        return readDouble(1);
-    }
-
-    public void setY(double y) {
-        writeDouble(1, y);
-    }
-
-    public double getZ() {
-        return readDouble(2);
-    }
-
-    public void setZ(double z) {
-        writeDouble(2, z);
+    public void setPosition(Vector3d position) {
+        writeDouble(0, position.x);
+        writeDouble(1, position.y);
+        writeDouble(2, position.z);
     }
 
     public float getYaw() {
@@ -75,19 +62,39 @@ public class WrappedPacketInFlying extends WrappedPacket {
         writeBoolean(0, onGround);
     }
 
+    @Deprecated
     public boolean isPosition() {
         return readBoolean(1);
     }
 
+    @Deprecated
     public void setIsPosition(boolean isPosition) {
         writeBoolean(1, isPosition);
     }
 
+    @Deprecated
     public boolean isLook() {
         return readBoolean(2);
     }
 
+    @Deprecated
     public void setIsLook(boolean isLook) {
         writeBoolean(2, isLook);
+    }
+
+    public boolean hasPositionChanged() {
+        return readBoolean(1);
+    }
+
+    public void setPositionChanged(boolean positionChanged) {
+        writeBoolean(1, positionChanged);
+    }
+
+    public boolean hasRotationChanged() {
+        return readBoolean(2);
+    }
+
+    public void setRotationChanged(boolean rotationChanged) {
+        writeBoolean(2, rotationChanged);
     }
 }

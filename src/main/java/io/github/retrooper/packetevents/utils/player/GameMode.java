@@ -17,7 +17,7 @@
  */
 
 package io.github.retrooper.packetevents.utils.player;
-
+//TODO Remove this enum, use Bukkit's GameMode enum everywhere.
 /**
  * Representation of a player's game mode.
  *

@@ -60,6 +60,25 @@ public class WrappedPacketOutNamedEntitySpawn extends WrappedPacketEntityAbstrac
         this.pitch = location.getPitch();
     }
 
+    public WrappedPacketOutNamedEntitySpawn(Entity entity, Location location) {
+        this.entityID = entity.getEntityId();
+        this.entity = entity;
+        this.uuid = entity.getUniqueId();
+        this.position = new Vector3d(location.getX(), location.getY(), location.getZ());
+        this.yaw = location.getYaw();
+        this.pitch = location.getPitch();
+    }
+
+    public WrappedPacketOutNamedEntitySpawn(Entity entity) {
+        this.entityID = entity.getEntityId();
+        this.entity = entity;
+        this.uuid = entity.getUniqueId();
+        Location location = entity.getLocation();
+        this.position = new Vector3d(location.getX(), location.getY(), location.getZ());
+        this.yaw = location.getYaw();
+        this.pitch = location.getPitch();
+    }
+
     public WrappedPacketOutNamedEntitySpawn(int entityID, UUID uuid, Vector3d position, float yaw, float pitch) {
         this.entityID = entityID;
         this.uuid = uuid;
