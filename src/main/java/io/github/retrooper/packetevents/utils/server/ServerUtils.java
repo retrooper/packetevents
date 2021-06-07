@@ -23,6 +23,8 @@ import io.github.retrooper.packetevents.utils.npc.NPCManager;
 import org.spigotmc.SpigotConfig;
 
 public final class ServerUtils {
+    private static Class<?> geyserClass;
+    private boolean geyserClassChecked;
     private final NPCManager npcManager = new NPCManager();
 
     /**
@@ -72,5 +74,18 @@ public final class ServerUtils {
 
     public boolean isBungeeCordEnabled() {
         return SpigotConfig.bungee;
+    }
+
+    public boolean isGeyserAvailable() {
+        if (!geyserClassChecked) {
+            geyserClassChecked = true;
+            try {
+                geyserClass = Class.forName("org.geysermc.connector.GeyserConnector");
+                return true;
+            } catch (ClassNotFoundException e) {
+                return false;
+            }
+        }
+        return geyserClass != null;
     }
 }

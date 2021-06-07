@@ -24,6 +24,7 @@ import io.github.retrooper.packetevents.packetwrappers.play.out.entitydestroy.Wr
 import io.github.retrooper.packetevents.packetwrappers.play.out.namedentityspawn.WrappedPacketOutNamedEntitySpawn;
 import io.github.retrooper.packetevents.utils.gameprofile.GameProfileUtil;
 import io.github.retrooper.packetevents.utils.gameprofile.WrappedGameProfile;
+import io.github.retrooper.packetevents.utils.geyser.GeyserUtils;
 import io.github.retrooper.packetevents.utils.nms.NMSUtils;
 import io.github.retrooper.packetevents.utils.server.ServerVersion;
 import io.github.retrooper.packetevents.utils.versionlookup.VersionLookupUtils;
@@ -97,11 +98,13 @@ public final class PlayerUtils {
     }
 
     //TODO Don't calculate ping internally, use NMS' smoothed ping. On 1.17 use the Player#getPing which you contributed.
+
     /**
      * Use the ping PacketEvents calculates for the player. (Updates every incoming Keep Alive packet)
-     * @deprecated Please use {@link #getPing(Player)}
+     *
      * @param uuid Target player UUID.
      * @return Non-smoothed ping.
+     * @deprecated Please use {@link #getPing(Player)}
      */
     @Deprecated
     public int getPing(UUID uuid) {
@@ -238,8 +241,22 @@ public final class PlayerUtils {
         return GameProfileUtil.getWrappedGameProfile(gameProfile);
     }
 
+    public boolean isGeyserPlayer(Player player) {
+        if (!PacketEvents.get().getServerUtils().isGeyserAvailable()) {
+            return false;
+        }
+        return GeyserUtils.isGeyserPlayer(player.getUniqueId());
+    }
+
+    public boolean isGeyserPlayer(UUID uuid) {
+        if (!PacketEvents.get().getServerUtils().isGeyserAvailable()) {
+            return false;
+        }
+        return GeyserUtils.isGeyserPlayer(uuid);
+    }
+
     //TODO FINISH CHANGE SKIN
-    public void changeSkin(Player player, Skin skin) {
+    private void changeSkin(Player player, Skin skin) {
         Object gameProfile = NMSUtils.getGameProfile(player);
         GameProfileUtil.setGameProfileSkin(gameProfile, skin);
     }
@@ -258,7 +275,7 @@ public final class PlayerUtils {
                     PacketEvents.get().getPlayerUtils().sendPacket(p, destroyPacket);
                     PacketEvents.get().getPlayerUtils().sendPacket(p, spawnPacket);
 
-                    Bukkit.getServer().getScheduler().runTask(plugin,() -> p.hidePlayer(plugin, player));
+                    Bukkit.getServer().getScheduler().runTask(plugin, () -> p.hidePlayer(plugin, player));
                     Bukkit.getServer().getScheduler().runTaskLater(plugin, () -> p.showPlayer(plugin, player), 4L);
                 }
             }
