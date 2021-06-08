@@ -106,6 +106,7 @@ public final class PacketEvents implements Listener, EventManager {
     public void load() {
         if (!loaded && !loading) {
             loading = true;
+            //Resolve server version and cache
             ServerVersion version = ServerVersion.getVersion();
             WrappedPacket.version = version;
             NMSUtils.version = version;
