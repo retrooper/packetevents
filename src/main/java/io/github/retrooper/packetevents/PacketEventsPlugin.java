@@ -25,8 +25,8 @@ import org.bukkit.plugin.java.JavaPlugin;
 public class PacketEventsPlugin extends JavaPlugin {
     //TODO Check announcements for release plan
     //TODO finish remaining wrappers
-    //TODO add property map to game profile wrappers to allow users to change skins with packetevents
     //TODO Check johanness' issue with early packets like a teleport one being missed
+    //TODO Ability to add a packet behind a packet being listened to
     //1.8.1 -  PacketListener will have all listener methods, packetlistenerabstract will implement it with filter system additionally.
     @Override
     public void onLoad() {
