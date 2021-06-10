@@ -42,6 +42,12 @@ import java.util.UUID;
  * @since 1.7.9
  */
 public class PacketProcessorInternal {
+
+    public class PacketData {
+        public Object packet;
+        public Runnable postAction;
+    }
+
     /**
      * Force PacketEvents to process an incoming packet.
      * This method could be used to spoof an incoming packet to the PacketEvents API.
@@ -51,10 +57,12 @@ public class PacketProcessorInternal {
      * @param packet  NMS Packet.
      * @return NMS Packet, null if the event was cancelled.
      */
-    public Object read(Player player, Object channel, Object packet) {
+    public PacketData read(Player player, Object channel, Object packet) {
+        PacketData data = new PacketData();
+        data.packet = packet;
         PacketState state = getPacketState(player, packet);
         if (state == null) {
-            return packet;
+            return data;
         }
         switch (state) {
             case STATUS:
@@ -105,7 +113,8 @@ public class PacketProcessorInternal {
                 }
                 break;
         }
-        return packet;
+        data.packet = packet;
+        return data;
     }
 
     /**
@@ -117,15 +126,20 @@ public class PacketProcessorInternal {
      * @param packet  NMS Packet.
      * @return NMS Packet, null if the event was cancelled.
      */
-    public Object write(Player player, Object channel, Object packet) {
+    public PacketData write(Player player, Object channel, Object packet) {
+        PacketData data = new PacketData();
+        data.packet = packet;
         PacketState state = getPacketState(player, packet);
         if (state == null) {
-            return packet;
+            return data;
         }
         switch (state) {
             case STATUS:
                 PacketStatusSendEvent statusEvent = new PacketStatusSendEvent(channel, new NMSPacket(packet));
                 PacketEvents.get().getEventManager().callEvent(statusEvent);
+                if (statusEvent.isPostTaskAvailable()) {
+                    data.postAction = statusEvent.getPostTask();
+                }
                 packet = statusEvent.getNMSPacket().getRawNMSPacket();
                 interceptStatusSend(statusEvent);
                 if (statusEvent.isCancelled()) {
@@ -135,6 +149,9 @@ public class PacketProcessorInternal {
             case LOGIN:
                 PacketLoginSendEvent loginEvent = new PacketLoginSendEvent(channel, new NMSPacket(packet));
                 PacketEvents.get().getEventManager().callEvent(loginEvent);
+                if (loginEvent.isPostTaskAvailable()) {
+                    data.postAction = loginEvent.getPostTask();
+                }
                 packet = loginEvent.getNMSPacket().getRawNMSPacket();
                 interceptLoginSend(loginEvent);
                 if (loginEvent.isCancelled()) {
@@ -144,6 +161,9 @@ public class PacketProcessorInternal {
             case PLAY:
                 PacketPlaySendEvent playEvent = new PacketPlaySendEvent(player, channel, new NMSPacket(packet));
                 PacketEvents.get().getEventManager().callEvent(playEvent);
+                if (playEvent.isPostTaskAvailable()) {
+                    data.postAction = playEvent.getPostTask();
+                }
                 packet = playEvent.getNMSPacket().getRawNMSPacket();
                 interceptPlaySend(playEvent);
                 if (playEvent.isCancelled()) {
@@ -151,7 +171,8 @@ public class PacketProcessorInternal {
                 }
                 break;
         }
-        return packet;
+        data.packet = packet;
+        return data;
     }
 
     /**

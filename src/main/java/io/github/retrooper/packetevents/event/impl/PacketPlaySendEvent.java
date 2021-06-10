@@ -21,9 +21,11 @@ package io.github.retrooper.packetevents.event.impl;
 import io.github.retrooper.packetevents.event.PacketListenerAbstract;
 import io.github.retrooper.packetevents.event.eventtypes.CancellableNMSPacketEvent;
 import io.github.retrooper.packetevents.event.eventtypes.PlayerEvent;
+import io.github.retrooper.packetevents.event.eventtypes.PostTaskEvent;
 import io.github.retrooper.packetevents.packetwrappers.NMSPacket;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * The {@code PacketPlaySendEvent} event is fired whenever the a PLAY packet is about to be sent to a client.
@@ -34,8 +36,9 @@ import org.jetbrains.annotations.NotNull;
  * @see <a href="https://wiki.vg/Protocol#Play">https://wiki.vg/Protocol#Play</a>
  * @since 1.2.6
  */
-public final class PacketPlaySendEvent extends CancellableNMSPacketEvent implements PlayerEvent {
+public final class PacketPlaySendEvent extends CancellableNMSPacketEvent implements PlayerEvent, PostTaskEvent {
     private final Player player;
+    private Runnable postTask;
 
     public PacketPlaySendEvent(final Player player, final Object channel, final NMSPacket packet) {
         super(channel, packet);
@@ -52,6 +55,21 @@ public final class PacketPlaySendEvent extends CancellableNMSPacketEvent impleme
     @Override
     public Player getPlayer() {
         return player;
+    }
+
+    @Override
+    public boolean isPostTaskAvailable() {
+        return postTask != null;
+    }
+
+    @Override
+    public Runnable getPostTask() {
+        return postTask;
+    }
+
+    @Override
+    public void setPostTask(@NotNull Runnable postTask) {
+        this.postTask = postTask;
     }
 
     @Override

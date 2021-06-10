@@ -20,7 +20,9 @@ package io.github.retrooper.packetevents.event.impl;
 
 import io.github.retrooper.packetevents.event.PacketListenerAbstract;
 import io.github.retrooper.packetevents.event.eventtypes.CancellableNMSPacketEvent;
+import io.github.retrooper.packetevents.event.eventtypes.PostTaskEvent;
 import io.github.retrooper.packetevents.packetwrappers.NMSPacket;
+import org.jetbrains.annotations.NotNull;
 
 import java.net.InetSocketAddress;
 
@@ -33,13 +35,29 @@ import java.net.InetSocketAddress;
  * @see <a href="https://wiki.vg/Protocol#Login">https://wiki.vg/Protocol#Login</a>
  * @since 1.8
  */
-public class PacketLoginSendEvent extends CancellableNMSPacketEvent {
+public class PacketLoginSendEvent extends CancellableNMSPacketEvent implements PostTaskEvent {
+    private Runnable postTask;
     public PacketLoginSendEvent(Object channel, NMSPacket packet) {
         super(channel, packet);
     }
 
     public PacketLoginSendEvent(InetSocketAddress address, NMSPacket packet) {
         super(address, packet);
+    }
+
+    @Override
+    public boolean isPostTaskAvailable() {
+        return postTask != null;
+    }
+
+    @Override
+    public Runnable getPostTask() {
+        return postTask;
+    }
+
+    @Override
+    public void setPostTask(@NotNull Runnable postTask) {
+        this.postTask = postTask;
     }
 
     @Override

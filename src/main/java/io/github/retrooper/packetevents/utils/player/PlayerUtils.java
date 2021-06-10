@@ -255,8 +255,7 @@ public final class PlayerUtils {
         return GeyserUtils.isGeyserPlayer(uuid);
     }
 
-    //TODO FINISH CHANGE SKIN
-    private void changeSkin(Player player, Skin skin) {
+    public void changeSkinProperty(Player player, Skin skin) {
         Object gameProfile = NMSUtils.getGameProfile(player);
         GameProfileUtil.setGameProfileSkin(gameProfile, skin);
     }

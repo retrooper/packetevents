@@ -21,7 +21,10 @@ package io.github.retrooper.packetevents.event.impl;
 import io.github.retrooper.packetevents.event.PacketListenerAbstract;
 import io.github.retrooper.packetevents.event.eventtypes.CancellableEvent;
 import io.github.retrooper.packetevents.event.eventtypes.CancellableNMSPacketEvent;
+import io.github.retrooper.packetevents.event.eventtypes.PostTaskEvent;
 import io.github.retrooper.packetevents.packetwrappers.NMSPacket;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.net.InetSocketAddress;
 
@@ -35,7 +38,8 @@ import java.net.InetSocketAddress;
  * @see <a href="https://wiki.vg/Protocol#Status">https://wiki.vg/Protocol#Status</a>
  * @since 1.8
  */
-public class PacketStatusSendEvent extends CancellableNMSPacketEvent {
+public class PacketStatusSendEvent extends CancellableNMSPacketEvent implements PostTaskEvent {
+    private Runnable postTask;
     public PacketStatusSendEvent(Object channel, NMSPacket packet) {
         super(channel, packet);
     }
@@ -44,6 +48,20 @@ public class PacketStatusSendEvent extends CancellableNMSPacketEvent {
         super(address, packet);
     }
 
+    @Override
+    public boolean isPostTaskAvailable() {
+        return postTask != null;
+    }
+
+    @Override
+    public Runnable getPostTask() {
+        return postTask;
+    }
+
+    @Override
+    public void setPostTask(@NotNull Runnable postTask) {
+        this.postTask = postTask;
+    }
 
     @Override
     public void call(PacketListenerAbstract listener) {
