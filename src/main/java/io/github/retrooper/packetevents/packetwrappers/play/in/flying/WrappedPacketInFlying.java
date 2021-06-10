@@ -28,6 +28,36 @@ public class WrappedPacketInFlying extends WrappedPacket {
         super(packet);
     }
 
+    @Deprecated
+    public double getX() {
+        return readDouble(0);
+    }
+
+    @Deprecated
+    public void setX(double x) {
+        writeDouble(0, x);
+    }
+
+    @Deprecated
+    public double getY() {
+        return readDouble(1);
+    }
+
+    @Deprecated
+    public void setY(double y) {
+        writeDouble(1, y);
+    }
+
+    @Deprecated
+    public double getZ() {
+        return readDouble(2);
+    }
+
+    @Deprecated
+    public void setZ(double z) {
+        writeDouble(2, z);
+    }
+
     public Vector3d getPosition() {
         return new Vector3d(readDouble(0), readDouble(1), readDouble(2));
     }
