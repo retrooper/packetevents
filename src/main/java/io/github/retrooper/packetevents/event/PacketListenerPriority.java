@@ -18,7 +18,7 @@
  *
  */
 
-package io.github.retrooper.packetevents.event.priority;
+package io.github.retrooper.packetevents.event;
 
 /**
  * The priority of packet listeners affect the order they will be invoked in.

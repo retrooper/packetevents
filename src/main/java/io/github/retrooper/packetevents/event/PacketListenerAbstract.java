@@ -20,7 +20,6 @@ package io.github.retrooper.packetevents.event;
 
 import io.github.retrooper.packetevents.event.impl.*;
 import io.github.retrooper.packetevents.event.priority.PacketEventPriority;
-import io.github.retrooper.packetevents.event.priority.PacketListenerPriority;
 import io.github.retrooper.packetevents.utils.immutableset.ImmutableSetCustom;
 
 /**

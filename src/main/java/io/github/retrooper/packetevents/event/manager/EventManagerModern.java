@@ -23,7 +23,7 @@ import io.github.retrooper.packetevents.event.PacketEvent;
 import io.github.retrooper.packetevents.event.PacketListenerAbstract;
 import io.github.retrooper.packetevents.event.eventtypes.CancellableEvent;
 import io.github.retrooper.packetevents.event.priority.PacketEventPriority;
-import io.github.retrooper.packetevents.event.priority.PacketListenerPriority;
+import io.github.retrooper.packetevents.event.PacketListenerPriority;
 
 import java.util.HashSet;
 import java.util.Map;

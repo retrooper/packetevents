@@ -19,7 +19,6 @@
 package io.github.retrooper.packetevents.event;
 
 import io.github.retrooper.packetevents.event.priority.PacketEventPriority;
-import io.github.retrooper.packetevents.event.priority.PacketListenerPriority;
 
 /**
  * Deprecated abstract PacketListener.
