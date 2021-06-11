@@ -25,16 +25,22 @@ import io.github.retrooper.packetevents.utils.nms.NMSUtils;
 import io.github.retrooper.packetevents.utils.server.ServerVersion;
 
 public class WrappedPacketLoginInCustomPayload extends WrappedPacket {
+    private static boolean v_1_17;
     public WrappedPacketLoginInCustomPayload(NMSPacket packet) {
         super(packet);
     }
 
+    @Override
+    protected void load() {
+        v_1_17 = version.isNewerThanOrEquals(ServerVersion.v_1_17);
+    }
+
     public int getMessageId() {
-        return readInt(0);
+        return readInt(v_1_17 ? 1 : 0);
     }
 
     public void setMessageId(int id) {
-        writeInt(0, id);
+        writeInt(v_1_17 ? 1 : 0, id);
     }
 
     public byte[] getData() {

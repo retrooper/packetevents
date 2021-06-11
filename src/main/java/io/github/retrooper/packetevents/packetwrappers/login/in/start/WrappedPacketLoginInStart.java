@@ -30,10 +30,12 @@ public class WrappedPacketLoginInStart extends WrappedPacket {
         super(packet);
     }
 
+    //TODO Allow accessing game profile property
     public WrappedGameProfile getGameProfile() {
         return GameProfileUtil.getWrappedGameProfile(readObject(0, NMSUtils.gameProfileClass));
     }
 
+    //TODO Add support for game profile property
     public void setGameProfile(WrappedGameProfile wrappedGameProfile) {
         Object gameProfile = GameProfileUtil.getGameProfile(wrappedGameProfile.getId(), wrappedGameProfile.getName());
         write(NMSUtils.gameProfileClass, 0, gameProfile);

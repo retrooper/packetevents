@@ -27,23 +27,22 @@ import io.github.retrooper.packetevents.utils.nms.NMSUtils;
 import java.lang.reflect.Constructor;
 
 public class WrappedPacketLoginOutDisconnect extends WrappedPacket implements SendableWrapper {
-
     private static Constructor<?> packetConstructor;
     private String reason;
 
-    public WrappedPacketLoginOutDisconnect(final NMSPacket packet) {
+    public WrappedPacketLoginOutDisconnect(NMSPacket packet) {
         super(packet);
     }
 
-    public WrappedPacketLoginOutDisconnect(final String reason) {
+    public WrappedPacketLoginOutDisconnect(String reason) {
         this.reason = reason;
     }
 
     @Override
     protected void load() {
         try {
-            packetConstructor = PacketTypeClasses.Login.Server.DISCONNECT.getConstructors()[1];
-        } catch (final Exception e) {
+            packetConstructor = PacketTypeClasses.Login.Server.DISCONNECT.getConstructor(NMSUtils.iChatBaseComponentClass);
+        } catch (NoSuchMethodException e) {
             e.printStackTrace();
         }
     }
@@ -66,9 +65,7 @@ public class WrappedPacketLoginOutDisconnect extends WrappedPacket implements Se
 
     @Override
     public Object asNMSPacket() throws Exception {
-        return packetConstructor.newInstance(
-                NMSUtils.generateIChatBaseComponent(getReason())
-        );
+        return packetConstructor.newInstance(NMSUtils.generateIChatBaseComponent(getReason()));
     }
 
     @Override

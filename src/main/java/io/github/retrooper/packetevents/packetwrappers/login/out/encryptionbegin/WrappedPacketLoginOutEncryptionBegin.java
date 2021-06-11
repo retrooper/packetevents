@@ -21,12 +21,23 @@ package io.github.retrooper.packetevents.packetwrappers.login.out.encryptionbegi
 import io.github.retrooper.packetevents.packettype.PacketTypeClasses;
 import io.github.retrooper.packetevents.packetwrappers.NMSPacket;
 import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
+import io.github.retrooper.packetevents.utils.server.ServerVersion;
+import net.minecraft.util.CryptographyException;
 
+import java.security.KeyFactory;
 import java.security.PublicKey;
+import java.security.spec.EncodedKeySpec;
+import java.security.spec.X509EncodedKeySpec;
 
 public class WrappedPacketLoginOutEncryptionBegin extends WrappedPacket {
+    private static boolean v_1_17;
     public WrappedPacketLoginOutEncryptionBegin(NMSPacket packet) {
         super(packet);
+    }
+
+    @Override
+    protected void load() {
+        v_1_17 = version.isNewerThanOrEquals(ServerVersion.v_1_17);
     }
 
     public String getEncodedString() {
@@ -38,19 +49,34 @@ public class WrappedPacketLoginOutEncryptionBegin extends WrappedPacket {
     }
 
     public PublicKey getPublicKey() {
-        return readObject(1, PublicKey.class);
+        return v_1_17 ? encrypt(readByteArray(0)) : readObject(0, PublicKey.class);
     }
 
     public void setPublicKey(PublicKey key) {
-        writeObject(0, key);
+        if (v_1_17) {
+            writeByteArray(0, key.getEncoded());
+        } else {
+            writeObject(0, key);
+        }
     }
 
     public byte[] getVerifyToken() {
-        return readByteArray(0);
+        return readByteArray(v_1_17 ? 1 : 0);
     }
 
     public void setVerifyToken(byte[] verifyToken) {
-        writeByteArray(0, verifyToken);
+        writeByteArray(v_1_17 ? 1 : 0, verifyToken);
+    }
+
+    private PublicKey encrypt(byte[] bytes) {
+        try {
+            EncodedKeySpec encodedKeySpec = new X509EncodedKeySpec(bytes);
+            KeyFactory keyFactory = KeyFactory.getInstance("RSA");
+            return keyFactory.generatePublic(encodedKeySpec);
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            return null;
+        }
     }
 
     @Override

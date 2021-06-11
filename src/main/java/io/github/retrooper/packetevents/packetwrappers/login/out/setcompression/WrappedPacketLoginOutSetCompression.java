@@ -25,9 +25,7 @@ import io.github.retrooper.packetevents.packetwrappers.api.SendableWrapper;
 import io.github.retrooper.packetevents.utils.server.ServerVersion;
 
 import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
 
-//This packet does not exist on 1.7.10
 public class WrappedPacketLoginOutSetCompression extends WrappedPacket implements SendableWrapper {
     private static Constructor<?> constructor;
     private int threshold;
@@ -73,12 +71,7 @@ public class WrappedPacketLoginOutSetCompression extends WrappedPacket implement
 
     @Override
     public Object asNMSPacket() throws Exception {
-        try {
-            return constructor.newInstance(getThreshold());
-        } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
-            e.printStackTrace();
-        }
-        return null;
+        return constructor.newInstance(getThreshold());
     }
 
     @Override
