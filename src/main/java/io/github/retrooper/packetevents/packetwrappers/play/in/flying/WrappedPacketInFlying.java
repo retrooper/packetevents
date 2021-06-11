@@ -58,6 +58,46 @@ public class WrappedPacketInFlying extends WrappedPacket {
         writeDouble(2, z);
     }
 
+    @Deprecated
+    public boolean isPosition() {
+        return readBoolean(1);
+    }
+
+    @Deprecated
+    public void setIsPosition(boolean isPosition) {
+        writeBoolean(1, isPosition);
+    }
+
+    @Deprecated
+    public boolean isLook() {
+        return readBoolean(2);
+    }
+
+    @Deprecated
+    public void setIsLook(boolean isLook) {
+        writeBoolean(2, isLook);
+    }
+
+    @Deprecated
+    public boolean hasPositionChanged() {
+        return readBoolean(1);
+    }
+
+    @Deprecated
+    public void setPositionChanged(boolean positionChanged) {
+        writeBoolean(1, positionChanged);
+    }
+
+    @Deprecated
+    public boolean hasRotationChanged() {
+        return readBoolean(2);
+    }
+
+    @Deprecated
+    public void setRotationChanged(boolean rotationChanged) {
+        writeBoolean(2, rotationChanged);
+    }
+
     public Vector3d getPosition() {
         return new Vector3d(readDouble(0), readDouble(1), readDouble(2));
     }
@@ -92,39 +132,19 @@ public class WrappedPacketInFlying extends WrappedPacket {
         writeBoolean(0, onGround);
     }
 
-    @Deprecated
-    public boolean isPosition() {
+    public boolean isMoving() {
         return readBoolean(1);
     }
 
-    @Deprecated
-    public void setIsPosition(boolean isPosition) {
-        writeBoolean(1, isPosition);
+    public void setMoving(boolean moving) {
+        writeBoolean(1, moving);
     }
 
-    @Deprecated
-    public boolean isLook() {
+    public boolean isRotating() {
         return readBoolean(2);
     }
 
-    @Deprecated
-    public void setIsLook(boolean isLook) {
-        writeBoolean(2, isLook);
-    }
-
-    public boolean hasPositionChanged() {
-        return readBoolean(1);
-    }
-
-    public void setPositionChanged(boolean positionChanged) {
-        writeBoolean(1, positionChanged);
-    }
-
-    public boolean hasRotationChanged() {
-        return readBoolean(2);
-    }
-
-    public void setRotationChanged(boolean rotationChanged) {
-        writeBoolean(2, rotationChanged);
+    public void setRotating(boolean rotating) {
+        writeBoolean(2, rotating);
     }
 }
