@@ -45,7 +45,7 @@ public final class EntityFinderUtils {
         try {
             worldServerClass = NMSUtils.getNMSClass("WorldServer");
         } catch (ClassNotFoundException e) {
-            e.printStackTrace();
+            worldServerClass =NMSUtils.getNMClassWithoutException("server.level.WorldServer");
         }
 
         try {

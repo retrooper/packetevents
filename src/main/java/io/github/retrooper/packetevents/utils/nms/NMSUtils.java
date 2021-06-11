@@ -54,7 +54,7 @@ public final class NMSUtils {
     public static Class<?> mobEffectListClass, nmsEntityClass, minecraftServerClass, craftWorldClass, playerInteractManagerClass, entityPlayerClass, playerConnectionClass, craftServerClass,
             craftPlayerClass, serverConnectionClass, craftEntityClass, nmsItemStackClass, networkManagerClass, nettyChannelClass, gameProfileClass, iChatBaseComponentClass,
             blockPosClass, vec3DClass, channelFutureClass, blockClass, iBlockDataClass, nmsWorldClass, craftItemStackClass,
-            soundEffectClass, minecraftKeyClass, chatSerializerClass, craftMagicNumbersClass, worldSettingsClass, worldServerClass, dataWatcherClass, nmsEntityHumanClass,
+            soundEffectClass, minecraftKeyClass, chatSerializerClass, craftMagicNumbersClass, worldSettingsClass, worldServerClass, dataWatcherClass,
             dedicatedServerClass, entityHumanClass, packetDataSerializerClass, byteBufClass, dimensionManagerClass, nmsItemClass;
     public static Class<? extends Enum<?>> enumDirectionClass, enumHandClass, enumGameModeClass, enumDifficultyClass;
     public static Method getBlockPosX, getBlockPosY, getBlockPosZ;
@@ -62,7 +62,7 @@ public final class NMSUtils {
     private static Method getCraftPlayerHandle, getCraftEntityHandle, getCraftWorldHandle, asBukkitCopy,
             asNMSCopy, getMessageMethod, chatFromStringMethod, getMaterialFromNMSBlock, getNMSBlockFromMaterial,
             getMobEffectListId, getMobEffectListById, getItemId, getItemById;
-    private static Field entityPlayerPingField, playerConnectionField;
+    private static Field entityPlayerPingField;
     private static Object minecraftServer;
     private static Object minecraftServerConnection;
 
@@ -96,46 +96,120 @@ public final class NMSUtils {
             byteBufClass = getNettyClass("buffer.ByteBuf");
             nettyChannelClass = getNettyClass("channel.Channel");
             channelFutureClass = getNettyClass("channel.ChannelFuture");
-            nmsEntityClass = getNMSClass("Entity");
-            minecraftServerClass = getNMSClass("MinecraftServer");
             craftWorldClass = getOBCClass("CraftWorld");
             craftPlayerClass = getOBCClass("entity.CraftPlayer");
             craftServerClass = getOBCClass("CraftServer");
-            entityPlayerClass = getNMSClass("EntityPlayer");
-            entityHumanClass = getNMSClass("EntityHuman");
-            playerConnectionClass = getNMSClass("PlayerConnection");
-            serverConnectionClass = getNMSClass("ServerConnection");
             craftEntityClass = getOBCClass("entity.CraftEntity");
             craftItemStackClass = getOBCClass("inventory.CraftItemStack");
-            nmsItemStackClass = getNMSClass("ItemStack");
-            networkManagerClass = getNMSClass("NetworkManager");
-            mobEffectListClass = getNMSClassWithoutException("MobEffectList");
-            playerInteractManagerClass = getNMSClass("PlayerInteractManager");
-            blockClass = getNMSClass("Block");
-            //IBlockData doesn't exist on 1.7.10
-            iBlockDataClass = getNMSClassWithoutException("IBlockData");
-            nmsWorldClass = getNMSClass("World");
-            soundEffectClass = getNMSClassWithoutException("SoundEffect");
-            minecraftKeyClass = getNMSClassWithoutException("MinecraftKey");
-            worldServerClass = getNMSClassWithoutException("WorldServer");
-            dataWatcherClass = getNMSClassWithoutException("DataWatcher");
-            nmsEntityHumanClass = getNMSClassWithoutException("EntityHuman");
-            nmsItemClass = getNMSClassWithoutException("Item");
-            dedicatedServerClass = getNMSClassWithoutException("DedicatedServer");
-            packetDataSerializerClass = getNMSClassWithoutException("PacketDataSerializer");
-            dimensionManagerClass = NMSUtils.getNMSClassWithoutException("DimensionManager");
-            try {
-                gameProfileClass = Class.forName("net.minecraft.util.com.mojang.authlib.GameProfile");
-            } catch (ClassNotFoundException e) {
-                gameProfileClass = Class.forName("com.mojang.authlib.GameProfile");
-            }
-            iChatBaseComponentClass = NMSUtils.getNMSClass("IChatBaseComponent");
-            vec3DClass = NMSUtils.getNMSClass("Vec3D");
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
         }
+
+        nmsEntityClass = getNMSClassWithoutException("Entity");
+        if (nmsEntityClass == null) {
+            nmsEntityClass = getNMClassWithoutException("world.entity.Entity");
+        }
+        minecraftServerClass = getNMSClassWithoutException("MinecraftServer");
+        if (minecraftServerClass == null) {
+            minecraftServerClass = getNMClassWithoutException("server.MinecraftServer");
+        }
+        entityPlayerClass = getNMSClassWithoutException("EntityPlayer");
+        if (entityPlayerClass == null) {
+            entityPlayerClass = getNMClassWithoutException("server.level.EntityPlayer");
+        }
+        entityHumanClass = getNMSClassWithoutException("EntityHuman");
+        if (entityHumanClass == null) {
+            entityHumanClass = getNMClassWithoutException("world.entity.player.EntityHuman");
+        }
+        playerConnectionClass = getNMSClassWithoutException("PlayerConnection");
+        if (playerConnectionClass == null) {
+            playerConnectionClass = getNMClassWithoutException("server.network.PlayerConnection");
+        }
+        serverConnectionClass = getNMSClassWithoutException("ServerConnection");
+        if (serverConnectionClass == null) {
+            serverConnectionClass = getNMClassWithoutException("server.network.ServerConnection");
+        }
+        nmsItemStackClass = getNMSClassWithoutException("ItemStack");
+        if (nmsItemStackClass == null) {
+            nmsItemStackClass = getNMClassWithoutException("world.item.ItemStack");
+        }
+        networkManagerClass = getNMSClassWithoutException("NetworkManager");
+        if (networkManagerClass == null) {
+            networkManagerClass = getNMClassWithoutException("network.NetworkManager");
+        }
+        mobEffectListClass = getNMSClassWithoutException("MobEffectList");
+        playerInteractManagerClass = getNMSClassWithoutException("PlayerInteractManager");
+        if (playerInteractManagerClass == null) {
+            playerInteractManagerClass = getNMClassWithoutException("server.level.PlayerInteractManager");
+        }
+        blockClass = getNMSClassWithoutException("Block");
+        if (blockClass == null) {
+            blockClass = getNMClassWithoutException("world.level.block.Block");
+        }
+        //IBlockData doesn't exist on 1.7.10
+        iBlockDataClass = getNMSClassWithoutException("IBlockData");
+        if (iBlockDataClass == null) {
+            iBlockDataClass = getNMClassWithoutException("world.level.block.state.IBlockData");
+        }
+        nmsWorldClass = getNMSClassWithoutException("World");
+        if (nmsWorldClass == null) {
+            nmsWorldClass = getNMClassWithoutException("world.level.World");
+        }
+        soundEffectClass = getNMSClassWithoutException("SoundEffect");
+        if (soundEffectClass == null) {
+            soundEffectClass = getNMClassWithoutException("sounds.SoundEffect");
+        }
+        minecraftKeyClass = getNMSClassWithoutException("MinecraftKey");
+        if (minecraftKeyClass == null) {
+            minecraftKeyClass = getNMClassWithoutException("resources.MinecraftKey");
+        }
+        worldServerClass = getNMSClassWithoutException("WorldServer");
+        if (worldServerClass == null) {
+            worldServerClass = getNMClassWithoutException("server.level.WorldServer");
+        }
+        dataWatcherClass = getNMSClassWithoutException("DataWatcher");
+        if (dataWatcherClass == null) {
+            dataWatcherClass = getNMClassWithoutException("network.syncher.DataWatcher");
+        }
+        nmsItemClass = getNMSClassWithoutException("Item");
+        if (nmsItemClass == null) {
+            nmsItemClass = getNMClassWithoutException("world.item.Item");
+        }
+        dedicatedServerClass = getNMSClassWithoutException("DedicatedServer");
+        if (dedicatedServerClass == null) {
+            dedicatedServerClass = getNMClassWithoutException("server.dedicated.DedicatedServer");
+        }
+        packetDataSerializerClass = getNMSClassWithoutException("PacketDataSerializer");
+        if (packetDataSerializerClass == null) {
+            packetDataSerializerClass = getNMClassWithoutException("network.PacketDataSerializer");
+        }
+        dimensionManagerClass = NMSUtils.getNMSClassWithoutException("DimensionManager");
+        if (dimensionManagerClass == null) {
+            dimensionManagerClass = getNMClassWithoutException("world.level.dimension.DimensionManager");
+        }
+        try {
+            gameProfileClass = Class.forName("net.minecraft.util.com.mojang.authlib.GameProfile");
+        } catch (ClassNotFoundException e) {
+            try {
+                gameProfileClass = Class.forName("com.mojang.authlib.GameProfile");
+            } catch (ClassNotFoundException e2) {
+                e2.printStackTrace();
+            }
+        }
+        iChatBaseComponentClass = NMSUtils.getNMSClassWithoutException("IChatBaseComponent");
+        if (iChatBaseComponentClass == null) {
+            iChatBaseComponentClass = getNMClassWithoutException("network.chat.IChatBaseComponent");
+        }
+        vec3DClass = NMSUtils.getNMSClassWithoutException("Vec3D");
+        if (vec3DClass == null) {
+            vec3DClass = getNMClassWithoutException("world.phys.Vec3D");
+        }
+
         if (version.isNewerThan(ServerVersion.v_1_7_10)) {
             blockPosClass = NMSUtils.getNMSClassWithoutException("BlockPosition");
+            if (blockPosClass == null) {
+                blockPosClass = getNMClassWithoutException("core.BlockPosition");
+            }
         }
         try {
             //If null, it is 1.7.10
@@ -163,6 +237,9 @@ public final class NMSUtils {
 
 
         enumDirectionClass = NMSUtils.getNMSEnumClassWithoutException("EnumDirection");
+        if (enumDirectionClass == null) {
+            enumDirectionClass = getNMEnumClassWithoutException("core.EnumDirection");
+        }
         //METHODS
         try {
             getCraftPlayerHandle = craftPlayerClass.getMethod("getHandle");
@@ -210,9 +287,8 @@ public final class NMSUtils {
         }
         try {
             entityPlayerPingField = entityPlayerClass.getField("ping");
-            playerConnectionField = entityPlayerClass.getField("playerConnection");
         } catch (NoSuchFieldException e) {
-            e.printStackTrace();
+            //Ignore on 1.17, we will use API (Player#getPing) to access ping
         }
         //In case its null, these methods are not needed and would cause errors
         if (blockPosClass != null) {
@@ -221,12 +297,25 @@ public final class NMSUtils {
             getBlockPosZ = Reflection.getMethod(NMSUtils.blockPosClass.getSuperclass(), "getZ", 0);
         }
         worldSettingsClass = NMSUtils.getNMSClassWithoutException("WorldSettings");
-
+        if (worldServerClass == null) {
+            worldServerClass = getNMClassWithoutException("world.level.WorldSettings");
+        }
         enumHandClass = getNMSEnumClassWithoutException("EnumHand");
+        if (enumHandClass == null) {
+            enumHandClass = getNMEnumClassWithoutException("world.EnumHand");
+        }
         enumDifficultyClass = NMSUtils.getNMSEnumClassWithoutException("EnumDifficulty");
+        if (enumDifficultyClass == null) {
+            enumDifficultyClass = getNMEnumClassWithoutException("world.EnumDifficulty");
+        }
         enumGameModeClass = NMSUtils.getNMSEnumClassWithoutException("EnumGamemode");
+
         if (enumGameModeClass == null) {
             enumGameModeClass = SubclassUtil.getEnumSubClass(worldSettingsClass, "EnumGamemode");
+        }
+
+        if (enumGameModeClass == null) {
+            enumGameModeClass = getNMEnumClassWithoutException("world.level.EnumGamemode");
         }
     }
 
@@ -261,6 +350,26 @@ public final class NMSUtils {
         return Class.forName(NMS_DIR + name);
     }
 
+    public static Class<?> getNMClass(String name) throws ClassNotFoundException{
+            return Class.forName("net.minecraft." + name);
+    }
+
+    public static Class<?> getNMClassWithoutException(String name) {
+        try {
+            return Class.forName("net.minecraft." + name);
+        } catch (ClassNotFoundException ex) {
+            return null;
+        }
+    }
+
+    public static Class<? extends Enum<?>> getNMEnumClassWithoutException(String name) {
+        try {
+            return (Class<? extends Enum<?>>) Class.forName("net.minecraft." + name);
+        } catch (ClassNotFoundException ex) {
+            return null;
+        }
+    }
+
     public static Class<? extends Enum<?>> getNMSEnumClass(String name) throws ClassNotFoundException {
         return (Class<? extends Enum<?>>) Class.forName(NMS_DIR + name);
     }
@@ -271,7 +380,6 @@ public final class NMSUtils {
         } catch (Exception e) {
             return null;
         }
-
     }
 
     public static Class<?> getNMSClassWithoutException(String name) {
@@ -342,12 +450,8 @@ public final class NMSUtils {
         if (entityPlayer == null) {
             return null;
         }
-        try {
-            return playerConnectionField.get(entityPlayer);
-        } catch (IllegalAccessException e) {
-            e.printStackTrace();
-        }
-        return null;
+        WrappedPacket wrappedEntityPlayer = new WrappedPacket(new NMSPacket(entityPlayer));
+        return wrappedEntityPlayer.readObject(0, NMSUtils.playerConnectionClass);
     }
 
     public static Object getGameProfile(Player player) {
@@ -387,6 +491,9 @@ public final class NMSUtils {
     }
 
     public static int getPlayerPing(final Player player) {
+        if (entityPlayerPingField == null) {
+            return PlayerAPIModern.getPing(player);
+        }
         Object entityPlayer = getEntityPlayer(player);
         try {
             return entityPlayerPingField.getInt(entityPlayer);

@@ -196,7 +196,7 @@ public class PacketType {
                     ADVANCEMENTS = -81, TR_SEL = -80, BEACON = -79, HELD_ITEM_SLOT = -78,
                     SET_COMMAND_BLOCK = -77, SET_COMMAND_MINECART = -76, SET_CREATIVE_SLOT = -75, SET_JIGSAW = -74,
                     STRUCT = -73, UPDATE_SIGN = -72, ARM_ANIMATION = -71, SPECTATE = -70,
-                    USE_ITEM = -69, BLOCK_PLACE = -68;
+                    USE_ITEM = -69, BLOCK_PLACE = -68, PONG = 28;
 
             private static void load() {
                 insertPacketID(PacketTypeClasses.Play.Client.TELEPORT_ACCEPT, TELEPORT_ACCEPT);
@@ -246,6 +246,7 @@ public class PacketType {
                 insertPacketID(PacketTypeClasses.Play.Client.SPECTATE, SPECTATE);
                 insertPacketID(PacketTypeClasses.Play.Client.USE_ITEM, USE_ITEM);
                 insertPacketID(PacketTypeClasses.Play.Client.BLOCK_PLACE, BLOCK_PLACE);
+                insertPacketID(PacketTypeClasses.Play.Client.PONG, PONG);
             }
 
             /**
@@ -323,7 +324,7 @@ public class PacketType {
                     SCOREBOARD_SCORE = 10, SPAWN_POSITION = 11, UPDATE_TIME = 12, TITLE = 13,
                     ENTITY_SOUND = 14, NAMED_SOUND_EFFECT = 15, STOP_SOUND = 16, PLAYER_LIST_HEADER_FOOTER = 17,
                     NBT_QUERY = 18, COLLECT = 19, ENTITY_TELEPORT = 20, ADVANCEMENTS = 21, UPDATE_ATTRIBUTES = 22,
-                    ENTITY_EFFECT = 23, RECIPE_UPDATE = 24, TAGS = 25, MAP_CHUNK_BULK = 26, NAMED_ENTITY_SPAWN = 27;
+                    ENTITY_EFFECT = 23, RECIPE_UPDATE = 24, TAGS = 25, MAP_CHUNK_BULK = 26, NAMED_ENTITY_SPAWN = 27, PING = 29;
 
             private static void load() {
                 insertPacketID(PacketTypeClasses.Play.Server.SPAWN_ENTITY, SPAWN_ENTITY);
@@ -423,6 +424,7 @@ public class PacketType {
                 insertPacketID(PacketTypeClasses.Play.Server.TAGS, TAGS);
                 insertPacketID(PacketTypeClasses.Play.Server.MAP_CHUNK_BULK, MAP_CHUNK_BULK);
                 insertPacketID(PacketTypeClasses.Play.Server.NAMED_ENTITY_SPAWN, NAMED_ENTITY_SPAWN);
+                insertPacketID(PacketTypeClasses.Play.Server.PING, PING);
             }
 
             /**

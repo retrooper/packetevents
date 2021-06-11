@@ -25,6 +25,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 public class PacketEventsPlugin extends JavaPlugin {
     //TODO finish remaining wrappers
     //1.8.1 -  PacketListener will have all listener methods, packetlistenerabstract will implement it with filter system additionally.
+    //Some important networking classes have been relocated, all NMS packets relocated...
     @Override
     public void onLoad() {
         //Return value of create is your PacketEvents instance.

@@ -20,8 +20,11 @@ package io.github.retrooper.packetevents.packettype;
 
 import io.github.retrooper.packetevents.PacketEvents;
 import io.github.retrooper.packetevents.utils.nms.NMSUtils;
+import io.github.retrooper.packetevents.utils.reflection.Reflection;
 import io.github.retrooper.packetevents.utils.reflection.SubclassUtil;
 import io.github.retrooper.packetevents.utils.server.ServerVersion;
+
+import java.sql.Ref;
 
 public class PacketTypeClasses {
     public static void load() {
@@ -40,61 +43,96 @@ public class PacketTypeClasses {
 
     public static class Status {
         public static class Client {
+            private static String PREFIX;
             public static Class<?> START, PING;
 
             public static void load() {
-                Client.START = NMSUtils.getNMSClassWithoutException("PacketStatusInStart");
-                Client.PING = NMSUtils.getNMSClassWithoutException("PacketStatusInPing");
+                if (PacketEvents.get().getServerUtils().getVersion().isNewerThanOrEquals(ServerVersion.v_1_17)) {
+                    PREFIX  = "net.minecraft.network.protocol.status.";
+                }
+                else {
+                    PREFIX = ServerVersion.getNMSDirectory() + ".";
+                }
+                Client.START = Reflection.getClassByNameWithoutException(PREFIX + "PacketStatusInStart");
+                Client.PING = Reflection.getClassByNameWithoutException(PREFIX + "PacketStatusInPing");
             }
         }
 
         public static class Server {
+            private static String PREFIX;
             public static Class<?> PONG, SERVER_INFO;
 
             public static void load() {
-                Server.PONG = NMSUtils.getNMSClassWithoutException("PacketStatusOutPong");
-                Server.SERVER_INFO = NMSUtils.getNMSClassWithoutException("PacketStatusOutServerInfo");
+                if (PacketEvents.get().getServerUtils().getVersion().isNewerThanOrEquals(ServerVersion.v_1_17)) {
+                    PREFIX  = "net.minecraft.network.protocol.status.";
+                }
+                else {
+                    PREFIX = ServerVersion.getNMSDirectory() + ".";
+                }
+                Server.PONG = Reflection.getClassByNameWithoutException(PREFIX + "PacketStatusOutPong");
+                Server.SERVER_INFO = Reflection.getClassByNameWithoutException(PREFIX + "PacketStatusOutServerInfo");
             }
         }
     }
 
     public static class Handshaking {
         public static class Client {
+            private static String PREFIX;
             public static Class<?> SET_PROTOCOL;
 
             public static void load() {
-                Handshaking.Client.SET_PROTOCOL = NMSUtils.getNMSClassWithoutException("PacketHandshakingInSetProtocol");
+                if (PacketEvents.get().getServerUtils().getVersion().isNewerThanOrEquals(ServerVersion.v_1_17)) {
+                    PREFIX  = "net.minecraft.network.protocol.handshake.";
+                }
+                else {
+                    PREFIX = ServerVersion.getNMSDirectory() + ".";
+                }
+                Handshaking.Client.SET_PROTOCOL = Reflection.getClassByNameWithoutException(PREFIX + "PacketHandshakingInSetProtocol");
             }
         }
     }
 
     public static class Login {
         public static class Client {
+            private static String PREFIX;
             public static Class<?> CUSTOM_PAYLOAD, START, ENCRYPTION_BEGIN;
 
             public static void load() {
+                if (PacketEvents.get().getServerUtils().getVersion().isNewerThanOrEquals(ServerVersion.v_1_17)) {
+                    PREFIX  = "net.minecraft.network.protocol.login.";
+                }
+                else {
+                    PREFIX = ServerVersion.getNMSDirectory() + ".";
+                }
                 //In and Out custom payload login packets have been here since 1.13
                 if (PacketEvents.get().getServerUtils().getVersion().isNewerThanOrEquals(ServerVersion.v_1_13)) {
-                    Client.CUSTOM_PAYLOAD = NMSUtils.getNMSClassWithoutException("PacketLoginInCustomPayload");
+                    Client.CUSTOM_PAYLOAD = Reflection.getClassByNameWithoutException(PREFIX + "PacketLoginInCustomPayload");
                 }
-                Client.START = NMSUtils.getNMSClassWithoutException("PacketLoginInStart");
-                Client.ENCRYPTION_BEGIN = NMSUtils.getNMSClassWithoutException("PacketLoginInEncryptionBegin");
+                Client.START = Reflection.getClassByNameWithoutException(PREFIX + "PacketLoginInStart");
+                Client.ENCRYPTION_BEGIN = Reflection.getClassByNameWithoutException(PREFIX + "PacketLoginInEncryptionBegin");
             }
         }
 
         public static class Server {
+            private static String PREFIX;
             public static Class<?> CUSTOM_PAYLOAD, DISCONNECT, ENCRYPTION_BEGIN, SUCCESS, SET_COMPRESSION;
 
             public static void load() {
+                if (PacketEvents.get().getServerUtils().getVersion().isNewerThanOrEquals(ServerVersion.v_1_17)) {
+                    PREFIX  = "net.minecraft.network.protocol.login.";
+                }
+                else {
+                    PREFIX = ServerVersion.getNMSDirectory() + ".";
+                }
                 //In and Out custom payload login packets have been here since 1.13
                 if (PacketEvents.get().getServerUtils().getVersion().isNewerThanOrEquals(ServerVersion.v_1_13)) {
-                    Server.CUSTOM_PAYLOAD = NMSUtils.getNMSClassWithoutException("PacketLoginOutCustomPayload");
+                    Server.CUSTOM_PAYLOAD = Reflection.getClassByNameWithoutException(PREFIX + "PacketLoginOutCustomPayload");
                 }
-                Server.DISCONNECT = NMSUtils.getNMSClassWithoutException("PacketLoginOutDisconnect");
-                Server.ENCRYPTION_BEGIN = NMSUtils.getNMSClassWithoutException("PacketLoginOutEncryptionBegin");
-                Server.SUCCESS = NMSUtils.getNMSClassWithoutException("PacketLoginOutSuccess");
+                Server.DISCONNECT = Reflection.getClassByNameWithoutException(PREFIX + "PacketLoginOutDisconnect");
+                Server.ENCRYPTION_BEGIN = Reflection.getClassByNameWithoutException(PREFIX + "PacketLoginOutEncryptionBegin");
+                Server.SUCCESS = Reflection.getClassByNameWithoutException(PREFIX + "PacketLoginOutSuccess");
                 if (PacketEvents.get().getServerUtils().getVersion().isNewerThan(ServerVersion.v_1_7_10)) {
-                    Server.SET_COMPRESSION = NMSUtils.getNMSClassWithoutException("PacketLoginOutSetCompression");
+                    Server.SET_COMPRESSION = Reflection.getClassByNameWithoutException(PREFIX + "PacketLoginOutSetCompression");
                 }
             }
         }
@@ -102,7 +140,8 @@ public class PacketTypeClasses {
 
     public static class Play {
         public static class Client {
-            private static final String PREFIX = "PacketPlayIn";
+            private static String COMMON_PREFIX;
+            private static String PREFIX;
             public static Class<?> FLYING, POSITION, POSITION_LOOK, LOOK, CLIENT_COMMAND,
                     TRANSACTION, BLOCK_DIG, ENTITY_ACTION, USE_ENTITY,
                     WINDOW_CLICK, STEER_VEHICLE, CUSTOM_PAYLOAD, ARM_ANIMATION,
@@ -113,76 +152,86 @@ public class PacketTypeClasses {
                     JIGSAW_GENERATE, DIFFICULTY_LOCK, VEHICLE_MOVE, BOAT_MOVE, PICK_ITEM,
                     AUTO_RECIPE, RECIPE_DISPLAYED, ITEM_NAME, RESOURCE_PACK_STATUS,
                     ADVANCEMENTS, TR_SEL, BEACON, SET_COMMAND_BLOCK,
-                    SET_COMMAND_MINECART, SET_JIGSAW, STRUCT, UPDATE_SIGN, SPECTATE;
+                    SET_COMMAND_MINECART, SET_JIGSAW, STRUCT, UPDATE_SIGN, SPECTATE, PONG;
 
             /**
              * Initiate all server-bound play packet classes.
              */
             public static void load() {
-                FLYING = NMSUtils.getNMSClassWithoutException(PREFIX + "Flying");
+                if (PacketEvents.get().getServerUtils().getVersion().isNewerThanOrEquals(ServerVersion.v_1_17)) {
+                    PREFIX  = "net.minecraft.network.protocol.game.";
+                }
+                else {
+                    PREFIX = ServerVersion.getNMSDirectory() + ".";
+                }
+                COMMON_PREFIX  = PREFIX + "PacketPlayIn";
+                FLYING = Reflection.getClassByNameWithoutException(COMMON_PREFIX + "Flying");
                 try {
-                    POSITION = NMSUtils.getNMSClass(PREFIX + "Position");
-                    POSITION_LOOK = NMSUtils.getNMSClass(PREFIX + "PositionLook");
-                    LOOK = NMSUtils.getNMSClass(PREFIX + "Look");
-                } catch (Exception e) {
-                    POSITION = SubclassUtil.getSubClass(FLYING, PREFIX + "Position");
-                    POSITION_LOOK = SubclassUtil.getSubClass(FLYING, PREFIX + "PositionLook");
-                    LOOK = SubclassUtil.getSubClass(FLYING, PREFIX + "Look");
+                    POSITION = Class.forName(COMMON_PREFIX + "Position");
+                    POSITION_LOOK = Class.forName(COMMON_PREFIX + "PositionLook");
+                    LOOK = Class.forName(COMMON_PREFIX + "Look");
+                } catch (ClassNotFoundException ex) {
+                    POSITION = SubclassUtil.getSubClass(FLYING, COMMON_PREFIX + "Position");
+                    POSITION_LOOK = SubclassUtil.getSubClass(FLYING, COMMON_PREFIX + "PositionLook");
+                    LOOK = SubclassUtil.getSubClass(FLYING, COMMON_PREFIX + "Look");
                 }
 
+                //This packet does not exist in the 1.17+ protocol
+                TRANSACTION = Reflection.getClassByNameWithoutException(COMMON_PREFIX + "Transaction");
+                //This packet was added in 1.17 protocol
+                PONG = Reflection.getClassByNameWithoutException(PREFIX + "ServerboundPongPacket");
                 try {
-                    SETTINGS = NMSUtils.getNMSClass(PREFIX + "Settings");
-                    ENCHANT_ITEM = NMSUtils.getNMSClass(PREFIX + "EnchantItem");
+                    SETTINGS = Class.forName(COMMON_PREFIX + "Settings");
+                    ENCHANT_ITEM = Class.forName(COMMON_PREFIX + "EnchantItem");
 
-                    CLIENT_COMMAND = NMSUtils.getNMSClass(PREFIX + "ClientCommand");
-                    TRANSACTION = NMSUtils.getNMSClass(PREFIX + "Transaction");
-                    BLOCK_DIG = NMSUtils.getNMSClass(PREFIX + "BlockDig");
-                    ENTITY_ACTION = NMSUtils.getNMSClass(PREFIX + "EntityAction");
-                    USE_ENTITY = NMSUtils.getNMSClass(PREFIX + "UseEntity");
-                    WINDOW_CLICK = NMSUtils.getNMSClass(PREFIX + "WindowClick");
-                    STEER_VEHICLE = NMSUtils.getNMSClass(PREFIX + "SteerVehicle");
-                    CUSTOM_PAYLOAD = NMSUtils.getNMSClass(PREFIX + "CustomPayload");
-                    ARM_ANIMATION = NMSUtils.getNMSClass(PREFIX + "ArmAnimation");
-                    ABILITIES = NMSUtils.getNMSClass(PREFIX + "Abilities");
-                    HELD_ITEM_SLOT = NMSUtils.getNMSClass(PREFIX + "HeldItemSlot");
-                    CLOSE_WINDOW = NMSUtils.getNMSClass(PREFIX + "CloseWindow");
-                    TAB_COMPLETE = NMSUtils.getNMSClass(PREFIX + "TabComplete");
-                    CHAT = NMSUtils.getNMSClass(PREFIX + "Chat");
-                    SET_CREATIVE_SLOT = NMSUtils.getNMSClass(PREFIX + "SetCreativeSlot");
-                    KEEP_ALIVE = NMSUtils.getNMSClass(PREFIX + "KeepAlive");
-                    UPDATE_SIGN = NMSUtils.getNMSClassWithoutException(PREFIX + "UpdateSign");
+                    CLIENT_COMMAND = Class.forName(COMMON_PREFIX + "ClientCommand");
+                    BLOCK_DIG = Class.forName(COMMON_PREFIX + "BlockDig");
+                    ENTITY_ACTION = Class.forName(COMMON_PREFIX + "EntityAction");
+                    USE_ENTITY = Class.forName(COMMON_PREFIX + "UseEntity");
+                    WINDOW_CLICK = Class.forName(COMMON_PREFIX + "WindowClick");
+                    STEER_VEHICLE = Class.forName(COMMON_PREFIX + "SteerVehicle");
+                    CUSTOM_PAYLOAD = Class.forName(COMMON_PREFIX + "CustomPayload");
+                    ARM_ANIMATION = Class.forName(COMMON_PREFIX + "ArmAnimation");
+                    ABILITIES = Class.forName(COMMON_PREFIX + "Abilities");
+                    HELD_ITEM_SLOT = Class.forName(COMMON_PREFIX + "HeldItemSlot");
+                    CLOSE_WINDOW = Class.forName(COMMON_PREFIX + "CloseWindow");
+                    TAB_COMPLETE = Class.forName(COMMON_PREFIX + "TabComplete");
+                    CHAT = Class.forName(COMMON_PREFIX + "Chat");
+                    SET_CREATIVE_SLOT = Class.forName(COMMON_PREFIX + "SetCreativeSlot");
+                    KEEP_ALIVE = Class.forName(COMMON_PREFIX + "KeepAlive");
+                    UPDATE_SIGN = Reflection.getClassByNameWithoutException(COMMON_PREFIX + "UpdateSign");
 
-                    TELEPORT_ACCEPT = NMSUtils.getNMSClassWithoutException(PREFIX + "TeleportAccept");
-                    TILE_NBT_QUERY = NMSUtils.getNMSClassWithoutException(PREFIX + "TileNBTQuery");
-                    DIFFICULTY_CHANGE = NMSUtils.getNMSClassWithoutException(PREFIX + "DifficultyChange");
-                    B_EDIT = NMSUtils.getNMSClassWithoutException(PREFIX + "BEdit");
-                    ENTITY_NBT_QUERY = NMSUtils.getNMSClassWithoutException(PREFIX + "EntityNBTQuery");
-                    JIGSAW_GENERATE = NMSUtils.getNMSClassWithoutException(PREFIX + "JigsawGenerate");
-                    DIFFICULTY_LOCK = NMSUtils.getNMSClassWithoutException(PREFIX + "DifficultyLock");
-                    VEHICLE_MOVE = NMSUtils.getNMSClassWithoutException(PREFIX + "VehicleMove");
-                    BOAT_MOVE = NMSUtils.getNMSClassWithoutException(PREFIX + "BoatMove");
-                    PICK_ITEM = NMSUtils.getNMSClassWithoutException(PREFIX + "PickItem");
-                    AUTO_RECIPE = NMSUtils.getNMSClassWithoutException(PREFIX + "AutoRecipe");
-                    RECIPE_DISPLAYED = NMSUtils.getNMSClassWithoutException(PREFIX + "RecipeDisplayed");
-                    ITEM_NAME = NMSUtils.getNMSClassWithoutException(PREFIX + "ItemName");
+                    TELEPORT_ACCEPT = Reflection.getClassByNameWithoutException(COMMON_PREFIX + "TeleportAccept");
+                    TILE_NBT_QUERY = Reflection.getClassByNameWithoutException(COMMON_PREFIX + "TileNBTQuery");
+                    DIFFICULTY_CHANGE = Reflection.getClassByNameWithoutException(COMMON_PREFIX + "DifficultyChange");
+                    B_EDIT = Reflection.getClassByNameWithoutException(COMMON_PREFIX + "BEdit");
+                    ENTITY_NBT_QUERY = Reflection.getClassByNameWithoutException(COMMON_PREFIX + "EntityNBTQuery");
+                    JIGSAW_GENERATE = Reflection.getClassByNameWithoutException(COMMON_PREFIX + "JigsawGenerate");
+                    DIFFICULTY_LOCK = Reflection.getClassByNameWithoutException(COMMON_PREFIX + "DifficultyLock");
+                    VEHICLE_MOVE = Reflection.getClassByNameWithoutException(COMMON_PREFIX + "VehicleMove");
+                    BOAT_MOVE = Reflection.getClassByNameWithoutException(COMMON_PREFIX + "BoatMove");
+                    PICK_ITEM = Reflection.getClassByNameWithoutException(COMMON_PREFIX + "PickItem");
+                    AUTO_RECIPE = Reflection.getClassByNameWithoutException(COMMON_PREFIX + "AutoRecipe");
+                    RECIPE_DISPLAYED = Reflection.getClassByNameWithoutException(COMMON_PREFIX + "RecipeDisplayed");
+                    ITEM_NAME = Reflection.getClassByNameWithoutException(COMMON_PREFIX + "ItemName");
                     //1.8+
-                    RESOURCE_PACK_STATUS = NMSUtils.getNMSClassWithoutException(PREFIX + "ResourcePackStatus");
+                    RESOURCE_PACK_STATUS = Reflection.getClassByNameWithoutException(COMMON_PREFIX + "ResourcePackStatus");
 
-                    ADVANCEMENTS = NMSUtils.getNMSClassWithoutException(PREFIX + "Advancements");
-                    TR_SEL = NMSUtils.getNMSClassWithoutException(PREFIX + "TrSel");
-                    BEACON = NMSUtils.getNMSClassWithoutException(PREFIX + "Beacon");
-                    SET_COMMAND_BLOCK = NMSUtils.getNMSClassWithoutException(PREFIX + "SetCommandBlock");
-                    SET_COMMAND_MINECART = NMSUtils.getNMSClassWithoutException(PREFIX + "SetCommandMinecart");
-                    SET_JIGSAW = NMSUtils.getNMSClassWithoutException(PREFIX + "SetJigsaw");
-                    STRUCT = NMSUtils.getNMSClassWithoutException(PREFIX + "Struct");
-                    SPECTATE = NMSUtils.getNMSClassWithoutException(PREFIX + "Spectate");
+                    ADVANCEMENTS = Reflection.getClassByNameWithoutException(COMMON_PREFIX + "Advancements");
+                    TR_SEL = Reflection.getClassByNameWithoutException(COMMON_PREFIX + "TrSel");
+                    BEACON = Reflection.getClassByNameWithoutException(COMMON_PREFIX + "Beacon");
+                    SET_COMMAND_BLOCK = Reflection.getClassByNameWithoutException(COMMON_PREFIX + "SetCommandBlock");
+                    SET_COMMAND_MINECART = Reflection.getClassByNameWithoutException(COMMON_PREFIX + "SetCommandMinecart");
+                    SET_JIGSAW = Reflection.getClassByNameWithoutException(COMMON_PREFIX + "SetJigsaw");
+                    STRUCT = Reflection.getClassByNameWithoutException(COMMON_PREFIX + "Struct");
+                    SPECTATE = Reflection.getClassByNameWithoutException(COMMON_PREFIX + "Spectate");
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
 
                 try {
-                    BLOCK_PLACE = NMSUtils.getNMSClass(PREFIX + "BlockPlace");
-                    USE_ITEM = NMSUtils.getNMSClass(PREFIX + "UseItem");
+                    BLOCK_PLACE = Class.forName(COMMON_PREFIX + "BlockPlace");
+                    USE_ITEM = Class.forName(COMMON_PREFIX + "UseItem");
                 } catch (Exception ignored) {
                 }
 
@@ -190,7 +239,7 @@ public class PacketTypeClasses {
         }
 
         public static class Server {
-            private static final String s = "PacketPlayOut";
+            private static String COMMON_PREFIX, PREFIX;
             public static Class<?> SPAWN_ENTITY, SPAWN_ENTITY_EXPERIENCE_ORB, SPAWN_ENTITY_WEATHER, SPAWN_ENTITY_LIVING,
                     SPAWN_ENTITY_PAINTING, SPAWN_ENTITY_SPAWN, ANIMATION, STATISTIC,
                     BLOCK_BREAK, BLOCK_BREAK_ANIMATION, TILE_ENTITY_DATA, BLOCK_ACTION,
@@ -213,113 +262,122 @@ public class PacketTypeClasses {
                     SCOREBOARD_SCORE, SPAWN_POSITION, UPDATE_TIME, TITLE,
                     ENTITY_SOUND, NAMED_SOUND_EFFECT, STOP_SOUND, PLAYER_LIST_HEADER_FOOTER,
                     NBT_QUERY, COLLECT, ENTITY_TELEPORT, ADVANCEMENTS, UPDATE_ATTRIBUTES,
-                    ENTITY_EFFECT, RECIPE_UPDATE, TAGS, MAP_CHUNK_BULK, NAMED_ENTITY_SPAWN;
+                    ENTITY_EFFECT, RECIPE_UPDATE, TAGS, MAP_CHUNK_BULK, NAMED_ENTITY_SPAWN, PING;
 
             /**
              * Initiate all client-bound packet classes.
              */
             public static void load() {
-                SPAWN_ENTITY = NMSUtils.getNMSClassWithoutException(s + "SpawnEntity");
-                SPAWN_ENTITY_EXPERIENCE_ORB = NMSUtils.getNMSClassWithoutException(s + "SpawnEntityExperienceOrb");
-                SPAWN_ENTITY_WEATHER = NMSUtils.getNMSClassWithoutException(s + "SpawnEntityWeather");
-                SPAWN_ENTITY_LIVING = NMSUtils.getNMSClassWithoutException(s + "SpawnEntityLiving");
-                SPAWN_ENTITY_PAINTING = NMSUtils.getNMSClassWithoutException(s + "SpawnEntityPainting");
-                SPAWN_ENTITY_SPAWN = NMSUtils.getNMSClassWithoutException(s + "SpawnEntitySpawn");
-                ANIMATION = NMSUtils.getNMSClassWithoutException(s + "Animation");
-                STATISTIC = NMSUtils.getNMSClassWithoutException(s + "Statistic");
-                BLOCK_BREAK = NMSUtils.getNMSClassWithoutException(s + "BlockBreak");
-                BLOCK_BREAK_ANIMATION = NMSUtils.getNMSClassWithoutException(s + "BlockBreakAnimation");
-                TILE_ENTITY_DATA = NMSUtils.getNMSClassWithoutException(s + "TileEntityData");
-                BLOCK_ACTION = NMSUtils.getNMSClassWithoutException(s + "BlockAction");
-                BLOCK_CHANGE = NMSUtils.getNMSClassWithoutException(s + "BlockChange");
-                BOSS = NMSUtils.getNMSClassWithoutException(s + "Boss");
-                SERVER_DIFFICULTY = NMSUtils.getNMSClassWithoutException(s + "ServerDifficulty");
-                CHAT = NMSUtils.getNMSClassWithoutException(s + "Chat");
-                MULTI_BLOCK_CHANGE = NMSUtils.getNMSClassWithoutException(s + "MultiBlockChange");
-                TAB_COMPLETE = NMSUtils.getNMSClassWithoutException(s + "TabComplete");
-                COMMANDS = NMSUtils.getNMSClassWithoutException(s + "Commands");
-                TRANSACTION = NMSUtils.getNMSClassWithoutException(s + "Transaction");
-                CLOSE_WINDOW = NMSUtils.getNMSClassWithoutException(s + "CloseWindow");
-                WINDOW_ITEMS = NMSUtils.getNMSClassWithoutException(s + "WindowItems");
-                WINDOW_DATA = NMSUtils.getNMSClassWithoutException(s + "WindowData");
-                SET_SLOT = NMSUtils.getNMSClassWithoutException(s + "SetSlot");
-                SET_COOLDOWN = NMSUtils.getNMSClassWithoutException(s + "SetCooldown");
-                CUSTOM_PAYLOAD = NMSUtils.getNMSClassWithoutException(s + "CustomPayload");
-                CUSTOM_SOUND_EFFECT = NMSUtils.getNMSClassWithoutException(s + "CustomSoundEffect");
-                KICK_DISCONNECT = NMSUtils.getNMSClassWithoutException(s + "KickDisconnect");
-                ENTITY_STATUS = NMSUtils.getNMSClassWithoutException(s + "EntityStatus");
-                EXPLOSION = NMSUtils.getNMSClassWithoutException(s + "Explosion");
-                UNLOAD_CHUNK = NMSUtils.getNMSClassWithoutException(s + "UnloadChunk");
-                GAME_STATE_CHANGE = NMSUtils.getNMSClassWithoutException(s + "GameStateChange");
-                OPEN_WINDOW_HORSE = NMSUtils.getNMSClassWithoutException(s + "OpenWindowHorse");
-                KEEP_ALIVE = NMSUtils.getNMSClassWithoutException(s + "KeepAlive");
-                MAP_CHUNK = NMSUtils.getNMSClassWithoutException(s + "MapChunk");
-                WORLD_EVENT = NMSUtils.getNMSClassWithoutException(s + "WorldEvent");
-                WORLD_PARTICLES = NMSUtils.getNMSClassWithoutException(s + "WorldParticles");
-                LIGHT_UPDATE = NMSUtils.getNMSClassWithoutException(s + "LightUpdate");
-                LOGIN = NMSUtils.getNMSClassWithoutException(s + "Login");
-                MAP = NMSUtils.getNMSClassWithoutException(s + "Map");
-                OPEN_WINDOW_MERCHANT = NMSUtils.getNMSClassWithoutException(s + "OpenWindowMerchant");
-                ENTITY = NMSUtils.getNMSClassWithoutException(s + "Entity");
-                REL_ENTITY_MOVE = SubclassUtil.getSubClass(ENTITY, s + "RelEntityMove");
-                REL_ENTITY_MOVE_LOOK = SubclassUtil.getSubClass(ENTITY, s + "RelEntityMoveLook");
-                ENTITY_LOOK = SubclassUtil.getSubClass(ENTITY, s + "EntityLook");
+                if (PacketEvents.get().getServerUtils().getVersion().isNewerThanOrEquals(ServerVersion.v_1_17)) {
+                    PREFIX  = "net.minecraft.network.protocol.game.";
+                }
+                else {
+                    PREFIX = ServerVersion.getNMSDirectory() + ".";
+                }
+                COMMON_PREFIX  = PREFIX + "PacketPlayOut";
+                SPAWN_ENTITY = Reflection.getClassByNameWithoutException(COMMON_PREFIX + "SpawnEntity");
+                SPAWN_ENTITY_EXPERIENCE_ORB = Reflection.getClassByNameWithoutException(COMMON_PREFIX + "SpawnEntityExperienceOrb");
+                SPAWN_ENTITY_WEATHER = Reflection.getClassByNameWithoutException(COMMON_PREFIX + "SpawnEntityWeather");
+                SPAWN_ENTITY_LIVING = Reflection.getClassByNameWithoutException(COMMON_PREFIX + "SpawnEntityLiving");
+                SPAWN_ENTITY_PAINTING = Reflection.getClassByNameWithoutException(COMMON_PREFIX + "SpawnEntityPainting");
+                SPAWN_ENTITY_SPAWN = Reflection.getClassByNameWithoutException(COMMON_PREFIX + "SpawnEntitySpawn");
+                ANIMATION = Reflection.getClassByNameWithoutException(COMMON_PREFIX + "Animation");
+                STATISTIC = Reflection.getClassByNameWithoutException(COMMON_PREFIX + "Statistic");
+                BLOCK_BREAK = Reflection.getClassByNameWithoutException(COMMON_PREFIX + "BlockBreak");
+                BLOCK_BREAK_ANIMATION = Reflection.getClassByNameWithoutException(COMMON_PREFIX + "BlockBreakAnimation");
+                TILE_ENTITY_DATA = Reflection.getClassByNameWithoutException(COMMON_PREFIX + "TileEntityData");
+                BLOCK_ACTION = Reflection.getClassByNameWithoutException(COMMON_PREFIX + "BlockAction");
+                BLOCK_CHANGE = Reflection.getClassByNameWithoutException(COMMON_PREFIX + "BlockChange");
+                BOSS = Reflection.getClassByNameWithoutException(COMMON_PREFIX + "Boss");
+                SERVER_DIFFICULTY = Reflection.getClassByNameWithoutException(COMMON_PREFIX + "ServerDifficulty");
+                CHAT = Reflection.getClassByNameWithoutException(COMMON_PREFIX + "Chat");
+                MULTI_BLOCK_CHANGE = Reflection.getClassByNameWithoutException(COMMON_PREFIX + "MultiBlockChange");
+                TAB_COMPLETE = Reflection.getClassByNameWithoutException(COMMON_PREFIX + "TabComplete");
+                COMMANDS = Reflection.getClassByNameWithoutException(COMMON_PREFIX + "Commands");
+                TRANSACTION = Reflection.getClassByNameWithoutException(COMMON_PREFIX + "Transaction");
+                CLOSE_WINDOW = Reflection.getClassByNameWithoutException(COMMON_PREFIX + "CloseWindow");
+                WINDOW_ITEMS = Reflection.getClassByNameWithoutException(COMMON_PREFIX + "WindowItems");
+                WINDOW_DATA = Reflection.getClassByNameWithoutException(COMMON_PREFIX + "WindowData");
+                SET_SLOT = Reflection.getClassByNameWithoutException(COMMON_PREFIX + "SetSlot");
+                SET_COOLDOWN = Reflection.getClassByNameWithoutException(COMMON_PREFIX + "SetCooldown");
+                CUSTOM_PAYLOAD = Reflection.getClassByNameWithoutException(COMMON_PREFIX + "CustomPayload");
+                CUSTOM_SOUND_EFFECT = Reflection.getClassByNameWithoutException(COMMON_PREFIX + "CustomSoundEffect");
+                KICK_DISCONNECT = Reflection.getClassByNameWithoutException(COMMON_PREFIX + "KickDisconnect");
+                ENTITY_STATUS = Reflection.getClassByNameWithoutException(COMMON_PREFIX + "EntityStatus");
+                EXPLOSION = Reflection.getClassByNameWithoutException(COMMON_PREFIX + "Explosion");
+                UNLOAD_CHUNK = Reflection.getClassByNameWithoutException(COMMON_PREFIX + "UnloadChunk");
+                GAME_STATE_CHANGE = Reflection.getClassByNameWithoutException(COMMON_PREFIX + "GameStateChange");
+                OPEN_WINDOW_HORSE = Reflection.getClassByNameWithoutException(COMMON_PREFIX + "OpenWindowHorse");
+                KEEP_ALIVE = Reflection.getClassByNameWithoutException(COMMON_PREFIX + "KeepAlive");
+                MAP_CHUNK = Reflection.getClassByNameWithoutException(COMMON_PREFIX + "MapChunk");
+                WORLD_EVENT = Reflection.getClassByNameWithoutException(COMMON_PREFIX + "WorldEvent");
+                WORLD_PARTICLES = Reflection.getClassByNameWithoutException(COMMON_PREFIX + "WorldParticles");
+                LIGHT_UPDATE = Reflection.getClassByNameWithoutException(COMMON_PREFIX + "LightUpdate");
+                LOGIN = Reflection.getClassByNameWithoutException(COMMON_PREFIX + "Login");
+                MAP = Reflection.getClassByNameWithoutException(COMMON_PREFIX + "Map");
+                OPEN_WINDOW_MERCHANT = Reflection.getClassByNameWithoutException(COMMON_PREFIX + "OpenWindowMerchant");
+                ENTITY = Reflection.getClassByNameWithoutException(COMMON_PREFIX + "Entity");
+                REL_ENTITY_MOVE = SubclassUtil.getSubClass(ENTITY, COMMON_PREFIX + "RelEntityMove");
+                REL_ENTITY_MOVE_LOOK = SubclassUtil.getSubClass(ENTITY, COMMON_PREFIX + "RelEntityMoveLook");
+                ENTITY_LOOK = SubclassUtil.getSubClass(ENTITY, COMMON_PREFIX + "EntityLook");
                 if (REL_ENTITY_MOVE == null) {
                     //is not a subclass and should be accessed normally
-                    REL_ENTITY_MOVE = NMSUtils.getNMSClassWithoutException(s + "RelEntityMove");
-                    REL_ENTITY_MOVE_LOOK = NMSUtils.getNMSClassWithoutException(s + "RelEntityMoveLook");
-                    ENTITY_LOOK = NMSUtils.getNMSClassWithoutException(s + "RelEntityLook");
+                    REL_ENTITY_MOVE = Reflection.getClassByNameWithoutException(COMMON_PREFIX + "RelEntityMove");
+                    REL_ENTITY_MOVE_LOOK = Reflection.getClassByNameWithoutException(COMMON_PREFIX + "RelEntityMoveLook");
+                    ENTITY_LOOK = Reflection.getClassByNameWithoutException(COMMON_PREFIX + "RelEntityLook");
                 }
-                VEHICLE_MOVE = NMSUtils.getNMSClassWithoutException(s + "VehicleMove");
-                OPEN_BOOK = NMSUtils.getNMSClassWithoutException(s + "OpenBook");
-                OPEN_WINDOW = NMSUtils.getNMSClassWithoutException(s + "OpenWindow");
-                OPEN_SIGN_EDITOR = NMSUtils.getNMSClassWithoutException(s + "OpenSignEditor");
-                AUTO_RECIPE = NMSUtils.getNMSClassWithoutException(s + "AutoRecipe");
-                ABILITIES = NMSUtils.getNMSClassWithoutException(s + "Abilities");
-                COMBAT_EVENT = NMSUtils.getNMSClassWithoutException(s + "CombatEvent");
-                PLAYER_INFO = NMSUtils.getNMSClassWithoutException(s + "PlayerInfo");
-                LOOK_AT = NMSUtils.getNMSClassWithoutException(s + "LookAt");
-                POSITION = NMSUtils.getNMSClassWithoutException(s + "Position");
-                RECIPES = NMSUtils.getNMSClassWithoutException(s + "Recipes");
-                ENTITY_DESTROY = NMSUtils.getNMSClassWithoutException(s + "EntityDestroy");
-                REMOVE_ENTITY_EFFECT = NMSUtils.getNMSClassWithoutException(s + "RemoveEntityEffect");
-                RESOURCE_PACK_SEND = NMSUtils.getNMSClassWithoutException(s + "ResourcePackSend");
-                RESPAWN = NMSUtils.getNMSClassWithoutException(s + "Respawn");
-                ENTITY_HEAD_ROTATION = NMSUtils.getNMSClassWithoutException(s + "EntityHeadRotation");
-                SELECT_ADVANCEMENT_TAB = NMSUtils.getNMSClassWithoutException(s + "SelectAdvancementTab");
-                WORLD_BORDER = NMSUtils.getNMSClassWithoutException(s + "WorldBorder");
-                CAMERA = NMSUtils.getNMSClassWithoutException(s + "Camera");
-                HELD_ITEM_SLOT = NMSUtils.getNMSClassWithoutException(s + "HeldItemSlot");
-                VIEW_CENTRE = NMSUtils.getNMSClassWithoutException(s + "ViewCentre");
-                VIEW_DISTANCE = NMSUtils.getNMSClassWithoutException(s + "ViewDistance");
-                SCOREBOARD_DISPLAY_OBJECTIVE = NMSUtils.getNMSClassWithoutException(s + "ScoreboardDisplayObjective");
-                ENTITY_METADATA = NMSUtils.getNMSClassWithoutException(s + "EntityMetadata");
-                ATTACH_ENTITY = NMSUtils.getNMSClassWithoutException(s + "AttachEntity");
-                ENTITY_VELOCITY = NMSUtils.getNMSClassWithoutException(s + "EntityVelocity");
-                ENTITY_EQUIPMENT = NMSUtils.getNMSClassWithoutException(s + "EntityEquipment");
-                EXPERIENCE = NMSUtils.getNMSClassWithoutException(s + "Experience");
-                UPDATE_HEALTH = NMSUtils.getNMSClassWithoutException(s + "UpdateHealth");
-                SCOREBOARD_OBJECTIVE = NMSUtils.getNMSClassWithoutException(s + "ScoreboardObjective");
-                MOUNT = NMSUtils.getNMSClassWithoutException(s + "Mount");
-                SCOREBOARD_TEAM = NMSUtils.getNMSClassWithoutException(s + "ScoreboardTeam");
-                SCOREBOARD_SCORE = NMSUtils.getNMSClassWithoutException(s + "ScoreboardScore");
-                SPAWN_POSITION = NMSUtils.getNMSClassWithoutException(s + "SpawnPosition");
-                UPDATE_TIME = NMSUtils.getNMSClassWithoutException(s + "UpdateTime");
-                TITLE = NMSUtils.getNMSClassWithoutException(s + "Title");
-                ENTITY_SOUND = NMSUtils.getNMSClassWithoutException(s + "EntitySound");
-                NAMED_SOUND_EFFECT = NMSUtils.getNMSClassWithoutException(s + "NamedSoundEffect");
-                STOP_SOUND = NMSUtils.getNMSClassWithoutException(s + "StopSound");
-                PLAYER_LIST_HEADER_FOOTER = NMSUtils.getNMSClassWithoutException(s + "PlayerListHeaderFooter");
-                NBT_QUERY = NMSUtils.getNMSClassWithoutException(s + "NBTQuery");
-                COLLECT = NMSUtils.getNMSClassWithoutException(s + "Collect");
-                ENTITY_TELEPORT = NMSUtils.getNMSClassWithoutException(s + "EntityTeleport");
-                ADVANCEMENTS = NMSUtils.getNMSClassWithoutException(s + "Advancements");
-                UPDATE_ATTRIBUTES = NMSUtils.getNMSClassWithoutException(s + "UpdateAttributes");
-                ENTITY_EFFECT = NMSUtils.getNMSClassWithoutException(s + "EntityEffect");
-                RECIPE_UPDATE = NMSUtils.getNMSClassWithoutException(s + "RecipeUpdate");
-                TAGS = NMSUtils.getNMSClassWithoutException(s + "Tags");
-                MAP_CHUNK_BULK = NMSUtils.getNMSClassWithoutException(s + "MapChunkBulk");
-                NAMED_ENTITY_SPAWN = NMSUtils.getNMSClassWithoutException(s + "NamedEntitySpawn");
+                VEHICLE_MOVE = Reflection.getClassByNameWithoutException(COMMON_PREFIX + "VehicleMove");
+                OPEN_BOOK = Reflection.getClassByNameWithoutException(COMMON_PREFIX + "OpenBook");
+                OPEN_WINDOW = Reflection.getClassByNameWithoutException(COMMON_PREFIX + "OpenWindow");
+                OPEN_SIGN_EDITOR = Reflection.getClassByNameWithoutException(COMMON_PREFIX + "OpenSignEditor");
+                AUTO_RECIPE = Reflection.getClassByNameWithoutException(COMMON_PREFIX + "AutoRecipe");
+                ABILITIES = Reflection.getClassByNameWithoutException(COMMON_PREFIX + "Abilities");
+                COMBAT_EVENT = Reflection.getClassByNameWithoutException(COMMON_PREFIX + "CombatEvent");
+                PLAYER_INFO = Reflection.getClassByNameWithoutException(COMMON_PREFIX + "PlayerInfo");
+                LOOK_AT = Reflection.getClassByNameWithoutException(COMMON_PREFIX + "LookAt");
+                POSITION = Reflection.getClassByNameWithoutException(COMMON_PREFIX + "Position");
+                RECIPES = Reflection.getClassByNameWithoutException(COMMON_PREFIX + "Recipes");
+                ENTITY_DESTROY = Reflection.getClassByNameWithoutException(COMMON_PREFIX + "EntityDestroy");
+                REMOVE_ENTITY_EFFECT = Reflection.getClassByNameWithoutException(COMMON_PREFIX + "RemoveEntityEffect");
+                RESOURCE_PACK_SEND = Reflection.getClassByNameWithoutException(COMMON_PREFIX + "ResourcePackSend");
+                RESPAWN = Reflection.getClassByNameWithoutException(COMMON_PREFIX + "Respawn");
+                ENTITY_HEAD_ROTATION = Reflection.getClassByNameWithoutException(COMMON_PREFIX + "EntityHeadRotation");
+                SELECT_ADVANCEMENT_TAB = Reflection.getClassByNameWithoutException(COMMON_PREFIX + "SelectAdvancementTab");
+                WORLD_BORDER = Reflection.getClassByNameWithoutException(COMMON_PREFIX + "WorldBorder");
+                CAMERA = Reflection.getClassByNameWithoutException(COMMON_PREFIX + "Camera");
+                HELD_ITEM_SLOT = Reflection.getClassByNameWithoutException(COMMON_PREFIX + "HeldItemSlot");
+                VIEW_CENTRE = Reflection.getClassByNameWithoutException(COMMON_PREFIX + "ViewCentre");
+                VIEW_DISTANCE = Reflection.getClassByNameWithoutException(COMMON_PREFIX + "ViewDistance");
+                SCOREBOARD_DISPLAY_OBJECTIVE = Reflection.getClassByNameWithoutException(COMMON_PREFIX + "ScoreboardDisplayObjective");
+                ENTITY_METADATA = Reflection.getClassByNameWithoutException(COMMON_PREFIX + "EntityMetadata");
+                ATTACH_ENTITY = Reflection.getClassByNameWithoutException(COMMON_PREFIX + "AttachEntity");
+                ENTITY_VELOCITY = Reflection.getClassByNameWithoutException(COMMON_PREFIX + "EntityVelocity");
+                ENTITY_EQUIPMENT = Reflection.getClassByNameWithoutException(COMMON_PREFIX + "EntityEquipment");
+                EXPERIENCE = Reflection.getClassByNameWithoutException(COMMON_PREFIX + "Experience");
+                UPDATE_HEALTH = Reflection.getClassByNameWithoutException(COMMON_PREFIX + "UpdateHealth");
+                SCOREBOARD_OBJECTIVE = Reflection.getClassByNameWithoutException(COMMON_PREFIX + "ScoreboardObjective");
+                MOUNT = Reflection.getClassByNameWithoutException(COMMON_PREFIX + "Mount");
+                SCOREBOARD_TEAM = Reflection.getClassByNameWithoutException(COMMON_PREFIX + "ScoreboardTeam");
+                SCOREBOARD_SCORE = Reflection.getClassByNameWithoutException(COMMON_PREFIX + "ScoreboardScore");
+                SPAWN_POSITION = Reflection.getClassByNameWithoutException(COMMON_PREFIX + "SpawnPosition");
+                UPDATE_TIME = Reflection.getClassByNameWithoutException(COMMON_PREFIX + "UpdateTime");
+                TITLE = Reflection.getClassByNameWithoutException(COMMON_PREFIX + "Title");
+                ENTITY_SOUND = Reflection.getClassByNameWithoutException(COMMON_PREFIX + "EntitySound");
+                NAMED_SOUND_EFFECT = Reflection.getClassByNameWithoutException(COMMON_PREFIX + "NamedSoundEffect");
+                STOP_SOUND = Reflection.getClassByNameWithoutException(COMMON_PREFIX + "StopSound");
+                PLAYER_LIST_HEADER_FOOTER = Reflection.getClassByNameWithoutException(COMMON_PREFIX + "PlayerListHeaderFooter");
+                NBT_QUERY = Reflection.getClassByNameWithoutException(COMMON_PREFIX + "NBTQuery");
+                COLLECT = Reflection.getClassByNameWithoutException(COMMON_PREFIX + "Collect");
+                ENTITY_TELEPORT = Reflection.getClassByNameWithoutException(COMMON_PREFIX + "EntityTeleport");
+                ADVANCEMENTS = Reflection.getClassByNameWithoutException(COMMON_PREFIX + "Advancements");
+                UPDATE_ATTRIBUTES = Reflection.getClassByNameWithoutException(COMMON_PREFIX + "UpdateAttributes");
+                ENTITY_EFFECT = Reflection.getClassByNameWithoutException(COMMON_PREFIX + "EntityEffect");
+                RECIPE_UPDATE = Reflection.getClassByNameWithoutException(COMMON_PREFIX + "RecipeUpdate");
+                TAGS = Reflection.getClassByNameWithoutException(COMMON_PREFIX + "Tags");
+                MAP_CHUNK_BULK = Reflection.getClassByNameWithoutException(COMMON_PREFIX + "MapChunkBulk");
+                NAMED_ENTITY_SPAWN = Reflection.getClassByNameWithoutException(COMMON_PREFIX + "NamedEntitySpawn");
+                //This packet was added in 1.17
+                PING = Reflection.getClassByNameWithoutException(PREFIX + "ClientboundPingPacket");
             }
         }
     }

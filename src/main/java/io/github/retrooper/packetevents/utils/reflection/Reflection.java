@@ -19,6 +19,8 @@
 package io.github.retrooper.packetevents.utils.reflection;
 
 
+import org.jetbrains.annotations.Nullable;
+
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -198,5 +200,14 @@ public final class Reflection {
             return getMethod(cls.getSuperclass(), name, returning);
         }
         return null;
+    }
+
+    @Nullable
+    public static Class<?> getClassByNameWithoutException(String name) {
+        try {
+            return Class.forName(name);
+        } catch (ClassNotFoundException e) {
+            return null;
+        }
     }
 }
