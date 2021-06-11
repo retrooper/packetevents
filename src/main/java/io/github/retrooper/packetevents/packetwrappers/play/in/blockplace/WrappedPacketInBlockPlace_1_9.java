@@ -51,7 +51,7 @@ final class WrappedPacketInBlockPlace_1_9 extends WrappedPacket {
                 movingObjPos = readObject(0, movingObjectPositionBlockClass);
             }
             WrappedPacket movingObjectPosWrapper = new WrappedPacket(new NMSPacket(movingObjPos));
-            blockPosObj = movingObjectPosWrapper.readObject(0, NMSUtils.blockPosClass);
+            blockPosObj = movingObjectPosWrapper.readBlockPosition(0);
         }
         try {
             blockPos.x = (int) NMSUtils.getBlockPosX.invoke(blockPosObj);
@@ -72,7 +72,7 @@ final class WrappedPacketInBlockPlace_1_9 extends WrappedPacket {
                 movingObjPos = readObject(0, movingObjectPositionBlockClass);
             }
             WrappedPacket movingObjectPosWrapper = new WrappedPacket(new NMSPacket(movingObjPos));
-            movingObjectPosWrapper.write(NMSUtils.blockPosClass, 0, blockPos);
+            movingObjectPosWrapper.writeBlockPosition(0, blockPos);
         }
     }
 

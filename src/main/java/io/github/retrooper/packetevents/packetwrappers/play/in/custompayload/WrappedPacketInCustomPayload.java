@@ -24,9 +24,11 @@ import io.github.retrooper.packetevents.packetwrappers.NMSPacket;
 import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
 import io.github.retrooper.packetevents.utils.nms.NMSUtils;
 import io.github.retrooper.packetevents.utils.reflection.Reflection;
+import io.github.retrooper.packetevents.utils.server.ServerVersion;
+import org.bukkit.entity.Player;
 
 public final class WrappedPacketInCustomPayload extends WrappedPacket {
-    private static boolean strPresent, byteArrayPresent;
+    private static boolean v_1_17, strPresent, byteArrayPresent;
 
     public WrappedPacketInCustomPayload(NMSPacket packet) {
         super(packet);
@@ -37,13 +39,14 @@ public final class WrappedPacketInCustomPayload extends WrappedPacket {
         Class<?> packetClass = PacketTypeClasses.Play.Client.CUSTOM_PAYLOAD;
         strPresent = Reflection.getField(packetClass, String.class, 0) != null;
         byteArrayPresent = Reflection.getField(packetClass, byte[].class, 0) != null;
+        v_1_17 = version.isNewerThanOrEquals(ServerVersion.v_1_17);
     }
 
     public String getTag() {
         if (strPresent) {
             return readString(0);
         } else {
-            Object minecraftKey = readObject(0, NMSUtils.minecraftKeyClass);
+            Object minecraftKey = readObject(v_1_17 ? 1 : 0, NMSUtils.minecraftKeyClass);
             return NMSUtils.getStringFromMinecraftKey(minecraftKey);
         }
     }
@@ -53,7 +56,7 @@ public final class WrappedPacketInCustomPayload extends WrappedPacket {
             writeString(0, tag);
         } else {
             Object minecraftKey = NMSUtils.generateMinecraftKey(tag);
-            write(NMSUtils.minecraftKeyClass, 0, minecraftKey);
+            write(NMSUtils.minecraftKeyClass, v_1_17 ? 1 : 0, minecraftKey);
         }
     }
 
@@ -81,13 +84,13 @@ public final class WrappedPacketInCustomPayload extends WrappedPacket {
     }
 
     public void retain() {
-        if (!byteArrayPresent) {
+        if (packet != null && !byteArrayPresent) {
             PacketEvents.get().getByteBufUtil().retain(getBuffer());
         }
     }
 
     public void release() {
-        if (!byteArrayPresent) {
+        if (packet != null && !byteArrayPresent) {
             PacketEvents.get().getByteBufUtil().release(getBuffer());
         }
     }

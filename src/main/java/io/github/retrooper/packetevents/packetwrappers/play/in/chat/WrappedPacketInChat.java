@@ -22,21 +22,15 @@ import io.github.retrooper.packetevents.packetwrappers.NMSPacket;
 import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
 
 public final class WrappedPacketInChat extends WrappedPacket {
-    private String message = null;
-
     public WrappedPacketInChat(NMSPacket packet) {
         super(packet);
     }
 
     public String getMessage() {
-        if (message != null) {
-            return message;
-        }
-        return message = readString(0);
+        return readString(0);
     }
 
     public void setMessage(String message) {
-        this.message = message;
         writeString(0, message);
     }
 }

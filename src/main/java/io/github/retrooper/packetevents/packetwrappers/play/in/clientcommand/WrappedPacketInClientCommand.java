@@ -27,6 +27,7 @@ import io.github.retrooper.packetevents.utils.reflection.SubclassUtil;
 import io.github.retrooper.packetevents.utils.server.ServerVersion;
 
 public final class WrappedPacketInClientCommand extends WrappedPacket {
+    private static boolean v_1_16;
     private static Class<? extends Enum<?>> enumClientCommandClass;
 
     public WrappedPacketInClientCommand(NMSPacket packet) {
@@ -35,26 +36,26 @@ public final class WrappedPacketInClientCommand extends WrappedPacket {
 
     @Override
     protected void load() {
-        Class<?> packetClass = PacketTypeClasses.Play.Client.CLIENT_COMMAND;
+        v_1_16 = version.isNewerThanOrEquals(ServerVersion.v_1_16);
         try {
             enumClientCommandClass = NMSUtils.getNMSEnumClass("EnumClientCommand");
         } catch (ClassNotFoundException e) {
             //Probably a subclass
-            enumClientCommandClass = SubclassUtil.getEnumSubClass(packetClass, "EnumClientCommand");
+            enumClientCommandClass = SubclassUtil.getEnumSubClass(PacketTypeClasses.Play.Client.CLIENT_COMMAND, "EnumClientCommand");
         }
     }
 
 
     public ClientCommand getClientCommand() {
-        Enum<?> emumConst = readEnumConstant(0, enumClientCommandClass);
-        return ClientCommand.valueOf(emumConst.name());
+        Enum<?> enumConst = readEnumConstant(0, enumClientCommandClass);
+        return ClientCommand.values()[enumConst.ordinal()];
     }
 
     public void setClientCommand(ClientCommand command) throws UnsupportedOperationException {
-        if (command == ClientCommand.OPEN_INVENTORY_ACHIEVEMENT && version.isNewerThan(ServerVersion.v_1_16)) {
+        if (command == ClientCommand.OPEN_INVENTORY_ACHIEVEMENT && v_1_16) {
             throwUnsupportedOperation(command);
         }
-        Enum<?> enumConst = EnumUtil.valueOf(enumClientCommandClass, command.name());
+        Enum<?> enumConst = EnumUtil.valueByIndex(enumClientCommandClass, command.ordinal());
         writeEnumConstant(0, enumConst);
     }
 

@@ -53,17 +53,18 @@ public final class WrappedPacketInBlockPlace extends WrappedPacket {
     }
 
     public Hand getHand() {
-        if (version.isOlderThan(ServerVersion.v_1_9)) {
-            return Hand.MAIN_HAND;
-        } else {
+        if (newerThan_v_1_8_8) {
             Enum<?> enumConst = readEnumConstant(handEnumIndex, NMSUtils.enumHandClass);
             return Hand.valueOf(enumConst.name());
+        }
+        else {
+            return Hand.MAIN_HAND;
         }
     }
 
     public void setHand(Hand hand) {
         //Optimize to do nothing on legacy versions. The protocol of the legacy versions only support one hand, the main hand.
-        if (version.isNewerThan(ServerVersion.v_1_8_8)) {
+        if (newerThan_v_1_8_8) {
             Enum<?> enumConst = EnumUtil.valueOf(NMSUtils.enumHandClass, hand.name());
             write(NMSUtils.enumHandClass, handEnumIndex, enumConst);
         }
@@ -149,7 +150,7 @@ public final class WrappedPacketInBlockPlace extends WrappedPacket {
 
     public void setItemStack(ItemStack stack) {
         if (newerThan_v_1_8_8) {
-
+            //Newer versions do not contain an itemstack
         } else if (newerThan_v_1_7_10) {
             WrappedPacketInBlockPlace_1_8 blockPlace_1_8 = new WrappedPacketInBlockPlace_1_8(packet);
             blockPlace_1_8.setItemStack(stack);

@@ -29,10 +29,11 @@ import java.lang.reflect.Constructor;
 import java.util.Optional;
 
 public class WrappedPacketOutEntityEffect extends WrappedPacketEntityAbstraction implements SendableWrapper {
+    private static boolean v_1_7_10;
     private static Constructor<?> packetDefaultConstructor;
-    private int effectID = -1;
-    private int amplifier = -1;
-    private int duration = -1;
+    private int effectID;
+    private int amplifier;
+    private int duration;
     private byte byteMask;
     private boolean byteMaskInitialized = false;
 
@@ -79,6 +80,7 @@ public class WrappedPacketOutEntityEffect extends WrappedPacketEntityAbstraction
 
     @Override
     protected void load() {
+        v_1_7_10 = version.isOlderThan(ServerVersion.v_1_8);
         try {
             packetDefaultConstructor = PacketTypeClasses.Play.Server.ENTITY_EFFECT.getConstructor();
         } catch (NoSuchMethodException e) {
@@ -87,11 +89,8 @@ public class WrappedPacketOutEntityEffect extends WrappedPacketEntityAbstraction
     }
 
     public int getEffectId() {
-        if (effectID != -1) {
-            return effectID;
-        }
         if (packet != null) {
-            return effectID = readByte(0);
+            return readByte(0);
         } else {
             return effectID;
         }
@@ -99,18 +98,15 @@ public class WrappedPacketOutEntityEffect extends WrappedPacketEntityAbstraction
 
     public void setEffectId(int effectID) {
         if (packet != null) {
-            writeByte(0, (byte) (this.effectID = effectID));
+            writeByte(0, (byte) effectID);
         } else {
             this.effectID = effectID;
         }
     }
 
     public int getAmplifier() {
-        if (amplifier != -1) {
-            return amplifier;
-        }
         if (packet != null) {
-            return amplifier = readByte(1);
+            return readByte(1);
         } else {
             return amplifier;
         }
@@ -118,21 +114,18 @@ public class WrappedPacketOutEntityEffect extends WrappedPacketEntityAbstraction
 
     public void setAmplifier(int amplifier) {
         if (packet != null) {
-            writeByte(1, (byte) (this.amplifier = amplifier));
+            writeByte(1, (byte) amplifier);
         } else {
             this.amplifier = amplifier;
         }
     }
 
     public int getDuration() {
-        if (duration != -1) {
-            return duration;
-        }
         if (packet != null) {
-            if (version.isOlderThan(ServerVersion.v_1_8)) {
-                return duration = readShort(1);
+            if (v_1_7_10) {
+                return readShort(1);
             } else {
-                return duration = readInt(1);
+                return readInt(1);
             }
         } else {
             return duration;
@@ -142,7 +135,7 @@ public class WrappedPacketOutEntityEffect extends WrappedPacketEntityAbstraction
     public void setDuration(int duration) {
         if (packet != null) {
             this.duration = duration;
-            if (version.isOlderThan(ServerVersion.v_1_8)) {
+            if (v_1_7_10) {
                 if (duration > Short.MAX_VALUE) {
                     duration = Short.MAX_VALUE;
                 } else if (duration < Short.MIN_VALUE) {

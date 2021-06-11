@@ -22,7 +22,6 @@ import io.github.retrooper.packetevents.packettype.PacketTypeClasses;
 import io.github.retrooper.packetevents.packetwrappers.NMSPacket;
 import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
 import io.github.retrooper.packetevents.utils.server.ServerVersion;
-import net.minecraft.util.CryptographyException;
 
 import java.security.KeyFactory;
 import java.security.PublicKey;

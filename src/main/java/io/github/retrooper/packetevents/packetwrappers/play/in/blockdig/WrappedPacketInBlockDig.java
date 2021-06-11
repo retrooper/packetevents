@@ -113,7 +113,7 @@ public final class WrappedPacketInBlockDig extends WrappedPacket {
             writeInt(4, type.ordinal());
         } else {
             Enum<?> enumConst = EnumUtil.valueOf(digTypeClass, type.name());
-            write(digTypeClass, 0, enumConst);
+            writeEnumConstant(0, enumConst);
         }
     }
 
@@ -124,14 +124,6 @@ public final class WrappedPacketInBlockDig extends WrappedPacket {
         DROP_ALL_ITEMS,
         DROP_ITEM,
         RELEASE_USE_ITEM,
-
-        /**
-         * Doesn't exist on the newest versions.
-         */
-        @Deprecated
-        SWAP_HELD_ITEMS,
-
-        SWAP_ITEM_WITH_OFFHAND,
-        UNKNOWN
+        SWAP_HELD_ITEMS
     }
 }

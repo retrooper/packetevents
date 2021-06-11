@@ -21,13 +21,14 @@ package io.github.retrooper.packetevents.packetwrappers.play.in.entityaction;
 import io.github.retrooper.packetevents.packettype.PacketTypeClasses;
 import io.github.retrooper.packetevents.packetwrappers.NMSPacket;
 import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
+import io.github.retrooper.packetevents.packetwrappers.api.helper.WrappedPacketEntityAbstraction;
 import io.github.retrooper.packetevents.utils.enums.EnumUtil;
 import io.github.retrooper.packetevents.utils.nms.NMSUtils;
 import io.github.retrooper.packetevents.utils.reflection.SubclassUtil;
 import io.github.retrooper.packetevents.utils.server.ServerVersion;
 import org.jetbrains.annotations.Nullable;
 
-public final class WrappedPacketInEntityAction extends WrappedPacket {
+public final class WrappedPacketInEntityAction extends WrappedPacketEntityAbstraction {
     private static Class<? extends Enum<?>> enumPlayerActionClass;
     private static boolean newerThan_v_1_8_8;
 

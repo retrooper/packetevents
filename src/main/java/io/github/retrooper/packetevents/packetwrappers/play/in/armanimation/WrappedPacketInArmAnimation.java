@@ -26,22 +26,29 @@ import io.github.retrooper.packetevents.utils.player.Hand;
 import io.github.retrooper.packetevents.utils.server.ServerVersion;
 
 public class WrappedPacketInArmAnimation extends WrappedPacket {
+    private static boolean v_1_9;
     public WrappedPacketInArmAnimation(NMSPacket packet) {
         super(packet);
     }
 
+    @Override
+    protected void load() {
+        v_1_9 = version.isNewerThanOrEquals(ServerVersion.v_1_9);
+    }
+
     public Hand getHand() {
-        if (version.isOlderThan(ServerVersion.v_1_9)) {
-            return Hand.MAIN_HAND;
-        } else {
+        if (v_1_9) {
             Enum<?> enumConst = readEnumConstant(0, NMSUtils.enumHandClass);
             return Hand.valueOf(enumConst.name());
+        }
+        else {
+            return Hand.MAIN_HAND;
         }
     }
 
     public void setHand(Hand hand) {
         //Optimize to do nothing on legacy versions. The protocol of the legacy versions only support one hand, the main hand.
-        if (version.isNewerThan(ServerVersion.v_1_8_8)) {
+        if (v_1_9) {
             Enum<?> enumConst = EnumUtil.valueOf(NMSUtils.enumHandClass, hand.name());
             writeEnumConstant(0, enumConst);
         }
