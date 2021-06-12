@@ -20,15 +20,10 @@
 
 package io.github.retrooper.packetevents.packetwrappers.play.in.pong;
 
-import io.github.retrooper.packetevents.packettype.PacketTypeClasses;
 import io.github.retrooper.packetevents.packetwrappers.NMSPacket;
 import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
-import io.github.retrooper.packetevents.packetwrappers.api.SendableWrapper;
 
-import java.lang.reflect.Constructor;
-
-public class WrappedPacketInPong extends WrappedPacket implements SendableWrapper {
-    private static Constructor<?> packetConstructor;
+public class WrappedPacketInPong extends WrappedPacket {
     private int id;
 
     public WrappedPacketInPong(NMSPacket packet) {
@@ -39,35 +34,19 @@ public class WrappedPacketInPong extends WrappedPacket implements SendableWrappe
         this.id = id;
     }
 
-    @Override
-    protected void load() {
-        try {
-            packetConstructor = PacketTypeClasses.Play.Client.PONG.getConstructor(int.class);
-        } catch (NoSuchMethodException e) {
-            e.printStackTrace();
-        }
-    }
-
     public int getId() {
         if (packet != null) {
             return readInt(0);
-        }
-        else {
+        } else {
             return id;
         }
     }
 
     public void setId(int id) {
-        if (packet != null)  {
+        if (packet != null) {
             writeInt(0, id);
-        }
-        else {
+        } else {
             this.id = id;
         }
-    }
-
-    @Override
-    public Object asNMSPacket() throws Exception {
-        return packetConstructor.newInstance(getId());
     }
 }

@@ -405,8 +405,8 @@ public final class NMSUtils {
             Entity entity = EntityFinderUtils.getEntityById(world, id);
             if (entity == null) {
                 List<World> worlds = new ArrayList<>(Bukkit.getWorlds());
-                for (World wrld : worlds) {
-                    for (Entity e : wrld.getEntities()) {
+                for (World w : worlds) {
+                    for (Entity e : w.getEntities()) {
                         if (e.getEntityId() == id) {
                             entity = e;
                             break;

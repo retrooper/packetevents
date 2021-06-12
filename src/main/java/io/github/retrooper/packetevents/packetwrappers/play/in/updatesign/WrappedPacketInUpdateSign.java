@@ -61,10 +61,10 @@ public class WrappedPacketInUpdateSign extends WrappedPacket {
 
     public String[] getTextLines() {
         if (strArrayMode) {
-            //1.7.10
+            //1.7.10 and 1.17+
             return readStringArray(0);
         } else {
-            //1.8 and above
+            //1.8 -> 1.16.5
             Object[] iChatComponents = (Object[]) readAnyObject(1);
             return NMSUtils.readIChatBaseComponents(iChatComponents);
         }

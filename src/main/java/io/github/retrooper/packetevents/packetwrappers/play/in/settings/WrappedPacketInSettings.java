@@ -26,13 +26,13 @@ import io.github.retrooper.packetevents.utils.reflection.SubclassUtil;
 import io.github.retrooper.packetevents.utils.server.ServerVersion;
 
 import java.util.HashSet;
+import java.util.Optional;
 import java.util.Set;
 
 public class WrappedPacketInSettings extends WrappedPacket {
     private static Class<? extends Enum<?>> chatVisibilityEnumClass;
 
-    private static boolean isLowerThan_v_1_8;
-    private Object chatVisibilityEnumObj;
+    private static boolean isLowerThan_v_1_8, v_1_17;
 
     public WrappedPacketInSettings(final NMSPacket packet) {
         super(packet);
@@ -41,13 +41,15 @@ public class WrappedPacketInSettings extends WrappedPacket {
     @Override
     protected void load() {
         isLowerThan_v_1_8 = version.isOlderThan(ServerVersion.v_1_8);
-
-        try {
-            chatVisibilityEnumClass = NMSUtils.getNMSEnumClass("EnumChatVisibility");
-        } catch (ClassNotFoundException e) {
-            Class<?> entityHumanClass = NMSUtils.getNMSClassWithoutException("EntityHuman");
-            //They are just on an outdated version
-            chatVisibilityEnumClass = SubclassUtil.getEnumSubClass(entityHumanClass, "EnumChatVisibility");
+        v_1_17 = version.isNewerThanOrEquals(ServerVersion.v_1_17);
+        chatVisibilityEnumClass = NMSUtils.getNMSEnumClassWithoutException("EnumChatVisibility");
+        if (chatVisibilityEnumClass == null) {
+            //They are on 1.17+
+            chatVisibilityEnumClass = NMSUtils.getNMEnumClassWithoutException("world.entity.player.EnumChatVisibility");
+            if (chatVisibilityEnumClass == null) {
+                //They are just on an outdated version
+                chatVisibilityEnumClass = SubclassUtil.getEnumSubClass(NMSUtils.entityHumanClass, "EnumChatVisibility");
+            }
         }
     }
 
@@ -60,20 +62,20 @@ public class WrappedPacketInSettings extends WrappedPacket {
     }
 
     public int getViewDistance() {
-        return readInt(0);
+        return readInt(v_1_17 ? 1 : 0);
     }
 
     public void setViewDistance(int viewDistance) {
-        writeInt(0, viewDistance);
+        writeInt(v_1_17 ? 1 : 0, viewDistance);
     }
 
     public ChatVisibility getChatVisibility() {
         Enum<?> enumConst = readEnumConstant(0, chatVisibilityEnumClass);
-        return ChatVisibility.valueOf(enumConst.name());
+        return ChatVisibility.values()[enumConst.ordinal()];
     }
 
     public void setChatVisibility(ChatVisibility visibility) {
-        Enum<?> enumConst = EnumUtil.valueByIndex(chatVisibilityEnumClass, visibility.ordinal()); //Ordinal is faster than name comparison.
+        Enum<?> enumConst = EnumUtil.valueByIndex(chatVisibilityEnumClass, visibility.ordinal());
         writeEnumConstant(0, enumConst);
     }
 
@@ -85,6 +87,19 @@ public class WrappedPacketInSettings extends WrappedPacket {
         writeBoolean(0, chatColors);
     }
 
+    public Optional<Boolean> isTextFilteringEnabled() {
+        if (!v_1_17) {
+            return Optional.empty();
+        }
+        return Optional.of(!readBoolean(1));
+    }
+
+    public void setTextFilteringEnabled(boolean textFilteringEnabled) {
+        if (v_1_17) {
+            writeBoolean(1, !textFilteringEnabled);
+        }
+    }
+
     public byte getDisplaySkinPartsMask() {
         byte mask = 0;
         if (isLowerThan_v_1_8) {
@@ -93,7 +108,7 @@ public class WrappedPacketInSettings extends WrappedPacket {
                 mask |= 0x01;
             }
         } else {
-            mask = (byte) readInt(1);
+            mask = (byte) readInt(v_1_17 ? 2 : 1);
         }
         return mask;
     }
@@ -103,7 +118,7 @@ public class WrappedPacketInSettings extends WrappedPacket {
             boolean capeEnabled = (mask & 0x01) == 0x01;
             writeBoolean(1, capeEnabled);
         } else {
-            writeInt(1, mask);
+            writeInt(v_1_17 ? 2 : 1, mask);
         }
     }
 

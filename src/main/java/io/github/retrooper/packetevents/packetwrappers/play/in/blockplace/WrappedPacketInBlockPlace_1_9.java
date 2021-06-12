@@ -39,6 +39,9 @@ final class WrappedPacketInBlockPlace_1_9 extends WrappedPacket {
     @Override
     protected void load() {
         movingObjectPositionBlockClass = NMSUtils.getNMSClassWithoutException("MovingObjectPositionBlock");
+        if (movingObjectPositionBlockClass == null) {
+            movingObjectPositionBlockClass = NMSUtils.getNMClassWithoutException("world.phys.MovingObjectPositionBlock");
+        }
     }
 
     public Vector3i getBlockPosition() {

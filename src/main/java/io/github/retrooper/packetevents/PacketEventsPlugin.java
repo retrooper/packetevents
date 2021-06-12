@@ -18,8 +18,14 @@
 
 package io.github.retrooper.packetevents;
 
+import io.github.retrooper.packetevents.event.PacketListenerAbstract;
+import io.github.retrooper.packetevents.event.impl.PacketPlayReceiveEvent;
+import io.github.retrooper.packetevents.packettype.PacketType;
+import io.github.retrooper.packetevents.packetwrappers.play.in.useentity.WrappedPacketInUseEntity;
 import io.github.retrooper.packetevents.settings.PacketEventsSettings;
+import io.github.retrooper.packetevents.utils.player.Hand;
 import io.github.retrooper.packetevents.utils.server.ServerVersion;
+import org.bukkit.entity.Entity;
 import org.bukkit.plugin.java.JavaPlugin;
 
 public class PacketEventsPlugin extends JavaPlugin {
@@ -39,6 +45,20 @@ public class PacketEventsPlugin extends JavaPlugin {
 
     @Override
     public void onEnable() {
+        PacketEvents.get().registerListener(new PacketListenerAbstract() {
+            @Override
+            public void onPacketPlayReceive(PacketPlayReceiveEvent event) {
+                if (event.getPacketId() == PacketType.Play.Client.USE_ENTITY) {
+                    WrappedPacketInUseEntity ue = new WrappedPacketInUseEntity(event.getNMSPacket());
+                    //TODO Support accessing entity by id
+                    //Entity entity = ue.getEntity(event.getPlayer().getWorld());
+                    WrappedPacketInUseEntity.EntityUseAction action = ue.getAction();
+                    event.getPlayer().sendMessage("action: " + action);
+                    Hand hand = ue.getHand();
+                    event.getPlayer().sendMessage("hand: " + hand);
+                }
+            }
+        });
         PacketEvents.get().init();
     }
 

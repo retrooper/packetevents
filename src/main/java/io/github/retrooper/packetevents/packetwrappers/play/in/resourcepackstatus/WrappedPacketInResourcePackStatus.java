@@ -39,11 +39,11 @@ public class WrappedPacketInResourcePackStatus extends WrappedPacket {
 
     public ResourcePackStatus getStatus() {
         Enum<?> enumConst = readEnumConstant(0, enumResourcePackStatusClass);
-        return ResourcePackStatus.valueOf(enumConst.name());
+        return ResourcePackStatus.values()[enumConst.ordinal()];
     }
 
     public void setStatus(ResourcePackStatus status) {
-        Enum<?> enumConst = EnumUtil.valueOf(enumResourcePackStatusClass, status.name());
+        Enum<?> enumConst = EnumUtil.valueByIndex(enumResourcePackStatusClass, status.ordinal());
         writeEnumConstant(0, enumConst);
     }
 

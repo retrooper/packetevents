@@ -49,17 +49,15 @@ public final class EntityFinderUtils {
         }
 
         try {
-            getEntityByIdMethod = worldServerClass.getMethod((version.getProtocolVersion() == (short) 47)
-                    ? "a" : "getEntity", int.class);
-
             craftWorldGetHandle = NMSUtils.craftWorldClass.getMethod("getHandle");
             getBukkitEntity = NMSUtils.nmsEntityClass.getMethod("getBukkitEntity");
+
+            String getEntityByIdMethodName = (version.getProtocolVersion() == (short) 47)
+                    ? "a" : "getEntity";
+            getEntityByIdMethod = worldServerClass.getMethod(getEntityByIdMethodName, int.class);
         } catch (NoSuchMethodException e) {
             try {
                 getEntityByIdMethod = worldServerClass.getMethod("getEntity", int.class);
-
-                craftWorldGetHandle = NMSUtils.craftWorldClass.getMethod("getHandle");
-                getBukkitEntity = NMSUtils.nmsEntityClass.getMethod("getBukkitEntity");
             } catch (NoSuchMethodException ex) {
                 ex.printStackTrace();
             }
