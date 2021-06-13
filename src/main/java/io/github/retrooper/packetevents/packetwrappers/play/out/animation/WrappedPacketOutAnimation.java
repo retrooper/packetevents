@@ -23,25 +23,29 @@ import io.github.retrooper.packetevents.packetwrappers.NMSPacket;
 import io.github.retrooper.packetevents.packetwrappers.api.SendableWrapper;
 import io.github.retrooper.packetevents.packetwrappers.api.helper.WrappedPacketEntityAbstraction;
 import io.github.retrooper.packetevents.utils.nms.NMSUtils;
+import io.github.retrooper.packetevents.utils.server.ServerVersion;
 import org.bukkit.entity.Entity;
 
 import java.lang.reflect.Constructor;
 
 public final class WrappedPacketOutAnimation extends WrappedPacketEntityAbstraction implements SendableWrapper {
+    private static boolean v_1_17;
     private static Constructor<?> animationConstructor;
     private EntityAnimationType type;
 
     public WrappedPacketOutAnimation(final NMSPacket packet) {
-        super(packet);
+        super(packet, v_1_17 ? 6 : 0);
     }
 
     public WrappedPacketOutAnimation(final Entity target, final EntityAnimationType type) {
+        super(v_1_17 ? 6 : 0);
         this.entityID = target.getEntityId();
         this.entity = target;
         this.type = type;
     }
 
     public WrappedPacketOutAnimation(final int entityID, final EntityAnimationType type) {
+        super(v_1_17 ? 6 : 0);
         this.entityID = entityID;
         this.entity = null;
         this.type = type;
@@ -49,10 +53,9 @@ public final class WrappedPacketOutAnimation extends WrappedPacketEntityAbstract
 
     @Override
     protected void load() {
-        Class<?> animationClass = PacketTypeClasses.Play.Server.ANIMATION;
-
+        v_1_17 = version.isNewerThanOrEquals(ServerVersion.v_1_17);
         try {
-            animationConstructor = animationClass.getConstructor(NMSUtils.nmsEntityClass, int.class);
+            animationConstructor = PacketTypeClasses.Play.Server.ANIMATION.getConstructor(NMSUtils.nmsEntityClass, int.class);
         } catch (NoSuchMethodException e) {
             e.printStackTrace();
         }
@@ -60,8 +63,8 @@ public final class WrappedPacketOutAnimation extends WrappedPacketEntityAbstract
 
     public EntityAnimationType getAnimationType() {
         if (packet != null) {
-            byte id = (byte) readInt(1);
-            return EntityAnimationType.getById(id);
+            byte id = (byte) readInt(v_1_17 ? 7 : 1);
+            return EntityAnimationType.values()[id];
         } else {
             return type;
         }
@@ -69,7 +72,7 @@ public final class WrappedPacketOutAnimation extends WrappedPacketEntityAbstract
 
     public void setAnimationType(EntityAnimationType type) {
         if (packet != null) {
-            writeInt(1, type.ordinal());
+            writeInt(v_1_17 ? 7 : 1, type.ordinal());
         } else {
             this.type = type;
         }
@@ -77,21 +80,12 @@ public final class WrappedPacketOutAnimation extends WrappedPacketEntityAbstract
 
     @Override
     public Object asNMSPacket() throws Exception {
-        final Object nmsEntity = NMSUtils.getNMSEntity(getEntity());
-        final int index = getAnimationType().ordinal();
-        return animationConstructor.newInstance(nmsEntity, index);
+        Object nmsEntity = NMSUtils.getNMSEntity(getEntity());
+        return animationConstructor.newInstance(nmsEntity, getAnimationType().ordinal());
     }
 
     public enum EntityAnimationType {
         SWING_MAIN_ARM, TAKE_DAMAGE, LEAVE_BED,
-        SWING_OFFHAND, CRITICAL_EFFECT, MAGIC_CRITICAL_EFFECT;
-
-        EntityAnimationType() {
-
-        }
-
-        public static EntityAnimationType getById(byte id) {
-            return values()[id]; //id is at the same time the index
-        }
+        SWING_OFFHAND, CRITICAL_EFFECT, MAGIC_CRITICAL_EFFECT
     }
 }

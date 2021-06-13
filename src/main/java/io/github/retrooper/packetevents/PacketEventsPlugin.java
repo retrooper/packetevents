@@ -19,17 +19,10 @@
 package io.github.retrooper.packetevents;
 
 import io.github.retrooper.packetevents.event.PacketListenerAbstract;
-import io.github.retrooper.packetevents.event.impl.PacketPlayReceiveEvent;
-import io.github.retrooper.packetevents.packettype.PacketType;
-import io.github.retrooper.packetevents.packetwrappers.play.in.useentity.WrappedPacketInUseEntity;
+import io.github.retrooper.packetevents.event.impl.PacketPlaySendEvent;
 import io.github.retrooper.packetevents.settings.PacketEventsSettings;
-import io.github.retrooper.packetevents.utils.player.Hand;
 import io.github.retrooper.packetevents.utils.server.ServerVersion;
-import io.github.retrooper.packetevents.utils.vector.Vector3d;
-import org.bukkit.entity.Entity;
 import org.bukkit.plugin.java.JavaPlugin;
-
-import java.util.Optional;
 
 public class PacketEventsPlugin extends JavaPlugin {
     @Override
@@ -50,8 +43,7 @@ public class PacketEventsPlugin extends JavaPlugin {
     public void onEnable() {
         PacketEvents.get().registerListener(new PacketListenerAbstract() {
             @Override
-            public void onPacketPlayReceive(PacketPlayReceiveEvent event) {
-
+            public void onPacketPlaySend(PacketPlaySendEvent event) {
             }
         });
         PacketEvents.get().init();

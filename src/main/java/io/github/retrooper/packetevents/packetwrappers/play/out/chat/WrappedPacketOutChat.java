@@ -22,6 +22,7 @@ import io.github.retrooper.packetevents.packettype.PacketTypeClasses;
 import io.github.retrooper.packetevents.packetwrappers.NMSPacket;
 import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
 import io.github.retrooper.packetevents.packetwrappers.api.SendableWrapper;
+import io.github.retrooper.packetevents.utils.enums.EnumUtil;
 import io.github.retrooper.packetevents.utils.nms.NMSUtils;
 import io.github.retrooper.packetevents.utils.reflection.Reflection;
 import net.md_5.bungee.api.chat.BaseComponent;
@@ -33,8 +34,7 @@ import java.util.UUID;
 
 public final class WrappedPacketOutChat extends WrappedPacket implements SendableWrapper {
     private static Constructor<?> chatClassConstructor;
-    private static Class<?> packetClass, iChatBaseComponentClass, chatMessageTypeEnum;
-    private static Method chatMessageTypeCreatorMethod;
+    private static Class<? extends Enum<?>> chatMessageTypeEnum;
     //0 = IChatBaseComponent, Byte
     //1 = IChatBaseComponent, Int
     //2 = IChatBaseComponent, ChatMessageType
@@ -68,30 +68,19 @@ public final class WrappedPacketOutChat extends WrappedPacket implements Sendabl
 
     @Override
     protected void load() {
-        try {
-            packetClass = PacketTypeClasses.Play.Server.CHAT;
-            iChatBaseComponentClass = NMSUtils.getNMSClass("IChatBaseComponent");
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
+        Class<?> packetClass = PacketTypeClasses.Play.Server.CHAT;
+        chatMessageTypeEnum = NMSUtils.getNMSEnumClassWithoutException("ChatMessageType");
+        if (chatMessageTypeEnum == null) {
+            chatMessageTypeEnum = NMSUtils.getNMEnumClassWithoutException("network.chat.ChatMessageType");
         }
-
-        boolean isVeryOutdated = false;
-        try {
-            chatMessageTypeEnum = NMSUtils.getNMSClass("ChatMessageType");
-        } catch (ClassNotFoundException e) {
-            isVeryOutdated = true;
-        }
-
-        if (!isVeryOutdated) {
-            chatMessageTypeCreatorMethod = Reflection.getMethod(chatMessageTypeEnum, 0, byte.class);
-
+        if (chatMessageTypeEnum != null) {
             try {
-                chatClassConstructor = packetClass.getConstructor(iChatBaseComponentClass, chatMessageTypeEnum);
+                chatClassConstructor = packetClass.getConstructor(NMSUtils.iChatBaseComponentClass, chatMessageTypeEnum);
                 constructorMode = 2;
             } catch (NoSuchMethodException e) {
                 //Just a much newer version(1.16.x and above right now)
                 try {
-                    chatClassConstructor = packetClass.getConstructor(iChatBaseComponentClass, chatMessageTypeEnum, UUID.class);
+                    chatClassConstructor = packetClass.getConstructor(NMSUtils.iChatBaseComponentClass, chatMessageTypeEnum, UUID.class);
                     constructorMode = 3;
                 } catch (NoSuchMethodException e2) {
                     //Failed to resolve the constructor
@@ -100,21 +89,21 @@ public final class WrappedPacketOutChat extends WrappedPacket implements Sendabl
             }
         } else {
             try {
-                chatClassConstructor = packetClass.getConstructor(iChatBaseComponentClass, byte.class);
+                chatClassConstructor = packetClass.getConstructor(NMSUtils.iChatBaseComponentClass, byte.class);
                 constructorMode = 0;
             } catch (NoSuchMethodException e) {
                 //That is fine, they are most likely on an older version.
                 try {
-                    chatClassConstructor = packetClass.getConstructor(iChatBaseComponentClass, int.class);
+                    chatClassConstructor = packetClass.getConstructor(NMSUtils.iChatBaseComponentClass, int.class);
                     constructorMode = 1;
                 } catch (NoSuchMethodException e2) {
                     try {
                         //Some weird 1.7.10 spigots remove that int parameter for no reason, I won't keep adding support for any more spigots and might stop
                         //accepting pull requests for support for spigots breaking things that normal spigot has.
-                        chatClassConstructor = packetClass.getConstructor(iChatBaseComponentClass);
+                        chatClassConstructor = packetClass.getConstructor(NMSUtils.iChatBaseComponentClass);
                         constructorMode = -1;
-                    } catch (NoSuchMethodException noSuchMethodException) {
-                        noSuchMethodException.printStackTrace();
+                    } catch (NoSuchMethodException e3) {
+                        e3.printStackTrace();
                     }
                 }
             }
@@ -125,9 +114,9 @@ public final class WrappedPacketOutChat extends WrappedPacket implements Sendabl
     @Override
     public Object asNMSPacket() throws Exception {
         byte chatPos = (byte) getChatPosition().ordinal();
-        Object chatMessageTypeInstance = null;
+        Enum<?> chatMessageTypeInstance = null;
         if (chatMessageTypeEnum != null) {
-            chatMessageTypeInstance = chatMessageTypeCreatorMethod.invoke(null, chatPos);
+            chatMessageTypeInstance = EnumUtil.valueByIndex(chatMessageTypeEnum, chatPos);
         }
         switch (constructorMode) {
             case -1:
@@ -152,10 +141,17 @@ public final class WrappedPacketOutChat extends WrappedPacket implements Sendabl
      */
     public String getMessage() {
         if (packet != null) {
-            final Object iChatBaseObj = readObject(0, iChatBaseComponentClass);
-            return NMSUtils.readIChatBaseComponent(iChatBaseObj);
+            return readIChatBaseComponent(0);
         } else {
             return message;
+        }
+    }
+
+    public void setMessage(String message) {
+        if (packet != null) {
+            writeIChatBaseComponent(0, message);
+        } else {
+            this.message = message;
         }
     }
 
@@ -182,15 +178,35 @@ public final class WrappedPacketOutChat extends WrappedPacket implements Sendabl
                     break;
                 case 2:
                 case 3:
-                    Object chatTypeEnumInstance = readObject(0, chatMessageTypeEnum);
-                    return ChatPosition.valueOf(chatTypeEnumInstance.toString());
+                    Enum<?> chatTypeEnumInstance = readEnumConstant(0, chatMessageTypeEnum);
+                    return ChatPosition.values()[chatTypeEnumInstance.ordinal()];
                 default:
                     chatPositionValue = 0;
                     break;
             }
-            return ChatPosition.getByPositionValue(chatPositionValue);
+            return ChatPosition.values()[chatPositionValue];
         } else {
             return chatPosition;
+        }
+    }
+
+    public void setChatPosition(ChatPosition chatPosition) {
+        if (packet != null) {
+            switch (constructorMode) {
+                case 0:
+                    writeByte(0, (byte) chatPosition.ordinal());
+                    break;
+                case 1:
+                    writeInt(0, chatPosition.ordinal());
+                    break;
+                case 2:
+                case 3:
+                    Enum<?> chatTypeEnumInstance = EnumUtil.valueByIndex(chatMessageTypeEnum, chatPosition.ordinal());
+                    writeEnumConstant(0, chatTypeEnumInstance);
+                    break;
+            }
+        } else {
+            this.chatPosition = chatPosition;
         }
     }
 
@@ -198,12 +214,5 @@ public final class WrappedPacketOutChat extends WrappedPacket implements Sendabl
         CHAT,
         SYSTEM_MESSAGE,
         GAME_INFO;
-
-        ChatPosition() {
-        }
-
-        public static ChatPosition getByPositionValue(byte position) {
-            return values()[position];
-        }
     }
 }

@@ -15,9 +15,16 @@ import java.util.Optional;
  * @see <a href="https://wiki.vg/Protocol#Edit_Book"</a>
  */
 public class WrappedPacketInBEdit extends WrappedPacket {
+    private static boolean v_1_13, v_1_17;
 
     public WrappedPacketInBEdit(final NMSPacket packet) {
         super(packet);
+    }
+
+    @Override
+    protected void load() {
+        v_1_13 = version.isNewerThanOrEquals(ServerVersion.v_1_13);
+        v_1_17 = version.isNewerThanOrEquals(ServerVersion.v_1_17);
     }
 
     public ItemStack getItemStack() {
@@ -38,7 +45,9 @@ public class WrappedPacketInBEdit extends WrappedPacket {
 
     @SupportedVersions(ranges = {ServerVersion.v_1_13, ServerVersion.v_1_16_5})
     public Optional<Hand> getHand() {
-        if (version.isNewerThanOrEquals(ServerVersion.v_1_13)) {
+        if (v_1_17) {
+            return Optional.of(Hand.values()[readInt(0)]);
+        } else if (v_1_13) {
             final Enum<?> enumConst = readEnumConstant(0, NMSUtils.enumHandClass);
             return Optional.of(Hand.valueOf(enumConst.name()));
         }
@@ -48,7 +57,9 @@ public class WrappedPacketInBEdit extends WrappedPacket {
 
     @SupportedVersions(ranges = {ServerVersion.v_1_13, ServerVersion.v_1_16_5})
     public void setHand(final Hand hand) {
-        if (version.isNewerThanOrEquals(ServerVersion.v_1_13)) {
+        if (v_1_17) {
+            writeInt(0, hand.ordinal());
+        } else if (v_1_13) {
             final Enum<?> enumConst = EnumUtil.valueOf(NMSUtils.enumHandClass, hand.name());
             writeEnumConstant(0, enumConst);
         }

@@ -49,11 +49,10 @@ public final class WrappedPacketOutAbilities extends WrappedPacket implements Se
 
     @Override
     protected void load() {
-        Class<?> packetClass = PacketTypeClasses.Play.Server.ABILITIES;
         try {
             playerAbilitiesClass = NMSUtils.getNMSClass("PlayerAbilities");
         } catch (ClassNotFoundException e) {
-            e.printStackTrace();
+            playerAbilitiesClass = NMSUtils.getNMClassWithoutException("world.entity.player.PlayerAbilities");
         }
 
         if (playerAbilitiesClass != null) {
@@ -65,7 +64,7 @@ public final class WrappedPacketOutAbilities extends WrappedPacket implements Se
         }
 
         try {
-            packetConstructor = packetClass.getConstructor(playerAbilitiesClass);
+            packetConstructor = PacketTypeClasses.Play.Server.ABILITIES.getConstructor(playerAbilitiesClass);
         } catch (NoSuchMethodException e) {
             e.printStackTrace();
         }

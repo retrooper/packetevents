@@ -50,7 +50,7 @@ public final class NMSUtils {
     private static final ThreadLocal<Random> randomThreadLocal = ThreadLocal.withInitial(Random::new);
     public static boolean legacyNettyImportMode;
     public static ServerVersion version;
-    public static Constructor<?> blockPosConstructor, minecraftKeyConstructor, vec3DConstructor, dataWatcherConstructor;
+    public static Constructor<?> blockPosConstructor, minecraftKeyConstructor, vec3DConstructor, dataWatcherConstructor, packetDataSerializerConstructor;
     public static Class<?> mobEffectListClass, nmsEntityClass, minecraftServerClass, craftWorldClass, playerInteractManagerClass, entityPlayerClass, playerConnectionClass, craftServerClass,
             craftPlayerClass, serverConnectionClass, craftEntityClass, nmsItemStackClass, networkManagerClass, nettyChannelClass, gameProfileClass, iChatBaseComponentClass,
             blockPosClass, vec3DClass, channelFutureClass, blockClass, iBlockDataClass, nmsWorldClass, craftItemStackClass,
@@ -182,6 +182,13 @@ public final class NMSUtils {
         packetDataSerializerClass = getNMSClassWithoutException("PacketDataSerializer");
         if (packetDataSerializerClass == null) {
             packetDataSerializerClass = getNMClassWithoutException("network.PacketDataSerializer");
+        }
+        if (packetDataSerializerClass != null) {
+            try {
+                packetDataSerializerConstructor = packetDataSerializerClass.getConstructor(NMSUtils.byteBufClass);
+            } catch (NoSuchMethodException e) {
+                e.printStackTrace();
+            }
         }
         dimensionManagerClass = NMSUtils.getNMSClassWithoutException("DimensionManager");
         if (dimensionManagerClass == null) {
@@ -723,6 +730,15 @@ public final class NMSUtils {
         try {
             return getItemById.invoke(null, id);
         } catch (IllegalAccessException | InvocationTargetException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    public static Object generatePacketDataSerializer(Object byteBuf) {
+        try {
+            return packetDataSerializerConstructor.newInstance(byteBuf);
+        } catch (InstantiationException | InvocationTargetException | IllegalAccessException e) {
             e.printStackTrace();
         }
         return null;

@@ -31,6 +31,7 @@ import java.lang.reflect.Constructor;
 
 public class WrappedPacketOutBlockBreakAnimation extends WrappedPacketEntityAbstraction implements SendableWrapper {
     private static Constructor<?> packetConstructor;
+    private static boolean v_1_7_10;
     private Vector3i blockPosition;
     private int destroyStage;
 
@@ -53,6 +54,7 @@ public class WrappedPacketOutBlockBreakAnimation extends WrappedPacketEntityAbst
 
     @Override
     protected void load() {
+        v_1_7_10 = version.isOlderThan(ServerVersion.v_1_8);
         try {
             packetConstructor = PacketTypeClasses.Play.Server.BLOCK_BREAK_ANIMATION.getConstructor(int.class, int.class, int.class, int.class, int.class);
         } catch (NoSuchMethodException e) {
@@ -66,7 +68,7 @@ public class WrappedPacketOutBlockBreakAnimation extends WrappedPacketEntityAbst
 
     public Vector3i getBlockPosition() {
         if (packet != null) {
-            if (version.isOlderThan(ServerVersion.v_1_8)) {
+            if (v_1_7_10) {
                 int x = readInt(1);
                 int y = readInt(2);
                 int z = readInt(3);
@@ -81,7 +83,7 @@ public class WrappedPacketOutBlockBreakAnimation extends WrappedPacketEntityAbst
 
     public void setBlockPosition(Vector3i blockPosition) {
         if (packet != null) {
-            if (version.isOlderThan(ServerVersion.v_1_8)) {
+            if (v_1_7_10) {
                 writeInt(1, blockPosition.x);
                 writeInt(2, blockPosition.y);
                 writeInt(3, blockPosition.z);
@@ -95,7 +97,7 @@ public class WrappedPacketOutBlockBreakAnimation extends WrappedPacketEntityAbst
 
     public int getDestroyStage() {
         if (packet != null) {
-            int index = version.isOlderThan(ServerVersion.v_1_8) ? 4 : 1;
+            int index = v_1_7_10 ? 4 : 1;
             return readInt(index);
         } else {
             return this.destroyStage;
@@ -104,7 +106,7 @@ public class WrappedPacketOutBlockBreakAnimation extends WrappedPacketEntityAbst
 
     public void setDestroyStage(int destroyStage) {
         if (packet != null) {
-            int index = version.isOlderThan(ServerVersion.v_1_8) ? 4 : 1;
+            int index = v_1_7_10 ? 4 : 1;
             writeInt(index, destroyStage);
         } else {
             this.destroyStage = destroyStage;
@@ -114,7 +116,7 @@ public class WrappedPacketOutBlockBreakAnimation extends WrappedPacketEntityAbst
     @Override
     public Object asNMSPacket() throws Exception {
         Vector3i blockPosition = getBlockPosition();
-        if (version.isOlderThan(ServerVersion.v_1_8)) {
+        if (v_1_7_10) {
             return packetConstructor.newInstance(getEntityId(), blockPosition.x, blockPosition.y, blockPosition.z, getDestroyStage());
         } else {
             Object nmsBlockPos = NMSUtils.generateNMSBlockPos(blockPosition);

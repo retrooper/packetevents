@@ -38,53 +38,40 @@ public class WrappedPacketOutBlockAction extends WrappedPacket implements Sendab
 
     private static Constructor<?> packetConstructor;
     private Vector3i blockPos;
-    private int action, actionParam;
-    private Material material;
+    private int actionID, actionData;
+    private Material blockType;
 
-    public WrappedPacketOutBlockAction(final NMSPacket packet) {
+    public WrappedPacketOutBlockAction(NMSPacket packet) {
         super(packet);
     }
 
-    public WrappedPacketOutBlockAction(final Vector3i blockPos, final int action, final int actionParam, final Material material) {
+    public WrappedPacketOutBlockAction(Vector3i blockPos, int actionID, int actionData, Material blockType) {
         this.blockPos = blockPos;
-        this.action = action;
-        this.actionParam = actionParam;
-        this.material = material;
+        this.actionID = actionID;
+        this.actionData = actionData;
+        this.blockType = blockType;
     }
 
     @Override
     protected void load() {
         try {
-            packetConstructor = PacketTypeClasses.Play.Server.BLOCK_ACTION.getConstructors()[1];
-        } catch (final Exception e) {
+            packetConstructor = PacketTypeClasses.Play.Server.BLOCK_ACTION.getConstructor(NMSUtils.blockPosClass, NMSUtils.blockClass, int.class, int.class);
+        } catch (NoSuchMethodException e) {
             e.printStackTrace();
         }
     }
 
     public Vector3i getBlockPosition() {
         if (packet != null) {
-            final Vector3i blockPos = new Vector3i();
-
-            final Object blockPosObj = readObject(0, NMSUtils.blockPosClass);
-
-            try {
-                blockPos.x = (int) NMSUtils.getBlockPosX.invoke(blockPosObj);
-                blockPos.y = (int) NMSUtils.getBlockPosY.invoke(blockPosObj);
-                blockPos.z = (int) NMSUtils.getBlockPosZ.invoke(blockPosObj);
-            } catch (final Exception e) {
-                e.printStackTrace();
-            }
-
-            return blockPos;
+            return readBlockPosition(0);
         } else {
             return this.blockPos;
         }
     }
 
-    public void setBlockPosition(final Vector3i blockPos) {
+    public void setBlockPosition(Vector3i blockPos) {
         if (packet != null) {
-            final Object nmsBlockPos = NMSUtils.generateNMSBlockPos(blockPos);
-            write(NMSUtils.blockPosClass, 0, nmsBlockPos);
+            writeBlockPosition(0, blockPos);
         } else {
             this.blockPos = blockPos;
         }
@@ -94,31 +81,41 @@ public class WrappedPacketOutBlockAction extends WrappedPacket implements Sendab
         if (packet != null) {
             return readInt(0);
         } else {
-            return this.action;
+            return this.actionID;
         }
     }
 
-    public void setActionId(final int actionId) {
+    public void setActionId(int actionID) {
         if (packet != null) {
-            writeInt(0, actionId);
+            writeInt(0, actionID);
         } else {
-            this.action = actionId;
+            this.actionID = actionID;
         }
     }
 
+    @Deprecated
     public int getActionParam() {
+        return getActionData();
+    }
+
+    @Deprecated
+    public void setActionParam(int actionParam) {
+        setActionData(actionParam);
+    }
+
+    public int getActionData() {
         if (packet != null) {
             return readInt(1);
         } else {
-            return this.actionParam;
+            return this.actionData;
         }
     }
 
-    public void setActionParam(final int actionParam) {
+    public void setActionData(int actionData) {
         if (packet != null) {
-            writeInt(1, actionParam);
+            writeInt(1, actionData);
         } else {
-            this.actionParam = actionParam;
+            this.actionData = actionData;
         }
     }
 
@@ -126,26 +123,23 @@ public class WrappedPacketOutBlockAction extends WrappedPacket implements Sendab
         if (packet != null) {
             return NMSUtils.getMaterialFromNMSBlock(readObject(0, NMSUtils.blockClass));
         } else {
-            return this.material;
+            return this.blockType;
         }
     }
 
-    public void setBlockType(final Material material) {
+    public void setBlockType(Material blockType) {
         if (packet != null) {
-            final Object nmsBlock = NMSUtils.getNMSBlockFromMaterial(material);
+            final Object nmsBlock = NMSUtils.getNMSBlockFromMaterial(blockType);
             write(NMSUtils.blockClass, 0, nmsBlock);
         } else {
-            this.material = material;
+            this.blockType = blockType;
         }
     }
 
     @Override
     public Object asNMSPacket() throws Exception {
-        final Object nmsBlockPos = NMSUtils.generateNMSBlockPos(blockPos);
-        final Object nmsBlock = NMSUtils.getNMSBlockFromMaterial(material);
-
-        return packetConstructor.newInstance(
-                nmsBlockPos, nmsBlock, action, actionParam
-        );
+        Object nmsBlockPos = NMSUtils.generateNMSBlockPos(getBlockPosition());
+        Object nmsBlock = NMSUtils.getNMSBlockFromMaterial(getBlockType());
+        return packetConstructor.newInstance(nmsBlockPos, nmsBlock, getActionId(), getActionData());
     }
 }
