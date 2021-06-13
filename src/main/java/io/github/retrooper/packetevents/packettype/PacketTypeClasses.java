@@ -167,13 +167,13 @@ public class PacketTypeClasses {
                 COMMON_PREFIX  = PREFIX + "PacketPlayIn";
                 FLYING = Reflection.getClassByNameWithoutException(COMMON_PREFIX + "Flying");
                 try {
-                    POSITION = Class.forName(COMMON_PREFIX + "Position");
-                    POSITION_LOOK = Class.forName(COMMON_PREFIX + "PositionLook");
-                    LOOK = Class.forName(COMMON_PREFIX + "Look");
+                    POSITION = Class.forName("PacketPlayInPosition");
+                    POSITION_LOOK = Class.forName("PacketPlayInPositionLook");
+                    LOOK = Class.forName("PacketPlayInLook");
                 } catch (ClassNotFoundException ex) {
-                    POSITION = SubclassUtil.getSubClass(FLYING, COMMON_PREFIX + "Position");
-                    POSITION_LOOK = SubclassUtil.getSubClass(FLYING, COMMON_PREFIX + "PositionLook");
-                    LOOK = SubclassUtil.getSubClass(FLYING, COMMON_PREFIX + "Look");
+                    POSITION = SubclassUtil.getSubClass(FLYING,"PacketPlayInPosition");
+                    POSITION_LOOK = SubclassUtil.getSubClass(FLYING, "PacketPlayInPositionLook");
+                    LOOK = SubclassUtil.getSubClass(FLYING, "PacketPlayInLook");
                 }
 
                 //This packet does not exist in the 1.17+ protocol
@@ -317,9 +317,9 @@ public class PacketTypeClasses {
                 MAP = Reflection.getClassByNameWithoutException(COMMON_PREFIX + "Map");
                 OPEN_WINDOW_MERCHANT = Reflection.getClassByNameWithoutException(COMMON_PREFIX + "OpenWindowMerchant");
                 ENTITY = Reflection.getClassByNameWithoutException(COMMON_PREFIX + "Entity");
-                REL_ENTITY_MOVE = SubclassUtil.getSubClass(ENTITY, COMMON_PREFIX + "RelEntityMove");
-                REL_ENTITY_MOVE_LOOK = SubclassUtil.getSubClass(ENTITY, COMMON_PREFIX + "RelEntityMoveLook");
-                ENTITY_LOOK = SubclassUtil.getSubClass(ENTITY, COMMON_PREFIX + "EntityLook");
+                REL_ENTITY_MOVE = SubclassUtil.getSubClass(ENTITY, "PacketPlayOutRelEntityMove");
+                REL_ENTITY_MOVE_LOOK = SubclassUtil.getSubClass(ENTITY, "PacketPlayOutRelEntityMoveLook");
+                ENTITY_LOOK = SubclassUtil.getSubClass(ENTITY, "PacketPlayOutEntityLook");
                 if (REL_ENTITY_MOVE == null) {
                     //is not a subclass and should be accessed normally
                     REL_ENTITY_MOVE = Reflection.getClassByNameWithoutException(COMMON_PREFIX + "RelEntityMove");

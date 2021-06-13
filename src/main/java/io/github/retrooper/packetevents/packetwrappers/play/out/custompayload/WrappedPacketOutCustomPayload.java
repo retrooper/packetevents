@@ -161,14 +161,18 @@ public class WrappedPacketOutCustomPayload extends WrappedPacket implements Send
     }
 
     public void retain() {
-        if (constructorMode != 0) {
-            PacketEvents.get().getByteBufUtil().retain(getBuffer());
+        if (packet != null) {
+            if (constructorMode != 0) {
+                PacketEvents.get().getByteBufUtil().retain(getBuffer());
+            }
         }
     }
 
     public void release() {
-        if (constructorMode != 0) {
-            PacketEvents.get().getByteBufUtil().release(getBuffer());
+        if (packet != null) {
+            if (constructorMode != 0) {
+                PacketEvents.get().getByteBufUtil().release(getBuffer());
+            }
         }
     }
 
