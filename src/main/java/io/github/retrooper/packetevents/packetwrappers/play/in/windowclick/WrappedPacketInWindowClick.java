@@ -24,14 +24,16 @@ import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
 import io.github.retrooper.packetevents.utils.enums.EnumUtil;
 import io.github.retrooper.packetevents.utils.nms.NMSUtils;
 import io.github.retrooper.packetevents.utils.reflection.Reflection;
+import io.github.retrooper.packetevents.utils.server.ServerVersion;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.Optional;
 
 public class WrappedPacketInWindowClick extends WrappedPacket {
-    private static final HashMap<Integer, ArrayList<WindowClickType>> WINDOW_CLICK_TYPE_CACHE = new HashMap<>();
+    private static boolean v_1_17;
     private static Class<? extends Enum<?>> invClickTypeClass;
     private static boolean isClickModePrimitive;
 
@@ -40,58 +42,14 @@ public class WrappedPacketInWindowClick extends WrappedPacket {
         super(packet);
     }
 
-    private static ArrayList<WindowClickType> getArrayListOfWindowClickTypes(WindowClickType... types) {
-        ArrayList<WindowClickType> arrayList = new ArrayList<>(types.length);
-        arrayList.addAll(Arrays.asList(types));
-        return arrayList;
-    }
-
     @Override
     protected void load() {
-        Class<?> packetClass = PacketTypeClasses.Play.Client.WINDOW_CLICK;
+        v_1_17 = version.isNewerThanOrEquals(ServerVersion.v_1_17);
         invClickTypeClass = NMSUtils.getNMSEnumClassWithoutException("InventoryClickType");
-
-        //MODE 0
-        WINDOW_CLICK_TYPE_CACHE.put(0, getArrayListOfWindowClickTypes(WindowClickType.LEFT_MOUSE_CLICK,
-                WindowClickType.RIGHT_MOUSE_CLICK));
-
-        //MODE 1
-        WINDOW_CLICK_TYPE_CACHE.put(1, getArrayListOfWindowClickTypes(WindowClickType.SHIFT_LEFT_MOUSE_CLICK,
-                WindowClickType.SHIFT_RIGHT_MOUSE_CLICK));
-
-        //MODE 2
-        WINDOW_CLICK_TYPE_CACHE.put(2, getArrayListOfWindowClickTypes(
-                WindowClickType.KEY_NUMBER1,
-                WindowClickType.KEY_NUMBER2,
-                WindowClickType.KEY_NUMBER3,
-                WindowClickType.KEY_NUMBER4,
-                WindowClickType.KEY_NUMBER5,
-                WindowClickType.KEY_NUMBER6,
-                WindowClickType.KEY_NUMBER7,
-                WindowClickType.KEY_NUMBER8,
-                WindowClickType.KEY_NUMBER9));
-
-        //MODE 3
-        WINDOW_CLICK_TYPE_CACHE.put(3, getArrayListOfWindowClickTypes(WindowClickType.UNKNOWN, WindowClickType.UNKNOWN, WindowClickType.CREATIVE_MIDDLE_CLICK));
-
-        //MODE 4
-        WINDOW_CLICK_TYPE_CACHE.put(4, getArrayListOfWindowClickTypes(WindowClickType.KEY_DROP,
-                WindowClickType.KEY_DROP_STACK));
-
-        //MODE 5
-        WINDOW_CLICK_TYPE_CACHE.put(5, getArrayListOfWindowClickTypes(
-                WindowClickType.STARTING_LEFT_MOUSE_DRAG,
-                WindowClickType.ADD_SLOT_LEFT_MOUSE_DRAG,
-                WindowClickType.ENDING_LEFT_MOUSE_DRAG,
-                WindowClickType.UNKNOWN,
-                WindowClickType.STARTING_RIGHT_MOUSE_DRAG,
-                WindowClickType.ADD_SLOT_RIGHT_MOUSE_DRAG,
-                WindowClickType.CREATIVE_STARTING_MIDDLE_MOUSE_DRAG,
-                WindowClickType.ADD_SLOT_MIDDLE_MOUSE_DRAG,
-                WindowClickType.ENDING_MIDDLE_MOUSE_DRAG));
-
-        WINDOW_CLICK_TYPE_CACHE.put(6, getArrayListOfWindowClickTypes(WindowClickType.DOUBLE_CLICK));
-        isClickModePrimitive = Reflection.getField(packetClass, int.class, 3) != null;
+        if (invClickTypeClass == null) {
+            invClickTypeClass = NMSUtils.getNMEnumClassWithoutException("world.inventory.InventoryClickType");
+        }
+        isClickModePrimitive = Reflection.getField(PacketTypeClasses.Play.Client.WINDOW_CLICK, int.class, 3) != null;
     }
 
     public int getWindowId() {
@@ -118,36 +76,17 @@ public class WrappedPacketInWindowClick extends WrappedPacket {
         writeInt(2, button);
     }
 
-    public short getActionNumber() {
-        return readShort(0);
+    public Optional<Short> getActionNumber() {
+        if (v_1_17) {
+            return Optional.empty();
+        }
+        return Optional.of(readShort(0));
     }
 
     public void setActionNumber(short actionNumber) {
-        writeShort(0, actionNumber);
-    }
-
-    @Deprecated
-    public WindowClickType getWindowClickType() {
-        int mode = getMode();
-        if (WINDOW_CLICK_TYPE_CACHE.get(mode) == null) {
-            return WindowClickType.UNKNOWN;
+        if (!v_1_17) {
+            writeShort(0, actionNumber);
         }
-        int windowButton = getWindowButton();
-        if (windowButton + 1 > WINDOW_CLICK_TYPE_CACHE.size()) {
-            return WindowClickType.UNKNOWN;
-        }
-
-        if (mode == 4) {
-            int windowSlot = getWindowSlot();
-            if (windowSlot == -999) {
-                if (windowButton == 0) {
-                    return WindowClickType.LEFT_CLICK_OUTSIDE_WINDOW_HOLDING_NOTHING;
-                } else if (windowButton == 1) {
-                    return WindowClickType.RIGHT_CLICK_OUTSIDE_WINDOW_HOLDING_NOTHING;
-                }
-            }
-        }
-        return WINDOW_CLICK_TYPE_CACHE.get(mode).get(windowButton);
     }
 
     public int getMode() {
@@ -174,42 +113,10 @@ public class WrappedPacketInWindowClick extends WrappedPacket {
      * @return Get Clicked ItemStack
      */
     public ItemStack getClickedItemStack() {
-        Object nmsItemStack = readObject(0, NMSUtils.nmsItemStackClass);
-        return NMSUtils.toBukkitItemStack(nmsItemStack);
+        return readItemStack(0);
     }
 
     public void setClickedItemStack(ItemStack stack) {
-        Object nmsItemStack = NMSUtils.toNMSItemStack(stack);
-        write(NMSUtils.nmsItemStackClass, 0, nmsItemStack);
-    }
-
-    @Deprecated
-    public enum WindowClickType {
-        LEFT_MOUSE_CLICK, RIGHT_MOUSE_CLICK,
-        SHIFT_LEFT_MOUSE_CLICK, SHIFT_RIGHT_MOUSE_CLICK,
-
-        CREATIVE_MIDDLE_CLICK, CREATIVE_STARTING_MIDDLE_MOUSE_DRAG,
-
-        KEY_NUMBER1, KEY_NUMBER2, KEY_NUMBER3, KEY_NUMBER4,
-        KEY_NUMBER5, KEY_NUMBER6, KEY_NUMBER7, KEY_NUMBER8,
-        KEY_NUMBER9, KEY_DROP, KEY_DROP_STACK,
-
-        LEFT_CLICK_OUTSIDE_WINDOW_HOLDING_NOTHING,
-        RIGHT_CLICK_OUTSIDE_WINDOW_HOLDING_NOTHING,
-
-        STARTING_LEFT_MOUSE_DRAG,
-        STARTING_RIGHT_MOUSE_DRAG,
-
-        ADD_SLOT_LEFT_MOUSE_DRAG,
-        ADD_SLOT_RIGHT_MOUSE_DRAG,
-        ADD_SLOT_MIDDLE_MOUSE_DRAG,
-
-        ENDING_LEFT_MOUSE_DRAG,
-        ENDING_RIGHT_MOUSE_DRAG,
-        ENDING_MIDDLE_MOUSE_DRAG,
-
-        DOUBLE_CLICK,
-
-        UNKNOWN
+       writeItemStack(0, stack);
     }
 }

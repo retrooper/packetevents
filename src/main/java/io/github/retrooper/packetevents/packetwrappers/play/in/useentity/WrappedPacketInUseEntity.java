@@ -73,8 +73,16 @@ public final class WrappedPacketInUseEntity extends WrappedPacketEntityAbstracti
         }
         Object vec3DObj;
         if (v_1_17) {
-            //TODO Add 1.17 support
-            vec3DObj = null;
+            if (obfuscatedDataObj == null) {
+                obfuscatedDataObj = readObject(0, obfuscatedDataInterface);
+            }
+            if (obfuscatedTargetAndHandContainerClass.isInstance(obfuscatedDataObj)) {
+                Object obfuscatedTargetAndHandContainerObj = obfuscatedTargetAndHandContainerClass.cast(obfuscatedDataObj);
+                WrappedPacket wrappedTargetAndHandContainer = new WrappedPacket(new NMSPacket(obfuscatedTargetAndHandContainerObj));
+                vec3DObj = wrappedTargetAndHandContainer.readObject(0, NMSUtils.vec3DClass);
+            } else {
+                return Optional.empty();
+            }
         } else {
             vec3DObj = readObject(0, NMSUtils.vec3DClass);
         }
@@ -83,8 +91,18 @@ public final class WrappedPacketInUseEntity extends WrappedPacketEntityAbstracti
     }
 
     public void setTarget(Vector3d target) {
-        //TODO add 1.17 support
-        if (v_1_7_10 && getAction() == EntityUseAction.INTERACT_AT) {
+        if (v_1_17) {
+            Object vec3DObj = NMSUtils.generateVec3D(target.x, target.y, target.z);
+            if (obfuscatedDataObj == null) {
+                obfuscatedDataObj = readObject(0, obfuscatedDataInterface);
+            }
+            if (obfuscatedTargetAndHandContainerClass.isInstance(obfuscatedDataObj)) {
+                Object obfuscatedTargetAndHandContainerObj = obfuscatedTargetAndHandContainerClass.cast(obfuscatedDataObj);
+                WrappedPacket wrappedTargetAndHandContainer = new WrappedPacket(new NMSPacket(obfuscatedTargetAndHandContainerObj));
+                wrappedTargetAndHandContainer.write(NMSUtils.vec3DClass, 0, vec3DObj);
+            }
+        }
+        else if (v_1_7_10 && getAction() == EntityUseAction.INTERACT_AT) {
             Object vec3DObj = NMSUtils.generateVec3D(target.x, target.y, target.z);
             write(NMSUtils.vec3DClass, 0, vec3DObj);
         }
@@ -115,14 +133,18 @@ public final class WrappedPacketInUseEntity extends WrappedPacketEntityAbstracti
         return action;
     }
 
-    public void setAction(EntityUseAction action) {
-        //TODO add 1.17 support
+    protected void setAction(EntityUseAction action) {
         this.action = action;
         Enum<?> enumConst = EnumUtil.valueByIndex(enumEntityUseActionClass, action.ordinal());
-        writeEnumConstant(0, enumConst);
+        if (v_1_17) {
+            //TODO Add 1.17 support
+        }
+        else {
+            writeEnumConstant(0, enumConst);
+        }
     }
 
-    public Hand getHand() {
+    public Optional<Hand> getHand() {
         if (v_1_9 && (getAction() == EntityUseAction.INTERACT || getAction() == EntityUseAction.INTERACT_AT)) {
             Enum<?> enumHandConst;
             if (v_1_17) {
@@ -132,35 +154,43 @@ public final class WrappedPacketInUseEntity extends WrappedPacketEntityAbstracti
                 if (obfuscatedHandContainerClass.isInstance(obfuscatedDataObj)) {
                     Object obfuscatedHandContainerObj = obfuscatedHandContainerClass.cast(obfuscatedDataObj);
                     WrappedPacket wrappedHandContainer = new WrappedPacket(new NMSPacket(obfuscatedHandContainerObj));
-                    System.out.println("HAND");
                     enumHandConst = wrappedHandContainer.readEnumConstant(0, NMSUtils.enumHandClass);
-                }
-                else if (obfuscatedTargetAndHandContainerClass.isInstance(obfuscatedDataObj)) {
+                } else if (obfuscatedTargetAndHandContainerClass.isInstance(obfuscatedDataObj)) {
                     Object obfuscatedTargetAndHandContainerObj = obfuscatedTargetAndHandContainerClass.cast(obfuscatedDataObj);
                     WrappedPacket wrappedTargetAndHandContainer = new WrappedPacket(new NMSPacket(obfuscatedTargetAndHandContainerObj));
-                    System.out.println("TARGET AND HAND");
                     enumHandConst = wrappedTargetAndHandContainer.readEnumConstant(0, NMSUtils.enumHandClass);
-                }
-                else {
-                    System.out.println("NONE");
-                    return Hand.MAIN_HAND;
+                } else {
+                    return Optional.empty();
                 }
             } else {
                 enumHandConst = readEnumConstant(0, NMSUtils.enumHandClass);
             }
             //Should actually never be null, but we will handle such a case
             if (enumHandConst == null) {
-                return Hand.MAIN_HAND;
+                return Optional.empty();
             }
-            return Hand.values()[enumHandConst.ordinal()];
+            return Optional.of(Hand.values()[enumHandConst.ordinal()]);
         }
-        return Hand.MAIN_HAND;
+        return Optional.empty();
     }
 
     public void setHand(Hand hand) {
-        if (v_1_9 && (getAction() == EntityUseAction.INTERACT || getAction() == EntityUseAction.INTERACT_AT)) {
-            //TODO 1.17 support
-            Enum<?> enumConst = EnumUtil.valueByIndex(NMSUtils.enumHandClass, hand.ordinal());
+        Enum<?> enumConst = EnumUtil.valueByIndex(NMSUtils.enumHandClass, hand.ordinal());
+        if (v_1_17) {
+            if (obfuscatedDataObj == null) {
+                obfuscatedDataObj = readObject(0, obfuscatedDataInterface);
+            }
+            if (obfuscatedHandContainerClass.isInstance(obfuscatedDataObj)) {
+                Object obfuscatedHandContainerObj = obfuscatedHandContainerClass.cast(obfuscatedDataObj);
+                WrappedPacket wrappedHandContainer = new WrappedPacket(new NMSPacket(obfuscatedHandContainerObj));
+                wrappedHandContainer.writeEnumConstant(0, enumConst);
+            } else if (obfuscatedTargetAndHandContainerClass.isInstance(obfuscatedDataObj)) {
+                Object obfuscatedTargetAndHandContainerObj = obfuscatedTargetAndHandContainerClass.cast(obfuscatedDataObj);
+                WrappedPacket wrappedTargetAndHandContainer = new WrappedPacket(new NMSPacket(obfuscatedTargetAndHandContainerObj));
+                wrappedTargetAndHandContainer.writeEnumConstant(0, enumConst);
+            }
+        }
+        else if (v_1_9 && (getAction() == EntityUseAction.INTERACT || getAction() == EntityUseAction.INTERACT_AT)) {
             writeEnumConstant(0, enumConst);
         }
     }
