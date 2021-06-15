@@ -18,16 +18,20 @@
 
 package io.github.retrooper.packetevents.packetwrappers.play.out.entityheadrotation;
 
+import io.github.retrooper.packetevents.PacketEvents;
 import io.github.retrooper.packetevents.packettype.PacketTypeClasses;
 import io.github.retrooper.packetevents.packetwrappers.NMSPacket;
 import io.github.retrooper.packetevents.packetwrappers.api.SendableWrapper;
 import io.github.retrooper.packetevents.packetwrappers.api.helper.WrappedPacketEntityAbstraction;
+import io.github.retrooper.packetevents.utils.nms.NMSUtils;
+import io.github.retrooper.packetevents.utils.server.ServerVersion;
 import org.bukkit.entity.Entity;
 
 import java.lang.reflect.Constructor;
 
 public class WrappedPacketOutEntityHeadRotation extends WrappedPacketEntityAbstraction implements SendableWrapper {
-    private static Constructor<?> packetDefaultConstructor;
+    private static boolean v_1_17;
+    private static Constructor<?> packetConstructor;
     private byte yaw;
 
     public WrappedPacketOutEntityHeadRotation(NMSPacket packet) {
@@ -47,8 +51,14 @@ public class WrappedPacketOutEntityHeadRotation extends WrappedPacketEntityAbstr
 
     @Override
     protected void load() {
+        v_1_17 = version.isNewerThanOrEquals(ServerVersion.v_1_17);
         try {
-            packetDefaultConstructor = PacketTypeClasses.Play.Server.ENTITY_HEAD_ROTATION.getConstructor();
+            if (v_1_17) {
+                packetConstructor = PacketTypeClasses.Play.Server.ENTITY_HEAD_ROTATION.getConstructor(NMSUtils.packetDataSerializerClass);
+            }
+            else {
+                packetConstructor = PacketTypeClasses.Play.Server.ENTITY_HEAD_ROTATION.getConstructor();
+            }
         } catch (NoSuchMethodException e) {
             e.printStackTrace();
         }
@@ -72,10 +82,17 @@ public class WrappedPacketOutEntityHeadRotation extends WrappedPacketEntityAbstr
 
     @Override
     public Object asNMSPacket() throws Exception {
-        Object packetInstance = packetDefaultConstructor.newInstance();
+        Object packetInstance;
+        if (v_1_17) {
+            Object packetDataSerializer = NMSUtils.generatePacketDataSerializer(PacketEvents.get().getByteBufUtil().newByteBuf(new byte[] {0, 0}));
+            packetInstance = packetConstructor.newInstance(packetDataSerializer);
+        }
+        else {
+            packetInstance = packetConstructor.newInstance();
+        }
         WrappedPacketOutEntityHeadRotation wrappedPacketOutEntityHeadRotation = new WrappedPacketOutEntityHeadRotation(new NMSPacket(packetInstance));
-        wrappedPacketOutEntityHeadRotation.setYaw(getYaw());
         wrappedPacketOutEntityHeadRotation.setEntityId(getEntityId());
+        wrappedPacketOutEntityHeadRotation.setYaw(getYaw());
         return packetInstance;
     }
 }

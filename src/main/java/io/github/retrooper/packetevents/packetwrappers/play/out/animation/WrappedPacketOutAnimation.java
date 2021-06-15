@@ -18,6 +18,7 @@
 
 package io.github.retrooper.packetevents.packetwrappers.play.out.animation;
 
+import io.github.retrooper.packetevents.PacketEvents;
 import io.github.retrooper.packetevents.packettype.PacketTypeClasses;
 import io.github.retrooper.packetevents.packetwrappers.NMSPacket;
 import io.github.retrooper.packetevents.packetwrappers.api.SendableWrapper;
@@ -30,7 +31,7 @@ import java.lang.reflect.Constructor;
 
 public final class WrappedPacketOutAnimation extends WrappedPacketEntityAbstraction implements SendableWrapper {
     private static boolean v_1_17;
-    private static Constructor<?> animationConstructor;
+    private static Constructor<?> packetConstructor;
     private EntityAnimationType type;
 
     public WrappedPacketOutAnimation(final NMSPacket packet) {
@@ -55,7 +56,12 @@ public final class WrappedPacketOutAnimation extends WrappedPacketEntityAbstract
     protected void load() {
         v_1_17 = version.isNewerThanOrEquals(ServerVersion.v_1_17);
         try {
-            animationConstructor = PacketTypeClasses.Play.Server.ANIMATION.getConstructor(NMSUtils.nmsEntityClass, int.class);
+            if (v_1_17) {
+                packetConstructor = PacketTypeClasses.Play.Server.ANIMATION.getConstructor(NMSUtils.packetDataSerializerClass);
+            }
+            else {
+                packetConstructor = PacketTypeClasses.Play.Server.ANIMATION.getConstructor();
+            }
         } catch (NoSuchMethodException e) {
             e.printStackTrace();
         }
@@ -80,8 +86,19 @@ public final class WrappedPacketOutAnimation extends WrappedPacketEntityAbstract
 
     @Override
     public Object asNMSPacket() throws Exception {
-        Object nmsEntity = NMSUtils.getNMSEntity(getEntity());
-        return animationConstructor.newInstance(nmsEntity, getAnimationType().ordinal());
+        Object packetInstance;
+        if (v_1_17) {
+            Object packetDataSerializer = NMSUtils.generatePacketDataSerializer(PacketEvents.get().getByteBufUtil().newByteBuf(
+                    new byte[] {0, 0, 0, 0, 0, 0, 0, 0}));
+            packetInstance = packetConstructor.newInstance(packetDataSerializer);
+        }
+        else {
+            packetInstance = packetConstructor.newInstance();
+        }
+        WrappedPacketOutAnimation animation = new WrappedPacketOutAnimation(new NMSPacket(packetInstance));
+        animation.setEntityId(getEntityId());
+        animation.setAnimationType(getAnimationType());
+        return packetInstance;
     }
 
     public enum EntityAnimationType {

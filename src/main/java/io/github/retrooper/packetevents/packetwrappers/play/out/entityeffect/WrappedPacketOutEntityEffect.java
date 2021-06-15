@@ -18,19 +18,23 @@
 
 package io.github.retrooper.packetevents.packetwrappers.play.out.entityeffect;
 
+import io.github.retrooper.packetevents.PacketEvents;
 import io.github.retrooper.packetevents.packettype.PacketTypeClasses;
 import io.github.retrooper.packetevents.packetwrappers.NMSPacket;
 import io.github.retrooper.packetevents.packetwrappers.api.SendableWrapper;
 import io.github.retrooper.packetevents.packetwrappers.api.helper.WrappedPacketEntityAbstraction;
+import io.github.retrooper.packetevents.utils.nms.NMSUtils;
 import io.github.retrooper.packetevents.utils.server.ServerVersion;
+import org.bukkit.Effect;
 import org.bukkit.entity.Entity;
+import org.bukkit.potion.PotionEffectType;
 
 import java.lang.reflect.Constructor;
 import java.util.Optional;
 
 public class WrappedPacketOutEntityEffect extends WrappedPacketEntityAbstraction implements SendableWrapper {
-    private static boolean v_1_7_10;
-    private static Constructor<?> packetDefaultConstructor;
+    private static boolean v_1_7_10, v_1_17;
+    private static Constructor<?> packetConstructor;
     private int effectID;
     private int amplifier;
     private int duration;
@@ -38,10 +42,11 @@ public class WrappedPacketOutEntityEffect extends WrappedPacketEntityAbstraction
     private boolean byteMaskInitialized = false;
 
     public WrappedPacketOutEntityEffect(NMSPacket packet) {
-        super(packet);
+        super(packet, v_1_17 ? 3 : 0);
     }
 
     public WrappedPacketOutEntityEffect(Entity entity, int effectID, int amplifier, int duration) {
+        super(v_1_17 ? 3 : 0);
         this.entityID = entity.getEntityId();
         this.entity = entity;
         this.effectID = effectID;
@@ -51,6 +56,7 @@ public class WrappedPacketOutEntityEffect extends WrappedPacketEntityAbstraction
     }
 
     public WrappedPacketOutEntityEffect(int entityID, int effectID, int amplifier, int duration, boolean hideParticles, boolean ambient, boolean showIcon) {
+        super(v_1_17 ? 3 : 0);
         this.entityID = entityID;
         this.effectID = effectID;
         this.amplifier = amplifier;
@@ -78,11 +84,32 @@ public class WrappedPacketOutEntityEffect extends WrappedPacketEntityAbstraction
         }
     }
 
+    public WrappedPacketOutEntityEffect(Entity entity, PotionEffectType effectType, int amplifier, int duration) {
+        this(entity, effectType.getId(), amplifier, duration);
+    }
+
+    public WrappedPacketOutEntityEffect(int entityID, PotionEffectType effectType, int amplifier, int duration, boolean hideParticles, boolean ambient, boolean showIcon) {
+        this(entityID, effectType.getId(), amplifier, duration, hideParticles, ambient, showIcon);
+    }
+
+    public WrappedPacketOutEntityEffect(Entity entity, Effect effect, int amplifier, int duration) {
+        this(entity, effect.getId(), amplifier, duration);
+    }
+
+    public WrappedPacketOutEntityEffect(int entityID, Effect effect, int amplifier, int duration, boolean hideParticles, boolean ambient, boolean showIcon) {
+        this(entityID, effect.getId(), amplifier, duration, hideParticles, ambient, showIcon);
+    }
+
     @Override
     protected void load() {
         v_1_7_10 = version.isOlderThan(ServerVersion.v_1_8);
+        v_1_17 = version.isNewerThanOrEquals(ServerVersion.v_1_17);
         try {
-            packetDefaultConstructor = PacketTypeClasses.Play.Server.ENTITY_EFFECT.getConstructor();
+            if (v_1_17) {
+                packetConstructor = PacketTypeClasses.Play.Server.ENTITY_EFFECT.getConstructor(NMSUtils.packetDataSerializerClass);
+            } else {
+                packetConstructor = PacketTypeClasses.Play.Server.ENTITY_EFFECT.getConstructor();
+            }
         } catch (NoSuchMethodException e) {
             e.printStackTrace();
         }
@@ -125,7 +152,7 @@ public class WrappedPacketOutEntityEffect extends WrappedPacketEntityAbstraction
             if (v_1_7_10) {
                 return readShort(1);
             } else {
-                return readInt(1);
+                return readInt(v_1_17 ? 4 : 1);
             }
         } else {
             return duration;
@@ -143,7 +170,7 @@ public class WrappedPacketOutEntityEffect extends WrappedPacketEntityAbstraction
                 }
                 writeShort(0, (short) duration);
             } else {
-                writeInt(1, duration);
+                writeInt(v_1_17 ? 4 : 1, duration);
             }
         } else {
             this.duration = duration;
@@ -264,15 +291,23 @@ public class WrappedPacketOutEntityEffect extends WrappedPacketEntityAbstraction
 
     @Override
     public Object asNMSPacket() throws Exception {
-        Object packetPlayOutEntityEffectInstance = packetDefaultConstructor.newInstance();
+        Object packetInstance;
+        if (v_1_17) {
+            //Lazy, but smart way :)
+            Object packetDataSerializer = NMSUtils.generatePacketDataSerializer(PacketEvents.get().getByteBufUtil().newByteBuf(new byte[]{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}));
+            packetInstance = packetConstructor.newInstance(packetDataSerializer);
+        } else {
+            packetInstance = packetConstructor.newInstance();
+
+        }
         WrappedPacketOutEntityEffect wrappedPacketOutEntityEffect =
-                new WrappedPacketOutEntityEffect(new NMSPacket(packetPlayOutEntityEffectInstance));
+                new WrappedPacketOutEntityEffect(new NMSPacket(packetInstance));
         wrappedPacketOutEntityEffect.setEntityId(getEntityId());
         wrappedPacketOutEntityEffect.setEffectId(getEffectId());
         wrappedPacketOutEntityEffect.setAmplifier(getAmplifier());
         wrappedPacketOutEntityEffect.setDuration(getDuration());
         Optional<Byte> optionalByteMask = getByteMask();
         optionalByteMask.ifPresent(wrappedPacketOutEntityEffect::setByteMask);
-        return packetPlayOutEntityEffectInstance;
+        return packetInstance;
     }
 }

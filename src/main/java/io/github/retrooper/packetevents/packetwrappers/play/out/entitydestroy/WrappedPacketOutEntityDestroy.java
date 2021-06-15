@@ -22,89 +22,143 @@ import io.github.retrooper.packetevents.packettype.PacketTypeClasses;
 import io.github.retrooper.packetevents.packetwrappers.NMSPacket;
 import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
 import io.github.retrooper.packetevents.packetwrappers.api.SendableWrapper;
+import io.github.retrooper.packetevents.packetwrappers.api.helper.WrappedPacketEntityAbstraction;
 import io.github.retrooper.packetevents.utils.nms.NMSUtils;
+import io.github.retrooper.packetevents.utils.server.ServerVersion;
 import org.bukkit.World;
 import org.bukkit.entity.Entity;
 import org.jetbrains.annotations.Nullable;
 
 import java.lang.reflect.Constructor;
+import java.util.Optional;
 
 /**
  * @author yanjulang
  * @since 1.8
  */
-public class WrappedPacketOutEntityDestroy extends WrappedPacket implements SendableWrapper {
-
+public class WrappedPacketOutEntityDestroy extends WrappedPacketEntityAbstraction implements SendableWrapper {
+    private static boolean v_1_17;
     private static Constructor<?> packetConstructor;
     private int[] entityIds;
-    private Entity[] entities;
 
     public WrappedPacketOutEntityDestroy(NMSPacket packet) {
         super(packet);
     }
 
+    @Deprecated
     public WrappedPacketOutEntityDestroy(int... entityIds) {
         this.entityIds = entityIds;
     }
 
-    public WrappedPacketOutEntityDestroy(Entity... entities) {
-        setEntities(entities);
+    public WrappedPacketOutEntityDestroy(int entityID) {
+        setEntityId(entityID);
+    }
+
+    public WrappedPacketOutEntityDestroy(Entity entity) {
+        setEntity(entity);
     }
 
     @Override
     protected void load() {
+        v_1_17 = version.isNewerThanOrEquals(ServerVersion.v_1_17);
         try {
-            packetConstructor =
-                    PacketTypeClasses.Play.Server.ENTITY_DESTROY.getConstructor(int[].class);
+            if (v_1_17) {
+                packetConstructor =
+                        PacketTypeClasses.Play.Server.ENTITY_DESTROY.getConstructor(int.class);
+            }
+            else {
+                packetConstructor =
+                        PacketTypeClasses.Play.Server.ENTITY_DESTROY.getConstructor(int[].class);
+            }
         } catch (NoSuchMethodException e) {
             e.printStackTrace();
         }
     }
 
-    public int[] getEntityIds() {
-        if (packet != null && entityIds == null) {
-            return entityIds = readIntArray(0);
+    @Override
+    public int getEntityId() {
+        if (entityID != -1 || packet == null) {
+            if (v_1_17) {
+                return entityID;
+            }
+            else {
+                return entityIds[0];
+            }
+        }
+        if (v_1_17) {
+            entityID = readInt(0);
+        }
+        else {
+            entityID = readIntArray(0)[0];
+        }
+        return entityID;
+    }
+
+    @Override
+    public void setEntityId(int entityID) {
+        if (packet != null) {
+            if (v_1_17) {
+                writeInt(0, this.entityID = entityID);
+            }
+            else {
+                this.entityIds = new int[] {entityID};
+                writeIntArray(0, new int[]{this.entityIds[0]});
+            }
         } else {
-            return entityIds;
+            if (v_1_17) {
+                this.entityID = entityID;
+            }
+            else {
+                this.entityIds = new int[] {entityID};
+            }
+        }
+        this.entity = null;
+    }
+
+    public Optional<int[]> getEntityIds() {
+        if (packet != null) {
+            if (v_1_17) {
+                return Optional.of(new int[] {getEntityId()});
+            }
+            else {
+                return Optional.of(readIntArray(0));
+            }
+        } else {
+            if (v_1_17) {
+                return Optional.of(new int[] {entityID});
+            }
+            else {
+                return Optional.of(entityIds);
+            }
         }
     }
 
     public void setEntityIds(int... entityIds) {
-        this.entityIds = entityIds;
         if (packet != null) {
-            writeIntArray(0, entityIds);
-        }
-    }
-
-    public Entity[] getEntities(@Nullable World world) {
-        if (packet != null && entities == null) {
-            int[] entityIDs = getEntityIds();
-            entities = new Entity[entityIDs.length];
-            for (int i = 0; i < entityIDs.length; i++) {
-                entities[i] = NMSUtils.getEntityById(world, entityIDs[i]);
+            if (v_1_17) {
+                setEntityId(entityIds[0]);
+            }
+            else {
+                writeIntArray(0, entityIds);
             }
         }
-        return entities;
-    }
-
-    public Entity[] getEntities() {
-        return getEntities(null);
-    }
-
-    public void setEntities(Entity... entities) {
-        this.entityIds = new int[entities.length];
-        this.entities = entities;
-        for (int i = 0; i < entities.length; i++) {
-            Entity entity = entities[i];
-            entityIds[i] = entity.getEntityId();
-        }
-        if (packet != null) {
-            writeIntArray(0, entityIds);
+        else {
+            if (v_1_17) {
+                this.entityID = entityIds[0];
+            }
+            else {
+                this.entityIds = entityIds;
+            }
         }
     }
+
 
     @Override
     public Object asNMSPacket() throws Exception {
-        return packetConstructor.newInstance(entityIds);
+        if (v_1_17) {
+            return packetConstructor.newInstance(getEntityId());
+        } else {
+            return packetConstructor.newInstance(getEntityIds().get());
+        }
     }
 }

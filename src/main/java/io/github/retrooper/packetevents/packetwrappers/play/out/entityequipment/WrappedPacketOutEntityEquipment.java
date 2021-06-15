@@ -18,6 +18,7 @@
 
 package io.github.retrooper.packetevents.packetwrappers.play.out.entityequipment;
 
+import io.github.retrooper.packetevents.PacketEvents;
 import io.github.retrooper.packetevents.packettype.PacketTypeClasses;
 import io.github.retrooper.packetevents.packetwrappers.NMSPacket;
 import io.github.retrooper.packetevents.packetwrappers.api.SendableWrapper;
@@ -36,8 +37,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class WrappedPacketOutEntityEquipment extends WrappedPacketEntityAbstraction implements SendableWrapper {
+    private static boolean v_1_17;
     private static Class<? extends Enum<?>> enumItemSlotClass;
-    private static Constructor<?> packetDefaultConstructor;
+    private static Constructor<?> packetConstructor;
     private List<Pair<EquipmentSlot, ItemStack>> equipment;
     private EquipmentSlot legacySlot;
     private ItemStack legacyItemStack;
@@ -82,23 +84,19 @@ public class WrappedPacketOutEntityEquipment extends WrappedPacketEntityAbstract
 
     @Override
     protected void load() {
+        v_1_17 = version.isNewerThanOrEquals(ServerVersion.v_1_17);
         try {
-            packetDefaultConstructor = PacketTypeClasses.Play.Server.ENTITY_EQUIPMENT.getConstructor();
+            if (v_1_17) {
+                packetConstructor = PacketTypeClasses.Play.Server.ENTITY_EQUIPMENT.getConstructor(NMSUtils.packetDataSerializerClass);
+            } else {
+                packetConstructor = PacketTypeClasses.Play.Server.ENTITY_EQUIPMENT.getConstructor();
+            }
         } catch (NoSuchMethodException e) {
             e.printStackTrace();
         }
         enumItemSlotClass = NMSUtils.getNMSEnumClassWithoutException("EnumItemSlot");
-        if (version.isNewerThan(ServerVersion.v_1_8_8)) {
-            for (EquipmentSlot slot : EquipmentSlot.values()) {
-                slot.id = (byte) slot.ordinal();
-            }
-        } else {
-            EquipmentSlot.MAINHAND.id = 0;
-            EquipmentSlot.OFFHAND.id = -1; //Invalid
-            EquipmentSlot.BOOTS.id = 1;
-            EquipmentSlot.LEGGINGS.id = 2;
-            EquipmentSlot.CHESTPLATE.id = 3;
-            EquipmentSlot.HELMET.id = 4;
+        if (enumItemSlotClass == null) {
+            enumItemSlotClass = NMSUtils.getNMEnumClassWithoutException("world.entity.EnumItemSlot");
         }
     }
 
@@ -210,7 +208,14 @@ public class WrappedPacketOutEntityEquipment extends WrappedPacketEntityAbstract
 
     @Override
     public Object asNMSPacket() throws Exception {
-        Object packetInstance = packetDefaultConstructor.newInstance();
+        Object packetInstance;
+        if (v_1_17) {
+            Object packetDataSerializer = NMSUtils.generatePacketDataSerializer(PacketEvents.get().getByteBufUtil().newByteBuf(new byte[] {0, 0, 0, 0}));
+            packetInstance = packetConstructor.newInstance(packetDataSerializer);
+        }
+        else {
+            packetInstance = packetConstructor.newInstance();
+        }
         WrappedPacketOutEntityEquipment wrappedPacketOutEntityEquipment = new WrappedPacketOutEntityEquipment(new NMSPacket(packetInstance));
         wrappedPacketOutEntityEquipment.setEntityId(getEntityId());
         wrappedPacketOutEntityEquipment.setEquipment(getEquipment());
@@ -225,7 +230,7 @@ public class WrappedPacketOutEntityEquipment extends WrappedPacketEntityAbstract
         CHESTPLATE,
         HELMET;
 
-        private byte id;
+        public byte id;
 
         @Nullable
         public static EquipmentSlot getById(byte id) {

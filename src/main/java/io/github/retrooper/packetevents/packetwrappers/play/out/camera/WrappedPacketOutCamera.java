@@ -69,6 +69,7 @@ public class WrappedPacketOutCamera extends WrappedPacketEntityAbstraction imple
     public Object asNMSPacket() throws Exception {
         Object packetInstance;
         if (v_1_17) {
+            //You call it lazy, I call it smart
             Object byteBuf = PacketEvents.get().getByteBufUtil().newByteBuf(new byte[]{1});
             Object packetDataSerializer = NMSUtils.generatePacketDataSerializer(byteBuf);
             packetInstance = packetConstructor.newInstance(packetDataSerializer);

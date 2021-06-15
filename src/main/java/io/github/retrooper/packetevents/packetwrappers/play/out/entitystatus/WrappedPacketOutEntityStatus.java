@@ -18,16 +18,19 @@
 
 package io.github.retrooper.packetevents.packetwrappers.play.out.entitystatus;
 
+import io.github.retrooper.packetevents.PacketEvents;
 import io.github.retrooper.packetevents.packettype.PacketTypeClasses;
 import io.github.retrooper.packetevents.packetwrappers.NMSPacket;
 import io.github.retrooper.packetevents.packetwrappers.api.SendableWrapper;
 import io.github.retrooper.packetevents.packetwrappers.api.helper.WrappedPacketEntityAbstraction;
 import io.github.retrooper.packetevents.utils.nms.NMSUtils;
+import io.github.retrooper.packetevents.utils.server.ServerVersion;
 import org.bukkit.entity.Entity;
 
 import java.lang.reflect.Constructor;
 
 public class WrappedPacketOutEntityStatus extends WrappedPacketEntityAbstraction implements SendableWrapper {
+    private static boolean v_1_17;
     private static Constructor<?> packetConstructor;
     private byte status;
 
@@ -48,9 +51,15 @@ public class WrappedPacketOutEntityStatus extends WrappedPacketEntityAbstraction
 
     @Override
     protected void load() {
+        v_1_17 = version.isNewerThanOrEquals(ServerVersion.v_1_17);
         try {
-            packetConstructor =
-                    PacketTypeClasses.Play.Server.ENTITY_STATUS.getConstructor(NMSUtils.nmsEntityClass, byte.class);
+            if (v_1_17) {
+                packetConstructor = PacketTypeClasses.Play.Server.ENTITY_STATUS.getConstructor(NMSUtils.packetDataSerializerClass);
+            }
+            else {
+                packetConstructor =
+                        PacketTypeClasses.Play.Server.ENTITY_STATUS.getConstructor();
+            }
         } catch (NoSuchMethodException e) {
             e.printStackTrace();
         }
@@ -74,7 +83,17 @@ public class WrappedPacketOutEntityStatus extends WrappedPacketEntityAbstraction
 
     @Override
     public Object asNMSPacket() throws Exception {
-        Object nmsEntity = NMSUtils.getNMSEntity(getEntity());
-        return packetConstructor.newInstance(nmsEntity, getEntityStatus());
+        Object packetInstance;
+        if (v_1_17) {
+            Object packetDataSerializer = NMSUtils.generatePacketDataSerializer(PacketEvents.get().getByteBufUtil().newByteBuf(new byte[] {0, 0, 0, 0, 0}));
+            packetInstance = packetConstructor.newInstance(packetDataSerializer);
+        }
+        else {
+            packetInstance = packetConstructor.newInstance();
+        }
+        WrappedPacketOutEntityStatus entityStatus = new WrappedPacketOutEntityStatus(new NMSPacket(packetInstance));
+        entityStatus.setEntityId(getEntityId());
+        entityStatus.setEntityStatus(getEntityStatus());
+        return packetInstance;
     }
 }

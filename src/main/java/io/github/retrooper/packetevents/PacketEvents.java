@@ -27,6 +27,7 @@ import io.github.retrooper.packetevents.injector.GlobalChannelInjector;
 import io.github.retrooper.packetevents.packettype.PacketType;
 import io.github.retrooper.packetevents.packettype.PacketTypeClasses;
 import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
+import io.github.retrooper.packetevents.packetwrappers.play.out.entityequipment.WrappedPacketOutEntityEquipment;
 import io.github.retrooper.packetevents.processor.BukkitEventProcessorInternal;
 import io.github.retrooper.packetevents.processor.PacketProcessorInternal;
 import io.github.retrooper.packetevents.settings.PacketEventsSettings;
@@ -120,6 +121,19 @@ public final class PacketEvents implements Listener, EventManager {
                 PacketType.load();
 
                 EntityFinderUtils.load();
+
+                if (version.isNewerThanOrEquals(ServerVersion.v_1_9)) {
+                    for (WrappedPacketOutEntityEquipment.EquipmentSlot slot : WrappedPacketOutEntityEquipment.EquipmentSlot.values()) {
+                        slot.id = (byte) slot.ordinal();
+                    }
+                } else {
+                    WrappedPacketOutEntityEquipment.EquipmentSlot.MAINHAND.id = 0;
+                    WrappedPacketOutEntityEquipment.EquipmentSlot.OFFHAND.id = -1; //Invalid
+                    WrappedPacketOutEntityEquipment.EquipmentSlot.BOOTS.id = 1;
+                    WrappedPacketOutEntityEquipment.EquipmentSlot.LEGGINGS.id = 2;
+                    WrappedPacketOutEntityEquipment.EquipmentSlot.CHESTPLATE.id = 3;
+                    WrappedPacketOutEntityEquipment.EquipmentSlot.HELMET.id = 4;
+                }
             } catch (Exception ex) {
                 loading = false;
                 throw new PacketEventsLoadFailureException(ex);
@@ -310,6 +324,9 @@ public final class PacketEvents implements Listener, EventManager {
     }
 
     private void handleUpdateCheck() {
+        if (updateChecker == null) {
+            updateChecker = new UpdateChecker();
+        }
         Thread thread = new Thread(() -> {
             PacketEvents.get().getPlugin().getLogger().info("[packetevents] Checking for an update, please wait...");
             UpdateChecker.UpdateCheckerStatus status = updateChecker.checkForUpdate();
