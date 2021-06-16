@@ -341,7 +341,6 @@ public class PacketType {
                 insertPacketID(PacketTypeClasses.Play.Server.BLOCK_ACTION, BLOCK_ACTION);
                 insertPacketID(PacketTypeClasses.Play.Server.BLOCK_CHANGE, BLOCK_CHANGE);
                 insertPacketID(PacketTypeClasses.Play.Server.BOSS, BOSS);
-                insertPacketID(PacketTypeClasses.Play.Server.SPAWN_ENTITY, SPAWN_ENTITY);
                 insertPacketID(PacketTypeClasses.Play.Server.SERVER_DIFFICULTY, SERVER_DIFFICULTY);
                 insertPacketID(PacketTypeClasses.Play.Server.CHAT, CHAT);
                 insertPacketID(PacketTypeClasses.Play.Server.MULTI_BLOCK_CHANGE, MULTI_BLOCK_CHANGE);
@@ -364,7 +363,6 @@ public class PacketType {
                 insertPacketID(PacketTypeClasses.Play.Server.KEEP_ALIVE, KEEP_ALIVE);
                 insertPacketID(PacketTypeClasses.Play.Server.MAP_CHUNK, MAP_CHUNK);
                 insertPacketID(PacketTypeClasses.Play.Server.WORLD_EVENT, WORLD_EVENT);
-                insertPacketID(PacketTypeClasses.Play.Server.WORLD_EVENT, SPAWN_ENTITY);
                 insertPacketID(PacketTypeClasses.Play.Server.WORLD_PARTICLES, WORLD_PARTICLES);
                 insertPacketID(PacketTypeClasses.Play.Server.LIGHT_UPDATE, LIGHT_UPDATE);
                 insertPacketID(PacketTypeClasses.Play.Server.LOGIN, LOGIN);
