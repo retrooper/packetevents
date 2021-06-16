@@ -36,8 +36,6 @@ public class WrappedPacketOutMount extends WrappedPacketEntityAbstraction implem
 
     public WrappedPacketOutMount(NMSPacket packet) {
         super(packet);
-        net.minecraft.server.v1_16_R2.PacketPlayOutMount m;
-        net.minecraft.network.protocol.game.PacketPlayOutMount m2;
     }
 
     public WrappedPacketOutMount(int entityID, int[] passengerIDs) {

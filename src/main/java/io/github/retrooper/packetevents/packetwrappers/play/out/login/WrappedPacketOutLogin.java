@@ -29,8 +29,6 @@ public class WrappedPacketOutLogin extends WrappedPacketEntityAbstraction {
 
     public WrappedPacketOutLogin(NMSPacket packet) {
         super(packet);
-        net.minecraft.server.v1_16_R2.PacketPlayOutLogin ol;
-        net.minecraft.network.protocol.game.PacketPlayOutLogin ol2;
     }
 
     @Override

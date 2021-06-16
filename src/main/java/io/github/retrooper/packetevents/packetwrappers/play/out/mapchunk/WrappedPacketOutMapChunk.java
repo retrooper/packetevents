@@ -57,7 +57,7 @@ public class WrappedPacketOutMapChunk extends WrappedPacket {
         net.minecraft.server.v1_13_R1.PacketPlayOutMapChunk a5;
         net.minecraft.server.v1_13_R2.PacketPlayOutMapChunk a6;
         net.minecraft.server.v1_16_R2.PacketPlayOutMapChunk a7;
-        net.minecraft.network.protocol.game.PacketPlayOutMapChunk a8;
+        //net.minecraft.network.protocol.game.PacketPlayOutMapChunk a8;
     }
 
 
