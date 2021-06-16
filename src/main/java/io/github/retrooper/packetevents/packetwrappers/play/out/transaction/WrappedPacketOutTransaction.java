@@ -22,6 +22,7 @@ import io.github.retrooper.packetevents.packettype.PacketTypeClasses;
 import io.github.retrooper.packetevents.packetwrappers.NMSPacket;
 import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
 import io.github.retrooper.packetevents.packetwrappers.api.SendableWrapper;
+import io.github.retrooper.packetevents.utils.server.ServerVersion;
 
 import java.lang.reflect.Constructor;
 
@@ -105,4 +106,8 @@ public class WrappedPacketOutTransaction extends WrappedPacket implements Sendab
         return packetConstructor.newInstance(getWindowId(), getActionNumber(), isAccepted());
     }
 
+    @Override
+    public boolean isSupported() {
+        return version.isOlderThan(ServerVersion.v_1_17);
+    }
 }

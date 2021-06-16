@@ -29,6 +29,7 @@ import java.lang.reflect.InvocationTargetException;
 
 //TODO finish wrapper
 public class WrappedPacketOutMapChunk extends WrappedPacket {
+    private static boolean v_1_8_x;
     private Class<?> chunkMapClass;
     private Constructor<?> chunkMapConstructor;
     private Object nmsChunkMap;
@@ -39,7 +40,8 @@ public class WrappedPacketOutMapChunk extends WrappedPacket {
 
     @Override
     protected void load() {
-        if (version.isNewerThan(ServerVersion.v_1_7_10) && version.isOlderThan(ServerVersion.v_1_9)) {
+        v_1_8_x = version.isNewerThan(ServerVersion.v_1_7_10) && version.isOlderThan(ServerVersion.v_1_9);
+        if (v_1_8_x) {
             chunkMapClass = SubclassUtil.getSubClass(PacketTypeClasses.Play.Server.MAP_CHUNK, "ChunkMap");
             try {
                 chunkMapConstructor = chunkMapClass.getConstructor();
@@ -55,6 +57,7 @@ public class WrappedPacketOutMapChunk extends WrappedPacket {
         net.minecraft.server.v1_13_R1.PacketPlayOutMapChunk a5;
         net.minecraft.server.v1_13_R2.PacketPlayOutMapChunk a6;
         net.minecraft.server.v1_16_R2.PacketPlayOutMapChunk a7;
+        net.minecraft.network.protocol.game.PacketPlayOutMapChunk a8;
     }
 
 
@@ -74,8 +77,9 @@ public class WrappedPacketOutMapChunk extends WrappedPacket {
         writeInt(1, chunkZ);
     }
 
+    //TODO Add 1.17 support
     public int getPrimaryBitMap() {
-        if (version.isNewerThan(ServerVersion.v_1_7_10) && version.isOlderThan(ServerVersion.v_1_9)) {
+        if (v_1_8_x) {
             if (nmsChunkMap == null) {
                 nmsChunkMap = readObject(0, chunkMapClass);
             }
@@ -86,6 +90,7 @@ public class WrappedPacketOutMapChunk extends WrappedPacket {
         }
     }
 
+    //TODO Add 1.17 support
     public void setPrimaryBitMap(int primaryBitMap) {
         if (version.isNewerThan(ServerVersion.v_1_7_10) && version.isOlderThan(ServerVersion.v_1_9)) {
             if (nmsChunkMap == null) {
@@ -104,16 +109,18 @@ public class WrappedPacketOutMapChunk extends WrappedPacket {
         }
     }
 
+    //TODO Add 1.17 support
     public boolean isGroundUpContinuous() {
         return readBoolean(0);
     }
 
+    //TODO Add 1.17 support
     public void setGroundUpContinuous(boolean groundUpContinuous) {
         writeBoolean(0, groundUpContinuous);
     }
 
     public byte[] getCompressedData() {
-        if (version.isNewerThan(ServerVersion.v_1_7_10) && version.isOlderThan(ServerVersion.v_1_9)) {
+        if (v_1_8_x) {
             if (nmsChunkMap == null) {
                 nmsChunkMap = readObject(0, chunkMapClass);
             }
@@ -125,7 +132,7 @@ public class WrappedPacketOutMapChunk extends WrappedPacket {
     }
 
     public void setCompressedData(byte[] data) {
-        if (version.isNewerThan(ServerVersion.v_1_7_10) && version.isOlderThan(ServerVersion.v_1_9)) {
+        if (v_1_8_x) {
             if (nmsChunkMap == null) {
                 try {
                     nmsChunkMap = chunkMapConstructor.newInstance();
@@ -140,5 +147,4 @@ public class WrappedPacketOutMapChunk extends WrappedPacket {
             writeByteArray(0, data);
         }
     }
-
 }

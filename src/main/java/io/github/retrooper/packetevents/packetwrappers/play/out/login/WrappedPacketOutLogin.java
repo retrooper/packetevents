@@ -25,13 +25,18 @@ import io.github.retrooper.packetevents.utils.server.ServerVersion;
 
 //TODO Make sendable and finish
 public class WrappedPacketOutLogin extends WrappedPacketEntityAbstraction {
+    private static boolean v_1_13_2, v_1_17;
+
     public WrappedPacketOutLogin(NMSPacket packet) {
         super(packet);
+        net.minecraft.server.v1_16_R2.PacketPlayOutLogin ol;
+        net.minecraft.network.protocol.game.PacketPlayOutLogin ol2;
     }
 
     @Override
     protected void load() {
-
+        v_1_13_2 = version.isNewerThanOrEquals(ServerVersion.v_1_13_2);
+        v_1_17 = version.isNewerThanOrEquals(ServerVersion.v_1_17);
     }
 
     public boolean isHardcore() {
@@ -70,11 +75,8 @@ public class WrappedPacketOutLogin extends WrappedPacketEntityAbstraction {
 
     public int getMaxPlayers() {
         if (packet != null) {
-            if (version.isNewerThan(ServerVersion.v_1_13_1)) {
-                return readInt(1);
-            } else {
-                return readInt(2);
-            }
+            int index = v_1_13_2 && !v_1_17 ? 1 : 2;
+            return readInt(index);
         } else {
             //TODO Finish
             return -1;
