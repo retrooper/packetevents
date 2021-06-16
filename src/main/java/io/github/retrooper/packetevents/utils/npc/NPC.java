@@ -60,6 +60,16 @@ public class NPC {
         this.pitch = 0;
     }
 
+    public NPC(String name, int entityID, UUID uuid, WrappedGameProfile gameProfile) {
+        this.name = name;
+        this.entityID = entityID;
+        this.uuid = uuid;
+        this.gameProfile = gameProfile;
+        this.position = new Vector3d(0, 0, 0);
+        this.yaw = 0;
+        this.pitch = 0;
+    }
+
     public NPC(String name, Vector3d position, float yaw, float pitch) {
         this.name = name;
         this.entityID = NMSUtils.generateEntityId();
@@ -79,21 +89,12 @@ public class NPC {
         spawnedForPlayerMap.remove(player.getUniqueId());
         if (spawned) {
             try {
-                CompletableFuture.runAsync(new Runnable() {
-                    @Override
-                    public void run() {
-                        WrappedPacketOutPlayerInfo playerInfo = new WrappedPacketOutPlayerInfo(WrappedPacketOutPlayerInfo.PlayerInfoAction.REMOVE_PLAYER, new WrappedPacketOutPlayerInfo.PlayerInfo(name, gameProfile, GameMode.SURVIVAL, 0));
-                        PacketEvents.get().getPlayerUtils().sendPacket(player, playerInfo);
-                    }
-                }).thenRunAsync(new Runnable() {
-                    @Override
-                    public void run() {
-                        WrappedPacketOutEntityDestroy wrappedPacketOutEntityDestroy = new WrappedPacketOutEntityDestroy(entityID);
-                        PacketEvents.get().getPlayerUtils().sendPacket(player, wrappedPacketOutEntityDestroy);
-                    }
-                })
-
-                        .get();
+                CompletableFuture.runAsync(() -> {
+                    WrappedPacketOutPlayerInfo playerInfo = new WrappedPacketOutPlayerInfo(WrappedPacketOutPlayerInfo.PlayerInfoAction.REMOVE_PLAYER, new WrappedPacketOutPlayerInfo.PlayerInfo(name, gameProfile, GameMode.SURVIVAL, 0));
+                    PacketEvents.get().getPlayerUtils().sendPacket(player, playerInfo);
+                    WrappedPacketOutEntityDestroy wrappedPacketOutEntityDestroy = new WrappedPacketOutEntityDestroy(entityID);
+                    PacketEvents.get().getPlayerUtils().sendPacket(player, wrappedPacketOutEntityDestroy);
+                }).get();
             } catch (InterruptedException | ExecutionException e) {
                 e.printStackTrace();
             }
@@ -104,19 +105,12 @@ public class NPC {
         try {
             boolean spawned = spawnedForPlayerMap.getOrDefault(player.getUniqueId(), false);
             if (!spawned) {
-                CompletableFuture.runAsync(new Runnable() {
-                    @Override
-                    public void run() {
-                        WrappedPacketOutPlayerInfo playerInfo = new WrappedPacketOutPlayerInfo(WrappedPacketOutPlayerInfo.PlayerInfoAction.ADD_PLAYER, new WrappedPacketOutPlayerInfo.PlayerInfo(name, gameProfile, GameMode.SURVIVAL, 0));
-                        PacketEvents.get().getPlayerUtils().sendPacket(player, playerInfo);
-                    }
-                }).thenRunAsync(new Runnable() {
-                    @Override
-                    public void run() {
-                        WrappedPacketOutNamedEntitySpawn wrappedPacketOutNamedEntitySpawn = new WrappedPacketOutNamedEntitySpawn(entityID, uuid, position, yaw, pitch);
-                        PacketEvents.get().getPlayerUtils().sendPacket(player, wrappedPacketOutNamedEntitySpawn);
-                        spawnedForPlayerMap.put(player.getUniqueId(), true);
-                    }
+                CompletableFuture.runAsync(() -> {
+                    WrappedPacketOutPlayerInfo playerInfo = new WrappedPacketOutPlayerInfo(WrappedPacketOutPlayerInfo.PlayerInfoAction.ADD_PLAYER, new WrappedPacketOutPlayerInfo.PlayerInfo(name, gameProfile, GameMode.SURVIVAL, 0));
+                    PacketEvents.get().getPlayerUtils().sendPacket(player, playerInfo);
+                    WrappedPacketOutNamedEntitySpawn wrappedPacketOutNamedEntitySpawn = new WrappedPacketOutNamedEntitySpawn(entityID, uuid, position, yaw, pitch);
+                    PacketEvents.get().getPlayerUtils().sendPacket(player, wrappedPacketOutNamedEntitySpawn);
+                    spawnedForPlayerMap.put(player.getUniqueId(), true);
                 }).get();
             }
         } catch (InterruptedException | ExecutionException e) {
@@ -160,99 +154,119 @@ public class NPC {
         return yaw;
     }
 
-    public void moveDelta(List<Player> players, Vector3d deltaPosition) {
-        SendableWrapper sentPacket = getAppropriatePacket(getPosition().add(deltaPosition));
-        this.position = this.position.add(deltaPosition);
-        for (Player player : players) {
-            boolean spawned = spawnedForPlayerMap.getOrDefault(player.getUniqueId(), false);
-            if (spawned) {
-                if (sentPacket != null) {
-                    PacketEvents.get().getPlayerUtils().sendPacket(player, sentPacket);
-                }
-            }
+    public void move(Player player, Vector3d targetPosition) {
+        this.position = targetPosition;
+        WrappedPacketOutEntityTeleport teleportPacket = new WrappedPacketOutEntityTeleport(entityID, position, yaw, pitch, onGround);
+        boolean spawned = spawnedForPlayerMap.getOrDefault(player.getUniqueId(), false);
+        if (spawned) {
+            PacketEvents.get().getPlayerUtils().sendPacket(player, teleportPacket);
+        }
+    }
+
+    public void moveAndRotate(Player player, Vector3d targetPosition, float yaw, float pitch) {
+        this.position = targetPosition;
+        this.yaw = yaw;
+        this.pitch = pitch;
+        WrappedPacketOutEntityTeleport teleportPacket = new WrappedPacketOutEntityTeleport(entityID, position, yaw, pitch, onGround);
+        boolean spawned = spawnedForPlayerMap.getOrDefault(player.getUniqueId(), false);
+        if (spawned) {
+            PacketEvents.get().getPlayerUtils().sendPacket(player, teleportPacket);
+        }
+    }
+
+    public void rotate(Player player, float yaw, float pitch) {
+        this.yaw = yaw;
+        this.pitch = pitch;
+        WrappedPacketOutEntity.WrappedPacketOutEntityLook lookPacket = new WrappedPacketOutEntity.WrappedPacketOutEntityLook(entityID, (byte) (yaw * 256 / 360), (byte) (pitch * 256 / 360), onGround);
+        WrappedPacketOutEntityHeadRotation headRotationPacket = new WrappedPacketOutEntityHeadRotation(entityID, (byte) (yaw * 256 / 360));
+        boolean spawned = spawnedForPlayerMap.getOrDefault(player.getUniqueId(), false);
+        if (spawned) {
+            PacketEvents.get().getPlayerUtils().sendPacket(player, lookPacket);
+            PacketEvents.get().getPlayerUtils().sendPacket(player, headRotationPacket);
         }
     }
 
     public void move(List<Player> players, Vector3d targetPosition) {
-        SendableWrapper sentPacket = getAppropriatePacket(targetPosition);
+        double distX = targetPosition.x - position.x;
+        double distY = targetPosition.y - position.y;
+        double distZ = targetPosition.z - position.z;
+        double dist = distX + distY + distZ;
         this.position = targetPosition;
-        for (Player player : players) {
-            boolean spawned = spawnedForPlayerMap.getOrDefault(player.getUniqueId(), false);
-            if (spawned) {
-                if (sentPacket != null) {
-                    PacketEvents.get().getPlayerUtils().sendPacket(player, sentPacket);
-                }
-            }
+        SendableWrapper sentPacket;
+        if (dist > 8) {
+            sentPacket = new WrappedPacketOutEntityTeleport(entityID, position, yaw, pitch, onGround);
         }
-    }
-
-    public void moveDeltaAndRotate(List<Player> players, Vector3d deltaPosition, byte yaw, byte pitch) {
-        SendableWrapper[] sentPackets = getAppropriatePacket(getPosition().add(deltaPosition), yaw, pitch);
-        this.position = this.position.add(deltaPosition);
-        this.yaw = yaw;
-        this.pitch = pitch;
+        else {
+            sentPacket = new WrappedPacketOutEntity.WrappedPacketOutRelEntityMove(entityID, distX, distY, distZ, onGround);
+        }
         for (Player player : players) {
             boolean spawned = spawnedForPlayerMap.getOrDefault(player.getUniqueId(), false);
             if (spawned) {
-                for (SendableWrapper sentPacket : sentPackets) {
-                    PacketEvents.get().getPlayerUtils().sendPacket(player, sentPacket);
-                }
+                PacketEvents.get().getPlayerUtils().sendPacket(player, sentPacket);
             }
         }
     }
 
     public void moveAndRotate(List<Player> players, Vector3d targetPosition, float yaw, float pitch) {
-        SendableWrapper[] sentPackets = getAppropriatePacket(targetPosition, yaw, pitch);
+        double distX = targetPosition.x - position.x;
+        double distY = targetPosition.y - position.y;
+        double distZ = targetPosition.z - position.z;
+        double dist = distX + distY + distZ;
         this.position = targetPosition;
         this.yaw = yaw;
         this.pitch = pitch;
+        SendableWrapper sentPacket;
+        if (dist > 8) {
+            sentPacket = new WrappedPacketOutEntityTeleport(entityID, position, yaw, pitch, onGround);
+        }
+        else {
+            sentPacket = new WrappedPacketOutEntity.WrappedPacketOutRelEntityMoveLook(entityID, distX, distY, distZ, (byte) yaw, (byte) pitch, onGround);
+        }
         for (Player player : players) {
             boolean spawned = spawnedForPlayerMap.getOrDefault(player.getUniqueId(), false);
             if (spawned) {
-                for (SendableWrapper sentPacket : sentPackets) {
-                    PacketEvents.get().getPlayerUtils().sendPacket(player, sentPacket);
-                }
+                PacketEvents.get().getPlayerUtils().sendPacket(player, sentPacket);
             }
         }
     }
 
     public void rotate(List<Player> players, float yaw, float pitch) {
-        SendableWrapper[] sentPackets = getAppropriatePacket(yaw, pitch);
         this.yaw = yaw;
         this.pitch = pitch;
+        WrappedPacketOutEntity.WrappedPacketOutEntityLook lookPacket = new WrappedPacketOutEntity.WrappedPacketOutEntityLook(entityID, (byte) (yaw * 256 / 360), (byte) (pitch * 256 / 360), onGround);
+        WrappedPacketOutEntityHeadRotation headRotationPacket = new WrappedPacketOutEntityHeadRotation(entityID, (byte) (yaw * 256 / 360));
         for (Player player : players) {
             boolean spawned = spawnedForPlayerMap.getOrDefault(player.getUniqueId(), false);
             if (spawned) {
-                for (SendableWrapper sentPacket : sentPackets) {
-                    PacketEvents.get().getPlayerUtils().sendPacket(player, sentPacket);
-                }
+                PacketEvents.get().getPlayerUtils().sendPacket(player, lookPacket);
+                PacketEvents.get().getPlayerUtils().sendPacket(player, headRotationPacket);
             }
         }
     }
 
-    private SendableWrapper getAppropriatePacket(Vector3d targetPos) {
-        double dist = getPosition().distance(targetPos);
-        if (dist == 0.0) {
-            return null;
+    @Deprecated
+    public void moveDelta(List<Player> players, Vector3d deltaPosition) {
+        this.position = this.position.add(deltaPosition);
+        WrappedPacketOutEntityTeleport teleportPacket = new WrappedPacketOutEntityTeleport(entityID, position, yaw, pitch, onGround);
+        for (Player player : players) {
+            boolean spawned = spawnedForPlayerMap.getOrDefault(player.getUniqueId(), false);
+            if (spawned) {
+                PacketEvents.get().getPlayerUtils().sendPacket(player, teleportPacket);
+            }
         }
-        return new WrappedPacketOutEntityTeleport(entityID, targetPos, yaw, pitch, onGround);
     }
 
-    private SendableWrapper[] getAppropriatePacket(Vector3d targetPos, float yaw, float pitch) {
-        double dist = getPosition().distance(targetPos);
-        if (dist == 0.0 && this.yaw == yaw && this.pitch == pitch) {
-            return new SendableWrapper[]{};
+    @Deprecated
+    public void moveDeltaAndRotate(List<Player> players, Vector3d deltaPosition, byte yaw, byte pitch) {
+        this.position = this.position.add(deltaPosition);
+        this.yaw = yaw;
+        this.pitch = pitch;
+        WrappedPacketOutEntityTeleport teleportPacket = new WrappedPacketOutEntityTeleport(entityID, position, yaw, pitch, onGround);
+        for (Player player : players) {
+            boolean spawned = spawnedForPlayerMap.getOrDefault(player.getUniqueId(), false);
+            if (spawned) {
+                PacketEvents.get().getPlayerUtils().sendPacket(player, teleportPacket);
+            }
         }
-        return new SendableWrapper[]{new WrappedPacketOutEntityTeleport(entityID, targetPos, yaw, pitch, onGround)};
-    }
-
-    private SendableWrapper[] getAppropriatePacket(float yaw, float pitch) {
-        if (this.yaw == yaw && this.pitch == pitch) {
-            return new SendableWrapper[]{};
-        }
-        return new SendableWrapper[]{
-                new WrappedPacketOutEntity.WrappedPacketOutEntityLook(entityID, (byte) (yaw * 256 / 360), (byte) (pitch * 256 / 360), onGround)
-                , new WrappedPacketOutEntityHeadRotation(entityID, (byte) (yaw * 256 / 360))
-        };
     }
 }
