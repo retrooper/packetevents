@@ -42,10 +42,8 @@ public final class WrappedPacketOutKickDisconnect extends WrappedPacket implemen
 
     @Override
     protected void load() {
-        Class<?> packetClass = PacketTypeClasses.Play.Server.KICK_DISCONNECT;
-
         try {
-            kickDisconnectConstructor = packetClass.getConstructor(NMSUtils.iChatBaseComponentClass);
+            kickDisconnectConstructor = PacketTypeClasses.Play.Server.KICK_DISCONNECT.getConstructor(NMSUtils.iChatBaseComponentClass);
         } catch (NoSuchMethodException e) {
             e.printStackTrace();
         }

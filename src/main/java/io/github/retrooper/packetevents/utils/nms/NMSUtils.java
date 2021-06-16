@@ -24,6 +24,8 @@ import io.github.retrooper.packetevents.utils.entityfinder.EntityFinderUtils;
 import io.github.retrooper.packetevents.utils.reflection.Reflection;
 import io.github.retrooper.packetevents.utils.reflection.SubclassUtil;
 import io.github.retrooper.packetevents.utils.server.ServerVersion;
+import io.github.retrooper.packetevents.utils.vector.Vector3d;
+import io.github.retrooper.packetevents.utils.vector.Vector3f;
 import io.github.retrooper.packetevents.utils.vector.Vector3i;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -637,6 +639,14 @@ public final class NMSUtils {
             e.printStackTrace();
         }
         return null;
+    }
+
+    public static Object generateVec3D(Vector3f vector) {
+        return generateVec3D(vector.x, vector.y, vector.z);
+    }
+
+    public static Object generateVec3D(Vector3d vector) {
+        return generateVec3D(vector.x, vector.y, vector.z);
     }
 
     public static Object generateVec3D(double x, double y, double z) {

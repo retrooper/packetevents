@@ -23,6 +23,7 @@ import io.github.retrooper.packetevents.utils.server.ServerVersion;
 import org.bukkit.plugin.java.JavaPlugin;
 
 public class PacketEventsPlugin extends JavaPlugin {
+    //TODO Work on WrappedPacketEntityAbstraction#getEntity support, the cache never works and getEntities async call causes an exception
     @Override
     public void onLoad() {
         //Return value of create is your PacketEvents instance.

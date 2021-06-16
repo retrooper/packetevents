@@ -18,6 +18,7 @@
 
 package io.github.retrooper.packetevents.packetwrappers.play.out.explosion;
 
+import io.github.retrooper.packetevents.packettype.PacketTypeClasses;
 import io.github.retrooper.packetevents.packetwrappers.NMSPacket;
 import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
 import io.github.retrooper.packetevents.packetwrappers.api.SendableWrapper;
@@ -33,7 +34,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class WrappedPacketOutExplosion extends WrappedPacket implements SendableWrapper {
-    private static Constructor<?> chunkPosConstructor, blockPosConstructor, packetConstructor, vec3dConstructor;
+    private static boolean v_1_8;
+    private static Constructor<?> chunkPosConstructor, packetConstructor;
 
     private double x, y, z;
     private float strength;
@@ -70,25 +72,14 @@ public class WrappedPacketOutExplosion extends WrappedPacket implements Sendable
 
     @Override
     protected void load() {
+        v_1_8 = version.isNewerThanOrEquals(ServerVersion.v_1_8);
         Class<?> chunkPosClass = NMSUtils.getNMSClassWithoutException("ChunkPosition");
-        Class<?> blockPosClass = NMSUtils.getNMSClassWithoutException("BlockPosition");
-        Class<?> packetClass = NMSUtils.getNMSClassWithoutException("PacketPlayOutExplosion");
-        Class<?> vec3DClass = NMSUtils.getNMSClassWithoutException("Vec3D");
         try {
-            packetConstructor = packetClass.getConstructor(double.class, double.class, double.class, float.class, List.class, vec3DClass);
-            vec3dConstructor = vec3DClass.getDeclaredConstructor(double.class, double.class, double.class);
+            packetConstructor = PacketTypeClasses.Play.Server.EXPLOSION.getConstructor(double.class, double.class, double.class, float.class, List.class, NMSUtils.vec3DClass);
             if (chunkPosClass != null) {
                 chunkPosConstructor = chunkPosClass.getConstructor(int.class, int.class, int.class);
             }
 
-        } catch (NoSuchMethodException e) {
-            e.printStackTrace();
-        }
-
-        try {
-            if (blockPosClass != null) {
-                blockPosConstructor = blockPosClass.getConstructor(int.class, int.class, int.class);
-            }
         } catch (NoSuchMethodException e) {
             e.printStackTrace();
         }
@@ -211,10 +202,9 @@ public class WrappedPacketOutExplosion extends WrappedPacket implements Sendable
         if (packet != null) {
             List<Object> nmsRecordsList = new ArrayList<>();
             for (Vector3i record : records) {
-                Object[] arguments = {record.x, record.y, record.z};
                 Object position = null; //construct position
                 try {
-                    position = version.isNewerThan(ServerVersion.v_1_7_10) ? blockPosConstructor.newInstance(arguments) : chunkPosConstructor.newInstance(arguments);
+                    position = v_1_8 ? NMSUtils.generateNMSBlockPos(record) : chunkPosConstructor.newInstance(record.x, record.y, record.z);
                 } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
                     e.printStackTrace();
                 }
@@ -307,14 +297,13 @@ public class WrappedPacketOutExplosion extends WrappedPacket implements Sendable
     public Object asNMSPacket() throws Exception {
         List<Object> positions = new ArrayList<>();
         for (Vector3i record : getRecords()) {
-            Object[] arguments = {record.x, record.y, record.z};
-            Object position = version.isNewerThan(ServerVersion.v_1_7_10) ? blockPosConstructor.newInstance(arguments)
-                    : chunkPosConstructor.newInstance(arguments);
+            Object position = v_1_8 ? NMSUtils.generateNMSBlockPos(record)
+                    : chunkPosConstructor.newInstance(record.x, record.y, record.z);
             positions.add(position);
         }
         Vector3f velocity = getPlayerVelocity();
         Vector3f pos = getPlayerVelocity();
-        Object vec = vec3dConstructor.newInstance(velocity.x, velocity.y, velocity.z);
+        Object vec = NMSUtils.generateVec3D(velocity);
         return packetConstructor.newInstance(pos.x, pos.y, pos.z, getStrength(), positions, vec);
     }
 }

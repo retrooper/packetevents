@@ -18,10 +18,13 @@
 
 package io.github.retrooper.packetevents.packetwrappers.play.out.entityteleport;
 
+import io.github.retrooper.packetevents.PacketEvents;
 import io.github.retrooper.packetevents.packettype.PacketTypeClasses;
 import io.github.retrooper.packetevents.packetwrappers.NMSPacket;
 import io.github.retrooper.packetevents.packetwrappers.api.SendableWrapper;
 import io.github.retrooper.packetevents.packetwrappers.api.helper.WrappedPacketEntityAbstraction;
+import io.github.retrooper.packetevents.utils.nms.NMSUtils;
+import io.github.retrooper.packetevents.utils.server.ServerVersion;
 import io.github.retrooper.packetevents.utils.vector.Vector3d;
 import org.bukkit.Location;
 import org.bukkit.entity.Entity;
@@ -30,6 +33,7 @@ import java.lang.reflect.Constructor;
 
 public class WrappedPacketOutEntityTeleport extends WrappedPacketEntityAbstraction implements SendableWrapper {
     private static final float rotationMultiplier = 256.0F / 360.0F;
+    private static boolean v_1_17;
     private static boolean legacyVersionMode;
     private static boolean ultraLegacyVersionMode;
     private static Constructor<?> constructor;
@@ -90,6 +94,7 @@ public class WrappedPacketOutEntityTeleport extends WrappedPacketEntityAbstracti
 
     @Override
     protected void load() {
+        v_1_17 = version.isNewerThanOrEquals(ServerVersion.v_1_17);
         Class<?> packetClass = PacketTypeClasses.Play.Server.ENTITY_TELEPORT;
         try {
             constructor = packetClass.getConstructor(int.class, int.class, int.class, int.class, byte.class, byte.class, boolean.class, boolean.class);
@@ -102,7 +107,11 @@ public class WrappedPacketOutEntityTeleport extends WrappedPacketEntityAbstracti
                 legacyVersionMode = true;
             } catch (NoSuchMethodException e2) {
                 try {
-                    constructor = packetClass.getConstructor();
+                    if (v_1_17) {
+                        constructor = packetClass.getConstructor(NMSUtils.packetDataSerializerClass);
+                    } else {
+                        constructor = packetClass.getConstructor();
+                    }
                     ultraLegacyVersionMode = false;
                     legacyVersionMode = false;
                 } catch (NoSuchMethodException e3) {
@@ -208,8 +217,22 @@ public class WrappedPacketOutEntityTeleport extends WrappedPacketEntityAbstracti
                     (byte) ((int) getYaw() * rotationMultiplier), (byte) (int) (getPitch() * rotationMultiplier), false);
         } else {
             //newer versions
-            Object instance = constructor.newInstance();
-
+            Object instance;
+            if (v_1_17) {
+                Object byteBuf = PacketEvents.get().getByteBufUtil().newByteBuf(new byte[]{
+                        0, 0, 0, 0,
+                        0, 0, 0, 0,
+                        0, 0, 0, 0,
+                        0, 0, 0, 0,
+                        0, 0, 0, 0,
+                        0, 0, 0, 0,
+                        0, 0, 0, 0});
+                //4 bytes per bytebuf field
+                Object packetDataSerializer = NMSUtils.generatePacketDataSerializer(byteBuf);
+                instance = constructor.newInstance(packetDataSerializer);
+            } else {
+                instance = constructor.newInstance();
+            }
             WrappedPacketOutEntityTeleport instanceWrapper = new WrappedPacketOutEntityTeleport(new NMSPacket(instance));
             instanceWrapper.setEntityId(getEntityId());
             instanceWrapper.setPosition(pos);

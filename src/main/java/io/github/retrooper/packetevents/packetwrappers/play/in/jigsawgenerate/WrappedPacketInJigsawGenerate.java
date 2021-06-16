@@ -1,4 +1,4 @@
-package io.github.retrooper.packetevents.packetwrappers.play.out.jigsawgenerate;
+package io.github.retrooper.packetevents.packetwrappers.play.in.jigsawgenerate;
 
 import io.github.retrooper.packetevents.packetwrappers.NMSPacket;
 import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
