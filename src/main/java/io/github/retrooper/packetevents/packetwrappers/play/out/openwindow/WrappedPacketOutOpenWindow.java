@@ -103,8 +103,7 @@ public class WrappedPacketOutOpenWindow extends WrappedPacket {
             if (ultraLegacyMode) {
                 return readString(0);
             }
-            Object iChatBaseComp = readObject(0, NMSUtils.iChatBaseComponentClass);
-            return NMSUtils.readIChatBaseComponent(iChatBaseComp);
+            return readIChatBaseComponent(0);
         }
         return windowTitle;
     }
@@ -114,8 +113,7 @@ public class WrappedPacketOutOpenWindow extends WrappedPacket {
             if (ultraLegacyMode) {
                 writeString(0, title);
             } else {
-                Object iChatBaseComponent = NMSUtils.generateIChatBaseComponent(title);
-                write(NMSUtils.iChatBaseComponentClass, 0, iChatBaseComponent);
+                writeIChatBaseComponent(0, title);
             }
         }
     }

@@ -33,7 +33,8 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.Optional;
 
 public class WrappedPacketOutNamedSoundEffect extends WrappedPacket implements SendableWrapper {
-    private static Constructor<?> packetDefaultConstructor, soundEffectConstructor;
+    private static boolean v_1_9, v_1_17;
+    private static Constructor<?> packetConstructor, soundEffectConstructor;
     private static Class<? extends Enum<?>> enumSoundCategoryClass;
     private static boolean soundEffectVarExists;
     private static float pitchMultiplier = 63.0F;
@@ -64,9 +65,14 @@ public class WrappedPacketOutNamedSoundEffect extends WrappedPacket implements S
 
     @Override
     protected void load() {
+        v_1_9 = version.isNewerThanOrEquals(ServerVersion.v_1_9);
+        v_1_17 = version.isNewerThanOrEquals(ServerVersion.v_1_17);
         soundEffectVarExists = NMSUtils.soundEffectClass != null;
         if (soundEffectVarExists) {
             enumSoundCategoryClass = NMSUtils.getNMSEnumClassWithoutException("SoundCategory");
+            if (enumSoundCategoryClass == null) {
+                enumSoundCategoryClass = NMSUtils.getNMEnumClassWithoutException("sounds.SoundCategory");
+            }
             try {
                 soundEffectConstructor = NMSUtils.soundEffectClass.getConstructor(NMSUtils.minecraftKeyClass);
             } catch (NoSuchMethodException e) {
@@ -75,7 +81,13 @@ public class WrappedPacketOutNamedSoundEffect extends WrappedPacket implements S
         }
         pitchMultiplier = version.isNewerThan(ServerVersion.v_1_9_4) ? 1 : version.isNewerThan(ServerVersion.v_1_8_8) ? 63.5F : 63.0F;
         try {
-            packetDefaultConstructor = PacketTypeClasses.Play.Server.NAMED_SOUND_EFFECT.getConstructor();
+            if (v_1_17) {
+                packetConstructor = PacketTypeClasses.Play.Server.NAMED_SOUND_EFFECT.getConstructor(NMSUtils.soundEffectClass,
+                        enumSoundCategoryClass, double.class, double.class, double.class, float.class, float.class);
+            }
+            else {
+                packetConstructor = PacketTypeClasses.Play.Server.NAMED_SOUND_EFFECT.getConstructor();
+            }
         } catch (NoSuchMethodException e) {
             e.printStackTrace();
         }
@@ -116,23 +128,25 @@ public class WrappedPacketOutNamedSoundEffect extends WrappedPacket implements S
     }
 
     public Optional<SoundCategory> getSoundCategory() {
-        if (version.isOlderThan(ServerVersion.v_1_9)) {
-            return Optional.empty();
-        }
-        if (packet != null) {
-            Enum<?> enumConst = readEnumConstant(0, enumSoundCategoryClass);
-            return Optional.ofNullable(SoundCategory.getByName(enumConst.name()));
-        } else {
-            return Optional.of(soundCategory);
-        }
+       if (v_1_9) {
+           if (packet != null) {
+               Enum<?> enumConst = readEnumConstant(0, enumSoundCategoryClass);
+               return Optional.ofNullable(SoundCategory.values()[enumConst.ordinal()]);
+           } else {
+               return Optional.of(soundCategory);
+           }
+       }
+       else {
+           return Optional.empty();
+       }
     }
 
     public void setSoundCategory(SoundCategory soundCategory) {
-        if (version.isOlderThan(ServerVersion.v_1_9)) {
+        if (!v_1_9) {
             return;
         }
         if (packet != null) {
-            Enum<?> enumConst = EnumUtil.valueOf(enumSoundCategoryClass, soundCategory.name());
+            Enum<?> enumConst = EnumUtil.valueByIndex(enumSoundCategoryClass, soundCategory.ordinal());
             writeEnumConstant(0, enumConst);
         } else {
             this.soundCategory = soundCategory;
@@ -163,7 +177,7 @@ public class WrappedPacketOutNamedSoundEffect extends WrappedPacket implements S
     //Might be more than 1.0 on some older versions. 1 is 100%
     public float getVolume() {
         if (packet != null) {
-            return readFloat(0);
+            return readFloat(v_1_17 ? 1 : 0);
         } else {
             return volume;
         }
@@ -171,7 +185,7 @@ public class WrappedPacketOutNamedSoundEffect extends WrappedPacket implements S
 
     public void setVolume(float volume) {
         if (packet != null) {
-            writeFloat(0, volume);
+            writeFloat(v_1_17 ? 1 : 0, volume);
         } else {
             this.volume = volume;
         }
@@ -182,7 +196,7 @@ public class WrappedPacketOutNamedSoundEffect extends WrappedPacket implements S
             if (version.isOlderThan(ServerVersion.v_1_10)) {
                 return readInt(3) / pitchMultiplier;
             } else {
-                return readFloat(1);
+                return readFloat(v_1_17 ? 2: 1);
             }
         } else {
             return pitch;
@@ -194,7 +208,7 @@ public class WrappedPacketOutNamedSoundEffect extends WrappedPacket implements S
             if (version.isOlderThan(ServerVersion.v_1_10)) {
                 writeInt(1, (int) (pitch * pitchMultiplier));
             } else {
-                writeFloat(1, pitch);
+                writeFloat(v_1_17 ? 2 : 1, pitch);
             }
         } else {
             this.pitch = pitch;
@@ -203,16 +217,25 @@ public class WrappedPacketOutNamedSoundEffect extends WrappedPacket implements S
 
     @Override
     public Object asNMSPacket() throws Exception {
-        Object packetPlayOutNamedSoundEffectInstance = packetDefaultConstructor.newInstance();
-        WrappedPacketOutNamedSoundEffect wrappedPacketOutNamedSoundEffect = new WrappedPacketOutNamedSoundEffect(new NMSPacket(packetPlayOutNamedSoundEffectInstance));
-        wrappedPacketOutNamedSoundEffect.setSoundEffectName(getSoundEffectName());
-        if (soundEffectVarExists) {
-            wrappedPacketOutNamedSoundEffect.setSoundCategory(getSoundCategory().get());
+        Object packetInstance;
+        if (v_1_17) {
+            Object nmsSoundEffect = soundEffectConstructor.newInstance(NMSUtils.generateMinecraftKey(getSoundEffectName()));
+            Object nmsSoundCategory = EnumUtil.valueByIndex(enumSoundCategoryClass, getSoundCategory().get().ordinal());
+            Vector3d effectPos = getEffectPosition();
+            packetInstance = packetConstructor.newInstance(nmsSoundEffect, nmsSoundCategory, effectPos.x, effectPos.y, effectPos.z, getVolume(), getPitch());
         }
-        wrappedPacketOutNamedSoundEffect.setEffectPosition(getEffectPosition());
-        wrappedPacketOutNamedSoundEffect.setPitch(getPitch());
-        wrappedPacketOutNamedSoundEffect.setVolume(getVolume());
-        return packetPlayOutNamedSoundEffectInstance;
+        else {
+            packetInstance = packetConstructor.newInstance();
+            WrappedPacketOutNamedSoundEffect wrappedPacketOutNamedSoundEffect = new WrappedPacketOutNamedSoundEffect(new NMSPacket(packetInstance));
+            wrappedPacketOutNamedSoundEffect.setSoundEffectName(getSoundEffectName());
+            if (soundEffectVarExists) {
+                wrappedPacketOutNamedSoundEffect.setSoundCategory(getSoundCategory().get());
+            }
+            wrappedPacketOutNamedSoundEffect.setEffectPosition(getEffectPosition());
+            wrappedPacketOutNamedSoundEffect.setPitch(getPitch());
+            wrappedPacketOutNamedSoundEffect.setVolume(getVolume());
+        }
+        return packetInstance;
     }
 
     public enum SoundCategory {
@@ -225,16 +248,6 @@ public class WrappedPacketOutNamedSoundEffect extends WrappedPacket implements S
         NEUTRAL,
         PLAYERS,
         AMBIENT,
-        VOICE;
-
-        @Nullable
-        public static SoundCategory getByName(String name) {
-            for (SoundCategory value : values()) {
-                if (value.name().equalsIgnoreCase(name)) {
-                    return value;
-                }
-            }
-            return null;
-        }
+        VOICE
     }
 }

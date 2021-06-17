@@ -18,6 +18,7 @@
 
 package io.github.retrooper.packetevents.packetwrappers.play.out.playerinfo;
 
+import io.github.retrooper.packetevents.PacketEvents;
 import io.github.retrooper.packetevents.packettype.PacketTypeClasses;
 import io.github.retrooper.packetevents.packetwrappers.NMSPacket;
 import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
@@ -37,9 +38,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class WrappedPacketOutPlayerInfo extends WrappedPacket implements SendableWrapper {
+    private static boolean v_1_7_10, v_1_17;
     private static Class<? extends Enum<?>> enumPlayerInfoActionClass;
-    private static Class<?> playerInfoDataClass;
-    private static Constructor<?> packetDefaultConstructor, playerInfoDataConstructor;
+    private static Constructor<?> packetConstructor, playerInfoDataConstructor;
     private static byte constructorMode = 0;
     private PlayerInfoAction action;
     private PlayerInfo[] playerInfoArray = new PlayerInfo[0];
@@ -55,13 +56,19 @@ public class WrappedPacketOutPlayerInfo extends WrappedPacket implements Sendabl
 
     @Override
     protected void load() {
+        v_1_7_10 = version.isOlderThan(ServerVersion.v_1_8);
+        v_1_17 = version.isNewerThanOrEquals(ServerVersion.v_1_17);
         enumPlayerInfoActionClass = SubclassUtil.getEnumSubClass(PacketTypeClasses.Play.Server.PLAYER_INFO, "EnumPlayerInfoAction");
         try {
-            packetDefaultConstructor = PacketTypeClasses.Play.Server.PLAYER_INFO.getConstructor();
+            if (v_1_17) {
+                packetConstructor = PacketTypeClasses.Play.Server.PLAYER_INFO.getConstructor(NMSUtils.packetDataSerializerClass);
+            } else {
+                packetConstructor = PacketTypeClasses.Play.Server.PLAYER_INFO.getConstructor();
+            }
         } catch (NoSuchMethodException e) {
             e.printStackTrace();
         }
-        playerInfoDataClass = SubclassUtil.getSubClass(PacketTypeClasses.Play.Server.PLAYER_INFO, "PlayerInfoData");
+        Class<?> playerInfoDataClass = SubclassUtil.getSubClass(PacketTypeClasses.Play.Server.PLAYER_INFO, "PlayerInfoData");
         if (playerInfoDataClass != null) {
             try {
                 playerInfoDataConstructor = playerInfoDataClass.getConstructor(NMSUtils.gameProfileClass, int.class, NMSUtils.enumGameModeClass, NMSUtils.iChatBaseComponentClass);
@@ -81,7 +88,7 @@ public class WrappedPacketOutPlayerInfo extends WrappedPacket implements Sendabl
     public PlayerInfoAction getAction() {
         if (packet != null) {
             int index;
-            if (version.isOlderThan(ServerVersion.v_1_8)) {
+            if (v_1_7_10) {
                 index = readInt(0);
             } else {
                 Enum<?> enumConst = readEnumConstant(0, enumPlayerInfoActionClass);
@@ -96,7 +103,7 @@ public class WrappedPacketOutPlayerInfo extends WrappedPacket implements Sendabl
     public void setAction(PlayerInfoAction action) {
         if (packet != null) {
             int index = action.ordinal();
-            if (version.isOlderThan(ServerVersion.v_1_8)) {
+            if (v_1_7_10) {
                 writeInt(0, index);
             } else {
                 Enum<?> enumConst = EnumUtil.valueByIndex(enumPlayerInfoActionClass, action.ordinal());
@@ -110,7 +117,7 @@ public class WrappedPacketOutPlayerInfo extends WrappedPacket implements Sendabl
     public PlayerInfo[] getPlayerInfo() {
         if (packet != null) {
             PlayerInfo[] playerInfoArray = new PlayerInfo[1];
-            if (version.isOlderThan(ServerVersion.v_1_8)) {
+            if (v_1_7_10) {
                 String username = readString(0);
                 Object mojangGameProfile = readObject(0, NMSUtils.gameProfileClass);
                 WrappedGameProfile gameProfile = GameProfileUtil.getWrappedGameProfile(mojangGameProfile);
@@ -118,21 +125,14 @@ public class WrappedPacketOutPlayerInfo extends WrappedPacket implements Sendabl
                 int ping = readInt(2);
                 playerInfoArray[0] = new PlayerInfo(username, gameProfile, gameMode, ping);
             } else {
-                List<Object> nmsPlayerInfoDataList = readObject(0, List.class);
+                List<Object> nmsPlayerInfoDataList = readList(0);
                 for (int i = 0; i < nmsPlayerInfoDataList.size(); i++) {
                     Object nmsPlayerInfoData = nmsPlayerInfoDataList.get(i);
                     WrappedPacket nmsPlayerInfoDataWrapper = new WrappedPacket(new NMSPacket(nmsPlayerInfoData));
-                    Object iChatBaseComponentName = nmsPlayerInfoDataWrapper.readObject(0, NMSUtils.iChatBaseComponentClass);
-                    String username;
-                    if (iChatBaseComponentName == null) {
-                        username = null;
-                    } else {
-                        username = NMSUtils.readIChatBaseComponent(iChatBaseComponentName);
-                    }
+                    String username = nmsPlayerInfoDataWrapper.readIChatBaseComponent(0);
                     Object mojangGameProfile = nmsPlayerInfoDataWrapper.readObject(0, NMSUtils.gameProfileClass);
                     WrappedGameProfile gameProfile = GameProfileUtil.getWrappedGameProfile(mojangGameProfile);
-                    Enum<?> nmsGameModeEnumConstant = nmsPlayerInfoDataWrapper.readEnumConstant(0, NMSUtils.enumGameModeClass);
-                    GameMode gameMode = GameMode.valueOf(nmsGameModeEnumConstant.name());
+                    GameMode gameMode = nmsPlayerInfoDataWrapper.readGameMode(0);
                     int ping = nmsPlayerInfoDataWrapper.readInt(0);
                     playerInfoArray[i] = new PlayerInfo(username, gameProfile, gameMode, ping);
                 }
@@ -144,11 +144,11 @@ public class WrappedPacketOutPlayerInfo extends WrappedPacket implements Sendabl
     }
 
     public void setPlayerInfo(PlayerInfo... playerInfoArray) throws UnsupportedOperationException {
-        if (version.isOlderThan(ServerVersion.v_1_8) && playerInfoArray.length > 1) {
-            throw new UnsupportedOperationException("The player info list size cannot be greater than 1 on 1.7.10 server versions!");
+        if (v_1_7_10 && playerInfoArray.length > 1) {
+            throw new UnsupportedOperationException("The player info list size cannot be greater than 1 on 1.7.10 servers!");
         }
         if (packet != null) {
-            if (version.isOlderThan(ServerVersion.v_1_8)) {
+            if (v_1_7_10) {
                 PlayerInfo playerInfo = playerInfoArray[0];
                 writeString(0, playerInfo.username);
                 Object mojangGameProfile = GameProfileUtil.getGameProfile(playerInfo.gameProfile.getId(), playerInfo.gameProfile.getName());
@@ -161,7 +161,7 @@ public class WrappedPacketOutPlayerInfo extends WrappedPacket implements Sendabl
                 for (PlayerInfo playerInfo : playerInfoArray) {
                     Object usernameIChatBaseComponent = NMSUtils.generateIChatBaseComponent(NMSUtils.fromStringToJSON(playerInfo.username));
                     Object mojangGameProfile = GameProfileUtil.getGameProfile(playerInfo.gameProfile.getId(), playerInfo.gameProfile.getName());
-                    Enum<?> nmsGameModeEnumConstant = EnumUtil.valueOf(NMSUtils.enumGameModeClass, playerInfo.gameMode.name());
+                    Enum<?> nmsGameModeEnumConstant = EnumUtil.valueByIndex(NMSUtils.enumGameModeClass, playerInfo.gameMode.ordinal());
                     int ping = playerInfo.ping;
                     try {
                         if (constructorMode == 0) {
@@ -174,7 +174,7 @@ public class WrappedPacketOutPlayerInfo extends WrappedPacket implements Sendabl
                         e.printStackTrace();
                     }
                 }
-                write(List.class, 0, nmsPlayerInfoList);
+                writeList(0, nmsPlayerInfoList);
             }
         } else {
             this.playerInfoArray = playerInfoArray;
@@ -183,19 +183,21 @@ public class WrappedPacketOutPlayerInfo extends WrappedPacket implements Sendabl
 
     @Override
     public Object asNMSPacket() throws Exception {
-        try {
-            Object packetPlayOutPlayerInfoInstance = packetDefaultConstructor.newInstance();
-            WrappedPacketOutPlayerInfo playerInfoWrapper = new WrappedPacketOutPlayerInfo(new NMSPacket(packetPlayOutPlayerInfoInstance));
-            PlayerInfo[] playerInfos = getPlayerInfo();
-            if (playerInfos.length != 0) {
-                playerInfoWrapper.setPlayerInfo(playerInfos);
-            }
-            playerInfoWrapper.setAction(getAction());
-            return packetPlayOutPlayerInfoInstance;
-        } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
-            e.printStackTrace();
+        Object packetInstance;
+        if (v_1_17) {
+            Object byteBuf = PacketEvents.get().getByteBufUtil().newByteBuf(new byte[] {0, 0, 0, 0, 0, 0, 0, 0});
+            Object packetDataSerializer = NMSUtils.generatePacketDataSerializer(byteBuf);
+            packetInstance = packetConstructor.newInstance(packetDataSerializer);
+        } else {
+            packetInstance = packetConstructor.newInstance();
         }
-        return null;
+        WrappedPacketOutPlayerInfo playerInfoWrapper = new WrappedPacketOutPlayerInfo(new NMSPacket(packetInstance));
+        PlayerInfo[] playerInfos = getPlayerInfo();
+        if (playerInfos.length != 0) {
+            playerInfoWrapper.setPlayerInfo(playerInfos);
+        }
+        playerInfoWrapper.setAction(getAction());
+        return packetInstance;
     }
 
     public enum PlayerInfoAction {

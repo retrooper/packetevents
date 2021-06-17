@@ -33,6 +33,7 @@ import java.util.Optional;
 import java.util.Set;
 
 public final class WrappedPacketOutPosition extends WrappedPacket implements SendableWrapper {
+    private static boolean v_1_8, v_1_17;
     private static Constructor<?> packetConstructor;
     private static byte constructorMode = 0;
     private static Class<? extends Enum<?>> enumPlayerTeleportFlagsClass;
@@ -85,6 +86,8 @@ public final class WrappedPacketOutPosition extends WrappedPacket implements Sen
 
     @Override
     protected void load() {
+        v_1_8 = version.isNewerThanOrEquals(ServerVersion.v_1_8);
+        v_1_17 = version.isNewerThanOrEquals(ServerVersion.v_1_17);
         enumPlayerTeleportFlagsClass = SubclassUtil.getEnumSubClass(PacketTypeClasses.Play.Server.POSITION, "EnumPlayerTeleportFlags");
         try {
             //1.7.10
@@ -96,21 +99,28 @@ public final class WrappedPacketOutPosition extends WrappedPacket implements Sen
                 packetConstructor = PacketTypeClasses.Play.Server.POSITION.getConstructor(double.class, double.class, double.class, float.class, float.class, Set.class);
             } catch (NoSuchMethodException e2) {
                 constructorMode = 2;
+                //1.9 -> 1.16.5
                 try {
                     packetConstructor = PacketTypeClasses.Play.Server.POSITION.getConstructor(double.class, double.class, double.class, float.class, float.class, Set.class, int.class);
                 } catch (NoSuchMethodException e3) {
-                    throw new IllegalStateException("Failed to locate a supported constructor of the PacketPlayOutPosition packet class.");
+                    constructorMode = 3;
+                    //1.17
+                    try {
+                        packetConstructor = PacketTypeClasses.Play.Server.POSITION.getConstructor(double.class, double.class, double.class, float.class, float.class, Set.class, int.class, boolean.class);
+                    } catch (NoSuchMethodException e4) {
+                        throw new IllegalStateException("Failed to locate a supported constructor of the PacketPlayOutPosition packet class.");
+                    }
                 }
             }
         }
     }
 
     public Optional<Boolean> isOnGround() {
-        if (version.isNewerThan(ServerVersion.v_1_7_10)) {
+        //1.7.10 and 1.17 support this field
+        if (v_1_8 && !v_1_17) {
             return Optional.empty();
         }
         if (packet != null) {
-
             return Optional.of(readBoolean(0));
         } else {
             return Optional.of(onGround);
@@ -118,11 +128,10 @@ public final class WrappedPacketOutPosition extends WrappedPacket implements Sen
     }
 
     public void setOnGround(boolean onGround) {
-        if (version.isNewerThan(ServerVersion.v_1_7_10)) {
+        if (v_1_8 && !v_1_17) {
             return;
         }
         if (packet != null) {
-
             writeBoolean(0, onGround);
         } else {
             this.onGround = onGround;
@@ -309,8 +318,11 @@ public final class WrappedPacketOutPosition extends WrappedPacket implements Sen
                 return packetConstructor.newInstance(position.x, position.y, position.z, getYaw(), getPitch(), nmsRelativeFlags);
             case 2:
                 return packetConstructor.newInstance(position.x, position.y, position.z, getYaw(), getPitch(), nmsRelativeFlags, getTeleportId());
+            case 3:
+                return packetConstructor.newInstance(position.x, position.y, position.z, getYaw(), getPitch(), nmsRelativeFlags, getTeleportId(), isOnGround().get());
+            default:
+                return null;
         }
-        return null;
     }
 
     public enum PlayerTeleportFlags {

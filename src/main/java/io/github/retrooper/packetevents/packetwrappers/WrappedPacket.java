@@ -88,7 +88,7 @@ public class WrappedPacket implements WrapperPacketReader, WrapperPacketWriter {
             try {
                 load();
             } catch (Exception ex) {
-                String wrapperName = ClassUtil.getClassSimpleName(getClass());
+                String wrapperName = ClassUtil.getClassSimpleName(clazz);
                 PacketEvents.get().getPlugin().getLogger()
                         .log(Level.SEVERE, "PacketEvents found an exception while loading the " + wrapperName + " packet wrapper. Please report this bug! Tell us about your server version, spigot and code(of you using the wrapper)", ex);
                 LOADED_WRAPPERS.put(clazz, false);
@@ -390,12 +390,16 @@ public class WrappedPacket implements WrapperPacketReader, WrapperPacketWriter {
 
     @Override
     public void writeEnumConstant(int index, Enum<?> enumConstant) {
-        write(enumConstant.getClass(), index, enumConstant);
+        try {
+            write(enumConstant.getClass(), index, enumConstant);
+        }
+        catch (WrapperFieldNotFoundException ex) {
+            write(enumConstant.getDeclaringClass(), index, enumConstant);
+        }
     }
 
     public void write(Class<?> type, int index, Object value) throws WrapperFieldNotFoundException {
         Field field = getField(type, index);
-        //Reflection.getFieldWithoutFinalModifier(field);
         if (field == null) {
             throw new WrapperFieldNotFoundException(packetClass, type, index);
         }
@@ -436,11 +440,11 @@ public class WrappedPacket implements WrapperPacketReader, WrapperPacketWriter {
 
     public GameMode readGameMode(int index) {
         Enum<?> enumConst = readEnumConstant(index, NMSUtils.enumGameModeClass);
-        return GameMode.valueOf(enumConst.name());
+        return GameMode.values()[enumConst.ordinal()];
     }
 
     public void writeGameMode(int index, GameMode gameMode) {
-        Enum<?> enumConst = EnumUtil.valueOf(NMSUtils.enumGameModeClass, gameMode.name());
+        Enum<?> enumConst = EnumUtil.valueByIndex(NMSUtils.enumGameModeClass, gameMode.ordinal());
         writeEnumConstant(index, enumConst);
     }
 
