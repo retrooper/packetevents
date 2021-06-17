@@ -34,7 +34,6 @@ final class WrappedPacketInBlockPlace_1_7_10 extends WrappedPacket {
     }
 
     public void setBlockPosition(Vector3i blockPos) {
-        Vector3i currentBlockPos = getBlockPosition();
         writeInt(0, blockPos.x);
         writeInt(1, blockPos.y);
         writeInt(2, blockPos.z);

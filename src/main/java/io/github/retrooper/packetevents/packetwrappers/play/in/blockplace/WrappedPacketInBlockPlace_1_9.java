@@ -45,31 +45,20 @@ final class WrappedPacketInBlockPlace_1_9 extends WrappedPacket {
     }
 
     public Vector3i getBlockPosition() {
-        Vector3i blockPos = new Vector3i();
-        Object blockPosObj;
         if (movingObjectPositionBlockClass == null) {
-            blockPosObj = readObject(0, NMSUtils.blockPosClass);
+            return readBlockPosition(0);
         } else {
             if (movingObjPos == null) {
                 movingObjPos = readObject(0, movingObjectPositionBlockClass);
             }
             WrappedPacket movingObjectPosWrapper = new WrappedPacket(new NMSPacket(movingObjPos));
-            blockPosObj = movingObjectPosWrapper.readBlockPosition(0);
+            return movingObjectPosWrapper.readBlockPosition(0);
         }
-        try {
-            blockPos.x = (int) NMSUtils.getBlockPosX.invoke(blockPosObj);
-            blockPos.y = (int) NMSUtils.getBlockPosY.invoke(blockPosObj);
-            blockPos.z = (int) NMSUtils.getBlockPosZ.invoke(blockPosObj);
-        } catch (IllegalAccessException | InvocationTargetException e) {
-            e.printStackTrace();
-        }
-        return blockPos;
     }
 
     public void setBlockPosition(Vector3i blockPos) {
-        Object blockPosObj = NMSUtils.generateNMSBlockPos(blockPos);
         if (movingObjectPositionBlockClass == null) {
-            write(NMSUtils.blockPosClass, 0, blockPosObj);
+            writeBlockPosition(0, blockPos);
         } else {
             if (movingObjPos == null) {
                 movingObjPos = readObject(0, movingObjectPositionBlockClass);
