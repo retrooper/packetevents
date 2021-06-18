@@ -18,6 +18,7 @@
 
 package io.github.retrooper.packetevents.utils.nms;
 
+import io.github.retrooper.packetevents.PacketEvents;
 import io.github.retrooper.packetevents.packetwrappers.NMSPacket;
 import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
 import io.github.retrooper.packetevents.utils.entityfinder.EntityFinderUtils;
@@ -40,7 +41,6 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 import java.util.UUID;
@@ -358,8 +358,8 @@ public final class NMSUtils {
         return Class.forName(NMS_DIR + name);
     }
 
-    public static Class<?> getNMClass(String name) throws ClassNotFoundException{
-            return Class.forName("net.minecraft." + name);
+    public static Class<?> getNMClass(String name) throws ClassNotFoundException {
+        return Class.forName("net.minecraft." + name);
     }
 
     public static Class<?> getNMClassWithoutException(String name) {
@@ -409,27 +409,14 @@ public final class NMSUtils {
 
     @Nullable
     public static Entity getEntityById(@Nullable World world, int id) {
-        try {
-            Entity entity = EntityFinderUtils.getEntityById(world, id);
-            if (entity == null) {
-                List<World> worlds = new ArrayList<>(Bukkit.getWorlds());
-                for (World w : worlds) {
-                    for (Entity e : w.getEntities()) {
-                        if (e.getEntityId() == id) {
-                            entity = e;
-                            break;
-                        }
-                    }
-                }
-            }
-            return entity;
-        } catch (Exception ex) {
-            return null;
+        Entity entity = PacketEvents.get().getServerUtils().getEntityById(id);
+        if (entity == null) {
+            return EntityFinderUtils.getEntityById(world, id);
         }
+        return entity;
     }
 
     public static Object getNMSEntity(final Entity entity) {
-
         final Object craftEntity = craftEntityClass.cast(entity);
         try {
             return getCraftEntityHandle.invoke(craftEntity);

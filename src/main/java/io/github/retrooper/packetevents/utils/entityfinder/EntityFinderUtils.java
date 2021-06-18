@@ -39,7 +39,6 @@ import java.lang.reflect.Method;
 public final class EntityFinderUtils {
     public static ServerVersion version;
     private static Class<?> worldServerClass;
-    private static Field entityTrackerField;
     private static Method getEntityByIdMethod;
     private static Method craftWorldGetHandle;
     private static Method getBukkitEntity;
@@ -56,9 +55,6 @@ public final class EntityFinderUtils {
 
             String getEntityByIdMethodName = (version.getProtocolVersion() == (short) 47)
                     ? "a" : "getEntity";
-            if (version.isNewerThanOrEquals(ServerVersion.v_1_17)) {
-                getEntityByIdMethodName = "b";
-            }
             getEntityByIdMethod = worldServerClass.getMethod(getEntityByIdMethodName, int.class);
         } catch (NoSuchMethodException e) {
             try {
@@ -86,7 +82,7 @@ public final class EntityFinderUtils {
                 }
             }
         }
-        return null;
+        return e;
     }
 
     /**

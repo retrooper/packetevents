@@ -20,12 +20,20 @@ package io.github.retrooper.packetevents.utils.server;
 
 import io.github.retrooper.packetevents.utils.nms.NMSUtils;
 import io.github.retrooper.packetevents.utils.npc.NPCManager;
+import org.bukkit.entity.Entity;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.spigotmc.SpigotConfig;
+
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 public final class ServerUtils {
     private static Class<?> geyserClass;
     private boolean geyserClassChecked;
     private final NPCManager npcManager = new NPCManager();
+
+    private final Map<Integer, Entity> entityIDs = new ConcurrentHashMap<>();
 
     /**
      * Get the server version.
@@ -74,6 +82,15 @@ public final class ServerUtils {
 
     public boolean isBungeeCordEnabled() {
         return SpigotConfig.bungee;
+    }
+
+    @Nullable
+    public Entity getEntityById(int entityID) {
+        return entityIDs.get(entityID);
+    }
+
+    public void cacheEntityById(int entityID, @NotNull Entity entity) {
+        entityIDs.put(entityID, entity);
     }
 
     public boolean isGeyserAvailable() {

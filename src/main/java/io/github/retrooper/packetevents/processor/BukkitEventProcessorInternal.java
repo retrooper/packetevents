@@ -23,13 +23,17 @@ import io.github.retrooper.packetevents.event.impl.PostPlayerInjectEvent;
 import io.github.retrooper.packetevents.utils.player.ClientVersion;
 import io.github.retrooper.packetevents.utils.versionlookup.VersionLookupUtils;
 import org.bukkit.Bukkit;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
+import org.bukkit.event.entity.EntityDeathEvent;
+import org.bukkit.event.entity.EntitySpawnEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerLoginEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.event.world.ChunkLoadEvent;
 
 import java.net.InetSocketAddress;
 import java.util.UUID;
@@ -47,7 +51,6 @@ public class BukkitEventProcessorInternal implements Listener {
     public void onJoin(PlayerJoinEvent e) {
         Player player = e.getPlayer();
         InetSocketAddress address = player.getAddress();
-
         boolean shouldInject = PacketEvents.get().getSettings().shouldUseCompatibilityInjector() || !(PacketEvents.get().getInjector().hasInjected(e.getPlayer()));
         //Inject now if we are using the compatibility-injector or inject if the early injector failed to inject them.
         if (shouldInject) {
@@ -88,6 +91,12 @@ public class BukkitEventProcessorInternal implements Listener {
         PacketEvents.get().getPlayerUtils().tempClientVersionMap.remove(address);
         PacketEvents.get().getPlayerUtils().keepAliveMap.remove(uuid);
         PacketEvents.get().getPlayerUtils().channels.remove(player.getName());
+    }
 
+
+    @EventHandler
+    public void onEntitySpawn(EntitySpawnEvent event) {
+        Entity entity = event.getEntity();
+        PacketEvents.get().getServerUtils().cacheEntityById(entity.getEntityId(), entity);
     }
 }

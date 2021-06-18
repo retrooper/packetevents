@@ -42,6 +42,8 @@ import io.github.retrooper.packetevents.utils.server.ServerUtils;
 import io.github.retrooper.packetevents.utils.server.ServerVersion;
 import io.github.retrooper.packetevents.utils.version.PEVersion;
 import org.bukkit.Bukkit;
+import org.bukkit.World;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
 import org.bukkit.plugin.Plugin;
@@ -193,6 +195,7 @@ public final class PacketEvents implements Listener, EventManager {
             //Wait for the injector to be ready.
             while (!injectorReady.get()) {
             }
+
             Runnable postInjectTask = () -> {
                 Bukkit.getPluginManager().registerEvents(bukkitEventProcessorInternal, plugin);
                 for (final Player p : Bukkit.getOnlinePlayers()) {
@@ -212,6 +215,7 @@ public final class PacketEvents implements Listener, EventManager {
             } else {
                 postInjectTask.run();
             }
+
 
 
             initialized = true;
