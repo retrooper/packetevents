@@ -60,7 +60,7 @@ public class WrappedPacketOutUpdateAttributes extends WrappedPacketEntityAbstrac
 
     public List<AttributeSnapshotWrapper> getProperties() {
         if (packet != null) {
-            List<?> list = readObject(0, List.class);
+            List<Object> list = readList(0);
             List<AttributeSnapshotWrapper> attributeSnapshotWrappers = new ArrayList<>(list.size());
             for (Object nmsAttributeSnapshot : list) {
                 attributeSnapshotWrappers.add(new AttributeSnapshotWrapper(new NMSPacket(nmsAttributeSnapshot)));
@@ -77,7 +77,7 @@ public class WrappedPacketOutUpdateAttributes extends WrappedPacketEntityAbstrac
             for (AttributeSnapshotWrapper attributeSnapshotWrapper : properties) {
                 list.add(attributeSnapshotWrapper.getNMSPacket().getRawNMSPacket());
             }
-            writeObject(0, list);
+            writeList(0, list);
         } else {
             this.properties = properties;
         }

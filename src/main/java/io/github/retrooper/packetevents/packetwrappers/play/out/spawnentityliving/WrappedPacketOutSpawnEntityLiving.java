@@ -18,11 +18,13 @@
 
 package io.github.retrooper.packetevents.packetwrappers.play.out.spawnentityliving;
 
+import io.github.retrooper.packetevents.PacketEvents;
 import io.github.retrooper.packetevents.packettype.PacketTypeClasses;
 import io.github.retrooper.packetevents.packetwrappers.NMSPacket;
 import io.github.retrooper.packetevents.packetwrappers.api.SendableWrapper;
 import io.github.retrooper.packetevents.packetwrappers.api.helper.WrappedPacketEntityAbstraction;
 import io.github.retrooper.packetevents.utils.math.MathUtils;
+import io.github.retrooper.packetevents.utils.nms.NMSUtils;
 import io.github.retrooper.packetevents.utils.server.ServerVersion;
 import io.github.retrooper.packetevents.utils.vector.Vector3d;
 import org.bukkit.entity.Entity;
@@ -33,9 +35,11 @@ import java.util.Optional;
 import java.util.UUID;
 
 public class WrappedPacketOutSpawnEntityLiving extends WrappedPacketEntityAbstraction implements SendableWrapper {
+    private static boolean v_1_9, v_1_17;
+    private static final byte[] byteBufAllocation = new byte[48];
     private static final float rotationFactor = 256.0F / 360.0F;
     private static final double velocityFactor = 8000.0;
-    private static Constructor<?> packetDefaultConstructor;
+    private static Constructor<?> packetConstructor;
 
     private Vector3d position, velocity;
     private EntityType entityType;
@@ -71,14 +75,21 @@ public class WrappedPacketOutSpawnEntityLiving extends WrappedPacketEntityAbstra
     @Override
     protected void load() {
         try {
-            packetDefaultConstructor = PacketTypeClasses.Play.Server.SPAWN_ENTITY_LIVING.getConstructor();
+            v_1_9 = version.isNewerThanOrEquals(ServerVersion.v_1_9);
+            v_1_17 = version.isNewerThanOrEquals(ServerVersion.v_1_17);
+            if (v_1_17) {
+                packetConstructor = PacketTypeClasses.Play.Server.SPAWN_ENTITY_LIVING.getConstructor(NMSUtils.packetDataSerializerClass);
+            }
+            else {
+                packetConstructor = PacketTypeClasses.Play.Server.SPAWN_ENTITY_LIVING.getConstructor();
+            }
         } catch (NoSuchMethodException e) {
             e.printStackTrace();
         }
     }
 
     public Optional<UUID> getUUID() {
-        if (version.isNewerThan(ServerVersion.v_1_8_8)) {
+        if (v_1_9) {
             if (packet != null) {
                 return Optional.of(readObject(0, UUID.class));
             } else {
@@ -90,7 +101,7 @@ public class WrappedPacketOutSpawnEntityLiving extends WrappedPacketEntityAbstra
     }
 
     public void setUUID(UUID uuid) {
-        if (version.isNewerThan(ServerVersion.v_1_8_8)) {
+        if (v_1_9) {
             if (packet != null) {
                 writeObject(0, uuid);
             } else {
@@ -122,7 +133,7 @@ public class WrappedPacketOutSpawnEntityLiving extends WrappedPacketEntityAbstra
             double y;
             double z;
             //On 1.8.x and 1.7.10 they are factored by 32
-            if (version.isOlderThan(ServerVersion.v_1_9)) {
+            if (!v_1_9) {
                 x = readInt(2) / 32.0;
                 y = readInt(3) / 32.0;
                 z = readInt(4) / 32.0;
@@ -140,7 +151,7 @@ public class WrappedPacketOutSpawnEntityLiving extends WrappedPacketEntityAbstra
     public void setPosition(Vector3d position) {
         if (packet != null) {
             //On 1.8.x and 1.7.10 they must be factored by 32
-            if (version.isOlderThan(ServerVersion.v_1_9)) {
+            if (!v_1_9) {
                 writeInt(2, MathUtils.floor(position.x * 32.0));
                 writeInt(3, MathUtils.floor(position.y * 32.0));
                 writeInt(4, MathUtils.floor(position.z * 32.0));
@@ -159,7 +170,7 @@ public class WrappedPacketOutSpawnEntityLiving extends WrappedPacketEntityAbstra
             int factoredVelX;
             int factoredVelY;
             int factoredVelZ;
-            if (version.isOlderThan(ServerVersion.v_1_9)) {
+            if (!v_1_9) {
                 factoredVelX = readInt(5);
                 factoredVelY = readInt(6);
                 factoredVelZ = readInt(7);
@@ -179,7 +190,7 @@ public class WrappedPacketOutSpawnEntityLiving extends WrappedPacketEntityAbstra
             int factoredVelX = (int) (velocity.x * velocityFactor);
             int factoredVelY = (int) (velocity.y * velocityFactor);
             int factoredVelZ = (int) (velocity.z * velocityFactor);
-            if (version.isOlderThan(ServerVersion.v_1_9)) {
+            if (!v_1_9) {
                 writeInt(5, factoredVelX);
                 writeInt(6, factoredVelY);
                 writeInt(7, factoredVelZ);
@@ -246,11 +257,19 @@ public class WrappedPacketOutSpawnEntityLiving extends WrappedPacketEntityAbstra
 
     @Override
     public Object asNMSPacket() throws Exception {
-        Object packetInstance = packetDefaultConstructor.newInstance();
+        Object packetInstance;
+        if (v_1_17) {
+            Object byteBuf = PacketEvents.get().getByteBufUtil().newByteBuf(byteBufAllocation);
+            Object packetDataSerializer = NMSUtils.generatePacketDataSerializer(byteBuf);
+            packetInstance = packetConstructor.newInstance(packetDataSerializer);
+        }
+        else {
+            packetInstance = packetConstructor.newInstance();
+        }
         WrappedPacketOutSpawnEntityLiving wrappedPacketOutSpawnEntityLiving = new WrappedPacketOutSpawnEntityLiving(new NMSPacket(packetInstance));
         wrappedPacketOutSpawnEntityLiving.setEntityId(getEntityId());
-        if (version.isNewerThan(ServerVersion.v_1_8_8)) {
-            wrappedPacketOutSpawnEntityLiving.setUUID(getUUID().orElse(null));
+        if (v_1_9) {
+            wrappedPacketOutSpawnEntityLiving.setUUID(getUUID().get());
         }
         wrappedPacketOutSpawnEntityLiving.setEntityType(getEntityType());
         wrappedPacketOutSpawnEntityLiving.setPosition(getPosition());

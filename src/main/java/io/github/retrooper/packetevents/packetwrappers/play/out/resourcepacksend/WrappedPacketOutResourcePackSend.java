@@ -22,26 +22,24 @@ import io.github.retrooper.packetevents.packettype.PacketTypeClasses;
 import io.github.retrooper.packetevents.packetwrappers.NMSPacket;
 import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
 import io.github.retrooper.packetevents.packetwrappers.api.SendableWrapper;
+import io.github.retrooper.packetevents.utils.nms.NMSUtils;
 import io.github.retrooper.packetevents.utils.server.ServerVersion;
 
 import java.lang.reflect.Constructor;
+import java.util.Optional;
 
 public class WrappedPacketOutResourcePackSend extends WrappedPacket implements SendableWrapper {
+    private static boolean v_1_17;
     private static Constructor<?> packetConstructor;
     private String url;
     private String hash;
+    private boolean forced;
+    private String forcedMessage;
 
     public WrappedPacketOutResourcePackSend(NMSPacket packet) {
         super(packet);
     }
 
-    /**
-     * Unfinished docs
-     * Hash may not be longer than 40 characters.
-     *
-     * @param url  URL
-     * @param hash Hash
-     */
     public WrappedPacketOutResourcePackSend(String url, String hash) {
         this.url = url;
         this.hash = hash;
@@ -49,9 +47,13 @@ public class WrappedPacketOutResourcePackSend extends WrappedPacket implements S
 
     @Override
     protected void load() {
+        v_1_17 = version.isNewerThanOrEquals(ServerVersion.v_1_17);
         try {
-            if (PacketTypeClasses.Play.Server.RESOURCE_PACK_SEND != null) {
+            if (v_1_17) {
+                packetConstructor = PacketTypeClasses.Play.Server.RESOURCE_PACK_SEND.getConstructor(String.class, String.class, boolean.class, NMSUtils.iChatBaseComponentClass);
+            } else {
                 packetConstructor = PacketTypeClasses.Play.Server.RESOURCE_PACK_SEND.getConstructor(String.class, String.class);
+
             }
         } catch (NoSuchMethodException e) {
             e.printStackTrace();
@@ -88,6 +90,49 @@ public class WrappedPacketOutResourcePackSend extends WrappedPacket implements S
         }
     }
 
+    public Optional<Boolean> isForced() {
+        if (!v_1_17) {
+            return Optional.empty();
+        }
+        if (packet != null) {
+            return Optional.of(readBoolean(0));
+        } else {
+            return Optional.of(forced);
+        }
+    }
+
+    public void setForced(boolean forced) {
+        if (v_1_17) {
+            if (packet != null) {
+                writeBoolean(0, forced);
+            } else {
+                this.forced = forced;
+            }
+        }
+    }
+
+    public Optional<String> getForcedMessage() {
+        if (v_1_17) {
+            if (packet != null) {
+                return Optional.of(readIChatBaseComponent(0));
+            } else {
+                return Optional.of(forcedMessage);
+            }
+        } else {
+            return Optional.empty();
+        }
+    }
+
+    public void setForcedMessage(String forcedMessage) {
+        if (v_1_17) {
+            if (packet != null) {
+                writeIChatBaseComponent(0, forcedMessage);
+            } else {
+                this.forcedMessage = forcedMessage;
+            }
+        }
+    }
+
     @Override
     public boolean isSupported() {
         return version.isNewerThan(ServerVersion.v_1_7_10);
@@ -95,6 +140,10 @@ public class WrappedPacketOutResourcePackSend extends WrappedPacket implements S
 
     @Override
     public Object asNMSPacket() throws Exception {
-        return packetConstructor.newInstance(getUrl(), getHash());
+        if (v_1_17) {
+            return packetConstructor.newInstance(getUrl(), getHash(), isForced().get(), NMSUtils.generateIChatBaseComponent(getForcedMessage().get()));
+        } else {
+            return packetConstructor.newInstance(getUrl(), getHash());
+        }
     }
 }

@@ -23,6 +23,7 @@ import io.github.retrooper.packetevents.packetwrappers.NMSPacket;
 import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
 import io.github.retrooper.packetevents.packetwrappers.api.SendableWrapper;
 import io.github.retrooper.packetevents.utils.nms.NMSUtils;
+import io.github.retrooper.packetevents.utils.server.ServerVersion;
 import org.bukkit.inventory.ItemStack;
 
 import java.lang.reflect.Constructor;
@@ -32,7 +33,7 @@ import java.lang.reflect.Constructor;
  * @since 1.8
  */
 public class WrappedPacketOutSetSlot extends WrappedPacket implements SendableWrapper {
-
+    private static boolean v_1_17;
     private static Constructor<?> packetConstructor;
 
     private int windowID;
@@ -52,9 +53,9 @@ public class WrappedPacketOutSetSlot extends WrappedPacket implements SendableWr
 
     @Override
     protected void load() {
-        Class<?> packetClass = PacketTypeClasses.Play.Server.SET_SLOT;
+        v_1_17 = version.isNewerThanOrEquals(ServerVersion.v_1_17);
         try {
-            packetConstructor = packetClass.getConstructor(int.class, int.class, NMSUtils.nmsItemStackClass);
+            packetConstructor = PacketTypeClasses.Play.Server.SET_SLOT.getConstructor(int.class, int.class, NMSUtils.nmsItemStackClass);
         } catch (NoSuchMethodException e) {
             e.printStackTrace();
         }
@@ -63,7 +64,7 @@ public class WrappedPacketOutSetSlot extends WrappedPacket implements SendableWr
 
     public int getWindowId() {
         if (packet != null) {
-            return readInt(0);
+            return readInt(v_1_17 ? 2 : 0);
         } else {
             return windowID;
         }
@@ -71,7 +72,7 @@ public class WrappedPacketOutSetSlot extends WrappedPacket implements SendableWr
 
     public void setWindowId(int windowID) {
         if (packet != null) {
-            writeInt(0, windowID);
+            writeInt(v_1_17 ? 2 : 0, windowID);
         } else {
             this.windowID = windowID;
         }
@@ -79,7 +80,7 @@ public class WrappedPacketOutSetSlot extends WrappedPacket implements SendableWr
 
     public int getSlot() {
         if (packet != null) {
-            return readInt(1);
+            return readInt(v_1_17 ? 3: 1);
         } else {
             return slot;
         }
@@ -87,7 +88,7 @@ public class WrappedPacketOutSetSlot extends WrappedPacket implements SendableWr
 
     public void setSlot(int slot) {
         if (packet != null) {
-            writeInt(1, slot);
+            writeInt(v_1_17 ? 3: 1, slot);
         } else {
             this.slot = slot;
         }

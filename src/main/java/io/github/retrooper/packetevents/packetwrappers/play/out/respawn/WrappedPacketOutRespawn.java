@@ -28,7 +28,7 @@ import org.bukkit.WorldType;
 
 //TODO finish and test
 class WrappedPacketOutRespawn extends WrappedPacket {
-    private static Class<?> worldTypeClass;
+    //private static Class<?> worldTypeClass;
     private Dimension dimension;
     private Difficulty difficulty;
     private GameMode gameMode;
@@ -40,15 +40,7 @@ class WrappedPacketOutRespawn extends WrappedPacket {
 
     @Override
     protected void load() {
-        worldTypeClass = NMSUtils.getNMSClassWithoutException("WorldType");
-        net.minecraft.server.v1_7_R4.PacketPlayOutRespawn a0;
-        net.minecraft.server.v1_8_R3.PacketPlayOutRespawn a1;
-        net.minecraft.server.v1_9_R1.PacketPlayOutRespawn a2;
-        net.minecraft.server.v1_9_R2.PacketPlayOutRespawn a3;
-        net.minecraft.server.v1_12_R1.PacketPlayOutRespawn a4;
-        net.minecraft.server.v1_13_R1.PacketPlayOutRespawn a5;
-        net.minecraft.server.v1_13_R2.PacketPlayOutRespawn a6;
-        net.minecraft.server.v1_16_R2.PacketPlayOutRespawn a7;
+        //worldTypeClass = NMSUtils.getNMSClassWithoutException("WorldType");
 
     }
 
@@ -84,7 +76,7 @@ class WrappedPacketOutRespawn extends WrappedPacket {
         }
     }
 
-    public WorldType getLevelType() {
+    /*public WorldType getLevelType() {
         if (packet != null) {
             //TODO finish
             Object worldTypeObject = readObject(0, worldTypeClass);
@@ -100,5 +92,5 @@ class WrappedPacketOutRespawn extends WrappedPacket {
         } else {
             return levelType;
         }
-    }
+    }*/
 }

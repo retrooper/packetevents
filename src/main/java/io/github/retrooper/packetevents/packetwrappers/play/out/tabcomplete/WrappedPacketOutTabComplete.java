@@ -27,6 +27,7 @@ import java.util.Optional;
 
 //TODO Make sendable
 public class WrappedPacketOutTabComplete extends WrappedPacket {
+    private static boolean v_1_13;
     private static Class<?> suggestionsClass;
     private int transactionID;
     private String[] matches;
@@ -47,15 +48,15 @@ public class WrappedPacketOutTabComplete extends WrappedPacket {
 
     @Override
     protected void load() {
+        v_1_13 = version.isNewerThanOrEquals(ServerVersion.v_1_13);
         try {
             suggestionsClass = Class.forName("com.mojang.brigadier.suggestion.Suggestions");
         } catch (ClassNotFoundException ignored) {
-
         }
     }
 
     public Optional<Integer> getTransactionId() {
-        if (version.isNewerThan(ServerVersion.v_1_12_2)) {
+        if (v_1_13) {
             if (packet != null) {
                 return Optional.of(readInt(0));
             } else {
@@ -67,7 +68,7 @@ public class WrappedPacketOutTabComplete extends WrappedPacket {
     }
 
     public void setTransactionId(int transactionID) {
-        if (version.isNewerThan(ServerVersion.v_1_12_2)) {
+        if (v_1_13) {
             if (packet != null) {
                 writeInt(0, transactionID);
             } else {
@@ -78,7 +79,7 @@ public class WrappedPacketOutTabComplete extends WrappedPacket {
 
     public String[] getMatches() {
         if (packet != null) {
-            if (version.isNewerThan(ServerVersion.v_1_12_2)) {
+            if (v_1_13) {
                 Object suggestions = readObject(0, suggestionsClass);
                 WrappedPacket suggestionsWrapper = new WrappedPacket(new NMSPacket(suggestions));
                 List<Object> suggestionList = suggestionsWrapper.readList(0);
@@ -100,7 +101,7 @@ public class WrappedPacketOutTabComplete extends WrappedPacket {
 
     public void setMatches(String[] matches) {
         if (packet != null) {
-            if (version.isNewerThan(ServerVersion.v_1_12_2)) {
+            if (v_1_13) {
                 Object suggestions = readObject(0, suggestionsClass);
                 WrappedPacket suggestionsWrapper = new WrappedPacket(new NMSPacket(suggestions));
                 List<Object> suggestionList = suggestionsWrapper.readList(0);

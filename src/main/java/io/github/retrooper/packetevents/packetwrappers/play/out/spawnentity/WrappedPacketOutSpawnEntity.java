@@ -31,6 +31,7 @@ import java.util.UUID;
 
 //TODO Make this sendable and finish
 class WrappedPacketOutSpawnEntity extends WrappedPacketEntityAbstraction {
+    private static boolean v_1_9, v_1_17;
     private static final float rotationFactor = 256.0F / 360.0F;
     private UUID uuid;
     private Vector3d position, velocity;
@@ -42,18 +43,12 @@ class WrappedPacketOutSpawnEntity extends WrappedPacketEntityAbstraction {
 
     @Override
     protected void load() {
-        net.minecraft.server.v1_7_R4.PacketPlayOutSpawnEntity a0;
-        net.minecraft.server.v1_8_R3.PacketPlayOutSpawnEntity a1;
-        net.minecraft.server.v1_9_R1.PacketPlayOutSpawnEntity a2;
-        net.minecraft.server.v1_9_R2.PacketPlayOutSpawnEntity a3;
-        net.minecraft.server.v1_12_R1.PacketPlayOutSpawnEntity a4;
-        net.minecraft.server.v1_13_R1.PacketPlayOutSpawnEntity a5;
-        net.minecraft.server.v1_13_R2.PacketPlayOutSpawnEntity a6;
-        net.minecraft.server.v1_16_R2.PacketPlayOutSpawnEntity a7;
+        v_1_9 = version.isNewerThanOrEquals(ServerVersion.v_1_9);
+        v_1_17 = version.isNewerThanOrEquals(ServerVersion.v_1_17);
     }
 
     public Optional<UUID> getUUID() {
-        if (version.isNewerThan(ServerVersion.v_1_8_8)) {
+        if (v_1_9) {
             if (packet != null) {
                 return Optional.of(readObject(0, UUID.class));
             } else {
@@ -65,7 +60,7 @@ class WrappedPacketOutSpawnEntity extends WrappedPacketEntityAbstraction {
     }
 
     public void setUUID(UUID uuid) {
-        if (version.isNewerThan(ServerVersion.v_1_8_8)) {
+        if (v_1_9) {
             if (packet != null) {
                 writeObject(0, uuid);
             } else {
@@ -79,14 +74,14 @@ class WrappedPacketOutSpawnEntity extends WrappedPacketEntityAbstraction {
             double x;
             double y;
             double z;
-            if (version.isOlderThan(ServerVersion.v_1_9)) {
+            if (!v_1_9) {
                 x = readInt(1) / 32.0;
                 y = readInt(2) / 32.0;
                 z = readInt(3) / 32.0;
             } else {
-                x = readDouble(0);
-                y = readDouble(1);
-                z = readDouble(2);
+                x = readDouble(v_1_17 ? 1 : 0);
+                y = readDouble(v_1_17 ? 2 : 1);
+                z = readDouble(v_1_17 ? 3 : 2);
             }
             return new Vector3d(x, y, z);
         } else {
@@ -96,14 +91,14 @@ class WrappedPacketOutSpawnEntity extends WrappedPacketEntityAbstraction {
 
     public void setPosition(Vector3d position) {
         if (packet != null) {
-            if (version.isOlderThan(ServerVersion.v_1_9)) {
+            if (!v_1_9) {
                 writeInt(1, MathUtils.floor(position.x * 32.0));
                 writeInt(2, MathUtils.floor(position.y * 32.0));
                 writeInt(3, MathUtils.floor(position.z * 32.0));
             } else {
-                writeDouble(0, position.x);
-                writeDouble(1, position.y);
-                writeDouble(2, position.z);
+                writeDouble(v_1_17 ? 1 : 0, position.x);
+                writeDouble(v_1_17 ? 2 : 1, position.y);
+                writeDouble(v_1_17 ? 3 : 2, position.z);
             }
         } else {
             this.position = position;
@@ -115,19 +110,17 @@ class WrappedPacketOutSpawnEntity extends WrappedPacketEntityAbstraction {
             double velX;
             double velY;
             double velZ;
-            if (version.isOlderThan(ServerVersion.v_1_9)) {
+            if (!v_1_9) {
                 velX = readInt(4) / 8000.0;
                 velY = readInt(5) / 8000.0;
                 velZ = readInt(6) / 8000.0;
-            }
-            else {
+            } else {
                 velX = readInt(1) / 8000.0;
                 velY = readInt(2) / 8000.0;
                 velZ = readInt(3) / 8000.0;
             }
             return new Vector3d(velX, velY, velZ);
-        }
-        else {
+        } else {
             return velocity;
         }
     }
@@ -137,18 +130,16 @@ class WrappedPacketOutSpawnEntity extends WrappedPacketEntityAbstraction {
             int velX = (int) (velocity.x * 8000.0);
             int velY = (int) (velocity.y * 8000.0);
             int velZ = (int) (velocity.z * 8000.0);
-            if (version.isOlderThan(ServerVersion.v_1_9)) {
+            if (!v_1_9) {
                 writeInt(4, velX);
                 writeInt(5, velY);
                 writeInt(6, velZ);
-            }
-            else {
+            } else {
                 writeInt(1, velX);
                 writeInt(2, velY);
                 writeInt(3, velZ);
             }
-        }
-        else {
+        } else {
             this.velocity = velocity;
         }
     }
@@ -156,10 +147,9 @@ class WrappedPacketOutSpawnEntity extends WrappedPacketEntityAbstraction {
     public float getPitch() {
         if (packet != null) {
             int factoredPitch;
-            if (version.isOlderThan(ServerVersion.v_1_9)) {
+            if (!v_1_9) {
                 factoredPitch = readInt(7);
-            }
-            else {
+            } else {
                 factoredPitch = readInt(4);
             }
             return factoredPitch / rotationFactor;
@@ -170,10 +160,9 @@ class WrappedPacketOutSpawnEntity extends WrappedPacketEntityAbstraction {
 
     public void setPitch(float pitch) {
         if (packet != null) {
-            if (version.isOlderThan(ServerVersion.v_1_9)) {
+            if (!v_1_9) {
                 writeInt(7, MathUtils.floor(pitch * rotationFactor));
-            }
-            else {
+            } else {
                 writeInt(4, MathUtils.floor(pitch * rotationFactor));
             }
         } else {
@@ -184,10 +173,9 @@ class WrappedPacketOutSpawnEntity extends WrappedPacketEntityAbstraction {
     public float getYaw() {
         if (packet != null) {
             int factoredYaw;
-            if (version.isOlderThan(ServerVersion.v_1_9)) {
+            if (!v_1_9) {
                 factoredYaw = readInt(8);
-            }
-            else {
+            } else {
                 factoredYaw = readInt(5);
             }
             return factoredYaw / rotationFactor;
@@ -198,10 +186,9 @@ class WrappedPacketOutSpawnEntity extends WrappedPacketEntityAbstraction {
 
     public void setYaw(float yaw) {
         if (packet != null) {
-            if (version.isOlderThan(ServerVersion.v_1_9)) {
+            if (!v_1_9) {
                 writeInt(8, MathUtils.floor(yaw * rotationFactor));
-            }
-            else {
+            } else {
                 writeInt(5, MathUtils.floor(yaw * rotationFactor));
             }
         } else {

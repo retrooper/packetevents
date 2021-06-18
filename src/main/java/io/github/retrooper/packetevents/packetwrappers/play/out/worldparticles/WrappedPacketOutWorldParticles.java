@@ -52,12 +52,15 @@ public class WrappedPacketOutWorldParticles extends WrappedPacket {
                 particleEnumClass = NMSUtils.getNMSEnumClass("EnumParticle");
             } catch (ClassNotFoundException e) {
                 particleParamClass = NMSUtils.getNMSClassWithoutException("ParticleParam");
+                if (particleParamClass == null) {
+                    particleParamClass = NMSUtils.getNMClassWithoutException("core.particles.ParticleParam");
+                }
                 particleParamGetNameMethod = Reflection.getMethod(particleParamClass, String.class, 0);
             }
         }
     }
 
-    public String getParticleName() {
+    protected String getParticleName() {
         if (packet != null) {
             if (version.isNewerThan(ServerVersion.v_1_12_1)) {
                 Object particleParamObj = readObject(0, particleParamClass);
@@ -67,12 +70,12 @@ public class WrappedPacketOutWorldParticles extends WrappedPacket {
                 } catch (IllegalAccessException | InvocationTargetException e) {
                     e.printStackTrace();
                 }
-                return particleParamName;
+                return particleParamName;  //starts with minecraft:
             } else if (version.isNewerThan(ServerVersion.v_1_7_10)) {
                 Enum<?> enumConst = readEnumConstant(0, particleEnumClass);
-                return "minecraft:" + enumConst.name();
+                return enumConst.name(); //inconsistent
             } else {
-                return "minecraft:" + readString(0);
+                return readString(0); //inconsistent
             }
         } else {
             return particleName;

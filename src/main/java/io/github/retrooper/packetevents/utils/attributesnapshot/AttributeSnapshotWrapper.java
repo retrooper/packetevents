@@ -36,8 +36,8 @@ import java.util.Objects;
 
 public class AttributeSnapshotWrapper extends WrappedPacket {
     private static byte constructorMode;
-    private static Constructor<?> attributeSnapshotConstructor, attributeBaseConstructor;
-    private static Class<?> attributeSnapshotClass, attributeBaseClass, iRegistryClass;
+    private static Constructor<?> attributeSnapshotConstructor;
+    private static Class<?> attributeSnapshotClass, attributeBaseClass;
     private static Field iRegistryAttributeBaseField;
     private static Method getiRegistryByMinecraftKeyMethod;
     private static boolean stringKeyPresent;
@@ -124,6 +124,9 @@ public class AttributeSnapshotWrapper extends WrappedPacket {
         stringKeyPresent = Reflection.getField(packet.getRawNMSPacket().getClass(), String.class, 0) != null;
         if (attributeBaseClass == null) {
             attributeBaseClass = NMSUtils.getNMSClassWithoutException("AttributeBase");
+            if (attributeBaseClass == null) {
+                attributeBaseClass = NMSUtils.getNMClassWithoutException("world.entity.ai.attributes.AttributeBase");
+            }
         }
         if (attributeSnapshotClass == null) {
             attributeSnapshotClass = NMSUtils.getNMSClassWithoutException("AttributeSnapshot");
@@ -140,6 +143,9 @@ public class AttributeSnapshotWrapper extends WrappedPacket {
             }
         }
         Class<?> iRegistryClass = NMSUtils.getNMSClassWithoutException("IRegistry");
+        if (iRegistryClass == null) {
+            iRegistryClass = NMSUtils.getNMClassWithoutException("core.IRegistry");
+        }
         if (iRegistryClass != null) {
             try {
                 iRegistryAttributeBaseField = iRegistryClass.getField("ATTRIBUTE");

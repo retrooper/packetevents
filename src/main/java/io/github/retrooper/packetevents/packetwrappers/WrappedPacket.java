@@ -80,11 +80,11 @@ public class WrappedPacket implements WrapperPacketReader, WrapperPacketWriter {
     }
 
     private void load0() {
-        if (!isSupported()) {
-            throw new WrapperUnsupportedUsageException(getClass());
-        }
         final Class<? extends WrappedPacket> clazz = getClass();
         if (!LOADED_WRAPPERS.containsKey(clazz)) {
+            if (!isSupported()) {
+                throw new WrapperUnsupportedUsageException(getClass());
+            }
             try {
                 load();
             } catch (Exception ex) {

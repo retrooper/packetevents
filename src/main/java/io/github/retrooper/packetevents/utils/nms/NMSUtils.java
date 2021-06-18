@@ -271,7 +271,6 @@ public final class NMSUtils {
                 //That is fine, it is probably a subclass
                 chatSerializerClass = SubclassUtil.getSubClass(iChatBaseComponentClass, "ChatSerializer");
             }
-
             craftMagicNumbersClass = NMSUtils.getOBCClass("util.CraftMagicNumbers");
 
             chatFromStringMethod = Reflection.getMethod(chatSerializerClass, 0, String.class);

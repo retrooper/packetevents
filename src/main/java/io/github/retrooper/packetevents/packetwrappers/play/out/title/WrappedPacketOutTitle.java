@@ -146,7 +146,7 @@ public class WrappedPacketOutTitle extends WrappedPacket implements SendableWrap
 
     @Override
     public boolean isSupported() {
-        return version.isNewerThan(ServerVersion.v_1_7_10);
+        return version.isNewerThan(ServerVersion.v_1_7_10) && version.isOlderThan(ServerVersion.v_1_17);
     }
 
     @Override

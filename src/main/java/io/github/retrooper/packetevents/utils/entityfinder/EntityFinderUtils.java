@@ -20,11 +20,13 @@ package io.github.retrooper.packetevents.utils.entityfinder;
 
 import io.github.retrooper.packetevents.utils.nms.NMSUtils;
 import io.github.retrooper.packetevents.utils.server.ServerVersion;
+import net.minecraft.server.v1_16_R2.PlayerChunkMap;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.entity.Entity;
 import org.jetbrains.annotations.Nullable;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
@@ -37,15 +39,15 @@ import java.lang.reflect.Method;
 public final class EntityFinderUtils {
     public static ServerVersion version;
     private static Class<?> worldServerClass;
+    private static Field entityTrackerField;
     private static Method getEntityByIdMethod;
     private static Method craftWorldGetHandle;
     private static Method getBukkitEntity;
 
     public static void load() {
-        try {
-            worldServerClass = NMSUtils.getNMSClass("WorldServer");
-        } catch (ClassNotFoundException e) {
-            worldServerClass =NMSUtils.getNMClassWithoutException("server.level.WorldServer");
+        worldServerClass = NMSUtils.getNMSClassWithoutException("WorldServer");
+        if (worldServerClass == null) {
+            worldServerClass = NMSUtils.getNMClassWithoutException("server.level.WorldServer");
         }
 
         try {
@@ -54,6 +56,9 @@ public final class EntityFinderUtils {
 
             String getEntityByIdMethodName = (version.getProtocolVersion() == (short) 47)
                     ? "a" : "getEntity";
+            if (version.isNewerThanOrEquals(ServerVersion.v_1_17)) {
+                getEntityByIdMethodName = "b";
+            }
             getEntityByIdMethod = worldServerClass.getMethod(getEntityByIdMethodName, int.class);
         } catch (NoSuchMethodException e) {
             try {

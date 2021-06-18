@@ -29,8 +29,9 @@ import org.bukkit.entity.Entity;
 import java.lang.reflect.Constructor;
 
 public class WrappedPacketOutRemoveEntityEffect extends WrappedPacketEntityAbstraction implements SendableWrapper {
-    private static Constructor<?> packetDefaultConstructor;
-    private int effectID = -1;
+    private static boolean v_1_8_x, v_1_17;
+    private static Constructor<?> packetConstructor;
+    private int effectID;
 
     public WrappedPacketOutRemoveEntityEffect(NMSPacket packet) {
         super(packet);
@@ -49,43 +50,62 @@ public class WrappedPacketOutRemoveEntityEffect extends WrappedPacketEntityAbstr
 
     @Override
     protected void load() {
+        v_1_8_x = version.isOlderThan(ServerVersion.v_1_9);
+        v_1_17 = version.isNewerThanOrEquals(ServerVersion.v_1_17);
         try {
-            packetDefaultConstructor = PacketTypeClasses.Play.Server.REMOVE_ENTITY_EFFECT.getConstructor();
+            if (v_1_17) {
+                packetConstructor = PacketTypeClasses.Play.Server.REMOVE_ENTITY_EFFECT.getConstructor(int.class, NMSUtils.mobEffectListClass);
+            }
+            else {
+                packetConstructor = PacketTypeClasses.Play.Server.REMOVE_ENTITY_EFFECT.getConstructor();
+            }
         } catch (NoSuchMethodException e) {
             e.printStackTrace();
         }
     }
 
     public int getEffectId() {
-        if (effectID != -1 || packet == null) {
+        if (packet != null) {
+            if (v_1_8_x) {
+                return readInt(1);
+            } else {
+                Object nmsMobEffectList = readObject(0, NMSUtils.mobEffectListClass);
+                return NMSUtils.getEffectId(nmsMobEffectList);
+            }
+        }
+        else {
             return effectID;
-        } else if (version.isOlderThan(ServerVersion.v_1_9)) {
-            return effectID = readInt(1);
-        } else {
-            Object nmsMobEffectList = read(0, NMSUtils.mobEffectListClass);
-            return NMSUtils.getEffectId(nmsMobEffectList);
         }
     }
 
     public void setEffectId(int effectID) {
-        this.effectID = effectID;
         if (packet != null) {
-            if (version.isOlderThan(ServerVersion.v_1_9)) {
+            if (v_1_8_x) {
                 writeInt(1, effectID);
             } else {
                 Object nmsMobEffectList = NMSUtils.getMobEffectListById(effectID);
                 write(NMSUtils.mobEffectListClass, 0, nmsMobEffectList);
             }
         }
+        else {
+            this.effectID = effectID;
+        }
     }
 
     @Override
     public Object asNMSPacket() throws Exception {
-        Object packetPlayOutRemoveEntityEffectInstance = packetDefaultConstructor.newInstance();
-        WrappedPacketOutRemoveEntityEffect wrappedPacketOutRemoveEntityEffect =
-                new WrappedPacketOutRemoveEntityEffect(new NMSPacket(packetPlayOutRemoveEntityEffectInstance));
-        wrappedPacketOutRemoveEntityEffect.setEntityId(getEntityId());
-        wrappedPacketOutRemoveEntityEffect.setEffectId(getEffectId());
-        return packetPlayOutRemoveEntityEffectInstance;
+        Object packetInstance;
+        if (v_1_17) {
+            Object nmsMobEffectList = NMSUtils.getMobEffectListById(getEffectId());
+            packetInstance = packetConstructor.newInstance(getEntityId(), nmsMobEffectList);
+        }
+        else {
+            packetInstance = packetConstructor.newInstance();
+            WrappedPacketOutRemoveEntityEffect wrappedPacketOutRemoveEntityEffect =
+                    new WrappedPacketOutRemoveEntityEffect(new NMSPacket(packetInstance));
+            wrappedPacketOutRemoveEntityEffect.setEntityId(getEntityId());
+            wrappedPacketOutRemoveEntityEffect.setEffectId(getEffectId());
+        }
+        return packetInstance;
     }
 }

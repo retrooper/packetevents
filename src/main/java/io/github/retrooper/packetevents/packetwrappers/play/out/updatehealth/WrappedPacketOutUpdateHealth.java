@@ -42,10 +42,8 @@ public final class WrappedPacketOutUpdateHealth extends WrappedPacket implements
 
     @Override
     protected void load() {
-        Class<?> packetClass = PacketTypeClasses.Play.Server.UPDATE_HEALTH;
-
         try {
-            packetConstructor = packetClass.getConstructor(float.class, int.class, float.class);
+            packetConstructor = PacketTypeClasses.Play.Server.UPDATE_HEALTH.getConstructor(float.class, int.class, float.class);
         } catch (NoSuchMethodException e) {
             e.printStackTrace();
         }

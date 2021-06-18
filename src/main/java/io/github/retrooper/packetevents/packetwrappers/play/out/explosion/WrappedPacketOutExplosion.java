@@ -73,13 +73,13 @@ public class WrappedPacketOutExplosion extends WrappedPacket implements Sendable
     @Override
     protected void load() {
         v_1_8 = version.isNewerThanOrEquals(ServerVersion.v_1_8);
-        Class<?> chunkPosClass = NMSUtils.getNMSClassWithoutException("ChunkPosition");
+
         try {
+            Class<?> chunkPosClass = NMSUtils.getNMSClassWithoutException("ChunkPosition");
             packetConstructor = PacketTypeClasses.Play.Server.EXPLOSION.getConstructor(double.class, double.class, double.class, float.class, List.class, NMSUtils.vec3DClass);
             if (chunkPosClass != null) {
                 chunkPosConstructor = chunkPosClass.getConstructor(int.class, int.class, int.class);
             }
-
         } catch (NoSuchMethodException e) {
             e.printStackTrace();
         }
