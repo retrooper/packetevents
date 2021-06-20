@@ -90,7 +90,7 @@ public final class ServerUtils {
     }
 
     public void cacheEntityById(int entityID, @NotNull Entity entity) {
-        entityIDs.put(entityID, entity);
+        entityIDs.putIfAbsent(entityID, entity);
     }
 
     public boolean isGeyserAvailable() {

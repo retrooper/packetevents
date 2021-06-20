@@ -31,7 +31,7 @@ import java.util.Optional;
 //TODO finish wrapper
 public class WrappedPacketOutMapChunk extends WrappedPacket {
     private static boolean v_1_8_x, v_1_17;
-    private Class<?> chunkMapClass;
+    private static Class<?> chunkMapClass;
     private Constructor<?> chunkMapConstructor;
     private Object nmsChunkMap;
 
@@ -44,7 +44,7 @@ public class WrappedPacketOutMapChunk extends WrappedPacket {
         v_1_8_x = version.isNewerThan(ServerVersion.v_1_7_10) && version.isOlderThan(ServerVersion.v_1_9);
         v_1_17 = version.isNewerThanOrEquals(ServerVersion.v_1_17);
         if (v_1_8_x) {
-            chunkMapClass = SubclassUtil.getSubClass(PacketTypeClasses.Play.Server.MAP_CHUNK, "ChunkMap");
+            chunkMapClass = SubclassUtil.getSubClass(PacketTypeClasses.Play.Server.MAP_CHUNK, 0);
             try {
                 chunkMapConstructor = chunkMapClass.getConstructor();
             } catch (NoSuchMethodException e) {

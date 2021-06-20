@@ -34,6 +34,7 @@ import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerLoginEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.world.ChunkLoadEvent;
+import org.bukkit.event.world.WorldLoadEvent;
 
 import java.net.InetSocketAddress;
 import java.util.UUID;
@@ -98,5 +99,12 @@ public class BukkitEventProcessorInternal implements Listener {
     public void onEntitySpawn(EntitySpawnEvent event) {
         Entity entity = event.getEntity();
         PacketEvents.get().getServerUtils().cacheEntityById(entity.getEntityId(), entity);
+    }
+
+    @EventHandler
+    public void onWorldLoad(ChunkLoadEvent event) {
+        for (Entity entity : event.getWorld().getEntities()) {
+            PacketEvents.get().getServerUtils().cacheEntityById(entity.getEntityId(), entity);
+        }
     }
 }

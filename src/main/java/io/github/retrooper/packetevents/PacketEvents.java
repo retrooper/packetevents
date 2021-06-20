@@ -216,8 +216,6 @@ public final class PacketEvents implements Listener, EventManager {
                 postInjectTask.run();
             }
 
-
-
             initialized = true;
             initializing = false;
         }
