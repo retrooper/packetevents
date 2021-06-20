@@ -33,6 +33,7 @@ import io.github.retrooper.packetevents.processor.PacketProcessorInternal;
 import io.github.retrooper.packetevents.settings.PacketEventsSettings;
 import io.github.retrooper.packetevents.updatechecker.UpdateChecker;
 import io.github.retrooper.packetevents.utils.entityfinder.EntityFinderUtils;
+import io.github.retrooper.packetevents.utils.guava.GuavaUtils;
 import io.github.retrooper.packetevents.utils.netty.bytebuf.ByteBufUtil;
 import io.github.retrooper.packetevents.utils.netty.bytebuf.ByteBufUtil_7;
 import io.github.retrooper.packetevents.utils.netty.bytebuf.ByteBufUtil_8;
@@ -123,6 +124,8 @@ public final class PacketEvents implements Listener, EventManager {
                 PacketType.load();
 
                 EntityFinderUtils.load();
+
+                getServerUtils().entityCache = GuavaUtils.makeMap();
 
                 if (version.isNewerThanOrEquals(ServerVersion.v_1_9)) {
                     for (WrappedPacketOutEntityEquipment.EquipmentSlot slot : WrappedPacketOutEntityEquipment.EquipmentSlot.values()) {

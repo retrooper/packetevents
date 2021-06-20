@@ -33,7 +33,8 @@ public final class ServerUtils {
     private boolean geyserClassChecked;
     private final NPCManager npcManager = new NPCManager();
 
-    private final Map<Integer, Entity> entityIDs = new ConcurrentHashMap<>();
+    //Initialized in PacketEvents#load
+    public Map<Integer, Entity> entityCache;
 
     /**
      * Get the server version.
@@ -86,11 +87,11 @@ public final class ServerUtils {
 
     @Nullable
     public Entity getEntityById(int entityID) {
-        return entityIDs.get(entityID);
+        return entityCache.get(entityID);
     }
 
     public void cacheEntityById(int entityID, @NotNull Entity entity) {
-        entityIDs.putIfAbsent(entityID, entity);
+        entityCache.putIfAbsent(entityID, entity);
     }
 
     public boolean isGeyserAvailable() {
