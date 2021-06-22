@@ -174,12 +174,6 @@ public class PacketTypeClasses {
                     POSITION = SubclassUtil.getSubClass(FLYING,"PacketPlayInPosition");
                     POSITION_LOOK = SubclassUtil.getSubClass(FLYING, "PacketPlayInPositionLook");
                     LOOK = SubclassUtil.getSubClass(FLYING, "PacketPlayInLook");
-                    if (POSITION == null) {
-                        System.out.println("YOOOOOO WHY IS POITION PACKET NULL ON 1.7.10 BRO IM HACKING U RN SYSTEM SHUTTING DOWN");
-                    }
-                    else {
-                        System.out.println("OMG U FOUND POSITION PACKET CLASS ON 1.7.10. GOOD JOB");
-                    }
                 }
 
                 //This packet does not exist in the 1.17+ protocol
