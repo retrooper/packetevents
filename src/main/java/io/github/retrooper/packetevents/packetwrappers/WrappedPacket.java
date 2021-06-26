@@ -440,11 +440,11 @@ public class WrappedPacket implements WrapperPacketReader, WrapperPacketWriter {
 
     public GameMode readGameMode(int index) {
         Enum<?> enumConst = readEnumConstant(index, NMSUtils.enumGameModeClass);
-        return GameMode.values()[enumConst.ordinal()];
+        return GameMode.values()[enumConst.ordinal() - 1];
     }
 
     public void writeGameMode(int index, GameMode gameMode) {
-        Enum<?> enumConst = EnumUtil.valueByIndex(NMSUtils.enumGameModeClass, gameMode.ordinal());
+        Enum<?> enumConst = EnumUtil.valueByIndex(NMSUtils.enumGameModeClass, gameMode.ordinal() + 1);
         writeEnumConstant(index, enumConst);
     }
 
