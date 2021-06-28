@@ -207,16 +207,9 @@ public class WrappedPacketOutNamedEntitySpawn extends WrappedPacketEntityAbstrac
     public Object asNMSPacket() throws Exception {
         Object packetInstance;
         if (v_1_17) {
-            //28 bytes, 4 bytes per bytebuf field
-            Object byteBuf = PacketEvents.get().getByteBufUtil().newByteBuf(new byte[] {
-               0, 0, 0, 0,
-               0, 0, 0, 0,
-               0, 0, 0, 0,
-               0, 0, 0, 0,
-               0, 0, 0, 0,
-               0, 0, 0, 0,
-               0, 0, 0, 0
-            });
+            //we were at 40
+            byte[] bytes = new byte[60];
+            Object byteBuf = PacketEvents.get().getByteBufUtil().newByteBuf(bytes);
             Object packetDataSerializer = NMSUtils.generatePacketDataSerializer(byteBuf);
             packetInstance = packetConstructor.newInstance(packetDataSerializer);
         }

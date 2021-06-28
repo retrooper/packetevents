@@ -24,6 +24,7 @@ import io.github.retrooper.packetevents.packettype.PacketTypeClasses;
 import io.github.retrooper.packetevents.packetwrappers.NMSPacket;
 import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
 import io.github.retrooper.packetevents.packetwrappers.api.SendableWrapper;
+import io.github.retrooper.packetevents.utils.server.ServerVersion;
 
 import java.lang.reflect.Constructor;
 
@@ -62,6 +63,11 @@ public class WrappedPacketOutPing extends WrappedPacket implements SendableWrapp
         } else {
             this.id = id;
         }
+    }
+
+    @Override
+    public boolean isSupported() {
+        return version.isNewerThanOrEquals(ServerVersion.v_1_17);
     }
 
     @Override

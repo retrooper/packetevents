@@ -101,10 +101,13 @@ public class NPC {
         }
     }
 
+    public boolean hasSpawned(Player player) {
+        return spawnedForPlayerMap.getOrDefault(player.getUniqueId(), false);
+    }
+
     public void spawn(Player player) {
         try {
-            boolean spawned = spawnedForPlayerMap.getOrDefault(player.getUniqueId(), false);
-            if (!spawned) {
+            if (!hasSpawned(player)) {
                 CompletableFuture.runAsync(() -> {
                     WrappedPacketOutPlayerInfo playerInfo = new WrappedPacketOutPlayerInfo(WrappedPacketOutPlayerInfo.PlayerInfoAction.ADD_PLAYER, new WrappedPacketOutPlayerInfo.PlayerInfo(name, gameProfile, GameMode.SURVIVAL, 0));
                     PacketEvents.get().getPlayerUtils().sendPacket(player, playerInfo);
@@ -156,10 +159,20 @@ public class NPC {
 
     public void move(Player player, Vector3d targetPosition) {
         this.position = targetPosition;
-        WrappedPacketOutEntityTeleport teleportPacket = new WrappedPacketOutEntityTeleport(entityID, position, yaw, pitch, onGround);
-        boolean spawned = spawnedForPlayerMap.getOrDefault(player.getUniqueId(), false);
-        if (spawned) {
-            PacketEvents.get().getPlayerUtils().sendPacket(player, teleportPacket);
+        double distX = targetPosition.x - position.x;
+        double distY = targetPosition.y - position.y;
+        double distZ = targetPosition.z - position.z;
+        double dist = distX + distY + distZ;
+        SendableWrapper sentPacket;
+        if (dist > 8) {
+            sentPacket = new WrappedPacketOutEntityTeleport(entityID, position, yaw, pitch, onGround);
+        }
+        else {
+
+            sentPacket = new WrappedPacketOutEntity.WrappedPacketOutRelEntityMove(entityID, distX, distY, distZ, onGround);
+        }
+        if (hasSpawned(player)) {
+            PacketEvents.get().getPlayerUtils().sendPacket(player, sentPacket);
         }
     }
 
@@ -167,10 +180,19 @@ public class NPC {
         this.position = targetPosition;
         this.yaw = yaw;
         this.pitch = pitch;
-        WrappedPacketOutEntityTeleport teleportPacket = new WrappedPacketOutEntityTeleport(entityID, position, yaw, pitch, onGround);
-        boolean spawned = spawnedForPlayerMap.getOrDefault(player.getUniqueId(), false);
-        if (spawned) {
-            PacketEvents.get().getPlayerUtils().sendPacket(player, teleportPacket);
+        double distX = targetPosition.x - position.x;
+        double distY = targetPosition.y - position.y;
+        double distZ = targetPosition.z - position.z;
+        double dist = distX + distY + distZ;
+        SendableWrapper sentPacket;
+        if (dist > 8) {
+            sentPacket = new WrappedPacketOutEntityTeleport(entityID, position, yaw, pitch, onGround);
+        }
+        else {
+            sentPacket = new WrappedPacketOutEntity.WrappedPacketOutRelEntityMoveLook(entityID, distX, distY, distZ, (byte) yaw, (byte) pitch, onGround);
+        }
+        if (hasSpawned(player)) {
+            PacketEvents.get().getPlayerUtils().sendPacket(player, sentPacket);
         }
     }
 
@@ -179,8 +201,7 @@ public class NPC {
         this.pitch = pitch;
         WrappedPacketOutEntity.WrappedPacketOutEntityLook lookPacket = new WrappedPacketOutEntity.WrappedPacketOutEntityLook(entityID, (byte) (yaw * 256 / 360), (byte) (pitch * 256 / 360), onGround);
         WrappedPacketOutEntityHeadRotation headRotationPacket = new WrappedPacketOutEntityHeadRotation(entityID, (byte) (yaw * 256 / 360));
-        boolean spawned = spawnedForPlayerMap.getOrDefault(player.getUniqueId(), false);
-        if (spawned) {
+        if (hasSpawned(player)) {
             PacketEvents.get().getPlayerUtils().sendPacket(player, lookPacket);
             PacketEvents.get().getPlayerUtils().sendPacket(player, headRotationPacket);
         }
@@ -200,8 +221,7 @@ public class NPC {
             sentPacket = new WrappedPacketOutEntity.WrappedPacketOutRelEntityMove(entityID, distX, distY, distZ, onGround);
         }
         for (Player player : players) {
-            boolean spawned = spawnedForPlayerMap.getOrDefault(player.getUniqueId(), false);
-            if (spawned) {
+            if (hasSpawned(player)) {
                 PacketEvents.get().getPlayerUtils().sendPacket(player, sentPacket);
             }
         }
@@ -223,8 +243,7 @@ public class NPC {
             sentPacket = new WrappedPacketOutEntity.WrappedPacketOutRelEntityMoveLook(entityID, distX, distY, distZ, (byte) yaw, (byte) pitch, onGround);
         }
         for (Player player : players) {
-            boolean spawned = spawnedForPlayerMap.getOrDefault(player.getUniqueId(), false);
-            if (spawned) {
+            if (hasSpawned(player)) {
                 PacketEvents.get().getPlayerUtils().sendPacket(player, sentPacket);
             }
         }
@@ -236,8 +255,7 @@ public class NPC {
         WrappedPacketOutEntity.WrappedPacketOutEntityLook lookPacket = new WrappedPacketOutEntity.WrappedPacketOutEntityLook(entityID, (byte) (yaw * 256 / 360), (byte) (pitch * 256 / 360), onGround);
         WrappedPacketOutEntityHeadRotation headRotationPacket = new WrappedPacketOutEntityHeadRotation(entityID, (byte) (yaw * 256 / 360));
         for (Player player : players) {
-            boolean spawned = spawnedForPlayerMap.getOrDefault(player.getUniqueId(), false);
-            if (spawned) {
+            if (hasSpawned(player)) {
                 PacketEvents.get().getPlayerUtils().sendPacket(player, lookPacket);
                 PacketEvents.get().getPlayerUtils().sendPacket(player, headRotationPacket);
             }
@@ -249,8 +267,7 @@ public class NPC {
         this.position = this.position.add(deltaPosition);
         WrappedPacketOutEntityTeleport teleportPacket = new WrappedPacketOutEntityTeleport(entityID, position, yaw, pitch, onGround);
         for (Player player : players) {
-            boolean spawned = spawnedForPlayerMap.getOrDefault(player.getUniqueId(), false);
-            if (spawned) {
+            if (hasSpawned(player)) {
                 PacketEvents.get().getPlayerUtils().sendPacket(player, teleportPacket);
             }
         }
@@ -263,8 +280,7 @@ public class NPC {
         this.pitch = pitch;
         WrappedPacketOutEntityTeleport teleportPacket = new WrappedPacketOutEntityTeleport(entityID, position, yaw, pitch, onGround);
         for (Player player : players) {
-            boolean spawned = spawnedForPlayerMap.getOrDefault(player.getUniqueId(), false);
-            if (spawned) {
+            if (hasSpawned(player)) {
                 PacketEvents.get().getPlayerUtils().sendPacket(player, teleportPacket);
             }
         }

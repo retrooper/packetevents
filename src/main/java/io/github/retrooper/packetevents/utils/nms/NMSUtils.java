@@ -679,6 +679,9 @@ public final class NMSUtils {
 
     public static int generateEntityId() {
         Field field = Reflection.getField(nmsEntityClass, "entityCount");
+        if (field == null) {
+            field = Reflection.getField(nmsEntityClass, AtomicInteger.class, 0);
+        }
         try {
             if (field.getType().equals(AtomicInteger.class)) {
                 //Newer versions
