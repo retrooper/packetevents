@@ -62,7 +62,7 @@ public class BukkitEventProcessorInternal implements Listener {
         PacketEvents.get().getPlayerUtils().loginTime.put(player.getUniqueId(), System.currentTimeMillis());
         //A supported dependency is available, we need to first ask the dependency for the client version.
         if (dependencyAvailable) {
-            //We are resolving version one tick later for extra safety. Some dependencies throw exceptions if we throw too early.
+            //We are resolving version one tick later for extra safety. Some dependencies throw exceptions if we try too early.
             Bukkit.getScheduler().runTaskLaterAsynchronously(PacketEvents.get().getPlugin(), () -> {
                 try {
                     int protocolVersion = VersionLookupUtils.getProtocolVersion(player);
@@ -77,6 +77,7 @@ public class BukkitEventProcessorInternal implements Listener {
             //Dependency isn't available, we can already call the post player inject event.
             PacketEvents.get().getEventManager().callEvent(new PostPlayerInjectEvent(e.getPlayer(), false));
         }
+        PacketEvents.get().getServerUtils().entityCache.putIfAbsent(e.getPlayer().getEntityId(), e.getPlayer());
     }
 
     @EventHandler(priority = EventPriority.HIGHEST)
@@ -98,13 +99,13 @@ public class BukkitEventProcessorInternal implements Listener {
     @EventHandler
     public void onEntitySpawn(EntitySpawnEvent event) {
         Entity entity = event.getEntity();
-        PacketEvents.get().getServerUtils().cacheEntityById(entity.getEntityId(), entity);
+        PacketEvents.get().getServerUtils().entityCache.putIfAbsent(entity.getEntityId(), entity);
     }
 
     @EventHandler
     public void onWorldLoad(ChunkLoadEvent event) {
         for (Entity entity : event.getWorld().getEntities()) {
-            PacketEvents.get().getServerUtils().cacheEntityById(entity.getEntityId(), entity);
+            PacketEvents.get().getServerUtils().entityCache.putIfAbsent(entity.getEntityId(), entity);
         }
     }
 }
