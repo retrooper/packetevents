@@ -134,6 +134,10 @@ public class EarlyChannelInjectorModern implements EarlyInjector {
                     continue;
                 }
 
+                if (channel.pipeline().get(PacketEvents.get().getHandlerName()) != null) {
+                    channel.pipeline().remove(PacketEvents.get().getHandlerName());
+                }
+
                 if (channel.pipeline().get("packet_handler") != null) {
                     channel.pipeline().addBefore("packet_handler", PacketEvents.get().getHandlerName(), new PlayerChannelHandlerModern());
                 }
