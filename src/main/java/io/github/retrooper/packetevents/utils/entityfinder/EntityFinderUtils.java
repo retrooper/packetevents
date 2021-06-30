@@ -20,13 +20,11 @@ package io.github.retrooper.packetevents.utils.entityfinder;
 
 import io.github.retrooper.packetevents.utils.nms.NMSUtils;
 import io.github.retrooper.packetevents.utils.server.ServerVersion;
-import net.minecraft.server.v1_16_R2.PlayerChunkMap;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.entity.Entity;
 import org.jetbrains.annotations.Nullable;
 
-import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
@@ -41,7 +39,6 @@ public final class EntityFinderUtils {
     private static Class<?> worldServerClass;
     private static Method getEntityByIdMethod;
     private static Method craftWorldGetHandle;
-    private static Method getBukkitEntity;
 
     public static void load() {
         worldServerClass = NMSUtils.getNMSClassWithoutException("WorldServer");
@@ -51,7 +48,6 @@ public final class EntityFinderUtils {
 
         try {
             craftWorldGetHandle = NMSUtils.craftWorldClass.getMethod("getHandle");
-            getBukkitEntity = NMSUtils.nmsEntityClass.getMethod("getBukkitEntity");
 
             String getEntityByIdMethodName = (version.getProtocolVersion() == (short) 47)
                     ? "a" : "getEntity";
@@ -72,17 +68,25 @@ public final class EntityFinderUtils {
      * @return Bukkit Entity.
      */
     @Nullable
-    public static Entity getEntityById(World origin, int id) {
-        Entity e = getEntityByIdWithWorld(origin, id);
-        if (e == null) {
-            for (World world : Bukkit.getWorlds()) {
-                Entity entity = getEntityByIdWithWorld(world, id);
-                if (entity != null) {
+    public static Entity getEntityByIdUnsafe(World origin, int id) {
+        Entity e = getEntityByIdWithWorldUnsafe(origin, id);
+        if (e != null) {
+            return e;
+        }
+        for (World world : Bukkit.getWorlds()) {
+            Entity entity = getEntityByIdWithWorldUnsafe(world, id);
+            if (entity != null) {
+                return entity;
+            }
+        }
+        for (World world : Bukkit.getWorlds()) {
+            for (Entity entity : world.getEntities()) {
+                if (entity.getEntityId() == id) {
                     return entity;
                 }
             }
         }
-        return e;
+        return null;
     }
 
     /**
@@ -92,7 +96,7 @@ public final class EntityFinderUtils {
      * @param id    Entity ID.
      * @return Bukkit Entity.
      */
-    public static Entity getEntityByIdWithWorld(World world, int id) {
+    public static Entity getEntityByIdWithWorldUnsafe(World world, int id) {
         if (world == null) {
             return null;
         }
@@ -107,7 +111,7 @@ public final class EntityFinderUtils {
             if (nmsEntity == null) {
                 return null;
             }
-            return (Entity) getBukkitEntity.invoke(nmsEntity);
+            return NMSUtils.getBukkitEntity(nmsEntity);
         } catch (IllegalAccessException | InvocationTargetException e) {
             e.printStackTrace();
         }

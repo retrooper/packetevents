@@ -127,7 +127,7 @@ public enum ServerVersion {
     }
 
     public static String getOBCDirectory() {
-        return "org.bukkit.craftbukkit." + getNMSSuffix();
+        return "org.bukkit.craftbukkit." + (getNMSSuffix());
     }
 
     public static ServerVersion getLatest() {

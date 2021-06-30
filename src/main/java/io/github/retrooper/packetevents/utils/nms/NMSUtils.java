@@ -47,8 +47,9 @@ import java.util.UUID;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public final class NMSUtils {
-    private static final String NMS_DIR = ServerVersion.getNMSDirectory() + ".";
-    private static final String OBC_DIR = ServerVersion.getOBCDirectory() + ".";
+    private static boolean v_1_17;
+    public static final String NMS_DIR = ServerVersion.getNMSDirectory() + ".";
+    public static final String OBC_DIR = ServerVersion.getOBCDirectory() + ".";
     private static final ThreadLocal<Random> randomThreadLocal = ThreadLocal.withInitial(Random::new);
     public static boolean legacyNettyImportMode;
     public static ServerVersion version;
@@ -63,12 +64,15 @@ public final class NMSUtils {
     private static String nettyPrefix;
     private static Method getCraftPlayerHandle, getCraftEntityHandle, getCraftWorldHandle, asBukkitCopy,
             asNMSCopy, getMessageMethod, chatFromStringMethod, getMaterialFromNMSBlock, getNMSBlockFromMaterial,
-            getMobEffectListId, getMobEffectListById, getItemId, getItemById;
+            getMobEffectListId, getMobEffectListById, getItemId, getItemById, getBukkitEntity;
     private static Field entityPlayerPingField;
     private static Object minecraftServer;
     private static Object minecraftServerConnection;
 
     public static void load() {
+        if (version.isNewerThanOrEquals(ServerVersion.v_1_17)) {
+            v_1_17 = true;
+        }
         String legacyNettyPrefix = "net.minecraft.util.io.netty.";
         String newNettyPrefix = "io.netty.";
         if (version.isNewerThan(ServerVersion.v_1_7_10)) {
@@ -110,6 +114,10 @@ public final class NMSUtils {
         nmsEntityClass = getNMSClassWithoutException("Entity");
         if (nmsEntityClass == null) {
             nmsEntityClass = getNMClassWithoutException("world.entity.Entity");
+        }
+
+        if (nmsEntityClass != null) {
+            getBukkitEntity = Reflection.getMethod(nmsEntityClass, craftEntityClass, 0);
         }
         minecraftServerClass = getNMSClassWithoutException("MinecraftServer");
         if (minecraftServerClass == null) {
@@ -408,12 +416,19 @@ public final class NMSUtils {
     }
 
     @Nullable
+    @Deprecated
     public static Entity getEntityById(@Nullable World world, int id) {
-        Entity entity = PacketEvents.get().getServerUtils().getEntityById(id);
-        if (entity == null) {
-            return EntityFinderUtils.getEntityById(world, id);
+       return PacketEvents.get().getServerUtils().getEntityById(world, id);
+    }
+
+    public static Entity getBukkitEntity(Object nmsEntity) {
+        Object craftEntity = null;
+        try {
+            craftEntity = getBukkitEntity.invoke(nmsEntity);
+        } catch (IllegalAccessException | InvocationTargetException e) {
+            e.printStackTrace();
         }
-        return entity;
+        return (Entity) craftEntity;
     }
 
     public static Object getNMSEntity(final Entity entity) {

@@ -18,6 +18,7 @@
 
 package io.github.retrooper.packetevents.packetwrappers.api.helper;
 
+import io.github.retrooper.packetevents.PacketEvents;
 import io.github.retrooper.packetevents.packetwrappers.NMSPacket;
 import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
 import io.github.retrooper.packetevents.utils.nms.NMSUtils;
@@ -72,11 +73,15 @@ public abstract class WrappedPacketEntityAbstraction extends WrappedPacket {
         if (entity != null) {
             return entity;
         }
-        return entity = NMSUtils.getEntityById(world, getEntityId());
+        return PacketEvents.get().getServerUtils().getEntityById(world, getEntityId());
     }
 
+    @Nullable
     public Entity getEntity() {
-        return getEntity(null);
+        if (entity != null) {
+            return entity;
+        }
+        return PacketEvents.get().getServerUtils().getEntityById(getEntityId());
     }
 
     public void setEntity(@NotNull Entity entity) {

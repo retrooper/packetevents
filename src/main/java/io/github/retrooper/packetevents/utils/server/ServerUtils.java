@@ -18,17 +18,29 @@
 
 package io.github.retrooper.packetevents.utils.server;
 
+import io.github.retrooper.packetevents.PacketEvents;
+import io.github.retrooper.packetevents.packetwrappers.NMSPacket;
+import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
+import io.github.retrooper.packetevents.utils.entityfinder.EntityFinderUtils;
 import io.github.retrooper.packetevents.utils.nms.NMSUtils;
 import io.github.retrooper.packetevents.utils.npc.NPCManager;
+import io.github.retrooper.packetevents.utils.reflection.Reflection;
+import org.bukkit.Bukkit;
+import org.bukkit.World;
 import org.bukkit.entity.Entity;
-import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.spigotmc.SpigotConfig;
 
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 public final class ServerUtils {
+    private static Method getLevelEntityGetterIterable;
+    private static Class<?> persistentEntitySectionManagerClass, levelEntityGetterClass;
+    private static byte v_1_17 = -1;
     private static Class<?> geyserClass;
     private boolean geyserClassChecked;
     private final NPCManager npcManager = new NPCManager();
@@ -86,13 +98,83 @@ public final class ServerUtils {
     }
 
     @Nullable
-    public Entity getEntityById(int entityID) {
-        return entityCache.get(entityID);
+    public Entity getEntityById(@Nullable World world, int entityID) {
+        Entity e= entityCache.get(entityID);
+        if (e != null) {
+            return e;
+        }
+        e = PacketEvents.get().getServerUtils().getEntityById(world, entityID);
+        if (e != null) {
+            return e;
+        }
+
+        if (v_1_17 == -1) {
+            v_1_17 = (byte) (getVersion().isNewerThanOrEquals(ServerVersion.v_1_17) ? 1 : 0);
+        }
+
+        if (v_1_17 == 1) {
+            if (world != null) {
+                for (Entity entity : PacketEvents.get().getServerUtils().getEntityList(world)) {
+                    if (entity.getEntityId() == entityID) {
+                        return entity;
+                    }
+                }
+            }
+            for (World w : Bukkit.getWorlds()) {
+                for (Entity entity : PacketEvents.get().getServerUtils().getEntityList(w)) {
+                    if (entity.getEntityId() == entityID) {
+                        return entity;
+                    }
+                }
+            }
+        } else {
+            return EntityFinderUtils.getEntityByIdUnsafe(world, entityID);
+        }
+        return null;
     }
 
-    public void cacheEntityById(int entityID, @NotNull Entity entity) {
-        entityCache.putIfAbsent(entityID, entity);
+    @Nullable
+    public Entity getEntityById(int entityID) {
+        return getEntityById(null, entityID);
     }
+
+    public List<Entity> getEntityList(World world) {
+        if (v_1_17 == -1) {
+            v_1_17 = (byte) (getVersion().isNewerThanOrEquals(ServerVersion.v_1_17) ? 1 : 0);
+        }
+
+        if (v_1_17 == 1) {
+            if (persistentEntitySectionManagerClass == null) {
+                persistentEntitySectionManagerClass = NMSUtils.getNMClassWithoutException("world.level.entity.PersistentEntitySectionManager");
+            }
+            if (levelEntityGetterClass == null) {
+                levelEntityGetterClass = NMSUtils.getNMClassWithoutException("world.level.entity.LevelEntityGetter");
+            }
+            if (getLevelEntityGetterIterable == null) {
+                getLevelEntityGetterIterable = Reflection.getMethod(levelEntityGetterClass, Iterable.class, 0);
+            }
+            Object worldServer = NMSUtils.convertBukkitWorldToWorldServer(world);
+            WrappedPacket wrappedWorldServer = new WrappedPacket(new NMSPacket(worldServer));
+            Object persistentEntitySectionManager = wrappedWorldServer.readObject(0, persistentEntitySectionManagerClass);
+            WrappedPacket wrappedPersistentEntitySectionManager = new WrappedPacket(new NMSPacket(persistentEntitySectionManager));
+            Object levelEntityGetter = wrappedPersistentEntitySectionManager.readObject(0, levelEntityGetterClass);
+            Iterable<Object> nmsEntitiesIterable = null;
+            try {
+                nmsEntitiesIterable = (Iterable<Object>) getLevelEntityGetterIterable.invoke(levelEntityGetter);
+            } catch (IllegalAccessException | InvocationTargetException e) {
+                e.printStackTrace();
+            }
+            List<Entity> entityList = new ArrayList<>();
+            nmsEntitiesIterable.forEach(nmsEntity -> {
+                Entity bukkitEntity = NMSUtils.getBukkitEntity(nmsEntity);
+                entityList.add(bukkitEntity);
+            });
+            return entityList;
+        } else {
+            return world.getEntities();
+        }
+    }
+
 
     public boolean isGeyserAvailable() {
         if (!geyserClassChecked) {

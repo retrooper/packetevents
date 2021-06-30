@@ -35,6 +35,7 @@ import org.bukkit.event.player.PlayerLoginEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.world.ChunkLoadEvent;
 import org.bukkit.event.world.WorldLoadEvent;
+import org.spigotmc.AsyncCatcher;
 
 import java.net.InetSocketAddress;
 import java.util.UUID;
@@ -93,6 +94,7 @@ public class BukkitEventProcessorInternal implements Listener {
         PacketEvents.get().getPlayerUtils().tempClientVersionMap.remove(address);
         PacketEvents.get().getPlayerUtils().keepAliveMap.remove(uuid);
         PacketEvents.get().getPlayerUtils().channels.remove(player.getName());
+        PacketEvents.get().getServerUtils().entityCache.remove(e.getPlayer().getEntityId());
     }
 
 
@@ -103,7 +105,12 @@ public class BukkitEventProcessorInternal implements Listener {
     }
 
     @EventHandler
-    public void onWorldLoad(ChunkLoadEvent event) {
+    public void onEntityDeath(EntityDeathEvent event) {
+        PacketEvents.get().getServerUtils().entityCache.remove(event.getEntity().getEntityId());
+    }
+
+    @EventHandler
+    public void onChunkLoad(ChunkLoadEvent event) {
         for (Entity entity : event.getWorld().getEntities()) {
             PacketEvents.get().getServerUtils().entityCache.putIfAbsent(entity.getEntityId(), entity);
         }

@@ -55,19 +55,19 @@ public class WrappedPacketOutMapChunk extends WrappedPacket {
 
 
     public int getChunkX() {
-        return readInt(0);
+        return readInt(v_1_17 ? 1 : 0);
     }
 
     public void setChunkX(int chunkX) {
-        writeInt(0, chunkX);
+        writeInt(v_1_17 ? 1: 0, chunkX);
     }
 
     public int getChunkZ() {
-        return readInt(1);
+        return readInt(v_1_17 ? 2: 1);
     }
 
     public void setChunkZ(int chunkZ) {
-        writeInt(1, chunkZ);
+        writeInt(v_1_17 ? 2: 1, chunkZ);
     }
 
     //TODO Add 1.17 support
