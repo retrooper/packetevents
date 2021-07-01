@@ -99,11 +99,7 @@ public final class ServerUtils {
 
     @Nullable
     public Entity getEntityById(@Nullable World world, int entityID) {
-        Entity e= entityCache.get(entityID);
-        if (e != null) {
-            return e;
-        }
-        e = PacketEvents.get().getServerUtils().getEntityById(world, entityID);
+        Entity e = entityCache.get(entityID);
         if (e != null) {
             return e;
         }
