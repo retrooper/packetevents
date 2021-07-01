@@ -148,6 +148,9 @@ public final class NMSUtils {
             networkManagerClass = getNMClassWithoutException("network.NetworkManager");
         }
         mobEffectListClass = getNMSClassWithoutException("MobEffectList");
+        if (mobEffectListClass == null) {
+            mobEffectListClass = getNMClassWithoutException("world.effect.MobEffectList");
+        }
         playerInteractManagerClass = getNMSClassWithoutException("PlayerInteractManager");
         if (playerInteractManagerClass == null) {
             playerInteractManagerClass = getNMClassWithoutException("server.level.PlayerInteractManager");

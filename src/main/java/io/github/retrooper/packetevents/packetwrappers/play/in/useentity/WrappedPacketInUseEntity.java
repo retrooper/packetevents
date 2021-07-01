@@ -56,10 +56,10 @@ public final class WrappedPacketInUseEntity extends WrappedPacketEntityAbstracti
         } catch (ClassNotFoundException e) {
             //That is fine, it is probably a subclass
             if (v_1_17) {
-                enumEntityUseActionClass = SubclassUtil.getEnumSubClass(PacketTypeClasses.Play.Client.USE_ENTITY, 3);
-                obfuscatedDataInterface = SubclassUtil.getSubClass(PacketTypeClasses.Play.Client.USE_ENTITY, 0);
-                obfuscatedHandContainerClass = SubclassUtil.getSubClass(PacketTypeClasses.Play.Client.USE_ENTITY, 1);
-                obfuscatedTargetAndHandContainerClass = SubclassUtil.getSubClass(PacketTypeClasses.Play.Client.USE_ENTITY, 2);
+                enumEntityUseActionClass = SubclassUtil.getEnumSubClass(PacketTypeClasses.Play.Client.USE_ENTITY, "b");
+                obfuscatedDataInterface = SubclassUtil.getSubClass(PacketTypeClasses.Play.Client.USE_ENTITY, "EnumEntityUseAction");
+                obfuscatedHandContainerClass = SubclassUtil.getSubClass(PacketTypeClasses.Play.Client.USE_ENTITY, "d");
+                obfuscatedTargetAndHandContainerClass = SubclassUtil.getSubClass(PacketTypeClasses.Play.Client.USE_ENTITY, "e");
                 getObfuscatedEntityUseActionMethod = Reflection.getMethod(obfuscatedDataInterface, enumEntityUseActionClass, 0);
             } else {
                 enumEntityUseActionClass = SubclassUtil.getEnumSubClass(PacketTypeClasses.Play.Client.USE_ENTITY, "EnumEntityUseAction");
@@ -122,7 +122,7 @@ public final class WrappedPacketInUseEntity extends WrappedPacketEntityAbstracti
                     return null;
                 }
             } else {
-                useActionEnum = readEnumConstant(0, enumEntityUseActionClass);
+                useActionEnum = readEnumConstant(0, (Class<? extends Enum<?>>) enumEntityUseActionClass);
                 if (useActionEnum == null) {
                     //This happens on some weird spigots apparently? Not sure why this is null.
                     return action = EntityUseAction.INTERACT;
@@ -135,7 +135,7 @@ public final class WrappedPacketInUseEntity extends WrappedPacketEntityAbstracti
 
     protected void setAction(EntityUseAction action) {
         this.action = action;
-        Enum<?> enumConst = EnumUtil.valueByIndex(enumEntityUseActionClass, action.ordinal());
+        Enum<?> enumConst = EnumUtil.valueByIndex((Class<? extends Enum<?>>) enumEntityUseActionClass, action.ordinal());
         if (v_1_17) {
             //TODO Add 1.17 support
         }
