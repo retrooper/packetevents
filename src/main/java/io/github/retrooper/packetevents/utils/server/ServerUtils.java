@@ -112,6 +112,7 @@ public final class ServerUtils {
             if (world != null) {
                 for (Entity entity : PacketEvents.get().getServerUtils().getEntityList(world)) {
                     if (entity.getEntityId() == entityID) {
+                        entityCache.putIfAbsent(entity.getEntityId(), entity);
                         return entity;
                     }
                 }
@@ -119,6 +120,7 @@ public final class ServerUtils {
             for (World w : Bukkit.getWorlds()) {
                 for (Entity entity : PacketEvents.get().getServerUtils().getEntityList(w)) {
                     if (entity.getEntityId() == entityID) {
+                        entityCache.putIfAbsent(entity.getEntityId(), entity);
                         return entity;
                     }
                 }
@@ -161,10 +163,12 @@ public final class ServerUtils {
                 e.printStackTrace();
             }
             List<Entity> entityList = new ArrayList<>();
-            nmsEntitiesIterable.forEach(nmsEntity -> {
-                Entity bukkitEntity = NMSUtils.getBukkitEntity(nmsEntity);
-                entityList.add(bukkitEntity);
-            });
+            if (nmsEntitiesIterable != null) {
+                for (Object nmsEntity : nmsEntitiesIterable) {
+                    Entity bukkitEntity = NMSUtils.getBukkitEntity(nmsEntity);
+                    entityList.add(bukkitEntity);
+                }
+            }
             return entityList;
         } else {
             return world.getEntities();

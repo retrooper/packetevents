@@ -108,11 +108,4 @@ public class BukkitEventProcessorInternal implements Listener {
     public void onEntityDeath(EntityDeathEvent event) {
         PacketEvents.get().getServerUtils().entityCache.remove(event.getEntity().getEntityId());
     }
-
-    @EventHandler
-    public void onChunkLoad(ChunkLoadEvent event) {
-        for (Entity entity : event.getWorld().getEntities()) {
-            PacketEvents.get().getServerUtils().entityCache.putIfAbsent(entity.getEntityId(), entity);
-        }
-    }
 }
