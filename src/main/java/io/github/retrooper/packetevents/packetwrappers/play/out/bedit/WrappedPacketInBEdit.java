@@ -43,7 +43,7 @@ public class WrappedPacketInBEdit extends WrappedPacket {
         writeBoolean(0, signing);
     }
 
-    @SupportedVersions(ranges = {ServerVersion.v_1_13, ServerVersion.v_1_16_5})
+    @SupportedVersions(ranges = {ServerVersion.v_1_13, ServerVersion.ERROR})
     public Optional<Hand> getHand() {
         if (v_1_17) {
             return Optional.of(Hand.values()[readInt(0)]);
@@ -55,7 +55,7 @@ public class WrappedPacketInBEdit extends WrappedPacket {
         return Optional.empty();
     }
 
-    @SupportedVersions(ranges = {ServerVersion.v_1_13, ServerVersion.v_1_16_5})
+    @SupportedVersions(ranges = {ServerVersion.v_1_13, ServerVersion.ERROR})
     public void setHand(final Hand hand) {
         if (v_1_17) {
             writeInt(0, hand.ordinal());

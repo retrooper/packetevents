@@ -52,6 +52,9 @@ public final class WrappedPacketInEntityAction extends WrappedPacketEntityAbstra
             return PlayerAction.getByActionValue((byte) (animationIndex));
         } else {
             Enum<?> enumConst = readEnumConstant(0, enumPlayerActionClass);
+            if (newerThan_v_1_8_8) {
+                return PlayerAction.getByActionValue((byte) enumConst.ordinal());
+            }
             return PlayerAction.getByName(enumConst.name());
         }
     }
@@ -66,7 +69,7 @@ public final class WrappedPacketInEntityAction extends WrappedPacketEntityAbstra
                 if (action == PlayerAction.RIDING_JUMP) {
                     throwUnsupportedOperation(action);
                 }
-                enumConst = EnumUtil.valueByIndex(enumPlayerActionClass, action.ordinal());
+                enumConst = EnumUtil.valueByIndex(enumPlayerActionClass, action.getActionValue());
 
             } else {
                 enumConst = EnumUtil.valueOf(enumPlayerActionClass, action.name());

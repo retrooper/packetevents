@@ -55,7 +55,7 @@ public final class WrappedPacketInBlockPlace extends WrappedPacket {
     public Hand getHand() {
         if (newerThan_v_1_8_8) {
             Enum<?> enumConst = readEnumConstant(handEnumIndex, NMSUtils.enumHandClass);
-            return Hand.valueOf(enumConst.name());
+            return Hand.values()[enumConst.ordinal()];
         }
         else {
             return Hand.MAIN_HAND;
@@ -65,8 +65,8 @@ public final class WrappedPacketInBlockPlace extends WrappedPacket {
     public void setHand(Hand hand) {
         //Optimize to do nothing on legacy versions. The protocol of the legacy versions only support one hand, the main hand.
         if (newerThan_v_1_8_8) {
-            Enum<?> enumConst = EnumUtil.valueOf(NMSUtils.enumHandClass, hand.name());
-            write(NMSUtils.enumHandClass, handEnumIndex, enumConst);
+            Enum<?> enumConst = EnumUtil.valueByIndex(NMSUtils.enumHandClass, hand.ordinal());
+            writeEnumConstant(handEnumIndex, enumConst);
         }
     }
 

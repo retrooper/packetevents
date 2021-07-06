@@ -82,7 +82,7 @@ public final class WrappedPacketInBlockDig extends WrappedPacket {
             return Direction.getDirection(readInt(3));
         } else {
             Enum<?> enumDir = readEnumConstant(0, NMSUtils.enumDirectionClass);
-            return Direction.valueOf(enumDir.name());
+            return Direction.values()[enumDir.ordinal()];
         }
     }
 
@@ -90,7 +90,7 @@ public final class WrappedPacketInBlockDig extends WrappedPacket {
         if (isVersionLowerThan_v_1_8) {
             writeInt(3, direction.getFaceValue());
         } else {
-            Enum<?> enumConst = EnumUtil.valueOf(NMSUtils.enumDirectionClass, direction.name());
+            Enum<?> enumConst = EnumUtil.valueByIndex(NMSUtils.enumDirectionClass, direction.ordinal());
             write(NMSUtils.enumDirectionClass, 0, enumConst);
         }
     }
@@ -104,7 +104,7 @@ public final class WrappedPacketInBlockDig extends WrappedPacket {
         if (isVersionLowerThan_v_1_8) {
             return PlayerDigType.values()[readInt(4)];
         } else {
-            return PlayerDigType.valueOf(readObject(0, digTypeClass).name());
+            return PlayerDigType.values()[readEnumConstant(0, digTypeClass).ordinal()];
         }
     }
 
@@ -112,7 +112,7 @@ public final class WrappedPacketInBlockDig extends WrappedPacket {
         if (isVersionLowerThan_v_1_8) {
             writeInt(4, type.ordinal());
         } else {
-            Enum<?> enumConst = EnumUtil.valueOf(digTypeClass, type.name());
+            Enum<?> enumConst = EnumUtil.valueByIndex(digTypeClass, type.ordinal());
             writeEnumConstant(0, enumConst);
         }
     }

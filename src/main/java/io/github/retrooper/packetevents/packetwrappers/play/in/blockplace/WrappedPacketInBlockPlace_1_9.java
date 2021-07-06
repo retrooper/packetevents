@@ -79,11 +79,11 @@ final class WrappedPacketInBlockPlace_1_9 extends WrappedPacket {
             WrappedPacket movingObjectPosWrapper = new WrappedPacket(new NMSPacket(movingObjPos));
             enumConst = movingObjectPosWrapper.readEnumConstant(0, NMSUtils.enumDirectionClass);
         }
-        return Direction.valueOf(enumConst.name());
+        return Direction.values()[enumConst.ordinal()];
     }
 
     public void setDirection(Direction direction) {
-        Enum<?> enumConst = EnumUtil.valueOf(NMSUtils.enumDirectionClass, direction.name());
+        Enum<?> enumConst = EnumUtil.valueByIndex(NMSUtils.enumDirectionClass, direction.ordinal());
         if (movingObjectPositionBlockClass == null) {
             writeEnumConstant(0, enumConst);
         } else {

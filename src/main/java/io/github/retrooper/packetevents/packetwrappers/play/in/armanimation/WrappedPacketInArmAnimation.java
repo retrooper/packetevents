@@ -39,7 +39,7 @@ public class WrappedPacketInArmAnimation extends WrappedPacket {
     public Hand getHand() {
         if (v_1_9) {
             Enum<?> enumConst = readEnumConstant(0, NMSUtils.enumHandClass);
-            return Hand.valueOf(enumConst.name());
+            return Hand.values()[enumConst.ordinal()];
         }
         else {
             return Hand.MAIN_HAND;
@@ -49,7 +49,7 @@ public class WrappedPacketInArmAnimation extends WrappedPacket {
     public void setHand(Hand hand) {
         //Optimize to do nothing on legacy versions. The protocol of the legacy versions only support one hand, the main hand.
         if (v_1_9) {
-            Enum<?> enumConst = EnumUtil.valueOf(NMSUtils.enumHandClass, hand.name());
+            Enum<?> enumConst = EnumUtil.valueByIndex(NMSUtils.enumHandClass, hand.ordinal());
             writeEnumConstant(0, enumConst);
         }
     }
