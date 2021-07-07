@@ -25,8 +25,6 @@ import net.minecraft.util.io.netty.channel.ChannelHandlerContext;
 import net.minecraft.util.io.netty.channel.ChannelPromise;
 import org.bukkit.entity.Player;
 
-import java.util.logging.Level;
-
 public class PlayerChannelHandlerLegacy extends ChannelDuplexHandler {
     /**
      * Associated player.
@@ -36,32 +34,24 @@ public class PlayerChannelHandlerLegacy extends ChannelDuplexHandler {
 
     @Override
     public void channelRead(final ChannelHandlerContext ctx, Object packet) throws Exception {
-        try {
-            PacketProcessorInternal.PacketData data = PacketEvents.get().getInternalPacketProcessor().read(player, ctx.channel(), packet);
-            if (data.packet != null) {
-                super.channelRead(ctx, data.packet);
-                PacketEvents.get().getInternalPacketProcessor().postRead(player, ctx.channel(), data.packet);
-            }
-        } catch (Throwable t) {
-            PacketEvents.get().getPlugin().getLogger().log(Level.SEVERE, "Unable to handle an incoming packet ", t.getMessage());
+        PacketProcessorInternal.PacketData data = PacketEvents.get().getInternalPacketProcessor().read(player, ctx.channel(), packet);
+        if (data.packet != null) {
+            super.channelRead(ctx, data.packet);
+            PacketEvents.get().getInternalPacketProcessor().postRead(player, ctx.channel(), data.packet);
         }
     }
 
     @Override
     public void write(final ChannelHandlerContext ctx, Object packet, final ChannelPromise promise) throws Exception {
-        try {
-            PacketProcessorInternal.PacketData data = PacketEvents.get().getInternalPacketProcessor().write(player, ctx.channel(), packet);
-            if (data.postAction != null) {
-                promise.addListener(f -> {
-                    data.postAction.run();
-                });
-            }
-            if (data.packet != null) {
-                super.write(ctx, data.packet, promise);
-                PacketEvents.get().getInternalPacketProcessor().postWrite(player, ctx.channel(), data.packet);
-            }
-        } catch (Throwable t) {
-            PacketEvents.get().getPlugin().getLogger().log(Level.SEVERE, "Unable to handle an outgoing packet ", t.getMessage());
+        PacketProcessorInternal.PacketData data = PacketEvents.get().getInternalPacketProcessor().write(player, ctx.channel(), packet);
+        if (data.postAction != null) {
+            promise.addListener(f -> {
+                data.postAction.run();
+            });
+        }
+        if (data.packet != null) {
+            super.write(ctx, data.packet, promise);
+            PacketEvents.get().getInternalPacketProcessor().postWrite(player, ctx.channel(), data.packet);
         }
     }
 }

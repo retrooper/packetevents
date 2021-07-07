@@ -27,6 +27,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.ConcurrentModificationException;
 
 /**
  * Internal utility class to find entities by their Entity ID.
@@ -80,10 +81,15 @@ public final class EntityFinderUtils {
             }
         }
         for (World world : Bukkit.getWorlds()) {
-            for (Entity entity : world.getEntities()) {
-                if (entity.getEntityId() == id) {
-                    return entity;
+            try {
+                for (Entity entity : world.getEntities()) {
+                    if (entity.getEntityId() == id) {
+                        return entity;
+                    }
                 }
+            }
+            catch (ConcurrentModificationException ex) {
+                return null;
             }
         }
         return null;
