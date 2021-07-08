@@ -26,6 +26,7 @@ import io.github.retrooper.packetevents.utils.server.ServerVersion;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
+import java.util.BitSet;
 import java.util.Optional;
 
 //TODO finish wrapper
@@ -70,10 +71,24 @@ public class WrappedPacketOutMapChunk extends WrappedPacket {
         writeInt(v_1_17 ? 2: 1, chunkZ);
     }
 
-    //TODO Add 1.17 support
-    public Optional<Integer> getPrimaryBitMap() {
+    public Optional<BitSet> getPrimaryBitMaskBitSet() {
         if (v_1_17) {
+            return Optional.of(readObject(0, BitSet.class));
+        }
+        else {
             return Optional.empty();
+        }
+    }
+
+    public void setPrimaryBitMaskBitSet(BitSet bitMaskBitSet) {
+        if (v_1_17) {
+            writeObject(0, bitMaskBitSet);
+        }
+    }
+
+    public Optional<Integer> getPrimaryBitMask() {
+        if (v_1_17) {
+            return Optional.of((int) readObject(0, BitSet.class).toLongArray()[0]);
         }
         if (v_1_8_x) {
             if (nmsChunkMap == null) {
@@ -86,9 +101,9 @@ public class WrappedPacketOutMapChunk extends WrappedPacket {
         }
     }
 
-    //TODO Add 1.17 support
-    public void setPrimaryBitMap(int primaryBitMap) {
+    public void setPrimaryBitMask(int primaryBitMask) {
         if (v_1_17) {
+            writeObject(0, BitSet.valueOf(new long[] {primaryBitMask}));
             return;
         }
         if (v_1_8_x) {
@@ -100,11 +115,11 @@ public class WrappedPacketOutMapChunk extends WrappedPacket {
                 }
             }
             WrappedPacket nmsChunkMapWrapper = new WrappedPacket(new NMSPacket(nmsChunkMap));
-            nmsChunkMapWrapper.writeInt(0, primaryBitMap);
+            nmsChunkMapWrapper.writeInt(0, primaryBitMask);
             write(chunkMapClass, 0, nmsChunkMap);
 
         } else {
-            writeInt(2, primaryBitMap);
+            writeInt(2, primaryBitMask);
         }
     }
 
