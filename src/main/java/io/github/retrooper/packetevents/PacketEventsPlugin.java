@@ -25,7 +25,6 @@ import org.bukkit.plugin.java.JavaPlugin;
 public class PacketEventsPlugin extends JavaPlugin {
     @Override
     public void onLoad() {
-        //Return value of create is your PacketEvents instance.
         PacketEvents.create(this);
         PacketEventsSettings settings = PacketEvents.get().getSettings();
         settings
