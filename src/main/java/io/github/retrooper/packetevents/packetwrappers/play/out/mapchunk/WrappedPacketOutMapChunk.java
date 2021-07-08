@@ -86,6 +86,16 @@ public class WrappedPacketOutMapChunk extends WrappedPacket {
         }
     }
 
+    @Deprecated
+    public Optional<Integer> getPrimaryBitMap() {
+        return getPrimaryBitMask();
+    }
+
+    @Deprecated
+    public void setPrimaryBitMap(int primaryBitMask) {
+        setPrimaryBitMask(primaryBitMask);
+    }
+
     public Optional<Integer> getPrimaryBitMask() {
         if (v_1_17) {
             return Optional.of((int) readObject(0, BitSet.class).toLongArray()[0]);
