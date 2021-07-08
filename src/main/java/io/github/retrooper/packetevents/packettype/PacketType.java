@@ -324,7 +324,11 @@ public class PacketType {
                     SCOREBOARD_SCORE = 10, SPAWN_POSITION = 11, UPDATE_TIME = 12, TITLE = 13,
                     ENTITY_SOUND = 14, NAMED_SOUND_EFFECT = 15, STOP_SOUND = 16, PLAYER_LIST_HEADER_FOOTER = 17,
                     NBT_QUERY = 18, COLLECT = 19, ENTITY_TELEPORT = 20, ADVANCEMENTS = 21, UPDATE_ATTRIBUTES = 22,
-                    ENTITY_EFFECT = 23, RECIPE_UPDATE = 24, TAGS = 25, MAP_CHUNK_BULK = 26, NAMED_ENTITY_SPAWN = 27, PING = 29;
+                    ENTITY_EFFECT = 23, RECIPE_UPDATE = 24, TAGS = 25, MAP_CHUNK_BULK = 26, NAMED_ENTITY_SPAWN = 27, PING = 29,
+                    ADD_VIBRATION_SIGNAL = 30, CLEAR_TITLES = 31, INITIALIZE_BORDER = 32, PLAYER_COMBAT_END = 33,
+                    PLAYER_COMBAT_ENTER = 34, PLAYER_COMBAT_KILL = 35, SET_ACTIONBAR_TEXT = 36, SET_BORDER_CENTER = 37,
+                    SET_BORDER_LERP_SIZE = 38, SET_BORDER_SIZE = 39, SET_BORDER_WARNING_DELAY = 40, SET_BORDER_WARNING_DISTANCE = 41,
+                    SET_SUBTITLE_TEXT = 42, SET_TITLES_ANIMATION = 43, SET_TITLE_TEXT = 44;
 
             private static void load() {
                 insertPacketID(PacketTypeClasses.Play.Server.SPAWN_ENTITY, SPAWN_ENTITY);
@@ -423,6 +427,21 @@ public class PacketType {
                 insertPacketID(PacketTypeClasses.Play.Server.MAP_CHUNK_BULK, MAP_CHUNK_BULK);
                 insertPacketID(PacketTypeClasses.Play.Server.NAMED_ENTITY_SPAWN, NAMED_ENTITY_SPAWN);
                 insertPacketID(PacketTypeClasses.Play.Server.PING, PING);
+                insertPacketID(PacketTypeClasses.Play.Server.ADD_VIBRATION_SIGNAL, ADD_VIBRATION_SIGNAL);
+                insertPacketID(PacketTypeClasses.Play.Server.CLEAR_TITLES, CLEAR_TITLES );
+                insertPacketID(PacketTypeClasses.Play.Server.INITIALIZE_BORDER, INITIALIZE_BORDER);
+                insertPacketID(PacketTypeClasses.Play.Server.PLAYER_COMBAT_END, PLAYER_COMBAT_END);
+                insertPacketID(PacketTypeClasses.Play.Server.PLAYER_COMBAT_ENTER, PLAYER_COMBAT_ENTER);
+                insertPacketID(PacketTypeClasses.Play.Server.PLAYER_COMBAT_KILL, PLAYER_COMBAT_KILL);
+                insertPacketID(PacketTypeClasses.Play.Server.SET_ACTIONBAR_TEXT, SET_ACTIONBAR_TEXT);
+                insertPacketID(PacketTypeClasses.Play.Server.SET_BORDER_CENTER, SET_BORDER_CENTER);
+                insertPacketID(PacketTypeClasses.Play.Server.SET_BORDER_LERP_SIZE, SET_BORDER_LERP_SIZE);
+                insertPacketID(PacketTypeClasses.Play.Server.SET_BORDER_SIZE, SET_BORDER_SIZE);
+                insertPacketID(PacketTypeClasses.Play.Server.SET_BORDER_WARNING_DELAY, SET_BORDER_WARNING_DELAY);
+                insertPacketID(PacketTypeClasses.Play.Server.SET_BORDER_WARNING_DISTANCE, SET_BORDER_WARNING_DISTANCE);
+                insertPacketID(PacketTypeClasses.Play.Server.SET_SUBTITLE_TEXT, SET_SUBTITLE_TEXT);
+                insertPacketID(PacketTypeClasses.Play.Server.SET_TITLES_ANIMATION, SET_TITLES_ANIMATION);
+                insertPacketID(PacketTypeClasses.Play.Server.SET_TITLE_TEXT, SET_TITLE_TEXT);
             }
 
             /**

@@ -19,12 +19,9 @@
 package io.github.retrooper.packetevents.packettype;
 
 import io.github.retrooper.packetevents.PacketEvents;
-import io.github.retrooper.packetevents.utils.nms.NMSUtils;
 import io.github.retrooper.packetevents.utils.reflection.Reflection;
 import io.github.retrooper.packetevents.utils.reflection.SubclassUtil;
 import io.github.retrooper.packetevents.utils.server.ServerVersion;
-
-import java.sql.Ref;
 
 public class PacketTypeClasses {
     public static void load() {
@@ -262,7 +259,10 @@ public class PacketTypeClasses {
                     SCOREBOARD_SCORE, SPAWN_POSITION, UPDATE_TIME, TITLE,
                     ENTITY_SOUND, NAMED_SOUND_EFFECT, STOP_SOUND, PLAYER_LIST_HEADER_FOOTER,
                     NBT_QUERY, COLLECT, ENTITY_TELEPORT, ADVANCEMENTS, UPDATE_ATTRIBUTES,
-                    ENTITY_EFFECT, RECIPE_UPDATE, TAGS, MAP_CHUNK_BULK, NAMED_ENTITY_SPAWN, PING;
+                    ENTITY_EFFECT, RECIPE_UPDATE, TAGS, MAP_CHUNK_BULK, NAMED_ENTITY_SPAWN, PING, ADD_VIBRATION_SIGNAL,
+                    CLEAR_TITLES, INITIALIZE_BORDER, PLAYER_COMBAT_END, PLAYER_COMBAT_ENTER, PLAYER_COMBAT_KILL,
+                    SET_ACTIONBAR_TEXT, SET_BORDER_CENTER, SET_BORDER_LERP_SIZE, SET_BORDER_SIZE, SET_BORDER_WARNING_DELAY,
+                    SET_BORDER_WARNING_DISTANCE, SET_SUBTITLE_TEXT, SET_TITLES_ANIMATION, SET_TITLE_TEXT;
 
             /**
              * Initiate all client-bound packet classes.
@@ -376,8 +376,24 @@ public class PacketTypeClasses {
                 TAGS = Reflection.getClassByNameWithoutException(COMMON_PREFIX + "Tags");
                 MAP_CHUNK_BULK = Reflection.getClassByNameWithoutException(COMMON_PREFIX + "MapChunkBulk");
                 NAMED_ENTITY_SPAWN = Reflection.getClassByNameWithoutException(COMMON_PREFIX + "NamedEntitySpawn");
-                //This packet was added in 1.17
+
+                //These packets were added in 1.17
                 PING = Reflection.getClassByNameWithoutException(PREFIX + "ClientboundPingPacket");
+                ADD_VIBRATION_SIGNAL = Reflection.getClassByNameWithoutException(PREFIX + "ClientboundAddVibrationSignalPacket");
+                CLEAR_TITLES = Reflection.getClassByNameWithoutException(PREFIX + "ClientboundClearTitlesPacket");
+                INITIALIZE_BORDER = Reflection.getClassByNameWithoutException(PREFIX + "ClientboundInitializeBorderPacket");
+                PLAYER_COMBAT_END = Reflection.getClassByNameWithoutException(PREFIX + "ClientboundPlayerCombatEndPacket");
+                PLAYER_COMBAT_ENTER = Reflection.getClassByNameWithoutException(PREFIX + "ClientboundPlayerCombatEnterPacket");
+                PLAYER_COMBAT_KILL = Reflection.getClassByNameWithoutException(PREFIX + "ClientboundPlayerCombatKillPacket");
+                SET_ACTIONBAR_TEXT = Reflection.getClassByNameWithoutException(PREFIX + "ClientboundSetActionBarTextPacket");
+                SET_BORDER_CENTER = Reflection.getClassByNameWithoutException(PREFIX + "ClientboundSetBorderCenterPacket");
+                SET_BORDER_LERP_SIZE = Reflection.getClassByNameWithoutException(PREFIX + "ClientboundSetBorderLerpSizePacket");
+                SET_BORDER_SIZE = Reflection.getClassByNameWithoutException(PREFIX + "ClientboundSetBorderSizePacket");
+                SET_BORDER_WARNING_DELAY = Reflection.getClassByNameWithoutException(PREFIX + "ClientboundSetBorderWarningDelayPacket");
+                SET_BORDER_WARNING_DISTANCE = Reflection.getClassByNameWithoutException(PREFIX + "ClientboundSetBorderWarningDistancePacket");
+                SET_SUBTITLE_TEXT = Reflection.getClassByNameWithoutException(PREFIX + "ClientboundSetSubtitleTextPacket");
+                SET_TITLES_ANIMATION = Reflection.getClassByNameWithoutException(PREFIX + "ClientboundSetTitlesAnimationPacket");
+                SET_TITLE_TEXT = Reflection.getClassByNameWithoutException(PREFIX + "ClientboundSetTitleTextPacket");
             }
         }
     }

@@ -204,7 +204,7 @@ public final class PacketEvents implements Listener, EventManager {
                 for (final Player p : Bukkit.getOnlinePlayers()) {
                     try {
                         injector.injectPlayer(p);
-                        PacketEvents.get().getEventManager().callEvent(new PostPlayerInjectEvent(p, false));
+                        getEventManager().callEvent(new PostPlayerInjectEvent(p, false));
                     } catch (Exception ex) {
                         p.kickPlayer("Failed to inject... Please rejoin!");
                     }
@@ -333,7 +333,7 @@ public final class PacketEvents implements Listener, EventManager {
             updateChecker = new UpdateChecker();
         }
         Thread thread = new Thread(() -> {
-            PacketEvents.get().getPlugin().getLogger().info("[packetevents] Checking for an update, please wait...");
+            getPlugin().getLogger().info("[packetevents] Checking for an update, please wait...");
             UpdateChecker.UpdateCheckerStatus status = updateChecker.checkForUpdate();
             int seconds = 5;
             int retryCount = 5;
@@ -341,7 +341,7 @@ public final class PacketEvents implements Listener, EventManager {
                 if (status != UpdateChecker.UpdateCheckerStatus.FAILED) {
                     break;
                 }
-                PacketEvents.get().getPlugin().getLogger().severe("[packetevents] Checking for an update again in " + seconds + " seconds...");
+                getPlugin().getLogger().severe("[packetevents] Checking for an update again in " + seconds + " seconds...");
                 try {
                     Thread.sleep(seconds * 1000L);
                 } catch (InterruptedException e) {
@@ -353,7 +353,7 @@ public final class PacketEvents implements Listener, EventManager {
                 status = updateChecker.checkForUpdate();
 
                 if (i == (retryCount - 1)) {
-                    PacketEvents.get().getPlugin().getLogger().severe("[packetevents] PacketEvents failed to check for an update. No longer retrying.");
+                    getPlugin().getLogger().severe("[packetevents] PacketEvents failed to check for an update. No longer retrying.");
                     break;
                 }
 
