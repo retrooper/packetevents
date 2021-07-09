@@ -4,19 +4,21 @@ import io.github.retrooper.packetevents.packettype.PacketTypeClasses;
 import io.github.retrooper.packetevents.packetwrappers.NMSPacket;
 import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
 import io.github.retrooper.packetevents.packetwrappers.api.SendableWrapper;
+import io.github.retrooper.packetevents.utils.server.ServerVersion;
 
 import java.lang.reflect.Constructor;
+import java.util.Optional;
 
 public class WrappedPacketOutCollect extends WrappedPacket implements SendableWrapper {
-
-    private int collectedEntityId, collectorEntityId, itemCount;
+    private static boolean v_1_11;
     private static Constructor<?> packetConstructor;
+    private int collectedEntityId, collectorEntityId, itemCount;
 
     public WrappedPacketOutCollect(NMSPacket packet) {
         super(packet);
     }
 
-    public WrappedPacketOutCollect(final int collectedEntityId, final int collectorEntityId, final int itemCount) {
+    public WrappedPacketOutCollect(int collectedEntityId, int collectorEntityId, int itemCount) {
         this.collectedEntityId = collectedEntityId;
         this.collectorEntityId = collectorEntityId;
         this.itemCount = itemCount;
@@ -24,8 +26,13 @@ public class WrappedPacketOutCollect extends WrappedPacket implements SendableWr
 
     @Override
     protected void load() {
+        v_1_11 = version.isNewerThanOrEquals(ServerVersion.v_1_11);
         try {
-            packetConstructor = PacketTypeClasses.Play.Server.COLLECT.getConstructors()[1];
+            if (v_1_11) {
+                packetConstructor = PacketTypeClasses.Play.Server.COLLECT.getConstructor(int.class, int.class, int.class);
+            } else {
+                packetConstructor = PacketTypeClasses.Play.Server.COLLECT.getConstructor(int.class, int.class);
+            }
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -63,33 +70,34 @@ public class WrappedPacketOutCollect extends WrappedPacket implements SendableWr
         }
     }
 
-    public int getItemCount() {
+    public Optional<Integer> getItemCount() {
+        if (!v_1_11) {
+            return Optional.empty();
+        }
         if (packet != null) {
-            return readInt(2);
+            return Optional.of(readInt(2));
         } else {
-            return this.itemCount;
+            return Optional.of(this.itemCount);
         }
     }
 
     public void setItemCount(int count) {
-        if (packet != null) {
-            writeInt(2, count);
-        } else {
-            this.itemCount = count;
+        if (v_1_11) {
+            if (packet != null) {
+                writeInt(2, count);
+            } else {
+                this.itemCount = count;
+            }
         }
     }
 
     @Override
     public Object asNMSPacket() throws Exception {
         /*
-         * The reasoning of the checking for constructor parameter count is that on newer versions
-         * the packet has an extra field and an extra parameter which is the picked up item count.
-         *
-         * As we want to support both of these we can just check for the amount
-         * of parameters on the constructor and support every version with ease.
+         * On newer versions the packet has an extra field which is the picked up item count.
          */
-        return packetConstructor.getParameterCount() == 3
-                ? packetConstructor.newInstance(this.collectedEntityId, this.collectorEntityId, this.itemCount)
-                : packetConstructor.newInstance(this.collectedEntityId, this.collectorEntityId);
+        return v_1_11
+                ? packetConstructor.newInstance(getCollectedEntityId(), getCollectorEntityId(), getItemCount())
+                : packetConstructor.newInstance(getCollectedEntityId(), getCollectorEntityId());
     }
 }
