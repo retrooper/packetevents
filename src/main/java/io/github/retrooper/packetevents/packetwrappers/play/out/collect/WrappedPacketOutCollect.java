@@ -97,7 +97,7 @@ public class WrappedPacketOutCollect extends WrappedPacket implements SendableWr
          * On newer versions the packet has an extra field which is the picked up item count.
          */
         return v_1_11
-                ? packetConstructor.newInstance(getCollectedEntityId(), getCollectorEntityId(), getItemCount())
+                ? packetConstructor.newInstance(getCollectedEntityId(), getCollectorEntityId(), (int) (getItemCount().get()))
                 : packetConstructor.newInstance(getCollectedEntityId(), getCollectorEntityId());
     }
 }
