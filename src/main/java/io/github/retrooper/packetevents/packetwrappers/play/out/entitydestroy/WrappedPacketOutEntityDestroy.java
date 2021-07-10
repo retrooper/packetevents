@@ -20,14 +20,11 @@ package io.github.retrooper.packetevents.packetwrappers.play.out.entitydestroy;
 
 import io.github.retrooper.packetevents.packettype.PacketTypeClasses;
 import io.github.retrooper.packetevents.packetwrappers.NMSPacket;
-import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
 import io.github.retrooper.packetevents.packetwrappers.api.SendableWrapper;
 import io.github.retrooper.packetevents.packetwrappers.api.helper.WrappedPacketEntityAbstraction;
-import io.github.retrooper.packetevents.utils.nms.NMSUtils;
 import io.github.retrooper.packetevents.utils.server.ServerVersion;
-import org.bukkit.World;
+import it.unimi.dsi.fastutil.ints.IntList;
 import org.bukkit.entity.Entity;
-import org.jetbrains.annotations.Nullable;
 
 import java.lang.reflect.Constructor;
 import java.util.Optional;
@@ -38,6 +35,7 @@ import java.util.Optional;
  */
 public class WrappedPacketOutEntityDestroy extends WrappedPacketEntityAbstraction implements SendableWrapper {
     private static boolean v_1_17;
+    private static boolean v_1_17_1;
     private static Constructor<?> packetConstructor;
     private int[] entityIds;
 
@@ -61,6 +59,7 @@ public class WrappedPacketOutEntityDestroy extends WrappedPacketEntityAbstractio
     @Override
     protected void load() {
         v_1_17 = version.isNewerThanOrEquals(ServerVersion.v_1_17);
+        v_1_17_1 = version.isNewerThanOrEquals(ServerVersion.v_1_17_1);
         try {
             if (v_1_17) {
                 packetConstructor =
@@ -85,7 +84,11 @@ public class WrappedPacketOutEntityDestroy extends WrappedPacketEntityAbstractio
                 return entityIds[0];
             }
         }
-        if (v_1_17) {
+        if (v_1_17_1) {
+            IntList list = readObject(0, IntList.class);
+            entityID = list.get(0);
+        }
+        else if (v_1_17) {
             entityID = readInt(0);
         }
         else {
@@ -124,7 +127,11 @@ public class WrappedPacketOutEntityDestroy extends WrappedPacketEntityAbstractio
                 return Optional.of(readIntArray(0));
             }
         } else {
-            if (v_1_17) {
+            if (v_1_17_1) {
+                IntList list = readObject(0, IntList.class);
+                return Optional.of(list.toIntArray());
+            }
+            else if (v_1_17) {
                 return Optional.of(new int[] {entityID});
             }
             else {
