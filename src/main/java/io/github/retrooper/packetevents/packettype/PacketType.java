@@ -220,7 +220,7 @@ public class PacketType {
                 insertPacketID(PacketTypeClasses.Play.Client.POSITION, POSITION);
                 insertPacketID(PacketTypeClasses.Play.Client.POSITION_LOOK, POSITION_LOOK);
                 insertPacketID(PacketTypeClasses.Play.Client.LOOK, LOOK);
-                insertPacketID(PacketTypeClasses.Play.Client.FLYING, FLYING);
+                insertPacketID(PacketTypeClasses.Play.Client.GROUND, FLYING);
                 insertPacketID(PacketTypeClasses.Play.Client.VEHICLE_MOVE, VEHICLE_MOVE);
                 insertPacketID(PacketTypeClasses.Play.Client.BOAT_MOVE, BOAT_MOVE);
                 insertPacketID(PacketTypeClasses.Play.Client.PICK_ITEM, PICK_ITEM);
