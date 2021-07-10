@@ -98,7 +98,8 @@ public class WrappedPacketOutMapChunk extends WrappedPacket {
 
     public Optional<Integer> getPrimaryBitMask() {
         if (v_1_17) {
-            return Optional.of((int) readObject(0, BitSet.class).toLongArray()[0]);
+            long[] bitset = readObject(0, BitSet.class).toLongArray();
+            return Optional.of(bitset.length == 0 ? 0 : (int) bitset[0]);
         }
         if (v_1_8_x) {
             if (nmsChunkMap == null) {
