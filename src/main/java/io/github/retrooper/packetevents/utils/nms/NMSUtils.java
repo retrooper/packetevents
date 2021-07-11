@@ -58,7 +58,7 @@ public final class NMSUtils {
             craftPlayerClass, serverConnectionClass, craftEntityClass, nmsItemStackClass, networkManagerClass, nettyChannelClass, gameProfileClass, iChatBaseComponentClass,
             blockPosClass, vec3DClass, channelFutureClass, blockClass, iBlockDataClass, nmsWorldClass, craftItemStackClass,
             soundEffectClass, minecraftKeyClass, chatSerializerClass, craftMagicNumbersClass, worldSettingsClass, worldServerClass, dataWatcherClass,
-            dedicatedServerClass, entityHumanClass, packetDataSerializerClass, byteBufClass, dimensionManagerClass, nmsItemClass;
+            dedicatedServerClass, entityHumanClass, packetDataSerializerClass, byteBufClass, dimensionManagerClass, nmsItemClass, movingObjectPositionBlock;
     public static Class<? extends Enum<?>> enumDirectionClass, enumHandClass, enumGameModeClass, enumDifficultyClass;
     public static Method getBlockPosX, getBlockPosY, getBlockPosZ;
     private static String nettyPrefix;
@@ -229,6 +229,14 @@ public final class NMSUtils {
             blockPosClass = NMSUtils.getNMSClassWithoutException("BlockPosition");
             if (blockPosClass == null) {
                 blockPosClass = getNMClassWithoutException("core.BlockPosition");
+            }
+        }
+
+        if (version.isNewerThanOrEquals(ServerVersion.v_1_14)) {
+            movingObjectPositionBlock = NMSUtils.getNMSClassWithoutException("MovingObjectPositionBlock");
+
+            if (movingObjectPositionBlock == null) {
+                movingObjectPositionBlock = getNMClassWithoutException("world.phys.MovingObjectPositionBlock");
             }
         }
         try {
