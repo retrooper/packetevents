@@ -46,7 +46,6 @@ import java.util.UUID;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public final class NMSUtils {
-    private static boolean v_1_17;
     public static final String NMS_DIR = ServerVersion.getNMSDirectory() + ".";
     public static final String OBC_DIR = ServerVersion.getOBCDirectory() + ".";
     private static final ThreadLocal<Random> randomThreadLocal = ThreadLocal.withInitial(Random::new);
@@ -69,9 +68,6 @@ public final class NMSUtils {
     private static Object minecraftServerConnection;
 
     public static void load() {
-        if (version.isNewerThanOrEquals(ServerVersion.v_1_17)) {
-            v_1_17 = true;
-        }
         String legacyNettyPrefix = "net.minecraft.util.io.netty.";
         String newNettyPrefix = "io.netty.";
         if (version.isNewerThan(ServerVersion.v_1_7_10)) {

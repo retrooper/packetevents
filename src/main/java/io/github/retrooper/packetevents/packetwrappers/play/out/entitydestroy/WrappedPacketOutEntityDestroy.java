@@ -28,7 +28,6 @@ import it.unimi.dsi.fastutil.ints.IntList;
 import org.bukkit.entity.Entity;
 
 import java.lang.reflect.Constructor;
-import java.util.Optional;
 
 /**
  * @author yanjulang, MWHunter
