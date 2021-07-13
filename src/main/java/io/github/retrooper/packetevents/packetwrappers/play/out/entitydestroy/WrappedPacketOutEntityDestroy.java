@@ -20,26 +20,25 @@ package io.github.retrooper.packetevents.packetwrappers.play.out.entitydestroy;
 
 import io.github.retrooper.packetevents.packettype.PacketTypeClasses;
 import io.github.retrooper.packetevents.packetwrappers.NMSPacket;
-import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
 import io.github.retrooper.packetevents.packetwrappers.api.SendableWrapper;
 import io.github.retrooper.packetevents.packetwrappers.api.helper.WrappedPacketEntityAbstraction;
-import io.github.retrooper.packetevents.utils.nms.NMSUtils;
 import io.github.retrooper.packetevents.utils.server.ServerVersion;
-import org.bukkit.World;
+import it.unimi.dsi.fastutil.ints.IntArrayList;
+import it.unimi.dsi.fastutil.ints.IntList;
 import org.bukkit.entity.Entity;
-import org.jetbrains.annotations.Nullable;
 
 import java.lang.reflect.Constructor;
 import java.util.Optional;
 
 /**
- * @author yanjulang
+ * @author yanjulang, MWHunter
  * @since 1.8
  */
 public class WrappedPacketOutEntityDestroy extends WrappedPacketEntityAbstraction implements SendableWrapper {
     private static boolean v_1_17;
+    private static boolean v_1_17_1;
     private static Constructor<?> packetConstructor;
-    private int[] entityIds;
+    private int[] entityIds = new int[0];
 
     public WrappedPacketOutEntityDestroy(NMSPacket packet) {
         super(packet);
@@ -60,7 +59,9 @@ public class WrappedPacketOutEntityDestroy extends WrappedPacketEntityAbstractio
 
     @Override
     protected void load() {
-        v_1_17 = version.isNewerThanOrEquals(ServerVersion.v_1_17);
+        v_1_17_1 = version.isNewerThanOrEquals(ServerVersion.v_1_17_1);
+        v_1_17 = version.equals(ServerVersion.v_1_17);
+
         try {
             if (v_1_17) {
                 packetConstructor =
@@ -77,7 +78,7 @@ public class WrappedPacketOutEntityDestroy extends WrappedPacketEntityAbstractio
 
     @Override
     public int getEntityId() {
-        if (entityID != -1 || packet == null) {
+        if (entityID != -1 || entityIds.length > 0 || packet == null) {
             if (v_1_17) {
                 return entityID;
             }
@@ -85,13 +86,19 @@ public class WrappedPacketOutEntityDestroy extends WrappedPacketEntityAbstractio
                 return entityIds[0];
             }
         }
-        if (v_1_17) {
-            entityID = readInt(0);
-        }
         else {
-            entityID = readIntArray(0)[0];
+            if (v_1_17_1) {
+                IntList list = readObject(0, IntList.class);
+                entityIds = list.toIntArray();
+                return entityIds[0];
+            } else if (v_1_17) {
+                return entityID = readInt(0);
+            } else {
+                entityIds = readIntArray(0);
+                return entityIds[0];
+            }
         }
-        return entityID;
+
     }
 
     @Override
@@ -102,7 +109,13 @@ public class WrappedPacketOutEntityDestroy extends WrappedPacketEntityAbstractio
             }
             else {
                 this.entityIds = new int[] {entityID};
-                writeIntArray(0, new int[]{this.entityIds[0]});
+                if (v_1_17_1) {
+                    IntList intArrayList = new IntArrayList(this.entityIds);
+                    write(IntList.class, 0, intArrayList);
+                }
+                else {
+                    writeIntArray(0, new int[]{this.entityIds[0]});
+                }
             }
         } else {
             if (v_1_17) {
@@ -115,20 +128,23 @@ public class WrappedPacketOutEntityDestroy extends WrappedPacketEntityAbstractio
         this.entity = null;
     }
 
-    public Optional<int[]> getEntityIds() {
+    public int[] getEntityIds() {
         if (packet != null) {
             if (v_1_17) {
-                return Optional.of(new int[] {getEntityId()});
+                return new int[] {getEntityId()};
+            }
+            else if (v_1_17_1) {
+                return readObject(0, IntList.class).toIntArray();
             }
             else {
-                return Optional.of(readIntArray(0));
+                return readIntArray(0);
             }
         } else {
-            if (v_1_17) {
-                return Optional.of(new int[] {entityID});
+           if (v_1_17) {
+                return new int[] {entityID};
             }
             else {
-                return Optional.of(entityIds);
+                return entityIds;
             }
         }
     }
@@ -137,6 +153,10 @@ public class WrappedPacketOutEntityDestroy extends WrappedPacketEntityAbstractio
         if (packet != null) {
             if (v_1_17) {
                 setEntityId(entityIds[0]);
+            }
+            else if (v_1_17_1) {
+                IntList intList = new IntArrayList(entityIds);
+                write(IntList.class, 0, intList);
             }
             else {
                 writeIntArray(0, entityIds);
@@ -157,8 +177,9 @@ public class WrappedPacketOutEntityDestroy extends WrappedPacketEntityAbstractio
     public Object asNMSPacket() throws Exception {
         if (v_1_17) {
             return packetConstructor.newInstance(getEntityId());
-        } else {
-            return packetConstructor.newInstance(getEntityIds().get());
+        }
+        else {
+            return packetConstructor.newInstance(getEntityIds());
         }
     }
 }
