@@ -2,6 +2,7 @@ package io.github.retrooper.packetevents.packetwrappers.play.in.useitem;
 
 import io.github.retrooper.packetevents.packetwrappers.NMSPacket;
 import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
+import io.github.retrooper.packetevents.utils.enums.EnumUtil;
 import io.github.retrooper.packetevents.utils.nms.NMSUtils;
 import io.github.retrooper.packetevents.utils.player.Hand;
 import io.github.retrooper.packetevents.utils.reflection.Reflection;
@@ -28,25 +29,35 @@ public class WrappedPacketInUseItem extends WrappedPacket {
         return Hand.values()[readEnumConstant(0, NMSUtils.enumHandClass).ordinal()];
     }
 
-    public Vector3i getBlockPosition() {
-        try {
-            if (v_1_14) {
-                Object movingBlockPosition = readObject(0, NMSUtils.movingObjectPositionBlock);
-                Field position = Reflection.getField(movingBlockPosition.getClass(), NMSUtils.blockPosClass, 0);
-                return readBlockPosition(position.get(movingBlockPosition));
-            }
-        } catch (IllegalAccessException | NullPointerException | InvocationTargetException e) {
-            e.printStackTrace();
-            return null;
-        }
-
-        return readBlockPosition(0);
+    public void setHand(Hand hand) {
+        Enum<?> enumConstant = EnumUtil.valueByIndex(NMSUtils.enumHandClass, hand.ordinal());
+        writeEnumConstant(0, enumConstant);
     }
 
-    private Vector3i readBlockPosition(Object blockPosObj) throws InvocationTargetException, IllegalAccessException {
-        int x = (int) NMSUtils.getBlockPosX.invoke(blockPosObj);
-        int y = (int) NMSUtils.getBlockPosY.invoke(blockPosObj);
-        int z = (int) NMSUtils.getBlockPosZ.invoke(blockPosObj);
-        return new Vector3i(x, y, z);
+    public Vector3i getBlockPosition() {
+            if (v_1_14) {
+                Object movingBlockPosition = readObject(0, NMSUtils.movingObjectPositionBlockClass);
+                WrappedPacket movingBlockPositionWrapper = new WrappedPacket(new NMSPacket(movingBlockPosition));
+                return movingBlockPositionWrapper.readBlockPosition(0);
+            }
+            else {
+                return readBlockPosition(0);
+            }
+    }
+
+    public void setBlockPosition(Vector3i blockPosition) {
+        if (v_1_14) {
+            Object movingBlockPosition = readObject(0, NMSUtils.movingObjectPositionBlockClass);
+            WrappedPacket movingBlockPositionWrapper = new WrappedPacket(new NMSPacket(movingBlockPosition));
+            movingBlockPositionWrapper.writeBlockPosition(0, blockPosition);
+        }
+        else {
+            writeBlockPosition(0, blockPosition);
+        }
+    }
+
+    @Override
+    public boolean isSupported() {
+        return version.isNewerThanOrEquals(ServerVersion.v_1_9);
     }
 }
