@@ -35,11 +35,11 @@ public class WrappedPacketOutCustomPayload extends WrappedPacket implements Send
     private static int minecraftKeyIndexInClass;
 
     private static byte constructorMode;
-    private String tag;
+    private String channelName;
     private byte[] data;
 
-    public WrappedPacketOutCustomPayload(String tag, byte[] data) {
-        this.tag = tag;
+    public WrappedPacketOutCustomPayload(String channelName, byte[] data) {
+        this.channelName = channelName;
         this.data = data;
     }
 
@@ -92,33 +92,35 @@ public class WrappedPacketOutCustomPayload extends WrappedPacket implements Send
         }
     }
 
-    public String getTag() {
+    public String getChannelName() {
         if (packet != null) {
             switch (constructorMode) {
                 case 0:
                 case 1:
                     return readString(0);
                 case 2:
-                    Object minecraftKey = readObject(minecraftKeyIndexInClass, NMSUtils.minecraftKeyClass);
-                    return NMSUtils.getStringFromMinecraftKey(minecraftKey);
+                    return readMinecraftKey(minecraftKeyIndexInClass);
+                default:
+                    return null;
             }
-            return null;
         }
-        return tag;
+        else {
+            return channelName;
+        }
     }
 
-    public void setTag(String tag) {
+    public void setChannelName(String channelName) {
         if (packet != null) {
             switch (constructorMode) {
                 case 0:
                 case 1:
-                    writeString(0, tag);
+                    writeString(0, channelName);
                 case 2:
-                    Object minecraftKey = NMSUtils.generateMinecraftKey(tag);
-                    write(NMSUtils.minecraftKeyClass, minecraftKeyIndexInClass, minecraftKey);
+                    writeMinecraftKey(0, channelName);
             }
-        } else {
-            this.tag = tag;
+        }
+        else {
+            this.channelName = channelName;
         }
     }
 
@@ -130,8 +132,9 @@ public class WrappedPacketOutCustomPayload extends WrappedPacket implements Send
                 case 1:
                 case 2:
                     return PacketEvents.get().getByteBufUtil().getBytes(getBuffer());
+                default:
+                    return new byte[0];
             }
-            return new byte[0];
         }
         return data;
     }
@@ -156,7 +159,6 @@ public class WrappedPacketOutCustomPayload extends WrappedPacket implements Send
     private Object getBuffer() {
         Object dataSerializer = readObject(0, NMSUtils.packetDataSerializerClass);
         WrappedPacket dataSerializerWrapper = new WrappedPacket(new NMSPacket(dataSerializer));
-
         return dataSerializerWrapper.readObject(0, NMSUtils.byteBufClass);
     }
 
@@ -182,12 +184,12 @@ public class WrappedPacketOutCustomPayload extends WrappedPacket implements Send
         Object dataSerializer;
         switch (constructorMode) {
             case 0:
-                return constructor.newInstance(getTag(), data);
+                return constructor.newInstance(getChannelName(), data);
             case 1:
                 dataSerializer = packetDataSerializerConstructor.newInstance(PacketEvents.get().getByteBufUtil().newByteBuf(data));
-                return constructor.newInstance(getTag(), dataSerializer);
+                return constructor.newInstance(getChannelName(), dataSerializer);
             case 2:
-                Object minecraftKey = NMSUtils.generateMinecraftKey(getTag());
+                Object minecraftKey = NMSUtils.generateMinecraftKeyNew(getChannelName());
                 dataSerializer = packetDataSerializerConstructor.newInstance(PacketEvents.get().getByteBufUtil().newByteBuf(data));
                 return constructor.newInstance(minecraftKey, dataSerializer);
             default:

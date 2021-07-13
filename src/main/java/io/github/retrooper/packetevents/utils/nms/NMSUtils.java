@@ -639,7 +639,19 @@ public final class NMSUtils {
         return minecraftKeyWrapper.readString(1);
     }
 
-    public static Object generateMinecraftKey(String text) {
+    public static String[] splitMinecraftKey(String var0, char var1) {
+        String[] array = new String[]{"minecraft", var0};
+        int index = var0.indexOf(var1);
+        if (index >= 0) {
+            array[1] = var0.substring(index + 1);
+            if (index >= 1) {
+                array[0] = var0.substring(0, index);
+            }
+        }
+        return array;
+    }
+
+    public static Object generateMinecraftKeyNew(String text) {
         try {
             return minecraftKeyConstructor.newInstance(text);
         } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {

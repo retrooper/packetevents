@@ -98,8 +98,7 @@ public class WrappedPacketOutNamedSoundEffect extends WrappedPacket implements S
             if (soundEffectVarExists) {
                 Object soundEffect = readObject(0, NMSUtils.soundEffectClass);
                 WrappedPacket soundEffectWrapper = new WrappedPacket(new NMSPacket(soundEffect));
-                Object minecraftKey = soundEffectWrapper.readObject(0, NMSUtils.minecraftKeyClass);
-                return NMSUtils.getStringFromMinecraftKey(minecraftKey);
+                return soundEffectWrapper.readMinecraftKey(0);
             } else {
                 return readString(0);
             }
@@ -111,7 +110,7 @@ public class WrappedPacketOutNamedSoundEffect extends WrappedPacket implements S
     public void setSoundEffectName(String name) {
         if (packet != null) {
             if (soundEffectVarExists) {
-                Object minecraftKey = NMSUtils.generateMinecraftKey(name);
+                Object minecraftKey = NMSUtils.generateMinecraftKeyNew(name);
                 Object soundEffect = null;
                 try {
                     soundEffect = soundEffectConstructor.newInstance(minecraftKey);
@@ -219,7 +218,7 @@ public class WrappedPacketOutNamedSoundEffect extends WrappedPacket implements S
     public Object asNMSPacket() throws Exception {
         Object packetInstance;
         if (v_1_17) {
-            Object nmsSoundEffect = soundEffectConstructor.newInstance(NMSUtils.generateMinecraftKey(getSoundEffectName()));
+            Object nmsSoundEffect = soundEffectConstructor.newInstance(NMSUtils.generateMinecraftKeyNew(getSoundEffectName()));
             Object nmsSoundCategory = EnumUtil.valueByIndex(enumSoundCategoryClass, getSoundCategory().get().ordinal());
             Vector3d effectPos = getEffectPosition();
             packetInstance = packetConstructor.newInstance(nmsSoundEffect, nmsSoundCategory, effectPos.x, effectPos.y, effectPos.z, getVolume(), getPitch());

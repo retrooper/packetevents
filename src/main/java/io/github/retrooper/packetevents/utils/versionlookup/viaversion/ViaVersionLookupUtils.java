@@ -28,6 +28,7 @@ public class ViaVersionLookupUtils {
     }
 
     public static int getProtocolVersion(Player player) {
+        //TODO I think 4.0.0 repackaged the Via class, account for that
         return Via.getAPI().getPlayerVersion(player.getUniqueId());
     }
 }

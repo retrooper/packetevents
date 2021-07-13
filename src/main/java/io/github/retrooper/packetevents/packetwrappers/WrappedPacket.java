@@ -54,6 +54,7 @@ public class WrappedPacket implements WrapperPacketReader, WrapperPacketWriter {
     private static final Map<Class<? extends WrappedPacket>, Boolean> LOADED_WRAPPERS = new ConcurrentHashMap<>();
     private static final Map<Class<?>, Map<Class<?>, Field[]>> FIELD_CACHE = new ConcurrentHashMap<>();
     private static final Field[] EMPTY_FIELD_ARRAY = new Field[0];
+    private static byte isVersion_1_17 = -1;
     public static ServerVersion version;
     protected final NMSPacket packet;
     private final Class<?> packetClass;
@@ -489,6 +490,27 @@ public class WrappedPacket implements WrapperPacketReader, WrapperPacketWriter {
     public void writeIChatBaseComponent(int index, String content) {
         Object iChatBaseComponent = NMSUtils.generateIChatBaseComponent(content);
         write(NMSUtils.iChatBaseComponentClass, index, iChatBaseComponent);
+    }
+
+    public String readMinecraftKey(int index) {
+        if (isVersion_1_17 == -1) {
+            isVersion_1_17 = (byte) (version.isNewerThanOrEquals(ServerVersion.v_1_17) ? 1 : 0);
+        }
+        int namespaceIndex = isVersion_1_17 == 1 ? 2 : 0;
+        int keyIndex = isVersion_1_17 == 1 ? 3 : 1;
+        Object minecraftKey = readObject(index, NMSUtils.minecraftKeyClass);
+        WrappedPacket minecraftKeyWrapper = new WrappedPacket(new NMSPacket(minecraftKey));
+        return minecraftKeyWrapper.readString(namespaceIndex) + ":" + minecraftKeyWrapper.readString(keyIndex);
+    }
+
+    public void writeMinecraftKey(int index, String content) {
+        Object minecraftKey = null;
+        try {
+            minecraftKey = NMSUtils.minecraftKeyConstructor.newInstance(content);
+        } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
+            e.printStackTrace();
+        }
+        write(NMSUtils.minecraftKeyClass, index, minecraftKey);
     }
 
     public List<Object> readList(int index) {

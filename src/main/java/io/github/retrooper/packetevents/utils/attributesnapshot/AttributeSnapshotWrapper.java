@@ -105,7 +105,7 @@ public class AttributeSnapshotWrapper extends WrappedPacket {
                     nmsAttributeSnapshot = attributeSnapshotConstructor.newInstance(key, value, nmsModifiers);
                     break;
                 case 2:
-                    Object minecraftKey = NMSUtils.generateMinecraftKey(key);
+                    Object minecraftKey = NMSUtils.generateMinecraftKeyNew(key);
                     Object attributeObj = iRegistryAttributeBaseField.get(null);
                     Object nmsAttributeBase = getiRegistryByMinecraftKeyMethod.invoke(attributeObj, minecraftKey);
                     nmsAttributeSnapshot = attributeSnapshotConstructor.newInstance(nmsAttributeBase, value, nmsModifiers);
@@ -170,7 +170,7 @@ public class AttributeSnapshotWrapper extends WrappedPacket {
         if (stringKeyPresent) {
             writeString(0, identifier);
         } else {
-            Object minecraftKey = NMSUtils.generateMinecraftKey(identifier);
+            Object minecraftKey = NMSUtils.generateMinecraftKeyNew(identifier);
             Object attributeObj = null;
             try {
                 attributeObj = iRegistryAttributeBaseField.get(null);
