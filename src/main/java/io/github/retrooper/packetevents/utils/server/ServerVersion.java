@@ -177,7 +177,10 @@ public enum ServerVersion {
             if (version == target) {
                 return false;
             }
+            if (version == this) return true;
+            if (version == target) return false;
         }
+
         return false;
     }
 
