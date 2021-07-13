@@ -139,7 +139,7 @@ public class PacketTypeClasses {
         public static class Client {
             private static String COMMON_PREFIX;
             private static String PREFIX;
-            public static Class<?> FLYING, POSITION, POSITION_LOOK, LOOK, CLIENT_COMMAND,
+            public static Class<?> FLYING, POSITION, POSITION_LOOK, LOOK, GROUND, CLIENT_COMMAND,
                     TRANSACTION, BLOCK_DIG, ENTITY_ACTION, USE_ENTITY,
                     WINDOW_CLICK, STEER_VEHICLE, CUSTOM_PAYLOAD, ARM_ANIMATION,
                     BLOCK_PLACE, USE_ITEM, ABILITIES, HELD_ITEM_SLOT,
@@ -172,7 +172,12 @@ public class PacketTypeClasses {
                     POSITION_LOOK = SubclassUtil.getSubClass(FLYING, "PacketPlayInPositionLook");
                     LOOK = SubclassUtil.getSubClass(FLYING, "PacketPlayInLook");
                 }
-
+                if (PacketEvents.get().getServerUtils().getVersion().isNewerThanOrEquals(ServerVersion.v_1_17)) {
+                    GROUND = SubclassUtil.getSubClass(FLYING, "d");
+                }
+                else {
+                    GROUND = FLYING;
+                }
                 //This packet does not exist in the 1.17+ protocol
                 TRANSACTION = Reflection.getClassByNameWithoutException(COMMON_PREFIX + "Transaction");
                 //This packet was added in 1.17 protocol
