@@ -25,8 +25,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 public class PacketEventsPlugin extends JavaPlugin {
     @Override
     public void onLoad() {
-        PacketEvents.create(this);
-        PacketEventsSettings settings = PacketEvents.get().getSettings();
+        PacketEventsSettings settings = PacketEvents.create(this).getSettings();
         settings
                 .fallbackServerVersion(ServerVersion.v_1_7_10)
                 .compatInjector(false)
