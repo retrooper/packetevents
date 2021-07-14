@@ -29,8 +29,8 @@ import io.github.retrooper.packetevents.utils.vector.Vector3d;
 import java.util.Optional;
 import java.util.UUID;
 
-//TODO Make this sendable and finish
-class WrappedPacketOutSpawnEntity extends WrappedPacketEntityAbstraction {
+//TODO Make this sendable
+public class WrappedPacketOutSpawnEntity extends WrappedPacketEntityAbstraction {
     private static boolean v_1_9, v_1_17;
     private static final float rotationFactor = 256.0F / 360.0F;
     private UUID uuid;
@@ -74,14 +74,15 @@ class WrappedPacketOutSpawnEntity extends WrappedPacketEntityAbstraction {
             double x;
             double y;
             double z;
-            if (!v_1_9) {
-                x = readInt(1) / 32.0;
-                y = readInt(2) / 32.0;
-                z = readInt(3) / 32.0;
-            } else {
+            if (v_1_9) {
                 x = readDouble(v_1_17 ? 1 : 0);
                 y = readDouble(v_1_17 ? 2 : 1);
                 z = readDouble(v_1_17 ? 3 : 2);
+            }
+            else {
+                x = readInt(1) / 32.0;
+                y = readInt(2) / 32.0;
+                z = readInt(3) / 32.0;
             }
             return new Vector3d(x, y, z);
         } else {
@@ -91,14 +92,15 @@ class WrappedPacketOutSpawnEntity extends WrappedPacketEntityAbstraction {
 
     public void setPosition(Vector3d position) {
         if (packet != null) {
-            if (!v_1_9) {
-                writeInt(1, MathUtils.floor(position.x * 32.0));
-                writeInt(2, MathUtils.floor(position.y * 32.0));
-                writeInt(3, MathUtils.floor(position.z * 32.0));
-            } else {
+            if (v_1_9) {
                 writeDouble(v_1_17 ? 1 : 0, position.x);
                 writeDouble(v_1_17 ? 2 : 1, position.y);
                 writeDouble(v_1_17 ? 3 : 2, position.z);
+            }
+            else {
+                writeInt(1, MathUtils.floor(position.x * 32.0));
+                writeInt(2, MathUtils.floor(position.y * 32.0));
+                writeInt(3, MathUtils.floor(position.z * 32.0));
             }
         } else {
             this.position = position;
@@ -110,14 +112,15 @@ class WrappedPacketOutSpawnEntity extends WrappedPacketEntityAbstraction {
             double velX;
             double velY;
             double velZ;
-            if (!v_1_9) {
-                velX = readInt(4) / 8000.0;
-                velY = readInt(5) / 8000.0;
-                velZ = readInt(6) / 8000.0;
-            } else {
+            if (v_1_9) {
                 velX = readInt(1) / 8000.0;
                 velY = readInt(2) / 8000.0;
                 velZ = readInt(3) / 8000.0;
+            }
+            else {
+                velX = readInt(4) / 8000.0;
+                velY = readInt(5) / 8000.0;
+                velZ = readInt(6) / 8000.0;
             }
             return new Vector3d(velX, velY, velZ);
         } else {
@@ -130,14 +133,15 @@ class WrappedPacketOutSpawnEntity extends WrappedPacketEntityAbstraction {
             int velX = (int) (velocity.x * 8000.0);
             int velY = (int) (velocity.y * 8000.0);
             int velZ = (int) (velocity.z * 8000.0);
-            if (!v_1_9) {
-                writeInt(4, velX);
-                writeInt(5, velY);
-                writeInt(6, velZ);
-            } else {
+            if (v_1_9) {
                 writeInt(1, velX);
                 writeInt(2, velY);
                 writeInt(3, velZ);
+            }
+            else {
+                writeInt(4, velX);
+                writeInt(5, velY);
+                writeInt(6, velZ);
             }
         } else {
             this.velocity = velocity;

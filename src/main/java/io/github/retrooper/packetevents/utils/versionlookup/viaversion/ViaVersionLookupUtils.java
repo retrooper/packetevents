@@ -20,15 +20,23 @@ package io.github.retrooper.packetevents.utils.versionlookup.viaversion;
 
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
-import us.myles.ViaVersion.api.Via;
 
 public class ViaVersionLookupUtils {
+    private static ViaVersionAccessor viaVersionAccessor;
+
     public static boolean isAvailable() {
         return Bukkit.getPluginManager().getPlugin("ViaVersion") != null;
     }
 
     public static int getProtocolVersion(Player player) {
-        //TODO I think 4.0.0 repackaged the Via class, account for that
-        return Via.getAPI().getPlayerVersion(player.getUniqueId());
+        if (viaVersionAccessor == null) {
+            try {
+                Class.forName("com.viaversion.viaversion.api.Via");
+                viaVersionAccessor = new ViaVersionAccessorImpl();
+            } catch (ClassNotFoundException e) {
+                viaVersionAccessor = new ViaVersionAccessorImplLegacy();
+            }
+        }
+        return viaVersionAccessor.getProtocolVersion(player);
     }
 }

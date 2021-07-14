@@ -27,7 +27,6 @@ import io.github.retrooper.packetevents.utils.npc.NPCManager;
 import io.github.retrooper.packetevents.utils.reflection.Reflection;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
-import org.bukkit.craftbukkit.v1_8_R3.entity.CraftEntity;
 import org.bukkit.entity.Entity;
 import org.bukkit.util.BoundingBox;
 import org.jetbrains.annotations.Nullable;
