@@ -23,6 +23,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -56,6 +57,24 @@ public final class Reflection {
         int currentIndex = 0;
         for (final Field f : getFields(cls)) {
             if (dataType.isAssignableFrom(f.getType())) {
+                if (currentIndex++ == index) {
+                    return f;
+                }
+            }
+        }
+        if (cls.getSuperclass() != null) {
+            return getField(cls.getSuperclass(), dataType, index);
+        }
+        return null;
+    }
+
+    public static Field getField(final Class<?> cls, final Class<?> dataType, final int index, boolean ignoreStatic) {
+        if (dataType == null || cls == null) {
+            return null;
+        }
+        int currentIndex = 0;
+        for (final Field f : getFields(cls)) {
+            if (dataType.isAssignableFrom(f.getType()) && (!ignoreStatic || !Modifier.isStatic(f.getModifiers()))) {
                 if (currentIndex++ == index) {
                     return f;
                 }

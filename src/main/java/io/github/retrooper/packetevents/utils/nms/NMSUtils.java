@@ -114,7 +114,8 @@ public final class NMSUtils {
         if (boundingBoxClass == null) {
             boundingBoxClass = getNMClassWithoutException("world.phys.AxisAlignedBB");
         }
-        entityBoundingBoxField = Reflection.getField(nmsEntityClass, boundingBoxClass, 0);
+
+        entityBoundingBoxField = Reflection.getField(nmsEntityClass, boundingBoxClass, 0, true);
 
         if (nmsEntityClass != null) {
             getBukkitEntity = Reflection.getMethod(nmsEntityClass, craftEntityClass, 0);
