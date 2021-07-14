@@ -43,7 +43,6 @@ public final class WrappedPacketOutPosition extends WrappedPacket implements Sen
     private Set<PlayerTeleportFlags> relativeFlags;
     private int teleportID;
 
-    @Deprecated
     private boolean onGround;
 
     public WrappedPacketOutPosition(NMSPacket packet) {
@@ -84,6 +83,15 @@ public final class WrappedPacketOutPosition extends WrappedPacket implements Sen
         this.teleportID = teleportID;
     }
 
+    public WrappedPacketOutPosition(Vector3d position, float yaw, float pitch, Set<PlayerTeleportFlags> relativeFlags, int teleportID, boolean onGround) {
+        this.position = position;
+        this.yaw = yaw;
+        this.pitch = pitch;
+        this.relativeFlags = relativeFlags;
+        this.teleportID = teleportID;
+        this.onGround= onGround;
+    }
+
     @Override
     protected void load() {
         v_1_8 = version.isNewerThanOrEquals(ServerVersion.v_1_8);
@@ -116,7 +124,7 @@ public final class WrappedPacketOutPosition extends WrappedPacket implements Sen
     }
 
     public Optional<Boolean> isOnGround() {
-        //1.7.10 and 1.17 support this field
+        //1.7.10 and 1.17+ support this field
         if (v_1_8 && !v_1_17) {
             return Optional.empty();
         }
@@ -317,8 +325,10 @@ public final class WrappedPacketOutPosition extends WrappedPacket implements Sen
                 //1.8 -> 1.8.8
                 return packetConstructor.newInstance(position.x, position.y, position.z, getYaw(), getPitch(), nmsRelativeFlags);
             case 2:
-                return packetConstructor.newInstance(position.x, position.y, position.z, getYaw(), getPitch(), nmsRelativeFlags, getTeleportId());
+                //1.9 -> 1.16.5
+                return packetConstructor.newInstance(position.x, position.y, position.z, getYaw(), getPitch(), nmsRelativeFlags, getTeleportId().get());
             case 3:
+                //1.17
                 return packetConstructor.newInstance(position.x, position.y, position.z, getYaw(), getPitch(), nmsRelativeFlags, getTeleportId(), isOnGround().get());
             default:
                 return null;

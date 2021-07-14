@@ -77,7 +77,6 @@ public final class NMSUtils {
             legacyNettyImportMode = true;
             nettyPrefix = legacyNettyPrefix;
         }
-
         try {
             //Test if the selected netty location is valid
             getNettyClass("channel.Channel");
