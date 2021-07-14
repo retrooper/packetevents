@@ -56,14 +56,14 @@ public final class NMSUtils {
             craftPlayerClass, serverConnectionClass, craftEntityClass, nmsItemStackClass, networkManagerClass, nettyChannelClass, gameProfileClass, iChatBaseComponentClass,
             blockPosClass, vec3DClass, channelFutureClass, blockClass, iBlockDataClass, nmsWorldClass, craftItemStackClass,
             soundEffectClass, minecraftKeyClass, chatSerializerClass, craftMagicNumbersClass, worldSettingsClass, worldServerClass, dataWatcherClass,
-            dedicatedServerClass, entityHumanClass, packetDataSerializerClass, byteBufClass, dimensionManagerClass, nmsItemClass, movingObjectPositionBlockClass;
+            dedicatedServerClass, entityHumanClass, packetDataSerializerClass, byteBufClass, dimensionManagerClass, nmsItemClass, movingObjectPositionBlockClass, boundingBoxClass;
     public static Class<? extends Enum<?>> enumDirectionClass, enumHandClass, enumGameModeClass, enumDifficultyClass;
     public static Method getBlockPosX, getBlockPosY, getBlockPosZ;
     private static String nettyPrefix;
     private static Method getCraftPlayerHandle, getCraftEntityHandle, getCraftWorldHandle, asBukkitCopy,
             asNMSCopy, getMessageMethod, chatFromStringMethod, getMaterialFromNMSBlock, getNMSBlockFromMaterial,
             getMobEffectListId, getMobEffectListById, getItemId, getItemById, getBukkitEntity;
-    private static Field entityPlayerPingField;
+    private static Field entityPlayerPingField, entityBoundingBoxField;
     private static Object minecraftServer;
     private static Object minecraftServerConnection;
 
@@ -109,6 +109,12 @@ public final class NMSUtils {
         if (nmsEntityClass == null) {
             nmsEntityClass = getNMClassWithoutException("world.entity.Entity");
         }
+
+        boundingBoxClass = getNMSClassWithoutException("AxisAlignedBB");
+        if (boundingBoxClass == null) {
+            boundingBoxClass = getNMClassWithoutException("world.phys.AxisAlignedBB");
+        }
+        entityBoundingBoxField = Reflection.getField(nmsEntityClass, boundingBoxClass, 0);
 
         if (nmsEntityClass != null) {
             getBukkitEntity = Reflection.getMethod(nmsEntityClass, craftEntityClass, 0);
@@ -441,6 +447,15 @@ public final class NMSUtils {
         try {
             return getCraftEntityHandle.invoke(craftEntity);
         } catch (IllegalAccessException | InvocationTargetException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    public static Object getNMSAxisAlignedBoundingBox(Object nmsEntity) {
+        try {
+            return entityBoundingBoxField.get(nmsEntityClass.cast(nmsEntity));
+        } catch (IllegalAccessException e) {
             e.printStackTrace();
         }
         return null;

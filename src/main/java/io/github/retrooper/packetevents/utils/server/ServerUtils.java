@@ -27,7 +27,9 @@ import io.github.retrooper.packetevents.utils.npc.NPCManager;
 import io.github.retrooper.packetevents.utils.reflection.Reflection;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
+import org.bukkit.craftbukkit.v1_8_R3.entity.CraftEntity;
 import org.bukkit.entity.Entity;
+import org.bukkit.util.BoundingBox;
 import org.jetbrains.annotations.Nullable;
 import org.spigotmc.SpigotConfig;
 
@@ -95,6 +97,19 @@ public final class ServerUtils {
 
     public boolean isBungeeCordEnabled() {
         return SpigotConfig.bungee;
+    }
+
+    public BoundingBox getEntityBoundingBox(Entity entity) {
+        Object nmsEntity = NMSUtils.getNMSEntity(entity);
+        Object aabb = NMSUtils.getNMSAxisAlignedBoundingBox(nmsEntity);
+        WrappedPacket wrappedBoundingBox= new WrappedPacket(new NMSPacket(aabb));
+        double minX = wrappedBoundingBox.readDouble(0);
+        double minY = wrappedBoundingBox.readDouble(1);
+        double minZ = wrappedBoundingBox.readDouble(2);
+        double maxX = wrappedBoundingBox.readDouble(3);
+        double maxY = wrappedBoundingBox.readDouble(4);
+        double maxZ = wrappedBoundingBox.readDouble(5);
+        return new BoundingBox(minX, minY, minZ, maxX, maxY, maxZ);
     }
 
     @Nullable
