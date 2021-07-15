@@ -157,6 +157,15 @@ public class NPC {
         return yaw;
     }
 
+    public void teleport(Player player, Vector3d targetPosition, float yaw, float pitch) {
+        this.position = targetPosition;
+        this.yaw = yaw;
+        this.pitch = pitch;
+        if (hasSpawned(player)) {
+            PacketEvents.get().getPlayerUtils().sendPacket(player, new WrappedPacketOutEntityTeleport(entityID, position, yaw, pitch, onGround));
+        }
+    }
+
     public void move(Player player, Vector3d targetPosition) {
         this.position = targetPosition;
         double distX = targetPosition.x - position.x;
@@ -166,8 +175,7 @@ public class NPC {
         SendableWrapper sentPacket;
         if (dist > 8) {
             sentPacket = new WrappedPacketOutEntityTeleport(entityID, position, yaw, pitch, onGround);
-        }
-        else {
+        } else {
 
             sentPacket = new WrappedPacketOutEntity.WrappedPacketOutRelEntityMove(entityID, distX, distY, distZ, onGround);
         }
@@ -187,8 +195,7 @@ public class NPC {
         SendableWrapper sentPacket;
         if (dist > 8) {
             sentPacket = new WrappedPacketOutEntityTeleport(entityID, position, yaw, pitch, onGround);
-        }
-        else {
+        } else {
             sentPacket = new WrappedPacketOutEntity.WrappedPacketOutRelEntityMoveLook(entityID, distX, distY, distZ, (byte) yaw, (byte) pitch, onGround);
         }
         if (hasSpawned(player)) {
@@ -207,6 +214,17 @@ public class NPC {
         }
     }
 
+    public void teleport(List<Player> players, Vector3d targetPosition, float yaw, float pitch) {
+        this.position = targetPosition;
+        this.yaw = yaw;
+        this.pitch = pitch;
+        for (Player player : players) {
+            if (hasSpawned(player)) {
+                PacketEvents.get().getPlayerUtils().sendPacket(player, new WrappedPacketOutEntityTeleport(entityID, position, yaw, pitch, onGround));
+            }
+        }
+    }
+
     public void move(List<Player> players, Vector3d targetPosition) {
         double distX = targetPosition.x - position.x;
         double distY = targetPosition.y - position.y;
@@ -216,8 +234,7 @@ public class NPC {
         SendableWrapper sentPacket;
         if (dist > 8) {
             sentPacket = new WrappedPacketOutEntityTeleport(entityID, position, yaw, pitch, onGround);
-        }
-        else {
+        } else {
             sentPacket = new WrappedPacketOutEntity.WrappedPacketOutRelEntityMove(entityID, distX, distY, distZ, onGround);
         }
         for (Player player : players) {
@@ -238,8 +255,7 @@ public class NPC {
         SendableWrapper sentPacket;
         if (dist > 8) {
             sentPacket = new WrappedPacketOutEntityTeleport(entityID, position, yaw, pitch, onGround);
-        }
-        else {
+        } else {
             sentPacket = new WrappedPacketOutEntity.WrappedPacketOutRelEntityMoveLook(entityID, distX, distY, distZ, (byte) yaw, (byte) pitch, onGround);
         }
         for (Player player : players) {
