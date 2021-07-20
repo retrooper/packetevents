@@ -56,8 +56,9 @@ public final class NMSUtils {
             craftPlayerClass, serverConnectionClass, craftEntityClass, nmsItemStackClass, networkManagerClass, nettyChannelClass, gameProfileClass, iChatBaseComponentClass,
             blockPosClass, vec3DClass, channelFutureClass, blockClass, iBlockDataClass, nmsWorldClass, craftItemStackClass,
             soundEffectClass, minecraftKeyClass, chatSerializerClass, craftMagicNumbersClass, worldSettingsClass, worldServerClass, dataWatcherClass,
-            dedicatedServerClass, entityHumanClass, packetDataSerializerClass, byteBufClass, dimensionManagerClass, nmsItemClass, movingObjectPositionBlockClass, boundingBoxClass;
-    public static Class<? extends Enum<?>> enumDirectionClass, enumHandClass, enumGameModeClass, enumDifficultyClass;
+            dedicatedServerClass, entityHumanClass, packetDataSerializerClass, byteBufClass, dimensionManagerClass, nmsItemClass, movingObjectPositionBlockClass, boundingBoxClass,
+    tileEntityCommandClass;
+    public static Class<? extends Enum<?>> enumDirectionClass, enumHandClass, enumGameModeClass, enumDifficultyClass, tileEntityCommandTypeClass;
     public static Method getBlockPosX, getBlockPosY, getBlockPosZ;
     private static String nettyPrefix;
     private static Method getCraftPlayerHandle, getCraftEntityHandle, getCraftWorldHandle, asBukkitCopy,
@@ -221,6 +222,14 @@ public final class NMSUtils {
         if (iChatBaseComponentClass == null) {
             iChatBaseComponentClass = getNMClassWithoutException("network.chat.IChatBaseComponent");
         }
+
+        tileEntityCommandClass = NMSUtils.getNMSClassWithoutException("TileEntityCommand");
+        if (tileEntityCommandClass == null) {
+            tileEntityCommandClass = NMSUtils.getNMClassWithoutException("world.level.block.entity.TileEntityCommand");
+        }
+
+        tileEntityCommandTypeClass = SubclassUtil.getEnumSubClass(tileEntityCommandClass, 0);
+
         vec3DClass = NMSUtils.getNMSClassWithoutException("Vec3D");
         if (vec3DClass == null) {
             vec3DClass = getNMClassWithoutException("world.phys.Vec3D");
