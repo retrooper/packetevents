@@ -32,11 +32,11 @@ import org.bukkit.Bukkit;
  */
 public enum ServerVersion {
     v_1_7_10((short) 5),
-    v_1_8((short) 47), v_1_8_1((short) 47), v_1_8_2((short) 47), v_1_8_3((short) 47),
-    v_1_8_4((short) 47), v_1_8_5((short) 47), v_1_8_6((short) 47), v_1_8_7((short) 47), v_1_8_8((short) 47),
-    v_1_9((short) 107), v_1_9_1((short) 108), v_1_9_2((short) 109), v_1_9_3((short) 110), v_1_9_4((short) 110),
+    v_1_8((short) 47), v_1_8_3((short) 47), v_1_8_8((short) 47),
+    v_1_9((short) 107), v_1_9_2((short) 109), v_1_9_4((short) 110),
+    //1.10 and 1.10.1 are redundant
     v_1_10((short) 210), v_1_10_1((short) 210), v_1_10_2((short) 210),
-    v_1_11((short) 315), v_1_11_1((short) 316), v_1_11_2((short) 316),
+    v_1_11((short) 315), v_1_11_2((short) 316),
     v_1_12((short) 335), v_1_12_1((short) 338), v_1_12_2((short) 340),
     v_1_13((short) 393), v_1_13_1((short) 401), v_1_13_2((short) 404),
     v_1_14((short) 477), v_1_14_1((short) 480), v_1_14_2((short) 485), v_1_14_3((short) 490), v_1_14_4((short) 498),
