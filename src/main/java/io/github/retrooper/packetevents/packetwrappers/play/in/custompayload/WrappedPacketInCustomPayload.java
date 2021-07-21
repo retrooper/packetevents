@@ -28,7 +28,7 @@ import io.github.retrooper.packetevents.utils.server.ServerVersion;
 import org.bukkit.entity.Player;
 
 public final class WrappedPacketInCustomPayload extends WrappedPacket {
-    private static boolean v_1_17, strPresent, byteArrayPresent;
+    private static boolean strPresent, byteArrayPresent;
 
     public WrappedPacketInCustomPayload(NMSPacket packet) {
         super(packet);
@@ -38,14 +38,13 @@ public final class WrappedPacketInCustomPayload extends WrappedPacket {
     protected void load() {
         strPresent = Reflection.getField(PacketTypeClasses.Play.Client.CUSTOM_PAYLOAD, String.class, 0) != null;
         byteArrayPresent = Reflection.getField(PacketTypeClasses.Play.Client.CUSTOM_PAYLOAD, byte[].class, 0) != null;
-        v_1_17 = version.isNewerThanOrEquals(ServerVersion.v_1_17);
     }
 
     public String getChannelName() {
         if (strPresent) {
             return readString(0);
         } else {
-            return readMinecraftKey(v_1_17 ? 1 : 0);
+            return readMinecraftKey(1);
         }
     }
 
@@ -53,7 +52,7 @@ public final class WrappedPacketInCustomPayload extends WrappedPacket {
         if (strPresent) {
             writeString(0, channelName);
         } else {
-            writeMinecraftKey(v_1_17 ? 1 : 0, channelName);
+            writeMinecraftKey(1, channelName);
         }
     }
 

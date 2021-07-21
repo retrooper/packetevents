@@ -53,7 +53,7 @@ public class WrappedPacketOutCustomPayload extends WrappedPacket implements Send
         try {
             packetDataSerializerConstructor = NMSUtils.packetDataSerializerClass.getConstructor(NMSUtils.byteBufClass);
         } catch (NullPointerException | NoSuchMethodException e) {
-            //For some reason some 1.7.10 spigots don't have this constructor although its on normal spigot 1.7.10???
+            //For some reason some annoying 1.7.10 spigot forks don't have this constructor?
         }
 
         //Constructors:
