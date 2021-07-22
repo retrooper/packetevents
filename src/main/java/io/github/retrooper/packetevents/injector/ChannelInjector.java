@@ -36,4 +36,6 @@ public interface ChannelInjector {
     boolean hasInjected(Player player);
 
     void sendPacket(Object channel, Object rawNMSPacket);
+
+    void sendPacketWithoutFlush(Object channel, Object rawNMSPacket);
 }

@@ -285,6 +285,12 @@ public class EarlyChannelInjectorLegacy implements EarlyInjector {
         channel.writeAndFlush(rawNMSPacket);
     }
 
+    @Override
+    public void sendPacketWithoutFlush(Object ch, Object rawNMSPacket) {
+        Channel channel = (Channel) ch;
+        channel.write(rawNMSPacket);
+    }
+
     private PlayerChannelHandlerLegacy getHandler(Object rawChannel) {
         Channel channel = (Channel) rawChannel;
         ChannelHandler handler = channel.pipeline().get(PacketEvents.get().getHandlerName());

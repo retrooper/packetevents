@@ -66,4 +66,10 @@ public class LateChannelInjectorLegacy implements LateInjector {
         Channel channel = (Channel) rawChannel;
         channel.pipeline().writeAndFlush(packet);
     }
+
+    @Override
+    public void sendPacketWithoutFlush(Object ch, Object rawNMSPacket) {
+        Channel channel = (Channel) ch;
+        channel.write(rawNMSPacket);
+    }
 }
