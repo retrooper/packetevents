@@ -84,6 +84,14 @@ public class GlobalChannelInjector {
         return injector.hasInjected(player);
     }
 
+    public void writePacket(Object ch, Object rawNMSPacket) {
+        injector.writePacket(ch, rawNMSPacket);
+    }
+
+    public void flushPackets(Object ch) {
+        injector.flushPackets(ch);
+    }
+
     public void sendPacket(Object ch, Object rawNMSPacket) {
         injector.sendPacket(ch, rawNMSPacket);
     }

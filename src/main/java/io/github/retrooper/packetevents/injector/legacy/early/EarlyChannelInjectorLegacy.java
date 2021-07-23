@@ -280,6 +280,18 @@ public class EarlyChannelInjectorLegacy implements EarlyInjector {
     }
 
     @Override
+    public void writePacket(Object ch, Object rawNMSPacket) {
+        Channel channel = (Channel) ch;
+        channel.write(rawNMSPacket);
+    }
+
+    @Override
+    public void flushPackets(Object ch) {
+        Channel channel = (Channel) ch;
+        channel.flush();
+    }
+
+    @Override
     public void sendPacket(Object ch, Object rawNMSPacket) {
         Channel channel = (Channel) ch;
         channel.writeAndFlush(rawNMSPacket);

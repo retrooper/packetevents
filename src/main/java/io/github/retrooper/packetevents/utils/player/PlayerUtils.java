@@ -186,6 +186,25 @@ public final class PlayerUtils {
         return version;
     }
 
+    public void writePacket(Player player, SendableWrapper wrapper) {
+        try {
+            Object nmsPacket = wrapper.asNMSPacket();
+            PacketEvents.get().getInjector().writePacket(getChannel(player), nmsPacket);
+        }
+        catch (Exception ex) {
+            ex.printStackTrace();
+        }
+    }
+
+    public void flushPackets(Player player) {
+        try {
+            PacketEvents.get().getInjector().flushPackets(getChannel(player));
+        }
+        catch (Exception ex) {
+            ex.printStackTrace();
+        }
+    }
+
     /**
      * Send a client-bound(server-sided) wrapper that supports sending to a player.
      *
@@ -201,12 +220,7 @@ public final class PlayerUtils {
         }
     }
 
-    /**
-     * Send a client-bound(server-sided) wrapper that supports sending to a netty channel.
-     *
-     * @param channel Netty channel as object(due to netty package changes)
-     * @param wrapper Client-bound raw NMS packet.
-     */
+    @Deprecated
     public void sendPacket(Object channel, SendableWrapper wrapper) {
         try {
             Object nmsPacket = wrapper.asNMSPacket();
@@ -226,12 +240,7 @@ public final class PlayerUtils {
         PacketEvents.get().getInjector().sendPacket(getChannel(player), packet);
     }
 
-    /**
-     * Send a client-bound(server-sided) raw NMS Packet without any wrapper to a netty channel.
-     *
-     * @param channel Netty channel as object(due to netty package changes)
-     * @param packet  Client-bound raw NMS packet.
-     */
+    @Deprecated
     public void sendNMSPacket(Object channel, Object packet) {
         PacketEvents.get().getInjector().sendPacket(channel, packet);
     }
