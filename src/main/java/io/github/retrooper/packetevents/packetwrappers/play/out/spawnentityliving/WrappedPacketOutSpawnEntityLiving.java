@@ -35,10 +35,10 @@ import java.util.Optional;
 import java.util.UUID;
 
 public class WrappedPacketOutSpawnEntityLiving extends WrappedPacketEntityAbstraction implements SendableWrapper {
-    private static boolean v_1_9, v_1_17;
     private static final byte[] byteBufAllocation = new byte[48];
     private static final float rotationFactor = 256.0F / 360.0F;
     private static final double velocityFactor = 8000.0;
+    private static boolean v_1_9, v_1_17;
     private static Constructor<?> packetConstructor;
 
     private Vector3d position, velocity;
@@ -79,8 +79,7 @@ public class WrappedPacketOutSpawnEntityLiving extends WrappedPacketEntityAbstra
             v_1_17 = version.isNewerThanOrEquals(ServerVersion.v_1_17);
             if (v_1_17) {
                 packetConstructor = PacketTypeClasses.Play.Server.SPAWN_ENTITY_LIVING.getConstructor(NMSUtils.packetDataSerializerClass);
-            }
-            else {
+            } else {
                 packetConstructor = PacketTypeClasses.Play.Server.SPAWN_ENTITY_LIVING.getConstructor();
             }
         } catch (NoSuchMethodException e) {
@@ -262,8 +261,7 @@ public class WrappedPacketOutSpawnEntityLiving extends WrappedPacketEntityAbstra
             Object byteBuf = PacketEvents.get().getByteBufUtil().newByteBuf(byteBufAllocation);
             Object packetDataSerializer = NMSUtils.generatePacketDataSerializer(byteBuf);
             packetInstance = packetConstructor.newInstance(packetDataSerializer);
-        }
-        else {
+        } else {
             packetInstance = packetConstructor.newInstance();
         }
         WrappedPacketOutSpawnEntityLiving wrappedPacketOutSpawnEntityLiving = new WrappedPacketOutSpawnEntityLiving(new NMSPacket(packetInstance));

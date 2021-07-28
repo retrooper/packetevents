@@ -24,7 +24,6 @@ import org.bukkit.entity.Player;
 public class ViaVersionAccessorImpl implements ViaVersionAccessor {
     @Override
     public int getProtocolVersion(Player player) {
-        System.out.println("GOOD 1");
         return Via.getAPI().getPlayerVersion(player);
     }
 }

@@ -24,7 +24,6 @@ import us.myles.ViaVersion.api.Via;
 public class ViaVersionAccessorImplLegacy implements ViaVersionAccessor {
     @Override
     public int getProtocolVersion(Player player) {
-        System.out.println("BAD 1");
         return Via.getAPI().getPlayerVersion(player);
     }
 }
