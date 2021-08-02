@@ -22,6 +22,9 @@ import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
 public class ViaVersionLookupUtils {
+    private ViaVersionLookupUtils() {
+    }
+
     private static ViaVersionAccessor viaVersionAccessor;
 
     public static boolean isAvailable() {

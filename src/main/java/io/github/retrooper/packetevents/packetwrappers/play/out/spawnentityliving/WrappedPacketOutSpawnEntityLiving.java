@@ -36,8 +36,8 @@ import java.util.UUID;
 
 public class WrappedPacketOutSpawnEntityLiving extends WrappedPacketEntityAbstraction implements SendableWrapper {
     private static final byte[] byteBufAllocation = new byte[48];
-    private static final float rotationFactor = 256.0F / 360.0F;
-    private static final double velocityFactor = 8000.0;
+    private static final float ROTATION_FACTOR = 256.0F / 360.0F;
+    private static final double VELOCITY_FACTOR = 8000.0;
     private static boolean v_1_9, v_1_17;
     private static Constructor<?> packetConstructor;
 
@@ -178,7 +178,7 @@ public class WrappedPacketOutSpawnEntityLiving extends WrappedPacketEntityAbstra
                 factoredVelY = readInt(3);
                 factoredVelZ = readInt(4);
             }
-            return new Vector3d(factoredVelX / velocityFactor, factoredVelY / velocityFactor, factoredVelZ / velocityFactor);
+            return new Vector3d(factoredVelX / VELOCITY_FACTOR, factoredVelY / VELOCITY_FACTOR, factoredVelZ / VELOCITY_FACTOR);
         } else {
             return this.velocity;
         }
@@ -186,9 +186,9 @@ public class WrappedPacketOutSpawnEntityLiving extends WrappedPacketEntityAbstra
 
     public void setVelocity(Vector3d velocity) {
         if (packet != null) {
-            int factoredVelX = (int) (velocity.x * velocityFactor);
-            int factoredVelY = (int) (velocity.y * velocityFactor);
-            int factoredVelZ = (int) (velocity.z * velocityFactor);
+            int factoredVelX = (int) (velocity.x * VELOCITY_FACTOR);
+            int factoredVelY = (int) (velocity.y * VELOCITY_FACTOR);
+            int factoredVelZ = (int) (velocity.z * VELOCITY_FACTOR);
             if (!v_1_9) {
                 writeInt(5, factoredVelX);
                 writeInt(6, factoredVelY);
@@ -206,7 +206,7 @@ public class WrappedPacketOutSpawnEntityLiving extends WrappedPacketEntityAbstra
     public float getYaw() {
         if (packet != null) {
             byte factoredYaw = readByte(0);
-            return factoredYaw / rotationFactor;
+            return factoredYaw / ROTATION_FACTOR;
         } else {
             return yaw;
         }
@@ -214,7 +214,7 @@ public class WrappedPacketOutSpawnEntityLiving extends WrappedPacketEntityAbstra
 
     public void setYaw(float yaw) {
         if (packet != null) {
-            writeByte(0, (byte) ((int) (yaw * rotationFactor)));
+            writeByte(0, (byte) ((int) (yaw * ROTATION_FACTOR)));
         } else {
             this.yaw = yaw;
         }
@@ -223,7 +223,7 @@ public class WrappedPacketOutSpawnEntityLiving extends WrappedPacketEntityAbstra
     public float getPitch() {
         if (packet != null) {
             byte factoredPitch = readByte(1);
-            return factoredPitch / rotationFactor;
+            return factoredPitch / ROTATION_FACTOR;
         } else {
             return pitch;
         }
@@ -231,7 +231,7 @@ public class WrappedPacketOutSpawnEntityLiving extends WrappedPacketEntityAbstra
 
     public void setPitch(float pitch) {
         if (packet != null) {
-            writeByte(1, (byte) ((int) (pitch * rotationFactor)));
+            writeByte(1, (byte) ((int) (pitch * ROTATION_FACTOR)));
         } else {
             this.pitch = pitch;
         }
@@ -240,7 +240,7 @@ public class WrappedPacketOutSpawnEntityLiving extends WrappedPacketEntityAbstra
     public float getHeadPitch() {
         if (packet != null) {
             byte factoredHeadPitch = readByte(2);
-            return factoredHeadPitch / rotationFactor;
+            return factoredHeadPitch / ROTATION_FACTOR;
         } else {
             return this.headPitch;
         }
@@ -248,7 +248,7 @@ public class WrappedPacketOutSpawnEntityLiving extends WrappedPacketEntityAbstra
 
     public void setHeadPitch(float headPitch) {
         if (packet != null) {
-            writeByte(2, (byte) ((int) (headPitch * rotationFactor)));
+            writeByte(2, (byte) ((int) (headPitch * ROTATION_FACTOR)));
         } else {
             this.headPitch = headPitch;
         }

@@ -18,12 +18,35 @@
 
 package io.github.retrooper.packetevents.utils.versionlookup.viaversion;
 
+import io.github.retrooper.packetevents.utils.reflection.Reflection;
 import org.bukkit.entity.Player;
-import us.myles.ViaVersion.api.Via;
+
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 
 public class ViaVersionAccessorImplLegacy implements ViaVersionAccessor {
+    private static Class<?> viaClass;
+    private static Method apiAccessor;
+    private static Method getPlayerVersionMethod;
     @Override
     public int getProtocolVersion(Player player) {
-        return Via.getAPI().getPlayerVersion(player);
+        if (viaClass== null) {
+            try {
+                viaClass = Class.forName("us.myles.ViaVersion.api.Via");
+                Class<?> viaAPIClass = Class.forName("us.myles.ViaVersion.api.ViaAPI");
+                apiAccessor = viaClass.getMethod("getAPI");
+                getPlayerVersionMethod = Reflection.getMethods(viaAPIClass, "getPlayerVersion", Player.class).get(0);
+            } catch (ClassNotFoundException | NoSuchMethodException e) {
+                e.printStackTrace();
+            }
+
+        }
+        try {
+            Object viaAPI = apiAccessor.invoke(null);
+            return (int) getPlayerVersionMethod.invoke(viaAPI, player);
+        } catch (IllegalAccessException | InvocationTargetException e) {
+            e.printStackTrace();
+        }
+        return -1;
     }
 }
