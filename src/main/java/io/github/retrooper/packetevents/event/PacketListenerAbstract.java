@@ -104,6 +104,9 @@ public abstract class PacketListenerAbstract {
     public void onPacketEventExternal(PacketEvent event) {
     }
 
+    public void onPacketDecode(PacketDecodeEvent event){
+    }
+
     public final void addServerSidedStatusFilter(Byte... statusPacketIDs) {
         if (this.serverSidedStatusAllowance == null) {
             this.serverSidedStatusAllowance = new ImmutableSetCustom<>(statusPacketIDs);

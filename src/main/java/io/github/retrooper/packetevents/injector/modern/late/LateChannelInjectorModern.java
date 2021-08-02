@@ -20,6 +20,7 @@ package io.github.retrooper.packetevents.injector.modern.late;
 
 import io.github.retrooper.packetevents.PacketEvents;
 import io.github.retrooper.packetevents.injector.LateInjector;
+import io.github.retrooper.packetevents.injector.modern.PacketDecoderModern;
 import io.github.retrooper.packetevents.injector.modern.PlayerChannelHandlerModern;
 import io.netty.channel.Channel;
 import org.bukkit.entity.Player;
@@ -38,8 +39,18 @@ public class LateChannelInjectorModern implements LateInjector {
     @Override
     public void injectPlayer(Player player) {
         PlayerChannelHandlerModern playerChannelHandlerModern = new PlayerChannelHandlerModern();
+        PacketDecoderModern packetDecoderModern = new PacketDecoderModern();
         playerChannelHandlerModern.player = player;
         Channel channel = (Channel) PacketEvents.get().getPlayerUtils().getChannel(player);
+
+        if(channel.pipeline().get("decompress") != null){
+            String handlerName = PacketEvents.get().getHandlerName() + "-decoder";
+            channel.pipeline().addAfter("decompress",handlerName,packetDecoderModern);
+        }else if(channel.pipeline().get("splitter") != null){
+            String handlerName = PacketEvents.get().getHandlerName() + "-decoder";
+            channel.pipeline().addAfter("splitter",handlerName,packetDecoderModern);
+        }
+
         channel.pipeline().addBefore("packet_handler", PacketEvents.get().getHandlerName(), playerChannelHandlerModern);
     }
 

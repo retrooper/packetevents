@@ -1,0 +1,527 @@
+io/github/retrooper/packetevents/event/impl/PacketPlayReceiveEvent.java
+ io.github.retrooper.packetevents.event.impl.PacketPlayReceiveEvent
+io/github/retrooper/packetevents/packetwrappers/play/out/updateattributes/WrappedPacketOutUpdateAttributes.java
+ io.github.retrooper.packetevents.packetwrappers.play.out.updateattributes.WrappedPacketOutUpdateAttributes
+io/github/retrooper/packetevents/utils/player/ClientHand.java
+ io.github.retrooper.packetevents.utils.player.ClientHand
+io/github/retrooper/packetevents/event/manager/PEEventManager.java
+ io.github.retrooper.packetevents.event.manager.PEEventManager
+io/github/retrooper/packetevents/packetwrappers/play/in/vehiclemove/WrappedPacketInVehicleMove.java
+ io.github.retrooper.packetevents.packetwrappers.play.in.vehiclemove.WrappedPacketInVehicleMove
+io/github/retrooper/packetevents/injector/modern/early/PEChannelInitializerModern.java
+ io.github.retrooper.packetevents.injector.modern.early.PEChannelInitializerModern
+io/github/retrooper/packetevents/packetwrappers/play/out/title/WrappedPacketOutTitle.java
+ io.github.retrooper.packetevents.packetwrappers.play.out.title.WrappedPacketOutTitle
+ io.github.retrooper.packetevents.packetwrappers.play.out.title.WrappedPacketOutTitle$TitleAction
+io/github/retrooper/packetevents/injector/ChannelInjector.java
+ io.github.retrooper.packetevents.injector.ChannelInjector
+io/github/retrooper/packetevents/utils/versionlookup/v_1_7_10/SpigotVersionLookup_1_7.java
+ io.github.retrooper.packetevents.utils.versionlookup.v_1_7_10.SpigotVersionLookup_1_7
+io/github/retrooper/packetevents/event/impl/PacketPlaySendEvent.java
+ io.github.retrooper.packetevents.event.impl.PacketPlaySendEvent
+io/github/retrooper/packetevents/packetwrappers/play/out/entityequipment/WrappedPacketOutEntityEquipment.java
+ io.github.retrooper.packetevents.packetwrappers.play.out.entityequipment.WrappedPacketOutEntityEquipment
+ io.github.retrooper.packetevents.packetwrappers.play.out.entityequipment.WrappedPacketOutEntityEquipment$EquipmentSlot
+io/github/retrooper/packetevents/packetwrappers/play/in/keepalive/WrappedPacketInKeepAlive.java
+ io.github.retrooper.packetevents.packetwrappers.play.in.keepalive.WrappedPacketInKeepAlive
+io/github/retrooper/packetevents/utils/immutableset/ImmutableSet_7.java
+ io.github.retrooper.packetevents.utils.immutableset.ImmutableSet_7
+io/github/retrooper/packetevents/processor/BukkitEventProcessorInternal.java
+ io.github.retrooper.packetevents.processor.BukkitEventProcessorInternal
+io/github/retrooper/packetevents/utils/list/ListWrapper.java
+ io.github.retrooper.packetevents.utils.list.ListWrapper
+io/github/retrooper/packetevents/event/PacketListener.java
+ io.github.retrooper.packetevents.event.PacketListener
+io/github/retrooper/packetevents/utils/vector/Vector3d.java
+ io.github.retrooper.packetevents.utils.vector.Vector3d
+io/github/retrooper/packetevents/utils/version/PEVersion.java
+ io.github.retrooper.packetevents.utils.version.PEVersion
+io/github/retrooper/packetevents/packetwrappers/play/out/keepalive/WrappedPacketOutKeepAlive.java
+ io.github.retrooper.packetevents.packetwrappers.play.out.keepalive.WrappedPacketOutKeepAlive
+io/github/retrooper/packetevents/utils/versionlookup/protocolsupport/ProtocolSupportVersionLookupUtils.java
+ io.github.retrooper.packetevents.utils.versionlookup.protocolsupport.ProtocolSupportVersionLookupUtils
+io/github/retrooper/packetevents/packetwrappers/play/in/blockplace/WrappedPacketInBlockPlace_1_7_10.java
+ io.github.retrooper.packetevents.packetwrappers.play.in.blockplace.WrappedPacketInBlockPlace_1_7_10
+io/github/retrooper/packetevents/injector/modern/PacketDecoderModern.java
+ io.github.retrooper.packetevents.injector.modern.PacketDecoderModern
+io/github/retrooper/packetevents/utils/netty/bytebuf/ByteBufUtil_8.java
+ io.github.retrooper.packetevents.utils.netty.bytebuf.ByteBufUtil_8
+io/github/retrooper/packetevents/packetwrappers/play/in/entityaction/WrappedPacketInEntityAction.java
+ io.github.retrooper.packetevents.packetwrappers.play.in.entityaction.WrappedPacketInEntityAction
+ io.github.retrooper.packetevents.packetwrappers.play.in.entityaction.WrappedPacketInEntityAction$PlayerAction
+io/github/retrooper/packetevents/packetwrappers/status/out/pong/WrappedPacketStatusPong.java
+ io.github.retrooper.packetevents.packetwrappers.status.out.pong.WrappedPacketStatusPong
+io/github/retrooper/packetevents/event/eventtypes/CancellableEvent.java
+ io.github.retrooper.packetevents.event.eventtypes.CancellableEvent
+io/github/retrooper/packetevents/event/manager/EventManagerLegacy.java
+ io.github.retrooper.packetevents.event.manager.EventManagerLegacy
+io/github/retrooper/packetevents/utils/nms/NMSUtils.java
+ io.github.retrooper.packetevents.utils.nms.NMSUtils
+io/github/retrooper/packetevents/packetwrappers/play/out/worldparticles/WrappedPacketOutWorldParticles.java
+ io.github.retrooper.packetevents.packetwrappers.play.out.worldparticles.WrappedPacketOutWorldParticles
+io/github/retrooper/packetevents/packetwrappers/play/out/windowitems/WrappedPacketOutWindowItems.java
+ io.github.retrooper.packetevents.packetwrappers.play.out.windowitems.WrappedPacketOutWindowItems
+io/github/retrooper/packetevents/utils/player/PlayerUtils.java
+ io.github.retrooper.packetevents.utils.player.PlayerUtils
+io/github/retrooper/packetevents/packetwrappers/WrappedPacket.java
+ io.github.retrooper.packetevents.packetwrappers.WrappedPacket
+ io.github.retrooper.packetevents.packetwrappers.WrappedPacket$SupportedVersions
+io/github/retrooper/packetevents/packetwrappers/play/in/closewindow/WrappedPacketInCloseWindow.java
+ io.github.retrooper.packetevents.packetwrappers.play.in.closewindow.WrappedPacketInCloseWindow
+io/github/retrooper/packetevents/packetwrappers/login/out/encryptionbegin/WrappedPacketLoginOutEncryptionBegin.java
+ io.github.retrooper.packetevents.packetwrappers.login.out.encryptionbegin.WrappedPacketLoginOutEncryptionBegin
+io/github/retrooper/packetevents/packetwrappers/play/out/entitymetadata/WrappedWatchableObject.java
+ io.github.retrooper.packetevents.packetwrappers.play.out.entitymetadata.WrappedWatchableObject
+io/github/retrooper/packetevents/packetwrappers/play/out/entityeffect/WrappedPacketOutEntityEffect.java
+ io.github.retrooper.packetevents.packetwrappers.play.out.entityeffect.WrappedPacketOutEntityEffect
+io/github/retrooper/packetevents/packetwrappers/api/WrapperPacketWriter.java
+ io.github.retrooper.packetevents.packetwrappers.api.WrapperPacketWriter
+io/github/retrooper/packetevents/packetwrappers/status/in/ping/WrappedPacketStatusPing.java
+ io.github.retrooper.packetevents.packetwrappers.status.in.ping.WrappedPacketStatusPing
+io/github/retrooper/packetevents/packetwrappers/login/in/start/WrappedPacketLoginInStart.java
+ io.github.retrooper.packetevents.packetwrappers.login.in.start.WrappedPacketLoginInStart
+io/github/retrooper/packetevents/packetwrappers/play/out/playerinfo/WrappedPacketOutPlayerInfo.java
+ io.github.retrooper.packetevents.packetwrappers.play.out.playerinfo.WrappedPacketOutPlayerInfo
+ io.github.retrooper.packetevents.packetwrappers.play.out.playerinfo.WrappedPacketOutPlayerInfo$PlayerInfo
+ io.github.retrooper.packetevents.packetwrappers.play.out.playerinfo.WrappedPacketOutPlayerInfo$PlayerInfoAction
+io/github/retrooper/packetevents/updatechecker/LowLevelUpdateCheckerLegacy.java
+ io.github.retrooper.packetevents.updatechecker.LowLevelUpdateCheckerLegacy
+io/github/retrooper/packetevents/packetwrappers/play/in/blockplace/WrappedPacketInBlockPlace_1_9.java
+ io.github.retrooper.packetevents.packetwrappers.play.in.blockplace.WrappedPacketInBlockPlace_1_9
+io/github/retrooper/packetevents/packetwrappers/play/out/tabcomplete/WrappedPacketOutTabComplete.java
+ io.github.retrooper.packetevents.packetwrappers.play.out.tabcomplete.WrappedPacketOutTabComplete
+io/github/retrooper/packetevents/packetwrappers/play/out/animation/WrappedPacketOutAnimation.java
+ io.github.retrooper.packetevents.packetwrappers.play.out.animation.WrappedPacketOutAnimation
+ io.github.retrooper.packetevents.packetwrappers.play.out.animation.WrappedPacketOutAnimation$EntityAnimationType
+io/github/retrooper/packetevents/packetwrappers/play/out/closewindow/WrappedPacketOutCloseWindow.java
+ io.github.retrooper.packetevents.packetwrappers.play.out.closewindow.WrappedPacketOutCloseWindow
+io/github/retrooper/packetevents/utils/google/GoogleOptionalUtils.java
+ io.github.retrooper.packetevents.utils.google.GoogleOptionalUtils
+io/github/retrooper/packetevents/updatechecker/UpdateChecker.java
+ io.github.retrooper.packetevents.updatechecker.UpdateChecker
+ io.github.retrooper.packetevents.updatechecker.UpdateChecker$UpdateCheckerStatus
+io/github/retrooper/packetevents/packetwrappers/play/in/tabcomplete/WrappedPacketInTabComplete.java
+ io.github.retrooper.packetevents.packetwrappers.play.in.tabcomplete.WrappedPacketInTabComplete
+io/github/retrooper/packetevents/event/impl/PlayerInjectEvent.java
+ io.github.retrooper.packetevents.event.impl.PlayerInjectEvent
+io/github/retrooper/packetevents/packetwrappers/play/out/position/WrappedPacketOutPosition.java
+ io.github.retrooper.packetevents.packetwrappers.play.out.position.WrappedPacketOutPosition
+ io.github.retrooper.packetevents.packetwrappers.play.out.position.WrappedPacketOutPosition$PlayerTeleportFlags
+io/github/retrooper/packetevents/packetwrappers/play/in/teleportaccept/WrappedPacketInTeleportAccept.java
+ io.github.retrooper.packetevents.packetwrappers.play.in.teleportaccept.WrappedPacketInTeleportAccept
+io/github/retrooper/packetevents/utils/server/SystemOS.java
+ io.github.retrooper.packetevents.utils.server.SystemOS
+io/github/retrooper/packetevents/utils/versionlookup/VersionLookupUtils.java
+ io.github.retrooper.packetevents.utils.versionlookup.VersionLookupUtils
+io/github/retrooper/packetevents/utils/google/OptionalUtils.java
+ io.github.retrooper.packetevents.utils.google.OptionalUtils
+io/github/retrooper/packetevents/utils/geyser/GeyserUtils.java
+ io.github.retrooper.packetevents.utils.geyser.GeyserUtils
+io/github/retrooper/packetevents/packetwrappers/play/out/experience/WrappedPacketOutExperience.java
+ io.github.retrooper.packetevents.packetwrappers.play.out.experience.WrappedPacketOutExperience
+io/github/retrooper/packetevents/event/eventtypes/PostTaskEvent.java
+ io.github.retrooper.packetevents.event.eventtypes.PostTaskEvent
+io/github/retrooper/packetevents/injector/EarlyInjector.java
+ io.github.retrooper.packetevents.injector.EarlyInjector
+io/github/retrooper/packetevents/event/eventtypes/NMSPacketEvent.java
+ io.github.retrooper.packetevents.event.eventtypes.NMSPacketEvent
+io/github/retrooper/packetevents/processor/PacketProcessorInternal.java
+ io.github.retrooper.packetevents.processor.PacketProcessorInternal
+ io.github.retrooper.packetevents.processor.PacketProcessorInternal$1
+ io.github.retrooper.packetevents.processor.PacketProcessorInternal$PacketData
+io/github/retrooper/packetevents/event/impl/PlayerEjectEvent.java
+ io.github.retrooper.packetevents.event.impl.PlayerEjectEvent
+io/github/retrooper/packetevents/packetwrappers/play/in/blockdig/WrappedPacketInBlockDig.java
+ io.github.retrooper.packetevents.packetwrappers.play.in.blockdig.WrappedPacketInBlockDig
+ io.github.retrooper.packetevents.packetwrappers.play.in.blockdig.WrappedPacketInBlockDig$PlayerDigType
+io/github/retrooper/packetevents/event/PacketListenerPriority.java
+ io.github.retrooper.packetevents.event.PacketListenerPriority
+io/github/retrooper/packetevents/packetwrappers/play/out/abilities/WrappedPacketOutAbilities.java
+ io.github.retrooper.packetevents.packetwrappers.play.out.abilities.WrappedPacketOutAbilities
+io/github/retrooper/packetevents/packetwrappers/play/out/mapchunk/WrappedPacketOutMapChunk.java
+ io.github.retrooper.packetevents.packetwrappers.play.out.mapchunk.WrappedPacketOutMapChunk
+io/github/retrooper/packetevents/utils/versionlookup/viaversion/ViaVersionAccessorImplLegacy.java
+ io.github.retrooper.packetevents.utils.versionlookup.viaversion.ViaVersionAccessorImplLegacy
+io/github/retrooper/packetevents/packetwrappers/play/in/blockplace/WrappedPacketInBlockPlace.java
+ io.github.retrooper.packetevents.packetwrappers.play.in.blockplace.WrappedPacketInBlockPlace
+io/github/retrooper/packetevents/event/impl/PacketHandshakeReceiveEvent.java
+ io.github.retrooper.packetevents.event.impl.PacketHandshakeReceiveEvent
+io/github/retrooper/packetevents/packetwrappers/play/out/chat/WrappedPacketOutChat.java
+ io.github.retrooper.packetevents.packetwrappers.play.out.chat.WrappedPacketOutChat
+ io.github.retrooper.packetevents.packetwrappers.play.out.chat.WrappedPacketOutChat$ChatPosition
+io/github/retrooper/packetevents/utils/pair/MojangPairUtils.java
+ io.github.retrooper.packetevents.utils.pair.MojangPairUtils
+io/github/retrooper/packetevents/packetwrappers/play/in/armanimation/WrappedPacketInArmAnimation.java
+ io.github.retrooper.packetevents.packetwrappers.play.in.armanimation.WrappedPacketInArmAnimation
+io/github/retrooper/packetevents/utils/server/ServerUtils.java
+ io.github.retrooper.packetevents.utils.server.ServerUtils
+io/github/retrooper/packetevents/packetwrappers/login/out/success/WrappedPacketLoginOutSuccess.java
+ io.github.retrooper.packetevents.packetwrappers.login.out.success.WrappedPacketLoginOutSuccess
+io/github/retrooper/packetevents/utils/world/Difficulty.java
+ io.github.retrooper.packetevents.utils.world.Difficulty
+io/github/retrooper/packetevents/event/manager/EventManager.java
+ io.github.retrooper.packetevents.event.manager.EventManager
+io/github/retrooper/packetevents/utils/immutableset/ImmutableSetCustom.java
+ io.github.retrooper.packetevents.utils.immutableset.ImmutableSetCustom
+io/github/retrooper/packetevents/utils/netty/bytebuf/ByteBufUtil.java
+ io.github.retrooper.packetevents.utils.netty.bytebuf.ByteBufUtil
+io/github/retrooper/packetevents/packetwrappers/play/in/settings/WrappedPacketInSettings.java
+ io.github.retrooper.packetevents.packetwrappers.play.in.settings.WrappedPacketInSettings
+ io.github.retrooper.packetevents.packetwrappers.play.in.settings.WrappedPacketInSettings$ChatVisibility
+ io.github.retrooper.packetevents.packetwrappers.play.in.settings.WrappedPacketInSettings$DisplayedSkinPart
+io/github/retrooper/packetevents/packetwrappers/play/out/viewdistance/WrappedPacketOutViewDistance.java
+ io.github.retrooper.packetevents.packetwrappers.play.out.viewdistance.WrappedPacketOutViewDistance
+io/github/retrooper/packetevents/utils/reflection/SubclassUtil.java
+ io.github.retrooper.packetevents.utils.reflection.SubclassUtil
+io/github/retrooper/packetevents/utils/versionlookup/viaversion/ViaVersionAccessorImpl.java
+ io.github.retrooper.packetevents.utils.versionlookup.viaversion.ViaVersionAccessorImpl
+io/github/retrooper/packetevents/packetwrappers/play/in/useitem/WrappedPacketInUseItem.java
+ io.github.retrooper.packetevents.packetwrappers.play.in.useitem.WrappedPacketInUseItem
+io/github/retrooper/packetevents/injector/modern/late/LateChannelInjectorModern.java
+ io.github.retrooper.packetevents.injector.modern.late.LateChannelInjectorModern
+io/github/retrooper/packetevents/packetwrappers/play/out/entity/WrappedPacketOutEntity.java
+ io.github.retrooper.packetevents.packetwrappers.play.out.entity.WrappedPacketOutEntity
+ io.github.retrooper.packetevents.packetwrappers.play.out.entity.WrappedPacketOutEntity$WrappedPacketOutEntityLook
+ io.github.retrooper.packetevents.packetwrappers.play.out.entity.WrappedPacketOutEntity$WrappedPacketOutRelEntityMove
+ io.github.retrooper.packetevents.packetwrappers.play.out.entity.WrappedPacketOutEntity$WrappedPacketOutRelEntityMoveLook
+io/github/retrooper/packetevents/packettype/PacketTypeClasses.java
+ io.github.retrooper.packetevents.packettype.PacketTypeClasses
+ io.github.retrooper.packetevents.packettype.PacketTypeClasses$Handshaking
+ io.github.retrooper.packetevents.packettype.PacketTypeClasses$Handshaking$Client
+ io.github.retrooper.packetevents.packettype.PacketTypeClasses$Login
+ io.github.retrooper.packetevents.packettype.PacketTypeClasses$Login$Client
+ io.github.retrooper.packetevents.packettype.PacketTypeClasses$Login$Server
+ io.github.retrooper.packetevents.packettype.PacketTypeClasses$Play
+ io.github.retrooper.packetevents.packettype.PacketTypeClasses$Play$Client
+ io.github.retrooper.packetevents.packettype.PacketTypeClasses$Play$Server
+ io.github.retrooper.packetevents.packettype.PacketTypeClasses$Status
+ io.github.retrooper.packetevents.packettype.PacketTypeClasses$Status$Client
+ io.github.retrooper.packetevents.packettype.PacketTypeClasses$Status$Server
+io/github/retrooper/packetevents/utils/gameprofile/WrappedGameProfile.java
+ io.github.retrooper.packetevents.utils.gameprofile.WrappedGameProfile
+io/github/retrooper/packetevents/injector/legacy/PlayerChannelHandlerLegacy.java
+ io.github.retrooper.packetevents.injector.legacy.PlayerChannelHandlerLegacy
+io/github/retrooper/packetevents/packetwrappers/play/in/pickitem/WrappedPacketInPickItem.java
+ io.github.retrooper.packetevents.packetwrappers.play.in.pickitem.WrappedPacketInPickItem
+io/github/retrooper/packetevents/packetwrappers/play/in/flying/WrappedPacketInFlying.java
+ io.github.retrooper.packetevents.packetwrappers.play.in.flying.WrappedPacketInFlying
+io/github/retrooper/packetevents/packetwrappers/login/in/encryptionbegin/WrappedPacketLoginInEncryptionBegin.java
+ io.github.retrooper.packetevents.packetwrappers.login.in.encryptionbegin.WrappedPacketLoginInEncryptionBegin
+io/github/retrooper/packetevents/event/eventtypes/CallableEvent.java
+ io.github.retrooper.packetevents.event.eventtypes.CallableEvent
+io/github/retrooper/packetevents/packetwrappers/login/out/setcompression/WrappedPacketLoginOutSetCompression.java
+ io.github.retrooper.packetevents.packetwrappers.login.out.setcompression.WrappedPacketLoginOutSetCompression
+io/github/retrooper/packetevents/packettype/PacketState.java
+ io.github.retrooper.packetevents.packettype.PacketState
+io/github/retrooper/packetevents/bstats/Metrics.java
+ io.github.retrooper.packetevents.bstats.Metrics
+ io.github.retrooper.packetevents.bstats.Metrics$1
+ io.github.retrooper.packetevents.bstats.Metrics$AdvancedBarChart
+ io.github.retrooper.packetevents.bstats.Metrics$AdvancedPie
+ io.github.retrooper.packetevents.bstats.Metrics$CustomChart
+ io.github.retrooper.packetevents.bstats.Metrics$DrilldownPie
+ io.github.retrooper.packetevents.bstats.Metrics$JsonObjectBuilder
+ io.github.retrooper.packetevents.bstats.Metrics$JsonObjectBuilder$JsonObject
+ io.github.retrooper.packetevents.bstats.Metrics$MetricsBase
+ io.github.retrooper.packetevents.bstats.Metrics$MultiLineChart
+ io.github.retrooper.packetevents.bstats.Metrics$SimpleBarChart
+ io.github.retrooper.packetevents.bstats.Metrics$SimplePie
+ io.github.retrooper.packetevents.bstats.Metrics$SingleLineChart
+io/github/retrooper/packetevents/updatechecker/LowLevelUpdateChecker.java
+ io.github.retrooper.packetevents.updatechecker.LowLevelUpdateChecker
+io/github/retrooper/packetevents/exceptions/PacketEventsLoadFailureException.java
+ io.github.retrooper.packetevents.exceptions.PacketEventsLoadFailureException
+io/github/retrooper/packetevents/injector/modern/PlayerChannelHandlerModern.java
+ io.github.retrooper.packetevents.injector.modern.PlayerChannelHandlerModern
+io/github/retrooper/packetevents/packetwrappers/play/out/entitystatus/WrappedPacketOutEntityStatus.java
+ io.github.retrooper.packetevents.packetwrappers.play.out.entitystatus.WrappedPacketOutEntityStatus
+io/github/retrooper/packetevents/event/impl/PostPacketPlayReceiveEvent.java
+ io.github.retrooper.packetevents.event.impl.PostPacketPlayReceiveEvent
+io/github/retrooper/packetevents/packetwrappers/play/out/transaction/WrappedPacketOutTransaction.java
+ io.github.retrooper.packetevents.packetwrappers.play.out.transaction.WrappedPacketOutTransaction
+io/github/retrooper/packetevents/utils/gameprofile/GameProfileUtil_8.java
+ io.github.retrooper.packetevents.utils.gameprofile.GameProfileUtil_8
+io/github/retrooper/packetevents/packetwrappers/play/out/login/WrappedPacketOutLogin.java
+ io.github.retrooper.packetevents.packetwrappers.play.out.login.WrappedPacketOutLogin
+io/github/retrooper/packetevents/utils/enums/EnumUtil.java
+ io.github.retrooper.packetevents.utils.enums.EnumUtil
+io/github/retrooper/packetevents/utils/netty/bytebuf/ByteBufUtil_7.java
+ io.github.retrooper.packetevents.utils.netty.bytebuf.ByteBufUtil_7
+io/github/retrooper/packetevents/utils/boundingbox/BoundingBox.java
+ io.github.retrooper.packetevents.utils.boundingbox.BoundingBox
+io/github/retrooper/packetevents/utils/guava/GuavaUtils.java
+ io.github.retrooper.packetevents.utils.guava.GuavaUtils
+io/github/retrooper/packetevents/event/impl/PacketLoginSendEvent.java
+ io.github.retrooper.packetevents.event.impl.PacketLoginSendEvent
+io/github/retrooper/packetevents/utils/attributesnapshot/AttributeModifierWrapper.java
+ io.github.retrooper.packetevents.utils.attributesnapshot.AttributeModifierWrapper
+ io.github.retrooper.packetevents.utils.attributesnapshot.AttributeModifierWrapper$Operation
+io/github/retrooper/packetevents/utils/world/Dimension.java
+ io.github.retrooper.packetevents.utils.world.Dimension
+io/github/retrooper/packetevents/utils/npc/NPCManager.java
+ io.github.retrooper.packetevents.utils.npc.NPCManager
+io/github/retrooper/packetevents/packetwrappers/play/out/ping/WrappedPacketOutPing.java
+ io.github.retrooper.packetevents.packetwrappers.play.out.ping.WrappedPacketOutPing
+io/github/retrooper/packetevents/utils/immutableset/ImmutableSet_8.java
+ io.github.retrooper.packetevents.utils.immutableset.ImmutableSet_8
+io/github/retrooper/packetevents/packetwrappers/play/out/blockbreakanimation/WrappedPacketOutBlockBreakAnimation.java
+ io.github.retrooper.packetevents.packetwrappers.play.out.blockbreakanimation.WrappedPacketOutBlockBreakAnimation
+io/github/retrooper/packetevents/packetwrappers/play/in/pong/WrappedPacketInPong.java
+ io.github.retrooper.packetevents.packetwrappers.play.in.pong.WrappedPacketInPong
+io/github/retrooper/packetevents/utils/vector/Vector3f.java
+ io.github.retrooper.packetevents.utils.vector.Vector3f
+io/github/retrooper/packetevents/packetwrappers/play/out/updatetime/WrappedPacketOutUpdateTime.java
+ io.github.retrooper.packetevents.packetwrappers.play.out.updatetime.WrappedPacketOutUpdateTime
+io/github/retrooper/packetevents/event/impl/PacketLoginReceiveEvent.java
+ io.github.retrooper.packetevents.event.impl.PacketLoginReceiveEvent
+io/github/retrooper/packetevents/packetwrappers/play/out/blockaction/WrappedPacketOutBlockAction.java
+ io.github.retrooper.packetevents.packetwrappers.play.out.blockaction.WrappedPacketOutBlockAction
+io/github/retrooper/packetevents/packetwrappers/NMSPacket.java
+ io.github.retrooper.packetevents.packetwrappers.NMSPacket
+io/github/retrooper/packetevents/event/PacketListenerAbstract.java
+ io.github.retrooper.packetevents.event.PacketListenerAbstract
+io/github/retrooper/packetevents/packetwrappers/play/out/spawnentity/WrappedPacketOutSpawnEntity.java
+ io.github.retrooper.packetevents.packetwrappers.play.out.spawnentity.WrappedPacketOutSpawnEntity
+io/github/retrooper/packetevents/packetwrappers/play/out/explosion/WrappedPacketOutExplosion.java
+ io.github.retrooper.packetevents.packetwrappers.play.out.explosion.WrappedPacketOutExplosion
+io/github/retrooper/packetevents/packetwrappers/play/in/spectate/WrappedPacketInSpectate.java
+ io.github.retrooper.packetevents.packetwrappers.play.in.spectate.WrappedPacketInSpectate
+io/github/retrooper/packetevents/packetwrappers/play/in/blockplace/WrappedPacketInBlockPlace_1_8.java
+ io.github.retrooper.packetevents.packetwrappers.play.in.blockplace.WrappedPacketInBlockPlace_1_8
+io/github/retrooper/packetevents/packetwrappers/api/helper/WrappedPacketEntityAbstraction.java
+ io.github.retrooper.packetevents.packetwrappers.api.helper.WrappedPacketEntityAbstraction
+io/github/retrooper/packetevents/event/impl/PostPlayerInjectEvent.java
+ io.github.retrooper.packetevents.event.impl.PostPlayerInjectEvent
+io/github/retrooper/packetevents/packetwrappers/play/in/useentity/WrappedPacketInUseEntity.java
+ io.github.retrooper.packetevents.packetwrappers.play.in.useentity.WrappedPacketInUseEntity
+ io.github.retrooper.packetevents.packetwrappers.play.in.useentity.WrappedPacketInUseEntity$EntityUseAction
+io/github/retrooper/packetevents/packetwrappers/play/out/spawnentityliving/WrappedPacketOutSpawnEntityLiving.java
+ io.github.retrooper.packetevents.packetwrappers.play.out.spawnentityliving.WrappedPacketOutSpawnEntityLiving
+io/github/retrooper/packetevents/packetwrappers/play/out/removeentityeffect/WrappedPacketOutRemoveEntityEffect.java
+ io.github.retrooper.packetevents.packetwrappers.play.out.removeentityeffect.WrappedPacketOutRemoveEntityEffect
+io/github/retrooper/packetevents/exceptions/WrapperUnsupportedUsageException.java
+ io.github.retrooper.packetevents.exceptions.WrapperUnsupportedUsageException
+io/github/retrooper/packetevents/packetwrappers/play/out/custompayload/WrappedPacketOutCustomPayload.java
+ io.github.retrooper.packetevents.packetwrappers.play.out.custompayload.WrappedPacketOutCustomPayload
+io/github/retrooper/packetevents/PacketEvents.java
+ io.github.retrooper.packetevents.PacketEvents
+io/github/retrooper/packetevents/packetwrappers/play/out/namedsoundeffect/WrappedPacketOutNamedSoundEffect.java
+ io.github.retrooper.packetevents.packetwrappers.play.out.namedsoundeffect.WrappedPacketOutNamedSoundEffect
+ io.github.retrooper.packetevents.packetwrappers.play.out.namedsoundeffect.WrappedPacketOutNamedSoundEffect$SoundCategory
+io/github/retrooper/packetevents/settings/PacketEventsSettings.java
+ io.github.retrooper.packetevents.settings.PacketEventsSettings
+io/github/retrooper/packetevents/utils/immutableset/ImmutableSetAbstract.java
+ io.github.retrooper.packetevents.utils.immutableset.ImmutableSetAbstract
+io/github/retrooper/packetevents/event/manager/EventManagerModern.java
+ io.github.retrooper.packetevents.event.manager.EventManagerModern
+io/github/retrooper/packetevents/event/impl/PacketDecodeEvent.java
+ io.github.retrooper.packetevents.event.impl.PacketDecodeEvent
+io/github/retrooper/packetevents/packetwrappers/play/out/updatehealth/WrappedPacketOutUpdateHealth.java
+ io.github.retrooper.packetevents.packetwrappers.play.out.updatehealth.WrappedPacketOutUpdateHealth
+io/github/retrooper/packetevents/packetwrappers/play/out/openwindowhorse/WrappedPacketOutOpenWindowHorse.java
+ io.github.retrooper.packetevents.packetwrappers.play.out.openwindowhorse.WrappedPacketOutOpenWindowHorse
+io/github/retrooper/packetevents/packetwrappers/play/out/entityheadrotation/WrappedPacketOutEntityHeadRotation.java
+ io.github.retrooper.packetevents.packetwrappers.play.out.entityheadrotation.WrappedPacketOutEntityHeadRotation
+io/github/retrooper/packetevents/packetwrappers/play/in/steervehicle/WrappedPacketInSteerVehicle.java
+ io.github.retrooper.packetevents.packetwrappers.play.in.steervehicle.WrappedPacketInSteerVehicle
+io/github/retrooper/packetevents/event/eventtypes/PlayerEvent.java
+ io.github.retrooper.packetevents.event.eventtypes.PlayerEvent
+io/github/retrooper/packetevents/utils/nms/PlayerAPIModern.java
+ io.github.retrooper.packetevents.utils.nms.PlayerAPIModern
+io/github/retrooper/packetevents/utils/player/ClientVersion.java
+ io.github.retrooper.packetevents.utils.player.ClientVersion
+io/github/retrooper/packetevents/packetwrappers/play/in/setcreativeslot/WrappedPacketInSetCreativeSlot.java
+ io.github.retrooper.packetevents.packetwrappers.play.in.setcreativeslot.WrappedPacketInSetCreativeSlot
+io/github/retrooper/packetevents/updatechecker/LowLevelUpdateCheckerModern.java
+ io.github.retrooper.packetevents.updatechecker.LowLevelUpdateCheckerModern
+io/github/retrooper/packetevents/PacketEventsPlugin.java
+ io.github.retrooper.packetevents.PacketEventsPlugin
+io/github/retrooper/packetevents/packetwrappers/play/out/setcooldown/WrappedPacketOutSetCooldown.java
+ io.github.retrooper.packetevents.packetwrappers.play.out.setcooldown.WrappedPacketOutSetCooldown
+io/github/retrooper/packetevents/injector/modern/early/PaperChannelInjector.java
+ io.github.retrooper.packetevents.injector.modern.early.PaperChannelInjector
+io/github/retrooper/packetevents/injector/legacy/late/LateChannelInjectorLegacy.java
+ io.github.retrooper.packetevents.injector.legacy.late.LateChannelInjectorLegacy
+io/github/retrooper/packetevents/utils/netty/channel/ChannelUtils.java
+ io.github.retrooper.packetevents.utils.netty.channel.ChannelUtils
+io/github/retrooper/packetevents/packetwrappers/play/out/collect/WrappedPacketOutCollect.java
+ io.github.retrooper.packetevents.packetwrappers.play.out.collect.WrappedPacketOutCollect
+io/github/retrooper/packetevents/packetwrappers/play/out/unloadchunk/WrappedPacketOutUnloadChunk.java
+ io.github.retrooper.packetevents.packetwrappers.play.out.unloadchunk.WrappedPacketOutUnloadChunk
+io/github/retrooper/packetevents/packetwrappers/play/out/entityteleport/WrappedPacketOutEntityTeleport.java
+ io.github.retrooper.packetevents.packetwrappers.play.out.entityteleport.WrappedPacketOutEntityTeleport
+io/github/retrooper/packetevents/packetwrappers/handshaking/setprotocol/WrappedPacketHandshakingInSetProtocol.java
+ io.github.retrooper.packetevents.packetwrappers.handshaking.setprotocol.WrappedPacketHandshakingInSetProtocol
+io/github/retrooper/packetevents/event/impl/PacketStatusReceiveEvent.java
+ io.github.retrooper.packetevents.event.impl.PacketStatusReceiveEvent
+io/github/retrooper/packetevents/packetwrappers/play/out/bedit/WrappedPacketInBEdit.java
+ io.github.retrooper.packetevents.packetwrappers.play.out.bedit.WrappedPacketInBEdit
+io/github/retrooper/packetevents/packetwrappers/api/SendableWrapper.java
+ io.github.retrooper.packetevents.packetwrappers.api.SendableWrapper
+io/github/retrooper/packetevents/packetwrappers/play/out/kickdisconnect/WrappedPacketOutKickDisconnect.java
+ io.github.retrooper.packetevents.packetwrappers.play.out.kickdisconnect.WrappedPacketOutKickDisconnect
+io/github/retrooper/packetevents/packetwrappers/play/out/resourcepacksend/WrappedPacketOutResourcePackSend.java
+ io.github.retrooper.packetevents.packetwrappers.play.out.resourcepacksend.WrappedPacketOutResourcePackSend
+io/github/retrooper/packetevents/packetwrappers/play/in/beacon/WrappedPacketInBeacon.java
+ io.github.retrooper.packetevents.packetwrappers.play.in.beacon.WrappedPacketInBeacon
+io/github/retrooper/packetevents/packetwrappers/play/out/setslot/WrappedPacketOutSetSlot.java
+ io.github.retrooper.packetevents.packetwrappers.play.out.setslot.WrappedPacketOutSetSlot
+io/github/retrooper/packetevents/packetwrappers/play/out/camera/WrappedPacketOutCamera.java
+ io.github.retrooper.packetevents.packetwrappers.play.out.camera.WrappedPacketOutCamera
+io/github/retrooper/packetevents/packetwrappers/play/in/clientcommand/WrappedPacketInClientCommand.java
+ io.github.retrooper.packetevents.packetwrappers.play.in.clientcommand.WrappedPacketInClientCommand
+ io.github.retrooper.packetevents.packetwrappers.play.in.clientcommand.WrappedPacketInClientCommand$ClientCommand
+io/github/retrooper/packetevents/utils/boundingbox/RayTraceResult.java
+ io.github.retrooper.packetevents.utils.boundingbox.RayTraceResult
+io/github/retrooper/packetevents/packetwrappers/play/in/custompayload/WrappedPacketInCustomPayload.java
+ io.github.retrooper.packetevents.packetwrappers.play.in.custompayload.WrappedPacketInCustomPayload
+io/github/retrooper/packetevents/packetwrappers/login/out/custompayload/WrappedPacketLoginOutCustomPayload.java
+ io.github.retrooper.packetevents.packetwrappers.login.out.custompayload.WrappedPacketLoginOutCustomPayload
+io/github/retrooper/packetevents/packetwrappers/play/in/transaction/WrappedPacketInTransaction.java
+ io.github.retrooper.packetevents.packetwrappers.play.in.transaction.WrappedPacketInTransaction
+io/github/retrooper/packetevents/utils/player/Direction.java
+ io.github.retrooper.packetevents.utils.player.Direction
+io/github/retrooper/packetevents/utils/gameprofile/GameProfileUtil_7.java
+ io.github.retrooper.packetevents.utils.gameprofile.GameProfileUtil_7
+io/github/retrooper/packetevents/event/impl/PacketStatusSendEvent.java
+ io.github.retrooper.packetevents.event.impl.PacketStatusSendEvent
+io/github/retrooper/packetevents/packetwrappers/login/out/disconnect/WrappedPacketLoginOutDisconnect.java
+ io.github.retrooper.packetevents.packetwrappers.login.out.disconnect.WrappedPacketLoginOutDisconnect
+io/github/retrooper/packetevents/packetwrappers/play/out/respawn/WrappedPacketOutRespawn.java
+ io.github.retrooper.packetevents.packetwrappers.play.out.respawn.WrappedPacketOutRespawn
+io/github/retrooper/packetevents/packettype/PacketType.java
+ io.github.retrooper.packetevents.packettype.PacketType
+ io.github.retrooper.packetevents.packettype.PacketType$Handshaking
+ io.github.retrooper.packetevents.packettype.PacketType$Handshaking$Client
+ io.github.retrooper.packetevents.packettype.PacketType$Login
+ io.github.retrooper.packetevents.packettype.PacketType$Login$Client
+ io.github.retrooper.packetevents.packettype.PacketType$Login$Server
+ io.github.retrooper.packetevents.packettype.PacketType$Play
+ io.github.retrooper.packetevents.packettype.PacketType$Play$Client
+ io.github.retrooper.packetevents.packettype.PacketType$Play$Client$Util
+ io.github.retrooper.packetevents.packettype.PacketType$Play$Server
+ io.github.retrooper.packetevents.packettype.PacketType$Play$Server$Util
+ io.github.retrooper.packetevents.packettype.PacketType$Status
+ io.github.retrooper.packetevents.packettype.PacketType$Status$Client
+ io.github.retrooper.packetevents.packettype.PacketType$Status$Server
+io/github/retrooper/packetevents/packetwrappers/play/out/blockchange/WrappedPacketOutBlockChange.java
+ io.github.retrooper.packetevents.packetwrappers.play.out.blockchange.WrappedPacketOutBlockChange
+io/github/retrooper/packetevents/packetwrappers/play/in/resourcepackstatus/WrappedPacketInResourcePackStatus.java
+ io.github.retrooper.packetevents.packetwrappers.play.in.resourcepackstatus.WrappedPacketInResourcePackStatus
+ io.github.retrooper.packetevents.packetwrappers.play.in.resourcepackstatus.WrappedPacketInResourcePackStatus$ResourcePackStatus
+io/github/retrooper/packetevents/injector/legacy/early/PEChannelInitializerLegacy.java
+ io.github.retrooper.packetevents.injector.legacy.early.PEChannelInitializerLegacy
+io/github/retrooper/packetevents/event/PacketListenerDynamic.java
+ io.github.retrooper.packetevents.event.PacketListenerDynamic
+io/github/retrooper/packetevents/packetwrappers/play/in/difficultylock/WrappedPacketInDifficultyLock.java
+ io.github.retrooper.packetevents.packetwrappers.play.in.difficultylock.WrappedPacketInDifficultyLock
+io/github/retrooper/packetevents/packetwrappers/play/out/entitymetadata/WrappedPacketOutEntityMetadata.java
+ io.github.retrooper.packetevents.packetwrappers.play.out.entitymetadata.WrappedPacketOutEntityMetadata
+io/github/retrooper/packetevents/packetwrappers/play/out/entityvelocity/WrappedPacketOutEntityVelocity.java
+ io.github.retrooper.packetevents.packetwrappers.play.out.entityvelocity.WrappedPacketOutEntityVelocity
+io/github/retrooper/packetevents/event/priority/PacketEventPriority.java
+ io.github.retrooper.packetevents.event.priority.PacketEventPriority
+io/github/retrooper/packetevents/packetwrappers/api/WrapperPacketReader.java
+ io.github.retrooper.packetevents.packetwrappers.api.WrapperPacketReader
+io/github/retrooper/packetevents/utils/reflection/ClassUtil.java
+ io.github.retrooper.packetevents.utils.reflection.ClassUtil
+io/github/retrooper/packetevents/utils/entityfinder/EntityFinderUtils.java
+ io.github.retrooper.packetevents.utils.entityfinder.EntityFinderUtils
+io/github/retrooper/packetevents/packetwrappers/play/in/enchantitem/WrappedPacketInEnchantItem.java
+ io.github.retrooper.packetevents.packetwrappers.play.in.enchantitem.WrappedPacketInEnchantItem
+io/github/retrooper/packetevents/packetwrappers/play/out/openwindow/WrappedPacketOutOpenWindow.java
+ io.github.retrooper.packetevents.packetwrappers.play.out.openwindow.WrappedPacketOutOpenWindow
+io/github/retrooper/packetevents/utils/npc/NPC.java
+ io.github.retrooper.packetevents.utils.npc.NPC
+io/github/retrooper/packetevents/utils/player/Skin.java
+ io.github.retrooper.packetevents.utils.player.Skin
+io/github/retrooper/packetevents/utils/netty/channel/ChannelUtils7.java
+ io.github.retrooper.packetevents.utils.netty.channel.ChannelUtils7
+io/github/retrooper/packetevents/utils/guava/GuavaUtils_7.java
+ io.github.retrooper.packetevents.utils.guava.GuavaUtils_7
+io/github/retrooper/packetevents/packetwrappers/play/in/abilities/WrappedPacketInAbilities.java
+ io.github.retrooper.packetevents.packetwrappers.play.in.abilities.WrappedPacketInAbilities
+io/github/retrooper/packetevents/utils/server/ServerVersion.java
+ io.github.retrooper.packetevents.utils.server.ServerVersion
+io/github/retrooper/packetevents/packetwrappers/play/in/chat/WrappedPacketInChat.java
+ io.github.retrooper.packetevents.packetwrappers.play.in.chat.WrappedPacketInChat
+io/github/retrooper/packetevents/packetwrappers/play/in/trsel/WrappedPacketInTrSel.java
+ io.github.retrooper.packetevents.packetwrappers.play.in.trsel.WrappedPacketInTrSel
+io/github/retrooper/packetevents/utils/attributesnapshot/AttributeSnapshotWrapper.java
+ io.github.retrooper.packetevents.utils.attributesnapshot.AttributeSnapshotWrapper
+io/github/retrooper/packetevents/packetwrappers/play/in/updatesign/WrappedPacketInUpdateSign.java
+ io.github.retrooper.packetevents.packetwrappers.play.in.updatesign.WrappedPacketInUpdateSign
+io/github/retrooper/packetevents/utils/gameprofile/GameProfileUtil.java
+ io.github.retrooper.packetevents.utils.gameprofile.GameProfileUtil
+io/github/retrooper/packetevents/utils/math/MathUtils.java
+ io.github.retrooper.packetevents.utils.math.MathUtils
+io/github/retrooper/packetevents/exceptions/WrapperFieldNotFoundException.java
+ io.github.retrooper.packetevents.exceptions.WrapperFieldNotFoundException
+io/github/retrooper/packetevents/packetwrappers/login/in/custompayload/WrappedPacketLoginInCustomPayload.java
+ io.github.retrooper.packetevents.packetwrappers.login.in.custompayload.WrappedPacketLoginInCustomPayload
+io/github/retrooper/packetevents/utils/reflection/Reflection.java
+ io.github.retrooper.packetevents.utils.reflection.Reflection
+io/github/retrooper/packetevents/utils/versionlookup/viaversion/ViaVersionLookupUtils.java
+ io.github.retrooper.packetevents.utils.versionlookup.viaversion.ViaVersionLookupUtils
+io/github/retrooper/packetevents/packetwrappers/play/out/scoreboardteam/WrappedPacketOutScoreboardTeam.java
+ io.github.retrooper.packetevents.packetwrappers.play.out.scoreboardteam.WrappedPacketOutScoreboardTeam
+io/github/retrooper/packetevents/utils/player/Hand.java
+ io.github.retrooper.packetevents.utils.player.Hand
+io/github/retrooper/packetevents/event/eventtypes/CancellableNMSPacketEvent.java
+ io.github.retrooper.packetevents.event.eventtypes.CancellableNMSPacketEvent
+io/github/retrooper/packetevents/packetwrappers/play/in/jigsawgenerate/WrappedPacketInJigsawGenerate.java
+ io.github.retrooper.packetevents.packetwrappers.play.in.jigsawgenerate.WrappedPacketInJigsawGenerate
+io/github/retrooper/packetevents/injector/GlobalChannelInjector.java
+ io.github.retrooper.packetevents.injector.GlobalChannelInjector
+io/github/retrooper/packetevents/packetwrappers/play/out/entitydestroy/WrappedPacketOutEntityDestroy.java
+ io.github.retrooper.packetevents.packetwrappers.play.out.entitydestroy.WrappedPacketOutEntityDestroy
+io/github/retrooper/packetevents/event/impl/PostPacketPlaySendEvent.java
+ io.github.retrooper.packetevents.event.impl.PostPacketPlaySendEvent
+io/github/retrooper/packetevents/packetwrappers/play/in/windowclick/WrappedPacketInWindowClick.java
+ io.github.retrooper.packetevents.packetwrappers.play.in.windowclick.WrappedPacketInWindowClick
+io/github/retrooper/packetevents/injector/legacy/early/EarlyChannelInjectorLegacy.java
+ io.github.retrooper.packetevents.injector.legacy.early.EarlyChannelInjectorLegacy
+ io.github.retrooper.packetevents.injector.legacy.early.EarlyChannelInjectorLegacy$1
+io/github/retrooper/packetevents/event/annotation/PacketHandler.java
+ io.github.retrooper.packetevents.event.annotation.PacketHandler
+io/github/retrooper/packetevents/utils/versionlookup/viaversion/ViaVersionAccessor.java
+ io.github.retrooper.packetevents.utils.versionlookup.viaversion.ViaVersionAccessor
+io/github/retrooper/packetevents/packetwrappers/play/out/multiblockchange/WrappedPacketOutMultiBlockChange.java
+ io.github.retrooper.packetevents.packetwrappers.play.out.multiblockchange.WrappedPacketOutMultiBlockChange
+io/github/retrooper/packetevents/packetwrappers/play/out/namedentityspawn/WrappedPacketOutNamedEntitySpawn.java
+ io.github.retrooper.packetevents.packetwrappers.play.out.namedentityspawn.WrappedPacketOutNamedEntitySpawn
+io/github/retrooper/packetevents/packetwrappers/play/in/difficultychange/WrappedPacketInDifficultyChange.java
+ io.github.retrooper.packetevents.packetwrappers.play.in.difficultychange.WrappedPacketInDifficultyChange
+io/github/retrooper/packetevents/packetwrappers/play/out/helditemslot/WrappedPacketOutHeldItemSlot.java
+ io.github.retrooper.packetevents.packetwrappers.play.out.helditemslot.WrappedPacketOutHeldItemSlot
+io/github/retrooper/packetevents/packetwrappers/play/out/mount/WrappedPacketOutMount.java
+ io.github.retrooper.packetevents.packetwrappers.play.out.mount.WrappedPacketOutMount
+io/github/retrooper/packetevents/utils/pair/Pair.java
+ io.github.retrooper.packetevents.utils.pair.Pair
+io/github/retrooper/packetevents/packetwrappers/play/out/gamestatechange/WrappedPacketOutGameStateChange.java
+ io.github.retrooper.packetevents.packetwrappers.play.out.gamestatechange.WrappedPacketOutGameStateChange
+io/github/retrooper/packetevents/injector/LateInjector.java
+ io.github.retrooper.packetevents.injector.LateInjector
+io/github/retrooper/packetevents/utils/vector/Vector3i.java
+ io.github.retrooper.packetevents.utils.vector.Vector3i
+io/github/retrooper/packetevents/utils/list/ConcurrentList.java
+ io.github.retrooper.packetevents.utils.list.ConcurrentList
+ io.github.retrooper.packetevents.utils.list.ConcurrentList$Itr
+ io.github.retrooper.packetevents.utils.list.ConcurrentList$ListItr
+io/github/retrooper/packetevents/event/PacketEvent.java
+ io.github.retrooper.packetevents.event.PacketEvent
+io/github/retrooper/packetevents/packetwrappers/play/in/helditemslot/WrappedPacketInHeldItemSlot.java
+ io.github.retrooper.packetevents.packetwrappers.play.in.helditemslot.WrappedPacketInHeldItemSlot
+io/github/retrooper/packetevents/utils/netty/channel/ChannelUtils8.java
+ io.github.retrooper.packetevents.utils.netty.channel.ChannelUtils8
+io/github/retrooper/packetevents/utils/guava/GuavaUtils_8.java
+ io.github.retrooper.packetevents.utils.guava.GuavaUtils_8
+io/github/retrooper/packetevents/packetwrappers/play/in/itemname/WrappedPacketInItemName.java
+ io.github.retrooper.packetevents.packetwrappers.play.in.itemname.WrappedPacketInItemName
+io/github/retrooper/packetevents/injector/modern/early/EarlyChannelInjectorModern.java
+ io.github.retrooper.packetevents.injector.modern.early.EarlyChannelInjectorModern
+ io.github.retrooper.packetevents.injector.modern.early.EarlyChannelInjectorModern$1
+io/github/retrooper/packetevents/utils/player/GameMode.java
+ io.github.retrooper.packetevents.utils.player.GameMode
+io/github/retrooper/packetevents/packetwrappers/play/in/boatmove/WrappedPacketInBoatMove.java
+ io.github.retrooper.packetevents.packetwrappers.play.in.boatmove.WrappedPacketInBoatMove
