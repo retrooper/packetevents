@@ -160,8 +160,8 @@ public final class PlayerUtils {
                 } catch (Exception ex) {
                     //Try ask the dependency again the next time, for now it is temporarily unresolved...
                     //Temporary unresolved means there is still hope, an exception was thrown on the dependency's end.
+                    return ClientVersion.TEMP_UNRESOLVED;
                 }
-                return ClientVersion.TEMP_UNRESOLVED;
             } else {
                 //We can trust the version we retrieved from the packet.
                 version = tempClientVersionMap.get(player.getAddress());
