@@ -20,6 +20,7 @@ package io.github.retrooper.packetevents.injector.legacy.late;
 
 import io.github.retrooper.packetevents.PacketEvents;
 import io.github.retrooper.packetevents.injector.LateInjector;
+import io.github.retrooper.packetevents.injector.legacy.PacketDecoderLagacy;
 import io.github.retrooper.packetevents.injector.legacy.PlayerChannelHandlerLegacy;
 import net.minecraft.util.io.netty.channel.Channel;
 import org.bukkit.entity.Player;
@@ -38,8 +39,18 @@ public class LateChannelInjectorLegacy implements LateInjector {
     @Override
     public void injectPlayer(Player player) {
         PlayerChannelHandlerLegacy playerChannelHandlerLegacy = new PlayerChannelHandlerLegacy();
+        PacketDecoderLagacy packetDecoderLagacy = new PacketDecoderLagacy();
         playerChannelHandlerLegacy.player = player;
         Channel channel = (Channel) PacketEvents.get().getPlayerUtils().getChannel(player);
+
+        if(channel.pipeline().get("decompress") != null){
+            String handlerName = PacketEvents.get().getHandlerName() + "-decoder";
+            channel.pipeline().addAfter("decompress",handlerName,packetDecoderLagacy);
+        }else if(channel.pipeline().get("splitter") != null){
+            String handlerName = PacketEvents.get().getHandlerName() + "-decoder";
+            channel.pipeline().addAfter("splitter",handlerName,packetDecoderLagacy);
+        }
+
         channel.pipeline().addBefore("packet_handler", PacketEvents.get().getHandlerName(), playerChannelHandlerLegacy);
     }
 

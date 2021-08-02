@@ -7,12 +7,18 @@ import io.netty.buffer.ByteBuf;
 
 public class PacketDecodeEvent extends PacketEvent implements CancellableEvent {
     private boolean cancel;
-    private final ByteBuf byteBuf;
+    private ByteBuf byteBuf;
+    private net.minecraft.util.io.netty.buffer.ByteBuf lagacyByteBuf;
 
 
     public PacketDecodeEvent(ByteBuf byteBuf){
         this.byteBuf = byteBuf;
     }
+
+    public PacketDecodeEvent(net.minecraft.util.io.netty.buffer.ByteBuf lagacyByteBuf){
+        this.lagacyByteBuf = lagacyByteBuf;
+    }
+
 
     @Override
     public void call(PacketListenerAbstract listener) {
@@ -29,7 +35,19 @@ public class PacketDecodeEvent extends PacketEvent implements CancellableEvent {
         this.cancel = val;
     }
 
+    /**
+     * ByteBuffer can be null if the server is running lagacy version of minecraft
+     * @return
+     */
     public ByteBuf getByteBuf(){
         return this.byteBuf;
+    }
+
+    /**
+     * ByteBuffer can be null if the server is running modern version of minecraft
+     * @return
+     */
+    public net.minecraft.util.io.netty.buffer.ByteBuf getLagacyByteBuf(){
+        return this.lagacyByteBuf;
     }
 }

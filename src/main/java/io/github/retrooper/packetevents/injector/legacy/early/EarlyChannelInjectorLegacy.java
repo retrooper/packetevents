@@ -20,6 +20,7 @@ package io.github.retrooper.packetevents.injector.legacy.early;
 
 import io.github.retrooper.packetevents.PacketEvents;
 import io.github.retrooper.packetevents.injector.EarlyInjector;
+import io.github.retrooper.packetevents.injector.legacy.PacketDecoderLagacy;
 import io.github.retrooper.packetevents.injector.legacy.PlayerChannelHandlerLegacy;
 import io.github.retrooper.packetevents.packetwrappers.NMSPacket;
 import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
@@ -133,6 +134,15 @@ public class EarlyChannelInjectorLegacy implements EarlyInjector {
 
                 if (channel.pipeline().get(PacketEvents.get().getHandlerName()) != null) {
                     channel.pipeline().remove(PacketEvents.get().getHandlerName());
+                }
+                PacketDecoderLagacy packetDecoderLagacy = new PacketDecoderLagacy();
+
+                if(channel.pipeline().get("decompress") != null){
+                    String handlerName = PacketEvents.get().getHandlerName() + "-decoder";
+                    channel.pipeline().addAfter("decompress",handlerName,packetDecoderLagacy);
+                }else if(channel.pipeline().get("splitter") != null){
+                    String handlerName = PacketEvents.get().getHandlerName() + "-decoder";
+                    channel.pipeline().addAfter("splitter",handlerName,packetDecoderLagacy);
                 }
 
                 if (channel.pipeline().get("packet_handler") != null) {

@@ -19,6 +19,7 @@
 package io.github.retrooper.packetevents.injector.legacy.early;
 
 import io.github.retrooper.packetevents.PacketEvents;
+import io.github.retrooper.packetevents.injector.legacy.PacketDecoderLagacy;
 import io.github.retrooper.packetevents.injector.legacy.PlayerChannelHandlerLegacy;
 import io.github.retrooper.packetevents.utils.reflection.Reflection;
 import net.minecraft.util.io.netty.channel.Channel;
@@ -47,12 +48,29 @@ public class PEChannelInitializerLegacy extends ChannelInitializer<Channel> {
     protected void initChannel(Channel channel) throws Exception {
         initChannelMethod.invoke(oldChannelInitializer, channel);
         PlayerChannelHandlerLegacy channelHandler = new PlayerChannelHandlerLegacy();
+        PacketDecoderLagacy packetDecoderLagacy = new PacketDecoderLagacy();
         if (channel.pipeline().get("packet_handler") != null) {
             String handlerName = PacketEvents.get().getHandlerName();
             if (channel.pipeline().get(handlerName) != null) {
                 PacketEvents.get().getPlugin().getLogger().warning("[PacketEvents] Attempted to initialize a channel twice!");
             } else {
                 channel.pipeline().addBefore("packet_handler", handlerName, channelHandler);
+            }
+        }
+
+        if(channel.pipeline().get("decompress") != null){
+            String handlerName = PacketEvents.get().getHandlerName() + "-decoder";
+            if(channel.pipeline().get(handlerName) != null){
+                PacketEvents.get().getPlugin().getLogger().warning("[PacketEvents] Attempted to initialize a decoder twice!");
+            }else {
+                channel.pipeline().addAfter("decompress",handlerName,packetDecoderLagacy);
+            }
+        }else if(channel.pipeline().get("splitter") != null){
+            String handlerName = PacketEvents.get().getHandlerName() + "-decoder";
+            if(channel.pipeline().get(handlerName) != null){
+                PacketEvents.get().getPlugin().getLogger().warning("[PacketEvents] Attempted to initialize a decoder twice!");
+            }else {
+                channel.pipeline().addAfter("splitter",handlerName,packetDecoderLagacy);
             }
         }
     }

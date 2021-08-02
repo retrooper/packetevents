@@ -27,11 +27,11 @@
         {
           "name": "packetevents-1.8-pre-17.jar",
           "url": "packetevents-1.8-pre-17.jar",
-          "size": 507880,
-          "sha512": "22003456330b534e4d12c18ae15a6fe79da428cdf483769e509e83684e19391226a5a834ce05b9fcfa07a53f09dd33f1c732f578e8ed6deb7b8058e84f3e04d2",
-          "sha256": "4499abc6c1a770b004fed67cd34efc034f300f866d4a6cc1c7676f7e58bacabd",
-          "sha1": "0432bb8e445951882405f576dcced7def834d1a3",
-          "md5": "d9f94fa4a4cdfa938f69ad061a09fe71"
+          "size": 509755,
+          "sha512": "52675d554d3bad55d7b9add27a1bbf1f56daae8fbeb7383f44322d640362ba94fedb20d74db9cd533d8194839b1c7cd2eab753441a2d775d508d91b0917c0465",
+          "sha256": "53fbc5c258dc38efac5dc6efe41bfb804c9a580dd2a13346dc9180210be958d3",
+          "sha1": "826496d48b0518980d5b38f2167046e7f5f41d82",
+          "md5": "864b9ae81b0c34fec0984ba3a669018c"
         }
       ]
     },
@@ -57,11 +57,11 @@
         {
           "name": "packetevents-1.8-pre-17.jar",
           "url": "packetevents-1.8-pre-17.jar",
-          "size": 507880,
-          "sha512": "22003456330b534e4d12c18ae15a6fe79da428cdf483769e509e83684e19391226a5a834ce05b9fcfa07a53f09dd33f1c732f578e8ed6deb7b8058e84f3e04d2",
-          "sha256": "4499abc6c1a770b004fed67cd34efc034f300f866d4a6cc1c7676f7e58bacabd",
-          "sha1": "0432bb8e445951882405f576dcced7def834d1a3",
-          "md5": "d9f94fa4a4cdfa938f69ad061a09fe71"
+          "size": 509755,
+          "sha512": "52675d554d3bad55d7b9add27a1bbf1f56daae8fbeb7383f44322d640362ba94fedb20d74db9cd533d8194839b1c7cd2eab753441a2d775d508d91b0917c0465",
+          "sha256": "53fbc5c258dc38efac5dc6efe41bfb804c9a580dd2a13346dc9180210be958d3",
+          "sha1": "826496d48b0518980d5b38f2167046e7f5f41d82",
+          "md5": "864b9ae81b0c34fec0984ba3a669018c"
         }
       ]
     }
