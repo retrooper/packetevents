@@ -53,8 +53,8 @@ io/github/retrooper/packetevents/event/eventtypes/CancellableEvent.java
  io.github.retrooper.packetevents.event.eventtypes.CancellableEvent
 io/github/retrooper/packetevents/packetwrappers/status/out/pong/WrappedPacketStatusPong.java
  io.github.retrooper.packetevents.packetwrappers.status.out.pong.WrappedPacketStatusPong
-io/github/retrooper/packetevents/injector/GlobalChannelInjector.java
- io.github.retrooper.packetevents.injector.GlobalChannelInjector
+io/github/retrooper/packetevents/injector/legacy/PacketDecoderLagacy.java
+ io.github.retrooper.packetevents.injector.legacy.PacketDecoderLagacy
 io/github/retrooper/packetevents/utils/nms/NMSUtils.java
  io.github.retrooper.packetevents.utils.nms.NMSUtils
 io/github/retrooper/packetevents/packetwrappers/play/out/worldparticles/WrappedPacketOutWorldParticles.java
@@ -346,8 +346,8 @@ io/github/retrooper/packetevents/updatechecker/LowLevelUpdateCheckerModern.java
  io.github.retrooper.packetevents.updatechecker.LowLevelUpdateCheckerModern
 io/github/retrooper/packetevents/packetwrappers/play/out/setcooldown/WrappedPacketOutSetCooldown.java
  io.github.retrooper.packetevents.packetwrappers.play.out.setcooldown.WrappedPacketOutSetCooldown
-io/github/retrooper/packetevents/injector/modern/early/PaperChannelInjector.java
- io.github.retrooper.packetevents.injector.modern.early.PaperChannelInjector
+io/github/retrooper/packetevents/injector/modern/PacketDecoderModern.java
+ io.github.retrooper.packetevents.injector.modern.PacketDecoderModern
 io/github/retrooper/packetevents/event/impl/PacketStatusSendEvent.java
  io.github.retrooper.packetevents.event.impl.PacketStatusSendEvent
 io/github/retrooper/packetevents/utils/netty/channel/ChannelUtils.java
@@ -515,22 +515,22 @@ io/github/retrooper/packetevents/event/impl/PacketLoginSendEvent.java
  io.github.retrooper.packetevents.event.impl.PacketLoginSendEvent
 io/github/retrooper/packetevents/event/impl/PacketDecodeEvent.java
  io.github.retrooper.packetevents.event.impl.PacketDecodeEvent
+io/github/retrooper/packetevents/PacketEventsPlugin.java
+ io.github.retrooper.packetevents.PacketEventsPlugin
+ io.github.retrooper.packetevents.PacketEventsPlugin$1
+io/github/retrooper/packetevents/injector/legacy/late/LateChannelInjectorLegacy.java
+ io.github.retrooper.packetevents.injector.legacy.late.LateChannelInjectorLegacy
 io/github/retrooper/packetevents/injector/legacy/early/EarlyChannelInjectorLegacy.java
  io.github.retrooper.packetevents.injector.legacy.early.EarlyChannelInjectorLegacy
  io.github.retrooper.packetevents.injector.legacy.early.EarlyChannelInjectorLegacy$1
-io/github/retrooper/packetevents/injector/legacy/late/LateChannelInjectorLegacy.java
- io.github.retrooper.packetevents.injector.legacy.late.LateChannelInjectorLegacy
-io/github/retrooper/packetevents/injector/modern/PacketDecoderModern.java
- io.github.retrooper.packetevents.injector.modern.PacketDecoderModern
+io/github/retrooper/packetevents/injector/modern/early/PaperChannelInjector.java
+ io.github.retrooper.packetevents.injector.modern.early.PaperChannelInjector
+io/github/retrooper/packetevents/injector/GlobalChannelInjector.java
+ io.github.retrooper.packetevents.injector.GlobalChannelInjector
 io/github/retrooper/packetevents/injector/modern/early/PEChannelInitializerModern.java
  io.github.retrooper.packetevents.injector.modern.early.PEChannelInitializerModern
-io/github/retrooper/packetevents/injector/legacy/PacketDecoderLagacy.java
- io.github.retrooper.packetevents.injector.legacy.PacketDecoderLagacy
 io/github/retrooper/packetevents/injector/legacy/early/PEChannelInitializerLegacy.java
  io.github.retrooper.packetevents.injector.legacy.early.PEChannelInitializerLegacy
 io/github/retrooper/packetevents/injector/modern/early/EarlyChannelInjectorModern.java
  io.github.retrooper.packetevents.injector.modern.early.EarlyChannelInjectorModern
  io.github.retrooper.packetevents.injector.modern.early.EarlyChannelInjectorModern$1
-io/github/retrooper/packetevents/PacketEventsPlugin.java
- io.github.retrooper.packetevents.PacketEventsPlugin
- io.github.retrooper.packetevents.PacketEventsPlugin$1
