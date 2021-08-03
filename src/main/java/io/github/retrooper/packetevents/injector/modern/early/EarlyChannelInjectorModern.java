@@ -140,6 +140,10 @@ public class EarlyChannelInjectorModern implements EarlyInjector {
                     channel.pipeline().remove(PacketEvents.get().getHandlerName());
                 }
 
+                if (channel.pipeline().get(PacketEvents.get().getDecoderName()) != null) {
+                    channel.pipeline().remove(PacketEvents.get().getDecoderName());
+                }
+
                 PacketDecoderModern packetDecoderModern = new PacketDecoderModern();
                 if (channel.pipeline().get("decompress") != null) {
                     String decoderName = PacketEvents.get().getDecoderName();

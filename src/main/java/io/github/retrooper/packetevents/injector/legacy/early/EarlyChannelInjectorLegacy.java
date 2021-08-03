@@ -135,6 +135,11 @@ public class EarlyChannelInjectorLegacy implements EarlyInjector {
                 if (channel.pipeline().get(PacketEvents.get().getHandlerName()) != null) {
                     channel.pipeline().remove(PacketEvents.get().getHandlerName());
                 }
+
+                if (channel.pipeline().get(PacketEvents.get().getDecoderName()) != null) {
+                    channel.pipeline().remove(PacketEvents.get().getDecoderName());
+                }
+
                 PacketDecoderLagacy packetDecoderLagacy = new PacketDecoderLagacy();
 
                 if(channel.pipeline().get("decompress") != null){
