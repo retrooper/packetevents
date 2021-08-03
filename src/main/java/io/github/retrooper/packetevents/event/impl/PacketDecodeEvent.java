@@ -7,6 +7,7 @@ import io.github.retrooper.packetevents.event.eventtypes.CancellableEvent;
 import io.github.retrooper.packetevents.event.eventtypes.PlayerEvent;
 import io.github.retrooper.packetevents.utils.netty.bytebuf.ByteBufAbstract;
 import org.bukkit.entity.Player;
+import org.jetbrains.annotations.Nullable;
 
 public class PacketDecodeEvent extends PacketEvent implements PlayerEvent, CancellableEvent {
     private final Player player;
@@ -39,6 +40,7 @@ public class PacketDecodeEvent extends PacketEvent implements PlayerEvent, Cance
         this.cancel = val;
     }
 
+    @Nullable
     @Override
     public Player getPlayer() {
         return player;

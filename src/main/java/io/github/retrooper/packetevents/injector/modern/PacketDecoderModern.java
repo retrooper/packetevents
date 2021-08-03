@@ -28,6 +28,8 @@ public class PacketDecoderModern extends ByteToMessageDecoder {
             return;
         }
 
+        byteBuf = (ByteBuf) packetDecodeEvent.getByteBuf().rawByteBuf();
+
         list.add(byteBuf.readBytes(byteBuf.readableBytes()));
     }
 }
