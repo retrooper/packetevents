@@ -18,7 +18,14 @@
 
 package io.github.retrooper.packetevents.utils.netty.bytebuf;
 
+
+import java.nio.ByteBuffer;
+import java.nio.charset.Charset;
+
 public interface ByteBufAbstract {
+
+    Object rawByteBuf();
+
     int capacity();
 
     ByteBufAbstract capacity(int capacity);
@@ -61,41 +68,108 @@ public interface ByteBufAbstract {
 
     short getShort(int i);
 
-    short getShortLE(int i);
-
     int getUnsignedShort(int i);
 
-    int getUnsignedShortLE(int i);
-
     int getMedium(int i);
-
-    int getMediumLE(int i);
+    
 
     int getUnsignedMedium(int i);
 
-    int getUnsignedMediumLE(int i);
-
     int getInt(int i);
-
-    int getIntLE(int i);
 
     long getUnsignedInt(int i);
 
-    long getUnsignedIntLE(int i);
-
     long getLong(int i);
-
-    long getLongLE(int i);
 
     char getChar(int i);
 
     float getFloat(int i);
 
-    float getFloatLE(int i);
-
     double getDouble(int i);
 
-    double getDoubleLE(int i);
+    boolean readBoolean();
 
-    //TODO add setters, add reading/writing without index methods, implement them
+    byte readByte();
+
+    short readUnsignedByte();
+
+    short readShort();
+
+    int readUnsignedShort();
+
+    int readMedium();
+
+    int readUnsignedMedium();
+
+    int readInt();
+
+    long readUnsignedInt();
+
+    long readLong();
+
+    char readChar();
+
+    float readFloat();
+
+    double readDouble();
+
+     ByteBufAbstract writeBoolean(boolean a);
+
+    ByteBufAbstract writeByte(int a);
+
+    ByteBufAbstract writeShort(int a);
+
+    ByteBufAbstract writeMedium(int a);
+
+    ByteBufAbstract writeInt(int a);
+
+    ByteBufAbstract writeLong(long a);
+
+    ByteBufAbstract writeChar(int a);
+
+    ByteBufAbstract writeFloat(float a);
+
+    ByteBufAbstract writeDouble(double a);
+
+     ByteBufAbstract copy();
+
+     ByteBufAbstract copy(int a, int b);
+
+     ByteBufAbstract slice();
+
+     ByteBufAbstract slice(int a, int b);
+
+     ByteBufAbstract duplicate();
+
+     int nioBufferCount();
+
+     ByteBuffer nioBuffer();
+
+     ByteBuffer nioBuffer(int a, int b);
+
+     ByteBuffer internalNioBuffer(int a, int b);
+
+     ByteBuffer[] nioBuffers();
+
+     ByteBuffer[] nioBuffers(int a, int b);
+
+     boolean hasArray();
+
+     byte[] array();
+
+     int arrayOffset();
+
+     boolean hasMemoryAddress();
+
+     long memoryAddress();
+
+     int hashCode();
+
+     boolean equals(Object a);
+
+     int compareTo(ByteBufAbstract a);
+
+     ByteBufAbstract retain(int a);
+
+     ByteBufAbstract retain();
 }
