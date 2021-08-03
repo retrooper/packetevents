@@ -37,31 +37,26 @@ public class PEChannelInitializerModern extends ChannelInitializer<Channel> {
     }
 
     public static void postInitChannel(Channel channel) {
-        PlayerChannelHandlerModern channelHandler = new PlayerChannelHandlerModern();
-        PacketDecoderModern packetDecoderModern = new PacketDecoderModern();
-
         if (channel.pipeline().get("packet_handler") != null) {
             String handlerName = PacketEvents.get().getHandlerName();
             if (channel.pipeline().get(handlerName) != null) {
                 PacketEvents.get().getPlugin().getLogger().warning("[PacketEvents] Attempted to initialize a channel twice!");
             } else {
-                channel.pipeline().addBefore("packet_handler", handlerName, channelHandler);
+                channel.pipeline().addBefore("packet_handler", handlerName, new PlayerChannelHandlerModern());
             }
         }
-
+        String decoderName = PacketEvents.get().getDecoderName();
         if(channel.pipeline().get("decompress") != null){
-            String handlerName = PacketEvents.get().getHandlerName() + "-decoder";
-            if(channel.pipeline().get(handlerName) != null){
+            if(channel.pipeline().get(decoderName) != null){
                 PacketEvents.get().getPlugin().getLogger().warning("[PacketEvents] Attempted to initialize a decoder twice!");
             }else {
-                channel.pipeline().addAfter("decompress",handlerName,packetDecoderModern);
+                channel.pipeline().addAfter("decompress",decoderName,new PacketDecoderModern());
             }
         }else if(channel.pipeline().get("splitter") != null){
-            String handlerName = PacketEvents.get().getHandlerName() + "-decoder";
-            if(channel.pipeline().get(handlerName) != null){
+            if(channel.pipeline().get(decoderName) != null){
                 PacketEvents.get().getPlugin().getLogger().warning("[PacketEvents] Attempted to initialize a decoder twice!");
             }else {
-                channel.pipeline().addAfter("splitter",handlerName,packetDecoderModern);
+                channel.pipeline().addAfter("splitter",decoderName,new PacketDecoderModern());
             }
         }
     }

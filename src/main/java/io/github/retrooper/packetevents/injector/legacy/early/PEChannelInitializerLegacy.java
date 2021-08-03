@@ -57,20 +57,18 @@ public class PEChannelInitializerLegacy extends ChannelInitializer<Channel> {
                 channel.pipeline().addBefore("packet_handler", handlerName, channelHandler);
             }
         }
-
+        String decoderName = PacketEvents.get().getDecoderName();
         if(channel.pipeline().get("decompress") != null){
-            String handlerName = PacketEvents.get().getHandlerName() + "-decoder";
-            if(channel.pipeline().get(handlerName) != null){
+            if(channel.pipeline().get(decoderName) != null){
                 PacketEvents.get().getPlugin().getLogger().warning("[PacketEvents] Attempted to initialize a decoder twice!");
             }else {
-                channel.pipeline().addAfter("decompress",handlerName,packetDecoderLagacy);
+                channel.pipeline().addAfter("decompress",decoderName,packetDecoderLagacy);
             }
         }else if(channel.pipeline().get("splitter") != null){
-            String handlerName = PacketEvents.get().getHandlerName() + "-decoder";
-            if(channel.pipeline().get(handlerName) != null){
+            if(channel.pipeline().get(decoderName) != null){
                 PacketEvents.get().getPlugin().getLogger().warning("[PacketEvents] Attempted to initialize a decoder twice!");
             }else {
-                channel.pipeline().addAfter("splitter",handlerName,packetDecoderLagacy);
+                channel.pipeline().addAfter("splitter",decoderName,packetDecoderLagacy);
             }
         }
     }

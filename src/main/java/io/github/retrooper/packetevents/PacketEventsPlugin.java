@@ -18,7 +18,10 @@
 
 package io.github.retrooper.packetevents;
 
+import io.github.retrooper.packetevents.event.PacketListenerAbstract;
+import io.github.retrooper.packetevents.event.impl.PacketDecodeEvent;
 import io.github.retrooper.packetevents.settings.PacketEventsSettings;
+import io.github.retrooper.packetevents.utils.netty.bytebuf.ByteBufAbstract;
 import io.github.retrooper.packetevents.utils.server.ServerVersion;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -37,6 +40,28 @@ public class PacketEventsPlugin extends JavaPlugin {
 
     @Override
     public void onEnable() {
+        PacketEvents.get().registerListener(new PacketListenerAbstract() {
+            public int readVarInt(ByteBufAbstract byteBuf) {
+                int i = 0;
+                int j = 0;
+                while (true) {
+                    byte b0 = byteBuf.readByte();
+                    i |= (b0 & Byte.MAX_VALUE) << j++ * 7;
+                    if (j > 5)
+                        throw new RuntimeException("VarInt too big");
+                    if ((b0 & 0x80) != 128)
+                        return i;
+                }
+            }
+
+            @Override
+            public void onPacketDecode(PacketDecodeEvent event) {
+                if (event.getPlayer() != null) {
+                    int packetID = readVarInt(event.getByteBuf());
+                    event.getPlayer().sendMessage("id: " + packetID);
+                }
+            }
+        });
         PacketEvents.get().init();
     }
 

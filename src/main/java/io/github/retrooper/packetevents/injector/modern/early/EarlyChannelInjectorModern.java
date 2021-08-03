@@ -131,7 +131,7 @@ public class EarlyChannelInjectorModern implements EarlyInjector {
         synchronized (networkManagers) {
             for (Object networkManager : networkManagers) {
                 WrappedPacket networkManagerWrapper = new WrappedPacket(new NMSPacket(networkManager));
-                Channel channel = (Channel) networkManagerWrapper.readObject(0, NMSUtils.nettyChannelClass);
+                Channel channel = networkManagerWrapper.readObject(0, Channel.class);
                 if (channel == null) {
                     continue;
                 }
@@ -209,7 +209,6 @@ public class EarlyChannelInjectorModern implements EarlyInjector {
 
     @Override
     public void eject() {
-        // TODO: Uninject from players currently online to prevent protocol lib issues.
         if (PaperChannelInjector.PAPER_INJECTION_METHOD) {
             try {
                 PaperChannelInjector.removePaperChannelInitializeListener();
