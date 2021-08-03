@@ -20,10 +20,10 @@ package io.github.retrooper.packetevents.injector.modern.early;
 
 import io.github.retrooper.packetevents.PacketEvents;
 import io.github.retrooper.packetevents.injector.modern.PacketDecoderModern;
-import io.github.retrooper.packetevents.injector.modern.PlayerChannelHandlerModern;
 import io.github.retrooper.packetevents.utils.reflection.Reflection;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelInitializer;
+import io.netty.handler.codec.ByteToMessageDecoder;
 
 import java.lang.reflect.Method;
 
@@ -37,28 +37,8 @@ public class PEChannelInitializerModern extends ChannelInitializer<Channel> {
     }
 
     public static void postInitChannel(Channel channel) {
-        if (channel.pipeline().get("packet_handler") != null) {
-            String handlerName = PacketEvents.get().getHandlerName();
-            if (channel.pipeline().get(handlerName) != null) {
-                PacketEvents.get().getPlugin().getLogger().warning("[PacketEvents] Attempted to initialize a channel twice!");
-            } else {
-                channel.pipeline().addBefore("packet_handler", handlerName, new PlayerChannelHandlerModern());
-            }
-        }
-        String decoderName = PacketEvents.get().getDecoderName();
-        if(channel.pipeline().get("decompress") != null){
-            if(channel.pipeline().get(decoderName) != null){
-                PacketEvents.get().getPlugin().getLogger().warning("[PacketEvents] Attempted to initialize a decoder twice!");
-            }else {
-                channel.pipeline().addAfter("decompress",decoderName,new PacketDecoderModern());
-            }
-        }else if(channel.pipeline().get("splitter") != null){
-            if(channel.pipeline().get(decoderName) != null){
-                PacketEvents.get().getPlugin().getLogger().warning("[PacketEvents] Attempted to initialize a decoder twice!");
-            }else {
-                channel.pipeline().addAfter("splitter",decoderName,new PacketDecoderModern());
-            }
-        }
+        PacketDecoderModern packetDecoderModern = new PacketDecoderModern((ByteToMessageDecoder) channel.pipeline().get("decoder"));
+        channel.pipeline().replace("decoder", "decoder", packetDecoderModern);
     }
 
     private void load() {

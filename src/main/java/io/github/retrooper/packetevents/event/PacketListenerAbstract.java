@@ -65,33 +65,6 @@ public abstract class PacketListenerAbstract {
         return priority;
     }
 
-    public void onPacketStatusReceive(PacketStatusReceiveEvent event) {
-    }
-
-    public void onPacketStatusSend(PacketStatusSendEvent event) {
-    }
-
-    public void onPacketHandshakeReceive(PacketHandshakeReceiveEvent event) {
-    }
-
-    public void onPacketLoginReceive(PacketLoginReceiveEvent event) {
-    }
-
-    public void onPacketLoginSend(PacketLoginSendEvent event) {
-    }
-
-    public void onPacketPlayReceive(PacketPlayReceiveEvent event) {
-    }
-
-    public void onPacketPlaySend(PacketPlaySendEvent event) {
-    }
-
-    public void onPostPacketPlayReceive(PostPacketPlayReceiveEvent event) {
-    }
-
-    public void onPostPacketPlaySend(PostPacketPlaySendEvent event) {
-    }
-
     public void onPostPlayerInject(PostPlayerInjectEvent event) {
     }
 

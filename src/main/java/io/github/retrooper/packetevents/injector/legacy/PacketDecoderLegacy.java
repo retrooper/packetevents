@@ -1,10 +1,10 @@
-package io.github.retrooper.packetevents.injector.modern;
+package io.github.retrooper.packetevents.injector.legacy;
 
 import io.github.retrooper.packetevents.PacketEvents;
 import io.github.retrooper.packetevents.event.impl.PacketDecodeEvent;
-import io.netty.buffer.ByteBuf;
-import io.netty.channel.ChannelHandlerContext;
-import io.netty.handler.codec.ByteToMessageDecoder;
+import net.minecraft.util.io.netty.buffer.ByteBuf;
+import net.minecraft.util.io.netty.channel.ChannelHandlerContext;
+import net.minecraft.util.io.netty.handler.codec.ByteToMessageDecoder;
 import org.bukkit.entity.Player;
 
 import java.lang.reflect.InvocationTargetException;
@@ -12,12 +12,12 @@ import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 
-public class PacketDecoderModern extends ByteToMessageDecoder {
+public class PacketDecoderLegacy extends ByteToMessageDecoder {
     private static Method DECODE_METHOD;
     public volatile Player player;
     public final ByteToMessageDecoder minecraftDecoder;
 
-    public PacketDecoderModern(ByteToMessageDecoder minecraftDecoder) {
+    public PacketDecoderLegacy(ByteToMessageDecoder minecraftDecoder) {
         this.minecraftDecoder = minecraftDecoder;
     }
 

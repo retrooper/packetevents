@@ -18,7 +18,6 @@
 
 package io.github.retrooper.packetevents.event.eventtypes;
 
-import io.github.retrooper.packetevents.event.impl.PacketPlayReceiveEvent;
 import org.bukkit.entity.Player;
 
 /**

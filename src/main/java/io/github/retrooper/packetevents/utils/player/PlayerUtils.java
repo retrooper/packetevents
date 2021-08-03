@@ -19,9 +19,6 @@
 package io.github.retrooper.packetevents.utils.player;
 
 import io.github.retrooper.packetevents.PacketEvents;
-import io.github.retrooper.packetevents.packetwrappers.api.SendableWrapper;
-import io.github.retrooper.packetevents.packetwrappers.play.out.entitydestroy.WrappedPacketOutEntityDestroy;
-import io.github.retrooper.packetevents.packetwrappers.play.out.namedentityspawn.WrappedPacketOutNamedEntitySpawn;
 import io.github.retrooper.packetevents.utils.gameprofile.GameProfileUtil;
 import io.github.retrooper.packetevents.utils.gameprofile.WrappedGameProfile;
 import io.github.retrooper.packetevents.utils.geyser.GeyserUtils;
@@ -185,7 +182,7 @@ public final class PlayerUtils {
         }
         return version;
     }
-
+/*
     public void writePacket(Player player, SendableWrapper wrapper) {
         try {
             Object nmsPacket = wrapper.asNMSPacket();
@@ -205,12 +202,7 @@ public final class PlayerUtils {
         }
     }
 
-    /**
-     * Send a client-bound(server-sided) wrapper that supports sending to a player.
-     *
-     * @param player  Packet receiver.
-     * @param wrapper Client-bound wrapper supporting sending.
-     */
+
     public void sendPacket(Player player, SendableWrapper wrapper) {
         try {
             Object nmsPacket = wrapper.asNMSPacket();
@@ -228,14 +220,8 @@ public final class PlayerUtils {
         } catch (Exception ex) {
             ex.printStackTrace();
         }
-    }
+    }*/
 
-    /**
-     * Send a client-bound(server-sided) raw NMS Packet without any wrapper to a player.
-     *
-     * @param player Packet receiver.
-     * @param packet Client-bound raw NMS packet.
-     */
     public void sendNMSPacket(Player player, Object packet) {
         PacketEvents.get().getInjector().sendPacket(getChannel(player), packet);
     }
@@ -267,30 +253,6 @@ public final class PlayerUtils {
     public void changeSkinProperty(Player player, Skin skin) {
         Object gameProfile = NMSUtils.getGameProfile(player);
         GameProfileUtil.setGameProfileSkin(gameProfile, skin);
-    }
-
-    //TODO FINISH APPLY SKIN. ITS NOT WORKING?
-    private void applySkinChangeAsync(Player player) {
-        Plugin plugin = PacketEvents.get().getPlugin();
-        CompletableFuture.runAsync(() -> {
-            System.out.println("STARTING");
-
-        }).thenRunAsync(() -> {
-            WrappedPacketOutEntityDestroy destroyPacket = new WrappedPacketOutEntityDestroy(player.getEntityId());
-            WrappedPacketOutNamedEntitySpawn spawnPacket = new WrappedPacketOutNamedEntitySpawn(player);
-            for (Player p : Bukkit.getOnlinePlayers()) {
-                if (p.getEntityId() != player.getEntityId()) {
-                    PacketEvents.get().getPlayerUtils().sendPacket(p, destroyPacket);
-                    PacketEvents.get().getPlayerUtils().sendPacket(p, spawnPacket);
-
-                    Bukkit.getServer().getScheduler().runTask(plugin, () -> p.hidePlayer(plugin, player));
-                    Bukkit.getServer().getScheduler().runTaskLater(plugin, () -> p.showPlayer(plugin, player), 4L);
-                }
-            }
-
-        }).thenRunAsync(() -> {
-            System.out.println("DONE");
-        });
     }
 
     public Skin getSkin(Player player) {

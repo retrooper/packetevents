@@ -24,12 +24,8 @@ import io.github.retrooper.packetevents.event.manager.EventManager;
 import io.github.retrooper.packetevents.event.manager.PEEventManager;
 import io.github.retrooper.packetevents.exceptions.PacketEventsLoadFailureException;
 import io.github.retrooper.packetevents.injector.GlobalChannelInjector;
-import io.github.retrooper.packetevents.packettype.PacketType;
-import io.github.retrooper.packetevents.packettype.PacketTypeClasses;
 import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
-import io.github.retrooper.packetevents.packetwrappers.play.out.entityequipment.WrappedPacketOutEntityEquipment;
 import io.github.retrooper.packetevents.processor.BukkitEventProcessorInternal;
-import io.github.retrooper.packetevents.processor.PacketProcessorInternal;
 import io.github.retrooper.packetevents.settings.PacketEventsSettings;
 import io.github.retrooper.packetevents.updatechecker.UpdateChecker;
 import io.github.retrooper.packetevents.utils.entityfinder.EntityFinderUtils;
@@ -43,8 +39,6 @@ import io.github.retrooper.packetevents.utils.server.ServerUtils;
 import io.github.retrooper.packetevents.utils.server.ServerVersion;
 import io.github.retrooper.packetevents.utils.version.PEVersion;
 import org.bukkit.Bukkit;
-import org.bukkit.World;
-import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
 import org.bukkit.plugin.Plugin;
@@ -61,11 +55,10 @@ public final class PacketEvents implements Listener, EventManager {
     private final EventManager eventManager = new PEEventManager();
     private final PlayerUtils playerUtils = new PlayerUtils();
     private final ServerUtils serverUtils = new ServerUtils();
-    private final PacketProcessorInternal packetProcessorInternal = new PacketProcessorInternal();
     private final BukkitEventProcessorInternal bukkitEventProcessorInternal = new BukkitEventProcessorInternal();
     private final GlobalChannelInjector injector = new GlobalChannelInjector();
     private final AtomicBoolean injectorReady = new AtomicBoolean();
-    private String handlerName;
+    public String handlerName;
     private PacketEventsSettings settings = new PacketEventsSettings();
     private ByteBufUtil byteBufUtil;
     private UpdateChecker updateChecker;
@@ -119,26 +112,9 @@ public final class PacketEvents implements Listener, EventManager {
             try {
                 NMSUtils.load();
 
-                PacketTypeClasses.load();
-
-                PacketType.load();
-
                 EntityFinderUtils.load();
 
                 getServerUtils().entityCache = GuavaUtils.makeMap();
-
-                if (version.isNewerThanOrEquals(ServerVersion.v_1_9)) {
-                    for (WrappedPacketOutEntityEquipment.EquipmentSlot slot : WrappedPacketOutEntityEquipment.EquipmentSlot.values()) {
-                        slot.id = (byte) slot.ordinal();
-                    }
-                } else {
-                    WrappedPacketOutEntityEquipment.EquipmentSlot.MAINHAND.id = 0;
-                    WrappedPacketOutEntityEquipment.EquipmentSlot.OFFHAND.id = -1; //Invalid
-                    WrappedPacketOutEntityEquipment.EquipmentSlot.BOOTS.id = 1;
-                    WrappedPacketOutEntityEquipment.EquipmentSlot.LEGGINGS.id = 2;
-                    WrappedPacketOutEntityEquipment.EquipmentSlot.CHESTPLATE.id = 3;
-                    WrappedPacketOutEntityEquipment.EquipmentSlot.HELMET.id = 4;
-                }
             } catch (Exception ex) {
                 loading = false;
                 throw new PacketEventsLoadFailureException(ex);
@@ -290,18 +266,6 @@ public final class PacketEvents implements Listener, EventManager {
 
     public GlobalChannelInjector getInjector() {
         return injector;
-    }
-
-    public PacketProcessorInternal getInternalPacketProcessor() {
-        return packetProcessorInternal;
-    }
-
-    public String getHandlerName() {
-        return handlerName;
-    }
-
-    public String getDecoderName() {
-        return handlerName + "-decoder";
     }
 
     public PacketEventsSettings getSettings() {

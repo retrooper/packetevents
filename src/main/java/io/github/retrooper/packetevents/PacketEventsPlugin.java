@@ -20,6 +20,7 @@ package io.github.retrooper.packetevents;
 
 import io.github.retrooper.packetevents.event.PacketListenerAbstract;
 import io.github.retrooper.packetevents.event.impl.PacketDecodeEvent;
+import io.github.retrooper.packetevents.packettype.PacketType;
 import io.github.retrooper.packetevents.settings.PacketEventsSettings;
 import io.github.retrooper.packetevents.utils.netty.bytebuf.ByteBufAbstract;
 import io.github.retrooper.packetevents.utils.server.ServerVersion;
@@ -58,7 +59,7 @@ public class PacketEventsPlugin extends JavaPlugin {
             public void onPacketDecode(PacketDecodeEvent event) {
                 if (event.getPlayer() != null) {
                     int packetID = readVarInt(event.getByteBuf());
-                    event.getPlayer().sendMessage("id: " + packetID);
+                    event.getPlayer().sendMessage("id: " + PacketType.Play.Client.values()[packetID]);
                 }
             }
         });

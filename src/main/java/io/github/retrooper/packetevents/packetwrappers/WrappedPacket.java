@@ -21,9 +21,6 @@ package io.github.retrooper.packetevents.packetwrappers;
 import io.github.retrooper.packetevents.PacketEvents;
 import io.github.retrooper.packetevents.exceptions.WrapperFieldNotFoundException;
 import io.github.retrooper.packetevents.exceptions.WrapperUnsupportedUsageException;
-import io.github.retrooper.packetevents.packettype.PacketTypeClasses;
-import io.github.retrooper.packetevents.packetwrappers.api.WrapperPacketReader;
-import io.github.retrooper.packetevents.packetwrappers.api.WrapperPacketWriter;
 import io.github.retrooper.packetevents.utils.enums.EnumUtil;
 import io.github.retrooper.packetevents.utils.nms.NMSUtils;
 import io.github.retrooper.packetevents.utils.player.GameMode;
@@ -70,11 +67,6 @@ public class WrappedPacket implements WrapperPacketReader, WrapperPacketWriter {
     }
 
     public WrappedPacket(final NMSPacket packet, Class<?> packetClass) {
-        if (packetClass.getSuperclass().equals(PacketTypeClasses.Play.Client.FLYING)) {
-            packetClass = PacketTypeClasses.Play.Client.FLYING;
-        } else if (packetClass.getSuperclass().equals(PacketTypeClasses.Play.Server.ENTITY)) {
-            packetClass = PacketTypeClasses.Play.Server.ENTITY;
-        }
         this.packetClass = packetClass;
         this.packet = packet;
         load0();

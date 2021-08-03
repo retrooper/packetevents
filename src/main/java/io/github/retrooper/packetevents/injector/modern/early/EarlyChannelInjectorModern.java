@@ -21,7 +21,6 @@ package io.github.retrooper.packetevents.injector.modern.early;
 import io.github.retrooper.packetevents.PacketEvents;
 import io.github.retrooper.packetevents.injector.EarlyInjector;
 import io.github.retrooper.packetevents.injector.modern.PacketDecoderModern;
-import io.github.retrooper.packetevents.injector.modern.PlayerChannelHandlerModern;
 import io.github.retrooper.packetevents.packetwrappers.NMSPacket;
 import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
 import io.github.retrooper.packetevents.utils.list.ListWrapper;
@@ -136,26 +135,8 @@ public class EarlyChannelInjectorModern implements EarlyInjector {
                     continue;
                 }
 
-                if (channel.pipeline().get(PacketEvents.get().getHandlerName()) != null) {
-                    channel.pipeline().remove(PacketEvents.get().getHandlerName());
-                }
-
-                if (channel.pipeline().get(PacketEvents.get().getDecoderName()) != null) {
-                    channel.pipeline().remove(PacketEvents.get().getDecoderName());
-                }
-
-                PacketDecoderModern packetDecoderModern = new PacketDecoderModern();
-                if (channel.pipeline().get("decompress") != null) {
-                    String decoderName = PacketEvents.get().getDecoderName();
-                    channel.pipeline().addAfter("decompress", decoderName, packetDecoderModern);
-                } else if (channel.pipeline().get("splitter") != null) {
-                    String decoderName = PacketEvents.get().getDecoderName();
-                    channel.pipeline().addAfter("splitter", decoderName, packetDecoderModern);
-                }
-
-                if (channel.pipeline().get("packet_handler") != null) {
-                    channel.pipeline().addBefore("packet_handler", PacketEvents.get().getHandlerName(), new PlayerChannelHandlerModern());
-                }
+                PacketDecoderModern packetDecoderModern = new PacketDecoderModern((ByteToMessageDecoder) channel.pipeline().get("decoder"));
+                channel.pipeline().replace("decoder", "decoder", packetDecoderModern);
             }
         }
     }
@@ -286,8 +267,7 @@ public class EarlyChannelInjectorModern implements EarlyInjector {
         if (channel != null) {
             Channel chnl = (Channel) channel;
             try {
-                chnl.pipeline().remove(PacketEvents.get().getHandlerName());
-                chnl.pipeline().remove(PacketEvents.get().getDecoderName());
+                chnl.pipeline().replace("decoder", "decoder", getDecoder(channel).minecraftDecoder);
             } catch (Exception ignored) {
             }
         }
@@ -299,8 +279,8 @@ public class EarlyChannelInjectorModern implements EarlyInjector {
         if (channel == null) {
             return false;
         }
-        PlayerChannelHandlerModern handler = getHandler(channel);
-        return handler != null && handler.player != null;
+        PacketDecoderModern decoder = getDecoder(channel);
+        return decoder != null && decoder.player != null;
     }
 
     @Override
@@ -321,19 +301,9 @@ public class EarlyChannelInjectorModern implements EarlyInjector {
         channel.writeAndFlush(rawNMSPacket);
     }
 
-    private PlayerChannelHandlerModern getHandler(Object rawChannel) {
-        Channel channel = (Channel) rawChannel;
-        ChannelHandler handler = channel.pipeline().get(PacketEvents.get().getHandlerName());
-        if (handler instanceof PlayerChannelHandlerModern) {
-            return (PlayerChannelHandlerModern) handler;
-        } else {
-            return null;
-        }
-    }
-
     private PacketDecoderModern getDecoder(Object rawChannel) {
         Channel channel = (Channel) rawChannel;
-        ChannelHandler decoder = channel.pipeline().get(PacketEvents.get().getDecoderName());
+        ChannelHandler decoder = channel.pipeline().get("decoder");
         if (decoder instanceof PacketDecoderModern) {
             return (PacketDecoderModern) decoder;
         }
@@ -344,10 +314,6 @@ public class EarlyChannelInjectorModern implements EarlyInjector {
 
     @Override
     public void updatePlayerObject(Player player, Object rawChannel) {
-        PlayerChannelHandlerModern handler = getHandler(rawChannel);
-        if (handler != null) {
-            handler.player = player;
-        }
         PacketDecoderModern decoder = getDecoder(rawChannel);
         if (decoder != null) {
             decoder.player = player;

@@ -27,7 +27,6 @@ import io.github.retrooper.packetevents.utils.netty.bytebuf.ByteBufAbstract;
 import io.github.retrooper.packetevents.utils.netty.bytebuf.ByteBufLegacy;
 import io.github.retrooper.packetevents.utils.netty.bytebuf.ByteBufModern;
 import io.github.retrooper.packetevents.utils.nms.NMSUtils;
-import io.github.retrooper.packetevents.utils.npc.NPCManager;
 import io.github.retrooper.packetevents.utils.reflection.Reflection;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
@@ -48,7 +47,6 @@ public final class ServerUtils {
     private static byte v_1_17 = -1;
     private static Class<?> geyserClass;
     private boolean geyserClassChecked;
-    private final NPCManager npcManager = new NPCManager();
 
     //Initialized in PacketEvents#load
     public Map<Integer, Entity> entityCache;
@@ -87,15 +85,6 @@ public final class ServerUtils {
      */
     public SystemOS getOS() {
         return SystemOS.getOS();
-    }
-
-    /**
-     * Get the NPC Manager.
-     *
-     * @return NPC Manager
-     */
-    public NPCManager getNPCManager() {
-        return npcManager;
     }
 
     public boolean isBungeeCordEnabled() {
