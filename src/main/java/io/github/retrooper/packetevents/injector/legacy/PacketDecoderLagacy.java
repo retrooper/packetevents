@@ -19,6 +19,8 @@ public class PacketDecoderLagacy extends ByteToMessageDecoder {
 
     @Override
     protected void decode(ChannelHandlerContext ctx, ByteBuf byteBuf, List<Object> list) throws Exception {
+        if (!byteBuf.isReadable())
+            return;
         PacketDecodeEvent packetDecodeEvent = new PacketDecodeEvent(player, byteBuf);
         this.packetEvents.getEventManager().callEvent(packetDecodeEvent);
 
@@ -26,8 +28,6 @@ public class PacketDecoderLagacy extends ByteToMessageDecoder {
             byteBuf.skipBytes(byteBuf.readableBytes());
             return;
         }
-
-        byteBuf = (ByteBuf) packetDecodeEvent.getByteBuf().rawByteBuf();
 
         list.add(byteBuf.readBytes(byteBuf.readableBytes()));
     }

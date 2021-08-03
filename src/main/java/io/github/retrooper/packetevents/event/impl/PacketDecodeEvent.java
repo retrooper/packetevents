@@ -16,12 +16,12 @@ public class PacketDecodeEvent extends PacketEvent implements PlayerEvent, Cance
 
     public PacketDecodeEvent(Player player, ByteBufAbstract byteBuf){
         this.player = player;
-        this.byteBuf = byteBuf;
+        this.byteBuf = byteBuf.duplicate();
     }
 
     public PacketDecodeEvent(Player player, Object rawByteBuf) {
         this.player = player;
-        this.byteBuf = PacketEvents.get().getServerUtils().generateByteBufAbstract(rawByteBuf);
+        this.byteBuf = PacketEvents.get().getServerUtils().generateByteBufAbstract(rawByteBuf).duplicate();
     }
 
 

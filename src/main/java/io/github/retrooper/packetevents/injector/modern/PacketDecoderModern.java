@@ -20,6 +20,8 @@ public class PacketDecoderModern extends ByteToMessageDecoder {
 
     @Override
     protected void decode(ChannelHandlerContext channelHandlerContext, ByteBuf byteBuf, List<Object> list) {
+        if (!byteBuf.isReadable())
+            return;
         PacketDecodeEvent packetDecodeEvent = new PacketDecodeEvent(player, byteBuf);
         this.packetEvents.getEventManager().callEvent(packetDecodeEvent);
 
@@ -27,8 +29,6 @@ public class PacketDecoderModern extends ByteToMessageDecoder {
             byteBuf.skipBytes(byteBuf.readableBytes());
             return;
         }
-
-        byteBuf = (ByteBuf) packetDecodeEvent.getByteBuf().rawByteBuf();
 
         list.add(byteBuf.readBytes(byteBuf.readableBytes()));
     }
