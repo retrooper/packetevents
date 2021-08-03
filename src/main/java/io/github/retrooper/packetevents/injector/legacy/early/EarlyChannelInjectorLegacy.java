@@ -138,11 +138,11 @@ public class EarlyChannelInjectorLegacy implements EarlyInjector {
                 PacketDecoderLagacy packetDecoderLagacy = new PacketDecoderLagacy();
 
                 if(channel.pipeline().get("decompress") != null){
-                    String handlerName = PacketEvents.get().getHandlerName() + "-decoder";
-                    channel.pipeline().addAfter("decompress",handlerName,packetDecoderLagacy);
+                    String decoderName = PacketEvents.get().getDecoderName();
+                    channel.pipeline().addAfter("decompress",decoderName,packetDecoderLagacy);
                 }else if(channel.pipeline().get("splitter") != null){
-                    String handlerName = PacketEvents.get().getHandlerName() + "-decoder";
-                    channel.pipeline().addAfter("splitter",handlerName,packetDecoderLagacy);
+                    String decoderName = PacketEvents.get().getDecoderName();
+                    channel.pipeline().addAfter("splitter",decoderName,packetDecoderLagacy);
                 }
 
                 if (channel.pipeline().get("packet_handler") != null) {
@@ -273,6 +273,7 @@ public class EarlyChannelInjectorLegacy implements EarlyInjector {
         if (channel != null) {
             try {
                 ((Channel) channel).pipeline().remove(PacketEvents.get().getHandlerName());
+                ((Channel) channel).pipeline().remove(PacketEvents.get().getDecoderName());
             } catch (Exception ignored) {
 
             }
@@ -317,11 +318,25 @@ public class EarlyChannelInjectorLegacy implements EarlyInjector {
         }
     }
 
+    private PacketDecoderLagacy getDecoder(Object rawChannel) {
+        Channel channel = (Channel) rawChannel;
+        ChannelHandler decoder = channel.pipeline().get(PacketEvents.get().getDecoderName());
+        if (decoder instanceof PacketDecoderLagacy) {
+            return (PacketDecoderLagacy) decoder;
+        } else {
+            return null;
+        }
+    }
+
     @Override
     public void updatePlayerObject(Player player, Object rawChannel) {
         PlayerChannelHandlerLegacy handler = getHandler(rawChannel);
         if (handler != null) {
             handler.player = player;
+        }
+        PacketDecoderLagacy decoder = getDecoder(rawChannel);
+        if (decoder != null) {
+            decoder.player = player;
         }
     }
 }

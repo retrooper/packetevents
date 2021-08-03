@@ -23,7 +23,6 @@ import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
 
 public interface ByteBufAbstract {
-
     Object rawByteBuf();
 
     int capacity();

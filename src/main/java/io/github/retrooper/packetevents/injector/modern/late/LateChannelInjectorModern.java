@@ -39,16 +39,17 @@ public class LateChannelInjectorModern implements LateInjector {
     @Override
     public void injectPlayer(Player player) {
         PlayerChannelHandlerModern playerChannelHandlerModern = new PlayerChannelHandlerModern();
-        PacketDecoderModern packetDecoderModern = new PacketDecoderModern();
         playerChannelHandlerModern.player = player;
+        PacketDecoderModern packetDecoderModern = new PacketDecoderModern();
+        packetDecoderModern.player = player;
         Channel channel = (Channel) PacketEvents.get().getPlayerUtils().getChannel(player);
 
         if(channel.pipeline().get("decompress") != null){
-            String handlerName = PacketEvents.get().getHandlerName() + "-decoder";
-            channel.pipeline().addAfter("decompress",handlerName,packetDecoderModern);
+            String decoderName = PacketEvents.get().getDecoderName();
+            channel.pipeline().addAfter("decompress",decoderName,packetDecoderModern);
         }else if(channel.pipeline().get("splitter") != null){
-            String handlerName = PacketEvents.get().getHandlerName() + "-decoder";
-            channel.pipeline().addAfter("splitter",handlerName,packetDecoderModern);
+            String decoderName = PacketEvents.get().getDecoderName();
+            channel.pipeline().addAfter("splitter",decoderName,packetDecoderModern);
         }
 
         channel.pipeline().addBefore("packet_handler", PacketEvents.get().getHandlerName(), playerChannelHandlerModern);
@@ -61,6 +62,7 @@ public class LateChannelInjectorModern implements LateInjector {
             Channel chnl = (Channel) channel;
             try {
                 chnl.pipeline().remove(PacketEvents.get().getHandlerName());
+                chnl.pipeline().remove(PacketEvents.get().getDecoderName());
             } catch (Exception ex) {
 
             }

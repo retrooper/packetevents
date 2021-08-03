@@ -23,12 +23,16 @@ import io.github.retrooper.packetevents.packetwrappers.NMSPacket;
 import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
 import io.github.retrooper.packetevents.utils.boundingbox.BoundingBox;
 import io.github.retrooper.packetevents.utils.entityfinder.EntityFinderUtils;
+import io.github.retrooper.packetevents.utils.netty.bytebuf.ByteBufAbstract;
+import io.github.retrooper.packetevents.utils.netty.bytebuf.ByteBufLegacy;
+import io.github.retrooper.packetevents.utils.netty.bytebuf.ByteBufModern;
 import io.github.retrooper.packetevents.utils.nms.NMSUtils;
 import io.github.retrooper.packetevents.utils.npc.NPCManager;
 import io.github.retrooper.packetevents.utils.reflection.Reflection;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.entity.Entity;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.spigotmc.SpigotConfig;
 
@@ -40,7 +44,7 @@ import java.util.Map;
 
 public final class ServerUtils {
     private static Method getLevelEntityGetterIterable;
-    private static Class<?> persistentEntitySectionManagerClass, levelEntityGetterClass;
+    private static Class<?> persistentEntitySectionManagerClass, levelEntityGetterClass, legacyByteBufClass;
     private static byte v_1_17 = -1;
     private static Class<?> geyserClass;
     private boolean geyserClassChecked;
@@ -201,5 +205,20 @@ public final class ServerUtils {
             }
         }
         return geyserClass != null;
+    }
+
+    public ByteBufAbstract generateByteBufAbstract(@NotNull Object byteBuf) {
+        if (legacyByteBufClass == null) { 
+            try {
+                legacyByteBufClass = Class.forName("net.minecraft.util.io.netty.buffer.ByteBuf");
+            } catch (ClassNotFoundException e) {
+            }
+        }
+        if (legacyByteBufClass != null) {
+            return new ByteBufLegacy(byteBuf);
+        }
+        else {
+            return new ByteBufModern(byteBuf);
+        }
     }
 }

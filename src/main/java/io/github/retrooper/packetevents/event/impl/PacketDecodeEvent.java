@@ -1,22 +1,26 @@
 package io.github.retrooper.packetevents.event.impl;
 
+import io.github.retrooper.packetevents.PacketEvents;
 import io.github.retrooper.packetevents.event.PacketEvent;
 import io.github.retrooper.packetevents.event.PacketListenerAbstract;
 import io.github.retrooper.packetevents.event.eventtypes.CancellableEvent;
-import io.netty.buffer.ByteBuf;
+import io.github.retrooper.packetevents.event.eventtypes.PlayerEvent;
+import io.github.retrooper.packetevents.utils.netty.bytebuf.ByteBufAbstract;
+import org.bukkit.entity.Player;
 
-public class PacketDecodeEvent extends PacketEvent implements CancellableEvent {
+public class PacketDecodeEvent extends PacketEvent implements PlayerEvent, CancellableEvent {
+    private final Player player;
     private boolean cancel;
-    private ByteBuf byteBuf;
-    private net.minecraft.util.io.netty.buffer.ByteBuf lagacyByteBuf;
+    private ByteBufAbstract byteBuf;
 
-
-    public PacketDecodeEvent(ByteBuf byteBuf){
+    public PacketDecodeEvent(Player player, ByteBufAbstract byteBuf){
+        this.player = player;
         this.byteBuf = byteBuf;
     }
 
-    public PacketDecodeEvent(net.minecraft.util.io.netty.buffer.ByteBuf lagacyByteBuf){
-        this.lagacyByteBuf = lagacyByteBuf;
+    public PacketDecodeEvent(Player player, Object rawByteBuf) {
+        this.player = player;
+        this.byteBuf = PacketEvents.get().getServerUtils().generateByteBufAbstract(rawByteBuf);
     }
 
 
@@ -35,19 +39,16 @@ public class PacketDecodeEvent extends PacketEvent implements CancellableEvent {
         this.cancel = val;
     }
 
-    /**
-     * ByteBuffer can be null if the server is running lagacy version of minecraft
-     * @return
-     */
-    public ByteBuf getByteBuf(){
+    @Override
+    public Player getPlayer() {
+        return player;
+    }
+
+    public ByteBufAbstract getByteBuf(){
         return this.byteBuf;
     }
 
-    /**
-     * ByteBuffer can be null if the server is running modern version of minecraft
-     * @return
-     */
-    public net.minecraft.util.io.netty.buffer.ByteBuf getLagacyByteBuf(){
-        return this.lagacyByteBuf;
+    public void setByteBuf(ByteBufAbstract byteBuf) {
+        this.byteBuf = byteBuf;
     }
 }

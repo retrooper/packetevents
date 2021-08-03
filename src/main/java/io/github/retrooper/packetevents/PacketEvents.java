@@ -300,6 +300,10 @@ public final class PacketEvents implements Listener, EventManager {
         return handlerName;
     }
 
+    public String getDecoderName() {
+        return handlerName + "-decoder";
+    }
+
     public PacketEventsSettings getSettings() {
         return settings;
     }
