@@ -44,7 +44,7 @@ public class PacketDecoderLegacy extends ByteToMessageDecoder {
             byteBuf.skipBytes(byteBuf.readableBytes());
             return;
         }
-        
+
         try {
             DECODE_METHOD.invoke(minecraftDecoder, channelHandlerContext, byteBuf, list);
         }catch (Exception exception){

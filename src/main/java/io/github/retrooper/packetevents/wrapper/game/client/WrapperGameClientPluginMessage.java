@@ -1,13 +1,13 @@
-package io.github.retrooper.packetevents.wrapper.in.custompayload;
+package io.github.retrooper.packetevents.wrapper.game.client;
 
 import io.github.retrooper.packetevents.utils.netty.bytebuf.ByteBufAbstract;
 import io.github.retrooper.packetevents.wrapper.PacketWrapper;
 
-public class WrappedPacketInCustomPayload extends PacketWrapper {
+public class WrapperGameClientPluginMessage extends PacketWrapper {
     private final String tag;
-    private byte[] data;
+    private final byte[] data;
 
-    public WrappedPacketInCustomPayload(ByteBufAbstract byteBuf) {
+    public WrapperGameClientPluginMessage(ByteBufAbstract byteBuf) {
         super(byteBuf);
         this.tag = readString();
         this.data = new byte[byteBuf.readableBytes()];
