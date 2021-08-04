@@ -10,8 +10,7 @@ public class WrapperGameClientPluginMessage extends PacketWrapper {
     public WrapperGameClientPluginMessage(ByteBufAbstract byteBuf) {
         super(byteBuf);
         this.tag = readString();
-        this.data = new byte[byteBuf.readableBytes()];
-        byteBuf.readBytes(data);
+        this.data = readByteArray(byteBuf.readableBytes());
     }
 
     public String getTag(){

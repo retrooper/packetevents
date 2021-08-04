@@ -70,4 +70,15 @@ public class PacketWrapper {
     public long readLong(){
         return byteBuf.readLong();
     }
+
+    public boolean readBoolean(){
+        return byteBuf.readBoolean();
+    }
+
+    public byte[] readByteArray(int legnth) {
+        byte[] ret = new byte[legnth];
+        byteBuf.readBytes( ret );
+        return ret;
+    }
+
 }
