@@ -173,4 +173,6 @@ public interface ByteBufAbstract {
      ByteBufAbstract retain();
 
      ByteBufAbstract readBytes(int i);
+
+     void readBytes(byte[] bytes);
 }
