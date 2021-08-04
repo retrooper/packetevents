@@ -30,7 +30,6 @@ import org.jetbrains.annotations.NotNull;
  * This class implements {@link CancellableEvent} and {@link PlayerEvent}.
  *
  * @author retrooper
- * @see <a href="https://github.com/retrooper/packetevents/blob/dev/src/main/java/io/github/retrooper/packetevents/handler/PacketHandlerInternal.java">https://github.com/retrooper/packetevents/blob/dev/src/main/java/io/github/retrooper/packetevents/handler/PacketHandlerInternal.java</a>
  * @since 1.6.9
  */
 public final class PlayerEjectEvent extends PacketEvent implements CancellableEvent, PlayerEvent {
@@ -61,15 +60,6 @@ public final class PlayerEjectEvent extends PacketEvent implements CancellableEv
     @Override
     public Player getPlayer() {
         return player;
-    }
-
-    /**
-     * @return Is the event called async?
-     * @deprecated Now always false
-     */
-    @Deprecated
-    public boolean isAsync() {
-        return false;
     }
 
     @Override

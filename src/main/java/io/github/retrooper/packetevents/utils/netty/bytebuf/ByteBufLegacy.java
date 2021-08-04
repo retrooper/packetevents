@@ -391,4 +391,9 @@ public class ByteBufLegacy implements ByteBufAbstract {
     public ByteBufAbstract retain() {
         return new ByteBufLegacy(byteBuf.retain());
     }
+
+    @Override
+    public ByteBufAbstract readBytes(int i) {
+        return new ByteBufLegacy(byteBuf.readBytes(i));
+    }
 }

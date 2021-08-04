@@ -24,6 +24,7 @@ import io.github.retrooper.packetevents.event.manager.EventManager;
 import io.github.retrooper.packetevents.event.manager.PEEventManager;
 import io.github.retrooper.packetevents.exceptions.PacketEventsLoadFailureException;
 import io.github.retrooper.packetevents.injector.GlobalChannelInjector;
+import io.github.retrooper.packetevents.packettype.PacketType;
 import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
 import io.github.retrooper.packetevents.processor.BukkitEventProcessorInternal;
 import io.github.retrooper.packetevents.settings.PacketEventsSettings;
@@ -93,12 +94,6 @@ public final class PacketEvents implements Listener, EventManager {
     public static PacketEvents get() {
         return instance;
     }
-
-    @Deprecated
-    public static PacketEvents getAPI() {
-        return instance;
-    }
-
 
     public void load() {
         if (!loaded && !loading) {
@@ -175,6 +170,9 @@ public final class PacketEvents implements Listener, EventManager {
             while (!injectorReady.get()) {
             }
 
+            //TODO Load other ones
+            PacketType.Play.Client.load(getServerUtils().getVersion());
+
             Runnable postInjectTask = () -> {
                 Bukkit.getPluginManager().registerEvents(bukkitEventProcessorInternal, plugin);
                 for (final Player p : Bukkit.getOnlinePlayers()) {
@@ -200,16 +198,6 @@ public final class PacketEvents implements Listener, EventManager {
         }
     }
 
-    @Deprecated
-    public void init(Plugin plugin) {
-        init(plugin, settings);
-    }
-
-    @Deprecated
-    public void init(Plugin pl, PacketEventsSettings packetEventsSettings) {
-        init(packetEventsSettings);
-    }
-
     public void terminate() {
         if (initialized && !terminating) {
             //Eject all players
@@ -225,16 +213,6 @@ public final class PacketEvents implements Listener, EventManager {
         }
     }
 
-    /**
-     * Use {@link #terminate()}. This is deprecated
-     *
-     * @deprecated "Stop" might be misleading and "terminate" sounds better I guess...
-     */
-    @Deprecated
-    public void stop() {
-        terminate();
-    }
-
     public boolean isLoading() {
         return loading;
     }
@@ -245,11 +223,6 @@ public final class PacketEvents implements Listener, EventManager {
 
     public boolean isTerminating() {
         return terminating;
-    }
-
-    @Deprecated
-    public boolean isStopping() {
-        return isTerminating();
     }
 
     public boolean isInitializing() {

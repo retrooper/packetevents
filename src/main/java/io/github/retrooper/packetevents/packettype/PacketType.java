@@ -18,11 +18,74 @@
 
 package io.github.retrooper.packetevents.packettype;
 
-public class PacketType {
+import io.github.retrooper.packetevents.packettype.protocols.PacketType_1_7_10;
+import io.github.retrooper.packetevents.packettype.protocols.PacketType_1_8;
+import io.github.retrooper.packetevents.utils.server.ServerVersion;
+import org.jetbrains.annotations.Nullable;
+
+import java.util.IdentityHashMap;
+import java.util.Map;
+
+public final class PacketType {
     public static class Play {
-        //TODO This is 1.8 order, the index is the packet id, each protocol might have a different order
         public enum Client {
-            KEEP_ALIVE, CHAT, USE_ENTITY, FLYING, POSITION, LOOK, POSITION_LOOK;
+            KEEP_ALIVE,
+            CHAT_MESSAGE,
+            INTERACT_ENTITY,
+            PLAYER_MOVEMENT,
+            PLAYER_POSITION,
+            PLAYER_ROTATION,
+            PLAYER_POSITION_AND_ROTATION,
+            PLAYER_DIGGING,
+            PLAYER_BLOCK_PLACEMENT,
+            HELD_ITEM_CHANGE,
+            ANIMATION,
+            ENTITY_ACTION,
+            STEER_VEHICLE,
+            CLOSE_WINDOW,
+            CLICK_WINDOW,
+            WINDOW_CONFIRMATION,
+            CREATIVE_INVENTORY_ACTION,
+            CLICK_WINDOW_BUTTON,
+            UPDATE_SIGN,
+            PLAYER_ABILITIES,
+            TAB_COMPLETE,
+            CLIENT_SETTINGS,
+            CLIENT_STATUS,
+            PLUGIN_MESSAGE,
+            SPECTATE,
+            RESOURCE_PACK_STATUS;
+
+            public int packetID = -1;
+
+            private static final Map<Integer, Enum<?>> PACKET_ID_CACHE = new IdentityHashMap<>();
+
+            Client() {
+            }
+
+            public boolean isSupported() {
+                return packetID != -1;
+            }
+
+            @Nullable
+            public static Client getById(int packetID) {
+                return (Client) PACKET_ID_CACHE.get(packetID);
+            }
+
+            private static void loadPacketIDs(Enum<?>[] enumConstants) {
+                for (int i = 0; i < enumConstants.length; i++) {
+                    Client.valueOf(enumConstants[i].name()).packetID = i;
+                    PACKET_ID_CACHE.put(i, Client.valueOf(enumConstants[i].name()));
+                }
+            }
+
+            public static void load(ServerVersion version) {
+                if (version.equals(ServerVersion.v_1_7_10)) {
+                    loadPacketIDs(PacketType_1_7_10.Play.Client.values());
+                } else if (version.isNewerThanOrEquals(ServerVersion.v_1_8) && version.isOlderThanOrEquals(ServerVersion.v_1_8_8)) {
+                    loadPacketIDs(PacketType_1_8.Play.Client.values());
+                }
+            }
         }
     }
 }

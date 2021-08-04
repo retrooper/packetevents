@@ -45,7 +45,7 @@ public class PaperChannelInjector {
 
         Class<?> holderClass = Class.forName("io.papermc.paper.network.ChannelInitializeListenerHolder");
         Method addListenerMethod = holderClass.getDeclaredMethod("addListener", Key.class, listenerClass);
-        Key key = Key.key(PacketEvents.get().handlerName, "injector");
+        Key key = Key.key(PacketEvents.get().handlerName.toLowerCase(), "injector");
         addListenerMethod.invoke(null, key, channelInitializeListener);
     }
 

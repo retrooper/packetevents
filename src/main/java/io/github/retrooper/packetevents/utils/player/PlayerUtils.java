@@ -44,9 +44,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * @since 1.6.8
  */
 public final class PlayerUtils {
-    public final Map<UUID, Long> loginTime = new ConcurrentHashMap<>();
-    public final Map<UUID, Integer> playerPingMap = new ConcurrentHashMap<>();
-    public final Map<UUID, Integer> playerSmoothedPingMap = new ConcurrentHashMap<>();
+    private static byte v_1_17 = -1;
     public final Map<InetSocketAddress, ClientVersion> clientVersionsMap = new ConcurrentHashMap<>();
     public final Map<UUID, Long> keepAliveMap = new ConcurrentHashMap<>();
     public final Map<String, Object> channels = new ConcurrentHashMap<>();
@@ -60,19 +58,6 @@ public final class PlayerUtils {
      * If ViaVersion or ProtocolSupport aren't available, we will trust this one.
      */
     public final Map<InetSocketAddress, ClientVersion> tempClientVersionMap = new ConcurrentHashMap<>();
-
-    /**
-     * Use reflection to read the ping value NMS calculates for the player.
-     * NMS smooths the player ping.
-     *
-     * @param player Target player.
-     * @return NMS smoothed ping.
-     */
-    @Deprecated
-    public int getNMSPing(final Player player) {
-        return NMSUtils.getPlayerPing(player);
-    }
-
     /**
      * Use the ping PacketEvents calculates for the player. (Updates every incoming Keep Alive packet)
      *
@@ -80,59 +65,7 @@ public final class PlayerUtils {
      * @return Non-smoothed ping.
      */
     public int getPing(Player player) {
-        return getPing(player.getUniqueId());
-    }
-
-    /**
-     * Use the ping PacketEvents calculates and smooths in the same way NMS does (Updates every incoming Keep Alive packet)
-     *
-     * @param player Target player.
-     * @return Smoothed ping.
-     */
-    @Deprecated
-    public int getSmoothedPing(final Player player) {
-        return getSmoothedPing(player.getUniqueId());
-    }
-
-    //TODO Don't calculate ping internally, use NMS' smoothed ping. On 1.17 use the Player#getPing which you contributed.
-
-    /**
-     * Use the ping PacketEvents calculates for the player. (Updates every incoming Keep Alive packet)
-     *
-     * @param uuid Target player UUID.
-     * @return Non-smoothed ping.
-     * @deprecated Please use {@link #getPing(Player)}
-     */
-    @Deprecated
-    public int getPing(UUID uuid) {
-        Integer ping = playerPingMap.get(uuid);
-        if (ping == null) {
-            Long joinTime = loginTime.get(uuid);
-            if (joinTime == null) {
-                return 0;
-            }
-            return (int) (System.currentTimeMillis() - joinTime);
-        }
-        return ping;
-    }
-
-    /**
-     * Use the ping PacketEvents calculates and smooths in the same way NMS does (Updates every incoming Keep Alive packet)
-     *
-     * @param uuid Target player UUID.
-     * @return Smoothed ping.
-     */
-    @Deprecated
-    public int getSmoothedPing(UUID uuid) {
-        Integer smoothedPing = playerSmoothedPingMap.get(uuid);
-        if (smoothedPing == null) {
-            Long joinTime = loginTime.get(uuid);
-            if (joinTime == null) {
-                return 0;
-            }
-            return (int) (System.currentTimeMillis() - joinTime);
-        }
-        return smoothedPing;
+        return NMSUtils.getPlayerPing(player);
     }
 
     /**
@@ -226,10 +159,6 @@ public final class PlayerUtils {
         PacketEvents.get().getInjector().sendPacket(getChannel(player), packet);
     }
 
-    @Deprecated
-    public void sendNMSPacket(Object channel, Object packet) {
-        PacketEvents.get().getInjector().sendPacket(channel, packet);
-    }
 
     public WrappedGameProfile getGameProfile(Player player) {
         Object gameProfile = GameProfileUtil.getGameProfile(player.getUniqueId(), player.getName());

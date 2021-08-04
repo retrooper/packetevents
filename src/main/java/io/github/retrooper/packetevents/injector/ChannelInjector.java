@@ -18,12 +18,20 @@
 
 package io.github.retrooper.packetevents.injector;
 
+import io.github.retrooper.packetevents.packettype.PacketState;
 import org.bukkit.entity.Player;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 public interface ChannelInjector {
     default boolean isBound() {
         return true;
     }
+
+    @Nullable
+    PacketState getPacketState(Object channel);
+
+    void changePacketState(Object channel, PacketState packetState);
 
     void inject();
 

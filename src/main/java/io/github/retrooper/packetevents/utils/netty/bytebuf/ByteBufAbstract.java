@@ -171,4 +171,6 @@ public interface ByteBufAbstract {
      ByteBufAbstract retain(int a);
 
      ByteBufAbstract retain();
+
+     ByteBufAbstract readBytes(int i);
 }

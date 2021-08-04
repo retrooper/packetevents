@@ -21,6 +21,7 @@ package io.github.retrooper.packetevents.injector.modern.early;
 import io.github.retrooper.packetevents.PacketEvents;
 import io.github.retrooper.packetevents.injector.EarlyInjector;
 import io.github.retrooper.packetevents.injector.modern.PacketDecoderModern;
+import io.github.retrooper.packetevents.packettype.PacketState;
 import io.github.retrooper.packetevents.packetwrappers.NMSPacket;
 import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
 import io.github.retrooper.packetevents.utils.list.ListWrapper;
@@ -317,6 +318,25 @@ public class EarlyChannelInjectorModern implements EarlyInjector {
         PacketDecoderModern decoder = getDecoder(rawChannel);
         if (decoder != null) {
             decoder.player = player;
+        }
+    }
+
+    @Override
+    public PacketState getPacketState(Object channel) {
+        PacketDecoderModern decoder = getDecoder(channel);
+        if (decoder != null) {
+            return decoder.packetState;
+        }
+        else {
+            return null;
+        }
+    }
+
+    @Override
+    public void changePacketState(Object channel, PacketState packetState) {
+        PacketDecoderModern decoder = getDecoder(channel);
+        if (decoder != null) {
+            decoder.packetState = packetState;
         }
     }
 }

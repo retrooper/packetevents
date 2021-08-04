@@ -60,7 +60,6 @@ public class BukkitEventProcessorInternal implements Listener {
         }
 
         boolean dependencyAvailable = VersionLookupUtils.isDependencyAvailable();
-        PacketEvents.get().getPlayerUtils().loginTime.put(player.getUniqueId(), System.currentTimeMillis());
         //A supported dependency is available, we need to first ask the dependency for the client version.
         if (dependencyAvailable) {
             //We are resolving version one tick later for extra safety. Some dependencies throw exceptions if we try too early.
@@ -87,9 +86,6 @@ public class BukkitEventProcessorInternal implements Listener {
         UUID uuid = player.getUniqueId();
         InetSocketAddress address = player.getAddress();
         //Cleanup user data
-        PacketEvents.get().getPlayerUtils().loginTime.remove(uuid);
-        PacketEvents.get().getPlayerUtils().playerPingMap.remove(uuid);
-        PacketEvents.get().getPlayerUtils().playerSmoothedPingMap.remove(uuid);
         PacketEvents.get().getPlayerUtils().clientVersionsMap.remove(address);
         PacketEvents.get().getPlayerUtils().tempClientVersionMap.remove(address);
         PacketEvents.get().getPlayerUtils().keepAliveMap.remove(uuid);

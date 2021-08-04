@@ -21,6 +21,7 @@ package io.github.retrooper.packetevents.injector.modern.late;
 import io.github.retrooper.packetevents.PacketEvents;
 import io.github.retrooper.packetevents.injector.LateInjector;
 import io.github.retrooper.packetevents.injector.modern.PacketDecoderModern;
+import io.github.retrooper.packetevents.packettype.PacketState;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandler;
 import io.netty.handler.codec.ByteToMessageDecoder;
@@ -95,5 +96,18 @@ public class LateChannelInjectorModern implements LateInjector {
     public void sendPacket(Object rawChannel, Object packet) {
         Channel channel = (Channel) rawChannel;
         channel.pipeline().writeAndFlush(packet);
+    }
+
+    @Override
+    public PacketState getPacketState(Object channel) {
+        return PacketState.PLAY;
+    }
+
+    @Override
+    public void changePacketState(Object channel, PacketState packetState) {
+        PacketDecoderModern decoder = getDecoder(channel);
+        if (decoder != null) {
+            decoder.packetState = packetState;
+        }
     }
 }

@@ -436,12 +436,6 @@ public final class NMSUtils {
         return Class.forName(nettyPrefix + name);
     }
 
-    @Nullable
-    @Deprecated
-    public static Entity getEntityById(@Nullable World world, int id) {
-       return PacketEvents.get().getServerUtils().getEntityById(world, id);
-    }
-
     public static Entity getBukkitEntity(Object nmsEntity) {
         Object craftEntity = null;
         try {

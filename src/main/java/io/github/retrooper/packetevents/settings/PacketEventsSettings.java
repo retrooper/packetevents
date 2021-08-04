@@ -61,24 +61,6 @@ public class PacketEventsSettings {
      * This is the server version PacketEvents should assume the server is when detecting
      * the server version fails using the Bukkit API.
      * This seems to be most common on 1.7.10 paper forks.
-     * They probably mess up somewhere.
-     *
-     * @param serverVersion ServerVersion
-     * @return Settings instance.
-     * @deprecated Use {@link #getFallbackServerVersion()}
-     */
-    @Deprecated
-    public PacketEventsSettings backupServerVersion(ServerVersion serverVersion) {
-        if (!locked) {
-            this.fallbackServerVersion = serverVersion;
-        }
-        return this;
-    }
-
-    /**
-     * This is the server version PacketEvents should assume the server is when detecting
-     * the server version fails using the Bukkit API.
-     * This seems to be most common on 1.7.10 paper forks.
      *
      * @param version ServerVersion
      * @return Settings instance.
@@ -139,17 +121,6 @@ public class PacketEventsSettings {
      */
     public boolean isLocked() {
         return locked;
-    }
-
-    /**
-     * Backup server version.
-     *
-     * @return Getter for {@link #backupServerVersion}
-     * @deprecated Use {@link #getFallbackServerVersion()}
-     */
-    @Deprecated
-    public ServerVersion getBackupServerVersion() {
-        return fallbackServerVersion;
     }
 
     /**

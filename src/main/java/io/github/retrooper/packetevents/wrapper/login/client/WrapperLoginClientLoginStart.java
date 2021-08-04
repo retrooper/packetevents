@@ -16,17 +16,19 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package io.github.retrooper.packetevents.event;
+package io.github.retrooper.packetevents.wrapper.login.client;
 
-/**
- * The legacy Packet listener.
- * Implement this interface in your listener if you are using the legacy event system.
- *
- * @author retrooper
- * @see PacketListenerAbstract
- * @since 1.2.6
- * @deprecated There is a new and better listener for the new event system.
- */
-@Deprecated
-public interface PacketListener {
+import io.github.retrooper.packetevents.utils.netty.bytebuf.ByteBufAbstract;
+import io.github.retrooper.packetevents.wrapper.PacketWrapper;
+
+public class WrapperLoginClientLoginStart extends PacketWrapper {
+   // private final String username;
+    public WrapperLoginClientLoginStart(ByteBufAbstract byteBuf) {
+        super(byteBuf);
+        //this.username = readString(16);
+    }
+
+    public String getUsername() {
+        return "username";
+    }
 }

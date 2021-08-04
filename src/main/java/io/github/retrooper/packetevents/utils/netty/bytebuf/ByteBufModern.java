@@ -391,4 +391,9 @@ public class ByteBufModern implements ByteBufAbstract {
     public ByteBufAbstract retain() {
         return new ByteBufModern(byteBuf.retain());
     }
+
+    @Override
+    public ByteBufAbstract readBytes(int i) {
+        return new ByteBufModern(byteBuf.readBytes(i));
+    }
 }

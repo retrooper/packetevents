@@ -25,8 +25,10 @@ import io.github.retrooper.packetevents.injector.legacy.early.EarlyChannelInject
 import io.github.retrooper.packetevents.injector.legacy.late.LateChannelInjectorLegacy;
 import io.github.retrooper.packetevents.injector.modern.early.EarlyChannelInjectorModern;
 import io.github.retrooper.packetevents.injector.modern.late.LateChannelInjectorModern;
+import io.github.retrooper.packetevents.packettype.PacketState;
 import io.github.retrooper.packetevents.utils.nms.NMSUtils;
 import org.bukkit.entity.Player;
+import org.jetbrains.annotations.Nullable;
 
 public class GlobalChannelInjector {
     private ChannelInjector injector;
@@ -94,5 +96,14 @@ public class GlobalChannelInjector {
 
     public void sendPacket(Object ch, Object rawNMSPacket) {
         injector.sendPacket(ch, rawNMSPacket);
+    }
+
+    @Nullable
+    public PacketState getPacketState(Object channel) {
+        return injector.getPacketState(channel);
+    }
+
+    public void changePacketState(Object channel, PacketState packetState) {
+        injector.changePacketState(channel, packetState);
     }
 }

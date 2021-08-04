@@ -2,6 +2,7 @@ package io.github.retrooper.packetevents.injector.legacy;
 
 import io.github.retrooper.packetevents.PacketEvents;
 import io.github.retrooper.packetevents.event.impl.PacketDecodeEvent;
+import io.github.retrooper.packetevents.packettype.PacketState;
 import net.minecraft.util.io.netty.buffer.ByteBuf;
 import net.minecraft.util.io.netty.channel.ChannelHandlerContext;
 import net.minecraft.util.io.netty.handler.codec.ByteToMessageDecoder;
@@ -15,6 +16,7 @@ import java.util.List;
 public class PacketDecoderLegacy extends ByteToMessageDecoder {
     private static Method DECODE_METHOD;
     public volatile Player player;
+    public volatile PacketState packetState;
     public final ByteToMessageDecoder minecraftDecoder;
 
     public PacketDecoderLegacy(ByteToMessageDecoder minecraftDecoder) {
@@ -43,7 +45,7 @@ public class PacketDecoderLegacy extends ByteToMessageDecoder {
     protected void decode(ChannelHandlerContext channelHandlerContext, ByteBuf byteBuf, List<Object> list) {
         if (!byteBuf.isReadable())
             return;
-        PacketDecodeEvent packetDecodeEvent = new PacketDecodeEvent(player, byteBuf);
+        PacketDecodeEvent packetDecodeEvent = new PacketDecodeEvent(channelHandlerContext.channel() ,player, byteBuf);
         PacketEvents.get().getEventManager().callEvent(packetDecodeEvent);
 
         if (packetDecodeEvent.isCancelled()) {

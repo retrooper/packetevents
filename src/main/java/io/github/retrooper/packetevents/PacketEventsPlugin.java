@@ -19,11 +19,15 @@
 package io.github.retrooper.packetevents;
 
 import io.github.retrooper.packetevents.event.PacketListenerAbstract;
+import io.github.retrooper.packetevents.event.PacketListenerPriority;
 import io.github.retrooper.packetevents.event.impl.PacketDecodeEvent;
-import io.github.retrooper.packetevents.packettype.PacketType;
+import io.github.retrooper.packetevents.packettype.PacketState;
 import io.github.retrooper.packetevents.settings.PacketEventsSettings;
 import io.github.retrooper.packetevents.utils.netty.bytebuf.ByteBufAbstract;
 import io.github.retrooper.packetevents.utils.server.ServerVersion;
+import io.github.retrooper.packetevents.wrapper.PacketWrapper;
+import io.github.retrooper.packetevents.wrapper.handshaking.client.WrapperHandshakingClientHandshake;
+import io.github.retrooper.packetevents.wrapper.login.client.WrapperLoginClientLoginStart;
 import org.bukkit.plugin.java.JavaPlugin;
 
 public class PacketEventsPlugin extends JavaPlugin {
@@ -41,29 +45,37 @@ public class PacketEventsPlugin extends JavaPlugin {
 
     @Override
     public void onEnable() {
-        PacketEvents.get().registerListener(new PacketListenerAbstract() {
-            public int readVarInt(ByteBufAbstract byteBuf) {
-                int i = 0;
-                int j = 0;
-                while (true) {
-                    byte b0 = byteBuf.readByte();
-                    i |= (b0 & Byte.MAX_VALUE) << j++ * 7;
-                    if (j > 5)
-                        throw new RuntimeException("VarInt too big");
-                    if ((b0 & 0x80) != 128)
-                        return i;
-                }
-            }
-
+        PacketEvents.get().init();
+        PacketEvents.get().registerListener(new PacketListenerAbstract(PacketListenerPriority.LOWEST) {
             @Override
             public void onPacketDecode(PacketDecodeEvent event) {
-                if (event.getPlayer() != null) {
-                    int packetID = readVarInt(event.getByteBuf());
-                    event.getPlayer().sendMessage("id: " + PacketType.Play.Client.values()[packetID]);
+                ByteBufAbstract byteBuf = event.getByteBuf();
+                PacketState packetState = event.getState();
+                if (event.getPlayer() == null && packetState == null) {
+                    System.out.println("channel is null: " + (event.getChannel() == null ? "true" : "false"));
+                    PacketEvents.get().getInjector().changePacketState(event.getChannel(), PacketState.HANDSHAKING);
+                    System.out.println("Changed state to handshake!");
+                    WrapperHandshakingClientHandshake handshake = new WrapperHandshakingClientHandshake(byteBuf);
+                    System.err.println("CLIENT VERSION: " + handshake.getClientVersion().name());
+                    //System.err.println("SERVER ADDRESS: " + handshake.getServerAddress());
+                    //System.err.println("SERVER PORT: " + handshake.getServerPort());
+                    //System.err.println("NEXT STATE: " + handshake.getNextState());
+                    //PacketEvents.get().getInjector().changePacketState(event.getChannel(), handshake.getNextState());
+                    PacketEvents.get().getInjector().changePacketState(event.getChannel(), PacketState.LOGIN);
+                }
+                else if (event.getState() == PacketState.LOGIN) {
+                    if (event.getPacketID() == 0) {
+                        WrapperLoginClientLoginStart start = new WrapperLoginClientLoginStart(byteBuf);
+                        //Cache the channel
+                        PacketEvents.get().getPlayerUtils().channels.put(start.getUsername(), event.getChannel());
+                        PacketEvents.get().getInjector().changePacketState(event.getChannel(), PacketState.PLAY);
+                    }
+                } else if (event.getState() == PacketState.PLAY) {
+                    PacketWrapper packetWrapper = new PacketWrapper(event.getByteBuf());
+                    event.getPlayer().sendMessage("PACKET: " + event.getPacketType());
                 }
             }
         });
-        PacketEvents.get().init();
     }
 
     @Override
