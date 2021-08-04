@@ -37,11 +37,6 @@ public class PacketDecoderModern extends ByteToMessageDecoder {
     @Override
     protected void decode(ChannelHandlerContext channelHandlerContext, ByteBuf byteBuf, List<Object> list) {
         ByteBuf buf = byteBuf.copy();
-        try {
-            DECODE_METHOD.invoke(minecraftDecoder, channelHandlerContext, byteBuf, list);
-        }catch (Exception exception){
-            exception.printStackTrace();
-        }
 
         PacketDecodeEvent packetDecodeEvent = new PacketDecodeEvent(channelHandlerContext.channel(), player, buf);
         PacketEvents.get().getEventManager().callEvent(packetDecodeEvent);
@@ -49,6 +44,12 @@ public class PacketDecoderModern extends ByteToMessageDecoder {
         if (packetDecodeEvent.isCancelled()) {
             byteBuf.skipBytes(byteBuf.readableBytes());
             return;
+        }
+
+        try {
+            DECODE_METHOD.invoke(minecraftDecoder, channelHandlerContext, byteBuf, list);
+        }catch (Exception exception){
+            exception.printStackTrace();
         }
 
     }

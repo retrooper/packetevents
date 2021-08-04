@@ -36,11 +36,6 @@ public class PacketDecoderLegacy extends ByteToMessageDecoder {
     @Override
     protected void decode(net.minecraft.util.io.netty.channel.ChannelHandlerContext channelHandlerContext, net.minecraft.util.io.netty.buffer.ByteBuf byteBuf, List<Object> list) throws Exception {
         ByteBuf buf = byteBuf.copy();
-        try {
-            DECODE_METHOD.invoke(minecraftDecoder, channelHandlerContext, byteBuf, list);
-        }catch (Exception exception){
-            exception.printStackTrace();
-        }
 
         PacketDecodeEvent packetDecodeEvent = new PacketDecodeEvent(channelHandlerContext.channel(), player, buf);
         PacketEvents.get().getEventManager().callEvent(packetDecodeEvent);
@@ -49,5 +44,12 @@ public class PacketDecoderLegacy extends ByteToMessageDecoder {
             byteBuf.skipBytes(byteBuf.readableBytes());
             return;
         }
+        
+        try {
+            DECODE_METHOD.invoke(minecraftDecoder, channelHandlerContext, byteBuf, list);
+        }catch (Exception exception){
+            exception.printStackTrace();
+        }
+
     }
 }
