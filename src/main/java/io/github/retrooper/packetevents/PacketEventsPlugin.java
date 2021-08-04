@@ -61,20 +61,15 @@ public class PacketEventsPlugin extends JavaPlugin {
                     System.err.println("SERVER ADDRESS: " + handshake.getServerAddress());
                     System.err.println("SERVER PORT: " + handshake.getServerPort());
                     System.err.println("NEXT STATE: " + handshake.getNextState());
-                    //PacketEvents.get().getInjector().changePacketState(event.getChannel(), handshake.getNextState());
-                    PacketEvents.get().getInjector().changePacketState(event.getChannel(), PacketState.LOGIN);
+                    PacketEvents.get().getInjector().changePacketState(event.getChannel(), handshake.getNextState());
                 }
                 else if (event.getState() == PacketState.LOGIN) {
                     if (event.getPacketID() == 0) {
                         WrapperLoginClientLoginStart start = new WrapperLoginClientLoginStart(byteBuf);
-
                         //Cache the channel
                         PacketEvents.get().getPlayerUtils().channels.put(start.getUsername(), event.getChannel());
                         PacketEvents.get().getInjector().changePacketState(event.getChannel(), PacketState.PLAY);
                     }
-                } else if (event.getState() == PacketState.PLAY) {
-                    PacketWrapper packetWrapper = new PacketWrapper(event.getByteBuf());
-                    event.getPlayer().sendMessage("PACKET: " + event.getPacketType());
                 }
             }
         });

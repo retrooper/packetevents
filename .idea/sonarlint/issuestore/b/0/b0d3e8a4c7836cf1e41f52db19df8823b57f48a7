@@ -1,0 +1,46 @@
+
+D
+java:S3740]"/Provide the parametrized type for this generic.(Ø•«[
+B
+java:S30117",This accessibility update should be removed.(˜ÂÓ˜
+>	java:S108F")Either remove or fill this block of code.(”ı¾
+g
+java:S3776L"RRefactor this method to reduce its Cognitive Complexity from 27 to the 15 allowed.(âíón
+B
+java:S3011T",This accessibility update should be removed.(˜ÂÓ˜
+B
+java:S3011m",This accessibility bypass should be removed.(×Â£
+C
+java:S3011š",This accessibility update should be removed.(¦”Õ
+D	java:S108")Either remove or fill this block of code.(Æ¸Û‚øÿÿÿÿ
+C
+java:S3011¬",This accessibility update should be removed.(¦”Õ
+B
+java:S3011­",This accessibility bypass should be removed.(ŞÂİk
+C
+java:S1872±"'Use an "instanceof" comparison instead.(’Ğ§şÿÿÿÿ
+n
+java:S3776Á"RRefactor this method to reduce its Cognitive Complexity from 29 to the 15 allowed.(Á¸õÉøÿÿÿÿ
+C
+java:S3011Ó",This accessibility update should be removed.(ƒ¦‹á
+C
+java:S3011æ",This accessibility update should be removed.(ƒ¦‹á
+C
+java:S3011ç",This accessibility bypass should be removed.(î±ÖÇ
+K
+java:S2864ñ"4Iterate over the "entrySet" instead of the "keySet".(ï¡³‘
+C
+java:S3011ò",This accessibility update should be removed.(«áˆë
+H
+java:S3011õ",This accessibility bypass should be removed.(¾â¡øÿÿÿÿ
+D	java:S108")Either remove or fill this block of code.(Æ¸Û‚øÿÿÿÿ
+_
+java:S1192‹"HDefine a constant instead of duplicating this literal "decoder" 6 times.(Ã½šË
+P
+java:S1141V"5Extract this nested try block into a separate method.(¡»¢üùÿÿÿÿ
+`
+java:S2259"IA "NullPointerException" could be thrown; "getDecoder()" can return null.(Æ¿Ï
+Y
+java:S2259¸"BA "NullPointerException" could be thrown; "yaml" is nullable here.(Ë„•¬
+k
+java:S2259§"TA "NullPointerException" could be thrown; "bootstrapAcceptorField" is nullable here.(ÄòÌŸ

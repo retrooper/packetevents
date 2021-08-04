@@ -1,0 +1,10 @@
+
+–
+java:S1186 "€Add a nested comment explaining why this method is empty, throw an UnsupportedOperationException or complete the implementation.(âíón
+œ
+java:S1186%"€Add a nested comment explaining why this method is empty, throw an UnsupportedOperationException or complete the implementation.(Á¸õÉøÿÿÿÿ
+C	java:S108C")Either remove or fill this block of code.(±Ÿ—±ÿÿÿÿÿ
+c
+java:S1192,"HDefine a constant instead of duplicating this literal "decoder" 6 times.(ÍÔçÕÿÿÿÿÿ
+_
+java:S2259B"IA "NullPointerException" could be thrown; "getDecoder()" can return null.(Æ¿Ï

@@ -22,13 +22,14 @@ import io.github.retrooper.packetevents.utils.netty.bytebuf.ByteBufAbstract;
 import io.github.retrooper.packetevents.wrapper.PacketWrapper;
 
 public class WrapperLoginClientLoginStart extends PacketWrapper {
-   // private final String username;
+    private final String username;
+
     public WrapperLoginClientLoginStart(ByteBufAbstract byteBuf) {
         super(byteBuf);
-        //this.username = readString(16);
+        this.username = readString(16);
     }
 
     public String getUsername() {
-        return "username";
+        return username;
     }
 }

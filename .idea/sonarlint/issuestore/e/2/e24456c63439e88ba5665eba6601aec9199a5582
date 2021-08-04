@@ -1,0 +1,7 @@
+
+A
+java:S14520"&Remove usage of generic wildcard type.(“ÓÙşøÿÿÿÿ
+`
+java:S1128"JRemove this unused import 'io.github.retrooper.packetevents.PacketEvents'.(ö²È½
+^
+java:S1192("HDefine a constant instead of duplicating this literal "decoder" 3 times.(Ã½šË
