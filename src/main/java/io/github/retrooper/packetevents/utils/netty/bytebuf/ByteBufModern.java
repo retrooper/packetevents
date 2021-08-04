@@ -396,4 +396,9 @@ public class ByteBufModern implements ByteBufAbstract {
     public ByteBufAbstract readBytes(int i) {
         return new ByteBufModern(byteBuf.readBytes(i));
     }
+
+    @Override
+    public void readBytes(byte[] bytes) {
+        byteBuf.readBytes(bytes);
+    }
 }
