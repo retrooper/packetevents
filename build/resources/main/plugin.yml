@@ -1,0 +1,4 @@
+main: io.github.retrooper.packetevents.PacketEventsPlugin
+name: PacketEvents
+version: 1.0
+author: retrooper

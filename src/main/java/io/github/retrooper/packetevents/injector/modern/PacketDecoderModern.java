@@ -8,23 +8,18 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.ByteToMessageDecoder;
 import org.bukkit.entity.Player;
 
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.ArrayList;
 import java.util.List;
 
 public class PacketDecoderModern extends ByteToMessageDecoder {
     private static Method DECODE_METHOD;
     public volatile Player player;
-    public volatile PacketState packetState;
     public final ByteToMessageDecoder minecraftDecoder;
+    public PacketState packetState;
 
     public PacketDecoderModern(ByteToMessageDecoder minecraftDecoder) {
         this.minecraftDecoder = minecraftDecoder;
-    }
-
-    private List<Object> callDecode(ByteToMessageDecoder decoder, ChannelHandlerContext channelHandlerContext, Object input) {
-        if (DECODE_METHOD== null) {
+        if (DECODE_METHOD == null) {
             try {
                 DECODE_METHOD = ByteToMessageDecoder.class.getDeclaredMethod("decode", ChannelHandlerContext.class, ByteBuf.class, List.class);
                 DECODE_METHOD.setAccessible(true);
@@ -32,20 +27,12 @@ public class PacketDecoderModern extends ByteToMessageDecoder {
                 e.printStackTrace();
             }
         }
-        List<Object> output = new ArrayList<>();
-        try {
-            DECODE_METHOD.invoke(decoder, channelHandlerContext, input, output);
-        } catch (IllegalAccessException | InvocationTargetException e) {
-            e.printStackTrace();
-        }
-        return output;
     }
 
     @Override
     protected void decode(ChannelHandlerContext channelHandlerContext, ByteBuf byteBuf, List<Object> list) {
-        if (!byteBuf.isReadable())
-            return;
-        PacketDecodeEvent packetDecodeEvent = new PacketDecodeEvent(channelHandlerContext.channel(), player, byteBuf);
+        ByteBuf buf = byteBuf.slice();
+        PacketDecodeEvent packetDecodeEvent = new PacketDecodeEvent(channelHandlerContext.channel(), player, buf);
         PacketEvents.get().getEventManager().callEvent(packetDecodeEvent);
 
         if (packetDecodeEvent.isCancelled()) {
@@ -53,6 +40,11 @@ public class PacketDecoderModern extends ByteToMessageDecoder {
             return;
         }
 
-        list.addAll(callDecode(minecraftDecoder, channelHandlerContext, byteBuf));
+        try {
+            DECODE_METHOD.invoke(minecraftDecoder, channelHandlerContext, byteBuf, list);
+        }catch (Exception exception){
+            exception.printStackTrace();
+        }
+
     }
 }
