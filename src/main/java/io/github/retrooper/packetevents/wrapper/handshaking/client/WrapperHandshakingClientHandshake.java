@@ -25,17 +25,17 @@ import io.github.retrooper.packetevents.wrapper.PacketWrapper;
 
 public class WrapperHandshakingClientHandshake extends PacketWrapper {
     private final int protocolVersion;
-   /* private final String serverAddress;
+    private final String serverAddress;
     private final int serverPort;
-    private final PacketState nextPacketState;*/
+    private final PacketState nextPacketState;
 
     public WrapperHandshakingClientHandshake(ByteBufAbstract byteBuf) {
         super(byteBuf);
         this.protocolVersion = readVarInt();
-        /*this.serverAddress = readString(32767);
+        this.serverAddress = readString(32767);
         this.serverPort = readUnsignedShort();
         int nextStateIndex = readVarInt();
-        this.nextPacketState = PacketState.values()[nextStateIndex];*/
+        this.nextPacketState = PacketState.values()[nextStateIndex];
     }
 
     public int getProtocolVersion() {
@@ -46,7 +46,7 @@ public class WrapperHandshakingClientHandshake extends PacketWrapper {
         return ClientVersion.getClientVersion(protocolVersion);
     }
 
-    /*public String getServerAddress() {
+    public String getServerAddress() {
         return serverAddress;
     }
 
@@ -56,5 +56,5 @@ public class WrapperHandshakingClientHandshake extends PacketWrapper {
 
     public PacketState getNextState() {
         return nextPacketState;
-    }*/
+    }
 }

@@ -21,7 +21,7 @@ package io.github.retrooper.packetevents.wrapper;
 import io.github.retrooper.packetevents.PacketEvents;
 import io.github.retrooper.packetevents.packettype.PacketType;
 import io.github.retrooper.packetevents.utils.netty.bytebuf.ByteBufAbstract;
-import net.minecraft.util.com.google.common.base.Charsets;
+import org.apache.commons.io.Charsets;
 
 
 public class PacketWrapper {

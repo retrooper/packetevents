@@ -6,6 +6,7 @@ import io.github.retrooper.packetevents.packettype.PacketState;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.ByteToMessageDecoder;
+import io.netty.util.AttributeKey;
 import org.bukkit.entity.Player;
 
 import java.lang.reflect.Method;
@@ -19,6 +20,10 @@ public class PacketDecoderModern extends ByteToMessageDecoder {
 
     public PacketDecoderModern(ByteToMessageDecoder minecraftDecoder) {
         this.minecraftDecoder = minecraftDecoder;
+        this.updateBuffer();
+    }
+
+    public void updateBuffer(){
         if (DECODE_METHOD == null) {
             try {
                 DECODE_METHOD = ByteToMessageDecoder.class.getDeclaredMethod("decode", ChannelHandlerContext.class, ByteBuf.class, List.class);
@@ -31,19 +36,19 @@ public class PacketDecoderModern extends ByteToMessageDecoder {
 
     @Override
     protected void decode(ChannelHandlerContext channelHandlerContext, ByteBuf byteBuf, List<Object> list) {
-        ByteBuf buf = byteBuf.slice();
+        ByteBuf buf = byteBuf.copy();
+        try {
+            DECODE_METHOD.invoke(minecraftDecoder, channelHandlerContext, byteBuf, list);
+        }catch (Exception exception){
+            exception.printStackTrace();
+        }
+
         PacketDecodeEvent packetDecodeEvent = new PacketDecodeEvent(channelHandlerContext.channel(), player, buf);
         PacketEvents.get().getEventManager().callEvent(packetDecodeEvent);
 
         if (packetDecodeEvent.isCancelled()) {
             byteBuf.skipBytes(byteBuf.readableBytes());
             return;
-        }
-
-        try {
-            DECODE_METHOD.invoke(minecraftDecoder, channelHandlerContext, byteBuf, list);
-        }catch (Exception exception){
-            exception.printStackTrace();
         }
 
     }

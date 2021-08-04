@@ -56,16 +56,18 @@ public class PacketEventsPlugin extends JavaPlugin {
                     PacketEvents.get().getInjector().changePacketState(event.getChannel(), PacketState.HANDSHAKING);
                     System.out.println("Changed state to handshake!");
                     WrapperHandshakingClientHandshake handshake = new WrapperHandshakingClientHandshake(byteBuf);
+                    System.err.println(handshake.getProtocolVersion() );
                     System.err.println("CLIENT VERSION: " + handshake.getClientVersion().name());
-                    //System.err.println("SERVER ADDRESS: " + handshake.getServerAddress());
-                    //System.err.println("SERVER PORT: " + handshake.getServerPort());
-                    //System.err.println("NEXT STATE: " + handshake.getNextState());
+                    System.err.println("SERVER ADDRESS: " + handshake.getServerAddress());
+                    System.err.println("SERVER PORT: " + handshake.getServerPort());
+                    System.err.println("NEXT STATE: " + handshake.getNextState());
                     //PacketEvents.get().getInjector().changePacketState(event.getChannel(), handshake.getNextState());
                     PacketEvents.get().getInjector().changePacketState(event.getChannel(), PacketState.LOGIN);
                 }
                 else if (event.getState() == PacketState.LOGIN) {
                     if (event.getPacketID() == 0) {
                         WrapperLoginClientLoginStart start = new WrapperLoginClientLoginStart(byteBuf);
+
                         //Cache the channel
                         PacketEvents.get().getPlayerUtils().channels.put(start.getUsername(), event.getChannel());
                         PacketEvents.get().getInjector().changePacketState(event.getChannel(), PacketState.PLAY);
