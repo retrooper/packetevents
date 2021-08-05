@@ -31,10 +31,6 @@ Psrc/main/java/io/github/retrooper/packetevents/event/eventtypes/PlayerEvent.jav
 Rsrc/main/java/io/github/retrooper/packetevents/event/eventtypes/PostTaskEvent.java,e/d/ed43264986698d6d8d33445381753cb81f8aa158
 Ü
 Vsrc/main/java/io/github/retrooper/packetevents/packetwrappers/WrapperPacketReader.java,c/d/cdd3877db1df76e681da06d4e4d64177371f6016
-Ü
-Vsrc/main/java/io/github/retrooper/packetevents/packetwrappers/WrapperPacketWriter.java,5/c/5c773e2378a775faba80cd1ed55b04eae6a454e3
-|
-Lsrc/main/java/io/github/retrooper/packetevents/utils/server/ServerUtils.java,6/1/617a176e8df9fae0d240016ce901a60ed6869d25
 }
 Msrc/main/java/io/github/retrooper/packetevents/utils/nms/PlayerAPIModern.java,6/d/6de3a5896e1db47490c816737ce1222a17ab2022
 Ö
@@ -45,10 +41,6 @@ Usrc/main/java/io/github/retrooper/packetevents/utils/netty/bytebuf/ByteBufModer
 Lsrc/main/java/io/github/retrooper/packetevents/injector/ChannelInjector.java,0/2/0243de7929368b4b2d34f497bc91eaa9b25d4e95
 ~
 Nsrc/main/java/io/github/retrooper/packetevents/utils/player/ClientVersion.java,7/2/72c01ebe1a2948e2e209393771cbad1a10ea0872
-î
-dsrc/main/java/io/github/retrooper/packetevents/injector/legacy/early/EarlyChannelInjectorLegacy.java,2/4/249c884f3864d5164ef7b12c6f0b94fbea53bb40
-î
-dsrc/main/java/io/github/retrooper/packetevents/injector/modern/early/EarlyChannelInjectorModern.java,b/0/b0d3e8a4c7836cf1e41f52db19df8823b57f48a7
 ~
 Nsrc/main/java/io/github/retrooper/packetevents/event/manager/EventManager.java,4/6/46481e66f02c4bc985cd142d2190beb1d942544a
 Ç
@@ -57,12 +49,8 @@ Rsrc/main/java/io/github/retrooper/packetevents/injector/GlobalChannelInjector.j
 bsrc/main/java/io/github/retrooper/packetevents/injector/legacy/late/LateChannelInjectorLegacy.java,1/d/1d20c74ffa95bb556a26e26906ff8f73fc3211a2
 í
 bsrc/main/java/io/github/retrooper/packetevents/injector/modern/late/LateChannelInjectorModern.java,2/1/21a73ffb8d1aa4c92817b2bb7fbbde70dcec10c6
-v
-Fsrc/main/java/io/github/retrooper/packetevents/utils/nms/NMSUtils.java,3/7/37800fc8183d6581bc9d95bb27577459e9ecbe4f
 á
 Wsrc/main/java/io/github/retrooper/packetevents/injector/legacy/PacketDecoderLegacy.java,c/f/cffb2c98d4e4fb15d213cdad004c654c57db062c
-p
-@src/main/java/io/github/retrooper/packetevents/PacketEvents.java,1/1/114b4267d3b543f22e251a6f6245028e1f571479
 Å
 Qsrc/main/java/io/github/retrooper/packetevents/settings/PacketEventsSettings.java,1/7/1787fa8306a7d6b1a343fc93d88d02a6781199c9
 z

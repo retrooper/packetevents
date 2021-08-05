@@ -22,8 +22,7 @@ import io.github.retrooper.packetevents.PacketEvents;
 import io.github.retrooper.packetevents.injector.EarlyInjector;
 import io.github.retrooper.packetevents.injector.legacy.PacketDecoderLegacy;
 import io.github.retrooper.packetevents.packettype.PacketState;
-import io.github.retrooper.packetevents.packetwrappers.NMSPacket;
-import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
+import io.github.retrooper.packetevents.utils.reflection.ReflectionObject;
 import io.github.retrooper.packetevents.utils.list.ListWrapper;
 import io.github.retrooper.packetevents.utils.nms.NMSUtils;
 import net.minecraft.util.io.netty.channel.Channel;
@@ -127,7 +126,7 @@ public class EarlyChannelInjectorLegacy implements EarlyInjector {
         List<Object> networkManagers = NMSUtils.getNetworkManagers();
         synchronized (networkManagers) {
             for (Object networkManager : networkManagers) {
-                WrappedPacket networkManagerWrapper = new WrappedPacket(new NMSPacket(networkManager));
+                ReflectionObject networkManagerWrapper = new ReflectionObject(networkManager);
                 Channel channel = networkManagerWrapper.readObject(0, Channel.class);
                 if (channel == null) {
                     continue;

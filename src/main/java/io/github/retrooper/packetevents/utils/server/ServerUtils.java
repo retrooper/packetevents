@@ -19,8 +19,7 @@
 package io.github.retrooper.packetevents.utils.server;
 
 import io.github.retrooper.packetevents.PacketEvents;
-import io.github.retrooper.packetevents.packetwrappers.NMSPacket;
-import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
+import io.github.retrooper.packetevents.utils.reflection.ReflectionObject;
 import io.github.retrooper.packetevents.utils.boundingbox.BoundingBox;
 import io.github.retrooper.packetevents.utils.entityfinder.EntityFinderUtils;
 import io.github.retrooper.packetevents.utils.netty.bytebuf.ByteBufAbstract;
@@ -94,7 +93,7 @@ public final class ServerUtils {
     public BoundingBox getEntityBoundingBox(Entity entity) {
         Object nmsEntity = NMSUtils.getNMSEntity(entity);
         Object aabb = NMSUtils.getNMSAxisAlignedBoundingBox(nmsEntity);
-        WrappedPacket wrappedBoundingBox= new WrappedPacket(new NMSPacket(aabb));
+        ReflectionObject wrappedBoundingBox= new ReflectionObject(aabb);
         double minX = wrappedBoundingBox.readDouble(0);
         double minY = wrappedBoundingBox.readDouble(1);
         double minZ = wrappedBoundingBox.readDouble(2);
@@ -159,9 +158,9 @@ public final class ServerUtils {
                 getLevelEntityGetterIterable = Reflection.getMethod(levelEntityGetterClass, Iterable.class, 0);
             }
             Object worldServer = NMSUtils.convertBukkitWorldToWorldServer(world);
-            WrappedPacket wrappedWorldServer = new WrappedPacket(new NMSPacket(worldServer));
+            ReflectionObject wrappedWorldServer = new ReflectionObject(worldServer);
             Object persistentEntitySectionManager = wrappedWorldServer.readObject(0, persistentEntitySectionManagerClass);
-            WrappedPacket wrappedPersistentEntitySectionManager = new WrappedPacket(new NMSPacket(persistentEntitySectionManager));
+            ReflectionObject wrappedPersistentEntitySectionManager = new ReflectionObject(persistentEntitySectionManager);
             Object levelEntityGetter = wrappedPersistentEntitySectionManager.readObject(0, levelEntityGetterClass);
             Iterable<Object> nmsEntitiesIterable = null;
             try {

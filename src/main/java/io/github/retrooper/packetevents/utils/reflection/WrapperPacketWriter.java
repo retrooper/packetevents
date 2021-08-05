@@ -16,7 +16,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package io.github.retrooper.packetevents.packetwrappers;
+package io.github.retrooper.packetevents.utils.reflection;
 
 public interface WrapperPacketWriter {
     void writeBoolean(int index, boolean value);

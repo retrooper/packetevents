@@ -18,8 +18,7 @@
 
 package io.github.retrooper.packetevents.utils.gameprofile;
 
-import io.github.retrooper.packetevents.packetwrappers.NMSPacket;
-import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
+import io.github.retrooper.packetevents.utils.reflection.ReflectionObject;
 import io.github.retrooper.packetevents.utils.nms.NMSUtils;
 import io.github.retrooper.packetevents.utils.player.Skin;
 import net.minecraft.util.com.mojang.authlib.GameProfile;
@@ -47,7 +46,7 @@ class GameProfileUtil_7 {
         Player player = Bukkit.getPlayer(uuid);
         if (player != null) {
             Object entityHuman = NMSUtils.entityHumanClass.cast(NMSUtils.getEntityPlayer(player));
-            WrappedPacket wrappedEntityPlayer = new WrappedPacket(new NMSPacket(entityHuman), NMSUtils.entityHumanClass);
+            ReflectionObject wrappedEntityPlayer = new ReflectionObject(entityHuman, NMSUtils.entityHumanClass);
             return wrappedEntityPlayer.readObject(0, GameProfile.class);
         } else {
             return new GameProfile(uuid, username);
