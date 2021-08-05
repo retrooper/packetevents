@@ -5,20 +5,20 @@ import io.github.retrooper.packetevents.utils.player.ClientVersion;
 import io.github.retrooper.packetevents.wrapper.PacketWrapper;
 
 public class WrapperGameClientPluginMessage extends PacketWrapper {
-    private final String tag;
+    private final String channelName;
     private final byte[] data;
 
     public WrapperGameClientPluginMessage(ClientVersion version, ByteBufAbstract byteBuf) {
         super(version, byteBuf);
-        this.tag = readString();
+        this.channelName = readString();
         this.data = readByteArray(byteBuf.readableBytes());
     }
 
-    public String getTag(){
-        return this.tag;
+    public String getChannelName(){
+        return channelName;
     }
 
     public byte[] getData(){
-        return this.data;
+        return data;
     }
 }

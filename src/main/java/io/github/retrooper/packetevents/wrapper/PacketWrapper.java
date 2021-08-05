@@ -22,6 +22,8 @@ import io.github.retrooper.packetevents.utils.netty.bytebuf.ByteBufAbstract;
 import io.github.retrooper.packetevents.utils.player.ClientVersion;
 import org.apache.commons.io.Charsets;
 
+import java.util.UUID;
+
 
 public class PacketWrapper {
     private final ClientVersion version;
@@ -79,18 +81,22 @@ public class PacketWrapper {
         return byteBuf.readUnsignedShort();
     }
 
-    public long readLong(){
+    public long readLong() {
         return byteBuf.readLong();
     }
 
-    public boolean readBoolean(){
+    public boolean readBoolean() {
         return byteBuf.readBoolean();
     }
 
-    public byte[] readByteArray(int legnth) {
-        byte[] ret = new byte[legnth];
-        byteBuf.readBytes( ret );
+    public byte[] readByteArray(int length) {
+        byte[] ret = new byte[length];
+        byteBuf.readBytes(ret);
         return ret;
+    }
+
+    public UUID readUUID() {
+        return UUID.fromString(readString(36));
     }
 
 }

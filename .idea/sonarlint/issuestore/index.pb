@@ -15,8 +15,6 @@ hsrc/main/java/io/github/retrooper/packetevents/utils/versionlookup/v_1_7_10/Spi
 hsrc/main/java/io/github/retrooper/packetevents/utils/versionlookup/viaversion/ViaVersionLookupUtils.java,8/d/8dd30fb76ca194dcd1409cb53fb3a9bf59cea628
 Ÿ
 osrc/main/java/io/github/retrooper/packetevents/utils/versionlookup/viaversion/ViaVersionAccessorImplLegacy.java,6/a/6a8818fa2ab5a53674a923c1aaab37ea142f1a64
-<
-build.gradle,f/0/f07866736216be0ee2aba49e392191aeae700a35
 ƒ
 Ssrc/main/java/io/github/retrooper/packetevents/utils/netty/bytebuf/ByteBufUtil.java,1/3/1349dbe2c1dd6ddf00fd4e31304af1f40bbe211f
 ‚

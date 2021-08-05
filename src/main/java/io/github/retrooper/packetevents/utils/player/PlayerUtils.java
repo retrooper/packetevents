@@ -41,7 +41,6 @@ import java.util.concurrent.ConcurrentHashMap;
  * @since 1.6.8
  */
 public final class PlayerUtils {
-    private static byte v_1_17 = -1;
     public final Map<InetSocketAddress, ClientVersion> clientVersions = new ConcurrentHashMap<>();
     public final Map<UUID, Long> keepAliveMap = new ConcurrentHashMap<>();
     public final Map<String, Object> channels = new ConcurrentHashMap<>();
