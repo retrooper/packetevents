@@ -4,19 +4,19 @@ import io.github.retrooper.packetevents.utils.netty.bytebuf.ByteBufAbstract;
 import io.github.retrooper.packetevents.wrapper.PacketWrapper;
 
 public class WrapperLoginClientPluginResponse extends PacketWrapper {
-    private final int messageid;
+    private final int messageID;
     private final boolean successful;
     private final byte[] data;
 
     public WrapperLoginClientPluginResponse(ByteBufAbstract byteBuf) {
         super(byteBuf);
-        this.messageid = readVarInt();
+        this.messageID = readVarInt();
         this.successful = readBoolean();
         this.data = readByteArray(byteBuf.readableBytes());
     }
 
-    public int getMessageId(){
-        return this.messageid;
+    public int getMessageID(){
+        return this.messageID;
     }
 
     public boolean isSuccessful(){
