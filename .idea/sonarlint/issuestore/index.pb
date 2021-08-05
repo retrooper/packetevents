@@ -32,13 +32,9 @@ Rsrc/main/java/io/github/retrooper/packetevents/event/eventtypes/PostTaskEvent.j
 }
 Msrc/main/java/io/github/retrooper/packetevents/utils/nms/PlayerAPIModern.java,6/d/6de3a5896e1db47490c816737ce1222a17ab2022
 …
-Usrc/main/java/io/github/retrooper/packetevents/utils/netty/bytebuf/ByteBufLegacy.java,d/a/da86f3e161f866c14affe5edd08a745388451024
-…
 Usrc/main/java/io/github/retrooper/packetevents/utils/netty/bytebuf/ByteBufModern.java,0/d/0d5c0d8310c8e8ef4fccee469c98b280b38a86c1
 |
 Lsrc/main/java/io/github/retrooper/packetevents/injector/ChannelInjector.java,0/2/0243de7929368b4b2d34f497bc91eaa9b25d4e95
-~
-Nsrc/main/java/io/github/retrooper/packetevents/utils/player/ClientVersion.java,7/2/72c01ebe1a2948e2e209393771cbad1a10ea0872
 ~
 Nsrc/main/java/io/github/retrooper/packetevents/event/manager/EventManager.java,4/6/46481e66f02c4bc985cd142d2190beb1d942544a
 ‚

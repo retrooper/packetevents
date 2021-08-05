@@ -47,6 +47,9 @@ public class PacketWrapper {
         return byteBuf;
     }
 
+    public int readInt() {
+        return byteBuf.readInt();
+    }
 
     public int readVarInt() {
         byte b0;
