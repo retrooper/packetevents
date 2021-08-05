@@ -81,6 +81,10 @@ public class PacketWrapper {
         return byteBuf.readUnsignedShort();
     }
 
+    public short readShort() {
+        return byteBuf.readShort();
+    }
+
     public long readLong() {
         return byteBuf.readLong();
     }
