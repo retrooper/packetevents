@@ -67,7 +67,7 @@ public class BukkitEventProcessorInternal implements Listener {
                 try {
                     int protocolVersion = VersionLookupUtils.getProtocolVersion(player);
                     ClientVersion version = ClientVersion.getClientVersion(protocolVersion);
-                    PacketEvents.get().getPlayerUtils().clientVersionsMap.put(address, version);
+                    PacketEvents.get().getPlayerUtils().clientVersions.put(address, version);
                 } catch (Exception ignored) {
 
                 }
@@ -86,8 +86,7 @@ public class BukkitEventProcessorInternal implements Listener {
         UUID uuid = player.getUniqueId();
         InetSocketAddress address = player.getAddress();
         //Cleanup user data
-        PacketEvents.get().getPlayerUtils().clientVersionsMap.remove(address);
-        PacketEvents.get().getPlayerUtils().tempClientVersionMap.remove(address);
+        PacketEvents.get().getPlayerUtils().clientVersions.remove(address);
         PacketEvents.get().getPlayerUtils().keepAliveMap.remove(uuid);
         PacketEvents.get().getPlayerUtils().channels.remove(player.getName());
         PacketEvents.get().getServerUtils().entityCache.remove(e.getPlayer().getEntityId());

@@ -1,14 +1,0 @@
-
-g
-java:S3008/"QRename this field "v_1_17" to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(Æž¥‚
-h
-java:S3776O"RRefactor this method to reduce its Cognitive Complexity from 16 to the 15 allowed.(§˜”¾
-V	java:S125w"<This block of commented-out lines of code should be removed.(à±Œøøÿÿÿÿ
-K
-java:S1128".Remove this unused import 'org.bukkit.Bukkit'.(Ø­æ8œÖÂ‚±/
-R
-java:S1128"5Remove this unused import 'org.bukkit.plugin.Plugin'.(üÇ†á8œÖÂ‚±/
-`
-java:S1128%"CRemove this unused import 'java.util.concurrent.CompletableFuture'.(ôÞä´8œÖÂ‚±/
-G
-java:S1068/"*Remove this unused "v_1_17" private field.(Æž¥‚8œÖÂ‚±/

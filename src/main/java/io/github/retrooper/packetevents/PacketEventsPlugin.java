@@ -52,15 +52,9 @@ public class PacketEventsPlugin extends JavaPlugin {
                 ByteBufAbstract byteBuf = event.getByteBuf();
                 PacketState packetState = event.getState();
                 if (event.getPlayer() == null && packetState == null) {
-                    System.out.println("channel is null: " + (event.getChannel() == null ? "true" : "false"));
                     PacketEvents.get().getInjector().changePacketState(event.getChannel(), PacketState.HANDSHAKING);
-                    System.out.println("Changed state to handshake!");
                     WrapperHandshakingClientHandshake handshake = new WrapperHandshakingClientHandshake(byteBuf);
-                    System.err.println(handshake.getProtocolVersion() );
-                    System.err.println("CLIENT VERSION: " + handshake.getClientVersion().name());
-                    System.err.println("SERVER ADDRESS: " + handshake.getServerAddress());
-                    System.err.println("SERVER PORT: " + handshake.getServerPort());
-                    System.err.println("NEXT STATE: " + handshake.getNextState());
+                    PacketEvents.get().getPlayerUtils().clientVersions.put(event.getSocketAddress(), handshake.getClientVersion());
                     PacketEvents.get().getInjector().changePacketState(event.getChannel(), handshake.getNextState());
                 }
                 else if (event.getState() == PacketState.LOGIN) {

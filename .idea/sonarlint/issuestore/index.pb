@@ -39,8 +39,6 @@ Vsrc/main/java/io/github/retrooper/packetevents/packetwrappers/WrapperPacketWrit
 Lsrc/main/java/io/github/retrooper/packetevents/utils/server/ServerUtils.java,6/1/617a176e8df9fae0d240016ce901a60ed6869d25
 }
 Msrc/main/java/io/github/retrooper/packetevents/utils/nms/PlayerAPIModern.java,6/d/6de3a5896e1db47490c816737ce1222a17ab2022
-Š
-Zsrc/main/java/io/github/retrooper/packetevents/processor/BukkitEventProcessorInternal.java,c/8/c80a962735468ac7bdfa8a646127359a98c56b6a
 …
 Usrc/main/java/io/github/retrooper/packetevents/utils/netty/bytebuf/ByteBufLegacy.java,d/a/da86f3e161f866c14affe5edd08a745388451024
 …
@@ -83,8 +81,6 @@ Wsrc/main/java/io/github/retrooper/packetevents/packettype/protocols/PacketType_
 Psrc/main/java/io/github/retrooper/packetevents/event/manager/PEEventManager.java,1/b/1b8b9e8e5792fdb2ce23f450f4d17dd91d4e8b15
 
 Osrc/main/java/io/github/retrooper/packetevents/event/impl/PlayerEjectEvent.java,0/6/0611bda76895d3f55151c5cc575b5dcf8227d9f5
-|
-Lsrc/main/java/io/github/retrooper/packetevents/utils/player/PlayerUtils.java,d/d/dde51ac1f7b223a69b19dc28d0c9fef64c5affa1
 ~
 Nsrc/main/java/io/github/retrooper/packetevents/utils/server/ServerVersion.java,3/a/3a68dd083877f58b55985ca6fb99fafc4b9dfae3
 y

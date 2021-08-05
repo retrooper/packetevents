@@ -19,14 +19,26 @@
 package io.github.retrooper.packetevents.wrapper;
 
 import io.github.retrooper.packetevents.utils.netty.bytebuf.ByteBufAbstract;
+import io.github.retrooper.packetevents.utils.player.ClientVersion;
 import org.apache.commons.io.Charsets;
 
 
 public class PacketWrapper {
+    private final ClientVersion version;
     private final ByteBufAbstract byteBuf;
 
     public PacketWrapper(ByteBufAbstract byteBuf) {
+        this.version = ClientVersion.UNKNOWN;
         this.byteBuf = byteBuf;
+    }
+
+    public PacketWrapper(ClientVersion version, ByteBufAbstract byteBuf) {
+        this.version = version;
+        this.byteBuf = byteBuf;
+    }
+
+    public ClientVersion getClientVersion() {
+        return version;
     }
 
     public ByteBufAbstract getByteBuf() {

@@ -9,6 +9,7 @@ import io.github.retrooper.packetevents.packettype.PacketState;
 import io.github.retrooper.packetevents.packettype.PacketType;
 import io.github.retrooper.packetevents.utils.netty.bytebuf.ByteBufAbstract;
 import io.github.retrooper.packetevents.utils.netty.channel.ChannelUtils;
+import io.github.retrooper.packetevents.utils.player.ClientVersion;
 import io.github.retrooper.packetevents.wrapper.PacketWrapper;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.Nullable;
@@ -20,7 +21,7 @@ public class PacketDecodeEvent extends PacketEvent implements PlayerEvent, Cance
     private final Player player;
     private boolean cancel;
     private ByteBufAbstract byteBuf;
-    private int packetIDNum;
+    private final int packetIDNum;
 
     public PacketDecodeEvent(Object channel, Player player, ByteBufAbstract byteBuf){
         this.channel = channel;
@@ -56,6 +57,10 @@ public class PacketDecodeEvent extends PacketEvent implements PlayerEvent, Cance
 
     public InetSocketAddress getSocketAddress() {
         return ChannelUtils.getSocketAddress(channel);
+    }
+
+    public ClientVersion getClientVersion() {
+        return PacketEvents.get().getPlayerUtils().getClientVersion(player);
     }
 
     @Override
