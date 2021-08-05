@@ -20,7 +20,6 @@ package io.github.retrooper.packetevents.packetwrappers;
 
 import io.github.retrooper.packetevents.PacketEvents;
 import io.github.retrooper.packetevents.exceptions.WrapperFieldNotFoundException;
-import io.github.retrooper.packetevents.exceptions.WrapperUnsupportedUsageException;
 import io.github.retrooper.packetevents.utils.enums.EnumUtil;
 import io.github.retrooper.packetevents.utils.nms.NMSUtils;
 import io.github.retrooper.packetevents.utils.player.GameMode;
@@ -44,22 +43,18 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.logging.Level;
 
 public class WrappedPacket implements WrapperPacketReader, WrapperPacketWriter {
-
-    private static final Map<Class<? extends WrappedPacket>, Boolean> LOADED_WRAPPERS = new ConcurrentHashMap<>();
     private static final Map<Class<?>, Map<Class<?>, Field[]>> FIELD_CACHE = new ConcurrentHashMap<>();
     private static final Field[] EMPTY_FIELD_ARRAY = new Field[0];
-    private static byte isVersion_1_17 = -1;
+    private static byte V_1_17 = -1;
     public static ServerVersion version;
     protected final NMSPacket packet;
-    private final Class<?> packetClass;
+    private final Class<?> clazz;
 
     public WrappedPacket() {
         packet = null;
-        packetClass = null;
-        load0();
+        clazz = null;
     }
 
     public WrappedPacket(final NMSPacket packet) {
@@ -67,34 +62,8 @@ public class WrappedPacket implements WrapperPacketReader, WrapperPacketWriter {
     }
 
     public WrappedPacket(final NMSPacket packet, Class<?> packetClass) {
-        this.packetClass = packetClass;
+        this.clazz = packetClass;
         this.packet = packet;
-        load0();
-    }
-
-    private void load0() {
-        final Class<? extends WrappedPacket> clazz = getClass();
-        if (!LOADED_WRAPPERS.containsKey(clazz)) {
-            if (!isSupported()) {
-                throw new WrapperUnsupportedUsageException(getClass());
-            }
-            try {
-                load();
-            } catch (Exception ex) {
-                String wrapperName = ClassUtil.getClassSimpleName(clazz);
-                PacketEvents.get().getPlugin().getLogger()
-                        .log(Level.SEVERE, "PacketEvents found an exception while loading the " + wrapperName + " packet wrapper. Please report this bug! Tell us about your server version, spigot and code(of you using the wrapper)", ex);
-                LOADED_WRAPPERS.put(clazz, false);
-            }
-            LOADED_WRAPPERS.put(clazz, true);
-        }
-    }
-
-    protected void load() {
-    }
-
-    protected boolean hasLoaded() {
-        return LOADED_WRAPPERS.getOrDefault(getClass(), false);
     }
 
     protected void throwUnsupportedOperation(Enum<?> enumConst) throws UnsupportedOperationException {
@@ -250,7 +219,7 @@ public class WrappedPacket implements WrapperPacketReader, WrapperPacketWriter {
     @Override
     public Object readAnyObject(int index) {
         try {
-            Field f = packetClass.getDeclaredFields()[index];
+            Field f = clazz.getDeclaredFields()[index];
             if (!f.isAccessible()) {
                 f.setAccessible(true);
             }
@@ -260,7 +229,7 @@ public class WrappedPacket implements WrapperPacketReader, WrapperPacketWriter {
                 e.printStackTrace();
             }
         } catch (ArrayIndexOutOfBoundsException e) {
-            throw new WrapperFieldNotFoundException("PacketEvents failed to find any field indexed " + index + " in the " + ClassUtil.getClassSimpleName(packetClass) + " class!");
+            throw new WrapperFieldNotFoundException("PacketEvents failed to find any field indexed " + index + " in the " + ClassUtil.getClassSimpleName(clazz) + " class!");
         }
         return null;
     }
@@ -281,7 +250,7 @@ public class WrappedPacket implements WrapperPacketReader, WrapperPacketWriter {
             Field field = getField(type, index);
             return (T) field.get(packet.getRawNMSPacket());
         } catch (IllegalAccessException | NullPointerException | ArrayIndexOutOfBoundsException e) {
-            throw new WrapperFieldNotFoundException(packetClass, type, index);
+            throw new WrapperFieldNotFoundException(clazz, type, index);
         }
     }
 
@@ -374,10 +343,10 @@ public class WrappedPacket implements WrapperPacketReader, WrapperPacketWriter {
     @Override
     public void writeAnyObject(int index, Object value) {
         try {
-            Field f = packetClass.getDeclaredFields()[index];
+            Field f = clazz.getDeclaredFields()[index];
             f.set(packet.getRawNMSPacket(), value);
         } catch (Exception e) {
-            throw new WrapperFieldNotFoundException("PacketEvents failed to find any field indexed " + index + " in the " + ClassUtil.getClassSimpleName(packetClass) + " class!");
+            throw new WrapperFieldNotFoundException("PacketEvents failed to find any field indexed " + index + " in the " + ClassUtil.getClassSimpleName(clazz) + " class!");
         }
     }
 
@@ -394,7 +363,7 @@ public class WrappedPacket implements WrapperPacketReader, WrapperPacketWriter {
     public void write(Class<?> type, int index, Object value) throws WrapperFieldNotFoundException {
         Field field = getField(type, index);
         if (field == null) {
-            throw new WrapperFieldNotFoundException(packetClass, type, index);
+            throw new WrapperFieldNotFoundException(clazz, type, index);
         }
         try {
             field.set(packet.getRawNMSPacket(), value);
@@ -485,11 +454,11 @@ public class WrappedPacket implements WrapperPacketReader, WrapperPacketWriter {
     }
 
     public String readMinecraftKey(int index) {
-        if (isVersion_1_17 == -1) {
-            isVersion_1_17 = (byte) (version.isNewerThanOrEquals(ServerVersion.v_1_17) ? 1 : 0);
+        if (V_1_17 == -1) {
+            V_1_17 = (byte) (version.isNewerThanOrEquals(ServerVersion.v_1_17) ? 1 : 0);
         }
-        int namespaceIndex = isVersion_1_17 == 1 ? 2 : 0;
-        int keyIndex = isVersion_1_17 == 1 ? 3 : 1;
+        int namespaceIndex = V_1_17 == 1 ? 2 : 0;
+        int keyIndex = V_1_17 == 1 ? 3 : 1;
         Object minecraftKey = readObject(index, NMSUtils.minecraftKeyClass);
         WrappedPacket minecraftKeyWrapper = new WrappedPacket(new NMSPacket(minecraftKey));
         return minecraftKeyWrapper.readString(namespaceIndex) + ":" + minecraftKeyWrapper.readString(keyIndex);
@@ -514,12 +483,12 @@ public class WrappedPacket implements WrapperPacketReader, WrapperPacketWriter {
     }
 
     private Field getField(Class<?> type, int index) {
-        Map<Class<?>, Field[]> cached = FIELD_CACHE.computeIfAbsent(packetClass, k -> new ConcurrentHashMap<>());
-        Field[] fields = cached.computeIfAbsent(type, typeClass -> getFields(typeClass, packetClass.getDeclaredFields()));
+        Map<Class<?>, Field[]> cached = FIELD_CACHE.computeIfAbsent(clazz, k -> new ConcurrentHashMap<>());
+        Field[] fields = cached.computeIfAbsent(type, typeClass -> getFields(typeClass, clazz.getDeclaredFields()));
         if (fields.length >= index + 1) {
             return fields[index];
         } else {
-            throw new WrapperFieldNotFoundException(packetClass, type, index);
+            throw new WrapperFieldNotFoundException(clazz, type, index);
         }
     }
 

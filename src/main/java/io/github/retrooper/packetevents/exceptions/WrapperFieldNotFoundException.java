@@ -18,6 +18,7 @@
 
 package io.github.retrooper.packetevents.exceptions;
 
+import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
 import io.github.retrooper.packetevents.utils.reflection.ClassUtil;
 
 /**
@@ -25,8 +26,8 @@ import io.github.retrooper.packetevents.utils.reflection.ClassUtil;
  * to find a field.
  *
  * @author retrooper
- * @see io.github.retrooper.packetevents.packetwrappers.WrappedPacket#read(int, Class)
- * @see io.github.retrooper.packetevents.packetwrappers.WrappedPacket#write(Class, int, Object)
+ * @see WrappedPacket#read(int, Class)
+ * @see WrappedPacket#write(Class, int, Object)
  * @since 1.6.9
  */
 public class WrapperFieldNotFoundException extends RuntimeException {
