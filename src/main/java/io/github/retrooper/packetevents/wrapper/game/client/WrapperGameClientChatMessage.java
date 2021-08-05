@@ -20,36 +20,17 @@ package io.github.retrooper.packetevents.wrapper.game.client;
 
 import io.github.retrooper.packetevents.utils.netty.bytebuf.ByteBufAbstract;
 import io.github.retrooper.packetevents.utils.player.ClientVersion;
-import io.github.retrooper.packetevents.utils.vector.Vector3i;
 import io.github.retrooper.packetevents.wrapper.PacketWrapper;
-import io.github.retrooper.packetevents.wrapper.utils.PacketWrapperUtils;
 
-public class WrapperGameClientUpdateSign extends PacketWrapper {
-    //TODO Test the blockposition on as many versions as possible
-    private final Vector3i blockPosition;
-    private final String[] textLines = new String[4];
-
-    public WrapperGameClientUpdateSign(ClientVersion version, ByteBufAbstract byteBuf) {
+public class WrapperGameClientChatMessage extends PacketWrapper {
+    private final String message;
+    public WrapperGameClientChatMessage(ClientVersion version, ByteBufAbstract byteBuf) {
         super(version, byteBuf);
-        if (version.isNewerThanOrEquals(ClientVersion.v_1_8)) {
-            long position = readLong();
-            this.blockPosition = PacketWrapperUtils.readVectorFromLong(position);
-        } else {
-            int x = readInt();
-            int y = readShort();
-            int z = readInt();
-            this.blockPosition = new Vector3i(x, y, z);
-        }
-        for (int i = 0; i < 4; i++) {
-            this.textLines[i] = readString(384);
-        }
+        int maxMessageLength = version.isNewerThanOrEquals(ClientVersion.v_1_11) ? 256 : 100;
+        this.message = readString(maxMessageLength);
     }
 
-    public Vector3i getBlockPosition() {
-        return blockPosition;
-    }
-
-    public String[] getTextLines() {
-        return textLines;
+    public String getMessage() {
+        return message;
     }
 }
