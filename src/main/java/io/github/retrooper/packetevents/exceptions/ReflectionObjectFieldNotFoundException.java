@@ -30,12 +30,12 @@ import io.github.retrooper.packetevents.utils.reflection.ClassUtil;
  * @see ReflectionObject#write(Class, int, Object)
  * @since 1.6.9
  */
-public class WrapperFieldNotFoundException extends RuntimeException {
-    public WrapperFieldNotFoundException(String message) {
+public class ReflectionObjectFieldNotFoundException extends RuntimeException {
+    public ReflectionObjectFieldNotFoundException(String message) {
         super(message);
     }
 
-    public WrapperFieldNotFoundException(Class<?> packetClass, Class<?> type, int index) {
+    public ReflectionObjectFieldNotFoundException(Class<?> packetClass, Class<?> type, int index) {
         this("PacketEvents failed to find a " + ClassUtil.getClassSimpleName(type) + " indexed " + index + " by its type in the " + packetClass.getName() + " class!");
     }
 }

@@ -19,7 +19,7 @@
 package io.github.retrooper.packetevents.utils.reflection;
 
 import io.github.retrooper.packetevents.PacketEvents;
-import io.github.retrooper.packetevents.exceptions.WrapperFieldNotFoundException;
+import io.github.retrooper.packetevents.exceptions.ReflectionObjectFieldNotFoundException;
 import io.github.retrooper.packetevents.utils.enums.EnumUtil;
 import io.github.retrooper.packetevents.utils.nms.NMSUtils;
 import io.github.retrooper.packetevents.utils.player.GameMode;
@@ -228,7 +228,7 @@ public class ReflectionObject implements ReflectionObjectReader, WrapperPacketWr
                 e.printStackTrace();
             }
         } catch (ArrayIndexOutOfBoundsException e) {
-            throw new WrapperFieldNotFoundException("PacketEvents failed to find any field indexed " + index + " in the " + ClassUtil.getClassSimpleName(clazz) + " class!");
+            throw new ReflectionObjectFieldNotFoundException("PacketEvents failed to find any field indexed " + index + " in the " + ClassUtil.getClassSimpleName(clazz) + " class!");
         }
         return null;
     }
@@ -249,7 +249,7 @@ public class ReflectionObject implements ReflectionObjectReader, WrapperPacketWr
             Field field = getField(type, index);
             return (T) field.get(object);
         } catch (IllegalAccessException | NullPointerException | ArrayIndexOutOfBoundsException e) {
-            throw new WrapperFieldNotFoundException(clazz, type, index);
+            throw new ReflectionObjectFieldNotFoundException(clazz, type, index);
         }
     }
 
@@ -345,7 +345,7 @@ public class ReflectionObject implements ReflectionObjectReader, WrapperPacketWr
             Field f = clazz.getDeclaredFields()[index];
             f.set(object, value);
         } catch (Exception e) {
-            throw new WrapperFieldNotFoundException("PacketEvents failed to find any field indexed " + index + " in the " + ClassUtil.getClassSimpleName(clazz) + " class!");
+            throw new ReflectionObjectFieldNotFoundException("PacketEvents failed to find any field indexed " + index + " in the " + ClassUtil.getClassSimpleName(clazz) + " class!");
         }
     }
 
@@ -354,15 +354,15 @@ public class ReflectionObject implements ReflectionObjectReader, WrapperPacketWr
         try {
             write(enumConstant.getClass(), index, enumConstant);
         }
-        catch (WrapperFieldNotFoundException ex) {
+        catch (ReflectionObjectFieldNotFoundException ex) {
             write(enumConstant.getDeclaringClass(), index, enumConstant);
         }
     }
 
-    public void write(Class<?> type, int index, Object value) throws WrapperFieldNotFoundException {
+    public void write(Class<?> type, int index, Object value) throws ReflectionObjectFieldNotFoundException {
         Field field = getField(type, index);
         if (field == null) {
-            throw new WrapperFieldNotFoundException(clazz, type, index);
+            throw new ReflectionObjectFieldNotFoundException(clazz, type, index);
         }
         try {
             field.set(object, value);
@@ -487,7 +487,7 @@ public class ReflectionObject implements ReflectionObjectReader, WrapperPacketWr
         if (fields.length >= index + 1) {
             return fields[index];
         } else {
-            throw new WrapperFieldNotFoundException(clazz, type, index);
+            throw new ReflectionObjectFieldNotFoundException(clazz, type, index);
         }
     }
 
