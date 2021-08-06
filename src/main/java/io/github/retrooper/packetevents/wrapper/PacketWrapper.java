@@ -103,7 +103,8 @@ public class PacketWrapper {
     }
 
     public UUID readUUID() {
-        return UUID.fromString(readString(36));
+        long mostSigBits = readLong();
+        long leastSigBits = readLong();
+        return new UUID(mostSigBits, leastSigBits);
     }
-
 }

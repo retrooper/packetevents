@@ -40,6 +40,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * @author retrooper
  * @since 1.6.8
  */
+//TODO Cache clientVersions map by channels and not inetsocketaddresses :)
 public final class PlayerUtils {
     public final Map<InetSocketAddress, ClientVersion> clientVersions = new ConcurrentHashMap<>();
     public final Map<UUID, Long> keepAliveMap = new ConcurrentHashMap<>();

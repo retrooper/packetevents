@@ -73,18 +73,12 @@ Psrc/main/java/io/github/retrooper/packetevents/event/impl/PacketDecodeEvent.jav
 msrc/main/java/io/github/retrooper/packetevents/wrapper/login/client/WrapperLoginClientEncryptionResponse.java,3/c/3cefd2cdf5a9e439e5110a5de3483000a0d0fd68
  
 psrc/main/java/io/github/retrooper/packetevents/wrapper/handshaking/client/WrapperHandshakingClientHandshake.java,7/4/74a42186bb7531b674471ab5b5480015be656efb
-<
-build.gradle,f/0/f07866736216be0ee2aba49e392191aeae700a35
 ™
 isrc/main/java/io/github/retrooper/packetevents/wrapper/login/client/WrapperLoginClientPluginResponse.java,6/3/639908176301c9ec61c0f6e6869cfb7f637a88be
-|
-Lsrc/main/java/io/github/retrooper/packetevents/utils/player/PlayerUtils.java,d/d/dde51ac1f7b223a69b19dc28d0c9fef64c5affa1
 •
 esrc/main/java/io/github/retrooper/packetevents/wrapper/login/server/WrapperLoginServerDisconnect.java,e/b/eb5958e81fb2c7531f0439a950787d4e3c17a833
 œ
 lsrc/main/java/io/github/retrooper/packetevents/wrapper/login/server/WrapperLoginServerEncryptionRequest.java,2/d/2d84934006c6eb3ab6aa6d86e132c57308d41e43
-—
-gsrc/main/java/io/github/retrooper/packetevents/wrapper/login/server/WrapperLoginServerLoginSuccess.java,0/d/0d74d6acf01aec6ff377eb559d1bcd1d1bbd0037
 ˜
 hsrc/main/java/io/github/retrooper/packetevents/wrapper/login/server/WrapperLoginServerPluginRequest.java,a/8/a8802ae4d168b64831e8b65ee08e65eb960c0f61
 ™
@@ -101,3 +95,5 @@ p
 @src/main/java/io/github/retrooper/packetevents/PacketEvents.java,1/1/114b4267d3b543f22e251a6f6245028e1f571479
 |
 Lsrc/main/java/io/github/retrooper/packetevents/utils/server/ServerUtils.java,6/1/617a176e8df9fae0d240016ce901a60ed6869d25
+”
+dsrc/main/java/io/github/retrooper/packetevents/wrapper/game/client/WrapperGameClientChatMessage.java,8/6/86ab132a0350cfd517f5ed1ca54cd9e8fd208198
