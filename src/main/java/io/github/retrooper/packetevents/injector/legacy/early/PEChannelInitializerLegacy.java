@@ -18,6 +18,7 @@
 
 package io.github.retrooper.packetevents.injector.legacy.early;
 
+import io.github.retrooper.packetevents.PacketEvents;
 import io.github.retrooper.packetevents.injector.legacy.PacketDecoderLegacy;
 import io.github.retrooper.packetevents.utils.reflection.Reflection;
 import net.minecraft.util.io.netty.channel.Channel;
@@ -43,10 +44,14 @@ public class PEChannelInitializerLegacy extends ChannelInitializer<Channel> {
         return oldChannelInitializer;
     }
 
+    public static void postInitChannel(Channel channel) {
+        PacketDecoderLegacy packetDecoderLegacy = new PacketDecoderLegacy();
+        channel.pipeline().replace("decoder", PacketEvents.get().decoderName, packetDecoderLegacy);
+    }
+
     @Override
     protected void initChannel(Channel channel) throws Exception {
         initChannelMethod.invoke(oldChannelInitializer, channel);
-        PacketDecoderLegacy packetDecoderLegacy = new PacketDecoderLegacy((ByteToMessageDecoder) channel.pipeline().get("decoder"));
-        channel.pipeline().replace("decoder", "decoder", packetDecoderLegacy);
+        postInitChannel(channel);
     }
 }

@@ -20,8 +20,8 @@ package io.github.retrooper.packetevents.wrapper;
 
 import io.github.retrooper.packetevents.utils.netty.bytebuf.ByteBufAbstract;
 import io.github.retrooper.packetevents.utils.player.ClientVersion;
-import org.apache.commons.io.Charsets;
 
+import java.nio.charset.StandardCharsets;
 import java.util.UUID;
 
 
@@ -74,7 +74,16 @@ public class PacketWrapper {
             throw new RuntimeException("The received encoded string buffer length is longer than maximum allowed (" + j + " > " + (maxLen * 4) + ")");
         if (j < 0)
             throw new RuntimeException("The received encoded string buffer length is less than zero! Weird string!");
-        String s = new String(byteBuf.readBytes(j).array(), Charsets.UTF_8);
+        ByteBufAbstract bb = byteBuf.readBytes(j);
+        byte[] array;
+        if (bb.hasArray()) {
+            array = bb.array();
+        }
+        else {
+            array = new byte[bb.readableBytes()];
+            bb.getBytes(bb.readerIndex(), array);
+        }
+        String s = new String(array, StandardCharsets.UTF_8);
         if (s.length() > maxLen)
             throw new RuntimeException("The received string length is longer than maximum allowed (" + j + " > " + maxLen + ")");
         return s;

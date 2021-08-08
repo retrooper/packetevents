@@ -132,8 +132,7 @@ public class EarlyChannelInjectorLegacy implements EarlyInjector {
                     continue;
                 }
 
-                PacketDecoderLegacy packetDecoderLegacy = new PacketDecoderLegacy((ByteToMessageDecoder) channel.pipeline().get("decoder"));
-                channel.pipeline().replace("decoder", "decoder", packetDecoderLegacy);
+                PEChannelInitializerLegacy.postInitChannel(channel);
             }
         }
     }
@@ -258,7 +257,7 @@ public class EarlyChannelInjectorLegacy implements EarlyInjector {
         Object channel = PacketEvents.get().getPlayerUtils().getChannel(player);
         if (channel != null) {
             try {
-                ((Channel)channel).pipeline().replace("decoder", "decoder", getDecoder(channel).minecraftDecoder);
+                ((Channel)channel).pipeline().remove(PacketEvents.get().decoderName);
             } catch (Exception ignored) {
 
             }
@@ -295,7 +294,7 @@ public class EarlyChannelInjectorLegacy implements EarlyInjector {
 
     private PacketDecoderLegacy getDecoder(Object rawChannel) {
         Channel channel = (Channel) rawChannel;
-        ChannelHandler decoder = channel.pipeline().get("decoder");
+        ChannelHandler decoder = channel.pipeline().get(PacketEvents.get().decoderName);
         if (decoder instanceof PacketDecoderLegacy) {
             return (PacketDecoderLegacy) decoder;
         } else {

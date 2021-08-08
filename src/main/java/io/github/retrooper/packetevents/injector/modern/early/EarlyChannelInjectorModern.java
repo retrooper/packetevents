@@ -135,8 +135,7 @@ public class EarlyChannelInjectorModern implements EarlyInjector {
                     continue;
                 }
 
-                PacketDecoderModern packetDecoderModern = new PacketDecoderModern((ByteToMessageDecoder) channel.pipeline().get("decoder"));
-                channel.pipeline().replace("decoder", "decoder", packetDecoderModern);
+                PEChannelInitializerModern.postInitChannel(channel);
             }
         }
     }
@@ -267,7 +266,7 @@ public class EarlyChannelInjectorModern implements EarlyInjector {
         if (channel != null) {
             Channel chnl = (Channel) channel;
             try {
-                chnl.pipeline().replace("decoder", "decoder", getDecoder(channel).minecraftDecoder);
+                chnl.pipeline().remove(PacketEvents.get().decoderName);
             } catch (Exception ignored) {
             }
         }
@@ -303,7 +302,7 @@ public class EarlyChannelInjectorModern implements EarlyInjector {
 
     private PacketDecoderModern getDecoder(Object rawChannel) {
         Channel channel = (Channel) rawChannel;
-        ChannelHandler decoder = channel.pipeline().get("decoder");
+        ChannelHandler decoder = channel.pipeline().get(PacketEvents.get().decoderName);
         if (decoder instanceof PacketDecoderModern) {
             return (PacketDecoderModern) decoder;
         }

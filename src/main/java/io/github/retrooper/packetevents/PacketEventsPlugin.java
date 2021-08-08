@@ -31,6 +31,7 @@ import io.github.retrooper.packetevents.wrapper.PacketWrapper;
 import io.github.retrooper.packetevents.wrapper.game.client.WrapperGameClientUpdateSign;
 import io.github.retrooper.packetevents.wrapper.handshaking.client.WrapperHandshakingClientHandshake;
 import io.github.retrooper.packetevents.wrapper.login.client.WrapperLoginClientLoginStart;
+import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
 
 public class PacketEventsPlugin extends JavaPlugin {
@@ -58,6 +59,7 @@ public class PacketEventsPlugin extends JavaPlugin {
                     PacketEvents.get().getInjector().changePacketState(event.getChannel(), PacketState.HANDSHAKING);
                     WrapperHandshakingClientHandshake handshake = new WrapperHandshakingClientHandshake(byteBuf);
                     PacketEvents.get().getPlayerUtils().clientVersions.put(event.getSocketAddress(), handshake.getClientVersion());
+                    System.err.println("PROTOCOL VERSION: " + handshake.getClientVersion());
                     PacketEvents.get().getInjector().changePacketState(event.getChannel(), handshake.getNextState());
                 }
                 else if (event.getState() == PacketState.LOGIN) {

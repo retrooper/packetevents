@@ -60,6 +60,7 @@ public final class PacketEvents implements Listener, EventManager {
     private final GlobalChannelInjector injector = new GlobalChannelInjector();
     private final AtomicBoolean injectorReady = new AtomicBoolean();
     public String handlerName;
+    public String decoderName;
     private PacketEventsSettings settings = new PacketEventsSettings();
     private ByteBufUtil byteBufUtil;
     private UpdateChecker updateChecker;
@@ -104,6 +105,7 @@ public final class PacketEvents implements Listener, EventManager {
             NMSUtils.version = version;
             EntityFinderUtils.version = version;
             handlerName = "pe-" + plugin.getName();
+            decoderName = handlerName + "-decoder";
             try {
                 NMSUtils.load();
 

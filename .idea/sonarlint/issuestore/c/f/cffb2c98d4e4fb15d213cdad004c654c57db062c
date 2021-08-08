@@ -1,15 +1,0 @@
-
-s
-java:S3008"XRename this field "DECODE_METHOD" to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(Ù‘ÇÜûÿÿÿÿ
-r
-java:S3077"WUse a thread-safe type; adding "volatile" is not enough to make this field thread-safe.(ö×–õÿÿÿÿÿ
-K
-java:S2696"6Make the enclosing method "static" or remove this set.(ÖØ¬o
-B
-java:S3011",This accessibility update should be removed.(Üğş«
-m
-java:S1104"RMake player a static final constant or non-public and provide accessors if needed.(ö×–õÿÿÿÿÿ
-m
-java:S1104"WMake packetState a static final constant or non-public and provide accessors if needed.(ë¶­
-a
-java:S2259%"KA "NullPointerException" could be thrown; "DECODE_METHOD" is nullable here.(äúç¶

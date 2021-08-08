@@ -175,4 +175,6 @@ public interface ByteBufAbstract {
      ByteBufAbstract readBytes(int i);
 
      void readBytes(byte[] bytes);
+
+    ByteBufAbstract getBytes(int readerIndex, byte[] bytes);
 }

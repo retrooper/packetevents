@@ -67,6 +67,4 @@ public final class ByteBufUtil_8 implements ByteBufUtil {
         }
         bb.setBytes(0, bytes);
     }
-
-
 }

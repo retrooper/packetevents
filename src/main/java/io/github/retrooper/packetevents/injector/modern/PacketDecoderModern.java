@@ -13,26 +13,8 @@ import java.lang.reflect.Method;
 import java.util.List;
 
 public class PacketDecoderModern extends ByteToMessageDecoder {
-    private static Method DECODE_METHOD;
     public volatile Player player;
-    public final ByteToMessageDecoder minecraftDecoder;
     public PacketState packetState;
-
-    public PacketDecoderModern(ByteToMessageDecoder minecraftDecoder) {
-        this.minecraftDecoder = minecraftDecoder;
-        this.updateBuffer();
-    }
-
-    public void updateBuffer(){
-        if (DECODE_METHOD == null) {
-            try {
-                DECODE_METHOD = ByteToMessageDecoder.class.getDeclaredMethod("decode", ChannelHandlerContext.class, ByteBuf.class, List.class);
-                DECODE_METHOD.setAccessible(true);
-            } catch (NoSuchMethodException e) {
-                e.printStackTrace();
-            }
-        }
-    }
 
     @Override
     protected void decode(ChannelHandlerContext channelHandlerContext, ByteBuf byteBuf, List<Object> list) {
@@ -43,14 +25,6 @@ public class PacketDecoderModern extends ByteToMessageDecoder {
 
         if (packetDecodeEvent.isCancelled()) {
             byteBuf.skipBytes(byteBuf.readableBytes());
-            return;
         }
-
-        try {
-            DECODE_METHOD.invoke(minecraftDecoder, channelHandlerContext, byteBuf, list);
-        }catch (Exception exception){
-            exception.printStackTrace();
-        }
-
     }
 }

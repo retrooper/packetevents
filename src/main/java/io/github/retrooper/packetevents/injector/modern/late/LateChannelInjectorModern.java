@@ -21,6 +21,7 @@ package io.github.retrooper.packetevents.injector.modern.late;
 import io.github.retrooper.packetevents.PacketEvents;
 import io.github.retrooper.packetevents.injector.LateInjector;
 import io.github.retrooper.packetevents.injector.modern.PacketDecoderModern;
+import io.github.retrooper.packetevents.injector.modern.early.PEChannelInitializerModern;
 import io.github.retrooper.packetevents.packettype.PacketState;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandler;
@@ -41,13 +42,12 @@ public class LateChannelInjectorModern implements LateInjector {
     @Override
     public void injectPlayer(Player player) {
         Channel channel = (Channel) PacketEvents.get().getPlayerUtils().getChannel(player);
-        PacketDecoderModern packetDecoderModern = new PacketDecoderModern((ByteToMessageDecoder) channel.pipeline().get("decoder"));
-        channel.pipeline().replace("decoder", "decoder",packetDecoderModern);
+        PEChannelInitializerModern.postInitChannel(channel);
     }
 
     private PacketDecoderModern getDecoder(Object rawChannel) {
         Channel channel = (Channel) rawChannel;
-        ChannelHandler decoder = channel.pipeline().get("decoder");
+        ChannelHandler decoder = channel.pipeline().get(PacketEvents.get().decoderName);
         if (decoder instanceof PacketDecoderModern) {
             return (PacketDecoderModern) decoder;
         }
@@ -61,11 +61,9 @@ public class LateChannelInjectorModern implements LateInjector {
     public void ejectPlayer(Player player) {
         Object channel = PacketEvents.get().getPlayerUtils().getChannel(player);
         if (channel != null) {
-            Channel chnl = (Channel) channel;
             try {
-                chnl.pipeline().replace("decoder", "decoder", getDecoder(channel).minecraftDecoder);
-            } catch (Exception ex) {
-
+                ((Channel)channel).pipeline().remove(PacketEvents.get().decoderName);
+            } catch (Exception ignored) {
             }
         }
     }
