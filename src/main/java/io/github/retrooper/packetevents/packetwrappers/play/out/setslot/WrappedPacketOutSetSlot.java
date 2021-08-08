@@ -27,16 +27,18 @@ import io.github.retrooper.packetevents.utils.server.ServerVersion;
 import org.bukkit.inventory.ItemStack;
 
 import java.lang.reflect.Constructor;
+import java.util.Optional;
 
 /**
  * @author AoElite
  * @since 1.8
  */
 public class WrappedPacketOutSetSlot extends WrappedPacket implements SendableWrapper {
-    private static boolean v_1_17;
+    private static boolean v_1_17, v_1_17_1;
     private static Constructor<?> packetConstructor;
 
     private int windowID;
+    private int stateID;
     private int slot;
     private ItemStack itemStack;
 
@@ -46,6 +48,14 @@ public class WrappedPacketOutSetSlot extends WrappedPacket implements SendableWr
 
     public WrappedPacketOutSetSlot(int windowID, int slot, ItemStack itemstack) {
         this.windowID = windowID;
+        this.stateID = 0;
+        this.slot = slot;
+        this.itemStack = itemstack;
+    }
+
+    public WrappedPacketOutSetSlot(int windowID, int stateID, int slot, ItemStack itemstack) {
+        this.windowID = windowID;
+        this.stateID = stateID;
         this.slot = slot;
         this.itemStack = itemstack;
     }
@@ -54,8 +64,14 @@ public class WrappedPacketOutSetSlot extends WrappedPacket implements SendableWr
     @Override
     protected void load() {
         v_1_17 = version.isNewerThanOrEquals(ServerVersion.v_1_17);
+        v_1_17_1 = version.isNewerThanOrEquals(ServerVersion.v_1_17_1);
         try {
-            packetConstructor = PacketTypeClasses.Play.Server.SET_SLOT.getConstructor(int.class, int.class, NMSUtils.nmsItemStackClass);
+            if (v_1_17_1) {
+                packetConstructor = PacketTypeClasses.Play.Server.SET_SLOT.getConstructor(int.class, int.class, int.class, NMSUtils.nmsItemStackClass);
+
+            } else {
+                packetConstructor = PacketTypeClasses.Play.Server.SET_SLOT.getConstructor(int.class, int.class, NMSUtils.nmsItemStackClass);
+            }
         } catch (NoSuchMethodException e) {
             e.printStackTrace();
         }
@@ -64,7 +80,8 @@ public class WrappedPacketOutSetSlot extends WrappedPacket implements SendableWr
 
     public int getWindowId() {
         if (packet != null) {
-            return readInt(v_1_17 ? 2 : 0);
+            int index = v_1_17_1 ? 3 : v_1_17 ? 2 : 0;
+            return readInt(index);
         } else {
             return windowID;
         }
@@ -72,15 +89,39 @@ public class WrappedPacketOutSetSlot extends WrappedPacket implements SendableWr
 
     public void setWindowId(int windowID) {
         if (packet != null) {
-            writeInt(v_1_17 ? 2 : 0, windowID);
+            int index = v_1_17_1 ? 3 : v_1_17 ? 2 : 0;
+            writeInt(index, windowID);
         } else {
             this.windowID = windowID;
         }
     }
 
+    public Optional<Integer> getStateId() {
+        if (v_1_17_1) {
+            if (packet != null) {
+                return Optional.of(readInt(4));
+            } else {
+                return Optional.of(stateID);
+            }
+        } else {
+            return Optional.empty();
+        }
+    }
+
+    public void setStateId(int stateID) {
+        if (v_1_17_1) {
+            if (packet != null) {
+                writeInt(4, stateID);
+            } else {
+                this.stateID = stateID;
+            }
+        }
+    }
+
     public int getSlot() {
         if (packet != null) {
-            return readInt(v_1_17 ? 3: 1);
+            int index = v_1_17_1 ? 4 : v_1_17 ? 3 : 1;
+            return readInt(index);
         } else {
             return slot;
         }
@@ -88,7 +129,8 @@ public class WrappedPacketOutSetSlot extends WrappedPacket implements SendableWr
 
     public void setSlot(int slot) {
         if (packet != null) {
-            writeInt(v_1_17 ? 3: 1, slot);
+            int index = v_1_17_1 ? 4 : v_1_17 ? 3 : 1;
+            writeInt(index, slot);
         } else {
             this.slot = slot;
         }
@@ -112,6 +154,11 @@ public class WrappedPacketOutSetSlot extends WrappedPacket implements SendableWr
 
     @Override
     public Object asNMSPacket() throws Exception {
-        return packetConstructor.newInstance(getWindowId(), getSlot(), NMSUtils.toNMSItemStack(getItemStack()));
+        if (v_1_17_1) {
+            return packetConstructor.newInstance(getWindowId(), getStateId(), getSlot(), NMSUtils.toNMSItemStack(getItemStack()));
+        }
+        else {
+            return packetConstructor.newInstance(getWindowId(), getSlot(), NMSUtils.toNMSItemStack(getItemStack()));
+        }
     }
 }
