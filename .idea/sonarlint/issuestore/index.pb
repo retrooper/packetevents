@@ -53,8 +53,6 @@ y
 Isrc/main/java/io/github/retrooper/packetevents/utils/server/SystemOS.java,5/b/5b62444fd15a31f8e535c676466915489abe4b44
 ù
 msrc/main/java/io/github/retrooper/packetevents/wrapper/login/client/WrapperLoginClientEncryptionResponse.java,3/c/3cefd2cdf5a9e439e5110a5de3483000a0d0fd68
-†
-psrc/main/java/io/github/retrooper/packetevents/wrapper/handshaking/client/WrapperHandshakingClientHandshake.java,7/4/74a42186bb7531b674471ab5b5480015be656efb
 ô
 isrc/main/java/io/github/retrooper/packetevents/wrapper/login/client/WrapperLoginClientPluginResponse.java,6/3/639908176301c9ec61c0f6e6869cfb7f637a88be
 ï

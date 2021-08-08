@@ -23,6 +23,7 @@ import io.github.retrooper.packetevents.injector.modern.PacketDecoderModern;
 import io.github.retrooper.packetevents.utils.reflection.Reflection;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelInitializer;
+import io.netty.handler.codec.ByteToMessageDecoder;
 
 import java.lang.reflect.Method;
 
@@ -36,7 +37,7 @@ public class PEChannelInitializerModern extends ChannelInitializer<Channel> {
     }
 
     public static void postInitChannel(Channel channel) {
-        PacketDecoderModern packetDecoderModern = new PacketDecoderModern();
+        PacketDecoderModern packetDecoderModern = new PacketDecoderModern(channel);
         channel.pipeline().addBefore("decoder", PacketEvents.get().decoderName, packetDecoderModern);
     }
 

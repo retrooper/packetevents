@@ -34,7 +34,7 @@ public class PacketDecodeEvent extends PacketEvent implements PlayerEvent, Cance
     public PacketDecodeEvent(Object channel, Player player, Object rawByteBuf) {
         this.channel = channel;
         this.player = player;
-        this.byteBuf = PacketEvents.get().getServerUtils().generateByteBufAbstract(rawByteBuf).duplicate();
+        this.byteBuf = PacketEvents.get().getServerUtils().generateByteBufAbstract(rawByteBuf);
         PacketWrapper packetWrapper = new PacketWrapper(this.byteBuf);
         this.packetIDNum = packetWrapper.readVarInt();
     }

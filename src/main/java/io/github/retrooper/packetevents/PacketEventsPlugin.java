@@ -54,12 +54,14 @@ public class PacketEventsPlugin extends JavaPlugin {
             @Override
             public void onPacketDecode(PacketDecodeEvent event) {
                 ByteBufAbstract byteBuf = event.getByteBuf();
-                PacketState packetState = event.getState();
-                if (event.getPlayer() == null && packetState == null) {
+                if (event.getPlayer() == null && event.getState() == null) {
                     PacketEvents.get().getInjector().changePacketState(event.getChannel(), PacketState.HANDSHAKING);
                     WrapperHandshakingClientHandshake handshake = new WrapperHandshakingClientHandshake(byteBuf);
                     PacketEvents.get().getPlayerUtils().clientVersions.put(event.getSocketAddress(), handshake.getClientVersion());
                     System.err.println("PROTOCOL VERSION: " + handshake.getClientVersion());
+                    System.err.println("SERVER ADDRESS: " + handshake.getServerAddress());
+                    System.err.println("PORT: " + handshake.getServerPort());
+                    System.err.println("NEXT STATE: " + handshake.getNextState());
                     PacketEvents.get().getInjector().changePacketState(event.getChannel(), handshake.getNextState());
                 }
                 else if (event.getState() == PacketState.LOGIN) {
@@ -71,6 +73,7 @@ public class PacketEventsPlugin extends JavaPlugin {
                     }
                 }
                 else if (event.getState() == PacketState.PLAY) {
+
                 }
             }
         });
