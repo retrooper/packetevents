@@ -36,7 +36,7 @@ public class PacketDecoderModern extends ByteToMessageDecoder {
     }
 
     @Override
-    protected void decode(ChannelHandlerContext channelHandlerContext, ByteBuf byteBuf, List<Object> list) {
+    protected void decode(ChannelHandlerContext channelHandlerContext, ByteBuf byteBuf, List<Object> list) throws Exception {
         ByteBuf buf = byteBuf.copy();
         PacketDecodeEvent packetDecodeEvent = new PacketDecodeEvent(channelHandlerContext.channel(), player, buf);
         PacketEvents.get().getEventManager().callEvent(packetDecodeEvent);
@@ -49,8 +49,17 @@ public class PacketDecoderModern extends ByteToMessageDecoder {
         try {
             DECODE_METHOD.invoke(channel.pipeline().get("decoder"), channelHandlerContext, byteBuf, list);
         } catch (IllegalAccessException | InvocationTargetException e) {
-            e.printStackTrace();
+            if (e.getCause() instanceof Exception) {
+                throw (Exception) e.getCause();
+            } else if (e.getCause() instanceof Error) {
+                throw (Error) e.getCause();
+            }
         }
         //TODO COMPLETE PACKETDECODERLEGACY
+    }
+
+    @Override
+    public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
+        super.exceptionCaught(ctx, cause);
     }
 }

@@ -72,8 +72,8 @@ public class PacketEventsPlugin extends JavaPlugin {
                         PacketEvents.get().getInjector().changePacketState(event.getChannel(), PacketState.PLAY);
                     }
                 }
-                else if (event.getState() == PacketState.PLAY) {
-
+                else if (event.getState() == PacketState.PLAY && event.getPlayer() != null) {
+                    event.getPlayer().sendMessage("PACKET ID: "+ event.getPacketID());
                 }
             }
         });

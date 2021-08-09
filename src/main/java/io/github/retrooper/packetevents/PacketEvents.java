@@ -105,7 +105,7 @@ public final class PacketEvents implements Listener, EventManager {
             NMSUtils.version = version;
             EntityFinderUtils.version = version;
             handlerName = "pe-" + plugin.getName();
-            decoderName = handlerName + "-decoder";
+            decoderName = "pe-decoder-" + plugin.getName();
             try {
                 NMSUtils.load();
 

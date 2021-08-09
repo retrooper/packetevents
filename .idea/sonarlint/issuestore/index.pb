@@ -85,8 +85,6 @@ dsrc/main/java/io/github/retrooper/packetevents/injector/legacy/early/EarlyChann
 dsrc/main/java/io/github/retrooper/packetevents/injector/legacy/early/PEChannelInitializerLegacy.java,6/c/6c77c57e80ba28c82df10c148b298e3d58a6239a
 •
 esrc/main/java/io/github/retrooper/packetevents/wrapper/login/client/WrapperLoginClientLoginStart.java,0/6/06dcd2a49ddcc89d3f017459864c76300aa34821
-v
-Fsrc/main/java/io/github/retrooper/packetevents/PacketEventsPlugin.java,9/b/9b7511d2fe8346c29eed2430db9d8609b1119118
 ’
 bsrc/main/java/io/github/retrooper/packetevents/injector/modern/late/LateChannelInjectorModern.java,2/1/21a73ffb8d1aa4c92817b2bb7fbbde70dcec10c6
 y
@@ -95,9 +93,5 @@ Isrc/main/java/io/github/retrooper/packetevents/wrapper/PacketWrapper.java,f/9/
 psrc/main/java/io/github/retrooper/packetevents/wrapper/handshaking/client/WrapperHandshakingClientHandshake.java,7/4/74a42186bb7531b674471ab5b5480015be656efb
 v
 Fsrc/main/java/io/github/retrooper/packetevents/utils/nms/NMSUtils.java,3/7/37800fc8183d6581bc9d95bb27577459e9ecbe4f
-”
-dsrc/main/java/io/github/retrooper/packetevents/injector/modern/early/EarlyChannelInjectorModern.java,b/0/b0d3e8a4c7836cf1e41f52db19df8823b57f48a7
 <
 build.gradle,f/0/f07866736216be0ee2aba49e392191aeae700a35
-”
-dsrc/main/java/io/github/retrooper/packetevents/injector/modern/early/PEChannelInitializerModern.java,e/2/e24456c63439e88ba5665eba6601aec9199a5582
