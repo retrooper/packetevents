@@ -7,9 +7,9 @@ import io.netty.buffer.ByteBuf;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.ByteToMessageDecoder;
-import io.netty.util.AttributeKey;
 import org.bukkit.entity.Player;
 
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.List;
 
@@ -20,7 +20,7 @@ public class PacketDecoderModern extends ByteToMessageDecoder {
     public PacketState packetState;
 
     private void load() {
-        if (DECODE_METHOD== null) {
+        if (DECODE_METHOD == null) {
             try {
                 DECODE_METHOD = ByteToMessageDecoder.class.getDeclaredMethod("decode", ChannelHandlerContext.class, ByteBuf.class, List.class);
                 DECODE_METHOD.setAccessible(true);
@@ -38,7 +38,6 @@ public class PacketDecoderModern extends ByteToMessageDecoder {
     @Override
     protected void decode(ChannelHandlerContext channelHandlerContext, ByteBuf byteBuf, List<Object> list) {
         ByteBuf buf = byteBuf.copy();
-
         PacketDecodeEvent packetDecodeEvent = new PacketDecodeEvent(channelHandlerContext.channel(), player, buf);
         PacketEvents.get().getEventManager().callEvent(packetDecodeEvent);
 
@@ -48,9 +47,9 @@ public class PacketDecoderModern extends ByteToMessageDecoder {
         }
 
         try {
-            DECODE_METHOD.invoke((ByteToMessageDecoder) channel.pipeline().get("decoder"), channelHandlerContext, byteBuf, list);
-        } catch (Exception ex) {
-            ex.printStackTrace();
+            DECODE_METHOD.invoke(channel.pipeline().get("decoder"), channelHandlerContext, byteBuf, list);
+        } catch (IllegalAccessException | InvocationTargetException e) {
+            e.printStackTrace();
         }
         //TODO COMPLETE PACKETDECODERLEGACY
     }
