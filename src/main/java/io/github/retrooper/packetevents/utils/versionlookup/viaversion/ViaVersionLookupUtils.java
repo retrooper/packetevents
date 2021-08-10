@@ -36,7 +36,7 @@ public class ViaVersionLookupUtils {
             try {
                 Class.forName("com.viaversion.viaversion.api.Via");
                 viaVersionAccessor = new ViaVersionAccessorImpl();
-            } catch (ClassNotFoundException e) {
+            } catch (Exception e) {
                 viaVersionAccessor = new ViaVersionAccessorImplLegacy();
             }
         }
