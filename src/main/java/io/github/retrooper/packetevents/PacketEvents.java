@@ -25,7 +25,6 @@ import io.github.retrooper.packetevents.event.manager.PEEventManager;
 import io.github.retrooper.packetevents.exceptions.PacketEventsLoadFailureException;
 import io.github.retrooper.packetevents.injector.GlobalChannelInjector;
 import io.github.retrooper.packetevents.packettype.PacketType;
-import io.github.retrooper.packetevents.utils.reflection.ReflectionObject;
 import io.github.retrooper.packetevents.processor.BukkitEventProcessorInternal;
 import io.github.retrooper.packetevents.settings.PacketEventsSettings;
 import io.github.retrooper.packetevents.updatechecker.UpdateChecker;
@@ -36,18 +35,17 @@ import io.github.retrooper.packetevents.utils.netty.bytebuf.ByteBufUtil_7;
 import io.github.retrooper.packetevents.utils.netty.bytebuf.ByteBufUtil_8;
 import io.github.retrooper.packetevents.utils.nms.NMSUtils;
 import io.github.retrooper.packetevents.utils.player.PlayerUtils;
+import io.github.retrooper.packetevents.utils.reflection.ReflectionObject;
 import io.github.retrooper.packetevents.utils.server.ServerUtils;
 import io.github.retrooper.packetevents.utils.server.ServerVersion;
 import io.github.retrooper.packetevents.utils.version.PEVersion;
+import io.github.retrooper.packetevents.utils.versionlookup.viaversion.ViaVersionLookupUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.ServicePriority;
 import org.bukkit.plugin.java.JavaPlugin;
-
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 public final class PacketEvents implements Listener, EventManager {
     private static PacketEvents instance;
@@ -58,7 +56,6 @@ public final class PacketEvents implements Listener, EventManager {
     private final ServerUtils serverUtils = new ServerUtils();
     private final BukkitEventProcessorInternal bukkitEventProcessorInternal = new BukkitEventProcessorInternal();
     private final GlobalChannelInjector injector = new GlobalChannelInjector();
-    private final AtomicBoolean injectorReady = new AtomicBoolean();
     public String handlerName;
     public String decoderName;
     private PacketEventsSettings settings = new PacketEventsSettings();
@@ -119,33 +116,17 @@ public final class PacketEvents implements Listener, EventManager {
 
             byteBufUtil = NMSUtils.legacyNettyImportMode ? new ByteBufUtil_7() : new ByteBufUtil_8();
             updateChecker = new UpdateChecker();
-            if (!injectorReady.get()) {
-                //TODO DEBUG
-                System.err.println("PREPARING OUR HANDLER");
-                injector.load();
-                lateBind = !injector.isBound();
-                //If late-bind is enabled, we will inject a bit later.
-                if (!lateBind) {
-                    injector.inject();
-                }
-                injectorReady.set(true);
+
+            injector.load();
+            lateBind = !injector.isBound() || ViaVersionLookupUtils.isAvailable();
+            //If late-bind is enabled or ViaVersion is present, we will inject a bit later.
+            if (!lateBind) {
+                injector.inject();
             }
 
             loaded = true;
             loading = false;
         }
-    }
-
-    public void loadAsyncNewThread() {
-        new Thread(this::load).start();
-    }
-
-    public void loadAsync(ExecutorService executorService) {
-        executorService.execute(this::load);
-    }
-
-    public void loadSettings(PacketEventsSettings settings) {
-        this.settings = settings;
     }
 
     public void init() {
@@ -166,12 +147,6 @@ public final class PacketEvents implements Listener, EventManager {
 
             if (settings.isbStatsEnabled()) {
                 Metrics metrics = new Metrics((JavaPlugin) getPlugin(), 11327);
-            }
-
-            //We must wait for the injector to initialize.
-
-            //Wait for the injector to be ready.
-            while (!injectorReady.get()) {
             }
 
             //TODO Load other ones

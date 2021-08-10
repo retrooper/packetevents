@@ -20,7 +20,7 @@ package io.github.retrooper.packetevents.packettype;
 
 import io.github.retrooper.packetevents.packettype.protocols.PacketType_1_7_10;
 import io.github.retrooper.packetevents.packettype.protocols.PacketType_1_8;
-import io.github.retrooper.packetevents.utils.server.ServerVersion;
+import io.github.retrooper.packetevents.utils.player.ClientVersion;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.IdentityHashMap;
@@ -57,8 +57,7 @@ public final class PacketType {
             RESOURCE_PACK_STATUS;
 
             public int packetID = -1;
-
-            private static final Map<Integer, Enum<?>> PACKET_ID_CACHE = new IdentityHashMap<>();
+            private static final Map<ClientVersion, Map<Integer, Enum<?>>> PACKET_ID_CACHE = new IdentityHashMap<>();
 
             Client() {
             }
@@ -68,23 +67,29 @@ public final class PacketType {
             }
 
             @Nullable
-            public static Client getById(int packetID) {
-                return (Client) PACKET_ID_CACHE.get(packetID);
+            public static Client getById(ClientVersion version, int packetID) {
+                Map<Integer, Enum<?>> innerMap = PACKET_ID_CACHE.get(version);
+                if (innerMap != null) {
+                    Object client = innerMap.get(packetID);
+                    if (client instanceof Client) {
+                        return (Client) client;
+                    }
+                }
+                return null;
             }
 
-            private static void loadPacketIDs(Enum<?>[] enumConstants) {
+            private static void loadPacketIDs(ClientVersion version, Enum<?>[] enumConstants) {
+                Map<Integer, Enum<?>> innerMap = new IdentityHashMap<>();
                 for (int i = 0; i < enumConstants.length; i++) {
                     Client.valueOf(enumConstants[i].name()).packetID = i;
-                    PACKET_ID_CACHE.put(i, Client.valueOf(enumConstants[i].name()));
+                    innerMap.put(i, Client.valueOf(enumConstants[i].name()));
                 }
+                PACKET_ID_CACHE.put(version, innerMap);
             }
 
-            public static void load(ServerVersion version) {
-                if (version.equals(ServerVersion.v_1_7_10)) {
-                    loadPacketIDs(PacketType_1_7_10.Play.Client.values());
-                } else if (version.isNewerThanOrEquals(ServerVersion.v_1_8) && version.isOlderThanOrEquals(ServerVersion.v_1_8_8)) {
-                    loadPacketIDs(PacketType_1_8.Play.Client.values());
-                }
+            public static void load() {
+                loadPacketIDs(ClientVersion.v_1_7_10, PacketType_1_7_10.Play.Client.values());
+                loadPacketIDs(ClientVersion.v_1_8, PacketType_1_8.Play.Client.values());
             }
         }
     }

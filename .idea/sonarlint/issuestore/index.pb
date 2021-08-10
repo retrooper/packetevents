@@ -23,16 +23,12 @@ Psrc/main/java/io/github/retrooper/packetevents/event/eventtypes/PlayerEvent.jav
 Rsrc/main/java/io/github/retrooper/packetevents/event/eventtypes/PostTaskEvent.java,e/d/ed43264986698d6d8d33445381753cb81f8aa158
 }
 Msrc/main/java/io/github/retrooper/packetevents/utils/nms/PlayerAPIModern.java,6/d/6de3a5896e1db47490c816737ce1222a17ab2022
-|
-Lsrc/main/java/io/github/retrooper/packetevents/injector/ChannelInjector.java,0/2/0243de7929368b4b2d34f497bc91eaa9b25d4e95
 ~
 Nsrc/main/java/io/github/retrooper/packetevents/event/manager/EventManager.java,4/6/46481e66f02c4bc985cd142d2190beb1d942544a
 Å
 Qsrc/main/java/io/github/retrooper/packetevents/settings/PacketEventsSettings.java,1/7/1787fa8306a7d6b1a343fc93d88d02a6781199c9
 z
 Jsrc/main/java/io/github/retrooper/packetevents/packettype/PacketState.java,f/0/f093fcc93569f9961d5c45446f9058e7e13837d0
-y
-Isrc/main/java/io/github/retrooper/packetevents/packettype/PacketType.java,9/1/9175219047f8e99b0e13e09dbb412ca4ffdd64fb
 ä
 Zsrc/main/java/io/github/retrooper/packetevents/packettype/protocols/PacketType_1_7_10.java,9/4/946dc82f8f4ffd30b7e2b05ebe4bb9bc18c31c1e
 á

@@ -1,7 +1,0 @@
-
-O
-java:S1118":Add a private constructor to hide the implicit public one.(ÿÂ«
-9
-java:S3066;"#Lower the visibility of this field.(æİìÍ
-j
-java:S1104;"TMake packetID a static final constant or non-public and provide accessors if needed.(æİìÍ

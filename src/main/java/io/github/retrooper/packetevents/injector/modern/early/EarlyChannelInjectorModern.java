@@ -74,6 +74,7 @@ public class EarlyChannelInjectorModern implements EarlyInjector {
     public void inject() {
         try {
             if (PaperChannelInjector.PAPER_INJECTION_METHOD) {
+                System.err.println("EYOOOO");
                 PaperChannelInjector.setPaperChannelInitializeListener();
                 return;
             }
@@ -134,6 +135,7 @@ public class EarlyChannelInjectorModern implements EarlyInjector {
                     continue;
                 }
 
+                System.err.println("Oh...");
                 PEChannelInitializerModern.postInitChannel(channel);
             }
         }
@@ -191,7 +193,7 @@ public class EarlyChannelInjectorModern implements EarlyInjector {
         if (PaperChannelInjector.PAPER_INJECTION_METHOD) {
             try {
                 PaperChannelInjector.removePaperChannelInitializeListener();
-            } catch (ReflectiveOperationException e) {
+            } catch (Exception e) {
                 e.printStackTrace();
             }
         }

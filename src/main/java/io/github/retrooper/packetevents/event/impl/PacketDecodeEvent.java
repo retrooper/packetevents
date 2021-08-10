@@ -44,7 +44,7 @@ public class PacketDecodeEvent extends PacketEvent implements PlayerEvent, Cance
     }
 
     public PacketType.Play.Client getPacketType() {
-        return PacketType.Play.Client.getById(packetIDNum);
+        return PacketType.Play.Client.getById(getClientVersion(), packetIDNum);
     }
 
     public PacketState getState() {
