@@ -21,11 +21,11 @@ package io.github.retrooper.packetevents.injector.modern.late;
 import io.github.retrooper.packetevents.PacketEvents;
 import io.github.retrooper.packetevents.injector.LateInjector;
 import io.github.retrooper.packetevents.injector.modern.PacketDecoderModern;
+import io.github.retrooper.packetevents.injector.modern.PacketPostDecoderModern;
 import io.github.retrooper.packetevents.injector.modern.early.PEChannelInitializerModern;
 import io.github.retrooper.packetevents.packettype.PacketState;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandler;
-import io.netty.handler.codec.ByteToMessageDecoder;
 import org.bukkit.entity.Player;
 
 public class LateChannelInjectorModern implements LateInjector {
@@ -45,11 +45,11 @@ public class LateChannelInjectorModern implements LateInjector {
         PEChannelInitializerModern.postInitChannel(channel);
     }
 
-    private PacketDecoderModern getDecoder(Object rawChannel) {
+    private PacketPostDecoderModern getDecoder(Object rawChannel) {
         Channel channel = (Channel) rawChannel;
         ChannelHandler decoder = channel.pipeline().get(PacketEvents.get().decoderName);
-        if (decoder instanceof PacketDecoderModern) {
-            return (PacketDecoderModern) decoder;
+        if (decoder instanceof PacketPostDecoderModern) {
+            return (PacketPostDecoderModern) decoder;
         }
         else {
             return null;
@@ -74,7 +74,7 @@ public class LateChannelInjectorModern implements LateInjector {
         if (channel == null) {
             return false;
         }
-        PacketDecoderModern decoder = getDecoder(channel);
+        PacketPostDecoderModern decoder = getDecoder(channel);
         return decoder != null && decoder.player != null;
     }
 
@@ -103,7 +103,7 @@ public class LateChannelInjectorModern implements LateInjector {
 
     @Override
     public void changePacketState(Object channel, PacketState packetState) {
-        PacketDecoderModern decoder = getDecoder(channel);
+        PacketPostDecoderModern decoder = getDecoder(channel);
         if (decoder != null) {
             decoder.packetState = packetState;
         }

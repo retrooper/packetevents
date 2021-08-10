@@ -406,4 +406,9 @@ public class ByteBufLegacy implements ByteBufAbstract {
     public ByteBufAbstract getBytes(int readerIndex, byte[] bytes) {
         return new ByteBufLegacy(byteBuf.getBytes(readerIndex, bytes));
     }
+
+    @Override
+    public boolean release() {
+        return byteBuf.release();
+    }
 }

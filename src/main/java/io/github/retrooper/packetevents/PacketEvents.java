@@ -52,7 +52,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 public final class PacketEvents implements Listener, EventManager {
     private static PacketEvents instance;
     private static Plugin plugin;
-    private final PEVersion version = new PEVersion(1, 7, 9, 17);
+    private final PEVersion version = new PEVersion(2, 0, 0);
     private final EventManager eventManager = new PEEventManager();
     private final PlayerUtils playerUtils = new PlayerUtils();
     private final ServerUtils serverUtils = new ServerUtils();
@@ -60,6 +60,7 @@ public final class PacketEvents implements Listener, EventManager {
     private final GlobalChannelInjector injector = new GlobalChannelInjector();
     private final AtomicBoolean injectorReady = new AtomicBoolean();
     public String handlerName;
+    public String splitterName;
     public String decoderName;
     private PacketEventsSettings settings = new PacketEventsSettings();
     private ByteBufUtil byteBufUtil;
@@ -105,6 +106,7 @@ public final class PacketEvents implements Listener, EventManager {
             NMSUtils.version = version;
             EntityFinderUtils.version = version;
             handlerName = "pe-" + plugin.getName();
+            splitterName = "splitter";
             decoderName = "pe-decoder-" + plugin.getName();
             try {
                 NMSUtils.load();

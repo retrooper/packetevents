@@ -406,4 +406,9 @@ public class ByteBufModern implements ByteBufAbstract {
     public ByteBufAbstract getBytes(int readerIndex, byte[] bytes) {
         return new ByteBufModern(byteBuf.getBytes(readerIndex, bytes));
     }
+
+    @Override
+    public boolean release() {
+        return byteBuf.release();
+    }
 }

@@ -21,6 +21,7 @@ package io.github.retrooper.packetevents.injector.modern.early;
 import io.github.retrooper.packetevents.PacketEvents;
 import io.github.retrooper.packetevents.injector.EarlyInjector;
 import io.github.retrooper.packetevents.injector.modern.PacketDecoderModern;
+import io.github.retrooper.packetevents.injector.modern.PacketPostDecoderModern;
 import io.github.retrooper.packetevents.packettype.PacketState;
 import io.github.retrooper.packetevents.utils.reflection.ReflectionObject;
 import io.github.retrooper.packetevents.utils.list.ListWrapper;
@@ -29,7 +30,6 @@ import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelInitializer;
-import io.netty.handler.codec.ByteToMessageDecoder;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.PluginDescriptionFile;
 
@@ -278,7 +278,7 @@ public class EarlyChannelInjectorModern implements EarlyInjector {
         if (channel == null) {
             return false;
         }
-        PacketDecoderModern decoder = getDecoder(channel);
+        PacketPostDecoderModern decoder = getDecoder(channel);
         return decoder != null && decoder.player != null;
     }
 
@@ -300,11 +300,11 @@ public class EarlyChannelInjectorModern implements EarlyInjector {
         channel.writeAndFlush(rawNMSPacket);
     }
 
-    private PacketDecoderModern getDecoder(Object rawChannel) {
+    private PacketPostDecoderModern getDecoder(Object rawChannel) {
         Channel channel = (Channel) rawChannel;
         ChannelHandler decoder = channel.pipeline().get(PacketEvents.get().decoderName);
-        if (decoder instanceof PacketDecoderModern) {
-            return (PacketDecoderModern) decoder;
+        if (decoder instanceof PacketPostDecoderModern) {
+            return (PacketPostDecoderModern) decoder;
         }
         else {
             return null;
@@ -313,7 +313,7 @@ public class EarlyChannelInjectorModern implements EarlyInjector {
 
     @Override
     public void updatePlayerObject(Player player, Object rawChannel) {
-        PacketDecoderModern decoder = getDecoder(rawChannel);
+        PacketPostDecoderModern decoder = getDecoder(rawChannel);
         if (decoder != null) {
             decoder.player = player;
         }
@@ -321,7 +321,7 @@ public class EarlyChannelInjectorModern implements EarlyInjector {
 
     @Override
     public PacketState getPacketState(Object channel) {
-        PacketDecoderModern decoder = getDecoder(channel);
+        PacketPostDecoderModern decoder = getDecoder(channel);
         if (decoder != null) {
             return decoder.packetState;
         }
@@ -332,7 +332,7 @@ public class EarlyChannelInjectorModern implements EarlyInjector {
 
     @Override
     public void changePacketState(Object channel, PacketState packetState) {
-        PacketDecoderModern decoder = getDecoder(channel);
+        PacketPostDecoderModern decoder = getDecoder(channel);
         if (decoder != null) {
             decoder.packetState = packetState;
         }
