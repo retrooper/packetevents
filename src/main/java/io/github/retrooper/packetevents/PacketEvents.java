@@ -60,7 +60,6 @@ public final class PacketEvents implements Listener, EventManager {
     private final GlobalChannelInjector injector = new GlobalChannelInjector();
     private final AtomicBoolean injectorReady = new AtomicBoolean();
     public String handlerName;
-    public String splitterName;
     public String decoderName;
     private PacketEventsSettings settings = new PacketEventsSettings();
     private ByteBufUtil byteBufUtil;
@@ -106,8 +105,7 @@ public final class PacketEvents implements Listener, EventManager {
             NMSUtils.version = version;
             EntityFinderUtils.version = version;
             handlerName = "pe-" + plugin.getName();
-            splitterName = "splitter";
-            decoderName = "pe-decoder-" + plugin.getName();
+            decoderName = "decoder";
             try {
                 NMSUtils.load();
 
@@ -122,6 +120,8 @@ public final class PacketEvents implements Listener, EventManager {
             byteBufUtil = NMSUtils.legacyNettyImportMode ? new ByteBufUtil_7() : new ByteBufUtil_8();
             updateChecker = new UpdateChecker();
             if (!injectorReady.get()) {
+                //TODO DEBUG
+                System.err.println("PREPARING OUR HANDLER");
                 injector.load();
                 lateBind = !injector.isBound();
                 //If late-bind is enabled, we will inject a bit later.

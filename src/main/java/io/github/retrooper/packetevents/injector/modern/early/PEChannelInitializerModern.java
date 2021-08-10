@@ -20,10 +20,10 @@ package io.github.retrooper.packetevents.injector.modern.early;
 
 import io.github.retrooper.packetevents.PacketEvents;
 import io.github.retrooper.packetevents.injector.modern.PacketDecoderModern;
-import io.github.retrooper.packetevents.injector.modern.PacketPostDecoderModern;
 import io.github.retrooper.packetevents.utils.reflection.Reflection;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelInitializer;
+import io.netty.handler.codec.ByteToMessageDecoder;
 
 import java.lang.reflect.Method;
 import java.util.Arrays;
@@ -38,10 +38,9 @@ public class PEChannelInitializerModern extends ChannelInitializer<Channel> {
     }
 
     public static void postInitChannel(Channel channel) {
-        PacketDecoderModern packetSplitterModern = new PacketDecoderModern();
-        channel.pipeline().replace(PacketEvents.get().splitterName, PacketEvents.get().splitterName, packetSplitterModern);
-        PacketPostDecoderModern packetPostDecoderModern = new PacketPostDecoderModern(channel);
-        channel.pipeline().addAfter(PacketEvents.get().splitterName, PacketEvents.get().decoderName, packetPostDecoderModern);
+        PacketDecoderModern packetDecoderModern = new PacketDecoderModern((ByteToMessageDecoder) channel.pipeline().get("decoder"));
+        channel.pipeline().replace(PacketEvents.get().decoderName, PacketEvents.get().decoderName, packetDecoderModern);
+        //TODO DEBUG
         System.out.println("HANDLERS: " + Arrays.toString(channel.pipeline().names().toArray(new String[0])));
     }
 

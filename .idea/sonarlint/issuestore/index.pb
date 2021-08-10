@@ -27,8 +27,6 @@ Msrc/main/java/io/github/retrooper/packetevents/utils/nms/PlayerAPIModern.java,
 Lsrc/main/java/io/github/retrooper/packetevents/injector/ChannelInjector.java,0/2/0243de7929368b4b2d34f497bc91eaa9b25d4e95
 ~
 Nsrc/main/java/io/github/retrooper/packetevents/event/manager/EventManager.java,4/6/46481e66f02c4bc985cd142d2190beb1d942544a
-Ç
-Rsrc/main/java/io/github/retrooper/packetevents/injector/GlobalChannelInjector.java,2/2/2271865abd6f6213bbaac1b4221f87949c807eb3
 Å
 Qsrc/main/java/io/github/retrooper/packetevents/settings/PacketEventsSettings.java,1/7/1787fa8306a7d6b1a343fc93d88d02a6781199c9
 z

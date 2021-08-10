@@ -21,7 +21,6 @@ package io.github.retrooper.packetevents.injector.modern.early;
 import io.github.retrooper.packetevents.PacketEvents;
 import io.github.retrooper.packetevents.injector.EarlyInjector;
 import io.github.retrooper.packetevents.injector.modern.PacketDecoderModern;
-import io.github.retrooper.packetevents.injector.modern.PacketPostDecoderModern;
 import io.github.retrooper.packetevents.packettype.PacketState;
 import io.github.retrooper.packetevents.utils.reflection.ReflectionObject;
 import io.github.retrooper.packetevents.utils.list.ListWrapper;
@@ -278,7 +277,7 @@ public class EarlyChannelInjectorModern implements EarlyInjector {
         if (channel == null) {
             return false;
         }
-        PacketPostDecoderModern decoder = getDecoder(channel);
+        PacketDecoderModern decoder = getDecoder(channel);
         return decoder != null && decoder.player != null;
     }
 
@@ -300,11 +299,11 @@ public class EarlyChannelInjectorModern implements EarlyInjector {
         channel.writeAndFlush(rawNMSPacket);
     }
 
-    private PacketPostDecoderModern getDecoder(Object rawChannel) {
+    private PacketDecoderModern getDecoder(Object rawChannel) {
         Channel channel = (Channel) rawChannel;
         ChannelHandler decoder = channel.pipeline().get(PacketEvents.get().decoderName);
-        if (decoder instanceof PacketPostDecoderModern) {
-            return (PacketPostDecoderModern) decoder;
+        if (decoder instanceof PacketDecoderModern) {
+            return (PacketDecoderModern) decoder;
         }
         else {
             return null;
@@ -313,7 +312,7 @@ public class EarlyChannelInjectorModern implements EarlyInjector {
 
     @Override
     public void updatePlayerObject(Player player, Object rawChannel) {
-        PacketPostDecoderModern decoder = getDecoder(rawChannel);
+        PacketDecoderModern decoder = getDecoder(rawChannel);
         if (decoder != null) {
             decoder.player = player;
         }
@@ -321,7 +320,7 @@ public class EarlyChannelInjectorModern implements EarlyInjector {
 
     @Override
     public PacketState getPacketState(Object channel) {
-        PacketPostDecoderModern decoder = getDecoder(channel);
+        PacketDecoderModern decoder = getDecoder(channel);
         if (decoder != null) {
             return decoder.packetState;
         }
@@ -332,7 +331,7 @@ public class EarlyChannelInjectorModern implements EarlyInjector {
 
     @Override
     public void changePacketState(Object channel, PacketState packetState) {
-        PacketPostDecoderModern decoder = getDecoder(channel);
+        PacketDecoderModern decoder = getDecoder(channel);
         if (decoder != null) {
             decoder.packetState = packetState;
         }

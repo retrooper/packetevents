@@ -22,16 +22,11 @@ import io.github.retrooper.packetevents.event.PacketListenerAbstract;
 import io.github.retrooper.packetevents.event.PacketListenerPriority;
 import io.github.retrooper.packetevents.event.impl.PacketDecodeEvent;
 import io.github.retrooper.packetevents.packettype.PacketState;
-import io.github.retrooper.packetevents.packettype.PacketType;
 import io.github.retrooper.packetevents.settings.PacketEventsSettings;
 import io.github.retrooper.packetevents.utils.netty.bytebuf.ByteBufAbstract;
-import io.github.retrooper.packetevents.utils.player.ClientVersion;
 import io.github.retrooper.packetevents.utils.server.ServerVersion;
-import io.github.retrooper.packetevents.wrapper.PacketWrapper;
-import io.github.retrooper.packetevents.wrapper.game.client.WrapperGameClientUpdateSign;
 import io.github.retrooper.packetevents.wrapper.handshaking.client.WrapperHandshakingClientHandshake;
 import io.github.retrooper.packetevents.wrapper.login.client.WrapperLoginClientLoginStart;
-import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
 
 public class PacketEventsPlugin extends JavaPlugin {
@@ -43,7 +38,7 @@ public class PacketEventsPlugin extends JavaPlugin {
                 .compatInjector(false)
                 .checkForUpdates(true)
                 .bStats(true);
-        PacketEvents.get().loadAsyncNewThread();
+        PacketEvents.get().load();
         //You can do something here as it is loading
     }
 

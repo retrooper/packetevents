@@ -21,50 +21,57 @@ package io.github.retrooper.packetevents.injector.modern;
 import io.github.retrooper.packetevents.PacketEvents;
 import io.github.retrooper.packetevents.event.impl.PacketDecodeEvent;
 import io.github.retrooper.packetevents.packettype.PacketState;
-import io.github.retrooper.packetevents.utils.netty.bytebuf.ByteBufModern;
-import io.github.retrooper.packetevents.wrapper.PacketWrapper;
 import io.netty.buffer.ByteBuf;
-import io.netty.buffer.Unpooled;
+import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.ByteToMessageDecoder;
-import io.netty.handler.codec.CorruptedFrameException;
 import org.bukkit.entity.Player;
 
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.List;
 
 public class PacketDecoderModern extends ByteToMessageDecoder {
-    protected void decode(ChannelHandlerContext ctx, ByteBuf byteBuf, List<Object> list) throws Exception {
-        byteBuf.markReaderIndex();
+    private static Method DECODE_METHOD;
+    public final ByteToMessageDecoder previousDecoder;
+    public volatile Player player;
+    public PacketState packetState;
 
-        byte[] array = new byte[3];
-
-        for (int i = 0; i < array.length; ++i) {
-            if (!byteBuf.isReadable()) {
-                byteBuf.resetReaderIndex();
-                return;
-            }
-
-            array[i] = byteBuf.readByte();
-            if (array[i] >= 0) {
-                ByteBuf wrappedBuffer = Unpooled.wrappedBuffer(array);
-                PacketWrapper bufferReader = new PacketWrapper(new ByteBufModern(wrappedBuffer));
-
-                try {
-
-                    int length = bufferReader.readVarInt();
-                    if (byteBuf.readableBytes() >= length) {
-                        list.add(byteBuf.readBytes(length));
-                        return;
-                    }
-
-                    byteBuf.resetReaderIndex();
-                } finally {
-                    wrappedBuffer.release();
-                }
-                return;
+    private void load() {
+        if (DECODE_METHOD == null) {
+            try {
+                DECODE_METHOD = ByteToMessageDecoder.class.getDeclaredMethod("decode", ChannelHandlerContext.class, ByteBuf.class, List.class);
+                DECODE_METHOD.setAccessible(true);
+            } catch (NoSuchMethodException e) {
+                e.printStackTrace();
             }
         }
+    }
 
-        throw new CorruptedFrameException("length wider than 21-bit");
+    public PacketDecoderModern(ByteToMessageDecoder previousDecoder) {
+        load();
+        this.previousDecoder = previousDecoder;
+    }
+
+    @Override
+    protected void decode(ChannelHandlerContext ctx, ByteBuf byteBuf, List<Object> list) throws Exception {
+        PacketDecodeEvent packetDecodeEvent = new PacketDecodeEvent(ctx.channel(), player, byteBuf.copy());
+        PacketEvents.get().getEventManager().callEvent(packetDecodeEvent);
+
+        if (packetDecodeEvent.isCancelled()) {
+            byteBuf.skipBytes(byteBuf.readableBytes());
+            return;
+        }
+
+        try {
+            DECODE_METHOD.invoke(previousDecoder, ctx, byteBuf, list);
+        } catch (IllegalAccessException | InvocationTargetException e) {
+            if (e.getCause() instanceof Exception) {
+                throw (Exception) e.getCause();
+            } else if (e.getCause() instanceof Error) {
+                throw (Error) e.getCause();
+            }
+        }
+        //TODO COMPLETE PACKETDECODERLEGACY
     }
 }
