@@ -150,7 +150,7 @@ public final class PacketEvents implements Listener, EventManager {
             }
 
             //TODO Load other ones
-            PacketType.Play.Client.load(getServerUtils().getVersion());
+            PacketType.Play.Client.load();
 
             Runnable postInjectTask = () -> {
                 Bukkit.getPluginManager().registerEvents(bukkitEventProcessorInternal, plugin);

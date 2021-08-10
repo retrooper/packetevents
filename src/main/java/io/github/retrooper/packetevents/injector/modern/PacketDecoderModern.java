@@ -22,7 +22,6 @@ import io.github.retrooper.packetevents.PacketEvents;
 import io.github.retrooper.packetevents.event.impl.PacketDecodeEvent;
 import io.github.retrooper.packetevents.packettype.PacketState;
 import io.netty.buffer.ByteBuf;
-import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.ByteToMessageDecoder;
 import org.bukkit.entity.Player;
@@ -62,7 +61,6 @@ public class PacketDecoderModern extends ByteToMessageDecoder {
             byteBuf.skipBytes(byteBuf.readableBytes());
             return;
         }
-
         try {
             DECODE_METHOD.invoke(previousDecoder, ctx, byteBuf, list);
         } catch (IllegalAccessException | InvocationTargetException e) {
