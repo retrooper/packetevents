@@ -95,3 +95,15 @@ v
 Fsrc/main/java/io/github/retrooper/packetevents/utils/nms/NMSUtils.java,3/7/37800fc8183d6581bc9d95bb27577459e9ecbe4f
 <
 build.gradle,f/0/f07866736216be0ee2aba49e392191aeae700a35
+‡
+Wsrc/main/java/io/github/retrooper/packetevents/injector/legacy/PacketDecoderLegacy.java,c/f/cffb2c98d4e4fb15d213cdad004c654c57db062c
+€
+Psrc/main/java/io/github/retrooper/packetevents/event/impl/PacketDecodeEvent.java,a/a/aa36609f0aec75254b105cf05624a47b99aea70e
+”
+dsrc/main/java/io/github/retrooper/packetevents/injector/modern/early/EarlyChannelInjectorModern.java,b/0/b0d3e8a4c7836cf1e41f52db19df8823b57f48a7
+v
+Fsrc/main/java/io/github/retrooper/packetevents/PacketEventsPlugin.java,9/b/9b7511d2fe8346c29eed2430db9d8609b1119118
+p
+@src/main/java/io/github/retrooper/packetevents/PacketEvents.java,1/1/114b4267d3b543f22e251a6f6245028e1f571479
+‡
+Wsrc/main/java/io/github/retrooper/packetevents/injector/modern/PacketDecoderModern.java,a/b/abd3092de4a295808557578a568a0cc33db9d287

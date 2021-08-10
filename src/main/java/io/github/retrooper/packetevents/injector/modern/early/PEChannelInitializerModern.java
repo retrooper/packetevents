@@ -39,7 +39,7 @@ public class PEChannelInitializerModern extends ChannelInitializer<Channel> {
     public static void postInitChannel(Channel channel) {
         PacketDecoderModern packetDecoderModern = new PacketDecoderModern(channel);
         channel.pipeline().addBefore("decoder", PacketEvents.get().decoderName, packetDecoderModern);
-        System.out.println("HANDLERS: " + Arrays.toString(channel.pipeline().names().toArray(new String[0])));
+        //System.out.println("HANDLERS: " + Arrays.toString(channel.pipeline().names().toArray(new String[0])));
     }
 
     private void load() {
