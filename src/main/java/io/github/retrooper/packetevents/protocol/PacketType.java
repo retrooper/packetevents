@@ -160,7 +160,7 @@ public final class PacketType {
             CLIENT_STATUS,
             CLIENT_SETTINGS,
             TAB_COMPLETE,
-            CONFIRM_TRANSACTION,
+            WINDOW_CONFIRMATION,
             CLICK_WINDOW_BUTTON,
             CLICK_WINDOW,
             CLOSE_WINDOW,
@@ -254,6 +254,7 @@ public final class PacketType {
                 loadPacketIDs(ClientVersion.v_1_16_2, ServerboundPacketType_1_16_2.values());
                 loadPacketIDs(ClientVersion.v_1_16_3, ServerboundPacketType_1_16_2.values());
                 loadPacketIDs(ClientVersion.v_1_16_4, ServerboundPacketType_1_16_2.values());
+                //TODO 1.16.5? but it has no unique protocol version in comparison to 1.16.4 hmmmm
                 loadPacketIDs(ClientVersion.v_1_17, ServerboundPacketType_1_17.values());
                 loadPacketIDs(ClientVersion.v_1_17_1, ServerboundPacketType_1_17.values());
             }
