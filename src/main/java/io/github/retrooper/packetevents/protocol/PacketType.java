@@ -20,6 +20,7 @@ package io.github.retrooper.packetevents.protocol;
 
 import io.github.retrooper.packetevents.protocol.protocols.serverbound.*;
 import io.github.retrooper.packetevents.utils.player.ClientVersion;
+import net.minecraft.network.EnumProtocol;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.IdentityHashMap;
@@ -204,23 +205,23 @@ public final class PacketType {
             PLAYER_BLOCK_PLACEMENT,
             USE_ITEM;
 
-            private static final Map<ClientVersion, Map<Integer, Enum<?>>> PACKET_ID_CACHE = new IdentityHashMap<>();
+            private static final Map<ClientVersion, Map<Integer, PacketTypeAbstract>> PACKET_ID_CACHE = new IdentityHashMap<>();
 
 
             @Nullable
             public static PacketTypeAbstract getById(ClientVersion version, int packetID) {
-                Map<Integer, Enum<?>> innerMap = PACKET_ID_CACHE.get(version);
+                Map<Integer, PacketTypeAbstract> innerMap = PACKET_ID_CACHE.get(version);
                 if (innerMap != null) {
-                    Object client = innerMap.get(packetID);
-                    if (client instanceof PacketTypeAbstract) {
-                        return (PacketTypeAbstract) client;
+                    PacketTypeAbstract client = innerMap.get(packetID);
+                    if (client != null) {
+                        return client;
                     }
                 }
                 return null;
             }
 
             private static void loadPacketIDs(ClientVersion version, Enum<?>[] enumConstants) {
-                Map<Integer, Enum<?>> innerMap = new IdentityHashMap<>();
+                Map<Integer, PacketTypeAbstract> innerMap = new IdentityHashMap<>();
                 for (int i = 0; i < enumConstants.length; i++) {
                     innerMap.put(i, Client.valueOf(enumConstants[i].name()));
                 }
@@ -254,9 +255,39 @@ public final class PacketType {
                 loadPacketIDs(ClientVersion.v_1_16_2, ServerboundPacketType_1_16_2.values());
                 loadPacketIDs(ClientVersion.v_1_16_3, ServerboundPacketType_1_16_2.values());
                 loadPacketIDs(ClientVersion.v_1_16_4, ServerboundPacketType_1_16_2.values());
-                //TODO 1.16.5? but it has no unique protocol version in comparison to 1.16.4 hmmmm
                 loadPacketIDs(ClientVersion.v_1_17, ServerboundPacketType_1_17.values());
                 loadPacketIDs(ClientVersion.v_1_17_1, ServerboundPacketType_1_17.values());
+            }
+        }
+
+        //TODO FINISH
+        public enum Server implements PacketTypeAbstract {
+            FIRST, SECOND, THIRD;
+
+            private static final Map<ClientVersion, Map<Integer, PacketTypeAbstract>> PACKET_ID_CACHE = new IdentityHashMap<>();
+
+            @Nullable
+            public static PacketTypeAbstract getById(ClientVersion version, int packetID) {
+                Map<Integer, PacketTypeAbstract> innerMap = PACKET_ID_CACHE.get(version);
+                if (innerMap != null) {
+                    PacketTypeAbstract server = innerMap.get(packetID);
+                    if (server != null) {
+                        return server;
+                    }
+                }
+                return null;
+            }
+
+            private static void loadPacketIDs(ClientVersion version, Enum<?>[] enumConstants) {
+                Map<Integer, PacketTypeAbstract> innerMap = new IdentityHashMap<>();
+                for (int i = 0; i < enumConstants.length; i++) {
+                    innerMap.put(i, Play.Client.valueOf(enumConstants[i].name()));
+                }
+                PACKET_ID_CACHE.put(version, innerMap);
+            }
+
+            public static void load() {
+
             }
         }
     }

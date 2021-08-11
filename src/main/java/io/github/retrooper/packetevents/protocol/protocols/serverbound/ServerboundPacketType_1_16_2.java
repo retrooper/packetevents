@@ -51,8 +51,8 @@ public enum ServerboundPacketType_1_16_2 {
     STEER_VEHICLE,
     //RECIPE_BOOK_DATA was deleted and has been split up into two new packets
     //RECIPE_BOOK_DATA,
-    SET_DISPLAYED_RECIPE,
     SET_RECIPE_BOOK_STATE,
+    SET_DISPLAYED_RECIPE,
     NAME_ITEM,
     RESOURCE_PACK_STATUS,
     ADVANCEMENT_TAB,
