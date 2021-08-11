@@ -18,7 +18,7 @@
 
 package io.github.retrooper.packetevents.protocol.protocols.clientbound;
 
-public enum ClientboundPacketType_1_7_10 {
+public enum ClientboundPacketType_1_8 {
     KEEP_ALIVE,
     JOIN_GAME,
     CHAT_MESSAGE,
@@ -30,7 +30,7 @@ public enum ClientboundPacketType_1_7_10 {
     PLAYER_POSITION_AND_LOOK,
     HELD_ITEM_CHANGE,
     USE_BED,
-    SPAWN_ENTITY,
+    ENTITY_ANIMATION,
     SPAWN_PLAYER,
     COLLECT_ITEM,
     SPAWN_ENTITY,
@@ -83,5 +83,16 @@ public enum ClientboundPacketType_1_7_10 {
     DISPLAY_SCOREBOARD,
     TEAMS,
     PLUGIN_MESSAGE,
-    DISCONNECT
+    DISCONNECT,
+
+    //1.8 added these new packets
+    SERVER_DIFFICULTY,
+    COMBAT_EVENT,
+    CAMERA,
+    WORLD_BORDER,
+    TITLE,
+    SET_COMPRESSION,
+    PLAYER_LIST_HEADER_AND_FOOTER,
+    RESOURCE_PACK_SEND,
+    UPDATE_ENTITY_NBT
 }
