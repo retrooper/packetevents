@@ -228,34 +228,34 @@ public final class PacketType {
             }
 
             public static void load() {
-                loadPacketIDs(ClientVersion.v_1_7_10, ServerboundPacketType_1_7_10.Play.Client.values());
-                loadPacketIDs(ClientVersion.v_1_8, ServerboundPacketType_1_8.Play.Client.values());
-                loadPacketIDs(ClientVersion.v_1_9, ServerboundPacketType_1_9.Play.Client.values());
-                loadPacketIDs(ClientVersion.v_1_9_1, ServerboundPacketType_1_9.Play.Client.values());
-                loadPacketIDs(ClientVersion.v_1_9_2, ServerboundPacketType_1_9.Play.Client.values());
-                loadPacketIDs(ClientVersion.v_1_9_3, ServerboundPacketType_1_9.Play.Client.values());
-                loadPacketIDs(ClientVersion.v_1_10, ServerboundPacketType_1_9.Play.Client.values());
-                loadPacketIDs(ClientVersion.v_1_11, ServerboundPacketType_1_9.Play.Client.values());
-                loadPacketIDs(ClientVersion.v_1_11_1, ServerboundPacketType_1_9.Play.Client.values());
-                loadPacketIDs(ClientVersion.v_1_12, ServerboundPacketType_1_12.Play.Client.values());
-                loadPacketIDs(ClientVersion.v_1_12_1, ServerboundPacketType_1_12_1.Play.Client.values());
-                loadPacketIDs(ClientVersion.v_1_12_2, ServerboundPacketType_1_12_1.Play.Client.values());
-                loadPacketIDs(ClientVersion.v_1_13, ServerboundPacketType_1_13.Play.Client.values());
-                loadPacketIDs(ClientVersion.v_1_14, ServerboundPacketType_1_14.Play.Client.values());
-                loadPacketIDs(ClientVersion.v_1_14_1, ServerboundPacketType_1_14.Play.Client.values());
-                loadPacketIDs(ClientVersion.v_1_14_2, ServerboundPacketType_1_14.Play.Client.values());
-                loadPacketIDs(ClientVersion.v_1_14_3, ServerboundPacketType_1_14.Play.Client.values());
-                loadPacketIDs(ClientVersion.v_1_14_4, ServerboundPacketType_1_14.Play.Client.values());
-                loadPacketIDs(ClientVersion.v_1_15, ServerboundPacketType_1_14.Play.Client.values());
-                loadPacketIDs(ClientVersion.v_1_15_1, ServerboundPacketType_1_14.Play.Client.values());
-                loadPacketIDs(ClientVersion.v_1_15_2, ServerboundPacketType_1_15_2.Play.Client.values());
-                loadPacketIDs(ClientVersion.v_1_16, ServerboundPacketType_1_16.Play.Client.values());
-                loadPacketIDs(ClientVersion.v_1_16_1, ServerboundPacketType_1_16.Play.Client.values());
-                loadPacketIDs(ClientVersion.v_1_16_2, ServerboundPacketType_1_16_2.Play.Client.values());
-                loadPacketIDs(ClientVersion.v_1_16_3, ServerboundPacketType_1_16_2.Play.Client.values());
-                loadPacketIDs(ClientVersion.v_1_16_4, ServerboundPacketType_1_16_2.Play.Client.values());
-                loadPacketIDs(ClientVersion.v_1_17, ServerboundPacketType_1_17.Play.Client.values());
-                loadPacketIDs(ClientVersion.v_1_17_1, ServerboundPacketType_1_17.Play.Client.values());
+                loadPacketIDs(ClientVersion.v_1_7_10, ServerboundPacketType_1_7_10.values());
+                loadPacketIDs(ClientVersion.v_1_8, ServerboundPacketType_1_8.values());
+                loadPacketIDs(ClientVersion.v_1_9, ServerboundPacketType_1_9.values());
+                loadPacketIDs(ClientVersion.v_1_9_1, ServerboundPacketType_1_9.values());
+                loadPacketIDs(ClientVersion.v_1_9_2, ServerboundPacketType_1_9.values());
+                loadPacketIDs(ClientVersion.v_1_9_3, ServerboundPacketType_1_9.values());
+                loadPacketIDs(ClientVersion.v_1_10, ServerboundPacketType_1_9.values());
+                loadPacketIDs(ClientVersion.v_1_11, ServerboundPacketType_1_9.values());
+                loadPacketIDs(ClientVersion.v_1_11_1, ServerboundPacketType_1_9.values());
+                loadPacketIDs(ClientVersion.v_1_12, ServerboundPacketType_1_12.values());
+                loadPacketIDs(ClientVersion.v_1_12_1, ServerboundPacketType_1_12_1.values());
+                loadPacketIDs(ClientVersion.v_1_12_2, ServerboundPacketType_1_12_1.values());
+                loadPacketIDs(ClientVersion.v_1_13, ServerboundPacketType_1_13.values());
+                loadPacketIDs(ClientVersion.v_1_14, ServerboundPacketType_1_14.values());
+                loadPacketIDs(ClientVersion.v_1_14_1, ServerboundPacketType_1_14.values());
+                loadPacketIDs(ClientVersion.v_1_14_2, ServerboundPacketType_1_14.values());
+                loadPacketIDs(ClientVersion.v_1_14_3, ServerboundPacketType_1_14.values());
+                loadPacketIDs(ClientVersion.v_1_14_4, ServerboundPacketType_1_14.values());
+                loadPacketIDs(ClientVersion.v_1_15, ServerboundPacketType_1_14.values());
+                loadPacketIDs(ClientVersion.v_1_15_1, ServerboundPacketType_1_14.values());
+                loadPacketIDs(ClientVersion.v_1_15_2, ServerboundPacketType_1_15_2.values());
+                loadPacketIDs(ClientVersion.v_1_16, ServerboundPacketType_1_16.values());
+                loadPacketIDs(ClientVersion.v_1_16_1, ServerboundPacketType_1_16.values());
+                loadPacketIDs(ClientVersion.v_1_16_2, ServerboundPacketType_1_16_2.values());
+                loadPacketIDs(ClientVersion.v_1_16_3, ServerboundPacketType_1_16_2.values());
+                loadPacketIDs(ClientVersion.v_1_16_4, ServerboundPacketType_1_16_2.values());
+                loadPacketIDs(ClientVersion.v_1_17, ServerboundPacketType_1_17.values());
+                loadPacketIDs(ClientVersion.v_1_17_1, ServerboundPacketType_1_17.values());
             }
         }
     }

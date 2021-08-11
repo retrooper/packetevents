@@ -18,35 +18,31 @@
 
 package io.github.retrooper.packetevents.protocol.protocols.serverbound;
 
-public class ServerboundPacketType_1_8 {
-    public static class Play {
-        public enum Client {
-            KEEP_ALIVE,
-            CHAT_MESSAGE,
-            INTERACT_ENTITY,
-            PLAYER_MOVEMENT,
-            PLAYER_POSITION,
-            PLAYER_ROTATION,
-            PLAYER_POSITION_AND_ROTATION,
-            PLAYER_DIGGING,
-            PLAYER_BLOCK_PLACEMENT,
-            HELD_ITEM_CHANGE,
-            ANIMATION,
-            ENTITY_ACTION,
-            STEER_VEHICLE,
-            CLOSE_WINDOW,
-            CLICK_WINDOW,
-            CONFIRM_TRANSACTION,
-            CREATIVE_INVENTORY_ACTION,
-            CLICK_WINDOW_BUTTON,
-            UPDATE_SIGN,
-            PLAYER_ABILITIES,
-            TAB_COMPLETE,
-            CLIENT_SETTINGS,
-            CLIENT_STATUS,
-            PLUGIN_MESSAGE,
-            SPECTATE,
-            RESOURCE_PACK_STATUS
-        }
-    }
+public enum ServerboundPacketType_1_8 {
+    KEEP_ALIVE,
+    CHAT_MESSAGE,
+    INTERACT_ENTITY,
+    PLAYER_MOVEMENT,
+    PLAYER_POSITION,
+    PLAYER_ROTATION,
+    PLAYER_POSITION_AND_ROTATION,
+    PLAYER_DIGGING,
+    PLAYER_BLOCK_PLACEMENT,
+    HELD_ITEM_CHANGE,
+    ANIMATION,
+    ENTITY_ACTION,
+    STEER_VEHICLE,
+    CLOSE_WINDOW,
+    CLICK_WINDOW,
+    CONFIRM_TRANSACTION,
+    CREATIVE_INVENTORY_ACTION,
+    CLICK_WINDOW_BUTTON,
+    UPDATE_SIGN,
+    PLAYER_ABILITIES,
+    TAB_COMPLETE,
+    CLIENT_SETTINGS,
+    CLIENT_STATUS,
+    PLUGIN_MESSAGE,
+    SPECTATE,
+    RESOURCE_PACK_STATUS
 }
