@@ -20,15 +20,16 @@ package io.github.retrooper.packetevents.injector.legacy.early;
 
 import io.github.retrooper.packetevents.PacketEvents;
 import io.github.retrooper.packetevents.injector.EarlyInjector;
-import io.github.retrooper.packetevents.injector.legacy.PlayerChannelHandlerLegacy;
-import io.github.retrooper.packetevents.packetwrappers.NMSPacket;
-import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
+import io.github.retrooper.packetevents.injector.legacy.PacketDecoderLegacy;
+import io.github.retrooper.packetevents.packettype.PacketState;
+import io.github.retrooper.packetevents.utils.reflection.ReflectionObject;
 import io.github.retrooper.packetevents.utils.list.ListWrapper;
 import io.github.retrooper.packetevents.utils.nms.NMSUtils;
 import net.minecraft.util.io.netty.channel.Channel;
 import net.minecraft.util.io.netty.channel.ChannelFuture;
 import net.minecraft.util.io.netty.channel.ChannelHandler;
 import net.minecraft.util.io.netty.channel.ChannelInitializer;
+import net.minecraft.util.io.netty.handler.codec.ByteToMessageDecoder;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.PluginDescriptionFile;
 
@@ -125,19 +126,13 @@ public class EarlyChannelInjectorLegacy implements EarlyInjector {
         List<Object> networkManagers = NMSUtils.getNetworkManagers();
         synchronized (networkManagers) {
             for (Object networkManager : networkManagers) {
-                WrappedPacket networkManagerWrapper = new WrappedPacket(new NMSPacket(networkManager));
-                Channel channel = (Channel) networkManagerWrapper.readObject(0, NMSUtils.nettyChannelClass);
+                ReflectionObject networkManagerWrapper = new ReflectionObject(networkManager);
+                Channel channel = networkManagerWrapper.readObject(0, Channel.class);
                 if (channel == null) {
                     continue;
                 }
 
-                if (channel.pipeline().get(PacketEvents.get().getHandlerName()) != null) {
-                    channel.pipeline().remove(PacketEvents.get().getHandlerName());
-                }
-
-                if (channel.pipeline().get("packet_handler") != null) {
-                    channel.pipeline().addBefore("packet_handler", PacketEvents.get().getHandlerName(), new PlayerChannelHandlerLegacy());
-                }
+                PEChannelInitializerLegacy.postInitChannel(channel);
             }
         }
     }
@@ -262,7 +257,7 @@ public class EarlyChannelInjectorLegacy implements EarlyInjector {
         Object channel = PacketEvents.get().getPlayerUtils().getChannel(player);
         if (channel != null) {
             try {
-                ((Channel) channel).pipeline().remove(PacketEvents.get().getHandlerName());
+                ((Channel)channel).pipeline().remove(PacketEvents.get().decoderName);
             } catch (Exception ignored) {
 
             }
@@ -275,8 +270,8 @@ public class EarlyChannelInjectorLegacy implements EarlyInjector {
         if (channel == null) {
             return false;
         }
-        PlayerChannelHandlerLegacy handler = getHandler(channel);
-        return handler != null && handler.player != null;
+        PacketDecoderLegacy decoder = getDecoder(channel);
+        return decoder != null && decoder.player != null;
     }
 
     @Override
@@ -297,11 +292,11 @@ public class EarlyChannelInjectorLegacy implements EarlyInjector {
         channel.writeAndFlush(rawNMSPacket);
     }
 
-    private PlayerChannelHandlerLegacy getHandler(Object rawChannel) {
+    private PacketDecoderLegacy getDecoder(Object rawChannel) {
         Channel channel = (Channel) rawChannel;
-        ChannelHandler handler = channel.pipeline().get(PacketEvents.get().getHandlerName());
-        if (handler instanceof PlayerChannelHandlerLegacy) {
-            return (PlayerChannelHandlerLegacy) handler;
+        ChannelHandler decoder = channel.pipeline().get(PacketEvents.get().decoderName);
+        if (decoder instanceof PacketDecoderLegacy) {
+            return (PacketDecoderLegacy) decoder;
         } else {
             return null;
         }
@@ -309,9 +304,28 @@ public class EarlyChannelInjectorLegacy implements EarlyInjector {
 
     @Override
     public void updatePlayerObject(Player player, Object rawChannel) {
-        PlayerChannelHandlerLegacy handler = getHandler(rawChannel);
-        if (handler != null) {
-            handler.player = player;
+        PacketDecoderLegacy decoder = getDecoder(rawChannel);
+        if (decoder != null) {
+            decoder.player = player;
+        }
+    }
+
+    @Override
+    public PacketState getPacketState(Object channel) {
+        PacketDecoderLegacy decoder = getDecoder(channel);
+        if (decoder != null) {
+            return decoder.packetState;
+        }
+        else {
+            return null;
+        }
+    }
+
+    @Override
+    public void changePacketState(Object channel, PacketState packetState) {
+        PacketDecoderLegacy decoder = getDecoder(channel);
+        if (decoder != null) {
+            decoder.packetState = packetState;
         }
     }
 }

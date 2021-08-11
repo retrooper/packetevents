@@ -97,7 +97,6 @@ public enum ClientVersion {
 
     TEMP_UNRESOLVED(-1),
 
-    @Deprecated
     UNRESOLVED(-1),
 
     UNKNOWN(-1);
@@ -204,54 +203,6 @@ public enum ClientVersion {
      */
     public boolean isOlderThanOrEquals(ClientVersion target) {
         return this == target || isOlderThan(target);
-    }
-
-    /**
-     * Deprecated, please use {@link #isNewerThan(ClientVersion)}
-     *
-     * @param target Compared client version.
-     * @return Is this client version newer than the compared client version.
-     * @deprecated Rename...
-     */
-    @Deprecated
-    public boolean isHigherThan(ClientVersion target) {
-        return isNewerThan(target);
-    }
-
-    /**
-     * Deprecated, please use {@link #isNewerThanOrEquals(ClientVersion)}
-     *
-     * @param target Compared client version.
-     * @return Is this client version newer than or equal to the compared client version.
-     * @deprecated Rename...
-     */
-    @Deprecated
-    public boolean isHigherThanOrEquals(ClientVersion target) {
-        return isNewerThanOrEquals(target);
-    }
-
-    /**
-     * Deprecated, please use {@link #isOlderThan(ClientVersion)}
-     *
-     * @param target Compared client version.
-     * @return Is this client version older than the compared client version.
-     * @deprecated Rename...
-     */
-    @Deprecated
-    public boolean isLowerThan(ClientVersion target) {
-        return isOlderThan(target);
-    }
-
-    /**
-     * Deprecated, please use {@link #isOlderThanOrEquals(ClientVersion)}
-     *
-     * @param target Compared client version.
-     * @return Is this client version older than or equal to the compared client version.
-     * @deprecated Rename...
-     */
-    @Deprecated
-    public boolean isLowerThanOrEquals(ClientVersion target) {
-        return isOlderThanOrEquals(target);
     }
 
 

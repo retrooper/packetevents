@@ -19,6 +19,7 @@
 package io.github.retrooper.packetevents.injector.modern.early;
 
 import io.github.retrooper.packetevents.PacketEvents;
+import io.github.retrooper.packetevents.utils.nms.NMSUtils;
 import io.netty.channel.Channel;
 import net.kyori.adventure.key.Key;
 
@@ -31,29 +32,55 @@ public class PaperChannelInjector {
     private PaperChannelInjector() {
     }
 
-    public static void setPaperChannelInitializeListener() throws ReflectiveOperationException {
+    private static void addChannelInitializeListenerHolderListener(Key key, Object listener) throws Exception {
+        Class<?> listenerClass = Class.forName("io.papermc.paper.network.ChannelInitializeListener");
+        Class<?> holderClass = Class.forName("io.papermc.paper.network.ChannelInitializeListenerHolder");
+        Method addListenerMethod = holderClass.getDeclaredMethod("addListener", Key.class, listenerClass);
+        addListenerMethod.invoke(null, key, listener);
+    }
+
+    private static boolean hasChannelInitializeHolderListener(Key key) throws Exception {
+        Class<?> holderClass = Class.forName("io.papermc.paper.network.ChannelInitializeListenerHolder");
+        Method hasListenerMethod = holderClass.getDeclaredMethod("hasListener", Key.class);
+        return (boolean) hasListenerMethod.invoke(null,  key);
+    }
+
+    private static void removeChannelInitializeListenerHolderListener(Key key) throws Exception {
+        Class<?> holderClass = Class.forName("io.papermc.paper.network.ChannelInitializeListenerHolder");
+        Method removeListenerMethod = holderClass.getDeclaredMethod("removeListener", Key.class);
+        removeListenerMethod.invoke(null, key);
+    }
+
+    public static void setPaperChannelInitializeListener() throws Exception {
         // Call io.papermc.paper.network.ChannelInitializeListenerHolder.addListener(net.kyori.adventure.key.Key, io.papermc.paper.network.ChannelInitializeListener)
         // Create an interface proxy of ChannelInitializeListener
+        boolean shouldHandleViaVersion = hasChannelInitializeHolderListener(Key.key("viaversion", "injector"));
         Class<?> listenerClass = Class.forName("io.papermc.paper.network.ChannelInitializeListener");
         Object channelInitializeListener = Proxy.newProxyInstance(EarlyChannelInjectorModern.class.getClassLoader(), new Class[]{listenerClass}, (proxy, method, args) -> {
             if (method.getName().equals("afterInitChannel")) {
+                if (shouldHandleViaVersion) {
+                    //Call Via's here
+                    Class<?> viaBukkitChannelInitializer = Class.forName("com.viaversion.viaversion.bukkit.handlers.BukkitChannelInitializer");
+                    Method viaAfterInitChannelMethod = viaBukkitChannelInitializer.getMethod("afterChannelInitialize", Channel.class);
+                    viaAfterInitChannelMethod.invoke(null, (Channel) args[0]);
+                }
                 PEChannelInitializerModern.postInitChannel((Channel) args[0]);
                 return null;
             }
             return method.invoke(proxy, args);
         });
 
-        Class<?> holderClass = Class.forName("io.papermc.paper.network.ChannelInitializeListenerHolder");
-        Method addListenerMethod = holderClass.getDeclaredMethod("addListener", Key.class, listenerClass);
-        Key key = Key.key(PacketEvents.get().getHandlerName().toLowerCase(), "injector");
-        addListenerMethod.invoke(null, key, channelInitializeListener);
+        Key key = Key.key(PacketEvents.get().handlerName.toLowerCase(), "injector");
+
+        addChannelInitializeListenerHolderListener(key, channelInitializeListener);
+        if (shouldHandleViaVersion) {
+            removeChannelInitializeListenerHolderListener(Key.key("viaversion", "injector"));
+        }
     }
 
-    public static void removePaperChannelInitializeListener() throws ReflectiveOperationException {
-        Class<?> holderClass = Class.forName("io.papermc.paper.network.ChannelInitializeListenerHolder");
-        Method addListenerMethod = holderClass.getDeclaredMethod("removeListener", Key.class);
-        Key key = Key.key(PacketEvents.get().getHandlerName().toLowerCase(), "injector");
-        addListenerMethod.invoke(null, key);
+    public static void removePaperChannelInitializeListener() throws Exception {
+        Key key = Key.key(PacketEvents.get().handlerName.toLowerCase(), "injector");
+        removeChannelInitializeListenerHolderListener(key);
     }
 
     private static boolean hasPaperInjectionMethod() {

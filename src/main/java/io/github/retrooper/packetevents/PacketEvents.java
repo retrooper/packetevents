@@ -25,11 +25,7 @@ import io.github.retrooper.packetevents.event.manager.PEEventManager;
 import io.github.retrooper.packetevents.exceptions.PacketEventsLoadFailureException;
 import io.github.retrooper.packetevents.injector.GlobalChannelInjector;
 import io.github.retrooper.packetevents.packettype.PacketType;
-import io.github.retrooper.packetevents.packettype.PacketTypeClasses;
-import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
-import io.github.retrooper.packetevents.packetwrappers.play.out.entityequipment.WrappedPacketOutEntityEquipment;
 import io.github.retrooper.packetevents.processor.BukkitEventProcessorInternal;
-import io.github.retrooper.packetevents.processor.PacketProcessorInternal;
 import io.github.retrooper.packetevents.settings.PacketEventsSettings;
 import io.github.retrooper.packetevents.updatechecker.UpdateChecker;
 import io.github.retrooper.packetevents.utils.entityfinder.EntityFinderUtils;
@@ -39,33 +35,29 @@ import io.github.retrooper.packetevents.utils.netty.bytebuf.ByteBufUtil_7;
 import io.github.retrooper.packetevents.utils.netty.bytebuf.ByteBufUtil_8;
 import io.github.retrooper.packetevents.utils.nms.NMSUtils;
 import io.github.retrooper.packetevents.utils.player.PlayerUtils;
+import io.github.retrooper.packetevents.utils.reflection.ReflectionObject;
 import io.github.retrooper.packetevents.utils.server.ServerUtils;
 import io.github.retrooper.packetevents.utils.server.ServerVersion;
 import io.github.retrooper.packetevents.utils.version.PEVersion;
+import io.github.retrooper.packetevents.utils.versionlookup.viaversion.ViaVersionLookupUtils;
 import org.bukkit.Bukkit;
-import org.bukkit.World;
-import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.ServicePriority;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.atomic.AtomicBoolean;
-
 public final class PacketEvents implements Listener, EventManager {
     private static PacketEvents instance;
     private static Plugin plugin;
-    private final PEVersion version = new PEVersion(1, 7, 9, 17);
+    private final PEVersion version = new PEVersion(2, 0, 0);
     private final EventManager eventManager = new PEEventManager();
     private final PlayerUtils playerUtils = new PlayerUtils();
     private final ServerUtils serverUtils = new ServerUtils();
-    private final PacketProcessorInternal packetProcessorInternal = new PacketProcessorInternal();
     private final BukkitEventProcessorInternal bukkitEventProcessorInternal = new BukkitEventProcessorInternal();
     private final GlobalChannelInjector injector = new GlobalChannelInjector();
-    private final AtomicBoolean injectorReady = new AtomicBoolean();
-    private String handlerName;
+    public String handlerName;
+    public String decoderName;
     private PacketEventsSettings settings = new PacketEventsSettings();
     private ByteBufUtil byteBufUtil;
     private UpdateChecker updateChecker;
@@ -101,44 +93,22 @@ public final class PacketEvents implements Listener, EventManager {
         return instance;
     }
 
-    @Deprecated
-    public static PacketEvents getAPI() {
-        return instance;
-    }
-
-
     public void load() {
         if (!loaded && !loading) {
             loading = true;
             //Resolve server version and cache
             ServerVersion version = ServerVersion.getVersion();
-            WrappedPacket.version = version;
+            ReflectionObject.version = version;
             NMSUtils.version = version;
             EntityFinderUtils.version = version;
             handlerName = "pe-" + plugin.getName();
+            decoderName = "decoder";
             try {
                 NMSUtils.load();
-
-                PacketTypeClasses.load();
-
-                PacketType.load();
 
                 EntityFinderUtils.load();
 
                 getServerUtils().entityCache = GuavaUtils.makeMap();
-
-                if (version.isNewerThanOrEquals(ServerVersion.v_1_9)) {
-                    for (WrappedPacketOutEntityEquipment.EquipmentSlot slot : WrappedPacketOutEntityEquipment.EquipmentSlot.values()) {
-                        slot.id = (byte) slot.ordinal();
-                    }
-                } else {
-                    WrappedPacketOutEntityEquipment.EquipmentSlot.MAINHAND.id = 0;
-                    WrappedPacketOutEntityEquipment.EquipmentSlot.OFFHAND.id = -1; //Invalid
-                    WrappedPacketOutEntityEquipment.EquipmentSlot.BOOTS.id = 1;
-                    WrappedPacketOutEntityEquipment.EquipmentSlot.LEGGINGS.id = 2;
-                    WrappedPacketOutEntityEquipment.EquipmentSlot.CHESTPLATE.id = 3;
-                    WrappedPacketOutEntityEquipment.EquipmentSlot.HELMET.id = 4;
-                }
             } catch (Exception ex) {
                 loading = false;
                 throw new PacketEventsLoadFailureException(ex);
@@ -146,31 +116,17 @@ public final class PacketEvents implements Listener, EventManager {
 
             byteBufUtil = NMSUtils.legacyNettyImportMode ? new ByteBufUtil_7() : new ByteBufUtil_8();
             updateChecker = new UpdateChecker();
-            if (!injectorReady.get()) {
-                injector.load();
-                lateBind = !injector.isBound();
-                //If late-bind is enabled, we will inject a bit later.
-                if (!lateBind) {
-                    injector.inject();
-                }
-                injectorReady.set(true);
+
+            injector.load();
+            lateBind = !injector.isBound() || ViaVersionLookupUtils.isAvailable();
+            //If late-bind is enabled or ViaVersion is present, we will inject a bit later.
+            if (!lateBind) {
+                injector.inject();
             }
 
             loaded = true;
             loading = false;
         }
-    }
-
-    public void loadAsyncNewThread() {
-        new Thread(this::load).start();
-    }
-
-    public void loadAsync(ExecutorService executorService) {
-        executorService.execute(this::load);
-    }
-
-    public void loadSettings(PacketEventsSettings settings) {
-        this.settings = settings;
     }
 
     public void init() {
@@ -193,11 +149,8 @@ public final class PacketEvents implements Listener, EventManager {
                 Metrics metrics = new Metrics((JavaPlugin) getPlugin(), 11327);
             }
 
-            //We must wait for the injector to initialize.
-
-            //Wait for the injector to be ready.
-            while (!injectorReady.get()) {
-            }
+            //TODO Load other ones
+            PacketType.Play.Client.load();
 
             Runnable postInjectTask = () -> {
                 Bukkit.getPluginManager().registerEvents(bukkitEventProcessorInternal, plugin);
@@ -224,16 +177,6 @@ public final class PacketEvents implements Listener, EventManager {
         }
     }
 
-    @Deprecated
-    public void init(Plugin plugin) {
-        init(plugin, settings);
-    }
-
-    @Deprecated
-    public void init(Plugin pl, PacketEventsSettings packetEventsSettings) {
-        init(packetEventsSettings);
-    }
-
     public void terminate() {
         if (initialized && !terminating) {
             //Eject all players
@@ -249,16 +192,6 @@ public final class PacketEvents implements Listener, EventManager {
         }
     }
 
-    /**
-     * Use {@link #terminate()}. This is deprecated
-     *
-     * @deprecated "Stop" might be misleading and "terminate" sounds better I guess...
-     */
-    @Deprecated
-    public void stop() {
-        terminate();
-    }
-
     public boolean isLoading() {
         return loading;
     }
@@ -269,11 +202,6 @@ public final class PacketEvents implements Listener, EventManager {
 
     public boolean isTerminating() {
         return terminating;
-    }
-
-    @Deprecated
-    public boolean isStopping() {
-        return isTerminating();
     }
 
     public boolean isInitializing() {
@@ -290,14 +218,6 @@ public final class PacketEvents implements Listener, EventManager {
 
     public GlobalChannelInjector getInjector() {
         return injector;
-    }
-
-    public PacketProcessorInternal getInternalPacketProcessor() {
-        return packetProcessorInternal;
-    }
-
-    public String getHandlerName() {
-        return handlerName;
     }
 
     public PacketEventsSettings getSettings() {

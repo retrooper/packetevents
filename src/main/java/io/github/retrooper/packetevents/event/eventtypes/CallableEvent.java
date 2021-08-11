@@ -20,7 +20,6 @@ package io.github.retrooper.packetevents.event.eventtypes;
 
 import io.github.retrooper.packetevents.event.PacketEvent;
 import io.github.retrooper.packetevents.event.PacketListenerAbstract;
-import io.github.retrooper.packetevents.event.impl.PacketPlayReceiveEvent;
 
 /**
  * The {@link PacketEvent} implements this interface.

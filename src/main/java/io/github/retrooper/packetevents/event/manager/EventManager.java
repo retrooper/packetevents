@@ -20,9 +20,7 @@ package io.github.retrooper.packetevents.event.manager;
 
 import io.github.retrooper.packetevents.PacketEvents;
 import io.github.retrooper.packetevents.event.PacketEvent;
-import io.github.retrooper.packetevents.event.PacketListener;
 import io.github.retrooper.packetevents.event.PacketListenerAbstract;
-import io.github.retrooper.packetevents.event.PacketListenerDynamic;
 
 /**
  * This is the event manager interface.
@@ -50,84 +48,6 @@ public interface EventManager {
     default EventManager callEvent(PacketEvent event) {
         //The dynamic event manager calls the legacy event manager.
         PEEventManager.EVENT_MANAGER_MODERN.callEvent(event);
-        return this;
-    }
-
-    /**
-     * Register a deprecated event listener.
-     * Not recommended to use the deprecated event listener.
-     *
-     * @param listener {@link PacketListener}
-     * @return Same event manager instance.
-     */
-    @Deprecated
-    default EventManager registerListener(PacketListener listener) {
-        if (listener != null) {
-            PEEventManager.EVENT_MANAGER_LEGACY.registerListener(listener);
-        }
-        return this;
-    }
-
-    /**
-     * Register multiple deprecated event listeners with one method.
-     * Not recommended to use the deprecated event listener.
-     *
-     * @param listeners {@link PacketListener}
-     * @return Same event manager instance.
-     */
-    @Deprecated
-    default EventManager registerListeners(PacketListener... listeners) {
-        PEEventManager.EVENT_MANAGER_LEGACY.registerListeners(listeners);
-        return this;
-    }
-
-    /**
-     * Unregister a deprecated event listener.
-     * Not recommended to use the deprecated event listener.
-     *
-     * @param listener {@link PacketListener}
-     * @return Same event manager instance.
-     */
-    @Deprecated
-    default EventManager unregisterListener(PacketListener listener) {
-        PEEventManager.EVENT_MANAGER_LEGACY.unregisterListener(listener);
-        return this;
-    }
-
-    /**
-     * Unregister multiple deprecated event listeners with one method.
-     * Not recommended to use the deprecated event listener.
-     *
-     * @param listeners {@link PacketListener}
-     * @return Same event manager instance.
-     */
-    @Deprecated
-    default EventManager unregisterListeners(PacketListener... listeners) {
-        PEEventManager.EVENT_MANAGER_LEGACY.unregisterListeners(listeners);
-        return this;
-    }
-
-    /**
-     * Register a PacketListenerDynamic listener.
-     *
-     * @param listener {@link PacketListenerDynamic}
-     * @return Same event manager instance.
-     */
-    @Deprecated
-    default EventManager registerListener(PacketListenerDynamic listener) {
-        PEEventManager.EVENT_MANAGER_MODERN.registerListener(listener);
-        return this;
-    }
-
-    /**
-     * Register multiple PacketListenerDynamic listeners.
-     *
-     * @param listeners {@link PacketListenerDynamic}
-     * @return Same event manager instance.
-     */
-    @Deprecated
-    default EventManager registerListeners(PacketListenerDynamic... listeners) {
-        PEEventManager.EVENT_MANAGER_MODERN.registerListeners(listeners);
         return this;
     }
 
@@ -164,7 +84,6 @@ public interface EventManager {
      */
     default EventManager unregisterAllListeners() {
         PEEventManager.EVENT_MANAGER_MODERN.unregisterAllListeners();
-        PEEventManager.EVENT_MANAGER_LEGACY.unregisterAllListeners();
         return this;
     }
 }

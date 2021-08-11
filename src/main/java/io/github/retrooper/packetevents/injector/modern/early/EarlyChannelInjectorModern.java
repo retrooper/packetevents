@@ -20,9 +20,9 @@ package io.github.retrooper.packetevents.injector.modern.early;
 
 import io.github.retrooper.packetevents.PacketEvents;
 import io.github.retrooper.packetevents.injector.EarlyInjector;
-import io.github.retrooper.packetevents.injector.modern.PlayerChannelHandlerModern;
-import io.github.retrooper.packetevents.packetwrappers.NMSPacket;
-import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
+import io.github.retrooper.packetevents.injector.modern.PacketDecoderModern;
+import io.github.retrooper.packetevents.packettype.PacketState;
+import io.github.retrooper.packetevents.utils.reflection.ReflectionObject;
 import io.github.retrooper.packetevents.utils.list.ListWrapper;
 import io.github.retrooper.packetevents.utils.nms.NMSUtils;
 import io.netty.channel.Channel;
@@ -74,6 +74,7 @@ public class EarlyChannelInjectorModern implements EarlyInjector {
     public void inject() {
         try {
             if (PaperChannelInjector.PAPER_INJECTION_METHOD) {
+                System.err.println("EYOOOO");
                 PaperChannelInjector.setPaperChannelInitializeListener();
                 return;
             }
@@ -128,19 +129,14 @@ public class EarlyChannelInjectorModern implements EarlyInjector {
         List<Object> networkManagers = NMSUtils.getNetworkManagers();
         synchronized (networkManagers) {
             for (Object networkManager : networkManagers) {
-                WrappedPacket networkManagerWrapper = new WrappedPacket(new NMSPacket(networkManager));
-                Channel channel = (Channel) networkManagerWrapper.readObject(0, NMSUtils.nettyChannelClass);
+                ReflectionObject networkManagerWrapper = new ReflectionObject(networkManager);
+                Channel channel = networkManagerWrapper.readObject(0, Channel.class);
                 if (channel == null) {
                     continue;
                 }
 
-                if (channel.pipeline().get(PacketEvents.get().getHandlerName()) != null) {
-                    channel.pipeline().remove(PacketEvents.get().getHandlerName());
-                }
-
-                if (channel.pipeline().get("packet_handler") != null) {
-                    channel.pipeline().addBefore("packet_handler", PacketEvents.get().getHandlerName(), new PlayerChannelHandlerModern());
-                }
+                System.err.println("Oh...");
+                PEChannelInitializerModern.postInitChannel(channel);
             }
         }
     }
@@ -194,11 +190,10 @@ public class EarlyChannelInjectorModern implements EarlyInjector {
 
     @Override
     public void eject() {
-        // TODO: Uninject from players currently online to prevent protocol lib issues.
         if (PaperChannelInjector.PAPER_INJECTION_METHOD) {
             try {
                 PaperChannelInjector.removePaperChannelInitializeListener();
-            } catch (ReflectiveOperationException e) {
+            } catch (Exception e) {
                 e.printStackTrace();
             }
         }
@@ -272,7 +267,7 @@ public class EarlyChannelInjectorModern implements EarlyInjector {
         if (channel != null) {
             Channel chnl = (Channel) channel;
             try {
-                chnl.pipeline().remove(PacketEvents.get().getHandlerName());
+                chnl.pipeline().remove(PacketEvents.get().decoderName);
             } catch (Exception ignored) {
             }
         }
@@ -284,8 +279,8 @@ public class EarlyChannelInjectorModern implements EarlyInjector {
         if (channel == null) {
             return false;
         }
-        PlayerChannelHandlerModern handler = getHandler(channel);
-        return handler != null && handler.player != null;
+        PacketDecoderModern decoder = getDecoder(channel);
+        return decoder != null && decoder.player != null;
     }
 
     @Override
@@ -306,21 +301,41 @@ public class EarlyChannelInjectorModern implements EarlyInjector {
         channel.writeAndFlush(rawNMSPacket);
     }
 
-    private PlayerChannelHandlerModern getHandler(Object rawChannel) {
+    private PacketDecoderModern getDecoder(Object rawChannel) {
         Channel channel = (Channel) rawChannel;
-        ChannelHandler handler = channel.pipeline().get(PacketEvents.get().getHandlerName());
-        if (handler instanceof PlayerChannelHandlerModern) {
-            return (PlayerChannelHandlerModern) handler;
-        } else {
+        ChannelHandler decoder = channel.pipeline().get(PacketEvents.get().decoderName);
+        if (decoder instanceof PacketDecoderModern) {
+            return (PacketDecoderModern) decoder;
+        }
+        else {
             return null;
         }
     }
 
     @Override
     public void updatePlayerObject(Player player, Object rawChannel) {
-        PlayerChannelHandlerModern handler = getHandler(rawChannel);
-        if (handler != null) {
-            handler.player = player;
+        PacketDecoderModern decoder = getDecoder(rawChannel);
+        if (decoder != null) {
+            decoder.player = player;
+        }
+    }
+
+    @Override
+    public PacketState getPacketState(Object channel) {
+        PacketDecoderModern decoder = getDecoder(channel);
+        if (decoder != null) {
+            return decoder.packetState;
+        }
+        else {
+            return null;
+        }
+    }
+
+    @Override
+    public void changePacketState(Object channel, PacketState packetState) {
+        PacketDecoderModern decoder = getDecoder(channel);
+        if (decoder != null) {
+            decoder.packetState = packetState;
         }
     }
 }

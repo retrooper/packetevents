@@ -60,16 +60,4 @@ public enum SystemOS {
         return value;
     }
 
-    /**
-     * Get the server's operating system.
-     * This method will CACHE for you.
-     *
-     * @return Operating System.
-     * @deprecated Use {@link #getOS()}, method renamed.
-     */
-    @Deprecated
-    public static SystemOS getOperatingSystem() {
-        return getOS();
-    }
-
 }

@@ -21,8 +21,6 @@ package io.github.retrooper.packetevents.event.manager;
 import io.github.retrooper.packetevents.PacketEvents;
 import io.github.retrooper.packetevents.event.PacketEvent;
 import io.github.retrooper.packetevents.event.PacketListenerAbstract;
-import io.github.retrooper.packetevents.event.eventtypes.CancellableEvent;
-import io.github.retrooper.packetevents.event.priority.PacketEventPriority;
 import io.github.retrooper.packetevents.event.PacketListenerPriority;
 
 import java.util.HashSet;
@@ -36,20 +34,13 @@ class EventManagerModern {
     /**
      * Call the PacketEvent.
      * This method processes the event on all the registered dynamic packet event listeners.
-     * The {@link PacketEventPriority#LOWEST} prioritized listeners will be processing first,
-     * the {@link PacketEventPriority#MONITOR} will be processing last and can
+     * The {@link PacketListenerPriority#LOWEST} prioritized listeners will be processing first,
+     * the {@link PacketListenerPriority#MONITOR} will be processing last and can
      * be the final decider whether the event has been cancelled or not.
-     * This call event also calls the legacy event manager call event.
      *
      * @param event {@link PacketEvent}
-     * @see EventManagerLegacy#callEvent(PacketEvent, byte)
      */
     public void callEvent(final PacketEvent event) {
-        boolean cancel = false;
-        if (event instanceof CancellableEvent) {
-            cancel = ((CancellableEvent) event).isCancelled();
-        }
-        byte highestReachedPriority = (byte) (PacketListenerPriority.LOWEST.getId() - 1);
         for (byte priority = PacketListenerPriority.LOWEST.getId(); priority <= PacketListenerPriority.MONITOR.getId(); priority++) {
             HashSet<PacketListenerAbstract> listeners = listenersMap.get(priority);
             if (listeners != null) {
@@ -60,23 +51,9 @@ class EventManagerModern {
                         PacketEvents.get().getPlugin().getLogger()
                                 .log(Level.SEVERE, "PacketEvents found an exception while calling a packet listener.", ex);
                     }
-                    //TODO Remove, because its redundant. We are only keeping it for compatibility with the legacy event manager.
-                    if (event instanceof CancellableEvent) {
-                        if (priority > highestReachedPriority) {
-                            CancellableEvent ce = (CancellableEvent) event;
-                            cancel = ce.isCancelled();
-                            highestReachedPriority = priority;
-                        }
-                    }
-                }
-                //TODO Remove. This is also redundant. The listeners are always called in order, the event is always being modified by each listener. The last listener therefore has the last decision on the cancellation.
-                if (event instanceof CancellableEvent) {
-                    CancellableEvent ce = (CancellableEvent) event;
-                    ce.setCancelled(cancel);
                 }
             }
         }
-        PEEventManager.EVENT_MANAGER_LEGACY.callEvent(event, highestReachedPriority);
     }
 
     /**

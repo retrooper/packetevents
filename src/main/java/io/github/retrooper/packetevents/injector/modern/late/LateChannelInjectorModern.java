@@ -20,8 +20,11 @@ package io.github.retrooper.packetevents.injector.modern.late;
 
 import io.github.retrooper.packetevents.PacketEvents;
 import io.github.retrooper.packetevents.injector.LateInjector;
-import io.github.retrooper.packetevents.injector.modern.PlayerChannelHandlerModern;
+import io.github.retrooper.packetevents.injector.modern.PacketDecoderModern;
+import io.github.retrooper.packetevents.injector.modern.early.PEChannelInitializerModern;
+import io.github.retrooper.packetevents.packettype.PacketState;
 import io.netty.channel.Channel;
+import io.netty.channel.ChannelHandler;
 import org.bukkit.entity.Player;
 
 public class LateChannelInjectorModern implements LateInjector {
@@ -37,29 +40,41 @@ public class LateChannelInjectorModern implements LateInjector {
 
     @Override
     public void injectPlayer(Player player) {
-        PlayerChannelHandlerModern playerChannelHandlerModern = new PlayerChannelHandlerModern();
-        playerChannelHandlerModern.player = player;
         Channel channel = (Channel) PacketEvents.get().getPlayerUtils().getChannel(player);
-        channel.pipeline().addBefore("packet_handler", PacketEvents.get().getHandlerName(), playerChannelHandlerModern);
+        PEChannelInitializerModern.postInitChannel(channel);
     }
+
+    private PacketDecoderModern getDecoder(Object rawChannel) {
+        Channel channel = (Channel) rawChannel;
+        ChannelHandler decoder = channel.pipeline().get(PacketEvents.get().decoderName);
+        if (decoder instanceof PacketDecoderModern) {
+            return (PacketDecoderModern) decoder;
+        }
+        else {
+            return null;
+        }
+    }
+
 
     @Override
     public void ejectPlayer(Player player) {
         Object channel = PacketEvents.get().getPlayerUtils().getChannel(player);
         if (channel != null) {
-            Channel chnl = (Channel) channel;
             try {
-                chnl.pipeline().remove(PacketEvents.get().getHandlerName());
-            } catch (Exception ex) {
-
+                ((Channel)channel).pipeline().remove(PacketEvents.get().decoderName);
+            } catch (Exception ignored) {
             }
         }
     }
 
     @Override
     public boolean hasInjected(Player player) {
-        Channel channel = (Channel) PacketEvents.get().getPlayerUtils().getChannel(player);
-        return channel.pipeline().get(PacketEvents.get().getHandlerName()) != null;
+        Object channel = PacketEvents.get().getPlayerUtils().getChannel(player);
+        if (channel == null) {
+            return false;
+        }
+        PacketDecoderModern decoder = getDecoder(channel);
+        return decoder != null && decoder.player != null;
     }
 
     @Override
@@ -78,5 +93,18 @@ public class LateChannelInjectorModern implements LateInjector {
     public void sendPacket(Object rawChannel, Object packet) {
         Channel channel = (Channel) rawChannel;
         channel.pipeline().writeAndFlush(packet);
+    }
+
+    @Override
+    public PacketState getPacketState(Object channel) {
+        return PacketState.PLAY;
+    }
+
+    @Override
+    public void changePacketState(Object channel, PacketState packetState) {
+        PacketDecoderModern decoder = getDecoder(channel);
+        if (decoder != null) {
+            decoder.packetState = packetState;
+        }
     }
 }

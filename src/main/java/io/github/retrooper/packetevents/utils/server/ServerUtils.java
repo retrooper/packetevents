@@ -19,16 +19,18 @@
 package io.github.retrooper.packetevents.utils.server;
 
 import io.github.retrooper.packetevents.PacketEvents;
-import io.github.retrooper.packetevents.packetwrappers.NMSPacket;
-import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
+import io.github.retrooper.packetevents.utils.reflection.ReflectionObject;
 import io.github.retrooper.packetevents.utils.boundingbox.BoundingBox;
 import io.github.retrooper.packetevents.utils.entityfinder.EntityFinderUtils;
+import io.github.retrooper.packetevents.utils.netty.bytebuf.ByteBufAbstract;
+import io.github.retrooper.packetevents.utils.netty.bytebuf.ByteBufLegacy;
+import io.github.retrooper.packetevents.utils.netty.bytebuf.ByteBufModern;
 import io.github.retrooper.packetevents.utils.nms.NMSUtils;
-import io.github.retrooper.packetevents.utils.npc.NPCManager;
 import io.github.retrooper.packetevents.utils.reflection.Reflection;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.entity.Entity;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.spigotmc.SpigotConfig;
 
@@ -40,11 +42,10 @@ import java.util.Map;
 
 public final class ServerUtils {
     private static Method getLevelEntityGetterIterable;
-    private static Class<?> persistentEntitySectionManagerClass, levelEntityGetterClass;
+    private static Class<?> persistentEntitySectionManagerClass, levelEntityGetterClass, legacyByteBufClass;
     private static byte v_1_17 = -1;
     private static Class<?> geyserClass;
     private boolean geyserClassChecked;
-    private final NPCManager npcManager = new NPCManager();
 
     //Initialized in PacketEvents#load
     public Map<Integer, Entity> entityCache;
@@ -85,15 +86,6 @@ public final class ServerUtils {
         return SystemOS.getOS();
     }
 
-    /**
-     * Get the NPC Manager.
-     *
-     * @return NPC Manager
-     */
-    public NPCManager getNPCManager() {
-        return npcManager;
-    }
-
     public boolean isBungeeCordEnabled() {
         return SpigotConfig.bungee;
     }
@@ -101,7 +93,7 @@ public final class ServerUtils {
     public BoundingBox getEntityBoundingBox(Entity entity) {
         Object nmsEntity = NMSUtils.getNMSEntity(entity);
         Object aabb = NMSUtils.getNMSAxisAlignedBoundingBox(nmsEntity);
-        WrappedPacket wrappedBoundingBox= new WrappedPacket(new NMSPacket(aabb));
+        ReflectionObject wrappedBoundingBox= new ReflectionObject(aabb);
         double minX = wrappedBoundingBox.readDouble(0);
         double minY = wrappedBoundingBox.readDouble(1);
         double minZ = wrappedBoundingBox.readDouble(2);
@@ -166,9 +158,9 @@ public final class ServerUtils {
                 getLevelEntityGetterIterable = Reflection.getMethod(levelEntityGetterClass, Iterable.class, 0);
             }
             Object worldServer = NMSUtils.convertBukkitWorldToWorldServer(world);
-            WrappedPacket wrappedWorldServer = new WrappedPacket(new NMSPacket(worldServer));
+            ReflectionObject wrappedWorldServer = new ReflectionObject(worldServer);
             Object persistentEntitySectionManager = wrappedWorldServer.readObject(0, persistentEntitySectionManagerClass);
-            WrappedPacket wrappedPersistentEntitySectionManager = new WrappedPacket(new NMSPacket(persistentEntitySectionManager));
+            ReflectionObject wrappedPersistentEntitySectionManager = new ReflectionObject(persistentEntitySectionManager);
             Object levelEntityGetter = wrappedPersistentEntitySectionManager.readObject(0, levelEntityGetterClass);
             Iterable<Object> nmsEntitiesIterable = null;
             try {
@@ -201,5 +193,20 @@ public final class ServerUtils {
             }
         }
         return geyserClass != null;
+    }
+
+    public ByteBufAbstract generateByteBufAbstract(@NotNull Object byteBuf) {
+        if (legacyByteBufClass == null) { 
+            try {
+                legacyByteBufClass = Class.forName("net.minecraft.util.io.netty.buffer.ByteBuf");
+            } catch (ClassNotFoundException e) {
+            }
+        }
+        if (legacyByteBufClass != null) {
+            return new ByteBufLegacy(byteBuf);
+        }
+        else {
+            return new ByteBufModern(byteBuf);
+        }
     }
 }

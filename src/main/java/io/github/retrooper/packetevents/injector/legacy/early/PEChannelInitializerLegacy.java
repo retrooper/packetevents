@@ -19,10 +19,11 @@
 package io.github.retrooper.packetevents.injector.legacy.early;
 
 import io.github.retrooper.packetevents.PacketEvents;
-import io.github.retrooper.packetevents.injector.legacy.PlayerChannelHandlerLegacy;
+import io.github.retrooper.packetevents.injector.legacy.PacketDecoderLegacy;
 import io.github.retrooper.packetevents.utils.reflection.Reflection;
 import net.minecraft.util.io.netty.channel.Channel;
 import net.minecraft.util.io.netty.channel.ChannelInitializer;
+import net.minecraft.util.io.netty.handler.codec.ByteToMessageDecoder;
 
 import java.lang.reflect.Method;
 
@@ -43,17 +44,14 @@ public class PEChannelInitializerLegacy extends ChannelInitializer<Channel> {
         return oldChannelInitializer;
     }
 
+    public static void postInitChannel(Channel channel) {
+        PacketDecoderLegacy packetDecoderLegacy = new PacketDecoderLegacy();
+        channel.pipeline().replace("decoder", PacketEvents.get().decoderName, packetDecoderLegacy);
+    }
+
     @Override
     protected void initChannel(Channel channel) throws Exception {
         initChannelMethod.invoke(oldChannelInitializer, channel);
-        PlayerChannelHandlerLegacy channelHandler = new PlayerChannelHandlerLegacy();
-        if (channel.pipeline().get("packet_handler") != null) {
-            String handlerName = PacketEvents.get().getHandlerName();
-            if (channel.pipeline().get(handlerName) != null) {
-                PacketEvents.get().getPlugin().getLogger().warning("[PacketEvents] Attempted to initialize a channel twice!");
-            } else {
-                channel.pipeline().addBefore("packet_handler", handlerName, channelHandler);
-            }
-        }
+        postInitChannel(channel);
     }
 }

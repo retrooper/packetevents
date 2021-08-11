@@ -18,9 +18,7 @@
 
 package io.github.retrooper.packetevents.utils.nms;
 
-import io.github.retrooper.packetevents.PacketEvents;
-import io.github.retrooper.packetevents.packetwrappers.NMSPacket;
-import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
+import io.github.retrooper.packetevents.utils.reflection.ReflectionObject;
 import io.github.retrooper.packetevents.utils.reflection.Reflection;
 import io.github.retrooper.packetevents.utils.reflection.SubclassUtil;
 import io.github.retrooper.packetevents.utils.server.ServerVersion;
@@ -380,7 +378,7 @@ public final class NMSUtils {
     }
 
     public static double[] recentTPS() {
-        return new WrappedPacket(new NMSPacket(getMinecraftServerInstance(Bukkit.getServer())), minecraftServerClass).readDoubleArray(0);
+        return new ReflectionObject(getMinecraftServerInstance(Bukkit.getServer()), minecraftServerClass).readDoubleArray(0);
     }
 
     public static Class<?> getNMSClass(String name) throws ClassNotFoundException {
@@ -436,12 +434,6 @@ public final class NMSUtils {
         return Class.forName(nettyPrefix + name);
     }
 
-    @Nullable
-    @Deprecated
-    public static Entity getEntityById(@Nullable World world, int id) {
-       return PacketEvents.get().getServerUtils().getEntityById(world, id);
-    }
-
     public static Entity getBukkitEntity(Object nmsEntity) {
         Object craftEntity = null;
         try {
@@ -490,13 +482,13 @@ public final class NMSUtils {
         if (entityPlayer == null) {
             return null;
         }
-        WrappedPacket wrappedEntityPlayer = new WrappedPacket(new NMSPacket(entityPlayer));
+        ReflectionObject wrappedEntityPlayer = new ReflectionObject(entityPlayer);
         return wrappedEntityPlayer.readObject(0, NMSUtils.playerConnectionClass);
     }
 
     public static Object getGameProfile(Player player) {
         Object entityPlayer = getEntityPlayer(player);
-        WrappedPacket entityHumanWrapper = new WrappedPacket(new NMSPacket(entityPlayer), NMSUtils.entityHumanClass);
+        ReflectionObject entityHumanWrapper = new ReflectionObject(entityPlayer, NMSUtils.entityHumanClass);
         return entityHumanWrapper.readObject(0, NMSUtils.gameProfileClass);
     }
 
@@ -505,17 +497,17 @@ public final class NMSUtils {
         if (playerConnection == null) {
             return null;
         }
-        WrappedPacket wrapper = new WrappedPacket(new NMSPacket(playerConnection), playerConnectionClass);
+        ReflectionObject wrapper = new ReflectionObject(playerConnection, playerConnectionClass);
         try {
             return wrapper.readObject(0, networkManagerClass);
         } catch (Exception ex) {
-            wrapper = new WrappedPacket(new NMSPacket(playerConnection));
+            wrapper = new ReflectionObject(playerConnection);
             try {
                 return wrapper.readObject(0, networkManagerClass);
             } catch (Exception ex2) {
                 //Support for some custom plugins.
                 playerConnection = wrapper.read(0, playerConnectionClass);
-                wrapper = new WrappedPacket(new NMSPacket(playerConnection), playerConnectionClass);
+                wrapper = new ReflectionObject(playerConnection, playerConnectionClass);
                 return wrapper.readObject(0, networkManagerClass);
             }
         }
@@ -526,7 +518,7 @@ public final class NMSUtils {
         if (networkManager == null) {
             return null;
         }
-        WrappedPacket wrapper = new WrappedPacket(new NMSPacket(networkManager));
+        ReflectionObject wrapper = new ReflectionObject(networkManager);
         return wrapper.readObject(0, nettyChannelClass);
     }
 
@@ -544,7 +536,7 @@ public final class NMSUtils {
     }
 
     public static List<Object> getNetworkManagers() {
-        WrappedPacket serverConnectionWrapper = new WrappedPacket(new NMSPacket(getMinecraftServerConnection()));
+        ReflectionObject serverConnectionWrapper = new ReflectionObject(getMinecraftServerConnection());
         for (int i = 0; true; i++) {
             try {
                 List<?> list = (List<?>) serverConnectionWrapper.readObject(i, List.class);
@@ -581,7 +573,7 @@ public final class NMSUtils {
 
     public static Object convertBukkitServerToNMSServer(Server server) {
         Object craftServer = craftServerClass.cast(server);
-        WrappedPacket wrapper = new WrappedPacket(new NMSPacket(craftServer));
+        ReflectionObject wrapper = new ReflectionObject(craftServer);
         try {
             return wrapper.readObject(0, minecraftServerClass);
         } catch (Exception ex) {
@@ -659,7 +651,7 @@ public final class NMSUtils {
     }
 
     public static String getStringFromMinecraftKey(Object minecraftKey) {
-        WrappedPacket minecraftKeyWrapper = new WrappedPacket(new NMSPacket(minecraftKey));
+        ReflectionObject minecraftKeyWrapper = new ReflectionObject(minecraftKey);
         return minecraftKeyWrapper.readString(1);
     }
 
