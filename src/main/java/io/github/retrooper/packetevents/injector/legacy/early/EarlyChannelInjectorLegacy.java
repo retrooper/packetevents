@@ -21,7 +21,7 @@ package io.github.retrooper.packetevents.injector.legacy.early;
 import io.github.retrooper.packetevents.PacketEvents;
 import io.github.retrooper.packetevents.injector.EarlyInjector;
 import io.github.retrooper.packetevents.injector.legacy.PacketDecoderLegacy;
-import io.github.retrooper.packetevents.packettype.PacketState;
+import io.github.retrooper.packetevents.protocol.PacketState;
 import io.github.retrooper.packetevents.utils.reflection.ReflectionObject;
 import io.github.retrooper.packetevents.utils.list.ListWrapper;
 import io.github.retrooper.packetevents.utils.nms.NMSUtils;
@@ -29,7 +29,6 @@ import net.minecraft.util.io.netty.channel.Channel;
 import net.minecraft.util.io.netty.channel.ChannelFuture;
 import net.minecraft.util.io.netty.channel.ChannelHandler;
 import net.minecraft.util.io.netty.channel.ChannelInitializer;
-import net.minecraft.util.io.netty.handler.codec.ByteToMessageDecoder;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.PluginDescriptionFile;
 

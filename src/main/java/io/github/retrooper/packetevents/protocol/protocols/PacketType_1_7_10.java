@@ -16,9 +16,9 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package io.github.retrooper.packetevents.packettype.protocols;
+package io.github.retrooper.packetevents.protocol.protocols;
 
-public class PacketType_1_8 {
+public class PacketType_1_7_10 {
     public static class Play {
         public enum Client {
             KEEP_ALIVE,
@@ -44,9 +44,7 @@ public class PacketType_1_8 {
             TAB_COMPLETE,
             CLIENT_SETTINGS,
             CLIENT_STATUS,
-            PLUGIN_MESSAGE,
-            SPECTATE,
-            RESOURCE_PACK_STATUS
+            PLUGIN_MESSAGE
         }
     }
 }

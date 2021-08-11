@@ -16,35 +16,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package io.github.retrooper.packetevents.injector;
+package io.github.retrooper.packetevents.protocol;
 
-import io.github.retrooper.packetevents.protocol.PacketState;
-import org.bukkit.entity.Player;
-import org.jetbrains.annotations.Nullable;
+import io.github.retrooper.packetevents.utils.player.ClientVersion;
 
-public interface ChannelInjector {
-    default boolean isBound() {
-        return true;
-    }
+public interface PacketTypeAbstract {
 
-    @Nullable
-    PacketState getPacketState(Object channel);
-
-    void changePacketState(Object channel, PacketState packetState);
-
-    void inject();
-
-    void eject();
-
-    void injectPlayer(Player player);
-
-    void ejectPlayer(Player player);
-
-    boolean hasInjected(Player player);
-
-    void writePacket(Object channel, Object rawNMSPacket);
-
-    void flushPackets(Object channel);
-
-    void sendPacket(Object channel, Object rawNMSPacket);
 }

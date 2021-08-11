@@ -24,7 +24,7 @@ import io.github.retrooper.packetevents.event.manager.EventManager;
 import io.github.retrooper.packetevents.event.manager.PEEventManager;
 import io.github.retrooper.packetevents.exceptions.PacketEventsLoadFailureException;
 import io.github.retrooper.packetevents.injector.GlobalChannelInjector;
-import io.github.retrooper.packetevents.packettype.PacketType;
+import io.github.retrooper.packetevents.protocol.PacketType;
 import io.github.retrooper.packetevents.processor.BukkitEventProcessorInternal;
 import io.github.retrooper.packetevents.settings.PacketEventsSettings;
 import io.github.retrooper.packetevents.updatechecker.UpdateChecker;

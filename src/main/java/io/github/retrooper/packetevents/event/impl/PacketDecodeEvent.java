@@ -5,8 +5,10 @@ import io.github.retrooper.packetevents.event.PacketEvent;
 import io.github.retrooper.packetevents.event.PacketListenerAbstract;
 import io.github.retrooper.packetevents.event.eventtypes.CancellableEvent;
 import io.github.retrooper.packetevents.event.eventtypes.PlayerEvent;
-import io.github.retrooper.packetevents.packettype.PacketState;
-import io.github.retrooper.packetevents.packettype.PacketType;
+import io.github.retrooper.packetevents.protocol.PacketSide;
+import io.github.retrooper.packetevents.protocol.PacketState;
+import io.github.retrooper.packetevents.protocol.PacketType;
+import io.github.retrooper.packetevents.protocol.PacketTypeAbstract;
 import io.github.retrooper.packetevents.utils.netty.bytebuf.ByteBufAbstract;
 import io.github.retrooper.packetevents.utils.netty.channel.ChannelUtils;
 import io.github.retrooper.packetevents.utils.player.ClientVersion;
@@ -52,8 +54,10 @@ public class PacketDecodeEvent extends PacketEvent implements PlayerEvent, Cance
         return packetIDNum;
     }
 
-    public PacketType.Play.Client getPacketType() {
-        return PacketType.Play.Client.getById(version, packetIDNum);
+    @Nullable
+    public PacketTypeAbstract getPacketType() {
+        PacketState state = getState();
+        return PacketType.getById(PacketSide.CLIENT, state, version, packetIDNum);
     }
 
     public PacketState getState() {

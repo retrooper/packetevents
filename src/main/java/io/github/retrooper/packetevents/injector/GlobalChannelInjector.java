@@ -25,7 +25,7 @@ import io.github.retrooper.packetevents.injector.legacy.early.EarlyChannelInject
 import io.github.retrooper.packetevents.injector.legacy.late.LateChannelInjectorLegacy;
 import io.github.retrooper.packetevents.injector.modern.early.EarlyChannelInjectorModern;
 import io.github.retrooper.packetevents.injector.modern.late.LateChannelInjectorModern;
-import io.github.retrooper.packetevents.packettype.PacketState;
+import io.github.retrooper.packetevents.protocol.PacketState;
 import io.github.retrooper.packetevents.utils.nms.NMSUtils;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.Nullable;

@@ -16,9 +16,9 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package io.github.retrooper.packetevents.packettype.protocols;
+package io.github.retrooper.packetevents.protocol.protocols;
 
-public class PacketType_1_16_2 {
+public class PacketType_1_14 {
     public static class Play {
         public enum Client {
             TELEPORT_CONFIRM,
@@ -36,7 +36,6 @@ public class PacketType_1_16_2 {
             EDIT_BOOK,
             QUERY_ENTITY_NBT,
             INTERACT_ENTITY,
-            GENERATE_STRUCTURE,
             KEEP_ALIVE,
             LOCK_DIFFICULTY,
             PLAYER_POSITION,
@@ -51,10 +50,7 @@ public class PacketType_1_16_2 {
             PLAYER_DIGGING,
             ENTITY_ACTION,
             STEER_VEHICLE,
-            //RECIPE_BOOK_DATA was deleted and has been split up into two new packets
-            //RECIPE_BOOK_DATA,
-            SET_DISPLAYED_RECIPE,
-            SET_RECIPE_BOOK_STATE,
+            RECIPE_BOOK_DATA,
             NAME_ITEM,
             RESOURCE_PACK_STATUS,
             ADVANCEMENT_TAB,

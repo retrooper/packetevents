@@ -22,10 +22,9 @@ import io.github.retrooper.packetevents.PacketEvents;
 import io.github.retrooper.packetevents.injector.LateInjector;
 import io.github.retrooper.packetevents.injector.legacy.PacketDecoderLegacy;
 import io.github.retrooper.packetevents.injector.legacy.early.PEChannelInitializerLegacy;
-import io.github.retrooper.packetevents.packettype.PacketState;
+import io.github.retrooper.packetevents.protocol.PacketState;
 import net.minecraft.util.io.netty.channel.Channel;
 import net.minecraft.util.io.netty.channel.ChannelHandler;
-import net.minecraft.util.io.netty.handler.codec.ByteToMessageDecoder;
 import org.bukkit.entity.Player;
 
 public class LateChannelInjectorLegacy implements LateInjector {

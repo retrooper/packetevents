@@ -16,44 +16,37 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package io.github.retrooper.packetevents.packettype.protocols;
+package io.github.retrooper.packetevents.protocol.protocols;
 
-public class PacketType_1_12 {
+public class PacketType_1_8 {
     public static class Play {
         public enum Client {
-            TELEPORT_CONFIRM,
-            CRAFT_RECIPE_REQUEST,
-            TAB_COMPLETE,
-            CHAT_MESSAGE,
-            CLIENT_STATUS,
-            CLIENT_SETTINGS,
-            CONFIRM_TRANSACTION,
-            CLICK_WINDOW_BUTTON,
-            CLICK_WINDOW,
-            CLOSE_WINDOW,
-            PLUGIN_MESSAGE,
-            INTERACT_ENTITY,
             KEEP_ALIVE,
+            CHAT_MESSAGE,
+            INTERACT_ENTITY,
             PLAYER_MOVEMENT,
             PLAYER_POSITION,
-            PLAYER_POSITION_AND_ROTATION,
             PLAYER_ROTATION,
-            VEHICLE_MOVE,
-            STEER_BOAT,
-            PLAYER_ABILITIES,
+            PLAYER_POSITION_AND_ROTATION,
             PLAYER_DIGGING,
+            PLAYER_BLOCK_PLACEMENT,
+            HELD_ITEM_CHANGE,
+            ANIMATION,
             ENTITY_ACTION,
             STEER_VEHICLE,
-            RECIPE_BOOK_DATA,
-            RESOURCE_PACK_STATUS,
-            ADVANCEMENT_TAB,
-            HELD_ITEM_CHANGE,
+            CLOSE_WINDOW,
+            CLICK_WINDOW,
+            CONFIRM_TRANSACTION,
             CREATIVE_INVENTORY_ACTION,
+            CLICK_WINDOW_BUTTON,
             UPDATE_SIGN,
-            ANIMATION,
+            PLAYER_ABILITIES,
+            TAB_COMPLETE,
+            CLIENT_SETTINGS,
+            CLIENT_STATUS,
+            PLUGIN_MESSAGE,
             SPECTATE,
-            PLAYER_BLOCK_PLACEMENT,
-            USE_ITEM
+            RESOURCE_PACK_STATUS
         }
     }
 }

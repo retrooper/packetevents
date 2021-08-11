@@ -21,7 +21,7 @@ package io.github.retrooper.packetevents.injector.modern.early;
 import io.github.retrooper.packetevents.PacketEvents;
 import io.github.retrooper.packetevents.injector.EarlyInjector;
 import io.github.retrooper.packetevents.injector.modern.PacketDecoderModern;
-import io.github.retrooper.packetevents.packettype.PacketState;
+import io.github.retrooper.packetevents.protocol.PacketState;
 import io.github.retrooper.packetevents.utils.reflection.ReflectionObject;
 import io.github.retrooper.packetevents.utils.list.ListWrapper;
 import io.github.retrooper.packetevents.utils.nms.NMSUtils;

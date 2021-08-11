@@ -16,9 +16,9 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package io.github.retrooper.packetevents.packettype;
+package io.github.retrooper.packetevents.protocol;
 
-import io.github.retrooper.packetevents.packettype.protocols.*;
+import io.github.retrooper.packetevents.protocol.protocols.*;
 import io.github.retrooper.packetevents.utils.player.ClientVersion;
 import org.jetbrains.annotations.Nullable;
 
@@ -26,8 +26,69 @@ import java.util.IdentityHashMap;
 import java.util.Map;
 
 public final class PacketType {
+    public static PacketTypeAbstract getById(PacketSide side, PacketState state, ClientVersion version, int packetID) {
+        if (state == null) {
+            state = PacketState.HANDSHAKING;
+        }
+        switch (state) {
+            case HANDSHAKING:
+                return Handshaking.Client.getById(packetID);
+            case STATUS:
+                return null;
+            case LOGIN:
+                return null;
+            case PLAY:
+                if (side == PacketSide.CLIENT) {
+                    return Play.Client.getById(version, packetID);
+                }
+                else {
+                    return null;
+                }
+            default:
+                return null;
+        }
+    }
+
+    public static class Handshaking {
+        public enum Client implements PacketTypeAbstract {
+            HANDSHAKE;
+
+            @Nullable
+            public static PacketTypeAbstract getById(int packetID) {
+                if (packetID == 0) {
+                    return HANDSHAKE;
+                }
+                else {
+                    return null;
+                }
+            }
+        }
+    }
+
+    public static class Status {
+        public enum Client implements PacketTypeAbstract {
+            REQUEST,
+            PING;
+
+            @Nullable
+            public static PacketTypeAbstract getById(int packetID) {
+                return packetID == 0 ? REQUEST : packetID == 1 ? PING : null;
+            }
+        }
+
+        public enum Server implements PacketTypeAbstract {
+            RESPONSE,
+            PONG;
+
+            @Nullable
+            public static PacketTypeAbstract getById(int packetID) {
+                return packetID == 0 ? RESPONSE : packetID == 1 ? PONG : null;
+            }
+        }
+    }
+
     public static class Play {
-        public enum Client {
+        public enum Client implements PacketTypeAbstract {
             TELEPORT_CONFIRM,
             QUERY_BLOCK_NBT,
             SET_DIFFICULTY,
@@ -94,12 +155,12 @@ public final class PacketType {
             }
 
             @Nullable
-            public static Client getById(ClientVersion version, int packetID) {
+            public static PacketTypeAbstract getById(ClientVersion version, int packetID) {
                 Map<Integer, Enum<?>> innerMap = PACKET_ID_CACHE.get(version);
                 if (innerMap != null) {
                     Object client = innerMap.get(packetID);
-                    if (client instanceof Client) {
-                        return (Client) client;
+                    if (client instanceof PacketTypeAbstract) {
+                        return (PacketTypeAbstract) client;
                     }
                 }
                 return null;

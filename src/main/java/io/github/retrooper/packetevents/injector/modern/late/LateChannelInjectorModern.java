@@ -22,7 +22,7 @@ import io.github.retrooper.packetevents.PacketEvents;
 import io.github.retrooper.packetevents.injector.LateInjector;
 import io.github.retrooper.packetevents.injector.modern.PacketDecoderModern;
 import io.github.retrooper.packetevents.injector.modern.early.PEChannelInitializerModern;
-import io.github.retrooper.packetevents.packettype.PacketState;
+import io.github.retrooper.packetevents.protocol.PacketState;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandler;
 import org.bukkit.entity.Player;

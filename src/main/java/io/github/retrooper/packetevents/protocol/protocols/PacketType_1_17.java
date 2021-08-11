@@ -16,9 +16,9 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package io.github.retrooper.packetevents.packettype.protocols;
+package io.github.retrooper.packetevents.protocol.protocols;
 
-public class PacketType_1_16 {
+public class PacketType_1_17 {
     public static class Play {
         public enum Client {
             TELEPORT_CONFIRM,
@@ -51,7 +51,10 @@ public class PacketType_1_16 {
             PLAYER_DIGGING,
             ENTITY_ACTION,
             STEER_VEHICLE,
-            RECIPE_BOOK_DATA,
+            PONG,
+            //RECIPE_BOOK_DATA,
+            SET_DISPLAYED_RECIPE,
+            SET_RECIPE_BOOK_STATE,
             NAME_ITEM,
             RESOURCE_PACK_STATUS,
             ADVANCEMENT_TAB,

@@ -2,7 +2,7 @@ package io.github.retrooper.packetevents.injector.legacy;
 
 import io.github.retrooper.packetevents.PacketEvents;
 import io.github.retrooper.packetevents.event.impl.PacketDecodeEvent;
-import io.github.retrooper.packetevents.packettype.PacketState;
+import io.github.retrooper.packetevents.protocol.PacketState;
 import net.minecraft.util.io.netty.buffer.ByteBuf;
 import net.minecraft.util.io.netty.channel.ChannelHandlerContext;
 import net.minecraft.util.io.netty.handler.codec.ByteToMessageDecoder;
