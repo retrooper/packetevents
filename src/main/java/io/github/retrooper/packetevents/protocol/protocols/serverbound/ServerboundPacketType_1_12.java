@@ -16,35 +16,44 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package io.github.retrooper.packetevents.protocol.protocols;
+package io.github.retrooper.packetevents.protocol.protocols.serverbound;
 
-public class PacketType_1_7_10 {
+public class ServerboundPacketType_1_12 {
     public static class Play {
         public enum Client {
-            KEEP_ALIVE,
+            TELEPORT_CONFIRM,
+            CRAFT_RECIPE_REQUEST,
+            TAB_COMPLETE,
             CHAT_MESSAGE,
+            CLIENT_STATUS,
+            CLIENT_SETTINGS,
+            CONFIRM_TRANSACTION,
+            CLICK_WINDOW_BUTTON,
+            CLICK_WINDOW,
+            CLOSE_WINDOW,
+            PLUGIN_MESSAGE,
             INTERACT_ENTITY,
+            KEEP_ALIVE,
             PLAYER_MOVEMENT,
             PLAYER_POSITION,
-            PLAYER_ROTATION,
             PLAYER_POSITION_AND_ROTATION,
+            PLAYER_ROTATION,
+            VEHICLE_MOVE,
+            STEER_BOAT,
+            PLAYER_ABILITIES,
             PLAYER_DIGGING,
-            PLAYER_BLOCK_PLACEMENT,
-            HELD_ITEM_CHANGE,
-            ANIMATION,
             ENTITY_ACTION,
             STEER_VEHICLE,
-            CLOSE_WINDOW,
-            CLICK_WINDOW,
-            CONFIRM_TRANSACTION,
+            RECIPE_BOOK_DATA,
+            RESOURCE_PACK_STATUS,
+            ADVANCEMENT_TAB,
+            HELD_ITEM_CHANGE,
             CREATIVE_INVENTORY_ACTION,
-            CLICK_WINDOW_BUTTON,
             UPDATE_SIGN,
-            PLAYER_ABILITIES,
-            TAB_COMPLETE,
-            CLIENT_SETTINGS,
-            CLIENT_STATUS,
-            PLUGIN_MESSAGE
+            ANIMATION,
+            SPECTATE,
+            PLAYER_BLOCK_PLACEMENT,
+            USE_ITEM
         }
     }
 }

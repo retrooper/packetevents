@@ -16,54 +16,37 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package io.github.retrooper.packetevents.protocol.protocols;
+package io.github.retrooper.packetevents.protocol.protocols.serverbound;
 
-public class PacketType_1_13 {
+public class ServerboundPacketType_1_8 {
     public static class Play {
         public enum Client {
-            TELEPORT_CONFIRM,
-            QUERY_BLOCK_NBT,
-            CHAT_MESSAGE,
-            CLIENT_STATUS,
-            CLIENT_SETTINGS,
-            TAB_COMPLETE,
-            CONFIRM_TRANSACTION,
-            CLICK_WINDOW_BUTTON,
-            CLICK_WINDOW,
-            CLOSE_WINDOW,
-            PLUGIN_MESSAGE,
-            EDIT_BOOK,
-            QUERY_ENTITY_NBT,
-            INTERACT_ENTITY,
             KEEP_ALIVE,
+            CHAT_MESSAGE,
+            INTERACT_ENTITY,
             PLAYER_MOVEMENT,
             PLAYER_POSITION,
-            PLAYER_POSITION_AND_ROTATION,
             PLAYER_ROTATION,
-            VEHICLE_MOVE,
-            STEER_BOAT,
-            PICK_ITEM,
-            CRAFT_RECIPE_REQUEST,
-            PLAYER_ABILITIES,
+            PLAYER_POSITION_AND_ROTATION,
             PLAYER_DIGGING,
+            PLAYER_BLOCK_PLACEMENT,
+            HELD_ITEM_CHANGE,
+            ANIMATION,
             ENTITY_ACTION,
             STEER_VEHICLE,
-            RECIPE_BOOK_DATA,
-            NAME_ITEM,
-            RESOURCE_PACK_STATUS,
-            ADVANCEMENT_TAB,
-            SELECT_TRADE,
-            SET_BEACON_EFFECT,
-            HELD_ITEM_CHANGE,
-            UPDATE_COMMAND_BLOCK,
-            UPDATE_COMMAND_BLOCK_MINECART,
+            CLOSE_WINDOW,
+            CLICK_WINDOW,
+            CONFIRM_TRANSACTION,
             CREATIVE_INVENTORY_ACTION,
-            UPDATE_STRUCTURE_BLOCK,
+            CLICK_WINDOW_BUTTON,
             UPDATE_SIGN,
-            ANIMATION,
+            PLAYER_ABILITIES,
+            TAB_COMPLETE,
+            CLIENT_SETTINGS,
+            CLIENT_STATUS,
+            PLUGIN_MESSAGE,
             SPECTATE,
-            PLAYER_BLOCK_PLACEMENT,
-            USE_ITEM
+            RESOURCE_PACK_STATUS
         }
     }
 }

@@ -18,7 +18,7 @@
 
 package io.github.retrooper.packetevents.protocol;
 
-import io.github.retrooper.packetevents.protocol.protocols.*;
+import io.github.retrooper.packetevents.protocol.protocols.serverbound.*;
 import io.github.retrooper.packetevents.utils.player.ClientVersion;
 import org.jetbrains.annotations.Nullable;
 
@@ -34,14 +34,23 @@ public final class PacketType {
             case HANDSHAKING:
                 return Handshaking.Client.getById(packetID);
             case STATUS:
-                return null;
+                if (side == PacketSide.CLIENT) {
+                    return Status.Client.getById(packetID);
+                }
+                else {
+                    return Status.Server.getById(packetID);
+                }
             case LOGIN:
-                return null;
+                if (side == PacketSide.CLIENT) {
+                    return Login.Client.getById(packetID);
+                }
+                else {
+                    return Login.Server.getById(packetID);
+                }
             case PLAY:
                 if (side == PacketSide.CLIENT) {
                     return Play.Client.getById(version, packetID);
-                }
-                else {
+                } else {
                     return null;
                 }
             default:
@@ -57,8 +66,7 @@ public final class PacketType {
             public static PacketTypeAbstract getById(int packetID) {
                 if (packetID == 0) {
                     return HANDSHAKE;
-                }
-                else {
+                } else {
                     return null;
                 }
             }
@@ -72,7 +80,13 @@ public final class PacketType {
 
             @Nullable
             public static PacketTypeAbstract getById(int packetID) {
-                return packetID == 0 ? REQUEST : packetID == 1 ? PING : null;
+                if (packetID == 0) {
+                    return REQUEST;
+                } else if (packetID == 1) {
+                    return PING;
+                } else {
+                    return null;
+                }
             }
         }
 
@@ -82,7 +96,57 @@ public final class PacketType {
 
             @Nullable
             public static PacketTypeAbstract getById(int packetID) {
-                return packetID == 0 ? RESPONSE : packetID == 1 ? PONG : null;
+                if (packetID == 0) {
+                    return RESPONSE;
+                }
+                else if (packetID == 1) {
+                    return PONG;
+                }
+                else {
+                    return null;
+                }
+            }
+        }
+    }
+
+    public static class Login {
+        public enum Client implements PacketTypeAbstract {
+            LOGIN_START,
+            ENCRYPTION_RESPONSE;
+
+            @Nullable
+            public static PacketTypeAbstract getById(int packetID) {
+                if (packetID == 0) {
+                    return LOGIN_START;
+                }
+                else if (packetID == 1) {
+                    return ENCRYPTION_RESPONSE;
+                }
+                else {
+                    return null;
+                }
+            }
+        }
+
+        public enum Server implements PacketTypeAbstract {
+            DISCONNECT,
+            ENCRYPTION_REQUEST,
+            LOGIN_SUCCESS;
+
+            @Nullable
+            public static PacketTypeAbstract getById(int packetID) {
+                if (packetID == 0) {
+                    return DISCONNECT;
+                }
+                else if (packetID == 1) {
+                    return ENCRYPTION_REQUEST;
+                }
+                else if (packetID == 2) {
+                    return LOGIN_SUCCESS;
+                }
+                else {
+                    return null;
+                }
             }
         }
     }
@@ -140,19 +204,8 @@ public final class PacketType {
             PLAYER_BLOCK_PLACEMENT,
             USE_ITEM;
 
-            private int packetID = -1;
             private static final Map<ClientVersion, Map<Integer, Enum<?>>> PACKET_ID_CACHE = new IdentityHashMap<>();
 
-            Client() {
-            }
-
-            public boolean isSupported() {
-                return packetID != -1;
-            }
-
-            public int getPacketID() {
-                return packetID;
-            }
 
             @Nullable
             public static PacketTypeAbstract getById(ClientVersion version, int packetID) {
@@ -169,41 +222,40 @@ public final class PacketType {
             private static void loadPacketIDs(ClientVersion version, Enum<?>[] enumConstants) {
                 Map<Integer, Enum<?>> innerMap = new IdentityHashMap<>();
                 for (int i = 0; i < enumConstants.length; i++) {
-                    Client.valueOf(enumConstants[i].name()).packetID = i;
                     innerMap.put(i, Client.valueOf(enumConstants[i].name()));
                 }
                 PACKET_ID_CACHE.put(version, innerMap);
             }
 
             public static void load() {
-                loadPacketIDs(ClientVersion.v_1_7_10, PacketType_1_7_10.Play.Client.values());
-                loadPacketIDs(ClientVersion.v_1_8, PacketType_1_8.Play.Client.values());
-                loadPacketIDs(ClientVersion.v_1_9, PacketType_1_9.Play.Client.values());
-                loadPacketIDs(ClientVersion.v_1_9_1, PacketType_1_9.Play.Client.values());
-                loadPacketIDs(ClientVersion.v_1_9_2, PacketType_1_9.Play.Client.values());
-                loadPacketIDs(ClientVersion.v_1_9_3, PacketType_1_9.Play.Client.values());
-                loadPacketIDs(ClientVersion.v_1_10, PacketType_1_9.Play.Client.values());
-                loadPacketIDs(ClientVersion.v_1_11, PacketType_1_9.Play.Client.values());
-                loadPacketIDs(ClientVersion.v_1_11_1, PacketType_1_9.Play.Client.values());
-                loadPacketIDs(ClientVersion.v_1_12, PacketType_1_12.Play.Client.values());
-                loadPacketIDs(ClientVersion.v_1_12_1, PacketType_1_12_1.Play.Client.values());
-                loadPacketIDs(ClientVersion.v_1_12_2, PacketType_1_12_1.Play.Client.values());
-                loadPacketIDs(ClientVersion.v_1_13, PacketType_1_13.Play.Client.values());
-                loadPacketIDs(ClientVersion.v_1_14, PacketType_1_14.Play.Client.values());
-                loadPacketIDs(ClientVersion.v_1_14_1, PacketType_1_14.Play.Client.values());
-                loadPacketIDs(ClientVersion.v_1_14_2, PacketType_1_14.Play.Client.values());
-                loadPacketIDs(ClientVersion.v_1_14_3, PacketType_1_14.Play.Client.values());
-                loadPacketIDs(ClientVersion.v_1_14_4, PacketType_1_14.Play.Client.values());
-                loadPacketIDs(ClientVersion.v_1_15, PacketType_1_14.Play.Client.values());
-                loadPacketIDs(ClientVersion.v_1_15_1, PacketType_1_14.Play.Client.values());
-                loadPacketIDs(ClientVersion.v_1_15_2, PacketType_1_15_2.Play.Client.values());
-                loadPacketIDs(ClientVersion.v_1_16, PacketType_1_16.Play.Client.values());
-                loadPacketIDs(ClientVersion.v_1_16_1, PacketType_1_16.Play.Client.values());
-                loadPacketIDs(ClientVersion.v_1_16_2, PacketType_1_16_2.Play.Client.values());
-                loadPacketIDs(ClientVersion.v_1_16_3, PacketType_1_16_2.Play.Client.values());
-                loadPacketIDs(ClientVersion.v_1_16_4, PacketType_1_16_2.Play.Client.values());
-                loadPacketIDs(ClientVersion.v_1_17, PacketType_1_17.Play.Client.values());
-                loadPacketIDs(ClientVersion.v_1_17_1, PacketType_1_17.Play.Client.values());
+                loadPacketIDs(ClientVersion.v_1_7_10, ServerboundPacketType_1_7_10.Play.Client.values());
+                loadPacketIDs(ClientVersion.v_1_8, ServerboundPacketType_1_8.Play.Client.values());
+                loadPacketIDs(ClientVersion.v_1_9, ServerboundPacketType_1_9.Play.Client.values());
+                loadPacketIDs(ClientVersion.v_1_9_1, ServerboundPacketType_1_9.Play.Client.values());
+                loadPacketIDs(ClientVersion.v_1_9_2, ServerboundPacketType_1_9.Play.Client.values());
+                loadPacketIDs(ClientVersion.v_1_9_3, ServerboundPacketType_1_9.Play.Client.values());
+                loadPacketIDs(ClientVersion.v_1_10, ServerboundPacketType_1_9.Play.Client.values());
+                loadPacketIDs(ClientVersion.v_1_11, ServerboundPacketType_1_9.Play.Client.values());
+                loadPacketIDs(ClientVersion.v_1_11_1, ServerboundPacketType_1_9.Play.Client.values());
+                loadPacketIDs(ClientVersion.v_1_12, ServerboundPacketType_1_12.Play.Client.values());
+                loadPacketIDs(ClientVersion.v_1_12_1, ServerboundPacketType_1_12_1.Play.Client.values());
+                loadPacketIDs(ClientVersion.v_1_12_2, ServerboundPacketType_1_12_1.Play.Client.values());
+                loadPacketIDs(ClientVersion.v_1_13, ServerboundPacketType_1_13.Play.Client.values());
+                loadPacketIDs(ClientVersion.v_1_14, ServerboundPacketType_1_14.Play.Client.values());
+                loadPacketIDs(ClientVersion.v_1_14_1, ServerboundPacketType_1_14.Play.Client.values());
+                loadPacketIDs(ClientVersion.v_1_14_2, ServerboundPacketType_1_14.Play.Client.values());
+                loadPacketIDs(ClientVersion.v_1_14_3, ServerboundPacketType_1_14.Play.Client.values());
+                loadPacketIDs(ClientVersion.v_1_14_4, ServerboundPacketType_1_14.Play.Client.values());
+                loadPacketIDs(ClientVersion.v_1_15, ServerboundPacketType_1_14.Play.Client.values());
+                loadPacketIDs(ClientVersion.v_1_15_1, ServerboundPacketType_1_14.Play.Client.values());
+                loadPacketIDs(ClientVersion.v_1_15_2, ServerboundPacketType_1_15_2.Play.Client.values());
+                loadPacketIDs(ClientVersion.v_1_16, ServerboundPacketType_1_16.Play.Client.values());
+                loadPacketIDs(ClientVersion.v_1_16_1, ServerboundPacketType_1_16.Play.Client.values());
+                loadPacketIDs(ClientVersion.v_1_16_2, ServerboundPacketType_1_16_2.Play.Client.values());
+                loadPacketIDs(ClientVersion.v_1_16_3, ServerboundPacketType_1_16_2.Play.Client.values());
+                loadPacketIDs(ClientVersion.v_1_16_4, ServerboundPacketType_1_16_2.Play.Client.values());
+                loadPacketIDs(ClientVersion.v_1_17, ServerboundPacketType_1_17.Play.Client.values());
+                loadPacketIDs(ClientVersion.v_1_17_1, ServerboundPacketType_1_17.Play.Client.values());
             }
         }
     }

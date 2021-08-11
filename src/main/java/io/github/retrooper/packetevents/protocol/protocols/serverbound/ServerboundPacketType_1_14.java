@@ -16,9 +16,9 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package io.github.retrooper.packetevents.protocol.protocols;
+package io.github.retrooper.packetevents.protocol.protocols.serverbound;
 
-public class PacketType_1_15_2 {
+public class ServerboundPacketType_1_14 {
     public static class Play {
         public enum Client {
             TELEPORT_CONFIRM,
