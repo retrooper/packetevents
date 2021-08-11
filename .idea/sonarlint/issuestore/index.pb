@@ -29,10 +29,6 @@ Nsrc/main/java/io/github/retrooper/packetevents/event/manager/EventManager.java
 Qsrc/main/java/io/github/retrooper/packetevents/settings/PacketEventsSettings.java,1/7/1787fa8306a7d6b1a343fc93d88d02a6781199c9
 z
 Jsrc/main/java/io/github/retrooper/packetevents/packettype/PacketState.java,f/0/f093fcc93569f9961d5c45446f9058e7e13837d0
-Š
-Zsrc/main/java/io/github/retrooper/packetevents/packettype/protocols/PacketType_1_7_10.java,9/4/946dc82f8f4ffd30b7e2b05ebe4bb9bc18c31c1e
-‡
-Wsrc/main/java/io/github/retrooper/packetevents/packettype/protocols/PacketType_1_8.java,a/d/ad34ae96a85a249787912fa3b41e86261db7a270
 €
 Psrc/main/java/io/github/retrooper/packetevents/event/manager/PEEventManager.java,1/b/1b8b9e8e5792fdb2ce23f450f4d17dd91d4e8b15
 
@@ -75,5 +71,3 @@ dsrc/main/java/io/github/retrooper/packetevents/injector/legacy/early/PEChannelI
 esrc/main/java/io/github/retrooper/packetevents/wrapper/login/client/WrapperLoginClientLoginStart.java,0/6/06dcd2a49ddcc89d3f017459864c76300aa34821
 v
 Fsrc/main/java/io/github/retrooper/packetevents/utils/nms/NMSUtils.java,3/7/37800fc8183d6581bc9d95bb27577459e9ecbe4f
-‡
-Wsrc/main/java/io/github/retrooper/packetevents/injector/legacy/PacketDecoderLegacy.java,c/f/cffb2c98d4e4fb15d213cdad004c654c57db062c

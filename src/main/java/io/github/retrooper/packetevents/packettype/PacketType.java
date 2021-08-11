@@ -18,8 +18,7 @@
 
 package io.github.retrooper.packetevents.packettype;
 
-import io.github.retrooper.packetevents.packettype.protocols.PacketType_1_7_10;
-import io.github.retrooper.packetevents.packettype.protocols.PacketType_1_8;
+import io.github.retrooper.packetevents.packettype.protocols.*;
 import io.github.retrooper.packetevents.utils.player.ClientVersion;
 import org.jetbrains.annotations.Nullable;
 
@@ -29,34 +28,58 @@ import java.util.Map;
 public final class PacketType {
     public static class Play {
         public enum Client {
-            KEEP_ALIVE,
+            TELLEPORT_CONFIRM,
+            QUERY_BLOCK_NBT,
+            SET_DIFFICULTY,
             CHAT_MESSAGE,
+            CLIENT_STATUS,
+            CLIENT_SETTINGS,
+            TAB_COMPLETE,
+            CONFIRM_TRANSACTION,
+            CLICK_WINDOW_BUTTON,
+            CLICK_WINDOW,
+            CLOSE_WINDOW,
+            PLUGIN_MESSAGE,
+            EDIT_BOOK,
+            QUERY_ENTITY_NBT,
             INTERACT_ENTITY,
-            PLAYER_MOVEMENT,
+            GENERATE_STRUCTURE,
+            KEEP_ALIVE,
+            LOCK_DIFFICULTY,
             PLAYER_POSITION,
-            PLAYER_ROTATION,
             PLAYER_POSITION_AND_ROTATION,
+            PLAYER_ROTATION,
+            PLAYER_MOVEMENT,
+            VEHICLE_MOVE,
+            STEER_BOAT,
+            PICK_ITEM,
+            CRAFT_RECIPE_REQUEST,
+            PLAYER_ABILITIES,
             PLAYER_DIGGING,
-            PLAYER_BLOCK_PLACEMENT,
-            HELD_ITEM_CHANGE,
-            ANIMATION,
             ENTITY_ACTION,
             STEER_VEHICLE,
-            CLOSE_WINDOW,
-            CLICK_WINDOW,
-            WINDOW_CONFIRMATION,
+            PONG,
+            RECIPE_BOOK_DATA,
+            SET_DISPLAYED_RECIPE,
+            SET_RECIPE_BOOK_STATE,
+            NAME_ITEM,
+            RESOURCE_PACK_STATUS,
+            ADVANCEMENT_TAB,
+            SELECT_TRADE,
+            SET_BEACON_EFFECT,
+            HELD_ITEM_CHANGE,
+            UPDATE_COMMAND_BLOCK,
+            UPDATE_COMMAND_BLOCK_MINECART,
             CREATIVE_INVENTORY_ACTION,
-            CLICK_WINDOW_BUTTON,
+            UPDATE_JIGSAW_BLOCK,
+            UPDATE_STRUCTURE_BLOCK,
             UPDATE_SIGN,
-            PLAYER_ABILITIES,
-            TAB_COMPLETE,
-            CLIENT_SETTINGS,
-            CLIENT_STATUS,
-            PLUGIN_MESSAGE,
+            ANIMATION,
             SPECTATE,
-            RESOURCE_PACK_STATUS;
+            PLAYER_BLOCK_PLACEMENT,
+            USE_ITEM;
 
-            public int packetID = -1;
+            private int packetID = -1;
             private static final Map<ClientVersion, Map<Integer, Enum<?>>> PACKET_ID_CACHE = new IdentityHashMap<>();
 
             Client() {
@@ -64,6 +87,10 @@ public final class PacketType {
 
             public boolean isSupported() {
                 return packetID != -1;
+            }
+
+            public int getPacketID() {
+                return packetID;
             }
 
             @Nullable
@@ -90,6 +117,32 @@ public final class PacketType {
             public static void load() {
                 loadPacketIDs(ClientVersion.v_1_7_10, PacketType_1_7_10.Play.Client.values());
                 loadPacketIDs(ClientVersion.v_1_8, PacketType_1_8.Play.Client.values());
+                loadPacketIDs(ClientVersion.v_1_9, PacketType_1_9.Play.Client.values());
+                loadPacketIDs(ClientVersion.v_1_9_1, PacketType_1_9.Play.Client.values());
+                loadPacketIDs(ClientVersion.v_1_9_2, PacketType_1_9.Play.Client.values());
+                loadPacketIDs(ClientVersion.v_1_9_3, PacketType_1_9.Play.Client.values());
+                loadPacketIDs(ClientVersion.v_1_10, PacketType_1_9.Play.Client.values());
+                loadPacketIDs(ClientVersion.v_1_11, PacketType_1_9.Play.Client.values());
+                loadPacketIDs(ClientVersion.v_1_11_1, PacketType_1_9.Play.Client.values());
+                loadPacketIDs(ClientVersion.v_1_12, PacketType_1_12.Play.Client.values());
+                loadPacketIDs(ClientVersion.v_1_12_1, PacketType_1_12_1.Play.Client.values());
+                loadPacketIDs(ClientVersion.v_1_12_2, PacketType_1_12_1.Play.Client.values());
+                loadPacketIDs(ClientVersion.v_1_13, PacketType_1_13.Play.Client.values());
+                loadPacketIDs(ClientVersion.v_1_14, PacketType_1_14.Play.Client.values());
+                loadPacketIDs(ClientVersion.v_1_14_1, PacketType_1_14.Play.Client.values());
+                loadPacketIDs(ClientVersion.v_1_14_2, PacketType_1_14.Play.Client.values());
+                loadPacketIDs(ClientVersion.v_1_14_3, PacketType_1_14.Play.Client.values());
+                loadPacketIDs(ClientVersion.v_1_14_4, PacketType_1_14.Play.Client.values());
+                loadPacketIDs(ClientVersion.v_1_15, PacketType_1_14.Play.Client.values());
+                loadPacketIDs(ClientVersion.v_1_15_1, PacketType_1_14.Play.Client.values());
+                loadPacketIDs(ClientVersion.v_1_15_2, PacketType_1_15_2.Play.Client.values());
+                loadPacketIDs(ClientVersion.v_1_16, PacketType_1_16.Play.Client.values());
+                loadPacketIDs(ClientVersion.v_1_16_1, PacketType_1_16.Play.Client.values());
+                loadPacketIDs(ClientVersion.v_1_16_2, PacketType_1_16_2.Play.Client.values());
+                loadPacketIDs(ClientVersion.v_1_16_3, PacketType_1_16_2.Play.Client.values());
+                loadPacketIDs(ClientVersion.v_1_16_4, PacketType_1_16_2.Play.Client.values());
+                loadPacketIDs(ClientVersion.v_1_17, PacketType_1_17.Play.Client.values());
+                loadPacketIDs(ClientVersion.v_1_17_1, PacketType_1_17.Play.Client.values());
             }
         }
     }

@@ -42,7 +42,7 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 //TODO Cache clientVersions map by channels and not inetsocketaddresses :)
 public final class PlayerUtils {
-    public final Map<InetSocketAddress, ClientVersion> clientVersions = new ConcurrentHashMap<>();
+    public final Map<Object, ClientVersion> clientVersions = new ConcurrentHashMap<>();
     public final Map<UUID, Long> keepAliveMap = new ConcurrentHashMap<>();
     public final Map<String, Object> channels = new ConcurrentHashMap<>();
 
@@ -68,13 +68,15 @@ public final class PlayerUtils {
         if (player.getAddress() == null) {
             return ClientVersion.UNKNOWN;
         }
-        ClientVersion version = clientVersions.get(player.getAddress());
+        Object channel = PacketEvents.get().getPlayerUtils().getChannel(player);
+        ClientVersion version = clientVersions.get(channel);
         if (version == null) {
             //Prioritize asking ViaVersion and ProtocolSupport as they modify the protocol version in the packet we access it from.
             if (VersionLookupUtils.isDependencyAvailable()) {
                 try {
                     version = ClientVersion.getClientVersion(VersionLookupUtils.getProtocolVersion(player));
-                    clientVersions.put(player.getAddress(), version);
+                    clientVersions.put(channel, version);
+                    return version;
                 } catch (Exception ex) {
                     //Try ask the dependency again the next time, for now it is temporarily unresolved...
                     //Temporary unresolved means there is still hope, an exception was thrown on the dependency's end.
@@ -94,7 +96,7 @@ public final class PlayerUtils {
                     protocolVersion = PacketEvents.get().getServerUtils().getVersion().getProtocolVersion();
                 }
                 version = ClientVersion.getClientVersion(protocolVersion);
-                clientVersions.put(player.getAddress(), version);
+                clientVersions.put(channel, version);
             }
         }
         return version;

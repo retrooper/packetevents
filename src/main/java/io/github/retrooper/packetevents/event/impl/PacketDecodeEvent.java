@@ -19,13 +19,18 @@ import java.net.InetSocketAddress;
 public class PacketDecodeEvent extends PacketEvent implements PlayerEvent, CancellableEvent {
     private final Object channel;
     private final Player player;
+    private ClientVersion version;
     private boolean cancel;
     private ByteBufAbstract byteBuf;
     private final int packetIDNum;
 
-    public PacketDecodeEvent(Object channel, Player player, ByteBufAbstract byteBuf){
+    public PacketDecodeEvent(Object channel, Player player, ByteBufAbstract byteBuf) {
         this.channel = channel;
         this.player = player;
+        this.version = PacketEvents.get().getPlayerUtils().clientVersions.get(channel);
+        if (this.version == null) {
+            this.version = ClientVersion.UNKNOWN;
+        }
         this.byteBuf = byteBuf.duplicate();
         PacketWrapper packetWrapper = new PacketWrapper(this.byteBuf);
         this.packetIDNum = packetWrapper.readVarInt();
@@ -34,6 +39,10 @@ public class PacketDecodeEvent extends PacketEvent implements PlayerEvent, Cance
     public PacketDecodeEvent(Object channel, Player player, Object rawByteBuf) {
         this.channel = channel;
         this.player = player;
+        this.version = PacketEvents.get().getPlayerUtils().clientVersions.get(channel);
+        if (this.version == null) {
+            this.version = ClientVersion.UNKNOWN;
+        }
         this.byteBuf = PacketEvents.get().getServerUtils().generateByteBufAbstract(rawByteBuf);
         PacketWrapper packetWrapper = new PacketWrapper(this.byteBuf);
         this.packetIDNum = packetWrapper.readVarInt();
@@ -44,7 +53,7 @@ public class PacketDecodeEvent extends PacketEvent implements PlayerEvent, Cance
     }
 
     public PacketType.Play.Client getPacketType() {
-        return PacketType.Play.Client.getById(getClientVersion(), packetIDNum);
+        return PacketType.Play.Client.getById(version, packetIDNum);
     }
 
     public PacketState getState() {
@@ -60,7 +69,12 @@ public class PacketDecodeEvent extends PacketEvent implements PlayerEvent, Cance
     }
 
     public ClientVersion getClientVersion() {
-        return PacketEvents.get().getPlayerUtils().getClientVersion(player);
+        return version;
+    }
+
+    public void setClientVersion(ClientVersion version) {
+        this.version = version;
+        PacketEvents.get().getPlayerUtils().clientVersions.put(channel, version);
     }
 
     @Override
@@ -84,7 +98,7 @@ public class PacketDecodeEvent extends PacketEvent implements PlayerEvent, Cance
         return player;
     }
 
-    public ByteBufAbstract getByteBuf(){
+    public ByteBufAbstract getByteBuf() {
         return this.byteBuf;
     }
 

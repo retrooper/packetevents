@@ -29,6 +29,7 @@ import org.bukkit.entity.Player;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.List;
+import java.util.ArrayList;
 
 public class PacketDecoderModern extends ByteToMessageDecoder {
     private static Method DECODE_METHOD;
@@ -52,6 +53,16 @@ public class PacketDecoderModern extends ByteToMessageDecoder {
         this.previousDecoder = previousDecoder;
     }
 
+    private List<Object> callDecoder(ByteToMessageDecoder decoder, ChannelHandlerContext ctx, Object input) throws InvocationTargetException {
+        List<Object> list = new ArrayList<>();
+        try {
+            DECODE_METHOD.invoke(decoder, ctx, input, list);
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        }
+        return list;
+    }
+
     @Override
     protected void decode(ChannelHandlerContext ctx, ByteBuf byteBuf, List<Object> list) throws Exception {
         PacketDecodeEvent packetDecodeEvent = new PacketDecodeEvent(ctx.channel(), player, byteBuf.copy());
@@ -62,8 +73,8 @@ public class PacketDecoderModern extends ByteToMessageDecoder {
             return;
         }
         try {
-            DECODE_METHOD.invoke(previousDecoder, ctx, byteBuf, list);
-        } catch (IllegalAccessException | InvocationTargetException e) {
+            list.addAll(callDecoder(previousDecoder, ctx, byteBuf));
+        } catch (InvocationTargetException e) {
             if (e.getCause() instanceof Exception) {
                 throw (Exception) e.getCause();
             } else if (e.getCause() instanceof Error) {

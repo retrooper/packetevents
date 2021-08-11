@@ -22,10 +22,14 @@ import io.github.retrooper.packetevents.event.PacketListenerAbstract;
 import io.github.retrooper.packetevents.event.PacketListenerPriority;
 import io.github.retrooper.packetevents.event.impl.PacketDecodeEvent;
 import io.github.retrooper.packetevents.packettype.PacketState;
+import io.github.retrooper.packetevents.packettype.PacketType;
 import io.github.retrooper.packetevents.utils.netty.bytebuf.ByteBufAbstract;
+import io.github.retrooper.packetevents.wrapper.game.client.WrapperGameClientUpdateSign;
 import io.github.retrooper.packetevents.wrapper.handshaking.client.WrapperHandshakingClientHandshake;
 import io.github.retrooper.packetevents.wrapper.login.client.WrapperLoginClientLoginStart;
 import org.bukkit.plugin.java.JavaPlugin;
+
+import java.util.Arrays;
 
 public class PacketEventsPlugin extends JavaPlugin {
     @Override
@@ -45,11 +49,7 @@ public class PacketEventsPlugin extends JavaPlugin {
                 if (event.getPlayer() == null && event.getState() == null) {
                     PacketEvents.get().getInjector().changePacketState(event.getChannel(), PacketState.HANDSHAKING);
                     WrapperHandshakingClientHandshake handshake = new WrapperHandshakingClientHandshake(byteBuf);
-                    PacketEvents.get().getPlayerUtils().clientVersions.put(event.getSocketAddress(), handshake.getClientVersion());
-                    System.err.println("PROTOCOL VERSION: " + handshake.getClientVersion());
-                    System.err.println("SERVER ADDRESS: " + handshake.getServerAddress());
-                    System.err.println("PORT: " + handshake.getServerPort());
-                    System.err.println("NEXT STATE: " + handshake.getNextState());
+                    event.setClientVersion(handshake.getClientVersion());
                     PacketEvents.get().getInjector().changePacketState(event.getChannel(), handshake.getNextState());
                 }
                 else if (event.getState() == PacketState.LOGIN) {
@@ -61,7 +61,12 @@ public class PacketEventsPlugin extends JavaPlugin {
                     }
                 }
                 else if (event.getState() == PacketState.PLAY && event.getPlayer() != null) {
-                    event.getPlayer().sendMessage("PACKET ID: "+ event.getPacketID());
+                    if (event.getPacketType() == PacketType.Play.Client.UPDATE_SIGN) {
+                        WrapperGameClientUpdateSign updateSign = new WrapperGameClientUpdateSign(event.getClientVersion(), event.getByteBuf());
+                        event.getPlayer().sendMessage("PACKET TYPE: "+ event.getPacketType());
+                        event.getPlayer().sendMessage("TEXT LINES: " + Arrays.toString(updateSign.getTextLines()));
+                        event.getPlayer().sendMessage("POSITION: " + updateSign.getBlockPosition().toString());
+                    }
                 }
             }
         });

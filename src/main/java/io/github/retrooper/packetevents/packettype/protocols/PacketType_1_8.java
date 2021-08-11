@@ -36,7 +36,7 @@ public class PacketType_1_8 {
             STEER_VEHICLE,
             CLOSE_WINDOW,
             CLICK_WINDOW,
-            WINDOW_CONFIRMATION,
+            CONFIRM_TRANSACTION,
             CREATIVE_INVENTORY_ACTION,
             CLICK_WINDOW_BUTTON,
             UPDATE_SIGN,
