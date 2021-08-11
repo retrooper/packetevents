@@ -18,7 +18,6 @@
 
 package io.github.retrooper.packetevents.injector.modern.early;
 
-import io.github.retrooper.packetevents.PacketEvents;
 import io.github.retrooper.packetevents.injector.modern.PacketDecoderModern;
 import io.github.retrooper.packetevents.utils.reflection.Reflection;
 import io.netty.channel.Channel;
@@ -27,7 +26,6 @@ import io.netty.channel.ChannelInitializer;
 import io.netty.handler.codec.ByteToMessageDecoder;
 
 import java.lang.reflect.Method;
-import java.util.Arrays;
 
 public class PEChannelInitializerModern extends ChannelInitializer<Channel> {
     private final ChannelInitializer<?> oldChannelInitializer;

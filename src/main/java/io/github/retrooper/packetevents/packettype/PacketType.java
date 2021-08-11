@@ -28,7 +28,7 @@ import java.util.Map;
 public final class PacketType {
     public static class Play {
         public enum Client {
-            TELLEPORT_CONFIRM,
+            TELEPORT_CONFIRM,
             QUERY_BLOCK_NBT,
             SET_DIFFICULTY,
             CHAT_MESSAGE,
