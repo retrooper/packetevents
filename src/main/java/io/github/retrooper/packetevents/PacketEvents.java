@@ -57,7 +57,6 @@ public final class PacketEvents implements Listener, EventManager {
     private final BukkitEventProcessorInternal bukkitEventProcessorInternal = new BukkitEventProcessorInternal();
     private final GlobalChannelInjector injector = new GlobalChannelInjector();
     public String handlerName;
-    public String decoderName;
     private PacketEventsSettings settings = new PacketEventsSettings();
     private ByteBufUtil byteBufUtil;
     private UpdateChecker updateChecker;
@@ -102,7 +101,6 @@ public final class PacketEvents implements Listener, EventManager {
             NMSUtils.version = version;
             EntityFinderUtils.version = version;
             handlerName = "pe-" + plugin.getName();
-            decoderName = "decoder";
             try {
                 NMSUtils.load();
 

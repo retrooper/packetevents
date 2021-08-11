@@ -61,9 +61,8 @@ public class LateChannelInjectorLegacy implements LateInjector {
     public void ejectPlayer(Player player) {
         Object channel = PacketEvents.get().getPlayerUtils().getChannel(player);
         if (channel != null) {
-            Channel chnl = (Channel) channel;
             try {
-                chnl.pipeline().remove(PacketEvents.get().decoderName);
+                PEChannelInitializerLegacy.postDestroyChannel((Channel) channel);
             } catch (Exception ex) {
 
             }

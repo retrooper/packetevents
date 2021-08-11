@@ -81,6 +81,5 @@ public class PacketDecoderModern extends ByteToMessageDecoder {
                 throw (Error) e.getCause();
             }
         }
-        //TODO COMPLETE PACKETDECODERLEGACY
     }
 }

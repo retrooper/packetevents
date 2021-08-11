@@ -63,10 +63,6 @@ dsrc/main/java/io/github/retrooper/packetevents/wrapper/game/client/WrapperGameC
 asrc/main/java/io/github/retrooper/packetevents/wrapper/game/client/WrapperGameClientSpectate.java,0/d/0d431ac30bcad1e91387c9f8f6f82a6df6a27afa
 —
 gsrc/main/java/io/github/retrooper/packetevents/wrapper/login/server/WrapperLoginServerLoginSuccess.java,0/d/0d74d6acf01aec6ff377eb559d1bcd1d1bbd0037
-”
-dsrc/main/java/io/github/retrooper/packetevents/injector/legacy/early/EarlyChannelInjectorLegacy.java,2/4/249c884f3864d5164ef7b12c6f0b94fbea53bb40
-”
-dsrc/main/java/io/github/retrooper/packetevents/injector/legacy/early/PEChannelInitializerLegacy.java,6/c/6c77c57e80ba28c82df10c148b298e3d58a6239a
 •
 esrc/main/java/io/github/retrooper/packetevents/wrapper/login/client/WrapperLoginClientLoginStart.java,0/6/06dcd2a49ddcc89d3f017459864c76300aa34821
 v

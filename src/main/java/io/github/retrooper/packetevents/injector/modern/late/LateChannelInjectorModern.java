@@ -46,7 +46,7 @@ public class LateChannelInjectorModern implements LateInjector {
 
     private PacketDecoderModern getDecoder(Object rawChannel) {
         Channel channel = (Channel) rawChannel;
-        ChannelHandler decoder = channel.pipeline().get(PacketEvents.get().decoderName);
+        ChannelHandler decoder = channel.pipeline().get("decoder");
         if (decoder instanceof PacketDecoderModern) {
             return (PacketDecoderModern) decoder;
         }
@@ -61,7 +61,7 @@ public class LateChannelInjectorModern implements LateInjector {
         Object channel = PacketEvents.get().getPlayerUtils().getChannel(player);
         if (channel != null) {
             try {
-                ((Channel)channel).pipeline().remove(PacketEvents.get().decoderName);
+                PEChannelInitializerModern.postDestroyChannel((Channel) channel);
             } catch (Exception ignored) {
             }
         }

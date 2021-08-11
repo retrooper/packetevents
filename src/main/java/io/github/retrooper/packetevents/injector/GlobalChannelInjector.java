@@ -47,8 +47,6 @@ public class GlobalChannelInjector {
     }
 
     public void inject() {
-        //TODO DEBUG
-        System.err.println("PREPARING OUR HANDLER");
         try {
             //Try inject...
             injector.inject();

@@ -74,7 +74,6 @@ public class EarlyChannelInjectorModern implements EarlyInjector {
     public void inject() {
         try {
             if (PaperChannelInjector.PAPER_INJECTION_METHOD) {
-                System.err.println("EYOOOO");
                 PaperChannelInjector.setPaperChannelInitializeListener();
                 return;
             }
@@ -135,7 +134,6 @@ public class EarlyChannelInjectorModern implements EarlyInjector {
                     continue;
                 }
 
-                System.err.println("Oh...");
                 PEChannelInitializerModern.postInitChannel(channel);
             }
         }
@@ -265,11 +263,7 @@ public class EarlyChannelInjectorModern implements EarlyInjector {
     public void ejectPlayer(Player player) {
         Object channel = PacketEvents.get().getPlayerUtils().getChannel(player);
         if (channel != null) {
-            Channel chnl = (Channel) channel;
-            try {
-                chnl.pipeline().remove(PacketEvents.get().decoderName);
-            } catch (Exception ignored) {
-            }
+           PEChannelInitializerModern.postDestroyChannel((Channel) channel);
         }
     }
 
@@ -303,7 +297,7 @@ public class EarlyChannelInjectorModern implements EarlyInjector {
 
     private PacketDecoderModern getDecoder(Object rawChannel) {
         Channel channel = (Channel) rawChannel;
-        ChannelHandler decoder = channel.pipeline().get(PacketEvents.get().decoderName);
+        ChannelHandler decoder = channel.pipeline().get("decoder");
         if (decoder instanceof PacketDecoderModern) {
             return (PacketDecoderModern) decoder;
         }

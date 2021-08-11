@@ -257,7 +257,7 @@ public class EarlyChannelInjectorLegacy implements EarlyInjector {
         Object channel = PacketEvents.get().getPlayerUtils().getChannel(player);
         if (channel != null) {
             try {
-                ((Channel)channel).pipeline().remove(PacketEvents.get().decoderName);
+                PEChannelInitializerLegacy.postDestroyChannel((Channel) channel);
             } catch (Exception ignored) {
 
             }
@@ -294,7 +294,7 @@ public class EarlyChannelInjectorLegacy implements EarlyInjector {
 
     private PacketDecoderLegacy getDecoder(Object rawChannel) {
         Channel channel = (Channel) rawChannel;
-        ChannelHandler decoder = channel.pipeline().get(PacketEvents.get().decoderName);
+        ChannelHandler decoder = channel.pipeline().get("decoder");
         if (decoder instanceof PacketDecoderLegacy) {
             return (PacketDecoderLegacy) decoder;
         } else {
