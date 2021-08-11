@@ -23,7 +23,7 @@ import io.github.retrooper.packetevents.event.PacketEvent;
 import io.github.retrooper.packetevents.event.PacketListenerAbstract;
 import io.github.retrooper.packetevents.event.eventtypes.CancellableEvent;
 import io.github.retrooper.packetevents.event.eventtypes.PlayerEvent;
-import io.github.retrooper.packetevents.utils.netty.channel.ChannelUtils;
+import io.github.retrooper.packetevents.utils.channel.ChannelUtils;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.Nullable;
 
@@ -45,7 +45,7 @@ public final class PlayerInjectEvent extends PacketEvent implements CancellableE
 
     public PlayerInjectEvent(final Player player) {
         this.player = player;
-        this.address = ChannelUtils.getSocketAddress(PacketEvents.get().getPlayerUtils().getChannel(player));
+        this.address = ChannelUtils.getSocketAddress(PacketEvents.get().getPlayerManager().getChannel(player));
     }
 
     @Override

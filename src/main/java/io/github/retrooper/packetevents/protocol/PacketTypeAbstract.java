@@ -18,8 +18,6 @@
 
 package io.github.retrooper.packetevents.protocol;
 
-import io.github.retrooper.packetevents.utils.player.ClientVersion;
-
 public interface PacketTypeAbstract {
 
 }

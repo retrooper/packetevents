@@ -19,7 +19,7 @@
 package io.github.retrooper.packetevents.utils.gameprofile;
 
 import io.github.retrooper.packetevents.utils.nms.NMSUtils;
-import io.github.retrooper.packetevents.utils.player.Skin;
+import io.github.retrooper.packetevents.manager.player.Skin;
 
 import java.util.UUID;
 

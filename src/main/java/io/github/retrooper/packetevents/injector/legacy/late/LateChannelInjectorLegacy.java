@@ -40,7 +40,7 @@ public class LateChannelInjectorLegacy implements LateInjector {
 
     @Override
     public void injectPlayer(Player player) {
-        Channel channel = (Channel) PacketEvents.get().getPlayerUtils().getChannel(player);
+        Channel channel = (Channel) PacketEvents.get().getPlayerManager().getChannel(player);
         PEChannelInitializerLegacy.postInitChannel(channel);
     }
 
@@ -58,7 +58,7 @@ public class LateChannelInjectorLegacy implements LateInjector {
 
     @Override
     public void ejectPlayer(Player player) {
-        Object channel = PacketEvents.get().getPlayerUtils().getChannel(player);
+        Object channel = PacketEvents.get().getPlayerManager().getChannel(player);
         if (channel != null) {
             try {
                 PEChannelInitializerLegacy.postDestroyChannel((Channel) channel);
@@ -70,7 +70,7 @@ public class LateChannelInjectorLegacy implements LateInjector {
 
     @Override
     public boolean hasInjected(Player player) {
-        Object channel = PacketEvents.get().getPlayerUtils().getChannel(player);
+        Object channel = PacketEvents.get().getPlayerManager().getChannel(player);
         if (channel == null) {
             return false;
         }

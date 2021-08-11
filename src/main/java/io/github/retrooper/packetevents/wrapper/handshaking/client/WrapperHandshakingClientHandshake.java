@@ -19,8 +19,8 @@
 package io.github.retrooper.packetevents.wrapper.handshaking.client;
 
 import io.github.retrooper.packetevents.protocol.PacketState;
-import io.github.retrooper.packetevents.utils.netty.bytebuf.ByteBufAbstract;
-import io.github.retrooper.packetevents.utils.player.ClientVersion;
+import io.github.retrooper.packetevents.utils.bytebuf.ByteBufAbstract;
+import io.github.retrooper.packetevents.manager.player.ClientVersion;
 import io.github.retrooper.packetevents.wrapper.PacketWrapper;
 
 public class WrapperHandshakingClientHandshake extends PacketWrapper {

@@ -53,7 +53,7 @@ public class BukkitEventProcessorInternal implements Listener {
         }
 
         PacketEvents.get().getEventManager().callEvent(new PostPlayerInjectEvent(e.getPlayer(), false));
-        PacketEvents.get().getServerUtils().entityCache.putIfAbsent(e.getPlayer().getEntityId(), e.getPlayer());
+        PacketEvents.get().getServerManager().entityCache.putIfAbsent(e.getPlayer().getEntityId(), e.getPlayer());
     }
 
     @EventHandler(priority = EventPriority.HIGHEST)
@@ -61,21 +61,21 @@ public class BukkitEventProcessorInternal implements Listener {
         Player player = e.getPlayer();
         UUID uuid = player.getUniqueId();
         //Cleanup user data
-        PacketEvents.get().getPlayerUtils().clientVersions.remove(PacketEvents.get().getPlayerUtils().getChannel(player));
-        PacketEvents.get().getPlayerUtils().keepAliveMap.remove(uuid);
-        PacketEvents.get().getPlayerUtils().channels.remove(player.getName());
-        PacketEvents.get().getServerUtils().entityCache.remove(e.getPlayer().getEntityId());
+        PacketEvents.get().getPlayerManager().clientVersions.remove(PacketEvents.get().getPlayerManager().getChannel(player));
+        PacketEvents.get().getPlayerManager().keepAliveMap.remove(uuid);
+        PacketEvents.get().getPlayerManager().channels.remove(player.getName());
+        PacketEvents.get().getServerManager().entityCache.remove(e.getPlayer().getEntityId());
     }
 
 
     @EventHandler
     public void onEntitySpawn(EntitySpawnEvent event) {
         Entity entity = event.getEntity();
-        PacketEvents.get().getServerUtils().entityCache.putIfAbsent(entity.getEntityId(), entity);
+        PacketEvents.get().getServerManager().entityCache.putIfAbsent(entity.getEntityId(), entity);
     }
 
     @EventHandler
     public void onEntityDeath(EntityDeathEvent event) {
-        PacketEvents.get().getServerUtils().entityCache.remove(event.getEntity().getEntityId());
+        PacketEvents.get().getServerManager().entityCache.remove(event.getEntity().getEntityId());
     }
 }

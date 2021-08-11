@@ -19,7 +19,7 @@
 package io.github.retrooper.packetevents.utils.immutableset;
 
 import io.github.retrooper.packetevents.PacketEvents;
-import io.github.retrooper.packetevents.utils.server.ServerVersion;
+import io.github.retrooper.packetevents.manager.server.ServerVersion;
 
 import java.util.List;
 
@@ -27,7 +27,7 @@ public class ImmutableSetCustom<T> {
     private final ImmutableSetAbstract<T> immutableSetAbstract;
 
     public ImmutableSetCustom() {
-        if (PacketEvents.get().getServerUtils().getVersion().isOlderThan(ServerVersion.v_1_8)) {
+        if (PacketEvents.get().getServerManager().getVersion().isOlderThan(ServerVersion.v_1_8)) {
             immutableSetAbstract = new ImmutableSet_7<>();
         } else {
             immutableSetAbstract = new ImmutableSet_8<>();
@@ -35,7 +35,7 @@ public class ImmutableSetCustom<T> {
     }
 
     public ImmutableSetCustom(List<T> data) {
-        if (PacketEvents.get().getServerUtils().getVersion().isOlderThan(ServerVersion.v_1_8)) {
+        if (PacketEvents.get().getServerManager().getVersion().isOlderThan(ServerVersion.v_1_8)) {
             immutableSetAbstract = new ImmutableSet_7<>(data);
         } else {
             immutableSetAbstract = new ImmutableSet_8<>(data);
@@ -44,7 +44,7 @@ public class ImmutableSetCustom<T> {
 
     @SafeVarargs
     public ImmutableSetCustom(T... data) {
-        if (PacketEvents.get().getServerUtils().getVersion().isOlderThan(ServerVersion.v_1_8)) {
+        if (PacketEvents.get().getServerManager().getVersion().isOlderThan(ServerVersion.v_1_8)) {
             immutableSetAbstract = new ImmutableSet_7<>(data);
         } else {
             immutableSetAbstract = new ImmutableSet_8<>(data);

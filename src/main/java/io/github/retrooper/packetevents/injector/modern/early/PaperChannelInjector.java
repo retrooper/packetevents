@@ -70,7 +70,7 @@ public class PaperChannelInjector {
             return method.invoke(proxy, args);
         });
 
-        Key key = Key.key(PacketEvents.get().handlerName.toLowerCase(), "injector");
+        Key key = Key.key(PacketEvents.get().identifier, "injector");
 
         addChannelInitializeListenerHolderListener(key, channelInitializeListener);
         if (shouldHandleViaVersion) {
@@ -79,7 +79,7 @@ public class PaperChannelInjector {
     }
 
     public static void removePaperChannelInitializeListener() throws Exception {
-        Key key = Key.key(PacketEvents.get().handlerName.toLowerCase(), "injector");
+        Key key = Key.key(PacketEvents.get().identifier, "injector");
         removeChannelInitializeListenerHolderListener(key);
     }
 

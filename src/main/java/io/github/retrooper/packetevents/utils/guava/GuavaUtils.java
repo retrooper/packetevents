@@ -19,13 +19,13 @@
 package io.github.retrooper.packetevents.utils.guava;
 
 import io.github.retrooper.packetevents.PacketEvents;
-import io.github.retrooper.packetevents.utils.server.ServerVersion;
+import io.github.retrooper.packetevents.manager.server.ServerVersion;
 
 import java.util.concurrent.ConcurrentMap;
 
 public class GuavaUtils {
     public static <T, K>ConcurrentMap<T, K> makeMap() {
-        if (PacketEvents.get().getServerUtils().getVersion().isNewerThan(ServerVersion.v_1_7_10)) {
+        if (PacketEvents.get().getServerManager().getVersion().isNewerThan(ServerVersion.v_1_7_10)) {
             return GuavaUtils_8.makeMap();
         }
         else {

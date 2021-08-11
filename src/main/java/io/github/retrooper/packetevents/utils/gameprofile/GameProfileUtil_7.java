@@ -20,7 +20,7 @@ package io.github.retrooper.packetevents.utils.gameprofile;
 
 import io.github.retrooper.packetevents.utils.reflection.ReflectionObject;
 import io.github.retrooper.packetevents.utils.nms.NMSUtils;
-import io.github.retrooper.packetevents.utils.player.Skin;
+import io.github.retrooper.packetevents.manager.player.Skin;
 import net.minecraft.util.com.mojang.authlib.GameProfile;
 import net.minecraft.util.com.mojang.authlib.properties.Property;
 import org.bukkit.Bukkit;

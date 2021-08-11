@@ -22,8 +22,8 @@ import io.github.retrooper.packetevents.PacketEvents;
 import io.github.retrooper.packetevents.event.PacketEvent;
 import io.github.retrooper.packetevents.event.PacketListenerAbstract;
 import io.github.retrooper.packetevents.event.eventtypes.PlayerEvent;
-import io.github.retrooper.packetevents.utils.netty.channel.ChannelUtils;
-import io.github.retrooper.packetevents.utils.player.ClientVersion;
+import io.github.retrooper.packetevents.utils.channel.ChannelUtils;
+import io.github.retrooper.packetevents.manager.player.ClientVersion;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
@@ -66,7 +66,7 @@ public class PostPlayerInjectEvent extends PacketEvent implements PlayerEvent {
      */
     @NotNull
     public Object getChannel() {
-        return PacketEvents.get().getPlayerUtils().getChannel(player);
+        return PacketEvents.get().getPlayerManager().getChannel(player);
     }
 
     @NotNull
@@ -82,7 +82,7 @@ public class PostPlayerInjectEvent extends PacketEvent implements PlayerEvent {
      */
     @NotNull
     public ClientVersion getClientVersion() {
-        return PacketEvents.get().getPlayerUtils().getClientVersion(player);
+        return PacketEvents.get().getPlayerManager().getClientVersion(player);
     }
 
     /**

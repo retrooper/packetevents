@@ -9,9 +9,9 @@ import io.github.retrooper.packetevents.protocol.PacketSide;
 import io.github.retrooper.packetevents.protocol.PacketState;
 import io.github.retrooper.packetevents.protocol.PacketType;
 import io.github.retrooper.packetevents.protocol.PacketTypeAbstract;
-import io.github.retrooper.packetevents.utils.netty.bytebuf.ByteBufAbstract;
-import io.github.retrooper.packetevents.utils.netty.channel.ChannelUtils;
-import io.github.retrooper.packetevents.utils.player.ClientVersion;
+import io.github.retrooper.packetevents.utils.bytebuf.ByteBufAbstract;
+import io.github.retrooper.packetevents.utils.channel.ChannelUtils;
+import io.github.retrooper.packetevents.manager.player.ClientVersion;
 import io.github.retrooper.packetevents.wrapper.PacketWrapper;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.Nullable;
@@ -29,7 +29,7 @@ public class PacketDecodeEvent extends PacketEvent implements PlayerEvent, Cance
     public PacketDecodeEvent(Object channel, Player player, ByteBufAbstract byteBuf) {
         this.channel = channel;
         this.player = player;
-        this.version = PacketEvents.get().getPlayerUtils().clientVersions.get(channel);
+        this.version = PacketEvents.get().getPlayerManager().clientVersions.get(channel);
         if (this.version == null) {
             this.version = ClientVersion.UNKNOWN;
         }
@@ -41,11 +41,11 @@ public class PacketDecodeEvent extends PacketEvent implements PlayerEvent, Cance
     public PacketDecodeEvent(Object channel, Player player, Object rawByteBuf) {
         this.channel = channel;
         this.player = player;
-        this.version = PacketEvents.get().getPlayerUtils().clientVersions.get(channel);
+        this.version = PacketEvents.get().getPlayerManager().clientVersions.get(channel);
         if (this.version == null) {
             this.version = ClientVersion.UNKNOWN;
         }
-        this.byteBuf = PacketEvents.get().getServerUtils().generateByteBufAbstract(rawByteBuf);
+        this.byteBuf = PacketEvents.get().getServerManager().generateByteBufAbstract(rawByteBuf);
         PacketWrapper packetWrapper = new PacketWrapper(this.byteBuf);
         this.packetIDNum = packetWrapper.readVarInt();
     }
@@ -78,7 +78,7 @@ public class PacketDecodeEvent extends PacketEvent implements PlayerEvent, Cance
 
     public void setClientVersion(ClientVersion version) {
         this.version = version;
-        PacketEvents.get().getPlayerUtils().clientVersions.put(channel, version);
+        PacketEvents.get().getPlayerManager().clientVersions.put(channel, version);
     }
 
     @Override

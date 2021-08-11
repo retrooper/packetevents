@@ -22,7 +22,7 @@ import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.properties.Property;
 import io.github.retrooper.packetevents.utils.reflection.ReflectionObject;
 import io.github.retrooper.packetevents.utils.nms.NMSUtils;
-import io.github.retrooper.packetevents.utils.player.Skin;
+import io.github.retrooper.packetevents.manager.player.Skin;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 

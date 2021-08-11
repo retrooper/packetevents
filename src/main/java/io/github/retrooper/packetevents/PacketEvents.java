@@ -24,95 +24,64 @@ import io.github.retrooper.packetevents.event.manager.EventManager;
 import io.github.retrooper.packetevents.event.manager.PEEventManager;
 import io.github.retrooper.packetevents.exceptions.PacketEventsLoadFailureException;
 import io.github.retrooper.packetevents.injector.GlobalChannelInjector;
-import io.github.retrooper.packetevents.protocol.PacketType;
+import io.github.retrooper.packetevents.manager.player.PlayerManager;
 import io.github.retrooper.packetevents.processor.BukkitEventProcessorInternal;
+import io.github.retrooper.packetevents.protocol.PacketType;
 import io.github.retrooper.packetevents.settings.PacketEventsSettings;
 import io.github.retrooper.packetevents.updatechecker.UpdateChecker;
-import io.github.retrooper.packetevents.utils.entityfinder.EntityFinderUtils;
+import io.github.retrooper.packetevents.manager.server.EntityFinderUtils;
 import io.github.retrooper.packetevents.utils.guava.GuavaUtils;
-import io.github.retrooper.packetevents.utils.netty.bytebuf.ByteBufUtil;
-import io.github.retrooper.packetevents.utils.netty.bytebuf.ByteBufUtil_7;
-import io.github.retrooper.packetevents.utils.netty.bytebuf.ByteBufUtil_8;
 import io.github.retrooper.packetevents.utils.nms.NMSUtils;
-import io.github.retrooper.packetevents.utils.player.PlayerUtils;
 import io.github.retrooper.packetevents.utils.reflection.ReflectionObject;
-import io.github.retrooper.packetevents.utils.server.ServerUtils;
-import io.github.retrooper.packetevents.utils.server.ServerVersion;
+import io.github.retrooper.packetevents.manager.server.ServerManager;
+import io.github.retrooper.packetevents.manager.server.ServerVersion;
 import io.github.retrooper.packetevents.utils.version.PEVersion;
-import io.github.retrooper.packetevents.utils.versionlookup.viaversion.ViaVersionLookupUtils;
+import io.github.retrooper.packetevents.utils.dependencies.viaversion.ViaVersionLookupUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
 import org.bukkit.plugin.Plugin;
-import org.bukkit.plugin.ServicePriority;
 import org.bukkit.plugin.java.JavaPlugin;
 
 public final class PacketEvents implements Listener, EventManager {
-    private static PacketEvents instance;
-    private static Plugin plugin;
+    private static PacketEvents instance = new PacketEvents();
     private final PEVersion version = new PEVersion(2, 0, 0);
     private final EventManager eventManager = new PEEventManager();
-    private final PlayerUtils playerUtils = new PlayerUtils();
-    private final ServerUtils serverUtils = new ServerUtils();
+    private final PlayerManager playerManager = new PlayerManager();
+    private final ServerManager serverManager = new ServerManager();
     private final BukkitEventProcessorInternal bukkitEventProcessorInternal = new BukkitEventProcessorInternal();
     private final GlobalChannelInjector injector = new GlobalChannelInjector();
-    public String handlerName;
+    public String identifier;
     private PacketEventsSettings settings = new PacketEventsSettings();
-    private ByteBufUtil byteBufUtil;
     private UpdateChecker updateChecker;
-    private volatile boolean loading, loaded;
-    private boolean initialized, initializing, terminating;
+    private boolean loaded;
+    private boolean initialized;
     private boolean lateBind = false;
+    private Plugin plugin;
 
-    public static PacketEvents create(final Plugin plugin) {
-        if (Bukkit.isPrimaryThread()) {
-            //We are on the main thread
-            if (!Bukkit.getServicesManager().isProvidedFor(PacketEvents.class)) {
-                //We can register in the service manager.
-                instance = new PacketEvents();
-                Bukkit.getServicesManager().register(PacketEvents.class, instance,
-                        plugin, ServicePriority.Normal);
-                PacketEvents.plugin = plugin;
-                return instance;
-            } else {
-                //We have already registered. Let us load what was registered.
-                return instance = Bukkit.getServicesManager().load(PacketEvents.class);
-            }
-        } else {
-            //We are off thread, we cannot use the service manager.
-            if (instance == null) {
-                PacketEvents.plugin = plugin;
-                instance = new PacketEvents();
-            }
-            return instance;
-        }
-    }
 
     public static PacketEvents get() {
         return instance;
     }
 
-    public void load() {
-        if (!loaded && !loading) {
-            loading = true;
+    public void load(Plugin plugin) {
+        this.plugin = plugin;
+        if (!loaded) {
             //Resolve server version and cache
             ServerVersion version = ServerVersion.getVersion();
             ReflectionObject.version = version;
             NMSUtils.version = version;
-            EntityFinderUtils.version = version;
-            handlerName = "pe-" + plugin.getName();
+            identifier = "pe-" + plugin.getName().toLowerCase();
             try {
                 NMSUtils.load();
 
-                EntityFinderUtils.load();
+                EntityFinderUtils.load(version);
 
-                getServerUtils().entityCache = GuavaUtils.makeMap();
+                serverManager.entityCache = GuavaUtils.makeMap();
             } catch (Exception ex) {
-                loading = false;
                 throw new PacketEventsLoadFailureException(ex);
             }
 
-            byteBufUtil = NMSUtils.legacyNettyImportMode ? new ByteBufUtil_7() : new ByteBufUtil_8();
             updateChecker = new UpdateChecker();
 
             injector.load();
@@ -123,7 +92,6 @@ public final class PacketEvents implements Listener, EventManager {
             }
 
             loaded = true;
-            loading = false;
         }
     }
 
@@ -133,22 +101,21 @@ public final class PacketEvents implements Listener, EventManager {
 
     public void init(PacketEventsSettings packetEventsSettings) {
         //Load if we haven't loaded already
-        load();
-        if (!initialized && !initializing) {
-            initializing = true;
+        load(plugin);
+        if (!initialized) {
             settings = packetEventsSettings;
             settings.lock();
 
             if (settings.shouldCheckForUpdates()) {
-                handleUpdateCheck();
+                handleUpdateCheck(plugin);
             }
 
             if (settings.isbStatsEnabled()) {
-                Metrics metrics = new Metrics((JavaPlugin) getPlugin(), 11327);
+                Metrics metrics = new Metrics((JavaPlugin) plugin, 11327);
             }
 
-            //TODO Load other ones
             PacketType.Play.Client.load();
+            PacketType.Play.Server.load();
 
             Runnable postInjectTask = () -> {
                 Bukkit.getPluginManager().registerEvents(bukkitEventProcessorInternal, plugin);
@@ -171,12 +138,11 @@ public final class PacketEvents implements Listener, EventManager {
             }
 
             initialized = true;
-            initializing = false;
         }
     }
 
     public void terminate() {
-        if (initialized && !terminating) {
+        if (initialized) {
             //Eject all players
             for (Player p : Bukkit.getOnlinePlayers()) {
                 injector.ejectPlayer(p);
@@ -186,32 +152,15 @@ public final class PacketEvents implements Listener, EventManager {
             //Unregister all our listeners
             getEventManager().unregisterAllListeners();
             initialized = false;
-            terminating = false;
         }
-    }
-
-    public boolean isLoading() {
-        return loading;
     }
 
     public boolean hasLoaded() {
         return loaded;
     }
 
-    public boolean isTerminating() {
-        return terminating;
-    }
-
-    public boolean isInitializing() {
-        return initializing;
-    }
-
     public boolean isInitialized() {
         return initialized;
-    }
-
-    public Plugin getPlugin() {
-        return plugin;
     }
 
     public GlobalChannelInjector getInjector() {
@@ -230,51 +179,53 @@ public final class PacketEvents implements Listener, EventManager {
         return eventManager;
     }
 
-    public PlayerUtils getPlayerUtils() {
-        return playerUtils;
+    public PlayerManager getPlayerManager() {
+        return playerManager;
     }
 
-    public ServerUtils getServerUtils() {
-        return serverUtils;
-    }
-
-    public ByteBufUtil getByteBufUtil() {
-        return byteBufUtil;
+    public ServerManager getServerManager() {
+        return serverManager;
     }
 
     public UpdateChecker getUpdateChecker() {
         return updateChecker;
     }
 
-    private void handleUpdateCheck() {
+    public Plugin getPlugin() {
+        return plugin;
+    }
+
+    private void handleUpdateCheck(Plugin plugin) {
         if (updateChecker == null) {
             updateChecker = new UpdateChecker();
         }
         Thread thread = new Thread(() -> {
-            getPlugin().getLogger().info("[packetevents] Checking for an update, please wait...");
+            plugin.getLogger().info("[packetevents] Checking for an update, please wait...");
             UpdateChecker.UpdateCheckerStatus status = updateChecker.checkForUpdate();
-            int seconds = 5;
-            int retryCount = 5;
-            for (int i = 0; i < retryCount; i++) {
+            int waitTimeInSeconds = 5;
+            int maxRetryCount = 5;
+            int retries = 0;
+            while (retries < maxRetryCount) {
                 if (status != UpdateChecker.UpdateCheckerStatus.FAILED) {
                     break;
                 }
-                getPlugin().getLogger().severe("[packetevents] Checking for an update again in " + seconds + " seconds...");
+                plugin.getLogger().severe("[packetevents] Checking for an update again in " + waitTimeInSeconds + " seconds...");
                 try {
-                    Thread.sleep(seconds * 1000L);
+                    Thread.sleep(waitTimeInSeconds * 1000L);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
 
-                seconds *= 2;
+                waitTimeInSeconds *= 2;
 
                 status = updateChecker.checkForUpdate();
 
-                if (i == (retryCount - 1)) {
-                    getPlugin().getLogger().severe("[packetevents] PacketEvents failed to check for an update. No longer retrying.");
+                if (retries == (maxRetryCount - 1)) {
+                    plugin.getLogger().severe("[packetevents] PacketEvents failed to check for an update. No longer retrying.");
                     break;
                 }
 
+                retries++;
             }
 
         }, "packetevents-update-check-thread");

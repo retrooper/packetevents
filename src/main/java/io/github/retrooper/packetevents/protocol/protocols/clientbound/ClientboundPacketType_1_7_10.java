@@ -30,7 +30,7 @@ public enum ClientboundPacketType_1_7_10 {
     PLAYER_POSITION_AND_LOOK,
     HELD_ITEM_CHANGE,
     USE_BED,
-    SPAWN_ENTITY,
+    ENTITY_ANIMATION,
     SPAWN_PLAYER,
     COLLECT_ITEM,
     SPAWN_ENTITY,

@@ -245,7 +245,7 @@ public class EarlyChannelInjectorLegacy implements EarlyInjector {
 
     @Override
     public void injectPlayer(Player player) {
-        Object channel = PacketEvents.get().getPlayerUtils().getChannel(player);
+        Object channel = PacketEvents.get().getPlayerManager().getChannel(player);
         if (channel != null) {
             updatePlayerObject(player, channel);
         }
@@ -253,7 +253,7 @@ public class EarlyChannelInjectorLegacy implements EarlyInjector {
 
     @Override
     public void ejectPlayer(Player player) {
-        Object channel = PacketEvents.get().getPlayerUtils().getChannel(player);
+        Object channel = PacketEvents.get().getPlayerManager().getChannel(player);
         if (channel != null) {
             try {
                 PEChannelInitializerLegacy.postDestroyChannel((Channel) channel);
@@ -265,7 +265,7 @@ public class EarlyChannelInjectorLegacy implements EarlyInjector {
 
     @Override
     public boolean hasInjected(Player player) {
-        Object channel = PacketEvents.get().getPlayerUtils().getChannel(player);
+        Object channel = PacketEvents.get().getPlayerManager().getChannel(player);
         if (channel == null) {
             return false;
         }

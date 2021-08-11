@@ -23,7 +23,7 @@ import io.github.retrooper.packetevents.event.PacketListenerPriority;
 import io.github.retrooper.packetevents.event.impl.PacketDecodeEvent;
 import io.github.retrooper.packetevents.protocol.PacketState;
 import io.github.retrooper.packetevents.protocol.PacketType;
-import io.github.retrooper.packetevents.utils.netty.bytebuf.ByteBufAbstract;
+import io.github.retrooper.packetevents.utils.bytebuf.ByteBufAbstract;
 import io.github.retrooper.packetevents.wrapper.game.client.WrapperGameClientUpdateSign;
 import io.github.retrooper.packetevents.wrapper.handshaking.client.WrapperHandshakingClientHandshake;
 import io.github.retrooper.packetevents.wrapper.login.client.WrapperLoginClientLoginStart;
@@ -34,8 +34,7 @@ import java.util.Arrays;
 public class PacketEventsPlugin extends JavaPlugin {
     @Override
     public void onLoad() {
-        PacketEvents.create(this);
-        PacketEvents.get().load();
+        PacketEvents.get().load(this);
         //You can do something here as it is loading
     }
 
@@ -56,7 +55,7 @@ public class PacketEventsPlugin extends JavaPlugin {
                     if (event.getPacketID() == 0) {
                         WrapperLoginClientLoginStart start = new WrapperLoginClientLoginStart(byteBuf);
                         //Cache the channel
-                        PacketEvents.get().getPlayerUtils().channels.put(start.getUsername(), event.getChannel());
+                        PacketEvents.get().getPlayerManager().channels.put(start.getUsername(), event.getChannel());
                         PacketEvents.get().getInjector().changePacketState(event.getChannel(), PacketState.PLAY);
                     }
                 }

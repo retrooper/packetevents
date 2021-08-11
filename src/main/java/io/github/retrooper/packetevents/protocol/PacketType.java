@@ -19,8 +19,7 @@
 package io.github.retrooper.packetevents.protocol;
 
 import io.github.retrooper.packetevents.protocol.protocols.serverbound.*;
-import io.github.retrooper.packetevents.utils.player.ClientVersion;
-import net.minecraft.network.EnumProtocol;
+import io.github.retrooper.packetevents.manager.player.ClientVersion;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.IdentityHashMap;

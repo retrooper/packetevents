@@ -18,7 +18,7 @@
 
 package io.github.retrooper.packetevents.settings;
 
-import io.github.retrooper.packetevents.utils.server.ServerVersion;
+import io.github.retrooper.packetevents.manager.server.ServerVersion;
 
 /**
  * Packet Events' settings.
