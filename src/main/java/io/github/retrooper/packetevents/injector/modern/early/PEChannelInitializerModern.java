@@ -19,11 +19,13 @@
 package io.github.retrooper.packetevents.injector.modern.early;
 
 import io.github.retrooper.packetevents.injector.modern.PacketDecoderModern;
+import io.github.retrooper.packetevents.injector.modern.PacketEncoderModern;
 import io.github.retrooper.packetevents.utils.reflection.Reflection;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelInitializer;
 import io.netty.handler.codec.ByteToMessageDecoder;
+import io.netty.handler.codec.MessageToByteEncoder;
 
 import java.lang.reflect.Method;
 
@@ -39,13 +41,19 @@ public class PEChannelInitializerModern extends ChannelInitializer<Channel> {
     public static void postInitChannel(Channel channel) {
         PacketDecoderModern packetDecoderModern = new PacketDecoderModern((ByteToMessageDecoder) channel.pipeline().get("decoder"));
         channel.pipeline().replace("decoder", "decoder", packetDecoderModern);
+        PacketEncoderModern packetEncoderModern = new PacketEncoderModern((MessageToByteEncoder) channel.pipeline().get("encoder"));
+        channel.pipeline().replace("encoder", "encoder", packetEncoderModern);
     }
 
     public static void postDestroyChannel(Channel channel) {
         ChannelHandler decoder = channel.pipeline().get("decoder");
         if (decoder instanceof PacketDecoderModern) {
-            PacketDecoderModern decoderModern = (PacketDecoderModern) decoder;
-            channel.pipeline().replace("decoder", "decoder", decoderModern.previousDecoder);
+            channel.pipeline().replace("decoder", "decoder", ((PacketDecoderModern)decoder).previousDecoder);
+        }
+
+        ChannelHandler encoder = channel.pipeline().get("encoder");
+        if (encoder instanceof PacketEncoderModern) {
+            channel.pipeline().replace("encoder", "encoder", ((PacketEncoderModern)encoder).previousEncoder);
         }
     }
 
