@@ -18,14 +18,10 @@
 
 package io.github.retrooper.packetevents.injector.modern;
 
-import io.github.retrooper.packetevents.utils.bytebuf.ByteBufModern;
-import io.github.retrooper.packetevents.utils.bytebuf.ByteBufUtil;
 import io.github.retrooper.packetevents.utils.reflection.ClassUtil;
 import io.github.retrooper.packetevents.utils.reflection.Reflection;
 import io.netty.buffer.ByteBuf;
-import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelHandlerContext;
-import io.netty.handler.codec.ByteToMessageDecoder;
 import io.netty.handler.codec.MessageToByteEncoder;
 
 import java.lang.reflect.InvocationTargetException;
@@ -57,7 +53,6 @@ public class PacketEncoderModern extends MessageToByteEncoder {
         } else {
             try {
                 minecraftEncoder = (MessageToByteEncoder) Reflection.getField(previousEncoder.getClass(), MessageToByteEncoder.class, 0).get(previousEncoder);
-            System.out.println("FOUND MC: " + minecraftEncoder.getClass().getSimpleName());
             } catch (IllegalAccessException e) {
                 e.printStackTrace();
             }
@@ -66,37 +61,14 @@ public class PacketEncoderModern extends MessageToByteEncoder {
 
     @Override
     protected void encode(ChannelHandlerContext ctx, Object o, ByteBuf byteBuf) throws Exception {
-        if (!(o instanceof ByteBuf)) {
-            //First call minecraft's encoder, we need minecraft to transform the packet into a bytebuf.
-            try {
-                System.out.println("CALLING MC'S ENCODER FIRST: " + minecraftEncoder.getClass().getSimpleName());
-                ENCODE_METHOD.invoke((isPreviousEncoderMinecraft ? this.previousEncoder : this.previousEncoder), ctx, o, byteBuf);
-            } catch (InvocationTargetException ex) {
-                if (ex.getCause() instanceof Exception) {
-                    throw (Exception) ex.getCause();
-                } else if (ex.getCause() instanceof Error) {
-                    throw (Error) ex.getCause();
-                }
+        try {
+            ENCODE_METHOD.invoke(this.previousEncoder, ctx, o, byteBuf);
+        } catch (InvocationTargetException ex) {
+            if (ex.getCause() instanceof Exception) {
+                throw (Exception) ex.getCause();
+            } else if (ex.getCause() instanceof Error) {
+                throw (Error) ex.getCause();
             }
-        } else {
-            //Oh.. its already in bytebuf form
-            byteBuf.writeBytes((ByteBuf) o);
         }
-
-
-        //Now after we have processed the bytebuf, we can pass it onto ViaVersion and other custom encoders.
-      /*  if (!isPreviousEncoderMinecraft) {
-            try {
-                System.out.println("ARE WE CALLING VIA NOW? : " + this.previousEncoder.getClass().getSimpleName() + ", OBJECT TYPE: " + o.getClass().getSimpleName());
-                //ENCODE_METHOD.invoke(this.previousEncoder, ctx, o, byteBuf);
-                ENCODE_METHOD.invoke(this.previousEncoder, ctx, o, byteBuf);
-            } catch (InvocationTargetException ex) {
-                if (ex.getCause() instanceof Exception) {
-                    throw (Exception) ex.getCause();
-                } else if (ex.getCause() instanceof Error) {
-                    throw (Error) ex.getCause();
-                }
-            }
-        }*/
     }
 }
