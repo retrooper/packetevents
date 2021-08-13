@@ -18,6 +18,8 @@
 
 package io.github.retrooper.packetevents.protocol;
 
+import io.github.retrooper.packetevents.manager.server.ServerVersion;
+import io.github.retrooper.packetevents.protocol.protocols.clientbound.*;
 import io.github.retrooper.packetevents.protocol.protocols.serverbound.*;
 import io.github.retrooper.packetevents.manager.player.ClientVersion;
 import org.jetbrains.annotations.Nullable;
@@ -261,12 +263,125 @@ public final class PacketType {
 
         //TODO FINISH
         public enum Server implements PacketTypeAbstract {
-            FIRST, SECOND, THIRD;
+            SET_COMPRESSION,
+            UPDATE_SIGN,
+            USE_BED,
+            SPAWN_MOB,
+            SPAWN_GLOBAL_ENTITY,
+            SPAWN_WEATHER_ENTITY,
+            TITLE,
+            WORLD_BORDER,
+            COMBAT_EVENT,
+            ENTITY_MOVEMENT,
 
-            private static final Map<ClientVersion, Map<Integer, PacketTypeAbstract>> PACKET_ID_CACHE = new IdentityHashMap<>();
+            WINDOW_CONFIRMATION,
+            SPAWN_ENTITY,
+            SPAWN_EXPERIENCE_ORB,
+            SPAWN_LIVING_ENTITY,
+            SPAWN_PAINTING,
+            SPAWN_PLAYER,
+            SCULK_VIBRATION_SIGNAL,
+            ENTITY_ANIMATION,
+            STATISTICS,
+            ACKNOWLEDGE_PLAYER_DIGGING,
+            BLOCK_BREAK_ANIMATION,
+            BLOCK_ENTITY_DATA,
+            BLOCK_ACTION,
+            BLOCK_CHANGE,
+            BOSS_BAR,
+            SERVER_DIFFICULTY,
+            CHAT_MESSAGE,
+            CLEAR_TITLES,
+            TAB_COMPLETE,
+            MULTI_BLOCK_CHANGE,
+            DECLARE_COMMANDS,
+            CLOSE_WINDOW,
+            WINDOW_ITEMS,
+            WINDOW_PROPERTY,
+            SET_SLOT,
+            SET_COOLDOWN,
+            PLUGIN_MESSAGE,
+            NAMED_SOUND_EFFECT,
+            DISCONNECT,
+            ENTITY_STATUS,
+            EXPLOSION,
+            UNLOAD_CHUNK,
+            CHANGE_GAME_STATE,
+            OPEN_HORSE_WINDOW,
+            INITIALIZE_WORLD_BORDER,
+            KEEP_ALIVE,
+            CHUNK_DATA,
+            EFFECT,
+            PARTICLE,
+            UPDATE_LIGHT,
+            JOIN_GAME,
+            MAP_DATA,
+            TRADE_LIST,
+            ENTITY_RELATIVE_MOVE,
+            ENTITY_LOOK_AND_RELATIVE_MOVE,
+            ENTITY_LOOK,
+            VEHICLE_MOVE,
+            OPEN_BOOK,
+            OPEN_WINDOW,
+            OPEN_SIGN_EDITOR,
+            PING,
+            CRAFT_RECIPE_RESPONSE,
+            PLAYER_ABILITIES,
+            END_COMBAT_EVENT,
+            ENTER_COMBAT_EVENT,
+            DEATH_COMBAT_EVENT,
+            PLAYER_INFO,
+            FACE_PLAYER,
+            PLAYER_POSITION_AND_LOOK,
+            UNLOCK_RECIPES,
+            DESTROY_ENTITY,
+            REMOVE_ENTITY_EFFECT,
+            RESOURCE_PACK_SEND,
+            RESPAWN,
+            ENTITY_HEAD_LOOK,
+            SELECT_ADVANCEMENT_TAB,
+            ACTION_BAR,
+            WORLD_BORDER_CENTER,
+            WORLD_BORDER_LERP_SIZE,
+            WORLD_BORDER_SIZE,
+            WORLD_BORDER_WARNING_DELAY,
+            WORLD_BORDER_WARNING_REACH,
+            CAMERA,
+            HELD_ITEM_CHANGE,
+            UPDATE_VIEW_POSITION,
+            UPDATE_VIEW_DISTANCE,
+            SPAWN_POSITION,
+            DISPLAY_SCOREBOARD,
+            ENTITY_METADATA,
+            ATTACH_ENTITY,
+            ENTITY_VELOCITY,
+            ENTITY_EQUIPMENT,
+            SET_EXPERIENCE,
+            UPDATE_HEALTH,
+            SCOREBOARD_OBJECTIVE,
+            SET_PASSENGERS,
+            TEAMS,
+            UPDATE_SCORE,
+            SET_TITLE_SUBTITLE,
+            TIME_UPDATE,
+            SET_TITLE_TEXT,
+            SET_TITLE_TIME,
+            ENTITY_SOUND_EFFECT,
+            SOUND_EFFECT,
+            STOP_SOUND,
+            PLAYER_LIST_HEADER_AND_FOOTER,
+            NBT_QUERY_RESPONSE,
+            COLLECT_ITEM,
+            ENTITY_TELEPORT,
+            ADVANCEMENTS,
+            ENTITY_PROPERTIES,
+            ENTITY_EFFECT,
+            DECLARE_RECIPES,
+            TAGS;
+            private static final Map<ServerVersion, Map<Integer, PacketTypeAbstract>> PACKET_ID_CACHE = new IdentityHashMap<>();
 
             @Nullable
-            public static PacketTypeAbstract getById(ClientVersion version, int packetID) {
+            public static PacketTypeAbstract getById(ServerVersion version, int packetID) {
                 Map<Integer, PacketTypeAbstract> innerMap = PACKET_ID_CACHE.get(version);
                 if (innerMap != null) {
                     PacketTypeAbstract server = innerMap.get(packetID);
@@ -277,7 +392,7 @@ public final class PacketType {
                 return null;
             }
 
-            private static void loadPacketIDs(ClientVersion version, Enum<?>[] enumConstants) {
+            private static void loadPacketIDs(ServerVersion version, Enum<?>[] enumConstants) {
                 Map<Integer, PacketTypeAbstract> innerMap = new IdentityHashMap<>();
                 for (int i = 0; i < enumConstants.length; i++) {
                     innerMap.put(i, Play.Client.valueOf(enumConstants[i].name()));
@@ -285,8 +400,44 @@ public final class PacketType {
                 PACKET_ID_CACHE.put(version, innerMap);
             }
 
-            public static void load() {
+            private static void loadPacketIDs(ServerVersion first, ServerVersion last, Enum<?>[] enumConstants) {
+                Map<Integer, PacketTypeAbstract> innerMap = new IdentityHashMap<>();
+                for (int i = 0; i < enumConstants.length; i++) {
+                    innerMap.put(i, Play.Client.valueOf(enumConstants[i].name()));
+                }
 
+                boolean shouldPut = false;
+                for (ServerVersion v : ServerVersion.values()) {
+                    if (v == first) {
+                        shouldPut = true;
+                    }
+
+                    if (shouldPut) {
+                        PACKET_ID_CACHE.put(v, innerMap);
+                    }
+
+                    if (v == last) {
+                        shouldPut = false;
+                    }
+                }
+            }
+
+            public static void load() {
+                loadPacketIDs(ServerVersion.v_1_7_10, ClientboundPacketType_1_7_10.values());
+                loadPacketIDs(ServerVersion.v_1_8, ServerVersion.v_1_8_8, ClientboundPacketType_1_8.values());
+                loadPacketIDs(ServerVersion.v_1_9, ServerVersion.v_1_9_2, ClientboundPacketType_1_9.values());
+                //Should be 1.9.3, but we don't have an enum constant for 1.9.3, because I couldn't access a 1.9.3 build of spigot.
+                loadPacketIDs(ServerVersion.v_1_9_4, ServerVersion.v_1_11_2, ClientboundPacketType_1_9_3.values());
+                loadPacketIDs(ServerVersion.v_1_12, ClientboundPacketType_1_12.values());
+                loadPacketIDs(ServerVersion.v_1_12_1, ClientboundPacketType_1_12_1.values());
+                loadPacketIDs(ServerVersion.v_1_13, ServerVersion.v_1_13_2, ClientboundPacketType_1_13.values());
+                loadPacketIDs(ServerVersion.v_1_14, ServerVersion.v_1_14_3, ClientboundPacketType_1_14.values());
+                loadPacketIDs(ServerVersion.v_1_14_4, ClientboundPacketType_1_14_4.values());
+                loadPacketIDs(ServerVersion.v_1_15, ServerVersion.v_1_15_1, ClientboundPacketType_1_15.values());
+                loadPacketIDs(ServerVersion.v_1_15_2, ClientboundPacketType_1_15_2.values());
+                loadPacketIDs(ServerVersion.v_1_16, ServerVersion.v_1_16_1, ClientboundPacketType_1_16.values());
+                loadPacketIDs(ServerVersion.v_1_16_2, ServerVersion.v_1_16_5, ClientboundPacketType_1_16_2.values());
+                loadPacketIDs(ServerVersion.v_1_17, ServerVersion.v_1_17_1, ClientboundPacketType_1_17.values());
             }
         }
     }

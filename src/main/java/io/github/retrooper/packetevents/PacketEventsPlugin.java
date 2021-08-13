@@ -59,14 +59,6 @@ public class PacketEventsPlugin extends JavaPlugin {
                         PacketEvents.get().getInjector().changePacketState(event.getChannel(), PacketState.PLAY);
                     }
                 }
-                else if (event.getState() == PacketState.PLAY && event.getPlayer() != null) {
-                    if (event.getPacketType() == PacketType.Play.Client.UPDATE_SIGN) {
-                        WrapperGameClientUpdateSign updateSign = new WrapperGameClientUpdateSign(event.getClientVersion(), event.getByteBuf());
-                        event.getPlayer().sendMessage("PACKET TYPE: "+ event.getPacketType());
-                        event.getPlayer().sendMessage("TEXT LINES: " + Arrays.toString(updateSign.getTextLines()));
-                        event.getPlayer().sendMessage("POSITION: " + updateSign.getBlockPosition().toString());
-                    }
-                }
             }
         });
     }
