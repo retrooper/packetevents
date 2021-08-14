@@ -73,8 +73,16 @@ public enum ClientboundPacketType_1_9 {
     RESPAWN,
     ENTITY_HEAD_LOOK,
     WORLD_BORDER,
+
     //This packet has been removed. Its broken, you should send the packet during the login stage.
     //SET_COMPRESSION,
+
+    //This packet was removed.
+    //MAP_CHUNK_BULK
+
+    //This packet was removed.
+    //UPDATE_ENTITY_NBT
+
     CAMERA,
     HELD_ITEM_CHANGE,
     DISPLAY_SCOREBOARD,

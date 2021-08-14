@@ -264,6 +264,8 @@ public final class PacketType {
         //TODO FINISH
         public enum Server implements PacketTypeAbstract {
             SET_COMPRESSION,
+            MAP_CHUNK_BULK,
+            UPDATE_ENTITY_NBT,
             UPDATE_SIGN,
             USE_BED,
             SPAWN_MOB,
@@ -395,7 +397,7 @@ public final class PacketType {
             private static void loadPacketIDs(ServerVersion version, Enum<?>[] enumConstants) {
                 Map<Integer, PacketTypeAbstract> innerMap = new IdentityHashMap<>();
                 for (int i = 0; i < enumConstants.length; i++) {
-                    innerMap.put(i, Play.Client.valueOf(enumConstants[i].name()));
+                    innerMap.put(i, Play.Server.valueOf(enumConstants[i].name()));
                 }
                 PACKET_ID_CACHE.put(version, innerMap);
             }
@@ -403,7 +405,7 @@ public final class PacketType {
             private static void loadPacketIDs(ServerVersion first, ServerVersion last, Enum<?>[] enumConstants) {
                 Map<Integer, PacketTypeAbstract> innerMap = new IdentityHashMap<>();
                 for (int i = 0; i < enumConstants.length; i++) {
-                    innerMap.put(i, Play.Client.valueOf(enumConstants[i].name()));
+                    innerMap.put(i, Play.Server.valueOf(enumConstants[i].name()));
                 }
 
                 boolean shouldPut = false;

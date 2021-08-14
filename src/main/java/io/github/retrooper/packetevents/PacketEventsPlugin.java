@@ -22,14 +22,10 @@ import io.github.retrooper.packetevents.event.PacketListenerAbstract;
 import io.github.retrooper.packetevents.event.PacketListenerPriority;
 import io.github.retrooper.packetevents.event.impl.PacketDecodeEvent;
 import io.github.retrooper.packetevents.protocol.PacketState;
-import io.github.retrooper.packetevents.protocol.PacketType;
 import io.github.retrooper.packetevents.utils.bytebuf.ByteBufAbstract;
-import io.github.retrooper.packetevents.wrapper.game.client.WrapperGameClientUpdateSign;
 import io.github.retrooper.packetevents.wrapper.handshaking.client.WrapperHandshakingClientHandshake;
 import io.github.retrooper.packetevents.wrapper.login.client.WrapperLoginClientLoginStart;
 import org.bukkit.plugin.java.JavaPlugin;
-
-import java.util.Arrays;
 
 public class PacketEventsPlugin extends JavaPlugin {
     @Override
@@ -50,8 +46,7 @@ public class PacketEventsPlugin extends JavaPlugin {
                     WrapperHandshakingClientHandshake handshake = new WrapperHandshakingClientHandshake(byteBuf);
                     event.setClientVersion(handshake.getClientVersion());
                     PacketEvents.get().getInjector().changePacketState(event.getChannel(), handshake.getNextState());
-                }
-                else if (event.getState() == PacketState.LOGIN) {
+                } else if (event.getState() == PacketState.LOGIN) {
                     if (event.getPacketID() == 0) {
                         WrapperLoginClientLoginStart start = new WrapperLoginClientLoginStart(byteBuf);
                         //Cache the channel
