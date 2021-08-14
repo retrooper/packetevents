@@ -8,12 +8,10 @@ PacketEvents is an open-source Packet API. It has many cross-version packet-wrap
 ### Resources
 * [SpigotMC](https://www.spigotmc.org/resources/packetevents-api.80279/)
 * [JavaDoc](https://packetevents.github.io/javadocs)
+* [Discord](https://discord.me/packetevents)
 
 ### Setup
 [Learn more](https://github.com/retrooper/packetevents/wiki/1.-Setup)
-
-### Discord
-[Learn more](https://discord.me/packetevents)
 
 ### Contributing/Forking
 [Learn more](https://github.com/retrooper/packetevents/wiki/2.-Contributing-and-Forking)\
