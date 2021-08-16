@@ -26,8 +26,8 @@ import java.util.UUID;
 
 
 public class PacketWrapper {
-    private final ClientVersion version;
-    private final ByteBufAbstract byteBuf;
+    protected final ClientVersion version;
+    protected final ByteBufAbstract byteBuf;
 
     public PacketWrapper(ByteBufAbstract byteBuf) {
         this.version = ClientVersion.UNKNOWN;
@@ -45,6 +45,10 @@ public class PacketWrapper {
 
     public ByteBufAbstract getByteBuf() {
         return byteBuf;
+    }
+
+    public byte readByte() {
+        return byteBuf.readByte();
     }
 
     public int readInt() {

@@ -37,5 +37,7 @@ public enum Hand {
      * This hand does not exist on 1.7.10 and 1.8.x's protocol.
      * It will always be the {@link Hand#MAIN_HAND} on those protocols.
      */
-    OFF_HAND
+    OFF_HAND;
+
+    public static final Hand[] VALUES = values();
 }

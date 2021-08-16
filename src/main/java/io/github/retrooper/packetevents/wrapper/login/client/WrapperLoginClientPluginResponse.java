@@ -12,7 +12,12 @@ public class WrapperLoginClientPluginResponse extends PacketWrapper {
         super(byteBuf);
         this.messageID = readVarInt();
         this.successful = readBoolean();
-        this.data = readByteArray(byteBuf.readableBytes());
+        if (this.successful) {
+            this.data = readByteArray(byteBuf.readableBytes());
+        }
+        else {
+            this.data = new byte[0];
+        }
     }
 
     public int getMessageID(){

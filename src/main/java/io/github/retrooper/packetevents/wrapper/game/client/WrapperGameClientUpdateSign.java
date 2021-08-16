@@ -25,7 +25,6 @@ import io.github.retrooper.packetevents.wrapper.PacketWrapper;
 import io.github.retrooper.packetevents.utils.wrapper.PacketWrapperUtils;
 
 public class WrapperGameClientUpdateSign extends PacketWrapper {
-    //TODO Test the blockposition on as many versions as possible
     private final Vector3i blockPosition;
     private final String[] textLines = new String[4];
 
