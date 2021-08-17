@@ -18,14 +18,15 @@
 
 package io.github.retrooper.packetevents.wrapper.login.client;
 
+import io.github.retrooper.packetevents.manager.player.ClientVersion;
 import io.github.retrooper.packetevents.utils.bytebuf.ByteBufAbstract;
 import io.github.retrooper.packetevents.wrapper.PacketWrapper;
 
 public class WrapperLoginClientLoginStart extends PacketWrapper {
     private final String username;
 
-    public WrapperLoginClientLoginStart(ByteBufAbstract byteBuf) {
-        super(byteBuf);
+    public WrapperLoginClientLoginStart(ClientVersion version, ByteBufAbstract byteBuf) {
+        super(version, byteBuf);
         this.username = readString(16);
     }
 

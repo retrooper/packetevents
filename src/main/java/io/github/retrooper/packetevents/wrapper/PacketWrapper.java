@@ -29,11 +29,6 @@ public class PacketWrapper {
     protected final ClientVersion version;
     protected final ByteBufAbstract byteBuf;
 
-    public PacketWrapper(ByteBufAbstract byteBuf) {
-        this.version = ClientVersion.UNKNOWN;
-        this.byteBuf = byteBuf;
-    }
-
     public PacketWrapper(ClientVersion version, ByteBufAbstract byteBuf) {
         this.version = version;
         this.byteBuf = byteBuf;
@@ -119,5 +114,9 @@ public class PacketWrapper {
         long mostSigBits = readLong();
         long leastSigBits = readLong();
         return new UUID(mostSigBits, leastSigBits);
+    }
+
+    public static PacketWrapper createUniversalPacketWrapper(ByteBufAbstract byteBuf) {
+        return new PacketWrapper(ClientVersion.UNKNOWN, byteBuf);
     }
 }

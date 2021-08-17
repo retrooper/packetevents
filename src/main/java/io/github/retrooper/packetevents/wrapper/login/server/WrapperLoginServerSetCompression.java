@@ -18,14 +18,15 @@
 
 package io.github.retrooper.packetevents.wrapper.login.server;
 
+import io.github.retrooper.packetevents.manager.player.ClientVersion;
 import io.github.retrooper.packetevents.utils.bytebuf.ByteBufAbstract;
 import io.github.retrooper.packetevents.wrapper.PacketWrapper;
 
 public class WrapperLoginServerSetCompression extends PacketWrapper {
     private final int threshold;
 
-    public WrapperLoginServerSetCompression(ByteBufAbstract byteBuf) {
-        super(byteBuf);
+    public WrapperLoginServerSetCompression(ClientVersion version, ByteBufAbstract byteBuf) {
+        super(version, byteBuf);
         this.threshold = readVarInt();
     }
 

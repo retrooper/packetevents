@@ -23,5 +23,5 @@ package io.github.retrooper.packetevents.protocol;
  * @since 1.8
  */
 public enum PacketState {
-    HANDSHAKING, STATUS, LOGIN, PLAY
+    HANDSHAKING, STATUS, LOGIN, GAME
 }

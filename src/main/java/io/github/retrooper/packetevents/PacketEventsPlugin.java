@@ -21,7 +21,9 @@ package io.github.retrooper.packetevents;
 import io.github.retrooper.packetevents.event.PacketListenerAbstract;
 import io.github.retrooper.packetevents.event.PacketListenerPriority;
 import io.github.retrooper.packetevents.event.impl.PacketDecodeEvent;
+import io.github.retrooper.packetevents.manager.player.ClientVersion;
 import io.github.retrooper.packetevents.protocol.PacketState;
+import io.github.retrooper.packetevents.protocol.PacketType;
 import io.github.retrooper.packetevents.utils.bytebuf.ByteBufAbstract;
 import io.github.retrooper.packetevents.wrapper.handshaking.client.WrapperHandshakingClientHandshake;
 import io.github.retrooper.packetevents.wrapper.login.client.WrapperLoginClientLoginStart;
@@ -37,21 +39,22 @@ public class PacketEventsPlugin extends JavaPlugin {
     @Override
     public void onEnable() {
         PacketEvents.get().init();
+        //TODO Listen for login success which is clientbound, then set state to PLAY
         PacketEvents.get().registerListener(new PacketListenerAbstract(PacketListenerPriority.LOWEST) {
             @Override
             public void onPacketDecode(PacketDecodeEvent event) {
                 ByteBufAbstract byteBuf = event.getByteBuf();
                 if (event.getPlayer() == null && event.getState() == null) {
                     PacketEvents.get().getInjector().changePacketState(event.getChannel(), PacketState.HANDSHAKING);
-                    WrapperHandshakingClientHandshake handshake = new WrapperHandshakingClientHandshake(byteBuf);
+                    WrapperHandshakingClientHandshake handshake = new WrapperHandshakingClientHandshake(ClientVersion.UNKNOWN, byteBuf);
                     event.setClientVersion(handshake.getClientVersion());
                     PacketEvents.get().getInjector().changePacketState(event.getChannel(), handshake.getNextState());
                 } else if (event.getState() == PacketState.LOGIN) {
                     if (event.getPacketID() == 0) {
-                        WrapperLoginClientLoginStart start = new WrapperLoginClientLoginStart(byteBuf);
+                        WrapperLoginClientLoginStart start = new WrapperLoginClientLoginStart(event.getClientVersion(), byteBuf);
                         //Cache the channel
                         PacketEvents.get().getPlayerManager().channels.put(start.getUsername(), event.getChannel());
-                        PacketEvents.get().getInjector().changePacketState(event.getChannel(), PacketState.PLAY);
+                        PacketEvents.get().getInjector().changePacketState(event.getChannel(), PacketState.GAME);
                     }
                 }
             }

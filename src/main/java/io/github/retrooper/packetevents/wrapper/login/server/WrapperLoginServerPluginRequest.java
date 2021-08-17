@@ -18,6 +18,7 @@
 
 package io.github.retrooper.packetevents.wrapper.login.server;
 
+import io.github.retrooper.packetevents.manager.player.ClientVersion;
 import io.github.retrooper.packetevents.utils.bytebuf.ByteBufAbstract;
 import io.github.retrooper.packetevents.wrapper.PacketWrapper;
 
@@ -25,8 +26,8 @@ public class WrapperLoginServerPluginRequest extends PacketWrapper {
     private final int messageID;
     private final String channelName;
     private final byte[] data;
-    public WrapperLoginServerPluginRequest(ByteBufAbstract byteBuf) {
-        super(byteBuf);
+    public WrapperLoginServerPluginRequest(ClientVersion version, ByteBufAbstract byteBuf) {
+        super(version, byteBuf);
         this.messageID = readVarInt();
         this.channelName = readString();
         this.data = readByteArray(byteBuf.readableBytes());

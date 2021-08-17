@@ -18,14 +18,15 @@
 
 package io.github.retrooper.packetevents.wrapper.game.client;
 
+import io.github.retrooper.packetevents.manager.player.ClientVersion;
 import io.github.retrooper.packetevents.utils.bytebuf.ByteBufAbstract;
 import io.github.retrooper.packetevents.wrapper.PacketWrapper;
 
 public class WrapperGameClientPong extends PacketWrapper {
     private final int id;
 
-    public WrapperGameClientPong(ByteBufAbstract byteBuf) {
-        super(byteBuf);
+    public WrapperGameClientPong(ClientVersion version, ByteBufAbstract byteBuf) {
+        super(version, byteBuf);
         this.id = readInt();
     }
 

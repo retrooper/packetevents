@@ -16,34 +16,20 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package io.github.retrooper.packetevents.wrapper.game.client;
+package io.github.retrooper.packetevents.wrapper.game.server;
 
 import io.github.retrooper.packetevents.manager.player.ClientVersion;
 import io.github.retrooper.packetevents.utils.bytebuf.ByteBufAbstract;
-import io.github.retrooper.packetevents.utils.vector.Vector3i;
-import io.github.retrooper.packetevents.utils.wrapper.PacketWrapperUtils;
 import io.github.retrooper.packetevents.wrapper.PacketWrapper;
 
-public class WrapperGameClientGenerateStructure extends PacketWrapper {
-    private final Vector3i blockPosition;
-    private final int levels;
-    private final boolean keepJigsaws;
-    public WrapperGameClientGenerateStructure(ClientVersion version, ByteBufAbstract byteBuf) {
+public class WrapperGameServerPing extends PacketWrapper {
+    private final int id;
+    public WrapperGameServerPing(ClientVersion version, ByteBufAbstract byteBuf) {
         super(version, byteBuf);
-        this.blockPosition = PacketWrapperUtils.readVectorFromLong(readLong());
-        this.levels = readVarInt();
-        this.keepJigsaws = readBoolean();
+        this.id = readInt();
     }
 
-    public Vector3i getBlockPosition() {
-        return blockPosition;
-    }
-
-    public int getLevels() {
-        return levels;
-    }
-
-    public boolean isKeepingJigsaws() {
-        return keepJigsaws;
+    public int getId() {
+        return id;
     }
 }

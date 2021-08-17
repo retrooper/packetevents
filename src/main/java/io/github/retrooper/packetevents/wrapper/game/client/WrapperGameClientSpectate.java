@@ -18,6 +18,7 @@
 
 package io.github.retrooper.packetevents.wrapper.game.client;
 
+import io.github.retrooper.packetevents.manager.player.ClientVersion;
 import io.github.retrooper.packetevents.utils.bytebuf.ByteBufAbstract;
 import io.github.retrooper.packetevents.wrapper.PacketWrapper;
 
@@ -25,8 +26,8 @@ import java.util.UUID;
 
 public class WrapperGameClientSpectate extends PacketWrapper {
     private final UUID uuid;
-    public WrapperGameClientSpectate(ByteBufAbstract byteBuf) {
-        super(byteBuf);
+    public WrapperGameClientSpectate(ClientVersion version, ByteBufAbstract byteBuf) {
+        super(version, byteBuf);
         this.uuid = readUUID();
     }
 

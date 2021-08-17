@@ -18,6 +18,7 @@
 
 package io.github.retrooper.packetevents.protocol;
 
+import io.github.retrooper.packetevents.PacketEvents;
 import io.github.retrooper.packetevents.manager.server.ServerVersion;
 import io.github.retrooper.packetevents.protocol.protocols.clientbound.*;
 import io.github.retrooper.packetevents.protocol.protocols.serverbound.*;
@@ -49,11 +50,12 @@ public final class PacketType {
                 else {
                     return Login.Server.getById(packetID);
                 }
-            case PLAY:
+            case GAME:
                 if (side == PacketSide.CLIENT) {
-                    return Play.Client.getById(version, packetID);
+                    return Game.Client.getById(version, packetID);
                 } else {
-                    return null;
+                    ServerVersion serverVersion = PacketEvents.get().getServerManager().getVersion();
+                    return Game.Server.getById(serverVersion, packetID);
                 }
             default:
                 return null;
@@ -153,7 +155,7 @@ public final class PacketType {
         }
     }
 
-    public static class Play {
+    public static class Game {
         public enum Client implements PacketTypeAbstract {
             TELEPORT_CONFIRM,
             QUERY_BLOCK_NBT,
@@ -213,10 +215,7 @@ public final class PacketType {
             public static PacketTypeAbstract getById(ClientVersion version, int packetID) {
                 Map<Integer, PacketTypeAbstract> innerMap = PACKET_ID_CACHE.get(version);
                 if (innerMap != null) {
-                    PacketTypeAbstract client = innerMap.get(packetID);
-                    if (client != null) {
-                        return client;
-                    }
+                    return innerMap.get(packetID);
                 }
                 return null;
             }
@@ -380,16 +379,15 @@ public final class PacketType {
             ENTITY_EFFECT,
             DECLARE_RECIPES,
             TAGS;
+
+            //TODO Simplify to one MAP, and the MAP is different depending on the local server version.
             private static final Map<ServerVersion, Map<Integer, PacketTypeAbstract>> PACKET_ID_CACHE = new IdentityHashMap<>();
 
             @Nullable
             public static PacketTypeAbstract getById(ServerVersion version, int packetID) {
                 Map<Integer, PacketTypeAbstract> innerMap = PACKET_ID_CACHE.get(version);
                 if (innerMap != null) {
-                    PacketTypeAbstract server = innerMap.get(packetID);
-                    if (server != null) {
-                        return server;
-                    }
+                    return innerMap.get(packetID);
                 }
                 return null;
             }
@@ -397,7 +395,7 @@ public final class PacketType {
             private static void loadPacketIDs(ServerVersion version, Enum<?>[] enumConstants) {
                 Map<Integer, PacketTypeAbstract> innerMap = new IdentityHashMap<>();
                 for (int i = 0; i < enumConstants.length; i++) {
-                    innerMap.put(i, Play.Server.valueOf(enumConstants[i].name()));
+                    innerMap.put(i, Game.Server.valueOf(enumConstants[i].name()));
                 }
                 PACKET_ID_CACHE.put(version, innerMap);
             }
@@ -405,7 +403,7 @@ public final class PacketType {
             private static void loadPacketIDs(ServerVersion first, ServerVersion last, Enum<?>[] enumConstants) {
                 Map<Integer, PacketTypeAbstract> innerMap = new IdentityHashMap<>();
                 for (int i = 0; i < enumConstants.length; i++) {
-                    innerMap.put(i, Play.Server.valueOf(enumConstants[i].name()));
+                    innerMap.put(i, Game.Server.valueOf(enumConstants[i].name()));
                 }
 
                 boolean shouldPut = false;

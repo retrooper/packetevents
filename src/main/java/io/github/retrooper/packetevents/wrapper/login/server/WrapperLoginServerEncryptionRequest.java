@@ -18,6 +18,7 @@
 
 package io.github.retrooper.packetevents.wrapper.login.server;
 
+import io.github.retrooper.packetevents.manager.player.ClientVersion;
 import io.github.retrooper.packetevents.utils.bytebuf.ByteBufAbstract;
 import io.github.retrooper.packetevents.wrapper.PacketWrapper;
 
@@ -31,8 +32,8 @@ public class WrapperLoginServerEncryptionRequest extends PacketWrapper {
     private final PublicKey publicKey;
     private final byte[] verifyToken;
 
-    public WrapperLoginServerEncryptionRequest(ByteBufAbstract byteBuf) {
-        super(byteBuf);
+    public WrapperLoginServerEncryptionRequest(ClientVersion version, ByteBufAbstract byteBuf) {
+        super(version, byteBuf);
         this.serverID = readString(20);
         int publicKeyLength = readVarInt();
         byte[] publicKeyBytes = readByteArray(publicKeyLength);

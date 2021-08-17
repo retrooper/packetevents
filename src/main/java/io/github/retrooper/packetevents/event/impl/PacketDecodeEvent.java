@@ -34,7 +34,7 @@ public class PacketDecodeEvent extends PacketEvent implements PlayerEvent, Cance
             this.version = ClientVersion.UNKNOWN;
         }
         this.byteBuf = byteBuf.duplicate();
-        PacketWrapper packetWrapper = new PacketWrapper(this.byteBuf);
+        PacketWrapper packetWrapper = PacketWrapper.createUniversalPacketWrapper(this.byteBuf);
         this.packetIDNum = packetWrapper.readVarInt();
     }
 
@@ -46,7 +46,7 @@ public class PacketDecodeEvent extends PacketEvent implements PlayerEvent, Cance
             this.version = ClientVersion.UNKNOWN;
         }
         this.byteBuf = PacketEvents.get().getServerManager().generateByteBufAbstract(rawByteBuf);
-        PacketWrapper packetWrapper = new PacketWrapper(this.byteBuf);
+        PacketWrapper packetWrapper = PacketWrapper.createUniversalPacketWrapper(this.byteBuf);
         this.packetIDNum = packetWrapper.readVarInt();
     }
 

@@ -98,7 +98,7 @@ public class LateChannelInjectorLegacy implements LateInjector {
 
     @Override
     public PacketState getPacketState(Object channel) {
-        return PacketState.PLAY;
+        return PacketState.GAME;
     }
 
     @Override

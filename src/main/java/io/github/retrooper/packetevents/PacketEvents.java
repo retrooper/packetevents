@@ -115,8 +115,8 @@ public final class PacketEvents implements Listener, EventManager {
                 Metrics metrics = new Metrics((JavaPlugin) plugin, 11327);
             }
 
-            PacketType.Play.Client.load();
-            PacketType.Play.Server.load();
+            PacketType.Game.Client.load();
+            PacketType.Game.Server.load();
 
             Runnable postInjectTask = () -> {
                 Bukkit.getPluginManager().registerEvents(bukkitEventProcessorInternal, plugin);

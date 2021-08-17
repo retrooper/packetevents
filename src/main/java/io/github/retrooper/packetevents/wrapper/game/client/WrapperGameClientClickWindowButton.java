@@ -18,14 +18,15 @@
 
 package io.github.retrooper.packetevents.wrapper.game.client;
 
+import io.github.retrooper.packetevents.manager.player.ClientVersion;
 import io.github.retrooper.packetevents.utils.bytebuf.ByteBufAbstract;
 import io.github.retrooper.packetevents.wrapper.PacketWrapper;
 
 public class WrapperGameClientClickWindowButton extends PacketWrapper {
     private final byte windowID;
     private final byte buttonID;
-    public WrapperGameClientClickWindowButton(ByteBufAbstract byteBuf) {
-        super(byteBuf);
+    public WrapperGameClientClickWindowButton(ClientVersion version, ByteBufAbstract byteBuf) {
+        super(version, byteBuf);
         this.windowID = readByte();
         this.buttonID = readByte();
     }
