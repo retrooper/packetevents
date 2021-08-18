@@ -29,6 +29,7 @@ import io.github.retrooper.packetevents.utils.reflection.Reflection;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.entity.Entity;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.spigotmc.SpigotConfig;
 
@@ -112,6 +113,17 @@ public final class ServerUtils {
     }
 
     @Nullable
+    private Entity getEntityByIdIterateWorld(@NotNull World world, int entityID) {
+        for (Entity entity : PacketEvents.get().getServerUtils().getEntityList(world)) {
+            if (entity.getEntityId() == entityID) {
+                entityCache.putIfAbsent(entity.getEntityId(), entity);
+                return entity;
+            }
+        }
+        return null;
+    }
+
+    @Nullable
     public Entity getEntityById(@Nullable World world, int entityID) {
         Entity e = entityCache.get(entityID);
         if (e != null) {
@@ -123,20 +135,21 @@ public final class ServerUtils {
         }
 
         if (v_1_17 == 1) {
-            if (world != null) {
-                for (Entity entity : PacketEvents.get().getServerUtils().getEntityList(world)) {
-                    if (entity.getEntityId() == entityID) {
-                        entityCache.putIfAbsent(entity.getEntityId(), entity);
-                        return entity;
+            try {
+                if (world != null) {
+                    Entity newEntity = getEntityByIdIterateWorld(world, entityID);
+                    if (newEntity != null) {
+                        return newEntity;
                     }
                 }
             }
+            catch (Exception ex) {
+                //We are retrying below
+            }
             for (World w : Bukkit.getWorlds()) {
-                for (Entity entity : PacketEvents.get().getServerUtils().getEntityList(w)) {
-                    if (entity.getEntityId() == entityID) {
-                        entityCache.putIfAbsent(entity.getEntityId(), entity);
-                        return entity;
-                    }
+                Entity newEntity = getEntityByIdIterateWorld(w, entityID);
+                if (newEntity != null) {
+                    return newEntity;
                 }
             }
         } else {
