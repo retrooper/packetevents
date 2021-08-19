@@ -146,11 +146,17 @@ public final class ServerUtils {
             catch (Exception ex) {
                 //We are retrying below
             }
-            for (World w : Bukkit.getWorlds()) {
-                Entity newEntity = getEntityByIdIterateWorld(w, entityID);
-                if (newEntity != null) {
-                    return newEntity;
+            try {
+                for (World w : Bukkit.getWorlds()) {
+                    Entity newEntity = getEntityByIdIterateWorld(w, entityID);
+                    if (newEntity != null) {
+                        return newEntity;
+                    }
                 }
+            }
+            catch (Exception ex) {
+                //No entity found
+                return null;
             }
         } else {
             return EntityFinderUtils.getEntityByIdUnsafe(world, entityID);
