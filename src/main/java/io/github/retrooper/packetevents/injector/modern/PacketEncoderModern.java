@@ -18,18 +18,113 @@
 
 package io.github.retrooper.packetevents.injector.modern;
 
+import io.github.retrooper.packetevents.PacketEvents;
+import io.github.retrooper.packetevents.event.impl.PacketEncodeEvent;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
+import io.netty.channel.ChannelPromise;
 import io.netty.handler.codec.MessageToByteEncoder;
+import io.netty.util.internal.EmptyArrays;
+import org.bukkit.entity.Player;
 
 import java.util.Arrays;
 
-public class PacketEncoderModern extends MessageToByteEncoder {
+public class PacketEncoderModern extends MessageToByteEncoder<ByteBuf> {
+    public volatile Player player;
 
     @Override
-    protected void encode(ChannelHandlerContext ctx, Object o, ByteBuf byteBuf) throws Exception {
-        System.out.println("OBJECT TYPE: " + o.getClass().getSimpleName());
-        System.out.println(Arrays.toString(ctx.channel().pipeline().names().toArray(new String[0])));
-        byteBuf.writeBytes((ByteBuf) o);
+    protected void encode(ChannelHandlerContext ctx, ByteBuf bb, ByteBuf byteBuf) throws Exception {
+        /*int firstReaderIndex = bb.readerIndex();
+        PacketEncodeEvent packetEncodeEvent = new PacketEncodeEvent(ctx.channel(), player, bb);
+        int readerIndex = bb.readerIndex();
+        PacketEvents.get().getEventManager().callEvent(packetEncodeEvent, () -> {
+            bb.readerIndex(readerIndex);
+        });
+        bb.readerIndex(firstReaderIndex);
+
+        byte[] buffer = getBytes(bb, bb.readableBytes());
+        writeBytes(byteBuf, buffer, 0);*/
+    }
+
+    @Override
+    public void write(ChannelHandlerContext ctx, Object msg, ChannelPromise promise) throws Exception {
+        ByteBuf bb = (ByteBuf) msg;
+        int firstReaderIndex = bb.readerIndex();
+        PacketEncodeEvent packetEncodeEvent = new PacketEncodeEvent(ctx.channel(), player, bb);
+        int readerIndex = bb.readerIndex();
+        PacketEvents.get().getEventManager().callEvent(packetEncodeEvent, () -> {
+            bb.readerIndex(readerIndex);
+        });
+
+        bb.readerIndex(firstReaderIndex);
+
+        ctx.write(bb);
+    }
+
+    public static void writeBytes(ByteBuf buf, byte[] bytes, int buffer) {
+        int length = bytes.length;
+        correctSize(buf, length, buffer);
+        if (length > 0) {
+            buf.writeBytes(bytes);
+        }
+    }
+
+    public static void correctSize(ByteBuf buf, int bytes, int buffer) {
+        int capacity = buf.capacity();
+        int available = capacity - (buf.writerIndex() + bytes);
+
+        if (available < 0) {
+            buf.capacity(capacity - available + buffer);
+        }
+    }
+
+    public static byte[] getBytes(ByteBuf buffer, int bytes) {
+        if (bytes == 0) {
+            return EmptyArrays.EMPTY_BYTES;
+        }
+
+        return getBytes0(buffer, bytes);
+    }
+
+    public static byte[] getBytesAndRelease(ByteBuf buffer) {
+        final byte[] bytes = getBytes(buffer, buffer.readableBytes());
+        buffer.release();
+        return bytes;
+    }
+
+    /**
+     * Copied from netty to allow the usage of older netty versions:
+     * <p>
+     * https://github.com/netty/netty/blob/4.1/buffer/src/main/java/io/netty/buffer/ByteBufUtil.java
+     */
+    private static byte[] getBytes0(ByteBuf buffer, int length) {
+        final int start = buffer.readerIndex();
+        final int capacity = buffer.capacity();
+
+        if (isOutOfBounds(start, length, capacity))
+            throw new IndexOutOfBoundsException("expected: 0 <= start(" + start + ") <= start + length(" + length
+                    + ") <= buf.capacity(" + capacity + ')');
+
+        if (buffer.hasArray()) {
+            final int baseOffset = buffer.arrayOffset() + start;
+            final byte[] bytes = buffer.array();
+            if (/*copy || */baseOffset != 0 || length != bytes.length) {
+                return Arrays.copyOfRange(bytes, baseOffset, baseOffset + length);
+            }
+            return bytes;
+        }
+
+        final byte[] bytes = new byte[length];
+        buffer.getBytes(start, bytes);
+        return bytes;
+    }
+
+    /**
+     * Copied from netty to allow the usage of older netty versions:
+     * <p>
+     * https://github.com/netty/netty/blob/4.1/common/src/main/java/io/netty/util/internal/MathUtil.java
+     */
+    private static boolean isOutOfBounds(int index, int length, int capacity) {
+        return (index | length | capacity | (index + length) | (capacity - (index + length))) < 0;
     }
 }

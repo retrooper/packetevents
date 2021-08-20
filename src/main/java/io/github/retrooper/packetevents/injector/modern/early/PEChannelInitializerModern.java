@@ -41,9 +41,7 @@ public class PEChannelInitializerModern extends ChannelInitializer<Channel> {
     public static void postInitChannel(Channel channel) {
         PacketDecoderModern packetDecoderModern = new PacketDecoderModern((ByteToMessageDecoder) channel.pipeline().get("decoder"));
         channel.pipeline().replace("decoder", "decoder", packetDecoderModern);
-        PacketEncoderModern packetEncoderModern = new PacketEncoderModern();
-        channel.pipeline().addBefore("prepender", PacketEvents.get().encoderName, packetEncoderModern);
-
+        channel.pipeline().addBefore("prepender", PacketEvents.get().encoderName, new PacketEncoderModern());
     }
 
     public static void postDestroyChannel(Channel channel) {
@@ -52,10 +50,7 @@ public class PEChannelInitializerModern extends ChannelInitializer<Channel> {
             channel.pipeline().replace("decoder", "decoder", ((PacketDecoderModern) decoder).previousDecoder);
         }
 
-        ChannelHandler encoder = channel.pipeline().get("encoder");
-        if (encoder instanceof PacketEncoderModern) {
-            channel.pipeline().remove(PacketEvents.get().encoderName);
-        }
+        channel.pipeline().remove(PacketEvents.get().encoderName);
     }
 
     private void load() {

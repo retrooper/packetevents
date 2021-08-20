@@ -29,10 +29,7 @@ import java.util.IdentityHashMap;
 import java.util.Map;
 
 public final class PacketType {
-    public static PacketTypeAbstract getById(PacketSide side, PacketState state, ClientVersion version, int packetID) {
-        if (state == null) {
-            state = PacketState.HANDSHAKING;
-        }
+    public static PacketTypeAbstract getById(PacketSide side, PacketState state, @Nullable ClientVersion version, int packetID) {
         switch (state) {
             case HANDSHAKING:
                 return Handshaking.Client.getById(packetID);

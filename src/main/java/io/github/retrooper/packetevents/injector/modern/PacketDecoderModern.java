@@ -35,7 +35,7 @@ public class PacketDecoderModern extends ByteToMessageDecoder {
     private static Method DECODE_METHOD;
     public final ByteToMessageDecoder previousDecoder;
     public volatile Player player;
-    public PacketState packetState;
+    public PacketState packetState = PacketState.HANDSHAKING;
 
     private void load() {
         if (DECODE_METHOD == null) {
@@ -65,8 +65,13 @@ public class PacketDecoderModern extends ByteToMessageDecoder {
 
     @Override
     protected void decode(ChannelHandlerContext ctx, ByteBuf byteBuf, List<Object> list) throws Exception {
-        PacketDecodeEvent packetDecodeEvent = new PacketDecodeEvent(ctx.channel(), player, byteBuf.copy());
-        PacketEvents.get().getEventManager().callEvent(packetDecodeEvent);
+        int firstReaderIndex = byteBuf.readerIndex();
+        PacketDecodeEvent packetDecodeEvent = new PacketDecodeEvent(ctx.channel(), player, byteBuf);
+        int readerIndex = byteBuf.readerIndex();
+        PacketEvents.get().getEventManager().callEvent(packetDecodeEvent, () -> {
+            byteBuf.readerIndex(readerIndex);
+        });
+        byteBuf.readerIndex(firstReaderIndex);
 
         if (packetDecodeEvent.isCancelled()) {
             byteBuf.skipBytes(byteBuf.readableBytes());

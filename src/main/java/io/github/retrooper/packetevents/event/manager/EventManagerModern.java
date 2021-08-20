@@ -56,6 +56,23 @@ class EventManagerModern {
         }
     }
 
+    public void callEvent(PacketEvent event, Runnable postCallListenerAction) {
+        for (byte priority = PacketListenerPriority.LOWEST.getId(); priority <= PacketListenerPriority.MONITOR.getId(); priority++) {
+            HashSet<PacketListenerAbstract> listeners = listenersMap.get(priority);
+            if (listeners != null) {
+                for (PacketListenerAbstract listener : listeners) {
+                    try {
+                        event.call(listener);
+                        postCallListenerAction.run();
+                    } catch (Exception ex) {
+                        PacketEvents.get().getPlugin().getLogger()
+                                .log(Level.SEVERE, "PacketEvents found an exception while calling a packet listener.", ex);
+                    }
+                }
+            }
+        }
+    }
+
     /**
      * Register the dynamic packet event listener.
      *

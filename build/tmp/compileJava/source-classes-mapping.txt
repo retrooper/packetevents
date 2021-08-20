@@ -22,8 +22,8 @@ io/github/retrooper/packetevents/manager/server/SystemOS.java
  io.github.retrooper.packetevents.manager.server.SystemOS
 io/github/retrooper/packetevents/event/manager/PEEventManager.java
  io.github.retrooper.packetevents.event.manager.PEEventManager
-io/github/retrooper/packetevents/injector/modern/early/PEChannelInitializerModern.java
- io.github.retrooper.packetevents.injector.modern.early.PEChannelInitializerModern
+io/github/retrooper/packetevents/protocol/PacketSide.java
+ io.github.retrooper.packetevents.protocol.PacketSide
 io/github/retrooper/packetevents/PacketEvents.java
  io.github.retrooper.packetevents.PacketEvents
 io/github/retrooper/packetevents/injector/ChannelInjector.java
@@ -32,6 +32,8 @@ io/github/retrooper/packetevents/settings/PacketEventsSettings.java
  io.github.retrooper.packetevents.settings.PacketEventsSettings
 io/github/retrooper/packetevents/utils/dependencies/viaversion/ViaVersionAccessorImplLegacy.java
  io.github.retrooper.packetevents.utils.dependencies.viaversion.ViaVersionAccessorImplLegacy
+io/github/retrooper/packetevents/wrapper/game/client/WrapperGameClientClickWindowButton.java
+ io.github.retrooper.packetevents.wrapper.game.client.WrapperGameClientClickWindowButton
 io/github/retrooper/packetevents/utils/immutableset/ImmutableSetAbstract.java
  io.github.retrooper.packetevents.utils.immutableset.ImmutableSetAbstract
 io/github/retrooper/packetevents/utils/channel/ChannelUtils8.java
@@ -63,8 +65,8 @@ io/github/retrooper/packetevents/utils/reflection/ReflectionObject.java
  io.github.retrooper.packetevents.utils.reflection.ReflectionObject$SupportedVersions
 io/github/retrooper/packetevents/event/eventtypes/PlayerEvent.java
  io.github.retrooper.packetevents.event.eventtypes.PlayerEvent
-io/github/retrooper/packetevents/injector/modern/PacketDecoderModern.java
- io.github.retrooper.packetevents.injector.modern.PacketDecoderModern
+io/github/retrooper/packetevents/utils/guava/GuavaUtils_8.java
+ io.github.retrooper.packetevents.utils.guava.GuavaUtils_8
 io/github/retrooper/packetevents/utils/dependencies/v_1_7_10/SpigotVersionLookup_1_7.java
  io.github.retrooper.packetevents.utils.dependencies.v_1_7_10.SpigotVersionLookup_1_7
 io/github/retrooper/packetevents/utils/nms/PlayerAPIModern.java
@@ -75,15 +77,17 @@ io/github/retrooper/packetevents/utils/bytebuf/ByteBufAbstract.java
  io.github.retrooper.packetevents.utils.bytebuf.ByteBufAbstract
 io/github/retrooper/packetevents/event/eventtypes/CancellableEvent.java
  io.github.retrooper.packetevents.event.eventtypes.CancellableEvent
-io/github/retrooper/packetevents/PacketEventsPlugin.java
- io.github.retrooper.packetevents.PacketEventsPlugin
- io.github.retrooper.packetevents.PacketEventsPlugin$1
+io/github/retrooper/packetevents/event/impl/PacketEncodeEvent.java
+ io.github.retrooper.packetevents.event.impl.PacketEncodeEvent
+io/github/retrooper/packetevents/injector/modern/early/EarlyChannelInjectorModern.java
+ io.github.retrooper.packetevents.injector.modern.early.EarlyChannelInjectorModern
+ io.github.retrooper.packetevents.injector.modern.early.EarlyChannelInjectorModern$1
 io/github/retrooper/packetevents/updatechecker/LowLevelUpdateCheckerModern.java
  io.github.retrooper.packetevents.updatechecker.LowLevelUpdateCheckerModern
 io/github/retrooper/packetevents/exceptions/ReflectionObjectFieldNotFoundException.java
  io.github.retrooper.packetevents.exceptions.ReflectionObjectFieldNotFoundException
-io/github/retrooper/packetevents/injector/modern/early/PaperChannelInjector.java
- io.github.retrooper.packetevents.injector.modern.early.PaperChannelInjector
+io/github/retrooper/packetevents/utils/dependencies/protocolsupport/ProtocolSupportVersionLookupUtils.java
+ io.github.retrooper.packetevents.utils.dependencies.protocolsupport.ProtocolSupportVersionLookupUtils
 io/github/retrooper/packetevents/utils/nms/NMSUtils.java
  io.github.retrooper.packetevents.utils.nms.NMSUtils
 io/github/retrooper/packetevents/wrapper/game/server/WrapperGameServerPluginMessage.java
@@ -131,10 +135,10 @@ io/github/retrooper/packetevents/utils/gameprofile/GameProfileUtil_7.java
  io.github.retrooper.packetevents.utils.gameprofile.GameProfileUtil_7
 io/github/retrooper/packetevents/protocol/protocols/serverbound/ServerboundPacketType_1_16_2.java
  io.github.retrooper.packetevents.protocol.protocols.serverbound.ServerboundPacketType_1_16_2
-io/github/retrooper/packetevents/utils/google/OptionalUtils.java
- io.github.retrooper.packetevents.utils.google.OptionalUtils
 io/github/retrooper/packetevents/utils/channel/ChannelUtils7.java
  io.github.retrooper.packetevents.utils.channel.ChannelUtils7
+io/github/retrooper/packetevents/utils/google/OptionalUtils.java
+ io.github.retrooper.packetevents.utils.google.OptionalUtils
 io/github/retrooper/packetevents/protocol/protocols/clientbound/ClientboundPacketType_1_9_3.java
  io.github.retrooper.packetevents.protocol.protocols.clientbound.ClientboundPacketType_1_9_3
 io/github/retrooper/packetevents/protocol/protocols/clientbound/ClientboundPacketType_1_9.java
@@ -169,6 +173,8 @@ io/github/retrooper/packetevents/wrapper/login/server/WrapperLoginServerEncrypti
  io.github.retrooper.packetevents.wrapper.login.server.WrapperLoginServerEncryptionRequest
 io/github/retrooper/packetevents/utils/bytebuf/ByteBufUtilModern.java
  io.github.retrooper.packetevents.utils.bytebuf.ByteBufUtilModern
+io/github/retrooper/packetevents/wrapper/game/server/WrapperGameServerPing.java
+ io.github.retrooper.packetevents.wrapper.game.server.WrapperGameServerPing
 io/github/retrooper/packetevents/utils/reflection/ClassUtil.java
  io.github.retrooper.packetevents.utils.reflection.ClassUtil
 io/github/retrooper/packetevents/wrapper/login/server/WrapperLoginServerSetCompression.java
@@ -195,8 +201,8 @@ io/github/retrooper/packetevents/utils/reflection/SubclassUtil.java
  io.github.retrooper.packetevents.utils.reflection.SubclassUtil
 io/github/retrooper/packetevents/wrapper/login/server/WrapperLoginServerLoginSuccess.java
  io.github.retrooper.packetevents.wrapper.login.server.WrapperLoginServerLoginSuccess
-io/github/retrooper/packetevents/injector/modern/late/LateChannelInjectorModern.java
- io.github.retrooper.packetevents.injector.modern.late.LateChannelInjectorModern
+io/github/retrooper/packetevents/wrapper/game/client/WrapperGameClientPong.java
+ io.github.retrooper.packetevents.wrapper.game.client.WrapperGameClientPong
 io/github/retrooper/packetevents/utils/reflection/Reflection.java
  io.github.retrooper.packetevents.utils.reflection.Reflection
 io/github/retrooper/packetevents/wrapper/game/client/WrapperGameClientPluginMessage.java
@@ -209,8 +215,8 @@ io/github/retrooper/packetevents/utils/bytebuf/ByteBufUtilLegacy.java
  io.github.retrooper.packetevents.utils.bytebuf.ByteBufUtilLegacy
 io/github/retrooper/packetevents/manager/server/EntityFinderUtils.java
  io.github.retrooper.packetevents.manager.server.EntityFinderUtils
-io/github/retrooper/packetevents/injector/modern/PacketEncoderModern.java
- io.github.retrooper.packetevents.injector.modern.PacketEncoderModern
+io/github/retrooper/packetevents/injector/modern/PacketDecoderModern.java
+ io.github.retrooper.packetevents.injector.modern.PacketDecoderModern
 io/github/retrooper/packetevents/protocol/PacketState.java
  io.github.retrooper.packetevents.protocol.PacketState
 io/github/retrooper/packetevents/wrapper/handshaking/client/WrapperHandshakingClientHandshake.java
@@ -247,6 +253,8 @@ io/github/retrooper/packetevents/injector/GlobalChannelInjector.java
  io.github.retrooper.packetevents.injector.GlobalChannelInjector
 io/github/retrooper/packetevents/exceptions/PacketEventsLoadFailureException.java
  io.github.retrooper.packetevents.exceptions.PacketEventsLoadFailureException
+io/github/retrooper/packetevents/wrapper/game/client/WrapperGameClientGenerateStructure.java
+ io.github.retrooper.packetevents.wrapper.game.client.WrapperGameClientGenerateStructure
 io/github/retrooper/packetevents/utils/dependencies/viaversion/ViaVersionAccessorImpl.java
  io.github.retrooper.packetevents.utils.dependencies.viaversion.ViaVersionAccessorImpl
 io/github/retrooper/packetevents/protocol/protocols/serverbound/ServerboundPacketType_1_8.java
@@ -258,14 +266,14 @@ io/github/retrooper/packetevents/utils/dependencies/viaversion/ViaVersionLookupU
 io/github/retrooper/packetevents/protocol/PacketType.java
  io.github.retrooper.packetevents.protocol.PacketType
  io.github.retrooper.packetevents.protocol.PacketType$1
+ io.github.retrooper.packetevents.protocol.PacketType$Game
+ io.github.retrooper.packetevents.protocol.PacketType$Game$Client
+ io.github.retrooper.packetevents.protocol.PacketType$Game$Server
  io.github.retrooper.packetevents.protocol.PacketType$Handshaking
  io.github.retrooper.packetevents.protocol.PacketType$Handshaking$Client
  io.github.retrooper.packetevents.protocol.PacketType$Login
  io.github.retrooper.packetevents.protocol.PacketType$Login$Client
  io.github.retrooper.packetevents.protocol.PacketType$Login$Server
- io.github.retrooper.packetevents.protocol.PacketType$Play
- io.github.retrooper.packetevents.protocol.PacketType$Play$Client
- io.github.retrooper.packetevents.protocol.PacketType$Play$Server
  io.github.retrooper.packetevents.protocol.PacketType$Status
  io.github.retrooper.packetevents.protocol.PacketType$Status$Client
  io.github.retrooper.packetevents.protocol.PacketType$Status$Server
@@ -280,6 +288,8 @@ io/github/retrooper/packetevents/utils/boundingbox/BoundingBox.java
  io.github.retrooper.packetevents.utils.boundingbox.BoundingBox
 io/github/retrooper/packetevents/utils/guava/GuavaUtils.java
  io.github.retrooper.packetevents.utils.guava.GuavaUtils
+io/github/retrooper/packetevents/wrapper/game/client/WrapperGameClientAnimation.java
+ io.github.retrooper.packetevents.wrapper.game.client.WrapperGameClientAnimation
 io/github/retrooper/packetevents/protocol/protocols/serverbound/ServerboundPacketType_1_17.java
  io.github.retrooper.packetevents.protocol.protocols.serverbound.ServerboundPacketType_1_17
 io/github/retrooper/packetevents/utils/dependencies/VersionLookupUtils.java
@@ -296,10 +306,10 @@ io/github/retrooper/packetevents/utils/pair/Pair.java
  io.github.retrooper.packetevents.utils.pair.Pair
 io/github/retrooper/packetevents/wrapper/PacketWrapper.java
  io.github.retrooper.packetevents.wrapper.PacketWrapper
-io/github/retrooper/packetevents/protocol/protocols/clientbound/ClientboundPacketType_1_12.java
- io.github.retrooper.packetevents.protocol.protocols.clientbound.ClientboundPacketType_1_12
 io/github/retrooper/packetevents/protocol/protocols/clientbound/ClientboundPacketType_1_12_1.java
  io.github.retrooper.packetevents.protocol.protocols.clientbound.ClientboundPacketType_1_12_1
+io/github/retrooper/packetevents/protocol/protocols/clientbound/ClientboundPacketType_1_12.java
+ io.github.retrooper.packetevents.protocol.protocols.clientbound.ClientboundPacketType_1_12
 io/github/retrooper/packetevents/utils/immutableset/ImmutableSet_8.java
  io.github.retrooper.packetevents.utils.immutableset.ImmutableSet_8
 io/github/retrooper/packetevents/injector/LateInjector.java
@@ -318,14 +328,15 @@ io/github/retrooper/packetevents/event/PacketEvent.java
  io.github.retrooper.packetevents.event.PacketEvent
 io/github/retrooper/packetevents/protocol/protocols/clientbound/ClientboundPacketType_1_8.java
  io.github.retrooper.packetevents.protocol.protocols.clientbound.ClientboundPacketType_1_8
-io/github/retrooper/packetevents/utils/dependencies/protocolsupport/ProtocolSupportVersionLookupUtils.java
- io.github.retrooper.packetevents.utils.dependencies.protocolsupport.ProtocolSupportVersionLookupUtils
-io/github/retrooper/packetevents/wrapper/game/client/WrapperGameClientPong.java
- io.github.retrooper.packetevents.wrapper.game.client.WrapperGameClientPong
-io/github/retrooper/packetevents/utils/guava/GuavaUtils_8.java
- io.github.retrooper.packetevents.utils.guava.GuavaUtils_8
-io/github/retrooper/packetevents/protocol/PacketSide.java
- io.github.retrooper.packetevents.protocol.PacketSide
-io/github/retrooper/packetevents/injector/modern/early/EarlyChannelInjectorModern.java
- io.github.retrooper.packetevents.injector.modern.early.EarlyChannelInjectorModern
- io.github.retrooper.packetevents.injector.modern.early.EarlyChannelInjectorModern$1
+io/github/retrooper/packetevents/injector/modern/early/PaperChannelInjector.java
+ io.github.retrooper.packetevents.injector.modern.early.PaperChannelInjector
+io/github/retrooper/packetevents/injector/modern/late/LateChannelInjectorModern.java
+ io.github.retrooper.packetevents.injector.modern.late.LateChannelInjectorModern
+io/github/retrooper/packetevents/injector/modern/PacketEncoderModern.java
+ io.github.retrooper.packetevents.injector.modern.PacketEncoderModern
+io/github/retrooper/packetevents/injector/modern/early/PEChannelInitializerModern.java
+ io.github.retrooper.packetevents.injector.modern.early.PEChannelInitializerModern
+io/github/retrooper/packetevents/PacketEventsPlugin.java
+ io.github.retrooper.packetevents.PacketEventsPlugin
+ io.github.retrooper.packetevents.PacketEventsPlugin$1
+ io.github.retrooper.packetevents.PacketEventsPlugin$2

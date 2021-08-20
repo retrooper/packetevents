@@ -18,10 +18,7 @@
 
 package io.github.retrooper.packetevents.event;
 
-import io.github.retrooper.packetevents.event.impl.PacketDecodeEvent;
-import io.github.retrooper.packetevents.event.impl.PlayerEjectEvent;
-import io.github.retrooper.packetevents.event.impl.PlayerInjectEvent;
-import io.github.retrooper.packetevents.event.impl.PostPlayerInjectEvent;
+import io.github.retrooper.packetevents.event.impl.*;
 
 /**
  * Abstract packet listener.
@@ -58,5 +55,9 @@ public abstract class PacketListenerAbstract {
     }
 
     public void onPacketDecode(PacketDecodeEvent event) {
+    }
+
+    public void onPacketEncode(PacketEncodeEvent event) {
+
     }
 }

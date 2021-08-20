@@ -46,8 +46,12 @@ public interface EventManager {
      * @return Same event manager instance.
      */
     default EventManager callEvent(PacketEvent event) {
-        //The dynamic event manager calls the legacy event manager.
         PEEventManager.EVENT_MANAGER_MODERN.callEvent(event);
+        return this;
+    }
+
+    default EventManager callEvent(PacketEvent event, Runnable postCallListenerAction) {
+        PEEventManager.EVENT_MANAGER_MODERN.callEvent(event, postCallListenerAction);
         return this;
     }
 
