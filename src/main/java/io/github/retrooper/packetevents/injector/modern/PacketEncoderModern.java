@@ -19,7 +19,7 @@
 package io.github.retrooper.packetevents.injector.modern;
 
 import io.github.retrooper.packetevents.PacketEvents;
-import io.github.retrooper.packetevents.event.impl.PacketEncodeEvent;
+import io.github.retrooper.packetevents.event.impl.PacketSendEvent;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelPromise;
@@ -50,9 +50,9 @@ public class PacketEncoderModern extends MessageToByteEncoder<ByteBuf> {
     public void write(ChannelHandlerContext ctx, Object msg, ChannelPromise promise) throws Exception {
         ByteBuf bb = (ByteBuf) msg;
         int firstReaderIndex = bb.readerIndex();
-        PacketEncodeEvent packetEncodeEvent = new PacketEncodeEvent(ctx.channel(), player, bb);
+        PacketSendEvent packetSendEvent = new PacketSendEvent(ctx.channel(), player, bb);
         int readerIndex = bb.readerIndex();
-        PacketEvents.get().getEventManager().callEvent(packetEncodeEvent, () -> {
+        PacketEvents.get().getEventManager().callEvent(packetSendEvent, () -> {
             bb.readerIndex(readerIndex);
         });
 

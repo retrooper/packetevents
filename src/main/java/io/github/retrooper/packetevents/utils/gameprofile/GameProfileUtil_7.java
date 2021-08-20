@@ -19,7 +19,7 @@
 package io.github.retrooper.packetevents.utils.gameprofile;
 
 import io.github.retrooper.packetevents.utils.reflection.ReflectionObject;
-import io.github.retrooper.packetevents.utils.nms.NMSUtils;
+import io.github.retrooper.packetevents.utils.nms.MinecraftReflection;
 import io.github.retrooper.packetevents.manager.player.Skin;
 import net.minecraft.util.com.mojang.authlib.GameProfile;
 import net.minecraft.util.com.mojang.authlib.properties.Property;
@@ -45,8 +45,8 @@ class GameProfileUtil_7 {
     public static Object getGameProfile(UUID uuid, String username) {
         Player player = Bukkit.getPlayer(uuid);
         if (player != null) {
-            Object entityHuman = NMSUtils.entityHumanClass.cast(NMSUtils.getEntityPlayer(player));
-            ReflectionObject wrappedEntityPlayer = new ReflectionObject(entityHuman, NMSUtils.entityHumanClass);
+            Object entityHuman = MinecraftReflection.ENTITY_HUMAN_CLASS.cast(MinecraftReflection.getEntityPlayer(player));
+            ReflectionObject wrappedEntityPlayer = new ReflectionObject(entityHuman, MinecraftReflection.ENTITY_HUMAN_CLASS);
             return wrappedEntityPlayer.readObject(0, GameProfile.class);
         } else {
             return new GameProfile(uuid, username);

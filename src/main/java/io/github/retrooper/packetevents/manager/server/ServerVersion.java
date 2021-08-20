@@ -45,30 +45,26 @@ public enum ServerVersion {
     v_1_17((short) 755), v_1_17_1((short) 756),
     ERROR((short) -1);
 
-    private static final String NMS_VERSION_SUFFIX = Bukkit.getServer().getClass().getPackage().getName()
-            .replace(".", ",").split(",")[3];
     private static final ServerVersion[] VALUES = values();
     public static ServerVersion[] reversedValues = new ServerVersion[VALUES.length];
-    private static ServerVersion cachedVersion;
     private final short protocolVersion;
 
     ServerVersion(short protocolId) {
         this.protocolVersion = protocolId;
     }
 
-    private static ServerVersion getVersionNoCache() {
+    public static ServerVersion resolve() {
         if (reversedValues[0] == null) {
             reversedValues = ServerVersion.reverse();
         }
-        if (reversedValues == null) {
-            throw new IllegalStateException("Failed to reverse the ServerVersion enum constant values.");
-        }
+
         for (final ServerVersion val : reversedValues) {
             String valName = val.name().substring(2).replace("_", ".");
             if (Bukkit.getBukkitVersion().contains(valName)) {
                 return val;
             }
         }
+
         ServerVersion fallbackVersion = PacketEvents.get().getSettings().getFallbackServerVersion();
         if (fallbackVersion != null) {
             if (fallbackVersion == ServerVersion.v_1_7_10) {
@@ -85,21 +81,6 @@ public enum ServerVersion {
         }
         return ERROR;
     }
-
-    /**
-     * Get the server version.
-     * If PacketEvents has already attempted resolving, return the cached version.
-     * If PacketEvents hasn't already attempted resolving, it will resolve it, cache it and return the version.
-     *
-     * @return Server Version. (possibly cached)
-     */
-    public static ServerVersion getVersion() {
-        if (cachedVersion == null) {
-            cachedVersion = getVersionNoCache();
-        }
-        return cachedVersion;
-    }
-
     /**
      * The values in this enum in reverse.
      *
@@ -116,18 +97,6 @@ public enum ServerVersion {
             array[i++] = tmp;
         }
         return array;
-    }
-
-    public static String getNMSSuffix() {
-        return NMS_VERSION_SUFFIX;
-    }
-
-    public static String getNMSDirectory() {
-        return "net.minecraft.server." + getNMSSuffix();
-    }
-
-    public static String getOBCDirectory() {
-        return "org.bukkit.craftbukkit." + (getNMSSuffix());
     }
 
     public static ServerVersion getLatest() {
@@ -178,7 +147,6 @@ public enum ServerVersion {
                 return false;
             }
             if (version == this) return true;
-            if (version == target) return false;
         }
 
         return false;

@@ -1,7 +1,7 @@
 package io.github.retrooper.packetevents.injector.legacy;
 
 import io.github.retrooper.packetevents.PacketEvents;
-import io.github.retrooper.packetevents.event.impl.PacketDecodeEvent;
+import io.github.retrooper.packetevents.event.impl.PacketReceiveEvent;
 import io.github.retrooper.packetevents.protocol.PacketState;
 import net.minecraft.util.io.netty.buffer.ByteBuf;
 import net.minecraft.util.io.netty.channel.ChannelHandlerContext;
@@ -47,10 +47,10 @@ public class PacketDecoderLegacy extends ByteToMessageDecoder {
 
     @Override
     protected void decode(ChannelHandlerContext ctx, ByteBuf byteBuf, List<Object> list) throws Exception {
-        PacketDecodeEvent packetDecodeEvent = new PacketDecodeEvent(ctx.channel(), player, byteBuf.copy());
-        PacketEvents.get().getEventManager().callEvent(packetDecodeEvent);
+        PacketReceiveEvent packetReceiveEvent = new PacketReceiveEvent(ctx.channel(), player, byteBuf.copy());
+        PacketEvents.get().getEventManager().callEvent(packetReceiveEvent);
 
-        if (packetDecodeEvent.isCancelled()) {
+        if (packetReceiveEvent.isCancelled()) {
             byteBuf.skipBytes(byteBuf.readableBytes());
             return;
         }

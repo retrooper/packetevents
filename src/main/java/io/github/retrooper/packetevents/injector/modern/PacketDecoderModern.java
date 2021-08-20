@@ -19,7 +19,7 @@
 package io.github.retrooper.packetevents.injector.modern;
 
 import io.github.retrooper.packetevents.PacketEvents;
-import io.github.retrooper.packetevents.event.impl.PacketDecodeEvent;
+import io.github.retrooper.packetevents.event.impl.PacketReceiveEvent;
 import io.github.retrooper.packetevents.protocol.PacketState;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
@@ -66,14 +66,14 @@ public class PacketDecoderModern extends ByteToMessageDecoder {
     @Override
     protected void decode(ChannelHandlerContext ctx, ByteBuf byteBuf, List<Object> list) throws Exception {
         int firstReaderIndex = byteBuf.readerIndex();
-        PacketDecodeEvent packetDecodeEvent = new PacketDecodeEvent(ctx.channel(), player, byteBuf);
+        PacketReceiveEvent packetReceiveEvent = new PacketReceiveEvent(ctx.channel(), player, byteBuf);
         int readerIndex = byteBuf.readerIndex();
-        PacketEvents.get().getEventManager().callEvent(packetDecodeEvent, () -> {
+        PacketEvents.get().getEventManager().callEvent(packetReceiveEvent, () -> {
             byteBuf.readerIndex(readerIndex);
         });
         byteBuf.readerIndex(firstReaderIndex);
 
-        if (packetDecodeEvent.isCancelled()) {
+        if (packetReceiveEvent.isCancelled()) {
             byteBuf.skipBytes(byteBuf.readableBytes());
             return;
         }

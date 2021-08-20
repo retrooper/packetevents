@@ -35,6 +35,7 @@ import io.github.retrooper.packetevents.event.PacketListenerAbstract;
  * @since 1.0
  */
 public interface EventManager {
+    //TODO Work on cleaning up event manager
 
     /**
      * Call a packet event.

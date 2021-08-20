@@ -24,7 +24,7 @@ import io.github.retrooper.packetevents.injector.modern.PacketDecoderModern;
 import io.github.retrooper.packetevents.protocol.PacketState;
 import io.github.retrooper.packetevents.utils.reflection.ReflectionObject;
 import io.github.retrooper.packetevents.utils.list.ListWrapper;
-import io.github.retrooper.packetevents.utils.nms.NMSUtils;
+import io.github.retrooper.packetevents.utils.nms.MinecraftReflection;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelHandler;
@@ -45,7 +45,7 @@ public class EarlyChannelInjectorModern implements EarlyInjector {
     @Override
     public boolean isBound() {
         try {
-            Object connection = NMSUtils.getMinecraftServerConnection();
+            Object connection = MinecraftReflection.getMinecraftServerConnectionInstance();
             if (connection == null) {
                 return false;
             }
@@ -77,7 +77,7 @@ public class EarlyChannelInjectorModern implements EarlyInjector {
                 PaperChannelInjector.setPaperChannelInitializeListener();
                 return;
             }
-            Object serverConnection = NMSUtils.getMinecraftServerConnection();
+            Object serverConnection = MinecraftReflection.getMinecraftServerConnectionInstance();
             for (Field field : serverConnection.getClass().getDeclaredFields()) {
                 field.setAccessible(true);
                 Object value = null;
@@ -125,7 +125,7 @@ public class EarlyChannelInjectorModern implements EarlyInjector {
 
         //Player channels might have been registered already. Let us add our handlers. We are a little late though.
         //This only happens when you join extremely early on older versions of minecraft.
-        List<Object> networkManagers = NMSUtils.getNetworkManagers();
+        List<Object> networkManagers = MinecraftReflection.getNetworkManagers();
         synchronized (networkManagers) {
             for (Object networkManager : networkManagers) {
                 ReflectionObject networkManagerWrapper = new ReflectionObject(networkManager);

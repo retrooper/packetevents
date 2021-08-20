@@ -21,14 +21,6 @@ package io.github.retrooper.packetevents.utils.reflection;
 import java.lang.annotation.Annotation;
 
 public class SubclassUtil {
-    public static Class<? extends Enum<?>> getEnumSubClass(Class<?> cls, String name) {
-        return (Class<? extends Enum<?>>) getSubClass(cls, name);
-    }
-
-    public static Class<? extends Enum<?>> getEnumSubClass(Class<?> cls, int index) {
-        return (Class<? extends Enum<?>>) getSubClass(cls, index);
-    }
-
     public static Class<?> getSubClass(Class<?> cls, String name) {
         if (cls == null) {
             return null;

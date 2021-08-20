@@ -21,7 +21,7 @@ package io.github.retrooper.packetevents.utils.reflection;
 import io.github.retrooper.packetevents.PacketEvents;
 import io.github.retrooper.packetevents.exceptions.ReflectionObjectFieldNotFoundException;
 import io.github.retrooper.packetevents.utils.enums.EnumUtil;
-import io.github.retrooper.packetevents.utils.nms.NMSUtils;
+import io.github.retrooper.packetevents.utils.nms.MinecraftReflection;
 import io.github.retrooper.packetevents.manager.player.GameMode;
 import io.github.retrooper.packetevents.manager.server.ServerVersion;
 import io.github.retrooper.packetevents.utils.vector.Vector3i;
@@ -43,10 +43,8 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class ReflectionObject implements ReflectionObjectReader, WrapperPacketWriter {
-    public static ServerVersion version;
     private static final Map<Class<?>, Map<Class<?>, Field[]>> FIELD_CACHE = new ConcurrentHashMap<>();
     private static final Field[] EMPTY_FIELD_ARRAY = new Field[0];
-    private static byte V_1_17 = -1;
     protected final Object object;
     private final Class<?> clazz;
 
@@ -369,108 +367,6 @@ public class ReflectionObject implements ReflectionObjectReader, WrapperPacketWr
         } catch (IllegalAccessException | NullPointerException e) {
             e.printStackTrace();
         }
-    }
-
-    public Vector3i readBlockPosition(int index) {
-        Object blockPosObj = readObject(index, NMSUtils.blockPosClass);
-        try {
-            int x = (int) NMSUtils.getBlockPosX.invoke(blockPosObj);
-            int y = (int) NMSUtils.getBlockPosY.invoke(blockPosObj);
-            int z = (int) NMSUtils.getBlockPosZ.invoke(blockPosObj);
-            return new Vector3i(x, y, z);
-        } catch (IllegalAccessException | InvocationTargetException e) {
-            e.printStackTrace();
-            return null;
-        }
-    }
-
-    public void writeBlockPosition(int index, Vector3i blockPosition) {
-        Object blockPosObj = NMSUtils.generateNMSBlockPos(blockPosition);
-        write(NMSUtils.blockPosClass, index, blockPosObj);
-    }
-
-    public ItemStack readItemStack(int index) {
-        Object nmsItemStack = readObject(index, NMSUtils.nmsItemStackClass);
-        return NMSUtils.toBukkitItemStack(nmsItemStack);
-    }
-
-    public void writeItemStack(int index, ItemStack stack) {
-        Object nmsItemStack = NMSUtils.toNMSItemStack(stack);
-        write(NMSUtils.nmsItemStackClass, index, nmsItemStack);
-    }
-
-    public GameMode readGameMode(int index) {
-        Enum<?> enumConst = readEnumConstant(index, NMSUtils.enumGameModeClass);
-        return GameMode.values()[enumConst.ordinal() - 1];
-    }
-
-    public void writeGameMode(int index, GameMode gameMode) {
-        Enum<?> enumConst = EnumUtil.valueByIndex(NMSUtils.enumGameModeClass, gameMode.ordinal() + 1);
-        writeEnumConstant(index, enumConst);
-    }
-
-    public Dimension readDimension(int index, int dimensionIDLegacyIndex) {
-        int dimensionID;
-        if (version.isOlderThan(ServerVersion.v_1_13_2)) {
-            dimensionID = readInt(dimensionIDLegacyIndex);
-        } else {
-            Object dimensionManagerObject = readObject(index, NMSUtils.dimensionManagerClass);
-            ReflectionObject dimensionManagerWrapper = new ReflectionObject(dimensionManagerObject);
-            dimensionID = dimensionManagerWrapper.readInt(0) - 1;
-        }
-        return Dimension.getById(dimensionID);
-    }
-
-    public void writeDimension(int index, int dimensionIDLegacyIndex, Dimension dimension) {
-        if (version.isOlderThan(ServerVersion.v_1_13_2)) {
-            writeInt(dimensionIDLegacyIndex, dimension.getId());
-        } else {
-            Object dimensionManagerObject = readObject(index, NMSUtils.dimensionManagerClass);
-            ReflectionObject dimensionManagerWrapper = new ReflectionObject(dimensionManagerObject);
-            dimensionManagerWrapper.writeInt(0, dimension.getId() + 1);
-        }
-    }
-
-
-    public Difficulty readDifficulty(int index) {
-        Enum<?> enumConstant = readEnumConstant(index, NMSUtils.enumDifficultyClass);
-        return Difficulty.values()[enumConstant.ordinal()];
-    }
-
-    public void writeDifficulty(int index, Difficulty difficulty) {
-        Enum<?> enumConstant = EnumUtil.valueByIndex(NMSUtils.enumDifficultyClass, difficulty.ordinal());
-        writeEnumConstant(index, enumConstant);
-    }
-
-    public String readIChatBaseComponent(int index) {
-        Object iChatBaseComponent = readObject(index, NMSUtils.iChatBaseComponentClass);
-        return NMSUtils.readIChatBaseComponent(iChatBaseComponent);
-    }
-
-    public void writeIChatBaseComponent(int index, String content) {
-        Object iChatBaseComponent = NMSUtils.generateIChatBaseComponent(content);
-        write(NMSUtils.iChatBaseComponentClass, index, iChatBaseComponent);
-    }
-
-    public String readMinecraftKey(int index) {
-        if (V_1_17 == -1) {
-            V_1_17 = (byte) (version.isNewerThanOrEquals(ServerVersion.v_1_17) ? 1 : 0);
-        }
-        int namespaceIndex = V_1_17 == 1 ? 2 : 0;
-        int keyIndex = V_1_17 == 1 ? 3 : 1;
-        Object minecraftKey = readObject(index, NMSUtils.minecraftKeyClass);
-        ReflectionObject minecraftKeyWrapper = new ReflectionObject(minecraftKey);
-        return minecraftKeyWrapper.readString(namespaceIndex) + ":" + minecraftKeyWrapper.readString(keyIndex);
-    }
-
-    public void writeMinecraftKey(int index, String content) {
-        Object minecraftKey = null;
-        try {
-            minecraftKey = NMSUtils.minecraftKeyConstructor.newInstance(content);
-        } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
-            e.printStackTrace();
-        }
-        write(NMSUtils.minecraftKeyClass, index, minecraftKey);
     }
 
     public List<Object> readList(int index) {

@@ -18,7 +18,7 @@
 
 package io.github.retrooper.packetevents.utils.gameprofile;
 
-import io.github.retrooper.packetevents.utils.nms.NMSUtils;
+import io.github.retrooper.packetevents.utils.nms.MinecraftReflection;
 import io.github.retrooper.packetevents.manager.player.Skin;
 
 import java.util.UUID;
@@ -26,35 +26,35 @@ import java.util.UUID;
 public class GameProfileUtil {
 
     public static Object getGameProfile(UUID uuid, String username) {
-        if (NMSUtils.legacyNettyImportMode) {
-            return GameProfileUtil_7.getGameProfile(uuid, username);
-        } else {
+        if (MinecraftReflection.USE_MODERN_NETTY_PACKAGE) {
             return GameProfileUtil_8.getGameProfile(uuid, username);
+        } else {
+            return GameProfileUtil_7.getGameProfile(uuid, username);
         }
     }
 
 
     public static WrappedGameProfile getWrappedGameProfile(Object gameProfile) {
-        if (NMSUtils.legacyNettyImportMode) {
-            return GameProfileUtil_7.getWrappedGameProfile(gameProfile);
-        } else {
+        if (MinecraftReflection.USE_MODERN_NETTY_PACKAGE) {
             return GameProfileUtil_8.getWrappedGameProfile(gameProfile);
+        } else {
+            return GameProfileUtil_7.getWrappedGameProfile(gameProfile);
         }
     }
 
     public static void setGameProfileSkin(Object gameProfile, Skin skin) {
-        if (NMSUtils.legacyNettyImportMode) {
-            GameProfileUtil_7.setGameProfileSkin(gameProfile, skin);
-        } else {
+        if (MinecraftReflection.USE_MODERN_NETTY_PACKAGE) {
             GameProfileUtil_8.setGameProfileSkin(gameProfile, skin);
+        } else {
+            GameProfileUtil_7.setGameProfileSkin(gameProfile, skin);
         }
     }
 
     public static Skin getGameProfileSkin(Object gameProfile) {
-        if (NMSUtils.legacyNettyImportMode) {
-            return GameProfileUtil_7.getGameProfileSkin(gameProfile);
-        } else {
+        if (MinecraftReflection.USE_MODERN_NETTY_PACKAGE) {
             return GameProfileUtil_8.getGameProfileSkin(gameProfile);
+        } else {
+            return GameProfileUtil_7.getGameProfileSkin(gameProfile);
         }
     }
 }

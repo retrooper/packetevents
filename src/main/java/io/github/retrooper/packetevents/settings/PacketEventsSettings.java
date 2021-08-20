@@ -27,6 +27,7 @@ import io.github.retrooper.packetevents.manager.server.ServerVersion;
  * @since 1.5.8
  */
 public class PacketEventsSettings {
+    //TODO Look at settings
     private boolean locked;
     private ServerVersion fallbackServerVersion = ServerVersion.v_1_7_10;
 

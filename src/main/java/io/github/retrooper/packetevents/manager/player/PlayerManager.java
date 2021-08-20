@@ -22,7 +22,7 @@ import io.github.retrooper.packetevents.PacketEvents;
 import io.github.retrooper.packetevents.utils.gameprofile.GameProfileUtil;
 import io.github.retrooper.packetevents.utils.gameprofile.WrappedGameProfile;
 import io.github.retrooper.packetevents.utils.geyser.GeyserUtils;
-import io.github.retrooper.packetevents.utils.nms.NMSUtils;
+import io.github.retrooper.packetevents.utils.nms.MinecraftReflection;
 import io.github.retrooper.packetevents.manager.server.ServerVersion;
 import io.github.retrooper.packetevents.utils.dependencies.VersionLookupUtils;
 import io.github.retrooper.packetevents.utils.dependencies.v_1_7_10.SpigotVersionLookup_1_7;
@@ -45,7 +45,7 @@ public class PlayerManager {
      * @return Non-smoothed ping.
      */
     public int getPing(Player player) {
-        return NMSUtils.getPlayerPing(player);
+        return MinecraftReflection.getPlayerPing(player);
     }
 
     /**
@@ -158,12 +158,12 @@ public class PlayerManager {
     }
 
     public void changeSkinProperty(Player player, Skin skin) {
-        Object gameProfile = NMSUtils.getGameProfile(player);
+        Object gameProfile = MinecraftReflection.getGameProfile(player);
         GameProfileUtil.setGameProfileSkin(gameProfile, skin);
     }
 
     public Skin getSkin(Player player) {
-        Object gameProfile = NMSUtils.getGameProfile(player);
+        Object gameProfile = MinecraftReflection.getGameProfile(player);
         return GameProfileUtil.getGameProfileSkin(gameProfile);
     }
 
@@ -171,7 +171,7 @@ public class PlayerManager {
         String name = player.getName();
         Object channel = channels.get(name);
         if (channel == null) {
-            channel = NMSUtils.getChannel(player);
+            channel = MinecraftReflection.getChannel(player);
             if (channel != null) {
                 channels.put(name, channel);
             }

@@ -29,10 +29,8 @@ import io.github.retrooper.packetevents.processor.BukkitEventProcessorInternal;
 import io.github.retrooper.packetevents.protocol.PacketType;
 import io.github.retrooper.packetevents.settings.PacketEventsSettings;
 import io.github.retrooper.packetevents.updatechecker.UpdateChecker;
-import io.github.retrooper.packetevents.manager.server.EntityFinderUtils;
 import io.github.retrooper.packetevents.utils.guava.GuavaUtils;
-import io.github.retrooper.packetevents.utils.nms.NMSUtils;
-import io.github.retrooper.packetevents.utils.reflection.ReflectionObject;
+import io.github.retrooper.packetevents.utils.nms.MinecraftReflection;
 import io.github.retrooper.packetevents.manager.server.ServerManager;
 import io.github.retrooper.packetevents.manager.server.ServerVersion;
 import io.github.retrooper.packetevents.utils.version.PEVersion;
@@ -68,15 +66,10 @@ public final class PacketEvents implements Listener, EventManager {
         this.plugin = plugin;
         if (!loaded) {
             //Resolve server version and cache
-            ServerVersion version = ServerVersion.getVersion();
-            ReflectionObject.version = version;
-            NMSUtils.version = version;
             identifier = "pe-" + plugin.getName().toLowerCase();
             encoderName = "pe-encoder-" + plugin.getName().toLowerCase();
             try {
-                NMSUtils.load();
-
-                EntityFinderUtils.load(version);
+                MinecraftReflection.init();
 
                 serverManager.entityCache = GuavaUtils.makeMap();
             } catch (Exception ex) {

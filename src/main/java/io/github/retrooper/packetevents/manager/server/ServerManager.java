@@ -20,33 +20,23 @@ package io.github.retrooper.packetevents.manager.server;
 
 import io.github.retrooper.packetevents.utils.reflection.ReflectionObject;
 import io.github.retrooper.packetevents.utils.boundingbox.BoundingBox;
-import io.github.retrooper.packetevents.utils.bytebuf.ByteBufAbstract;
-import io.github.retrooper.packetevents.utils.bytebuf.ByteBufLegacy;
-import io.github.retrooper.packetevents.utils.bytebuf.ByteBufModern;
-import io.github.retrooper.packetevents.utils.nms.NMSUtils;
-import io.github.retrooper.packetevents.utils.reflection.Reflection;
+import io.github.retrooper.packetevents.utils.nms.MinecraftReflection;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.entity.Entity;
-import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.spigotmc.SpigotConfig;
 
 import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.ConcurrentModificationException;
 import java.util.List;
 import java.util.Map;
 
 public final class ServerManager {
-    private static Method getLevelEntityGetterIterable;
-    private static Class<?> persistentEntitySectionManagerClass, levelEntityGetterClass, legacyByteBufClass;
-    private static byte v_1_17 = -1;
-    private static Class<?> geyserClass;
-    private boolean geyserClassChecked;
-
     //Initialized in PacketEvents#load
     public Map<Integer, Entity> entityCache;
+    private ServerVersion version;
 
     /**
      * Get the server version.
@@ -54,7 +44,12 @@ public final class ServerManager {
      * @return Get Server Version
      */
     public ServerVersion getVersion() {
-        return ServerVersion.getVersion();
+        if (version != null) {
+            return version;
+        }
+        else {
+            return version = ServerVersion.resolve();
+        }
     }
 
     /**
@@ -63,7 +58,7 @@ public final class ServerManager {
      * @return Get Recent TPS
      */
     public double[] getRecentTPS() {
-        return NMSUtils.recentTPS();
+        return MinecraftReflection.recentTPS();
     }
 
     /**
@@ -89,9 +84,9 @@ public final class ServerManager {
     }
 
     public BoundingBox getEntityBoundingBox(Entity entity) {
-        Object nmsEntity = NMSUtils.getNMSEntity(entity);
-        Object aabb = NMSUtils.getNMSAxisAlignedBoundingBox(nmsEntity);
-        ReflectionObject wrappedBoundingBox= new ReflectionObject(aabb);
+        Object nmsEntity = MinecraftReflection.getNMSEntity(entity);
+        Object aabb = MinecraftReflection.getNMSAxisAlignedBoundingBox(nmsEntity);
+        ReflectionObject wrappedBoundingBox = new ReflectionObject(aabb);
         double minX = wrappedBoundingBox.readDouble(0);
         double minY = wrappedBoundingBox.readDouble(1);
         double minZ = wrappedBoundingBox.readDouble(2);
@@ -101,6 +96,53 @@ public final class ServerManager {
         return new BoundingBox(minX, minY, minZ, maxX, maxY, maxZ);
     }
 
+    private Entity getEntityByIdWithWorldUnsafe(World world, int id) {
+        if (world == null) {
+            return null;
+        }
+
+        Object craftWorld = MinecraftReflection.CRAFT_WORLD_CLASS.cast(world);
+
+        try {
+            Object worldServer = MinecraftReflection.GET_CRAFT_WORLD_HANDLE_METHOD.invoke(craftWorld);
+            Object nmsEntity = MinecraftReflection.GET_ENTITY_BY_ID_METHOD.invoke(worldServer, id);
+            if (nmsEntity == null) {
+                return null;
+            }
+            return MinecraftReflection.getBukkitEntity(nmsEntity);
+        } catch (IllegalAccessException | InvocationTargetException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    @Nullable
+    private Entity getEntityByIdUnsafe(World origin, int id) {
+        Entity e = getEntityByIdWithWorldUnsafe(origin, id);
+        if (e != null) {
+            return e;
+        }
+        for (World world : Bukkit.getWorlds()) {
+            Entity entity = getEntityByIdWithWorldUnsafe(world, id);
+            if (entity != null) {
+                return entity;
+            }
+        }
+        for (World world : Bukkit.getWorlds()) {
+            try {
+                for (Entity entity : world.getEntities()) {
+                    if (entity.getEntityId() == id) {
+                        return entity;
+                    }
+                }
+            }
+            catch (ConcurrentModificationException ex) {
+                return null;
+            }
+        }
+        return null;
+    }
+
     @Nullable
     public Entity getEntityById(@Nullable World world, int entityID) {
         Entity e = entityCache.get(entityID);
@@ -108,29 +150,36 @@ public final class ServerManager {
             return e;
         }
 
-        if (v_1_17 == -1) {
-            v_1_17 = (byte) (getVersion().isNewerThanOrEquals(ServerVersion.v_1_17) ? 1 : 0);
-        }
-
-        if (v_1_17 == 1) {
-            if (world != null) {
-                for (Entity entity : getEntityList(world)) {
-                    if (entity.getEntityId() == entityID) {
-                        entityCache.putIfAbsent(entity.getEntityId(), entity);
-                        return entity;
+        if (MinecraftReflection.V_1_17_OR_HIGHER) {
+            try {
+                if (world != null) {
+                    for (Entity entity : getEntityList(world)) {
+                        if (entity.getEntityId() == entityID) {
+                            entityCache.putIfAbsent(entity.getEntityId(), entity);
+                            return entity;
+                        }
                     }
                 }
             }
-            for (World w : Bukkit.getWorlds()) {
-                for (Entity entity : getEntityList(w)) {
-                    if (entity.getEntityId() == entityID) {
-                        entityCache.putIfAbsent(entity.getEntityId(), entity);
-                        return entity;
+            catch (Exception ex) {
+                //We are retrying below
+            }
+            try {
+                for (World w : Bukkit.getWorlds()) {
+                    for (Entity entity : getEntityList(w)) {
+                        if (entity.getEntityId() == entityID) {
+                            entityCache.putIfAbsent(entity.getEntityId(), entity);
+                            return entity;
+                        }
                     }
                 }
+            }
+            catch (Exception ex) {
+                //No entity found
+                return null;
             }
         } else {
-            return EntityFinderUtils.getEntityByIdUnsafe(world, entityID);
+            return getEntityByIdUnsafe(world, entityID);
         }
         return null;
     }
@@ -141,35 +190,22 @@ public final class ServerManager {
     }
 
     public List<Entity> getEntityList(World world) {
-        if (v_1_17 == -1) {
-            v_1_17 = (byte) (getVersion().isNewerThanOrEquals(ServerVersion.v_1_17) ? 1 : 0);
-        }
-
-        if (v_1_17 == 1) {
-            if (persistentEntitySectionManagerClass == null) {
-                persistentEntitySectionManagerClass = NMSUtils.getNMClassWithoutException("world.level.entity.PersistentEntitySectionManager");
-            }
-            if (levelEntityGetterClass == null) {
-                levelEntityGetterClass = NMSUtils.getNMClassWithoutException("world.level.entity.LevelEntityGetter");
-            }
-            if (getLevelEntityGetterIterable == null) {
-                getLevelEntityGetterIterable = Reflection.getMethod(levelEntityGetterClass, Iterable.class, 0);
-            }
-            Object worldServer = NMSUtils.convertBukkitWorldToWorldServer(world);
+        if (MinecraftReflection.V_1_17_OR_HIGHER) {
+            Object worldServer = MinecraftReflection.convertBukkitWorldToWorldServer(world);
             ReflectionObject wrappedWorldServer = new ReflectionObject(worldServer);
-            Object persistentEntitySectionManager = wrappedWorldServer.readObject(0, persistentEntitySectionManagerClass);
+            Object persistentEntitySectionManager = wrappedWorldServer.readObject(0, MinecraftReflection.PERSISTENT_ENTITY_SECTION_MANAGER_CLASS);
             ReflectionObject wrappedPersistentEntitySectionManager = new ReflectionObject(persistentEntitySectionManager);
-            Object levelEntityGetter = wrappedPersistentEntitySectionManager.readObject(0, levelEntityGetterClass);
+            Object levelEntityGetter = wrappedPersistentEntitySectionManager.readObject(0, MinecraftReflection.LEVEL_ENTITY_GETTER_CLASS);
             Iterable<Object> nmsEntitiesIterable = null;
             try {
-                nmsEntitiesIterable = (Iterable<Object>) getLevelEntityGetterIterable.invoke(levelEntityGetter);
+                nmsEntitiesIterable = (Iterable<Object>) MinecraftReflection.GET_LEVEL_ENTITY_GETTER_ITERABLE_METHOD.invoke(levelEntityGetter);
             } catch (IllegalAccessException | InvocationTargetException e) {
                 e.printStackTrace();
             }
             List<Entity> entityList = new ArrayList<>();
             if (nmsEntitiesIterable != null) {
                 for (Object nmsEntity : nmsEntitiesIterable) {
-                    Entity bukkitEntity = NMSUtils.getBukkitEntity(nmsEntity);
+                    Entity bukkitEntity = MinecraftReflection.getBukkitEntity(nmsEntity);
                     entityList.add(bukkitEntity);
                 }
             }
@@ -181,30 +217,6 @@ public final class ServerManager {
 
 
     public boolean isGeyserAvailable() {
-        if (!geyserClassChecked) {
-            geyserClassChecked = true;
-            try {
-                geyserClass = Class.forName("org.geysermc.connector.GeyserConnector");
-                return true;
-            } catch (ClassNotFoundException e) {
-                return false;
-            }
-        }
-        return geyserClass != null;
-    }
-
-    public ByteBufAbstract generateByteBufAbstract(@NotNull Object byteBuf) {
-        if (legacyByteBufClass == null) { 
-            try {
-                legacyByteBufClass = Class.forName("net.minecraft.util.io.netty.buffer.ByteBuf");
-            } catch (ClassNotFoundException e) {
-            }
-        }
-        if (legacyByteBufClass != null) {
-            return new ByteBufLegacy(byteBuf);
-        }
-        else {
-            return new ByteBufModern(byteBuf);
-        }
+        return MinecraftReflection.GEYSER_CLASS != null;
     }
 }

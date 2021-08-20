@@ -54,10 +54,10 @@ public abstract class PacketListenerAbstract {
     public void onPacketEventExternal(PacketEvent event) {
     }
 
-    public void onPacketDecode(PacketDecodeEvent event) {
+    public void onPacketReceive(PacketReceiveEvent event) {
     }
 
-    public void onPacketEncode(PacketEncodeEvent event) {
+    public void onPacketSend(PacketSendEvent event) {
 
     }
 }

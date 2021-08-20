@@ -20,8 +20,8 @@ package io.github.retrooper.packetevents;
 
 import io.github.retrooper.packetevents.event.PacketListenerAbstract;
 import io.github.retrooper.packetevents.event.PacketListenerPriority;
-import io.github.retrooper.packetevents.event.impl.PacketDecodeEvent;
-import io.github.retrooper.packetevents.event.impl.PacketEncodeEvent;
+import io.github.retrooper.packetevents.event.impl.PacketReceiveEvent;
+import io.github.retrooper.packetevents.event.impl.PacketSendEvent;
 import io.github.retrooper.packetevents.manager.player.ClientVersion;
 import io.github.retrooper.packetevents.manager.player.Hand;
 import io.github.retrooper.packetevents.protocol.PacketState;
@@ -47,7 +47,7 @@ public class PacketEventsPlugin extends JavaPlugin {
         PacketEvents.get().init();
         PacketEvents.get().registerListener(new PacketListenerAbstract(PacketListenerPriority.LOWEST) {
             @Override
-            public void onPacketEncode(PacketEncodeEvent event) {
+            public void onPacketSend(PacketSendEvent event) {
                 ByteBufAbstract byteBuf = event.getByteBuf();
                 if (event.getPacketType() == PacketType.Login.Server.LOGIN_SUCCESS) {
                     //Change state to GAME
@@ -62,7 +62,7 @@ public class PacketEventsPlugin extends JavaPlugin {
             }
 
             @Override
-            public void onPacketDecode(PacketDecodeEvent event) {
+            public void onPacketReceive(PacketReceiveEvent event) {
                 ByteBufAbstract byteBuf = event.getByteBuf();
                 switch (event.getState()) {
                     case HANDSHAKING:
@@ -93,7 +93,7 @@ public class PacketEventsPlugin extends JavaPlugin {
 
         PacketEvents.get().registerListener(new PacketListenerAbstract() {
             @Override
-            public void onPacketDecode(PacketDecodeEvent event) {
+            public void onPacketReceive(PacketReceiveEvent event) {
                 if (event.getPacketType() == PacketType.Game.Client.ANIMATION) {
                     WrapperGameClientAnimation animation = new WrapperGameClientAnimation(event.getClientVersion(), event.getByteBuf());
                     Hand hand = animation.getHand();

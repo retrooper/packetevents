@@ -19,7 +19,6 @@
 package io.github.retrooper.packetevents.injector.modern.early;
 
 import io.github.retrooper.packetevents.PacketEvents;
-import io.github.retrooper.packetevents.utils.nms.NMSUtils;
 import io.netty.channel.Channel;
 import net.kyori.adventure.key.Key;
 

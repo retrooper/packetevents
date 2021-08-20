@@ -19,9 +19,21 @@
 package io.github.retrooper.packetevents.utils.bytebuf;
 
 
+import io.github.retrooper.packetevents.utils.nms.MinecraftReflection;
+import org.jetbrains.annotations.NotNull;
+
 import java.nio.ByteBuffer;
 
 public interface ByteBufAbstract {
+    static ByteBufAbstract generate(@NotNull Object byteBuf) {
+        if (MinecraftReflection.USE_MODERN_NETTY_PACKAGE) {
+            return new ByteBufModern(byteBuf);
+        }
+        else {
+            return new ByteBufLegacy(byteBuf);
+        }
+    }
+
     Object rawByteBuf();
 
     int capacity();
