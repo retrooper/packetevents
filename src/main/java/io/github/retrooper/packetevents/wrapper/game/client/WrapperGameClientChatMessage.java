@@ -22,6 +22,9 @@ import io.github.retrooper.packetevents.utils.bytebuf.ByteBufAbstract;
 import io.github.retrooper.packetevents.manager.player.ClientVersion;
 import io.github.retrooper.packetevents.wrapper.PacketWrapper;
 
+/**
+ * This packet is used to send a chat message to the server.
+ */
 public class WrapperGameClientChatMessage extends PacketWrapper {
     private final String message;
     public WrapperGameClientChatMessage(ClientVersion version, ByteBufAbstract byteBuf) {
@@ -30,6 +33,12 @@ public class WrapperGameClientChatMessage extends PacketWrapper {
         this.message = readString(maxMessageLength);
     }
 
+    /**
+     * The message.
+     * On {@link ClientVersion#v_1_10} and older clients, the message should never be larger than 100 characters.
+     * On {@link ClientVersion#v_1_11} and newer clients, the message should never be larger than 256 characters.
+     * @return Message
+     */
     public String getMessage() {
         return message;
     }
