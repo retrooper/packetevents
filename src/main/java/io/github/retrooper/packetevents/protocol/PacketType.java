@@ -61,13 +61,22 @@ public final class PacketType {
 
     public static class Handshaking {
         public enum Client implements PacketTypeAbstract {
-            HANDSHAKE;
+            HANDSHAKE,
+            /**
+             * Technically not part of the current protocol, but clients older than 1.7 will send this to initiate Server List Ping.
+             * 1.8 and newer servers will handle it correctly though.
+            */
+            LEGACY_SERVER_LIST_PING;
 
             @Nullable
             public static PacketTypeAbstract getById(int packetID) {
                 if (packetID == 0) {
                     return HANDSHAKE;
-                } else {
+                }
+                else if (packetID == 254) {//0XFE in hex
+                    return LEGACY_SERVER_LIST_PING;
+                }
+                else {
                     return null;
                 }
             }
