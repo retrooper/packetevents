@@ -114,3 +114,4 @@ buildNumber.properties
 /.idea/
 /.gradle/
 /build/
+/src/main/resources/plugin.yml
