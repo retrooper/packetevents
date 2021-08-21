@@ -18,6 +18,7 @@
 
 package io.github.retrooper.packetevents.wrapper.login.server;
 
+import io.github.retrooper.packetevents.protocol.ConnectionState;
 import io.github.retrooper.packetevents.utils.bytebuf.ByteBufAbstract;
 import io.github.retrooper.packetevents.manager.player.ClientVersion;
 import io.github.retrooper.packetevents.wrapper.PacketWrapper;
@@ -25,7 +26,7 @@ import io.github.retrooper.packetevents.wrapper.PacketWrapper;
 import java.util.UUID;
 
 /**
- * This packet switches the connection state to play.
+ * This packet switches the connection state to {@link ConnectionState#GAME}.
  */
 public class WrapperLoginServerLoginSuccess extends PacketWrapper {
     private final UUID uuid;

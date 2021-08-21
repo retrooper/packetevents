@@ -18,13 +18,13 @@
 
 package io.github.retrooper.packetevents.wrapper.login.server;
 
-import io.github.retrooper.packetevents.protocol.PacketState;
+import io.github.retrooper.packetevents.protocol.ConnectionState;
 import io.github.retrooper.packetevents.utils.bytebuf.ByteBufAbstract;
 import io.github.retrooper.packetevents.manager.player.ClientVersion;
 import io.github.retrooper.packetevents.wrapper.PacketWrapper;
 
 /**
- * This packet is used by the server to disconnect the client while in the {@link PacketState#LOGIN} packet state.
+ * This packet is used by the server to disconnect the client while in the {@link ConnectionState#LOGIN} connection state.
  */
 public class WrapperLoginServerDisconnect extends PacketWrapper {
     private final String reason;

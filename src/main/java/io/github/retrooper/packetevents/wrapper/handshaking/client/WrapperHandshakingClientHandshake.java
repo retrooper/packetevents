@@ -18,7 +18,7 @@
 
 package io.github.retrooper.packetevents.wrapper.handshaking.client;
 
-import io.github.retrooper.packetevents.protocol.PacketState;
+import io.github.retrooper.packetevents.protocol.ConnectionState;
 import io.github.retrooper.packetevents.utils.bytebuf.ByteBufAbstract;
 import io.github.retrooper.packetevents.manager.player.ClientVersion;
 import io.github.retrooper.packetevents.wrapper.PacketWrapper;
@@ -31,7 +31,7 @@ public class WrapperHandshakingClientHandshake extends PacketWrapper {
     private final int protocolVersion;
     private final String serverAddress;
     private final int serverPort;
-    private final PacketState nextPacketState;
+    private final ConnectionState nextConnectionState;
 
     public WrapperHandshakingClientHandshake(ClientVersion version, ByteBufAbstract byteBuf) {
         super(version, byteBuf);
@@ -39,7 +39,7 @@ public class WrapperHandshakingClientHandshake extends PacketWrapper {
         this.serverAddress = readString(32767);
         this.serverPort = readUnsignedShort();
         int nextStateIndex = readVarInt();
-        this.nextPacketState = PacketState.values()[nextStateIndex];
+        this.nextConnectionState = ConnectionState.values()[nextStateIndex];
     }
 
     /**
@@ -77,11 +77,11 @@ public class WrapperHandshakingClientHandshake extends PacketWrapper {
     }
 
     /**
-     * The next packet state.
-     * Should always be {@link PacketState#STATUS} or {@link PacketState#LOGIN} on the vanilla client.
-     * @return Next packet state
+     * The next connection state.
+     * Should always be {@link ConnectionState#STATUS} or {@link ConnectionState#LOGIN} on the vanilla client.
+     * @return Next connection state
      */
-    public PacketState getNextState() {
-        return nextPacketState;
+    public ConnectionState getNextConnectionState() {
+        return nextConnectionState;
     }
 }

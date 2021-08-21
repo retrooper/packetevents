@@ -20,6 +20,7 @@ package io.github.retrooper.packetevents.wrapper;
 
 import io.github.retrooper.packetevents.utils.bytebuf.ByteBufAbstract;
 import io.github.retrooper.packetevents.manager.player.ClientVersion;
+import io.github.retrooper.packetevents.utils.wrapper.PacketWrapperUtils;
 
 import java.nio.charset.StandardCharsets;
 import java.util.UUID;
@@ -51,16 +52,7 @@ public class PacketWrapper {
     }
 
     public int readVarInt() {
-        byte b0;
-        int i = 0;
-        int j = 0;
-        do {
-            b0 = byteBuf.readByte();
-            i |= (b0 & Byte.MAX_VALUE) << j++ * 7;
-            if (j > 5)
-                throw new RuntimeException("VarInt too big");
-        } while ((b0 & 0x80) == 128);
-        return i;
+        return PacketWrapperUtils.readVarInt(byteBuf);
     }
 
     public String readString() {

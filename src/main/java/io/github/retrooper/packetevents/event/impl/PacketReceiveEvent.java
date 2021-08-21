@@ -1,113 +1,22 @@
 package io.github.retrooper.packetevents.event.impl;
 
-import io.github.retrooper.packetevents.PacketEvents;
-import io.github.retrooper.packetevents.event.PacketEvent;
 import io.github.retrooper.packetevents.event.PacketListenerAbstract;
-import io.github.retrooper.packetevents.event.eventtypes.CancellableEvent;
-import io.github.retrooper.packetevents.event.eventtypes.PlayerEvent;
+import io.github.retrooper.packetevents.event.ProtocolPacketEvent;
 import io.github.retrooper.packetevents.protocol.PacketSide;
-import io.github.retrooper.packetevents.protocol.PacketState;
-import io.github.retrooper.packetevents.protocol.PacketType;
-import io.github.retrooper.packetevents.protocol.PacketTypeAbstract;
 import io.github.retrooper.packetevents.utils.bytebuf.ByteBufAbstract;
-import io.github.retrooper.packetevents.utils.channel.ChannelUtils;
-import io.github.retrooper.packetevents.manager.player.ClientVersion;
-import io.github.retrooper.packetevents.wrapper.PacketWrapper;
 import org.bukkit.entity.Player;
-import org.jetbrains.annotations.Nullable;
 
-import java.net.InetSocketAddress;
-
-public class PacketReceiveEvent extends PacketEvent implements PlayerEvent, CancellableEvent {
-    private final Object channel;
-    private PacketState state;
-    private final Player player;
-    private ClientVersion version;
-    private boolean cancel;
-    private ByteBufAbstract byteBuf;
-    private final int packetIDNum;
-
+public class PacketReceiveEvent extends ProtocolPacketEvent {
     public PacketReceiveEvent(Object channel, Player player, ByteBufAbstract byteBuf) {
-        this.channel = channel;
-        this.player = player;
-        this.version = PacketEvents.get().getPlayerManager().clientVersions.get(channel);
-        if (this.version == null) {
-            this.version = ClientVersion.UNKNOWN;
-        }
-        this.byteBuf = byteBuf.duplicate();
-        PacketWrapper packetWrapper = PacketWrapper.createUniversalPacketWrapper(this.byteBuf);
-        this.packetIDNum = packetWrapper.readVarInt();
+        super(PacketSide.CLIENT, channel, player, byteBuf, true);
     }
 
     public PacketReceiveEvent(Object channel, Player player, Object rawByteBuf) {
-        this.channel = channel;
-        this.player = player;
-        this.version = PacketEvents.get().getPlayerManager().clientVersions.get(channel);
-        if (this.version == null) {
-            this.version = ClientVersion.UNKNOWN;
-        }
-        this.byteBuf = ByteBufAbstract.generate(rawByteBuf);
-        PacketWrapper packetWrapper = PacketWrapper.createUniversalPacketWrapper(this.byteBuf);
-        this.packetIDNum = packetWrapper.readVarInt();
-    }
-
-    public int getPacketID() {
-        return packetIDNum;
-    }
-
-    @Nullable
-    public PacketTypeAbstract getPacketType() {
-        PacketState state = getState();
-        return PacketType.getById(PacketSide.CLIENT, state, version, packetIDNum);
-    }
-
-    public PacketState getState() {
-        return state == null ? state = PacketEvents.get().getInjector().getPacketState(channel) : state;
-    }
-
-    public Object getChannel() {
-        return channel;
-    }
-
-    public InetSocketAddress getSocketAddress() {
-        return ChannelUtils.getSocketAddress(channel);
-    }
-
-    public ClientVersion getClientVersion() {
-        return version;
-    }
-
-    public void setClientVersion(ClientVersion version) {
-        this.version = version;
-        PacketEvents.get().getPlayerManager().clientVersions.put(channel, version);
+        super(PacketSide.CLIENT, channel, player, rawByteBuf, true);
     }
 
     @Override
     public void call(PacketListenerAbstract listener) {
         listener.onPacketReceive(this);
-    }
-
-    @Override
-    public boolean isCancelled() {
-        return this.cancel;
-    }
-
-    @Override
-    public void setCancelled(boolean val) {
-        this.cancel = val;
-    }
-
-    @Nullable
-    @Override
-    public Player getPlayer() {
-        return player;
-    }
-
-    public ByteBufAbstract getByteBuf() {
-        return this.byteBuf;
-    }
-
-    public void setByteBuf(ByteBufAbstract byteBuf) {
-        this.byteBuf = byteBuf;
     }
 }

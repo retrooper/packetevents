@@ -22,7 +22,7 @@ import io.github.retrooper.packetevents.PacketEvents;
 import io.github.retrooper.packetevents.injector.LateInjector;
 import io.github.retrooper.packetevents.injector.modern.PacketDecoderModern;
 import io.github.retrooper.packetevents.injector.modern.early.PEChannelInitializerModern;
-import io.github.retrooper.packetevents.protocol.PacketState;
+import io.github.retrooper.packetevents.protocol.ConnectionState;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandler;
 import org.bukkit.entity.Player;
@@ -95,16 +95,15 @@ public class LateChannelInjectorModern implements LateInjector {
         channel.pipeline().writeAndFlush(packet);
     }
 
+    //TODO Look into this approach, maybe instead make the variable in the decoder just default to GAME
+    //TODO and implement changeConnectionState properly
     @Override
-    public PacketState getPacketState(Object channel) {
-        return PacketState.GAME;
+    public ConnectionState getConnectionState(Object channel) {
+        return ConnectionState.GAME;
     }
 
     @Override
-    public void changePacketState(Object channel, PacketState packetState) {
-        PacketDecoderModern decoder = getDecoder(channel);
-        if (decoder != null) {
-            decoder.packetState = packetState;
-        }
+    public void changeConnectionState(Object channel, ConnectionState connectionState) {
+
     }
 }

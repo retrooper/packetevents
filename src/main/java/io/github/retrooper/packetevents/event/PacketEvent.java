@@ -19,7 +19,7 @@
 package io.github.retrooper.packetevents.event;
 
 
-import io.github.retrooper.packetevents.event.eventtypes.CallableEvent;
+import io.github.retrooper.packetevents.event.type.CallableEvent;
 
 /**
  * An event in both of PacketEvents' event systems.

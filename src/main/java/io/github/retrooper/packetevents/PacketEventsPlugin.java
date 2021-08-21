@@ -19,12 +19,12 @@
 package io.github.retrooper.packetevents;
 
 import io.github.retrooper.packetevents.event.PacketListenerAbstract;
-import io.github.retrooper.packetevents.event.PacketListenerPriority;
 import io.github.retrooper.packetevents.event.impl.PacketReceiveEvent;
 import io.github.retrooper.packetevents.event.impl.PacketSendEvent;
+import io.github.retrooper.packetevents.event.type.PlayerEvent;
 import io.github.retrooper.packetevents.manager.player.ClientVersion;
 import io.github.retrooper.packetevents.manager.player.Hand;
-import io.github.retrooper.packetevents.protocol.PacketState;
+import io.github.retrooper.packetevents.protocol.ConnectionState;
 import io.github.retrooper.packetevents.protocol.PacketType;
 import io.github.retrooper.packetevents.utils.bytebuf.ByteBufAbstract;
 import io.github.retrooper.packetevents.wrapper.game.client.WrapperGameClientAnimation;
@@ -45,13 +45,13 @@ public class PacketEventsPlugin extends JavaPlugin {
     @Override
     public void onEnable() {
         PacketEvents.get().init();
-        PacketEvents.get().registerListener(new PacketListenerAbstract(PacketListenerPriority.LOWEST) {
+        PacketEvents.get().registerListener(new PacketListenerAbstract(PacketListenerAbstract.PacketListenerPriority.LOWEST) {
             @Override
             public void onPacketSend(PacketSendEvent event) {
                 ByteBufAbstract byteBuf = event.getByteBuf();
                 if (event.getPacketType() == PacketType.Login.Server.LOGIN_SUCCESS) {
-                    //Change state to GAME
-                    PacketEvents.get().getInjector().changePacketState(event.getChannel(), PacketState.GAME);
+                    //Transition into the GAME connection state
+                    PacketEvents.get().getInjector().changeConnectionState(event.getChannel(), ConnectionState.GAME);
                     System.out.println("CHANGED STATE TO GAME");
                 }
                 else if (event.getPacketType() == PacketType.Status.Server.PONG) {
@@ -64,11 +64,13 @@ public class PacketEventsPlugin extends JavaPlugin {
             @Override
             public void onPacketReceive(PacketReceiveEvent event) {
                 ByteBufAbstract byteBuf = event.getByteBuf();
-                switch (event.getState()) {
+                switch (event.getConnectionState()) {
                     case HANDSHAKING:
                         WrapperHandshakingClientHandshake handshake = new WrapperHandshakingClientHandshake(event.getClientVersion(), byteBuf);
-                        event.setClientVersion(handshake.getClientVersion());
-                        PacketEvents.get().getInjector().changePacketState(event.getChannel(), handshake.getNextState());
+                        //Cache client version
+                        PacketEvents.get().getPlayerManager().clientVersions.put(event.getChannel(), handshake.getClientVersion());
+                        //Transition into the next connection state
+                        PacketEvents.get().getInjector().changeConnectionState(event.getChannel(), handshake.getNextConnectionState());
                         break;
 
                     case STATUS:
@@ -82,7 +84,7 @@ public class PacketEventsPlugin extends JavaPlugin {
                     case LOGIN:
                         if (event.getPacketType() == PacketType.Login.Client.LOGIN_START) {
                             WrapperLoginClientLoginStart start = new WrapperLoginClientLoginStart(event.getClientVersion(), byteBuf);
-                            //Cache the channel
+                            //Map the usernames with the netty channels
                             PacketEvents.get().getPlayerManager().channels.put(start.getUsername(), event.getChannel());
                         }
                         break;

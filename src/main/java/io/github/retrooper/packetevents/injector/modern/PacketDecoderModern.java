@@ -20,7 +20,7 @@ package io.github.retrooper.packetevents.injector.modern;
 
 import io.github.retrooper.packetevents.PacketEvents;
 import io.github.retrooper.packetevents.event.impl.PacketReceiveEvent;
-import io.github.retrooper.packetevents.protocol.PacketState;
+import io.github.retrooper.packetevents.protocol.ConnectionState;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.ByteToMessageDecoder;
@@ -35,7 +35,7 @@ public class PacketDecoderModern extends ByteToMessageDecoder {
     private static Method DECODE_METHOD;
     public final ByteToMessageDecoder previousDecoder;
     public volatile Player player;
-    public PacketState packetState = PacketState.HANDSHAKING;
+    public ConnectionState connectionState = ConnectionState.HANDSHAKING;
 
     private void load() {
         if (DECODE_METHOD == null) {

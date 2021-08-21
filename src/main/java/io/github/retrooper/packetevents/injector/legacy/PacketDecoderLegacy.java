@@ -2,7 +2,7 @@ package io.github.retrooper.packetevents.injector.legacy;
 
 import io.github.retrooper.packetevents.PacketEvents;
 import io.github.retrooper.packetevents.event.impl.PacketReceiveEvent;
-import io.github.retrooper.packetevents.protocol.PacketState;
+import io.github.retrooper.packetevents.protocol.ConnectionState;
 import net.minecraft.util.io.netty.buffer.ByteBuf;
 import net.minecraft.util.io.netty.channel.ChannelHandlerContext;
 import net.minecraft.util.io.netty.handler.codec.ByteToMessageDecoder;
@@ -17,7 +17,7 @@ public class PacketDecoderLegacy extends ByteToMessageDecoder {
     private static Method DECODE_METHOD;
     public final ByteToMessageDecoder previousDecoder;
     public volatile Player player;
-    public PacketState packetState;
+    public ConnectionState packetState;
 
     private void load() {
         if (DECODE_METHOD == null) {

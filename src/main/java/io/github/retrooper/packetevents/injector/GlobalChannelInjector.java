@@ -25,7 +25,7 @@ import io.github.retrooper.packetevents.injector.legacy.early.EarlyChannelInject
 import io.github.retrooper.packetevents.injector.legacy.late.LateChannelInjectorLegacy;
 import io.github.retrooper.packetevents.injector.modern.early.EarlyChannelInjectorModern;
 import io.github.retrooper.packetevents.injector.modern.late.LateChannelInjectorModern;
-import io.github.retrooper.packetevents.protocol.PacketState;
+import io.github.retrooper.packetevents.protocol.ConnectionState;
 import io.github.retrooper.packetevents.utils.nms.MinecraftReflection;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.Nullable;
@@ -98,11 +98,11 @@ public class GlobalChannelInjector {
     }
 
     @Nullable
-    public PacketState getPacketState(Object channel) {
-        return injector.getPacketState(channel);
+    public ConnectionState getConnectionState(Object channel) {
+        return injector.getConnectionState(channel);
     }
 
-    public void changePacketState(Object channel, PacketState packetState) {
-        injector.changePacketState(channel, packetState);
+    public void changeConnectionState(Object channel, ConnectionState connectionState) {
+        injector.changeConnectionState(channel, connectionState);
     }
 }

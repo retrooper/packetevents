@@ -21,7 +21,7 @@ package io.github.retrooper.packetevents.injector.legacy.early;
 import io.github.retrooper.packetevents.PacketEvents;
 import io.github.retrooper.packetevents.injector.EarlyInjector;
 import io.github.retrooper.packetevents.injector.legacy.PacketDecoderLegacy;
-import io.github.retrooper.packetevents.protocol.PacketState;
+import io.github.retrooper.packetevents.protocol.ConnectionState;
 import io.github.retrooper.packetevents.utils.reflection.ReflectionObject;
 import io.github.retrooper.packetevents.utils.list.ListWrapper;
 import io.github.retrooper.packetevents.utils.nms.MinecraftReflection;
@@ -310,7 +310,7 @@ public class EarlyChannelInjectorLegacy implements EarlyInjector {
     }
 
     @Override
-    public PacketState getPacketState(Object channel) {
+    public ConnectionState getConnectionState(Object channel) {
         PacketDecoderLegacy decoder = getDecoder(channel);
         if (decoder != null) {
             return decoder.packetState;
@@ -321,7 +321,7 @@ public class EarlyChannelInjectorLegacy implements EarlyInjector {
     }
 
     @Override
-    public void changePacketState(Object channel, PacketState packetState) {
+    public void changeConnectionState(Object channel, ConnectionState packetState) {
         PacketDecoderLegacy decoder = getDecoder(channel);
         if (decoder != null) {
             decoder.packetState = packetState;

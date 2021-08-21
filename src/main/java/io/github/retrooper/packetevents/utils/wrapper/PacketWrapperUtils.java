@@ -18,6 +18,7 @@
 
 package io.github.retrooper.packetevents.utils.wrapper;
 
+import io.github.retrooper.packetevents.utils.bytebuf.ByteBufAbstract;
 import io.github.retrooper.packetevents.utils.vector.Vector3i;
 
 public final class PacketWrapperUtils {
@@ -32,4 +33,18 @@ public final class PacketWrapperUtils {
     public static long generateLongFromVector(Vector3i vector) {
         return generateLongFromVector(vector.x, vector.y, vector.z);
     }
+
+    public static int readVarInt(ByteBufAbstract byteBuf) {
+        byte b0;
+        int i = 0;
+        int j = 0;
+        do {
+            b0 = byteBuf.readByte();
+            i |= (b0 & Byte.MAX_VALUE) << j++ * 7;
+            if (j > 5)
+                throw new RuntimeException("VarInt too big");
+        } while ((b0 & 0x80) == 128);
+        return i;
+    }
+
 }

@@ -21,7 +21,6 @@ package io.github.retrooper.packetevents.event.manager;
 import io.github.retrooper.packetevents.PacketEvents;
 import io.github.retrooper.packetevents.event.PacketEvent;
 import io.github.retrooper.packetevents.event.PacketListenerAbstract;
-import io.github.retrooper.packetevents.event.PacketListenerPriority;
 
 import java.util.HashSet;
 import java.util.Map;
@@ -34,14 +33,14 @@ class EventManagerModern {
     /**
      * Call the PacketEvent.
      * This method processes the event on all the registered dynamic packet event listeners.
-     * The {@link PacketListenerPriority#LOWEST} prioritized listeners will be processing first,
-     * the {@link PacketListenerPriority#MONITOR} will be processing last and can
+     * The {@link PacketListenerAbstract.PacketListenerPriority#LOWEST} prioritized listeners will be processing first,
+     * the {@link PacketListenerAbstract.PacketListenerPriority#MONITOR} will be processing last and can
      * be the final decider whether the event has been cancelled or not.
      *
      * @param event {@link PacketEvent}
      */
     public void callEvent(final PacketEvent event) {
-        for (byte priority = PacketListenerPriority.LOWEST.getId(); priority <= PacketListenerPriority.MONITOR.getId(); priority++) {
+        for (byte priority = PacketListenerAbstract.PacketListenerPriority.LOWEST.getId(); priority <= PacketListenerAbstract.PacketListenerPriority.MONITOR.getId(); priority++) {
             HashSet<PacketListenerAbstract> listeners = listenersMap.get(priority);
             if (listeners != null) {
                 for (PacketListenerAbstract listener : listeners) {
@@ -57,7 +56,7 @@ class EventManagerModern {
     }
 
     public void callEvent(PacketEvent event, Runnable postCallListenerAction) {
-        for (byte priority = PacketListenerPriority.LOWEST.getId(); priority <= PacketListenerPriority.MONITOR.getId(); priority++) {
+        for (byte priority = PacketListenerAbstract.PacketListenerPriority.LOWEST.getId(); priority <= PacketListenerAbstract.PacketListenerPriority.MONITOR.getId(); priority++) {
             HashSet<PacketListenerAbstract> listeners = listenersMap.get(priority);
             if (listeners != null) {
                 for (PacketListenerAbstract listener : listeners) {

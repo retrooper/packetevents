@@ -18,7 +18,7 @@
 
 package io.github.retrooper.packetevents.injector;
 
-import io.github.retrooper.packetevents.protocol.PacketState;
+import io.github.retrooper.packetevents.protocol.ConnectionState;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.Nullable;
 
@@ -28,9 +28,9 @@ public interface ChannelInjector {
     }
 
     @Nullable
-    PacketState getPacketState(Object channel);
+    ConnectionState getConnectionState(Object channel);
 
-    void changePacketState(Object channel, PacketState packetState);
+    void changeConnectionState(Object channel, ConnectionState packetState);
 
     void inject();
 
