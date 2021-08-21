@@ -39,6 +39,7 @@ import java.net.InetSocketAddress;
  * @since 1.3
  */
 public class PostPlayerInjectEvent extends PacketEvent implements PlayerEvent {
+    //TODO Rethink this event
     private final Player player;
     private final boolean async;
 
