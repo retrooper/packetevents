@@ -22,6 +22,11 @@ import io.github.retrooper.packetevents.utils.bytebuf.ByteBufAbstract;
 import io.github.retrooper.packetevents.manager.player.ClientVersion;
 import io.github.retrooper.packetevents.wrapper.PacketWrapper;
 
+/**
+ * This is the server-bound keep-alive packet.
+ * The server will frequently send out a (client-bound) keep-alive, each containing a random ID.
+ * The client is expected to respond with a (server-bound) keep-alive, containing the same ID that the server sent out.
+ */
 public class WrapperGameClientKeepAlive extends PacketWrapper {
     private final long id;
 
@@ -36,6 +41,10 @@ public class WrapperGameClientKeepAlive extends PacketWrapper {
         }
     }
 
+    /**
+     * Keep-Alive ID.
+     * @return ID
+     */
     public long getId() {
         return id;
     }

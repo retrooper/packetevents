@@ -24,6 +24,9 @@ import io.github.retrooper.packetevents.wrapper.PacketWrapper;
 
 import java.util.UUID;
 
+/**
+ * Teleports the player to the given entity if the player is in spectator mode.
+ */
 public class WrapperGameClientSpectate extends PacketWrapper {
     private final UUID uuid;
     public WrapperGameClientSpectate(ClientVersion version, ByteBufAbstract byteBuf) {
@@ -31,6 +34,10 @@ public class WrapperGameClientSpectate extends PacketWrapper {
         this.uuid = readUUID();
     }
 
+    /**
+     * UUID of the entity we want to teleport to.
+     * @return UUID of target entity
+     */
     public UUID getUUID() {
         return uuid;
     }

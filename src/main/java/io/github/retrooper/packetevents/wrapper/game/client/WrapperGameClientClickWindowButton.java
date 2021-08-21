@@ -22,6 +22,9 @@ import io.github.retrooper.packetevents.manager.player.ClientVersion;
 import io.github.retrooper.packetevents.utils.bytebuf.ByteBufAbstract;
 import io.github.retrooper.packetevents.wrapper.PacketWrapper;
 
+/**
+ * This packet is used when clicking on window buttons. Until 1.14, this was only used by enchantment tables.
+ */
 public class WrapperGameClientClickWindowButton extends PacketWrapper {
     private final byte windowID;
     private final byte buttonID;
@@ -31,10 +34,19 @@ public class WrapperGameClientClickWindowButton extends PacketWrapper {
         this.buttonID = readByte();
     }
 
+    /**
+     * The ID of the window.
+     * @return Window ID
+     */
     public byte getWindowID() {
         return windowID;
     }
 
+    /**
+     * Meaning depends on the window type.
+     * Learn more about its meaning on wiki.vg/Protocol.
+     * @return Button ID
+     */
     public byte getButtonID() {
         return buttonID;
     }

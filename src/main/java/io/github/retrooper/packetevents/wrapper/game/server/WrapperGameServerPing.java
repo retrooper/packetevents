@@ -22,6 +22,12 @@ import io.github.retrooper.packetevents.manager.player.ClientVersion;
 import io.github.retrooper.packetevents.utils.bytebuf.ByteBufAbstract;
 import io.github.retrooper.packetevents.wrapper.PacketWrapper;
 
+/**
+ * This packet is currently used by mods to synchronize the client with the server.
+ * It is not used by the vanilla server.
+ * Most likely added as a replacement to the removed Window Confirmation packet.
+ * @see io.github.retrooper.packetevents.wrapper.game.client.WrapperGameClientPong
+ */
 public class WrapperGameServerPing extends PacketWrapper {
     private final int id;
     public WrapperGameServerPing(ClientVersion version, ByteBufAbstract byteBuf) {

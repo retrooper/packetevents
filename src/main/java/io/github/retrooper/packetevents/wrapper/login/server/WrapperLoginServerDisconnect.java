@@ -18,22 +18,27 @@
 
 package io.github.retrooper.packetevents.wrapper.login.server;
 
+import io.github.retrooper.packetevents.protocol.PacketState;
 import io.github.retrooper.packetevents.utils.bytebuf.ByteBufAbstract;
 import io.github.retrooper.packetevents.manager.player.ClientVersion;
 import io.github.retrooper.packetevents.wrapper.PacketWrapper;
 
+/**
+ * This packet is used by the server to disconnect the client while in the {@link PacketState#LOGIN} packet state.
+ */
 public class WrapperLoginServerDisconnect extends PacketWrapper {
-    public static int REASON_LENGTH = -1;
     private final String reason;
 
     public WrapperLoginServerDisconnect(ClientVersion version, ByteBufAbstract byteBuf) {
         super(version, byteBuf);
-        if (REASON_LENGTH == -1) {
-            REASON_LENGTH = version.isNewerThanOrEquals(ClientVersion.v_1_14) ? 262144 : 32767;
-        }
-        this.reason = readString(REASON_LENGTH);
+        int reasonLength = version.isNewerThanOrEquals(ClientVersion.v_1_14) ? 262144 : 32767;
+        this.reason = readString(reasonLength);
     }
 
+    /**
+     * The reason the server disconnected the client. (Specified by the server)
+     * @return Disconnection reason
+     */
     public String getReason() {
         return reason;
     }

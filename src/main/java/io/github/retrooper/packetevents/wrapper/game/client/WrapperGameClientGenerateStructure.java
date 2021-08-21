@@ -24,6 +24,9 @@ import io.github.retrooper.packetevents.utils.vector.Vector3i;
 import io.github.retrooper.packetevents.utils.wrapper.PacketWrapperUtils;
 import io.github.retrooper.packetevents.wrapper.PacketWrapper;
 
+/**
+ * This packet is sent when Generate is pressed on the Jigsaw Block interface.
+ */
 public class WrapperGameClientGenerateStructure extends PacketWrapper {
     private final Vector3i blockPosition;
     private final int levels;
@@ -35,14 +38,26 @@ public class WrapperGameClientGenerateStructure extends PacketWrapper {
         this.keepJigsaws = readBoolean();
     }
 
+    /**
+     * The block location of the entity.
+     * @return Block location
+     */
     public Vector3i getBlockPosition() {
         return blockPosition;
     }
 
+    /**
+     * Value of the levels' slider/max depth to generate.
+     * @return Levels
+     */
     public int getLevels() {
         return levels;
     }
 
+    /**
+     * Should we keep the Jigsaws?
+     * @return Keep Jigsaws
+     */
     public boolean isKeepingJigsaws() {
         return keepJigsaws;
     }

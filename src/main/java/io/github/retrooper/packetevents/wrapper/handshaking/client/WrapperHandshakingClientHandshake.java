@@ -23,6 +23,10 @@ import io.github.retrooper.packetevents.utils.bytebuf.ByteBufAbstract;
 import io.github.retrooper.packetevents.manager.player.ClientVersion;
 import io.github.retrooper.packetevents.wrapper.PacketWrapper;
 
+/**
+ * This packet is the first packet the client should send.
+ * It contains useful information such as the client's protocol version.
+ */
 public class WrapperHandshakingClientHandshake extends PacketWrapper {
     private final int protocolVersion;
     private final String serverAddress;
@@ -38,22 +42,45 @@ public class WrapperHandshakingClientHandshake extends PacketWrapper {
         this.nextPacketState = PacketState.values()[nextStateIndex];
     }
 
+    /**
+     * Protocol version of the client.
+     * The latest vanilla server won't let clients with a different protocol version join the server.
+     * @return Protocol version
+     */
     public int getProtocolVersion() {
         return protocolVersion;
     }
 
+    /**
+     * {@link ClientVersion} of the client.
+     * This enum maps the protocol versions with the name of the release.
+     * @return Client version
+     */
     public ClientVersion getClientVersion() {
         return ClientVersion.getClientVersion(protocolVersion);
     }
 
+    /**
+     * Address of the server.
+     * @return Server address
+     */
     public String getServerAddress() {
         return serverAddress;
     }
 
+    /**
+     * Port of the server.
+     * @return Server port
+     */
     public int getServerPort() {
         return serverPort;
     }
 
+    /**
+     * The next packet state.
+     * Should always be {@link PacketState#STATUS} or {@link PacketState#LOGIN} on the vanilla client.
+     * @return Next packet state
+     */
     public PacketState getNextState() {
         return nextPacketState;
     }

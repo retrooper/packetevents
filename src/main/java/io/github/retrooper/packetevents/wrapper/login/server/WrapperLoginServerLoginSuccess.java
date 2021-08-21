@@ -24,6 +24,9 @@ import io.github.retrooper.packetevents.wrapper.PacketWrapper;
 
 import java.util.UUID;
 
+/**
+ * This packet switches the connection state to play.
+ */
 public class WrapperLoginServerLoginSuccess extends PacketWrapper {
     private final UUID uuid;
     private final String username;

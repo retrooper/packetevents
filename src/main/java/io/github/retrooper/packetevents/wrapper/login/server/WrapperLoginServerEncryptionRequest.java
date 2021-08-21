@@ -21,12 +21,19 @@ package io.github.retrooper.packetevents.wrapper.login.server;
 import io.github.retrooper.packetevents.manager.player.ClientVersion;
 import io.github.retrooper.packetevents.utils.bytebuf.ByteBufAbstract;
 import io.github.retrooper.packetevents.wrapper.PacketWrapper;
+import io.github.retrooper.packetevents.wrapper.login.client.WrapperLoginClientEncryptionResponse;
 
 import java.security.KeyFactory;
 import java.security.PublicKey;
 import java.security.spec.EncodedKeySpec;
 import java.security.spec.X509EncodedKeySpec;
 
+/**
+ * This packet is sent by the server to the client if the server is in online mode.
+ * If the server is in offline mode, this packet won't be sent,
+ * encryption won't be enabled and no authentication will be performed.
+ * @see WrapperLoginClientEncryptionResponse
+ */
 public class WrapperLoginServerEncryptionRequest extends PacketWrapper {
     private final String serverID;
     private final PublicKey publicKey;
@@ -37,10 +44,38 @@ public class WrapperLoginServerEncryptionRequest extends PacketWrapper {
         this.serverID = readString(20);
         int publicKeyLength = readVarInt();
         byte[] publicKeyBytes = readByteArray(publicKeyLength);
-        //To decode use PublicKey#getEncoded
+        //To decrypt use PublicKey#getEncoded
         this.publicKey = encrypt(publicKeyBytes);
         int verifyTokenLength = readVarInt();
         this.verifyToken = readByteArray(verifyTokenLength);
+    }
+
+    /**
+     * This is an empty string on the vanilla client. (1.7.10 and above)
+     * @return Server ID
+     */
+    public String getServerID() {
+        return serverID;
+    }
+
+    /**
+     * The public key is in DER encoding format.
+     * More technically, it is in ASN.1 format.
+     * The public key will be encrypted by the client and
+     * sent to the server via the {@link WrapperLoginClientEncryptionResponse} packet.
+     * @return Public key
+     */
+    public PublicKey getPublicKey() {
+        return publicKey;
+    }
+
+    /**
+     * The verify token will be encrypted by the client and
+     * sent to the server via the {@link WrapperLoginClientEncryptionResponse} packet.
+     * @return Verify token
+     */
+    public byte[] getVerifyToken() {
+        return verifyToken;
     }
 
     private PublicKey encrypt(byte[] bytes) {
@@ -52,5 +87,9 @@ public class WrapperLoginServerEncryptionRequest extends PacketWrapper {
             ex.printStackTrace();
             return null;
         }
+    }
+
+    private byte[] decrypt(PublicKey key) {
+        return key.getEncoded();
     }
 }
