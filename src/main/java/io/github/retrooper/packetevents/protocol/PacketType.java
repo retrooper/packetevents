@@ -28,8 +28,8 @@ import org.jetbrains.annotations.Nullable;
 import java.util.IdentityHashMap;
 import java.util.Map;
 
-public final class PacketType {
-    public static PacketTypeAbstract getById(PacketSide side, ConnectionState state, @Nullable ClientVersion version, int packetID) {
+public interface PacketType {
+    static PacketType getById(PacketSide side, ConnectionState state, @Nullable ClientVersion version, int packetID) {
         switch (state) {
             case HANDSHAKING:
                 return Handshaking.Client.getById(packetID);
@@ -59,8 +59,8 @@ public final class PacketType {
         }
     }
 
-    public static class Handshaking {
-        public enum Client implements PacketTypeAbstract {
+    interface Handshaking extends PacketType{
+        enum Client implements Handshaking {
             HANDSHAKE,
             /**
              * Technically not part of the current protocol, but clients older than 1.7 will send this to initiate Server List Ping.
@@ -69,7 +69,7 @@ public final class PacketType {
             LEGACY_SERVER_LIST_PING;
 
             @Nullable
-            public static PacketTypeAbstract getById(int packetID) {
+            public static PacketType getById(int packetID) {
                 if (packetID == 0) {
                     return HANDSHAKE;
                 }
@@ -83,13 +83,13 @@ public final class PacketType {
         }
     }
 
-    public static class Status {
-        public enum Client implements PacketTypeAbstract {
+    interface Status extends PacketType{
+        enum Client implements Status {
             REQUEST,
             PING;
 
             @Nullable
-            public static PacketTypeAbstract getById(int packetID) {
+            public static PacketType getById(int packetID) {
                 if (packetID == 0) {
                     return REQUEST;
                 } else if (packetID == 1) {
@@ -100,12 +100,12 @@ public final class PacketType {
             }
         }
 
-        public enum Server implements PacketTypeAbstract {
+        enum Server implements Status {
             RESPONSE,
             PONG;
 
             @Nullable
-            public static PacketTypeAbstract getById(int packetID) {
+            public static PacketType getById(int packetID) {
                 if (packetID == 0) {
                     return RESPONSE;
                 }
@@ -119,13 +119,13 @@ public final class PacketType {
         }
     }
 
-    public static class Login {
-        public enum Client implements PacketTypeAbstract {
+    interface Login extends PacketType {
+        enum Client implements Login {
             LOGIN_START,
             ENCRYPTION_RESPONSE;
 
             @Nullable
-            public static PacketTypeAbstract getById(int packetID) {
+            public static PacketType getById(int packetID) {
                 if (packetID == 0) {
                     return LOGIN_START;
                 }
@@ -138,13 +138,13 @@ public final class PacketType {
             }
         }
 
-        public enum Server implements PacketTypeAbstract {
+        enum Server implements Login {
             DISCONNECT,
             ENCRYPTION_REQUEST,
             LOGIN_SUCCESS;
 
             @Nullable
-            public static PacketTypeAbstract getById(int packetID) {
+            public static PacketType getById(int packetID) {
                 if (packetID == 0) {
                     return DISCONNECT;
                 }
@@ -161,8 +161,8 @@ public final class PacketType {
         }
     }
 
-    public static class Game {
-        public enum Client implements PacketTypeAbstract {
+    interface Game extends PacketType {
+        enum Client implements Game {
             TELEPORT_CONFIRM,
             QUERY_BLOCK_NBT,
             SET_DIFFICULTY,
@@ -214,12 +214,12 @@ public final class PacketType {
             PLAYER_BLOCK_PLACEMENT,
             USE_ITEM;
 
-            private static final Map<ClientVersion, Map<Integer, PacketTypeAbstract>> PACKET_ID_CACHE = new IdentityHashMap<>();
+            private static final Map<ClientVersion, Map<Integer, PacketType>> PACKET_ID_CACHE = new IdentityHashMap<>();
 
 
             @Nullable
-            public static PacketTypeAbstract getById(ClientVersion version, int packetID) {
-                Map<Integer, PacketTypeAbstract> innerMap = PACKET_ID_CACHE.get(version);
+            public static PacketType getById(ClientVersion version, int packetID) {
+                Map<Integer, PacketType> innerMap = PACKET_ID_CACHE.get(version);
                 if (innerMap != null) {
                     return innerMap.get(packetID);
                 }
@@ -227,7 +227,7 @@ public final class PacketType {
             }
 
             private static void loadPacketIDs(ClientVersion version, Enum<?>[] enumConstants) {
-                Map<Integer, PacketTypeAbstract> innerMap = new IdentityHashMap<>();
+                Map<Integer, PacketType> innerMap = new IdentityHashMap<>();
                 for (int i = 0; i < enumConstants.length; i++) {
                     innerMap.put(i, Client.valueOf(enumConstants[i].name()));
                 }
@@ -266,8 +266,7 @@ public final class PacketType {
             }
         }
 
-        //TODO FINISH
-        public enum Server implements PacketTypeAbstract {
+        enum Server implements Game {
             SET_COMPRESSION,
             MAP_CHUNK_BULK,
             UPDATE_ENTITY_NBT,
@@ -387,11 +386,11 @@ public final class PacketType {
             TAGS;
 
             //TODO Simplify to one MAP, and the MAP is different depending on the local server version.
-            private static final Map<ServerVersion, Map<Integer, PacketTypeAbstract>> PACKET_ID_CACHE = new IdentityHashMap<>();
+            private static final Map<ServerVersion, Map<Integer, PacketType>> PACKET_ID_CACHE = new IdentityHashMap<>();
 
             @Nullable
-            public static PacketTypeAbstract getById(ServerVersion version, int packetID) {
-                Map<Integer, PacketTypeAbstract> innerMap = PACKET_ID_CACHE.get(version);
+            public static PacketType getById(ServerVersion version, int packetID) {
+                Map<Integer, PacketType> innerMap = PACKET_ID_CACHE.get(version);
                 if (innerMap != null) {
                     return innerMap.get(packetID);
                 }
@@ -399,7 +398,7 @@ public final class PacketType {
             }
 
             private static void loadPacketIDs(ServerVersion version, Enum<?>[] enumConstants) {
-                Map<Integer, PacketTypeAbstract> innerMap = new IdentityHashMap<>();
+                Map<Integer, PacketType> innerMap = new IdentityHashMap<>();
                 for (int i = 0; i < enumConstants.length; i++) {
                     innerMap.put(i, Game.Server.valueOf(enumConstants[i].name()));
                 }
@@ -407,7 +406,7 @@ public final class PacketType {
             }
 
             private static void loadPacketIDs(ServerVersion first, ServerVersion last, Enum<?>[] enumConstants) {
-                Map<Integer, PacketTypeAbstract> innerMap = new IdentityHashMap<>();
+                Map<Integer, PacketType> innerMap = new IdentityHashMap<>();
                 for (int i = 0; i < enumConstants.length; i++) {
                     innerMap.put(i, Game.Server.valueOf(enumConstants[i].name()));
                 }
