@@ -26,6 +26,7 @@ import io.github.retrooper.packetevents.utils.nms.MinecraftReflection;
 import io.github.retrooper.packetevents.manager.server.ServerVersion;
 import io.github.retrooper.packetevents.utils.dependencies.VersionLookupUtils;
 import io.github.retrooper.packetevents.utils.dependencies.v_1_7_10.SpigotVersionLookup_1_7;
+import io.github.retrooper.packetevents.utils.nms.PlayerPingAccessorModern;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
@@ -35,7 +36,6 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class PlayerManager {
     public final Map<Object, ClientVersion> clientVersions = new ConcurrentHashMap<>();
-    public final Map<UUID, Long> keepAliveMap = new ConcurrentHashMap<>();
     public final Map<String, Object> channels = new ConcurrentHashMap<>();
 
     /**
@@ -45,7 +45,12 @@ public class PlayerManager {
      * @return Non-smoothed ping.
      */
     public int getPing(Player player) {
-        return MinecraftReflection.getPlayerPing(player);
+        if (MinecraftReflection.V_1_17_OR_HIGHER) {
+            return PlayerPingAccessorModern.getPing(player);
+        }
+        else {
+            return MinecraftReflection.getPlayerPing(player);
+        }
     }
 
     /**

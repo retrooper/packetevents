@@ -209,24 +209,6 @@ public final class MinecraftReflection {
         return Class.forName(LEGACY_NMS_PACKAGE + name);
     }
 
-    public static Class<?> getNMClassWithoutException(String name) {
-        try {
-            return Class.forName("net.minecraft." + name);
-        } catch (ClassNotFoundException ex) {
-            return null;
-        }
-    }
-
-
-    public static Class<?> getNMSClassWithoutException(String name) {
-        try {
-            return getNMSClass(name);
-        } catch (Exception e) {
-            return null;
-        }
-
-    }
-
     public static Class<?> getOBCClass(String name) {
         return Reflection.getClassByNameWithoutException(OBC_PACKAGE + name);
     }
@@ -325,16 +307,11 @@ public final class MinecraftReflection {
 
     //TODO Inspect again
     public static int getPlayerPing(Player player) {
-        if (V_1_17_OR_HIGHER) {
-            return PlayerPingAccessorModern.getPing(player);
-        }
-        else {
-            Object entityPlayer = getEntityPlayer(player);
-            try {
-                return ENTITY_PLAYER_PING_FIELD.getInt(entityPlayer);
-            } catch (IllegalAccessException e) {
-                e.printStackTrace();
-            }
+        Object entityPlayer = getEntityPlayer(player);
+        try {
+            return ENTITY_PLAYER_PING_FIELD.getInt(entityPlayer);
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
         }
         return -1;
     }

@@ -59,12 +59,11 @@ public class BukkitEventProcessorInternal implements Listener {
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onQuit(PlayerQuitEvent e) {
         Player player = e.getPlayer();
-        UUID uuid = player.getUniqueId();
+        Object channel = PacketEvents.get().getPlayerManager().getChannel(player);
         //Cleanup user data
-        PacketEvents.get().getPlayerManager().clientVersions.remove(PacketEvents.get().getPlayerManager().getChannel(player));
-        PacketEvents.get().getPlayerManager().keepAliveMap.remove(uuid);
+        PacketEvents.get().getPlayerManager().clientVersions.remove(channel);
         PacketEvents.get().getPlayerManager().channels.remove(player.getName());
-        PacketEvents.get().getServerManager().entityCache.remove(e.getPlayer().getEntityId());
+        PacketEvents.get().getServerManager().entityCache.remove(player.getEntityId());
     }
 
 

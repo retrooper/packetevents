@@ -20,7 +20,7 @@ package io.github.retrooper.packetevents.utils.nms;
 
 import org.bukkit.entity.Player;
 
-class PlayerPingAccessorModern {
+public class PlayerPingAccessorModern {
     public static int getPing(Player player) {
         return player.getPing();
     }
