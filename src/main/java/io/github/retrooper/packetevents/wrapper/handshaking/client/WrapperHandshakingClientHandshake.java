@@ -36,7 +36,7 @@ public class WrapperHandshakingClientHandshake extends PacketWrapper {
     public WrapperHandshakingClientHandshake(ClientVersion version, ByteBufAbstract byteBuf) {
         super(version, byteBuf);
         this.protocolVersion = readVarInt();
-        this.serverAddress = readString(32767);
+        this.serverAddress = readString(protocolVersion, 32767);
         this.serverPort = readUnsignedShort();
         int nextStateIndex = readVarInt();
         this.nextConnectionState = ConnectionState.values()[nextStateIndex];

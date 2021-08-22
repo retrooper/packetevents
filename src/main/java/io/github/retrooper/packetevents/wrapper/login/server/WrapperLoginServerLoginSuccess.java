@@ -41,9 +41,9 @@ public class WrapperLoginServerLoginSuccess extends PacketWrapper {
             this.uuid = convertToUUID(data);
         }
         else {
-            this.uuid = UUID.fromString(readString(36));
+            this.uuid = UUID.fromString(readString(version, 36));
         }
-        this.username = readString(16);
+        this.username = readString(version, 16);
     }
 
     private UUID convertToUUID(int[] data) {

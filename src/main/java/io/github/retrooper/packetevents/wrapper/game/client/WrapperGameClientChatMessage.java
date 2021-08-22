@@ -30,7 +30,7 @@ public class WrapperGameClientChatMessage extends PacketWrapper {
     public WrapperGameClientChatMessage(ClientVersion version, ByteBufAbstract byteBuf) {
         super(version, byteBuf);
         int maxMessageLength = version.isNewerThanOrEquals(ClientVersion.v_1_11) ? 256 : 100;
-        this.message = readString(maxMessageLength);
+        this.message = readString(version, maxMessageLength);
     }
 
     /**

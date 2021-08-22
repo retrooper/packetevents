@@ -18,11 +18,14 @@
 
 package io.github.retrooper.packetevents.wrapper;
 
+import io.github.retrooper.packetevents.manager.server.ServerVersion;
 import io.github.retrooper.packetevents.utils.bytebuf.ByteBufAbstract;
 import io.github.retrooper.packetevents.manager.player.ClientVersion;
 import io.github.retrooper.packetevents.utils.wrapper.PacketWrapperUtils;
+import net.minecraft.util.com.google.common.base.Charsets;
 
 import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
 import java.util.UUID;
 
 
@@ -52,32 +55,82 @@ public class PacketWrapper {
     }
 
     public int readVarInt() {
-        return PacketWrapperUtils.readVarInt(byteBuf);
+        byte b0;
+        int i = 0;
+        int j = 0;
+        do {
+            b0 = byteBuf.readByte();
+            i |= (b0 & Byte.MAX_VALUE) << j++ * 7;
+            if (j > 5)
+                throw new RuntimeException("VarInt too big");
+        } while ((b0 & 0x80) == 128);
+        return i;
     }
 
-    public String readString() {
-        return readString(32767);
+    public String readString(ClientVersion version) {
+        return readString(version, 32767);
     }
 
-    public String readString(int maxLen) {
+    public String readString(ServerVersion version) {
+        return readString(version, 32767);
+    }
+
+    public String readString(ClientVersion version, int maxLen) {
+        return readString(version.getProtocolVersion(), maxLen);
+    }
+
+    public String readString(ServerVersion version, int maxLen) {
+        return readString(version.getProtocolVersion(), maxLen);
+    }
+
+    public String readString(int protocolVersion, int maxLen) {
+        //1.12 and higher
+        if (protocolVersion >= 335) {
+            return readStringModern(maxLen);
+        } else {
+            return readStringLegacy(maxLen);
+        }
+    }
+
+    private String readStringLegacy(int i) {
         int j = readVarInt();
-        if (j > maxLen * 4)
-            throw new RuntimeException("The received encoded string buffer length is longer than maximum allowed (" + j + " > " + (maxLen * 4) + ")");
-        if (j < 0)
+        if (j > i * 4) {
+            throw new RuntimeException("The received encoded string buffer length is longer than maximum allowed (" + j + " > " + (i * 4) + ")");
+        } else if (j < 0) {
             throw new RuntimeException("The received encoded string buffer length is less than zero! Weird string!");
-        ByteBufAbstract bb = byteBuf.readBytes(j);
-        byte[] array;
-        if (bb.hasArray()) {
-            array = bb.array();
+        } else {
+            ByteBufAbstract bb = byteBuf.readBytes(j);
+            byte[] bytes;
+            if (bb.hasArray()) {
+                bytes = bb.array();
+            }
+            else {
+                bytes = new byte[bb.readableBytes()];
+                bb.getBytes(bb.readerIndex(), bytes);
+            }
+            String s = new String(bytes);
+            if (s.length() > i) {
+                throw new RuntimeException("The received string length is longer than maximum allowed (" + j + " > " + i + ")");
+            }
+            return s;
         }
-        else {
-            array = new byte[bb.readableBytes()];
-            bb.getBytes(bb.readerIndex(), array);
+    }
+
+    private String readStringModern(int i) {
+        int j = readVarInt();
+        if (j > i * 4) {
+            throw new RuntimeException("The received encoded string buffer length is longer than maximum allowed (" + j + " > " + i * 4 + ")");
+        } else if (j < 0) {
+            throw new RuntimeException("The received encoded string buffer length is less than zero! Weird string!");
+        } else {
+            String s = byteBuf.toString(byteBuf.readerIndex(), j, StandardCharsets.UTF_8);
+            byteBuf.readerIndex(byteBuf.readerIndex() + j);
+            if (s.length() > i) {
+                throw new RuntimeException("The received string length is longer than maximum allowed (" + j + " > " + i + ")");
+            } else {
+                return s;
+            }
         }
-        String s = new String(array, StandardCharsets.UTF_8);
-        if (s.length() > maxLen)
-            throw new RuntimeException("The received string length is longer than maximum allowed (" + j + " > " + maxLen + ")");
-        return s;
     }
 
     public int readUnsignedShort() {

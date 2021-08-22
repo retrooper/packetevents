@@ -41,7 +41,7 @@ public class WrapperLoginServerEncryptionRequest extends PacketWrapper {
 
     public WrapperLoginServerEncryptionRequest(ClientVersion version, ByteBufAbstract byteBuf) {
         super(version, byteBuf);
-        this.serverID = readString(20);
+        this.serverID = readString(version, 20);
         int publicKeyLength = readVarInt();
         byte[] publicKeyBytes = readByteArray(publicKeyLength);
         //To decrypt use PublicKey#getEncoded

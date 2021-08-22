@@ -46,9 +46,9 @@ public class PacketEncoderModern extends MessageToByteEncoder<ByteBuf> {
         writeBytes(byteBuf, buffer, 0);*/
     }
 
-    @Override
-    public void write(ChannelHandlerContext ctx, Object msg, ChannelPromise promise) throws Exception {
-        ByteBuf bb = (ByteBuf) msg;
+
+    /*
+     ByteBuf bb = (ByteBuf) msg;
         int firstReaderIndex = bb.readerIndex();
         PacketSendEvent packetSendEvent = new PacketSendEvent(ctx.channel(), player, bb);
         int readerIndex = bb.readerIndex();
@@ -59,6 +59,17 @@ public class PacketEncoderModern extends MessageToByteEncoder<ByteBuf> {
         bb.readerIndex(firstReaderIndex);
 
         ctx.write(bb);
+     */
+    @Override
+    public void write(ChannelHandlerContext ctx, Object msg, ChannelPromise promise) throws Exception {
+        ByteBuf bb = (ByteBuf) msg;
+        ctx.write(bb);
+    }
+
+
+    @Override
+    public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
+        cause.printStackTrace();
     }
 
     public static void writeBytes(ByteBuf buf, byte[] bytes, int buffer) {

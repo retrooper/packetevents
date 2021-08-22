@@ -49,7 +49,7 @@ public final class PacketEvents implements Listener, EventManager {
     private final ServerManager serverManager = new ServerManager();
     private final BukkitEventProcessorInternal bukkitEventProcessorInternal = new BukkitEventProcessorInternal();
     private final GlobalChannelInjector injector = new GlobalChannelInjector();
-    public String identifier, encoderName;
+    public String identifier, encoderName, decoderName;
     private PacketEventsSettings settings = new PacketEventsSettings();
     private UpdateChecker updateChecker;
     private boolean loaded;
@@ -68,6 +68,7 @@ public final class PacketEvents implements Listener, EventManager {
             //Resolve server version and cache
             identifier = "pe-" + plugin.getName().toLowerCase();
             encoderName = "pe-encoder-" + plugin.getName().toLowerCase();
+            decoderName = "pe-decoder-" + plugin.getName().toLowerCase();
             try {
                 MinecraftReflection.init();
 

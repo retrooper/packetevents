@@ -21,6 +21,7 @@ package io.github.retrooper.packetevents.utils.bytebuf;
 import io.netty.buffer.ByteBuf;
 
 import java.nio.ByteBuffer;
+import java.nio.charset.Charset;
 
 public class ByteBufModern implements ByteBufAbstract {
     private final ByteBuf byteBuf;
@@ -420,5 +421,10 @@ public class ByteBufModern implements ByteBufAbstract {
     @Override
     public ByteBufAbstract setBytes(int i, byte[] bytes) {
         return new ByteBufModern(byteBuf.setBytes(i, bytes));
+    }
+
+    @Override
+    public String toString(int i, int j, Charset charset) {
+        return byteBuf.toString(i, j, charset);
     }
 }

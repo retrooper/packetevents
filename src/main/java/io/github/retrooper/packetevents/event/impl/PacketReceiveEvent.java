@@ -7,6 +7,7 @@ import io.github.retrooper.packetevents.utils.bytebuf.ByteBufAbstract;
 import org.bukkit.entity.Player;
 
 public class PacketReceiveEvent extends ProtocolPacketEvent {
+
     public PacketReceiveEvent(Object channel, Player player, ByteBufAbstract byteBuf) {
         super(PacketSide.CLIENT, channel, player, byteBuf, true);
     }

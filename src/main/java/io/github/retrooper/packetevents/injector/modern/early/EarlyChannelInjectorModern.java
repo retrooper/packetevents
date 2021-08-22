@@ -297,7 +297,7 @@ public class EarlyChannelInjectorModern implements EarlyInjector {
 
     private PacketDecoderModern getDecoder(Object rawChannel) {
         Channel channel = (Channel) rawChannel;
-        ChannelHandler decoder = channel.pipeline().get("decoder");
+        ChannelHandler decoder = channel.pipeline().get(PacketEvents.get().decoderName);
         if (decoder instanceof PacketDecoderModern) {
             return (PacketDecoderModern) decoder;
         }

@@ -29,7 +29,7 @@ public class WrapperLoginServerPluginRequest extends PacketWrapper {
     public WrapperLoginServerPluginRequest(ClientVersion version, ByteBufAbstract byteBuf) {
         super(version, byteBuf);
         this.messageID = readVarInt();
-        this.channelName = readString();
+        this.channelName = readString(version);
         this.data = readByteArray(byteBuf.readableBytes());
     }
 

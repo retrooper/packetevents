@@ -23,6 +23,7 @@ import io.github.retrooper.packetevents.utils.nms.MinecraftReflection;
 import org.jetbrains.annotations.NotNull;
 
 import java.nio.ByteBuffer;
+import java.nio.charset.Charset;
 
 public interface ByteBufAbstract {
     static ByteBufAbstract generate(@NotNull Object byteBuf) {
@@ -194,4 +195,6 @@ public interface ByteBufAbstract {
     int refCnt();
 
     ByteBufAbstract setBytes(int i, byte[] bytes);
+
+    String toString(int i, int j, Charset charset);
 }

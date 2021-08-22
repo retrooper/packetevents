@@ -32,7 +32,7 @@ public class WrapperLoginServerDisconnect extends PacketWrapper {
     public WrapperLoginServerDisconnect(ClientVersion version, ByteBufAbstract byteBuf) {
         super(version, byteBuf);
         int reasonLength = version.isNewerThanOrEquals(ClientVersion.v_1_14) ? 262144 : 32767;
-        this.reason = readString(reasonLength);
+        this.reason = readString(version, reasonLength);
     }
 
     /**

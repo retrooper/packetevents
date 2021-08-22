@@ -66,11 +66,16 @@ public class PacketEventsPlugin extends JavaPlugin {
                 switch (event.getConnectionState()) {
                     case HANDSHAKING:
                         if (event.getPacketType() == PacketType.Handshaking.Client.HANDSHAKE) {
+                            System.out.println("OK1");
                             WrapperHandshakingClientHandshake handshake = new WrapperHandshakingClientHandshake(event.getClientVersion(), byteBuf);
+                            System.out.println("OK2");
                             //Cache client version
                             PacketEvents.get().getPlayerManager().clientVersions.put(event.getChannel(), handshake.getClientVersion());
                             //Transition into the next connection state
                             PacketEvents.get().getInjector().changeConnectionState(event.getChannel(), handshake.getNextConnectionState());
+                            System.out.println("NEXT CONNECTION STATE: " + handshake.getNextConnectionState());
+                            System.out.println("CONFIRM: " + PacketEvents.get().getInjector().getConnectionState(event.getChannel()));
+                            System.out.println("USER CONNECTED WITH CLIENT VERSION: " + handshake.getClientVersion().name());
                         }
                         break;
 
@@ -92,7 +97,7 @@ public class PacketEventsPlugin extends JavaPlugin {
                 }
             }
         });
-
+/*
         //Sample listener
         PacketEvents.get().registerListener(new PacketListenerAbstract() {
             @Override
@@ -101,17 +106,12 @@ public class PacketEventsPlugin extends JavaPlugin {
                     WrapperGameClientAnimation animation = new WrapperGameClientAnimation(event.getClientVersion(), event.getByteBuf());
                     Hand hand = animation.getHand();
                     event.getPlayer().sendMessage("Nice hand: " + hand.name());
-                } else if (event.getPacketType() == PacketType.Handshaking.Client.HANDSHAKE) {
-                    WrapperHandshakingClientHandshake handshake = new WrapperHandshakingClientHandshake(event.getClientVersion(), event.getByteBuf());
-
-                    ClientVersion clientVersion = handshake.getClientVersion();
-                    System.out.println("USER JOINED WITH CLIENT VERSION: " + clientVersion.name());
                 } else if (event.getPacketType() == PacketType.Game.Client.CHAT_MESSAGE) {
                     WrapperGameClientChatMessage chatMessage = new WrapperGameClientChatMessage(event.getClientVersion(), event.getByteBuf());
                     String msg = chatMessage.getMessage();
                 }
             }
-        });
+        });*/
     }
 
     @Override
