@@ -51,8 +51,7 @@ public final class PacketType {
                 if (side == PacketSide.CLIENT) {
                     return Game.Client.getById(version, packetID);
                 } else {
-                    ServerVersion serverVersion = PacketEvents.get().getServerManager().getVersion();
-                    return Game.Server.getById(serverVersion, packetID);
+                    return Game.Server.getById(packetID);
                 }
             default:
                 return null;
@@ -266,7 +265,6 @@ public final class PacketType {
             }
         }
 
-        //TODO FINISH
         public enum Server implements PacketTypeCommon {
             SET_COMPRESSION,
             MAP_CHUNK_BULK,
@@ -386,64 +384,79 @@ public final class PacketType {
             DECLARE_RECIPES,
             TAGS;
 
-            //TODO Simplify to one MAP, and the MAP is different depending on the local server version.
-            private static final Map<ServerVersion, Map<Integer, PacketTypeCommon>> PACKET_ID_CACHE = new IdentityHashMap<>();
+            private static final Map<Integer, PacketTypeCommon> PACKET_ID_CACHE = new IdentityHashMap<>();
 
             @Nullable
-            public static PacketTypeCommon getById(ServerVersion version, int packetID) {
-                Map<Integer, PacketTypeCommon> innerMap = PACKET_ID_CACHE.get(version);
-                if (innerMap != null) {
-                    return innerMap.get(packetID);
-                }
-                return null;
+            public static PacketTypeCommon getById(int packetID) {
+                return PACKET_ID_CACHE.get(packetID);
             }
 
-            private static void loadPacketIDs(ServerVersion version, Enum<?>[] enumConstants) {
-                Map<Integer, PacketTypeCommon> innerMap = new IdentityHashMap<>();
+            private static void loadPacketIDs(Enum<?>[] enumConstants) {
                 for (int i = 0; i < enumConstants.length; i++) {
-                    innerMap.put(i, Game.Server.valueOf(enumConstants[i].name()));
-                }
-                PACKET_ID_CACHE.put(version, innerMap);
-            }
-
-            private static void loadPacketIDs(ServerVersion first, ServerVersion last, Enum<?>[] enumConstants) {
-                Map<Integer, PacketTypeCommon> innerMap = new IdentityHashMap<>();
-                for (int i = 0; i < enumConstants.length; i++) {
-                    innerMap.put(i, Game.Server.valueOf(enumConstants[i].name()));
-                }
-
-                boolean shouldPut = false;
-                for (ServerVersion v : ServerVersion.values()) {
-                    if (v == first) {
-                        shouldPut = true;
-                    }
-
-                    if (shouldPut) {
-                        PACKET_ID_CACHE.put(v, innerMap);
-                    }
-
-                    if (v == last) {
-                        shouldPut = false;
-                    }
+                    PACKET_ID_CACHE.put(i, Game.Server.valueOf(enumConstants[i].name()));
                 }
             }
+
 
             public static void load() {
-                loadPacketIDs(ServerVersion.v_1_7_10, ClientboundPacketType_1_7_10.values());
-                loadPacketIDs(ServerVersion.v_1_8, ServerVersion.v_1_8_8, ClientboundPacketType_1_8.values());
-                loadPacketIDs(ServerVersion.v_1_9, ServerVersion.v_1_9_2, ClientboundPacketType_1_9.values());
-                //Should be 1.9.3, but we don't have an enum constant for 1.9.3, because I couldn't access a 1.9.3 build of spigot.
-                loadPacketIDs(ServerVersion.v_1_9_4, ServerVersion.v_1_11_2, ClientboundPacketType_1_9_3.values());
-                loadPacketIDs(ServerVersion.v_1_12, ClientboundPacketType_1_12.values());
-                loadPacketIDs(ServerVersion.v_1_12_1, ClientboundPacketType_1_12_1.values());
-                loadPacketIDs(ServerVersion.v_1_13, ServerVersion.v_1_13_2, ClientboundPacketType_1_13.values());
-                loadPacketIDs(ServerVersion.v_1_14, ServerVersion.v_1_14_3, ClientboundPacketType_1_14.values());
-                loadPacketIDs(ServerVersion.v_1_14_4, ClientboundPacketType_1_14_4.values());
-                loadPacketIDs(ServerVersion.v_1_15, ServerVersion.v_1_15_1, ClientboundPacketType_1_15.values());
-                loadPacketIDs(ServerVersion.v_1_15_2, ClientboundPacketType_1_15_2.values());
-                loadPacketIDs(ServerVersion.v_1_16, ServerVersion.v_1_16_1, ClientboundPacketType_1_16.values());
-                loadPacketIDs(ServerVersion.v_1_16_2, ServerVersion.v_1_16_5, ClientboundPacketType_1_16_2.values());
-                loadPacketIDs(ServerVersion.v_1_17, ServerVersion.v_1_17_1, ClientboundPacketType_1_17.values());
+                ServerVersion version = PacketEvents.get().getServerManager().getVersion();
+                //1.7.10
+                if (version.isOlderThan(ServerVersion.v_1_8)) {
+                    loadPacketIDs(ClientboundPacketType_1_7_10.values());
+                }
+                //1.8 - 1.8.8
+                else if (version.isOlderThan(ServerVersion.v_1_9)) {
+                    loadPacketIDs(ClientboundPacketType_1_8.values());
+                }
+                //1.9 - 1.9.2
+                //(Should be 1.9 - 1.9.3, but I can't find a 1.9.3 build of Spigot)
+                else if (version.isOlderThan(ServerVersion.v_1_9_4)) {
+                    loadPacketIDs(ClientboundPacketType_1_9.values());
+                }
+                //1.10 - 1.11.2
+                else if (version.isOlderThan(ServerVersion.v_1_12)) {
+                    loadPacketIDs(ClientboundPacketType_1_9_3.values());
+                }
+                //1.12
+                else if (version.isOlderThan(ServerVersion.v_1_12_1)) {
+                    loadPacketIDs(ClientboundPacketType_1_12.values());
+                }
+                //1.12.1 - 1.12.2
+                else if (version.isOlderThan(ServerVersion.v_1_13)) {
+                    loadPacketIDs(ClientboundPacketType_1_12_1.values());
+                }
+                //1.13 - 1.13.2
+                else if (version.isOlderThan(ServerVersion.v_1_14)) {
+                    loadPacketIDs(ClientboundPacketType_1_13.values());
+                }
+                //1.14 - 1.14.3
+                else if (version.isOlderThan(ServerVersion.v_1_14_4)) {
+                    loadPacketIDs(ClientboundPacketType_1_14.values());
+                }
+                //1.14.4
+                else if (version.isOlderThan(ServerVersion.v_1_15)) {
+                    loadPacketIDs(ClientboundPacketType_1_14_4.values());
+                }
+                //1.15 - 1.15.1
+                else if (version.isOlderThan(ServerVersion.v_1_15_2)) {
+                    loadPacketIDs(ClientboundPacketType_1_15.values());
+                }
+                //1.15.2
+                else if (version.isOlderThan(ServerVersion.v_1_16)) {
+                    loadPacketIDs(ClientboundPacketType_1_15_2.values());
+                }
+                //1.16 - 1.16.1
+                else if (version.isOlderThan(ServerVersion.v_1_16_2)) {
+                    loadPacketIDs(ClientboundPacketType_1_16.values());
+                }
+                //1.16.2 - 1.16.5
+                else if (version.isOlderThan(ServerVersion.v_1_17)) {
+                    loadPacketIDs(ClientboundPacketType_1_16_2.values());
+                }
+                //1.17 - 1.17.1
+                else {
+                    loadPacketIDs(ClientboundPacketType_1_17.values());
+                }
             }
         }
     }

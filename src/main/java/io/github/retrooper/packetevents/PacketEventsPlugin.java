@@ -53,8 +53,7 @@ public class PacketEventsPlugin extends JavaPlugin {
                     //Transition into the GAME connection state
                     PacketEvents.get().getInjector().changeConnectionState(event.getChannel(), ConnectionState.GAME);
                     System.out.println("CHANGED STATE TO GAME");
-                }
-                else if (event.getPacketType() == PacketType.Status.Server.PONG) {
+                } else if (event.getPacketType() == PacketType.Status.Server.PONG) {
                     WrapperStatusServerPong pong = new WrapperStatusServerPong(ClientVersion.UNKNOWN, byteBuf);
                     long payload = pong.getTime();
                     System.out.println("PAYLOAD RESPONSE: " + payload);
@@ -66,11 +65,13 @@ public class PacketEventsPlugin extends JavaPlugin {
                 ByteBufAbstract byteBuf = event.getByteBuf();
                 switch (event.getConnectionState()) {
                     case HANDSHAKING:
-                        WrapperHandshakingClientHandshake handshake = new WrapperHandshakingClientHandshake(event.getClientVersion(), byteBuf);
-                        //Cache client version
-                        PacketEvents.get().getPlayerManager().clientVersions.put(event.getChannel(), handshake.getClientVersion());
-                        //Transition into the next connection state
-                        PacketEvents.get().getInjector().changeConnectionState(event.getChannel(), handshake.getNextConnectionState());
+                        if (event.getPacketType() == PacketType.Handshaking.Client.HANDSHAKE) {
+                            WrapperHandshakingClientHandshake handshake = new WrapperHandshakingClientHandshake(event.getClientVersion(), byteBuf);
+                            //Cache client version
+                            PacketEvents.get().getPlayerManager().clientVersions.put(event.getChannel(), handshake.getClientVersion());
+                            //Transition into the next connection state
+                            PacketEvents.get().getInjector().changeConnectionState(event.getChannel(), handshake.getNextConnectionState());
+                        }
                         break;
 
                     case STATUS:
@@ -100,14 +101,12 @@ public class PacketEventsPlugin extends JavaPlugin {
                     WrapperGameClientAnimation animation = new WrapperGameClientAnimation(event.getClientVersion(), event.getByteBuf());
                     Hand hand = animation.getHand();
                     event.getPlayer().sendMessage("Nice hand: " + hand.name());
-                }
-                else if (event.getPacketType() == PacketType.Handshaking.Client.HANDSHAKE) {
+                } else if (event.getPacketType() == PacketType.Handshaking.Client.HANDSHAKE) {
                     WrapperHandshakingClientHandshake handshake = new WrapperHandshakingClientHandshake(event.getClientVersion(), event.getByteBuf());
 
                     ClientVersion clientVersion = handshake.getClientVersion();
                     System.out.println("USER JOINED WITH CLIENT VERSION: " + clientVersion.name());
-                }
-                else if (event.getPacketType() == PacketType.Game.Client.CHAT_MESSAGE) {
+                } else if (event.getPacketType() == PacketType.Game.Client.CHAT_MESSAGE) {
                     WrapperGameClientChatMessage chatMessage = new WrapperGameClientChatMessage(event.getClientVersion(), event.getByteBuf());
                     String msg = chatMessage.getMessage();
                 }
