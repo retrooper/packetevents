@@ -18,6 +18,6 @@
 
 package io.github.retrooper.packetevents.protocol;
 
-public interface PacketTypeAbstract {
+public interface PacketTypeCommon {
 
 }

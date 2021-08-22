@@ -25,7 +25,7 @@ import io.github.retrooper.packetevents.manager.player.ClientVersion;
 import io.github.retrooper.packetevents.protocol.ConnectionState;
 import io.github.retrooper.packetevents.protocol.PacketSide;
 import io.github.retrooper.packetevents.protocol.PacketType;
-import io.github.retrooper.packetevents.protocol.PacketTypeAbstract;
+import io.github.retrooper.packetevents.protocol.PacketTypeCommon;
 import io.github.retrooper.packetevents.utils.bytebuf.ByteBufAbstract;
 import io.github.retrooper.packetevents.utils.channel.ChannelUtils;
 import io.github.retrooper.packetevents.utils.wrapper.PacketWrapperUtils;
@@ -45,7 +45,7 @@ public abstract class ProtocolPacketEvent extends PacketEvent implements PlayerE
 
     private final ByteBufAbstract byteBuf;
     private final int packetID;
-    private final PacketTypeAbstract packetType;
+    private final PacketTypeCommon packetType;
 
     private boolean cancel;
 
@@ -120,7 +120,7 @@ public abstract class ProtocolPacketEvent extends PacketEvent implements PlayerE
     }
 
     @Nullable
-    public PacketTypeAbstract getPacketType() {
+    public PacketTypeCommon getPacketType() {
         return packetType;
     }
 
