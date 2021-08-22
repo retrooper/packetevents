@@ -15,7 +15,7 @@ task myJavadocs(type: Javadoc) {
 repositories {
     mavenLocal()
     maven {
-        url = uri('https://hub.spigotmc.org/nexus/content/repositories/snapshots/')
+        url 'https://hub.spigotmc.org/nexus/content/repositories/snapshots/'
     }
 
     maven {
@@ -31,23 +31,23 @@ repositories {
     }
 
     maven {
-        url = uri('https://jitpack.io/')
+        url 'https://jitpack.io/'
     }
 
     maven {
-        url = uri('https://nexus.funkemunky.cc/content/repositories/releases/')
+        url 'https://nexus.funkemunky.cc/content/repositories/releases/'
     }
 
     maven {
-        url = uri('https://repo.viaversion.com/')
+        url 'https://repo.viaversion.com/'
     }
 
     maven {
-        url = uri('https://oss.sonatype.org/content/repositories/releases/')
+        url 'https://oss.sonatype.org/content/repositories/releases/'
     }
 
     maven {
-        url = uri('https://repo.maven.apache.org/maven2/')
+        url 'https://repo.maven.apache.org/maven2/'
     }
 }
 

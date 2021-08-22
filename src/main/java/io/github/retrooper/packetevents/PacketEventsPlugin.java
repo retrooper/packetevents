@@ -84,7 +84,7 @@ public class PacketEventsPlugin extends JavaPlugin {
                     case LOGIN:
                         if (event.getPacketType() == PacketType.Login.Client.LOGIN_START) {
                             WrapperLoginClientLoginStart start = new WrapperLoginClientLoginStart(event.getClientVersion(), byteBuf);
-                            //Map the usernames with the netty channels
+                            //Map the player usernames with their netty channels
                             PacketEvents.get().getPlayerManager().channels.put(start.getUsername(), event.getChannel());
                         }
                         break;
