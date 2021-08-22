@@ -27,18 +27,18 @@ import io.github.retrooper.packetevents.event.impl.*;
  * @since 1.8
  */
 public abstract class PacketListenerAbstract {
-    private final PacketListenerPriority priority;
+    private final Priority priority;
 
-    public PacketListenerAbstract(PacketListenerPriority priority) {
+    public PacketListenerAbstract(Priority priority) {
         this.priority = priority;
     }
 
 
     public PacketListenerAbstract() {
-        this.priority = PacketListenerPriority.NORMAL;
+        this.priority = Priority.NORMAL;
     }
 
-    public PacketListenerPriority getPriority() {
+    public Priority getPriority() {
         return priority;
     }
 
@@ -71,7 +71,7 @@ public abstract class PacketListenerAbstract {
      * @author retrooper
      * @since 1.8
      */
-    public enum PacketListenerPriority {
+    public enum Priority {
         //TODO Ponder on renaming this enum to maybe 'Priority'
         /**
          * Listener is of very low importance.
@@ -106,7 +106,7 @@ public abstract class PacketListenerAbstract {
          */
         MONITOR;
 
-        public static PacketListenerPriority getById(byte id) {
+        public static Priority getById(byte id) {
             return values()[id];
         }
 

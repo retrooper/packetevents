@@ -21,7 +21,6 @@ package io.github.retrooper.packetevents;
 import io.github.retrooper.packetevents.event.PacketListenerAbstract;
 import io.github.retrooper.packetevents.event.impl.PacketReceiveEvent;
 import io.github.retrooper.packetevents.event.impl.PacketSendEvent;
-import io.github.retrooper.packetevents.event.type.PlayerEvent;
 import io.github.retrooper.packetevents.manager.player.ClientVersion;
 import io.github.retrooper.packetevents.manager.player.Hand;
 import io.github.retrooper.packetevents.protocol.ConnectionState;
@@ -45,7 +44,8 @@ public class PacketEventsPlugin extends JavaPlugin {
     @Override
     public void onEnable() {
         PacketEvents.get().init();
-        PacketEvents.get().registerListener(new PacketListenerAbstract(PacketListenerAbstract.PacketListenerPriority.LOWEST) {
+        //Internal listener
+        PacketEvents.get().registerListener(new PacketListenerAbstract(PacketListenerAbstract.Priority.LOWEST) {
             @Override
             public void onPacketSend(PacketSendEvent event) {
                 ByteBufAbstract byteBuf = event.getByteBuf();
@@ -92,7 +92,7 @@ public class PacketEventsPlugin extends JavaPlugin {
             }
         });
 
-
+        //Sample listener
         PacketEvents.get().registerListener(new PacketListenerAbstract() {
             @Override
             public void onPacketReceive(PacketReceiveEvent event) {
