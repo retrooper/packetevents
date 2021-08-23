@@ -97,7 +97,7 @@ public class PacketEventsPlugin extends JavaPlugin {
                         if (event.getPacketType() == PacketType.Game.Client.ANIMATION) {
                             WrapperGameClientAnimation animation = new WrapperGameClientAnimation(event.getClientVersion(), event.getByteBuf());
                             Hand hand = animation.getHand();
-                            event.getPlayer().sendMessage("Nice hand: " + hand.name());
+                            event.getPlayer().sendMessage("You sent an animation with this hand: " + hand.name());
                         } else if (event.getPacketType() == PacketType.Game.Client.CHAT_MESSAGE) {
                             WrapperGameClientChatMessage chatMessage = new WrapperGameClientChatMessage(event.getClientVersion(), event.getByteBuf());
                             String msg = chatMessage.getMessage();
