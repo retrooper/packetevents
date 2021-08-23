@@ -38,10 +38,6 @@ public class PacketStatusReceiveEvent extends CancellableNMSPacketEvent {
         super(channel, packet);
     }
 
-    public PacketStatusReceiveEvent(final InetSocketAddress socketAddress, final NMSPacket packet) {
-        super(socketAddress, packet);
-    }
-
     @Override
     public void call(PacketListenerAbstract listener) {
         if (listener.clientSidedStatusAllowance == null || listener.clientSidedStatusAllowance.contains(getPacketId())) {

@@ -44,10 +44,6 @@ public class PacketStatusSendEvent extends CancellableNMSPacketEvent implements 
         super(channel, packet);
     }
 
-    public PacketStatusSendEvent(InetSocketAddress address, NMSPacket packet) {
-        super(address, packet);
-    }
-
     @Override
     public boolean isPostTaskAvailable() {
         return postTask != null;

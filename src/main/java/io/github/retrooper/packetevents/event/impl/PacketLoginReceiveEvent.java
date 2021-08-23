@@ -34,12 +34,8 @@ import java.net.InetSocketAddress;
  * @since 1.8
  */
 public class PacketLoginReceiveEvent extends CancellableNMSPacketEvent {
-    public PacketLoginReceiveEvent(final Object channel, final NMSPacket packet) {
+    public PacketLoginReceiveEvent(Object channel, NMSPacket packet) {
         super(channel, packet);
-    }
-
-    public PacketLoginReceiveEvent(final InetSocketAddress socketAddress, final NMSPacket packet) {
-        super(socketAddress, packet);
     }
 
     @Override

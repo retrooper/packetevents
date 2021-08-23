@@ -34,12 +34,8 @@ import java.net.InetSocketAddress;
  * @since 1.8
  */
 public class PacketHandshakeReceiveEvent extends CancellableNMSPacketEvent {
-    public PacketHandshakeReceiveEvent(final Object channel, final NMSPacket packet) {
+    public PacketHandshakeReceiveEvent(Object channel, NMSPacket packet) {
         super(channel, packet);
-    }
-
-    public PacketHandshakeReceiveEvent(final InetSocketAddress socketAddress, final NMSPacket packet) {
-        super(socketAddress, packet);
     }
 
     @Override

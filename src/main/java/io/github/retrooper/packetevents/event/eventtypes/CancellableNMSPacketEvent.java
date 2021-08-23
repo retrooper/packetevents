@@ -29,10 +29,6 @@ public abstract class CancellableNMSPacketEvent extends NMSPacketEvent implement
         super(channel, packet);
     }
 
-    public CancellableNMSPacketEvent(InetSocketAddress address, NMSPacket packet) {
-        super(address, packet);
-    }
-
     @Override
     public boolean isCancelled() {
         return cancelled;

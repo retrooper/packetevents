@@ -41,10 +41,6 @@ public class PacketLoginSendEvent extends CancellableNMSPacketEvent implements P
         super(channel, packet);
     }
 
-    public PacketLoginSendEvent(InetSocketAddress address, NMSPacket packet) {
-        super(address, packet);
-    }
-
     @Override
     public boolean isPostTaskAvailable() {
         return postTask != null;

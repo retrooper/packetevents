@@ -35,17 +35,15 @@ import java.net.InetSocketAddress;
  * @since 1.8
  */
 public abstract class NMSPacketEvent extends PacketEvent implements CallableEvent {
+    private final Object channel;
     private final InetSocketAddress socketAddress;
     private final byte packetID;
     protected NMSPacket packet;
     protected boolean cancelled;
 
     public NMSPacketEvent(Object channel, NMSPacket packet) {
-        this(ChannelUtils.getSocketAddress(channel), packet);//Call the constructor below
-    }
-
-    public NMSPacketEvent(InetSocketAddress address, NMSPacket packet) {
-        this.socketAddress = address;
+        this.channel = channel;
+        this.socketAddress = ChannelUtils.getSocketAddress(channel);
         this.packet = packet;
         packetID = PacketType.packetIDMap.getOrDefault(packet.getRawNMSPacket().getClass(), PacketType.INVALID);
     }
@@ -57,6 +55,14 @@ public abstract class NMSPacketEvent extends PacketEvent implements CallableEven
      */
     public final InetSocketAddress getSocketAddress() {
         return socketAddress;
+    }
+
+    /**
+     * Get the associated player's netty channel.
+     * @return Netty channel
+     */
+    public Object getChannel() {
+        return channel;
     }
 
     /**
