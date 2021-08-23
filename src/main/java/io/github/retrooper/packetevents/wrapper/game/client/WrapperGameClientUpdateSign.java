@@ -43,7 +43,7 @@ public class WrapperGameClientUpdateSign extends PacketWrapper {
             this.blockPosition = new Vector3i(x, y, z);
         }
         for (int i = 0; i < 4; i++) {
-            this.textLines[i] = readString(version, 384);
+            this.textLines[i] = readString(384);
         }
     }
 

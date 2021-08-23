@@ -51,10 +51,10 @@ public class PacketEventsPlugin extends JavaPlugin {
                 ByteBufAbstract byteBuf = event.getByteBuf();
                 if (event.getPacketType() == PacketType.Login.Server.LOGIN_SUCCESS) {
                     //Transition into the GAME connection state
-                    PacketEvents.get().getInjector().changeConnectionState(event.getChannel(), ConnectionState.GAME);
-                    System.out.println("CHANGED STATE TO GAME");
+//                    PacketEvents.get().getInjector().changeConnectionState(event.getChannel(), ConnectionState.GAME);
+  //                  System.out.println("CHANGED STATE TO GAME");
                 } else if (event.getPacketType() == PacketType.Status.Server.PONG) {
-                    WrapperStatusServerPong pong = new WrapperStatusServerPong(ClientVersion.UNKNOWN, byteBuf);
+                    WrapperStatusServerPong pong = new WrapperStatusServerPong(byteBuf);
                     long payload = pong.getTime();
                     System.out.println("PAYLOAD RESPONSE: " + payload);
                 }
@@ -66,15 +66,12 @@ public class PacketEventsPlugin extends JavaPlugin {
                 switch (event.getConnectionState()) {
                     case HANDSHAKING:
                         if (event.getPacketType() == PacketType.Handshaking.Client.HANDSHAKE) {
-                            System.out.println("OK1");
                             WrapperHandshakingClientHandshake handshake = new WrapperHandshakingClientHandshake(event.getClientVersion(), byteBuf);
-                            System.out.println("OK2");
                             //Cache client version
                             PacketEvents.get().getPlayerManager().clientVersions.put(event.getChannel(), handshake.getClientVersion());
                             //Transition into the next connection state
                             PacketEvents.get().getInjector().changeConnectionState(event.getChannel(), handshake.getNextConnectionState());
                             System.out.println("NEXT CONNECTION STATE: " + handshake.getNextConnectionState());
-                            System.out.println("CONFIRM: " + PacketEvents.get().getInjector().getConnectionState(event.getChannel()));
                             System.out.println("USER CONNECTED WITH CLIENT VERSION: " + handshake.getClientVersion().name());
                         }
                         break;
@@ -92,26 +89,24 @@ public class PacketEventsPlugin extends JavaPlugin {
                             WrapperLoginClientLoginStart start = new WrapperLoginClientLoginStart(event.getClientVersion(), byteBuf);
                             //Map the player usernames with their netty channels
                             PacketEvents.get().getPlayerManager().channels.put(start.getUsername(), event.getChannel());
+                            PacketEvents.get().getInjector().changeConnectionState(event.getChannel(), ConnectionState.GAME);
+                            System.out.println("CHANGED STATE TO GAME FROM LOGIN START WRONG");
+                        }
+                        break;
+                    case GAME:
+                        if (event.getPacketType() == PacketType.Game.Client.ANIMATION) {
+                            WrapperGameClientAnimation animation = new WrapperGameClientAnimation(event.getClientVersion(), event.getByteBuf());
+                            Hand hand = animation.getHand();
+                            event.getPlayer().sendMessage("Nice hand: " + hand.name());
+                        } else if (event.getPacketType() == PacketType.Game.Client.CHAT_MESSAGE) {
+                            WrapperGameClientChatMessage chatMessage = new WrapperGameClientChatMessage(event.getClientVersion(), event.getByteBuf());
+                            String msg = chatMessage.getMessage();
+                            event.getPlayer().sendMessage("U SAID: " + msg);
                         }
                         break;
                 }
             }
         });
-/*
-        //Sample listener
-        PacketEvents.get().registerListener(new PacketListenerAbstract() {
-            @Override
-            public void onPacketReceive(PacketReceiveEvent event) {
-                if (event.getPacketType() == PacketType.Game.Client.ANIMATION) {
-                    WrapperGameClientAnimation animation = new WrapperGameClientAnimation(event.getClientVersion(), event.getByteBuf());
-                    Hand hand = animation.getHand();
-                    event.getPlayer().sendMessage("Nice hand: " + hand.name());
-                } else if (event.getPacketType() == PacketType.Game.Client.CHAT_MESSAGE) {
-                    WrapperGameClientChatMessage chatMessage = new WrapperGameClientChatMessage(event.getClientVersion(), event.getByteBuf());
-                    String msg = chatMessage.getMessage();
-                }
-            }
-        });*/
     }
 
     @Override

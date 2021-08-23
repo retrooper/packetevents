@@ -18,6 +18,7 @@
 
 package io.github.retrooper.packetevents.wrapper.login.server;
 
+import io.github.retrooper.packetevents.manager.server.ServerVersion;
 import io.github.retrooper.packetevents.protocol.ConnectionState;
 import io.github.retrooper.packetevents.utils.bytebuf.ByteBufAbstract;
 import io.github.retrooper.packetevents.manager.player.ClientVersion;
@@ -29,10 +30,10 @@ import io.github.retrooper.packetevents.wrapper.PacketWrapper;
 public class WrapperLoginServerDisconnect extends PacketWrapper {
     private final String reason;
 
-    public WrapperLoginServerDisconnect(ClientVersion version, ByteBufAbstract byteBuf) {
-        super(version, byteBuf);
-        int reasonLength = version.isNewerThanOrEquals(ClientVersion.v_1_14) ? 262144 : 32767;
-        this.reason = readString(version, reasonLength);
+    public WrapperLoginServerDisconnect(ByteBufAbstract byteBuf) {
+        super(byteBuf);
+        int reasonLength = getServerVersion().isNewerThanOrEquals(ServerVersion.v_1_14) ? 262144 : 32767;
+        this.reason = readString(reasonLength);
     }
 
     /**

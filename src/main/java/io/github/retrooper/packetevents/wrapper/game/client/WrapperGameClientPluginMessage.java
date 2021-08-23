@@ -15,7 +15,7 @@ public class WrapperGameClientPluginMessage extends PacketWrapper {
 
     public WrapperGameClientPluginMessage(ClientVersion version, ByteBufAbstract byteBuf) {
         super(version, byteBuf);
-        this.channelName = readString(version);
+        this.channelName = readString();
         if (version.isNewerThanOrEquals(ClientVersion.v_1_8)) {
             this.data = readByteArray(byteBuf.readableBytes());
         }

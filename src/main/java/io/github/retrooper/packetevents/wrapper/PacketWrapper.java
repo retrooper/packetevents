@@ -18,6 +18,7 @@
 
 package io.github.retrooper.packetevents.wrapper;
 
+import io.github.retrooper.packetevents.PacketEvents;
 import io.github.retrooper.packetevents.manager.server.ServerVersion;
 import io.github.retrooper.packetevents.utils.bytebuf.ByteBufAbstract;
 import io.github.retrooper.packetevents.manager.player.ClientVersion;
@@ -30,16 +31,29 @@ import java.util.UUID;
 
 
 public class PacketWrapper {
-    protected final ClientVersion version;
+    protected final ClientVersion clientVersion;
+    private static ServerVersion serverVersion;
     protected final ByteBufAbstract byteBuf;
 
-    public PacketWrapper(ClientVersion version, ByteBufAbstract byteBuf) {
-        this.version = version;
+    public PacketWrapper(ClientVersion clientVersion, ByteBufAbstract byteBuf) {
+        this.clientVersion = clientVersion;
+        this.byteBuf = byteBuf;
+    }
+
+    public PacketWrapper(ByteBufAbstract byteBuf) {
+        this.clientVersion = ClientVersion.UNKNOWN;
         this.byteBuf = byteBuf;
     }
 
     public ClientVersion getClientVersion() {
-        return version;
+        return clientVersion;
+    }
+
+    public ServerVersion getServerVersion() {
+        if (serverVersion == null) {
+            serverVersion = PacketEvents.get().getServerManager().getVersion();
+        }
+        return serverVersion;
     }
 
     public ByteBufAbstract getByteBuf() {
@@ -67,20 +81,13 @@ public class PacketWrapper {
         return i;
     }
 
-    public String readString(ClientVersion version) {
-        return readString(version, 32767);
+    public String readString() {
+        return readString(32767);
     }
 
-    public String readString(ServerVersion version) {
-        return readString(version, 32767);
-    }
-
-    public String readString(ClientVersion version, int maxLen) {
-        return readString(version.getProtocolVersion(), maxLen);
-    }
-
-    public String readString(ServerVersion version, int maxLen) {
-        return readString(version.getProtocolVersion(), maxLen);
+    public String readString(int maxLen) {
+        int protocolVersion = (clientVersion != ClientVersion.UNKNOWN) ? clientVersion.getProtocolVersion() : getServerVersion().getProtocolVersion();
+        return readString(protocolVersion, maxLen);
     }
 
     public String readString(int protocolVersion, int maxLen) {
@@ -103,8 +110,7 @@ public class PacketWrapper {
             byte[] bytes;
             if (bb.hasArray()) {
                 bytes = bb.array();
-            }
-            else {
+            } else {
                 bytes = new byte[bb.readableBytes()];
                 bb.getBytes(bb.readerIndex(), bytes);
             }

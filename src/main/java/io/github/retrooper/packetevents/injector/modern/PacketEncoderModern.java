@@ -20,6 +20,10 @@ package io.github.retrooper.packetevents.injector.modern;
 
 import io.github.retrooper.packetevents.PacketEvents;
 import io.github.retrooper.packetevents.event.impl.PacketSendEvent;
+import io.github.retrooper.packetevents.manager.player.ClientVersion;
+import io.github.retrooper.packetevents.utils.bytebuf.ByteBufModern;
+import io.github.retrooper.packetevents.utils.wrapper.PacketWrapperUtils;
+import io.github.retrooper.packetevents.wrapper.PacketWrapper;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelPromise;
@@ -34,16 +38,15 @@ public class PacketEncoderModern extends MessageToByteEncoder<ByteBuf> {
 
     @Override
     protected void encode(ChannelHandlerContext ctx, ByteBuf bb, ByteBuf byteBuf) throws Exception {
-        /*int firstReaderIndex = bb.readerIndex();
-        PacketEncodeEvent packetEncodeEvent = new PacketEncodeEvent(ctx.channel(), player, bb);
+        int firstReaderIndex = bb.readerIndex();
+        PacketSendEvent packetSendEvent = new PacketSendEvent(ctx.channel(), player, bb);
         int readerIndex = bb.readerIndex();
-        PacketEvents.get().getEventManager().callEvent(packetEncodeEvent, () -> {
+        PacketEvents.get().getEventManager().callEvent(packetSendEvent, () -> {
             bb.readerIndex(readerIndex);
         });
-        bb.readerIndex(firstReaderIndex);
 
-        byte[] buffer = getBytes(bb, bb.readableBytes());
-        writeBytes(byteBuf, buffer, 0);*/
+        bb.readerIndex(firstReaderIndex);
+        byteBuf.writeBytes(bb);
     }
 
 
@@ -60,11 +63,21 @@ public class PacketEncoderModern extends MessageToByteEncoder<ByteBuf> {
 
         ctx.write(bb);
      */
-    @Override
-    public void write(ChannelHandlerContext ctx, Object msg, ChannelPromise promise) throws Exception {
-        ByteBuf bb = (ByteBuf) msg;
+ //   @Override
+   // public void write(ChannelHandlerContext ctx, Object msg, ChannelPromise promise) throws Exception {
+        /*ByteBuf bb = (ByteBuf) msg;
+        int firstReaderIndex = bb.readerIndex();
+        PacketSendEvent packetSendEvent = new PacketSendEvent(ctx.channel(), player, bb);
+        int readerIndex = bb.readerIndex();
+        PacketEvents.get().getEventManager().callEvent(packetSendEvent, () -> {
+            bb.readerIndex(readerIndex);
+        });
+
+        bb.readerIndex(firstReaderIndex);
+
         ctx.write(bb);
-    }
+*/
+    //}
 
 
     @Override

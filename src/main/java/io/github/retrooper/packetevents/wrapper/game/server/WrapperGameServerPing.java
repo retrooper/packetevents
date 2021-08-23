@@ -30,8 +30,8 @@ import io.github.retrooper.packetevents.wrapper.PacketWrapper;
  */
 public class WrapperGameServerPing extends PacketWrapper {
     private final int id;
-    public WrapperGameServerPing(ClientVersion version, ByteBufAbstract byteBuf) {
-        super(version, byteBuf);
+    public WrapperGameServerPing(ByteBufAbstract byteBuf) {
+        super(byteBuf);
         this.id = readInt();
     }
 

@@ -18,6 +18,7 @@
 
 package io.github.retrooper.packetevents.wrapper.login.server;
 
+import io.github.retrooper.packetevents.manager.server.ServerVersion;
 import io.github.retrooper.packetevents.protocol.ConnectionState;
 import io.github.retrooper.packetevents.utils.bytebuf.ByteBufAbstract;
 import io.github.retrooper.packetevents.manager.player.ClientVersion;
@@ -31,9 +32,9 @@ import java.util.UUID;
 public class WrapperLoginServerLoginSuccess extends PacketWrapper {
     private final UUID uuid;
     private final String username;
-    public WrapperLoginServerLoginSuccess(ClientVersion version, ByteBufAbstract byteBuf) {
-        super(version, byteBuf);
-        if (version.isNewerThanOrEquals(ClientVersion.v_1_16)) {
+    public WrapperLoginServerLoginSuccess(ByteBufAbstract byteBuf) {
+        super(byteBuf);
+            if (getServerVersion().isNewerThanOrEquals(ServerVersion.v_1_16)) {
             int[] data = new int[4];
             for (int i = 0; i < 4; i++) {
                 data[i] = readInt();
@@ -41,9 +42,9 @@ public class WrapperLoginServerLoginSuccess extends PacketWrapper {
             this.uuid = convertToUUID(data);
         }
         else {
-            this.uuid = UUID.fromString(readString(version, 36));
+            this.uuid = UUID.fromString(readString(36));
         }
-        this.username = readString(version, 16);
+        this.username = readString(16);
     }
 
     private UUID convertToUUID(int[] data) {

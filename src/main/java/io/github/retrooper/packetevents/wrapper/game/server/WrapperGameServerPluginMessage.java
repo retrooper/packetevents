@@ -18,6 +18,7 @@
 
 package io.github.retrooper.packetevents.wrapper.game.server;
 
+import io.github.retrooper.packetevents.manager.server.ServerVersion;
 import io.github.retrooper.packetevents.utils.bytebuf.ByteBufAbstract;
 import io.github.retrooper.packetevents.manager.player.ClientVersion;
 import io.github.retrooper.packetevents.wrapper.PacketWrapper;
@@ -31,10 +32,10 @@ public class WrapperGameServerPluginMessage extends PacketWrapper {
     private final String channelName;
     private final byte[] data;
 
-    public WrapperGameServerPluginMessage(ClientVersion version, ByteBufAbstract byteBuf) {
-        super(version, byteBuf);
-        this.channelName = readString(version);
-        if (version.isNewerThanOrEquals(ClientVersion.v_1_8)) {
+    public WrapperGameServerPluginMessage(ByteBufAbstract byteBuf) {
+        super(byteBuf);
+        this.channelName = readString();
+        if (getServerVersion().isNewerThanOrEquals(ServerVersion.v_1_8)) {
             this.data = readByteArray(byteBuf.readableBytes());
         }
         else {

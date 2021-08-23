@@ -18,15 +18,14 @@
 
 package io.github.retrooper.packetevents.wrapper.status.server;
 
-import io.github.retrooper.packetevents.manager.player.ClientVersion;
 import io.github.retrooper.packetevents.utils.bytebuf.ByteBufAbstract;
 import io.github.retrooper.packetevents.wrapper.PacketWrapper;
 
 public class WrapperStatusServerPong extends PacketWrapper {
     private final long time;
 
-    public WrapperStatusServerPong(ClientVersion version, ByteBufAbstract byteBuf) {
-        super(version, byteBuf);
+    public WrapperStatusServerPong(ByteBufAbstract byteBuf) {
+        super(byteBuf);
         this.time = readLong();
     }
 

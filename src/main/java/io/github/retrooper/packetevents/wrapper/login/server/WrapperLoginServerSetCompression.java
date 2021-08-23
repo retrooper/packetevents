@@ -25,8 +25,8 @@ import io.github.retrooper.packetevents.wrapper.PacketWrapper;
 public class WrapperLoginServerSetCompression extends PacketWrapper {
     private final int threshold;
 
-    public WrapperLoginServerSetCompression(ClientVersion version, ByteBufAbstract byteBuf) {
-        super(version, byteBuf);
+    public WrapperLoginServerSetCompression(ByteBufAbstract byteBuf) {
+        super(byteBuf);
         this.threshold = readVarInt();
     }
 

@@ -140,21 +140,22 @@ public final class PacketType {
         public enum Server implements PacketTypeCommon {
             DISCONNECT,
             ENCRYPTION_REQUEST,
-            LOGIN_SUCCESS;
+            LOGIN_SUCCESS,
+            SET_COMPRESSION;
 
             @Nullable
             public static PacketTypeCommon getById(int packetID) {
-                if (packetID == 0) {
-                    return DISCONNECT;
-                }
-                else if (packetID == 1) {
-                    return ENCRYPTION_REQUEST;
-                }
-                else if (packetID == 2) {
-                    return LOGIN_SUCCESS;
-                }
-                else {
-                    return null;
+                switch (packetID) {
+                    case 0:
+                        return DISCONNECT;
+                    case 1:
+                        return ENCRYPTION_REQUEST;
+                    case 2:
+                        return LOGIN_SUCCESS;
+                    case 3:
+                        return SET_COMPRESSION;
+                    default:
+                        return null;
                 }
             }
         }

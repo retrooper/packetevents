@@ -26,11 +26,11 @@ import org.bukkit.entity.Player;
 
 public class PacketSendEvent extends ProtocolPacketEvent {
    public PacketSendEvent(Object channel, Player player, ByteBufAbstract byteBuf) {
-        super(PacketSide.SERVER, channel, player, byteBuf, false);
+        super(PacketSide.SERVER, channel, player, byteBuf, true);
     }
 
     public PacketSendEvent(Object channel, Player player, Object rawByteBuf) {
-        super(PacketSide.SERVER, channel, player, rawByteBuf, false);
+        super(PacketSide.SERVER, channel, player, rawByteBuf, true);
     }
 
     @Override
