@@ -32,7 +32,11 @@ import io.github.retrooper.packetevents.wrapper.handshaking.client.WrapperHandsh
 import io.github.retrooper.packetevents.wrapper.login.client.WrapperLoginClientLoginStart;
 import io.github.retrooper.packetevents.wrapper.status.client.WrapperStatusClientPing;
 import io.github.retrooper.packetevents.wrapper.status.server.WrapperStatusServerPong;
+import io.netty.channel.Channel;
+import io.netty.channel.ChannelHandler;
 import org.bukkit.plugin.java.JavaPlugin;
+
+import java.util.Arrays;
 
 public class PacketEventsPlugin extends JavaPlugin {
     @Override
@@ -51,7 +55,7 @@ public class PacketEventsPlugin extends JavaPlugin {
                 ByteBufAbstract byteBuf = event.getByteBuf();
                 if (event.getPacketType() == PacketType.Login.Server.LOGIN_SUCCESS) {
                     //Transition into the GAME connection state
-                    PacketEvents.get().getInjector().changeConnectionState(event.getChannel(), ConnectionState.GAME);
+                    PacketEvents.get().getInjector().changeConnectionState(event.getChannel().rawChannel(), ConnectionState.GAME);
                     System.out.println("CHANGED CONNECTION STATE TO GAME");
                 } else if (event.getPacketType() == PacketType.Status.Server.PONG) {
                     WrapperStatusServerPong pong = new WrapperStatusServerPong(byteBuf);
@@ -68,9 +72,9 @@ public class PacketEventsPlugin extends JavaPlugin {
                         if (event.getPacketType() == PacketType.Handshaking.Client.HANDSHAKE) {
                             WrapperHandshakingClientHandshake handshake = new WrapperHandshakingClientHandshake(event.getClientVersion(), byteBuf);
                             //Cache client version
-                            PacketEvents.get().getPlayerManager().clientVersions.put(event.getChannel(), handshake.getClientVersion());
+                            PacketEvents.get().getPlayerManager().clientVersions.put(event.getChannel().rawChannel(), handshake.getClientVersion());
                             //Transition into the next connection state
-                            PacketEvents.get().getInjector().changeConnectionState(event.getChannel(), handshake.getNextConnectionState());
+                            PacketEvents.get().getInjector().changeConnectionState(event.getChannel().rawChannel(), handshake.getNextConnectionState());
                             System.out.println("NEXT CONNECTION STATE: " + handshake.getNextConnectionState());
                             System.out.println("USER CONNECTED WITH CLIENT VERSION: " + handshake.getClientVersion().name());
                         }
@@ -88,7 +92,17 @@ public class PacketEventsPlugin extends JavaPlugin {
                         if (event.getPacketType() == PacketType.Login.Client.LOGIN_START) {
                             WrapperLoginClientLoginStart start = new WrapperLoginClientLoginStart(event.getClientVersion(), byteBuf);
                             //Map the player usernames with their netty channels
-                            PacketEvents.get().getPlayerManager().channels.put(start.getUsername(), event.getChannel());
+                            PacketEvents.get().getPlayerManager().channels.put(start.getUsername(), event.getChannel().rawChannel());
+                            //TODO Work on this, this is just some random testing, please note these links
+                            //TODO https://wiki.vg/Protocol#Without_compression https://wiki.vg/Protocol#With_compression
+                            System.out.println("CHANNEL PIPELINE NAMES: " + Arrays.toString(event.getChannel().pipeline().names().stream().toArray()));
+                            Channel nettyChannel = (Channel) event.getChannel().rawChannel();
+                            if (nettyChannel.pipeline().get("decompress") != null) {
+                                ChannelHandler handler = nettyChannel.pipeline().remove(PacketEvents.get().decoderName);
+                                nettyChannel.pipeline().addAfter("decompress", PacketEvents.get().decoderName, handler);
+                                System.out.println("EDITED CHANNEL PIPELINE NAMES: " + Arrays.toString(nettyChannel.pipeline().names().stream().toArray()));
+                            }
+
                         }
                         break;
                     case GAME:

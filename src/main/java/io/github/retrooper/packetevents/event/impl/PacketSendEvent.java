@@ -22,10 +22,11 @@ import io.github.retrooper.packetevents.event.PacketListenerAbstract;
 import io.github.retrooper.packetevents.event.ProtocolPacketEvent;
 import io.github.retrooper.packetevents.protocol.PacketSide;
 import io.github.retrooper.packetevents.utils.bytebuf.ByteBufAbstract;
+import io.github.retrooper.packetevents.utils.channel.ChannelAbstract;
 import org.bukkit.entity.Player;
 
 public class PacketSendEvent extends ProtocolPacketEvent {
-   public PacketSendEvent(Object channel, Player player, ByteBufAbstract byteBuf) {
+   public PacketSendEvent(ChannelAbstract channel, Player player, ByteBufAbstract byteBuf) {
         super(PacketSide.SERVER, channel, player, byteBuf, true);
     }
 

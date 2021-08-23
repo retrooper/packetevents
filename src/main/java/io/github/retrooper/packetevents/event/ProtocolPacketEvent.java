@@ -27,7 +27,7 @@ import io.github.retrooper.packetevents.protocol.PacketSide;
 import io.github.retrooper.packetevents.protocol.PacketType;
 import io.github.retrooper.packetevents.protocol.PacketTypeCommon;
 import io.github.retrooper.packetevents.utils.bytebuf.ByteBufAbstract;
-import io.github.retrooper.packetevents.utils.channel.ChannelUtils;
+import io.github.retrooper.packetevents.utils.channel.ChannelAbstract;
 import io.github.retrooper.packetevents.utils.wrapper.PacketWrapperUtils;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.Nullable;
@@ -35,7 +35,7 @@ import org.jetbrains.annotations.Nullable;
 import java.net.InetSocketAddress;
 
 public abstract class ProtocolPacketEvent extends PacketEvent implements PlayerEvent, CancellableEvent {
-    private final Object channel;
+    private final ChannelAbstract channel;
     private final InetSocketAddress socketAddress;
     private final Player player;
 
@@ -50,18 +50,18 @@ public abstract class ProtocolPacketEvent extends PacketEvent implements PlayerE
     private boolean cancel;
 
     public ProtocolPacketEvent(PacketSide packetSide, Object channel, Player player, Object rawByteBuf, boolean ignoreBufferLength) {
-        this(packetSide, channel, player, ByteBufAbstract.generate(rawByteBuf), ignoreBufferLength);
+        this(packetSide, ChannelAbstract.generate(channel), player, ByteBufAbstract.generate(rawByteBuf), ignoreBufferLength);
     }
 
 
-    public ProtocolPacketEvent(PacketSide packetSide, Object channel, Player player, ByteBufAbstract byteBuf, boolean ignoreBufferLength) {
+    public ProtocolPacketEvent(PacketSide packetSide, ChannelAbstract channel, Player player, ByteBufAbstract byteBuf, boolean ignoreBufferLength) {
         this.channel = channel;
-        this.socketAddress = ChannelUtils.getSocketAddress(channel);
+        this.socketAddress = (InetSocketAddress) channel.remoteAddress();
         this.player = player;
 
-        this.connectionState = PacketEvents.get().getInjector().getConnectionState(channel);
+        this.connectionState = PacketEvents.get().getInjector().getConnectionState(channel.rawChannel());
 
-        ClientVersion version = PacketEvents.get().getPlayerManager().clientVersions.get(channel);
+        ClientVersion version = PacketEvents.get().getPlayerManager().clientVersions.get(channel.rawChannel());
         if (version == null) {
             if (player != null) {
                 //Possibly ask a soft-dependency(for example, ViaVersion) for the client version.
@@ -84,7 +84,7 @@ public abstract class ProtocolPacketEvent extends PacketEvent implements PlayerE
         this.packetType = PacketType.getById(packetSide, connectionState, clientVersion, packetID);
     }
 
-    public Object getChannel() {
+    public ChannelAbstract getChannel() {
         return channel;
     }
 

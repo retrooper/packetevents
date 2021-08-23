@@ -16,15 +16,23 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package io.github.retrooper.packetevents.utils.channel;
+package io.github.retrooper.packetevents.utils.channel.pipeline;
 
-import io.netty.channel.Channel;
+import io.github.retrooper.packetevents.utils.nms.MinecraftReflection;
 
-import java.net.InetSocketAddress;
-
-public final class ChannelUtils8 {
-    public static InetSocketAddress getSocketAddress(Object ch) {
-        Channel channel = (Channel) ch;
-        return ((InetSocketAddress) channel.remoteAddress());
+import java.util.List;
+//TODO Complete
+public interface ChannelPipelineAbstract {
+    static ChannelPipelineAbstract generate(Object rawChannelPipeline) {
+        if (MinecraftReflection.USE_MODERN_NETTY_PACKAGE) {
+            return new ChannelPipelineModern(rawChannelPipeline);
+        }
+        else {
+            return new ChannelPipelineLegacy(rawChannelPipeline);
+        }
     }
+
+    Object rawChannelPipeline();
+
+    List<String> names();
 }

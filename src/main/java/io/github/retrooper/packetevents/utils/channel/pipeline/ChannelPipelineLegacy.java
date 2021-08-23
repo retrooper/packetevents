@@ -16,22 +16,25 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package io.github.retrooper.packetevents.utils.channel;
+package io.github.retrooper.packetevents.utils.channel.pipeline;
 
-import io.github.retrooper.packetevents.PacketEvents;
-import io.github.retrooper.packetevents.manager.server.ServerVersion;
+import net.minecraft.util.io.netty.channel.ChannelPipeline;
 
-import java.net.InetSocketAddress;
+import java.util.List;
 
-public final class ChannelUtils {
-    public static InetSocketAddress getSocketAddress(Object ch) {
-        if (ch == null) {
-            return null;
-        }
-        if (PacketEvents.get().getServerManager().getVersion() == ServerVersion.v_1_7_10) {
-            return ChannelUtils7.getSocketAddress(ch);
-        } else {
-            return ChannelUtils8.getSocketAddress(ch);
-        }
+public class ChannelPipelineLegacy implements ChannelPipelineAbstract {
+    private final ChannelPipeline pipeline;
+    public ChannelPipelineLegacy(Object rawChannelPipeline) {
+        this.pipeline = (ChannelPipeline) rawChannelPipeline;
+    }
+
+    @Override
+    public Object rawChannelPipeline() {
+        return pipeline;
+    }
+
+    @Override
+    public List<String> names() {
+        return pipeline.names();
     }
 }

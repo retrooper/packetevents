@@ -21,15 +21,13 @@ package io.github.retrooper.packetevents.injector.modern;
 import io.github.retrooper.packetevents.PacketEvents;
 import io.github.retrooper.packetevents.event.impl.PacketReceiveEvent;
 import io.github.retrooper.packetevents.protocol.ConnectionState;
-import io.github.retrooper.packetevents.utils.bytebuf.ByteBufModern;
-import io.github.retrooper.packetevents.utils.wrapper.PacketWrapperUtils;
 import io.netty.buffer.ByteBuf;
+import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
-import io.netty.handler.codec.ByteToMessageDecoder;
 import org.bukkit.entity.Player;
-import java.util.List;
 
+@ChannelHandler.Sharable
 public class PacketDecoderModern extends ChannelInboundHandlerAdapter {
     public volatile Player player;
     public ConnectionState connectionState = ConnectionState.HANDSHAKING;
@@ -51,6 +49,7 @@ public class PacketDecoderModern extends ChannelInboundHandlerAdapter {
                byteBuf.skipBytes(byteBuf.readableBytes());
                return;
            }*/
+
 
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {

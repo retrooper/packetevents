@@ -23,7 +23,7 @@ import io.github.retrooper.packetevents.event.PacketEvent;
 import io.github.retrooper.packetevents.event.PacketListenerAbstract;
 import io.github.retrooper.packetevents.event.type.CancellableEvent;
 import io.github.retrooper.packetevents.event.type.PlayerEvent;
-import io.github.retrooper.packetevents.utils.channel.ChannelUtils;
+import io.github.retrooper.packetevents.utils.channel.ChannelAbstract;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.Nullable;
 
@@ -38,6 +38,7 @@ import java.net.InetSocketAddress;
  * @see <a href="https://github.com/retrooper/packetevents/blob/dev/src/main/java/io/github/retrooper/packetevents/handler/PacketHandlerInternal.java">https://github.com/retrooper/packetevents/blob/dev/src/main/java/io/github/retrooper/packetevents/handler/PacketHandlerInternal.java</a>
  * @since 1.6.9
  */
+//TODO Recode this event, looks questionable :0
 public final class PlayerInjectEvent extends PacketEvent implements CancellableEvent, PlayerEvent {
     private final Player player;
     private final InetSocketAddress address;
@@ -45,7 +46,8 @@ public final class PlayerInjectEvent extends PacketEvent implements CancellableE
 
     public PlayerInjectEvent(final Player player) {
         this.player = player;
-        this.address = ChannelUtils.getSocketAddress(PacketEvents.get().getPlayerManager().getChannel(player));
+        ChannelAbstract channelAbstract = ChannelAbstract.generate(PacketEvents.get().getPlayerManager().getChannel(player));
+        this.address = (InetSocketAddress) channelAbstract.remoteAddress();
     }
 
     @Override

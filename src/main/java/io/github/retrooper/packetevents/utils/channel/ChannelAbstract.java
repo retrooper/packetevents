@@ -18,13 +18,33 @@
 
 package io.github.retrooper.packetevents.utils.channel;
 
-import net.minecraft.util.io.netty.channel.Channel;
 
-import java.net.InetSocketAddress;
+import io.github.retrooper.packetevents.utils.channel.pipeline.ChannelPipelineAbstract;
+import io.github.retrooper.packetevents.utils.nms.MinecraftReflection;
 
-public final class ChannelUtils7 {
-    public static InetSocketAddress getSocketAddress(Object ch) {
-        Channel channel = (Channel) ch;
-        return ((InetSocketAddress) channel.remoteAddress());
+import java.net.SocketAddress;
+
+public interface ChannelAbstract {
+    static ChannelAbstract generate(Object rawChannel) {
+        if (MinecraftReflection.USE_MODERN_NETTY_PACKAGE) {
+            return new ChannelModern(rawChannel);
+        }
+        else {
+            return new ChannelLegacy(rawChannel);
+        }
     }
+    Object rawChannel();
+
+    boolean isOpen();
+
+    boolean isRegistered();
+
+    boolean isActive();
+
+    SocketAddress localAddress();
+    SocketAddress remoteAddress();
+
+    boolean isWritable();
+
+    ChannelPipelineAbstract pipeline();
 }

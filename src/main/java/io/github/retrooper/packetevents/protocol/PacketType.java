@@ -141,6 +141,7 @@ public final class PacketType {
             DISCONNECT,
             ENCRYPTION_REQUEST,
             LOGIN_SUCCESS,
+            //Added in 1.8
             SET_COMPRESSION;
 
             @Nullable
