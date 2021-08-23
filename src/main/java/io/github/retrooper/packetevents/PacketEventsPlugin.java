@@ -51,8 +51,8 @@ public class PacketEventsPlugin extends JavaPlugin {
                 ByteBufAbstract byteBuf = event.getByteBuf();
                 if (event.getPacketType() == PacketType.Login.Server.LOGIN_SUCCESS) {
                     //Transition into the GAME connection state
-//                    PacketEvents.get().getInjector().changeConnectionState(event.getChannel(), ConnectionState.GAME);
-  //                  System.out.println("CHANGED STATE TO GAME");
+                    PacketEvents.get().getInjector().changeConnectionState(event.getChannel(), ConnectionState.GAME);
+                    System.out.println("CHANGED CONNECTION STATE TO GAME");
                 } else if (event.getPacketType() == PacketType.Status.Server.PONG) {
                     WrapperStatusServerPong pong = new WrapperStatusServerPong(byteBuf);
                     long payload = pong.getTime();
@@ -89,8 +89,6 @@ public class PacketEventsPlugin extends JavaPlugin {
                             WrapperLoginClientLoginStart start = new WrapperLoginClientLoginStart(event.getClientVersion(), byteBuf);
                             //Map the player usernames with their netty channels
                             PacketEvents.get().getPlayerManager().channels.put(start.getUsername(), event.getChannel());
-                            PacketEvents.get().getInjector().changeConnectionState(event.getChannel(), ConnectionState.GAME);
-                            System.out.println("CHANGED STATE TO GAME FROM LOGIN START WRONG");
                         }
                         break;
                     case GAME:
