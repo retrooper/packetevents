@@ -33,7 +33,6 @@ import org.bukkit.entity.Player;
 
 import java.util.Arrays;
 
-@ChannelHandler.Sharable
 public class PacketEncoderModern extends MessageToByteEncoder<ByteBuf> {
     public volatile Player player;
 
@@ -65,6 +64,8 @@ public class PacketEncoderModern extends MessageToByteEncoder<ByteBuf> {
         ctx.write(bb);
 
     }*/
+
+
 
 
     @Override
