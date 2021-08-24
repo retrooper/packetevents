@@ -55,9 +55,8 @@ public class PacketEventsPlugin extends JavaPlugin {
             public void onPacketSend(PacketSendEvent event) {
                 ByteBufAbstract byteBuf = event.getByteBuf();
                 if (event.getPacketType() == PacketType.Login.Server.LOGIN_SUCCESS) {
-                    //Transition into the GAME connection state
-                    PacketEvents.get().getInjector().changeConnectionState(event.getChannel().rawChannel(), ConnectionState.GAME);
-                    System.out.println("CHANGED CONNECTION STATE TO GAME");
+                    //TODO Transition into the GAME connection state
+
                 } else if (event.getPacketType() == PacketType.Status.Server.PONG) {
                     WrapperStatusServerPong pong = new WrapperStatusServerPong(byteBuf);
                     long payload = pong.getTime();
@@ -94,6 +93,9 @@ public class PacketEventsPlugin extends JavaPlugin {
                             WrapperLoginClientLoginStart start = new WrapperLoginClientLoginStart(event.getClientVersion(), byteBuf);
                             //Map the player usernames with their netty channels
                             PacketEvents.get().getPlayerManager().channels.put(start.getUsername(), event.getChannel().rawChannel());
+                            //TODO Remove transition here
+                            PacketEvents.get().getInjector().changeConnectionState(event.getChannel().rawChannel(), ConnectionState.GAME);
+                            System.out.println("CHANGED CONNECTION STATE TO GAME");
                         }
                         break;
                     case GAME:
@@ -104,7 +106,9 @@ public class PacketEventsPlugin extends JavaPlugin {
                         } else if (event.getPacketType() == PacketType.Game.Client.CHAT_MESSAGE) {
                             WrapperGameClientChatMessage chatMessage = new WrapperGameClientChatMessage(event.getClientVersion(), event.getByteBuf());
                             String msg = chatMessage.getMessage();
-                            event.getPlayer().sendMessage("U SAID: " + msg);
+                            if (event.getPlayer() != null) {
+                                event.getPlayer().sendMessage("U SAID: " + msg);
+                            }
                         }
                         break;
                 }

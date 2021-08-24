@@ -27,8 +27,7 @@ public class WrapperLoginClientLoginStart extends PacketWrapper {
 
     public WrapperLoginClientLoginStart(ClientVersion version, ByteBufAbstract byteBuf) {
         super(version, byteBuf);
-        this.username = readString(23);//16
-        System.out.println("USERNAME: " + username);
+        this.username = readString(16);
     }
 
     public String getUsername() {
