@@ -55,7 +55,9 @@ public class PacketEventsPlugin extends JavaPlugin {
             public void onPacketSend(PacketSendEvent event) {
                 ByteBufAbstract byteBuf = event.getByteBuf();
                 if (event.getPacketType() == PacketType.Login.Server.LOGIN_SUCCESS) {
-                    //TODO Transition into the GAME connection state
+                    //Transition into the GAME connection state
+                    PacketEvents.get().getInjector().changeConnectionState(event.getChannel().rawChannel(), ConnectionState.GAME);
+                    System.out.println("CHANGED CONNECTION STATE TO GAME");
 
                 } else if (event.getPacketType() == PacketType.Status.Server.PONG) {
                     WrapperStatusServerPong pong = new WrapperStatusServerPong(byteBuf);
@@ -93,9 +95,6 @@ public class PacketEventsPlugin extends JavaPlugin {
                             WrapperLoginClientLoginStart start = new WrapperLoginClientLoginStart(event.getClientVersion(), byteBuf);
                             //Map the player usernames with their netty channels
                             PacketEvents.get().getPlayerManager().channels.put(start.getUsername(), event.getChannel().rawChannel());
-                            //TODO Remove transition here
-                            PacketEvents.get().getInjector().changeConnectionState(event.getChannel().rawChannel(), ConnectionState.GAME);
-                            System.out.println("CHANGED CONNECTION STATE TO GAME");
                         }
                         break;
                     case GAME:

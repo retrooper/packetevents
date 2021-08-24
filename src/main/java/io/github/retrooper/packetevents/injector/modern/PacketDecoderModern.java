@@ -31,10 +31,6 @@ public class PacketDecoderModern extends ChannelInboundHandlerAdapter {
     public volatile Player player;
     public ConnectionState connectionState = ConnectionState.HANDSHAKING;
 
-    public PacketDecoderModern() {
-
-    }
-
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
         ByteBuf byteBuf = (ByteBuf) msg;
