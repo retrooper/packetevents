@@ -151,6 +151,14 @@ public class PacketWrapper {
         return byteBuf.readLong();
     }
 
+    public double readFloat() {
+        return byteBuf.readFloat();
+    }
+
+    public double readDouble() {
+        return byteBuf.readDouble();
+    }
+
     public boolean readBoolean() {
         return byteBuf.readBoolean();
     }
