@@ -36,54 +36,15 @@ import java.util.Arrays;
 @ChannelHandler.Sharable
 public class PacketEncoderModern extends MessageToByteEncoder<ByteBuf> {
     public volatile Player player;
-    public boolean handleCompression = false;
-    public boolean inGameState = false;
 
     @Override
     protected void encode(ChannelHandlerContext ctx, ByteBuf bb, ByteBuf byteBuf) throws Exception {
         int firstReaderIndex = bb.readerIndex();
-        /*
         PacketSendEvent packetSendEvent = new PacketSendEvent(ctx.channel(), player, bb);
         int readerIndex = bb.readerIndex();
         PacketEvents.get().getEventManager().callEvent(packetSendEvent, () -> {
             bb.readerIndex(readerIndex);
         });
-        */
-        String before = Arrays.toString(ctx.channel().pipeline().names().stream().toArray());
-        if (!this.handleCompression && ctx.channel().pipeline().get("compress") != null) {
-            System.out.println("ENCODER CHANNEL PIPELINE NAMES BEFORE: " + before);
-            ctx.channel().pipeline().remove(PacketEvents.get().encoderName);
-            this.handleCompression = true;
-            ctx.channel().pipeline().addAfter("compress", PacketEvents.get().encoderName, this);
-            System.out.println("ENCODER EDITED CHANNEL PIPELINE NAMES: " + Arrays.toString(ctx.channel().pipeline().names().stream().toArray()));
-        }
-
-        if (!inGameState && handleCompression) {
-            ConnectionState connectionState = PacketEvents.get().getInjector().getConnectionState(ctx.channel());
-            if (connectionState == ConnectionState.GAME) {
-                inGameState = true;
-            }
-        }
-
-        if (!inGameState) {
-            PacketSendEvent packetSendEvent = new PacketSendEvent(ctx.channel(), player, bb, !this.handleCompression);
-            int readerIndex = bb.readerIndex();
-            PacketEvents.get().getEventManager().callEvent(packetSendEvent, () -> {
-                bb.readerIndex(readerIndex);
-            });
-        } else {
-            //TODO Debug how to read the packets, i believe some packets are compressed and some aren't, we need to detect this.
-            PacketWrapper wrapper = PacketWrapper.createUniversalPacketWrapper(new ByteBufModern(bb));
-            int first = wrapper.readVarInt();
-            if (first != 0) {
-                int second = wrapper.readVarInt();
-                System.out.println("FIRST: " + first + ", SECOND: " + second);
-            }
-            else {
-                System.out.println("ONE AND ONLY: " + first);
-            }
-
-        }
         bb.readerIndex(firstReaderIndex);
         byteBuf.writeBytes(bb);
     }
