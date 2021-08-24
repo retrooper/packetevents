@@ -26,19 +26,18 @@ import java.util.Arrays;
 public class PacketCompressionHandlerModern extends ChannelDuplexHandler {
     @Override
     public void write(ChannelHandlerContext ctx, Object msg, ChannelPromise promise) throws Exception {
-        ctx.write(msg);
-
+        ctx.write(msg, promise);
         if (msg.getClass().getSimpleName().equals("PacketLoginOutSetCompression")) {
             System.out.println("GOT: " + msg.getClass().getSimpleName());
             System.out.println("PIPELINE: " + Arrays.toString(ctx.pipeline().names().toArray(new String[0])));
             if (ctx.pipeline().get("decompress") != null) {
-                String decoderName = PacketEvents.get().decoderName;;
+                String decoderName = PacketEvents.get().decoderName;
                 ChannelHandler handler = ctx.pipeline().remove(decoderName);
                 ctx.pipeline().addAfter("decompress", decoderName, handler);
                 System.out.println("Added our handler after decompress: " + Arrays.toString(ctx.pipeline().names().toArray(new String[0])));
-            }
-            else {
+            } else {
                 System.out.println("what");
+
             }
         }
     }
