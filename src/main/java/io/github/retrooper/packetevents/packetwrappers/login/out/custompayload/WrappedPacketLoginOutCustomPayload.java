@@ -40,6 +40,12 @@ public class WrappedPacketLoginOutCustomPayload extends WrappedPacket implements
         super(packet);
     }
 
+    public WrappedPacketLoginOutCustomPayload(int messageID, String channelName, byte[] data) {
+        this.messageID = messageID;
+        this.channelName = channelName;
+        this.data = data;
+    }
+
     @Override
     protected void load() {
         v_1_17 = version.isNewerThanOrEquals(ServerVersion.v_1_17);
