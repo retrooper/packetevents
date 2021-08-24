@@ -21,17 +21,22 @@ package io.github.retrooper.packetevents.injector.modern;
 import io.github.retrooper.packetevents.PacketEvents;
 import io.github.retrooper.packetevents.event.impl.PacketReceiveEvent;
 import io.github.retrooper.packetevents.protocol.ConnectionState;
+import io.github.retrooper.packetevents.utils.bytebuf.ByteBufModern;
+import io.github.retrooper.packetevents.utils.wrapper.PacketWrapperUtils;
 import io.netty.buffer.ByteBuf;
+import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 import org.bukkit.entity.Player;
 
+import java.util.Arrays;
+
 @ChannelHandler.Sharable
 public class PacketDecoderModern extends ChannelInboundHandlerAdapter {
     public volatile Player player;
     public ConnectionState connectionState = ConnectionState.HANDSHAKING;
-
+    public boolean decompressHandlerPresent = false;
 
     public PacketDecoderModern() {
 
@@ -54,14 +59,30 @@ public class PacketDecoderModern extends ChannelInboundHandlerAdapter {
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
         ByteBuf byteBuf = (ByteBuf) msg;
+        //TODO Work on this, this is just some random testing, please note these links
+        //TODO https://wiki.vg/Protocol#Without_compression https://wiki.vg/Protocol#With_compression
+        String before = Arrays.toString(ctx.channel().pipeline().names().stream().toArray());
+        if (!decompressHandlerPresent && ctx.channel().pipeline().get("decompress") != null) {
+            System.out.println("DECODER CHANNEL PIPELINE NAMES BEFORE: " + before);
+            ctx.channel().pipeline().remove(PacketEvents.get().decoderName);
+            decompressHandlerPresent = true;
+            ctx.channel().pipeline().addAfter("decompress", PacketEvents.get().decoderName, this);
+            System.out.println("DECODER EDITED CHANNEL PIPELINE NAMES: " + Arrays.toString(ctx.channel().pipeline().names().stream().toArray()));
+        }
         int firstReaderIndex = byteBuf.readerIndex();
-        PacketReceiveEvent packetReceiveEvent = new PacketReceiveEvent(ctx.channel(), player, byteBuf);
-        int readerIndex = byteBuf.readerIndex();
-        PacketEvents.get().getEventManager().callEvent(packetReceiveEvent, () -> {
-            byteBuf.readerIndex(readerIndex);
-        });
+        if (decompressHandlerPresent) {
+            int a = PacketWrapperUtils.readVarInt(new ByteBufModern(byteBuf));
+            int b = PacketWrapperUtils.readVarInt(new ByteBufModern(byteBuf));
+            //System.out.println("A: " + a +  "B: " + b);
+        }
+        else {
+            PacketReceiveEvent packetReceiveEvent = new PacketReceiveEvent(ctx.channel(), player, byteBuf, !decompressHandlerPresent);
+            int readerIndex = byteBuf.readerIndex();
+            PacketEvents.get().getEventManager().callEvent(packetReceiveEvent, () -> {
+                byteBuf.readerIndex(readerIndex);
+            });
+        }
         byteBuf.readerIndex(firstReaderIndex);
-
       /*  int begin = byteBuf.readerIndex();
         int id = PacketWrapperUtils.readVarInt(new ByteBufModern(byteBuf));
         System.out.println("ID: " + id);

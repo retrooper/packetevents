@@ -17,6 +17,10 @@ public class PacketReceiveEvent extends ProtocolPacketEvent {
         super(PacketSide.CLIENT, channel, player, rawByteBuf, true);
     }
 
+    public PacketReceiveEvent(Object channel, Player player, Object rawByteBuf, boolean ignoreBufferLength) {
+        super(PacketSide.CLIENT, channel, player, rawByteBuf, ignoreBufferLength);
+    }
+
     @Override
     public void call(PacketListenerAbstract listener) {
         listener.onPacketReceive(this);

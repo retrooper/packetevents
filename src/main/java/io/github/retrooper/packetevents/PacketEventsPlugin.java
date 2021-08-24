@@ -21,6 +21,7 @@ package io.github.retrooper.packetevents;
 import io.github.retrooper.packetevents.event.PacketListenerAbstract;
 import io.github.retrooper.packetevents.event.impl.PacketReceiveEvent;
 import io.github.retrooper.packetevents.event.impl.PacketSendEvent;
+import io.github.retrooper.packetevents.injector.modern.PacketDecoderModern;
 import io.github.retrooper.packetevents.manager.player.ClientVersion;
 import io.github.retrooper.packetevents.manager.player.Hand;
 import io.github.retrooper.packetevents.protocol.ConnectionState;
@@ -93,16 +94,6 @@ public class PacketEventsPlugin extends JavaPlugin {
                             WrapperLoginClientLoginStart start = new WrapperLoginClientLoginStart(event.getClientVersion(), byteBuf);
                             //Map the player usernames with their netty channels
                             PacketEvents.get().getPlayerManager().channels.put(start.getUsername(), event.getChannel().rawChannel());
-                            //TODO Work on this, this is just some random testing, please note these links
-                            //TODO https://wiki.vg/Protocol#Without_compression https://wiki.vg/Protocol#With_compression
-                            System.out.println("CHANNEL PIPELINE NAMES: " + Arrays.toString(event.getChannel().pipeline().names().stream().toArray()));
-                            Channel nettyChannel = (Channel) event.getChannel().rawChannel();
-                            if (nettyChannel.pipeline().get("decompress") != null) {
-                                ChannelHandler handler = nettyChannel.pipeline().remove(PacketEvents.get().decoderName);
-                                nettyChannel.pipeline().addAfter("decompress", PacketEvents.get().decoderName, handler);
-                                System.out.println("EDITED CHANNEL PIPELINE NAMES: " + Arrays.toString(nettyChannel.pipeline().names().stream().toArray()));
-                            }
-
                         }
                         break;
                     case GAME:

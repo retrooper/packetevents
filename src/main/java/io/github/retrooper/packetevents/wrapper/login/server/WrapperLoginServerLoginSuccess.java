@@ -32,23 +32,23 @@ import java.util.UUID;
 public class WrapperLoginServerLoginSuccess extends PacketWrapper {
     private final UUID uuid;
     private final String username;
+
     public WrapperLoginServerLoginSuccess(ByteBufAbstract byteBuf) {
         super(byteBuf);
-            if (getServerVersion().isNewerThanOrEquals(ServerVersion.v_1_16)) {
+        if (getServerVersion().isNewerThanOrEquals(ServerVersion.v_1_16)) {
             int[] data = new int[4];
             for (int i = 0; i < 4; i++) {
                 data[i] = readInt();
             }
             this.uuid = convertToUUID(data);
-        }
-        else {
+        } else {
             this.uuid = UUID.fromString(readString(36));
         }
         this.username = readString(16);
     }
 
     private UUID convertToUUID(int[] data) {
-        return new UUID((long)data[0] << 32 | data[1] & 4294967295L, (long)data[2] << 32 | data[3] & 4294967295L);
+        return new UUID((long) data[0] << 32 | data[1] & 4294967295L, (long) data[2] << 32 | data[3] & 4294967295L);
     }
 
     public UUID getUUID() {

@@ -34,6 +34,10 @@ public class PacketSendEvent extends ProtocolPacketEvent {
         super(PacketSide.SERVER, channel, player, rawByteBuf, true);
     }
 
+    public PacketSendEvent(Object channel, Player player, Object rawByteBuf, boolean ignoreBufferLength) {
+        super(PacketSide.SERVER, channel, player, rawByteBuf, ignoreBufferLength);
+    }
+
     @Override
     public void call(PacketListenerAbstract listener) {
         listener.onPacketSend(this);

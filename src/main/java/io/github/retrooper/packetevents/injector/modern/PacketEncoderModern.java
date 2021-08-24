@@ -20,31 +20,60 @@ package io.github.retrooper.packetevents.injector.modern;
 
 import io.github.retrooper.packetevents.PacketEvents;
 import io.github.retrooper.packetevents.event.impl.PacketSendEvent;
-import io.github.retrooper.packetevents.manager.player.ClientVersion;
+import io.github.retrooper.packetevents.protocol.ConnectionState;
 import io.github.retrooper.packetevents.utils.bytebuf.ByteBufModern;
 import io.github.retrooper.packetevents.utils.wrapper.PacketWrapperUtils;
-import io.github.retrooper.packetevents.wrapper.PacketWrapper;
 import io.netty.buffer.ByteBuf;
+import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
-import io.netty.channel.ChannelPromise;
 import io.netty.handler.codec.MessageToByteEncoder;
 import io.netty.util.internal.EmptyArrays;
 import org.bukkit.entity.Player;
 
 import java.util.Arrays;
-
+@ChannelHandler.Sharable
 public class PacketEncoderModern extends MessageToByteEncoder<ByteBuf> {
     public volatile Player player;
-
+    public boolean handleCompression = false;
+    public boolean inGameState = false;
     @Override
     protected void encode(ChannelHandlerContext ctx, ByteBuf bb, ByteBuf byteBuf) throws Exception {
         int firstReaderIndex = bb.readerIndex();
+        /*
         PacketSendEvent packetSendEvent = new PacketSendEvent(ctx.channel(), player, bb);
         int readerIndex = bb.readerIndex();
         PacketEvents.get().getEventManager().callEvent(packetSendEvent, () -> {
             bb.readerIndex(readerIndex);
         });
+        */
+        String before = Arrays.toString(ctx.channel().pipeline().names().stream().toArray());
+        if (!this.handleCompression && ctx.channel().pipeline().get("compress") != null) {
+            System.out.println("ENCODER CHANNEL PIPELINE NAMES BEFORE: " + before);
+            ctx.channel().pipeline().remove(PacketEvents.get().encoderName);
+            this.handleCompression = true;
+            ctx.channel().pipeline().addAfter("compress", PacketEvents.get().encoderName, this);
+            System.out.println("ENCODER EDITED CHANNEL PIPELINE NAMES: " + Arrays.toString(ctx.channel().pipeline().names().stream().toArray()));
+        }
 
+        if (!inGameState && handleCompression) {
+            ConnectionState connectionState = PacketEvents.get().getInjector().getConnectionState(ctx.channel());
+            if (connectionState == ConnectionState.GAME) {
+                inGameState = true;
+            }
+        }
+
+        if (!inGameState) {
+            PacketSendEvent packetSendEvent = new PacketSendEvent(ctx.channel(), player, bb, (!this.handleCompression));
+            int readerIndex = bb.readerIndex();
+            PacketEvents.get().getEventManager().callEvent(packetSendEvent, () -> {
+                bb.readerIndex(readerIndex);
+            });
+        }
+        else {
+            int a = PacketWrapperUtils.readVarInt(new ByteBufModern(bb));
+            System.out.println("first: " + a);
+            //TODO Debug how to read the packets, i believe some packets are compressed and some aren't, we need to detect this.
+        }
         bb.readerIndex(firstReaderIndex);
         byteBuf.writeBytes(bb);
     }

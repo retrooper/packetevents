@@ -121,7 +121,9 @@ public final class PacketType {
     public static class Login {
         public enum Client implements PacketTypeCommon {
             LOGIN_START,
-            ENCRYPTION_RESPONSE;
+            ENCRYPTION_RESPONSE,
+            ///Added in 1.13
+            LOGIN_PLUGIN_RESPONSE;
 
             @Nullable
             public static PacketTypeCommon getById(int packetID) {
@@ -130,6 +132,9 @@ public final class PacketType {
                 }
                 else if (packetID == 1) {
                     return ENCRYPTION_RESPONSE;
+                }
+                else if (packetID == 2) {
+                    return LOGIN_PLUGIN_RESPONSE;
                 }
                 else {
                     return null;
@@ -142,7 +147,9 @@ public final class PacketType {
             ENCRYPTION_REQUEST,
             LOGIN_SUCCESS,
             //Added in 1.8
-            SET_COMPRESSION;
+            SET_COMPRESSION,
+            ///Added in 1.13
+            LOGIN_PLUGIN_REQUEST;
 
             @Nullable
             public static PacketTypeCommon getById(int packetID) {
@@ -155,6 +162,8 @@ public final class PacketType {
                         return LOGIN_SUCCESS;
                     case 3:
                         return SET_COMPRESSION;
+                    case 4:
+                        return LOGIN_PLUGIN_REQUEST;
                     default:
                         return null;
                 }

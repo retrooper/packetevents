@@ -75,7 +75,6 @@ public abstract class ProtocolPacketEvent extends PacketEvent implements PlayerE
         this.clientVersion = version;
 
         this.byteBuf = byteBuf;
-        //TODO Remove ignoreBufferLengh variable which was for our encoder, we are after the prepender so we dont need it
         if (!ignoreBufferLength) {
             //TODO For now we ignore the length which might be at the beginning of the packet, later we can decide what to do
             int bufferLength = PacketWrapperUtils.readVarInt(byteBuf);
