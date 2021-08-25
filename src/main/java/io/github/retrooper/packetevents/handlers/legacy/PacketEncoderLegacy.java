@@ -62,7 +62,8 @@ public class PacketEncoderLegacy extends MessageToMessageEncoder<ByteBuf> {
 
     @Override
     protected void encode(ChannelHandlerContext ctx, ByteBuf byteBuf, List<Object> out) {
-        out.add(handle(ChannelHandlerContextAbstract.generate(ctx), ByteBufAbstract.generate(byteBuf)));
+        ByteBuf output = (ByteBuf) handle(ChannelHandlerContextAbstract.generate(ctx), ByteBufAbstract.generate(byteBuf)).rawByteBuf();
+        out.add(output);
     }
 
     private boolean handleCompressionOrder(ChannelHandlerContextAbstract ctx, ByteBufAbstract buf) {
