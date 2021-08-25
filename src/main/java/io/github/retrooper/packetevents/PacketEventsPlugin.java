@@ -29,6 +29,7 @@ import io.github.retrooper.packetevents.protocol.PacketType;
 import io.github.retrooper.packetevents.utils.bytebuf.ByteBufAbstract;
 import io.github.retrooper.packetevents.wrapper.game.client.WrapperGameClientAnimation;
 import io.github.retrooper.packetevents.wrapper.game.client.WrapperGameClientChatMessage;
+import io.github.retrooper.packetevents.wrapper.game.server.WrapperGameServerPluginMessage;
 import io.github.retrooper.packetevents.wrapper.handshaking.client.WrapperHandshakingClientHandshake;
 import io.github.retrooper.packetevents.wrapper.login.client.WrapperLoginClientLoginStart;
 import io.github.retrooper.packetevents.wrapper.status.client.WrapperStatusClientPing;
@@ -57,12 +58,7 @@ public class PacketEventsPlugin extends JavaPlugin {
                 if (event.getPacketType() == PacketType.Login.Server.LOGIN_SUCCESS) {
                     //Transition into the GAME connection state
                     PacketEvents.get().getInjector().changeConnectionState(event.getChannel().rawChannel(), ConnectionState.GAME);
-                    System.out.println("CHANGED CONNECTION STATE TO GAME");
 
-                } else if (event.getPacketType() == PacketType.Status.Server.PONG) {
-                    WrapperStatusServerPong pong = new WrapperStatusServerPong(byteBuf);
-                    long payload = pong.getTime();
-                    System.out.println("PAYLOAD RESPONSE: " + payload);
                 }
             }
 
@@ -81,15 +77,6 @@ public class PacketEventsPlugin extends JavaPlugin {
                             System.out.println("USER CONNECTED WITH CLIENT VERSION: " + handshake.getClientVersion().name());
                         }
                         break;
-
-                    case STATUS:
-                        if (event.getPacketType() == PacketType.Status.Client.PING) {
-                            WrapperStatusClientPing ping = new WrapperStatusClientPing(event.getClientVersion(), byteBuf);
-                            long payload = ping.getTime();
-                            System.out.println("PAYLOAD: " + payload);
-                        }
-                        break;
-
                     case LOGIN:
                         if (event.getPacketType() == PacketType.Login.Client.LOGIN_START) {
                             WrapperLoginClientLoginStart start = new WrapperLoginClientLoginStart(event.getClientVersion(), byteBuf);
@@ -97,19 +84,15 @@ public class PacketEventsPlugin extends JavaPlugin {
                             PacketEvents.get().getPlayerManager().channels.put(start.getUsername(), event.getChannel().rawChannel());
                         }
                         break;
-                    case GAME:
-                        if (event.getPacketType() == PacketType.Game.Client.ANIMATION) {
-                            WrapperGameClientAnimation animation = new WrapperGameClientAnimation(event.getClientVersion(), event.getByteBuf());
-                            Hand hand = animation.getHand();
-                            event.getPlayer().sendMessage("You sent an animation with this hand: " + hand.name());
-                        } else if (event.getPacketType() == PacketType.Game.Client.CHAT_MESSAGE) {
-                            WrapperGameClientChatMessage chatMessage = new WrapperGameClientChatMessage(event.getClientVersion(), event.getByteBuf());
-                            String msg = chatMessage.getMessage();
-                            if (event.getPlayer() != null) {
-                                event.getPlayer().sendMessage("U SAID: " + msg);
-                            }
-                        }
-                        break;
+                }
+            }
+        });
+
+        PacketEvents.get().getEventManager().registerListener(new PacketListenerAbstract() {
+            @Override
+            public void onPacketReceive(PacketReceiveEvent event) {
+                if (event.getPacketType() == PacketType.Game.Client.INTERACT_ENTITY) {
+                    event.getPlayer().sendMessage("nice interaction bro");
                 }
             }
         });

@@ -290,9 +290,9 @@ public class EarlyChannelInjectorModern implements EarlyInjector {
     }
 
     @Override
-    public void sendPacket(Object ch, Object rawNMSPacket) {
+    public void sendPacket(Object ch, Object packet) {
         Channel channel = (Channel) ch;
-        channel.writeAndFlush(rawNMSPacket);
+        channel.writeAndFlush(packet);
     }
 
     private PacketDecoderModern getDecoder(Object rawChannel) {

@@ -72,7 +72,6 @@ public abstract class PacketListenerAbstract {
      * @since 1.8
      */
     public enum Priority {
-        //TODO Ponder on renaming this enum to maybe 'Priority'
         /**
          * Listener is of very low importance.
          * This listener will be ran first.

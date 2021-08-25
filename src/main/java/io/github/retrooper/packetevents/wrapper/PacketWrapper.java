@@ -151,7 +151,7 @@ public class PacketWrapper {
         return byteBuf.readLong();
     }
 
-    public double readFloat() {
+    public float readFloat() {
         return byteBuf.readFloat();
     }
 

@@ -87,10 +87,8 @@ public final class PacketWrapperUtils {
     public static String readString(int protocolVersion, ByteBufAbstract byteBuf, int maxLen) {
         //1.12 and higher
         if (protocolVersion >= 335) {
-            System.out.println("MODERNITY");
             return readStringModern(byteBuf, maxLen);
         } else {
-            System.out.println("LEGACY");
             return readStringLegacy(byteBuf, maxLen);
         }
     }

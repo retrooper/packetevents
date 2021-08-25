@@ -31,10 +31,15 @@ import org.bukkit.entity.Player;
 import org.jetbrains.annotations.Nullable;
 
 public class GlobalChannelInjector {
+    public boolean injectEarly = true;
     private ChannelInjector injector;
 
+    public boolean shouldInjectEarly() {
+        return injectEarly;
+    }
+
     public void load() {
-        if (!PacketEvents.get().getSettings().shouldUseCompatibilityInjector()) {
+        if (injectEarly) {
             injector = MinecraftReflection.USE_MODERN_NETTY_PACKAGE ? new EarlyChannelInjectorModern() : new EarlyChannelInjectorLegacy();
         } else {
             injector = MinecraftReflection.USE_MODERN_NETTY_PACKAGE ? new LateChannelInjectorModern() : new LateChannelInjectorLegacy();
@@ -52,7 +57,7 @@ public class GlobalChannelInjector {
         } catch (Exception ex) {
             //Failed to inject! Let us revert to the compatibility injector and re-inject.
             if (injector instanceof EarlyInjector) {
-                PacketEvents.get().getSettings().compatInjector(true);
+                injectEarly = false;
                 load();
                 injector.inject();
                 PacketEvents.get().getPlugin().getLogger().warning("[packetevents] Failed to inject with the Early Injector. Reverting to the Compatibility/Late Injector... This is just a warning, but please report this!");
@@ -93,8 +98,8 @@ public class GlobalChannelInjector {
         injector.flushPackets(ch);
     }
 
-    public void sendPacket(Object ch, Object rawNMSPacket) {
-        injector.sendPacket(ch, rawNMSPacket);
+    public void sendPacket(Object ch, Object packet) {
+        injector.sendPacket(ch, packet);
     }
 
     @Nullable

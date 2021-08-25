@@ -139,7 +139,7 @@ public class PacketDecoderModern extends MessageToMessageDecoder<ByteBuf> {
         ctx.pipeline().remove(decoder);
         ctx.pipeline().addAfter("compress", PacketEvents.get().encoderName, encoder);
         ctx.pipeline().addAfter("decompress", PacketEvents.get().decoderName, decoder);
-        System.out.println("REFACTORING, PIPELINE NAMES: " + Arrays.toString(ctx.channel().pipeline().names().toArray(new String[0])));
+        //System.out.println("REFACTORING, PIPELINE NAMES: " + Arrays.toString(ctx.channel().pipeline().names().toArray(new String[0])));
         return true;
     }
 

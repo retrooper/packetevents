@@ -37,12 +37,6 @@ public class PacketEventsSettings {
      */
     private boolean checkForUpdates = true;
 
-    /**
-     * This boolean stores if PacketEvents should inject a player earlier using the {@code LateInjector}.
-     * We also call it the "compatibility injector", because it should actually be compatible with everything.
-     * Using this injector prevents us from listening to packets during the early packet-states. (STATUS, HANDSHAKING, LOGIN)
-     */
-    private boolean compatInjector = false;
 
     /**
      * Can PacketEvents collect server data like player count, java version, plugins, etc... anonymously and report to bStats?
@@ -99,20 +93,6 @@ public class PacketEventsSettings {
         return this;
     }
 
-    /**
-     * This decides if PacketEvents should inject users earlier than usual,
-     * resulting in us being able to resolve client versions without the need of any dependencies.
-     * We end up using a different injection method which isn't supported on a few spigot forks.
-     *
-     * @param compatInjector Value
-     * @return Settings instance.
-     */
-    public PacketEventsSettings compatInjector(boolean compatInjector) {
-        if (!locked) {
-            this.compatInjector = compatInjector;
-        }
-        return this;
-    }
 
     /**
      * Are the settings locked?
@@ -127,7 +107,7 @@ public class PacketEventsSettings {
     /**
      * Fallback server version.
      *
-     * @return Getter for {@link #backupServerVersion}
+     * @return Getter for {@link #fallbackServerVersion}
      */
     public ServerVersion getFallbackServerVersion() {
         return fallbackServerVersion;
@@ -142,14 +122,6 @@ public class PacketEventsSettings {
         return checkForUpdates;
     }
 
-    /**
-     * Should we use the {@code LateInjector}(aka. "Compatibility Injector") with the sacrifice of a few features.
-     *
-     * @return Getter for {@link #compatInjector}
-     */
-    public boolean shouldUseCompatibilityInjector() {
-        return compatInjector;
-    }
 
     /**
      * Should we collect server data anonymously and report to bStats?

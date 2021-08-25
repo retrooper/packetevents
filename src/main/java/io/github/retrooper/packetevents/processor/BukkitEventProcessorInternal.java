@@ -38,7 +38,7 @@ public class BukkitEventProcessorInternal implements Listener {
     @EventHandler(priority = EventPriority.LOWEST)
     public void onLogin(PlayerLoginEvent e) {
         final Player player = e.getPlayer();
-        if (!PacketEvents.get().getSettings().shouldUseCompatibilityInjector()) {
+        if (PacketEvents.get().getInjector().shouldInjectEarly()) {
             PacketEvents.get().getInjector().injectPlayer(player);
         }
     }
@@ -46,7 +46,8 @@ public class BukkitEventProcessorInternal implements Listener {
     @EventHandler(priority = EventPriority.HIGH)
     public void onJoin(PlayerJoinEvent e) {
         Player player = e.getPlayer();
-        boolean shouldInject = PacketEvents.get().getSettings().shouldUseCompatibilityInjector() || !(PacketEvents.get().getInjector().hasInjected(e.getPlayer()));
+
+        boolean shouldInject = !PacketEvents.get().getInjector().shouldInjectEarly() || !(PacketEvents.get().getInjector().hasInjected(e.getPlayer()));
         //Inject now if we are using the compatibility-injector or inject if the early injector failed to inject them.
         if (shouldInject) {
             PacketEvents.get().getInjector().injectPlayer(player);
