@@ -96,7 +96,7 @@ public final class ServerManager {
         return new BoundingBox(minX, minY, minZ, maxX, maxY, maxZ);
     }
 
-    private Entity getEntityByIdWithWorldUnsafe(World world, int id) {
+    private Entity getEntityByIDWithWorldUnsafe(World world, int id) {
         if (world == null) {
             return null;
         }
@@ -117,13 +117,13 @@ public final class ServerManager {
     }
 
     @Nullable
-    private Entity getEntityByIdUnsafe(World origin, int id) {
-        Entity e = getEntityByIdWithWorldUnsafe(origin, id);
+    private Entity getEntityByIDUnsafe(World origin, int id) {
+        Entity e = getEntityByIDWithWorldUnsafe(origin, id);
         if (e != null) {
             return e;
         }
         for (World world : Bukkit.getWorlds()) {
-            Entity entity = getEntityByIdWithWorldUnsafe(world, id);
+            Entity entity = getEntityByIDWithWorldUnsafe(world, id);
             if (entity != null) {
                 return entity;
             }
@@ -144,7 +144,7 @@ public final class ServerManager {
     }
 
     @Nullable
-    public Entity getEntityById(@Nullable World world, int entityID) {
+    public Entity getEntityByID(@Nullable World world, int entityID) {
         Entity e = entityCache.get(entityID);
         if (e != null) {
             return e;
@@ -179,14 +179,14 @@ public final class ServerManager {
                 return null;
             }
         } else {
-            return getEntityByIdUnsafe(world, entityID);
+            return getEntityByIDUnsafe(world, entityID);
         }
         return null;
     }
 
     @Nullable
-    public Entity getEntityById(int entityID) {
-        return getEntityById(null, entityID);
+    public Entity getEntityByID(int entityID) {
+        return getEntityByID(null, entityID);
     }
 
     public List<Entity> getEntityList(World world) {

@@ -28,11 +28,11 @@ public enum Dimension {
         this.id = id;
     }
 
-    public static Dimension getById(int id) {
+    public static Dimension getByID(int id) {
         return values()[id + 1];
     }
 
-    public int getId() {
+    public int getID() {
         return id;
     }
 }

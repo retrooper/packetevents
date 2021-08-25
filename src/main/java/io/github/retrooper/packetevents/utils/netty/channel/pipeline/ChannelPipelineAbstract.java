@@ -1,0 +1,82 @@
+/*
+ * This file is part of packetevents - https://github.com/retrooper/packetevents
+ * Copyright (C) 2021 retrooper and contributors
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+package io.github.retrooper.packetevents.utils.netty.channel.pipeline;
+
+import io.github.retrooper.packetevents.utils.netty.channel.ChannelHandlerAbstract;
+import io.github.retrooper.packetevents.utils.nms.MinecraftReflection;
+import io.netty.channel.ChannelHandler;
+import io.netty.channel.ChannelPipeline;
+import io.netty.util.concurrent.EventExecutorGroup;
+
+import java.util.List;
+//TODO Complete
+public interface ChannelPipelineAbstract {
+    static ChannelPipelineAbstract generate(Object rawChannelPipeline) {
+        if (MinecraftReflection.USE_MODERN_NETTY_PACKAGE) {
+            return new ChannelPipelineModern(rawChannelPipeline);
+        }
+        else {
+            return new ChannelPipelineLegacy(rawChannelPipeline);
+        }
+    }
+
+    Object rawChannelPipeline();
+
+    List<String> names();
+
+    ChannelHandlerAbstract get(String handlerName);
+
+    ChannelPipelineAbstract addFirst(String handlerName, Object handler);
+
+    ChannelPipelineAbstract addLast(String handlerName, Object handler);
+
+    ChannelPipelineAbstract addBefore(String targetHandlerName, String handlerName, Object handler);
+
+    ChannelPipelineAbstract addAfter(String targetHandlerName, String handlerName, Object handler);
+
+    ChannelPipelineAbstract remove(Object handler);
+
+    Object remove(String handlerName);
+
+    Object removeFirst();
+
+    Object removeLast();
+
+    Object replace(String previousHandlerName, String handlerName, Object handler);
+
+    ChannelPipelineAbstract fireChannelRegistered();
+
+    ChannelPipelineAbstract fireChannelUnregistered();
+
+    ChannelPipelineAbstract fireChannelActive();
+
+    ChannelPipelineAbstract fireChannelInactive();
+
+    ChannelPipelineAbstract fireExceptionCaught(Throwable throwable);
+
+    ChannelPipelineAbstract fireUserEventTriggered(Object event);
+
+    ChannelPipelineAbstract fireChannelRead(Object msg);
+
+    ChannelPipelineAbstract fireChannelReadComplete();
+
+    ChannelPipelineAbstract fireChannelWritabilityChanged();
+
+    ChannelPipelineAbstract flush();
+}

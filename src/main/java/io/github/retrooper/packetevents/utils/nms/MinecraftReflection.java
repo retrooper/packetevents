@@ -129,6 +129,8 @@ public final class MinecraftReflection {
         CRAFT_ENTITY_CLASS = getOBCClass("entity.CraftEntity");
 
         CHANNEL_CLASS = getNettyClass("channel.Channel");
+        io.netty.channel.Channel c;
+        io.netty.handler.codec.ByteToMessageDecoder d;
 
         GEYSER_CLASS = Reflection.getClassByNameWithoutException("org.geysermc.connector.GeyserConnector");
     }
@@ -362,7 +364,7 @@ public final class MinecraftReflection {
         return "{\"text\": \"" + message + "\"}";
     }
 
-    public static int generateEntityId() {
+    public static int generateEntityID() {
         Field field = Reflection.getField(NMS_ENTITY_CLASS, "entityCount");
         if (field == null) {
             field = Reflection.getField(NMS_ENTITY_CLASS, AtomicInteger.class, 0);

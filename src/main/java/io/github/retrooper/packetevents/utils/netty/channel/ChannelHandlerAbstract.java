@@ -16,23 +16,23 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package io.github.retrooper.packetevents.utils.channel.pipeline;
+package io.github.retrooper.packetevents.utils.netty.channel;
 
 import io.github.retrooper.packetevents.utils.nms.MinecraftReflection;
 
-import java.util.List;
-//TODO Complete
-public interface ChannelPipelineAbstract {
-    static ChannelPipelineAbstract generate(Object rawChannelPipeline) {
+public interface ChannelHandlerAbstract {
+    static ChannelHandlerAbstract generate(Object rawChannelHandler) {
         if (MinecraftReflection.USE_MODERN_NETTY_PACKAGE) {
-            return new ChannelPipelineModern(rawChannelPipeline);
+            return new ChannelHandlerModern(rawChannelHandler);
         }
         else {
-            return new ChannelPipelineLegacy(rawChannelPipeline);
+            return new ChannelHandlerLegacy(rawChannelHandler);
         }
     }
 
-    Object rawChannelPipeline();
+    Object rawChannelHandler();
 
-    List<String> names();
+    void handlerAdded(ChannelHandlerContextAbstract var1) throws Exception;
+
+    void handlerRemoved(ChannelHandlerContextAbstract var1) throws Exception;
 }

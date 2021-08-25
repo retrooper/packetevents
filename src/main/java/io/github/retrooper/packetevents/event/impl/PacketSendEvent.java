@@ -21,8 +21,8 @@ package io.github.retrooper.packetevents.event.impl;
 import io.github.retrooper.packetevents.event.PacketListenerAbstract;
 import io.github.retrooper.packetevents.event.ProtocolPacketEvent;
 import io.github.retrooper.packetevents.protocol.PacketSide;
-import io.github.retrooper.packetevents.utils.bytebuf.ByteBufAbstract;
-import io.github.retrooper.packetevents.utils.channel.ChannelAbstract;
+import io.github.retrooper.packetevents.utils.netty.bytebuf.ByteBufAbstract;
+import io.github.retrooper.packetevents.utils.netty.channel.ChannelAbstract;
 import org.bukkit.entity.Player;
 
 public class PacketSendEvent extends ProtocolPacketEvent {

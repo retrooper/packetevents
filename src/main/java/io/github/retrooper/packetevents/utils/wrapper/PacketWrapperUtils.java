@@ -18,12 +18,10 @@
 
 package io.github.retrooper.packetevents.utils.wrapper;
 
-import io.github.retrooper.packetevents.manager.player.ClientVersion;
-import io.github.retrooper.packetevents.utils.bytebuf.ByteBufAbstract;
+import io.github.retrooper.packetevents.utils.netty.bytebuf.ByteBufAbstract;
 import io.github.retrooper.packetevents.utils.vector.Vector3i;
 import net.minecraft.util.com.google.common.base.Charsets;
 
-import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 
 public final class PacketWrapperUtils {

@@ -19,8 +19,6 @@
 package io.github.retrooper.packetevents.event;
 
 import io.github.retrooper.packetevents.PacketEvents;
-import io.github.retrooper.packetevents.event.PacketEvent;
-import io.github.retrooper.packetevents.event.PacketListenerAbstract;
 
 import java.util.HashSet;
 import java.util.Map;
@@ -40,7 +38,7 @@ public class EventManager {
      * @param event {@link PacketEvent}
      */
     public void callEvent(final PacketEvent event) {
-        for (byte priority = PacketListenerAbstract.Priority.LOWEST.getId(); priority <= PacketListenerAbstract.Priority.MONITOR.getId(); priority++) {
+        for (byte priority = PacketListenerAbstract.Priority.LOWEST.getID(); priority <= PacketListenerAbstract.Priority.MONITOR.getID(); priority++) {
             HashSet<PacketListenerAbstract> listeners = listenersMap.get(priority);
             if (listeners != null) {
                 for (PacketListenerAbstract listener : listeners) {
@@ -56,7 +54,7 @@ public class EventManager {
     }
 
     public void callEvent(PacketEvent event, Runnable postCallListenerAction) {
-        for (byte priority = PacketListenerAbstract.Priority.LOWEST.getId(); priority <= PacketListenerAbstract.Priority.MONITOR.getId(); priority++) {
+        for (byte priority = PacketListenerAbstract.Priority.LOWEST.getID(); priority <= PacketListenerAbstract.Priority.MONITOR.getID(); priority++) {
             HashSet<PacketListenerAbstract> listeners = listenersMap.get(priority);
             if (listeners != null) {
                 for (PacketListenerAbstract listener : listeners) {
@@ -78,7 +76,7 @@ public class EventManager {
      * @param listener {@link PacketListenerAbstract}
      */
     public synchronized void registerListener(final PacketListenerAbstract listener) {
-        byte priority = listener.getPriority().getId();
+        byte priority = listener.getPriority().getID();
         HashSet<PacketListenerAbstract> listenerSet = listenersMap.get(priority);
         if (listenerSet == null) {
             listenerSet = new HashSet<>();

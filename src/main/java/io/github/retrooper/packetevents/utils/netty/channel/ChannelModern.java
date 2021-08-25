@@ -16,18 +16,17 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package io.github.retrooper.packetevents.utils.channel;
+package io.github.retrooper.packetevents.utils.netty.channel;
 
-import io.github.retrooper.packetevents.utils.channel.pipeline.ChannelPipelineAbstract;
-import io.github.retrooper.packetevents.utils.channel.pipeline.ChannelPipelineLegacy;
-import io.github.retrooper.packetevents.utils.channel.pipeline.ChannelPipelineModern;
-import net.minecraft.util.io.netty.channel.Channel;
+import io.github.retrooper.packetevents.utils.netty.channel.pipeline.ChannelPipelineAbstract;
+import io.github.retrooper.packetevents.utils.netty.channel.pipeline.ChannelPipelineModern;
+import io.netty.channel.Channel;
 
 import java.net.SocketAddress;
 
-public class ChannelLegacy implements ChannelAbstract {
+public class ChannelModern implements ChannelAbstract {
     private final Channel channel;
-    public ChannelLegacy(Object rawChannel) {
+    public ChannelModern(Object rawChannel) {
         this.channel = (Channel) rawChannel;
     }
 
@@ -68,6 +67,6 @@ public class ChannelLegacy implements ChannelAbstract {
 
     @Override
     public ChannelPipelineAbstract pipeline() {
-        return new ChannelPipelineLegacy(channel.pipeline());
+        return new ChannelPipelineModern(channel.pipeline());
     }
 }

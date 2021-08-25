@@ -20,13 +20,10 @@ package io.github.retrooper.packetevents.wrapper;
 
 import io.github.retrooper.packetevents.PacketEvents;
 import io.github.retrooper.packetevents.manager.server.ServerVersion;
-import io.github.retrooper.packetevents.utils.bytebuf.ByteBufAbstract;
+import io.github.retrooper.packetevents.utils.netty.bytebuf.ByteBufAbstract;
 import io.github.retrooper.packetevents.manager.player.ClientVersion;
-import io.github.retrooper.packetevents.utils.wrapper.PacketWrapperUtils;
-import net.minecraft.util.com.google.common.base.Charsets;
 
 import java.nio.charset.StandardCharsets;
-import java.util.Arrays;
 import java.util.UUID;
 
 
@@ -79,6 +76,15 @@ public class PacketWrapper {
                 throw new RuntimeException("VarInt too big");
         } while ((b0 & 0x80) == 128);
         return i;
+    }
+
+    public void writeVarInt(int value) {
+        while((value & -128) != 0) {
+            byteBuf.writeByte(value & 127 | 128);
+            value >>>= 7;
+        }
+
+        byteBuf.writeByte(value);
     }
 
     public String readString() {

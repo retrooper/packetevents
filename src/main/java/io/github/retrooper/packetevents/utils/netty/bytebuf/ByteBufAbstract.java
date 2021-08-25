@@ -16,7 +16,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package io.github.retrooper.packetevents.utils.bytebuf;
+package io.github.retrooper.packetevents.utils.netty.bytebuf;
 
 
 import io.github.retrooper.packetevents.utils.nms.MinecraftReflection;
@@ -82,7 +82,6 @@ public interface ByteBufAbstract {
     int getUnsignedShort(int i);
 
     int getMedium(int i);
-    
 
     int getUnsignedMedium(int i);
 
@@ -124,7 +123,9 @@ public interface ByteBufAbstract {
 
     double readDouble();
 
-     ByteBufAbstract writeBoolean(boolean a);
+    ByteBufAbstract writeBytes(ByteBufAbstract byteBuf);
+
+    ByteBufAbstract writeBoolean(boolean a);
 
     ByteBufAbstract writeByte(int a);
 

@@ -16,25 +16,35 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package io.github.retrooper.packetevents.utils.channel.pipeline;
+package io.github.retrooper.packetevents.utils.netty.channel;
 
-import net.minecraft.util.io.netty.channel.ChannelPipeline;
 
-import java.util.List;
+import io.github.retrooper.packetevents.utils.netty.channel.pipeline.ChannelPipelineAbstract;
+import io.github.retrooper.packetevents.utils.nms.MinecraftReflection;
 
-public class ChannelPipelineLegacy implements ChannelPipelineAbstract {
-    private final ChannelPipeline pipeline;
-    public ChannelPipelineLegacy(Object rawChannelPipeline) {
-        this.pipeline = (ChannelPipeline) rawChannelPipeline;
+import java.net.SocketAddress;
+
+public interface ChannelAbstract {
+    static ChannelAbstract generate(Object rawChannel) {
+        if (MinecraftReflection.USE_MODERN_NETTY_PACKAGE) {
+            return new ChannelModern(rawChannel);
+        }
+        else {
+            return new ChannelLegacy(rawChannel);
+        }
     }
+    Object rawChannel();
 
-    @Override
-    public Object rawChannelPipeline() {
-        return pipeline;
-    }
+    boolean isOpen();
 
-    @Override
-    public List<String> names() {
-        return pipeline.names();
-    }
+    boolean isRegistered();
+
+    boolean isActive();
+
+    SocketAddress localAddress();
+    SocketAddress remoteAddress();
+
+    boolean isWritable();
+
+    ChannelPipelineAbstract pipeline();
 }

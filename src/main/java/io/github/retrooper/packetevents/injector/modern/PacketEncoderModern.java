@@ -20,15 +20,20 @@ package io.github.retrooper.packetevents.injector.modern;
 
 import io.github.retrooper.packetevents.PacketEvents;
 import io.github.retrooper.packetevents.event.impl.PacketSendEvent;
+import io.github.retrooper.packetevents.utils.netty.bytebuf.ByteBufAbstract;
+import io.github.retrooper.packetevents.utils.netty.channel.ChannelHandlerContextAbstract;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandler;
+import io.netty.channel.ChannelHandlerAdapter;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.ByteToMessageDecoder;
 import io.netty.handler.codec.MessageToByteEncoder;
 import io.netty.handler.codec.MessageToMessageEncoder;
 import org.bukkit.entity.Player;
 
+import java.util.Arrays;
 import java.util.List;
+
 @ChannelHandler.Sharable
 public class PacketEncoderModern extends MessageToMessageEncoder<ByteBuf> {
     public volatile Player player;
@@ -65,16 +70,15 @@ public class PacketEncoderModern extends MessageToMessageEncoder<ByteBuf> {
         handledCompression = true;
         if (encoderIndex > ctx.pipeline().names().indexOf(PacketEvents.get().encoderName)) {
             // Need to decompress this packet due to bad order
-            ByteBuf decompressed = PacketDecoderModern.callDecode((ByteToMessageDecoder) ctx.pipeline().get("decompress"), ctx, buf);
+            ByteBuf decompressed = (ByteBuf) CustomPacketDecompressor.decompress(ChannelHandlerContextAbstract.generate(ctx), ByteBufAbstract.generate(buf)).rawByteBuf();
             return PacketDecoderModern.refactorHandlers(ctx, buf, decompressed);
         }
         return false;
     }
 
     private void recompress(ChannelHandlerContext ctx, ByteBuf buf) {
-        ByteBuf compressed = ctx.alloc().buffer();
+        ByteBuf compressed = CustomPacketCompressorModern.compress(ctx, buf);
         try {
-            PacketDecoderModern.callEncode((MessageToByteEncoder<?>) ctx.pipeline().get("compress"), ctx, buf, compressed);
             buf.clear().writeBytes(compressed);
         } finally {
             compressed.release();

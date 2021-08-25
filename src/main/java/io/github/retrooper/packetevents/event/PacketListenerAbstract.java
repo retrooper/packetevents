@@ -105,11 +105,11 @@ public abstract class PacketListenerAbstract {
          */
         MONITOR;
 
-        public static Priority getById(byte id) {
+        public static Priority getByID(byte id) {
             return values()[id];
         }
 
-        public byte getId() {
+        public byte getID() {
             return (byte) ordinal();
         }
     }

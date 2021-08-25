@@ -16,17 +16,17 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package io.github.retrooper.packetevents.utils.bytebuf;
+package io.github.retrooper.packetevents.utils.netty.bytebuf;
 
-import io.netty.buffer.ByteBuf;
+import net.minecraft.util.io.netty.buffer.ByteBuf;
 
 import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
 
-public class ByteBufModern implements ByteBufAbstract {
+public class ByteBufLegacy implements ByteBufAbstract {
     private final ByteBuf byteBuf;
 
-    public ByteBufModern(Object byteBuf) {
+    public ByteBufLegacy(Object byteBuf) {
         this.byteBuf = (ByteBuf) byteBuf;
     }
 
@@ -62,7 +62,7 @@ public class ByteBufModern implements ByteBufAbstract {
 
     @Override
     public ByteBufAbstract readerIndex(int readerIndex) {
-        return new ByteBufModern(byteBuf.readerIndex(readerIndex));
+        return new ByteBufLegacy(byteBuf.readerIndex(readerIndex));
     }
 
     @Override
@@ -72,12 +72,12 @@ public class ByteBufModern implements ByteBufAbstract {
 
     @Override
     public ByteBufAbstract writerIndex(int writerIndex) {
-        return new ByteBufModern(byteBuf.writerIndex(writerIndex));
+        return new ByteBufLegacy(byteBuf.writerIndex(writerIndex));
     }
 
     @Override
     public ByteBufAbstract setIndex(int a, int b) {
-        return new ByteBufModern(byteBuf.setIndex(a, b));
+        return new ByteBufLegacy(byteBuf.setIndex(a, b));
     }
 
     @Override
@@ -117,7 +117,7 @@ public class ByteBufModern implements ByteBufAbstract {
 
     @Override
     public ByteBufAbstract clear() {
-        return new ByteBufModern(byteBuf.clear());
+        return new ByteBufLegacy(byteBuf.clear());
     }
 
     @Override
@@ -254,73 +254,78 @@ public class ByteBufModern implements ByteBufAbstract {
     }
 
     @Override
+    public ByteBufAbstract writeBytes(ByteBufAbstract byteBuf) {
+        return new ByteBufLegacy(((ByteBuf)byteBuf.rawByteBuf()).writeBytes((ByteBuf) byteBuf.rawByteBuf()));
+    }
+
+    @Override
     public ByteBufAbstract writeBoolean(boolean a) {
-        return new ByteBufModern(byteBuf.writeBoolean(a));
+        return new ByteBufLegacy(byteBuf.writeBoolean(a));
     }
 
     @Override
     public ByteBufAbstract writeByte(int a) {
-        return new ByteBufModern(byteBuf.writeByte(a));
+        return new ByteBufLegacy(byteBuf.writeByte(a));
     }
 
     @Override
     public ByteBufAbstract writeShort(int a) {
-        return new ByteBufModern(byteBuf.writeShort(a));
+        return new ByteBufLegacy(byteBuf.writeShort(a));
     }
 
     @Override
     public ByteBufAbstract writeMedium(int a) {
-        return new ByteBufModern(byteBuf.writeMedium(a));
+        return new ByteBufLegacy(byteBuf.writeMedium(a));
     }
 
     @Override
     public ByteBufAbstract writeInt(int a) {
-        return new ByteBufModern(byteBuf.writeInt(a));
+        return new ByteBufLegacy(byteBuf.writeInt(a));
     }
 
     @Override
     public ByteBufAbstract writeLong(long a) {
-        return new ByteBufModern(byteBuf.writeLong(a));
+        return new ByteBufLegacy(byteBuf.writeLong(a));
     }
 
     @Override
     public ByteBufAbstract writeChar(int a) {
-        return new ByteBufModern(byteBuf.writeChar(a));
+        return new ByteBufLegacy(byteBuf.writeChar(a));
     }
 
     @Override
     public ByteBufAbstract writeFloat(float a) {
-        return new ByteBufModern(byteBuf.writeFloat(a));
+        return new ByteBufLegacy(byteBuf.writeFloat(a));
     }
 
     @Override
     public ByteBufAbstract writeDouble(double a) {
-        return new ByteBufModern(byteBuf.writeDouble(a));
+        return new ByteBufLegacy(byteBuf.writeDouble(a));
     }
 
     @Override
     public ByteBufAbstract copy() {
-        return new ByteBufModern(byteBuf.copy());
+        return new ByteBufLegacy(byteBuf.copy());
     }
 
     @Override
     public ByteBufAbstract copy(int a, int b) {
-        return new ByteBufModern(byteBuf.copy(a, b));
+        return new ByteBufLegacy(byteBuf.copy(a, b));
     }
 
     @Override
     public ByteBufAbstract slice() {
-        return new ByteBufModern(byteBuf.slice());
+        return new ByteBufLegacy(byteBuf.slice());
     }
 
     @Override
     public ByteBufAbstract slice(int a, int b) {
-        return new ByteBufModern(byteBuf.slice(a, b));
+        return new ByteBufLegacy(byteBuf.slice(a, b));
     }
 
     @Override
     public ByteBufAbstract duplicate() {
-        return new ByteBufModern(byteBuf.duplicate());
+        return new ByteBufLegacy(byteBuf.duplicate());
     }
 
     @Override
@@ -385,17 +390,17 @@ public class ByteBufModern implements ByteBufAbstract {
 
     @Override
     public ByteBufAbstract retain(int a) {
-        return new ByteBufModern(byteBuf.retain(a));
+        return new ByteBufLegacy(byteBuf.retain(a));
     }
 
     @Override
     public ByteBufAbstract retain() {
-        return new ByteBufModern(byteBuf.retain());
+        return new ByteBufLegacy(byteBuf.retain());
     }
 
     @Override
     public ByteBufAbstract readBytes(int i) {
-        return new ByteBufModern(byteBuf.readBytes(i));
+        return new ByteBufLegacy(byteBuf.readBytes(i));
     }
 
     @Override
@@ -405,7 +410,7 @@ public class ByteBufModern implements ByteBufAbstract {
 
     @Override
     public ByteBufAbstract getBytes(int readerIndex, byte[] bytes) {
-        return new ByteBufModern(byteBuf.getBytes(readerIndex, bytes));
+        return new ByteBufLegacy(byteBuf.getBytes(readerIndex, bytes));
     }
 
     @Override
@@ -420,7 +425,7 @@ public class ByteBufModern implements ByteBufAbstract {
 
     @Override
     public ByteBufAbstract setBytes(int i, byte[] bytes) {
-        return new ByteBufModern(byteBuf.setBytes(i, bytes));
+        return new ByteBufLegacy(byteBuf.setBytes(i, bytes));
     }
 
     @Override

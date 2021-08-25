@@ -16,29 +16,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package io.github.retrooper.packetevents.utils.bytebuf;
+package io.github.retrooper.packetevents.utils.netty.bytebuf;
 
-import io.github.retrooper.packetevents.PacketEvents;
-import io.github.retrooper.packetevents.manager.server.ServerVersion;
-import io.github.retrooper.packetevents.protocol.PacketType;
-import io.github.retrooper.packetevents.utils.bytebuf.ByteBufAbstract;
-import io.netty.buffer.Unpooled;
+import io.github.retrooper.packetevents.utils.nms.MinecraftReflection;
 
 public final class ByteBufUtil {
-    private static boolean legacy = false;
-    private static boolean checked = false;
-
-
-    private static void prepare() {
-        if (!checked) {
-            legacy = PacketEvents.get().getServerManager().getVersion().isOlderThan(ServerVersion.v_1_8);
-            checked = true;
-        }
-    }
-
     public static ByteBufAbstract wrappedBuffer(byte[] bytes) {
-       prepare();
-        if (legacy) {
+        if (!MinecraftReflection.USE_MODERN_NETTY_PACKAGE) {
             return ByteBufUtilLegacy.wrappedBuffer(bytes);
         }
         else {
@@ -47,8 +31,7 @@ public final class ByteBufUtil {
     }
 
     public static ByteBufAbstract copiedBuffer(byte[] bytes) {
-        prepare();
-        if (legacy) {
+        if (!MinecraftReflection.USE_MODERN_NETTY_PACKAGE) {
             return ByteBufUtilLegacy.copiedBuffer(bytes);
         }
         else {
@@ -57,8 +40,7 @@ public final class ByteBufUtil {
     }
 
     public static ByteBufAbstract buffer() {
-        prepare();
-        if (legacy) {
+        if (!MinecraftReflection.USE_MODERN_NETTY_PACKAGE) {
             return ByteBufUtilLegacy.buffer();
         }
         else {
@@ -67,8 +49,7 @@ public final class ByteBufUtil {
     }
 
     public static ByteBufAbstract buffer(int initialCapacity) {
-        prepare();
-        if (legacy) {
+        if (!MinecraftReflection.USE_MODERN_NETTY_PACKAGE) {
             return ByteBufUtilLegacy.buffer(initialCapacity);
         }
         else {
@@ -77,8 +58,7 @@ public final class ByteBufUtil {
     }
 
     public static ByteBufAbstract buffer(int initialCapacity, int maxCapacity) {
-        prepare();
-        if (legacy) {
+        if (!MinecraftReflection.USE_MODERN_NETTY_PACKAGE) {
             return ByteBufUtilLegacy.buffer(initialCapacity, maxCapacity);
         }
         else {
@@ -87,8 +67,7 @@ public final class ByteBufUtil {
     }
 
     public static ByteBufAbstract directBuffer() {
-        prepare();
-        if (legacy) {
+        if (!MinecraftReflection.USE_MODERN_NETTY_PACKAGE) {
             return ByteBufUtilLegacy.directBuffer();
         }
         else {
@@ -97,8 +76,7 @@ public final class ByteBufUtil {
     }
 
     public static ByteBufAbstract directBuffer(int initialCapacity) {
-        prepare();
-        if (legacy) {
+        if (!MinecraftReflection.USE_MODERN_NETTY_PACKAGE) {
             return ByteBufUtilLegacy.directBuffer(initialCapacity);
         }
         else {
@@ -107,8 +85,7 @@ public final class ByteBufUtil {
     }
 
     public static ByteBufAbstract directBuffer(int initialCapacity, int maxCapacity) {
-        prepare();
-        if (legacy) {
+        if (!MinecraftReflection.USE_MODERN_NETTY_PACKAGE) {
             return ByteBufUtilLegacy.directBuffer(initialCapacity, maxCapacity);
         }
         else {
@@ -117,8 +94,7 @@ public final class ByteBufUtil {
     }
 
     public static ByteBufAbstract compositeBuffer() {
-        prepare();
-        if (legacy) {
+        if (!MinecraftReflection.USE_MODERN_NETTY_PACKAGE) {
             return ByteBufUtilLegacy.compositeBuffer();
         }
         else {
@@ -127,8 +103,7 @@ public final class ByteBufUtil {
     }
 
     public static ByteBufAbstract compositeBuffer(int maxNumComponents) {
-        prepare();
-        if (legacy) {
+        if (!MinecraftReflection.USE_MODERN_NETTY_PACKAGE) {
             return ByteBufUtilLegacy.compositeBuffer(maxNumComponents);
         }
         else {

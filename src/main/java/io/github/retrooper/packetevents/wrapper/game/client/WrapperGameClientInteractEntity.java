@@ -20,10 +20,9 @@ package io.github.retrooper.packetevents.wrapper.game.client;
 
 import io.github.retrooper.packetevents.manager.player.ClientVersion;
 import io.github.retrooper.packetevents.manager.player.Hand;
-import io.github.retrooper.packetevents.utils.bytebuf.ByteBufAbstract;
+import io.github.retrooper.packetevents.utils.netty.bytebuf.ByteBufAbstract;
 import io.github.retrooper.packetevents.utils.vector.Vector3f;
 import io.github.retrooper.packetevents.wrapper.PacketWrapper;
-import net.minecraft.server.v1_7_R4.EnumEntityUseAction;
 
 import java.util.Optional;
 
@@ -41,7 +40,7 @@ public class WrapperGameClientInteractEntity extends PacketWrapper {
         super(clientVersion, byteBuf);
         if (clientVersion.isOlderThan(ClientVersion.v_1_8)) {
             this.entityID = readInt();
-            int typeIndex = readByte() % EnumEntityUseAction.values().length;
+            int typeIndex = readByte() % Type.VALUES.length;
             this.type = Type.VALUES[typeIndex];
             this.target = Optional.empty();
             this.hand= Optional.empty();

@@ -35,7 +35,7 @@ public class WrappedGameProfile {
         this.name = name;
     }
 
-    public UUID getId() {
+    public UUID getID() {
         return id;
     }
 
