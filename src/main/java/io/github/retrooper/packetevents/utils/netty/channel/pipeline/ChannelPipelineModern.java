@@ -19,6 +19,8 @@
 package io.github.retrooper.packetevents.utils.netty.channel.pipeline;
 
 import io.github.retrooper.packetevents.utils.netty.channel.ChannelHandlerAbstract;
+import io.github.retrooper.packetevents.utils.netty.channel.ChannelHandlerContextAbstract;
+import io.github.retrooper.packetevents.utils.netty.channel.ChannelHandlerContextModern;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelPipeline;
 
@@ -139,5 +141,10 @@ public class ChannelPipelineModern implements ChannelPipelineAbstract {
     @Override
     public ChannelPipelineAbstract flush() {
         return new ChannelPipelineModern(pipeline.flush());
+    }
+
+    @Override
+    public ChannelHandlerContextAbstract context(String handlerName) {
+        return new ChannelHandlerContextModern(pipeline.context(handlerName));
     }
 }

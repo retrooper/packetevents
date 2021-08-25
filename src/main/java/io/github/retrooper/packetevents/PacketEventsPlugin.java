@@ -26,6 +26,8 @@ import io.github.retrooper.packetevents.protocol.ConnectionState;
 import io.github.retrooper.packetevents.protocol.PacketType;
 import io.github.retrooper.packetevents.utils.dependencies.protocolsupport.ProtocolSupportVersionLookupUtils;
 import io.github.retrooper.packetevents.utils.netty.buffer.ByteBufAbstract;
+import io.github.retrooper.packetevents.utils.netty.buffer.ByteBufUtil;
+import io.github.retrooper.packetevents.wrapper.PacketWrapper;
 import io.github.retrooper.packetevents.wrapper.game.client.WrapperGameClientInteractEntity;
 import io.github.retrooper.packetevents.wrapper.handshaking.client.WrapperHandshakingClientHandshake;
 import io.github.retrooper.packetevents.wrapper.login.client.WrapperLoginClientLoginStart;
@@ -93,6 +95,14 @@ public class PacketEventsPlugin extends JavaPlugin {
             @Override
             public void onPacketReceive(PacketReceiveEvent event) {
                 if (event.getPacketType() == PacketType.Game.Client.INTERACT_ENTITY) {
+                    ByteBufAbstract bb = ByteBufUtil.buffer();
+                    PacketWrapper wrapper = PacketWrapper.createUniversalPacketWrapper(bb);
+                    event.getPlayer().sendMessage("setting slot to 7");
+                    wrapper.writeVarInt(PacketType.Game.Server.HELD_ITEM_CHANGE.getID());
+                    bb.writeByte(7);
+                    PacketEvents.get().getPlayerManager().sendPacket(event.getChannel(), bb);
+                    event.getPlayer().sendMessage("sent");
+
                     WrapperGameClientInteractEntity interactEntity = new WrapperGameClientInteractEntity(event.getClientVersion(), event.getByteBuf());
                     int entityID = interactEntity.getEntityID();
                     Entity entity = PacketEvents.get().getServerManager().getEntityByID(entityID);

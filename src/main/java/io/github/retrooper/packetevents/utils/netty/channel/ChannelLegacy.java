@@ -18,6 +18,7 @@
 
 package io.github.retrooper.packetevents.utils.netty.channel;
 
+import io.github.retrooper.packetevents.utils.netty.buffer.ByteBufAbstract;
 import io.github.retrooper.packetevents.utils.netty.channel.pipeline.ChannelPipelineAbstract;
 import io.github.retrooper.packetevents.utils.netty.channel.pipeline.ChannelPipelineLegacy;
 import net.minecraft.util.io.netty.channel.Channel;
@@ -69,5 +70,26 @@ public class ChannelLegacy implements ChannelAbstract {
     @Override
     public ChannelPipelineAbstract pipeline() {
         return new ChannelPipelineLegacy(channel.pipeline());
+    }
+
+    @Override
+    public void write(Object msg) {
+        if (msg instanceof ByteBufAbstract) {
+            msg = ((ByteBufAbstract)msg).rawByteBuf();
+        }
+        channel.write(msg);
+    }
+
+    @Override
+    public void writeAndFlush(Object msg) {
+        if (msg instanceof ByteBufAbstract) {
+            msg = ((ByteBufAbstract)msg).rawByteBuf();
+        }
+        channel.writeAndFlush(msg);
+    }
+
+    @Override
+    public ChannelAbstract flush() {
+        return new ChannelLegacy(channel.flush());
     }
 }
