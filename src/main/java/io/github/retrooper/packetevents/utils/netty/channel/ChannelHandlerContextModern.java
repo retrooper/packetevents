@@ -18,6 +18,7 @@
 
 package io.github.retrooper.packetevents.utils.netty.channel;
 
+import io.github.retrooper.packetevents.utils.netty.buffer.ByteBufAbstract;
 import io.github.retrooper.packetevents.utils.netty.buffer.ByteBufAllocatorAbstract;
 import io.github.retrooper.packetevents.utils.netty.channel.pipeline.ChannelPipelineAbstract;
 import io.netty.channel.ChannelHandlerContext;
@@ -117,5 +118,21 @@ public class ChannelHandlerContextModern implements ChannelHandlerContextAbstrac
     @Override
     public ByteBufAllocatorAbstract alloc() {
         return ByteBufAllocatorAbstract.generate(ctx.alloc());
+    }
+
+    @Override
+    public void write(Object msg) {
+        if (msg instanceof ByteBufAbstract) {
+            msg = ((ByteBufAbstract)msg).rawByteBuf();
+        }
+        ctx.write(msg);
+    }
+
+    @Override
+    public void writeAndFlush(Object msg) {
+        if (msg instanceof ByteBufAbstract) {
+            msg = ((ByteBufAbstract)msg).rawByteBuf();
+        }
+        ctx.writeAndFlush(msg);
     }
 }
