@@ -60,7 +60,7 @@ public class PacketDecoderLegacy extends ByteToMessageDecoder {
         if (decoderIndex > ctx.pipeline().names().indexOf(PacketEvents.get().decoderName)) {
             // Need to decompress this packet due to bad order
             ByteBufAbstract decompressed = CustomPacketDecompressor.decompress(ctx, buf);
-            return CompressionManager.refactorHandlers(ctx, buf, decompressed);
+            return CompressionManager.rearrangeHandlersAndWriteOutput(ctx, buf, decompressed);
         }
         return false;
     }

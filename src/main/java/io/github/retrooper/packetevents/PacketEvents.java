@@ -29,6 +29,7 @@ import io.github.retrooper.packetevents.processor.BukkitEventProcessorInternal;
 import io.github.retrooper.packetevents.protocol.PacketType;
 import io.github.retrooper.packetevents.settings.PacketEventsSettings;
 import io.github.retrooper.packetevents.updatechecker.UpdateChecker;
+import io.github.retrooper.packetevents.utils.dependencies.protocolsupport.ProtocolSupportVersionLookupUtils;
 import io.github.retrooper.packetevents.utils.dependencies.viaversion.ViaVersionLookupUtils;
 import io.github.retrooper.packetevents.utils.guava.GuavaUtils;
 import io.github.retrooper.packetevents.utils.nms.MinecraftReflection;
@@ -78,8 +79,7 @@ public final class PacketEvents implements Listener {
             updateChecker = new UpdateChecker();
 
             injector.load();
-            lateBind = !injector.isBound() || ViaVersionLookupUtils.isAvailable();
-            //If late-bind is enabled or ViaVersion is present, we will inject a bit later.
+            lateBind = !injector.isBound();
             if (!lateBind) {
                 injector.inject();
             }

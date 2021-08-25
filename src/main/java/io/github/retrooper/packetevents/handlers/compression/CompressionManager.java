@@ -24,18 +24,23 @@ import io.github.retrooper.packetevents.utils.netty.channel.ChannelHandlerAbstra
 import io.github.retrooper.packetevents.utils.netty.channel.ChannelHandlerContextAbstract;
 
 public class CompressionManager {
-    public static boolean refactorHandlers(ChannelHandlerContextAbstract ctx, ByteBufAbstract buf, ByteBufAbstract decompressed) {
+    public static boolean rearrangeHandlersAndWriteOutput(ChannelHandlerContextAbstract ctx, ByteBufAbstract buf, ByteBufAbstract decompressed) {
         try {
             buf.clear().writeBytes(decompressed);
         } finally {
             decompressed.release();
         }
+        rearrangeHandlers(ctx, "encoder", "decoder");
+        return true;
+    }
+
+    public static boolean rearrangeHandlers(ChannelHandlerContextAbstract ctx, String encoderTarget, String decoderTarget) {
         ChannelHandlerAbstract encoder = ctx.pipeline().get(PacketEvents.get().encoderName);
         ChannelHandlerAbstract decoder = ctx.pipeline().get(PacketEvents.get().decoderName);
         ctx.pipeline().remove(encoder);
         ctx.pipeline().remove(decoder);
-        ctx.pipeline().addAfter("compress", PacketEvents.get().encoderName, encoder);
-        ctx.pipeline().addAfter("decompress", PacketEvents.get().decoderName, decoder);
+        ctx.pipeline().addAfter(encoderTarget, PacketEvents.get().encoderName, encoder);
+        ctx.pipeline().addAfter(decoderTarget, PacketEvents.get().decoderName, decoder);
         return true;
     }
 

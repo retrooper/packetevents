@@ -31,6 +31,7 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.MessageToMessageDecoder;
 import org.bukkit.entity.Player;
 
+import java.util.Arrays;
 import java.util.List;
 
 @ChannelHandler.Sharable
@@ -38,6 +39,7 @@ public class PacketDecoderModern extends MessageToMessageDecoder<ByteBuf> {
     public volatile Player player;
     public ConnectionState connectionState = ConnectionState.HANDSHAKING;
     private boolean handledCompression;
+    private boolean handledProtocolSupport;
     private boolean skipDoubleTransform;
 
     public ByteBufAbstract handle(ChannelHandlerContextAbstract ctx, ByteBufAbstract byteBuf) {
@@ -47,7 +49,20 @@ public class PacketDecoderModern extends MessageToMessageDecoder<ByteBuf> {
         }
         ByteBufAbstract transformedBuf = ctx.alloc().buffer().writeBytes(byteBuf);
         try {
-            boolean needsCompress = handleCompressionOrder(ctx, transformedBuf);
+            boolean needsCompress = false;
+            if (!handledCompression) {
+                List<String> handlerNames = ctx.pipeline().names();
+                int decompressDecoderIndex = handlerNames.indexOf("decompress");
+                if (decompressDecoderIndex != -1) {
+                    int decoderIndex = handlerNames.indexOf(PacketEvents.get().decoderName);
+                    needsCompress = handleCompressionOrder(ctx, transformedBuf, decompressDecoderIndex, decoderIndex);
+                }
+            }
+
+            if (!handledProtocolSupport) {
+                handleProtocolSupport(ctx);
+            }
+
             int firstReaderIndex = transformedBuf.readerIndex();
             PacketReceiveEvent packetReceiveEvent = new PacketReceiveEvent(ctx.channel(), player, transformedBuf);
             int readerIndex = transformedBuf.readerIndex();
@@ -71,16 +86,30 @@ public class PacketDecoderModern extends MessageToMessageDecoder<ByteBuf> {
         out.add(output);
     }
 
-    private boolean handleCompressionOrder(ChannelHandlerContextAbstract ctx, ByteBufAbstract buf) {
-        if (handledCompression) return false;
+    private void handleProtocolSupport(ChannelHandlerContextAbstract ctx) {
+        List<String> handlerNames = ctx.pipeline().names();
+        //ProtocolSupport is before us?
+        if (handlerNames.indexOf("ps_raw_capture_receive") < handlerNames.indexOf(PacketEvents.get().decoderName)) {
+            if (handlerNames.contains("decompress")) {
+                CompressionManager.rearrangeHandlers(ctx, "compress", "decompress");
+                handledProtocolSupport = true;
+                handlerNames = ctx.pipeline().names();
+                System.out.println("RE ARRANGED HANDLERS AFTER COMPRESSION HANDLERS WERE ADDED, HERE IS THE ORDER: " + Arrays.toString(handlerNames.toArray(new String[0])));
+            }
+            else {
+                CompressionManager.rearrangeHandlers(ctx, "prepender", "splitter");
+                handlerNames = ctx.pipeline().names();
+                System.out.println("RE ARRANGED HANDLERS, HERE IS THE ORDER: " + Arrays.toString(handlerNames.toArray(new String[0])));
+            }
+        }
+    }
 
-        int decoderIndex = ctx.pipeline().names().indexOf("decompress");
-        if (decoderIndex == -1) return false;
+    private boolean handleCompressionOrder(ChannelHandlerContextAbstract ctx, ByteBufAbstract buf, int decompressDecoderIndex, int decoderIndex) {
         handledCompression = true;
-        if (decoderIndex > ctx.pipeline().names().indexOf(PacketEvents.get().decoderName)) {
+        if (decompressDecoderIndex > decoderIndex) {
             // Need to decompress this packet due to bad order
             ByteBufAbstract decompressed = CustomPacketDecompressor.decompress(ctx, buf);
-            return CompressionManager.refactorHandlers(ctx, buf, decompressed);
+            return CompressionManager.rearrangeHandlersAndWriteOutput(ctx, buf, decompressed);
         }
         return false;
     }

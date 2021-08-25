@@ -22,6 +22,8 @@ import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import protocolsupport.api.ProtocolSupportAPI;
 
+import java.net.SocketAddress;
+
 public class ProtocolSupportVersionLookupUtils {
     public static boolean isAvailable() {
         return Bukkit.getPluginManager().getPlugin("ProtocolSupport") != null;
@@ -29,5 +31,9 @@ public class ProtocolSupportVersionLookupUtils {
 
     public static int getProtocolVersion(Player player) {
         return ProtocolSupportAPI.getProtocolVersion(player).getId();
+    }
+
+    public static int getProtocolVersion(SocketAddress address) {
+        return ProtocolSupportAPI.getProtocolVersion(address).getId();
     }
 }
