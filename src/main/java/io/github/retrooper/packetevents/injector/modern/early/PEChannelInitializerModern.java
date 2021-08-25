@@ -45,7 +45,6 @@ public class PEChannelInitializerModern extends ChannelInitializer<Channel> {
     public static void postDestroyChannel(Channel channel) {
         channel.pipeline().remove(PacketEvents.get().decoderName);
         channel.pipeline().remove(PacketEvents.get().encoderName);
-        channel.pipeline().remove(PacketEvents.get().compressionHandlerName);
     }
 
     private void load() {

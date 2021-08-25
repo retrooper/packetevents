@@ -20,8 +20,7 @@ package io.github.retrooper.packetevents;
 
 import io.github.retrooper.packetevents.bstats.Metrics;
 import io.github.retrooper.packetevents.event.impl.PostPlayerInjectEvent;
-import io.github.retrooper.packetevents.event.manager.EventManager;
-import io.github.retrooper.packetevents.event.manager.PEEventManager;
+import io.github.retrooper.packetevents.event.EventManager;
 import io.github.retrooper.packetevents.exceptions.PacketEventsLoadFailureException;
 import io.github.retrooper.packetevents.injector.GlobalChannelInjector;
 import io.github.retrooper.packetevents.manager.player.PlayerManager;
@@ -32,7 +31,6 @@ import io.github.retrooper.packetevents.updatechecker.UpdateChecker;
 import io.github.retrooper.packetevents.utils.guava.GuavaUtils;
 import io.github.retrooper.packetevents.utils.nms.MinecraftReflection;
 import io.github.retrooper.packetevents.manager.server.ServerManager;
-import io.github.retrooper.packetevents.manager.server.ServerVersion;
 import io.github.retrooper.packetevents.utils.version.PEVersion;
 import io.github.retrooper.packetevents.utils.dependencies.viaversion.ViaVersionLookupUtils;
 import org.bukkit.Bukkit;
@@ -41,15 +39,15 @@ import org.bukkit.event.Listener;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
 
-public final class PacketEvents implements Listener, EventManager {
+public final class PacketEvents implements Listener {
     private static PacketEvents instance = new PacketEvents();
     private final PEVersion version = new PEVersion(2, 0, 0);
-    private final EventManager eventManager = new PEEventManager();
+    private final EventManager eventManager = new EventManager();
     private final PlayerManager playerManager = new PlayerManager();
     private final ServerManager serverManager = new ServerManager();
     private final BukkitEventProcessorInternal bukkitEventProcessorInternal = new BukkitEventProcessorInternal();
     private final GlobalChannelInjector injector = new GlobalChannelInjector();
-    public String identifier, encoderName, decoderName, compressionHandlerName;
+    public String identifier, encoderName, decoderName;
     private PacketEventsSettings settings = new PacketEventsSettings();
     private UpdateChecker updateChecker;
     private boolean loaded;
@@ -69,7 +67,6 @@ public final class PacketEvents implements Listener, EventManager {
             identifier = "pe-" + plugin.getName().toLowerCase();
             encoderName = "pe-encoder-" + plugin.getName().toLowerCase();
             decoderName = "pe-decoder-" + plugin.getName().toLowerCase();
-            compressionHandlerName = "pe-compression-handler-" + plugin.getName().toLowerCase();
             try {
                 MinecraftReflection.init();
 

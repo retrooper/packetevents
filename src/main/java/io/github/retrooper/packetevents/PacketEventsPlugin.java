@@ -21,24 +21,14 @@ package io.github.retrooper.packetevents;
 import io.github.retrooper.packetevents.event.PacketListenerAbstract;
 import io.github.retrooper.packetevents.event.impl.PacketReceiveEvent;
 import io.github.retrooper.packetevents.event.impl.PacketSendEvent;
-import io.github.retrooper.packetevents.injector.modern.PacketDecoderModern;
-import io.github.retrooper.packetevents.manager.player.ClientVersion;
-import io.github.retrooper.packetevents.manager.player.Hand;
 import io.github.retrooper.packetevents.protocol.ConnectionState;
 import io.github.retrooper.packetevents.protocol.PacketType;
 import io.github.retrooper.packetevents.utils.bytebuf.ByteBufAbstract;
-import io.github.retrooper.packetevents.wrapper.game.client.WrapperGameClientAnimation;
-import io.github.retrooper.packetevents.wrapper.game.client.WrapperGameClientChatMessage;
-import io.github.retrooper.packetevents.wrapper.game.server.WrapperGameServerPluginMessage;
+import io.github.retrooper.packetevents.wrapper.game.client.WrapperGameClientInteractEntity;
 import io.github.retrooper.packetevents.wrapper.handshaking.client.WrapperHandshakingClientHandshake;
 import io.github.retrooper.packetevents.wrapper.login.client.WrapperLoginClientLoginStart;
-import io.github.retrooper.packetevents.wrapper.status.client.WrapperStatusClientPing;
-import io.github.retrooper.packetevents.wrapper.status.server.WrapperStatusServerPong;
-import io.netty.channel.Channel;
-import io.netty.channel.ChannelHandler;
+import org.bukkit.entity.Entity;
 import org.bukkit.plugin.java.JavaPlugin;
-
-import java.util.Arrays;
 
 public class PacketEventsPlugin extends JavaPlugin {
     @Override
@@ -51,7 +41,7 @@ public class PacketEventsPlugin extends JavaPlugin {
     public void onEnable() {
         PacketEvents.get().init();
         //Internal listener
-        PacketEvents.get().registerListener(new PacketListenerAbstract(PacketListenerAbstract.Priority.LOWEST) {
+        PacketEvents.get().getEventManager().registerListener(new PacketListenerAbstract(PacketListenerAbstract.Priority.LOWEST) {
             @Override
             public void onPacketSend(PacketSendEvent event) {
                 ByteBufAbstract byteBuf = event.getByteBuf();
@@ -92,7 +82,13 @@ public class PacketEventsPlugin extends JavaPlugin {
             @Override
             public void onPacketReceive(PacketReceiveEvent event) {
                 if (event.getPacketType() == PacketType.Game.Client.INTERACT_ENTITY) {
-                    event.getPlayer().sendMessage("nice interaction bro");
+                    WrapperGameClientInteractEntity interactEntity = new WrapperGameClientInteractEntity(event.getClientVersion(), event.getByteBuf());
+                    int entityID = interactEntity.getEntityID();
+                    Entity entity = PacketEvents.get().getServerManager().getEntityById(entityID);
+                    if (entity != null) {
+                        event.getPlayer().sendMessage("entity name: " + entity.getName());
+                    }
+                    event.getPlayer().sendMessage("type: " + interactEntity.getType().name());
                 }
             }
         });

@@ -72,7 +72,7 @@ public class GlobalChannelInjector {
 
     public void injectPlayer(Player player) {
         PlayerInjectEvent injectEvent = new PlayerInjectEvent(player);
-        PacketEvents.get().callEvent(injectEvent);
+        PacketEvents.get().getEventManager().callEvent(injectEvent);
         if (!injectEvent.isCancelled()) {
             injector.injectPlayer(player);
         }
@@ -80,7 +80,7 @@ public class GlobalChannelInjector {
 
     public void ejectPlayer(Player player) {
         PlayerEjectEvent ejectEvent = new PlayerEjectEvent(player);
-        PacketEvents.get().callEvent(ejectEvent);
+        PacketEvents.get().getEventManager().callEvent(ejectEvent);
         if (!ejectEvent.isCancelled()) {
             injector.ejectPlayer(player);
         }
