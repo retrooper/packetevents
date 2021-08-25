@@ -16,15 +16,15 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package io.github.retrooper.packetevents.injector;
+package io.github.retrooper.packetevents.handlers;
 
 import io.github.retrooper.packetevents.PacketEvents;
 import io.github.retrooper.packetevents.event.impl.PlayerEjectEvent;
 import io.github.retrooper.packetevents.event.impl.PlayerInjectEvent;
-import io.github.retrooper.packetevents.injector.legacy.early.EarlyChannelInjectorLegacy;
-import io.github.retrooper.packetevents.injector.legacy.late.LateChannelInjectorLegacy;
-import io.github.retrooper.packetevents.injector.modern.early.EarlyChannelInjectorModern;
-import io.github.retrooper.packetevents.injector.modern.late.LateChannelInjectorModern;
+import io.github.retrooper.packetevents.handlers.legacy.early.EarlyChannelInjectorLegacy;
+import io.github.retrooper.packetevents.handlers.legacy.late.LateChannelInjectorLegacy;
+import io.github.retrooper.packetevents.handlers.modern.early.EarlyChannelInjectorModern;
+import io.github.retrooper.packetevents.handlers.modern.late.LateChannelInjectorModern;
 import io.github.retrooper.packetevents.protocol.ConnectionState;
 import io.github.retrooper.packetevents.utils.nms.MinecraftReflection;
 import org.bukkit.entity.Player;

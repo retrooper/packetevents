@@ -26,6 +26,7 @@ import java.net.SocketAddress;
 
 public class ChannelModern implements ChannelAbstract {
     private final Channel channel;
+
     public ChannelModern(Object rawChannel) {
         this.channel = (Channel) rawChannel;
     }

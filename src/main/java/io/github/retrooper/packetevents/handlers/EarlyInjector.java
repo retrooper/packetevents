@@ -16,8 +16,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package io.github.retrooper.packetevents.injector;
+package io.github.retrooper.packetevents.handlers;
 
-public interface LateInjector extends ChannelInjector {
+import org.bukkit.entity.Player;
 
+public interface EarlyInjector extends ChannelInjector {
+    void updatePlayerObject(Player player, Object channel);
 }

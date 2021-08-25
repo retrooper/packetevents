@@ -20,21 +20,13 @@ package io.github.retrooper.packetevents.utils.reflection;
 
 import io.github.retrooper.packetevents.PacketEvents;
 import io.github.retrooper.packetevents.exceptions.ReflectionObjectFieldNotFoundException;
-import io.github.retrooper.packetevents.utils.enums.EnumUtil;
-import io.github.retrooper.packetevents.utils.nms.MinecraftReflection;
-import io.github.retrooper.packetevents.manager.player.GameMode;
 import io.github.retrooper.packetevents.manager.server.ServerVersion;
-import io.github.retrooper.packetevents.utils.vector.Vector3i;
-import io.github.retrooper.packetevents.utils.world.Difficulty;
-import io.github.retrooper.packetevents.utils.world.Dimension;
-import org.bukkit.inventory.ItemStack;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -351,8 +343,7 @@ public class ReflectionObject implements ReflectionObjectReader, WrapperPacketWr
     public void writeEnumConstant(int index, Enum<?> enumConstant) {
         try {
             write(enumConstant.getClass(), index, enumConstant);
-        }
-        catch (ReflectionObjectFieldNotFoundException ex) {
+        } catch (ReflectionObjectFieldNotFoundException ex) {
             write(enumConstant.getDeclaringClass(), index, enumConstant);
         }
     }

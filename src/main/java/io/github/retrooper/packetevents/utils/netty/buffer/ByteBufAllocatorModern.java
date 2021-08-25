@@ -18,7 +18,6 @@
 
 package io.github.retrooper.packetevents.utils.netty.buffer;
 
-import io.github.retrooper.packetevents.utils.netty.bytebuf.ByteBufAbstract;
 import io.netty.buffer.ByteBufAllocator;
 
 public class ByteBufAllocatorModern implements ByteBufAllocatorAbstract {

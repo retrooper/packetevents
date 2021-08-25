@@ -18,17 +18,19 @@
 
 package io.github.retrooper.packetevents.wrapper.game.server;
 
-import io.github.retrooper.packetevents.utils.netty.bytebuf.ByteBufAbstract;
+import io.github.retrooper.packetevents.utils.netty.buffer.ByteBufAbstract;
 import io.github.retrooper.packetevents.wrapper.PacketWrapper;
 
 /**
  * This packet is currently used by mods to synchronize the client with the server.
  * It is not used by the vanilla server.
  * Most likely added as a replacement to the removed Window Confirmation packet.
+ *
  * @see io.github.retrooper.packetevents.wrapper.game.client.WrapperGameClientPong
  */
 public class WrapperGameServerPing extends PacketWrapper {
     private final int id;
+
     public WrapperGameServerPing(ByteBufAbstract byteBuf) {
         super(byteBuf);
         this.id = readInt();

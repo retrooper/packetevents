@@ -57,16 +57,16 @@ public class UpdateChecker {
             newVersion = null;
         }
         if (newVersion != null && localVersion.isOlderThan(newVersion)) {
-            inform("There is an update available for the PacketEvents API! Your build: (" + localVersion.toString() + ") | Latest released build: (" + newVersion.toString() + ")");
+            inform("There is an update available for the PacketEvents API! Your build: (" + localVersion + ") | Latest released build: (" + newVersion + ")");
             return UpdateCheckerStatus.OUTDATED;
         } else if (newVersion != null && localVersion.isNewerThan(newVersion)) {
-            inform("You are on a dev or pre released build of PacketEvents. Your build: (" + localVersion.toString() + ") | Latest released build: (" + newVersion.toString() + ")");
+            inform("You are on a dev or pre released build of PacketEvents. Your build: (" + localVersion + ") | Latest released build: (" + newVersion + ")");
             return UpdateCheckerStatus.PRE_RELEASE;
         } else if (localVersion.equals(newVersion)) {
-            inform("You are on the latest released version of PacketEvents. (" + newVersion.toString() + ")");
+            inform("You are on the latest released version of PacketEvents. (" + newVersion + ")");
             return UpdateCheckerStatus.UP_TO_DATE;
         } else {
-            report("Something went wrong while checking for an update. Your build: (" + localVersion.toString() + ") | Latest released build: (" + newVersion.toString() + ")");
+            report("Something went wrong while checking for an update. Your build: (" + localVersion + ") | Latest released build: (" + newVersion.toString() + ")");
             return UpdateCheckerStatus.FAILED;
         }
     }

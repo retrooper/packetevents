@@ -16,7 +16,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package io.github.retrooper.packetevents.utils.netty.bytebuf;
+package io.github.retrooper.packetevents.utils.netty.buffer;
 
 
 import io.github.retrooper.packetevents.utils.nms.MinecraftReflection;
@@ -29,8 +29,7 @@ public interface ByteBufAbstract {
     static ByteBufAbstract generate(@NotNull Object byteBuf) {
         if (MinecraftReflection.USE_MODERN_NETTY_PACKAGE) {
             return new ByteBufModern(byteBuf);
-        }
-        else {
+        } else {
             return new ByteBufLegacy(byteBuf);
         }
     }
@@ -125,6 +124,8 @@ public interface ByteBufAbstract {
 
     ByteBufAbstract writeBytes(ByteBufAbstract byteBuf);
 
+    ByteBufAbstract writeBytes(byte[] bytes, int a, int b);
+
     ByteBufAbstract writeBoolean(boolean a);
 
     ByteBufAbstract writeByte(int a);
@@ -143,51 +144,51 @@ public interface ByteBufAbstract {
 
     ByteBufAbstract writeDouble(double a);
 
-     ByteBufAbstract copy();
+    ByteBufAbstract copy();
 
-     ByteBufAbstract copy(int a, int b);
+    ByteBufAbstract copy(int a, int b);
 
-     ByteBufAbstract slice();
+    ByteBufAbstract slice();
 
-     ByteBufAbstract slice(int a, int b);
+    ByteBufAbstract slice(int a, int b);
 
-     ByteBufAbstract duplicate();
+    ByteBufAbstract duplicate();
 
-     int nioBufferCount();
+    int nioBufferCount();
 
-     ByteBuffer nioBuffer();
+    ByteBuffer nioBuffer();
 
-     ByteBuffer nioBuffer(int a, int b);
+    ByteBuffer nioBuffer(int a, int b);
 
-     ByteBuffer internalNioBuffer(int a, int b);
+    ByteBuffer internalNioBuffer(int a, int b);
 
-     ByteBuffer[] nioBuffers();
+    ByteBuffer[] nioBuffers();
 
-     ByteBuffer[] nioBuffers(int a, int b);
+    ByteBuffer[] nioBuffers(int a, int b);
 
-     boolean hasArray();
+    boolean hasArray();
 
-     byte[] array();
+    byte[] array();
 
-     int arrayOffset();
+    int arrayOffset();
 
-     boolean hasMemoryAddress();
+    boolean hasMemoryAddress();
 
-     long memoryAddress();
+    long memoryAddress();
 
-     int hashCode();
+    int hashCode();
 
-     boolean equals(Object a);
+    boolean equals(Object a);
 
-     int compareTo(ByteBufAbstract a);
+    int compareTo(ByteBufAbstract a);
 
-     ByteBufAbstract retain(int a);
+    ByteBufAbstract retain(int a);
 
-     ByteBufAbstract retain();
+    ByteBufAbstract retain();
 
-     ByteBufAbstract readBytes(int i);
+    ByteBufAbstract readBytes(int i);
 
-     void readBytes(byte[] bytes);
+    void readBytes(byte[] bytes);
 
     ByteBufAbstract getBytes(int readerIndex, byte[] bytes);
 

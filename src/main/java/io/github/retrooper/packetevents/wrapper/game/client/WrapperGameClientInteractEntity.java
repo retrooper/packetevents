@@ -20,7 +20,7 @@ package io.github.retrooper.packetevents.wrapper.game.client;
 
 import io.github.retrooper.packetevents.manager.player.ClientVersion;
 import io.github.retrooper.packetevents.manager.player.Hand;
-import io.github.retrooper.packetevents.utils.netty.bytebuf.ByteBufAbstract;
+import io.github.retrooper.packetevents.utils.netty.buffer.ByteBufAbstract;
 import io.github.retrooper.packetevents.utils.vector.Vector3f;
 import io.github.retrooper.packetevents.wrapper.PacketWrapper;
 
@@ -31,11 +31,13 @@ public class WrapperGameClientInteractEntity extends PacketWrapper {
         INTERACT, ATTACK, INTERACT_AT;
         public static final Type[] VALUES = values();
     }
+
     private final int entityID;
     private final Type type;
     private final Optional<Vector3f> target;
     private final Optional<Hand> hand;
     private final Optional<Boolean> sneaking;
+
     public WrapperGameClientInteractEntity(ClientVersion clientVersion, ByteBufAbstract byteBuf) {
         super(clientVersion, byteBuf);
         if (clientVersion.isOlderThan(ClientVersion.v_1_8)) {
@@ -43,10 +45,9 @@ public class WrapperGameClientInteractEntity extends PacketWrapper {
             int typeIndex = readByte() % Type.VALUES.length;
             this.type = Type.VALUES[typeIndex];
             this.target = Optional.empty();
-            this.hand= Optional.empty();
+            this.hand = Optional.empty();
             this.sneaking = Optional.empty();
-        }
-        else {
+        } else {
             this.entityID = readVarInt();
             int typeIndex = readVarInt();
             this.type = Type.VALUES[typeIndex];
@@ -56,23 +57,20 @@ public class WrapperGameClientInteractEntity extends PacketWrapper {
                 float y = readFloat();
                 float z = readFloat();
                 this.target = Optional.of(new Vector3f(x, y, z));
-            }
-            else {
+            } else {
                 this.target = Optional.empty();
             }
 
             if (clientVersion.isNewerThan(ClientVersion.v_1_8) && (type == Type.INTERACT || type == Type.INTERACT_AT)) {
                 int handIndex = readVarInt();
                 this.hand = Optional.of(Hand.VALUES[handIndex]);
-            }
-            else {
+            } else {
                 this.hand = Optional.empty();
             }
 
             if (clientVersion.isNewerThanOrEquals(ClientVersion.v_1_16)) {
                 this.sneaking = Optional.of(readBoolean());
-            }
-            else {
+            } else {
                 this.sneaking = Optional.empty();
             }
         }

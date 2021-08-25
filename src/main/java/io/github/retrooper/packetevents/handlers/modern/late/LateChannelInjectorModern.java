@@ -16,12 +16,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package io.github.retrooper.packetevents.injector.modern.late;
+package io.github.retrooper.packetevents.handlers.modern.late;
 
 import io.github.retrooper.packetevents.PacketEvents;
-import io.github.retrooper.packetevents.injector.LateInjector;
-import io.github.retrooper.packetevents.injector.modern.PacketDecoderModern;
-import io.github.retrooper.packetevents.injector.modern.early.PEChannelInitializerModern;
+import io.github.retrooper.packetevents.handlers.LateInjector;
+import io.github.retrooper.packetevents.handlers.modern.PacketDecoderModern;
+import io.github.retrooper.packetevents.handlers.modern.PacketEncoderModern;
+import io.github.retrooper.packetevents.handlers.modern.early.PEChannelInitializerModern;
 import io.github.retrooper.packetevents.protocol.ConnectionState;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandler;
@@ -46,11 +47,20 @@ public class LateChannelInjectorModern implements LateInjector {
 
     private PacketDecoderModern getDecoder(Object rawChannel) {
         Channel channel = (Channel) rawChannel;
-        ChannelHandler decoder = channel.pipeline().get("decoder");
+        ChannelHandler decoder = channel.pipeline().get(PacketEvents.get().decoderName);
         if (decoder instanceof PacketDecoderModern) {
             return (PacketDecoderModern) decoder;
+        } else {
+            return null;
         }
-        else {
+    }
+
+    private PacketEncoderModern getEncoder(Object rawChannel) {
+        Channel channel = (Channel) rawChannel;
+        ChannelHandler decoder = channel.pipeline().get(PacketEvents.get().encoderName);
+        if (decoder instanceof PacketEncoderModern) {
+            return (PacketEncoderModern) decoder;
+        } else {
             return null;
         }
     }
@@ -74,7 +84,9 @@ public class LateChannelInjectorModern implements LateInjector {
             return false;
         }
         PacketDecoderModern decoder = getDecoder(channel);
-        return decoder != null && decoder.player != null;
+        PacketEncoderModern encoder = getEncoder(channel);
+        return decoder != null && decoder.player != null &&
+                encoder != null && encoder.player != null;
     }
 
     @Override

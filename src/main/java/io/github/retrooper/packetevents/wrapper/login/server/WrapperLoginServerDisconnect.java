@@ -20,7 +20,7 @@ package io.github.retrooper.packetevents.wrapper.login.server;
 
 import io.github.retrooper.packetevents.manager.server.ServerVersion;
 import io.github.retrooper.packetevents.protocol.ConnectionState;
-import io.github.retrooper.packetevents.utils.netty.bytebuf.ByteBufAbstract;
+import io.github.retrooper.packetevents.utils.netty.buffer.ByteBufAbstract;
 import io.github.retrooper.packetevents.wrapper.PacketWrapper;
 
 /**
@@ -37,6 +37,7 @@ public class WrapperLoginServerDisconnect extends PacketWrapper {
 
     /**
      * The reason the server disconnected the client. (Specified by the server)
+     *
      * @return Disconnection reason
      */
     public String getReason() {

@@ -76,13 +76,13 @@ public class BoundingBox implements Cloneable, ConfigurationSerializable {
         int maxX = Math.max(x1, x2) + 1;
         int maxY = Math.max(y1, y2) + 1;
         int maxZ = Math.max(z1, z2) + 1;
-        return new BoundingBox((double) minX, (double) minY, (double) minZ, (double) maxX, (double) maxY, (double) maxZ);
+        return new BoundingBox(minX, minY, minZ, maxX, maxY, maxZ);
     }
 
     @NotNull
     public static BoundingBox of(@NotNull Block block) {
         Validate.notNull(block, "Block is null!");
-        return new BoundingBox((double) block.getX(), (double) block.getY(), (double) block.getZ(), (double) (block.getX() + 1), (double) (block.getY() + 1), (double) (block.getZ() + 1));
+        return new BoundingBox(block.getX(), block.getY(), block.getZ(), block.getX() + 1, block.getY() + 1, block.getZ() + 1);
     }
 
     @NotNull

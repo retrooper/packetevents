@@ -152,8 +152,6 @@ public enum ClientboundPacketType_1_17 {
     SET_TITLE_TIME,
 
 
-
-
     //This packet was removed and split up into 3 new packets
     //TITLE,
 

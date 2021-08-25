@@ -19,7 +19,7 @@
 package io.github.retrooper.packetevents.wrapper.game.client;
 
 import io.github.retrooper.packetevents.manager.player.ClientVersion;
-import io.github.retrooper.packetevents.utils.netty.bytebuf.ByteBufAbstract;
+import io.github.retrooper.packetevents.utils.netty.buffer.ByteBufAbstract;
 import io.github.retrooper.packetevents.wrapper.PacketWrapper;
 
 import java.util.UUID;
@@ -29,6 +29,7 @@ import java.util.UUID;
  */
 public class WrapperGameClientSpectate extends PacketWrapper {
     private final UUID uuid;
+
     public WrapperGameClientSpectate(ClientVersion version, ByteBufAbstract byteBuf) {
         super(version, byteBuf);
         this.uuid = readUUID();
@@ -36,6 +37,7 @@ public class WrapperGameClientSpectate extends PacketWrapper {
 
     /**
      * UUID of the entity we want to teleport to.
+     *
      * @return UUID of target entity
      */
     public UUID getUUID() {

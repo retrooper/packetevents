@@ -16,7 +16,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package io.github.retrooper.packetevents.utils.netty.bytebuf;
+package io.github.retrooper.packetevents.utils.netty.buffer;
 
 import net.minecraft.util.io.netty.buffer.ByteBuf;
 
@@ -254,8 +254,13 @@ public class ByteBufLegacy implements ByteBufAbstract {
     }
 
     @Override
-    public ByteBufAbstract writeBytes(ByteBufAbstract byteBuf) {
-        return new ByteBufLegacy(((ByteBuf)byteBuf.rawByteBuf()).writeBytes((ByteBuf) byteBuf.rawByteBuf()));
+    public ByteBufAbstract writeBytes(ByteBufAbstract input) {
+        return new ByteBufLegacy(byteBuf.writeBytes((ByteBuf) input.rawByteBuf()));
+    }
+
+    @Override
+    public ByteBufAbstract writeBytes(byte[] bytes, int a, int b) {
+        return new ByteBufLegacy(byteBuf.writeBytes(bytes, a, b));
     }
 
     @Override

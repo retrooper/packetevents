@@ -19,10 +19,10 @@
 package io.github.retrooper.packetevents.protocol;
 
 import io.github.retrooper.packetevents.PacketEvents;
+import io.github.retrooper.packetevents.manager.player.ClientVersion;
 import io.github.retrooper.packetevents.manager.server.ServerVersion;
 import io.github.retrooper.packetevents.protocol.protocols.clientbound.*;
 import io.github.retrooper.packetevents.protocol.protocols.serverbound.*;
-import io.github.retrooper.packetevents.manager.player.ClientVersion;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.IdentityHashMap;
@@ -36,15 +36,13 @@ public final class PacketType {
             case STATUS:
                 if (side == PacketSide.CLIENT) {
                     return Status.Client.getById(packetID);
-                }
-                else {
+                } else {
                     return Status.Server.getById(packetID);
                 }
             case LOGIN:
                 if (side == PacketSide.CLIENT) {
                     return Login.Client.getById(packetID);
-                }
-                else {
+                } else {
                     return Login.Server.getById(packetID);
                 }
             case GAME:
@@ -64,18 +62,16 @@ public final class PacketType {
             /**
              * Technically not part of the current protocol, but clients older than 1.7 will send this to initiate Server List Ping.
              * 1.8 and newer servers will handle it correctly though.
-            */
+             */
             LEGACY_SERVER_LIST_PING;
 
             @Nullable
             public static PacketTypeCommon getById(int packetID) {
                 if (packetID == 0) {
                     return HANDSHAKE;
-                }
-                else if (packetID == 254) {//0XFE in hex
+                } else if (packetID == 254) {//0XFE in hex
                     return LEGACY_SERVER_LIST_PING;
-                }
-                else {
+                } else {
                     return null;
                 }
             }
@@ -107,11 +103,9 @@ public final class PacketType {
             public static PacketTypeCommon getById(int packetID) {
                 if (packetID == 0) {
                     return RESPONSE;
-                }
-                else if (packetID == 1) {
+                } else if (packetID == 1) {
                     return PONG;
-                }
-                else {
+                } else {
                     return null;
                 }
             }
@@ -129,14 +123,11 @@ public final class PacketType {
             public static PacketTypeCommon getById(int packetID) {
                 if (packetID == 0) {
                     return LOGIN_START;
-                }
-                else if (packetID == 1) {
+                } else if (packetID == 1) {
                     return ENCRYPTION_RESPONSE;
-                }
-                else if (packetID == 2) {
+                } else if (packetID == 2) {
                     return LOGIN_PLUGIN_RESPONSE;
-                }
-                else {
+                } else {
                     return null;
                 }
             }

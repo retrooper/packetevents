@@ -20,7 +20,7 @@ package io.github.retrooper.packetevents.wrapper.game.client;
 
 import io.github.retrooper.packetevents.manager.player.ClientVersion;
 import io.github.retrooper.packetevents.manager.player.Hand;
-import io.github.retrooper.packetevents.utils.netty.bytebuf.ByteBufAbstract;
+import io.github.retrooper.packetevents.utils.netty.buffer.ByteBufAbstract;
 import io.github.retrooper.packetevents.wrapper.PacketWrapper;
 
 /**
@@ -28,12 +28,12 @@ import io.github.retrooper.packetevents.wrapper.PacketWrapper;
  */
 public class WrapperGameClientAnimation extends PacketWrapper {
     private final Hand hand;
+
     public WrapperGameClientAnimation(ClientVersion version, ByteBufAbstract byteBuf) {
         super(version, byteBuf);
         if (version.isNewerThanOrEquals(ClientVersion.v_1_9)) {
             this.hand = Hand.VALUES[readVarInt()];
-        }
-        else {
+        } else {
             //Default to main hand, because 1.8 and 1.7.10 don't have an off-hand anyway.
             this.hand = Hand.MAIN_HAND;
         }
@@ -41,11 +41,12 @@ public class WrapperGameClientAnimation extends PacketWrapper {
 
     /**
      * Hand used for the animation.
-     *  On {@link ClientVersion#v_1_9}, an off-hand was introduced and specifies which arm has been swung.
-     *  For {@link ClientVersion#v_1_8} and {@link ClientVersion#v_1_7_10} clients only have a main hand.
+     * On {@link ClientVersion#v_1_9}, an off-hand was introduced and specifies which arm has been swung.
+     * For {@link ClientVersion#v_1_8} and {@link ClientVersion#v_1_7_10} clients only have a main hand.
+     *
      * @return Hand
      */
     public Hand getHand() {
-       return hand;
+        return hand;
     }
 }

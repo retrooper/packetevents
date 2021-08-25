@@ -18,8 +18,8 @@
 
 package io.github.retrooper.packetevents.exceptions;
 
-import io.github.retrooper.packetevents.utils.reflection.ReflectionObject;
 import io.github.retrooper.packetevents.utils.reflection.ClassUtil;
+import io.github.retrooper.packetevents.utils.reflection.ReflectionObject;
 
 /**
  * An exception thrown by PacketEvents when a wrapper fails

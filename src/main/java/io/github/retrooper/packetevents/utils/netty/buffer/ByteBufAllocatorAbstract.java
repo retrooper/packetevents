@@ -18,15 +18,13 @@
 
 package io.github.retrooper.packetevents.utils.netty.buffer;
 
-import io.github.retrooper.packetevents.utils.netty.bytebuf.ByteBufAbstract;
 import io.github.retrooper.packetevents.utils.nms.MinecraftReflection;
 
 public interface ByteBufAllocatorAbstract {
     static ByteBufAllocatorAbstract generate(Object rawByteBufAllocator) {
         if (MinecraftReflection.USE_MODERN_NETTY_PACKAGE) {
             return new ByteBufAllocatorModern(rawByteBufAllocator);
-        }
-        else {
+        } else {
             return new ByteBufAllocatorLegacy(rawByteBufAllocator);
         }
     }

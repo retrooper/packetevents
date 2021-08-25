@@ -19,9 +19,9 @@
 package io.github.retrooper.packetevents.wrapper;
 
 import io.github.retrooper.packetevents.PacketEvents;
-import io.github.retrooper.packetevents.manager.server.ServerVersion;
-import io.github.retrooper.packetevents.utils.netty.bytebuf.ByteBufAbstract;
 import io.github.retrooper.packetevents.manager.player.ClientVersion;
+import io.github.retrooper.packetevents.manager.server.ServerVersion;
+import io.github.retrooper.packetevents.utils.netty.buffer.ByteBufAbstract;
 
 import java.nio.charset.StandardCharsets;
 import java.util.UUID;
@@ -79,7 +79,7 @@ public class PacketWrapper {
     }
 
     public void writeVarInt(int value) {
-        while((value & -128) != 0) {
+        while ((value & -128) != 0) {
             byteBuf.writeByte(value & 127 | 128);
             value >>>= 7;
         }

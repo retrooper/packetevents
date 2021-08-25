@@ -19,13 +19,14 @@
 package io.github.retrooper.packetevents.wrapper.game.client;
 
 import io.github.retrooper.packetevents.manager.player.ClientVersion;
-import io.github.retrooper.packetevents.utils.netty.bytebuf.ByteBufAbstract;
+import io.github.retrooper.packetevents.utils.netty.buffer.ByteBufAbstract;
 import io.github.retrooper.packetevents.wrapper.PacketWrapper;
 
 /**
  * A response to the ping packet.
  * The vanilla server doesn't seem to send the Ping packet.
  * Most likely added as a replacement to the removed Window Confirmation packet.
+ *
  * @see io.github.retrooper.packetevents.wrapper.game.server.WrapperGameServerPing
  */
 public class WrapperGameClientPong extends PacketWrapper {
@@ -38,6 +39,7 @@ public class WrapperGameClientPong extends PacketWrapper {
 
     /**
      * ID of the last sent Ping packet.
+     *
      * @return ID
      */
     public int getID() {

@@ -18,7 +18,7 @@
 
 package io.github.retrooper.packetevents.utils.wrapper;
 
-import io.github.retrooper.packetevents.utils.netty.bytebuf.ByteBufAbstract;
+import io.github.retrooper.packetevents.utils.netty.buffer.ByteBufAbstract;
 import io.github.retrooper.packetevents.utils.vector.Vector3i;
 import net.minecraft.util.com.google.common.base.Charsets;
 

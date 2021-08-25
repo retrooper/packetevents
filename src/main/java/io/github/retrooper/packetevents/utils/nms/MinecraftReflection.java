@@ -19,9 +19,9 @@
 package io.github.retrooper.packetevents.utils.nms;
 
 import io.github.retrooper.packetevents.PacketEvents;
-import io.github.retrooper.packetevents.utils.reflection.ReflectionObject;
-import io.github.retrooper.packetevents.utils.reflection.Reflection;
 import io.github.retrooper.packetevents.manager.server.ServerVersion;
+import io.github.retrooper.packetevents.utils.reflection.Reflection;
+import io.github.retrooper.packetevents.utils.reflection.ReflectionObject;
 import org.bukkit.Bukkit;
 import org.bukkit.Server;
 import org.bukkit.World;
@@ -67,7 +67,7 @@ public final class MinecraftReflection {
 
     //Methods
     public static Method GET_CRAFT_PLAYER_HANDLE_METHOD, GET_CRAFT_ENTITY_HANDLE_METHOD, GET_CRAFT_WORLD_HANDLE_METHOD,
-            GET_MOB_EFFECT_LIST_ID_METHOD, GET_MOB_EFFECT_LIST_BY_ID_METHOD, GET_ITEM_ID_METHOD,  GET_ITEM_BY_ID_METHOD,
+            GET_MOB_EFFECT_LIST_ID_METHOD, GET_MOB_EFFECT_LIST_BY_ID_METHOD, GET_ITEM_ID_METHOD, GET_ITEM_BY_ID_METHOD,
             GET_BUKKIT_ENTITY_METHOD, GET_LEVEL_ENTITY_GETTER_ITERABLE_METHOD, GET_ENTITY_BY_ID_METHOD;
 
     private static Object MINECRAFT_SERVER_INSTANCE;
@@ -81,7 +81,7 @@ public final class MinecraftReflection {
         GET_MOB_EFFECT_LIST_ID_METHOD = Reflection.getMethod(MOB_EFFECT_LIST_CLASS, "getId", 0);
         GET_MOB_EFFECT_LIST_BY_ID_METHOD = Reflection.getMethod(MOB_EFFECT_LIST_CLASS, "fromId", 0);
         GET_ITEM_ID_METHOD = Reflection.getMethod(NMS_ITEM_CLASS, "getId", 0);
-        GET_ITEM_BY_ID_METHOD =  Reflection.getMethod(NMS_ITEM_CLASS, "getById", 0);
+        GET_ITEM_BY_ID_METHOD = Reflection.getMethod(NMS_ITEM_CLASS, "getById", 0);
         if (V_1_17_OR_HIGHER) {
             GET_LEVEL_ENTITY_GETTER_ITERABLE_METHOD = Reflection.getMethod(LEVEL_ENTITY_GETTER_CLASS, Iterable.class, 0);
         }
@@ -118,8 +118,7 @@ public final class MinecraftReflection {
 
         if (USE_MODERN_NETTY_PACKAGE) {
             GAME_PROFILE_CLASS = Reflection.getClassByNameWithoutException("com.mojang.authlib.GameProfile");
-        }
-        else {
+        } else {
             GAME_PROFILE_CLASS = Reflection.getClassByNameWithoutException("net.minecraft.util.com.mojang.authlib.GameProfile");
         }
 
@@ -148,8 +147,7 @@ public final class MinecraftReflection {
             USE_MODERN_NETTY_PACKAGE = !USE_MODERN_NETTY_PACKAGE;
             try {
                 getNettyClass("channel.Channel");
-            }
-            catch (Exception ex2) {
+            } catch (Exception ex2) {
                 //Failed again? Where is netty?
                 PacketEvents.get().getPlugin().getLogger().severe("PacketEvents failed to locate netty on your server.");
             }
@@ -160,7 +158,6 @@ public final class MinecraftReflection {
     }
 
 
-
     @Nullable
     public static Class<?> getServerClass(String modern, String legacy) {
         if (V_1_17_OR_HIGHER) {
@@ -169,12 +166,10 @@ public final class MinecraftReflection {
             } catch (ClassNotFoundException ex) {
                 return null;
             }
-        }
-        else {
+        } else {
             try {
                 return Class.forName(LEGACY_NMS_PACKAGE + legacy);
-            }
-            catch (ClassNotFoundException ex) {
+            } catch (ClassNotFoundException ex) {
                 return null;
             }
         }

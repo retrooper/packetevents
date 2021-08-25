@@ -16,12 +16,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package io.github.retrooper.packetevents.injector.legacy.late;
+package io.github.retrooper.packetevents.handlers.legacy.late;
 
 import io.github.retrooper.packetevents.PacketEvents;
-import io.github.retrooper.packetevents.injector.LateInjector;
-import io.github.retrooper.packetevents.injector.legacy.PacketDecoderLegacy;
-import io.github.retrooper.packetevents.injector.legacy.early.PEChannelInitializerLegacy;
+import io.github.retrooper.packetevents.handlers.LateInjector;
+import io.github.retrooper.packetevents.handlers.legacy.PacketDecoderLegacy;
+import io.github.retrooper.packetevents.handlers.legacy.PacketEncoderLegacy;
+import io.github.retrooper.packetevents.handlers.legacy.early.PEChannelInitializerLegacy;
 import io.github.retrooper.packetevents.protocol.ConnectionState;
 import net.minecraft.util.io.netty.channel.Channel;
 import net.minecraft.util.io.netty.channel.ChannelHandler;
@@ -46,11 +47,20 @@ public class LateChannelInjectorLegacy implements LateInjector {
 
     private PacketDecoderLegacy getDecoder(Object rawChannel) {
         Channel channel = (Channel) rawChannel;
-        ChannelHandler decoder = channel.pipeline().get("decoder");
+        ChannelHandler decoder = channel.pipeline().get(PacketEvents.get().decoderName);
         if (decoder instanceof PacketDecoderLegacy) {
             return (PacketDecoderLegacy) decoder;
+        } else {
+            return null;
         }
-        else {
+    }
+
+    private PacketEncoderLegacy getEncoder(Object rawChannel) {
+        Channel channel = (Channel) rawChannel;
+        ChannelHandler decoder = channel.pipeline().get(PacketEvents.get().encoderName);
+        if (decoder instanceof PacketEncoderLegacy) {
+            return (PacketEncoderLegacy) decoder;
+        } else {
             return null;
         }
     }
@@ -75,7 +85,9 @@ public class LateChannelInjectorLegacy implements LateInjector {
             return false;
         }
         PacketDecoderLegacy decoder = getDecoder(channel);
-        return decoder != null && decoder.player != null;
+        PacketEncoderLegacy encoder = getEncoder(channel);
+        return decoder != null && decoder.player != null &&
+                encoder != null && encoder.player != null;
     }
 
     @Override
@@ -102,10 +114,10 @@ public class LateChannelInjectorLegacy implements LateInjector {
     }
 
     @Override
-    public void changeConnectionState(Object channel, ConnectionState packetState) {
+    public void changeConnectionState(Object channel, ConnectionState connectionState) {
         PacketDecoderLegacy decoder = getDecoder(channel);
         if (decoder != null) {
-            decoder.packetState = packetState;
+            decoder.connectionState = connectionState;
         }
     }
 }

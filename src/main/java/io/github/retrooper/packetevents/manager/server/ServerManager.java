@@ -18,9 +18,9 @@
 
 package io.github.retrooper.packetevents.manager.server;
 
-import io.github.retrooper.packetevents.utils.reflection.ReflectionObject;
 import io.github.retrooper.packetevents.utils.boundingbox.BoundingBox;
 import io.github.retrooper.packetevents.utils.nms.MinecraftReflection;
+import io.github.retrooper.packetevents.utils.reflection.ReflectionObject;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.entity.Entity;
@@ -46,8 +46,7 @@ public final class ServerManager {
     public ServerVersion getVersion() {
         if (version != null) {
             return version;
-        }
-        else {
+        } else {
             return version = ServerVersion.resolve();
         }
     }
@@ -135,8 +134,7 @@ public final class ServerManager {
                         return entity;
                     }
                 }
-            }
-            catch (ConcurrentModificationException ex) {
+            } catch (ConcurrentModificationException ex) {
                 return null;
             }
         }
@@ -160,8 +158,7 @@ public final class ServerManager {
                         }
                     }
                 }
-            }
-            catch (Exception ex) {
+            } catch (Exception ex) {
                 //We are retrying below
             }
             try {
@@ -173,8 +170,7 @@ public final class ServerManager {
                         }
                     }
                 }
-            }
-            catch (Exception ex) {
+            } catch (Exception ex) {
                 //No entity found
                 return null;
             }

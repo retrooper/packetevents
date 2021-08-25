@@ -16,22 +16,21 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package io.github.retrooper.packetevents.injector.modern;
+package io.github.retrooper.packetevents.handlers.modern;
 
 import io.github.retrooper.packetevents.PacketEvents;
 import io.github.retrooper.packetevents.event.impl.PacketSendEvent;
-import io.github.retrooper.packetevents.utils.netty.bytebuf.ByteBufAbstract;
+import io.github.retrooper.packetevents.handlers.compression.CompressionManager;
+import io.github.retrooper.packetevents.handlers.compression.CustomPacketCompressor;
+import io.github.retrooper.packetevents.handlers.compression.CustomPacketDecompressor;
+import io.github.retrooper.packetevents.utils.netty.buffer.ByteBufAbstract;
 import io.github.retrooper.packetevents.utils.netty.channel.ChannelHandlerContextAbstract;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandler;
-import io.netty.channel.ChannelHandlerAdapter;
 import io.netty.channel.ChannelHandlerContext;
-import io.netty.handler.codec.ByteToMessageDecoder;
-import io.netty.handler.codec.MessageToByteEncoder;
 import io.netty.handler.codec.MessageToMessageEncoder;
 import org.bukkit.entity.Player;
 
-import java.util.Arrays;
 import java.util.List;
 
 @ChannelHandler.Sharable
@@ -39,9 +38,8 @@ public class PacketEncoderModern extends MessageToMessageEncoder<ByteBuf> {
     public volatile Player player;
     private boolean handledCompression;
 
-    @Override
-    protected void encode(ChannelHandlerContext ctx, ByteBuf byteBuf, List<Object> out) {
-        ByteBuf transformedBuf = ctx.alloc().buffer().writeBytes(byteBuf);
+    public ByteBufAbstract handle(ChannelHandlerContextAbstract ctx, ByteBufAbstract byteBuf) {
+        ByteBufAbstract transformedBuf = ctx.alloc().buffer().writeBytes(byteBuf);
         try {
             boolean needsCompress = handleCompressionOrder(ctx, transformedBuf);
 
@@ -56,13 +54,18 @@ public class PacketEncoderModern extends MessageToMessageEncoder<ByteBuf> {
             if (needsCompress) {
                 recompress(ctx, transformedBuf);
             }
-            out.add(transformedBuf.retain());
+            return transformedBuf.retain();
         } finally {
             transformedBuf.release();
         }
     }
 
-    private boolean handleCompressionOrder(ChannelHandlerContext ctx, ByteBuf buf) {
+    @Override
+    protected void encode(ChannelHandlerContext ctx, ByteBuf byteBuf, List<Object> out) {
+        out.add(handle(ChannelHandlerContextAbstract.generate(ctx), ByteBufAbstract.generate(byteBuf)));
+    }
+
+    private boolean handleCompressionOrder(ChannelHandlerContextAbstract ctx, ByteBufAbstract buf) {
         if (handledCompression) return false;
 
         int encoderIndex = ctx.pipeline().names().indexOf("compress");
@@ -70,14 +73,14 @@ public class PacketEncoderModern extends MessageToMessageEncoder<ByteBuf> {
         handledCompression = true;
         if (encoderIndex > ctx.pipeline().names().indexOf(PacketEvents.get().encoderName)) {
             // Need to decompress this packet due to bad order
-            ByteBuf decompressed = (ByteBuf) CustomPacketDecompressor.decompress(ChannelHandlerContextAbstract.generate(ctx), ByteBufAbstract.generate(buf)).rawByteBuf();
-            return PacketDecoderModern.refactorHandlers(ctx, buf, decompressed);
+            ByteBufAbstract decompressed = CustomPacketDecompressor.decompress(ctx, buf);
+            return CompressionManager.refactorHandlers(ctx, buf, decompressed);
         }
         return false;
     }
 
-    private void recompress(ChannelHandlerContext ctx, ByteBuf buf) {
-        ByteBuf compressed = CustomPacketCompressorModern.compress(ctx, buf);
+    private void recompress(ChannelHandlerContextAbstract ctx, ByteBufAbstract buf) {
+        ByteBufAbstract compressed = CustomPacketCompressor.compress(ctx, buf);
         try {
             buf.clear().writeBytes(compressed);
         } finally {

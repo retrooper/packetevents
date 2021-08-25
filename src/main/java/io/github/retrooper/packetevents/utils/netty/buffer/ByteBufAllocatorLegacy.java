@@ -18,7 +18,6 @@
 
 package io.github.retrooper.packetevents.utils.netty.buffer;
 
-import io.github.retrooper.packetevents.utils.netty.bytebuf.ByteBufAbstract;
 import net.minecraft.util.io.netty.buffer.ByteBufAllocator;
 
 public class ByteBufAllocatorLegacy implements ByteBufAllocatorAbstract {

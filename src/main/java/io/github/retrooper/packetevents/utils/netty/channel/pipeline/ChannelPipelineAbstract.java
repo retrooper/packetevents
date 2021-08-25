@@ -20,18 +20,15 @@ package io.github.retrooper.packetevents.utils.netty.channel.pipeline;
 
 import io.github.retrooper.packetevents.utils.netty.channel.ChannelHandlerAbstract;
 import io.github.retrooper.packetevents.utils.nms.MinecraftReflection;
-import io.netty.channel.ChannelHandler;
-import io.netty.channel.ChannelPipeline;
-import io.netty.util.concurrent.EventExecutorGroup;
 
 import java.util.List;
+
 //TODO Complete
 public interface ChannelPipelineAbstract {
     static ChannelPipelineAbstract generate(Object rawChannelPipeline) {
         if (MinecraftReflection.USE_MODERN_NETTY_PACKAGE) {
             return new ChannelPipelineModern(rawChannelPipeline);
-        }
-        else {
+        } else {
             return new ChannelPipelineLegacy(rawChannelPipeline);
         }
     }
@@ -42,23 +39,23 @@ public interface ChannelPipelineAbstract {
 
     ChannelHandlerAbstract get(String handlerName);
 
-    ChannelPipelineAbstract addFirst(String handlerName, Object handler);
+    ChannelPipelineAbstract addFirst(String handlerName, ChannelHandlerAbstract handler);
 
-    ChannelPipelineAbstract addLast(String handlerName, Object handler);
+    ChannelPipelineAbstract addLast(String handlerName, ChannelHandlerAbstract handler);
 
-    ChannelPipelineAbstract addBefore(String targetHandlerName, String handlerName, Object handler);
+    ChannelPipelineAbstract addBefore(String targetHandlerName, String handlerName, ChannelHandlerAbstract handler);
 
-    ChannelPipelineAbstract addAfter(String targetHandlerName, String handlerName, Object handler);
+    ChannelPipelineAbstract addAfter(String targetHandlerName, String handlerName, ChannelHandlerAbstract handler);
 
-    ChannelPipelineAbstract remove(Object handler);
+    ChannelPipelineAbstract remove(ChannelHandlerAbstract handler);
 
-    Object remove(String handlerName);
+    ChannelHandlerAbstract remove(String handlerName);
 
-    Object removeFirst();
+    ChannelHandlerAbstract removeFirst();
 
-    Object removeLast();
+    ChannelHandlerAbstract removeLast();
 
-    Object replace(String previousHandlerName, String handlerName, Object handler);
+    ChannelHandlerAbstract replace(String previousHandlerName, String handlerName, ChannelHandlerAbstract handler);
 
     ChannelPipelineAbstract fireChannelRegistered();
 

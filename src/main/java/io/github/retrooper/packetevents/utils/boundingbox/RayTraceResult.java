@@ -25,11 +25,10 @@ import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Entity;
 import org.bukkit.util.Vector;
-
-import java.util.Objects;
-
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+
+import java.util.Objects;
 
 public class RayTraceResult {
     private final Vector hitPosition;
@@ -46,23 +45,23 @@ public class RayTraceResult {
     }
 
     public RayTraceResult(@NotNull Vector hitPosition) {
-        this(hitPosition, (Block)null, (BlockFace)null, (Entity)null);
+        this(hitPosition, null, null, null);
     }
 
     public RayTraceResult(@NotNull Vector hitPosition, @Nullable BlockFace hitBlockFace) {
-        this(hitPosition, (Block)null, hitBlockFace, (Entity)null);
+        this(hitPosition, null, hitBlockFace, null);
     }
 
     public RayTraceResult(@NotNull Vector hitPosition, @Nullable Block hitBlock, @Nullable BlockFace hitBlockFace) {
-        this(hitPosition, hitBlock, hitBlockFace, (Entity)null);
+        this(hitPosition, hitBlock, hitBlockFace, null);
     }
 
     public RayTraceResult(@NotNull Vector hitPosition, @Nullable Entity hitEntity) {
-        this(hitPosition, (Block)null, (BlockFace)null, hitEntity);
+        this(hitPosition, null, null, hitEntity);
     }
 
     public RayTraceResult(@NotNull Vector hitPosition, @Nullable Entity hitEntity, @Nullable BlockFace hitBlockFace) {
-        this(hitPosition, (Block)null, hitBlockFace, hitEntity);
+        this(hitPosition, null, hitBlockFace, hitEntity);
     }
 
     @NotNull
@@ -99,7 +98,7 @@ public class RayTraceResult {
         } else if (!(obj instanceof RayTraceResult)) {
             return false;
         } else {
-            RayTraceResult other = (RayTraceResult)obj;
+            RayTraceResult other = (RayTraceResult) obj;
             if (!this.hitPosition.equals(other.hitPosition)) {
                 return false;
             } else if (!Objects.equals(this.hitBlock, other.hitBlock)) {

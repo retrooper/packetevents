@@ -16,7 +16,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package io.github.retrooper.packetevents.injector.modern.early;
+package io.github.retrooper.packetevents.handlers.modern.early;
 
 import io.github.retrooper.packetevents.PacketEvents;
 import io.netty.channel.Channel;
@@ -41,7 +41,7 @@ public class PaperChannelInjector {
     private static boolean hasChannelInitializeHolderListener(Key key) throws Exception {
         Class<?> holderClass = Class.forName("io.papermc.paper.network.ChannelInitializeListenerHolder");
         Method hasListenerMethod = holderClass.getDeclaredMethod("hasListener", Key.class);
-        return (boolean) hasListenerMethod.invoke(null,  key);
+        return (boolean) hasListenerMethod.invoke(null, key);
     }
 
     private static void removeChannelInitializeListenerHolderListener(Key key) throws Exception {
@@ -61,7 +61,7 @@ public class PaperChannelInjector {
                     //Call Via's here
                     Class<?> viaBukkitChannelInitializer = Class.forName("com.viaversion.viaversion.bukkit.handlers.BukkitChannelInitializer");
                     Method viaAfterInitChannelMethod = viaBukkitChannelInitializer.getMethod("afterChannelInitialize", Channel.class);
-                    viaAfterInitChannelMethod.invoke(null, (Channel) args[0]);
+                    viaAfterInitChannelMethod.invoke(null, args[0]);
                 }
                 PEChannelInitializerModern.postInitChannel((Channel) args[0]);
                 return null;

@@ -1,7 +1,7 @@
 package io.github.retrooper.packetevents.wrapper.status.client;
 
 import io.github.retrooper.packetevents.manager.player.ClientVersion;
-import io.github.retrooper.packetevents.utils.netty.bytebuf.ByteBufAbstract;
+import io.github.retrooper.packetevents.utils.netty.buffer.ByteBufAbstract;
 import io.github.retrooper.packetevents.wrapper.PacketWrapper;
 
 public class WrapperStatusClientPing extends PacketWrapper {
@@ -13,7 +13,7 @@ public class WrapperStatusClientPing extends PacketWrapper {
         this.time = readLong();
     }
 
-    public long getTime(){
+    public long getTime() {
         return this.time;
     }
 }

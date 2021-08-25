@@ -18,7 +18,7 @@
 
 package io.github.retrooper.packetevents.wrapper.login.server;
 
-import io.github.retrooper.packetevents.utils.netty.bytebuf.ByteBufAbstract;
+import io.github.retrooper.packetevents.utils.netty.buffer.ByteBufAbstract;
 import io.github.retrooper.packetevents.wrapper.PacketWrapper;
 import io.github.retrooper.packetevents.wrapper.login.client.WrapperLoginClientEncryptionResponse;
 
@@ -31,6 +31,7 @@ import java.security.spec.X509EncodedKeySpec;
  * This packet is sent by the server to the client if the server is in online mode.
  * If the server is in offline mode, this packet won't be sent,
  * encryption won't be enabled and no authentication will be performed.
+ *
  * @see WrapperLoginClientEncryptionResponse
  */
 public class WrapperLoginServerEncryptionRequest extends PacketWrapper {
@@ -51,6 +52,7 @@ public class WrapperLoginServerEncryptionRequest extends PacketWrapper {
 
     /**
      * This is an empty string on the vanilla client. (1.7.10 and above)
+     *
      * @return Server ID
      */
     public String getServerID() {
@@ -62,6 +64,7 @@ public class WrapperLoginServerEncryptionRequest extends PacketWrapper {
      * More technically, it is in ASN.1 format.
      * The public key will be encrypted by the client and
      * sent to the server via the {@link WrapperLoginClientEncryptionResponse} packet.
+     *
      * @return Public key
      */
     public PublicKey getPublicKey() {
@@ -71,6 +74,7 @@ public class WrapperLoginServerEncryptionRequest extends PacketWrapper {
     /**
      * The verify token will be encrypted by the client and
      * sent to the server via the {@link WrapperLoginClientEncryptionResponse} packet.
+     *
      * @return Verify token
      */
     public byte[] getVerifyToken() {

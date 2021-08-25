@@ -19,7 +19,7 @@
 package io.github.retrooper.packetevents.wrapper.game.client;
 
 import io.github.retrooper.packetevents.manager.player.ClientVersion;
-import io.github.retrooper.packetevents.utils.netty.bytebuf.ByteBufAbstract;
+import io.github.retrooper.packetevents.utils.netty.buffer.ByteBufAbstract;
 import io.github.retrooper.packetevents.utils.vector.Vector3i;
 import io.github.retrooper.packetevents.utils.wrapper.PacketWrapperUtils;
 import io.github.retrooper.packetevents.wrapper.PacketWrapper;
@@ -31,6 +31,7 @@ public class WrapperGameClientGenerateStructure extends PacketWrapper {
     private final Vector3i blockPosition;
     private final int levels;
     private final boolean keepJigsaws;
+
     public WrapperGameClientGenerateStructure(ClientVersion version, ByteBufAbstract byteBuf) {
         super(version, byteBuf);
         this.blockPosition = PacketWrapperUtils.readVectorFromLong(readLong());
@@ -40,6 +41,7 @@ public class WrapperGameClientGenerateStructure extends PacketWrapper {
 
     /**
      * The block location of the entity.
+     *
      * @return Block location
      */
     public Vector3i getBlockPosition() {
@@ -48,6 +50,7 @@ public class WrapperGameClientGenerateStructure extends PacketWrapper {
 
     /**
      * Value of the levels' slider/max depth to generate.
+     *
      * @return Levels
      */
     public int getLevels() {
@@ -56,6 +59,7 @@ public class WrapperGameClientGenerateStructure extends PacketWrapper {
 
     /**
      * Should we keep the Jigsaws?
+     *
      * @return Keep Jigsaws
      */
     public boolean isKeepingJigsaws() {

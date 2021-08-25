@@ -16,15 +16,16 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package io.github.retrooper.packetevents.injector.modern.early;
+package io.github.retrooper.packetevents.handlers.modern.early;
 
 import io.github.retrooper.packetevents.PacketEvents;
-import io.github.retrooper.packetevents.injector.EarlyInjector;
-import io.github.retrooper.packetevents.injector.modern.PacketDecoderModern;
+import io.github.retrooper.packetevents.handlers.EarlyInjector;
+import io.github.retrooper.packetevents.handlers.modern.PacketDecoderModern;
+import io.github.retrooper.packetevents.handlers.modern.PacketEncoderModern;
 import io.github.retrooper.packetevents.protocol.ConnectionState;
-import io.github.retrooper.packetevents.utils.reflection.ReflectionObject;
 import io.github.retrooper.packetevents.utils.list.ListWrapper;
 import io.github.retrooper.packetevents.utils.nms.MinecraftReflection;
+import io.github.retrooper.packetevents.utils.reflection.ReflectionObject;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelHandler;
@@ -263,7 +264,7 @@ public class EarlyChannelInjectorModern implements EarlyInjector {
     public void ejectPlayer(Player player) {
         Object channel = PacketEvents.get().getPlayerManager().getChannel(player);
         if (channel != null) {
-           PEChannelInitializerModern.postDestroyChannel((Channel) channel);
+            PEChannelInitializerModern.postDestroyChannel((Channel) channel);
         }
     }
 
@@ -274,7 +275,9 @@ public class EarlyChannelInjectorModern implements EarlyInjector {
             return false;
         }
         PacketDecoderModern decoder = getDecoder(channel);
-        return decoder != null && decoder.player != null;
+        PacketEncoderModern encoder = getEncoder(channel);
+        return decoder != null && decoder.player != null
+                && encoder != null && encoder.player != null;
     }
 
     @Override
@@ -300,8 +303,17 @@ public class EarlyChannelInjectorModern implements EarlyInjector {
         ChannelHandler decoder = channel.pipeline().get(PacketEvents.get().decoderName);
         if (decoder instanceof PacketDecoderModern) {
             return (PacketDecoderModern) decoder;
+        } else {
+            return null;
         }
-        else {
+    }
+
+    private PacketEncoderModern getEncoder(Object rawChannel) {
+        Channel channel = (Channel) rawChannel;
+        ChannelHandler encoder = channel.pipeline().get(PacketEvents.get().encoderName);
+        if (encoder instanceof PacketEncoderModern) {
+            return (PacketEncoderModern) encoder;
+        } else {
             return null;
         }
     }
@@ -312,6 +324,10 @@ public class EarlyChannelInjectorModern implements EarlyInjector {
         if (decoder != null) {
             decoder.player = player;
         }
+        PacketEncoderModern encoder = getEncoder(rawChannel);
+        if (encoder != null) {
+            encoder.player = player;
+        }
     }
 
     @Override
@@ -319,8 +335,7 @@ public class EarlyChannelInjectorModern implements EarlyInjector {
         PacketDecoderModern decoder = getDecoder(channel);
         if (decoder != null) {
             return decoder.connectionState;
-        }
-        else {
+        } else {
             return null;
         }
     }

@@ -18,7 +18,7 @@
 
 package io.github.retrooper.packetevents.wrapper.status.server;
 
-import io.github.retrooper.packetevents.utils.netty.bytebuf.ByteBufAbstract;
+import io.github.retrooper.packetevents.utils.netty.buffer.ByteBufAbstract;
 import io.github.retrooper.packetevents.wrapper.PacketWrapper;
 
 public class WrapperStatusServerPong extends PacketWrapper {

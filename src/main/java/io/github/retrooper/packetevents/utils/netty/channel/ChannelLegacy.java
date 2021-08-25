@@ -26,6 +26,7 @@ import java.net.SocketAddress;
 
 public class ChannelLegacy implements ChannelAbstract {
     private final Channel channel;
+
     public ChannelLegacy(Object rawChannel) {
         this.channel = (Channel) rawChannel;
     }

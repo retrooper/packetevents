@@ -16,30 +16,33 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package io.github.retrooper.packetevents.injector.modern;
+package io.github.retrooper.packetevents.handlers.compression;
 
-import io.github.retrooper.packetevents.utils.netty.bytebuf.ByteBufModern;
+import io.github.retrooper.packetevents.utils.netty.buffer.ByteBufAbstract;
+import io.github.retrooper.packetevents.utils.netty.channel.ChannelHandlerContextAbstract;
+import io.github.retrooper.packetevents.utils.nms.MinecraftReflection;
 import io.github.retrooper.packetevents.wrapper.PacketWrapper;
-import io.netty.buffer.ByteBuf;
-import io.netty.channel.ChannelHandlerContext;
-import io.netty.handler.codec.MessageToByteEncoder;
 
 import java.util.zip.Deflater;
 
-public class CustomPacketCompressorModern {
+public class CustomPacketCompressor {
+    private static Class<?> MESSAGE_TO_BYTE_ENCODER;
     private static final byte[] COMPRESSED_DATA = new byte[8192];
     private static final Deflater DEFLATER = new Deflater();
     private static final int THRESHOLD = 256;
 
-    public static ByteBuf compress(ChannelHandlerContext ctx, ByteBuf byteBuf) {
-        ByteBuf output = ctx.alloc().buffer();
-        if (!(ctx.pipeline().get("compress") instanceof MessageToByteEncoder)) {
+    public static ByteBufAbstract compress(ChannelHandlerContextAbstract ctx, ByteBufAbstract byteBuf) {
+        if (MESSAGE_TO_BYTE_ENCODER == null) {
+            MESSAGE_TO_BYTE_ENCODER = MinecraftReflection.getNettyClass("handler.codec.MessageToByteEncoder");
+        }
+        ByteBufAbstract output = ctx.alloc().buffer();
+        Object compressHandler = ctx.pipeline().get("compress").rawChannelHandler();
+        if (!MESSAGE_TO_BYTE_ENCODER.isInstance(compressHandler)) {
             //ViaRewind replaced the compressor with an empty handler, so we can just skip the compression process.
             return output.writeBytes(byteBuf);
         }
         int dataLength = byteBuf.readableBytes();
-        //TODO generate()
-        PacketWrapper outputWrapper = PacketWrapper.createUniversalPacketWrapper(new ByteBufModern(output));
+        PacketWrapper outputWrapper = PacketWrapper.createUniversalPacketWrapper(output);
         if (dataLength < THRESHOLD) {
             //Set data length to 0
             outputWrapper.writeVarInt(0);
@@ -52,8 +55,8 @@ public class CustomPacketCompressorModern {
             DEFLATER.finish();
 
             while (!DEFLATER.finished()) {
-                int var6 = DEFLATER.deflate(COMPRESSED_DATA);
-                output.writeBytes(COMPRESSED_DATA, 0, var6);
+                int deflateResult = DEFLATER.deflate(COMPRESSED_DATA);
+                output.writeBytes(COMPRESSED_DATA, 0, deflateResult);
             }
 
             DEFLATER.reset();

@@ -1,7 +1,7 @@
 package io.github.retrooper.packetevents.wrapper.game.client;
 
-import io.github.retrooper.packetevents.utils.netty.bytebuf.ByteBufAbstract;
 import io.github.retrooper.packetevents.manager.player.ClientVersion;
+import io.github.retrooper.packetevents.utils.netty.buffer.ByteBufAbstract;
 import io.github.retrooper.packetevents.wrapper.PacketWrapper;
 
 /**
@@ -18,8 +18,7 @@ public class WrapperGameClientPluginMessage extends PacketWrapper {
         this.channelName = readString();
         if (version.isNewerThanOrEquals(ClientVersion.v_1_8)) {
             this.data = readByteArray(byteBuf.readableBytes());
-        }
-        else {
+        } else {
             int dataLength = readShort();
             this.data = readByteArray(dataLength);
         }
@@ -27,17 +26,19 @@ public class WrapperGameClientPluginMessage extends PacketWrapper {
 
     /**
      * Name of the plugin channel used to send the data.
+     *
      * @return Plugin channel name
      */
-    public String getChannelName(){
+    public String getChannelName() {
         return channelName;
     }
 
     /**
      * Any data, depending on the channel.
+     *
      * @return Data
      */
-    public byte[] getData(){
+    public byte[] getData() {
         return data;
     }
 }

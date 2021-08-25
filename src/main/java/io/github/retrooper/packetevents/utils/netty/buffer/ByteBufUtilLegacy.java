@@ -16,48 +16,48 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package io.github.retrooper.packetevents.utils.netty.bytebuf;
+package io.github.retrooper.packetevents.utils.netty.buffer;
 
-import io.netty.buffer.Unpooled;
+import net.minecraft.util.io.netty.buffer.Unpooled;
 
-final class ByteBufUtilModern {
+final class ByteBufUtilLegacy {
     static ByteBufAbstract wrappedBuffer(byte[] bytes) {
-        return new ByteBufModern(Unpooled.wrappedBuffer(bytes));
+        return new ByteBufLegacy(Unpooled.wrappedBuffer(bytes));
     }
 
     static ByteBufAbstract copiedBuffer(byte[] bytes) {
-        return new ByteBufModern(Unpooled.copiedBuffer(bytes));
+        return new ByteBufLegacy(Unpooled.copiedBuffer(bytes));
     }
 
     static ByteBufAbstract buffer() {
-        return new ByteBufModern(Unpooled.buffer());
+        return new ByteBufLegacy(Unpooled.buffer());
     }
 
     static ByteBufAbstract buffer(int initialCapacity) {
-        return new ByteBufModern(Unpooled.buffer(initialCapacity));
+        return new ByteBufLegacy(Unpooled.buffer(initialCapacity));
     }
 
     static ByteBufAbstract buffer(int initialCapacity, int maxCapacity) {
-        return new ByteBufModern(Unpooled.buffer(initialCapacity, maxCapacity));
+        return new ByteBufLegacy(Unpooled.buffer(initialCapacity, maxCapacity));
     }
 
     static ByteBufAbstract directBuffer() {
-        return new ByteBufModern(Unpooled.directBuffer());
+        return new ByteBufLegacy(Unpooled.directBuffer());
     }
 
     static ByteBufAbstract directBuffer(int initialCapacity) {
-        return new ByteBufModern(Unpooled.directBuffer(initialCapacity));
+        return new ByteBufLegacy(Unpooled.directBuffer(initialCapacity));
     }
 
     static ByteBufAbstract directBuffer(int initialCapacity, int maxCapacity) {
-        return new ByteBufModern(Unpooled.directBuffer(initialCapacity, maxCapacity));
+        return new ByteBufLegacy(Unpooled.directBuffer(initialCapacity, maxCapacity));
     }
 
     static ByteBufAbstract compositeBuffer() {
-        return new ByteBufModern(Unpooled.compositeBuffer());
+        return new ByteBufLegacy(Unpooled.compositeBuffer());
     }
 
     static ByteBufAbstract compositeBuffer(int maxNumComponents) {
-        return new ByteBufModern(Unpooled.compositeBuffer(maxNumComponents));
+        return new ByteBufLegacy(Unpooled.compositeBuffer(maxNumComponents));
     }
 }

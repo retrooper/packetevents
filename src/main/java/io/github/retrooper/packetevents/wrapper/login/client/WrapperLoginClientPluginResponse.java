@@ -1,7 +1,7 @@
 package io.github.retrooper.packetevents.wrapper.login.client;
 
 import io.github.retrooper.packetevents.manager.player.ClientVersion;
-import io.github.retrooper.packetevents.utils.netty.bytebuf.ByteBufAbstract;
+import io.github.retrooper.packetevents.utils.netty.buffer.ByteBufAbstract;
 import io.github.retrooper.packetevents.wrapper.PacketWrapper;
 
 public class WrapperLoginClientPluginResponse extends PacketWrapper {
@@ -15,21 +15,20 @@ public class WrapperLoginClientPluginResponse extends PacketWrapper {
         this.successful = readBoolean();
         if (this.successful) {
             this.data = readByteArray(byteBuf.readableBytes());
-        }
-        else {
+        } else {
             this.data = new byte[0];
         }
     }
 
-    public int getMessageID(){
+    public int getMessageID() {
         return this.messageID;
     }
 
-    public boolean isSuccessful(){
+    public boolean isSuccessful() {
         return this.successful;
     }
 
-    public byte[] getData(){
+    public byte[] getData() {
         return this.data;
     }
 }

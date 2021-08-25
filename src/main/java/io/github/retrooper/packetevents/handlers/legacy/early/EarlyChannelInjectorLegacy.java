@@ -16,15 +16,16 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package io.github.retrooper.packetevents.injector.legacy.early;
+package io.github.retrooper.packetevents.handlers.legacy.early;
 
 import io.github.retrooper.packetevents.PacketEvents;
-import io.github.retrooper.packetevents.injector.EarlyInjector;
-import io.github.retrooper.packetevents.injector.legacy.PacketDecoderLegacy;
+import io.github.retrooper.packetevents.handlers.EarlyInjector;
+import io.github.retrooper.packetevents.handlers.legacy.PacketDecoderLegacy;
+import io.github.retrooper.packetevents.handlers.legacy.PacketEncoderLegacy;
 import io.github.retrooper.packetevents.protocol.ConnectionState;
-import io.github.retrooper.packetevents.utils.reflection.ReflectionObject;
 import io.github.retrooper.packetevents.utils.list.ListWrapper;
 import io.github.retrooper.packetevents.utils.nms.MinecraftReflection;
+import io.github.retrooper.packetevents.utils.reflection.ReflectionObject;
 import net.minecraft.util.io.netty.channel.Channel;
 import net.minecraft.util.io.netty.channel.ChannelFuture;
 import net.minecraft.util.io.netty.channel.ChannelHandler;
@@ -270,7 +271,9 @@ public class EarlyChannelInjectorLegacy implements EarlyInjector {
             return false;
         }
         PacketDecoderLegacy decoder = getDecoder(channel);
-        return decoder != null && decoder.player != null;
+        PacketEncoderLegacy encoder = getEncoder(channel);
+        return decoder != null && decoder.player != null &&
+                encoder != null && encoder.player != null;
     }
 
     @Override
@@ -293,9 +296,19 @@ public class EarlyChannelInjectorLegacy implements EarlyInjector {
 
     private PacketDecoderLegacy getDecoder(Object rawChannel) {
         Channel channel = (Channel) rawChannel;
-        ChannelHandler decoder = channel.pipeline().get("decoder");
+        ChannelHandler decoder = channel.pipeline().get(PacketEvents.get().decoderName);
         if (decoder instanceof PacketDecoderLegacy) {
             return (PacketDecoderLegacy) decoder;
+        } else {
+            return null;
+        }
+    }
+
+    private PacketEncoderLegacy getEncoder(Object rawChannel) {
+        Channel channel = (Channel) rawChannel;
+        ChannelHandler encoder = channel.pipeline().get(PacketEvents.get().encoderName);
+        if (encoder instanceof PacketEncoderLegacy) {
+            return (PacketEncoderLegacy) encoder;
         } else {
             return null;
         }
@@ -307,24 +320,28 @@ public class EarlyChannelInjectorLegacy implements EarlyInjector {
         if (decoder != null) {
             decoder.player = player;
         }
+
+        PacketEncoderLegacy encoder = getEncoder(rawChannel);
+        if (encoder != null) {
+            encoder.player = player;
+        }
     }
 
     @Override
     public ConnectionState getConnectionState(Object channel) {
         PacketDecoderLegacy decoder = getDecoder(channel);
         if (decoder != null) {
-            return decoder.packetState;
-        }
-        else {
+            return decoder.connectionState;
+        } else {
             return null;
         }
     }
 
     @Override
-    public void changeConnectionState(Object channel, ConnectionState packetState) {
+    public void changeConnectionState(Object channel, ConnectionState connectionState) {
         PacketDecoderLegacy decoder = getDecoder(channel);
         if (decoder != null) {
-            decoder.packetState = packetState;
+            decoder.connectionState = connectionState;
         }
     }
 }

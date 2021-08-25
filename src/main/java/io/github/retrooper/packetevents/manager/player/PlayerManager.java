@@ -19,13 +19,13 @@
 package io.github.retrooper.packetevents.manager.player;
 
 import io.github.retrooper.packetevents.PacketEvents;
+import io.github.retrooper.packetevents.manager.server.ServerVersion;
+import io.github.retrooper.packetevents.utils.dependencies.VersionLookupUtils;
+import io.github.retrooper.packetevents.utils.dependencies.v_1_7_10.SpigotVersionLookup_1_7;
 import io.github.retrooper.packetevents.utils.gameprofile.GameProfileUtil;
 import io.github.retrooper.packetevents.utils.gameprofile.WrappedGameProfile;
 import io.github.retrooper.packetevents.utils.geyser.GeyserUtils;
 import io.github.retrooper.packetevents.utils.nms.MinecraftReflection;
-import io.github.retrooper.packetevents.manager.server.ServerVersion;
-import io.github.retrooper.packetevents.utils.dependencies.VersionLookupUtils;
-import io.github.retrooper.packetevents.utils.dependencies.v_1_7_10.SpigotVersionLookup_1_7;
 import io.github.retrooper.packetevents.utils.nms.PlayerPingAccessorModern;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
@@ -47,8 +47,7 @@ public class PlayerManager {
     public int getPing(Player player) {
         if (MinecraftReflection.V_1_17_OR_HIGHER) {
             return PlayerPingAccessorModern.getPing(player);
-        }
-        else {
+        } else {
             return MinecraftReflection.getPlayerPing(player);
         }
     }

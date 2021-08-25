@@ -18,8 +18,8 @@
 
 package io.github.retrooper.packetevents.wrapper.game.client;
 
-import io.github.retrooper.packetevents.utils.netty.bytebuf.ByteBufAbstract;
 import io.github.retrooper.packetevents.manager.player.ClientVersion;
+import io.github.retrooper.packetevents.utils.netty.buffer.ByteBufAbstract;
 import io.github.retrooper.packetevents.wrapper.PacketWrapper;
 
 /**
@@ -27,6 +27,7 @@ import io.github.retrooper.packetevents.wrapper.PacketWrapper;
  */
 public class WrapperGameClientChatMessage extends PacketWrapper {
     private final String message;
+
     public WrapperGameClientChatMessage(ClientVersion version, ByteBufAbstract byteBuf) {
         super(version, byteBuf);
         int maxMessageLength = version.isNewerThanOrEquals(ClientVersion.v_1_11) ? 256 : 100;
@@ -37,6 +38,7 @@ public class WrapperGameClientChatMessage extends PacketWrapper {
      * The message.
      * On {@link ClientVersion#v_1_10} and older clients, the message should never be larger than 100 characters.
      * On {@link ClientVersion#v_1_11} and newer clients, the message should never be larger than 256 characters.
+     *
      * @return Message
      */
     public String getMessage() {

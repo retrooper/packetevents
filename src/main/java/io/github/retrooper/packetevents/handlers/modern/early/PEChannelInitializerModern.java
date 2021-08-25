@@ -16,17 +16,16 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package io.github.retrooper.packetevents.injector.modern.early;
+package io.github.retrooper.packetevents.handlers.modern.early;
 
 import io.github.retrooper.packetevents.PacketEvents;
-import io.github.retrooper.packetevents.injector.modern.PacketDecoderModern;
-import io.github.retrooper.packetevents.injector.modern.PacketEncoderModern;
+import io.github.retrooper.packetevents.handlers.modern.PacketDecoderModern;
+import io.github.retrooper.packetevents.handlers.modern.PacketEncoderModern;
 import io.github.retrooper.packetevents.utils.reflection.Reflection;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelInitializer;
 
 import java.lang.reflect.Method;
-import java.util.Arrays;
 
 public class PEChannelInitializerModern extends ChannelInitializer<Channel> {
     private final ChannelInitializer<?> oldChannelInitializer;

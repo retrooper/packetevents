@@ -16,7 +16,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package io.github.retrooper.packetevents.utils.netty.bytebuf;
+package io.github.retrooper.packetevents.utils.netty.buffer;
 
 import io.github.retrooper.packetevents.utils.nms.MinecraftReflection;
 
@@ -24,8 +24,7 @@ public final class ByteBufUtil {
     public static ByteBufAbstract wrappedBuffer(byte[] bytes) {
         if (!MinecraftReflection.USE_MODERN_NETTY_PACKAGE) {
             return ByteBufUtilLegacy.wrappedBuffer(bytes);
-        }
-        else {
+        } else {
             return ByteBufUtilModern.wrappedBuffer(bytes);
         }
     }
@@ -33,8 +32,7 @@ public final class ByteBufUtil {
     public static ByteBufAbstract copiedBuffer(byte[] bytes) {
         if (!MinecraftReflection.USE_MODERN_NETTY_PACKAGE) {
             return ByteBufUtilLegacy.copiedBuffer(bytes);
-        }
-        else {
+        } else {
             return ByteBufUtilModern.copiedBuffer(bytes);
         }
     }
@@ -42,8 +40,7 @@ public final class ByteBufUtil {
     public static ByteBufAbstract buffer() {
         if (!MinecraftReflection.USE_MODERN_NETTY_PACKAGE) {
             return ByteBufUtilLegacy.buffer();
-        }
-        else {
+        } else {
             return ByteBufUtilModern.buffer();
         }
     }
@@ -51,8 +48,7 @@ public final class ByteBufUtil {
     public static ByteBufAbstract buffer(int initialCapacity) {
         if (!MinecraftReflection.USE_MODERN_NETTY_PACKAGE) {
             return ByteBufUtilLegacy.buffer(initialCapacity);
-        }
-        else {
+        } else {
             return ByteBufUtilModern.buffer(initialCapacity);
         }
     }
@@ -60,8 +56,7 @@ public final class ByteBufUtil {
     public static ByteBufAbstract buffer(int initialCapacity, int maxCapacity) {
         if (!MinecraftReflection.USE_MODERN_NETTY_PACKAGE) {
             return ByteBufUtilLegacy.buffer(initialCapacity, maxCapacity);
-        }
-        else {
+        } else {
             return ByteBufUtilModern.buffer(initialCapacity, maxCapacity);
         }
     }
@@ -69,8 +64,7 @@ public final class ByteBufUtil {
     public static ByteBufAbstract directBuffer() {
         if (!MinecraftReflection.USE_MODERN_NETTY_PACKAGE) {
             return ByteBufUtilLegacy.directBuffer();
-        }
-        else {
+        } else {
             return ByteBufUtilModern.directBuffer();
         }
     }
@@ -78,8 +72,7 @@ public final class ByteBufUtil {
     public static ByteBufAbstract directBuffer(int initialCapacity) {
         if (!MinecraftReflection.USE_MODERN_NETTY_PACKAGE) {
             return ByteBufUtilLegacy.directBuffer(initialCapacity);
-        }
-        else {
+        } else {
             return ByteBufUtilModern.directBuffer(initialCapacity);
         }
     }
@@ -87,8 +80,7 @@ public final class ByteBufUtil {
     public static ByteBufAbstract directBuffer(int initialCapacity, int maxCapacity) {
         if (!MinecraftReflection.USE_MODERN_NETTY_PACKAGE) {
             return ByteBufUtilLegacy.directBuffer(initialCapacity, maxCapacity);
-        }
-        else {
+        } else {
             return ByteBufUtilModern.directBuffer(initialCapacity, maxCapacity);
         }
     }
@@ -96,8 +88,7 @@ public final class ByteBufUtil {
     public static ByteBufAbstract compositeBuffer() {
         if (!MinecraftReflection.USE_MODERN_NETTY_PACKAGE) {
             return ByteBufUtilLegacy.compositeBuffer();
-        }
-        else {
+        } else {
             return ByteBufUtilModern.compositeBuffer();
         }
     }
@@ -105,8 +96,7 @@ public final class ByteBufUtil {
     public static ByteBufAbstract compositeBuffer(int maxNumComponents) {
         if (!MinecraftReflection.USE_MODERN_NETTY_PACKAGE) {
             return ByteBufUtilLegacy.compositeBuffer(maxNumComponents);
-        }
-        else {
+        } else {
             return ByteBufUtilModern.compositeBuffer(maxNumComponents);
         }
     }

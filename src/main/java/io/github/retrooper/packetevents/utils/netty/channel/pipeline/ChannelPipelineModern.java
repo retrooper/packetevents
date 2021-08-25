@@ -26,6 +26,7 @@ import java.util.List;
 
 public class ChannelPipelineModern implements ChannelPipelineAbstract {
     private final ChannelPipeline pipeline;
+
     public ChannelPipelineModern(Object rawChannelPipeline) {
         this.pipeline = (ChannelPipeline) rawChannelPipeline;
     }
@@ -46,48 +47,48 @@ public class ChannelPipelineModern implements ChannelPipelineAbstract {
     }
 
     @Override
-    public ChannelPipelineAbstract addFirst(String handlerName, Object handler) {
-        return new ChannelPipelineModern(pipeline.addFirst(handlerName, (ChannelHandler) handler));
+    public ChannelPipelineAbstract addFirst(String handlerName, ChannelHandlerAbstract handler) {
+        return new ChannelPipelineModern(pipeline.addFirst(handlerName, (ChannelHandler) handler.rawChannelHandler()));
     }
 
     @Override
-    public ChannelPipelineAbstract addLast(String handlerName, Object handler) {
-        return new ChannelPipelineModern(pipeline.addLast(handlerName, (ChannelHandler) handler));
+    public ChannelPipelineAbstract addLast(String handlerName, ChannelHandlerAbstract handler) {
+        return new ChannelPipelineModern(pipeline.addLast(handlerName, (ChannelHandler) handler.rawChannelHandler()));
     }
 
     @Override
-    public ChannelPipelineAbstract addBefore(String targetHandlerName, String handlerName, Object handler) {
-        return new ChannelPipelineModern(pipeline.addBefore(targetHandlerName, handlerName, (ChannelHandler) handler));
+    public ChannelPipelineAbstract addBefore(String targetHandlerName, String handlerName, ChannelHandlerAbstract handler) {
+        return new ChannelPipelineModern(pipeline.addBefore(targetHandlerName, handlerName, (ChannelHandler) handler.rawChannelHandler()));
     }
 
     @Override
-    public ChannelPipelineAbstract addAfter(String targetHandlerName, String handlerName, Object handler) {
-        return new ChannelPipelineModern(pipeline.addAfter(targetHandlerName, handlerName, (ChannelHandler) handler));
+    public ChannelPipelineAbstract addAfter(String targetHandlerName, String handlerName, ChannelHandlerAbstract handler) {
+        return new ChannelPipelineModern(pipeline.addAfter(targetHandlerName, handlerName, (ChannelHandler) handler.rawChannelHandler()));
     }
 
     @Override
-    public ChannelPipelineAbstract remove(Object handler) {
-        return new ChannelPipelineModern(pipeline.remove((ChannelHandler) handler));
+    public ChannelPipelineAbstract remove(ChannelHandlerAbstract handler) {
+        return new ChannelPipelineModern(pipeline.remove((ChannelHandler) handler.rawChannelHandler()));
     }
 
     @Override
-    public Object remove(String handlerName) {
-        return new ChannelPipelineModern(pipeline.remove(handlerName));
+    public ChannelHandlerAbstract remove(String handlerName) {
+        return ChannelHandlerAbstract.generate(pipeline.remove(handlerName));
     }
 
     @Override
-    public Object removeFirst() {
-        return new ChannelPipelineModern(pipeline.removeFirst());
+    public ChannelHandlerAbstract removeFirst() {
+        return ChannelHandlerAbstract.generate(pipeline.removeFirst());
     }
 
     @Override
-    public Object removeLast() {
-        return new ChannelPipelineModern(pipeline.removeLast());
+    public ChannelHandlerAbstract removeLast() {
+        return ChannelHandlerAbstract.generate(pipeline.removeLast());
     }
 
     @Override
-    public Object replace(String previousHandlerName, String handlerName, Object handler) {
-        return new ChannelPipelineModern(pipeline.replace(previousHandlerName, handlerName, (ChannelHandler) handler));
+    public ChannelHandlerAbstract replace(String previousHandlerName, String handlerName, ChannelHandlerAbstract handler) {
+        return ChannelHandlerAbstract.generate(pipeline.replace(previousHandlerName, handlerName, (ChannelHandler) handler.rawChannelHandler()));
     }
 
     @Override

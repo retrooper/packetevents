@@ -16,22 +16,21 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package io.github.retrooper.packetevents.injector.modern;
+package io.github.retrooper.packetevents.handlers.modern;
 
 import io.github.retrooper.packetevents.PacketEvents;
 import io.github.retrooper.packetevents.event.impl.PacketReceiveEvent;
+import io.github.retrooper.packetevents.handlers.compression.CompressionManager;
+import io.github.retrooper.packetevents.handlers.compression.CustomPacketDecompressor;
 import io.github.retrooper.packetevents.protocol.ConnectionState;
-import io.github.retrooper.packetevents.utils.netty.bytebuf.ByteBufAbstract;
+import io.github.retrooper.packetevents.utils.netty.buffer.ByteBufAbstract;
 import io.github.retrooper.packetevents.utils.netty.channel.ChannelHandlerContextAbstract;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
-import io.netty.handler.codec.ByteToMessageDecoder;
-import io.netty.handler.codec.MessageToByteEncoder;
 import io.netty.handler.codec.MessageToMessageDecoder;
 import org.bukkit.entity.Player;
 
-import java.util.Arrays;
 import java.util.List;
 
 @ChannelHandler.Sharable
@@ -41,14 +40,12 @@ public class PacketDecoderModern extends MessageToMessageDecoder<ByteBuf> {
     private boolean handledCompression;
     private boolean skipDoubleTransform;
 
-    @Override
-    public void decode(ChannelHandlerContext ctx, ByteBuf byteBuf, List<Object> out) {
+    public ByteBufAbstract handle(ChannelHandlerContextAbstract ctx, ByteBufAbstract byteBuf) {
         if (skipDoubleTransform) {
             skipDoubleTransform = false;
-            out.add(byteBuf.retain());
-            return;
+            return byteBuf.retain();
         }
-        ByteBuf transformedBuf = ctx.alloc().buffer().writeBytes(byteBuf);
+        ByteBufAbstract transformedBuf = ctx.alloc().buffer().writeBytes(byteBuf);
         try {
             boolean needsCompress = handleCompressionOrder(ctx, transformedBuf);
             int firstReaderIndex = transformedBuf.readerIndex();
@@ -59,32 +56,22 @@ public class PacketDecoderModern extends MessageToMessageDecoder<ByteBuf> {
             });
             transformedBuf.readerIndex(firstReaderIndex);
             if (needsCompress) {
-                recompress(ctx, transformedBuf);
+                CompressionManager.recompress(ctx, transformedBuf);
                 skipDoubleTransform = true;
             }
-            out.add(transformedBuf.retain());
+            return transformedBuf.retain();
         } finally {
             transformedBuf.release();
         }
     }
 
-    protected static boolean refactorHandlers(ChannelHandlerContext ctx, ByteBuf buf, ByteBuf decompressed) {
-        try {
-            buf.clear().writeBytes(decompressed);
-        } finally {
-            decompressed.release();
-        }
-        ChannelHandler encoder = ctx.pipeline().get(PacketEvents.get().encoderName);
-        ChannelHandler decoder = ctx.pipeline().get(PacketEvents.get().decoderName);
-        ctx.pipeline().remove(encoder);
-        ctx.pipeline().remove(decoder);
-        ctx.pipeline().addAfter("compress", PacketEvents.get().encoderName, encoder);
-        ctx.pipeline().addAfter("decompress", PacketEvents.get().decoderName, decoder);
-        System.out.println("REFACTORING, PIPELINE NAMES: " + Arrays.toString(ctx.channel().pipeline().names().toArray(new String[0])));
-        return true;
+    @Override
+    public void decode(ChannelHandlerContext ctx, ByteBuf byteBuf, List<Object> out) {
+        ByteBuf output = (ByteBuf) handle(ChannelHandlerContextAbstract.generate(ctx), ByteBufAbstract.generate(byteBuf)).rawByteBuf();
+        out.add(output);
     }
 
-    private boolean handleCompressionOrder(ChannelHandlerContext ctx, ByteBuf buf) {
+    private boolean handleCompressionOrder(ChannelHandlerContextAbstract ctx, ByteBufAbstract buf) {
         if (handledCompression) return false;
 
         int decoderIndex = ctx.pipeline().names().indexOf("decompress");
@@ -92,18 +79,9 @@ public class PacketDecoderModern extends MessageToMessageDecoder<ByteBuf> {
         handledCompression = true;
         if (decoderIndex > ctx.pipeline().names().indexOf(PacketEvents.get().decoderName)) {
             // Need to decompress this packet due to bad order
-            ByteBuf decompressed = (ByteBuf) CustomPacketDecompressor.decompress(ChannelHandlerContextAbstract.generate(ctx), ByteBufAbstract.generate(buf)).rawByteBuf();
-            return refactorHandlers(ctx, buf, decompressed);
+            ByteBufAbstract decompressed = CustomPacketDecompressor.decompress(ctx, buf);
+            return CompressionManager.refactorHandlers(ctx, buf, decompressed);
         }
         return false;
-    }
-
-    private void recompress(ChannelHandlerContext ctx, ByteBuf buf) {
-        ByteBuf compressed = CustomPacketCompressorModern.compress(ctx, buf);
-        try {
-            buf.clear().writeBytes(compressed);
-        } finally {
-            compressed.release();
-        }
     }
 }

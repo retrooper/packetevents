@@ -18,8 +18,8 @@
 
 package io.github.retrooper.packetevents.wrapper.game.client;
 
-import io.github.retrooper.packetevents.utils.netty.bytebuf.ByteBufAbstract;
 import io.github.retrooper.packetevents.manager.player.ClientVersion;
+import io.github.retrooper.packetevents.utils.netty.buffer.ByteBufAbstract;
 import io.github.retrooper.packetevents.wrapper.PacketWrapper;
 
 /**
@@ -43,6 +43,7 @@ public class WrapperGameClientKeepAlive extends PacketWrapper {
 
     /**
      * Keep-Alive ID.
+     *
      * @return ID
      */
     public long getID() {

@@ -19,7 +19,7 @@
 package io.github.retrooper.packetevents.wrapper.game.client;
 
 import io.github.retrooper.packetevents.manager.player.ClientVersion;
-import io.github.retrooper.packetevents.utils.netty.bytebuf.ByteBufAbstract;
+import io.github.retrooper.packetevents.utils.netty.buffer.ByteBufAbstract;
 import io.github.retrooper.packetevents.wrapper.PacketWrapper;
 
 /**
@@ -28,6 +28,7 @@ import io.github.retrooper.packetevents.wrapper.PacketWrapper;
 public class WrapperGameClientClickWindowButton extends PacketWrapper {
     private final byte windowID;
     private final byte buttonID;
+
     public WrapperGameClientClickWindowButton(ClientVersion version, ByteBufAbstract byteBuf) {
         super(version, byteBuf);
         this.windowID = readByte();
@@ -36,6 +37,7 @@ public class WrapperGameClientClickWindowButton extends PacketWrapper {
 
     /**
      * The ID of the window.
+     *
      * @return Window ID
      */
     public byte getWindowID() {
@@ -45,6 +47,7 @@ public class WrapperGameClientClickWindowButton extends PacketWrapper {
     /**
      * Meaning depends on the window type.
      * Learn more about its meaning on wiki.vg/Protocol.
+     *
      * @return Button ID
      */
     public byte getButtonID() {

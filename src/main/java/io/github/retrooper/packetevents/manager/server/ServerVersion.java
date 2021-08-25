@@ -70,8 +70,7 @@ public enum ServerVersion {
             if (fallbackVersion == ServerVersion.v_1_7_10) {
                 try {
                     Class.forName("net.minecraft.util.io.netty.buffer.ByteBuf");
-                }
-                catch (Exception ex) {
+                } catch (Exception ex) {
                     //We will assume its 1.8.8
                     fallbackVersion = ServerVersion.v_1_8_8;
                 }
@@ -81,6 +80,7 @@ public enum ServerVersion {
         }
         return ERROR;
     }
+
     /**
      * The values in this enum in reverse.
      *

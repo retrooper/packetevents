@@ -24,8 +24,7 @@ public interface ChannelHandlerAbstract {
     static ChannelHandlerAbstract generate(Object rawChannelHandler) {
         if (MinecraftReflection.USE_MODERN_NETTY_PACKAGE) {
             return new ChannelHandlerModern(rawChannelHandler);
-        }
-        else {
+        } else {
             return new ChannelHandlerLegacy(rawChannelHandler);
         }
     }

@@ -26,8 +26,7 @@ public interface ChannelHandlerContextAbstract {
     static ChannelHandlerContextAbstract generate(Object rawChannelHandlerContext) {
         if (MinecraftReflection.USE_MODERN_NETTY_PACKAGE) {
             return new ChannelHandlerContextModern(rawChannelHandlerContext);
-        }
-        else {
+        } else {
             return new ChannelHandlerContextLegacy(rawChannelHandlerContext);
         }
     }

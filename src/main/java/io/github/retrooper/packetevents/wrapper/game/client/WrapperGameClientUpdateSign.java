@@ -18,11 +18,11 @@
 
 package io.github.retrooper.packetevents.wrapper.game.client;
 
-import io.github.retrooper.packetevents.utils.netty.bytebuf.ByteBufAbstract;
 import io.github.retrooper.packetevents.manager.player.ClientVersion;
+import io.github.retrooper.packetevents.utils.netty.buffer.ByteBufAbstract;
 import io.github.retrooper.packetevents.utils.vector.Vector3i;
-import io.github.retrooper.packetevents.wrapper.PacketWrapper;
 import io.github.retrooper.packetevents.utils.wrapper.PacketWrapperUtils;
+import io.github.retrooper.packetevents.wrapper.PacketWrapper;
 
 /**
  * This message is sent from the client to the server when the “Done” button is pushed after placing a sign.
@@ -49,6 +49,7 @@ public class WrapperGameClientUpdateSign extends PacketWrapper {
 
     /**
      * Block location of the sign.
+     *
      * @return Sign position
      */
     public Vector3i getBlockPosition() {
@@ -57,6 +58,7 @@ public class WrapperGameClientUpdateSign extends PacketWrapper {
 
     /**
      * The text lines in the sign.
+     *
      * @return Sign content
      */
     public String[] getTextLines() {

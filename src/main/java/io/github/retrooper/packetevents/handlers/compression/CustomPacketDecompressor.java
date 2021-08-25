@@ -16,10 +16,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package io.github.retrooper.packetevents.injector.modern;
+package io.github.retrooper.packetevents.handlers.compression;
 
-import io.github.retrooper.packetevents.utils.netty.bytebuf.ByteBufAbstract;
-import io.github.retrooper.packetevents.utils.netty.bytebuf.ByteBufUtil;
+import io.github.retrooper.packetevents.utils.netty.buffer.ByteBufAbstract;
+import io.github.retrooper.packetevents.utils.netty.buffer.ByteBufUtil;
 import io.github.retrooper.packetevents.utils.netty.channel.ChannelHandlerContextAbstract;
 import io.github.retrooper.packetevents.utils.nms.MinecraftReflection;
 import io.github.retrooper.packetevents.wrapper.PacketWrapper;
@@ -43,7 +43,7 @@ public class CustomPacketDecompressor {
             return ctx.alloc().buffer().writeBytes(byteBuf);
         }
         if (byteBuf.readableBytes() != 0) {
-            PacketWrapper wrapper = PacketWrapper.createUniversalPacketWrapper(ByteBufAbstract.generate(byteBuf));
+            PacketWrapper wrapper = PacketWrapper.createUniversalPacketWrapper(byteBuf);
             int dataLength = wrapper.readVarInt();
             if (dataLength == 0) {
                 return byteBuf.readBytes(byteBuf.readableBytes());

@@ -16,15 +16,14 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package io.github.retrooper.packetevents.injector.legacy.early;
+package io.github.retrooper.packetevents.handlers.legacy.early;
 
 import io.github.retrooper.packetevents.PacketEvents;
-import io.github.retrooper.packetevents.injector.legacy.PacketDecoderLegacy;
+import io.github.retrooper.packetevents.handlers.legacy.PacketDecoderLegacy;
+import io.github.retrooper.packetevents.handlers.legacy.PacketEncoderLegacy;
 import io.github.retrooper.packetevents.utils.reflection.Reflection;
 import net.minecraft.util.io.netty.channel.Channel;
-import net.minecraft.util.io.netty.channel.ChannelHandler;
 import net.minecraft.util.io.netty.channel.ChannelInitializer;
-import net.minecraft.util.io.netty.handler.codec.ByteToMessageDecoder;
 
 import java.lang.reflect.Method;
 
@@ -46,16 +45,13 @@ public class PEChannelInitializerLegacy extends ChannelInitializer<Channel> {
     }
 
     public static void postInitChannel(Channel channel) {
-        PacketDecoderLegacy packetDecoderLegacy = new PacketDecoderLegacy((ByteToMessageDecoder) channel.pipeline().get("decoder"));
-        channel.pipeline().replace("decoder", "decoder", packetDecoderLegacy);
+        channel.pipeline().addBefore("decoder", PacketEvents.get().decoderName, new PacketDecoderLegacy());
+        channel.pipeline().addBefore("encoder", PacketEvents.get().encoderName, new PacketEncoderLegacy());
     }
 
     public static void postDestroyChannel(Channel channel) {
-        ChannelHandler decoder = channel.pipeline().get("decoder");
-        if (decoder instanceof PacketDecoderLegacy) {
-            PacketDecoderLegacy decoderLegacy = (PacketDecoderLegacy) decoder;
-            channel.pipeline().replace("decoder", "decoder", decoderLegacy.previousDecoder);
-        }
+        channel.pipeline().remove(PacketEvents.get().decoderName);
+        channel.pipeline().remove(PacketEvents.get().encoderName);
     }
 
     @Override

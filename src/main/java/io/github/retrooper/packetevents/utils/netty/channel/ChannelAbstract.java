@@ -28,11 +28,11 @@ public interface ChannelAbstract {
     static ChannelAbstract generate(Object rawChannel) {
         if (MinecraftReflection.USE_MODERN_NETTY_PACKAGE) {
             return new ChannelModern(rawChannel);
-        }
-        else {
+        } else {
             return new ChannelLegacy(rawChannel);
         }
     }
+
     Object rawChannel();
 
     boolean isOpen();
@@ -42,6 +42,7 @@ public interface ChannelAbstract {
     boolean isActive();
 
     SocketAddress localAddress();
+
     SocketAddress remoteAddress();
 
     boolean isWritable();

@@ -28,9 +28,10 @@ public class ViaVersionAccessorImplLegacy implements ViaVersionAccessor {
     private static Class<?> viaClass;
     private static Method apiAccessor;
     private static Method getPlayerVersionMethod;
+
     @Override
     public int getProtocolVersion(Player player) {
-        if (viaClass== null) {
+        if (viaClass == null) {
             try {
                 viaClass = Class.forName("us.myles.ViaVersion.api.Via");
                 Class<?> viaAPIClass = Class.forName("us.myles.ViaVersion.api.ViaAPI");

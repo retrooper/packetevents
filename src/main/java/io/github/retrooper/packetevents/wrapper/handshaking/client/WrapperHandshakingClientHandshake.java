@@ -18,9 +18,9 @@
 
 package io.github.retrooper.packetevents.wrapper.handshaking.client;
 
-import io.github.retrooper.packetevents.protocol.ConnectionState;
-import io.github.retrooper.packetevents.utils.netty.bytebuf.ByteBufAbstract;
 import io.github.retrooper.packetevents.manager.player.ClientVersion;
+import io.github.retrooper.packetevents.protocol.ConnectionState;
+import io.github.retrooper.packetevents.utils.netty.buffer.ByteBufAbstract;
 import io.github.retrooper.packetevents.wrapper.PacketWrapper;
 
 /**
@@ -45,6 +45,7 @@ public class WrapperHandshakingClientHandshake extends PacketWrapper {
     /**
      * Protocol version of the client.
      * The latest vanilla server won't let clients with a different protocol version join the server.
+     *
      * @return Protocol version
      */
     public int getProtocolVersion() {
@@ -54,6 +55,7 @@ public class WrapperHandshakingClientHandshake extends PacketWrapper {
     /**
      * {@link ClientVersion} of the client.
      * This enum maps the protocol versions with the name of the release.
+     *
      * @return Client version
      */
     public ClientVersion getClientVersion() {
@@ -62,6 +64,7 @@ public class WrapperHandshakingClientHandshake extends PacketWrapper {
 
     /**
      * Address of the server.
+     *
      * @return Server address
      */
     public String getServerAddress() {
@@ -70,6 +73,7 @@ public class WrapperHandshakingClientHandshake extends PacketWrapper {
 
     /**
      * Port of the server.
+     *
      * @return Server port
      */
     public int getServerPort() {
@@ -79,6 +83,7 @@ public class WrapperHandshakingClientHandshake extends PacketWrapper {
     /**
      * The next connection state.
      * Should always be {@link ConnectionState#STATUS} or {@link ConnectionState#LOGIN} on the vanilla client.
+     *
      * @return Next connection state
      */
     public ConnectionState getNextConnectionState() {
