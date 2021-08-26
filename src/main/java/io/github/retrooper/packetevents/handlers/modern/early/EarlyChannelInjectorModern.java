@@ -30,7 +30,6 @@ import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelInitializer;
-import net.minecraft.util.io.netty.bootstrap.ServerBootstrap;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.PluginDescriptionFile;
 
@@ -143,7 +142,6 @@ public class EarlyChannelInjectorModern implements EarlyInjector {
 
 
     private void injectChannelFuture(ChannelFuture channelFuture) {
-        System.out.println("PE INJECTED A SERVER CHANNEL BOI");
         List<String> channelHandlerNames = channelFuture.channel().pipeline().names();
         ChannelHandler bootstrapAcceptor = null;
         Field bootstrapAcceptorField = null;
@@ -172,9 +170,6 @@ public class EarlyChannelInjectorModern implements EarlyInjector {
             bootstrapAcceptorField.setAccessible(true);
             bootstrapAcceptorField.set(bootstrapAcceptor, channelInitializer);
             injectedFutures.add(channelFuture);
-
-            System.out.println("um...: " + channelHandlerNames);
-            System.out.println("we captured: " + bootstrapAcceptor.getClass().getSimpleName());
         } catch (IllegalAccessException e) {
             ClassLoader cl = bootstrapAcceptor.getClass().getClassLoader();
             if (cl.getClass().getName().equals("org.bukkit.plugin.java.PluginClassLoader")) {

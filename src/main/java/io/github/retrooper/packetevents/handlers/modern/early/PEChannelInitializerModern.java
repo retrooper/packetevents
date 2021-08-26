@@ -26,7 +26,6 @@ import io.netty.channel.Channel;
 import io.netty.channel.ChannelInitializer;
 
 import java.lang.reflect.Method;
-import java.util.Arrays;
 
 public class PEChannelInitializerModern extends ChannelInitializer<Channel> {
     private final ChannelInitializer<?> oldChannelInitializer;
@@ -40,7 +39,6 @@ public class PEChannelInitializerModern extends ChannelInitializer<Channel> {
     public static void postInitChannel(Channel channel) {
         channel.pipeline().addAfter("splitter", PacketEvents.get().decoderName, new PacketDecoderModern());
         channel.pipeline().addAfter("prepender", PacketEvents.get().encoderName, new PacketEncoderModern());
-        System.out.println("handlers: " + Arrays.toString(channel.pipeline().names().toArray(new String[0])));
     }
 
     public static void postDestroyChannel(Channel channel) {
