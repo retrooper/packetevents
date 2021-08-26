@@ -53,16 +53,9 @@ public class PaperChannelInjector {
     public static void setPaperChannelInitializeListener() throws Exception {
         // Call io.papermc.paper.network.ChannelInitializeListenerHolder.addListener(net.kyori.adventure.key.Key, io.papermc.paper.network.ChannelInitializeListener)
         // Create an interface proxy of ChannelInitializeListener
-        boolean shouldHandleViaVersion = hasChannelInitializeHolderListener(Key.key("viaversion", "injector"));
         Class<?> listenerClass = Class.forName("io.papermc.paper.network.ChannelInitializeListener");
         Object channelInitializeListener = Proxy.newProxyInstance(EarlyChannelInjectorModern.class.getClassLoader(), new Class[]{listenerClass}, (proxy, method, args) -> {
             if (method.getName().equals("afterInitChannel")) {
-                if (shouldHandleViaVersion) {
-                    //Call Via's here
-                    Class<?> viaBukkitChannelInitializer = Class.forName("com.viaversion.viaversion.bukkit.handlers.BukkitChannelInitializer");
-                    Method viaAfterInitChannelMethod = viaBukkitChannelInitializer.getMethod("afterChannelInitialize", Channel.class);
-                    viaAfterInitChannelMethod.invoke(null, args[0]);
-                }
                 PEChannelInitializerModern.postInitChannel((Channel) args[0]);
                 return null;
             }
@@ -72,9 +65,6 @@ public class PaperChannelInjector {
         Key key = Key.key(PacketEvents.get().identifier, "injector");
 
         addChannelInitializeListenerHolderListener(key, channelInitializeListener);
-        if (shouldHandleViaVersion) {
-            removeChannelInitializeListenerHolderListener(Key.key("viaversion", "injector"));
-        }
     }
 
     public static void removePaperChannelInitializeListener() throws Exception {
