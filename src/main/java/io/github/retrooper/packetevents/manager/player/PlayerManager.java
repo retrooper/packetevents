@@ -25,8 +25,6 @@ import io.github.retrooper.packetevents.utils.dependencies.v_1_7_10.SpigotVersio
 import io.github.retrooper.packetevents.utils.gameprofile.GameProfileUtil;
 import io.github.retrooper.packetevents.utils.gameprofile.WrappedGameProfile;
 import io.github.retrooper.packetevents.utils.geyser.GeyserUtils;
-import io.github.retrooper.packetevents.utils.netty.buffer.ByteBufAbstract;
-import io.github.retrooper.packetevents.utils.netty.channel.ChannelAbstract;
 import io.github.retrooper.packetevents.utils.nms.MinecraftReflection;
 import io.github.retrooper.packetevents.utils.nms.PlayerPingAccessorModern;
 import org.bukkit.entity.Player;
@@ -99,11 +97,6 @@ public class PlayerManager {
         }
         return version;
     }
-    //TODO Fix, we get a DecoderException IndexOutOfBoundsException
-    public void sendPacket(ChannelAbstract channel, ByteBufAbstract byteBuf) {
-        channel.pipeline().context(PacketEvents.get().encoderName).writeAndFlush(byteBuf);
-    }
-
 /*
     public void writePacket(Player player, SendableWrapper wrapper) {
         try {

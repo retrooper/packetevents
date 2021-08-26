@@ -48,13 +48,4 @@ public interface ChannelAbstract {
     boolean isWritable();
 
     ChannelPipelineAbstract pipeline();
-
-    //TODO Support ChannelFuture for write and writeandflush
-    void write(Object msg);
-    //void write(Object msg, ChannelPromiseAbstract promise);
-
-    void writeAndFlush(Object msg);
-    //void writeAndFlush(Object msg, ChannelPromiseAbstract promise);
-
-    ChannelAbstract flush();
 }

@@ -19,7 +19,6 @@
 package io.github.retrooper.packetevents.utils.netty.channel.pipeline;
 
 import io.github.retrooper.packetevents.utils.netty.channel.ChannelHandlerAbstract;
-import io.github.retrooper.packetevents.utils.netty.channel.ChannelHandlerContextAbstract;
 import io.github.retrooper.packetevents.utils.nms.MinecraftReflection;
 
 import java.util.List;
@@ -77,6 +76,4 @@ public interface ChannelPipelineAbstract {
     ChannelPipelineAbstract fireChannelWritabilityChanged();
 
     ChannelPipelineAbstract flush();
-
-    ChannelHandlerContextAbstract context(String handlerName);
 }

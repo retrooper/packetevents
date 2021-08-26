@@ -58,28 +58,18 @@ public final class PacketType {
 
     public static class Handshaking {
         public enum Client implements PacketTypeCommon {
-            HANDSHAKE(0),
+            HANDSHAKE,
             /**
              * Technically not part of the current protocol, but clients older than 1.7 will send this to initiate Server List Ping.
              * 1.8 and newer servers will handle it correctly though.
              */
-            LEGACY_SERVER_LIST_PING(254);//0XFE in hex
-
-            private final int id;
-
-            Client(int id) {
-                this.id = id;
-            }
-
-            public int getID() {
-                return id;
-            }
+            LEGACY_SERVER_LIST_PING;
 
             @Nullable
             public static PacketTypeCommon getById(int packetID) {
                 if (packetID == 0) {
                     return HANDSHAKE;
-                } else if (packetID == 254) {
+                } else if (packetID == 254) {//0XFE in hex
                     return LEGACY_SERVER_LIST_PING;
                 } else {
                     return null;
@@ -90,18 +80,8 @@ public final class PacketType {
 
     public static class Status {
         public enum Client implements PacketTypeCommon {
-            REQUEST(0),
-            PING(1);
-
-            private final int id;
-
-            Client(int id) {
-                this.id = id;
-            }
-
-            public int getID() {
-                return id;
-            }
+            REQUEST,
+            PING;
 
             @Nullable
             public static PacketTypeCommon getById(int packetID) {
@@ -116,18 +96,8 @@ public final class PacketType {
         }
 
         public enum Server implements PacketTypeCommon {
-            RESPONSE(0),
-            PONG(1);
-
-            private final int id;
-
-            Server(int id) {
-                this.id = id;
-            }
-
-            public int getID() {
-                return id;
-            }
+            RESPONSE,
+            PONG;
 
             @Nullable
             public static PacketTypeCommon getById(int packetID) {
@@ -144,20 +114,10 @@ public final class PacketType {
 
     public static class Login {
         public enum Client implements PacketTypeCommon {
-            LOGIN_START(0),
-            ENCRYPTION_RESPONSE(1),
+            LOGIN_START,
+            ENCRYPTION_RESPONSE,
             ///Added in 1.13
-            LOGIN_PLUGIN_RESPONSE(2);
-
-            private final int id;
-
-            Client(int id) {
-                this.id = id;
-            }
-
-            public int getID() {
-                return id;
-            }
+            LOGIN_PLUGIN_RESPONSE;
 
             @Nullable
             public static PacketTypeCommon getById(int packetID) {
@@ -174,23 +134,13 @@ public final class PacketType {
         }
 
         public enum Server implements PacketTypeCommon {
-            DISCONNECT(0),
-            ENCRYPTION_REQUEST(1),
-            LOGIN_SUCCESS(2),
+            DISCONNECT,
+            ENCRYPTION_REQUEST,
+            LOGIN_SUCCESS,
             //Added in 1.8
-            SET_COMPRESSION(3),
+            SET_COMPRESSION,
             ///Added in 1.13
-            LOGIN_PLUGIN_REQUEST(4);
-
-            private final int id;
-
-            Server(int id) {
-                this.id = id;
-            }
-
-            public int getID() {
-                return id;
-            }
+            LOGIN_PLUGIN_REQUEST;
 
             @Nullable
             public static PacketTypeCommon getById(int packetID) {
@@ -265,12 +215,6 @@ public final class PacketType {
             PLAYER_BLOCK_PLACEMENT,
             USE_ITEM;
 
-            private int id = -1;
-
-            public int getID() {
-                return id;
-            }
-
             private static final Map<ClientVersion, Map<Integer, PacketTypeCommon>> PACKET_ID_CACHE = new IdentityHashMap<>();
 
 
@@ -285,10 +229,8 @@ public final class PacketType {
 
             private static void loadPacketIDs(ClientVersion version, Enum<?>[] enumConstants) {
                 Map<Integer, PacketTypeCommon> innerMap = new IdentityHashMap<>();
-                for (int id = 0; id < enumConstants.length; id++) {
-                    Client value = Client.valueOf(enumConstants[id].name());
-                    value.id = id;
-                    innerMap.put(id, value);
+                for (int i = 0; i < enumConstants.length; i++) {
+                    innerMap.put(i, Client.valueOf(enumConstants[i].name()));
                 }
                 PACKET_ID_CACHE.put(version, innerMap);
             }
@@ -444,12 +386,6 @@ public final class PacketType {
             DECLARE_RECIPES,
             TAGS;
 
-            private int id = -1;
-
-            public int getID() {
-                return id;
-            }
-
             private static final Map<Integer, PacketTypeCommon> PACKET_ID_CACHE = new IdentityHashMap<>();
 
             @Nullable
@@ -458,10 +394,8 @@ public final class PacketType {
             }
 
             private static void loadPacketIDs(Enum<?>[] enumConstants) {
-                for (int id = 0; id < enumConstants.length; id++) {
-                    Server value = Server.valueOf(enumConstants[id].name());
-                    value.id = id;
-                    PACKET_ID_CACHE.put(id, value);
+                for (int i = 0; i < enumConstants.length; i++) {
+                    PACKET_ID_CACHE.put(i, Game.Server.valueOf(enumConstants[i].name()));
                 }
             }
 

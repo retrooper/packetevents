@@ -66,11 +66,4 @@ public interface ChannelHandlerContextAbstract {
     ChannelPipelineAbstract pipeline();
 
     ByteBufAllocatorAbstract alloc();
-
-    //TODO Support ChannelFuture for write and writeandflush
-    void write(Object msg);
-    //void write(Object msg, ChannelPromiseAbstract promise);
-
-    void writeAndFlush(Object msg);
-    //void writeAndFlush(Object msg, ChannelPromiseAbstract promise);
 }

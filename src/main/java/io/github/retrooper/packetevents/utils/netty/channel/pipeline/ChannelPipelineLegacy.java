@@ -19,8 +19,6 @@
 package io.github.retrooper.packetevents.utils.netty.channel.pipeline;
 
 import io.github.retrooper.packetevents.utils.netty.channel.ChannelHandlerAbstract;
-import io.github.retrooper.packetevents.utils.netty.channel.ChannelHandlerContextAbstract;
-import io.github.retrooper.packetevents.utils.netty.channel.ChannelHandlerContextLegacy;
 import net.minecraft.util.io.netty.channel.ChannelHandler;
 import net.minecraft.util.io.netty.channel.ChannelPipeline;
 
@@ -141,10 +139,5 @@ public class ChannelPipelineLegacy implements ChannelPipelineAbstract {
     @Override
     public ChannelPipelineAbstract flush() {
         return new ChannelPipelineLegacy(pipeline.flush());
-    }
-
-    @Override
-    public ChannelHandlerContextAbstract context(String handlerName) {
-        return new ChannelHandlerContextLegacy(pipeline.context(handlerName));
     }
 }
