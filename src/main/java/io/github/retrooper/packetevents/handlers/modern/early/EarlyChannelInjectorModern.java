@@ -125,7 +125,7 @@ public class EarlyChannelInjectorModern implements EarlyInjector {
         }
 
         //Player channels might have been registered already. Let us add our handlers. We are a little late though.
-        //This only happens when you join extremely early on older server versions.
+        //This only happens when you join extremely early on older versions of minecraft.
         List<Object> networkManagers = MinecraftReflection.getNetworkManagers();
         synchronized (networkManagers) {
             for (Object networkManager : networkManagers) {

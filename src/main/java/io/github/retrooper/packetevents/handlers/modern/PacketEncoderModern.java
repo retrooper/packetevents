@@ -75,7 +75,7 @@ public class PacketEncoderModern extends MessageToMessageEncoder<ByteBuf> {
         if (encoderIndex > ctx.pipeline().names().indexOf(PacketEvents.get().encoderName)) {
             // Need to decompress this packet due to bad order
             ByteBufAbstract decompressed = CustomPacketDecompressor.decompress(ctx, buf);
-            return CompressionManager.rearrangeHandlersAndWriteOutput(ctx, buf, decompressed);
+            return CompressionManager.refactorHandlers(ctx, buf, decompressed);
         }
         return false;
     }

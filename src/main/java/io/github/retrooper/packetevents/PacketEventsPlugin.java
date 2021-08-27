@@ -21,19 +21,14 @@ package io.github.retrooper.packetevents;
 import io.github.retrooper.packetevents.event.PacketListenerAbstract;
 import io.github.retrooper.packetevents.event.impl.PacketReceiveEvent;
 import io.github.retrooper.packetevents.event.impl.PacketSendEvent;
-import io.github.retrooper.packetevents.manager.player.ClientVersion;
 import io.github.retrooper.packetevents.protocol.ConnectionState;
 import io.github.retrooper.packetevents.protocol.PacketType;
-import io.github.retrooper.packetevents.utils.dependencies.protocolsupport.ProtocolSupportVersionLookupUtils;
 import io.github.retrooper.packetevents.utils.netty.buffer.ByteBufAbstract;
 import io.github.retrooper.packetevents.wrapper.game.client.WrapperGameClientInteractEntity;
 import io.github.retrooper.packetevents.wrapper.handshaking.client.WrapperHandshakingClientHandshake;
 import io.github.retrooper.packetevents.wrapper.login.client.WrapperLoginClientLoginStart;
 import org.bukkit.entity.Entity;
 import org.bukkit.plugin.java.JavaPlugin;
-
-import java.net.SocketAddress;
-import java.util.Arrays;
 
 public class PacketEventsPlugin extends JavaPlugin {
     @Override
@@ -53,6 +48,7 @@ public class PacketEventsPlugin extends JavaPlugin {
                 if (event.getPacketType() == PacketType.Login.Server.LOGIN_SUCCESS) {
                     //Transition into the GAME connection state
                     PacketEvents.get().getInjector().changeConnectionState(event.getChannel().rawChannel(), ConnectionState.GAME);
+
                 }
             }
 
@@ -63,19 +59,12 @@ public class PacketEventsPlugin extends JavaPlugin {
                     case HANDSHAKING:
                         if (event.getPacketType() == PacketType.Handshaking.Client.HANDSHAKE) {
                             WrapperHandshakingClientHandshake handshake = new WrapperHandshakingClientHandshake(event.getClientVersion(), byteBuf);
-                            ClientVersion clientVersion = handshake.getClientVersion();
-                            //We weren't able to be before protocolsupport in the pipeline YET. After this packet we will be.
-                            //ProtocolSupport modifies the packet, so we are forced to use their API to confirm the version
-                            if (ProtocolSupportVersionLookupUtils.isAvailable()) {
-                                int protocolVersion = ProtocolSupportVersionLookupUtils.getProtocolVersion(event.getChannel().remoteAddress());
-                                clientVersion = ClientVersion.getClientVersion(protocolVersion);
-                            }
                             //Cache client version
-                            PacketEvents.get().getPlayerManager().clientVersions.put(event.getChannel().rawChannel(), clientVersion);
+                            PacketEvents.get().getPlayerManager().clientVersions.put(event.getChannel().rawChannel(), handshake.getClientVersion());
                             //Transition into the next connection state
                             PacketEvents.get().getInjector().changeConnectionState(event.getChannel().rawChannel(), handshake.getNextConnectionState());
                             System.out.println("NEXT CONNECTION STATE: " + handshake.getNextConnectionState());
-                            System.out.println("USER CONNECTED WITH CLIENT VERSION: " + clientVersion.name());
+                            System.out.println("USER CONNECTED WITH CLIENT VERSION: " + handshake.getClientVersion().name());
                         }
                         break;
                     case LOGIN:
@@ -100,7 +89,6 @@ public class PacketEventsPlugin extends JavaPlugin {
                         event.getPlayer().sendMessage("entity name: " + entity.getName());
                     }
                     event.getPlayer().sendMessage("type: " + interactEntity.getType().name());
-                    System.out.println("HANDLERS: " + Arrays.toString(event.getChannel().pipeline().names().toArray(new String[0])));
                 }
             }
         });

@@ -37,8 +37,8 @@ public class PEChannelInitializerModern extends ChannelInitializer<Channel> {
     }
 
     public static void postInitChannel(Channel channel) {
-        channel.pipeline().addAfter("splitter", PacketEvents.get().decoderName, new PacketDecoderModern());
-        channel.pipeline().addAfter("prepender", PacketEvents.get().encoderName, new PacketEncoderModern());
+        channel.pipeline().addBefore("decoder", PacketEvents.get().decoderName, new PacketDecoderModern());
+        channel.pipeline().addBefore("encoder", PacketEvents.get().encoderName, new PacketEncoderModern());
     }
 
     public static void postDestroyChannel(Channel channel) {
