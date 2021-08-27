@@ -265,12 +265,6 @@ public final class PacketType {
             PLAYER_BLOCK_PLACEMENT,
             USE_ITEM;
 
-            private int id = -1;
-
-            public int getID() {
-                return id;
-            }
-
             private static final Map<ClientVersion, Map<Integer, PacketTypeCommon>> PACKET_ID_CACHE = new IdentityHashMap<>();
 
 
@@ -287,7 +281,6 @@ public final class PacketType {
                 Map<Integer, PacketTypeCommon> innerMap = new IdentityHashMap<>();
                 for (int id = 0; id < enumConstants.length; id++) {
                     Client value = Client.valueOf(enumConstants[id].name());
-                    value.id = id;
                     innerMap.put(id, value);
                 }
                 PACKET_ID_CACHE.put(version, innerMap);

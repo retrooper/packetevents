@@ -80,16 +80,12 @@ public class PacketEventsPlugin extends JavaPlugin {
             }
         });
 
+        //TODO Add ProtocolSupport, readd the lost new netty abstraction that was added in the recently reverted commits.
+        //TODO Complete the legacy handlers.
         PacketEvents.get().getEventManager().registerListener(new PacketListenerAbstract() {
             @Override
             public void onPacketReceive(PacketReceiveEvent event) {
                 if (event.getPacketType() == PacketType.Game.Client.INTERACT_ENTITY) {
-                    ByteBufAbstract bb = ByteBufUtil.buffer();
-                    PacketWrapper wrapper = PacketWrapper.createUniversalPacketWrapper(bb);
-                    event.getPlayer().sendMessage("setting slot to 7");
-                    wrapper.writeVarInt(PacketType.Game.Server.HELD_ITEM_CHANGE.getID());
-                    bb.writeByte(7);
-                    PacketEvents.get().getPlayerManager().sendPacket(event.getChannel(), bb);
                     event.getPlayer().sendMessage("sent");
 
                     WrapperGameClientInteractEntity interactEntity = new WrapperGameClientInteractEntity(event.getClientVersion(), event.getByteBuf());
