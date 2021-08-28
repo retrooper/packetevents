@@ -31,7 +31,7 @@ import java.util.UUID;
  */
 public class WrapperLoginServerLoginSuccess extends SendablePacketWrapper {
     private final UUID uuid;
-    private String username;
+    private final String username;
 
     public WrapperLoginServerLoginSuccess(ByteBufAbstract byteBuf) {
         super(byteBuf);
@@ -82,8 +82,6 @@ public class WrapperLoginServerLoginSuccess extends SendablePacketWrapper {
         } else {
             writeString(uuid.toString(), 36);
         }
-
-        username = username.substring(16);
         writeString(username, 16);
     }
 }

@@ -56,7 +56,9 @@ public class WrapperLoginServerDisconnect extends SendablePacketWrapper {
     @Override
     public void createPacket() {
         int maxLen = protocolVersion >= 477 ? MODERN_REASON_LENGTH : LEGACY_REASON_LENGTH;
-        reason = reason.substring(maxLen);
+        if (reason.length() > maxLen) {
+            reason = reason.substring(0, maxLen);
+        }
         writeString(reason, maxLen);
     }
 }
