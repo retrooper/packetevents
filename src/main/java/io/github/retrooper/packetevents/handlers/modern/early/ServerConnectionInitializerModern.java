@@ -26,19 +26,12 @@ import io.netty.channel.Channel;
 import io.netty.channel.ChannelInitializer;
 
 import java.lang.reflect.Method;
+import java.util.Arrays;
 
-public class PEChannelInitializerModern extends ChannelInitializer<Channel> {
-    private final ChannelInitializer<?> oldChannelInitializer;
-    private Method initChannelMethod;
-
-    public PEChannelInitializerModern(ChannelInitializer<?> oldChannelInitializer) {
-        this.oldChannelInitializer = oldChannelInitializer;
-        load();
-    }
-
+public class ServerConnectionInitializerModern extends CustomChannelInitializerModern {
     public static void postInitChannel(Channel channel) {
-        channel.pipeline().addBefore("decoder", PacketEvents.get().decoderName, new PacketDecoderModern());
-        channel.pipeline().addBefore("encoder", PacketEvents.get().encoderName, new PacketEncoderModern());
+        channel.pipeline().addAfter("splitter", PacketEvents.get().decoderName, new PacketDecoderModern());
+        channel.pipeline().addAfter("prepender", PacketEvents.get().encoderName, new PacketEncoderModern());
     }
 
     public static void postDestroyChannel(Channel channel) {
@@ -46,17 +39,8 @@ public class PEChannelInitializerModern extends ChannelInitializer<Channel> {
         channel.pipeline().remove(PacketEvents.get().encoderName);
     }
 
-    private void load() {
-        initChannelMethod = Reflection.getMethod(oldChannelInitializer.getClass(), "initChannel", 0);
-    }
-
-    public ChannelInitializer<?> getOldChannelInitializer() {
-        return oldChannelInitializer;
-    }
-
     @Override
     protected void initChannel(Channel channel) throws Exception {
-        initChannelMethod.invoke(oldChannelInitializer, channel);
         postInitChannel(channel);
     }
 }

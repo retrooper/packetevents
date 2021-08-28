@@ -63,6 +63,10 @@ public class GlobalChannelInjector {
                 PacketEvents.get().getPlugin().getLogger().warning("[packetevents] Failed to inject with the Early Injector. Reverting to the Compatibility/Late Injector... This is just a warning, but please report this!");
                 ex.printStackTrace();
             }
+            else {
+                PacketEvents.get().getPlugin().getLogger().severe("[packetevents] Failed to inject with all available injectors. Please report this!");
+                ex.printStackTrace();
+            }
         }
     }
 

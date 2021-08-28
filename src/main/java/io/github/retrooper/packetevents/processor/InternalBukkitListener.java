@@ -31,7 +31,7 @@ import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerLoginEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 
-public class BukkitEventProcessorInternal implements Listener {
+public class InternalBukkitListener implements Listener {
     @EventHandler(priority = EventPriority.LOWEST)
     public void onLogin(PlayerLoginEvent e) {
         final Player player = e.getPlayer();
@@ -50,7 +50,7 @@ public class BukkitEventProcessorInternal implements Listener {
             PacketEvents.get().getInjector().injectPlayer(player);
         }
 
-        PacketEvents.get().getEventManager().callEvent(new PostPlayerInjectEvent(e.getPlayer(), false));
+        PacketEvents.get().getEventManager().callEvent(new PostPlayerInjectEvent(e.getPlayer()));
         PacketEvents.get().getServerManager().entityCache.putIfAbsent(e.getPlayer().getEntityId(), e.getPlayer());
     }
 

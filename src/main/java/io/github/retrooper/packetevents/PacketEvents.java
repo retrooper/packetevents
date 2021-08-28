@@ -25,11 +25,11 @@ import io.github.retrooper.packetevents.exceptions.PacketEventsLoadFailureExcept
 import io.github.retrooper.packetevents.handlers.GlobalChannelInjector;
 import io.github.retrooper.packetevents.manager.player.PlayerManager;
 import io.github.retrooper.packetevents.manager.server.ServerManager;
-import io.github.retrooper.packetevents.processor.BukkitEventProcessorInternal;
+import io.github.retrooper.packetevents.processor.InternalBukkitListener;
+import io.github.retrooper.packetevents.processor.InternalPacketListener;
 import io.github.retrooper.packetevents.protocol.PacketType;
 import io.github.retrooper.packetevents.settings.PacketEventsSettings;
 import io.github.retrooper.packetevents.updatechecker.UpdateChecker;
-import io.github.retrooper.packetevents.utils.dependencies.viaversion.ViaVersionLookupUtils;
 import io.github.retrooper.packetevents.utils.guava.GuavaUtils;
 import io.github.retrooper.packetevents.utils.nms.MinecraftReflection;
 import io.github.retrooper.packetevents.utils.version.PEVersion;
@@ -45,9 +45,9 @@ public final class PacketEvents implements Listener {
     private final EventManager eventManager = new EventManager();
     private final PlayerManager playerManager = new PlayerManager();
     private final ServerManager serverManager = new ServerManager();
-    private final BukkitEventProcessorInternal bukkitEventProcessorInternal = new BukkitEventProcessorInternal();
+    private final InternalBukkitListener internalBukkitListener = new InternalBukkitListener();
     private final GlobalChannelInjector injector = new GlobalChannelInjector();
-    public String identifier, encoderName, decoderName;
+    public String identifier, encoderName, decoderName, connectionHandlerName;
     private PacketEventsSettings settings = new PacketEventsSettings();
     private UpdateChecker updateChecker;
     private boolean loaded;
@@ -67,6 +67,7 @@ public final class PacketEvents implements Listener {
             identifier = "pe-" + plugin.getName().toLowerCase();
             encoderName = "pe-encoder-" + plugin.getName().toLowerCase();
             decoderName = "pe-decoder-" + plugin.getName().toLowerCase();
+            connectionHandlerName = "pe-connectionhandler-" + plugin.getName().toLowerCase();
             try {
                 MinecraftReflection.init();
 
@@ -78,13 +79,16 @@ public final class PacketEvents implements Listener {
             updateChecker = new UpdateChecker();
 
             injector.load();
-            lateBind = !injector.isBound() || ViaVersionLookupUtils.isAvailable();
+            lateBind = !injector.isBound();
             //If late-bind is enabled or ViaVersion is present, we will inject a bit later.
             if (!lateBind) {
                 injector.inject();
             }
 
             loaded = true;
+
+            //Register internal packet listener
+            getEventManager().registerListener(new InternalPacketListener());
         }
     }
 
@@ -111,11 +115,11 @@ public final class PacketEvents implements Listener {
             PacketType.Game.Server.load();
 
             Runnable postInjectTask = () -> {
-                Bukkit.getPluginManager().registerEvents(bukkitEventProcessorInternal, plugin);
+                Bukkit.getPluginManager().registerEvents(internalBukkitListener, plugin);
                 for (final Player p : Bukkit.getOnlinePlayers()) {
                     try {
                         injector.injectPlayer(p);
-                        getEventManager().callEvent(new PostPlayerInjectEvent(p, false));
+                        getEventManager().callEvent(new PostPlayerInjectEvent(p));
                     } catch (Exception ex) {
                         p.kickPlayer("Failed to inject... Please rejoin!");
                     }

@@ -10,15 +10,11 @@ import org.bukkit.entity.Player;
 public class PacketReceiveEvent extends ProtocolPacketEvent {
 
     public PacketReceiveEvent(ChannelAbstract channel, Player player, ByteBufAbstract byteBuf) {
-        super(PacketSide.CLIENT, channel, player, byteBuf, true);
+        super(PacketSide.CLIENT, channel, player, byteBuf);
     }
 
     public PacketReceiveEvent(Object channel, Player player, Object rawByteBuf) {
-        super(PacketSide.CLIENT, channel, player, rawByteBuf, true);
-    }
-
-    public PacketReceiveEvent(Object channel, Player player, Object rawByteBuf, boolean ignoreBufferLength) {
-        super(PacketSide.CLIENT, channel, player, rawByteBuf, ignoreBufferLength);
+        super(PacketSide.CLIENT, channel, player, rawByteBuf);
     }
 
     @Override

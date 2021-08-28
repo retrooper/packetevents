@@ -32,6 +32,8 @@ import io.github.retrooper.packetevents.wrapper.login.client.WrapperLoginClientL
 import org.bukkit.entity.Entity;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import java.util.Arrays;
+
 public class PacketEventsPlugin extends JavaPlugin {
     @Override
     public void onLoad() {
@@ -42,52 +44,12 @@ public class PacketEventsPlugin extends JavaPlugin {
     @Override
     public void onEnable() {
         PacketEvents.get().init();
-        //Internal listener
-        PacketEvents.get().getEventManager().registerListener(new PacketListenerAbstract(PacketListenerAbstract.Priority.LOWEST) {
-            @Override
-            public void onPacketSend(PacketSendEvent event) {
-                ByteBufAbstract byteBuf = event.getByteBuf();
-                if (event.getPacketType() == PacketType.Login.Server.LOGIN_SUCCESS) {
-                    //Transition into the GAME connection state
-                    PacketEvents.get().getInjector().changeConnectionState(event.getChannel().rawChannel(), ConnectionState.GAME);
 
-                }
-            }
-
-            @Override
-            public void onPacketReceive(PacketReceiveEvent event) {
-                ByteBufAbstract byteBuf = event.getByteBuf();
-                switch (event.getConnectionState()) {
-                    case HANDSHAKING:
-                        if (event.getPacketType() == PacketType.Handshaking.Client.HANDSHAKE) {
-                            WrapperHandshakingClientHandshake handshake = new WrapperHandshakingClientHandshake(event.getClientVersion(), byteBuf);
-                            //Cache client version
-                            PacketEvents.get().getPlayerManager().clientVersions.put(event.getChannel().rawChannel(), handshake.getClientVersion());
-                            //Transition into the next connection state
-                            PacketEvents.get().getInjector().changeConnectionState(event.getChannel().rawChannel(), handshake.getNextConnectionState());
-                            System.out.println("NEXT CONNECTION STATE: " + handshake.getNextConnectionState());
-                            System.out.println("USER CONNECTED WITH CLIENT VERSION: " + handshake.getClientVersion().name());
-                        }
-                        break;
-                    case LOGIN:
-                        if (event.getPacketType() == PacketType.Login.Client.LOGIN_START) {
-                            WrapperLoginClientLoginStart start = new WrapperLoginClientLoginStart(event.getClientVersion(), byteBuf);
-                            //Map the player usernames with their netty channels
-                            PacketEvents.get().getPlayerManager().channels.put(start.getUsername(), event.getChannel().rawChannel());
-                        }
-                        break;
-                }
-            }
-        });
-
-        //TODO Add ProtocolSupport, readd the lost new netty abstraction that was added in the recently reverted commits.
         //TODO Complete the legacy handlers.
         PacketEvents.get().getEventManager().registerListener(new PacketListenerAbstract() {
             @Override
             public void onPacketReceive(PacketReceiveEvent event) {
-                if (event.getPacketType() == PacketType.Game.Client.INTERACT_ENTITY) {
-                    event.getPlayer().sendMessage("sent");
-
+              if (event.getPacketType() == PacketType.Game.Client.INTERACT_ENTITY) {
                     WrapperGameClientInteractEntity interactEntity = new WrapperGameClientInteractEntity(event.getClientVersion(), event.getByteBuf());
                     int entityID = interactEntity.getEntityID();
                     Entity entity = PacketEvents.get().getServerManager().getEntityByID(entityID);
@@ -95,6 +57,13 @@ public class PacketEventsPlugin extends JavaPlugin {
                         event.getPlayer().sendMessage("entity name: " + entity.getName());
                     }
                     event.getPlayer().sendMessage("type: " + interactEntity.getType().name());
+                    System.out.println("HANDLERS: " + Arrays.toString(event.getChannel().pipeline().names().toArray(new String[0])));
+                    ByteBufAbstract sentPacket = ByteBufUtil.buffer();
+                    PacketWrapper sentPacketWrapper = PacketWrapper.createUniversalPacketWrapper(sentPacket);
+                    int serverPacketID = PacketType.Game.Server.HELD_ITEM_CHANGE.getID();
+                    sentPacketWrapper.writeVarInt(serverPacketID);
+                    sentPacket.writeByte(7);
+                    event.getChannel().writeAndFlush(sentPacket);
                 }
             }
         });

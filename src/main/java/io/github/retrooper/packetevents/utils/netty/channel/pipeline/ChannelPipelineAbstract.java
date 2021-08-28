@@ -24,7 +24,6 @@ import io.github.retrooper.packetevents.utils.nms.MinecraftReflection;
 
 import java.util.List;
 
-//TODO Complete
 public interface ChannelPipelineAbstract {
     static ChannelPipelineAbstract generate(Object rawChannelPipeline) {
         if (MinecraftReflection.USE_MODERN_NETTY_PACKAGE) {

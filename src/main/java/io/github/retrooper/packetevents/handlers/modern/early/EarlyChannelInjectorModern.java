@@ -29,15 +29,11 @@ import io.github.retrooper.packetevents.utils.reflection.ReflectionObject;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelHandler;
-import io.netty.channel.ChannelInitializer;
+import io.netty.channel.ChannelPipeline;
 import org.bukkit.entity.Player;
-import org.bukkit.plugin.PluginDescriptionFile;
 
 import java.lang.reflect.Field;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class EarlyChannelInjectorModern implements EarlyInjector {
     private final List<ChannelFuture> injectedFutures = new ArrayList<>();
@@ -66,7 +62,7 @@ public class EarlyChannelInjectorModern implements EarlyInjector {
                     }
                 }
             }
-        } catch (Exception e) {
+        } catch (Exception ignored) {
         }
         return false;
     }
@@ -135,56 +131,25 @@ public class EarlyChannelInjectorModern implements EarlyInjector {
                     continue;
                 }
 
-                PEChannelInitializerModern.postInitChannel(channel);
+                ServerConnectionInitializerModern.postInitChannel(channel);
             }
         }
     }
 
 
-    private void injectChannelFuture(ChannelFuture channelFuture) {
-        List<String> channelHandlerNames = channelFuture.channel().pipeline().names();
-        ChannelHandler bootstrapAcceptor = null;
-        Field bootstrapAcceptorField = null;
-        for (String handlerName : channelHandlerNames) {
-            ChannelHandler handler = channelFuture.channel().pipeline().get(handlerName);
-            try {
-                bootstrapAcceptorField = handler.getClass().getDeclaredField("childHandler");
-                bootstrapAcceptorField.setAccessible(true);
-                bootstrapAcceptorField.get(handler);
-                bootstrapAcceptor = handler;
-            } catch (Exception ignored) {
-            }
+    private void injectChannelFuture(ChannelFuture future) {
+        ChannelPipeline pipeline = future.channel().pipeline();
+        if (pipeline.get("SpigotNettyServerChannelHandler#0") != null) {
+            pipeline.addAfter("SpigotNettyServerChannelHandler#0", PacketEvents.get().connectionHandlerName, new ServerChannelHandlerModern());
         }
-
-        if (bootstrapAcceptor == null) {
-            bootstrapAcceptor = channelFuture.channel().pipeline().first();
+        else {
+            pipeline.addFirst(PacketEvents.get().connectionHandlerName, new ServerChannelHandlerModern());
         }
+        injectedFutures.add(future);
+    }
 
-        ChannelInitializer<?> oldChannelInitializer;
-        try {
-            oldChannelInitializer = (ChannelInitializer<?>) bootstrapAcceptorField.get(bootstrapAcceptor);
-
-            ChannelInitializer<?> channelInitializer = new PEChannelInitializerModern(oldChannelInitializer);
-
-            //Replace the old channel initializer with our own.
-            bootstrapAcceptorField.setAccessible(true);
-            bootstrapAcceptorField.set(bootstrapAcceptor, channelInitializer);
-            injectedFutures.add(channelFuture);
-        } catch (IllegalAccessException e) {
-            ClassLoader cl = bootstrapAcceptor.getClass().getClassLoader();
-            if (cl.getClass().getName().equals("org.bukkit.plugin.java.PluginClassLoader")) {
-                PluginDescriptionFile yaml = null;
-                try {
-                    yaml = (PluginDescriptionFile) PluginDescriptionFile.class.getDeclaredField("description").get(cl);
-                } catch (IllegalAccessException | NoSuchFieldException e2) {
-                    e2.printStackTrace();
-                }
-                throw new IllegalStateException("PacketEvents failed to inject, because of " + bootstrapAcceptor.getClass().getName() + ", you might want to try running without " + yaml.getName() + "?");
-            } else {
-                throw new IllegalStateException("PacketEvents failed to find core component 'childHandler', please check your plugins. issue: " + bootstrapAcceptor.getClass().getName());
-            }
-        }
-
+    private void ejectChannelFuture(ChannelFuture future) {
+        future.channel().pipeline().remove(PacketEvents.get().connectionHandlerName);
     }
 
     @Override
@@ -196,41 +161,8 @@ public class EarlyChannelInjectorModern implements EarlyInjector {
                 e.printStackTrace();
             }
         }
-        Field childHandlerField = null;
         for (ChannelFuture future : injectedFutures) {
-            List<String> names = future.channel().pipeline().names();
-            ChannelHandler bootstrapAcceptor = null;
-            // Pick best
-            for (String name : names) {
-                try {
-                    ChannelHandler handler = future.channel().pipeline().get(name);
-                    if (childHandlerField == null) {
-                        childHandlerField = handler.getClass().getDeclaredField("childHandler");
-                        childHandlerField.setAccessible(true);
-                    }
-
-                    ChannelInitializer<Channel> oldInit = (ChannelInitializer<Channel>) childHandlerField.get(handler);
-                    if (oldInit instanceof PEChannelInitializerModern) {
-                        bootstrapAcceptor = handler;
-                    }
-                } catch (Exception ignored) {
-                    // Not this one
-                }
-            }
-            // Default to first
-            if (bootstrapAcceptor == null) {
-                bootstrapAcceptor = future.channel().pipeline().first();
-            }
-
-            try {
-                ChannelInitializer<Channel> oldInit = (ChannelInitializer<Channel>) childHandlerField.get(bootstrapAcceptor);
-                if (oldInit instanceof PEChannelInitializerModern) {
-                    childHandlerField.setAccessible(true);
-                    childHandlerField.set(bootstrapAcceptor, ((PEChannelInitializerModern) oldInit).getOldChannelInitializer());
-                }
-            } catch (Exception e) {
-                PacketEvents.get().getPlugin().getLogger().severe("PacketEvents failed to eject the injection handler! Please reboot!");
-            }
+            ejectChannelFuture(future);
         }
         injectedFutures.clear();
 
@@ -264,7 +196,7 @@ public class EarlyChannelInjectorModern implements EarlyInjector {
     public void ejectPlayer(Player player) {
         Object channel = PacketEvents.get().getPlayerManager().getChannel(player);
         if (channel != null) {
-            PEChannelInitializerModern.postDestroyChannel((Channel) channel);
+            ServerConnectionInitializerModern.postDestroyChannel((Channel) channel);
         }
     }
 

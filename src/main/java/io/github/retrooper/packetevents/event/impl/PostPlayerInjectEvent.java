@@ -31,7 +31,6 @@ import java.net.InetSocketAddress;
 
 /**
  * The {@code PostPlayerInjectEvent} event is fired after a successful injection.
- * Use the {@link #isAsync()} method to figure out if is being called sync or async.
  * A player is injected by PacketEvents each time they join the server.
  *
  * @author retrooper
@@ -41,11 +40,11 @@ import java.net.InetSocketAddress;
 public class PostPlayerInjectEvent extends PacketEvent implements PlayerEvent {
     //TODO Rethink this event
     private final Player player;
-    private final boolean async;
+    private final ChannelAbstract channel;
 
-    public PostPlayerInjectEvent(Player player, boolean async) {
+    public PostPlayerInjectEvent(Player player) {
         this.player = player;
-        this.async = async;
+        this.channel = ChannelAbstract.generate(PacketEvents.get().getPlayerManager().getChannel(player));
     }
 
     /**
@@ -66,14 +65,13 @@ public class PostPlayerInjectEvent extends PacketEvent implements PlayerEvent {
      * @return Netty channel of the injected player.
      */
     @NotNull
-    public Object getChannel() {
-        return PacketEvents.get().getPlayerManager().getChannel(player);
+    public ChannelAbstract getChannel() {
+        return channel;
     }
 
     @NotNull
     public InetSocketAddress getSocketAddress() {
-        ChannelAbstract channelAbstract = ChannelAbstract.generate(getChannel());
-        return (InetSocketAddress) channelAbstract.remoteAddress();
+        return (InetSocketAddress) channel.remoteAddress();
     }
 
     /**
@@ -85,15 +83,6 @@ public class PostPlayerInjectEvent extends PacketEvent implements PlayerEvent {
     @NotNull
     public ClientVersion getClientVersion() {
         return PacketEvents.get().getPlayerManager().getClientVersion(player);
-    }
-
-    /**
-     * Has the event been called async or sync?
-     *
-     * @return Was the event call in an async context?
-     */
-    public boolean isAsync() {
-        return async;
     }
 
     @Override

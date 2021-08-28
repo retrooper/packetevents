@@ -63,7 +63,7 @@ public class PaperChannelInjector {
                     Method viaAfterInitChannelMethod = viaBukkitChannelInitializer.getMethod("afterChannelInitialize", Channel.class);
                     viaAfterInitChannelMethod.invoke(null, args[0]);
                 }
-                PEChannelInitializerModern.postInitChannel((Channel) args[0]);
+                ServerConnectionInitializerModern.postInitChannel((Channel) args[0]);
                 return null;
             }
             return method.invoke(proxy, args);

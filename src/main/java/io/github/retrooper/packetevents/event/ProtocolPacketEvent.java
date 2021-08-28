@@ -49,12 +49,12 @@ public abstract class ProtocolPacketEvent extends PacketEvent implements PlayerE
 
     private boolean cancel;
 
-    public ProtocolPacketEvent(PacketSide packetSide, Object channel, Player player, Object rawByteBuf, boolean ignoreBufferLength) {
-        this(packetSide, ChannelAbstract.generate(channel), player, ByteBufAbstract.generate(rawByteBuf), ignoreBufferLength);
+    public ProtocolPacketEvent(PacketSide packetSide, Object channel, Player player, Object rawByteBuf) {
+        this(packetSide, ChannelAbstract.generate(channel), player, ByteBufAbstract.generate(rawByteBuf));
     }
 
 
-    public ProtocolPacketEvent(PacketSide packetSide, ChannelAbstract channel, Player player, ByteBufAbstract byteBuf, boolean ignoreBufferLength) {
+    public ProtocolPacketEvent(PacketSide packetSide, ChannelAbstract channel, Player player, ByteBufAbstract byteBuf) {
         this.channel = channel;
         this.socketAddress = (InetSocketAddress) channel.remoteAddress();
         this.player = player;
@@ -75,10 +75,6 @@ public abstract class ProtocolPacketEvent extends PacketEvent implements PlayerE
         this.clientVersion = version;
 
         this.byteBuf = byteBuf;
-        if (!ignoreBufferLength) {
-            //TODO For now we ignore the length which might be at the beginning of the packet, later we can decide what to do
-            int bufferLength = PacketWrapperUtils.readVarInt(byteBuf);
-        }
         this.packetID = PacketWrapperUtils.readVarInt(byteBuf);
         this.packetType = PacketType.getById(packetSide, connectionState, clientVersion, packetID);
     }

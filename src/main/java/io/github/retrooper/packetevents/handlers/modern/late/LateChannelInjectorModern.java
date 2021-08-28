@@ -22,7 +22,7 @@ import io.github.retrooper.packetevents.PacketEvents;
 import io.github.retrooper.packetevents.handlers.LateInjector;
 import io.github.retrooper.packetevents.handlers.modern.PacketDecoderModern;
 import io.github.retrooper.packetevents.handlers.modern.PacketEncoderModern;
-import io.github.retrooper.packetevents.handlers.modern.early.PEChannelInitializerModern;
+import io.github.retrooper.packetevents.handlers.modern.early.ServerConnectionInitializerModern;
 import io.github.retrooper.packetevents.protocol.ConnectionState;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandler;
@@ -42,7 +42,7 @@ public class LateChannelInjectorModern implements LateInjector {
     @Override
     public void injectPlayer(Player player) {
         Channel channel = (Channel) PacketEvents.get().getPlayerManager().getChannel(player);
-        PEChannelInitializerModern.postInitChannel(channel);
+        ServerConnectionInitializerModern.postInitChannel(channel);
     }
 
     private PacketDecoderModern getDecoder(Object rawChannel) {
@@ -71,7 +71,7 @@ public class LateChannelInjectorModern implements LateInjector {
         Object channel = PacketEvents.get().getPlayerManager().getChannel(player);
         if (channel != null) {
             try {
-                PEChannelInitializerModern.postDestroyChannel((Channel) channel);
+                ServerConnectionInitializerModern.postDestroyChannel((Channel) channel);
             } catch (Exception ignored) {
             }
         }
