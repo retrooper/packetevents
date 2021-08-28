@@ -16,32 +16,31 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package io.github.retrooper.packetevents.wrapper.status.server;
+package io.github.retrooper.packetevents.wrapper.game.server;
 
 import io.github.retrooper.packetevents.protocol.PacketType;
 import io.github.retrooper.packetevents.utils.netty.buffer.ByteBufAbstract;
-import io.github.retrooper.packetevents.wrapper.PacketWrapper;
 import io.github.retrooper.packetevents.wrapper.SendablePacketWrapper;
 
-public class WrapperStatusServerPong extends SendablePacketWrapper {
-    private final long time;
-
-    public WrapperStatusServerPong(ByteBufAbstract byteBuf) {
+public class WrapperGameServerHeldItemChange extends SendablePacketWrapper {
+    private final byte slot;
+    public WrapperGameServerHeldItemChange(ByteBufAbstract byteBuf) {
         super(byteBuf);
-        this.time = readLong();
+        this.slot = readByte();
     }
 
-    public WrapperStatusServerPong(long time) {
-        super(PacketType.Status.Server.PONG.getID());
-        this.time = time;
+    public WrapperGameServerHeldItemChange(byte slot) {
+        super(PacketType.Game.Server.HELD_ITEM_CHANGE.getID());
+        this.slot = slot;
     }
 
-    public long getTime() {
-        return time;
+    public byte getSlot() {
+        return slot;
     }
+
 
     @Override
     public void createPacket() {
-        writeLong(time);
+        writeByte(slot);
     }
 }

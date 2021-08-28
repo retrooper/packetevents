@@ -29,6 +29,7 @@ import io.github.retrooper.packetevents.utils.netty.buffer.ByteBufAbstract;
 import io.github.retrooper.packetevents.utils.netty.channel.ChannelAbstract;
 import io.github.retrooper.packetevents.utils.nms.MinecraftReflection;
 import io.github.retrooper.packetevents.utils.nms.PlayerPingAccessorModern;
+import io.github.retrooper.packetevents.wrapper.SendablePacketWrapper;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
@@ -99,10 +100,27 @@ public class PlayerManager {
         }
         return version;
     }
-    //TODO Fix, we get a DecoderException IndexOutOfBoundsException
     public void sendPacket(ChannelAbstract channel, ByteBufAbstract byteBuf) {
-        channel.pipeline().context(PacketEvents.get().encoderName).writeAndFlush(byteBuf);
+        channel.writeAndFlush(byteBuf);
     }
+
+    public void sendPacket(ChannelAbstract channel, SendablePacketWrapper wrapper) {
+        wrapper.createPacket();
+        sendPacket(channel, wrapper.byteBuf);
+    }
+
+    public void sendPacket(Player player, ByteBufAbstract byteBuf) {
+        ChannelAbstract channel = ChannelAbstract.generate(getChannel(player));
+        channel.writeAndFlush(byteBuf);
+    }
+
+    public void sendPacket(Player player, SendablePacketWrapper wrapper) {
+        wrapper.createPacket();
+        ChannelAbstract channel = ChannelAbstract.generate(getChannel(player));
+        channel.writeAndFlush(wrapper.byteBuf);
+    }
+
+
 
 /*
     public void writePacket(Player player, SendableWrapper wrapper) {

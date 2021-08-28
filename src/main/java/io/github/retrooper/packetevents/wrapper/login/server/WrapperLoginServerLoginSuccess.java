@@ -20,17 +20,18 @@ package io.github.retrooper.packetevents.wrapper.login.server;
 
 import io.github.retrooper.packetevents.manager.server.ServerVersion;
 import io.github.retrooper.packetevents.protocol.ConnectionState;
+import io.github.retrooper.packetevents.protocol.PacketType;
 import io.github.retrooper.packetevents.utils.netty.buffer.ByteBufAbstract;
-import io.github.retrooper.packetevents.wrapper.PacketWrapper;
+import io.github.retrooper.packetevents.wrapper.SendablePacketWrapper;
 
 import java.util.UUID;
 
 /**
  * This packet switches the connection state to {@link ConnectionState#GAME}.
  */
-public class WrapperLoginServerLoginSuccess extends PacketWrapper {
+public class WrapperLoginServerLoginSuccess extends SendablePacketWrapper {
     private final UUID uuid;
-    private final String username;
+    private String username;
 
     public WrapperLoginServerLoginSuccess(ByteBufAbstract byteBuf) {
         super(byteBuf);
@@ -39,15 +40,27 @@ public class WrapperLoginServerLoginSuccess extends PacketWrapper {
             for (int i = 0; i < 4; i++) {
                 data[i] = readInt();
             }
-            this.uuid = convertToUUID(data);
+            this.uuid = deserializeUUID(data);
         } else {
             this.uuid = UUID.fromString(readString(36));
         }
         this.username = readString(16);
     }
 
-    private UUID convertToUUID(int[] data) {
+    public WrapperLoginServerLoginSuccess(UUID uuid, String username) {
+        super(PacketType.Login.Server.LOGIN_SUCCESS.getID());
+        this.uuid = uuid;
+        this.username = username;
+    }
+
+    private UUID deserializeUUID(int[] data) {
         return new UUID((long) data[0] << 32 | data[1] & 4294967295L, (long) data[2] << 32 | data[3] & 4294967295L);
+    }
+
+    public static int[] serializeUUID(UUID uuid) {
+        long mostSigBits = uuid.getMostSignificantBits();
+        long leastSigBits = uuid.getLeastSignificantBits();
+        return new int[]{(int)(mostSigBits >> 32), (int)mostSigBits, (int)(leastSigBits >> 32), (int)leastSigBits};
     }
 
     public UUID getUUID() {
@@ -56,5 +69,21 @@ public class WrapperLoginServerLoginSuccess extends PacketWrapper {
 
     public String getUsername() {
         return username;
+    }
+
+    @Override
+    public void createPacket() {
+        if (protocolVersion >= 735) {
+            int[] data = serializeUUID(uuid);
+            for (int i = 0; i < 4; i++) {
+                int value = data[i];
+                writeInt(value);
+            }
+        } else {
+            writeString(uuid.toString(), 36);
+        }
+
+        username = username.substring(16);
+        writeString(username, 16);
     }
 }

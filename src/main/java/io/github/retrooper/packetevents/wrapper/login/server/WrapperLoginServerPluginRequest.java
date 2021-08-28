@@ -18,10 +18,12 @@
 
 package io.github.retrooper.packetevents.wrapper.login.server;
 
+import io.github.retrooper.packetevents.protocol.PacketType;
 import io.github.retrooper.packetevents.utils.netty.buffer.ByteBufAbstract;
 import io.github.retrooper.packetevents.wrapper.PacketWrapper;
+import io.github.retrooper.packetevents.wrapper.SendablePacketWrapper;
 
-public class WrapperLoginServerPluginRequest extends PacketWrapper {
+public class WrapperLoginServerPluginRequest extends SendablePacketWrapper {
     private final int messageID;
     private final String channelName;
     private final byte[] data;
@@ -31,6 +33,13 @@ public class WrapperLoginServerPluginRequest extends PacketWrapper {
         this.messageID = readVarInt();
         this.channelName = readString();
         this.data = readByteArray(byteBuf.readableBytes());
+    }
+
+    public WrapperLoginServerPluginRequest(int messageID, String channelName, byte[] data) {
+        super(PacketType.Login.Server.LOGIN_PLUGIN_REQUEST.getID());
+        this.messageID = messageID;
+        this.channelName = channelName;
+        this.data = data;
     }
 
     public int getMessageID() {
@@ -43,5 +52,12 @@ public class WrapperLoginServerPluginRequest extends PacketWrapper {
 
     public byte[] getData() {
         return data;
+    }
+
+    @Override
+    public void createPacket() {
+        writeVarInt(messageID);
+        writeString(channelName);
+        writeByteArray(data);
     }
 }

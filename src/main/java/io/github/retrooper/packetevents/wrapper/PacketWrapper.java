@@ -22,6 +22,7 @@ import io.github.retrooper.packetevents.PacketEvents;
 import io.github.retrooper.packetevents.manager.player.ClientVersion;
 import io.github.retrooper.packetevents.manager.server.ServerVersion;
 import io.github.retrooper.packetevents.utils.netty.buffer.ByteBufAbstract;
+import io.netty.handler.codec.EncoderException;
 
 import java.nio.charset.StandardCharsets;
 import java.util.UUID;
@@ -30,7 +31,7 @@ import java.util.UUID;
 public class PacketWrapper {
     protected final ClientVersion clientVersion;
     private static ServerVersion serverVersion;
-    protected final ByteBufAbstract byteBuf;
+    public final ByteBufAbstract byteBuf;
 
     public PacketWrapper(ClientVersion clientVersion, ByteBufAbstract byteBuf) {
         this.clientVersion = clientVersion;
@@ -61,8 +62,16 @@ public class PacketWrapper {
         return byteBuf.readByte();
     }
 
+    public void writeByte(byte value) {
+        byteBuf.writeByte(value);
+    }
+
     public int readInt() {
         return byteBuf.readInt();
+    }
+
+    public void writeInt(int value) {
+        byteBuf.writeInt(value);
     }
 
     public int readVarInt() {
@@ -105,6 +114,21 @@ public class PacketWrapper {
         }
     }
 
+    public void writeString(String s) {
+        writeString(s, 32767);
+    }
+
+    public void writeString(String s, int maxLen) {
+        byte[] bytes = s.getBytes(StandardCharsets.UTF_8);
+        if (bytes.length > maxLen) {
+            throw new EncoderException("String too big (was " + bytes.length + " bytes encoded, max " + maxLen + ")");
+        } else {
+            writeVarInt(bytes.length);
+            byteBuf.writeBytes(bytes);
+        }
+    }
+
+    //TODO Test readstringlegacy and readstringmodern if they work interchangably
     private String readStringLegacy(int i) {
         int j = readVarInt();
         if (j > i * 4) {
@@ -153,20 +177,40 @@ public class PacketWrapper {
         return byteBuf.readShort();
     }
 
+    public void writeShort(int value) {
+        byteBuf.writeShort(value);
+    }
+
     public long readLong() {
         return byteBuf.readLong();
+    }
+
+    public void writeLong(long value) {
+        byteBuf.writeLong(value);
     }
 
     public float readFloat() {
         return byteBuf.readFloat();
     }
 
+    public void writeFloat(float value) {
+        byteBuf.writeFloat(value);
+    }
+
     public double readDouble() {
         return byteBuf.readDouble();
     }
 
+    public void writeDouble(double value) {
+        byteBuf.writeDouble(value);
+    }
+
     public boolean readBoolean() {
         return byteBuf.readBoolean();
+    }
+
+    public void writeBoolean(boolean value) {
+        byteBuf.writeBoolean(value);
     }
 
     public byte[] readByteArray(int length) {
@@ -175,10 +219,19 @@ public class PacketWrapper {
         return ret;
     }
 
+    public void writeByteArray(byte[] array) {
+        byteBuf.writeBytes(array);
+    }
+
     public UUID readUUID() {
         long mostSigBits = readLong();
         long leastSigBits = readLong();
         return new UUID(mostSigBits, leastSigBits);
+    }
+
+    public void writeUUID(UUID uuid) {
+        writeLong(uuid.getMostSignificantBits());
+        writeLong(uuid.getLeastSignificantBits());
     }
 
     public static PacketWrapper createUniversalPacketWrapper(ByteBufAbstract byteBuf) {

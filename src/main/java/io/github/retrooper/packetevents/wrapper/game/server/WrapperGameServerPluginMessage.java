@@ -19,15 +19,16 @@
 package io.github.retrooper.packetevents.wrapper.game.server;
 
 import io.github.retrooper.packetevents.manager.server.ServerVersion;
+import io.github.retrooper.packetevents.protocol.PacketType;
 import io.github.retrooper.packetevents.utils.netty.buffer.ByteBufAbstract;
-import io.github.retrooper.packetevents.wrapper.PacketWrapper;
+import io.github.retrooper.packetevents.wrapper.SendablePacketWrapper;
 
 /**
  * Mods and plugins can use this to send their data.
  * Minecraft itself uses some plugin channels.
  * These internal channels are in the minecraft namespace.
  */
-public class WrapperGameServerPluginMessage extends PacketWrapper {
+public class WrapperGameServerPluginMessage extends SendablePacketWrapper {
     private final String channelName;
     private final byte[] data;
 
@@ -40,6 +41,12 @@ public class WrapperGameServerPluginMessage extends PacketWrapper {
             int dataLength = readUnsignedShort();
             this.data = readByteArray(dataLength);
         }
+    }
+
+    public WrapperGameServerPluginMessage(String channelName, byte[] data) {
+        super(PacketType.Game.Server.PLUGIN_MESSAGE.getID());
+        this.channelName = channelName;
+        this.data = data;
     }
 
     /**
@@ -58,5 +65,17 @@ public class WrapperGameServerPluginMessage extends PacketWrapper {
      */
     public byte[] getData() {
         return data;
+    }
+
+    @Override
+    public void createPacket() {
+        writeString(channelName);
+
+        //To simplify, only if less than 1.8, we are just handling the dev builds inbetween for some reason.
+        if (protocolVersion < 29) {
+            writeShort(data.length);
+        }
+
+        writeByteArray(data);
     }
 }

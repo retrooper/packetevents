@@ -20,21 +20,14 @@ package io.github.retrooper.packetevents;
 
 import io.github.retrooper.packetevents.event.PacketListenerAbstract;
 import io.github.retrooper.packetevents.event.impl.PacketReceiveEvent;
-import io.github.retrooper.packetevents.event.impl.PacketSendEvent;
-import io.github.retrooper.packetevents.protocol.ConnectionState;
 import io.github.retrooper.packetevents.protocol.PacketType;
-import io.github.retrooper.packetevents.utils.netty.buffer.ByteBufAbstract;
-import io.github.retrooper.packetevents.utils.netty.buffer.ByteBufUtil;
-import io.github.retrooper.packetevents.wrapper.PacketWrapper;
 import io.github.retrooper.packetevents.wrapper.game.client.WrapperGameClientInteractEntity;
-import io.github.retrooper.packetevents.wrapper.handshaking.client.WrapperHandshakingClientHandshake;
-import io.github.retrooper.packetevents.wrapper.login.client.WrapperLoginClientLoginStart;
+import io.github.retrooper.packetevents.wrapper.game.server.WrapperGameServerHeldItemChange;
 import org.bukkit.entity.Entity;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import java.util.Arrays;
-
 public class PacketEventsPlugin extends JavaPlugin {
+    //TODO Complete the legacy handlers.
     @Override
     public void onLoad() {
         PacketEvents.get().load(this);
@@ -43,30 +36,24 @@ public class PacketEventsPlugin extends JavaPlugin {
 
     @Override
     public void onEnable() {
-        PacketEvents.get().init();
-
-        //TODO Complete the legacy handlers.
         PacketEvents.get().getEventManager().registerListener(new PacketListenerAbstract() {
             @Override
             public void onPacketReceive(PacketReceiveEvent event) {
-              if (event.getPacketType() == PacketType.Game.Client.INTERACT_ENTITY) {
-                    WrapperGameClientInteractEntity interactEntity = new WrapperGameClientInteractEntity(event.getClientVersion(), event.getByteBuf());
+                if (event.getPacketType() == PacketType.Game.Client.INTERACT_ENTITY) {
+                    WrapperGameClientInteractEntity interactEntity = new WrapperGameClientInteractEntity(event.getClientVersion(),
+                            event.getByteBuf());
                     int entityID = interactEntity.getEntityID();
                     Entity entity = PacketEvents.get().getServerManager().getEntityByID(entityID);
-                    if (entity != null) {
-                        event.getPlayer().sendMessage("entity name: " + entity.getName());
-                    }
-                    event.getPlayer().sendMessage("type: " + interactEntity.getType().name());
-                    System.out.println("HANDLERS: " + Arrays.toString(event.getChannel().pipeline().names().toArray(new String[0])));
-                    ByteBufAbstract sentPacket = ByteBufUtil.buffer();
-                    PacketWrapper sentPacketWrapper = PacketWrapper.createUniversalPacketWrapper(sentPacket);
-                    int serverPacketID = PacketType.Game.Server.HELD_ITEM_CHANGE.getID();
-                    sentPacketWrapper.writeVarInt(serverPacketID);
-                    sentPacket.writeByte(7);
-                    event.getChannel().writeAndFlush(sentPacket);
+                    event.getPlayer().sendMessage("entity name: " + entity.getName());
+                    event.getPlayer().sendMessage("action: " + interactEntity.getType().name());
+
+                    WrapperGameServerHeldItemChange heldItemChange = new WrapperGameServerHeldItemChange((byte) 7);
+                    PacketEvents.get().getPlayerManager().sendPacket(event.getChannel(), heldItemChange);
+                    event.getPlayer().sendMessage("changed slot to 7");
                 }
             }
         });
+        PacketEvents.get().init();
     }
 
     @Override

@@ -124,6 +124,8 @@ public interface ByteBufAbstract {
 
     ByteBufAbstract writeBytes(ByteBufAbstract byteBuf);
 
+    ByteBufAbstract writeBytes(byte[] bytes);
+
     ByteBufAbstract writeBytes(byte[] bytes, int a, int b);
 
     ByteBufAbstract writeBoolean(boolean a);

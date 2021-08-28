@@ -18,8 +18,10 @@
 
 package io.github.retrooper.packetevents.wrapper.game.server;
 
+import io.github.retrooper.packetevents.protocol.PacketType;
 import io.github.retrooper.packetevents.utils.netty.buffer.ByteBufAbstract;
 import io.github.retrooper.packetevents.wrapper.PacketWrapper;
+import io.github.retrooper.packetevents.wrapper.SendablePacketWrapper;
 
 /**
  * This packet is currently used by mods to synchronize the client with the server.
@@ -28,7 +30,7 @@ import io.github.retrooper.packetevents.wrapper.PacketWrapper;
  *
  * @see io.github.retrooper.packetevents.wrapper.game.client.WrapperGameClientPong
  */
-public class WrapperGameServerPing extends PacketWrapper {
+public class WrapperGameServerPing extends SendablePacketWrapper {
     private final int id;
 
     public WrapperGameServerPing(ByteBufAbstract byteBuf) {
@@ -36,7 +38,17 @@ public class WrapperGameServerPing extends PacketWrapper {
         this.id = readInt();
     }
 
+    public WrapperGameServerPing(int id) {
+        super(PacketType.Game.Server.PING.getID());
+        this.id = id;
+    }
+
     public int getID() {
         return id;
+    }
+
+    @Override
+    public void createPacket() {
+        writeInt(id);
     }
 }

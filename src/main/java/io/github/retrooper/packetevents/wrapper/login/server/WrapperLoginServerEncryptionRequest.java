@@ -18,8 +18,10 @@
 
 package io.github.retrooper.packetevents.wrapper.login.server;
 
+import io.github.retrooper.packetevents.protocol.PacketType;
 import io.github.retrooper.packetevents.utils.netty.buffer.ByteBufAbstract;
 import io.github.retrooper.packetevents.wrapper.PacketWrapper;
+import io.github.retrooper.packetevents.wrapper.SendablePacketWrapper;
 import io.github.retrooper.packetevents.wrapper.login.client.WrapperLoginClientEncryptionResponse;
 
 import java.security.KeyFactory;
@@ -34,7 +36,7 @@ import java.security.spec.X509EncodedKeySpec;
  *
  * @see WrapperLoginClientEncryptionResponse
  */
-public class WrapperLoginServerEncryptionRequest extends PacketWrapper {
+public class WrapperLoginServerEncryptionRequest extends SendablePacketWrapper {
     private final String serverID;
     private final PublicKey publicKey;
     private final byte[] verifyToken;
@@ -44,10 +46,23 @@ public class WrapperLoginServerEncryptionRequest extends PacketWrapper {
         this.serverID = readString(20);
         int publicKeyLength = readVarInt();
         byte[] publicKeyBytes = readByteArray(publicKeyLength);
-        //To decrypt use PublicKey#getEncoded
         this.publicKey = encrypt(publicKeyBytes);
         int verifyTokenLength = readVarInt();
         this.verifyToken = readByteArray(verifyTokenLength);
+    }
+
+    public WrapperLoginServerEncryptionRequest(String serverID, byte[] publicKeyBytes, byte[] verifyToken) {
+        super(PacketType.Login.Server.ENCRYPTION_REQUEST.getID());
+        this.serverID = serverID;
+        this.publicKey = encrypt(publicKeyBytes);
+        this.verifyToken = verifyToken;
+    }
+
+    public WrapperLoginServerEncryptionRequest(String serverID, PublicKey publicKey, byte[] verifyToken) {
+        super(PacketType.Login.Server.ENCRYPTION_REQUEST.getID());
+        this.serverID = serverID;
+        this.publicKey = publicKey;
+        this.verifyToken = verifyToken;
     }
 
     /**
@@ -92,7 +107,13 @@ public class WrapperLoginServerEncryptionRequest extends PacketWrapper {
         }
     }
 
-    private byte[] decrypt(PublicKey key) {
-        return key.getEncoded();
+    @Override
+    public void createPacket() {
+        writeString(serverID, 20);
+        byte[] encoded = publicKey.getEncoded();
+        writeVarInt(encoded.length);
+        writeByteArray(encoded);
+        writeVarInt(verifyToken.length);
+        writeByteArray(verifyToken);
     }
 }

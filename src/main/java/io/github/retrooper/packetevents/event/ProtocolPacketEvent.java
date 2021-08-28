@@ -110,6 +110,10 @@ public abstract class ProtocolPacketEvent extends PacketEvent implements PlayerE
         return byteBuf;
     }
 
+    public void setByteBuf(ByteBufAbstract byteBuf) {
+        this.byteBuf.clear().writeBytes(byteBuf.readBytes(byteBuf.readableBytes()));
+    }
+
     @Deprecated
     public int getPacketID() {
         return packetID;

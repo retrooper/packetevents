@@ -20,20 +20,29 @@ package io.github.retrooper.packetevents.wrapper.login.server;
 
 import io.github.retrooper.packetevents.manager.server.ServerVersion;
 import io.github.retrooper.packetevents.protocol.ConnectionState;
+import io.github.retrooper.packetevents.protocol.PacketType;
 import io.github.retrooper.packetevents.utils.netty.buffer.ByteBufAbstract;
-import io.github.retrooper.packetevents.wrapper.PacketWrapper;
+import io.github.retrooper.packetevents.wrapper.SendablePacketWrapper;
 
 /**
  * This packet is used by the server to disconnect the client while in the {@link ConnectionState#LOGIN} connection state.
  */
-public class WrapperLoginServerDisconnect extends PacketWrapper {
-    private final String reason;
+public class WrapperLoginServerDisconnect extends SendablePacketWrapper {
+    private static final int MODERN_REASON_LENGTH = 262144;
+    private static final int LEGACY_REASON_LENGTH = 32767;
+    private String reason;
 
     public WrapperLoginServerDisconnect(ByteBufAbstract byteBuf) {
         super(byteBuf);
-        int reasonLength = getServerVersion().isNewerThanOrEquals(ServerVersion.v_1_14) ? 262144 : 32767;
+        int reasonLength = getServerVersion().isNewerThanOrEquals(ServerVersion.v_1_14) ? MODERN_REASON_LENGTH : LEGACY_REASON_LENGTH;
         this.reason = readString(reasonLength);
     }
+
+    public WrapperLoginServerDisconnect(String reason) {
+        super(PacketType.Login.Server.DISCONNECT.getID());
+        this.reason = reason;
+    }
+
 
     /**
      * The reason the server disconnected the client. (Specified by the server)
@@ -42,5 +51,12 @@ public class WrapperLoginServerDisconnect extends PacketWrapper {
      */
     public String getReason() {
         return reason;
+    }
+
+    @Override
+    public void createPacket() {
+        int maxLen = protocolVersion >= 477 ? MODERN_REASON_LENGTH : LEGACY_REASON_LENGTH;
+        reason = reason.substring(maxLen);
+        writeString(reason, maxLen);
     }
 }

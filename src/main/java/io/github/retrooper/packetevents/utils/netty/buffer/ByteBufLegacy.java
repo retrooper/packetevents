@@ -259,6 +259,11 @@ public class ByteBufLegacy implements ByteBufAbstract {
     }
 
     @Override
+    public ByteBufAbstract writeBytes(byte[] bytes) {
+        return new ByteBufLegacy(byteBuf.writeBytes(bytes));
+    }
+
+    @Override
     public ByteBufAbstract writeBytes(byte[] bytes, int a, int b) {
         return new ByteBufLegacy(byteBuf.writeBytes(bytes, a, b));
     }

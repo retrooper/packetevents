@@ -259,6 +259,11 @@ public class ByteBufModern implements ByteBufAbstract {
     }
 
     @Override
+    public ByteBufAbstract writeBytes(byte[] bytes) {
+        return new ByteBufModern(byteBuf.writeBytes(bytes));
+    }
+
+    @Override
     public ByteBufAbstract writeBytes(byte[] bytes, int a, int b) {
         return new ByteBufModern(byteBuf.writeBytes(bytes, a, b));
     }

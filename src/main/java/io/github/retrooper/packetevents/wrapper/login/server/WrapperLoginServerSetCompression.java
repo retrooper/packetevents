@@ -18,10 +18,12 @@
 
 package io.github.retrooper.packetevents.wrapper.login.server;
 
+import io.github.retrooper.packetevents.protocol.PacketType;
 import io.github.retrooper.packetevents.utils.netty.buffer.ByteBufAbstract;
 import io.github.retrooper.packetevents.wrapper.PacketWrapper;
+import io.github.retrooper.packetevents.wrapper.SendablePacketWrapper;
 
-public class WrapperLoginServerSetCompression extends PacketWrapper {
+public class WrapperLoginServerSetCompression extends SendablePacketWrapper {
     private final int threshold;
 
     public WrapperLoginServerSetCompression(ByteBufAbstract byteBuf) {
@@ -29,7 +31,17 @@ public class WrapperLoginServerSetCompression extends PacketWrapper {
         this.threshold = readVarInt();
     }
 
+    public WrapperLoginServerSetCompression(int threshold) {
+        super(PacketType.Login.Server.SET_COMPRESSION.getID());
+        this.threshold = threshold;
+    }
+
     public int getThreshold() {
         return threshold;
+    }
+
+    @Override
+    public void createPacket() {
+        writeVarInt(threshold);
     }
 }
