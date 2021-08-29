@@ -49,46 +49,4 @@ public final class PacketWrapperUtils {
         } while ((b0 & 128) == 128);
         return i;
     }
-
-    private static String readStringLegacy(ByteBufAbstract byteBuf, int i) {
-        int j = readVarInt(byteBuf);
-        if (j > i * 4) {
-            throw new RuntimeException("The received encoded string buffer length is longer than maximum allowed (" + j + " > " + (i * 4) + ")");
-        } else if (j < 0) {
-            throw new RuntimeException("The received encoded string buffer length is less than zero! Weird string!");
-        } else {
-            String s = new String(byteBuf.readBytes(j).array(), Charsets.UTF_8);
-            if (s.length() > i) {
-                throw new RuntimeException("The received string length is longer than maximum allowed (" + j + " > " + i + ")");
-            }
-            return s;
-        }
-    }
-
-    private static String readStringModern(ByteBufAbstract byteBuf, int i) {
-        int j = readVarInt(byteBuf);
-        if (j > i * 4) {
-            throw new RuntimeException("The received encoded string buffer length is longer than maximum allowed (" + j + " > " + i * 4 + ")");
-        } else if (j < 0) {
-            throw new RuntimeException("The received encoded string buffer length is less than zero! Weird string!");
-        } else {
-            String s = byteBuf.toString(byteBuf.readerIndex(), j, StandardCharsets.UTF_8);
-            byteBuf.readerIndex(byteBuf.readerIndex() + j);
-            if (s.length() > i) {
-                throw new RuntimeException("The received string length is longer than maximum allowed (" + j + " > " + i + ")");
-            } else {
-                return s;
-            }
-        }
-    }
-
-    public static String readString(int protocolVersion, ByteBufAbstract byteBuf, int maxLen) {
-        //1.12 and higher
-        if (protocolVersion >= 335) {
-            return readStringModern(byteBuf, maxLen);
-        } else {
-            return readStringLegacy(byteBuf, maxLen);
-        }
-    }
-
 }

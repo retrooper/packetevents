@@ -26,10 +26,11 @@ import io.github.retrooper.packetevents.wrapper.PacketWrapper;
 
 /**
  * This packet is the first packet the client should send.
- * It contains useful information such as the client's protocol version.
+ * It contains important data such as the client's protocol version.
  */
 public class WrapperHandshakingClientHandshake extends PacketWrapper {
     private final int protocolVersion;
+    private final ClientVersion clientVersion;
     private final String serverAddress;
     private final int serverPort;
     private final ConnectionState nextConnectionState;
@@ -37,7 +38,8 @@ public class WrapperHandshakingClientHandshake extends PacketWrapper {
     public WrapperHandshakingClientHandshake(PacketReceiveEvent event) {
         super(event);
         this.protocolVersion = readVarInt();
-        this.serverAddress = readString(protocolVersion, 32767);
+        this.clientVersion = ClientVersion.getClientVersion(protocolVersion);
+        this.serverAddress = readString();
         this.serverPort = readUnsignedShort();
         int nextStateIndex = readVarInt();
         this.nextConnectionState = ConnectionState.values()[nextStateIndex];
@@ -60,7 +62,7 @@ public class WrapperHandshakingClientHandshake extends PacketWrapper {
      * @return Client version
      */
     public ClientVersion getClientVersion() {
-        return ClientVersion.getClientVersion(protocolVersion);
+        return clientVersion;
     }
 
     /**

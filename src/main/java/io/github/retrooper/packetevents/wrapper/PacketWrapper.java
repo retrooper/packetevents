@@ -108,16 +108,19 @@ public class PacketWrapper {
     }
 
     public String readString(int maxLen) {
-        int protocolVersion = (clientVersion != ClientVersion.UNKNOWN) ? clientVersion.getProtocolVersion() : getServerVersion().getProtocolVersion();
-        return readString(protocolVersion, maxLen);
-    }
-
-    public String readString(int protocolVersion, int maxLen) {
-        //1.12 and higher
-        if (protocolVersion >= 335) {
-            return readStringModern(maxLen);
+        int j = readVarInt();
+        if (j > maxLen * 4) {
+            throw new RuntimeException("The received encoded string buffer length is longer than maximum allowed (" + j + " > " + maxLen * 4 + ")");
+        } else if (j < 0) {
+            throw new RuntimeException("The received encoded string buffer length is less than zero! Weird string!");
         } else {
-            return readStringLegacy(maxLen);
+            String s = byteBuf.toString(byteBuf.readerIndex(), j, StandardCharsets.UTF_8);
+            byteBuf.readerIndex(byteBuf.readerIndex() + j);
+            if (s.length() > maxLen) {
+                throw new RuntimeException("The received string length is longer than maximum allowed (" + j + " > " + maxLen + ")");
+            } else {
+                return s;
+            }
         }
     }
 
@@ -132,47 +135,6 @@ public class PacketWrapper {
         } else {
             writeVarInt(bytes.length);
             byteBuf.writeBytes(bytes);
-        }
-    }
-
-    //TODO Test readstringlegacy and readstringmodern if they work interchangably
-    private String readStringLegacy(int i) {
-        int j = readVarInt();
-        if (j > i * 4) {
-            throw new RuntimeException("The received encoded string buffer length is longer than maximum allowed (" + j + " > " + (i * 4) + ")");
-        } else if (j < 0) {
-            throw new RuntimeException("The received encoded string buffer length is less than zero! Weird string!");
-        } else {
-            ByteBufAbstract bb = byteBuf.readBytes(j);
-            byte[] bytes;
-            if (bb.hasArray()) {
-                bytes = bb.array();
-            } else {
-                bytes = new byte[bb.readableBytes()];
-                bb.getBytes(bb.readerIndex(), bytes);
-            }
-            String s = new String(bytes);
-            if (s.length() > i) {
-                throw new RuntimeException("The received string length is longer than maximum allowed (" + j + " > " + i + ")");
-            }
-            return s;
-        }
-    }
-
-    private String readStringModern(int i) {
-        int j = readVarInt();
-        if (j > i * 4) {
-            throw new RuntimeException("The received encoded string buffer length is longer than maximum allowed (" + j + " > " + i * 4 + ")");
-        } else if (j < 0) {
-            throw new RuntimeException("The received encoded string buffer length is less than zero! Weird string!");
-        } else {
-            String s = byteBuf.toString(byteBuf.readerIndex(), j, StandardCharsets.UTF_8);
-            byteBuf.readerIndex(byteBuf.readerIndex() + j);
-            if (s.length() > i) {
-                throw new RuntimeException("The received string length is longer than maximum allowed (" + j + " > " + i + ")");
-            } else {
-                return s;
-            }
         }
     }
 
