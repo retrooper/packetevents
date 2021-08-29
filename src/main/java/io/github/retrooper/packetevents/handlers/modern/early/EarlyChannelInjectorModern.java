@@ -130,7 +130,6 @@ public class EarlyChannelInjectorModern implements EarlyInjector {
                 if (channel == null) {
                     continue;
                 }
-
                 ServerConnectionInitializerModern.postInitChannel(channel);
             }
         }
@@ -140,16 +139,30 @@ public class EarlyChannelInjectorModern implements EarlyInjector {
     private void injectChannelFuture(ChannelFuture future) {
         ChannelPipeline pipeline = future.channel().pipeline();
         if (pipeline.get("SpigotNettyServerChannelHandler#0") != null) {
-            pipeline.addAfter("SpigotNettyServerChannelHandler#0", PacketEvents.get().connectionHandlerName, new ServerChannelHandlerModern());
+            pipeline.addAfter("SpigotNettyServerChannelHandler#0", PacketEvents.get().connectionName, new ServerChannelHandlerModern());
         }
         else {
-            pipeline.addFirst(PacketEvents.get().connectionHandlerName, new ServerChannelHandlerModern());
+            pipeline.addFirst(PacketEvents.get().connectionName, new ServerChannelHandlerModern());
+        }
+        System.out.println("LOL: " + Arrays.toString(future.channel().pipeline().names().toArray(new String[0])));
+
+        List<Object> networkManagers = MinecraftReflection.getNetworkManagers();
+        synchronized (networkManagers) {
+            for (Object networkManager : networkManagers) {
+                ReflectionObject networkManagerWrapper = new ReflectionObject(networkManager);
+                Channel channel = networkManagerWrapper.readObject(0, Channel.class);
+                if (channel.isOpen()) {
+                    if (channel.localAddress().equals(future.channel().localAddress())) {
+                        channel.close();
+                    }
+                }
+            }
         }
         injectedFutures.add(future);
     }
 
     private void ejectChannelFuture(ChannelFuture future) {
-        future.channel().pipeline().remove(PacketEvents.get().connectionHandlerName);
+        future.channel().pipeline().remove(PacketEvents.get().connectionName);
     }
 
     @Override

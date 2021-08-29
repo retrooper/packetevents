@@ -73,7 +73,7 @@ public class WrapperGameServerChatMessage extends SendablePacketWrapper {
         this.senderUUID = senderUUID;
     }
 
-    public String getJsonMessage() {
+    public String getJSONMessage() {
         return jsonMessage;
     }
 

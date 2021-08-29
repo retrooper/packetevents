@@ -25,6 +25,8 @@ import io.netty.channel.ChannelPipeline;
 import io.netty.util.internal.logging.InternalLogger;
 import io.netty.util.internal.logging.InternalLoggerFactory;
 
+import java.util.Arrays;
+
 public abstract class CustomChannelInitializerModern extends ChannelInboundHandlerAdapter {
     private static final InternalLogger logger = InternalLoggerFactory.getInstance(io.netty.channel.ChannelInitializer.class);
 
@@ -44,9 +46,9 @@ public abstract class CustomChannelInitializerModern extends ChannelInboundHandl
     }
 
     @Override
-    public void exceptionCaught(ChannelHandlerContext channelHandlerContext, Throwable t) throws Exception {
-        CustomChannelInitializerModern.logger.warn("Failed to initialize a channel. Closing: " + channelHandlerContext.channel(), t);
-        channelHandlerContext.close();
+    public void exceptionCaught(ChannelHandlerContext ctx, Throwable t) throws Exception {
+        CustomChannelInitializerModern.logger.warn("Failed to initialize a channel. Closing: " + ctx.channel(), t);
+        ctx.close();
     }
 
     protected abstract void initChannel(Channel channel) throws Exception;

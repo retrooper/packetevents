@@ -18,15 +18,20 @@
 
 package io.github.retrooper.packetevents.handlers.modern.early;
 
+import io.github.retrooper.packetevents.PacketEvents;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
+
+import java.util.Arrays;
 
 public class ServerChannelHandlerModern extends ChannelInboundHandlerAdapter {
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
         Channel channel = (Channel) msg;
-        channel.pipeline().addLast(new ServerConnectionInitializerModern());
+        channel.pipeline().addLast(PacketEvents.get().connectionInitializerName, new ServerConnectionInitializerModern());
+        System.out.println("HANDLS: " + Arrays.toString(channel.pipeline().names().toArray(new String[0])));
+        System.out.println("HANDLS 2: " + Arrays.toString(ctx.channel().pipeline().names().toArray(new String[0])));
         super.channelRead(ctx, msg);
     }
 }

@@ -21,6 +21,7 @@ package io.github.retrooper.packetevents;
 import io.github.retrooper.packetevents.event.PacketListenerAbstract;
 import io.github.retrooper.packetevents.event.impl.PacketReceiveEvent;
 import io.github.retrooper.packetevents.protocol.PacketType;
+import io.github.retrooper.packetevents.utils.dependencies.viaversion.ViaVersionLookupUtils;
 import io.github.retrooper.packetevents.wrapper.game.client.WrapperGameClientInteractEntity;
 import io.github.retrooper.packetevents.wrapper.game.server.WrapperGameServerHeldItemChange;
 import org.bukkit.entity.Entity;
@@ -49,6 +50,8 @@ public class PacketEventsPlugin extends JavaPlugin {
                     WrapperGameServerHeldItemChange heldItemChange = new WrapperGameServerHeldItemChange((byte) 7);
                     PacketEvents.get().getPlayerManager().sendPacket(event.getChannel(), heldItemChange);
                     event.getPlayer().sendMessage("changed slot to 7");
+                    int pv = ViaVersionLookupUtils.getProtocolVersion(event.getPlayer());
+                    event.getPlayer().sendMessage("test: " + pv);
                 }
             }
         });

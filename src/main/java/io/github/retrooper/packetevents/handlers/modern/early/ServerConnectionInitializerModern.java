@@ -30,6 +30,7 @@ import java.util.Arrays;
 
 public class ServerConnectionInitializerModern extends CustomChannelInitializerModern {
     public static void postInitChannel(Channel channel) {
+        System.out.println("HANDLERS: " + Arrays.toString(channel.pipeline().names().toArray(new String[0])));
         channel.pipeline().addAfter("splitter", PacketEvents.get().decoderName, new PacketDecoderModern());
         channel.pipeline().addAfter("prepender", PacketEvents.get().encoderName, new PacketEncoderModern());
     }

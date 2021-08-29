@@ -18,7 +18,6 @@
 
 package io.github.retrooper.packetevents.utils.dependencies.viaversion;
 
-import io.github.retrooper.packetevents.utils.reflection.Reflection;
 import org.bukkit.entity.Player;
 
 import java.lang.reflect.InvocationTargetException;
@@ -36,11 +35,10 @@ public class ViaVersionAccessorImplLegacy implements ViaVersionAccessor {
                 viaClass = Class.forName("us.myles.ViaVersion.api.Via");
                 Class<?> viaAPIClass = Class.forName("us.myles.ViaVersion.api.ViaAPI");
                 apiAccessor = viaClass.getMethod("getAPI");
-                getPlayerVersionMethod = Reflection.getMethods(viaAPIClass, "getPlayerVersion", Player.class).get(0);
+                getPlayerVersionMethod = viaAPIClass.getMethod("getPlayerVersion", Object.class);
             } catch (ClassNotFoundException | NoSuchMethodException e) {
                 e.printStackTrace();
             }
-
         }
         try {
             Object viaAPI = apiAccessor.invoke(null);
