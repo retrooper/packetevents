@@ -32,5 +32,8 @@ import io.github.retrooper.packetevents.event.PacketListenerAbstract;
  * @since 1.8
  */
 public interface CallableEvent {
-    void call(PacketListenerAbstract listener);
+    //TODO Test implementing custom event
+    default void call(PacketListenerAbstract listener) {
+        listener.onPacketEventExternal((PacketEvent) this);
+    }
 }

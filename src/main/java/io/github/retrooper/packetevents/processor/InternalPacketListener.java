@@ -22,6 +22,7 @@ import io.github.retrooper.packetevents.PacketEvents;
 import io.github.retrooper.packetevents.event.PacketListenerAbstract;
 import io.github.retrooper.packetevents.event.impl.PacketReceiveEvent;
 import io.github.retrooper.packetevents.event.impl.PacketSendEvent;
+import io.github.retrooper.packetevents.manager.player.ClientVersion;
 import io.github.retrooper.packetevents.protocol.ConnectionState;
 import io.github.retrooper.packetevents.protocol.PacketType;
 import io.github.retrooper.packetevents.utils.netty.buffer.ByteBufAbstract;
@@ -43,17 +44,20 @@ public class InternalPacketListener extends PacketListenerAbstract {
 
     @Override
     public void onPacketReceive(PacketReceiveEvent event) {
-        ByteBufAbstract byteBuf = event.getByteBuf();
         switch (event.getConnectionState()) {
             case HANDSHAKING:
                 if (event.getPacketType() == PacketType.Handshaking.Client.HANDSHAKE) {
                     WrapperHandshakingClientHandshake handshake = new WrapperHandshakingClientHandshake(event);
-                    //Cache client version
-                    PacketEvents.get().getPlayerManager().clientVersions.put(event.getChannel().rawChannel(), handshake.getClientVersion());
+                    //Read client version
+                    ClientVersion clientVersion = handshake.getClientVersion();
+                    //Update client version in the event
+                    event.setClientVersion(clientVersion);
+
+                    //Map netty channel with the client version.
+                    Object rawChannel = event.getChannel().rawChannel();
+                    PacketEvents.get().getPlayerManager().clientVersions.put(rawChannel, clientVersion);
                     //Transition into the LOGIN OR STATUS connection state
-                    PacketEvents.get().getInjector().changeConnectionState(event.getChannel().rawChannel(), handshake.getNextConnectionState());
-                    //System.out.println("NEXT CONNECTION STATE: " + handshake.getNextConnectionState());
-                    //System.out.println("USER CONNECTED WITH CLIENT VERSION: " + handshake.getClientVersion().name());
+                    PacketEvents.get().getInjector().changeConnectionState(rawChannel, handshake.getNextConnectionState());
                 }
                 break;
             case LOGIN:

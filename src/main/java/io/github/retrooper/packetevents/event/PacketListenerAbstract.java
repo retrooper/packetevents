@@ -42,16 +42,14 @@ public abstract class PacketListenerAbstract {
         return priority;
     }
 
-    public void onPostPlayerInject(PostPlayerInjectEvent event) {
-    }
-
     public void onPlayerInject(PlayerInjectEvent event) {
     }
 
-    public void onPlayerEject(PlayerEjectEvent event) {
+    public void onPostPlayerInject(PostPlayerInjectEvent event) {
     }
 
-    public void onPacketEventExternal(PacketEvent event) {
+    public void onPlayerEject(PlayerEjectEvent event) {
+
     }
 
     public void onPacketReceive(PacketReceiveEvent event) {
@@ -59,6 +57,9 @@ public abstract class PacketListenerAbstract {
 
     public void onPacketSend(PacketSendEvent event) {
 
+    }
+
+    public void onPacketEventExternal(PacketEvent event) {
     }
 
     /**

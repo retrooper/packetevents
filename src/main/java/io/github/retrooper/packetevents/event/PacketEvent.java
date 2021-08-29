@@ -45,11 +45,11 @@ public abstract class PacketEvent implements CallableEvent {
      *
      * @param timestamp Packet timestamp in milliseconds.
      */
-    public void setTimestamp(final long timestamp) {
+    public void setTimestamp(long timestamp) {
         this.timestamp = timestamp;
     }
 
-    public void callPacketEventExternal(final PacketListenerAbstract listener) {
+    public void callPacketEventExternal(PacketListenerAbstract listener) {
         listener.onPacketEventExternal(this);
     }
 
