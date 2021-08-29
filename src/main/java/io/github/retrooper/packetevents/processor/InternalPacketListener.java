@@ -47,7 +47,7 @@ public class InternalPacketListener extends PacketListenerAbstract {
         switch (event.getConnectionState()) {
             case HANDSHAKING:
                 if (event.getPacketType() == PacketType.Handshaking.Client.HANDSHAKE) {
-                    WrapperHandshakingClientHandshake handshake = new WrapperHandshakingClientHandshake(event.getClientVersion(), byteBuf);
+                    WrapperHandshakingClientHandshake handshake = new WrapperHandshakingClientHandshake(event);
                     //Cache client version
                     PacketEvents.get().getPlayerManager().clientVersions.put(event.getChannel().rawChannel(), handshake.getClientVersion());
                     //Transition into the LOGIN OR STATUS connection state
@@ -58,7 +58,7 @@ public class InternalPacketListener extends PacketListenerAbstract {
                 break;
             case LOGIN:
                 if (event.getPacketType() == PacketType.Login.Client.LOGIN_START) {
-                    WrapperLoginClientLoginStart start = new WrapperLoginClientLoginStart(event.getClientVersion(), byteBuf);
+                    WrapperLoginClientLoginStart start = new WrapperLoginClientLoginStart(event);
                     //Map the player usernames with their netty channels
                     PacketEvents.get().getPlayerManager().channels.put(start.getUsername(), event.getChannel().rawChannel());
                 }

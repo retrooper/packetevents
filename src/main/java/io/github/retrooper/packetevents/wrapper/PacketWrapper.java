@@ -19,6 +19,8 @@
 package io.github.retrooper.packetevents.wrapper;
 
 import io.github.retrooper.packetevents.PacketEvents;
+import io.github.retrooper.packetevents.event.impl.PacketReceiveEvent;
+import io.github.retrooper.packetevents.event.impl.PacketSendEvent;
 import io.github.retrooper.packetevents.manager.player.ClientVersion;
 import io.github.retrooper.packetevents.manager.server.ServerVersion;
 import io.github.retrooper.packetevents.utils.netty.buffer.ByteBufAbstract;
@@ -30,17 +32,25 @@ import java.util.UUID;
 
 public class PacketWrapper {
     protected final ClientVersion clientVersion;
-    private static ServerVersion serverVersion;
+    private final ServerVersion serverVersion;
     public final ByteBufAbstract byteBuf;
 
-    public PacketWrapper(ClientVersion clientVersion, ByteBufAbstract byteBuf) {
+    public PacketWrapper(ClientVersion clientVersion, ServerVersion serverVersion, ByteBufAbstract byteBuf) {
         this.clientVersion = clientVersion;
+        this.serverVersion = serverVersion;
         this.byteBuf = byteBuf;
     }
 
-    public PacketWrapper(ByteBufAbstract byteBuf) {
+    public PacketWrapper(PacketReceiveEvent event) {
+        this.clientVersion = event.getClientVersion();
+        this.serverVersion = event.getServerVersion();
+        this.byteBuf = event.getByteBuf();
+    }
+
+    public PacketWrapper(PacketSendEvent event) {
         this.clientVersion = ClientVersion.UNKNOWN;
-        this.byteBuf = byteBuf;
+        this.serverVersion = event.getServerVersion();
+        this.byteBuf = event.getByteBuf();
     }
 
     public ClientVersion getClientVersion() {
@@ -48,9 +58,6 @@ public class PacketWrapper {
     }
 
     public ServerVersion getServerVersion() {
-        if (serverVersion == null) {
-            serverVersion = PacketEvents.get().getServerManager().getVersion();
-        }
         return serverVersion;
     }
 
@@ -235,6 +242,6 @@ public class PacketWrapper {
     }
 
     public static PacketWrapper createUniversalPacketWrapper(ByteBufAbstract byteBuf) {
-        return new PacketWrapper(ClientVersion.UNKNOWN, byteBuf);
+        return new PacketWrapper(ClientVersion.UNKNOWN, PacketEvents.get().getServerManager().getVersion(), byteBuf);
     }
 }

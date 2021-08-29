@@ -18,6 +18,7 @@
 
 package io.github.retrooper.packetevents.wrapper.login.server;
 
+import io.github.retrooper.packetevents.event.impl.PacketSendEvent;
 import io.github.retrooper.packetevents.manager.server.ServerVersion;
 import io.github.retrooper.packetevents.protocol.ConnectionState;
 import io.github.retrooper.packetevents.protocol.PacketType;
@@ -33,8 +34,8 @@ public class WrapperLoginServerLoginSuccess extends SendablePacketWrapper {
     private final UUID uuid;
     private final String username;
 
-    public WrapperLoginServerLoginSuccess(ByteBufAbstract byteBuf) {
-        super(byteBuf);
+    public WrapperLoginServerLoginSuccess(PacketSendEvent event) {
+        super(event);
         if (getServerVersion().isNewerThanOrEquals(ServerVersion.v_1_16)) {
             int[] data = new int[4];
             for (int i = 0; i < 4; i++) {

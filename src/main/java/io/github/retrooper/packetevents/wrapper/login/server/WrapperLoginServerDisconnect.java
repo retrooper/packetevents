@@ -18,10 +18,10 @@
 
 package io.github.retrooper.packetevents.wrapper.login.server;
 
+import io.github.retrooper.packetevents.event.impl.PacketSendEvent;
 import io.github.retrooper.packetevents.manager.server.ServerVersion;
 import io.github.retrooper.packetevents.protocol.ConnectionState;
 import io.github.retrooper.packetevents.protocol.PacketType;
-import io.github.retrooper.packetevents.utils.netty.buffer.ByteBufAbstract;
 import io.github.retrooper.packetevents.wrapper.SendablePacketWrapper;
 
 /**
@@ -32,8 +32,8 @@ public class WrapperLoginServerDisconnect extends SendablePacketWrapper {
     private static final int LEGACY_REASON_LENGTH = 32767;
     private String reason;
 
-    public WrapperLoginServerDisconnect(ByteBufAbstract byteBuf) {
-        super(byteBuf);
+    public WrapperLoginServerDisconnect(PacketSendEvent event) {
+        super(event);
         int reasonLength = getServerVersion().isNewerThanOrEquals(ServerVersion.v_1_14) ? MODERN_REASON_LENGTH : LEGACY_REASON_LENGTH;
         this.reason = readString(reasonLength);
     }

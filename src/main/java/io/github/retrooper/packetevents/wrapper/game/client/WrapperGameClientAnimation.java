@@ -18,6 +18,7 @@
 
 package io.github.retrooper.packetevents.wrapper.game.client;
 
+import io.github.retrooper.packetevents.event.impl.PacketReceiveEvent;
 import io.github.retrooper.packetevents.manager.player.ClientVersion;
 import io.github.retrooper.packetevents.manager.player.Hand;
 import io.github.retrooper.packetevents.utils.netty.buffer.ByteBufAbstract;
@@ -29,9 +30,9 @@ import io.github.retrooper.packetevents.wrapper.PacketWrapper;
 public class WrapperGameClientAnimation extends PacketWrapper {
     private final Hand hand;
 
-    public WrapperGameClientAnimation(ClientVersion version, ByteBufAbstract byteBuf) {
-        super(version, byteBuf);
-        if (version.isNewerThanOrEquals(ClientVersion.v_1_9)) {
+    public WrapperGameClientAnimation(PacketReceiveEvent event) {
+        super(event);
+        if (clientVersion.isNewerThanOrEquals(ClientVersion.v_1_9)) {
             this.hand = Hand.VALUES[readVarInt()];
         } else {
             //Default to main hand, because 1.8 and 1.7.10 don't have an off-hand anyway.

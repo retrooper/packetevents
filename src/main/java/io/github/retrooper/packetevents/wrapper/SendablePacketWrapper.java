@@ -19,6 +19,8 @@
 package io.github.retrooper.packetevents.wrapper;
 
 import io.github.retrooper.packetevents.PacketEvents;
+import io.github.retrooper.packetevents.event.impl.PacketSendEvent;
+import io.github.retrooper.packetevents.manager.player.ClientVersion;
 import io.github.retrooper.packetevents.utils.netty.buffer.ByteBufAbstract;
 import io.github.retrooper.packetevents.utils.netty.buffer.ByteBufUtil;
 
@@ -27,23 +29,21 @@ public abstract class SendablePacketWrapper extends PacketWrapper {
     protected final int protocolVersion;
 
     public SendablePacketWrapper(int packetID) {
-        super(ByteBufUtil.buffer());
+        super(ClientVersion.UNKNOWN, PacketEvents.get().getServerManager().getVersion(), ByteBufUtil.buffer());
         this.packetID = packetID;
-        this.protocolVersion = PacketEvents.get().getServerManager().getVersion().getProtocolVersion();
+        this.protocolVersion = getServerVersion().getProtocolVersion();
         writeVarInt(packetID);
-
     }
 
-
     public SendablePacketWrapper(int protocolVersion, int packetID) {
-        super(ByteBufUtil.buffer());
+        super(ClientVersion.UNKNOWN, PacketEvents.get().getServerManager().getVersion(), ByteBufUtil.buffer());
         this.packetID = packetID;
         this.protocolVersion = protocolVersion;
         writeVarInt(packetID);
     }
 
     public SendablePacketWrapper(ByteBufAbstract byteBuf, int protocolVersion, int packetID) {
-        super(byteBuf);
+        super(ClientVersion.UNKNOWN, PacketEvents.get().getServerManager().getVersion(), byteBuf);
         this.packetID = packetID;
         this.protocolVersion = protocolVersion;
         writeVarInt(packetID);
@@ -51,15 +51,15 @@ public abstract class SendablePacketWrapper extends PacketWrapper {
     }
 
     public SendablePacketWrapper(ByteBufAbstract byteBuf, int packetID) {
-        super(byteBuf);
+        super(ClientVersion.UNKNOWN, PacketEvents.get().getServerManager().getVersion(), byteBuf);
         this.packetID = packetID;
-        this.protocolVersion = PacketEvents.get().getServerManager().getVersion().getProtocolVersion();
+        this.protocolVersion = getServerVersion().getProtocolVersion();
         writeVarInt(packetID);
     }
 
     //Super constructor, this is when they DON'T want to use the wrapper for sending
-    public SendablePacketWrapper(ByteBufAbstract byteBuf) {
-        super(byteBuf);
+    public SendablePacketWrapper(PacketSendEvent event) {
+        super(event);
         this.packetID = -1;
         this.protocolVersion = -1;
     }

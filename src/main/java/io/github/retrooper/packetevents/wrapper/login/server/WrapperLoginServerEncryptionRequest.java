@@ -18,6 +18,7 @@
 
 package io.github.retrooper.packetevents.wrapper.login.server;
 
+import io.github.retrooper.packetevents.event.impl.PacketSendEvent;
 import io.github.retrooper.packetevents.protocol.PacketType;
 import io.github.retrooper.packetevents.utils.netty.buffer.ByteBufAbstract;
 import io.github.retrooper.packetevents.wrapper.PacketWrapper;
@@ -41,8 +42,8 @@ public class WrapperLoginServerEncryptionRequest extends SendablePacketWrapper {
     private final PublicKey publicKey;
     private final byte[] verifyToken;
 
-    public WrapperLoginServerEncryptionRequest(ByteBufAbstract byteBuf) {
-        super(byteBuf);
+    public WrapperLoginServerEncryptionRequest(PacketSendEvent event) {
+        super(event);
         this.serverID = readString(20);
         int publicKeyLength = readVarInt();
         byte[] publicKeyBytes = readByteArray(publicKeyLength);

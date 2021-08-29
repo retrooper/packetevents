@@ -1,5 +1,6 @@
 package io.github.retrooper.packetevents.wrapper.game.client;
 
+import io.github.retrooper.packetevents.event.impl.PacketReceiveEvent;
 import io.github.retrooper.packetevents.manager.player.ClientVersion;
 import io.github.retrooper.packetevents.utils.netty.buffer.ByteBufAbstract;
 import io.github.retrooper.packetevents.wrapper.PacketWrapper;
@@ -13,10 +14,10 @@ public class WrapperGameClientPluginMessage extends PacketWrapper {
     private final String channelName;
     private final byte[] data;
 
-    public WrapperGameClientPluginMessage(ClientVersion version, ByteBufAbstract byteBuf) {
-        super(version, byteBuf);
+    public WrapperGameClientPluginMessage(PacketReceiveEvent event) {
+        super(event);
         this.channelName = readString();
-        if (version.isNewerThanOrEquals(ClientVersion.v_1_8)) {
+        if (clientVersion.isNewerThanOrEquals(ClientVersion.v_1_8)) {
             this.data = readByteArray(byteBuf.readableBytes());
         } else {
             int dataLength = readShort();

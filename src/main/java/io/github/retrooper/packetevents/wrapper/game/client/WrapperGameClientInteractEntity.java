@@ -18,6 +18,7 @@
 
 package io.github.retrooper.packetevents.wrapper.game.client;
 
+import io.github.retrooper.packetevents.event.impl.PacketReceiveEvent;
 import io.github.retrooper.packetevents.manager.player.ClientVersion;
 import io.github.retrooper.packetevents.manager.player.Hand;
 import io.github.retrooper.packetevents.utils.netty.buffer.ByteBufAbstract;
@@ -38,8 +39,8 @@ public class WrapperGameClientInteractEntity extends PacketWrapper {
     private final Optional<Hand> hand;
     private final Optional<Boolean> sneaking;
 
-    public WrapperGameClientInteractEntity(ClientVersion clientVersion, ByteBufAbstract byteBuf) {
-        super(clientVersion, byteBuf);
+    public WrapperGameClientInteractEntity(PacketReceiveEvent event) {
+        super(event);
         if (clientVersion.isOlderThan(ClientVersion.v_1_8)) {
             this.entityID = readInt();
             int typeIndex = readByte() % Type.VALUES.length;

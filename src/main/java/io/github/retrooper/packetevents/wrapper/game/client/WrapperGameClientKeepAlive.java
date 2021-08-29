@@ -18,6 +18,7 @@
 
 package io.github.retrooper.packetevents.wrapper.game.client;
 
+import io.github.retrooper.packetevents.event.impl.PacketReceiveEvent;
 import io.github.retrooper.packetevents.manager.player.ClientVersion;
 import io.github.retrooper.packetevents.utils.netty.buffer.ByteBufAbstract;
 import io.github.retrooper.packetevents.wrapper.PacketWrapper;
@@ -30,11 +31,11 @@ import io.github.retrooper.packetevents.wrapper.PacketWrapper;
 public class WrapperGameClientKeepAlive extends PacketWrapper {
     private final long id;
 
-    public WrapperGameClientKeepAlive(ClientVersion version, ByteBufAbstract byteBuf) {
-        super(version, byteBuf);
-        if (version.isNewerThanOrEquals(ClientVersion.v_1_12)) {
+    public WrapperGameClientKeepAlive(PacketReceiveEvent event) {
+        super(event);
+        if (clientVersion.isNewerThanOrEquals(ClientVersion.v_1_12)) {
             this.id = readLong();
-        } else if (version.isNewerThanOrEquals(ClientVersion.v_1_8)) {
+        } else if (clientVersion.isNewerThanOrEquals(ClientVersion.v_1_8)) {
             this.id = readVarInt();
         } else {
             this.id = readInt();

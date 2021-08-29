@@ -22,6 +22,7 @@ import io.github.retrooper.packetevents.PacketEvents;
 import io.github.retrooper.packetevents.event.type.CancellableEvent;
 import io.github.retrooper.packetevents.event.type.PlayerEvent;
 import io.github.retrooper.packetevents.manager.player.ClientVersion;
+import io.github.retrooper.packetevents.manager.server.ServerVersion;
 import io.github.retrooper.packetevents.protocol.ConnectionState;
 import io.github.retrooper.packetevents.protocol.PacketSide;
 import io.github.retrooper.packetevents.protocol.PacketType;
@@ -30,6 +31,7 @@ import io.github.retrooper.packetevents.utils.netty.buffer.ByteBufAbstract;
 import io.github.retrooper.packetevents.utils.netty.channel.ChannelAbstract;
 import io.github.retrooper.packetevents.utils.wrapper.PacketWrapperUtils;
 import org.bukkit.entity.Player;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.net.InetSocketAddress;
@@ -41,7 +43,8 @@ public abstract class ProtocolPacketEvent extends PacketEvent implements PlayerE
 
 
     private ConnectionState connectionState;
-    private final ClientVersion clientVersion;
+    private ClientVersion clientVersion;
+    private ServerVersion serverVersion;
 
     private final ByteBufAbstract byteBuf;
     private final int packetID;
@@ -74,6 +77,8 @@ public abstract class ProtocolPacketEvent extends PacketEvent implements PlayerE
         }
         this.clientVersion = version;
 
+        this.serverVersion = PacketEvents.get().getServerManager().getVersion();
+
         this.byteBuf = byteBuf;
         this.packetID = PacketWrapperUtils.readVarInt(byteBuf);
         this.packetType = PacketType.getById(packetSide, connectionState, clientVersion, packetID);
@@ -104,6 +109,18 @@ public abstract class ProtocolPacketEvent extends PacketEvent implements PlayerE
 
     public ClientVersion getClientVersion() {
         return clientVersion;
+    }
+
+    public void setClientVersion(@NotNull ClientVersion clientVersion) {
+        this.clientVersion = clientVersion;
+    }
+
+    public ServerVersion getServerVersion() {
+        return serverVersion;
+    }
+
+    public void setServerVersion(@NotNull ServerVersion serverVersion) {
+        this.serverVersion = serverVersion;
     }
 
     public ByteBufAbstract getByteBuf() {

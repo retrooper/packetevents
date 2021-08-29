@@ -18,6 +18,7 @@
 
 package io.github.retrooper.packetevents.wrapper.game.client;
 
+import io.github.retrooper.packetevents.event.impl.PacketReceiveEvent;
 import io.github.retrooper.packetevents.manager.player.ClientVersion;
 import io.github.retrooper.packetevents.utils.netty.buffer.ByteBufAbstract;
 import io.github.retrooper.packetevents.utils.vector.Vector3i;
@@ -32,8 +33,8 @@ public class WrapperGameClientGenerateStructure extends PacketWrapper {
     private final int levels;
     private final boolean keepJigsaws;
 
-    public WrapperGameClientGenerateStructure(ClientVersion version, ByteBufAbstract byteBuf) {
-        super(version, byteBuf);
+    public WrapperGameClientGenerateStructure(PacketReceiveEvent event) {
+        super(event);
         this.blockPosition = PacketWrapperUtils.readVectorFromLong(readLong());
         this.levels = readVarInt();
         this.keepJigsaws = readBoolean();

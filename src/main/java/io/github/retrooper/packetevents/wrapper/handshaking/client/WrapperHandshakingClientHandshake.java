@@ -18,6 +18,7 @@
 
 package io.github.retrooper.packetevents.wrapper.handshaking.client;
 
+import io.github.retrooper.packetevents.event.impl.PacketReceiveEvent;
 import io.github.retrooper.packetevents.manager.player.ClientVersion;
 import io.github.retrooper.packetevents.protocol.ConnectionState;
 import io.github.retrooper.packetevents.utils.netty.buffer.ByteBufAbstract;
@@ -33,8 +34,8 @@ public class WrapperHandshakingClientHandshake extends PacketWrapper {
     private final int serverPort;
     private final ConnectionState nextConnectionState;
 
-    public WrapperHandshakingClientHandshake(ClientVersion version, ByteBufAbstract byteBuf) {
-        super(version, byteBuf);
+    public WrapperHandshakingClientHandshake(PacketReceiveEvent event) {
+        super(event);
         this.protocolVersion = readVarInt();
         this.serverAddress = readString(protocolVersion, 32767);
         this.serverPort = readUnsignedShort();

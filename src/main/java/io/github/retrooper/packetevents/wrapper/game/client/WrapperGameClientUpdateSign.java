@@ -18,6 +18,7 @@
 
 package io.github.retrooper.packetevents.wrapper.game.client;
 
+import io.github.retrooper.packetevents.event.impl.PacketReceiveEvent;
 import io.github.retrooper.packetevents.manager.player.ClientVersion;
 import io.github.retrooper.packetevents.utils.netty.buffer.ByteBufAbstract;
 import io.github.retrooper.packetevents.utils.vector.Vector3i;
@@ -31,9 +32,9 @@ public class WrapperGameClientUpdateSign extends PacketWrapper {
     private final Vector3i blockPosition;
     private final String[] textLines = new String[4];
 
-    public WrapperGameClientUpdateSign(ClientVersion version, ByteBufAbstract byteBuf) {
-        super(version, byteBuf);
-        if (version.isNewerThanOrEquals(ClientVersion.v_1_8)) {
+    public WrapperGameClientUpdateSign(PacketReceiveEvent event) {
+        super(event);
+        if (clientVersion.isNewerThanOrEquals(ClientVersion.v_1_8)) {
             long position = readLong();
             this.blockPosition = PacketWrapperUtils.readVectorFromLong(position);
         } else {

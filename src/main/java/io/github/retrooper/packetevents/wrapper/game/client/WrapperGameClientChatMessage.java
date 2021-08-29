@@ -18,6 +18,7 @@
 
 package io.github.retrooper.packetevents.wrapper.game.client;
 
+import io.github.retrooper.packetevents.event.impl.PacketReceiveEvent;
 import io.github.retrooper.packetevents.manager.player.ClientVersion;
 import io.github.retrooper.packetevents.utils.netty.buffer.ByteBufAbstract;
 import io.github.retrooper.packetevents.wrapper.PacketWrapper;
@@ -28,9 +29,9 @@ import io.github.retrooper.packetevents.wrapper.PacketWrapper;
 public class WrapperGameClientChatMessage extends PacketWrapper {
     private final String message;
 
-    public WrapperGameClientChatMessage(ClientVersion version, ByteBufAbstract byteBuf) {
-        super(version, byteBuf);
-        int maxMessageLength = version.isNewerThanOrEquals(ClientVersion.v_1_11) ? 256 : 100;
+    public WrapperGameClientChatMessage(PacketReceiveEvent event) {
+        super(event);
+        int maxMessageLength = clientVersion.isNewerThanOrEquals(ClientVersion.v_1_11) ? 256 : 100;
         this.message = readString(maxMessageLength);
     }
 

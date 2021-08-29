@@ -40,8 +40,7 @@ public class PacketEventsPlugin extends JavaPlugin {
             @Override
             public void onPacketReceive(PacketReceiveEvent event) {
                 if (event.getPacketType() == PacketType.Game.Client.INTERACT_ENTITY) {
-                    WrapperGameClientInteractEntity interactEntity = new WrapperGameClientInteractEntity(event.getClientVersion(),
-                            event.getByteBuf());
+                    WrapperGameClientInteractEntity interactEntity = new WrapperGameClientInteractEntity(event);
                     int entityID = interactEntity.getEntityID();
                     Entity entity = PacketEvents.get().getServerManager().getEntityByID(entityID);
                     event.getPlayer().sendMessage("entity name: " + entity.getName());
