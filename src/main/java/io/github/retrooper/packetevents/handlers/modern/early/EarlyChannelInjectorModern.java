@@ -144,7 +144,6 @@ public class EarlyChannelInjectorModern implements EarlyInjector {
         else {
             pipeline.addFirst(PacketEvents.get().connectionName, new ServerChannelHandlerModern());
         }
-        System.out.println("LOL: " + Arrays.toString(future.channel().pipeline().names().toArray(new String[0])));
 
         List<Object> networkManagers = MinecraftReflection.getNetworkManagers();
         synchronized (networkManagers) {

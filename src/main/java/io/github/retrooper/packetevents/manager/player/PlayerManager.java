@@ -102,6 +102,7 @@ public class PlayerManager {
     }
     public void sendPacket(ChannelAbstract channel, ByteBufAbstract byteBuf) {
         channel.writeAndFlush(byteBuf);
+        //channel.pipeline().context(PacketEvents.get().encoderName).writeAndFlush(byteBuf);
     }
 
     public void sendPacket(ChannelAbstract channel, SendablePacketWrapper wrapper) {
@@ -111,13 +112,13 @@ public class PlayerManager {
 
     public void sendPacket(Player player, ByteBufAbstract byteBuf) {
         ChannelAbstract channel = ChannelAbstract.generate(getChannel(player));
-        channel.writeAndFlush(byteBuf);
+        sendPacket(channel, byteBuf);
     }
 
     public void sendPacket(Player player, SendablePacketWrapper wrapper) {
         wrapper.createPacket();
         ChannelAbstract channel = ChannelAbstract.generate(getChannel(player));
-        channel.writeAndFlush(wrapper.byteBuf);
+        sendPacket(channel, wrapper.byteBuf);
     }
 
 

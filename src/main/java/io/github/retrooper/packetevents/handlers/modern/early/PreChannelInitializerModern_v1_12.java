@@ -18,22 +18,19 @@
 
 package io.github.retrooper.packetevents.handlers.modern.early;
 
-import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 import io.netty.channel.ChannelPipeline;
 import io.netty.util.internal.logging.InternalLogger;
 import io.netty.util.internal.logging.InternalLoggerFactory;
 
-import java.util.Arrays;
-
-public abstract class CustomChannelInitializerModern extends ChannelInboundHandlerAdapter {
+public class PreChannelInitializerModern_v1_12 extends ChannelInboundHandlerAdapter {
     private static final InternalLogger logger = InternalLoggerFactory.getInstance(io.netty.channel.ChannelInitializer.class);
 
     @Override
     public void channelRegistered(ChannelHandlerContext ctx) throws Exception {
         try {
-            initChannel(ctx.channel());
+            ServerConnectionInitializerModern.postInitChannel(ctx.channel());
         } catch (Throwable t) {
             exceptionCaught(ctx, t);
         } finally {
@@ -45,11 +42,11 @@ public abstract class CustomChannelInitializerModern extends ChannelInboundHandl
         ctx.pipeline().fireChannelRegistered();
     }
 
+
+
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable t) throws Exception {
-        CustomChannelInitializerModern.logger.warn("Failed to initialize a channel. Closing: " + ctx.channel(), t);
+        PreChannelInitializerModern_v1_12.logger.warn("Failed to initialize a channel. Closing: " + ctx.channel(), t);
         ctx.close();
     }
-
-    protected abstract void initChannel(Channel channel) throws Exception;
 }

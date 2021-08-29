@@ -19,19 +19,22 @@
 package io.github.retrooper.packetevents.handlers.modern.early;
 
 import io.github.retrooper.packetevents.PacketEvents;
+import io.github.retrooper.packetevents.manager.server.ServerVersion;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
-
-import java.util.Arrays;
 
 public class ServerChannelHandlerModern extends ChannelInboundHandlerAdapter {
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
         Channel channel = (Channel) msg;
-        channel.pipeline().addLast(PacketEvents.get().connectionInitializerName, new ServerConnectionInitializerModern());
-        System.out.println("HANDLS: " + Arrays.toString(channel.pipeline().names().toArray(new String[0])));
-        System.out.println("HANDLS 2: " + Arrays.toString(ctx.channel().pipeline().names().toArray(new String[0])));
+        //TODO Test injector on 1.11, 1.12 and 1.8 to check if this check if correct
+        if (PacketEvents.get().getServerManager().getVersion().isNewerThanOrEquals(ServerVersion.v_1_12)) {
+            channel.pipeline().addLast(PacketEvents.get().connectionInitializerName, new PreChannelInitializerModern_v1_12());
+        }
+        else {
+            channel.pipeline().addFirst(PacketEvents.get().connectionInitializerName, new PreChannelInitializerModern_v1_8());
+        }
         super.channelRead(ctx, msg);
     }
 }

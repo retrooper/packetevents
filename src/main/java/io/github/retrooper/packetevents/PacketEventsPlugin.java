@@ -27,6 +27,8 @@ import io.github.retrooper.packetevents.wrapper.game.server.WrapperGameServerHel
 import org.bukkit.entity.Entity;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import java.util.Arrays;
+
 public class PacketEventsPlugin extends JavaPlugin {
     //TODO Complete the legacy handlers.
     @Override
@@ -46,12 +48,8 @@ public class PacketEventsPlugin extends JavaPlugin {
                     Entity entity = PacketEvents.get().getServerManager().getEntityByID(entityID);
                     event.getPlayer().sendMessage("entity name: " + entity.getName());
                     event.getPlayer().sendMessage("action: " + interactEntity.getType().name());
-
                     WrapperGameServerHeldItemChange heldItemChange = new WrapperGameServerHeldItemChange((byte) 7);
                     PacketEvents.get().getPlayerManager().sendPacket(event.getChannel(), heldItemChange);
-                    event.getPlayer().sendMessage("changed slot to 7");
-                    int pv = ViaVersionLookupUtils.getProtocolVersion(event.getPlayer());
-                    event.getPlayer().sendMessage("test: " + pv);
                 }
             }
         });

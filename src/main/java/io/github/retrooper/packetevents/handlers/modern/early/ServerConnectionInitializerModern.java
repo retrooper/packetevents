@@ -21,27 +21,20 @@ package io.github.retrooper.packetevents.handlers.modern.early;
 import io.github.retrooper.packetevents.PacketEvents;
 import io.github.retrooper.packetevents.handlers.modern.PacketDecoderModern;
 import io.github.retrooper.packetevents.handlers.modern.PacketEncoderModern;
-import io.github.retrooper.packetevents.utils.reflection.Reflection;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelInitializer;
 
-import java.lang.reflect.Method;
 import java.util.Arrays;
 
-public class ServerConnectionInitializerModern extends CustomChannelInitializerModern {
+public class ServerConnectionInitializerModern {
     public static void postInitChannel(Channel channel) {
-        System.out.println("HANDLERS: " + Arrays.toString(channel.pipeline().names().toArray(new String[0])));
         channel.pipeline().addAfter("splitter", PacketEvents.get().decoderName, new PacketDecoderModern());
         channel.pipeline().addAfter("prepender", PacketEvents.get().encoderName, new PacketEncoderModern());
+        System.out.println("HANDLERSSSS: " + Arrays.toString(channel.pipeline().names().toArray(new String[0])));
     }
 
     public static void postDestroyChannel(Channel channel) {
         channel.pipeline().remove(PacketEvents.get().decoderName);
         channel.pipeline().remove(PacketEvents.get().encoderName);
-    }
-
-    @Override
-    protected void initChannel(Channel channel) throws Exception {
-        postInitChannel(channel);
     }
 }
