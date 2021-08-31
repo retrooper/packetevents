@@ -30,12 +30,12 @@ public class ViaVersionAccessorImplLegacy implements ViaVersionAccessor {
     private static Method getPlayerVersionMethod;
     @Override
     public int getProtocolVersion(Player player) {
-        if (viaClass== null) {
+        if (viaClass == null) {
             try {
                 viaClass = Class.forName("us.myles.ViaVersion.api.Via");
                 Class<?> viaAPIClass = Class.forName("us.myles.ViaVersion.api.ViaAPI");
                 apiAccessor = viaClass.getMethod("getAPI");
-                getPlayerVersionMethod = Reflection.getMethods(viaAPIClass, "getPlayerVersion", Player.class).get(0);
+                getPlayerVersionMethod = viaAPIClass.getMethod("getPlayerVersion", Object.class);
             } catch (ClassNotFoundException | NoSuchMethodException e) {
                 e.printStackTrace();
             }
