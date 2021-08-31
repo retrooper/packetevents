@@ -27,11 +27,14 @@ import io.github.retrooper.packetevents.wrapper.PacketWrapper;
  * This packet is used to send a chat message to the server.
  */
 public class WrapperGameClientChatMessage extends PacketWrapper {
-    private final String message;
+    private final int packetID;
+    private final int maxMessageLength;
+    private String message;
 
     public WrapperGameClientChatMessage(PacketReceiveEvent event) {
         super(event);
-        int maxMessageLength = clientVersion.isNewerThanOrEquals(ClientVersion.v_1_11) ? 256 : 100;
+        this.packetID = event.getPacketID();
+        this.maxMessageLength = clientVersion.isNewerThanOrEquals(ClientVersion.v_1_11) ? 256 : 100;
         this.message = readString(maxMessageLength);
     }
 
@@ -44,5 +47,13 @@ public class WrapperGameClientChatMessage extends PacketWrapper {
      */
     public String getMessage() {
         return message;
+    }
+
+    public void setMessage(String message) {
+        //TODO For now we basically reset the packet, but we don't want that
+        this.message = message;
+        byteBuf.clear();
+        writeVarInt(packetID);
+        writeString(message, maxMessageLength);
     }
 }

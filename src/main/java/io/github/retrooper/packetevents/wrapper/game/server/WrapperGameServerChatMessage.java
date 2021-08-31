@@ -19,6 +19,7 @@
 package io.github.retrooper.packetevents.wrapper.game.server;
 
 import io.github.retrooper.packetevents.event.impl.PacketSendEvent;
+import io.github.retrooper.packetevents.manager.player.ClientVersion;
 import io.github.retrooper.packetevents.manager.server.ServerVersion;
 import io.github.retrooper.packetevents.protocol.PacketType;
 import io.github.retrooper.packetevents.utils.netty.buffer.ByteBufAbstract;
@@ -49,8 +50,13 @@ public class WrapperGameServerChatMessage extends SendablePacketWrapper {
         else {
             this.jsonMessage = readString();
         }
-        byte positionIndex = readByte();
-        position = Position.VALUES[positionIndex];
+        if (getServerVersion().isNewerThanOrEquals(ServerVersion.v_1_8) || event.getClientVersion().isNewerThanOrEquals(ClientVersion.v_1_8)) {
+            byte positionIndex = readByte();
+            position = Position.VALUES[positionIndex];
+        }
+        else {
+            position = Position.CHAT;
+        }
         if (getServerVersion().isNewerThanOrEquals(ServerVersion.v_1_16)) {
             this.senderUUID = readUUID();
         }

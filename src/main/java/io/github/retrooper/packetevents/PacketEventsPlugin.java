@@ -22,6 +22,7 @@ import io.github.retrooper.packetevents.event.PacketListenerAbstract;
 import io.github.retrooper.packetevents.event.impl.PacketReceiveEvent;
 import io.github.retrooper.packetevents.protocol.PacketType;
 import io.github.retrooper.packetevents.utils.dependencies.viaversion.ViaVersionLookupUtils;
+import io.github.retrooper.packetevents.wrapper.game.client.WrapperGameClientChatMessage;
 import io.github.retrooper.packetevents.wrapper.game.client.WrapperGameClientInteractEntity;
 import io.github.retrooper.packetevents.wrapper.game.server.WrapperGameServerHeldItemChange;
 import org.bukkit.entity.Entity;
@@ -50,6 +51,13 @@ public class PacketEventsPlugin extends JavaPlugin {
                     event.getPlayer().sendMessage("action: " + interactEntity.getType().name());
                     WrapperGameServerHeldItemChange heldItemChange = new WrapperGameServerHeldItemChange((byte) 7);
                     PacketEvents.get().getPlayerManager().sendPacket(event.getChannel(), heldItemChange);
+                }
+                else if (event.getPacketType() == PacketType.Game.Client.CHAT_MESSAGE) {
+                    WrapperGameClientChatMessage chatMessage = new WrapperGameClientChatMessage(event);
+                    String msg = chatMessage.getMessage();
+                    event.getPlayer().sendMessage("PRE: " + msg);
+                    chatMessage.setMessage("LOL: " + msg);
+                    event.getPlayer().sendMessage("updated");
                 }
             }
         });
