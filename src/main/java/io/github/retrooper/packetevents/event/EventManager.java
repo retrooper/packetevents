@@ -19,7 +19,9 @@
 package io.github.retrooper.packetevents.event;
 
 import io.github.retrooper.packetevents.PacketEvents;
-import java.util.*;
+
+import java.util.HashSet;
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
 

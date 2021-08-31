@@ -24,7 +24,6 @@ import io.github.retrooper.packetevents.manager.server.ServerVersion;
 import io.github.retrooper.packetevents.protocol.PacketType;
 import io.github.retrooper.packetevents.wrapper.SendablePacketWrapper;
 
-
 import java.util.UUID;
 
 public class WrapperGameServerChatMessage extends SendablePacketWrapper {

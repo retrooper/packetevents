@@ -20,9 +20,6 @@ package io.github.retrooper.packetevents.utils.wrapper;
 
 import io.github.retrooper.packetevents.utils.netty.buffer.ByteBufAbstract;
 import io.github.retrooper.packetevents.utils.vector.Vector3i;
-import net.minecraft.util.com.google.common.base.Charsets;
-
-import java.nio.charset.StandardCharsets;
 
 public final class PacketWrapperUtils {
     public static Vector3i readVectorFromLong(long val) {

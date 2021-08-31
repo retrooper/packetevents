@@ -20,7 +20,6 @@ package io.github.retrooper.packetevents.event;
 
 import io.github.retrooper.packetevents.event.impl.*;
 
-import java.lang.reflect.MalformedParameterizedTypeException;
 import java.lang.reflect.Method;
 import java.util.List;
 import java.util.Map;

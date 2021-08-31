@@ -22,9 +22,6 @@ import io.github.retrooper.packetevents.PacketEvents;
 import io.github.retrooper.packetevents.handlers.modern.PacketDecoderModern;
 import io.github.retrooper.packetevents.handlers.modern.PacketEncoderModern;
 import io.netty.channel.Channel;
-import io.netty.channel.ChannelInitializer;
-
-import java.util.Arrays;
 
 public class ServerConnectionInitializerModern {
     public static void postInitChannel(Channel channel) {

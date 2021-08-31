@@ -18,7 +18,8 @@
 
 package io.github.retrooper.packetevents.handlers.modern.early;
 
-import io.netty.channel.*;
+import io.netty.channel.Channel;
+import io.netty.channel.ChannelInitializer;
 
 public class PreChannelInitializerModern_v1_8 extends ChannelInitializer<Channel> {
     @Override
