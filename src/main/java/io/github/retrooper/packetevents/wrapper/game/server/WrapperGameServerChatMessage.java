@@ -22,7 +22,6 @@ import io.github.retrooper.packetevents.event.impl.PacketSendEvent;
 import io.github.retrooper.packetevents.manager.player.ClientVersion;
 import io.github.retrooper.packetevents.manager.server.ServerVersion;
 import io.github.retrooper.packetevents.protocol.PacketType;
-import io.github.retrooper.packetevents.utils.netty.buffer.ByteBufAbstract;
 import io.github.retrooper.packetevents.wrapper.SendablePacketWrapper;
 
 
@@ -32,14 +31,14 @@ public class WrapperGameServerChatMessage extends SendablePacketWrapper {
     private static final int MODERN_MESSAGE_LENGTH = 262144;
     private static final int LEGACY_MESSAGE_LENGTH = 32767;
 
-    public enum Position {
+    public enum ChatPosition {
         CHAT, SYSTEM_MESSAGE, GAME_INFO;
 
-        public static final Position[] VALUES = values();
+        public static final ChatPosition[] VALUES = values();
     }
 
     private String jsonMessage;
-    private final Position position;
+    private final ChatPosition position;
     private final UUID senderUUID;
 
     public WrapperGameServerChatMessage(PacketSendEvent event) {
@@ -52,11 +51,12 @@ public class WrapperGameServerChatMessage extends SendablePacketWrapper {
         }
         if (getServerVersion().isNewerThanOrEquals(ServerVersion.v_1_8) || event.getClientVersion().isNewerThanOrEquals(ClientVersion.v_1_8)) {
             byte positionIndex = readByte();
-            position = Position.VALUES[positionIndex];
+            position = ChatPosition.VALUES[positionIndex];
         }
         else {
-            position = Position.CHAT;
+            position = ChatPosition.CHAT;
         }
+
         if (getServerVersion().isNewerThanOrEquals(ServerVersion.v_1_16)) {
             this.senderUUID = readUUID();
         }
@@ -65,14 +65,14 @@ public class WrapperGameServerChatMessage extends SendablePacketWrapper {
         }
     }
 
-    public WrapperGameServerChatMessage(String jsonMessage, Position position) {
+    public WrapperGameServerChatMessage(String jsonMessage, ChatPosition position) {
         super(PacketType.Game.Server.CHAT_MESSAGE.getID());
         this.jsonMessage = jsonMessage;
         this.position = position;
         this.senderUUID = new UUID(0L, 0L);
     }
 
-    public WrapperGameServerChatMessage(String jsonMessage, Position position, UUID senderUUID) {
+    public WrapperGameServerChatMessage(String jsonMessage, ChatPosition position, UUID senderUUID) {
         super(PacketType.Game.Server.CHAT_MESSAGE.getID());
         this.jsonMessage = jsonMessage;
         this.position = position;
@@ -83,7 +83,7 @@ public class WrapperGameServerChatMessage extends SendablePacketWrapper {
         return jsonMessage;
     }
 
-    public Position getPosition() {
+    public ChatPosition getPosition() {
         return position;
     }
 

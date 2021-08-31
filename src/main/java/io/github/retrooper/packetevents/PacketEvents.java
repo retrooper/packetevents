@@ -20,6 +20,7 @@ package io.github.retrooper.packetevents;
 
 import io.github.retrooper.packetevents.bstats.Metrics;
 import io.github.retrooper.packetevents.event.EventManager;
+import io.github.retrooper.packetevents.event.PacketListenerPriority;
 import io.github.retrooper.packetevents.event.impl.PostPlayerInjectEvent;
 import io.github.retrooper.packetevents.exceptions.PacketEventsLoadFailureException;
 import io.github.retrooper.packetevents.handlers.GlobalChannelInjector;
@@ -89,7 +90,7 @@ public final class PacketEvents implements Listener {
             loaded = true;
 
             //Register internal packet listener
-            getEventManager().registerListener(new InternalPacketListener());
+            getEventManager().registerListener(new InternalPacketListener(), PacketListenerPriority.LOWEST);
         }
     }
 

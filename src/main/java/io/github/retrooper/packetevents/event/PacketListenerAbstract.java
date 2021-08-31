@@ -20,6 +20,11 @@ package io.github.retrooper.packetevents.event;
 
 import io.github.retrooper.packetevents.event.impl.*;
 
+import java.lang.reflect.MalformedParameterizedTypeException;
+import java.lang.reflect.Method;
+import java.util.List;
+import java.util.Map;
+
 /**
  * Abstract packet listener.
  *
@@ -27,91 +32,38 @@ import io.github.retrooper.packetevents.event.impl.*;
  * @since 1.8
  */
 public abstract class PacketListenerAbstract {
-    private final Priority priority;
+    private final PacketListenerPriority priority;
+    protected final Map<Byte, List<Method>> methods;
 
-    public PacketListenerAbstract(Priority priority) {
+    public PacketListenerAbstract(PacketListenerPriority priority) {
         this.priority = priority;
+        this.methods = null;
     }
 
+    public PacketListenerAbstract(PacketListenerPriority priority, Map<Byte, List<Method>> methods) {
+        this.priority = priority;
+        this.methods = methods;
+    }
 
     public PacketListenerAbstract() {
-        this.priority = Priority.NORMAL;
+        this.priority = PacketListenerPriority.NORMAL;
+        this.methods = null;
     }
 
-    public Priority getPriority() {
+    public PacketListenerPriority getPriority() {
         return priority;
     }
 
-    public void onPlayerInject(PlayerInjectEvent event) {
-    }
+    public void onPlayerInject(PlayerInjectEvent event) {}
 
-    public void onPostPlayerInject(PostPlayerInjectEvent event) {
-    }
+    public void onPostPlayerInject(PostPlayerInjectEvent event) {}
 
-    public void onPlayerEject(PlayerEjectEvent event) {
+    public void onPlayerEject(PlayerEjectEvent event) {}
 
-    }
+    public void onPacketReceive(PacketReceiveEvent event) {}
 
-    public void onPacketReceive(PacketReceiveEvent event) {
-    }
+    public void onPacketSend(PacketSendEvent event) {}
 
-    public void onPacketSend(PacketSendEvent event) {
+    public void onPacketEventExternal(PacketEvent event) {}
 
-    }
-
-    public void onPacketEventExternal(PacketEvent event) {
-    }
-
-    /**
-     * The priority of packet listeners affect the order they will be invoked in.
-     * The lowest priority listeners are invoked first, the most high ones are invoked last.
-     * The most high priority listener has the final decider on an event being cancelled.
-     * This priority can be specified in the PacketListenerAbstract constructor.
-     * If you don't specify a priority in the constructor, it will use the {@link #NORMAL} priority.
-     *
-     * @author retrooper
-     * @since 1.8
-     */
-    public enum Priority {
-        /**
-         * Listener is of very low importance.
-         * This listener will be ran first.
-         */
-        LOWEST,
-
-        /**
-         * Listener is of low importance.
-         */
-        LOW,
-
-        /**
-         * Default listener priority.
-         * Listener is neither important nor unimportant and may run normally.
-         */
-        NORMAL,
-
-        /**
-         * Listener is of high importance.
-         */
-        HIGH,
-
-        /**
-         * Listener is of critical importance and wants to decide the cancellation of an event.
-         */
-        HIGHEST,
-
-        /**
-         * Listener is purely trying to decide the cancellation of an event.
-         * This listener should be ran last.
-         */
-        MONITOR;
-
-        public static Priority getByID(byte id) {
-            return values()[id];
-        }
-
-        public byte getID() {
-            return (byte) ordinal();
-        }
-    }
 }

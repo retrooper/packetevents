@@ -21,18 +21,22 @@ package io.github.retrooper.packetevents.manager.player;
 import io.github.retrooper.packetevents.PacketEvents;
 import io.github.retrooper.packetevents.manager.server.ServerVersion;
 import io.github.retrooper.packetevents.utils.dependencies.VersionLookupUtils;
+import io.github.retrooper.packetevents.utils.dependencies.protocolsupport.ProtocolSupportVersionLookupUtils;
 import io.github.retrooper.packetevents.utils.dependencies.v_1_7_10.SpigotVersionLookup_1_7;
+import io.github.retrooper.packetevents.utils.dependencies.viaversion.ViaVersionLookupUtils;
 import io.github.retrooper.packetevents.utils.gameprofile.GameProfileUtil;
 import io.github.retrooper.packetevents.utils.gameprofile.WrappedGameProfile;
 import io.github.retrooper.packetevents.utils.geyser.GeyserUtils;
 import io.github.retrooper.packetevents.utils.netty.buffer.ByteBufAbstract;
 import io.github.retrooper.packetevents.utils.netty.channel.ChannelAbstract;
+import io.github.retrooper.packetevents.utils.netty.channel.pipeline.ChannelPipelineAbstract;
 import io.github.retrooper.packetevents.utils.nms.MinecraftReflection;
 import io.github.retrooper.packetevents.utils.nms.PlayerPingAccessorModern;
 import io.github.retrooper.packetevents.wrapper.SendablePacketWrapper;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
@@ -100,9 +104,27 @@ public class PlayerManager {
         }
         return version;
     }
+
+    public void spoofIncomingPacket(ChannelAbstract channel, ByteBufAbstract byteBuf) {
+        //TODO Also check if our encoder is RIGHT before minecraft's,
+        //if it is, then don't use context to writeflush, otherwise use it (to support multiple packetevents instances)
+        if (ViaVersionLookupUtils.isAvailable() && !ProtocolSupportVersionLookupUtils.isAvailable()) {
+            channel.pipeline().fireChannelRead(byteBuf);
+        }
+        else {
+            channel.pipeline().context(PacketEvents.get().encoderName).fireChannelRead(byteBuf);
+        }
+    }
+
     public void sendPacket(ChannelAbstract channel, ByteBufAbstract byteBuf) {
-        channel.writeAndFlush(byteBuf);
-        //channel.pipeline().context(PacketEvents.get().encoderName).writeAndFlush(byteBuf);
+        //TODO Also check if our encoder is RIGHT before minecraft's,
+        //if it is, then don't use context to writeflush, otherwise use it (to support multiple packetevents instances)
+        if (ViaVersionLookupUtils.isAvailable() && !ProtocolSupportVersionLookupUtils.isAvailable()) {
+            channel.writeAndFlush(byteBuf);
+        }
+        else {
+            channel.pipeline().context(PacketEvents.get().encoderName).writeAndFlush(byteBuf);
+        }
     }
 
     public void sendPacket(ChannelAbstract channel, SendablePacketWrapper wrapper) {

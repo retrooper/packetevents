@@ -19,9 +19,7 @@
 package io.github.retrooper.packetevents.event;
 
 import io.github.retrooper.packetevents.PacketEvents;
-
-import java.util.HashSet;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
 
@@ -31,14 +29,14 @@ public class EventManager {
     /**
      * Call the PacketEvent.
      * This method processes the event on all the registered dynamic packet event listeners.
-     * The {@link PacketListenerAbstract.Priority#LOWEST} prioritized listeners will be processing first,
-     * the {@link PacketListenerAbstract.Priority#MONITOR} will be processing last and can
+     * The {@link PacketListenerPriority#LOWEST} prioritized listeners will be processing first,
+     * the {@link PacketListenerPriority#MONITOR} will be processing last and can
      * be the final decider whether the event has been cancelled or not.
      *
      * @param event {@link PacketEvent}
      */
     public void callEvent(final PacketEvent event) {
-        for (byte priority = PacketListenerAbstract.Priority.LOWEST.getID(); priority <= PacketListenerAbstract.Priority.MONITOR.getID(); priority++) {
+        for (byte priority = PacketListenerPriority.LOWEST.getID(); priority <= PacketListenerPriority.MONITOR.getID(); priority++) {
             HashSet<PacketListenerAbstract> listeners = listenersMap.get(priority);
             if (listeners != null) {
                 for (PacketListenerAbstract listener : listeners) {
@@ -54,7 +52,7 @@ public class EventManager {
     }
 
     public void callEvent(PacketEvent event, Runnable postCallListenerAction) {
-        for (byte priority = PacketListenerAbstract.Priority.LOWEST.getID(); priority <= PacketListenerAbstract.Priority.MONITOR.getID(); priority++) {
+        for (byte priority = PacketListenerPriority.LOWEST.getID(); priority <= PacketListenerPriority.MONITOR.getID(); priority++) {
             HashSet<PacketListenerAbstract> listeners = listenersMap.get(priority);
             if (listeners != null) {
                 for (PacketListenerAbstract listener : listeners) {
@@ -70,12 +68,22 @@ public class EventManager {
         }
     }
 
+    public void registerListener(PacketListener listener, PacketListenerPriority priority) {
+        PacketListenerAbstract packetListenerAbstract = listener.asAbstract(priority);
+        registerListener(packetListenerAbstract);
+    }
+
+    public void registerListener(PacketListenerReflect listener, PacketListenerPriority priority) {
+        PacketListenerAbstract packetListenerAbstract = listener.asAbstract(priority);
+        registerListener(packetListenerAbstract);
+    }
+
     /**
      * Register the dynamic packet event listener.
      *
      * @param listener {@link PacketListenerAbstract}
      */
-    public synchronized void registerListener(final PacketListenerAbstract listener) {
+    public void registerListener(PacketListenerAbstract listener) {
         byte priority = listener.getPriority().getID();
         HashSet<PacketListenerAbstract> listenerSet = listenersMap.get(priority);
         if (listenerSet == null) {
@@ -90,7 +98,7 @@ public class EventManager {
      *
      * @param listeners {@link PacketListenerAbstract}
      */
-    public synchronized void registerListeners(PacketListenerAbstract... listeners) {
+    public void registerListeners(PacketListenerAbstract... listeners) {
         for (PacketListenerAbstract listener : listeners) {
             registerListener(listener);
         }
@@ -99,7 +107,7 @@ public class EventManager {
     /**
      * Unregister all dynamic packet event listeners.
      */
-    public synchronized void unregisterAllListeners() {
+    public void unregisterAllListeners() {
         listenersMap.clear();
     }
 }

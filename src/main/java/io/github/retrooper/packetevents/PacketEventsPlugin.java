@@ -19,16 +19,14 @@
 package io.github.retrooper.packetevents;
 
 import io.github.retrooper.packetevents.event.PacketListenerAbstract;
+import io.github.retrooper.packetevents.event.PacketListenerPriority;
 import io.github.retrooper.packetevents.event.impl.PacketReceiveEvent;
 import io.github.retrooper.packetevents.protocol.PacketType;
-import io.github.retrooper.packetevents.utils.dependencies.viaversion.ViaVersionLookupUtils;
 import io.github.retrooper.packetevents.wrapper.game.client.WrapperGameClientChatMessage;
 import io.github.retrooper.packetevents.wrapper.game.client.WrapperGameClientInteractEntity;
 import io.github.retrooper.packetevents.wrapper.game.server.WrapperGameServerHeldItemChange;
 import org.bukkit.entity.Entity;
 import org.bukkit.plugin.java.JavaPlugin;
-
-import java.util.Arrays;
 
 public class PacketEventsPlugin extends JavaPlugin {
     //TODO Complete the legacy handlers.
@@ -40,8 +38,7 @@ public class PacketEventsPlugin extends JavaPlugin {
 
     @Override
     public void onEnable() {
-        PacketEvents.get().getEventManager().registerListener(new PacketListenerAbstract() {
-            @Override
+        PacketEvents.get().getEventManager().registerListener(new PacketListenerAbstract(PacketListenerPriority.NORMAL) {
             public void onPacketReceive(PacketReceiveEvent event) {
                 if (event.getPacketType() == PacketType.Game.Client.INTERACT_ENTITY) {
                     WrapperGameClientInteractEntity interactEntity = new WrapperGameClientInteractEntity(event);
@@ -55,9 +52,7 @@ public class PacketEventsPlugin extends JavaPlugin {
                 else if (event.getPacketType() == PacketType.Game.Client.CHAT_MESSAGE) {
                     WrapperGameClientChatMessage chatMessage = new WrapperGameClientChatMessage(event);
                     String msg = chatMessage.getMessage();
-                    event.getPlayer().sendMessage("PRE: " + msg);
-                    chatMessage.setMessage("LOL: " + msg);
-                    event.getPlayer().sendMessage("updated");
+                    chatMessage.setMessage("edited: " + msg);
                 }
             }
         });
