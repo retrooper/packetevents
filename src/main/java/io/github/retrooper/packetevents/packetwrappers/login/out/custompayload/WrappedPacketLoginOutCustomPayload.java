@@ -1,80 +1,66 @@
 /*
- * MIT License
+ * This file is part of packetevents - https://github.com/retrooper/packetevents
+ * Copyright (C) 2021 retrooper and contributors
  *
- * Copyright (c) 2020 retrooper
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
  *
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
  *
- * The above copyright notice and this permission notice shall be included in all
- * copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
- * SOFTWARE.
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
 package io.github.retrooper.packetevents.packetwrappers.login.out.custompayload;
 
+import io.github.retrooper.packetevents.PacketEvents;
 import io.github.retrooper.packetevents.packettype.PacketTypeClasses;
-import io.github.retrooper.packetevents.packetwrappers.SendableWrapper;
+import io.github.retrooper.packetevents.packetwrappers.NMSPacket;
 import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
-import io.github.retrooper.packetevents.utils.bytebuf.ByteBufUtil;
+import io.github.retrooper.packetevents.packetwrappers.api.SendableWrapper;
 import io.github.retrooper.packetevents.utils.nms.NMSUtils;
+import io.github.retrooper.packetevents.utils.server.ServerVersion;
 
 import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
 
 public class WrappedPacketLoginOutCustomPayload extends WrappedPacket implements SendableWrapper {
+    private static boolean v_1_17;
     private static Constructor<?> constructor;
     private static Constructor<?> packetDataSerializerConstructor;
-    private static Constructor<?> minecraftKeyConstructor;
-    private static Class<?> byteBufClass;
-    private static Class<?> packetDataSerializerClass;
-    private static Class<?> minecraftKeyClass;
     private int messageID;
     private String channelName;
     private byte[] data;
-    public WrappedPacketLoginOutCustomPayload(Object packet) {
+
+    public WrappedPacketLoginOutCustomPayload(NMSPacket packet) {
         super(packet);
     }
 
-    public static void load() {
+    public WrappedPacketLoginOutCustomPayload(int messageID, String channelName, byte[] data) {
+        this.messageID = messageID;
+        this.channelName = channelName;
+        this.data = data;
+    }
+
+    @Override
+    protected void load() {
+        v_1_17 = version.isNewerThanOrEquals(ServerVersion.v_1_17);
         Class<?> packetClass = PacketTypeClasses.Login.Server.CUSTOM_PAYLOAD;
         if (packetClass != null) {
-            packetDataSerializerClass = NMSUtils.getNMSClassWithoutException("PacketDataSerializer");
-            minecraftKeyClass = NMSUtils.getNMSClassWithoutException("MinecraftKey");
             try {
-                byteBufClass = NMSUtils.getNettyClass("buffer.ByteBuf");
-            } catch (ClassNotFoundException ex) {
-                ex.printStackTrace();
-            }
-
-            try {
-                if (packetDataSerializerClass != null) {
-                    packetDataSerializerConstructor = packetDataSerializerClass.getConstructor(byteBufClass);
-                }
-            } catch (NoSuchMethodException e) {
-                e.printStackTrace();
-            }
-            try {
-                if (minecraftKeyClass != null) {
-                    minecraftKeyConstructor = minecraftKeyClass.getConstructor(String.class);
+                if (NMSUtils.packetDataSerializerClass != null) {
+                    packetDataSerializerConstructor = NMSUtils.packetDataSerializerClass.getConstructor(NMSUtils.byteBufClass);
                 }
             } catch (NoSuchMethodException e) {
                 e.printStackTrace();
             }
 
             try {
-                constructor = packetClass.getConstructor();
+                constructor = packetClass.getConstructor(int.class, NMSUtils.minecraftKeyClass, NMSUtils.packetDataSerializerClass);
             } catch (NoSuchMethodException e3) {
                 throw new IllegalStateException("PacketEvents is unable to resolve the PacketPlayOutCustomPayload constructor.");
             }
@@ -83,46 +69,71 @@ public class WrappedPacketLoginOutCustomPayload extends WrappedPacket implements
 
     public int getMessageId() {
         if (packet != null) {
-            return readInt(0);
+            return readInt(v_1_17 ? 1 : 0);
         }
         return messageID;
     }
 
+    public void setMessageId(int messageID) {
+        if (packet != null) {
+            writeInt(v_1_17 ? 1 : 0, messageID);
+        } else {
+            this.messageID = messageID;
+        }
+    }
+
     public String getChannelName() {
         if (packet != null) {
-            Object minecraftKey = readObject(0, minecraftKeyClass);
-            WrappedPacket minecraftKeyWrapper = new WrappedPacket(minecraftKey);
-            return minecraftKeyWrapper.readString(1);
+           return readMinecraftKey(0);
         }
-        return channelName;
+        else {
+            return channelName;
+        }
+    }
+
+    public void setChannelName(String channelName) {
+        if (packet != null) {
+            writeMinecraftKey(0, channelName);
+        } else {
+            this.channelName = channelName;
+        }
     }
 
     public byte[] getData() {
         if (packet != null) {
-            Object dataSerializer = readObject(0, packetDataSerializerClass);
-            WrappedPacket byteBufWrapper = new WrappedPacket(dataSerializer);
-            Object byteBuf = byteBufWrapper.readObject(0, byteBufClass);
-            return ByteBufUtil.getBytes(byteBuf);
+            Object dataSerializer = readObject(0, NMSUtils.packetDataSerializerClass);
+            WrappedPacket byteBufWrapper = new WrappedPacket(new NMSPacket(dataSerializer));
+            Object byteBuf = byteBufWrapper.readObject(0, NMSUtils.byteBufClass);
+            return PacketEvents.get().getByteBufUtil().getBytes(byteBuf);
+        } else {
+            return data;
         }
-        return data;
+    }
+
+    public void setData(byte[] data) {
+        if (packet != null) {
+            PacketEvents.get().getByteBufUtil().setBytes(getBuffer(), data);
+        } else {
+            this.data = data;
+        }
+    }
+
+    private Object getBuffer() {
+        Object dataSerializer = readObject(0, NMSUtils.packetDataSerializerClass);
+        WrappedPacket byteBufWrapper = new WrappedPacket(new NMSPacket(dataSerializer));
+        return byteBufWrapper.readObject(0, NMSUtils.byteBufClass);
     }
 
     @Override
-    public Object asNMSPacket() {
-        Object byteBufObject = ByteBufUtil.copiedBuffer(data);
-        try {
-            Object minecraftKey = minecraftKeyConstructor.newInstance(channelName);
-            Object dataSerializer = packetDataSerializerConstructor.newInstance(byteBufObject);
+    public Object asNMSPacket() throws Exception {
+        Object byteBufObject = PacketEvents.get().getByteBufUtil().newByteBuf(data);
+        Object minecraftKey = NMSUtils.generateMinecraftKeyNew(channelName);
+        Object dataSerializer = packetDataSerializerConstructor.newInstance(byteBufObject);
+        return constructor.newInstance(getMessageId(), minecraftKey, dataSerializer);
+    }
 
-            Object packetInstance = constructor.newInstance();
-            WrappedPacket packetWrapper = new WrappedPacket(packetInstance);
-            packetWrapper.writeInt(0, messageID);
-            packetWrapper.writeObject(0, minecraftKey);
-            packetWrapper.writeObject(0, dataSerializer);
-            return packetInstance;
-        } catch (InstantiationException | InvocationTargetException | IllegalAccessException e) {
-            e.printStackTrace();
-        }
-        return null;
+    @Override
+    public boolean isSupported() {
+        return PacketTypeClasses.Login.Server.CUSTOM_PAYLOAD != null;
     }
 }

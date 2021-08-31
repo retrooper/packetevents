@@ -1,0 +1,92 @@
+plugins {
+    id 'java'
+    id 'maven-publish'
+}
+
+//gradle myJavadocs
+task myJavadocs(type: Javadoc) {
+    source = sourceSets.main.allJava
+    File projectDir = getProjectDir()
+    File javadocsDir = new File(projectDir.getParentFile().getAbsolutePath() + "/docs");
+    javadocsDir.mkdirs()
+    setDestinationDir(javadocsDir)
+}
+
+repositories {
+    mavenLocal()
+    maven {
+        url = uri('https://hub.spigotmc.org/nexus/content/repositories/snapshots/')
+    }
+
+    maven {
+        url 'https://papermc.io/repo/repository/maven-public/'
+    }
+
+    maven {
+        url 'https://repo.opencollab.dev/maven-snapshots/'
+    }
+
+    maven {
+        url 'https://repo.opencollab.dev/maven-releases/'
+    }
+
+    maven {
+        url = uri('https://jitpack.io/')
+    }
+
+    maven {
+        url = uri('https://nexus.funkemunky.cc/content/repositories/releases/')
+    }
+
+    maven {
+        url = uri('https://repo.viaversion.com/')
+    }
+
+    maven {
+        url = uri('https://oss.sonatype.org/content/repositories/releases/')
+    }
+
+    maven {
+        url = uri('https://repo.maven.apache.org/maven2/')
+    }
+}
+
+dependencies {
+    implementation 'org.jetbrains:annotations:20.1.0'
+
+    compileOnly 'org.spigotmc:spigot-api:1.17.1-R0.1-SNAPSHOT'
+    compileOnly 'com.destroystokyo.paper:paper-api:1.16.5-R0.1-SNAPSHOT'
+    compileOnly 'org.geysermc:connector:1.2.1-SNAPSHOT'
+    compileOnly 'com.viaversion:viaversion-api:4.0.1'
+    compileOnly 'com.github.ProtocolSupport:ProtocolSupport:3d24efeda6'
+
+    /*compileOnly 'org.github.spigot:1.16.2:1.16.2'
+   compileOnly 'org.github.spigot:1.8.8:1.8.8'
+   compileOnly 'org.github.spigot:1.7.10:1.7.10'*/
+    compileOnly 'org.github.spigot:1.16.2:1.16.2'
+    compileOnly 'org.github.spigot:1.13.2:1.13.2'
+    compileOnly 'org.github.spigot:1.13:1.13'
+    compileOnly 'org.github.spigot:1.12.2:1.12.2'
+    compileOnly 'org.github.spigot:1.9.4:1.9.4'
+    compileOnly 'org.github.spigot:1.9:1.9'
+    compileOnly 'org.github.spigot:1.8.8:1.8.8'
+    compileOnly 'org.github.spigot:1.7.10:1.7.10'
+
+}
+
+group = 'io.github.retrooper'
+version = '1.8-pre-17'
+description = 'packetevents'
+java.sourceCompatibility = JavaVersion.VERSION_1_8
+
+publishing {
+    publications {
+        maven(MavenPublication) {
+            from(components.java)
+        }
+    }
+}
+
+tasks.withType(JavaCompile) {
+    options.encoding = 'UTF-8'
+}

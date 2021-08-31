@@ -1,32 +1,38 @@
 /*
- * MIT License
+ * This file is part of packetevents - https://github.com/retrooper/packetevents
+ * Copyright (C) 2021 retrooper and contributors
  *
- * Copyright (c) 2020 retrooper
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
  *
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
  *
- * The above copyright notice and this permission notice shall be included in all
- * copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
- * SOFTWARE.
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
 package io.github.retrooper.packetevents.event.eventtypes;
 
 import io.github.retrooper.packetevents.event.PacketEvent;
-import io.github.retrooper.packetevents.event.PacketListenerDynamic;
+import io.github.retrooper.packetevents.event.PacketListenerAbstract;
+import io.github.retrooper.packetevents.event.impl.PacketPlayReceiveEvent;
 
+/**
+ * The {@link PacketEvent} implements this interface.
+ * Every inbuilt event should implement the {@link #call(PacketListenerAbstract)} method.
+ * If you are making a custom event, don't implement this.
+ * The {@link PacketListenerAbstract#onPacketEventExternal(PacketEvent)} method is called for every event that is not in-built.
+ * including custom events.
+ *
+ * @author retrooper
+ * @see PacketPlayReceiveEvent
+ * @since 1.8
+ */
 public interface CallableEvent {
-    void call(PacketListenerDynamic listener);
+    void call(PacketListenerAbstract listener);
 }

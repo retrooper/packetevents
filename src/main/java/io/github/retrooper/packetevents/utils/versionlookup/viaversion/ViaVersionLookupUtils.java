@@ -1,39 +1,45 @@
 /*
- * MIT License
+ * This file is part of packetevents - https://github.com/retrooper/packetevents
+ * Copyright (C) 2021 retrooper and contributors
  *
- * Copyright (c) 2020 retrooper
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
  *
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
  *
- * The above copyright notice and this permission notice shall be included in all
- * copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
- * SOFTWARE.
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
 package io.github.retrooper.packetevents.utils.versionlookup.viaversion;
 
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
-import us.myles.ViaVersion.api.Via;
 
 public class ViaVersionLookupUtils {
+    private ViaVersionLookupUtils() {
+    }
+
+    private static ViaVersionAccessor viaVersionAccessor;
+
     public static boolean isAvailable() {
-        return Bukkit.getPluginManager().isPluginEnabled("ViaVersion");
+        return Bukkit.getPluginManager().getPlugin("ViaVersion") != null;
     }
 
     public static int getProtocolVersion(Player player) {
-        return Via.getAPI().getPlayerVersion(player.getUniqueId());
+        if (viaVersionAccessor == null) {
+            try {
+                Class.forName("com.viaversion.viaversion.api.Via");
+                viaVersionAccessor = new ViaVersionAccessorImpl();
+            } catch (Exception e) {
+                viaVersionAccessor = new ViaVersionAccessorImplLegacy();
+            }
+        }
+        return viaVersionAccessor.getProtocolVersion(player);
     }
 }

@@ -1,70 +1,45 @@
 /*
- * MIT License
+ * This file is part of packetevents - https://github.com/retrooper/packetevents
+ * Copyright (C) 2021 retrooper and contributors
  *
- * Copyright (c) 2020 retrooper
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
  *
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
  *
- * The above copyright notice and this permission notice shall be included in all
- * copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
- * SOFTWARE.
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
 package io.github.retrooper.packetevents.event;
 
-import io.github.retrooper.packetevents.event.impl.*;
+import io.github.retrooper.packetevents.event.priority.PacketEventPriority;
 
-public abstract class PacketListenerDynamic {
-    private final byte priority;
-
-    public PacketListenerDynamic(final byte priority) {
-        this.priority = priority;
+/**
+ * Deprecated abstract PacketListener.
+ * Please use {@link PacketListenerAbstract}, but this class will still work for a bit.
+ *
+ * @author retrooper
+ * @since 1.7.7
+ */
+@Deprecated
+public abstract class PacketListenerDynamic extends PacketListenerAbstract {
+    @Deprecated
+    public PacketListenerDynamic(final PacketEventPriority priority) {
+        super(priority);
     }
 
-    public final byte getPriority() {
-        return priority;
+    public PacketListenerDynamic(PacketListenerPriority priority) {
+        super(priority);
     }
 
-    public void onPacketStatus(PacketStatusEvent event) {
-    }
 
-    public void onPacketLogin(PacketLoginEvent event) {
-    }
-
-    public void onPacketReceive(PacketReceiveEvent event) {
-    }
-
-    public void onPacketSend(PacketSendEvent event) {
-    }
-
-    public void onPostPacketReceive(PostPacketReceiveEvent event) {
-    }
-
-    public void onPostPacketSend(PostPacketSendEvent event) {
-    }
-
-    public void onPostPlayerInject(PostPlayerInjectEvent event) {
-
-    }
-
-    public void onPlayerInject(PlayerInjectEvent event) {
-    }
-
-    public void onPlayerEject(PlayerEjectEvent event) {
-    }
-
-    public void onPacketEvent(PacketEvent event) {
+    public PacketListenerDynamic() {
+        super(PacketListenerPriority.NORMAL);
     }
 }

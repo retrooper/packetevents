@@ -1,61 +1,51 @@
 /*
- * MIT License
+ * This file is part of packetevents - https://github.com/retrooper/packetevents
+ * Copyright (C) 2021 retrooper and contributors
  *
- * Copyright (c) 2020 retrooper
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
  *
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
  *
- * The above copyright notice and this permission notice shall be included in all
- * copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
- * SOFTWARE.
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
 package io.github.retrooper.packetevents.event.impl;
 
-import io.github.retrooper.packetevents.event.PacketListenerDynamic;
-import io.github.retrooper.packetevents.event.eventtypes.CallableEvent;
-import io.github.retrooper.packetevents.event.eventtypes.CancellableEvent;
+import io.github.retrooper.packetevents.PacketEvents;
 import io.github.retrooper.packetevents.event.PacketEvent;
+import io.github.retrooper.packetevents.event.PacketListenerAbstract;
+import io.github.retrooper.packetevents.event.eventtypes.CancellableEvent;
 import io.github.retrooper.packetevents.event.eventtypes.PlayerEvent;
+import io.github.retrooper.packetevents.utils.netty.channel.ChannelUtils;
 import org.bukkit.entity.Player;
+import org.jetbrains.annotations.Nullable;
+
+import java.net.InetSocketAddress;
 
 /**
- * This event is called each time you inject a player.
+ * The {@code PlayerInjectEvent} event is fired whenever a player is injected.
+ * A player is injected by PacketEvents whenever they join the server.
+ * This class implements {@link CancellableEvent} and {@link PlayerEvent}.
+ *
+ * @author retrooper
+ * @see <a href="https://github.com/retrooper/packetevents/blob/dev/src/main/java/io/github/retrooper/packetevents/handler/PacketHandlerInternal.java">https://github.com/retrooper/packetevents/blob/dev/src/main/java/io/github/retrooper/packetevents/handler/PacketHandlerInternal.java</a>
+ * @since 1.6.9
  */
 public final class PlayerInjectEvent extends PacketEvent implements CancellableEvent, PlayerEvent {
     private final Player player;
-    private final boolean async;
+    private final InetSocketAddress address;
     private boolean cancelled;
 
     public PlayerInjectEvent(final Player player) {
-        this(player, false);
-    }
-
-    public PlayerInjectEvent(final Player player, boolean isAsync) {
         this.player = player;
-        this.async = isAsync;
-    }
-
-    @Override
-    public void cancel() {
-        cancelled = true;
-    }
-
-    @Override
-    public void uncancel() {
-        cancelled = false;
+        this.address = ChannelUtils.getSocketAddress(PacketEvents.get().getPlayerUtils().getChannel(player));
     }
 
     @Override
@@ -68,17 +58,43 @@ public final class PlayerInjectEvent extends PacketEvent implements CancellableE
         cancelled = value;
     }
 
+    /**
+     * This method returns the bukkit player object of the player being injected.
+     * This player might not be fully initialized.
+     *
+     * @return Injected Player.
+     */
+    @Nullable
     @Override
     public Player getPlayer() {
         return player;
     }
 
+    /**
+     * This method returns the socket address injecting player.
+     *
+     * @return Socket address of the injecting player.
+     */
+    @Nullable
+    public InetSocketAddress getSocketAddress() {
+        return address;
+    }
+
+    /**
+     * @deprecated Will always be false
+     */
+    @Deprecated
     public boolean isAsync() {
-        return async;
+        return false;
     }
 
     @Override
-    public void call(PacketListenerDynamic listener) {
+    public void call(PacketListenerAbstract listener) {
         listener.onPlayerInject(this);
+    }
+
+    @Override
+    public boolean isInbuilt() {
+        return true;
     }
 }

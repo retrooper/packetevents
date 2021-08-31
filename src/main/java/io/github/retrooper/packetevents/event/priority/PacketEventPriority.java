@@ -1,34 +1,92 @@
 /*
- * MIT License
+ * This file is part of packetevents - https://github.com/retrooper/packetevents
+ * Copyright (C) 2021 retrooper and contributors
  *
- * Copyright (c) 2020 retrooper
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
  *
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
  *
- * The above copyright notice and this permission notice shall be included in all
- * copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
- * SOFTWARE.
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
 package io.github.retrooper.packetevents.event.priority;
 
-public interface PacketEventPriority {
-    byte LOWEST = 0;
-    byte LOW = 1;
-    byte NORMAL = 2;
-    byte HIGH = 3;
-    byte HIGHEST = 4;
-    byte MONITOR = 5;
+/**
+ * Event priority enum for the new event system.
+ * The event priority counts for the whole {@link io.github.retrooper.packetevents.event.PacketListenerAbstract}
+ * and not for just one event.
+ * The priority can be specified in the PacketListenerAbstract constructor.
+ * If you don't specify a priority in the constructor, it will use the {@link #NORMAL} priority.
+ *
+ * @author retrooper
+ * @since 1.6.9
+ */
+@Deprecated
+public enum PacketEventPriority {
+    /**
+     * The weakest event priority.
+     * The first to be processed(IN THE DYNAMIC EVENT SYSTEM ONLY).
+     * Use this if you need to be the first processing the event and
+     * need no power in cancelling an event or preventing an event cancellation.
+     */
+    LOWEST,
+
+    /**
+     * A weak event priority.
+     * Second to be processed(IN THE DYNAMIC EVENT SYSTEM ONLY).
+     * Use this if you would prefer to be one of the first to process the event,
+     * but don't mind if some other listener processes before you.
+     */
+    LOW,
+
+    /**
+     * Default event priority.
+     * Third to be processed(IN THE DYNAMIC EVENT SYSTEM ONLY).
+     * Use this if you don't really care/know when you process or just want to
+     * be in the middle.
+     */
+    NORMAL,
+
+    /**
+     * Higher than the {@link PacketEventPriority#NORMAL} event priority.
+     * Fourth to be processed(IN THE DYNAMIC EVENT SYSTEM ONLY).
+     * Use this if you want to process before the default event prioritized listeners.
+     */
+    HIGH,
+
+    /**
+     * Second most powerful event priority.
+     * Fifth to be processed(IN THE DYNAMIC EVENT SYSTEM ONLY).
+     * Use this if you prefer to be one of the last to process,
+     * but don't mind if some other listener really needs to process after you.
+     * Also use this if you prefer deciding if the event cancelled or not, but don't
+     * mind if some other listener urgently needs to decide over you.
+     * {@link PacketEventPriority#MONITOR} is rarely ever recommended to use.
+     */
+    HIGHEST,
+
+    /**
+     * Most powerful event priority.
+     * Last(Sixth) to be processed(IN THE DYNAMIC EVENT SYSTEM ONLY).
+     * Use this if you urgently need to be the last to process
+     * or urgently need to be the final decider whether the event has cancelled or not.
+     * This is rarely recommended.
+     */
+    MONITOR;
+
+
+    public static PacketEventPriority getPacketEventPriority(byte bytePriority) {
+        return values()[bytePriority];
+    }
+
+    public byte getPriorityValue() {
+        return (byte) ordinal();
+    }
 }

@@ -1,40 +1,48 @@
 /*
- * MIT License
+ * This file is part of packetevents - https://github.com/retrooper/packetevents
+ * Copyright (C) 2021 retrooper and contributors
  *
- * Copyright (c) 2020 retrooper
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
  *
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
  *
- * The above copyright notice and this permission notice shall be included in all
- * copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
- * SOFTWARE.
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
 package io.github.retrooper.packetevents.packetwrappers.login.in.start;
 
+import io.github.retrooper.packetevents.packettype.PacketTypeClasses;
+import io.github.retrooper.packetevents.packetwrappers.NMSPacket;
 import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
 import io.github.retrooper.packetevents.utils.gameprofile.GameProfileUtil;
 import io.github.retrooper.packetevents.utils.gameprofile.WrappedGameProfile;
 import io.github.retrooper.packetevents.utils.nms.NMSUtils;
 
 public class WrappedPacketLoginInStart extends WrappedPacket {
-    public WrappedPacketLoginInStart(Object packet) {
+    public WrappedPacketLoginInStart(NMSPacket packet) {
         super(packet);
     }
 
+    //TODO Allow accessing game profile property
     public WrappedGameProfile getGameProfile() {
         return GameProfileUtil.getWrappedGameProfile(readObject(0, NMSUtils.gameProfileClass));
+    }
+
+    //TODO Add support for game profile property
+    public void setGameProfile(WrappedGameProfile wrappedGameProfile) {
+        Object gameProfile = GameProfileUtil.getGameProfile(wrappedGameProfile.getId(), wrappedGameProfile.getName());
+        write(NMSUtils.gameProfileClass, 0, gameProfile);
+    }
+
+    @Override
+    public boolean isSupported() {
+        return PacketTypeClasses.Login.Client.START != null;
     }
 }
