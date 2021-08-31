@@ -39,8 +39,8 @@ public class WrapperGameClientChatMessage extends PacketWrapper {
 
     /**
      * The message.
-     * On {@link ClientVersion#v_1_10} and older clients, the message should never be larger than 100 characters.
-     * On {@link ClientVersion#v_1_11} and newer clients, the message should never be larger than 256 characters.
+     * On {@link ClientVersion#v_1_10} and older clients, the message should never exceed 100 characters.
+     * On {@link ClientVersion#v_1_11} and newer clients, the message should never exceed 256 characters.
      *
      * @return Message
      */

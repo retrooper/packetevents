@@ -48,11 +48,13 @@ public class WrapperGameServerChatMessage extends SendablePacketWrapper {
         else {
             this.jsonMessage = readString();
         }
+        //Is the server 1.8+ or is the client 1.8+? 1.7.10 servers support 1.8 clients, and send the chat position.
         if (getServerVersion().isNewerThanOrEquals(ServerVersion.v_1_8) || event.getClientVersion().isNewerThanOrEquals(ClientVersion.v_1_8)) {
             byte positionIndex = readByte();
             position = ChatPosition.VALUES[positionIndex];
         }
         else {
+            //Always chat in 1.7.10 protocol.
             position = ChatPosition.CHAT;
         }
 

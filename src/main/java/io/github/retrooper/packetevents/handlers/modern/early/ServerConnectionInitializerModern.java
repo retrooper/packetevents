@@ -23,10 +23,13 @@ import io.github.retrooper.packetevents.handlers.modern.PacketDecoderModern;
 import io.github.retrooper.packetevents.handlers.modern.PacketEncoderModern;
 import io.netty.channel.Channel;
 
+import java.util.Arrays;
+
 public class ServerConnectionInitializerModern {
     public static void postInitChannel(Channel channel) {
         channel.pipeline().addAfter("splitter", PacketEvents.get().decoderName, new PacketDecoderModern());
         channel.pipeline().addBefore("encoder", PacketEvents.get().encoderName, new PacketEncoderModern());
+        System.out.println("HANDLERS: " + Arrays.toString(channel.pipeline().names().toArray(new String[0])));
     }
 
     public static void postDestroyChannel(Channel channel) {

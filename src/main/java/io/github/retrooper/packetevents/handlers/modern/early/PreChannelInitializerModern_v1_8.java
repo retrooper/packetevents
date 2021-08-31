@@ -24,7 +24,6 @@ import io.netty.channel.ChannelInitializer;
 public class PreChannelInitializerModern_v1_8 extends ChannelInitializer<Channel> {
     @Override
     protected void initChannel(Channel channel) throws Exception {
-        //TODO Create custom handler name for it
         channel.pipeline().addLast(new ChannelInitializer<Channel>() {
             @Override
             protected void initChannel(Channel channel) throws Exception {

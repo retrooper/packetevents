@@ -20,6 +20,7 @@ package io.github.retrooper.packetevents.handlers.modern.early;
 
 import io.github.retrooper.packetevents.PacketEvents;
 import io.github.retrooper.packetevents.manager.server.ServerVersion;
+import io.github.retrooper.packetevents.utils.nms.MinecraftReflection;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
@@ -28,8 +29,7 @@ public class ServerChannelHandlerModern extends ChannelInboundHandlerAdapter {
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
         Channel channel = (Channel) msg;
-        //TODO Test injector on 1.11, 1.12 and 1.8 to check if this check if correct
-        if (PacketEvents.get().getServerManager().getVersion().isNewerThanOrEquals(ServerVersion.v_1_12)) {
+        if (MinecraftReflection.V_1_12_OR_HIGHER) {
             channel.pipeline().addLast(PacketEvents.get().connectionInitializerName, new PreChannelInitializerModern_v1_12());
         }
         else {
