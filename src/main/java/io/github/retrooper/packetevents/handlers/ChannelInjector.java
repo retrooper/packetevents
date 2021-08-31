@@ -41,10 +41,4 @@ public interface ChannelInjector {
     void ejectPlayer(Player player);
 
     boolean hasInjected(Player player);
-
-    void writePacket(Object channel, Object rawNMSPacket);
-
-    void flushPackets(Object channel);
-
-    void sendPacket(Object channel, Object rawNMSPacket);
 }

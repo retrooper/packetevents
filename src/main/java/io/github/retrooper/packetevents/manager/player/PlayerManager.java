@@ -183,10 +183,6 @@ public class PlayerManager {
         }
     }*/
 
-    public void sendNMSPacket(Player player, Object packet) {
-        PacketEvents.get().getInjector().sendPacket(getChannel(player), packet);
-    }
-
 
     public WrappedGameProfile getGameProfile(Player player) {
         Object gameProfile = GameProfileUtil.getGameProfile(player.getUniqueId(), player.getName());

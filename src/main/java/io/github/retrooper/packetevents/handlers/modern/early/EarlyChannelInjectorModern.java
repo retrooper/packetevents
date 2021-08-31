@@ -1,6 +1,6 @@
 /*
- * This file is part of packetevents - https://github.com/retrooper/packetevents
- * Copyright (C) 2021 retrooper and contributors
+ * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
+ * Copyright (C) 2016-2021 ViaVersion and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -38,7 +38,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-//This injector was built with the help of ViaVersion, ProtocolLib and ProtocolSupport. Thank you!
 public class EarlyChannelInjectorModern implements EarlyInjector {
     private final List<ChannelFuture> injectedFutures = new ArrayList<>();
     private final List<Map<Field, Object>> injectedLists = new ArrayList<>();
@@ -226,24 +225,6 @@ public class EarlyChannelInjectorModern implements EarlyInjector {
         PacketEncoderModern encoder = getEncoder(channel);
         return decoder != null && decoder.player != null
                 && encoder != null && encoder.player != null;
-    }
-
-    @Override
-    public void writePacket(Object ch, Object rawNMSPacket) {
-        Channel channel = (Channel) ch;
-        channel.write(rawNMSPacket);
-    }
-
-    @Override
-    public void flushPackets(Object ch) {
-        Channel channel = (Channel) ch;
-        channel.flush();
-    }
-
-    @Override
-    public void sendPacket(Object ch, Object packet) {
-        Channel channel = (Channel) ch;
-        channel.writeAndFlush(packet);
     }
 
     private PacketDecoderModern getDecoder(Object rawChannel) {

@@ -89,24 +89,6 @@ public class LateChannelInjectorModern implements LateInjector {
                 encoder != null && encoder.player != null;
     }
 
-    @Override
-    public void writePacket(Object ch, Object rawNMSPacket) {
-        Channel channel = (Channel) ch;
-        channel.write(rawNMSPacket);
-    }
-
-    @Override
-    public void flushPackets(Object ch) {
-        Channel channel = (Channel) ch;
-        channel.flush();
-    }
-
-    @Override
-    public void sendPacket(Object rawChannel, Object packet) {
-        Channel channel = (Channel) rawChannel;
-        channel.pipeline().writeAndFlush(packet);
-    }
-
     //TODO Look into this approach, maybe instead make the variable in the decoder just default to GAME
     //TODO and implement changeConnectionState properly
     @Override

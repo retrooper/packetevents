@@ -85,7 +85,7 @@ public class EarlyChannelInjectorLegacy implements EarlyInjector {
                 }
                 if (value instanceof List) {
                     //Get the list.
-                    List<?> listWrapper = new ListWrapper((List<?>) value) {
+                    List listWrapper = new ListWrapper((List) value) {
                         @Override
                         public void processAdd(Object o) {
                             if (o instanceof ChannelFuture) {
@@ -104,7 +104,7 @@ public class EarlyChannelInjectorLegacy implements EarlyInjector {
                     field.set(serverConnection, listWrapper);
 
                     synchronized (listWrapper) {
-                        for (Object serverChannel : (List<?>) value) {
+                        for (Object serverChannel : (List) value) {
                             //Is this the server channel future list?
                             if (serverChannel instanceof ChannelFuture) {
                                 //Yes it is...
@@ -274,24 +274,6 @@ public class EarlyChannelInjectorLegacy implements EarlyInjector {
         PacketEncoderLegacy encoder = getEncoder(channel);
         return decoder != null && decoder.player != null &&
                 encoder != null && encoder.player != null;
-    }
-
-    @Override
-    public void writePacket(Object ch, Object rawNMSPacket) {
-        Channel channel = (Channel) ch;
-        channel.write(rawNMSPacket);
-    }
-
-    @Override
-    public void flushPackets(Object ch) {
-        Channel channel = (Channel) ch;
-        channel.flush();
-    }
-
-    @Override
-    public void sendPacket(Object ch, Object rawNMSPacket) {
-        Channel channel = (Channel) ch;
-        channel.writeAndFlush(rawNMSPacket);
     }
 
     private PacketDecoderLegacy getDecoder(Object rawChannel) {
