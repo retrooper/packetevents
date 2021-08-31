@@ -28,7 +28,7 @@ public class PreChannelInitializerModern_v1_12 extends ChannelInboundHandlerAdap
     private static final InternalLogger logger = InternalLoggerFactory.getInstance(io.netty.channel.ChannelInitializer.class);
 
     @Override
-    public void channelRegistered(ChannelHandlerContext ctx) throws Exception {
+    public void channelRegistered(ChannelHandlerContext ctx) {
         try {
             ServerConnectionInitializerModern.postInitChannel(ctx.channel());
         } catch (Throwable t) {
@@ -45,7 +45,7 @@ public class PreChannelInitializerModern_v1_12 extends ChannelInboundHandlerAdap
 
 
     @Override
-    public void exceptionCaught(ChannelHandlerContext ctx, Throwable t) throws Exception {
+    public void exceptionCaught(ChannelHandlerContext ctx, Throwable t) {
         PreChannelInitializerModern_v1_12.logger.warn("Failed to initialize a channel. Closing: " + ctx.channel(), t);
         ctx.close();
     }

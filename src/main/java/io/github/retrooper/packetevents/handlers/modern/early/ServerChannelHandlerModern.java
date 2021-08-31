@@ -19,7 +19,6 @@
 package io.github.retrooper.packetevents.handlers.modern.early;
 
 import io.github.retrooper.packetevents.PacketEvents;
-import io.github.retrooper.packetevents.manager.server.ServerVersion;
 import io.github.retrooper.packetevents.utils.nms.MinecraftReflection;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
@@ -30,10 +29,10 @@ public class ServerChannelHandlerModern extends ChannelInboundHandlerAdapter {
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
         Channel channel = (Channel) msg;
         if (MinecraftReflection.V_1_12_OR_HIGHER) {
-            channel.pipeline().addLast(PacketEvents.get().connectionInitializerName, new PreChannelInitializerModern_v1_12());
+            channel.pipeline().addLast(PacketEvents.get().serverChannelHandlerName, new PreChannelInitializerModern_v1_12());
         }
         else {
-            channel.pipeline().addFirst(PacketEvents.get().connectionInitializerName, new PreChannelInitializerModern_v1_8());
+            channel.pipeline().addFirst(PacketEvents.get().serverChannelHandlerName, new PreChannelInitializerModern_v1_8());
         }
         super.channelRead(ctx, msg);
     }

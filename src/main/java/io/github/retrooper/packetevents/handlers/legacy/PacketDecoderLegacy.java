@@ -20,10 +20,10 @@ public class PacketDecoderLegacy extends ByteToMessageDecoder {
     private boolean handledCompression;
     private boolean skipDoubleTransform;
 
-    public ByteBufAbstract handle(ChannelHandlerContextAbstract ctx, ByteBufAbstract byteBuf) {
+    public void handle(ChannelHandlerContextAbstract ctx, ByteBufAbstract byteBuf, List<Object> output) {
         if (skipDoubleTransform) {
             skipDoubleTransform = false;
-            return byteBuf.retain();
+            output.add(byteBuf.retain().rawByteBuf());
         }
         ByteBufAbstract transformedBuf = ctx.alloc().buffer().writeBytes(byteBuf);
         try {
@@ -34,12 +34,14 @@ public class PacketDecoderLegacy extends ByteToMessageDecoder {
             PacketEvents.get().getEventManager().callEvent(packetReceiveEvent, () -> {
                 transformedBuf.readerIndex(readerIndex);
             });
-            transformedBuf.readerIndex(firstReaderIndex);
-            if (needsCompress) {
-                CompressionManager.recompress(ctx, transformedBuf);
-                skipDoubleTransform = true;
+            if (!packetReceiveEvent.isCancelled()) {
+                transformedBuf.readerIndex(firstReaderIndex);
+                if (needsCompress) {
+                    CompressionManager.recompress(ctx, transformedBuf);
+                    skipDoubleTransform = true;
+                }
+                output.add(transformedBuf.retain().rawByteBuf());
             }
-            return transformedBuf.retain();
         } finally {
             transformedBuf.release();
         }
@@ -47,8 +49,7 @@ public class PacketDecoderLegacy extends ByteToMessageDecoder {
 
     @Override
     public void decode(ChannelHandlerContext ctx, ByteBuf byteBuf, List<Object> out) {
-        ByteBuf output = (ByteBuf) handle(ChannelHandlerContextAbstract.generate(ctx), ByteBufAbstract.generate(byteBuf)).rawByteBuf();
-        out.add(output);
+        handle(ChannelHandlerContextAbstract.generate(ctx), ByteBufAbstract.generate(byteBuf), out);
     }
 
     private boolean handleCompressionOrder(ChannelHandlerContextAbstract ctx, ByteBufAbstract buf) {

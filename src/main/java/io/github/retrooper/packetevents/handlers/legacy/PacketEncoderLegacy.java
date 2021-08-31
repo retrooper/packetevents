@@ -38,7 +38,7 @@ public class PacketEncoderLegacy extends MessageToMessageEncoder<ByteBuf> {
     public volatile Player player;
     private boolean handledCompression;
 
-    public ByteBufAbstract handle(ChannelHandlerContextAbstract ctx, ByteBufAbstract byteBuf) {
+    public void handle(ChannelHandlerContextAbstract ctx, ByteBufAbstract byteBuf, List<Object> output) {
         ByteBufAbstract transformedBuf = ctx.alloc().buffer().writeBytes(byteBuf);
         try {
             boolean needsCompress = handleCompressionOrder(ctx, transformedBuf);
@@ -49,12 +49,14 @@ public class PacketEncoderLegacy extends MessageToMessageEncoder<ByteBuf> {
             PacketEvents.get().getEventManager().callEvent(packetSendEvent, () -> {
                 transformedBuf.readerIndex(readerIndex);
             });
-            transformedBuf.readerIndex(firstReaderIndex);
+            if (!packetSendEvent.isCancelled()) {
+                transformedBuf.readerIndex(firstReaderIndex);
 
-            if (needsCompress) {
-                recompress(ctx, transformedBuf);
+                if (needsCompress) {
+                    recompress(ctx, transformedBuf);
+                }
+                output.add(transformedBuf.retain().rawByteBuf());
             }
-            return transformedBuf.retain();
         } finally {
             transformedBuf.release();
         }
@@ -62,8 +64,7 @@ public class PacketEncoderLegacy extends MessageToMessageEncoder<ByteBuf> {
 
     @Override
     protected void encode(ChannelHandlerContext ctx, ByteBuf byteBuf, List<Object> out) {
-        ByteBuf output = (ByteBuf) handle(ChannelHandlerContextAbstract.generate(ctx), ByteBufAbstract.generate(byteBuf)).rawByteBuf();
-        out.add(output);
+        handle(ChannelHandlerContextAbstract.generate(ctx), ByteBufAbstract.generate(byteBuf), out);
     }
 
     private boolean handleCompressionOrder(ChannelHandlerContextAbstract ctx, ByteBufAbstract buf) {

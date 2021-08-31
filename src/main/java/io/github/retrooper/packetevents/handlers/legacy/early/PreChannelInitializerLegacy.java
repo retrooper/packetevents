@@ -16,18 +16,18 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package io.github.retrooper.packetevents.handlers.modern.early;
+package io.github.retrooper.packetevents.handlers.legacy.early;
 
-import io.netty.channel.Channel;
-import io.netty.channel.ChannelInitializer;
+import net.minecraft.util.io.netty.channel.Channel;
+import net.minecraft.util.io.netty.channel.ChannelInitializer;
 
-public class PreChannelInitializerModern_v1_8 extends ChannelInitializer<Channel> {
+public class PreChannelInitializerLegacy extends ChannelInitializer<Channel> {
     @Override
     protected void initChannel(Channel channel) {
         channel.pipeline().addLast(new ChannelInitializer<Channel>() {
             @Override
             protected void initChannel(Channel channel) {
-                ServerConnectionInitializerModern.postInitChannel(channel);
+                ServerConnectionInitializerLegacy.postInitChannel(channel);
             }
         });
     }

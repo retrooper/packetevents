@@ -1,6 +1,6 @@
 /*
- * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
- * Copyright (C) 2016-2021 ViaVersion and contributors
+ * This file is part of packetevents - https://github.com/retrooper/packetevents
+ * Copyright (C) 2021 retrooper and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,42 +21,16 @@ package io.github.retrooper.packetevents.handlers.legacy.early;
 import io.github.retrooper.packetevents.PacketEvents;
 import io.github.retrooper.packetevents.handlers.legacy.PacketDecoderLegacy;
 import io.github.retrooper.packetevents.handlers.legacy.PacketEncoderLegacy;
-import io.github.retrooper.packetevents.utils.reflection.Reflection;
 import net.minecraft.util.io.netty.channel.Channel;
-import net.minecraft.util.io.netty.channel.ChannelInitializer;
 
-import java.lang.reflect.Method;
-
-public class PEChannelInitializerLegacy extends ChannelInitializer<Channel> {
-    private final ChannelInitializer<?> oldChannelInitializer;
-    private Method initChannelMethod;
-
-    public PEChannelInitializerLegacy(ChannelInitializer<?> oldChannelInitializer) {
-        this.oldChannelInitializer = oldChannelInitializer;
-        load();
-    }
-
-    private void load() {
-        initChannelMethod = Reflection.getMethod(oldChannelInitializer.getClass(), "initChannel", 0);
-    }
-
-    public ChannelInitializer<?> getOldChannelInitializer() {
-        return oldChannelInitializer;
-    }
-
+public class ServerConnectionInitializerLegacy {
     public static void postInitChannel(Channel channel) {
-        channel.pipeline().addBefore("decoder", PacketEvents.get().decoderName, new PacketDecoderLegacy());
+        channel.pipeline().addAfter("splitter", PacketEvents.get().decoderName, new PacketDecoderLegacy());
         channel.pipeline().addBefore("encoder", PacketEvents.get().encoderName, new PacketEncoderLegacy());
     }
 
     public static void postDestroyChannel(Channel channel) {
         channel.pipeline().remove(PacketEvents.get().decoderName);
         channel.pipeline().remove(PacketEvents.get().encoderName);
-    }
-
-    @Override
-    protected void initChannel(Channel channel) throws Exception {
-        initChannelMethod.invoke(oldChannelInitializer, channel);
-        postInitChannel(channel);
     }
 }

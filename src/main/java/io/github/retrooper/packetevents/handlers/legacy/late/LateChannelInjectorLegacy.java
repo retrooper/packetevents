@@ -22,7 +22,7 @@ import io.github.retrooper.packetevents.PacketEvents;
 import io.github.retrooper.packetevents.handlers.LateInjector;
 import io.github.retrooper.packetevents.handlers.legacy.PacketDecoderLegacy;
 import io.github.retrooper.packetevents.handlers.legacy.PacketEncoderLegacy;
-import io.github.retrooper.packetevents.handlers.legacy.early.PEChannelInitializerLegacy;
+import io.github.retrooper.packetevents.handlers.legacy.early.ServerConnectionInitializerLegacy;
 import io.github.retrooper.packetevents.protocol.ConnectionState;
 import net.minecraft.util.io.netty.channel.Channel;
 import net.minecraft.util.io.netty.channel.ChannelHandler;
@@ -42,7 +42,7 @@ public class LateChannelInjectorLegacy implements LateInjector {
     @Override
     public void injectPlayer(Player player) {
         Channel channel = (Channel) PacketEvents.get().getPlayerManager().getChannel(player);
-        PEChannelInitializerLegacy.postInitChannel(channel);
+        ServerConnectionInitializerLegacy.postInitChannel(channel);
     }
 
     private PacketDecoderLegacy getDecoder(Object rawChannel) {
@@ -71,7 +71,7 @@ public class LateChannelInjectorLegacy implements LateInjector {
         Object channel = PacketEvents.get().getPlayerManager().getChannel(player);
         if (channel != null) {
             try {
-                PEChannelInitializerLegacy.postDestroyChannel((Channel) channel);
+                ServerConnectionInitializerLegacy.postDestroyChannel((Channel) channel);
             } catch (Exception ex) {
 
             }

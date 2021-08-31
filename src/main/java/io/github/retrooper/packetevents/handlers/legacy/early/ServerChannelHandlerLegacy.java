@@ -16,22 +16,18 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package io.github.retrooper.packetevents.handlers.modern.early;
+package io.github.retrooper.packetevents.handlers.legacy.early;
 
 import io.github.retrooper.packetevents.PacketEvents;
-import io.github.retrooper.packetevents.handlers.modern.PacketDecoderModern;
-import io.github.retrooper.packetevents.handlers.modern.PacketEncoderModern;
-import io.netty.channel.Channel;
+import net.minecraft.util.io.netty.channel.Channel;
+import net.minecraft.util.io.netty.channel.ChannelHandlerContext;
+import net.minecraft.util.io.netty.channel.ChannelInboundHandlerAdapter;
 
-
-public class ServerConnectionInitializerModern {
-    public static void postInitChannel(Channel channel) {
-        channel.pipeline().addAfter("splitter", PacketEvents.get().decoderName, new PacketDecoderModern());
-        channel.pipeline().addBefore("encoder", PacketEvents.get().encoderName, new PacketEncoderModern());
-    }
-
-    public static void postDestroyChannel(Channel channel) {
-        channel.pipeline().remove(PacketEvents.get().decoderName);
-        channel.pipeline().remove(PacketEvents.get().encoderName);
+public class ServerChannelHandlerLegacy extends ChannelInboundHandlerAdapter {
+    @Override
+    public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
+        Channel channel = (Channel) msg;
+        channel.pipeline().addFirst(PacketEvents.get().serverChannelHandlerName, new PreChannelInitializerLegacy());
+        super.channelRead(ctx, msg);
     }
 }

@@ -26,10 +26,7 @@ import io.github.retrooper.packetevents.protocol.ConnectionState;
 import io.github.retrooper.packetevents.utils.list.ListWrapper;
 import io.github.retrooper.packetevents.utils.nms.MinecraftReflection;
 import io.github.retrooper.packetevents.utils.reflection.ReflectionObject;
-import net.minecraft.util.io.netty.channel.Channel;
-import net.minecraft.util.io.netty.channel.ChannelFuture;
-import net.minecraft.util.io.netty.channel.ChannelHandler;
-import net.minecraft.util.io.netty.channel.ChannelInitializer;
+import net.minecraft.util.io.netty.channel.*;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.PluginDescriptionFile;
 
@@ -132,97 +129,44 @@ public class EarlyChannelInjectorLegacy implements EarlyInjector {
                     continue;
                 }
 
-                PEChannelInitializerLegacy.postInitChannel(channel);
+                ServerConnectionInitializerLegacy.postInitChannel(channel);
             }
         }
     }
 
 
-    private void injectChannelFuture(ChannelFuture channelFuture) {
-        List<String> channelHandlerNames = channelFuture.channel().pipeline().names();
-        ChannelHandler bootstrapAcceptor = null;
-        Field bootstrapAcceptorField = null;
-        for (String handlerName : channelHandlerNames) {
-            ChannelHandler handler = channelFuture.channel().pipeline().get(handlerName);
-            try {
-                bootstrapAcceptorField = handler.getClass().getDeclaredField("childHandler");
-                bootstrapAcceptorField.setAccessible(true);
-                bootstrapAcceptorField.get(handler);
-                bootstrapAcceptor = handler;
-            } catch (Exception ignored) {
-
-            }
+    private void injectChannelFuture(ChannelFuture future) {
+        ChannelPipeline pipeline = future.channel().pipeline();
+        if (pipeline.get("SpigotNettyServerChannelHandler#0") != null) {
+            pipeline.addAfter("SpigotNettyServerChannelHandler#0", PacketEvents.get().connectionName, new ServerChannelHandlerLegacy());
+        }
+        else {
+            pipeline.addFirst(PacketEvents.get().connectionName, new ServerChannelHandlerLegacy());
         }
 
-        if (bootstrapAcceptor == null) {
-            bootstrapAcceptor = channelFuture.channel().pipeline().first();
-        }
-
-        ChannelInitializer<?> oldChannelInitializer = null;
-        try {
-            oldChannelInitializer = (ChannelInitializer<?>) bootstrapAcceptorField.get(bootstrapAcceptor);
-
-            ChannelInitializer<?> channelInitializer = new PEChannelInitializerLegacy(oldChannelInitializer);
-
-            //Replace the old channel initializer with our own.
-            bootstrapAcceptorField.setAccessible(true);
-            bootstrapAcceptorField.set(bootstrapAcceptor, channelInitializer);
-
-            injectedFutures.add(channelFuture);
-        } catch (IllegalAccessException e) {
-            ClassLoader cl = bootstrapAcceptor.getClass().getClassLoader();
-            if (cl.getClass().getName().equals("org.bukkit.plugin.java.PluginClassLoader")) {
-                PluginDescriptionFile yaml = null;
-                try {
-                    yaml = (PluginDescriptionFile) PluginDescriptionFile.class.getDeclaredField("description").get(cl);
-                } catch (IllegalAccessException | NoSuchFieldException e2) {
-                    e2.printStackTrace();
+        List<Object> networkManagers = MinecraftReflection.getNetworkManagers();
+        synchronized (networkManagers) {
+            for (Object networkManager : networkManagers) {
+                ReflectionObject networkManagerWrapper = new ReflectionObject(networkManager);
+                Channel channel = networkManagerWrapper.readObject(0, Channel.class);
+                if (channel.isOpen()) {
+                    if (channel.localAddress().equals(future.channel().localAddress())) {
+                        channel.close();
+                    }
                 }
-                throw new IllegalStateException("PacketEvents failed to inject, because of " + bootstrapAcceptor.getClass().getName() + ", you might want to try running without " + yaml.getName() + "?");
-            } else {
-                throw new IllegalStateException("PacketEvents failed to find core component 'childHandler', please check your plugins. issue: " + bootstrapAcceptor.getClass().getName());
             }
         }
+        injectedFutures.add(future);
+    }
 
+    private void ejectChannelFuture(ChannelFuture future) {
+        future.channel().pipeline().remove(PacketEvents.get().connectionName);
     }
 
     @Override
     public void eject() {
-        Field childHandlerField = null;
         for (ChannelFuture future : injectedFutures) {
-            List<String> names = future.channel().pipeline().names();
-            ChannelHandler bootstrapAcceptor = null;
-            // Pick best
-            for (String name : names) {
-                try {
-                    ChannelHandler handler = future.channel().pipeline().get(name);
-                    if (childHandlerField == null) {
-                        childHandlerField = handler.getClass().getDeclaredField("childHandler");
-                        childHandlerField.setAccessible(true);
-                    }
-
-                    ChannelInitializer<Channel> oldInit = (ChannelInitializer<Channel>) childHandlerField.get(handler);
-                    if (oldInit instanceof PEChannelInitializerLegacy) {
-                        bootstrapAcceptor = handler;
-                    }
-                } catch (Exception e) {
-                    // Not this one
-                }
-            }
-            // Default to first
-            if (bootstrapAcceptor == null) {
-                bootstrapAcceptor = future.channel().pipeline().first();
-            }
-
-            try {
-                ChannelInitializer<Channel> oldInit = (ChannelInitializer<Channel>) childHandlerField.get(bootstrapAcceptor);
-                if (oldInit instanceof PEChannelInitializerLegacy) {
-                    childHandlerField.setAccessible(true);
-                    childHandlerField.set(bootstrapAcceptor, ((PEChannelInitializerLegacy) oldInit).getOldChannelInitializer());
-                }
-            } catch (Exception e) {
-                PacketEvents.get().getPlugin().getLogger().severe("PacketEvents failed to eject the injection handler! Please reboot!");
-            }
+            ejectChannelFuture(future);
         }
         injectedFutures.clear();
 
@@ -257,7 +201,7 @@ public class EarlyChannelInjectorLegacy implements EarlyInjector {
         Object channel = PacketEvents.get().getPlayerManager().getChannel(player);
         if (channel != null) {
             try {
-                PEChannelInitializerLegacy.postDestroyChannel((Channel) channel);
+                ServerConnectionInitializerLegacy.postDestroyChannel((Channel) channel);
             } catch (Exception ignored) {
 
             }
