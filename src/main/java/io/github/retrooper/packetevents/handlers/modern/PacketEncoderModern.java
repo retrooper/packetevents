@@ -56,6 +56,11 @@ public class PacketEncoderModern extends MessageToMessageEncoder<ByteBuf> {
                     recompress(ctx, transformedBuf);
                 }
                 output.add(transformedBuf.retain().rawByteBuf());
+                if (packetSendEvent.getPostTask() != null) {
+                    ((ChannelHandlerContext) ctx.rawChannelHandlerContext()).newPromise().addListener(f -> {
+                        packetSendEvent.getPostTask().run();
+                    });
+                }
             }
         } finally {
             transformedBuf.release();

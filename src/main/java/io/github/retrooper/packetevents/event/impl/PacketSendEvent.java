@@ -26,12 +26,34 @@ import io.github.retrooper.packetevents.utils.netty.channel.ChannelAbstract;
 import org.bukkit.entity.Player;
 
 public class PacketSendEvent extends ProtocolPacketEvent {
+    private Runnable postTask = null;
+
+    public PacketSendEvent(ChannelAbstract channel, Player player, ByteBufAbstract byteBuf, Runnable postTask) {
+        super(PacketSide.SERVER, channel, player, byteBuf);
+        this.postTask = postTask;
+    }
+
+    public PacketSendEvent(Object channel, Player player, Object rawByteBuf, Runnable postTask) {
+        super(PacketSide.SERVER, channel, player, rawByteBuf);
+        this.postTask = postTask;
+    }
+
     public PacketSendEvent(ChannelAbstract channel, Player player, ByteBufAbstract byteBuf) {
         super(PacketSide.SERVER, channel, player, byteBuf);
+        this.postTask = null;
     }
 
     public PacketSendEvent(Object channel, Player player, Object rawByteBuf) {
         super(PacketSide.SERVER, channel, player, rawByteBuf);
+        this.postTask = null;
+    }
+
+    public Runnable getPostTask() {
+        return postTask;
+    }
+
+    public void setPostTask(Runnable postTask) {
+        this.postTask = postTask;
     }
 
     @Override
