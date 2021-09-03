@@ -33,7 +33,7 @@ import java.util.UUID;
 
 public class PacketWrapper<T extends PacketWrapper> {
     protected final ClientVersion clientVersion;
-    private final ServerVersion serverVersion;
+    protected final ServerVersion serverVersion;
     public final ByteBufAbstract byteBuf;
     private final int packetID;
 
@@ -122,7 +122,7 @@ public class PacketWrapper<T extends PacketWrapper> {
         return byteBuf.readByte();
     }
 
-    public void writeByte(byte value) {
+    public void writeByte(int value) {
         byteBuf.writeByte(value);
     }
 

@@ -22,12 +22,6 @@ public enum ClientboundPacketType_1_15_2 {
     SPAWN_ENTITY,
     SPAWN_EXPERIENCE_ORB,
 
-    //This packet was removed
-    //SPAWN_GLOBAL_ENTITY,
-
-    //This packet was removed
-    //SPAWN_MOB,
-
     //This packet was added
     SPAWN_WEATHER_ENTITY,
 

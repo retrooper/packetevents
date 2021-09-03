@@ -333,8 +333,6 @@ public final class PacketType {
             UPDATE_ENTITY_NBT,
             UPDATE_SIGN,
             USE_BED,
-            SPAWN_MOB,
-            SPAWN_GLOBAL_ENTITY,
             SPAWN_WEATHER_ENTITY,
             TITLE,
             WORLD_BORDER,

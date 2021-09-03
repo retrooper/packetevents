@@ -21,8 +21,8 @@ package io.github.retrooper.packetevents.protocol.protocols.clientbound;
 public enum ClientboundPacketType_1_9_3 {
     SPAWN_ENTITY,
     SPAWN_EXPERIENCE_ORB,
-    SPAWN_GLOBAL_ENTITY,
-    SPAWN_MOB,
+    SPAWN_WEATHER_ENTITY,
+    SPAWN_LIVING_ENTITY,
     SPAWN_PAINTING,
     SPAWN_PLAYER,
     ENTITY_ANIMATION,

@@ -22,7 +22,7 @@ public enum ClientboundPacketType_1_16 {
     SPAWN_ENTITY,
     SPAWN_EXPERIENCE_ORB,
 
-    //This packet was added in 1.15.2 and instantly got removed again XD
+    //This packet was removed.
     //SPAWN_WEATHER_ENTITY,
 
     SPAWN_LIVING_ENTITY,
