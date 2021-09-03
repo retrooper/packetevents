@@ -19,20 +19,30 @@
 package io.github.retrooper.packetevents.wrapper.game.client;
 
 import io.github.retrooper.packetevents.event.impl.PacketReceiveEvent;
+import io.github.retrooper.packetevents.manager.player.ClientVersion;
+import io.github.retrooper.packetevents.protocol.PacketType;
 import io.github.retrooper.packetevents.utils.vector.Vector3i;
 import io.github.retrooper.packetevents.utils.PacketWrapperUtil;
 import io.github.retrooper.packetevents.wrapper.PacketWrapper;
+import io.github.retrooper.packetevents.wrapper.SendablePacketWrapper;
 
 /**
  * This packet is sent when Generate is pressed on the Jigsaw Block interface.
  */
-public class WrapperGameClientGenerateStructure extends PacketWrapper<WrapperGameClientGenerateStructure> {
+public class WrapperGameClientGenerateStructure extends SendablePacketWrapper<WrapperGameClientGenerateStructure> {
     private Vector3i blockPosition;
     private int levels;
     private boolean keepJigsaws;
 
     public WrapperGameClientGenerateStructure(PacketReceiveEvent event) {
         super(event);
+    }
+
+    public WrapperGameClientGenerateStructure(ClientVersion clientVersion, Vector3i blockPosition, int levels, boolean keepJigsaws) {
+        super(PacketType.Game.Client.GENERATE_STRUCTURE.getPacketID(clientVersion), clientVersion);
+        this.blockPosition = blockPosition;
+        this.levels = levels;
+        this.keepJigsaws = keepJigsaws;
     }
 
     @Override

@@ -19,7 +19,10 @@
 package io.github.retrooper.packetevents.wrapper.game.client;
 
 import io.github.retrooper.packetevents.event.impl.PacketReceiveEvent;
+import io.github.retrooper.packetevents.manager.player.ClientVersion;
+import io.github.retrooper.packetevents.protocol.PacketType;
 import io.github.retrooper.packetevents.wrapper.PacketWrapper;
+import io.github.retrooper.packetevents.wrapper.SendablePacketWrapper;
 
 /**
  * A response to the ping packet.
@@ -28,11 +31,16 @@ import io.github.retrooper.packetevents.wrapper.PacketWrapper;
  *
  * @see io.github.retrooper.packetevents.wrapper.game.server.WrapperGameServerPing
  */
-public class WrapperGameClientPong extends PacketWrapper<WrapperGameClientPong> {
+public class WrapperGameClientPong extends SendablePacketWrapper<WrapperGameClientPong> {
     private int id;
 
     public WrapperGameClientPong(PacketReceiveEvent event) {
         super(event);
+    }
+
+    public WrapperGameClientPong(ClientVersion clientVersion, int id) {
+        super(PacketType.Game.Client.PONG.getPacketID(clientVersion), clientVersion);
+        this.id = id;
     }
 
     @Override

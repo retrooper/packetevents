@@ -56,9 +56,4 @@ public class WrapperGameServerHeldItemChange extends SendablePacketWrapper<Wrapp
     public void setSlot(byte slot) {
         this.slot = slot;
     }
-
-    @Override
-    public void createPacket() {
-        writeByte(slot);
-    }
 }

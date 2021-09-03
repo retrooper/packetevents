@@ -71,11 +71,4 @@ public class WrapperLoginServerDisconnect extends SendablePacketWrapper<WrapperL
     public void setReason(String reason) {
         this.reason = reason;
     }
-
-    @Override
-    public void createPacket() {
-        int maxLen = protocolVersion >= 477 ? MODERN_REASON_LENGTH : LEGACY_REASON_LENGTH;
-        reason = StringUtil.maximizeLength(reason, maxLen);
-        writeString(reason, maxLen);
-    }
 }

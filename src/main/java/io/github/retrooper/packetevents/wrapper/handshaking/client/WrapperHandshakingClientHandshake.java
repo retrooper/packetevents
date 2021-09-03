@@ -21,13 +21,15 @@ package io.github.retrooper.packetevents.wrapper.handshaking.client;
 import io.github.retrooper.packetevents.event.impl.PacketReceiveEvent;
 import io.github.retrooper.packetevents.manager.player.ClientVersion;
 import io.github.retrooper.packetevents.protocol.ConnectionState;
+import io.github.retrooper.packetevents.protocol.PacketType;
 import io.github.retrooper.packetevents.wrapper.PacketWrapper;
+import io.github.retrooper.packetevents.wrapper.SendablePacketWrapper;
 
 /**
  * This packet is the first packet the client should send.
  * It contains important data such as the client's protocol version.
  */
-public class WrapperHandshakingClientHandshake extends PacketWrapper<WrapperHandshakingClientHandshake> {
+public class WrapperHandshakingClientHandshake extends SendablePacketWrapper<WrapperHandshakingClientHandshake> {
     private int protocolVersion;
     private ClientVersion clientVersion;
     private String serverAddress;
@@ -36,6 +38,15 @@ public class WrapperHandshakingClientHandshake extends PacketWrapper<WrapperHand
 
     public WrapperHandshakingClientHandshake(PacketReceiveEvent event) {
         super(event);
+    }
+
+    public WrapperHandshakingClientHandshake(int protocolVersion, String serverAddress, int serverPort, ConnectionState nextConnectionState) {
+        super(PacketType.Handshaking.Client.HANDSHAKE.getID(), ClientVersion.UNKNOWN);
+        this.protocolVersion = protocolVersion;
+        this.clientVersion = ClientVersion.getClientVersionByProtocolVersion(protocolVersion);
+        this.serverAddress = serverAddress;
+        this.serverPort = serverPort;
+        this.nextConnectionState = nextConnectionState;
     }
 
     @Override

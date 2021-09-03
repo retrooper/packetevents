@@ -9,7 +9,7 @@ import io.github.retrooper.packetevents.wrapper.PacketWrapper;
 import org.bukkit.entity.Player;
 
 public class PacketReceiveEvent extends ProtocolPacketEvent {
-    private PacketWrapper packetWrapper;
+    private PacketWrapper currentPacketWrapper;
     public PacketReceiveEvent(ChannelAbstract channel, Player player, ByteBufAbstract byteBuf) {
         super(PacketSide.CLIENT, channel, player, byteBuf);
     }
@@ -23,11 +23,13 @@ public class PacketReceiveEvent extends ProtocolPacketEvent {
         listener.onPacketReceive(this);
     }
 
-    public PacketWrapper getPacketWrapper() {
-        return packetWrapper;
+    @Deprecated
+    public PacketWrapper getCurrentPacketWrapper() {
+        return currentPacketWrapper;
     }
 
-    public void setPacketWrapper(PacketWrapper packetWrapper) {
-        this.packetWrapper = packetWrapper;
+    @Deprecated
+    public void setCurrentPacketWrapper(PacketWrapper currentPacketWrapper) {
+        this.currentPacketWrapper = currentPacketWrapper;
     }
 }

@@ -82,11 +82,4 @@ public class WrapperLoginServerPluginRequest extends SendablePacketWrapper<Wrapp
     public void setData(byte[] data) {
         this.data = data;
     }
-
-    @Override
-    public void createPacket() {
-        writeVarInt(messageID);
-        writeString(channelName);
-        writeByteArray(data);
-    }
 }

@@ -19,44 +19,33 @@
 package io.github.retrooper.packetevents.wrapper;
 
 import io.github.retrooper.packetevents.PacketEvents;
+import io.github.retrooper.packetevents.event.impl.PacketReceiveEvent;
 import io.github.retrooper.packetevents.event.impl.PacketSendEvent;
 import io.github.retrooper.packetevents.manager.player.ClientVersion;
-import io.github.retrooper.packetevents.utils.netty.buffer.ByteBufAbstract;
 import io.github.retrooper.packetevents.utils.netty.buffer.ByteBufUtil;
 
 public abstract class SendablePacketWrapper<T extends PacketWrapper> extends PacketWrapper<T> {
-    protected final int protocolVersion;
+    public SendablePacketWrapper(int packetID, ClientVersion clientVersion) {
+        super(clientVersion, PacketEvents.get().getServerManager().getVersion(), ByteBufUtil.buffer(), packetID);
+        writeVarInt(packetID);
+    }
 
     public SendablePacketWrapper(int packetID) {
         super(ClientVersion.UNKNOWN, PacketEvents.get().getServerManager().getVersion(), ByteBufUtil.buffer(), packetID);
-        this.protocolVersion = getServerVersion().getProtocolVersion();
-        writeVarInt(packetID);
-    }
-
-    public SendablePacketWrapper(int protocolVersion, int packetID) {
-        super(ClientVersion.UNKNOWN, PacketEvents.get().getServerManager().getVersion(), ByteBufUtil.buffer(), packetID);
-        this.protocolVersion = protocolVersion;
-        writeVarInt(packetID);
-    }
-
-    public SendablePacketWrapper(ByteBufAbstract byteBuf, int protocolVersion, int packetID) {
-        super(ClientVersion.UNKNOWN, PacketEvents.get().getServerManager().getVersion(), byteBuf, packetID);
-        this.protocolVersion = protocolVersion;
-        writeVarInt(packetID);
-
-    }
-
-    public SendablePacketWrapper(ByteBufAbstract byteBuf, int packetID) {
-        super(ClientVersion.UNKNOWN, PacketEvents.get().getServerManager().getVersion(), byteBuf, packetID);
-        this.protocolVersion = getServerVersion().getProtocolVersion();
         writeVarInt(packetID);
     }
 
     //Super constructor, this is when they DON'T want to use the wrapper for sending
     public SendablePacketWrapper(PacketSendEvent event) {
         super(event);
-        this.protocolVersion = -1;
     }
 
-    public abstract void createPacket();
+    //Super constructor, this is when they DON'T want to use the wrapper for sending
+    public SendablePacketWrapper(PacketReceiveEvent event) {
+        super(event);
+    }
+
+    public void createPacket() {
+        writeData();
+    }
 }

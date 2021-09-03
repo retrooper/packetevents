@@ -89,16 +89,4 @@ public class WrapperGameServerPluginMessage extends SendablePacketWrapper<Wrappe
     public void setData(byte[] data) {
         this.data = data;
     }
-
-    @Override
-    public void createPacket() {
-        writeString(channelName);
-
-        //To simplify, only if less than 1.8, we are just handling the dev builds inbetween for some reason.
-        if (protocolVersion < 29) {
-            writeShort(data.length);
-        }
-
-        writeByteArray(data);
-    }
 }

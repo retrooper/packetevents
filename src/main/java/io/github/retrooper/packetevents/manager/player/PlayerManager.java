@@ -103,6 +103,11 @@ public class PlayerManager {
         return version;
     }
 
+    public void spoofIncomingPacket(ChannelAbstract channel, SendablePacketWrapper<?> wrapper) {
+        wrapper.createPacket();
+        spoofIncomingPacket(channel, wrapper.byteBuf);
+    }
+
     public void spoofIncomingPacket(ChannelAbstract channel, ByteBufAbstract byteBuf) {
         //TODO Also check if our encoder is RIGHT before minecraft's,
         //if it is, then don't use context to writeflush, otherwise use it (to support multiple packetevents instances)
@@ -110,7 +115,7 @@ public class PlayerManager {
             channel.pipeline().fireChannelRead(byteBuf);
         }
         else {
-            channel.pipeline().context(PacketEvents.get().encoderName).fireChannelRead(byteBuf);
+            channel.pipeline().context(PacketEvents.get().decoderName).fireChannelRead(byteBuf);
         }
     }
 
@@ -125,7 +130,7 @@ public class PlayerManager {
         }
     }
 
-    public void sendPacket(ChannelAbstract channel, SendablePacketWrapper wrapper) {
+    public void sendPacket(ChannelAbstract channel, SendablePacketWrapper<?> wrapper) {
         wrapper.createPacket();
         sendPacket(channel, wrapper.byteBuf);
     }
@@ -135,54 +140,11 @@ public class PlayerManager {
         sendPacket(channel, byteBuf);
     }
 
-    public void sendPacket(Player player, SendablePacketWrapper wrapper) {
+    public void sendPacket(Player player, SendablePacketWrapper<?> wrapper) {
         wrapper.createPacket();
         ChannelAbstract channel = ChannelAbstract.generate(getChannel(player));
         sendPacket(channel, wrapper.byteBuf);
     }
-
-
-
-/*
-    public void writePacket(Player player, SendableWrapper wrapper) {
-        try {
-            Object nmsPacket = wrapper.asNMSPacket();
-            PacketEvents.get().getInjector().writePacket(getChannel(player), nmsPacket);
-        }
-        catch (Exception ex) {
-            ex.printStackTrace();
-        }
-    }
-
-    public void flushPackets(Player player) {
-        try {
-            PacketEvents.get().getInjector().flushPackets(getChannel(player));
-        }
-        catch (Exception ex) {
-            ex.printStackTrace();
-        }
-    }
-
-
-    public void sendPacket(Player player, SendableWrapper wrapper) {
-        try {
-            Object nmsPacket = wrapper.asNMSPacket();
-            PacketEvents.get().getInjector().sendPacket(getChannel(player), nmsPacket);
-        } catch (Exception ex) {
-            ex.printStackTrace();
-        }
-    }
-
-    @Deprecated
-    public void sendPacket(Object channel, SendableWrapper wrapper) {
-        try {
-            Object nmsPacket = wrapper.asNMSPacket();
-            PacketEvents.get().getInjector().sendPacket(channel, nmsPacket);
-        } catch (Exception ex) {
-            ex.printStackTrace();
-        }
-    }*/
-
 
     public WrappedGameProfile getGameProfile(Player player) {
         Object gameProfile = GameProfileUtil.getGameProfile(player.getUniqueId(), player.getName());

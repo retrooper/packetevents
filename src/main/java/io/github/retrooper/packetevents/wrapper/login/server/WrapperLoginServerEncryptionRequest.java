@@ -139,14 +139,4 @@ public class WrapperLoginServerEncryptionRequest extends SendablePacketWrapper<W
             return null;
         }
     }
-
-    @Override
-    public void createPacket() {
-        writeString(serverID, 20);
-        byte[] encoded = publicKey.getEncoded();
-        writeVarInt(encoded.length);
-        writeByteArray(encoded);
-        writeVarInt(verifyToken.length);
-        writeByteArray(verifyToken);
-    }
 }

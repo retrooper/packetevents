@@ -50,10 +50,10 @@ public class PacketEncoderModern extends MessageToMessageEncoder<ByteBuf> {
                 transformedBuf.readerIndex(readerIndex);
             });
             if (!packetSendEvent.isCancelled()) {
-                if (packetSendEvent.getPacketWrapper() != null) {
+                if (packetSendEvent.getCurrentPacketWrapper() != null) {
                     packetSendEvent.getByteBuf().clear();
-                    packetSendEvent.getPacketWrapper().writeVarInt(packetSendEvent.getPacketID());
-                    packetSendEvent.getPacketWrapper().writeData();
+                    packetSendEvent.getCurrentPacketWrapper().writeVarInt(packetSendEvent.getPacketID());
+                    packetSendEvent.getCurrentPacketWrapper().writeData();
                 }
                 transformedBuf.readerIndex(firstReaderIndex);
                 if (needsCompress) {

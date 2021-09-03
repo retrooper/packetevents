@@ -56,9 +56,4 @@ public class WrapperLoginServerSetCompression extends SendablePacketWrapper<Wrap
     public void setThreshold(int threshold) {
         this.threshold = threshold;
     }
-
-    @Override
-    public void createPacket() {
-        writeVarInt(threshold);
-    }
 }

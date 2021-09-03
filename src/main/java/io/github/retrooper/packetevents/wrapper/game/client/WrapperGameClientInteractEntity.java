@@ -21,13 +21,15 @@ package io.github.retrooper.packetevents.wrapper.game.client;
 import io.github.retrooper.packetevents.event.impl.PacketReceiveEvent;
 import io.github.retrooper.packetevents.manager.player.ClientVersion;
 import io.github.retrooper.packetevents.manager.player.Hand;
+import io.github.retrooper.packetevents.protocol.PacketType;
 import io.github.retrooper.packetevents.utils.vector.Vector3f;
 import io.github.retrooper.packetevents.utils.vector.Vector3i;
 import io.github.retrooper.packetevents.wrapper.PacketWrapper;
+import io.github.retrooper.packetevents.wrapper.SendablePacketWrapper;
 
 import java.util.Optional;
 
-public class WrapperGameClientInteractEntity extends PacketWrapper<WrapperGameClientInteractEntity> {
+public class WrapperGameClientInteractEntity extends SendablePacketWrapper<WrapperGameClientInteractEntity> {
     public enum Type {
         INTERACT, ATTACK, INTERACT_AT;
         public static final Type[] VALUES = values();
@@ -41,6 +43,15 @@ public class WrapperGameClientInteractEntity extends PacketWrapper<WrapperGameCl
 
     public WrapperGameClientInteractEntity(PacketReceiveEvent event) {
         super(event);
+    }
+
+    public WrapperGameClientInteractEntity(ClientVersion clientVersion, int entityID, Type type, Optional<Vector3f> target, Optional<Hand> hand, Optional<Boolean> sneaking) {
+        super(PacketType.Game.Client.INTERACT_ENTITY.getPacketID(clientVersion), clientVersion);
+        this.entityID = entityID;
+        this.type = type;
+        this.target = target;
+        this.hand = hand;
+        this.sneaking = sneaking;
     }
 
     @Override

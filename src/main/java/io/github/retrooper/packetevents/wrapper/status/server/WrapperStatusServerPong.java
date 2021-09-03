@@ -56,9 +56,4 @@ public class WrapperStatusServerPong extends SendablePacketWrapper<WrapperStatus
     public void setTime(long time) {
         this.time = time;
     }
-
-    @Override
-    public void createPacket() {
-        writeLong(time);
-    }
 }

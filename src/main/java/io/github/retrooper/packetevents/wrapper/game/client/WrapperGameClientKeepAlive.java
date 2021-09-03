@@ -20,18 +20,25 @@ package io.github.retrooper.packetevents.wrapper.game.client;
 
 import io.github.retrooper.packetevents.event.impl.PacketReceiveEvent;
 import io.github.retrooper.packetevents.manager.player.ClientVersion;
+import io.github.retrooper.packetevents.protocol.PacketType;
 import io.github.retrooper.packetevents.wrapper.PacketWrapper;
+import io.github.retrooper.packetevents.wrapper.SendablePacketWrapper;
 
 /**
  * This is the server-bound keep-alive packet.
  * The server will frequently send out a (client-bound) keep-alive, each containing a random ID.
  * The client is expected to respond with a (server-bound) keep-alive, containing the same ID that the server sent out.
  */
-public class WrapperGameClientKeepAlive extends PacketWrapper<WrapperGameClientKeepAlive> {
+public class WrapperGameClientKeepAlive extends SendablePacketWrapper<WrapperGameClientKeepAlive> {
     private long id;
 
     public WrapperGameClientKeepAlive(PacketReceiveEvent event) {
         super(event);
+    }
+
+    public WrapperGameClientKeepAlive(ClientVersion clientVersion, long id) {
+        super(PacketType.Game.Client.KEEP_ALIVE.getPacketID(clientVersion), clientVersion);
+        this.id = id;
     }
 
     @Override

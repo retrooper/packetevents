@@ -25,6 +25,7 @@ import io.github.retrooper.packetevents.protocol.protocols.clientbound.*;
 import io.github.retrooper.packetevents.protocol.protocols.serverbound.*;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.HashMap;
 import java.util.IdentityHashMap;
 import java.util.Map;
 
@@ -265,7 +266,12 @@ public final class PacketType {
             PLAYER_BLOCK_PLACEMENT,
             USE_ITEM;
 
+            public int getPacketID(ClientVersion clientVersion) {
+                return PACKET_TYPE_CACHE.get(clientVersion).getOrDefault(this, -1);
+            }
+
             private static final Map<ClientVersion, Map<Integer, PacketTypeCommon>> PACKET_ID_CACHE = new IdentityHashMap<>();
+            private static final Map<ClientVersion, Map<PacketTypeCommon, Integer>> PACKET_TYPE_CACHE = new HashMap<>();
 
 
             @Nullable
@@ -279,11 +285,14 @@ public final class PacketType {
 
             private static void loadPacketIDs(ClientVersion version, Enum<?>[] enumConstants) {
                 Map<Integer, PacketTypeCommon> innerMap = new IdentityHashMap<>();
+                Map<PacketTypeCommon, Integer> secondInnerMap = new IdentityHashMap<>();
                 for (int id = 0; id < enumConstants.length; id++) {
                     Client value = Client.valueOf(enumConstants[id].name());
                     innerMap.put(id, value);
+                    secondInnerMap.put(value, id);
                 }
                 PACKET_ID_CACHE.put(version, innerMap);
+                PACKET_TYPE_CACHE.put(version, secondInnerMap);
             }
 
             public static void load() {

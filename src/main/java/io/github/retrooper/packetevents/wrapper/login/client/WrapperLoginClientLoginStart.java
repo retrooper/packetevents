@@ -19,13 +19,21 @@
 package io.github.retrooper.packetevents.wrapper.login.client;
 
 import io.github.retrooper.packetevents.event.impl.PacketReceiveEvent;
+import io.github.retrooper.packetevents.manager.player.ClientVersion;
+import io.github.retrooper.packetevents.protocol.PacketType;
 import io.github.retrooper.packetevents.wrapper.PacketWrapper;
+import io.github.retrooper.packetevents.wrapper.SendablePacketWrapper;
 
-public class WrapperLoginClientLoginStart extends PacketWrapper<WrapperLoginClientLoginStart> {
+public class WrapperLoginClientLoginStart extends SendablePacketWrapper<WrapperLoginClientLoginStart> {
     private String username;
 
     public WrapperLoginClientLoginStart(PacketReceiveEvent event) {
         super(event);
+    }
+
+    public WrapperLoginClientLoginStart(ClientVersion clientVersion, String username) {
+        super(PacketType.Login.Client.LOGIN_START.getID(), clientVersion);
+        this.username = username;
     }
 
     @Override

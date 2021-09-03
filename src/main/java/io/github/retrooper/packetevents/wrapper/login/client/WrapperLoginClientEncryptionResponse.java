@@ -2,14 +2,22 @@ package io.github.retrooper.packetevents.wrapper.login.client;
 
 import io.github.retrooper.packetevents.event.impl.PacketReceiveEvent;
 import io.github.retrooper.packetevents.manager.player.ClientVersion;
+import io.github.retrooper.packetevents.protocol.PacketType;
 import io.github.retrooper.packetevents.wrapper.PacketWrapper;
+import io.github.retrooper.packetevents.wrapper.SendablePacketWrapper;
 
-public class WrapperLoginClientEncryptionResponse extends PacketWrapper<WrapperLoginClientEncryptionResponse> {
+public class WrapperLoginClientEncryptionResponse extends SendablePacketWrapper<WrapperLoginClientEncryptionResponse> {
     private byte[] sharedSecret;
     private byte[] verifyToken;
 
     public WrapperLoginClientEncryptionResponse(PacketReceiveEvent event) {
         super(event);
+    }
+
+    public WrapperLoginClientEncryptionResponse(ClientVersion clientVersion, byte[] sharedSecret, byte[] verifyToken) {
+        super(PacketType.Login.Client.ENCRYPTION_RESPONSE.getID(), clientVersion);
+        this.sharedSecret = sharedSecret;
+        this.verifyToken = verifyToken;
     }
 
     @Override

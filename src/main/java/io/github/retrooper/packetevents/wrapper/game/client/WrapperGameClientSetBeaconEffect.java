@@ -19,14 +19,23 @@
 package io.github.retrooper.packetevents.wrapper.game.client;
 
 import io.github.retrooper.packetevents.event.impl.PacketReceiveEvent;
+import io.github.retrooper.packetevents.manager.player.ClientVersion;
+import io.github.retrooper.packetevents.protocol.PacketType;
 import io.github.retrooper.packetevents.wrapper.PacketWrapper;
+import io.github.retrooper.packetevents.wrapper.SendablePacketWrapper;
 
-public class WrapperGameClientSetBeaconEffect extends PacketWrapper<WrapperGameClientSetBeaconEffect> {
+public class WrapperGameClientSetBeaconEffect extends SendablePacketWrapper<WrapperGameClientSetBeaconEffect> {
     private int primaryEffect;
     private int secondaryEffect;
 
     public WrapperGameClientSetBeaconEffect(PacketReceiveEvent event) {
         super(event);
+    }
+
+    public WrapperGameClientSetBeaconEffect(ClientVersion clientVersion, int primaryEffect, int secondaryEffect) {
+        super(PacketType.Game.Client.SET_BEACON_EFFECT.getPacketID(clientVersion), clientVersion);
+        this.primaryEffect = primaryEffect;
+        this.secondaryEffect = secondaryEffect;
     }
 
     @Override

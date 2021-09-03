@@ -64,9 +64,4 @@ public class WrapperGameServerPing extends SendablePacketWrapper<WrapperGameServ
     public void setID(int id) {
         this.id = id;
     }
-
-    @Override
-    public void createPacket() {
-        writeInt(id);
-    }
 }

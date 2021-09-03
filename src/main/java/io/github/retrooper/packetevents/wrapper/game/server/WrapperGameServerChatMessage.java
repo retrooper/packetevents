@@ -136,15 +136,4 @@ public class WrapperGameServerChatMessage extends SendablePacketWrapper<WrapperG
     public void setSenderUUID(UUID senderUUID) {
         this.senderUUID = senderUUID;
     }
-
-    @Override
-    public void createPacket() {
-        int maxLen = protocolVersion >= 393 ? MODERN_MESSAGE_LENGTH : LEGACY_MESSAGE_LENGTH;
-        this.jsonMessage = StringUtil.maximizeLength(jsonMessage, maxLen);
-        writeString(jsonMessage, maxLen);
-        writeByte((byte) position.ordinal());
-        if (protocolVersion >= 735) {
-            writeUUID(senderUUID);
-        }
-    }
 }

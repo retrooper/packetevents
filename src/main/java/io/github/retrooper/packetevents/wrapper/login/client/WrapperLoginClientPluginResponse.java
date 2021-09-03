@@ -1,15 +1,25 @@
 package io.github.retrooper.packetevents.wrapper.login.client;
 
 import io.github.retrooper.packetevents.event.impl.PacketReceiveEvent;
+import io.github.retrooper.packetevents.manager.player.ClientVersion;
+import io.github.retrooper.packetevents.protocol.PacketType;
 import io.github.retrooper.packetevents.wrapper.PacketWrapper;
+import io.github.retrooper.packetevents.wrapper.SendablePacketWrapper;
 
-public class WrapperLoginClientPluginResponse extends PacketWrapper<WrapperLoginClientPluginResponse> {
+public class WrapperLoginClientPluginResponse extends SendablePacketWrapper<WrapperLoginClientPluginResponse> {
     private int messageID;
     private boolean successful;
     private byte[] data;
 
     public WrapperLoginClientPluginResponse(PacketReceiveEvent event) {
         super(event);
+    }
+
+    public WrapperLoginClientPluginResponse(ClientVersion clientVersion, int messageID, boolean successful, byte[] data) {
+        super(PacketType.Login.Client.LOGIN_PLUGIN_RESPONSE.getID(), clientVersion);
+        this.messageID = messageID;
+        this.successful = successful;
+        this.data = data;
     }
 
     @Override

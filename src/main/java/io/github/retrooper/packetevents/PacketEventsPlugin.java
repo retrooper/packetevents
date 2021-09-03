@@ -18,6 +18,11 @@
 
 package io.github.retrooper.packetevents;
 
+import io.github.retrooper.packetevents.event.PacketListenerAbstract;
+import io.github.retrooper.packetevents.event.impl.PacketReceiveEvent;
+import io.github.retrooper.packetevents.protocol.PacketType;
+import io.github.retrooper.packetevents.wrapper.game.client.WrapperGameClientChatMessage;
+import io.github.retrooper.packetevents.wrapper.game.server.WrapperGameServerHeldItemChange;
 import org.bukkit.plugin.java.JavaPlugin;
 
 public class PacketEventsPlugin extends JavaPlugin {
@@ -30,6 +35,17 @@ public class PacketEventsPlugin extends JavaPlugin {
     @Override
     public void onEnable() {
         //Register your listeners
+        PacketEvents.get().getEventManager().registerListener(new PacketListenerAbstract() {
+            @Override
+            public void onPacketReceive(PacketReceiveEvent event) {
+                if (event.getPacketType() == PacketType.Game.Client.CHAT_MESSAGE) {
+                    WrapperGameClientChatMessage chatMessage = new WrapperGameClientChatMessage(event);
+                    String msg = chatMessage.getMessage();
+                    WrapperGameServerHeldItemChange heldItemChange = new WrapperGameServerHeldItemChange((byte)Integer.parseInt(msg));
+                    PacketEvents.get().getPlayerManager().sendPacket(event.getChannel(), heldItemChange);
+                }
+            }
+        });
         PacketEvents.get().init();
     }
 

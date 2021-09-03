@@ -1,13 +1,21 @@
 package io.github.retrooper.packetevents.wrapper.status.client;
 
 import io.github.retrooper.packetevents.event.impl.PacketReceiveEvent;
+import io.github.retrooper.packetevents.manager.player.ClientVersion;
+import io.github.retrooper.packetevents.protocol.PacketType;
 import io.github.retrooper.packetevents.wrapper.PacketWrapper;
+import io.github.retrooper.packetevents.wrapper.SendablePacketWrapper;
 
-public class WrapperStatusClientPing extends PacketWrapper<WrapperStatusClientPing> {
+public class WrapperStatusClientPing extends SendablePacketWrapper<WrapperStatusClientPing> {
     private long time;
 
     public WrapperStatusClientPing(PacketReceiveEvent event) {
         super(event);
+    }
+
+    public WrapperStatusClientPing(long time) {
+        super(PacketType.Status.Client.PING.getID(), ClientVersion.UNKNOWN);
+        this.time = time;
     }
 
     @Override

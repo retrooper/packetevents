@@ -101,18 +101,4 @@ public class WrapperLoginServerLoginSuccess extends SendablePacketWrapper<Wrappe
     public void setUsername(String username) {
         this.username = username;
     }
-
-    @Override
-    public void createPacket() {
-        if (protocolVersion >= 735) {
-            int[] data = serializeUUID(uuid);
-            for (int i = 0; i < 4; i++) {
-                int value = data[i];
-                writeInt(value);
-            }
-        } else {
-            writeString(uuid.toString(), 36);
-        }
-        writeString(username, 16);
-    }
 }
