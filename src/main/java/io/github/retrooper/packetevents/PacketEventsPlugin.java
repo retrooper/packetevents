@@ -35,18 +35,6 @@ public class PacketEventsPlugin extends JavaPlugin {
     @Override
     public void onEnable() {
         //Register your listeners
-        PacketEvents.get().getEventManager().registerListener(new PacketListenerAbstract() {
-            @Override
-            public void onPacketReceive(PacketReceiveEvent event) {
-                if (event.getPacketType() == PacketType.Game.Client.CHAT_MESSAGE) {
-                    WrapperGameClientChatMessage chatMessage = new WrapperGameClientChatMessage(event);
-                }
-                else if (event.getPacketType() == PacketType.Game.Client.INTERACT_ENTITY) {
-                    WrapperGameClientInteractEntity interactEntity = new WrapperGameClientInteractEntity(event);
-                    event.getPlayer().sendMessage("we attacked entity id: " + interactEntity.getEntityID() + ", type: " + interactEntity.getType().name());
-                }
-            }
-        });
         PacketEvents.get().init();
     }
 
