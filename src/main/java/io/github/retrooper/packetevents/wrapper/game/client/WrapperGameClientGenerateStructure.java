@@ -20,7 +20,7 @@ package io.github.retrooper.packetevents.wrapper.game.client;
 
 import io.github.retrooper.packetevents.event.impl.PacketReceiveEvent;
 import io.github.retrooper.packetevents.utils.vector.Vector3i;
-import io.github.retrooper.packetevents.utils.wrapper.PacketWrapperUtils;
+import io.github.retrooper.packetevents.utils.PacketWrapperUtil;
 import io.github.retrooper.packetevents.wrapper.PacketWrapper;
 
 /**
@@ -38,7 +38,7 @@ public class WrapperGameClientGenerateStructure extends PacketWrapper<WrapperGam
     @Override
     public void readData() {
         long vectorLong = readLong();
-        this.blockPosition = PacketWrapperUtils.readVectorFromLong(vectorLong);
+        this.blockPosition = PacketWrapperUtil.readVectorFromLong(vectorLong);
         this.levels = readVarInt();
         this.keepJigsaws = readBoolean();
     }
@@ -52,7 +52,7 @@ public class WrapperGameClientGenerateStructure extends PacketWrapper<WrapperGam
 
     @Override
     public void writeData() {
-        writeLong(PacketWrapperUtils.generateLongFromVector(this.blockPosition));
+        writeLong(PacketWrapperUtil.generateLongFromVector(this.blockPosition));
         writeVarInt(this.levels);
         writeBoolean(this.keepJigsaws);
     }

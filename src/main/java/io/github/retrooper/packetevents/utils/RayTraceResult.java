@@ -1,7 +1,6 @@
 /*
- *
- * This file is part of Bukkit - https://hub.spigotmc.org/stash/projects/SPIGOT/repos/bukkit/browse
- * Copyright (C) 2011 Bukkit author and contributors
+ * This file is part of packetevents - https://github.com/retrooper/packetevents
+ * Copyright (C) 2021 retrooper and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -15,10 +14,9 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- *
  */
 
-package io.github.retrooper.packetevents.utils.boundingbox;
+package io.github.retrooper.packetevents.utils;
 
 import org.apache.commons.lang.Validate;
 import org.bukkit.block.Block;

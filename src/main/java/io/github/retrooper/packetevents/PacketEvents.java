@@ -33,7 +33,7 @@ import io.github.retrooper.packetevents.settings.PacketEventsSettings;
 import io.github.retrooper.packetevents.updatechecker.UpdateChecker;
 import io.github.retrooper.packetevents.utils.guava.GuavaUtils;
 import io.github.retrooper.packetevents.utils.nms.MinecraftReflection;
-import io.github.retrooper.packetevents.utils.version.PEVersion;
+import io.github.retrooper.packetevents.utils.PEVersion;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
@@ -103,7 +103,6 @@ public final class PacketEvents implements Listener {
         load(plugin);
         if (!initialized) {
             settings = packetEventsSettings;
-            settings.lock();
 
             if (settings.shouldCheckForUpdates()) {
                 handleUpdateCheck(plugin);

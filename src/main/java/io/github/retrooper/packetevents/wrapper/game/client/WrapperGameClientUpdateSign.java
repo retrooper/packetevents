@@ -21,7 +21,7 @@ package io.github.retrooper.packetevents.wrapper.game.client;
 import io.github.retrooper.packetevents.event.impl.PacketReceiveEvent;
 import io.github.retrooper.packetevents.manager.player.ClientVersion;
 import io.github.retrooper.packetevents.utils.vector.Vector3i;
-import io.github.retrooper.packetevents.utils.wrapper.PacketWrapperUtils;
+import io.github.retrooper.packetevents.utils.PacketWrapperUtil;
 import io.github.retrooper.packetevents.wrapper.PacketWrapper;
 
 /**
@@ -39,7 +39,7 @@ public class WrapperGameClientUpdateSign extends PacketWrapper<WrapperGameClient
     public void readData() {
         if (clientVersion.isNewerThanOrEquals(ClientVersion.v_1_8)) {
             long position = readLong();
-            this.blockPosition = PacketWrapperUtils.readVectorFromLong(position);
+            this.blockPosition = PacketWrapperUtil.readVectorFromLong(position);
         } else {
             int x = readInt();
             int y = readShort();
@@ -60,7 +60,7 @@ public class WrapperGameClientUpdateSign extends PacketWrapper<WrapperGameClient
     @Override
     public void writeData() {
         if (clientVersion.isNewerThanOrEquals(ClientVersion.v_1_8)) {
-            long positionVector = PacketWrapperUtils.generateLongFromVector(blockPosition);
+            long positionVector = PacketWrapperUtil.generateLongFromVector(blockPosition);
             writeLong(positionVector);
         } else {
             writeInt(blockPosition.x);

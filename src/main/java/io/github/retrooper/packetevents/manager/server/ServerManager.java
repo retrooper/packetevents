@@ -18,7 +18,7 @@
 
 package io.github.retrooper.packetevents.manager.server;
 
-import io.github.retrooper.packetevents.utils.boundingbox.BoundingBox;
+import io.github.retrooper.packetevents.utils.BoundingBox;
 import io.github.retrooper.packetevents.utils.nms.MinecraftReflection;
 import io.github.retrooper.packetevents.utils.reflection.ReflectionObject;
 import org.bukkit.Bukkit;

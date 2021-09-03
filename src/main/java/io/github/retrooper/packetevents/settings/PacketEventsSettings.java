@@ -27,8 +27,6 @@ import io.github.retrooper.packetevents.manager.server.ServerVersion;
  * @since 1.5.8
  */
 public class PacketEventsSettings {
-    //TODO Look at settings
-    private boolean locked;
     private ServerVersion fallbackServerVersion = ServerVersion.v_1_7_10;
 
     /**
@@ -44,15 +42,6 @@ public class PacketEventsSettings {
     private boolean bStatsEnabled = true;
 
     /**
-     * This method locks the settings.
-     * If the settings are locked, you won't be able to modify any settings using the setters.
-     */
-    public PacketEventsSettings lock() {
-        this.locked = true;
-        return this;
-    }
-
-    /**
      * This is the server version PacketEvents should assume the server is when detecting
      * the server version fails using the Bukkit API.
      * This seems to be most common on 1.7.10 paper forks.
@@ -61,9 +50,7 @@ public class PacketEventsSettings {
      * @return Settings instance.
      */
     public PacketEventsSettings fallbackServerVersion(ServerVersion version) {
-        if (!locked) {
-            this.fallbackServerVersion = version;
-        }
+        this.fallbackServerVersion = version;
         return this;
     }
 
@@ -74,9 +61,7 @@ public class PacketEventsSettings {
      * @return Settings instance.
      */
     public PacketEventsSettings checkForUpdates(boolean checkForUpdates) {
-        if (!locked) {
-            this.checkForUpdates = checkForUpdates;
-        }
+        this.checkForUpdates = checkForUpdates;
         return this;
     }
 
@@ -87,21 +72,8 @@ public class PacketEventsSettings {
      * @return Settings instance.
      */
     public PacketEventsSettings bStats(boolean bStatsEnabled) {
-        if (!locked) {
             this.bStatsEnabled = bStatsEnabled;
-        }
         return this;
-    }
-
-
-    /**
-     * Are the settings locked?
-     *
-     * @return Is locked.
-     * @see #lock()
-     */
-    public boolean isLocked() {
-        return locked;
     }
 
     /**

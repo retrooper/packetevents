@@ -18,18 +18,9 @@
 
 package io.github.retrooper.packetevents;
 
-import io.github.retrooper.packetevents.event.PacketListenerAbstract;
-import io.github.retrooper.packetevents.event.PacketListenerPriority;
-import io.github.retrooper.packetevents.event.impl.PacketReceiveEvent;
-import io.github.retrooper.packetevents.protocol.PacketType;
-import io.github.retrooper.packetevents.wrapper.game.client.WrapperGameClientChatMessage;
-import io.github.retrooper.packetevents.wrapper.game.client.WrapperGameClientInteractEntity;
-import io.github.retrooper.packetevents.wrapper.game.server.WrapperGameServerHeldItemChange;
-import org.bukkit.entity.Entity;
 import org.bukkit.plugin.java.JavaPlugin;
 
 public class PacketEventsPlugin extends JavaPlugin {
-    //TODO Complete the legacy handlers.
     @Override
     public void onLoad() {
         PacketEvents.get().load(this);
@@ -38,35 +29,7 @@ public class PacketEventsPlugin extends JavaPlugin {
 
     @Override
     public void onEnable() {
-        PacketEvents.get().getEventManager().registerListener(new PacketListenerAbstract(PacketListenerPriority.NORMAL) {
-            public void onPacketReceive(PacketReceiveEvent event) {
-                if (event.getPacketType() == PacketType.Game.Client.INTERACT_ENTITY) {
-                    WrapperGameClientInteractEntity interactEntity = new WrapperGameClientInteractEntity(event);
-                    int entityID = interactEntity.getEntityID();
-                    Entity entity = PacketEvents.get().getServerManager().getEntityByID(entityID);
-                    event.getPlayer().sendMessage("entity name: " + entity.getName());
-                    event.getPlayer().sendMessage("action: " + interactEntity.getType().name());
-                    WrapperGameServerHeldItemChange heldItemChange = new WrapperGameServerHeldItemChange((byte) 7);
-                    PacketEvents.get().getPlayerManager().sendPacket(event.getChannel(), heldItemChange);
-                }
-                else if (event.getPacketType() == PacketType.Game.Client.CHAT_MESSAGE) {
-                    WrapperGameClientChatMessage chatMessage = new WrapperGameClientChatMessage(event);
-                    String msg = chatMessage.getMessage();
-                    event.getPlayer().sendMessage("modifying " + msg);
-                    chatMessage.setMessage("edited: " + msg);
-                }
-            }
-        });
-
-        PacketEvents.get().getEventManager().registerListener(new PacketListenerAbstract(PacketListenerPriority.HIGH) {
-            public void onPacketReceive(PacketReceiveEvent event) {
-              if (event.getPacketType() == PacketType.Game.Client.CHAT_MESSAGE) {
-                    WrapperGameClientChatMessage chatMessage = new WrapperGameClientChatMessage(event);
-                    String msg = chatMessage.getMessage();
-                    event.getPlayer().sendMessage("second listener can see: " + msg);
-                }
-            }
-        });
+        //Register your listeners
         PacketEvents.get().init();
     }
 

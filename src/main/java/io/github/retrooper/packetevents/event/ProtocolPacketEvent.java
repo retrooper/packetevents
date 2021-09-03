@@ -29,7 +29,7 @@ import io.github.retrooper.packetevents.protocol.PacketType;
 import io.github.retrooper.packetevents.protocol.PacketTypeCommon;
 import io.github.retrooper.packetevents.utils.netty.buffer.ByteBufAbstract;
 import io.github.retrooper.packetevents.utils.netty.channel.ChannelAbstract;
-import io.github.retrooper.packetevents.utils.wrapper.PacketWrapperUtils;
+import io.github.retrooper.packetevents.utils.PacketWrapperUtil;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -80,7 +80,7 @@ public abstract class ProtocolPacketEvent extends PacketEvent implements PlayerE
         this.serverVersion = PacketEvents.get().getServerManager().getVersion();
 
         this.byteBuf = byteBuf;
-        this.packetID = PacketWrapperUtils.readVarInt(byteBuf);
+        this.packetID = PacketWrapperUtil.readVarInt(byteBuf);
         this.packetType = PacketType.getById(packetSide, connectionState, clientVersion, packetID);
     }
 

@@ -16,14 +16,19 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package io.github.retrooper.packetevents.utils.geyser;
+package io.github.retrooper.packetevents.utils;
 
-import org.geysermc.connector.GeyserConnector;
+public class EnumUtil {
+    public static Enum<?> valueOf(Class<? extends Enum<?>> cls, String constantName) {
+        for (Enum<?> enumConstant : cls.getEnumConstants()) {
+            if (enumConstant.name().equals(constantName)) {
+                return enumConstant;
+            }
+        }
+        return null;
+    }
 
-import java.util.UUID;
-
-public class GeyserUtils {
-    public static boolean isGeyserPlayer(UUID uuid) {
-        return GeyserConnector.getInstance().getPlayerByUuid(uuid) != null;
+    public static Enum<?> valueByIndex(Class<? extends Enum<?>> cls, int index) {
+        return cls.getEnumConstants()[index];
     }
 }

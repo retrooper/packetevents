@@ -26,7 +26,7 @@ import io.github.retrooper.packetevents.utils.dependencies.v_1_7_10.SpigotVersio
 import io.github.retrooper.packetevents.utils.dependencies.viaversion.ViaVersionLookupUtils;
 import io.github.retrooper.packetevents.utils.gameprofile.GameProfileUtil;
 import io.github.retrooper.packetevents.utils.gameprofile.WrappedGameProfile;
-import io.github.retrooper.packetevents.utils.geyser.GeyserUtils;
+import io.github.retrooper.packetevents.utils.GeyserUtil;
 import io.github.retrooper.packetevents.utils.netty.buffer.ByteBufAbstract;
 import io.github.retrooper.packetevents.utils.netty.channel.ChannelAbstract;
 import io.github.retrooper.packetevents.utils.nms.MinecraftReflection;
@@ -193,14 +193,14 @@ public class PlayerManager {
         if (!PacketEvents.get().getServerManager().isGeyserAvailable()) {
             return false;
         }
-        return GeyserUtils.isGeyserPlayer(player.getUniqueId());
+        return GeyserUtil.isGeyserPlayer(player.getUniqueId());
     }
 
     public boolean isGeyserPlayer(UUID uuid) {
         if (!PacketEvents.get().getServerManager().isGeyserAvailable()) {
             return false;
         }
-        return GeyserUtils.isGeyserPlayer(uuid);
+        return GeyserUtil.isGeyserPlayer(uuid);
     }
 
     public void changeSkinProperty(Player player, Skin skin) {
