@@ -16,22 +16,27 @@ repositories {
     mavenLocal()
     maven {
         url 'https://hub.spigotmc.org/nexus/content/repositories/snapshots/'
+        allowInsecureProtocol = true
     }
 
     maven {
         url 'https://papermc.io/repo/repository/maven-public/'
+        allowInsecureProtocol = true
     }
 
     maven {
         url 'https://repo.opencollab.dev/maven-snapshots/'
+        allowInsecureProtocol = true
     }
 
     maven {
         url 'https://repo.opencollab.dev/maven-releases/'
+        allowInsecureProtocol = true
     }
 
     maven {
         url 'https://jitpack.io/'
+        allowInsecureProtocol = true
     }
 
     maven {
@@ -41,6 +46,7 @@ repositories {
 
     maven {
         url 'https://repo.viaversion.com/'
+        allowInsecureProtocol = true
     }
 
     maven {
@@ -50,6 +56,7 @@ repositories {
 
     maven {
         url 'https://repo.maven.apache.org/maven2/'
+        allowInsecureProtocol = true
     }
 }
 
