@@ -18,12 +18,17 @@
 
 package io.github.retrooper.packetevents.manager.server;
 
+import io.github.retrooper.packetevents.PacketEvents;
 import io.github.retrooper.packetevents.utils.BoundingBox;
+import io.github.retrooper.packetevents.utils.netty.buffer.ByteBufAbstract;
+import io.github.retrooper.packetevents.utils.netty.channel.ChannelAbstract;
 import io.github.retrooper.packetevents.utils.nms.MinecraftReflection;
 import io.github.retrooper.packetevents.utils.reflection.ReflectionObject;
+import io.github.retrooper.packetevents.wrapper.PacketWrapper;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.entity.Entity;
+import org.bukkit.entity.Player;
 import org.jetbrains.annotations.Nullable;
 import org.spigotmc.SpigotConfig;
 
@@ -93,6 +98,36 @@ public final class ServerManager {
         double maxY = wrappedBoundingBox.readDouble(4);
         double maxZ = wrappedBoundingBox.readDouble(5);
         return new BoundingBox(minX, minY, minZ, maxX, maxY, maxZ);
+    }
+
+    public void receivePacket(ChannelAbstract channel, ByteBufAbstract byteBuf) {
+        List<String> handlerNames = channel.pipeline().names();
+        String beforeDecoderHandlerName = null;
+        for (int i = 0; i < handlerNames.size(); i++) {
+            if (handlerNames.get(i).equals(PacketEvents.get().decoderName)) {
+                beforeDecoderHandlerName = handlerNames.get(i - 1);
+                break;
+            }
+        }
+        if (beforeDecoderHandlerName != null) {
+            channel.pipeline().context(beforeDecoderHandlerName).fireChannelRead(byteBuf.rawByteBuf());
+        }
+    }
+
+    public void receivePacket(Player player, ByteBufAbstract byteBuf) {
+        ChannelAbstract channel = ChannelAbstract.generate(PacketEvents.get().getPlayerManager().getChannel(player));
+        receivePacket(channel, byteBuf);
+    }
+
+    public void receivePacket(Player player, PacketWrapper<?> wrapper) {
+        wrapper.createPacket();
+        ChannelAbstract channel = ChannelAbstract.generate(PacketEvents.get().getPlayerManager().getChannel(player));
+        receivePacket(channel, wrapper.byteBuf);
+    }
+
+    public void receivePacket(ChannelAbstract channel, PacketWrapper<?> wrapper) {
+        wrapper.createPacket();
+        receivePacket(channel, wrapper.byteBuf);
     }
 
     private Entity getEntityByIDWithWorldUnsafe(World world, int id) {

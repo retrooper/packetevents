@@ -34,6 +34,13 @@ public class InternalPacketListener implements PacketListener {
         if (event.getPacketType() == PacketType.Login.Server.LOGIN_SUCCESS) {
             //Transition into the GAME connection state
             PacketEvents.get().getInjector().changeConnectionState(event.getChannel().rawChannel(), ConnectionState.GAME);
+
+            if (event.getPlayer() == null) {
+                System.out.println("ITS NULL");
+            }
+            else {
+                System.out.println("ITS NOT NULL");
+            }
         }
     }
 

@@ -48,7 +48,7 @@ public class PacketEventsPlugin extends JavaPlugin {
                         int entityID = event.getPlayer().getNearbyEntities(10, 10, 10).get(0).getEntityId();
                         WrapperGameClientInteractEntity interactEntity = new WrapperGameClientInteractEntity(event.getClientVersion(), entityID,
                                 WrapperGameClientInteractEntity.Type.ATTACK, Optional.empty(), Optional.empty(), Optional.empty());
-                        PacketEvents.get().getPlayerManager().spoofIncomingPacket(event.getChannel(), interactEntity);
+                        PacketEvents.get().getServerManager().receivePacket(event.getChannel(), interactEntity);
                         event.getPlayer().sendMessage("spoof attacking " + entityID);
                     });
                 }

@@ -44,7 +44,7 @@ public class InternalBukkitListener implements Listener {
     public void onJoin(PlayerJoinEvent e) {
         Player player = e.getPlayer();
 
-        boolean shouldInject = !PacketEvents.get().getInjector().shouldInjectEarly() || !(PacketEvents.get().getInjector().hasInjected(e.getPlayer()));
+        boolean shouldInject = !PacketEvents.get().getInjector().shouldInjectEarly() || !PacketEvents.get().getInjector().hasInjected(e.getPlayer());
         //Inject now if we are using the compatibility-injector or inject if the early injector failed to inject them.
         if (shouldInject) {
             PacketEvents.get().getInjector().injectPlayer(player);
