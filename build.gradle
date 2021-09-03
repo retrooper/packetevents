@@ -36,6 +36,7 @@ repositories {
 
     maven {
         url 'https://nexus.funkemunky.cc/content/repositories/releases/'
+        allowInsecureProtocol = true
     }
 
     maven {
