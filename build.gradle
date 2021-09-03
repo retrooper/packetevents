@@ -44,11 +44,11 @@ repositories {
 
     maven {
         url 'https://oss.sonatype.org/content/repositories/releases/'
+        allowInsecureProtocol = true
     }
 
     maven {
         url 'https://repo.maven.apache.org/maven2/'
-        allowInsecureProtocol = true
     }
 }
 
