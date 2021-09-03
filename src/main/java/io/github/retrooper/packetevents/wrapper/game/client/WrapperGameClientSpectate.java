@@ -22,7 +22,6 @@ import io.github.retrooper.packetevents.event.impl.PacketReceiveEvent;
 import io.github.retrooper.packetevents.manager.player.ClientVersion;
 import io.github.retrooper.packetevents.protocol.PacketType;
 import io.github.retrooper.packetevents.wrapper.PacketWrapper;
-import io.github.retrooper.packetevents.wrapper.PacketWrapper;
 
 import java.util.UUID;
 
@@ -30,7 +29,7 @@ import java.util.UUID;
  * Teleports the player to the given entity if the player is in spectator mode.
  */
 public class WrapperGameClientSpectate extends PacketWrapper<WrapperGameClientSpectate> {
-    private UUID uuid;
+    private UUID targetUUID;
 
     public WrapperGameClientSpectate(PacketReceiveEvent event) {
         super(event);
@@ -38,22 +37,22 @@ public class WrapperGameClientSpectate extends PacketWrapper<WrapperGameClientSp
 
     public WrapperGameClientSpectate(ClientVersion clientVersion, UUID uuid) {
         super(PacketType.Game.Client.SPECTATE.getPacketID(clientVersion), clientVersion);
-        this.uuid = uuid;
+        this.targetUUID = uuid;
     }
 
     @Override
     public void readData() {
-        this.uuid = readUUID();
+        this.targetUUID = readUUID();
     }
 
     @Override
     public void readData(WrapperGameClientSpectate wrapper) {
-        this.uuid = wrapper.uuid;
+        this.targetUUID = wrapper.targetUUID;
     }
 
     @Override
     public void writeData() {
-        writeUUID(uuid);
+        writeUUID(targetUUID);
     }
 
     /**
@@ -61,11 +60,11 @@ public class WrapperGameClientSpectate extends PacketWrapper<WrapperGameClientSp
      *
      * @return UUID of target entity
      */
-    public UUID getUUID() {
-        return uuid;
+    public UUID getTargetUUID() {
+        return targetUUID;
     }
 
-    public void setUUID(UUID uuid) {
-        this.uuid = uuid;
+    public void setTargetUUID(UUID uuid) {
+        this.targetUUID = uuid;
     }
 }
