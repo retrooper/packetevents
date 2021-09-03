@@ -22,27 +22,32 @@ import io.github.retrooper.packetevents.event.impl.PacketReceiveEvent;
 import io.github.retrooper.packetevents.manager.player.ClientVersion;
 import io.github.retrooper.packetevents.manager.player.Hand;
 import io.github.retrooper.packetevents.utils.vector.Vector3f;
+import io.github.retrooper.packetevents.utils.vector.Vector3i;
 import io.github.retrooper.packetevents.wrapper.PacketWrapper;
 
 import java.util.Optional;
 
-public class WrapperGameClientInteractEntity extends PacketWrapper {
+public class WrapperGameClientInteractEntity extends PacketWrapper<WrapperGameClientInteractEntity> {
     public enum Type {
         INTERACT, ATTACK, INTERACT_AT;
         public static final Type[] VALUES = values();
     }
 
-    private final int entityID;
-    private final Type type;
-    private final Optional<Vector3f> target;
-    private final Optional<Hand> hand;
-    private final Optional<Boolean> sneaking;
+    private int entityID;
+    private Type type;
+    private Optional<Vector3f> target;
+    private Optional<Hand> hand;
+    private Optional<Boolean> sneaking;
 
     public WrapperGameClientInteractEntity(PacketReceiveEvent event) {
         super(event);
+    }
+
+    @Override
+    public void readData() {
         if (clientVersion.isOlderThan(ClientVersion.v_1_8)) {
             this.entityID = readInt();
-            int typeIndex = readByte() % Type.VALUES.length;
+            byte typeIndex = readByte();
             this.type = Type.VALUES[typeIndex];
             this.target = Optional.empty();
             this.hand = Optional.empty();
@@ -51,7 +56,6 @@ public class WrapperGameClientInteractEntity extends PacketWrapper {
             this.entityID = readVarInt();
             int typeIndex = readVarInt();
             this.type = Type.VALUES[typeIndex];
-
             if (type == Type.INTERACT_AT) {
                 float x = readFloat();
                 float y = readFloat();
@@ -76,23 +80,78 @@ public class WrapperGameClientInteractEntity extends PacketWrapper {
         }
     }
 
+    @Override
+    public void readData(WrapperGameClientInteractEntity wrapper) {
+        this.entityID = wrapper.entityID;
+        this.type = wrapper.type;
+        this.target = wrapper.target;
+        this.hand = wrapper.hand;
+        this.sneaking = wrapper.sneaking;
+    }
+
+    @Override
+    public void writeData() {
+        if (clientVersion.isOlderThan(ClientVersion.v_1_8)) {
+            writeInt(entityID);
+            writeByte((byte) type.ordinal());
+        } else {
+            writeVarInt(entityID);
+            writeVarInt(type.ordinal());
+            if (type == Type.INTERACT_AT) {
+                Vector3f targetVec = target.orElse(new Vector3f(0.0F, 0.0F, 0.0F));
+                writeFloat(targetVec.x);
+                writeFloat(targetVec.y);
+                writeFloat(targetVec.z);
+            }
+
+            if (clientVersion.isNewerThan(ClientVersion.v_1_8) && (type == Type.INTERACT || type == Type.INTERACT_AT)) {
+                Hand handValue = hand.orElse(Hand.MAIN_HAND);
+                writeVarInt(handValue.ordinal());
+            }
+
+            if (clientVersion.isNewerThanOrEquals(ClientVersion.v_1_16)) {
+                writeBoolean(sneaking.orElse(false));
+            }
+        }
+    }
+
     public int getEntityID() {
         return entityID;
+    }
+
+    public void setEntityID(int entityID) {
+        this.entityID = entityID;
     }
 
     public Type getType() {
         return type;
     }
 
+    public void setType(Type type) {
+        this.type = type;
+    }
+
     public Optional<Vector3f> getTarget() {
         return target;
+    }
+
+    public void setTarget(Optional<Vector3f> target) {
+        this.target = target;
     }
 
     public Optional<Hand> getHand() {
         return hand;
     }
 
+    public void setHand(Optional<Hand> hand) {
+        this.hand = hand;
+    }
+
     public Optional<Boolean> isSneaking() {
         return sneaking;
+    }
+
+    public void setSneaking(Optional<Boolean> sneaking) {
+        this.sneaking = sneaking;
     }
 }

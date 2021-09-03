@@ -138,7 +138,7 @@ public final class MinecraftReflection {
     public static void init() {
         VERSION = PacketEvents.get().getServerManager().getVersion();
         V_1_17_OR_HIGHER = VERSION.isNewerThanOrEquals(ServerVersion.v_1_17);
-        V_1_17_OR_HIGHER = VERSION.isNewerThanOrEquals(ServerVersion.v_1_12);
+        V_1_12_OR_HIGHER = VERSION.isNewerThanOrEquals(ServerVersion.v_1_12);
         USE_MODERN_NETTY_PACKAGE = VERSION.isNewerThan(ServerVersion.v_1_7_10);
         try {
             //Check if the selected netty location is valid

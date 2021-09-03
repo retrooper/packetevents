@@ -28,25 +28,40 @@ import io.github.retrooper.packetevents.wrapper.SendablePacketWrapper;
  * Minecraft itself uses some plugin channels.
  * These internal channels are in the minecraft namespace.
  */
-public class WrapperGameServerPluginMessage extends SendablePacketWrapper {
-    private final String channelName;
-    private final byte[] data;
+public class WrapperGameServerPluginMessage extends SendablePacketWrapper<WrapperGameServerPluginMessage> {
+    private String channelName;
+    private byte[] data;
 
     public WrapperGameServerPluginMessage(PacketSendEvent event) {
         super(event);
-        this.channelName = readString();
-        if (getServerVersion().isNewerThanOrEquals(ServerVersion.v_1_8)) {
-            this.data = readByteArray(byteBuf.readableBytes());
-        } else {
-            int dataLength = readUnsignedShort();
-            this.data = readByteArray(dataLength);
-        }
     }
 
     public WrapperGameServerPluginMessage(String channelName, byte[] data) {
         super(PacketType.Game.Server.PLUGIN_MESSAGE.getID());
         this.channelName = channelName;
         this.data = data;
+    }
+
+    @Override
+    public void readData() {
+        this.channelName = readString();
+        int dataLength = getServerVersion().isNewerThanOrEquals(ServerVersion.v_1_8) ? byteBuf.readableBytes() : readUnsignedShort();
+        this.data = readByteArray(dataLength);
+    }
+
+    @Override
+    public void readData(WrapperGameServerPluginMessage wrapper) {
+        this.channelName = wrapper.channelName;
+        this.data = wrapper.data;
+    }
+
+    @Override
+    public void writeData() {
+        writeString(channelName);
+        if (getServerVersion().isOlderThan(ServerVersion.v_1_8)) {
+            writeShort(data.length);
+        }
+        writeByteArray(data);
     }
 
     /**
@@ -58,6 +73,10 @@ public class WrapperGameServerPluginMessage extends SendablePacketWrapper {
         return channelName;
     }
 
+    public void setChannelName(String channelName) {
+        this.channelName = channelName;
+    }
+
     /**
      * Any data, depending on the channel.
      *
@@ -65,6 +84,10 @@ public class WrapperGameServerPluginMessage extends SendablePacketWrapper {
      */
     public byte[] getData() {
         return data;
+    }
+
+    public void setData(byte[] data) {
+        this.data = data;
     }
 
     @Override

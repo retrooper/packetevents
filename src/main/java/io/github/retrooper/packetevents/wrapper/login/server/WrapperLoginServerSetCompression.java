@@ -22,12 +22,11 @@ import io.github.retrooper.packetevents.event.impl.PacketSendEvent;
 import io.github.retrooper.packetevents.protocol.PacketType;
 import io.github.retrooper.packetevents.wrapper.SendablePacketWrapper;
 
-public class WrapperLoginServerSetCompression extends SendablePacketWrapper {
-    private final int threshold;
+public class WrapperLoginServerSetCompression extends SendablePacketWrapper<WrapperLoginServerSetCompression> {
+    private int threshold;
 
     public WrapperLoginServerSetCompression(PacketSendEvent event) {
         super(event);
-        this.threshold = readVarInt();
     }
 
     public WrapperLoginServerSetCompression(int threshold) {
@@ -35,8 +34,27 @@ public class WrapperLoginServerSetCompression extends SendablePacketWrapper {
         this.threshold = threshold;
     }
 
+    @Override
+    public void readData() {
+        this.threshold = readVarInt();
+    }
+
+    @Override
+    public void readData(WrapperLoginServerSetCompression wrapper) {
+        this.threshold = wrapper.threshold;
+    }
+
+    @Override
+    public void writeData() {
+        writeVarInt(threshold);
+    }
+
     public int getThreshold() {
         return threshold;
+    }
+
+    public void setThreshold(int threshold) {
+        this.threshold = threshold;
     }
 
     @Override

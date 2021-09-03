@@ -26,12 +26,26 @@ import java.util.UUID;
 /**
  * Teleports the player to the given entity if the player is in spectator mode.
  */
-public class WrapperGameClientSpectate extends PacketWrapper {
-    private final UUID uuid;
+public class WrapperGameClientSpectate extends PacketWrapper<WrapperGameClientSpectate> {
+    private UUID uuid;
 
     public WrapperGameClientSpectate(PacketReceiveEvent event) {
         super(event);
+    }
+
+    @Override
+    public void readData() {
         this.uuid = readUUID();
+    }
+
+    @Override
+    public void readData(WrapperGameClientSpectate wrapper) {
+        this.uuid = wrapper.uuid;
+    }
+
+    @Override
+    public void writeData() {
+        writeUUID(uuid);
     }
 
     /**
@@ -41,5 +55,9 @@ public class WrapperGameClientSpectate extends PacketWrapper {
      */
     public UUID getUUID() {
         return uuid;
+    }
+
+    public void setUUID(UUID uuid) {
+        this.uuid = uuid;
     }
 }

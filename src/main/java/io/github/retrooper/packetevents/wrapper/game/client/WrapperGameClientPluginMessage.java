@@ -9,19 +9,34 @@ import io.github.retrooper.packetevents.wrapper.PacketWrapper;
  * Minecraft itself uses some plugin channels.
  * These internal channels are in the minecraft namespace.
  */
-public class WrapperGameClientPluginMessage extends PacketWrapper {
-    private final String channelName;
-    private final byte[] data;
+public class WrapperGameClientPluginMessage extends PacketWrapper<WrapperGameClientPluginMessage> {
+    private String channelName;
+    private byte[] data;
 
     public WrapperGameClientPluginMessage(PacketReceiveEvent event) {
         super(event);
+    }
+
+    @Override
+    public void readData() {
         this.channelName = readString();
-        if (clientVersion.isNewerThanOrEquals(ClientVersion.v_1_8)) {
-            this.data = readByteArray(byteBuf.readableBytes());
-        } else {
-            int dataLength = readShort();
-            this.data = readByteArray(dataLength);
+        int dataLength = clientVersion.isNewerThanOrEquals(ClientVersion.v_1_8) ? byteBuf.readableBytes() : readShort();
+        this.data = readByteArray(dataLength);
+    }
+
+    @Override
+    public void readData(WrapperGameClientPluginMessage wrapper) {
+        this.channelName = wrapper.channelName;
+        this.data = wrapper.data;
+    }
+
+    @Override
+    public void writeData() {
+        writeString(channelName);
+        if (clientVersion.isOlderThan(ClientVersion.v_1_8)) {
+            writeShort(this.data.length);
         }
+        writeByteArray(this.data);
     }
 
     /**
@@ -33,6 +48,10 @@ public class WrapperGameClientPluginMessage extends PacketWrapper {
         return channelName;
     }
 
+    public void setChannelName(String channelName) {
+        this.channelName = channelName;
+    }
+
     /**
      * Any data, depending on the channel.
      *
@@ -40,5 +59,9 @@ public class WrapperGameClientPluginMessage extends PacketWrapper {
      */
     public byte[] getData() {
         return data;
+    }
+
+    public void setData(byte[] data) {
+        this.data = data;
     }
 }

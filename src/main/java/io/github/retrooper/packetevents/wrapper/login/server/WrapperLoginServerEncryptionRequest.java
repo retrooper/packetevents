@@ -20,6 +20,7 @@ package io.github.retrooper.packetevents.wrapper.login.server;
 
 import io.github.retrooper.packetevents.event.impl.PacketSendEvent;
 import io.github.retrooper.packetevents.protocol.PacketType;
+import io.github.retrooper.packetevents.wrapper.PacketWrapper;
 import io.github.retrooper.packetevents.wrapper.SendablePacketWrapper;
 import io.github.retrooper.packetevents.wrapper.login.client.WrapperLoginClientEncryptionResponse;
 
@@ -35,19 +36,13 @@ import java.security.spec.X509EncodedKeySpec;
  *
  * @see WrapperLoginClientEncryptionResponse
  */
-public class WrapperLoginServerEncryptionRequest extends SendablePacketWrapper {
-    private final String serverID;
-    private final PublicKey publicKey;
-    private final byte[] verifyToken;
+public class WrapperLoginServerEncryptionRequest extends SendablePacketWrapper<WrapperLoginServerEncryptionRequest> {
+    private String serverID;
+    private PublicKey publicKey;
+    private byte[] verifyToken;
 
     public WrapperLoginServerEncryptionRequest(PacketSendEvent event) {
         super(event);
-        this.serverID = readString(20);
-        int publicKeyLength = readVarInt();
-        byte[] publicKeyBytes = readByteArray(publicKeyLength);
-        this.publicKey = encrypt(publicKeyBytes);
-        int verifyTokenLength = readVarInt();
-        this.verifyToken = readByteArray(verifyTokenLength);
     }
 
     public WrapperLoginServerEncryptionRequest(String serverID, byte[] publicKeyBytes, byte[] verifyToken) {
@@ -64,6 +59,33 @@ public class WrapperLoginServerEncryptionRequest extends SendablePacketWrapper {
         this.verifyToken = verifyToken;
     }
 
+    @Override
+    public void readData() {
+        this.serverID = readString(20);
+        int publicKeyLength = readVarInt();
+        byte[] publicKeyBytes = readByteArray(publicKeyLength);
+        this.publicKey = encrypt(publicKeyBytes);
+        int verifyTokenLength = readVarInt();
+        this.verifyToken = readByteArray(verifyTokenLength);
+    }
+
+    @Override
+    public void readData(WrapperLoginServerEncryptionRequest wrapper) {
+        this.serverID = wrapper.serverID;
+        this.publicKey = wrapper.publicKey;
+        this.verifyToken = wrapper.verifyToken;
+    }
+
+    @Override
+    public void writeData() {
+        writeString(serverID, 20);
+        byte[] encoded = publicKey.getEncoded();
+        writeVarInt(encoded.length);
+        writeByteArray(encoded);
+        writeVarInt(verifyToken.length);
+        writeByteArray(verifyToken);
+    }
+
     /**
      * This is an empty string on the vanilla client. (1.7.10 and above)
      *
@@ -71,6 +93,10 @@ public class WrapperLoginServerEncryptionRequest extends SendablePacketWrapper {
      */
     public String getServerID() {
         return serverID;
+    }
+
+    public void setServerID(String serverID) {
+        this.serverID = serverID;
     }
 
     /**
@@ -85,6 +111,10 @@ public class WrapperLoginServerEncryptionRequest extends SendablePacketWrapper {
         return publicKey;
     }
 
+    public void setPublicKey(PublicKey publicKey) {
+        this.publicKey = publicKey;
+    }
+
     /**
      * The verify token will be encrypted by the client and
      * sent to the server via the {@link WrapperLoginClientEncryptionResponse} packet.
@@ -93,6 +123,10 @@ public class WrapperLoginServerEncryptionRequest extends SendablePacketWrapper {
      */
     public byte[] getVerifyToken() {
         return verifyToken;
+    }
+
+    public void setVerifyToken(byte[] verifyToken) {
+        this.verifyToken = verifyToken;
     }
 
     private PublicKey encrypt(byte[] bytes) {

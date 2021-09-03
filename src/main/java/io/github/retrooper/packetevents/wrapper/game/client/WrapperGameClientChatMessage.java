@@ -20,21 +20,35 @@ package io.github.retrooper.packetevents.wrapper.game.client;
 
 import io.github.retrooper.packetevents.event.impl.PacketReceiveEvent;
 import io.github.retrooper.packetevents.manager.player.ClientVersion;
+import io.github.retrooper.packetevents.utils.StringUtil;
 import io.github.retrooper.packetevents.wrapper.PacketWrapper;
 
 /**
  * This packet is used to send a chat message to the server.
  */
-public class WrapperGameClientChatMessage extends PacketWrapper {
-    private final int packetID;
-    private final int maxMessageLength;
+public class WrapperGameClientChatMessage extends PacketWrapper<WrapperGameClientChatMessage> {
     private String message;
 
     public WrapperGameClientChatMessage(PacketReceiveEvent event) {
         super(event);
-        this.packetID = event.getPacketID();
-        this.maxMessageLength = clientVersion.isNewerThanOrEquals(ClientVersion.v_1_11) ? 256 : 100;
+    }
+
+    @Override
+    public void readData() {
+        int maxMessageLength = clientVersion.isNewerThanOrEquals(ClientVersion.v_1_11) ? 256 : 100;
         this.message = readString(maxMessageLength);
+    }
+
+    @Override
+    public void readData(WrapperGameClientChatMessage wrapper) {
+        this.message = wrapper.message;
+    }
+
+    @Override
+    public void writeData() {
+        int maxMessageLength = clientVersion.isNewerThanOrEquals(ClientVersion.v_1_11) ? 256 : 100;
+        this.message = StringUtil.maximizeLength(this.message, maxMessageLength);
+        writeString(this.message, maxMessageLength);
     }
 
     /**
@@ -49,10 +63,6 @@ public class WrapperGameClientChatMessage extends PacketWrapper {
     }
 
     public void setMessage(String message) {
-        //TODO For now we basically reset the packet, but we don't want that
-        this.message = message;
-        byteBuf.clear();
-        writeVarInt(packetID);
-        writeString(message, maxMessageLength);
+       this.message = message;
     }
 }

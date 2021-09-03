@@ -55,6 +55,11 @@ public class PacketDecoderModern extends MessageToMessageDecoder<ByteBuf> {
                 transformedBuf.readerIndex(readerIndex);
             });
             if (!packetReceiveEvent.isCancelled()) {
+                if (packetReceiveEvent.getPacketWrapper() != null) {
+                    packetReceiveEvent.getByteBuf().clear();
+                    packetReceiveEvent.getPacketWrapper().writeVarInt(packetReceiveEvent.getPacketID());
+                    packetReceiveEvent.getPacketWrapper().writeData();
+                }
                 transformedBuf.readerIndex(firstReaderIndex);
                 if (needsCompress) {
                     CompressionManager.recompress(ctx, transformedBuf);

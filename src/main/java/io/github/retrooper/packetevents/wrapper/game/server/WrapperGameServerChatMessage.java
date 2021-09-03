@@ -22,11 +22,13 @@ import io.github.retrooper.packetevents.event.impl.PacketSendEvent;
 import io.github.retrooper.packetevents.manager.player.ClientVersion;
 import io.github.retrooper.packetevents.manager.server.ServerVersion;
 import io.github.retrooper.packetevents.protocol.PacketType;
+import io.github.retrooper.packetevents.utils.StringUtil;
+import io.github.retrooper.packetevents.wrapper.PacketWrapper;
 import io.github.retrooper.packetevents.wrapper.SendablePacketWrapper;
 
 import java.util.UUID;
 
-public class WrapperGameServerChatMessage extends SendablePacketWrapper {
+public class WrapperGameServerChatMessage extends SendablePacketWrapper<WrapperGameServerChatMessage> {
     private static final int MODERN_MESSAGE_LENGTH = 262144;
     private static final int LEGACY_MESSAGE_LENGTH = 32767;
 
@@ -37,33 +39,11 @@ public class WrapperGameServerChatMessage extends SendablePacketWrapper {
     }
 
     private String jsonMessage;
-    private final ChatPosition position;
-    private final UUID senderUUID;
+    private ChatPosition position;
+    private UUID senderUUID;
 
     public WrapperGameServerChatMessage(PacketSendEvent event) {
         super(event);
-        if (getServerVersion().isNewerThanOrEquals(ServerVersion.v_1_13)) {
-            this.jsonMessage = readString(MODERN_MESSAGE_LENGTH);
-        }
-        else {
-            this.jsonMessage = readString();
-        }
-        //Is the server 1.8+ or is the client 1.8+? 1.7.10 servers support 1.8 clients, and send the chat position.
-        if (getServerVersion().isNewerThanOrEquals(ServerVersion.v_1_8) || event.getClientVersion().isNewerThanOrEquals(ClientVersion.v_1_8)) {
-            byte positionIndex = readByte();
-            position = ChatPosition.VALUES[positionIndex];
-        }
-        else {
-            //Always chat in 1.7.10 protocol.
-            position = ChatPosition.CHAT;
-        }
-
-        if (getServerVersion().isNewerThanOrEquals(ServerVersion.v_1_16)) {
-            this.senderUUID = readUUID();
-        }
-        else {
-            this.senderUUID = new UUID(0L, 0L);
-        }
     }
 
     public WrapperGameServerChatMessage(String jsonMessage, ChatPosition position) {
@@ -80,24 +60,87 @@ public class WrapperGameServerChatMessage extends SendablePacketWrapper {
         this.senderUUID = senderUUID;
     }
 
+
+    @Override
+    public void readData() {
+        if (getServerVersion().isNewerThanOrEquals(ServerVersion.v_1_13)) {
+            this.jsonMessage = readString(MODERN_MESSAGE_LENGTH);
+        }
+        else {
+            this.jsonMessage = readString(LEGACY_MESSAGE_LENGTH);
+        }
+        //Is the server 1.8+ or is the client 1.8+? 1.7.10 servers support 1.8 clients, and send the chat position.
+        if (getServerVersion().isNewerThanOrEquals(ServerVersion.v_1_8) || getClientVersion().isNewerThanOrEquals(ClientVersion.v_1_8)) {
+            byte positionIndex = readByte();
+            position = ChatPosition.VALUES[positionIndex];
+        }
+        else {
+            //Always chat in 1.7.10 protocol.
+            position = ChatPosition.CHAT;
+        }
+
+        if (getServerVersion().isNewerThanOrEquals(ServerVersion.v_1_16)) {
+            this.senderUUID = readUUID();
+        }
+        else {
+            this.senderUUID = new UUID(0L, 0L);
+        }
+    }
+
+    @Override
+    public void readData(WrapperGameServerChatMessage wrapper) {
+        this.jsonMessage = wrapper.jsonMessage;
+        this.position = wrapper.position;
+        this.senderUUID = wrapper.senderUUID;
+    }
+
+    @Override
+    public void writeData() {
+        if (getServerVersion().isNewerThanOrEquals(ServerVersion.v_1_13)) {
+            writeString(jsonMessage, MODERN_MESSAGE_LENGTH);
+        }
+        else {
+            writeString(jsonMessage, LEGACY_MESSAGE_LENGTH);
+        }
+
+        //Is the server 1.8+ or is the client 1.8+? (1.7.10 servers support 1.8 clients, and send the chat position for 1.8 clients)
+        if (getServerVersion().isNewerThanOrEquals(ServerVersion.v_1_8) || getClientVersion().isNewerThanOrEquals(ClientVersion.v_1_8)) {
+            writeByte((byte) position.ordinal());
+        }
+
+        if (getServerVersion().isNewerThanOrEquals(ServerVersion.v_1_16)) {
+            writeUUID(senderUUID);
+        }
+    }
+
     public String getJSONMessage() {
         return jsonMessage;
+    }
+
+    public void setJSONMessage(String jsonMessage) {
+        this.jsonMessage = jsonMessage;
     }
 
     public ChatPosition getPosition() {
         return position;
     }
 
+    public void setPosition(ChatPosition position) {
+        this.position = position;
+    }
+
     public UUID getSenderUUID() {
         return senderUUID;
+    }
+
+    public void setSenderUUID(UUID senderUUID) {
+        this.senderUUID = senderUUID;
     }
 
     @Override
     public void createPacket() {
         int maxLen = protocolVersion >= 393 ? MODERN_MESSAGE_LENGTH : LEGACY_MESSAGE_LENGTH;
-        if (jsonMessage.length() > maxLen) {
-            jsonMessage = jsonMessage.substring(0, maxLen);
-        }
+        this.jsonMessage = StringUtil.maximizeLength(jsonMessage, maxLen);
         writeString(jsonMessage, maxLen);
         writeByte((byte) position.ordinal());
         if (protocolVersion >= 735) {

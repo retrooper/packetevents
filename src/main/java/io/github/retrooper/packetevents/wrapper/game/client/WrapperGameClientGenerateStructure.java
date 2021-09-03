@@ -26,16 +26,35 @@ import io.github.retrooper.packetevents.wrapper.PacketWrapper;
 /**
  * This packet is sent when Generate is pressed on the Jigsaw Block interface.
  */
-public class WrapperGameClientGenerateStructure extends PacketWrapper {
-    private final Vector3i blockPosition;
-    private final int levels;
-    private final boolean keepJigsaws;
+public class WrapperGameClientGenerateStructure extends PacketWrapper<WrapperGameClientGenerateStructure> {
+    private Vector3i blockPosition;
+    private int levels;
+    private boolean keepJigsaws;
 
     public WrapperGameClientGenerateStructure(PacketReceiveEvent event) {
         super(event);
-        this.blockPosition = PacketWrapperUtils.readVectorFromLong(readLong());
+    }
+
+    @Override
+    public void readData() {
+        long vectorLong = readLong();
+        this.blockPosition = PacketWrapperUtils.readVectorFromLong(vectorLong);
         this.levels = readVarInt();
         this.keepJigsaws = readBoolean();
+    }
+
+    @Override
+    public void readData(WrapperGameClientGenerateStructure wrapper) {
+        this.blockPosition = wrapper.blockPosition;
+        this.levels = wrapper.levels;
+        this.keepJigsaws = wrapper.keepJigsaws;
+    }
+
+    @Override
+    public void writeData() {
+        writeLong(PacketWrapperUtils.generateLongFromVector(this.blockPosition));
+        writeVarInt(this.levels);
+        writeBoolean(this.keepJigsaws);
     }
 
     /**
@@ -47,6 +66,10 @@ public class WrapperGameClientGenerateStructure extends PacketWrapper {
         return blockPosition;
     }
 
+    public void setBlockPosition(Vector3i blockPosition) {
+        this.blockPosition = blockPosition;
+    }
+
     /**
      * Value of the levels' slider/max depth to generate.
      *
@@ -56,6 +79,10 @@ public class WrapperGameClientGenerateStructure extends PacketWrapper {
         return levels;
     }
 
+    public void setLevels(int levels) {
+        this.levels = levels;
+    }
+
     /**
      * Should we keep the Jigsaws?
      *
@@ -63,5 +90,9 @@ public class WrapperGameClientGenerateStructure extends PacketWrapper {
      */
     public boolean isKeepingJigsaws() {
         return keepJigsaws;
+    }
+
+    public void setKeepJigsaws(boolean keepJigsaws) {
+        this.keepJigsaws = keepJigsaws;
     }
 }

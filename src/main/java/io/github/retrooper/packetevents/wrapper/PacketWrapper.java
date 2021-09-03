@@ -30,27 +30,57 @@ import java.nio.charset.StandardCharsets;
 import java.util.UUID;
 
 
-public class PacketWrapper {
+public class PacketWrapper<T extends PacketWrapper> {
     protected final ClientVersion clientVersion;
     private final ServerVersion serverVersion;
     public final ByteBufAbstract byteBuf;
+    private final int packetID;
 
-    public PacketWrapper(ClientVersion clientVersion, ServerVersion serverVersion, ByteBufAbstract byteBuf) {
+    public PacketWrapper(ClientVersion clientVersion, ServerVersion serverVersion, ByteBufAbstract byteBuf, int packetID) {
         this.clientVersion = clientVersion;
         this.serverVersion = serverVersion;
         this.byteBuf = byteBuf;
+        this.packetID = packetID;
     }
 
     public PacketWrapper(PacketReceiveEvent event) {
         this.clientVersion = event.getClientVersion();
         this.serverVersion = event.getServerVersion();
         this.byteBuf = event.getByteBuf();
+        this.packetID = event.getPacketID();
+        if (event.getPacketWrapper() == null) {
+            event.setPacketWrapper(this);
+            readData();
+        }
+        else {
+            readData((T) event.getPacketWrapper());
+        }
     }
 
     public PacketWrapper(PacketSendEvent event) {
-        this.clientVersion = ClientVersion.UNKNOWN;
+        this.clientVersion = event.getClientVersion();
         this.serverVersion = event.getServerVersion();
         this.byteBuf = event.getByteBuf();
+        this.packetID = event.getPacketID();
+        if (event.getPacketWrapper() == null) {
+            event.setPacketWrapper(this);
+            readData();
+        }
+        else {
+            readData((T) event.getPacketWrapper());
+        }
+    }
+
+    public void readData() {
+
+    }
+
+    public void readData(T wrapper) {
+
+    }
+
+    public void writeData() {
+
     }
 
     public ClientVersion getClientVersion() {
@@ -63,6 +93,15 @@ public class PacketWrapper {
 
     public ByteBufAbstract getByteBuf() {
         return byteBuf;
+    }
+
+    public int getPacketID() {
+        return packetID;
+    }
+
+    public void resetByteBuf() {
+        byteBuf.clear();
+        writeVarInt(packetID);
     }
 
     public byte readByte() {
@@ -204,6 +243,6 @@ public class PacketWrapper {
     }
 
     public static PacketWrapper createUniversalPacketWrapper(ByteBufAbstract byteBuf) {
-        return new PacketWrapper(ClientVersion.UNKNOWN, PacketEvents.get().getServerManager().getVersion(), byteBuf);
+        return new PacketWrapper(ClientVersion.UNKNOWN, PacketEvents.get().getServerManager().getVersion(), byteBuf, -1);
     }
 }

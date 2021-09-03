@@ -24,14 +24,30 @@ import io.github.retrooper.packetevents.wrapper.PacketWrapper;
 /**
  * This packet is used when clicking on window buttons. Until 1.14, this was only used by enchantment tables.
  */
-public class WrapperGameClientClickWindowButton extends PacketWrapper {
-    private final byte windowID;
-    private final byte buttonID;
+public class WrapperGameClientClickWindowButton extends PacketWrapper<WrapperGameClientClickWindowButton> {
+    private byte windowID;
+    private byte buttonID;
 
     public WrapperGameClientClickWindowButton(PacketReceiveEvent event) {
         super(event);
+    }
+
+    @Override
+    public void readData() {
         this.windowID = readByte();
         this.buttonID = readByte();
+    }
+
+    @Override
+    public void readData(WrapperGameClientClickWindowButton wrapper) {
+        this.windowID = wrapper.windowID;
+        this.buttonID = wrapper.buttonID;
+    }
+
+    @Override
+    public void writeData() {
+        writeByte(this.windowID);
+        writeByte(this.buttonID);
     }
 
     /**
@@ -43,6 +59,10 @@ public class WrapperGameClientClickWindowButton extends PacketWrapper {
         return windowID;
     }
 
+    public void setWindowID(byte windowID) {
+        this.windowID = windowID;
+    }
+
     /**
      * Meaning depends on the window type.
      * Learn more about its meaning on wiki.vg/Protocol.
@@ -51,5 +71,9 @@ public class WrapperGameClientClickWindowButton extends PacketWrapper {
      */
     public byte getButtonID() {
         return buttonID;
+    }
+
+    public void setButtonID(byte buttonID) {
+        this.buttonID = buttonID;
     }
 }

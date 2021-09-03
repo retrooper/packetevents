@@ -28,12 +28,26 @@ import io.github.retrooper.packetevents.wrapper.PacketWrapper;
  *
  * @see io.github.retrooper.packetevents.wrapper.game.server.WrapperGameServerPing
  */
-public class WrapperGameClientPong extends PacketWrapper {
-    private final int id;
+public class WrapperGameClientPong extends PacketWrapper<WrapperGameClientPong> {
+    private int id;
 
     public WrapperGameClientPong(PacketReceiveEvent event) {
         super(event);
+    }
+
+    @Override
+    public void readData() {
         this.id = readInt();
+    }
+
+    @Override
+    public void readData(WrapperGameClientPong wrapper) {
+        this.id = wrapper.id;
+    }
+
+    @Override
+    public void writeData() {
+        writeInt(id);
     }
 
     /**
@@ -43,5 +57,9 @@ public class WrapperGameClientPong extends PacketWrapper {
      */
     public int getID() {
         return id;
+    }
+
+    public void setID(int id) {
+        this.id = id;
     }
 }

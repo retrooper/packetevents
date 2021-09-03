@@ -75,7 +75,7 @@ public class PlayerManager {
             //Prioritize asking ViaVersion and ProtocolSupport as they modify the protocol version in the packet we access it from.
             if (VersionLookupUtils.isDependencyAvailable()) {
                 try {
-                    version = ClientVersion.getClientVersion(VersionLookupUtils.getProtocolVersion(player));
+                    version = ClientVersion.getClientVersionByProtocolVersion(VersionLookupUtils.getProtocolVersion(player));
                     clientVersions.put(channel, version);
                     return version;
                 } catch (Exception ex) {
@@ -96,7 +96,7 @@ public class PlayerManager {
                     //(WE DONT SUPPORT CUSTOM PROTOCOL VERSION HACKS other than viaversion & protocolsupport)
                     protocolVersion = PacketEvents.get().getServerManager().getVersion().getProtocolVersion();
                 }
-                version = ClientVersion.getClientVersion(protocolVersion);
+                version = ClientVersion.getClientVersionByProtocolVersion(protocolVersion);
                 clientVersions.put(channel, version);
             }
         }

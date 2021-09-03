@@ -23,10 +23,12 @@ import io.github.retrooper.packetevents.event.ProtocolPacketEvent;
 import io.github.retrooper.packetevents.protocol.PacketSide;
 import io.github.retrooper.packetevents.utils.netty.buffer.ByteBufAbstract;
 import io.github.retrooper.packetevents.utils.netty.channel.ChannelAbstract;
+import io.github.retrooper.packetevents.wrapper.PacketWrapper;
 import org.bukkit.entity.Player;
 
 public class PacketSendEvent extends ProtocolPacketEvent {
     private Runnable postTask = null;
+    private PacketWrapper packetWrapper;
 
     public PacketSendEvent(ChannelAbstract channel, Player player, ByteBufAbstract byteBuf, Runnable postTask) {
         super(PacketSide.SERVER, channel, player, byteBuf);
@@ -54,6 +56,14 @@ public class PacketSendEvent extends ProtocolPacketEvent {
 
     public void setPostTask(Runnable postTask) {
         this.postTask = postTask;
+    }
+
+    public PacketWrapper getPacketWrapper() {
+        return packetWrapper;
+    }
+
+    public void setPacketWrapper(PacketWrapper packetWrapper) {
+        this.packetWrapper = packetWrapper;
     }
 
     @Override

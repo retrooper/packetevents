@@ -22,20 +22,19 @@ import io.github.retrooper.packetevents.event.impl.PacketSendEvent;
 import io.github.retrooper.packetevents.manager.server.ServerVersion;
 import io.github.retrooper.packetevents.protocol.ConnectionState;
 import io.github.retrooper.packetevents.protocol.PacketType;
+import io.github.retrooper.packetevents.utils.StringUtil;
 import io.github.retrooper.packetevents.wrapper.SendablePacketWrapper;
 
 /**
  * This packet is used by the server to disconnect the client while in the {@link ConnectionState#LOGIN} connection state.
  */
-public class WrapperLoginServerDisconnect extends SendablePacketWrapper {
+public class WrapperLoginServerDisconnect extends SendablePacketWrapper<WrapperLoginServerDisconnect> {
     private static final int MODERN_REASON_LENGTH = 262144;
     private static final int LEGACY_REASON_LENGTH = 32767;
     private String reason;
 
     public WrapperLoginServerDisconnect(PacketSendEvent event) {
         super(event);
-        int reasonLength = getServerVersion().isNewerThanOrEquals(ServerVersion.v_1_14) ? MODERN_REASON_LENGTH : LEGACY_REASON_LENGTH;
-        this.reason = readString(reasonLength);
     }
 
     public WrapperLoginServerDisconnect(String reason) {
@@ -43,6 +42,22 @@ public class WrapperLoginServerDisconnect extends SendablePacketWrapper {
         this.reason = reason;
     }
 
+    @Override
+    public void readData() {
+        int reasonLength = getServerVersion().isNewerThanOrEquals(ServerVersion.v_1_14) ? MODERN_REASON_LENGTH : LEGACY_REASON_LENGTH;
+        this.reason = readString(reasonLength);
+    }
+
+    @Override
+    public void readData(WrapperLoginServerDisconnect wrapper) {
+        this.reason = wrapper.reason;
+    }
+
+    @Override
+    public void writeData() {
+        int reasonLength = getServerVersion().isNewerThanOrEquals(ServerVersion.v_1_14) ? MODERN_REASON_LENGTH : LEGACY_REASON_LENGTH;
+        writeString(reason, reasonLength);
+    }
 
     /**
      * The reason the server disconnected the client. (Specified by the server)
@@ -53,12 +68,14 @@ public class WrapperLoginServerDisconnect extends SendablePacketWrapper {
         return reason;
     }
 
+    public void setReason(String reason) {
+        this.reason = reason;
+    }
+
     @Override
     public void createPacket() {
         int maxLen = protocolVersion >= 477 ? MODERN_REASON_LENGTH : LEGACY_REASON_LENGTH;
-        if (reason.length() > maxLen) {
-            reason = reason.substring(0, maxLen);
-        }
+        reason = StringUtil.maximizeLength(reason, maxLen);
         writeString(reason, maxLen);
     }
 }

@@ -16,14 +16,15 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package io.github.retrooper.packetevents.protocol;
+package io.github.retrooper.packetevents.utils;
 
-/**
- * @author retrooper
- * @since 1.8
- */
-public enum ConnectionState {
-    HANDSHAKING, STATUS, LOGIN, GAME;
-
-    public static final ConnectionState[] VALUES = values();
+public class StringUtil {
+    public static String maximizeLength(String msg, int maxLength) {
+        if (msg.length() > maxLength) {
+            return msg.substring(0, maxLength);
+        }
+        else {
+            return msg;
+        }
+    }
 }

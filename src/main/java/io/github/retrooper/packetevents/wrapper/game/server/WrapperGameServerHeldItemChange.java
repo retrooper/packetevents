@@ -22,12 +22,11 @@ import io.github.retrooper.packetevents.event.impl.PacketSendEvent;
 import io.github.retrooper.packetevents.protocol.PacketType;
 import io.github.retrooper.packetevents.wrapper.SendablePacketWrapper;
 
-public class WrapperGameServerHeldItemChange extends SendablePacketWrapper {
-    private final byte slot;
+public class WrapperGameServerHeldItemChange extends SendablePacketWrapper<WrapperGameServerHeldItemChange> {
+    private byte slot;
 
     public WrapperGameServerHeldItemChange(PacketSendEvent event) {
         super(event);
-        this.slot = readByte();
     }
 
     public WrapperGameServerHeldItemChange(byte slot) {
@@ -35,10 +34,28 @@ public class WrapperGameServerHeldItemChange extends SendablePacketWrapper {
         this.slot = slot;
     }
 
+    @Override
+    public void readData() {
+        this.slot = readByte();
+    }
+
+    @Override
+    public void readData(WrapperGameServerHeldItemChange wrapper) {
+        this.slot = wrapper.slot;
+    }
+
+    @Override
+    public void writeData() {
+        writeByte(slot);
+    }
+
     public byte getSlot() {
         return slot;
     }
 
+    public void setSlot(byte slot) {
+        this.slot = slot;
+    }
 
     @Override
     public void createPacket() {

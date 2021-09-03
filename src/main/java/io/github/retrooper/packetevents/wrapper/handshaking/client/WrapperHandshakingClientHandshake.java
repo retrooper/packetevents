@@ -27,21 +27,42 @@ import io.github.retrooper.packetevents.wrapper.PacketWrapper;
  * This packet is the first packet the client should send.
  * It contains important data such as the client's protocol version.
  */
-public class WrapperHandshakingClientHandshake extends PacketWrapper {
-    private final int protocolVersion;
-    private final ClientVersion clientVersion;
-    private final String serverAddress;
-    private final int serverPort;
-    private final ConnectionState nextConnectionState;
+public class WrapperHandshakingClientHandshake extends PacketWrapper<WrapperHandshakingClientHandshake> {
+    private int protocolVersion;
+    private ClientVersion clientVersion;
+    private String serverAddress;
+    private int serverPort;
+    private ConnectionState nextConnectionState;
 
     public WrapperHandshakingClientHandshake(PacketReceiveEvent event) {
         super(event);
+    }
+
+    @Override
+    public void readData() {
         this.protocolVersion = readVarInt();
-        this.clientVersion = ClientVersion.getClientVersion(protocolVersion);
+        this.clientVersion = ClientVersion.getClientVersionByProtocolVersion(protocolVersion);
         this.serverAddress = readString();
         this.serverPort = readUnsignedShort();
         int nextStateIndex = readVarInt();
-        this.nextConnectionState = ConnectionState.values()[nextStateIndex];
+        this.nextConnectionState = ConnectionState.VALUES[nextStateIndex];
+    }
+
+    @Override
+    public void readData(WrapperHandshakingClientHandshake wrapper) {
+        this.protocolVersion = wrapper.protocolVersion;
+        this.clientVersion = wrapper.clientVersion;
+        this.serverAddress = wrapper.serverAddress;
+        this.serverPort = wrapper.serverPort;
+        this.nextConnectionState = wrapper.nextConnectionState;
+    }
+
+    @Override
+    public void writeData() {
+        writeVarInt(protocolVersion);
+        writeString(serverAddress);
+        writeShort(serverPort);
+        writeVarInt(nextConnectionState.ordinal());
     }
 
     /**
@@ -54,6 +75,11 @@ public class WrapperHandshakingClientHandshake extends PacketWrapper {
         return protocolVersion;
     }
 
+    public void setProtocolVersion(int protocolVersion) {
+        this.protocolVersion = protocolVersion;
+        setClientVersion(ClientVersion.getClientVersionByProtocolVersion(protocolVersion));
+    }
+
     /**
      * {@link ClientVersion} of the client.
      * This enum maps the protocol versions with the name of the release.
@@ -62,6 +88,11 @@ public class WrapperHandshakingClientHandshake extends PacketWrapper {
      */
     public ClientVersion getClientVersion() {
         return clientVersion;
+    }
+
+    public void setClientVersion(ClientVersion clientVersion) {
+        this.clientVersion = clientVersion;
+        setProtocolVersion(clientVersion.getProtocolVersion());
     }
 
     /**
@@ -73,6 +104,10 @@ public class WrapperHandshakingClientHandshake extends PacketWrapper {
         return serverAddress;
     }
 
+    public void setServerAddress(String serverAddress) {
+        this.serverAddress = serverAddress;
+    }
+
     /**
      * Port of the server.
      *
@@ -80,6 +115,10 @@ public class WrapperHandshakingClientHandshake extends PacketWrapper {
      */
     public int getServerPort() {
         return serverPort;
+    }
+
+    public void setServerPort(int serverPort) {
+        this.serverPort = serverPort;
     }
 
     /**
@@ -90,5 +129,9 @@ public class WrapperHandshakingClientHandshake extends PacketWrapper {
      */
     public ConnectionState getNextConnectionState() {
         return nextConnectionState;
+    }
+
+    public void setNextConnectionState(ConnectionState nextConnectionState) {
+        this.nextConnectionState = nextConnectionState;
     }
 }

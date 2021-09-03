@@ -26,16 +26,32 @@ import io.github.retrooper.packetevents.wrapper.PacketWrapper;
 /**
  * This packet is sent when the client swings their arm.
  */
-public class WrapperGameClientAnimation extends PacketWrapper {
-    private final Hand hand;
+public class WrapperGameClientAnimation extends PacketWrapper<WrapperGameClientAnimation> {
+    private Hand hand;
 
     public WrapperGameClientAnimation(PacketReceiveEvent event) {
         super(event);
+    }
+
+    @Override
+    public void readData() {
         if (clientVersion.isNewerThanOrEquals(ClientVersion.v_1_9)) {
             this.hand = Hand.VALUES[readVarInt()];
         } else {
             //Default to main hand, because 1.8 and 1.7.10 don't have an off-hand anyway.
             this.hand = Hand.MAIN_HAND;
+        }
+    }
+
+    @Override
+    public void readData(WrapperGameClientAnimation wrapper) {
+        this.hand = wrapper.hand;
+    }
+
+    @Override
+    public void writeData() {
+        if (clientVersion.isNewerThanOrEquals(ClientVersion.v_1_9)) {
+            writeVarInt(hand.ordinal());
         }
     }
 
@@ -48,5 +64,9 @@ public class WrapperGameClientAnimation extends PacketWrapper {
      */
     public Hand getHand() {
         return hand;
+    }
+
+    public void setHand(Hand hand) {
+        this.hand = hand;
     }
 }

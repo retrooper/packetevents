@@ -50,6 +50,11 @@ public class PacketEncoderLegacy extends MessageToMessageEncoder<ByteBuf> {
                 transformedBuf.readerIndex(readerIndex);
             });
             if (!packetSendEvent.isCancelled()) {
+                if (packetSendEvent.getPacketWrapper() != null) {
+                    packetSendEvent.getByteBuf().clear();
+                    packetSendEvent.getPacketWrapper().writeVarInt(packetSendEvent.getPacketID());
+                    packetSendEvent.getPacketWrapper().writeData();
+                }
                 transformedBuf.readerIndex(firstReaderIndex);
 
                 if (needsCompress) {

@@ -120,7 +120,7 @@ public enum ClientVersion {
      * @return ClientVersion
      */
     @NotNull
-    public static ClientVersion getClientVersion(int protocolVersion) {
+    public static ClientVersion getClientVersionByProtocolVersion(int protocolVersion) {
         if (protocolVersion == -1) {
             return ClientVersion.UNRESOLVED;
         } else if (protocolVersion < LOWEST_SUPPORTED_PROTOCOL_VERSION) {

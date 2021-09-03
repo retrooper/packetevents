@@ -21,15 +21,33 @@ package io.github.retrooper.packetevents.wrapper.login.client;
 import io.github.retrooper.packetevents.event.impl.PacketReceiveEvent;
 import io.github.retrooper.packetevents.wrapper.PacketWrapper;
 
-public class WrapperLoginClientLoginStart extends PacketWrapper {
-    private final String username;
+public class WrapperLoginClientLoginStart extends PacketWrapper<WrapperLoginClientLoginStart> {
+    private String username;
 
     public WrapperLoginClientLoginStart(PacketReceiveEvent event) {
         super(event);
+    }
+
+    @Override
+    public void readData() {
         this.username = readString(16);
+    }
+
+    @Override
+    public void readData(WrapperLoginClientLoginStart wrapper) {
+        this.username = wrapper.username;
+    }
+
+    @Override
+    public void writeData() {
+        writeString(username, 16);
     }
 
     public String getUsername() {
         return username;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
     }
 }

@@ -22,12 +22,11 @@ import io.github.retrooper.packetevents.event.impl.PacketSendEvent;
 import io.github.retrooper.packetevents.protocol.PacketType;
 import io.github.retrooper.packetevents.wrapper.SendablePacketWrapper;
 
-public class WrapperStatusServerPong extends SendablePacketWrapper {
-    private final long time;
+public class WrapperStatusServerPong extends SendablePacketWrapper<WrapperStatusServerPong> {
+    private long time;
 
     public WrapperStatusServerPong(PacketSendEvent event) {
         super(event);
-        this.time = readLong();
     }
 
     public WrapperStatusServerPong(long time) {
@@ -35,8 +34,27 @@ public class WrapperStatusServerPong extends SendablePacketWrapper {
         this.time = time;
     }
 
+    @Override
+    public void readData() {
+        this.time = readLong();
+    }
+
+    @Override
+    public void readData(WrapperStatusServerPong wrapper) {
+        this.time = wrapper.time;
+    }
+
+    @Override
+    public void writeData() {
+        writeLong(time);
+    }
+
     public long getTime() {
         return time;
+    }
+
+    public void setTime(long time) {
+        this.time = time;
     }
 
     @Override

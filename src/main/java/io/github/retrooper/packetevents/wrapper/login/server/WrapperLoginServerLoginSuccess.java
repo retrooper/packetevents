@@ -29,12 +29,16 @@ import java.util.UUID;
 /**
  * This packet switches the connection state to {@link ConnectionState#GAME}.
  */
-public class WrapperLoginServerLoginSuccess extends SendablePacketWrapper {
-    private final UUID uuid;
-    private final String username;
+public class WrapperLoginServerLoginSuccess extends SendablePacketWrapper<WrapperLoginServerLoginSuccess> {
+    private UUID uuid;
+    private String username;
 
     public WrapperLoginServerLoginSuccess(PacketSendEvent event) {
         super(event);
+    }
+
+    @Override
+    public void readData() {
         if (getServerVersion().isNewerThanOrEquals(ServerVersion.v_1_16)) {
             int[] data = new int[4];
             for (int i = 0; i < 4; i++) {
@@ -45,6 +49,25 @@ public class WrapperLoginServerLoginSuccess extends SendablePacketWrapper {
             this.uuid = UUID.fromString(readString(36));
         }
         this.username = readString(16);
+    }
+
+    @Override
+    public void readData(WrapperLoginServerLoginSuccess wrapper) {
+        this.uuid = wrapper.uuid;
+        this.username = wrapper.username;
+    }
+
+    @Override
+    public void writeData() {
+        if (getServerVersion().isNewerThanOrEquals(ServerVersion.v_1_16)) {
+            int[] data = serializeUUID(uuid);
+            for (int i = 0; i < 4; i++) {
+                writeInt(data[i]);
+            }
+        } else {
+            writeString(uuid.toString(), 36);
+        }
+        writeString(username, 16);
     }
 
     public WrapperLoginServerLoginSuccess(UUID uuid, String username) {
@@ -67,8 +90,16 @@ public class WrapperLoginServerLoginSuccess extends SendablePacketWrapper {
         return uuid;
     }
 
+    public void setUUID(UUID uuid) {
+        this.uuid = uuid;
+    }
+
     public String getUsername() {
         return username;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
     }
 
     @Override

@@ -27,12 +27,16 @@ import io.github.retrooper.packetevents.wrapper.PacketWrapper;
 /**
  * This message is sent from the client to the server when the “Done” button is pushed after placing a sign.
  */
-public class WrapperGameClientUpdateSign extends PacketWrapper {
-    private final Vector3i blockPosition;
+public class WrapperGameClientUpdateSign extends PacketWrapper<WrapperGameClientUpdateSign> {
+    private Vector3i blockPosition;
     private final String[] textLines = new String[4];
 
     public WrapperGameClientUpdateSign(PacketReceiveEvent event) {
         super(event);
+    }
+
+    @Override
+    public void readData() {
         if (clientVersion.isNewerThanOrEquals(ClientVersion.v_1_8)) {
             long position = readLong();
             this.blockPosition = PacketWrapperUtils.readVectorFromLong(position);
@@ -47,6 +51,27 @@ public class WrapperGameClientUpdateSign extends PacketWrapper {
         }
     }
 
+    @Override
+    public void readData(WrapperGameClientUpdateSign wrapper) {
+        this.blockPosition = wrapper.blockPosition;
+        System.arraycopy(wrapper.textLines, 0, this.textLines, 0, 4);
+    }
+
+    @Override
+    public void writeData() {
+        if (clientVersion.isNewerThanOrEquals(ClientVersion.v_1_8)) {
+            long positionVector = PacketWrapperUtils.generateLongFromVector(blockPosition);
+            writeLong(positionVector);
+        } else {
+            writeInt(blockPosition.x);
+            writeShort(blockPosition.y);
+            writeInt(blockPosition.z);
+        }
+        for (int i = 0; i < 4; i++) {
+            writeString(textLines[i], 384);
+        }
+    }
+
     /**
      * Block location of the sign.
      *
@@ -56,6 +81,10 @@ public class WrapperGameClientUpdateSign extends PacketWrapper {
         return blockPosition;
     }
 
+    public void setBlockPosition(Vector3i blockPosition) {
+        this.blockPosition = blockPosition;
+    }
+
     /**
      * The text lines in the sign.
      *
@@ -63,5 +92,9 @@ public class WrapperGameClientUpdateSign extends PacketWrapper {
      */
     public String[] getTextLines() {
         return textLines;
+    }
+
+    public void setTextLines(String[] textLines) {
+        System.arraycopy(textLines, 0, this.textLines, 0, 4);
     }
 }

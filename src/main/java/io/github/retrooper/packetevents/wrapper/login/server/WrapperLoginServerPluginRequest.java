@@ -22,16 +22,13 @@ import io.github.retrooper.packetevents.event.impl.PacketSendEvent;
 import io.github.retrooper.packetevents.protocol.PacketType;
 import io.github.retrooper.packetevents.wrapper.SendablePacketWrapper;
 
-public class WrapperLoginServerPluginRequest extends SendablePacketWrapper {
-    private final int messageID;
-    private final String channelName;
-    private final byte[] data;
+public class WrapperLoginServerPluginRequest extends SendablePacketWrapper<WrapperLoginServerPluginRequest> {
+    private int messageID;
+    private String channelName;
+    private byte[] data;
 
     public WrapperLoginServerPluginRequest(PacketSendEvent event) {
         super(event);
-        this.messageID = readVarInt();
-        this.channelName = readString();
-        this.data = readByteArray(byteBuf.readableBytes());
     }
 
     public WrapperLoginServerPluginRequest(int messageID, String channelName, byte[] data) {
@@ -41,16 +38,49 @@ public class WrapperLoginServerPluginRequest extends SendablePacketWrapper {
         this.data = data;
     }
 
+    @Override
+    public void readData() {
+        this.messageID = readVarInt();
+        this.channelName = readString();
+        this.data = readByteArray(byteBuf.readableBytes());
+    }
+
+    @Override
+    public void readData(WrapperLoginServerPluginRequest wrapper) {
+        this.messageID = wrapper.messageID;
+        this.channelName = wrapper.channelName;
+        this.data = wrapper.data;
+    }
+
+    @Override
+    public void writeData() {
+        writeVarInt(messageID);
+        writeString(channelName);
+        writeByteArray(data);
+    }
+
     public int getMessageID() {
         return messageID;
+    }
+
+    public void setMessageID(int messageID) {
+        this.messageID = messageID;
     }
 
     public String getChannelName() {
         return channelName;
     }
 
+    public void setChannelName(String channelName) {
+        this.channelName = channelName;
+    }
+
     public byte[] getData() {
         return data;
+    }
+
+    public void setData(byte[] data) {
+        this.data = data;
     }
 
     @Override

@@ -27,17 +27,37 @@ import io.github.retrooper.packetevents.wrapper.PacketWrapper;
  * The server will frequently send out a (client-bound) keep-alive, each containing a random ID.
  * The client is expected to respond with a (server-bound) keep-alive, containing the same ID that the server sent out.
  */
-public class WrapperGameClientKeepAlive extends PacketWrapper {
-    private final long id;
+public class WrapperGameClientKeepAlive extends PacketWrapper<WrapperGameClientKeepAlive> {
+    private long id;
 
     public WrapperGameClientKeepAlive(PacketReceiveEvent event) {
         super(event);
+    }
+
+    @Override
+    public void readData() {
         if (clientVersion.isNewerThanOrEquals(ClientVersion.v_1_12)) {
             this.id = readLong();
         } else if (clientVersion.isNewerThanOrEquals(ClientVersion.v_1_8)) {
             this.id = readVarInt();
         } else {
             this.id = readInt();
+        }
+    }
+
+    @Override
+    public void readData(WrapperGameClientKeepAlive wrapper) {
+        this.id = wrapper.id;
+    }
+
+    @Override
+    public void writeData() {
+        if (clientVersion.isNewerThanOrEquals(ClientVersion.v_1_12)) {
+            writeLong(id);
+        } else if (clientVersion.isNewerThanOrEquals(ClientVersion.v_1_8)) {
+            writeVarInt((int) id);
+        } else {
+            writeInt((int) id);
         }
     }
 
@@ -48,5 +68,9 @@ public class WrapperGameClientKeepAlive extends PacketWrapper {
      */
     public long getID() {
         return id;
+    }
+
+    public void setID(long id) {
+        this.id = id;
     }
 }

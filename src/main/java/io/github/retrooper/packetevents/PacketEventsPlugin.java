@@ -52,7 +52,18 @@ public class PacketEventsPlugin extends JavaPlugin {
                 else if (event.getPacketType() == PacketType.Game.Client.CHAT_MESSAGE) {
                     WrapperGameClientChatMessage chatMessage = new WrapperGameClientChatMessage(event);
                     String msg = chatMessage.getMessage();
+                    event.getPlayer().sendMessage("modifying " + msg);
                     chatMessage.setMessage("edited: " + msg);
+                }
+            }
+        });
+
+        PacketEvents.get().getEventManager().registerListener(new PacketListenerAbstract(PacketListenerPriority.HIGH) {
+            public void onPacketReceive(PacketReceiveEvent event) {
+              if (event.getPacketType() == PacketType.Game.Client.CHAT_MESSAGE) {
+                    WrapperGameClientChatMessage chatMessage = new WrapperGameClientChatMessage(event);
+                    String msg = chatMessage.getMessage();
+                    event.getPlayer().sendMessage("second listener can see: " + msg);
                 }
             }
         });
