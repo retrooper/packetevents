@@ -43,14 +43,15 @@ public class InternalPacketListener implements PacketListener {
             case HANDSHAKING:
                 if (event.getPacketType() == PacketType.Handshaking.Client.HANDSHAKE) {
                     WrapperHandshakingClientHandshake handshake = new WrapperHandshakingClientHandshake(event);
-                    //Read client version
                     ClientVersion clientVersion = handshake.getClientVersion();
-                    //Update client version in the event
+
+                    //Update client version for this event call
                     event.setClientVersion(clientVersion);
 
                     //Map netty channel with the client version.
                     Object rawChannel = event.getChannel().rawChannel();
                     PacketEvents.get().getPlayerManager().clientVersions.put(rawChannel, clientVersion);
+
                     //Transition into the LOGIN OR STATUS connection state
                     PacketEvents.get().getInjector().changeConnectionState(rawChannel, handshake.getNextConnectionState());
                 }
