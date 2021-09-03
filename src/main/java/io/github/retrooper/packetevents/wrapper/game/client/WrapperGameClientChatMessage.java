@@ -23,12 +23,12 @@ import io.github.retrooper.packetevents.manager.player.ClientVersion;
 import io.github.retrooper.packetevents.protocol.PacketType;
 import io.github.retrooper.packetevents.utils.StringUtil;
 import io.github.retrooper.packetevents.wrapper.PacketWrapper;
-import io.github.retrooper.packetevents.wrapper.SendablePacketWrapper;
+import io.github.retrooper.packetevents.wrapper.PacketWrapper;
 
 /**
  * This packet is used to send a chat message to the server.
  */
-public class WrapperGameClientChatMessage extends SendablePacketWrapper<WrapperGameClientChatMessage> {
+public class WrapperGameClientChatMessage extends PacketWrapper<WrapperGameClientChatMessage> {
     private String message;
 
     public WrapperGameClientChatMessage(PacketReceiveEvent event) {

@@ -24,11 +24,11 @@ import io.github.retrooper.packetevents.manager.server.ServerVersion;
 import io.github.retrooper.packetevents.protocol.PacketType;
 import io.github.retrooper.packetevents.utils.StringUtil;
 import io.github.retrooper.packetevents.wrapper.PacketWrapper;
-import io.github.retrooper.packetevents.wrapper.SendablePacketWrapper;
+import io.github.retrooper.packetevents.wrapper.PacketWrapper;
 
 import java.util.UUID;
 
-public class WrapperGameServerChatMessage extends SendablePacketWrapper<WrapperGameServerChatMessage> {
+public class WrapperGameServerChatMessage extends PacketWrapper<WrapperGameServerChatMessage> {
     private static final int MODERN_MESSAGE_LENGTH = 262144;
     private static final int LEGACY_MESSAGE_LENGTH = 32767;
 

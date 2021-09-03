@@ -22,8 +22,12 @@ import io.github.retrooper.packetevents.event.PacketListenerAbstract;
 import io.github.retrooper.packetevents.event.impl.PacketReceiveEvent;
 import io.github.retrooper.packetevents.protocol.PacketType;
 import io.github.retrooper.packetevents.wrapper.game.client.WrapperGameClientChatMessage;
+import io.github.retrooper.packetevents.wrapper.game.client.WrapperGameClientInteractEntity;
 import io.github.retrooper.packetevents.wrapper.game.server.WrapperGameServerHeldItemChange;
+import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
+
+import java.util.Optional;
 
 public class PacketEventsPlugin extends JavaPlugin {
     @Override
@@ -40,9 +44,17 @@ public class PacketEventsPlugin extends JavaPlugin {
             public void onPacketReceive(PacketReceiveEvent event) {
                 if (event.getPacketType() == PacketType.Game.Client.CHAT_MESSAGE) {
                     WrapperGameClientChatMessage chatMessage = new WrapperGameClientChatMessage(event);
-                    String msg = chatMessage.getMessage();
-                    WrapperGameServerHeldItemChange heldItemChange = new WrapperGameServerHeldItemChange((byte)Integer.parseInt(msg));
-                    PacketEvents.get().getPlayerManager().sendPacket(event.getChannel(), heldItemChange);
+                    Bukkit.getScheduler().runTask(PacketEventsPlugin.this, () -> {
+                        int entityID = event.getPlayer().getNearbyEntities(10, 10, 10).get(0).getEntityId();
+                        WrapperGameClientInteractEntity interactEntity = new WrapperGameClientInteractEntity(event.getClientVersion(), entityID,
+                                WrapperGameClientInteractEntity.Type.ATTACK, Optional.empty(), Optional.empty(), Optional.empty());
+                        PacketEvents.get().getPlayerManager().spoofIncomingPacket(event.getChannel(), interactEntity);
+                        event.getPlayer().sendMessage("spoof attacking " + entityID);
+                    });
+                }
+                else if (event.getPacketType() == PacketType.Game.Client.INTERACT_ENTITY) {
+                    WrapperGameClientInteractEntity interactEntity = new WrapperGameClientInteractEntity(event);
+                    event.getPlayer().sendMessage("we attacked entity id: " + interactEntity.getEntityID() + ", type: " + interactEntity.getType().name());
                 }
             }
         });

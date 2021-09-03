@@ -23,13 +23,13 @@ import io.github.retrooper.packetevents.manager.player.ClientVersion;
 import io.github.retrooper.packetevents.protocol.ConnectionState;
 import io.github.retrooper.packetevents.protocol.PacketType;
 import io.github.retrooper.packetevents.wrapper.PacketWrapper;
-import io.github.retrooper.packetevents.wrapper.SendablePacketWrapper;
+import io.github.retrooper.packetevents.wrapper.PacketWrapper;
 
 /**
  * This packet is the first packet the client should send.
  * It contains important data such as the client's protocol version.
  */
-public class WrapperHandshakingClientHandshake extends SendablePacketWrapper<WrapperHandshakingClientHandshake> {
+public class WrapperHandshakingClientHandshake extends PacketWrapper<WrapperHandshakingClientHandshake> {
     private int protocolVersion;
     private ClientVersion clientVersion;
     private String serverAddress;

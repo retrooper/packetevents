@@ -22,12 +22,12 @@ import io.github.retrooper.packetevents.event.impl.PacketReceiveEvent;
 import io.github.retrooper.packetevents.manager.player.ClientVersion;
 import io.github.retrooper.packetevents.protocol.PacketType;
 import io.github.retrooper.packetevents.wrapper.PacketWrapper;
-import io.github.retrooper.packetevents.wrapper.SendablePacketWrapper;
+import io.github.retrooper.packetevents.wrapper.PacketWrapper;
 
 /**
  * This packet is used when clicking on window buttons. Until 1.14, this was only used by enchantment tables.
  */
-public class WrapperGameClientClickWindowButton extends SendablePacketWrapper<WrapperGameClientClickWindowButton> {
+public class WrapperGameClientClickWindowButton extends PacketWrapper<WrapperGameClientClickWindowButton> {
     private byte windowID;
     private byte buttonID;
 

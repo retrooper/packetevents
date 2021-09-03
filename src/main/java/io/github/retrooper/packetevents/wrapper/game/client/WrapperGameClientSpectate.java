@@ -22,14 +22,14 @@ import io.github.retrooper.packetevents.event.impl.PacketReceiveEvent;
 import io.github.retrooper.packetevents.manager.player.ClientVersion;
 import io.github.retrooper.packetevents.protocol.PacketType;
 import io.github.retrooper.packetevents.wrapper.PacketWrapper;
-import io.github.retrooper.packetevents.wrapper.SendablePacketWrapper;
+import io.github.retrooper.packetevents.wrapper.PacketWrapper;
 
 import java.util.UUID;
 
 /**
  * Teleports the player to the given entity if the player is in spectator mode.
  */
-public class WrapperGameClientSpectate extends SendablePacketWrapper<WrapperGameClientSpectate> {
+public class WrapperGameClientSpectate extends PacketWrapper<WrapperGameClientSpectate> {
     private UUID uuid;
 
     public WrapperGameClientSpectate(PacketReceiveEvent event) {

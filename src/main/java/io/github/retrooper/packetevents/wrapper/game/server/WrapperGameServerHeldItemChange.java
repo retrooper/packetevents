@@ -20,9 +20,9 @@ package io.github.retrooper.packetevents.wrapper.game.server;
 
 import io.github.retrooper.packetevents.event.impl.PacketSendEvent;
 import io.github.retrooper.packetevents.protocol.PacketType;
-import io.github.retrooper.packetevents.wrapper.SendablePacketWrapper;
+import io.github.retrooper.packetevents.wrapper.PacketWrapper;
 
-public class WrapperGameServerHeldItemChange extends SendablePacketWrapper<WrapperGameServerHeldItemChange> {
+public class WrapperGameServerHeldItemChange extends PacketWrapper<WrapperGameServerHeldItemChange> {
     private byte slot;
 
     public WrapperGameServerHeldItemChange(PacketSendEvent event) {

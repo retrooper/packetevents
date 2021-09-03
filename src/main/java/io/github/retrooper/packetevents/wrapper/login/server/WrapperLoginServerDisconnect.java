@@ -23,12 +23,12 @@ import io.github.retrooper.packetevents.manager.server.ServerVersion;
 import io.github.retrooper.packetevents.protocol.ConnectionState;
 import io.github.retrooper.packetevents.protocol.PacketType;
 import io.github.retrooper.packetevents.utils.StringUtil;
-import io.github.retrooper.packetevents.wrapper.SendablePacketWrapper;
+import io.github.retrooper.packetevents.wrapper.PacketWrapper;
 
 /**
  * This packet is used by the server to disconnect the client while in the {@link ConnectionState#LOGIN} connection state.
  */
-public class WrapperLoginServerDisconnect extends SendablePacketWrapper<WrapperLoginServerDisconnect> {
+public class WrapperLoginServerDisconnect extends PacketWrapper<WrapperLoginServerDisconnect> {
     private static final int MODERN_REASON_LENGTH = 262144;
     private static final int LEGACY_REASON_LENGTH = 32767;
     private String reason;

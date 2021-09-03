@@ -20,18 +20,18 @@ package io.github.retrooper.packetevents.manager.player;
 
 import io.github.retrooper.packetevents.PacketEvents;
 import io.github.retrooper.packetevents.manager.server.ServerVersion;
+import io.github.retrooper.packetevents.utils.GeyserUtil;
 import io.github.retrooper.packetevents.utils.dependencies.VersionLookupUtils;
 import io.github.retrooper.packetevents.utils.dependencies.protocolsupport.ProtocolSupportVersionLookupUtils;
 import io.github.retrooper.packetevents.utils.dependencies.v_1_7_10.SpigotVersionLookup_1_7;
 import io.github.retrooper.packetevents.utils.dependencies.viaversion.ViaVersionLookupUtils;
 import io.github.retrooper.packetevents.utils.gameprofile.GameProfileUtil;
 import io.github.retrooper.packetevents.utils.gameprofile.WrappedGameProfile;
-import io.github.retrooper.packetevents.utils.GeyserUtil;
 import io.github.retrooper.packetevents.utils.netty.buffer.ByteBufAbstract;
 import io.github.retrooper.packetevents.utils.netty.channel.ChannelAbstract;
 import io.github.retrooper.packetevents.utils.nms.MinecraftReflection;
 import io.github.retrooper.packetevents.utils.nms.PlayerPingAccessorModern;
-import io.github.retrooper.packetevents.wrapper.SendablePacketWrapper;
+import io.github.retrooper.packetevents.wrapper.PacketWrapper;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
@@ -103,7 +103,7 @@ public class PlayerManager {
         return version;
     }
 
-    public void spoofIncomingPacket(ChannelAbstract channel, SendablePacketWrapper<?> wrapper) {
+    public void spoofIncomingPacket(ChannelAbstract channel, PacketWrapper<?> wrapper) {
         wrapper.createPacket();
         spoofIncomingPacket(channel, wrapper.byteBuf);
     }
@@ -130,7 +130,7 @@ public class PlayerManager {
         }
     }
 
-    public void sendPacket(ChannelAbstract channel, SendablePacketWrapper<?> wrapper) {
+    public void sendPacket(ChannelAbstract channel, PacketWrapper<?> wrapper) {
         wrapper.createPacket();
         sendPacket(channel, wrapper.byteBuf);
     }
@@ -140,7 +140,7 @@ public class PlayerManager {
         sendPacket(channel, byteBuf);
     }
 
-    public void sendPacket(Player player, SendablePacketWrapper<?> wrapper) {
+    public void sendPacket(Player player, PacketWrapper<?> wrapper) {
         wrapper.createPacket();
         ChannelAbstract channel = ChannelAbstract.generate(getChannel(player));
         sendPacket(channel, wrapper.byteBuf);

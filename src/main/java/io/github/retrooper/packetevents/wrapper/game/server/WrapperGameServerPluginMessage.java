@@ -21,14 +21,14 @@ package io.github.retrooper.packetevents.wrapper.game.server;
 import io.github.retrooper.packetevents.event.impl.PacketSendEvent;
 import io.github.retrooper.packetevents.manager.server.ServerVersion;
 import io.github.retrooper.packetevents.protocol.PacketType;
-import io.github.retrooper.packetevents.wrapper.SendablePacketWrapper;
+import io.github.retrooper.packetevents.wrapper.PacketWrapper;
 
 /**
  * Mods and plugins can use this to send their data.
  * Minecraft itself uses some plugin channels.
  * These internal channels are in the minecraft namespace.
  */
-public class WrapperGameServerPluginMessage extends SendablePacketWrapper<WrapperGameServerPluginMessage> {
+public class WrapperGameServerPluginMessage extends PacketWrapper<WrapperGameServerPluginMessage> {
     private String channelName;
     private byte[] data;
 

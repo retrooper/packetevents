@@ -20,9 +20,9 @@ package io.github.retrooper.packetevents.wrapper.status.server;
 
 import io.github.retrooper.packetevents.event.impl.PacketSendEvent;
 import io.github.retrooper.packetevents.protocol.PacketType;
-import io.github.retrooper.packetevents.wrapper.SendablePacketWrapper;
+import io.github.retrooper.packetevents.wrapper.PacketWrapper;
 
-public class WrapperStatusServerPong extends SendablePacketWrapper<WrapperStatusServerPong> {
+public class WrapperStatusServerPong extends PacketWrapper<WrapperStatusServerPong> {
     private long time;
 
     public WrapperStatusServerPong(PacketSendEvent event) {

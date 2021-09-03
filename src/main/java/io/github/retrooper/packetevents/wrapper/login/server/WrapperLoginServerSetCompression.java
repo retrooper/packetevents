@@ -20,9 +20,9 @@ package io.github.retrooper.packetevents.wrapper.login.server;
 
 import io.github.retrooper.packetevents.event.impl.PacketSendEvent;
 import io.github.retrooper.packetevents.protocol.PacketType;
-import io.github.retrooper.packetevents.wrapper.SendablePacketWrapper;
+import io.github.retrooper.packetevents.wrapper.PacketWrapper;
 
-public class WrapperLoginServerSetCompression extends SendablePacketWrapper<WrapperLoginServerSetCompression> {
+public class WrapperLoginServerSetCompression extends PacketWrapper<WrapperLoginServerSetCompression> {
     private int threshold;
 
     public WrapperLoginServerSetCompression(PacketSendEvent event) {

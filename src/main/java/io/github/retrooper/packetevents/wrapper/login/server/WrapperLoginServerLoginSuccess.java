@@ -22,14 +22,14 @@ import io.github.retrooper.packetevents.event.impl.PacketSendEvent;
 import io.github.retrooper.packetevents.manager.server.ServerVersion;
 import io.github.retrooper.packetevents.protocol.ConnectionState;
 import io.github.retrooper.packetevents.protocol.PacketType;
-import io.github.retrooper.packetevents.wrapper.SendablePacketWrapper;
+import io.github.retrooper.packetevents.wrapper.PacketWrapper;
 
 import java.util.UUID;
 
 /**
  * This packet switches the connection state to {@link ConnectionState#GAME}.
  */
-public class WrapperLoginServerLoginSuccess extends SendablePacketWrapper<WrapperLoginServerLoginSuccess> {
+public class WrapperLoginServerLoginSuccess extends PacketWrapper<WrapperLoginServerLoginSuccess> {
     private UUID uuid;
     private String username;
 

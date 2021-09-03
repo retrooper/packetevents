@@ -22,9 +22,9 @@ import io.github.retrooper.packetevents.event.impl.PacketReceiveEvent;
 import io.github.retrooper.packetevents.manager.player.ClientVersion;
 import io.github.retrooper.packetevents.protocol.PacketType;
 import io.github.retrooper.packetevents.wrapper.PacketWrapper;
-import io.github.retrooper.packetevents.wrapper.SendablePacketWrapper;
+import io.github.retrooper.packetevents.wrapper.PacketWrapper;
 
-public class WrapperLoginClientLoginStart extends SendablePacketWrapper<WrapperLoginClientLoginStart> {
+public class WrapperLoginClientLoginStart extends PacketWrapper<WrapperLoginClientLoginStart> {
     private String username;
 
     public WrapperLoginClientLoginStart(PacketReceiveEvent event) {

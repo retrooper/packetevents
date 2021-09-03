@@ -22,7 +22,7 @@ import io.github.retrooper.packetevents.event.impl.PacketReceiveEvent;
 import io.github.retrooper.packetevents.manager.player.ClientVersion;
 import io.github.retrooper.packetevents.protocol.PacketType;
 import io.github.retrooper.packetevents.wrapper.PacketWrapper;
-import io.github.retrooper.packetevents.wrapper.SendablePacketWrapper;
+import io.github.retrooper.packetevents.wrapper.PacketWrapper;
 
 /**
  * A response to the ping packet.
@@ -31,7 +31,7 @@ import io.github.retrooper.packetevents.wrapper.SendablePacketWrapper;
  *
  * @see io.github.retrooper.packetevents.wrapper.game.server.WrapperGameServerPing
  */
-public class WrapperGameClientPong extends SendablePacketWrapper<WrapperGameClientPong> {
+public class WrapperGameClientPong extends PacketWrapper<WrapperGameClientPong> {
     private int id;
 
     public WrapperGameClientPong(PacketReceiveEvent event) {

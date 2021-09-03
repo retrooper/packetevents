@@ -25,11 +25,11 @@ import io.github.retrooper.packetevents.protocol.PacketType;
 import io.github.retrooper.packetevents.utils.vector.Vector3f;
 import io.github.retrooper.packetevents.utils.vector.Vector3i;
 import io.github.retrooper.packetevents.wrapper.PacketWrapper;
-import io.github.retrooper.packetevents.wrapper.SendablePacketWrapper;
+import io.github.retrooper.packetevents.wrapper.PacketWrapper;
 
 import java.util.Optional;
 
-public class WrapperGameClientInteractEntity extends SendablePacketWrapper<WrapperGameClientInteractEntity> {
+public class WrapperGameClientInteractEntity extends PacketWrapper<WrapperGameClientInteractEntity> {
     public enum Type {
         INTERACT, ATTACK, INTERACT_AT;
         public static final Type[] VALUES = values();

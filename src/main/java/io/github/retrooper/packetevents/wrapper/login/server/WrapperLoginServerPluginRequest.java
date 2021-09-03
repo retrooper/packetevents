@@ -20,9 +20,9 @@ package io.github.retrooper.packetevents.wrapper.login.server;
 
 import io.github.retrooper.packetevents.event.impl.PacketSendEvent;
 import io.github.retrooper.packetevents.protocol.PacketType;
-import io.github.retrooper.packetevents.wrapper.SendablePacketWrapper;
+import io.github.retrooper.packetevents.wrapper.PacketWrapper;
 
-public class WrapperLoginServerPluginRequest extends SendablePacketWrapper<WrapperLoginServerPluginRequest> {
+public class WrapperLoginServerPluginRequest extends PacketWrapper<WrapperLoginServerPluginRequest> {
     private int messageID;
     private String channelName;
     private byte[] data;

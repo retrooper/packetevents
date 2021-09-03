@@ -24,12 +24,12 @@ import io.github.retrooper.packetevents.protocol.PacketType;
 import io.github.retrooper.packetevents.utils.vector.Vector3i;
 import io.github.retrooper.packetevents.utils.PacketWrapperUtil;
 import io.github.retrooper.packetevents.wrapper.PacketWrapper;
-import io.github.retrooper.packetevents.wrapper.SendablePacketWrapper;
+import io.github.retrooper.packetevents.wrapper.PacketWrapper;
 
 /**
  * This packet is sent when Generate is pressed on the Jigsaw Block interface.
  */
-public class WrapperGameClientGenerateStructure extends SendablePacketWrapper<WrapperGameClientGenerateStructure> {
+public class WrapperGameClientGenerateStructure extends PacketWrapper<WrapperGameClientGenerateStructure> {
     private Vector3i blockPosition;
     private int levels;
     private boolean keepJigsaws;

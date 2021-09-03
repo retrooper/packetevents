@@ -24,6 +24,7 @@ import io.github.retrooper.packetevents.event.impl.PacketSendEvent;
 import io.github.retrooper.packetevents.manager.player.ClientVersion;
 import io.github.retrooper.packetevents.manager.server.ServerVersion;
 import io.github.retrooper.packetevents.utils.netty.buffer.ByteBufAbstract;
+import io.github.retrooper.packetevents.utils.netty.buffer.ByteBufUtil;
 import io.netty.handler.codec.EncoderException;
 
 import java.nio.charset.StandardCharsets;
@@ -69,6 +70,19 @@ public class PacketWrapper<T extends PacketWrapper> {
         else {
             readData((T) event.getCurrentPacketWrapper());
         }
+    }
+
+    public PacketWrapper(int packetID, ClientVersion clientVersion) {
+        this(clientVersion, PacketEvents.get().getServerManager().getVersion(), ByteBufUtil.buffer(), packetID);
+    }
+
+    public PacketWrapper(int packetID) {
+        this(ClientVersion.UNKNOWN, PacketEvents.get().getServerManager().getVersion(), ByteBufUtil.buffer(), packetID);
+    }
+
+    public void createPacket() {
+        writeVarInt(packetID);
+        writeData();
     }
 
     public void readData() {

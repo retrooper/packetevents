@@ -23,12 +23,12 @@ import io.github.retrooper.packetevents.manager.player.ClientVersion;
 import io.github.retrooper.packetevents.manager.player.Hand;
 import io.github.retrooper.packetevents.protocol.PacketType;
 import io.github.retrooper.packetevents.wrapper.PacketWrapper;
-import io.github.retrooper.packetevents.wrapper.SendablePacketWrapper;
+import io.github.retrooper.packetevents.wrapper.PacketWrapper;
 
 /**
  * This packet is sent when the client swings their arm.
  */
-public class WrapperGameClientAnimation extends SendablePacketWrapper<WrapperGameClientAnimation> {
+public class WrapperGameClientAnimation extends PacketWrapper<WrapperGameClientAnimation> {
     private Hand hand;
 
     public WrapperGameClientAnimation(PacketReceiveEvent event) {
