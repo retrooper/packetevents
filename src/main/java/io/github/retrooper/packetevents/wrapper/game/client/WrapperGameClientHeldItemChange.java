@@ -16,37 +16,38 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package io.github.retrooper.packetevents.wrapper.game.server;
+package io.github.retrooper.packetevents.wrapper.game.client;
 
-import io.github.retrooper.packetevents.event.impl.PacketSendEvent;
+import io.github.retrooper.packetevents.event.impl.PacketReceiveEvent;
+import io.github.retrooper.packetevents.manager.player.ClientVersion;
 import io.github.retrooper.packetevents.protocol.PacketType;
 import io.github.retrooper.packetevents.wrapper.PacketWrapper;
 
-public class WrapperGameServerHeldItemChange extends PacketWrapper<WrapperGameServerHeldItemChange> {
+public class WrapperGameClientHeldItemChange extends PacketWrapper<WrapperGameClientHeldItemChange> {
     private int slot;
 
-    public WrapperGameServerHeldItemChange(PacketSendEvent event) {
+    public WrapperGameClientHeldItemChange(PacketReceiveEvent event) {
         super(event);
     }
 
-    public WrapperGameServerHeldItemChange(int slot) {
-        super(PacketType.Game.Server.HELD_ITEM_CHANGE.getID());
+    public WrapperGameClientHeldItemChange(ClientVersion clientVersion, int slot) {
+        super(PacketType.Game.Client.HELD_ITEM_CHANGE.getPacketID(clientVersion), clientVersion);
         this.slot = slot;
     }
 
     @Override
     public void readData() {
-        this.slot = readByte();
+        this.slot = readShort();
     }
 
     @Override
-    public void readData(WrapperGameServerHeldItemChange wrapper) {
+    public void readData(WrapperGameClientHeldItemChange wrapper) {
         this.slot = wrapper.slot;
     }
 
     @Override
     public void writeData() {
-        writeByte(slot);
+        writeShort(slot);
     }
 
     public int getSlot() {

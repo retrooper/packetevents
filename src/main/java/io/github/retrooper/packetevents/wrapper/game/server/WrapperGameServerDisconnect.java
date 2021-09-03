@@ -54,4 +54,12 @@ public class WrapperGameServerDisconnect extends PacketWrapper<WrapperGameServer
         reason = StringUtil.maximizeLength(reason, maxMessageLength);
         writeString(reason, maxMessageLength);
     }
+
+    public String getReason() {
+        return reason;
+    }
+
+    public void setReason(String reason) {
+        this.reason = reason;
+    }
 }
