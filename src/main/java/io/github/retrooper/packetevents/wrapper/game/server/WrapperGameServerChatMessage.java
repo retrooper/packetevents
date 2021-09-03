@@ -24,7 +24,6 @@ import io.github.retrooper.packetevents.manager.server.ServerVersion;
 import io.github.retrooper.packetevents.protocol.PacketType;
 import io.github.retrooper.packetevents.utils.StringUtil;
 import io.github.retrooper.packetevents.wrapper.PacketWrapper;
-import io.github.retrooper.packetevents.wrapper.PacketWrapper;
 
 import java.util.UUID;
 
@@ -63,26 +62,20 @@ public class WrapperGameServerChatMessage extends PacketWrapper<WrapperGameServe
 
     @Override
     public void readData() {
-        if (getServerVersion().isNewerThanOrEquals(ServerVersion.v_1_13)) {
-            this.jsonMessage = readString(MODERN_MESSAGE_LENGTH);
-        }
-        else {
-            this.jsonMessage = readString(LEGACY_MESSAGE_LENGTH);
-        }
+        int maxMessageLength = serverVersion.isNewerThanOrEquals(ServerVersion.v_1_13) ? MODERN_MESSAGE_LENGTH : LEGACY_MESSAGE_LENGTH;
+        this.jsonMessage = readString(maxMessageLength);
         //Is the server 1.8+ or is the client 1.8+? 1.7.10 servers support 1.8 clients, and send the chat position.
         if (getServerVersion().isNewerThanOrEquals(ServerVersion.v_1_8) || getClientVersion().isNewerThanOrEquals(ClientVersion.v_1_8)) {
             byte positionIndex = readByte();
             position = ChatPosition.VALUES[positionIndex];
-        }
-        else {
+        } else {
             //Always chat in 1.7.10 protocol.
             position = ChatPosition.CHAT;
         }
 
         if (getServerVersion().isNewerThanOrEquals(ServerVersion.v_1_16)) {
             this.senderUUID = readUUID();
-        }
-        else {
+        } else {
             this.senderUUID = new UUID(0L, 0L);
         }
     }
@@ -96,12 +89,9 @@ public class WrapperGameServerChatMessage extends PacketWrapper<WrapperGameServe
 
     @Override
     public void writeData() {
-        if (getServerVersion().isNewerThanOrEquals(ServerVersion.v_1_13)) {
-            writeString(jsonMessage, MODERN_MESSAGE_LENGTH);
-        }
-        else {
-            writeString(jsonMessage, LEGACY_MESSAGE_LENGTH);
-        }
+        int maxMessageLength = serverVersion.isNewerThanOrEquals(ServerVersion.v_1_13) ? MODERN_MESSAGE_LENGTH : LEGACY_MESSAGE_LENGTH;
+        jsonMessage = StringUtil.maximizeLength(jsonMessage, maxMessageLength);
+        writeString(jsonMessage, maxMessageLength);
 
         //Is the server 1.8+ or is the client 1.8+? (1.7.10 servers support 1.8 clients, and send the chat position for 1.8 clients)
         if (getServerVersion().isNewerThanOrEquals(ServerVersion.v_1_8) || getClientVersion().isNewerThanOrEquals(ClientVersion.v_1_8)) {

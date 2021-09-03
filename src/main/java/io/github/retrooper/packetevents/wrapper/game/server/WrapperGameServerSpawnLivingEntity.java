@@ -19,7 +19,6 @@
 package io.github.retrooper.packetevents.wrapper.game.server;
 
 import io.github.retrooper.packetevents.event.impl.PacketSendEvent;
-import io.github.retrooper.packetevents.manager.player.ClientVersion;
 import io.github.retrooper.packetevents.manager.server.ServerVersion;
 import io.github.retrooper.packetevents.protocol.PacketType;
 import io.github.retrooper.packetevents.utils.MathUtil;
@@ -35,7 +34,7 @@ public class WrapperGameServerSpawnLivingEntity extends PacketWrapper<WrapperGam
     private static final double VELOCITY_FACTOR = 8000.0;
     private int entityID;
     private Optional<UUID> entityUUID;
-    private int entityType;
+    private int entityTypeID;
     private Vector3d position;
     private float yaw;
     private float pitch;
@@ -46,8 +45,16 @@ public class WrapperGameServerSpawnLivingEntity extends PacketWrapper<WrapperGam
         super(event);
     }
 
-    public WrapperGameServerSpawnLivingEntity() {
+    public WrapperGameServerSpawnLivingEntity(int entityID, Optional<UUID> entityUUID, int entityTypeID, Vector3d position, float yaw, float pitch, float headPitch, Vector3d velocity) {
         super(PacketType.Game.Server.SPAWN_LIVING_ENTITY.getID());
+        this.entityID = entityID;
+        this.entityUUID = entityUUID;
+        this.entityTypeID = entityTypeID;
+        this.position = position;
+        this.yaw = yaw;
+        this.pitch = pitch;
+        this.headPitch = headPitch;
+        this.velocity = velocity;
     }
 
     @Override
@@ -55,14 +62,14 @@ public class WrapperGameServerSpawnLivingEntity extends PacketWrapper<WrapperGam
         this.entityID = readVarInt();
         if (serverVersion.isOlderThan(ServerVersion.v_1_9)) {
             this.entityUUID = Optional.empty();
-            this.entityType = readByte() & 255;
+            this.entityTypeID = readByte() & 255;
             this.position = new Vector3d(readInt() / POSITION_FACTOR, readInt() / POSITION_FACTOR, readInt() / POSITION_FACTOR);
         } else {
             this.entityUUID = Optional.of(readUUID());
             if (serverVersion.isNewerThanOrEquals(ServerVersion.v_1_11)) {
-                this.entityType = readVarInt();
+                this.entityTypeID = readVarInt();
             } else {
-                this.entityType = readByte() & 255;
+                this.entityTypeID = readByte() & 255;
             }
             this.position = new Vector3d(readDouble(), readDouble(), readDouble());
         }
@@ -79,7 +86,7 @@ public class WrapperGameServerSpawnLivingEntity extends PacketWrapper<WrapperGam
     public void readData(WrapperGameServerSpawnLivingEntity wrapper) {
         this.entityID = wrapper.entityID;
         this.entityUUID = wrapper.entityUUID;
-        this.entityType = wrapper.entityType;
+        this.entityTypeID = wrapper.entityTypeID;
         this.position = wrapper.position;
         this.yaw = wrapper.yaw;
         this.pitch = wrapper.pitch;
@@ -93,16 +100,16 @@ public class WrapperGameServerSpawnLivingEntity extends PacketWrapper<WrapperGam
     public void writeData() {
         writeVarInt(entityID);
         if (serverVersion.isOlderThan(ServerVersion.v_1_9)) {
-            writeByte(entityType & 255);
+            writeByte(entityTypeID & 255);
             writeInt(MathUtil.floor(position.x * POSITION_FACTOR));
             writeInt(MathUtil.floor(position.y * POSITION_FACTOR));
             writeInt(MathUtil.floor(position.z * POSITION_FACTOR));
         } else {
             writeUUID(entityUUID.orElse(new UUID(0L, 0L)));
             if (serverVersion.isNewerThanOrEquals(ServerVersion.v_1_11)) {
-                writeVarInt(entityType);
+                writeVarInt(entityTypeID);
             } else {
-                writeByte(entityType & 255);
+                writeByte(entityTypeID & 255);
             }
             writeDouble(position.x);
             writeDouble(position.y);
@@ -132,12 +139,12 @@ public class WrapperGameServerSpawnLivingEntity extends PacketWrapper<WrapperGam
         this.entityUUID = entityUUID;
     }
 
-    public int getEntityType() {
-        return entityType;
+    public int getEntityTypeID() {
+        return entityTypeID;
     }
 
-    public void setEntityType(int entityType) {
-        this.entityType = entityType;
+    public void setEntityTypeID(int entityTypeID) {
+        this.entityTypeID = entityTypeID;
     }
 
     public Vector3d getPosition() {
