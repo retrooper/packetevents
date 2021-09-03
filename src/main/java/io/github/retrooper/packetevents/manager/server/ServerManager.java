@@ -20,8 +20,10 @@ package io.github.retrooper.packetevents.manager.server;
 
 import io.github.retrooper.packetevents.PacketEvents;
 import io.github.retrooper.packetevents.utils.BoundingBox;
+import io.github.retrooper.packetevents.utils.netty.ChannelInboundHandlerUtil;
 import io.github.retrooper.packetevents.utils.netty.buffer.ByteBufAbstract;
 import io.github.retrooper.packetevents.utils.netty.channel.ChannelAbstract;
+import io.github.retrooper.packetevents.utils.netty.channel.ChannelHandlerContextAbstract;
 import io.github.retrooper.packetevents.utils.nms.MinecraftReflection;
 import io.github.retrooper.packetevents.utils.reflection.ReflectionObject;
 import io.github.retrooper.packetevents.wrapper.PacketWrapper;
@@ -101,17 +103,10 @@ public final class ServerManager {
     }
 
     public void receivePacket(ChannelAbstract channel, ByteBufAbstract byteBuf) {
-        List<String> handlerNames = channel.pipeline().names();
-        String beforeDecoderHandlerName = null;
-        for (int i = 0; i < handlerNames.size(); i++) {
-            if (handlerNames.get(i).equals(PacketEvents.get().decoderName)) {
-                beforeDecoderHandlerName = handlerNames.get(i - 1);
-                break;
-            }
-        }
-        if (beforeDecoderHandlerName != null) {
-            channel.pipeline().context(beforeDecoderHandlerName).fireChannelRead(byteBuf.rawByteBuf());
-        }
+        //TODO Test with Via present
+        ChannelHandlerContextAbstract ctx = channel.pipeline().context(PacketEvents.get().decoderName);
+        ChannelInboundHandlerUtil.handlerChannelRead(ctx.handler().rawChannelHandler(),
+                ctx.rawChannelHandlerContext(), byteBuf.rawByteBuf());
     }
 
     public void receivePacket(Player player, ByteBufAbstract byteBuf) {

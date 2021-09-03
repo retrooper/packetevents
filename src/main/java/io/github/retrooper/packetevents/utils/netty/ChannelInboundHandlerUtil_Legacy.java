@@ -18,14 +18,13 @@
 
 package io.github.retrooper.packetevents.utils.netty;
 
-import io.netty.buffer.ByteBuf;
 import net.minecraft.util.io.netty.channel.ChannelHandlerContext;
-import net.minecraft.util.io.netty.handler.codec.MessageToMessageDecoder;
+import net.minecraft.util.io.netty.channel.ChannelInboundHandler;
 
-public class DecoderUtil_Legacy {
-    public static void decoderChannelRead(Object decoder, Object ctx, Object msg) {
+public class ChannelInboundHandlerUtil_Legacy {
+    public static void handlerChannelRead(Object handler, Object ctx, Object msg) {
         try {
-            ((MessageToMessageDecoder<ByteBuf>)decoder).channelRead((ChannelHandlerContext) ctx, msg);
+            ((ChannelInboundHandler)handler).channelRead((ChannelHandlerContext) ctx, msg);
         } catch (Exception e) {
             e.printStackTrace();
         }

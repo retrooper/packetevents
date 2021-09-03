@@ -27,18 +27,14 @@ import io.github.retrooper.packetevents.utils.dependencies.v_1_7_10.SpigotVersio
 import io.github.retrooper.packetevents.utils.dependencies.viaversion.ViaVersionLookupUtils;
 import io.github.retrooper.packetevents.utils.gameprofile.GameProfileUtil;
 import io.github.retrooper.packetevents.utils.gameprofile.WrappedGameProfile;
-import io.github.retrooper.packetevents.utils.netty.DecoderUtil;
 import io.github.retrooper.packetevents.utils.netty.buffer.ByteBufAbstract;
 import io.github.retrooper.packetevents.utils.netty.channel.ChannelAbstract;
-import io.github.retrooper.packetevents.utils.netty.channel.ChannelHandlerAbstract;
-import io.github.retrooper.packetevents.utils.netty.channel.ChannelHandlerContextAbstract;
 import io.github.retrooper.packetevents.utils.nms.MinecraftReflection;
 import io.github.retrooper.packetevents.utils.nms.PlayerPingAccessorModern;
 import io.github.retrooper.packetevents.wrapper.PacketWrapper;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;

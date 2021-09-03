@@ -20,6 +20,8 @@ package io.github.retrooper.packetevents.utils.netty.channel;
 
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
+import io.netty.channel.ChannelInboundHandler;
+import io.netty.channel.ChannelInboundHandlerAdapter;
 
 public class ChannelHandlerModern implements ChannelHandlerAbstract {
     private final ChannelHandler channelHandler;
