@@ -24,12 +24,10 @@ repositories {
 
     maven {
         url 'https://repo.opencollab.dev/maven-snapshots/'
-        allowInsecureProtocol = true
     }
 
     maven {
         url 'https://repo.opencollab.dev/maven-releases/'
-        allowInsecureProtocol = true
     }
 
     maven {
@@ -50,6 +48,7 @@ repositories {
 
     maven {
         url 'https://repo.maven.apache.org/maven2/'
+        allowInsecureProtocol = true
     }
 }
 
