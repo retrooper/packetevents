@@ -21,17 +21,16 @@ package io.github.retrooper.packetevents.wrapper.game.client;
 import io.github.retrooper.packetevents.event.impl.PacketReceiveEvent;
 import io.github.retrooper.packetevents.manager.player.ClientVersion;
 import io.github.retrooper.packetevents.protocol.PacketType;
-import io.github.retrooper.packetevents.utils.vector.Vector3i;
 import io.github.retrooper.packetevents.utils.PacketWrapperUtil;
-import io.github.retrooper.packetevents.wrapper.PacketWrapper;
+import io.github.retrooper.packetevents.utils.vector.Vector3i;
 import io.github.retrooper.packetevents.wrapper.PacketWrapper;
 
 /**
  * This message is sent from the client to the server when the “Done” button is pushed after placing a sign.
  */
 public class WrapperGameClientUpdateSign extends PacketWrapper<WrapperGameClientUpdateSign> {
-    private Vector3i blockPosition;
     private final String[] textLines = new String[4];
+    private Vector3i blockPosition;
 
     public WrapperGameClientUpdateSign(PacketReceiveEvent event) {
         super(event);

@@ -23,7 +23,6 @@ import io.github.retrooper.packetevents.manager.player.ClientVersion;
 import io.github.retrooper.packetevents.protocol.PacketType;
 import io.github.retrooper.packetevents.utils.StringUtil;
 import io.github.retrooper.packetevents.wrapper.PacketWrapper;
-import io.github.retrooper.packetevents.wrapper.PacketWrapper;
 
 /**
  * This packet is used to send a chat message to the server.
@@ -69,7 +68,14 @@ public class WrapperGameClientChatMessage extends PacketWrapper<WrapperGameClien
         return message;
     }
 
+    /**
+     * Modify the message.
+     * On {@link ClientVersion#v_1_10} and older clients, the message should never exceed 100 characters.
+     * On {@link ClientVersion#v_1_11} and newer clients, the message should never exceed 256 characters.
+     *
+     * @param message Message
+     */
     public void setMessage(String message) {
-       this.message = message;
+        this.message = message;
     }
 }

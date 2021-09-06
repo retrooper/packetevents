@@ -18,7 +18,7 @@
 
 package io.github.retrooper.packetevents.utils.netty.buffer;
 
-import io.github.retrooper.packetevents.utils.nms.MinecraftReflection;
+import io.github.retrooper.packetevents.utils.MinecraftReflection;
 
 public interface ByteBufAllocatorAbstract {
     static ByteBufAllocatorAbstract generate(Object rawByteBufAllocator) {

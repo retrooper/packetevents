@@ -21,7 +21,7 @@ package io.github.retrooper.packetevents.utils.gameprofile;
 import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.properties.Property;
 import io.github.retrooper.packetevents.manager.player.Skin;
-import io.github.retrooper.packetevents.utils.nms.MinecraftReflection;
+import io.github.retrooper.packetevents.utils.MinecraftReflection;
 import io.github.retrooper.packetevents.utils.reflection.ReflectionObject;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;

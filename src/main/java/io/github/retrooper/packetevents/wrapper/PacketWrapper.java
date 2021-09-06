@@ -26,15 +26,17 @@ import io.github.retrooper.packetevents.manager.server.ServerVersion;
 import io.github.retrooper.packetevents.utils.netty.buffer.ByteBufAbstract;
 import io.github.retrooper.packetevents.utils.netty.buffer.ByteBufUtil;
 import io.netty.handler.codec.EncoderException;
+import org.bukkit.Material;
+import org.bukkit.inventory.ItemStack;
 
 import java.nio.charset.StandardCharsets;
 import java.util.UUID;
 
 
 public class PacketWrapper<T extends PacketWrapper> {
+    public final ByteBufAbstract byteBuf;
     protected final ClientVersion clientVersion;
     protected final ServerVersion serverVersion;
-    public final ByteBufAbstract byteBuf;
     private final int packetID;
 
     public PacketWrapper(ClientVersion clientVersion, ServerVersion serverVersion, ByteBufAbstract byteBuf, int packetID) {
@@ -52,8 +54,7 @@ public class PacketWrapper<T extends PacketWrapper> {
         if (event.getCurrentPacketWrapper() == null) {
             event.setCurrentPacketWrapper(this);
             readData();
-        }
-        else {
+        } else {
             readData((T) event.getCurrentPacketWrapper());
         }
     }
@@ -66,8 +67,7 @@ public class PacketWrapper<T extends PacketWrapper> {
         if (event.getCurrentPacketWrapper() == null) {
             event.setCurrentPacketWrapper(this);
             readData();
-        }
-        else {
+        } else {
             readData((T) event.getCurrentPacketWrapper());
         }
     }
@@ -78,6 +78,10 @@ public class PacketWrapper<T extends PacketWrapper> {
 
     public PacketWrapper(int packetID) {
         this(ClientVersion.UNKNOWN, PacketEvents.get().getServerManager().getVersion(), ByteBufUtil.buffer(), packetID);
+    }
+
+    public static PacketWrapper createUniversalPacketWrapper(ByteBufAbstract byteBuf) {
+        return new PacketWrapper(ClientVersion.UNKNOWN, PacketEvents.get().getServerManager().getVersion(), byteBuf, -1);
     }
 
     public void createPacket() {
@@ -154,6 +158,49 @@ public class PacketWrapper<T extends PacketWrapper> {
         }
 
         byteBuf.writeByte(value);
+    }
+/*
+    public ItemStack readItemStackRaw() {
+        net.minecraft.server.v1_7_R4.ItemStack itemstack = null;
+        short short1 = this.readShort();
+        if (short1 >= 0) {
+            byte b0 = this.readByte();
+            short short2 = this.readShort();
+            itemstack = new net.minecraft.server.v1_7_R4.ItemStack(Item.getById(short1), b0, short2);
+            itemstack.tag = this.b();
+            if (itemstack.tag != null) {
+                if (clientVersion.isNewerThanOrEquals(ClientVersion.v_1_8) && itemstack.getItem() == Items.WRITTEN_BOOK && itemstack.tag.hasKeyOfType("pages", 9)) {
+                    NBTTagList nbttaglist = itemstack.tag.getList("pages", 8);
+                    NBTTagList newList = new NBTTagList();
+
+                    for(int i = 0; i < nbttaglist.size(); ++i) {
+                        IChatBaseComponent s = ChatSerializer.a(nbttaglist.getString(i));
+                        String newString = SpigotComponentReverter.toLegacy(s);
+                        newList.add(new NBTTagString(newString));
+                    }
+
+                    itemstack.tag.set("pages", newList);
+                }
+
+                CraftItemStack.setItemMeta(itemstack, CraftItemStack.getItemMeta(itemstack));
+            }
+        }
+
+        return CraftItemStack.asBukkitCopy(itemstack);
+    }*/
+
+    private ItemStack readItemStack() {
+        ItemStack itemStack = null;
+        short itemID = readShort();
+        if (itemID >= 0) {
+            byte count = readByte();
+            short data = readShort();
+            itemStack = new ItemStack(Material.values()[itemID], count, data);
+            itemStack.setItemMeta(null);
+
+            return itemStack;
+        }
+        throw new RuntimeException("Invalid ItemStack material ID: " + itemID + ". The ID may not be less than 0.");
     }
 
     public String readString() {
@@ -254,9 +301,5 @@ public class PacketWrapper<T extends PacketWrapper> {
     public void writeUUID(UUID uuid) {
         writeLong(uuid.getMostSignificantBits());
         writeLong(uuid.getLeastSignificantBits());
-    }
-
-    public static PacketWrapper createUniversalPacketWrapper(ByteBufAbstract byteBuf) {
-        return new PacketWrapper(ClientVersion.UNKNOWN, PacketEvents.get().getServerManager().getVersion(), byteBuf, -1);
     }
 }

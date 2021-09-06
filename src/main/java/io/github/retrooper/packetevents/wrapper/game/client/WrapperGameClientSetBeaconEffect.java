@@ -22,7 +22,6 @@ import io.github.retrooper.packetevents.event.impl.PacketReceiveEvent;
 import io.github.retrooper.packetevents.manager.player.ClientVersion;
 import io.github.retrooper.packetevents.protocol.PacketType;
 import io.github.retrooper.packetevents.wrapper.PacketWrapper;
-import io.github.retrooper.packetevents.wrapper.PacketWrapper;
 
 public class WrapperGameClientSetBeaconEffect extends PacketWrapper<WrapperGameClientSetBeaconEffect> {
     private int primaryEffect;

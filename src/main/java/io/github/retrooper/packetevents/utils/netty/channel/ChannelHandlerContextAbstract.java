@@ -18,9 +18,9 @@
 
 package io.github.retrooper.packetevents.utils.netty.channel;
 
+import io.github.retrooper.packetevents.utils.MinecraftReflection;
 import io.github.retrooper.packetevents.utils.netty.buffer.ByteBufAllocatorAbstract;
 import io.github.retrooper.packetevents.utils.netty.channel.pipeline.ChannelPipelineAbstract;
-import io.github.retrooper.packetevents.utils.nms.MinecraftReflection;
 
 public interface ChannelHandlerContextAbstract {
     static ChannelHandlerContextAbstract generate(Object rawChannelHandlerContext) {

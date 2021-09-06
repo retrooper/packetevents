@@ -23,51 +23,40 @@ import io.github.retrooper.packetevents.manager.player.ClientVersion;
 import io.github.retrooper.packetevents.protocol.PacketType;
 import io.github.retrooper.packetevents.wrapper.PacketWrapper;
 
-/**
- * This packet is sent when the player changes their slot selection.
- */
-public class WrapperGameClientHeldItemChange extends PacketWrapper<WrapperGameClientHeldItemChange> {
+public class WrapperGameClientCreativeInventoryAction extends PacketWrapper<WrapperGameClientCreativeInventoryAction> {
     private int slot;
 
-    public WrapperGameClientHeldItemChange(PacketReceiveEvent event) {
+    public WrapperGameClientCreativeInventoryAction(PacketReceiveEvent event) {
         super(event);
     }
 
-    public WrapperGameClientHeldItemChange(ClientVersion clientVersion, int slot) {
-        super(PacketType.Game.Client.HELD_ITEM_CHANGE.getPacketID(clientVersion), clientVersion);
-        this.slot = slot;
+    public WrapperGameClientCreativeInventoryAction(ClientVersion clientVersion) {
+        super(PacketType.Game.Client.CREATIVE_INVENTORY_ACTION.getPacketID(clientVersion), clientVersion);
     }
 
     @Override
     public void readData() {
         this.slot = readShort();
+        net.minecraft.server.v1_7_R4.PacketPlayInSetCreativeSlot cs0;
+        net.minecraft.server.v1_8_R3.PacketPlayInSetCreativeSlot cs1;
+        net.minecraft.server.v1_9_R1.PacketPlayInSetCreativeSlot cs2;
+        net.minecraft.server.v1_10_R1.PacketPlayInSetCreativeSlot cs3;
+        net.minecraft.server.v1_11_R1.PacketPlayInSetCreativeSlot cs4;
+        net.minecraft.server.v1_12_R1.PacketPlayInSetCreativeSlot cs5;
+        net.minecraft.server.v1_13_R1.PacketPlayInSetCreativeSlot cs6;
+        net.minecraft.server.v1_14_R1.PacketPlayInSetCreativeSlot cs7;
+        net.minecraft.server.v1_15_R1.PacketPlayInSetCreativeSlot cs8;
+        net.minecraft.server.v1_16_R1.PacketPlayInSetCreativeSlot cs9;
+        net.minecraft.network.protocol.game.PacketPlayInSetCreativeSlot cs10;
     }
 
     @Override
-    public void readData(WrapperGameClientHeldItemChange wrapper) {
+    public void readData(WrapperGameClientCreativeInventoryAction wrapper) {
         this.slot = wrapper.slot;
     }
 
     @Override
     public void writeData() {
         writeShort(slot);
-    }
-
-    /**
-     * The slot which the player has selected.
-     *
-     * @return Target slot
-     */
-    public int getSlot() {
-        return slot;
-    }
-
-    /**
-     * Modify the slot which the player has selected.
-     *
-     * @param slot Target slot
-     */
-    public void setSlot(int slot) {
-        this.slot = slot;
     }
 }

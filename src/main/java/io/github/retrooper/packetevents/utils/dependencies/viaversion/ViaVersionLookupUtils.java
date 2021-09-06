@@ -22,10 +22,10 @@ import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
 public class ViaVersionLookupUtils {
+    private static ViaVersionAccessor viaVersionAccessor;
+
     private ViaVersionLookupUtils() {
     }
-
-    private static ViaVersionAccessor viaVersionAccessor;
 
     public static boolean isAvailable() {
         return Bukkit.getPluginManager().getPlugin("ViaVersion") != null;

@@ -10,6 +10,7 @@ import org.bukkit.entity.Player;
 
 public class PacketReceiveEvent extends ProtocolPacketEvent {
     private PacketWrapper currentPacketWrapper;
+
     public PacketReceiveEvent(ChannelAbstract channel, Player player, ByteBufAbstract byteBuf) {
         super(PacketSide.CLIENT, channel, player, byteBuf);
     }

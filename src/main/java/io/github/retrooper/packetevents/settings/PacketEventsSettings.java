@@ -72,7 +72,7 @@ public class PacketEventsSettings {
      * @return Settings instance.
      */
     public PacketEventsSettings bStats(boolean bStatsEnabled) {
-            this.bStatsEnabled = bStatsEnabled;
+        this.bStatsEnabled = bStatsEnabled;
         return this;
     }
 

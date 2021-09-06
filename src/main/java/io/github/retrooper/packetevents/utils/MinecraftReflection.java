@@ -16,7 +16,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package io.github.retrooper.packetevents.utils.nms;
+package io.github.retrooper.packetevents.utils;
 
 import io.github.retrooper.packetevents.PacketEvents;
 import io.github.retrooper.packetevents.manager.server.ServerVersion;
@@ -36,20 +36,17 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public final class MinecraftReflection {
-    public static ServerVersion VERSION;
-
-    //Booleans
-    public static boolean USE_MODERN_NETTY_PACKAGE;
-    public static boolean V_1_17_OR_HIGHER;
-    public static boolean V_1_12_OR_HIGHER;
-
     private static final String MODIFIED_PACKAGE_NAME = Bukkit.getServer().getClass().getPackage().getName()
             .replace(".", ",").split(",")[3];
     //Example: net.minecraft.server.v1_8_R3.
     public static final String LEGACY_NMS_PACKAGE = "net.minecraft.server." + MODIFIED_PACKAGE_NAME + ".";
     //Example: org.bukkit.craftbukkit.v1_8_R3.
     public static final String OBC_PACKAGE = "org.bukkit.craftbukkit." + MODIFIED_PACKAGE_NAME + ".";
-
+    public static ServerVersion VERSION;
+    //Booleans
+    public static boolean USE_MODERN_NETTY_PACKAGE;
+    public static boolean V_1_17_OR_HIGHER;
+    public static boolean V_1_12_OR_HIGHER;
     //Minecraft classes
     public static Class<?> MINECRAFT_SERVER_CLASS, NMS_ENTITY_CLASS, ENTITY_PLAYER_CLASS, BOUNDING_BOX_CLASS,
             ENTITY_HUMAN_CLASS, PLAYER_CONNECTION_CLASS, SERVER_CONNECTION_CLASS, NETWORK_MANAGER_CLASS,

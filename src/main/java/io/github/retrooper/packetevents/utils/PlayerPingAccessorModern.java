@@ -16,16 +16,12 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package io.github.retrooper.packetevents.utils.netty;
+package io.github.retrooper.packetevents.utils;
 
-import io.github.retrooper.packetevents.utils.MinecraftReflection;
+import org.bukkit.entity.Player;
 
-public class ChannelInboundHandlerUtil {
-    public static void handlerChannelRead(Object handler, Object ctx, Object msg) {
-        if (MinecraftReflection.USE_MODERN_NETTY_PACKAGE) {
-            ChannelInboundHandlerUtil_Modern.handlerChannelRead(handler, ctx, msg);
-        } else {
-            ChannelInboundHandlerUtil_Legacy.handlerChannelRead(handler, ctx, msg);
-        }
+public class PlayerPingAccessorModern {
+    public static int getPing(Player player) {
+        return player.getPing();
     }
 }

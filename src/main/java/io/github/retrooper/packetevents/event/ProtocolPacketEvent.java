@@ -27,9 +27,9 @@ import io.github.retrooper.packetevents.protocol.ConnectionState;
 import io.github.retrooper.packetevents.protocol.PacketSide;
 import io.github.retrooper.packetevents.protocol.PacketType;
 import io.github.retrooper.packetevents.protocol.PacketTypeCommon;
+import io.github.retrooper.packetevents.utils.PacketWrapperUtil;
 import io.github.retrooper.packetevents.utils.netty.buffer.ByteBufAbstract;
 import io.github.retrooper.packetevents.utils.netty.channel.ChannelAbstract;
-import io.github.retrooper.packetevents.utils.PacketWrapperUtil;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -40,16 +40,12 @@ public abstract class ProtocolPacketEvent extends PacketEvent implements PlayerE
     private final ChannelAbstract channel;
     private final InetSocketAddress socketAddress;
     private final Player player;
-
-
-    private ConnectionState connectionState;
-    private ClientVersion clientVersion;
-    private ServerVersion serverVersion;
-
     private final ByteBufAbstract byteBuf;
     private final int packetID;
     private final PacketTypeCommon packetType;
-
+    private ConnectionState connectionState;
+    private ClientVersion clientVersion;
+    private ServerVersion serverVersion;
     private boolean cancel;
 
     public ProtocolPacketEvent(PacketSide packetSide, Object channel, Player player, Object rawByteBuf) {

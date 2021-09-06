@@ -55,15 +55,21 @@ public interface PacketListener {
         };
     }
 
-    default void onPlayerInject(PlayerInjectEvent event) {}
+    default void onPlayerInject(PlayerInjectEvent event) {
+    }
 
-    default void onPostPlayerInject(PostPlayerInjectEvent event) {}
+    default void onPostPlayerInject(PostPlayerInjectEvent event) {
+    }
 
-    default void onPlayerEject(PlayerEjectEvent event) {}
+    default void onPlayerEject(PlayerEjectEvent event) {
+    }
 
-    default void onPacketReceive(PacketReceiveEvent event) {}
+    default void onPacketReceive(PacketReceiveEvent event) {
+    }
 
-    default void onPacketSend(PacketSendEvent event) {}
+    default void onPacketSend(PacketSendEvent event) {
+    }
 
-    default void onPacketEventExternal(PacketEvent event) {}
+    default void onPacketEventExternal(PacketEvent event) {
+    }
 }

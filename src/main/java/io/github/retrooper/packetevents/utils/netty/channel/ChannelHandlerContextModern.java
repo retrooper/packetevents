@@ -123,7 +123,7 @@ public class ChannelHandlerContextModern implements ChannelHandlerContextAbstrac
     @Override
     public void write(Object msg) {
         if (msg instanceof ByteBufAbstract) {
-            msg = ((ByteBufAbstract)msg).rawByteBuf();
+            msg = ((ByteBufAbstract) msg).rawByteBuf();
         }
         ctx.write(msg);
     }
@@ -131,7 +131,7 @@ public class ChannelHandlerContextModern implements ChannelHandlerContextAbstrac
     @Override
     public void writeAndFlush(Object msg) {
         if (msg instanceof ByteBufAbstract) {
-            msg = ((ByteBufAbstract)msg).rawByteBuf();
+            msg = ((ByteBufAbstract) msg).rawByteBuf();
         }
         ctx.writeAndFlush(msg);
     }

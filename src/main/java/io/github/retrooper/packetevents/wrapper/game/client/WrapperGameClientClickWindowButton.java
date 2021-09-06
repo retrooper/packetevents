@@ -22,7 +22,6 @@ import io.github.retrooper.packetevents.event.impl.PacketReceiveEvent;
 import io.github.retrooper.packetevents.manager.player.ClientVersion;
 import io.github.retrooper.packetevents.protocol.PacketType;
 import io.github.retrooper.packetevents.wrapper.PacketWrapper;
-import io.github.retrooper.packetevents.wrapper.PacketWrapper;
 
 /**
  * This packet is used when clicking on window buttons. Until 1.14, this was only used by enchantment tables.
@@ -68,13 +67,18 @@ public class WrapperGameClientClickWindowButton extends PacketWrapper<WrapperGam
         return windowID;
     }
 
+    /**
+     * Modify the ID of the window.
+     *
+     * @param windowID Window ID
+     */
     public void setWindowID(byte windowID) {
         this.windowID = windowID;
     }
 
     /**
      * Meaning depends on the window type.
-     * Learn more about its meaning on wiki.vg/Protocol.
+     * Learn more on wiki.vg/Protocol.
      *
      * @return Button ID
      */
@@ -82,6 +86,12 @@ public class WrapperGameClientClickWindowButton extends PacketWrapper<WrapperGam
         return buttonID;
     }
 
+    /**
+     * Modify the meaning.
+     * Learn more on wiki.vg/Protocol.
+     *
+     * @param buttonID Button ID
+     */
     public void setButtonID(byte buttonID) {
         this.buttonID = buttonID;
     }

@@ -21,9 +21,8 @@ package io.github.retrooper.packetevents.wrapper.game.client;
 import io.github.retrooper.packetevents.event.impl.PacketReceiveEvent;
 import io.github.retrooper.packetevents.manager.player.ClientVersion;
 import io.github.retrooper.packetevents.protocol.PacketType;
-import io.github.retrooper.packetevents.utils.vector.Vector3i;
 import io.github.retrooper.packetevents.utils.PacketWrapperUtil;
-import io.github.retrooper.packetevents.wrapper.PacketWrapper;
+import io.github.retrooper.packetevents.utils.vector.Vector3i;
 import io.github.retrooper.packetevents.wrapper.PacketWrapper;
 
 /**
@@ -76,6 +75,11 @@ public class WrapperGameClientGenerateStructure extends PacketWrapper<WrapperGam
         return blockPosition;
     }
 
+    /**
+     * Modify the block location of the entity.
+     *
+     * @param blockPosition Block location
+     */
     public void setBlockPosition(Vector3i blockPosition) {
         this.blockPosition = blockPosition;
     }

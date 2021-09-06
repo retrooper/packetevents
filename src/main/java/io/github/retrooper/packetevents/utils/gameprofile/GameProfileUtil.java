@@ -19,7 +19,7 @@
 package io.github.retrooper.packetevents.utils.gameprofile;
 
 import io.github.retrooper.packetevents.manager.player.Skin;
-import io.github.retrooper.packetevents.utils.nms.MinecraftReflection;
+import io.github.retrooper.packetevents.utils.MinecraftReflection;
 
 import java.util.UUID;
 

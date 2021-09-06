@@ -37,6 +37,18 @@ public class WrapperLoginServerLoginSuccess extends PacketWrapper<WrapperLoginSe
         super(event);
     }
 
+    public WrapperLoginServerLoginSuccess(UUID uuid, String username) {
+        super(PacketType.Login.Server.LOGIN_SUCCESS.getID());
+        this.uuid = uuid;
+        this.username = username;
+    }
+
+    public static int[] serializeUUID(UUID uuid) {
+        long mostSigBits = uuid.getMostSignificantBits();
+        long leastSigBits = uuid.getLeastSignificantBits();
+        return new int[]{(int) (mostSigBits >> 32), (int) mostSigBits, (int) (leastSigBits >> 32), (int) leastSigBits};
+    }
+
     @Override
     public void readData() {
         if (getServerVersion().isNewerThanOrEquals(ServerVersion.v_1_16)) {
@@ -70,20 +82,8 @@ public class WrapperLoginServerLoginSuccess extends PacketWrapper<WrapperLoginSe
         writeString(username, 16);
     }
 
-    public WrapperLoginServerLoginSuccess(UUID uuid, String username) {
-        super(PacketType.Login.Server.LOGIN_SUCCESS.getID());
-        this.uuid = uuid;
-        this.username = username;
-    }
-
     private UUID deserializeUUID(int[] data) {
         return new UUID((long) data[0] << 32 | data[1] & 4294967295L, (long) data[2] << 32 | data[3] & 4294967295L);
-    }
-
-    public static int[] serializeUUID(UUID uuid) {
-        long mostSigBits = uuid.getMostSignificantBits();
-        long leastSigBits = uuid.getLeastSignificantBits();
-        return new int[]{(int)(mostSigBits >> 32), (int)mostSigBits, (int)(leastSigBits >> 32), (int)leastSigBits};
     }
 
     public UUID getUUID() {

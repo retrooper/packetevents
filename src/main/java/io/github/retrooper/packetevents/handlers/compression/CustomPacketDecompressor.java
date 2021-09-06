@@ -18,19 +18,19 @@
 
 package io.github.retrooper.packetevents.handlers.compression;
 
+import io.github.retrooper.packetevents.utils.MinecraftReflection;
 import io.github.retrooper.packetevents.utils.netty.buffer.ByteBufAbstract;
 import io.github.retrooper.packetevents.utils.netty.buffer.ByteBufUtil;
 import io.github.retrooper.packetevents.utils.netty.channel.ChannelHandlerContextAbstract;
-import io.github.retrooper.packetevents.utils.nms.MinecraftReflection;
 import io.github.retrooper.packetevents.wrapper.PacketWrapper;
 
 import java.util.zip.DataFormatException;
 import java.util.zip.Inflater;
 
 public class CustomPacketDecompressor {
-    private static Class<?> BYTE_TO_MESSAGE_DECODER;
     private static final Inflater INFLATER = new Inflater();
     private static final int THRESHOLD = 256;
+    private static Class<?> BYTE_TO_MESSAGE_DECODER;
 
     public static ByteBufAbstract decompress(ChannelHandlerContextAbstract ctx, ByteBufAbstract byteBuf) {
         if (BYTE_TO_MESSAGE_DECODER == null) {

@@ -20,11 +20,11 @@ package io.github.retrooper.packetevents.manager.server;
 
 import io.github.retrooper.packetevents.PacketEvents;
 import io.github.retrooper.packetevents.utils.BoundingBox;
+import io.github.retrooper.packetevents.utils.MinecraftReflection;
 import io.github.retrooper.packetevents.utils.netty.ChannelInboundHandlerUtil;
 import io.github.retrooper.packetevents.utils.netty.buffer.ByteBufAbstract;
 import io.github.retrooper.packetevents.utils.netty.channel.ChannelAbstract;
 import io.github.retrooper.packetevents.utils.netty.channel.ChannelHandlerContextAbstract;
-import io.github.retrooper.packetevents.utils.nms.MinecraftReflection;
 import io.github.retrooper.packetevents.utils.reflection.ReflectionObject;
 import io.github.retrooper.packetevents.wrapper.PacketWrapper;
 import org.bukkit.Bukkit;

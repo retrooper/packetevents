@@ -23,12 +23,14 @@ import io.github.retrooper.packetevents.handlers.EarlyInjector;
 import io.github.retrooper.packetevents.handlers.legacy.PacketDecoderLegacy;
 import io.github.retrooper.packetevents.handlers.legacy.PacketEncoderLegacy;
 import io.github.retrooper.packetevents.protocol.ConnectionState;
+import io.github.retrooper.packetevents.utils.MinecraftReflection;
 import io.github.retrooper.packetevents.utils.list.ListWrapper;
-import io.github.retrooper.packetevents.utils.nms.MinecraftReflection;
 import io.github.retrooper.packetevents.utils.reflection.ReflectionObject;
-import net.minecraft.util.io.netty.channel.*;
+import net.minecraft.util.io.netty.channel.Channel;
+import net.minecraft.util.io.netty.channel.ChannelFuture;
+import net.minecraft.util.io.netty.channel.ChannelHandler;
+import net.minecraft.util.io.netty.channel.ChannelPipeline;
 import org.bukkit.entity.Player;
-import org.bukkit.plugin.PluginDescriptionFile;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
@@ -139,8 +141,7 @@ public class EarlyChannelInjectorLegacy implements EarlyInjector {
         ChannelPipeline pipeline = future.channel().pipeline();
         if (pipeline.get("SpigotNettyServerChannelHandler#0") != null) {
             pipeline.addAfter("SpigotNettyServerChannelHandler#0", PacketEvents.get().connectionName, new ServerChannelHandlerLegacy());
-        }
-        else {
+        } else {
             pipeline.addFirst(PacketEvents.get().connectionName, new ServerChannelHandlerLegacy());
         }
 

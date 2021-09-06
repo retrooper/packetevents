@@ -23,24 +23,21 @@ import io.github.retrooper.packetevents.manager.player.ClientVersion;
 import io.github.retrooper.packetevents.manager.player.Hand;
 import io.github.retrooper.packetevents.protocol.PacketType;
 import io.github.retrooper.packetevents.utils.vector.Vector3f;
-import io.github.retrooper.packetevents.utils.vector.Vector3i;
-import io.github.retrooper.packetevents.wrapper.PacketWrapper;
 import io.github.retrooper.packetevents.wrapper.PacketWrapper;
 
 import java.util.Optional;
 
+/**
+ * This packet is sent from the client to the server when the client attacks or right-clicks another entity (a player, minecart, etc).
+ * The vanilla server discards this packet if the entity being attacked is not within a 4-unit radius of the player's position.
+ * Please note that this packet is NOT sent whenever the client middle-clicks, the {@link WrapperGameClientCreativeInventoryAction} packet is sent instead.
+ */
 public class WrapperGameClientInteractEntity extends PacketWrapper<WrapperGameClientInteractEntity> {
-    public enum Type {
-        INTERACT, ATTACK, INTERACT_AT;
-        public static final Type[] VALUES = values();
-    }
-
     private int entityID;
     private Type type;
     private Optional<Vector3f> target;
     private Optional<Hand> hand;
     private Optional<Boolean> sneaking;
-
     public WrapperGameClientInteractEntity(PacketReceiveEvent event) {
         super(event);
     }
@@ -164,5 +161,10 @@ public class WrapperGameClientInteractEntity extends PacketWrapper<WrapperGameCl
 
     public void setSneaking(Optional<Boolean> sneaking) {
         this.sneaking = sneaking;
+    }
+
+    public enum Type {
+        INTERACT, ATTACK, INTERACT_AT;
+        public static final Type[] VALUES = values();
     }
 }

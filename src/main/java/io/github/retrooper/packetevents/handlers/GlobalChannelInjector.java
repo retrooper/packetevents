@@ -26,7 +26,7 @@ import io.github.retrooper.packetevents.handlers.legacy.late.LateChannelInjector
 import io.github.retrooper.packetevents.handlers.modern.early.EarlyChannelInjectorModern;
 import io.github.retrooper.packetevents.handlers.modern.late.LateChannelInjectorModern;
 import io.github.retrooper.packetevents.protocol.ConnectionState;
-import io.github.retrooper.packetevents.utils.nms.MinecraftReflection;
+import io.github.retrooper.packetevents.utils.MinecraftReflection;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.Nullable;
 
@@ -62,8 +62,7 @@ public class GlobalChannelInjector {
                 injector.inject();
                 PacketEvents.get().getPlugin().getLogger().warning("[packetevents] Failed to inject with the Early Injector. Reverting to the Compatibility/Late Injector... This is just a warning, but please report this!");
                 ex.printStackTrace();
-            }
-            else {
+            } else {
                 PacketEvents.get().getPlugin().getLogger().severe("[packetevents] Failed to inject with all available injectors. Please report this!");
                 ex.printStackTrace();
             }

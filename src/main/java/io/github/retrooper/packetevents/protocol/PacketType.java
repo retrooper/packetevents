@@ -72,10 +72,6 @@ public final class PacketType {
                 this.id = id;
             }
 
-            public int getID() {
-                return id;
-            }
-
             @Nullable
             public static PacketTypeCommon getById(int packetID) {
                 if (packetID == 0) {
@@ -85,6 +81,10 @@ public final class PacketType {
                 } else {
                     return null;
                 }
+            }
+
+            public int getID() {
+                return id;
             }
         }
     }
@@ -100,10 +100,6 @@ public final class PacketType {
                 this.id = id;
             }
 
-            public int getID() {
-                return id;
-            }
-
             @Nullable
             public static PacketTypeCommon getById(int packetID) {
                 if (packetID == 0) {
@@ -113,6 +109,10 @@ public final class PacketType {
                 } else {
                     return null;
                 }
+            }
+
+            public int getID() {
+                return id;
             }
         }
 
@@ -126,10 +126,6 @@ public final class PacketType {
                 this.id = id;
             }
 
-            public int getID() {
-                return id;
-            }
-
             @Nullable
             public static PacketTypeCommon getById(int packetID) {
                 if (packetID == 0) {
@@ -139,6 +135,10 @@ public final class PacketType {
                 } else {
                     return null;
                 }
+            }
+
+            public int getID() {
+                return id;
             }
         }
     }
@@ -156,10 +156,6 @@ public final class PacketType {
                 this.id = id;
             }
 
-            public int getID() {
-                return id;
-            }
-
             @Nullable
             public static PacketTypeCommon getById(int packetID) {
                 if (packetID == 0) {
@@ -171,6 +167,10 @@ public final class PacketType {
                 } else {
                     return null;
                 }
+            }
+
+            public int getID() {
+                return id;
             }
         }
 
@@ -189,10 +189,6 @@ public final class PacketType {
                 this.id = id;
             }
 
-            public int getID() {
-                return id;
-            }
-
             @Nullable
             public static PacketTypeCommon getById(int packetID) {
                 switch (packetID) {
@@ -209,6 +205,10 @@ public final class PacketType {
                     default:
                         return null;
                 }
+            }
+
+            public int getID() {
+                return id;
             }
         }
     }
@@ -266,13 +266,8 @@ public final class PacketType {
             PLAYER_BLOCK_PLACEMENT,
             USE_ITEM;
 
-            public int getPacketID(ClientVersion clientVersion) {
-                return PACKET_TYPE_CACHE.get(clientVersion).getOrDefault(this, -1);
-            }
-
             private static final Map<ClientVersion, Map<Integer, PacketTypeCommon>> PACKET_ID_CACHE = new IdentityHashMap<>();
             private static final Map<ClientVersion, Map<PacketTypeCommon, Integer>> PACKET_TYPE_CACHE = new HashMap<>();
-
 
             @Nullable
             public static PacketTypeCommon getById(ClientVersion version, int packetID) {
@@ -324,6 +319,10 @@ public final class PacketType {
                 loadPacketIDs(ClientVersion.v_1_16_4, ServerboundPacketType_1_16_2.values());
                 loadPacketIDs(ClientVersion.v_1_17, ServerboundPacketType_1_17.values());
                 loadPacketIDs(ClientVersion.v_1_17_1, ServerboundPacketType_1_17.values());
+            }
+
+            public int getPacketID(ClientVersion clientVersion) {
+                return PACKET_TYPE_CACHE.get(clientVersion).getOrDefault(this, -1);
             }
         }
 
@@ -444,13 +443,8 @@ public final class PacketType {
             DECLARE_RECIPES,
             TAGS;
 
-            private int id = -1;
-
-            public int getID() {
-                return id;
-            }
-
             private static final Map<Integer, PacketTypeCommon> PACKET_ID_CACHE = new IdentityHashMap<>();
+            private int id = -1;
 
             @Nullable
             public static PacketTypeCommon getById(int packetID) {
@@ -464,7 +458,6 @@ public final class PacketType {
                     PACKET_ID_CACHE.put(id, value);
                 }
             }
-
 
             public static void load() {
                 ServerVersion version = PacketEvents.get().getServerManager().getVersion();
@@ -525,6 +518,10 @@ public final class PacketType {
                 else {
                     loadPacketIDs(ClientboundPacketType_1_17.values());
                 }
+            }
+
+            public int getID() {
+                return id;
             }
         }
     }

@@ -23,7 +23,6 @@ import io.github.retrooper.packetevents.manager.player.ClientVersion;
 import io.github.retrooper.packetevents.protocol.ConnectionState;
 import io.github.retrooper.packetevents.protocol.PacketType;
 import io.github.retrooper.packetevents.wrapper.PacketWrapper;
-import io.github.retrooper.packetevents.wrapper.PacketWrapper;
 
 /**
  * This packet is the first packet the client should send.

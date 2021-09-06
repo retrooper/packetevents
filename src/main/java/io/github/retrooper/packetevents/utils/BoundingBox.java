@@ -42,6 +42,14 @@ public class BoundingBox implements Cloneable, ConfigurationSerializable {
     private double maxY;
     private double maxZ;
 
+    public BoundingBox() {
+        this.resize(0.0D, 0.0D, 0.0D, 0.0D, 0.0D, 0.0D);
+    }
+
+    public BoundingBox(double x1, double y1, double z1, double x2, double y2, double z2) {
+        this.resize(x1, y1, z1, x2, y2, z2);
+    }
+
     @NotNull
     public static BoundingBox of(@NotNull Vector corner1, @NotNull Vector corner2) {
         Validate.notNull(corner1, "Corner1 is null!");
@@ -95,12 +103,39 @@ public class BoundingBox implements Cloneable, ConfigurationSerializable {
         return new BoundingBox(center.getX() - x, center.getY() - y, center.getZ() - z, center.getX() + x, center.getY() + y, center.getZ() + z);
     }
 
-    public BoundingBox() {
-        this.resize(0.0D, 0.0D, 0.0D, 0.0D, 0.0D, 0.0D);
-    }
+    @NotNull
+    public static BoundingBox deserialize(@NotNull Map<String, Object> args) {
+        double minX = 0.0D;
+        double minY = 0.0D;
+        double minZ = 0.0D;
+        double maxX = 0.0D;
+        double maxY = 0.0D;
+        double maxZ = 0.0D;
+        if (args.containsKey("minX")) {
+            minX = ((Number) args.get("minX")).doubleValue();
+        }
 
-    public BoundingBox(double x1, double y1, double z1, double x2, double y2, double z2) {
-        this.resize(x1, y1, z1, x2, y2, z2);
+        if (args.containsKey("minY")) {
+            minY = ((Number) args.get("minY")).doubleValue();
+        }
+
+        if (args.containsKey("minZ")) {
+            minZ = ((Number) args.get("minZ")).doubleValue();
+        }
+
+        if (args.containsKey("maxX")) {
+            maxX = ((Number) args.get("maxX")).doubleValue();
+        }
+
+        if (args.containsKey("maxY")) {
+            maxY = ((Number) args.get("maxY")).doubleValue();
+        }
+
+        if (args.containsKey("maxZ")) {
+            maxZ = ((Number) args.get("maxZ")).doubleValue();
+        }
+
+        return new BoundingBox(minX, minY, minZ, maxX, maxY, maxZ);
     }
 
     @NotNull
@@ -629,40 +664,5 @@ public class BoundingBox implements Cloneable, ConfigurationSerializable {
         result.put("maxY", this.maxY);
         result.put("maxZ", this.maxZ);
         return result;
-    }
-
-    @NotNull
-    public static BoundingBox deserialize(@NotNull Map<String, Object> args) {
-        double minX = 0.0D;
-        double minY = 0.0D;
-        double minZ = 0.0D;
-        double maxX = 0.0D;
-        double maxY = 0.0D;
-        double maxZ = 0.0D;
-        if (args.containsKey("minX")) {
-            minX = ((Number) args.get("minX")).doubleValue();
-        }
-
-        if (args.containsKey("minY")) {
-            minY = ((Number) args.get("minY")).doubleValue();
-        }
-
-        if (args.containsKey("minZ")) {
-            minZ = ((Number) args.get("minZ")).doubleValue();
-        }
-
-        if (args.containsKey("maxX")) {
-            maxX = ((Number) args.get("maxX")).doubleValue();
-        }
-
-        if (args.containsKey("maxY")) {
-            maxY = ((Number) args.get("maxY")).doubleValue();
-        }
-
-        if (args.containsKey("maxZ")) {
-            maxZ = ((Number) args.get("maxZ")).doubleValue();
-        }
-
-        return new BoundingBox(minX, minY, minZ, maxX, maxY, maxZ);
     }
 }

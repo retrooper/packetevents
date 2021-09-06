@@ -21,7 +21,6 @@ package io.github.retrooper.packetevents.wrapper.game.server;
 import io.github.retrooper.packetevents.event.impl.PacketSendEvent;
 import io.github.retrooper.packetevents.protocol.PacketType;
 import io.github.retrooper.packetevents.wrapper.PacketWrapper;
-import io.github.retrooper.packetevents.wrapper.PacketWrapper;
 
 /**
  * This packet is currently used by mods to synchronize the client with the server.

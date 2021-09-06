@@ -31,8 +31,8 @@ import java.util.Map;
  * @since 1.8
  */
 public abstract class PacketListenerAbstract {
-    private final PacketListenerPriority priority;
     protected final Map<Byte, List<Method>> methods;
+    private final PacketListenerPriority priority;
 
     public PacketListenerAbstract(PacketListenerPriority priority) {
         this.priority = priority;
@@ -53,16 +53,22 @@ public abstract class PacketListenerAbstract {
         return priority;
     }
 
-    public void onPlayerInject(PlayerInjectEvent event) {}
+    public void onPlayerInject(PlayerInjectEvent event) {
+    }
 
-    public void onPostPlayerInject(PostPlayerInjectEvent event) {}
+    public void onPostPlayerInject(PostPlayerInjectEvent event) {
+    }
 
-    public void onPlayerEject(PlayerEjectEvent event) {}
+    public void onPlayerEject(PlayerEjectEvent event) {
+    }
 
-    public void onPacketReceive(PacketReceiveEvent event) {}
+    public void onPacketReceive(PacketReceiveEvent event) {
+    }
 
-    public void onPacketSend(PacketSendEvent event) {}
+    public void onPacketSend(PacketSendEvent event) {
+    }
 
-    public void onPacketEventExternal(PacketEvent event) {}
+    public void onPacketEventExternal(PacketEvent event) {
+    }
 
 }

@@ -18,18 +18,18 @@
 
 package io.github.retrooper.packetevents.handlers.compression;
 
+import io.github.retrooper.packetevents.utils.MinecraftReflection;
 import io.github.retrooper.packetevents.utils.netty.buffer.ByteBufAbstract;
 import io.github.retrooper.packetevents.utils.netty.channel.ChannelHandlerContextAbstract;
-import io.github.retrooper.packetevents.utils.nms.MinecraftReflection;
 import io.github.retrooper.packetevents.wrapper.PacketWrapper;
 
 import java.util.zip.Deflater;
 
 public class CustomPacketCompressor {
-    private static Class<?> MESSAGE_TO_BYTE_ENCODER;
     private static final byte[] COMPRESSED_DATA = new byte[8192];
     private static final Deflater DEFLATER = new Deflater();
     private static final int THRESHOLD = 256;
+    private static Class<?> MESSAGE_TO_BYTE_ENCODER;
 
     public static ByteBufAbstract compress(ChannelHandlerContextAbstract ctx, ByteBufAbstract byteBuf) {
         if (MESSAGE_TO_BYTE_ENCODER == null) {

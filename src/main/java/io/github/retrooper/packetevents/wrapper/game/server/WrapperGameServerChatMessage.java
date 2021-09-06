@@ -30,17 +30,9 @@ import java.util.UUID;
 public class WrapperGameServerChatMessage extends PacketWrapper<WrapperGameServerChatMessage> {
     private static final int MODERN_MESSAGE_LENGTH = 262144;
     private static final int LEGACY_MESSAGE_LENGTH = 32767;
-
-    public enum ChatPosition {
-        CHAT, SYSTEM_MESSAGE, GAME_INFO;
-
-        public static final ChatPosition[] VALUES = values();
-    }
-
     private String jsonMessage;
     private ChatPosition position;
     private UUID senderUUID;
-
     public WrapperGameServerChatMessage(PacketSendEvent event) {
         super(event);
     }
@@ -58,7 +50,6 @@ public class WrapperGameServerChatMessage extends PacketWrapper<WrapperGameServe
         this.position = position;
         this.senderUUID = senderUUID;
     }
-
 
     @Override
     public void readData() {
@@ -125,5 +116,11 @@ public class WrapperGameServerChatMessage extends PacketWrapper<WrapperGameServe
 
     public void setSenderUUID(UUID senderUUID) {
         this.senderUUID = senderUUID;
+    }
+
+    public enum ChatPosition {
+        CHAT, SYSTEM_MESSAGE, GAME_INFO;
+
+        public static final ChatPosition[] VALUES = values();
     }
 }

@@ -28,14 +28,6 @@ import java.util.Optional;
 public class WrapperGameClientResourcePackStatus extends PacketWrapper<WrapperGameClientResourcePackStatus> {
     private Optional<String> hash;
     private Result result;
-    public enum Result {
-        SUCCESSFULLY_LOADED,
-        DECLINED,
-        FAILED_DOWNLOAD,
-        ACCEPTED;
-
-        public static final Result[] VALUES = values();
-    }
 
     public WrapperGameClientResourcePackStatus(PacketReceiveEvent event) {
         super(event);
@@ -72,7 +64,7 @@ public class WrapperGameClientResourcePackStatus extends PacketWrapper<WrapperGa
     @Override
     public void writeData() {
         if (clientVersion.isOlderThan(ClientVersion.v_1_10)) {
-            writeString(hash.get(), 40);
+            writeString(hash.orElse("invalid"), 40);
         }
         writeVarInt(result.ordinal());
     }
@@ -85,11 +77,20 @@ public class WrapperGameClientResourcePackStatus extends PacketWrapper<WrapperGa
         this.result = result;
     }
 
-    protected Optional<String> getHash() {
+    public Optional<String> getHash() {
         return hash;
     }
 
-    protected void setHash(Optional<String> hash) {
+    public void setHash(Optional<String> hash) {
         this.hash = hash;
+    }
+
+    public enum Result {
+        SUCCESSFULLY_LOADED,
+        DECLINED,
+        FAILED_DOWNLOAD,
+        ACCEPTED;
+
+        public static final Result[] VALUES = values();
     }
 }

@@ -16,12 +16,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package io.github.retrooper.packetevents.utils.nms;
+package io.github.retrooper.packetevents.utils.entitytype;
 
-import org.bukkit.entity.Player;
-
-public class PlayerPingAccessorModern {
-    public static int getPing(Player player) {
-        return player.getPing();
-    }
+public enum EntityType {
 }

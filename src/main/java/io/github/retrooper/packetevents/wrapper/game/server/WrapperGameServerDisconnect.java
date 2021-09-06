@@ -28,6 +28,7 @@ public class WrapperGameServerDisconnect extends PacketWrapper<WrapperGameServer
     private static final int MODERN_MESSAGE_LENGTH = 262144;
     private static final int LEGACY_MESSAGE_LENGTH = 32767;
     private String reason;
+
     public WrapperGameServerDisconnect(PacketSendEvent event) {
         super(event);
     }

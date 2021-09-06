@@ -14,7 +14,7 @@
  *
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
-*/
+ */
 
 package io.github.retrooper.packetevents.handlers.modern.early;
 
@@ -41,7 +41,6 @@ public class PreChannelInitializerModern_v1_12 extends ChannelInboundHandlerAdap
         }
         ctx.pipeline().fireChannelRegistered();
     }
-
 
 
     @Override

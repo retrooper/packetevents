@@ -75,7 +75,7 @@ public class ChannelModern implements ChannelAbstract {
     @Override
     public void write(Object msg) {
         if (msg instanceof ByteBufAbstract) {
-            msg = ((ByteBufAbstract)msg).rawByteBuf();
+            msg = ((ByteBufAbstract) msg).rawByteBuf();
         }
         channel.write(msg);
     }
@@ -83,7 +83,7 @@ public class ChannelModern implements ChannelAbstract {
     @Override
     public void writeAndFlush(Object msg) {
         if (msg instanceof ByteBufAbstract) {
-            msg = ((ByteBufAbstract)msg).rawByteBuf();
+            msg = ((ByteBufAbstract) msg).rawByteBuf();
         }
         channel.writeAndFlush(msg);
     }

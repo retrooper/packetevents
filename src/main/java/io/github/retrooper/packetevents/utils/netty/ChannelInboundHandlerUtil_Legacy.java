@@ -24,7 +24,7 @@ import net.minecraft.util.io.netty.channel.ChannelInboundHandler;
 public class ChannelInboundHandlerUtil_Legacy {
     public static void handlerChannelRead(Object handler, Object ctx, Object msg) {
         try {
-            ((ChannelInboundHandler)handler).channelRead((ChannelHandlerContext) ctx, msg);
+            ((ChannelInboundHandler) handler).channelRead((ChannelHandlerContext) ctx, msg);
         } catch (Exception e) {
             e.printStackTrace();
         }

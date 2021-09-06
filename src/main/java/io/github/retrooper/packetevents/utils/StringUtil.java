@@ -22,8 +22,7 @@ public class StringUtil {
     public static String maximizeLength(String msg, int maxLength) {
         if (msg.length() > maxLength) {
             return msg.substring(0, maxLength);
-        }
-        else {
+        } else {
             return msg;
         }
     }

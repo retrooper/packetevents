@@ -23,7 +23,6 @@ import io.github.retrooper.packetevents.manager.player.ClientVersion;
 import io.github.retrooper.packetevents.manager.player.Hand;
 import io.github.retrooper.packetevents.protocol.PacketType;
 import io.github.retrooper.packetevents.wrapper.PacketWrapper;
-import io.github.retrooper.packetevents.wrapper.PacketWrapper;
 
 /**
  * This packet is sent when the client swings their arm.
@@ -73,6 +72,14 @@ public class WrapperGameClientAnimation extends PacketWrapper<WrapperGameClientA
         return hand;
     }
 
+    /**
+     * Modify the hand used for the animation.
+     * On {@link ClientVersion#v_1_9}, an off-hand was introduced and specifies which arm has been swung.
+     * For {@link ClientVersion#v_1_8} and {@link ClientVersion#v_1_7_10} clients only have a main hand.
+     * Modifying the hand on 1.8 and 1.7 clients is redundant.
+     *
+     * @param hand Hand used for the animation
+     */
     public void setHand(Hand hand) {
         this.hand = hand;
     }

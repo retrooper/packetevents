@@ -18,7 +18,7 @@
 
 package io.github.retrooper.packetevents.utils.netty.channel;
 
-import io.github.retrooper.packetevents.utils.nms.MinecraftReflection;
+import io.github.retrooper.packetevents.utils.MinecraftReflection;
 
 public interface ChannelHandlerAbstract {
     static ChannelHandlerAbstract generate(Object rawChannelHandler) {

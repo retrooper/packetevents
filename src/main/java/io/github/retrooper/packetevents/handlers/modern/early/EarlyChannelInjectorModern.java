@@ -23,8 +23,8 @@ import io.github.retrooper.packetevents.handlers.EarlyInjector;
 import io.github.retrooper.packetevents.handlers.modern.PacketDecoderModern;
 import io.github.retrooper.packetevents.handlers.modern.PacketEncoderModern;
 import io.github.retrooper.packetevents.protocol.ConnectionState;
+import io.github.retrooper.packetevents.utils.MinecraftReflection;
 import io.github.retrooper.packetevents.utils.list.ListWrapper;
-import io.github.retrooper.packetevents.utils.nms.MinecraftReflection;
 import io.github.retrooper.packetevents.utils.reflection.ReflectionObject;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
@@ -143,8 +143,7 @@ public class EarlyChannelInjectorModern implements EarlyInjector {
         ChannelPipeline pipeline = future.channel().pipeline();
         if (pipeline.get("SpigotNettyServerChannelHandler#0") != null) {
             pipeline.addAfter("SpigotNettyServerChannelHandler#0", PacketEvents.get().connectionName, new ServerChannelHandlerModern());
-        }
-        else {
+        } else {
             pipeline.addFirst(PacketEvents.get().connectionName, new ServerChannelHandlerModern());
         }
 

@@ -73,7 +73,7 @@ public class WrapperGameServerSpawnLivingEntity extends PacketWrapper<WrapperGam
             }
             this.position = new Vector3d(readDouble(), readDouble(), readDouble());
         }
-        this.yaw = readByte() /  ROTATION_FACTOR;
+        this.yaw = readByte() / ROTATION_FACTOR;
         this.pitch = readByte() / ROTATION_FACTOR;
         this.headPitch = readByte() / ROTATION_FACTOR;
         double velX = readShort() / VELOCITY_FACTOR;
@@ -93,7 +93,6 @@ public class WrapperGameServerSpawnLivingEntity extends PacketWrapper<WrapperGam
         this.headPitch = wrapper.headPitch;
         this.velocity = wrapper.velocity;
     }
-
 
 
     @Override
