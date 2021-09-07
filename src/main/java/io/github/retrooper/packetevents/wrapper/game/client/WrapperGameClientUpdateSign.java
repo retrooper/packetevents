@@ -88,6 +88,10 @@ public class WrapperGameClientUpdateSign extends PacketWrapper<WrapperGameClient
         return blockPosition;
     }
 
+    /**
+     * Modify the block location of the sign.
+     * @param blockPosition Sign position
+     */
     public void setBlockPosition(Vector3i blockPosition) {
         this.blockPosition = blockPosition;
     }
@@ -101,6 +105,11 @@ public class WrapperGameClientUpdateSign extends PacketWrapper<WrapperGameClient
         return textLines;
     }
 
+    /**
+     * Modify the text lines in the sign.
+     *
+     * @param textLines Sign content
+     */
     public void setTextLines(String[] textLines) {
         System.arraycopy(textLines, 0, this.textLines, 0, 4);
     }

@@ -189,18 +189,30 @@ public class PacketWrapper<T extends PacketWrapper> {
         return CraftItemStack.asBukkitCopy(itemstack);
     }*/
 
-    private ItemStack readItemStack() {
+    //TODO Finish
+    public ItemStack readItemStack() {
         ItemStack itemStack = null;
         short itemID = readShort();
         if (itemID >= 0) {
             byte count = readByte();
             short data = readShort();
             itemStack = new ItemStack(Material.values()[itemID], count, data);
-            itemStack.setItemMeta(null);
-
-            return itemStack;
+            int readerIndex = byteBuf.readerIndex();
+            boolean hasMetaData = readByte() != 0;
+            if (hasMetaData) {
+                byteBuf.readerIndex(readerIndex);
+                //TODO this is the NMS ItemStack#setTag NBTCompressedStreamTools.a(new ByteBufInputStream(byteBuf.rawByteBuf()), new NBTReadLimiter(2097152L));
+                return itemStack;
+            } else {
+                return itemStack;
+            }
         }
         throw new RuntimeException("Invalid ItemStack material ID: " + itemID + ". The ID may not be less than 0.");
+    }
+
+    //TODO Finish
+    public void writeItemStack(ItemStack itemStack) {
+
     }
 
     public String readString() {

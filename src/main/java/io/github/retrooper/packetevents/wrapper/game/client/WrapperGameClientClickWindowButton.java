@@ -27,14 +27,14 @@ import io.github.retrooper.packetevents.wrapper.PacketWrapper;
  * This packet is used when clicking on window buttons. Until 1.14, this was only used by enchantment tables.
  */
 public class WrapperGameClientClickWindowButton extends PacketWrapper<WrapperGameClientClickWindowButton> {
-    private byte windowID;
-    private byte buttonID;
+    private int windowID;
+    private int buttonID;
 
     public WrapperGameClientClickWindowButton(PacketReceiveEvent event) {
         super(event);
     }
 
-    public WrapperGameClientClickWindowButton(ClientVersion clientVersion, byte windowID, byte buttonID) {
+    public WrapperGameClientClickWindowButton(ClientVersion clientVersion, int windowID, int buttonID) {
         super(PacketType.Game.Client.CLICK_WINDOW_BUTTON.getPacketID(clientVersion), clientVersion);
         this.windowID = windowID;
         this.buttonID = buttonID;
@@ -63,7 +63,7 @@ public class WrapperGameClientClickWindowButton extends PacketWrapper<WrapperGam
      *
      * @return Window ID
      */
-    public byte getWindowID() {
+    public int getWindowID() {
         return windowID;
     }
 
@@ -72,7 +72,7 @@ public class WrapperGameClientClickWindowButton extends PacketWrapper<WrapperGam
      *
      * @param windowID Window ID
      */
-    public void setWindowID(byte windowID) {
+    public void setWindowID(int windowID) {
         this.windowID = windowID;
     }
 
@@ -82,7 +82,7 @@ public class WrapperGameClientClickWindowButton extends PacketWrapper<WrapperGam
      *
      * @return Button ID
      */
-    public byte getButtonID() {
+    public int getButtonID() {
         return buttonID;
     }
 
@@ -92,7 +92,7 @@ public class WrapperGameClientClickWindowButton extends PacketWrapper<WrapperGam
      *
      * @param buttonID Button ID
      */
-    public void setButtonID(byte buttonID) {
+    public void setButtonID(int buttonID) {
         this.buttonID = buttonID;
     }
 }

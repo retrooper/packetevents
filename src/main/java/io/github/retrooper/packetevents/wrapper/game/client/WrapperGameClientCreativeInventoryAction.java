@@ -22,10 +22,11 @@ import io.github.retrooper.packetevents.event.impl.PacketReceiveEvent;
 import io.github.retrooper.packetevents.manager.player.ClientVersion;
 import io.github.retrooper.packetevents.protocol.PacketType;
 import io.github.retrooper.packetevents.wrapper.PacketWrapper;
+import org.bukkit.inventory.ItemStack;
 
 public class WrapperGameClientCreativeInventoryAction extends PacketWrapper<WrapperGameClientCreativeInventoryAction> {
     private int slot;
-
+    private ItemStack itemStack;
     public WrapperGameClientCreativeInventoryAction(PacketReceiveEvent event) {
         super(event);
     }
@@ -37,7 +38,8 @@ public class WrapperGameClientCreativeInventoryAction extends PacketWrapper<Wrap
     @Override
     public void readData() {
         this.slot = readShort();
-        net.minecraft.server.v1_7_R4.PacketPlayInSetCreativeSlot cs0;
+        this.itemStack = readItemStack();
+        /*net.minecraft.server.v1_7_R4.PacketPlayInSetCreativeSlot cs0;
         net.minecraft.server.v1_8_R3.PacketPlayInSetCreativeSlot cs1;
         net.minecraft.server.v1_9_R1.PacketPlayInSetCreativeSlot cs2;
         net.minecraft.server.v1_10_R1.PacketPlayInSetCreativeSlot cs3;
@@ -47,16 +49,34 @@ public class WrapperGameClientCreativeInventoryAction extends PacketWrapper<Wrap
         net.minecraft.server.v1_14_R1.PacketPlayInSetCreativeSlot cs7;
         net.minecraft.server.v1_15_R1.PacketPlayInSetCreativeSlot cs8;
         net.minecraft.server.v1_16_R1.PacketPlayInSetCreativeSlot cs9;
-        net.minecraft.network.protocol.game.PacketPlayInSetCreativeSlot cs10;
+        net.minecraft.network.protocol.game.PacketPlayInSetCreativeSlot cs10;*/
     }
 
     @Override
     public void readData(WrapperGameClientCreativeInventoryAction wrapper) {
         this.slot = wrapper.slot;
+        this.itemStack = wrapper.itemStack;
     }
 
     @Override
     public void writeData() {
         writeShort(slot);
+        writeItemStack(itemStack);
+    }
+
+    public int getSlot() {
+        return slot;
+    }
+
+    public void setSlot(int slot) {
+        this.slot = slot;
+    }
+
+    public ItemStack getItemStack() {
+        return itemStack;
+    }
+
+    public void setItemStack(ItemStack itemStack) {
+        this.itemStack = itemStack;
     }
 }

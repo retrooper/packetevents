@@ -93,6 +93,10 @@ public class WrapperGameClientGenerateStructure extends PacketWrapper<WrapperGam
         return levels;
     }
 
+    /**
+     * Modify levels.
+     * @param levels Levels
+     */
     public void setLevels(int levels) {
         this.levels = levels;
     }
@@ -106,6 +110,11 @@ public class WrapperGameClientGenerateStructure extends PacketWrapper<WrapperGam
         return keepJigsaws;
     }
 
+    /**
+     * Should we keep the Jigsaws?
+     *
+     * @param keepJigsaws Keep Jigsaws
+     */
     public void setKeepJigsaws(boolean keepJigsaws) {
         this.keepJigsaws = keepJigsaws;
     }

@@ -64,6 +64,11 @@ public class WrapperGameClientSpectate extends PacketWrapper<WrapperGameClientSp
         return targetUUID;
     }
 
+    /**
+     * Modify the UUID of the entity we want to teleport to.
+     *
+     * @param uuid UUID of target entity
+     */
     public void setTargetUUID(UUID uuid) {
         this.targetUUID = uuid;
     }

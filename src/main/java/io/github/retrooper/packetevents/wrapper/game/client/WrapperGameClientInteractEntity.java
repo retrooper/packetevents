@@ -38,6 +38,7 @@ public class WrapperGameClientInteractEntity extends PacketWrapper<WrapperGameCl
     private Optional<Vector3f> target;
     private Optional<Hand> hand;
     private Optional<Boolean> sneaking;
+
     public WrapperGameClientInteractEntity(PacketReceiveEvent event) {
         super(event);
     }
