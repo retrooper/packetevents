@@ -23,10 +23,10 @@ import io.github.retrooper.packetevents.event.impl.PacketReceiveEvent;
 import io.github.retrooper.packetevents.event.impl.PacketSendEvent;
 import io.github.retrooper.packetevents.manager.player.ClientVersion;
 import io.github.retrooper.packetevents.manager.server.ServerVersion;
+import io.github.retrooper.packetevents.utils.MinecraftReflection;
 import io.github.retrooper.packetevents.utils.netty.buffer.ByteBufAbstract;
 import io.github.retrooper.packetevents.utils.netty.buffer.ByteBufUtil;
 import io.netty.handler.codec.EncoderException;
-import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 
 import java.nio.charset.StandardCharsets;
@@ -159,39 +159,9 @@ public class PacketWrapper<T extends PacketWrapper> {
 
         byteBuf.writeByte(value);
     }
-/*
-    public ItemStack readItemStackRaw() {
-        net.minecraft.server.v1_7_R4.ItemStack itemstack = null;
-        short short1 = this.readShort();
-        if (short1 >= 0) {
-            byte b0 = this.readByte();
-            short short2 = this.readShort();
-            itemstack = new net.minecraft.server.v1_7_R4.ItemStack(Item.getById(short1), b0, short2);
-            itemstack.tag = this.b();
-            if (itemstack.tag != null) {
-                if (clientVersion.isNewerThanOrEquals(ClientVersion.v_1_8) && itemstack.getItem() == Items.WRITTEN_BOOK && itemstack.tag.hasKeyOfType("pages", 9)) {
-                    NBTTagList nbttaglist = itemstack.tag.getList("pages", 8);
-                    NBTTagList newList = new NBTTagList();
 
-                    for(int i = 0; i < nbttaglist.size(); ++i) {
-                        IChatBaseComponent s = ChatSerializer.a(nbttaglist.getString(i));
-                        String newString = SpigotComponentReverter.toLegacy(s);
-                        newList.add(new NBTTagString(newString));
-                    }
-
-                    itemstack.tag.set("pages", newList);
-                }
-
-                CraftItemStack.setItemMeta(itemstack, CraftItemStack.getItemMeta(itemstack));
-            }
-        }
-
-        return CraftItemStack.asBukkitCopy(itemstack);
-    }*/
-
-    //TODO Finish
-    public ItemStack readItemStack() {
-        ItemStack itemStack = null;
+    //TODO Finish by supporting itemmeta
+    private ItemStack readItemStack0() {
         short itemID = readShort();
         if (itemID >= 0) {
             byte count = readByte();
@@ -207,12 +177,18 @@ public class PacketWrapper<T extends PacketWrapper> {
                 return itemStack;
             }
         }
-        throw new RuntimeException("Invalid ItemStack material ID: " + itemID + ". The ID may not be less than 0.");
     }
 
-    //TODO Finish
-    public void writeItemStack(ItemStack itemStack) {
+    public ItemStack readItemStack() {
+        Object packetDataSerializer = MinecraftReflection.createPacketDataSerializer(byteBuf.rawByteBuf());
+        return MinecraftReflection.readNMSItemStackPacketDataSerializer(packetDataSerializer);
+    }
 
+    //TODO Recode to support cross-version
+    public void writeItemStack(ItemStack itemStack) {
+        Object packetDataSerializer = MinecraftReflection.createPacketDataSerializer(byteBuf.rawByteBuf());
+        Object nmsItemStack = MinecraftReflection.toNMSItemStack(itemStack);
+        MinecraftReflection.writeNMSItemStackPacketDataSerializer(packetDataSerializer, nmsItemStack);
     }
 
     public String readString() {

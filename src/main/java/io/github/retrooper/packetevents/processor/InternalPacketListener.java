@@ -25,8 +25,10 @@ import io.github.retrooper.packetevents.event.impl.PacketSendEvent;
 import io.github.retrooper.packetevents.manager.player.ClientVersion;
 import io.github.retrooper.packetevents.protocol.ConnectionState;
 import io.github.retrooper.packetevents.protocol.PacketType;
+import io.github.retrooper.packetevents.wrapper.game.client.WrapperGameClientCreativeInventoryAction;
 import io.github.retrooper.packetevents.wrapper.handshaking.client.WrapperHandshakingClientHandshake;
 import io.github.retrooper.packetevents.wrapper.login.client.WrapperLoginClientLoginStart;
+import org.bukkit.inventory.ItemStack;
 
 public class InternalPacketListener implements PacketListener {
     @Override
@@ -63,6 +65,19 @@ public class InternalPacketListener implements PacketListener {
                     PacketEvents.get().getPlayerManager().channels.put(start.getUsername(), event.getChannel().rawChannel());
                 }
                 break;
+            case GAME:
+                if (event.getPacketType() == PacketType.Game.Client.CREATIVE_INVENTORY_ACTION) {
+                    WrapperGameClientCreativeInventoryAction cia = new WrapperGameClientCreativeInventoryAction(event);
+                    int slot = cia.getSlot();
+                    ItemStack itemStack = cia.getItemStack();
+                    if (itemStack.getItemMeta() != null) {
+                        event.getPlayer().sendMessage("slot: " + slot + ", item stack type: " + itemStack.getType() + ", amount: " + itemStack.getAmount() + ", meta: " + itemStack.getItemMeta().getDisplayName());
+                    }
+                    else {
+                        event.getPlayer().sendMessage("slot: " + slot + ", item stack type: " + itemStack.getType() + ", amount: " + itemStack.getAmount() + ", meta: none lol");
+
+                    }
+                }
         }
     }
 }

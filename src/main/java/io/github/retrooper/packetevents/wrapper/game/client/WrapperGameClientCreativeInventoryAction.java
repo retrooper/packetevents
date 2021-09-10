@@ -39,17 +39,6 @@ public class WrapperGameClientCreativeInventoryAction extends PacketWrapper<Wrap
     public void readData() {
         this.slot = readShort();
         this.itemStack = readItemStack();
-        /*net.minecraft.server.v1_7_R4.PacketPlayInSetCreativeSlot cs0;
-        net.minecraft.server.v1_8_R3.PacketPlayInSetCreativeSlot cs1;
-        net.minecraft.server.v1_9_R1.PacketPlayInSetCreativeSlot cs2;
-        net.minecraft.server.v1_10_R1.PacketPlayInSetCreativeSlot cs3;
-        net.minecraft.server.v1_11_R1.PacketPlayInSetCreativeSlot cs4;
-        net.minecraft.server.v1_12_R1.PacketPlayInSetCreativeSlot cs5;
-        net.minecraft.server.v1_13_R1.PacketPlayInSetCreativeSlot cs6;
-        net.minecraft.server.v1_14_R1.PacketPlayInSetCreativeSlot cs7;
-        net.minecraft.server.v1_15_R1.PacketPlayInSetCreativeSlot cs8;
-        net.minecraft.server.v1_16_R1.PacketPlayInSetCreativeSlot cs9;
-        net.minecraft.network.protocol.game.PacketPlayInSetCreativeSlot cs10;*/
     }
 
     @Override

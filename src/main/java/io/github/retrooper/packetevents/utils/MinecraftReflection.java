@@ -27,8 +27,10 @@ import org.bukkit.Server;
 import org.bukkit.World;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.Nullable;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -48,14 +50,14 @@ public final class MinecraftReflection {
     public static boolean V_1_17_OR_HIGHER;
     public static boolean V_1_12_OR_HIGHER;
     //Minecraft classes
-    public static Class<?> MINECRAFT_SERVER_CLASS, NMS_ENTITY_CLASS, ENTITY_PLAYER_CLASS, BOUNDING_BOX_CLASS,
+    public static Class<?> MINECRAFT_SERVER_CLASS, NMS_PACKET_DATA_SERIALIZER_CLASS, NMS_ITEM_STACK_CLASS, NMS_IMATERIAL_CLASS, NMS_ENTITY_CLASS, ENTITY_PLAYER_CLASS, BOUNDING_BOX_CLASS,
             ENTITY_HUMAN_CLASS, PLAYER_CONNECTION_CLASS, SERVER_CONNECTION_CLASS, NETWORK_MANAGER_CLASS,
             MOB_EFFECT_LIST_CLASS, NMS_ITEM_CLASS, DEDICATED_SERVER_CLASS, WORLD_SERVER_CLASS, GAME_PROFILE_CLASS,
-            CRAFT_WORLD_CLASS, CRAFT_SERVER_CLASS, CRAFT_PLAYER_CLASS, CRAFT_ENTITY_CLASS,
+            CRAFT_WORLD_CLASS, CRAFT_SERVER_CLASS, CRAFT_PLAYER_CLASS, CRAFT_ENTITY_CLASS, CRAFT_ITEM_STACK_CLASS,
             LEVEL_ENTITY_GETTER_CLASS, PERSISTENT_ENTITY_SECTION_MANAGER_CLASS;
 
     //Netty classes
-    public static Class<?> CHANNEL_CLASS;
+    public static Class<?> CHANNEL_CLASS, BYTE_BUF_CLASS;
 
     //External classes
     public static Class<?> GEYSER_CLASS;
@@ -66,10 +68,25 @@ public final class MinecraftReflection {
     //Methods
     public static Method GET_CRAFT_PLAYER_HANDLE_METHOD, GET_CRAFT_ENTITY_HANDLE_METHOD, GET_CRAFT_WORLD_HANDLE_METHOD,
             GET_MOB_EFFECT_LIST_ID_METHOD, GET_MOB_EFFECT_LIST_BY_ID_METHOD, GET_ITEM_ID_METHOD, GET_ITEM_BY_ID_METHOD,
-            GET_BUKKIT_ENTITY_METHOD, GET_LEVEL_ENTITY_GETTER_ITERABLE_METHOD, GET_ENTITY_BY_ID_METHOD;
+            GET_BUKKIT_ENTITY_METHOD, GET_LEVEL_ENTITY_GETTER_ITERABLE_METHOD, GET_ENTITY_BY_ID_METHOD,
+            CRAFT_ITEM_STACK_AS_BUKKIT_COPY, CRAFT_ITEM_STACK_AS_NMS_COPY,
+            READ_ITEM_STACK_IN_PACKET_DATA_SERIALIZER_METHOD, WRITE_ITEM_STACK_IN_PACKET_DATA_SERIALIZER_METHOD;
+
+    //Constructors
+    private static Constructor<?> NMS_ITEM_STACK_CONSTRUCTOR, NMS_PACKET_DATA_SERIALIZER_CONSTRUCTOR;
 
     private static Object MINECRAFT_SERVER_INSTANCE;
     private static Object MINECRAFT_SERVER_CONNECTION_INSTANCE;
+
+    private static void initConstructors() {
+        Class<?> itemClass = NMS_IMATERIAL_CLASS != null ? NMS_IMATERIAL_CLASS : NMS_ITEM_CLASS;
+        try {
+            NMS_ITEM_STACK_CONSTRUCTOR = NMS_ITEM_STACK_CLASS.getConstructor(itemClass, int.class);
+            NMS_PACKET_DATA_SERIALIZER_CONSTRUCTOR = NMS_PACKET_DATA_SERIALIZER_CLASS.getConstructor(BYTE_BUF_CLASS);
+        } catch (NoSuchMethodException e) {
+            e.printStackTrace();
+        }
+    }
 
     private static void initMethods() {
         GET_BUKKIT_ENTITY_METHOD = Reflection.getMethod(NMS_ENTITY_CLASS, CRAFT_ENTITY_CLASS, 0);
@@ -89,6 +106,12 @@ public final class MinecraftReflection {
         if (GET_ENTITY_BY_ID_METHOD == null) {
             GET_ENTITY_BY_ID_METHOD = Reflection.getMethod(WORLD_SERVER_CLASS, "getEntity", NMS_ENTITY_CLASS, int.class);
         }
+
+        CRAFT_ITEM_STACK_AS_BUKKIT_COPY = Reflection.getMethod(CRAFT_ITEM_STACK_CLASS, "asBukkitCopy", 0);
+        CRAFT_ITEM_STACK_AS_NMS_COPY = Reflection.getMethod(CRAFT_ITEM_STACK_CLASS, "asNMSCopy", 0);
+
+        READ_ITEM_STACK_IN_PACKET_DATA_SERIALIZER_METHOD = Reflection.getMethod(NMS_PACKET_DATA_SERIALIZER_CLASS, NMS_ITEM_STACK_CLASS, 0);
+        WRITE_ITEM_STACK_IN_PACKET_DATA_SERIALIZER_METHOD = Reflection.getMethod(NMS_PACKET_DATA_SERIALIZER_CLASS, 0, NMS_ITEM_STACK_CLASS);
     }
 
     private static void initFields() {
@@ -98,6 +121,9 @@ public final class MinecraftReflection {
 
     private static void initClasses() {
         MINECRAFT_SERVER_CLASS = getServerClass("server.MinecraftServer", "MinecraftServer");
+        NMS_PACKET_DATA_SERIALIZER_CLASS = getServerClass("network.PacketDataSerializer", "PacketDataSerializer");
+        NMS_ITEM_STACK_CLASS = getServerClass("world.item.ItemStack", "ItemStack");
+        NMS_IMATERIAL_CLASS = getServerClass("world.level.IMaterial", "IMaterial");
         NMS_ENTITY_CLASS = getServerClass("world.entity.Entity", "Entity");
         ENTITY_PLAYER_CLASS = getServerClass("server.level.EntityPlayer", "EntityPlayer");
         BOUNDING_BOX_CLASS = getServerClass("world.phys.AxisAlignedBB", "AxisAlignedBB");
@@ -124,10 +150,10 @@ public final class MinecraftReflection {
         CRAFT_PLAYER_CLASS = getOBCClass("entity.CraftPlayer");
         CRAFT_SERVER_CLASS = getOBCClass("CraftServer");
         CRAFT_ENTITY_CLASS = getOBCClass("entity.CraftEntity");
+        CRAFT_ITEM_STACK_CLASS = getOBCClass("inventory.CraftItemStack");
 
         CHANNEL_CLASS = getNettyClass("channel.Channel");
-        io.netty.channel.Channel c;
-        io.netty.handler.codec.ByteToMessageDecoder d;
+        BYTE_BUF_CLASS = getNettyClass("buffer.ByteBuf");
 
         GEYSER_CLASS = Reflection.getClassByNameWithoutException("org.geysermc.connector.GeyserConnector");
     }
@@ -154,6 +180,7 @@ public final class MinecraftReflection {
         initClasses();
         initFields();
         initMethods();
+        initConstructors();
     }
 
 
@@ -414,4 +441,70 @@ public final class MinecraftReflection {
         }
         return null;
     }
+
+    public static Object createNMSItemStack(Object nmsItem, int count) {
+        try {
+            return NMS_ITEM_STACK_CONSTRUCTOR.newInstance(nmsItem, count);
+        } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    public static Object createNMSItemStack(int itemID, int count) {
+        try {
+            Object nmsItem = getNMSItemById(itemID);
+            return NMS_ITEM_STACK_CONSTRUCTOR.newInstance(nmsItem, count);
+        } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    public static Object createPacketDataSerializer(Object byteBuf) {
+        try {
+            return NMS_PACKET_DATA_SERIALIZER_CONSTRUCTOR.newInstance(byteBuf);
+        } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    public static ItemStack toBukkitItemStack(Object nmsItemStack) {
+        try {
+            return (ItemStack) CRAFT_ITEM_STACK_AS_BUKKIT_COPY.invoke(null, nmsItemStack);
+        } catch (IllegalAccessException | InvocationTargetException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    public static Object toNMSItemStack(ItemStack itemStack) {
+        try {
+            return CRAFT_ITEM_STACK_AS_NMS_COPY.invoke(null, itemStack);
+        } catch (IllegalAccessException | InvocationTargetException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+
+    public static Object readNMSItemStackPacketDataSerializer(Object packetDataSerializer) {
+        try {
+            return READ_ITEM_STACK_IN_PACKET_DATA_SERIALIZER_METHOD.invoke(packetDataSerializer);
+        } catch (IllegalAccessException | InvocationTargetException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    public static Object writeNMSItemStackPacketDataSerializer(Object packetDataSerializer, Object nmsItemStack) {
+        try {
+            return WRITE_ITEM_STACK_IN_PACKET_DATA_SERIALIZER_METHOD.invoke(packetDataSerializer, nmsItemStack);
+        } catch (IllegalAccessException | InvocationTargetException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
 }
