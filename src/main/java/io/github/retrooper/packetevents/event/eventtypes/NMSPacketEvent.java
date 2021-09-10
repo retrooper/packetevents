@@ -39,7 +39,6 @@ public abstract class NMSPacketEvent extends PacketEvent implements CallableEven
     private final InetSocketAddress socketAddress;
     private final byte packetID;
     protected NMSPacket packet;
-    protected boolean cancelled;
 
     public NMSPacketEvent(Object channel, NMSPacket packet) {
         this.channel = channel;

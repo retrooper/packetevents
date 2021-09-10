@@ -45,10 +45,6 @@ class EventManagerModern {
      * @see EventManagerLegacy#callEvent(PacketEvent, byte)
      */
     public void callEvent(final PacketEvent event) {
-        boolean cancel = false;
-        if (event instanceof CancellableEvent) {
-            cancel = ((CancellableEvent) event).isCancelled();
-        }
         byte highestReachedPriority = (byte) (PacketListenerPriority.LOWEST.getId() - 1);
         for (byte priority = PacketListenerPriority.LOWEST.getId(); priority <= PacketListenerPriority.MONITOR.getId(); priority++) {
             HashSet<PacketListenerAbstract> listeners = listenersMap.get(priority);
@@ -63,16 +59,9 @@ class EventManagerModern {
                     //TODO Remove, because its redundant. We are only keeping it for compatibility with the legacy event manager.
                     if (event instanceof CancellableEvent) {
                         if (priority > highestReachedPriority) {
-                            CancellableEvent ce = (CancellableEvent) event;
-                            cancel = ce.isCancelled();
                             highestReachedPriority = priority;
                         }
                     }
-                }
-                //TODO Remove. This is also redundant. The listeners are always called in order, the event is always being modified by each listener. The last listener therefore has the last decision on the cancellation.
-                if (event instanceof CancellableEvent) {
-                    CancellableEvent ce = (CancellableEvent) event;
-                    ce.setCancelled(cancel);
                 }
             }
         }
