@@ -20,6 +20,7 @@ package io.github.retrooper.packetevents.wrapper.game.server;
 
 import io.github.retrooper.packetevents.event.impl.PacketSendEvent;
 import io.github.retrooper.packetevents.manager.player.ClientVersion;
+import io.github.retrooper.packetevents.manager.server.ServerVersion;
 import io.github.retrooper.packetevents.protocol.PacketType;
 import io.github.retrooper.packetevents.utils.StringUtil;
 import io.github.retrooper.packetevents.wrapper.PacketWrapper;
@@ -40,7 +41,7 @@ public class WrapperGameServerDisconnect extends PacketWrapper<WrapperGameServer
 
     @Override
     public void readData() {
-        int maxMessageLength = clientVersion.isNewerThanOrEquals(ClientVersion.v_1_13) ? MODERN_MESSAGE_LENGTH : LEGACY_MESSAGE_LENGTH;
+        int maxMessageLength = serverVersion.isNewerThanOrEquals(ServerVersion.v_1_13) ? MODERN_MESSAGE_LENGTH : LEGACY_MESSAGE_LENGTH;
         this.reason = readString(maxMessageLength);
     }
 
@@ -51,7 +52,7 @@ public class WrapperGameServerDisconnect extends PacketWrapper<WrapperGameServer
 
     @Override
     public void writeData() {
-        int maxMessageLength = clientVersion.isNewerThanOrEquals(ClientVersion.v_1_13) ? MODERN_MESSAGE_LENGTH : LEGACY_MESSAGE_LENGTH;
+        int maxMessageLength = serverVersion.isNewerThanOrEquals(ServerVersion.v_1_13) ? MODERN_MESSAGE_LENGTH : LEGACY_MESSAGE_LENGTH;
         reason = StringUtil.maximizeLength(reason, maxMessageLength);
         writeString(reason, maxMessageLength);
     }

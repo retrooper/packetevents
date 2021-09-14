@@ -32,6 +32,7 @@ import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.ByteToMessageDecoder;
 import io.netty.handler.codec.MessageToMessageDecoder;
+import org.bukkit.Bukkit;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
@@ -93,7 +94,17 @@ public class CustomBukkitDecodeHandler extends ByteToMessageDecoder {
                         result = PipelineUtil.callDecode((MessageToMessageDecoder<?>) customDecoder, ctx, result).get(0);
                     }
                 }
-                list.addAll(PipelineUtil.callDecode(minecraftDecoder, ctx, result));
+                if (result instanceof ByteBuf) {
+                    //We will utilize the vanilla decoder to convert the ByteBuf to an NMS packet
+                    List<Object> nmsObjects = PipelineUtil.callDecode(minecraftDecoder, ctx, result);
+                    list.addAll(nmsObjects);
+                }
+                else {
+                    //Some decoder already converted the object to an NMS packet (ProtocolLib)
+                    System.out.println("NMS TYPE: " + result.getClass().getSimpleName());
+                    Bukkit.shutdown();
+                    list.add(result);
+                }
             } catch (InvocationTargetException e) {
                 if (e.getCause() instanceof Exception) {
                     throw (Exception) e.getCause();

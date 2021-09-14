@@ -101,7 +101,7 @@ public class WrapperGameClientInteractEntity extends PacketWrapper<WrapperGameCl
 
     @Override
     public void writeData() {
-        if (clientVersion.isOlderThan(ClientVersion.v_1_8)) {
+        if (serverVersion.isOlderThan(ServerVersion.v_1_8)) {
             writeInt(entityID);
             writeByte(type.ordinal());
         } else {
