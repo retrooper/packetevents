@@ -43,11 +43,6 @@ public class InternalPacketListener implements PacketListener {
             PacketEvents.get().getInjector().changeConnectionState(event.getChannel().rawChannel(), ConnectionState.GAME);
             System.out.println("TRANSITIONED!");
         }
-        else {
-            if (event.getPacketType() == PacketType.Game.Server.SPAWN_LIVING_ENTITY) {
-                System.out.println("detected!");
-            }
-        }
     }
 
     @Override
@@ -82,10 +77,7 @@ public class InternalPacketListener implements PacketListener {
                     WrapperGameClientInteractEntity interactEntity = new WrapperGameClientInteractEntity(event);
                     int entityID = interactEntity.getEntityID();
                     Entity entity = PacketEvents.get().getServerManager().getEntityByID(entityID);
-                    event.getPlayer().sendMessage("entity name: " + entity.getName());
-                }
-                else {
-                    System.out.println("PACKET NAME: " + event.getPacketName());
+                    event.getPlayer().sendMessage("entity name: " + entity.getName() + ", type: " + interactEntity.getType().name());
                 }
         }
     }

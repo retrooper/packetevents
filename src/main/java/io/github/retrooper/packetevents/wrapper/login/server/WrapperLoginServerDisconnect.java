@@ -43,7 +43,7 @@ public class WrapperLoginServerDisconnect extends PacketWrapper<WrapperLoginServ
 
     @Override
     public void readData() {
-        int reasonLength = getServerVersion().isNewerThanOrEquals(ServerVersion.v_1_14) ? MODERN_REASON_LENGTH : LEGACY_REASON_LENGTH;
+        int reasonLength = serverVersion.isNewerThanOrEquals(ServerVersion.v_1_14) ? MODERN_REASON_LENGTH : LEGACY_REASON_LENGTH;
         this.reason = readString(reasonLength);
     }
 
@@ -54,7 +54,7 @@ public class WrapperLoginServerDisconnect extends PacketWrapper<WrapperLoginServ
 
     @Override
     public void writeData() {
-        int reasonLength = getServerVersion().isNewerThanOrEquals(ServerVersion.v_1_14) ? MODERN_REASON_LENGTH : LEGACY_REASON_LENGTH;
+        int reasonLength = serverVersion.isNewerThanOrEquals(ServerVersion.v_1_14) ? MODERN_REASON_LENGTH : LEGACY_REASON_LENGTH;
         writeString(reason, reasonLength);
     }
 

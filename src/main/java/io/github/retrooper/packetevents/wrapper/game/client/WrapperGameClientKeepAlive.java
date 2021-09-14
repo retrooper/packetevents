@@ -20,6 +20,7 @@ package io.github.retrooper.packetevents.wrapper.game.client;
 
 import io.github.retrooper.packetevents.event.impl.PacketReceiveEvent;
 import io.github.retrooper.packetevents.manager.player.ClientVersion;
+import io.github.retrooper.packetevents.manager.server.ServerVersion;
 import io.github.retrooper.packetevents.protocol.PacketType;
 import io.github.retrooper.packetevents.wrapper.PacketWrapper;
 
@@ -42,9 +43,9 @@ public class WrapperGameClientKeepAlive extends PacketWrapper<WrapperGameClientK
 
     @Override
     public void readData() {
-        if (clientVersion.isNewerThanOrEquals(ClientVersion.v_1_12)) {
+        if (serverVersion.isNewerThanOrEquals(ServerVersion.v_1_12)) {
             this.id = readLong();
-        } else if (clientVersion.isNewerThanOrEquals(ClientVersion.v_1_8)) {
+        } else if (serverVersion.isNewerThanOrEquals(ServerVersion.v_1_8)) {
             this.id = readVarInt();
         } else {
             this.id = readInt();
@@ -58,9 +59,9 @@ public class WrapperGameClientKeepAlive extends PacketWrapper<WrapperGameClientK
 
     @Override
     public void writeData() {
-        if (clientVersion.isNewerThanOrEquals(ClientVersion.v_1_12)) {
+        if (serverVersion.isNewerThanOrEquals(ServerVersion.v_1_12)) {
             writeLong(id);
-        } else if (clientVersion.isNewerThanOrEquals(ClientVersion.v_1_8)) {
+        } else if (serverVersion.isNewerThanOrEquals(ServerVersion.v_1_8)) {
             writeVarInt((int) id);
         } else {
             writeInt((int) id);

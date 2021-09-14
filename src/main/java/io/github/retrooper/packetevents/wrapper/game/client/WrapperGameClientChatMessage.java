@@ -20,6 +20,7 @@ package io.github.retrooper.packetevents.wrapper.game.client;
 
 import io.github.retrooper.packetevents.event.impl.PacketReceiveEvent;
 import io.github.retrooper.packetevents.manager.player.ClientVersion;
+import io.github.retrooper.packetevents.manager.server.ServerVersion;
 import io.github.retrooper.packetevents.protocol.PacketType;
 import io.github.retrooper.packetevents.utils.StringUtil;
 import io.github.retrooper.packetevents.wrapper.PacketWrapper;
@@ -41,7 +42,7 @@ public class WrapperGameClientChatMessage extends PacketWrapper<WrapperGameClien
 
     @Override
     public void readData() {
-        int maxMessageLength = clientVersion.isNewerThanOrEquals(ClientVersion.v_1_11) ? 256 : 100;
+        int maxMessageLength = serverVersion.isNewerThanOrEquals(ServerVersion.v_1_11) ? 256 : 100;
         this.message = readString(maxMessageLength);
     }
 
@@ -52,7 +53,7 @@ public class WrapperGameClientChatMessage extends PacketWrapper<WrapperGameClien
 
     @Override
     public void writeData() {
-        int maxMessageLength = clientVersion.isNewerThanOrEquals(ClientVersion.v_1_11) ? 256 : 100;
+        int maxMessageLength = serverVersion.isNewerThanOrEquals(ServerVersion.v_1_11) ? 256 : 100;
         this.message = StringUtil.maximizeLength(this.message, maxMessageLength);
         writeString(this.message, maxMessageLength);
     }

@@ -20,6 +20,7 @@ package io.github.retrooper.packetevents.wrapper.game.client;
 
 import io.github.retrooper.packetevents.event.impl.PacketReceiveEvent;
 import io.github.retrooper.packetevents.manager.player.ClientVersion;
+import io.github.retrooper.packetevents.manager.server.ServerVersion;
 import io.github.retrooper.packetevents.protocol.PacketType;
 import io.github.retrooper.packetevents.wrapper.PacketWrapper;
 
@@ -47,7 +48,7 @@ public class WrapperGameClientResourcePackStatus extends PacketWrapper<WrapperGa
 
     @Override
     public void readData() {
-        if (clientVersion.isOlderThan(ClientVersion.v_1_10)) {
+        if (serverVersion.isOlderThan(ServerVersion.v_1_10)) {
             //For now ignore hash, maybe make optional
             this.hash = Optional.of(readString(40));
         }
@@ -63,7 +64,7 @@ public class WrapperGameClientResourcePackStatus extends PacketWrapper<WrapperGa
 
     @Override
     public void writeData() {
-        if (clientVersion.isOlderThan(ClientVersion.v_1_10)) {
+        if (serverVersion.isOlderThan(ServerVersion.v_1_10)) {
             writeString(hash.orElse("invalid"), 40);
         }
         writeVarInt(result.ordinal());

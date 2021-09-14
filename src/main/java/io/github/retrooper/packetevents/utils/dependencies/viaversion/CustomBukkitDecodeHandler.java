@@ -90,7 +90,7 @@ public class CustomBukkitDecodeHandler extends ByteToMessageDecoder {
                         result = PipelineUtil.callDecode((ByteToMessageDecoder) customDecoder, ctx, result).get(0);
                     }
                     else if (customDecoder instanceof MessageToMessageDecoder) {
-                        result = PipelineUtil.callDecode((MessageToMessageDecoder) customDecoder, ctx, result).get(0);
+                        result = PipelineUtil.callDecode((MessageToMessageDecoder<?>) customDecoder, ctx, result).get(0);
                     }
                 }
                 list.addAll(PipelineUtil.callDecode(minecraftDecoder, ctx, result));

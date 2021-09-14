@@ -21,6 +21,7 @@ package io.github.retrooper.packetevents.wrapper.game.client;
 import io.github.retrooper.packetevents.event.impl.PacketReceiveEvent;
 import io.github.retrooper.packetevents.manager.player.ClientVersion;
 import io.github.retrooper.packetevents.manager.player.Hand;
+import io.github.retrooper.packetevents.manager.server.ServerVersion;
 import io.github.retrooper.packetevents.protocol.PacketType;
 import io.github.retrooper.packetevents.wrapper.PacketWrapper;
 
@@ -41,7 +42,7 @@ public class WrapperGameClientAnimation extends PacketWrapper<WrapperGameClientA
 
     @Override
     public void readData() {
-        if (clientVersion.isNewerThanOrEquals(ClientVersion.v_1_9)) {
+        if (serverVersion.isNewerThanOrEquals(ServerVersion.v_1_9)) {
             this.hand = Hand.VALUES[readVarInt()];
         } else {
             //Default to main hand, because 1.8 and 1.7.10 don't have an off-hand anyway.
@@ -56,7 +57,7 @@ public class WrapperGameClientAnimation extends PacketWrapper<WrapperGameClientA
 
     @Override
     public void writeData() {
-        if (clientVersion.isNewerThanOrEquals(ClientVersion.v_1_9)) {
+        if (serverVersion.isNewerThanOrEquals(ServerVersion.v_1_9)) {
             writeVarInt(hand.ordinal());
         }
     }

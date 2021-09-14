@@ -2,6 +2,7 @@ package io.github.retrooper.packetevents.wrapper.game.client;
 
 import io.github.retrooper.packetevents.event.impl.PacketReceiveEvent;
 import io.github.retrooper.packetevents.manager.player.ClientVersion;
+import io.github.retrooper.packetevents.manager.server.ServerVersion;
 import io.github.retrooper.packetevents.protocol.PacketType;
 import io.github.retrooper.packetevents.wrapper.PacketWrapper;
 
@@ -27,7 +28,7 @@ public class WrapperGameClientPluginMessage extends PacketWrapper<WrapperGameCli
     @Override
     public void readData() {
         this.channelName = readString();
-        int dataLength = clientVersion.isNewerThanOrEquals(ClientVersion.v_1_8) ? byteBuf.readableBytes() : readShort();
+        int dataLength = serverVersion.isNewerThanOrEquals(ServerVersion.v_1_8) ? byteBuf.readableBytes() : readShort();
         this.data = readByteArray(dataLength);
     }
 
@@ -40,7 +41,7 @@ public class WrapperGameClientPluginMessage extends PacketWrapper<WrapperGameCli
     @Override
     public void writeData() {
         writeString(channelName);
-        if (clientVersion.isOlderThan(ClientVersion.v_1_8)) {
+        if (serverVersion.isOlderThan(ServerVersion.v_1_8)) {
             writeShort(this.data.length);
         }
         writeByteArray(this.data);

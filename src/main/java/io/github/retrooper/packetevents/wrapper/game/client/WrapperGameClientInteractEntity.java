@@ -21,6 +21,7 @@ package io.github.retrooper.packetevents.wrapper.game.client;
 import io.github.retrooper.packetevents.event.impl.PacketReceiveEvent;
 import io.github.retrooper.packetevents.manager.player.ClientVersion;
 import io.github.retrooper.packetevents.manager.player.Hand;
+import io.github.retrooper.packetevents.manager.server.ServerVersion;
 import io.github.retrooper.packetevents.protocol.PacketType;
 import io.github.retrooper.packetevents.utils.vector.Vector3f;
 import io.github.retrooper.packetevents.wrapper.PacketWrapper;
@@ -54,7 +55,7 @@ public class WrapperGameClientInteractEntity extends PacketWrapper<WrapperGameCl
 
     @Override
     public void readData() {
-        if (clientVersion.isOlderThan(ClientVersion.v_1_8)) {
+        if (serverVersion.isOlderThan(ServerVersion.v_1_8)) {
             this.entityID = readInt();
             byte typeIndex = readByte();
             this.type = Type.VALUES[typeIndex];
@@ -74,14 +75,14 @@ public class WrapperGameClientInteractEntity extends PacketWrapper<WrapperGameCl
                 this.target = Optional.empty();
             }
 
-            if (clientVersion.isNewerThan(ClientVersion.v_1_8) && (type == Type.INTERACT || type == Type.INTERACT_AT)) {
+            if (serverVersion.isNewerThan(ServerVersion.v_1_8) && (type == Type.INTERACT || type == Type.INTERACT_AT)) {
                 int handIndex = readVarInt();
                 this.hand = Optional.of(Hand.VALUES[handIndex]);
             } else {
                 this.hand = Optional.empty();
             }
 
-            if (clientVersion.isNewerThanOrEquals(ClientVersion.v_1_16)) {
+            if (serverVersion.isNewerThanOrEquals(ServerVersion.v_1_16)) {
                 this.sneaking = Optional.of(readBoolean());
             } else {
                 this.sneaking = Optional.empty();
@@ -113,12 +114,12 @@ public class WrapperGameClientInteractEntity extends PacketWrapper<WrapperGameCl
                 writeFloat(targetVec.z);
             }
 
-            if (clientVersion.isNewerThan(ClientVersion.v_1_8) && (type == Type.INTERACT || type == Type.INTERACT_AT)) {
+            if (serverVersion.isNewerThan(ServerVersion.v_1_8) && (type == Type.INTERACT || type == Type.INTERACT_AT)) {
                 Hand handValue = hand.orElse(Hand.MAIN_HAND);
                 writeVarInt(handValue.ordinal());
             }
 
-            if (clientVersion.isNewerThanOrEquals(ClientVersion.v_1_16)) {
+            if (serverVersion.isNewerThanOrEquals(ServerVersion.v_1_16)) {
                 writeBoolean(sneaking.orElse(false));
             }
         }
