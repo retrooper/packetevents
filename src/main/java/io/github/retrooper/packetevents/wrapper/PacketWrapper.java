@@ -160,31 +160,12 @@ public class PacketWrapper<T extends PacketWrapper> {
         byteBuf.writeByte(value);
     }
 
-    //TODO Finish by supporting itemmeta
-    private ItemStack readItemStack0() {
-        short itemID = readShort();
-        if (itemID >= 0) {
-            byte count = readByte();
-            short data = readShort();
-            itemStack = new ItemStack(Material.values()[itemID], count, data);
-            int readerIndex = byteBuf.readerIndex();
-            boolean hasMetaData = readByte() != 0;
-            if (hasMetaData) {
-                byteBuf.readerIndex(readerIndex);
-                //TODO this is the NMS ItemStack#setTag NBTCompressedStreamTools.a(new ByteBufInputStream(byteBuf.rawByteBuf()), new NBTReadLimiter(2097152L));
-                return itemStack;
-            } else {
-                return itemStack;
-            }
-        }
-    }
-
     public ItemStack readItemStack() {
         Object packetDataSerializer = MinecraftReflection.createPacketDataSerializer(byteBuf.rawByteBuf());
-        return MinecraftReflection.readNMSItemStackPacketDataSerializer(packetDataSerializer);
+        Object nmsItemStack = MinecraftReflection.readNMSItemStackPacketDataSerializer(packetDataSerializer);
+        return MinecraftReflection.toBukkitItemStack(nmsItemStack);
     }
 
-    //TODO Recode to support cross-version
     public void writeItemStack(ItemStack itemStack) {
         Object packetDataSerializer = MinecraftReflection.createPacketDataSerializer(byteBuf.rawByteBuf());
         Object nmsItemStack = MinecraftReflection.toNMSItemStack(itemStack);

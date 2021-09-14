@@ -36,8 +36,8 @@ public class WrapperGameClientUpdateSign extends PacketWrapper<WrapperGameClient
         super(event);
     }
 
-    public WrapperGameClientUpdateSign(ClientVersion clientVersion, Vector3i blockPosition, String[] textLines) {
-        super(PacketType.Game.Client.UPDATE_SIGN.getPacketID(clientVersion), clientVersion);
+    public WrapperGameClientUpdateSign(Vector3i blockPosition, String[] textLines) {
+        super(PacketType.Game.Client.UPDATE_SIGN.getID());
         this.blockPosition = blockPosition;
         System.arraycopy(textLines, 0, this.textLines, 0, 4);
     }

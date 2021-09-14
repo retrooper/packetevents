@@ -31,8 +31,8 @@ public class WrapperGameClientSetBeaconEffect extends PacketWrapper<WrapperGameC
         super(event);
     }
 
-    public WrapperGameClientSetBeaconEffect(ClientVersion clientVersion, int primaryEffect, int secondaryEffect) {
-        super(PacketType.Game.Client.SET_BEACON_EFFECT.getPacketID(clientVersion), clientVersion);
+    public WrapperGameClientSetBeaconEffect(int primaryEffect, int secondaryEffect) {
+        super(PacketType.Game.Client.SET_BEACON_EFFECT.getID());
         this.primaryEffect = primaryEffect;
         this.secondaryEffect = secondaryEffect;
     }

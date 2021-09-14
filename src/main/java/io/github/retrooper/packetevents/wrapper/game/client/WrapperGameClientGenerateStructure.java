@@ -37,8 +37,8 @@ public class WrapperGameClientGenerateStructure extends PacketWrapper<WrapperGam
         super(event);
     }
 
-    public WrapperGameClientGenerateStructure(ClientVersion clientVersion, Vector3i blockPosition, int levels, boolean keepJigsaws) {
-        super(PacketType.Game.Client.GENERATE_STRUCTURE.getPacketID(clientVersion), clientVersion);
+    public WrapperGameClientGenerateStructure(Vector3i blockPosition, int levels, boolean keepJigsaws) {
+        super(PacketType.Game.Client.GENERATE_STRUCTURE.getID());
         this.blockPosition = blockPosition;
         this.levels = levels;
         this.keepJigsaws = keepJigsaws;

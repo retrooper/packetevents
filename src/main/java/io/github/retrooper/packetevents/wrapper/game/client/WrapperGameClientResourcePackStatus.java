@@ -33,14 +33,14 @@ public class WrapperGameClientResourcePackStatus extends PacketWrapper<WrapperGa
         super(event);
     }
 
-    public WrapperGameClientResourcePackStatus(ClientVersion clientVersion, Result result) {
-        super(PacketType.Game.Client.RESOURCE_PACK_STATUS.getPacketID(clientVersion), clientVersion);
+    public WrapperGameClientResourcePackStatus(Result result) {
+        super(PacketType.Game.Client.RESOURCE_PACK_STATUS.getID());
         this.result = result;
     }
 
     @Deprecated
-    public WrapperGameClientResourcePackStatus(ClientVersion clientVersion, String hash, Result result) {
-        super(PacketType.Game.Client.RESOURCE_PACK_STATUS.getPacketID(clientVersion), clientVersion);
+    public WrapperGameClientResourcePackStatus(String hash, Result result) {
+        super(PacketType.Game.Client.RESOURCE_PACK_STATUS.getID());
         this.hash = Optional.of(hash);
         this.result = result;
     }

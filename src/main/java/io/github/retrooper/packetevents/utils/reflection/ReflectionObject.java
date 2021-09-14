@@ -360,7 +360,7 @@ public class ReflectionObject implements ReflectionObjectReader, WrapperPacketWr
         }
     }
 
-    public List<Object> readList(int index) {
+    public <T> List<T> readList(int index) {
         return read(index, List.class);
     }
 

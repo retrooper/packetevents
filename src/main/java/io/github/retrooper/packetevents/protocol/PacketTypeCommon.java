@@ -19,5 +19,7 @@
 package io.github.retrooper.packetevents.protocol;
 
 public interface PacketTypeCommon {
-
+    default String getName() {
+        return ((Enum<?>)this).name();
+    }
 }

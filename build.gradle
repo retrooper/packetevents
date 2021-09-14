@@ -58,7 +58,7 @@ dependencies {
     compileOnly 'org.spigotmc:spigot-api:1.17-R0.1-SNAPSHOT'
     compileOnly 'com.destroystokyo.paper:paper-api:1.16.5-R0.1-SNAPSHOT'
     compileOnly 'org.geysermc:connector:1.2.1-SNAPSHOT'
-    compileOnly 'com.viaversion:viaversion-api:4.0.1'
+    compileOnly 'com.viaversion:viaversion:4.0.1'
     compileOnly 'com.github.ProtocolSupport:ProtocolSupport:3d24efeda6'
 
     /*compileOnly 'org.github.spigot:1.16.2:1.16.2'

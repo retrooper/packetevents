@@ -34,8 +34,8 @@ public class WrapperGameClientAnimation extends PacketWrapper<WrapperGameClientA
         super(event);
     }
 
-    public WrapperGameClientAnimation(ClientVersion clientVersion, Hand hand) {
-        super(PacketType.Game.Client.ANIMATION.getPacketID(clientVersion), clientVersion);
+    public WrapperGameClientAnimation(Hand hand) {
+        super(PacketType.Game.Client.ANIMATION.getID());
         this.hand = hand;
     }
 

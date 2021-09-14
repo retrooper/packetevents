@@ -1,6 +1,6 @@
 /*
  * This file is part of ProtocolSupport - https://github.com/ProtocolSupport/ProtocolSupport
- * Copyright (C) ProtocolSupport
+ * Copyright (C) 2021 ProtocolSupport
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as

@@ -27,11 +27,7 @@ public class ViaVersionLookupUtils {
     private ViaVersionLookupUtils() {
     }
 
-    public static boolean isAvailable() {
-        return Bukkit.getPluginManager().getPlugin("ViaVersion") != null;
-    }
-
-    public static int getProtocolVersion(Player player) {
+    private static void load() {
         if (viaVersionAccessor == null) {
             try {
                 Class.forName("com.viaversion.viaversion.api.Via");
@@ -40,6 +36,20 @@ public class ViaVersionLookupUtils {
                 viaVersionAccessor = new ViaVersionAccessorImplLegacy();
             }
         }
-        return viaVersionAccessor.getProtocolVersion(player);
+    }
+
+    public static boolean isAvailable() {
+        return Bukkit.getPluginManager().getPlugin("ViaVersion") != null;
+    }
+
+
+    public static ViaVersionAccessor getViaVersionAccessor() {
+        load();
+        return viaVersionAccessor;
+    }
+
+
+    public static int getProtocolVersion(Player player) {
+        return getViaVersionAccessor().getProtocolVersion(player);
     }
 }

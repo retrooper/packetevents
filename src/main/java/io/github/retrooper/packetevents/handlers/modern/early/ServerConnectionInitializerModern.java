@@ -21,7 +21,9 @@ package io.github.retrooper.packetevents.handlers.modern.early;
 import io.github.retrooper.packetevents.PacketEvents;
 import io.github.retrooper.packetevents.handlers.modern.PacketDecoderModern;
 import io.github.retrooper.packetevents.handlers.modern.PacketEncoderModern;
+import io.github.retrooper.packetevents.utils.dependencies.viaversion.CustomBukkitDecodeHandler;
 import io.netty.channel.Channel;
+import io.netty.channel.ChannelHandler;
 
 
 public class ServerConnectionInitializerModern {
@@ -31,7 +33,15 @@ public class ServerConnectionInitializerModern {
     }
 
     public static void postDestroyChannel(Channel channel) {
-        channel.pipeline().remove(PacketEvents.get().decoderName);
-        channel.pipeline().remove(PacketEvents.get().encoderName);
+        ChannelHandler mcDecoder = channel.pipeline().get("decoder");
+        if (mcDecoder instanceof CustomBukkitDecodeHandler) {
+            //Convert back to the original ViaVersion decoder
+            CustomBukkitDecodeHandler customBukkitDecodeHandler = (CustomBukkitDecodeHandler) mcDecoder;
+            channel.pipeline().replace("decoder", "decoder", customBukkitDecodeHandler.oldBukkitDecodeHandler);
+        }
+        else {
+            channel.pipeline().remove(PacketEvents.get().decoderName);
+            channel.pipeline().remove(PacketEvents.get().encoderName);
+        }
     }
 }

@@ -30,7 +30,7 @@ import java.util.IdentityHashMap;
 import java.util.Map;
 
 public final class PacketType {
-    public static PacketTypeCommon getById(PacketSide side, ConnectionState state, @Nullable ClientVersion version, int packetID) {
+    public static PacketTypeCommon getById(PacketSide side, ConnectionState state, int protocolVersion, int packetID) {
         switch (state) {
             case HANDSHAKING:
                 return Handshaking.Client.getById(packetID);
@@ -48,13 +48,22 @@ public final class PacketType {
                 }
             case GAME:
                 if (side == PacketSide.CLIENT) {
-                    return Game.Client.getById(version, packetID);
+                    return Game.Client.getById(protocolVersion, packetID);
                 } else {
                     return Game.Server.getById(packetID);
                 }
             default:
                 return null;
         }
+    }
+
+    public static PacketTypeCommon getById(PacketSide side, ConnectionState state, @Nullable ClientVersion version, int packetID) {
+        int protocolVersion = version != null ? version.getProtocolVersion() : -1;
+        return getById(side, state, protocolVersion, packetID);
+    }
+    public static PacketTypeCommon getById(PacketSide side, ConnectionState state, @Nullable ServerVersion version, int packetID) {
+        int protocolVersion = version != null ? version.getProtocolVersion() : -1;
+        return getById(side, state, protocolVersion, packetID);
     }
 
     public static class Handshaking {
@@ -266,12 +275,18 @@ public final class PacketType {
             PLAYER_BLOCK_PLACEMENT,
             USE_ITEM;
 
-            private static final Map<ClientVersion, Map<Integer, PacketTypeCommon>> PACKET_ID_CACHE = new IdentityHashMap<>();
-            private static final Map<ClientVersion, Map<PacketTypeCommon, Integer>> PACKET_TYPE_CACHE = new HashMap<>();
+            private int id = -1;
+
+            public int getID() {
+                return id;
+            }
+
+            private static final Map<Integer, Map<Integer, PacketTypeCommon>> PACKET_ID_CACHE = new IdentityHashMap<>();
+            private static final Map<Integer, Map<PacketTypeCommon, Integer>> PACKET_TYPE_CACHE = new HashMap<>();
 
             @Nullable
-            public static PacketTypeCommon getById(ClientVersion version, int packetID) {
-                Map<Integer, PacketTypeCommon> innerMap = PACKET_ID_CACHE.get(version);
+            public static PacketTypeCommon getById(int protocolVersion, int packetID) {
+                Map<Integer, PacketTypeCommon> innerMap = PACKET_ID_CACHE.get(protocolVersion);
                 if (innerMap != null) {
                     return innerMap.get(packetID);
                 }
@@ -283,11 +298,14 @@ public final class PacketType {
                 Map<PacketTypeCommon, Integer> secondInnerMap = new IdentityHashMap<>();
                 for (int id = 0; id < enumConstants.length; id++) {
                     Client value = Client.valueOf(enumConstants[id].name());
+                    if (version.getProtocolVersion() == PacketEvents.get().getServerManager().getVersion().getProtocolVersion()) {
+                        value.id = id;
+                    }
                     innerMap.put(id, value);
                     secondInnerMap.put(value, id);
                 }
-                PACKET_ID_CACHE.put(version, innerMap);
-                PACKET_TYPE_CACHE.put(version, secondInnerMap);
+                PACKET_ID_CACHE.put(version.getProtocolVersion(), innerMap);
+                PACKET_TYPE_CACHE.put(version.getProtocolVersion(), secondInnerMap);
             }
 
             public static void load() {
@@ -321,8 +339,8 @@ public final class PacketType {
                 loadPacketIDs(ClientVersion.v_1_17_1, ServerboundPacketType_1_17.values());
             }
 
-            public int getPacketID(ClientVersion clientVersion) {
-                return PACKET_TYPE_CACHE.get(clientVersion).getOrDefault(this, -1);
+            public int getPacketID(int protocolVersion) {
+                return PACKET_TYPE_CACHE.get(protocolVersion).getOrDefault(this, -1);
             }
         }
 

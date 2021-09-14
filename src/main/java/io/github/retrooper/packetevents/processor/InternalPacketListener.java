@@ -26,16 +26,27 @@ import io.github.retrooper.packetevents.manager.player.ClientVersion;
 import io.github.retrooper.packetevents.protocol.ConnectionState;
 import io.github.retrooper.packetevents.protocol.PacketType;
 import io.github.retrooper.packetevents.wrapper.game.client.WrapperGameClientCreativeInventoryAction;
+import io.github.retrooper.packetevents.wrapper.game.client.WrapperGameClientInteractEntity;
+import io.github.retrooper.packetevents.wrapper.game.server.WrapperGameServerHeldItemChange;
+import io.github.retrooper.packetevents.wrapper.game.server.WrapperGameServerSpawnLivingEntity;
 import io.github.retrooper.packetevents.wrapper.handshaking.client.WrapperHandshakingClientHandshake;
 import io.github.retrooper.packetevents.wrapper.login.client.WrapperLoginClientLoginStart;
+import org.bukkit.entity.Entity;
 import org.bukkit.inventory.ItemStack;
 
 public class InternalPacketListener implements PacketListener {
+    //Make this specific event be at MONITOR priority
     @Override
     public void onPacketSend(PacketSendEvent event) {
         if (event.getPacketType() == PacketType.Login.Server.LOGIN_SUCCESS) {
             //Transition into the GAME connection state
             PacketEvents.get().getInjector().changeConnectionState(event.getChannel().rawChannel(), ConnectionState.GAME);
+            System.out.println("TRANSITIONED!");
+        }
+        else {
+            if (event.getPacketType() == PacketType.Game.Server.SPAWN_LIVING_ENTITY) {
+                System.out.println("detected!");
+            }
         }
     }
 
@@ -56,6 +67,7 @@ public class InternalPacketListener implements PacketListener {
 
                     //Transition into the LOGIN OR STATUS connection state
                     PacketEvents.get().getInjector().changeConnectionState(rawChannel, handshake.getNextConnectionState());
+                    System.out.println("INCOMING VERSION: " + clientVersion.name());
                 }
                 break;
             case LOGIN:
@@ -66,17 +78,14 @@ public class InternalPacketListener implements PacketListener {
                 }
                 break;
             case GAME:
-                if (event.getPacketType() == PacketType.Game.Client.CREATIVE_INVENTORY_ACTION) {
-                    WrapperGameClientCreativeInventoryAction cia = new WrapperGameClientCreativeInventoryAction(event);
-                    int slot = cia.getSlot();
-                    ItemStack itemStack = cia.getItemStack();
-                    if (itemStack.getItemMeta() != null) {
-                        event.getPlayer().sendMessage("slot: " + slot + ", item stack type: " + itemStack.getType() + ", amount: " + itemStack.getAmount() + ", meta: " + itemStack.getItemMeta().getDisplayName());
-                    }
-                    else {
-                        event.getPlayer().sendMessage("slot: " + slot + ", item stack type: " + itemStack.getType() + ", amount: " + itemStack.getAmount() + ", meta: none lol");
-
-                    }
+                if (event.getPacketType() == PacketType.Game.Client.INTERACT_ENTITY) {
+                    WrapperGameClientInteractEntity interactEntity = new WrapperGameClientInteractEntity(event);
+                    int entityID = interactEntity.getEntityID();
+                    Entity entity = PacketEvents.get().getServerManager().getEntityByID(entityID);
+                    event.getPlayer().sendMessage("entity name: " + entity.getName());
+                }
+                else {
+                    System.out.println("PACKET NAME: " + event.getPacketName());
                 }
         }
     }

@@ -91,7 +91,7 @@ public enum ClientVersion {
     HIGHER_THAN_SUPPORTED_VERSIONS(v_1_17_1.protocolVersion + 1),
     /**
      * Pre releases just aren't supported, we would end up with so many enum constants.
-     * This constant assures you they are on a pre release.
+     * This constant assures you they are on a pre-release.
      */
     ANY_PRE_RELEASE_VERSION(0),
 
@@ -151,7 +151,7 @@ public enum ClientVersion {
      *
      * @return Protocol version.
      */
-    public short getProtocolVersion() {
+    public int getProtocolVersion() {
         return protocolVersion;
     }
 

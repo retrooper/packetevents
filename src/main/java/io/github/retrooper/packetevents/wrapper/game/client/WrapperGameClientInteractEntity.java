@@ -43,8 +43,8 @@ public class WrapperGameClientInteractEntity extends PacketWrapper<WrapperGameCl
         super(event);
     }
 
-    public WrapperGameClientInteractEntity(ClientVersion clientVersion, int entityID, Type type, Optional<Vector3f> target, Optional<Hand> hand, Optional<Boolean> sneaking) {
-        super(PacketType.Game.Client.INTERACT_ENTITY.getPacketID(clientVersion), clientVersion);
+    public WrapperGameClientInteractEntity(int entityID, Type type, Optional<Vector3f> target, Optional<Hand> hand, Optional<Boolean> sneaking) {
+        super(PacketType.Game.Client.INTERACT_ENTITY.getID());
         this.entityID = entityID;
         this.type = type;
         this.target = target;

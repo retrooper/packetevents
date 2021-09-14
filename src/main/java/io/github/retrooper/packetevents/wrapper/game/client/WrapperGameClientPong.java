@@ -37,8 +37,8 @@ public class WrapperGameClientPong extends PacketWrapper<WrapperGameClientPong> 
         super(event);
     }
 
-    public WrapperGameClientPong(ClientVersion clientVersion, int id) {
-        super(PacketType.Game.Client.PONG.getPacketID(clientVersion), clientVersion);
+    public WrapperGameClientPong(int id) {
+        super(PacketType.Game.Client.PONG.getID());
         this.id = id;
     }
 

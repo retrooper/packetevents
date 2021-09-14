@@ -33,8 +33,8 @@ public class WrapperGameClientHeldItemChange extends PacketWrapper<WrapperGameCl
         super(event);
     }
 
-    public WrapperGameClientHeldItemChange(ClientVersion clientVersion, int slot) {
-        super(PacketType.Game.Client.HELD_ITEM_CHANGE.getPacketID(clientVersion), clientVersion);
+    public WrapperGameClientHeldItemChange(int slot) {
+        super(PacketType.Game.Client.HELD_ITEM_CHANGE.getID());
         this.slot = slot;
     }
 

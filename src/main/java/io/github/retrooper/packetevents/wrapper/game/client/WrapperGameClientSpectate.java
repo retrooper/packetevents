@@ -35,8 +35,8 @@ public class WrapperGameClientSpectate extends PacketWrapper<WrapperGameClientSp
         super(event);
     }
 
-    public WrapperGameClientSpectate(ClientVersion clientVersion, UUID uuid) {
-        super(PacketType.Game.Client.SPECTATE.getPacketID(clientVersion), clientVersion);
+    public WrapperGameClientSpectate(UUID uuid) {
+        super(PacketType.Game.Client.SPECTATE.getID());
         this.targetUUID = uuid;
     }
 

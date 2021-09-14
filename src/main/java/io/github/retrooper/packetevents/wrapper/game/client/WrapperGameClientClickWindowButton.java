@@ -34,8 +34,8 @@ public class WrapperGameClientClickWindowButton extends PacketWrapper<WrapperGam
         super(event);
     }
 
-    public WrapperGameClientClickWindowButton(ClientVersion clientVersion, int windowID, int buttonID) {
-        super(PacketType.Game.Client.CLICK_WINDOW_BUTTON.getPacketID(clientVersion), clientVersion);
+    public WrapperGameClientClickWindowButton(int windowID, int buttonID) {
+        super(PacketType.Game.Client.CLICK_WINDOW_BUTTON.getID());
         this.windowID = windowID;
         this.buttonID = buttonID;
     }

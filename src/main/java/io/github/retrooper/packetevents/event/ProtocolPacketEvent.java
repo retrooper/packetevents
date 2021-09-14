@@ -77,7 +77,7 @@ public abstract class ProtocolPacketEvent extends PacketEvent implements PlayerE
 
         this.byteBuf = byteBuf;
         this.packetID = PacketWrapperUtil.readVarInt(byteBuf);
-        this.packetType = PacketType.getById(packetSide, connectionState, clientVersion, packetID);
+        this.packetType = PacketType.getById(packetSide, connectionState, this.serverVersion, packetID);
     }
 
     public ChannelAbstract getChannel() {
@@ -135,6 +135,11 @@ public abstract class ProtocolPacketEvent extends PacketEvent implements PlayerE
     @Nullable
     public PacketTypeCommon getPacketType() {
         return packetType;
+    }
+
+    @Deprecated
+    public String getPacketName() {
+        return ((Enum<?>)packetType).name();
     }
 
     @Override

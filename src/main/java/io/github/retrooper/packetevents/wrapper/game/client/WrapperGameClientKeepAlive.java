@@ -35,8 +35,8 @@ public class WrapperGameClientKeepAlive extends PacketWrapper<WrapperGameClientK
         super(event);
     }
 
-    public WrapperGameClientKeepAlive(ClientVersion clientVersion, long id) {
-        super(PacketType.Game.Client.KEEP_ALIVE.getPacketID(clientVersion), clientVersion);
+    public WrapperGameClientKeepAlive(long id) {
+        super(PacketType.Game.Client.KEEP_ALIVE.getID());
         this.id = id;
     }
 
