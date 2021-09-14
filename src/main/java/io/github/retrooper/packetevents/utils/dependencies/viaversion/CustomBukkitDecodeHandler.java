@@ -40,7 +40,7 @@ import java.util.List;
 //TODO Maybe make it extend BukkitDecodeHandler
 public class CustomBukkitDecodeHandler extends ByteToMessageDecoder {
     public final ChannelHandler oldBukkitDecodeHandler;
-    public final List<MessageToMessageDecoder<?>> customDecoders = new ArrayList<>();
+    public final List<Object> customDecoders = new ArrayList<>();
     public final ByteToMessageDecoder minecraftDecoder;
     private final UserConnection info;
 
@@ -50,12 +50,12 @@ public class CustomBukkitDecodeHandler extends ByteToMessageDecoder {
         this.oldBukkitDecodeHandler = oldBukkitDecodeHandler;
     }
 
-    public void addCustomDecoder(MessageToMessageDecoder<?> customDecoder) {
+    public void addCustomDecoder(Object customDecoder) {
         customDecoders.add(customDecoder);
     }
 
-    public MessageToMessageDecoder<?> getCustomDecoder(String handlerName) {
-        for (MessageToMessageDecoder<?> customDecoder : customDecoders) {
+    public Object getCustomDecoder(String handlerName) {
+        for (Object customDecoder : customDecoders) {
             ReflectionObject reflectionObject = new ReflectionObject(customDecoder);
             try {
                 String customDecoderHandlerName = reflectionObject.readString(0);
@@ -75,7 +75,6 @@ public class CustomBukkitDecodeHandler extends ByteToMessageDecoder {
             bytebuf.clear(); // Don't accumulate
             throw CancelDecoderException.generate(null);
         }
-        System.out.println("INC pt 2");
         ByteBuf transformedBuf = null;
         try {
             if (info.shouldTransformPacket()) {
@@ -85,9 +84,14 @@ public class CustomBukkitDecodeHandler extends ByteToMessageDecoder {
 
             try {
                 Object result = transformedBuf == null ? bytebuf : transformedBuf;
-                for (MessageToMessageDecoder<?> customDecoder : customDecoders) {
+                for (Object customDecoder : customDecoders) {
                     //We only support one output
-                    result = PipelineUtil.callDecode(customDecoder, ctx, result).get(0);
+                    if (customDecoder instanceof ByteToMessageDecoder) {
+                        result = PipelineUtil.callDecode((ByteToMessageDecoder) customDecoder, ctx, result).get(0);
+                    }
+                    else if (customDecoder instanceof MessageToMessageDecoder) {
+                        result = PipelineUtil.callDecode((MessageToMessageDecoder) customDecoder, ctx, result).get(0);
+                    }
                 }
                 list.addAll(PipelineUtil.callDecode(minecraftDecoder, ctx, result));
             } catch (InvocationTargetException e) {
