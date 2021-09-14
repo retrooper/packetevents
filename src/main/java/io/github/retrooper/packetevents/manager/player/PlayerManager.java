@@ -72,7 +72,7 @@ public class PlayerManager {
         Object channel = PacketEvents.get().getPlayerManager().getChannel(player);
         ClientVersion version = clientVersions.get(channel);
         if (version == null) {
-            //Prioritize asking ViaVersion and ProtocolSupport as they modify the protocol version in the packet we access it from.
+            //Asking ViaVersion or ProtocolSupport for the protocol version.
             if (VersionLookupUtils.isDependencyAvailable()) {
                 try {
                     version = ClientVersion.getClientVersionByProtocolVersion(VersionLookupUtils.getProtocolVersion(player));
@@ -84,16 +84,14 @@ public class PlayerManager {
                     return ClientVersion.TEMP_UNRESOLVED;
                 }
             } else {
-                //We can trust the version we retrieved from the packet.
                 short protocolVersion;
-                //Handle 1.7.10, luckily 1.7.10 provides a method for us to access a player's protocol version(because 1.7.10 servers support 1.8 clients too)
+                //Luckily 1.7.10 provides a method for us to access a player's protocol version(because 1.7.10 servers support 1.8 clients too)
                 if (PacketEvents.get().getServerManager().getVersion().isOlderThan(ServerVersion.v_1_8)) {
                     protocolVersion = (short) SpigotVersionLookup_1_7.getProtocolVersion(player);
                 } else {
                     //No dependency available, couldn't snatch the version from the packet AND server version is not 1.7.10
                     //We are pretty safe to assume the version is the same as the server, as ViaVersion AND ProtocolSupport could not be found.
                     //If you aren't using ViaVersion or ProtocolSupport, how are you supporting multiple protocol versions?
-                    //(WE DONT SUPPORT CUSTOM PROTOCOL VERSION HACKS other than viaversion & protocolsupport)
                     protocolVersion = PacketEvents.get().getServerManager().getVersion().getProtocolVersion();
                 }
                 version = ClientVersion.getClientVersionByProtocolVersion(protocolVersion);

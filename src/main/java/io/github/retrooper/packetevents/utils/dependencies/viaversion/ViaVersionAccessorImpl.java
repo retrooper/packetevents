@@ -21,6 +21,7 @@ package io.github.retrooper.packetevents.utils.dependencies.viaversion;
 import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.bukkit.handlers.BukkitDecodeHandler;
+import com.viaversion.viaversion.bukkit.platform.BukkitViaInjector;
 import io.github.retrooper.packetevents.utils.reflection.ClassUtil;
 import io.github.retrooper.packetevents.utils.reflection.Reflection;
 import io.github.retrooper.packetevents.utils.reflection.ReflectionObject;
@@ -54,6 +55,7 @@ public class ViaVersionAccessorImpl implements ViaVersionAccessor {
             ChannelHandler protocolLibDecoder = channel.pipeline().get("protocol_lib_decoder");
             if (protocolLibDecoder != null) {
                 channel.pipeline().remove("protocol_lib_decoder");
+                ((BukkitViaInjector)Via.getManager().getInjector()).setProtocolLib(false);
                 customBukkitDecodeHandler.addCustomDecoder(protocolLibDecoder);
             }
             channel.pipeline().replace("decoder", "decoder", customBukkitDecodeHandler);
