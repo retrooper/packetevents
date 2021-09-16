@@ -275,7 +275,7 @@ public enum ClientVersion {
      *
      * @return Is resolved
      */
-    public boolean isResoled() {
+    public boolean isResolved() {
         return this != TEMP_UNRESOLVED && this != UNRESOLVED;
     }
 }
