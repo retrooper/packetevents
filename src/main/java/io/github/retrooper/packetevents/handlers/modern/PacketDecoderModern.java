@@ -32,7 +32,6 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.MessageToMessageDecoder;
 import org.bukkit.entity.Player;
 
-import java.util.Arrays;
 import java.util.List;
 
 @ChannelHandler.Sharable
@@ -44,48 +43,75 @@ public class PacketDecoderModern extends MessageToMessageDecoder<ByteBuf> {
     public boolean handleViaVersion = false;
     public Object viaUserConnectionObj;
 
-    public void handle(ChannelHandlerContextAbstract ctx, ByteBufAbstract byteBuf, List<Object> output) {
+    public void handle(ChannelHandlerContextAbstract ctx, ByteBufAbstract byteBuf, List<Object> output) throws Exception {
         if (skipDoubleTransform) {
             skipDoubleTransform = false;
             output.add(byteBuf.retain().rawByteBuf());
         }
-        ByteBufAbstract transformedBuf = ctx.alloc().buffer().writeBytes(byteBuf);
-        try {
-            boolean needsCompress = handleCompressionOrder(ctx, transformedBuf);
-            if (handleViaVersion) {
-                //Transform the packet
-                ViaVersionUtil.transformPacket(viaUserConnectionObj, transformedBuf.rawByteBuf(), true);
-                System.out.println("THE HANDLERS: " + Arrays.toString(ctx.channel().pipeline().names().toArray(new String[0])));
+        boolean needsCompress = handleCompressionOrder(ctx, byteBuf);
+        int firstReaderIndex = byteBuf.readerIndex();
+        PacketReceiveEvent packetReceiveEvent = new PacketReceiveEvent(ctx.channel(), player, byteBuf);
+        int readerIndex = byteBuf.readerIndex();
+        PacketEvents.get().getEventManager().callEvent(packetReceiveEvent, () -> {
+            byteBuf.readerIndex(readerIndex);
+        });
+        if (!packetReceiveEvent.isCancelled()) {
+            //A wrapper has been used
+            if (packetReceiveEvent.getCurrentPacketWrapper() != null) {
+                //Rewrite the bytebuf with the content of the wrapper (modify the packet)
+                packetReceiveEvent.getByteBuf().clear();
+                packetReceiveEvent.getCurrentPacketWrapper().writeVarInt(packetReceiveEvent.getPacketID());
+                packetReceiveEvent.getCurrentPacketWrapper().writeData();
             }
-            int firstReaderIndex = transformedBuf.readerIndex();
-            PacketReceiveEvent packetReceiveEvent = new PacketReceiveEvent(ctx.channel(), player, transformedBuf);
-            int readerIndex = transformedBuf.readerIndex();
-            PacketEvents.get().getEventManager().callEvent(packetReceiveEvent, () -> {
-                transformedBuf.readerIndex(readerIndex);
-            });
-            if (!packetReceiveEvent.isCancelled()) {
-                //A wrapper has been used
-                if (packetReceiveEvent.getCurrentPacketWrapper() != null) {
-                    //Rewrite the bytebuf with the content of the wrapper (modify the packet)
-                    packetReceiveEvent.getByteBuf().clear();
-                    packetReceiveEvent.getCurrentPacketWrapper().writeVarInt(packetReceiveEvent.getPacketID());
-                    packetReceiveEvent.getCurrentPacketWrapper().writeData();
-                }
-                transformedBuf.readerIndex(firstReaderIndex);
-                if (needsCompress) {
-                    CompressionManager.recompress(ctx, transformedBuf);
-                    skipDoubleTransform = true;
-                }
-                output.add(transformedBuf.retain().rawByteBuf());
+            byteBuf.readerIndex(firstReaderIndex);
+            if (needsCompress) {
+                CompressionManager.recompress(ctx, byteBuf);
+                skipDoubleTransform = true;
             }
-        } finally {
-            transformedBuf.release();
+            output.add(byteBuf.retain().rawByteBuf());
         }
     }
 
     @Override
-    public void decode(ChannelHandlerContext ctx, ByteBuf byteBuf, List<Object> out) {
-        handle(ChannelHandlerContextAbstract.generate(ctx), ByteBufAbstract.generate(byteBuf), out);
+    public void decode(ChannelHandlerContext ctx, ByteBuf byteBuf, List<Object> out) throws Exception {
+        ByteBuf transformedBuf = ctx.alloc().buffer().writeBytes(byteBuf);
+        if (handleViaVersion) {
+            if (!ViaVersionUtil.checkServerboundPacketUserConnection(viaUserConnectionObj)) {
+                byteBuf.clear();
+                throw ViaVersionUtil.throwCancelEncoderException(null);
+            }
+            if (ViaVersionUtil.isUserConnectionActive(viaUserConnectionObj)) {
+                //Transform the packet
+                //int preID = PacketWrapperUtil.readVarInt(ByteBufAbstract.generate(byteBuf.copy()));
+                ByteBuf updated = ctx.alloc().buffer().writeBytes(byteBuf);
+                ViaVersionUtil.transformPacket(viaUserConnectionObj, updated, true);
+                transformedBuf.clear().writeBytes(updated);
+                //int postID = PacketWrapperUtil.readVarInt((ByteBufAbstract.generate(updated).copy()));
+                /*
+                if (postID == 0x05) {
+                    System.out.println("PRE ID: " + preID + ", POST ID: " + postID);
+                    PacketWrapper<?> packetWrapper = new PacketWrapper<>(ClientVersion.UNKNOWN, PacketEvents.get().getServerManager().getVersion(),
+                            ByteBufAbstract.generate(updated), postID);
+                    String locale = packetWrapper.readString(16);
+                    byte vd = packetWrapper.readByte();
+                    int chatModeIndex = packetWrapper.readVarInt();
+                    boolean chatColors = packetWrapper.readBoolean();
+                    short displayedSkinPartsMask = packetWrapper.readUnsignedByte();
+                    int mainHandIndex = packetWrapper.readVarInt();
+                    boolean dtf = packetWrapper.readBoolean();
+                    System.out.println("LOCALE: " + locale + ", vd: " + vd + ", chat mode index: " + chatModeIndex + ", chat colors: " + chatColors +
+                            ", displayed skin parts mask: " + displayedSkinPartsMask + ", main hand inex: " + mainHandIndex + ", dtf: " + dtf);
+                    System.out.println("REMAINING BYTES: " + updated.readableBytes());
+                    //Client settings
+                    System.exit(0);
+                }*/
+            }
+        }
+        try {
+            handle(ChannelHandlerContextAbstract.generate(ctx), ByteBufAbstract.generate(transformedBuf), out);
+        } finally {
+            transformedBuf.release();
+        }
     }
 
     private boolean handleCompressionOrder(ChannelHandlerContextAbstract ctx, ByteBufAbstract buf) {

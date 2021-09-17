@@ -280,6 +280,7 @@ public class EarlyChannelInjectorModern implements EarlyInjector {
                 encoder.handleViaVersion = true;
 
                 ChannelHandler viaDecoder = ((Channel)channel).pipeline().get("decoder");
+                //TODO Check if viaDecoder is an instanceof BukkitDecodeHandler, then proceed with our replacing
                 ReflectionObject viaDecoderReflect = new ReflectionObject(viaDecoder);
 
                 decoder.viaUserConnectionObj = viaDecoderReflect.readObject(0, ViaVersionUtil.getUserConnectionClass());

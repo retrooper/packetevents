@@ -77,6 +77,28 @@ public class ViaVersionAccessorImplLegacy implements ViaVersionAccessor {
     }
 
     @Override
+    public Exception throwCancelDecoderException(Throwable throwable) {
+        load();
+        try {
+            return (Exception) cancelDecoderExceptionGenerator.invoke(throwable);
+        } catch (IllegalAccessException | InvocationTargetException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    @Override
+    public Exception throwCancelEncoderException(Throwable throwable) {
+        load();
+        try {
+            return (Exception) cancelEncoderExceptionGenerator.invoke(throwable);
+        } catch (IllegalAccessException | InvocationTargetException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    @Override
     public void transformPacket(Object userConnectionObj, Object byteBufObj, boolean clientSide) {
         load();
         ByteBuf byteBuf = (ByteBuf) byteBufObj;
@@ -111,6 +133,12 @@ public class ViaVersionAccessorImplLegacy implements ViaVersionAccessor {
             e.printStackTrace();
         }
         return false;
+    }
+
+    @Override
+    public boolean checkServerboundPacketUserConnection(Object userConnectionObj) {
+        load();
+        return false;//TODO Complete
     }
 
     @Override

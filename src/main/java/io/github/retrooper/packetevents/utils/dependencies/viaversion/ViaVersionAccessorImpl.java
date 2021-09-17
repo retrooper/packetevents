@@ -60,6 +60,16 @@ public class ViaVersionAccessorImpl implements ViaVersionAccessor {
     }
 
     @Override
+    public Exception throwCancelDecoderException(Throwable throwable) {
+        return CancelDecoderException.generate(throwable);
+    }
+
+    @Override
+    public Exception throwCancelEncoderException(Throwable throwable) {
+        return CancelEncoderException.generate(throwable);
+    }
+
+    @Override
     public void transformPacket(Object userConnectionObj, Object byteBufObj, boolean clientSide) {
         UserConnection userConnection = (UserConnection) userConnectionObj;
         ByteBuf byteBuf = (ByteBuf) byteBufObj;
@@ -84,6 +94,11 @@ public class ViaVersionAccessorImpl implements ViaVersionAccessor {
     @Override
     public boolean isUserConnectionActive(Object userConnectionObj) {
         return ((UserConnection)userConnectionObj).isActive();
+    }
+
+    @Override
+    public boolean checkServerboundPacketUserConnection(Object userConnectionObj) {
+        return ((UserConnection)userConnectionObj).checkServerboundPacket();
     }
 
     @Override

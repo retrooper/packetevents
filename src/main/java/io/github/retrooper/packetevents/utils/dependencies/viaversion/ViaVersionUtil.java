@@ -53,6 +53,14 @@ public class ViaVersionUtil {
         return getViaVersionAccessor().getProtocolVersion(player);
     }
 
+    public static Object throwCancelDecoderException(Throwable throwable) {
+        return getViaVersionAccessor().throwCancelDecoderException(throwable);
+    }
+
+    public static Exception throwCancelEncoderException(Throwable throwable) {
+        return getViaVersionAccessor().throwCancelEncoderException(throwable);
+    }
+
     public static void transformPacket(Object userConnectionObj, Object byteBufObj, boolean clientSide) {
         getViaVersionAccessor().transformPacket(userConnectionObj, byteBufObj, clientSide);
     }
@@ -62,6 +70,10 @@ public class ViaVersionUtil {
     }
 
     public static boolean isUserConnectionActive(Object userConnectionObj) {
+        return getViaVersionAccessor().isUserConnectionActive(userConnectionObj);
+    }
+
+    public static boolean checkServerboundPacketUserConnection(Object userConnectionObj) {
         return getViaVersionAccessor().isUserConnectionActive(userConnectionObj);
     }
 
