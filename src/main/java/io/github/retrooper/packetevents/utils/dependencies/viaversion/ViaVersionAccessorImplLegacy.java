@@ -18,6 +18,8 @@
 
 package io.github.retrooper.packetevents.utils.dependencies.viaversion;
 
+import io.github.retrooper.packetevents.utils.reflection.Reflection;
+import io.netty.buffer.ByteBuf;
 import org.bukkit.entity.Player;
 
 import java.lang.reflect.InvocationTargetException;
@@ -27,9 +29,15 @@ public class ViaVersionAccessorImplLegacy implements ViaVersionAccessor {
     private static Class<?> viaClass;
     private static Method apiAccessor;
     private static Method getPlayerVersionMethod;
+    private static Class<?> userConnectionClass;
+    private static Method cancelDecoderExceptionGenerator;
+    private static Method cancelEncoderExceptionGenerator;
+    private Method transformServerboundMethod;
+    private Method transformClientboundMethod;
+    private Method setActiveMethod;
+    private Method isActiveMethod;
 
-    @Override
-    public int getProtocolVersion(Player player) {
+    private void load() {
         if (viaClass == null) {
             try {
                 viaClass = Class.forName("us.myles.ViaVersion.api.Via");
@@ -40,6 +48,25 @@ public class ViaVersionAccessorImplLegacy implements ViaVersionAccessor {
                 e.printStackTrace();
             }
         }
+
+        if (userConnectionClass == null) {
+            try {
+                userConnectionClass = Class.forName("us.myles.ViaVersion.api.data.UserConnection");
+                transformServerboundMethod = Reflection.getMethod(userConnectionClass, "transformServerbound", 0);
+                transformClientboundMethod = Reflection.getMethod(userConnectionClass, "transformClientbound", 0);
+                setActiveMethod = Reflection.getMethod(userConnectionClass, "setActive", 0);
+                isActiveMethod = Reflection.getMethod(userConnectionClass, "isActive", 0);
+                cancelDecoderExceptionGenerator= Reflection.getMethod(Class.forName("us.myles.ViaVersion.exception.CancelDecoderException"), "generate", 0);
+                cancelEncoderExceptionGenerator= Reflection.getMethod(Class.forName("us.myles.ViaVersion.exception.CancelEncoderException"), "generate", 0);
+            } catch (ClassNotFoundException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    @Override
+    public int getProtocolVersion(Player player) {
+        load();
         try {
             Object viaAPI = apiAccessor.invoke(null);
             return (int) getPlayerVersionMethod.invoke(viaAPI, player);
@@ -47,5 +74,48 @@ public class ViaVersionAccessorImplLegacy implements ViaVersionAccessor {
             e.printStackTrace();
         }
         return -1;
+    }
+
+    @Override
+    public void transformPacket(Object userConnectionObj, Object byteBufObj, boolean clientSide) {
+        load();
+        ByteBuf byteBuf = (ByteBuf) byteBufObj;
+        try {
+            if (clientSide) {
+                transformServerboundMethod.invoke(userConnectionObj, byteBuf, cancelDecoderExceptionGenerator.invoke(null));
+            } else {
+                transformClientboundMethod.invoke(userConnectionObj, byteBuf, cancelEncoderExceptionGenerator.invoke(null));
+            }
+        }
+        catch (Exception ex) {
+            ex.printStackTrace();
+        }
+    }
+
+    @Override
+    public void setUserConnectionActive(Object userConnectionObj, boolean active) {
+        load();
+        try {
+            setActiveMethod.invoke(userConnectionObj, active);
+        } catch (IllegalAccessException | InvocationTargetException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Override
+    public boolean isUserConnectionActive(Object userConnectionObj) {
+        load();
+        try {
+            return (boolean) isActiveMethod.invoke(userConnectionObj);
+        } catch (IllegalAccessException | InvocationTargetException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    @Override
+    public Class<?> getUserConnectionClass() {
+        load();
+        return userConnectionClass;
     }
 }

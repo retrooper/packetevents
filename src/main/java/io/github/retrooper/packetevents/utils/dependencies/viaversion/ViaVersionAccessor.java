@@ -22,4 +22,12 @@ import org.bukkit.entity.Player;
 
 public interface ViaVersionAccessor {
     int getProtocolVersion(Player player);
+
+    void transformPacket(Object userConnectionObj, Object byteBufObj, boolean clientSide);
+
+    public void setUserConnectionActive(Object userConnectionObj, boolean active);
+
+    public boolean isUserConnectionActive(Object userConnectionObj);
+
+    public Class<?> getUserConnectionClass();
 }

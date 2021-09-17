@@ -16,24 +16,18 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package io.github.retrooper.packetevents.utils.dependencies;
+package io.github.retrooper.packetevents.utils.dependencies.protocolsupport;
 
-import io.github.retrooper.packetevents.utils.dependencies.protocolsupport.ProtocolSupportVersionLookupUtils;
-import io.github.retrooper.packetevents.utils.dependencies.viaversion.ViaVersionLookupUtils;
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
+import protocolsupport.api.ProtocolSupportAPI;
 
-public class VersionLookupUtils {
-    public static boolean isDependencyAvailable() {
-        return ViaVersionLookupUtils.isAvailable()
-                || ProtocolSupportVersionLookupUtils.isAvailable();
+public class ProtocolSupportUtil {
+    public static boolean isAvailable() {
+        return Bukkit.getPluginManager().getPlugin("ProtocolSupport") != null;
     }
 
     public static int getProtocolVersion(Player player) {
-        if (ViaVersionLookupUtils.isAvailable()) {
-            return ViaVersionLookupUtils.getProtocolVersion(player);
-        } else if (ProtocolSupportVersionLookupUtils.isAvailable()) {
-            return ProtocolSupportVersionLookupUtils.getProtocolVersion(player);
-        }
-        return -1;
+        return ProtocolSupportAPI.getProtocolVersion(player).getId();
     }
 }

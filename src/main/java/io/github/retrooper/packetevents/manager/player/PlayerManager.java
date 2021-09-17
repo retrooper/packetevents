@@ -23,10 +23,10 @@ import io.github.retrooper.packetevents.manager.server.ServerVersion;
 import io.github.retrooper.packetevents.utils.GeyserUtil;
 import io.github.retrooper.packetevents.utils.MinecraftReflection;
 import io.github.retrooper.packetevents.utils.PlayerPingAccessorModern;
-import io.github.retrooper.packetevents.utils.dependencies.VersionLookupUtils;
-import io.github.retrooper.packetevents.utils.dependencies.protocolsupport.ProtocolSupportVersionLookupUtils;
+import io.github.retrooper.packetevents.utils.dependencies.DependencyUtil;
+import io.github.retrooper.packetevents.utils.dependencies.protocolsupport.ProtocolSupportUtil;
 import io.github.retrooper.packetevents.utils.dependencies.v_1_7_10.SpigotVersionLookup_1_7;
-import io.github.retrooper.packetevents.utils.dependencies.viaversion.ViaVersionLookupUtils;
+import io.github.retrooper.packetevents.utils.dependencies.viaversion.ViaVersionUtil;
 import io.github.retrooper.packetevents.utils.gameprofile.GameProfileUtil;
 import io.github.retrooper.packetevents.utils.gameprofile.WrappedGameProfile;
 import io.github.retrooper.packetevents.utils.netty.buffer.ByteBufAbstract;
@@ -73,9 +73,9 @@ public class PlayerManager {
         ClientVersion version = clientVersions.get(channel);
         if (version == null) {
             //Asking ViaVersion or ProtocolSupport for the protocol version.
-            if (VersionLookupUtils.isDependencyAvailable()) {
+            if (DependencyUtil.isDependencyAvailable()) {
                 try {
-                    version = ClientVersion.getClientVersionByProtocolVersion(VersionLookupUtils.getProtocolVersion(player));
+                    version = ClientVersion.getClientVersionByProtocolVersion(DependencyUtil.getProtocolVersion(player));
                     clientVersions.put(channel, version);
                     return version;
                 } catch (Exception ex) {
@@ -104,7 +104,7 @@ public class PlayerManager {
     public void sendPacket(ChannelAbstract channel, ByteBufAbstract byteBuf) {
         //TODO Also check if our encoder is RIGHT before minecraft's,
         //if it is, then don't use context to writeflush, otherwise use it (to support multiple packetevents instances)
-        if (ViaVersionLookupUtils.isAvailable() && !ProtocolSupportVersionLookupUtils.isAvailable()) {
+        if (ViaVersionUtil.isAvailable() && !ProtocolSupportUtil.isAvailable()) {
             channel.writeAndFlush(byteBuf);
         } else {
             channel.pipeline().context(PacketEvents.get().encoderName).writeAndFlush(byteBuf);
