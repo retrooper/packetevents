@@ -77,10 +77,6 @@ public class EarlyChannelInjectorModern implements EarlyInjector {
     @Override
     public void inject() {
         try {
-            if (PaperChannelInjector.PAPER_INJECTION_METHOD) {
-                PaperChannelInjector.setPaperChannelInitializeListener();
-                return;
-            }
             Object serverConnection = MinecraftReflection.getMinecraftServerConnectionInstance();
             for (Field field : serverConnection.getClass().getDeclaredFields()) {
                 field.setAccessible(true);
@@ -172,13 +168,6 @@ public class EarlyChannelInjectorModern implements EarlyInjector {
 
     @Override
     public void eject() {
-        if (PaperChannelInjector.PAPER_INJECTION_METHOD) {
-            try {
-                PaperChannelInjector.removePaperChannelInitializeListener();
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }
         for (ChannelFuture future : injectedFutures) {
             ejectChannelFuture(future);
         }
