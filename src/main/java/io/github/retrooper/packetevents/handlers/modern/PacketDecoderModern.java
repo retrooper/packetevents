@@ -23,26 +23,25 @@ import io.github.retrooper.packetevents.event.impl.PacketReceiveEvent;
 import io.github.retrooper.packetevents.handlers.compression.CompressionManager;
 import io.github.retrooper.packetevents.handlers.compression.CustomPacketDecompressor;
 import io.github.retrooper.packetevents.protocol.ConnectionState;
-import io.github.retrooper.packetevents.utils.dependencies.viaversion.ViaVersionUtil;
 import io.github.retrooper.packetevents.utils.netty.buffer.ByteBufAbstract;
 import io.github.retrooper.packetevents.utils.netty.channel.ChannelHandlerContextAbstract;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
+import io.netty.handler.codec.ByteToMessageDecoder;
 import io.netty.handler.codec.MessageToMessageDecoder;
 import org.bukkit.entity.Player;
 
-import java.util.Arrays;
 import java.util.List;
 
 @ChannelHandler.Sharable
 public class PacketDecoderModern extends MessageToMessageDecoder<ByteBuf> {
+    public String handlerName;
     public volatile Player player;
     public ConnectionState connectionState = ConnectionState.HANDSHAKING;
     private boolean handledCompression;
     private boolean skipDoubleTransform;
     public boolean handleViaVersion = false;
-    public Object viaUserConnectionObj;
 
     public void handle(ChannelHandlerContextAbstract ctx, ByteBufAbstract byteBuf, List<Object> output) {
         if (skipDoubleTransform) {
@@ -51,12 +50,7 @@ public class PacketDecoderModern extends MessageToMessageDecoder<ByteBuf> {
         }
         ByteBufAbstract transformedBuf = ctx.alloc().buffer().writeBytes(byteBuf);
         try {
-            boolean needsCompress = handleCompressionOrder(ctx, transformedBuf);
-            if (handleViaVersion) {
-                //Transform the packet
-                ViaVersionUtil.transformPacket(viaUserConnectionObj, transformedBuf.rawByteBuf(), true);
-                System.out.println("THE HANDLERS: " + Arrays.toString(ctx.channel().pipeline().names().toArray(new String[0])));
-            }
+            boolean needsCompress = !handleViaVersion && handleCompressionOrder(ctx, transformedBuf);
             int firstReaderIndex = transformedBuf.readerIndex();
             PacketReceiveEvent packetReceiveEvent = new PacketReceiveEvent(ctx.channel(), player, transformedBuf);
             int readerIndex = transformedBuf.readerIndex();
@@ -64,9 +58,7 @@ public class PacketDecoderModern extends MessageToMessageDecoder<ByteBuf> {
                 transformedBuf.readerIndex(readerIndex);
             });
             if (!packetReceiveEvent.isCancelled()) {
-                //A wrapper has been used
                 if (packetReceiveEvent.getCurrentPacketWrapper() != null) {
-                    //Rewrite the bytebuf with the content of the wrapper (modify the packet)
                     packetReceiveEvent.getByteBuf().clear();
                     packetReceiveEvent.getCurrentPacketWrapper().writeVarInt(packetReceiveEvent.getPacketID());
                     packetReceiveEvent.getCurrentPacketWrapper().writeData();

@@ -16,33 +16,28 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package io.github.retrooper.packetevents.utils.dependencies.viaversion;
+package io.github.retrooper.packetevents.utils.dependencies.v_1_7_10;
 
+import io.github.retrooper.packetevents.utils.MinecraftReflection;
 import org.bukkit.entity.Player;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
-public class ViaVersionAccessorImplLegacy implements ViaVersionAccessor {
-    private static Class<?> viaClass;
-    private static Method apiAccessor;
-    private static Method getPlayerVersionMethod;
+public class SpigotVersionLookup_1_7 {
+    private static Method getPlayerVersionMethod = null;
 
-    @Override
-    public int getProtocolVersion(Player player) {
-        if (viaClass == null) {
+    public static int getProtocolVersion(Player player) {
+        if (getPlayerVersionMethod == null) {
             try {
-                viaClass = Class.forName("us.myles.ViaVersion.api.Via");
-                Class<?> viaAPIClass = Class.forName("us.myles.ViaVersion.api.ViaAPI");
-                apiAccessor = viaClass.getMethod("getAPI");
-                getPlayerVersionMethod = viaAPIClass.getMethod("getPlayerVersion", Object.class);
-            } catch (ClassNotFoundException | NoSuchMethodException e) {
+                getPlayerVersionMethod = MinecraftReflection.NETWORK_MANAGER_CLASS.getMethod("getVersion");
+            } catch (NoSuchMethodException e) {
                 e.printStackTrace();
             }
         }
+        Object networkManager = MinecraftReflection.getNetworkManager(player);
         try {
-            Object viaAPI = apiAccessor.invoke(null);
-            return (int) getPlayerVersionMethod.invoke(viaAPI, player);
+            return (int) getPlayerVersionMethod.invoke(networkManager);
         } catch (IllegalAccessException | InvocationTargetException e) {
             e.printStackTrace();
         }

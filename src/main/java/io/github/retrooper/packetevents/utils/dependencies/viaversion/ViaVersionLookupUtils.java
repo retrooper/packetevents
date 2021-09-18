@@ -21,10 +21,10 @@ package io.github.retrooper.packetevents.utils.dependencies.viaversion;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
-public class ViaVersionUtil {
+public class ViaVersionLookupUtils {
     private static ViaVersionAccessor viaVersionAccessor;
 
-    private ViaVersionUtil() {
+    private ViaVersionLookupUtils() {
     }
 
     private static void load() {
@@ -51,21 +51,5 @@ public class ViaVersionUtil {
 
     public static int getProtocolVersion(Player player) {
         return getViaVersionAccessor().getProtocolVersion(player);
-    }
-
-    public static void transformPacket(Object userConnectionObj, Object byteBufObj, boolean clientSide) {
-        getViaVersionAccessor().transformPacket(userConnectionObj, byteBufObj, clientSide);
-    }
-
-    public static void setUserConnectionActive(Object userConnectionObj, boolean active) {
-        getViaVersionAccessor().setUserConnectionActive(userConnectionObj, active);
-    }
-
-    public static boolean isUserConnectionActive(Object userConnectionObj) {
-        return getViaVersionAccessor().isUserConnectionActive(userConnectionObj);
-    }
-
-    public static Class<?> getUserConnectionClass() {
-        return getViaVersionAccessor().getUserConnectionClass();
     }
 }
