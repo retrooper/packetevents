@@ -69,8 +69,6 @@ public class ViaVersionAccessorImpl implements ViaVersionAccessor {
                 }
             }
             channel.pipeline().replace("decoder", "decoder", customBukkitDecodeHandler);
-            System.out.println("REPLACED like a lil' sussy baka");
-            System.out.println("NEW HANDLERS: " + Arrays.toString(((Channel) channel).pipeline().names().toArray(new String[0])));
         } else if (ClassUtil.getClassSimpleName(decoder.getClass()).equals("CustomBukkitDecodeHandler")) {
             ReflectionObject reflectionObject = new ReflectionObject(decoder);
             //TODO Test multiple packetevents instances that have shaded in diff locations

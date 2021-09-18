@@ -61,7 +61,6 @@ dependencies {
     compileOnly 'org.geysermc:connector:1.2.1-SNAPSHOT'
     compileOnly 'com.viaversion:viaversion:4.0.1'
     compileOnly 'com.github.ProtocolSupport:ProtocolSupport:3d24efeda6'
-    compileOnly 'com.github.dmulloy2:ProtocolLib:4.7.0'
 
     /*compileOnly 'org.github.spigot:1.16.2:1.16.2'
    compileOnly 'org.github.spigot:1.8.8:1.8.8'
