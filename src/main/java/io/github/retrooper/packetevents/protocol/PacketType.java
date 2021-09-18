@@ -61,6 +61,7 @@ public final class PacketType {
         int protocolVersion = version != null ? version.getProtocolVersion() : -1;
         return getById(side, state, protocolVersion, packetID);
     }
+
     public static PacketTypeCommon getById(PacketSide side, ConnectionState state, @Nullable ServerVersion version, int packetID) {
         int protocolVersion = version != null ? version.getProtocolVersion() : -1;
         return getById(side, state, protocolVersion, packetID);
@@ -281,7 +282,7 @@ public final class PacketType {
                 return id;
             }
 
-            private static final Map<Integer, Map<Integer, PacketTypeCommon>> PACKET_ID_CACHE = new IdentityHashMap<>();
+            private static final Map<Integer, Map<Integer, PacketTypeCommon>> PACKET_ID_CACHE = new HashMap<>();
             private static final Map<Integer, Map<PacketTypeCommon, Integer>> PACKET_TYPE_CACHE = new HashMap<>();
 
             @Nullable

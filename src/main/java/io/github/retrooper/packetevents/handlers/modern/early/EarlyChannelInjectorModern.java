@@ -279,7 +279,6 @@ public class EarlyChannelInjectorModern implements EarlyInjector {
     public ConnectionState getConnectionState(Object channel) {
         ConnectionState state = PacketEvents.get().getPlayerManager().connectionStates.get(channel);
         if (state == null) {
-            System.out.println("STATE WAS NOT CACHED!");
             PacketDecoderModern decoder = getDecoder(channel);
             if (decoder != null) {
                 state = decoder.connectionState;

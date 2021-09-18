@@ -48,8 +48,8 @@ public class ViaVersionAccessorImpl implements ViaVersionAccessor {
             customBukkitDecodeHandler.addCustomDecoder(customDecoder);
         } else if (decoder instanceof BukkitDecodeHandler) {
             ReflectionObject reflectionObject = new ReflectionObject(decoder);
-            UserConnection userConnectionInfo = reflectionObject.read(0, UserConnection.class);
-            ByteToMessageDecoder minecraftDecoder = reflectionObject.read(0, ByteToMessageDecoder.class);
+            UserConnection userConnectionInfo = reflectionObject.readObject(0, UserConnection.class);
+            ByteToMessageDecoder minecraftDecoder = reflectionObject.readObject(0, ByteToMessageDecoder.class);
             CustomBukkitDecodeHandler customBukkitDecodeHandler = new CustomBukkitDecodeHandler(userConnectionInfo, minecraftDecoder, decoder);
             customBukkitDecodeHandler.addCustomDecoder(customDecoder);
             channel.pipeline().replace("decoder", "decoder", customBukkitDecodeHandler);
