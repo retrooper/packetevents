@@ -24,10 +24,10 @@ import io.github.retrooper.packetevents.handlers.modern.PacketDecoderModern;
 import io.github.retrooper.packetevents.handlers.modern.PacketEncoderModern;
 import io.github.retrooper.packetevents.protocol.ConnectionState;
 import io.github.retrooper.packetevents.utils.MinecraftReflection;
-import io.github.retrooper.packetevents.utils.dependencies.protocollib.ProtocolLibUtil;
+import io.github.retrooper.packetevents.utils.dependencies.protocolsupport.ProtocolSupportUtil;
 import io.github.retrooper.packetevents.utils.dependencies.viaversion.CustomBukkitDecodeHandler;
 import io.github.retrooper.packetevents.utils.dependencies.viaversion.ViaVersionAccessorImpl;
-import io.github.retrooper.packetevents.utils.dependencies.viaversion.ViaVersionLookupUtils;
+import io.github.retrooper.packetevents.utils.dependencies.viaversion.ViaVersionUtil;
 import io.github.retrooper.packetevents.utils.list.ListWrapper;
 import io.github.retrooper.packetevents.utils.reflection.ClassUtil;
 import io.github.retrooper.packetevents.utils.reflection.ReflectionObject;
@@ -44,7 +44,6 @@ import java.util.*;
 public class EarlyChannelInjectorModern implements EarlyInjector {
     private final List<ChannelFuture> injectedFutures = new ArrayList<>();
     private final List<Map<Field, Object>> injectedLists = new ArrayList<>();
-    public boolean viaAvailable = false;
 
     @Override
     public boolean isBound() {
@@ -224,12 +223,11 @@ public class EarlyChannelInjectorModern implements EarlyInjector {
         ChannelHandler decoder = channel.pipeline().get(PacketEvents.get().decoderName);
         if (decoder != null) {
             return (PacketDecoderModern) decoder;
-        } else if (viaAvailable) {
+        } else if (ViaVersionUtil.isAvailable()) {
             ChannelHandler mcDecoder = channel.pipeline().get("decoder");
             if (mcDecoder instanceof CustomBukkitDecodeHandler) {
-                return ((CustomBukkitDecodeHandler)mcDecoder).getCustomDecoder(PacketDecoderModern.class);
-            }
-            else if (ClassUtil.getClassSimpleName(mcDecoder.getClass()).equals("CustomBukkitDecodeHandler")) {
+                return ((CustomBukkitDecodeHandler) mcDecoder).getCustomDecoder(PacketDecoderModern.class);
+            } else if (ClassUtil.getClassSimpleName(mcDecoder.getClass()).equals("CustomBukkitDecodeHandler")) {
                 List<MessageToMessageDecoder<?>> customDecoders = new ReflectionObject(mcDecoder).readList(0);
                 for (MessageToMessageDecoder<?> customDecoder : customDecoders) {
                     ReflectionObject reflectionObject = new ReflectionObject(customDecoder);
@@ -282,25 +280,32 @@ public class EarlyChannelInjectorModern implements EarlyInjector {
     }
 
     @Override
-    public void changeConnectionState(Object channel, ConnectionState connectionState) {
+    public void changeConnectionState(Object ch, ConnectionState connectionState) {
+        Channel channel = (Channel) ch;
         PacketDecoderModern decoder = getDecoder(channel);
         if (decoder != null) {
             //Change connection state in decoder
             decoder.connectionState = connectionState;
             //Change connection state in map
             PacketEvents.get().getPlayerManager().connectionStates.put(channel, connectionState);
-            if (connectionState == ConnectionState.GAME && (viaAvailable || ViaVersionLookupUtils.isAvailable())) {
-                viaAvailable = true;
-                ((Channel) channel).pipeline().remove(PacketEvents.get().decoderName);
-                decoder.handleViaVersion = true;
-                PacketEncoderModern encoder = (PacketEncoderModern) ((Channel) channel).pipeline().remove(PacketEvents.get().encoderName);
-                encoder.handleViaVersion = true;
-                //If via is present, replace their decode handler with my custom one
-                ((ViaVersionAccessorImpl) ViaVersionLookupUtils.getViaVersionAccessor()).addDecoderAfterVia(channel, decoder);
+            if (connectionState == ConnectionState.GAME) {
+                if (ViaVersionUtil.isAvailable()) {
+                    channel.pipeline().remove(PacketEvents.get().decoderName);
+                    decoder.bypassCompression = true;
+                    PacketEncoderModern encoder = (PacketEncoderModern) channel.pipeline().remove(PacketEvents.get().encoderName);
+                    encoder.handleViaVersion = true;
+                    //If via is present, replace their decode handler with my custom one
+                    ((ViaVersionAccessorImpl) ViaVersionUtil.getViaVersionAccessor()).addDecoderAfterVia(channel, decoder);
 
-                //TODO Confirm
-                ((Channel) channel).pipeline().addAfter("encoder", PacketEvents.get().encoderName, encoder);
-                System.out.println("CHANGED HANDLERS: " + Arrays.toString(((Channel) channel).pipeline().names().toArray(new String[0])));
+                    //TODO Confirm
+                    channel.pipeline().addAfter("encoder", PacketEvents.get().encoderName, encoder);
+                    System.out.println("CHANGED HANDLERS: " + Arrays.toString((channel.pipeline().names().toArray(new String[0]))));
+                }
+                else if (ProtocolSupportUtil.isAvailable()) {
+                    channel.pipeline().remove(PacketEvents.get().decoderName);
+                    channel.pipeline().addAfter("ps_decoder_transformer", PacketEvents.get().decoderName, decoder);
+                    System.out.println("THE HANDLERS: " + Arrays.toString((channel.pipeline().names().toArray(new String[0]))));
+                }
             }
         }
 

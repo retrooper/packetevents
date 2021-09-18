@@ -28,7 +28,6 @@ import io.github.retrooper.packetevents.utils.netty.channel.ChannelHandlerContex
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
-import io.netty.handler.codec.ByteToMessageDecoder;
 import io.netty.handler.codec.MessageToMessageDecoder;
 import org.bukkit.entity.Player;
 
@@ -40,7 +39,7 @@ public class PacketDecoderModern extends MessageToMessageDecoder<ByteBuf> {
     public ConnectionState connectionState = ConnectionState.HANDSHAKING;
     private boolean handledCompression;
     private boolean skipDoubleTransform;
-    public boolean handleViaVersion = false;
+    public boolean bypassCompression = false;
 
     public void handle(ChannelHandlerContextAbstract ctx, ByteBufAbstract byteBuf, List<Object> output) {
         if (skipDoubleTransform) {
@@ -49,7 +48,7 @@ public class PacketDecoderModern extends MessageToMessageDecoder<ByteBuf> {
         }
         ByteBufAbstract transformedBuf = ctx.alloc().buffer().writeBytes(byteBuf);
         try {
-            boolean needsCompress = !handleViaVersion && handleCompressionOrder(ctx, transformedBuf);
+            boolean needsCompress = !bypassCompression && handleCompressionOrder(ctx, transformedBuf);
             int firstReaderIndex = transformedBuf.readerIndex();
             PacketReceiveEvent packetReceiveEvent = new PacketReceiveEvent(connectionState, ctx.channel(), player, transformedBuf);
             int readerIndex = transformedBuf.readerIndex();

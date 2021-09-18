@@ -16,30 +16,23 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package io.github.retrooper.packetevents.utils.dependencies.v_1_7_10;
+package io.github.retrooper.packetevents.utils.dependencies;
 
-import io.github.retrooper.packetevents.utils.MinecraftReflection;
+import io.github.retrooper.packetevents.utils.dependencies.protocolsupport.ProtocolSupportUtil;
+import io.github.retrooper.packetevents.utils.dependencies.viaversion.ViaVersionUtil;
 import org.bukkit.entity.Player;
 
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-
-public class SpigotVersionLookup_1_7 {
-    private static Method getPlayerVersionMethod = null;
+public class DependencyUtil {
+    public static boolean isDependencyAvailable() {
+        return ViaVersionUtil.isAvailable()
+                || ProtocolSupportUtil.isAvailable();
+    }
 
     public static int getProtocolVersion(Player player) {
-        if (getPlayerVersionMethod == null) {
-            try {
-                getPlayerVersionMethod = MinecraftReflection.NETWORK_MANAGER_CLASS.getMethod("getVersion");
-            } catch (NoSuchMethodException e) {
-                e.printStackTrace();
-            }
-        }
-        Object networkManager = MinecraftReflection.getNetworkManager(player);
-        try {
-            return (int) getPlayerVersionMethod.invoke(networkManager);
-        } catch (IllegalAccessException | InvocationTargetException e) {
-            e.printStackTrace();
+        if (ViaVersionUtil.isAvailable()) {
+            return ViaVersionUtil.getProtocolVersion(player);
+        } else if (ProtocolSupportUtil.isAvailable()) {
+            return ProtocolSupportUtil.getProtocolVersion(player);
         }
         return -1;
     }

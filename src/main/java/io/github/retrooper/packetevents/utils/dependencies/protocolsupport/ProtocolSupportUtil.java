@@ -22,9 +22,14 @@ import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import protocolsupport.api.ProtocolSupportAPI;
 
-public class ProtocolSupportVersionLookupUtils {
+public class ProtocolSupportUtil {
+    private static byte available = -1;
     public static boolean isAvailable() {
-        return Bukkit.getPluginManager().getPlugin("ProtocolSupport") != null;
+        if (available == -1) {
+            boolean present = Bukkit.getPluginManager().getPlugin("ProtocolSupport") != null;
+            available = (byte) (present ? 1 : 0);
+        }
+        return available == 1;
     }
 
     public static int getProtocolVersion(Player player) {

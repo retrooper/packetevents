@@ -21,10 +21,11 @@ package io.github.retrooper.packetevents.utils.dependencies.viaversion;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
-public class ViaVersionLookupUtils {
+public class ViaVersionUtil {
+    private static byte available = -1;
     private static ViaVersionAccessor viaVersionAccessor;
 
-    private ViaVersionLookupUtils() {
+    private ViaVersionUtil() {
     }
 
     private static void load() {
@@ -39,7 +40,11 @@ public class ViaVersionLookupUtils {
     }
 
     public static boolean isAvailable() {
-        return Bukkit.getPluginManager().getPlugin("ViaVersion") != null;
+        if (available == -1) {
+            boolean present = Bukkit.getPluginManager().getPlugin("ViaVersion") != null;
+            available = (byte) (present ? 1 : 0);
+        }
+        return available == 1;
     }
 
 
