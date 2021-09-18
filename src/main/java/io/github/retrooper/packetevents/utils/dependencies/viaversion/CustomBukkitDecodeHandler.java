@@ -32,13 +32,11 @@ import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.ByteToMessageDecoder;
 import io.netty.handler.codec.MessageToMessageDecoder;
-import org.bukkit.Bukkit;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;
 
-//TODO Maybe make it extend BukkitDecodeHandler
 public class CustomBukkitDecodeHandler extends ByteToMessageDecoder {
     public final ChannelHandler oldBukkitDecodeHandler;
     public final List<Object> customDecoders = new ArrayList<>();
@@ -63,8 +61,7 @@ public class CustomBukkitDecodeHandler extends ByteToMessageDecoder {
                 if (customDecoderHandlerName.equals(handlerName)) {
                     return customDecoder;
                 }
-            }
-            catch (Exception ignored) {
+            } catch (Exception ignored) {
             }
         }
         return null;
@@ -89,22 +86,13 @@ public class CustomBukkitDecodeHandler extends ByteToMessageDecoder {
                     //We only support one output
                     if (customDecoder instanceof ByteToMessageDecoder) {
                         result = PipelineUtil.callDecode((ByteToMessageDecoder) customDecoder, ctx, result).get(0);
-                    }
-                    else if (customDecoder instanceof MessageToMessageDecoder) {
+                    } else if (customDecoder instanceof MessageToMessageDecoder) {
                         result = PipelineUtil.callDecode((MessageToMessageDecoder<?>) customDecoder, ctx, result).get(0);
                     }
                 }
-                if (result instanceof ByteBuf) {
-                    //We will utilize the vanilla decoder to convert the ByteBuf to an NMS packet
-                    List<Object> nmsObjects = PipelineUtil.callDecode(minecraftDecoder, ctx, result);
-                    list.addAll(nmsObjects);
-                }
-                else {
-                    //Some decoder already converted the object to an NMS packet (ProtocolLib)
-                    System.out.println("NMS TYPE: " + result.getClass().getSimpleName());
-                    Bukkit.shutdown();
-                    list.add(result);
-                }
+                //We will utilize the vanilla decoder to convert the ByteBuf to an NMS packet
+                List<Object> nmsObjects = PipelineUtil.callDecode(minecraftDecoder, ctx, result);
+                list.addAll(nmsObjects);
             } catch (InvocationTargetException e) {
                 if (e.getCause() instanceof Exception) {
                     throw (Exception) e.getCause();

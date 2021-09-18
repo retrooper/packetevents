@@ -20,6 +20,7 @@ package io.github.retrooper.packetevents.manager.player;
 
 import io.github.retrooper.packetevents.PacketEvents;
 import io.github.retrooper.packetevents.manager.server.ServerVersion;
+import io.github.retrooper.packetevents.protocol.ConnectionState;
 import io.github.retrooper.packetevents.utils.GeyserUtil;
 import io.github.retrooper.packetevents.utils.MinecraftReflection;
 import io.github.retrooper.packetevents.utils.PlayerPingAccessorModern;
@@ -41,7 +42,17 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class PlayerManager {
     public final Map<Object, ClientVersion> clientVersions = new ConcurrentHashMap<>();
+    public final Map<Object, ConnectionState> connectionStates = new ConcurrentHashMap<>();
     public final Map<String, Object> channels = new ConcurrentHashMap<>();
+
+    public ConnectionState getConnectionState(Player player) {
+        Object channel = getChannel(player);
+        ConnectionState state = connectionStates.get(channel);
+        if (state == null) {
+            state = ConnectionState.GAME;
+        }
+        return state;
+    }
 
     /**
      * Use the ping PacketEvents calculates for the player. (Updates every incoming Keep Alive packet)
@@ -65,11 +76,11 @@ public class PlayerManager {
      * @see #clientVersions
      */
     @NotNull
-    public ClientVersion getClientVersion(@NotNull final Player player) {
+    public ClientVersion getClientVersion(@NotNull Player player) {
         if (player.getAddress() == null) {
             return ClientVersion.UNKNOWN;
         }
-        Object channel = PacketEvents.get().getPlayerManager().getChannel(player);
+        Object channel = getChannel(player);
         ClientVersion version = clientVersions.get(channel);
         if (version == null) {
             //Asking ViaVersion or ProtocolSupport for the protocol version.

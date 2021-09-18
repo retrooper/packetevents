@@ -277,19 +277,29 @@ public class EarlyChannelInjectorModern implements EarlyInjector {
 
     @Override
     public ConnectionState getConnectionState(Object channel) {
-        PacketDecoderModern decoder = getDecoder(channel);
-        if (decoder != null) {
-            return decoder.connectionState;
-        } else {
-            return null;
+        ConnectionState state = PacketEvents.get().getPlayerManager().connectionStates.get(channel);
+        if (state == null) {
+            System.out.println("STATE WAS NOT CACHED!");
+            PacketDecoderModern decoder = getDecoder(channel);
+            if (decoder != null) {
+                state = decoder.connectionState;
+                //Cache connection state in map
+                PacketEvents.get().getPlayerManager().connectionStates.put(channel, state);
+            } else {
+                return null;
+            }
         }
+        return state;
     }
 
     @Override
     public void changeConnectionState(Object channel, ConnectionState connectionState) {
         PacketDecoderModern decoder = getDecoder(channel);
         if (decoder != null) {
+            //Change connection state in decoder
             decoder.connectionState = connectionState;
+            //Change connection state in map
+            PacketEvents.get().getPlayerManager().connectionStates.put(channel, connectionState);
             if (connectionState == ConnectionState.GAME && (viaAvailable || ViaVersionLookupUtils.isAvailable())) {
                 viaAvailable = true;
                 ((Channel) channel).pipeline().remove(PacketEvents.get().decoderName);
@@ -302,7 +312,7 @@ public class EarlyChannelInjectorModern implements EarlyInjector {
 
                 //TODO Confirm
                 ((Channel) channel).pipeline().addAfter("encoder", PacketEvents.get().encoderName, encoder);
-                System.out.println("HANDLERS: " + Arrays.toString(((Channel) channel).pipeline().names().toArray(new String[0])));
+                System.out.println("CHANGED HANDLERS: " + Arrays.toString(((Channel) channel).pipeline().names().toArray(new String[0])));
             }
         }
 
