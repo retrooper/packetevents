@@ -41,7 +41,6 @@ public class InternalPacketListener implements PacketListener {
         if (event.getPacketType() == PacketType.Login.Server.LOGIN_SUCCESS) {
             //Transition into the GAME connection state
             PacketEvents.get().getInjector().changeConnectionState(event.getChannel().rawChannel(), ConnectionState.GAME);
-            System.out.println("TRANSITIONED!");
         }
     }
 
@@ -62,7 +61,6 @@ public class InternalPacketListener implements PacketListener {
 
                     //Transition into the LOGIN OR STATUS connection state
                     PacketEvents.get().getInjector().changeConnectionState(rawChannel, handshake.getNextConnectionState());
-                    System.out.println("INCOMING VERSION: " + clientVersion.name());
                 }
                 break;
             case LOGIN:
@@ -72,13 +70,6 @@ public class InternalPacketListener implements PacketListener {
                     PacketEvents.get().getPlayerManager().channels.put(start.getUsername(), event.getChannel().rawChannel());
                 }
                 break;
-            case GAME:
-                if (event.getPacketType() == PacketType.Game.Client.INTERACT_ENTITY) {
-                    WrapperGameClientInteractEntity interactEntity = new WrapperGameClientInteractEntity(event);
-                    int entityID = interactEntity.getEntityID();
-                    Entity entity = PacketEvents.get().getServerManager().getEntityByID(entityID);
-                    event.getPlayer().sendMessage("entity name: " + entity.getName() + ", type: " + interactEntity.getType().name());
-                }
         }
     }
 }

@@ -299,12 +299,10 @@ public class EarlyChannelInjectorModern implements EarlyInjector {
 
                     //TODO Confirm
                     channel.pipeline().addAfter("encoder", PacketEvents.get().encoderName, encoder);
-                    System.out.println("CHANGED HANDLERS: " + Arrays.toString((channel.pipeline().names().toArray(new String[0]))));
                 }
                 else if (ProtocolSupportUtil.isAvailable()) {
                     channel.pipeline().remove(PacketEvents.get().decoderName);
                     channel.pipeline().addAfter("ps_decoder_transformer", PacketEvents.get().decoderName, decoder);
-                    System.out.println("THE HANDLERS: " + Arrays.toString((channel.pipeline().names().toArray(new String[0]))));
                 }
             }
         }
