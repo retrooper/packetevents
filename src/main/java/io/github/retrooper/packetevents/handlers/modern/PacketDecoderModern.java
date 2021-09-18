@@ -36,7 +36,6 @@ import java.util.List;
 
 @ChannelHandler.Sharable
 public class PacketDecoderModern extends MessageToMessageDecoder<ByteBuf> {
-    public String handlerName;
     public volatile Player player;
     public ConnectionState connectionState = ConnectionState.HANDSHAKING;
     private boolean handledCompression;

@@ -18,12 +18,11 @@
 
 package io.github.retrooper.packetevents.utils.dependencies.viaversion;
 
+import com.comphenix.protocol.injector.netty.CustomChannelInjector;
 import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.bukkit.handlers.BukkitDecodeHandler;
-import com.viaversion.viaversion.bukkit.platform.BukkitViaInjector;
 import io.github.retrooper.packetevents.utils.reflection.ClassUtil;
-import io.github.retrooper.packetevents.utils.reflection.Reflection;
 import io.github.retrooper.packetevents.utils.reflection.ReflectionObject;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandler;
@@ -31,7 +30,6 @@ import io.netty.handler.codec.ByteToMessageDecoder;
 import io.netty.handler.codec.MessageToMessageDecoder;
 import org.bukkit.entity.Player;
 
-import java.lang.reflect.Field;
 import java.util.*;
 
 public class ViaVersionAccessorImpl implements ViaVersionAccessor {
@@ -52,10 +50,17 @@ public class ViaVersionAccessorImpl implements ViaVersionAccessor {
             ByteToMessageDecoder minecraftDecoder = reflectionObject.readObject(0, ByteToMessageDecoder.class);
             CustomBukkitDecodeHandler customBukkitDecodeHandler = new CustomBukkitDecodeHandler(userConnectionInfo, minecraftDecoder, decoder);
             customBukkitDecodeHandler.addCustomDecoder(customDecoder);
+            ChannelHandler protocolLibDecoder = channel.pipeline().get("protocol_lib_decoder");
+            if (protocolLibDecoder != null) {
+                customBukkitDecodeHandler.protocolLibAvailable = true;
+                //Remove the ProtocolLib decoder
+                channel.pipeline().remove("protocol_lib_decoder");
+                CustomChannelInjector customChannelInjector = CustomChannelInjector.construct(protocolLibDecoder);
+                customBukkitDecodeHandler.addCustomDecoder(customChannelInjector);
+            }
             channel.pipeline().replace("decoder", "decoder", customBukkitDecodeHandler);
             System.out.println("REPLACED like a lil' sussy baka");
             System.out.println("NEW HANDLERS: " + Arrays.toString(((Channel) channel).pipeline().names().toArray(new String[0])));
-            //TODO load before via and have em' wrap our decoder
         } else if (ClassUtil.getClassSimpleName(decoder.getClass()).equals("CustomBukkitDecodeHandler")) {
             ReflectionObject reflectionObject = new ReflectionObject(decoder);
             //TODO Test multiple packetevents instances that have shaded in diff locations
@@ -66,8 +71,8 @@ public class ViaVersionAccessorImpl implements ViaVersionAccessor {
             ChannelHandler oldBukkitDecoder = reflectionObject.readObject(0, ChannelHandler.class);
 
             CustomBukkitDecodeHandler customBukkitDecodeHandler = new CustomBukkitDecodeHandler(userConnection, minecraftDecoder, oldBukkitDecoder);
-            customBukkitDecodeHandler.customDecoders.addAll(customDecoders);
             customBukkitDecodeHandler.addCustomDecoder(customDecoder);
+            customBukkitDecodeHandler.customDecoders.addAll(customDecoders);
             channel.pipeline().replace("decoder", "decoder", customBukkitDecodeHandler);
         }
     }

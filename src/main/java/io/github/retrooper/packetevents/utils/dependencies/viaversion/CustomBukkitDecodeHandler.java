@@ -26,14 +26,19 @@ import com.viaversion.viaversion.exception.CancelCodecException;
 import com.viaversion.viaversion.exception.CancelDecoderException;
 import com.viaversion.viaversion.exception.InformativeException;
 import com.viaversion.viaversion.util.PipelineUtil;
+import io.github.retrooper.packetevents.utils.reflection.ClassUtil;
+import io.github.retrooper.packetevents.utils.reflection.Reflection;
 import io.github.retrooper.packetevents.utils.reflection.ReflectionObject;
 import io.netty.buffer.ByteBuf;
+import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.ByteToMessageDecoder;
 import io.netty.handler.codec.MessageToMessageDecoder;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -42,6 +47,8 @@ public class CustomBukkitDecodeHandler extends ByteToMessageDecoder {
     public final List<Object> customDecoders = new ArrayList<>();
     public final ByteToMessageDecoder minecraftDecoder;
     private final UserConnection info;
+    public boolean protocolLibAvailable = false;
+    private boolean protocolLibReady = false;
 
     public CustomBukkitDecodeHandler(UserConnection info, ByteToMessageDecoder minecraftDecoder, ChannelHandler oldBukkitDecodeHandler) {
         this.info = info;
@@ -53,15 +60,19 @@ public class CustomBukkitDecodeHandler extends ByteToMessageDecoder {
         customDecoders.add(customDecoder);
     }
 
-    public Object getCustomDecoder(String handlerName) {
+    public <T> T getCustomDecoder(Class<T> clazz) {
         for (Object customDecoder : customDecoders) {
-            ReflectionObject reflectionObject = new ReflectionObject(customDecoder);
-            try {
-                String customDecoderHandlerName = reflectionObject.readString(0);
-                if (customDecoderHandlerName.equals(handlerName)) {
-                    return customDecoder;
-                }
-            } catch (Exception ignored) {
+            if (customDecoder.getClass().equals(clazz)) {
+                return (T) customDecoder;
+            }
+        }
+        return null;
+    }
+
+    public Object getCustomDecoderBySimpleName(String simpleName) {
+        for (Object customDecoder : customDecoders) {
+            if (ClassUtil.getClassSimpleName(customDecoder.getClass()).equals(simpleName)) {
+                return customDecoder;
             }
         }
         return null;
@@ -83,16 +94,50 @@ public class CustomBukkitDecodeHandler extends ByteToMessageDecoder {
             try {
                 Object result = transformedBuf == null ? bytebuf : transformedBuf;
                 for (Object customDecoder : customDecoders) {
-                    //We only support one output
-                    if (customDecoder instanceof ByteToMessageDecoder) {
+                    //We only support one output (except for ProtocolLib)
+                    if (protocolLibAvailable) {
+                        if (!protocolLibReady) {
+                            if (ClassUtil.getClassSimpleName(customDecoder.getClass()).equals("ChannelInjector")) {
+                                ReflectionObject reflectProtocolLibDecoder = new ReflectionObject(customDecoder);
+                                //Correct the vanillaDecoder variable in the ProtocolLib decoder
+                                reflectProtocolLibDecoder.write(ByteToMessageDecoder.class, 0, minecraftDecoder);
+                                //Correct the decodeBuffer variable in ProtocolLib decoder
+                                Method minecraftDecodeMethod = Reflection.getMethod(minecraftDecoder.getClass(), "decode", 0);
+                                Field decodeBufferField = customDecoder.getClass().getDeclaredField("decodeBuffer");
+                                decodeBufferField.setAccessible(true);
+                                decodeBufferField.set(customDecoder, minecraftDecodeMethod);
+
+                                Channel originalChannel = reflectProtocolLibDecoder.read(0, Channel.class);
+                                System.out.println("CHANNEL TYPE: " + originalChannel.getClass().getSimpleName());
+                                protocolLibReady = true;
+                                System.out.println("OVERWRITTEN AND READY");
+                            }
+                        }
+
+                    }
+                    if (protocolLibAvailable && ClassUtil.getClassSimpleName(customDecoder.getClass()).equals("ChannelInjector")) {
+                        result = PipelineUtil.callDecode((ByteToMessageDecoder) customDecoder, ctx, result);
+                    }
+                    else if (customDecoder instanceof ByteToMessageDecoder) {
                         result = PipelineUtil.callDecode((ByteToMessageDecoder) customDecoder, ctx, result).get(0);
                     } else if (customDecoder instanceof MessageToMessageDecoder) {
                         result = PipelineUtil.callDecode((MessageToMessageDecoder<?>) customDecoder, ctx, result).get(0);
                     }
                 }
-                //We will utilize the vanilla decoder to convert the ByteBuf to an NMS packet
-                List<Object> nmsObjects = PipelineUtil.callDecode(minecraftDecoder, ctx, result);
-                list.addAll(nmsObjects);
+                if (result instanceof ByteBuf) {
+                    //We will utilize the vanilla decoder to convert the ByteBuf to an NMS packet
+                    List<Object> nmsObjects = PipelineUtil.callDecode(minecraftDecoder, ctx, result);
+                    list.addAll(nmsObjects);
+                }
+                else {
+                    //Some previous decoder likely already converted the ByteBuf to an NMS packet
+                    if (result instanceof List) {
+                        list.addAll((List<?>)result);
+                    }
+                    else {
+                        list.add(result);
+                    }
+                }
             } catch (InvocationTargetException e) {
                 if (e.getCause() instanceof Exception) {
                     throw (Exception) e.getCause();

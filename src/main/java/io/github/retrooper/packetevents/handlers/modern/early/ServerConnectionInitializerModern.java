@@ -22,10 +22,8 @@ import io.github.retrooper.packetevents.PacketEvents;
 import io.github.retrooper.packetevents.handlers.modern.PacketDecoderModern;
 import io.github.retrooper.packetevents.handlers.modern.PacketEncoderModern;
 import io.github.retrooper.packetevents.utils.dependencies.viaversion.CustomBukkitDecodeHandler;
-import io.github.retrooper.packetevents.utils.reflection.ClassUtil;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandler;
-import org.bukkit.Bukkit;
 
 
 public class ServerConnectionInitializerModern {
@@ -40,19 +38,15 @@ public class ServerConnectionInitializerModern {
             //Convert back to the original ViaVersion decoder
             CustomBukkitDecodeHandler customBukkitDecodeHandler = (CustomBukkitDecodeHandler) mcDecoder;
             channel.pipeline().replace("decoder", "decoder", customBukkitDecodeHandler.oldBukkitDecodeHandler);
-            if (Bukkit.getPluginManager().getPlugin("ProtocolLib") != null) {
-                ChannelHandler plibDecoder = null;
-                for (Object o : customBukkitDecodeHandler.customDecoders) {
-                    if (ClassUtil.getClassSimpleName(o.getClass()).equals("ChannelInjector")) {
-                        plibDecoder = (ChannelHandler) o;
-                    }
-                }
-                if (plibDecoder != null) {
-                    channel.pipeline().addBefore("decoder", "protocol_lib_decoder", plibDecoder);
-                }
+            if (customBukkitDecodeHandler.protocolLibAvailable) {
+                ChannelHandler protocolLibDecoder = (ChannelHandler) customBukkitDecodeHandler.getCustomDecoderBySimpleName("ChannelInjector");
+                channel.pipeline().addBefore("decoder", "protocol_lib_decoder", protocolLibDecoder);
+                System.out.println("DESTROYED SUCCESSFULLY WITH PLIB!");
             }
-        }
-        else {
+            else {
+                System.out.println("DESTROYED SUCCESSFULLY WITHOUT PLIB!");
+            }
+        } else {
             channel.pipeline().remove(PacketEvents.get().decoderName);
             channel.pipeline().remove(PacketEvents.get().encoderName);
         }

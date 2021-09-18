@@ -237,7 +237,7 @@ public class EarlyChannelInjectorModern implements EarlyInjector {
         } else if (viaAvailable) {
             ChannelHandler mcDecoder = channel.pipeline().get("decoder");
             if (mcDecoder instanceof CustomBukkitDecodeHandler) {
-                return (PacketDecoderModern) ((CustomBukkitDecodeHandler)mcDecoder).getCustomDecoder(PacketEvents.get().decoderName);
+                return ((CustomBukkitDecodeHandler)mcDecoder).getCustomDecoder(PacketDecoderModern.class);
             }
             else if (ClassUtil.getClassSimpleName(mcDecoder.getClass()).equals("CustomBukkitDecodeHandler")) {
                 List<MessageToMessageDecoder<?>> customDecoders = new ReflectionObject(mcDecoder).readList(0);
@@ -303,7 +303,6 @@ public class EarlyChannelInjectorModern implements EarlyInjector {
                 viaAvailable = true;
                 ((Channel) channel).pipeline().remove(PacketEvents.get().decoderName);
                 decoder.handleViaVersion = true;
-                decoder.handlerName = PacketEvents.get().decoderName;
                 PacketEncoderModern encoder = (PacketEncoderModern) ((Channel) channel).pipeline().remove(PacketEvents.get().encoderName);
                 encoder.handleViaVersion = true;
                 //If via is present, replace their decode handler with my custom one
