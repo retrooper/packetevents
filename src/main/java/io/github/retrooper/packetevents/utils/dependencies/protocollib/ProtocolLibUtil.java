@@ -36,24 +36,4 @@ public class ProtocolLibUtil {
     public static boolean isAvailable() {
         return Bukkit.getPluginManager().getPlugin("ProtocolLib") != null;
     }
-
-    public static void patchProtocolInjector() {
-        ProtocolManager manager = ProtocolLibrary.getProtocolManager();
-        PacketFilterManager filterManager = (PacketFilterManager) manager;
-        System.out.println("filter manager: " + filterManager.getClass().getSimpleName());
-        ReflectionObject reflectManager = new ReflectionObject(manager, PacketFilterManager.class);
-
-        ProtocolInjector protocolInjector = reflectManager.read(0, ProtocolInjector.class);
-        ReflectionObject reflectProtocolInjector = new ReflectionObject(protocolInjector);
-
-        Plugin plugin = Bukkit.getPluginManager().getPlugin("ProtocolLib");
-        ListenerInvoker invoker = reflectProtocolInjector.read(0, ListenerInvoker.class);
-        ErrorReporter reporter = reflectProtocolInjector.read(0, ErrorReporter.class);
-        CustomProtocolInjector customProtocolInjector = new CustomProtocolInjector(plugin, invoker, reporter);
-        reflectManager.write(ProtocolInjector.class, 0, customProtocolInjector);
-
-        PlayerInjectionHandler playerInjectionHandler = customProtocolInjector.getPlayerInjector();
-        reflectManager.write(PlayerInjectionHandler.class, 0, playerInjectionHandler);
-        System.out.println("SUCCESSFULLY PATCHED");
-    }
 }

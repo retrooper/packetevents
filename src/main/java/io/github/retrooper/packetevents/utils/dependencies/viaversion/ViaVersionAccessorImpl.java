@@ -22,6 +22,7 @@ import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.bukkit.handlers.BukkitDecodeHandler;
 import io.github.retrooper.packetevents.utils.reflection.ClassUtil;
+import io.github.retrooper.packetevents.utils.reflection.Reflection;
 import io.github.retrooper.packetevents.utils.reflection.ReflectionObject;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandler;
@@ -29,6 +30,8 @@ import io.netty.handler.codec.ByteToMessageDecoder;
 import io.netty.handler.codec.MessageToMessageDecoder;
 import org.bukkit.entity.Player;
 
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.util.*;
 
 public class ViaVersionAccessorImpl implements ViaVersionAccessor {
@@ -51,10 +54,19 @@ public class ViaVersionAccessorImpl implements ViaVersionAccessor {
             customBukkitDecodeHandler.addCustomDecoder(customDecoder);
             ChannelHandler protocolLibDecoder = channel.pipeline().get("protocol_lib_decoder");
             if (protocolLibDecoder != null) {
-                customBukkitDecodeHandler.protocolLibAvailable = true;
-                //Remove the ProtocolLib decoder
-                channel.pipeline().remove("protocol_lib_decoder");
-                customBukkitDecodeHandler.addCustomDecoder(protocolLibDecoder);
+                //Reflect the ProtocolLib decoder
+                ReflectionObject reflectProtocolLibDecoder = new ReflectionObject(protocolLibDecoder);
+                //Correct the vanillaDecoder variable in the ProtocolLib decoder
+                reflectProtocolLibDecoder.write(ByteToMessageDecoder.class, 0, customBukkitDecodeHandler);
+                //Correct the decodeBuffer variable in ProtocolLib decoder
+                Method minecraftDecodeMethod = Reflection.getMethod(minecraftDecoder.getClass(), "decode", 0);
+                try {
+                    Field decodeBufferField = protocolLibDecoder.getClass().getDeclaredField("decodeBuffer");
+                    decodeBufferField.setAccessible(true);
+                    decodeBufferField.set(protocolLibDecoder, minecraftDecodeMethod);
+                } catch (NoSuchFieldException | IllegalAccessException e) {
+                    e.printStackTrace();
+                }
             }
             channel.pipeline().replace("decoder", "decoder", customBukkitDecodeHandler);
             System.out.println("REPLACED like a lil' sussy baka");

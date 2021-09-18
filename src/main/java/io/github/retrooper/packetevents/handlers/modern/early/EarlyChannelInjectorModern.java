@@ -76,9 +76,6 @@ public class EarlyChannelInjectorModern implements EarlyInjector {
 
     @Override
     public void inject() {
-        if (ProtocolLibUtil.isAvailable()) {
-            ProtocolLibUtil.patchProtocolInjector();
-        }
         try {
             if (PaperChannelInjector.PAPER_INJECTION_METHOD) {
                 PaperChannelInjector.setPaperChannelInitializeListener();

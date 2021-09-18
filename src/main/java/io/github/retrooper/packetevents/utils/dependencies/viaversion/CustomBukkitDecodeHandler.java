@@ -46,8 +46,6 @@ public class CustomBukkitDecodeHandler extends ByteToMessageDecoder {
     public final List<Object> customDecoders = new ArrayList<>();
     public final ByteToMessageDecoder minecraftDecoder;
     private final UserConnection info;
-    public boolean protocolLibAvailable = false;
-    private boolean protocolLibReady = false;
 
     public CustomBukkitDecodeHandler(UserConnection info, ByteToMessageDecoder minecraftDecoder, ChannelHandler oldBukkitDecodeHandler) {
         this.info = info;
@@ -94,24 +92,7 @@ public class CustomBukkitDecodeHandler extends ByteToMessageDecoder {
                 Object result = transformedBuf == null ? bytebuf : transformedBuf;
                 for (Object customDecoder : customDecoders) {
                     //We only support one output (except for ProtocolLib)
-                    if (protocolLibAvailable && !protocolLibReady) {
-                        if (ClassUtil.getClassSimpleName(customDecoder.getClass()).equals("ChannelInjector")) {
-                            ReflectionObject reflectProtocolLibDecoder = new ReflectionObject(customDecoder);
-                            //Correct the vanillaDecoder variable in the ProtocolLib decoder
-                            reflectProtocolLibDecoder.write(ByteToMessageDecoder.class, 0, minecraftDecoder);
-                            //Correct the decodeBuffer variable in ProtocolLib decoder
-                            Method minecraftDecodeMethod = Reflection.getMethod(minecraftDecoder.getClass(), "decode", 0);
-                            Field decodeBufferField = customDecoder.getClass().getDeclaredField("decodeBuffer");
-                            decodeBufferField.setAccessible(true);
-                            decodeBufferField.set(customDecoder, minecraftDecodeMethod);
-
-                            protocolLibReady = true;
-                        }
-
-                    }
-                    if (protocolLibAvailable && ClassUtil.getClassSimpleName(customDecoder.getClass()).equals("ChannelInjector")) {
-                        result = PipelineUtil.callDecode((ByteToMessageDecoder) customDecoder, ctx, result);
-                    } else if (customDecoder instanceof ByteToMessageDecoder) {
+                    if (customDecoder instanceof ByteToMessageDecoder) {
                         result = PipelineUtil.callDecode((ByteToMessageDecoder) customDecoder, ctx, result).get(0);
                     } else if (customDecoder instanceof MessageToMessageDecoder) {
                         result = PipelineUtil.callDecode((MessageToMessageDecoder<?>) customDecoder, ctx, result).get(0);
