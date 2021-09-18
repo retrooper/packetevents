@@ -23,16 +23,16 @@ import io.github.retrooper.packetevents.event.PacketListener;
 import io.github.retrooper.packetevents.event.impl.PacketReceiveEvent;
 import io.github.retrooper.packetevents.event.impl.PacketSendEvent;
 import io.github.retrooper.packetevents.manager.player.ClientVersion;
-import io.github.retrooper.packetevents.manager.server.SystemOS;
 import io.github.retrooper.packetevents.protocol.ConnectionState;
 import io.github.retrooper.packetevents.protocol.PacketType;
-import io.github.retrooper.packetevents.utils.netty.buffer.ByteBufAbstract;
-import io.github.retrooper.packetevents.wrapper.PacketWrapper;
+import io.github.retrooper.packetevents.wrapper.game.client.WrapperGameClientCreativeInventoryAction;
 import io.github.retrooper.packetevents.wrapper.game.client.WrapperGameClientInteractEntity;
+import io.github.retrooper.packetevents.wrapper.game.server.WrapperGameServerHeldItemChange;
+import io.github.retrooper.packetevents.wrapper.game.server.WrapperGameServerSpawnLivingEntity;
 import io.github.retrooper.packetevents.wrapper.handshaking.client.WrapperHandshakingClientHandshake;
 import io.github.retrooper.packetevents.wrapper.login.client.WrapperLoginClientLoginStart;
-import org.bukkit.Bukkit;
 import org.bukkit.entity.Entity;
+import org.bukkit.inventory.ItemStack;
 
 public class InternalPacketListener implements PacketListener {
     //Make this specific event be at MONITOR priority
@@ -78,18 +78,6 @@ public class InternalPacketListener implements PacketListener {
                     int entityID = interactEntity.getEntityID();
                     Entity entity = PacketEvents.get().getServerManager().getEntityByID(entityID);
                     event.getPlayer().sendMessage("entity name: " + entity.getName() + ", type: " + interactEntity.getType().name());
-                } else if (event.getPacketType() == PacketType.Game.Client.PLAYER_POSITION) {
-                    ByteBufAbstract pre = event.getByteBuf().copy();
-
-                    double x = pre.readDouble();
-                    double y = pre.readDouble();
-                    double z = pre.readDouble();
-
-                    boolean ground = pre.readBoolean();
-                    event.getPlayer().sendMessage("X: " + x + ", Y: " + y + ", Z: " + z + ", GROUND: " + ground);
-                    event.getPlayer().sendMessage("BYTES LEFT: " + pre.readableBytes());
-                    System.out.println("X: " + x + ", Y: " + y + ", Z: " + z + ", GROUND: " + ground);
-                    System.out.println("BYTES LEFT: " + pre.readableBytes());
                 }
         }
     }

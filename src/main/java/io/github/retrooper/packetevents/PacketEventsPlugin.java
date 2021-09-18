@@ -18,7 +18,6 @@
 
 package io.github.retrooper.packetevents;
 
-import io.github.retrooper.packetevents.event.PacketListenerAbstract;
 import org.bukkit.plugin.java.JavaPlugin;
 
 public class PacketEventsPlugin extends JavaPlugin {

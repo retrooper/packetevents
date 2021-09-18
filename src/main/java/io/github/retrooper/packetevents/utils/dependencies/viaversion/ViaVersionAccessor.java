@@ -23,17 +23,11 @@ import org.bukkit.entity.Player;
 public interface ViaVersionAccessor {
     int getProtocolVersion(Player player);
 
-    Exception throwCancelDecoderException(Throwable throwable);
-
-    Exception throwCancelEncoderException(Throwable throwable);
-
     void transformPacket(Object userConnectionObj, Object byteBufObj, boolean clientSide);
 
-    void setUserConnectionActive(Object userConnectionObj, boolean active);
+    public void setUserConnectionActive(Object userConnectionObj, boolean active);
 
-    boolean isUserConnectionActive(Object userConnectionObj);
+    public boolean isUserConnectionActive(Object userConnectionObj);
 
-    boolean checkServerboundPacketUserConnection(Object userConnectionObj);
-
-    Class<?> getUserConnectionClass();
+    public Class<?> getUserConnectionClass();
 }

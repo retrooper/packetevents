@@ -122,10 +122,6 @@ public class PacketWrapper<T extends PacketWrapper> {
         writeVarInt(packetID);
     }
 
-    public short readUnsignedByte() {
-        return byteBuf.readUnsignedByte();
-    }
-
     public byte readByte() {
         return byteBuf.readByte();
     }
