@@ -18,7 +18,6 @@
 
 package io.github.retrooper.packetevents.utils.dependencies.viaversion;
 
-import com.comphenix.protocol.injector.netty.CustomChannelInjector;
 import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.bukkit.handlers.BukkitDecodeHandler;
@@ -55,8 +54,7 @@ public class ViaVersionAccessorImpl implements ViaVersionAccessor {
                 customBukkitDecodeHandler.protocolLibAvailable = true;
                 //Remove the ProtocolLib decoder
                 channel.pipeline().remove("protocol_lib_decoder");
-                CustomChannelInjector customChannelInjector = CustomChannelInjector.construct(protocolLibDecoder);
-                customBukkitDecodeHandler.addCustomDecoder(customChannelInjector);
+                customBukkitDecodeHandler.addCustomDecoder(protocolLibDecoder);
             }
             channel.pipeline().replace("decoder", "decoder", customBukkitDecodeHandler);
             System.out.println("REPLACED like a lil' sussy baka");

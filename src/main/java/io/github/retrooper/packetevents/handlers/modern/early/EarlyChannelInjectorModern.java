@@ -24,6 +24,7 @@ import io.github.retrooper.packetevents.handlers.modern.PacketDecoderModern;
 import io.github.retrooper.packetevents.handlers.modern.PacketEncoderModern;
 import io.github.retrooper.packetevents.protocol.ConnectionState;
 import io.github.retrooper.packetevents.utils.MinecraftReflection;
+import io.github.retrooper.packetevents.utils.dependencies.protocollib.ProtocolLibUtil;
 import io.github.retrooper.packetevents.utils.dependencies.viaversion.CustomBukkitDecodeHandler;
 import io.github.retrooper.packetevents.utils.dependencies.viaversion.ViaVersionAccessorImpl;
 import io.github.retrooper.packetevents.utils.dependencies.viaversion.ViaVersionLookupUtils;
@@ -75,6 +76,9 @@ public class EarlyChannelInjectorModern implements EarlyInjector {
 
     @Override
     public void inject() {
+        if (ProtocolLibUtil.isAvailable()) {
+            ProtocolLibUtil.patchProtocolInjector();
+        }
         try {
             if (PaperChannelInjector.PAPER_INJECTION_METHOD) {
                 PaperChannelInjector.setPaperChannelInitializeListener();

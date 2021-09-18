@@ -30,7 +30,6 @@ import io.github.retrooper.packetevents.utils.reflection.ClassUtil;
 import io.github.retrooper.packetevents.utils.reflection.Reflection;
 import io.github.retrooper.packetevents.utils.reflection.ReflectionObject;
 import io.netty.buffer.ByteBuf;
-import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.ByteToMessageDecoder;
@@ -95,30 +94,24 @@ public class CustomBukkitDecodeHandler extends ByteToMessageDecoder {
                 Object result = transformedBuf == null ? bytebuf : transformedBuf;
                 for (Object customDecoder : customDecoders) {
                     //We only support one output (except for ProtocolLib)
-                    if (protocolLibAvailable) {
-                        if (!protocolLibReady) {
-                            if (ClassUtil.getClassSimpleName(customDecoder.getClass()).equals("ChannelInjector")) {
-                                ReflectionObject reflectProtocolLibDecoder = new ReflectionObject(customDecoder);
-                                //Correct the vanillaDecoder variable in the ProtocolLib decoder
-                                reflectProtocolLibDecoder.write(ByteToMessageDecoder.class, 0, minecraftDecoder);
-                                //Correct the decodeBuffer variable in ProtocolLib decoder
-                                Method minecraftDecodeMethod = Reflection.getMethod(minecraftDecoder.getClass(), "decode", 0);
-                                Field decodeBufferField = customDecoder.getClass().getDeclaredField("decodeBuffer");
-                                decodeBufferField.setAccessible(true);
-                                decodeBufferField.set(customDecoder, minecraftDecodeMethod);
+                    if (protocolLibAvailable && !protocolLibReady) {
+                        if (ClassUtil.getClassSimpleName(customDecoder.getClass()).equals("ChannelInjector")) {
+                            ReflectionObject reflectProtocolLibDecoder = new ReflectionObject(customDecoder);
+                            //Correct the vanillaDecoder variable in the ProtocolLib decoder
+                            reflectProtocolLibDecoder.write(ByteToMessageDecoder.class, 0, minecraftDecoder);
+                            //Correct the decodeBuffer variable in ProtocolLib decoder
+                            Method minecraftDecodeMethod = Reflection.getMethod(minecraftDecoder.getClass(), "decode", 0);
+                            Field decodeBufferField = customDecoder.getClass().getDeclaredField("decodeBuffer");
+                            decodeBufferField.setAccessible(true);
+                            decodeBufferField.set(customDecoder, minecraftDecodeMethod);
 
-                                Channel originalChannel = reflectProtocolLibDecoder.read(0, Channel.class);
-                                System.out.println("CHANNEL TYPE: " + originalChannel.getClass().getSimpleName());
-                                protocolLibReady = true;
-                                System.out.println("OVERWRITTEN AND READY");
-                            }
+                            protocolLibReady = true;
                         }
 
                     }
                     if (protocolLibAvailable && ClassUtil.getClassSimpleName(customDecoder.getClass()).equals("ChannelInjector")) {
                         result = PipelineUtil.callDecode((ByteToMessageDecoder) customDecoder, ctx, result);
-                    }
-                    else if (customDecoder instanceof ByteToMessageDecoder) {
+                    } else if (customDecoder instanceof ByteToMessageDecoder) {
                         result = PipelineUtil.callDecode((ByteToMessageDecoder) customDecoder, ctx, result).get(0);
                     } else if (customDecoder instanceof MessageToMessageDecoder) {
                         result = PipelineUtil.callDecode((MessageToMessageDecoder<?>) customDecoder, ctx, result).get(0);
@@ -128,13 +121,11 @@ public class CustomBukkitDecodeHandler extends ByteToMessageDecoder {
                     //We will utilize the vanilla decoder to convert the ByteBuf to an NMS packet
                     List<Object> nmsObjects = PipelineUtil.callDecode(minecraftDecoder, ctx, result);
                     list.addAll(nmsObjects);
-                }
-                else {
+                } else {
                     //Some previous decoder likely already converted the ByteBuf to an NMS packet
                     if (result instanceof List) {
-                        list.addAll((List<?>)result);
-                    }
-                    else {
+                        list.addAll((List<?>) result);
+                    } else {
                         list.add(result);
                     }
                 }
