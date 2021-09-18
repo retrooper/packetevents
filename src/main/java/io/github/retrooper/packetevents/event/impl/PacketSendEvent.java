@@ -20,6 +20,7 @@ package io.github.retrooper.packetevents.event.impl;
 
 import io.github.retrooper.packetevents.event.PacketListenerAbstract;
 import io.github.retrooper.packetevents.event.ProtocolPacketEvent;
+import io.github.retrooper.packetevents.protocol.ConnectionState;
 import io.github.retrooper.packetevents.protocol.PacketSide;
 import io.github.retrooper.packetevents.utils.netty.buffer.ByteBufAbstract;
 import io.github.retrooper.packetevents.utils.netty.channel.ChannelAbstract;
@@ -35,8 +36,18 @@ public class PacketSendEvent extends ProtocolPacketEvent {
         this.postTask = postTask;
     }
 
+    public PacketSendEvent(ConnectionState connectionState, ChannelAbstract channel, Player player, ByteBufAbstract byteBuf, Runnable postTask) {
+        super(PacketSide.SERVER, connectionState, channel, player, byteBuf);
+        this.postTask = postTask;
+    }
+
     public PacketSendEvent(Object channel, Player player, Object rawByteBuf, Runnable postTask) {
         super(PacketSide.SERVER, channel, player, rawByteBuf);
+        this.postTask = postTask;
+    }
+
+    public PacketSendEvent(ConnectionState connectionState, Object channel, Player player, Object rawByteBuf, Runnable postTask) {
+        super(PacketSide.SERVER, connectionState, channel, player, rawByteBuf);
         this.postTask = postTask;
     }
 
@@ -45,8 +56,18 @@ public class PacketSendEvent extends ProtocolPacketEvent {
         this.postTask = null;
     }
 
+    public PacketSendEvent(ConnectionState connectionState, ChannelAbstract channel, Player player, ByteBufAbstract byteBuf) {
+        super(PacketSide.SERVER, connectionState, channel, player, byteBuf);
+        this.postTask = null;
+    }
+
     public PacketSendEvent(Object channel, Player player, Object rawByteBuf) {
         super(PacketSide.SERVER, channel, player, rawByteBuf);
+        this.postTask = null;
+    }
+
+    public PacketSendEvent(ConnectionState connectionState, Object channel, Player player, Object rawByteBuf) {
+        super(PacketSide.SERVER, connectionState, channel, player, rawByteBuf);
         this.postTask = null;
     }
 

@@ -52,7 +52,7 @@ public class PacketDecoderModern extends MessageToMessageDecoder<ByteBuf> {
         try {
             boolean needsCompress = !handleViaVersion && handleCompressionOrder(ctx, transformedBuf);
             int firstReaderIndex = transformedBuf.readerIndex();
-            PacketReceiveEvent packetReceiveEvent = new PacketReceiveEvent(ctx.channel(), player, transformedBuf);
+            PacketReceiveEvent packetReceiveEvent = new PacketReceiveEvent(connectionState, ctx.channel(), player, transformedBuf);
             int readerIndex = transformedBuf.readerIndex();
             PacketEvents.get().getEventManager().callEvent(packetReceiveEvent, () -> {
                 transformedBuf.readerIndex(readerIndex);
