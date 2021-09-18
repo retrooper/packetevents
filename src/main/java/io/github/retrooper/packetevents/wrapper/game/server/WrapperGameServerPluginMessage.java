@@ -45,7 +45,7 @@ public class WrapperGameServerPluginMessage extends PacketWrapper<WrapperGameSer
     @Override
     public void readData() {
         this.channelName = readString();
-        int dataLength = getServerVersion().isNewerThanOrEquals(ServerVersion.v_1_8) ? byteBuf.readableBytes() : readUnsignedShort();
+        int dataLength = serverVersion.isNewerThanOrEquals(ServerVersion.v_1_8) ? byteBuf.readableBytes() : readUnsignedShort();
         this.data = readByteArray(dataLength);
     }
 
@@ -58,7 +58,7 @@ public class WrapperGameServerPluginMessage extends PacketWrapper<WrapperGameSer
     @Override
     public void writeData() {
         writeString(channelName);
-        if (getServerVersion().isOlderThan(ServerVersion.v_1_8)) {
+        if (serverVersion.isOlderThan(ServerVersion.v_1_8)) {
             writeShort(data.length);
         }
         writeByteArray(data);
