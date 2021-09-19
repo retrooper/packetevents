@@ -22,10 +22,18 @@ import io.github.retrooper.packetevents.PacketEvents;
 import io.github.retrooper.packetevents.handlers.EarlyInjector;
 import io.github.retrooper.packetevents.handlers.legacy.PacketDecoderLegacy;
 import io.github.retrooper.packetevents.handlers.legacy.PacketEncoderLegacy;
+import io.github.retrooper.packetevents.handlers.modern.PacketDecoderModern;
 import io.github.retrooper.packetevents.protocol.ConnectionState;
 import io.github.retrooper.packetevents.utils.MinecraftReflection;
+import io.github.retrooper.packetevents.utils.dependencies.protocolsupport.ProtocolSupportUtil;
+import io.github.retrooper.packetevents.utils.dependencies.viaversion.CustomBukkitDecodeHandler;
+import io.github.retrooper.packetevents.utils.dependencies.viaversion.ViaVersionUtil;
 import io.github.retrooper.packetevents.utils.list.ListWrapper;
+import io.github.retrooper.packetevents.utils.reflection.ClassUtil;
+import io.github.retrooper.packetevents.utils.reflection.Reflection;
 import io.github.retrooper.packetevents.utils.reflection.ReflectionObject;
+import io.netty.handler.codec.ByteToMessageDecoder;
+import io.netty.handler.codec.MessageToMessageDecoder;
 import net.minecraft.util.io.netty.channel.Channel;
 import net.minecraft.util.io.netty.channel.ChannelFuture;
 import net.minecraft.util.io.netty.channel.ChannelHandler;
@@ -33,6 +41,7 @@ import net.minecraft.util.io.netty.channel.ChannelPipeline;
 import org.bukkit.entity.Player;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -116,8 +125,7 @@ public class EarlyChannelInjectorLegacy implements EarlyInjector {
                 }
             }
         } catch (Exception ex) {
-            PacketEvents.get().getPlugin().getLogger().severe("PacketEvents failed to inject!");
-            ex.printStackTrace();
+            throw new IllegalStateException("PacketEvents failed to inject!", ex);
         }
 
         //Player channels might have been registered already. Let us add our handlers. We are a little late though.
@@ -224,9 +232,10 @@ public class EarlyChannelInjectorLegacy implements EarlyInjector {
     private PacketDecoderLegacy getDecoder(Object rawChannel) {
         Channel channel = (Channel) rawChannel;
         ChannelHandler decoder = channel.pipeline().get(PacketEvents.get().decoderName);
-        if (decoder instanceof PacketDecoderLegacy) {
+        if (decoder != null) {
             return (PacketDecoderLegacy) decoder;
-        } else {
+        }
+        else {
             return null;
         }
     }
@@ -256,19 +265,36 @@ public class EarlyChannelInjectorLegacy implements EarlyInjector {
 
     @Override
     public ConnectionState getConnectionState(Object channel) {
-        PacketDecoderLegacy decoder = getDecoder(channel);
-        if (decoder != null) {
-            return decoder.connectionState;
-        } else {
-            return null;
+        ConnectionState state = PacketEvents.get().getPlayerManager().connectionStates.get(channel);
+        if (state == null) {
+            PacketDecoderLegacy decoder = getDecoder(channel);
+            if (decoder != null) {
+                state = decoder.connectionState;
+                //Cache connection state in map
+                PacketEvents.get().getPlayerManager().connectionStates.put(channel, state);
+            } else {
+                return null;
+            }
         }
+        return state;
     }
-
     @Override
-    public void changeConnectionState(Object channel, ConnectionState connectionState) {
+    public void changeConnectionState(Object ch, ConnectionState connectionState) {
+        Channel channel = (Channel) ch;
         PacketDecoderLegacy decoder = getDecoder(channel);
         if (decoder != null) {
+            //Change connection state in decoder
             decoder.connectionState = connectionState;
+            //Change connection state in map
+            PacketEvents.get().getPlayerManager().connectionStates.put(channel, connectionState);
+            if (connectionState == ConnectionState.PLAY) {
+                if (ProtocolSupportUtil.isAvailable()) {
+                    channel.pipeline().remove(PacketEvents.get().decoderName);
+                    decoder.bypassCompression = true;
+                    channel.pipeline().addAfter("ps_decoder_transformer", PacketEvents.get().decoderName, decoder);
+                }
+            }
         }
+
     }
 }
