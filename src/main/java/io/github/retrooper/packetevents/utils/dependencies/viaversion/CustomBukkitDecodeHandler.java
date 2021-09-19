@@ -1,6 +1,6 @@
 /*
- * This file is part of packetevents - https://github.com/retrooper/packetevents
- * Copyright (C) 2021 retrooper and contributors
+ * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
+ * Copyright (C) 2016-2021 ViaVersion and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,26 +18,18 @@
 
 package io.github.retrooper.packetevents.utils.dependencies.viaversion;
 
-import com.viaversion.viaversion.api.Via;
-import com.viaversion.viaversion.api.connection.UserConnection;
-import com.viaversion.viaversion.api.protocol.packet.State;
-import com.viaversion.viaversion.bukkit.util.NMSUtil;
 import com.viaversion.viaversion.exception.CancelCodecException;
-import com.viaversion.viaversion.exception.CancelDecoderException;
 import com.viaversion.viaversion.exception.InformativeException;
 import com.viaversion.viaversion.util.PipelineUtil;
+import io.github.retrooper.packetevents.protocol.ConnectionState;
 import io.github.retrooper.packetevents.utils.reflection.ClassUtil;
-import io.github.retrooper.packetevents.utils.reflection.Reflection;
-import io.github.retrooper.packetevents.utils.reflection.ReflectionObject;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.ByteToMessageDecoder;
 import io.netty.handler.codec.MessageToMessageDecoder;
 
-import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -45,10 +37,10 @@ public class CustomBukkitDecodeHandler extends ByteToMessageDecoder {
     public final ChannelHandler oldBukkitDecodeHandler;
     public final List<Object> customDecoders = new ArrayList<>();
     public final ByteToMessageDecoder minecraftDecoder;
-    private final UserConnection info;
+    private final Object userInfo;
 
-    public CustomBukkitDecodeHandler(UserConnection info, ByteToMessageDecoder minecraftDecoder, ChannelHandler oldBukkitDecodeHandler) {
-        this.info = info;
+    public CustomBukkitDecodeHandler(Object userInfo, ByteToMessageDecoder minecraftDecoder, ChannelHandler oldBukkitDecodeHandler) {
+        this.userInfo = userInfo;
         this.minecraftDecoder = minecraftDecoder;
         this.oldBukkitDecodeHandler = oldBukkitDecodeHandler;
     }
@@ -76,20 +68,21 @@ public class CustomBukkitDecodeHandler extends ByteToMessageDecoder {
     }
 
     @Override
-    protected void decode(ChannelHandlerContext ctx, ByteBuf bytebuf, List<Object> list) throws Exception {
-        if (!info.checkServerboundPacket()) {
-            bytebuf.clear(); // Don't accumulate
-            throw CancelDecoderException.generate(null);
+    protected void decode(ChannelHandlerContext ctx, ByteBuf byteBuf, List<Object> list) throws Exception {
+        if (!ViaVersionUtil.checkServerboundPacketUserConnection(userInfo)) {
+            byteBuf.clear(); //Don't accumulate
+            throw ViaVersionUtil.throwCancelEncoderException(null);
+
         }
         ByteBuf transformedBuf = null;
         try {
-            if (info.shouldTransformPacket()) {
-                transformedBuf = ctx.alloc().buffer().writeBytes(bytebuf);
-                info.transformServerbound(transformedBuf, CancelDecoderException::generate);
+            if (ViaVersionUtil.isUserConnectionActive(userInfo)) {
+                transformedBuf = ctx.alloc().buffer().writeBytes(byteBuf);
+                ViaVersionUtil.transformPacket(userInfo, transformedBuf, true);
             }
 
             try {
-                Object result = transformedBuf == null ? bytebuf : transformedBuf;
+                Object result = transformedBuf == null ? byteBuf : transformedBuf;
                 for (Object customDecoder : customDecoders) {
                     //We only support one output (except for ProtocolLib)
                     if (customDecoder instanceof ByteToMessageDecoder) {
@@ -124,13 +117,24 @@ public class CustomBukkitDecodeHandler extends ByteToMessageDecoder {
         }
     }
 
+    private boolean containsCause(Throwable t, Class<?> c) {
+        while (t != null) {
+            if (c.isAssignableFrom(t.getClass())) {
+                return true;
+            }
+
+            t = t.getCause();
+        }
+        return false;
+    }
+
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
-        if (PipelineUtil.containsCause(cause, CancelCodecException.class)) return; // ProtocolLib compat
+        if (containsCause(cause, CancelCodecException.class)) return; // ProtocolLib compat
 
         super.exceptionCaught(ctx, cause);
-        if (!NMSUtil.isDebugPropertySet() && PipelineUtil.containsCause(cause, InformativeException.class)
-                && (info.getProtocolInfo().getState() != State.HANDSHAKE || Via.getManager().isDebug())) {
+        if (!ViaNMSUtil.isDebugPropertySet() && containsCause(cause, InformativeException.class)
+                && (ViaVersionUtil.getUserConnectionProtocolState(userInfo) != ConnectionState.HANDSHAKING || ViaVersionUtil.isDebug())) {
             cause.printStackTrace(); // Print if CB doesn't already do it
         }
     }

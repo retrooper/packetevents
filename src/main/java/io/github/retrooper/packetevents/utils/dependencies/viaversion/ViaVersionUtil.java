@@ -18,6 +18,7 @@
 
 package io.github.retrooper.packetevents.utils.dependencies.viaversion;
 
+import io.github.retrooper.packetevents.protocol.ConnectionState;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
@@ -47,14 +48,52 @@ public class ViaVersionUtil {
         return available == 1;
     }
 
-
     public static ViaVersionAccessor getViaVersionAccessor() {
         load();
         return viaVersionAccessor;
     }
 
-
     public static int getProtocolVersion(Player player) {
         return getViaVersionAccessor().getProtocolVersion(player);
+    }
+
+    public static boolean isDebug() {
+        return getViaVersionAccessor().isDebug();
+    }
+
+    public static Object throwCancelDecoderException(Throwable throwable) {
+        return getViaVersionAccessor().throwCancelDecoderException(throwable);
+    }
+
+    public static Exception throwCancelEncoderException(Throwable throwable) {
+        return getViaVersionAccessor().throwCancelEncoderException(throwable);
+    }
+
+    public static void transformPacket(Object userConnectionObj, Object byteBufObj, boolean clientSide) {
+        getViaVersionAccessor().transformPacket(userConnectionObj, byteBufObj, clientSide);
+    }
+
+    public static void setUserConnectionActive(Object userConnectionObj, boolean active) {
+        getViaVersionAccessor().setUserConnectionActive(userConnectionObj, active);
+    }
+
+    public static boolean isUserConnectionActive(Object userConnectionObj) {
+        return getViaVersionAccessor().isUserConnectionActive(userConnectionObj);
+    }
+
+    public static boolean checkServerboundPacketUserConnection(Object userConnectionObj) {
+        return getViaVersionAccessor().isUserConnectionActive(userConnectionObj);
+    }
+
+    public static ConnectionState getUserConnectionProtocolState(Object userConnectionObj) {
+        return getViaVersionAccessor().getUserConnectionProtocolState(userConnectionObj);
+    }
+
+    public static Class<?> getUserConnectionClass() {
+        return getViaVersionAccessor().getUserConnectionClass();
+    }
+
+    public static Class<?> getBukkitDecodeHandlerClass() {
+        return getViaVersionAccessor().getBukkitDecodeHandlerClass();
     }
 }
