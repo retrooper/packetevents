@@ -16,18 +16,30 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package io.github.retrooper.packetevents.manager.player;
-//TODO Remove this enum, migrate to Bukkit's GameMode enum everywhere.
+package io.github.retrooper.packetevents.utils.player;
 
-/**
- * Representation of a player's game mode.
- *
- * @author retrooper
- * @since 1.8
- */
-public enum GameMode {
-    SURVIVAL,
-    CREATIVE,
-    ADVENTURE,
-    SPECTATOR
+public class Skin {
+    private String value;
+    private String signature;
+
+    public Skin(String value, String signature) {
+        this.value = value;
+        this.signature = signature;
+    }
+
+    public String getValue() {
+        return value;
+    }
+
+    public void setValue(String value) {
+        this.value = value;
+    }
+
+    public String getSignature() {
+        return signature;
+    }
+
+    public void setSignature(String signature) {
+        this.signature = signature;
+    }
 }

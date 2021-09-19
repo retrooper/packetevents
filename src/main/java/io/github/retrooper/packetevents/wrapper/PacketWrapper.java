@@ -21,7 +21,7 @@ package io.github.retrooper.packetevents.wrapper;
 import io.github.retrooper.packetevents.PacketEvents;
 import io.github.retrooper.packetevents.event.impl.PacketReceiveEvent;
 import io.github.retrooper.packetevents.event.impl.PacketSendEvent;
-import io.github.retrooper.packetevents.manager.player.ClientVersion;
+import io.github.retrooper.packetevents.utils.player.ClientVersion;
 import io.github.retrooper.packetevents.manager.server.ServerVersion;
 import io.github.retrooper.packetevents.utils.MinecraftReflection;
 import io.github.retrooper.packetevents.utils.netty.buffer.ByteBufAbstract;

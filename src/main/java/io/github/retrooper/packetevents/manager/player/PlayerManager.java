@@ -26,6 +26,8 @@ import io.github.retrooper.packetevents.utils.MinecraftReflection;
 import io.github.retrooper.packetevents.utils.PlayerPingAccessorModern;
 import io.github.retrooper.packetevents.utils.dependencies.DependencyUtil;
 import io.github.retrooper.packetevents.utils.dependencies.protocolsupport.ProtocolSupportUtil;
+import io.github.retrooper.packetevents.utils.player.ClientVersion;
+import io.github.retrooper.packetevents.utils.player.Skin;
 import io.github.retrooper.packetevents.utils.v1_7.SpigotVersionLookup_1_7;
 import io.github.retrooper.packetevents.utils.dependencies.viaversion.ViaVersionUtil;
 import io.github.retrooper.packetevents.utils.gameprofile.GameProfileUtil;

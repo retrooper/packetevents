@@ -16,45 +16,43 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package io.github.retrooper.packetevents.wrapper.login.client;
+package io.github.retrooper.packetevents.wrapper.play.client;
 
 import io.github.retrooper.packetevents.event.impl.PacketReceiveEvent;
-import io.github.retrooper.packetevents.utils.player.ClientVersion;
 import io.github.retrooper.packetevents.protocol.PacketType;
 import io.github.retrooper.packetevents.wrapper.PacketWrapper;
 
-public class WrapperLoginClientLoginStart extends PacketWrapper<WrapperLoginClientLoginStart> {
-    private String username;
-
-    public WrapperLoginClientLoginStart(PacketReceiveEvent event) {
+public class WrapperPlayClientCloseWindow extends PacketWrapper<WrapperPlayClientCloseWindow> {
+    private int windowID;
+    public WrapperPlayClientCloseWindow(PacketReceiveEvent event) {
         super(event);
     }
 
-    public WrapperLoginClientLoginStart(ClientVersion clientVersion, String username) {
-        super(PacketType.Login.Client.LOGIN_START.getID(), clientVersion);
-        this.username = username;
+    public WrapperPlayClientCloseWindow(int windowID) {
+        super(PacketType.Play.Client.CLOSE_WINDOW.getID());
+        this.windowID = windowID;
     }
 
     @Override
     public void readData() {
-        this.username = readString(16);
+        this.windowID = readUnsignedByte();
     }
 
     @Override
-    public void readData(WrapperLoginClientLoginStart wrapper) {
-        this.username = wrapper.username;
+    public void readData(WrapperPlayClientCloseWindow wrapper) {
+        this.windowID = wrapper.windowID;
     }
 
     @Override
     public void writeData() {
-        writeString(username, 16);
+        writeByte(this.windowID);
     }
 
-    public String getUsername() {
-        return username;
+    public int getWindowID() {
+        return windowID;
     }
 
-    public void setUsername(String username) {
-        this.username = username;
+    public void setWindowID(int windowID) {
+        this.windowID = windowID;
     }
 }

@@ -22,17 +22,14 @@ import io.github.retrooper.packetevents.PacketEvents;
 import io.github.retrooper.packetevents.event.PacketListener;
 import io.github.retrooper.packetevents.event.impl.PacketReceiveEvent;
 import io.github.retrooper.packetevents.event.impl.PacketSendEvent;
-import io.github.retrooper.packetevents.manager.player.ClientVersion;
+import io.github.retrooper.packetevents.utils.player.ClientVersion;
 import io.github.retrooper.packetevents.protocol.ConnectionState;
 import io.github.retrooper.packetevents.protocol.PacketType;
 import io.github.retrooper.packetevents.wrapper.handshaking.client.WrapperHandshakingClientHandshake;
 import io.github.retrooper.packetevents.wrapper.login.client.WrapperLoginClientLoginStart;
-import io.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientChatMessage;
-import io.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientClickWindow;
-import org.bukkit.inventory.ItemStack;
-
-import java.util.HashMap;
-import java.util.Map;
+import io.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientSteerBoat;
+import io.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientVehicleMove;
+import org.bukkit.Location;
 
 public class InternalPacketListener implements PacketListener {
     //Make this specific event be at MONITOR priority
@@ -72,21 +69,19 @@ public class InternalPacketListener implements PacketListener {
                 break;
 
             case PLAY:
-                if (event.getPacketType() == PacketType.Play.Client.CLICK_WINDOW) {
-                    WrapperPlayClientClickWindow clickWindow = new WrapperPlayClientClickWindow(event);
-                    int id = clickWindow.getWindowID();
-                    int button = clickWindow.getButton();
-                    WrapperPlayClientClickWindow.WindowClickType windowClickType = clickWindow.getWindowClickType();
-                    Map<Integer, ItemStack> slots = clickWindow.getSlots().orElse(new HashMap<>());
-                    String msg = "ID: " + id + ", BUTTON: " + button + ", WINDOW CLICK TYPE: " + windowClickType.name();
-                    System.out.println(msg);
-                    event.getPlayer().sendMessage(msg);
-                    for (Integer slot : slots.keySet()) {
-                        ItemStack stack = slots.get(slot);
-                        String mapMsg = "We've got a " + stack.getType().name() + " at slot " + slot;
-                        System.out.println(mapMsg);
-                        event.getPlayer().sendMessage(mapMsg);
-                    }
+                if (event.getPacketType() == PacketType.Play.Client.STEER_BOAT) {
+                    WrapperPlayClientSteerBoat steerBoat = new WrapperPlayClientSteerBoat(event);
+                    boolean left = steerBoat.isLeftPaddleTurning();
+                    boolean right = steerBoat.isRightPaddleTurning();
+
+                    event.getPlayer().sendMessage("left: " + left + ", right: " + right);
+
+                }
+                else if (event.getPacketType() == PacketType.Play.Client.VEHICLE_MOVE) {
+                    WrapperPlayClientVehicleMove vehicleMove = new WrapperPlayClientVehicleMove(event);
+                    Location location = vehicleMove.getPosition()
+                            .asLocation(event.getPlayer().getWorld(), vehicleMove.getYaw(), vehicleMove.getPitch());
+                    event.getPlayer().sendMessage(location.toString());
                 }
                 break;
         }

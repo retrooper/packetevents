@@ -22,7 +22,7 @@ import io.github.retrooper.packetevents.PacketEvents;
 import io.github.retrooper.packetevents.event.PacketEvent;
 import io.github.retrooper.packetevents.event.PacketListenerAbstract;
 import io.github.retrooper.packetevents.event.type.PlayerEvent;
-import io.github.retrooper.packetevents.manager.player.ClientVersion;
+import io.github.retrooper.packetevents.utils.player.ClientVersion;
 import io.github.retrooper.packetevents.utils.netty.channel.ChannelAbstract;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;

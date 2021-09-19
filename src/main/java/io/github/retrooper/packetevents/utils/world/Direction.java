@@ -16,7 +16,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package io.github.retrooper.packetevents.manager.player;
+package io.github.retrooper.packetevents.utils.world;
 
 /**
  * The {@code Direction} enum contains constants for the different valid faces in the minecraft protocol.

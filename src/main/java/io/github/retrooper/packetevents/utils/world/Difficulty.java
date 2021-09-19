@@ -24,7 +24,5 @@ public enum Difficulty {
     NORMAL,
     HARD;
 
-    public String getName() {
-        return name().toLowerCase();
-    }
+    public static final Difficulty[] VALUES = values();
 }

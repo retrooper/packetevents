@@ -16,45 +16,45 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package io.github.retrooper.packetevents.wrapper.login.client;
+package io.github.retrooper.packetevents.wrapper.play.client;
 
 import io.github.retrooper.packetevents.event.impl.PacketReceiveEvent;
-import io.github.retrooper.packetevents.utils.player.ClientVersion;
 import io.github.retrooper.packetevents.protocol.PacketType;
+import io.github.retrooper.packetevents.utils.world.Difficulty;
 import io.github.retrooper.packetevents.wrapper.PacketWrapper;
 
-public class WrapperLoginClientLoginStart extends PacketWrapper<WrapperLoginClientLoginStart> {
-    private String username;
+public class WrapperPlayClientSetDifficulty extends PacketWrapper<WrapperPlayClientSetDifficulty> {
+    private Difficulty difficulty;
 
-    public WrapperLoginClientLoginStart(PacketReceiveEvent event) {
+    public WrapperPlayClientSetDifficulty(PacketReceiveEvent event) {
         super(event);
     }
 
-    public WrapperLoginClientLoginStart(ClientVersion clientVersion, String username) {
-        super(PacketType.Login.Client.LOGIN_START.getID(), clientVersion);
-        this.username = username;
+    public WrapperPlayClientSetDifficulty(Difficulty difficulty) {
+        super(PacketType.Play.Client.SET_DIFFICULTY.getID());
+        this.difficulty = difficulty;
     }
 
     @Override
     public void readData() {
-        this.username = readString(16);
+        this.difficulty = Difficulty.VALUES[readByte()];
     }
 
     @Override
-    public void readData(WrapperLoginClientLoginStart wrapper) {
-        this.username = wrapper.username;
+    public void readData(WrapperPlayClientSetDifficulty wrapper) {
+        this.difficulty = wrapper.difficulty;
     }
 
     @Override
     public void writeData() {
-        writeString(username, 16);
+        writeByte(difficulty.ordinal());
     }
 
-    public String getUsername() {
-        return username;
+    public Difficulty getDifficulty() {
+        return difficulty;
     }
 
-    public void setUsername(String username) {
-        this.username = username;
+    public void setDifficulty(Difficulty difficulty) {
+        this.difficulty = difficulty;
     }
 }

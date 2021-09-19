@@ -21,7 +21,7 @@ package io.github.retrooper.packetevents.event;
 import io.github.retrooper.packetevents.PacketEvents;
 import io.github.retrooper.packetevents.event.type.CancellableEvent;
 import io.github.retrooper.packetevents.event.type.PlayerEvent;
-import io.github.retrooper.packetevents.manager.player.ClientVersion;
+import io.github.retrooper.packetevents.utils.player.ClientVersion;
 import io.github.retrooper.packetevents.manager.server.ServerVersion;
 import io.github.retrooper.packetevents.protocol.ConnectionState;
 import io.github.retrooper.packetevents.protocol.PacketSide;
