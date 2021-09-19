@@ -67,23 +67,6 @@ public class InternalPacketListener implements PacketListener {
                     PacketEvents.get().getPlayerManager().channels.put(start.getUsername(), event.getChannel().rawChannel());
                 }
                 break;
-
-            case PLAY:
-                if (event.getPacketType() == PacketType.Play.Client.STEER_BOAT) {
-                    WrapperPlayClientSteerBoat steerBoat = new WrapperPlayClientSteerBoat(event);
-                    boolean left = steerBoat.isLeftPaddleTurning();
-                    boolean right = steerBoat.isRightPaddleTurning();
-
-                    event.getPlayer().sendMessage("left: " + left + ", right: " + right);
-
-                }
-                else if (event.getPacketType() == PacketType.Play.Client.VEHICLE_MOVE) {
-                    WrapperPlayClientVehicleMove vehicleMove = new WrapperPlayClientVehicleMove(event);
-                    Location location = vehicleMove.getPosition()
-                            .asLocation(event.getPlayer().getWorld(), vehicleMove.getYaw(), vehicleMove.getPitch());
-                    event.getPlayer().sendMessage(location.toString());
-                }
-                break;
         }
     }
 }
