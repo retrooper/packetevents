@@ -16,10 +16,9 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package io.github.retrooper.packetevents.wrapper.game.client;
+package io.github.retrooper.packetevents.wrapper.play.client;
 
 import io.github.retrooper.packetevents.event.impl.PacketReceiveEvent;
-import io.github.retrooper.packetevents.manager.player.ClientVersion;
 import io.github.retrooper.packetevents.protocol.PacketType;
 import io.github.retrooper.packetevents.utils.PacketWrapperUtil;
 import io.github.retrooper.packetevents.utils.vector.Vector3i;
@@ -28,16 +27,16 @@ import io.github.retrooper.packetevents.wrapper.PacketWrapper;
 /**
  * This packet is sent when Generate is pressed on the Jigsaw Block interface.
  */
-public class WrapperGameClientGenerateStructure extends PacketWrapper<WrapperGameClientGenerateStructure> {
+public class WrapperPlayClientGenerateStructure extends PacketWrapper<WrapperPlayClientGenerateStructure> {
     private Vector3i blockPosition;
     private int levels;
     private boolean keepJigsaws;
 
-    public WrapperGameClientGenerateStructure(PacketReceiveEvent event) {
+    public WrapperPlayClientGenerateStructure(PacketReceiveEvent event) {
         super(event);
     }
 
-    public WrapperGameClientGenerateStructure(Vector3i blockPosition, int levels, boolean keepJigsaws) {
+    public WrapperPlayClientGenerateStructure(Vector3i blockPosition, int levels, boolean keepJigsaws) {
         super(PacketType.Game.Client.GENERATE_STRUCTURE.getID());
         this.blockPosition = blockPosition;
         this.levels = levels;
@@ -53,7 +52,7 @@ public class WrapperGameClientGenerateStructure extends PacketWrapper<WrapperGam
     }
 
     @Override
-    public void readData(WrapperGameClientGenerateStructure wrapper) {
+    public void readData(WrapperPlayClientGenerateStructure wrapper) {
         this.blockPosition = wrapper.blockPosition;
         this.levels = wrapper.levels;
         this.keepJigsaws = wrapper.keepJigsaws;

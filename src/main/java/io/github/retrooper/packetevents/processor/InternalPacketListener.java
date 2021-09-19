@@ -25,14 +25,8 @@ import io.github.retrooper.packetevents.event.impl.PacketSendEvent;
 import io.github.retrooper.packetevents.manager.player.ClientVersion;
 import io.github.retrooper.packetevents.protocol.ConnectionState;
 import io.github.retrooper.packetevents.protocol.PacketType;
-import io.github.retrooper.packetevents.wrapper.game.client.WrapperGameClientCreativeInventoryAction;
-import io.github.retrooper.packetevents.wrapper.game.client.WrapperGameClientInteractEntity;
-import io.github.retrooper.packetevents.wrapper.game.server.WrapperGameServerHeldItemChange;
-import io.github.retrooper.packetevents.wrapper.game.server.WrapperGameServerSpawnLivingEntity;
 import io.github.retrooper.packetevents.wrapper.handshaking.client.WrapperHandshakingClientHandshake;
 import io.github.retrooper.packetevents.wrapper.login.client.WrapperLoginClientLoginStart;
-import org.bukkit.entity.Entity;
-import org.bukkit.inventory.ItemStack;
 
 public class InternalPacketListener implements PacketListener {
     //Make this specific event be at MONITOR priority
@@ -40,7 +34,7 @@ public class InternalPacketListener implements PacketListener {
     public void onPacketSend(PacketSendEvent event) {
         if (event.getPacketType() == PacketType.Login.Server.LOGIN_SUCCESS) {
             //Transition into the GAME connection state
-            PacketEvents.get().getInjector().changeConnectionState(event.getChannel().rawChannel(), ConnectionState.GAME);
+            PacketEvents.get().getInjector().changeConnectionState(event.getChannel().rawChannel(), ConnectionState.PLAY);
         }
     }
 

@@ -49,7 +49,7 @@ public class PlayerManager {
         Object channel = getChannel(player);
         ConnectionState state = connectionStates.get(channel);
         if (state == null) {
-            state = ConnectionState.GAME;
+            state = ConnectionState.PLAY;
         }
         return state;
     }

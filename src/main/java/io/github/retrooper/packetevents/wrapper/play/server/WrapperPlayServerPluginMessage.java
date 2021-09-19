@@ -16,7 +16,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package io.github.retrooper.packetevents.wrapper.game.server;
+package io.github.retrooper.packetevents.wrapper.play.server;
 
 import io.github.retrooper.packetevents.event.impl.PacketSendEvent;
 import io.github.retrooper.packetevents.manager.server.ServerVersion;
@@ -28,15 +28,15 @@ import io.github.retrooper.packetevents.wrapper.PacketWrapper;
  * Minecraft itself uses some plugin channels.
  * These internal channels are in the minecraft namespace.
  */
-public class WrapperGameServerPluginMessage extends PacketWrapper<WrapperGameServerPluginMessage> {
+public class WrapperPlayServerPluginMessage extends PacketWrapper<WrapperPlayServerPluginMessage> {
     private String channelName;
     private byte[] data;
 
-    public WrapperGameServerPluginMessage(PacketSendEvent event) {
+    public WrapperPlayServerPluginMessage(PacketSendEvent event) {
         super(event);
     }
 
-    public WrapperGameServerPluginMessage(String channelName, byte[] data) {
+    public WrapperPlayServerPluginMessage(String channelName, byte[] data) {
         super(PacketType.Game.Server.PLUGIN_MESSAGE.getID());
         this.channelName = channelName;
         this.data = data;
@@ -50,7 +50,7 @@ public class WrapperGameServerPluginMessage extends PacketWrapper<WrapperGameSer
     }
 
     @Override
-    public void readData(WrapperGameServerPluginMessage wrapper) {
+    public void readData(WrapperPlayServerPluginMessage wrapper) {
         this.channelName = wrapper.channelName;
         this.data = wrapper.data;
     }

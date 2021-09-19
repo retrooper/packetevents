@@ -16,7 +16,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package io.github.retrooper.packetevents.wrapper.game.server;
+package io.github.retrooper.packetevents.wrapper.play.server;
 
 import io.github.retrooper.packetevents.event.impl.PacketSendEvent;
 import io.github.retrooper.packetevents.manager.player.ClientVersion;
@@ -27,24 +27,24 @@ import io.github.retrooper.packetevents.wrapper.PacketWrapper;
 
 import java.util.UUID;
 
-public class WrapperGameServerChatMessage extends PacketWrapper<WrapperGameServerChatMessage> {
+public class WrapperPlayServerChatMessage extends PacketWrapper<WrapperPlayServerChatMessage> {
     private static final int MODERN_MESSAGE_LENGTH = 262144;
     private static final int LEGACY_MESSAGE_LENGTH = 32767;
     private String jsonMessage;
     private ChatPosition position;
     private UUID senderUUID;
-    public WrapperGameServerChatMessage(PacketSendEvent event) {
+    public WrapperPlayServerChatMessage(PacketSendEvent event) {
         super(event);
     }
 
-    public WrapperGameServerChatMessage(String jsonMessage, ChatPosition position) {
+    public WrapperPlayServerChatMessage(String jsonMessage, ChatPosition position) {
         super(PacketType.Game.Server.CHAT_MESSAGE.getID());
         this.jsonMessage = jsonMessage;
         this.position = position;
         this.senderUUID = new UUID(0L, 0L);
     }
 
-    public WrapperGameServerChatMessage(String jsonMessage, ChatPosition position, UUID senderUUID) {
+    public WrapperPlayServerChatMessage(String jsonMessage, ChatPosition position, UUID senderUUID) {
         super(PacketType.Game.Server.CHAT_MESSAGE.getID());
         this.jsonMessage = jsonMessage;
         this.position = position;
@@ -72,7 +72,7 @@ public class WrapperGameServerChatMessage extends PacketWrapper<WrapperGameServe
     }
 
     @Override
-    public void readData(WrapperGameServerChatMessage wrapper) {
+    public void readData(WrapperPlayServerChatMessage wrapper) {
         this.jsonMessage = wrapper.jsonMessage;
         this.position = wrapper.position;
         this.senderUUID = wrapper.senderUUID;

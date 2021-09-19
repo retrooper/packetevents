@@ -16,22 +16,21 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package io.github.retrooper.packetevents.wrapper.game.client;
+package io.github.retrooper.packetevents.wrapper.play.client;
 
 import io.github.retrooper.packetevents.event.impl.PacketReceiveEvent;
-import io.github.retrooper.packetevents.manager.player.ClientVersion;
 import io.github.retrooper.packetevents.protocol.PacketType;
 import io.github.retrooper.packetevents.wrapper.PacketWrapper;
 
-public class WrapperGameClientSetBeaconEffect extends PacketWrapper<WrapperGameClientSetBeaconEffect> {
+public class WrapperPlayClientSetBeaconEffect extends PacketWrapper<WrapperPlayClientSetBeaconEffect> {
     private int primaryEffect;
     private int secondaryEffect;
 
-    public WrapperGameClientSetBeaconEffect(PacketReceiveEvent event) {
+    public WrapperPlayClientSetBeaconEffect(PacketReceiveEvent event) {
         super(event);
     }
 
-    public WrapperGameClientSetBeaconEffect(int primaryEffect, int secondaryEffect) {
+    public WrapperPlayClientSetBeaconEffect(int primaryEffect, int secondaryEffect) {
         super(PacketType.Game.Client.SET_BEACON_EFFECT.getID());
         this.primaryEffect = primaryEffect;
         this.secondaryEffect = secondaryEffect;
@@ -44,7 +43,7 @@ public class WrapperGameClientSetBeaconEffect extends PacketWrapper<WrapperGameC
     }
 
     @Override
-    public void readData(WrapperGameClientSetBeaconEffect wrapper) {
+    public void readData(WrapperPlayClientSetBeaconEffect wrapper) {
         this.primaryEffect = wrapper.primaryEffect;
         this.secondaryEffect = wrapper.secondaryEffect;
     }

@@ -16,10 +16,9 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package io.github.retrooper.packetevents.wrapper.game.client;
+package io.github.retrooper.packetevents.wrapper.play.client;
 
 import io.github.retrooper.packetevents.event.impl.PacketReceiveEvent;
-import io.github.retrooper.packetevents.manager.player.ClientVersion;
 import io.github.retrooper.packetevents.manager.server.ServerVersion;
 import io.github.retrooper.packetevents.protocol.PacketType;
 import io.github.retrooper.packetevents.wrapper.PacketWrapper;
@@ -29,14 +28,14 @@ import io.github.retrooper.packetevents.wrapper.PacketWrapper;
  * The server will frequently send out a (client-bound) keep-alive, each containing a random ID.
  * The client is expected to respond with a (server-bound) keep-alive, containing the same ID that the server sent out.
  */
-public class WrapperGameClientKeepAlive extends PacketWrapper<WrapperGameClientKeepAlive> {
+public class WrapperPlayClientKeepAlive extends PacketWrapper<WrapperPlayClientKeepAlive> {
     private long id;
 
-    public WrapperGameClientKeepAlive(PacketReceiveEvent event) {
+    public WrapperPlayClientKeepAlive(PacketReceiveEvent event) {
         super(event);
     }
 
-    public WrapperGameClientKeepAlive(long id) {
+    public WrapperPlayClientKeepAlive(long id) {
         super(PacketType.Game.Client.KEEP_ALIVE.getID());
         this.id = id;
     }
@@ -53,7 +52,7 @@ public class WrapperGameClientKeepAlive extends PacketWrapper<WrapperGameClientK
     }
 
     @Override
-    public void readData(WrapperGameClientKeepAlive wrapper) {
+    public void readData(WrapperPlayClientKeepAlive wrapper) {
         this.id = wrapper.id;
     }
 

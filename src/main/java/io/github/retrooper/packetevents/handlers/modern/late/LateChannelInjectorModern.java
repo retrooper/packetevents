@@ -93,7 +93,7 @@ public class LateChannelInjectorModern implements LateInjector {
     //TODO and implement changeConnectionState properly
     @Override
     public ConnectionState getConnectionState(Object channel) {
-        return ConnectionState.GAME;
+        return ConnectionState.PLAY;
     }
 
     @Override

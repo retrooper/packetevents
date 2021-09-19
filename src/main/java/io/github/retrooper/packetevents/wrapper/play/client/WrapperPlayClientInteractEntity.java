@@ -16,10 +16,9 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package io.github.retrooper.packetevents.wrapper.game.client;
+package io.github.retrooper.packetevents.wrapper.play.client;
 
 import io.github.retrooper.packetevents.event.impl.PacketReceiveEvent;
-import io.github.retrooper.packetevents.manager.player.ClientVersion;
 import io.github.retrooper.packetevents.manager.player.Hand;
 import io.github.retrooper.packetevents.manager.server.ServerVersion;
 import io.github.retrooper.packetevents.protocol.PacketType;
@@ -31,20 +30,20 @@ import java.util.Optional;
 /**
  * This packet is sent from the client to the server when the client attacks or right-clicks another entity (a player, minecart, etc).
  * The vanilla server discards this packet if the entity being attacked is not within a 4-unit radius of the player's position.
- * Please note that this packet is NOT sent whenever the client middle-clicks, the {@link WrapperGameClientCreativeInventoryAction} packet is sent instead.
+ * Please note that this packet is NOT sent whenever the client middle-clicks, the {@link WrapperPlayClientCreativeInventoryAction} packet is sent instead.
  */
-public class WrapperGameClientInteractEntity extends PacketWrapper<WrapperGameClientInteractEntity> {
+public class WrapperPlayClientInteractEntity extends PacketWrapper<WrapperPlayClientInteractEntity> {
     private int entityID;
     private Type type;
     private Optional<Vector3f> target;
     private Optional<Hand> hand;
     private Optional<Boolean> sneaking;
 
-    public WrapperGameClientInteractEntity(PacketReceiveEvent event) {
+    public WrapperPlayClientInteractEntity(PacketReceiveEvent event) {
         super(event);
     }
 
-    public WrapperGameClientInteractEntity(int entityID, Type type, Optional<Vector3f> target, Optional<Hand> hand, Optional<Boolean> sneaking) {
+    public WrapperPlayClientInteractEntity(int entityID, Type type, Optional<Vector3f> target, Optional<Hand> hand, Optional<Boolean> sneaking) {
         super(PacketType.Game.Client.INTERACT_ENTITY.getID());
         this.entityID = entityID;
         this.type = type;
@@ -91,7 +90,7 @@ public class WrapperGameClientInteractEntity extends PacketWrapper<WrapperGameCl
     }
 
     @Override
-    public void readData(WrapperGameClientInteractEntity wrapper) {
+    public void readData(WrapperPlayClientInteractEntity wrapper) {
         this.entityID = wrapper.entityID;
         this.type = wrapper.type;
         this.target = wrapper.target;

@@ -16,7 +16,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package io.github.retrooper.packetevents.wrapper.game.server;
+package io.github.retrooper.packetevents.wrapper.play.server;
 
 import io.github.retrooper.packetevents.event.impl.PacketSendEvent;
 import io.github.retrooper.packetevents.manager.server.ServerVersion;
@@ -28,7 +28,7 @@ import io.github.retrooper.packetevents.wrapper.PacketWrapper;
 import java.util.Optional;
 import java.util.UUID;
 
-public class WrapperGameServerSpawnLivingEntity extends PacketWrapper<WrapperGameServerSpawnLivingEntity> {
+public class WrapperPlayServerSpawnLivingEntity extends PacketWrapper<WrapperPlayServerSpawnLivingEntity> {
     private static final double POSITION_FACTOR = 32.0;
     private static final float ROTATION_FACTOR = 256.0F / 360.0F;
     private static final double VELOCITY_FACTOR = 8000.0;
@@ -41,11 +41,11 @@ public class WrapperGameServerSpawnLivingEntity extends PacketWrapper<WrapperGam
     private float headPitch;
     private Vector3d velocity;
 
-    public WrapperGameServerSpawnLivingEntity(PacketSendEvent event) {
+    public WrapperPlayServerSpawnLivingEntity(PacketSendEvent event) {
         super(event);
     }
 
-    public WrapperGameServerSpawnLivingEntity(int entityID, Optional<UUID> entityUUID, int entityTypeID, Vector3d position, float yaw, float pitch, float headPitch, Vector3d velocity) {
+    public WrapperPlayServerSpawnLivingEntity(int entityID, Optional<UUID> entityUUID, int entityTypeID, Vector3d position, float yaw, float pitch, float headPitch, Vector3d velocity) {
         super(PacketType.Game.Server.SPAWN_LIVING_ENTITY.getID());
         this.entityID = entityID;
         this.entityUUID = entityUUID;
@@ -83,7 +83,7 @@ public class WrapperGameServerSpawnLivingEntity extends PacketWrapper<WrapperGam
     }
 
     @Override
-    public void readData(WrapperGameServerSpawnLivingEntity wrapper) {
+    public void readData(WrapperPlayServerSpawnLivingEntity wrapper) {
         this.entityID = wrapper.entityID;
         this.entityUUID = wrapper.entityUUID;
         this.entityTypeID = wrapper.entityTypeID;

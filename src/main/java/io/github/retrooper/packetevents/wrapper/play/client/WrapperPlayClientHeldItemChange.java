@@ -16,43 +16,56 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package io.github.retrooper.packetevents.wrapper.game.server;
+package io.github.retrooper.packetevents.wrapper.play.client;
 
-import io.github.retrooper.packetevents.event.impl.PacketSendEvent;
+import io.github.retrooper.packetevents.event.impl.PacketReceiveEvent;
 import io.github.retrooper.packetevents.protocol.PacketType;
 import io.github.retrooper.packetevents.wrapper.PacketWrapper;
 
-public class WrapperGameServerHeldItemChange extends PacketWrapper<WrapperGameServerHeldItemChange> {
+/**
+ * This packet is sent when the player changes their slot selection.
+ */
+public class WrapperPlayClientHeldItemChange extends PacketWrapper<WrapperPlayClientHeldItemChange> {
     private int slot;
 
-    public WrapperGameServerHeldItemChange(PacketSendEvent event) {
+    public WrapperPlayClientHeldItemChange(PacketReceiveEvent event) {
         super(event);
     }
 
-    public WrapperGameServerHeldItemChange(int slot) {
-        super(PacketType.Game.Server.HELD_ITEM_CHANGE.getID());
+    public WrapperPlayClientHeldItemChange(int slot) {
+        super(PacketType.Game.Client.HELD_ITEM_CHANGE.getID());
         this.slot = slot;
     }
 
     @Override
     public void readData() {
-        this.slot = readByte();
+        this.slot = readShort();
     }
 
     @Override
-    public void readData(WrapperGameServerHeldItemChange wrapper) {
+    public void readData(WrapperPlayClientHeldItemChange wrapper) {
         this.slot = wrapper.slot;
     }
 
     @Override
     public void writeData() {
-        writeByte(slot);
+        writeShort(slot);
     }
 
+    /**
+     * The slot which the player has selected.
+     *
+     * @return Target slot
+     */
     public int getSlot() {
         return slot;
     }
 
+    /**
+     * Modify the slot which the player has selected.
+     *
+     * @param slot Target slot
+     */
     public void setSlot(int slot) {
         this.slot = slot;
     }

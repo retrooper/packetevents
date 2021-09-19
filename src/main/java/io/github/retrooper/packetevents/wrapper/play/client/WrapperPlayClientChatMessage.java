@@ -16,7 +16,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package io.github.retrooper.packetevents.wrapper.game.client;
+package io.github.retrooper.packetevents.wrapper.play.client;
 
 import io.github.retrooper.packetevents.event.impl.PacketReceiveEvent;
 import io.github.retrooper.packetevents.manager.player.ClientVersion;
@@ -28,14 +28,14 @@ import io.github.retrooper.packetevents.wrapper.PacketWrapper;
 /**
  * This packet is used to send a chat message to the server.
  */
-public class WrapperGameClientChatMessage extends PacketWrapper<WrapperGameClientChatMessage> {
+public class WrapperPlayClientChatMessage extends PacketWrapper<WrapperPlayClientChatMessage> {
     private String message;
 
-    public WrapperGameClientChatMessage(PacketReceiveEvent event) {
+    public WrapperPlayClientChatMessage(PacketReceiveEvent event) {
         super(event);
     }
 
-    public WrapperGameClientChatMessage(String message) {
+    public WrapperPlayClientChatMessage(String message) {
         super(PacketType.Game.Client.CHAT_MESSAGE.getID());
         this.message = message;
     }
@@ -47,7 +47,7 @@ public class WrapperGameClientChatMessage extends PacketWrapper<WrapperGameClien
     }
 
     @Override
-    public void readData(WrapperGameClientChatMessage wrapper) {
+    public void readData(WrapperPlayClientChatMessage wrapper) {
         this.message = wrapper.message;
     }
 

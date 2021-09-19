@@ -16,10 +16,9 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package io.github.retrooper.packetevents.wrapper.game.client;
+package io.github.retrooper.packetevents.wrapper.play.client;
 
 import io.github.retrooper.packetevents.event.impl.PacketReceiveEvent;
-import io.github.retrooper.packetevents.manager.player.ClientVersion;
 import io.github.retrooper.packetevents.manager.server.ServerVersion;
 import io.github.retrooper.packetevents.protocol.PacketType;
 import io.github.retrooper.packetevents.utils.PacketWrapperUtil;
@@ -29,15 +28,15 @@ import io.github.retrooper.packetevents.wrapper.PacketWrapper;
 /**
  * This message is sent from the client to the server when the “Done” button is pushed after placing a sign.
  */
-public class WrapperGameClientUpdateSign extends PacketWrapper<WrapperGameClientUpdateSign> {
+public class WrapperPlayClientUpdateSign extends PacketWrapper<WrapperPlayClientUpdateSign> {
     private final String[] textLines = new String[4];
     private Vector3i blockPosition;
 
-    public WrapperGameClientUpdateSign(PacketReceiveEvent event) {
+    public WrapperPlayClientUpdateSign(PacketReceiveEvent event) {
         super(event);
     }
 
-    public WrapperGameClientUpdateSign(Vector3i blockPosition, String[] textLines) {
+    public WrapperPlayClientUpdateSign(Vector3i blockPosition, String[] textLines) {
         super(PacketType.Game.Client.UPDATE_SIGN.getID());
         this.blockPosition = blockPosition;
         System.arraycopy(textLines, 0, this.textLines, 0, 4);
@@ -60,7 +59,7 @@ public class WrapperGameClientUpdateSign extends PacketWrapper<WrapperGameClient
     }
 
     @Override
-    public void readData(WrapperGameClientUpdateSign wrapper) {
+    public void readData(WrapperPlayClientUpdateSign wrapper) {
         this.blockPosition = wrapper.blockPosition;
         System.arraycopy(wrapper.textLines, 0, this.textLines, 0, 4);
     }

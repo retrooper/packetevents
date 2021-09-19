@@ -16,25 +16,24 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package io.github.retrooper.packetevents.wrapper.game.client;
+package io.github.retrooper.packetevents.wrapper.play.client;
 
 import io.github.retrooper.packetevents.event.impl.PacketReceiveEvent;
-import io.github.retrooper.packetevents.manager.player.ClientVersion;
 import io.github.retrooper.packetevents.protocol.PacketType;
 import io.github.retrooper.packetevents.wrapper.PacketWrapper;
 
 /**
  * This packet is used when clicking on window buttons. Until 1.14, this was only used by enchantment tables.
  */
-public class WrapperGameClientClickWindowButton extends PacketWrapper<WrapperGameClientClickWindowButton> {
+public class WrapperPlayClientClickWindowButton extends PacketWrapper<WrapperPlayClientClickWindowButton> {
     private int windowID;
     private int buttonID;
 
-    public WrapperGameClientClickWindowButton(PacketReceiveEvent event) {
+    public WrapperPlayClientClickWindowButton(PacketReceiveEvent event) {
         super(event);
     }
 
-    public WrapperGameClientClickWindowButton(int windowID, int buttonID) {
+    public WrapperPlayClientClickWindowButton(int windowID, int buttonID) {
         super(PacketType.Game.Client.CLICK_WINDOW_BUTTON.getID());
         this.windowID = windowID;
         this.buttonID = buttonID;
@@ -47,7 +46,7 @@ public class WrapperGameClientClickWindowButton extends PacketWrapper<WrapperGam
     }
 
     @Override
-    public void readData(WrapperGameClientClickWindowButton wrapper) {
+    public void readData(WrapperPlayClientClickWindowButton wrapper) {
         this.windowID = wrapper.windowID;
         this.buttonID = wrapper.buttonID;
     }

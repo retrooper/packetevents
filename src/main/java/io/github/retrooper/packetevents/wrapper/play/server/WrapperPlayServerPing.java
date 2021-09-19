@@ -16,29 +16,29 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package io.github.retrooper.packetevents.wrapper.game.client;
+package io.github.retrooper.packetevents.wrapper.play.server;
 
-import io.github.retrooper.packetevents.event.impl.PacketReceiveEvent;
-import io.github.retrooper.packetevents.manager.player.ClientVersion;
+import io.github.retrooper.packetevents.event.impl.PacketSendEvent;
 import io.github.retrooper.packetevents.protocol.PacketType;
 import io.github.retrooper.packetevents.wrapper.PacketWrapper;
+import io.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientPong;
 
 /**
- * A response to the ping packet.
- * The vanilla server doesn't seem to send the Ping packet.
+ * This packet is currently used by mods to synchronize the client with the server.
+ * It is not used by the vanilla server.
  * Most likely added as a replacement to the removed Window Confirmation packet.
  *
- * @see io.github.retrooper.packetevents.wrapper.game.server.WrapperGameServerPing
+ * @see WrapperPlayClientPong
  */
-public class WrapperGameClientPong extends PacketWrapper<WrapperGameClientPong> {
+public class WrapperPlayServerPing extends PacketWrapper<WrapperPlayServerPing> {
     private int id;
 
-    public WrapperGameClientPong(PacketReceiveEvent event) {
+    public WrapperPlayServerPing(PacketSendEvent event) {
         super(event);
     }
 
-    public WrapperGameClientPong(int id) {
-        super(PacketType.Game.Client.PONG.getID());
+    public WrapperPlayServerPing(int id) {
+        super(PacketType.Game.Server.PING.getID());
         this.id = id;
     }
 
@@ -48,7 +48,7 @@ public class WrapperGameClientPong extends PacketWrapper<WrapperGameClientPong> 
     }
 
     @Override
-    public void readData(WrapperGameClientPong wrapper) {
+    public void readData(WrapperPlayServerPing wrapper) {
         this.id = wrapper.id;
     }
 
@@ -57,11 +57,6 @@ public class WrapperGameClientPong extends PacketWrapper<WrapperGameClientPong> 
         writeInt(id);
     }
 
-    /**
-     * ID of the last sent Ping packet.
-     *
-     * @return ID
-     */
     public int getID() {
         return id;
     }

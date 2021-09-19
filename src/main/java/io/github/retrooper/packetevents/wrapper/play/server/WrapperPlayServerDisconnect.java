@@ -16,25 +16,24 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package io.github.retrooper.packetevents.wrapper.game.server;
+package io.github.retrooper.packetevents.wrapper.play.server;
 
 import io.github.retrooper.packetevents.event.impl.PacketSendEvent;
-import io.github.retrooper.packetevents.manager.player.ClientVersion;
 import io.github.retrooper.packetevents.manager.server.ServerVersion;
 import io.github.retrooper.packetevents.protocol.PacketType;
 import io.github.retrooper.packetevents.utils.StringUtil;
 import io.github.retrooper.packetevents.wrapper.PacketWrapper;
 
-public class WrapperGameServerDisconnect extends PacketWrapper<WrapperGameServerDisconnect> {
+public class WrapperPlayServerDisconnect extends PacketWrapper<WrapperPlayServerDisconnect> {
     private static final int MODERN_MESSAGE_LENGTH = 262144;
     private static final int LEGACY_MESSAGE_LENGTH = 32767;
     private String reason;
 
-    public WrapperGameServerDisconnect(PacketSendEvent event) {
+    public WrapperPlayServerDisconnect(PacketSendEvent event) {
         super(event);
     }
 
-    public WrapperGameServerDisconnect(String reason) {
+    public WrapperPlayServerDisconnect(String reason) {
         super(PacketType.Game.Server.DISCONNECT.getID());
         this.reason = reason;
     }
@@ -46,7 +45,7 @@ public class WrapperGameServerDisconnect extends PacketWrapper<WrapperGameServer
     }
 
     @Override
-    public void readData(WrapperGameServerDisconnect wrapper) {
+    public void readData(WrapperPlayServerDisconnect wrapper) {
         this.reason = wrapper.reason;
     }
 

@@ -16,7 +16,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package io.github.retrooper.packetevents.wrapper.game.client;
+package io.github.retrooper.packetevents.wrapper.play.client;
 
 import io.github.retrooper.packetevents.event.impl.PacketReceiveEvent;
 import io.github.retrooper.packetevents.manager.player.ClientVersion;
@@ -28,14 +28,14 @@ import io.github.retrooper.packetevents.wrapper.PacketWrapper;
 /**
  * This packet is sent when the client swings their arm.
  */
-public class WrapperGameClientAnimation extends PacketWrapper<WrapperGameClientAnimation> {
+public class WrapperPlayClientAnimation extends PacketWrapper<WrapperPlayClientAnimation> {
     private Hand hand;
 
-    public WrapperGameClientAnimation(PacketReceiveEvent event) {
+    public WrapperPlayClientAnimation(PacketReceiveEvent event) {
         super(event);
     }
 
-    public WrapperGameClientAnimation(Hand hand) {
+    public WrapperPlayClientAnimation(Hand hand) {
         super(PacketType.Game.Client.ANIMATION.getID());
         this.hand = hand;
     }
@@ -51,7 +51,7 @@ public class WrapperGameClientAnimation extends PacketWrapper<WrapperGameClientA
     }
 
     @Override
-    public void readData(WrapperGameClientAnimation wrapper) {
+    public void readData(WrapperPlayClientAnimation wrapper) {
         this.hand = wrapper.hand;
     }
 

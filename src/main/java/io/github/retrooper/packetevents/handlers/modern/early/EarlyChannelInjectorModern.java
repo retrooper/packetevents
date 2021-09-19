@@ -288,7 +288,7 @@ public class EarlyChannelInjectorModern implements EarlyInjector {
             decoder.connectionState = connectionState;
             //Change connection state in map
             PacketEvents.get().getPlayerManager().connectionStates.put(channel, connectionState);
-            if (connectionState == ConnectionState.GAME) {
+            if (connectionState == ConnectionState.PLAY) {
                 if (ViaVersionUtil.isAvailable()) {
                     channel.pipeline().remove(PacketEvents.get().decoderName);
                     decoder.bypassCompression = true;

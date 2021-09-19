@@ -16,31 +16,30 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package io.github.retrooper.packetevents.wrapper.game.client;
+package io.github.retrooper.packetevents.wrapper.play.client;
 
 import io.github.retrooper.packetevents.event.impl.PacketReceiveEvent;
-import io.github.retrooper.packetevents.manager.player.ClientVersion;
 import io.github.retrooper.packetevents.manager.server.ServerVersion;
 import io.github.retrooper.packetevents.protocol.PacketType;
 import io.github.retrooper.packetevents.wrapper.PacketWrapper;
 
 import java.util.Optional;
 
-public class WrapperGameClientResourcePackStatus extends PacketWrapper<WrapperGameClientResourcePackStatus> {
+public class WrapperPlayClientResourcePackStatus extends PacketWrapper<WrapperPlayClientResourcePackStatus> {
     private Optional<String> hash;
     private Result result;
 
-    public WrapperGameClientResourcePackStatus(PacketReceiveEvent event) {
+    public WrapperPlayClientResourcePackStatus(PacketReceiveEvent event) {
         super(event);
     }
 
-    public WrapperGameClientResourcePackStatus(Result result) {
+    public WrapperPlayClientResourcePackStatus(Result result) {
         super(PacketType.Game.Client.RESOURCE_PACK_STATUS.getID());
         this.result = result;
     }
 
     @Deprecated
-    public WrapperGameClientResourcePackStatus(String hash, Result result) {
+    public WrapperPlayClientResourcePackStatus(String hash, Result result) {
         super(PacketType.Game.Client.RESOURCE_PACK_STATUS.getID());
         this.hash = Optional.of(hash);
         this.result = result;
@@ -57,7 +56,7 @@ public class WrapperGameClientResourcePackStatus extends PacketWrapper<WrapperGa
     }
 
     @Override
-    public void readData(WrapperGameClientResourcePackStatus wrapper) {
+    public void readData(WrapperPlayClientResourcePackStatus wrapper) {
         this.hash = wrapper.hash;
         this.result = wrapper.result;
     }

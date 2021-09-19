@@ -16,43 +16,37 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package io.github.retrooper.packetevents.wrapper.game.client;
+package io.github.retrooper.packetevents.wrapper.play.server;
 
-import io.github.retrooper.packetevents.event.impl.PacketReceiveEvent;
-import io.github.retrooper.packetevents.manager.player.ClientVersion;
+import io.github.retrooper.packetevents.event.impl.PacketSendEvent;
 import io.github.retrooper.packetevents.protocol.PacketType;
 import io.github.retrooper.packetevents.wrapper.PacketWrapper;
-import org.bukkit.inventory.ItemStack;
 
-public class WrapperGameClientCreativeInventoryAction extends PacketWrapper<WrapperGameClientCreativeInventoryAction> {
+public class WrapperPlayServerHeldItemChange extends PacketWrapper<WrapperPlayServerHeldItemChange> {
     private int slot;
-    private ItemStack itemStack;
-    public WrapperGameClientCreativeInventoryAction(PacketReceiveEvent event) {
+
+    public WrapperPlayServerHeldItemChange(PacketSendEvent event) {
         super(event);
     }
 
-    public WrapperGameClientCreativeInventoryAction(int slot, ItemStack itemStack) {
-        super(PacketType.Game.Client.CREATIVE_INVENTORY_ACTION.getID());
+    public WrapperPlayServerHeldItemChange(int slot) {
+        super(PacketType.Game.Server.HELD_ITEM_CHANGE.getID());
         this.slot = slot;
-        this.itemStack = itemStack;
     }
 
     @Override
     public void readData() {
-        this.slot = readShort();
-        this.itemStack = readItemStack();
+        this.slot = readByte();
     }
 
     @Override
-    public void readData(WrapperGameClientCreativeInventoryAction wrapper) {
+    public void readData(WrapperPlayServerHeldItemChange wrapper) {
         this.slot = wrapper.slot;
-        this.itemStack = wrapper.itemStack;
     }
 
     @Override
     public void writeData() {
-        writeShort(slot);
-        writeItemStack(itemStack);
+        writeByte(slot);
     }
 
     public int getSlot() {
@@ -61,13 +55,5 @@ public class WrapperGameClientCreativeInventoryAction extends PacketWrapper<Wrap
 
     public void setSlot(int slot) {
         this.slot = slot;
-    }
-
-    public ItemStack getItemStack() {
-        return itemStack;
-    }
-
-    public void setItemStack(ItemStack itemStack) {
-        this.itemStack = itemStack;
     }
 }

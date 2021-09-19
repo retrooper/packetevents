@@ -46,7 +46,7 @@ public final class PacketType {
                 } else {
                     return Login.Server.getById(packetID);
                 }
-            case GAME:
+            case PLAY:
                 if (side == PacketSide.CLIENT) {
                     return Game.Client.getById(protocolVersion, packetID);
                 } else {

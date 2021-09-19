@@ -16,14 +16,14 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package io.github.retrooper.packetevents.wrapper.game.client;
+package io.github.retrooper.packetevents.wrapper.play.client;
 
 import io.github.retrooper.packetevents.event.impl.PacketReceiveEvent;
 import io.github.retrooper.packetevents.manager.server.ServerVersion;
 import io.github.retrooper.packetevents.protocol.PacketType;
 import io.github.retrooper.packetevents.wrapper.PacketWrapper;
 
-public class WrapperGameClientClientStatus extends PacketWrapper<WrapperGameClientClientStatus> {
+public class WrapperPlayClientClientStatus extends PacketWrapper<WrapperPlayClientClientStatus> {
     private Action action;
 
     public enum Action {
@@ -37,11 +37,11 @@ public class WrapperGameClientClientStatus extends PacketWrapper<WrapperGameClie
     }
 
 
-    public WrapperGameClientClientStatus(PacketReceiveEvent event) {
+    public WrapperPlayClientClientStatus(PacketReceiveEvent event) {
         super(event);
     }
 
-    public WrapperGameClientClientStatus(Action action) {
+    public WrapperPlayClientClientStatus(Action action) {
         super(PacketType.Game.Client.CLIENT_STATUS.getID());
         this.action = action;
     }
@@ -59,7 +59,7 @@ public class WrapperGameClientClientStatus extends PacketWrapper<WrapperGameClie
     }
 
     @Override
-    public void readData(WrapperGameClientClientStatus wrapper) {
+    public void readData(WrapperPlayClientClientStatus wrapper) {
         this.action = wrapper.action;
     }
 

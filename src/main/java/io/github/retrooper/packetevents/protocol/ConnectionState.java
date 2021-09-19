@@ -23,7 +23,7 @@ package io.github.retrooper.packetevents.protocol;
  * @since 1.8
  */
 public enum ConnectionState {
-    HANDSHAKING, STATUS, LOGIN, GAME;
+    HANDSHAKING, STATUS, LOGIN, PLAY;
 
     public static final ConnectionState[] VALUES = values();
 }

@@ -16,58 +16,57 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package io.github.retrooper.packetevents.wrapper.game.client;
+package io.github.retrooper.packetevents.wrapper.play.client;
 
 import io.github.retrooper.packetevents.event.impl.PacketReceiveEvent;
-import io.github.retrooper.packetevents.manager.player.ClientVersion;
 import io.github.retrooper.packetevents.protocol.PacketType;
 import io.github.retrooper.packetevents.wrapper.PacketWrapper;
+import org.bukkit.inventory.ItemStack;
 
-/**
- * This packet is sent when the player changes their slot selection.
- */
-public class WrapperGameClientHeldItemChange extends PacketWrapper<WrapperGameClientHeldItemChange> {
+public class WrapperPlayClientCreativeInventoryAction extends PacketWrapper<WrapperPlayClientCreativeInventoryAction> {
     private int slot;
-
-    public WrapperGameClientHeldItemChange(PacketReceiveEvent event) {
+    private ItemStack itemStack;
+    public WrapperPlayClientCreativeInventoryAction(PacketReceiveEvent event) {
         super(event);
     }
 
-    public WrapperGameClientHeldItemChange(int slot) {
-        super(PacketType.Game.Client.HELD_ITEM_CHANGE.getID());
+    public WrapperPlayClientCreativeInventoryAction(int slot, ItemStack itemStack) {
+        super(PacketType.Game.Client.CREATIVE_INVENTORY_ACTION.getID());
         this.slot = slot;
+        this.itemStack = itemStack;
     }
 
     @Override
     public void readData() {
         this.slot = readShort();
+        this.itemStack = readItemStack();
     }
 
     @Override
-    public void readData(WrapperGameClientHeldItemChange wrapper) {
+    public void readData(WrapperPlayClientCreativeInventoryAction wrapper) {
         this.slot = wrapper.slot;
+        this.itemStack = wrapper.itemStack;
     }
 
     @Override
     public void writeData() {
         writeShort(slot);
+        writeItemStack(itemStack);
     }
 
-    /**
-     * The slot which the player has selected.
-     *
-     * @return Target slot
-     */
     public int getSlot() {
         return slot;
     }
 
-    /**
-     * Modify the slot which the player has selected.
-     *
-     * @param slot Target slot
-     */
     public void setSlot(int slot) {
         this.slot = slot;
+    }
+
+    public ItemStack getItemStack() {
+        return itemStack;
+    }
+
+    public void setItemStack(ItemStack itemStack) {
+        this.itemStack = itemStack;
     }
 }
