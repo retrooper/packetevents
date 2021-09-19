@@ -36,7 +36,7 @@ public class WrapperPlayClientChatMessage extends PacketWrapper<WrapperPlayClien
     }
 
     public WrapperPlayClientChatMessage(String message) {
-        super(PacketType.Game.Client.CHAT_MESSAGE.getID());
+        super(PacketType.Play.Client.CHAT_MESSAGE.getID());
         this.message = message;
     }
 

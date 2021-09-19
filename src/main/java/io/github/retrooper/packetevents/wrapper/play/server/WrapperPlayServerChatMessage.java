@@ -38,14 +38,14 @@ public class WrapperPlayServerChatMessage extends PacketWrapper<WrapperPlayServe
     }
 
     public WrapperPlayServerChatMessage(String jsonMessage, ChatPosition position) {
-        super(PacketType.Game.Server.CHAT_MESSAGE.getID());
+        super(PacketType.Play.Server.CHAT_MESSAGE.getID());
         this.jsonMessage = jsonMessage;
         this.position = position;
         this.senderUUID = new UUID(0L, 0L);
     }
 
     public WrapperPlayServerChatMessage(String jsonMessage, ChatPosition position, UUID senderUUID) {
-        super(PacketType.Game.Server.CHAT_MESSAGE.getID());
+        super(PacketType.Play.Server.CHAT_MESSAGE.getID());
         this.jsonMessage = jsonMessage;
         this.position = position;
         this.senderUUID = senderUUID;

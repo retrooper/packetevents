@@ -48,9 +48,9 @@ public final class PacketType {
                 }
             case PLAY:
                 if (side == PacketSide.CLIENT) {
-                    return Game.Client.getById(protocolVersion, packetID);
+                    return Play.Client.getById(protocolVersion, packetID);
                 } else {
-                    return Game.Server.getById(packetID);
+                    return Play.Server.getById(packetID);
                 }
             default:
                 return null;
@@ -223,7 +223,7 @@ public final class PacketType {
         }
     }
 
-    public static class Game {
+    public static class Play {
         public enum Client implements PacketTypeCommon {
             TELEPORT_CONFIRM,
             QUERY_BLOCK_NBT,

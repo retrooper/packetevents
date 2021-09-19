@@ -19,7 +19,7 @@ public class WrapperPlayClientPluginMessage extends PacketWrapper<WrapperPlayCli
     }
 
     public WrapperPlayClientPluginMessage(String channelName, byte[] data) {
-        super(PacketType.Game.Client.PLUGIN_MESSAGE.getID());
+        super(PacketType.Play.Client.PLUGIN_MESSAGE.getID());
         this.channelName = channelName;
         this.data = data;
     }

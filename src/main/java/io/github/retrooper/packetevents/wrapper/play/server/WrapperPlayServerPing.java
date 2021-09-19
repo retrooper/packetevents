@@ -38,7 +38,7 @@ public class WrapperPlayServerPing extends PacketWrapper<WrapperPlayServerPing> 
     }
 
     public WrapperPlayServerPing(int id) {
-        super(PacketType.Game.Server.PING.getID());
+        super(PacketType.Play.Server.PING.getID());
         this.id = id;
     }
 

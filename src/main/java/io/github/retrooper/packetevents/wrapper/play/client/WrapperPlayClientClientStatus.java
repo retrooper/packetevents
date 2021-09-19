@@ -42,7 +42,7 @@ public class WrapperPlayClientClientStatus extends PacketWrapper<WrapperPlayClie
     }
 
     public WrapperPlayClientClientStatus(Action action) {
-        super(PacketType.Game.Client.CLIENT_STATUS.getID());
+        super(PacketType.Play.Client.CLIENT_STATUS.getID());
         this.action = action;
     }
 

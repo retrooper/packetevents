@@ -31,7 +31,7 @@ public class WrapperPlayClientCreativeInventoryAction extends PacketWrapper<Wrap
     }
 
     public WrapperPlayClientCreativeInventoryAction(int slot, ItemStack itemStack) {
-        super(PacketType.Game.Client.CREATIVE_INVENTORY_ACTION.getID());
+        super(PacketType.Play.Client.CREATIVE_INVENTORY_ACTION.getID());
         this.slot = slot;
         this.itemStack = itemStack;
     }

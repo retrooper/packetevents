@@ -35,7 +35,7 @@ public class WrapperPlayClientSpectate extends PacketWrapper<WrapperPlayClientSp
     }
 
     public WrapperPlayClientSpectate(UUID uuid) {
-        super(PacketType.Game.Client.SPECTATE.getID());
+        super(PacketType.Play.Client.SPECTATE.getID());
         this.targetUUID = uuid;
     }
 

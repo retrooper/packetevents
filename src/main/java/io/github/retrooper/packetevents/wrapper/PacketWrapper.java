@@ -30,7 +30,11 @@ import io.netty.handler.codec.EncoderException;
 import org.bukkit.inventory.ItemStack;
 
 import java.nio.charset.StandardCharsets;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.UUID;
+import java.util.function.BiConsumer;
+import java.util.function.Function;
 
 
 public class PacketWrapper<T extends PacketWrapper> {
@@ -130,6 +134,18 @@ public class PacketWrapper<T extends PacketWrapper> {
         byteBuf.writeByte(value);
     }
 
+    public short readUnsignedByte() {
+        return (short) (readByte() & 255);
+    }
+
+    public boolean readBoolean() {
+        return readByte() != 0;
+    }
+
+    public void writeBoolean(boolean value) {
+        writeByte(value ? 1 : 0);
+    }
+
     public int readInt() {
         return byteBuf.readInt();
     }
@@ -158,6 +174,26 @@ public class PacketWrapper<T extends PacketWrapper> {
         }
 
         byteBuf.writeByte(value);
+    }
+
+    public <K, V> Map<K, V> readMap(Function<PacketWrapper<?>, K> keyFunction, Function<PacketWrapper<?>, V> valueFunction) {
+        int size = readVarInt();
+        Map<K, V> map = new HashMap<>(size);
+        for (int i = 0; i < size; i++) {
+            K key = keyFunction.apply(this);
+            V value = valueFunction.apply(this);
+            map.put(key, value);
+        }
+        return map;
+    }
+
+    public <K, V> void writeMap(Map<K, V> map, BiConsumer<PacketWrapper<?>, K> keyConsumer, BiConsumer<PacketWrapper<?>, V> valueConsumer) {
+        writeVarInt(map.size());
+        for (K key : map.keySet()) {
+            V value = map.get(key);
+            keyConsumer.accept(this, key);
+            valueConsumer.accept(this, value);
+        }
     }
 
     public ItemStack readItemStack() {
@@ -241,14 +277,6 @@ public class PacketWrapper<T extends PacketWrapper> {
 
     public void writeDouble(double value) {
         byteBuf.writeDouble(value);
-    }
-
-    public boolean readBoolean() {
-        return byteBuf.readBoolean();
-    }
-
-    public void writeBoolean(boolean value) {
-        byteBuf.writeBoolean(value);
     }
 
     public byte[] readByteArray(int length) {
