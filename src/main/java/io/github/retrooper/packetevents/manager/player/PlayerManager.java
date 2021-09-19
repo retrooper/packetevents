@@ -84,7 +84,7 @@ public class PlayerManager {
         }
         Object channel = getChannel(player);
         ClientVersion version = clientVersions.get(channel);
-        if (version == null || !version.isResoled()) {
+        if (version == null || !version.isResolved()) {
             //Asking ViaVersion or ProtocolSupport for the protocol version.
             if (DependencyUtil.isDependencyAvailable()) {
                 try {
