@@ -52,7 +52,6 @@ public class WrapperPlayServerDisconnect extends PacketWrapper<WrapperPlayServer
     @Override
     public void writeData() {
         int maxMessageLength = serverVersion.isNewerThanOrEquals(ServerVersion.v_1_13) ? MODERN_MESSAGE_LENGTH : LEGACY_MESSAGE_LENGTH;
-        reason = StringUtil.maximizeLength(reason, maxMessageLength);
         writeString(reason, maxMessageLength);
     }
 

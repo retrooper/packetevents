@@ -19,37 +19,119 @@
 package io.github.retrooper.packetevents.wrapper.play.client;
 
 import io.github.retrooper.packetevents.event.impl.PacketReceiveEvent;
+import io.github.retrooper.packetevents.manager.server.ServerVersion;
 import io.github.retrooper.packetevents.protocol.PacketType;
+import io.github.retrooper.packetevents.utils.PacketWrapperUtil;
+import io.github.retrooper.packetevents.utils.player.ClientVersion;
+import io.github.retrooper.packetevents.utils.vector.Vector3i;
 import io.github.retrooper.packetevents.wrapper.PacketWrapper;
 
 import java.util.Optional;
-//TODO Finish, 1.13 added the transactionid, but 1.12 seems to have more fields??? tf
 public class WrapperPlayClientTabComplete extends PacketWrapper<WrapperPlayClientTabComplete> {
-    private Optional<Integer> transactionID;
     private String text;
+    private Optional<Integer> transactionID;
+    private Optional<Vector3i> blockPosition;
 
     public WrapperPlayClientTabComplete(PacketReceiveEvent event) {
         super(event);
     }
 
-    public WrapperPlayClientTabComplete(Optional<Integer> transactionID, String text) {
+    public WrapperPlayClientTabComplete(Optional<Integer> transactionID, String text, Optional<Vector3i> blockPosition) {
         super(PacketType.Play.Client.TAB_COMPLETE.getID());
         this.transactionID = transactionID;
         this.text = text;
+        this.blockPosition = blockPosition;
     }
 
     @Override
     public void readData() {
+        //1.7 -> 1.12.2 text length
+        int textLength = 32767;
+        boolean v1_13 = serverVersion.isNewerThanOrEquals(ServerVersion.v_1_13);
+        if (v1_13) {
 
+            if (serverVersion.isNewerThanOrEquals(ServerVersion.v_1_13_1)) {
+                //1.13.1+ text length
+                textLength = 32500;
+            }
+            else {
+                //1.13 text length
+                textLength = 256;
+            }
+            transactionID = Optional.of(readVarInt());
+            blockPosition = Optional.empty();
+        }
+
+        text = readString(textLength);
+        if (serverVersion.isNewerThanOrEquals(ServerVersion.v_1_8) || clientVersion.isNewerThanOrEquals(ClientVersion.v_1_8)) {
+           if (!v1_13) {
+                transactionID = Optional.empty();
+                //1.13+ removed this
+                boolean hasPosition = readBoolean();
+                if (hasPosition) {
+                    blockPosition = Optional.of(PacketWrapperUtil.readVectorFromLong(readLong()));
+                }
+            }
+        }
     }
 
     @Override
     public void readData(WrapperPlayClientTabComplete wrapper) {
-        super.readData(wrapper);
+        text = wrapper.text;
+        transactionID = wrapper.transactionID;
+        blockPosition = wrapper.blockPosition;
     }
 
     @Override
     public void writeData() {
-        super.writeData();
+        //1.7 -> 1.12.2 text length
+        int textLength = 32767;
+        boolean v1_13 = serverVersion.isNewerThanOrEquals(ServerVersion.v_1_13);
+        if (v1_13) {
+            if (serverVersion.isNewerThanOrEquals(ServerVersion.v_1_13_1)) {
+                //1.13.1+ text length
+                textLength = 32500;
+            }
+            else {
+                //1.13 text length
+                textLength = 256;
+            }
+            writeVarInt(transactionID.orElse(-1));
+        }
+        writeString(text, textLength);
+        if (serverVersion.isNewerThanOrEquals(ServerVersion.v_1_8) || clientVersion.isNewerThanOrEquals(ClientVersion.v_1_8)) {
+            if (!v1_13) {
+                //1.13+ removed this
+                boolean hasPosition = blockPosition.isPresent();
+                writeBoolean(hasPosition);
+                if (hasPosition) {
+                    writeLong(PacketWrapperUtil.generateLongFromVector(blockPosition.orElse(new Vector3i(-1, -1, -1))));
+                }
+            }
+        }
+    }
+
+    public String getText() {
+        return text;
+    }
+
+    public void setText(String text) {
+        this.text = text;
+    }
+
+    public Optional<Integer> getTransactionID() {
+        return transactionID;
+    }
+
+    public void setTransactionID(Optional<Integer> transactionID) {
+        this.transactionID = transactionID;
+    }
+
+    public Optional<Vector3i> getBlockPosition() {
+        return blockPosition;
+    }
+
+    public void setBlockPosition(Optional<Vector3i> blockPosition) {
+        this.blockPosition = blockPosition;
     }
 }

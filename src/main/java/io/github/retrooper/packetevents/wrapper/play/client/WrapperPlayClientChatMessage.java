@@ -54,7 +54,6 @@ public class WrapperPlayClientChatMessage extends PacketWrapper<WrapperPlayClien
     @Override
     public void writeData() {
         int maxMessageLength = serverVersion.isNewerThanOrEquals(ServerVersion.v_1_11) ? 256 : 100;
-        this.message = StringUtil.maximizeLength(this.message, maxMessageLength);
         writeString(this.message, maxMessageLength);
     }
 

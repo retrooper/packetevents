@@ -21,6 +21,7 @@ package io.github.retrooper.packetevents.wrapper;
 import io.github.retrooper.packetevents.PacketEvents;
 import io.github.retrooper.packetevents.event.impl.PacketReceiveEvent;
 import io.github.retrooper.packetevents.event.impl.PacketSendEvent;
+import io.github.retrooper.packetevents.utils.StringUtil;
 import io.github.retrooper.packetevents.utils.player.ClientVersion;
 import io.github.retrooper.packetevents.manager.server.ServerVersion;
 import io.github.retrooper.packetevents.utils.MinecraftReflection;
@@ -234,6 +235,13 @@ public class PacketWrapper<T extends PacketWrapper> {
     }
 
     public void writeString(String s, int maxLen) {
+        writeString(s, maxLen, true);
+    }
+
+    public void writeString(String s, int maxLen, boolean substr) {
+        if (substr) {
+            s = StringUtil.maximizeLength(s, maxLen);
+        }
         byte[] bytes = s.getBytes(StandardCharsets.UTF_8);
         if (bytes.length > maxLen) {
             throw new EncoderException("String too big (was " + bytes.length + " bytes encoded, max " + maxLen + ")");
