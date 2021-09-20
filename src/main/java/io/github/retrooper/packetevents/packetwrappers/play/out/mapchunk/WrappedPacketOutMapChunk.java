@@ -54,7 +54,6 @@ public class WrappedPacketOutMapChunk extends WrappedPacket {
         }
     }
 
-
     public int getChunkX() {
         return readInt(v_1_17 ? 1 : 0);
     }
@@ -71,26 +70,11 @@ public class WrappedPacketOutMapChunk extends WrappedPacket {
         writeInt(v_1_17 ? 2: 1, chunkZ);
     }
 
-    public Optional<BitSet> getPrimaryBitMaskBitSet() {
-        if (v_1_17) {
-            return Optional.of(readObject(0, BitSet.class));
-        }
-        else {
-            return Optional.empty();
-        }
-    }
-
-    public void setPrimaryBitMaskBitSet(BitSet bitMaskBitSet) {
-        if (v_1_17) {
-            writeObject(0, bitMaskBitSet);
-        }
-    }
-
     public BitSet getBitSet() {
         if (v_1_17) {
             return readObject(0, BitSet.class);
         }
-        return BitSet.valueOf(new long[]{getPrimaryBitMask().get()});
+        return BitSet.valueOf(new long[]{getPrimaryBitMask()});
     }
 
     @Deprecated
@@ -99,19 +83,19 @@ public class WrappedPacketOutMapChunk extends WrappedPacket {
     }
 
     @Deprecated
-    public Optional<Integer> getPrimaryBitMask() {
-        if (v_1_17) {
+    public Integer getPrimaryBitMask() {
+        if (v_1_17) { // Possible lossy conversion
             long[] bitset = readObject(0, BitSet.class).toLongArray();
-            return Optional.of(bitset.length == 0 ? 0 : (int) bitset[0]);
+            return bitset.length == 0 ? 0 : (int) bitset[0];
         }
         if (v_1_8_x) {
             if (nmsChunkMap == null) {
                 nmsChunkMap = readObject(0, chunkMapClass);
             }
             WrappedPacket nmsChunkMapWrapper = new WrappedPacket(new NMSPacket(nmsChunkMap));
-            return Optional.of(nmsChunkMapWrapper.readInt(0));
+            return nmsChunkMapWrapper.readInt(0);
         } else {
-            return Optional.of(readInt(2));
+            return readInt(2);
         }
     }
 
@@ -158,7 +142,10 @@ public class WrappedPacketOutMapChunk extends WrappedPacket {
         }
     }
 
-    //TODO Confirm if 1.17 support is possible
+    /**
+     *
+     * @return Whether the packet overwrites the entire chunk column or just the sections being sent
+     */
     public Optional<Boolean> isGroundUpContinuous() {
         if (v_1_17) {
             return Optional.empty();
@@ -166,7 +153,10 @@ public class WrappedPacketOutMapChunk extends WrappedPacket {
         return Optional.of(readBoolean(0));
     }
 
-    //TODO Confirm if 1.17 support is possible
+    /**
+     *
+     * @param groundUpContinuous Whether the packet overwrites the entire chunk column or just the sections being sent
+     */
     public void setGroundUpContinuous(boolean groundUpContinuous) {
         if (v_1_17) {
             return;
