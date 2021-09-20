@@ -86,9 +86,11 @@ public class WrappedPacketOutMapChunk extends WrappedPacket {
         }
     }
 
-    @Deprecated
-    public Optional<Integer> getPrimaryBitMap() {
-        return getPrimaryBitMask();
+    public BitSet getBitSet() {
+        if (v_1_17) {
+            return readObject(0, BitSet.class);
+        }
+        return BitSet.valueOf(new long[]{getPrimaryBitMask().get()});
     }
 
     @Deprecated
@@ -96,6 +98,7 @@ public class WrappedPacketOutMapChunk extends WrappedPacket {
         setPrimaryBitMask(primaryBitMask);
     }
 
+    @Deprecated
     public Optional<Integer> getPrimaryBitMask() {
         if (v_1_17) {
             long[] bitset = readObject(0, BitSet.class).toLongArray();
@@ -112,6 +115,27 @@ public class WrappedPacketOutMapChunk extends WrappedPacket {
         }
     }
 
+    /**
+     *
+     * @param bitSet Bitset that can hold multiple integer values to support the expanded world height on
+     *               1.17 and newer servers. This is due to 1.17 needing to support up to 127 chunk sections
+     *               (2032 blocks) and an integer only being able to hold 32 bits to represent 32 chunk sections
+     */
+    public void setPrimaryBitMask(BitSet bitSet) {
+        if (v_1_17) {
+            writeObject(0, bitSet);
+        }
+        setPrimaryBitMask((int) bitSet.toLongArray()[0]);
+    }
+
+    /**
+     *
+     * @param primaryBitMask Integer that determines which chunk sections the server is sending
+     *
+     * @deprecated Possible lossy conversion on 1.17 servers that could result in the client only reading 32
+     * out of the total possible 127 chunk sections. Safe to use on 1.16 and below servers
+     */
+    @Deprecated
     public void setPrimaryBitMask(int primaryBitMask) {
         if (v_1_17) {
             writeObject(0, BitSet.valueOf(new long[] {primaryBitMask}));
