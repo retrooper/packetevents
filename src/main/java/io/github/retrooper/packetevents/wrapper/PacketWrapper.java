@@ -27,7 +27,6 @@ import io.github.retrooper.packetevents.manager.server.ServerVersion;
 import io.github.retrooper.packetevents.utils.MinecraftReflection;
 import io.github.retrooper.packetevents.utils.netty.buffer.ByteBufAbstract;
 import io.github.retrooper.packetevents.utils.netty.buffer.ByteBufUtil;
-import io.netty.handler.codec.EncoderException;
 import org.bukkit.inventory.ItemStack;
 
 import java.nio.charset.StandardCharsets;
@@ -244,7 +243,7 @@ public class PacketWrapper<T extends PacketWrapper> {
         }
         byte[] bytes = s.getBytes(StandardCharsets.UTF_8);
         if (bytes.length > maxLen) {
-            throw new EncoderException("String too big (was " + bytes.length + " bytes encoded, max " + maxLen + ")");
+            throw new IllegalStateException("String too big (was " + bytes.length + " bytes encoded, max " + maxLen + ")");
         } else {
             writeVarInt(bytes.length);
             byteBuf.writeBytes(bytes);
@@ -295,6 +294,27 @@ public class PacketWrapper<T extends PacketWrapper> {
 
     public void writeByteArray(byte[] array) {
         byteBuf.writeBytes(array);
+    }
+
+    public long[] readLongArray() {
+        int readableBytes = byteBuf.readableBytes() / 8;
+        int size = readVarInt();
+        if (size > readableBytes) {
+            throw new IllegalStateException("LongArray with size " + size + " is bigger than allowed " + readableBytes);
+        }
+        long[] array = new long[size];
+
+        for (int i = 0; i < array.length; i++) {
+            array[i] = readLong();
+        }
+        return array;
+    }
+
+    public void writeLongArray(long[] array) {
+        writeVarInt(array.length);
+        for (long l : array) {
+            writeLong(l);
+        }
     }
 
     public UUID readUUID() {
