@@ -43,7 +43,11 @@ import java.util.Map;
 public final class ServerManager {
     //Initialized in PacketEvents#load
     public Map<Integer, Entity> entityCache;
-    private ServerVersion version;
+    private static final ServerVersion version;
+
+    static {
+        version = ServerVersion.resolve();
+    }
 
     /**
      * Get the server version.
@@ -51,11 +55,7 @@ public final class ServerManager {
      * @return Get Server Version
      */
     public ServerVersion getVersion() {
-        if (version != null) {
-            return version;
-        } else {
-            return version = ServerVersion.resolve();
-        }
+        return version;
     }
 
     /**
