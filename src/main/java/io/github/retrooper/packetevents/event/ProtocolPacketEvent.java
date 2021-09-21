@@ -27,7 +27,6 @@ import io.github.retrooper.packetevents.protocol.ConnectionState;
 import io.github.retrooper.packetevents.protocol.PacketSide;
 import io.github.retrooper.packetevents.protocol.PacketType;
 import io.github.retrooper.packetevents.protocol.PacketTypeCommon;
-import io.github.retrooper.packetevents.utils.PacketWrapperUtil;
 import io.github.retrooper.packetevents.utils.netty.buffer.ByteBufAbstract;
 import io.github.retrooper.packetevents.utils.netty.channel.ChannelAbstract;
 import org.bukkit.entity.Player;
@@ -80,7 +79,7 @@ public abstract class ProtocolPacketEvent extends PacketEvent implements PlayerE
         this.serverVersion = PacketEvents.get().getServerManager().getVersion();
 
         this.byteBuf = byteBuf;
-        this.packetID = PacketWrapperUtil.readVarInt(byteBuf);
+        this.packetID = readVarInt(byteBuf);
         this.packetType = PacketType.getById(packetSide, connectionState, this.serverVersion, packetID);
     }
 
@@ -107,8 +106,21 @@ public abstract class ProtocolPacketEvent extends PacketEvent implements PlayerE
         this.serverVersion = PacketEvents.get().getServerManager().getVersion();
 
         this.byteBuf = byteBuf;
-        this.packetID = PacketWrapperUtil.readVarInt(byteBuf);
+        this.packetID = readVarInt(byteBuf);
         this.packetType = PacketType.getById(packetSide, connectionState, this.serverVersion, packetID);
+    }
+
+    private static int readVarInt(ByteBufAbstract byteBuf) {
+        byte b0;
+        int i = 0;
+        int j = 0;
+        do {
+            b0 = byteBuf.readByte();
+            i |= (b0 & Byte.MAX_VALUE) << j++ * 7;
+            if (j > 5)
+                throw new RuntimeException("VarInt too big");
+        } while ((b0 & 128) == 128);
+        return i;
     }
 
     public ChannelAbstract getChannel() {

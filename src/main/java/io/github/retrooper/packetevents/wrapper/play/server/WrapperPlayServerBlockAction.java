@@ -2,11 +2,11 @@ package io.github.retrooper.packetevents.wrapper.play.server;
 
 import io.github.retrooper.packetevents.event.impl.PacketSendEvent;
 import io.github.retrooper.packetevents.protocol.PacketType;
-import io.github.retrooper.packetevents.utils.vector.Vector3i;
+import io.github.retrooper.packetevents.utils.BlockPosition;
 import io.github.retrooper.packetevents.wrapper.PacketWrapper;
 
 public class WrapperPlayServerBlockAction extends PacketWrapper<WrapperPlayServerBlockAction> {
-    Vector3i blockPos;
+    BlockPosition blockPos;
     int actionID, actionParam;
     int block;
 
@@ -14,7 +14,7 @@ public class WrapperPlayServerBlockAction extends PacketWrapper<WrapperPlayServe
         super(event);
     }
 
-    public WrapperPlayServerBlockAction(Vector3i blockPos, int actionID, int actionParam, int block) {
+    public WrapperPlayServerBlockAction(BlockPosition blockPos, int actionID, int actionParam, int block) {
         super(PacketType.Play.Server.BLOCK_ACTION.getID());
         this.blockPos = blockPos;
         this.actionID = actionID;
@@ -46,11 +46,11 @@ public class WrapperPlayServerBlockAction extends PacketWrapper<WrapperPlayServe
         this.block = wrapper.getBlock();
     }
 
-    public Vector3i getBlockPos() {
+    public BlockPosition getBlockPos() {
         return blockPos;
     }
 
-    public void setBlockPos(Vector3i blockPos) {
+    public void setBlockPos(BlockPosition blockPos) {
         this.blockPos = blockPos;
     }
 

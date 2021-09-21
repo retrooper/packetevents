@@ -16,8 +16,12 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package io.github.retrooper.packetevents.utils.vector;
+package io.github.retrooper.packetevents.utils;
 
+import io.github.retrooper.packetevents.PacketEvents;
+import io.github.retrooper.packetevents.manager.server.ServerVersion;
+import io.github.retrooper.packetevents.utils.vector.Vector3d;
+import io.github.retrooper.packetevents.utils.vector.Vector3f;
 import org.bukkit.Location;
 
 /**
@@ -29,13 +33,13 @@ import org.bukkit.Location;
  * @author retrooper
  * @since 1.7
  */
-public class Vector3i {
+public class BlockPosition {
     /**
      * This is the invalid vector.
      * In wrappers, when a vector is null in the actual packet, PacketEvents will set our high level vector X,Y,Z values
      * to -1 to avoid null pointer exceptions.
      */
-    public static final Vector3i INVALID = new Vector3i(-1, -1, -1);
+    public static final BlockPosition INVALID = new BlockPosition(-1, -1, -1);
     /**
      * X (coordinate/angle/whatever you wish)
      */
@@ -52,16 +56,36 @@ public class Vector3i {
     /**
      * Default constructor setting all coordinates/angles/values to their default values (=0).
      */
-    public Vector3i() {
+    public BlockPosition() {
         this.x = 0;
         this.y = 0;
         this.z = 0;
     }
 
-    public Vector3i(Location location) {
+    public BlockPosition(Location location) {
         this.x = location.getBlockX();
         this.y = location.getBlockY();
         this.z = location.getBlockZ();
+    }
+
+    public BlockPosition(long val) {
+        int x = (int) (val >> 38);
+        int y;
+        int z;
+
+        // 1.14 method for this is storing X Z Y
+        if (PacketEvents.get().getServerManager().getVersion().isNewerThanOrEquals(ServerVersion.v_1_14)) {
+            y = (int) (val & 0xFFF);
+            z = (int) (val << 26 >> 38);
+        } else {
+            // 1.13 and below store X Y Z
+            y = (int) ((val >> 26) & 0xFFF);
+            z = (int) (val << 38 >> 38);
+        }
+
+        setX(x);
+        setY(y);
+        setZ(z);
     }
 
     /**
@@ -71,7 +95,7 @@ public class Vector3i {
      * @param y Y
      * @param z Z
      */
-    public Vector3i(int x, int y, int z) {
+    public BlockPosition(int x, int y, int z) {
         this.x = x;
         this.y = y;
         this.z = z;
@@ -85,7 +109,7 @@ public class Vector3i {
      *
      * @param array Array.
      */
-    public Vector3i(int[] array) {
+    public BlockPosition(int[] array) {
         if (array.length > 0) {
             x = array[0];
         } else {
@@ -106,6 +130,15 @@ public class Vector3i {
         } else {
             z = 0;
         }
+    }
+
+    public long getSerializedPosition() {
+        // 1.14 method for this is storing X Z Y
+        if (PacketEvents.get().getServerManager().getVersion().isNewerThanOrEquals(ServerVersion.v_1_14)) {
+            return ((long) (getX() & 0x3FFFFFF) << 38) | ((long) (getZ() & 0x3FFFFFF) << 12) | (getY() & 0xFFF);
+        }
+        // 1.13 and below store X Y Z
+        return ((long) (getX() & 0x3FFFFFF) << 38) | ((long) (getY() & 0xFFF) << 26) | (getZ() & 0x3FFFFFF);
     }
 
     public int getX() {
@@ -141,8 +174,8 @@ public class Vector3i {
      */
     @Override
     public boolean equals(Object obj) {
-        if (obj instanceof Vector3i) {
-            Vector3i vec = (Vector3i) obj;
+        if (obj instanceof BlockPosition) {
+            BlockPosition vec = (BlockPosition) obj;
             return x == vec.x && y == vec.y && z == vec.z;
         } else if (obj instanceof Vector3d) {
             Vector3d vec = (Vector3d) obj;
@@ -160,7 +193,7 @@ public class Vector3i {
      * @return Clone.
      */
     @Override
-    public Vector3i clone() {
+    public BlockPosition clone() {
         try {
             super.clone();
         } catch (CloneNotSupportedException e) {

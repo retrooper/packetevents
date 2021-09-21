@@ -20,15 +20,14 @@ package io.github.retrooper.packetevents.wrapper.play.client;
 
 import io.github.retrooper.packetevents.event.impl.PacketReceiveEvent;
 import io.github.retrooper.packetevents.protocol.PacketType;
-import io.github.retrooper.packetevents.utils.PacketWrapperUtil;
-import io.github.retrooper.packetevents.utils.vector.Vector3i;
+import io.github.retrooper.packetevents.utils.BlockPosition;
 import io.github.retrooper.packetevents.wrapper.PacketWrapper;
 
 /**
  * This packet is sent when Generate is pressed on the Jigsaw Block interface.
  */
 public class WrapperPlayClientGenerateStructure extends PacketWrapper<WrapperPlayClientGenerateStructure> {
-    private Vector3i blockPosition;
+    private BlockPosition blockPosition;
     private int levels;
     private boolean keepJigsaws;
 
@@ -36,7 +35,7 @@ public class WrapperPlayClientGenerateStructure extends PacketWrapper<WrapperPla
         super(event);
     }
 
-    public WrapperPlayClientGenerateStructure(Vector3i blockPosition, int levels, boolean keepJigsaws) {
+    public WrapperPlayClientGenerateStructure(BlockPosition blockPosition, int levels, boolean keepJigsaws) {
         super(PacketType.Play.Client.GENERATE_STRUCTURE.getID());
         this.blockPosition = blockPosition;
         this.levels = levels;
@@ -45,8 +44,7 @@ public class WrapperPlayClientGenerateStructure extends PacketWrapper<WrapperPla
 
     @Override
     public void readData() {
-        long vectorLong = readLong();
-        this.blockPosition = PacketWrapperUtil.readVectorFromLong(vectorLong);
+        this.blockPosition = new BlockPosition(readLong());
         this.levels = readVarInt();
         this.keepJigsaws = readBoolean();
     }
@@ -60,7 +58,7 @@ public class WrapperPlayClientGenerateStructure extends PacketWrapper<WrapperPla
 
     @Override
     public void writeData() {
-        writeLong(PacketWrapperUtil.generateLongFromVector(this.blockPosition));
+        writeLong(this.blockPosition.getSerializedPosition());
         writeVarInt(this.levels);
         writeBoolean(this.keepJigsaws);
     }
@@ -70,7 +68,7 @@ public class WrapperPlayClientGenerateStructure extends PacketWrapper<WrapperPla
      *
      * @return Block location
      */
-    public Vector3i getBlockPosition() {
+    public BlockPosition getBlockPosition() {
         return blockPosition;
     }
 
@@ -79,7 +77,7 @@ public class WrapperPlayClientGenerateStructure extends PacketWrapper<WrapperPla
      *
      * @param blockPosition Block location
      */
-    public void setBlockPosition(Vector3i blockPosition) {
+    public void setBlockPosition(BlockPosition blockPosition) {
         this.blockPosition = blockPosition;
     }
 

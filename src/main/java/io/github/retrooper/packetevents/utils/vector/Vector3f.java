@@ -18,6 +18,8 @@
 
 package io.github.retrooper.packetevents.utils.vector;
 
+import io.github.retrooper.packetevents.utils.BlockPosition;
+
 /**
  * 3D float Vector.
  * This vector can represent coordinates, angles, or anything you want.
@@ -138,8 +140,8 @@ public class Vector3f {
         } else if (obj instanceof Vector3d) {
             Vector3d vec = (Vector3d) obj;
             return x == vec.x && y == vec.y && z == vec.z;
-        } else if (obj instanceof Vector3i) {
-            Vector3i vec = (Vector3i) obj;
+        } else if (obj instanceof BlockPosition) {
+            BlockPosition vec = (BlockPosition) obj;
             return x == (double) vec.x && y == (double) vec.y && z == (double) vec.z;
         }
         return false;
