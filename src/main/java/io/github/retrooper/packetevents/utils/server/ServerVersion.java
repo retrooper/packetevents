@@ -49,7 +49,7 @@ public enum ServerVersion {
             .replace(".", ",").split(",")[3];
     private static final ServerVersion[] VALUES = values();
     public static ServerVersion[] reversedValues = new ServerVersion[VALUES.length];
-    private static ServerVersion cachedVersion;
+    private static final ServerVersion cachedVersion;
     private final short protocolVersion;
 
     ServerVersion(short protocolId) {
@@ -91,13 +91,14 @@ public enum ServerVersion {
      * If PacketEvents has already attempted resolving, return the cached version.
      * If PacketEvents hasn't already attempted resolving, it will resolve it, cache it and return the version.
      *
-     * @return Server Version. (possibly cached)
+     * @return Server Version. (always cached)
      */
     public static ServerVersion getVersion() {
-        if (cachedVersion == null) {
-            cachedVersion = getVersionNoCache();
-        }
         return cachedVersion;
+    }
+
+    static {
+        cachedVersion = getVersionNoCache();
     }
 
     /**

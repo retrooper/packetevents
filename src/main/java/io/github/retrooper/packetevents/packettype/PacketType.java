@@ -39,6 +39,7 @@ public class PacketType {
      */
     public static final byte INVALID = -128;
     public static final Map<Class<?>, Byte> packetIDMap = new IdentityHashMap<>();
+    private static final boolean isNine = ServerVersion.getVersion().isNewerThanOrEquals(ServerVersion.v_1_9);
 
     private static void insertPacketID(Class<?> cls, byte packetID) {
         if (cls != null) {
@@ -286,10 +287,7 @@ public class PacketType {
                  * @return Has the client placed a block?
                  */
                 public static boolean isBlockPlace(final byte packetID) {
-                    final ServerVersion version = PacketEvents.get().getServerUtils().getVersion();
-                    return version.isNewerThan(ServerVersion.v_1_8_8) ?
-                            packetID == PacketType.Play.Client.USE_ITEM
-                            : packetID == PacketType.Play.Client.BLOCK_PLACE;
+                    return isNine ? packetID == PacketType.Play.Client.USE_ITEM : packetID == PacketType.Play.Client.BLOCK_PLACE;
                 }
             }
         }
