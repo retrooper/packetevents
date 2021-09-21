@@ -15,7 +15,7 @@ public class WrapperPlayServerBlockAction extends PacketWrapper<WrapperPlayServe
     }
 
     public WrapperPlayServerBlockAction(Vector3i blockPos, int actionID, int actionParam, int block) {
-        super(PacketType.Play.Server.UNLOAD_CHUNK.getID());
+        super(PacketType.Play.Server.BLOCK_ACTION.getID());
         this.blockPos = blockPos;
         this.actionID = actionID;
         this.actionParam = actionParam;
