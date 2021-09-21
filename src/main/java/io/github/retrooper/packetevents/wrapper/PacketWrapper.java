@@ -27,6 +27,7 @@ import io.github.retrooper.packetevents.manager.server.ServerVersion;
 import io.github.retrooper.packetevents.utils.MinecraftReflection;
 import io.github.retrooper.packetevents.utils.netty.buffer.ByteBufAbstract;
 import io.github.retrooper.packetevents.utils.netty.buffer.ByteBufUtil;
+import io.github.retrooper.packetevents.utils.vector.Vector3i;
 import org.bukkit.inventory.ItemStack;
 
 import java.nio.charset.StandardCharsets;
@@ -326,5 +327,32 @@ public class PacketWrapper<T extends PacketWrapper> {
     public void writeUUID(UUID uuid) {
         writeLong(uuid.getMostSignificantBits());
         writeLong(uuid.getLeastSignificantBits());
+    }
+
+    public Vector3i readBlockPos() {
+        long val = readLong();
+        int x = (int) (val >> 38);
+
+        // 1.14 method for this is storing X Z Y
+        if (serverVersion.isNewerThanOrEquals(ServerVersion.v_1_14)) {
+            int y = (int) (val & 0xFFF);
+            int z = (int) (val << 26 >> 38);
+            return new Vector3i(x, y, z);
+        }
+        // 1.13 and below store X Y Z
+        int y = (int) ((val >> 26) & 0xFFF);
+        int z = (int) (val << 38 >> 38);
+        return new Vector3i(x, y, z);
+    }
+
+    public void writeBlockPos(Vector3i pos) {
+        // 1.14 method for this is storing X Z Y
+        if (serverVersion.isNewerThanOrEquals(ServerVersion.v_1_14)) {
+            long val = ((long) (pos.getX() & 0x3FFFFFF) << 38) | ((long) (pos.getZ() & 0x3FFFFFF) << 12) | (pos.getY() & 0xFFF);
+            writeLong(val);
+        }
+        // 1.13 and below store X Y Z
+        long val = ((long) (pos.getX() & 0x3FFFFFF) << 38) | ((long) (pos.getY() & 0xFFF) << 26) | (pos.getZ() & 0x3FFFFFF);
+        writeLong(val);
     }
 }
