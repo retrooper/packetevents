@@ -19,6 +19,7 @@ public class PacketDecoderLegacy extends ByteToMessageDecoder {
     public ConnectionState connectionState = ConnectionState.HANDSHAKING;
     private boolean handledCompression;
     private boolean skipDoubleTransform;
+    public boolean bypassCompression = false;
 
     public void handle(ChannelHandlerContextAbstract ctx, ByteBufAbstract byteBuf, List<Object> output) {
         if (skipDoubleTransform) {
@@ -27,7 +28,7 @@ public class PacketDecoderLegacy extends ByteToMessageDecoder {
         }
         ByteBufAbstract transformedBuf = ctx.alloc().buffer().writeBytes(byteBuf);
         try {
-            boolean needsCompress = handleCompressionOrder(ctx, transformedBuf);
+            boolean needsCompress = !bypassCompression && handleCompressionOrder(ctx, transformedBuf);
             int firstReaderIndex = transformedBuf.readerIndex();
             PacketReceiveEvent packetReceiveEvent = new PacketReceiveEvent(ctx.channel(), player, transformedBuf);
             int readerIndex = transformedBuf.readerIndex();

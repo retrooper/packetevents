@@ -21,7 +21,7 @@ package io.github.retrooper.packetevents.event;
 import io.github.retrooper.packetevents.PacketEvents;
 import io.github.retrooper.packetevents.event.type.CancellableEvent;
 import io.github.retrooper.packetevents.event.type.PlayerEvent;
-import io.github.retrooper.packetevents.manager.player.ClientVersion;
+import io.github.retrooper.packetevents.utils.player.ClientVersion;
 import io.github.retrooper.packetevents.manager.server.ServerVersion;
 import io.github.retrooper.packetevents.protocol.ConnectionState;
 import io.github.retrooper.packetevents.protocol.PacketSide;
@@ -52,6 +52,10 @@ public abstract class ProtocolPacketEvent extends PacketEvent implements PlayerE
         this(packetSide, ChannelAbstract.generate(channel), player, ByteBufAbstract.generate(rawByteBuf));
     }
 
+    public ProtocolPacketEvent(PacketSide packetSide, ConnectionState connectionState, Object channel, Player player, Object rawByteBuf) {
+        this(packetSide, connectionState, ChannelAbstract.generate(channel), player, ByteBufAbstract.generate(rawByteBuf));
+    }
+
 
     public ProtocolPacketEvent(PacketSide packetSide, ChannelAbstract channel, Player player, ByteBufAbstract byteBuf) {
         this.channel = channel;
@@ -59,6 +63,33 @@ public abstract class ProtocolPacketEvent extends PacketEvent implements PlayerE
         this.player = player;
 
         this.connectionState = PacketEvents.get().getInjector().getConnectionState(channel.rawChannel());
+
+        ClientVersion version = PacketEvents.get().getPlayerManager().clientVersions.get(channel.rawChannel());
+        if (version == null) {
+            if (player != null) {
+                //Possibly ask a soft-dependency(for example, ViaVersion) for the client version.
+                version = PacketEvents.get().getPlayerManager().getClientVersion(player);
+            }
+        }
+
+        if (version == null) {
+            version = ClientVersion.UNKNOWN;
+        }
+        this.clientVersion = version;
+
+        this.serverVersion = PacketEvents.get().getServerManager().getVersion();
+
+        this.byteBuf = byteBuf;
+        this.packetID = PacketWrapperUtil.readVarInt(byteBuf);
+        this.packetType = PacketType.getById(packetSide, connectionState, this.serverVersion, packetID);
+    }
+
+    public ProtocolPacketEvent(PacketSide packetSide, ConnectionState connectionState, ChannelAbstract channel, Player player, ByteBufAbstract byteBuf) {
+        this.channel = channel;
+        this.socketAddress = (InetSocketAddress) channel.remoteAddress();
+        this.player = player;
+
+        this.connectionState = connectionState;
 
         ClientVersion version = PacketEvents.get().getPlayerManager().clientVersions.get(channel.rawChannel());
         if (version == null) {

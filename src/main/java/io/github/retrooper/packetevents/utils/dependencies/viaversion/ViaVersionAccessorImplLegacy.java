@@ -18,28 +18,77 @@
 
 package io.github.retrooper.packetevents.utils.dependencies.viaversion;
 
+import io.github.retrooper.packetevents.protocol.ConnectionState;
+import io.github.retrooper.packetevents.utils.reflection.Reflection;
+import io.github.retrooper.packetevents.utils.reflection.ReflectionObject;
+import io.netty.buffer.ByteBuf;
 import org.bukkit.entity.Player;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
 public class ViaVersionAccessorImplLegacy implements ViaVersionAccessor {
-    private static Class<?> viaClass;
-    private static Method apiAccessor;
-    private static Method getPlayerVersionMethod;
+    private Class<?> viaClass;
+    private Class<?> viaManagerClass;
+    private Class<?> protocolInfoClass;
+    private Class<?> bukkitDecodeHandlerClass;
+    private Class<? extends Enum<?>> protocolStateClass;
+    private Field viaManagerField;
+    private Method apiAccessor;
+    private Method getPlayerVersionMethod;
+    private Method checkServerBoundMethod;
+    private Class<?> userConnectionClass;
+    private Method cancelDecoderExceptionGenerator;
+    private Method cancelEncoderExceptionGenerator;
+    private Method transformServerboundMethod;
+    private Method transformClientboundMethod;
+    private Method setActiveMethod;
+    private Method isActiveMethod;
+    private Method getProtocolInfoMethod;
 
-    @Override
-    public int getProtocolVersion(Player player) {
+    private void load() {
         if (viaClass == null) {
             try {
                 viaClass = Class.forName("us.myles.ViaVersion.api.Via");
+
+                viaManagerClass = Class.forName("us.myles.ViaVersion.ViaManager");
+                viaManagerField = viaClass.getDeclaredField("manager");
+
+                protocolInfoClass = Class.forName("us.myles.ViaVersion.protocols.base.ProtocolInfo");
+
+                protocolStateClass = (Class<? extends Enum<?>>) Class.forName("us.myles.ViaVersion.packets.State");
+
+                bukkitDecodeHandlerClass = Class.forName("us.myles.ViaVersion.bukkit.handlers.BukkitDecodeHandler");
+
                 Class<?> viaAPIClass = Class.forName("us.myles.ViaVersion.api.ViaAPI");
                 apiAccessor = viaClass.getMethod("getAPI");
                 getPlayerVersionMethod = viaAPIClass.getMethod("getPlayerVersion", Object.class);
-            } catch (ClassNotFoundException | NoSuchMethodException e) {
+                checkServerBoundMethod = viaAPIClass.getDeclaredMethod("checkServerBound");
+            } catch (ClassNotFoundException | NoSuchMethodException | NoSuchFieldException e) {
                 e.printStackTrace();
             }
         }
+
+        if (userConnectionClass == null) {
+            try {
+                userConnectionClass = Class.forName("us.myles.ViaVersion.api.data.UserConnection");
+                transformServerboundMethod = Reflection.getMethod(userConnectionClass, "transformServerbound", 0);
+                transformClientboundMethod = Reflection.getMethod(userConnectionClass, "transformClientbound", 0);
+                setActiveMethod = Reflection.getMethod(userConnectionClass, "setActive", 0);
+                isActiveMethod = Reflection.getMethod(userConnectionClass, "isActive", 0);
+                cancelDecoderExceptionGenerator= Reflection.getMethod(Class.forName("us.myles.ViaVersion.exception.CancelDecoderException"), "generate", 0);
+                cancelEncoderExceptionGenerator= Reflection.getMethod(Class.forName("us.myles.ViaVersion.exception.CancelEncoderException"), "generate", 0);
+                getProtocolInfoMethod = Reflection.getMethod(userConnectionClass, "getProtocolInfo", 0);
+            } catch (ClassNotFoundException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    @Override
+    public int getProtocolVersion(Player player) {
+        load();
         try {
             Object viaAPI = apiAccessor.invoke(null);
             return (int) getPlayerVersionMethod.invoke(viaAPI, player);
@@ -47,5 +96,114 @@ public class ViaVersionAccessorImplLegacy implements ViaVersionAccessor {
             e.printStackTrace();
         }
         return -1;
+    }
+
+    @Override
+    public boolean isDebug() {
+        load();
+        try {
+            Object manager = viaManagerField.get(null);
+            ReflectionObject reflectManager = new ReflectionObject(manager);
+            return reflectManager.readBoolean(0);
+        }
+        catch (IllegalAccessException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    @Override
+    public Exception throwCancelDecoderException(Throwable throwable) {
+        load();
+        try {
+            return (Exception) cancelDecoderExceptionGenerator.invoke(throwable);
+        } catch (IllegalAccessException | InvocationTargetException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    @Override
+    public Exception throwCancelEncoderException(Throwable throwable) {
+        load();
+        try {
+            return (Exception) cancelEncoderExceptionGenerator.invoke(throwable);
+        } catch (IllegalAccessException | InvocationTargetException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    @Override
+    public void transformPacket(Object userConnectionObj, Object byteBufObj, boolean clientSide) {
+        load();
+        ByteBuf byteBuf = (ByteBuf) byteBufObj;
+        try {
+            if (clientSide) {
+                transformServerboundMethod.invoke(userConnectionObj, byteBuf, cancelDecoderExceptionGenerator.invoke(null));
+            } else {
+                transformClientboundMethod.invoke(userConnectionObj, byteBuf, cancelEncoderExceptionGenerator.invoke(null));
+            }
+        }
+        catch (Exception ex) {
+            ex.printStackTrace();
+        }
+    }
+
+    @Override
+    public void setUserConnectionActive(Object userConnectionObj, boolean active) {
+        load();
+        try {
+            setActiveMethod.invoke(userConnectionObj, active);
+        } catch (IllegalAccessException | InvocationTargetException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Override
+    public boolean isUserConnectionActive(Object userConnectionObj) {
+        load();
+        try {
+            return (boolean) isActiveMethod.invoke(userConnectionObj);
+        } catch (IllegalAccessException | InvocationTargetException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    @Override
+    public boolean checkServerboundPacketUserConnection(Object userConnectionObj) {
+        load();
+        try {
+            return (boolean) checkServerBoundMethod.invoke(userConnectionObj);
+        }
+        catch (IllegalAccessException | InvocationTargetException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    @Override
+    public ConnectionState getUserConnectionProtocolState(Object userConnectionObj) {
+        try {
+            Object protocolInfo = getProtocolInfoMethod.invoke(userConnectionObj);
+            ReflectionObject reflectProtocolInfo = new ReflectionObject(protocolInfo);
+            return ConnectionState.VALUES[reflectProtocolInfo.readEnumConstant(0, protocolStateClass).ordinal()];
+        } catch (IllegalAccessException | InvocationTargetException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    @Override
+    public Class<?> getUserConnectionClass() {
+        load();
+        return userConnectionClass;
+    }
+
+    @Override
+    public Class<?> getBukkitDecodeHandlerClass() {
+        load();
+        return bukkitDecodeHandlerClass;
     }
 }

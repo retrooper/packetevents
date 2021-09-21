@@ -92,7 +92,7 @@ public class LateChannelInjectorLegacy implements LateInjector {
 
     @Override
     public ConnectionState getConnectionState(Object channel) {
-        return ConnectionState.GAME;
+        return ConnectionState.PLAY;
     }
 
     @Override

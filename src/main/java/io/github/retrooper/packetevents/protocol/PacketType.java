@@ -19,7 +19,7 @@
 package io.github.retrooper.packetevents.protocol;
 
 import io.github.retrooper.packetevents.PacketEvents;
-import io.github.retrooper.packetevents.manager.player.ClientVersion;
+import io.github.retrooper.packetevents.utils.player.ClientVersion;
 import io.github.retrooper.packetevents.manager.server.ServerVersion;
 import io.github.retrooper.packetevents.protocol.protocols.clientbound.*;
 import io.github.retrooper.packetevents.protocol.protocols.serverbound.*;
@@ -46,11 +46,11 @@ public final class PacketType {
                 } else {
                     return Login.Server.getById(packetID);
                 }
-            case GAME:
+            case PLAY:
                 if (side == PacketSide.CLIENT) {
-                    return Game.Client.getById(protocolVersion, packetID);
+                    return Play.Client.getById(protocolVersion, packetID);
                 } else {
-                    return Game.Server.getById(packetID);
+                    return Play.Server.getById(packetID);
                 }
             default:
                 return null;
@@ -61,6 +61,7 @@ public final class PacketType {
         int protocolVersion = version != null ? version.getProtocolVersion() : -1;
         return getById(side, state, protocolVersion, packetID);
     }
+
     public static PacketTypeCommon getById(PacketSide side, ConnectionState state, @Nullable ServerVersion version, int packetID) {
         int protocolVersion = version != null ? version.getProtocolVersion() : -1;
         return getById(side, state, protocolVersion, packetID);
@@ -222,7 +223,7 @@ public final class PacketType {
         }
     }
 
-    public static class Game {
+    public static class Play {
         public enum Client implements PacketTypeCommon {
             TELEPORT_CONFIRM,
             QUERY_BLOCK_NBT,
@@ -281,7 +282,7 @@ public final class PacketType {
                 return id;
             }
 
-            private static final Map<Integer, Map<Integer, PacketTypeCommon>> PACKET_ID_CACHE = new IdentityHashMap<>();
+            private static final Map<Integer, Map<Integer, PacketTypeCommon>> PACKET_ID_CACHE = new HashMap<>();
             private static final Map<Integer, Map<PacketTypeCommon, Integer>> PACKET_TYPE_CACHE = new HashMap<>();
 
             @Nullable

@@ -21,16 +21,20 @@ package io.github.retrooper.packetevents.wrapper;
 import io.github.retrooper.packetevents.PacketEvents;
 import io.github.retrooper.packetevents.event.impl.PacketReceiveEvent;
 import io.github.retrooper.packetevents.event.impl.PacketSendEvent;
-import io.github.retrooper.packetevents.manager.player.ClientVersion;
+import io.github.retrooper.packetevents.utils.StringUtil;
+import io.github.retrooper.packetevents.utils.player.ClientVersion;
 import io.github.retrooper.packetevents.manager.server.ServerVersion;
 import io.github.retrooper.packetevents.utils.MinecraftReflection;
 import io.github.retrooper.packetevents.utils.netty.buffer.ByteBufAbstract;
 import io.github.retrooper.packetevents.utils.netty.buffer.ByteBufUtil;
-import io.netty.handler.codec.EncoderException;
 import org.bukkit.inventory.ItemStack;
 
 import java.nio.charset.StandardCharsets;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.UUID;
+import java.util.function.BiConsumer;
+import java.util.function.Function;
 
 
 public class PacketWrapper<T extends PacketWrapper> {
@@ -130,6 +134,18 @@ public class PacketWrapper<T extends PacketWrapper> {
         byteBuf.writeByte(value);
     }
 
+    public short readUnsignedByte() {
+        return (short) (readByte() & 255);
+    }
+
+    public boolean readBoolean() {
+        return readByte() != 0;
+    }
+
+    public void writeBoolean(boolean value) {
+        writeByte(value ? 1 : 0);
+    }
+
     public int readInt() {
         return byteBuf.readInt();
     }
@@ -158,6 +174,26 @@ public class PacketWrapper<T extends PacketWrapper> {
         }
 
         byteBuf.writeByte(value);
+    }
+
+    public <K, V> Map<K, V> readMap(Function<PacketWrapper<?>, K> keyFunction, Function<PacketWrapper<?>, V> valueFunction) {
+        int size = readVarInt();
+        Map<K, V> map = new HashMap<>(size);
+        for (int i = 0; i < size; i++) {
+            K key = keyFunction.apply(this);
+            V value = valueFunction.apply(this);
+            map.put(key, value);
+        }
+        return map;
+    }
+
+    public <K, V> void writeMap(Map<K, V> map, BiConsumer<PacketWrapper<?>, K> keyConsumer, BiConsumer<PacketWrapper<?>, V> valueConsumer) {
+        writeVarInt(map.size());
+        for (K key : map.keySet()) {
+            V value = map.get(key);
+            keyConsumer.accept(this, key);
+            valueConsumer.accept(this, value);
+        }
     }
 
     public ItemStack readItemStack() {
@@ -198,9 +234,16 @@ public class PacketWrapper<T extends PacketWrapper> {
     }
 
     public void writeString(String s, int maxLen) {
+        writeString(s, maxLen, true);
+    }
+
+    public void writeString(String s, int maxLen, boolean substr) {
+        if (substr) {
+            s = StringUtil.maximizeLength(s, maxLen);
+        }
         byte[] bytes = s.getBytes(StandardCharsets.UTF_8);
         if (bytes.length > maxLen) {
-            throw new EncoderException("String too big (was " + bytes.length + " bytes encoded, max " + maxLen + ")");
+            throw new IllegalStateException("String too big (was " + bytes.length + " bytes encoded, max " + maxLen + ")");
         } else {
             writeVarInt(bytes.length);
             byteBuf.writeBytes(bytes);
@@ -243,14 +286,6 @@ public class PacketWrapper<T extends PacketWrapper> {
         byteBuf.writeDouble(value);
     }
 
-    public boolean readBoolean() {
-        return byteBuf.readBoolean();
-    }
-
-    public void writeBoolean(boolean value) {
-        byteBuf.writeBoolean(value);
-    }
-
     public byte[] readByteArray(int length) {
         byte[] ret = new byte[length];
         byteBuf.readBytes(ret);
@@ -259,6 +294,27 @@ public class PacketWrapper<T extends PacketWrapper> {
 
     public void writeByteArray(byte[] array) {
         byteBuf.writeBytes(array);
+    }
+
+    public long[] readLongArray() {
+        int readableBytes = byteBuf.readableBytes() / 8;
+        int size = readVarInt();
+        if (size > readableBytes) {
+            throw new IllegalStateException("LongArray with size " + size + " is bigger than allowed " + readableBytes);
+        }
+        long[] array = new long[size];
+
+        for (int i = 0; i < array.length; i++) {
+            array[i] = readLong();
+        }
+        return array;
+    }
+
+    public void writeLongArray(long[] array) {
+        writeVarInt(array.length);
+        for (long l : array) {
+            writeLong(l);
+        }
     }
 
     public UUID readUUID() {

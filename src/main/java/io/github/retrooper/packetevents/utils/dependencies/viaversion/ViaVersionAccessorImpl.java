@@ -21,10 +21,13 @@ package io.github.retrooper.packetevents.utils.dependencies.viaversion;
 import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.bukkit.handlers.BukkitDecodeHandler;
-import com.viaversion.viaversion.bukkit.platform.BukkitViaInjector;
+import com.viaversion.viaversion.exception.CancelDecoderException;
+import com.viaversion.viaversion.exception.CancelEncoderException;
+import io.github.retrooper.packetevents.protocol.ConnectionState;
 import io.github.retrooper.packetevents.utils.reflection.ClassUtil;
 import io.github.retrooper.packetevents.utils.reflection.Reflection;
 import io.github.retrooper.packetevents.utils.reflection.ReflectionObject;
+import io.netty.buffer.ByteBuf;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandler;
 import io.netty.handler.codec.ByteToMessageDecoder;
@@ -32,6 +35,7 @@ import io.netty.handler.codec.MessageToMessageDecoder;
 import org.bukkit.entity.Player;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.util.*;
 
 public class ViaVersionAccessorImpl implements ViaVersionAccessor {
@@ -40,41 +44,65 @@ public class ViaVersionAccessorImpl implements ViaVersionAccessor {
         return Via.getAPI().getPlayerVersion(player);
     }
 
-    public void addDecoderAfterVia(Object ch, MessageToMessageDecoder<?> customDecoder) {
-        Channel channel = (Channel) ch;
-        ChannelHandler decoder = channel.pipeline().get("decoder");
-        if (decoder instanceof CustomBukkitDecodeHandler) {
-            CustomBukkitDecodeHandler customBukkitDecodeHandler = (CustomBukkitDecodeHandler) decoder;
-            customBukkitDecodeHandler.addCustomDecoder(customDecoder);
-        } else if (decoder instanceof BukkitDecodeHandler) {
-            ReflectionObject reflectionObject = new ReflectionObject(decoder);
-            UserConnection userConnectionInfo = reflectionObject.read(0, UserConnection.class);
-            ByteToMessageDecoder minecraftDecoder = reflectionObject.read(0, ByteToMessageDecoder.class);
-            CustomBukkitDecodeHandler customBukkitDecodeHandler = new CustomBukkitDecodeHandler(userConnectionInfo, minecraftDecoder, decoder);
-            customBukkitDecodeHandler.addCustomDecoder(customDecoder);
-            ChannelHandler protocolLibDecoder = channel.pipeline().get("protocol_lib_decoder");
-            if (protocolLibDecoder != null) {
-                channel.pipeline().remove("protocol_lib_decoder");
-                ((BukkitViaInjector)Via.getManager().getInjector()).setProtocolLib(false);
-                customBukkitDecodeHandler.addCustomDecoder(protocolLibDecoder);
+    @Override
+    public boolean isDebug() {
+        return Via.getManager().isDebug();
+    }
+
+    @Override
+    public Exception throwCancelDecoderException(Throwable throwable) {
+        return CancelDecoderException.generate(throwable);
+    }
+
+    @Override
+    public Exception throwCancelEncoderException(Throwable throwable) {
+        return CancelEncoderException.generate(throwable);
+    }
+
+    @Override
+    public void transformPacket(Object userConnectionObj, Object byteBufObj, boolean clientSide) {
+        UserConnection userConnection = (UserConnection) userConnectionObj;
+        ByteBuf byteBuf = (ByteBuf) byteBufObj;
+
+        try {
+            if (clientSide) {
+                userConnection.transformServerbound(byteBuf, CancelDecoderException::generate);
+            } else {
+                userConnection.transformClientbound(byteBuf, CancelEncoderException::generate);
             }
-            channel.pipeline().replace("decoder", "decoder", customBukkitDecodeHandler);
-            System.out.println("REPLACED like a lil' sussy baka");
-            System.out.println("NEW HANDLERS: " + Arrays.toString(((Channel) channel).pipeline().names().toArray(new String[0])));
-            //TODO load before via and have em' wrap our decoder
-        } else if (ClassUtil.getClassSimpleName(decoder.getClass()).equals("CustomBukkitDecodeHandler")) {
-            ReflectionObject reflectionObject = new ReflectionObject(decoder);
-            //TODO Test multiple packetevents instances that have shaded in diff locations
-            List<MessageToMessageDecoder<?>> customDecoders = reflectionObject.readList(0);
-            ByteToMessageDecoder minecraftDecoder = reflectionObject.read(0, ByteToMessageDecoder.class);
-            UserConnection userConnection = reflectionObject.read(0, UserConnection.class);
-
-            ChannelHandler oldBukkitDecoder = reflectionObject.readObject(0, ChannelHandler.class);
-
-            CustomBukkitDecodeHandler customBukkitDecodeHandler = new CustomBukkitDecodeHandler(userConnection, minecraftDecoder, oldBukkitDecoder);
-            customBukkitDecodeHandler.customDecoders.addAll(customDecoders);
-            customBukkitDecodeHandler.addCustomDecoder(customDecoder);
-            channel.pipeline().replace("decoder", "decoder", customBukkitDecodeHandler);
         }
+        catch (Exception ex) {
+            ex.printStackTrace();
+        }
+    }
+
+    @Override
+    public void setUserConnectionActive(Object userConnectionObj, boolean active) {
+        ((UserConnection)userConnectionObj).setActive(active);
+    }
+
+    @Override
+    public boolean isUserConnectionActive(Object userConnectionObj) {
+        return ((UserConnection)userConnectionObj).isActive();
+    }
+
+    @Override
+    public boolean checkServerboundPacketUserConnection(Object userConnectionObj) {
+        return ((UserConnection)userConnectionObj).checkServerboundPacket();
+    }
+
+    @Override
+    public ConnectionState getUserConnectionProtocolState(Object userConnectionObj) {
+        return ConnectionState.VALUES[((UserConnection)userConnectionObj).getProtocolInfo().getState().ordinal()];
+    }
+
+    @Override
+    public Class<?> getUserConnectionClass() {
+        return UserConnection.class;
+    }
+
+    @Override
+    public Class<?> getBukkitDecodeHandlerClass() {
+        return BukkitDecodeHandler.class;
     }
 }

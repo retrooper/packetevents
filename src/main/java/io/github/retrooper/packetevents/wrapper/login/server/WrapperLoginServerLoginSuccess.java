@@ -27,7 +27,7 @@ import io.github.retrooper.packetevents.wrapper.PacketWrapper;
 import java.util.UUID;
 
 /**
- * This packet switches the connection state to {@link ConnectionState#GAME}.
+ * This packet switches the connection state to {@link ConnectionState#PLAY}.
  */
 public class WrapperLoginServerLoginSuccess extends PacketWrapper<WrapperLoginServerLoginSuccess> {
     private UUID uuid;
@@ -51,7 +51,7 @@ public class WrapperLoginServerLoginSuccess extends PacketWrapper<WrapperLoginSe
 
     @Override
     public void readData() {
-        if (getServerVersion().isNewerThanOrEquals(ServerVersion.v_1_16)) {
+        if (serverVersion.isNewerThanOrEquals(ServerVersion.v_1_16)) {
             int[] data = new int[4];
             for (int i = 0; i < 4; i++) {
                 data[i] = readInt();
@@ -71,7 +71,7 @@ public class WrapperLoginServerLoginSuccess extends PacketWrapper<WrapperLoginSe
 
     @Override
     public void writeData() {
-        if (getServerVersion().isNewerThanOrEquals(ServerVersion.v_1_16)) {
+        if (serverVersion.isNewerThanOrEquals(ServerVersion.v_1_16)) {
             int[] data = serializeUUID(uuid);
             for (int i = 0; i < 4; i++) {
                 writeInt(data[i]);

@@ -19,8 +19,7 @@
 package io.github.retrooper.packetevents.wrapper.login.server;
 
 import io.github.retrooper.packetevents.event.impl.PacketSendEvent;
-import io.github.retrooper.packetevents.manager.player.ClientVersion;
-import io.github.retrooper.packetevents.manager.server.ServerVersion;
+import io.github.retrooper.packetevents.utils.player.ClientVersion;
 import io.github.retrooper.packetevents.protocol.ConnectionState;
 import io.github.retrooper.packetevents.protocol.PacketType;
 import io.github.retrooper.packetevents.wrapper.PacketWrapper;

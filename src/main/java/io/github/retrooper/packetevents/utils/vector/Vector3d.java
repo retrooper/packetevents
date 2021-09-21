@@ -19,6 +19,7 @@
 package io.github.retrooper.packetevents.utils.vector;
 
 import org.bukkit.Location;
+import org.bukkit.World;
 
 /**
  * 3D double Vector.
@@ -193,6 +194,10 @@ public class Vector3d {
         double distY = (y - target.y) * (y - target.y);
         double distZ = (z - target.z) * (z - target.z);
         return distX + distY + distZ;
+    }
+
+    public Location asLocation(World world, float yaw, float pitch) {
+        return new Location(world, x, y, z, yaw, pitch);
     }
 
     @Override

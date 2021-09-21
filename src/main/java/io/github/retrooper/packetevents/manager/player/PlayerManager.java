@@ -20,13 +20,16 @@ package io.github.retrooper.packetevents.manager.player;
 
 import io.github.retrooper.packetevents.PacketEvents;
 import io.github.retrooper.packetevents.manager.server.ServerVersion;
+import io.github.retrooper.packetevents.protocol.ConnectionState;
 import io.github.retrooper.packetevents.utils.GeyserUtil;
 import io.github.retrooper.packetevents.utils.MinecraftReflection;
 import io.github.retrooper.packetevents.utils.PlayerPingAccessorModern;
-import io.github.retrooper.packetevents.utils.dependencies.VersionLookupUtils;
-import io.github.retrooper.packetevents.utils.dependencies.protocolsupport.ProtocolSupportVersionLookupUtils;
-import io.github.retrooper.packetevents.utils.dependencies.v_1_7_10.SpigotVersionLookup_1_7;
-import io.github.retrooper.packetevents.utils.dependencies.viaversion.ViaVersionLookupUtils;
+import io.github.retrooper.packetevents.utils.dependencies.DependencyUtil;
+import io.github.retrooper.packetevents.utils.dependencies.protocolsupport.ProtocolSupportUtil;
+import io.github.retrooper.packetevents.utils.player.ClientVersion;
+import io.github.retrooper.packetevents.utils.player.Skin;
+import io.github.retrooper.packetevents.utils.v1_7.SpigotVersionLookup_1_7;
+import io.github.retrooper.packetevents.utils.dependencies.viaversion.ViaVersionUtil;
 import io.github.retrooper.packetevents.utils.gameprofile.GameProfileUtil;
 import io.github.retrooper.packetevents.utils.gameprofile.WrappedGameProfile;
 import io.github.retrooper.packetevents.utils.netty.buffer.ByteBufAbstract;
@@ -41,7 +44,17 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class PlayerManager {
     public final Map<Object, ClientVersion> clientVersions = new ConcurrentHashMap<>();
+    public final Map<Object, ConnectionState> connectionStates = new ConcurrentHashMap<>();
     public final Map<String, Object> channels = new ConcurrentHashMap<>();
+
+    public ConnectionState getConnectionState(Player player) {
+        Object channel = getChannel(player);
+        ConnectionState state = connectionStates.get(channel);
+        if (state == null) {
+            state = ConnectionState.PLAY;
+        }
+        return state;
+    }
 
     /**
      * Use the ping PacketEvents calculates for the player. (Updates every incoming Keep Alive packet)
@@ -65,17 +78,17 @@ public class PlayerManager {
      * @see #clientVersions
      */
     @NotNull
-    public ClientVersion getClientVersion(@NotNull final Player player) {
+    public ClientVersion getClientVersion(@NotNull Player player) {
         if (player.getAddress() == null) {
             return ClientVersion.UNKNOWN;
         }
-        Object channel = PacketEvents.get().getPlayerManager().getChannel(player);
+        Object channel = getChannel(player);
         ClientVersion version = clientVersions.get(channel);
-        if (version == null) {
+        if (version == null || !version.isResolved()) {
             //Asking ViaVersion or ProtocolSupport for the protocol version.
-            if (VersionLookupUtils.isDependencyAvailable()) {
+            if (DependencyUtil.isDependencyAvailable()) {
                 try {
-                    version = ClientVersion.getClientVersionByProtocolVersion(VersionLookupUtils.getProtocolVersion(player));
+                    version = ClientVersion.getClientVersionByProtocolVersion(DependencyUtil.getProtocolVersion(player));
                     clientVersions.put(channel, version);
                     return version;
                 } catch (Exception ex) {
@@ -104,7 +117,7 @@ public class PlayerManager {
     public void sendPacket(ChannelAbstract channel, ByteBufAbstract byteBuf) {
         //TODO Also check if our encoder is RIGHT before minecraft's,
         //if it is, then don't use context to writeflush, otherwise use it (to support multiple packetevents instances)
-        if (ViaVersionLookupUtils.isAvailable() && !ProtocolSupportVersionLookupUtils.isAvailable()) {
+        if (ViaVersionUtil.isAvailable() && !ProtocolSupportUtil.isAvailable()) {
             channel.writeAndFlush(byteBuf);
         } else {
             channel.pipeline().context(PacketEvents.get().encoderName).writeAndFlush(byteBuf);

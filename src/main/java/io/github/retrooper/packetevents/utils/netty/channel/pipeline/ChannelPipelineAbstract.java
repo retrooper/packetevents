@@ -37,6 +37,11 @@ public interface ChannelPipelineAbstract {
 
     List<String> names();
 
+    //namesArray is not a feature in netty, something I came up with to make my life easier
+    default String[] namesArray() {
+        return names().toArray(new String[0]);
+    }
+
     ChannelHandlerAbstract get(String handlerName);
 
     ChannelPipelineAbstract addFirst(String handlerName, ChannelHandlerAbstract handler);

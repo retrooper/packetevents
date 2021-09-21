@@ -22,10 +22,14 @@ import io.github.retrooper.packetevents.PacketEvents;
 import io.github.retrooper.packetevents.handlers.modern.PacketDecoderModern;
 import io.github.retrooper.packetevents.handlers.modern.PacketEncoderModern;
 import io.github.retrooper.packetevents.utils.dependencies.viaversion.CustomBukkitDecodeHandler;
-import io.github.retrooper.packetevents.utils.reflection.ClassUtil;
+import io.github.retrooper.packetevents.utils.reflection.Reflection;
+import io.github.retrooper.packetevents.utils.reflection.ReflectionObject;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandler;
-import org.bukkit.Bukkit;
+import io.netty.handler.codec.ByteToMessageDecoder;
+
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 
 
 public class ServerConnectionInitializerModern {
@@ -40,19 +44,23 @@ public class ServerConnectionInitializerModern {
             //Convert back to the original ViaVersion decoder
             CustomBukkitDecodeHandler customBukkitDecodeHandler = (CustomBukkitDecodeHandler) mcDecoder;
             channel.pipeline().replace("decoder", "decoder", customBukkitDecodeHandler.oldBukkitDecodeHandler);
-            if (Bukkit.getPluginManager().getPlugin("ProtocolLib") != null) {
-                ChannelHandler plibDecoder = null;
-                for (Object o : customBukkitDecodeHandler.customDecoders) {
-                    if (ClassUtil.getClassSimpleName(o.getClass()).equals("ChannelInjector")) {
-                        plibDecoder = (ChannelHandler) o;
-                    }
-                }
-                if (plibDecoder != null) {
-                    channel.pipeline().addBefore("decoder", "protocol_lib_decoder", plibDecoder);
+            ChannelHandler protocolLibDecoder = channel.pipeline().get("protocol_lib_decoder");
+            if (protocolLibDecoder != null) {
+                //Reflect the ProtocolLib decoder
+                ReflectionObject reflectProtocolLibDecoder = new ReflectionObject(protocolLibDecoder);
+                //Correct the vanillaDecoder variable in the ProtocolLib decoder
+                reflectProtocolLibDecoder.write(ByteToMessageDecoder.class, 0, customBukkitDecodeHandler.oldBukkitDecodeHandler);
+                //Correct the decodeBuffer variable in ProtocolLib decoder
+                Method minecraftDecodeMethod = Reflection.getMethod(customBukkitDecodeHandler.oldBukkitDecodeHandler.getClass(), "decode", 0);
+                try {
+                    Field decodeBufferField = protocolLibDecoder.getClass().getDeclaredField("decodeBuffer");
+                    decodeBufferField.setAccessible(true);
+                    decodeBufferField.set(protocolLibDecoder, minecraftDecodeMethod);
+                } catch (NoSuchFieldException | IllegalAccessException e) {
+                    e.printStackTrace();
                 }
             }
-        }
-        else {
+        } else {
             channel.pipeline().remove(PacketEvents.get().decoderName);
             channel.pipeline().remove(PacketEvents.get().encoderName);
         }

@@ -38,6 +38,10 @@ public class GlobalChannelInjector {
         return injectEarly;
     }
 
+    public void setShouldInjectEarly(boolean injectEarly) {
+        this.injectEarly = injectEarly;
+    }
+
     public void load() {
         if (injectEarly) {
             injector = MinecraftReflection.USE_MODERN_NETTY_PACKAGE ? new EarlyChannelInjectorModern() : new EarlyChannelInjectorLegacy();
