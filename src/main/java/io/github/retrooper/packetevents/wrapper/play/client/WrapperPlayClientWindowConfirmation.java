@@ -21,7 +21,22 @@ package io.github.retrooper.packetevents.wrapper.play.client;
 import io.github.retrooper.packetevents.event.impl.PacketReceiveEvent;
 import io.github.retrooper.packetevents.protocol.PacketType;
 import io.github.retrooper.packetevents.wrapper.PacketWrapper;
+import io.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerWindowConfirmation;
 
+/**
+ * A response to the window confirmation packet by the client
+ * It is processed on the main thread, and is therefore very useful for anticheat purposes
+ *
+ * If a confirmation sent by the client was not accepted, the server will reply with a
+ * {@link WrapperPlayServerWindowConfirmation}
+ * packet with the Accepted field set to false. When this happens,
+ * the client must send this packet to apologize (as with movement),
+ * otherwise the server ignores any successive confirmations.
+ *
+ * Replaced in 1.17 with the more efficient {@link WrapperPlayClientPong}
+ *
+ * @see WrapperPlayServerWindowConfirmation
+ */
 public class WrapperPlayClientWindowConfirmation extends PacketWrapper<WrapperPlayClientWindowConfirmation> {
     private int windowID;
     private short actionNumber;
