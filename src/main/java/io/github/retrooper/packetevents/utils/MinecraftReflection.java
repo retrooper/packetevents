@@ -19,6 +19,7 @@
 package io.github.retrooper.packetevents.utils;
 
 import io.github.retrooper.packetevents.PacketEvents;
+import io.github.retrooper.packetevents.manager.server.ServerManager;
 import io.github.retrooper.packetevents.manager.server.ServerVersion;
 import io.github.retrooper.packetevents.utils.reflection.Reflection;
 import io.github.retrooper.packetevents.utils.reflection.ReflectionObject;
@@ -159,7 +160,7 @@ public final class MinecraftReflection {
     }
 
     public static void init() {
-        VERSION = PacketEvents.get().getServerManager().getVersion();
+        VERSION = ServerManager.getVersion();
         V_1_17_OR_HIGHER = VERSION.isNewerThanOrEquals(ServerVersion.v_1_17);
         V_1_12_OR_HIGHER = VERSION.isNewerThanOrEquals(ServerVersion.v_1_12);
         USE_MODERN_NETTY_PACKAGE = VERSION.isNewerThan(ServerVersion.v_1_7_10);

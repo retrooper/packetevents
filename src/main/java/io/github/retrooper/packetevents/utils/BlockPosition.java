@@ -18,7 +18,7 @@
 
 package io.github.retrooper.packetevents.utils;
 
-import io.github.retrooper.packetevents.PacketEvents;
+import io.github.retrooper.packetevents.manager.server.ServerManager;
 import io.github.retrooper.packetevents.manager.server.ServerVersion;
 import io.github.retrooper.packetevents.utils.vector.Vector3d;
 import io.github.retrooper.packetevents.utils.vector.Vector3f;
@@ -74,7 +74,7 @@ public class BlockPosition {
         int z;
 
         // 1.14 method for this is storing X Z Y
-        if (PacketEvents.get().getServerManager().getVersion().isNewerThanOrEquals(ServerVersion.v_1_14)) {
+        if (ServerManager.getVersion().isNewerThanOrEquals(ServerVersion.v_1_14)) {
             y = (int) (val & 0xFFF);
             z = (int) (val << 26 >> 38);
         } else {
@@ -134,7 +134,7 @@ public class BlockPosition {
 
     public long getSerializedPosition() {
         // 1.14 method for this is storing X Z Y
-        if (PacketEvents.get().getServerManager().getVersion().isNewerThanOrEquals(ServerVersion.v_1_14)) {
+        if (ServerManager.getVersion().isNewerThanOrEquals(ServerVersion.v_1_14)) {
             return ((long) (getX() & 0x3FFFFFF) << 38) | ((long) (getZ() & 0x3FFFFFF) << 12) | (getY() & 0xFFF);
         }
         // 1.13 and below store X Y Z

@@ -19,6 +19,7 @@
 package io.github.retrooper.packetevents.updatechecker;
 
 import io.github.retrooper.packetevents.PacketEvents;
+import io.github.retrooper.packetevents.manager.server.ServerManager;
 import io.github.retrooper.packetevents.manager.server.ServerVersion;
 import io.github.retrooper.packetevents.utils.PEVersion;
 import org.bukkit.Bukkit;
@@ -34,7 +35,7 @@ public class UpdateChecker {
     private final LowLevelUpdateChecker lowLevelUpdateChecker;
 
     public UpdateChecker() {
-        if (PacketEvents.get().getServerManager().getVersion().isOlderThan(ServerVersion.v_1_8)) {
+        if (ServerManager.getVersion().isOlderThan(ServerVersion.v_1_8)) {
             lowLevelUpdateChecker = new LowLevelUpdateCheckerLegacy();
         } else {
             lowLevelUpdateChecker = new LowLevelUpdateCheckerModern();

@@ -18,8 +18,8 @@
 
 package io.github.retrooper.packetevents.utils.reflection;
 
-import io.github.retrooper.packetevents.PacketEvents;
 import io.github.retrooper.packetevents.exceptions.ReflectionObjectFieldNotFoundException;
+import io.github.retrooper.packetevents.manager.server.ServerManager;
 import io.github.retrooper.packetevents.manager.server.ServerVersion;
 
 import java.lang.annotation.ElementType;
@@ -67,9 +67,9 @@ public class ReflectionObject implements ReflectionObjectReader, WrapperPacketWr
             SupportedVersions supportedVersions = field.getAnnotation(SupportedVersions.class);
             List<ServerVersion> versionList = parseSupportedVersionsAnnotation(supportedVersions);
             String supportedVersionsMsg = Arrays.toString(versionList.toArray(new ServerVersion[0]));
-            throw new UnsupportedOperationException("PacketEvents failed to use the " + enumConst.name() + " enum constant in the " + enumConstClass.getSimpleName() + " enum. This enum constant is not supported on your server version. (" + PacketEvents.get().getServerManager().getVersion() + ")\n This enum constant is only supported on these server versions: " + supportedVersionsMsg);
+            throw new UnsupportedOperationException("PacketEvents failed to use the " + enumConst.name() + " enum constant in the " + enumConstClass.getSimpleName() + " enum. This enum constant is not supported on your server version. (" + ServerManager.getVersion() + ")\n This enum constant is only supported on these server versions: " + supportedVersionsMsg);
         } else {
-            throw new UnsupportedOperationException("PacketEvents failed to use the " + enumConst.name() + " enum constant in the " + enumConstClass.getSimpleName() + " enum. This enum constant is not supported on your server version. (" + PacketEvents.get().getServerManager().getVersion() + ")\n Failed to find out what server versions this enum constant is supported on.");
+            throw new UnsupportedOperationException("PacketEvents failed to use the " + enumConst.name() + " enum constant in the " + enumConstClass.getSimpleName() + " enum. This enum constant is not supported on your server version. (" + ServerManager.getVersion() + ")\n Failed to find out what server versions this enum constant is supported on.");
         }
     }
 
@@ -101,7 +101,7 @@ public class ReflectionObject implements ReflectionObjectReader, WrapperPacketWr
             List<ServerVersion> versionList = parseSupportedVersionsAnnotation(supportedVersions);
 
             String supportedVersionsMsg = Arrays.toString(versionList.toArray(new ServerVersion[0]));
-            throw new UnsupportedOperationException("PacketEvents failed to access your requested field. This field is not supported on your server version. (" + PacketEvents.get().getServerManager().getVersion() + ")\n This field is only supported on these server versions: " + supportedVersionsMsg);
+            throw new UnsupportedOperationException("PacketEvents failed to access your requested field. This field is not supported on your server version. (" + ServerManager.getVersion() + ")\n This field is only supported on these server versions: " + supportedVersionsMsg);
         }
     }
 

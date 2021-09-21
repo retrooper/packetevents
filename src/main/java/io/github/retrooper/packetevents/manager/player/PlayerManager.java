@@ -19,6 +19,7 @@
 package io.github.retrooper.packetevents.manager.player;
 
 import io.github.retrooper.packetevents.PacketEvents;
+import io.github.retrooper.packetevents.manager.server.ServerManager;
 import io.github.retrooper.packetevents.manager.server.ServerVersion;
 import io.github.retrooper.packetevents.protocol.ConnectionState;
 import io.github.retrooper.packetevents.utils.GeyserUtil;
@@ -26,14 +27,14 @@ import io.github.retrooper.packetevents.utils.MinecraftReflection;
 import io.github.retrooper.packetevents.utils.PlayerPingAccessorModern;
 import io.github.retrooper.packetevents.utils.dependencies.DependencyUtil;
 import io.github.retrooper.packetevents.utils.dependencies.protocolsupport.ProtocolSupportUtil;
-import io.github.retrooper.packetevents.utils.player.ClientVersion;
-import io.github.retrooper.packetevents.utils.player.Skin;
-import io.github.retrooper.packetevents.utils.v1_7.SpigotVersionLookup_1_7;
 import io.github.retrooper.packetevents.utils.dependencies.viaversion.ViaVersionUtil;
 import io.github.retrooper.packetevents.utils.gameprofile.GameProfileUtil;
 import io.github.retrooper.packetevents.utils.gameprofile.WrappedGameProfile;
 import io.github.retrooper.packetevents.utils.netty.buffer.ByteBufAbstract;
 import io.github.retrooper.packetevents.utils.netty.channel.ChannelAbstract;
+import io.github.retrooper.packetevents.utils.player.ClientVersion;
+import io.github.retrooper.packetevents.utils.player.Skin;
+import io.github.retrooper.packetevents.utils.v1_7.SpigotVersionLookup_1_7;
 import io.github.retrooper.packetevents.wrapper.PacketWrapper;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
@@ -99,13 +100,13 @@ public class PlayerManager {
             } else {
                 short protocolVersion;
                 //Luckily 1.7.10 provides a method for us to access a player's protocol version(because 1.7.10 servers support 1.8 clients too)
-                if (PacketEvents.get().getServerManager().getVersion().isOlderThan(ServerVersion.v_1_8)) {
+                if (ServerManager.getVersion().isOlderThan(ServerVersion.v_1_8)) {
                     protocolVersion = (short) SpigotVersionLookup_1_7.getProtocolVersion(player);
                 } else {
                     //No dependency available, couldn't snatch the version from the packet AND server version is not 1.7.10
                     //We are pretty safe to assume the version is the same as the server, as ViaVersion AND ProtocolSupport could not be found.
                     //If you aren't using ViaVersion or ProtocolSupport, how are you supporting multiple protocol versions?
-                    protocolVersion = PacketEvents.get().getServerManager().getVersion().getProtocolVersion();
+                    protocolVersion = ServerManager.getVersion().getProtocolVersion();
                 }
                 version = ClientVersion.getClientVersionByProtocolVersion(protocolVersion);
                 clientVersions.put(channel, version);

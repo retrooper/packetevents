@@ -54,7 +54,7 @@ public final class ServerManager {
      *
      * @return Get Server Version
      */
-    public ServerVersion getVersion() {
+    public static ServerVersion getVersion() {
         return version;
     }
 

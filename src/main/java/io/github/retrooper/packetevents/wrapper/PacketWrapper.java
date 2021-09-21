@@ -18,16 +18,16 @@
 
 package io.github.retrooper.packetevents.wrapper;
 
-import io.github.retrooper.packetevents.PacketEvents;
 import io.github.retrooper.packetevents.event.impl.PacketReceiveEvent;
 import io.github.retrooper.packetevents.event.impl.PacketSendEvent;
-import io.github.retrooper.packetevents.utils.StringUtil;
-import io.github.retrooper.packetevents.utils.player.ClientVersion;
+import io.github.retrooper.packetevents.manager.server.ServerManager;
 import io.github.retrooper.packetevents.manager.server.ServerVersion;
+import io.github.retrooper.packetevents.utils.BlockPosition;
 import io.github.retrooper.packetevents.utils.MinecraftReflection;
+import io.github.retrooper.packetevents.utils.StringUtil;
 import io.github.retrooper.packetevents.utils.netty.buffer.ByteBufAbstract;
 import io.github.retrooper.packetevents.utils.netty.buffer.ByteBufUtil;
-import io.github.retrooper.packetevents.utils.BlockPosition;
+import io.github.retrooper.packetevents.utils.player.ClientVersion;
 import org.bukkit.inventory.ItemStack;
 
 import java.nio.charset.StandardCharsets;
@@ -78,15 +78,15 @@ public class PacketWrapper<T extends PacketWrapper> {
     }
 
     public PacketWrapper(int packetID, ClientVersion clientVersion) {
-        this(clientVersion, PacketEvents.get().getServerManager().getVersion(), ByteBufUtil.buffer(), packetID);
+        this(clientVersion, ServerManager.getVersion(), ByteBufUtil.buffer(), packetID);
     }
 
     public PacketWrapper(int packetID) {
-        this(ClientVersion.UNKNOWN, PacketEvents.get().getServerManager().getVersion(), ByteBufUtil.buffer(), packetID);
+        this(ClientVersion.UNKNOWN, ServerManager.getVersion(), ByteBufUtil.buffer(), packetID);
     }
 
     public static PacketWrapper createUniversalPacketWrapper(ByteBufAbstract byteBuf) {
-        return new PacketWrapper(ClientVersion.UNKNOWN, PacketEvents.get().getServerManager().getVersion(), byteBuf, -1);
+        return new PacketWrapper(ClientVersion.UNKNOWN, ServerManager.getVersion(), byteBuf, -1);
     }
 
     public void createPacket() {

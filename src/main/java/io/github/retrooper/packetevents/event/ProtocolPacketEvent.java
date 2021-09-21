@@ -21,7 +21,7 @@ package io.github.retrooper.packetevents.event;
 import io.github.retrooper.packetevents.PacketEvents;
 import io.github.retrooper.packetevents.event.type.CancellableEvent;
 import io.github.retrooper.packetevents.event.type.PlayerEvent;
-import io.github.retrooper.packetevents.utils.player.ClientVersion;
+import io.github.retrooper.packetevents.manager.server.ServerManager;
 import io.github.retrooper.packetevents.manager.server.ServerVersion;
 import io.github.retrooper.packetevents.protocol.ConnectionState;
 import io.github.retrooper.packetevents.protocol.PacketSide;
@@ -29,6 +29,7 @@ import io.github.retrooper.packetevents.protocol.PacketType;
 import io.github.retrooper.packetevents.protocol.PacketTypeCommon;
 import io.github.retrooper.packetevents.utils.netty.buffer.ByteBufAbstract;
 import io.github.retrooper.packetevents.utils.netty.channel.ChannelAbstract;
+import io.github.retrooper.packetevents.utils.player.ClientVersion;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -76,7 +77,7 @@ public abstract class ProtocolPacketEvent extends PacketEvent implements PlayerE
         }
         this.clientVersion = version;
 
-        this.serverVersion = PacketEvents.get().getServerManager().getVersion();
+        this.serverVersion = ServerManager.getVersion();
 
         this.byteBuf = byteBuf;
         this.packetID = readVarInt(byteBuf);
@@ -103,7 +104,7 @@ public abstract class ProtocolPacketEvent extends PacketEvent implements PlayerE
         }
         this.clientVersion = version;
 
-        this.serverVersion = PacketEvents.get().getServerManager().getVersion();
+        this.serverVersion = ServerManager.getVersion();
 
         this.byteBuf = byteBuf;
         this.packetID = readVarInt(byteBuf);

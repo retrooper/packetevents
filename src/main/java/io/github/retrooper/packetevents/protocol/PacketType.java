@@ -18,11 +18,11 @@
 
 package io.github.retrooper.packetevents.protocol;
 
-import io.github.retrooper.packetevents.PacketEvents;
-import io.github.retrooper.packetevents.utils.player.ClientVersion;
+import io.github.retrooper.packetevents.manager.server.ServerManager;
 import io.github.retrooper.packetevents.manager.server.ServerVersion;
 import io.github.retrooper.packetevents.protocol.protocols.clientbound.*;
 import io.github.retrooper.packetevents.protocol.protocols.serverbound.*;
+import io.github.retrooper.packetevents.utils.player.ClientVersion;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.HashMap;
@@ -299,7 +299,7 @@ public final class PacketType {
                 Map<PacketTypeCommon, Integer> secondInnerMap = new IdentityHashMap<>();
                 for (int id = 0; id < enumConstants.length; id++) {
                     Client value = Client.valueOf(enumConstants[id].name());
-                    if (version.getProtocolVersion() == PacketEvents.get().getServerManager().getVersion().getProtocolVersion()) {
+                    if (version.getProtocolVersion() == ServerManager.getVersion().getProtocolVersion()) {
                         value.id = id;
                     }
                     innerMap.put(id, value);
@@ -479,7 +479,7 @@ public final class PacketType {
             }
 
             public static void load() {
-                ServerVersion version = PacketEvents.get().getServerManager().getVersion();
+                ServerVersion version = ServerManager.getVersion();
                 //1.7.10
                 if (version.isOlderThan(ServerVersion.v_1_8)) {
                     loadPacketIDs(ClientboundPacketType_1_7_10.values());
