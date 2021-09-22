@@ -26,9 +26,11 @@ import io.github.retrooper.packetevents.utils.BlockPosition;
 import io.github.retrooper.packetevents.utils.MinecraftReflection;
 import io.github.retrooper.packetevents.utils.StringUtil;
 import io.github.retrooper.packetevents.utils.nbt.NBTCompound;
+import io.github.retrooper.packetevents.utils.nbt.NBTEnd;
 import io.github.retrooper.packetevents.utils.nbt.serializer.DefaultNBTSerializer;
 import io.github.retrooper.packetevents.utils.netty.buffer.ByteBufAbstract;
 import io.github.retrooper.packetevents.utils.netty.buffer.ByteBufAbstractInputStream;
+import io.github.retrooper.packetevents.utils.netty.buffer.ByteBufAbstractOutputStream;
 import io.github.retrooper.packetevents.utils.netty.buffer.ByteBufUtil;
 import io.github.retrooper.packetevents.utils.player.ClientVersion;
 import org.bukkit.inventory.ItemStack;
@@ -220,6 +222,18 @@ public class PacketWrapper<T extends PacketWrapper> {
             e.printStackTrace();
         }
         return null;
+    }
+
+    public void writeTag(NBTCompound tag) {
+        try (ByteBufAbstractOutputStream outputStream = new ByteBufAbstractOutputStream(byteBuf)) {
+            if (tag != null) {
+                DefaultNBTSerializer.INSTANCE.serializeTag(outputStream, tag);
+            } else {
+                DefaultNBTSerializer.INSTANCE.serializeTag(outputStream, NBTEnd.INSTANCE);
+            }
+        } catch (IOException e) {
+            throw new IllegalStateException(e);
+        }
     }
 
     public String readString() {
