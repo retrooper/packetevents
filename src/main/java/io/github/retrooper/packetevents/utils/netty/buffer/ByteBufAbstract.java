@@ -190,6 +190,8 @@ public interface ByteBufAbstract {
 
     ByteBufAbstract readBytes(int i);
 
+    ByteBufAbstract readBytes(byte[] bytes, int a, int b);
+
     void readBytes(byte[] bytes);
 
     ByteBufAbstract getBytes(int readerIndex, byte[] bytes);
@@ -201,4 +203,14 @@ public interface ByteBufAbstract {
     ByteBufAbstract setBytes(int i, byte[] bytes);
 
     String toString(int i, int j, Charset charset);
+
+    ByteBufAbstract markReaderIndex();
+
+    ByteBufAbstract resetReaderIndex();
+
+    ByteBufAbstract markWriterIndex();
+
+    ByteBufAbstract resetWriterIndex();
+
+    ByteBufAbstract skipBytes(int length);
 }

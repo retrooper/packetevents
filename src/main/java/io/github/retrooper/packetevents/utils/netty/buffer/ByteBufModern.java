@@ -414,6 +414,11 @@ public class ByteBufModern implements ByteBufAbstract {
     }
 
     @Override
+    public ByteBufAbstract readBytes(byte[] bytes, int a, int b) {
+        return new ByteBufModern(byteBuf.readBytes(bytes, a, b));
+    }
+
+    @Override
     public void readBytes(byte[] bytes) {
         byteBuf.readBytes(bytes);
     }
@@ -441,5 +446,30 @@ public class ByteBufModern implements ByteBufAbstract {
     @Override
     public String toString(int i, int j, Charset charset) {
         return byteBuf.toString(i, j, charset);
+    }
+
+    @Override
+    public ByteBufAbstract markReaderIndex() {
+        return new ByteBufModern(byteBuf.markReaderIndex());
+    }
+
+    @Override
+    public ByteBufAbstract resetReaderIndex() {
+        return new ByteBufModern(byteBuf.resetReaderIndex());
+    }
+
+    @Override
+    public ByteBufAbstract markWriterIndex() {
+        return new ByteBufModern(byteBuf.markWriterIndex());
+    }
+
+    @Override
+    public ByteBufAbstract resetWriterIndex() {
+        return new ByteBufModern(byteBuf.resetWriterIndex());
+    }
+
+    @Override
+    public ByteBufAbstract skipBytes(int length) {
+        return new ByteBufModern(byteBuf.skipBytes(length));
     }
 }

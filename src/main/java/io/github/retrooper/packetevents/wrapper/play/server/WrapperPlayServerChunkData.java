@@ -21,6 +21,7 @@ package io.github.retrooper.packetevents.wrapper.play.server;
 import io.github.retrooper.packetevents.event.impl.PacketSendEvent;
 import io.github.retrooper.packetevents.manager.server.ServerVersion;
 import io.github.retrooper.packetevents.protocol.PacketType;
+import io.github.retrooper.packetevents.utils.nbt.NBTCompound;
 import io.github.retrooper.packetevents.wrapper.PacketWrapper;
 
 import java.util.BitSet;
@@ -33,6 +34,7 @@ public class WrapperPlayServerChunkData extends PacketWrapper<WrapperPlayServerC
     private Optional<Boolean> groundUpContinuous;
     private Optional<Boolean> fullChunk;
     private Optional<Boolean> ignoreOldData;
+    private Optional<NBTCompound> heightMaps;
     public WrapperPlayServerChunkData(PacketSendEvent event) {
         super(event);
     }
@@ -66,6 +68,16 @@ public class WrapperPlayServerChunkData extends PacketWrapper<WrapperPlayServerC
         else {
             primaryBitSet = BitSet.valueOf(new long[] {readUnsignedShort()});
         }
+
+        if (serverVersion.isNewerThanOrEquals(ServerVersion.v_1_14)) {
+            heightMaps = Optional.of(readTag());
+        }
+
+        //Biom thingy here on 1.17 and 1.16.x ig? (todo look further)
+
+        //newer versions have some extra data
+
+        //then we can finally go to size and the real byte array with data
 
         net.minecraft.server.v1_7_R4.PacketPlayOutMapChunk mc0;
         net.minecraft.server.v1_8_R3.PacketPlayOutMapChunk mc1;

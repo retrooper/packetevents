@@ -25,11 +25,15 @@ import io.github.retrooper.packetevents.manager.server.ServerVersion;
 import io.github.retrooper.packetevents.utils.BlockPosition;
 import io.github.retrooper.packetevents.utils.MinecraftReflection;
 import io.github.retrooper.packetevents.utils.StringUtil;
+import io.github.retrooper.packetevents.utils.nbt.NBTCompound;
+import io.github.retrooper.packetevents.utils.nbt.serializer.DefaultNBTSerializer;
 import io.github.retrooper.packetevents.utils.netty.buffer.ByteBufAbstract;
+import io.github.retrooper.packetevents.utils.netty.buffer.ByteBufAbstractInputStream;
 import io.github.retrooper.packetevents.utils.netty.buffer.ByteBufUtil;
 import io.github.retrooper.packetevents.utils.player.ClientVersion;
 import org.bukkit.inventory.ItemStack;
 
+import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
@@ -207,6 +211,15 @@ public class PacketWrapper<T extends PacketWrapper> {
         Object packetDataSerializer = MinecraftReflection.createPacketDataSerializer(byteBuf.rawByteBuf());
         Object nmsItemStack = MinecraftReflection.toNMSItemStack(itemStack);
         MinecraftReflection.writeNMSItemStackPacketDataSerializer(packetDataSerializer, nmsItemStack);
+    }
+
+    public NBTCompound readTag() {
+        try {
+            return (NBTCompound) DefaultNBTSerializer.INSTANCE.deserializeTag(new ByteBufAbstractInputStream(byteBuf));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 
     public String readString() {
