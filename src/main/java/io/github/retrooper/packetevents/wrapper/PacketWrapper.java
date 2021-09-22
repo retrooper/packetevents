@@ -356,7 +356,7 @@ public class PacketWrapper<T extends PacketWrapper> {
         writeLong(uuid.getLeastSignificantBits());
     }
 
-    public BlockPosition readBlockPos() {
+    public BlockPosition readBlockPosition() {
         long val = readLong();
         int x = (int) (val >> 38);
 
@@ -372,7 +372,7 @@ public class PacketWrapper<T extends PacketWrapper> {
         return new BlockPosition(x, y, z);
     }
 
-    public void writeBlockPos(BlockPosition pos) {
+    public void writeBlockPosition(BlockPosition pos) {
         // 1.14 method for this is storing X Z Y
         if (serverVersion.isNewerThanOrEquals(ServerVersion.v_1_14)) {
             long val = ((long) (pos.getX() & 0x3FFFFFF) << 38) | ((long) (pos.getZ() & 0x3FFFFFF) << 12) | (pos.getY() & 0xFFF);

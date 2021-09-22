@@ -6,9 +6,9 @@ import io.github.retrooper.packetevents.utils.BlockPosition;
 import io.github.retrooper.packetevents.wrapper.PacketWrapper;
 
 public class WrapperPlayServerBlockAction extends PacketWrapper<WrapperPlayServerBlockAction> {
-    BlockPosition blockPos;
-    int actionID, actionParam;
-    int block;
+    private BlockPosition blockPos;
+    private int actionID, actionParam;
+    private int blockID;
 
     public WrapperPlayServerBlockAction(PacketSendEvent event) {
         super(event);
@@ -19,23 +19,23 @@ public class WrapperPlayServerBlockAction extends PacketWrapper<WrapperPlayServe
         this.blockPos = blockPos;
         this.actionID = actionID;
         this.actionParam = actionParam;
-        this.block = block;
+        this.blockID = block;
     }
 
     @Override
     public void readData() {
-        this.blockPos = readBlockPos();
+        this.blockPos = readBlockPosition();
         this.actionID = readUnsignedByte();
         this.actionParam = readUnsignedByte();
-        this.block = readInt();
+        this.blockID = readInt();
     }
 
     @Override
     public void writeData() {
-        writeBlockPos(blockPos);
+        writeBlockPosition(blockPos);
         writeByte(actionID);
         writeByte(actionParam);
-        writeVarInt(block);
+        writeVarInt(blockID);
     }
 
     @Override
@@ -43,7 +43,7 @@ public class WrapperPlayServerBlockAction extends PacketWrapper<WrapperPlayServe
         this.blockPos = wrapper.getBlockPos();
         this.actionID = wrapper.getActionID();
         this.actionParam = wrapper.getActionParam();
-        this.block = wrapper.getBlock();
+        this.blockID = wrapper.getBlockID();
     }
 
     public BlockPosition getBlockPos() {
@@ -70,11 +70,11 @@ public class WrapperPlayServerBlockAction extends PacketWrapper<WrapperPlayServe
         this.actionParam = actionParam;
     }
 
-    public int getBlock() {
-        return block;
+    public int getBlockID() {
+        return blockID;
     }
 
-    public void setBlock(int block) {
-        this.block = block;
+    public void setBlockID(int blockID) {
+        this.blockID = blockID;
     }
 }

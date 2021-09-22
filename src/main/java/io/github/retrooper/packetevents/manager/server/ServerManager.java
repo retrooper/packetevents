@@ -42,7 +42,7 @@ import java.util.Map;
 
 public final class ServerManager {
     //Initialized in PacketEvents#load
-    public Map<Integer, Entity> entityCache;
+    public static Map<Integer, Entity> entityCache;
     private static final ServerVersion version;
 
     static {
@@ -63,7 +63,7 @@ public final class ServerManager {
      *
      * @return Get Recent TPS
      */
-    public double[] getRecentTPS() {
+    public static double[] getRecentTPS() {
         return MinecraftReflection.recentTPS();
     }
 
@@ -72,7 +72,7 @@ public final class ServerManager {
      *
      * @return Get Current TPS
      */
-    public double getTPS() {
+    public static double getTPS() {
         return getRecentTPS()[0];
     }
 
@@ -81,15 +81,15 @@ public final class ServerManager {
      *
      * @return Get Operating System
      */
-    public SystemOS getOS() {
+    public static SystemOS getOS() {
         return SystemOS.getOS();
     }
 
-    public boolean isBungeeCordEnabled() {
+    public static boolean isBungeeCordEnabled() {
         return SpigotConfig.bungee;
     }
 
-    public BoundingBox getEntityBoundingBox(Entity entity) {
+    public static BoundingBox getEntityBoundingBox(Entity entity) {
         Object nmsEntity = MinecraftReflection.getNMSEntity(entity);
         Object aabb = MinecraftReflection.getNMSAxisAlignedBoundingBox(nmsEntity);
         ReflectionObject wrappedBoundingBox = new ReflectionObject(aabb);
@@ -102,30 +102,30 @@ public final class ServerManager {
         return new BoundingBox(minX, minY, minZ, maxX, maxY, maxZ);
     }
 
-    public void receivePacket(ChannelAbstract channel, ByteBufAbstract byteBuf) {
+    public static void receivePacket(ChannelAbstract channel, ByteBufAbstract byteBuf) {
         //TODO Test with Via present
         ChannelHandlerContextAbstract ctx = channel.pipeline().context(PacketEvents.get().decoderName);
         ChannelInboundHandlerUtil.handlerChannelRead(ctx.handler().rawChannelHandler(),
                 ctx.rawChannelHandlerContext(), byteBuf.rawByteBuf());
     }
 
-    public void receivePacket(Player player, ByteBufAbstract byteBuf) {
+    public static void receivePacket(Player player, ByteBufAbstract byteBuf) {
         ChannelAbstract channel = ChannelAbstract.generate(PacketEvents.get().getPlayerManager().getChannel(player));
         receivePacket(channel, byteBuf);
     }
 
-    public void receivePacket(Player player, PacketWrapper<?> wrapper) {
+    public static void receivePacket(Player player, PacketWrapper<?> wrapper) {
         wrapper.createPacket();
         ChannelAbstract channel = ChannelAbstract.generate(PacketEvents.get().getPlayerManager().getChannel(player));
         receivePacket(channel, wrapper.byteBuf);
     }
 
-    public void receivePacket(ChannelAbstract channel, PacketWrapper<?> wrapper) {
+    public static void receivePacket(ChannelAbstract channel, PacketWrapper<?> wrapper) {
         wrapper.createPacket();
         receivePacket(channel, wrapper.byteBuf);
     }
 
-    private Entity getEntityByIDWithWorldUnsafe(World world, int id) {
+    private static Entity getEntityByIDWithWorldUnsafe(World world, int id) {
         if (world == null) {
             return null;
         }
@@ -146,7 +146,7 @@ public final class ServerManager {
     }
 
     @Nullable
-    private Entity getEntityByIDUnsafe(World origin, int id) {
+    private static Entity getEntityByIDUnsafe(World origin, int id) {
         Entity e = getEntityByIDWithWorldUnsafe(origin, id);
         if (e != null) {
             return e;
@@ -172,7 +172,7 @@ public final class ServerManager {
     }
 
     @Nullable
-    public Entity getEntityByID(@Nullable World world, int entityID) {
+    public static Entity getEntityByID(@Nullable World world, int entityID) {
         Entity e = entityCache.get(entityID);
         if (e != null) {
             return e;
@@ -211,11 +211,11 @@ public final class ServerManager {
     }
 
     @Nullable
-    public Entity getEntityByID(int entityID) {
+    public static Entity getEntityByID(int entityID) {
         return getEntityByID(null, entityID);
     }
 
-    public List<Entity> getEntityList(World world) {
+    public static List<Entity> getEntityList(World world) {
         if (MinecraftReflection.V_1_17_OR_HIGHER) {
             Object worldServer = MinecraftReflection.convertBukkitWorldToWorldServer(world);
             ReflectionObject wrappedWorldServer = new ReflectionObject(worldServer);
@@ -242,7 +242,7 @@ public final class ServerManager {
     }
 
 
-    public boolean isGeyserAvailable() {
+    public static boolean isGeyserAvailable() {
         return MinecraftReflection.GEYSER_CLASS != null;
     }
 }

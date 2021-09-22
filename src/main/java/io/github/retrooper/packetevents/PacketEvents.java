@@ -73,7 +73,7 @@ public final class PacketEvents implements Listener {
             try {
                 MinecraftReflection.init();
 
-                serverManager.entityCache = GuavaUtils.makeMap();
+                ServerManager.entityCache = GuavaUtils.makeMap();
             } catch (Exception ex) {
                 throw new PacketEventsLoadFailureException(ex);
             }
