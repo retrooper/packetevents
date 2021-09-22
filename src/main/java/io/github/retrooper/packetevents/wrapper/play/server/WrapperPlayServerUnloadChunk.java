@@ -5,7 +5,7 @@ import io.github.retrooper.packetevents.protocol.PacketType;
 import io.github.retrooper.packetevents.wrapper.PacketWrapper;
 
 public class WrapperPlayServerUnloadChunk extends PacketWrapper<WrapperPlayServerUnloadChunk> {
-    int chunkX, chunkZ;
+    private int chunkX, chunkZ;
 
     public WrapperPlayServerUnloadChunk(PacketSendEvent event) {
         super(event);

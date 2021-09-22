@@ -315,9 +315,9 @@ public class PacketWrapper<T extends PacketWrapper> {
     }
 
     public byte[] readByteArray(int length) {
-        byte[] ret = new byte[length];
-        byteBuf.readBytes(ret);
-        return ret;
+        byte[] bytes = new byte[length];
+        byteBuf.readBytes(bytes);
+        return bytes;
     }
 
     public void writeByteArray(byte[] array) {
