@@ -21,8 +21,11 @@ package io.github.retrooper.packetevents.utils.dependencies.viaversion;
 import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.bukkit.handlers.BukkitDecodeHandler;
+import com.viaversion.viaversion.bukkit.handlers.BukkitEncodeHandler;
+import com.viaversion.viaversion.exception.CancelCodecException;
 import com.viaversion.viaversion.exception.CancelDecoderException;
 import com.viaversion.viaversion.exception.CancelEncoderException;
+import com.viaversion.viaversion.exception.InformativeException;
 import io.github.retrooper.packetevents.protocol.ConnectionState;
 import io.github.retrooper.packetevents.utils.reflection.ClassUtil;
 import io.github.retrooper.packetevents.utils.reflection.Reflection;
@@ -92,6 +95,11 @@ public class ViaVersionAccessorImpl implements ViaVersionAccessor {
     }
 
     @Override
+    public boolean checkClientboundPacketUserConnection(Object userConnectionObj) {
+        return ((UserConnection)userConnectionObj).checkClientboundPacket();
+    }
+
+    @Override
     public ConnectionState getUserConnectionProtocolState(Object userConnectionObj) {
         return ConnectionState.VALUES[((UserConnection)userConnectionObj).getProtocolInfo().getState().ordinal()];
     }
@@ -104,5 +112,20 @@ public class ViaVersionAccessorImpl implements ViaVersionAccessor {
     @Override
     public Class<?> getBukkitDecodeHandlerClass() {
         return BukkitDecodeHandler.class;
+    }
+
+    @Override
+    public Class<?> getBukkitEncodeHandlerClass() {
+        return BukkitEncodeHandler.class;
+    }
+
+    @Override
+    public Class<?> getCancelCodecExceptionClass() {
+        return CancelCodecException.class;
+    }
+
+    @Override
+    public Class<?> getInformativeExceptionClass() {
+        return InformativeException.class;
     }
 }

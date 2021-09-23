@@ -1,6 +1,6 @@
 /*
- * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
- * Copyright (C) 2016-2021 ViaVersion and contributors
+ * This file is part of packetevents - https://github.com/retrooper/packetevents
+ * Copyright (C) 2021 retrooper and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,28 +18,51 @@
 
 package io.github.retrooper.packetevents.utils.dependencies.viaversion;
 
+import com.viaversion.viaversion.exception.CancelCodecException;
+import com.viaversion.viaversion.exception.InformativeException;
+import com.viaversion.viaversion.handlers.ChannelHandlerContextWrapper;
+import com.viaversion.viaversion.handlers.ViaCodecHandler;
+import com.viaversion.viaversion.util.PipelineUtil;
 import io.github.retrooper.packetevents.protocol.ConnectionState;
 import io.github.retrooper.packetevents.utils.reflection.ClassUtil;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.ByteToMessageDecoder;
+import io.netty.handler.codec.MessageToByteEncoder;
 import io.netty.handler.codec.MessageToMessageDecoder;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class CustomBukkitDecodeHandler extends ByteToMessageDecoder {
-    public final ChannelHandler oldBukkitDecodeHandler;
+public class CustomBukkitEncodeHandlerModern extends MessageToByteEncoder implements ViaCodecHandler {
+    private static Field versionField;
+
+    static {
+        try {
+            // Attempt to get any version info from the handler
+            versionField = ViaNMSUtil.nms(
+                    "PacketEncoder",
+                    "net.minecraft.network.PacketEncoder"
+            ).getDeclaredField("version");
+
+            versionField.setAccessible(true);
+        } catch (Exception e) {
+            // Not compat version
+        }
+    }
+
+    public final ChannelHandler oldBukkitEncodeHandler;
     public final List<Object> customDecoders = new ArrayList<>();
-    public final ByteToMessageDecoder minecraftDecoder;
+    public final MessageToByteEncoder minecraftEncoder;
     private final Object userInfo;
 
-    public CustomBukkitDecodeHandler(Object userInfo, ByteToMessageDecoder minecraftDecoder, ChannelHandler oldBukkitDecodeHandler) {
+    public CustomBukkitEncodeHandlerModern(Object userInfo, MessageToByteEncoder minecraftEncoder, ChannelHandler oldBukkitEncodeHandler) {
         this.userInfo = userInfo;
-        this.minecraftDecoder = minecraftDecoder;
-        this.oldBukkitDecodeHandler = oldBukkitDecodeHandler;
+        this.minecraftEncoder = minecraftEncoder;
+        this.oldBukkitEncodeHandler = oldBukkitEncodeHandler;
     }
 
     public void addCustomDecoder(Object customDecoder) {
@@ -65,12 +88,27 @@ public class CustomBukkitDecodeHandler extends ByteToMessageDecoder {
     }
 
     @Override
-    protected void decode(ChannelHandlerContext ctx, ByteBuf byteBuf, List<Object> list) throws Exception {
+    public void transform(ByteBuf bytebuf) throws Exception {
+        if (!ViaVersionUtil.checkClientboundPacketUserConnection(userInfo)) throw ViaVersionUtil.throwCancelEncoderException(null);
+        if (!ViaVersionUtil.isUserConnectionActive(userInfo)) return;
+        ViaVersionUtil.transformPacket(userInfo, bytebuf, false);
+    }
+
+    @Override
+    protected void encode(ChannelHandlerContext ctx, Object o, ByteBuf byteBuf) throws Exception {
+        if (versionField != null) {
+            versionField.set(minecraftEncoder, versionField.get(this));
+        }
+
+        if (!(o instanceof ByteBuf)) {
+            CustomPipelineUtil.callEncode(minecraftEncoder, new ChannelHandlerContextWrapper(ctx, this), o, byteBuf);
+        }
+
         if (!ViaVersionUtil.checkServerboundPacketUserConnection(userInfo)) {
             byteBuf.clear(); //Don't accumulate
             throw ViaVersionUtil.throwCancelEncoderException(null);
         }
-        
+
         ByteBuf transformedBuf = null;
         try {
             if (ViaVersionUtil.isUserConnectionActive(userInfo)) {
@@ -83,14 +121,14 @@ public class CustomBukkitDecodeHandler extends ByteToMessageDecoder {
                 for (Object customDecoder : customDecoders) {
                     //We only support one output (except for ProtocolLib)
                     if (customDecoder instanceof ByteToMessageDecoder) {
-                        result = CustomPipelineUtil.callDecode((ByteToMessageDecoder) customDecoder, ctx, result).get(0);
+                        result = PipelineUtil.callDecode((ByteToMessageDecoder) customDecoder, ctx, result).get(0);
                     } else if (customDecoder instanceof MessageToMessageDecoder) {
-                        result = CustomPipelineUtil.callDecode((MessageToMessageDecoder<?>) customDecoder, ctx, result).get(0);
+                        result = PipelineUtil.callDecode((MessageToMessageDecoder<?>) customDecoder, ctx, result).get(0);
                     }
                 }
                 if (result instanceof ByteBuf) {
                     //We will utilize the vanilla decoder to convert the ByteBuf to an NMS packet
-                    List<Object> nmsObjects = CustomPipelineUtil.callDecode(minecraftDecoder, ctx, result);
+                    List<Object> nmsObjects = PipelineUtil.callDecode(minecraftEncoder, ctx, result);
                     list.addAll(nmsObjects);
                 } else {
                     //Some previous decoder likely already converted the ByteBuf to an NMS packet
@@ -127,10 +165,10 @@ public class CustomBukkitDecodeHandler extends ByteToMessageDecoder {
 
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
-        if (containsCause(cause, ViaVersionUtil.getCancelCodecExceptionClass())) return; // ProtocolLib compat
+        if (containsCause(cause, CancelCodecException.class)) return; // ProtocolLib compat
 
         super.exceptionCaught(ctx, cause);
-        if (!ViaNMSUtil.isDebugPropertySet() && containsCause(cause, ViaVersionUtil.getInformativeExceptionClass())
+        if (!ViaNMSUtil.isDebugPropertySet() && containsCause(cause, InformativeException.class)
                 && (ViaVersionUtil.getUserConnectionProtocolState(userInfo) != ConnectionState.HANDSHAKING || ViaVersionUtil.isDebug())) {
             cause.printStackTrace(); // Print if CB doesn't already do it
         }

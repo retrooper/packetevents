@@ -38,9 +38,17 @@ public interface ViaVersionAccessor {
 
     boolean checkServerboundPacketUserConnection(Object userConnectionObj);
 
+    boolean checkClientboundPacketUserConnection(Object userConnectionObj);
+
     ConnectionState getUserConnectionProtocolState(Object userConnectionObj);
 
     Class<?> getUserConnectionClass();
 
     Class<?> getBukkitDecodeHandlerClass();
+
+    Class<?> getBukkitEncodeHandlerClass();
+
+    Class<?> getCancelCodecExceptionClass();
+
+    Class<?> getInformativeExceptionClass();
 }

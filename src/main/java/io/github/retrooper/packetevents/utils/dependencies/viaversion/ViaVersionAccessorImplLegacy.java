@@ -33,11 +33,15 @@ public class ViaVersionAccessorImplLegacy implements ViaVersionAccessor {
     private Class<?> viaManagerClass;
     private Class<?> protocolInfoClass;
     private Class<?> bukkitDecodeHandlerClass;
+    private Class<?> bukkitEncodeHandlerClass;
+    private Class<?> cancelCodecExceptionClass;
+    private Class<?> informativeExceptionClass;
     private Class<? extends Enum<?>> protocolStateClass;
     private Field viaManagerField;
     private Method apiAccessor;
     private Method getPlayerVersionMethod;
     private Method checkServerBoundMethod;
+    private Method checkClientBoundMethod;
     private Class<?> userConnectionClass;
     private Method cancelDecoderExceptionGenerator;
     private Method cancelEncoderExceptionGenerator;
@@ -60,11 +64,15 @@ public class ViaVersionAccessorImplLegacy implements ViaVersionAccessor {
                 protocolStateClass = (Class<? extends Enum<?>>) Class.forName("us.myles.ViaVersion.packets.State");
 
                 bukkitDecodeHandlerClass = Class.forName("us.myles.ViaVersion.bukkit.handlers.BukkitDecodeHandler");
+                bukkitEncodeHandlerClass = Class.forName("us.myles.ViaVersion.bukkit.handlers.BukkitEncodeHandler");
+                cancelCodecExceptionClass = Class.forName("us.myles.ViaVersion.exception.CancelCodecException");
+                informativeExceptionClass = Class.forName("us.myles.ViaVersion.exception.InformativeException");
 
                 Class<?> viaAPIClass = Class.forName("us.myles.ViaVersion.api.ViaAPI");
                 apiAccessor = viaClass.getMethod("getAPI");
                 getPlayerVersionMethod = viaAPIClass.getMethod("getPlayerVersion", Object.class);
                 checkServerBoundMethod = viaAPIClass.getDeclaredMethod("checkServerBound");
+                checkClientBoundMethod = viaAPIClass.getDeclaredMethod("checkClientBound");
             } catch (ClassNotFoundException | NoSuchMethodException | NoSuchFieldException e) {
                 e.printStackTrace();
             }
@@ -184,6 +192,19 @@ public class ViaVersionAccessorImplLegacy implements ViaVersionAccessor {
     }
 
     @Override
+    public boolean checkClientboundPacketUserConnection(Object userConnectionObj) {
+        load();
+
+        try {
+            return (boolean) checkClientBoundMethod.invoke(userConnectionObj);
+        }
+        catch (IllegalAccessException | InvocationTargetException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    @Override
     public ConnectionState getUserConnectionProtocolState(Object userConnectionObj) {
         try {
             Object protocolInfo = getProtocolInfoMethod.invoke(userConnectionObj);
@@ -205,5 +226,23 @@ public class ViaVersionAccessorImplLegacy implements ViaVersionAccessor {
     public Class<?> getBukkitDecodeHandlerClass() {
         load();
         return bukkitDecodeHandlerClass;
+    }
+
+    @Override
+    public Class<?> getBukkitEncodeHandlerClass() {
+        load();
+        return bukkitEncodeHandlerClass;
+    }
+
+    @Override
+    public Class<?> getCancelCodecExceptionClass() {
+        load();
+        return cancelCodecExceptionClass;
+    }
+
+    @Override
+    public Class<?> getInformativeExceptionClass() {
+        load();
+        return informativeExceptionClass;
     }
 }

@@ -39,6 +39,14 @@ public class ViaNMSUtil {
             return Class.forName(NMS + "." + className);
         }
 
+    public static Class<?> nms(String className, String fallbackFullClassName) throws ClassNotFoundException {
+        try {
+            return Class.forName(NMS + "." + className);
+        } catch (ClassNotFoundException ignored) {
+            return Class.forName(fallbackFullClassName);
+        }
+    }
+
         public static Class<?> obc(String className) throws ClassNotFoundException {
             return Class.forName(BASE + "." + className);
         }

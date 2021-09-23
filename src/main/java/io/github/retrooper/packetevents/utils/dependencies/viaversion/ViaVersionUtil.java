@@ -82,7 +82,11 @@ public class ViaVersionUtil {
     }
 
     public static boolean checkServerboundPacketUserConnection(Object userConnectionObj) {
-        return getViaVersionAccessor().isUserConnectionActive(userConnectionObj);
+        return getViaVersionAccessor().checkServerboundPacketUserConnection(userConnectionObj);
+    }
+
+    public static boolean checkClientboundPacketUserConnection(Object userConnectionObj) {
+        return getViaVersionAccessor().checkClientboundPacketUserConnection(userConnectionObj);
     }
 
     public static ConnectionState getUserConnectionProtocolState(Object userConnectionObj) {
@@ -95,5 +99,17 @@ public class ViaVersionUtil {
 
     public static Class<?> getBukkitDecodeHandlerClass() {
         return getViaVersionAccessor().getBukkitDecodeHandlerClass();
+    }
+
+    public static Class<?> getBukkitEncodeHandlerClass() {
+        return getViaVersionAccessor().getBukkitEncodeHandlerClass();
+    }
+
+    public static Class<?> getCancelCodecExceptionClass() {
+        return getViaVersionAccessor().getCancelCodecExceptionClass();
+    }
+
+    public static Class<?> getInformativeExceptionClass() {
+        return getViaVersionAccessor().getInformativeExceptionClass();
     }
 }
