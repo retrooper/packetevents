@@ -289,6 +289,7 @@ public class EarlyChannelInjectorModern implements EarlyInjector {
             CustomBukkitDecodeHandler customBukkitDecodeHandler = (CustomBukkitDecodeHandler) decoder;
             customBukkitDecodeHandler.addCustomDecoder(customDecoder);
         } else if (ViaVersionUtil.getBukkitDecodeHandlerClass().isInstance(decoder)) {
+            System.out.println("YESSSSSSSSSSSSSSSSSSSSSSSSSSS");
             ReflectionObject reflectionObject = new ReflectionObject(decoder);
             Object userConnectionInfo = reflectionObject.readObject(0, ViaVersionUtil.getUserConnectionClass());
             ByteToMessageDecoder minecraftDecoder = reflectionObject.readObject(0, ByteToMessageDecoder.class);
@@ -311,7 +312,9 @@ public class EarlyChannelInjectorModern implements EarlyInjector {
                 }
             }
             channel.pipeline().replace("decoder", "decoder", customBukkitDecodeHandler);
+            System.out.println("HANDLERS: " + Arrays.toString(channel.pipeline().names().toArray(new String[0])));
         } else if (ClassUtil.getClassSimpleName(decoder.getClass()).equals("CustomBukkitDecodeHandler")) {
+            System.out.println("TFFFFFFFFFFFFFFFFFFFFF");
             ReflectionObject reflectionObject = new ReflectionObject(decoder);
             //TODO Test multiple packetevents instances that have shaded in diff locations
             List<MessageToMessageDecoder<?>> customDecoders = reflectionObject.readList(0);
@@ -340,13 +343,8 @@ public class EarlyChannelInjectorModern implements EarlyInjector {
                 if (ViaVersionUtil.isAvailable()) {
                     channel.pipeline().remove(PacketEvents.get().decoderName);
                     decoder.bypassCompression = true;
-                    PacketEncoderModern encoder = (PacketEncoderModern) channel.pipeline().remove(PacketEvents.get().encoderName);
-                    encoder.handleViaVersion = true;
                     //If via is present, replace their decode handler with my custom one
                     addDecoderAfterVia(channel, decoder);
-
-                    //TODO Confirm
-                    channel.pipeline().addAfter("encoder", PacketEvents.get().encoderName, encoder);
                 }
                 else if (ProtocolSupportUtil.isAvailable()) {
                     channel.pipeline().remove(PacketEvents.get().decoderName);

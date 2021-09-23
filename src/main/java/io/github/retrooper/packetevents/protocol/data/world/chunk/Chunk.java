@@ -10,6 +10,7 @@ import io.github.retrooper.packetevents.protocol.data.world.chunk.palette.Global
 import io.github.retrooper.packetevents.protocol.data.world.chunk.palette.ListPalette;
 import io.github.retrooper.packetevents.protocol.data.world.chunk.palette.MapPalette;
 import io.github.retrooper.packetevents.protocol.data.world.chunk.palette.Palette;
+import io.github.retrooper.packetevents.utils.NetStreamOutput;
 import io.github.retrooper.packetevents.wrapper.PacketWrapper;
 
 import java.io.IOException;
@@ -51,7 +52,7 @@ public class Chunk {
         return new Chunk(blockCount, palette, storage);
     }
 
-    public static void write(PacketWrapper<?> out, Chunk chunk) {
+    public static void write(NetStreamOutput out, Chunk chunk) {
         out.writeShort(chunk.blockCount);
         out.writeByte(chunk.storage.getBitsPerEntry());
 
@@ -66,7 +67,7 @@ public class Chunk {
 
         long[] data = chunk.storage.getData();
         out.writeVarInt(data.length);
-        out.writeLongArray(data);
+        out.writeLongs(data);
     }
 
     public int get(int x, int y, int z) {

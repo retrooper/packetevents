@@ -17,13 +17,16 @@ public class Column {
     private final NBTCompound[] tileEntities;
     private final NBTCompound heightMaps;
     private final int[] biomeData;
+    private final boolean fullChunk;
 
-    /**
-     * @deprecated Non-full chunks no longer exist since 1.17.
-     */
-    @Deprecated
     public Column(int x, int z, Chunk[] chunks, NBTCompound[] tileEntities, NBTCompound heightMaps) {
-        this(x, z, chunks, tileEntities, heightMaps, new int[1024]);
+        this.x = x;
+        this.z = z;
+        this.chunks = Arrays.copyOf(chunks, chunks.length);
+        this.biomeData = new int[1024];
+        this.tileEntities = tileEntities != null ? tileEntities : new NBTCompound[0];
+        this.heightMaps = heightMaps;
+        this.fullChunk = false;
     }
 
     public Column(int x, int z, Chunk[] chunks, NBTCompound[] tileEntities, NBTCompound heightMaps, int[] biomeData) {
@@ -33,6 +36,7 @@ public class Column {
         this.biomeData = biomeData != null ? Arrays.copyOf(biomeData, biomeData.length) : null;
         this.tileEntities = tileEntities != null ? tileEntities : new NBTCompound[0];
         this.heightMaps = heightMaps;
+        this.fullChunk = true;
     }
 
     public int getX() {
@@ -57,5 +61,9 @@ public class Column {
 
     public int[] getBiomeData() {
         return biomeData;
+    }
+
+    public boolean isFullChunk() {
+        return fullChunk;
     }
 }

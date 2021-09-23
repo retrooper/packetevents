@@ -19,14 +19,17 @@
 package io.github.retrooper.packetevents.wrapper.play.server;
 
 import io.github.retrooper.packetevents.event.impl.PacketSendEvent;
+import io.github.retrooper.packetevents.manager.server.ServerVersion;
 import io.github.retrooper.packetevents.protocol.PacketType;
 import io.github.retrooper.packetevents.protocol.data.world.chunk.Chunk;
 import io.github.retrooper.packetevents.protocol.data.world.chunk.Column;
 import io.github.retrooper.packetevents.protocol.data.nbt.NBTCompound;
+import io.github.retrooper.packetevents.utils.NetStreamOutput;
 import io.github.retrooper.packetevents.utils.netty.buffer.ByteBufAbstract;
 import io.github.retrooper.packetevents.utils.netty.buffer.ByteBufUtil;
 import io.github.retrooper.packetevents.wrapper.PacketWrapper;
 
+import java.io.ByteArrayOutputStream;
 import java.util.BitSet;
 
 //TODO Finish
@@ -49,12 +52,27 @@ public class WrapperPlayServerChunkData extends PacketWrapper<WrapperPlayServerC
         int chunkX = readInt();
         int chunkZ = readInt();
 
-        int bitMaskLength = readVarInt();
-        BitSet chunkMask = BitSet.valueOf(readLongArray(bitMaskLength));
+        boolean fullChunk = true;
+        if (serverVersion.isNewerThanOrEquals(ServerVersion.v_1_13_2) && serverVersion.isOlderThan(ServerVersion.v_1_17)) {
+            fullChunk = readBoolean();
+        }
+
+        BitSet chunkMask;
+        if (serverVersion.isOlderThan(ServerVersion.v_1_17)) {
+            chunkMask = BitSet.valueOf(new long[] {readVarInt()});
+        }
+        else {
+            int bitMaskLength = readVarInt();
+            chunkMask = BitSet.valueOf(readLongArray(bitMaskLength));
+        }
+
         NBTCompound heightMaps = readTag();
-        int[] biomeData = new int[readVarInt()];
-        for (int index = 0; index < biomeData.length; index++) {
-            biomeData[index] = readVarInt();
+        int[] biomeData = new int[0];
+        if (fullChunk) {
+            biomeData = new int[readVarInt()];
+            for (int index = 0; index < biomeData.length; index++) {
+                biomeData[index] = readVarInt();
+            }
         }
         byte[] data = readByteArray(readVarInt());
         ByteBufAbstract bb = ByteBufUtil.copiedBuffer(data);
@@ -71,7 +89,12 @@ public class WrapperPlayServerChunkData extends PacketWrapper<WrapperPlayServerC
             tileEntities[i] = readTag();
         }
 
-        this.column = new Column(chunkX, chunkZ, chunks, tileEntities, heightMaps, biomeData);
+        if (fullChunk) {
+            column = new Column(chunkX, chunkZ, chunks, tileEntities, heightMaps, biomeData);
+        }
+        else {
+            column = new Column(chunkX, chunkZ, chunks, tileEntities, heightMaps);
+        }
     }
 
     @Override
@@ -81,8 +104,8 @@ public class WrapperPlayServerChunkData extends PacketWrapper<WrapperPlayServerC
 
     @Override
     public void writeData() {
-        ByteBufAbstract dataBB = ByteBufUtil.buffer();
-        PacketWrapper<?> dataWrapper = PacketWrapper.createUniversalPacketWrapper(dataBB);
+        ByteArrayOutputStream dataBytes = new ByteArrayOutputStream();
+        NetStreamOutput dataOut = new NetStreamOutput(dataBytes);
 
         BitSet bitSet = new BitSet();
         Chunk[] chunks = column.getChunks();
@@ -90,35 +113,41 @@ public class WrapperPlayServerChunkData extends PacketWrapper<WrapperPlayServerC
             Chunk chunk = chunks[index];
             if (chunk != null && !chunk.isEmpty()) {
                 bitSet.set(index);
-                Chunk.write(dataWrapper, chunk);
+                Chunk.write(dataOut, chunk);
             }
         }
 
         writeInt(column.getX());
         writeInt(column.getZ());
-        long[] longArray = bitSet.toLongArray();
-        writeVarInt(longArray.length);
-        for (long content : longArray) {
-            writeLong(content);
+
+        boolean fullChunk = column.isFullChunk();
+        if (serverVersion.isNewerThanOrEquals(ServerVersion.v_1_13_2) && serverVersion.isOlderThan(ServerVersion.v_1_17)) {
+            writeBoolean(fullChunk);
         }
-        System.out.println("A");
+
+        if (serverVersion.isOlderThan(ServerVersion.v_1_17)) {
+            writeVarInt((int) bitSet.toLongArray()[0]);
+        }
+        else {
+            long[] longArray = bitSet.toLongArray();
+            writeVarInt(longArray.length);
+            for (long content : longArray) {
+                writeLong(content);
+            }
+        }
         writeTag(column.getHeightMaps());
-        System.out.println("B");
-        writeVarInt(column.getBiomeData().length);
-        for (int biomeData : column.getBiomeData()) {
-            writeVarInt(biomeData);
+        if (fullChunk) {
+            writeVarInt(column.getBiomeData().length);
+            for (int biomeData : column.getBiomeData()) {
+                writeVarInt(biomeData);
+            }
         }
-        System.out.println("C");
-        byte[] data = dataWrapper.readByteArray(dataBB.readableBytes());
-        writeVarInt(data.length);
-        System.out.println("D: data len: " + data.length);
-        writeByteArray(data);
-        System.out.println("E");
+        writeVarInt(dataBytes.size());
+        writeByteArray(dataBytes.toByteArray());
         writeVarInt(column.getTileEntities().length);
         for(NBTCompound tag : column.getTileEntities()) {
             writeTag(tag);
         }
-        System.out.println("FFFF");
     }
 
     public Column getColumn() {

@@ -37,12 +37,11 @@ import java.util.List;
 public class PacketEncoderModern extends MessageToMessageEncoder<ByteBuf> {
     public volatile Player player;
     private boolean handledCompression;
-    public boolean handleViaVersion = false;
 
     public void handle(ChannelHandlerContextAbstract ctx, ByteBufAbstract byteBuf, List<Object> output) {
         ByteBufAbstract transformedBuf = ctx.alloc().buffer().writeBytes(byteBuf);
         try {
-            boolean needsCompress = !handleViaVersion && handleCompressionOrder(ctx, transformedBuf);
+            boolean needsCompress = handleCompressionOrder(ctx, transformedBuf);
 
             int firstReaderIndex = transformedBuf.readerIndex();
             PacketSendEvent packetSendEvent = new PacketSendEvent(ctx.channel(), player, transformedBuf);
