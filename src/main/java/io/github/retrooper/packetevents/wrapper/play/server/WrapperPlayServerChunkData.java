@@ -21,9 +21,13 @@ package io.github.retrooper.packetevents.wrapper.play.server;
 import io.github.retrooper.packetevents.event.impl.PacketSendEvent;
 import io.github.retrooper.packetevents.manager.server.ServerVersion;
 import io.github.retrooper.packetevents.protocol.PacketType;
+import io.github.retrooper.packetevents.utils.chunk.Chunk;
+import io.github.retrooper.packetevents.utils.chunk.Column;
 import io.github.retrooper.packetevents.utils.nbt.NBTCompound;
+import io.github.retrooper.packetevents.utils.netty.buffer.ByteBufAbstract;
+import io.github.retrooper.packetevents.utils.netty.buffer.ByteBufAbstractInputStream;
+import io.github.retrooper.packetevents.utils.netty.buffer.ByteBufUtil;
 import io.github.retrooper.packetevents.wrapper.PacketWrapper;
-import net.minecraft.server.v1_7_R4.PacketPlayOutMapChunk;
 
 import java.io.IOException;
 import java.util.BitSet;
@@ -33,16 +37,19 @@ import java.util.zip.Inflater;
 
 //TODO Finish
 public class WrapperPlayServerChunkData extends PacketWrapper<WrapperPlayServerChunkData> {
-    private int chunkX;
-    private int chunkZ;
-    private BitSet primaryBitSet;
+
     private Optional<Boolean> groundUpContinuous;
     private Optional<Boolean> fullChunk;
     private Optional<Boolean> ignoreOldData;
     private Optional<NBTCompound> heightMaps;
     //TODO Abstract the biome ids
     private Optional<int[]> biomeIDs;
+    private int chunkX;
+    private int chunkZ;
+    private BitSet primaryBitSet;
     private byte[] data;
+
+    private Column column;
 
     public WrapperPlayServerChunkData(PacketSendEvent event) {
         super(event);
@@ -52,8 +59,8 @@ public class WrapperPlayServerChunkData extends PacketWrapper<WrapperPlayServerC
         super(PacketType.Play.Server.CHUNK_DATA.getID());
     }
 
-    @Override
-    public void readData() {
+    private void oldReadData() {
+        //TODO Lots of cleaning up and parse the chunks correctly and make abstractions
         //Chunk X and Z
         chunkX = readInt();
         chunkZ = readInt();
@@ -71,20 +78,21 @@ public class WrapperPlayServerChunkData extends PacketWrapper<WrapperPlayServerC
         }
 
         //Bit set
-        long[] bitSetLongs = new long[0];
+        long[] bitSetLongs;
         if (serverVersion.isNewerThanOrEquals(ServerVersion.v_1_17)) {
-            primaryBitSet = BitSet.valueOf(readLongArray());
+            bitSetLongs = readLongArray();
+            primaryBitSet = BitSet.valueOf(bitSetLongs);
         } else if (serverVersion.isNewerThanOrEquals(ServerVersion.v_1_9)) {
-            primaryBitSet = BitSet.valueOf(new long[]{readVarInt()});
+            bitSetLongs = new long[]{readVarInt()};
+            primaryBitSet = BitSet.valueOf(bitSetLongs);
         } else {
 
             if (serverVersion == ServerVersion.v_1_7_10) {
                 //Primary bit mask, add bit mask
-                bitSetLongs = new long[] {readUnsignedShort(), readUnsignedShort()};
-            }
-            else {
+                bitSetLongs = new long[]{readUnsignedShort(), readUnsignedShort()};
+            } else {
                 //Primary bit mask
-                bitSetLongs = new long[] {readUnsignedShort()};
+                bitSetLongs = new long[]{readUnsignedShort()};
             }
             primaryBitSet = BitSet.valueOf(bitSetLongs);
         }
@@ -94,7 +102,8 @@ public class WrapperPlayServerChunkData extends PacketWrapper<WrapperPlayServerC
             heightMaps = Optional.of(readTag());
         }
 
-        //Biome IDs
+        //Biome IDs on newer versions
+        boolean handledBiomes = false;
         if (serverVersion.isNewerThanOrEquals(ServerVersion.v_1_15)) {
             int biomesLength;
             if (serverVersion.isNewerThanOrEquals(ServerVersion.v_1_16_2)) {
@@ -112,9 +121,7 @@ public class WrapperPlayServerChunkData extends PacketWrapper<WrapperPlayServerC
                 }
             }
             this.biomeIDs = Optional.of(biomeIDs);
-        }
-        else {
-            this.biomeIDs = Optional.empty();
+            handledBiomes = true;
         }
 
 
@@ -126,7 +133,7 @@ public class WrapperPlayServerChunkData extends PacketWrapper<WrapperPlayServerC
             int i = 0;
 
             int j;
-            for(j = 0; j < 16; ++j) {
+            for (j = 0; j < 16; ++j) {
                 i += bitSetLongs[0] >> j & 1;
             }
 
@@ -147,14 +154,59 @@ public class WrapperPlayServerChunkData extends PacketWrapper<WrapperPlayServerC
                 inflater.end();
             }
 
-        }
-        else {
+        } else {
             int dataLength = readVarInt();
-            data = readByteArray(dataLength);
+            data = readByteArray((int) bitSetLongs[0]);
+            if (!handledBiomes && groundUpContinuous.orElse(false)) {
+                byte[] bytes = readByteArray(byteBuf.readableBytes());
+                int[] output = new int[bytes.length];
+                for (int i = 0; i < bytes.length; i++) {
+                    output[i] = bytes[i];
+                }
+                biomeIDs = Optional.of(output);
+                handledBiomes = true;
+            }
         }
 
-        //TODO Support 1.9 - 1.11 with cursed biomes order
-        //TODO Support block of entities or whatever that is
+        if (!handledBiomes) {
+            biomeIDs = Optional.empty();
+        }
+    }
+
+    @Override
+    public void readData() {
+        //Currently only 1.17 support
+        //Chunk X and Z
+        chunkX = readInt();
+        chunkZ = readInt();
+
+        int bitMaskLength = readVarInt();
+        BitSet chunkMask = BitSet.valueOf(readLongArray(bitMaskLength));
+        NBTCompound heightMaps = readTag();
+        int[] biomeData = new int[readVarInt()];
+        for (int index = 0; index < biomeData.length; index++) {
+            biomeData[index] = readVarInt();
+        }
+        byte[] data = readByteArray(readVarInt());
+        ByteBufAbstract bb = ByteBufUtil.copiedBuffer(data);
+        PacketWrapper<?> dataWrapper = PacketWrapper.createUniversalPacketWrapper(bb);
+        Chunk[] chunks = new Chunk[chunkMask.size()];
+        for(int index = 0; index < chunks.length; index++) {
+            if(chunkMask.get(index)) {
+                try {
+                    chunks[index] = Chunk.read(dataWrapper);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+
+        NBTCompound[] tileEntities = new NBTCompound[readVarInt()];
+        for(int i = 0; i < tileEntities.length; i++) {
+            tileEntities[i] = readTag();
+        }
+
+        this.column = new Column(chunkX, chunkZ, chunks, tileEntities, heightMaps, biomeData);
     }
 
     @Override

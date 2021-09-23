@@ -324,6 +324,15 @@ public class PacketWrapper<T extends PacketWrapper> {
         byteBuf.writeBytes(array);
     }
 
+    public long[] readLongArray(int size) {
+        long[] array = new long[size];
+
+        for (int i = 0; i < array.length; i++) {
+            array[i] = readLong();
+        }
+        return array;
+    }
+
     public long[] readLongArray() {
         int readableBytes = byteBuf.readableBytes() / 8;
         int size = readVarInt();

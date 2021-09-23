@@ -100,6 +100,7 @@ public class ByteBufAbstractInputStream extends InputStream implements DataInput
         return !this.buffer.isReadable() ? -1 : this.buffer.readByte() & 255;
     }
 
+
     public int read(byte[] b, int off, int len) throws IOException {
         int available = this.available();
         if (available == 0) {
@@ -122,6 +123,12 @@ public class ByteBufAbstractInputStream extends InputStream implements DataInput
     public boolean readBoolean() throws IOException {
         this.checkAvailable(1);
         return this.read() != 0;
+    }
+
+    public byte[] readBytes(int len) {
+        byte[] bytes = new byte[len];
+        buffer.readBytes(bytes);
+        return bytes;
     }
 
     public byte readByte() throws IOException {
@@ -181,6 +188,15 @@ public class ByteBufAbstractInputStream extends InputStream implements DataInput
     public long readLong() throws IOException {
         this.checkAvailable(8);
         return this.buffer.readLong();
+    }
+
+    public long[] readLongs(int size) throws IOException {
+        long[] array = new long[size];
+
+        for (int i = 0; i < array.length; i++) {
+            array[i] = readLong();
+        }
+        return array;
     }
 
     public short readShort() throws IOException {

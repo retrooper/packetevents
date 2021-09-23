@@ -43,7 +43,7 @@ public enum ClientboundPacketType_1_17 {
     CLEAR_TITLES,
 
     TAB_COMPLETE,
-    MULTI_BLOCK_CHANGE,
+
     DECLARE_COMMANDS,
 
     //This packet was removed and replaced with the PING packet
@@ -112,6 +112,7 @@ public enum ClientboundPacketType_1_17 {
     RESOURCE_PACK_SEND,
     RESPAWN,
     ENTITY_HEAD_LOOK,
+    MULTI_BLOCK_CHANGE,
     SELECT_ADVANCEMENT_TAB,
 
     //These 5 new packets were added
