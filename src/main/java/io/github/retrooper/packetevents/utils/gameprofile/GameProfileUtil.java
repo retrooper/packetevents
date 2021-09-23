@@ -18,7 +18,7 @@
 
 package io.github.retrooper.packetevents.utils.gameprofile;
 
-import io.github.retrooper.packetevents.utils.player.Skin;
+import io.github.retrooper.packetevents.protocol.data.player.Skin;
 import io.github.retrooper.packetevents.utils.MinecraftReflection;
 
 import java.util.UUID;

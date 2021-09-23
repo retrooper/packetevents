@@ -2,7 +2,7 @@ package io.github.retrooper.packetevents.wrapper.play.server;
 
 import io.github.retrooper.packetevents.event.impl.PacketSendEvent;
 import io.github.retrooper.packetevents.protocol.PacketType;
-import io.github.retrooper.packetevents.utils.BlockPosition;
+import io.github.retrooper.packetevents.protocol.data.world.BlockPosition;
 import io.github.retrooper.packetevents.wrapper.PacketWrapper;
 
 public class WrapperPlayServerBlockAction extends PacketWrapper<WrapperPlayServerBlockAction> {

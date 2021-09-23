@@ -22,17 +22,14 @@ import io.github.retrooper.packetevents.PacketEvents;
 import io.github.retrooper.packetevents.event.PacketListener;
 import io.github.retrooper.packetevents.event.impl.PacketReceiveEvent;
 import io.github.retrooper.packetevents.event.impl.PacketSendEvent;
-import io.github.retrooper.packetevents.utils.chunk.Column;
-import io.github.retrooper.packetevents.utils.nbt.NBTCompound;
-import io.github.retrooper.packetevents.utils.player.ClientVersion;
+import io.github.retrooper.packetevents.protocol.data.world.chunk.Column;
+import io.github.retrooper.packetevents.protocol.data.nbt.NBTCompound;
+import io.github.retrooper.packetevents.protocol.data.player.ClientVersion;
 import io.github.retrooper.packetevents.protocol.ConnectionState;
 import io.github.retrooper.packetevents.protocol.PacketType;
 import io.github.retrooper.packetevents.wrapper.handshaking.client.WrapperHandshakingClientHandshake;
 import io.github.retrooper.packetevents.wrapper.login.client.WrapperLoginClientLoginStart;
-import io.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientSteerBoat;
-import io.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientVehicleMove;
 import io.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerChunkData;
-import org.bukkit.Location;
 
 public class InternalPacketListener implements PacketListener {
     //Make this specific event be at MONITOR priority
@@ -44,7 +41,6 @@ public class InternalPacketListener implements PacketListener {
         }
         else if (event.getPacketType() == PacketType.Play.Server.CHUNK_DATA) {
             WrapperPlayServerChunkData chunkData = new WrapperPlayServerChunkData(event);
-            event.setCurrentPacketWrapper(null);
             Column column = chunkData.getColumn();
             int x = column.getX();
             int z = column.getZ();

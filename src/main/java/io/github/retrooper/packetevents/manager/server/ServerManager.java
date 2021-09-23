@@ -19,7 +19,7 @@
 package io.github.retrooper.packetevents.manager.server;
 
 import io.github.retrooper.packetevents.PacketEvents;
-import io.github.retrooper.packetevents.utils.BoundingBox;
+import io.github.retrooper.packetevents.protocol.data.world.BoundingBox;
 import io.github.retrooper.packetevents.utils.MinecraftReflection;
 import io.github.retrooper.packetevents.utils.netty.ChannelInboundHandlerUtil;
 import io.github.retrooper.packetevents.utils.netty.buffer.ByteBufAbstract;

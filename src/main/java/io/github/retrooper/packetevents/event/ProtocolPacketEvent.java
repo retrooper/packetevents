@@ -29,7 +29,7 @@ import io.github.retrooper.packetevents.protocol.PacketType;
 import io.github.retrooper.packetevents.protocol.PacketTypeCommon;
 import io.github.retrooper.packetevents.utils.netty.buffer.ByteBufAbstract;
 import io.github.retrooper.packetevents.utils.netty.channel.ChannelAbstract;
-import io.github.retrooper.packetevents.utils.player.ClientVersion;
+import io.github.retrooper.packetevents.protocol.data.player.ClientVersion;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;

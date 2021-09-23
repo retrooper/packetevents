@@ -22,7 +22,7 @@ import io.github.retrooper.packetevents.manager.server.ServerManager;
 import io.github.retrooper.packetevents.manager.server.ServerVersion;
 import io.github.retrooper.packetevents.protocol.protocols.clientbound.*;
 import io.github.retrooper.packetevents.protocol.protocols.serverbound.*;
-import io.github.retrooper.packetevents.utils.player.ClientVersion;
+import io.github.retrooper.packetevents.protocol.data.player.ClientVersion;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.HashMap;

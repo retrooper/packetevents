@@ -18,7 +18,7 @@
 
 package io.github.retrooper.packetevents.utils.vector;
 
-import io.github.retrooper.packetevents.utils.BlockPosition;
+import io.github.retrooper.packetevents.protocol.data.world.BlockPosition;
 import org.bukkit.Location;
 import org.bukkit.World;
 
