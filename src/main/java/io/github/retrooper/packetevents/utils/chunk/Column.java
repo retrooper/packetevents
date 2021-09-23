@@ -34,4 +34,28 @@ public class Column {
         this.tileEntities = tileEntities != null ? tileEntities : new NBTCompound[0];
         this.heightMaps = heightMaps;
     }
+
+    public int getX() {
+        return x;
+    }
+
+    public int getZ() {
+        return z;
+    }
+
+    public Chunk[] getChunks() {
+        return chunks;
+    }
+
+    public NBTCompound[] getTileEntities() {
+        return tileEntities;
+    }
+
+    public NBTCompound getHeightMaps() {
+        return heightMaps;
+    }
+
+    public int[] getBiomeData() {
+        return biomeData;
+    }
 }

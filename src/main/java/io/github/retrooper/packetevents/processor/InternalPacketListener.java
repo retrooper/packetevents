@@ -22,6 +22,8 @@ import io.github.retrooper.packetevents.PacketEvents;
 import io.github.retrooper.packetevents.event.PacketListener;
 import io.github.retrooper.packetevents.event.impl.PacketReceiveEvent;
 import io.github.retrooper.packetevents.event.impl.PacketSendEvent;
+import io.github.retrooper.packetevents.utils.chunk.Column;
+import io.github.retrooper.packetevents.utils.nbt.NBTCompound;
 import io.github.retrooper.packetevents.utils.player.ClientVersion;
 import io.github.retrooper.packetevents.protocol.ConnectionState;
 import io.github.retrooper.packetevents.protocol.PacketType;
@@ -29,6 +31,7 @@ import io.github.retrooper.packetevents.wrapper.handshaking.client.WrapperHandsh
 import io.github.retrooper.packetevents.wrapper.login.client.WrapperLoginClientLoginStart;
 import io.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientSteerBoat;
 import io.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientVehicleMove;
+import io.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerChunkData;
 import org.bukkit.Location;
 
 public class InternalPacketListener implements PacketListener {
@@ -38,6 +41,15 @@ public class InternalPacketListener implements PacketListener {
         if (event.getPacketType() == PacketType.Login.Server.LOGIN_SUCCESS) {
             //Transition into the GAME connection state
             PacketEvents.get().getInjector().changeConnectionState(event.getChannel().rawChannel(), ConnectionState.PLAY);
+        }
+        else if (event.getPacketType() == PacketType.Play.Server.CHUNK_DATA) {
+            WrapperPlayServerChunkData chunkData = new WrapperPlayServerChunkData(event);
+            event.setCurrentPacketWrapper(null);
+            Column column = chunkData.getColumn();
+            int x = column.getX();
+            int z = column.getZ();
+            NBTCompound heightMaps = column.getHeightMaps();
+            System.out.println("X: " + x + ", Z: " + z + ", HEIGHT MAPS: " + heightMaps.getTagNames());
         }
     }
 

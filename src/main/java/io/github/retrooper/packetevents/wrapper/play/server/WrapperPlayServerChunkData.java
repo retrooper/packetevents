@@ -211,11 +211,19 @@ public class WrapperPlayServerChunkData extends PacketWrapper<WrapperPlayServerC
 
     @Override
     public void readData(WrapperPlayServerChunkData wrapper) {
-
+        column = wrapper.column;
     }
 
     @Override
     public void writeData() {
 
+    }
+
+    public Column getColumn() {
+        return column;
+    }
+
+    public void setColumn(Column column) {
+        this.column = column;
     }
 }

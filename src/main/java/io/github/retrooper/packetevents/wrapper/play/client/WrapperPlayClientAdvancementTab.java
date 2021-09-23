@@ -39,14 +39,10 @@ public class WrapperPlayClientAdvancementTab extends PacketWrapper<WrapperPlayCl
         super(event);
     }
 
-    public WrapperPlayClientAdvancementTab(Action action) {
+    public WrapperPlayClientAdvancementTab(Action action, Optional<String> tabID) {
         super(PacketType.Play.Client.ADVANCEMENT_TAB.getID());
-        net.minecraft.server.v1_12_R1.PacketPlayInAdvancements a0;
-        net.minecraft.server.v1_13_R1.PacketPlayInAdvancements a1;
-        net.minecraft.server.v1_14_R1.PacketPlayInAdvancements a2;
-        net.minecraft.server.v1_15_R1.PacketPlayInAdvancements a3;
-        net.minecraft.server.v1_16_R1.PacketPlayInAdvancements a4;
-        net.minecraft.network.protocol.game.PacketPlayInAdvancements a5;
+        this.action = action;
+        this.tabID = tabID;
     }
 
     @Override
