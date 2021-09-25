@@ -45,38 +45,89 @@ public class WrapperPlayServerChunkData extends PacketWrapper<WrapperPlayServerC
         this.column = column;
     }
 
+    private BitSet readChunkMask() {
+        BitSet chunkMask;
+        if (serverVersion.isNewerThanOrEquals(ServerVersion.v_1_17)) {
+            int bitMaskLength = readVarInt();
+            //Read primary bit mask
+            chunkMask = BitSet.valueOf(readLongArray(bitMaskLength));
+        } else if (serverVersion.isNewerThanOrEquals(ServerVersion.v_1_9)) {
+            //Read primary bit mask
+            chunkMask = BitSet.valueOf(new long[]{readVarInt()});
+        } else {
+            if (serverVersion == ServerVersion.v_1_7_10) {
+                //Read primary bit mask and add bit mask
+                chunkMask = BitSet.valueOf(new long[] {readUnsignedShort(), readUnsignedShort() });
+            }
+            else {
+                //Read primary bit mask
+                chunkMask = BitSet.valueOf(new long[] { readUnsignedShort() });
+            }
+        }
+        return chunkMask;
+    }
+
+    private void writeChunkMask(BitSet chunkMask) {
+        if (serverVersion.isNewerThanOrEquals(ServerVersion.v_1_17)) {
+            //Write primary bit mask
+            long[] longArray = chunkMask.toLongArray();
+            writeVarInt(longArray.length);
+            writeLongArray(longArray);
+        } else if (serverVersion.isNewerThanOrEquals(ServerVersion.v_1_9)) {
+            //Write primary bit mask
+            writeVarInt((int) chunkMask.toLongArray()[0]);
+        } else {
+            if (serverVersion == ServerVersion.v_1_7_10) {
+                //Write primary bit mask, add bit mask
+                long[] longArray = chunkMask.toLongArray();
+                writeShort((int) longArray[0]);
+                writeShort((int) longArray[1]);
+            }
+            else {
+                //Write primary bit mask
+                writeShort((int) chunkMask.toLongArray()[0]);
+            }
+        }
+    }
+
     @Override
     public void readData() {
-        //Currently only 1.17 support
+        //Currently, only 1.14 -> 1.17.1 support (only tested 1.16.5 -> 1.17.1)
         //Chunk X and Z
         int chunkX = readInt();
         int chunkZ = readInt();
 
-        boolean fullChunk = true;
+        boolean hasBiomeData = true;
         if (serverVersion.isNewerThanOrEquals(ServerVersion.v_1_13_2) && serverVersion.isOlderThan(ServerVersion.v_1_17)) {
-            fullChunk = readBoolean();
+            hasBiomeData = readBoolean();
         }
 
-        BitSet chunkMask;
-        if (serverVersion.isOlderThan(ServerVersion.v_1_17)) {
-            chunkMask = BitSet.valueOf(new long[] {readVarInt()});
+        boolean ignoreOldData = false;
+        if (serverVersion == ServerVersion.v_1_16 ||
+        serverVersion == ServerVersion.v_1_16_1) {
+            ignoreOldData = readBoolean();
         }
-        else {
-            int bitMaskLength = readVarInt();
-            chunkMask = BitSet.valueOf(readLongArray(bitMaskLength));
+        //Older than 1.13.2 has ground up continuous
+
+        //1.16.0 and 1.16.1 has "ignore old data"
+
+        BitSet chunkMask = readChunkMask();
+        boolean hasHeightMaps = serverVersion.isNewerThanOrEquals(ServerVersion.v_1_14);
+        NBTCompound heightMaps = null;
+        if (hasHeightMaps) {
+            heightMaps = readTag();
         }
 
-        NBTCompound heightMaps = readTag();
         int[] biomeData = new int[0];
-        if (fullChunk) {
+        if (hasBiomeData) {
             biomeData = new int[readVarInt()];
             for (int index = 0; index < biomeData.length; index++) {
                 biomeData[index] = readVarInt();
             }
         }
-        System.out.println("PREEEE, FULL CHUNK: " + fullChunk);
+        //TODO Decompress on 1.7.10
+        //https://github.com/retrooper/packetevents/blob/794ad6b042c1c89a931d322f4f83317b573e891a/src/main/java/io/github/retrooper/packetevents/wrapper/play/server/WrapperPlayServerChunkData.java
         byte[] data = readByteArray(readVarInt());
-        System.out.println("POST DATA READ!");
         NetStreamInput dataIn = new NetStreamInput(new ByteArrayInputStream(data));
         Chunk[] chunks = new Chunk[chunkMask.size()];
         for (int index = 0; index < chunks.length; index++) {
@@ -90,11 +141,18 @@ public class WrapperPlayServerChunkData extends PacketWrapper<WrapperPlayServerC
             tileEntities[i] = readTag();
         }
 
-        if (fullChunk) {
+        //TODO Support 1.9 - 1.11 with cursed biomes order
+
+        if (hasBiomeData) {
             column = new Column(chunkX, chunkZ, chunks, tileEntities, heightMaps, biomeData);
         }
         else {
-            column = new Column(chunkX, chunkZ, chunks, tileEntities, heightMaps);
+            if (hasHeightMaps) {
+                column = new Column(chunkX, chunkZ, chunks, tileEntities, heightMaps);
+            }
+            else {
+                column = new Column(chunkX, chunkZ, chunks, tileEntities);
+            }
         }
     }
 
@@ -105,15 +163,16 @@ public class WrapperPlayServerChunkData extends PacketWrapper<WrapperPlayServerC
 
     @Override
     public void writeData() {
+        //TODO Update
         ByteArrayOutputStream dataBytes = new ByteArrayOutputStream();
         NetStreamOutput dataOut = new NetStreamOutput(dataBytes);
 
-        BitSet bitSet = new BitSet();
+        BitSet chunkMask = new BitSet();
         Chunk[] chunks = column.getChunks();
         for (int index = 0; index < chunks.length; index++) {
             Chunk chunk = chunks[index];
             if (chunk != null && !chunk.isEmpty()) {
-                bitSet.set(index);
+                chunkMask.set(index);
                 Chunk.write(dataOut, chunk);
             }
         }
@@ -121,21 +180,13 @@ public class WrapperPlayServerChunkData extends PacketWrapper<WrapperPlayServerC
         writeInt(column.getX());
         writeInt(column.getZ());
 
-        boolean fullChunk = column.isFullChunk();
+        boolean fullChunk = column.hasBiomeData();
         if (serverVersion.isNewerThanOrEquals(ServerVersion.v_1_13_2) && serverVersion.isOlderThan(ServerVersion.v_1_17)) {
             writeBoolean(fullChunk);
         }
 
-        if (serverVersion.isOlderThan(ServerVersion.v_1_17)) {
-            writeVarInt((int) bitSet.toLongArray()[0]);
-        }
-        else {
-            long[] longArray = bitSet.toLongArray();
-            writeVarInt(longArray.length);
-            for (long content : longArray) {
-                writeLong(content);
-            }
-        }
+        writeChunkMask(chunkMask);
+
         writeTag(column.getHeightMaps());
         if (fullChunk) {
             writeVarInt(column.getBiomeData().length);

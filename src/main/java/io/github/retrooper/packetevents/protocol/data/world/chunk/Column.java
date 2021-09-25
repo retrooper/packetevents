@@ -15,28 +15,43 @@ public class Column {
     private final int z;
     private final Chunk[] chunks;
     private final NBTCompound[] tileEntities;
+    private final boolean hasHeightMaps;
     private final NBTCompound heightMaps;
+    private final boolean hasBiomeData;
     private final int[] biomeData;
-    private final boolean fullChunk;
+
+
+    public Column(int x, int z, Chunk[] chunks, NBTCompound[] tileEntities) {
+        this.x = x;
+        this.z = z;
+        this.chunks = Arrays.copyOf(chunks, chunks.length);
+        this.tileEntities = tileEntities != null ? tileEntities : new NBTCompound[0];
+        this.hasHeightMaps = false;
+        this.heightMaps = new NBTCompound();
+        this.hasBiomeData = false;
+        this.biomeData = new int[1024];
+    }
 
     public Column(int x, int z, Chunk[] chunks, NBTCompound[] tileEntities, NBTCompound heightMaps) {
         this.x = x;
         this.z = z;
         this.chunks = Arrays.copyOf(chunks, chunks.length);
-        this.biomeData = new int[1024];
         this.tileEntities = tileEntities != null ? tileEntities : new NBTCompound[0];
+        this.hasHeightMaps = true;
         this.heightMaps = heightMaps;
-        this.fullChunk = false;
+        this.hasBiomeData = false;
+        this.biomeData = new int[1024];
     }
 
     public Column(int x, int z, Chunk[] chunks, NBTCompound[] tileEntities, NBTCompound heightMaps, int[] biomeData) {
         this.x = x;
         this.z = z;
         this.chunks = Arrays.copyOf(chunks, chunks.length);
-        this.biomeData = biomeData != null ? Arrays.copyOf(biomeData, biomeData.length) : null;
         this.tileEntities = tileEntities != null ? tileEntities : new NBTCompound[0];
+        this.hasHeightMaps = true;
         this.heightMaps = heightMaps;
-        this.fullChunk = true;
+        this.hasBiomeData = true;
+        this.biomeData = biomeData != null ? Arrays.copyOf(biomeData, biomeData.length) : null;
     }
 
     public int getX() {
@@ -55,15 +70,19 @@ public class Column {
         return tileEntities;
     }
 
+    public boolean hasHeightMaps() {
+        return hasHeightMaps;
+    }
+
     public NBTCompound getHeightMaps() {
         return heightMaps;
     }
 
-    public int[] getBiomeData() {
-        return biomeData;
+    public boolean hasBiomeData() {
+        return hasBiomeData;
     }
 
-    public boolean isFullChunk() {
-        return fullChunk;
+    public int[] getBiomeData() {
+        return biomeData;
     }
 }
