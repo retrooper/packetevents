@@ -19,33 +19,33 @@
 package io.github.retrooper.packetevents.packetwrappers.play.out.setcooldown;
 
 import io.github.retrooper.packetevents.packettype.PacketTypeClasses;
+import io.github.retrooper.packetevents.packetwrappers.NMSPacket;
 import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
 import io.github.retrooper.packetevents.packetwrappers.api.SendableWrapper;
 import io.github.retrooper.packetevents.utils.nms.NMSUtils;
 import io.github.retrooper.packetevents.utils.server.ServerVersion;
-import org.bukkit.entity.EntityType;
+import org.bukkit.Material;
+import org.bukkit.inventory.ItemStack;
 
 import java.lang.reflect.Constructor;
-import java.util.IdentityHashMap;
-import java.util.Map;
+import java.lang.reflect.InvocationTargetException;
 
-//TODO TEST
 public class WrappedPacketOutSetCooldown extends WrappedPacket implements SendableWrapper {
-    private static final Map<Short, EntityType> ID_MAP = new IdentityHashMap<>();
     private static Constructor<?> packetConstructor;
-    private EntityType type;
+    private Object nmsItem;
     private int cooldownTicks;
 
-    public WrappedPacketOutSetCooldown(EntityType type, int cooldownTicks) {
-        this.type = type;
+    public WrappedPacketOutSetCooldown(NMSPacket packet) {
+        super(packet);
+    }
+
+    public WrappedPacketOutSetCooldown(Object nmsItem, int cooldownTicks) {
+        this.nmsItem = nmsItem;
         this.cooldownTicks = cooldownTicks;
     }
 
     @Override
     protected void load() {
-        for (EntityType type : EntityType.values()) {
-            ID_MAP.put(type.getTypeId(), type);
-        }
         try {
             packetConstructor = PacketTypeClasses.Play.Server.SET_COOLDOWN.getConstructor(NMSUtils.nmsItemClass, int.class);
         } catch (NoSuchMethodException e) {
@@ -53,23 +53,38 @@ public class WrappedPacketOutSetCooldown extends WrappedPacket implements Sendab
         }
     }
 
-    public EntityType getType() {
-        if (packet != null) {
+    @Override
+    public boolean isSupported() {
+        return version.isNewerThan(ServerVersion.v_1_8_8);
+    }
+
+    public ItemStack getItemStack() {
+        try {
             Object nmsItem = readObject(0, NMSUtils.nmsItemClass);
-            short nmsItemID = (short) NMSUtils.getNMSItemId(nmsItem);
-            return ID_MAP.get(nmsItemID);
+            Object nmsItemStack = NMSUtils.itemStackConstructor.newInstance(nmsItem);
+            return NMSUtils.toBukkitItemStack(nmsItemStack);
+        } catch (InvocationTargetException | InstantiationException | IllegalAccessException e) {
+            e.printStackTrace();
+        }
+
+        return new ItemStack(Material.AIR);
+    }
+
+    public Object getNmsItem() {
+        return nmsItem;
+    }
+
+    public void setNMSItemStack(Object type) {
+        if (packet != null) {
+            write(NMSUtils.nmsItemClass, 0, type);
         } else {
-            return type;
+            this.nmsItem = type;
         }
     }
 
-    public void setType(EntityType type) {
-        if (packet != null) {
-            Object nmsItem = NMSUtils.getNMSItemById(type.getTypeId());
-            write(NMSUtils.nmsItemClass, 0, nmsItem);
-        } else {
-            this.type = type;
-        }
+    @Override
+    public Object asNMSPacket() throws Exception {
+        return packetConstructor.newInstance(nmsItem, getCooldownTicks());
     }
 
     public int getCooldownTicks() {
@@ -86,16 +101,5 @@ public class WrappedPacketOutSetCooldown extends WrappedPacket implements Sendab
         } else {
             this.cooldownTicks = cooldownTicks;
         }
-    }
-
-    @Override
-    public boolean isSupported() {
-        return version.isNewerThan(ServerVersion.v_1_8_8);
-    }
-
-    @Override
-    public Object asNMSPacket() throws Exception {
-        Object nmsItem = NMSUtils.getNMSItemById(getType().getTypeId());
-        return packetConstructor.newInstance(nmsItem, getCooldownTicks());
     }
 }
