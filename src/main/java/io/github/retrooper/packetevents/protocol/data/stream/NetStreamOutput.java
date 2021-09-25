@@ -113,12 +113,12 @@ public class NetStreamOutput extends FilterOutputStream {
     }
 
 
-    public void writeBytes(byte b[]) {
+    public void writeBytes(byte[] b) {
         this.writeBytes(b, b.length);
     }
 
 
-    public void writeBytes(byte b[], int length) {
+    public void writeBytes(byte[] b, int length) {
         try {
             this.write(b, 0, length);
         } catch (IOException e) {

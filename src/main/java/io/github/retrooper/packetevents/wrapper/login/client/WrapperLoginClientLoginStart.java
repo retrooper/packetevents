@@ -19,8 +19,8 @@
 package io.github.retrooper.packetevents.wrapper.login.client;
 
 import io.github.retrooper.packetevents.event.impl.PacketReceiveEvent;
-import io.github.retrooper.packetevents.protocol.data.player.ClientVersion;
 import io.github.retrooper.packetevents.protocol.PacketType;
+import io.github.retrooper.packetevents.protocol.data.player.ClientVersion;
 import io.github.retrooper.packetevents.wrapper.PacketWrapper;
 
 public class WrapperLoginClientLoginStart extends PacketWrapper<WrapperLoginClientLoginStart> {

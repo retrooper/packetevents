@@ -20,6 +20,7 @@ package io.github.retrooper.packetevents.processor;
 
 import io.github.retrooper.packetevents.PacketEvents;
 import io.github.retrooper.packetevents.event.impl.PostPlayerInjectEvent;
+import io.github.retrooper.packetevents.manager.server.ServerManager;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -51,7 +52,7 @@ public class InternalBukkitListener implements Listener {
         }
 
         PacketEvents.get().getEventManager().callEvent(new PostPlayerInjectEvent(e.getPlayer()));
-        PacketEvents.get().getServerManager().entityCache.putIfAbsent(e.getPlayer().getEntityId(), e.getPlayer());
+        ServerManager.entityCache.putIfAbsent(e.getPlayer().getEntityId(), e.getPlayer());
     }
 
     @EventHandler(priority = EventPriority.HIGHEST)
@@ -62,18 +63,18 @@ public class InternalBukkitListener implements Listener {
         PacketEvents.get().getPlayerManager().clientVersions.remove(channel);
         PacketEvents.get().getPlayerManager().connectionStates.remove(channel);
         PacketEvents.get().getPlayerManager().channels.remove(player.getName());
-        PacketEvents.get().getServerManager().entityCache.remove(player.getEntityId());
+        ServerManager.entityCache.remove(player.getEntityId());
     }
 
 
     @EventHandler
     public void onEntitySpawn(EntitySpawnEvent event) {
         Entity entity = event.getEntity();
-        PacketEvents.get().getServerManager().entityCache.putIfAbsent(entity.getEntityId(), entity);
+        ServerManager.entityCache.putIfAbsent(entity.getEntityId(), entity);
     }
 
     @EventHandler
     public void onEntityDeath(EntityDeathEvent event) {
-        PacketEvents.get().getServerManager().entityCache.remove(event.getEntity().getEntityId());
+        ServerManager.entityCache.remove(event.getEntity().getEntityId());
     }
 }

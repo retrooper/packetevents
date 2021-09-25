@@ -8,7 +8,6 @@ package io.github.retrooper.packetevents.protocol.data.world.chunk.palette;
 
 /**
  * A global palette that maps 1:1.
- *
  */
 //TODO Equals & hashcode
 public class GlobalPalette implements Palette {

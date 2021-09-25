@@ -27,9 +27,9 @@ import io.github.retrooper.packetevents.protocol.ConnectionState;
 import io.github.retrooper.packetevents.protocol.PacketSide;
 import io.github.retrooper.packetevents.protocol.PacketType;
 import io.github.retrooper.packetevents.protocol.PacketTypeCommon;
+import io.github.retrooper.packetevents.protocol.data.player.ClientVersion;
 import io.github.retrooper.packetevents.utils.netty.buffer.ByteBufAbstract;
 import io.github.retrooper.packetevents.utils.netty.channel.ChannelAbstract;
-import io.github.retrooper.packetevents.protocol.data.player.ClientVersion;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -183,7 +183,7 @@ public abstract class ProtocolPacketEvent extends PacketEvent implements PlayerE
 
     @Deprecated
     public String getPacketName() {
-        return ((Enum<?>)packetType).name();
+        return ((Enum<?>) packetType).name();
     }
 
     @Override

@@ -18,141 +18,140 @@
 
 package io.github.retrooper.packetevents.protocol.data.nbt.serializer;
 
+import io.github.retrooper.packetevents.protocol.data.nbt.NBT;
+import io.github.retrooper.packetevents.protocol.data.nbt.NBTType;
+
 import java.io.IOException;
 import java.text.MessageFormat;
 import java.util.HashMap;
 import java.util.Map;
 
-import io.github.retrooper.packetevents.protocol.data.nbt.NBT;
-import io.github.retrooper.packetevents.protocol.data.nbt.NBTType;
 public class NBTSerializer<IN, OUT> {
 
-	public NBT deserializeTag(IN from) throws IOException {
-		NBTType<?> type = readTagType(from);
-		if (type == NBTType.END) {
-			return null;
-		}
-		readTagName(from);
-		return readTag(from, type);
-	}
+    protected final IdReader<IN> idReader;
+    protected final IdWriter<OUT> idWriter;
+    protected final NameReader<IN> nameReader;
+    protected final NameWriter<OUT> nameWriter;
+    protected final Map<Integer, NBTType<? extends NBT>> idToType = new HashMap<>();
+    protected final Map<NBTType<? extends NBT>, Integer> typeToId = new HashMap<>();
+    protected final Map<NBTType<? extends NBT>, TagReader<IN, ? extends NBT>> typeReaders = new HashMap<>();
+    protected final Map<NBTType<? extends NBT>, TagWriter<OUT, ? extends NBT>> typeWriters = new HashMap<>();
+    public NBTSerializer(
+            IdReader<IN> idReader, IdWriter<OUT> idWriter,
+            NameReader<IN> nameReader, NameWriter<OUT> nameWriter
+    ) {
+        this.idReader = idReader;
+        this.idWriter = idWriter;
+        this.nameReader = nameReader;
+        this.nameWriter = nameWriter;
+    }
 
-	public void serializeTag(OUT to, NBT tag) throws IOException {
-		NBTType<?> type = tag.getType();
-		writeTagType(to, type);
-		if (tag.getType() == NBTType.END) {
-			return;
-		}
-		writeTagName(to, "");
-		writeTag(to, tag);
-	}
+    public NBT deserializeTag(IN from) throws IOException {
+        NBTType<?> type = readTagType(from);
+        if (type == NBTType.END) {
+            return null;
+        }
+        readTagName(from);
+        return readTag(from, type);
+    }
 
+    public void serializeTag(OUT to, NBT tag) throws IOException {
+        NBTType<?> type = tag.getType();
+        writeTagType(to, type);
+        if (tag.getType() == NBTType.END) {
+            return;
+        }
+        writeTagName(to, "");
+        writeTag(to, tag);
+    }
 
-	protected final IdReader<IN> idReader;
-	protected final IdWriter<OUT> idWriter;
-	protected final NameReader<IN> nameReader;
-	protected final NameWriter<OUT> nameWriter;
-	public NBTSerializer(
-		IdReader<IN> idReader, IdWriter<OUT> idWriter,
-		NameReader<IN> nameReader, NameWriter<OUT> nameWriter
-	) {
-		this.idReader = idReader;
-		this.idWriter = idWriter;
-		this.nameReader = nameReader;
-		this.nameWriter = nameWriter;
-	}
+    protected <T extends NBT> void registerType(
+            NBTType<T> type, int id,
+            TagReader<IN, T> typeReader,
+            TagWriter<OUT, T> typeWriter
+    ) {
+        if (typeToId.containsKey(type)) {
+            throw new IllegalArgumentException(MessageFormat.format("Nbt type {0} is already registered", type));
+        }
+        if (idToType.containsKey(id)) {
+            throw new IllegalArgumentException(MessageFormat.format("Nbt type id {0} is already registered", id));
+        }
+        idToType.put(id, type);
+        typeToId.put(type, id);
+        typeReaders.put(type, typeReader);
+        typeWriters.put(type, typeWriter);
+    }
 
-	protected final Map<Integer, NBTType<? extends NBT>> idToType = new HashMap<>();
-	protected final Map<NBTType<? extends NBT>, Integer> typeToId = new HashMap<>();
-	protected final Map<NBTType<? extends NBT>, TagReader<IN, ? extends NBT>> typeReaders = new HashMap<>();
-	protected final Map<NBTType<? extends NBT>, TagWriter<OUT, ? extends NBT>> typeWriters = new HashMap<>();
+    protected NBTType<?> readTagType(IN from) throws IOException {
+        int id = idReader.readId(from);
+        NBTType<?> type = idToType.get(id);
+        if (type == null) {
+            throw new IOException(MessageFormat.format("Unknown nbt type id {0}", id));
+        }
+        return type;
+    }
 
-	protected <T extends NBT> void registerType(
-		NBTType<T> type, int id,
-		TagReader<IN, T> typeReader,
-		TagWriter<OUT, T> typeWriter
-	) {
-		if (typeToId.containsKey(type)) {
-			throw new IllegalArgumentException(MessageFormat.format("Nbt type {0} is already registered", type));
-		}
-		if (idToType.containsKey(id)) {
-			throw new IllegalArgumentException(MessageFormat.format("Nbt type id {0} is already registered", id));
-		}
-		idToType.put(id, type);
-		typeToId.put(type, id);
-		typeReaders.put(type, typeReader);
-		typeWriters.put(type, typeWriter);
-	}
+    protected String readTagName(IN from) throws IOException {
+        return nameReader.readName(from);
+    }
 
-	protected NBTType<?> readTagType(IN from) throws IOException {
-		int id = idReader.readId(from);
-		NBTType<?> type = idToType.get(id);
-		if (type == null) {
-			throw new IOException(MessageFormat.format("Unknown nbt type id {0}", id));
-		}
-		return type;
-	}
+    protected NBT readTag(IN from, NBTType<?> type) throws IOException {
+        TagReader<IN, ? extends NBT> f = typeReaders.get(type);
+        if (f == null) {
+            throw new IOException(MessageFormat.format("No reader registered for nbt type {0}", type));
+        }
+        return f.readTag(from);
+    }
 
-	protected String readTagName(IN from) throws IOException {
-		return nameReader.readName(from);
-	}
+    protected void writeTagType(OUT stream, NBTType<?> type) throws IOException {
+        int id = typeToId.getOrDefault(type, -1);
+        if (id == -1) {
+            throw new IOException(MessageFormat.format("Unknown nbt type {0}", type));
+        }
+        idWriter.writeId(stream, id);
+    }
 
-	protected NBT readTag(IN from, NBTType<?> type) throws IOException {
-		TagReader<IN, ? extends NBT> f = typeReaders.get(type);
-		if (f == null) {
-			throw new IOException(MessageFormat.format("No reader registered for nbt type {0}", type));
-		}
-		return f.readTag(from);
-	}
+    protected void writeTagName(OUT stream, String name) throws IOException {
+        nameWriter.writeName(stream, name);
+    }
 
-	protected void writeTagType(OUT stream, NBTType<?> type) throws IOException {
-		int id = typeToId.getOrDefault(type, -1);
-		if (id == -1) {
-			throw new IOException(MessageFormat.format("Unknown nbt type {0}", type));
-		}
-		idWriter.writeId(stream, id);
-	}
+    @SuppressWarnings("unchecked")
+    protected void writeTag(OUT stream, NBT tag) throws IOException {
+        TagWriter<OUT, NBT> f = (TagWriter<OUT, NBT>) typeWriters.get(tag.getType());
+        if (f == null) {
+            throw new IOException(MessageFormat.format("No writer registered for nbt type {0}", tag.getType()));
+        }
+        f.writeTag(stream, tag);
+    }
 
-	protected void writeTagName(OUT stream, String name) throws IOException {
-		nameWriter.writeName(stream, name);
-	}
+    @FunctionalInterface
+    protected interface IdReader<T> {
+        int readId(T from) throws IOException;
+    }
 
-	@SuppressWarnings("unchecked")
-	protected void writeTag(OUT stream, NBT tag) throws IOException {
-		TagWriter<OUT, NBT> f = (TagWriter<OUT, NBT>) typeWriters.get(tag.getType());
-		if (f == null) {
-			throw new IOException(MessageFormat.format("No writer registered for nbt type {0}", tag.getType()));
-		}
-		f.writeTag(stream, tag);
-	}
+    @FunctionalInterface
+    protected interface IdWriter<T> {
+        void writeId(T to, int id) throws IOException;
+    }
 
-	@FunctionalInterface
-	protected static interface IdReader<T> {
-		public int readId(T from) throws IOException;
-	}
+    @FunctionalInterface
+    protected interface NameReader<T> {
+        String readName(T from) throws IOException;
+    }
 
-	@FunctionalInterface
-	protected static interface IdWriter<T> {
-		public void writeId(T to, int id) throws IOException;
-	}
+    @FunctionalInterface
+    protected interface NameWriter<T> {
+        void writeName(T to, String name) throws IOException;
+    }
 
-	@FunctionalInterface
-	protected static interface NameReader<T> {
-		public String readName(T from) throws IOException;
-	}
+    @FunctionalInterface
+    protected interface TagReader<IN, T extends NBT> {
+        T readTag(IN from) throws IOException;
+    }
 
-	@FunctionalInterface
-	protected static interface NameWriter<T> {
-		public void writeName(T to, String name) throws IOException;
-	}
-
-	@FunctionalInterface
-	protected static interface TagReader<IN, T extends NBT> {
-		public T readTag(IN from) throws IOException;
-	}
-
-	@FunctionalInterface
-	public static interface TagWriter<OUT, T extends NBT> {
-		public void writeTag(OUT to, T tag) throws IOException;
-	}
+    @FunctionalInterface
+    public interface TagWriter<OUT, T extends NBT> {
+        void writeTag(OUT to, T tag) throws IOException;
+    }
 
 }

@@ -26,20 +26,10 @@ import io.github.retrooper.packetevents.wrapper.PacketWrapper;
 public class WrapperPlayClientClientStatus extends PacketWrapper<WrapperPlayClientClientStatus> {
     private Action action;
 
-    public enum Action {
-        PERFORM_RESPAWN,
-        REQUEST_STATS,
-
-        //This only exists on 1.7.10 -> 1.15.2
-        OPEN_INVENTORY_ACHIEVEMENT;
-
-        public static final Action[] VALUES = values();
-    }
-
-
     public WrapperPlayClientClientStatus(PacketReceiveEvent event) {
         super(event);
     }
+
 
     public WrapperPlayClientClientStatus(Action action) {
         super(PacketType.Play.Client.CLIENT_STATUS.getID());
@@ -51,8 +41,7 @@ public class WrapperPlayClientClientStatus extends PacketWrapper<WrapperPlayClie
         int index;
         if (serverVersion.isNewerThanOrEquals(ServerVersion.v_1_8)) {
             index = readVarInt();
-        }
-        else {
+        } else {
             index = readByte();
         }
         this.action = Action.VALUES[index];
@@ -73,8 +62,7 @@ public class WrapperPlayClientClientStatus extends PacketWrapper<WrapperPlayClie
                 }
             }
             writeVarInt(action.ordinal());
-        }
-        else {
+        } else {
             writeByte(action.ordinal());
         }
     }
@@ -85,5 +73,15 @@ public class WrapperPlayClientClientStatus extends PacketWrapper<WrapperPlayClie
 
     public void setAction(Action action) {
         this.action = action;
+    }
+
+    public enum Action {
+        PERFORM_RESPAWN,
+        REQUEST_STATS,
+
+        //This only exists on 1.7.10 -> 1.15.2
+        OPEN_INVENTORY_ACHIEVEMENT;
+
+        public static final Action[] VALUES = values();
     }
 }

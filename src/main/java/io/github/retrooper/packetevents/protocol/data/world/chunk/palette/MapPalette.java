@@ -32,7 +32,7 @@ public class MapPalette implements Palette {
         this(bitsPerEntry);
 
         int paletteLength = in.readVarInt();
-        for(int i = 0; i < paletteLength; i++) {
+        for (int i = 0; i < paletteLength; i++) {
             int state = in.readVarInt();
             this.idToState[i] = state;
             this.stateToId.putIfAbsent(state, i);
@@ -48,13 +48,13 @@ public class MapPalette implements Palette {
     @Override
     public int stateToId(int state) {
         Integer id = this.stateToId.get(state);
-        if(id == null && this.size() < this.maxId + 1) {
+        if (id == null && this.size() < this.maxId + 1) {
             id = this.nextId++;
             this.idToState[id] = state;
             this.stateToId.put(state, id);
         }
 
-        if(id != null) {
+        if (id != null) {
             return id;
         } else {
             return -1;
@@ -63,7 +63,7 @@ public class MapPalette implements Palette {
 
     @Override
     public int idToState(int id) {
-        if(id >= 0 && id < this.size()) {
+        if (id >= 0 && id < this.size()) {
             return this.idToState[id];
         } else {
             return 0;

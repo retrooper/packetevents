@@ -27,19 +27,8 @@ import com.viaversion.viaversion.exception.CancelDecoderException;
 import com.viaversion.viaversion.exception.CancelEncoderException;
 import com.viaversion.viaversion.exception.InformativeException;
 import io.github.retrooper.packetevents.protocol.ConnectionState;
-import io.github.retrooper.packetevents.utils.reflection.ClassUtil;
-import io.github.retrooper.packetevents.utils.reflection.Reflection;
-import io.github.retrooper.packetevents.utils.reflection.ReflectionObject;
 import io.netty.buffer.ByteBuf;
-import io.netty.channel.Channel;
-import io.netty.channel.ChannelHandler;
-import io.netty.handler.codec.ByteToMessageDecoder;
-import io.netty.handler.codec.MessageToMessageDecoder;
 import org.bukkit.entity.Player;
-
-import java.lang.reflect.Field;
-import java.lang.reflect.Method;
-import java.util.*;
 
 public class ViaVersionAccessorImpl implements ViaVersionAccessor {
     @Override
@@ -73,35 +62,34 @@ public class ViaVersionAccessorImpl implements ViaVersionAccessor {
             } else {
                 userConnection.transformClientbound(byteBuf, CancelEncoderException::generate);
             }
-        }
-        catch (Exception ex) {
+        } catch (Exception ex) {
             ex.printStackTrace();
         }
     }
 
     @Override
     public void setUserConnectionActive(Object userConnectionObj, boolean active) {
-        ((UserConnection)userConnectionObj).setActive(active);
+        ((UserConnection) userConnectionObj).setActive(active);
     }
 
     @Override
     public boolean isUserConnectionActive(Object userConnectionObj) {
-        return ((UserConnection)userConnectionObj).isActive();
+        return ((UserConnection) userConnectionObj).isActive();
     }
 
     @Override
     public boolean checkServerboundPacketUserConnection(Object userConnectionObj) {
-        return ((UserConnection)userConnectionObj).checkServerboundPacket();
+        return ((UserConnection) userConnectionObj).checkServerboundPacket();
     }
 
     @Override
     public boolean checkClientboundPacketUserConnection(Object userConnectionObj) {
-        return ((UserConnection)userConnectionObj).checkClientboundPacket();
+        return ((UserConnection) userConnectionObj).checkClientboundPacket();
     }
 
     @Override
     public ConnectionState getUserConnectionProtocolState(Object userConnectionObj) {
-        return ConnectionState.VALUES[((UserConnection)userConnectionObj).getProtocolInfo().getState().ordinal()];
+        return ConnectionState.VALUES[((UserConnection) userConnectionObj).getProtocolInfo().getState().ordinal()];
     }
 
     @Override

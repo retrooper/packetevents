@@ -24,6 +24,7 @@ import io.github.retrooper.packetevents.wrapper.PacketWrapper;
 
 public class WrapperPlayClientCloseWindow extends PacketWrapper<WrapperPlayClientCloseWindow> {
     private int windowID;
+
     public WrapperPlayClientCloseWindow(PacketReceiveEvent event) {
         super(event);
     }

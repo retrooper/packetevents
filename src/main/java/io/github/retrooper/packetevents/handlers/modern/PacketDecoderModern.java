@@ -37,9 +37,9 @@ import java.util.List;
 public class PacketDecoderModern extends MessageToMessageDecoder<ByteBuf> {
     public volatile Player player;
     public ConnectionState connectionState = ConnectionState.HANDSHAKING;
+    public boolean bypassCompression = false;
     private boolean handledCompression;
     private boolean skipDoubleTransform;
-    public boolean bypassCompression = false;
 
     public void handle(ChannelHandlerContextAbstract ctx, ByteBufAbstract byteBuf, List<Object> output) {
         if (skipDoubleTransform) {

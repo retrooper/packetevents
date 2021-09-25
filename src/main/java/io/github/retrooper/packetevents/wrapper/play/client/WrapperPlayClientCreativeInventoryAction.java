@@ -26,6 +26,7 @@ import org.bukkit.inventory.ItemStack;
 public class WrapperPlayClientCreativeInventoryAction extends PacketWrapper<WrapperPlayClientCreativeInventoryAction> {
     private int slot;
     private ItemStack itemStack;
+
     public WrapperPlayClientCreativeInventoryAction(PacketReceiveEvent event) {
         super(event);
     }

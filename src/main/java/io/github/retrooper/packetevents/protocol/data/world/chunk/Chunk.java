@@ -6,12 +6,12 @@
 
 package io.github.retrooper.packetevents.protocol.data.world.chunk;
 
+import io.github.retrooper.packetevents.protocol.data.stream.NetStreamInput;
+import io.github.retrooper.packetevents.protocol.data.stream.NetStreamOutput;
 import io.github.retrooper.packetevents.protocol.data.world.chunk.palette.GlobalPalette;
 import io.github.retrooper.packetevents.protocol.data.world.chunk.palette.ListPalette;
 import io.github.retrooper.packetevents.protocol.data.world.chunk.palette.MapPalette;
 import io.github.retrooper.packetevents.protocol.data.world.chunk.palette.Palette;
-import io.github.retrooper.packetevents.protocol.data.stream.NetStreamInput;
-import io.github.retrooper.packetevents.protocol.data.stream.NetStreamOutput;
 
 import java.io.IOException;
 
@@ -56,10 +56,10 @@ public class Chunk {
         out.writeShort(chunk.blockCount);
         out.writeByte(chunk.storage.getBitsPerEntry());
 
-        if(!(chunk.palette instanceof GlobalPalette)) {
+        if (!(chunk.palette instanceof GlobalPalette)) {
             int paletteLength = chunk.palette.size();
             out.writeVarInt(paletteLength);
-            for(int i = 0; i < paletteLength; i++) {
+            for (int i = 0; i < paletteLength; i++) {
                 //TODO Figure out why its not working for protocolsupport
                 out.writeVarInt(chunk.palette.idToState(i));
             }
@@ -70,6 +70,30 @@ public class Chunk {
         out.writeLongs(data);
     }
 
+    private static Palette createPalette(int bitsPerEntry) {
+        if (bitsPerEntry <= MIN_PALETTE_BITS_PER_ENTRY) {
+            return new ListPalette(bitsPerEntry);
+        } else if (bitsPerEntry <= MAX_PALETTE_BITS_PER_ENTRY) {
+            return new MapPalette(bitsPerEntry);
+        } else {
+            return new GlobalPalette();
+        }
+    }
+
+    private static Palette readPalette(int bitsPerEntry, NetStreamInput in) throws IOException {
+        if (bitsPerEntry <= MIN_PALETTE_BITS_PER_ENTRY) {
+            return new ListPalette(bitsPerEntry, in);
+        } else if (bitsPerEntry <= MAX_PALETTE_BITS_PER_ENTRY) {
+            return new MapPalette(bitsPerEntry, in);
+        } else {
+            return new GlobalPalette();
+        }
+    }
+
+    private static int index(int x, int y, int z) {
+        return y << 8 | z << 4 | x;
+    }
+
     public int get(int x, int y, int z) {
         int id = this.storage.get(index(x, y, z));
         return this.palette.idToState(id);
@@ -77,16 +101,16 @@ public class Chunk {
 
     public void set(int x, int y, int z, int state) {
         int id = this.palette.stateToId(state);
-        if(id == -1) {
+        if (id == -1) {
             this.resizePalette();
             id = this.palette.stateToId(state);
         }
 
         int index = index(x, y, z);
         int curr = this.storage.get(index);
-        if(state != AIR && curr == AIR) {
+        if (state != AIR && curr == AIR) {
             this.blockCount++;
-        } else if(state == AIR && curr != AIR) {
+        } else if (state == AIR && curr != AIR) {
             this.blockCount--;
         }
 
@@ -98,7 +122,7 @@ public class Chunk {
     }
 
     private int sanitizeBitsPerEntry(int bitsPerEntry) {
-        if(bitsPerEntry <= MAX_PALETTE_BITS_PER_ENTRY) {
+        if (bitsPerEntry <= MAX_PALETTE_BITS_PER_ENTRY) {
             return Math.max(MIN_PALETTE_BITS_PER_ENTRY, bitsPerEntry);
         } else {
             return GLOBAL_PALETTE_BITS_PER_ENTRY;
@@ -113,32 +137,8 @@ public class Chunk {
         this.palette = createPalette(bitsPerEntry);
         this.storage = new BitStorage(bitsPerEntry, CHUNK_SIZE);
 
-        for(int i = 0; i < CHUNK_SIZE; i++) {
+        for (int i = 0; i < CHUNK_SIZE; i++) {
             this.storage.set(i, this.palette.stateToId(oldPalette.idToState(oldData.get(i))));
         }
-    }
-
-    private static Palette createPalette(int bitsPerEntry) {
-        if(bitsPerEntry <= MIN_PALETTE_BITS_PER_ENTRY) {
-            return new ListPalette(bitsPerEntry);
-        } else if(bitsPerEntry <= MAX_PALETTE_BITS_PER_ENTRY) {
-            return new MapPalette(bitsPerEntry);
-        } else {
-            return new GlobalPalette();
-        }
-    }
-
-    private static Palette readPalette(int bitsPerEntry, NetStreamInput in) throws IOException {
-        if(bitsPerEntry <= MIN_PALETTE_BITS_PER_ENTRY) {
-            return new ListPalette(bitsPerEntry, in);
-        } else if(bitsPerEntry <= MAX_PALETTE_BITS_PER_ENTRY) {
-            return new MapPalette(bitsPerEntry, in);
-        } else {
-            return new GlobalPalette();
-        }
-    }
-
-    private static int index(int x, int y, int z) {
-        return y << 8 | z << 4 | x;
     }
 }

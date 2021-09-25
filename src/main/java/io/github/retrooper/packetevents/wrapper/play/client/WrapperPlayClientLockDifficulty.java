@@ -24,6 +24,7 @@ import io.github.retrooper.packetevents.wrapper.PacketWrapper;
 
 public class WrapperPlayClientLockDifficulty extends PacketWrapper<WrapperPlayClientLockDifficulty> {
     private boolean locked;
+
     public WrapperPlayClientLockDifficulty(PacketReceiveEvent event) {
         super(event);
     }

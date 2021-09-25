@@ -118,8 +118,7 @@ public class CustomBukkitEncodeHandlerModern extends MessageToByteEncoder<Object
             if (customEncoder instanceof MessageToByteEncoder) {
                 CustomPipelineUtil.callEncode((MessageToByteEncoder<?>) customEncoder, ctx, transformed, byteBuf);
                 transformed.clear().writeBytes(byteBuf);
-            }
-            else if (customEncoder instanceof MessageToMessageEncoder) {
+            } else if (customEncoder instanceof MessageToMessageEncoder) {
                 byteBuf = (ByteBuf) CustomPipelineUtil.callEncode((MessageToMessageEncoder<?>) customEncoder, ctx, transformed).get(0);
                 transformed.clear().writeBytes(byteBuf);
             }

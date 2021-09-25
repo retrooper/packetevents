@@ -22,11 +22,11 @@ import io.github.retrooper.packetevents.PacketEvents;
 import io.github.retrooper.packetevents.event.PacketListener;
 import io.github.retrooper.packetevents.event.impl.PacketReceiveEvent;
 import io.github.retrooper.packetevents.event.impl.PacketSendEvent;
-import io.github.retrooper.packetevents.protocol.data.world.chunk.Column;
-import io.github.retrooper.packetevents.protocol.data.nbt.NBTCompound;
-import io.github.retrooper.packetevents.protocol.data.player.ClientVersion;
 import io.github.retrooper.packetevents.protocol.ConnectionState;
 import io.github.retrooper.packetevents.protocol.PacketType;
+import io.github.retrooper.packetevents.protocol.data.nbt.NBTCompound;
+import io.github.retrooper.packetevents.protocol.data.player.ClientVersion;
+import io.github.retrooper.packetevents.protocol.data.world.chunk.Column;
 import io.github.retrooper.packetevents.wrapper.handshaking.client.WrapperHandshakingClientHandshake;
 import io.github.retrooper.packetevents.wrapper.login.client.WrapperLoginClientLoginStart;
 import io.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerChunkData;
@@ -38,8 +38,7 @@ public class InternalPacketListener implements PacketListener {
         if (event.getPacketType() == PacketType.Login.Server.LOGIN_SUCCESS) {
             //Transition into the GAME connection state
             PacketEvents.get().getInjector().changeConnectionState(event.getChannel().rawChannel(), ConnectionState.PLAY);
-        }
-        else if (event.getPacketType() == PacketType.Play.Server.CHUNK_DATA) {
+        } else if (event.getPacketType() == PacketType.Play.Server.CHUNK_DATA) {
             WrapperPlayServerChunkData chunkData = new WrapperPlayServerChunkData(event);
             Column column = chunkData.getColumn();
             int x = column.getX();

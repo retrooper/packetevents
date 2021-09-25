@@ -19,9 +19,9 @@
 package io.github.retrooper.packetevents.wrapper.play.server;
 
 import io.github.retrooper.packetevents.event.impl.PacketSendEvent;
-import io.github.retrooper.packetevents.protocol.data.player.ClientVersion;
 import io.github.retrooper.packetevents.manager.server.ServerVersion;
 import io.github.retrooper.packetevents.protocol.PacketType;
+import io.github.retrooper.packetevents.protocol.data.player.ClientVersion;
 import io.github.retrooper.packetevents.wrapper.PacketWrapper;
 
 import java.util.UUID;
@@ -32,6 +32,7 @@ public class WrapperPlayServerChatMessage extends PacketWrapper<WrapperPlayServe
     private String jsonMessage;
     private ChatPosition position;
     private UUID senderUUID;
+
     public WrapperPlayServerChatMessage(PacketSendEvent event) {
         super(event);
     }

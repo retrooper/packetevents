@@ -24,6 +24,7 @@ import protocolsupport.api.ProtocolSupportAPI;
 
 public class ProtocolSupportUtil {
     private static byte available = -1;
+
     public static boolean isAvailable() {
         if (available == -1) {
             boolean present = Bukkit.getPluginManager().getPlugin("ProtocolSupport") != null;

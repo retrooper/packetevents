@@ -27,12 +27,6 @@ import java.util.Optional;
 public class WrapperPlayClientAdvancementTab extends PacketWrapper<WrapperPlayClientAdvancementTab> {
     private Action action;
     private Optional<String> tabID;
-    public enum Action {
-        OPENED_TAB,
-        CLOSED_SCREEN;
-
-        public static final Action[] VALUES = values();
-    }
 
     public WrapperPlayClientAdvancementTab(PacketReceiveEvent event) {
         super(event);
@@ -50,8 +44,7 @@ public class WrapperPlayClientAdvancementTab extends PacketWrapper<WrapperPlayCl
         if (action == Action.OPENED_TAB) {
             String key = readString();
             tabID = Optional.of(key);
-        }
-        else {
+        } else {
             tabID = Optional.empty();
         }
     }
@@ -84,5 +77,12 @@ public class WrapperPlayClientAdvancementTab extends PacketWrapper<WrapperPlayCl
 
     public void setTabID(Optional<String> tabID) {
         this.tabID = tabID;
+    }
+
+    public enum Action {
+        OPENED_TAB,
+        CLOSED_SCREEN;
+
+        public static final Action[] VALUES = values();
     }
 }

@@ -88,6 +88,7 @@ public class WrapperPlayClientUpdateSign extends PacketWrapper<WrapperPlayClient
 
     /**
      * Modify the block location of the sign.
+     *
      * @param blockPosition Sign position
      */
     public void setBlockPosition(BlockPosition blockPosition) {

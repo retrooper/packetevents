@@ -26,6 +26,7 @@ import io.github.retrooper.packetevents.protocol.data.world.BlockPosition;
 import io.github.retrooper.packetevents.wrapper.PacketWrapper;
 
 import java.util.Optional;
+
 public class WrapperPlayClientTabComplete extends PacketWrapper<WrapperPlayClientTabComplete> {
     private String text;
     private Optional<Integer> transactionID;
@@ -52,8 +53,7 @@ public class WrapperPlayClientTabComplete extends PacketWrapper<WrapperPlayClien
             if (serverVersion.isNewerThanOrEquals(ServerVersion.v_1_13_1)) {
                 //1.13.1+ text length
                 textLength = 32500;
-            }
-            else {
+            } else {
                 //1.13 text length
                 textLength = 256;
             }
@@ -63,7 +63,7 @@ public class WrapperPlayClientTabComplete extends PacketWrapper<WrapperPlayClien
 
         text = readString(textLength);
         if (serverVersion.isNewerThanOrEquals(ServerVersion.v_1_8) || clientVersion.isNewerThanOrEquals(ClientVersion.v_1_8)) {
-           if (!v1_13) {
+            if (!v1_13) {
                 transactionID = Optional.empty();
                 //1.13+ removed this
                 boolean hasPosition = readBoolean();
@@ -90,8 +90,7 @@ public class WrapperPlayClientTabComplete extends PacketWrapper<WrapperPlayClien
             if (serverVersion.isNewerThanOrEquals(ServerVersion.v_1_13_1)) {
                 //1.13.1+ text length
                 textLength = 32500;
-            }
-            else {
+            } else {
                 //1.13 text length
                 textLength = 256;
             }

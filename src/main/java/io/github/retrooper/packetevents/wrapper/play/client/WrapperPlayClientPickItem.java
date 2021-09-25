@@ -24,6 +24,7 @@ import io.github.retrooper.packetevents.wrapper.PacketWrapper;
 
 public class WrapperPlayClientPickItem extends PacketWrapper<WrapperPlayClientPickItem> {
     private int slot;
+
     public WrapperPlayClientPickItem(PacketReceiveEvent event) {
         super(event);
     }

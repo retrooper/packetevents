@@ -20,16 +20,16 @@ package io.github.retrooper.packetevents.protocol.data.nbt;
 
 public abstract class NBTNumber extends NBT {
 
-	public abstract byte getAsByte();
+    public abstract byte getAsByte();
 
-	public abstract short getAsShort();
+    public abstract short getAsShort();
 
-	public abstract int getAsInt();
+    public abstract int getAsInt();
 
-	public abstract long getAsLong();
+    public abstract long getAsLong();
 
-	public abstract float getAsFloat();
+    public abstract float getAsFloat();
 
-	public abstract double getAsDouble();
+    public abstract double getAsDouble();
 
 }

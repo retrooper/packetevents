@@ -85,8 +85,8 @@ public class ViaVersionAccessorImplLegacy implements ViaVersionAccessor {
                 transformClientboundMethod = Reflection.getMethod(userConnectionClass, "transformClientbound", 0);
                 setActiveMethod = Reflection.getMethod(userConnectionClass, "setActive", 0);
                 isActiveMethod = Reflection.getMethod(userConnectionClass, "isActive", 0);
-                cancelDecoderExceptionGenerator= Reflection.getMethod(Class.forName("us.myles.ViaVersion.exception.CancelDecoderException"), "generate", 0);
-                cancelEncoderExceptionGenerator= Reflection.getMethod(Class.forName("us.myles.ViaVersion.exception.CancelEncoderException"), "generate", 0);
+                cancelDecoderExceptionGenerator = Reflection.getMethod(Class.forName("us.myles.ViaVersion.exception.CancelDecoderException"), "generate", 0);
+                cancelEncoderExceptionGenerator = Reflection.getMethod(Class.forName("us.myles.ViaVersion.exception.CancelEncoderException"), "generate", 0);
                 getProtocolInfoMethod = Reflection.getMethod(userConnectionClass, "getProtocolInfo", 0);
             } catch (ClassNotFoundException e) {
                 e.printStackTrace();
@@ -113,8 +113,7 @@ public class ViaVersionAccessorImplLegacy implements ViaVersionAccessor {
             Object manager = viaManagerField.get(null);
             ReflectionObject reflectManager = new ReflectionObject(manager);
             return reflectManager.readBoolean(0);
-        }
-        catch (IllegalAccessException e) {
+        } catch (IllegalAccessException e) {
             e.printStackTrace();
         }
         return false;
@@ -152,8 +151,7 @@ public class ViaVersionAccessorImplLegacy implements ViaVersionAccessor {
             } else {
                 transformClientboundMethod.invoke(userConnectionObj, byteBuf, cancelEncoderExceptionGenerator.invoke(null));
             }
-        }
-        catch (Exception ex) {
+        } catch (Exception ex) {
             ex.printStackTrace();
         }
     }
@@ -184,8 +182,7 @@ public class ViaVersionAccessorImplLegacy implements ViaVersionAccessor {
         load();
         try {
             return (boolean) checkServerBoundMethod.invoke(userConnectionObj);
-        }
-        catch (IllegalAccessException | InvocationTargetException e) {
+        } catch (IllegalAccessException | InvocationTargetException e) {
             e.printStackTrace();
         }
         return false;
@@ -197,8 +194,7 @@ public class ViaVersionAccessorImplLegacy implements ViaVersionAccessor {
 
         try {
             return (boolean) checkClientBoundMethod.invoke(userConnectionObj);
-        }
-        catch (IllegalAccessException | InvocationTargetException e) {
+        } catch (IllegalAccessException | InvocationTargetException e) {
             e.printStackTrace();
         }
         return false;

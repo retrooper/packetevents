@@ -26,13 +26,13 @@ import io.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerWin
 /**
  * A response to the window confirmation packet by the client
  * It is processed on the main thread, and is therefore very useful for anticheat purposes
- *
+ * <p>
  * If a confirmation sent by the client was not accepted, the server will reply with a
  * {@link WrapperPlayServerWindowConfirmation}
  * packet with the Accepted field set to false. When this happens,
  * the client must send this packet to apologize (as with movement),
  * otherwise the server ignores any successive confirmations.
- *
+ * <p>
  * Replaced in 1.17 with the more efficient {@link WrapperPlayClientPong}
  *
  * @see WrapperPlayServerWindowConfirmation

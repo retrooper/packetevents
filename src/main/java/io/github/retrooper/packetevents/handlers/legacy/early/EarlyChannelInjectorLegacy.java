@@ -23,9 +23,9 @@ import io.github.retrooper.packetevents.handlers.EarlyInjector;
 import io.github.retrooper.packetevents.handlers.legacy.PacketDecoderLegacy;
 import io.github.retrooper.packetevents.handlers.legacy.PacketEncoderLegacy;
 import io.github.retrooper.packetevents.protocol.ConnectionState;
+import io.github.retrooper.packetevents.utils.ListWrapper;
 import io.github.retrooper.packetevents.utils.MinecraftReflectionUtil;
 import io.github.retrooper.packetevents.utils.dependencies.protocolsupport.ProtocolSupportUtil;
-import io.github.retrooper.packetevents.utils.ListWrapper;
 import io.github.retrooper.packetevents.utils.reflection.ReflectionObject;
 import net.minecraft.util.io.netty.channel.Channel;
 import net.minecraft.util.io.netty.channel.ChannelFuture;
@@ -226,8 +226,7 @@ public class EarlyChannelInjectorLegacy implements EarlyInjector {
         ChannelHandler decoder = channel.pipeline().get(PacketEvents.get().decoderName);
         if (decoder != null) {
             return (PacketDecoderLegacy) decoder;
-        }
-        else {
+        } else {
             return null;
         }
     }
@@ -270,6 +269,7 @@ public class EarlyChannelInjectorLegacy implements EarlyInjector {
         }
         return state;
     }
+
     @Override
     public void changeConnectionState(Object ch, ConnectionState connectionState) {
         Channel channel = (Channel) ch;

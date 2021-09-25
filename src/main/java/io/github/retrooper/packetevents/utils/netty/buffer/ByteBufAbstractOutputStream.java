@@ -77,7 +77,7 @@ public class ByteBufAbstractOutputStream extends OutputStream implements DataOut
     public void writeChars(String s) throws IOException {
         int len = s.length();
 
-        for(int i = 0; i < len; ++i) {
+        for (int i = 0; i < len; ++i) {
             this.buffer.writeChar(s.charAt(i));
         }
 
@@ -100,7 +100,7 @@ public class ByteBufAbstractOutputStream extends OutputStream implements DataOut
     }
 
     public void writeShort(int v) throws IOException {
-        this.buffer.writeShort((short)v);
+        this.buffer.writeShort((short) v);
     }
 
     public void writeUTF(String s) throws IOException {

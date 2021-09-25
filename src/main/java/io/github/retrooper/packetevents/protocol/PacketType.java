@@ -20,9 +20,9 @@ package io.github.retrooper.packetevents.protocol;
 
 import io.github.retrooper.packetevents.manager.server.ServerManager;
 import io.github.retrooper.packetevents.manager.server.ServerVersion;
+import io.github.retrooper.packetevents.protocol.data.player.ClientVersion;
 import io.github.retrooper.packetevents.protocol.mappings.packettypes.clientbound.*;
 import io.github.retrooper.packetevents.protocol.mappings.packettypes.serverbound.*;
-import io.github.retrooper.packetevents.protocol.data.player.ClientVersion;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.HashMap;
@@ -276,14 +276,9 @@ public final class PacketType {
             PLAYER_BLOCK_PLACEMENT,
             USE_ITEM;
 
-            private int id = -1;
-
-            public int getID() {
-                return id;
-            }
-
             private static final Map<Integer, Map<Integer, PacketTypeCommon>> PACKET_ID_CACHE = new HashMap<>();
             private static final Map<Integer, Map<PacketTypeCommon, Integer>> PACKET_TYPE_CACHE = new HashMap<>();
+            private int id = -1;
 
             @Nullable
             public static PacketTypeCommon getById(int protocolVersion, int packetID) {
@@ -338,6 +333,10 @@ public final class PacketType {
                 loadPacketIDs(ClientVersion.v_1_16_4, ServerboundPacketType_1_16_2.values());
                 loadPacketIDs(ClientVersion.v_1_17, ServerboundPacketType_1_17.values());
                 loadPacketIDs(ClientVersion.v_1_17_1, ServerboundPacketType_1_17.values());
+            }
+
+            public int getID() {
+                return id;
             }
 
             public int getPacketID(int protocolVersion) {

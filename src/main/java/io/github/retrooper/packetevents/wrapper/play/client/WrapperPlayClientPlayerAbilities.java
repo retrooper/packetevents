@@ -89,8 +89,7 @@ public class WrapperPlayClientPlayerAbilities extends PacketWrapper<WrapperPlayC
         if (serverVersion.isNewerThanOrEquals(ServerVersion.v_1_16)) {
             byte mask = (byte) (flying ? 0x02 : 0x00);
             writeByte(mask);
-        }
-        else {
+        } else {
             byte mask = 0x00;
             if (vulnerable.orElse(false)) {
                 mask |= 0x01;

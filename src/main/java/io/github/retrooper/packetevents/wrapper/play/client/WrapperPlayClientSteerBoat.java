@@ -25,6 +25,7 @@ import io.github.retrooper.packetevents.wrapper.PacketWrapper;
 public class WrapperPlayClientSteerBoat extends PacketWrapper<WrapperPlayClientSteerBoat> {
     private boolean leftPaddleTurning;
     private boolean rightPaddleTurning;
+
     public WrapperPlayClientSteerBoat(PacketReceiveEvent event) {
         super(event);
     }

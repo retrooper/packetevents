@@ -41,9 +41,9 @@ import java.util.List;
 import java.util.Map;
 
 public final class ServerManager {
+    private static final ServerVersion version;
     //Initialized in PacketEvents#load
     public static Map<Integer, Entity> entityCache;
-    private static final ServerVersion version;
 
     static {
         version = ServerVersion.resolve();

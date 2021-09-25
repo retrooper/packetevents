@@ -20,30 +20,27 @@ package io.github.retrooper.packetevents.protocol.data.nbt;
 
 public class NBTEnd extends NBT {
 
-	public static final NBTEnd INSTANCE = new NBTEnd();
+    public static final NBTEnd INSTANCE = new NBTEnd();
 
-	@Override
-	public NBTType<NBTEnd> getType() {
-		return NBTType.END;
-	}
+    @Override
+    public NBTType<NBTEnd> getType() {
+        return NBTType.END;
+    }
 
-	@Override
-	public boolean equals(Object obj) {
-		if (this == obj) {
-			return true;
-		}
-		if (obj == null) {
-			return false;
-		}
-		if (getClass() != obj.getClass()) {
-			return false;
-		}
-		return true;
-	}
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        return getClass() == obj.getClass();
+    }
 
-	@Override
-	public int hashCode() {
-		return 0;
-	}
+    @Override
+    public int hashCode() {
+        return 0;
+    }
 
 }

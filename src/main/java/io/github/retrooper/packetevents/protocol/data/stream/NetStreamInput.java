@@ -110,7 +110,7 @@ public class NetStreamInput extends FilterInputStream {
 
 
     public long readLong() {
-        byte read[] = this.readBytes(8);
+        byte[] read = this.readBytes(8);
         return ((long) read[0] << 56) + ((long) (read[1] & 255) << 48) + ((long) (read[2] & 255) << 40) + ((long) (read[3] & 255) << 32) + ((long) (read[4] & 255) << 24) + ((read[5] & 255) << 16) + ((read[6] & 255) << 8) + ((read[7] & 255) << 0);
     }
 
@@ -145,7 +145,7 @@ public class NetStreamInput extends FilterInputStream {
             throw new IllegalArgumentException("Array cannot have length less than 0.");
         }
 
-        byte b[] = new byte[length];
+        byte[] b = new byte[length];
         int n = 0;
         while (n < length) {
             int count = 0;
@@ -223,7 +223,7 @@ public class NetStreamInput extends FilterInputStream {
             throw new IllegalArgumentException("Array cannot have length less than 0.");
         }
 
-        int i[] = new int[length];
+        int[] i = new int[length];
         int read = this.readInts(i);
         if (read < length) {
             throw new IllegalStateException();
@@ -256,7 +256,7 @@ public class NetStreamInput extends FilterInputStream {
             throw new IllegalArgumentException("Array cannot have length less than 0.");
         }
 
-        long l[] = new long[length];
+        long[] l = new long[length];
         int read = this.readLongs(l);
         if (read < length) {
             throw new IllegalStateException();
@@ -286,7 +286,7 @@ public class NetStreamInput extends FilterInputStream {
 
     public String readString() {
         int length = this.readVarInt();
-        byte bytes[] = this.readBytes(length);
+        byte[] bytes = this.readBytes(length);
         return new String(bytes, StandardCharsets.UTF_8);
     }
 

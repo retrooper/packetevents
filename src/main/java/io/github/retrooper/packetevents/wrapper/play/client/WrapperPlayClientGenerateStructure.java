@@ -92,6 +92,7 @@ public class WrapperPlayClientGenerateStructure extends PacketWrapper<WrapperPla
 
     /**
      * Modify levels.
+     *
      * @param levels Levels
      */
     public void setLevels(int levels) {

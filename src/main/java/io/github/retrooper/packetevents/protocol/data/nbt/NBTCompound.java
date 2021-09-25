@@ -21,18 +21,17 @@ package io.github.retrooper.packetevents.protocol.data.nbt;
 import java.text.MessageFormat;
 import java.util.Collections;
 import java.util.LinkedHashMap;
-
 import java.util.Map;
 import java.util.Set;
 
 public class NBTCompound extends NBT {
 
+    protected final Map<String, NBT> tags = new LinkedHashMap<>();
+
     @Override
     public NBTType<NBTCompound> getType() {
         return NBTType.COMPOUND;
     }
-
-    protected final Map<String, NBT> tags = new LinkedHashMap<>();
 
     public boolean isEmpty() {
         return tags.isEmpty();
@@ -149,7 +148,7 @@ public class NBTCompound extends NBT {
 
     public String getStringTagValueOrNull(String key) {
         NBT tag = getTagOrNull(key);
-        if (NBTString.class.isInstance(tag)) {
+        if (tag instanceof NBTString) {
             return ((NBTString) tag).getValue();
         }
         return null;
@@ -157,7 +156,7 @@ public class NBTCompound extends NBT {
 
     public String getStringTagValueOrDefault(String key, String defaultValue) {
         NBT tag = getTagOrNull(key);
-        if (NBTString.class.isInstance(tag)) {
+        if (tag instanceof NBTString) {
             return ((NBTString) tag).getValue();
         }
         return defaultValue;

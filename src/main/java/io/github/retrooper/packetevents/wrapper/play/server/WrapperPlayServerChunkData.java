@@ -21,11 +21,11 @@ package io.github.retrooper.packetevents.wrapper.play.server;
 import io.github.retrooper.packetevents.event.impl.PacketSendEvent;
 import io.github.retrooper.packetevents.manager.server.ServerVersion;
 import io.github.retrooper.packetevents.protocol.PacketType;
-import io.github.retrooper.packetevents.protocol.data.world.chunk.Chunk;
-import io.github.retrooper.packetevents.protocol.data.world.chunk.Column;
 import io.github.retrooper.packetevents.protocol.data.nbt.NBTCompound;
 import io.github.retrooper.packetevents.protocol.data.stream.NetStreamInput;
 import io.github.retrooper.packetevents.protocol.data.stream.NetStreamOutput;
+import io.github.retrooper.packetevents.protocol.data.world.chunk.Chunk;
+import io.github.retrooper.packetevents.protocol.data.world.chunk.Column;
 import io.github.retrooper.packetevents.wrapper.PacketWrapper;
 
 import java.io.ByteArrayInputStream;
@@ -57,11 +57,10 @@ public class WrapperPlayServerChunkData extends PacketWrapper<WrapperPlayServerC
         } else {
             if (serverVersion == ServerVersion.v_1_7_10) {
                 //Read primary bit mask and add bit mask
-                chunkMask = BitSet.valueOf(new long[] {readUnsignedShort(), readUnsignedShort() });
-            }
-            else {
+                chunkMask = BitSet.valueOf(new long[]{readUnsignedShort(), readUnsignedShort()});
+            } else {
                 //Read primary bit mask
-                chunkMask = BitSet.valueOf(new long[] { readUnsignedShort() });
+                chunkMask = BitSet.valueOf(new long[]{readUnsignedShort()});
             }
         }
         return chunkMask;
@@ -82,8 +81,7 @@ public class WrapperPlayServerChunkData extends PacketWrapper<WrapperPlayServerC
                 long[] longArray = chunkMask.toLongArray();
                 writeShort((int) longArray[0]);
                 writeShort((int) longArray[1]);
-            }
-            else {
+            } else {
                 //Write primary bit mask
                 writeShort((int) chunkMask.toLongArray()[0]);
             }
@@ -104,7 +102,7 @@ public class WrapperPlayServerChunkData extends PacketWrapper<WrapperPlayServerC
 
         boolean ignoreOldData = false;
         if (serverVersion == ServerVersion.v_1_16 ||
-        serverVersion == ServerVersion.v_1_16_1) {
+                serverVersion == ServerVersion.v_1_16_1) {
             ignoreOldData = readBoolean();
         }
         //Older than 1.13.2 has ground up continuous
@@ -145,12 +143,10 @@ public class WrapperPlayServerChunkData extends PacketWrapper<WrapperPlayServerC
 
         if (hasBiomeData) {
             column = new Column(chunkX, chunkZ, chunks, tileEntities, heightMaps, biomeData);
-        }
-        else {
+        } else {
             if (hasHeightMaps) {
                 column = new Column(chunkX, chunkZ, chunks, tileEntities, heightMaps);
-            }
-            else {
+            } else {
                 column = new Column(chunkX, chunkZ, chunks, tileEntities);
             }
         }
@@ -197,7 +193,7 @@ public class WrapperPlayServerChunkData extends PacketWrapper<WrapperPlayServerC
         writeVarInt(dataBytes.size());
         writeByteArray(dataBytes.toByteArray());
         writeVarInt(column.getTileEntities().length);
-        for(NBTCompound tag : column.getTileEntities()) {
+        for (NBTCompound tag : column.getTileEntities()) {
             writeTag(tag);
         }
     }

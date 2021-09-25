@@ -70,7 +70,7 @@ public class CustomBukkitDecodeHandler extends ByteToMessageDecoder {
             byteBuf.clear(); //Don't accumulate
             throw ViaVersionUtil.throwCancelEncoderException(null);
         }
-        
+
         ByteBuf transformedBuf = null;
         try {
             if (ViaVersionUtil.isUserConnectionActive(userInfo)) {

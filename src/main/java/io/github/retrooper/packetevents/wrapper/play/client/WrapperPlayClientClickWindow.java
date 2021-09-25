@@ -40,12 +40,6 @@ public class WrapperPlayClientClickWindow extends PacketWrapper<WrapperPlayClien
     private Optional<Map<Integer, ItemStack>> slots;
     private ItemStack clickedItemStack;
 
-    public enum WindowClickType {
-        PICKUP, QUICK_MOVE, SWAP, CLONE, THROW, QUICK_CRAFT, PICKUP_ALL;
-
-        public static final WindowClickType[] VALUES = values();
-    }
-
     public WrapperPlayClientClickWindow(PacketReceiveEvent event) {
         super(event);
     }
@@ -69,26 +63,23 @@ public class WrapperPlayClientClickWindow extends PacketWrapper<WrapperPlayClien
         this.windowID = readUnsignedByte();
         if (serverVersion.isNewerThanOrEquals(ServerVersion.v_1_17_1)) {
             this.stateID = Optional.of(readVarInt());
-        }
-        else {
+        } else {
             this.stateID = Optional.empty();
         }
         this.slot = readShort();
         this.button = readByte();
         if (!v1_17) {
-            this.actionNumber = Optional.of((int)readShort());
-        }
-        else {
+            this.actionNumber = Optional.of((int) readShort());
+        } else {
             this.actionNumber = Optional.empty();
         }
         int clickTypeIndex = readVarInt();
         this.windowClickType = WindowClickType.VALUES[clickTypeIndex];
         if (v1_17) {
-            Function<PacketWrapper<?>, Integer> slotReader = wrapper -> (int)wrapper.readShort();
+            Function<PacketWrapper<?>, Integer> slotReader = wrapper -> (int) wrapper.readShort();
             Function<PacketWrapper<?>, ItemStack> itemStackReader = PacketWrapper::readItemStack;
             this.slots = Optional.of(readMap(slotReader, itemStackReader));
-        }
-        else {
+        } else {
             this.slots = Optional.empty();
         }
         this.clickedItemStack = readItemStack();
@@ -181,5 +172,11 @@ public class WrapperPlayClientClickWindow extends PacketWrapper<WrapperPlayClien
 
     public void setClickedItemStack(ItemStack clickedItemStack) {
         this.clickedItemStack = clickedItemStack;
+    }
+
+    public enum WindowClickType {
+        PICKUP, QUICK_MOVE, SWAP, CLONE, THROW, QUICK_CRAFT, PICKUP_ALL;
+
+        public static final WindowClickType[] VALUES = values();
     }
 }

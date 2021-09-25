@@ -18,17 +18,16 @@
 
 package io.github.retrooper.packetevents.utils.netty.buffer;
 
-import io.netty.buffer.ByteBuf;
-
 import java.io.*;
+
 //TODO Give netty credit
 public class ByteBufAbstractInputStream extends InputStream implements DataInput {
     private final ByteBufAbstract buffer;
     private final int startIndex;
     private final int endIndex;
-    private boolean closed;
     private final boolean releaseOnClose;
     private final StringBuilder lineBuf;
+    private boolean closed;
 
     public ByteBufAbstractInputStream(ByteBufAbstract buffer) {
         this(buffer, buffer.readableBytes());
@@ -117,7 +116,7 @@ public class ByteBufAbstractInputStream extends InputStream implements DataInput
     }
 
     public long skip(long n) throws IOException {
-        return n > 2147483647L ? (long)this.skipBytes(2147483647) : (long)this.skipBytes((int)n);
+        return n > 2147483647L ? (long) this.skipBytes(2147483647) : (long) this.skipBytes((int) n);
     }
 
     public boolean readBoolean() throws IOException {
@@ -140,7 +139,7 @@ public class ByteBufAbstractInputStream extends InputStream implements DataInput
     }
 
     public char readChar() throws IOException {
-        return (char)this.readShort();
+        return (char) this.readShort();
     }
 
     public double readDouble() throws IOException {
@@ -168,17 +167,17 @@ public class ByteBufAbstractInputStream extends InputStream implements DataInput
     public String readLine() throws IOException {
         this.lineBuf.setLength(0);
 
-        while(this.buffer.isReadable()) {
+        while (this.buffer.isReadable()) {
             int c = this.buffer.readUnsignedByte();
-            switch(c) {
+            switch (c) {
                 case 13:
-                    if (this.buffer.isReadable() && (char)this.buffer.getUnsignedByte(this.buffer.readerIndex()) == '\n') {
+                    if (this.buffer.isReadable() && (char) this.buffer.getUnsignedByte(this.buffer.readerIndex()) == '\n') {
                         this.buffer.skipBytes(1);
                     }
                 case 10:
                     return this.lineBuf.toString();
                 default:
-                    this.lineBuf.append((char)c);
+                    this.lineBuf.append((char) c);
             }
         }
 

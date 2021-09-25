@@ -28,20 +28,6 @@ public class WrapperPlayClientEntityAction extends PacketWrapper<WrapperPlayClie
     private Action action;
     private int jumpBoost;
 
-    public enum Action {
-        START_SNEAKING,
-        STOP_SNEAKING,
-        LEAVE_BED,
-        START_SPRINTING,
-        STOP_SPRINTING,
-        START_JUMPING_WITH_HORSE,
-        STOP_JUMPING_WITH_HORSE,
-        OPEN_HORSE_INVENTORY,
-        START_FLYING_WITH_ELYTRA;
-
-        public static final Action[] VALUES = values();
-    }
-
     public WrapperPlayClientEntityAction(PacketReceiveEvent event) {
         super(event);
     }
@@ -107,5 +93,19 @@ public class WrapperPlayClientEntityAction extends PacketWrapper<WrapperPlayClie
 
     public void setJumpBoost(int jumpBoost) {
         this.jumpBoost = jumpBoost;
+    }
+
+    public enum Action {
+        START_SNEAKING,
+        STOP_SNEAKING,
+        LEAVE_BED,
+        START_SPRINTING,
+        STOP_SPRINTING,
+        START_JUMPING_WITH_HORSE,
+        STOP_JUMPING_WITH_HORSE,
+        OPEN_HORSE_INVENTORY,
+        START_FLYING_WITH_ELYTRA;
+
+        public static final Action[] VALUES = values();
     }
 }

@@ -24,6 +24,7 @@ import io.github.retrooper.packetevents.wrapper.PacketWrapper;
 
 public class WrapperPlayClientTeleportConfirm extends PacketWrapper<WrapperPlayClientTeleportConfirm> {
     private int teleportID;
+
     public WrapperPlayClientTeleportConfirm(PacketReceiveEvent event) {
         super(event);
     }
