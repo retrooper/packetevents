@@ -46,9 +46,10 @@ public class InternalPacketListener implements PacketListener {
             int z = column.getZ();
             NBTCompound heightMaps = column.getHeightMaps();
             event.getPlayer().sendMessage("X: " + x + ", Z: " + z + ", HEIGHT MAPS: " + heightMaps.getTagNames());
+            event.setCurrentPacketWrapper(null);
         }
         else {
-            System.out.println(event.getPacketType().getName());
+            System.out.println("PACKET NAME: " + event.getPacketType().getName());
         }
     }
 

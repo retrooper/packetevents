@@ -18,11 +18,11 @@
 
 package io.github.retrooper.packetevents.utils.netty;
 
-import io.github.retrooper.packetevents.utils.MinecraftReflection;
+import io.github.retrooper.packetevents.utils.MinecraftReflectionUtil;
 
 public class ChannelInboundHandlerUtil {
     public static void handlerChannelRead(Object handler, Object ctx, Object msg) {
-        if (MinecraftReflection.USE_MODERN_NETTY_PACKAGE) {
+        if (MinecraftReflectionUtil.USE_MODERN_NETTY_PACKAGE) {
             ChannelInboundHandlerUtil_Modern.handlerChannelRead(handler, ctx, msg);
         } else {
             ChannelInboundHandlerUtil_Legacy.handlerChannelRead(handler, ctx, msg);

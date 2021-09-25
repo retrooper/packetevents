@@ -19,7 +19,7 @@
 package io.github.retrooper.packetevents.utils.netty.buffer;
 
 
-import io.github.retrooper.packetevents.utils.MinecraftReflection;
+import io.github.retrooper.packetevents.utils.MinecraftReflectionUtil;
 import org.jetbrains.annotations.NotNull;
 
 import java.nio.ByteBuffer;
@@ -27,7 +27,7 @@ import java.nio.charset.Charset;
 
 public interface ByteBufAbstract {
     static ByteBufAbstract generate(@NotNull Object byteBuf) {
-        if (MinecraftReflection.USE_MODERN_NETTY_PACKAGE) {
+        if (MinecraftReflectionUtil.USE_MODERN_NETTY_PACKAGE) {
             return new ByteBufModern(byteBuf);
         } else {
             return new ByteBufLegacy(byteBuf);

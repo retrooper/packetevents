@@ -23,13 +23,12 @@ import io.github.retrooper.packetevents.manager.server.ServerManager;
 import io.github.retrooper.packetevents.manager.server.ServerVersion;
 import io.github.retrooper.packetevents.protocol.ConnectionState;
 import io.github.retrooper.packetevents.utils.GeyserUtil;
-import io.github.retrooper.packetevents.utils.MinecraftReflection;
+import io.github.retrooper.packetevents.utils.MinecraftReflectionUtil;
 import io.github.retrooper.packetevents.utils.PlayerPingAccessorModern;
 import io.github.retrooper.packetevents.utils.dependencies.DependencyUtil;
 import io.github.retrooper.packetevents.utils.dependencies.protocolsupport.ProtocolSupportUtil;
 import io.github.retrooper.packetevents.utils.dependencies.viaversion.ViaVersionUtil;
-import io.github.retrooper.packetevents.utils.gameprofile.GameProfileUtil;
-import io.github.retrooper.packetevents.utils.gameprofile.WrappedGameProfile;
+import io.github.retrooper.packetevents.protocol.data.player.WrappedGameProfile;
 import io.github.retrooper.packetevents.utils.netty.buffer.ByteBufAbstract;
 import io.github.retrooper.packetevents.utils.netty.channel.ChannelAbstract;
 import io.github.retrooper.packetevents.protocol.data.player.ClientVersion;
@@ -64,10 +63,10 @@ public class PlayerManager {
      * @return Non-smoothed ping.
      */
     public int getPing(Player player) {
-        if (MinecraftReflection.V_1_17_OR_HIGHER) {
+        if (MinecraftReflectionUtil.V_1_17_OR_HIGHER) {
             return PlayerPingAccessorModern.getPing(player);
         } else {
-            return MinecraftReflection.getPlayerPing(player);
+            return MinecraftReflectionUtil.getPlayerPing(player);
         }
     }
 
@@ -87,7 +86,7 @@ public class PlayerManager {
         ClientVersion version = clientVersions.get(channel);
         if (version == null || !version.isResolved()) {
             //Asking ViaVersion or ProtocolSupport for the protocol version.
-            if (DependencyUtil.isDependencyAvailable()) {
+            if (DependencyUtil.isProtocolTranslationDependencyAvailable()) {
                 try {
                     version = ClientVersion.getClientVersionByProtocolVersion(DependencyUtil.getProtocolVersion(player));
                     clientVersions.put(channel, version);
@@ -142,39 +141,39 @@ public class PlayerManager {
     }
 
     public WrappedGameProfile getGameProfile(Player player) {
-        Object gameProfile = GameProfileUtil.getGameProfile(player.getUniqueId(), player.getName());
-        return GameProfileUtil.getWrappedGameProfile(gameProfile);
+        Object gameProfile = DependencyUtil.getGameProfile(player.getUniqueId(), player.getName());
+        return DependencyUtil.getWrappedGameProfile(gameProfile);
     }
 
     public boolean isGeyserPlayer(Player player) {
-        if (!PacketEvents.get().getServerManager().isGeyserAvailable()) {
+        if (!ServerManager.isGeyserAvailable()) {
             return false;
         }
         return GeyserUtil.isGeyserPlayer(player.getUniqueId());
     }
 
     public boolean isGeyserPlayer(UUID uuid) {
-        if (!PacketEvents.get().getServerManager().isGeyserAvailable()) {
+        if (!ServerManager.isGeyserAvailable()) {
             return false;
         }
         return GeyserUtil.isGeyserPlayer(uuid);
     }
 
     public void changeSkinProperty(Player player, Skin skin) {
-        Object gameProfile = MinecraftReflection.getGameProfile(player);
-        GameProfileUtil.setGameProfileSkin(gameProfile, skin);
+        Object gameProfile = MinecraftReflectionUtil.getGameProfile(player);
+        DependencyUtil.setGameProfileSkin(gameProfile, skin);
     }
 
     public Skin getSkin(Player player) {
-        Object gameProfile = MinecraftReflection.getGameProfile(player);
-        return GameProfileUtil.getGameProfileSkin(gameProfile);
+        Object gameProfile = MinecraftReflectionUtil.getGameProfile(player);
+        return DependencyUtil.getGameProfileSkin(gameProfile);
     }
 
     public Object getChannel(Player player) {
         String name = player.getName();
         Object channel = channels.get(name);
         if (channel == null) {
-            channel = MinecraftReflection.getChannel(player);
+            channel = MinecraftReflectionUtil.getChannel(player);
             if (channel != null) {
                 channels.put(name, channel);
             }

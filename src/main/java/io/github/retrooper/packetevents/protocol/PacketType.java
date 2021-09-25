@@ -20,8 +20,8 @@ package io.github.retrooper.packetevents.protocol;
 
 import io.github.retrooper.packetevents.manager.server.ServerManager;
 import io.github.retrooper.packetevents.manager.server.ServerVersion;
-import io.github.retrooper.packetevents.protocol.protocols.clientbound.*;
-import io.github.retrooper.packetevents.protocol.protocols.serverbound.*;
+import io.github.retrooper.packetevents.protocol.mappings.packettypes.clientbound.*;
+import io.github.retrooper.packetevents.protocol.mappings.packettypes.serverbound.*;
 import io.github.retrooper.packetevents.protocol.data.player.ClientVersion;
 import org.jetbrains.annotations.Nullable;
 

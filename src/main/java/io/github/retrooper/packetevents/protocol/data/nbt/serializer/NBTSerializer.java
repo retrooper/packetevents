@@ -61,7 +61,7 @@ public class NBTSerializer<IN, OUT> {
 		this.nameWriter = nameWriter;
 	}
 
-	protected final Map<Integer, NBTType<? extends NBT>> idToType = new HashMap();
+	protected final Map<Integer, NBTType<? extends NBT>> idToType = new HashMap<>();
 	protected final Map<NBTType<? extends NBT>, Integer> typeToId = new HashMap<>();
 	protected final Map<NBTType<? extends NBT>, TagReader<IN, ? extends NBT>> typeReaders = new HashMap<>();
 	protected final Map<NBTType<? extends NBT>, TagWriter<OUT, ? extends NBT>> typeWriters = new HashMap<>();

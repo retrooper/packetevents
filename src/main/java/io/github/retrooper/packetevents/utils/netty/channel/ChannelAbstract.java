@@ -19,14 +19,14 @@
 package io.github.retrooper.packetevents.utils.netty.channel;
 
 
-import io.github.retrooper.packetevents.utils.MinecraftReflection;
+import io.github.retrooper.packetevents.utils.MinecraftReflectionUtil;
 import io.github.retrooper.packetevents.utils.netty.channel.pipeline.ChannelPipelineAbstract;
 
 import java.net.SocketAddress;
 
 public interface ChannelAbstract {
     static ChannelAbstract generate(Object rawChannel) {
-        if (MinecraftReflection.USE_MODERN_NETTY_PACKAGE) {
+        if (MinecraftReflectionUtil.USE_MODERN_NETTY_PACKAGE) {
             return new ChannelModern(rawChannel);
         } else {
             return new ChannelLegacy(rawChannel);

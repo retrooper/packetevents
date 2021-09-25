@@ -18,7 +18,7 @@
 
 package io.github.retrooper.packetevents.utils.v1_7;
 
-import io.github.retrooper.packetevents.utils.MinecraftReflection;
+import io.github.retrooper.packetevents.utils.MinecraftReflectionUtil;
 import org.bukkit.entity.Player;
 
 import java.lang.reflect.InvocationTargetException;
@@ -30,12 +30,12 @@ public class SpigotVersionLookup_1_7 {
     public static int getProtocolVersion(Player player) {
         if (getPlayerVersionMethod == null) {
             try {
-                getPlayerVersionMethod = MinecraftReflection.NETWORK_MANAGER_CLASS.getMethod("getVersion");
+                getPlayerVersionMethod = MinecraftReflectionUtil.NETWORK_MANAGER_CLASS.getMethod("getVersion");
             } catch (NoSuchMethodException e) {
                 e.printStackTrace();
             }
         }
-        Object networkManager = MinecraftReflection.getNetworkManager(player);
+        Object networkManager = MinecraftReflectionUtil.getNetworkManager(player);
         try {
             return (int) getPlayerVersionMethod.invoke(networkManager);
         } catch (IllegalAccessException | InvocationTargetException e) {

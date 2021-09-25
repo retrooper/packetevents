@@ -18,15 +18,16 @@
 
 package io.github.retrooper.packetevents.utils.netty.channel.pipeline;
 
-import io.github.retrooper.packetevents.utils.MinecraftReflection;
+import io.github.retrooper.packetevents.utils.MinecraftReflectionUtil;
 import io.github.retrooper.packetevents.utils.netty.channel.ChannelHandlerAbstract;
 import io.github.retrooper.packetevents.utils.netty.channel.ChannelHandlerContextAbstract;
 
+import java.util.Arrays;
 import java.util.List;
 
 public interface ChannelPipelineAbstract {
     static ChannelPipelineAbstract generate(Object rawChannelPipeline) {
-        if (MinecraftReflection.USE_MODERN_NETTY_PACKAGE) {
+        if (MinecraftReflectionUtil.USE_MODERN_NETTY_PACKAGE) {
             return new ChannelPipelineModern(rawChannelPipeline);
         } else {
             return new ChannelPipelineLegacy(rawChannelPipeline);
@@ -40,6 +41,11 @@ public interface ChannelPipelineAbstract {
     //namesArray is not a feature in netty, something I came up with to make my life easier
     default String[] namesArray() {
         return names().toArray(new String[0]);
+    }
+
+    //namesToString is not a feature in netty, something I came up with to make my life easier
+    default String namesToString() {
+        return Arrays.toString(namesArray());
     }
 
     ChannelHandlerAbstract get(String handlerName);

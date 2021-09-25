@@ -18,7 +18,7 @@
 
 package io.github.retrooper.packetevents.handlers.compression;
 
-import io.github.retrooper.packetevents.utils.MinecraftReflection;
+import io.github.retrooper.packetevents.utils.MinecraftReflectionUtil;
 import io.github.retrooper.packetevents.utils.netty.buffer.ByteBufAbstract;
 import io.github.retrooper.packetevents.utils.netty.channel.ChannelHandlerContextAbstract;
 import io.github.retrooper.packetevents.wrapper.PacketWrapper;
@@ -33,7 +33,7 @@ public class CustomPacketCompressor {
 
     public static ByteBufAbstract compress(ChannelHandlerContextAbstract ctx, ByteBufAbstract byteBuf) {
         if (MESSAGE_TO_BYTE_ENCODER == null) {
-            MESSAGE_TO_BYTE_ENCODER = MinecraftReflection.getNettyClass("handler.codec.MessageToByteEncoder");
+            MESSAGE_TO_BYTE_ENCODER = MinecraftReflectionUtil.getNettyClass("handler.codec.MessageToByteEncoder");
         }
         ByteBufAbstract output = ctx.alloc().buffer();
         Object compressHandler = ctx.pipeline().get("compress").rawChannelHandler();

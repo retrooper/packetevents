@@ -20,7 +20,7 @@ package io.github.retrooper.packetevents.manager.server;
 
 import io.github.retrooper.packetevents.PacketEvents;
 import io.github.retrooper.packetevents.protocol.data.world.BoundingBox;
-import io.github.retrooper.packetevents.utils.MinecraftReflection;
+import io.github.retrooper.packetevents.utils.MinecraftReflectionUtil;
 import io.github.retrooper.packetevents.utils.netty.ChannelInboundHandlerUtil;
 import io.github.retrooper.packetevents.utils.netty.buffer.ByteBufAbstract;
 import io.github.retrooper.packetevents.utils.netty.channel.ChannelAbstract;
@@ -64,7 +64,7 @@ public final class ServerManager {
      * @return Get Recent TPS
      */
     public static double[] getRecentTPS() {
-        return MinecraftReflection.recentTPS();
+        return MinecraftReflectionUtil.recentTPS();
     }
 
     /**
@@ -90,8 +90,8 @@ public final class ServerManager {
     }
 
     public static BoundingBox getEntityBoundingBox(Entity entity) {
-        Object nmsEntity = MinecraftReflection.getNMSEntity(entity);
-        Object aabb = MinecraftReflection.getNMSAxisAlignedBoundingBox(nmsEntity);
+        Object nmsEntity = MinecraftReflectionUtil.getNMSEntity(entity);
+        Object aabb = MinecraftReflectionUtil.getNMSAxisAlignedBoundingBox(nmsEntity);
         ReflectionObject wrappedBoundingBox = new ReflectionObject(aabb);
         double minX = wrappedBoundingBox.readDouble(0);
         double minY = wrappedBoundingBox.readDouble(1);
@@ -130,15 +130,15 @@ public final class ServerManager {
             return null;
         }
 
-        Object craftWorld = MinecraftReflection.CRAFT_WORLD_CLASS.cast(world);
+        Object craftWorld = MinecraftReflectionUtil.CRAFT_WORLD_CLASS.cast(world);
 
         try {
-            Object worldServer = MinecraftReflection.GET_CRAFT_WORLD_HANDLE_METHOD.invoke(craftWorld);
-            Object nmsEntity = MinecraftReflection.GET_ENTITY_BY_ID_METHOD.invoke(worldServer, id);
+            Object worldServer = MinecraftReflectionUtil.GET_CRAFT_WORLD_HANDLE_METHOD.invoke(craftWorld);
+            Object nmsEntity = MinecraftReflectionUtil.GET_ENTITY_BY_ID_METHOD.invoke(worldServer, id);
             if (nmsEntity == null) {
                 return null;
             }
-            return MinecraftReflection.getBukkitEntity(nmsEntity);
+            return MinecraftReflectionUtil.getBukkitEntity(nmsEntity);
         } catch (IllegalAccessException | InvocationTargetException e) {
             e.printStackTrace();
         }
@@ -178,7 +178,7 @@ public final class ServerManager {
             return e;
         }
 
-        if (MinecraftReflection.V_1_17_OR_HIGHER) {
+        if (MinecraftReflectionUtil.V_1_17_OR_HIGHER) {
             try {
                 if (world != null) {
                     for (Entity entity : getEntityList(world)) {
@@ -216,22 +216,22 @@ public final class ServerManager {
     }
 
     public static List<Entity> getEntityList(World world) {
-        if (MinecraftReflection.V_1_17_OR_HIGHER) {
-            Object worldServer = MinecraftReflection.convertBukkitWorldToWorldServer(world);
+        if (MinecraftReflectionUtil.V_1_17_OR_HIGHER) {
+            Object worldServer = MinecraftReflectionUtil.convertBukkitWorldToWorldServer(world);
             ReflectionObject wrappedWorldServer = new ReflectionObject(worldServer);
-            Object persistentEntitySectionManager = wrappedWorldServer.readObject(0, MinecraftReflection.PERSISTENT_ENTITY_SECTION_MANAGER_CLASS);
+            Object persistentEntitySectionManager = wrappedWorldServer.readObject(0, MinecraftReflectionUtil.PERSISTENT_ENTITY_SECTION_MANAGER_CLASS);
             ReflectionObject wrappedPersistentEntitySectionManager = new ReflectionObject(persistentEntitySectionManager);
-            Object levelEntityGetter = wrappedPersistentEntitySectionManager.readObject(0, MinecraftReflection.LEVEL_ENTITY_GETTER_CLASS);
+            Object levelEntityGetter = wrappedPersistentEntitySectionManager.readObject(0, MinecraftReflectionUtil.LEVEL_ENTITY_GETTER_CLASS);
             Iterable<Object> nmsEntitiesIterable = null;
             try {
-                nmsEntitiesIterable = (Iterable<Object>) MinecraftReflection.GET_LEVEL_ENTITY_GETTER_ITERABLE_METHOD.invoke(levelEntityGetter);
+                nmsEntitiesIterable = (Iterable<Object>) MinecraftReflectionUtil.GET_LEVEL_ENTITY_GETTER_ITERABLE_METHOD.invoke(levelEntityGetter);
             } catch (IllegalAccessException | InvocationTargetException e) {
                 e.printStackTrace();
             }
             List<Entity> entityList = new ArrayList<>();
             if (nmsEntitiesIterable != null) {
                 for (Object nmsEntity : nmsEntitiesIterable) {
-                    Entity bukkitEntity = MinecraftReflection.getBukkitEntity(nmsEntity);
+                    Entity bukkitEntity = MinecraftReflectionUtil.getBukkitEntity(nmsEntity);
                     entityList.add(bukkitEntity);
                 }
             }
@@ -243,6 +243,6 @@ public final class ServerManager {
 
 
     public static boolean isGeyserAvailable() {
-        return MinecraftReflection.GEYSER_CLASS != null;
+        return MinecraftReflectionUtil.GEYSER_CLASS != null;
     }
 }

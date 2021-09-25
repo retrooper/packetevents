@@ -26,7 +26,7 @@ import io.github.retrooper.packetevents.handlers.legacy.late.LateChannelInjector
 import io.github.retrooper.packetevents.handlers.modern.early.EarlyChannelInjectorModern;
 import io.github.retrooper.packetevents.handlers.modern.late.LateChannelInjectorModern;
 import io.github.retrooper.packetevents.protocol.ConnectionState;
-import io.github.retrooper.packetevents.utils.MinecraftReflection;
+import io.github.retrooper.packetevents.utils.MinecraftReflectionUtil;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.Nullable;
 
@@ -44,9 +44,9 @@ public class GlobalChannelInjector {
 
     public void load() {
         if (injectEarly) {
-            injector = MinecraftReflection.USE_MODERN_NETTY_PACKAGE ? new EarlyChannelInjectorModern() : new EarlyChannelInjectorLegacy();
+            injector = MinecraftReflectionUtil.USE_MODERN_NETTY_PACKAGE ? new EarlyChannelInjectorModern() : new EarlyChannelInjectorLegacy();
         } else {
-            injector = MinecraftReflection.USE_MODERN_NETTY_PACKAGE ? new LateChannelInjectorModern() : new LateChannelInjectorLegacy();
+            injector = MinecraftReflectionUtil.USE_MODERN_NETTY_PACKAGE ? new LateChannelInjectorModern() : new LateChannelInjectorLegacy();
         }
     }
 

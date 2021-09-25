@@ -23,7 +23,7 @@ import io.github.retrooper.packetevents.event.impl.PacketSendEvent;
 import io.github.retrooper.packetevents.manager.server.ServerManager;
 import io.github.retrooper.packetevents.manager.server.ServerVersion;
 import io.github.retrooper.packetevents.protocol.data.world.BlockPosition;
-import io.github.retrooper.packetevents.utils.MinecraftReflection;
+import io.github.retrooper.packetevents.utils.MinecraftReflectionUtil;
 import io.github.retrooper.packetevents.utils.StringUtil;
 import io.github.retrooper.packetevents.protocol.data.nbt.NBTCompound;
 import io.github.retrooper.packetevents.protocol.data.nbt.NBTEnd;
@@ -204,15 +204,15 @@ public class PacketWrapper<T extends PacketWrapper> {
     }
 
     public ItemStack readItemStack() {
-        Object packetDataSerializer = MinecraftReflection.createPacketDataSerializer(byteBuf.rawByteBuf());
-        Object nmsItemStack = MinecraftReflection.readNMSItemStackPacketDataSerializer(packetDataSerializer);
-        return MinecraftReflection.toBukkitItemStack(nmsItemStack);
+        Object packetDataSerializer = MinecraftReflectionUtil.createPacketDataSerializer(byteBuf.rawByteBuf());
+        Object nmsItemStack = MinecraftReflectionUtil.readNMSItemStackPacketDataSerializer(packetDataSerializer);
+        return MinecraftReflectionUtil.toBukkitItemStack(nmsItemStack);
     }
 
     public void writeItemStack(ItemStack itemStack) {
-        Object packetDataSerializer = MinecraftReflection.createPacketDataSerializer(byteBuf.rawByteBuf());
-        Object nmsItemStack = MinecraftReflection.toNMSItemStack(itemStack);
-        MinecraftReflection.writeNMSItemStackPacketDataSerializer(packetDataSerializer, nmsItemStack);
+        Object packetDataSerializer = MinecraftReflectionUtil.createPacketDataSerializer(byteBuf.rawByteBuf());
+        Object nmsItemStack = MinecraftReflectionUtil.toNMSItemStack(itemStack);
+        MinecraftReflectionUtil.writeNMSItemStackPacketDataSerializer(packetDataSerializer, nmsItemStack);
     }
 
     public NBTCompound readTag() {

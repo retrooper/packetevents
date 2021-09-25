@@ -22,18 +22,11 @@ import io.github.retrooper.packetevents.PacketEvents;
 import io.github.retrooper.packetevents.handlers.EarlyInjector;
 import io.github.retrooper.packetevents.handlers.legacy.PacketDecoderLegacy;
 import io.github.retrooper.packetevents.handlers.legacy.PacketEncoderLegacy;
-import io.github.retrooper.packetevents.handlers.modern.PacketDecoderModern;
 import io.github.retrooper.packetevents.protocol.ConnectionState;
-import io.github.retrooper.packetevents.utils.MinecraftReflection;
+import io.github.retrooper.packetevents.utils.MinecraftReflectionUtil;
 import io.github.retrooper.packetevents.utils.dependencies.protocolsupport.ProtocolSupportUtil;
-import io.github.retrooper.packetevents.utils.dependencies.viaversion.CustomBukkitDecodeHandler;
-import io.github.retrooper.packetevents.utils.dependencies.viaversion.ViaVersionUtil;
-import io.github.retrooper.packetevents.utils.list.ListWrapper;
-import io.github.retrooper.packetevents.utils.reflection.ClassUtil;
-import io.github.retrooper.packetevents.utils.reflection.Reflection;
+import io.github.retrooper.packetevents.utils.ListWrapper;
 import io.github.retrooper.packetevents.utils.reflection.ReflectionObject;
-import io.netty.handler.codec.ByteToMessageDecoder;
-import io.netty.handler.codec.MessageToMessageDecoder;
 import net.minecraft.util.io.netty.channel.Channel;
 import net.minecraft.util.io.netty.channel.ChannelFuture;
 import net.minecraft.util.io.netty.channel.ChannelHandler;
@@ -41,7 +34,6 @@ import net.minecraft.util.io.netty.channel.ChannelPipeline;
 import org.bukkit.entity.Player;
 
 import java.lang.reflect.Field;
-import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -54,7 +46,7 @@ public class EarlyChannelInjectorLegacy implements EarlyInjector {
     @Override
     public boolean isBound() {
         try {
-            Object connection = MinecraftReflection.getMinecraftServerConnectionInstance();
+            Object connection = MinecraftReflectionUtil.getMinecraftServerConnectionInstance();
             if (connection == null) {
                 return false;
             }
@@ -82,7 +74,7 @@ public class EarlyChannelInjectorLegacy implements EarlyInjector {
     @Override
     public void inject() {
         try {
-            Object serverConnection = MinecraftReflection.getMinecraftServerConnectionInstance();
+            Object serverConnection = MinecraftReflectionUtil.getMinecraftServerConnectionInstance();
             for (Field field : serverConnection.getClass().getDeclaredFields()) {
                 field.setAccessible(true);
                 Object value = null;
@@ -130,7 +122,7 @@ public class EarlyChannelInjectorLegacy implements EarlyInjector {
 
         //Player channels might have been registered already. Let us add our handlers. We are a little late though.
         //This only happens when you join extremely early on older versions of minecraft.
-        List<Object> networkManagers = MinecraftReflection.getNetworkManagers();
+        List<Object> networkManagers = MinecraftReflectionUtil.getNetworkManagers();
         synchronized (networkManagers) {
             for (Object networkManager : networkManagers) {
                 ReflectionObject networkManagerWrapper = new ReflectionObject(networkManager);
@@ -153,7 +145,7 @@ public class EarlyChannelInjectorLegacy implements EarlyInjector {
             pipeline.addFirst(PacketEvents.get().connectionName, new ServerChannelHandlerLegacy());
         }
 
-        List<Object> networkManagers = MinecraftReflection.getNetworkManagers();
+        List<Object> networkManagers = MinecraftReflectionUtil.getNetworkManagers();
         synchronized (networkManagers) {
             for (Object networkManager : networkManagers) {
                 ReflectionObject networkManagerWrapper = new ReflectionObject(networkManager);

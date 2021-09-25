@@ -6,7 +6,7 @@
 
 package io.github.retrooper.packetevents.protocol.data.world.chunk.palette;
 
-import io.github.retrooper.packetevents.wrapper.PacketWrapper;
+import io.github.retrooper.packetevents.protocol.data.stream.NetStreamInput;
 
 import java.io.IOException;
 
@@ -26,7 +26,7 @@ public class ListPalette implements Palette {
         this.data = new int[this.maxId + 1];
     }
 
-    public ListPalette(int bitsPerEntry, PacketWrapper<?> in) throws IOException {
+    public ListPalette(int bitsPerEntry, NetStreamInput in) throws IOException {
         this(bitsPerEntry);
 
         int paletteLength = in.readVarInt();

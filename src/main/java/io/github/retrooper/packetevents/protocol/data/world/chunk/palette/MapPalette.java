@@ -6,7 +6,7 @@
 
 package io.github.retrooper.packetevents.protocol.data.world.chunk.palette;
 
-import io.github.retrooper.packetevents.wrapper.PacketWrapper;
+import io.github.retrooper.packetevents.protocol.data.stream.NetStreamInput;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -28,7 +28,7 @@ public class MapPalette implements Palette {
         this.idToState = new int[this.maxId + 1];
     }
 
-    public MapPalette(int bitsPerEntry, PacketWrapper<?> in) {
+    public MapPalette(int bitsPerEntry, NetStreamInput in) {
         this(bitsPerEntry);
 
         int paletteLength = in.readVarInt();

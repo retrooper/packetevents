@@ -18,12 +18,22 @@
 
 package io.github.retrooper.packetevents.utils.dependencies;
 
+import io.github.retrooper.packetevents.protocol.data.player.Skin;
+import io.github.retrooper.packetevents.protocol.data.player.WrappedGameProfile;
+import io.github.retrooper.packetevents.utils.MinecraftReflectionUtil;
+import io.github.retrooper.packetevents.utils.dependencies.gameprofile.GameProfileUtil_7;
+import io.github.retrooper.packetevents.utils.dependencies.gameprofile.GameProfileUtil_8;
+import io.github.retrooper.packetevents.utils.dependencies.guava.GuavaUtils_7;
+import io.github.retrooper.packetevents.utils.dependencies.guava.GuavaUtils_8;
 import io.github.retrooper.packetevents.utils.dependencies.protocolsupport.ProtocolSupportUtil;
 import io.github.retrooper.packetevents.utils.dependencies.viaversion.ViaVersionUtil;
 import org.bukkit.entity.Player;
 
+import java.util.UUID;
+import java.util.concurrent.ConcurrentMap;
+
 public class DependencyUtil {
-    public static boolean isDependencyAvailable() {
+    public static boolean isProtocolTranslationDependencyAvailable() {
         return ViaVersionUtil.isAvailable()
                 || ProtocolSupportUtil.isAvailable();
     }
@@ -35,5 +45,46 @@ public class DependencyUtil {
             return ProtocolSupportUtil.getProtocolVersion(player);
         }
         return -1;
+    }
+
+    public static <T, K> ConcurrentMap<T, K> makeMap() {
+        if (MinecraftReflectionUtil.USE_MODERN_NETTY_PACKAGE) {
+            return GuavaUtils_8.makeMap();
+        } else {
+            return GuavaUtils_7.makeMap();
+        }
+    }
+
+    public static Object getGameProfile(UUID uuid, String username) {
+        if (MinecraftReflectionUtil.USE_MODERN_NETTY_PACKAGE) {
+            return GameProfileUtil_8.getGameProfile(uuid, username);
+        } else {
+            return GameProfileUtil_7.getGameProfile(uuid, username);
+        }
+    }
+
+
+    public static WrappedGameProfile getWrappedGameProfile(Object gameProfile) {
+        if (MinecraftReflectionUtil.USE_MODERN_NETTY_PACKAGE) {
+            return GameProfileUtil_8.getWrappedGameProfile(gameProfile);
+        } else {
+            return GameProfileUtil_7.getWrappedGameProfile(gameProfile);
+        }
+    }
+
+    public static void setGameProfileSkin(Object gameProfile, Skin skin) {
+        if (MinecraftReflectionUtil.USE_MODERN_NETTY_PACKAGE) {
+            GameProfileUtil_8.setGameProfileSkin(gameProfile, skin);
+        } else {
+            GameProfileUtil_7.setGameProfileSkin(gameProfile, skin);
+        }
+    }
+
+    public static Skin getGameProfileSkin(Object gameProfile) {
+        if (MinecraftReflectionUtil.USE_MODERN_NETTY_PACKAGE) {
+            return GameProfileUtil_8.getGameProfileSkin(gameProfile);
+        } else {
+            return GameProfileUtil_7.getGameProfileSkin(gameProfile);
+        }
     }
 }

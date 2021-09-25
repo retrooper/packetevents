@@ -31,9 +31,9 @@ import io.github.retrooper.packetevents.processor.InternalPacketListener;
 import io.github.retrooper.packetevents.protocol.PacketType;
 import io.github.retrooper.packetevents.settings.PacketEventsSettings;
 import io.github.retrooper.packetevents.updatechecker.UpdateChecker;
-import io.github.retrooper.packetevents.utils.MinecraftReflection;
+import io.github.retrooper.packetevents.utils.MinecraftReflectionUtil;
 import io.github.retrooper.packetevents.utils.PEVersion;
-import io.github.retrooper.packetevents.utils.guava.GuavaUtils;
+import io.github.retrooper.packetevents.utils.dependencies.DependencyUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
@@ -71,9 +71,9 @@ public final class PacketEvents implements Listener {
             connectionName = "pe-connection-handler-" + plugin.getName().toLowerCase();
             serverChannelHandlerName = "pe-connection-initializer-" + plugin.getName().toLowerCase();
             try {
-                MinecraftReflection.init();
+                MinecraftReflectionUtil.init();
 
-                ServerManager.entityCache = GuavaUtils.makeMap();
+                ServerManager.entityCache = DependencyUtil.makeMap();
             } catch (Exception ex) {
                 throw new PacketEventsLoadFailureException(ex);
             }

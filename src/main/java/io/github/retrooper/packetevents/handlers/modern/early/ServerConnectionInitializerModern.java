@@ -35,7 +35,7 @@ import java.lang.reflect.Method;
 public class ServerConnectionInitializerModern {
     public static void postInitChannel(Channel channel) {
         channel.pipeline().addAfter("splitter", PacketEvents.get().decoderName, new PacketDecoderModern());
-        channel.pipeline().addAfter("encoder", PacketEvents.get().encoderName, new PacketEncoderModern());
+        channel.pipeline().addBefore("encoder", PacketEvents.get().encoderName, new PacketEncoderModern());
     }
 
     public static void postDestroyChannel(Channel channel) {

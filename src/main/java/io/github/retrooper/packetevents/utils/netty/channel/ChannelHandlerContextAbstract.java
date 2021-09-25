@@ -18,13 +18,13 @@
 
 package io.github.retrooper.packetevents.utils.netty.channel;
 
-import io.github.retrooper.packetevents.utils.MinecraftReflection;
+import io.github.retrooper.packetevents.utils.MinecraftReflectionUtil;
 import io.github.retrooper.packetevents.utils.netty.buffer.ByteBufAllocatorAbstract;
 import io.github.retrooper.packetevents.utils.netty.channel.pipeline.ChannelPipelineAbstract;
 
 public interface ChannelHandlerContextAbstract {
     static ChannelHandlerContextAbstract generate(Object rawChannelHandlerContext) {
-        if (MinecraftReflection.USE_MODERN_NETTY_PACKAGE) {
+        if (MinecraftReflectionUtil.USE_MODERN_NETTY_PACKAGE) {
             return new ChannelHandlerContextModern(rawChannelHandlerContext);
         } else {
             return new ChannelHandlerContextLegacy(rawChannelHandlerContext);

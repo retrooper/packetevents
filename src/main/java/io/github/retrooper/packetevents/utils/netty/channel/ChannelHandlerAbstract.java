@@ -18,11 +18,11 @@
 
 package io.github.retrooper.packetevents.utils.netty.channel;
 
-import io.github.retrooper.packetevents.utils.MinecraftReflection;
+import io.github.retrooper.packetevents.utils.MinecraftReflectionUtil;
 
 public interface ChannelHandlerAbstract {
     static ChannelHandlerAbstract generate(Object rawChannelHandler) {
-        if (MinecraftReflection.USE_MODERN_NETTY_PACKAGE) {
+        if (MinecraftReflectionUtil.USE_MODERN_NETTY_PACKAGE) {
             return new ChannelHandlerModern(rawChannelHandler);
         } else {
             return new ChannelHandlerLegacy(rawChannelHandler);

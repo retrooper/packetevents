@@ -22,22 +22,20 @@ import com.viaversion.viaversion.exception.CancelCodecException;
 import com.viaversion.viaversion.exception.InformativeException;
 import com.viaversion.viaversion.handlers.ChannelHandlerContextWrapper;
 import com.viaversion.viaversion.handlers.ViaCodecHandler;
-import com.viaversion.viaversion.util.PipelineUtil;
 import io.github.retrooper.packetevents.protocol.ConnectionState;
 import io.github.retrooper.packetevents.utils.reflection.ClassUtil;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
-import io.netty.handler.codec.ByteToMessageDecoder;
 import io.netty.handler.codec.MessageToByteEncoder;
-import io.netty.handler.codec.MessageToMessageDecoder;
+import io.netty.handler.codec.MessageToMessageEncoder;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class CustomBukkitEncodeHandlerModern extends MessageToByteEncoder implements ViaCodecHandler {
+public class CustomBukkitEncodeHandlerModern extends MessageToByteEncoder<Object> implements ViaCodecHandler {
     private static Field versionField;
 
     static {
@@ -55,33 +53,33 @@ public class CustomBukkitEncodeHandlerModern extends MessageToByteEncoder implem
     }
 
     public final ChannelHandler oldBukkitEncodeHandler;
-    public final List<Object> customDecoders = new ArrayList<>();
-    public final MessageToByteEncoder minecraftEncoder;
+    public final List<Object> customEncoders = new ArrayList<>();
+    public final MessageToByteEncoder<?> minecraftEncoder;
     private final Object userInfo;
 
-    public CustomBukkitEncodeHandlerModern(Object userInfo, MessageToByteEncoder minecraftEncoder, ChannelHandler oldBukkitEncodeHandler) {
+    public CustomBukkitEncodeHandlerModern(Object userInfo, MessageToByteEncoder<?> minecraftEncoder, ChannelHandler oldBukkitEncodeHandler) {
         this.userInfo = userInfo;
         this.minecraftEncoder = minecraftEncoder;
         this.oldBukkitEncodeHandler = oldBukkitEncodeHandler;
     }
 
-    public void addCustomDecoder(Object customDecoder) {
-        customDecoders.add(customDecoder);
+    public void addCustomEncoder(Object customEncoder) {
+        customEncoders.add(customEncoder);
     }
 
-    public <T> T getCustomDecoder(Class<T> clazz) {
-        for (Object customDecoder : customDecoders) {
-            if (customDecoder.getClass().equals(clazz)) {
-                return (T) customDecoder;
+    public <T> T getCustomEncoder(Class<T> clazz) {
+        for (Object customEncoder : customEncoders) {
+            if (customEncoder.getClass().equals(clazz)) {
+                return (T) customEncoder;
             }
         }
         return null;
     }
 
-    public Object getCustomDecoderBySimpleName(String simpleName) {
-        for (Object customDecoder : customDecoders) {
-            if (ClassUtil.getClassSimpleName(customDecoder.getClass()).equals(simpleName)) {
-                return customDecoder;
+    public Object getCustomEncoderByName(String simpleName) {
+        for (Object customEncoder : customEncoders) {
+            if (ClassUtil.getClassSimpleName(customEncoder.getClass()).equals(simpleName)) {
+                return customEncoder;
             }
         }
         return null;
@@ -89,7 +87,8 @@ public class CustomBukkitEncodeHandlerModern extends MessageToByteEncoder implem
 
     @Override
     public void transform(ByteBuf bytebuf) throws Exception {
-        if (!ViaVersionUtil.checkClientboundPacketUserConnection(userInfo)) throw ViaVersionUtil.throwCancelEncoderException(null);
+        if (!ViaVersionUtil.checkClientboundPacketUserConnection(userInfo))
+            throw ViaVersionUtil.throwCancelEncoderException(null);
         if (!ViaVersionUtil.isUserConnectionActive(userInfo)) return;
         ViaVersionUtil.transformPacket(userInfo, bytebuf, false);
     }
@@ -101,43 +100,8 @@ public class CustomBukkitEncodeHandlerModern extends MessageToByteEncoder implem
         }
 
         if (!(o instanceof ByteBuf)) {
-            CustomPipelineUtil.callEncode(minecraftEncoder, new ChannelHandlerContextWrapper(ctx, this), o, byteBuf);
-        }
-
-        if (!ViaVersionUtil.checkServerboundPacketUserConnection(userInfo)) {
-            byteBuf.clear(); //Don't accumulate
-            throw ViaVersionUtil.throwCancelEncoderException(null);
-        }
-
-        ByteBuf transformedBuf = null;
-        try {
-            if (ViaVersionUtil.isUserConnectionActive(userInfo)) {
-                transformedBuf = ctx.alloc().buffer().writeBytes(byteBuf);
-                ViaVersionUtil.transformPacket(userInfo, transformedBuf, true);
-            }
-
             try {
-                Object result = transformedBuf == null ? byteBuf : transformedBuf;
-                for (Object customDecoder : customDecoders) {
-                    //We only support one output (except for ProtocolLib)
-                    if (customDecoder instanceof ByteToMessageDecoder) {
-                        result = PipelineUtil.callDecode((ByteToMessageDecoder) customDecoder, ctx, result).get(0);
-                    } else if (customDecoder instanceof MessageToMessageDecoder) {
-                        result = PipelineUtil.callDecode((MessageToMessageDecoder<?>) customDecoder, ctx, result).get(0);
-                    }
-                }
-                if (result instanceof ByteBuf) {
-                    //We will utilize the vanilla decoder to convert the ByteBuf to an NMS packet
-                    List<Object> nmsObjects = PipelineUtil.callDecode(minecraftEncoder, ctx, result);
-                    list.addAll(nmsObjects);
-                } else {
-                    //Some previous decoder likely already converted the ByteBuf to an NMS packet
-                    if (result instanceof List) {
-                        list.addAll((List<?>) result);
-                    } else {
-                        list.add(result);
-                    }
-                }
+                CustomPipelineUtil.callEncode(minecraftEncoder, new ChannelHandlerContextWrapper(ctx, this), o, byteBuf);
             } catch (InvocationTargetException e) {
                 if (e.getCause() instanceof Exception) {
                     throw (Exception) e.getCause();
@@ -145,11 +109,23 @@ public class CustomBukkitEncodeHandlerModern extends MessageToByteEncoder implem
                     throw (Error) e.getCause();
                 }
             }
-        } finally {
-            if (transformedBuf != null) {
-                transformedBuf.release();
+        } else {
+            byteBuf.writeBytes((ByteBuf) o);
+        }
+        ByteBuf transformed = ctx.alloc().buffer().writeBytes(byteBuf);
+        for (Object customEncoder : customEncoders) {
+            //We only support one output (except for ProtocolLib)
+            if (customEncoder instanceof MessageToByteEncoder) {
+                CustomPipelineUtil.callEncode((MessageToByteEncoder<?>) customEncoder, ctx, transformed, byteBuf);
+                transformed.clear().writeBytes(byteBuf);
+            }
+            else if (customEncoder instanceof MessageToMessageEncoder) {
+                byteBuf = (ByteBuf) CustomPipelineUtil.callEncode((MessageToMessageEncoder<?>) customEncoder, ctx, transformed).get(0);
+                transformed.clear().writeBytes(byteBuf);
             }
         }
+        byteBuf.clear().writeBytes(transformed);
+        transform(byteBuf);
     }
 
     private boolean containsCause(Throwable t, Class<?> c) {

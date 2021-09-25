@@ -18,11 +18,11 @@
 
 package io.github.retrooper.packetevents.utils.netty.buffer;
 
-import io.github.retrooper.packetevents.utils.MinecraftReflection;
+import io.github.retrooper.packetevents.utils.MinecraftReflectionUtil;
 
 public final class ByteBufUtil {
     public static ByteBufAbstract wrappedBuffer(byte[] bytes) {
-        if (!MinecraftReflection.USE_MODERN_NETTY_PACKAGE) {
+        if (!MinecraftReflectionUtil.USE_MODERN_NETTY_PACKAGE) {
             return ByteBufUtilLegacy.wrappedBuffer(bytes);
         } else {
             return ByteBufUtilModern.wrappedBuffer(bytes);
@@ -30,7 +30,7 @@ public final class ByteBufUtil {
     }
 
     public static ByteBufAbstract copiedBuffer(byte[] bytes) {
-        if (!MinecraftReflection.USE_MODERN_NETTY_PACKAGE) {
+        if (!MinecraftReflectionUtil.USE_MODERN_NETTY_PACKAGE) {
             return ByteBufUtilLegacy.copiedBuffer(bytes);
         } else {
             return ByteBufUtilModern.copiedBuffer(bytes);
@@ -38,7 +38,7 @@ public final class ByteBufUtil {
     }
 
     public static ByteBufAbstract buffer() {
-        if (!MinecraftReflection.USE_MODERN_NETTY_PACKAGE) {
+        if (!MinecraftReflectionUtil.USE_MODERN_NETTY_PACKAGE) {
             return ByteBufUtilLegacy.buffer();
         } else {
             return ByteBufUtilModern.buffer();
@@ -46,7 +46,7 @@ public final class ByteBufUtil {
     }
 
     public static ByteBufAbstract buffer(int initialCapacity) {
-        if (!MinecraftReflection.USE_MODERN_NETTY_PACKAGE) {
+        if (!MinecraftReflectionUtil.USE_MODERN_NETTY_PACKAGE) {
             return ByteBufUtilLegacy.buffer(initialCapacity);
         } else {
             return ByteBufUtilModern.buffer(initialCapacity);
@@ -54,7 +54,7 @@ public final class ByteBufUtil {
     }
 
     public static ByteBufAbstract buffer(int initialCapacity, int maxCapacity) {
-        if (!MinecraftReflection.USE_MODERN_NETTY_PACKAGE) {
+        if (!MinecraftReflectionUtil.USE_MODERN_NETTY_PACKAGE) {
             return ByteBufUtilLegacy.buffer(initialCapacity, maxCapacity);
         } else {
             return ByteBufUtilModern.buffer(initialCapacity, maxCapacity);
@@ -62,7 +62,7 @@ public final class ByteBufUtil {
     }
 
     public static ByteBufAbstract directBuffer() {
-        if (!MinecraftReflection.USE_MODERN_NETTY_PACKAGE) {
+        if (!MinecraftReflectionUtil.USE_MODERN_NETTY_PACKAGE) {
             return ByteBufUtilLegacy.directBuffer();
         } else {
             return ByteBufUtilModern.directBuffer();
@@ -70,7 +70,7 @@ public final class ByteBufUtil {
     }
 
     public static ByteBufAbstract directBuffer(int initialCapacity) {
-        if (!MinecraftReflection.USE_MODERN_NETTY_PACKAGE) {
+        if (!MinecraftReflectionUtil.USE_MODERN_NETTY_PACKAGE) {
             return ByteBufUtilLegacy.directBuffer(initialCapacity);
         } else {
             return ByteBufUtilModern.directBuffer(initialCapacity);
@@ -78,7 +78,7 @@ public final class ByteBufUtil {
     }
 
     public static ByteBufAbstract directBuffer(int initialCapacity, int maxCapacity) {
-        if (!MinecraftReflection.USE_MODERN_NETTY_PACKAGE) {
+        if (!MinecraftReflectionUtil.USE_MODERN_NETTY_PACKAGE) {
             return ByteBufUtilLegacy.directBuffer(initialCapacity, maxCapacity);
         } else {
             return ByteBufUtilModern.directBuffer(initialCapacity, maxCapacity);
@@ -86,7 +86,7 @@ public final class ByteBufUtil {
     }
 
     public static ByteBufAbstract compositeBuffer() {
-        if (!MinecraftReflection.USE_MODERN_NETTY_PACKAGE) {
+        if (!MinecraftReflectionUtil.USE_MODERN_NETTY_PACKAGE) {
             return ByteBufUtilLegacy.compositeBuffer();
         } else {
             return ByteBufUtilModern.compositeBuffer();
@@ -94,7 +94,7 @@ public final class ByteBufUtil {
     }
 
     public static ByteBufAbstract compositeBuffer(int maxNumComponents) {
-        if (!MinecraftReflection.USE_MODERN_NETTY_PACKAGE) {
+        if (!MinecraftReflectionUtil.USE_MODERN_NETTY_PACKAGE) {
             return ByteBufUtilLegacy.compositeBuffer(maxNumComponents);
         } else {
             return ByteBufUtilModern.compositeBuffer(maxNumComponents);

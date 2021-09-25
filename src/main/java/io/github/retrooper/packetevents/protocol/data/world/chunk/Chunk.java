@@ -10,8 +10,8 @@ import io.github.retrooper.packetevents.protocol.data.world.chunk.palette.Global
 import io.github.retrooper.packetevents.protocol.data.world.chunk.palette.ListPalette;
 import io.github.retrooper.packetevents.protocol.data.world.chunk.palette.MapPalette;
 import io.github.retrooper.packetevents.protocol.data.world.chunk.palette.Palette;
-import io.github.retrooper.packetevents.utils.NetStreamOutput;
-import io.github.retrooper.packetevents.wrapper.PacketWrapper;
+import io.github.retrooper.packetevents.protocol.data.stream.NetStreamInput;
+import io.github.retrooper.packetevents.protocol.data.stream.NetStreamOutput;
 
 import java.io.IOException;
 
@@ -37,7 +37,7 @@ public class Chunk {
         this(0, new ListPalette(MIN_PALETTE_BITS_PER_ENTRY), new BitStorage(MIN_PALETTE_BITS_PER_ENTRY, CHUNK_SIZE));
     }
 
-    public static Chunk read(PacketWrapper<?> in) {
+    public static Chunk read(NetStreamInput in) {
         int blockCount = in.readShort();
         int bitsPerEntry = in.readUnsignedByte();
 
@@ -48,7 +48,7 @@ public class Chunk {
             e.printStackTrace();
         }
 
-        BitStorage storage = new BitStorage(bitsPerEntry, CHUNK_SIZE, in.readLongArray(in.readVarInt()));
+        BitStorage storage = new BitStorage(bitsPerEntry, CHUNK_SIZE, in.readLongs(in.readVarInt()));
         return new Chunk(blockCount, palette, storage);
     }
 
@@ -128,7 +128,7 @@ public class Chunk {
         }
     }
 
-    private static Palette readPalette(int bitsPerEntry, PacketWrapper<?> in) throws IOException {
+    private static Palette readPalette(int bitsPerEntry, NetStreamInput in) throws IOException {
         if(bitsPerEntry <= MIN_PALETTE_BITS_PER_ENTRY) {
             return new ListPalette(bitsPerEntry, in);
         } else if(bitsPerEntry <= MAX_PALETTE_BITS_PER_ENTRY) {

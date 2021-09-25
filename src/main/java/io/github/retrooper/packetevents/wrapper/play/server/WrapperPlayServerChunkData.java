@@ -24,11 +24,11 @@ import io.github.retrooper.packetevents.protocol.PacketType;
 import io.github.retrooper.packetevents.protocol.data.world.chunk.Chunk;
 import io.github.retrooper.packetevents.protocol.data.world.chunk.Column;
 import io.github.retrooper.packetevents.protocol.data.nbt.NBTCompound;
-import io.github.retrooper.packetevents.utils.NetStreamOutput;
-import io.github.retrooper.packetevents.utils.netty.buffer.ByteBufAbstract;
-import io.github.retrooper.packetevents.utils.netty.buffer.ByteBufUtil;
+import io.github.retrooper.packetevents.protocol.data.stream.NetStreamInput;
+import io.github.retrooper.packetevents.protocol.data.stream.NetStreamOutput;
 import io.github.retrooper.packetevents.wrapper.PacketWrapper;
 
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.util.BitSet;
 
@@ -74,13 +74,14 @@ public class WrapperPlayServerChunkData extends PacketWrapper<WrapperPlayServerC
                 biomeData[index] = readVarInt();
             }
         }
+        System.out.println("PREEEE, FULL CHUNK: " + fullChunk);
         byte[] data = readByteArray(readVarInt());
-        ByteBufAbstract bb = ByteBufUtil.copiedBuffer(data);
-        PacketWrapper<?> dataWrapper = PacketWrapper.createUniversalPacketWrapper(bb);
+        System.out.println("POST DATA READ!");
+        NetStreamInput dataIn = new NetStreamInput(new ByteArrayInputStream(data));
         Chunk[] chunks = new Chunk[chunkMask.size()];
         for (int index = 0; index < chunks.length; index++) {
             if (chunkMask.get(index)) {
-                chunks[index] = Chunk.read(dataWrapper);
+                chunks[index] = Chunk.read(dataIn);
             }
         }
 
