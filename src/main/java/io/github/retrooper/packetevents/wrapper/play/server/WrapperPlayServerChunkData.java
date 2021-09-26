@@ -118,9 +118,20 @@ public class WrapperPlayServerChunkData extends PacketWrapper<WrapperPlayServerC
 
         int[] biomeData = new int[0];
         if (hasBiomeData) {
-            biomeData = new int[readVarInt()];
+            boolean v1_17 = serverVersion.isNewerThanOrEquals(ServerVersion.v_1_17);
+            int biomesLength;
+            if (serverVersion.isNewerThanOrEquals(ServerVersion.v_1_16_2)) {
+                biomesLength = readVarInt();
+            } else {
+                biomesLength = 1024;//Always 1024
+            }
+            biomeData = new int[biomesLength];
             for (int index = 0; index < biomeData.length; index++) {
-                biomeData[index] = readVarInt();
+                if (v1_17) {
+                    biomeData[index] = readVarInt();
+                } else {
+                    biomeData[index] = readInt();
+                }
             }
         }
         //TODO Decompress on 1.7.10
