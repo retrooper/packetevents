@@ -30,7 +30,7 @@ public class WrapperPlayClientTeleportConfirm extends PacketWrapper<WrapperPlayC
     }
 
     public WrapperPlayClientTeleportConfirm(int teleportID) {
-        super(PacketType.Play.Client.TELEPORT_CONFIRM.getID());
+        super(PacketType.Play.Client.TELEPORT_CONFIRM);
         this.teleportID = teleportID;
     }
 

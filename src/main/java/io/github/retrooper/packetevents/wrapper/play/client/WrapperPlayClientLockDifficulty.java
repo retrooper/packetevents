@@ -30,7 +30,7 @@ public class WrapperPlayClientLockDifficulty extends PacketWrapper<WrapperPlayCl
     }
 
     public WrapperPlayClientLockDifficulty(boolean locked) {
-        super(PacketType.Play.Client.LOCK_DIFFICULTY.getID());
+        super(PacketType.Play.Client.LOCK_DIFFICULTY);
         this.locked = locked;
     }
 

@@ -34,7 +34,7 @@ public class WrapperPlayClientClickWindowButton extends PacketWrapper<WrapperPla
     }
 
     public WrapperPlayClientClickWindowButton(int windowID, int buttonID) {
-        super(PacketType.Play.Client.CLICK_WINDOW_BUTTON.getID());
+        super(PacketType.Play.Client.CLICK_WINDOW_BUTTON);
         this.windowID = windowID;
         this.buttonID = buttonID;
     }

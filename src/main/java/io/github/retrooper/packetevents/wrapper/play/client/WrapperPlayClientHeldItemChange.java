@@ -33,7 +33,7 @@ public class WrapperPlayClientHeldItemChange extends PacketWrapper<WrapperPlayCl
     }
 
     public WrapperPlayClientHeldItemChange(int slot) {
-        super(PacketType.Play.Client.HELD_ITEM_CHANGE.getID());
+        super(PacketType.Play.Client.HELD_ITEM_CHANGE);
         this.slot = slot;
     }
 

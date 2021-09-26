@@ -33,7 +33,7 @@ public class WrapperPlayClientVehicleMove extends PacketWrapper<WrapperPlayClien
     }
 
     public WrapperPlayClientVehicleMove(Vector3d position, float yaw, float pitch) {
-        super(PacketType.Play.Client.VEHICLE_MOVE.getID());
+        super(PacketType.Play.Client.VEHICLE_MOVE);
         this.position = position;
         this.yaw = yaw;
         this.pitch = pitch;

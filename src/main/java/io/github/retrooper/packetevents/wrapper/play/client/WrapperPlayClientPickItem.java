@@ -30,7 +30,7 @@ public class WrapperPlayClientPickItem extends PacketWrapper<WrapperPlayClientPi
     }
 
     public WrapperPlayClientPickItem(int slot) {
-        super(PacketType.Play.Client.PICK_ITEM.getID());
+        super(PacketType.Play.Client.PICK_ITEM);
         this.slot = slot;
     }
 

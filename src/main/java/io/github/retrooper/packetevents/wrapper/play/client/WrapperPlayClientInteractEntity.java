@@ -44,7 +44,7 @@ public class WrapperPlayClientInteractEntity extends PacketWrapper<WrapperPlayCl
     }
 
     public WrapperPlayClientInteractEntity(int entityID, Type type, Optional<Vector3f> target, Optional<Hand> hand, Optional<Boolean> sneaking) {
-        super(PacketType.Play.Client.INTERACT_ENTITY.getID());
+        super(PacketType.Play.Client.INTERACT_ENTITY);
         this.entityID = entityID;
         this.type = type;
         this.target = target;

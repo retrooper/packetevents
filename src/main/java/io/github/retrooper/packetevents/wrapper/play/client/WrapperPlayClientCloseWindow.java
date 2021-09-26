@@ -30,7 +30,7 @@ public class WrapperPlayClientCloseWindow extends PacketWrapper<WrapperPlayClien
     }
 
     public WrapperPlayClientCloseWindow(int windowID) {
-        super(PacketType.Play.Client.CLOSE_WINDOW.getID());
+        super(PacketType.Play.Client.CLOSE_WINDOW);
         this.windowID = windowID;
     }
 

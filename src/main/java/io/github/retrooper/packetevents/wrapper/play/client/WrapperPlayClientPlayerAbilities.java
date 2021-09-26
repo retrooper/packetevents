@@ -40,7 +40,7 @@ public class WrapperPlayClientPlayerAbilities extends PacketWrapper<WrapperPlayC
     public WrapperPlayClientPlayerAbilities(boolean flying, Optional<Boolean> vulnerable, Optional<Boolean> flightAllowed,
                                             Optional<Boolean> buildingInstantlyAllowed,
                                             Optional<Float> flySpeed, Optional<Float> walkSpeed) {
-        super(PacketType.Play.Client.PLAYER_ABILITIES.getID());
+        super(PacketType.Play.Client.PLAYER_ABILITIES);
         this.flying = flying;
         this.vulnerable = vulnerable;
         this.flightAllowed = flightAllowed;

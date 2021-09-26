@@ -37,7 +37,7 @@ public class WrapperLoginServerDisconnect extends PacketWrapper<WrapperLoginServ
     }
 
     public WrapperLoginServerDisconnect(String reason) {
-        super(PacketType.Login.Server.DISCONNECT.getID());
+        super(PacketType.Login.Server.DISCONNECT);
         this.reason = reason;
     }
 

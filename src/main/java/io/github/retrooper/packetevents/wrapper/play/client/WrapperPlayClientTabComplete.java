@@ -37,7 +37,7 @@ public class WrapperPlayClientTabComplete extends PacketWrapper<WrapperPlayClien
     }
 
     public WrapperPlayClientTabComplete(Optional<Integer> transactionID, String text, Optional<BlockPosition> blockPosition) {
-        super(PacketType.Play.Client.TAB_COMPLETE.getID());
+        super(PacketType.Play.Client.TAB_COMPLETE);
         this.transactionID = transactionID;
         this.text = text;
         this.blockPosition = blockPosition;

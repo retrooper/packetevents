@@ -36,7 +36,7 @@ public class WrapperPlayClientGenerateStructure extends PacketWrapper<WrapperPla
     }
 
     public WrapperPlayClientGenerateStructure(BlockPosition blockPosition, int levels, boolean keepJigsaws) {
-        super(PacketType.Play.Client.GENERATE_STRUCTURE.getID());
+        super(PacketType.Play.Client.GENERATE_STRUCTURE);
         this.blockPosition = blockPosition;
         this.levels = levels;
         this.keepJigsaws = keepJigsaws;

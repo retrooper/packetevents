@@ -37,7 +37,7 @@ public class WrapperPlayServerWindowConfirmation extends PacketWrapper<WrapperPl
      * @param accepted Whether the action was accepted. Use false to get a response from the client.
      */
     public WrapperPlayServerWindowConfirmation(byte windowID, short actionID, boolean accepted) {
-        super(PacketType.Play.Server.WINDOW_CONFIRMATION.getID());
+        super(PacketType.Play.Server.WINDOW_CONFIRMATION);
         this.windowID = windowID;
         this.actionID = actionID;
         this.accepted = accepted;

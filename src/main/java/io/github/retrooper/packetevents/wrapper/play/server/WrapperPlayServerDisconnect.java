@@ -33,7 +33,7 @@ public class WrapperPlayServerDisconnect extends PacketWrapper<WrapperPlayServer
     }
 
     public WrapperPlayServerDisconnect(String reason) {
-        super(PacketType.Play.Server.DISCONNECT.getID());
+        super(PacketType.Play.Server.DISCONNECT);
         this.reason = reason;
     }
 

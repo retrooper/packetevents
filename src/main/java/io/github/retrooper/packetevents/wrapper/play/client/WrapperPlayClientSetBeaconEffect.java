@@ -31,7 +31,7 @@ public class WrapperPlayClientSetBeaconEffect extends PacketWrapper<WrapperPlayC
     }
 
     public WrapperPlayClientSetBeaconEffect(int primaryEffect, int secondaryEffect) {
-        super(PacketType.Play.Client.SET_BEACON_EFFECT.getID());
+        super(PacketType.Play.Client.SET_BEACON_EFFECT);
         this.primaryEffect = primaryEffect;
         this.secondaryEffect = secondaryEffect;
     }

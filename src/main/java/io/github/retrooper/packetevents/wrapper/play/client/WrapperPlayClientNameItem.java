@@ -30,7 +30,7 @@ public class WrapperPlayClientNameItem extends PacketWrapper<WrapperPlayClientNa
     }
 
     public WrapperPlayClientNameItem(String itemName) {
-        super(PacketType.Play.Client.NAME_ITEM.getID());
+        super(PacketType.Play.Client.NAME_ITEM);
         this.itemName = itemName;
     }
 

@@ -27,6 +27,7 @@ import io.github.retrooper.packetevents.protocol.data.nbt.NBTEnd;
 import io.github.retrooper.packetevents.protocol.data.nbt.serializer.DefaultNBTSerializer;
 import io.github.retrooper.packetevents.protocol.data.player.ClientVersion;
 import io.github.retrooper.packetevents.protocol.data.world.BlockPosition;
+import io.github.retrooper.packetevents.protocol.packettype.PacketTypeCommon;
 import io.github.retrooper.packetevents.utils.MinecraftReflectionUtil;
 import io.github.retrooper.packetevents.utils.StringUtil;
 import io.github.retrooper.packetevents.utils.netty.buffer.ByteBufAbstract;
@@ -89,6 +90,10 @@ public class PacketWrapper<T extends PacketWrapper> {
 
     public PacketWrapper(int packetID) {
         this(ClientVersion.UNKNOWN, ServerManager.getVersion(), ByteBufUtil.buffer(), packetID);
+    }
+
+    public PacketWrapper(PacketTypeCommon packetType) {
+        this(packetType.getID());
     }
 
     public static PacketWrapper createUniversalPacketWrapper(ByteBufAbstract byteBuf) {

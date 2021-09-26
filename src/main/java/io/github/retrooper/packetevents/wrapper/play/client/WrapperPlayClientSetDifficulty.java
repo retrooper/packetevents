@@ -31,7 +31,7 @@ public class WrapperPlayClientSetDifficulty extends PacketWrapper<WrapperPlayCli
     }
 
     public WrapperPlayClientSetDifficulty(Difficulty difficulty) {
-        super(PacketType.Play.Client.SET_DIFFICULTY.getID());
+        super(PacketType.Play.Client.SET_DIFFICULTY);
         this.difficulty = difficulty;
     }
 

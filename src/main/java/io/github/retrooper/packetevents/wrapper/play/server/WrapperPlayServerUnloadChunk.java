@@ -12,7 +12,7 @@ public class WrapperPlayServerUnloadChunk extends PacketWrapper<WrapperPlayServe
     }
 
     public WrapperPlayServerUnloadChunk(int chunkX, int chunkZ) {
-        super(PacketType.Play.Server.UNLOAD_CHUNK.getID());
+        super(PacketType.Play.Server.UNLOAD_CHUNK);
         this.chunkX = chunkX;
         this.chunkZ = chunkZ;
     }

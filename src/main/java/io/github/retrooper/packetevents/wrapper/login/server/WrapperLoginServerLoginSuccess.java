@@ -38,7 +38,7 @@ public class WrapperLoginServerLoginSuccess extends PacketWrapper<WrapperLoginSe
     }
 
     public WrapperLoginServerLoginSuccess(UUID uuid, String username) {
-        super(PacketType.Login.Server.LOGIN_SUCCESS.getID());
+        super(PacketType.Login.Server.LOGIN_SUCCESS);
         this.uuid = uuid;
         this.username = username;
     }

@@ -46,7 +46,7 @@ public class WrapperPlayClientClickWindow extends PacketWrapper<WrapperPlayClien
 
     public WrapperPlayClientClickWindow(int windowID, Optional<Integer> stateID, int slot, int button, Optional<Integer> actionNumber, WindowClickType windowClickType,
                                         Optional<Map<Integer, ItemStack>> slots, ItemStack clickedItemStack) {
-        super(PacketType.Play.Client.CLICK_WINDOW.getID());
+        super(PacketType.Play.Client.CLICK_WINDOW);
         this.windowID = windowID;
         this.stateID = stateID;
         this.slot = slot;

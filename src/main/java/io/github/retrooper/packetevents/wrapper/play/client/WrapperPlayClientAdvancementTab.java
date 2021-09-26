@@ -33,7 +33,7 @@ public class WrapperPlayClientAdvancementTab extends PacketWrapper<WrapperPlayCl
     }
 
     public WrapperPlayClientAdvancementTab(Action action, Optional<String> tabID) {
-        super(PacketType.Play.Client.ADVANCEMENT_TAB.getID());
+        super(PacketType.Play.Client.ADVANCEMENT_TAB);
         this.action = action;
         this.tabID = tabID;
     }

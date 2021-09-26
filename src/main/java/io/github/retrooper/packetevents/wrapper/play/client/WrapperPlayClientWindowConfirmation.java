@@ -47,7 +47,7 @@ public class WrapperPlayClientWindowConfirmation extends PacketWrapper<WrapperPl
     }
 
     public WrapperPlayClientWindowConfirmation(int windowID, short actionNumber, boolean accepted) {
-        super(PacketType.Play.Client.WINDOW_CONFIRMATION.getID());
+        super(PacketType.Play.Client.WINDOW_CONFIRMATION);
         this.windowID = windowID;
         this.actionNumber = actionNumber;
         this.accepted = accepted;

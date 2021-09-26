@@ -41,7 +41,7 @@ public class WrapperPlayServerChunkData extends PacketWrapper<WrapperPlayServerC
     }
 
     public WrapperPlayServerChunkData(Column column) {
-        super(PacketType.Play.Server.CHUNK_DATA.getID());
+        super(PacketType.Play.Server.CHUNK_DATA);
         this.column = column;
     }
 

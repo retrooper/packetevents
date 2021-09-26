@@ -36,7 +36,7 @@ public class WrapperPlayClientAnimation extends PacketWrapper<WrapperPlayClientA
     }
 
     public WrapperPlayClientAnimation(Hand hand) {
-        super(PacketType.Play.Client.ANIMATION.getID());
+        super(PacketType.Play.Client.ANIMATION);
         this.hand = hand;
     }
 

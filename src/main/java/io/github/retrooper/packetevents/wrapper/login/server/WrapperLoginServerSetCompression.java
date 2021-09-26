@@ -30,7 +30,7 @@ public class WrapperLoginServerSetCompression extends PacketWrapper<WrapperLogin
     }
 
     public WrapperLoginServerSetCompression(int threshold) {
-        super(PacketType.Login.Server.SET_COMPRESSION.getID());
+        super(PacketType.Login.Server.SET_COMPRESSION);
         this.threshold = threshold;
     }
 

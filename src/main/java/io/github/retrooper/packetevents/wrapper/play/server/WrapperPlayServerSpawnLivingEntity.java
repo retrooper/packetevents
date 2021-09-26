@@ -46,7 +46,7 @@ public class WrapperPlayServerSpawnLivingEntity extends PacketWrapper<WrapperPla
     }
 
     public WrapperPlayServerSpawnLivingEntity(int entityID, Optional<UUID> entityUUID, int entityTypeID, Vector3d position, float yaw, float pitch, float headPitch, Vector3d velocity) {
-        super(PacketType.Play.Server.SPAWN_LIVING_ENTITY.getID());
+        super(PacketType.Play.Server.SPAWN_LIVING_ENTITY);
         this.entityID = entityID;
         this.entityUUID = entityUUID;
         this.entityTypeID = entityTypeID;

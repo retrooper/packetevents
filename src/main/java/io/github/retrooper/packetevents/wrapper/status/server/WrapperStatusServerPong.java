@@ -30,7 +30,7 @@ public class WrapperStatusServerPong extends PacketWrapper<WrapperStatusServerPo
     }
 
     public WrapperStatusServerPong(long time) {
-        super(PacketType.Status.Server.PONG.getID());
+        super(PacketType.Status.Server.PONG);
         this.time = time;
     }
 

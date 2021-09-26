@@ -33,7 +33,7 @@ public class WrapperPlayClientEntityAction extends PacketWrapper<WrapperPlayClie
     }
 
     public WrapperPlayClientEntityAction(int entityID, Action action, int jumpBoost) {
-        super(PacketType.Play.Client.ENTITY_ACTION.getID());
+        super(PacketType.Play.Client.ENTITY_ACTION);
         this.entityID = entityID;
         this.action = action;
         this.jumpBoost = jumpBoost;

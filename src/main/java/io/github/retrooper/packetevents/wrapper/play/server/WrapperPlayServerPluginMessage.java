@@ -37,7 +37,7 @@ public class WrapperPlayServerPluginMessage extends PacketWrapper<WrapperPlaySer
     }
 
     public WrapperPlayServerPluginMessage(String channelName, byte[] data) {
-        super(PacketType.Play.Server.PLUGIN_MESSAGE.getID());
+        super(PacketType.Play.Server.PLUGIN_MESSAGE);
         this.channelName = channelName;
         this.data = data;
     }

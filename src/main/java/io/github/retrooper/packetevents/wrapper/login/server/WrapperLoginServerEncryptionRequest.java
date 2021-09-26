@@ -45,14 +45,14 @@ public class WrapperLoginServerEncryptionRequest extends PacketWrapper<WrapperLo
     }
 
     public WrapperLoginServerEncryptionRequest(String serverID, byte[] publicKeyBytes, byte[] verifyToken) {
-        super(PacketType.Login.Server.ENCRYPTION_REQUEST.getID());
+        super(PacketType.Login.Server.ENCRYPTION_REQUEST);
         this.serverID = serverID;
         this.publicKey = encrypt(publicKeyBytes);
         this.verifyToken = verifyToken;
     }
 
     public WrapperLoginServerEncryptionRequest(String serverID, PublicKey publicKey, byte[] verifyToken) {
-        super(PacketType.Login.Server.ENCRYPTION_REQUEST.getID());
+        super(PacketType.Login.Server.ENCRYPTION_REQUEST);
         this.serverID = serverID;
         this.publicKey = publicKey;
         this.verifyToken = verifyToken;

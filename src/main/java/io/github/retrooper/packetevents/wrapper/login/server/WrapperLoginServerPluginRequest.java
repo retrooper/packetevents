@@ -32,7 +32,7 @@ public class WrapperLoginServerPluginRequest extends PacketWrapper<WrapperLoginS
     }
 
     public WrapperLoginServerPluginRequest(int messageID, String channelName, byte[] data) {
-        super(PacketType.Login.Server.LOGIN_PLUGIN_REQUEST.getID());
+        super(PacketType.Login.Server.LOGIN_PLUGIN_REQUEST);
         this.messageID = messageID;
         this.channelName = channelName;
         this.data = data;

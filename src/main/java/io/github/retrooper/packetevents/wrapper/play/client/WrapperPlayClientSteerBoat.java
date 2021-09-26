@@ -31,7 +31,7 @@ public class WrapperPlayClientSteerBoat extends PacketWrapper<WrapperPlayClientS
     }
 
     public WrapperPlayClientSteerBoat(boolean leftPaddleTurning, boolean rightPaddleTurning) {
-        super(PacketType.Play.Client.STEER_BOAT.getID());
+        super(PacketType.Play.Client.STEER_BOAT);
         this.leftPaddleTurning = leftPaddleTurning;
         this.rightPaddleTurning = rightPaddleTurning;
     }

@@ -36,7 +36,7 @@ public class WrapperPlayClientKeepAlive extends PacketWrapper<WrapperPlayClientK
     }
 
     public WrapperPlayClientKeepAlive(long id) {
-        super(PacketType.Play.Client.KEEP_ALIVE.getID());
+        super(PacketType.Play.Client.KEEP_ALIVE);
         this.id = id;
     }
 

@@ -34,13 +34,13 @@ public class WrapperPlayClientResourcePackStatus extends PacketWrapper<WrapperPl
     }
 
     public WrapperPlayClientResourcePackStatus(Result result) {
-        super(PacketType.Play.Client.RESOURCE_PACK_STATUS.getID());
+        super(PacketType.Play.Client.RESOURCE_PACK_STATUS);
         this.result = result;
     }
 
     @Deprecated
     public WrapperPlayClientResourcePackStatus(String hash, Result result) {
-        super(PacketType.Play.Client.RESOURCE_PACK_STATUS.getID());
+        super(PacketType.Play.Client.RESOURCE_PACK_STATUS);
         this.hash = Optional.of(hash);
         this.result = result;
     }

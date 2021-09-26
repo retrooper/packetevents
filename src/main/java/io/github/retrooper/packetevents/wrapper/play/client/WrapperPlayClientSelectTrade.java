@@ -30,7 +30,7 @@ public class WrapperPlayClientSelectTrade extends PacketWrapper<WrapperPlayClien
     }
 
     public WrapperPlayClientSelectTrade(int slot) {
-        super(PacketType.Play.Client.SELECT_TRADE.getID());
+        super(PacketType.Play.Client.SELECT_TRADE);
         this.slot = slot;
     }
 

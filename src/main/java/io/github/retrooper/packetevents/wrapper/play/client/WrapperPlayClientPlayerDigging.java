@@ -47,7 +47,7 @@ public class WrapperPlayClientPlayerDigging extends PacketWrapper<WrapperPlayCli
     }
 
     public WrapperPlayClientPlayerDigging(Action action, BlockPosition blockPosition, Direction direction) {
-        super(PacketType.Play.Client.PLAYER_DIGGING.getID());
+        super(PacketType.Play.Client.PLAYER_DIGGING);
         this.action = action;
         this.blockPosition = blockPosition;
         this.direction = direction;
