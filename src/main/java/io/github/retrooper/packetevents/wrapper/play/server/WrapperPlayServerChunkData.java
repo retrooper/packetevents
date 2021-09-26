@@ -45,25 +45,27 @@ public class WrapperPlayServerChunkData extends PacketWrapper<WrapperPlayServerC
         this.column = column;
     }
 
-    private BitSet readChunkMask() {
-        BitSet chunkMask;
+    private long[] readBitSetLongs() {
         if (serverVersion.isNewerThanOrEquals(ServerVersion.v_1_17)) {
             int bitMaskLength = readVarInt();
             //Read primary bit mask
-            chunkMask = BitSet.valueOf(readLongArray(bitMaskLength));
+            return readLongArray(bitMaskLength);
         } else if (serverVersion.isNewerThanOrEquals(ServerVersion.v_1_9)) {
             //Read primary bit mask
-            chunkMask = BitSet.valueOf(new long[]{readVarInt()});
+            return new long[]{readVarInt()};
         } else {
             if (serverVersion == ServerVersion.v_1_7_10) {
                 //Read primary bit mask and add bit mask
-                chunkMask = BitSet.valueOf(new long[]{readUnsignedShort(), readUnsignedShort()});
+                return new long[]{readUnsignedShort(), readUnsignedShort()};
             } else {
                 //Read primary bit mask
-                chunkMask = BitSet.valueOf(new long[]{readUnsignedShort()});
+                return new long[]{readUnsignedShort()};
             }
         }
-        return chunkMask;
+    }
+
+    private BitSet readChunkMask() {
+        return BitSet.valueOf(readBitSetLongs());
     }
 
     private void writeChunkMask(BitSet chunkMask) {
@@ -102,14 +104,11 @@ public class WrapperPlayServerChunkData extends PacketWrapper<WrapperPlayServerC
         boolean hasReadBiomeData = false;
         if (v1_17) {
             hasBiomeData = true;
-        }
-        else if (v1_13_2) {
+        } else if (v1_13_2) {
             hasBiomeData = fullChunk;
-        }
-        else if (serverVersion.isOlderThanOrEquals(ServerVersion.v_1_11_2) && serverVersion.isNewerThanOrEquals(ServerVersion.v_1_9)) {
+        } else if (serverVersion.isOlderThanOrEquals(ServerVersion.v_1_11_2) && serverVersion.isNewerThanOrEquals(ServerVersion.v_1_9)) {
             hasBiomeData = fullChunk;
-        }
-        else {
+        } else {
             //Full chunk boolean exists, but the biome data is not present in the packet
             hasBiomeData = false;
         }
@@ -152,12 +151,14 @@ public class WrapperPlayServerChunkData extends PacketWrapper<WrapperPlayServerC
         int dataLength = readVarInt();
         byte[] data = readByteArray(dataLength);
         NetStreamInput dataIn = new NetStreamInput(new ByteArrayInputStream(data));
+        System.out.println("BEGININING");
         Chunk[] chunks = new Chunk[chunkMask.size()];
         for (int index = 0; index < chunks.length; index++) {
             if (chunkMask.get(index)) {
                 chunks[index] = Chunk.read(dataIn);
             }
         }
+        System.out.println("DONE");
 
         if (hasBiomeData && !hasReadBiomeData) {
             byte[] biomeDataBytes = readByteArray(256);
@@ -177,8 +178,7 @@ public class WrapperPlayServerChunkData extends PacketWrapper<WrapperPlayServerC
         if (hasBiomeData) {
             if (hasHeightMaps) {
                 column = new Column(chunkX, chunkZ, fullChunk, chunks, tileEntities, heightMaps, biomeData);
-            }
-            else {
+            } else {
                 column = new Column(chunkX, chunkZ, fullChunk, chunks, tileEntities, biomeData);
             }
         } else {
