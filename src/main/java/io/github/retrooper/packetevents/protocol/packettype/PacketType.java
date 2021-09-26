@@ -418,7 +418,7 @@ public final class PacketType {
             FACE_PLAYER,
             PLAYER_POSITION_AND_LOOK,
             UNLOCK_RECIPES,
-            DESTROY_ENTITY,
+            DESTROY_ENTITIES,
             REMOVE_ENTITY_EFFECT,
             RESOURCE_PACK_SEND,
             RESPAWN,

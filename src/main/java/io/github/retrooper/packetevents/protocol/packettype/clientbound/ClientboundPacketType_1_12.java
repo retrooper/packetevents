@@ -71,7 +71,7 @@ public enum ClientboundPacketType_1_12 {
     //This packet was added
     UNLOCK_RECIPES,
 
-    DESTROY_ENTITY,
+    DESTROY_ENTITIES,
     REMOVE_ENTITY_EFFECT,
     RESOURCE_PACK_SEND,
     RESPAWN,

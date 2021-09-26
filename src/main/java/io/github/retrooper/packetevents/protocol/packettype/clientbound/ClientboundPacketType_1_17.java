@@ -106,7 +106,7 @@ public enum ClientboundPacketType_1_17 {
     UNLOCK_RECIPES,
 
     //In 1.17 you can only destroy ONE ENTITY now
-    DESTROY_ENTITY,
+    DESTROY_ENTITIES,
 
     REMOVE_ENTITY_EFFECT,
     RESOURCE_PACK_SEND,
