@@ -526,7 +526,7 @@ public final class NMSUtils {
         if (networkManager == null) {
             return null;
         }
-        WrappedPacket wrapper = new WrappedPacket(new NMSPacket(networkManager));
+        WrappedPacket wrapper = new WrappedPacket(new NMSPacket(networkManager), networkManagerClass);
         return wrapper.readObject(0, nettyChannelClass);
     }
 

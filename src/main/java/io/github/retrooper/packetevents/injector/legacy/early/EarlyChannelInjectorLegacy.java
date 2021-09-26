@@ -125,7 +125,7 @@ public class EarlyChannelInjectorLegacy implements EarlyInjector {
         List<Object> networkManagers = NMSUtils.getNetworkManagers();
         synchronized (networkManagers) {
             for (Object networkManager : networkManagers) {
-                WrappedPacket networkManagerWrapper = new WrappedPacket(new NMSPacket(networkManager));
+                WrappedPacket networkManagerWrapper = new WrappedPacket(new NMSPacket(networkManager), NMSUtils.networkManagerClass);
                 Channel channel = (Channel) networkManagerWrapper.readObject(0, NMSUtils.nettyChannelClass);
                 if (channel == null) {
                     continue;
