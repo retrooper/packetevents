@@ -16,29 +16,28 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package io.github.retrooper.packetevents.protocol.mappings.packettypes.clientbound;
+package io.github.retrooper.packetevents.protocol.packettype.clientbound;
 
-public enum ClientboundPacketType_1_9 {
+public enum ClientboundPacketType_1_16_2 {
     SPAWN_ENTITY,
     SPAWN_EXPERIENCE_ORB,
-    SPAWN_WEATHER_ENTITY,
     SPAWN_LIVING_ENTITY,
     SPAWN_PAINTING,
     SPAWN_PLAYER,
     ENTITY_ANIMATION,
     STATISTICS,
+    ACKNOWLEDGE_PLAYER_DIGGING,
     BLOCK_BREAK_ANIMATION,
     BLOCK_ENTITY_DATA,
     BLOCK_ACTION,
     BLOCK_CHANGE,
     BOSS_BAR,
     SERVER_DIFFICULTY,
-    TAB_COMPLETE,
     CHAT_MESSAGE,
-    MULTI_BLOCK_CHANGE,
+    TAB_COMPLETE,
+    DECLARE_COMMANDS,
     WINDOW_CONFIRMATION,
     CLOSE_WINDOW,
-    OPEN_WINDOW,
     WINDOW_ITEMS,
     WINDOW_PROPERTY,
     SET_SLOT,
@@ -50,41 +49,42 @@ public enum ClientboundPacketType_1_9 {
     EXPLOSION,
     UNLOAD_CHUNK,
     CHANGE_GAME_STATE,
+    OPEN_HORSE_WINDOW,
     KEEP_ALIVE,
     CHUNK_DATA,
     EFFECT,
     PARTICLE,
+    UPDATE_LIGHT,
     JOIN_GAME,
     MAP_DATA,
+    TRADE_LIST,
     ENTITY_RELATIVE_MOVE,
     ENTITY_LOOK_AND_RELATIVE_MOVE,
     ENTITY_LOOK,
     ENTITY_MOVEMENT,
     VEHICLE_MOVE,
+    OPEN_BOOK,
+    OPEN_WINDOW,
     OPEN_SIGN_EDITOR,
+    CRAFT_RECIPE_RESPONSE,
     PLAYER_ABILITIES,
     COMBAT_EVENT,
     PLAYER_INFO,
+    FACE_PLAYER,
     PLAYER_POSITION_AND_LOOK,
-    USE_BED,
+    UNLOCK_RECIPES,
     DESTROY_ENTITY,
     REMOVE_ENTITY_EFFECT,
     RESOURCE_PACK_SEND,
     RESPAWN,
     ENTITY_HEAD_LOOK,
+    MULTI_BLOCK_CHANGE,
+    SELECT_ADVANCEMENT_TAB,
     WORLD_BORDER,
-
-    //This packet has been removed. Its broken, you should send the packet during the login stage.
-    //SET_COMPRESSION,
-
-    //This packet was removed.
-    //MAP_CHUNK_BULK
-
-    //This packet was removed.
-    //UPDATE_ENTITY_NBT
-
     CAMERA,
     HELD_ITEM_CHANGE,
+    UPDATE_VIEW_POSITION,
+    UPDATE_VIEW_DISTANCE,
     DISPLAY_SCOREBOARD,
     ENTITY_METADATA,
     ATTACH_ENTITY,
@@ -99,11 +99,16 @@ public enum ClientboundPacketType_1_9 {
     SPAWN_POSITION,
     TIME_UPDATE,
     TITLE,
-    UPDATE_SIGN,
+    ENTITY_SOUND_EFFECT,
     SOUND_EFFECT,
+    STOP_SOUND,
     PLAYER_LIST_HEADER_AND_FOOTER,
+    NBT_QUERY_RESPONSE,
     COLLECT_ITEM,
     ENTITY_TELEPORT,
+    ADVANCEMENTS,
     ENTITY_PROPERTIES,
-    ENTITY_EFFECT
+    ENTITY_EFFECT,
+    DECLARE_RECIPES,
+    TAGS
 }

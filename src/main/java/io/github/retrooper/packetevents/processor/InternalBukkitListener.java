@@ -52,7 +52,7 @@ public class InternalBukkitListener implements Listener {
         }
 
         PacketEvents.get().getEventManager().callEvent(new PostPlayerInjectEvent(e.getPlayer()));
-        ServerManager.entityCache.putIfAbsent(e.getPlayer().getEntityId(), e.getPlayer());
+        ServerManager.ENTITY_ID_CACHE.putIfAbsent(e.getPlayer().getEntityId(), e.getPlayer());
     }
 
     @EventHandler(priority = EventPriority.HIGHEST)
@@ -63,18 +63,18 @@ public class InternalBukkitListener implements Listener {
         PacketEvents.get().getPlayerManager().clientVersions.remove(channel);
         PacketEvents.get().getPlayerManager().connectionStates.remove(channel);
         PacketEvents.get().getPlayerManager().channels.remove(player.getName());
-        ServerManager.entityCache.remove(player.getEntityId());
+        ServerManager.ENTITY_ID_CACHE.remove(player.getEntityId());
     }
 
 
     @EventHandler
     public void onEntitySpawn(EntitySpawnEvent event) {
         Entity entity = event.getEntity();
-        ServerManager.entityCache.putIfAbsent(entity.getEntityId(), entity);
+        ServerManager.ENTITY_ID_CACHE.putIfAbsent(entity.getEntityId(), entity);
     }
 
     @EventHandler
     public void onEntityDeath(EntityDeathEvent event) {
-        ServerManager.entityCache.remove(event.getEntity().getEntityId());
+        ServerManager.ENTITY_ID_CACHE.remove(event.getEntity().getEntityId());
     }
 }

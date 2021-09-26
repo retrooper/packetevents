@@ -16,12 +16,18 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package io.github.retrooper.packetevents.protocol.mappings.packettypes.clientbound;
+package io.github.retrooper.packetevents.protocol.packettype.clientbound;
 
-public enum ClientboundPacketType_1_16_2 {
+public enum ClientboundPacketType_1_15_2 {
     SPAWN_ENTITY,
     SPAWN_EXPERIENCE_ORB,
+
+    //This packet was added
+    SPAWN_WEATHER_ENTITY,
+
+    //This packet was added
     SPAWN_LIVING_ENTITY,
+
     SPAWN_PAINTING,
     SPAWN_PLAYER,
     ENTITY_ANIMATION,
@@ -34,6 +40,7 @@ public enum ClientboundPacketType_1_16_2 {
     BOSS_BAR,
     SERVER_DIFFICULTY,
     CHAT_MESSAGE,
+    MULTI_BLOCK_CHANGE,
     TAB_COMPLETE,
     DECLARE_COMMANDS,
     WINDOW_CONFIRMATION,
@@ -78,7 +85,6 @@ public enum ClientboundPacketType_1_16_2 {
     RESOURCE_PACK_SEND,
     RESPAWN,
     ENTITY_HEAD_LOOK,
-    MULTI_BLOCK_CHANGE,
     SELECT_ADVANCEMENT_TAB,
     WORLD_BORDER,
     CAMERA,

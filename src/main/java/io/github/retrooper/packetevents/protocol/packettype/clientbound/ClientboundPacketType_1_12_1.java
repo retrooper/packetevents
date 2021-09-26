@@ -1,6 +1,24 @@
-package io.github.retrooper.packetevents.protocol.mappings.packettypes.clientbound;
+/*
+ * This file is part of packetevents - https://github.com/retrooper/packetevents
+ * Copyright (C) 2021 retrooper and contributors
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
 
-public enum ClientboundPacketType_1_12 {
+package io.github.retrooper.packetevents.protocol.packettype.clientbound;
+
+public enum ClientboundPacketType_1_12_1 {
     SPAWN_ENTITY,
     SPAWN_EXPERIENCE_ORB,
     SPAWN_WEATHER_ENTITY,
@@ -44,24 +62,22 @@ public enum ClientboundPacketType_1_12 {
     ENTITY_LOOK,
     VEHICLE_MOVE,
     OPEN_SIGN_EDITOR,
+
+    //This packet was added
+    CRAFT_RECIPE_RESPONSE,
+
     PLAYER_ABILITIES,
     COMBAT_EVENT,
     PLAYER_INFO,
     PLAYER_POSITION_AND_LOOK,
     USE_BED,
-
-    //This packet was added
     UNLOCK_RECIPES,
-
     DESTROY_ENTITY,
     REMOVE_ENTITY_EFFECT,
     RESOURCE_PACK_SEND,
     RESPAWN,
     ENTITY_HEAD_LOOK,
-
-    //This packet was added
     SELECT_ADVANCEMENT_TAB,
-
     WORLD_BORDER,
     CAMERA,
     HELD_ITEM_CHANGE,
@@ -83,10 +99,7 @@ public enum ClientboundPacketType_1_12 {
     PLAYER_LIST_HEADER_AND_FOOTER,
     COLLECT_ITEM,
     ENTITY_TELEPORT,
-
-    //This packet was added
     ADVANCEMENTS,
-
     ENTITY_PROPERTIES,
     ENTITY_EFFECT
 }

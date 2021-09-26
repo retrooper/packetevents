@@ -29,7 +29,7 @@ import org.bukkit.entity.Player;
 
 public class PacketSendEvent extends ProtocolPacketEvent {
     private Runnable postTask = null;
-    private PacketWrapper currentPacketWrapper;
+    private PacketWrapper<?> lastUsedWrapper;
 
     public PacketSendEvent(ChannelAbstract channel, Player player, ByteBufAbstract byteBuf, Runnable postTask) {
         super(PacketSide.SERVER, channel, player, byteBuf);
@@ -80,13 +80,13 @@ public class PacketSendEvent extends ProtocolPacketEvent {
     }
 
     @Deprecated
-    public PacketWrapper getCurrentPacketWrapper() {
-        return currentPacketWrapper;
+    public PacketWrapper<?> getLastUsedWrapper() {
+        return lastUsedWrapper;
     }
 
     @Deprecated
-    public void setCurrentPacketWrapper(PacketWrapper currentPacketWrapper) {
-        this.currentPacketWrapper = currentPacketWrapper;
+    public void setLastUsedWrapper(PacketWrapper<?> currentPacketWrapper) {
+        this.lastUsedWrapper = currentPacketWrapper;
     }
 
     @Override

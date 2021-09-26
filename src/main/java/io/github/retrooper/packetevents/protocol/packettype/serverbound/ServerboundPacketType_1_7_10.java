@@ -16,9 +16,9 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package io.github.retrooper.packetevents.protocol.mappings.packettypes.serverbound;
+package io.github.retrooper.packetevents.protocol.packettype.serverbound;
 
-public enum ServerboundPacketType_1_8 {
+public enum ServerboundPacketType_1_7_10 {
     KEEP_ALIVE,
     CHAT_MESSAGE,
     INTERACT_ENTITY,
@@ -42,7 +42,5 @@ public enum ServerboundPacketType_1_8 {
     TAB_COMPLETE,
     CLIENT_SETTINGS,
     CLIENT_STATUS,
-    PLUGIN_MESSAGE,
-    SPECTATE,
-    RESOURCE_PACK_STATUS
+    PLUGIN_MESSAGE
 }

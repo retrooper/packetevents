@@ -16,9 +16,9 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package io.github.retrooper.packetevents.protocol.mappings.packettypes.clientbound;
+package io.github.retrooper.packetevents.protocol.packettype.clientbound;
 
-public enum ClientboundPacketType_1_14 {
+public enum ClientboundPacketType_1_13 {
     SPAWN_ENTITY,
     SPAWN_EXPERIENCE_ORB,
     SPAWN_WEATHER_ENTITY,
@@ -36,9 +36,13 @@ public enum ClientboundPacketType_1_14 {
     CHAT_MESSAGE,
     MULTI_BLOCK_CHANGE,
     TAB_COMPLETE,
+
+    //This packet was added
     DECLARE_COMMANDS,
+
     WINDOW_CONFIRMATION,
     CLOSE_WINDOW,
+    OPEN_WINDOW,
     WINDOW_ITEMS,
     WINDOW_PROPERTY,
     SET_SLOT,
@@ -47,42 +51,35 @@ public enum ClientboundPacketType_1_14 {
     NAMED_SOUND_EFFECT,
     DISCONNECT,
     ENTITY_STATUS,
+
+    //This packet was added
+    NBT_QUERY_RESPONSE,
+
     EXPLOSION,
     UNLOAD_CHUNK,
     CHANGE_GAME_STATE,
-
-    //This packet was added
-    OPEN_HORSE_WINDOW,
-
     KEEP_ALIVE,
     CHUNK_DATA,
     EFFECT,
     PARTICLE,
-
-    //This packet was just added
-    UPDATE_LIGHT,
-
     JOIN_GAME,
     MAP_DATA,
-    TRADE_LIST,
+    ENTITY_MOVEMENT,
     ENTITY_RELATIVE_MOVE,
     ENTITY_LOOK_AND_RELATIVE_MOVE,
     ENTITY_LOOK,
-    ENTITY_MOVEMENT,
     VEHICLE_MOVE,
-    OPEN_BOOK,
-    OPEN_WINDOW,
     OPEN_SIGN_EDITOR,
     CRAFT_RECIPE_RESPONSE,
     PLAYER_ABILITIES,
     COMBAT_EVENT,
-
-    //This packet has been removed
-    //USE_BED,
-
     PLAYER_INFO,
+
+    //This packet was added
     FACE_PLAYER,
+
     PLAYER_POSITION_AND_LOOK,
+    USE_BED,
     UNLOCK_RECIPES,
     DESTROY_ENTITY,
     REMOVE_ENTITY_EFFECT,
@@ -93,13 +90,6 @@ public enum ClientboundPacketType_1_14 {
     WORLD_BORDER,
     CAMERA,
     HELD_ITEM_CHANGE,
-
-    //This packet was just added
-    UPDATE_VIEW_POSITION,
-    //This packet was just added
-    UPDATE_VIEW_DISTANCE,
-
-
     DISPLAY_SCOREBOARD,
     ENTITY_METADATA,
     ATTACH_ENTITY,
@@ -115,18 +105,18 @@ public enum ClientboundPacketType_1_14 {
     TIME_UPDATE,
     TITLE,
 
-    //This packet was just added
-    ENTITY_SOUND_EFFECT,
+    //This packet was added
+    STOP_SOUND,
 
     SOUND_EFFECT,
-    STOP_SOUND,
     PLAYER_LIST_HEADER_AND_FOOTER,
-    NBT_QUERY_RESPONSE,
     COLLECT_ITEM,
     ENTITY_TELEPORT,
     ADVANCEMENTS,
     ENTITY_PROPERTIES,
     ENTITY_EFFECT,
+
+    //These two packets were added
     DECLARE_RECIPES,
     TAGS
 }

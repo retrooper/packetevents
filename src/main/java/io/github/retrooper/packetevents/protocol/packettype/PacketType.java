@@ -16,13 +16,15 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package io.github.retrooper.packetevents.protocol;
+package io.github.retrooper.packetevents.protocol.packettype;
 
 import io.github.retrooper.packetevents.manager.server.ServerManager;
 import io.github.retrooper.packetevents.manager.server.ServerVersion;
+import io.github.retrooper.packetevents.protocol.ConnectionState;
+import io.github.retrooper.packetevents.protocol.PacketSide;
 import io.github.retrooper.packetevents.protocol.data.player.ClientVersion;
-import io.github.retrooper.packetevents.protocol.mappings.packettypes.clientbound.*;
-import io.github.retrooper.packetevents.protocol.mappings.packettypes.serverbound.*;
+import io.github.retrooper.packetevents.protocol.packettype.clientbound.*;
+import io.github.retrooper.packetevents.protocol.packettype.serverbound.*;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.HashMap;

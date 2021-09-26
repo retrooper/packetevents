@@ -1,7 +1,7 @@
 package io.github.retrooper.packetevents.wrapper.status.client;
 
 import io.github.retrooper.packetevents.event.impl.PacketReceiveEvent;
-import io.github.retrooper.packetevents.protocol.PacketType;
+import io.github.retrooper.packetevents.protocol.packettype.PacketType;
 import io.github.retrooper.packetevents.protocol.data.player.ClientVersion;
 import io.github.retrooper.packetevents.wrapper.PacketWrapper;
 

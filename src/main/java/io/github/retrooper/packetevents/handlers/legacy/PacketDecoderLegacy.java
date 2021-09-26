@@ -36,10 +36,10 @@ public class PacketDecoderLegacy extends ByteToMessageDecoder {
                 transformedBuf.readerIndex(readerIndex);
             });
             if (!packetReceiveEvent.isCancelled()) {
-                if (packetReceiveEvent.getCurrentPacketWrapper() != null) {
+                if (packetReceiveEvent.getLastUsedWrapper() != null) {
                     packetReceiveEvent.getByteBuf().clear();
-                    packetReceiveEvent.getCurrentPacketWrapper().writeVarInt(packetReceiveEvent.getPacketID());
-                    packetReceiveEvent.getCurrentPacketWrapper().writeData();
+                    packetReceiveEvent.getLastUsedWrapper().writeVarInt(packetReceiveEvent.getPacketID());
+                    packetReceiveEvent.getLastUsedWrapper().writeData();
                 }
                 transformedBuf.readerIndex(firstReaderIndex);
                 if (needsCompress) {

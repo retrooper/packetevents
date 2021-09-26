@@ -10,7 +10,7 @@ import io.github.retrooper.packetevents.wrapper.PacketWrapper;
 import org.bukkit.entity.Player;
 
 public class PacketReceiveEvent extends ProtocolPacketEvent {
-    private PacketWrapper currentPacketWrapper;
+    private PacketWrapper<?> lastUsedWrapper;
 
     public PacketReceiveEvent(ChannelAbstract channel, Player player, ByteBufAbstract byteBuf) {
         super(PacketSide.CLIENT, channel, player, byteBuf);
@@ -34,12 +34,12 @@ public class PacketReceiveEvent extends ProtocolPacketEvent {
     }
 
     @Deprecated
-    public PacketWrapper getCurrentPacketWrapper() {
-        return currentPacketWrapper;
+    public PacketWrapper<?> getLastUsedWrapper() {
+        return lastUsedWrapper;
     }
 
     @Deprecated
-    public void setCurrentPacketWrapper(PacketWrapper currentPacketWrapper) {
-        this.currentPacketWrapper = currentPacketWrapper;
+    public void setLastUsedWrapper(PacketWrapper<?> currentPacketWrapper) {
+        this.lastUsedWrapper = currentPacketWrapper;
     }
 }

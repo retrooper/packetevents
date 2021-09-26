@@ -41,12 +41,12 @@ import java.util.List;
 import java.util.Map;
 
 public final class ServerManager {
-    private static final ServerVersion version;
+    private static final ServerVersion VERSION;
     //Initialized in PacketEvents#load
-    public static Map<Integer, Entity> entityCache;
+    public static Map<Integer, Entity> ENTITY_ID_CACHE;
 
     static {
-        version = ServerVersion.resolve();
+        VERSION = ServerVersion.resolve();
     }
 
     /**
@@ -55,7 +55,7 @@ public final class ServerManager {
      * @return Get Server Version
      */
     public static ServerVersion getVersion() {
-        return version;
+        return VERSION;
     }
 
     /**
@@ -173,7 +173,7 @@ public final class ServerManager {
 
     @Nullable
     public static Entity getEntityByID(@Nullable World world, int entityID) {
-        Entity e = entityCache.get(entityID);
+        Entity e = ENTITY_ID_CACHE.get(entityID);
         if (e != null) {
             return e;
         }
@@ -183,7 +183,7 @@ public final class ServerManager {
                 if (world != null) {
                     for (Entity entity : getEntityList(world)) {
                         if (entity.getEntityId() == entityID) {
-                            entityCache.putIfAbsent(entity.getEntityId(), entity);
+                            ENTITY_ID_CACHE.putIfAbsent(entity.getEntityId(), entity);
                             return entity;
                         }
                     }
@@ -195,7 +195,7 @@ public final class ServerManager {
                 for (World w : Bukkit.getWorlds()) {
                     for (Entity entity : getEntityList(w)) {
                         if (entity.getEntityId() == entityID) {
-                            entityCache.putIfAbsent(entity.getEntityId(), entity);
+                            ENTITY_ID_CACHE.putIfAbsent(entity.getEntityId(), entity);
                             return entity;
                         }
                     }

@@ -19,7 +19,7 @@
 package io.github.retrooper.packetevents.wrapper.play.server;
 
 import io.github.retrooper.packetevents.event.impl.PacketSendEvent;
-import io.github.retrooper.packetevents.protocol.PacketType;
+import io.github.retrooper.packetevents.protocol.packettype.PacketType;
 import io.github.retrooper.packetevents.wrapper.PacketWrapper;
 
 public class WrapperPlayServerHeldItemChange extends PacketWrapper<WrapperPlayServerHeldItemChange> {

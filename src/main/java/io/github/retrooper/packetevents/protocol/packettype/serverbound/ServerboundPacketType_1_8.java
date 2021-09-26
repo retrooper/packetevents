@@ -16,10 +16,33 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package io.github.retrooper.packetevents.protocol;
+package io.github.retrooper.packetevents.protocol.packettype.serverbound;
 
-public interface PacketTypeCommon {
-    default String getName() {
-        return ((Enum<?>) this).name();
-    }
+public enum ServerboundPacketType_1_8 {
+    KEEP_ALIVE,
+    CHAT_MESSAGE,
+    INTERACT_ENTITY,
+    PLAYER_MOVEMENT,
+    PLAYER_POSITION,
+    PLAYER_ROTATION,
+    PLAYER_POSITION_AND_ROTATION,
+    PLAYER_DIGGING,
+    PLAYER_BLOCK_PLACEMENT,
+    HELD_ITEM_CHANGE,
+    ANIMATION,
+    ENTITY_ACTION,
+    STEER_VEHICLE,
+    CLOSE_WINDOW,
+    CLICK_WINDOW,
+    WINDOW_CONFIRMATION,
+    CREATIVE_INVENTORY_ACTION,
+    CLICK_WINDOW_BUTTON,
+    UPDATE_SIGN,
+    PLAYER_ABILITIES,
+    TAB_COMPLETE,
+    CLIENT_SETTINGS,
+    CLIENT_STATUS,
+    PLUGIN_MESSAGE,
+    SPECTATE,
+    RESOURCE_PACK_STATUS
 }

@@ -16,9 +16,9 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package io.github.retrooper.packetevents.protocol.mappings.packettypes.serverbound;
+package io.github.retrooper.packetevents.protocol.packettype.serverbound;
 
-public enum ServerboundPacketType_1_14 {
+public enum ServerboundPacketType_1_15_2 {
     TELEPORT_CONFIRM,
     QUERY_BLOCK_NBT,
     SET_DIFFICULTY,

@@ -62,11 +62,11 @@ public class PacketWrapper<T extends PacketWrapper> {
         this.serverVersion = event.getServerVersion();
         this.byteBuf = event.getByteBuf();
         this.packetID = event.getPacketID();
-        if (event.getCurrentPacketWrapper() == null) {
-            event.setCurrentPacketWrapper(this);
+        if (event.getLastUsedWrapper() == null) {
+            event.setLastUsedWrapper(this);
             readData();
         } else {
-            readData((T) event.getCurrentPacketWrapper());
+            readData((T) event.getLastUsedWrapper());
         }
     }
 
@@ -75,11 +75,11 @@ public class PacketWrapper<T extends PacketWrapper> {
         this.serverVersion = event.getServerVersion();
         this.byteBuf = event.getByteBuf();
         this.packetID = event.getPacketID();
-        if (event.getCurrentPacketWrapper() == null) {
-            event.setCurrentPacketWrapper(this);
+        if (event.getLastUsedWrapper() == null) {
+            event.setLastUsedWrapper(this);
             readData();
         } else {
-            readData((T) event.getCurrentPacketWrapper());
+            readData((T) event.getLastUsedWrapper());
         }
     }
 

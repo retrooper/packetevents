@@ -3,15 +3,6 @@ plugins {
     id 'maven-publish'
 }
 
-//gradle myJavadocs
-task myJavadocs(type: Javadoc) {
-    source = sourceSets.main.allJava
-    File projectDir = getProjectDir()
-    File javadocsDir = new File(projectDir.getParentFile().getAbsolutePath() + "/docs");
-    javadocsDir.mkdirs()
-    setDestinationDir(javadocsDir)
-}
-
 repositories {
     mavenLocal()
 
@@ -56,7 +47,7 @@ repositories {
 dependencies {
     implementation 'org.jetbrains:annotations:22.0.0'
 
-    compileOnly 'org.spigotmc:spigot-api:1.17-R0.1-SNAPSHOT'
+    compileOnly 'org.spigotmc:spigot-api:1.17.1-R0.1-SNAPSHOT'
     compileOnly 'com.destroystokyo.paper:paper-api:1.16.5-R0.1-SNAPSHOT'
     compileOnly 'org.geysermc:connector:1.2.1-SNAPSHOT'
     compileOnly 'com.viaversion:viaversion:4.0.1'

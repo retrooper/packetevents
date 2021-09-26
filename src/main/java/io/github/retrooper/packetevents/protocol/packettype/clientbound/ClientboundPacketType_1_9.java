@@ -16,9 +16,9 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package io.github.retrooper.packetevents.protocol.mappings.packettypes.clientbound;
+package io.github.retrooper.packetevents.protocol.packettype.clientbound;
 
-public enum ClientboundPacketType_1_13 {
+public enum ClientboundPacketType_1_9 {
     SPAWN_ENTITY,
     SPAWN_EXPERIENCE_ORB,
     SPAWN_WEATHER_ENTITY,
@@ -33,13 +33,9 @@ public enum ClientboundPacketType_1_13 {
     BLOCK_CHANGE,
     BOSS_BAR,
     SERVER_DIFFICULTY,
+    TAB_COMPLETE,
     CHAT_MESSAGE,
     MULTI_BLOCK_CHANGE,
-    TAB_COMPLETE,
-
-    //This packet was added
-    DECLARE_COMMANDS,
-
     WINDOW_CONFIRMATION,
     CLOSE_WINDOW,
     OPEN_WINDOW,
@@ -51,10 +47,6 @@ public enum ClientboundPacketType_1_13 {
     NAMED_SOUND_EFFECT,
     DISCONNECT,
     ENTITY_STATUS,
-
-    //This packet was added
-    NBT_QUERY_RESPONSE,
-
     EXPLOSION,
     UNLOAD_CHUNK,
     CHANGE_GAME_STATE,
@@ -64,30 +56,33 @@ public enum ClientboundPacketType_1_13 {
     PARTICLE,
     JOIN_GAME,
     MAP_DATA,
-    ENTITY_MOVEMENT,
     ENTITY_RELATIVE_MOVE,
     ENTITY_LOOK_AND_RELATIVE_MOVE,
     ENTITY_LOOK,
+    ENTITY_MOVEMENT,
     VEHICLE_MOVE,
     OPEN_SIGN_EDITOR,
-    CRAFT_RECIPE_RESPONSE,
     PLAYER_ABILITIES,
     COMBAT_EVENT,
     PLAYER_INFO,
-
-    //This packet was added
-    FACE_PLAYER,
-
     PLAYER_POSITION_AND_LOOK,
     USE_BED,
-    UNLOCK_RECIPES,
     DESTROY_ENTITY,
     REMOVE_ENTITY_EFFECT,
     RESOURCE_PACK_SEND,
     RESPAWN,
     ENTITY_HEAD_LOOK,
-    SELECT_ADVANCEMENT_TAB,
     WORLD_BORDER,
+
+    //This packet has been removed. Its broken, you should send the packet during the login stage.
+    //SET_COMPRESSION,
+
+    //This packet was removed.
+    //MAP_CHUNK_BULK
+
+    //This packet was removed.
+    //UPDATE_ENTITY_NBT
+
     CAMERA,
     HELD_ITEM_CHANGE,
     DISPLAY_SCOREBOARD,
@@ -104,19 +99,11 @@ public enum ClientboundPacketType_1_13 {
     SPAWN_POSITION,
     TIME_UPDATE,
     TITLE,
-
-    //This packet was added
-    STOP_SOUND,
-
+    UPDATE_SIGN,
     SOUND_EFFECT,
     PLAYER_LIST_HEADER_AND_FOOTER,
     COLLECT_ITEM,
     ENTITY_TELEPORT,
-    ADVANCEMENTS,
     ENTITY_PROPERTIES,
-    ENTITY_EFFECT,
-
-    //These two packets were added
-    DECLARE_RECIPES,
-    TAGS
+    ENTITY_EFFECT
 }

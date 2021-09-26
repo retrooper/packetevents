@@ -16,9 +16,9 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package io.github.retrooper.packetevents.protocol.mappings.packettypes.serverbound;
+package io.github.retrooper.packetevents.protocol.packettype.serverbound;
 
-public enum ServerboundPacketType_1_15_2 {
+public enum ServerboundPacketType_1_17 {
     TELEPORT_CONFIRM,
     QUERY_BLOCK_NBT,
     SET_DIFFICULTY,
@@ -26,7 +26,6 @@ public enum ServerboundPacketType_1_15_2 {
     CLIENT_STATUS,
     CLIENT_SETTINGS,
     TAB_COMPLETE,
-    WINDOW_CONFIRMATION,
     CLICK_WINDOW_BUTTON,
     CLICK_WINDOW,
     CLOSE_WINDOW,
@@ -34,6 +33,7 @@ public enum ServerboundPacketType_1_15_2 {
     EDIT_BOOK,
     QUERY_ENTITY_NBT,
     INTERACT_ENTITY,
+    GENERATE_STRUCTURE,
     KEEP_ALIVE,
     LOCK_DIFFICULTY,
     PLAYER_POSITION,
@@ -48,7 +48,10 @@ public enum ServerboundPacketType_1_15_2 {
     PLAYER_DIGGING,
     ENTITY_ACTION,
     STEER_VEHICLE,
-    RECIPE_BOOK_DATA,
+    PONG,
+    //RECIPE_BOOK_DATA,
+    SET_RECIPE_BOOK_STATE,
+    SET_DISPLAYED_RECIPE,
     NAME_ITEM,
     RESOURCE_PACK_STATUS,
     ADVANCEMENT_TAB,

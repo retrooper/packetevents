@@ -28,7 +28,7 @@ import io.github.retrooper.packetevents.manager.player.PlayerManager;
 import io.github.retrooper.packetevents.manager.server.ServerManager;
 import io.github.retrooper.packetevents.processor.InternalBukkitListener;
 import io.github.retrooper.packetevents.processor.InternalPacketListener;
-import io.github.retrooper.packetevents.protocol.PacketType;
+import io.github.retrooper.packetevents.protocol.packettype.PacketType;
 import io.github.retrooper.packetevents.settings.PacketEventsSettings;
 import io.github.retrooper.packetevents.updatechecker.UpdateChecker;
 import io.github.retrooper.packetevents.utils.MinecraftReflectionUtil;
@@ -73,7 +73,7 @@ public final class PacketEvents implements Listener {
             try {
                 MinecraftReflectionUtil.init();
 
-                ServerManager.entityCache = DependencyUtil.makeMap();
+                ServerManager.ENTITY_ID_CACHE = DependencyUtil.makeMap();
             } catch (Exception ex) {
                 throw new PacketEventsLoadFailureException(ex);
             }
@@ -89,7 +89,7 @@ public final class PacketEvents implements Listener {
 
             loaded = true;
 
-            //Register internal packet listener
+            //Register internal packet listener (should be the first listener)
             getEventManager().registerListener(new InternalPacketListener(), PacketListenerPriority.LOWEST);
         }
     }

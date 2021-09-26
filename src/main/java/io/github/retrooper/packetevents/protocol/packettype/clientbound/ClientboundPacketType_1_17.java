@@ -16,29 +16,40 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package io.github.retrooper.packetevents.protocol.mappings.packettypes.clientbound;
+package io.github.retrooper.packetevents.protocol.packettype.clientbound;
 
-public enum ClientboundPacketType_1_12_1 {
+public enum ClientboundPacketType_1_17 {
     SPAWN_ENTITY,
     SPAWN_EXPERIENCE_ORB,
-    SPAWN_WEATHER_ENTITY,
     SPAWN_LIVING_ENTITY,
     SPAWN_PAINTING,
     SPAWN_PLAYER,
+
+    //This packet was added
+    SCULK_VIBRATION_SIGNAL,
+
     ENTITY_ANIMATION,
     STATISTICS,
+    ACKNOWLEDGE_PLAYER_DIGGING,
     BLOCK_BREAK_ANIMATION,
     BLOCK_ENTITY_DATA,
     BLOCK_ACTION,
     BLOCK_CHANGE,
     BOSS_BAR,
     SERVER_DIFFICULTY,
-    TAB_COMPLETE,
     CHAT_MESSAGE,
-    MULTI_BLOCK_CHANGE,
-    WINDOW_CONFIRMATION,
+
+    //This packet was added
+    CLEAR_TITLES,
+
+    TAB_COMPLETE,
+
+    DECLARE_COMMANDS,
+
+    //This packet was removed and replaced with the PING packet
+    //WINDOW_CONFIRMATION,
+
     CLOSE_WINDOW,
-    OPEN_WINDOW,
     WINDOW_ITEMS,
     WINDOW_PROPERTY,
     SET_SLOT,
@@ -50,37 +61,76 @@ public enum ClientboundPacketType_1_12_1 {
     EXPLOSION,
     UNLOAD_CHUNK,
     CHANGE_GAME_STATE,
+    OPEN_HORSE_WINDOW,
+
+    //This packet was added
+    INITIALIZE_WORLD_BORDER,
+
     KEEP_ALIVE,
     CHUNK_DATA,
     EFFECT,
     PARTICLE,
+    UPDATE_LIGHT,
     JOIN_GAME,
     MAP_DATA,
-    ENTITY_MOVEMENT,
+    TRADE_LIST,
     ENTITY_RELATIVE_MOVE,
     ENTITY_LOOK_AND_RELATIVE_MOVE,
     ENTITY_LOOK,
+
+    //This packet was removed
+    //ENTITY_MOVEMENT,
+
     VEHICLE_MOVE,
+    OPEN_BOOK,
+    OPEN_WINDOW,
     OPEN_SIGN_EDITOR,
 
     //This packet was added
-    CRAFT_RECIPE_RESPONSE,
+    PING,
 
+    CRAFT_RECIPE_RESPONSE,
     PLAYER_ABILITIES,
-    COMBAT_EVENT,
+
+    //This packet was removed and split up into 3 new packets
+    //COMBAT_EVENT,
+
+    //These 3 new packets were added
+    END_COMBAT_EVENT,
+    ENTER_COMBAT_EVENT,
+    DEATH_COMBAT_EVENT,
+
     PLAYER_INFO,
+    FACE_PLAYER,
     PLAYER_POSITION_AND_LOOK,
-    USE_BED,
     UNLOCK_RECIPES,
+
+    //In 1.17 you can only destroy ONE ENTITY now
     DESTROY_ENTITY,
+
     REMOVE_ENTITY_EFFECT,
     RESOURCE_PACK_SEND,
     RESPAWN,
     ENTITY_HEAD_LOOK,
+    MULTI_BLOCK_CHANGE,
     SELECT_ADVANCEMENT_TAB,
-    WORLD_BORDER,
+
+    //These 5 new packets were added
+    ACTION_BAR,
+    WORLD_BORDER_CENTER,
+    WORLD_BORDER_LERP_SIZE,
+    WORLD_BORDER_SIZE,
+    WORLD_BORDER_WARNING_DELAY,
+    WORLD_BORDER_WARNING_REACH,
+
+    //This packet was removed
+    //WORLD_BORDER,
+
     CAMERA,
     HELD_ITEM_CHANGE,
+    UPDATE_VIEW_POSITION,
+    UPDATE_VIEW_DISTANCE,
+    SPAWN_POSITION,
     DISPLAY_SCOREBOARD,
     ENTITY_METADATA,
     ATTACH_ENTITY,
@@ -92,14 +142,30 @@ public enum ClientboundPacketType_1_12_1 {
     SET_PASSENGERS,
     TEAMS,
     UPDATE_SCORE,
-    SPAWN_POSITION,
+
+    //This new packet was added
+    SET_TITLE_SUBTITLE,
+
     TIME_UPDATE,
-    TITLE,
+
+    //These 2 new packets were added
+    SET_TITLE_TEXT,
+    SET_TITLE_TIME,
+
+
+    //This packet was removed and split up into 3 new packets
+    //TITLE,
+
+    ENTITY_SOUND_EFFECT,
     SOUND_EFFECT,
+    STOP_SOUND,
     PLAYER_LIST_HEADER_AND_FOOTER,
+    NBT_QUERY_RESPONSE,
     COLLECT_ITEM,
     ENTITY_TELEPORT,
     ADVANCEMENTS,
     ENTITY_PROPERTIES,
-    ENTITY_EFFECT
+    ENTITY_EFFECT,
+    DECLARE_RECIPES,
+    TAGS
 }
