@@ -37,6 +37,8 @@ public class Chunk {
         this(0, new ListPalette(MIN_PALETTE_BITS_PER_ENTRY), new BitStorage(MIN_PALETTE_BITS_PER_ENTRY, CHUNK_SIZE));
     }
 
+
+    //TODO Fix on older versions
     public static Chunk read(NetStreamInput in) {
         int blockCount = in.readShort();
         int bitsPerEntry = in.readUnsignedByte();
@@ -60,7 +62,6 @@ public class Chunk {
             int paletteLength = chunk.palette.size();
             out.writeVarInt(paletteLength);
             for (int i = 0; i < paletteLength; i++) {
-                //TODO Figure out why its not working for protocolsupport
                 out.writeVarInt(chunk.palette.idToState(i));
             }
         }

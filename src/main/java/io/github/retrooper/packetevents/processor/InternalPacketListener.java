@@ -31,6 +31,8 @@ import io.github.retrooper.packetevents.wrapper.handshaking.client.WrapperHandsh
 import io.github.retrooper.packetevents.wrapper.login.client.WrapperLoginClientLoginStart;
 import io.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerChunkData;
 
+import java.util.Arrays;
+
 public class InternalPacketListener implements PacketListener {
     //Make this specific event be at MONITOR priority
     @Override
@@ -44,7 +46,8 @@ public class InternalPacketListener implements PacketListener {
             int x = column.getX();
             int z = column.getZ();
             NBTCompound heightMaps = column.getHeightMaps();
-            event.getPlayer().sendMessage("X: " + x + ", Z: " + z + ", HEIGHT MAPS: " + heightMaps.getTagNames());
+            event.getPlayer().sendMessage("X: " + x + ", Z: " + z + ", BIOME DATA: " + Arrays.toString(column.getBiomeData()));
+            event.getPlayer().sendMessage("HEIGHT MAPS: " + heightMaps.getTagNames());
         }
     }
 

@@ -13,6 +13,7 @@ import java.util.Arrays;
 public class Column {
     private final int x;
     private final int z;
+    private final boolean fullChunk;
     private final Chunk[] chunks;
     private final NBTCompound[] tileEntities;
     private final boolean hasHeightMaps;
@@ -20,10 +21,22 @@ public class Column {
     private final boolean hasBiomeData;
     private final int[] biomeData;
 
-
-    public Column(int x, int z, Chunk[] chunks, NBTCompound[] tileEntities) {
+    public Column(int x, int z, boolean fullChunk, Chunk[] chunks, NBTCompound[] tileEntities, int[] biomeData) {
         this.x = x;
         this.z = z;
+        this.fullChunk = fullChunk;
+        this.chunks = Arrays.copyOf(chunks, chunks.length);
+        this.tileEntities = tileEntities != null ? tileEntities : new NBTCompound[0];
+        this.hasHeightMaps = false;
+        this.heightMaps = new NBTCompound();
+        this.hasBiomeData = true;
+        this.biomeData = biomeData != null ? Arrays.copyOf(biomeData, biomeData.length) : null;
+    }
+
+    public Column(int x, int z, boolean fullChunk, Chunk[] chunks, NBTCompound[] tileEntities) {
+        this.x = x;
+        this.z = z;
+        this.fullChunk = fullChunk;
         this.chunks = Arrays.copyOf(chunks, chunks.length);
         this.tileEntities = tileEntities != null ? tileEntities : new NBTCompound[0];
         this.hasHeightMaps = false;
@@ -32,9 +45,10 @@ public class Column {
         this.biomeData = new int[1024];
     }
 
-    public Column(int x, int z, Chunk[] chunks, NBTCompound[] tileEntities, NBTCompound heightMaps) {
+    public Column(int x, int z, boolean fullChunk, Chunk[] chunks, NBTCompound[] tileEntities, NBTCompound heightMaps) {
         this.x = x;
         this.z = z;
+        this.fullChunk = fullChunk;
         this.chunks = Arrays.copyOf(chunks, chunks.length);
         this.tileEntities = tileEntities != null ? tileEntities : new NBTCompound[0];
         this.hasHeightMaps = true;
@@ -43,9 +57,10 @@ public class Column {
         this.biomeData = new int[1024];
     }
 
-    public Column(int x, int z, Chunk[] chunks, NBTCompound[] tileEntities, NBTCompound heightMaps, int[] biomeData) {
+    public Column(int x, int z, boolean fullChunk, Chunk[] chunks, NBTCompound[] tileEntities, NBTCompound heightMaps, int[] biomeData) {
         this.x = x;
         this.z = z;
+        this.fullChunk = fullChunk;
         this.chunks = Arrays.copyOf(chunks, chunks.length);
         this.tileEntities = tileEntities != null ? tileEntities : new NBTCompound[0];
         this.hasHeightMaps = true;
@@ -60,6 +75,10 @@ public class Column {
 
     public int getZ() {
         return z;
+    }
+
+    public boolean isFullChunk() {
+        return fullChunk;
     }
 
     public Chunk[] getChunks() {

@@ -90,24 +90,36 @@ public class WrapperPlayServerChunkData extends PacketWrapper<WrapperPlayServerC
 
     @Override
     public void readData() {
-        //Currently, only 1.14 -> 1.17.1 support (only tested 1.16.5 -> 1.17.1)
-        //Chunk X and Z
+        //TODO Add 1.7.10 support by decompressing and compressing data
         int chunkX = readInt();
         int chunkZ = readInt();
 
-        boolean hasBiomeData = true;
-        if (serverVersion.isNewerThanOrEquals(ServerVersion.v_1_13_2) && serverVersion.isOlderThan(ServerVersion.v_1_17)) {
-            hasBiomeData = readBoolean();
+        boolean v1_17 = serverVersion.isNewerThanOrEquals(ServerVersion.v_1_17);
+        boolean v1_13_2 = serverVersion.isNewerThanOrEquals(ServerVersion.v_1_13_2);
+
+        boolean fullChunk = readBoolean();
+        boolean hasBiomeData;
+        boolean hasReadBiomeData = false;
+        if (v1_17) {
+            hasBiomeData = true;
         }
+        else if (v1_13_2) {
+            hasBiomeData = fullChunk;
+        }
+        else if (serverVersion.isOlderThanOrEquals(ServerVersion.v_1_11_2) && serverVersion.isNewerThanOrEquals(ServerVersion.v_1_9)) {
+            hasBiomeData = fullChunk;
+        }
+        else {
+            //Full chunk boolean exists, but the biome data is not present in the packet
+            hasBiomeData = false;
+        }
+
 
         boolean ignoreOldData = false;
         if (serverVersion == ServerVersion.v_1_16 ||
                 serverVersion == ServerVersion.v_1_16_1) {
             ignoreOldData = readBoolean();
         }
-        //Older than 1.13.2 has ground up continuous
-
-        //1.16.0 and 1.16.1 has "ignore old data"
 
         BitSet chunkMask = readChunkMask();
         boolean hasHeightMaps = serverVersion.isNewerThanOrEquals(ServerVersion.v_1_14);
@@ -117,8 +129,7 @@ public class WrapperPlayServerChunkData extends PacketWrapper<WrapperPlayServerC
         }
 
         int[] biomeData = new int[0];
-        if (hasBiomeData) {
-            boolean v1_17 = serverVersion.isNewerThanOrEquals(ServerVersion.v_1_17);
+        if (hasBiomeData && v1_13_2 && serverVersion.isNewerThanOrEquals(ServerVersion.v_1_15)) {
             int biomesLength;
             if (serverVersion.isNewerThanOrEquals(ServerVersion.v_1_16_2)) {
                 biomesLength = readVarInt();
@@ -133,10 +144,13 @@ public class WrapperPlayServerChunkData extends PacketWrapper<WrapperPlayServerC
                     biomeData[index] = readInt();
                 }
             }
+            hasReadBiomeData = true;
         }
+
         //TODO Decompress on 1.7.10
         //https://github.com/retrooper/packetevents/blob/794ad6b042c1c89a931d322f4f83317b573e891a/src/main/java/io/github/retrooper/packetevents/wrapper/play/server/WrapperPlayServerChunkData.java
-        byte[] data = readByteArray(readVarInt());
+        int dataLength = readVarInt();
+        byte[] data = readByteArray(dataLength);
         NetStreamInput dataIn = new NetStreamInput(new ByteArrayInputStream(data));
         Chunk[] chunks = new Chunk[chunkMask.size()];
         for (int index = 0; index < chunks.length; index++) {
@@ -145,20 +159,33 @@ public class WrapperPlayServerChunkData extends PacketWrapper<WrapperPlayServerC
             }
         }
 
-        NBTCompound[] tileEntities = new NBTCompound[readVarInt()];
+        if (hasBiomeData && !hasReadBiomeData) {
+            byte[] biomeDataBytes = readByteArray(256);
+            biomeData = new int[256];
+            for (int i = 0; i < biomeDataBytes.length; i++) {
+                biomeData[i] = biomeDataBytes[i];
+            }
+        }
+
+        int tileEntityCount = serverVersion.isOlderThan(ServerVersion.v_1_9) ? 0 : readVarInt();
+        NBTCompound[] tileEntities = new NBTCompound[tileEntityCount];
         for (int i = 0; i < tileEntities.length; i++) {
             tileEntities[i] = readTag();
         }
 
-        //TODO Support 1.9 - 1.11 with cursed biomes order
 
         if (hasBiomeData) {
-            column = new Column(chunkX, chunkZ, chunks, tileEntities, heightMaps, biomeData);
+            if (hasHeightMaps) {
+                column = new Column(chunkX, chunkZ, fullChunk, chunks, tileEntities, heightMaps, biomeData);
+            }
+            else {
+                column = new Column(chunkX, chunkZ, fullChunk, chunks, tileEntities, biomeData);
+            }
         } else {
             if (hasHeightMaps) {
-                column = new Column(chunkX, chunkZ, chunks, tileEntities, heightMaps);
+                column = new Column(chunkX, chunkZ, fullChunk, chunks, tileEntities, heightMaps);
             } else {
-                column = new Column(chunkX, chunkZ, chunks, tileEntities);
+                column = new Column(chunkX, chunkZ, fullChunk, chunks, tileEntities);
             }
         }
     }
@@ -170,7 +197,50 @@ public class WrapperPlayServerChunkData extends PacketWrapper<WrapperPlayServerC
 
     @Override
     public void writeData() {
-        //TODO Update
+        writeInt(column.getX());
+        writeInt(column.getZ());
+
+        boolean v1_17 = serverVersion.isNewerThanOrEquals(ServerVersion.v_1_17);
+        boolean v1_13_2 = serverVersion.isNewerThanOrEquals(ServerVersion.v_1_13_2);
+
+        writeBoolean(column.isFullChunk());
+        boolean hasWrittenBiomeData = false;
+
+
+        if (serverVersion == ServerVersion.v_1_16 ||
+                serverVersion == ServerVersion.v_1_16_1) {
+            //Ignore old data = true, use existing lighting
+            //TODO See what we can do with this field
+            writeBoolean(true);
+        }
+
+        boolean hasHeightMaps = serverVersion.isNewerThanOrEquals(ServerVersion.v_1_14);
+        NBTCompound heightMaps = null;
+        if (hasHeightMaps) {
+            writeTag(column.getHeightMaps());
+        }
+
+        if (column.hasBiomeData() && v1_13_2 && serverVersion.isNewerThanOrEquals(ServerVersion.v_1_15)) {
+
+            int[] biomeData = column.getBiomeData();
+            int biomesLength = biomeData.length;
+            if (serverVersion.isNewerThanOrEquals(ServerVersion.v_1_16_2)) {
+                writeVarInt(biomesLength);
+                biomesLength = readVarInt();
+            }
+            for (int index = 0; index < column.getBiomeData().length; index++) {
+                if (v1_17) {
+                    writeVarInt(biomeData[index]);
+                } else {
+                    writeInt(biomeData[index]);
+                }
+            }
+            hasWrittenBiomeData = true;
+        }
+
+        //TODO Decompress data on 1.7.10
+        //https://github.com/retrooper/packetevents/blob/794ad6b042c1c89a931d322f4f83317b573e891a/src/main/java/io/github/retrooper/packetevents/wrapper/play/server/WrapperPlayServerChunkData.java
+
         ByteArrayOutputStream dataBytes = new ByteArrayOutputStream();
         NetStreamOutput dataOut = new NetStreamOutput(dataBytes);
 
@@ -184,28 +254,25 @@ public class WrapperPlayServerChunkData extends PacketWrapper<WrapperPlayServerC
             }
         }
 
-        writeInt(column.getX());
-        writeInt(column.getZ());
+        byte[] data = dataBytes.toByteArray();
+        writeVarInt(data.length);
+        writeByteArray(data);
 
-        boolean fullChunk = column.hasBiomeData();
-        if (serverVersion.isNewerThanOrEquals(ServerVersion.v_1_13_2) && serverVersion.isOlderThan(ServerVersion.v_1_17)) {
-            writeBoolean(fullChunk);
-        }
-
-        writeChunkMask(chunkMask);
-
-        writeTag(column.getHeightMaps());
-        if (fullChunk) {
-            writeVarInt(column.getBiomeData().length);
-            for (int biomeData : column.getBiomeData()) {
-                writeVarInt(biomeData);
+        if (column.hasBiomeData() && !hasWrittenBiomeData) {
+            byte[] biomeDataBytes = new byte[256];
+            int[] biomeData = column.getBiomeData();
+            for (int i = 0; i < biomeDataBytes.length; i++) {
+                biomeDataBytes[i] = (byte) biomeData[i];
             }
+            writeByteArray(biomeDataBytes);
         }
-        writeVarInt(dataBytes.size());
-        writeByteArray(dataBytes.toByteArray());
-        writeVarInt(column.getTileEntities().length);
-        for (NBTCompound tag : column.getTileEntities()) {
-            writeTag(tag);
+
+        if (serverVersion.isNewerThanOrEquals(ServerVersion.v_1_9)) {
+            NBTCompound[] tileEntities = column.getTileEntities();
+            writeVarInt(tileEntities.length);
+            for (int i = 0; i < tileEntities.length; i++) {
+                writeTag(tileEntities[i]);
+            }
         }
     }
 
