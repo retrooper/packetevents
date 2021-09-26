@@ -51,12 +51,12 @@ public final class NMSUtils {
     private static final ThreadLocal<Random> randomThreadLocal = ThreadLocal.withInitial(Random::new);
     public static boolean legacyNettyImportMode;
     public static ServerVersion version;
-    public static Constructor<?> blockPosConstructor, minecraftKeyConstructor, vec3DConstructor, dataWatcherConstructor, packetDataSerializerConstructor;
+    public static Constructor<?> blockPosConstructor, minecraftKeyConstructor, vec3DConstructor, dataWatcherConstructor, packetDataSerializerConstructor, itemStackConstructor;
     public static Class<?> mobEffectListClass, nmsEntityClass, minecraftServerClass, craftWorldClass, playerInteractManagerClass, entityPlayerClass, playerConnectionClass, craftServerClass,
             craftPlayerClass, serverConnectionClass, craftEntityClass, nmsItemStackClass, networkManagerClass, nettyChannelClass, gameProfileClass, iChatBaseComponentClass,
             blockPosClass, vec3DClass, channelFutureClass, blockClass, iBlockDataClass, nmsWorldClass, craftItemStackClass,
             soundEffectClass, minecraftKeyClass, chatSerializerClass, craftMagicNumbersClass, worldSettingsClass, worldServerClass, dataWatcherClass,
-            dedicatedServerClass, entityHumanClass, packetDataSerializerClass, byteBufClass, dimensionManagerClass, nmsItemClass, movingObjectPositionBlockClass, boundingBoxClass,
+            dedicatedServerClass, entityHumanClass, packetDataSerializerClass, byteBufClass, dimensionManagerClass, nmsItemClass, iMaterialClass, movingObjectPositionBlockClass, boundingBoxClass,
     tileEntityCommandClass;
     public static Class<? extends Enum<?>> enumDirectionClass, enumHandClass, enumGameModeClass, enumDifficultyClass, tileEntityCommandTypeClass;
     public static Method getBlockPosX, getBlockPosY, getBlockPosZ;
@@ -190,6 +190,10 @@ public final class NMSUtils {
         if (nmsItemClass == null) {
             nmsItemClass = getNMClassWithoutException("world.item.Item");
         }
+        iMaterialClass = getNMSClassWithoutException("IMaterial");
+        if (iMaterialClass == null) {
+            iMaterialClass = getNMClassWithoutException("world.level.IMaterial");
+        }
         dedicatedServerClass = getNMSClassWithoutException("DedicatedServer");
         if (dedicatedServerClass == null) {
             dedicatedServerClass = getNMClassWithoutException("server.dedicated.DedicatedServer");
@@ -261,6 +265,10 @@ public final class NMSUtils {
 
             if (dataWatcherClass != null) {
                 dataWatcherConstructor = dataWatcherClass.getConstructor(nmsEntityClass);
+            }
+
+            if (nmsItemStackClass != null && iMaterialClass != null) {
+                itemStackConstructor = nmsItemStackClass.getDeclaredConstructor(iMaterialClass);
             }
         } catch (NoSuchMethodException e) {
             e.printStackTrace();

@@ -54,7 +54,6 @@ public class WrappedPacketOutMapChunk extends WrappedPacket {
         }
     }
 
-
     public int getChunkX() {
         return readInt(v_1_17 ? 1 : 0);
     }
@@ -71,24 +70,11 @@ public class WrappedPacketOutMapChunk extends WrappedPacket {
         writeInt(v_1_17 ? 2: 1, chunkZ);
     }
 
-    public Optional<BitSet> getPrimaryBitMaskBitSet() {
+    public BitSet getBitSet() {
         if (v_1_17) {
-            return Optional.of(readObject(0, BitSet.class));
+            return readObject(0, BitSet.class);
         }
-        else {
-            return Optional.empty();
-        }
-    }
-
-    public void setPrimaryBitMaskBitSet(BitSet bitMaskBitSet) {
-        if (v_1_17) {
-            writeObject(0, bitMaskBitSet);
-        }
-    }
-
-    @Deprecated
-    public Optional<Integer> getPrimaryBitMap() {
-        return getPrimaryBitMask();
+        return BitSet.valueOf(new long[]{getPrimaryBitMask()});
     }
 
     @Deprecated
@@ -96,22 +82,44 @@ public class WrappedPacketOutMapChunk extends WrappedPacket {
         setPrimaryBitMask(primaryBitMask);
     }
 
-    public Optional<Integer> getPrimaryBitMask() {
-        if (v_1_17) {
+    @Deprecated
+    public Integer getPrimaryBitMask() {
+        if (v_1_17) { // Possible lossy conversion
             long[] bitset = readObject(0, BitSet.class).toLongArray();
-            return Optional.of(bitset.length == 0 ? 0 : (int) bitset[0]);
+            return bitset.length == 0 ? 0 : (int) bitset[0];
         }
         if (v_1_8_x) {
             if (nmsChunkMap == null) {
                 nmsChunkMap = readObject(0, chunkMapClass);
             }
             WrappedPacket nmsChunkMapWrapper = new WrappedPacket(new NMSPacket(nmsChunkMap));
-            return Optional.of(nmsChunkMapWrapper.readInt(0));
+            return nmsChunkMapWrapper.readInt(0);
         } else {
-            return Optional.of(readInt(2));
+            return readInt(2);
         }
     }
 
+    /**
+     *
+     * @param bitSet Bitset that can hold multiple integer values to support the expanded world height on
+     *               1.17 and newer servers. This is due to 1.17 needing to support up to 127 chunk sections
+     *               (2032 blocks) and an integer only being able to hold 32 bits to represent 32 chunk sections
+     */
+    public void setPrimaryBitMask(BitSet bitSet) {
+        if (v_1_17) {
+            writeObject(0, bitSet);
+        }
+        setPrimaryBitMask((int) bitSet.toLongArray()[0]);
+    }
+
+    /**
+     *
+     * @param primaryBitMask Integer that determines which chunk sections the server is sending
+     *
+     * @deprecated Possible lossy conversion on 1.17 servers that could result in the client only reading 32
+     * out of the total possible 127 chunk sections. Safe to use on 1.16 and below servers
+     */
+    @Deprecated
     public void setPrimaryBitMask(int primaryBitMask) {
         if (v_1_17) {
             writeObject(0, BitSet.valueOf(new long[] {primaryBitMask}));
@@ -134,7 +142,10 @@ public class WrappedPacketOutMapChunk extends WrappedPacket {
         }
     }
 
-    //TODO Confirm if 1.17 support is possible
+    /**
+     *
+     * @return Whether the packet overwrites the entire chunk column or just the sections being sent
+     */
     public Optional<Boolean> isGroundUpContinuous() {
         if (v_1_17) {
             return Optional.empty();
@@ -142,7 +153,10 @@ public class WrappedPacketOutMapChunk extends WrappedPacket {
         return Optional.of(readBoolean(0));
     }
 
-    //TODO Confirm if 1.17 support is possible
+    /**
+     *
+     * @param groundUpContinuous Whether the packet overwrites the entire chunk column or just the sections being sent
+     */
     public void setGroundUpContinuous(boolean groundUpContinuous) {
         if (v_1_17) {
             return;
