@@ -40,11 +40,8 @@ public class Chunk {
 
     //TODO Fix on older versions
     public static Chunk read(NetStreamInput in) {
-        System.out.println("GOAL 0");
         int blockCount = in.readShort();
-        System.out.println("GOAL 1");
         int bitsPerEntry = in.readUnsignedByte();
-        System.out.println("GOAL 2");
         Palette palette = null;
         try {
             palette = readPalette(bitsPerEntry, in);
@@ -52,9 +49,7 @@ public class Chunk {
             e.printStackTrace();
         }
 
-        System.out.println("GOAL 3");
         BitStorage storage = new BitStorage(bitsPerEntry, CHUNK_SIZE, in.readLongs(in.readVarInt()));
-        System.out.println("GOAL LASTTT");
         return new Chunk(blockCount, palette, storage);
     }
 

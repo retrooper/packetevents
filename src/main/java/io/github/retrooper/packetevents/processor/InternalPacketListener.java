@@ -23,12 +23,14 @@ import io.github.retrooper.packetevents.event.PacketListener;
 import io.github.retrooper.packetevents.event.impl.PacketReceiveEvent;
 import io.github.retrooper.packetevents.event.impl.PacketSendEvent;
 import io.github.retrooper.packetevents.protocol.ConnectionState;
+import io.github.retrooper.packetevents.protocol.data.player.Hand;
 import io.github.retrooper.packetevents.protocol.packettype.PacketType;
 import io.github.retrooper.packetevents.protocol.data.nbt.NBTCompound;
 import io.github.retrooper.packetevents.protocol.data.player.ClientVersion;
 import io.github.retrooper.packetevents.protocol.data.world.chunk.Column;
 import io.github.retrooper.packetevents.wrapper.handshaking.client.WrapperHandshakingClientHandshake;
 import io.github.retrooper.packetevents.wrapper.login.client.WrapperLoginClientLoginStart;
+import io.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientSettings;
 import io.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerChunkData;
 
 import java.util.Arrays;
@@ -40,7 +42,7 @@ public class InternalPacketListener implements PacketListener {
         if (event.getPacketType() == PacketType.Login.Server.LOGIN_SUCCESS) {
             //Transition into the GAME connection state
             PacketEvents.get().getInjector().changeConnectionState(event.getChannel().rawChannel(), ConnectionState.PLAY);
-        } else if (event.getPacketType() == PacketType.Play.Server.CHUNK_DATA) {
+        } /*else if (event.getPacketType() == PacketType.Play.Server.CHUNK_DATA) {
             WrapperPlayServerChunkData chunkData = new WrapperPlayServerChunkData(event);
             Column column = chunkData.getColumn();
             int x = column.getX();
@@ -48,7 +50,7 @@ public class InternalPacketListener implements PacketListener {
             NBTCompound heightMaps = column.getHeightMaps();
             event.getPlayer().sendMessage("X: " + x + ", Z: " + z + ", BIOME DATA: " + Arrays.toString(column.getBiomeData()));
             event.getPlayer().sendMessage("HEIGHT MAPS: " + heightMaps.getTagNames());
-        }
+        }*/
     }
 
     @Override

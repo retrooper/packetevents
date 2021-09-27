@@ -151,14 +151,12 @@ public class WrapperPlayServerChunkData extends PacketWrapper<WrapperPlayServerC
         int dataLength = readVarInt();
         byte[] data = readByteArray(dataLength);
         NetStreamInput dataIn = new NetStreamInput(new ByteArrayInputStream(data));
-        System.out.println("BEGININING");
         Chunk[] chunks = new Chunk[chunkMask.size()];
         for (int index = 0; index < chunks.length; index++) {
             if (chunkMask.get(index)) {
                 chunks[index] = Chunk.read(dataIn);
             }
         }
-        System.out.println("DONE");
 
         if (hasBiomeData && !hasReadBiomeData) {
             byte[] biomeDataBytes = readByteArray(256);

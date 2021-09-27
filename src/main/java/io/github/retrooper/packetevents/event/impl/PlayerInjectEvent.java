@@ -82,14 +82,6 @@ public final class PlayerInjectEvent extends PacketEvent implements CancellableE
         return address;
     }
 
-    /**
-     * @deprecated Will always be false
-     */
-    @Deprecated
-    public boolean isAsync() {
-        return false;
-    }
-
     @Override
     public void call(PacketListenerAbstract listener) {
         listener.onPlayerInject(this);

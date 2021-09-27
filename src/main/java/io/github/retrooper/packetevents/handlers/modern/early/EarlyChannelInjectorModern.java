@@ -305,7 +305,6 @@ public class EarlyChannelInjectorModern implements EarlyInjector {
             CustomBukkitEncodeHandlerModern customBukkitEncodeHandlerModern = (CustomBukkitEncodeHandlerModern) encoder;
             customBukkitEncodeHandlerModern.addCustomEncoder(customEncoder);
         } else if (ViaVersionUtil.getBukkitEncodeHandlerClass().isInstance(encoder)) {
-            System.out.println("YESSSSSSSSSSSSSSSSSSSSSSSSSSS");
             ReflectionObject reflectionObject = new ReflectionObject(encoder);
             Object userConnectionInfo = reflectionObject.readObject(0, ViaVersionUtil.getUserConnectionClass());
             MessageToByteEncoder minecraftEncoder = reflectionObject.readObject(0, MessageToByteEncoder.class);
@@ -408,6 +407,7 @@ public class EarlyChannelInjectorModern implements EarlyInjector {
                     decoder.bypassCompression = true;
                     //If via is present, replace their decode handler with my custom one
                     addCustomViaDecoder(channel, decoder);
+                    //TODO Confirm if the custom via encoder is necessary
                     addCustomViaEncoder(channel, encoder);
                 } else if (ProtocolSupportUtil.isAvailable()) {
 
