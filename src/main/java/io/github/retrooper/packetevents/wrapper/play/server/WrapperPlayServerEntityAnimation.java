@@ -49,7 +49,7 @@ public class WrapperPlayServerEntityAnimation extends PacketWrapper<WrapperPlayS
     @Override
     public void readData() {
         entityID = readVarInt();
-        type = EntityAnimationType.VALUES[readUnsignedByte()];
+        type = EntityAnimationType.VALUES[readByte()];
     }
 
     @Override
