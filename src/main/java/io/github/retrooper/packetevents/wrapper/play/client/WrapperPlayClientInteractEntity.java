@@ -36,19 +36,20 @@ public class WrapperPlayClientInteractEntity extends PacketWrapper<WrapperPlayCl
     private int entityID;
     private Type type;
     private Optional<Vector3f> target;
-    private Optional<Hand> hand;
+    //TODO Make hand not optional?
+    private Hand hand;
     private Optional<Boolean> sneaking;
 
     public WrapperPlayClientInteractEntity(PacketReceiveEvent event) {
         super(event);
     }
 
-    public WrapperPlayClientInteractEntity(int entityID, Type type, Optional<Vector3f> target, Optional<Hand> hand, Optional<Boolean> sneaking) {
+    public WrapperPlayClientInteractEntity(int entityID, Type type, Hand hand, Optional<Vector3f> target, Optional<Boolean> sneaking) {
         super(PacketType.Play.Client.INTERACT_ENTITY);
         this.entityID = entityID;
         this.type = type;
-        this.target = target;
         this.hand = hand;
+        this.target = target;
         this.sneaking = sneaking;
     }
 
@@ -59,7 +60,7 @@ public class WrapperPlayClientInteractEntity extends PacketWrapper<WrapperPlayCl
             byte typeIndex = readByte();
             this.type = Type.VALUES[typeIndex];
             this.target = Optional.empty();
-            this.hand = Optional.empty();
+            this.hand = Hand.RIGHT;
             this.sneaking = Optional.empty();
         } else {
             this.entityID = readVarInt();
@@ -75,10 +76,10 @@ public class WrapperPlayClientInteractEntity extends PacketWrapper<WrapperPlayCl
             }
 
             if (serverVersion.isNewerThan(ServerVersion.v_1_8) && (type == Type.INTERACT || type == Type.INTERACT_AT)) {
-                int handIndex = readVarInt();
-                this.hand = Optional.of(Hand.VALUES[handIndex]);
+                int handID = readVarInt();
+                this.hand = Hand.getByLegacyID(handID);
             } else {
-                this.hand = Optional.empty();
+                this.hand = Hand.RIGHT;
             }
 
             if (serverVersion.isNewerThanOrEquals(ServerVersion.v_1_16)) {
@@ -114,8 +115,7 @@ public class WrapperPlayClientInteractEntity extends PacketWrapper<WrapperPlayCl
             }
 
             if (serverVersion.isNewerThan(ServerVersion.v_1_8) && (type == Type.INTERACT || type == Type.INTERACT_AT)) {
-                Hand handValue = hand.orElse(Hand.MAIN_HAND);
-                writeVarInt(handValue.ordinal());
+                writeVarInt(hand.getLegacyID());
             }
 
             if (serverVersion.isNewerThanOrEquals(ServerVersion.v_1_16)) {
@@ -140,20 +140,20 @@ public class WrapperPlayClientInteractEntity extends PacketWrapper<WrapperPlayCl
         this.type = type;
     }
 
+    public Hand getHand() {
+        return hand;
+    }
+
+    public void setHand(Hand hand) {
+        this.hand = hand;
+    }
+
     public Optional<Vector3f> getTarget() {
         return target;
     }
 
     public void setTarget(Optional<Vector3f> target) {
         this.target = target;
-    }
-
-    public Optional<Hand> getHand() {
-        return hand;
-    }
-
-    public void setHand(Optional<Hand> hand) {
-        this.hand = hand;
     }
 
     public Optional<Boolean> isSneaking() {

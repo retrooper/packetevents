@@ -43,10 +43,9 @@ public class WrapperPlayClientAnimation extends PacketWrapper<WrapperPlayClientA
     @Override
     public void readData() {
         if (serverVersion.isNewerThanOrEquals(ServerVersion.v_1_9)) {
-            this.hand = Hand.VALUES[readVarInt()];
+            this.hand = Hand.getByLegacyID(readVarInt());
         } else {
-            //Default to main hand, because 1.8 and 1.7.10 don't have an off-hand anyway.
-            this.hand = Hand.MAIN_HAND;
+            this.hand = Hand.RIGHT;
         }
     }
 
@@ -58,7 +57,7 @@ public class WrapperPlayClientAnimation extends PacketWrapper<WrapperPlayClientA
     @Override
     public void writeData() {
         if (serverVersion.isNewerThanOrEquals(ServerVersion.v_1_9)) {
-            writeVarInt(hand.ordinal());
+            writeVarInt(hand.getLegacyID());
         }
     }
 
