@@ -73,12 +73,11 @@ public class CustomBukkitDecodeHandler extends ByteToMessageDecoder {
 
         ByteBuf transformedBuf = null;
         try {
-            if (ViaVersionUtil.isUserConnectionActive(userInfo)) {
-                transformedBuf = ctx.alloc().buffer().writeBytes(byteBuf);
-                ViaVersionUtil.transformPacket(userInfo, transformedBuf, true);
-            }
-
             try {
+                if (ViaVersionUtil.isUserConnectionActive(userInfo)) {
+                    transformedBuf = ctx.alloc().buffer().writeBytes(byteBuf);
+                    ViaVersionUtil.transformPacket(userInfo, transformedBuf, true);
+                }
                 Object result = transformedBuf == null ? byteBuf : transformedBuf;
                 for (Object customDecoder : customDecoders) {
                     //We only support one output (except for ProtocolLib)

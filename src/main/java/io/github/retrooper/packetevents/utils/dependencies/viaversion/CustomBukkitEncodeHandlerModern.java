@@ -118,12 +118,12 @@ public class CustomBukkitEncodeHandlerModern extends MessageToByteEncoder<Object
                 CustomPipelineUtil.callEncode((MessageToByteEncoder<?>) customEncoder, ctx, transformed, byteBuf);
                 transformed.clear().writeBytes(byteBuf);
             } else if (customEncoder instanceof MessageToMessageEncoder) {
-                byteBuf = (ByteBuf) CustomPipelineUtil.callEncode((MessageToMessageEncoder<?>) customEncoder, ctx, transformed).get(0);
-                transformed.clear().writeBytes(byteBuf);
+                ByteBuf bb = (ByteBuf) CustomPipelineUtil.callEncode((MessageToMessageEncoder<?>) customEncoder, ctx, transformed).get(0);
+                transformed.clear().writeBytes(bb);
             }
         }
-        byteBuf.clear().writeBytes(transformed);
-        transform(byteBuf);
+        transform(transformed);
+        byteBuf.clear().writeBytes(byteBuf);
     }
 
     private boolean containsCause(Throwable t, Class<?> c) {
@@ -142,6 +142,7 @@ public class CustomBukkitEncodeHandlerModern extends MessageToByteEncoder<Object
         if (containsCause(cause, CancelCodecException.class)) return; // ProtocolLib compat
 
         super.exceptionCaught(ctx, cause);
+
         if (!ViaNMSUtil.isDebugPropertySet() && containsCause(cause, InformativeException.class)
                 && (ViaVersionUtil.getUserConnectionProtocolState(userInfo) != ConnectionState.HANDSHAKING || ViaVersionUtil.isDebug())) {
             cause.printStackTrace(); // Print if CB doesn't already do it
