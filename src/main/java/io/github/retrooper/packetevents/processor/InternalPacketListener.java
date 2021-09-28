@@ -31,6 +31,7 @@ import io.github.retrooper.packetevents.protocol.data.world.chunk.Column;
 import io.github.retrooper.packetevents.wrapper.handshaking.client.WrapperHandshakingClientHandshake;
 import io.github.retrooper.packetevents.wrapper.login.client.WrapperLoginClientLoginStart;
 import io.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientSettings;
+import io.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerChatMessage;
 import io.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerChunkData;
 
 import java.util.Arrays;
@@ -51,6 +52,11 @@ public class InternalPacketListener implements PacketListener {
             event.getPlayer().sendMessage("X: " + x + ", Z: " + z + ", BIOME DATA: " + Arrays.toString(column.getBiomeData()));
             event.getPlayer().sendMessage("HEIGHT MAPS: " + heightMaps.getTagNames());
         }*/
+        if (event.getPacketType() == PacketType.Play.Server.CHAT_MESSAGE) {
+            WrapperPlayServerChatMessage msg = new WrapperPlayServerChatMessage(event);
+            System.out.println("msg: " + msg.getJSONMessage());
+            //event.getPlayer().sendMessage("msg: " + msg.getJSONMessage());
+        }
     }
 
     @Override

@@ -29,6 +29,7 @@ import io.github.retrooper.packetevents.utils.dependencies.protocolsupport.Proto
 import io.github.retrooper.packetevents.utils.dependencies.viaversion.CustomBukkitDecodeHandler;
 import io.github.retrooper.packetevents.utils.dependencies.viaversion.CustomBukkitEncodeHandlerModern;
 import io.github.retrooper.packetevents.utils.dependencies.viaversion.ViaVersionUtil;
+import io.github.retrooper.packetevents.utils.netty.channel.ChannelAbstract;
 import io.github.retrooper.packetevents.utils.reflection.ClassUtil;
 import io.github.retrooper.packetevents.utils.reflection.Reflection;
 import io.github.retrooper.packetevents.utils.reflection.ReflectionObject;
@@ -307,7 +308,7 @@ public class EarlyChannelInjectorModern implements EarlyInjector {
         } else if (ViaVersionUtil.getBukkitEncodeHandlerClass().isInstance(encoder)) {
             ReflectionObject reflectionObject = new ReflectionObject(encoder);
             Object userConnectionInfo = reflectionObject.readObject(0, ViaVersionUtil.getUserConnectionClass());
-            MessageToByteEncoder minecraftEncoder = reflectionObject.readObject(0, MessageToByteEncoder.class);
+            MessageToByteEncoder<?> minecraftEncoder = reflectionObject.readObject(0, MessageToByteEncoder.class);
             CustomBukkitEncodeHandlerModern customBukkitEncodeHandlerModern = new CustomBukkitEncodeHandlerModern(userConnectionInfo, minecraftEncoder, encoder);
             customBukkitEncodeHandlerModern.addCustomEncoder(customEncoder);
             //TODO ProtocolLib support
@@ -407,10 +408,8 @@ public class EarlyChannelInjectorModern implements EarlyInjector {
                     decoder.bypassCompression = true;
                     //If via is present, replace their decode handler with my custom one
                     addCustomViaDecoder(channel, decoder);
-                    //TODO Confirm if the custom via encoder is necessary
                     addCustomViaEncoder(channel, encoder);
                 } else if (ProtocolSupportUtil.isAvailable()) {
-
                     channel.pipeline().remove(PacketEvents.get().decoderName);
                     channel.pipeline().addAfter("ps_decoder_transformer", PacketEvents.get().decoderName, decoder);
                 }

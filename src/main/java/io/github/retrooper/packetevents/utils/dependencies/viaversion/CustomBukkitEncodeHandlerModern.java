@@ -114,7 +114,6 @@ public class CustomBukkitEncodeHandlerModern extends MessageToByteEncoder<Object
         }
         ByteBuf transformed = ctx.alloc().buffer().writeBytes(byteBuf);
         for (Object customEncoder : customEncoders) {
-            //We only support one output (except for ProtocolLib)
             if (customEncoder instanceof MessageToByteEncoder) {
                 CustomPipelineUtil.callEncode((MessageToByteEncoder<?>) customEncoder, ctx, transformed, byteBuf);
                 transformed.clear().writeBytes(byteBuf);
