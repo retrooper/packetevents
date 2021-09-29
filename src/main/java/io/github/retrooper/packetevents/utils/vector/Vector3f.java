@@ -153,13 +153,8 @@ public class Vector3f {
      * @return Clone.
      */
     @Override
-    public Vector3d clone() {
-        try {
-            super.clone();
-        } catch (CloneNotSupportedException e) {
-            e.printStackTrace();
-        }
-        return null;
+    public Vector3f clone() {
+        return new Vector3f(getX(), getY(), getZ());
     }
 
     @Override
