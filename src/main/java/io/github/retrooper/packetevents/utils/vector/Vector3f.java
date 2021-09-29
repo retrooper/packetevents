@@ -151,8 +151,8 @@ public class Vector3f {
      * @return Clone.
      */
     @Override
-    public Vector3d clone() {
-        return new Vector3d(getX(), getY(), getZ());
+    public Vector3f clone() {
+        return new Vector3f(getX(), getY(), getZ());
     }
 
     @Override
