@@ -18,7 +18,7 @@
 
 package io.github.retrooper.packetevents.utils.dependencies.google;
 
-import io.github.retrooper.packetevents.utils.dependencies.gameprofile.GameProfileProperty;
+import io.github.retrooper.packetevents.utils.dependencies.gameprofile.WrappedProperty;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Collection;
@@ -26,33 +26,33 @@ import java.util.Map;
 import java.util.Set;
 
 public interface WrappedPropertyMap {
-    Map<String, Collection<GameProfileProperty>> asMap();
+    Map<String, Collection<WrappedProperty>> asMap();
 
     void clear();
 
-    boolean containsEntry(String key, GameProfileProperty value);
+    boolean containsEntry(Object key, Object value);
 
-    boolean containsKey(String key);
+    boolean containsKey(Object key);
 
     boolean containsValue(@Nullable Object value);
 
-    Collection<Map.Entry<String, GameProfileProperty>> entries();
+    Collection<Map.Entry<String, WrappedProperty>> entries();
 
-    Collection<GameProfileProperty> get(@Nullable String key);
+    Collection<WrappedProperty> get(@Nullable String key);
 
     boolean isEmpty();
 
     //Multiset<String> keys()
     Set<String> keySet();
 
-    boolean put(String key, GameProfileProperty value);
+    boolean put(String key, WrappedProperty value);
 
-    boolean putAll(String key, Iterable<? extends GameProfileProperty> values);
+    boolean putAll(String key, Iterable<? extends WrappedProperty> values);
 
-    boolean remove(String key, GameProfileProperty value);
+    boolean remove(Object key, Object value);
 
-    Collection<GameProfileProperty> removeAll(@Nullable Object key);
-    Collection<GameProfileProperty> replaceValues(String key, Iterable<? extends GameProfileProperty> values);
+    Collection<WrappedProperty> removeAll(@Nullable Object key);
+    Collection<WrappedProperty> replaceValues(String key, Iterable<? extends WrappedProperty> values);
     int size();
     boolean equals(@Nullable Object object);
     int hashCode();

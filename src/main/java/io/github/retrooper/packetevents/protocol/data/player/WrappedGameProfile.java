@@ -20,7 +20,6 @@ package io.github.retrooper.packetevents.protocol.data.player;
 
 import io.github.retrooper.packetevents.manager.server.ServerManager;
 import io.github.retrooper.packetevents.manager.server.ServerVersion;
-import io.github.retrooper.packetevents.utils.dependencies.gameprofile.GameProfileProperty;
 import io.github.retrooper.packetevents.utils.dependencies.google.WrappedPropertyMap;
 import io.github.retrooper.packetevents.utils.dependencies.google.WrappedPropertyMapLegacy;
 import io.github.retrooper.packetevents.utils.dependencies.google.WrappedPropertyMapModern;

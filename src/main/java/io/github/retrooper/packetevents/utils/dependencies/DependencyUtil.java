@@ -23,6 +23,7 @@ import io.github.retrooper.packetevents.protocol.data.player.WrappedGameProfile;
 import io.github.retrooper.packetevents.utils.MinecraftReflectionUtil;
 import io.github.retrooper.packetevents.utils.dependencies.gameprofile.GameProfileUtil_7;
 import io.github.retrooper.packetevents.utils.dependencies.gameprofile.GameProfileUtil_8;
+import io.github.retrooper.packetevents.utils.dependencies.gameprofile.WrappedProperty;
 import io.github.retrooper.packetevents.utils.dependencies.google.GuavaUtils_7;
 import io.github.retrooper.packetevents.utils.dependencies.google.GuavaUtils_8;
 import io.github.retrooper.packetevents.utils.dependencies.protocolsupport.ProtocolSupportUtil;
@@ -72,7 +73,7 @@ public class DependencyUtil {
         }
     }
 
-    public static void setGameProfileSkin(Object gameProfile, Skin skin) {
+    public static void setGameProfileSkin(Object gameProfile, WrappedProperty skin) {
         if (MinecraftReflectionUtil.USE_MODERN_NETTY_PACKAGE) {
             GameProfileUtil_8.setGameProfileSkin(gameProfile, skin);
         } else {
@@ -80,7 +81,7 @@ public class DependencyUtil {
         }
     }
 
-    public static Skin getGameProfileSkin(Object gameProfile) {
+    public static WrappedProperty getGameProfileSkin(Object gameProfile) {
         if (MinecraftReflectionUtil.USE_MODERN_NETTY_PACKAGE) {
             return GameProfileUtil_8.getGameProfileSkin(gameProfile);
         } else {

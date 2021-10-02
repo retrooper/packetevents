@@ -22,16 +22,16 @@ import net.minecraft.util.org.apache.commons.codec.binary.Base64;
 
 import java.security.*;
 
-public class GameProfileProperty {
+public class WrappedProperty {
     private final String name;
     private final String value;
     private final String signature;
 
-    public GameProfileProperty(String value, String name) {
+    public WrappedProperty(String value, String name) {
         this(value, name, (String)null);
     }
 
-    public GameProfileProperty(String name, String value, String signature) {
+    public WrappedProperty(String name, String value, String signature) {
         this.name = name;
         this.value = value;
         this.signature = signature;
