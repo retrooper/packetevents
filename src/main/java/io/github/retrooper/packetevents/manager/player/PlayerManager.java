@@ -99,7 +99,7 @@ public class PlayerManager {
             } else {
                 short protocolVersion;
                 //Luckily 1.7.10 provides a method for us to access a player's protocol version(because 1.7.10 servers support 1.8 clients too)
-                if (ServerManager.getVersion().isOlderThan(ServerVersion.v_1_8)) {
+                if (ServerManager.getVersion() == ServerVersion.v_1_7_10) {
                     protocolVersion = (short) SpigotVersionLookup_1_7.getProtocolVersion(player);
                 } else {
                     //No dependency available, couldn't snatch the version from the packet AND server version is not 1.7.10
@@ -158,7 +158,7 @@ public class PlayerManager {
         }
         return GeyserUtil.isGeyserPlayer(uuid);
     }
-
+/*
     public void changeSkinProperty(Player player, Skin skin) {
         Object gameProfile = MinecraftReflectionUtil.getGameProfile(player);
         DependencyUtil.setGameProfileSkin(gameProfile, skin);
@@ -167,7 +167,7 @@ public class PlayerManager {
     public Skin getSkin(Player player) {
         Object gameProfile = MinecraftReflectionUtil.getGameProfile(player);
         return DependencyUtil.getGameProfileSkin(gameProfile);
-    }
+    }*/
 
     public Object getChannel(Player player) {
         String name = player.getName();

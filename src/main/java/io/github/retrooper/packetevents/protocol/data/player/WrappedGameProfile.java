@@ -18,6 +18,13 @@
 
 package io.github.retrooper.packetevents.protocol.data.player;
 
+import io.github.retrooper.packetevents.manager.server.ServerManager;
+import io.github.retrooper.packetevents.manager.server.ServerVersion;
+import io.github.retrooper.packetevents.utils.dependencies.gameprofile.GameProfileProperty;
+import io.github.retrooper.packetevents.utils.dependencies.google.WrappedPropertyMap;
+import io.github.retrooper.packetevents.utils.dependencies.google.WrappedPropertyMapLegacy;
+import io.github.retrooper.packetevents.utils.dependencies.google.WrappedPropertyMapModern;
+
 import java.util.UUID;
 
 /**
@@ -29,10 +36,20 @@ import java.util.UUID;
 public class WrappedGameProfile {
     private final UUID id;
     private final String name;
+    private final WrappedPropertyMap properties;
+
 
     public WrappedGameProfile(UUID id, String name) {
         this.id = id;
         this.name = name;
+        properties =
+                ServerManager.getVersion() == ServerVersion.v_1_7_10 ? new WrappedPropertyMapLegacy() : new WrappedPropertyMapModern();
+    }
+
+    public WrappedGameProfile(UUID id, String name, WrappedPropertyMap properties) {
+        this.id = id;
+        this.name = name;
+        this.properties = properties;
     }
 
     public UUID getID() {
@@ -43,6 +60,9 @@ public class WrappedGameProfile {
         return name;
     }
 
+    public WrappedPropertyMap getProperties() {
+        return properties;
+    }
 
     public boolean isComplete() {
         return id != null && !isBlank(name);

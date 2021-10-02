@@ -482,7 +482,7 @@ public final class PacketType {
             public static void load() {
                 ServerVersion version = ServerManager.getVersion();
                 //1.7.10
-                if (version.isOlderThan(ServerVersion.v_1_8)) {
+                if (version == ServerVersion.v_1_7_10) {
                     loadPacketIDs(ClientboundPacketType_1_7_10.values());
                 }
                 //1.8 - 1.8.8

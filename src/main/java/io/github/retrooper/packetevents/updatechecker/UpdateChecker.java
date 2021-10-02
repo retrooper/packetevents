@@ -35,7 +35,7 @@ public class UpdateChecker {
     private final LowLevelUpdateChecker lowLevelUpdateChecker;
 
     public UpdateChecker() {
-        if (ServerManager.getVersion().isOlderThan(ServerVersion.v_1_8)) {
+        if (ServerManager.getVersion() == ServerVersion.v_1_7_10) {
             lowLevelUpdateChecker = new LowLevelUpdateCheckerLegacy();
         } else {
             lowLevelUpdateChecker = new LowLevelUpdateCheckerModern();

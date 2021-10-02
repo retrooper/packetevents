@@ -58,7 +58,7 @@ public class WrapperPlayServerPluginMessage extends PacketWrapper<WrapperPlaySer
     @Override
     public void writeData() {
         writeString(channelName);
-        if (serverVersion.isOlderThan(ServerVersion.v_1_8)) {
+        if (serverVersion == ServerVersion.v_1_7_10) {
             writeShort(data.length);
         }
         writeByteArray(data);

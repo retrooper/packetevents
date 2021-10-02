@@ -55,7 +55,7 @@ public class WrapperPlayClientInteractEntity extends PacketWrapper<WrapperPlayCl
 
     @Override
     public void readData() {
-        if (serverVersion.isOlderThan(ServerVersion.v_1_8)) {
+        if (serverVersion == ServerVersion.v_1_7_10) {
             this.entityID = readInt();
             byte typeIndex = readByte();
             this.type = Type.VALUES[typeIndex];
@@ -101,7 +101,7 @@ public class WrapperPlayClientInteractEntity extends PacketWrapper<WrapperPlayCl
 
     @Override
     public void writeData() {
-        if (serverVersion.isOlderThan(ServerVersion.v_1_8)) {
+        if (serverVersion == ServerVersion.v_1_7_10) {
             writeInt(entityID);
             writeByte(type.ordinal());
         } else {
