@@ -162,12 +162,7 @@ public class Vector3d {
      */
     @Override
     public Vector3d clone() {
-        try {
-            super.clone();
-        } catch (CloneNotSupportedException e) {
-            e.printStackTrace();
-        }
-        return null;
+        return new Vector3d(getX(), getY(), getZ());
     }
 
     public Vector3d add(Vector3d target) {

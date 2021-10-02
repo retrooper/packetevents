@@ -194,12 +194,7 @@ public class BlockPosition {
      */
     @Override
     public BlockPosition clone() {
-        try {
-            super.clone();
-        } catch (CloneNotSupportedException e) {
-            e.printStackTrace();
-        }
-        return null;
+        return new BlockPosition(getX(), getY(), getZ());
     }
 
     @Override
