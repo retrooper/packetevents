@@ -19,15 +19,20 @@
 package io.github.retrooper.packetevents.wrapper.play.server;
 
 import io.github.retrooper.packetevents.event.impl.PacketSendEvent;
+import io.github.retrooper.packetevents.manager.server.ServerVersion;
+import io.github.retrooper.packetevents.protocol.data.entity.EntityPose;
+import io.github.retrooper.packetevents.protocol.data.nbt.NBTCompound;
+import io.github.retrooper.packetevents.protocol.data.world.Direction;
 import io.github.retrooper.packetevents.protocol.packettype.PacketType;
 import io.github.retrooper.packetevents.utils.Vector3f;
 import io.github.retrooper.packetevents.utils.Vector3i;
 import io.github.retrooper.packetevents.wrapper.PacketWrapper;
-import net.minecraft.server.v1_9_R1.DataWatcher;
+import org.bukkit.inventory.ItemStack;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
 
@@ -43,7 +48,6 @@ public class WrapperPlayServerEntityMetadata extends PacketWrapper<WrapperPlaySe
         super(PacketType.Play.Server.ENTITY_METADATA);
         this.entityID = entityID;
         this.watchableObjects = watchableObjects;
-        net.minecraft.server.v1_9_R1.PacketPlayOutEntityMetadata em00;
     }
 
     private List<WatchableObject> serializeWatchableObjectsLegacy() {
@@ -93,16 +97,16 @@ public class WrapperPlayServerEntityMetadata extends PacketWrapper<WrapperPlaySe
         return list;
     }
 
-    private List<WatchableObject> serializeWatchableObjects() {
+    private List<WatchableObject> serializeWatchableObjectsModern() {
         List<WatchableObject> list = new ArrayList<>();
-        short short0;
-        while ((short0 = readUnsignedByte()) != 255) {
+        short index;
+        while ((index = readUnsignedByte()) != 255) {
 
             short typeID = readUnsignedByte();
             WatchableObject.Type type = WatchableObject.Type.values()[typeID];
-            list.add(new WatchableObject(-1, type, value));
-
-            list.add(new DataWatcher.Item(datawatcherserializer.a(short0), datawatcherserializer.a(packetdataserializer)));
+            Object value = type.readDataConsumer.apply(this);
+            //TODO Resolve index, is it the correct one?
+            list.add(new WatchableObject(index, type, value));
         }
         return list;
     }
@@ -110,7 +114,11 @@ public class WrapperPlayServerEntityMetadata extends PacketWrapper<WrapperPlaySe
     @Override
     public void readData() {
         entityID = readInt();
-        watchableObjects = serializeWatchableObjectsLegacy();
+        if (serverVersion.isNewerThanOrEquals(ServerVersion.v_1_9)) {
+            watchableObjects = serializeWatchableObjectsModern();
+        } else {
+            watchableObjects = serializeWatchableObjectsLegacy();
+        }
     }
 
     @Override
@@ -161,39 +169,130 @@ public class WrapperPlayServerEntityMetadata extends PacketWrapper<WrapperPlaySe
                 if (optString.isPresent()) {
                     packetWrapper.writeBoolean(true);
                     packetWrapper.writeString(optString.get());
+                } else {
+                    packetWrapper.writeBoolean(false);
+                }
+            }),
+            ITEM_STACK(PacketWrapper::readItemStack,
+                    (packetWrapper, o) -> {
+                        packetWrapper.writeItemStack((ItemStack) o);
+                    }),
+            BOOLEAN(PacketWrapper::readBoolean,
+                    (packetWrapper, o) -> {
+                        packetWrapper.writeBoolean((boolean) o);
+                    }),
+            //3 floats
+            ROTATION(packetWrapper -> {
+                return new Vector3f(packetWrapper.readFloat(), packetWrapper.readFloat(), packetWrapper.readFloat());
+            },
+                    (packetWrapper, o) -> {
+                        Vector3f vec = (Vector3f) o;
+                        packetWrapper.writeFloat(vec.x);
+                        packetWrapper.writeFloat(vec.y);
+                        packetWrapper.writeFloat(vec.z);
+                    }),
+            //blockposition
+            POSITION(packetWrapper -> {
+                return new Vector3i(packetWrapper.readInt(), packetWrapper.readInt(), packetWrapper.readInt());
+            },
+                    (packetWrapper, o) -> {
+                        Vector3i vec = (Vector3i) o;
+                        packetWrapper.writeBlockPosition(vec);
+                    }),
+            OPTIONAL_POSITION(packetWrapper -> {
+                if (packetWrapper.readBoolean()) {
+                    return Optional.of(new Vector3i(packetWrapper.readInt(), packetWrapper.readInt(), packetWrapper.readInt()));
+                } else {
+                    return Optional.empty();
+                }
+            },
+                    (packetWrapper, o) -> {
+                        Optional<Vector3i> optVec = (Optional<Vector3i>) o;
+                        if (optVec.isPresent()) {
+                            packetWrapper.writeBoolean(true);
+                            packetWrapper.writeBlockPosition(optVec.get());
+                        } else {
+                            packetWrapper.writeBoolean(false);
+                        }
+                    }),
+            //Var int
+            DIRECTION(packetWrapper -> {
+                return Direction.getDirectionByFace(packetWrapper.readVarInt());
+            },
+                    (packetWrapper, o) -> {
+                        packetWrapper.writeVarInt(((Direction) o).getFaceValue());
+                    }),
+            OPTIONAL_UUID(packetWrapper -> {
+                if (packetWrapper.readBoolean()) {
+                    return Optional.of(packetWrapper.readUUID());
+                } else {
+                    return Optional.empty();
+                }
+            },
+                    (packetWrapper, o) -> {
+                        Optional<UUID> optUUID = (Optional<UUID>) o;
+                        if (optUUID.isPresent()) {
+                            packetWrapper.writeBoolean(true);
+                            packetWrapper.writeUUID(optUUID.get());
+                        } else {
+                            packetWrapper.writeBoolean(false);
+                        }
+                    }),
+            OPTIONAL_BLOCK_TYPE_ID(PacketWrapper::readVarInt,
+                    (packetWrapper, o) -> {
+                        packetWrapper.writeVarInt((int) o);
+                    }),
+            //1.9 has the above
+            NBT(PacketWrapper::readNBTTag,
+                    (packetWrapper, o) -> {
+                        packetWrapper.writeNBTTab((NBTCompound) o);
+                    }),
+            //TODO https://wiki.vg/Entity_metadata#Entity_Metadata_Format
+            PARTICLE(null, null),
+            //TODO
+            VILLAGER_DATA(null, null),
+            OPTIONAL_INTEGER(packetWrapper -> {
+                if (packetWrapper.readBoolean()) {
+                    return Optional.of(packetWrapper.readVarInt());
+                }
+                else {
+                    return Optional.empty();
+                }
+            }, (packetWrapper, o) -> {
+                Optional<Integer> optInt = (Optional<Integer>) o;
+                if (optInt.isPresent()) {
+                    packetWrapper.writeBoolean(true);
+                    packetWrapper.writeVarInt(optInt.get());
                 }
                 else {
                     packetWrapper.writeBoolean(false);
                 }
             }),
-            ITEM_STACK,
-            BOOLEAN,
-            //3 floats
-            ROTATION,
-            //blockposition
-            POSITION,
-            OPTIONAL_POSITION,
-            //Var int
-            DIRECTION,
-            OPTIONAL_UUID,
-            OPTIONAL_BLOCK_TYPE_ID,
-            //1.9 has the above
-            NBT,
-            PARTICLE,
-            VILLAGER_DATA,
-            OPTIONAL_INTEGER,
-            POSE,
+            POSE(packetWrapper -> EntityPose.VALUES[packetWrapper.readVarInt()], (packetWrapper, o) -> {
+                packetWrapper.writeVarInt(((EntityPose)o).ordinal());
+            }),
 
             //Not present on 1.9+
             @Deprecated
-            SHORT;
+            SHORT(PacketWrapper::readShort,
+                    (packetWrapper, o) -> {
+                        packetWrapper.writeShort((short) o);
+                    });
 
-            private Function<PacketWrapper<?>, Object> readDataConsumer;
-            private BiConsumer<PacketWrapper<?>, Object> writeDataConsumer;
+            private final Function<PacketWrapper<?>, Object> readDataConsumer;
+            private final BiConsumer<PacketWrapper<?>, Object> writeDataConsumer;
 
             Type(Function<PacketWrapper<?>, Object> readDataConsumer, BiConsumer<PacketWrapper<?>, Object> writeDataConsumer) {
                 this.readDataConsumer = readDataConsumer;
                 this.writeDataConsumer = writeDataConsumer;
+            }
+
+            public Function<PacketWrapper<?>, Object> getReadDataConsumer() {
+                return readDataConsumer;
+            }
+
+            public BiConsumer<PacketWrapper<?>, Object> getWriteDataConsumer() {
+                return writeDataConsumer;
             }
 
             public static final Type[] VALUES = values();

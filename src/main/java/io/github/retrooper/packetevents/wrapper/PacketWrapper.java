@@ -220,7 +220,7 @@ public class PacketWrapper<T extends PacketWrapper> {
         MinecraftReflectionUtil.writeNMSItemStackPacketDataSerializer(packetDataSerializer, nmsItemStack);
     }
 
-    public NBTCompound readTag() {
+    public NBTCompound readNBTTag() {
         try {
             return (NBTCompound) DefaultNBTSerializer.INSTANCE.deserializeTag(new ByteBufAbstractInputStream(byteBuf));
         } catch (IOException e) {
@@ -229,7 +229,7 @@ public class PacketWrapper<T extends PacketWrapper> {
         return null;
     }
 
-    public void writeTag(NBTCompound tag) {
+    public void writeNBTTab(NBTCompound tag) {
         try (ByteBufAbstractOutputStream outputStream = new ByteBufAbstractOutputStream(byteBuf)) {
             if (tag != null) {
                 DefaultNBTSerializer.INSTANCE.serializeTag(outputStream, tag);
