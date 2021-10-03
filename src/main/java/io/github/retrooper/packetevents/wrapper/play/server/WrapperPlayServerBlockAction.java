@@ -1,6 +1,7 @@
 package io.github.retrooper.packetevents.wrapper.play.server;
 
 import io.github.retrooper.packetevents.event.impl.PacketSendEvent;
+import io.github.retrooper.packetevents.manager.server.ServerVersion;
 import io.github.retrooper.packetevents.protocol.packettype.PacketType;
 import io.github.retrooper.packetevents.protocol.data.world.BlockPosition;
 import io.github.retrooper.packetevents.wrapper.PacketWrapper;
@@ -8,34 +9,49 @@ import io.github.retrooper.packetevents.wrapper.PacketWrapper;
 public class WrapperPlayServerBlockAction extends PacketWrapper<WrapperPlayServerBlockAction> {
     private BlockPosition blockPosition;
     private int actionID, actionData;
-    private int blockID;
+    private int blockTypeID;
 
     public WrapperPlayServerBlockAction(PacketSendEvent event) {
         super(event);
     }
 
-    public WrapperPlayServerBlockAction(BlockPosition blockPosition, int actionID, int actionParam, int block) {
+    public WrapperPlayServerBlockAction(BlockPosition blockPosition, int actionID, int actionParam, int blockTypeID) {
         super(PacketType.Play.Server.BLOCK_ACTION);
         this.blockPosition = blockPosition;
         this.actionID = actionID;
         this.actionData = actionParam;
-        this.blockID = block;
+        this.blockTypeID = blockTypeID;
     }
 
     @Override
     public void readData() {
-        this.blockPosition = readBlockPosition();
+        if (serverVersion == ServerVersion.v_1_7_10) {
+            int x = readInt();
+            int y = readShort();
+            int z = readInt();
+            blockPosition = new BlockPosition(x, y, z);
+        }
+        else {
+            this.blockPosition = readBlockPosition();
+        }
         this.actionID = readUnsignedByte();
         this.actionData = readUnsignedByte();
-        this.blockID = readInt();
+        this.blockTypeID = readVarInt();
     }
 
     @Override
     public void writeData() {
-        writeBlockPosition(blockPosition);
+        if (serverVersion == ServerVersion.v_1_7_10) {
+            writeInt(blockPosition.x);
+            writeShort(blockPosition.y);
+            writeInt(blockPosition.z);
+        }
+        else {
+            writeBlockPosition(blockPosition);
+        }
         writeByte(actionID);
         writeByte(actionData);
-        writeVarInt(blockID);
+        writeVarInt(blockTypeID);
     }
 
     @Override
@@ -43,15 +59,15 @@ public class WrapperPlayServerBlockAction extends PacketWrapper<WrapperPlayServe
         this.blockPosition = wrapper.blockPosition;
         this.actionID = wrapper.actionID;
         this.actionData = wrapper.actionData;
-        this.blockID = wrapper.blockID;
+        this.blockTypeID = wrapper.blockTypeID;
     }
 
     public BlockPosition getBlockPosition() {
         return blockPosition;
     }
 
-    public void setBlockPosition(BlockPosition blockPos) {
-        this.blockPosition = blockPos;
+    public void setBlockPosition(BlockPosition blockPosition) {
+        this.blockPosition = blockPosition;
     }
 
     public int getActionID() {
@@ -70,11 +86,11 @@ public class WrapperPlayServerBlockAction extends PacketWrapper<WrapperPlayServe
         this.actionData = actionData;
     }
 
-    public int getBlockID() {
-        return blockID;
+    public int getBlockTypeID() {
+        return blockTypeID;
     }
 
-    public void setBlockID(int blockID) {
-        this.blockID = blockID;
+    public void setBlockTypeID(int blockTypeID) {
+        this.blockTypeID = blockTypeID;
     }
 }
