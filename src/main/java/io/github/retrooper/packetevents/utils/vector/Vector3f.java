@@ -30,12 +30,6 @@ import io.github.retrooper.packetevents.protocol.data.world.BlockPosition;
  */
 public class Vector3f {
     /**
-     * This is the invalid vector.
-     * In wrappers, when a vector is null in the actual packet, PacketEvents will set our high level vector X,Y,Z values
-     * to -1 to avoid null pointer exceptions.
-     */
-    public static final Vector3f INVALID = new Vector3f(-1, -1, -1);
-    /**
      * X (coordinate/angle/whatever you wish)
      */
     public float x;

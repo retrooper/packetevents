@@ -33,13 +33,8 @@ import org.bukkit.Location;
  * @author retrooper
  * @since 1.7
  */
+//TODO Rename to Vector3i again
 public class BlockPosition {
-    /**
-     * This is the invalid vector.
-     * In wrappers, when a vector is null in the actual packet, PacketEvents will set our high level vector X,Y,Z values
-     * to -1 to avoid null pointer exceptions.
-     */
-    public static final BlockPosition INVALID = new BlockPosition(-1, -1, -1);
     /**
      * X (coordinate/angle/whatever you wish)
      */
