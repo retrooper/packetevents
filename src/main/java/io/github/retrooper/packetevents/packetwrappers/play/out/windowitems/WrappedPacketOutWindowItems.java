@@ -55,7 +55,7 @@ public class WrappedPacketOutWindowItems extends WrappedPacket implements Sendab
         try {
             if (v_1_17) {
                 nonNullListClass = NMSUtils.getNMClassWithoutException("core.NonNullList");
-                Constructor<?> nonNullListConstructor = nonNullListClass.getConstructor();
+                Constructor<?> nonNullListConstructor = nonNullListClass.getDeclaredConstructor();
                 nonNullListConstructor.setAccessible(true);
                 nonNullListInstance = nonNullListConstructor.newInstance();
                 packetConstructor = PacketTypeClasses.Play.Server.WINDOW_ITEMS.getConstructor(int.class, nonNullListClass);
