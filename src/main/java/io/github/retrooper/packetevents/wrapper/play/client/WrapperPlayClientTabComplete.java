@@ -22,7 +22,7 @@ import io.github.retrooper.packetevents.event.impl.PacketReceiveEvent;
 import io.github.retrooper.packetevents.manager.server.ServerVersion;
 import io.github.retrooper.packetevents.protocol.packettype.PacketType;
 import io.github.retrooper.packetevents.protocol.data.player.ClientVersion;
-import io.github.retrooper.packetevents.protocol.data.world.BlockPosition;
+import io.github.retrooper.packetevents.utils.Vector3i;
 import io.github.retrooper.packetevents.wrapper.PacketWrapper;
 
 import java.util.Optional;
@@ -30,13 +30,13 @@ import java.util.Optional;
 public class WrapperPlayClientTabComplete extends PacketWrapper<WrapperPlayClientTabComplete> {
     private String text;
     private Optional<Integer> transactionID;
-    private Optional<BlockPosition> blockPosition;
+    private Optional<Vector3i> blockPosition;
 
     public WrapperPlayClientTabComplete(PacketReceiveEvent event) {
         super(event);
     }
 
-    public WrapperPlayClientTabComplete(Optional<Integer> transactionID, String text, Optional<BlockPosition> blockPosition) {
+    public WrapperPlayClientTabComplete(Optional<Integer> transactionID, String text, Optional<Vector3i> blockPosition) {
         super(PacketType.Play.Client.TAB_COMPLETE);
         this.transactionID = transactionID;
         this.text = text;
@@ -68,7 +68,7 @@ public class WrapperPlayClientTabComplete extends PacketWrapper<WrapperPlayClien
                 //1.13+ removed this
                 boolean hasPosition = readBoolean();
                 if (hasPosition) {
-                    blockPosition = Optional.of(new BlockPosition(readLong()));
+                    blockPosition = Optional.of(new Vector3i(readLong()));
                 }
             }
         }
@@ -103,7 +103,7 @@ public class WrapperPlayClientTabComplete extends PacketWrapper<WrapperPlayClien
                 boolean hasPosition = blockPosition.isPresent();
                 writeBoolean(hasPosition);
                 if (hasPosition) {
-                    writeLong(blockPosition.orElse(new BlockPosition(-1, -1, -1)).getSerializedPosition());
+                    writeLong(blockPosition.orElse(new Vector3i(-1, -1, -1)).getSerializedPosition());
                 }
             }
         }
@@ -125,11 +125,11 @@ public class WrapperPlayClientTabComplete extends PacketWrapper<WrapperPlayClien
         this.transactionID = transactionID;
     }
 
-    public Optional<BlockPosition> getBlockPosition() {
+    public Optional<Vector3i> getBlockPosition() {
         return blockPosition;
     }
 
-    public void setBlockPosition(Optional<BlockPosition> blockPosition) {
+    public void setBlockPosition(Optional<Vector3i> blockPosition) {
         this.blockPosition = blockPosition;
     }
 }

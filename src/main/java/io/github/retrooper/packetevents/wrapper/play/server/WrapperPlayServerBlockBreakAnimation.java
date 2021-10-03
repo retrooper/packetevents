@@ -20,20 +20,20 @@ package io.github.retrooper.packetevents.wrapper.play.server;
 
 import io.github.retrooper.packetevents.event.impl.PacketSendEvent;
 import io.github.retrooper.packetevents.manager.server.ServerVersion;
-import io.github.retrooper.packetevents.protocol.data.world.BlockPosition;
+import io.github.retrooper.packetevents.utils.Vector3i;
 import io.github.retrooper.packetevents.protocol.packettype.PacketType;
 import io.github.retrooper.packetevents.wrapper.PacketWrapper;
 
 public class WrapperPlayServerBlockBreakAnimation extends PacketWrapper<WrapperPlayServerBlockBreakAnimation> {
     private int entityID;
-    private BlockPosition blockPosition;
+    private Vector3i blockPosition;
     private byte destroyStage;
 
     public WrapperPlayServerBlockBreakAnimation(PacketSendEvent event) {
         super(event);
     }
 
-    public WrapperPlayServerBlockBreakAnimation(int entityID, BlockPosition blockPosition, byte destroyStage) {
+    public WrapperPlayServerBlockBreakAnimation(int entityID, Vector3i blockPosition, byte destroyStage) {
         super(PacketType.Play.Server.BLOCK_BREAK_ANIMATION);
         this.entityID = entityID;
         this.blockPosition = blockPosition;
@@ -47,7 +47,7 @@ public class WrapperPlayServerBlockBreakAnimation extends PacketWrapper<WrapperP
             int x = readInt();
             int y = readInt();
             int z = readInt();
-            blockPosition = new BlockPosition(x, y, z);
+            blockPosition = new Vector3i(x, y, z);
         }
         else {
             blockPosition = readBlockPosition();
@@ -84,11 +84,11 @@ public class WrapperPlayServerBlockBreakAnimation extends PacketWrapper<WrapperP
         this.entityID = entityID;
     }
 
-    public BlockPosition getBlockPosition() {
+    public Vector3i getBlockPosition() {
         return blockPosition;
     }
 
-    public void setBlockPosition(BlockPosition blockPosition) {
+    public void setBlockPosition(Vector3i blockPosition) {
         this.blockPosition = blockPosition;
     }
 

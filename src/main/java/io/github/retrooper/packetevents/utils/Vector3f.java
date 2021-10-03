@@ -16,9 +16,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package io.github.retrooper.packetevents.utils.vector;
-
-import io.github.retrooper.packetevents.protocol.data.world.BlockPosition;
+package io.github.retrooper.packetevents.utils;
 
 /**
  * 3D float Vector.
@@ -81,6 +79,7 @@ public class Vector3f {
             z = 0;
             return;
         }
+
         if (array.length > 1) {
             y = array[1];
         } else {
@@ -88,6 +87,7 @@ public class Vector3f {
             z = 0;
             return;
         }
+
         if (array.length > 2) {
             z = array[2];
         } else {
@@ -134,8 +134,8 @@ public class Vector3f {
         } else if (obj instanceof Vector3d) {
             Vector3d vec = (Vector3d) obj;
             return x == vec.x && y == vec.y && z == vec.z;
-        } else if (obj instanceof BlockPosition) {
-            BlockPosition vec = (BlockPosition) obj;
+        } else if (obj instanceof Vector3i) {
+            Vector3i vec = (Vector3i) obj;
             return x == (double) vec.x && y == (double) vec.y && z == (double) vec.z;
         }
         return false;

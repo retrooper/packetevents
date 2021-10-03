@@ -3,11 +3,11 @@ package io.github.retrooper.packetevents.wrapper.play.server;
 import io.github.retrooper.packetevents.event.impl.PacketSendEvent;
 import io.github.retrooper.packetevents.manager.server.ServerVersion;
 import io.github.retrooper.packetevents.protocol.packettype.PacketType;
-import io.github.retrooper.packetevents.protocol.data.world.BlockPosition;
+import io.github.retrooper.packetevents.utils.Vector3i;
 import io.github.retrooper.packetevents.wrapper.PacketWrapper;
 
 public class WrapperPlayServerBlockAction extends PacketWrapper<WrapperPlayServerBlockAction> {
-    private BlockPosition blockPosition;
+    private Vector3i blockPosition;
     private int actionID, actionData;
     private int blockTypeID;
 
@@ -15,7 +15,7 @@ public class WrapperPlayServerBlockAction extends PacketWrapper<WrapperPlayServe
         super(event);
     }
 
-    public WrapperPlayServerBlockAction(BlockPosition blockPosition, int actionID, int actionParam, int blockTypeID) {
+    public WrapperPlayServerBlockAction(Vector3i blockPosition, int actionID, int actionParam, int blockTypeID) {
         super(PacketType.Play.Server.BLOCK_ACTION);
         this.blockPosition = blockPosition;
         this.actionID = actionID;
@@ -29,7 +29,7 @@ public class WrapperPlayServerBlockAction extends PacketWrapper<WrapperPlayServe
             int x = readInt();
             int y = readShort();
             int z = readInt();
-            blockPosition = new BlockPosition(x, y, z);
+            blockPosition = new Vector3i(x, y, z);
         }
         else {
             this.blockPosition = readBlockPosition();
@@ -62,11 +62,11 @@ public class WrapperPlayServerBlockAction extends PacketWrapper<WrapperPlayServe
         this.blockTypeID = wrapper.blockTypeID;
     }
 
-    public BlockPosition getBlockPosition() {
+    public Vector3i getBlockPosition() {
         return blockPosition;
     }
 
-    public void setBlockPosition(BlockPosition blockPosition) {
+    public void setBlockPosition(Vector3i blockPosition) {
         this.blockPosition = blockPosition;
     }
 

@@ -22,7 +22,7 @@ import io.github.retrooper.packetevents.event.impl.PacketReceiveEvent;
 import io.github.retrooper.packetevents.manager.server.ServerVersion;
 import io.github.retrooper.packetevents.protocol.packettype.PacketType;
 import io.github.retrooper.packetevents.protocol.data.player.Hand;
-import io.github.retrooper.packetevents.utils.vector.Vector3f;
+import io.github.retrooper.packetevents.utils.Vector3f;
 import io.github.retrooper.packetevents.wrapper.PacketWrapper;
 
 import java.util.Optional;

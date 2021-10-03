@@ -16,12 +16,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package io.github.retrooper.packetevents.protocol.data.world;
+package io.github.retrooper.packetevents.utils;
 
 import io.github.retrooper.packetevents.manager.server.ServerManager;
 import io.github.retrooper.packetevents.manager.server.ServerVersion;
-import io.github.retrooper.packetevents.utils.vector.Vector3d;
-import io.github.retrooper.packetevents.utils.vector.Vector3f;
 import org.bukkit.Location;
 
 /**
@@ -33,8 +31,7 @@ import org.bukkit.Location;
  * @author retrooper
  * @since 1.7
  */
-//TODO Rename to Vector3i again
-public class BlockPosition {
+public class Vector3i {
     /**
      * X (coordinate/angle/whatever you wish)
      */
@@ -51,19 +48,19 @@ public class BlockPosition {
     /**
      * Default constructor setting all coordinates/angles/values to their default values (=0).
      */
-    public BlockPosition() {
+    public Vector3i() {
         this.x = 0;
         this.y = 0;
         this.z = 0;
     }
 
-    public BlockPosition(Location location) {
+    public Vector3i(Location location) {
         this.x = location.getBlockX();
         this.y = location.getBlockY();
         this.z = location.getBlockZ();
     }
 
-    public BlockPosition(long val) {
+    public Vector3i(long val) {
         int x = (int) (val >> 38);
         int y;
         int z;
@@ -90,7 +87,7 @@ public class BlockPosition {
      * @param y Y
      * @param z Z
      */
-    public BlockPosition(int x, int y, int z) {
+    public Vector3i(int x, int y, int z) {
         this.x = x;
         this.y = y;
         this.z = z;
@@ -104,7 +101,7 @@ public class BlockPosition {
      *
      * @param array Array.
      */
-    public BlockPosition(int[] array) {
+    public Vector3i(int[] array) {
         if (array.length > 0) {
             x = array[0];
         } else {
@@ -169,8 +166,8 @@ public class BlockPosition {
      */
     @Override
     public boolean equals(Object obj) {
-        if (obj instanceof BlockPosition) {
-            BlockPosition vec = (BlockPosition) obj;
+        if (obj instanceof Vector3i) {
+            Vector3i vec = (Vector3i) obj;
             return x == vec.x && y == vec.y && z == vec.z;
         } else if (obj instanceof Vector3d) {
             Vector3d vec = (Vector3d) obj;
@@ -188,8 +185,8 @@ public class BlockPosition {
      * @return Clone.
      */
     @Override
-    public BlockPosition clone() {
-        return new BlockPosition(getX(), getY(), getZ());
+    public Vector3i clone() {
+        return new Vector3i(getX(), getY(), getZ());
     }
 
     @Override

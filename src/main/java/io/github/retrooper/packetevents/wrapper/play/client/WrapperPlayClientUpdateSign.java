@@ -21,7 +21,7 @@ package io.github.retrooper.packetevents.wrapper.play.client;
 import io.github.retrooper.packetevents.event.impl.PacketReceiveEvent;
 import io.github.retrooper.packetevents.manager.server.ServerVersion;
 import io.github.retrooper.packetevents.protocol.packettype.PacketType;
-import io.github.retrooper.packetevents.protocol.data.world.BlockPosition;
+import io.github.retrooper.packetevents.utils.Vector3i;
 import io.github.retrooper.packetevents.wrapper.PacketWrapper;
 
 /**
@@ -29,13 +29,13 @@ import io.github.retrooper.packetevents.wrapper.PacketWrapper;
  */
 public class WrapperPlayClientUpdateSign extends PacketWrapper<WrapperPlayClientUpdateSign> {
     private final String[] textLines = new String[4];
-    private BlockPosition blockPosition;
+    private Vector3i blockPosition;
 
     public WrapperPlayClientUpdateSign(PacketReceiveEvent event) {
         super(event);
     }
 
-    public WrapperPlayClientUpdateSign(BlockPosition blockPosition, String[] textLines) {
+    public WrapperPlayClientUpdateSign(Vector3i blockPosition, String[] textLines) {
         super(PacketType.Play.Client.UPDATE_SIGN);
         this.blockPosition = blockPosition;
         System.arraycopy(textLines, 0, this.textLines, 0, 4);
@@ -44,12 +44,12 @@ public class WrapperPlayClientUpdateSign extends PacketWrapper<WrapperPlayClient
     @Override
     public void readData() {
         if (serverVersion.isNewerThanOrEquals(ServerVersion.v_1_8)) {
-            this.blockPosition = new BlockPosition(readLong());
+            this.blockPosition = new Vector3i(readLong());
         } else {
             int x = readInt();
             int y = readShort();
             int z = readInt();
-            this.blockPosition = new BlockPosition(x, y, z);
+            this.blockPosition = new Vector3i(x, y, z);
         }
         for (int i = 0; i < 4; i++) {
             this.textLines[i] = readString(384);
@@ -82,7 +82,7 @@ public class WrapperPlayClientUpdateSign extends PacketWrapper<WrapperPlayClient
      *
      * @return Sign position
      */
-    public BlockPosition getBlockPosition() {
+    public Vector3i getBlockPosition() {
         return blockPosition;
     }
 
@@ -91,7 +91,7 @@ public class WrapperPlayClientUpdateSign extends PacketWrapper<WrapperPlayClient
      *
      * @param blockPosition Sign position
      */
-    public void setBlockPosition(BlockPosition blockPosition) {
+    public void setBlockPosition(Vector3i blockPosition) {
         this.blockPosition = blockPosition;
     }
 

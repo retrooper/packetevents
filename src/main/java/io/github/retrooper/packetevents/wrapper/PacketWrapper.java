@@ -26,7 +26,7 @@ import io.github.retrooper.packetevents.protocol.data.nbt.NBTCompound;
 import io.github.retrooper.packetevents.protocol.data.nbt.NBTEnd;
 import io.github.retrooper.packetevents.protocol.data.nbt.serializer.DefaultNBTSerializer;
 import io.github.retrooper.packetevents.protocol.data.player.ClientVersion;
-import io.github.retrooper.packetevents.protocol.data.world.BlockPosition;
+import io.github.retrooper.packetevents.utils.Vector3i;
 import io.github.retrooper.packetevents.protocol.packettype.PacketTypeCommon;
 import io.github.retrooper.packetevents.utils.MinecraftReflectionUtil;
 import io.github.retrooper.packetevents.utils.StringUtil;
@@ -370,7 +370,7 @@ public class PacketWrapper<T extends PacketWrapper> {
         writeLong(uuid.getLeastSignificantBits());
     }
 
-    public BlockPosition readBlockPosition() {
+    public Vector3i readBlockPosition() {
         long val = readLong();
         int x = (int) (val >> 38);
 
@@ -378,15 +378,15 @@ public class PacketWrapper<T extends PacketWrapper> {
         if (serverVersion.isNewerThanOrEquals(ServerVersion.v_1_14)) {
             int y = (int) (val & 0xFFF);
             int z = (int) (val << 26 >> 38);
-            return new BlockPosition(x, y, z);
+            return new Vector3i(x, y, z);
         }
         // 1.13 and below store X Y Z
         int y = (int) ((val >> 26) & 0xFFF);
         int z = (int) (val << 38 >> 38);
-        return new BlockPosition(x, y, z);
+        return new Vector3i(x, y, z);
     }
 
-    public void writeBlockPosition(BlockPosition pos) {
+    public void writeBlockPosition(Vector3i pos) {
         // 1.14 method for this is storing X Z Y
         if (serverVersion.isNewerThanOrEquals(ServerVersion.v_1_14)) {
             long val = ((long) (pos.getX() & 0x3FFFFFF) << 38) | ((long) (pos.getZ() & 0x3FFFFFF) << 12) | (pos.getY() & 0xFFF);

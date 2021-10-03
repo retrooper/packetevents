@@ -19,9 +19,9 @@
 package io.github.retrooper.packetevents.wrapper.play.server;
 
 import io.github.retrooper.packetevents.event.impl.PacketSendEvent;
-import io.github.retrooper.packetevents.protocol.data.world.BlockPosition;
+import io.github.retrooper.packetevents.utils.Vector3i;
 import io.github.retrooper.packetevents.protocol.packettype.PacketType;
-import io.github.retrooper.packetevents.utils.vector.Vector3f;
+import io.github.retrooper.packetevents.utils.Vector3f;
 import io.github.retrooper.packetevents.wrapper.PacketWrapper;
 
 import java.util.ArrayList;
@@ -31,13 +31,13 @@ public class WrapperPlayServerExplosion extends PacketWrapper<WrapperPlayServerE
     private Vector3f position;
     private float strength;
     //Chunk posiitons?
-    private List<BlockPosition> records;
+    private List<Vector3i> records;
     private Vector3f playerMotion;
     public WrapperPlayServerExplosion(PacketSendEvent event) {
         super(event);
     }
 
-    public WrapperPlayServerExplosion(Vector3f position, float strength, List<BlockPosition> records, Vector3f playerMotion) {
+    public WrapperPlayServerExplosion(Vector3f position, float strength, List<Vector3i> records, Vector3f playerMotion) {
         super(PacketType.Play.Server.EXPLOSION);
         this.position = position;
         this.strength = strength;
@@ -58,7 +58,7 @@ public class WrapperPlayServerExplosion extends PacketWrapper<WrapperPlayServerE
             int chunkPosX = readByte() + (int)position.x;
             int chunkPosY = readByte() + (int)position.y;
             int chunkPosZ = readByte() + (int)position.z;
-            records.add(new BlockPosition(chunkPosX, chunkPosY, chunkPosZ));
+            records.add(new Vector3i(chunkPosX, chunkPosY, chunkPosZ));
         }
 
         float motX = readFloat();
@@ -82,7 +82,7 @@ public class WrapperPlayServerExplosion extends PacketWrapper<WrapperPlayServerE
         writeFloat(position.z);
        writeFloat(strength);
        writeInt(records.size());
-        for (BlockPosition record : records) {
+        for (Vector3i record : records) {
             writeByte(record.x - (int)position.x);
             writeByte(record.y - (int)position.y);
             writeByte(record.z - (int)position.z);
@@ -109,11 +109,11 @@ public class WrapperPlayServerExplosion extends PacketWrapper<WrapperPlayServerE
         this.strength = strength;
     }
 
-    public List<BlockPosition> getRecords() {
+    public List<Vector3i> getRecords() {
         return records;
     }
 
-    public void setRecords(List<BlockPosition> records) {
+    public void setRecords(List<Vector3i> records) {
         this.records = records;
     }
 

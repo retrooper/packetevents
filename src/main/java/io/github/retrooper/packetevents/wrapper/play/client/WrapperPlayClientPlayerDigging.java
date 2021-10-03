@@ -20,14 +20,14 @@ package io.github.retrooper.packetevents.wrapper.play.client;
 
 import io.github.retrooper.packetevents.event.impl.PacketReceiveEvent;
 import io.github.retrooper.packetevents.manager.server.ServerVersion;
-import io.github.retrooper.packetevents.protocol.data.world.BlockPosition;
+import io.github.retrooper.packetevents.utils.Vector3i;
 import io.github.retrooper.packetevents.protocol.data.world.Direction;
 import io.github.retrooper.packetevents.protocol.packettype.PacketType;
 import io.github.retrooper.packetevents.wrapper.PacketWrapper;
 
 public class WrapperPlayClientPlayerDigging extends PacketWrapper<WrapperPlayClientPlayerDigging> {
     private Action action;
-    private BlockPosition blockPosition;
+    private Vector3i blockPosition;
     private Direction direction;
 
     public enum Action {
@@ -46,7 +46,7 @@ public class WrapperPlayClientPlayerDigging extends PacketWrapper<WrapperPlayCli
         super(event);
     }
 
-    public WrapperPlayClientPlayerDigging(Action action, BlockPosition blockPosition, Direction direction) {
+    public WrapperPlayClientPlayerDigging(Action action, Vector3i blockPosition, Direction direction) {
         super(PacketType.Play.Client.PLAYER_DIGGING);
         this.action = action;
         this.blockPosition = blockPosition;
@@ -64,7 +64,7 @@ public class WrapperPlayClientPlayerDigging extends PacketWrapper<WrapperPlayCli
             int x = readInt();
             int y = readUnsignedByte();
             int z = readInt();
-            blockPosition = new BlockPosition(x, y, z);
+            blockPosition = new Vector3i(x, y, z);
         }
         byte face = readByte();
         direction = Direction.getDirectionByFace(face);
@@ -100,11 +100,11 @@ public class WrapperPlayClientPlayerDigging extends PacketWrapper<WrapperPlayCli
         this.action = action;
     }
 
-    public BlockPosition getBlockPosition() {
+    public Vector3i getBlockPosition() {
         return blockPosition;
     }
 
-    public void setBlockPosition(BlockPosition blockPosition) {
+    public void setBlockPosition(Vector3i blockPosition) {
         this.blockPosition = blockPosition;
     }
 

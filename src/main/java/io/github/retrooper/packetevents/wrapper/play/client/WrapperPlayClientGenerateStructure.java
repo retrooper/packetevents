@@ -20,14 +20,14 @@ package io.github.retrooper.packetevents.wrapper.play.client;
 
 import io.github.retrooper.packetevents.event.impl.PacketReceiveEvent;
 import io.github.retrooper.packetevents.protocol.packettype.PacketType;
-import io.github.retrooper.packetevents.protocol.data.world.BlockPosition;
+import io.github.retrooper.packetevents.utils.Vector3i;
 import io.github.retrooper.packetevents.wrapper.PacketWrapper;
 
 /**
  * This packet is sent when Generate is pressed on the Jigsaw Block interface.
  */
 public class WrapperPlayClientGenerateStructure extends PacketWrapper<WrapperPlayClientGenerateStructure> {
-    private BlockPosition blockPosition;
+    private Vector3i blockPosition;
     private int levels;
     private boolean keepJigsaws;
 
@@ -35,7 +35,7 @@ public class WrapperPlayClientGenerateStructure extends PacketWrapper<WrapperPla
         super(event);
     }
 
-    public WrapperPlayClientGenerateStructure(BlockPosition blockPosition, int levels, boolean keepJigsaws) {
+    public WrapperPlayClientGenerateStructure(Vector3i blockPosition, int levels, boolean keepJigsaws) {
         super(PacketType.Play.Client.GENERATE_STRUCTURE);
         this.blockPosition = blockPosition;
         this.levels = levels;
@@ -44,7 +44,7 @@ public class WrapperPlayClientGenerateStructure extends PacketWrapper<WrapperPla
 
     @Override
     public void readData() {
-        this.blockPosition = new BlockPosition(readLong());
+        this.blockPosition = new Vector3i(readLong());
         this.levels = readVarInt();
         this.keepJigsaws = readBoolean();
     }
@@ -68,7 +68,7 @@ public class WrapperPlayClientGenerateStructure extends PacketWrapper<WrapperPla
      *
      * @return Block location
      */
-    public BlockPosition getBlockPosition() {
+    public Vector3i getBlockPosition() {
         return blockPosition;
     }
 
@@ -77,7 +77,7 @@ public class WrapperPlayClientGenerateStructure extends PacketWrapper<WrapperPla
      *
      * @param blockPosition Block location
      */
-    public void setBlockPosition(BlockPosition blockPosition) {
+    public void setBlockPosition(Vector3i blockPosition) {
         this.blockPosition = blockPosition;
     }
 
