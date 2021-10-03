@@ -152,7 +152,7 @@ public class WrapperPlayServerPlayerInfo extends PacketWrapper<WrapperPlayServer
             for (PlayerData data : playerDataList) {
                 switch (action) {
                     case ADD_PLAYER: {
-                        writeString(data.gameProfile.getName());
+                        writeString(data.gameProfile.getName(), 16);
                         writeVarInt(data.gameProfile.getProperties().size());
                         for (WrappedProperty property : data.gameProfile.getProperties().values()) {
                             writeString(property.getName());
