@@ -45,6 +45,8 @@ public interface WrappedPropertyMap {
     //Multiset<String> keys()
     Set<String> keySet();
 
+    Collection<WrappedProperty> values();
+
     boolean put(String key, WrappedProperty value);
 
     boolean putAll(String key, Iterable<? extends WrappedProperty> values);

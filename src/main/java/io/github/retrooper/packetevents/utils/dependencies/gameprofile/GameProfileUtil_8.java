@@ -20,7 +20,6 @@ package io.github.retrooper.packetevents.utils.dependencies.gameprofile;
 
 import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.properties.Property;
-import io.github.retrooper.packetevents.protocol.data.player.Skin;
 import io.github.retrooper.packetevents.protocol.data.player.WrappedGameProfile;
 import io.github.retrooper.packetevents.utils.MinecraftReflectionUtil;
 import io.github.retrooper.packetevents.utils.dependencies.google.WrappedPropertyMap;

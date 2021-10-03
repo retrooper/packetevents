@@ -26,7 +26,6 @@ package io.github.retrooper.packetevents.protocol.data.player;
  * @since 1.8
  */
 public enum Hand {
-    //TODO Confirm if this is correct order
     LEFT,
 
     RIGHT;

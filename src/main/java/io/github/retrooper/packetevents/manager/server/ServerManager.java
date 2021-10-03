@@ -40,7 +40,7 @@ import java.util.ConcurrentModificationException;
 import java.util.List;
 import java.util.Map;
 
-public final class ServerManager {
+public class ServerManager {
     private static final ServerVersion VERSION;
     //Initialized in PacketEvents#load
     public static Map<Integer, Entity> ENTITY_ID_CACHE;

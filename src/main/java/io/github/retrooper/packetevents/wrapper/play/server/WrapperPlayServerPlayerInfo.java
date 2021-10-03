@@ -18,20 +18,26 @@
 
 package io.github.retrooper.packetevents.wrapper.play.server;
 
+import com.mojang.authlib.properties.Property;
 import io.github.retrooper.packetevents.event.impl.PacketSendEvent;
 import io.github.retrooper.packetevents.manager.server.ServerVersion;
 import io.github.retrooper.packetevents.protocol.data.player.GameMode;
 import io.github.retrooper.packetevents.protocol.data.player.WrappedGameProfile;
 import io.github.retrooper.packetevents.protocol.packettype.PacketType;
+import io.github.retrooper.packetevents.utils.dependencies.gameprofile.WrappedProperty;
 import io.github.retrooper.packetevents.wrapper.PacketWrapper;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 public class WrapperPlayServerPlayerInfo extends PacketWrapper<WrapperPlayServerPlayerInfo> {
     @Nullable
     private Action action;
+
+    private UUID uuid;
 
     private List<PlayerData> playerDataList;
 
@@ -50,19 +56,11 @@ public class WrapperPlayServerPlayerInfo extends PacketWrapper<WrapperPlayServer
         super(event);
     }
 
-    public WrapperPlayServerPlayerInfo() {
+    public WrapperPlayServerPlayerInfo(@NotNull Action action, UUID uuid, List<PlayerData> playerDataList) {
         super(PacketType.Play.Server.PLAYER_INFO);
-        net.minecraft.server.v1_7_R4.PacketPlayOutPlayerInfo pi0;
-        net.minecraft.server.v1_8_R3.PacketPlayOutPlayerInfo pi1;
-        net.minecraft.server.v1_9_R1.PacketPlayOutPlayerInfo pi2;
-        net.minecraft.server.v1_10_R1.PacketPlayOutPlayerInfo pi3;
-        net.minecraft.server.v1_11_R1.PacketPlayOutPlayerInfo pi4;
-        net.minecraft.server.v1_12_R1.PacketPlayOutPlayerInfo pi5;
-        net.minecraft.server.v1_13_R2.PacketPlayOutPlayerInfo pi6;
-        net.minecraft.server.v1_14_R1.PacketPlayOutPlayerInfo pi7;
-        net.minecraft.server.v1_15_R1.PacketPlayOutPlayerInfo pi8;
-        net.minecraft.server.v1_16_R2.PacketPlayOutPlayerInfo pi9;
-        net.minecraft.network.protocol.game.PacketPlayOutPlayerInfo pi10;
+        this.action = action;
+        this.uuid = uuid;
+        this.playerDataList = playerDataList;
     }
 
     @Override
@@ -78,65 +76,187 @@ public class WrapperPlayServerPlayerInfo extends PacketWrapper<WrapperPlayServer
             if (online) {
                 //We really can't know...
                 action = null;
-            }
-            else {
+            } else {
                 action = Action.REMOVE_PLAYER;
             }
-        }
-        else {
+        } else {
             action = Action.VALUES[readVarInt()];
             int playerDataCount = readVarInt();
+            uuid = readUUID();
             playerDataList = new ArrayList<>(playerDataCount);
             for (int i = 0; i < playerDataCount; i++) {
+                PlayerData data = null;
+                switch (action) {
+                    case ADD_PLAYER: {
+                        String playerUsername = readString(16);
+                        WrappedGameProfile gameProfile = new WrappedGameProfile(uuid, playerUsername);
+                        int propertyCount = readVarInt();
+                        for (int j = 0; j < propertyCount; j++) {
+                            String propertyName = readString();
+                            String propertyValue = readString();
+                            String propertySignature = readBoolean() ? readString() : null;
+                            WrappedProperty property = new WrappedProperty(propertyName, propertyValue, propertySignature);
+                            gameProfile.getProperties().put(propertyName, property);
+                        }
+                        GameMode gameMode = GameMode.VALUES[readVarInt()];
+                        int ping = readVarInt();
+                        String displayName = readBoolean() ? readString() : null;
+                        data = new PlayerData(displayName, gameProfile, gameMode, ping);
+                        break;
+                    }
+                    case UPDATE_GAME_MODE: {
+                        GameMode gameMode = GameMode.VALUES[readVarInt()];
+                        data = new PlayerData(null, null, gameMode, -1);
+                        break;
+                    }
+                    case UPDATE_LATENCY: {
+                        int ping = readVarInt();
+                        data = new PlayerData(null, null, null, ping);
+                        break;
+                    }
+                    case UPDATE_DISPLAY_NAME:
+                        String displayName = readBoolean() ? readString() : null;
+                        data = new PlayerData(displayName, null, null, -1);
+                        break;
 
+                    case REMOVE_PLAYER:
+                        data = new PlayerData(null, null, null, -1);
+                        break;
+                }
+                if (data != null) {
+                    playerDataList.add(data);
+                }
             }
         }
     }
 
     @Override
     public void readData(WrapperPlayServerPlayerInfo wrapper) {
-
+        action = wrapper.action;
+        uuid = wrapper.uuid;
+        playerDataList = wrapper.playerDataList;
     }
 
     @Override
     public void writeData() {
+        if (serverVersion == ServerVersion.v_1_7_10) {
+            //Only one player data can be sent
+            PlayerData data = playerDataList.get(0);
+            writeString(data.displayName);
+            writeBoolean(action != Action.REMOVE_PLAYER);
+            writeShort(data.ping);
+        } else {
+            writeVarInt(action.ordinal());
+            writeVarInt(playerDataList.size());
+            writeUUID(uuid);
+            for (PlayerData data : playerDataList) {
+                switch (action) {
+                    case ADD_PLAYER: {
+                        writeString(data.gameProfile.getName());
+                        writeVarInt(data.gameProfile.getProperties().size());
+                        for (WrappedProperty property : data.gameProfile.getProperties().values()) {
+                            writeString(property.getName());
+                            writeString(property.getValue());
+                            boolean hasSignature = property.hasSignature();
+                            writeBoolean(hasSignature);
+                            if (hasSignature) {
+                                writeString(property.getSignature());
+                            }
+                        }
+                        writeVarInt(data.gameMode.ordinal());
+                        writeVarInt(data.ping);
+                        if (data.displayName != null) {
+                            writeBoolean(true);
+                            writeString(data.displayName);
+                        }
+                        else {
+                            writeBoolean(false);
+                        }
+                        break;
+                    }
+                    case UPDATE_GAME_MODE: {
+                        writeVarInt(data.gameMode.ordinal());
+                        break;
+                    }
+                    case UPDATE_LATENCY: {
+                        writeVarInt(data.ping);
+                        break;
+                    }
+                    case UPDATE_DISPLAY_NAME:
+                        if (data.displayName != null) {
+                            writeBoolean(true);
+                            writeString(data.displayName);
+                        }
+                        else {
+                            writeBoolean(false);
+                        }
+                        break;
+
+                    case REMOVE_PLAYER:
+                        break;
+                }
+            }
+        }
 
     }
 
+    @Nullable
+    public Action getAction() {
+        return action;
+    }
+
+    public void setAction(@NotNull Action action) {
+        this.action = action;
+    }
+
+    public UUID getUUID() {
+        return uuid;
+    }
+
+    public void setUUID(UUID uuid) {
+        this.uuid = uuid;
+    }
+
+    public List<PlayerData> getPlayerDataList() {
+        return playerDataList;
+    }
+
+    public void setPlayerDataList(List<PlayerData> playerDataList) {
+        this.playerDataList = playerDataList;
+    }
 
     public static class PlayerData {
-        private String username;
+        @Nullable
+        private String displayName;
+        @Nullable
         private WrappedGameProfile gameProfile;
+        @Nullable
         private GameMode gameMode;
+
         private int ping;
 
-        public PlayerData(@Nullable String username, WrappedGameProfile gameProfile, GameMode gameMode, int ping) {
-            this.username = username;
+        public PlayerData(@Nullable String displayName, @Nullable WrappedGameProfile gameProfile, @Nullable GameMode gameMode, int ping) {
+            this.displayName = displayName;
             this.gameProfile = gameProfile;
             this.gameMode = gameMode;
             this.ping = ping;
         }
 
-        public PlayerData(@Nullable String username, WrappedGameProfile gameProfile, org.bukkit.GameMode gameMode, int ping) {
-            this.username = username;
-            this.gameProfile = gameProfile;
-            this.gameMode = GameMode.valueOf(gameMode.name());
-            this.ping = ping;
-        }
-
+        @Nullable
         public WrappedGameProfile getGameProfile() {
             return gameProfile;
         }
 
-        public void setGameProfile(WrappedGameProfile gameProfile) {
+        public void setGameProfile(@Nullable WrappedGameProfile gameProfile) {
             this.gameProfile = gameProfile;
         }
 
+        @Nullable
         public GameMode getGameMode() {
             return gameMode;
         }
 
-        public void setGameMode(GameMode gameMode) {
+        public void setGameMode(@Nullable GameMode gameMode) {
             this.gameMode = gameMode;
         }
 
@@ -149,12 +269,12 @@ public class WrapperPlayServerPlayerInfo extends PacketWrapper<WrapperPlayServer
         }
 
         @Nullable
-        public String getUsername() {
-            return username;
+        public String getDisplayName() {
+            return displayName;
         }
 
-        public void setUsername(@Nullable String username) {
-            this.username = username;
+        public void setDisplayName(@Nullable String displayName) {
+            this.displayName = displayName;
         }
     }
 }

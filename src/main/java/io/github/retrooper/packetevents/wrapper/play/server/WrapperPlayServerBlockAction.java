@@ -6,52 +6,52 @@ import io.github.retrooper.packetevents.protocol.data.world.BlockPosition;
 import io.github.retrooper.packetevents.wrapper.PacketWrapper;
 
 public class WrapperPlayServerBlockAction extends PacketWrapper<WrapperPlayServerBlockAction> {
-    private BlockPosition blockPos;
-    private int actionID, actionParam;
+    private BlockPosition blockPosition;
+    private int actionID, actionData;
     private int blockID;
 
     public WrapperPlayServerBlockAction(PacketSendEvent event) {
         super(event);
     }
 
-    public WrapperPlayServerBlockAction(BlockPosition blockPos, int actionID, int actionParam, int block) {
+    public WrapperPlayServerBlockAction(BlockPosition blockPosition, int actionID, int actionParam, int block) {
         super(PacketType.Play.Server.BLOCK_ACTION);
-        this.blockPos = blockPos;
+        this.blockPosition = blockPosition;
         this.actionID = actionID;
-        this.actionParam = actionParam;
+        this.actionData = actionParam;
         this.blockID = block;
     }
 
     @Override
     public void readData() {
-        this.blockPos = readBlockPosition();
+        this.blockPosition = readBlockPosition();
         this.actionID = readUnsignedByte();
-        this.actionParam = readUnsignedByte();
+        this.actionData = readUnsignedByte();
         this.blockID = readInt();
     }
 
     @Override
     public void writeData() {
-        writeBlockPosition(blockPos);
+        writeBlockPosition(blockPosition);
         writeByte(actionID);
-        writeByte(actionParam);
+        writeByte(actionData);
         writeVarInt(blockID);
     }
 
     @Override
     public void readData(WrapperPlayServerBlockAction wrapper) {
-        this.blockPos = wrapper.getBlockPos();
-        this.actionID = wrapper.getActionID();
-        this.actionParam = wrapper.getActionParam();
-        this.blockID = wrapper.getBlockID();
+        this.blockPosition = wrapper.blockPosition;
+        this.actionID = wrapper.actionID;
+        this.actionData = wrapper.actionData;
+        this.blockID = wrapper.blockID;
     }
 
-    public BlockPosition getBlockPos() {
-        return blockPos;
+    public BlockPosition getBlockPosition() {
+        return blockPosition;
     }
 
-    public void setBlockPos(BlockPosition blockPos) {
-        this.blockPos = blockPos;
+    public void setBlockPosition(BlockPosition blockPos) {
+        this.blockPosition = blockPos;
     }
 
     public int getActionID() {
@@ -62,12 +62,12 @@ public class WrapperPlayServerBlockAction extends PacketWrapper<WrapperPlayServe
         this.actionID = actionID;
     }
 
-    public int getActionParam() {
-        return actionParam;
+    public int getActionData() {
+        return actionData;
     }
 
-    public void setActionParam(int actionParam) {
-        this.actionParam = actionParam;
+    public void setActionData(int actionData) {
+        this.actionData = actionData;
     }
 
     public int getBlockID() {

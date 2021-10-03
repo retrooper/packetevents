@@ -19,6 +19,7 @@
 package io.github.retrooper.packetevents.utils.dependencies.gameprofile;
 
 import net.minecraft.util.org.apache.commons.codec.binary.Base64;
+import org.jetbrains.annotations.Nullable;
 
 import java.security.*;
 
@@ -27,11 +28,11 @@ public class WrappedProperty {
     private final String value;
     private final String signature;
 
-    public WrappedProperty(String value, String name) {
-        this(value, name, (String)null);
+    public WrappedProperty(String name, String value) {
+        this(value, name, null);
     }
 
-    public WrappedProperty(String name, String value, String signature) {
+    public WrappedProperty(String name, String value, @Nullable String signature) {
         this.name = name;
         this.value = value;
         this.signature = signature;

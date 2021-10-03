@@ -75,11 +75,10 @@ public class WrappedPropertyMapLegacy extends ForwardingMultimap<String, Wrapped
                         entry = (Map.Entry) var6.next();
                     } while (!(entry.getValue() instanceof JsonArray));
 
-                    Iterator var8 = ((JsonArray) entry.getValue()).iterator();
-
-                    while (var8.hasNext()) {
-                        JsonElement element = (JsonElement) var8.next();
-                        result.put((String) entry.getKey(), new WrappedProperty((String) entry.getKey(), element.getAsString()));
+                    for (JsonElement element : (JsonArray) entry.getValue()) {
+                        String name = (String) entry.getKey();
+                        String value = element.getAsString();
+                        result.put(name, new WrappedProperty(name, value));
                     }
                 }
             } else if (json instanceof JsonArray) {

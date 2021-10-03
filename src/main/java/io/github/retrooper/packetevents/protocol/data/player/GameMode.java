@@ -17,7 +17,6 @@
  */
 
 package io.github.retrooper.packetevents.protocol.data.player;
-//TODO Remove this enum, migrate to Bukkit's GameMode enum everywhere.
 
 /**
  * Representation of a player's game mode.
@@ -29,5 +28,7 @@ public enum GameMode {
     SURVIVAL,
     CREATIVE,
     ADVENTURE,
-    SPECTATOR
+    SPECTATOR;
+
+    public static final GameMode[] VALUES = values();
 }

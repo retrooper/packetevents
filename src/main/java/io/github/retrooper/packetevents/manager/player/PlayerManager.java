@@ -23,7 +23,6 @@ import io.github.retrooper.packetevents.manager.server.ServerManager;
 import io.github.retrooper.packetevents.manager.server.ServerVersion;
 import io.github.retrooper.packetevents.protocol.ConnectionState;
 import io.github.retrooper.packetevents.protocol.data.player.ClientVersion;
-import io.github.retrooper.packetevents.protocol.data.player.Skin;
 import io.github.retrooper.packetevents.protocol.data.player.WrappedGameProfile;
 import io.github.retrooper.packetevents.utils.GeyserUtil;
 import io.github.retrooper.packetevents.utils.MinecraftReflectionUtil;
