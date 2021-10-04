@@ -299,7 +299,6 @@ public class WrapperPlayServerEntityMetadata extends PacketWrapper<WrapperPlaySe
         }
 
         private int index;
-        //TODO Make enum for type
         private Type type;
         private Object value;
 

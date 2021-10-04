@@ -56,10 +56,17 @@ public class PlayerManager {
     }
 
     /**
-     * Use the ping PacketEvents calculates for the player. (Updates every incoming Keep Alive packet)
+     * Gets the player's estimated ping in milliseconds.
+     * In Vanilla this value represents the average of the response time
+     * to the last four application layer ping packets sent.
+     * This value does not represent the network round trip time and
+     * as such may have less granularity and be impacted by other sources.
+     * For these reasons it should not be used for anti-cheat purposes.
+     * Its recommended use is only as a qualitative indicator of connection quality
+     * (Vanilla uses it for this purpose in the tab list).
      *
      * @param player Target player.
-     * @return Non-smoothed ping.
+     * @return player ping
      */
     public int getPing(Player player) {
         if (MinecraftReflectionUtil.V_1_17_OR_HIGHER) {

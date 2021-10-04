@@ -36,7 +36,6 @@ public class WrapperPlayClientInteractEntity extends PacketWrapper<WrapperPlayCl
     private int entityID;
     private Type type;
     private Optional<Vector3f> target;
-    //TODO Make hand not optional?
     private Hand hand;
     private Optional<Boolean> sneaking;
 

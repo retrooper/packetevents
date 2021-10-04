@@ -330,12 +330,15 @@ public final class MinecraftReflectionUtil {
     }
 
     //TODO Inspect again
+    @Deprecated
     public static int getPlayerPing(Player player) {
-        Object entityPlayer = getEntityPlayer(player);
-        try {
-            return ENTITY_PLAYER_PING_FIELD.getInt(entityPlayer);
-        } catch (IllegalAccessException e) {
-            e.printStackTrace();
+        if (ENTITY_PLAYER_PING_FIELD != null) {
+            Object entityPlayer = getEntityPlayer(player);
+            try {
+                return ENTITY_PLAYER_PING_FIELD.getInt(entityPlayer);
+            } catch (IllegalAccessException e) {
+                e.printStackTrace();
+            }
         }
         return -1;
     }
