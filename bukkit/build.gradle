@@ -19,6 +19,7 @@
 plugins {
     id 'java'
     id 'maven-publish'
+    id 'com.github.johnrengelman.shadow' version '7.0.0'
 }
 
 repositories {
@@ -64,7 +65,7 @@ repositories {
 
 dependencies {
     implementation project(':api')
-    implementation 'org.jetbrains:annotations:22.0.0'
+    compileOnly 'org.jetbrains:annotations:22.0.0'
 
     compileOnly 'org.spigotmc:spigot-api:1.17-R0.1-SNAPSHOT'
     compileOnly 'com.destroystokyo.paper:paper-api:1.16.5-R0.1-SNAPSHOT'
