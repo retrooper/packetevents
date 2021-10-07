@@ -36,7 +36,7 @@ repositories {
 }
 
 dependencies {
-    implementation 'org.jetbrains:annotations:22.0.0'
+    compileOnly 'org.jetbrains:annotations:22.0.0'
 }
 
 group = 'io.github.retrooper'
