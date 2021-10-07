@@ -16,23 +16,26 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package io.github.retrooper.packetevents.updatechecker;
+package com.retrooper.packetevents.netty.buffer;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.net.URL;
-import java.net.URLConnection;
+public interface ByteBufManagerAbstract {
+    ByteBufAbstract wrappedBuffer(byte[] bytes);
 
-public interface LowLevelUpdateChecker {
-    String getLatestRelease();
+    ByteBufAbstract copiedBuffer(byte[] bytes);
 
-    default String getLatestReleaseJson() throws IOException {
-        URLConnection connection = new URL("https://api.github.com/repos/retrooper/packetevents/releases/latest").openConnection();
-        connection.addRequestProperty("User-Agent", "Mozilla/4.0");
-        BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
-        String line = reader.readLine();
-        reader.close();
-        return line;
-    }
+    ByteBufAbstract buffer();
+
+    ByteBufAbstract buffer(int initialCapacity);
+
+    ByteBufAbstract buffer(int initialCapacity, int maxCapacity);
+
+    ByteBufAbstract directBuffer();
+
+    ByteBufAbstract directBuffer(int initialCapacity);
+
+    ByteBufAbstract directBuffer(int initialCapacity, int maxCapacity);
+
+    ByteBufAbstract compositeBuffer();
+
+    ByteBufAbstract compositeBuffer(int maxNumComponents);
 }

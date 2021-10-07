@@ -16,14 +16,11 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package io.github.retrooper.packetevents.updatechecker;
+package com.retrooper.packetevents.util.updatechecker;
 
-import io.github.retrooper.packetevents.PacketEvents;
-import com.retrooper.packetevents.manager.server.ServerManager;
+import com.retrooper.packetevents.PacketEvents;
 import com.retrooper.packetevents.manager.server.ServerVersion;
 import com.retrooper.packetevents.util.PEVersion;
-import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 
 /**
  * PacketEvents update checker.
@@ -34,12 +31,8 @@ import org.bukkit.ChatColor;
 public class UpdateChecker {
     private final LowLevelUpdateChecker lowLevelUpdateChecker;
 
-    public UpdateChecker() {
-        if (ServerManager.getVersion() == ServerVersion.v_1_7_10) {
-            lowLevelUpdateChecker = new LowLevelUpdateCheckerLegacy();
-        } else {
-            lowLevelUpdateChecker = new LowLevelUpdateCheckerModern();
-        }
+    public UpdateChecker(LowLevelUpdateChecker lowLevelUpdateChecker) {
+        this.lowLevelUpdateChecker = lowLevelUpdateChecker;
     }
 
     public String checkLatestReleasedVersion() {
@@ -78,7 +71,7 @@ public class UpdateChecker {
      * @param message Message
      */
     private void inform(String message) {
-        Bukkit.getLogger().info("[packetevents] " + message);
+        PacketEvents.get().getLogger().info("[packetevents] " + message);
     }
 
     /**
@@ -87,7 +80,8 @@ public class UpdateChecker {
      * @param message Message
      */
     private void report(String message) {
-        Bukkit.getLogger().warning(ChatColor.DARK_RED + "[packetevents] " + message);
+        //TODO Maybe find some universal way to make it red
+        PacketEvents.get().getLogger().warning("[packetevents] " + message);
     }
 
     /**

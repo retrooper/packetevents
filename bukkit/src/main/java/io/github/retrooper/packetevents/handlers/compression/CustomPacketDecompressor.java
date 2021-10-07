@@ -18,11 +18,11 @@
 
 package io.github.retrooper.packetevents.handlers.compression;
 
-import com.retrooper.packetevents.util.MinecraftReflectionUtil;
-import com.retrooper.packetevents.util.netty.buffer.ByteBufAbstract;
-import com.retrooper.packetevents.util.netty.buffer.ByteBufUtil;
-import com.retrooper.packetevents.util.netty.channel.ChannelHandlerContextAbstract;
+import com.retrooper.packetevents.netty.buffer.ByteBufAbstract;
+import com.retrooper.packetevents.netty.channel.ChannelHandlerContextAbstract;
+import io.github.retrooper.packetevents.utils.MinecraftReflectionUtil;
 import com.retrooper.packetevents.wrapper.PacketWrapper;
+import io.github.retrooper.packetevents.utils.netty.buffer.ByteBufUtil;
 
 import java.util.zip.DataFormatException;
 import java.util.zip.Inflater;
@@ -43,7 +43,7 @@ public class CustomPacketDecompressor {
             return ctx.alloc().buffer().writeBytes(byteBuf);
         }
         if (byteBuf.readableBytes() != 0) {
-            PacketWrapper wrapper = PacketWrapper.createUniversalPacketWrapper(byteBuf);
+            PacketWrapper<?> wrapper = PacketWrapper.createUniversalPacketWrapper(byteBuf);
             int dataLength = wrapper.readVarInt();
             if (dataLength == 0) {
                 return byteBuf.readBytes(byteBuf.readableBytes());

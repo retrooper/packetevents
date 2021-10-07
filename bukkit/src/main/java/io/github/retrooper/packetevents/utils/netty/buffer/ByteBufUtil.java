@@ -18,7 +18,18 @@
 
 package io.github.retrooper.packetevents.utils.netty.buffer;
 
+import com.retrooper.packetevents.netty.buffer.ByteBufAbstract;
+import io.github.retrooper.packetevents.utils.MinecraftReflectionUtil;
+
 public final class ByteBufUtil {
+    public static ByteBufAbstract wrappedBuffer(byte[] bytes) {
+        if (!MinecraftReflectionUtil.USE_MODERN_NETTY_PACKAGE) {
+            return ByteBufUtilLegacy.wrappedBuffer(bytes);
+        } else {
+            return ByteBufUtilModern.wrappedBuffer(bytes);
+        }
+    }
+
     public static ByteBufAbstract copiedBuffer(byte[] bytes) {
         if (!MinecraftReflectionUtil.USE_MODERN_NETTY_PACKAGE) {
             return ByteBufUtilLegacy.copiedBuffer(bytes);

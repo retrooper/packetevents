@@ -18,6 +18,7 @@
 
 package io.github.retrooper.packetevents.utils.netty.buffer;
 
+import com.retrooper.packetevents.netty.buffer.ByteBufAbstract;
 import net.minecraft.util.io.netty.buffer.ByteBuf;
 
 import java.nio.ByteBuffer;
@@ -42,7 +43,7 @@ public class ByteBufLegacy implements ByteBufAbstract {
 
     @Override
     public ByteBufAbstract capacity(int capacity) {
-        return new ByteBufModern(byteBuf.capacity(capacity));
+        return new ByteBufLegacy(byteBuf.capacity(capacity));
     }
 
     @Override

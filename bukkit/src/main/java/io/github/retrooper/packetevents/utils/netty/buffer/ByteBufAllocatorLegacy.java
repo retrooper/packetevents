@@ -18,6 +18,8 @@
 
 package io.github.retrooper.packetevents.utils.netty.buffer;
 
+import com.retrooper.packetevents.netty.buffer.ByteBufAbstract;
+import com.retrooper.packetevents.netty.buffer.ByteBufAllocatorAbstract;
 import net.minecraft.util.io.netty.buffer.ByteBufAllocator;
 
 public class ByteBufAllocatorLegacy implements ByteBufAllocatorAbstract {
@@ -34,92 +36,92 @@ public class ByteBufAllocatorLegacy implements ByteBufAllocatorAbstract {
 
     @Override
     public ByteBufAbstract buffer() {
-        return ByteBufAbstract.generate(byteBufAllocator.buffer());
+        return new ByteBufLegacy(byteBufAllocator.buffer());
     }
 
     @Override
     public ByteBufAbstract buffer(int initialCapacity) {
-        return ByteBufAbstract.generate(byteBufAllocator.buffer());
+        return new ByteBufLegacy(byteBufAllocator.buffer(initialCapacity));
     }
 
     @Override
     public ByteBufAbstract buffer(int initialCapacity, int maxCapacity) {
-        return ByteBufAbstract.generate(byteBufAllocator.buffer(initialCapacity, maxCapacity));
+        return new ByteBufLegacy(byteBufAllocator.buffer(initialCapacity, maxCapacity));
     }
 
     @Override
     public ByteBufAbstract ioBuffer() {
-        return ByteBufAbstract.generate(byteBufAllocator.ioBuffer());
+        return new ByteBufLegacy(byteBufAllocator.ioBuffer());
     }
 
     @Override
     public ByteBufAbstract ioBuffer(int initialCapacity) {
-        return ByteBufAbstract.generate(byteBufAllocator.ioBuffer(initialCapacity));
+        return new ByteBufLegacy(byteBufAllocator.ioBuffer(initialCapacity));
     }
 
     @Override
     public ByteBufAbstract ioBuffer(int initialCapacity, int maxCapacity) {
-        return ByteBufAbstract.generate(byteBufAllocator.ioBuffer(initialCapacity, maxCapacity));
+        return new ByteBufLegacy(byteBufAllocator.ioBuffer(initialCapacity, maxCapacity));
     }
 
     @Override
     public ByteBufAbstract heapBuffer() {
-        return ByteBufAbstract.generate(byteBufAllocator.heapBuffer());
+        return new ByteBufLegacy(byteBufAllocator.heapBuffer());
     }
 
     @Override
     public ByteBufAbstract heapBuffer(int initialCapacity) {
-        return ByteBufAbstract.generate(byteBufAllocator.heapBuffer(initialCapacity));
+        return new ByteBufLegacy(byteBufAllocator.heapBuffer(initialCapacity));
     }
 
     @Override
     public ByteBufAbstract heapBuffer(int initialCapacity, int maxCapacity) {
-        return ByteBufAbstract.generate(byteBufAllocator.heapBuffer(initialCapacity, maxCapacity));
+        return new ByteBufLegacy(byteBufAllocator.buffer(initialCapacity, maxCapacity));
     }
 
     @Override
     public ByteBufAbstract directBuffer() {
-        return ByteBufAbstract.generate(byteBufAllocator.directBuffer());
+        return new ByteBufLegacy(byteBufAllocator.directBuffer());
     }
 
     @Override
     public ByteBufAbstract directBuffer(int initialCapacity) {
-        return ByteBufAbstract.generate(byteBufAllocator.directBuffer(initialCapacity));
+        return new ByteBufLegacy(byteBufAllocator.directBuffer(initialCapacity));
     }
 
     @Override
     public ByteBufAbstract directBuffer(int initialCapacity, int maxCapacity) {
-        return ByteBufAbstract.generate(byteBufAllocator.directBuffer(initialCapacity, maxCapacity));
+        return new ByteBufLegacy(byteBufAllocator.directBuffer(initialCapacity, maxCapacity));
     }
 
     @Override
     public ByteBufAbstract compositeBuffer() {
-        return ByteBufAbstract.generate(byteBufAllocator.compositeBuffer());
+        return new ByteBufLegacy(byteBufAllocator.compositeBuffer());
     }
 
     @Override
     public ByteBufAbstract compositeBuffer(int maxNumComponents) {
-        return ByteBufAbstract.generate(byteBufAllocator.compositeBuffer(maxNumComponents));
+        return new ByteBufLegacy(byteBufAllocator.compositeBuffer(maxNumComponents));
     }
 
     @Override
     public ByteBufAbstract compositeHeapBuffer() {
-        return ByteBufAbstract.generate(byteBufAllocator.compositeHeapBuffer());
+        return new ByteBufLegacy(byteBufAllocator.compositeHeapBuffer());
     }
 
     @Override
     public ByteBufAbstract compositeHeapBuffer(int maxNumComponents) {
-        return ByteBufAbstract.generate(byteBufAllocator.compositeHeapBuffer(maxNumComponents));
+        return new ByteBufLegacy(byteBufAllocator.compositeHeapBuffer(maxNumComponents));
     }
 
     @Override
     public ByteBufAbstract compositeDirectBuffer() {
-        return ByteBufAbstract.generate(byteBufAllocator.compositeDirectBuffer());
+        return new ByteBufLegacy(byteBufAllocator.compositeDirectBuffer());
     }
 
     @Override
     public ByteBufAbstract compositeDirectBuffer(int maxNumComponents) {
-        return ByteBufAbstract.generate(byteBufAllocator.compositeDirectBuffer(maxNumComponents));
+        return new ByteBufLegacy(byteBufAllocator.compositeDirectBuffer(maxNumComponents));
     }
 
     @Override

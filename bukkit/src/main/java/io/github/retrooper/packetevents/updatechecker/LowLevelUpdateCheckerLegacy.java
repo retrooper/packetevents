@@ -18,6 +18,7 @@
 
 package io.github.retrooper.packetevents.updatechecker;
 
+import com.retrooper.packetevents.util.updatechecker.LowLevelUpdateChecker;
 import net.minecraft.util.com.google.gson.JsonObject;
 import net.minecraft.util.com.google.gson.JsonParser;
 

@@ -18,6 +18,7 @@
 
 package io.github.retrooper.packetevents.utils.netty.buffer;
 
+import com.retrooper.packetevents.netty.buffer.ByteBufAbstract;
 import io.netty.buffer.ByteBuf;
 
 import java.nio.ByteBuffer;

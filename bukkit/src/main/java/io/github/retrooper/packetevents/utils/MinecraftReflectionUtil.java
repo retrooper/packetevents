@@ -18,8 +18,7 @@
 
 package io.github.retrooper.packetevents.utils;
 
-import io.github.retrooper.packetevents.PacketEvents;
-import com.retrooper.packetevents.manager.server.ServerManager;
+import com.retrooper.packetevents.PacketEvents;
 import com.retrooper.packetevents.manager.server.ServerVersion;
 import com.retrooper.packetevents.util.reflection.Reflection;
 import com.retrooper.packetevents.util.reflection.ReflectionObject;
@@ -160,7 +159,7 @@ public final class MinecraftReflectionUtil {
     }
 
     public static void init() {
-        VERSION = ServerManager.getVersion();
+        VERSION = PacketEvents.get().getServerManager().getVersion();
         V_1_17_OR_HIGHER = VERSION.isNewerThanOrEquals(ServerVersion.v_1_17);
         V_1_12_OR_HIGHER = VERSION.isNewerThanOrEquals(ServerVersion.v_1_12);
         USE_MODERN_NETTY_PACKAGE = VERSION.isNewerThan(ServerVersion.v_1_7_10);
@@ -168,14 +167,14 @@ public final class MinecraftReflectionUtil {
             //Check if the selected netty location is valid
             getNettyClass("channel.Channel");
         } catch (Exception ex) {
-            PacketEvents.get().getPlugin().getLogger().severe("PacketEvents is searching for netty...");
+            PacketEvents.get().getLogger().severe("PacketEvents is searching for netty...");
             //Time to correct the netty location
             USE_MODERN_NETTY_PACKAGE = !USE_MODERN_NETTY_PACKAGE;
             try {
                 getNettyClass("channel.Channel");
             } catch (Exception ex2) {
                 //Failed again? Where is netty?
-                PacketEvents.get().getPlugin().getLogger().severe("PacketEvents failed to locate netty on your server.");
+                PacketEvents.get().getLogger().severe("PacketEvents failed to locate netty on your server.");
             }
         }
         initClasses();

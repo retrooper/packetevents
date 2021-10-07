@@ -18,7 +18,7 @@
 
 package io.github.retrooper.packetevents.utils.v1_7;
 
-import com.retrooper.packetevents.util.MinecraftReflectionUtil;
+import io.github.retrooper.packetevents.utils.MinecraftReflectionUtil;
 import org.bukkit.entity.Player;
 
 import java.lang.reflect.InvocationTargetException;

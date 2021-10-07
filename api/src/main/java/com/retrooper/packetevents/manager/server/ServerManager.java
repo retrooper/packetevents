@@ -34,22 +34,6 @@ public interface ServerManager {
     ServerVersion getVersion();
 
     /**
-     * Get recent TPS array from NMS.
-     *
-     * @return Get Recent TPS
-     */
-    double[] getRecentTPS();
-
-    /**
-     * Get the current TPS.
-     *
-     * @return Get Current TPS
-     */
-    default double getTPS() {
-        return getRecentTPS()[0];
-    }
-
-    /**
      * Get the operating system of the local machine
      *
      * @return Get Operating System
@@ -57,10 +41,6 @@ public interface ServerManager {
     default SystemOS getOS() {
         return SystemOS.getOS();
     }
-
-    boolean isBungeeCordEnabled();
-
-    BoundingBox getEntityBoundingBox(Object entity);
 
     void receivePacket(ChannelAbstract channel, ByteBufAbstract byteBuf);
 
