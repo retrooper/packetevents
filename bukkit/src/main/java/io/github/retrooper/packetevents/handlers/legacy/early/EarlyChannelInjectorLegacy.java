@@ -18,15 +18,16 @@
 
 package io.github.retrooper.packetevents.handlers.legacy.early;
 
-import io.github.retrooper.packetevents.PacketEvents;
+import com.github.retrooper.packetevents.PacketEvents;
+import com.github.retrooper.packetevents.netty.channel.ChannelAbstract;
+import com.github.retrooper.packetevents.protocol.ConnectionState;
+import com.github.retrooper.packetevents.util.ListWrapper;
+import com.github.retrooper.packetevents.util.reflection.ReflectionObject;
 import io.github.retrooper.packetevents.handlers.EarlyInjector;
 import io.github.retrooper.packetevents.handlers.legacy.PacketDecoderLegacy;
 import io.github.retrooper.packetevents.handlers.legacy.PacketEncoderLegacy;
-import com.github.retrooper.packetevents.protocol.ConnectionState;
-import com.github.retrooper.packetevents.util.ListWrapper;
-import com.github.retrooper.packetevents.util.MinecraftReflectionUtil;
-import com.github.retrooper.packetevents.util.dependencies.protocolsupport.ProtocolSupportUtil;
-import com.github.retrooper.packetevents.util.reflection.ReflectionObject;
+import io.github.retrooper.packetevents.utils.MinecraftReflectionUtil;
+import io.github.retrooper.packetevents.utils.dependencies.protocolsupport.ProtocolSupportUtil;
 import net.minecraft.util.io.netty.channel.Channel;
 import net.minecraft.util.io.netty.channel.ChannelFuture;
 import net.minecraft.util.io.netty.channel.ChannelHandler;
@@ -130,7 +131,6 @@ public class EarlyChannelInjectorLegacy implements EarlyInjector {
                 if (channel == null) {
                     continue;
                 }
-
                 ServerConnectionInitializerLegacy.postInitChannel(channel);
             }
         }
@@ -140,9 +140,9 @@ public class EarlyChannelInjectorLegacy implements EarlyInjector {
     private void injectChannelFuture(ChannelFuture future) {
         ChannelPipeline pipeline = future.channel().pipeline();
         if (pipeline.get("SpigotNettyServerChannelHandler#0") != null) {
-            pipeline.addAfter("SpigotNettyServerChannelHandler#0", PacketEvents.get().connectionName, new ServerChannelHandlerLegacy());
+            pipeline.addAfter("SpigotNettyServerChannelHandler#0", PacketEvents.CONNECTION_NAME, new ServerChannelHandlerLegacy());
         } else {
-            pipeline.addFirst(PacketEvents.get().connectionName, new ServerChannelHandlerLegacy());
+            pipeline.addFirst(PacketEvents.CONNECTION_NAME, new ServerChannelHandlerLegacy());
         }
 
         List<Object> networkManagers = MinecraftReflectionUtil.getNetworkManagers();
@@ -161,7 +161,7 @@ public class EarlyChannelInjectorLegacy implements EarlyInjector {
     }
 
     private void ejectChannelFuture(ChannelFuture future) {
-        future.channel().pipeline().remove(PacketEvents.get().connectionName);
+        future.channel().pipeline().remove(PacketEvents.CONNECTION_NAME);
     }
 
     @Override
@@ -182,7 +182,7 @@ public class EarlyChannelInjectorLegacy implements EarlyInjector {
                 }
 
             } catch (IllegalAccessException e) {
-                PacketEvents.get().getPlugin().getLogger().severe("PacketEvents failed to eject the injection handler! Please reboot!!");
+                PacketEvents.getAPI().getLogger().severe("PacketEvents failed to eject the injection handler! Please reboot!!");
             }
         }
 
@@ -190,19 +190,19 @@ public class EarlyChannelInjectorLegacy implements EarlyInjector {
     }
 
     @Override
-    public void injectPlayer(Player player) {
-        Object channel = PacketEvents.get().getPlayerManager().getChannel(player);
+    public void injectPlayer(Object player) {
+        ChannelAbstract channel = PacketEvents.getAPI().getPlayerManager().getChannel(player);
         if (channel != null) {
             updatePlayerObject(player, channel);
         }
     }
 
     @Override
-    public void ejectPlayer(Player player) {
-        Object channel = PacketEvents.get().getPlayerManager().getChannel(player);
+    public void ejectPlayer(Object player) {
+        ChannelAbstract channel = PacketEvents.getAPI().getPlayerManager().getChannel(player);
         if (channel != null) {
             try {
-                ServerConnectionInitializerLegacy.postDestroyChannel((Channel) channel);
+                ServerConnectionInitializerLegacy.postDestroyChannel(channel.rawChannel());
             } catch (Exception ignored) {
 
             }
@@ -210,8 +210,8 @@ public class EarlyChannelInjectorLegacy implements EarlyInjector {
     }
 
     @Override
-    public boolean hasInjected(Player player) {
-        Object channel = PacketEvents.get().getPlayerManager().getChannel(player);
+    public boolean hasInjected(Object player) {
+        ChannelAbstract channel = PacketEvents.getAPI().getPlayerManager().getChannel(player);
         if (channel == null) {
             return false;
         }
@@ -221,9 +221,9 @@ public class EarlyChannelInjectorLegacy implements EarlyInjector {
                 encoder != null && encoder.player != null;
     }
 
-    private PacketDecoderLegacy getDecoder(Object rawChannel) {
-        Channel channel = (Channel) rawChannel;
-        ChannelHandler decoder = channel.pipeline().get(PacketEvents.get().decoderName);
+    private PacketDecoderLegacy getDecoder(ChannelAbstract ch) {
+        Channel channel = (Channel) ch.rawChannel();
+        ChannelHandler decoder = channel.pipeline().get(PacketEvents.DECODER_NAME);
         if (decoder != null) {
             return (PacketDecoderLegacy) decoder;
         } else {
@@ -231,9 +231,9 @@ public class EarlyChannelInjectorLegacy implements EarlyInjector {
         }
     }
 
-    private PacketEncoderLegacy getEncoder(Object rawChannel) {
-        Channel channel = (Channel) rawChannel;
-        ChannelHandler encoder = channel.pipeline().get(PacketEvents.get().encoderName);
+    private PacketEncoderLegacy getEncoder(ChannelAbstract ch) {
+        Channel channel = (Channel) ch.rawChannel();
+        ChannelHandler encoder = channel.pipeline().get(PacketEvents.ENCODER_NAME);
         if (encoder instanceof PacketEncoderLegacy) {
             return (PacketEncoderLegacy) encoder;
         } else {
@@ -242,48 +242,40 @@ public class EarlyChannelInjectorLegacy implements EarlyInjector {
     }
 
     @Override
-    public void updatePlayerObject(Player player, Object rawChannel) {
-        PacketDecoderLegacy decoder = getDecoder(rawChannel);
+    public void updatePlayerObject(Object player, ChannelAbstract ch) {
+        PacketDecoderLegacy decoder = getDecoder(ch);
         if (decoder != null) {
-            decoder.player = player;
+            decoder.player = (Player) player;
         }
 
-        PacketEncoderLegacy encoder = getEncoder(rawChannel);
+        PacketEncoderLegacy encoder = getEncoder(ch);
         if (encoder != null) {
-            encoder.player = player;
+            encoder.player = (Player) player;
         }
     }
 
     @Override
-    public ConnectionState getConnectionState(Object channel) {
-        ConnectionState state = PacketEvents.get().getPlayerManager().connectionStates.get(channel);
-        if (state == null) {
-            PacketDecoderLegacy decoder = getDecoder(channel);
-            if (decoder != null) {
-                state = decoder.connectionState;
-                //Cache connection state in map
-                PacketEvents.get().getPlayerManager().connectionStates.put(channel, state);
-            } else {
-                return null;
-            }
-        }
-        return state;
-    }
-
-    @Override
-    public void changeConnectionState(Object ch, ConnectionState connectionState) {
-        Channel channel = (Channel) ch;
+    public ConnectionState getConnectionState(ChannelAbstract channel) {
         PacketDecoderLegacy decoder = getDecoder(channel);
+        if (decoder != null) {
+            return decoder.connectionState;
+        } else {
+            return null;
+        }
+    }
+
+    @Override
+    public void changeConnectionState(ChannelAbstract ch, ConnectionState connectionState) {
+        Channel channel = (Channel) ch.rawChannel();
+        PacketDecoderLegacy decoder = getDecoder(ch);
         if (decoder != null) {
             //Change connection state in decoder
             decoder.connectionState = connectionState;
-            //Change connection state in map
-            PacketEvents.get().getPlayerManager().connectionStates.put(channel, connectionState);
             if (connectionState == ConnectionState.PLAY) {
                 if (ProtocolSupportUtil.isAvailable()) {
-                    channel.pipeline().remove(PacketEvents.get().decoderName);
+                    channel.pipeline().remove(PacketEvents.DECODER_NAME);
                     decoder.bypassCompression = true;
-                    channel.pipeline().addAfter("ps_decoder_transformer", PacketEvents.get().decoderName, decoder);
+                    channel.pipeline().addAfter("ps_decoder_transformer", PacketEvents.DECODER_NAME, decoder);
                 }
             }
         }

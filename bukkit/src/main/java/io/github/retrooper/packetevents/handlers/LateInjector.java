@@ -18,6 +18,8 @@
 
 package io.github.retrooper.packetevents.handlers;
 
+import com.github.retrooper.packetevents.injector.ChannelInjector;
+
 public interface LateInjector extends ChannelInjector {
 
 }

@@ -18,9 +18,11 @@
 
 package io.github.retrooper.packetevents.processor;
 
-import io.github.retrooper.packetevents.PacketEvents;
+import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.event.impl.PostPlayerInjectEvent;
+import com.github.retrooper.packetevents.injector.ChannelInjector;
 import com.github.retrooper.packetevents.manager.server.ServerManager;
+import io.github.retrooper.packetevents.handlers.GlobalChannelInjector;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -36,8 +38,9 @@ public class InternalBukkitListener implements Listener {
     @EventHandler(priority = EventPriority.LOWEST)
     public void onLogin(PlayerLoginEvent e) {
         final Player player = e.getPlayer();
-        if (PacketEvents.get().getInjector().shouldInjectEarly()) {
-            PacketEvents.get().getInjector().injectPlayer(player);
+        GlobalChannelInjector injector = (GlobalChannelInjector)PacketEvents.getAPI().getInjector();
+        if (injector.shouldInjectEarly()) {
+            PacketEvents.getAPI().getInjector().injectPlayer(player);
         }
     }
 
@@ -45,36 +48,25 @@ public class InternalBukkitListener implements Listener {
     public void onJoin(PlayerJoinEvent e) {
         Player player = e.getPlayer();
 
-        boolean shouldInject = !PacketEvents.get().getInjector().shouldInjectEarly() || !PacketEvents.get().getInjector().hasInjected(e.getPlayer());
+        GlobalChannelInjector injector = (GlobalChannelInjector)PacketEvents.getAPI().getInjector();
+
+        boolean injectEarly = injector.shouldInjectEarly();
+        boolean shouldInject = !injectEarly || !PacketEvents.getAPI().getInjector().hasInjected(e.getPlayer());
         //Inject now if we are using the compatibility-injector or inject if the early injector failed to inject them.
         if (shouldInject) {
-            PacketEvents.get().getInjector().injectPlayer(player);
+            PacketEvents.getAPI().getInjector().injectPlayer(player);
         }
 
-        PacketEvents.get().getEventManager().callEvent(new PostPlayerInjectEvent(e.getPlayer()));
-        ServerManager.ENTITY_ID_CACHE.putIfAbsent(e.getPlayer().getEntityId(), e.getPlayer());
+        PacketEvents.getAPI().getEventManager().callEvent(new PostPlayerInjectEvent(e.getPlayer()));
     }
 
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onQuit(PlayerQuitEvent e) {
         Player player = e.getPlayer();
-        Object channel = PacketEvents.get().getPlayerManager().getChannel(player);
+        Object channel = PacketEvents.getAPI().getPlayerManager().getChannel(player);
         //Cleanup user data
-        PacketEvents.get().getPlayerManager().clientVersions.remove(channel);
-        PacketEvents.get().getPlayerManager().connectionStates.remove(channel);
-        PacketEvents.get().getPlayerManager().channels.remove(player.getName());
-        ServerManager.ENTITY_ID_CACHE.remove(player.getEntityId());
-    }
-
-
-    @EventHandler
-    public void onEntitySpawn(EntitySpawnEvent event) {
-        Entity entity = event.getEntity();
-        ServerManager.ENTITY_ID_CACHE.putIfAbsent(entity.getEntityId(), entity);
-    }
-
-    @EventHandler
-    public void onEntityDeath(EntityDeathEvent event) {
-        ServerManager.ENTITY_ID_CACHE.remove(event.getEntity().getEntityId());
+        PacketEvents.getAPI().getPlayerManager().clientVersions.remove(channel);
+        PacketEvents.getAPI().getPlayerManager().connectionStates.remove(channel);
+        PacketEvents.getAPI().getPlayerManager().channels.remove(player.getName());
     }
 }

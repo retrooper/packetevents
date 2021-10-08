@@ -18,13 +18,14 @@
 
 package io.github.retrooper.packetevents.utils.dependencies.google;
 
+import com.github.retrooper.packetevents.protocol.data.gameprofile.WrappedProperty;
+import com.github.retrooper.packetevents.protocol.data.gameprofile.WrappedPropertyMap;
 import com.google.common.collect.ForwardingMultimap;
 import com.google.common.collect.LinkedHashMultimap;
 import com.google.common.collect.Multimap;
 import com.google.gson.*;
 import com.mojang.authlib.properties.Property;
 import com.mojang.authlib.properties.PropertyMap;
-import com.github.retrooper.packetevents.util.dependencies.gameprofile.WrappedProperty;
 
 import java.lang.reflect.Type;
 import java.util.ArrayList;

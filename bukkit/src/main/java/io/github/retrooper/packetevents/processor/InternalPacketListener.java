@@ -18,10 +18,11 @@
 
 package io.github.retrooper.packetevents.processor;
 
-import io.github.retrooper.packetevents.PacketEvents;
-import io.github.retrooper.packetevents.event.PacketListener;
+import com.github.retrooper.packetevents.PacketEvents;
+import com.github.retrooper.packetevents.event.PacketListener;
 import com.github.retrooper.packetevents.event.impl.PacketReceiveEvent;
 import com.github.retrooper.packetevents.event.impl.PacketSendEvent;
+import com.github.retrooper.packetevents.manager.player.PlayerManager;
 import com.github.retrooper.packetevents.protocol.ConnectionState;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.protocol.data.player.ClientVersion;
@@ -35,7 +36,7 @@ public class InternalPacketListener implements PacketListener {
     public void onPacketSend(PacketSendEvent event) {
         if (event.getPacketType() == PacketType.Login.Server.LOGIN_SUCCESS) {
             //Transition into the GAME connection state
-            PacketEvents.get().getInjector().changeConnectionState(event.getChannel().rawChannel(), ConnectionState.PLAY);
+            PacketEvents.getAPI().getPlayerManager().changeConnectionState(event.getChannel(), ConnectionState.PLAY);
         } /*else if (event.getPacketType() == PacketType.Play.Server.CHUNK_DATA) {
             WrapperPlayServerChunkData chunkData = new WrapperPlayServerChunkData(event);
             Column column = chunkData.getColumn();
@@ -64,18 +65,17 @@ public class InternalPacketListener implements PacketListener {
                     event.setClientVersion(clientVersion);
 
                     //Map netty channel with the client version.
-                    Object rawChannel = event.getChannel().rawChannel();
-                    PacketEvents.get().getPlayerManager().clientVersions.put(rawChannel, clientVersion);
+                    PacketEvents.getAPI().getPlayerManager().clientVersions.put(event.getChannel(), clientVersion);
 
                     //Transition into the LOGIN OR STATUS connection state
-                    PacketEvents.get().getInjector().changeConnectionState(rawChannel, handshake.getNextConnectionState());
+                    PacketEvents.getAPI().getInjector().changeConnectionState(event.getChannel(), handshake.getNextConnectionState());
                 }
                 break;
             case LOGIN:
                 if (event.getPacketType() == PacketType.Login.Client.LOGIN_START) {
                     WrapperLoginClientLoginStart start = new WrapperLoginClientLoginStart(event);
                     //Map the player usernames with their netty channels
-                    PacketEvents.get().getPlayerManager().channels.put(start.getUsername(), event.getChannel().rawChannel());
+                    PacketEvents.getAPI().getPlayerManager().channels.put(start.getUsername(), event.getChannel());
                 }
                 break;
         }

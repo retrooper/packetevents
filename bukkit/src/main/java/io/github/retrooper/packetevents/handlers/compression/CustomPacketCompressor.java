@@ -18,10 +18,10 @@
 
 package io.github.retrooper.packetevents.handlers.compression;
 
-import com.github.retrooper.packetevents.util.MinecraftReflectionUtil;
-import com.github.retrooper.packetevents.util.netty.buffer.ByteBufAbstract;
-import com.github.retrooper.packetevents.util.netty.channel.ChannelHandlerContextAbstract;
+import com.github.retrooper.packetevents.netty.buffer.ByteBufAbstract;
+import com.github.retrooper.packetevents.netty.channel.ChannelHandlerContextAbstract;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
+import io.github.retrooper.packetevents.utils.MinecraftReflectionUtil;
 
 import java.util.zip.Deflater;
 
@@ -42,7 +42,7 @@ public class CustomPacketCompressor {
             return output.writeBytes(byteBuf);
         }
         int dataLength = byteBuf.readableBytes();
-        PacketWrapper outputWrapper = PacketWrapper.createUniversalPacketWrapper(output);
+        PacketWrapper<?> outputWrapper = PacketWrapper.createUniversalPacketWrapper(output);
         if (dataLength < THRESHOLD) {
             //Set data length to 0
             outputWrapper.writeVarInt(0);

@@ -18,19 +18,21 @@
 
 package io.github.retrooper.packetevents.handlers.legacy.early;
 
-import io.github.retrooper.packetevents.PacketEvents;
+import com.github.retrooper.packetevents.PacketEvents;
 import io.github.retrooper.packetevents.handlers.legacy.PacketDecoderLegacy;
 import io.github.retrooper.packetevents.handlers.legacy.PacketEncoderLegacy;
 import net.minecraft.util.io.netty.channel.Channel;
 
 public class ServerConnectionInitializerLegacy {
-    public static void postInitChannel(Channel channel) {
-        channel.pipeline().addAfter("splitter", PacketEvents.get().decoderName, new PacketDecoderLegacy());
-        channel.pipeline().addBefore("encoder", PacketEvents.get().encoderName, new PacketEncoderLegacy());
+    public static void postInitChannel(Object ch) {
+        Channel channel = (Channel) ch;
+        channel.pipeline().addAfter("splitter", PacketEvents.DECODER_NAME, new PacketDecoderLegacy());
+        channel.pipeline().addBefore("encoder", PacketEvents.ENCODER_NAME, new PacketEncoderLegacy());
     }
 
-    public static void postDestroyChannel(Channel channel) {
-        channel.pipeline().remove(PacketEvents.get().decoderName);
-        channel.pipeline().remove(PacketEvents.get().encoderName);
+    public static void postDestroyChannel(Object ch) {
+        Channel channel = (Channel) ch;
+        channel.pipeline().remove(PacketEvents.DECODER_NAME);
+        channel.pipeline().remove(PacketEvents.ENCODER_NAME);
     }
 }

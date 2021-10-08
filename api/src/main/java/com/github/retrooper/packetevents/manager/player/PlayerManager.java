@@ -18,22 +18,28 @@
 
 package com.github.retrooper.packetevents.manager.player;
 
-import com.github.retrooper.packetevents.protocol.ConnectionState;
 import com.github.retrooper.packetevents.netty.buffer.ByteBufAbstract;
 import com.github.retrooper.packetevents.netty.channel.ChannelAbstract;
-import com.github.retrooper.packetevents.protocol.data.player.ClientVersion;
+import com.github.retrooper.packetevents.protocol.ConnectionState;
 import com.github.retrooper.packetevents.protocol.data.gameprofile.WrappedGameProfile;
+import com.github.retrooper.packetevents.protocol.data.player.ClientVersion;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 
 public interface PlayerManager {
+    Map<ChannelAbstract, ClientVersion> clientVersions = new ConcurrentHashMap<>();
+    Map<ChannelAbstract, ConnectionState> connectionStates = new ConcurrentHashMap<>();
+    Map<String, ChannelAbstract> channels = new ConcurrentHashMap<>();
+
     ConnectionState getConnectionState(Object player);
 
     ConnectionState getConnectionState(ChannelAbstract channel);
 
-    ConnectionState changeConnectionState(ChannelAbstract channel, ConnectionState connectionState);
+    void changeConnectionState(ChannelAbstract channel, ConnectionState connectionState);
 
     int getPing(Object player);
 
@@ -41,6 +47,10 @@ public interface PlayerManager {
     ClientVersion getClientVersion(Object player);
 
     ClientVersion getClientVersion(ChannelAbstract channel);
+
+    void setClientVersion(ChannelAbstract channel, ClientVersion version);
+
+    void setClientVersion(Object player, ClientVersion version);
 
     void sendPacket(ChannelAbstract channel, ByteBufAbstract byteBuf);
 
@@ -57,4 +67,10 @@ public interface PlayerManager {
     boolean isGeyserPlayer(UUID uuid);
 
     ChannelAbstract getChannel(Object player);
+
+    ChannelAbstract getChannel(String username);
+
+    void setChannel(String username, ChannelAbstract channel);
+
+    void setChannel(Object player, ChannelAbstract channel);
 }

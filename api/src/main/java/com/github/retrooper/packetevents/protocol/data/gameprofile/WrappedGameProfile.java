@@ -18,7 +18,7 @@
 
 package com.github.retrooper.packetevents.protocol.data.gameprofile;
 
-import java.util.UUID;
+import java.util.*;
 
 /**
  * Wrapper for the Player Game Profile.
@@ -29,23 +29,25 @@ import java.util.UUID;
 public class WrappedGameProfile {
     private final UUID id;
     private final String name;
-    private final WrappedPropertyMap properties;
+    private final Map<String, Collection<WrappedProperty>> properties;
 
 
     public WrappedGameProfile(UUID id, String name) {
         this.id = id;
         this.name = name;
-        //TODO get wrapped property map implementation
+        properties = new HashMap<>();
+    }
 
-        //properties =
-          //      ServerManager.getVersion() == ServerVersion.v_1_7_10 ? new WrappedPropertyMapLegacy() : new WrappedPropertyMapModern();
-        properties = null;
+    public WrappedGameProfile(UUID id, String name, Map<String, Collection<WrappedProperty>> properties) {
+        this.id = id;
+        this.name = name;
+        this.properties = properties;
     }
 
     public WrappedGameProfile(UUID id, String name, WrappedPropertyMap properties) {
         this.id = id;
         this.name = name;
-        this.properties = properties;
+        this.properties = properties.asMap();
     }
 
     public UUID getID() {
@@ -56,8 +58,17 @@ public class WrappedGameProfile {
         return name;
     }
 
-    public WrappedPropertyMap getProperties() {
+    public Map<String, Collection<WrappedProperty>> getProperties() {
         return properties;
+    }
+
+    public void addProperty(String propertyName, WrappedProperty property) {
+        Collection<WrappedProperty> currentProperties = this.properties.get(propertyName);
+        if (currentProperties == null) {
+            currentProperties = new ArrayList<>();
+        }
+        currentProperties.add(property);
+        this.properties.put(propertyName, currentProperties);
     }
 
     public boolean isComplete() {

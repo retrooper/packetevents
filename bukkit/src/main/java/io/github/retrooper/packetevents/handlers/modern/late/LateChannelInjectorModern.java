@@ -18,7 +18,8 @@
 
 package io.github.retrooper.packetevents.handlers.modern.late;
 
-import io.github.retrooper.packetevents.PacketEvents;
+import com.github.retrooper.packetevents.PacketEvents;
+import com.github.retrooper.packetevents.netty.channel.ChannelAbstract;
 import io.github.retrooper.packetevents.handlers.LateInjector;
 import io.github.retrooper.packetevents.handlers.modern.PacketDecoderModern;
 import io.github.retrooper.packetevents.handlers.modern.PacketEncoderModern;
@@ -26,7 +27,6 @@ import io.github.retrooper.packetevents.handlers.modern.early.ServerConnectionIn
 import com.github.retrooper.packetevents.protocol.ConnectionState;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandler;
-import org.bukkit.entity.Player;
 
 public class LateChannelInjectorModern implements LateInjector {
     @Override
@@ -40,14 +40,14 @@ public class LateChannelInjectorModern implements LateInjector {
     }
 
     @Override
-    public void injectPlayer(Player player) {
-        Channel channel = (Channel) PacketEvents.get().getPlayerManager().getChannel(player);
-        ServerConnectionInitializerModern.postInitChannel(channel);
+    public void injectPlayer(Object player) {
+        ChannelAbstract channel = PacketEvents.getAPI().getPlayerManager().getChannel(player);
+        ServerConnectionInitializerModern.postInitChannel(channel.rawChannel());
     }
 
-    private PacketDecoderModern getDecoder(Object rawChannel) {
-        Channel channel = (Channel) rawChannel;
-        ChannelHandler decoder = channel.pipeline().get(PacketEvents.get().decoderName);
+    private PacketDecoderModern getDecoder(ChannelAbstract ch) {
+        Channel channel = (Channel) ch.rawChannel();
+        ChannelHandler decoder = channel.pipeline().get(PacketEvents.DECODER_NAME);
         if (decoder instanceof PacketDecoderModern) {
             return (PacketDecoderModern) decoder;
         } else {
@@ -55,9 +55,9 @@ public class LateChannelInjectorModern implements LateInjector {
         }
     }
 
-    private PacketEncoderModern getEncoder(Object rawChannel) {
-        Channel channel = (Channel) rawChannel;
-        ChannelHandler decoder = channel.pipeline().get(PacketEvents.get().encoderName);
+    private PacketEncoderModern getEncoder(ChannelAbstract ch) {
+        Channel channel = (Channel) ch.rawChannel();
+        ChannelHandler decoder = channel.pipeline().get(PacketEvents.ENCODER_NAME);
         if (decoder instanceof PacketEncoderModern) {
             return (PacketEncoderModern) decoder;
         } else {
@@ -67,19 +67,19 @@ public class LateChannelInjectorModern implements LateInjector {
 
 
     @Override
-    public void ejectPlayer(Player player) {
-        Object channel = PacketEvents.get().getPlayerManager().getChannel(player);
+    public void ejectPlayer(Object player) {
+        ChannelAbstract channel = PacketEvents.getAPI().getPlayerManager().getChannel(player);
         if (channel != null) {
             try {
-                ServerConnectionInitializerModern.postDestroyChannel((Channel) channel);
+                ServerConnectionInitializerModern.postDestroyChannel(channel.rawChannel());
             } catch (Exception ignored) {
             }
         }
     }
 
     @Override
-    public boolean hasInjected(Player player) {
-        Object channel = PacketEvents.get().getPlayerManager().getChannel(player);
+    public boolean hasInjected(Object player) {
+        ChannelAbstract channel = PacketEvents.getAPI().getPlayerManager().getChannel(player);
         if (channel == null) {
             return false;
         }
@@ -92,12 +92,12 @@ public class LateChannelInjectorModern implements LateInjector {
     //TODO Look into this approach, maybe instead make the variable in the decoder just default to GAME
     //TODO and implement changeConnectionState properly
     @Override
-    public ConnectionState getConnectionState(Object channel) {
+    public ConnectionState getConnectionState(ChannelAbstract channel) {
         return ConnectionState.PLAY;
     }
 
     @Override
-    public void changeConnectionState(Object channel, ConnectionState connectionState) {
+    public void changeConnectionState(ChannelAbstract channel, ConnectionState connectionState) {
 
     }
 }

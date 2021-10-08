@@ -16,9 +16,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.github.retrooper.packetevents.netty.buffer;
+package com.github.retrooper.packetevents.netty;
 
-public interface ByteBufManagerAbstract {
+import com.github.retrooper.packetevents.netty.buffer.ByteBufAbstract;
+import com.github.retrooper.packetevents.netty.channel.ChannelAbstract;
+import com.github.retrooper.packetevents.netty.channel.ChannelHandlerContextAbstract;
+
+public interface NettyManager {
     ByteBufAbstract wrappedBuffer(byte[] bytes);
 
     ByteBufAbstract copiedBuffer(byte[] bytes);
@@ -38,4 +42,10 @@ public interface ByteBufManagerAbstract {
     ByteBufAbstract compositeBuffer();
 
     ByteBufAbstract compositeBuffer(int maxNumComponents);
+
+    ByteBufAbstract wrapByteBuf(Object byteBuf);
+
+    ChannelAbstract wrapChannel(Object channel);
+
+    ChannelHandlerContextAbstract wrapChannelHandlerContext(Object ctx);
 }

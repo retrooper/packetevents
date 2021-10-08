@@ -18,9 +18,14 @@
 
 package io.github.retrooper.packetevents.utils.netty.channel;
 
-import com.github.retrooper.packetevents.util.netty.buffer.ByteBufAbstract;
-import com.github.retrooper.packetevents.util.netty.buffer.ByteBufAllocatorAbstract;
-import com.github.retrooper.packetevents.util.netty.channel.pipeline.ChannelPipelineAbstract;
+import com.github.retrooper.packetevents.netty.buffer.ByteBufAbstract;
+import com.github.retrooper.packetevents.netty.buffer.ByteBufAllocatorAbstract;
+import com.github.retrooper.packetevents.netty.channel.ChannelAbstract;
+import com.github.retrooper.packetevents.netty.channel.ChannelHandlerAbstract;
+import com.github.retrooper.packetevents.netty.channel.ChannelHandlerContextAbstract;
+import com.github.retrooper.packetevents.netty.channel.pipeline.ChannelPipelineAbstract;
+import io.github.retrooper.packetevents.utils.netty.buffer.ByteBufAllocatorModern;
+import io.github.retrooper.packetevents.utils.netty.channel.pipeline.ChannelPipelineModern;
 import io.netty.channel.ChannelHandlerContext;
 
 public class ChannelHandlerContextModern implements ChannelHandlerContextAbstract {
@@ -37,7 +42,7 @@ public class ChannelHandlerContextModern implements ChannelHandlerContextAbstrac
 
     @Override
     public ChannelAbstract channel() {
-        return ChannelAbstract.generate(ctx.channel());
+        return new ChannelModern(ctx.channel());
     }
 
     @Override
@@ -47,7 +52,7 @@ public class ChannelHandlerContextModern implements ChannelHandlerContextAbstrac
 
     @Override
     public ChannelHandlerAbstract handler() {
-        return ChannelHandlerAbstract.generate(ctx.handler());
+        return new ChannelHandlerModern(ctx.handler());
     }
 
     @Override
@@ -112,12 +117,12 @@ public class ChannelHandlerContextModern implements ChannelHandlerContextAbstrac
 
     @Override
     public ChannelPipelineAbstract pipeline() {
-        return ChannelPipelineAbstract.generate(ctx.pipeline());
+        return new ChannelPipelineModern(ctx.pipeline());
     }
 
     @Override
     public ByteBufAllocatorAbstract alloc() {
-        return ByteBufAllocatorAbstract.generate(ctx.alloc());
+        return new ByteBufAllocatorModern(ctx.alloc());
     }
 
     @Override

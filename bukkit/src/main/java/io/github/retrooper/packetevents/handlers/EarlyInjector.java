@@ -18,8 +18,10 @@
 
 package io.github.retrooper.packetevents.handlers;
 
+import com.github.retrooper.packetevents.injector.ChannelInjector;
+import com.github.retrooper.packetevents.netty.channel.ChannelAbstract;
 import org.bukkit.entity.Player;
 
 public interface EarlyInjector extends ChannelInjector {
-    void updatePlayerObject(Player player, Object channel);
+    void updatePlayerObject(Object player, ChannelAbstract channel);
 }

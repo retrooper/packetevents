@@ -18,13 +18,13 @@
 
 package io.github.retrooper.packetevents.handlers.modern;
 
-import io.github.retrooper.packetevents.PacketEvents;
+import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.event.impl.PacketReceiveEvent;
 import io.github.retrooper.packetevents.handlers.compression.CompressionManager;
 import io.github.retrooper.packetevents.handlers.compression.CustomPacketDecompressor;
 import com.github.retrooper.packetevents.protocol.ConnectionState;
-import com.github.retrooper.packetevents.util.netty.buffer.ByteBufAbstract;
-import com.github.retrooper.packetevents.util.netty.channel.ChannelHandlerContextAbstract;
+import com.github.retrooper.packetevents.netty.buffer.ByteBufAbstract;
+import com.github.retrooper.packetevents.netty.channel.ChannelHandlerContextAbstract;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
@@ -52,7 +52,7 @@ public class PacketDecoderModern extends MessageToMessageDecoder<ByteBuf> {
             int firstReaderIndex = transformedBuf.readerIndex();
             PacketReceiveEvent packetReceiveEvent = new PacketReceiveEvent(connectionState, ctx.channel(), player, transformedBuf);
             int readerIndex = transformedBuf.readerIndex();
-            PacketEvents.get().getEventManager().callEvent(packetReceiveEvent, () -> {
+            PacketEvents.getAPI().getEventManager().callEvent(packetReceiveEvent, () -> {
                 transformedBuf.readerIndex(readerIndex);
             });
             if (!packetReceiveEvent.isCancelled()) {
@@ -75,7 +75,7 @@ public class PacketDecoderModern extends MessageToMessageDecoder<ByteBuf> {
 
     @Override
     public void decode(ChannelHandlerContext ctx, ByteBuf byteBuf, List<Object> out) {
-        handle(ChannelHandlerContextAbstract.generate(ctx), ByteBufAbstract.generate(byteBuf), out);
+        handle(PacketEvents.getAPI().getNettyManager().wrapChannelHandlerContext(ctx), PacketEvents.getAPI().getNettyManager().wrapByteBuf(byteBuf), out);
     }
 
     private boolean handleCompressionOrder(ChannelHandlerContextAbstract ctx, ByteBufAbstract buf) {
@@ -84,7 +84,7 @@ public class PacketDecoderModern extends MessageToMessageDecoder<ByteBuf> {
         int decoderIndex = ctx.pipeline().names().indexOf("decompress");
         if (decoderIndex == -1) return false;
         handledCompression = true;
-        if (decoderIndex > ctx.pipeline().names().indexOf(PacketEvents.get().decoderName)) {
+        if (decoderIndex > ctx.pipeline().names().indexOf(PacketEvents.DECODER_NAME)) {
             // Need to decompress this packet due to bad order
             ByteBufAbstract decompressed = CustomPacketDecompressor.decompress(ctx, buf);
             return CompressionManager.refactorHandlers(ctx, buf, decompressed);

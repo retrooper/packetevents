@@ -18,9 +18,11 @@
 
 package io.github.retrooper.packetevents.utils.netty.channel.pipeline;
 
-import com.github.retrooper.packetevents.util.netty.channel.ChannelHandlerAbstract;
-import com.github.retrooper.packetevents.util.netty.channel.ChannelHandlerContextAbstract;
-import com.github.retrooper.packetevents.util.netty.channel.ChannelHandlerContextModern;
+import com.github.retrooper.packetevents.netty.channel.ChannelHandlerAbstract;
+import com.github.retrooper.packetevents.netty.channel.ChannelHandlerContextAbstract;
+import com.github.retrooper.packetevents.netty.channel.pipeline.ChannelPipelineAbstract;
+import io.github.retrooper.packetevents.utils.netty.channel.ChannelHandlerContextModern;
+import io.github.retrooper.packetevents.utils.netty.channel.ChannelHandlerModern;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelPipeline;
 
@@ -45,7 +47,7 @@ public class ChannelPipelineModern implements ChannelPipelineAbstract {
 
     @Override
     public ChannelHandlerAbstract get(String handlerName) {
-        return ChannelHandlerAbstract.generate(pipeline.get(handlerName));
+        return new ChannelHandlerModern(pipeline.get(handlerName));
     }
 
     @Override
@@ -75,22 +77,22 @@ public class ChannelPipelineModern implements ChannelPipelineAbstract {
 
     @Override
     public ChannelHandlerAbstract remove(String handlerName) {
-        return ChannelHandlerAbstract.generate(pipeline.remove(handlerName));
+        return new ChannelHandlerModern(pipeline.remove(handlerName));
     }
 
     @Override
     public ChannelHandlerAbstract removeFirst() {
-        return ChannelHandlerAbstract.generate(pipeline.removeFirst());
+        return new ChannelHandlerModern(pipeline.removeFirst());
     }
 
     @Override
     public ChannelHandlerAbstract removeLast() {
-        return ChannelHandlerAbstract.generate(pipeline.removeLast());
+        return new ChannelHandlerModern(pipeline.removeLast());
     }
 
     @Override
     public ChannelHandlerAbstract replace(String previousHandlerName, String handlerName, ChannelHandlerAbstract handler) {
-        return ChannelHandlerAbstract.generate(pipeline.replace(previousHandlerName, handlerName, (ChannelHandler) handler.rawChannelHandler()));
+        return new ChannelHandlerModern(pipeline.replace(previousHandlerName, handlerName, (ChannelHandler) handler.rawChannelHandler()));
     }
 
     @Override

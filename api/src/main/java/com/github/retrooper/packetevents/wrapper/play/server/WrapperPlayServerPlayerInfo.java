@@ -29,6 +29,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
 
@@ -95,7 +96,7 @@ public class WrapperPlayServerPlayerInfo extends PacketWrapper<WrapperPlayServer
                             String propertyValue = readString();
                             String propertySignature = readBoolean() ? readString() : null;
                             WrappedProperty property = new WrappedProperty(propertyName, propertyValue, propertySignature);
-                            gameProfile.getProperties().put(propertyName, property);
+                            gameProfile.addProperty(propertyName, property);
                         }
                         GameMode gameMode = GameMode.VALUES[readVarInt()];
                         int ping = readVarInt();
@@ -153,13 +154,15 @@ public class WrapperPlayServerPlayerInfo extends PacketWrapper<WrapperPlayServer
                     case ADD_PLAYER: {
                         writeString(data.gameProfile.getName(), 16);
                         writeVarInt(data.gameProfile.getProperties().size());
-                        for (WrappedProperty property : data.gameProfile.getProperties().values()) {
-                            writeString(property.getName());
-                            writeString(property.getValue());
-                            boolean hasSignature = property.hasSignature();
-                            writeBoolean(hasSignature);
-                            if (hasSignature) {
-                                writeString(property.getSignature());
+                        for (Collection<WrappedProperty> properties : data.gameProfile.getProperties().values()) {
+                            for (WrappedProperty property : properties) {
+                                writeString(property.getName());
+                                writeString(property.getValue());
+                                boolean hasSignature = property.hasSignature();
+                                writeBoolean(hasSignature);
+                                if (hasSignature) {
+                                    writeString(property.getSignature());
+                                }
                             }
                         }
                         writeVarInt(data.gameMode.ordinal());

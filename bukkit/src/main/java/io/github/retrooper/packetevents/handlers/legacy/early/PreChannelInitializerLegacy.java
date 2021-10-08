@@ -18,6 +18,9 @@
 
 package io.github.retrooper.packetevents.handlers.legacy.early;
 
+import com.github.retrooper.packetevents.PacketEvents;
+import com.github.retrooper.packetevents.factory.bukkit.PacketEventsBuilder;
+import com.github.retrooper.packetevents.netty.channel.ChannelAbstract;
 import net.minecraft.util.io.netty.channel.Channel;
 import net.minecraft.util.io.netty.channel.ChannelInitializer;
 

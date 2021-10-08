@@ -19,6 +19,14 @@
 package io.github.retrooper.packetevents.utils.dependencies;
 
 import com.github.retrooper.packetevents.protocol.data.gameprofile.WrappedGameProfile;
+import com.github.retrooper.packetevents.protocol.data.gameprofile.WrappedProperty;
+import io.github.retrooper.packetevents.utils.MinecraftReflectionUtil;
+import io.github.retrooper.packetevents.utils.dependencies.gameprofile.GameProfileUtil_7;
+import io.github.retrooper.packetevents.utils.dependencies.gameprofile.GameProfileUtil_8;
+import io.github.retrooper.packetevents.utils.dependencies.google.GuavaUtils_7;
+import io.github.retrooper.packetevents.utils.dependencies.google.GuavaUtils_8;
+import io.github.retrooper.packetevents.utils.dependencies.protocolsupport.ProtocolSupportUtil;
+import io.github.retrooper.packetevents.utils.dependencies.viaversion.ViaVersionUtil;
 import org.bukkit.entity.Player;
 
 import java.util.UUID;

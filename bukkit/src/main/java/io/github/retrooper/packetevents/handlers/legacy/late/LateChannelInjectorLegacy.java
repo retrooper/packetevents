@@ -18,7 +18,8 @@
 
 package io.github.retrooper.packetevents.handlers.legacy.late;
 
-import io.github.retrooper.packetevents.PacketEvents;
+import com.github.retrooper.packetevents.PacketEvents;
+import com.github.retrooper.packetevents.netty.channel.ChannelAbstract;
 import io.github.retrooper.packetevents.handlers.LateInjector;
 import io.github.retrooper.packetevents.handlers.legacy.PacketDecoderLegacy;
 import io.github.retrooper.packetevents.handlers.legacy.PacketEncoderLegacy;
@@ -26,7 +27,6 @@ import io.github.retrooper.packetevents.handlers.legacy.early.ServerConnectionIn
 import com.github.retrooper.packetevents.protocol.ConnectionState;
 import net.minecraft.util.io.netty.channel.Channel;
 import net.minecraft.util.io.netty.channel.ChannelHandler;
-import org.bukkit.entity.Player;
 
 public class LateChannelInjectorLegacy implements LateInjector {
     @Override
@@ -40,14 +40,14 @@ public class LateChannelInjectorLegacy implements LateInjector {
     }
 
     @Override
-    public void injectPlayer(Player player) {
-        Channel channel = (Channel) PacketEvents.get().getPlayerManager().getChannel(player);
-        ServerConnectionInitializerLegacy.postInitChannel(channel);
+    public void injectPlayer(Object player) {
+        ChannelAbstract channel = PacketEvents.getAPI().getPlayerManager().getChannel(player);
+        ServerConnectionInitializerLegacy.postInitChannel(channel.rawChannel());
     }
 
-    private PacketDecoderLegacy getDecoder(Object rawChannel) {
-        Channel channel = (Channel) rawChannel;
-        ChannelHandler decoder = channel.pipeline().get(PacketEvents.get().decoderName);
+    private PacketDecoderLegacy getDecoder(ChannelAbstract ch) {
+        Channel channel = (Channel) ch.rawChannel();
+        ChannelHandler decoder = channel.pipeline().get(PacketEvents.DECODER_NAME);
         if (decoder instanceof PacketDecoderLegacy) {
             return (PacketDecoderLegacy) decoder;
         } else {
@@ -55,9 +55,9 @@ public class LateChannelInjectorLegacy implements LateInjector {
         }
     }
 
-    private PacketEncoderLegacy getEncoder(Object rawChannel) {
-        Channel channel = (Channel) rawChannel;
-        ChannelHandler decoder = channel.pipeline().get(PacketEvents.get().encoderName);
+    private PacketEncoderLegacy getEncoder(ChannelAbstract ch) {
+        Channel channel = (Channel) ch.rawChannel();
+        ChannelHandler decoder = channel.pipeline().get(PacketEvents.ENCODER_NAME);
         if (decoder instanceof PacketEncoderLegacy) {
             return (PacketEncoderLegacy) decoder;
         } else {
@@ -67,20 +67,20 @@ public class LateChannelInjectorLegacy implements LateInjector {
 
 
     @Override
-    public void ejectPlayer(Player player) {
-        Object channel = PacketEvents.get().getPlayerManager().getChannel(player);
+    public void ejectPlayer(Object player) {
+        ChannelAbstract channel = PacketEvents.getAPI().getPlayerManager().getChannel(player);
         if (channel != null) {
             try {
-                ServerConnectionInitializerLegacy.postDestroyChannel((Channel) channel);
-            } catch (Exception ex) {
+                ServerConnectionInitializerLegacy.postDestroyChannel(channel.rawChannel());
+            } catch (Exception ignored) {
 
             }
         }
     }
 
     @Override
-    public boolean hasInjected(Player player) {
-        Object channel = PacketEvents.get().getPlayerManager().getChannel(player);
+    public boolean hasInjected(Object player) {
+        ChannelAbstract channel = PacketEvents.getAPI().getPlayerManager().getChannel(player);
         if (channel == null) {
             return false;
         }
@@ -91,12 +91,12 @@ public class LateChannelInjectorLegacy implements LateInjector {
     }
 
     @Override
-    public ConnectionState getConnectionState(Object channel) {
+    public ConnectionState getConnectionState(ChannelAbstract channel) {
         return ConnectionState.PLAY;
     }
 
     @Override
-    public void changeConnectionState(Object channel, ConnectionState connectionState) {
+    public void changeConnectionState(ChannelAbstract channel, ConnectionState connectionState) {
         PacketDecoderLegacy decoder = getDecoder(channel);
         if (decoder != null) {
             decoder.connectionState = connectionState;

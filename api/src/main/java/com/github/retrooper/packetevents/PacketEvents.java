@@ -24,7 +24,7 @@ public final class PacketEvents {
 
  //   private final InternalBukkitListener internalBukkitListener = new InternalBukkitListener();
  //   private final GlobalChannelInjector injector = new GlobalChannelInjector();
-    public static String identifier, encoderName, decoderName, connectionName, serverChannelHandlerName;
+    public static String IDENTIFIER, ENCODER_NAME, DECODER_NAME, CONNECTION_NAME, SERVER_CHANNEL_HANDLER_NAME;
     //private UpdateChecker updateChecker;
     private static boolean LOADED;
     private static boolean INITIALIZED;

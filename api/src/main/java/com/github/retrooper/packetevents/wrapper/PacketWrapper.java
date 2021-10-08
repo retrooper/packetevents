@@ -81,25 +81,26 @@ public class PacketWrapper<T extends PacketWrapper> {
         }
     }
 
-    //TODO ByteBufUtil.buffer()
     public PacketWrapper(int packetID, ClientVersion clientVersion) {
-        this(clientVersion, PacketEvents.getAPI().getServerManager().getVersion(), null, packetID);
+        this(clientVersion, PacketEvents.getAPI().getServerManager().getVersion(),
+                PacketEvents.getAPI().getNettyManager().buffer(), packetID);
     }
 
-    //TODO ByteBufUtil.buffer()
     public PacketWrapper(int packetID) {
-        this(ClientVersion.UNKNOWN, PacketEvents.getAPI().getServerManager().getVersion(), null, packetID);
+        this(ClientVersion.UNKNOWN,
+                PacketEvents.getAPI().getServerManager().getVersion(),
+                PacketEvents.getAPI().getNettyManager().buffer(), packetID);
     }
 
     public PacketWrapper(PacketTypeCommon packetType) {
         this(packetType.getID());
     }
 
-    public static PacketWrapper createUniversalPacketWrapper(ByteBufAbstract byteBuf) {
+    public static PacketWrapper<?> createUniversalPacketWrapper(ByteBufAbstract byteBuf) {
         return new PacketWrapper(ClientVersion.UNKNOWN, PacketEvents.getAPI().getServerManager().getVersion(), byteBuf, -1);
     }
 
-    public void createPacket() {
+    public final void createPacket() {
         writeVarInt(packetID);
         writeData();
     }

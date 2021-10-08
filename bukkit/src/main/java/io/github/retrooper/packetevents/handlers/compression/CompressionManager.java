@@ -18,10 +18,10 @@
 
 package io.github.retrooper.packetevents.handlers.compression;
 
-import io.github.retrooper.packetevents.PacketEvents;
-import com.github.retrooper.packetevents.util.netty.buffer.ByteBufAbstract;
-import com.github.retrooper.packetevents.util.netty.channel.ChannelHandlerAbstract;
-import com.github.retrooper.packetevents.util.netty.channel.ChannelHandlerContextAbstract;
+import com.github.retrooper.packetevents.PacketEvents;
+import com.github.retrooper.packetevents.netty.buffer.ByteBufAbstract;
+import com.github.retrooper.packetevents.netty.channel.ChannelHandlerAbstract;
+import com.github.retrooper.packetevents.netty.channel.ChannelHandlerContextAbstract;
 
 public class CompressionManager {
     public static boolean refactorHandlers(ChannelHandlerContextAbstract ctx, ByteBufAbstract buf, ByteBufAbstract decompressed) {
@@ -30,12 +30,12 @@ public class CompressionManager {
         } finally {
             decompressed.release();
         }
-        ChannelHandlerAbstract encoder = ctx.pipeline().get(PacketEvents.get().encoderName);
-        ChannelHandlerAbstract decoder = ctx.pipeline().get(PacketEvents.get().decoderName);
+        ChannelHandlerAbstract encoder = ctx.pipeline().get(PacketEvents.ENCODER_NAME);
+        ChannelHandlerAbstract decoder = ctx.pipeline().get(PacketEvents.DECODER_NAME);
         ctx.pipeline().remove(encoder);
         ctx.pipeline().remove(decoder);
-        ctx.pipeline().addAfter("compress", PacketEvents.get().encoderName, encoder);
-        ctx.pipeline().addAfter("decompress", PacketEvents.get().decoderName, decoder);
+        ctx.pipeline().addAfter("compress", PacketEvents.ENCODER_NAME, encoder);
+        ctx.pipeline().addAfter("decompress", PacketEvents.DECODER_NAME, decoder);
         return true;
     }
 

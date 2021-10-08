@@ -16,9 +16,12 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.retrooper.packetevents.netty;
+package io.github.retrooper.packetevents.utils.netty.channel;
 
-import com.github.retrooper.packetevents.util.MinecraftReflectionUtil;
+
+import io.github.retrooper.packetevents.utils.MinecraftReflectionUtil;
+import io.github.retrooper.packetevents.utils.netty.ChannelInboundHandlerUtil_Legacy;
+import io.github.retrooper.packetevents.utils.netty.ChannelInboundHandlerUtil_Modern;
 
 public class ChannelInboundHandlerUtil {
     public static void handlerChannelRead(Object handler, Object ctx, Object msg) {

@@ -16,12 +16,22 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package io.github.retrooper.packetevents.utils.netty.buffer;
+package io.github.retrooper.packetevents.utils.netty;
 
 import com.github.retrooper.packetevents.netty.buffer.ByteBufAbstract;
-import com.github.retrooper.packetevents.netty.buffer.ByteBufManagerAbstract;
+import com.github.retrooper.packetevents.netty.NettyManager;
+import com.github.retrooper.packetevents.netty.channel.ChannelAbstract;
+import com.github.retrooper.packetevents.netty.channel.ChannelHandlerContextAbstract;
+import io.github.retrooper.packetevents.utils.MinecraftReflectionUtil;
+import io.github.retrooper.packetevents.utils.netty.buffer.ByteBufLegacy;
+import io.github.retrooper.packetevents.utils.netty.buffer.ByteBufModern;
+import io.github.retrooper.packetevents.utils.netty.buffer.ByteBufUtil;
+import io.github.retrooper.packetevents.utils.netty.channel.ChannelHandlerContextLegacy;
+import io.github.retrooper.packetevents.utils.netty.channel.ChannelHandlerContextModern;
+import io.github.retrooper.packetevents.utils.netty.channel.ChannelLegacy;
+import io.github.retrooper.packetevents.utils.netty.channel.ChannelModern;
 
-public class ByteBufManagerImpl implements ByteBufManagerAbstract {
+public class NettyManagerImpl implements NettyManager {
     @Override
     public ByteBufAbstract wrappedBuffer(byte[] bytes) {
         return ByteBufUtil.wrappedBuffer(bytes);
@@ -70,5 +80,35 @@ public class ByteBufManagerImpl implements ByteBufManagerAbstract {
     @Override
     public ByteBufAbstract compositeBuffer(int maxNumComponents) {
         return ByteBufUtil.compositeBuffer(maxNumComponents);
+    }
+
+    @Override
+    public ByteBufAbstract wrapByteBuf(Object byteBuf) {
+        if (MinecraftReflectionUtil.USE_MODERN_NETTY_PACKAGE) {
+            return new ByteBufModern(byteBuf);
+        }
+        else {
+            return new ByteBufLegacy(byteBuf);
+        }
+    }
+
+    @Override
+    public ChannelAbstract wrapChannel(Object channel) {
+        if (MinecraftReflectionUtil.USE_MODERN_NETTY_PACKAGE) {
+            return new ChannelModern(channel);
+        }
+        else {
+            return new ChannelLegacy(channel);
+        }
+    }
+
+    @Override
+    public ChannelHandlerContextAbstract wrapChannelHandlerContext(Object ctx) {
+        if (MinecraftReflectionUtil.USE_MODERN_NETTY_PACKAGE) {
+            return new ChannelHandlerContextModern(ctx);
+        }
+        else {
+            return new ChannelHandlerContextLegacy(ctx);
+        }
     }
 }

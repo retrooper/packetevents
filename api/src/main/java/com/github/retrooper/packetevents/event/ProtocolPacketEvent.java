@@ -46,15 +46,19 @@ public abstract class ProtocolPacketEvent extends PacketEvent implements PlayerE
     private ServerVersion serverVersion;
     private boolean cancel;
 
-    //TODO generate channel, generate bytebufabstract
     public ProtocolPacketEvent(PacketSide packetSide, Object channel, Object player, Object rawByteBuf) {
-        this(packetSide, null, player, null);
+        this(packetSide,
+                PacketEvents.getAPI().getNettyManager().wrapChannel(channel),
+                player,
+                PacketEvents.getAPI().getNettyManager().wrapByteBuf(rawByteBuf));
     }
 
-    //TODO generate channel, generate bytebufabstract
-
     public ProtocolPacketEvent(PacketSide packetSide, ConnectionState connectionState, Object channel, Object player, Object rawByteBuf) {
-        this(packetSide, connectionState, null, player, null);
+        this(packetSide,
+                connectionState,
+                PacketEvents.getAPI().getNettyManager().wrapChannel(channel),
+                player,
+                PacketEvents.getAPI().getNettyManager().wrapByteBuf(rawByteBuf));
     }
 
 

@@ -18,6 +18,8 @@
 
 package io.github.retrooper.packetevents.utils.netty.channel;
 
+import com.github.retrooper.packetevents.netty.channel.ChannelHandlerAbstract;
+import com.github.retrooper.packetevents.netty.channel.ChannelHandlerContextAbstract;
 import net.minecraft.util.io.netty.channel.ChannelHandler;
 import net.minecraft.util.io.netty.channel.ChannelHandlerContext;
 

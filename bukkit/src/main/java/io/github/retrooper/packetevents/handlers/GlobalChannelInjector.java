@@ -18,19 +18,20 @@
 
 package io.github.retrooper.packetevents.handlers;
 
-import io.github.retrooper.packetevents.PacketEvents;
+import com.github.retrooper.packetevents.PacketEvents;
+import com.github.retrooper.packetevents.injector.ChannelInjector;
 import com.github.retrooper.packetevents.event.impl.PlayerEjectEvent;
 import com.github.retrooper.packetevents.event.impl.PlayerInjectEvent;
+import com.github.retrooper.packetevents.netty.channel.ChannelAbstract;
 import io.github.retrooper.packetevents.handlers.legacy.early.EarlyChannelInjectorLegacy;
 import io.github.retrooper.packetevents.handlers.legacy.late.LateChannelInjectorLegacy;
 import io.github.retrooper.packetevents.handlers.modern.early.EarlyChannelInjectorModern;
 import io.github.retrooper.packetevents.handlers.modern.late.LateChannelInjectorModern;
 import com.github.retrooper.packetevents.protocol.ConnectionState;
-import com.github.retrooper.packetevents.util.MinecraftReflectionUtil;
-import org.bukkit.entity.Player;
+import io.github.retrooper.packetevents.utils.MinecraftReflectionUtil;
 import org.jetbrains.annotations.Nullable;
 
-public class GlobalChannelInjector {
+public class GlobalChannelInjector implements ChannelInjector {
     public boolean injectEarly = true;
     private ChannelInjector injector;
 
@@ -50,10 +51,12 @@ public class GlobalChannelInjector {
         }
     }
 
+    @Override
     public boolean isBound() {
         return injector.isBound();
     }
 
+    @Override
     public void inject() {
         try {
             //Try inject...
@@ -64,45 +67,51 @@ public class GlobalChannelInjector {
                 injectEarly = false;
                 load();
                 injector.inject();
-                PacketEvents.get().getPlugin().getLogger().warning("[packetevents] Failed to inject with the Early Injector. Reverting to the Compatibility/Late Injector... This is just a warning, but please report this!");
+                PacketEvents.getAPI().getLogger().warning("[packetevents] Failed to inject with the Early Injector. Reverting to the Compatibility/Late Injector... This is just a warning, but please report this!");
                 ex.printStackTrace();
             } else {
-                PacketEvents.get().getPlugin().getLogger().severe("[packetevents] Failed to inject with all available injectors. Please report this!");
+                PacketEvents.getAPI().getLogger().severe("[packetevents] Failed to inject with all available injectors. Please report this!");
                 ex.printStackTrace();
             }
         }
     }
 
+    @Override
     public void eject() {
         injector.eject();
     }
 
-    public void injectPlayer(Player player) {
+    @Override
+    public void injectPlayer(Object player) {
         PlayerInjectEvent injectEvent = new PlayerInjectEvent(player);
-        PacketEvents.get().getEventManager().callEvent(injectEvent);
+        PacketEvents.getAPI().getEventManager().callEvent(injectEvent);
         if (!injectEvent.isCancelled()) {
             injector.injectPlayer(player);
         }
     }
 
-    public void ejectPlayer(Player player) {
+    @Override
+    public void ejectPlayer(Object player) {
         PlayerEjectEvent ejectEvent = new PlayerEjectEvent(player);
-        PacketEvents.get().getEventManager().callEvent(ejectEvent);
+        PacketEvents.getAPI().getEventManager().callEvent(ejectEvent);
         if (!ejectEvent.isCancelled()) {
             injector.ejectPlayer(player);
         }
     }
 
-    public boolean hasInjected(Player player) {
+    @Override
+    public boolean hasInjected(Object player) {
         return injector.hasInjected(player);
     }
 
+    @Override
     @Nullable
-    public ConnectionState getConnectionState(Object channel) {
+    public ConnectionState getConnectionState(ChannelAbstract channel) {
         return injector.getConnectionState(channel);
     }
 
-    public void changeConnectionState(Object channel, ConnectionState connectionState) {
+    @Override
+    public void changeConnectionState(ChannelAbstract channel, ConnectionState connectionState) {
         injector.changeConnectionState(channel, connectionState);
     }
 }

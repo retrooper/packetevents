@@ -163,13 +163,8 @@ public interface ServerManager {
         } else {
             return world.getEntities();
         }
-    }
+    }*/
 
 
-    public static boolean isGeyserAvailable() {
-        return MinecraftReflectionUtil.GEYSER_CLASS != null;
-    }
-
-
-    */
+    boolean isGeyserAvailable();
 }

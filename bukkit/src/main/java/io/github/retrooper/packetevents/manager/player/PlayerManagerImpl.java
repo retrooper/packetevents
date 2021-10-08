@@ -18,15 +18,22 @@
 
 package io.github.retrooper.packetevents.manager.player;
 
+import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.manager.player.PlayerManager;
+import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.netty.buffer.ByteBufAbstract;
 import com.github.retrooper.packetevents.netty.channel.ChannelAbstract;
 import com.github.retrooper.packetevents.protocol.ConnectionState;
 import com.github.retrooper.packetevents.protocol.data.gameprofile.WrappedGameProfile;
 import com.github.retrooper.packetevents.protocol.data.player.ClientVersion;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
+import io.github.retrooper.packetevents.utils.GeyserUtil;
 import io.github.retrooper.packetevents.utils.MinecraftReflectionUtil;
 import io.github.retrooper.packetevents.utils.PlayerPingAccessorModern;
+import io.github.retrooper.packetevents.utils.dependencies.DependencyUtil;
+import io.github.retrooper.packetevents.utils.dependencies.protocolsupport.ProtocolSupportUtil;
+import io.github.retrooper.packetevents.utils.dependencies.viaversion.ViaVersionUtil;
+import io.github.retrooper.packetevents.utils.v1_7.SpigotVersionLookup_1_7;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
@@ -35,81 +42,167 @@ import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class PlayerManagerImpl implements PlayerManager {
-    public final Map<Object, ClientVersion> clientVersions = new ConcurrentHashMap<>();
-    public final Map<Object, ConnectionState> connectionStates = new ConcurrentHashMap<>();
-    public final Map<String, Object> channels = new ConcurrentHashMap<>();
     @Override
     public ConnectionState getConnectionState(Object player) {
-        return null;
+        return getConnectionState(getChannel(player));
     }
 
     @Override
     public ConnectionState getConnectionState(ChannelAbstract channel) {
-        return null;
+        ConnectionState connectionState = connectionStates.get(channel);
+        if (connectionState == null) {
+            connectionState = PacketEvents.getAPI().getInjector().getConnectionState(channel);
+            connectionStates.put(channel, connectionState);
+        }
+        return connectionState;
     }
 
     @Override
-    public ConnectionState changeConnectionState(ChannelAbstract channel, ConnectionState connectionState) {
-        return null;
+    public void changeConnectionState(ChannelAbstract channel, ConnectionState connectionState) {
+        connectionStates.put(channel, connectionState);
+        PacketEvents.getAPI().getInjector().changeConnectionState(channel, connectionState);
     }
 
     @Override
     public int getPing(Object player) {
         if (MinecraftReflectionUtil.V_1_17_OR_HIGHER) {
-            return PlayerPingAccessorModern.getPing((Player)player);
-        }
-        else {
-            return MinecraftReflectionUtil.getPlayerPing((Player)player);
+            return PlayerPingAccessorModern.getPing((Player) player);
+        } else {
+            return MinecraftReflectionUtil.getPlayerPing((Player) player);
         }
     }
 
     @Override
-    public @NotNull ClientVersion getClientVersion(Object player) {
-        return null;
+    public @NotNull ClientVersion getClientVersion(Object pl) {
+        Player player = (Player) pl;
+        if (player.getAddress() == null) {
+            return ClientVersion.UNKNOWN;
+        }
+        ChannelAbstract channel = getChannel(player);
+        ClientVersion version = clientVersions.get(channel);
+        if (version == null || !version.isResolved()) {
+            //Asking ViaVersion or ProtocolSupport for the protocol version.
+            if (DependencyUtil.isProtocolTranslationDependencyAvailable()) {
+                try {
+                    version = ClientVersion.getClientVersionByProtocolVersion(DependencyUtil.getProtocolVersion(player));
+                    clientVersions.put(channel, version);
+                    return version;
+                } catch (Exception ex) {
+                    //Try ask the dependency again the next time, for now it is temporarily unresolved...
+                    //Temporary unresolved means there is still hope, an exception was thrown on the dependency's end.
+                    return ClientVersion.TEMP_UNRESOLVED;
+                }
+            } else {
+                short protocolVersion;
+                //Luckily 1.7.10 provides a method for us to access a player's protocol version(because 1.7.10 servers support 1.8 clients too)
+                if (PacketEvents.getAPI().getServerManager().getVersion() == ServerVersion.v_1_7_10) {
+                    protocolVersion = (short) SpigotVersionLookup_1_7.getProtocolVersion(player);
+                } else {
+                    //No dependency available, couldn't snatch the version from the packet AND server version is not 1.7.10
+                    //We are pretty safe to assume the version is the same as the server, as ViaVersion AND ProtocolSupport could not be found.
+                    //If you aren't using ViaVersion or ProtocolSupport, how are you supporting multiple protocol versions?
+                    protocolVersion = PacketEvents.getAPI().getServerManager().getVersion().getProtocolVersion();
+                }
+                version = ClientVersion.getClientVersionByProtocolVersion(protocolVersion);
+                clientVersions.put(channel, version);
+            }
+        }
+        return version;
     }
+
 
     @Override
     public ClientVersion getClientVersion(ChannelAbstract channel) {
-        return null;
+        return clientVersions.get(channel);
+    }
+
+    @Override
+    public void setClientVersion(ChannelAbstract channel, ClientVersion version) {
+        clientVersions.put(channel, version);
+    }
+
+    @Override
+    public void setClientVersion(Object player, ClientVersion version) {
+        setClientVersion(getChannel(player), version);
     }
 
     @Override
     public void sendPacket(ChannelAbstract channel, ByteBufAbstract byteBuf) {
-
+        //TODO Also check if our encoder is RIGHT before minecraft's,
+        //if it is, then don't use context to writeflush, otherwise use it (to support multiple packetevents instances)
+        if (ViaVersionUtil.isAvailable() && !ProtocolSupportUtil.isAvailable()) {
+            channel.writeAndFlush(byteBuf);
+        } else {
+            channel.pipeline().context(PacketEvents.ENCODER_NAME).writeAndFlush(byteBuf);
+        }
     }
 
     @Override
     public void sendPacket(ChannelAbstract channel, PacketWrapper<?> wrapper) {
-
+        wrapper.createPacket();
+        sendPacket(channel, wrapper.byteBuf);
     }
 
     @Override
     public void sendPacket(Object player, ByteBufAbstract byteBuf) {
-
+        ChannelAbstract channel = getChannel(player);
+        sendPacket(channel, byteBuf);
     }
 
     @Override
     public void sendPacket(Object player, PacketWrapper<?> wrapper) {
-
+        wrapper.createPacket();
+        ChannelAbstract channel = getChannel(player);
+        sendPacket(channel, wrapper.byteBuf);
     }
 
     @Override
-    public WrappedGameProfile getGameProfile(Object player) {
-        return null;
+    public WrappedGameProfile getGameProfile(Object pl) {
+        Player player = (Player) pl;
+        Object gameProfile = DependencyUtil.getGameProfile(player.getUniqueId(), player.getName());
+        return DependencyUtil.getWrappedGameProfile(gameProfile);
     }
 
     @Override
-    public boolean isGeyserPlayer(Object player) {
-        return false;
+    public boolean isGeyserPlayer(Object pl) {
+        Player player = (Player) pl;
+        return isGeyserPlayer(player.getUniqueId());
     }
 
     @Override
     public boolean isGeyserPlayer(UUID uuid) {
-        return false;
+        if (!PacketEvents.getAPI().getServerManager().isGeyserAvailable()) {
+            return false;
+        }
+        return GeyserUtil.isGeyserPlayer(uuid);
     }
 
     @Override
     public ChannelAbstract getChannel(Object player) {
-        return null;
+        String username = ((Player) player).getName();
+        ChannelAbstract channel = getChannel(username);
+        if (channel == null) {
+            Object ch = MinecraftReflectionUtil.getChannel((Player) player);
+            if (ch != null) {
+                channel = PacketEvents.getAPI().getNettyManager().wrapChannel(ch);
+                channels.put(username, channel);
+            }
+        }
+        return channel;
+    }
+
+    @Override
+    public ChannelAbstract getChannel(String username) {
+        return channels.get(username);
+    }
+
+    @Override
+    public void setChannel(String username, ChannelAbstract channel) {
+        channels.put(username, channel);
+    }
+
+    @Override
+    public void setChannel(Object player, ChannelAbstract channel) {
+        setChannel(((Player) player).getName(), channel);
     }
 }

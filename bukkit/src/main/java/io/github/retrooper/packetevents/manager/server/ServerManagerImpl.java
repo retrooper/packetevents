@@ -25,6 +25,7 @@ import com.github.retrooper.packetevents.netty.buffer.ByteBufAbstract;
 import com.github.retrooper.packetevents.netty.channel.ChannelAbstract;
 import com.github.retrooper.packetevents.protocol.data.world.BoundingBox;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
+import io.github.retrooper.packetevents.utils.MinecraftReflectionUtil;
 import org.bukkit.Bukkit;
 
 public class ServerManagerImpl implements ServerManager {
@@ -43,7 +44,7 @@ public class ServerManagerImpl implements ServerManager {
             }
         }
 
-        ServerVersion fallbackVersion = PacketEvents.get().getSettings().getFallbackServerVersion();
+        ServerVersion fallbackVersion = PacketEvents.getAPI().getSettings().getFallbackServerVersion();
         if (fallbackVersion != null) {
             if (fallbackVersion == ServerVersion.v_1_7_10) {
                 try {
@@ -85,5 +86,10 @@ public class ServerManagerImpl implements ServerManager {
     @Override
     public void receivePacket(ChannelAbstract channel, PacketWrapper<?> wrapper) {
 
+    }
+
+    @Override
+    public boolean isGeyserAvailable() {
+        return MinecraftReflectionUtil.GEYSER_CLASS != null;
     }
 }

@@ -18,7 +18,7 @@
 
 package io.github.retrooper.packetevents.handlers.legacy.early;
 
-import io.github.retrooper.packetevents.PacketEvents;
+import com.github.retrooper.packetevents.PacketEvents;
 import net.minecraft.util.io.netty.channel.Channel;
 import net.minecraft.util.io.netty.channel.ChannelHandlerContext;
 import net.minecraft.util.io.netty.channel.ChannelInboundHandlerAdapter;
@@ -27,7 +27,7 @@ public class ServerChannelHandlerLegacy extends ChannelInboundHandlerAdapter {
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
         Channel channel = (Channel) msg;
-        channel.pipeline().addFirst(PacketEvents.get().serverChannelHandlerName, new PreChannelInitializerLegacy());
+        channel.pipeline().addFirst(PacketEvents.SERVER_CHANNEL_HANDLER_NAME, new PreChannelInitializerLegacy());
         super.channelRead(ctx, msg);
     }
 }

@@ -16,25 +16,29 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import com.github.retrooper.packetevents.PacketEvents;
-import com.github.retrooper.packetevents.event.PacketListener;
-import com.github.retrooper.packetevents.event.PacketListenerPriority;
-import com.github.retrooper.packetevents.event.impl.PacketReceiveEvent;
-import com.github.retrooper.packetevents.factory.bukkit.PacketEventsBuilder;
+package com.github.retrooper.packetevents.injector;
 
-public class Test {
-    public static void main(String[] args) {
-        PacketEvents.load(PacketEventsBuilder.build(null));
+import com.github.retrooper.packetevents.netty.channel.ChannelAbstract;
+import com.github.retrooper.packetevents.protocol.ConnectionState;
+import org.jetbrains.annotations.Nullable;
 
-        PacketEvents.init();
-
-        PacketEvents.getAPI().getEventManager().registerListener(new PacketListener() {
-            @Override
-            public void onPacketReceive(PacketReceiveEvent event) {
-
-            }
-        }, PacketListenerPriority.LOWEST);
-
-        PacketEvents.terminate();
+public interface ChannelInjector {
+    default boolean isBound() {
+        return true;
     }
+
+    @Nullable
+    ConnectionState getConnectionState(ChannelAbstract channel);
+
+    void changeConnectionState(ChannelAbstract channel, ConnectionState packetState);
+
+    void inject();
+
+    void eject();
+
+    void injectPlayer(Object player);
+
+    void ejectPlayer(Object player);
+
+    boolean hasInjected(Object player);
 }

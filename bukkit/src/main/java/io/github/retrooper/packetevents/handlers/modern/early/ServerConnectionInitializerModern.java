@@ -18,12 +18,13 @@
 
 package io.github.retrooper.packetevents.handlers.modern.early;
 
-import io.github.retrooper.packetevents.PacketEvents;
+import com.github.retrooper.packetevents.PacketEvents;
+import com.github.retrooper.packetevents.netty.channel.ChannelAbstract;
 import io.github.retrooper.packetevents.handlers.modern.PacketDecoderModern;
 import io.github.retrooper.packetevents.handlers.modern.PacketEncoderModern;
-import com.github.retrooper.packetevents.util.dependencies.viaversion.CustomBukkitDecodeHandler;
 import com.github.retrooper.packetevents.util.reflection.Reflection;
 import com.github.retrooper.packetevents.util.reflection.ReflectionObject;
+import io.github.retrooper.packetevents.utils.dependencies.viaversion.CustomBukkitDecodeHandler;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandler;
 import io.netty.handler.codec.ByteToMessageDecoder;
@@ -33,12 +34,14 @@ import java.lang.reflect.Method;
 
 
 public class ServerConnectionInitializerModern {
-    public static void postInitChannel(Channel channel) {
-        channel.pipeline().addAfter("splitter", PacketEvents.get().decoderName, new PacketDecoderModern());
-        channel.pipeline().addBefore("encoder", PacketEvents.get().encoderName, new PacketEncoderModern());
+    public static void postInitChannel(Object ch) {
+        Channel channel = (Channel) ch;
+        channel.pipeline().addAfter("splitter", PacketEvents.DECODER_NAME, new PacketDecoderModern());
+        channel.pipeline().addBefore("encoder", PacketEvents.ENCODER_NAME, new PacketEncoderModern());
     }
 
-    public static void postDestroyChannel(Channel channel) {
+    public static void postDestroyChannel(Object ch) {
+        Channel channel = (Channel) ch;
         ChannelHandler mcDecoder = channel.pipeline().get("decoder");
         if (mcDecoder instanceof CustomBukkitDecodeHandler) {
             //Convert back to the original ViaVersion decoder
@@ -61,8 +64,8 @@ public class ServerConnectionInitializerModern {
                 }
             }
         } else {
-            channel.pipeline().remove(PacketEvents.get().decoderName);
-            channel.pipeline().remove(PacketEvents.get().encoderName);
+            channel.pipeline().remove(PacketEvents.DECODER_NAME);
+            channel.pipeline().remove(PacketEvents.ENCODER_NAME);
         }
     }
 }

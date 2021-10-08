@@ -18,23 +18,24 @@
 
 package io.github.retrooper.packetevents;
 
+import com.github.retrooper.packetevents.PacketEvents;
+import com.github.retrooper.packetevents.factory.bukkit.PacketEventsBuilder;
 import org.bukkit.plugin.java.JavaPlugin;
 
 public class PacketEventsPlugin extends JavaPlugin {
     @Override
     public void onLoad() {
-        PacketEvents.get().load(this);
-        //You can do something here as it is loading
+        PacketEvents.load(PacketEventsBuilder.build(this));
     }
 
     @Override
     public void onEnable() {
         //Register your listeners
-        PacketEvents.get().init();
+        PacketEvents.init();
     }
 
     @Override
     public void onDisable() {
-        PacketEvents.get().terminate();
+        PacketEvents.terminate();
     }
 }
