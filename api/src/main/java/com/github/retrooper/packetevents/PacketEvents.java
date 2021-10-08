@@ -29,7 +29,6 @@ public final class PacketEvents {
     private static boolean LOADED;
     private static boolean INITIALIZED;
     private static boolean LATE_BIND = false;
-    private static Object PLUGIN;
 
 
     public static PacketEventsAPI getAPI() {
@@ -37,9 +36,8 @@ public final class PacketEvents {
     }
 
     //Plugin plugin
-    public static void load(PacketEventsAPI api, Object plugin) {
+    public static void load(PacketEventsAPI api) {
         API = api;
-        PLUGIN = plugin;
         /*if (!loaded) {
             //Resolve server version and cache
             identifier = "pe-" + plugin.getName().toLowerCase();

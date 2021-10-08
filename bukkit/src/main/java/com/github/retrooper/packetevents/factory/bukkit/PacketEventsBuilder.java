@@ -30,7 +30,7 @@ import io.github.retrooper.packetevents.manager.server.ServerManagerImpl;
 import java.util.logging.Logger;
 
 public class PacketEventsBuilder {
-    public static PacketEventsAPI build() {
+    public static PacketEventsAPI build(Object plugin) {
         return new PacketEventsAPI() {
             private final EventManager eventManager = new EventManager();
             private final PEVersion version = new PEVersion(2, 0, 0);
@@ -38,6 +38,11 @@ public class PacketEventsBuilder {
             private final Logger logger = Logger.getLogger(PacketEventsAPI.class.getName());
             private final ServerManager serverManager = new ServerManagerImpl();
             private final PlayerManager playerManager = new PlayerManagerImpl();
+
+            @Override
+            public Object getPlugin() {
+                return plugin;
+            }
 
             @Override
             public ServerManager getServerManager() {

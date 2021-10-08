@@ -27,7 +27,10 @@ import com.github.retrooper.packetevents.util.PEVersion;
 import java.util.logging.Logger;
 
 public interface PacketEventsAPI {
+    Object getPlugin();
+
     ServerManager getServerManager();
+
     PlayerManager getPlayerManager();
 
     EventManager getEventManager();

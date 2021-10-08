@@ -22,9 +22,9 @@ import com.github.retrooper.packetevents.event.PacketListenerPriority;
 import com.github.retrooper.packetevents.event.impl.PacketReceiveEvent;
 import com.github.retrooper.packetevents.factory.bukkit.PacketEventsBuilder;
 
-public class Test {/*
+public class Test {
     public static void main(String[] args) {
-        PacketEvents.load(PacketEventsBuilder.build(), null);
+        PacketEvents.load(PacketEventsBuilder.build(null));
 
         PacketEvents.init();
 
@@ -36,5 +36,5 @@ public class Test {/*
         }, PacketListenerPriority.LOWEST);
 
         PacketEvents.terminate();
-    }*/
+    }
 }
