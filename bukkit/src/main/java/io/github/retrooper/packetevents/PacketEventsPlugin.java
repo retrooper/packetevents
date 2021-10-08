@@ -25,17 +25,18 @@ import org.bukkit.plugin.java.JavaPlugin;
 public class PacketEventsPlugin extends JavaPlugin {
     @Override
     public void onLoad() {
-        PacketEvents.load(PacketEventsBuilder.build(this));
+        PacketEvents.build(PacketEventsBuilder.build(this));
+        PacketEvents.getAPI().load();
     }
 
     @Override
     public void onEnable() {
         //Register your listeners
-        PacketEvents.init();
+        PacketEvents.getAPI().init();
     }
 
     @Override
     public void onDisable() {
-        PacketEvents.terminate();
+        PacketEvents.getAPI().terminate();
     }
 }

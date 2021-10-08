@@ -25,10 +25,17 @@ import com.github.retrooper.packetevents.manager.server.ServerManager;
 import com.github.retrooper.packetevents.netty.NettyManager;
 import com.github.retrooper.packetevents.settings.PacketEventsSettings;
 import com.github.retrooper.packetevents.util.PEVersion;
+import com.github.retrooper.packetevents.util.updatechecker.UpdateChecker;
 
 import java.util.logging.Logger;
 
 public interface PacketEventsAPI<PluginType> {
+    void load();
+
+    void init();
+
+    void terminate();
+
     PluginType getPlugin();
 
     ServerManager getServerManager();
@@ -46,4 +53,6 @@ public interface PacketEventsAPI<PluginType> {
     NettyManager getNettyManager();
 
     ChannelInjector getInjector();
+
+    UpdateChecker getUpdateChecker();
 }

@@ -64,6 +64,40 @@ public class UpdateChecker {
         }
     }
 
+    public void handleUpdateCheck() {
+        Thread thread = new Thread(() -> {
+            PacketEvents.getAPI().getLogger().info("[packetevents] Checking for an update, please wait...");
+            UpdateChecker.UpdateCheckerStatus status = checkForUpdate();
+            int waitTimeInSeconds = 5;
+            int maxRetryCount = 5;
+            int retries = 0;
+            while (retries < maxRetryCount) {
+                if (status != UpdateChecker.UpdateCheckerStatus.FAILED) {
+                    break;
+                }
+                PacketEvents.getAPI().getLogger().severe("[packetevents] Checking for an update again in " + waitTimeInSeconds + " seconds...");
+                try {
+                    Thread.sleep(waitTimeInSeconds * 1000L);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+
+                waitTimeInSeconds *= 2;
+
+                status = checkForUpdate();
+
+                if (retries == (maxRetryCount - 1)) {
+                    PacketEvents.getAPI().getLogger().severe("[packetevents] PacketEvents failed to check for an update. No longer retrying.");
+                    break;
+                }
+
+                retries++;
+            }
+
+        }, "packetevents-update-check-thread");
+        thread.start();
+    }
+
     /**
      * Log a positive message in the console.
      *
