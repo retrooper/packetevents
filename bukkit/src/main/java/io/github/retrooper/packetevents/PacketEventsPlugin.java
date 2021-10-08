@@ -19,6 +19,8 @@
 package io.github.retrooper.packetevents;
 
 import com.github.retrooper.packetevents.PacketEvents;
+import com.github.retrooper.packetevents.event.PacketListenerAbstract;
+import com.github.retrooper.packetevents.event.impl.PacketReceiveEvent;
 import com.github.retrooper.packetevents.factory.bukkit.PacketEventsBuilder;
 import org.bukkit.plugin.java.JavaPlugin;
 

@@ -63,11 +63,18 @@ repositories {
     mavenCentral()
 }
 
+tasks {
+    shadowJar {
+        //Shading is that easy
+        //relocate("com.github.retrooper", "com.github.repooper.kek")
+    }
+}
+
 dependencies {
     implementation project(':api')
     compileOnly 'org.jetbrains:annotations:22.0.0'
 
-    compileOnly 'org.spigotmc:spigot-api:1.17-R0.1-SNAPSHOT'
+    compileOnly 'org.spigotmc:spigot-api:1.17.1-R0.1-SNAPSHOT'
     compileOnly 'com.destroystokyo.paper:paper-api:1.16.5-R0.1-SNAPSHOT'
     compileOnly 'org.geysermc:connector:1.2.1-SNAPSHOT'
     compileOnly 'com.viaversion:viaversion:4.0.1'

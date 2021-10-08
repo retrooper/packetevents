@@ -28,7 +28,9 @@ import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.protocol.data.player.ClientVersion;
 import com.github.retrooper.packetevents.wrapper.handshaking.client.WrapperHandshakingClientHandshake;
 import com.github.retrooper.packetevents.wrapper.login.client.WrapperLoginClientLoginStart;
+import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientInteractEntity;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerChatMessage;
+import org.bukkit.entity.Player;
 
 public class InternalPacketListener implements PacketListener {
     //Make this specific event be at MONITOR priority
@@ -76,6 +78,13 @@ public class InternalPacketListener implements PacketListener {
                     WrapperLoginClientLoginStart start = new WrapperLoginClientLoginStart(event);
                     //Map the player usernames with their netty channels
                     PacketEvents.getAPI().getPlayerManager().channels.put(start.getUsername(), event.getChannel());
+                }
+                break;
+            case PLAY:
+                if (event.getPacketType() == PacketType.Play.Client.INTERACT_ENTITY) {
+                    WrapperPlayClientInteractEntity interactEntity = new WrapperPlayClientInteractEntity(event);
+                    Player player = (Player) event.getPlayer();
+                    player.sendMessage(interactEntity.getHand().name() + ", type: " + interactEntity.getType() + ", entity id: " + interactEntity.getEntityID());
                 }
                 break;
         }
