@@ -19,9 +19,9 @@
 package io.github.retrooper.packetevents.handlers.compression;
 
 import io.github.retrooper.packetevents.PacketEvents;
-import com.retrooper.packetevents.util.netty.buffer.ByteBufAbstract;
-import com.retrooper.packetevents.util.netty.channel.ChannelHandlerAbstract;
-import com.retrooper.packetevents.util.netty.channel.ChannelHandlerContextAbstract;
+import com.github.retrooper.packetevents.util.netty.buffer.ByteBufAbstract;
+import com.github.retrooper.packetevents.util.netty.channel.ChannelHandlerAbstract;
+import com.github.retrooper.packetevents.util.netty.channel.ChannelHandlerContextAbstract;
 
 public class CompressionManager {
     public static boolean refactorHandlers(ChannelHandlerContextAbstract ctx, ByteBufAbstract buf, ByteBufAbstract decompressed) {

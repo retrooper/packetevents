@@ -20,7 +20,7 @@ package io.github.retrooper.packetevents.updatechecker;
 
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-import com.retrooper.packetevents.util.updatechecker.LowLevelUpdateChecker;
+import com.github.retrooper.packetevents.util.updatechecker.LowLevelUpdateChecker;
 
 import java.io.IOException;
 

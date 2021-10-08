@@ -26,7 +26,7 @@ import com.viaversion.viaversion.exception.CancelCodecException;
 import com.viaversion.viaversion.exception.CancelDecoderException;
 import com.viaversion.viaversion.exception.CancelEncoderException;
 import com.viaversion.viaversion.exception.InformativeException;
-import com.retrooper.packetevents.protocol.ConnectionState;
+import com.github.retrooper.packetevents.protocol.ConnectionState;
 import io.netty.buffer.ByteBuf;
 import org.bukkit.entity.Player;
 

@@ -18,7 +18,7 @@
 
 package io.github.retrooper.packetevents.handlers;
 
-import com.retrooper.packetevents.protocol.ConnectionState;
+import com.github.retrooper.packetevents.protocol.ConnectionState;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.Nullable;
 

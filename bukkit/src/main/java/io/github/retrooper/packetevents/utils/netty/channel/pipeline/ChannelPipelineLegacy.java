@@ -18,9 +18,9 @@
 
 package io.github.retrooper.packetevents.utils.netty.channel.pipeline;
 
-import com.retrooper.packetevents.util.netty.channel.ChannelHandlerAbstract;
-import com.retrooper.packetevents.util.netty.channel.ChannelHandlerContextAbstract;
-import com.retrooper.packetevents.util.netty.channel.ChannelHandlerContextLegacy;
+import com.github.retrooper.packetevents.util.netty.channel.ChannelHandlerAbstract;
+import com.github.retrooper.packetevents.util.netty.channel.ChannelHandlerContextAbstract;
+import com.github.retrooper.packetevents.util.netty.channel.ChannelHandlerContextLegacy;
 import net.minecraft.util.io.netty.channel.ChannelHandler;
 import net.minecraft.util.io.netty.channel.ChannelPipeline;
 

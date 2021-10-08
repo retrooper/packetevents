@@ -18,7 +18,7 @@
 
 package com.retrooper.packetevents.netty;
 
-import com.retrooper.packetevents.util.MinecraftReflectionUtil;
+import com.github.retrooper.packetevents.util.MinecraftReflectionUtil;
 
 public class ChannelInboundHandlerUtil {
     public static void handlerChannelRead(Object handler, Object ctx, Object msg) {

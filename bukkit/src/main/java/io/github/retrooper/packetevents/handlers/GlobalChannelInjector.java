@@ -19,14 +19,14 @@
 package io.github.retrooper.packetevents.handlers;
 
 import io.github.retrooper.packetevents.PacketEvents;
-import com.retrooper.packetevents.event.impl.PlayerEjectEvent;
-import com.retrooper.packetevents.event.impl.PlayerInjectEvent;
+import com.github.retrooper.packetevents.event.impl.PlayerEjectEvent;
+import com.github.retrooper.packetevents.event.impl.PlayerInjectEvent;
 import io.github.retrooper.packetevents.handlers.legacy.early.EarlyChannelInjectorLegacy;
 import io.github.retrooper.packetevents.handlers.legacy.late.LateChannelInjectorLegacy;
 import io.github.retrooper.packetevents.handlers.modern.early.EarlyChannelInjectorModern;
 import io.github.retrooper.packetevents.handlers.modern.late.LateChannelInjectorModern;
-import com.retrooper.packetevents.protocol.ConnectionState;
-import com.retrooper.packetevents.util.MinecraftReflectionUtil;
+import com.github.retrooper.packetevents.protocol.ConnectionState;
+import com.github.retrooper.packetevents.util.MinecraftReflectionUtil;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.Nullable;
 

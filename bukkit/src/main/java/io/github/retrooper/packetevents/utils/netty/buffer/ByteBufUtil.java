@@ -18,7 +18,7 @@
 
 package io.github.retrooper.packetevents.utils.netty.buffer;
 
-import com.retrooper.packetevents.netty.buffer.ByteBufAbstract;
+import com.github.retrooper.packetevents.netty.buffer.ByteBufAbstract;
 import io.github.retrooper.packetevents.utils.MinecraftReflectionUtil;
 
 public final class ByteBufUtil {

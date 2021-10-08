@@ -18,10 +18,10 @@
 
 package io.github.retrooper.packetevents.utils;
 
-import com.retrooper.packetevents.PacketEvents;
-import com.retrooper.packetevents.manager.server.ServerVersion;
-import com.retrooper.packetevents.util.reflection.Reflection;
-import com.retrooper.packetevents.util.reflection.ReflectionObject;
+import com.github.retrooper.packetevents.PacketEvents;
+import com.github.retrooper.packetevents.manager.server.ServerVersion;
+import com.github.retrooper.packetevents.util.reflection.Reflection;
+import com.github.retrooper.packetevents.util.reflection.ReflectionObject;
 import org.bukkit.Bukkit;
 import org.bukkit.Server;
 import org.bukkit.World;

@@ -19,12 +19,12 @@
 package io.github.retrooper.packetevents.handlers.legacy;
 
 import io.github.retrooper.packetevents.PacketEvents;
-import com.retrooper.packetevents.event.impl.PacketSendEvent;
+import com.github.retrooper.packetevents.event.impl.PacketSendEvent;
 import io.github.retrooper.packetevents.handlers.compression.CompressionManager;
 import io.github.retrooper.packetevents.handlers.compression.CustomPacketCompressor;
 import io.github.retrooper.packetevents.handlers.compression.CustomPacketDecompressor;
-import com.retrooper.packetevents.util.netty.buffer.ByteBufAbstract;
-import com.retrooper.packetevents.util.netty.channel.ChannelHandlerContextAbstract;
+import com.github.retrooper.packetevents.util.netty.buffer.ByteBufAbstract;
+import com.github.retrooper.packetevents.util.netty.channel.ChannelHandlerContextAbstract;
 import net.minecraft.util.io.netty.buffer.ByteBuf;
 import net.minecraft.util.io.netty.channel.ChannelHandler;
 import net.minecraft.util.io.netty.channel.ChannelHandlerContext;

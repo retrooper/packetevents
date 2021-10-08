@@ -18,10 +18,10 @@
 
 package io.github.retrooper.packetevents.handlers.compression;
 
-import com.retrooper.packetevents.netty.buffer.ByteBufAbstract;
-import com.retrooper.packetevents.netty.channel.ChannelHandlerContextAbstract;
+import com.github.retrooper.packetevents.netty.buffer.ByteBufAbstract;
+import com.github.retrooper.packetevents.netty.channel.ChannelHandlerContextAbstract;
 import io.github.retrooper.packetevents.utils.MinecraftReflectionUtil;
-import com.retrooper.packetevents.wrapper.PacketWrapper;
+import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 import io.github.retrooper.packetevents.utils.netty.buffer.ByteBufUtil;
 
 import java.util.zip.DataFormatException;

@@ -18,13 +18,13 @@
 
 package io.github.retrooper.packetevents.manager.server;
 
-import com.retrooper.packetevents.PacketEvents;
-import com.retrooper.packetevents.manager.server.ServerManager;
-import com.retrooper.packetevents.manager.server.ServerVersion;
-import com.retrooper.packetevents.netty.buffer.ByteBufAbstract;
-import com.retrooper.packetevents.netty.channel.ChannelAbstract;
-import com.retrooper.packetevents.protocol.data.world.BoundingBox;
-import com.retrooper.packetevents.wrapper.PacketWrapper;
+import com.github.retrooper.packetevents.PacketEvents;
+import com.github.retrooper.packetevents.manager.server.ServerManager;
+import com.github.retrooper.packetevents.manager.server.ServerVersion;
+import com.github.retrooper.packetevents.netty.buffer.ByteBufAbstract;
+import com.github.retrooper.packetevents.netty.channel.ChannelAbstract;
+import com.github.retrooper.packetevents.protocol.data.world.BoundingBox;
+import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 import org.bukkit.Bukkit;
 
 public class ServerManagerImpl implements ServerManager {

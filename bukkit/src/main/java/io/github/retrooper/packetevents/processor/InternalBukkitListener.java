@@ -19,8 +19,8 @@
 package io.github.retrooper.packetevents.processor;
 
 import io.github.retrooper.packetevents.PacketEvents;
-import com.retrooper.packetevents.event.impl.PostPlayerInjectEvent;
-import com.retrooper.packetevents.manager.server.ServerManager;
+import com.github.retrooper.packetevents.event.impl.PostPlayerInjectEvent;
+import com.github.retrooper.packetevents.manager.server.ServerManager;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;

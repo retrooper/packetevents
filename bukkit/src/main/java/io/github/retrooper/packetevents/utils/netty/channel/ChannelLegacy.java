@@ -18,9 +18,9 @@
 
 package io.github.retrooper.packetevents.utils.netty.channel;
 
-import com.retrooper.packetevents.util.netty.buffer.ByteBufAbstract;
-import com.retrooper.packetevents.util.netty.channel.pipeline.ChannelPipelineAbstract;
-import com.retrooper.packetevents.util.netty.channel.pipeline.ChannelPipelineLegacy;
+import com.github.retrooper.packetevents.util.netty.buffer.ByteBufAbstract;
+import com.github.retrooper.packetevents.util.netty.channel.pipeline.ChannelPipelineAbstract;
+import com.github.retrooper.packetevents.util.netty.channel.pipeline.ChannelPipelineLegacy;
 import net.minecraft.util.io.netty.channel.Channel;
 
 import java.net.SocketAddress;

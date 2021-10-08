@@ -18,11 +18,11 @@
 
 package io.github.retrooper.packetevents.utils.dependencies.gameprofile;
 
-import com.retrooper.packetevents.protocol.data.player.WrappedGameProfile;
-import com.retrooper.packetevents.util.MinecraftReflectionUtil;
-import com.retrooper.packetevents.util.dependencies.google.WrappedPropertyMap;
-import com.retrooper.packetevents.util.dependencies.google.WrappedPropertyMapLegacy;
-import com.retrooper.packetevents.util.reflection.ReflectionObject;
+import com.github.retrooper.packetevents.protocol.data.player.WrappedGameProfile;
+import com.github.retrooper.packetevents.util.MinecraftReflectionUtil;
+import com.github.retrooper.packetevents.util.dependencies.google.WrappedPropertyMap;
+import com.github.retrooper.packetevents.util.dependencies.google.WrappedPropertyMapLegacy;
+import com.github.retrooper.packetevents.util.reflection.ReflectionObject;
 import net.minecraft.util.com.mojang.authlib.GameProfile;
 import net.minecraft.util.com.mojang.authlib.properties.Property;
 import org.bukkit.Bukkit;

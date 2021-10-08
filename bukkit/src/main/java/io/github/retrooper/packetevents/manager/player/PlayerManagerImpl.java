@@ -18,13 +18,13 @@
 
 package io.github.retrooper.packetevents.manager.player;
 
-import com.retrooper.packetevents.manager.player.PlayerManager;
-import com.retrooper.packetevents.netty.buffer.ByteBufAbstract;
-import com.retrooper.packetevents.netty.channel.ChannelAbstract;
-import com.retrooper.packetevents.protocol.ConnectionState;
-import com.retrooper.packetevents.protocol.data.gameprofile.WrappedGameProfile;
-import com.retrooper.packetevents.protocol.data.player.ClientVersion;
-import com.retrooper.packetevents.wrapper.PacketWrapper;
+import com.github.retrooper.packetevents.manager.player.PlayerManager;
+import com.github.retrooper.packetevents.netty.buffer.ByteBufAbstract;
+import com.github.retrooper.packetevents.netty.channel.ChannelAbstract;
+import com.github.retrooper.packetevents.protocol.ConnectionState;
+import com.github.retrooper.packetevents.protocol.data.gameprofile.WrappedGameProfile;
+import com.github.retrooper.packetevents.protocol.data.player.ClientVersion;
+import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 import io.github.retrooper.packetevents.utils.MinecraftReflectionUtil;
 import io.github.retrooper.packetevents.utils.PlayerPingAccessorModern;
 import org.bukkit.entity.Player;

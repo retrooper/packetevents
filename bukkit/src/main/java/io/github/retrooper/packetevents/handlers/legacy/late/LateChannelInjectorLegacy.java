@@ -23,7 +23,7 @@ import io.github.retrooper.packetevents.handlers.LateInjector;
 import io.github.retrooper.packetevents.handlers.legacy.PacketDecoderLegacy;
 import io.github.retrooper.packetevents.handlers.legacy.PacketEncoderLegacy;
 import io.github.retrooper.packetevents.handlers.legacy.early.ServerConnectionInitializerLegacy;
-import com.retrooper.packetevents.protocol.ConnectionState;
+import com.github.retrooper.packetevents.protocol.ConnectionState;
 import net.minecraft.util.io.netty.channel.Channel;
 import net.minecraft.util.io.netty.channel.ChannelHandler;
 import org.bukkit.entity.Player;

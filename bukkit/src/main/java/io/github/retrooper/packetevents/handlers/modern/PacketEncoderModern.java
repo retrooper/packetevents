@@ -19,12 +19,12 @@
 package io.github.retrooper.packetevents.handlers.modern;
 
 import io.github.retrooper.packetevents.PacketEvents;
-import com.retrooper.packetevents.event.impl.PacketSendEvent;
+import com.github.retrooper.packetevents.event.impl.PacketSendEvent;
 import io.github.retrooper.packetevents.handlers.compression.CompressionManager;
 import io.github.retrooper.packetevents.handlers.compression.CustomPacketCompressor;
 import io.github.retrooper.packetevents.handlers.compression.CustomPacketDecompressor;
-import com.retrooper.packetevents.util.netty.buffer.ByteBufAbstract;
-import com.retrooper.packetevents.util.netty.channel.ChannelHandlerContextAbstract;
+import com.github.retrooper.packetevents.util.netty.buffer.ByteBufAbstract;
+import com.github.retrooper.packetevents.util.netty.channel.ChannelHandlerContextAbstract;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;

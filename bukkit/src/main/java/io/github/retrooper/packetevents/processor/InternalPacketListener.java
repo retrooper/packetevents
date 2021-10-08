@@ -20,14 +20,14 @@ package io.github.retrooper.packetevents.processor;
 
 import io.github.retrooper.packetevents.PacketEvents;
 import io.github.retrooper.packetevents.event.PacketListener;
-import com.retrooper.packetevents.event.impl.PacketReceiveEvent;
-import com.retrooper.packetevents.event.impl.PacketSendEvent;
-import com.retrooper.packetevents.protocol.ConnectionState;
-import com.retrooper.packetevents.protocol.packettype.PacketType;
-import com.retrooper.packetevents.protocol.data.player.ClientVersion;
-import com.retrooper.packetevents.wrapper.handshaking.client.WrapperHandshakingClientHandshake;
-import com.retrooper.packetevents.wrapper.login.client.WrapperLoginClientLoginStart;
-import com.retrooper.packetevents.wrapper.play.server.WrapperPlayServerChatMessage;
+import com.github.retrooper.packetevents.event.impl.PacketReceiveEvent;
+import com.github.retrooper.packetevents.event.impl.PacketSendEvent;
+import com.github.retrooper.packetevents.protocol.ConnectionState;
+import com.github.retrooper.packetevents.protocol.packettype.PacketType;
+import com.github.retrooper.packetevents.protocol.data.player.ClientVersion;
+import com.github.retrooper.packetevents.wrapper.handshaking.client.WrapperHandshakingClientHandshake;
+import com.github.retrooper.packetevents.wrapper.login.client.WrapperLoginClientLoginStart;
+import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerChatMessage;
 
 public class InternalPacketListener implements PacketListener {
     //Make this specific event be at MONITOR priority

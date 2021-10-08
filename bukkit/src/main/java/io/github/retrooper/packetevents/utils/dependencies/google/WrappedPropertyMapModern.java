@@ -24,7 +24,7 @@ import com.google.common.collect.Multimap;
 import com.google.gson.*;
 import com.mojang.authlib.properties.Property;
 import com.mojang.authlib.properties.PropertyMap;
-import com.retrooper.packetevents.util.dependencies.gameprofile.WrappedProperty;
+import com.github.retrooper.packetevents.util.dependencies.gameprofile.WrappedProperty;
 
 import java.lang.reflect.Type;
 import java.util.ArrayList;

@@ -19,7 +19,7 @@
 package io.github.retrooper.packetevents.handlers.modern.early;
 
 import io.github.retrooper.packetevents.PacketEvents;
-import com.retrooper.packetevents.util.MinecraftReflectionUtil;
+import com.github.retrooper.packetevents.util.MinecraftReflectionUtil;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;

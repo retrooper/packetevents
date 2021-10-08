@@ -18,9 +18,9 @@
 
 package io.github.retrooper.packetevents.utils.dependencies.viaversion;
 
-import com.retrooper.packetevents.protocol.ConnectionState;
-import com.retrooper.packetevents.util.reflection.Reflection;
-import com.retrooper.packetevents.util.reflection.ReflectionObject;
+import com.github.retrooper.packetevents.protocol.ConnectionState;
+import com.github.retrooper.packetevents.util.reflection.Reflection;
+import com.github.retrooper.packetevents.util.reflection.ReflectionObject;
 import io.netty.buffer.ByteBuf;
 import org.bukkit.entity.Player;
 

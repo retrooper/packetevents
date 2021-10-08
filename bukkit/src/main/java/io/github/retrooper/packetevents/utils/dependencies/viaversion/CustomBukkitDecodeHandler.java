@@ -18,8 +18,8 @@
 
 package io.github.retrooper.packetevents.utils.dependencies.viaversion;
 
-import com.retrooper.packetevents.protocol.ConnectionState;
-import com.retrooper.packetevents.util.reflection.ClassUtil;
+import com.github.retrooper.packetevents.protocol.ConnectionState;
+import com.github.retrooper.packetevents.util.reflection.ClassUtil;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;

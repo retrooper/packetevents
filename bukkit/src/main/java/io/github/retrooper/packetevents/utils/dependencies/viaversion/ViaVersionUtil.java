@@ -18,7 +18,7 @@
 
 package io.github.retrooper.packetevents.utils.dependencies.viaversion;
 
-import com.retrooper.packetevents.protocol.ConnectionState;
+import com.github.retrooper.packetevents.protocol.ConnectionState;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
