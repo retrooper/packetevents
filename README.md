@@ -11,10 +11,10 @@ PacketEvents is an open-source Packet API. It has many cross-version packet-wrap
 * [Discord](https://discord.me/packetevents)
 
 ### Setup
-[Learn more](https://github.com/retrooper/packetevents/wiki/1.-Setup)
+[Learn more](https://github.com/retrooper/packetevents/wiki/Setup)
 
 ### Contributing/Forking
-[Learn more](https://github.com/retrooper/packetevents/wiki/2.-Contributing-and-Forking)\
+[Learn more](https://github.com/retrooper/packetevents/wiki/Contributing-and-Forking)\
 Our discord server has a role for contributors and forkers.
 
 ### Sponsorships
