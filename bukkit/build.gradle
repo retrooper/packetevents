@@ -80,9 +80,11 @@ dependencies {
     compileOnly 'com.viaversion:viaversion:4.0.1'
     compileOnly 'com.github.ProtocolSupport:ProtocolSupport:3d24efeda6'
 
-    /*compileOnly 'org.github.spigot:1.16.2:1.16.2'
+    compileOnly 'org.github.spigot:1.16.2:1.16.2'
    compileOnly 'org.github.spigot:1.8.8:1.8.8'
-   compileOnly 'org.github.spigot:1.7.10:1.7.10'*/
+   compileOnly 'org.github.spigot:1.7.10:1.7.10'
+
+    /*
     compileOnly 'org.github.spigot:1.17:1.17'
     compileOnly 'org.github.spigot:1.16.2:1.16.2'
     compileOnly 'org.github.spigot:1.16.1:1.16.1'
@@ -100,7 +102,7 @@ dependencies {
     compileOnly 'org.github.spigot:1.9.4:1.9.4'
     compileOnly 'org.github.spigot:1.9:1.9'
     compileOnly 'org.github.spigot:1.8.8:1.8.8'
-    compileOnly 'org.github.spigot:1.7.10:1.7.10'
+    compileOnly 'org.github.spigot:1.7.10:1.7.10'*/
 }
 
 group = 'io.github.retrooper'

@@ -33,10 +33,9 @@ import java.net.InetSocketAddress;
  * A player is injected by PacketEvents each time they join the server.
  *
  * @author retrooper
- * @see <a href="https://github.com/retrooper/packetevents/blob/dev/src/main/java/io/github/retrooper/packetevents/handler/PacketHandlerInternal.java">https://github.com/retrooper/packetevents/blob/dev/src/main/java/io/github/retrooper/packetevents/handler/PacketHandlerInternal.java</a>
  * @since 1.3
  */
-public class PostPlayerInjectEvent extends PacketEvent implements PlayerEvent {
+public class PostPlayerInjectEvent extends PacketEvent implements PlayerEvent<Object> {
     //TODO Rethink this event
     private final Object player;
     private final ChannelAbstract channel;

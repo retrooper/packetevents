@@ -24,11 +24,11 @@ package com.github.retrooper.packetevents.event.type;
  * @author retrooper
  * @since 1.6.9
  */
-public interface PlayerEvent {
+public interface PlayerEvent<T> {
     /**
      * Associated player.
      *
      * @return Player.
      */
-    Object getPlayer();
+    T getPlayer();
 }

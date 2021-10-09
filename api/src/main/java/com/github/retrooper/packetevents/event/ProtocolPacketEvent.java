@@ -34,10 +34,10 @@ import org.jetbrains.annotations.Nullable;
 
 import java.net.InetSocketAddress;
 
-public abstract class ProtocolPacketEvent extends PacketEvent implements PlayerEvent, CancellableEvent {
+public abstract class ProtocolPacketEvent<T> extends PacketEvent implements PlayerEvent<T>, CancellableEvent {
     private final ChannelAbstract channel;
     private final InetSocketAddress socketAddress;
-    private final Object player;
+    private final T player;
     private final ByteBufAbstract byteBuf;
     private final int packetID;
     private final PacketTypeCommon packetType;
@@ -46,14 +46,14 @@ public abstract class ProtocolPacketEvent extends PacketEvent implements PlayerE
     private ServerVersion serverVersion;
     private boolean cancel;
 
-    public ProtocolPacketEvent(PacketSide packetSide, Object channel, Object player, Object rawByteBuf) {
+    public ProtocolPacketEvent(PacketSide packetSide, Object channel, T player, Object rawByteBuf) {
         this(packetSide,
                 PacketEvents.getAPI().getNettyManager().wrapChannel(channel),
                 player,
                 PacketEvents.getAPI().getNettyManager().wrapByteBuf(rawByteBuf));
     }
 
-    public ProtocolPacketEvent(PacketSide packetSide, ConnectionState connectionState, Object channel, Object player, Object rawByteBuf) {
+    public ProtocolPacketEvent(PacketSide packetSide, ConnectionState connectionState, Object channel, T player, Object rawByteBuf) {
         this(packetSide,
                 connectionState,
                 PacketEvents.getAPI().getNettyManager().wrapChannel(channel),
@@ -62,7 +62,7 @@ public abstract class ProtocolPacketEvent extends PacketEvent implements PlayerE
     }
 
 
-    public ProtocolPacketEvent(PacketSide packetSide, ChannelAbstract channel, Object player, ByteBufAbstract byteBuf) {
+    public ProtocolPacketEvent(PacketSide packetSide, ChannelAbstract channel, T player, ByteBufAbstract byteBuf) {
         this.channel = channel;
         this.socketAddress = (InetSocketAddress) channel.remoteAddress();
         this.player = player;
@@ -89,7 +89,7 @@ public abstract class ProtocolPacketEvent extends PacketEvent implements PlayerE
         this.packetType = PacketType.getById(packetSide, connectionState, this.serverVersion, packetID);
     }
 
-    public ProtocolPacketEvent(PacketSide packetSide, ConnectionState connectionState, ChannelAbstract channel, Object player, ByteBufAbstract byteBuf) {
+    public ProtocolPacketEvent(PacketSide packetSide, ConnectionState connectionState, ChannelAbstract channel, T player, ByteBufAbstract byteBuf) {
         this.channel = channel;
         this.socketAddress = (InetSocketAddress) channel.remoteAddress();
         this.player = player;
@@ -139,7 +139,7 @@ public abstract class ProtocolPacketEvent extends PacketEvent implements PlayerE
 
     @Nullable
     @Override
-    public Object getPlayer() {
+    public T getPlayer() {
         return player;
     }
 
@@ -149,7 +149,6 @@ public abstract class ProtocolPacketEvent extends PacketEvent implements PlayerE
 
     public void setConnectionState(ConnectionState connectionState) {
         this.connectionState = connectionState;
-        PacketEvents.getAPI().getPlayerManager().changeConnectionState(channel, connectionState);
     }
 
     public ClientVersion getClientVersion() {

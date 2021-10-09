@@ -31,7 +31,7 @@ import org.jetbrains.annotations.NotNull;
  * @author retrooper
  * @since 1.6.9
  */
-public final class PlayerEjectEvent extends PacketEvent implements CancellableEvent, PlayerEvent {
+public final class PlayerEjectEvent extends PacketEvent implements CancellableEvent, PlayerEvent<Object> {
     private final Object player;
     private boolean cancelled;
 

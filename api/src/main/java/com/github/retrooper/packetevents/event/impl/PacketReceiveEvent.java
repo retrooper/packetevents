@@ -26,7 +26,7 @@ import com.github.retrooper.packetevents.event.ProtocolPacketEvent;
 import com.github.retrooper.packetevents.netty.buffer.ByteBufAbstract;
 import com.github.retrooper.packetevents.netty.channel.ChannelAbstract;
 
-public class PacketReceiveEvent extends ProtocolPacketEvent {
+public class PacketReceiveEvent extends ProtocolPacketEvent<Object> {
     private PacketWrapper<?> lastUsedWrapper;
 
     public PacketReceiveEvent(ChannelAbstract channel, Object player, ByteBufAbstract byteBuf) {

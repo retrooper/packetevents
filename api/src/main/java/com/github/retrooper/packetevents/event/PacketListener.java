@@ -65,6 +65,7 @@ public interface PacketListener {
     default void onPlayerEject(PlayerEjectEvent event) {
     }
 
+
     default void onPacketReceive(PacketReceiveEvent event) {
     }
 

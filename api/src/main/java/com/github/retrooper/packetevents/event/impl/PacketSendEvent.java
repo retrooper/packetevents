@@ -26,7 +26,7 @@ import com.github.retrooper.packetevents.event.ProtocolPacketEvent;
 import com.github.retrooper.packetevents.netty.buffer.ByteBufAbstract;
 import com.github.retrooper.packetevents.netty.channel.ChannelAbstract;
 
-public class PacketSendEvent extends ProtocolPacketEvent {
+public class PacketSendEvent extends ProtocolPacketEvent<Object> {
     private Runnable postTask = null;
     private PacketWrapper<?> lastUsedWrapper;
 

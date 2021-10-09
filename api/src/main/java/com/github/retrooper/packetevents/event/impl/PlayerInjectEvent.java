@@ -38,7 +38,7 @@ import java.net.InetSocketAddress;
  * @since 1.6.9
  */
 //TODO Recode this event, looks questionable :0
-public final class PlayerInjectEvent extends PacketEvent implements CancellableEvent, PlayerEvent {
+public final class PlayerInjectEvent extends PacketEvent implements CancellableEvent, PlayerEvent<Object> {
     private final Object player;
     private final InetSocketAddress address;
     private boolean cancelled;
