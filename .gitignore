@@ -3,3 +3,4 @@
 .github
 /bukkit/build/
 /bukkit/src/main/resources/plugin.yml
+/build/

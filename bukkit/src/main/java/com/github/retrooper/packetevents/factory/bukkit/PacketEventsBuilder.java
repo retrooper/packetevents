@@ -59,7 +59,6 @@ public class PacketEventsBuilder {
     public static PacketEventsAPI<Plugin> build(Plugin plugin, PacketEventsSettings inSettings) {
         return new PacketEventsAPI<Plugin>() {
             private final EventManager eventManager = new EventManager();
-            private final PEVersion version = new PEVersion(2, 0, 0);
             private final PacketEventsSettings settings = inSettings;
             private final Logger logger = Logger.getLogger(PacketEventsAPI.class.getName());
             private final ServerManager serverManager = new ServerManagerImpl();
@@ -190,7 +189,7 @@ public class PacketEventsBuilder {
 
             @Override
             public PEVersion getVersion() {
-                return version;
+                return PacketEvents.VERSION;
             }
 
             @Override
