@@ -70,7 +70,7 @@ public class InternalPacketListener implements PacketListener {
                     PacketEvents.getAPI().getPlayerManager().clientVersions.put(event.getChannel(), clientVersion);
 
                     //Transition into the LOGIN OR STATUS connection state
-                    PacketEvents.getAPI().getInjector().changeConnectionState(event.getChannel(), handshake.getNextConnectionState());
+                    PacketEvents.getAPI().getPlayerManager().changeConnectionState(event.getChannel(), handshake.getNextConnectionState());
                 }
                 break;
             case LOGIN:
