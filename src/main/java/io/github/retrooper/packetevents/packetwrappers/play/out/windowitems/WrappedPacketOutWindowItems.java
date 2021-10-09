@@ -33,7 +33,7 @@ import java.util.ArrayList;
 import java.util.List;
 //TODO Test wrapper
 public class WrappedPacketOutWindowItems extends WrappedPacket implements SendableWrapper {
-    private static boolean v_1_17;
+    private static boolean v_1_17, v_1_17_1;
     private static Object nonNullListInstance;
     private static Class<?> nonNullListClass;
     private static Constructor<?> packetConstructor;
@@ -52,12 +52,20 @@ public class WrappedPacketOutWindowItems extends WrappedPacket implements Sendab
     @Override
     protected void load() {
         v_1_17 = version.isNewerThanOrEquals(ServerVersion.v_1_17);
+        v_1_17_1 = version.isNewerThanOrEquals(ServerVersion.v_1_17_1);
         try {
             if (v_1_17) {
                 nonNullListClass = NMSUtils.getNMClassWithoutException("core.NonNullList");
-                Constructor<?> nonNullListConstructor = nonNullListClass.getDeclaredConstructor();
-                nonNullListConstructor.setAccessible(true);
-                nonNullListInstance = nonNullListConstructor.newInstance();
+                if (v_1_17_1) {
+                    Constructor<?> nonNullListConstructor = nonNullListClass.getDeclaredConstructors()[0];
+                    nonNullListConstructor.setAccessible(true);
+                    nonNullListInstance = nonNullListConstructor.newInstance(new ArrayList<>(), null);
+                }
+                else {
+                    Constructor<?> nonNullListConstructor = nonNullListClass.getDeclaredConstructor();
+                    nonNullListConstructor.setAccessible(true);
+                    nonNullListInstance = nonNullListConstructor.newInstance();
+                }
                 packetConstructor = PacketTypeClasses.Play.Server.WINDOW_ITEMS.getConstructor(int.class, nonNullListClass);
             }
             else {
