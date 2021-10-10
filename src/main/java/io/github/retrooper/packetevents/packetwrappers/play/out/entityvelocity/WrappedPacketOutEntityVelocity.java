@@ -84,9 +84,9 @@ public final class WrappedPacketOutEntityVelocity extends WrappedPacketEntityAbs
 
     public void setVelocity(Vector3d velocity) {
         if (packet != null) {
-            writeInt(1, (int) (velocity.x));
-            writeInt(2, (int) (velocity.y));
-            writeInt(3, (int) (velocity.z));
+            writeInt(1, (int) (velocity.x * 8000.0));
+            writeInt(2, (int) (velocity.y * 8000.0));
+            writeInt(3, (int) (velocity.z * 8000.0));
         }
         else {
             this.velocityX = velocity.x;
