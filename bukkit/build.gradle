@@ -105,11 +105,6 @@ dependencies {
     compileOnly 'org.github.spigot:1.7.10:1.7.10'*/
 }
 
-group = 'io.github.retrooper'
-version = '2.0.0'
-description = 'packetevents'
-java.sourceCompatibility = JavaVersion.VERSION_1_8
-
 publishing {
     publications {
         maven(MavenPublication) {

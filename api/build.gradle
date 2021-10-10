@@ -1,9 +1,4 @@
-import org.gradle.api.JavaVersion
-import org.gradle.api.publish.maven.MavenPublication
-import org.gradle.api.tasks.compile.JavaCompile
-
-/*
- * This file is part of packetevents - https://github.com/retrooper/packetevents
+/* * This file is part of packetevents - https://github.com/retrooper/packetevents
  * Copyright (C) 2021 retrooper and contributors
  *
  * This program is free software: you can redistribute it and/or modify
@@ -24,9 +19,6 @@ plugins {
     id 'java'
 }
 
-group = 'io.github.retrooper'
-version = '1.0-SNAPSHOT'
-
 repositories {
     mavenCentral()
     maven {
@@ -38,11 +30,6 @@ repositories {
 dependencies {
     compileOnly 'org.jetbrains:annotations:22.0.0'
 }
-
-group = 'io.github.retrooper'
-version = '2.0.0'
-description = 'packetevents'
-java.sourceCompatibility = JavaVersion.VERSION_1_8
 
 tasks.withType(JavaCompile) {
     options.encoding = 'UTF-8'
