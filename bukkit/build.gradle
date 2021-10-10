@@ -47,6 +47,9 @@ repositories {
 
 tasks {
     shadowJar {
+        archiveBaseName.set('bukkit')
+        archiveClassifier.set('')
+        archiveVersion.set('')
         //Shading is that easy
         //relocate("com.github.retrooper", "com.github.repooper.kek")
     }
