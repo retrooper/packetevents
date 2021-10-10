@@ -17,6 +17,7 @@
 
 plugins {
     id 'java-library'
+    id 'maven-publish'
 }
 
 repositories {
@@ -25,6 +26,14 @@ repositories {
 
 dependencies {
     compileOnly 'org.jetbrains:annotations:22.0.0'
+}
+
+publishing {
+    publications {
+        maven(MavenPublication) {
+            from(components.java)
+        }
+    }
 }
 
 tasks.withType(JavaCompile) {
