@@ -19,3 +19,8 @@ publishing {
 tasks.withType(JavaCompile) {
     options.encoding = 'UTF-8'
 }
+
+wrapper {
+    gradleVersion = "7.0"
+    distributionType = Wrapper.DistributionType.ALL
+}
