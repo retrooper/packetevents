@@ -68,7 +68,7 @@ public class CustomBukkitDecodeHandler extends ByteToMessageDecoder {
     protected void decode(ChannelHandlerContext ctx, ByteBuf byteBuf, List<Object> list) throws Exception {
         if (!ViaVersionUtil.checkServerboundPacketUserConnection(userInfo)) {
             byteBuf.clear(); //Don't accumulate
-            throw ViaVersionUtil.throwCancelEncoderException(null);
+            throw ViaVersionUtil.throwCancelDecoderException(null);
         }
 
         ByteBuf transformedBuf = null;

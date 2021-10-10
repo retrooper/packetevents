@@ -30,7 +30,7 @@ public interface ViaVersionAccessor {
 
     Exception throwCancelEncoderException(Throwable throwable);
 
-    void transformPacket(Object userConnectionObj, Object byteBufObj, boolean clientSide);
+    void transformPacket(Object userConnectionObj, Object byteBufObj, boolean clientSide) throws Exception;
 
     void setUserConnectionActive(Object userConnectionObj, boolean active);
 

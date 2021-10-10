@@ -142,17 +142,13 @@ public class ViaVersionAccessorImplLegacy implements ViaVersionAccessor {
     }
 
     @Override
-    public void transformPacket(Object userConnectionObj, Object byteBufObj, boolean clientSide) {
+    public void transformPacket(Object userConnectionObj, Object byteBufObj, boolean clientSide) throws Exception {
         load();
         ByteBuf byteBuf = (ByteBuf) byteBufObj;
-        try {
-            if (clientSide) {
-                transformServerboundMethod.invoke(userConnectionObj, byteBuf, cancelDecoderExceptionGenerator.invoke(null));
-            } else {
-                transformClientboundMethod.invoke(userConnectionObj, byteBuf, cancelEncoderExceptionGenerator.invoke(null));
-            }
-        } catch (Exception ex) {
-            ex.printStackTrace();
+        if (clientSide) {
+            transformServerboundMethod.invoke(userConnectionObj, byteBuf, cancelDecoderExceptionGenerator.invoke(null));
+        } else {
+            transformClientboundMethod.invoke(userConnectionObj, byteBuf, cancelEncoderExceptionGenerator.invoke(null));
         }
     }
 

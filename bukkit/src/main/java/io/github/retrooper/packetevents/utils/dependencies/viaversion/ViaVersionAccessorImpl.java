@@ -52,7 +52,7 @@ public class ViaVersionAccessorImpl implements ViaVersionAccessor {
     }
 
     @Override
-    public void transformPacket(Object userConnectionObj, Object byteBufObj, boolean clientSide) {
+    public void transformPacket(Object userConnectionObj, Object byteBufObj, boolean clientSide) throws Exception {
         UserConnection userConnection = (UserConnection) userConnectionObj;
         ByteBuf byteBuf = (ByteBuf) byteBufObj;
 

@@ -1,6 +1,6 @@
 /*
- * This file is part of packetevents - https://github.com/retrooper/packetevents
- * Copyright (C) 2021 retrooper and contributors
+ * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
+ * Copyright (C) 2016-2021 ViaVersion and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,12 +18,12 @@
 
 package io.github.retrooper.packetevents.utils.dependencies.viaversion;
 
+import com.github.retrooper.packetevents.protocol.ConnectionState;
+import com.github.retrooper.packetevents.util.reflection.ClassUtil;
 import com.viaversion.viaversion.exception.CancelCodecException;
 import com.viaversion.viaversion.exception.InformativeException;
 import com.viaversion.viaversion.handlers.ChannelHandlerContextWrapper;
 import com.viaversion.viaversion.handlers.ViaCodecHandler;
-import com.github.retrooper.packetevents.protocol.ConnectionState;
-import com.github.retrooper.packetevents.util.reflection.ClassUtil;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
@@ -93,6 +93,19 @@ public class CustomBukkitEncodeHandlerModern extends MessageToByteEncoder<Object
         ViaVersionUtil.transformPacket(userInfo, bytebuf, false);
     }
 
+    private static int readVarInt(ByteBuf byteBuf) {
+        byte b0;
+        int i = 0;
+        int j = 0;
+        do {
+            b0 = byteBuf.readByte();
+            i |= (b0 & Byte.MAX_VALUE) << j++ * 7;
+            if (j > 5)
+                throw new RuntimeException("VarInt too big");
+        } while ((b0 & 128) == 128);
+        return i;
+    }
+
     @Override
     protected void encode(ChannelHandlerContext ctx, Object o, ByteBuf byteBuf) throws Exception {
         if (versionField != null) {
@@ -113,17 +126,20 @@ public class CustomBukkitEncodeHandlerModern extends MessageToByteEncoder<Object
             byteBuf.writeBytes((ByteBuf) o);
         }
         ByteBuf transformed = ctx.alloc().buffer().writeBytes(byteBuf);
+        //Call our custom encoders before ViaVersion translates the packet.
         for (Object customEncoder : customEncoders) {
             if (customEncoder instanceof MessageToByteEncoder) {
-                CustomPipelineUtil.callEncode((MessageToByteEncoder<?>) customEncoder, ctx, transformed, byteBuf);
+                CustomPipelineUtil.callEncode((MessageToByteEncoder<?>) customEncoder, new ChannelHandlerContextWrapper(ctx, this), transformed, byteBuf);
                 transformed.clear().writeBytes(byteBuf);
             } else if (customEncoder instanceof MessageToMessageEncoder) {
-                ByteBuf bb = (ByteBuf) CustomPipelineUtil.callEncode((MessageToMessageEncoder<?>) customEncoder, ctx, transformed).get(0);
+                ByteBuf bb = (ByteBuf) CustomPipelineUtil.callEncode((MessageToMessageEncoder<?>) customEncoder, new ChannelHandlerContextWrapper(ctx, this), transformed).get(0);
                 transformed.clear().writeBytes(bb);
             }
         }
+        //Let ViaVersion translate our potentially modified version of the packet.
         transform(transformed);
-        byteBuf.clear().writeBytes(byteBuf);
+        byteBuf.clear().writeBytes(transformed);
+        transformed.release();
     }
 
     private boolean containsCause(Throwable t, Class<?> c) {

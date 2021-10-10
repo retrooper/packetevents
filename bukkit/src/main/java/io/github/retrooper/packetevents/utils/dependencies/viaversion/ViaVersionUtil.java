@@ -61,7 +61,7 @@ public class ViaVersionUtil {
         return getViaVersionAccessor().isDebug();
     }
 
-    public static Object throwCancelDecoderException(Throwable throwable) {
+    public static Exception throwCancelDecoderException(Throwable throwable) {
         return getViaVersionAccessor().throwCancelDecoderException(throwable);
     }
 
@@ -69,7 +69,7 @@ public class ViaVersionUtil {
         return getViaVersionAccessor().throwCancelEncoderException(throwable);
     }
 
-    public static void transformPacket(Object userConnectionObj, Object byteBufObj, boolean clientSide) {
+    public static void transformPacket(Object userConnectionObj, Object byteBufObj, boolean clientSide) throws Exception {
         getViaVersionAccessor().transformPacket(userConnectionObj, byteBufObj, clientSide);
     }
 

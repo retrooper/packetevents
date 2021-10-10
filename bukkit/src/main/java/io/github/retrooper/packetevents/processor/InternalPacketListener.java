@@ -50,8 +50,7 @@ public class InternalPacketListener implements PacketListener {
         }*/
         if (event.getPacketType() == PacketType.Play.Server.CHAT_MESSAGE) {
             WrapperPlayServerChatMessage msg = new WrapperPlayServerChatMessage(event);
-            //System.out.println("msg: " + msg.getJSONMessage());
-            //event.getPlayer().sendMessage("msg: " + msg.getJSONMessage());
+            System.out.println("msg: " + msg.getJSONMessage());
         }
     }
 
@@ -80,6 +79,12 @@ public class InternalPacketListener implements PacketListener {
                     PacketEvents.getAPI().getPlayerManager().channels.put(start.getUsername(), event.getChannel());
                 }
                 break;
+        case PLAY:
+            if (event.getPacketType() == PacketType.Play.Client.INTERACT_ENTITY) {
+                WrapperPlayClientInteractEntity in = new WrapperPlayClientInteractEntity(event);
+                ((Player)event.getPlayer()).sendMessage("eid: " + in.getEntityID() + ", type: " + in.getType().name());
+            }
+            break;
         }
     }
 }
