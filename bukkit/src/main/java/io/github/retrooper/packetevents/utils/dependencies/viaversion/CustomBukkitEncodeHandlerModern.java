@@ -93,19 +93,6 @@ public class CustomBukkitEncodeHandlerModern extends MessageToByteEncoder<Object
         ViaVersionUtil.transformPacket(userInfo, bytebuf, false);
     }
 
-    private static int readVarInt(ByteBuf byteBuf) {
-        byte b0;
-        int i = 0;
-        int j = 0;
-        do {
-            b0 = byteBuf.readByte();
-            i |= (b0 & Byte.MAX_VALUE) << j++ * 7;
-            if (j > 5)
-                throw new RuntimeException("VarInt too big");
-        } while ((b0 & 128) == 128);
-        return i;
-    }
-
     @Override
     protected void encode(ChannelHandlerContext ctx, Object o, ByteBuf byteBuf) throws Exception {
         if (versionField != null) {
