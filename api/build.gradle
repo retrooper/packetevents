@@ -16,15 +16,11 @@
  */
 
 plugins {
-    id 'java'
+    id 'java-library'
 }
 
 repositories {
     mavenCentral()
-    maven {
-        name = 'sonatype'
-        url = 'https://oss.sonatype.org/content/groups/public/'
-    }
 }
 
 dependencies {
