@@ -20,16 +20,12 @@ package io.github.retrooper.packetevents.processor;
 
 import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.event.impl.PostPlayerInjectEvent;
-import com.github.retrooper.packetevents.injector.ChannelInjector;
-import com.github.retrooper.packetevents.manager.server.ServerManager;
+import com.github.retrooper.packetevents.netty.channel.ChannelAbstract;
 import io.github.retrooper.packetevents.handlers.GlobalChannelInjector;
-import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
-import org.bukkit.event.entity.EntityDeathEvent;
-import org.bukkit.event.entity.EntitySpawnEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerLoginEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
@@ -63,7 +59,7 @@ public class InternalBukkitListener implements Listener {
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onQuit(PlayerQuitEvent e) {
         Player player = e.getPlayer();
-        Object channel = PacketEvents.getAPI().getPlayerManager().getChannel(player);
+        ChannelAbstract channel = PacketEvents.getAPI().getPlayerManager().getChannel(player);
         //Cleanup user data
         PacketEvents.getAPI().getPlayerManager().clientVersions.remove(channel);
         PacketEvents.getAPI().getPlayerManager().connectionStates.remove(channel);
