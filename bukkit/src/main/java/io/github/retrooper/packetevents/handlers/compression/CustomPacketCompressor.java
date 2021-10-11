@@ -31,6 +31,15 @@ public class CustomPacketCompressor {
     private static final int THRESHOLD = 256;
     private static Class<?> MESSAGE_TO_BYTE_ENCODER;
 
+    public static void recompress(ChannelHandlerContextAbstract ctx, ByteBufAbstract buf) {
+        ByteBufAbstract compressed = CustomPacketCompressor.compress(ctx, buf);
+        try {
+            buf.clear().writeBytes(compressed);
+        } finally {
+            compressed.release();
+        }
+    }
+
     public static ByteBufAbstract compress(ChannelHandlerContextAbstract ctx, ByteBufAbstract byteBuf) {
         if (MESSAGE_TO_BYTE_ENCODER == null) {
             MESSAGE_TO_BYTE_ENCODER = MinecraftReflectionUtil.getNettyClass("handler.codec.MessageToByteEncoder");

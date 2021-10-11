@@ -25,6 +25,7 @@ import io.github.retrooper.packetevents.handlers.modern.PacketEncoderModern;
 import com.github.retrooper.packetevents.util.reflection.Reflection;
 import com.github.retrooper.packetevents.util.reflection.ReflectionObject;
 import io.github.retrooper.packetevents.utils.dependencies.viaversion.CustomBukkitDecodeHandler;
+import io.github.retrooper.packetevents.utils.dependencies.viaversion.ViaVersionUtil;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandler;
 import io.netty.handler.codec.ByteToMessageDecoder;
@@ -43,26 +44,10 @@ public class ServerConnectionInitializerModern {
     public static void postDestroyChannel(Object ch) {
         Channel channel = (Channel) ch;
         ChannelHandler mcDecoder = channel.pipeline().get("decoder");
-        if (mcDecoder instanceof CustomBukkitDecodeHandler) {
-            //Convert back to the original ViaVersion decoder
-            CustomBukkitDecodeHandler customBukkitDecodeHandler = (CustomBukkitDecodeHandler) mcDecoder;
-            channel.pipeline().replace("decoder", "decoder", customBukkitDecodeHandler.oldBukkitDecodeHandler);
-            ChannelHandler protocolLibDecoder = channel.pipeline().get("protocol_lib_decoder");
-            if (protocolLibDecoder != null) {
-                //Reflect the ProtocolLib decoder
-                ReflectionObject reflectProtocolLibDecoder = new ReflectionObject(protocolLibDecoder);
-                //Correct the vanillaDecoder variable in the ProtocolLib decoder
-                reflectProtocolLibDecoder.write(ByteToMessageDecoder.class, 0, customBukkitDecodeHandler.oldBukkitDecodeHandler);
-                //Correct the decodeBuffer variable in ProtocolLib decoder
-                Method minecraftDecodeMethod = Reflection.getMethod(customBukkitDecodeHandler.oldBukkitDecodeHandler.getClass(), "decode", 0);
-                try {
-                    Field decodeBufferField = protocolLibDecoder.getClass().getDeclaredField("decodeBuffer");
-                    decodeBufferField.setAccessible(true);
-                    decodeBufferField.set(protocolLibDecoder, minecraftDecodeMethod);
-                } catch (NoSuchFieldException | IllegalAccessException e) {
-                    e.printStackTrace();
-                }
-            }
+        if (ViaVersionUtil.getBukkitDecodeHandlerClass().isInstance(mcDecoder)) {
+            ReflectionObject reflectMCDecoder = new ReflectionObject(mcDecoder);
+            PacketDecoderModern decoder = (PacketDecoderModern) reflectMCDecoder.readObject(0, ByteToMessageDecoder.class);
+            reflectMCDecoder.write(ByteToMessageDecoder.class, 0, decoder.previousMCDecoder);
         } else {
             channel.pipeline().remove(PacketEvents.DECODER_NAME);
             channel.pipeline().remove(PacketEvents.ENCODER_NAME);

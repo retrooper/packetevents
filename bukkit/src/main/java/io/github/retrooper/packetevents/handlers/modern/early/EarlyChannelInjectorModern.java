@@ -23,14 +23,12 @@ import com.github.retrooper.packetevents.netty.channel.ChannelAbstract;
 import com.github.retrooper.packetevents.protocol.ConnectionState;
 import com.github.retrooper.packetevents.util.ListWrapper;
 import com.github.retrooper.packetevents.util.reflection.ClassUtil;
-import com.github.retrooper.packetevents.util.reflection.Reflection;
 import com.github.retrooper.packetevents.util.reflection.ReflectionObject;
 import io.github.retrooper.packetevents.handlers.EarlyInjector;
 import io.github.retrooper.packetevents.handlers.modern.PacketDecoderModern;
 import io.github.retrooper.packetevents.handlers.modern.PacketEncoderModern;
 import io.github.retrooper.packetevents.utils.MinecraftReflectionUtil;
 import io.github.retrooper.packetevents.utils.dependencies.protocolsupport.ProtocolSupportUtil;
-import io.github.retrooper.packetevents.utils.dependencies.viaversion.CustomBukkitDecodeHandler;
 import io.github.retrooper.packetevents.utils.dependencies.viaversion.CustomBukkitEncodeHandlerModern;
 import io.github.retrooper.packetevents.utils.dependencies.viaversion.ViaVersionUtil;
 import io.netty.channel.Channel;
@@ -39,12 +37,10 @@ import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelPipeline;
 import io.netty.handler.codec.ByteToMessageDecoder;
 import io.netty.handler.codec.MessageToByteEncoder;
-import io.netty.handler.codec.MessageToMessageDecoder;
 import io.netty.handler.codec.MessageToMessageEncoder;
 import org.bukkit.entity.Player;
 
 import java.lang.reflect.Field;
-import java.lang.reflect.Method;
 import java.util.*;
 
 public class EarlyChannelInjectorModern implements EarlyInjector {
@@ -226,22 +222,16 @@ public class EarlyChannelInjectorModern implements EarlyInjector {
 
     private PacketDecoderModern getDecoder(ChannelAbstract ch) {
         Channel channel = (Channel) ch.rawChannel();
+        System.out.println("TRIED: " + PacketEvents.DECODER_NAME);
         ChannelHandler decoder = channel.pipeline().get(PacketEvents.DECODER_NAME);
         if (decoder != null) {
             return (PacketDecoderModern) decoder;
         } else if (ViaVersionUtil.isAvailable()) {
             ChannelHandler mcDecoder = channel.pipeline().get("decoder");
-            if (mcDecoder instanceof CustomBukkitDecodeHandler) {
-                return ((CustomBukkitDecodeHandler) mcDecoder).getCustomDecoder(PacketDecoderModern.class);
-            } else if (ClassUtil.getClassSimpleName(mcDecoder.getClass()).equals("CustomBukkitDecodeHandler")) {
-                List<MessageToMessageDecoder<?>> customDecoders = new ReflectionObject(mcDecoder).readList(0);
-                for (MessageToMessageDecoder<?> customDecoder : customDecoders) {
-                    ReflectionObject reflectionObject = new ReflectionObject(customDecoder);
-                    String customDecoderHandlerName = reflectionObject.readString(0);
-                    if (customDecoderHandlerName.equals(PacketEvents.DECODER_NAME)) {
-                        return (PacketDecoderModern) customDecoder;
-                    }
-                }
+            if (ViaVersionUtil.getBukkitDecodeHandlerClass().isInstance(mcDecoder)) {
+                System.out.println("GETTING THERE...");
+                ReflectionObject reflectMCDecoder = new ReflectionObject(mcDecoder);
+                return (PacketDecoderModern) reflectMCDecoder.readObject(0, ByteToMessageDecoder.class);
             }
         }
         return null;
@@ -341,49 +331,14 @@ public class EarlyChannelInjectorModern implements EarlyInjector {
         }
     }
 
-    private void addCustomViaDecoder(Object ch, MessageToMessageDecoder<?> customDecoder) {
+    private void addCustomViaDecoder(Object ch, PacketDecoderModern customDecoder) {
         Channel channel = (Channel) ch;
         ChannelHandler decoder = channel.pipeline().get("decoder");
-        if (decoder instanceof CustomBukkitDecodeHandler) {
-            CustomBukkitDecodeHandler customBukkitDecodeHandler = (CustomBukkitDecodeHandler) decoder;
-            customBukkitDecodeHandler.addCustomDecoder(customDecoder);
-        } else if (ViaVersionUtil.getBukkitDecodeHandlerClass().isInstance(decoder)) {
-            ReflectionObject reflectionObject = new ReflectionObject(decoder);
-            Object userConnectionInfo = reflectionObject.readObject(0, ViaVersionUtil.getUserConnectionClass());
-            ByteToMessageDecoder minecraftDecoder = reflectionObject.readObject(0, ByteToMessageDecoder.class);
-            CustomBukkitDecodeHandler customBukkitDecodeHandler = new CustomBukkitDecodeHandler(userConnectionInfo, minecraftDecoder, decoder);
-            customBukkitDecodeHandler.addCustomDecoder(customDecoder);
-            ChannelHandler protocolLibDecoder = channel.pipeline().get("protocol_lib_decoder");
-            if (protocolLibDecoder != null) {
-                //Reflect the ProtocolLib decoder
-                ReflectionObject reflectProtocolLibDecoder = new ReflectionObject(protocolLibDecoder);
-                //Correct the vanillaDecoder variable in the ProtocolLib decoder
-                reflectProtocolLibDecoder.write(ByteToMessageDecoder.class, 0, customBukkitDecodeHandler);
-                //Correct the decodeBuffer variable in ProtocolLib decoder
-                Method minecraftDecodeMethod = Reflection.getMethod(minecraftDecoder.getClass(), "decode", 0);
-                try {
-                    Field decodeBufferField = protocolLibDecoder.getClass().getDeclaredField("decodeBuffer");
-                    decodeBufferField.setAccessible(true);
-                    decodeBufferField.set(protocolLibDecoder, minecraftDecodeMethod);
-                } catch (NoSuchFieldException | IllegalAccessException e) {
-                    e.printStackTrace();
-                }
-            }
-            channel.pipeline().replace("decoder", "decoder", customBukkitDecodeHandler);
-        } else if (ClassUtil.getClassSimpleName(decoder.getClass()).equals("CustomBukkitDecodeHandler")) {
-            ReflectionObject reflectionObject = new ReflectionObject(decoder);
-            //TODO Test multiple packetevents instances that have shaded in diff locations
-            List<MessageToMessageDecoder<?>> customDecoders = reflectionObject.readList(0);
-            ByteToMessageDecoder minecraftDecoder = reflectionObject.read(0, ByteToMessageDecoder.class);
-            Object userConnection = reflectionObject.read(0, ViaVersionUtil.getUserConnectionClass());
+        ReflectionObject reflectionObject = new ReflectionObject(decoder);
+        customDecoder.previousMCDecoder = reflectionObject.readObject(0, ByteToMessageDecoder.class);
+        reflectionObject.write(ByteToMessageDecoder.class, 0, customDecoder);
 
-            ChannelHandler oldBukkitDecoder = reflectionObject.readObject(0, ChannelHandler.class);
-
-            CustomBukkitDecodeHandler customBukkitDecodeHandler = new CustomBukkitDecodeHandler(userConnection, minecraftDecoder, oldBukkitDecoder);
-            customBukkitDecodeHandler.addCustomDecoder(customDecoder);
-            customBukkitDecodeHandler.customDecoders.addAll(customDecoders);
-            channel.pipeline().replace("decoder", "decoder", customBukkitDecodeHandler);
-        }
+        System.out.println("MODIFIED VIA'S DECODER: " + reflectionObject.read(0, ByteToMessageDecoder.class).getClass().getSimpleName());
     }
 
     @Override
@@ -394,16 +349,22 @@ public class EarlyChannelInjectorModern implements EarlyInjector {
             //Change connection state in decoder
             decoder.connectionState = connectionState;
             if (connectionState == ConnectionState.PLAY) {
+                System.out.println("REPLACING DECODER");
                 if (ViaVersionUtil.isAvailable()) {
+                    System.out.println("VIA WAY");
                     channel.pipeline().remove(PacketEvents.DECODER_NAME);
                     PacketEncoderModern encoder = (PacketEncoderModern) channel.pipeline().remove(PacketEvents.ENCODER_NAME);
                     decoder.bypassCompression = true;
                     //If via is present, replace their decode handler with my custom one
-                    addCustomViaDecoder(channel, decoder);
+                    addCustomViaDecoder(channel, new PacketDecoderModern(decoder));
                     addCustomViaEncoder(channel, encoder);
                 } else if (ProtocolSupportUtil.isAvailable()) {
+                    System.out.println("PROTOCOLSUPPORT WAY?");
                     channel.pipeline().remove(PacketEvents.DECODER_NAME);
-                    channel.pipeline().addAfter("ps_decoder_transformer", PacketEvents.DECODER_NAME, decoder);
+                    channel.pipeline().addAfter("ps_decoder_transformer", PacketEvents.DECODER_NAME, new PacketDecoderModern(decoder));
+                }
+                else {
+                    System.out.println("WHAT ARE WE DOING?");
                 }
             }
         }

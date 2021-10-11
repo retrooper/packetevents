@@ -37,7 +37,8 @@ public class InternalPacketListener implements PacketListener {
     @Override
     public void onPacketSend(PacketSendEvent event) {
         if (event.getPacketType() == PacketType.Login.Server.LOGIN_SUCCESS) {
-            //Transition into the GAME connection state
+            //Transition into the PLAY connection state
+            System.out.println("TRANSITIONING INTO PLAY STATE");
             PacketEvents.getAPI().getPlayerManager().changeConnectionState(event.getChannel(), ConnectionState.PLAY);
         } /*else if (event.getPacketType() == PacketType.Play.Server.CHUNK_DATA) {
             WrapperPlayServerChunkData chunkData = new WrapperPlayServerChunkData(event);

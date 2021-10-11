@@ -16,22 +16,28 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package io.github.retrooper.packetevents.handlers.compression;
+package io.github.retrooper.packetevents.handlers.legacy.early;
 
 import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.netty.buffer.ByteBufAbstract;
-import com.github.retrooper.packetevents.netty.channel.ChannelHandlerAbstract;
 import com.github.retrooper.packetevents.netty.channel.ChannelHandlerContextAbstract;
+import io.github.retrooper.packetevents.handlers.compression.CustomPacketCompressor;
+import io.github.retrooper.packetevents.handlers.legacy.PacketDecoderLegacy;
+import io.github.retrooper.packetevents.handlers.legacy.PacketEncoderLegacy;
+import io.github.retrooper.packetevents.handlers.modern.PacketDecoderModern;
+import io.github.retrooper.packetevents.handlers.modern.PacketEncoderModern;
+import net.minecraft.util.io.netty.buffer.ByteBuf;
+import net.minecraft.util.io.netty.channel.ChannelHandlerContext;
 
-public class CompressionManager {
-    public static boolean refactorHandlers(ChannelHandlerContextAbstract ctx, ByteBufAbstract buf, ByteBufAbstract decompressed) {
+public class CompressionManagerLegacy {
+    public static boolean refactorHandlers(ChannelHandlerContext ctx, ByteBuf buf, ByteBuf decompressed) {
         try {
             buf.clear().writeBytes(decompressed);
         } finally {
             decompressed.release();
         }
-        ChannelHandlerAbstract encoder = ctx.pipeline().get(PacketEvents.ENCODER_NAME);
-        ChannelHandlerAbstract decoder = ctx.pipeline().get(PacketEvents.DECODER_NAME);
+        PacketEncoderLegacy encoder = (PacketEncoderLegacy) ctx.pipeline().get(PacketEvents.ENCODER_NAME);
+        PacketDecoderLegacy decoder = (PacketDecoderLegacy) ctx.pipeline().get(PacketEvents.DECODER_NAME);
         ctx.pipeline().remove(encoder);
         ctx.pipeline().remove(decoder);
         ctx.pipeline().addAfter("compress", PacketEvents.ENCODER_NAME, encoder);
