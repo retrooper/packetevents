@@ -239,20 +239,6 @@ public class EarlyChannelInjectorModern implements EarlyInjector {
         ChannelHandler encoder = channel.pipeline().get(PacketEvents.ENCODER_NAME);
         if (encoder instanceof PacketEncoderModern) {
             return (PacketEncoderModern) encoder;
-        } else if (ViaVersionUtil.isAvailable()) {
-            ChannelHandler mcDecoder = channel.pipeline().get("encoder");
-            if (mcDecoder instanceof CustomBukkitEncodeHandlerModern) {
-                return ((CustomBukkitEncodeHandlerModern) mcDecoder).getCustomEncoder(PacketEncoderModern.class);
-            } else if (ClassUtil.getClassSimpleName(mcDecoder.getClass()).equals("CustomBukkitEncodeHandlerModern")) {
-                List<Object> customEncoders = new ReflectionObject(mcDecoder).readList(0);
-                for (Object customEncoder : customEncoders) {
-                    ReflectionObject reflectionObject = new ReflectionObject(customEncoder);
-                    String customEncoderHandlerName = reflectionObject.readString(0);
-                    if (customEncoderHandlerName.equals(PacketEvents.ENCODER_NAME)) {
-                        return (PacketEncoderModern) customEncoder;
-                    }
-                }
-            }
         }
         return null;
     }
@@ -280,13 +266,11 @@ public class EarlyChannelInjectorModern implements EarlyInjector {
     }
 
     private void addCustomViaEncoder(Object ch, PacketEncoderModern encoder) {
-        //TODO Support legacy via versions
         Channel channel = (Channel) ch;
         ChannelHandler mcEncoder = channel.pipeline().get("encoder");
         ReflectionObject reflectMCEncoder = new ReflectionObject(mcEncoder);
         encoder.mcEncoder = reflectMCEncoder.read(0, MessageToByteEncoder.class);
         channel.pipeline().addAfter("encoder", PacketEvents.ENCODER_NAME, encoder);
-        System.out.println("pipe: " + Arrays.toString(channel.pipeline().names().toArray(new String[0])));
     }
 
     private void addCustomViaDecoder(Object ch, PacketDecoderModern decoder) {
@@ -295,8 +279,6 @@ public class EarlyChannelInjectorModern implements EarlyInjector {
         ReflectionObject reflectionObject = new ReflectionObject(mcDecoder);
         decoder.mcDecoder = reflectionObject.readObject(0, ByteToMessageDecoder.class);
         reflectionObject.write(ByteToMessageDecoder.class, 0, decoder);
-
-        System.out.println("MODIFIED VIA'S DECODER: " + reflectionObject.read(0, ByteToMessageDecoder.class).getClass().getSimpleName());
     }
 
     @Override
@@ -307,21 +289,15 @@ public class EarlyChannelInjectorModern implements EarlyInjector {
             //Change connection state in decoder
             decoder.connectionState = connectionState;
             if (connectionState == ConnectionState.PLAY) {
-                System.out.println("REPLACING DECODER");
                 if (ViaVersionUtil.isAvailable()) {
-                    System.out.println("VIA WAY");
                     PacketEncoderModern encoder = (PacketEncoderModern) channel.pipeline().remove(PacketEvents.ENCODER_NAME);
                     addCustomViaEncoder(channel, encoder);
                     channel.pipeline().remove(PacketEvents.DECODER_NAME);
                     decoder.bypassCompression = true;
                     addCustomViaDecoder(channel, new PacketDecoderModern(decoder));
                 } else if (ProtocolSupportUtil.isAvailable()) {
-                    System.out.println("PROTOCOLSUPPORT WAY?");
                     channel.pipeline().remove(PacketEvents.DECODER_NAME);
                     channel.pipeline().addAfter("ps_decoder_transformer", PacketEvents.DECODER_NAME, new PacketDecoderModern(decoder));
-                }
-                else {
-                    System.out.println("WHAT ARE WE DOING?");
                 }
             }
         }

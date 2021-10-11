@@ -19,9 +19,9 @@
 package io.github.retrooper.packetevents.handlers.modern.early;
 
 import com.github.retrooper.packetevents.PacketEvents;
+import com.github.retrooper.packetevents.util.reflection.ReflectionObject;
 import io.github.retrooper.packetevents.handlers.modern.PacketDecoderModern;
 import io.github.retrooper.packetevents.handlers.modern.PacketEncoderModern;
-import com.github.retrooper.packetevents.util.reflection.ReflectionObject;
 import io.github.retrooper.packetevents.utils.dependencies.viaversion.ViaVersionUtil;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandler;
@@ -44,7 +44,8 @@ public class ServerConnectionInitializerModern {
             reflectMCDecoder.write(ByteToMessageDecoder.class, 0, decoder.mcDecoder);
         } else {
             channel.pipeline().remove(PacketEvents.DECODER_NAME);
-            channel.pipeline().remove(PacketEvents.ENCODER_NAME);
         }
+
+        channel.pipeline().remove(PacketEvents.ENCODER_NAME);
     }
 }

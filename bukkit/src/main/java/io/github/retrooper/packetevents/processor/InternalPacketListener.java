@@ -38,7 +38,6 @@ public class InternalPacketListener implements PacketListener {
     public void onPacketSend(PacketSendEvent event) {
         if (event.getPacketType() == PacketType.Login.Server.LOGIN_SUCCESS) {
             //Transition into the PLAY connection state
-            System.out.println("TRANSITIONING INTO PLAY STATE");
             PacketEvents.getAPI().getPlayerManager().changeConnectionState(event.getChannel(), ConnectionState.PLAY);
         } /*else if (event.getPacketType() == PacketType.Play.Server.CHUNK_DATA) {
             WrapperPlayServerChunkData chunkData = new WrapperPlayServerChunkData(event);
@@ -51,10 +50,10 @@ public class InternalPacketListener implements PacketListener {
         }*/
         if (event.getPacketType() == PacketType.Play.Server.CHAT_MESSAGE) {
             WrapperPlayServerChatMessage msg = new WrapperPlayServerChatMessage(event);
-            System.out.println("msg: " + msg.getJSONMessage());
+            //System.out.println("msg: " + msg.getJSONMessage());
         }
         else if (event.getPacketType() == PacketType.Play.Server.RESPAWN) {
-            System.out.println("COOL, YOU DIED!");
+            //System.out.println("COOL!!!!!!11 YOU DIED!");
         }
     }
 
@@ -86,7 +85,7 @@ public class InternalPacketListener implements PacketListener {
         case PLAY:
             if (event.getPacketType() == PacketType.Play.Client.INTERACT_ENTITY) {
                 WrapperPlayClientInteractEntity in = new WrapperPlayClientInteractEntity(event);
-                ((Player)event.getPlayer()).sendMessage("eid: " + in.getEntityID() + ", type: " + in.getType().name());
+                //((Player)event.getPlayer()).sendMessage("eid: " + in.getEntityID() + ", type: " + in.getType().name());
             }
             break;
         }
