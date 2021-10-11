@@ -36,6 +36,7 @@ import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelPipeline;
 import io.netty.handler.codec.ByteToMessageDecoder;
+import io.netty.handler.codec.MessageToByteEncoder;
 import org.bukkit.entity.Player;
 
 import java.lang.reflect.Field;
@@ -220,14 +221,12 @@ public class EarlyChannelInjectorModern implements EarlyInjector {
 
     private PacketDecoderModern getDecoder(ChannelAbstract ch) {
         Channel channel = (Channel) ch.rawChannel();
-        System.out.println("TRIED: " + PacketEvents.DECODER_NAME);
         ChannelHandler decoder = channel.pipeline().get(PacketEvents.DECODER_NAME);
         if (decoder != null) {
             return (PacketDecoderModern) decoder;
         } else if (ViaVersionUtil.isAvailable()) {
             ChannelHandler mcDecoder = channel.pipeline().get("decoder");
             if (ViaVersionUtil.getBukkitDecodeHandlerClass().isInstance(mcDecoder)) {
-                System.out.println("GETTING THERE...");
                 ReflectionObject reflectMCDecoder = new ReflectionObject(mcDecoder);
                 return (PacketDecoderModern) reflectMCDecoder.readObject(0, ByteToMessageDecoder.class);
             }
@@ -283,9 +282,10 @@ public class EarlyChannelInjectorModern implements EarlyInjector {
     private void addCustomViaEncoder(Object ch, PacketEncoderModern encoder) {
         //TODO Support legacy via versions
         Channel channel = (Channel) ch;
-        //ChannelHandler mcEncoder = channel.pipeline().get("encoder");
-        //Where do I place the encoder? help
-        channel.pipeline().addAfter("decoder", PacketEvents.ENCODER_NAME, encoder);
+        ChannelHandler mcEncoder = channel.pipeline().get("encoder");
+        ReflectionObject reflectMCEncoder = new ReflectionObject(mcEncoder);
+        encoder.mcEncoder = reflectMCEncoder.read(0, MessageToByteEncoder.class);
+        channel.pipeline().addAfter("encoder", PacketEvents.ENCODER_NAME, encoder);
         System.out.println("pipe: " + Arrays.toString(channel.pipeline().names().toArray(new String[0])));
     }
 

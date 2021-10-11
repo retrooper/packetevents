@@ -25,21 +25,24 @@ import io.github.retrooper.packetevents.handlers.compression.CustomPacketDecompr
 import com.github.retrooper.packetevents.netty.buffer.ByteBufAbstract;
 import com.github.retrooper.packetevents.netty.channel.ChannelHandlerContextAbstract;
 import io.github.retrooper.packetevents.handlers.modern.early.CompressionManagerModern;
+import io.github.retrooper.packetevents.utils.dependencies.viaversion.CustomPipelineUtil;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
+import io.netty.handler.codec.MessageToByteEncoder;
 import io.netty.handler.codec.MessageToMessageEncoder;
 import org.bukkit.entity.Player;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 
 @ChannelHandler.Sharable
-public class PacketEncoderModern extends MessageToMessageEncoder<ByteBuf> {
+public class PacketEncoderModern extends MessageToMessageEncoder<Object> {
     public volatile Player player;
     private boolean handledCompression;
+    public MessageToByteEncoder mcEncoder;
 
-    public void handle(ChannelHandlerContextAbstract ctx, ByteBufAbstract byteBuf, List<Object> output) {
-        ByteBufAbstract transformedBuf = ctx.alloc().buffer().writeBytes(byteBuf);
+    public void handle(ChannelHandlerContextAbstract ctx, ByteBufAbstract transformedBuf, List<Object> output) {
         try {
             boolean needsCompress = handleCompressionOrder(ctx, transformedBuf);
 
@@ -72,7 +75,21 @@ public class PacketEncoderModern extends MessageToMessageEncoder<ByteBuf> {
     }
 
     @Override
-    protected void encode(ChannelHandlerContext ctx, ByteBuf byteBuf, List<Object> out) {
+    protected void encode(ChannelHandlerContext ctx, Object o, List<Object> out) {
+        ByteBuf byteBuf = ctx.alloc().buffer();
+        if (!(o instanceof ByteBuf)) {
+            //Call mc encoder
+            if (mcEncoder == null)return;
+            try {
+                CustomPipelineUtil.callEncode(mcEncoder, ctx, o, byteBuf);
+            } catch (InvocationTargetException e) {
+                e.printStackTrace();
+            }
+        }
+        else {
+            byteBuf.writeBytes((ByteBuf) o);
+        }
+        //byteBuf is released in the handle method
         handle(PacketEvents.getAPI().getNettyManager().wrapChannelHandlerContext(ctx), PacketEvents.getAPI().getNettyManager().wrapByteBuf(byteBuf), out);
     }
 

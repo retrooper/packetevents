@@ -53,6 +53,9 @@ public class InternalPacketListener implements PacketListener {
             WrapperPlayServerChatMessage msg = new WrapperPlayServerChatMessage(event);
             System.out.println("msg: " + msg.getJSONMessage());
         }
+        else if (event.getPacketType() == PacketType.Play.Server.RESPAWN) {
+            System.out.println("COOL, YOU DIED!");
+        }
     }
 
     @Override
@@ -88,4 +91,6 @@ public class InternalPacketListener implements PacketListener {
             break;
         }
     }
+
+
 }
