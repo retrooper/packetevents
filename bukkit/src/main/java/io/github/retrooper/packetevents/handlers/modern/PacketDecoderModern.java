@@ -26,15 +26,17 @@ import com.github.retrooper.packetevents.protocol.ConnectionState;
 import com.github.retrooper.packetevents.netty.buffer.ByteBufAbstract;
 import com.github.retrooper.packetevents.netty.channel.ChannelHandlerContextAbstract;
 import io.github.retrooper.packetevents.handlers.modern.early.CompressionManagerModern;
+import io.github.retrooper.packetevents.utils.dependencies.viaversion.CustomPipelineUtil;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.ByteToMessageDecoder;
 import org.bukkit.entity.Player;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 
 public class PacketDecoderModern extends ByteToMessageDecoder {
-    public ByteToMessageDecoder previousMCDecoder = null;
+    public ByteToMessageDecoder mcDecoder = null;
     public volatile Player player;
     public ConnectionState connectionState = ConnectionState.HANDSHAKING;
     public boolean bypassCompression = false;
@@ -46,7 +48,7 @@ public class PacketDecoderModern extends ByteToMessageDecoder {
     }
 
     public PacketDecoderModern(PacketDecoderModern decoder) {
-        previousMCDecoder = decoder.previousMCDecoder;
+        mcDecoder = decoder.mcDecoder;
         player = decoder.player;
         connectionState = decoder.connectionState;
         bypassCompression = decoder.bypassCompression;
@@ -89,6 +91,15 @@ public class PacketDecoderModern extends ByteToMessageDecoder {
     @Override
     public void decode(ChannelHandlerContext ctx, ByteBuf byteBuf, List<Object> out) {
         handle(PacketEvents.getAPI().getNettyManager().wrapChannelHandlerContext(ctx), PacketEvents.getAPI().getNettyManager().wrapByteBuf(byteBuf), out);
+        if (mcDecoder != null) {
+            try {
+                Object input = out.get(0);
+                out.clear();
+                out.addAll(CustomPipelineUtil.callDecode(mcDecoder, ctx, input));
+            } catch (InvocationTargetException e) {
+                e.printStackTrace();
+            }
+        }
     }
 
     private boolean handleCompressionOrder(ChannelHandlerContextAbstract ctx, ByteBufAbstract buf) {

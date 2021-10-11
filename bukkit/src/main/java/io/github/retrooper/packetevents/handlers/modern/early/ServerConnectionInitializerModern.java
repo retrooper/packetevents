@@ -19,19 +19,13 @@
 package io.github.retrooper.packetevents.handlers.modern.early;
 
 import com.github.retrooper.packetevents.PacketEvents;
-import com.github.retrooper.packetevents.netty.channel.ChannelAbstract;
 import io.github.retrooper.packetevents.handlers.modern.PacketDecoderModern;
 import io.github.retrooper.packetevents.handlers.modern.PacketEncoderModern;
-import com.github.retrooper.packetevents.util.reflection.Reflection;
 import com.github.retrooper.packetevents.util.reflection.ReflectionObject;
-import io.github.retrooper.packetevents.utils.dependencies.viaversion.CustomBukkitDecodeHandler;
 import io.github.retrooper.packetevents.utils.dependencies.viaversion.ViaVersionUtil;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandler;
 import io.netty.handler.codec.ByteToMessageDecoder;
-
-import java.lang.reflect.Field;
-import java.lang.reflect.Method;
 
 
 public class ServerConnectionInitializerModern {
@@ -47,7 +41,7 @@ public class ServerConnectionInitializerModern {
         if (ViaVersionUtil.getBukkitDecodeHandlerClass().isInstance(mcDecoder)) {
             ReflectionObject reflectMCDecoder = new ReflectionObject(mcDecoder);
             PacketDecoderModern decoder = (PacketDecoderModern) reflectMCDecoder.readObject(0, ByteToMessageDecoder.class);
-            reflectMCDecoder.write(ByteToMessageDecoder.class, 0, decoder.previousMCDecoder);
+            reflectMCDecoder.write(ByteToMessageDecoder.class, 0, decoder.mcDecoder);
         } else {
             channel.pipeline().remove(PacketEvents.DECODER_NAME);
             channel.pipeline().remove(PacketEvents.ENCODER_NAME);
