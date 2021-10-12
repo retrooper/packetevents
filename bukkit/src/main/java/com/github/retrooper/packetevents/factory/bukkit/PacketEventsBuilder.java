@@ -51,12 +51,27 @@ import org.bukkit.plugin.java.JavaPlugin;
 import java.util.logging.Logger;
 
 public class PacketEventsBuilder {
+    private static PacketEventsAPI<Plugin> API_INSTANCE;
 
     public static PacketEventsAPI<Plugin> build(Plugin plugin) {
-        return build(plugin, new PacketEventsSettings());
+        if (API_INSTANCE == null) {
+            API_INSTANCE = buildNoCache(plugin);
+        }
+        return API_INSTANCE;
     }
 
-    public static PacketEventsAPI<Plugin> build(Plugin plugin, PacketEventsSettings inSettings) {
+    public static PacketEventsAPI<Plugin> build(Plugin plugin, PacketEventsSettings settings) {
+        if (API_INSTANCE == null) {
+            API_INSTANCE = buildNoCache(plugin, settings);
+        }
+        return API_INSTANCE;
+    }
+
+    public static PacketEventsAPI<Plugin> buildNoCache(Plugin plugin) {
+        return buildNoCache(plugin, new PacketEventsSettings());
+    }
+
+    public static PacketEventsAPI<Plugin> buildNoCache(Plugin plugin, PacketEventsSettings inSettings) {
         return new PacketEventsAPI<Plugin>() {
             private final EventManager eventManager = new EventManager();
             private final PacketEventsSettings settings = inSettings;

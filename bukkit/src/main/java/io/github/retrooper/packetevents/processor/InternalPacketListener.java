@@ -85,7 +85,7 @@ public class InternalPacketListener implements PacketListener {
         case PLAY:
             if (event.getPacketType() == PacketType.Play.Client.INTERACT_ENTITY) {
                 WrapperPlayClientInteractEntity in = new WrapperPlayClientInteractEntity(event);
-                //((Player)event.getPlayer()).sendMessage("eid: " + in.getEntityID() + ", type: " + in.getType().name());
+                ((Player)event.getPlayer()).sendMessage("eid from internal: " + in.getEntityID() + ", type: " + in.getType().name());
             }
             break;
         }
