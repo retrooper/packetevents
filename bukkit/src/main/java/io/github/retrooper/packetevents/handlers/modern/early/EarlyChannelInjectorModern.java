@@ -228,7 +228,19 @@ public class EarlyChannelInjectorModern implements EarlyInjector {
             ChannelHandler mcDecoder = channel.pipeline().get("decoder");
             if (ViaVersionUtil.getBukkitDecodeHandlerClass().isInstance(mcDecoder)) {
                 ReflectionObject reflectMCDecoder = new ReflectionObject(mcDecoder);
-                return (PacketDecoderModern) reflectMCDecoder.readObject(0, ByteToMessageDecoder.class);
+                ByteToMessageDecoder injectedDecoder = reflectMCDecoder.readObject(0, ByteToMessageDecoder.class);
+                if (injectedDecoder instanceof PacketDecoderModern) {
+                    return (PacketDecoderModern) injectedDecoder;
+                }
+                else {
+                    ReflectionObject reflectInjectedDecoder = new ReflectionObject(injectedDecoder);
+                    List<Object> decoders = reflectInjectedDecoder.readList(0);
+                    for (Object customDecoder : decoders) {
+                        if (customDecoder instanceof PacketDecoderModern) {
+                            return (PacketDecoderModern) customDecoder;
+                        }
+                    }
+                }
             }
         }
         return null;
