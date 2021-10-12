@@ -20,11 +20,11 @@ package io.github.retrooper.packetevents.handlers.modern;
 
 import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.event.impl.PacketReceiveEvent;
-import io.github.retrooper.packetevents.handlers.compression.CustomPacketCompressor;
-import io.github.retrooper.packetevents.handlers.compression.CustomPacketDecompressor;
-import com.github.retrooper.packetevents.protocol.ConnectionState;
 import com.github.retrooper.packetevents.netty.buffer.ByteBufAbstract;
 import com.github.retrooper.packetevents.netty.channel.ChannelHandlerContextAbstract;
+import com.github.retrooper.packetevents.protocol.ConnectionState;
+import io.github.retrooper.packetevents.handlers.compression.CustomPacketCompressor;
+import io.github.retrooper.packetevents.handlers.compression.CustomPacketDecompressor;
 import io.github.retrooper.packetevents.handlers.modern.early.CompressionManagerModern;
 import io.github.retrooper.packetevents.utils.dependencies.viaversion.CustomPipelineUtil;
 import io.netty.buffer.ByteBuf;
@@ -33,15 +33,17 @@ import io.netty.handler.codec.ByteToMessageDecoder;
 import org.bukkit.entity.Player;
 
 import java.lang.reflect.InvocationTargetException;
+import java.util.ArrayList;
 import java.util.List;
 
 public class PacketDecoderModern extends ByteToMessageDecoder {
     public ByteToMessageDecoder mcDecoder = null;
+    public List<ByteToMessageDecoder> decoders = new ArrayList<>();
     public volatile Player player;
     public ConnectionState connectionState = ConnectionState.HANDSHAKING;
     public boolean bypassCompression = false;
-    private boolean handledCompression;
-    private boolean skipDoubleTransform;
+    public boolean handledCompression;
+    public boolean skipDoubleTransform;
 
     public PacketDecoderModern() {
 
@@ -49,6 +51,7 @@ public class PacketDecoderModern extends ByteToMessageDecoder {
 
     public PacketDecoderModern(PacketDecoderModern decoder) {
         mcDecoder = decoder.mcDecoder;
+        decoders = decoder.decoders;
         player = decoder.player;
         connectionState = decoder.connectionState;
         bypassCompression = decoder.bypassCompression;
@@ -91,7 +94,21 @@ public class PacketDecoderModern extends ByteToMessageDecoder {
     @Override
     public void decode(ChannelHandlerContext ctx, ByteBuf byteBuf, List<Object> out) {
         handle(PacketEvents.getAPI().getNettyManager().wrapChannelHandlerContext(ctx), PacketEvents.getAPI().getNettyManager().wrapByteBuf(byteBuf), out);
+        if (!decoders.isEmpty()) {
+            //Call custom decoders
+            try {
+                for (ByteToMessageDecoder decoder : decoders) {
+                    //Only support one output object
+                    Object input = out.get(0);
+                    out.clear();
+                    out.addAll(CustomPipelineUtil.callDecode(decoder, ctx, input));
+                }
+            } catch (InvocationTargetException e) {
+                e.printStackTrace();
+            }
+        }
         if (mcDecoder != null) {
+            //Call minecraft decoder to convert the ByteBuf to an NMS object for the next handlers
             try {
                 Object input = out.get(0);
                 out.clear();

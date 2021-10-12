@@ -19,6 +19,7 @@
 package io.github.retrooper.packetevents.handlers.modern.early;
 
 import com.github.retrooper.packetevents.PacketEvents;
+import com.github.retrooper.packetevents.protocol.ConnectionState;
 import com.github.retrooper.packetevents.util.reflection.ReflectionObject;
 import io.github.retrooper.packetevents.handlers.modern.PacketDecoderModern;
 import io.github.retrooper.packetevents.handlers.modern.PacketEncoderModern;
@@ -26,6 +27,10 @@ import io.github.retrooper.packetevents.utils.dependencies.viaversion.ViaVersion
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandler;
 import io.netty.handler.codec.ByteToMessageDecoder;
+import org.bukkit.entity.Player;
+
+import java.util.ArrayList;
+import java.util.List;
 
 
 public class ServerConnectionInitializerModern {
@@ -37,15 +42,62 @@ public class ServerConnectionInitializerModern {
 
     public static void postDestroyChannel(Object ch) {
         Channel channel = (Channel) ch;
-        ChannelHandler mcDecoder = channel.pipeline().get("decoder");
-        if (ViaVersionUtil.getBukkitDecodeHandlerClass().isInstance(mcDecoder)) {
-            ReflectionObject reflectMCDecoder = new ReflectionObject(mcDecoder);
-            PacketDecoderModern decoder = (PacketDecoderModern) reflectMCDecoder.readObject(0, ByteToMessageDecoder.class);
-            reflectMCDecoder.write(ByteToMessageDecoder.class, 0, decoder.mcDecoder);
+        ChannelHandler viaDecoder = channel.pipeline().get("decoder");
+        if (ViaVersionUtil.getBukkitDecodeHandlerClass().isInstance(viaDecoder)) {
+            ReflectionObject reflectMCDecoder = new ReflectionObject(viaDecoder);
+            ByteToMessageDecoder decoder = reflectMCDecoder.readObject(0, ByteToMessageDecoder.class);
+            if (decoder instanceof PacketDecoderModern) {
+                PacketDecoderModern decoderModern = (PacketDecoderModern) decoder;
+                //No decoders injected into our decoder
+                if (decoderModern.decoders.isEmpty()) {
+                    reflectMCDecoder.write(ByteToMessageDecoder.class, 0, decoderModern.mcDecoder);
+                }
+                //Some decoders injected into our decoder, lets do some cleaning up
+                else {
+                    //This decoder will now be injected into ViaVersion
+                    ByteToMessageDecoder newDecoderModern = decoderModern.decoders.get(0);
+                    ReflectionObject reflectNewDecoderModern = new ReflectionObject(newDecoderModern);
+                    decoderModern.decoders.remove(0);
+
+                    //Write custom decoders
+                    reflectNewDecoderModern.writeList(0, decoderModern.decoders);
+
+                    //Write mc decoder
+                    reflectNewDecoderModern.write(ByteToMessageDecoder.class, 0, decoderModern.mcDecoder);
+
+                    //Write player
+                    reflectNewDecoderModern.write(Player.class, 0, decoderModern.player);
+
+                    //Write connection state
+                    reflectNewDecoderModern.write(ConnectionState.class, 0, decoderModern.connectionState);
+
+                    //Write bypassCompression
+                    reflectNewDecoderModern.write(boolean.class, 0, decoderModern.bypassCompression);
+
+                    //Write handledCompression
+                    reflectNewDecoderModern.write(boolean.class, 1, decoderModern.handledCompression);
+
+                    //Write skipDoubleTransform
+                    reflectNewDecoderModern.write(boolean.class, 2, decoderModern.skipDoubleTransform);
+                }
+            }
+            else {
+                ReflectionObject reflectDecoder = new ReflectionObject(decoder);
+                List<Object> decoders = reflectDecoder.readList(0);
+                int targetIndex = -1;
+                for (int i = 0; i < decoders.size(); i++) {
+                    if (decoders.get(i) instanceof PacketDecoderModern) {
+                        targetIndex = i;
+                    }
+                }
+                if (targetIndex != -1) {
+                    decoders.remove(targetIndex);
+                    reflectDecoder.writeList(0, decoders);
+                }
+            }
         } else {
             channel.pipeline().remove(PacketEvents.DECODER_NAME);
         }
-
         channel.pipeline().remove(PacketEvents.ENCODER_NAME);
     }
 }

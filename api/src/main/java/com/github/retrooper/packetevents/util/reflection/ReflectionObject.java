@@ -284,7 +284,7 @@ public class ReflectionObject implements ReflectionObjectReader, WrapperPacketWr
         return read(index, List.class);
     }
 
-    public void writeList(int index, List<Object> list) {
+    public void writeList(int index, List<?> list) {
         write(List.class, index, list);
     }
 
