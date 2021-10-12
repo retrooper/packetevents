@@ -37,9 +37,7 @@ import io.github.retrooper.packetevents.utils.v1_7.SpigotVersionLookup_1_7;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.Map;
 import java.util.UUID;
-import java.util.concurrent.ConcurrentHashMap;
 
 public class PlayerManagerImpl implements PlayerManager {
     @Override
@@ -49,17 +47,20 @@ public class PlayerManagerImpl implements PlayerManager {
 
     @Override
     public ConnectionState getConnectionState(ChannelAbstract channel) {
-        ConnectionState connectionState = connectionStates.get(channel);
+        ConnectionState connectionState = CONNECTION_STATES.get(channel);
         if (connectionState == null) {
             connectionState = PacketEvents.getAPI().getInjector().getConnectionState(channel);
-            connectionStates.put(channel, connectionState);
+            if (connectionState == null) {
+                connectionState = ConnectionState.PLAY;
+            }
+            CONNECTION_STATES.put(channel, connectionState);
         }
         return connectionState;
     }
 
     @Override
     public void changeConnectionState(ChannelAbstract channel, ConnectionState connectionState) {
-        connectionStates.put(channel, connectionState);
+        CONNECTION_STATES.put(channel, connectionState);
         PacketEvents.getAPI().getInjector().changeConnectionState(channel, connectionState);
     }
 
@@ -79,13 +80,13 @@ public class PlayerManagerImpl implements PlayerManager {
             return ClientVersion.UNKNOWN;
         }
         ChannelAbstract channel = getChannel(player);
-        ClientVersion version = clientVersions.get(channel);
+        ClientVersion version = CLIENT_VERSIONS.get(channel);
         if (version == null || !version.isResolved()) {
             //Asking ViaVersion or ProtocolSupport for the protocol version.
             if (DependencyUtil.isProtocolTranslationDependencyAvailable()) {
                 try {
                     version = ClientVersion.getClientVersionByProtocolVersion(DependencyUtil.getProtocolVersion(player));
-                    clientVersions.put(channel, version);
+                    CLIENT_VERSIONS.put(channel, version);
                     return version;
                 } catch (Exception ex) {
                     //Try ask the dependency again the next time, for now it is temporarily unresolved...
@@ -104,7 +105,7 @@ public class PlayerManagerImpl implements PlayerManager {
                     protocolVersion = PacketEvents.getAPI().getServerManager().getVersion().getProtocolVersion();
                 }
                 version = ClientVersion.getClientVersionByProtocolVersion(protocolVersion);
-                clientVersions.put(channel, version);
+                CLIENT_VERSIONS.put(channel, version);
             }
         }
         return version;
@@ -113,12 +114,12 @@ public class PlayerManagerImpl implements PlayerManager {
 
     @Override
     public ClientVersion getClientVersion(ChannelAbstract channel) {
-        return clientVersions.get(channel);
+        return CLIENT_VERSIONS.get(channel);
     }
 
     @Override
     public void setClientVersion(ChannelAbstract channel, ClientVersion version) {
-        clientVersions.put(channel, version);
+        CLIENT_VERSIONS.put(channel, version);
     }
 
     @Override
@@ -185,7 +186,7 @@ public class PlayerManagerImpl implements PlayerManager {
             Object ch = MinecraftReflectionUtil.getChannel((Player) player);
             if (ch != null) {
                 channel = PacketEvents.getAPI().getNettyManager().wrapChannel(ch);
-                channels.put(username, channel);
+                CHANNELS.put(username, channel);
             }
         }
         return channel;
@@ -193,12 +194,12 @@ public class PlayerManagerImpl implements PlayerManager {
 
     @Override
     public ChannelAbstract getChannel(String username) {
-        return channels.get(username);
+        return CHANNELS.get(username);
     }
 
     @Override
     public void setChannel(String username, ChannelAbstract channel) {
-        channels.put(username, channel);
+        CHANNELS.put(username, channel);
     }
 
     @Override

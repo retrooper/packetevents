@@ -69,7 +69,7 @@ public class InternalPacketListener implements PacketListener {
                     event.setClientVersion(clientVersion);
 
                     //Map netty channel with the client version.
-                    PacketEvents.getAPI().getPlayerManager().clientVersions.put(event.getChannel(), clientVersion);
+                    PacketEvents.getAPI().getPlayerManager().CLIENT_VERSIONS.put(event.getChannel(), clientVersion);
 
                     //Transition into the LOGIN OR STATUS connection state
                     PacketEvents.getAPI().getPlayerManager().changeConnectionState(event.getChannel(), handshake.getNextConnectionState());
@@ -79,7 +79,7 @@ public class InternalPacketListener implements PacketListener {
                 if (event.getPacketType() == PacketType.Login.Client.LOGIN_START) {
                     WrapperLoginClientLoginStart start = new WrapperLoginClientLoginStart(event);
                     //Map the player usernames with their netty channels
-                    PacketEvents.getAPI().getPlayerManager().channels.put(start.getUsername(), event.getChannel());
+                    PacketEvents.getAPI().getPlayerManager().CHANNELS.put(start.getUsername(), event.getChannel());
                 }
                 break;
         case PLAY:

@@ -31,9 +31,9 @@ import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
 public interface PlayerManager {
-    Map<ChannelAbstract, ClientVersion> clientVersions = new ConcurrentHashMap<>();
-    Map<ChannelAbstract, ConnectionState> connectionStates = new ConcurrentHashMap<>();
-    Map<String, ChannelAbstract> channels = new ConcurrentHashMap<>();
+    Map<ChannelAbstract, ClientVersion> CLIENT_VERSIONS = new ConcurrentHashMap<>();
+    Map<ChannelAbstract, ConnectionState> CONNECTION_STATES = new ConcurrentHashMap<>();
+    Map<String, ChannelAbstract> CHANNELS = new ConcurrentHashMap<>();
 
     ConnectionState getConnectionState(Object player);
 

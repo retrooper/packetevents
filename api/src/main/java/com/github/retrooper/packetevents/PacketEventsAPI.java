@@ -29,14 +29,14 @@ import com.github.retrooper.packetevents.util.updatechecker.UpdateChecker;
 
 import java.util.logging.Logger;
 
-public interface PacketEventsAPI<PluginType> {
+public interface PacketEventsAPI<T> {
     void load();
 
     void init();
 
     void terminate();
 
-    PluginType getPlugin();
+    T getPlugin();
 
     ServerManager getServerManager();
 
