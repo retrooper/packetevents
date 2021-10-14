@@ -727,9 +727,9 @@ public final class NMSUtils {
         return null;
     }
 
-    public static Object generateDataWatcher(Entity entity) {
+    public static Object generateDataWatcher(Object nmsEntity) {
         try {
-            return dataWatcherConstructor.newInstance(entity);
+            return dataWatcherConstructor.newInstance(nmsEntity);
         } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
             e.printStackTrace();
         }
