@@ -22,7 +22,7 @@ import com.github.retrooper.packetevents.event.impl.PacketSendEvent;
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.protocol.data.entity.EntityPose;
 import com.github.retrooper.packetevents.protocol.data.nbt.NBTCompound;
-import com.github.retrooper.packetevents.protocol.data.world.Direction;
+import com.github.retrooper.packetevents.protocol.data.world.BlockFace;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.util.Vector3f;
 import com.github.retrooper.packetevents.util.Vector3i;
@@ -216,10 +216,10 @@ public class WrapperPlayServerEntityMetadata extends PacketWrapper<WrapperPlaySe
                     }),
             //Var int
             DIRECTION(packetWrapper -> {
-                return Direction.getDirectionByFace(packetWrapper.readVarInt());
+                return BlockFace.getBlockFaceByValue(packetWrapper.readVarInt());
             },
                     (packetWrapper, o) -> {
-                        packetWrapper.writeVarInt(((Direction) o).getFaceValue());
+                        packetWrapper.writeVarInt(((BlockFace) o).getFaceValue());
                     }),
             OPTIONAL_UUID(packetWrapper -> {
                 if (packetWrapper.readBoolean()) {

@@ -31,6 +31,7 @@ public class PacketEventsPlugin extends JavaPlugin {
 
     @Override
     public void onEnable() {
+        net.minecraft.server.v1_10_R1.PacketPlayInUseItem ui0;
         //Register your listeners
         PacketEvents.getAPI().init();
     }

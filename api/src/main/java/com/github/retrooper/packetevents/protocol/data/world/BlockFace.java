@@ -25,7 +25,7 @@ package com.github.retrooper.packetevents.protocol.data.world;
  * @see <a href="https://wiki.vg/Protocol#Player_Digging">https://wiki.vg/Protocol#Player_Digging</a>
  * @since 1.7.8
  */
-public enum Direction {
+public enum BlockFace {
     /**
      * -Y offset
      */
@@ -61,19 +61,19 @@ public enum Direction {
      */
     OTHER((short) 255);
 
-    public static final Direction[] VALUES = values();
+    public static final BlockFace[] VALUES = values();
 
     final short faceValue;
 
-    Direction(short faceValue) {
+    BlockFace(short faceValue) {
         this.faceValue = faceValue;
     }
 
-    Direction() {
+    BlockFace() {
         this.faceValue = (short) ordinal();
     }
 
-    public static Direction getDirectionByFace(int face) {
+    public static BlockFace getBlockFaceByValue(int face) {
         if (face == 255) {
             return OTHER;
         }

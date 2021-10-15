@@ -22,13 +22,13 @@ import com.github.retrooper.packetevents.event.impl.PacketReceiveEvent;
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 import com.github.retrooper.packetevents.util.Vector3i;
-import com.github.retrooper.packetevents.protocol.data.world.Direction;
+import com.github.retrooper.packetevents.protocol.data.world.BlockFace;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 
 public class WrapperPlayClientPlayerDigging extends PacketWrapper<WrapperPlayClientPlayerDigging> {
     private Action action;
     private Vector3i blockPosition;
-    private Direction direction;
+    private BlockFace blockFace;
 
     public enum Action {
         START_DIGGING,
@@ -46,11 +46,11 @@ public class WrapperPlayClientPlayerDigging extends PacketWrapper<WrapperPlayCli
         super(event);
     }
 
-    public WrapperPlayClientPlayerDigging(Action action, Vector3i blockPosition, Direction direction) {
+    public WrapperPlayClientPlayerDigging(Action action, Vector3i blockPosition, BlockFace blockFace) {
         super(PacketType.Play.Client.PLAYER_DIGGING);
         this.action = action;
         this.blockPosition = blockPosition;
-        this.direction = direction;
+        this.blockFace = blockFace;
     }
 
     @Override
@@ -67,14 +67,14 @@ public class WrapperPlayClientPlayerDigging extends PacketWrapper<WrapperPlayCli
             blockPosition = new Vector3i(x, y, z);
         }
         byte face = readByte();
-        direction = Direction.getDirectionByFace(face);
+        blockFace = BlockFace.getBlockFaceByValue(face);
     }
 
     @Override
     public void readData(WrapperPlayClientPlayerDigging wrapper) {
         action = wrapper.action;
         blockPosition = wrapper.blockPosition;
-        direction = wrapper.direction;
+        blockFace = wrapper.blockFace;
     }
 
     @Override
@@ -89,7 +89,7 @@ public class WrapperPlayClientPlayerDigging extends PacketWrapper<WrapperPlayCli
             writeByte(blockPosition.y);
             writeInt(blockPosition.z);
         }
-        writeByte(direction.getFaceValue());
+        writeByte(blockFace.getFaceValue());
     }
 
     public Action getAction() {
@@ -108,11 +108,11 @@ public class WrapperPlayClientPlayerDigging extends PacketWrapper<WrapperPlayCli
         this.blockPosition = blockPosition;
     }
 
-    public Direction getDirection() {
-        return direction;
+    public BlockFace getDirection() {
+        return blockFace;
     }
 
-    public void setDirection(Direction direction) {
-        this.direction = direction;
+    public void setDirection(BlockFace blockFace) {
+        this.blockFace = blockFace;
     }
 }
