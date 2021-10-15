@@ -49,7 +49,7 @@ public enum ServerVersion {
             .replace(".", ",").split(",")[3];
     private static final ServerVersion[] VALUES = values();
     public static ServerVersion[] reversedValues = new ServerVersion[VALUES.length];
-    private static final ServerVersion cachedVersion;
+    private static ServerVersion cachedVersion;
     private final short protocolVersion;
 
     ServerVersion(short protocolId) {
@@ -94,11 +94,10 @@ public enum ServerVersion {
      * @return Server Version. (always cached)
      */
     public static ServerVersion getVersion() {
+        if (cachedVersion == null) {
+            cachedVersion = getVersionNoCache();
+        }
         return cachedVersion;
-    }
-
-    static {
-        cachedVersion = getVersionNoCache();
     }
 
     /**
