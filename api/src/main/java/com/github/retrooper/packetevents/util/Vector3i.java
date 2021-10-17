@@ -131,12 +131,7 @@ public class Vector3i {
     }
 
     public long getSerializedPosition() {
-        // 1.14 method for this is storing X Z Y
-        if (PacketEvents.getAPI().getServerManager().getVersion().isNewerThanOrEquals(ServerVersion.v_1_14)) {
-            return ((long) (getX() & 0x3FFFFFF) << 38) | ((long) (getZ() & 0x3FFFFFF) << 12) | (getY() & 0xFFF);
-        }
-        // 1.13 and below store X Y Z
-        return ((long) (getX() & 0x3FFFFFF) << 38) | ((long) (getY() & 0xFFF) << 26) | (getZ() & 0x3FFFFFF);
+        return getSerializedPosition(PacketEvents.getAPI().getServerManager().getVersion());
     }
 
     public int getX() {

@@ -66,10 +66,10 @@ dependencies {
     compileOnly 'com.github.ProtocolSupport:ProtocolSupport:3d24efeda6'
 
 
-
+    compileOnly 'org.github.spigot:1.17:1.17'
     compileOnly 'org.github.spigot:1.16.2:1.16.2'
-   compileOnly 'org.github.spigot:1.8.8:1.8.8'
-   compileOnly 'org.github.spigot:1.7.10:1.7.10'
+    compileOnly 'org.github.spigot:1.8.8:1.8.8'
+    compileOnly 'org.github.spigot:1.7.10:1.7.10'
 
     //All these dependencies are only enabled when developing wrappers for quick access to spigot source
 
