@@ -248,7 +248,7 @@ public final class PacketType {
             PLAYER_POSITION,
             PLAYER_POSITION_AND_ROTATION,
             PLAYER_ROTATION,
-            PLAYER_MOVEMENT,
+            PLAYER_FLYING,
             VEHICLE_MOVE,
             STEER_BOAT,
             PICK_ITEM,
