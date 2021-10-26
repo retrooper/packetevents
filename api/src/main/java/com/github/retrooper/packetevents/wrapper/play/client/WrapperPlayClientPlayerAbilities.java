@@ -27,9 +27,9 @@ import java.util.Optional;
 
 public class WrapperPlayClientPlayerAbilities extends PacketWrapper<WrapperPlayClientPlayerAbilities> {
     private boolean flying;
-    private Optional<Boolean> vulnerable;
+    private Optional<Boolean> godMode;
     private Optional<Boolean> flightAllowed;
-    private Optional<Boolean> buildingInstantlyAllowed;
+    private Optional<Boolean> creativeMode;
     private Optional<Float> flySpeed;
     private Optional<Float> walkSpeed;
 
@@ -37,14 +37,14 @@ public class WrapperPlayClientPlayerAbilities extends PacketWrapper<WrapperPlayC
         super(event);
     }
 
-    public WrapperPlayClientPlayerAbilities(boolean flying, Optional<Boolean> vulnerable, Optional<Boolean> flightAllowed,
-                                            Optional<Boolean> buildingInstantlyAllowed,
+    public WrapperPlayClientPlayerAbilities(boolean flying, Optional<Boolean> godMode, Optional<Boolean> flightAllowed,
+                                            Optional<Boolean> creativeMode,
                                             Optional<Float> flySpeed, Optional<Float> walkSpeed) {
         super(PacketType.Play.Client.PLAYER_ABILITIES);
         this.flying = flying;
-        this.vulnerable = vulnerable;
+        this.godMode = godMode;
         this.flightAllowed = flightAllowed;
-        this.buildingInstantlyAllowed = buildingInstantlyAllowed;
+        this.creativeMode = creativeMode;
         this.flySpeed = flySpeed;
         this.walkSpeed = walkSpeed;
     }
@@ -58,16 +58,16 @@ public class WrapperPlayClientPlayerAbilities extends PacketWrapper<WrapperPlayC
         byte mask = readByte();
         if (serverVersion.isNewerThanOrEquals(ServerVersion.v_1_16)) {
             flying = (mask & 0x02) != 0;
-            vulnerable = Optional.empty();
+            godMode = Optional.empty();
             flightAllowed = Optional.empty();
-            buildingInstantlyAllowed = Optional.empty();
+            creativeMode = Optional.empty();
             flySpeed = Optional.empty();
             walkSpeed = Optional.empty();
         } else {
-            vulnerable = Optional.of((mask & 0x01) != 0);
+            godMode = Optional.of((mask & 0x01) != 0);
             flying = (mask & 0x02) != 0;
             flightAllowed = Optional.of((mask & 0x04) != 0);
-            buildingInstantlyAllowed = Optional.of((mask & 0x08) != 0);
+            creativeMode = Optional.of((mask & 0x08) != 0);
             flySpeed = Optional.of(readFloat());
             walkSpeed = Optional.of(readFloat());
         }
@@ -76,10 +76,10 @@ public class WrapperPlayClientPlayerAbilities extends PacketWrapper<WrapperPlayC
 
     @Override
     public void readData(WrapperPlayClientPlayerAbilities wrapper) {
-        vulnerable = wrapper.vulnerable;
+        godMode = wrapper.godMode;
         flying = wrapper.flying;
         flightAllowed = wrapper.flightAllowed;
-        buildingInstantlyAllowed = wrapper.buildingInstantlyAllowed;
+        creativeMode = wrapper.creativeMode;
         flySpeed = wrapper.flySpeed;
         walkSpeed = wrapper.walkSpeed;
     }
@@ -91,7 +91,7 @@ public class WrapperPlayClientPlayerAbilities extends PacketWrapper<WrapperPlayC
             writeByte(mask);
         } else {
             byte mask = 0x00;
-            if (vulnerable.orElse(false)) {
+            if (godMode.orElse(false)) {
                 mask |= 0x01;
             }
 
@@ -103,7 +103,7 @@ public class WrapperPlayClientPlayerAbilities extends PacketWrapper<WrapperPlayC
                 mask |= 0x04;
             }
 
-            if (buildingInstantlyAllowed.orElse(false)) {
+            if (creativeMode.orElse(false)) {
                 mask |= 0x08;
             }
             writeByte(mask);
@@ -121,12 +121,12 @@ public class WrapperPlayClientPlayerAbilities extends PacketWrapper<WrapperPlayC
         this.flying = flying;
     }
 
-    public Optional<Boolean> isVulnerable() {
-        return vulnerable;
+    public Optional<Boolean> isInGodMode() {
+        return godMode;
     }
 
-    public void setVulnerable(Optional<Boolean> vulnerable) {
-        this.vulnerable = vulnerable;
+    public void setInGodMode(Optional<Boolean> godMode) {
+        this.godMode = godMode;
     }
 
     public Optional<Boolean> isFlightAllowed() {
@@ -137,12 +137,12 @@ public class WrapperPlayClientPlayerAbilities extends PacketWrapper<WrapperPlayC
         this.flightAllowed = flightAllowed;
     }
 
-    public Optional<Boolean> isBuildingInstantlyAllowed() {
-        return buildingInstantlyAllowed;
+    public Optional<Boolean> isInCreativeMode() {
+        return creativeMode;
     }
 
-    public void setBuildingInstantlyAllowed(Optional<Boolean> buildingInstantlyAllowed) {
-        this.buildingInstantlyAllowed = buildingInstantlyAllowed;
+    public void setCreativeMode(Optional<Boolean> creativeMode) {
+        this.creativeMode = creativeMode;
     }
 
     public Optional<Float> getFlySpeed() {
