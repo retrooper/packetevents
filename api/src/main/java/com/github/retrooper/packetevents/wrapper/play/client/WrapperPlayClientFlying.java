@@ -22,6 +22,14 @@ public class WrapperPlayClientFlying<T extends WrapperPlayClientFlying> extends 
         this.onGround = onGround;
     }
 
+    //TODO Rethink, should this be somewhere else?
+    public static boolean isInstanceOfFlying(PacketTypeCommon type) {
+        return type == PacketType.Play.Client.PLAYER_FLYING
+                || type == PacketType.Play.Client.PLAYER_POSITION
+                || type == PacketType.Play.Client.PLAYER_ROTATION
+                || type == PacketType.Play.Client.PLAYER_POSITION_AND_ROTATION;
+    }
+
 
     @Override
     public void readData() {
