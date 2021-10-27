@@ -20,8 +20,8 @@ package com.github.retrooper.packetevents.wrapper.play.server;
 
 import com.github.retrooper.packetevents.event.impl.PacketSendEvent;
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
-import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
+import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 
 public class WrapperPlayServerSetExperience extends PacketWrapper<WrapperPlayServerSetExperience> {
     private float experienceBar;
@@ -32,8 +32,11 @@ public class WrapperPlayServerSetExperience extends PacketWrapper<WrapperPlaySer
         super(event);
     }
 
-    public WrapperPlayServerSetExperience() {
+    public WrapperPlayServerSetExperience(float experienceBar, int level, int totalExperience) {
         super(PacketType.Play.Server.SET_EXPERIENCE);
+        this.experienceBar = experienceBar;
+        this.level = level;
+        this.totalExperience = totalExperience;
     }
 
     @Override
@@ -42,8 +45,7 @@ public class WrapperPlayServerSetExperience extends PacketWrapper<WrapperPlaySer
         if (serverVersion == ServerVersion.v_1_7_10) {
             level = readShort();
             totalExperience = readShort();
-        }
-        else {
+        } else {
             level = readVarInt();
             totalExperience = readVarInt();
         }
@@ -62,8 +64,7 @@ public class WrapperPlayServerSetExperience extends PacketWrapper<WrapperPlaySer
         if (serverVersion == ServerVersion.v_1_7_10) {
             writeShort(level);
             writeShort(totalExperience);
-        }
-        else {
+        } else {
             writeVarInt(level);
             writeVarInt(totalExperience);
         }

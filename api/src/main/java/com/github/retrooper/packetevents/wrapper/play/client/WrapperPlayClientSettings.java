@@ -36,6 +36,9 @@ public class WrapperPlayClientSettings extends PacketWrapper<WrapperPlayClientSe
     private Hand hand;
     private boolean disableTextFiltering;
 
+    //Not accessible, only for 1.7
+    private byte ignoredDifficulty;
+
     public enum ChatVisibility {
         FULL, SYSTEM, HIDDEN;
 
@@ -74,8 +77,17 @@ public class WrapperPlayClientSettings extends PacketWrapper<WrapperPlayClientSe
         super(event);
     }
 
-    public WrapperPlayClientSettings() {
+    public WrapperPlayClientSettings(String locale, int viewDistance, ChatVisibility visibility,
+                                     boolean chatColors, byte visibleSkinSectionMask, Hand hand,
+                                     boolean disableTextFiltering) {
         super(PacketType.Play.Client.CLIENT_SETTINGS);
+        this.locale = locale;
+        this.viewDistance = viewDistance;
+        this.visibility = visibility;
+        this.chatColors = chatColors;
+        this.visibleSkinSectionMask = visibleSkinSectionMask;
+        this.hand = hand;
+        this.disableTextFiltering = disableTextFiltering;
     }
 
     @Override
@@ -88,7 +100,7 @@ public class WrapperPlayClientSettings extends PacketWrapper<WrapperPlayClientSe
         chatColors = readBoolean();
         if (serverVersion == ServerVersion.v_1_7_10) {
             //Ignored
-            byte difficulty = readByte();
+            ignoredDifficulty = readByte();
             //We use this for the skin sections
             boolean showCape = readBoolean();
             if (showCape) {
@@ -138,8 +150,7 @@ public class WrapperPlayClientSettings extends PacketWrapper<WrapperPlayClientSe
         }
         writeBoolean(chatColors);
         if (serverVersion == ServerVersion.v_1_7_10) {
-            //Client-sided difficulty, I don't believe its important
-            writeByte(0);
+            writeByte(ignoredDifficulty);
             //Show cape
             boolean showCape = SkinSection.isSectionPresent(visibleSkinSectionMask, SkinSection.CAPE);
             writeBoolean(showCape);

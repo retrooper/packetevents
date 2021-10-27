@@ -20,10 +20,10 @@ package com.github.retrooper.packetevents.wrapper.play.client;
 
 import com.github.retrooper.packetevents.event.impl.PacketReceiveEvent;
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
-import com.github.retrooper.packetevents.wrapper.PacketWrapper;
-import com.github.retrooper.packetevents.util.Vector3i;
 import com.github.retrooper.packetevents.protocol.data.world.BlockFace;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
+import com.github.retrooper.packetevents.util.Vector3i;
+import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 
 public class WrapperPlayClientPlayerDigging extends PacketWrapper<WrapperPlayClientPlayerDigging> {
     private Action action;
@@ -58,8 +58,7 @@ public class WrapperPlayClientPlayerDigging extends PacketWrapper<WrapperPlayCli
         if (serverVersion.isNewerThanOrEquals(ServerVersion.v_1_8)) {
             action = Action.VALUES[readVarInt()];
             blockPosition = readBlockPosition();
-        }
-        else {
+        } else {
             action = Action.VALUES[readByte()];
             int x = readInt();
             int y = readUnsignedByte();
@@ -82,8 +81,7 @@ public class WrapperPlayClientPlayerDigging extends PacketWrapper<WrapperPlayCli
         if (serverVersion.isNewerThanOrEquals(ServerVersion.v_1_8)) {
             writeVarInt(action.ordinal());
             writeBlockPosition(blockPosition);
-        }
-        else {
+        } else {
             writeByte(action.ordinal());
             writeInt(blockPosition.x);
             writeByte(blockPosition.y);

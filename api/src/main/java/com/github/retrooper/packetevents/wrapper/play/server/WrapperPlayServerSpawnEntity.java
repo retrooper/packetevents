@@ -43,8 +43,16 @@ public class WrapperPlayServerSpawnEntity extends PacketWrapper<WrapperPlayServe
         super(event);
     }
 
-    public WrapperPlayServerSpawnEntity() {
+    public WrapperPlayServerSpawnEntity(int entityID, Optional<UUID> uuid, int entityTypeID, Vector3d position, float pitch, float yaw, int data, Optional<Vector3d> velocity) {
         super(PacketType.Play.Server.SPAWN_ENTITY);
+        this.entityID = entityID;
+        this.uuid = uuid;
+        this.entityTypeID = entityTypeID;
+        this.position = position;
+        this.pitch = pitch;
+        this.yaw = yaw;
+        this.data = data;
+        this.velocity = velocity;
     }
 
     @Override

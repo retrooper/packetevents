@@ -34,8 +34,14 @@ public class WrapperPlayServerPlayerAbilities extends PacketWrapper<WrapperPlayS
         super(event);
     }
 
-    public WrapperPlayServerPlayerAbilities() {
+    public WrapperPlayServerPlayerAbilities(boolean godMode, boolean flying, boolean flightAllowed, boolean creativeMode, float flySpeed, float fovModifier) {
         super(PacketType.Play.Server.PLAYER_ABILITIES);
+        this.godMode = godMode;
+        this.flying = flying;
+        this.flightAllowed = flightAllowed;
+        this.creativeMode = creativeMode;
+        this.flySpeed = flySpeed;
+        this.fovModifier = fovModifier;
     }
 
     @Override
