@@ -24,30 +24,55 @@ import com.github.retrooper.packetevents.event.impl.PacketReceiveEvent;
 import com.github.retrooper.packetevents.event.impl.PacketSendEvent;
 import com.github.retrooper.packetevents.manager.player.PlayerManager;
 import com.github.retrooper.packetevents.protocol.ConnectionState;
+import com.github.retrooper.packetevents.protocol.data.nbt.NBTCompound;
+import com.github.retrooper.packetevents.protocol.data.world.blockstate.BaseBlockState;
+import com.github.retrooper.packetevents.protocol.data.world.chunk.BaseChunk;
+import com.github.retrooper.packetevents.protocol.data.world.chunk.Column;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.protocol.data.player.ClientVersion;
 import com.github.retrooper.packetevents.wrapper.handshaking.client.WrapperHandshakingClientHandshake;
 import com.github.retrooper.packetevents.wrapper.login.client.WrapperLoginClientLoginStart;
 import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientInteractEntity;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerChatMessage;
+import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerChunkData;
 import org.bukkit.entity.Player;
+
+import java.util.Arrays;
 
 public class InternalPacketListener implements PacketListener {
     //Make this specific event be at MONITOR priority
     @Override
     public void onPacketSend(PacketSendEvent event) {
+        Player player = (Player) event.getPlayer();
         if (event.getPacketType() == PacketType.Login.Server.LOGIN_SUCCESS) {
             //Transition into the PLAY connection state
             PacketEvents.getAPI().getPlayerManager().changeConnectionState(event.getChannel(), ConnectionState.PLAY);
-        } /*else if (event.getPacketType() == PacketType.Play.Server.CHUNK_DATA) {
+        } else if (event.getPacketType() == PacketType.Play.Server.CHUNK_DATA) {
             WrapperPlayServerChunkData chunkData = new WrapperPlayServerChunkData(event);
             Column column = chunkData.getColumn();
             int x = column.getX();
             int z = column.getZ();
             NBTCompound heightMaps = column.getHeightMaps();
-            event.getPlayer().sendMessage("X: " + x + ", Z: " + z + ", BIOME DATA: " + Arrays.toString(column.getBiomeData()));
-            event.getPlayer().sendMessage("HEIGHT MAPS: " + heightMaps.getTagNames());
-        }*/
+            if (player != null) {
+                player.sendMessage("X: " + x + ", Z: " + z);
+                player.sendMessage("HEIGHT MAPS: " + heightMaps.getTagNames());
+                player.sendMessage("CHUNKS:");
+                //TODO Credit in all chunk related classes
+                for (BaseChunk chunk : column.getChunks()) {
+                    try {
+                        BaseBlockState state = chunk.get(column.getX(), player.getLocation().getBlockY(), column.getZ());
+                        if (state != null) {
+                            player.sendMessage("Jackpot!");
+                            player.sendMessage("Block type: " + state.getCombinedID());
+                        }
+                    }
+                    catch (Exception ignored) {
+
+                    }
+                }
+            }
+            event.setLastUsedWrapper(null);
+        }
         if (event.getPacketType() == PacketType.Play.Server.CHAT_MESSAGE) {
             WrapperPlayServerChatMessage msg = new WrapperPlayServerChatMessage(event);
             //System.out.println("msg: " + msg.getJSONMessage());

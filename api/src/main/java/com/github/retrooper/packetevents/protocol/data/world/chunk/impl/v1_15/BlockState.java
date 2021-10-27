@@ -16,37 +16,27 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.github.retrooper.packetevents.protocol.packettype.serverbound;
+package com.github.retrooper.packetevents.protocol.data.world.chunk.impl.v1_15;
 
-public enum ServerboundPacketType_1_9 {
-    TELEPORT_CONFIRM,
-    TAB_COMPLETE,
-    CHAT_MESSAGE,
-    CLIENT_STATUS,
-    CLIENT_SETTINGS,
-    WINDOW_CONFIRMATION,
-    CLICK_WINDOW_BUTTON,
-    CLICK_WINDOW,
-    CLOSE_WINDOW,
-    PLUGIN_MESSAGE,
-    INTERACT_ENTITY,
-    KEEP_ALIVE,
-    PLAYER_POSITION,
-    PLAYER_POSITION_AND_ROTATION,
-    PLAYER_ROTATION,
-    PLAYER_FLYING,
-    VEHICLE_MOVE,
-    STEER_BOAT,
-    PLAYER_ABILITIES,
-    PLAYER_DIGGING,
-    ENTITY_ACTION,
-    STEER_VEHICLE,
-    RESOURCE_PACK_STATUS,
-    HELD_ITEM_CHANGE,
-    CREATIVE_INVENTORY_ACTION,
-    UPDATE_SIGN,
-    ANIMATION,
-    SPECTATE,
-    PLAYER_BLOCK_PLACEMENT,
-    USE_ITEM
+import com.github.retrooper.packetevents.protocol.data.stream.NetStreamInput;
+import com.github.retrooper.packetevents.protocol.data.stream.NetStreamOutput;
+
+public class BlockState {
+    private final int id;
+
+    public BlockState(int id) {
+        this.id = id;
+    }
+
+    public static BlockState read(NetStreamInput in) {
+        return new BlockState(in.readVarInt());
+    }
+
+    public static void write(NetStreamOutput out, BlockState blockState) {
+        out.writeVarInt(blockState.getID());
+    }
+
+    public int getID() {
+        return id;
+    }
 }

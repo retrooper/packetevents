@@ -39,7 +39,7 @@ public enum ServerboundPacketType_1_17 {
     PLAYER_POSITION,
     PLAYER_POSITION_AND_ROTATION,
     PLAYER_ROTATION,
-    FLYING,
+    PLAYER_FLYING,
     VEHICLE_MOVE,
     STEER_BOAT,
     PICK_ITEM,

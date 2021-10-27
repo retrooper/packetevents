@@ -32,14 +32,14 @@ public class Column {
     private final int x;
     private final int z;
     private final boolean fullChunk;
-    private final Chunk[] chunks;
+    private final BaseChunk[] chunks;
     private final NBTCompound[] tileEntities;
     private final boolean hasHeightMaps;
     private final NBTCompound heightMaps;
     private final boolean hasBiomeData;
     private final int[] biomeData;
 
-    public Column(int x, int z, boolean fullChunk, Chunk[] chunks, NBTCompound[] tileEntities, int[] biomeData) {
+    public Column(int x, int z, boolean fullChunk, BaseChunk[] chunks, NBTCompound[] tileEntities, int[] biomeData) {
         this.x = x;
         this.z = z;
         this.fullChunk = fullChunk;
@@ -51,7 +51,7 @@ public class Column {
         this.biomeData = biomeData != null ? Arrays.copyOf(biomeData, biomeData.length) : null;
     }
 
-    public Column(int x, int z, boolean fullChunk, Chunk[] chunks, NBTCompound[] tileEntities) {
+    public Column(int x, int z, boolean fullChunk, BaseChunk[] chunks, NBTCompound[] tileEntities) {
         this.x = x;
         this.z = z;
         this.fullChunk = fullChunk;
@@ -63,7 +63,7 @@ public class Column {
         this.biomeData = new int[1024];
     }
 
-    public Column(int x, int z, boolean fullChunk, Chunk[] chunks, NBTCompound[] tileEntities, NBTCompound heightMaps) {
+    public Column(int x, int z, boolean fullChunk, BaseChunk[] chunks, NBTCompound[] tileEntities, NBTCompound heightMaps) {
         this.x = x;
         this.z = z;
         this.fullChunk = fullChunk;
@@ -75,7 +75,7 @@ public class Column {
         this.biomeData = new int[1024];
     }
 
-    public Column(int x, int z, boolean fullChunk, Chunk[] chunks, NBTCompound[] tileEntities, NBTCompound heightMaps, int[] biomeData) {
+    public Column(int x, int z, boolean fullChunk, BaseChunk[] chunks, NBTCompound[] tileEntities, NBTCompound heightMaps, int[] biomeData) {
         this.x = x;
         this.z = z;
         this.fullChunk = fullChunk;
@@ -99,7 +99,7 @@ public class Column {
         return fullChunk;
     }
 
-    public Chunk[] getChunks() {
+    public BaseChunk[] getChunks() {
         return chunks;
     }
 

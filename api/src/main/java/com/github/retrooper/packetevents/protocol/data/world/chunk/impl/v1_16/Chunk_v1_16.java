@@ -16,70 +16,55 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/*
- * This class was taken from MCProtocolLib.
- *
- * https://github.com/Steveice10/MCProtocolLib
- */
+package com.github.retrooper.packetevents.protocol.data.world.chunk.impl.v1_16;
 
-package com.github.retrooper.packetevents.protocol.data.world.chunk;
-
+import com.github.retrooper.packetevents.protocol.data.stream.NetStreamInput;
+import com.github.retrooper.packetevents.protocol.data.stream.NetStreamOutput;
+import com.github.retrooper.packetevents.protocol.data.world.blockstate.BaseBlockState;
+import com.github.retrooper.packetevents.protocol.data.world.blockstate.FlatBlockState;
+import com.github.retrooper.packetevents.protocol.data.world.chunk.BaseChunk;
 import com.github.retrooper.packetevents.protocol.data.world.chunk.palette.GlobalPalette;
 import com.github.retrooper.packetevents.protocol.data.world.chunk.palette.ListPalette;
 import com.github.retrooper.packetevents.protocol.data.world.chunk.palette.MapPalette;
 import com.github.retrooper.packetevents.protocol.data.world.chunk.palette.Palette;
-import com.github.retrooper.packetevents.protocol.data.stream.NetStreamInput;
-import com.github.retrooper.packetevents.protocol.data.stream.NetStreamOutput;
 import com.github.retrooper.packetevents.protocol.data.world.chunk.storage.BitStorage;
 
-import java.io.IOException;
-
-public class Chunk {
+public class Chunk_v1_16 implements BaseChunk {
     private static final int CHUNK_SIZE = 4096;
     private static final int MIN_PALETTE_BITS_PER_ENTRY = 4;
     private static final int MAX_PALETTE_BITS_PER_ENTRY = 8;
     private static final int GLOBAL_PALETTE_BITS_PER_ENTRY = 14;
-
     private static final int AIR = 0;
-
     private int blockCount;
     private Palette palette;
     private BitStorage storage;
 
-    public Chunk(int blockCount, Palette palette, BitStorage storage) {
+    public Chunk_v1_16() {
+        this(0, new ListPalette(4), new BitStorage(4, 4096));
+    }
+
+    public Chunk_v1_16(int blockCount, Palette palette, BitStorage storage) {
         this.blockCount = blockCount;
         this.palette = palette;
         this.storage = storage;
     }
 
-    public Chunk() {
-        this(0, new ListPalette(MIN_PALETTE_BITS_PER_ENTRY), new BitStorage(MIN_PALETTE_BITS_PER_ENTRY, CHUNK_SIZE));
-    }
-
-
-    //TODO Fix on older versions
-    public static Chunk read(NetStreamInput in) {
+    public static Chunk_v1_16 read(NetStreamInput in) {
         int blockCount = in.readShort();
         int bitsPerEntry = in.readUnsignedByte();
-        Palette palette = null;
-        try {
-            palette = readPalette(bitsPerEntry, in);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        BitStorage storage = new BitStorage(bitsPerEntry, CHUNK_SIZE, in.readLongs(in.readVarInt()));
-        return new Chunk(blockCount, palette, storage);
+        Palette palette = readPalette(bitsPerEntry, in);
+        BitStorage storage = new BitStorage(bitsPerEntry, 4096, in.readLongs(in.readVarInt()));
+        return new Chunk_v1_16(blockCount, palette, storage);
     }
 
-    public static void write(NetStreamOutput out, Chunk chunk) {
+    public static void write(NetStreamOutput out, Chunk_v1_16 chunk) {
         out.writeShort(chunk.blockCount);
         out.writeByte(chunk.storage.getBitsPerEntry());
-
         if (!(chunk.palette instanceof GlobalPalette)) {
             int paletteLength = chunk.palette.size();
             out.writeVarInt(paletteLength);
-            for (int i = 0; i < paletteLength; i++) {
+
+            for (int i = 0; i < paletteLength; ++i) {
                 out.writeVarInt(chunk.palette.idToState(i));
             }
         }
@@ -90,22 +75,18 @@ public class Chunk {
     }
 
     private static Palette createPalette(int bitsPerEntry) {
-        if (bitsPerEntry <= MIN_PALETTE_BITS_PER_ENTRY) {
+        if (bitsPerEntry <= 4) {
             return new ListPalette(bitsPerEntry);
-        } else if (bitsPerEntry <= MAX_PALETTE_BITS_PER_ENTRY) {
-            return new MapPalette(bitsPerEntry);
         } else {
-            return new GlobalPalette();
+            return bitsPerEntry <= 8 ? new MapPalette(bitsPerEntry) : new GlobalPalette();
         }
     }
 
-    private static Palette readPalette(int bitsPerEntry, NetStreamInput in) throws IOException {
-        if (bitsPerEntry <= MIN_PALETTE_BITS_PER_ENTRY) {
+    private static Palette readPalette(int bitsPerEntry, NetStreamInput in) {
+        if (bitsPerEntry <= 4) {
             return new ListPalette(bitsPerEntry, in);
-        } else if (bitsPerEntry <= MAX_PALETTE_BITS_PER_ENTRY) {
-            return new MapPalette(bitsPerEntry, in);
         } else {
-            return new GlobalPalette();
+            return bitsPerEntry <= 8 ? new MapPalette(bitsPerEntry, in) : new GlobalPalette();
         }
     }
 
@@ -113,9 +94,9 @@ public class Chunk {
         return y << 8 | z << 4 | x;
     }
 
-    public int get(int x, int y, int z) {
+    public BaseBlockState get(int x, int y, int z) {
         int id = this.storage.get(index(x, y, z));
-        return this.palette.idToState(id);
+        return new FlatBlockState(this.palette.idToState(id));
     }
 
     public void set(int x, int y, int z, int state) {
@@ -127,37 +108,44 @@ public class Chunk {
 
         int index = index(x, y, z);
         int curr = this.storage.get(index);
-        if (state != AIR && curr == AIR) {
-            this.blockCount++;
-        } else if (state == AIR && curr != AIR) {
-            this.blockCount--;
+        if (state != 0 && curr == 0) {
+            ++this.blockCount;
+        } else if (state == 0 && curr != 0) {
+            --this.blockCount;
         }
 
         this.storage.set(index, id);
     }
 
-    public boolean isEmpty() {
+    public boolean isKnownEmpty() {
         return this.blockCount == 0;
     }
 
     private int sanitizeBitsPerEntry(int bitsPerEntry) {
-        if (bitsPerEntry <= MAX_PALETTE_BITS_PER_ENTRY) {
-            return Math.max(MIN_PALETTE_BITS_PER_ENTRY, bitsPerEntry);
-        } else {
-            return GLOBAL_PALETTE_BITS_PER_ENTRY;
-        }
+        return bitsPerEntry <= 8 ? Math.max(4, bitsPerEntry) : 14;
     }
 
     private void resizePalette() {
         Palette oldPalette = this.palette;
         BitStorage oldData = this.storage;
-
-        int bitsPerEntry = sanitizeBitsPerEntry(oldData.getBitsPerEntry() + 1);
+        int bitsPerEntry = this.sanitizeBitsPerEntry(oldData.getBitsPerEntry() + 1);
         this.palette = createPalette(bitsPerEntry);
-        this.storage = new BitStorage(bitsPerEntry, CHUNK_SIZE);
+        this.storage = new BitStorage(bitsPerEntry, 4096);
 
-        for (int i = 0; i < CHUNK_SIZE; i++) {
+        for (int i = 0; i < 4096; ++i) {
             this.storage.set(i, this.palette.stateToId(oldPalette.idToState(oldData.get(i))));
         }
+    }
+
+    public int getBlockCount() {
+        return this.blockCount;
+    }
+
+    public Palette getPalette() {
+        return this.palette;
+    }
+
+    public BitStorage getStorage() {
+        return this.storage;
     }
 }

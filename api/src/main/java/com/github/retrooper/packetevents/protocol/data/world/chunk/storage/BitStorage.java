@@ -22,7 +22,7 @@
  * https://github.com/Steveice10/MCProtocolLib
  */
 
-package com.github.retrooper.packetevents.protocol.data.world.chunk;
+package com.github.retrooper.packetevents.protocol.data.world.chunk.storage;
 
 //TODO Equals & hashcode
 public class BitStorage {

@@ -16,37 +16,34 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.github.retrooper.packetevents.protocol.packettype.serverbound;
+package com.github.retrooper.packetevents.protocol.data.world.chunk;
 
-public enum ServerboundPacketType_1_9 {
-    TELEPORT_CONFIRM,
-    TAB_COMPLETE,
-    CHAT_MESSAGE,
-    CLIENT_STATUS,
-    CLIENT_SETTINGS,
-    WINDOW_CONFIRMATION,
-    CLICK_WINDOW_BUTTON,
-    CLICK_WINDOW,
-    CLOSE_WINDOW,
-    PLUGIN_MESSAGE,
-    INTERACT_ENTITY,
-    KEEP_ALIVE,
-    PLAYER_POSITION,
-    PLAYER_POSITION_AND_ROTATION,
-    PLAYER_ROTATION,
-    PLAYER_FLYING,
-    VEHICLE_MOVE,
-    STEER_BOAT,
-    PLAYER_ABILITIES,
-    PLAYER_DIGGING,
-    ENTITY_ACTION,
-    STEER_VEHICLE,
-    RESOURCE_PACK_STATUS,
-    HELD_ITEM_CHANGE,
-    CREATIVE_INVENTORY_ACTION,
-    UPDATE_SIGN,
-    ANIMATION,
-    SPECTATE,
-    PLAYER_BLOCK_PLACEMENT,
-    USE_ITEM
+import java.util.Arrays;
+
+public class ByteArray3d {
+    private final byte[] data;
+
+    public ByteArray3d(int size) {
+        this.data = new byte[size];
+    }
+
+    public ByteArray3d(byte[] array) {
+        this.data = array;
+    }
+
+    public byte[] getData() {
+        return this.data;
+    }
+
+    public int get(int x, int y, int z) {
+        return this.data[y << 8 | z << 4 | x] & 0xFF;
+    }
+
+    public void set(int x, int y, int z, int val) {
+        this.data[y << 8 | z << 4 | x] = (byte) val;
+    }
+
+    public void fill(int val) {
+        Arrays.fill(this.data, (byte) val);
+    }
 }

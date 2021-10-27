@@ -44,7 +44,7 @@ public class ListPalette implements Palette {
         this.data = new int[this.maxId + 1];
     }
 
-    public ListPalette(int bitsPerEntry, NetStreamInput in) throws IOException {
+    public ListPalette(int bitsPerEntry, NetStreamInput in) {
         this(bitsPerEntry);
 
         int paletteLength = in.readVarInt();
