@@ -24,6 +24,7 @@ import com.github.retrooper.packetevents.event.impl.PacketReceiveEvent;
 import com.github.retrooper.packetevents.event.impl.PacketSendEvent;
 import com.github.retrooper.packetevents.manager.player.PlayerManager;
 import com.github.retrooper.packetevents.protocol.ConnectionState;
+import com.github.retrooper.packetevents.protocol.data.chat.ChatComponent;
 import com.github.retrooper.packetevents.protocol.data.nbt.NBTCompound;
 import com.github.retrooper.packetevents.protocol.data.world.blockstate.BaseBlockState;
 import com.github.retrooper.packetevents.protocol.data.world.chunk.BaseChunk;
@@ -75,6 +76,9 @@ public class InternalPacketListener implements PacketListener {
         }
         if (event.getPacketType() == PacketType.Play.Server.CHAT_MESSAGE) {
             WrapperPlayServerChatMessage msg = new WrapperPlayServerChatMessage(event);
+            for (ChatComponent component : msg.getComponents()) {
+                System.out.println("Text: " + component.getText() + ", color: " + component.getColor().name() + ", bold: " + component.isBold());
+            }
             //System.out.println("msg: " + msg.getJSONMessage());
         }
         else if (event.getPacketType() == PacketType.Play.Server.RESPAWN) {
