@@ -21,7 +21,7 @@ package com.github.retrooper.packetevents.wrapper.play.server;
 import com.github.retrooper.packetevents.event.impl.PacketSendEvent;
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.protocol.data.chat.ChatComponent;
-import com.github.retrooper.packetevents.protocol.data.chat.ClickEvent;
+import com.github.retrooper.packetevents.protocol.data.chat.ClickEvent.ClickType;
 import com.github.retrooper.packetevents.protocol.data.chat.Color;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.protocol.data.player.ClientVersion;
@@ -40,7 +40,7 @@ public class WrapperPlayServerChatMessage extends PacketWrapper<WrapperPlayServe
     private static final int MODERN_MESSAGE_LENGTH = 262144;
     private static final int LEGACY_MESSAGE_LENGTH = 32767;
     private String jsonMessageRaw;
-    private List<ChatComponent> components;
+    private List<ChatComponent> messageComponents;
     private ChatPosition position;
     private UUID senderUUID;
 
@@ -85,6 +85,7 @@ public class WrapperPlayServerChatMessage extends PacketWrapper<WrapperPlayServe
         }
 
         //Parse json message
+
         JSONObject fullJsonObject = null;
         try {
             fullJsonObject = (JSONObject) PARSER.parse(jsonMessageRaw);
@@ -93,38 +94,55 @@ public class WrapperPlayServerChatMessage extends PacketWrapper<WrapperPlayServe
         }
 
         List<JSONObject> jsonObjects = new ArrayList<>();
+        //We add the whole JSON object as it contains the data for the parent component
         jsonObjects.add(fullJsonObject);
+        //Extra components, I'm not sure why minecraft designed their component system like this (parent and extra components)
+        //Everything could have just been one array of components, no parent required
         JSONArray jsonArray = (JSONArray) fullJsonObject.getOrDefault("extra", "");
         for (Object o : jsonArray) {
             jsonObjects.add((JSONObject) o);
         }
-        components = new ArrayList<>();
+        messageComponents = new ArrayList<>();
 
         for (JSONObject jsonObject : jsonObjects) {
+            ChatComponent.Builder builder = ChatComponent.builder();
+            //Read general data in this message component
+
             String text = (String) jsonObject.getOrDefault("text", "");
             String color = (String) jsonObject.getOrDefault("color", "");
+            String font = (String) jsonObject.getOrDefault("font", "");
             String insertion = (String) jsonObject.getOrDefault("insertion", "");
-            String clickEvent = (String) jsonObject.getOrDefault("clickEvent", "");
-            List<ClickEvent> clickEvents = new ArrayList<>();
-            clickEvents.add(new ClickEvent(ClickEvent.ClickType.OPEN_URL, ""));
-            clickEvents.add(new ClickEvent(ClickEvent.ClickType.OPEN_FILE, ""));
-            clickEvents.add(new ClickEvent(ClickEvent.ClickType.RUN_COMMAND, ""));
-            clickEvents.add(new ClickEvent(ClickEvent.ClickType.SUGGEST_COMMAND, ""));
-            clickEvents.add(new ClickEvent(ClickEvent.ClickType.CHANGE_PAGE, ""));
-            clickEvents.add(new ClickEvent(ClickEvent.ClickType.COPY_TO_CLIPBOARD, ""));
-           //TODO Click events
             boolean bold = (boolean) jsonObject.getOrDefault("bold", false);
             boolean italic = (boolean) jsonObject.getOrDefault("italic", false);
             boolean underlined = (boolean) jsonObject.getOrDefault("underlined", false);
             boolean strikeThrough = (boolean) jsonObject.getOrDefault("strikethrough", false);
             boolean obfuscated = (boolean) jsonObject.getOrDefault("obfuscated", false);
-            ChatComponent component = ChatComponent.builder()
-                    .text(text).color(Color.getByName(color)).insertion(insertion)
-                    .clickEvents(clickEvents)
+            builder = builder
+                    .text(text).color(Color.getByName(color))
+                    .font(font).insertion(insertion)
                     .bold(bold).italic(italic).underlined(underlined)
-                    .strikeThrough(strikeThrough).obfuscated(obfuscated)
-                    .build();
-            components.add(component);
+                    .strikeThrough(strikeThrough).obfuscated(obfuscated);
+
+            //Read click events
+            JSONObject clickEvents = (JSONObject) jsonObject.get("clickEvent");
+            if (clickEvents != null) {
+                //Read all click events
+                String openURLValue = (String) clickEvents.getOrDefault(ClickType.OPEN_URL.getName(), "");
+                String openFileValue = (String) clickEvents.getOrDefault(ClickType.OPEN_FILE.getName(), "");
+                String runCommandValue = (String) clickEvents.getOrDefault(ClickType.RUN_COMMAND.getName(), "");
+                String suggestCommandValue = (String) clickEvents.getOrDefault(ClickType.SUGGEST_COMMAND.getName(), "");
+                String changePageValue = (String) clickEvents.getOrDefault(ClickType.CHANGE_PAGE.getName(), "");
+                String copyToClipboardValue = (String) clickEvents.getOrDefault(ClickType.COPY_TO_CLIPBOARD.getName(), "");
+                //Add them to the builder
+                builder = builder.openURLClickEvent(openURLValue).openFileClickEvent(openFileValue)
+                .runCommandClickEvent(runCommandValue).suggestCommandClickEvent(suggestCommandValue)
+                .changePageClickEvent(changePageValue).copyToClipboardClickEvent(copyToClipboardValue);
+            }
+
+            //Construct the component
+            ChatComponent component = builder.build();
+            //Add to list of components
+            messageComponents.add(component);
         }
     }
 
@@ -150,12 +168,12 @@ public class WrapperPlayServerChatMessage extends PacketWrapper<WrapperPlayServe
         }
     }
 
-    public List<ChatComponent> getComponents() {
-        return components;
+    public List<ChatComponent> getMessageComponents() {
+        return messageComponents;
     }
 
-    public void setComponents(List<ChatComponent> components) {
-        this.components = components;
+    public void setMessageComponents(List<ChatComponent> components) {
+        this.messageComponents = components;
     }
 
     public String getJSONMessageRaw() {

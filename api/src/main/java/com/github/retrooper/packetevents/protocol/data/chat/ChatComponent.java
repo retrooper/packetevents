@@ -18,15 +18,18 @@
 
 package com.github.retrooper.packetevents.protocol.data.chat;
 
-import java.util.ArrayList;
-import java.util.List;
 
 public class ChatComponent {
     private String text = "";
     private Color color = Color.WHITE;
     private String font = "";
     private String insertion = "";
-    private List<ClickEvent> clickEvents = new ArrayList<>();
+    private ClickEvent openURLClickEvent = new ClickEvent(ClickEvent.ClickType.OPEN_URL);
+    private ClickEvent openFileClickEvent = new ClickEvent(ClickEvent.ClickType.OPEN_FILE);
+    private ClickEvent runCommandClickEvent = new ClickEvent(ClickEvent.ClickType.RUN_COMMAND);
+    private ClickEvent suggestCommandClickEvent = new ClickEvent(ClickEvent.ClickType.SUGGEST_COMMAND);
+    private ClickEvent changePageClickEvent = new ClickEvent(ClickEvent.ClickType.CHANGE_PAGE);
+    private ClickEvent copyToClipboardClickEvent = new ClickEvent(ClickEvent.ClickType.COPY_TO_CLIPBOARD);
     private boolean bold = false;
     private boolean italic = false;
     private boolean underlined = false;
@@ -68,12 +71,52 @@ public class ChatComponent {
         this.insertion = insertion;
     }
 
-    public List<ClickEvent> getClickEvents() {
-        return clickEvents;
+    public ClickEvent getOpenURLClickEvent() {
+        return openURLClickEvent;
     }
 
-    public void setClickEvents(List<ClickEvent> clickEvents) {
-        this.clickEvents = clickEvents;
+    public void setOpenURLClickEvent(ClickEvent openURLClickEvent) {
+        this.openURLClickEvent = openURLClickEvent;
+    }
+
+    public ClickEvent getOpenFileClickEvent() {
+        return openFileClickEvent;
+    }
+
+    public void setOpenFileClickEvent(ClickEvent openFileClickEvent) {
+        this.openFileClickEvent = openFileClickEvent;
+    }
+
+    public ClickEvent getRunCommandClickEvent() {
+        return runCommandClickEvent;
+    }
+
+    public void setRunCommandClickEvent(ClickEvent runCommandClickEvent) {
+        this.runCommandClickEvent = runCommandClickEvent;
+    }
+
+    public ClickEvent getSuggestCommandClickEvent() {
+        return suggestCommandClickEvent;
+    }
+
+    public void setSuggestCommandClickEvent(ClickEvent suggestCommandClickEvent) {
+        this.suggestCommandClickEvent = suggestCommandClickEvent;
+    }
+
+    public ClickEvent getChangePageClickEvent() {
+        return changePageClickEvent;
+    }
+
+    public void setChangePageClickEvent(ClickEvent changePageClickEvent) {
+        this.changePageClickEvent = changePageClickEvent;
+    }
+
+    public ClickEvent getCopyToClipboardClickEvent() {
+        return copyToClipboardClickEvent;
+    }
+
+    public void setCopyToClipboardClickEvent(ClickEvent copyToClipboardClickEvent) {
+        this.copyToClipboardClickEvent = copyToClipboardClickEvent;
     }
 
     public boolean isBold() {
@@ -168,8 +211,33 @@ public class ChatComponent {
             return this;
         }
 
-        public Builder clickEvents(List<ClickEvent> clickEvents) {
-            this.component.setClickEvents(clickEvents);
+        public Builder openURLClickEvent(String value) {
+            this.component.setOpenURLClickEvent(new ClickEvent(ClickEvent.ClickType.OPEN_URL, value));
+            return this;
+        }
+
+        public Builder openFileClickEvent(String value) {
+            this.component.setOpenFileClickEvent(new ClickEvent(ClickEvent.ClickType.OPEN_FILE, value));
+            return this;
+        }
+
+        public Builder runCommandClickEvent(String value) {
+            this.component.setRunCommandClickEvent(new ClickEvent(ClickEvent.ClickType.RUN_COMMAND, value));
+            return this;
+        }
+
+        public Builder suggestCommandClickEvent(String value) {
+            this.component.setSuggestCommandClickEvent(new ClickEvent(ClickEvent.ClickType.SUGGEST_COMMAND, value));
+            return this;
+        }
+
+        public Builder changePageClickEvent(String value) {
+            this.component.setChangePageClickEvent(new ClickEvent(ClickEvent.ClickType.CHANGE_PAGE, value));
+            return this;
+        }
+
+        public Builder copyToClipboardClickEvent(String value) {
+            this.component.setCopyToClipboardClickEvent(new ClickEvent(ClickEvent.ClickType.COPY_TO_CLIPBOARD, value));
             return this;
         }
 

@@ -22,7 +22,6 @@ import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.event.PacketListener;
 import com.github.retrooper.packetevents.event.impl.PacketReceiveEvent;
 import com.github.retrooper.packetevents.event.impl.PacketSendEvent;
-import com.github.retrooper.packetevents.manager.player.PlayerManager;
 import com.github.retrooper.packetevents.protocol.ConnectionState;
 import com.github.retrooper.packetevents.protocol.data.chat.ChatComponent;
 import com.github.retrooper.packetevents.protocol.data.nbt.NBTCompound;
@@ -37,8 +36,6 @@ import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientIn
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerChatMessage;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerChunkData;
 import org.bukkit.entity.Player;
-
-import java.util.Arrays;
 
 public class InternalPacketListener implements PacketListener {
     //Make this specific event be at MONITOR priority
@@ -76,8 +73,9 @@ public class InternalPacketListener implements PacketListener {
         }
         if (event.getPacketType() == PacketType.Play.Server.CHAT_MESSAGE) {
             WrapperPlayServerChatMessage msg = new WrapperPlayServerChatMessage(event);
-            for (ChatComponent component : msg.getComponents()) {
-                System.out.println("Text: " + component.getText() + ", color: " + component.getColor().name() + ", bold: " + component.isBold());
+            for (ChatComponent component : msg.getMessageComponents()) {
+                System.out.println("Text: " + component.getText() + ", color: " + component.getColor().name() + ", bold: " + component.isBold()
+                + ", font: " + component.getFont());
             }
             //System.out.println("msg: " + msg.getJSONMessage());
         }

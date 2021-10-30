@@ -27,6 +27,10 @@ public class ClickEvent {
         this.value = value;
     }
 
+    public ClickEvent(ClickType type) {
+        this(type, "");
+    }
+
     public ClickType getType() {
         return type;
     }
