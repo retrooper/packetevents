@@ -47,13 +47,19 @@ public class WrapperPlayServerChatMessage extends PacketWrapper<WrapperPlayServe
         super(event);
     }
 
-    //TODO Constructor with components
+    public WrapperPlayServerChatMessage(List<TextComponent> messageComponents, ChatPosition position) {
+        this(messageComponents, position, new UUID(0L, 0L));
+    }
+
+    public WrapperPlayServerChatMessage(List<TextComponent> messageComponents, ChatPosition position, UUID senderUUID) {
+        super(PacketType.Play.Server.CHAT_MESSAGE);
+        this.messageComponents = messageComponents;
+        this.position = position;
+        this.senderUUID = senderUUID;
+    }
 
     public WrapperPlayServerChatMessage(String jsonMessageRaw, ChatPosition position) {
-        super(PacketType.Play.Server.CHAT_MESSAGE);
-        this.jsonMessageRaw = jsonMessageRaw;
-        this.position = position;
-        this.senderUUID = new UUID(0L, 0L);
+        this(jsonMessageRaw, position, new UUID(0L, 0L));
     }
 
     public WrapperPlayServerChatMessage(String jsonMessageRaw, ChatPosition position, UUID senderUUID) {
@@ -101,12 +107,9 @@ public class WrapperPlayServerChatMessage extends PacketWrapper<WrapperPlayServe
     public void writeData() {
         int maxMessageLength = serverVersion.isNewerThanOrEquals(ServerVersion.v_1_13) ? MODERN_MESSAGE_LENGTH : LEGACY_MESSAGE_LENGTH;
         if (HANDLE_JSON) {
-            String jsonMessage = buildJSONMessage();
-            writeString(jsonMessage, maxMessageLength);
-            System.out.println("BUILT JSON MESSAGE");
-        } else {
-            writeString(jsonMessageRaw, maxMessageLength);
+            jsonMessageRaw = buildJSONMessage();
         }
+        writeString(jsonMessageRaw, maxMessageLength);
 
         //Is the server 1.8+ or is the client 1.8+? (1.7.10 servers support 1.8 clients, and send the chat position for 1.8 clients)
         if (serverVersion.isNewerThanOrEquals(ServerVersion.v_1_8) || clientVersion.isNewerThanOrEquals(ClientVersion.v_1_8)) {
@@ -130,8 +133,8 @@ public class WrapperPlayServerChatMessage extends PacketWrapper<WrapperPlayServe
         return jsonMessageRaw;
     }
 
-    public void setJSONMessageRaw(String jsonMessage) {
-        this.jsonMessageRaw = jsonMessage;
+    public void setJSONMessageRaw(String jsonMessageRaw) {
+        this.jsonMessageRaw = jsonMessageRaw;
     }
 
     public ChatPosition getPosition() {
@@ -182,12 +185,14 @@ public class WrapperPlayServerChatMessage extends PacketWrapper<WrapperPlayServe
         JSONObject fullJSONObject = new JSONObject();
         boolean firstComponent = true;
         for (TextComponent component : messageComponents) {
-            JSONObject output = component.buildJSON();
             if (firstComponent) {
-                fullJSONObject = output;
+                fullJSONObject = component.buildJSON();
                 firstComponent = false;
-                fullJSONObject.put("extra", new JSONArray());
+                if (messageComponents.size() > 1) {
+                    fullJSONObject.put("extra", new JSONArray());
+                }
             } else {
+                JSONObject output = component.buildJSON();
                 JSONArray extraComponents = (JSONArray) fullJSONObject.get("extra");
                 extraComponents.add(output);
             }
