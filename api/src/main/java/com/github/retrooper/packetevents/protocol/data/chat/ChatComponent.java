@@ -18,11 +18,15 @@
 
 package com.github.retrooper.packetevents.protocol.data.chat;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class ChatComponent {
     private String text = "";
     private Color color = Color.WHITE;
     private String font = "";
     private String insertion = "";
+    private List<ClickEvent> clickEvents = new ArrayList<>();
     private boolean bold = false;
     private boolean italic = false;
     private boolean underlined = false;
@@ -62,6 +66,14 @@ public class ChatComponent {
 
     public void setInsertion(String insertion) {
         this.insertion = insertion;
+    }
+
+    public List<ClickEvent> getClickEvents() {
+        return clickEvents;
+    }
+
+    public void setClickEvents(List<ClickEvent> clickEvents) {
+        this.clickEvents = clickEvents;
     }
 
     public boolean isBold() {
@@ -104,55 +116,60 @@ public class ChatComponent {
         this.obfuscated = obfuscated;
     }
 
-    public static BuilderData generate() {
-        return new BuilderData();
+    public static Builder builder() {
+        return new Builder();
     }
 
-    public static class BuilderData {
+    public static class Builder {
         private final ChatComponent component = new ChatComponent();
 
-        public BuilderData text(String text) {
+        public Builder text(String text) {
             this.component.setText(text);
             return this;
         }
 
-        public BuilderData color(Color color) {
+        public Builder color(Color color) {
             this.component.setColor(color);
             return this;
         }
 
-        public BuilderData font(String font) {
+        public Builder font(String font) {
             this.component.setFont(font);
             return this;
         }
 
-        public BuilderData bold(boolean bold) {
+        public Builder bold(boolean bold) {
             this.component.setBold(bold);
             return this;
         }
 
-        public BuilderData italic(boolean italic) {
+        public Builder italic(boolean italic) {
             this.component.setItalic(italic);
             return this;
         }
 
-        public BuilderData underlined(boolean underlined) {
+        public Builder underlined(boolean underlined) {
             this.component.setUnderlined(underlined);
             return this;
         }
 
-        public BuilderData strikeThrough(boolean strikeThrough) {
+        public Builder strikeThrough(boolean strikeThrough) {
             this.component.setStrikeThrough(strikeThrough);
             return this;
         }
 
-        public BuilderData obfuscated(boolean obfuscated) {
+        public Builder obfuscated(boolean obfuscated) {
             this.component.setObfuscated(obfuscated);
             return this;
         }
 
-        public BuilderData insertion(String insertion) {
+        public Builder insertion(String insertion) {
             this.component.setInsertion(insertion);
+            return this;
+        }
+
+        public Builder clickEvents(List<ClickEvent> clickEvents) {
+            this.component.setClickEvents(clickEvents);
             return this;
         }
 

@@ -102,4 +102,10 @@ public enum Color {
     public String getFullCode() {
         return fullCode;
     }
+
+
+    @Override
+    public String toString() {
+        return name;
+    }
 }

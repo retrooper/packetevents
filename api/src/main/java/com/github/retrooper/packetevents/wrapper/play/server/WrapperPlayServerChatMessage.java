@@ -21,6 +21,7 @@ package com.github.retrooper.packetevents.wrapper.play.server;
 import com.github.retrooper.packetevents.event.impl.PacketSendEvent;
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.protocol.data.chat.ChatComponent;
+import com.github.retrooper.packetevents.protocol.data.chat.ClickEvent;
 import com.github.retrooper.packetevents.protocol.data.chat.Color;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.protocol.data.player.ClientVersion;
@@ -101,16 +102,27 @@ public class WrapperPlayServerChatMessage extends PacketWrapper<WrapperPlayServe
 
         for (JSONObject jsonObject : jsonObjects) {
             String text = (String) jsonObject.getOrDefault("text", "");
+            String color = (String) jsonObject.getOrDefault("color", "");
+            String insertion = (String) jsonObject.getOrDefault("insertion", "");
+            String clickEvent = (String) jsonObject.getOrDefault("clickEvent", "");
+            List<ClickEvent> clickEvents = new ArrayList<>();
+            clickEvents.add(new ClickEvent(ClickEvent.ClickType.OPEN_URL, ""));
+            clickEvents.add(new ClickEvent(ClickEvent.ClickType.OPEN_FILE, ""));
+            clickEvents.add(new ClickEvent(ClickEvent.ClickType.RUN_COMMAND, ""));
+            clickEvents.add(new ClickEvent(ClickEvent.ClickType.SUGGEST_COMMAND, ""));
+            clickEvents.add(new ClickEvent(ClickEvent.ClickType.CHANGE_PAGE, ""));
+            clickEvents.add(new ClickEvent(ClickEvent.ClickType.COPY_TO_CLIPBOARD, ""));
+           //TODO Click events
             boolean bold = (boolean) jsonObject.getOrDefault("bold", false);
             boolean italic = (boolean) jsonObject.getOrDefault("italic", false);
             boolean underlined = (boolean) jsonObject.getOrDefault("underlined", false);
             boolean strikeThrough = (boolean) jsonObject.getOrDefault("strikethrough", false);
             boolean obfuscated = (boolean) jsonObject.getOrDefault("obfuscated", false);
-            String color = (String) jsonObject.getOrDefault("color", "");
-            ChatComponent component = ChatComponent.generate()
-                    .text(text).bold(bold).italic(italic)
-                    .underlined(underlined).strikeThrough(strikeThrough)
-                    .obfuscated(obfuscated).color(Color.getByName(color))
+            ChatComponent component = ChatComponent.builder()
+                    .text(text).color(Color.getByName(color)).insertion(insertion)
+                    .clickEvents(clickEvents)
+                    .bold(bold).italic(italic).underlined(underlined)
+                    .strikeThrough(strikeThrough).obfuscated(obfuscated)
                     .build();
             components.add(component);
         }
