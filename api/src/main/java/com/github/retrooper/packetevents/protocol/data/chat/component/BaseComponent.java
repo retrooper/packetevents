@@ -16,11 +16,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.github.retrooper.packetevents.protocol.data.chat;
+package com.github.retrooper.packetevents.protocol.data.chat.component;
 
 
-public class ChatComponent {
-    private String text = "";
+import com.github.retrooper.packetevents.protocol.data.chat.ClickEvent;
+import com.github.retrooper.packetevents.protocol.data.chat.Color;
+
+public class BaseComponent {
     private Color color = Color.WHITE;
     private String font = "";
     private String insertion = "";
@@ -36,15 +38,7 @@ public class ChatComponent {
     private boolean strikeThrough = false;
     private boolean obfuscated = false;
 
-    public ChatComponent() {
-    }
-
-    public String getText() {
-        return text;
-    }
-
-    public void setText(String text) {
-        this.text = text;
+    public BaseComponent() {
     }
 
     public Color getColor() {
@@ -164,12 +158,7 @@ public class ChatComponent {
     }
 
     public static class Builder {
-        private final ChatComponent component = new ChatComponent();
-
-        public Builder text(String text) {
-            this.component.setText(text);
-            return this;
-        }
+        private final BaseComponent component = new BaseComponent();
 
         public Builder color(Color color) {
             this.component.setColor(color);
@@ -241,7 +230,7 @@ public class ChatComponent {
             return this;
         }
 
-        public ChatComponent build() {
+        public TextComponent build() {
             return component;
         }
     }

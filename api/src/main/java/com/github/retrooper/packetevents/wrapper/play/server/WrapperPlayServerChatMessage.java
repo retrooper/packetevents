@@ -20,11 +20,11 @@ package com.github.retrooper.packetevents.wrapper.play.server;
 
 import com.github.retrooper.packetevents.event.impl.PacketSendEvent;
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
-import com.github.retrooper.packetevents.protocol.data.chat.ChatComponent;
 import com.github.retrooper.packetevents.protocol.data.chat.ClickEvent.ClickType;
 import com.github.retrooper.packetevents.protocol.data.chat.Color;
-import com.github.retrooper.packetevents.protocol.packettype.PacketType;
+import com.github.retrooper.packetevents.protocol.data.chat.component.TextComponent;
 import com.github.retrooper.packetevents.protocol.data.player.ClientVersion;
+import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
@@ -40,7 +40,7 @@ public class WrapperPlayServerChatMessage extends PacketWrapper<WrapperPlayServe
     private static final int MODERN_MESSAGE_LENGTH = 262144;
     private static final int LEGACY_MESSAGE_LENGTH = 32767;
     private String jsonMessageRaw;
-    private List<ChatComponent> messageComponents;
+    private List<TextComponent> messageComponents;
     private ChatPosition position;
     private UUID senderUUID;
 
@@ -104,7 +104,7 @@ public class WrapperPlayServerChatMessage extends PacketWrapper<WrapperPlayServe
         messageComponents = new ArrayList<>();
 
         for (JSONObject jsonObject : jsonObjects) {
-            ChatComponent.Builder builder = ChatComponent.builder();
+            TextComponent.Builder builder = TextComponent.builder();
             //Read general data in this message component
 
             String text = (String) jsonObject.getOrDefault("text", "");
@@ -134,12 +134,12 @@ public class WrapperPlayServerChatMessage extends PacketWrapper<WrapperPlayServe
                 String copyToClipboardValue = (String) clickEvents.getOrDefault(ClickType.COPY_TO_CLIPBOARD.getName(), "");
                 //Add them to the builder
                 builder = builder.openURLClickEvent(openURLValue).openFileClickEvent(openFileValue)
-                .runCommandClickEvent(runCommandValue).suggestCommandClickEvent(suggestCommandValue)
-                .changePageClickEvent(changePageValue).copyToClipboardClickEvent(copyToClipboardValue);
+                        .runCommandClickEvent(runCommandValue).suggestCommandClickEvent(suggestCommandValue)
+                        .changePageClickEvent(changePageValue).copyToClipboardClickEvent(copyToClipboardValue);
             }
 
             //Construct the component
-            ChatComponent component = builder.build();
+            TextComponent component = builder.build();
             //Add to list of components
             messageComponents.add(component);
         }
@@ -167,11 +167,11 @@ public class WrapperPlayServerChatMessage extends PacketWrapper<WrapperPlayServe
         }
     }
 
-    public List<ChatComponent> getMessageComponents() {
+    public List<TextComponent> getMessageComponents() {
         return messageComponents;
     }
 
-    public void setMessageComponents(List<ChatComponent> components) {
+    public void setMessageComponents(List<TextComponent> components) {
         this.messageComponents = components;
     }
 

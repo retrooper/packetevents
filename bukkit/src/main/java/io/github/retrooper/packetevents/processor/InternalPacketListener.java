@@ -23,13 +23,13 @@ import com.github.retrooper.packetevents.event.PacketListener;
 import com.github.retrooper.packetevents.event.impl.PacketReceiveEvent;
 import com.github.retrooper.packetevents.event.impl.PacketSendEvent;
 import com.github.retrooper.packetevents.protocol.ConnectionState;
-import com.github.retrooper.packetevents.protocol.data.chat.ChatComponent;
+import com.github.retrooper.packetevents.protocol.data.chat.component.TextComponent;
 import com.github.retrooper.packetevents.protocol.data.nbt.NBTCompound;
+import com.github.retrooper.packetevents.protocol.data.player.ClientVersion;
 import com.github.retrooper.packetevents.protocol.data.world.blockstate.BaseBlockState;
 import com.github.retrooper.packetevents.protocol.data.world.chunk.BaseChunk;
 import com.github.retrooper.packetevents.protocol.data.world.chunk.Column;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
-import com.github.retrooper.packetevents.protocol.data.player.ClientVersion;
 import com.github.retrooper.packetevents.wrapper.handshaking.client.WrapperHandshakingClientHandshake;
 import com.github.retrooper.packetevents.wrapper.login.client.WrapperLoginClientLoginStart;
 import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientInteractEntity;
@@ -63,8 +63,7 @@ public class InternalPacketListener implements PacketListener {
                             player.sendMessage("Jackpot!");
                             player.sendMessage("Block type: " + state.getCombinedID());
                         }
-                    }
-                    catch (Exception ignored) {
+                    } catch (Exception ignored) {
 
                     }
                 }
@@ -73,13 +72,12 @@ public class InternalPacketListener implements PacketListener {
         }
         if (event.getPacketType() == PacketType.Play.Server.CHAT_MESSAGE) {
             WrapperPlayServerChatMessage msg = new WrapperPlayServerChatMessage(event);
-            for (ChatComponent component : msg.getMessageComponents()) {
+            for (TextComponent component : msg.getMessageComponents()) {
                 System.out.println("Text: " + component.getText() + ", color: " + component.getColor().name() + ", bold: " + component.isBold()
-                + ", font: " + component.getFont());
+                        + ", font: " + component.getFont());
             }
             //System.out.println("msg: " + msg.getJSONMessage());
-        }
-        else if (event.getPacketType() == PacketType.Play.Server.RESPAWN) {
+        } else if (event.getPacketType() == PacketType.Play.Server.RESPAWN) {
             //System.out.println("COOL!!!!!!11 YOU DIED!");
         }
     }
@@ -109,12 +107,12 @@ public class InternalPacketListener implements PacketListener {
                     PacketEvents.getAPI().getPlayerManager().CHANNELS.put(start.getUsername(), event.getChannel());
                 }
                 break;
-        case PLAY:
-            if (event.getPacketType() == PacketType.Play.Client.INTERACT_ENTITY) {
-                WrapperPlayClientInteractEntity in = new WrapperPlayClientInteractEntity(event);
-                ((Player)event.getPlayer()).sendMessage("eid from internal: " + in.getEntityID() + ", type: " + in.getType().name());
-            }
-            break;
+            case PLAY:
+                if (event.getPacketType() == PacketType.Play.Client.INTERACT_ENTITY) {
+                    WrapperPlayClientInteractEntity in = new WrapperPlayClientInteractEntity(event);
+                    ((Player) event.getPlayer()).sendMessage("eid from internal: " + in.getEntityID() + ", type: " + in.getType().name());
+                }
+                break;
         }
     }
 
