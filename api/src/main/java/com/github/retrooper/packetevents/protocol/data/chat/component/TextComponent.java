@@ -20,6 +20,7 @@ package com.github.retrooper.packetevents.protocol.data.chat.component;
 
 import com.github.retrooper.packetevents.protocol.data.chat.ClickEvent;
 import com.github.retrooper.packetevents.protocol.data.chat.Color;
+import org.json.simple.JSONObject;
 
 public class TextComponent extends BaseComponent {
     private String text;
@@ -36,6 +37,19 @@ public class TextComponent extends BaseComponent {
         this.text = text;
     }
 
+    @Override
+    public void parseJSON(JSONObject jsonObject) {
+        this.text = (String) jsonObject.getOrDefault("text", "");
+        super.parseJSON(jsonObject);
+    }
+
+    @Override
+    public JSONObject buildJSON() {
+        JSONObject jsonObject = super.buildJSON();
+        jsonObject.put("text", text);
+        return jsonObject;
+    }
+
     public static Builder builder() {
         return new Builder();
     }
@@ -50,11 +64,6 @@ public class TextComponent extends BaseComponent {
 
         public Builder color(Color color) {
             this.component.setColor(color);
-            return this;
-        }
-
-        public Builder font(String font) {
-            this.component.setFont(font);
             return this;
         }
 

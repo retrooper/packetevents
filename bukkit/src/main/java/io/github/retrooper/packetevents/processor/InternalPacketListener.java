@@ -52,16 +52,16 @@ public class InternalPacketListener implements PacketListener {
             int z = column.getZ();
             NBTCompound heightMaps = column.getHeightMaps();
             if (player != null) {
-                player.sendMessage("X: " + x + ", Z: " + z);
-                player.sendMessage("HEIGHT MAPS: " + heightMaps.getTagNames());
-                player.sendMessage("CHUNKS:");
+             //   player.sendMessage("X: " + x + ", Z: " + z);
+              //  player.sendMessage("HEIGHT MAPS: " + heightMaps.getTagNames());
+              //  player.sendMessage("CHUNKS:");
                 //TODO Credit in all chunk related classes
                 for (BaseChunk chunk : column.getChunks()) {
                     try {
                         BaseBlockState state = chunk.get(column.getX(), player.getLocation().getBlockY(), column.getZ());
                         if (state != null) {
-                            player.sendMessage("Jackpot!");
-                            player.sendMessage("Block type: " + state.getCombinedID());
+                            //player.sendMessage("Jackpot!");
+                            //player.sendMessage("Block type: " + state.getCombinedID());
                         }
                     } catch (Exception ignored) {
 
@@ -73,8 +73,7 @@ public class InternalPacketListener implements PacketListener {
         if (event.getPacketType() == PacketType.Play.Server.CHAT_MESSAGE) {
             WrapperPlayServerChatMessage msg = new WrapperPlayServerChatMessage(event);
             for (TextComponent component : msg.getMessageComponents()) {
-                System.out.println("Text: " + component.getText() + ", color: " + component.getColor().name() + ", bold: " + component.isBold()
-                        + ", font: " + component.getFont());
+                System.out.println("Text: " + component.getText() + ", color: " + component.getColor().name() + ", bold: " + component.isBold());
             }
             //System.out.println("msg: " + msg.getJSONMessage());
         } else if (event.getPacketType() == PacketType.Play.Server.RESPAWN) {

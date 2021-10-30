@@ -20,8 +20,6 @@ package com.github.retrooper.packetevents.wrapper.play.server;
 
 import com.github.retrooper.packetevents.event.impl.PacketSendEvent;
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
-import com.github.retrooper.packetevents.protocol.data.chat.ClickEvent.ClickType;
-import com.github.retrooper.packetevents.protocol.data.chat.Color;
 import com.github.retrooper.packetevents.protocol.data.chat.component.TextComponent;
 import com.github.retrooper.packetevents.protocol.data.player.ClientVersion;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
@@ -36,6 +34,7 @@ import java.util.List;
 import java.util.UUID;
 
 public class WrapperPlayServerChatMessage extends PacketWrapper<WrapperPlayServerChatMessage> {
+    public static boolean HANDLE_JSON = true;
     private static final JSONParser PARSER = new JSONParser();
     private static final int MODERN_MESSAGE_LENGTH = 262144;
     private static final int LEGACY_MESSAGE_LENGTH = 32767;
@@ -69,6 +68,11 @@ public class WrapperPlayServerChatMessage extends PacketWrapper<WrapperPlayServe
         int maxMessageLength = serverVersion.isNewerThanOrEquals(ServerVersion.v_1_13) ? MODERN_MESSAGE_LENGTH : LEGACY_MESSAGE_LENGTH;
         this.jsonMessageRaw = readString(maxMessageLength);
 
+        //Parse JSON message
+        if (HANDLE_JSON) {
+            parseJSONMessage();
+        }
+
         //Is the server 1.8+ or is the client 1.8+? 1.7.10 servers support 1.8 clients, and send the chat position.
         if (serverVersion.isNewerThanOrEquals(ServerVersion.v_1_8) || clientVersion.isNewerThanOrEquals(ClientVersion.v_1_8)) {
             byte positionIndex = readByte();
@@ -83,71 +87,12 @@ public class WrapperPlayServerChatMessage extends PacketWrapper<WrapperPlayServe
         } else {
             this.senderUUID = new UUID(0L, 0L);
         }
-
-        //Parse json message
-        JSONObject fullJsonObject = null;
-        try {
-            fullJsonObject = (JSONObject) PARSER.parse(jsonMessageRaw);
-        } catch (ParseException e) {
-            e.printStackTrace();
-        }
-
-        List<JSONObject> jsonObjects = new ArrayList<>();
-        //We add the whole JSON object as it contains the data for the parent component
-        jsonObjects.add(fullJsonObject);
-        //Extra components, I'm not sure why minecraft designed their component system like this (parent and extra components)
-        //Everything could have just been one array of components, no parent required
-        JSONArray jsonArray = (JSONArray) fullJsonObject.getOrDefault("extra", new JSONArray());
-        for (Object o : jsonArray) {
-            jsonObjects.add((JSONObject) o);
-        }
-        messageComponents = new ArrayList<>();
-
-        for (JSONObject jsonObject : jsonObjects) {
-            TextComponent.Builder builder = TextComponent.builder();
-            //Read general data in this message component
-
-            String text = (String) jsonObject.getOrDefault("text", "");
-            String color = (String) jsonObject.getOrDefault("color", "");
-            String font = (String) jsonObject.getOrDefault("font", "");
-            String insertion = (String) jsonObject.getOrDefault("insertion", "");
-            boolean bold = (boolean) jsonObject.getOrDefault("bold", false);
-            boolean italic = (boolean) jsonObject.getOrDefault("italic", false);
-            boolean underlined = (boolean) jsonObject.getOrDefault("underlined", false);
-            boolean strikeThrough = (boolean) jsonObject.getOrDefault("strikethrough", false);
-            boolean obfuscated = (boolean) jsonObject.getOrDefault("obfuscated", false);
-            builder = builder
-                    .text(text).color(Color.getByName(color))
-                    .font(font).insertion(insertion)
-                    .bold(bold).italic(italic).underlined(underlined)
-                    .strikeThrough(strikeThrough).obfuscated(obfuscated);
-
-            //Read click events
-            JSONObject clickEvents = (JSONObject) jsonObject.get("clickEvent");
-            if (clickEvents != null) {
-                //Read all click events
-                String openURLValue = (String) clickEvents.getOrDefault(ClickType.OPEN_URL.getName(), "");
-                String openFileValue = (String) clickEvents.getOrDefault(ClickType.OPEN_FILE.getName(), "");
-                String runCommandValue = (String) clickEvents.getOrDefault(ClickType.RUN_COMMAND.getName(), "");
-                String suggestCommandValue = (String) clickEvents.getOrDefault(ClickType.SUGGEST_COMMAND.getName(), "");
-                String changePageValue = (String) clickEvents.getOrDefault(ClickType.CHANGE_PAGE.getName(), "");
-                String copyToClipboardValue = (String) clickEvents.getOrDefault(ClickType.COPY_TO_CLIPBOARD.getName(), "");
-                //Add them to the builder
-                builder = builder.openURLClickEvent(openURLValue).openFileClickEvent(openFileValue)
-                        .runCommandClickEvent(runCommandValue).suggestCommandClickEvent(suggestCommandValue)
-                        .changePageClickEvent(changePageValue).copyToClipboardClickEvent(copyToClipboardValue);
-            }
-
-            //Construct the component
-            TextComponent component = builder.build();
-            //Add to list of components
-            messageComponents.add(component);
-        }
     }
 
     @Override
     public void readData(WrapperPlayServerChatMessage wrapper) {
         this.jsonMessageRaw = wrapper.jsonMessageRaw;
+        this.messageComponents = wrapper.messageComponents;
         this.position = wrapper.position;
         this.senderUUID = wrapper.senderUUID;
     }
@@ -155,7 +100,13 @@ public class WrapperPlayServerChatMessage extends PacketWrapper<WrapperPlayServe
     @Override
     public void writeData() {
         int maxMessageLength = serverVersion.isNewerThanOrEquals(ServerVersion.v_1_13) ? MODERN_MESSAGE_LENGTH : LEGACY_MESSAGE_LENGTH;
-        writeString(jsonMessageRaw, maxMessageLength);
+        if (HANDLE_JSON) {
+            String jsonMessage = buildJSONMessage();
+            writeString(jsonMessage, maxMessageLength);
+            System.out.println("BUILT JSON MESSAGE");
+        } else {
+            writeString(jsonMessageRaw, maxMessageLength);
+        }
 
         //Is the server 1.8+ or is the client 1.8+? (1.7.10 servers support 1.8 clients, and send the chat position for 1.8 clients)
         if (serverVersion.isNewerThanOrEquals(ServerVersion.v_1_8) || clientVersion.isNewerThanOrEquals(ClientVersion.v_1_8)) {
@@ -171,8 +122,8 @@ public class WrapperPlayServerChatMessage extends PacketWrapper<WrapperPlayServe
         return messageComponents;
     }
 
-    public void setMessageComponents(List<TextComponent> components) {
-        this.messageComponents = components;
+    public void setMessageComponents(List<TextComponent> messageComponents) {
+        this.messageComponents = messageComponents;
     }
 
     public String getJSONMessageRaw() {
@@ -197,6 +148,51 @@ public class WrapperPlayServerChatMessage extends PacketWrapper<WrapperPlayServe
 
     public void setSenderUUID(UUID senderUUID) {
         this.senderUUID = senderUUID;
+    }
+
+    private void parseJSONMessage() {
+        JSONObject fullJsonObject = null;
+        try {
+            fullJsonObject = (JSONObject) PARSER.parse(jsonMessageRaw);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+
+        List<JSONObject> jsonObjects = new ArrayList<>();
+        //We add the whole JSON object as it contains the data for the parent component
+        jsonObjects.add(fullJsonObject);
+        //Extra components, I'm not sure why minecraft designed their component system like this (parent and extra components)
+        //Everything could have just been one array of components, no parent required
+        Object jsonArrayObj = fullJsonObject.get("extra");
+        if (jsonArrayObj != null) {
+            for (Object o : (JSONArray) jsonArrayObj) {
+                jsonObjects.add((JSONObject) o);
+            }
+        }
+        messageComponents = new ArrayList<>();
+
+        for (JSONObject jsonObject : jsonObjects) {
+            TextComponent component = new TextComponent();
+            component.parseJSON(jsonObject);
+            messageComponents.add(component);
+        }
+    }
+
+    private String buildJSONMessage() {
+        JSONObject fullJSONObject = new JSONObject();
+        boolean firstComponent = true;
+        for (TextComponent component : messageComponents) {
+            JSONObject output = component.buildJSON();
+            if (firstComponent) {
+                fullJSONObject = output;
+                firstComponent = false;
+                fullJSONObject.put("extra", new JSONArray());
+            } else {
+                JSONArray extraComponents = (JSONArray) fullJSONObject.get("extra");
+                extraComponents.add(output);
+            }
+        }
+        return fullJSONObject.toJSONString();
     }
 
     public enum ChatPosition {

@@ -20,11 +20,15 @@ package com.github.retrooper.packetevents.protocol.data.chat.component;
 
 
 import com.github.retrooper.packetevents.protocol.data.chat.ClickEvent;
+import com.github.retrooper.packetevents.protocol.data.chat.ClickEvent.ClickType;
 import com.github.retrooper.packetevents.protocol.data.chat.Color;
+import org.json.simple.JSONObject;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class BaseComponent {
     private Color color = Color.WHITE;
-    private String font = "";
     private String insertion = "";
     private ClickEvent openURLClickEvent = new ClickEvent(ClickEvent.ClickType.OPEN_URL);
     private ClickEvent openFileClickEvent = new ClickEvent(ClickEvent.ClickType.OPEN_FILE);
@@ -47,14 +51,6 @@ public class BaseComponent {
 
     public void setColor(Color color) {
         this.color = color;
-    }
-
-    public String getFont() {
-        return font;
-    }
-
-    public void setFont(String font) {
-        this.font = font;
     }
 
     public String getInsertion() {
@@ -157,16 +153,91 @@ public class BaseComponent {
         return new Builder();
     }
 
+    public void parseJSON(JSONObject jsonObject) {
+        String colorStr = (String) jsonObject.getOrDefault("color", "");
+
+        if (!colorStr.isEmpty()) {
+            this.color = Color.getByName(colorStr);
+        } else {
+            this.color = Color.WHITE;
+        }
+
+        this.insertion = (String) jsonObject.getOrDefault("insertion", "");
+        this.bold = (boolean) jsonObject.getOrDefault("bold", false);
+        this.italic = (boolean) jsonObject.getOrDefault("italic", false);
+        this.underlined = (boolean) jsonObject.getOrDefault("underlined", false);
+        this.strikeThrough = (boolean) jsonObject.getOrDefault("strikethrough", false);
+        this.obfuscated = (boolean) jsonObject.getOrDefault("obfuscated", false);
+
+        //Read click events if it has been specified
+        JSONObject clickEvents = (JSONObject) jsonObject.get("clickEvent");
+        if (clickEvents != null) {
+            String openURLValue = (String) clickEvents.getOrDefault(ClickEvent.ClickType.OPEN_URL.getName(), "");
+            String openFileValue = (String) clickEvents.getOrDefault(ClickEvent.ClickType.OPEN_FILE.getName(), "");
+            String runCommandValue = (String) clickEvents.getOrDefault(ClickEvent.ClickType.RUN_COMMAND.getName(), "");
+            String suggestCommandValue = (String) clickEvents.getOrDefault(ClickEvent.ClickType.SUGGEST_COMMAND.getName(), "");
+            String changePageValue = (String) clickEvents.getOrDefault(ClickEvent.ClickType.CHANGE_PAGE.getName(), "");
+            String copyToClipboardValue = (String) clickEvents.getOrDefault(ClickEvent.ClickType.COPY_TO_CLIPBOARD.getName(), "");
+
+            this.openURLClickEvent = new ClickEvent(ClickType.OPEN_URL, openURLValue);
+            this.openFileClickEvent = new ClickEvent(ClickType.OPEN_FILE, openFileValue);
+            this.runCommandClickEvent = new ClickEvent(ClickType.RUN_COMMAND, runCommandValue);
+            this.suggestCommandClickEvent = new ClickEvent(ClickType.SUGGEST_COMMAND, suggestCommandValue);
+            this.changePageClickEvent = new ClickEvent(ClickType.CHANGE_PAGE, changePageValue);
+            this.copyToClipboardClickEvent = new ClickEvent(ClickType.COPY_TO_CLIPBOARD, copyToClipboardValue);
+        }
+    }
+
+    public JSONObject buildJSON() {
+        JSONObject jsonObject = new JSONObject();
+        if (color != Color.WHITE && color != null) {
+            jsonObject.put("color", color.getName());
+        }
+        if (insertion != null && !insertion.isEmpty()) {
+            jsonObject.put("insertion", insertion);
+        }
+        if (bold) {
+            jsonObject.put("bold", true);
+        }
+        if (italic) {
+            jsonObject.put("italic", true);
+        }
+        if (underlined) {
+            jsonObject.put("underlined", true);
+        }
+        if (strikeThrough) {
+            jsonObject.put("strikethrough", true);
+        }
+        if (obfuscated) {
+            jsonObject.put("obfuscated", true);
+        }
+
+        List<ClickEvent> clickEvents = new ArrayList<>();
+        clickEvents.add(openURLClickEvent);
+        clickEvents.add(openFileClickEvent);
+        clickEvents.add(runCommandClickEvent);
+        clickEvents.add(suggestCommandClickEvent);
+        clickEvents.add(changePageClickEvent);
+        clickEvents.add(copyToClipboardClickEvent);
+        boolean allClickEventsEmpty = true;
+        JSONObject jsonClickEvents = new JSONObject();
+        for (ClickEvent clickEvent : clickEvents) {
+            if (!clickEvent.getValue().isEmpty()) {
+                jsonClickEvents.put(clickEvent.getType().getName(), clickEvent.getValue());
+                allClickEventsEmpty = false;
+            }
+        }
+        if (!allClickEventsEmpty) {
+            jsonObject.put("clickEvent", jsonClickEvents);
+        }
+        return jsonObject;
+    }
+
     public static class Builder {
         private final BaseComponent component = new BaseComponent();
 
         public Builder color(Color color) {
             this.component.setColor(color);
-            return this;
-        }
-
-        public Builder font(String font) {
-            this.component.setFont(font);
             return this;
         }
 
@@ -230,7 +301,7 @@ public class BaseComponent {
             return this;
         }
 
-        public TextComponent build() {
+        public BaseComponent build() {
             return component;
         }
     }
