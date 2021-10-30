@@ -85,7 +85,6 @@ public class WrapperPlayServerChatMessage extends PacketWrapper<WrapperPlayServe
         }
 
         //Parse json message
-
         JSONObject fullJsonObject = null;
         try {
             fullJsonObject = (JSONObject) PARSER.parse(jsonMessageRaw);
@@ -98,7 +97,7 @@ public class WrapperPlayServerChatMessage extends PacketWrapper<WrapperPlayServe
         jsonObjects.add(fullJsonObject);
         //Extra components, I'm not sure why minecraft designed their component system like this (parent and extra components)
         //Everything could have just been one array of components, no parent required
-        JSONArray jsonArray = (JSONArray) fullJsonObject.getOrDefault("extra", "");
+        JSONArray jsonArray = (JSONArray) fullJsonObject.getOrDefault("extra", new JSONArray());
         for (Object o : jsonArray) {
             jsonObjects.add((JSONObject) o);
         }
