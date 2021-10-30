@@ -24,17 +24,17 @@ public enum Color {
     BLACK('0'),
     DARK_BLUE('1'),
     DARK_GREEN('2'),
-    DARK_CYAN('3'),
+    DARK_CYAN('3', true, "dark_aqua"),
     DARK_RED('4'),
-    PURPLE('5'),
+    PURPLE('5', true, "dark_purple"),
     GOLD('6'),
     GRAY('7'),
     DARK_GRAY('8'),
     BLUE('9'),
-    BRIGHT_GREEN('a'),
-    CYAN('b'),
+    BRIGHT_GREEN('a', true, "green"),
+    CYAN('b', true, "aqua"),
     RED('c'),
-    PINK('d'),
+    PINK('d', true, "light_purple"),
     YELLOW('e'),
     WHITE('f'),
 
@@ -61,7 +61,13 @@ public enum Color {
         this.color = color;
         this.name = name().toLowerCase();
         this.fullCode = new String(new char[] {PREFIX, code});
+    }
 
+    Color(char code, boolean color, String name) {
+        this.code = code;
+        this.color = color;
+        this.name = name;
+        this.fullCode = new String(new char[] {PREFIX, code});
     }
 
     public boolean isColor() {
@@ -80,7 +86,7 @@ public enum Color {
 
     @Nullable
     public static Color getByName(String name) {
-        if ("".equals(name)) {
+        if (name.isEmpty()) {
             return Color.WHITE;
         }
         for (Color color : values()) {

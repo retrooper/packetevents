@@ -18,12 +18,9 @@
 
 package com.github.retrooper.packetevents.event;
 
-import com.github.retrooper.packetevents.PacketEvents;
-
 import java.util.HashSet;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.logging.Level;
 
 public class EventManager {
     private final Map<Byte, HashSet<PacketListenerAbstract>> listenersMap = new ConcurrentHashMap<>();
@@ -42,12 +39,7 @@ public class EventManager {
             HashSet<PacketListenerAbstract> listeners = listenersMap.get(priority);
             if (listeners != null) {
                 for (PacketListenerAbstract listener : listeners) {
-                    try {
-                        event.call(listener);
-                    } catch (Exception ex) {
-                        PacketEvents.getAPI().getLogger()
-                                .log(Level.SEVERE, "PacketEvents found an exception while calling a packet listener.", ex);
-                    }
+                    event.call(listener);
                 }
             }
         }
@@ -58,13 +50,8 @@ public class EventManager {
             HashSet<PacketListenerAbstract> listeners = listenersMap.get(priority);
             if (listeners != null) {
                 for (PacketListenerAbstract listener : listeners) {
-                    try {
-                        event.call(listener);
-                        postCallListenerAction.run();
-                    } catch (Exception ex) {
-                        PacketEvents.getAPI().getLogger()
-                                .log(Level.SEVERE, "PacketEvents found an exception while calling a packet listener.", ex);
-                    }
+                    event.call(listener);
+                    postCallListenerAction.run();
                 }
             }
         }

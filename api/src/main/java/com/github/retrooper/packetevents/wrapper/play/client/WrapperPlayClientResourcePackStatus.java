@@ -26,7 +26,7 @@ import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 import java.util.Optional;
 
 public class WrapperPlayClientResourcePackStatus extends PacketWrapper<WrapperPlayClientResourcePackStatus> {
-    private Optional<String> hash;
+    private String hash;
     private Result result;
 
     public WrapperPlayClientResourcePackStatus(PacketReceiveEvent event) {
@@ -41,7 +41,7 @@ public class WrapperPlayClientResourcePackStatus extends PacketWrapper<WrapperPl
     @Deprecated
     public WrapperPlayClientResourcePackStatus(String hash, Result result) {
         super(PacketType.Play.Client.RESOURCE_PACK_STATUS);
-        this.hash = Optional.of(hash);
+        this.hash = hash;
         this.result = result;
     }
 
@@ -49,7 +49,10 @@ public class WrapperPlayClientResourcePackStatus extends PacketWrapper<WrapperPl
     public void readData() {
         if (serverVersion.isOlderThan(ServerVersion.v_1_10)) {
             //For now ignore hash, maybe make optional
-            this.hash = Optional.of(readString(40));
+            this.hash = readString(40);
+        }
+        else {
+            this.hash = "";
         }
         int resultIndex = readVarInt();
         this.result = Result.VALUES[resultIndex];
@@ -64,7 +67,7 @@ public class WrapperPlayClientResourcePackStatus extends PacketWrapper<WrapperPl
     @Override
     public void writeData() {
         if (serverVersion.isOlderThan(ServerVersion.v_1_10)) {
-            writeString(hash.orElse("invalid"), 40);
+            writeString(hash, 40);
         }
         writeVarInt(result.ordinal());
     }
@@ -77,11 +80,11 @@ public class WrapperPlayClientResourcePackStatus extends PacketWrapper<WrapperPl
         this.result = result;
     }
 
-    public Optional<String> getHash() {
+    public String getHash() {
         return hash;
     }
 
-    public void setHash(Optional<String> hash) {
+    public void setHash(String hash) {
         this.hash = hash;
     }
 

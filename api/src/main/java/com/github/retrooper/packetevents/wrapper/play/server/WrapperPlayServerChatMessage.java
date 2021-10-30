@@ -154,6 +154,7 @@ public class WrapperPlayServerChatMessage extends PacketWrapper<WrapperPlayServe
     }
 
     private void parseJSONMessage() {
+        messageComponents = new ArrayList<>();
         JSONObject fullJsonObject = null;
         try {
             fullJsonObject = (JSONObject) PARSER.parse(jsonMessageRaw);
@@ -161,6 +162,9 @@ public class WrapperPlayServerChatMessage extends PacketWrapper<WrapperPlayServe
             e.printStackTrace();
         }
 
+        if (fullJsonObject == null) {
+            return;
+        }
         List<JSONObject> jsonObjects = new ArrayList<>();
         //We add the whole JSON object as it contains the data for the parent component
         jsonObjects.add(fullJsonObject);
@@ -172,7 +176,7 @@ public class WrapperPlayServerChatMessage extends PacketWrapper<WrapperPlayServe
                 jsonObjects.add((JSONObject) o);
             }
         }
-        messageComponents = new ArrayList<>();
+
 
         for (JSONObject jsonObject : jsonObjects) {
             TextComponent component = new TextComponent();

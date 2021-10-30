@@ -155,13 +155,7 @@ public class BaseComponent {
 
     public void parseJSON(JSONObject jsonObject) {
         String colorStr = (String) jsonObject.getOrDefault("color", "");
-
-        if (!colorStr.isEmpty()) {
-            this.color = Color.getByName(colorStr);
-        } else {
-            this.color = Color.WHITE;
-        }
-
+        this.color = Color.getByName(colorStr);
         this.insertion = (String) jsonObject.getOrDefault("insertion", "");
         this.bold = (boolean) jsonObject.getOrDefault("bold", false);
         this.italic = (boolean) jsonObject.getOrDefault("italic", false);
