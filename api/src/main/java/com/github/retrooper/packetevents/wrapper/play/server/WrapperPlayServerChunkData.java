@@ -133,7 +133,7 @@ public class WrapperPlayServerChunkData extends PacketWrapper<WrapperPlayServerC
         boolean hasHeightMaps = serverVersion.isNewerThanOrEquals(ServerVersion.v_1_14);
         NBTCompound heightMaps = null;
         if (hasHeightMaps) {
-            heightMaps = readNBTTag();
+            heightMaps = readNBT();
         }
 
         int[] biomeData = new int[0];
@@ -170,7 +170,7 @@ public class WrapperPlayServerChunkData extends PacketWrapper<WrapperPlayServerC
         int tileEntityCount = serverVersion.isOlderThan(ServerVersion.v_1_9) ? 0 : readVarInt();
         NBTCompound[] tileEntities = new NBTCompound[tileEntityCount];
         for (int i = 0; i < tileEntities.length; i++) {
-            tileEntities[i] = readNBTTag();
+            tileEntities[i] = readNBT();
         }
 
 
@@ -215,7 +215,7 @@ public class WrapperPlayServerChunkData extends PacketWrapper<WrapperPlayServerC
 
         boolean hasHeightMaps = serverVersion.isNewerThanOrEquals(ServerVersion.v_1_14);
         if (hasHeightMaps) {
-            writeNBTTab(column.getHeightMaps());
+            writeNBT(column.getHeightMaps());
         }
 
         if (column.hasBiomeData() && v1_13_2 && serverVersion.isNewerThanOrEquals(ServerVersion.v_1_15)) {
@@ -268,7 +268,7 @@ public class WrapperPlayServerChunkData extends PacketWrapper<WrapperPlayServerC
             NBTCompound[] tileEntities = column.getTileEntities();
             writeVarInt(tileEntities.length);
             for (int i = 0; i < tileEntities.length; i++) {
-                writeNBTTab(tileEntities[i]);
+                writeNBT(tileEntities[i]);
             }
         }
     }

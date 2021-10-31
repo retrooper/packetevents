@@ -28,7 +28,7 @@ import java.util.List;
 
 public class ComponentParser {
     public static final JSONParser PARSER = new JSONParser();
-    public static List<TextComponent> parseTextComponents(String jsonMessageRaw) {
+    public static List<TextComponent> parseJSONString(String jsonMessageRaw) {
         List<TextComponent> messageComponents = new ArrayList<>();
         JSONObject fullJsonObject = null;
         try {

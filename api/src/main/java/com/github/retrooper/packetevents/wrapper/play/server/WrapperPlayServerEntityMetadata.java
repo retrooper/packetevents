@@ -242,9 +242,9 @@ public class WrapperPlayServerEntityMetadata extends PacketWrapper<WrapperPlaySe
                         packetWrapper.writeVarInt((int) o);
                     }),
             //1.9 has the above
-            NBT(PacketWrapper::readNBTTag,
+            NBT(PacketWrapper::readNBT,
                     (packetWrapper, o) -> {
-                        packetWrapper.writeNBTTab((NBTCompound) o);
+                        packetWrapper.writeNBT((NBTCompound) o);
                     }),
             //TODO https://wiki.vg/Entity_metadata#Entity_Metadata_Format
             PARTICLE(null, null),

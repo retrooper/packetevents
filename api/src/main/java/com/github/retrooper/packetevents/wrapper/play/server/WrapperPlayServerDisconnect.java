@@ -53,7 +53,7 @@ public class WrapperPlayServerDisconnect extends PacketWrapper<WrapperPlayServer
         int maxMessageLength = serverVersion.isNewerThanOrEquals(ServerVersion.v_1_13) ? MODERN_MESSAGE_LENGTH : LEGACY_MESSAGE_LENGTH;
         jsonReasonRaw = readString(maxMessageLength);
         if (HANDLE_JSON) {
-            reasonComponents = ComponentParser.parseTextComponents(jsonReasonRaw);
+            reasonComponents = ComponentParser.parseJSONString(jsonReasonRaw);
         }
     }
 

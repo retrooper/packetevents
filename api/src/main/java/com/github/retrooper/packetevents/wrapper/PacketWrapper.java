@@ -217,7 +217,7 @@ public class PacketWrapper<T extends PacketWrapper> {
         //TODO
     }
 
-    public NBTCompound readNBTTag() {
+    public NBTCompound readNBT() {
         try {
             return (NBTCompound) DefaultNBTSerializer.INSTANCE.deserializeTag(new ByteBufAbstractInputStream(byteBuf));
         } catch (IOException e) {
@@ -226,7 +226,7 @@ public class PacketWrapper<T extends PacketWrapper> {
         return null;
     }
 
-    public void writeNBTTab(NBTCompound tag) {
+    public void writeNBT(NBTCompound tag) {
         try (ByteBufAbstractOutputStream outputStream = new ByteBufAbstractOutputStream(byteBuf)) {
             if (tag != null) {
                 DefaultNBTSerializer.INSTANCE.serializeTag(outputStream, tag);

@@ -71,7 +71,7 @@ public class WrapperPlayServerChatMessage extends PacketWrapper<WrapperPlayServe
 
         //Parse JSON message
         if (HANDLE_JSON) {
-            messageComponents = ComponentParser.parseTextComponents(this.jsonMessageRaw);
+            messageComponents = ComponentParser.parseJSONString(this.jsonMessageRaw);
         }
 
         //Is the server 1.8+ or is the client 1.8+? 1.7.10 servers support 1.8 clients, and send the chat position.
