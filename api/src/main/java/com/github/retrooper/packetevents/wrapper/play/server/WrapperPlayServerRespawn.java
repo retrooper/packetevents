@@ -54,6 +54,8 @@ public class WrapperPlayServerRespawn extends PacketWrapper<WrapperPlayServerRes
 
     @Override
     public void readData() {
+        //TODO On 1.16.0 we only get dimension type,
+        //TODO here on 1.17 we get a registry with dimensiontype, biome stuff and more
         dimension = readNBT();
         worldName = readString();
         hashedSeed = readLong();
