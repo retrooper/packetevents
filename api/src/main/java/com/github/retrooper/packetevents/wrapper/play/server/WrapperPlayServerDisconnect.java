@@ -20,45 +20,71 @@ package com.github.retrooper.packetevents.wrapper.play.server;
 
 import com.github.retrooper.packetevents.event.impl.PacketSendEvent;
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
+import com.github.retrooper.packetevents.protocol.data.chat.component.ComponentParser;
+import com.github.retrooper.packetevents.protocol.data.chat.component.TextComponent;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 
+import java.util.List;
+
 public class WrapperPlayServerDisconnect extends PacketWrapper<WrapperPlayServerDisconnect> {
+    public static boolean HANDLE_JSON = true;
     private static final int MODERN_MESSAGE_LENGTH = 262144;
     private static final int LEGACY_MESSAGE_LENGTH = 32767;
-    private String reason;
+    private String jsonReasonRaw;
+    private List<TextComponent> reasonComponents;
 
     public WrapperPlayServerDisconnect(PacketSendEvent event) {
         super(event);
     }
 
-    public WrapperPlayServerDisconnect(String reason) {
+    public WrapperPlayServerDisconnect(List<TextComponent> reasonComponents) {
         super(PacketType.Play.Server.DISCONNECT);
-        this.reason = reason;
+        this.reasonComponents = reasonComponents;
+    }
+
+    public WrapperPlayServerDisconnect(String jsonReasonRaw) {
+        super(PacketType.Play.Server.DISCONNECT);
+        this.jsonReasonRaw = jsonReasonRaw;
     }
 
     @Override
     public void readData() {
         int maxMessageLength = serverVersion.isNewerThanOrEquals(ServerVersion.v_1_13) ? MODERN_MESSAGE_LENGTH : LEGACY_MESSAGE_LENGTH;
-        this.reason = readString(maxMessageLength);
+        jsonReasonRaw = readString(maxMessageLength);
+        if (HANDLE_JSON) {
+            reasonComponents = ComponentParser.parseTextComponents(jsonReasonRaw);
+        }
     }
 
     @Override
     public void readData(WrapperPlayServerDisconnect wrapper) {
-        this.reason = wrapper.reason;
+        jsonReasonRaw = wrapper.jsonReasonRaw;
+        reasonComponents = wrapper.reasonComponents;
     }
 
     @Override
     public void writeData() {
         int maxMessageLength = serverVersion.isNewerThanOrEquals(ServerVersion.v_1_13) ? MODERN_MESSAGE_LENGTH : LEGACY_MESSAGE_LENGTH;
-        writeString(reason, maxMessageLength);
+        if (HANDLE_JSON) {
+            jsonReasonRaw = ComponentParser.buildJSONString(reasonComponents);
+        }
+        writeString(jsonReasonRaw, maxMessageLength);
     }
 
-    public String getReason() {
-        return reason;
+    public String getJSONReasonRaw() {
+        return jsonReasonRaw;
     }
 
-    public void setReason(String reason) {
-        this.reason = reason;
+    public void setJSONReasonRaw(String jsonReasonRaw) {
+        this.jsonReasonRaw = jsonReasonRaw;
+    }
+
+    public List<TextComponent> getReasonComponents() {
+        return reasonComponents;
+    }
+
+    public void setReasonComponents(List<TextComponent> reasonComponents) {
+        this.reasonComponents = reasonComponents;
     }
 }

@@ -20,22 +20,17 @@ package com.github.retrooper.packetevents.wrapper.play.server;
 
 import com.github.retrooper.packetevents.event.impl.PacketSendEvent;
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
+import com.github.retrooper.packetevents.protocol.data.chat.component.ComponentParser;
 import com.github.retrooper.packetevents.protocol.data.chat.component.TextComponent;
 import com.github.retrooper.packetevents.protocol.data.player.ClientVersion;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
-import org.json.simple.parser.ParseException;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
 public class WrapperPlayServerChatMessage extends PacketWrapper<WrapperPlayServerChatMessage> {
     public static boolean HANDLE_JSON = true;
-    private static final JSONParser PARSER = new JSONParser();
     private static final int MODERN_MESSAGE_LENGTH = 262144;
     private static final int LEGACY_MESSAGE_LENGTH = 32767;
     private String jsonMessageRaw;
@@ -76,7 +71,7 @@ public class WrapperPlayServerChatMessage extends PacketWrapper<WrapperPlayServe
 
         //Parse JSON message
         if (HANDLE_JSON) {
-            parseJSONMessage();
+            messageComponents = ComponentParser.parseTextComponents(this.jsonMessageRaw);
         }
 
         //Is the server 1.8+ or is the client 1.8+? 1.7.10 servers support 1.8 clients, and send the chat position.
@@ -107,7 +102,7 @@ public class WrapperPlayServerChatMessage extends PacketWrapper<WrapperPlayServe
     public void writeData() {
         int maxMessageLength = serverVersion.isNewerThanOrEquals(ServerVersion.v_1_13) ? MODERN_MESSAGE_LENGTH : LEGACY_MESSAGE_LENGTH;
         if (HANDLE_JSON) {
-            jsonMessageRaw = buildJSONMessage();
+            jsonMessageRaw = ComponentParser.buildJSONString(messageComponents);
         }
         writeString(jsonMessageRaw, maxMessageLength);
 
@@ -151,57 +146,6 @@ public class WrapperPlayServerChatMessage extends PacketWrapper<WrapperPlayServe
 
     public void setSenderUUID(UUID senderUUID) {
         this.senderUUID = senderUUID;
-    }
-
-    private void parseJSONMessage() {
-        messageComponents = new ArrayList<>();
-        JSONObject fullJsonObject = null;
-        try {
-            fullJsonObject = (JSONObject) PARSER.parse(jsonMessageRaw);
-        } catch (ParseException e) {
-            e.printStackTrace();
-        }
-
-        if (fullJsonObject == null) {
-            return;
-        }
-        List<JSONObject> jsonObjects = new ArrayList<>();
-        //We add the whole JSON object as it contains the data for the parent component
-        jsonObjects.add(fullJsonObject);
-        //Extra components, I'm not sure why minecraft designed their component system like this (parent and extra components)
-        //Everything could have just been one array of components, no parent required
-        Object jsonArrayObj = fullJsonObject.get("extra");
-        if (jsonArrayObj != null) {
-            for (Object o : (JSONArray) jsonArrayObj) {
-                jsonObjects.add((JSONObject) o);
-            }
-        }
-
-
-        for (JSONObject jsonObject : jsonObjects) {
-            TextComponent component = new TextComponent();
-            component.parseJSON(jsonObject);
-            messageComponents.add(component);
-        }
-    }
-
-    private String buildJSONMessage() {
-        JSONObject fullJSONObject = new JSONObject();
-        boolean firstComponent = true;
-        for (TextComponent component : messageComponents) {
-            if (firstComponent) {
-                fullJSONObject = component.buildJSON();
-                firstComponent = false;
-                if (messageComponents.size() > 1) {
-                    fullJSONObject.put("extra", new JSONArray());
-                }
-            } else {
-                JSONObject output = component.buildJSON();
-                JSONArray extraComponents = (JSONArray) fullJSONObject.get("extra");
-                extraComponents.add(output);
-            }
-        }
-        return fullJSONObject.toJSONString();
     }
 
     public enum ChatPosition {
