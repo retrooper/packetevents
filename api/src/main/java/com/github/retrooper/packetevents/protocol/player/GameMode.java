@@ -29,6 +29,4 @@ public enum GameMode {
     CREATIVE,
     ADVENTURE,
     SPECTATOR;
-
-    public static final GameMode[] VALUES = values();
 }
