@@ -19,10 +19,10 @@
 package com.github.retrooper.packetevents.wrapper.play.server;
 
 import com.github.retrooper.packetevents.event.impl.PacketSendEvent;
-import com.github.retrooper.packetevents.protocol.data.gameprofile.WrappedProperty;
+import com.github.retrooper.packetevents.protocol.gameprofile.WrappedProperty;
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
-import com.github.retrooper.packetevents.protocol.data.player.GameMode;
-import com.github.retrooper.packetevents.protocol.data.gameprofile.WrappedGameProfile;
+import com.github.retrooper.packetevents.protocol.player.GameMode;
+import com.github.retrooper.packetevents.protocol.gameprofile.WrappedGameProfile;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 import org.jetbrains.annotations.NotNull;

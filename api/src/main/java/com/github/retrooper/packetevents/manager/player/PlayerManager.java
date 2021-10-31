@@ -21,8 +21,8 @@ package com.github.retrooper.packetevents.manager.player;
 import com.github.retrooper.packetevents.netty.buffer.ByteBufAbstract;
 import com.github.retrooper.packetevents.netty.channel.ChannelAbstract;
 import com.github.retrooper.packetevents.protocol.ConnectionState;
-import com.github.retrooper.packetevents.protocol.data.gameprofile.WrappedGameProfile;
-import com.github.retrooper.packetevents.protocol.data.player.ClientVersion;
+import com.github.retrooper.packetevents.protocol.gameprofile.WrappedGameProfile;
+import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 import org.jetbrains.annotations.NotNull;
 

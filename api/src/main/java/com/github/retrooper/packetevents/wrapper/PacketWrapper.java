@@ -26,10 +26,10 @@ import com.github.retrooper.packetevents.event.impl.PacketSendEvent;
 import com.github.retrooper.packetevents.netty.buffer.ByteBufAbstract;
 import com.github.retrooper.packetevents.netty.buffer.ByteBufAbstractInputStream;
 import com.github.retrooper.packetevents.netty.buffer.ByteBufAbstractOutputStream;
-import com.github.retrooper.packetevents.protocol.data.nbt.NBTCompound;
-import com.github.retrooper.packetevents.protocol.data.nbt.NBTEnd;
-import com.github.retrooper.packetevents.protocol.data.nbt.serializer.DefaultNBTSerializer;
-import com.github.retrooper.packetevents.protocol.data.player.ClientVersion;
+import com.github.retrooper.packetevents.protocol.nbt.NBTCompound;
+import com.github.retrooper.packetevents.protocol.nbt.NBTEnd;
+import com.github.retrooper.packetevents.protocol.nbt.serializer.DefaultNBTSerializer;
+import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 import com.github.retrooper.packetevents.util.StringUtil;
 import com.github.retrooper.packetevents.util.Vector3i;
 

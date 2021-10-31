@@ -18,8 +18,8 @@
 
 package io.github.retrooper.packetevents.utils.dependencies;
 
-import com.github.retrooper.packetevents.protocol.data.gameprofile.WrappedGameProfile;
-import com.github.retrooper.packetevents.protocol.data.gameprofile.WrappedProperty;
+import com.github.retrooper.packetevents.protocol.gameprofile.WrappedGameProfile;
+import com.github.retrooper.packetevents.protocol.gameprofile.WrappedProperty;
 import io.github.retrooper.packetevents.utils.MinecraftReflectionUtil;
 import io.github.retrooper.packetevents.utils.dependencies.gameprofile.GameProfileUtil_7;
 import io.github.retrooper.packetevents.utils.dependencies.gameprofile.GameProfileUtil_8;

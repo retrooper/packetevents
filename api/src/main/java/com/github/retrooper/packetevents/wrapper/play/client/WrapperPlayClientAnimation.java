@@ -21,8 +21,8 @@ package com.github.retrooper.packetevents.wrapper.play.client;
 import com.github.retrooper.packetevents.event.impl.PacketReceiveEvent;
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
-import com.github.retrooper.packetevents.protocol.data.player.ClientVersion;
-import com.github.retrooper.packetevents.protocol.data.player.Hand;
+import com.github.retrooper.packetevents.protocol.player.ClientVersion;
+import com.github.retrooper.packetevents.protocol.player.Hand;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 
 /**

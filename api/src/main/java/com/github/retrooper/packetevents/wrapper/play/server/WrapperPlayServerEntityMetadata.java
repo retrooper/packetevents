@@ -20,9 +20,9 @@ package com.github.retrooper.packetevents.wrapper.play.server;
 
 import com.github.retrooper.packetevents.event.impl.PacketSendEvent;
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
-import com.github.retrooper.packetevents.protocol.data.entity.EntityPose;
-import com.github.retrooper.packetevents.protocol.data.nbt.NBTCompound;
-import com.github.retrooper.packetevents.protocol.data.world.BlockFace;
+import com.github.retrooper.packetevents.protocol.entity.EntityPose;
+import com.github.retrooper.packetevents.protocol.nbt.NBTCompound;
+import com.github.retrooper.packetevents.protocol.world.BlockFace;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.util.Vector3f;
 import com.github.retrooper.packetevents.util.Vector3i;

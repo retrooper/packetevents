@@ -20,7 +20,7 @@ package com.github.retrooper.packetevents.wrapper.login.client;
 
 import com.github.retrooper.packetevents.event.impl.PacketReceiveEvent;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
-import com.github.retrooper.packetevents.protocol.data.player.ClientVersion;
+import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 
 public class WrapperLoginClientLoginStart extends PacketWrapper<WrapperLoginClientLoginStart> {

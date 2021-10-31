@@ -20,8 +20,8 @@ package com.github.retrooper.packetevents.wrapper.play.server;
 
 import com.github.retrooper.packetevents.event.impl.PacketSendEvent;
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
-import com.github.retrooper.packetevents.protocol.data.chat.component.ComponentParser;
-import com.github.retrooper.packetevents.protocol.data.chat.component.TextComponent;
+import com.github.retrooper.packetevents.protocol.chat.component.ComponentParser;
+import com.github.retrooper.packetevents.protocol.chat.component.TextComponent;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 

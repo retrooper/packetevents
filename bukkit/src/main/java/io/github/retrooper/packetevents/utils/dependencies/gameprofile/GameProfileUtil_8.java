@@ -18,9 +18,9 @@
 
 package io.github.retrooper.packetevents.utils.dependencies.gameprofile;
 
-import com.github.retrooper.packetevents.protocol.data.gameprofile.WrappedGameProfile;
-import com.github.retrooper.packetevents.protocol.data.gameprofile.WrappedProperty;
-import com.github.retrooper.packetevents.protocol.data.gameprofile.WrappedPropertyMap;
+import com.github.retrooper.packetevents.protocol.gameprofile.WrappedGameProfile;
+import com.github.retrooper.packetevents.protocol.gameprofile.WrappedProperty;
+import com.github.retrooper.packetevents.protocol.gameprofile.WrappedPropertyMap;
 import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.properties.Property;
 import com.github.retrooper.packetevents.util.reflection.ReflectionObject;

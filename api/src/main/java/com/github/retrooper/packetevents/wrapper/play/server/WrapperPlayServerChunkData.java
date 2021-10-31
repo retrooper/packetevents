@@ -20,23 +20,18 @@ package com.github.retrooper.packetevents.wrapper.play.server;
 
 import com.github.retrooper.packetevents.event.impl.PacketSendEvent;
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
-import com.github.retrooper.packetevents.protocol.data.nbt.NBTCompound;
-import com.github.retrooper.packetevents.protocol.data.stream.NetStreamInput;
-import com.github.retrooper.packetevents.protocol.data.stream.NetStreamOutput;
-import com.github.retrooper.packetevents.protocol.data.world.chunk.BaseChunk;
-import com.github.retrooper.packetevents.protocol.data.world.chunk.Chunk;
-import com.github.retrooper.packetevents.protocol.data.world.chunk.Column;
-import com.github.retrooper.packetevents.protocol.data.world.chunk.impl.v1_15.Chunk_v1_15;
-import com.github.retrooper.packetevents.protocol.data.world.chunk.impl.v1_16.Chunk_v1_16;
-import com.github.retrooper.packetevents.protocol.data.world.chunk.reader.ChunkReader;
-import com.github.retrooper.packetevents.protocol.data.world.chunk.reader.impl.ChunkReader_v1_16;
-import com.github.retrooper.packetevents.protocol.data.world.chunk.reader.impl.ChunkReader_v1_7;
-import com.github.retrooper.packetevents.protocol.data.world.chunk.reader.impl.ChunkReader_v1_8;
-import com.github.retrooper.packetevents.protocol.data.world.chunk.reader.impl.ChunkReader_v1_9;
+import com.github.retrooper.packetevents.protocol.nbt.NBTCompound;
+import com.github.retrooper.packetevents.protocol.stream.NetStreamOutput;
+import com.github.retrooper.packetevents.protocol.world.chunk.BaseChunk;
+import com.github.retrooper.packetevents.protocol.world.chunk.Column;
+import com.github.retrooper.packetevents.protocol.world.chunk.reader.ChunkReader;
+import com.github.retrooper.packetevents.protocol.world.chunk.reader.impl.ChunkReader_v1_16;
+import com.github.retrooper.packetevents.protocol.world.chunk.reader.impl.ChunkReader_v1_7;
+import com.github.retrooper.packetevents.protocol.world.chunk.reader.impl.ChunkReader_v1_8;
+import com.github.retrooper.packetevents.protocol.world.chunk.reader.impl.ChunkReader_v1_9;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 
-import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.util.BitSet;
 

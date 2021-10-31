@@ -18,8 +18,8 @@
 
 package io.github.retrooper.packetevents.utils.dependencies.google;
 
-import com.github.retrooper.packetevents.protocol.data.gameprofile.WrappedProperty;
-import com.github.retrooper.packetevents.protocol.data.gameprofile.WrappedPropertyMap;
+import com.github.retrooper.packetevents.protocol.gameprofile.WrappedProperty;
+import com.github.retrooper.packetevents.protocol.gameprofile.WrappedPropertyMap;
 import com.google.common.collect.ForwardingMultimap;
 import com.google.common.collect.LinkedHashMultimap;
 import com.google.common.collect.Multimap;
