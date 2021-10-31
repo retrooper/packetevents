@@ -85,8 +85,8 @@ public enum Color {
     }
 
     @Nullable
-    public static Color getByName(String name) {
-        if (name.isEmpty()) {
+    public static Color getByName(@Nullable String name) {
+        if (name == null || name.isEmpty()) {
             return Color.WHITE;
         }
         for (Color color : values()) {
