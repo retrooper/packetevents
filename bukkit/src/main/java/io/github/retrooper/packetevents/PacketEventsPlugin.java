@@ -43,7 +43,7 @@ public class PacketEventsPlugin extends JavaPlugin {
         net.minecraft.server.v1_14_R1.PacketPlayOutRespawn r7;
         net.minecraft.server.v1_15_R1.PacketPlayOutRespawn r8;
         net.minecraft.server.v1_16_R1.PacketPlayOutRespawn r9;
-        net.minecraft.network.protocol.game.PacketPlayOutRespawn r10;
+        //net.minecraft.network.protocol.game.PacketPlayOutRespawn r10;
     }
 
     @Override

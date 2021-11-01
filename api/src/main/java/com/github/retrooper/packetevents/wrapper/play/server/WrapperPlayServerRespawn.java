@@ -19,13 +19,20 @@
 package com.github.retrooper.packetevents.wrapper.play.server;
 
 import com.github.retrooper.packetevents.event.impl.PacketSendEvent;
+import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.protocol.nbt.NBTCompound;
+import com.github.retrooper.packetevents.protocol.nbt.NBTShort;
+import com.github.retrooper.packetevents.protocol.nbt.NBTString;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.protocol.player.GameMode;
+import com.github.retrooper.packetevents.protocol.world.Dimension;
+import com.github.retrooper.packetevents.protocol.world.WorldType;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 
+import java.util.Arrays;
+
 public class WrapperPlayServerRespawn extends PacketWrapper<WrapperPlayServerRespawn> {
-    private NBTCompound dimension;
+    private Dimension dimension;
     private String worldName;
     private long hashedSeed;
     private GameMode gameMode;
@@ -38,13 +45,13 @@ public class WrapperPlayServerRespawn extends PacketWrapper<WrapperPlayServerRes
         super(event);
     }
 
-    public WrapperPlayServerRespawn(NBTCompound dimension, String worldName, long hashedSeed,
+    public WrapperPlayServerRespawn(Dimension dimension, String worldName, long hashedSeed,
                                     GameMode gameMode, GameMode previousGameMode,
                                     boolean debug, boolean flat, boolean keepingAllPlayerData) {
         super(PacketType.Play.Server.RESPAWN);
         this.dimension = dimension;
         this.worldName = worldName;
-        this.hashedSeed= hashedSeed;
+        this.hashedSeed = hashedSeed;
         this.gameMode = gameMode;
         this.previousGameMode = previousGameMode;
         this.debug = debug;
@@ -55,8 +62,16 @@ public class WrapperPlayServerRespawn extends PacketWrapper<WrapperPlayServerRes
     @Override
     public void readData() {
         //TODO On 1.16.0 we only get dimension type,
-        //TODO here on 1.17 we get a registry with dimensiontype, biome stuff and more
-        dimension = readNBT();
+        //TODO here on 1.16.2->1.17.1 we get a registry with dimensiontype, biome stuff and more
+        if (serverVersion.isNewerThanOrEquals(ServerVersion.v_1_16_2)) {
+            NBTCompound dimensionAttributes = readNBT();
+            System.out.println("tags: " + Arrays.toString(dimensionAttributes.getTagNames().toArray(new String[0])));
+            WorldType worldType = WorldType.getByName(dimensionAttributes.getStringTagValueOrDefault("effects", ""));
+            dimension = new Dimension(worldType, dimensionAttributes);
+        } else {
+            WorldType worldType = WorldType.getByName(readString());
+            dimension = new Dimension(worldType);
+        }
         worldName = readString();
         hashedSeed = readLong();
         gameMode = GameMode.values()[readByte()];
@@ -75,12 +90,18 @@ public class WrapperPlayServerRespawn extends PacketWrapper<WrapperPlayServerRes
         previousGameMode = wrapper.previousGameMode;
         debug = wrapper.debug;
         flat = wrapper.flat;
-        keepingAllPlayerData= wrapper.keepingAllPlayerData;
+        keepingAllPlayerData = wrapper.keepingAllPlayerData;
     }
 
     @Override
     public void writeData() {
-        writeNBT(dimension);
+        if (serverVersion.isNewerThanOrEquals(ServerVersion.v_1_16_2)) {
+            //TODO Update attributes by using world type
+            dimension.getAttributes().get().setTag("effects", new NBTString(dimension.getWorldType().getName()));
+            writeNBT(dimension.getAttributes().get());
+        } else {
+            writeString(dimension.getWorldType().getName());
+        }
         writeString(worldName);
         writeLong(hashedSeed);
         writeByte(gameMode.ordinal());
@@ -90,11 +111,11 @@ public class WrapperPlayServerRespawn extends PacketWrapper<WrapperPlayServerRes
         writeBoolean(keepingAllPlayerData);
     }
 
-    public NBTCompound getDimension() {
+    public Dimension getDimension() {
         return dimension;
     }
 
-    public void setDimension(NBTCompound dimension) {
+    public void setDimension(Dimension dimension) {
         this.dimension = dimension;
     }
 

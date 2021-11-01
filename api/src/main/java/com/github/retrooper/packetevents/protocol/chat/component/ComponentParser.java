@@ -30,6 +30,7 @@ public class ComponentParser {
     public static final JSONParser PARSER = new JSONParser();
     public static List<TextComponent> parseJSONString(String jsonMessageRaw) {
         List<TextComponent> messageComponents = new ArrayList<>();
+        //TODO Caused by: java.lang.ArrayIndexOutOfBoundsException: arraycopy: length -1 is negative on line  36
         JSONObject fullJsonObject = null;
         try {
             fullJsonObject = (JSONObject) PARSER.parse(jsonMessageRaw);

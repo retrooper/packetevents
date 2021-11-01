@@ -35,6 +35,7 @@ import com.github.retrooper.packetevents.wrapper.login.client.WrapperLoginClient
 import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientInteractEntity;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerChatMessage;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerChunkData;
+import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerRespawn;
 import org.bukkit.entity.Player;
 
 public class InternalPacketListener implements PacketListener {
@@ -77,7 +78,10 @@ public class InternalPacketListener implements PacketListener {
             }
             //System.out.println("msg: " + msg.getJSONMessage());
         } else if (event.getPacketType() == PacketType.Play.Server.RESPAWN) {
-            //System.out.println("COOL!!!!!!11 YOU DIED!");
+            WrapperPlayServerRespawn respawn = new WrapperPlayServerRespawn(event);
+            System.out.println("dimension world type: " + respawn.getDimension().getWorldType());
+            System.out.println("world name: " + respawn.getWorldName());
+            event.setLastUsedWrapper(null);
         }
     }
 

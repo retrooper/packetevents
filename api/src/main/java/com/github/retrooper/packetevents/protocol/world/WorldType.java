@@ -18,41 +18,40 @@
 
 package com.github.retrooper.packetevents.protocol.world;
 
-import com.github.retrooper.packetevents.protocol.nbt.NBTCompound;
+import org.jetbrains.annotations.Nullable;
 
-import java.util.Optional;
+public enum WorldType {
+    NETHER(-1, "minecraft:the_nether"),
+    OVERWORLD(0, "minecraft:overworld"),
+    END(1, "minecraft:the_end");
+    private final int id;
+    private final String name;
 
-public class Dimension {
-    private WorldType type;
-    private Optional<NBTCompound> attributes;
-
-    public Dimension(WorldType type) {
-        this.type = type;
-        this.attributes = Optional.empty();
+    WorldType(int id, String name) {
+        this.id = id;
+        this.name = name;
     }
 
-    public Dimension(WorldType type, NBTCompound attributes) {
-        this.type = type;
-        setAttributes(attributes);
+    public static WorldType getByID(int id) {
+        return values()[id + 1];
     }
 
-    public WorldType getWorldType() {
-        return type;
-    }
-
-    public void setWorldType(WorldType type) {
-        this.type = type;
-    }
-
-    public Optional<NBTCompound> getAttributes() {
-        return attributes;
-    }
-
-    public void setAttributes(NBTCompound attributes) {
-        if (attributes == null) {
-            this.attributes = Optional.empty();
-            return;
+    @Nullable
+    public static WorldType getByName(String name) {
+        System.out.println("name: " + name);
+        for (WorldType type : values()) {
+            if (type.name.equals(name)) {
+                return type;
+            }
         }
-        this.attributes = Optional.of(attributes);
+        return null;
+    }
+
+    public int getID() {
+        return id;
+    }
+
+    public String getName() {
+        return name;
     }
 }
