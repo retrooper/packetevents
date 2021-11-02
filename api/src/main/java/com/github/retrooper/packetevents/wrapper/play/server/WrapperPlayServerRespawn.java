@@ -28,12 +28,14 @@ import com.github.retrooper.packetevents.protocol.player.GameMode;
 import com.github.retrooper.packetevents.protocol.world.Dimension;
 import com.github.retrooper.packetevents.protocol.world.WorldType;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Arrays;
+import java.util.Optional;
 
 public class WrapperPlayServerRespawn extends PacketWrapper<WrapperPlayServerRespawn> {
     private Dimension dimension;
-    private String worldName;
+    private Optional<String> worldName;
     private long hashedSeed;
     private GameMode gameMode;
     private GameMode previousGameMode;
@@ -50,7 +52,7 @@ public class WrapperPlayServerRespawn extends PacketWrapper<WrapperPlayServerRes
                                     boolean debug, boolean flat, boolean keepingAllPlayerData) {
         super(PacketType.Play.Server.RESPAWN);
         this.dimension = dimension;
-        this.worldName = worldName;
+        this.worldName = Optional.of(worldName);
         this.hashedSeed = hashedSeed;
         this.gameMode = gameMode;
         this.previousGameMode = previousGameMode;
@@ -63,22 +65,54 @@ public class WrapperPlayServerRespawn extends PacketWrapper<WrapperPlayServerRes
     public void readData() {
         //TODO On 1.16.0 we only get dimension type,
         //TODO here on 1.16.2->1.17.1 we get a registry with dimensiontype, biome stuff and more
-        if (serverVersion.isNewerThanOrEquals(ServerVersion.v_1_16_2)) {
+        boolean v1_16_2 = serverVersion.isNewerThanOrEquals(ServerVersion.v_1_16_2);
+        boolean v1_16_0 = serverVersion.isNewerThanOrEquals(ServerVersion.v_1_16);
+        if (v1_16_2) {
             NBTCompound dimensionAttributes = readNBT();
-            System.out.println("tags: " + Arrays.toString(dimensionAttributes.getTagNames().toArray(new String[0])));
             WorldType worldType = WorldType.getByName(dimensionAttributes.getStringTagValueOrDefault("effects", ""));
             dimension = new Dimension(worldType, dimensionAttributes);
         } else {
-            WorldType worldType = WorldType.getByName(readString());
+            WorldType worldType;
+            if (v1_16_0) {
+                worldType = WorldType.getByName(readString());
+            }
+            else {
+                worldType = WorldType.getByID(readInt());
+            }
             dimension = new Dimension(worldType);
         }
-        worldName = readString();
+        if (v1_16_0) {
+            worldName = Optional.of(readString());
+        }
+        else {
+            worldName = Optional.empty();
+        }
         hashedSeed = readLong();
         gameMode = GameMode.values()[readByte()];
-        previousGameMode = GameMode.values()[readByte()];
-        debug = readBoolean();
-        flat = readBoolean();
-        keepingAllPlayerData = readBoolean();
+        if (v1_16_0) {
+            previousGameMode = GameMode.values()[readByte()];
+        }
+        else {
+            //We just previous gamemode to the current one
+            previousGameMode = gameMode;
+        }
+
+
+        if (v1_16_0) {
+            debug = readBoolean();
+            flat = readBoolean();
+            keepingAllPlayerData = readBoolean();
+        }
+        else {
+            String levelType = readString();
+            if ("flat".equals(levelType)) {
+                debug = false;
+                flat = true;
+            } else {
+                debug = false;
+                flat = false;
+            }
+        }
     }
 
     @Override
@@ -95,14 +129,14 @@ public class WrapperPlayServerRespawn extends PacketWrapper<WrapperPlayServerRes
 
     @Override
     public void writeData() {
+        //TODO Finish
         if (serverVersion.isNewerThanOrEquals(ServerVersion.v_1_16_2)) {
-            //TODO Update attributes by using world type
             dimension.getAttributes().get().setTag("effects", new NBTString(dimension.getWorldType().getName()));
             writeNBT(dimension.getAttributes().get());
         } else {
             writeString(dimension.getWorldType().getName());
         }
-        writeString(worldName);
+        writeString(worldName.get());
         writeLong(hashedSeed);
         writeByte(gameMode.ordinal());
         writeByte(previousGameMode.ordinal());
@@ -119,12 +153,17 @@ public class WrapperPlayServerRespawn extends PacketWrapper<WrapperPlayServerRes
         this.dimension = dimension;
     }
 
-    public String getWorldName() {
+    public Optional<String> getWorldName() {
         return worldName;
     }
 
-    public void setWorldName(String worldName) {
-        this.worldName = worldName;
+    public void setWorldName(@Nullable String worldName) {
+        if (worldName == null) {
+            this.worldName = Optional.empty();
+        }
+        else {
+            this.worldName = Optional.of(worldName);
+        }
     }
 
     public long getHashedSeed() {
