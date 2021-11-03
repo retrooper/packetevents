@@ -272,7 +272,7 @@ public class PacketWrapper<T extends PacketWrapper> {
             s = StringUtil.maximizeLength(s, maxLen);
         }
         byte[] bytes = s.getBytes(StandardCharsets.UTF_8);
-        if (bytes.length > maxLen) {
+        if (substr || bytes.length > maxLen) {
             throw new IllegalStateException("String too big (was " + bytes.length + " bytes encoded, max " + maxLen + ")");
         } else {
             writeVarInt(bytes.length);

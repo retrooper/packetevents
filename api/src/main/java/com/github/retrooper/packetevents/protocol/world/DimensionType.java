@@ -20,33 +20,37 @@ package com.github.retrooper.packetevents.protocol.world;
 
 import org.jetbrains.annotations.Nullable;
 
-public enum WorldType {
-    DEFAULT("default"),
-    FLAT("flat"),
-    LARGE_BIOMES("largeBiomes"),
-    AMPLIFIED("amplified"),
-    CUSTOMIZED("customized"),
-    BUFFET("buffet"),
-    DEBUG_ALL_BLOCK_STATES("debug_all_block_states"),
-    DEFAULT_1_1("default_1_1");
-
+public enum DimensionType {
+    NETHER(-1, "minecraft:the_nether"),
+    OVERWORLD(0, "minecraft:overworld"),
+    END(1, "minecraft:the_end");
+    private final int id;
     private final String name;
 
-    WorldType(String name) {
+    DimensionType(int id, String name) {
+        this.id = id;
         this.name = name;
     }
 
-    public String getName() {
-        return name;
+    public static DimensionType getByID(int id) {
+        return values()[id + 1];
     }
 
     @Nullable
-    public static WorldType getByName(String name) {
-        for (WorldType type : values()) {
+    public static DimensionType getByName(String name) {
+        for (DimensionType type : values()) {
             if (type.name.equals(name)) {
                 return type;
             }
         }
         return null;
+    }
+
+    public int getID() {
+        return id;
+    }
+
+    public String getName() {
+        return name;
     }
 }

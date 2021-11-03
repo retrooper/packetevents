@@ -33,17 +33,6 @@ public class PacketEventsPlugin extends JavaPlugin {
     public void onEnable() {
         //Register your listeners
         PacketEvents.getAPI().init();
-        net.minecraft.server.v1_7_R4.PacketPlayOutRespawn r0;
-        net.minecraft.server.v1_8_R3.PacketPlayOutRespawn r1;
-        net.minecraft.server.v1_9_R1.PacketPlayOutRespawn r2;
-        net.minecraft.server.v1_10_R1.PacketPlayOutRespawn r3;
-        net.minecraft.server.v1_11_R1.PacketPlayOutRespawn r4;
-        net.minecraft.server.v1_12_R1.PacketPlayOutRespawn r5;
-        net.minecraft.server.v1_13_R1.PacketPlayOutRespawn r6;
-        net.minecraft.server.v1_14_R1.PacketPlayOutRespawn r7;
-        net.minecraft.server.v1_15_R1.PacketPlayOutRespawn r8;
-        net.minecraft.server.v1_16_R1.PacketPlayOutRespawn r9;
-        //net.minecraft.network.protocol.game.PacketPlayOutRespawn r10;
     }
 
     @Override

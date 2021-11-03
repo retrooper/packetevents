@@ -23,24 +23,24 @@ import com.github.retrooper.packetevents.protocol.nbt.NBTCompound;
 import java.util.Optional;
 
 public class Dimension {
-    private WorldType type;
+    private DimensionType type;
     private Optional<NBTCompound> attributes;
 
-    public Dimension(WorldType type) {
+    public Dimension(DimensionType type) {
         this.type = type;
         this.attributes = Optional.empty();
     }
 
-    public Dimension(WorldType type, NBTCompound attributes) {
+    public Dimension(DimensionType type, NBTCompound attributes) {
         this.type = type;
         setAttributes(attributes);
     }
 
-    public WorldType getWorldType() {
+    public DimensionType getType() {
         return type;
     }
 
-    public void setWorldType(WorldType type) {
+    public void setType(DimensionType type) {
         this.type = type;
     }
 

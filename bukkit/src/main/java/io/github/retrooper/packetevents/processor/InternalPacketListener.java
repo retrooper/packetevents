@@ -79,7 +79,7 @@ public class InternalPacketListener implements PacketListener {
             //System.out.println("msg: " + msg.getJSONMessage());
         } else if (event.getPacketType() == PacketType.Play.Server.RESPAWN) {
             WrapperPlayServerRespawn respawn = new WrapperPlayServerRespawn(event);
-            System.out.println("dimension world type: " + respawn.getDimension().getWorldType());
+            System.out.println("dimension world type: " + respawn.getDimension().getType());
             System.out.println("world name: " + respawn.getWorldName());
             event.setLastUsedWrapper(null);
         }

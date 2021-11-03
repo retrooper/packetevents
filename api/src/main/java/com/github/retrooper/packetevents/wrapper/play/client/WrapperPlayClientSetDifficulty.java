@@ -37,7 +37,7 @@ public class WrapperPlayClientSetDifficulty extends PacketWrapper<WrapperPlayCli
 
     @Override
     public void readData() {
-        this.difficulty = Difficulty.VALUES[readByte()];
+        this.difficulty = Difficulty.getByID(readByte());
     }
 
     @Override
