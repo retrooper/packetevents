@@ -67,8 +67,7 @@ public class WrapperPlayServerRespawn extends PacketWrapper<WrapperPlayServerRes
 
     @Override
     public void readData() {
-        boolean v1_11_2 = serverVersion.isNewerThanOrEquals(ServerVersion.v_1_11_2);//1.11.1 & 1.11.2
-        boolean v1_14 = v1_11_2 && serverVersion.isNewerThanOrEquals(ServerVersion.v_1_14);
+        boolean v1_14 = serverVersion.isNewerThanOrEquals(ServerVersion.v_1_14);
         boolean v1_15_0 = v1_14 && serverVersion.isNewerThanOrEquals(ServerVersion.v_1_15);
         boolean v1_16_0 = v1_15_0 && serverVersion.isNewerThanOrEquals(ServerVersion.v_1_16);
         boolean v1_16_2 = v1_16_0 && serverVersion.isNewerThanOrEquals(ServerVersion.v_1_16_2);
@@ -104,11 +103,10 @@ public class WrapperPlayServerRespawn extends PacketWrapper<WrapperPlayServerRes
             //We just set the previous gamemode to the current one
             previousGameMode = gameMode;
             levelType = readString(16);
-            //We can only handle "flat" or "default"
-            if ("flat".equals(levelType)) {
+            if (WorldType.FLAT.getName().equals(levelType)) {
                 worldFlat = true;
             }
-            else if ("debug_all_block_states".equals(levelType)) {
+            else if (WorldType.DEBUG_ALL_BLOCK_STATES.getName().equals(levelType)) {
                 worldDebug = true;
             }
         }
