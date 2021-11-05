@@ -33,9 +33,11 @@ import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.wrapper.handshaking.client.WrapperHandshakingClientHandshake;
 import com.github.retrooper.packetevents.wrapper.login.client.WrapperLoginClientLoginStart;
 import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientInteractEntity;
+import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientTabComplete;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerChatMessage;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerChunkData;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerRespawn;
+import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerTabComplete;
 import org.bukkit.entity.Player;
 
 public class InternalPacketListener implements PacketListener {
@@ -83,10 +85,19 @@ public class InternalPacketListener implements PacketListener {
             System.out.println("world name: " + respawn.getWorldName());
             event.setLastUsedWrapper(null);
         }
+        else if (event.getPacketType() == PacketType.Play.Server.TAB_COMPLETE) {
+            WrapperPlayServerTabComplete tabComplete = new WrapperPlayServerTabComplete(event);
+            System.out.println("RANGE: " + tabComplete.getCommandRange().getBegin() + ", " + tabComplete.getCommandRange().getEnd());
+            for (WrapperPlayServerTabComplete.CommandMatch match : tabComplete.getCommandMatches()) {
+                System.out.println("MATCH: " + match.getText());
+            }
+            event.setLastUsedWrapper(null);
+        }
     }
 
     @Override
     public void onPacketReceive(PacketReceiveEvent event) {
+        Player player = (Player) event.getPlayer();
         switch (event.getConnectionState()) {
             case HANDSHAKING:
                 if (event.getPacketType() == PacketType.Handshaking.Client.HANDSHAKE) {
@@ -113,7 +124,12 @@ public class InternalPacketListener implements PacketListener {
             case PLAY:
                 if (event.getPacketType() == PacketType.Play.Client.INTERACT_ENTITY) {
                     WrapperPlayClientInteractEntity in = new WrapperPlayClientInteractEntity(event);
-                    ((Player) event.getPlayer()).sendMessage("eid from internal: " + in.getEntityID() + ", type: " + in.getType().name());
+                    player.sendMessage("eid from internal: " + in.getEntityID() + ", type: " + in.getType().name());
+                }
+                else if (event.getPacketType() == PacketType.Play.Client.TAB_COMPLETE) {
+                    WrapperPlayClientTabComplete tabComplete = new WrapperPlayClientTabComplete(event);
+                    String text = tabComplete.getText();
+                    player.sendMessage("Incoming tab complete: " + text);
                 }
                 break;
         }

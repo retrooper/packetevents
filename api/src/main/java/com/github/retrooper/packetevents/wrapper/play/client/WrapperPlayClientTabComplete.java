@@ -24,6 +24,7 @@ import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 import com.github.retrooper.packetevents.util.Vector3i;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Optional;
 
@@ -121,15 +122,25 @@ public class WrapperPlayClientTabComplete extends PacketWrapper<WrapperPlayClien
         return transactionID;
     }
 
-    public void setTransactionID(Optional<Integer> transactionID) {
-        this.transactionID = transactionID;
+    public void setTransactionID(@Nullable Integer transactionID) {
+        if (transactionID != null) {
+            this.transactionID = Optional.of(transactionID);
+        }
+        else {
+            this.transactionID = Optional.empty();
+        }
     }
 
     public Optional<Vector3i> getBlockPosition() {
         return blockPosition;
     }
 
-    public void setBlockPosition(Optional<Vector3i> blockPosition) {
-        this.blockPosition = blockPosition;
+    public void setBlockPosition(@Nullable Vector3i blockPosition) {
+        if (blockPosition != null) {
+            this.blockPosition = Optional.of(blockPosition);
+        }
+        else {
+            this.blockPosition = Optional.empty();
+        }
     }
 }

@@ -19,6 +19,8 @@
 package com.github.retrooper.packetevents.wrapper.play.server;
 
 import com.github.retrooper.packetevents.event.impl.PacketSendEvent;
+import com.github.retrooper.packetevents.manager.server.ServerVersion;
+import com.github.retrooper.packetevents.protocol.chat.component.ComponentParser;
 import com.github.retrooper.packetevents.protocol.chat.component.TextComponent;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
@@ -29,6 +31,8 @@ import java.util.List;
 import java.util.Optional;
 
 public class WrapperPlayServerTabComplete extends PacketWrapper<WrapperPlayServerTabComplete> {
+    private static final int MODERN_MESSAGE_LENGTH = 262144;
+    private static final int LEGACY_MESSAGE_LENGTH = 32767;
     private int transactionID;
     private CommandRange commandRange;
     private List<CommandMatch> commandMatches;
@@ -47,19 +51,22 @@ public class WrapperPlayServerTabComplete extends PacketWrapper<WrapperPlayServe
     @Override
     public void readData() {
         transactionID = readVarInt();
+        // - /help -> 4 chars + "/" + 1 = 6
+        //begin = 6
         int begin = readVarInt();
         int len = readVarInt();
         int matchLength = readVarInt();
         //TODO Think, maybe put command range in each match cause 1.8 compat
         commandRange = new CommandRange(begin, begin + len);
         commandMatches = new ArrayList<>(matchLength);
+        int maxMessageLength = serverVersion.isNewerThanOrEquals(ServerVersion.v_1_13) ? MODERN_MESSAGE_LENGTH : LEGACY_MESSAGE_LENGTH;
         for (int i = 0; i < matchLength; i++) {
             String text = readString();
             List<TextComponent> tooltip;
             boolean hasTooltip = readBoolean();
             if (hasTooltip) {
-                //TODO make abstraction in packetwrapper to read text components
-                tooltip = null;
+                String jsonMessage = readString(maxMessageLength);
+                tooltip = ComponentParser.parseJSONString(jsonMessage);
             } else {
                 tooltip = null;
             }
@@ -72,12 +79,13 @@ public class WrapperPlayServerTabComplete extends PacketWrapper<WrapperPlayServe
     public void readData(WrapperPlayServerTabComplete wrapper) {
         transactionID = wrapper.transactionID;
         commandRange = wrapper.commandRange;
-        this.commandMatches = wrapper.commandMatches;
+        commandMatches = wrapper.commandMatches;
     }
 
     @Override
     public void writeData() {
         //TODO
+
     }
 
     public int getTransactionID() {
