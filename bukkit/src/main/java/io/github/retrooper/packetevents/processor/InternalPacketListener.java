@@ -51,7 +51,9 @@ public class InternalPacketListener implements PacketListener {
         if (event.getPacketType() == PacketType.Login.Server.LOGIN_SUCCESS) {
             //Transition into the PLAY connection state
             PacketEvents.getAPI().getPlayerManager().changeConnectionState(event.getChannel(), ConnectionState.PLAY);
-        } else if (event.getPacketType() == PacketType.Play.Server.CHUNK_DATA) {
+        }
+        /*
+        else if (event.getPacketType() == PacketType.Play.Server.CHUNK_DATA) {
             WrapperPlayServerChunkData chunkData = new WrapperPlayServerChunkData(event);
             Column column = chunkData.getColumn();
             int x = column.getX();
@@ -91,11 +93,10 @@ public class InternalPacketListener implements PacketListener {
             WrapperPlayServerTabComplete tabComplete = new WrapperPlayServerTabComplete(event);
             String lastInput = PacketEvents.getAPI().getPlayerManager().getAttribute(player.getUniqueId(), TabCompleteAttribute.class).getInput();
             System.out.println("Last input length: " + lastInput.length() + ", Last input: " + lastInput);
-            tabComplete.getCommandMatches().add(new WrapperPlayServerTabComplete.CommandMatch("retsexer"));
             for (WrapperPlayServerTabComplete.CommandMatch match : tabComplete.getCommandMatches()) {
                 System.out.println("MATCH: " + match.getText());
             }
-        }
+        }*/
     }
 
     @Override
@@ -125,6 +126,7 @@ public class InternalPacketListener implements PacketListener {
                 }
                 break;
             case PLAY:
+                /*
                 if (event.getPacketType() == PacketType.Play.Client.INTERACT_ENTITY) {
                     WrapperPlayClientInteractEntity in = new WrapperPlayClientInteractEntity(event);
                     player.sendMessage("eid from internal: " + in.getEntityID() + ", type: " + in.getType().name());
@@ -139,7 +141,7 @@ public class InternalPacketListener implements PacketListener {
                     Optional<Integer> transactionID = tabComplete.getTransactionID();
                     transactionID.ifPresent(tabComplete::setTransactionID);
                     player.sendMessage("Incoming tab complete: " + text);
-                }
+                }*/
                 break;
         }
     }
