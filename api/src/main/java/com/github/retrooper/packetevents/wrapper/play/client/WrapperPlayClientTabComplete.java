@@ -46,11 +46,9 @@ public class WrapperPlayClientTabComplete extends PacketWrapper<WrapperPlayClien
 
     @Override
     public void readData() {
-        //1.7 -> 1.12.2 text length
-        int textLength = 32767;
         boolean v1_13 = serverVersion.isNewerThanOrEquals(ServerVersion.v_1_13);
+        int textLength;
         if (v1_13) {
-
             if (serverVersion.isNewerThanOrEquals(ServerVersion.v_1_13_1)) {
                 //1.13.1+ text length
                 textLength = 32500;
@@ -60,17 +58,23 @@ public class WrapperPlayClientTabComplete extends PacketWrapper<WrapperPlayClien
             }
             transactionID = Optional.of(readVarInt());
             blockPosition = Optional.empty();
+            text = readString(textLength);
         }
-
-        text = readString(textLength);
-        if (serverVersion.isNewerThanOrEquals(ServerVersion.v_1_8) || clientVersion.isNewerThanOrEquals(ClientVersion.v_1_8)) {
-            if (!v1_13) {
-                transactionID = Optional.empty();
-                //1.13+ removed this
+        else {
+            textLength = 32767;
+            text = readString(textLength);
+            transactionID = Optional.empty();
+            if (serverVersion.isNewerThanOrEquals(ServerVersion.v_1_8) || clientVersion.isNewerThanOrEquals(ClientVersion.v_1_8)) {
                 boolean hasPosition = readBoolean();
                 if (hasPosition) {
                     blockPosition = Optional.of(new Vector3i(readLong()));
                 }
+                else {
+                    blockPosition = Optional.empty();
+                }
+            }
+            else {
+                blockPosition = Optional.empty();
             }
         }
     }
@@ -84,9 +88,8 @@ public class WrapperPlayClientTabComplete extends PacketWrapper<WrapperPlayClien
 
     @Override
     public void writeData() {
-        //1.7 -> 1.12.2 text length
-        int textLength = 32767;
         boolean v1_13 = serverVersion.isNewerThanOrEquals(ServerVersion.v_1_13);
+        int textLength;
         if (v1_13) {
             if (serverVersion.isNewerThanOrEquals(ServerVersion.v_1_13_1)) {
                 //1.13.1+ text length
@@ -95,16 +98,17 @@ public class WrapperPlayClientTabComplete extends PacketWrapper<WrapperPlayClien
                 //1.13 text length
                 textLength = 256;
             }
-            writeVarInt(transactionID.orElse(-1));
+            writeVarInt(transactionID.get());
+            writeString(text, textLength);
         }
-        writeString(text, textLength);
-        if (serverVersion.isNewerThanOrEquals(ServerVersion.v_1_8) || clientVersion.isNewerThanOrEquals(ClientVersion.v_1_8)) {
-            if (!v1_13) {
-                //1.13+ removed this
+        else {
+            textLength = 32767;
+            writeString(text, textLength);
+            if (serverVersion.isNewerThanOrEquals(ServerVersion.v_1_8) || clientVersion.isNewerThanOrEquals(ClientVersion.v_1_8)) {
                 boolean hasPosition = blockPosition.isPresent();
                 writeBoolean(hasPosition);
                 if (hasPosition) {
-                    writeLong(blockPosition.orElse(new Vector3i(-1, -1, -1)).getSerializedPosition());
+                    writeLong(blockPosition.get().getSerializedPosition());
                 }
             }
         }

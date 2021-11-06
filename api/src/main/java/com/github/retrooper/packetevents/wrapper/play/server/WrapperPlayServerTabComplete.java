@@ -18,60 +18,82 @@
 
 package com.github.retrooper.packetevents.wrapper.play.server;
 
+import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.event.impl.PacketSendEvent;
+import com.github.retrooper.packetevents.manager.player.attributes.TabCompleteAttribute;
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.protocol.chat.component.ComponentParser;
 import com.github.retrooper.packetevents.protocol.chat.component.TextComponent;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 public class WrapperPlayServerTabComplete extends PacketWrapper<WrapperPlayServerTabComplete> {
     private static final int MODERN_MESSAGE_LENGTH = 262144;
     private static final int LEGACY_MESSAGE_LENGTH = 32767;
-    private int transactionID;
-    private CommandRange commandRange;
+    private Optional<Integer> transactionID;
+    private Optional<CommandRange> commandRange;
     private List<CommandMatch> commandMatches;
 
     public WrapperPlayServerTabComplete(PacketSendEvent event) {
         super(event);
     }
 
-    public WrapperPlayServerTabComplete(int transactionID, CommandRange commandRange, List<CommandMatch> commandMatches) {
+    public WrapperPlayServerTabComplete(@Nullable Integer transactionID, @NotNull CommandRange commandRange, List<CommandMatch> commandMatches) {
         super(PacketType.Play.Server.TAB_COMPLETE);
-        this.transactionID = transactionID;
-        this.commandRange = commandRange;
+        setTransactionID(transactionID);
+        setCommandRange(commandRange);
+        this.commandMatches = commandMatches;
+    }
+
+    public WrapperPlayServerTabComplete(UUID uuid, List<CommandMatch> commandMatches) {
+        super(PacketType.Play.Server.TAB_COMPLETE);
+        TabCompleteAttribute tabCompleteAttribute = PacketEvents.getAPI()
+                .getPlayerManager().getAttributeOrDefault(uuid, TabCompleteAttribute.class, new TabCompleteAttribute());
+        setTransactionID(tabCompleteAttribute.getTransactionID());
+        int len = tabCompleteAttribute.getInput().length();
+        setCommandRange(new CommandRange(len, len));
         this.commandMatches = commandMatches;
     }
 
     @Override
     public void readData() {
-        transactionID = readVarInt();
-        // - /help -> 4 chars + "/" + 1 = 6
-        //begin = 6
-        int begin = readVarInt();
-        int len = readVarInt();
-        int matchLength = readVarInt();
-        //TODO Think, maybe put command range in each match cause 1.8 compat
-        commandRange = new CommandRange(begin, begin + len);
-        commandMatches = new ArrayList<>(matchLength);
-        int maxMessageLength = serverVersion.isNewerThanOrEquals(ServerVersion.v_1_13) ? MODERN_MESSAGE_LENGTH : LEGACY_MESSAGE_LENGTH;
-        for (int i = 0; i < matchLength; i++) {
-            String text = readString();
-            List<TextComponent> tooltip;
-            boolean hasTooltip = readBoolean();
-            if (hasTooltip) {
-                String jsonMessage = readString(maxMessageLength);
-                tooltip = ComponentParser.parseJSONString(jsonMessage);
-            } else {
-                tooltip = null;
+        if (serverVersion.isNewerThanOrEquals(ServerVersion.v_1_13)) {
+            transactionID = Optional.of(readVarInt());
+            int begin = readVarInt();
+            int len = readVarInt();
+            int matchLength = readVarInt();
+            commandRange = Optional.of(new CommandRange(begin, begin + len));
+            commandMatches = new ArrayList<>(matchLength);
+            int maxMessageLength = serverVersion.isNewerThanOrEquals(ServerVersion.v_1_13) ? MODERN_MESSAGE_LENGTH : LEGACY_MESSAGE_LENGTH;
+            for (int i = 0; i < matchLength; i++) {
+                String text = readString();
+                List<TextComponent> tooltip;
+                boolean hasTooltip = readBoolean();
+                if (hasTooltip) {
+                    String jsonMessage = readString(maxMessageLength);
+                    tooltip = ComponentParser.parseJSONString(jsonMessage);
+                } else {
+                    tooltip = null;
+                }
+                CommandMatch commandMatch = new CommandMatch(text, tooltip);
+                commandMatches.add(commandMatch);
             }
-            CommandMatch commandMatch = new CommandMatch(text, tooltip);
-            commandMatches.add(commandMatch);
+        }
+        else {
+            int matchLength = readVarInt();
+            commandMatches = new ArrayList<>(matchLength);
+            for (int i = 0; i < matchLength; i++) {
+                String text = readString();
+                CommandMatch commandMatch = new CommandMatch(text, null);
+                commandMatches.add(commandMatch);
+            }
         }
     }
 
@@ -84,24 +106,55 @@ public class WrapperPlayServerTabComplete extends PacketWrapper<WrapperPlayServe
 
     @Override
     public void writeData() {
-        //TODO
-
+        if (serverVersion.isNewerThanOrEquals(ServerVersion.v_1_13)) {
+            writeVarInt(transactionID.orElse(-1));
+            CommandRange commandRange = this.commandRange.get();
+            writeVarInt(commandRange.getBegin());
+            writeVarInt(commandRange.getLength());
+            writeVarInt(commandMatches.size());
+            int maxMessageLength = serverVersion.isNewerThanOrEquals(ServerVersion.v_1_13) ? MODERN_MESSAGE_LENGTH : LEGACY_MESSAGE_LENGTH;
+            for (CommandMatch match : commandMatches) {
+                writeString(match.getText());
+                boolean hasTooltip = match.getTooltip().isPresent();
+                writeBoolean(hasTooltip);
+                if (hasTooltip) {
+                    String jsonMessage = ComponentParser.buildJSONString(match.getTooltip().get());
+                    writeString(jsonMessage, maxMessageLength);
+                }
+            }
+        }
+        else {
+            writeVarInt(commandMatches.size());
+            for (CommandMatch match : commandMatches) {
+                writeString(match.getText());
+            }
+        }
     }
 
-    public int getTransactionID() {
+    public Optional<Integer> getTransactionID() {
         return transactionID;
     }
 
-    public void setTransactionID(int transactionID) {
-        this.transactionID = transactionID;
+    public void setTransactionID(Integer transactionID) {
+        if (transactionID != null) {
+            this.transactionID = Optional.of(transactionID);
+        }
+        else {
+            this.transactionID = Optional.empty();
+        }
     }
 
-    public CommandRange getCommandRange() {
+    public Optional<CommandRange> getCommandRange() {
         return commandRange;
     }
 
-    public void setCommandRange(CommandRange commandRange) {
-        this.commandRange = commandRange;
+    public void setCommandRange(@Nullable CommandRange commandRange) {
+        if (commandRange != null) {
+            this.commandRange = Optional.of(commandRange);
+        }
+        else {
+            this.commandRange = Optional.empty();
+        }
     }
 
     public List<CommandMatch> getCommandMatches() {
@@ -119,6 +172,11 @@ public class WrapperPlayServerTabComplete extends PacketWrapper<WrapperPlayServe
         public CommandMatch(String text, @Nullable List<TextComponent> tooltip) {
             this.text = text;
             setTooltip(tooltip);
+        }
+
+        public CommandMatch(String text) {
+            this.text = text;
+            tooltip = Optional.empty();
         }
 
         public String getText() {

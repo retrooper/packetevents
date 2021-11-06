@@ -34,6 +34,11 @@ public interface PlayerManager {
     Map<ChannelAbstract, ClientVersion> CLIENT_VERSIONS = new ConcurrentHashMap<>();
     Map<ChannelAbstract, ConnectionState> CONNECTION_STATES = new ConcurrentHashMap<>();
     Map<String, ChannelAbstract> CHANNELS = new ConcurrentHashMap<>();
+    Map<UUID, Map<Class<? extends PlayerAttributeObject>, PlayerAttributeObject>> PLAYER_ATTRIBUTES = new ConcurrentHashMap<>();
+
+    <T extends PlayerAttributeObject> T getAttributeOrDefault(UUID uuid, Class<T> clazz, T defaultReturnValue);
+    <T extends PlayerAttributeObject> T getAttribute(UUID uuid, Class<T> clazz);
+    <T extends PlayerAttributeObject> void setAttribute(UUID uuid, T attribute);
 
     ConnectionState getConnectionState(Object player);
 

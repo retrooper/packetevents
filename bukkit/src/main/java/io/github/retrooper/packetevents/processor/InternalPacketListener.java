@@ -22,14 +22,15 @@ import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.event.PacketListener;
 import com.github.retrooper.packetevents.event.impl.PacketReceiveEvent;
 import com.github.retrooper.packetevents.event.impl.PacketSendEvent;
+import com.github.retrooper.packetevents.manager.player.attributes.TabCompleteAttribute;
 import com.github.retrooper.packetevents.protocol.ConnectionState;
 import com.github.retrooper.packetevents.protocol.chat.component.TextComponent;
 import com.github.retrooper.packetevents.protocol.nbt.NBTCompound;
+import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 import com.github.retrooper.packetevents.protocol.world.blockstate.BaseBlockState;
 import com.github.retrooper.packetevents.protocol.world.chunk.BaseChunk;
 import com.github.retrooper.packetevents.protocol.world.chunk.Column;
-import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.wrapper.handshaking.client.WrapperHandshakingClientHandshake;
 import com.github.retrooper.packetevents.wrapper.login.client.WrapperLoginClientLoginStart;
 import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientInteractEntity;
@@ -39,6 +40,8 @@ import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerCh
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerRespawn;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerTabComplete;
 import org.bukkit.entity.Player;
+
+import java.util.Optional;
 
 public class InternalPacketListener implements PacketListener {
     //Make this specific event be at MONITOR priority
@@ -55,9 +58,9 @@ public class InternalPacketListener implements PacketListener {
             int z = column.getZ();
             NBTCompound heightMaps = column.getHeightMaps();
             if (player != null) {
-             //   player.sendMessage("X: " + x + ", Z: " + z);
-              //  player.sendMessage("HEIGHT MAPS: " + heightMaps.getTagNames());
-              //  player.sendMessage("CHUNKS:");
+                //   player.sendMessage("X: " + x + ", Z: " + z);
+                //  player.sendMessage("HEIGHT MAPS: " + heightMaps.getTagNames());
+                //  player.sendMessage("CHUNKS:");
                 //TODO Credit in all chunk related classes
                 for (BaseChunk chunk : column.getChunks()) {
                     try {
@@ -83,15 +86,15 @@ public class InternalPacketListener implements PacketListener {
             WrapperPlayServerRespawn respawn = new WrapperPlayServerRespawn(event);
             System.out.println("dimension world type: " + respawn.getDimension().getType());
             System.out.println("world name: " + respawn.getWorldName());
-            event.setLastUsedWrapper(null);
-        }
-        else if (event.getPacketType() == PacketType.Play.Server.TAB_COMPLETE) {
+
+        } else if (event.getPacketType() == PacketType.Play.Server.TAB_COMPLETE) {
             WrapperPlayServerTabComplete tabComplete = new WrapperPlayServerTabComplete(event);
-            System.out.println("RANGE: " + tabComplete.getCommandRange().getBegin() + ", " + tabComplete.getCommandRange().getEnd());
+            String lastInput = PacketEvents.getAPI().getPlayerManager().getAttribute(player.getUniqueId(), TabCompleteAttribute.class).getInput();
+            System.out.println("Last input length: " + lastInput.length() + ", Last input: " + lastInput);
+            tabComplete.getCommandMatches().add(new WrapperPlayServerTabComplete.CommandMatch("retsexer"));
             for (WrapperPlayServerTabComplete.CommandMatch match : tabComplete.getCommandMatches()) {
                 System.out.println("MATCH: " + match.getText());
             }
-            event.setLastUsedWrapper(null);
         }
     }
 
@@ -125,10 +128,16 @@ public class InternalPacketListener implements PacketListener {
                 if (event.getPacketType() == PacketType.Play.Client.INTERACT_ENTITY) {
                     WrapperPlayClientInteractEntity in = new WrapperPlayClientInteractEntity(event);
                     player.sendMessage("eid from internal: " + in.getEntityID() + ", type: " + in.getType().name());
-                }
-                else if (event.getPacketType() == PacketType.Play.Client.TAB_COMPLETE) {
+                } else if (event.getPacketType() == PacketType.Play.Client.TAB_COMPLETE) {
                     WrapperPlayClientTabComplete tabComplete = new WrapperPlayClientTabComplete(event);
                     String text = tabComplete.getText();
+                    TabCompleteAttribute tabCompleteAttribute =
+                            PacketEvents.getAPI().getPlayerManager().getAttributeOrDefault(player.getUniqueId(),
+                                    TabCompleteAttribute.class,
+                                    new TabCompleteAttribute());
+                    tabCompleteAttribute.setInput(text);
+                    Optional<Integer> transactionID = tabComplete.getTransactionID();
+                    transactionID.ifPresent(tabComplete::setTransactionID);
                     player.sendMessage("Incoming tab complete: " + text);
                 }
                 break;

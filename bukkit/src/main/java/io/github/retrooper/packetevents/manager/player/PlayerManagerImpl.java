@@ -19,6 +19,7 @@
 package io.github.retrooper.packetevents.manager.player;
 
 import com.github.retrooper.packetevents.PacketEvents;
+import com.github.retrooper.packetevents.manager.player.PlayerAttributeObject;
 import com.github.retrooper.packetevents.manager.player.PlayerManager;
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.netty.buffer.ByteBufAbstract;
@@ -37,9 +38,44 @@ import io.github.retrooper.packetevents.utils.v1_7.SpigotVersionLookup_1_7;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.UUID;
 
 public class PlayerManagerImpl implements PlayerManager {
+
+    @Override
+    public <T extends PlayerAttributeObject> T getAttributeOrDefault(UUID uuid, Class<T> clazz, T defaultReturnValue) {
+        Map<Class<? extends PlayerAttributeObject>, PlayerAttributeObject> attributes = PLAYER_ATTRIBUTES.get(uuid);
+        if (attributes != null) {
+            return (T) attributes.get(clazz);
+        }
+        else {
+            attributes = new HashMap<>();
+            attributes.put(defaultReturnValue.getClass(), defaultReturnValue);
+            PLAYER_ATTRIBUTES.put(uuid, attributes);
+            return defaultReturnValue;
+        }
+    }
+
+    @Override
+    public <T extends PlayerAttributeObject> T getAttribute(UUID uuid, Class<T> clazz) {
+        Map<Class<? extends PlayerAttributeObject>, PlayerAttributeObject> attributes = PLAYER_ATTRIBUTES.get(uuid);
+        if (attributes != null) {
+            return (T) attributes.get(clazz);
+        }
+        else {
+            PLAYER_ATTRIBUTES.put(uuid, new HashMap<>());
+            return null;
+        }
+    }
+
+    @Override
+    public <T extends PlayerAttributeObject> void setAttribute(UUID uuid, T attribute) {
+        Map<Class<? extends PlayerAttributeObject>, PlayerAttributeObject> attributes = PLAYER_ATTRIBUTES.computeIfAbsent(uuid, k -> new HashMap<>());
+        attributes.put(attribute.getClass(), attribute);
+    }
+
     @Override
     public ConnectionState getConnectionState(Object player) {
         return getConnectionState(getChannel(player));
