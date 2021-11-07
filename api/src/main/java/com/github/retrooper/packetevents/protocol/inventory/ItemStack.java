@@ -21,6 +21,7 @@ package com.github.retrooper.packetevents.protocol.inventory;
 import com.github.retrooper.packetevents.protocol.nbt.NBTCompound;
 
 public class ItemStack {
+    public static final ItemStack NULL = new ItemStack(null, 0);
     //TODO Support legacy data
     private ItemType type;
     private int amount;

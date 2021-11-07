@@ -19,35 +19,27 @@
 package com.github.retrooper.packetevents.wrapper;
 
 import com.github.retrooper.packetevents.PacketEvents;
+import com.github.retrooper.packetevents.event.impl.PacketReceiveEvent;
+import com.github.retrooper.packetevents.event.impl.PacketSendEvent;
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
+import com.github.retrooper.packetevents.netty.buffer.ByteBufAbstract;
 import com.github.retrooper.packetevents.protocol.inventory.ItemStack;
 import com.github.retrooper.packetevents.protocol.inventory.ItemType;
 import com.github.retrooper.packetevents.protocol.inventory.ItemTypes;
+import com.github.retrooper.packetevents.protocol.nbt.NBTCompound;
 import com.github.retrooper.packetevents.protocol.nbt.codec.NBTCodec;
 import com.github.retrooper.packetevents.protocol.packettype.PacketTypeCommon;
-import com.github.retrooper.packetevents.event.impl.PacketReceiveEvent;
-import com.github.retrooper.packetevents.event.impl.PacketSendEvent;
-import com.github.retrooper.packetevents.netty.buffer.ByteBufAbstract;
-import com.github.retrooper.packetevents.netty.buffer.ByteBufAbstractInputStream;
-import com.github.retrooper.packetevents.netty.buffer.ByteBufAbstractOutputStream;
-import com.github.retrooper.packetevents.protocol.nbt.NBTCompound;
-import com.github.retrooper.packetevents.protocol.nbt.NBTEnd;
-import com.github.retrooper.packetevents.protocol.nbt.serializer.DefaultNBTSerializer;
 import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 import com.github.retrooper.packetevents.util.StringUtil;
 import com.github.retrooper.packetevents.util.Vector3i;
+import org.jetbrains.annotations.NotNull;
 
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
-import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
-import java.util.zip.GZIPInputStream;
-import java.util.zip.GZIPOutputStream;
 
 
 public class PacketWrapper<T extends PacketWrapper> {
@@ -216,11 +208,15 @@ public class PacketWrapper<T extends PacketWrapper> {
         }
     }
 
+    @NotNull
     public ItemStack readItemStack() {
+        if (!readBoolean()) {
+            return ItemStack.NULL;
+        }
         //TODO Get cross-version compatibility
         int typeID = readShort();
         if (typeID < 0) {
-            return null;
+            return ItemStack.NULL;
         }
         ItemType type = ItemTypes.getById(typeID);
         int amount = readByte();
@@ -228,11 +224,16 @@ public class PacketWrapper<T extends PacketWrapper> {
         return new ItemStack(type, amount, nbt);
     }
 
-    public void writeItemStack(ItemStack itemStack) {
-        //TODO Get cross-version compatibility
-        writeShort(itemStack.getType().getId());
-        writeByte(itemStack.getAmount());
-        writeNBT(itemStack.getNBT());
+    public void writeItemStack(@NotNull ItemStack itemStack) {
+        if (!itemStack.equals(ItemStack.NULL)) {
+            //TODO Get cross-version compatibility
+            writeBoolean(true);
+            writeShort(itemStack.getType().getId());
+            writeByte(itemStack.getAmount());
+            writeNBT(itemStack.getNBT());
+        } else {
+            writeBoolean(false);
+        }
     }
 
     public NBTCompound readNBT() {
@@ -240,7 +241,7 @@ public class PacketWrapper<T extends PacketWrapper> {
     }
 
     public void writeNBT(NBTCompound nbt) {
-       NBTCodec.writeNBT(byteBuf, serverVersion, nbt);
+        NBTCodec.writeNBT(byteBuf, serverVersion, nbt);
     }
 
     public String readString() {

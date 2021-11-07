@@ -151,6 +151,7 @@ public class InternalPacketListener implements PacketListener {
                     player.sendMessage("Clicked window: " + clickWindow.getWindowId() + ", slot: " + clickWindow.getSlot() + ", button: " + clickWindow.getButton());
                     player.sendMessage("Amount: " + clickWindow.getClickedItemStack().getAmount());
                     player.sendMessage("NBT: " + Arrays.toString(clickWindow.getClickedItemStack().getNBT().getTagNames().toArray(new String[0])));
+                    event.setLastUsedWrapper(null);
                 }
 
                 break;
