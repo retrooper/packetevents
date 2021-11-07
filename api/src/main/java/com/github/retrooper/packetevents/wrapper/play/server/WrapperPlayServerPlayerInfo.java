@@ -79,6 +79,7 @@ public class WrapperPlayServerPlayerInfo extends PacketWrapper<WrapperPlayServer
             } else {
                 action = Action.REMOVE_PLAYER;
             }
+            uuid = new UUID(0L, 0L);
         } else {
             action = Action.VALUES[readVarInt()];
             int playerDataCount = readVarInt();
