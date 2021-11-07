@@ -106,6 +106,32 @@ class EventManagerModern {
     }
 
     /**
+     * Unregister the dynamic packet event listener.
+     *
+     * @param listener {@link PacketListenerAbstract}
+     */
+    public synchronized void unregisterListener(final PacketListenerAbstract listener) {
+        byte priority = listener.getPriority().getId();
+        HashSet<PacketListenerAbstract> listenerSet = listenersMap.get(priority);
+        if (listenerSet == null) {
+            return;
+        }
+        listenerSet.remove(listener);
+        listenersMap.put(priority, listenerSet);
+    }
+
+    /**
+     * Unregister multiple dynamic packet event listeners with one method.
+     *
+     * @param listeners {@link PacketListenerAbstract}
+     */
+    public synchronized void unregisterListeners(PacketListenerAbstract... listeners) {
+        for (PacketListenerAbstract listener : listeners) {
+            unregisterListener(listener);
+        }
+    }
+
+    /**
      * Unregister all dynamic packet event listeners.
      */
     public synchronized void unregisterAllListeners() {
