@@ -117,7 +117,6 @@ class EventManagerModern {
             return;
         }
         listenerSet.remove(listener);
-        listenersMap.put(priority, listenerSet);
     }
 
     /**
