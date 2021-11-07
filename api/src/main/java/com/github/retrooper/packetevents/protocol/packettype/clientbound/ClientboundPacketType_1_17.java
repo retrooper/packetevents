@@ -75,7 +75,7 @@ public enum ClientboundPacketType_1_17 {
     MAP_DATA,
     TRADE_LIST,
     ENTITY_RELATIVE_MOVE,
-    ENTITY_LOOK_AND_RELATIVE_MOVE,
+    ENTITY_RELATIVE_MOVE_AND_LOOK,
     ENTITY_LOOK,
 
     //This packet was removed

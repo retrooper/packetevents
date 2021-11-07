@@ -402,7 +402,7 @@ public final class PacketType {
             MAP_DATA,
             TRADE_LIST,
             ENTITY_RELATIVE_MOVE,
-            ENTITY_LOOK_AND_RELATIVE_MOVE,
+            ENTITY_RELATIVE_MOVE_AND_LOOK,
             ENTITY_LOOK,
             VEHICLE_MOVE,
             OPEN_BOOK,
