@@ -113,10 +113,9 @@ class EventManagerModern {
     public synchronized void unregisterListener(final PacketListenerAbstract listener) {
         byte priority = listener.getPriority().getId();
         HashSet<PacketListenerAbstract> listenerSet = listenersMap.get(priority);
-        if (listenerSet == null) {
-            return;
+        if (listenerSet != null) {
+            listenerSet.remove(listener);
         }
-        listenerSet.remove(listener);
     }
 
     /**
