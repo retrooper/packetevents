@@ -51,7 +51,6 @@ public class InternalPacketListener implements PacketListener {
         }
         else if (event.getPacketType() == PacketType.Play.Server.ENTITY_RELATIVE_MOVE_AND_LOOK) {
             WrapperPlayServerEntityRelativeMoveAndLook wrapper = new WrapperPlayServerEntityRelativeMoveAndLook(event);
-
         }
         /*
         else if (event.getPacketType() == PacketType.Play.Server.CHUNK_DATA) {

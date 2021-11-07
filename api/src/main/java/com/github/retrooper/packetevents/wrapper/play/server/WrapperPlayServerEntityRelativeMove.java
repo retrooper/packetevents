@@ -23,28 +23,24 @@ import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 
-public class WrapperPlayServerEntityRelativeMoveAndLook extends PacketWrapper<WrapperPlayServerEntityRelativeMoveAndLook> {
+public class WrapperPlayServerEntityRelativeMove extends PacketWrapper<WrapperPlayServerEntityRelativeMove> {
     private static double MODERN_DELTA_DIVISOR = 4096.0;
     private static double LEGACY_DELTA_DIVISOR = 32.0;
     private int entityID;
     private double deltaX;
     private double deltaY;
     private double deltaZ;
-    private byte yaw;
-    private byte pitch;
     private boolean onGround;
-    public WrapperPlayServerEntityRelativeMoveAndLook(PacketSendEvent event) {
+    public WrapperPlayServerEntityRelativeMove(PacketSendEvent event) {
         super(event);
     }
 
-    public WrapperPlayServerEntityRelativeMoveAndLook(int entityID, double deltaX, double deltaY, double deltaZ, byte yaw, byte pitch, boolean onGround) {
+    public WrapperPlayServerEntityRelativeMove(int entityID, double deltaX, double deltaY, double deltaZ, boolean onGround) {
         super(PacketType.Play.Server.ENTITY_RELATIVE_MOVE_AND_LOOK);
         this.entityID = entityID;
         this.deltaX = deltaX;
         this.deltaY = deltaY;
         this.deltaZ = deltaZ;
-        this.yaw = yaw;
-        this.pitch = pitch;
         this.onGround = onGround;
     }
 
@@ -61,19 +57,15 @@ public class WrapperPlayServerEntityRelativeMoveAndLook extends PacketWrapper<Wr
             deltaY = readByte() / LEGACY_DELTA_DIVISOR;
             deltaZ = readByte() / LEGACY_DELTA_DIVISOR;
         }
-        yaw = readByte();
-        pitch = readByte();
         onGround = readBoolean();
     }
 
     @Override
-    public void readData(WrapperPlayServerEntityRelativeMoveAndLook wrapper) {
+    public void readData(WrapperPlayServerEntityRelativeMove wrapper) {
         entityID = wrapper.entityID;
         deltaX = wrapper.deltaX;
         deltaY = wrapper.deltaY;
         deltaZ = wrapper.deltaZ;
-        yaw = wrapper.yaw;
-        pitch = wrapper.pitch;
         onGround = wrapper.onGround;
     }
 
@@ -90,8 +82,6 @@ public class WrapperPlayServerEntityRelativeMoveAndLook extends PacketWrapper<Wr
             writeByte((byte) (deltaY * LEGACY_DELTA_DIVISOR));
             writeByte((byte) (deltaZ * LEGACY_DELTA_DIVISOR));
         }
-        writeByte(yaw);
-        writeByte(pitch);
         writeBoolean(onGround);
     }
 
@@ -125,22 +115,6 @@ public class WrapperPlayServerEntityRelativeMoveAndLook extends PacketWrapper<Wr
 
     public void setDeltaZ(double deltaZ) {
         this.deltaZ = deltaZ;
-    }
-
-    public byte getYaw() {
-        return yaw;
-    }
-
-    public void setYaw(byte yaw) {
-        this.yaw = yaw;
-    }
-
-    public byte getPitch() {
-        return pitch;
-    }
-
-    public void setPitch(byte pitch) {
-        this.pitch = pitch;
     }
 
     public boolean isOnGround() {
