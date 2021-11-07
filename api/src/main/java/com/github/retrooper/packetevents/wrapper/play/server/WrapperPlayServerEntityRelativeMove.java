@@ -85,7 +85,7 @@ public class WrapperPlayServerEntityRelativeMove extends PacketWrapper<WrapperPl
         writeBoolean(onGround);
     }
 
-    public int getEntityID() {
+    public int getEntityId() {
         return entityID;
     }
 

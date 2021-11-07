@@ -108,7 +108,7 @@ public class Chunk_v1_15 implements BaseChunk {
 
     public int getInt(int x, int y, int z) {
         int id = this.storage.get(index(x, y, z));
-        return this.bitsPerEntry <= 8 ? (id >= 0 && id < this.states.size() ? this.states.get(id).getID() : AIR_ID) : id;
+        return this.bitsPerEntry <= 8 ? (id >= 0 && id < this.states.size() ? this.states.get(id).getId() : AIR_ID) : id;
     }
 
     public void set(int x, int y, int z, int state) {
@@ -116,7 +116,7 @@ public class Chunk_v1_15 implements BaseChunk {
     }
 
     public void set(int x, int y, int z, BlockState state) {
-        int id = this.bitsPerEntry <= 8 ? this.states.indexOf(state) : state.getID();
+        int id = this.bitsPerEntry <= 8 ? this.states.indexOf(state) : state.getId();
         if (id == -1) {
             this.states.add(state);
             if (this.states.size() > 1 << this.bitsPerEntry) {
@@ -132,18 +132,18 @@ public class Chunk_v1_15 implements BaseChunk {
                 LegacyFlexibleStorage oldStorage = this.storage;
                 this.storage = new LegacyFlexibleStorage(this.bitsPerEntry, this.storage.getSize());
                 for (int index = 0; index < this.storage.getSize(); index++) {
-                    this.storage.set(index, this.bitsPerEntry <= 8 ? oldStorage.get(index) : oldStates.get(oldStorage.get(index)).getID());
+                    this.storage.set(index, this.bitsPerEntry <= 8 ? oldStorage.get(index) : oldStates.get(oldStorage.get(index)).getId());
                 }
             }
 
-            id = this.bitsPerEntry <= 8 ? this.states.indexOf(state) : state.getID();
+            id = this.bitsPerEntry <= 8 ? this.states.indexOf(state) : state.getId();
         }
 
         int ind = index(x, y, z);
         int curr = this.storage.get(ind);
-        if (state.getID() != AIR.getID() && curr == AIR.getID()) {
+        if (state.getId() != AIR.getId() && curr == AIR.getId()) {
             this.blockCount++;
-        } else if (state.getID() == AIR.getID() && curr != AIR.getID()) {
+        } else if (state.getId() == AIR.getId() && curr != AIR.getId()) {
             this.blockCount--;
         }
 

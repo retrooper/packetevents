@@ -32,7 +32,7 @@ public class TabCompleteAttribute implements PlayerAttributeObject {
         this.input = input;
     }
 
-    public int getTransactionID() {
+    public int getTransactionId() {
         return transactionID;
     }
 

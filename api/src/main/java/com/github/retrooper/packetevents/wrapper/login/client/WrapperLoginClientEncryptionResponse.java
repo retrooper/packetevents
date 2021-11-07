@@ -32,7 +32,7 @@ public class WrapperLoginClientEncryptionResponse extends PacketWrapper<WrapperL
     }
 
     public WrapperLoginClientEncryptionResponse(ClientVersion clientVersion, byte[] sharedSecret, byte[] verifyToken) {
-        super(PacketType.Login.Client.ENCRYPTION_RESPONSE.getID(), clientVersion);
+        super(PacketType.Login.Client.ENCRYPTION_RESPONSE.getId(), clientVersion);
         this.sharedSecret = sharedSecret;
         this.verifyToken = verifyToken;
     }

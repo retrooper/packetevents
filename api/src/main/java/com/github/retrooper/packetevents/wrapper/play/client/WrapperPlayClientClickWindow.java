@@ -20,6 +20,7 @@ package com.github.retrooper.packetevents.wrapper.play.client;
 
 import com.github.retrooper.packetevents.event.impl.PacketReceiveEvent;
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
+import com.github.retrooper.packetevents.protocol.inventory.ItemStack;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 
@@ -36,15 +37,15 @@ public class WrapperPlayClientClickWindow extends PacketWrapper<WrapperPlayClien
     private int button;
     private Optional<Integer> actionNumber;
     private WindowClickType windowClickType;
-    private Optional<Map<Integer, Object>> slots;
-    private Object clickedItemStack;
+    private Optional<Map<Integer, ItemStack>> slots;
+    private ItemStack clickedItemStack;
 
     public WrapperPlayClientClickWindow(PacketReceiveEvent event) {
         super(event);
     }
 
     public WrapperPlayClientClickWindow(int windowID, Optional<Integer> stateID, int slot, int button, Optional<Integer> actionNumber, WindowClickType windowClickType,
-                                        Optional<Map<Integer, Object>> slots, Object clickedItemStack) {
+                                        Optional<Map<Integer, ItemStack>> slots, ItemStack clickedItemStack) {
         super(PacketType.Play.Client.CLICK_WINDOW);
         this.windowID = windowID;
         this.stateID = stateID;
@@ -76,7 +77,7 @@ public class WrapperPlayClientClickWindow extends PacketWrapper<WrapperPlayClien
         this.windowClickType = WindowClickType.VALUES[clickTypeIndex];
         if (v1_17) {
             Function<PacketWrapper<?>, Integer> slotReader = wrapper -> (int) wrapper.readShort();
-            Function<PacketWrapper<?>, Object> itemStackReader = PacketWrapper::readItemStack;
+            Function<PacketWrapper<?>, ItemStack> itemStackReader = PacketWrapper::readItemStack;
             this.slots = Optional.of(readMap(slotReader, itemStackReader));
         } else {
             this.slots = Optional.empty();
@@ -111,13 +112,13 @@ public class WrapperPlayClientClickWindow extends PacketWrapper<WrapperPlayClien
         writeVarInt(windowClickType.ordinal());
         if (v1_17) {
             BiConsumer<PacketWrapper<?>, Integer> keyConsumer = PacketWrapper::writeShort;
-            BiConsumer<PacketWrapper<?>, Object> valueConsumer = PacketWrapper::writeItemStack;
+            BiConsumer<PacketWrapper<?>, ItemStack> valueConsumer = PacketWrapper::writeItemStack;
             writeMap(slots.orElse(new HashMap<>()), keyConsumer, valueConsumer);
         }
         writeItemStack(clickedItemStack);
     }
 
-    public int getWindowID() {
+    public int getWindowId() {
         return windowID;
     }
 
@@ -125,7 +126,7 @@ public class WrapperPlayClientClickWindow extends PacketWrapper<WrapperPlayClien
         this.windowID = windowID;
     }
 
-    public Optional<Integer> getStateID() {
+    public Optional<Integer> getStateId() {
         return stateID;
     }
 
@@ -157,19 +158,19 @@ public class WrapperPlayClientClickWindow extends PacketWrapper<WrapperPlayClien
         this.windowClickType = windowClickType;
     }
 
-    public Optional<Map<Integer, Object>> getSlots() {
+    public Optional<Map<Integer, ItemStack>> getSlots() {
         return slots;
     }
 
-    public void setSlots(Optional<Map<Integer, Object>> slots) {
+    public void setSlots(Optional<Map<Integer, ItemStack>> slots) {
         this.slots = slots;
     }
 
-    public Object getClickedItemStack() {
+    public ItemStack getClickedItemStack() {
         return clickedItemStack;
     }
 
-    public void setClickedItemStack(Object clickedItemStack) {
+    public void setClickedItemStack(ItemStack clickedItemStack) {
         this.clickedItemStack = clickedItemStack;
     }
 

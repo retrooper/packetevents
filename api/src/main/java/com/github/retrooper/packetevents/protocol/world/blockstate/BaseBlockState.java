@@ -20,7 +20,7 @@ package com.github.retrooper.packetevents.protocol.world.blockstate;
 
 public interface BaseBlockState {
     //TODO Make some item type abstraction
-    int getID();
+    int getId();
 
-    int getCombinedID();
+    int getCombinedId();
 }

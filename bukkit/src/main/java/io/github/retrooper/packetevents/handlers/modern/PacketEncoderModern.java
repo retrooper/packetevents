@@ -55,7 +55,7 @@ public class PacketEncoderModern extends MessageToMessageEncoder<Object> {
             if (!packetSendEvent.isCancelled()) {
                 if (packetSendEvent.getLastUsedWrapper() != null) {
                     packetSendEvent.getByteBuf().clear();
-                    packetSendEvent.getLastUsedWrapper().writeVarInt(packetSendEvent.getPacketID());
+                    packetSendEvent.getLastUsedWrapper().writeVarInt(packetSendEvent.getPacketId());
                     packetSendEvent.getLastUsedWrapper().writeData();
                 }
                 transformedBuf.readerIndex(firstReaderIndex);

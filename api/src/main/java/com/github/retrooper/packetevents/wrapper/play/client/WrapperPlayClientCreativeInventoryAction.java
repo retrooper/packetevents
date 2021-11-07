@@ -19,18 +19,19 @@
 package com.github.retrooper.packetevents.wrapper.play.client;
 
 import com.github.retrooper.packetevents.event.impl.PacketReceiveEvent;
+import com.github.retrooper.packetevents.protocol.inventory.ItemStack;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 
 public class WrapperPlayClientCreativeInventoryAction extends PacketWrapper<WrapperPlayClientCreativeInventoryAction> {
     private int slot;
-    private Object itemStack;
+    private ItemStack itemStack;
 
     public WrapperPlayClientCreativeInventoryAction(PacketReceiveEvent event) {
         super(event);
     }
 
-    public WrapperPlayClientCreativeInventoryAction(int slot, Object itemStack) {
+    public WrapperPlayClientCreativeInventoryAction(int slot, ItemStack itemStack) {
         super(PacketType.Play.Client.CREATIVE_INVENTORY_ACTION);
         this.slot = slot;
         this.itemStack = itemStack;
@@ -62,11 +63,11 @@ public class WrapperPlayClientCreativeInventoryAction extends PacketWrapper<Wrap
         this.slot = slot;
     }
 
-    public Object getItemStack() {
+    public ItemStack getItemStack() {
         return itemStack;
     }
 
-    public void setItemStack(Object itemStack) {
+    public void setItemStack(ItemStack itemStack) {
         this.itemStack = itemStack;
     }
 }

@@ -33,12 +33,12 @@ public class MagicBlockState implements BaseBlockState {
     }
 
     @Override
-    public int getID() {
+    public int getId() {
         return id;
     }
 
     @Override
-    public int getCombinedID() {
+    public int getCombinedId() {
         return id + (data << 12);
     }
 
@@ -52,7 +52,7 @@ public class MagicBlockState implements BaseBlockState {
         if (!(o instanceof MagicBlockState)) return false;
 
         MagicBlockState that = (MagicBlockState) o;
-        return this.id == that.getID() &&
+        return this.id == that.getId() &&
                 this.data == that.getBlockData();
     }
 }

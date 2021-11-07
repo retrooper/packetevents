@@ -71,7 +71,7 @@ public class WrapperPlayClientAdvancementTab extends PacketWrapper<WrapperPlayCl
         this.action = action;
     }
 
-    public Optional<String> getTabID() {
+    public Optional<String> getTabId() {
         return tabID;
     }
 

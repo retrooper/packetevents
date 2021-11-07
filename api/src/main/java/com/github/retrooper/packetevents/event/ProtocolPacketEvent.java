@@ -176,7 +176,7 @@ public abstract class ProtocolPacketEvent<T> extends PacketEvent implements Play
     }
 
     @Deprecated
-    public int getPacketID() {
+    public int getPacketId() {
         return packetID;
     }
 

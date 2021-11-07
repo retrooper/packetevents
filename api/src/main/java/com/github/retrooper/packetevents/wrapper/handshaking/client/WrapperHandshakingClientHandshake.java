@@ -40,7 +40,7 @@ public class WrapperHandshakingClientHandshake extends PacketWrapper<WrapperHand
     }
 
     public WrapperHandshakingClientHandshake(int protocolVersion, String serverAddress, int serverPort, ConnectionState nextConnectionState) {
-        super(PacketType.Handshaking.Client.HANDSHAKE.getID(), ClientVersion.UNKNOWN);
+        super(PacketType.Handshaking.Client.HANDSHAKE.getId(), ClientVersion.UNKNOWN);
         this.protocolVersion = protocolVersion;
         this.clientVersion = ClientVersion.getClientVersionByProtocolVersion(protocolVersion);
         this.serverAddress = serverAddress;

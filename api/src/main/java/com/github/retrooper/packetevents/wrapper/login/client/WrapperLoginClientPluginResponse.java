@@ -33,7 +33,7 @@ public class WrapperLoginClientPluginResponse extends PacketWrapper<WrapperLogin
     }
 
     public WrapperLoginClientPluginResponse(ClientVersion clientVersion, int messageID, boolean successful, byte[] data) {
-        super(PacketType.Login.Client.LOGIN_PLUGIN_RESPONSE.getID(), clientVersion);
+        super(PacketType.Login.Client.LOGIN_PLUGIN_RESPONSE.getId(), clientVersion);
         this.messageID = messageID;
         this.successful = successful;
         this.data = data;
@@ -66,7 +66,7 @@ public class WrapperLoginClientPluginResponse extends PacketWrapper<WrapperLogin
         }
     }
 
-    public int getMessageID() {
+    public int getMessageId() {
         return this.messageID;
     }
 

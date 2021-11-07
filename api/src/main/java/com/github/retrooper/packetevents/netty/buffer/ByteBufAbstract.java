@@ -202,6 +202,8 @@ public interface ByteBufAbstract {
 
     ByteBufAbstract skipBytes(int length);
 
+    ByteBufAbstract readSlice(int length);
+
     //writeCharSequence is not available on legacy netty (on 1.7.10)
     //int writeCharSequence(CharSequence s, Charset charset);
 }

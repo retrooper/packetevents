@@ -66,7 +66,7 @@ public enum PacketListenerPriority {
         return values()[id];
     }
 
-    public byte getID() {
+    public byte getId() {
         return (byte) ordinal();
     }
 }

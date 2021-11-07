@@ -53,7 +53,7 @@ public class WrapperPlayServerEntityStatus extends PacketWrapper<WrapperPlayServ
         writeByte(status);
     }
 
-    public int getEntityID() {
+    public int getEntityId() {
         return entityID;
     }
 

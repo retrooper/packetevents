@@ -82,7 +82,7 @@ public class WrapperPlayClientUseItem extends PacketWrapper<WrapperPlayClientUse
     @Override
     public void writeData() {
         if (serverVersion.isNewerThanOrEquals(ServerVersion.v_1_14)) {
-            writeVarInt(hand.getLegacyID());
+            writeVarInt(hand.getLegacyId());
             writeBlockPosition(blockPosition);
             writeVarInt(face.getFaceValue());
             writeFloat(cursorPosition.x);
@@ -93,7 +93,7 @@ public class WrapperPlayClientUseItem extends PacketWrapper<WrapperPlayClientUse
         } else {
             writeBlockPosition(blockPosition);
             writeVarInt(face.getFaceValue());
-            writeVarInt(hand.getLegacyID());
+            writeVarInt(hand.getLegacyId());
             if (serverVersion.isNewerThanOrEquals(ServerVersion.v_1_11)) {
                 writeFloat(cursorPosition.x);
                 writeFloat(cursorPosition.y);

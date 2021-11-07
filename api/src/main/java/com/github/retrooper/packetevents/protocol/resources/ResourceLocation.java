@@ -34,4 +34,13 @@ public class ResourceLocation {
     public String getKey() {
         return key;
     }
+
+    @Override
+    public String toString() {
+        return namespace + ":" + key;
+    }
+
+    public static ResourceLocation minecraft(String key) {
+        return new ResourceLocation("minecraft", key);
+    }
 }

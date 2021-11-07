@@ -59,7 +59,7 @@ public class WrapperLoginServerPluginRequest extends PacketWrapper<WrapperLoginS
         writeByteArray(data);
     }
 
-    public int getMessageID() {
+    public int getMessageId() {
         return messageID;
     }
 

@@ -53,7 +53,7 @@ public class WrapperPlayClientQueryEntityNBT extends PacketWrapper<WrapperPlayCl
         writeVarInt(entityID);
     }
 
-    public int getTransactionID() {
+    public int getTransactionId() {
         return transactionID;
     }
 
@@ -61,7 +61,7 @@ public class WrapperPlayClientQueryEntityNBT extends PacketWrapper<WrapperPlayCl
         this.transactionID = transactionID;
     }
 
-    public int getEntityID() {
+    public int getEntityId() {
         return entityID;
     }
 

@@ -473,4 +473,9 @@ public class ByteBufLegacy implements ByteBufAbstract {
     public ByteBufAbstract skipBytes(int length) {
         return new ByteBufLegacy(byteBuf.skipBytes(length));
     }
+
+    @Override
+    public ByteBufAbstract readSlice(int length) {
+        return new ByteBufLegacy(byteBuf.readSlice(length));
+    }
 }

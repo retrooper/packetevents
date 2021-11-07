@@ -99,7 +99,7 @@ public class WrapperPlayServerEntityTeleport extends PacketWrapper<WrapperPlaySe
         }
     }
 
-    public int getEntityID() {
+    public int getEntityId() {
         return entityID;
     }
 

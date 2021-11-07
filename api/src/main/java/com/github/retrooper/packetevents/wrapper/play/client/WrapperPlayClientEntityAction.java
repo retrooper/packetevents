@@ -71,7 +71,7 @@ public class WrapperPlayClientEntityAction extends PacketWrapper<WrapperPlayClie
         writeVarInt(jumpBoost);
     }
 
-    public int getEntityID() {
+    public int getEntityId() {
         return entityID;
     }
 

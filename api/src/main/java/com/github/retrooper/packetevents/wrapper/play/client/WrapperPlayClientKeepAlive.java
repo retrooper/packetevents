@@ -72,7 +72,7 @@ public class WrapperPlayClientKeepAlive extends PacketWrapper<WrapperPlayClientK
      *
      * @return ID
      */
-    public long getID() {
+    public long getId() {
         return id;
     }
 

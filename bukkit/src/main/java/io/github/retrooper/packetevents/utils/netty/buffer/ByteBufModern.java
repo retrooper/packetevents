@@ -473,4 +473,9 @@ public class ByteBufModern implements ByteBufAbstract {
     public ByteBufAbstract skipBytes(int length) {
         return new ByteBufModern(byteBuf.skipBytes(length));
     }
+
+    @Override
+    public ByteBufAbstract readSlice(int length) {
+        return new ByteBufModern(byteBuf.readSlice(length));
+    }
 }

@@ -64,7 +64,7 @@ public class WrapperPlayServerEntityLook extends PacketWrapper<WrapperPlayServer
         writeBoolean(onGround);
     }
 
-    public int getEntityID() {
+    public int getEntityId() {
         return entityID;
     }
 

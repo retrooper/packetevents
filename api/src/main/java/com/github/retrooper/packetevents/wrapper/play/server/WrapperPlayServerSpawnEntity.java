@@ -163,7 +163,7 @@ public class WrapperPlayServerSpawnEntity extends PacketWrapper<WrapperPlayServe
         }
     }
 
-    public int getEntityID() {
+    public int getEntityId() {
         return entityID;
     }
 
@@ -180,7 +180,7 @@ public class WrapperPlayServerSpawnEntity extends PacketWrapper<WrapperPlayServe
     }
 
     //TODO Make EntityType enum
-    public int getEntityTypeID() {
+    public int getEntityTypeId() {
         return entityTypeID;
     }
 

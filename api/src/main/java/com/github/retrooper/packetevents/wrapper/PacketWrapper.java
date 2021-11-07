@@ -20,6 +20,10 @@ package com.github.retrooper.packetevents.wrapper;
 
 import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
+import com.github.retrooper.packetevents.protocol.inventory.ItemStack;
+import com.github.retrooper.packetevents.protocol.inventory.ItemType;
+import com.github.retrooper.packetevents.protocol.inventory.ItemTypes;
+import com.github.retrooper.packetevents.protocol.nbt.codec.NBTCodec;
 import com.github.retrooper.packetevents.protocol.packettype.PacketTypeCommon;
 import com.github.retrooper.packetevents.event.impl.PacketReceiveEvent;
 import com.github.retrooper.packetevents.event.impl.PacketSendEvent;
@@ -33,6 +37,8 @@ import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 import com.github.retrooper.packetevents.util.StringUtil;
 import com.github.retrooper.packetevents.util.Vector3i;
 
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
@@ -40,6 +46,8 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
+import java.util.zip.GZIPInputStream;
+import java.util.zip.GZIPOutputStream;
 
 
 public class PacketWrapper<T extends PacketWrapper> {
@@ -59,7 +67,7 @@ public class PacketWrapper<T extends PacketWrapper> {
         this.clientVersion = event.getClientVersion();
         this.serverVersion = event.getServerVersion();
         this.byteBuf = event.getByteBuf();
-        this.packetID = event.getPacketID();
+        this.packetID = event.getPacketId();
         if (event.getLastUsedWrapper() == null) {
             event.setLastUsedWrapper(this);
             readData();
@@ -72,7 +80,7 @@ public class PacketWrapper<T extends PacketWrapper> {
         this.clientVersion = event.getClientVersion();
         this.serverVersion = event.getServerVersion();
         this.byteBuf = event.getByteBuf();
-        this.packetID = event.getPacketID();
+        this.packetID = event.getPacketId();
         if (event.getLastUsedWrapper() == null) {
             event.setLastUsedWrapper(this);
             readData();
@@ -93,7 +101,7 @@ public class PacketWrapper<T extends PacketWrapper> {
     }
 
     public PacketWrapper(PacketTypeCommon packetType) {
-        this(packetType.getID());
+        this(packetType.getId());
     }
 
     public static PacketWrapper<?> createUniversalPacketWrapper(ByteBufAbstract byteBuf) {
@@ -129,7 +137,7 @@ public class PacketWrapper<T extends PacketWrapper> {
         return byteBuf;
     }
 
-    public int getPacketID() {
+    public int getPacketId() {
         return packetID;
     }
 
@@ -208,34 +216,31 @@ public class PacketWrapper<T extends PacketWrapper> {
         }
     }
 
-    public Object readItemStack() {
-        //TODO
-        return null;
+    public ItemStack readItemStack() {
+        //TODO Get cross-version compatibility
+        int typeID = readShort();
+        if (typeID < 0) {
+            return null;
+        }
+        ItemType type = ItemTypes.getById(typeID);
+        int amount = readByte();
+        NBTCompound nbt = readNBT();
+        return new ItemStack(type, amount, nbt);
     }
 
-    public void writeItemStack(Object itemStack) {
-        //TODO
+    public void writeItemStack(ItemStack itemStack) {
+        //TODO Get cross-version compatibility
+        writeShort(itemStack.getType().getId());
+        writeByte(itemStack.getAmount());
+        writeNBT(itemStack.getNBT());
     }
 
     public NBTCompound readNBT() {
-        try {
-            return (NBTCompound) DefaultNBTSerializer.INSTANCE.deserializeTag(new ByteBufAbstractInputStream(byteBuf));
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return null;
+        return NBTCodec.readNBT(byteBuf, serverVersion);
     }
 
-    public void writeNBT(NBTCompound tag) {
-        try (ByteBufAbstractOutputStream outputStream = new ByteBufAbstractOutputStream(byteBuf)) {
-            if (tag != null) {
-                DefaultNBTSerializer.INSTANCE.serializeTag(outputStream, tag);
-            } else {
-                DefaultNBTSerializer.INSTANCE.serializeTag(outputStream, NBTEnd.INSTANCE);
-            }
-        } catch (IOException e) {
-            throw new IllegalStateException(e);
-        }
+    public void writeNBT(NBTCompound nbt) {
+       NBTCodec.writeNBT(byteBuf, serverVersion, nbt);
     }
 
     public String readString() {

@@ -71,7 +71,7 @@ public class WrapperPlayServerEntityVelocity extends PacketWrapper<WrapperPlaySe
        writeShort((int) (velocity.z * 8000.0));
     }
 
-    public int getEntityID() {
+    public int getEntityId() {
         return entityID;
     }
 

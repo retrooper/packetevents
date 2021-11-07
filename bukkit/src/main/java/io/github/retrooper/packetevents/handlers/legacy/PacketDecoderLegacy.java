@@ -39,7 +39,7 @@ public class PacketDecoderLegacy extends ByteToMessageDecoder {
             if (!packetReceiveEvent.isCancelled()) {
                 if (packetReceiveEvent.getLastUsedWrapper() != null) {
                     packetReceiveEvent.getByteBuf().clear();
-                    packetReceiveEvent.getLastUsedWrapper().writeVarInt(packetReceiveEvent.getPacketID());
+                    packetReceiveEvent.getLastUsedWrapper().writeVarInt(packetReceiveEvent.getPacketId());
                     packetReceiveEvent.getLastUsedWrapper().writeData();
                 }
                 transformedBuf.readerIndex(firstReaderIndex);

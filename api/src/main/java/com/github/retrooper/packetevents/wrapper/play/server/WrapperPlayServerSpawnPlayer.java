@@ -108,7 +108,7 @@ public class WrapperPlayServerSpawnPlayer extends PacketWrapper<WrapperPlayServe
         }
     }
 
-    public int getEntityID() {
+    public int getEntityId() {
         return entityID;
     }
 

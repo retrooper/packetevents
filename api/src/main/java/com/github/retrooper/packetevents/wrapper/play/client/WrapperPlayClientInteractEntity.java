@@ -114,7 +114,7 @@ public class WrapperPlayClientInteractEntity extends PacketWrapper<WrapperPlayCl
             }
 
             if (serverVersion.isNewerThan(ServerVersion.v_1_8) && (type == Type.INTERACT || type == Type.INTERACT_AT)) {
-                writeVarInt(hand.getLegacyID());
+                writeVarInt(hand.getLegacyId());
             }
 
             if (serverVersion.isNewerThanOrEquals(ServerVersion.v_1_16)) {
@@ -123,7 +123,7 @@ public class WrapperPlayClientInteractEntity extends PacketWrapper<WrapperPlayCl
         }
     }
 
-    public int getEntityID() {
+    public int getEntityId() {
         return entityID;
     }
 

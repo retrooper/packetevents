@@ -55,7 +55,7 @@ public class WrapperPlayClientQueryBlockNBT extends PacketWrapper<WrapperPlayCli
         writeBlockPosition(blockPosition);
     }
 
-    public int getTransactionID() {
+    public int getTransactionId() {
         return transactionID;
     }
 

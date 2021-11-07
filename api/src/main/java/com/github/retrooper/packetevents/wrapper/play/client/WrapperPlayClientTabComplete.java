@@ -122,7 +122,7 @@ public class WrapperPlayClientTabComplete extends PacketWrapper<WrapperPlayClien
         this.text = text;
     }
 
-    public Optional<Integer> getTransactionID() {
+    public Optional<Integer> getTransactionId() {
         return transactionID;
     }
 

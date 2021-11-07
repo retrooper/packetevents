@@ -87,7 +87,7 @@ public class Chunk_v1_12 implements BaseChunk {
                         LegacyFlexibleStorage oldStorage = this.storage;
                         this.storage = new LegacyFlexibleStorage(this.bitsPerEntry, this.storage.getSize());
                         for (int index = 0; index < this.storage.getSize(); index++) {
-                            this.storage.set(index, this.bitsPerEntry <= 8 ? oldStorage.get(index) : oldStates.get(oldStorage.get(index)).getCombinedID());
+                            this.storage.set(index, this.bitsPerEntry <= 8 ? oldStorage.get(index) : oldStates.get(oldStorage.get(index)).getCombinedId());
                         }
                     }
 
@@ -122,7 +122,7 @@ public class Chunk_v1_12 implements BaseChunk {
     }
 
     public static void writeBlockState(NetStreamOutput out, MagicBlockState blockState) {
-        out.writeVarInt((blockState.getID() << 4) | (blockState.getBlockData() & 0xF));
+        out.writeVarInt((blockState.getId() << 4) | (blockState.getBlockData() & 0xF));
     }
 
     public MagicBlockState get(int x, int y, int z) {
@@ -142,7 +142,7 @@ public class Chunk_v1_12 implements BaseChunk {
     }
 
     public void set(int x, int y, int z, MagicBlockState state) {
-        int id = this.bitsPerEntry <= 8 ? this.states.indexOf(state) : state.getCombinedID();
+        int id = this.bitsPerEntry <= 8 ? this.states.indexOf(state) : state.getCombinedId();
         if (id == -1) {
             this.states.add(state);
             if (this.states.size() > 1 << this.bitsPerEntry) {
@@ -158,11 +158,11 @@ public class Chunk_v1_12 implements BaseChunk {
                 LegacyFlexibleStorage oldStorage = this.storage;
                 this.storage = new LegacyFlexibleStorage(this.bitsPerEntry, this.storage.getSize());
                 for (int index = 0; index < this.storage.getSize(); index++) {
-                    this.storage.set(index, this.bitsPerEntry <= 8 ? oldStorage.get(index) : oldStates.get(oldStorage.get(index)).getCombinedID());
+                    this.storage.set(index, this.bitsPerEntry <= 8 ? oldStorage.get(index) : oldStates.get(oldStorage.get(index)).getCombinedId());
                 }
             }
 
-            id = this.bitsPerEntry <= 8 ? this.states.indexOf(state) : state.getCombinedID();
+            id = this.bitsPerEntry <= 8 ? this.states.indexOf(state) : state.getCombinedId();
         }
 
         this.storage.set(index(x, y, z), id);

@@ -180,7 +180,7 @@ public class WrapperPlayServerRespawn extends PacketWrapper<WrapperPlayServerRes
             writeBoolean(keepingAllPlayerData);
         }
         else if (v1_15_0) {
-            writeInt(dimension.getType().getID());
+            writeInt(dimension.getType().getId());
             writeString(worldName.orElse(""));
             writeLong(hashedSeed);
             writeByte(gameMode.ordinal());
@@ -199,7 +199,7 @@ public class WrapperPlayServerRespawn extends PacketWrapper<WrapperPlayServerRes
 
         }
         else {
-            writeInt(dimension.getType().getID());
+            writeInt(dimension.getType().getId());
             if (!v1_14) {
                 //Handle 1.13.2 and below
                 if (difficulty == null) {

@@ -30,12 +30,12 @@ public class FlatBlockState implements BaseBlockState {
     }
 
     @Override
-    public int getID() {
+    public int getId() {
         return -1;
-        //TODO Implement return blockData.getMaterial() //.getID();
+        //TODO Implement return blockData.getMaterial() //.getId();
     }
 
-    public int getCombinedID() {
+    public int getCombinedId() {
         return globalID;
     }
     /*
@@ -52,6 +52,6 @@ public class FlatBlockState implements BaseBlockState {
         if (!(o instanceof FlatBlockState)) return false;
 
         FlatBlockState that = (FlatBlockState) o;
-        return getCombinedID() == that.getCombinedID();
+        return getCombinedId() == that.getCombinedId();
     }
 }

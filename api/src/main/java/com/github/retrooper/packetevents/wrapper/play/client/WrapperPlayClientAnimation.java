@@ -57,7 +57,7 @@ public class WrapperPlayClientAnimation extends PacketWrapper<WrapperPlayClientA
     @Override
     public void writeData() {
         if (serverVersion.isNewerThanOrEquals(ServerVersion.v_1_9)) {
-            writeVarInt(hand.getLegacyID());
+            writeVarInt(hand.getLegacyId());
         }
     }
 

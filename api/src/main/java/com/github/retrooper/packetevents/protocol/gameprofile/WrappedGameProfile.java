@@ -50,7 +50,7 @@ public class WrappedGameProfile {
         this.properties = properties.asMap();
     }
 
-    public UUID getID() {
+    public UUID getId() {
         return id;
     }
 

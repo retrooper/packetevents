@@ -31,7 +31,7 @@ public class WrapperStatusClientPing extends PacketWrapper<WrapperStatusClientPi
     }
 
     public WrapperStatusClientPing(long time) {
-        super(PacketType.Status.Client.PING.getID(), ClientVersion.UNKNOWN);
+        super(PacketType.Status.Client.PING.getId(), ClientVersion.UNKNOWN);
         this.time = time;
     }
 

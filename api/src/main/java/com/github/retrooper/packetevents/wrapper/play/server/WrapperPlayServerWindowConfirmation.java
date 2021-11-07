@@ -77,12 +77,12 @@ public class WrapperPlayServerWindowConfirmation extends PacketWrapper<WrapperPl
 
     @Override
     public void readData(WrapperPlayServerWindowConfirmation wrapper) {
-        this.windowID = wrapper.getWindowID();
-        this.actionID = wrapper.getActionID();
+        this.windowID = wrapper.getWindowId();
+        this.actionID = wrapper.getActionId();
         this.accepted = wrapper.isAccepted();
     }
 
-    public byte getWindowID() {
+    public byte getWindowId() {
         return windowID;
     }
 
@@ -90,7 +90,7 @@ public class WrapperPlayServerWindowConfirmation extends PacketWrapper<WrapperPl
         this.windowID = windowID;
     }
 
-    public short getActionID() {
+    public short getActionId() {
         return actionID;
     }
 

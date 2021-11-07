@@ -388,7 +388,7 @@ public final class MinecraftReflectionUtil {
         return "{\"text\": \"" + message + "\"}";
     }
 
-    public static int generateEntityID() {
+    public static int generateEntityId() {
         Field field = Reflection.getField(NMS_ENTITY_CLASS, "entityCount");
         if (field == null) {
             field = Reflection.getField(NMS_ENTITY_CLASS, AtomicInteger.class, 0);

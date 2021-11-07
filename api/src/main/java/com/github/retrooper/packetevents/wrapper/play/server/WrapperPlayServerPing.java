@@ -57,7 +57,7 @@ public class WrapperPlayServerPing extends PacketWrapper<WrapperPlayServerPing> 
         writeInt(id);
     }
 
-    public int getID() {
+    public int getId() {
         return id;
     }
 

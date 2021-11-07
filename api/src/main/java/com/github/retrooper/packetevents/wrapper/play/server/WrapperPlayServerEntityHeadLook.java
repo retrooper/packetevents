@@ -54,7 +54,7 @@ public class WrapperPlayServerEntityHeadLook extends PacketWrapper<WrapperPlaySe
         writeByte(headYaw);
     }
 
-    public int getEntityID() {
+    public int getEntityId() {
         return entityID;
     }
 

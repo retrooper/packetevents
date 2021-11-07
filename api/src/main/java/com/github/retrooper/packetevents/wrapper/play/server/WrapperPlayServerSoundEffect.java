@@ -73,7 +73,7 @@ public class WrapperPlayServerSoundEffect extends PacketWrapper<WrapperPlayServe
         writeFloat(pitch);
     }
 
-    public int getSoundID() {
+    public int getSoundId() {
         return soundID;
     }
 

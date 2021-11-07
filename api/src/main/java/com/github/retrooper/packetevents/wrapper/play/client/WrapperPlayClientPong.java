@@ -62,7 +62,7 @@ public class WrapperPlayClientPong extends PacketWrapper<WrapperPlayClientPong> 
      *
      * @return ID
      */
-    public int getID() {
+    public int getId() {
         return id;
     }
 

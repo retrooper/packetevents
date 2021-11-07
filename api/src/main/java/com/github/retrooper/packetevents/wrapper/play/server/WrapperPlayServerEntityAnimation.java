@@ -64,7 +64,7 @@ public class WrapperPlayServerEntityAnimation extends PacketWrapper<WrapperPlayS
         writeByte(type.ordinal());
     }
 
-    public int getEntityID() {
+    public int getEntityId() {
         return entityID;
     }
 

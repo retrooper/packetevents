@@ -76,7 +76,7 @@ public class WrapperPlayServerBlockBreakAnimation extends PacketWrapper<WrapperP
         writeByte(destroyStage);
     }
 
-    public int getEntityID() {
+    public int getEntityId() {
         return entityID;
     }
 

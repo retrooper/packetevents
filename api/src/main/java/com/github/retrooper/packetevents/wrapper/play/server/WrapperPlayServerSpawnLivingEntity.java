@@ -122,7 +122,7 @@ public class WrapperPlayServerSpawnLivingEntity extends PacketWrapper<WrapperPla
         writeShort((int) (velocity.z * VELOCITY_FACTOR));
     }
 
-    public int getEntityID() {
+    public int getEntityId() {
         return entityID;
     }
 
@@ -138,7 +138,7 @@ public class WrapperPlayServerSpawnLivingEntity extends PacketWrapper<WrapperPla
         this.entityUUID = entityUUID;
     }
 
-    public int getEntityTypeID() {
+    public int getEntityTypeId() {
         return entityTypeID;
     }
 

@@ -95,7 +95,7 @@ public final class PacketType {
                 }
             }
 
-            public int getID() {
+            public int getId() {
                 return id;
             }
         }
@@ -123,7 +123,7 @@ public final class PacketType {
                 }
             }
 
-            public int getID() {
+            public int getId() {
                 return id;
             }
         }
@@ -149,7 +149,7 @@ public final class PacketType {
                 }
             }
 
-            public int getID() {
+            public int getId() {
                 return id;
             }
         }
@@ -181,7 +181,7 @@ public final class PacketType {
                 }
             }
 
-            public int getID() {
+            public int getId() {
                 return id;
             }
         }
@@ -219,7 +219,7 @@ public final class PacketType {
                 }
             }
 
-            public int getID() {
+            public int getId() {
                 return id;
             }
         }
@@ -337,7 +337,7 @@ public final class PacketType {
                 loadPacketIDs(ClientVersion.v_1_17_1, ServerboundPacketType_1_17.values());
             }
 
-            public int getID() {
+            public int getId() {
                 return id;
             }
 
@@ -540,7 +540,7 @@ public final class PacketType {
                 }
             }
 
-            public int getID() {
+            public int getId() {
                 return id;
             }
         }

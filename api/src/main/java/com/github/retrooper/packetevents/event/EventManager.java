@@ -35,7 +35,7 @@ public class EventManager {
      * @param event {@link PacketEvent}
      */
     public void callEvent(final PacketEvent event) {
-        for (byte priority = PacketListenerPriority.LOWEST.getID(); priority <= PacketListenerPriority.MONITOR.getID(); priority++) {
+        for (byte priority = PacketListenerPriority.LOWEST.getId(); priority <= PacketListenerPriority.MONITOR.getId(); priority++) {
             HashSet<PacketListenerAbstract> listeners = listenersMap.get(priority);
             if (listeners != null) {
                 for (PacketListenerAbstract listener : listeners) {
@@ -46,7 +46,7 @@ public class EventManager {
     }
 
     public void callEvent(PacketEvent event, Runnable postCallListenerAction) {
-        for (byte priority = PacketListenerPriority.LOWEST.getID(); priority <= PacketListenerPriority.MONITOR.getID(); priority++) {
+        for (byte priority = PacketListenerPriority.LOWEST.getId(); priority <= PacketListenerPriority.MONITOR.getId(); priority++) {
             HashSet<PacketListenerAbstract> listeners = listenersMap.get(priority);
             if (listeners != null) {
                 for (PacketListenerAbstract listener : listeners) {
@@ -73,7 +73,7 @@ public class EventManager {
      * @param listener {@link PacketListenerAbstract}
      */
     public void registerListener(PacketListenerAbstract listener) {
-        byte priority = listener.getPriority().getID();
+        byte priority = listener.getPriority().getId();
         HashSet<PacketListenerAbstract> listenerSet = listenersMap.get(priority);
         if (listenerSet == null) {
             listenerSet = new HashSet<>();

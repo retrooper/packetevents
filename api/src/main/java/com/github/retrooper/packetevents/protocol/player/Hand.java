@@ -30,7 +30,7 @@ public enum Hand {
 
     RIGHT;
 
-    public int getLegacyID() {
+    public int getLegacyId() {
         return this == RIGHT ? 0 : 1;
     }
 

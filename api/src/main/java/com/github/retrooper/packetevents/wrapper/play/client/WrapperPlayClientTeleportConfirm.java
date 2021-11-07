@@ -49,7 +49,7 @@ public class WrapperPlayClientTeleportConfirm extends PacketWrapper<WrapperPlayC
         writeVarInt(teleportID);
     }
 
-    public int getTeleportID() {
+    public int getTeleportId() {
         return teleportID;
     }
 

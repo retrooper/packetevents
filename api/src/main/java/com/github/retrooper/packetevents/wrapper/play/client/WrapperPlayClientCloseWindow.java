@@ -49,7 +49,7 @@ public class WrapperPlayClientCloseWindow extends PacketWrapper<WrapperPlayClien
         writeByte(this.windowID);
     }
 
-    public int getWindowID() {
+    public int getWindowId() {
         return windowID;
     }
 

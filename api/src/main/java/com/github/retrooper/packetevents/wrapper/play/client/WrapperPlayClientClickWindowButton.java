@@ -62,7 +62,7 @@ public class WrapperPlayClientClickWindowButton extends PacketWrapper<WrapperPla
      *
      * @return Window ID
      */
-    public int getWindowID() {
+    public int getWindowId() {
         return windowID;
     }
 
@@ -81,7 +81,7 @@ public class WrapperPlayClientClickWindowButton extends PacketWrapper<WrapperPla
      *
      * @return Button ID
      */
-    public int getButtonID() {
+    public int getButtonId() {
         return buttonID;
     }
 

@@ -16,27 +16,14 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.github.retrooper.packetevents.protocol.world.chunk.impl.v1_15;
+package com.github.retrooper.packetevents.protocol.inventory;
 
-import com.github.retrooper.packetevents.protocol.stream.NetStreamInput;
-import com.github.retrooper.packetevents.protocol.stream.NetStreamOutput;
+import com.github.retrooper.packetevents.protocol.resources.ResourceLocation;
 
-public class BlockState {
-    private final int id;
+public interface ItemType {
+    int getMaxAmount();
 
-    public BlockState(int id) {
-        this.id = id;
-    }
+    ResourceLocation getIdentifier();
 
-    public static BlockState read(NetStreamInput in) {
-        return new BlockState(in.readVarInt());
-    }
-
-    public static void write(NetStreamOutput out, BlockState blockState) {
-        out.writeVarInt(blockState.getId());
-    }
-
-    public int getId() {
-        return id;
-    }
+    int getId();
 }

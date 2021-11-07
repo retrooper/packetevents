@@ -74,7 +74,7 @@ public class WrapperPlayClientWindowConfirmation extends PacketWrapper<WrapperPl
         writeBoolean(accepted);
     }
 
-    public int getWindowID() {
+    public int getWindowId() {
         return windowID;
     }
 

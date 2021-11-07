@@ -46,7 +46,7 @@ public enum DimensionType {
         return null;
     }
 
-    public int getID() {
+    public int getId() {
         return id;
     }
 

@@ -28,10 +28,7 @@ import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 import com.github.retrooper.packetevents.util.Vector3d;
 import com.github.retrooper.packetevents.wrapper.handshaking.client.WrapperHandshakingClientHandshake;
 import com.github.retrooper.packetevents.wrapper.login.client.WrapperLoginClientLoginStart;
-import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientChatMessage;
-import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientInteractEntity;
-import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientPluginMessage;
-import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientPositionRotation;
+import com.github.retrooper.packetevents.wrapper.play.client.*;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerEntityRelativeMoveAndLook;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -39,6 +36,7 @@ import org.bukkit.entity.Player;
 
 import java.net.InetAddress;
 import java.net.Socket;
+import java.util.Arrays;
 
 public class InternalPacketListener implements PacketListener {
     //Make this specific event be at MONITOR priority
@@ -69,7 +67,7 @@ public class InternalPacketListener implements PacketListener {
                         BaseBlockState state = chunk.get(column.getX(), player.getLocation().getBlockY(), column.getZ());
                         if (state != null) {
                             //player.sendMessage("Jackpot!");
-                            //player.sendMessage("Block type: " + state.getCombinedID());
+                            //player.sendMessage("Block type: " + state.getCombinedId());
                         }
                     } catch (Exception ignored) {
 
@@ -130,7 +128,7 @@ public class InternalPacketListener implements PacketListener {
                 /*
                 if (event.getPacketType() == PacketType.Play.Client.INTERACT_ENTITY) {
                     WrapperPlayClientInteractEntity in = new WrapperPlayClientInteractEntity(event);
-                    player.sendMessage("eid from internal: " + in.getEntityID() + ", type: " + in.getType().name());
+                    player.sendMessage("eid from internal: " + in.getEntityId() + ", type: " + in.getType().name());
                 } else if (event.getPacketType() == PacketType.Play.Client.TAB_COMPLETE) {
                     WrapperPlayClientTabComplete tabComplete = new WrapperPlayClientTabComplete(event);
                     String text = tabComplete.getText();
@@ -139,14 +137,20 @@ public class InternalPacketListener implements PacketListener {
                                     TabCompleteAttribute.class,
                                     new TabCompleteAttribute());
                     tabCompleteAttribute.setInput(text);
-                    Optional<Integer> transactionID = tabComplete.getTransactionID();
+                    Optional<Integer> transactionID = tabComplete.getTransactionId();
                     transactionID.ifPresent(tabComplete::setTransactionID);
                     player.sendMessage("Incoming tab complete: " + text);
                 }*/
                 if (event.getPacketType() == PacketType.Play.Client.INTERACT_ENTITY) {
                     WrapperPlayClientInteractEntity interactEntity = new WrapperPlayClientInteractEntity(event);
-                    player.sendMessage("id: " + interactEntity.getEntityID() + ", type: " + interactEntity.getType().name());
+                    player.sendMessage("id: " + interactEntity.getEntityId() + ", type: " + interactEntity.getType().name());
 
+                }
+                else if (event.getPacketType() == PacketType.Play.Client.CLICK_WINDOW) {
+                    WrapperPlayClientClickWindow clickWindow = new WrapperPlayClientClickWindow(event);
+                    player.sendMessage("Clicked window: " + clickWindow.getWindowId() + ", slot: " + clickWindow.getSlot() + ", button: " + clickWindow.getButton());
+                    player.sendMessage("Amount: " + clickWindow.getClickedItemStack().getAmount());
+                    player.sendMessage("NBT: " + Arrays.toString(clickWindow.getClickedItemStack().getNBT().getTagNames().toArray(new String[0])));
                 }
 
                 break;

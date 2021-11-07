@@ -31,7 +31,7 @@ public class WrapperLoginClientLoginStart extends PacketWrapper<WrapperLoginClie
     }
 
     public WrapperLoginClientLoginStart(ClientVersion clientVersion, String username) {
-        super(PacketType.Login.Client.LOGIN_START.getID(), clientVersion);
+        super(PacketType.Login.Client.LOGIN_START.getId(), clientVersion);
         this.username = username;
     }
 

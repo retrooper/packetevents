@@ -90,7 +90,7 @@ public class WrapperLoginServerEncryptionRequest extends PacketWrapper<WrapperLo
      *
      * @return Server ID
      */
-    public String getServerID() {
+    public String getServerId() {
         return serverID;
     }
 
