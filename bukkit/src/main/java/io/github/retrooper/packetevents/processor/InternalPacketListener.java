@@ -22,26 +22,22 @@ import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.event.PacketListener;
 import com.github.retrooper.packetevents.event.impl.PacketReceiveEvent;
 import com.github.retrooper.packetevents.event.impl.PacketSendEvent;
-import com.github.retrooper.packetevents.manager.player.attributes.TabCompleteAttribute;
 import com.github.retrooper.packetevents.protocol.ConnectionState;
-import com.github.retrooper.packetevents.protocol.chat.component.TextComponent;
-import com.github.retrooper.packetevents.protocol.nbt.NBTCompound;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.protocol.player.ClientVersion;
-import com.github.retrooper.packetevents.protocol.world.blockstate.BaseBlockState;
-import com.github.retrooper.packetevents.protocol.world.chunk.BaseChunk;
-import com.github.retrooper.packetevents.protocol.world.chunk.Column;
+import com.github.retrooper.packetevents.util.Vector3d;
 import com.github.retrooper.packetevents.wrapper.handshaking.client.WrapperHandshakingClientHandshake;
 import com.github.retrooper.packetevents.wrapper.login.client.WrapperLoginClientLoginStart;
+import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientChatMessage;
 import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientInteractEntity;
-import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientTabComplete;
-import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerChatMessage;
-import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerChunkData;
-import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerRespawn;
-import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerTabComplete;
+import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientPluginMessage;
+import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientPositionRotation;
+import org.bukkit.Bukkit;
+import org.bukkit.Material;
 import org.bukkit.entity.Player;
 
-import java.util.Optional;
+import java.net.InetAddress;
+import java.net.Socket;
 
 public class InternalPacketListener implements PacketListener {
     //Make this specific event be at MONITOR priority
@@ -116,6 +112,7 @@ public class InternalPacketListener implements PacketListener {
 
                     //Transition into the LOGIN OR STATUS connection state
                     PacketEvents.getAPI().getPlayerManager().changeConnectionState(event.getChannel(), handshake.getNextConnectionState());
+
                 }
                 break;
             case LOGIN:
@@ -142,6 +139,12 @@ public class InternalPacketListener implements PacketListener {
                     transactionID.ifPresent(tabComplete::setTransactionID);
                     player.sendMessage("Incoming tab complete: " + text);
                 }*/
+                if (event.getPacketType() == PacketType.Play.Client.INTERACT_ENTITY) {
+                    WrapperPlayClientInteractEntity interactEntity = new WrapperPlayClientInteractEntity(event);
+                    player.sendMessage("id: " + interactEntity.getEntityID() + ", type: " + interactEntity.getType().name());
+
+                }
+
                 break;
         }
     }

@@ -158,7 +158,8 @@ public class WrapperPlayServerRespawn extends PacketWrapper<WrapperPlayServerRes
         if (v1_16_2) {
             NBT tag = new NBTString(dimension.getType().getName());
             //TODO Fix orElse to generate a new nbt compound
-            dimension.getAttributes().orElse(null).setTag("effects", tag);
+            dimension.getAttributes().orElse(new NBTCompound()).setTag("effects", tag);
+            //TODO Fix no value when get()
             writeNBT(dimension.getAttributes().get());
             writeString(worldName.orElse(""));
             writeLong(hashedSeed);
