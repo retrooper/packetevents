@@ -23,20 +23,17 @@ import com.github.retrooper.packetevents.event.PacketListener;
 import com.github.retrooper.packetevents.event.impl.PacketReceiveEvent;
 import com.github.retrooper.packetevents.event.impl.PacketSendEvent;
 import com.github.retrooper.packetevents.protocol.ConnectionState;
+import com.github.retrooper.packetevents.protocol.chat.component.TextComponent;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.protocol.player.ClientVersion;
-import com.github.retrooper.packetevents.util.Vector3d;
 import com.github.retrooper.packetevents.wrapper.handshaking.client.WrapperHandshakingClientHandshake;
 import com.github.retrooper.packetevents.wrapper.login.client.WrapperLoginClientLoginStart;
-import com.github.retrooper.packetevents.wrapper.play.client.*;
+import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientInteractEntity;
+import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerChatMessage;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerEntityRelativeMoveAndLook;
-import org.bukkit.Bukkit;
-import org.bukkit.Material;
 import org.bukkit.entity.Player;
 
-import java.net.InetAddress;
-import java.net.Socket;
-import java.util.Arrays;
+import java.util.List;
 
 public class InternalPacketListener implements PacketListener {
     //Make this specific event be at MONITOR priority
@@ -47,8 +44,12 @@ public class InternalPacketListener implements PacketListener {
             //Transition into the PLAY connection state
             PacketEvents.getAPI().getPlayerManager().changeConnectionState(event.getChannel(), ConnectionState.PLAY);
         }
-        else if (event.getPacketType() == PacketType.Play.Server.ENTITY_RELATIVE_MOVE_AND_LOOK) {
-            WrapperPlayServerEntityRelativeMoveAndLook wrapper = new WrapperPlayServerEntityRelativeMoveAndLook(event);
+        else if (event.getPacketType() == PacketType.Play.Server.CHAT_MESSAGE) {
+            WrapperPlayServerChatMessage chatMessage = new WrapperPlayServerChatMessage(event);
+            List<TextComponent> components = chatMessage.getMessageComponents();
+            for (TextComponent component : components) {
+                System.out.println("Component part: " + component.getText());
+            }
         }
         /*
         else if (event.getPacketType() == PacketType.Play.Server.CHUNK_DATA) {
@@ -144,10 +145,8 @@ public class InternalPacketListener implements PacketListener {
                 if (event.getPacketType() == PacketType.Play.Client.INTERACT_ENTITY) {
                     WrapperPlayClientInteractEntity interactEntity = new WrapperPlayClientInteractEntity(event);
                     player.sendMessage("id: " + interactEntity.getEntityId() + ", type: " + interactEntity.getType().name());
-
                 }
                 //TODO Test update checker
-
                 break;
         }
     }

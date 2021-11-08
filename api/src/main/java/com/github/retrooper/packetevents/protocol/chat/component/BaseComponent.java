@@ -22,7 +22,7 @@ package com.github.retrooper.packetevents.protocol.chat.component;
 import com.github.retrooper.packetevents.protocol.chat.ClickEvent;
 import com.github.retrooper.packetevents.protocol.chat.ClickEvent.ClickType;
 import com.github.retrooper.packetevents.protocol.chat.Color;
-import org.json.simple.JSONObject;
+import com.github.retrooper.packetevents.util.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -154,24 +154,24 @@ public class BaseComponent {
     }
 
     public void parseJSON(JSONObject jsonObject) {
-        String colorStr = (String) jsonObject.getOrDefault("color", "");
+        String colorStr = jsonObject.getString("color");
         this.color = Color.getByName(colorStr);
-        this.insertion = (String) jsonObject.getOrDefault("insertion", "");
-        this.bold = (boolean) jsonObject.getOrDefault("bold", false);
-        this.italic = (boolean) jsonObject.getOrDefault("italic", false);
-        this.underlined = (boolean) jsonObject.getOrDefault("underlined", false);
-        this.strikeThrough = (boolean) jsonObject.getOrDefault("strikethrough", false);
-        this.obfuscated = (boolean) jsonObject.getOrDefault("obfuscated", false);
+        this.insertion = jsonObject.getString("insertion");
+        this.bold = jsonObject.getBoolean("bold");
+        this.italic = jsonObject.getBoolean("italic");
+        this.underlined = jsonObject.getBoolean("underlined");
+        this.strikeThrough = jsonObject.getBoolean("strikethrough");
+        this.obfuscated = jsonObject.getBoolean("obfuscated");
 
         //Read click events if it has been specified
-        JSONObject clickEvents = (JSONObject) jsonObject.get("clickEvent");
+        JSONObject clickEvents = jsonObject.getJSONObject("clickEvent");
         if (clickEvents != null) {
-            String openURLValue = (String) clickEvents.getOrDefault(ClickEvent.ClickType.OPEN_URL.getName(), "");
-            String openFileValue = (String) clickEvents.getOrDefault(ClickEvent.ClickType.OPEN_FILE.getName(), "");
-            String runCommandValue = (String) clickEvents.getOrDefault(ClickEvent.ClickType.RUN_COMMAND.getName(), "");
-            String suggestCommandValue = (String) clickEvents.getOrDefault(ClickEvent.ClickType.SUGGEST_COMMAND.getName(), "");
-            String changePageValue = (String) clickEvents.getOrDefault(ClickEvent.ClickType.CHANGE_PAGE.getName(), "");
-            String copyToClipboardValue = (String) clickEvents.getOrDefault(ClickEvent.ClickType.COPY_TO_CLIPBOARD.getName(), "");
+            String openURLValue = clickEvents.getString(ClickEvent.ClickType.OPEN_URL.getName());
+            String openFileValue = clickEvents.getString(ClickEvent.ClickType.OPEN_FILE.getName());
+            String runCommandValue = clickEvents.getString(ClickEvent.ClickType.RUN_COMMAND.getName());
+            String suggestCommandValue = clickEvents.getString(ClickEvent.ClickType.SUGGEST_COMMAND.getName());
+            String changePageValue = clickEvents.getString(ClickEvent.ClickType.CHANGE_PAGE.getName());
+            String copyToClipboardValue = clickEvents.getString(ClickEvent.ClickType.COPY_TO_CLIPBOARD.getName());
 
             this.openURLClickEvent = new ClickEvent(ClickType.OPEN_URL, openURLValue);
             this.openFileClickEvent = new ClickEvent(ClickType.OPEN_FILE, openFileValue);
@@ -185,25 +185,25 @@ public class BaseComponent {
     public JSONObject buildJSON() {
         JSONObject jsonObject = new JSONObject();
         if (color != Color.WHITE && color != null) {
-            jsonObject.put("color", color.getName());
+            jsonObject.setString("color", color.getName());
         }
         if (insertion != null && !insertion.isEmpty()) {
-            jsonObject.put("insertion", insertion);
+            jsonObject.setString("insertion", insertion);
         }
         if (bold) {
-            jsonObject.put("bold", true);
+            jsonObject.setBoolean("bold", true);
         }
         if (italic) {
-            jsonObject.put("italic", true);
+            jsonObject.setBoolean("italic", true);
         }
         if (underlined) {
-            jsonObject.put("underlined", true);
+            jsonObject.setBoolean("underlined", true);
         }
         if (strikeThrough) {
-            jsonObject.put("strikethrough", true);
+            jsonObject.setBoolean("strikethrough", true);
         }
         if (obfuscated) {
-            jsonObject.put("obfuscated", true);
+            jsonObject.setBoolean("obfuscated", true);
         }
 
         List<ClickEvent> clickEvents = new ArrayList<>();
@@ -217,12 +217,12 @@ public class BaseComponent {
         JSONObject jsonClickEvents = new JSONObject();
         for (ClickEvent clickEvent : clickEvents) {
             if (!clickEvent.getValue().isEmpty()) {
-                jsonClickEvents.put(clickEvent.getType().getName(), clickEvent.getValue());
+                jsonClickEvents.setString(clickEvent.getType().getName(), clickEvent.getValue());
                 allClickEventsEmpty = false;
             }
         }
         if (!allClickEventsEmpty) {
-            jsonObject.put("clickEvent", jsonClickEvents);
+            jsonObject.setJSONObject("clickEvent", jsonClickEvents);
         }
         return jsonObject;
     }

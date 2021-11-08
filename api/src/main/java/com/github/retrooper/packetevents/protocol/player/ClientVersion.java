@@ -207,10 +207,10 @@ public enum ClientVersion {
 
 
     /**
-     * Is this client version a pre release?
-     * This method checks if this version is a pre release.
+     * Is this client version a pre-release?
+     * This method checks if this version is a pre-release.
      *
-     * @return Is pre release
+     * @return Is pre-release
      */
     public boolean isPreRelease() {
         if (protocolVersion > LOWEST_SUPPORTED_PROTOCOL_VERSION && protocolVersion < HIGHEST_SUPPORTED_PROTOCOL_VERSION) {

@@ -20,7 +20,7 @@ package com.github.retrooper.packetevents.protocol.chat.component;
 
 import com.github.retrooper.packetevents.protocol.chat.ClickEvent;
 import com.github.retrooper.packetevents.protocol.chat.Color;
-import org.json.simple.JSONObject;
+import com.github.retrooper.packetevents.util.json.JSONObject;
 
 public class TextComponent extends BaseComponent {
     private String text;
@@ -39,14 +39,14 @@ public class TextComponent extends BaseComponent {
 
     @Override
     public void parseJSON(JSONObject jsonObject) {
-        this.text = (String) jsonObject.getOrDefault("text", "");
+        this.text = jsonObject.getString("text");
         super.parseJSON(jsonObject);
     }
 
     @Override
     public JSONObject buildJSON() {
         JSONObject jsonObject = super.buildJSON();
-        jsonObject.put("text", text);
+        jsonObject.setString("text", text);
         return jsonObject;
     }
 
@@ -62,66 +62,79 @@ public class TextComponent extends BaseComponent {
             return this;
         }
 
+        @Override
         public Builder color(Color color) {
             this.component.setColor(color);
             return this;
         }
 
+        @Override
         public Builder bold(boolean bold) {
             this.component.setBold(bold);
             return this;
         }
 
+        @Override
         public Builder italic(boolean italic) {
             this.component.setItalic(italic);
             return this;
         }
 
+        @Override
         public Builder underlined(boolean underlined) {
             this.component.setUnderlined(underlined);
             return this;
         }
 
+        @Override
         public Builder strikeThrough(boolean strikeThrough) {
             this.component.setStrikeThrough(strikeThrough);
             return this;
         }
 
+        @Override
         public Builder obfuscated(boolean obfuscated) {
             this.component.setObfuscated(obfuscated);
             return this;
         }
 
+        @Override
         public Builder insertion(String insertion) {
             this.component.setInsertion(insertion);
             return this;
         }
 
+        @Override
         public Builder openURLClickEvent(String value) {
             this.component.setOpenURLClickEvent(new ClickEvent(ClickEvent.ClickType.OPEN_URL, value));
             return this;
         }
 
+        @Override
         public Builder openFileClickEvent(String value) {
             this.component.setOpenFileClickEvent(new ClickEvent(ClickEvent.ClickType.OPEN_FILE, value));
             return this;
         }
 
+        @Override
         public Builder runCommandClickEvent(String value) {
             this.component.setRunCommandClickEvent(new ClickEvent(ClickEvent.ClickType.RUN_COMMAND, value));
             return this;
         }
 
+        @Override
         public Builder suggestCommandClickEvent(String value) {
             this.component.setSuggestCommandClickEvent(new ClickEvent(ClickEvent.ClickType.SUGGEST_COMMAND, value));
             return this;
         }
 
+        @Override
         public Builder changePageClickEvent(String value) {
             this.component.setChangePageClickEvent(new ClickEvent(ClickEvent.ClickType.CHANGE_PAGE, value));
             return this;
         }
 
+        @Override
         public Builder copyToClipboardClickEvent(String value) {
             this.component.setCopyToClipboardClickEvent(new ClickEvent(ClickEvent.ClickType.COPY_TO_CLIPBOARD, value));
             return this;

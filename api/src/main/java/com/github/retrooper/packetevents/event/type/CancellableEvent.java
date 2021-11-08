@@ -18,17 +18,19 @@
 
 package com.github.retrooper.packetevents.event.type;
 
+import com.github.retrooper.packetevents.event.impl.PacketReceiveEvent;
+
 /**
  * Every event that supports cancellation should implement this interface.
  * PacketEvents' event system lets the highest priority listener be have the highest priority
  * in deciding whether the event will cancel.
  * This means an event with a lower priority than the higher priority one would not be able to decide.
  * Cancelling the event means the action assosiated with the event will be cancelled.
- * For example, cancelling the {@link PacketPlayReceiveEvent}
+ * For example, cancelling the {@link PacketReceiveEvent}
  * will prevent minecraft from processing the incoming packet.
  *
  * @author retrooper
- * @see PacketPlayReceiveEvent
+ * @see PacketReceiveEvent
  * @since 1.7
  */
 public interface CancellableEvent {

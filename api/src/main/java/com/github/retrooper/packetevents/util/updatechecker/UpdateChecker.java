@@ -20,8 +20,8 @@ package com.github.retrooper.packetevents.util.updatechecker;
 
 import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.util.PEVersion;
-import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
+import com.github.retrooper.packetevents.util.json.JSONObject;
+import com.github.retrooper.packetevents.util.json.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
 import java.io.BufferedReader;
@@ -47,8 +47,8 @@ public class UpdateChecker {
             BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
             String jsonResponse = reader.readLine();
             reader.close();
-            JSONObject jsonObject = (JSONObject) PARSER.parse(jsonResponse);
-            return (String) jsonObject.get("tag_name");
+            JSONObject jsonObject = PARSER.parse(jsonResponse);
+            return jsonObject.getString("tag_name");
         } catch (IOException | ParseException e) {
             throw new IllegalStateException("Failed to parse packetevents version!", e);
         }
@@ -63,6 +63,7 @@ public class UpdateChecker {
         try {
             newVersion = new PEVersion(checkLatestReleasedVersion());
         } catch (Exception ex) {
+            ex.printStackTrace();
             newVersion = null;
         }
         if (newVersion != null && localVersion.isOlderThan(newVersion)) {
@@ -75,7 +76,7 @@ public class UpdateChecker {
             inform("You are on the latest released version of packetevents. (" + newVersion + ")");
             return UpdateCheckerStatus.UP_TO_DATE;
         } else {
-            report("Something went wrong while checking for an update. Your build: (" + localVersion + ") | Latest released build: (" + newVersion.toString() + ")");
+            report("Something went wrong while checking for an update. Your build: (" + localVersion + ")");
             return UpdateCheckerStatus.FAILED;
         }
     }

@@ -33,6 +33,7 @@ public class PacketEventsPlugin extends JavaPlugin {
     public void onEnable() {
         //Register your listeners
         PacketEvents.getAPI().init();
+        //net.minecraft.network.protocol.game.PacketPlayOutNamedEntitySpawn a0;
         net.minecraft.server.v1_16_R2.PacketPlayOutNamedEntitySpawn a1;
         net.minecraft.server.v1_15_R1.PacketPlayOutNamedEntitySpawn a2;
         net.minecraft.server.v1_14_R1.PacketPlayOutNamedEntitySpawn a3;
