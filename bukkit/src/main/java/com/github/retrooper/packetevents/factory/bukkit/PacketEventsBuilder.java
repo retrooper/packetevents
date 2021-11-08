@@ -26,12 +26,10 @@ import com.github.retrooper.packetevents.event.impl.PostPlayerInjectEvent;
 import com.github.retrooper.packetevents.injector.ChannelInjector;
 import com.github.retrooper.packetevents.manager.player.PlayerManager;
 import com.github.retrooper.packetevents.manager.server.ServerManager;
-import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.netty.NettyManager;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.settings.PacketEventsSettings;
 import com.github.retrooper.packetevents.util.PEVersion;
-import com.github.retrooper.packetevents.util.updatechecker.LowLevelUpdateChecker;
 import com.github.retrooper.packetevents.util.updatechecker.UpdateChecker;
 import io.github.retrooper.packetevents.bstats.Metrics;
 import io.github.retrooper.packetevents.handlers.GlobalChannelInjector;
@@ -39,8 +37,6 @@ import io.github.retrooper.packetevents.manager.player.PlayerManagerImpl;
 import io.github.retrooper.packetevents.manager.server.ServerManagerImpl;
 import io.github.retrooper.packetevents.processor.InternalBukkitListener;
 import io.github.retrooper.packetevents.processor.InternalPacketListener;
-import io.github.retrooper.packetevents.updatechecker.LowLevelUpdateCheckerLegacy;
-import io.github.retrooper.packetevents.updatechecker.LowLevelUpdateCheckerModern;
 import io.github.retrooper.packetevents.utils.MinecraftReflectionUtil;
 import io.github.retrooper.packetevents.utils.netty.NettyManagerImpl;
 import org.bukkit.Bukkit;
@@ -80,7 +76,7 @@ public class PacketEventsBuilder {
             private final PlayerManager playerManager = new PlayerManagerImpl();
             private final NettyManager nettyManager = new NettyManagerImpl();
             private final GlobalChannelInjector injector = new GlobalChannelInjector();
-            private UpdateChecker updateChecker;
+            private final UpdateChecker updateChecker = new UpdateChecker();
             private final InternalBukkitListener internalBukkitListener = new InternalBukkitListener();
             private boolean loaded;
             private boolean initialized;
@@ -113,12 +109,6 @@ public class PacketEventsBuilder {
 
                     //Register internal packet listener (should be the first listener)
                     getEventManager().registerListener(new InternalPacketListener(), PacketListenerPriority.LOWEST);
-
-                    LowLevelUpdateChecker lowLevelUpdateChecker =
-                            PacketEvents.getAPI().getServerManager().getVersion() == ServerVersion.v_1_7_10
-                                    ? new LowLevelUpdateCheckerLegacy() :
-                                    new LowLevelUpdateCheckerModern();
-                    updateChecker = new UpdateChecker(lowLevelUpdateChecker);
                 }
             }
 

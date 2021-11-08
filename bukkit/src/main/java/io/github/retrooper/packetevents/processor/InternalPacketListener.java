@@ -146,13 +146,7 @@ public class InternalPacketListener implements PacketListener {
                     player.sendMessage("id: " + interactEntity.getEntityId() + ", type: " + interactEntity.getType().name());
 
                 }
-                else if (event.getPacketType() == PacketType.Play.Client.CLICK_WINDOW) {
-                    WrapperPlayClientClickWindow clickWindow = new WrapperPlayClientClickWindow(event);
-                    player.sendMessage("Clicked window: " + clickWindow.getWindowId() + ", slot: " + clickWindow.getSlot() + ", button: " + clickWindow.getButton());
-                    player.sendMessage("Amount: " + clickWindow.getClickedItemStack().getAmount());
-                    player.sendMessage("NBT: " + Arrays.toString(clickWindow.getClickedItemStack().getNBT().getTagNames().toArray(new String[0])));
-                    event.setLastUsedWrapper(null);
-                }
+                //TODO Test update checker
 
                 break;
         }

@@ -20,6 +20,15 @@ package com.github.retrooper.packetevents.util.updatechecker;
 
 import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.util.PEVersion;
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.URL;
+import java.net.URLConnection;
 
 /**
  * PacketEvents update checker.
@@ -28,14 +37,21 @@ import com.github.retrooper.packetevents.util.PEVersion;
  * @since 1.6.9
  */
 public class UpdateChecker {
-    private final LowLevelUpdateChecker lowLevelUpdateChecker;
+    private static final JSONParser PARSER = new JSONParser();
 
-    public UpdateChecker(LowLevelUpdateChecker lowLevelUpdateChecker) {
-        this.lowLevelUpdateChecker = lowLevelUpdateChecker;
-    }
 
     public String checkLatestReleasedVersion() {
-        return lowLevelUpdateChecker.getLatestRelease();
+        try {
+            URLConnection connection = new URL("https://api.github.com/repos/retrooper/packetevents/releases/latest").openConnection();
+            connection.addRequestProperty("User-Agent", "Mozilla/4.0");
+            BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+            String jsonResponse = reader.readLine();
+            reader.close();
+            JSONObject jsonObject = (JSONObject) PARSER.parse(jsonResponse);
+            return (String) jsonObject.get("tag_name");
+        } catch (IOException | ParseException e) {
+            throw new IllegalStateException("Failed to parse packetevents version!", e);
+        }
     }
 
     /**
@@ -50,13 +66,13 @@ public class UpdateChecker {
             newVersion = null;
         }
         if (newVersion != null && localVersion.isOlderThan(newVersion)) {
-            inform("There is an update available for the PacketEvents API! Your build: (" + localVersion + ") | Latest released build: (" + newVersion + ")");
+            inform("There is an update available for packetevents! Your build: (" + localVersion + ") | Latest released build: (" + newVersion + ")");
             return UpdateCheckerStatus.OUTDATED;
         } else if (newVersion != null && localVersion.isNewerThan(newVersion)) {
-            inform("You are on a dev or pre released build of PacketEvents. Your build: (" + localVersion + ") | Latest released build: (" + newVersion + ")");
+            inform("You are on a dev or pre released build of packetevents. Your build: (" + localVersion + ") | Latest released build: (" + newVersion + ")");
             return UpdateCheckerStatus.PRE_RELEASE;
         } else if (localVersion.equals(newVersion)) {
-            inform("You are on the latest released version of PacketEvents. (" + newVersion + ")");
+            inform("You are on the latest released version of packetevents. (" + newVersion + ")");
             return UpdateCheckerStatus.UP_TO_DATE;
         } else {
             report("Something went wrong while checking for an update. Your build: (" + localVersion + ") | Latest released build: (" + newVersion.toString() + ")");
@@ -87,7 +103,7 @@ public class UpdateChecker {
                 status = checkForUpdate();
 
                 if (retries == (maxRetryCount - 1)) {
-                    PacketEvents.getAPI().getLogger().severe("[packetevents] PacketEvents failed to check for an update. No longer retrying.");
+                    PacketEvents.getAPI().getLogger().severe("[packetevents] packetevents failed to check for an update. No longer retrying.");
                     break;
                 }
 
@@ -133,7 +149,7 @@ public class UpdateChecker {
          */
         PRE_RELEASE,
         /**
-         * Your build is up to date.
+         * Your build is up-to-date.
          */
         UP_TO_DATE,
         /**
