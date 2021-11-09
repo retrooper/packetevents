@@ -75,7 +75,7 @@ public class UpdateChecker {
             inform("You are on the latest released version of packetevents. (" + newVersion + ")");
             return UpdateCheckerStatus.UP_TO_DATE;
         } else {
-            report("Something went wrong while checking for an update. Your build: (" + localVersion + ") | Latest released build: (" + newVersion.toString() + ")");
+            report("Something went wrong while checking for an update. Your build: (" + localVersion + ")");
             return UpdateCheckerStatus.FAILED;
         }
     }

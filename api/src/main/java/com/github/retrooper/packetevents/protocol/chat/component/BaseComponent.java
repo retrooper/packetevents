@@ -180,6 +180,18 @@ public class BaseComponent {
             this.changePageClickEvent = new ClickEvent(ClickType.CHANGE_PAGE, changePageValue);
             this.copyToClipboardClickEvent = new ClickEvent(ClickType.COPY_TO_CLIPBOARD, copyToClipboardValue);
         }
+
+        //TODO Make hover events
+        JSONObject hoverEvents = (JSONObject) jsonObject.get("hoverEvent");
+        if (hoverEvents != null) {
+            //String showTextValue = (String) hoverEvents.getOrDefault(HoverEvent.HoverType.SHOW_TEXT.getName(), "");
+            //String showItemValue = (String) hoverEvents.getOrDefault(HoverEvent.HoverType.SHOW_ITEM.getName(), "");
+            //String showEntityValue = (String) hoverEvents.getOrDefault(HoverEvent.HoverType.SHOW_ENTITY.getName(), "");
+
+        }
+
+        //TODO Other components such as the translation component, and the score component, and the selector component, and the keybind component
+
     }
 
     public JSONObject buildJSON() {

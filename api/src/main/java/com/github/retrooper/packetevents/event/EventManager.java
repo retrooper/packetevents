@@ -18,9 +18,13 @@
 
 package com.github.retrooper.packetevents.event;
 
+import com.github.retrooper.packetevents.PacketEvents;
+import org.jetbrains.annotations.Nullable;
+
 import java.util.HashSet;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.logging.Level;
 
 public class EventManager {
     private final Map<Byte, HashSet<PacketListenerAbstract>> listenersMap = new ConcurrentHashMap<>();
@@ -34,24 +38,24 @@ public class EventManager {
      *
      * @param event {@link PacketEvent}
      */
-    public void callEvent(final PacketEvent event) {
-        for (byte priority = PacketListenerPriority.LOWEST.getId(); priority <= PacketListenerPriority.MONITOR.getId(); priority++) {
-            HashSet<PacketListenerAbstract> listeners = listenersMap.get(priority);
-            if (listeners != null) {
-                for (PacketListenerAbstract listener : listeners) {
-                    event.call(listener);
-                }
-            }
-        }
+    public void callEvent(PacketEvent event) {
+        callEvent(event, null);
     }
 
-    public void callEvent(PacketEvent event, Runnable postCallListenerAction) {
+    public void callEvent(PacketEvent event, @Nullable Runnable postCallListenerAction) {
         for (byte priority = PacketListenerPriority.LOWEST.getId(); priority <= PacketListenerPriority.MONITOR.getId(); priority++) {
             HashSet<PacketListenerAbstract> listeners = listenersMap.get(priority);
             if (listeners != null) {
                 for (PacketListenerAbstract listener : listeners) {
-                    event.call(listener);
-                    postCallListenerAction.run();
+                    try {
+                        event.call(listener);
+                        if (postCallListenerAction != null) {
+                            postCallListenerAction.run();
+                        }
+                    }
+                    catch (Exception ex) {
+                        PacketEvents.getAPI().getLogger().log(Level.SEVERE, "PacketEvents encountered an exception when calling your listener.", ex);
+                    }
                 }
             }
         }
