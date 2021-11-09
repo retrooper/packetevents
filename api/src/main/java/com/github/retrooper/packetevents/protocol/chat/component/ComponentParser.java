@@ -18,9 +18,9 @@
 
 package com.github.retrooper.packetevents.protocol.chat.component;
 
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
+import com.github.retrooper.packetevents.util.json.JSONArray;
+import com.github.retrooper.packetevents.util.json.JSONObject;
+import com.github.retrooper.packetevents.util.json.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
 import java.util.ArrayList;
@@ -28,12 +28,13 @@ import java.util.List;
 
 public class ComponentParser {
     public static final JSONParser PARSER = new JSONParser();
+
     public static List<TextComponent> parseJSONString(String jsonMessageRaw) {
         List<TextComponent> messageComponents = new ArrayList<>();
         //TODO Caused by: java.lang.ArrayIndexOutOfBoundsException: arraycopy: length -1 is negative on line  36
         JSONObject fullJsonObject = null;
         try {
-            fullJsonObject = (JSONObject) PARSER.parse(jsonMessageRaw);
+            fullJsonObject = PARSER.parse(jsonMessageRaw);
         } catch (ParseException e) {
             e.printStackTrace();
         }
@@ -46,13 +47,10 @@ public class ComponentParser {
         jsonObjects.add(fullJsonObject);
         //Extra components, I'm not sure why minecraft designed their component system like this (parent and extra components)
         //Everything could have just been one array of components, no parent required
-        Object jsonArrayObj = fullJsonObject.get("extra");
-        if (jsonArrayObj != null) {
-            for (Object o : (JSONArray) jsonArrayObj) {
-                jsonObjects.add((JSONObject) o);
-            }
+        JSONArray jsonArrayObj = fullJsonObject.getJSONArray("extra");
+        for (Object o : jsonArrayObj) {
+            jsonObjects.add((JSONObject) o);
         }
-
 
         for (JSONObject jsonObject : jsonObjects) {
             TextComponent component = new TextComponent();
@@ -70,11 +68,11 @@ public class ComponentParser {
                 fullJSONObject = component.buildJSON();
                 firstComponent = false;
                 if (messageComponents.size() > 1) {
-                    fullJSONObject.put("extra", new JSONArray());
+                    fullJSONObject.setJSONArray("extra", new JSONArray());
                 }
             } else {
                 JSONObject output = component.buildJSON();
-                JSONArray extraComponents = (JSONArray) fullJSONObject.get("extra");
+                JSONArray extraComponents = fullJSONObject.getJSONArray("extra");
                 extraComponents.add(output);
             }
         }
