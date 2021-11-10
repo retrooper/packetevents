@@ -18,9 +18,8 @@
 
 package com.github.retrooper.packetevents.protocol.chat.component;
 
-import com.github.retrooper.packetevents.protocol.chat.ClickEvent;
 import com.github.retrooper.packetevents.protocol.chat.Color;
-import com.github.retrooper.packetevents.util.json.JSONObject;
+import org.json.simple.JSONObject;
 
 public class TextComponent extends BaseComponent {
     private String text;
@@ -39,14 +38,14 @@ public class TextComponent extends BaseComponent {
 
     @Override
     public void parseJSON(JSONObject jsonObject) {
-        this.text = jsonObject.getString("text");
+        this.text = (String) jsonObject.getOrDefault("text", "");
         super.parseJSON(jsonObject);
     }
 
     @Override
     public JSONObject buildJSON() {
         JSONObject jsonObject = super.buildJSON();
-        jsonObject.setString("text", text);
+        jsonObject.put("text", text);
         return jsonObject;
     }
 
@@ -54,7 +53,7 @@ public class TextComponent extends BaseComponent {
         return new Builder();
     }
 
-    public static class Builder extends BaseComponent.Builder {
+    public static class Builder<T extends TextComponent> extends BaseComponent.Builder<T> {
         private final TextComponent component = new TextComponent();
 
         public Builder text(String text) {
@@ -138,6 +137,35 @@ public class TextComponent extends BaseComponent {
         public Builder copyToClipboardClickEvent(String value) {
             this.component.setCopyToClipboardClickEvent(new ClickEvent(ClickEvent.ClickType.COPY_TO_CLIPBOARD, value));
             return this;
+        }
+
+        @Override
+        public BaseComponent.Builder showTextHoverEvent(String value) {
+            this.component.setShowTextHoverEvent(new HoverEvent(HoverEvent.HoverType.SHOW_TEXT, value));
+            return this;
+        }
+
+        @Override
+        public BaseComponent.Builder showItemHoverEvent(String value) {
+            this.component.setShowItemHoverEvent(new HoverEvent(HoverEvent.HoverType.SHOW_ITEM, value));
+            return this;
+        }
+
+        @Override
+        public BaseComponent.Builder showEntityHoverEvent(String value) {
+            this.component.setShowEntityHoverEvent(new HoverEvent(HoverEvent.HoverType.SHOW_ENTITY, value));
+            return this;
+        }
+
+        @Override
+        public BaseComponent.Builder showAchievementHoverEvent(String value) {
+            this.component.setShowAchievementHoverEvent(new HoverEvent(HoverEvent.HoverType.SHOW_ACHIEVEMENT, value));
+            return this;
+        }
+
+        @Override
+        public T build() {
+            return (T) component;
         }
     }
 }

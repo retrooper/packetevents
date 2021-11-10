@@ -23,17 +23,20 @@ import com.github.retrooper.packetevents.event.PacketListener;
 import com.github.retrooper.packetevents.event.impl.PacketReceiveEvent;
 import com.github.retrooper.packetevents.event.impl.PacketSendEvent;
 import com.github.retrooper.packetevents.protocol.ConnectionState;
+import com.github.retrooper.packetevents.protocol.chat.Color;
 import com.github.retrooper.packetevents.protocol.chat.component.ComponentParser;
 import com.github.retrooper.packetevents.protocol.chat.component.TextComponent;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 import com.github.retrooper.packetevents.wrapper.handshaking.client.WrapperHandshakingClientHandshake;
 import com.github.retrooper.packetevents.wrapper.login.client.WrapperLoginClientLoginStart;
+import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientChatMessage;
 import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientInteractEntity;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerChatMessage;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerEntityRelativeMoveAndLook;
 import org.bukkit.entity.Player;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class InternalPacketListener implements PacketListener {
@@ -149,7 +152,18 @@ public class InternalPacketListener implements PacketListener {
                 }*/
                 if (event.getPacketType() == PacketType.Play.Client.INTERACT_ENTITY) {
                     WrapperPlayClientInteractEntity interactEntity = new WrapperPlayClientInteractEntity(event);
-                    player.sendMessage("id: " + interactEntity.getEntityId() + ", type: " + interactEntity.getType().name());
+                    List<TextComponent> components = new ArrayList<>();
+                    components.add(TextComponent.builder().text("id: " + interactEntity.getEntityId() + " ")
+                                    .color(Color.BRIGHT_GREEN)
+                                    .italic(true)
+                            .build());
+
+                    components.add(TextComponent.builder().text("type: " + interactEntity.getType().name())
+                                    .color(Color.DARK_RED)
+                                    .bold(true)
+                            .build());
+                    WrapperPlayServerChatMessage cm = new WrapperPlayServerChatMessage(components, WrapperPlayServerChatMessage.ChatPosition.CHAT, player.getUniqueId());
+                    PacketEvents.getAPI().getPlayerManager().sendPacket(event.getChannel(), cm);
                 }
                 //TODO Test update checker
                 break;

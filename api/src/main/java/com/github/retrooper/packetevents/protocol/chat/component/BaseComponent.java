@@ -19,10 +19,9 @@
 package com.github.retrooper.packetevents.protocol.chat.component;
 
 
-import com.github.retrooper.packetevents.protocol.chat.ClickEvent;
-import com.github.retrooper.packetevents.protocol.chat.ClickEvent.ClickType;
+import com.github.retrooper.packetevents.protocol.chat.component.ClickEvent.ClickType;
 import com.github.retrooper.packetevents.protocol.chat.Color;
-import com.github.retrooper.packetevents.util.json.JSONObject;
+import org.json.simple.JSONObject;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -36,6 +35,12 @@ public class BaseComponent {
     private ClickEvent suggestCommandClickEvent = new ClickEvent(ClickEvent.ClickType.SUGGEST_COMMAND);
     private ClickEvent changePageClickEvent = new ClickEvent(ClickEvent.ClickType.CHANGE_PAGE);
     private ClickEvent copyToClipboardClickEvent = new ClickEvent(ClickEvent.ClickType.COPY_TO_CLIPBOARD);
+    private HoverEvent showTextHoverEvent = new HoverEvent(HoverEvent.HoverType.SHOW_TEXT);
+    private HoverEvent showItemHoverEvent = new HoverEvent(HoverEvent.HoverType.SHOW_ITEM);
+    private HoverEvent showEntityHoverEvent = new HoverEvent(HoverEvent.HoverType.SHOW_ENTITY);
+    @Deprecated
+    private HoverEvent showAchievementHoverEvent = new HoverEvent(HoverEvent.HoverType.SHOW_ACHIEVEMENT);
+
     private boolean bold = false;
     private boolean italic = false;
     private boolean underlined = false;
@@ -109,6 +114,40 @@ public class BaseComponent {
         this.copyToClipboardClickEvent = copyToClipboardClickEvent;
     }
 
+    public HoverEvent getShowTextHoverEvent() {
+        return showTextHoverEvent;
+    }
+
+    public void setShowTextHoverEvent(HoverEvent showTextHoverEvent) {
+        this.showTextHoverEvent = showTextHoverEvent;
+    }
+
+    public HoverEvent getShowItemHoverEvent() {
+        return showItemHoverEvent;
+    }
+
+    public void setShowItemHoverEvent(HoverEvent showItemHoverEvent) {
+        this.showItemHoverEvent = showItemHoverEvent;
+    }
+
+    public HoverEvent getShowEntityHoverEvent() {
+        return showEntityHoverEvent;
+    }
+
+    public void setShowEntityHoverEvent(HoverEvent showEntityHoverEvent) {
+        this.showEntityHoverEvent = showEntityHoverEvent;
+    }
+
+    @Deprecated
+    public HoverEvent getShowAchievementHoverEvent() {
+        return showAchievementHoverEvent;
+    }
+
+    @Deprecated
+    public void setShowAchievementHoverEvent(HoverEvent showAchievementHoverEvent) {
+        this.showAchievementHoverEvent = showAchievementHoverEvent;
+    }
+
     public boolean isBold() {
         return bold;
     }
@@ -154,24 +193,24 @@ public class BaseComponent {
     }
 
     public void parseJSON(JSONObject jsonObject) {
-        String colorStr = jsonObject.getString("color");
+        String colorStr = (String) jsonObject.getOrDefault("color", "");
         this.color = Color.getByName(colorStr);
-        this.insertion = jsonObject.getString("insertion");
-        this.bold = jsonObject.getBoolean("bold");
-        this.italic = jsonObject.getBoolean("italic");
-        this.underlined = jsonObject.getBoolean("underlined");
-        this.strikeThrough = jsonObject.getBoolean("strikethrough");
-        this.obfuscated = jsonObject.getBoolean("obfuscated");
+        this.insertion = (String) jsonObject.getOrDefault("insertion", "");
+        this.bold = (boolean) jsonObject.getOrDefault("bold", false);
+        this.italic = (boolean) jsonObject.getOrDefault("italic", false);
+        this.underlined = (boolean) jsonObject.getOrDefault("underlined", false);
+        this.strikeThrough = (boolean) jsonObject.getOrDefault("strikethrough", false);
+        this.obfuscated = (boolean) jsonObject.getOrDefault("obfuscated", false);
 
         //Read click events if it has been specified
-        JSONObject clickEvents = jsonObject.getJSONObject("clickEvent");
+        JSONObject clickEvents = (JSONObject) jsonObject.get("clickEvent");
         if (clickEvents != null) {
-            String openURLValue = clickEvents.getString(ClickEvent.ClickType.OPEN_URL.getName());
-            String openFileValue = clickEvents.getString(ClickEvent.ClickType.OPEN_FILE.getName());
-            String runCommandValue = clickEvents.getString(ClickEvent.ClickType.RUN_COMMAND.getName());
-            String suggestCommandValue = clickEvents.getString(ClickEvent.ClickType.SUGGEST_COMMAND.getName());
-            String changePageValue = clickEvents.getString(ClickEvent.ClickType.CHANGE_PAGE.getName());
-            String copyToClipboardValue = clickEvents.getString(ClickEvent.ClickType.COPY_TO_CLIPBOARD.getName());
+            String openURLValue = (String) clickEvents.getOrDefault(ClickEvent.ClickType.OPEN_URL.getName(), "");
+            String openFileValue = (String) clickEvents.getOrDefault(ClickEvent.ClickType.OPEN_FILE.getName(), "");
+            String runCommandValue = (String) clickEvents.getOrDefault(ClickEvent.ClickType.RUN_COMMAND.getName(), "");
+            String suggestCommandValue = (String) clickEvents.getOrDefault(ClickEvent.ClickType.SUGGEST_COMMAND.getName(), "");
+            String changePageValue = (String) clickEvents.getOrDefault(ClickEvent.ClickType.CHANGE_PAGE.getName(), "");
+            String copyToClipboardValue = (String) clickEvents.getOrDefault(ClickEvent.ClickType.COPY_TO_CLIPBOARD.getName(), "");
 
             this.openURLClickEvent = new ClickEvent(ClickType.OPEN_URL, openURLValue);
             this.openFileClickEvent = new ClickEvent(ClickType.OPEN_FILE, openFileValue);
@@ -181,13 +220,17 @@ public class BaseComponent {
             this.copyToClipboardClickEvent = new ClickEvent(ClickType.COPY_TO_CLIPBOARD, copyToClipboardValue);
         }
 
-        //TODO Make hover events
         JSONObject hoverEvents = (JSONObject) jsonObject.get("hoverEvent");
         if (hoverEvents != null) {
-            //String showTextValue = (String) hoverEvents.getOrDefault(HoverEvent.HoverType.SHOW_TEXT.getName(), "");
-            //String showItemValue = (String) hoverEvents.getOrDefault(HoverEvent.HoverType.SHOW_ITEM.getName(), "");
-            //String showEntityValue = (String) hoverEvents.getOrDefault(HoverEvent.HoverType.SHOW_ENTITY.getName(), "");
+            String showTextValue = (String) hoverEvents.getOrDefault(HoverEvent.HoverType.SHOW_TEXT.getName(), "");
+            String showItemValue = (String) hoverEvents.getOrDefault(HoverEvent.HoverType.SHOW_ITEM.getName(), "");
+            String showEntityValue = (String) hoverEvents.getOrDefault(HoverEvent.HoverType.SHOW_ENTITY.getName(), "");
+            String showAchievementValue = (String) hoverEvents.getOrDefault(HoverEvent.HoverType.SHOW_ACHIEVEMENT.getName(), "");
 
+            this.showTextHoverEvent = new HoverEvent(HoverEvent.HoverType.SHOW_TEXT, showTextValue);
+            this.showItemHoverEvent = new HoverEvent(HoverEvent.HoverType.SHOW_ITEM, showItemValue);
+            this.showEntityHoverEvent = new HoverEvent(HoverEvent.HoverType.SHOW_ENTITY, showEntityValue);
+            this.showAchievementHoverEvent = new HoverEvent(HoverEvent.HoverType.SHOW_ACHIEVEMENT, showAchievementValue);
         }
 
         //TODO Other components such as the translation component, and the score component, and the selector component, and the keybind component
@@ -197,25 +240,25 @@ public class BaseComponent {
     public JSONObject buildJSON() {
         JSONObject jsonObject = new JSONObject();
         if (color != Color.WHITE && color != null) {
-            jsonObject.setString("color", color.getName());
+            jsonObject.put("color", color.getName());
         }
         if (insertion != null && !insertion.isEmpty()) {
-            jsonObject.setString("insertion", insertion);
+            jsonObject.put("insertion", insertion);
         }
         if (bold) {
-            jsonObject.setBoolean("bold", true);
+            jsonObject.put("bold", true);
         }
         if (italic) {
-            jsonObject.setBoolean("italic", true);
+            jsonObject.put("italic", true);
         }
         if (underlined) {
-            jsonObject.setBoolean("underlined", true);
+            jsonObject.put("underlined", true);
         }
         if (strikeThrough) {
-            jsonObject.setBoolean("strikethrough", true);
+            jsonObject.put("strikethrough", true);
         }
         if (obfuscated) {
-            jsonObject.setBoolean("obfuscated", true);
+            jsonObject.put("obfuscated", true);
         }
 
         List<ClickEvent> clickEvents = new ArrayList<>();
@@ -229,17 +272,35 @@ public class BaseComponent {
         JSONObject jsonClickEvents = new JSONObject();
         for (ClickEvent clickEvent : clickEvents) {
             if (!clickEvent.getValue().isEmpty()) {
-                jsonClickEvents.setString(clickEvent.getType().getName(), clickEvent.getValue());
+                jsonClickEvents.put(clickEvent.getType().getName(), clickEvent.getValue());
                 allClickEventsEmpty = false;
             }
         }
         if (!allClickEventsEmpty) {
-            jsonObject.setJSONObject("clickEvent", jsonClickEvents);
+            jsonObject.put("clickEvent", jsonClickEvents);
+        }
+
+        List<HoverEvent> hoverEvents = new ArrayList<>();
+        hoverEvents.add(showTextHoverEvent);
+        hoverEvents.add(showItemHoverEvent);
+        hoverEvents.add(showEntityHoverEvent);
+        hoverEvents.add(showAchievementHoverEvent);
+        boolean allHoverEventsEmpty = true;
+        JSONObject jsonHoverEvents = new JSONObject();
+        for (HoverEvent hoverEvent : hoverEvents) {
+            if (!hoverEvent.getValue().isEmpty()) {
+                jsonHoverEvents.put(hoverEvent.getType().getName(), hoverEvent.getValue());
+                allHoverEventsEmpty = false;
+            }
+        }
+
+        if (!allHoverEventsEmpty) {
+            jsonObject.put("hoverEvent", jsonHoverEvents);
         }
         return jsonObject;
     }
 
-    public static class Builder {
+    public static class Builder<T extends BaseComponent> {
         private final BaseComponent component = new BaseComponent();
 
         public Builder color(Color color) {
@@ -307,8 +368,29 @@ public class BaseComponent {
             return this;
         }
 
-        public BaseComponent build() {
-            return component;
+        public Builder showTextHoverEvent(String value) {
+            this.component.setShowTextHoverEvent(new HoverEvent(HoverEvent.HoverType.SHOW_TEXT, value));
+            return this;
+        }
+
+        public Builder showItemHoverEvent(String value) {
+            this.component.setShowItemHoverEvent(new HoverEvent(HoverEvent.HoverType.SHOW_ITEM, value));
+            return this;
+        }
+
+        public Builder showEntityHoverEvent(String value) {
+            this.component.setShowEntityHoverEvent(new HoverEvent(HoverEvent.HoverType.SHOW_ENTITY, value));
+            return this;
+        }
+
+        @Deprecated
+        public Builder showAchievementHoverEvent(String value) {
+            this.component.setShowAchievementHoverEvent(new HoverEvent(HoverEvent.HoverType.SHOW_ACHIEVEMENT, value));
+            return this;
+        }
+
+        public T build() {
+            return (T) component;
         }
     }
 }

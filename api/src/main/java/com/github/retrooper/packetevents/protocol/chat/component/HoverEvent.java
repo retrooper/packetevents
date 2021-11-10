@@ -16,26 +16,26 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.github.retrooper.packetevents.protocol.chat;
+package com.github.retrooper.packetevents.protocol.chat.component;
 
-public class ClickEvent {
-    private ClickType type;
+public class HoverEvent {
+    private HoverType type;
     private String value;
 
-    public ClickEvent(ClickType type, String value) {
+    public HoverEvent(HoverType type, String value) {
         this.type = type;
         this.value = value;
     }
 
-    public ClickEvent(ClickType type) {
+    public HoverEvent(HoverType type) {
         this(type, "");
     }
 
-    public ClickType getType() {
+    public HoverType getType() {
         return type;
     }
 
-    public void setType(ClickType type) {
+    public void setType(HoverType type) {
         this.type = type;
     }
 
@@ -49,26 +49,24 @@ public class ClickEvent {
 
     @Override
     public boolean equals(Object obj) {
-        if (obj instanceof ClickEvent) {
-            ClickEvent clickEvent = (ClickEvent) obj;
-            if (clickEvent.type == type && clickEvent.value.equals(value)) {
-                return true;
-            }
+        if (this == obj) return true;
+        if (obj instanceof HoverEvent) {
+            HoverEvent hoverEvent = (HoverEvent) obj;
+            return type == hoverEvent.type && value.equals(hoverEvent.value);
         }
         return false;
     }
 
-    public enum ClickType {
-        OPEN_URL,
-        OPEN_FILE,
-        RUN_COMMAND,
-        SUGGEST_COMMAND,
-        CHANGE_PAGE,
-        COPY_TO_CLIPBOARD;
+    public enum HoverType {
+        SHOW_TEXT,
+        SHOW_ITEM,
+        SHOW_ENTITY,
+        @Deprecated
+        SHOW_ACHIEVEMENT;
 
         private final String name;
 
-        ClickType() {
+        HoverType() {
             this.name = name().toLowerCase();
         }
 

@@ -20,8 +20,8 @@ package com.github.retrooper.packetevents.util.updatechecker;
 
 import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.util.PEVersion;
-import com.github.retrooper.packetevents.util.json.JSONObject;
-import com.github.retrooper.packetevents.util.json.parser.JSONParser;
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
 import java.io.BufferedReader;
@@ -47,8 +47,8 @@ public class UpdateChecker {
             BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
             String jsonResponse = reader.readLine();
             reader.close();
-            JSONObject jsonObject = PARSER.parse(jsonResponse);
-            return jsonObject.getString("tag_name");
+            JSONObject jsonObject = (JSONObject) PARSER.parse(jsonResponse);
+            return (String) jsonObject.getOrDefault("tag_name", "");
         } catch (IOException | ParseException e) {
             throw new IllegalStateException("Failed to parse packetevents version!", e);
         }
