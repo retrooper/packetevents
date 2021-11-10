@@ -63,7 +63,8 @@ public class ClickEvent {
         RUN_COMMAND,
         SUGGEST_COMMAND,
         CHANGE_PAGE,
-        COPY_TO_CLIPBOARD;
+        COPY_TO_CLIPBOARD,
+        EMPTY("");
 
         private final String name;
 
@@ -71,8 +72,21 @@ public class ClickEvent {
             this.name = name().toLowerCase();
         }
 
+        ClickType(String name) {
+            this.name = name;
+        }
+
         public String getName() {
             return name;
+        }
+
+        public static ClickType getByName(String name) {
+            for (ClickType type : ClickType.values()) {
+                if (type.getName().equals(name)) {
+                    return type;
+                }
+            }
+            return null;
         }
     }
 }

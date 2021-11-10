@@ -25,19 +25,22 @@ import com.github.retrooper.packetevents.event.impl.PacketSendEvent;
 import com.github.retrooper.packetevents.protocol.ConnectionState;
 import com.github.retrooper.packetevents.protocol.chat.Color;
 import com.github.retrooper.packetevents.protocol.chat.component.ComponentParser;
+import com.github.retrooper.packetevents.protocol.chat.component.HoverEvent;
 import com.github.retrooper.packetevents.protocol.chat.component.TextComponent;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 import com.github.retrooper.packetevents.wrapper.handshaking.client.WrapperHandshakingClientHandshake;
 import com.github.retrooper.packetevents.wrapper.login.client.WrapperLoginClientLoginStart;
-import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientChatMessage;
 import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientInteractEntity;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerChatMessage;
-import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerEntityRelativeMoveAndLook;
+import net.md_5.bungee.api.ChatColor;
+import net.md_5.bungee.api.chat.ClickEvent;
+import net.md_5.bungee.api.chat.ComponentBuilder;
 import org.bukkit.entity.Player;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 public class InternalPacketListener implements PacketListener {
     //Make this specific event be at MONITOR priority
@@ -47,8 +50,7 @@ public class InternalPacketListener implements PacketListener {
         if (event.getPacketType() == PacketType.Login.Server.LOGIN_SUCCESS) {
             //Transition into the PLAY connection state
             PacketEvents.getAPI().getPlayerManager().changeConnectionState(event.getChannel(), ConnectionState.PLAY);
-        }
-        else if (event.getPacketType() == PacketType.Play.Server.CHAT_MESSAGE) {
+        } else if (event.getPacketType() == PacketType.Play.Server.CHAT_MESSAGE) {
             WrapperPlayServerChatMessage chatMessage = new WrapperPlayServerChatMessage(event);
             String og = chatMessage.getJSONMessageRaw();
             System.out.println("OG JSON: " + og);
@@ -154,16 +156,36 @@ public class InternalPacketListener implements PacketListener {
                     WrapperPlayClientInteractEntity interactEntity = new WrapperPlayClientInteractEntity(event);
                     List<TextComponent> components = new ArrayList<>();
                     components.add(TextComponent.builder().text("id: " + interactEntity.getEntityId() + " ")
-                                    .color(Color.BRIGHT_GREEN)
-                                    .italic(true)
+                            .color(Color.BRIGHT_GREEN)
+                            .italic(true)
                             .build());
 
-                    components.add(TextComponent.builder().text("type: " + interactEntity.getType().name())
-                                    .color(Color.DARK_RED)
+                    TextComponent hoverComponent = TextComponent.builder().text("Request to get banned!").color(Color.DARK_RED)
                                     .bold(true)
+                                            .underlined(true)
+                                                    .build();
+
+                    String hoverText = hoverComponent.buildJSON().toJSONString();
+                    components.add(TextComponent.builder().text("type: " + interactEntity.getType().name())
+                            .color(Color.DARK_RED)
+                            .bold(true)
+                            .hoverEvent(new HoverEvent(HoverEvent.HoverType.SHOW_TEXT, new String[] {hoverText}))
                             .build());
-                    WrapperPlayServerChatMessage cm = new WrapperPlayServerChatMessage(components, WrapperPlayServerChatMessage.ChatPosition.CHAT, player.getUniqueId());
+
+
+                    UUID uuid = player != null ? player.getUniqueId() : new UUID(0L, 0L);
+                    WrapperPlayServerChatMessage cm = new WrapperPlayServerChatMessage(components, WrapperPlayServerChatMessage.ChatPosition.CHAT, uuid);
                     PacketEvents.getAPI().getPlayerManager().sendPacket(event.getChannel(), cm);
+
+                    net.md_5.bungee.api.chat.TextComponent mainComponent = new  net.md_5.bungee.api.chat.TextComponent ( "Here's a question: " );
+                    mainComponent.setColor( ChatColor.GOLD );
+                    net.md_5.bungee.api.chat.TextComponent  subComponent = new  net.md_5.bungee.api.chat.TextComponent ( "Maybe u r noob?" );
+                    subComponent.setColor( ChatColor.AQUA );
+                    subComponent.setHoverEvent( new net.md_5.bungee.api.chat.HoverEvent( net.md_5.bungee.api.chat.HoverEvent.Action.SHOW_TEXT, new ComponentBuilder( "Click me!" ).color(ChatColor.DARK_RED).create() ) );
+                    subComponent.setClickEvent( new ClickEvent( ClickEvent.Action.OPEN_URL, "https://www.spigotmc.org/wiki/the-chat-component-api/" ) );
+                    mainComponent.addExtra( subComponent );
+                    mainComponent.addExtra( " Does that answer your question?" );
+                    player.spigot().sendMessage( mainComponent );
                 }
                 //TODO Test update checker
                 break;

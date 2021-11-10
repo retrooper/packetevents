@@ -104,62 +104,14 @@ public class TextComponent extends BaseComponent {
         }
 
         @Override
-        public Builder openURLClickEvent(String value) {
-            this.component.setOpenURLClickEvent(new ClickEvent(ClickEvent.ClickType.OPEN_URL, value));
+        public Builder clickEvent(ClickEvent clickEvent) {
+            this.component.setClickEvent(clickEvent);
             return this;
         }
 
         @Override
-        public Builder openFileClickEvent(String value) {
-            this.component.setOpenFileClickEvent(new ClickEvent(ClickEvent.ClickType.OPEN_FILE, value));
-            return this;
-        }
-
-        @Override
-        public Builder runCommandClickEvent(String value) {
-            this.component.setRunCommandClickEvent(new ClickEvent(ClickEvent.ClickType.RUN_COMMAND, value));
-            return this;
-        }
-
-        @Override
-        public Builder suggestCommandClickEvent(String value) {
-            this.component.setSuggestCommandClickEvent(new ClickEvent(ClickEvent.ClickType.SUGGEST_COMMAND, value));
-            return this;
-        }
-
-        @Override
-        public Builder changePageClickEvent(String value) {
-            this.component.setChangePageClickEvent(new ClickEvent(ClickEvent.ClickType.CHANGE_PAGE, value));
-            return this;
-        }
-
-        @Override
-        public Builder copyToClipboardClickEvent(String value) {
-            this.component.setCopyToClipboardClickEvent(new ClickEvent(ClickEvent.ClickType.COPY_TO_CLIPBOARD, value));
-            return this;
-        }
-
-        @Override
-        public BaseComponent.Builder showTextHoverEvent(String value) {
-            this.component.setShowTextHoverEvent(new HoverEvent(HoverEvent.HoverType.SHOW_TEXT, value));
-            return this;
-        }
-
-        @Override
-        public BaseComponent.Builder showItemHoverEvent(String value) {
-            this.component.setShowItemHoverEvent(new HoverEvent(HoverEvent.HoverType.SHOW_ITEM, value));
-            return this;
-        }
-
-        @Override
-        public BaseComponent.Builder showEntityHoverEvent(String value) {
-            this.component.setShowEntityHoverEvent(new HoverEvent(HoverEvent.HoverType.SHOW_ENTITY, value));
-            return this;
-        }
-
-        @Override
-        public BaseComponent.Builder showAchievementHoverEvent(String value) {
-            this.component.setShowAchievementHoverEvent(new HoverEvent(HoverEvent.HoverType.SHOW_ACHIEVEMENT, value));
+        public Builder hoverEvent(HoverEvent hoverEvent) {
+            this.component.setHoverEvent(hoverEvent);
             return this;
         }
 

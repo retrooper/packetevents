@@ -18,17 +18,34 @@
 
 package com.github.retrooper.packetevents.protocol.chat.component;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
 public class HoverEvent {
     private HoverType type;
-    private String value;
+    //Can also be a component in string form
+    private List<String> values;
+
+    public HoverEvent(HoverType type, List<String> values) {
+        this.type = type;
+        this.values = values;
+    }
+
+    public HoverEvent(HoverType type, String[] values) {
+        this.type = type;
+        this.values = new ArrayList<>();
+        this.values.addAll(Arrays.asList(values));
+    }
 
     public HoverEvent(HoverType type, String value) {
         this.type = type;
-        this.value = value;
+        this.values = new ArrayList<>();
+        this.values.add(value);
     }
 
     public HoverEvent(HoverType type) {
-        this(type, "");
+        this(type, new ArrayList<>());
     }
 
     public HoverType getType() {
@@ -39,12 +56,12 @@ public class HoverEvent {
         this.type = type;
     }
 
-    public String getValue() {
-        return value;
+    public List<String> getValues() {
+        return values;
     }
 
-    public void setValue(String value) {
-        this.value = value;
+    public void setValues(List<String> values) {
+        this.values = values;
     }
 
     @Override
@@ -52,7 +69,14 @@ public class HoverEvent {
         if (this == obj) return true;
         if (obj instanceof HoverEvent) {
             HoverEvent hoverEvent = (HoverEvent) obj;
-            return type == hoverEvent.type && value.equals(hoverEvent.value);
+            if (type == hoverEvent.type && values.size() == hoverEvent.values.size()) {
+                for (int i = 0; i < values.size(); i++) {
+                    if (!values.get(i).equals(hoverEvent.values.get(i))) {
+                        return false;
+                    }
+                }
+                return true;
+            }
         }
         return false;
     }
@@ -62,7 +86,8 @@ public class HoverEvent {
         SHOW_ITEM,
         SHOW_ENTITY,
         @Deprecated
-        SHOW_ACHIEVEMENT;
+        SHOW_ACHIEVEMENT,
+        EMPTY("");
 
         private final String name;
 
@@ -70,8 +95,19 @@ public class HoverEvent {
             this.name = name().toLowerCase();
         }
 
+        HoverType(String name) {
+            this.name = name;
+        }
+
         public String getName() {
             return name;
+        }
+
+        public static HoverType getByName(String name) {
+            for (HoverType type : values()) {
+                if (type.getName().equals(name)) return type;
+            }
+            return null;
         }
     }
 }
