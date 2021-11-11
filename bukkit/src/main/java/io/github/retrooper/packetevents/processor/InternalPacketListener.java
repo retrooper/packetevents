@@ -22,6 +22,7 @@ import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.event.PacketListener;
 import com.github.retrooper.packetevents.event.impl.PacketReceiveEvent;
 import com.github.retrooper.packetevents.event.impl.PacketSendEvent;
+import com.github.retrooper.packetevents.manager.player.attributes.TabCompleteAttribute;
 import com.github.retrooper.packetevents.protocol.ConnectionState;
 import com.github.retrooper.packetevents.protocol.chat.Color;
 import com.github.retrooper.packetevents.protocol.chat.component.ComponentParser;
@@ -32,6 +33,7 @@ import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 import com.github.retrooper.packetevents.wrapper.handshaking.client.WrapperHandshakingClientHandshake;
 import com.github.retrooper.packetevents.wrapper.login.client.WrapperLoginClientLoginStart;
 import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientInteractEntity;
+import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientTabComplete;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerChatMessage;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.chat.ClickEvent;
@@ -40,6 +42,7 @@ import org.bukkit.entity.Player;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 public class InternalPacketListener implements PacketListener {
@@ -136,11 +139,7 @@ public class InternalPacketListener implements PacketListener {
                 }
                 break;
             case PLAY:
-                /*
-                if (event.getPacketType() == PacketType.Play.Client.INTERACT_ENTITY) {
-                    WrapperPlayClientInteractEntity in = new WrapperPlayClientInteractEntity(event);
-                    player.sendMessage("eid from internal: " + in.getEntityId() + ", type: " + in.getType().name());
-                } else if (event.getPacketType() == PacketType.Play.Client.TAB_COMPLETE) {
+                if (event.getPacketType() == PacketType.Play.Client.TAB_COMPLETE) {
                     WrapperPlayClientTabComplete tabComplete = new WrapperPlayClientTabComplete(event);
                     String text = tabComplete.getText();
                     TabCompleteAttribute tabCompleteAttribute =
@@ -150,8 +149,7 @@ public class InternalPacketListener implements PacketListener {
                     tabCompleteAttribute.setInput(text);
                     Optional<Integer> transactionID = tabComplete.getTransactionId();
                     transactionID.ifPresent(tabComplete::setTransactionID);
-                    player.sendMessage("Incoming tab complete: " + text);
-                }*/
+                }
                 if (event.getPacketType() == PacketType.Play.Client.INTERACT_ENTITY) {
                     WrapperPlayClientInteractEntity interactEntity = new WrapperPlayClientInteractEntity(event);
                     List<TextComponent> components = new ArrayList<>();
