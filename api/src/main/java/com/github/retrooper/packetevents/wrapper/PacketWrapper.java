@@ -221,7 +221,10 @@ public class PacketWrapper<T extends PacketWrapper> {
         ItemType type = ItemTypes.getById(typeID);
         int amount = readByte();
         NBTCompound nbt = readNBT();
-        return new ItemStack(type, amount, nbt);
+        return ItemStack.builder()
+                .type(type)
+                .amount(amount)
+                .nbt(nbt).build();
     }
 
     public void writeItemStack(@NotNull ItemStack itemStack) {

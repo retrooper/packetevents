@@ -21,19 +21,19 @@ package com.github.retrooper.packetevents.protocol.inventory;
 import com.github.retrooper.packetevents.protocol.nbt.NBTCompound;
 
 public class ItemStack {
-    public static final ItemStack NULL = new ItemStack(null, 0);
+    public static final ItemStack NULL = new ItemStack(ItemTypes.AIR, -1);
     //TODO Support legacy data
     private ItemType type;
     private int amount;
     private NBTCompound nbt;
 
-    public ItemStack(ItemType type, int amount) {
+    private ItemStack(ItemType type, int amount) {
         this.type = type;
         this.amount = amount;
         this.nbt = new NBTCompound();
     }
 
-    public ItemStack(ItemType type, int amount, NBTCompound nbt) {
+    private ItemStack(ItemType type, int amount, NBTCompound nbt) {
         this.type = type;
         this.amount = amount;
         this.nbt = nbt;

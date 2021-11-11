@@ -28,16 +28,18 @@ import com.github.retrooper.packetevents.protocol.chat.Color;
 import com.github.retrooper.packetevents.protocol.chat.component.ComponentParser;
 import com.github.retrooper.packetevents.protocol.chat.component.HoverEvent;
 import com.github.retrooper.packetevents.protocol.chat.component.TextComponent;
+import com.github.retrooper.packetevents.protocol.inventory.ItemStack;
+import com.github.retrooper.packetevents.protocol.inventory.ItemTypes;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 import com.github.retrooper.packetevents.wrapper.handshaking.client.WrapperHandshakingClientHandshake;
 import com.github.retrooper.packetevents.wrapper.login.client.WrapperLoginClientLoginStart;
+import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientChatMessage;
 import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientInteractEntity;
 import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientTabComplete;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerChatMessage;
-import net.md_5.bungee.api.ChatColor;
-import net.md_5.bungee.api.chat.ClickEvent;
-import net.md_5.bungee.api.chat.ComponentBuilder;
+import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerSetSlot;
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
 import java.util.ArrayList;
@@ -149,8 +151,7 @@ public class InternalPacketListener implements PacketListener {
                     tabCompleteAttribute.setInput(text);
                     Optional<Integer> transactionID = tabComplete.getTransactionId();
                     transactionID.ifPresent(tabComplete::setTransactionID);
-                }
-                if (event.getPacketType() == PacketType.Play.Client.INTERACT_ENTITY) {
+                } else if (event.getPacketType() == PacketType.Play.Client.INTERACT_ENTITY) {
                     WrapperPlayClientInteractEntity interactEntity = new WrapperPlayClientInteractEntity(event);
                     List<TextComponent> components = new ArrayList<>();
                     components.add(TextComponent.builder().text("id: " + interactEntity.getEntityId() + " ")
@@ -159,15 +160,15 @@ public class InternalPacketListener implements PacketListener {
                             .build());
 
                     TextComponent hoverComponent = TextComponent.builder().text("Request to get banned!").color(Color.DARK_RED)
-                                    .bold(true)
-                                            .underlined(true)
-                                                    .build();
+                            .bold(true)
+                            .underlined(true)
+                            .build();
 
                     String hoverText = hoverComponent.buildJSON().toJSONString();
                     components.add(TextComponent.builder().text("type: " + interactEntity.getType().name())
                             .color(Color.DARK_RED)
                             .bold(true)
-                            .hoverEvent(new HoverEvent(HoverEvent.HoverType.SHOW_TEXT, new String[] {hoverText}))
+                            .hoverEvent(new HoverEvent(HoverEvent.HoverType.SHOW_TEXT, new String[]{hoverText}))
                             .build());
 
 
@@ -175,15 +176,19 @@ public class InternalPacketListener implements PacketListener {
                     WrapperPlayServerChatMessage cm = new WrapperPlayServerChatMessage(components, WrapperPlayServerChatMessage.ChatPosition.CHAT, uuid);
                     PacketEvents.getAPI().getPlayerManager().sendPacket(event.getChannel(), cm);
 
-                    net.md_5.bungee.api.chat.TextComponent mainComponent = new  net.md_5.bungee.api.chat.TextComponent ( "Here's a question: " );
-                    mainComponent.setColor( ChatColor.GOLD );
-                    net.md_5.bungee.api.chat.TextComponent  subComponent = new  net.md_5.bungee.api.chat.TextComponent ( "Maybe u r noob?" );
-                    subComponent.setColor( ChatColor.AQUA );
-                    subComponent.setHoverEvent( new net.md_5.bungee.api.chat.HoverEvent( net.md_5.bungee.api.chat.HoverEvent.Action.SHOW_TEXT, new ComponentBuilder( "Click me!" ).color(ChatColor.DARK_RED).create() ) );
-                    subComponent.setClickEvent( new ClickEvent( ClickEvent.Action.OPEN_URL, "https://www.spigotmc.org/wiki/the-chat-component-api/" ) );
-                    mainComponent.addExtra( subComponent );
-                    mainComponent.addExtra( " Does that answer your question?" );
-                    player.spigot().sendMessage( mainComponent );
+
+                    int id = ItemTypes.DIAMOND_SWORD.getId();
+                    player.sendMessage("sword id: " + id);
+                    ItemStack item = ItemStack.builder().type(ItemTypes.DIAMOND_BLOCK)
+                            .amount(61).build();
+
+                    WrapperPlayServerSetSlot setSlot =
+                            new WrapperPlayServerSetSlot(0, 4, 3, item);
+
+                    //PacketEvents.getAPI().getPlayerManager().sendPacket(event.getChannel(), setSlot);
+                    if (player != null) {
+                        //player.sendMessage("Yes set slot!");
+                    }
                 }
                 //TODO Test update checker
                 break;
