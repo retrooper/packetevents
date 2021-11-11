@@ -58,13 +58,13 @@ public class InternalPacketListener implements PacketListener {
         } else if (event.getPacketType() == PacketType.Play.Server.CHAT_MESSAGE) {
             WrapperPlayServerChatMessage chatMessage = new WrapperPlayServerChatMessage(event);
             String og = chatMessage.getJSONMessageRaw();
-            System.out.println("OG JSON: " + og);
+            //System.out.println("OG JSON: " + og);
             List<TextComponent> components = chatMessage.getMessageComponents();
             for (TextComponent component : components) {
-                System.out.println("Component part: " + component.getText());
+                //System.out.println("Component part: " + component.getText());
             }
             String jsonMessage = ComponentParser.buildJSONString(components);
-            System.out.println("JSON Message: " + jsonMessage);
+            //System.out.println("JSON Message: " + jsonMessage);
         }
         /*
         else if (event.getPacketType() == PacketType.Play.Server.CHUNK_DATA) {
@@ -174,11 +174,11 @@ public class InternalPacketListener implements PacketListener {
 
                     UUID uuid = player != null ? player.getUniqueId() : new UUID(0L, 0L);
                     WrapperPlayServerChatMessage cm = new WrapperPlayServerChatMessage(components, WrapperPlayServerChatMessage.ChatPosition.CHAT, uuid);
-                    PacketEvents.getAPI().getPlayerManager().sendPacket(event.getChannel(), cm);
+                    //PacketEvents.getAPI().getPlayerManager().sendPacket(event.getChannel(), cm);
 
 
                     int id = ItemTypes.DIAMOND_SWORD.getId();
-                    player.sendMessage("sword id: " + id);
+                    //player.sendMessage("sword id: " + id);
                     ItemStack item = ItemStack.builder().type(ItemTypes.DIAMOND_BLOCK)
                             .amount(61).build();
 
@@ -190,7 +190,6 @@ public class InternalPacketListener implements PacketListener {
                         //player.sendMessage("Yes set slot!");
                     }
                 }
-                //TODO Test update checker
                 break;
         }
     }
