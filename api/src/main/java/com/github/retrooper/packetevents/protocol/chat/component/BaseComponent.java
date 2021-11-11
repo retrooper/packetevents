@@ -145,13 +145,26 @@ public class BaseComponent {
         if (hoverEvent != null) {
             String action = (String) hoverEvent.get("action");
             //Parse value as JSON array or TODO : JSON object, String or primitive
-            JSONArray s = (JSONArray) hoverEvent.get("value");
+            Object jsonHoverEventValue = hoverEvent.get("value");
             List<String> values = new ArrayList<>();
-            for (Object o : s) {
-                JSONObject jsonObj = (JSONObject) o;
-                values.add((jsonObj.toJSONString()));
+            if (jsonHoverEventValue instanceof JSONArray) {
+                for (Object o : (JSONArray)jsonHoverEventValue) {
+                    JSONObject jsonObj = (JSONObject) o;
+                    values.add((jsonObj.toJSONString()));
+                }
             }
-            this.hoverEvent = new HoverEvent(HoverType.getByName(action), values);
+            else if (jsonHoverEventValue instanceof String) {
+                values.add((String) jsonHoverEventValue);
+            }
+            else if (jsonHoverEventValue instanceof JSONObject) {
+                values.add(((JSONObject) jsonHoverEventValue).toJSONString());
+            }
+            if (!values.isEmpty()) {
+                this.hoverEvent = new HoverEvent(HoverType.getByName(action), values);
+            }
+            else {
+                this.hoverEvent = new HoverEvent(HoverType.EMPTY);
+            }
         } else {
             this.hoverEvent = new HoverEvent(HoverType.EMPTY);
         }
