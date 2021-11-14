@@ -26,6 +26,7 @@ public class ItemStack {
     private ItemType type;
     private int amount;
     private NBTCompound nbt;
+    private int legacyData;
 
     private ItemStack(ItemType type, int amount) {
         this.type = type;
@@ -37,6 +38,13 @@ public class ItemStack {
         this.type = type;
         this.amount = amount;
         this.nbt = nbt;
+    }
+
+    private ItemStack(ItemType type, int amount, NBTCompound nbt, int legacyData) {
+        this.type = type;
+        this.amount = amount;
+        this.nbt = nbt;
+        this.legacyData = legacyData;
     }
 
     public ItemType getType() {
@@ -63,6 +71,14 @@ public class ItemStack {
         this.nbt = nbt;
     }
 
+    public int getLegacyData() {
+        return legacyData;
+    }
+
+    public void setLegacyData(int legacyData) {
+        this.legacyData = legacyData;
+    }
+
     @Override
     public boolean equals(Object obj) {
         if (this == obj)
@@ -71,7 +87,8 @@ public class ItemStack {
             ItemStack itemStack = (ItemStack) obj;
             return type == itemStack.type
                     && amount == itemStack.amount
-                    && nbt.equals(itemStack.nbt);
+                    && nbt.equals(itemStack.nbt)
+                    && legacyData == itemStack.legacyData;
         }
         return false;
     }
@@ -88,6 +105,7 @@ public class ItemStack {
         private ItemType type;
         private int amount;
         private NBTCompound nbt = new NBTCompound();
+        private int legacyData;
 
         public Builder type(ItemType type) {
             this.type = type;
@@ -104,8 +122,13 @@ public class ItemStack {
             return this;
         }
 
+        public Builder legacyData(int legacyData) {
+            this.legacyData = legacyData;
+            return this;
+        }
+
         public ItemStack build() {
-            return new ItemStack(type, amount, nbt);
+            return new ItemStack(type, amount, nbt, legacyData);
         }
 
     }

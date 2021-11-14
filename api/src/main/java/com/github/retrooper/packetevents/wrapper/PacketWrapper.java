@@ -210,32 +210,51 @@ public class PacketWrapper<T extends PacketWrapper> {
 
     @NotNull
     public ItemStack readItemStack() {
-        if (!readBoolean()) {
-            return ItemStack.NULL;
+        boolean v1_13_2 = serverVersion.isNewerThanOrEquals(ServerVersion.v_1_13_2);
+        if (v1_13_2) {
+            if (!readBoolean()) {
+                return ItemStack.NULL;
+            }
         }
-        //TODO Get cross-version compatibility
-        int typeID = readShort();
+        int typeID = v1_13_2 ? readVarInt() : readShort();
         if (typeID < 0) {
             return ItemStack.NULL;
         }
         ItemType type = ItemTypes.getById(typeID);
         int amount = readByte();
         NBTCompound nbt = readNBT();
+        int legacyData = v1_13_2 ? 0 : readShort();
         return ItemStack.builder()
                 .type(type)
                 .amount(amount)
-                .nbt(nbt).build();
+                .nbt(nbt)
+                .legacyData(legacyData)
+                .build();
     }
 
     public void writeItemStack(@NotNull ItemStack itemStack) {
-        if (!itemStack.equals(ItemStack.NULL)) {
-            //TODO Get cross-version compatibility
-            writeBoolean(true);
-            writeShort(itemStack.getType().getId());
-            writeByte(itemStack.getAmount());
-            writeNBT(itemStack.getNBT());
-        } else {
-            writeBoolean(false);
+        boolean v1_13_2 = serverVersion.isNewerThanOrEquals(ServerVersion.v_1_13_2);
+        if (v1_13_2) {
+            if (itemStack.equals(ItemStack.NULL)) {
+                writeBoolean(false);
+                return;
+            } else {
+                writeBoolean(true);
+            }
+        }
+        int typeID = itemStack.getType().getId();
+        if (typeID >= 0) {
+            if (v1_13_2) {
+                writeVarInt(typeID);
+            }
+            else {
+                writeShort(typeID);
+            }
+        }
+        writeByte(itemStack.getAmount());
+        writeNBT(itemStack.getNBT());
+        if (!v1_13_2) {
+            writeShort(itemStack.getLegacyData());
         }
     }
 

@@ -174,20 +174,20 @@ public class InternalPacketListener implements PacketListener {
 
                     UUID uuid = player != null ? player.getUniqueId() : new UUID(0L, 0L);
                     WrapperPlayServerChatMessage cm = new WrapperPlayServerChatMessage(components, WrapperPlayServerChatMessage.ChatPosition.CHAT, uuid);
-                    //PacketEvents.getAPI().getPlayerManager().sendPacket(event.getChannel(), cm);
+                    PacketEvents.getAPI().getPlayerManager().sendPacket(event.getChannel(), cm);
 
 
-                    int id = ItemTypes.DIAMOND_SWORD.getId();
-                    //player.sendMessage("sword id: " + id);
+                    int id = ItemTypes.DIAMOND_BLOCK.getId();
+                    player.sendMessage("diamond block id: " + id);
                     ItemStack item = ItemStack.builder().type(ItemTypes.DIAMOND_BLOCK)
                             .amount(61).build();
 
                     WrapperPlayServerSetSlot setSlot =
                             new WrapperPlayServerSetSlot(0, 4, 3, item);
 
-                    //PacketEvents.getAPI().getPlayerManager().sendPacket(event.getChannel(), setSlot);
+                    PacketEvents.getAPI().getPlayerManager().sendPacket(event.getChannel(), setSlot);
                     if (player != null) {
-                        //player.sendMessage("Yes set slot!");
+                        player.sendMessage("Yes set slot!");
                     }
                 }
                 break;
