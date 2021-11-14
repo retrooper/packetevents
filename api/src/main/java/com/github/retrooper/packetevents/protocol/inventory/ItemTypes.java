@@ -281,9 +281,9 @@ public class ItemTypes {
     public static final ItemType SPRUCE_FENCE = define(64, "spruce_fence");
     public static final ItemType COAL_BLOCK = define(64, "coal_block");
     public static final ItemType STRIPPED_CRIMSON_HYPHAE = define(64, "stripped_crimson_hyphae");
-    public static final ItemType WOODEN_PICKAXE = define(64, "wooden_pickaxe");
+    public static final ItemType WOODEN_PICKAXE = define(1, "wooden_pickaxe");
     public static final ItemType BIRCH_LEAVES = define(64, "birch_leaves");
-    public static final ItemType DIAMOND_PICKAXE = define(64, "diamond_pickaxe");
+    public static final ItemType DIAMOND_PICKAXE = define(1, "diamond_pickaxe");
     public static final ItemType FLOWER_POT = define(64, "flower_pot");
     public static final ItemType ACACIA_BUTTON = define(64, "acacia_button");
     public static final ItemType STRIPPED_DARK_OAK_WOOD = define(64, "stripped_dark_oak_wood");
@@ -734,7 +734,7 @@ public class ItemTypes {
     public static final ItemType END_ROD = define(64, "end_rod");
     public static final ItemType DEEPSLATE_COAL_ORE = define(64, "deepslate_coal_ore");
     public static final ItemType PHANTOM_SPAWN_EGG = define(64, "phantom_spawn_egg");
-    public static final ItemType STONE_PICKAXE = define(64, "stone_pickaxe");
+    public static final ItemType STONE_PICKAXE = define(1, "stone_pickaxe");
     public static final ItemType IRON_HELMET = define(1, "iron_helmet");
     public static final ItemType GUARDIAN_SPAWN_EGG = define(64, "guardian_spawn_egg");
     public static final ItemType PINK_STAINED_GLASS = define(64, "pink_stained_glass");
@@ -871,7 +871,7 @@ public class ItemTypes {
     public static final ItemType MAGENTA_STAINED_GLASS = define(64, "magenta_stained_glass");
     public static final ItemType LAPIS_LAZULI = define(64, "lapis_lazuli");
     public static final ItemType MUSIC_DISC_WAIT = define(64, "music_disc_wait");
-    public static final ItemType NETHERITE_PICKAXE = define(64, "netherite_pickaxe");
+    public static final ItemType NETHERITE_PICKAXE = define(1, "netherite_pickaxe");
     public static final ItemType BUNDLE = define(64, "bundle");
     public static final ItemType MOOSHROOM_SPAWN_EGG = define(64, "mooshroom_spawn_egg");
     public static final ItemType MAP = define(64, "map");
@@ -944,7 +944,7 @@ public class ItemTypes {
     public static final ItemType SMOOTH_QUARTZ_SLAB = define(64, "smooth_quartz_slab");
     public static final ItemType CYAN_BED = define(1, "cyan_bed");
     public static final ItemType STRIPPED_ACACIA_LOG = define(64, "stripped_acacia_log");
-    public static final ItemType GOLDEN_PICKAXE = define(64, "golden_pickaxe");
+    public static final ItemType GOLDEN_PICKAXE = define(1, "golden_pickaxe");
     public static final ItemType SWEET_BERRIES = define(64, "sweet_berries");
     public static final ItemType BOW = define(64, "bow");
     public static final ItemType CRIMSON_ROOTS = define(64, "crimson_roots");
@@ -1219,7 +1219,7 @@ public class ItemTypes {
     public static final ItemType MAGMA_CUBE_SPAWN_EGG = define(64, "magma_cube_spawn_egg");
     public static final ItemType DEEPSLATE_TILE_WALL = define(64, "deepslate_tile_wall");
     public static final ItemType JUNGLE_LOG = define(64, "jungle_log");
-    public static final ItemType IRON_PICKAXE = define(64, "iron_pickaxe");
+    public static final ItemType IRON_PICKAXE = define(1, "iron_pickaxe");
     public static final ItemType DARK_OAK_SLAB = define(64, "dark_oak_slab");
     public static final ItemType NETHERRACK = define(64, "netherrack");
     public static final ItemType POLISHED_DEEPSLATE_WALL = define(64, "polished_deepslate_wall");
