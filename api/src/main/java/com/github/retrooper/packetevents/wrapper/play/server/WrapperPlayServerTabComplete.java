@@ -64,14 +64,14 @@ public class WrapperPlayServerTabComplete extends PacketWrapper<WrapperPlayServe
 
     @Override
     public void readData() {
-        if (serverVersion.isNewerThanOrEquals(ServerVersion.v_1_13)) {
+        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_13)) {
             transactionID = Optional.of(readVarInt());
             int begin = readVarInt();
             int len = readVarInt();
             int matchLength = readVarInt();
             commandRange = Optional.of(new CommandRange(begin, begin + len));
             commandMatches = new ArrayList<>(matchLength);
-            int maxMessageLength = serverVersion.isNewerThanOrEquals(ServerVersion.v_1_13) ? MODERN_MESSAGE_LENGTH : LEGACY_MESSAGE_LENGTH;
+            int maxMessageLength = serverVersion.isNewerThanOrEquals(ServerVersion.V_1_13) ? MODERN_MESSAGE_LENGTH : LEGACY_MESSAGE_LENGTH;
             for (int i = 0; i < matchLength; i++) {
                 String text = readString();
                 List<TextComponent> tooltip;
@@ -106,13 +106,13 @@ public class WrapperPlayServerTabComplete extends PacketWrapper<WrapperPlayServe
 
     @Override
     public void writeData() {
-        if (serverVersion.isNewerThanOrEquals(ServerVersion.v_1_13)) {
+        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_13)) {
             writeVarInt(transactionID.orElse(-1));
             CommandRange commandRange = this.commandRange.get();
             writeVarInt(commandRange.getBegin());
             writeVarInt(commandRange.getLength());
             writeVarInt(commandMatches.size());
-            int maxMessageLength = serverVersion.isNewerThanOrEquals(ServerVersion.v_1_13) ? MODERN_MESSAGE_LENGTH : LEGACY_MESSAGE_LENGTH;
+            int maxMessageLength = serverVersion.isNewerThanOrEquals(ServerVersion.V_1_13) ? MODERN_MESSAGE_LENGTH : LEGACY_MESSAGE_LENGTH;
             for (CommandMatch match : commandMatches) {
                 writeString(match.getText());
                 boolean hasTooltip = match.getTooltip().isPresent();

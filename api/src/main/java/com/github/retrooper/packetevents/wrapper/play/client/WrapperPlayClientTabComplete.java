@@ -46,10 +46,10 @@ public class WrapperPlayClientTabComplete extends PacketWrapper<WrapperPlayClien
 
     @Override
     public void readData() {
-        boolean v1_13 = serverVersion.isNewerThanOrEquals(ServerVersion.v_1_13);
+        boolean v1_13 = serverVersion.isNewerThanOrEquals(ServerVersion.V_1_13);
         int textLength;
         if (v1_13) {
-            if (serverVersion.isNewerThanOrEquals(ServerVersion.v_1_13_1)) {
+            if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_13_1)) {
                 //1.13.1+ text length
                 textLength = 32500;
             } else {
@@ -64,7 +64,7 @@ public class WrapperPlayClientTabComplete extends PacketWrapper<WrapperPlayClien
             textLength = 32767;
             text = readString(textLength);
             transactionID = Optional.empty();
-            if (serverVersion.isNewerThanOrEquals(ServerVersion.v_1_8) || clientVersion.isNewerThanOrEquals(ClientVersion.v_1_8)) {
+            if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_8) || clientVersion.isNewerThanOrEquals(ClientVersion.V_1_8)) {
                 boolean hasPosition = readBoolean();
                 if (hasPosition) {
                     blockPosition = Optional.of(new Vector3i(readLong()));
@@ -88,10 +88,10 @@ public class WrapperPlayClientTabComplete extends PacketWrapper<WrapperPlayClien
 
     @Override
     public void writeData() {
-        boolean v1_13 = serverVersion.isNewerThanOrEquals(ServerVersion.v_1_13);
+        boolean v1_13 = serverVersion.isNewerThanOrEquals(ServerVersion.V_1_13);
         int textLength;
         if (v1_13) {
-            if (serverVersion.isNewerThanOrEquals(ServerVersion.v_1_13_1)) {
+            if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_13_1)) {
                 //1.13.1+ text length
                 textLength = 32500;
             } else {
@@ -104,7 +104,7 @@ public class WrapperPlayClientTabComplete extends PacketWrapper<WrapperPlayClien
         else {
             textLength = 32767;
             writeString(text, textLength);
-            if (serverVersion.isNewerThanOrEquals(ServerVersion.v_1_8) || clientVersion.isNewerThanOrEquals(ClientVersion.v_1_8)) {
+            if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_8) || clientVersion.isNewerThanOrEquals(ClientVersion.V_1_8)) {
                 boolean hasPosition = blockPosition.isPresent();
                 writeBoolean(hasPosition);
                 if (hasPosition) {

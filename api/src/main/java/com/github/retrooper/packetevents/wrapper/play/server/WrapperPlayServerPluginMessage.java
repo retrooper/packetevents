@@ -45,7 +45,7 @@ public class WrapperPlayServerPluginMessage extends PacketWrapper<WrapperPlaySer
     @Override
     public void readData() {
         this.channelName = readString();
-        int dataLength = serverVersion.isNewerThanOrEquals(ServerVersion.v_1_8) ? byteBuf.readableBytes() : readUnsignedShort();
+        int dataLength = serverVersion.isNewerThanOrEquals(ServerVersion.V_1_8) ? byteBuf.readableBytes() : readUnsignedShort();
         this.data = readByteArray(dataLength);
     }
 
@@ -58,7 +58,7 @@ public class WrapperPlayServerPluginMessage extends PacketWrapper<WrapperPlaySer
     @Override
     public void writeData() {
         writeString(channelName);
-        if (serverVersion == ServerVersion.v_1_7_10) {
+        if (serverVersion == ServerVersion.V_1_7_10) {
             writeShort(data.length);
         }
         writeByteArray(data);

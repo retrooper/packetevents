@@ -34,7 +34,7 @@ import java.util.zip.GZIPOutputStream;
 
 public class NBTCodec {
     public static NBTCompound readNBT(ByteBufAbstract byteBuf, ServerVersion serverVersion) {
-        if (serverVersion.isNewerThanOrEquals(ServerVersion.v_1_8)) {
+        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_8)) {
             try {
                 return (NBTCompound) DefaultNBTSerializer.INSTANCE.deserializeTag(new ByteBufAbstractInputStream(byteBuf));
             } catch (IOException e) {
@@ -59,7 +59,7 @@ public class NBTCodec {
     }
 
     public static void writeNBT(ByteBufAbstract byteBuf, ServerVersion serverVersion, NBTCompound tag) {
-        if (serverVersion.isNewerThanOrEquals(ServerVersion.v_1_8)) {
+        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_8)) {
             try (ByteBufAbstractOutputStream outputStream = new ByteBufAbstractOutputStream(byteBuf)) {
                 if (tag != null) {
                     DefaultNBTSerializer.INSTANCE.serializeTag(outputStream, tag);

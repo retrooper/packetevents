@@ -28,7 +28,7 @@ import com.github.retrooper.packetevents.manager.server.ServerVersion;
  * @since 1.5.8
  */
 public class PacketEventsSettings {
-    private ServerVersion fallbackServerVersion = ServerVersion.v_1_7_10;
+    private ServerVersion fallbackServerVersion = ServerVersion.V_1_7_10;
 
     /**
      * This boolean stores if PacketEvents should check for updates,

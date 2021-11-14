@@ -51,7 +51,7 @@ public class WrapperLoginServerLoginSuccess extends PacketWrapper<WrapperLoginSe
 
     @Override
     public void readData() {
-        if (serverVersion.isNewerThanOrEquals(ServerVersion.v_1_16)) {
+        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_16)) {
             int[] data = new int[4];
             for (int i = 0; i < 4; i++) {
                 data[i] = readInt();
@@ -71,7 +71,7 @@ public class WrapperLoginServerLoginSuccess extends PacketWrapper<WrapperLoginSe
 
     @Override
     public void writeData() {
-        if (serverVersion.isNewerThanOrEquals(ServerVersion.v_1_16)) {
+        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_16)) {
             int[] data = serializeUUID(uuid);
             for (int i = 0; i < 4; i++) {
                 writeInt(data[i]);

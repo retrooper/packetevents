@@ -57,7 +57,7 @@ public class WrapperPlayServerSpawnPlayer extends PacketWrapper<WrapperPlayServe
     public void readData() {
         entityID = readVarInt();
         uuid = readUUID();
-        boolean v1_9 = serverVersion.isNewerThanOrEquals(ServerVersion.v_1_9);
+        boolean v1_9 = serverVersion.isNewerThanOrEquals(ServerVersion.V_1_9);
         if (v1_9) {
             position = new Vector3d(readDouble(), readDouble(), readDouble());
         }
@@ -69,7 +69,7 @@ public class WrapperPlayServerSpawnPlayer extends PacketWrapper<WrapperPlayServe
         if (!v1_9) {
             itemID = readByte();
         }
-        if (serverVersion.isOlderThan(ServerVersion.v_1_15)) {
+        if (serverVersion.isOlderThan(ServerVersion.V_1_15)) {
             //TODO Read metadata
         }
     }
@@ -87,7 +87,7 @@ public class WrapperPlayServerSpawnPlayer extends PacketWrapper<WrapperPlayServe
     public void writeData() {
         writeVarInt(entityID);
         writeUUID(uuid);
-        boolean v1_9 = serverVersion.isNewerThanOrEquals(ServerVersion.v_1_9);
+        boolean v1_9 = serverVersion.isNewerThanOrEquals(ServerVersion.V_1_9);
         if (v1_9) {
             writeDouble(position.getX());
             writeDouble(position.getY());
@@ -103,7 +103,7 @@ public class WrapperPlayServerSpawnPlayer extends PacketWrapper<WrapperPlayServe
         if (!v1_9) {
             writeByte((byte) itemID);
         }
-        if (serverVersion.isOlderThan(ServerVersion.v_1_15)) {
+        if (serverVersion.isOlderThan(ServerVersion.V_1_15)) {
             //TODO Write metadata
         }
     }

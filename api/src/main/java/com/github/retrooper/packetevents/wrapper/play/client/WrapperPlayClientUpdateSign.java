@@ -43,7 +43,7 @@ public class WrapperPlayClientUpdateSign extends PacketWrapper<WrapperPlayClient
 
     @Override
     public void readData() {
-        if (serverVersion.isNewerThanOrEquals(ServerVersion.v_1_8)) {
+        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_8)) {
             this.blockPosition = new Vector3i(readLong());
         } else {
             int x = readInt();
@@ -64,7 +64,7 @@ public class WrapperPlayClientUpdateSign extends PacketWrapper<WrapperPlayClient
 
     @Override
     public void writeData() {
-        if (serverVersion.isNewerThanOrEquals(ServerVersion.v_1_8)) {
+        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_8)) {
             long positionVector = blockPosition.getSerializedPosition();
             writeLong(positionVector);
         } else {

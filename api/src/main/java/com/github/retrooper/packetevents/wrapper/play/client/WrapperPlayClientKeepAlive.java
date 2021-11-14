@@ -42,9 +42,9 @@ public class WrapperPlayClientKeepAlive extends PacketWrapper<WrapperPlayClientK
 
     @Override
     public void readData() {
-        if (serverVersion.isNewerThanOrEquals(ServerVersion.v_1_12)) {
+        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_12)) {
             this.id = readLong();
-        } else if (serverVersion.isNewerThanOrEquals(ServerVersion.v_1_8)) {
+        } else if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_8)) {
             this.id = readVarInt();
         } else {
             this.id = readInt();
@@ -58,9 +58,9 @@ public class WrapperPlayClientKeepAlive extends PacketWrapper<WrapperPlayClientK
 
     @Override
     public void writeData() {
-        if (serverVersion.isNewerThanOrEquals(ServerVersion.v_1_12)) {
+        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_12)) {
             writeLong(id);
-        } else if (serverVersion.isNewerThanOrEquals(ServerVersion.v_1_8)) {
+        } else if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_8)) {
             writeVarInt((int) id);
         } else {
             writeInt((int) id);

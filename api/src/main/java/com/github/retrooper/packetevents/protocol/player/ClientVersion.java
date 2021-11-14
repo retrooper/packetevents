@@ -37,58 +37,58 @@ import java.util.Map;
  * @since 1.6.9
  */
 public enum ClientVersion {
-    v_1_7_10(5),
+    V_1_7_10(5),
 
-    v_1_8(47),
-    v_1_9(107),
+    V_1_8(47),
+    V_1_9(107),
 
-    v_1_9_1(108),
-    v_1_9_2(109),
+    V_1_9_1(108),
+    V_1_9_2(109),
     /**
      * 1.9.3 or 1.9.4 as they have the same protocol version.
      */
-    v_1_9_3(110),
+    V_1_9_3(110),
 
-    v_1_10(210),
-    v_1_11(315),
+    V_1_10(210),
+    V_1_11(315),
     /**
      * 1.11.1 or 1.11.2 as they have the same protocol version.
      */
-    v_1_11_1(316),
+    V_1_11_1(316),
 
-    v_1_12(335),
-    v_1_12_1(338),
-    v_1_12_2(340),
+    V_1_12(335),
+    V_1_12_1(338),
+    V_1_12_2(340),
 
-    v_1_13(393),
-    v_1_13_1(401),
-    v_1_13_2(404),
+    V_1_13(393),
+    V_1_13_1(401),
+    V_1_13_2(404),
 
-    v_1_14(477),
-    v_1_14_1(480),
-    v_1_14_2(485),
-    v_1_14_3(490),
-    v_1_14_4(498),
+    V_1_14(477),
+    V_1_14_1(480),
+    V_1_14_2(485),
+    V_1_14_3(490),
+    V_1_14_4(498),
 
-    v_1_15(573),
-    v_1_15_1(575),
-    v_1_15_2(578),
+    V_1_15(573),
+    V_1_15_1(575),
+    V_1_15_2(578),
 
-    v_1_16(735),
-    v_1_16_1(736),
-    v_1_16_2(751),
-    v_1_16_3(753),
+    V_1_16(735),
+    V_1_16_1(736),
+    V_1_16_2(751),
+    V_1_16_3(753),
     /**
      * 1.16.4 or 1.16.5 as they have the same protocol version.
      */
-    v_1_16_4(754),
+    V_1_16_4(754),
 
-    v_1_17(755),
+    V_1_17(755),
 
-    v_1_17_1(756),
+    V_1_17_1(756),
 
-    LOWER_THAN_SUPPORTED_VERSIONS(v_1_7_10.protocolVersion - 1),
-    HIGHER_THAN_SUPPORTED_VERSIONS(v_1_17_1.protocolVersion + 1),
+    LOWER_THAN_SUPPORTED_VERSIONS(V_1_7_10.protocolVersion - 1),
+    HIGHER_THAN_SUPPORTED_VERSIONS(V_1_17_1.protocolVersion + 1),
     /**
      * Pre releases just aren't supported, we would end up with so many enum constants.
      * This constant assures you they are on a pre-release.

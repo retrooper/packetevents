@@ -114,7 +114,7 @@ public class WrapperPlayServerEntityMetadata extends PacketWrapper<WrapperPlaySe
     @Override
     public void readData() {
         entityID = readInt();
-        if (serverVersion.isNewerThanOrEquals(ServerVersion.v_1_9)) {
+        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_9)) {
             watchableObjects = serializeWatchableObjectsModern();
         } else {
             watchableObjects = serializeWatchableObjectsLegacy();

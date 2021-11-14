@@ -55,15 +55,15 @@ public class WrapperPlayServerChunkData extends PacketWrapper<WrapperPlayServerC
     }
 
     private long[] readBitSetLongs() {
-        if (serverVersion.isNewerThanOrEquals(ServerVersion.v_1_17)) {
+        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_17)) {
             int bitMaskLength = readVarInt();
             //Read primary bit mask
             return readLongArray(bitMaskLength);
-        } else if (serverVersion.isNewerThanOrEquals(ServerVersion.v_1_9)) {
+        } else if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_9)) {
             //Read primary bit mask
             return new long[]{readVarInt()};
         } else {
-            if (serverVersion == ServerVersion.v_1_7_10) {
+            if (serverVersion == ServerVersion.V_1_7_10) {
                 //Read primary bit mask and add bit mask
                 return new long[]{readUnsignedShort(), readUnsignedShort()};
             } else {
@@ -78,16 +78,16 @@ public class WrapperPlayServerChunkData extends PacketWrapper<WrapperPlayServerC
     }
 
     private void writeChunkMask(BitSet chunkMask) {
-        if (serverVersion.isNewerThanOrEquals(ServerVersion.v_1_17)) {
+        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_17)) {
             //Write primary bit mask
             long[] longArray = chunkMask.toLongArray();
             writeVarInt(longArray.length);
             writeLongArray(longArray);
-        } else if (serverVersion.isNewerThanOrEquals(ServerVersion.v_1_9)) {
+        } else if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_9)) {
             //Write primary bit mask
             writeVarInt((int) chunkMask.toLongArray()[0]);
         } else {
-            if (serverVersion == ServerVersion.v_1_7_10) {
+            if (serverVersion == ServerVersion.V_1_7_10) {
                 //Write primary bit mask, add bit mask
                 long[] longArray = chunkMask.toLongArray();
                 writeShort((int) longArray[0]);
@@ -105,9 +105,9 @@ public class WrapperPlayServerChunkData extends PacketWrapper<WrapperPlayServerC
         int chunkX = readInt();
         int chunkZ = readInt();
 
-        boolean v1_17 = serverVersion.isNewerThanOrEquals(ServerVersion.v_1_17);
-        boolean v1_16_2 = serverVersion.isNewerThanOrEquals(ServerVersion.v_1_16_2);
-        boolean v1_13_2 = serverVersion.isNewerThanOrEquals(ServerVersion.v_1_13_2);
+        boolean v1_17 = serverVersion.isNewerThanOrEquals(ServerVersion.V_1_17);
+        boolean v1_16_2 = serverVersion.isNewerThanOrEquals(ServerVersion.V_1_16_2);
+        boolean v1_13_2 = serverVersion.isNewerThanOrEquals(ServerVersion.V_1_13_2);
 
         boolean fullChunk = readBoolean();
         boolean hasBiomeData;
@@ -116,7 +116,7 @@ public class WrapperPlayServerChunkData extends PacketWrapper<WrapperPlayServerC
             hasBiomeData = true;
         } else if (v1_13_2) {
             hasBiomeData = fullChunk;
-        } else if (serverVersion.isOlderThanOrEquals(ServerVersion.v_1_11_2) && serverVersion.isNewerThanOrEquals(ServerVersion.v_1_9)) {
+        } else if (serverVersion.isOlderThanOrEquals(ServerVersion.V_1_11_2) && serverVersion.isNewerThanOrEquals(ServerVersion.V_1_9)) {
             hasBiomeData = fullChunk;
         } else {
             //Full chunk boolean exists, but the biome data is not present in the packet
@@ -124,20 +124,20 @@ public class WrapperPlayServerChunkData extends PacketWrapper<WrapperPlayServerC
         }
 
 
-        if (serverVersion == ServerVersion.v_1_16 ||
-                serverVersion == ServerVersion.v_1_16_1) {
+        if (serverVersion == ServerVersion.V_1_16 ||
+                serverVersion == ServerVersion.V_1_16_1) {
             ignoreOldData = readBoolean();
         }
 
         BitSet chunkMask = readChunkMask();
-        boolean hasHeightMaps = serverVersion.isNewerThanOrEquals(ServerVersion.v_1_14);
+        boolean hasHeightMaps = serverVersion.isNewerThanOrEquals(ServerVersion.V_1_14);
         NBTCompound heightMaps = null;
         if (hasHeightMaps) {
             heightMaps = readNBT();
         }
 
         int[] biomeData = new int[0];
-        if (hasBiomeData && v1_13_2 && serverVersion.isNewerThanOrEquals(ServerVersion.v_1_15)) {
+        if (hasBiomeData && v1_13_2 && serverVersion.isNewerThanOrEquals(ServerVersion.V_1_15)) {
             int biomesLength;
             if (v1_16_2) {
                 biomesLength = readVarInt();
@@ -167,7 +167,7 @@ public class WrapperPlayServerChunkData extends PacketWrapper<WrapperPlayServerC
             }
         }
 
-        int tileEntityCount = serverVersion.isOlderThan(ServerVersion.v_1_9) ? 0 : readVarInt();
+        int tileEntityCount = serverVersion.isOlderThan(ServerVersion.V_1_9) ? 0 : readVarInt();
         NBTCompound[] tileEntities = new NBTCompound[tileEntityCount];
         for (int i = 0; i < tileEntities.length; i++) {
             tileEntities[i] = readNBT();
@@ -199,30 +199,30 @@ public class WrapperPlayServerChunkData extends PacketWrapper<WrapperPlayServerC
         writeInt(column.getX());
         writeInt(column.getZ());
 
-        boolean v1_17 = serverVersion.isNewerThanOrEquals(ServerVersion.v_1_17);
-        boolean v1_13_2 = serverVersion.isNewerThanOrEquals(ServerVersion.v_1_13_2);
+        boolean v1_17 = serverVersion.isNewerThanOrEquals(ServerVersion.V_1_17);
+        boolean v1_13_2 = serverVersion.isNewerThanOrEquals(ServerVersion.V_1_13_2);
 
         writeBoolean(column.isFullChunk());
         boolean hasWrittenBiomeData = false;
 
 
-        if (serverVersion == ServerVersion.v_1_16 ||
-                serverVersion == ServerVersion.v_1_16_1) {
+        if (serverVersion == ServerVersion.V_1_16 ||
+                serverVersion == ServerVersion.V_1_16_1) {
             //Ignore old data = true, use existing lighting
             //TODO See what we can do with this field
             writeBoolean(true);
         }
 
-        boolean hasHeightMaps = serverVersion.isNewerThanOrEquals(ServerVersion.v_1_14);
+        boolean hasHeightMaps = serverVersion.isNewerThanOrEquals(ServerVersion.V_1_14);
         if (hasHeightMaps) {
             writeNBT(column.getHeightMaps());
         }
 
-        if (column.hasBiomeData() && v1_13_2 && serverVersion.isNewerThanOrEquals(ServerVersion.v_1_15)) {
+        if (column.hasBiomeData() && v1_13_2 && serverVersion.isNewerThanOrEquals(ServerVersion.V_1_15)) {
 
             int[] biomeData = column.getBiomeData();
             int biomesLength = biomeData.length;
-            if (serverVersion.isNewerThanOrEquals(ServerVersion.v_1_16_2)) {
+            if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_16_2)) {
                 writeVarInt(biomesLength);
             }
             for (int index = 0; index < column.getBiomeData().length; index++) {
@@ -264,7 +264,7 @@ public class WrapperPlayServerChunkData extends PacketWrapper<WrapperPlayServerC
             writeByteArray(biomeDataBytes);
         }
 
-        if (serverVersion.isNewerThanOrEquals(ServerVersion.v_1_9)) {
+        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_9)) {
             NBTCompound[] tileEntities = column.getTileEntities();
             writeVarInt(tileEntities.length);
             for (int i = 0; i < tileEntities.length; i++) {
@@ -282,13 +282,13 @@ public class WrapperPlayServerChunkData extends PacketWrapper<WrapperPlayServerC
     }
 
     private ChunkReader getChunkReader() {
-        if (serverVersion.isNewerThanOrEquals(ServerVersion.v_1_16)) {
+        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_16)) {
             return chunkReader_v1_16;
         }
-        else if (serverVersion.isNewerThanOrEquals(ServerVersion.v_1_9)) {
+        else if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_9)) {
             return chunkReader_v1_9;
         }
-        else if (serverVersion.isNewerThanOrEquals(ServerVersion.v_1_8)) {
+        else if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_8)) {
             return chunkReader_v1_8;
         }
         else {

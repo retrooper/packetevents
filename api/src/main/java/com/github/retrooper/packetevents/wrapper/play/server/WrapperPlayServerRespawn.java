@@ -67,10 +67,10 @@ public class WrapperPlayServerRespawn extends PacketWrapper<WrapperPlayServerRes
 
     @Override
     public void readData() {
-        boolean v1_14 = serverVersion.isNewerThanOrEquals(ServerVersion.v_1_14);
-        boolean v1_15_0 = v1_14 && serverVersion.isNewerThanOrEquals(ServerVersion.v_1_15);
-        boolean v1_16_0 = v1_15_0 && serverVersion.isNewerThanOrEquals(ServerVersion.v_1_16);
-        boolean v1_16_2 = v1_16_0 && serverVersion.isNewerThanOrEquals(ServerVersion.v_1_16_2);
+        boolean v1_14 = serverVersion.isNewerThanOrEquals(ServerVersion.V_1_14);
+        boolean v1_15_0 = v1_14 && serverVersion.isNewerThanOrEquals(ServerVersion.V_1_15);
+        boolean v1_16_0 = v1_15_0 && serverVersion.isNewerThanOrEquals(ServerVersion.V_1_16);
+        boolean v1_16_2 = v1_16_0 && serverVersion.isNewerThanOrEquals(ServerVersion.V_1_16_2);
         if (v1_16_2) {
             NBTCompound dimensionAttributes = readNBT();
             DimensionType dimensionType = DimensionType.getByName(dimensionAttributes.getStringTagValueOrDefault("effects", ""));
@@ -151,10 +151,10 @@ public class WrapperPlayServerRespawn extends PacketWrapper<WrapperPlayServerRes
 
     @Override
     public void writeData() {
-        boolean v1_14 = serverVersion.isNewerThanOrEquals(ServerVersion.v_1_14);
-        boolean v1_15_0 = v1_14 && serverVersion.isNewerThanOrEquals(ServerVersion.v_1_15);
-        boolean v1_16_0 = v1_15_0 && serverVersion.isNewerThanOrEquals(ServerVersion.v_1_16);
-        boolean v1_16_2 = v1_16_0 && serverVersion.isNewerThanOrEquals(ServerVersion.v_1_16_2);
+        boolean v1_14 = serverVersion.isNewerThanOrEquals(ServerVersion.V_1_14);
+        boolean v1_15_0 = v1_14 && serverVersion.isNewerThanOrEquals(ServerVersion.V_1_15);
+        boolean v1_16_0 = v1_15_0 && serverVersion.isNewerThanOrEquals(ServerVersion.V_1_16);
+        boolean v1_16_2 = v1_16_0 && serverVersion.isNewerThanOrEquals(ServerVersion.V_1_16_2);
         if (v1_16_2) {
             NBT tag = new NBTString(dimension.getType().getName());
             //TODO Fix orElse to generate a new nbt compound

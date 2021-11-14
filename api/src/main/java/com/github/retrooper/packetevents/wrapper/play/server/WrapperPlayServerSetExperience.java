@@ -42,7 +42,7 @@ public class WrapperPlayServerSetExperience extends PacketWrapper<WrapperPlaySer
     @Override
     public void readData() {
         experienceBar = readFloat();
-        if (serverVersion == ServerVersion.v_1_7_10) {
+        if (serverVersion == ServerVersion.V_1_7_10) {
             level = readShort();
             totalExperience = readShort();
         } else {
@@ -61,7 +61,7 @@ public class WrapperPlayServerSetExperience extends PacketWrapper<WrapperPlaySer
     @Override
     public void writeData() {
         writeFloat(experienceBar);
-        if (serverVersion == ServerVersion.v_1_7_10) {
+        if (serverVersion == ServerVersion.V_1_7_10) {
             writeShort(level);
             writeShort(totalExperience);
         } else {

@@ -39,7 +39,7 @@ public class WrapperPlayClientPosition extends WrapperPlayClientFlying<WrapperPl
     public void readData() {
         double x = readDouble();
         double y = readDouble();
-        if (serverVersion == ServerVersion.v_1_7_10) {
+        if (serverVersion == ServerVersion.V_1_7_10) {
             //Can be ignored, cause stance = (y + 1.62)
             double stance = readDouble();
         }
@@ -58,7 +58,7 @@ public class WrapperPlayClientPosition extends WrapperPlayClientFlying<WrapperPl
     public void writeData() {
         writeDouble(position.x);
         writeDouble(position.y);
-        if (serverVersion == ServerVersion.v_1_7_10) {
+        if (serverVersion == ServerVersion.V_1_7_10) {
             writeDouble(position.y + 1.62);
         }
         writeDouble(position.z);

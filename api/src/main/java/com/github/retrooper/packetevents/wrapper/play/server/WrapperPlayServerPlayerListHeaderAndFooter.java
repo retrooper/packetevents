@@ -53,7 +53,7 @@ public class WrapperPlayServerPlayerListHeaderAndFooter extends PacketWrapper<Wr
 
     @Override
     public void readData() {
-        int maxMessageLength = serverVersion.isNewerThanOrEquals(ServerVersion.v_1_13) ? MODERN_MESSAGE_LENGTH : LEGACY_MESSAGE_LENGTH;
+        int maxMessageLength = serverVersion.isNewerThanOrEquals(ServerVersion.V_1_13) ? MODERN_MESSAGE_LENGTH : LEGACY_MESSAGE_LENGTH;
         jsonHeader = readString(maxMessageLength);
         jsonFooter = readString(maxMessageLength);
         if (HANDLE_JSON) {
@@ -72,7 +72,7 @@ public class WrapperPlayServerPlayerListHeaderAndFooter extends PacketWrapper<Wr
 
     @Override
     public void writeData() {
-        int maxMessageLength = serverVersion.isNewerThanOrEquals(ServerVersion.v_1_13) ? MODERN_MESSAGE_LENGTH : LEGACY_MESSAGE_LENGTH;
+        int maxMessageLength = serverVersion.isNewerThanOrEquals(ServerVersion.V_1_13) ? MODERN_MESSAGE_LENGTH : LEGACY_MESSAGE_LENGTH;
         if (HANDLE_JSON) {
             jsonHeader = ComponentParser.buildJSONString(headerComponents);
             jsonFooter = ComponentParser.buildJSONString(footerComponents);

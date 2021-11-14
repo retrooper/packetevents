@@ -39,7 +39,7 @@ public class WrapperPlayClientClientStatus extends PacketWrapper<WrapperPlayClie
     @Override
     public void readData() {
         int index;
-        if (serverVersion.isNewerThanOrEquals(ServerVersion.v_1_8)) {
+        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_8)) {
             index = readVarInt();
         } else {
             index = readByte();
@@ -54,9 +54,9 @@ public class WrapperPlayClientClientStatus extends PacketWrapper<WrapperPlayClie
 
     @Override
     public void writeData() {
-        if (serverVersion.isNewerThanOrEquals(ServerVersion.v_1_8)) {
+        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_8)) {
             int index = action.ordinal();
-            if (serverVersion.isNewerThanOrEquals(ServerVersion.v_1_16)) {
+            if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_16)) {
                 if (index == 2) {
                     throw new IllegalStateException("The WrapperGameClientClientStatus.Action.OPEN_INVENTORY_ACTION enum constant is not supported on 1.16+ servers!");
                 }

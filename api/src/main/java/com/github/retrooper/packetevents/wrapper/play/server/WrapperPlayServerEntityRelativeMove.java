@@ -47,7 +47,7 @@ public class WrapperPlayServerEntityRelativeMove extends PacketWrapper<WrapperPl
     @Override
     public void readData() {
         entityID = readVarInt();
-        if (serverVersion.isNewerThanOrEquals(ServerVersion.v_1_9)) {
+        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_9)) {
             deltaX = readShort() / MODERN_DELTA_DIVISOR;
             deltaY = readShort() / MODERN_DELTA_DIVISOR;
             deltaZ = readShort() / MODERN_DELTA_DIVISOR;
@@ -72,7 +72,7 @@ public class WrapperPlayServerEntityRelativeMove extends PacketWrapper<WrapperPl
     @Override
     public void writeData() {
         writeVarInt(entityID);
-        if (serverVersion.isNewerThanOrEquals(ServerVersion.v_1_9)) {
+        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_9)) {
             writeShort((short) (deltaX * MODERN_DELTA_DIVISOR));
             writeShort((short) (deltaY * MODERN_DELTA_DIVISOR));
             writeShort((short) (deltaZ * MODERN_DELTA_DIVISOR));

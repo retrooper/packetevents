@@ -42,11 +42,11 @@ public class WrapperPlayServerDestroyEntities extends PacketWrapper<WrapperPlayS
 
     @Override
     public void readData() {
-        if (serverVersion == ServerVersion.v_1_17) {
+        if (serverVersion == ServerVersion.V_1_17) {
             entityIDs = new int[] {readVarInt()};
         }
         else {
-            if (serverVersion == ServerVersion.v_1_7_10) {
+            if (serverVersion == ServerVersion.V_1_7_10) {
                 int entityIDCount = readUnsignedByte();
                 entityIDs = new int[entityIDCount];
                 for (int i = 0; i < entityIDCount; i++) {
@@ -70,11 +70,11 @@ public class WrapperPlayServerDestroyEntities extends PacketWrapper<WrapperPlayS
 
     @Override
     public void writeData() {
-        if (serverVersion == ServerVersion.v_1_17) {
+        if (serverVersion == ServerVersion.V_1_17) {
             writeVarInt(entityIDs[0]);
         }
         else {
-            if (serverVersion == ServerVersion.v_1_7_10) {
+            if (serverVersion == ServerVersion.V_1_7_10) {
                 writeByte(entityIDs.length);
                 for (int entityID : entityIDs) {
                     writeInt(entityID);

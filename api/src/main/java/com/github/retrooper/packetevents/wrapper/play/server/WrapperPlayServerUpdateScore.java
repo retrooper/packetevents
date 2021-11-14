@@ -52,7 +52,7 @@ public class WrapperPlayServerUpdateScore extends PacketWrapper<WrapperPlayServe
 
     @Override
     public void readData() {
-        if (serverVersion == ServerVersion.v_1_7_10) {
+        if (serverVersion == ServerVersion.V_1_7_10) {
             entityName = readString(16);
             action = Action.VALUES[readByte()];
             if (action != Action.REMOVE_ITEM) {
@@ -84,7 +84,7 @@ public class WrapperPlayServerUpdateScore extends PacketWrapper<WrapperPlayServe
 
     @Override
     public void writeData() {
-        if (serverVersion == ServerVersion.v_1_7_10) {
+        if (serverVersion == ServerVersion.V_1_7_10) {
             writeString(entityName, 16);
             writeByte(action.ordinal());
             if (action != Action.REMOVE_ITEM) {

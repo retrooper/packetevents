@@ -92,13 +92,13 @@ public class WrapperPlayClientSettings extends PacketWrapper<WrapperPlayClientSe
 
     @Override
     public void readData() {
-        int localeLength = serverVersion.isNewerThanOrEquals(ServerVersion.v_1_12) ? 16 : 7;
+        int localeLength = serverVersion.isNewerThanOrEquals(ServerVersion.V_1_12) ? 16 : 7;
         locale = readString(localeLength);
         viewDistance = readByte();
-        int visibilityIndex = serverVersion.isNewerThanOrEquals(ServerVersion.v_1_9) ? readVarInt() : readByte();
+        int visibilityIndex = serverVersion.isNewerThanOrEquals(ServerVersion.V_1_9) ? readVarInt() : readByte();
         visibility = ChatVisibility.VALUES[visibilityIndex];
         chatColors = readBoolean();
-        if (serverVersion == ServerVersion.v_1_7_10) {
+        if (serverVersion == ServerVersion.V_1_7_10) {
             //Ignored
             ignoredDifficulty = readByte();
             //We use this for the skin sections
@@ -111,14 +111,14 @@ public class WrapperPlayClientSettings extends PacketWrapper<WrapperPlayClientSe
             visibleSkinSectionMask = readByte();
         }
 
-        if (serverVersion.isNewerThanOrEquals(ServerVersion.v_1_9)) {
+        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_9)) {
             hand = Hand.VALUES[readVarInt()];
         }
         else {
             hand = Hand.RIGHT;
         }
 
-        if (serverVersion.isNewerThanOrEquals(ServerVersion.v_1_17)) {
+        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_17)) {
             disableTextFiltering = readBoolean();
         }
         else {
@@ -139,17 +139,17 @@ public class WrapperPlayClientSettings extends PacketWrapper<WrapperPlayClientSe
 
     @Override
     public void writeData() {
-        int localeLength = serverVersion.isNewerThanOrEquals(ServerVersion.v_1_12) ? 16 : 7;
+        int localeLength = serverVersion.isNewerThanOrEquals(ServerVersion.V_1_12) ? 16 : 7;
         writeString(locale, localeLength);
         writeByte(viewDistance);
-        if (serverVersion.isNewerThanOrEquals(ServerVersion.v_1_9)) {
+        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_9)) {
             writeVarInt(visibility.ordinal());
         }
         else {
             writeByte(visibility.ordinal());
         }
         writeBoolean(chatColors);
-        if (serverVersion == ServerVersion.v_1_7_10) {
+        if (serverVersion == ServerVersion.V_1_7_10) {
             writeByte(ignoredDifficulty);
             //Show cape
             boolean showCape = SkinSection.isSectionPresent(visibleSkinSectionMask, SkinSection.CAPE);
@@ -159,11 +159,11 @@ public class WrapperPlayClientSettings extends PacketWrapper<WrapperPlayClientSe
             writeByte(visibleSkinSectionMask);
         }
 
-        if (serverVersion.isNewerThanOrEquals(ServerVersion.v_1_9)) {
+        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_9)) {
             writeVarInt(hand.ordinal());
         }
 
-        if (serverVersion.isNewerThanOrEquals(ServerVersion.v_1_17)) {
+        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_17)) {
             writeBoolean(disableTextFiltering);
         }
     }

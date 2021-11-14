@@ -60,13 +60,13 @@ public class WrapperPlayServerSpawnLivingEntity extends PacketWrapper<WrapperPla
     @Override
     public void readData() {
         this.entityID = readVarInt();
-        if (serverVersion.isOlderThan(ServerVersion.v_1_9)) {
+        if (serverVersion.isOlderThan(ServerVersion.V_1_9)) {
             this.entityUUID = Optional.empty();
             this.entityTypeID = readByte() & 255;
             this.position = new Vector3d(readInt() / POSITION_FACTOR, readInt() / POSITION_FACTOR, readInt() / POSITION_FACTOR);
         } else {
             this.entityUUID = Optional.of(readUUID());
-            if (serverVersion.isNewerThanOrEquals(ServerVersion.v_1_11)) {
+            if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_11)) {
                 this.entityTypeID = readVarInt();
             } else {
                 this.entityTypeID = readByte() & 255;
@@ -98,14 +98,14 @@ public class WrapperPlayServerSpawnLivingEntity extends PacketWrapper<WrapperPla
     @Override
     public void writeData() {
         writeVarInt(entityID);
-        if (serverVersion.isOlderThan(ServerVersion.v_1_9)) {
+        if (serverVersion.isOlderThan(ServerVersion.V_1_9)) {
             writeByte(entityTypeID & 255);
             writeInt(MathUtil.floor(position.x * POSITION_FACTOR));
             writeInt(MathUtil.floor(position.y * POSITION_FACTOR));
             writeInt(MathUtil.floor(position.z * POSITION_FACTOR));
         } else {
             writeUUID(entityUUID.orElse(new UUID(0L, 0L)));
-            if (serverVersion.isNewerThanOrEquals(ServerVersion.v_1_11)) {
+            if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_11)) {
                 writeVarInt(entityTypeID);
             } else {
                 writeByte(entityTypeID & 255);

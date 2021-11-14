@@ -66,7 +66,7 @@ public class WrapperPlayServerChatMessage extends PacketWrapper<WrapperPlayServe
 
     @Override
     public void readData() {
-        int maxMessageLength = serverVersion.isNewerThanOrEquals(ServerVersion.v_1_13) ? MODERN_MESSAGE_LENGTH : LEGACY_MESSAGE_LENGTH;
+        int maxMessageLength = serverVersion.isNewerThanOrEquals(ServerVersion.V_1_13) ? MODERN_MESSAGE_LENGTH : LEGACY_MESSAGE_LENGTH;
         this.jsonMessageRaw = readString(maxMessageLength);
 
         //Parse JSON message
@@ -75,7 +75,7 @@ public class WrapperPlayServerChatMessage extends PacketWrapper<WrapperPlayServe
         }
 
         //Is the server 1.8+ or is the client 1.8+? 1.7.10 servers support 1.8 clients, and send the chat position.
-        if (serverVersion.isNewerThanOrEquals(ServerVersion.v_1_8) || clientVersion.isNewerThanOrEquals(ClientVersion.v_1_8)) {
+        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_8) || clientVersion.isNewerThanOrEquals(ClientVersion.V_1_8)) {
             byte positionIndex = readByte();
             position = ChatPosition.VALUES[positionIndex];
         } else {
@@ -83,7 +83,7 @@ public class WrapperPlayServerChatMessage extends PacketWrapper<WrapperPlayServe
             position = ChatPosition.CHAT;
         }
 
-        if (serverVersion.isNewerThanOrEquals(ServerVersion.v_1_16)) {
+        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_16)) {
             this.senderUUID = readUUID();
         } else {
             this.senderUUID = new UUID(0L, 0L);
@@ -100,18 +100,18 @@ public class WrapperPlayServerChatMessage extends PacketWrapper<WrapperPlayServe
 
     @Override
     public void writeData() {
-        int maxMessageLength = serverVersion.isNewerThanOrEquals(ServerVersion.v_1_13) ? MODERN_MESSAGE_LENGTH : LEGACY_MESSAGE_LENGTH;
+        int maxMessageLength = serverVersion.isNewerThanOrEquals(ServerVersion.V_1_13) ? MODERN_MESSAGE_LENGTH : LEGACY_MESSAGE_LENGTH;
         if (HANDLE_JSON) {
             jsonMessageRaw = ComponentParser.buildJSONString(messageComponents);
         }
         writeString(jsonMessageRaw, maxMessageLength);
 
         //Is the server 1.8+ or is the client 1.8+? (1.7.10 servers support 1.8 clients, and send the chat position for 1.8 clients)
-        if (serverVersion.isNewerThanOrEquals(ServerVersion.v_1_8) || clientVersion.isNewerThanOrEquals(ClientVersion.v_1_8)) {
+        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_8) || clientVersion.isNewerThanOrEquals(ClientVersion.V_1_8)) {
             writeByte(position.ordinal());
         }
 
-        if (serverVersion.isNewerThanOrEquals(ServerVersion.v_1_16)) {
+        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_16)) {
             writeUUID(senderUUID);
         }
     }

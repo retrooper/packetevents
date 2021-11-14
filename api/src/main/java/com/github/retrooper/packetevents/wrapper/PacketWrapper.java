@@ -210,7 +210,7 @@ public class PacketWrapper<T extends PacketWrapper> {
 
     @NotNull
     public ItemStack readItemStack() {
-        boolean v1_13_2 = serverVersion.isNewerThanOrEquals(ServerVersion.v_1_13_2);
+        boolean v1_13_2 = serverVersion.isNewerThanOrEquals(ServerVersion.V_1_13_2);
         if (v1_13_2) {
             if (!readBoolean()) {
                 return ItemStack.NULL;
@@ -233,7 +233,7 @@ public class PacketWrapper<T extends PacketWrapper> {
     }
 
     public void writeItemStack(@NotNull ItemStack itemStack) {
-        boolean v1_13_2 = serverVersion.isNewerThanOrEquals(ServerVersion.v_1_13_2);
+        boolean v1_13_2 = serverVersion.isNewerThanOrEquals(ServerVersion.V_1_13_2);
         if (v1_13_2) {
             if (itemStack.equals(ItemStack.NULL)) {
                 writeBoolean(false);
@@ -246,8 +246,7 @@ public class PacketWrapper<T extends PacketWrapper> {
         if (typeID >= 0) {
             if (v1_13_2) {
                 writeVarInt(typeID);
-            }
-            else {
+            } else {
                 writeShort(typeID);
             }
         }

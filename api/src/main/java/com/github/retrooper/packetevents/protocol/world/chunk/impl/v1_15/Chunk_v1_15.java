@@ -61,7 +61,7 @@ public class Chunk_v1_15 implements BaseChunk {
         // 1.14 and 1.15 include block count in chunk data
         // In 1.13 we don't send that, so there is no need to keep track of it
         //TODO Confirm if 1.13.2 counts too
-        if (PacketEvents.getAPI().getServerManager().getVersion().isNewerThanOrEquals(ServerVersion.v_1_14)) {
+        if (PacketEvents.getAPI().getServerManager().getVersion().isNewerThanOrEquals(ServerVersion.V_1_14)) {
             blockCount = in.readShort();
         }
 
@@ -80,7 +80,7 @@ public class Chunk_v1_15 implements BaseChunk {
     public static void write(NetStreamOutput out, Chunk_v1_15 chunk) {
         // ViaVersion should handle not writing block count in 1.13, as vanilla doesn't include it
         // It would probably crash the client if we tried writing it
-        if (PacketEvents.getAPI().getServerManager().getVersion().isNewerThanOrEquals(ServerVersion.v_1_14)) {
+        if (PacketEvents.getAPI().getServerManager().getVersion().isNewerThanOrEquals(ServerVersion.V_1_14)) {
             out.writeShort(chunk.getBlockCount());
         }
 
@@ -151,7 +151,7 @@ public class Chunk_v1_15 implements BaseChunk {
     }
 
     public boolean isKnownEmpty() {
-        return blockCount == 0 && PacketEvents.getAPI().getServerManager().getVersion().isNewerThanOrEquals(ServerVersion.v_1_14);
+        return blockCount == 0 && PacketEvents.getAPI().getServerManager().getVersion().isNewerThanOrEquals(ServerVersion.V_1_14);
     }
 
     public int getBlockCount() {

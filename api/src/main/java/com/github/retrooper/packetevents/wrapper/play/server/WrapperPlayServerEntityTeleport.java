@@ -48,7 +48,7 @@ public class WrapperPlayServerEntityTeleport extends PacketWrapper<WrapperPlaySe
 
     @Override
     public void readData() {
-        if (serverVersion.isNewerThanOrEquals(ServerVersion.v_1_9)) {
+        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_9)) {
             entityID = readVarInt();
             position = new Vector3d(readDouble(), readDouble(), readDouble());
             yaw = readByte() / ROTATION_FACTOR;
@@ -59,7 +59,7 @@ public class WrapperPlayServerEntityTeleport extends PacketWrapper<WrapperPlaySe
             position = new Vector3d((readInt() / 32.0), (readInt() / 32.0), (readInt() / 32.0));
             yaw = readByte() / ROTATION_FACTOR;
             pitch = readByte() / ROTATION_FACTOR;
-            if (serverVersion.isNewerThanOrEquals(ServerVersion.v_1_8)) {
+            if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_8)) {
                 onGround = readBoolean();
             } else {
                 onGround = false;
@@ -78,7 +78,7 @@ public class WrapperPlayServerEntityTeleport extends PacketWrapper<WrapperPlaySe
 
     @Override
     public void writeData() {
-        if (serverVersion.isNewerThanOrEquals(ServerVersion.v_1_9)) {
+        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_9)) {
             writeVarInt(entityID);
             writeDouble(position.x);
             writeDouble(position.y);
@@ -93,7 +93,7 @@ public class WrapperPlayServerEntityTeleport extends PacketWrapper<WrapperPlaySe
             writeInt(MathUtil.floor(position.z * 32.0));
             writeByte((int) (yaw * ROTATION_FACTOR));
             writeByte((int) (pitch * ROTATION_FACTOR));
-            if (serverVersion.isNewerThanOrEquals(ServerVersion.v_1_8)) {
+            if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_8)) {
                 writeBoolean(onGround);
             }
         }

@@ -45,12 +45,12 @@ public class ServerManagerImpl implements ServerManager {
 
         ServerVersion fallbackVersion = PacketEvents.getAPI().getSettings().getFallbackServerVersion();
         if (fallbackVersion != null) {
-            if (fallbackVersion == ServerVersion.v_1_7_10) {
+            if (fallbackVersion == ServerVersion.V_1_7_10) {
                 try {
                     Class.forName("net.minecraft.util.io.netty.buffer.ByteBuf");
                 } catch (Exception ex) {
                     //We will assume its 1.8.8
-                    fallbackVersion = ServerVersion.v_1_8_8;
+                    fallbackVersion = ServerVersion.V_1_8_8;
                 }
             }
             Bukkit.getLogger().warning("[packetevents] Your server software is preventing us from checking the server version. We will assume the server version is " + fallbackVersion.name() + "...");

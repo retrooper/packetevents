@@ -37,8 +37,8 @@ public class ChunkReader_v1_9 implements ChunkReader {
     @Override
     public BaseChunk[] read(BitSet set, int chunkSize, byte[] data) {
         if (!CHECKED_VERSION) {
-            V_1_13_OR_NEWER = PacketEvents.getAPI().getServerManager().getVersion().isNewerThanOrEquals(ServerVersion.v_1_13);
-            OLDER_THAN_V_1_14 = PacketEvents.getAPI().getServerManager().getVersion().isOlderThan(ServerVersion.v_1_14);
+            V_1_13_OR_NEWER = PacketEvents.getAPI().getServerManager().getVersion().isNewerThanOrEquals(ServerVersion.V_1_13);
+            OLDER_THAN_V_1_14 = PacketEvents.getAPI().getServerManager().getVersion().isOlderThan(ServerVersion.V_1_14);
             CHECKED_VERSION = true;
         }
         boolean isFlattened = V_1_13_OR_NEWER;

@@ -51,7 +51,7 @@ public class WrapperPlayClientUseItem extends PacketWrapper<WrapperPlayClientUse
 
     @Override
     public void readData() {
-        if (serverVersion.isNewerThanOrEquals(ServerVersion.v_1_14)) {
+        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_14)) {
             hand = Hand.getByLegacyID(readVarInt());
             blockPosition = readBlockPosition();
             face = BlockFace.getBlockFaceByValue(readVarInt());
@@ -62,7 +62,7 @@ public class WrapperPlayClientUseItem extends PacketWrapper<WrapperPlayClientUse
             blockPosition = readBlockPosition();
             face = BlockFace.getBlockFaceByValue(readVarInt());
             hand = Hand.getByLegacyID(readVarInt());
-            if (serverVersion.isNewerThanOrEquals(ServerVersion.v_1_11)) {
+            if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_11)) {
                 cursorPosition = new Vector3f(readFloat(), readFloat(), readFloat());
             } else {
                 cursorPosition = new Vector3f(readUnsignedByte() / 16.0F, readUnsignedByte() / 16.0F, readUnsignedByte() / 16.0F);
@@ -81,7 +81,7 @@ public class WrapperPlayClientUseItem extends PacketWrapper<WrapperPlayClientUse
 
     @Override
     public void writeData() {
-        if (serverVersion.isNewerThanOrEquals(ServerVersion.v_1_14)) {
+        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_14)) {
             writeVarInt(hand.getLegacyId());
             writeBlockPosition(blockPosition);
             writeVarInt(face.getFaceValue());
@@ -94,7 +94,7 @@ public class WrapperPlayClientUseItem extends PacketWrapper<WrapperPlayClientUse
             writeBlockPosition(blockPosition);
             writeVarInt(face.getFaceValue());
             writeVarInt(hand.getLegacyId());
-            if (serverVersion.isNewerThanOrEquals(ServerVersion.v_1_11)) {
+            if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_11)) {
                 writeFloat(cursorPosition.x);
                 writeFloat(cursorPosition.y);
                 writeFloat(cursorPosition.z);

@@ -63,7 +63,7 @@ public class Vector3i {
         int z;
 
         // 1.14 method for this is storing X Z Y
-        if (serverVersion.isNewerThanOrEquals(ServerVersion.v_1_14)) {
+        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_14)) {
             y = (int) (val & 0xFFF);
             z = (int) (val << 26 >> 38);
         } else {
@@ -123,7 +123,7 @@ public class Vector3i {
 
     public long getSerializedPosition(ServerVersion serverVersion) {
         // 1.14 method for this is storing X Z Y
-        if (serverVersion.isNewerThanOrEquals(ServerVersion.v_1_14)) {
+        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_14)) {
             return ((long) (getX() & 0x3FFFFFF) << 38) | ((long) (getZ() & 0x3FFFFFF) << 12) | (getY() & 0xFFF);
         }
         // 1.13 and below store X Y Z

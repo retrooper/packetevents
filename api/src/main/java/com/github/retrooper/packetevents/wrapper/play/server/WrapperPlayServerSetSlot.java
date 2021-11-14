@@ -45,7 +45,7 @@ public class WrapperPlayServerSetSlot extends PacketWrapper<WrapperPlayServerSet
     @Override
     public void readData() {
         windowID = readByte();
-        if (serverVersion.isNewerThanOrEquals(ServerVersion.v_1_17_1)) {
+        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_17_1)) {
             stateID = readVarInt();
         }
         slot = readShort();
@@ -63,7 +63,7 @@ public class WrapperPlayServerSetSlot extends PacketWrapper<WrapperPlayServerSet
     @Override
     public void writeData() {
         writeByte(windowID);
-        if (serverVersion.isNewerThanOrEquals(ServerVersion.v_1_17_1)) {
+        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_17_1)) {
             writeVarInt(stateID);
         }
         writeShort(slot);

@@ -54,7 +54,7 @@ public class WrapperPlayClientInteractEntity extends PacketWrapper<WrapperPlayCl
 
     @Override
     public void readData() {
-        if (serverVersion == ServerVersion.v_1_7_10) {
+        if (serverVersion == ServerVersion.V_1_7_10) {
             this.entityID = readInt();
             byte typeIndex = readByte();
             this.type = Type.VALUES[typeIndex];
@@ -74,14 +74,14 @@ public class WrapperPlayClientInteractEntity extends PacketWrapper<WrapperPlayCl
                 this.target = Optional.empty();
             }
 
-            if (serverVersion.isNewerThan(ServerVersion.v_1_8) && (type == Type.INTERACT || type == Type.INTERACT_AT)) {
+            if (serverVersion.isNewerThan(ServerVersion.V_1_8) && (type == Type.INTERACT || type == Type.INTERACT_AT)) {
                 int handID = readVarInt();
                 this.hand = Hand.getByLegacyID(handID);
             } else {
                 this.hand = Hand.RIGHT;
             }
 
-            if (serverVersion.isNewerThanOrEquals(ServerVersion.v_1_16)) {
+            if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_16)) {
                 this.sneaking = Optional.of(readBoolean());
             } else {
                 this.sneaking = Optional.empty();
@@ -100,7 +100,7 @@ public class WrapperPlayClientInteractEntity extends PacketWrapper<WrapperPlayCl
 
     @Override
     public void writeData() {
-        if (serverVersion == ServerVersion.v_1_7_10) {
+        if (serverVersion == ServerVersion.V_1_7_10) {
             writeInt(entityID);
             writeByte(type.ordinal());
         } else {
@@ -113,11 +113,11 @@ public class WrapperPlayClientInteractEntity extends PacketWrapper<WrapperPlayCl
                 writeFloat(targetVec.z);
             }
 
-            if (serverVersion.isNewerThan(ServerVersion.v_1_8) && (type == Type.INTERACT || type == Type.INTERACT_AT)) {
+            if (serverVersion.isNewerThan(ServerVersion.V_1_8) && (type == Type.INTERACT || type == Type.INTERACT_AT)) {
                 writeVarInt(hand.getLegacyId());
             }
 
-            if (serverVersion.isNewerThanOrEquals(ServerVersion.v_1_16)) {
+            if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_16)) {
                 writeBoolean(sneaking.orElse(false));
             }
         }

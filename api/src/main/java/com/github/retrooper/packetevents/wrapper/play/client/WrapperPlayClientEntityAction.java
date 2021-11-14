@@ -43,7 +43,7 @@ public class WrapperPlayClientEntityAction extends PacketWrapper<WrapperPlayClie
     public void readData() {
         entityID = readVarInt();
         action = Action.VALUES[readVarInt()];
-        if (serverVersion.isOlderThan(ServerVersion.v_1_9)) {
+        if (serverVersion.isOlderThan(ServerVersion.V_1_9)) {
             if (action == Action.STOP_JUMPING_WITH_HORSE) {
                 action = Action.OPEN_HORSE_INVENTORY;
             }
@@ -62,7 +62,7 @@ public class WrapperPlayClientEntityAction extends PacketWrapper<WrapperPlayClie
     public void writeData() {
         writeVarInt(entityID);
         int actionIndex = action.ordinal();
-        if (serverVersion.isOlderThan(ServerVersion.v_1_9)) {
+        if (serverVersion.isOlderThan(ServerVersion.V_1_9)) {
             if (action == Action.OPEN_HORSE_INVENTORY) {
                 actionIndex--;
             }
