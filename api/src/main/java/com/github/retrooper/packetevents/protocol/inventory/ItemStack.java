@@ -85,7 +85,7 @@ public class ItemStack {
             return true;
         if (obj instanceof ItemStack) {
             ItemStack itemStack = (ItemStack) obj;
-            return type == itemStack.type
+            return type.equals(itemStack.type)
                     && amount == itemStack.amount
                     && nbt.equals(itemStack.nbt)
                     && legacyData == itemStack.legacyData;
@@ -118,6 +118,9 @@ public class ItemStack {
         }
 
         public Builder nbt(NBTCompound nbt) {
+            if (nbt == null) {
+                nbt = new NBTCompound();
+            }
             this.nbt = nbt;
             return this;
         }

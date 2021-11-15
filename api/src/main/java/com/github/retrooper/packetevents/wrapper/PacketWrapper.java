@@ -213,6 +213,7 @@ public class PacketWrapper<T extends PacketWrapper> {
         boolean v1_13_2 = serverVersion.isNewerThanOrEquals(ServerVersion.V_1_13_2);
         if (v1_13_2) {
             if (!readBoolean()) {
+                System.out.println("i seee");
                 return ItemStack.NULL;
             }
         }
@@ -236,23 +237,26 @@ public class PacketWrapper<T extends PacketWrapper> {
         boolean v1_13_2 = serverVersion.isNewerThanOrEquals(ServerVersion.V_1_13_2);
         if (v1_13_2) {
             if (itemStack.equals(ItemStack.NULL)) {
+                System.out.println("correct");
                 writeBoolean(false);
-                return;
             } else {
+                System.out.println("tf u doin");
                 writeBoolean(true);
+                int typeID = itemStack.getType().getId();
+                if (typeID >= 0) {
+                    writeVarInt(typeID);
+                }
+                writeByte(itemStack.getAmount());
+                writeNBT(itemStack.getNBT());
             }
         }
-        int typeID = itemStack.getType().getId();
-        if (typeID >= 0) {
-            if (v1_13_2) {
-                writeVarInt(typeID);
-            } else {
+        else {
+            int typeID = itemStack.getType().getId();
+            if (typeID >= 0) {
                 writeShort(typeID);
             }
-        }
-        writeByte(itemStack.getAmount());
-        writeNBT(itemStack.getNBT());
-        if (!v1_13_2) {
+            writeByte(itemStack.getAmount());
+            writeNBT(itemStack.getNBT());
             writeShort(itemStack.getLegacyData());
         }
     }

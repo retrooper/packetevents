@@ -19,6 +19,7 @@
 package com.github.retrooper.packetevents.protocol.inventory;
 
 import com.github.retrooper.packetevents.protocol.resources.ResourceLocation;
+import org.jetbrains.annotations.Nullable;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
@@ -28,8 +29,7 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLConnection;
 import java.nio.charset.StandardCharsets;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 public class ItemTypes {
     private static final Map<String, ItemType> ITEM_TYPE_MAP = new HashMap<>();
@@ -37,9 +37,20 @@ public class ItemTypes {
     private static final JSONParser PARSER = new JSONParser();
     private static JSONObject modernItemTypesJSONObject = null;
 
+    private enum ItemAttribute {
+        //TODO Add more
+        MUSIC_DISC, EDIBLE;
+    }
+
+
     public static ItemType define(int maxAmount, String key) {
+        return define(maxAmount, key, new ItemAttribute[]{});
+    }
+    public static ItemType define(int maxAmount, String key, ItemAttribute ... attributesArr) {
+        Set<ItemAttribute> attributes = new HashSet<>(Arrays.asList(attributesArr));
         Long itemID = (Long) modernItemTypesJSONObject.get(key);
         int id = itemID.intValue();
+        boolean musicDisc = attributes.contains(ItemAttribute.MUSIC_DISC);
         ResourceLocation identifier = ResourceLocation.minecraft(key);
 
         ItemType type = new ItemType() {
@@ -57,16 +68,31 @@ public class ItemTypes {
             public int getId() {
                 return id;
             }
+
+            @Override
+            public boolean equals(Object obj) {
+                if (obj instanceof ItemType) {
+                    return ((ItemType) obj).getId() == id;
+                }
+                return false;
+            }
+
+            @Override
+            public boolean isMusicDisc() {
+                return musicDisc;
+            }
         };
         ITEM_TYPE_MAP.put(type.getIdentifier().getKey(), type);
         ITEM_TYPE_ID_MAP.put(type.getId(), type);
         return type;
     }
 
+    @Nullable
     public static ItemType getByKey(String key) {
         return ITEM_TYPE_MAP.get(key);
     }
 
+    @Nullable
     public static ItemType getById(int id) {
         return ITEM_TYPE_ID_MAP.get(id);
     }
@@ -151,7 +177,7 @@ public class ItemTypes {
     public static final ItemType NETHER_BRICK_SLAB = define(64, "nether_brick_slab");
     public static final ItemType ANDESITE_SLAB = define(64, "andesite_slab");
     public static final ItemType EGG = define(16, "egg");
-    public static final ItemType MUSIC_DISC_STAL = define(1, "music_disc_stal");
+    public static final ItemType MUSIC_DISC_STAL = define(1, "music_disc_stal", ItemAttribute.MUSIC_DISC);
     public static final ItemType PIGLIN_BRUTE_SPAWN_EGG = define(64, "piglin_brute_spawn_egg");
     public static final ItemType BIRCH_STAIRS = define(64, "birch_stairs");
     public static final ItemType SPRUCE_SIGN = define(16, "spruce_sign");
@@ -243,7 +269,7 @@ public class ItemTypes {
     public static final ItemType STONE_BUTTON = define(64, "stone_button");
     public static final ItemType MELON = define(64, "melon");
     public static final ItemType INFESTED_CHISELED_STONE_BRICKS = define(64, "infested_chiseled_stone_bricks");
-    public static final ItemType MUSIC_DISC_STRAD = define(1, "music_disc_strad");
+    public static final ItemType MUSIC_DISC_STRAD = define(1, "music_disc_strad", ItemAttribute.MUSIC_DISC);
     public static final ItemType STRUCTURE_BLOCK = define(64, "structure_block");
     public static final ItemType STICKY_PISTON = define(64, "sticky_piston");
     public static final ItemType GRAY_STAINED_GLASS = define(64, "gray_stained_glass");
@@ -433,7 +459,7 @@ public class ItemTypes {
     public static final ItemType RAW_COPPER = define(64, "raw_copper");
     public static final ItemType BEETROOT = define(64, "beetroot");
     public static final ItemType DEAD_FIRE_CORAL = define(64, "dead_fire_coral");
-    public static final ItemType MUSIC_DISC_MALL = define(64, "music_disc_mall");
+    public static final ItemType MUSIC_DISC_MALL = define(1, "music_disc_mall", ItemAttribute.MUSIC_DISC);
     public static final ItemType LADDER = define(64, "ladder");
     public static final ItemType LODESTONE = define(64, "lodestone");
     public static final ItemType RAVAGER_SPAWN_EGG = define(64, "ravager_spawn_egg");
@@ -479,7 +505,7 @@ public class ItemTypes {
     public static final ItemType DIAMOND_CHESTPLATE = define(1, "diamond_chestplate");
     public static final ItemType MOSSY_COBBLESTONE_SLAB = define(64, "mossy_cobblestone_slab");
     public static final ItemType WOODEN_HOE = define(1, "wooden_hoe");
-    public static final ItemType MUSIC_DISC_BLOCKS = define(64, "music_disc_blocks");
+    public static final ItemType MUSIC_DISC_BLOCKS = define(1, "music_disc_blocks", ItemAttribute.MUSIC_DISC);
     public static final ItemType WHITE_WOOL = define(64, "white_wool");
     public static final ItemType HANGING_ROOTS = define(64, "hanging_roots");
     public static final ItemType END_STONE_BRICK_STAIRS = define(64, "end_stone_brick_stairs");
@@ -565,7 +591,7 @@ public class ItemTypes {
     public static final ItemType SMOOTH_RED_SANDSTONE_SLAB = define(64, "smooth_red_sandstone_slab");
     public static final ItemType CUT_SANDSTONE_SLAB = define(64, "cut_sandstone_slab");
     public static final ItemType GRASS_BLOCK = define(64, "grass_block");
-    public static final ItemType MUSIC_DISC_PIGSTEP = define(1, "music_disc_pigstep");
+    public static final ItemType MUSIC_DISC_PIGSTEP = define(1, "music_disc_pigstep", ItemAttribute.MUSIC_DISC);
     public static final ItemType BLACK_BED = define(1, "black_bed");
     public static final ItemType WAXED_OXIDIZED_COPPER = define(64, "waxed_oxidized_copper");
     public static final ItemType MINECART = define(1, "minecart");
@@ -648,7 +674,7 @@ public class ItemTypes {
     public static final ItemType BLUE_DYE = define(64, "blue_dye");
     public static final ItemType SUGAR = define(64, "sugar");
     public static final ItemType CAT_SPAWN_EGG = define(64, "cat_spawn_egg");
-    public static final ItemType MUSIC_DISC_FAR = define(1, "music_disc_far");
+    public static final ItemType MUSIC_DISC_FAR = define(1, "music_disc_far", ItemAttribute.MUSIC_DISC);
     public static final ItemType BROWN_GLAZED_TERRACOTTA = define(64, "brown_glazed_terracotta");
     public static final ItemType COPPER_INGOT = define(64, "copper_ingot");
     public static final ItemType COD_BUCKET = define(1, "cod_bucket");
@@ -694,7 +720,7 @@ public class ItemTypes {
     public static final ItemType BRICK_WALL = define(64, "brick_wall");
     public static final ItemType BRAIN_CORAL_BLOCK = define(64, "brain_coral_block");
     public static final ItemType BIRCH_FENCE_GATE = define(64, "birch_fence_gate");
-    public static final ItemType MUSIC_DISC_CHIRP = define(64, "music_disc_chirp");
+    public static final ItemType MUSIC_DISC_CHIRP = define(1, "music_disc_chirp", ItemAttribute.MUSIC_DISC);
     public static final ItemType NETHERITE_SWORD = define(1, "netherite_sword");
     public static final ItemType COBBLED_DEEPSLATE = define(64, "cobbled_deepslate");
     public static final ItemType BROWN_CANDLE = define(64, "brown_candle");
@@ -726,7 +752,7 @@ public class ItemTypes {
     public static final ItemType BEETROOT_SOUP = define(64, "beetroot_soup");
     public static final ItemType RAW_COPPER_BLOCK = define(64, "raw_copper_block");
     public static final ItemType LIGHT_GRAY_CARPET = define(64, "light_gray_carpet");
-    public static final ItemType MUSIC_DISC_WARD = define(64, "music_disc_ward");
+    public static final ItemType MUSIC_DISC_WARD = define(1, "music_disc_ward", ItemAttribute.MUSIC_DISC);
     public static final ItemType GRASS = define(64, "grass");
     public static final ItemType END_CRYSTAL = define(64, "end_crystal");
     public static final ItemType VINDICATOR_SPAWN_EGG = define(64, "vindicator_spawn_egg");
@@ -870,7 +896,7 @@ public class ItemTypes {
     public static final ItemType RED_DYE = define(64, "red_dye");
     public static final ItemType MAGENTA_STAINED_GLASS = define(64, "magenta_stained_glass");
     public static final ItemType LAPIS_LAZULI = define(64, "lapis_lazuli");
-    public static final ItemType MUSIC_DISC_WAIT = define(1, "music_disc_wait");
+    public static final ItemType MUSIC_DISC_WAIT = define(1, "music_disc_wait", ItemAttribute.MUSIC_DISC);
     public static final ItemType NETHERITE_PICKAXE = define(1, "netherite_pickaxe");
     public static final ItemType BUNDLE = define(1, "bundle");
     public static final ItemType MOOSHROOM_SPAWN_EGG = define(64, "mooshroom_spawn_egg");
@@ -898,9 +924,9 @@ public class ItemTypes {
     public static final ItemType BIRCH_DOOR = define(64, "birch_door");
     public static final ItemType STRIPPED_ACACIA_WOOD = define(64, "stripped_acacia_wood");
     public static final ItemType COW_SPAWN_EGG = define(64, "cow_spawn_egg");
-    public static final ItemType MUSIC_DISC_13 = define(1, "music_disc_13");
+    public static final ItemType MUSIC_DISC_13 = define(1, "music_disc_13", ItemAttribute.MUSIC_DISC);
     public static final ItemType DIORITE_WALL = define(64, "diorite_wall");
-    public static final ItemType MUSIC_DISC_11 = define(1, "music_disc_11");
+    public static final ItemType MUSIC_DISC_11 = define(1, "music_disc_11", ItemAttribute.MUSIC_DISC);
     public static final ItemType BLUE_CONCRETE = define(64, "blue_concrete");
     public static final ItemType WOODEN_AXE = define(1, "wooden_axe");
     public static final ItemType VEX_SPAWN_EGG = define(64, "vex_spawn_egg");
@@ -1060,7 +1086,7 @@ public class ItemTypes {
     public static final ItemType CYAN_CARPET = define(64, "cyan_carpet");
     public static final ItemType SKULL_BANNER_PATTERN = define(1, "skull_banner_pattern");
     public static final ItemType FIREWORK_STAR = define(64, "firework_star");
-    public static final ItemType MUSIC_DISC_MELLOHI = define(1, "music_disc_mellohi");
+    public static final ItemType MUSIC_DISC_MELLOHI = define(1, "music_disc_mellohi", ItemAttribute.MUSIC_DISC);
     public static final ItemType PURPLE_CARPET = define(64, "purple_carpet");
     public static final ItemType GOLDEN_HOE = define(1, "golden_hoe");
     public static final ItemType COOKED_CHICKEN = define(64, "cooked_chicken");
@@ -1106,7 +1132,7 @@ public class ItemTypes {
     public static final ItemType PINK_BANNER = define(16, "pink_banner");
     public static final ItemType EXPOSED_CUT_COPPER_SLAB = define(64, "exposed_cut_copper_slab");
     public static final ItemType MELON_SEEDS = define(64, "melon_seeds");
-    public static final ItemType MUSIC_DISC_CAT = define(1, "music_disc_cat");
+    public static final ItemType MUSIC_DISC_CAT = define(1, "music_disc_cat", ItemAttribute.MUSIC_DISC);
     public static final ItemType RED_SANDSTONE = define(64, "red_sandstone");
     public static final ItemType PURPLE_DYE = define(64, "purple_dye");
     public static final ItemType COBBLED_DEEPSLATE_WALL = define(64, "cobbled_deepslate_wall");

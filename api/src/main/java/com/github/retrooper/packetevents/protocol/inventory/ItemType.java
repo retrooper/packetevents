@@ -26,4 +26,6 @@ public interface ItemType {
     ResourceLocation getIdentifier();
 
     int getId();
+
+    boolean isMusicDisc();
 }

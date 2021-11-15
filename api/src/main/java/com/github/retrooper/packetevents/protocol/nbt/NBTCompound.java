@@ -194,7 +194,13 @@ public class NBTCompound extends NBT {
 
     @Override
     public boolean equals(Object other) {
-        return (other instanceof NBTCompound) && ((NBTCompound) other).tags.equals(tags);
+        if (other instanceof NBTCompound) {
+            if (isEmpty() && ((NBTCompound) other).isEmpty()) {
+                return true;
+            }
+            return tags.equals(((NBTCompound) other).tags);
+        }
+        return false;
     }
 
     @Override

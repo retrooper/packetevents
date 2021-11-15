@@ -23,6 +23,7 @@ import com.github.retrooper.packetevents.event.PacketListener;
 import com.github.retrooper.packetevents.event.impl.PacketReceiveEvent;
 import com.github.retrooper.packetevents.event.impl.PacketSendEvent;
 import com.github.retrooper.packetevents.manager.player.attributes.TabCompleteAttribute;
+import com.github.retrooper.packetevents.netty.buffer.ByteBufAbstract;
 import com.github.retrooper.packetevents.protocol.ConnectionState;
 import com.github.retrooper.packetevents.protocol.chat.Color;
 import com.github.retrooper.packetevents.protocol.chat.component.ComponentParser;
@@ -42,10 +43,7 @@ import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerSe
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 public class InternalPacketListener implements PacketListener {
     //Make this specific event be at MONITOR priority
@@ -65,6 +63,12 @@ public class InternalPacketListener implements PacketListener {
             }
             String jsonMessage = ComponentParser.buildJSONString(components);
             //System.out.println("JSON Message: " + jsonMessage);
+        }
+        else if(event.getPacketType() == PacketType.Play.Server.SET_SLOT) {
+            WrapperPlayServerSetSlot setSlot = new WrapperPlayServerSetSlot(event);
+            player.sendMessage("Item type: "+ setSlot.getItem().getType().getIdentifier().getKey() + ", item nbt: " + Arrays.toString(setSlot.getItem().getNBT().getTagNames().toArray(new String[0])));
+            player.sendMessage("slot: " + setSlot.getSlot() + ", window id: " + setSlot.getWindowId());
+            event.setLastUsedWrapper(null);
         }
         /*
         else if (event.getPacketType() == PacketType.Play.Server.CHUNK_DATA) {
