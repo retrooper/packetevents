@@ -20,7 +20,7 @@ package com.github.retrooper.packetevents.wrapper.play.server;
 
 import com.github.retrooper.packetevents.event.impl.PacketSendEvent;
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
-import com.github.retrooper.packetevents.protocol.chat.component.ComponentParser;
+import com.github.retrooper.packetevents.protocol.chat.component.ComponentSerializer;
 import com.github.retrooper.packetevents.protocol.chat.component.TextComponent;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
@@ -57,8 +57,8 @@ public class WrapperPlayServerPlayerListHeaderAndFooter extends PacketWrapper<Wr
         jsonHeader = readString(maxMessageLength);
         jsonFooter = readString(maxMessageLength);
         if (HANDLE_JSON) {
-            headerComponents = ComponentParser.parseJSONString(jsonHeader);
-            footerComponents = ComponentParser.parseJSONString(jsonFooter);
+            headerComponents = ComponentSerializer.parseJSONString(jsonHeader);
+            footerComponents = ComponentSerializer.parseJSONString(jsonFooter);
         }
     }
 
@@ -74,8 +74,8 @@ public class WrapperPlayServerPlayerListHeaderAndFooter extends PacketWrapper<Wr
     public void writeData() {
         int maxMessageLength = serverVersion.isNewerThanOrEquals(ServerVersion.V_1_13) ? MODERN_MESSAGE_LENGTH : LEGACY_MESSAGE_LENGTH;
         if (HANDLE_JSON) {
-            jsonHeader = ComponentParser.buildJSONString(headerComponents);
-            jsonFooter = ComponentParser.buildJSONString(footerComponents);
+            jsonHeader = ComponentSerializer.buildJSONString(headerComponents);
+            jsonFooter = ComponentSerializer.buildJSONString(footerComponents);
         }
         writeString(jsonHeader, maxMessageLength);
         writeString(jsonFooter, maxMessageLength);

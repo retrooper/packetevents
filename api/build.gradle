@@ -10,12 +10,12 @@ repositories {
 
 tasks {
     shadowJar {
-        relocate("org.json.simple", "com.github.retrooper.packetevents.lib.org.json.simple")
+        relocate("com.google.gson", "com.github.retrooper.packetevents.google.gson")
     }
 }
 
 dependencies {
-    api group: 'com.googlecode.json-simple', name: 'json-simple', version: '1.1.1'
+    api 'com.google.code.gson:gson:2.8.9'
     compileOnly 'org.jetbrains:annotations:22.0.0'
 }
 

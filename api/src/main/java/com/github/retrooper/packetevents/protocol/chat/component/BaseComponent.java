@@ -22,16 +22,15 @@ package com.github.retrooper.packetevents.protocol.chat.component;
 import com.github.retrooper.packetevents.protocol.chat.Color;
 import com.github.retrooper.packetevents.protocol.chat.component.ClickEvent.ClickType;
 import com.github.retrooper.packetevents.protocol.chat.component.HoverEvent.HoverType;
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
-import org.json.simple.parser.ParseException;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonPrimitive;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class BaseComponent {
-    private static final JSONParser PARSER = new JSONParser();
     private Color color = Color.WHITE;
     private String insertion = "";
     private ClickEvent clickEvent = new ClickEvent(ClickType.EMPTY);
@@ -121,50 +120,99 @@ public class BaseComponent {
         return new Builder();
     }
 
-    public void parseJSON(JSONObject jsonObject) {
-        String colorStr = (String) jsonObject.getOrDefault("color", "");
-        this.color = Color.getByName(colorStr);
-        this.insertion = (String) jsonObject.getOrDefault("insertion", "");
-        this.bold = (boolean) jsonObject.getOrDefault("bold", false);
-        this.italic = (boolean) jsonObject.getOrDefault("italic", false);
-        this.underlined = (boolean) jsonObject.getOrDefault("underlined", false);
-        this.strikeThrough = (boolean) jsonObject.getOrDefault("strikethrough", false);
-        this.obfuscated = (boolean) jsonObject.getOrDefault("obfuscated", false);
+    public void parseJSON(JsonObject jsonObject) {
+        if (jsonObject.has("color")) {
+            this.color = Color.getByName(jsonObject.get("color").getAsString());
+        }
+        else {
+            this.color = Color.WHITE;
+        }
+        if (jsonObject.has("insertion")) {
+            this.insertion = jsonObject.get("insertion").getAsString();
+        } else {
+            this.insertion = "";
+        }
+        if (jsonObject.has("bold")) {
+            this.bold = jsonObject.get("bold").getAsBoolean();
+        } else {
+            this.bold = false;
+        }
+        if (jsonObject.has("italic")) {
+            this.italic = jsonObject.get("italic").getAsBoolean();
+        } else {
+            this.italic = false;
+        }
+        if (jsonObject.has("underlined")) {
+            this.underlined = jsonObject.get("underlined").getAsBoolean();
+        } else {
+            this.underlined = false;
+        }
+        if (jsonObject.has("strikethrough")) {
+            this.strikeThrough = jsonObject.get("strikethrough").getAsBoolean();
+        } else {
+            this.strikeThrough = false;
+        }
+
+        if (jsonObject.has("obfuscated")) {
+            this.obfuscated = jsonObject.get("obfuscated").getAsBoolean();
+        } else {
+            this.obfuscated = false;
+        }
+
+        System.out.println("color: " + color.name());
 
         //Read click events if it has been specified
-        JSONObject clickEvent = (JSONObject) jsonObject.get("clickEvent");
-        if (clickEvent != null) {
-            String action = (String) clickEvent.get("action");
-            String value = (String) clickEvent.get("value");
+        JsonElement clickEventElement = jsonObject.get("clickEvent");
+        if (clickEventElement != null) {
+            JsonObject clickEventObject = clickEventElement.getAsJsonObject();
+            String action;
+            if (clickEventObject.has("action")) {
+                action = clickEventObject.get("action").getAsString();
+            } else {
+                action = "";
+            }
+            String value;
+            if (clickEventObject.has("value")) {
+                value = clickEventObject.get("value").getAsString();
+            } else {
+                value = "";
+            }
             this.clickEvent = new ClickEvent(ClickType.getByName(action), value);
         } else {
             this.clickEvent = new ClickEvent(ClickType.EMPTY);
         }
 
-        JSONObject hoverEvent = (JSONObject) jsonObject.get("hoverEvent");
-        if (hoverEvent != null) {
-            String action = (String) hoverEvent.get("action");
-            //Parse value as JSON array or TODO : JSON object, String or primitive
-            Object jsonHoverEventValue = hoverEvent.get("value");
+        JsonElement hoverEventElement = jsonObject.get("hoverEvent");
+        if (hoverEventElement != null) {
+            System.out.println("we have hover event!");
+            JsonObject hoverEventObject = hoverEventElement.getAsJsonObject();
+            String action;
+            if (hoverEventObject.has("action")) {
+                action = hoverEventObject.get("action").getAsString();
+            } else {
+                action = "";
+            }
+            System.out.println("action: " + action);
             List<String> values = new ArrayList<>();
-            if (jsonHoverEventValue instanceof JSONArray) {
-                for (Object o : (JSONArray)jsonHoverEventValue) {
-                    JSONObject jsonObj = (JSONObject) o;
-                    values.add((jsonObj.toJSONString()));
+
+            JsonElement jsonHoverEventValueElement = hoverEventObject.get("value");
+            if (jsonHoverEventValueElement != null) {
+                if (hoverEventElement.isJsonArray()) {
+                    JsonArray hoverEventValueArray = hoverEventElement.getAsJsonArray();
+                    for (JsonElement hoverEventValue : hoverEventValueArray) {
+                        System.out.println("value: " + hoverEventValue.getAsString());
+                        values.add(hoverEventValue.getAsString());
+                    }
+                } else if (hoverEventElement.isJsonPrimitive()) {
+                    System.out.println("value pt2: " + hoverEventElement.getAsString());
+                    values.add(hoverEventElement.getAsString());
+                }
+                else if (hoverEventElement.isJsonObject()) {
+                    values.add(hoverEventElement.toString());
+                    System.out.println("value pt3: " + hoverEventElement.toString());
                 }
             }
-            else if (jsonHoverEventValue instanceof String) {
-                values.add((String) jsonHoverEventValue);
-            }
-            else if (jsonHoverEventValue instanceof JSONObject) {
-                values.add(((JSONObject) jsonHoverEventValue).toJSONString());
-            }
-            if (!values.isEmpty()) {
-                this.hoverEvent = new HoverEvent(HoverType.getByName(action), values);
-            }
-            else {
-                this.hoverEvent = new HoverEvent(HoverType.EMPTY);
-            }
+            this.hoverEvent = new HoverEvent(values.isEmpty() ? HoverType.EMPTY : HoverType.getByName(action), values);
         } else {
             this.hoverEvent = new HoverEvent(HoverType.EMPTY);
         }
@@ -173,52 +221,47 @@ public class BaseComponent {
 
     }
 
-    public JSONObject buildJSON() {
-        JSONObject jsonObject = new JSONObject();
+    public JsonObject buildJSON() {
+        JsonObject jsonObject = new JsonObject();
         if (color != Color.WHITE && color != null) {
-            jsonObject.put("color", color.getName());
+            jsonObject.addProperty("color", color.getName());
         }
         if (insertion != null && !insertion.isEmpty()) {
-            jsonObject.put("insertion", insertion);
+            jsonObject.addProperty("insertion", insertion);
         }
         if (bold) {
-            jsonObject.put("bold", true);
+            jsonObject.addProperty("bold", true);
         }
         if (italic) {
-            jsonObject.put("italic", true);
+            jsonObject.addProperty("italic", true);
         }
         if (underlined) {
-            jsonObject.put("underlined", true);
+            jsonObject.addProperty("underlined", true);
         }
         if (strikeThrough) {
-            jsonObject.put("strikethrough", true);
+            jsonObject.addProperty("strikethrough", true);
         }
         if (obfuscated) {
-            jsonObject.put("obfuscated", true);
+            jsonObject.addProperty("obfuscated", true);
         }
 
         if (clickEvent != null && clickEvent.getType() != ClickType.EMPTY) {
-            JSONObject clickEventJSON = new JSONObject();
-            clickEventJSON.put("action", clickEvent.getType().getName());
-            clickEventJSON.put("value", clickEvent.getValue());
-            jsonObject.put("clickEvent", clickEventJSON);
+            JsonObject clickEventObject = new JsonObject();
+            clickEventObject.addProperty("action", clickEvent.getType().getName());
+            clickEventObject.addProperty("value", clickEvent.getValue());
+            jsonObject.add("clickEvent", clickEventObject);
         }
 
         if (hoverEvent != null && hoverEvent.getType() != HoverType.EMPTY) {
-            JSONObject hoverEventJSON = new JSONObject();
-            hoverEventJSON.put("action", hoverEvent.getType().getName());
-            JSONArray jsonArray = new JSONArray();
-            for (String s : hoverEvent.getValues()) {
-                JSONObject jsonObj = null;
-                try {
-                    jsonObj = (JSONObject) PARSER.parse(s);
-                } catch (ParseException e) {
-                    e.printStackTrace();
-                }
-                jsonArray.add(jsonObj);
+            JsonObject hoverEventObject = new JsonObject();
+            hoverEventObject.addProperty("action", hoverEvent.getType().getName());
+            JsonArray hoverEventValueArray = new JsonArray();
+            for (String value : hoverEvent.getValues()) {
+                JsonObject valueJsonObj = ComponentSerializer.GSON.fromJson(value, JsonObject.class);
+                hoverEventValueArray.add(valueJsonObj);
             }
-            hoverEventJSON.put("value", jsonArray);
-            jsonObject.put("hoverEvent", hoverEventJSON);
+            hoverEventObject.add("value", hoverEventValueArray);
+            jsonObject.add("hoverEvent", hoverEventObject);
         }
         return jsonObject;
     }

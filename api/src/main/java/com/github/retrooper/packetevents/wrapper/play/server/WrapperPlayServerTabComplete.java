@@ -22,7 +22,7 @@ import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.event.impl.PacketSendEvent;
 import com.github.retrooper.packetevents.manager.player.attributes.TabCompleteAttribute;
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
-import com.github.retrooper.packetevents.protocol.chat.component.ComponentParser;
+import com.github.retrooper.packetevents.protocol.chat.component.ComponentSerializer;
 import com.github.retrooper.packetevents.protocol.chat.component.TextComponent;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
@@ -78,7 +78,7 @@ public class WrapperPlayServerTabComplete extends PacketWrapper<WrapperPlayServe
                 boolean hasTooltip = readBoolean();
                 if (hasTooltip) {
                     String jsonMessage = readString(maxMessageLength);
-                    tooltip = ComponentParser.parseJSONString(jsonMessage);
+                    tooltip = ComponentSerializer.parseJSONString(jsonMessage);
                 } else {
                     tooltip = null;
                 }
@@ -118,7 +118,7 @@ public class WrapperPlayServerTabComplete extends PacketWrapper<WrapperPlayServe
                 boolean hasTooltip = match.getTooltip().isPresent();
                 writeBoolean(hasTooltip);
                 if (hasTooltip) {
-                    String jsonMessage = ComponentParser.buildJSONString(match.getTooltip().get());
+                    String jsonMessage = ComponentSerializer.buildJSONString(match.getTooltip().get());
                     writeString(jsonMessage, maxMessageLength);
                 }
             }

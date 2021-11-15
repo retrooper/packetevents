@@ -20,7 +20,7 @@ package com.github.retrooper.packetevents.wrapper.play.server;
 
 import com.github.retrooper.packetevents.event.impl.PacketSendEvent;
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
-import com.github.retrooper.packetevents.protocol.chat.component.ComponentParser;
+import com.github.retrooper.packetevents.protocol.chat.component.ComponentSerializer;
 import com.github.retrooper.packetevents.protocol.chat.component.TextComponent;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
@@ -53,7 +53,7 @@ public class WrapperPlayServerDisconnect extends PacketWrapper<WrapperPlayServer
         int maxMessageLength = serverVersion.isNewerThanOrEquals(ServerVersion.V_1_13) ? MODERN_MESSAGE_LENGTH : LEGACY_MESSAGE_LENGTH;
         jsonReasonRaw = readString(maxMessageLength);
         if (HANDLE_JSON) {
-            reasonComponents = ComponentParser.parseJSONString(jsonReasonRaw);
+            reasonComponents = ComponentSerializer.parseJSONString(jsonReasonRaw);
         }
     }
 
@@ -67,7 +67,7 @@ public class WrapperPlayServerDisconnect extends PacketWrapper<WrapperPlayServer
     public void writeData() {
         int maxMessageLength = serverVersion.isNewerThanOrEquals(ServerVersion.V_1_13) ? MODERN_MESSAGE_LENGTH : LEGACY_MESSAGE_LENGTH;
         if (HANDLE_JSON) {
-            jsonReasonRaw = ComponentParser.buildJSONString(reasonComponents);
+            jsonReasonRaw = ComponentSerializer.buildJSONString(reasonComponents);
         }
         writeString(jsonReasonRaw, maxMessageLength);
     }

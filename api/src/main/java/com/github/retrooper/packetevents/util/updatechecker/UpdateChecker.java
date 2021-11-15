@@ -19,14 +19,14 @@
 package com.github.retrooper.packetevents.util.updatechecker;
 
 import com.github.retrooper.packetevents.PacketEvents;
+import com.github.retrooper.packetevents.protocol.chat.component.ComponentSerializer;
 import com.github.retrooper.packetevents.util.PEVersion;
-import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
-import org.json.simple.parser.ParseException;
+import com.google.gson.JsonObject;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.StringReader;
 import java.net.URL;
 import java.net.URLConnection;
 
@@ -37,9 +37,6 @@ import java.net.URLConnection;
  * @since 1.6.9
  */
 public class UpdateChecker {
-    private static final JSONParser PARSER = new JSONParser();
-
-
     public String checkLatestReleasedVersion() {
         try {
             URLConnection connection = new URL("https://api.github.com/repos/retrooper/packetevents/releases/latest").openConnection();
@@ -47,9 +44,9 @@ public class UpdateChecker {
             BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
             String jsonResponse = reader.readLine();
             reader.close();
-            JSONObject jsonObject = (JSONObject) PARSER.parse(jsonResponse);
-            return (String) jsonObject.getOrDefault("tag_name", "");
-        } catch (IOException | ParseException e) {
+            JsonObject jsonObject = ComponentSerializer.GSON.fromJson(jsonResponse, JsonObject.class);
+            return jsonObject.get("tag_name").getAsString();
+        } catch (IOException e) {
             throw new IllegalStateException("Failed to parse packetevents version!", e);
         }
     }

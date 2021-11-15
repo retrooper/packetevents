@@ -19,7 +19,7 @@
 package com.github.retrooper.packetevents.protocol.chat.component;
 
 import com.github.retrooper.packetevents.protocol.chat.Color;
-import org.json.simple.JSONObject;
+import com.google.gson.JsonObject;
 
 public class TextComponent extends BaseComponent {
     private String text;
@@ -37,15 +37,19 @@ public class TextComponent extends BaseComponent {
     }
 
     @Override
-    public void parseJSON(JSONObject jsonObject) {
-        this.text = (String) jsonObject.getOrDefault("text", "");
+    public void parseJSON(JsonObject jsonObject) {
+        if (jsonObject.has("text")) {
+            text = jsonObject.get("text").getAsString();
+        } else {
+            text = "";
+        }
         super.parseJSON(jsonObject);
     }
 
     @Override
-    public JSONObject buildJSON() {
-        JSONObject jsonObject = super.buildJSON();
-        jsonObject.put("text", text);
+    public JsonObject buildJSON() {
+        JsonObject jsonObject = super.buildJSON();
+        jsonObject.addProperty("text", text);
         return jsonObject;
     }
 

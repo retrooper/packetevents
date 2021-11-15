@@ -165,12 +165,14 @@ public class PlayerManagerImpl implements PlayerManager {
 
     @Override
     public void sendPacket(ChannelAbstract channel, ByteBufAbstract byteBuf) {
-        //TODO Also check if our encoder is RIGHT before minecraft's,
-        //if it is, then don't use context to writeflush, otherwise use it (to support multiple packetevents instances)
-        if (ViaVersionUtil.isAvailable() && !ProtocolSupportUtil.isAvailable()) {
-            channel.writeAndFlush(byteBuf);
-        } else {
-            channel.pipeline().context(PacketEvents.ENCODER_NAME).writeAndFlush(byteBuf);
+        if (channel.isOpen()) {
+            //TODO Also check if our encoder is RIGHT before minecraft's,
+            //if it is, then don't use context to writeflush, otherwise use it (to support multiple packetevents instances)
+            if (ViaVersionUtil.isAvailable() && !ProtocolSupportUtil.isAvailable()) {
+                channel.writeAndFlush(byteBuf);
+            } else {
+                channel.pipeline().context(PacketEvents.ENCODER_NAME).writeAndFlush(byteBuf);
+            }
         }
     }
 

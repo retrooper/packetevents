@@ -18,11 +18,10 @@
 
 package com.github.retrooper.packetevents.protocol.inventory;
 
+import com.github.retrooper.packetevents.protocol.chat.component.ComponentSerializer;
 import com.github.retrooper.packetevents.protocol.resources.ResourceLocation;
+import com.google.gson.JsonObject;
 import org.jetbrains.annotations.Nullable;
-import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
-import org.json.simple.parser.ParseException;
 
 import java.io.*;
 import java.net.HttpURLConnection;
@@ -34,8 +33,7 @@ import java.util.*;
 public class ItemTypes {
     private static final Map<String, ItemType> ITEM_TYPE_MAP = new HashMap<>();
     private static final Map<Integer, ItemType> ITEM_TYPE_ID_MAP = new HashMap<>();
-    private static final JSONParser PARSER = new JSONParser();
-    private static JSONObject modernItemTypesJSONObject = null;
+    private static JsonObject modernItemTypesJSONObject = null;
 
     private enum ItemAttribute {
         //TODO Add more
@@ -46,9 +44,10 @@ public class ItemTypes {
     public static ItemType define(int maxAmount, String key) {
         return define(maxAmount, key, new ItemAttribute[]{});
     }
-    public static ItemType define(int maxAmount, String key, ItemAttribute ... attributesArr) {
+
+    public static ItemType define(int maxAmount, String key, ItemAttribute... attributesArr) {
         Set<ItemAttribute> attributes = new HashSet<>(Arrays.asList(attributesArr));
-        Long itemID = (Long) modernItemTypesJSONObject.get(key);
+        Long itemID = modernItemTypesJSONObject.get(key).getAsLong();
         int id = itemID.intValue();
         boolean musicDisc = attributes.contains(ItemAttribute.MUSIC_DISC);
         ResourceLocation identifier = ResourceLocation.minecraft(key);
@@ -97,7 +96,7 @@ public class ItemTypes {
         return ITEM_TYPE_ID_MAP.get(id);
     }
 
-    private static String paste(String content) throws IOException, ParseException {
+    private static String paste(String content) throws IOException {
         URL url = new URL("https://www.toptal.com/developers/hastebin/documents");
         URLConnection con = url.openConnection();
         con.addRequestProperty("User-Agent", "Mozilla/4.0");
@@ -110,7 +109,6 @@ public class ItemTypes {
             out.flush();
         }
 
-
         InputStream in = new BufferedInputStream(http.getInputStream());
         BufferedReader reader = new BufferedReader(new InputStreamReader(in));
 
@@ -120,8 +118,8 @@ public class ItemTypes {
             entirePage.append(inputLine);
         }
         reader.close();
-        JSONObject jsonObj = (JSONObject) PARSER.parse(entirePage.toString());
-        String keyValue = (String) jsonObj.get("key");
+        JsonObject jsonObj = ComponentSerializer.GSON.fromJson(entirePage.toString(), JsonObject.class);
+        String keyValue = jsonObj.get("key").getAsString();
         return "https://www.toptal.com/developers/hastebin/raw/" + keyValue;
     }
 
@@ -140,12 +138,7 @@ public class ItemTypes {
         } catch (IOException e) {
             e.printStackTrace();
         }
-
-        try {
-            modernItemTypesJSONObject = (JSONObject) PARSER.parse(modernItemTypesJSON.toString());
-        } catch (ParseException e) {
-            e.printStackTrace();
-        }
+        modernItemTypesJSONObject = ComponentSerializer.GSON.fromJson(modernItemTypesJSON.toString(), JsonObject.class);
         /*
 
         String content = "";

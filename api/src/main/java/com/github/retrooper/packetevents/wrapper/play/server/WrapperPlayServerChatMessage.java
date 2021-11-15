@@ -20,7 +20,7 @@ package com.github.retrooper.packetevents.wrapper.play.server;
 
 import com.github.retrooper.packetevents.event.impl.PacketSendEvent;
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
-import com.github.retrooper.packetevents.protocol.chat.component.ComponentParser;
+import com.github.retrooper.packetevents.protocol.chat.component.ComponentSerializer;
 import com.github.retrooper.packetevents.protocol.chat.component.TextComponent;
 import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
@@ -68,10 +68,11 @@ public class WrapperPlayServerChatMessage extends PacketWrapper<WrapperPlayServe
     public void readData() {
         int maxMessageLength = serverVersion.isNewerThanOrEquals(ServerVersion.V_1_13) ? MODERN_MESSAGE_LENGTH : LEGACY_MESSAGE_LENGTH;
         this.jsonMessageRaw = readString(maxMessageLength);
+        System.out.println("og json msg: " + jsonMessageRaw);
 
         //Parse JSON message
         if (HANDLE_JSON) {
-            messageComponents = ComponentParser.parseJSONString(this.jsonMessageRaw);
+            messageComponents = ComponentSerializer.parseJSONString(this.jsonMessageRaw);
         }
 
         //Is the server 1.8+ or is the client 1.8+? 1.7.10 servers support 1.8 clients, and send the chat position.
@@ -102,7 +103,7 @@ public class WrapperPlayServerChatMessage extends PacketWrapper<WrapperPlayServe
     public void writeData() {
         int maxMessageLength = serverVersion.isNewerThanOrEquals(ServerVersion.V_1_13) ? MODERN_MESSAGE_LENGTH : LEGACY_MESSAGE_LENGTH;
         if (HANDLE_JSON) {
-            jsonMessageRaw = ComponentParser.buildJSONString(messageComponents);
+            jsonMessageRaw = ComponentSerializer.buildJSONString(messageComponents);
         }
         writeString(jsonMessageRaw, maxMessageLength);
 
