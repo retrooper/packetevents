@@ -58,8 +58,8 @@ public class WrapperPlayClientChatMessage extends PacketWrapper<WrapperPlayClien
 
     /**
      * The message.
-     * On {@link ClientVersion#v_1_10} and older clients, the message should never exceed 100 characters.
-     * On {@link ClientVersion#v_1_11} and newer clients, the message should never exceed 256 characters.
+     * On {@link ClientVersion#V_1_10} and older clients, the message should never exceed 100 characters.
+     * On {@link ClientVersion#V_1_11} and newer clients, the message should never exceed 256 characters.
      *
      * @return Message
      */
@@ -69,8 +69,8 @@ public class WrapperPlayClientChatMessage extends PacketWrapper<WrapperPlayClien
 
     /**
      * Modify the message.
-     * On {@link ClientVersion#v_1_10} and older clients, the message should never exceed 100 characters.
-     * On {@link ClientVersion#v_1_11} and newer clients, the message should never exceed 256 characters.
+     * On {@link ClientVersion#V_1_10} and older clients, the message should never exceed 100 characters.
+     * On {@link ClientVersion#V_1_11} and newer clients, the message should never exceed 256 characters.
      *
      * @param message Message
      */

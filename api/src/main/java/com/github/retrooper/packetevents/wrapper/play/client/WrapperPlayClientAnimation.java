@@ -63,8 +63,8 @@ public class WrapperPlayClientAnimation extends PacketWrapper<WrapperPlayClientA
 
     /**
      * Hand used for the animation.
-     * On {@link ClientVersion#v_1_9}, an off-hand was introduced and specifies which arm has been swung.
-     * For {@link ClientVersion#v_1_8} and {@link ClientVersion#v_1_7_10} clients only have a main hand.
+     * On {@link ClientVersion#V_1_9}, an off-hand was introduced and specifies which arm has been swung.
+     * For {@link ClientVersion#V_1_8} and {@link ClientVersion#V_1_7_10} clients only have a main hand.
      *
      * @return Hand
      */
@@ -74,8 +74,8 @@ public class WrapperPlayClientAnimation extends PacketWrapper<WrapperPlayClientA
 
     /**
      * Modify the hand used for the animation.
-     * On {@link ClientVersion#v_1_9}, an off-hand was introduced and specifies which arm has been swung.
-     * For {@link ClientVersion#v_1_8} and {@link ClientVersion#v_1_7_10} clients only have a main hand.
+     * On {@link ClientVersion#V_1_9}, an off-hand was introduced and specifies which arm has been swung.
+     * For {@link ClientVersion#V_1_8} and {@link ClientVersion#V_1_7_10} clients only have a main hand.
      * Modifying the hand on 1.8 and 1.7 clients is redundant.
      *
      * @param hand Hand used for the animation

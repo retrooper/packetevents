@@ -30,7 +30,6 @@ public abstract class NBT {
 
     @Override
     public String toString() {
-        //TODO Utils.toStringAllFields(this);
         return "nbt";
     }
 

@@ -154,21 +154,13 @@ public class InternalPacketListener implements PacketListener {
                     WrapperPlayClientInteractEntity interactEntity = new WrapperPlayClientInteractEntity(event);
                     List<TextComponent> components = new ArrayList<>();
 
-                    TextComponent hoverComponent = TextComponent.builder().text("Request to get banned!").color(Color.DARK_RED)
-                            .bold(true)
-                            .underlined(true)
-                            .build();
 
-                    String hoverText = hoverComponent.buildJSON().toString();
                     components.add(TextComponent.builder().text("id: " + interactEntity.getEntityId() + " ")
                             .color(Color.BRIGHT_GREEN)
                             .italic(true)
-                                    .hoverEvent(new HoverEvent(HoverEvent.HoverType.SHOW_TEXT,
-                                            new String[] {hoverText}))
                             .build());
 
-
-                    //TODO Check
+                    
                     components.add(TextComponent.builder().text("type: " + interactEntity.getType().name())
                             .color(Color.DARK_GREEN)
                             .build());
@@ -176,27 +168,7 @@ public class InternalPacketListener implements PacketListener {
 
                     UUID uuid = player != null ? player.getUniqueId() : new UUID(0L, 0L);
                     WrapperPlayServerChatMessage cm = new WrapperPlayServerChatMessage(components, WrapperPlayServerChatMessage.ChatPosition.CHAT, uuid);
-                    //PacketEvents.getAPI().getPlayerManager().sendPacket(event.getChannel(), cm);
-                    net.md_5.bungee.api.chat.TextComponent mainComponent = new net.md_5.bungee.api.chat.TextComponent("id: " + interactEntity.getEntityId() + " ");
-                    mainComponent.setColor(ChatColor.GREEN);
-                    mainComponent.setItalic(true);
-                    mainComponent.setHoverEvent(
-                            new net.md_5.bungee.api.chat.
-                                    HoverEvent(net.md_5.bungee.api.chat.HoverEvent.Action.SHOW_TEXT,
-                                    new ComponentBuilder("Request to get banned!")
-                            .color(ChatColor.DARK_RED)
-                            .bold(true)
-                            .underlined(true)
-                            .create()));
-                    net.md_5.bungee.api.chat.TextComponent subComponent = new net.md_5.bungee.api.chat.TextComponent("type: " + interactEntity.getType().name());
-                    subComponent.setColor(ChatColor.DARK_GREEN);
-
-                    mainComponent.addExtra(subComponent);
-                    String target = net.md_5.bungee.chat.ComponentSerializer.toString(mainComponent);
-                    System.out.println("target: " + target);
-                    cm.createPacket();
-                    System.out.println("Our result: " + cm.getJSONMessageRaw());
-                    player.spigot().sendMessage(mainComponent);
+                    PacketEvents.getAPI().getPlayerManager().sendPacket(event.getChannel(), cm);
                 }
                 break;
         }
