@@ -77,7 +77,7 @@ public class PlayerManagerImpl implements PlayerManager {
     }
 
     @Override
-    public ConnectionState getConnectionState(Object player) {
+    public ConnectionState getConnectionState(@NotNull Object player) {
         return getConnectionState(getChannel(player));
     }
 
@@ -101,7 +101,7 @@ public class PlayerManagerImpl implements PlayerManager {
     }
 
     @Override
-    public int getPing(Object player) {
+    public int getPing(@NotNull Object player) {
         if (MinecraftReflectionUtil.V_1_17_OR_HIGHER) {
             return PlayerPingAccessorModern.getPing((Player) player);
         } else {
@@ -110,7 +110,7 @@ public class PlayerManagerImpl implements PlayerManager {
     }
 
     @Override
-    public @NotNull ClientVersion getClientVersion(Object pl) {
+    public @NotNull ClientVersion getClientVersion(@NotNull Object pl) {
         Player player = (Player) pl;
         if (player.getAddress() == null) {
             return ClientVersion.UNKNOWN;
@@ -159,7 +159,7 @@ public class PlayerManagerImpl implements PlayerManager {
     }
 
     @Override
-    public void setClientVersion(Object player, ClientVersion version) {
+    public void setClientVersion(@NotNull Object player, ClientVersion version) {
         setClientVersion(getChannel(player), version);
     }
 
@@ -183,27 +183,27 @@ public class PlayerManagerImpl implements PlayerManager {
     }
 
     @Override
-    public void sendPacket(Object player, ByteBufAbstract byteBuf) {
+    public void sendPacket(@NotNull Object player, ByteBufAbstract byteBuf) {
         ChannelAbstract channel = getChannel(player);
         sendPacket(channel, byteBuf);
     }
 
     @Override
-    public void sendPacket(Object player, PacketWrapper<?> wrapper) {
+    public void sendPacket(@NotNull Object player, PacketWrapper<?> wrapper) {
         wrapper.createPacket();
         ChannelAbstract channel = getChannel(player);
         sendPacket(channel, wrapper.byteBuf);
     }
 
     @Override
-    public WrappedGameProfile getGameProfile(Object pl) {
+    public WrappedGameProfile getGameProfile(@NotNull Object pl) {
         Player player = (Player) pl;
         Object gameProfile = DependencyUtil.getGameProfile(player.getUniqueId(), player.getName());
         return DependencyUtil.getWrappedGameProfile(gameProfile);
     }
 
     @Override
-    public boolean isGeyserPlayer(Object pl) {
+    public boolean isGeyserPlayer(@NotNull Object pl) {
         Player player = (Player) pl;
         return isGeyserPlayer(player.getUniqueId());
     }
@@ -217,7 +217,7 @@ public class PlayerManagerImpl implements PlayerManager {
     }
 
     @Override
-    public ChannelAbstract getChannel(Object player) {
+    public ChannelAbstract getChannel(@NotNull Object player) {
         String username = ((Player) player).getName();
         ChannelAbstract channel = getChannel(username);
         if (channel == null) {
@@ -241,7 +241,7 @@ public class PlayerManagerImpl implements PlayerManager {
     }
 
     @Override
-    public void setChannel(Object player, ChannelAbstract channel) {
+    public void setChannel(@NotNull Object player, ChannelAbstract channel) {
         setChannel(((Player) player).getName(), channel);
     }
 }

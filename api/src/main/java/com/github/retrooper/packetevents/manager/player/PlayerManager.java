@@ -40,42 +40,42 @@ public interface PlayerManager {
     <T extends PlayerAttributeObject> T getAttribute(UUID uuid, Class<T> clazz);
     <T extends PlayerAttributeObject> void setAttribute(UUID uuid, T attribute);
 
-    ConnectionState getConnectionState(Object player);
+    ConnectionState getConnectionState(@NotNull Object player);
 
     ConnectionState getConnectionState(ChannelAbstract channel);
 
     void changeConnectionState(ChannelAbstract channel, ConnectionState connectionState);
 
-    int getPing(Object player);
+    int getPing(@NotNull Object player);
 
     @NotNull
-    ClientVersion getClientVersion(Object player);
+    ClientVersion getClientVersion(@NotNull Object player);
 
     ClientVersion getClientVersion(ChannelAbstract channel);
 
     void setClientVersion(ChannelAbstract channel, ClientVersion version);
 
-    void setClientVersion(Object player, ClientVersion version);
+    void setClientVersion(@NotNull Object player, ClientVersion version);
 
     void sendPacket(ChannelAbstract channel, ByteBufAbstract byteBuf);
 
     void sendPacket(ChannelAbstract channel, PacketWrapper<?> wrapper);
 
-    void sendPacket(Object player, ByteBufAbstract byteBuf);
+    void sendPacket(@NotNull Object player, ByteBufAbstract byteBuf);
 
-    void sendPacket(Object player, PacketWrapper<?> wrapper);
+    void sendPacket(@NotNull Object player, PacketWrapper<?> wrapper);
 
-    WrappedGameProfile getGameProfile(Object player);
+    WrappedGameProfile getGameProfile(@NotNull Object player);
 
-    boolean isGeyserPlayer(Object player);
+    boolean isGeyserPlayer(@NotNull Object player);
 
     boolean isGeyserPlayer(UUID uuid);
 
-    ChannelAbstract getChannel(Object player);
+    ChannelAbstract getChannel(@NotNull Object player);
 
     ChannelAbstract getChannel(String username);
 
     void setChannel(String username, ChannelAbstract channel);
 
-    void setChannel(Object player, ChannelAbstract channel);
+    void setChannel(@NotNull Object player, ChannelAbstract channel);
 }
