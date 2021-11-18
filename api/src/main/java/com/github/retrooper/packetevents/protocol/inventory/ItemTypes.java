@@ -20,6 +20,7 @@ package com.github.retrooper.packetevents.protocol.inventory;
 
 import com.github.retrooper.packetevents.protocol.chat.component.ComponentSerializer;
 import com.github.retrooper.packetevents.protocol.resources.ResourceLocation;
+import com.github.retrooper.packetevents.util.MappingHelper;
 import com.google.gson.JsonObject;
 import org.jetbrains.annotations.Nullable;
 
@@ -27,19 +28,21 @@ import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLConnection;
-import java.nio.charset.StandardCharsets;
 import java.util.*;
 
 public class ItemTypes {
     private static final Map<String, ItemType> ITEM_TYPE_MAP = new HashMap<>();
     private static final Map<Integer, ItemType> ITEM_TYPE_ID_MAP = new HashMap<>();
-    private static JsonObject modernItemTypesJSONObject = null;
+    private static JsonObject ITEM_TYPES_JSON = null;
 
     private enum ItemAttribute {
         //TODO Add more
         MUSIC_DISC, EDIBLE;
     }
 
+    public static void replaceJsonObject(JsonObject jsonObject) {
+        ITEM_TYPES_JSON = jsonObject;
+    }
 
     public static ItemType define(int maxAmount, String key) {
         return define(maxAmount, key, new ItemAttribute[]{});
@@ -47,8 +50,10 @@ public class ItemTypes {
 
     public static ItemType define(int maxAmount, String key, ItemAttribute... attributesArr) {
         Set<ItemAttribute> attributes = new HashSet<>(Arrays.asList(attributesArr));
-        Long itemID = modernItemTypesJSONObject.get(key).getAsLong();
-        int id = itemID.intValue();
+        if (ITEM_TYPES_JSON == null) {
+            ITEM_TYPES_JSON = MappingHelper.getJSONObject("modernitemtypes");
+        }
+        int id = ITEM_TYPES_JSON.get(key).getAsInt();
         boolean musicDisc = attributes.contains(ItemAttribute.MUSIC_DISC);
         ResourceLocation identifier = ResourceLocation.minecraft(key);
 
@@ -66,14 +71,6 @@ public class ItemTypes {
             @Override
             public int getId() {
                 return id;
-            }
-
-            @Override
-            public boolean equals(Object obj) {
-                if (obj instanceof ItemType) {
-                    return ((ItemType) obj).getId() == id;
-                }
-                return false;
             }
 
             @Override
@@ -125,20 +122,6 @@ public class ItemTypes {
 
 
     static {
-        StringBuilder modernItemTypesJSON = new StringBuilder();
-        try (InputStream inputStream = ItemTypes.class.getClassLoader().getResourceAsStream("assets/mappings/modernitemtypes.json");
-             InputStreamReader streamReader = new InputStreamReader(inputStream, StandardCharsets.UTF_8);
-             BufferedReader reader = new BufferedReader(streamReader)) {
-
-            String line;
-            while ((line = reader.readLine()) != null) {
-                modernItemTypesJSON.append(line);
-            }
-
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        modernItemTypesJSONObject = ComponentSerializer.GSON.fromJson(modernItemTypesJSON.toString(), JsonObject.class);
         /*
 
         String content = "";
@@ -165,7 +148,6 @@ public class ItemTypes {
 
     }
 
-    //TODO Correct max amounts for all item types
     public static final ItemType GILDED_BLACKSTONE = define(64, "gilded_blackstone");
     public static final ItemType NETHER_BRICK_SLAB = define(64, "nether_brick_slab");
     public static final ItemType ANDESITE_SLAB = define(64, "andesite_slab");

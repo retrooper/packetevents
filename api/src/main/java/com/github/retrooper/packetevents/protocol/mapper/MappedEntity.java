@@ -16,12 +16,16 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.github.retrooper.packetevents.protocol.inventory;
+package com.github.retrooper.packetevents.protocol.mapper;
 
-import com.github.retrooper.packetevents.protocol.mapper.MappedEntity;
+import com.github.retrooper.packetevents.protocol.resources.ResourceLocation;
 
-public interface ItemType extends MappedEntity {
-    int getMaxAmount();
+public interface MappedEntity {
+    ResourceLocation getIdentifier();
 
-    boolean isMusicDisc();
+    int getId();
+
+    default boolean equals(MappedEntity other) {
+        return getId() == other.getId();
+    }
 }

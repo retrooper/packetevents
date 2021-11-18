@@ -26,22 +26,24 @@ import com.github.retrooper.packetevents.manager.player.attributes.TabCompleteAt
 import com.github.retrooper.packetevents.protocol.ConnectionState;
 import com.github.retrooper.packetevents.protocol.chat.Color;
 import com.github.retrooper.packetevents.protocol.chat.component.ComponentSerializer;
-import com.github.retrooper.packetevents.protocol.chat.component.HoverEvent;
 import com.github.retrooper.packetevents.protocol.chat.component.TextComponent;
+import com.github.retrooper.packetevents.protocol.entity.EntityType;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.protocol.player.ClientVersion;
+import com.github.retrooper.packetevents.util.MappingHelper;
+import com.github.retrooper.packetevents.util.Vector3d;
 import com.github.retrooper.packetevents.wrapper.handshaking.client.WrapperHandshakingClientHandshake;
 import com.github.retrooper.packetevents.wrapper.login.client.WrapperLoginClientLoginStart;
 import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientInteractEntity;
 import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientTabComplete;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerChatMessage;
-import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerSetSlot;
-import net.md_5.bungee.api.ChatColor;
-import net.md_5.bungee.api.chat.ClickEvent;
-import net.md_5.bungee.api.chat.ComponentBuilder;
+import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerSpawnLivingEntity;
 import org.bukkit.entity.Player;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
 
 public class InternalPacketListener implements PacketListener {
     //Make this specific event be at MONITOR priority
@@ -59,11 +61,12 @@ public class InternalPacketListener implements PacketListener {
             }
             String jsonMessage = ComponentSerializer.buildJSONString(components);
             System.out.println("JSON Message: " + jsonMessage);
-        } else if (event.getPacketType() == PacketType.Play.Server.SET_SLOT) {
-            WrapperPlayServerSetSlot setSlot = new WrapperPlayServerSetSlot(event);
-            player.sendMessage("Item type: " + setSlot.getItem().getType().getIdentifier().getKey() + ", item nbt: " + Arrays.toString(setSlot.getItem().getNBT().getTagNames().toArray(new String[0])));
-            player.sendMessage("slot: " + setSlot.getSlot() + ", window id: " + setSlot.getWindowId());
-            event.setLastUsedWrapper(null);
+        } else if (event.getPacketType() == PacketType.Play.Server.SPAWN_LIVING_ENTITY) {
+            WrapperPlayServerSpawnLivingEntity spawnLivingEntity = new WrapperPlayServerSpawnLivingEntity(event);
+            int entityID = spawnLivingEntity.getEntityId();
+            EntityType entityType = spawnLivingEntity.getEntityType();
+            Vector3d position = spawnLivingEntity.getPosition();
+            System.out.println("Spawned entity with ID " + entityID + " of type " + entityType.getIdentifier().getKey() + "=" + entityType.getId() + " at position " + position);
         }
         /*
         else if (event.getPacketType() == PacketType.Play.Server.CHUNK_DATA) {
@@ -160,7 +163,7 @@ public class InternalPacketListener implements PacketListener {
                             .italic(true)
                             .build());
 
-                    
+
                     components.add(TextComponent.builder().text("type: " + interactEntity.getType().name())
                             .color(Color.DARK_GREEN)
                             .build());
