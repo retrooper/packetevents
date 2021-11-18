@@ -178,7 +178,7 @@ public class PlayerManagerImpl implements PlayerManager {
 
     @Override
     public void sendPacket(ChannelAbstract channel, PacketWrapper<?> wrapper) {
-        wrapper.createPacket();
+        wrapper.prepareForSend();
         sendPacket(channel, wrapper.byteBuf);
     }
 
@@ -190,7 +190,7 @@ public class PlayerManagerImpl implements PlayerManager {
 
     @Override
     public void sendPacket(@NotNull Object player, PacketWrapper<?> wrapper) {
-        wrapper.createPacket();
+        wrapper.prepareForSend();
         ChannelAbstract channel = getChannel(player);
         sendPacket(channel, wrapper.byteBuf);
     }

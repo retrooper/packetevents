@@ -47,7 +47,7 @@ public class PacketWrapper<T extends PacketWrapper> {
     protected final ClientVersion clientVersion;
     protected final ServerVersion serverVersion;
     private final int packetID;
-
+    private boolean hasPreparedForSending;
     public PacketWrapper(ClientVersion clientVersion, ServerVersion serverVersion, ByteBufAbstract byteBuf, int packetID) {
         this.clientVersion = clientVersion;
         this.serverVersion = serverVersion;
@@ -100,9 +100,12 @@ public class PacketWrapper<T extends PacketWrapper> {
         return new PacketWrapper(ClientVersion.UNKNOWN, PacketEvents.getAPI().getServerManager().getVersion(), byteBuf, -1);
     }
 
-    public final void createPacket() {
-        writeVarInt(packetID);
-        writeData();
+    public final void prepareForSend() {
+        if (!hasPreparedForSending) {
+            writeVarInt(packetID);
+            writeData();
+            hasPreparedForSending = true;
+        }
     }
 
     public void readData() {
@@ -115,6 +118,14 @@ public class PacketWrapper<T extends PacketWrapper> {
 
     public void writeData() {
 
+    }
+
+    public boolean hasPreparedForSending() {
+        return hasPreparedForSending;
+    }
+
+    public void setHasPrepareForSending(boolean hasPreparedForSending) {
+        this.hasPreparedForSending = hasPreparedForSending;
     }
 
     public ClientVersion getClientVersion() {

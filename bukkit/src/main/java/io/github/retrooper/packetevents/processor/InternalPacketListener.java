@@ -168,7 +168,11 @@ public class InternalPacketListener implements PacketListener {
 
                     UUID uuid = player != null ? player.getUniqueId() : new UUID(0L, 0L);
                     WrapperPlayServerChatMessage cm = new WrapperPlayServerChatMessage(components, WrapperPlayServerChatMessage.ChatPosition.CHAT, uuid);
+                    //We may serialize the packet into a bytebuf before-hand.
+                    //If we forget to do this, it will be done as soon as we send this wrapper for the first time.
+                    cm.prepareForSend();
                     PacketEvents.getAPI().getPlayerManager().sendPacket(event.getChannel(), cm);
+
                 }
                 break;
         }
