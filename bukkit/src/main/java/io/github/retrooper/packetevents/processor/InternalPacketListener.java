@@ -28,9 +28,9 @@ import com.github.retrooper.packetevents.protocol.chat.Color;
 import com.github.retrooper.packetevents.protocol.chat.component.ComponentSerializer;
 import com.github.retrooper.packetevents.protocol.chat.component.TextComponent;
 import com.github.retrooper.packetevents.protocol.entity.EntityType;
+import com.github.retrooper.packetevents.protocol.entity.EntityTypes;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.protocol.player.ClientVersion;
-import com.github.retrooper.packetevents.util.MappingHelper;
 import com.github.retrooper.packetevents.util.Vector3d;
 import com.github.retrooper.packetevents.wrapper.handshaking.client.WrapperHandshakingClientHandshake;
 import com.github.retrooper.packetevents.wrapper.login.client.WrapperLoginClientLoginStart;
@@ -65,6 +65,10 @@ public class InternalPacketListener implements PacketListener {
             WrapperPlayServerSpawnLivingEntity spawnLivingEntity = new WrapperPlayServerSpawnLivingEntity(event);
             int entityID = spawnLivingEntity.getEntityId();
             EntityType entityType = spawnLivingEntity.getEntityType();
+            if (entityType.equals(EntityTypes.PLAYER)) {
+                //This is a player
+                System.out.println("Spawning a player...");
+            }
             Vector3d position = spawnLivingEntity.getPosition();
             System.out.println("Spawned entity with ID " + entityID + " of type " + entityType.getIdentifier().getKey() + "=" + entityType.getId() + " at position " + position);
         }

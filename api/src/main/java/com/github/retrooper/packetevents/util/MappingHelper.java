@@ -21,6 +21,7 @@ package com.github.retrooper.packetevents.util;
 import com.github.retrooper.packetevents.protocol.chat.component.ComponentSerializer;
 import com.github.retrooper.packetevents.protocol.entity.EntityTypes;
 import com.github.retrooper.packetevents.protocol.inventory.ItemTypes;
+import com.github.retrooper.packetevents.protocol.potion.PotionTypes;
 import com.google.gson.JsonObject;
 
 import java.io.BufferedReader;
@@ -66,5 +67,7 @@ public class MappingHelper {
         ItemTypes.replaceJsonObject(MappingHelper.getJSONObject("modernitemtypes"));
         MAPPING_JSON_OBJECTS.put("modernentitytypes", searchJSONObject("modernentitytypes"));
         EntityTypes.replaceJSONObject(MappingHelper.getJSONObject("modernentitytypes"));
+        MAPPING_JSON_OBJECTS.put("modernpotiontypes", searchJSONObject("modernpotiontypes"));
+        PotionTypes.replaceJSONObject(MappingHelper.getJSONObject("modernpotiontypes"));
     }
 }

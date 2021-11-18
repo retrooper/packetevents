@@ -16,12 +16,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.github.retrooper.packetevents.protocol.mapper;
+package com.github.retrooper.packetevents.protocol.potion;
 
-import com.github.retrooper.packetevents.protocol.resources.ResourceLocation;
+import com.github.retrooper.packetevents.protocol.mapper.MappedEntity;
 
-public interface MappedEntity {
-    ResourceLocation getIdentifier();
+public interface PotionType extends MappedEntity {
 
-    int getId();
 }

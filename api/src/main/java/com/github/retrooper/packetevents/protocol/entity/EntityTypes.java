@@ -38,9 +38,6 @@ public class EntityTypes {
         if (ENTITY_TYPES_JSON == null) {
             ENTITY_TYPES_JSON = MappingHelper.getJSONObject("modernentitytypes");
         }
-        if (ENTITY_TYPES_JSON.get(key) == null) {
-            System.out.println("KEY: " + key + " COULD NOT BE FOUND!");
-        }
         int id = ENTITY_TYPES_JSON.get(key).getAsInt();
         ResourceLocation identifier = ResourceLocation.minecraft(key);
         EntityType entityType = new EntityType() {
@@ -52,6 +49,14 @@ public class EntityTypes {
             @Override
             public int getId() {
                 return id;
+            }
+
+            @Override
+            public boolean equals(Object obj) {
+                if (obj instanceof EntityType) {
+                    return getId() == ((EntityType)obj).getId();
+                }
+                return false;
             }
         };
 

@@ -77,6 +77,14 @@ public class ItemTypes {
             public boolean isMusicDisc() {
                 return musicDisc;
             }
+
+            @Override
+            public boolean equals(Object obj) {
+                if (obj instanceof ItemType) {
+                    return getId() == ((ItemType)obj).getId();
+                }
+                return false;
+            }
         };
         ITEM_TYPE_MAP.put(type.getIdentifier().getKey(), type);
         ITEM_TYPE_ID_MAP.put(type.getId(), type);
