@@ -44,7 +44,12 @@ public class WrapperPlayClientPluginMessage extends PacketWrapper<WrapperPlayCli
 
     @Override
     public void readData() {
-        this.channelName = readString();
+        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_13)) {
+            this.channelName = readString(32767);
+        }
+        else {
+            this.channelName = readString(20);
+        }
         int dataLength = serverVersion.isNewerThanOrEquals(ServerVersion.V_1_8) ? byteBuf.readableBytes() : readShort();
         this.data = readByteArray(dataLength);
     }
@@ -57,7 +62,12 @@ public class WrapperPlayClientPluginMessage extends PacketWrapper<WrapperPlayCli
 
     @Override
     public void writeData() {
-        writeString(channelName);
+        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_13)) {
+            writeString(this.channelName, 32767);
+        }
+        else {
+            writeString(this.channelName, 20);
+        }
         if (serverVersion == ServerVersion.V_1_7_10) {
             writeShort(this.data.length);
         }
