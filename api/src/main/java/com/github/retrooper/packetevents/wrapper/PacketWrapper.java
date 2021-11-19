@@ -224,7 +224,6 @@ public class PacketWrapper<T extends PacketWrapper> {
         boolean v1_13_2 = serverVersion.isNewerThanOrEquals(ServerVersion.V_1_13_2);
         if (v1_13_2) {
             if (!readBoolean()) {
-                System.out.println("i seee");
                 return ItemStack.NULL;
             }
         }
@@ -248,10 +247,8 @@ public class PacketWrapper<T extends PacketWrapper> {
         boolean v1_13_2 = serverVersion.isNewerThanOrEquals(ServerVersion.V_1_13_2);
         if (v1_13_2) {
             if (itemStack.equals(ItemStack.NULL)) {
-                System.out.println("correct");
                 writeBoolean(false);
             } else {
-                System.out.println("tf u doin");
                 writeBoolean(true);
                 int typeID = itemStack.getType().getId();
                 if (typeID >= 0) {

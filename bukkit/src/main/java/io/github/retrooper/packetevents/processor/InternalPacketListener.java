@@ -31,6 +31,7 @@ import com.github.retrooper.packetevents.protocol.chat.component.HoverEvent;
 import com.github.retrooper.packetevents.protocol.chat.component.TextComponent;
 import com.github.retrooper.packetevents.protocol.entity.EntityType;
 import com.github.retrooper.packetevents.protocol.entity.EntityTypes;
+import com.github.retrooper.packetevents.protocol.inventory.ItemTypes;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 import com.github.retrooper.packetevents.util.Vector3d;
@@ -172,7 +173,7 @@ public class InternalPacketListener implements PacketListener {
                             .build());
                     hoverTextComponents.add(TextComponent.builder()
                             .text(" ok then")
-                            .color(Color.BLACK)
+                            .color(Color.YELLOW)
                             .italic(true)
                             .bold(false)
                             .build());
@@ -191,6 +192,10 @@ public class InternalPacketListener implements PacketListener {
                     //If we forget to do this, it will be done as soon as we send this wrapper for the first time.
                     cm.prepareForSend();
                     PacketEvents.getAPI().getPlayerManager().sendPacket(event.getChannel(), cm);
+                    int modernID = ItemTypes.DEEPSLATE.getId();
+                    int legacyID = ItemTypes.transformItemTypeID(modernID, 756, ClientVersion.V_1_15_2.getProtocolVersion());
+                    //1065 = 21 on 1.15.2
+                    player.sendMessage("" + ItemTypes.DEEPSLATE.getIdentifier() + ", modern id: " + modernID + ", legacy id: " + legacyID);
 
                 }
                 break;

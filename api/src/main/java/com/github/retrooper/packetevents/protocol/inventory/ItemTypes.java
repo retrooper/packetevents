@@ -18,7 +18,9 @@
 
 package com.github.retrooper.packetevents.protocol.inventory;
 
+import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.protocol.chat.component.ComponentSerializer;
+import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 import com.github.retrooper.packetevents.protocol.resources.ResourceLocation;
 import com.github.retrooper.packetevents.util.MappingHelper;
 import com.google.gson.JsonObject;
@@ -99,6 +101,51 @@ public class ItemTypes {
     @Nullable
     public static ItemType getById(int id) {
         return ITEM_TYPE_ID_MAP.get(id);
+    }
+
+    @Nullable
+    public static ItemType getById(int id, int currentProtocolVersion, int targetProtocolVersion) {
+        id = transformItemTypeID(id, currentProtocolVersion, targetProtocolVersion);
+        return getById(id);
+    }
+
+    public static int transformItemTypeID(int id, int currentProtocolVersion, int targetProtocolVersion) {
+        if (currentProtocolVersion == targetProtocolVersion) {
+            return id;
+        }
+        JsonObject jsonObject = MappingHelper.getJSONObject("legacyitemtypes");
+        //Assume currentProtocolVersion is 1.17.1=756
+        int i = 0;
+        for (ClientVersion cv : ClientVersion.REVERSED_VALUES) {
+            if (!cv.name().startsWith("V_")) {
+                continue;
+            }
+            String jsonName = cv.name().substring(2);
+            if (jsonObject.has(jsonName)) {
+                JsonObject mappings = jsonObject.getAsJsonObject(jsonName);
+                if (mappings.has(Integer.toString(id))) {
+                    int newID = mappings.get(Integer.toString(id)).getAsInt();
+                    id = newID;
+                }
+                else {
+                    continue;
+
+                }
+            }
+
+            if (cv.getProtocolVersion() == targetProtocolVersion) {
+                return id;
+            }
+        }
+        ClientVersion cv = ClientVersion.values()[0];
+        String jsonName = cv.name().substring(2);
+        if (jsonObject.has(jsonName)) {
+            JsonObject mappings = jsonObject.getAsJsonObject(jsonName);
+            if (mappings.has(Integer.toString(id))) {
+                return mappings.get(Integer.toString(id)).getAsInt();
+            }
+        }
+        return -1;
     }
 
     private static String paste(String content) throws IOException {
