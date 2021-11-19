@@ -110,18 +110,18 @@ public class PlayerManagerImpl implements PlayerManager {
     }
 
     @Override
-    public @NotNull ClientVersion getClientVersion(@NotNull Object pl) {
-        Player player = (Player) pl;
-        if (player.getAddress() == null) {
+    public @NotNull ClientVersion getClientVersion(@NotNull Object player) {
+        Player p = (Player) player;
+        if (p.getAddress() == null) {
             return ClientVersion.UNKNOWN;
         }
-        ChannelAbstract channel = getChannel(player);
+        ChannelAbstract channel = getChannel(p);
         ClientVersion version = CLIENT_VERSIONS.get(channel);
         if (version == null || !version.isResolved()) {
             //Asking ViaVersion or ProtocolSupport for the protocol version.
             if (DependencyUtil.isProtocolTranslationDependencyAvailable()) {
                 try {
-                    version = ClientVersion.getClientVersionByProtocolVersion(DependencyUtil.getProtocolVersion(player));
+                    version = ClientVersion.getClientVersionByProtocolVersion(DependencyUtil.getProtocolVersion(p));
                     CLIENT_VERSIONS.put(channel, version);
                     return version;
                 } catch (Exception ex) {
@@ -133,7 +133,7 @@ public class PlayerManagerImpl implements PlayerManager {
                 short protocolVersion;
                 //Luckily 1.7.10 provides a method for us to access a player's protocol version(because 1.7.10 servers support 1.8 clients too)
                 if (PacketEvents.getAPI().getServerManager().getVersion() == ServerVersion.V_1_7_10) {
-                    protocolVersion = (short) SpigotVersionLookup_1_7.getProtocolVersion(player);
+                    protocolVersion = (short) SpigotVersionLookup_1_7.getProtocolVersion(p);
                 } else {
                     //No dependency available, couldn't snatch the version from the packet AND server version is not 1.7.10
                     //We are pretty safe to assume the version is the same as the server, as ViaVersion AND ProtocolSupport could not be found.
@@ -196,16 +196,15 @@ public class PlayerManagerImpl implements PlayerManager {
     }
 
     @Override
-    public WrappedGameProfile getGameProfile(@NotNull Object pl) {
-        Player player = (Player) pl;
-        Object gameProfile = DependencyUtil.getGameProfile(player.getUniqueId(), player.getName());
+    public WrappedGameProfile getGameProfile(@NotNull Object player) {
+        Player p = (Player) player;
+        Object gameProfile = DependencyUtil.getGameProfile(p.getUniqueId(), p.getName());
         return DependencyUtil.getWrappedGameProfile(gameProfile);
     }
 
     @Override
-    public boolean isGeyserPlayer(@NotNull Object pl) {
-        Player player = (Player) pl;
-        return isGeyserPlayer(player.getUniqueId());
+    public boolean isGeyserPlayer(@NotNull Object player) {
+        return isGeyserPlayer(((Player)player).getUniqueId());
     }
 
     @Override

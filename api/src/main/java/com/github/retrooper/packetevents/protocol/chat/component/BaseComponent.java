@@ -278,11 +278,12 @@ public class BaseComponent {
                 hoverEventValueArray.add(value.buildJSON());
             }
 
+            //We use "value" instead of "contents" because we can be sure it will work on every Spigot version.
             if (hoverEventValueArray.size() == 1) {
                 hoverEventObject.add("value", hoverEventValueArray.get(0));
             }
             else {
-                hoverEventObject.add("contents", hoverEventValueArray);
+                hoverEventObject.add("value", hoverEventValueArray);
             }
             jsonObject.add("hoverEvent", hoverEventObject);
         }
