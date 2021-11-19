@@ -25,23 +25,17 @@ import java.util.List;
 public class HoverEvent {
     private HoverType type;
     //Can also be a component in string form
-    private List<String> values;
+    private List<BaseComponent> values;
 
-    public HoverEvent(HoverType type, List<String> values) {
+    public HoverEvent(HoverType type, List<BaseComponent> values) {
         this.type = type;
         this.values = values;
     }
 
-    public HoverEvent(HoverType type, String[] values) {
+    public HoverEvent(HoverType type, BaseComponent... values) {
         this.type = type;
         this.values = new ArrayList<>();
         this.values.addAll(Arrays.asList(values));
-    }
-
-    public HoverEvent(HoverType type, String value) {
-        this.type = type;
-        this.values = new ArrayList<>();
-        this.values.add(value);
     }
 
     public HoverEvent(HoverType type) {
@@ -56,11 +50,11 @@ public class HoverEvent {
         this.type = type;
     }
 
-    public List<String> getValues() {
+    public List<BaseComponent> getValues() {
         return values;
     }
 
-    public void setValues(List<String> values) {
+    public void setValues(List<BaseComponent> values) {
         this.values = values;
     }
 

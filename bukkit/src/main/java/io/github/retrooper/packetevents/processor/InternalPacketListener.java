@@ -25,7 +25,9 @@ import com.github.retrooper.packetevents.event.impl.PacketSendEvent;
 import com.github.retrooper.packetevents.manager.player.attributes.TabCompleteAttribute;
 import com.github.retrooper.packetevents.protocol.ConnectionState;
 import com.github.retrooper.packetevents.protocol.chat.Color;
+import com.github.retrooper.packetevents.protocol.chat.component.BaseComponent;
 import com.github.retrooper.packetevents.protocol.chat.component.ComponentSerializer;
+import com.github.retrooper.packetevents.protocol.chat.component.HoverEvent;
 import com.github.retrooper.packetevents.protocol.chat.component.TextComponent;
 import com.github.retrooper.packetevents.protocol.entity.EntityType;
 import com.github.retrooper.packetevents.protocol.entity.EntityTypes;
@@ -162,14 +164,24 @@ public class InternalPacketListener implements PacketListener {
                     List<TextComponent> components = new ArrayList<>();
 
 
+                    List<BaseComponent> hoverTextComponents = new ArrayList<>();
+                    hoverTextComponents.add(TextComponent.builder()
+                            .text("type: " + interactEntity.getType().name())
+                            .color(Color.GOLD)
+                            .bold(true)
+                            .build());
+                    hoverTextComponents.add(TextComponent.builder()
+                            .text(" ok then")
+                            .color(Color.BLACK)
+                            .italic(true)
+                            .bold(false)
+                            .build());
+
                     components.add(TextComponent.builder().text("id: " + interactEntity.getEntityId() + " ")
                             .color(Color.BRIGHT_GREEN)
                             .italic(true)
-                            .build());
-
-
-                    components.add(TextComponent.builder().text("type: " + interactEntity.getType().name())
-                            .color(Color.DARK_GREEN)
+                            .hoverEvent(new HoverEvent(HoverEvent.HoverType.SHOW_TEXT,
+                                    hoverTextComponents))
                             .build());
 
 
