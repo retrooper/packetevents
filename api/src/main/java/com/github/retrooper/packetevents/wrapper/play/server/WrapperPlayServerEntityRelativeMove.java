@@ -89,7 +89,7 @@ public class WrapperPlayServerEntityRelativeMove extends PacketWrapper<WrapperPl
         return entityID;
     }
 
-    public void setEntityID(int entityID) {
+    public void setEntityId(int entityID) {
         this.entityID = entityID;
     }
 

@@ -75,7 +75,7 @@ public class WrapperPlayClientEntityAction extends PacketWrapper<WrapperPlayClie
         return entityID;
     }
 
-    public void setEntityID(int entityID) {
+    public void setEntityId(int entityID) {
         this.entityID = entityID;
     }
 

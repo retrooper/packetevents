@@ -1,7 +1,6 @@
 plugins {
     id 'java-library'
     id 'maven-publish'
-    id 'com.github.johnrengelman.shadow' version '7.0.0'
 }
 
 repositories {
@@ -9,13 +8,10 @@ repositories {
 }
 
 tasks {
-    shadowJar {
-        relocate("com.google.gson", "com.github.retrooper.packetevents.google.gson")
-    }
 }
 
 dependencies {
-    api 'com.google.code.gson:gson:2.8.9'
+    compileOnlyApi 'com.google.code.gson:gson:2.8.9'
     compileOnly 'org.jetbrains:annotations:22.0.0'
 }
 

@@ -30,7 +30,7 @@ public class WrapperPlayServerDestroyEntities extends PacketWrapper<WrapperPlayS
         super(event);
     }
 
-    public WrapperPlayServerDestroyEntities(int[] entityIDs) {
+    public WrapperPlayServerDestroyEntities(int... entityIDs) {
         super(PacketType.Play.Server.DESTROY_ENTITIES);
         this.entityIDs = entityIDs;
     }
@@ -71,6 +71,7 @@ public class WrapperPlayServerDestroyEntities extends PacketWrapper<WrapperPlayS
     @Override
     public void writeData() {
         if (serverVersion == ServerVersion.V_1_17) {
+            //TODO Inform them that they should use the single entityID constructor
             writeVarInt(entityIDs[0]);
         }
         else {

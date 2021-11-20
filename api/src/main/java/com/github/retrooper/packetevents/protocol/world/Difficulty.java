@@ -24,7 +24,7 @@ public enum Difficulty {
     NORMAL,
     HARD;
 
-    public static Difficulty getByID(int id) {
+    public static Difficulty getById(int id) {
         return values()[id];
     }
 }

@@ -78,7 +78,7 @@ public class WrapperPlayClientWindowConfirmation extends PacketWrapper<WrapperPl
         return windowID;
     }
 
-    public void setWindowID(int windowID) {
+    public void setWindowId(int windowID) {
         this.windowID = windowID;
     }
 

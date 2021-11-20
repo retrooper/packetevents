@@ -193,7 +193,7 @@ public class InternalPacketListener implements PacketListener {
                     cm.prepareForSend();
                     PacketEvents.getAPI().getPlayerManager().sendPacket(event.getChannel(), cm);
                     int modernID = ItemTypes.DEEPSLATE.getId();
-                    int legacyID = ItemTypes.transformItemTypeID(modernID, 756, ClientVersion.V_1_15_2.getProtocolVersion());
+                    int legacyID = ItemTypes.transformItemTypeId(modernID, 756, ClientVersion.V_1_15_2.getProtocolVersion());
                     //1065 = 21 on 1.15.2
                     player.sendMessage("" + ItemTypes.DEEPSLATE.getIdentifier() + ", modern id: " + modernID + ", legacy id: " + legacyID);
 

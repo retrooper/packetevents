@@ -36,7 +36,7 @@ public enum Hand {
 
     public static final Hand[] VALUES = values();
 
-    public static Hand getByLegacyID(int handValue) {
+    public static Hand getByLegacyId(int handValue) {
         return handValue == 0 ? RIGHT : LEFT;
     }
 }

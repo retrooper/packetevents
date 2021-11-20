@@ -59,7 +59,7 @@ public class WrapperPlayClientQueryBlockNBT extends PacketWrapper<WrapperPlayCli
         return transactionID;
     }
 
-    public void setTransactionID(int transactionID) {
+    public void setTransactionId(int transactionID) {
         this.transactionID = transactionID;
     }
 

@@ -95,7 +95,7 @@ public class WrapperPlayServerRespawn extends PacketWrapper<WrapperPlayServerRes
             keepingAllPlayerData = readBoolean();
         }
         else if (v1_15_0) {
-            DimensionType dimensionType = DimensionType.getByID(readInt());
+            DimensionType dimensionType = DimensionType.getById(readInt());
             dimension = new Dimension(dimensionType);
             worldName = Optional.empty();
             hashedSeed = readLong();
@@ -111,11 +111,11 @@ public class WrapperPlayServerRespawn extends PacketWrapper<WrapperPlayServerRes
             }
         }
         else {
-            DimensionType dimensionType = DimensionType.getByID(readInt());
+            DimensionType dimensionType = DimensionType.getById(readInt());
             dimension = new Dimension(dimensionType);
             if (!v1_14) {
                 //Handle 1.13.2 and below
-                difficulty = Difficulty.getByID(readByte());
+                difficulty = Difficulty.getById(readByte());
             }
             else {
                 difficulty = Difficulty.NORMAL;

@@ -71,7 +71,7 @@ public class WrapperPlayClientClickWindowButton extends PacketWrapper<WrapperPla
      *
      * @param windowID Window ID
      */
-    public void setWindowID(int windowID) {
+    public void setWindowId(int windowID) {
         this.windowID = windowID;
     }
 
@@ -91,7 +91,7 @@ public class WrapperPlayClientClickWindowButton extends PacketWrapper<WrapperPla
      *
      * @param buttonID Button ID
      */
-    public void setButtonID(int buttonID) {
+    public void setButtonId(int buttonID) {
         this.buttonID = buttonID;
     }
 }

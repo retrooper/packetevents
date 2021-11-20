@@ -77,7 +77,7 @@ public class WrapperPlayServerSoundEffect extends PacketWrapper<WrapperPlayServe
         return soundID;
     }
 
-    public void setSoundID(int soundID) {
+    public void setSoundId(int soundID) {
         this.soundID = soundID;
     }
 

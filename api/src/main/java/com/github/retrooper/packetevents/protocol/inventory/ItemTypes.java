@@ -105,11 +105,12 @@ public class ItemTypes {
 
     @Nullable
     public static ItemType getById(int id, int currentProtocolVersion, int targetProtocolVersion) {
-        id = transformItemTypeID(id, currentProtocolVersion, targetProtocolVersion);
+        id = transformItemTypeId(id, currentProtocolVersion, targetProtocolVersion);
         return getById(id);
     }
 
-    public static int transformItemTypeID(int id, int currentProtocolVersion, int targetProtocolVersion) {
+    //TODO Look into transforming id from older versions to newer ones, now we only go down
+    public static int transformItemTypeId(int id, int currentProtocolVersion, int targetProtocolVersion) {
         if (currentProtocolVersion == targetProtocolVersion) {
             return id;
         }

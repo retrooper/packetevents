@@ -76,7 +76,7 @@ public class WrapperPlayClientInteractEntity extends PacketWrapper<WrapperPlayCl
 
             if (serverVersion.isNewerThan(ServerVersion.V_1_8) && (type == Type.INTERACT || type == Type.INTERACT_AT)) {
                 int handID = readVarInt();
-                this.hand = Hand.getByLegacyID(handID);
+                this.hand = Hand.getByLegacyId(handID);
             } else {
                 this.hand = Hand.RIGHT;
             }
@@ -127,7 +127,7 @@ public class WrapperPlayClientInteractEntity extends PacketWrapper<WrapperPlayCl
         return entityID;
     }
 
-    public void setEntityID(int entityID) {
+    public void setEntityId(int entityID) {
         this.entityID = entityID;
     }
 

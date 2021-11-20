@@ -53,7 +53,7 @@ public class WrapperPlayClientTeleportConfirm extends PacketWrapper<WrapperPlayC
         return teleportID;
     }
 
-    public void setTeleportID(int teleportID) {
+    public void setTeleportId(int teleportID) {
         this.teleportID = teleportID;
     }
 }

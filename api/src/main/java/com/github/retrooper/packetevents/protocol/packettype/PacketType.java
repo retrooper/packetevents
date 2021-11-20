@@ -341,7 +341,7 @@ public final class PacketType {
                 return id;
             }
 
-            public int getPacketID(int protocolVersion) {
+            public int getPacketId(int protocolVersion) {
                 return PACKET_TYPE_CACHE.get(protocolVersion).getOrDefault(this, -1);
             }
         }

@@ -49,7 +49,7 @@ public interface ServerManager {
 
     void receivePacket(ChannelAbstract channel, PacketWrapper<?> wrapper);
 
-   /* private static Entity getEntityByIDWithWorldUnsafe(World world, int id) {
+   /* private static Entity getEntityByIdWithWorldUnsafe(World world, int id) {
         if (world == null) {
             return null;
         }
@@ -70,7 +70,7 @@ public interface ServerManager {
     }
 
     @Nullable
-    private static Entity getEntityByIDUnsafe(World origin, int id) {
+    private static Entity getEntityByIdUnsafe(World origin, int id) {
         Entity e = getEntityByIDWithWorldUnsafe(origin, id);
         if (e != null) {
             return e;
@@ -96,7 +96,7 @@ public interface ServerManager {
     }
 
     @Nullable
-    public static Entity getEntityByID(@Nullable World world, int entityID) {
+    public static Entity getEntityById(@Nullable World world, int entityID) {
         Entity e = ENTITY_ID_CACHE.get(entityID);
         if (e != null) {
             return e;
@@ -135,7 +135,7 @@ public interface ServerManager {
     }
 
     @Nullable
-    public static Entity getEntityByID(int entityID) {
+    public static Entity getEntityById(int entityID) {
         return getEntityByID(null, entityID);
     }
 

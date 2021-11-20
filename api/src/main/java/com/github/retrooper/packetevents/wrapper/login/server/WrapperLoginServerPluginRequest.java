@@ -63,7 +63,7 @@ public class WrapperLoginServerPluginRequest extends PacketWrapper<WrapperLoginS
         return messageID;
     }
 
-    public void setMessageID(int messageID) {
+    public void setMessageId(int messageID) {
         this.messageID = messageID;
     }
 

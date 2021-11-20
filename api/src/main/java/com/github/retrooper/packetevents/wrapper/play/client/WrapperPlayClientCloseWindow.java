@@ -53,7 +53,7 @@ public class WrapperPlayClientCloseWindow extends PacketWrapper<WrapperPlayClien
         return windowID;
     }
 
-    public void setWindowID(int windowID) {
+    public void setWindowId(int windowID) {
         this.windowID = windowID;
     }
 }

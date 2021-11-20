@@ -44,18 +44,17 @@ repositories {
     }
     mavenCentral()
 }
+shadowJar {
+    //Just for jitpack to work
+    archiveBaseName.set('bukkit')
+    archiveClassifier.set('')
+    archiveVersion.set('')
 
-tasks {
-    shadowJar {
-        archiveBaseName.set('bukkit')
-        archiveClassifier.set('')
-        archiveVersion.set('')
-        //Shading is that easy
-        //relocate("com.github.retrooper", "com.github.repooper.kek")
-    }
+    relocate("com.google.gson", "com.github.retrooper.packetevents.libs.gson")
 }
 
 dependencies {
+    implementation 'com.google.code.gson:gson:2.8.9'
     api project(':api')
     compileOnly 'org.jetbrains:annotations:22.0.0'
 

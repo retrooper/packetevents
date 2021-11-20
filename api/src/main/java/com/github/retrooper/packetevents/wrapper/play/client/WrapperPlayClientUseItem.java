@@ -52,7 +52,7 @@ public class WrapperPlayClientUseItem extends PacketWrapper<WrapperPlayClientUse
     @Override
     public void readData() {
         if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_14)) {
-            hand = Hand.getByLegacyID(readVarInt());
+            hand = Hand.getByLegacyId(readVarInt());
             blockPosition = readBlockPosition();
             face = BlockFace.getBlockFaceByValue(readVarInt());
             cursorPosition = new Vector3f(readFloat(), readFloat(), readFloat());
@@ -61,7 +61,7 @@ public class WrapperPlayClientUseItem extends PacketWrapper<WrapperPlayClientUse
             insideBlock = Optional.empty();
             blockPosition = readBlockPosition();
             face = BlockFace.getBlockFaceByValue(readVarInt());
-            hand = Hand.getByLegacyID(readVarInt());
+            hand = Hand.getByLegacyId(readVarInt());
             if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_11)) {
                 cursorPosition = new Vector3f(readFloat(), readFloat(), readFloat());
             } else {

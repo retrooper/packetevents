@@ -32,7 +32,7 @@ public enum DimensionType {
         this.name = name;
     }
 
-    public static DimensionType getByID(int id) {
+    public static DimensionType getById(int id) {
         return values()[id + 1];
     }
 

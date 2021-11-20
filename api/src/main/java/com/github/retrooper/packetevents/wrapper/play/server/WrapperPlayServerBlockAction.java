@@ -92,7 +92,7 @@ public class WrapperPlayServerBlockAction extends PacketWrapper<WrapperPlayServe
         return actionID;
     }
 
-    public void setActionID(int actionID) {
+    public void setActionId(int actionID) {
         this.actionID = actionID;
     }
 
@@ -108,7 +108,7 @@ public class WrapperPlayServerBlockAction extends PacketWrapper<WrapperPlayServe
         return blockTypeID;
     }
 
-    public void setBlockTypeID(int blockTypeID) {
+    public void setBlockTypeId(int blockTypeID) {
         this.blockTypeID = blockTypeID;
     }
 }

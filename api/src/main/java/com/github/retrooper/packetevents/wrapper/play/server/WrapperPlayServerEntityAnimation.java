@@ -68,7 +68,7 @@ public class WrapperPlayServerEntityAnimation extends PacketWrapper<WrapperPlayS
         return entityID;
     }
 
-    public void setEntityID(int entityID) {
+    public void setEntityId(int entityID) {
         this.entityID = entityID;
     }
 
