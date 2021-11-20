@@ -33,6 +33,7 @@ import net.minecraft.util.io.netty.channel.ChannelFuture;
 import net.minecraft.util.io.netty.channel.ChannelHandler;
 import net.minecraft.util.io.netty.channel.ChannelPipeline;
 import org.bukkit.entity.Player;
+import org.jetbrains.annotations.Nullable;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
@@ -131,7 +132,7 @@ public class EarlyChannelInjectorLegacy implements EarlyInjector {
                 if (channel == null) {
                     continue;
                 }
-                ServerConnectionInitializerLegacy.postInitChannel(channel);
+                ServerConnectionInitializerLegacy.postInitChannel(channel, ConnectionState.PLAY);
             }
         }
     }
@@ -190,10 +191,10 @@ public class EarlyChannelInjectorLegacy implements EarlyInjector {
     }
 
     @Override
-    public void injectPlayer(Object player) {
+    public void injectPlayer(Object player, @Nullable ConnectionState connectionState) {
         ChannelAbstract channel = PacketEvents.getAPI().getPlayerManager().getChannel(player);
         if (channel != null) {
-            updatePlayerObject(player, channel);
+            updatePlayerObject(channel, player, connectionState);
         }
     }
 
@@ -236,16 +237,26 @@ public class EarlyChannelInjectorLegacy implements EarlyInjector {
         ChannelHandler encoder = channel.pipeline().get(PacketEvents.ENCODER_NAME);
         if (encoder instanceof PacketEncoderLegacy) {
             return (PacketEncoderLegacy) encoder;
-        } else {
-            return null;
         }
+        return null;
     }
 
     @Override
-    public void updatePlayerObject(Object player, ChannelAbstract ch) {
+    public void updatePlayerObject(ChannelAbstract ch, Object player, @Nullable ConnectionState newConnectionState) {
         PacketDecoderLegacy decoder = getDecoder(ch);
+        if (decoder == null) {
+            if (newConnectionState == null) {
+                newConnectionState = ConnectionState.PLAY;
+            }
+            ServerConnectionInitializerLegacy.postInitChannel(ch.rawChannel(), newConnectionState);
+            decoder = getDecoder(ch);
+        }
+
         if (decoder != null) {
             decoder.player = (Player) player;
+            if (newConnectionState != null) {
+                decoder.connectionState = newConnectionState;
+            }
         }
 
         PacketEncoderLegacy encoder = getEncoder(ch);

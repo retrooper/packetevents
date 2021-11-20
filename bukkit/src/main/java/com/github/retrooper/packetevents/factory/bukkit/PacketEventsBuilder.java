@@ -27,6 +27,7 @@ import com.github.retrooper.packetevents.injector.ChannelInjector;
 import com.github.retrooper.packetevents.manager.player.PlayerManager;
 import com.github.retrooper.packetevents.manager.server.ServerManager;
 import com.github.retrooper.packetevents.netty.NettyManager;
+import com.github.retrooper.packetevents.protocol.ConnectionState;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.settings.PacketEventsSettings;
 import com.github.retrooper.packetevents.util.PEVersion;
@@ -113,6 +114,11 @@ public class PacketEventsBuilder {
             }
 
             @Override
+            public boolean isLoaded() {
+                return loaded;
+            }
+
+            @Override
             public void init() {
                 //Load if we haven't loaded already
                 load();
@@ -132,7 +138,9 @@ public class PacketEventsBuilder {
                         Bukkit.getPluginManager().registerEvents(internalBukkitListener, plugin);
                         for (final Player p : Bukkit.getOnlinePlayers()) {
                             try {
-                                injector.injectPlayer(p);
+                                //TODO Remove this debug message
+                                System.out.println("INJECTED: " + p.getName());
+                                injector.injectPlayer(p, ConnectionState.PLAY);
                                 getEventManager().callEvent(new PostPlayerInjectEvent(p));
                             } catch (Exception ex) {
                                 p.kickPlayer("Failed to inject... Please rejoin!");
@@ -153,10 +161,17 @@ public class PacketEventsBuilder {
             }
 
             @Override
+            public boolean isInitialized() {
+                return initialized;
+            }
+
+            @Override
             public void terminate() {
                 if (initialized) {
                     //Eject all players
                     for (Player p : Bukkit.getOnlinePlayers()) {
+                        //TODO Remove this debug message
+                        System.out.println("EJECTING: " + p.getName());
                         injector.ejectPlayer(p);
                     }
                     //Eject the injector if needed
@@ -169,7 +184,7 @@ public class PacketEventsBuilder {
 
             @Override
             public Plugin getPlugin() {
-                return (Plugin) plugin;
+                return plugin;
             }
 
             @Override

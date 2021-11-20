@@ -18,6 +18,7 @@
 
 package io.github.retrooper.packetevents.handlers.modern.early;
 
+import com.github.retrooper.packetevents.protocol.ConnectionState;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelInitializer;
 
@@ -27,7 +28,7 @@ public class PreChannelInitializerModern_v1_8 extends ChannelInitializer<Channel
         channel.pipeline().addLast(new ChannelInitializer<Channel>() {
             @Override
             protected void initChannel(Channel channel) {
-                ServerConnectionInitializerModern.postInitChannel(channel);
+                ServerConnectionInitializerModern.postInitChannel(channel, ConnectionState.HANDSHAKING);
             }
         });
     }

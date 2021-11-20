@@ -27,6 +27,7 @@ import io.github.retrooper.packetevents.handlers.modern.early.ServerConnectionIn
 import com.github.retrooper.packetevents.protocol.ConnectionState;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandler;
+import org.jetbrains.annotations.Nullable;
 
 public class LateChannelInjectorModern implements LateInjector {
     @Override
@@ -40,9 +41,12 @@ public class LateChannelInjectorModern implements LateInjector {
     }
 
     @Override
-    public void injectPlayer(Object player) {
+    public void injectPlayer(Object player, @Nullable ConnectionState connectionState) {
         ChannelAbstract channel = PacketEvents.getAPI().getPlayerManager().getChannel(player);
-        ServerConnectionInitializerModern.postInitChannel(channel.rawChannel());
+        if (connectionState == null) {
+            connectionState = ConnectionState.PLAY;
+        }
+        ServerConnectionInitializerModern.postInitChannel(channel.rawChannel(), connectionState);
     }
 
     private PacketDecoderModern getDecoder(ChannelAbstract ch) {
@@ -89,15 +93,20 @@ public class LateChannelInjectorModern implements LateInjector {
                 encoder != null && encoder.player != null;
     }
 
-    //TODO Look into this approach, maybe instead make the variable in the decoder just default to GAME
-    //TODO and implement changeConnectionState properly
     @Override
     public ConnectionState getConnectionState(ChannelAbstract channel) {
-        return ConnectionState.PLAY;
+        PacketDecoderModern decoder = getDecoder(channel);
+        if (decoder != null) {
+            return decoder.connectionState;
+        }
+        return null;
     }
 
     @Override
     public void changeConnectionState(ChannelAbstract channel, ConnectionState connectionState) {
-
+        PacketDecoderModern decoder = getDecoder(channel);
+        if (decoder != null) {
+            decoder.connectionState = connectionState;
+        }
     }
 }

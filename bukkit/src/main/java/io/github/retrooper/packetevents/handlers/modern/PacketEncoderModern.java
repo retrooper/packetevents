@@ -39,7 +39,7 @@ import java.util.List;
 @ChannelHandler.Sharable
 public class PacketEncoderModern extends MessageToMessageEncoder<Object> {
     public volatile Player player;
-    private boolean handledCompression;
+    public boolean handledCompression;
     public MessageToByteEncoder mcEncoder;
 
     public void handle(ChannelHandlerContextAbstract ctx, ByteBufAbstract transformedBuf, List<Object> output) {

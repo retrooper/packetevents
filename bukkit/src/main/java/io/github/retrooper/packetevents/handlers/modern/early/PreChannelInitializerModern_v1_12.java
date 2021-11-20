@@ -18,6 +18,7 @@
 
 package io.github.retrooper.packetevents.handlers.modern.early;
 
+import com.github.retrooper.packetevents.protocol.ConnectionState;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 import io.netty.channel.ChannelPipeline;
@@ -30,7 +31,7 @@ public class PreChannelInitializerModern_v1_12 extends ChannelInboundHandlerAdap
     @Override
     public void channelRegistered(ChannelHandlerContext ctx) {
         try {
-            ServerConnectionInitializerModern.postInitChannel(ctx.channel());
+            ServerConnectionInitializerModern.postInitChannel(ctx.channel(), ConnectionState.HANDSHAKING);
         } catch (Throwable t) {
             exceptionCaught(ctx, t);
         } finally {

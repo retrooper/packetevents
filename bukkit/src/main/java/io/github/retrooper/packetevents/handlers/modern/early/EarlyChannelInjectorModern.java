@@ -38,6 +38,7 @@ import io.netty.channel.ChannelPipeline;
 import io.netty.handler.codec.ByteToMessageDecoder;
 import io.netty.handler.codec.MessageToByteEncoder;
 import org.bukkit.entity.Player;
+import org.jetbrains.annotations.Nullable;
 
 import java.lang.reflect.Field;
 import java.util.*;
@@ -133,7 +134,7 @@ public class EarlyChannelInjectorModern implements EarlyInjector {
                 if (channel == null) {
                     continue;
                 }
-                ServerConnectionInitializerModern.postInitChannel(channel);
+                ServerConnectionInitializerModern.postInitChannel(channel, ConnectionState.PLAY);
             }
         }
     }
@@ -192,10 +193,10 @@ public class EarlyChannelInjectorModern implements EarlyInjector {
     }
 
     @Override
-    public void injectPlayer(Object player) {
+    public void injectPlayer(Object player, @Nullable ConnectionState connectionState) {
         ChannelAbstract channel = PacketEvents.getAPI().getPlayerManager().getChannel(player);
         if (channel != null) {
-            updatePlayerObject(player, channel);
+            updatePlayerObject(channel, player, connectionState);
         }
     }
 
@@ -220,10 +221,16 @@ public class EarlyChannelInjectorModern implements EarlyInjector {
     }
 
     private PacketDecoderModern getDecoder(ChannelAbstract ch) {
+        //TODO Adjust legacy modern early injector
         Channel channel = (Channel) ch.rawChannel();
         ChannelHandler decoder = channel.pipeline().get(PacketEvents.DECODER_NAME);
         if (decoder != null) {
-            return (PacketDecoderModern) decoder;
+            if (decoder instanceof PacketDecoderModern) {
+                return (PacketDecoderModern) decoder;
+            }
+            else {
+                return null;
+            }
         } else if (ViaVersionUtil.isAvailable()) {
             ChannelHandler mcDecoder = channel.pipeline().get("decoder");
             if (ViaVersionUtil.getBukkitDecodeHandlerClass().isInstance(mcDecoder)) {
@@ -256,14 +263,42 @@ public class EarlyChannelInjectorModern implements EarlyInjector {
     }
 
     @Override
-    public void updatePlayerObject(Object player, ChannelAbstract ch) {
+    public void updatePlayerObject(ChannelAbstract ch, Object player, @Nullable ConnectionState newConnectionState) {
+        Channel channel = (Channel) ch.rawChannel();
         PacketDecoderModern decoder = getDecoder(ch);
         if (decoder != null) {
+            System.out.println("injing");
             decoder.player = (Player) player;
+            if (newConnectionState == ConnectionState.PLAY) {
+                decoder.handledCompression = true;
+                System.out.println("decoder handled compr to true");
+                if (ViaVersionUtil.isAvailable()) {
+                    channel.pipeline().remove(PacketEvents.DECODER_NAME);
+                    addCustomViaDecoder(channel, new PacketDecoderModern(decoder));
+                }
+                else if (ProtocolSupportUtil.isAvailable()) {
+                    channel.pipeline().remove(PacketEvents.DECODER_NAME);
+                    channel.pipeline().addAfter("ps_decoder_transformer", PacketEvents.DECODER_NAME, new PacketDecoderModern(decoder));
+                }
+            }
+            if (newConnectionState != null) {
+                decoder.connectionState = newConnectionState;
+            }
+            System.out.println("done pt 1?");
         }
         PacketEncoderModern encoder = getEncoder(ch);
         if (encoder != null) {
             encoder.player = (Player) player;
+            if (newConnectionState == ConnectionState.PLAY) {
+                encoder.handledCompression = true;
+                System.out.println("encoder handled compr to true");
+                if (ViaVersionUtil.isAvailable()) {
+                    channel.pipeline().remove(PacketEvents.ENCODER_NAME);
+                    addCustomViaEncoder(channel, encoder);
+                    System.out.println("via moment fixed");
+                }
+            }
+            System.out.println("done pt 2?");
         }
     }
 

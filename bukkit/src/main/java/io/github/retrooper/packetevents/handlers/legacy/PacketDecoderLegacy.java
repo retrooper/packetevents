@@ -17,10 +17,14 @@ import java.util.List;
 
 public class PacketDecoderLegacy extends ByteToMessageDecoder {
     public volatile Player player;
-    public ConnectionState connectionState = ConnectionState.HANDSHAKING;
+    public ConnectionState connectionState;
     public boolean bypassCompression = false;
     private boolean handledCompression;
     private boolean skipDoubleTransform;
+
+    public PacketDecoderLegacy(ConnectionState connectionState) {
+        this.connectionState = connectionState;
+    }
 
     public void handle(ChannelHandlerContextAbstract ctx, ByteBufAbstract byteBuf, List<Object> output) {
         if (skipDoubleTransform) {

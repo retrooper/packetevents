@@ -19,14 +19,15 @@
 package io.github.retrooper.packetevents.handlers.legacy.early;
 
 import com.github.retrooper.packetevents.PacketEvents;
+import com.github.retrooper.packetevents.protocol.ConnectionState;
 import io.github.retrooper.packetevents.handlers.legacy.PacketDecoderLegacy;
 import io.github.retrooper.packetevents.handlers.legacy.PacketEncoderLegacy;
 import net.minecraft.util.io.netty.channel.Channel;
 
 public class ServerConnectionInitializerLegacy {
-    public static void postInitChannel(Object ch) {
+    public static void postInitChannel(Object ch, ConnectionState connectionState) {
         Channel channel = (Channel) ch;
-        channel.pipeline().addAfter("splitter", PacketEvents.DECODER_NAME, new PacketDecoderLegacy());
+        channel.pipeline().addAfter("splitter", PacketEvents.DECODER_NAME, new PacketDecoderLegacy(connectionState));
         channel.pipeline().addBefore("encoder", PacketEvents.ENCODER_NAME, new PacketEncoderLegacy());
     }
 

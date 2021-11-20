@@ -30,13 +30,13 @@ public interface ChannelInjector {
     @Nullable
     ConnectionState getConnectionState(ChannelAbstract channel);
 
-    void changeConnectionState(ChannelAbstract channel, ConnectionState packetState);
+    void changeConnectionState(ChannelAbstract channel, @Nullable ConnectionState packetState);
 
     void inject();
 
     void eject();
 
-    void injectPlayer(Object player);
+    void injectPlayer(Object player, @Nullable ConnectionState connectionState);
 
     void ejectPlayer(Object player);
 

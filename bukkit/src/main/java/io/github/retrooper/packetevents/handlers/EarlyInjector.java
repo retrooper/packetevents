@@ -20,8 +20,10 @@ package io.github.retrooper.packetevents.handlers;
 
 import com.github.retrooper.packetevents.injector.ChannelInjector;
 import com.github.retrooper.packetevents.netty.channel.ChannelAbstract;
+import com.github.retrooper.packetevents.protocol.ConnectionState;
 import org.bukkit.entity.Player;
+import org.jetbrains.annotations.Nullable;
 
 public interface EarlyInjector extends ChannelInjector {
-    void updatePlayerObject(Object player, ChannelAbstract channel);
+    void updatePlayerObject(ChannelAbstract channel, Object player, @Nullable ConnectionState newConnectionState);
 }

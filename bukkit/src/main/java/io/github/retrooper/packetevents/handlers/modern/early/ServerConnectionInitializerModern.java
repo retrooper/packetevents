@@ -34,9 +34,9 @@ import java.util.List;
 
 
 public class ServerConnectionInitializerModern {
-    public static void postInitChannel(Object ch) {
+    public static void postInitChannel(Object ch, ConnectionState connectionState) {
         Channel channel = (Channel) ch;
-        channel.pipeline().addAfter("splitter", PacketEvents.DECODER_NAME, new PacketDecoderModern());
+        channel.pipeline().addAfter("splitter", PacketEvents.DECODER_NAME, new PacketDecoderModern(connectionState));
         channel.pipeline().addBefore("encoder", PacketEvents.ENCODER_NAME, new PacketEncoderModern());
     }
 

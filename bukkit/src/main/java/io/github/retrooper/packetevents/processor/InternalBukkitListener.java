@@ -21,6 +21,7 @@ package io.github.retrooper.packetevents.processor;
 import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.event.impl.PostPlayerInjectEvent;
 import com.github.retrooper.packetevents.netty.channel.ChannelAbstract;
+import com.github.retrooper.packetevents.protocol.ConnectionState;
 import com.github.retrooper.packetevents.protocol.nbt.*;
 import com.github.retrooper.packetevents.protocol.player.GameMode;
 import com.github.retrooper.packetevents.protocol.world.Difficulty;
@@ -46,7 +47,7 @@ public class InternalBukkitListener implements Listener {
         final Player player = e.getPlayer();
         GlobalChannelInjector injector = (GlobalChannelInjector)PacketEvents.getAPI().getInjector();
         if (injector.shouldInjectEarly()) {
-            PacketEvents.getAPI().getInjector().injectPlayer(player);
+            PacketEvents.getAPI().getInjector().injectPlayer(player, null);
         }
     }
 
@@ -60,7 +61,7 @@ public class InternalBukkitListener implements Listener {
         boolean shouldInject = !injectEarly || !PacketEvents.getAPI().getInjector().hasInjected(e.getPlayer());
         //Inject now if we are using the compatibility-injector or inject if the early injector failed to inject them.
         if (shouldInject) {
-            PacketEvents.getAPI().getInjector().injectPlayer(player);
+            PacketEvents.getAPI().getInjector().injectPlayer(player, ConnectionState.PLAY);
         }
 
         PacketEvents.getAPI().getEventManager().callEvent(new PostPlayerInjectEvent(e.getPlayer()));

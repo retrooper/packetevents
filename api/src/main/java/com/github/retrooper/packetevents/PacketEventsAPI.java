@@ -32,7 +32,11 @@ import java.util.logging.Logger;
 public interface PacketEventsAPI<T> {
     void load();
 
+    boolean isLoaded();
+
     void init();
+
+    boolean isInitialized();
 
     void terminate();
 

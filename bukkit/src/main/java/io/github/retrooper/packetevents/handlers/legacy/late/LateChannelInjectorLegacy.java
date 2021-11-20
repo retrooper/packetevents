@@ -27,6 +27,7 @@ import io.github.retrooper.packetevents.handlers.legacy.early.ServerConnectionIn
 import com.github.retrooper.packetevents.protocol.ConnectionState;
 import net.minecraft.util.io.netty.channel.Channel;
 import net.minecraft.util.io.netty.channel.ChannelHandler;
+import org.jetbrains.annotations.Nullable;
 
 public class LateChannelInjectorLegacy implements LateInjector {
     @Override
@@ -40,9 +41,12 @@ public class LateChannelInjectorLegacy implements LateInjector {
     }
 
     @Override
-    public void injectPlayer(Object player) {
+    public void injectPlayer(Object player, @Nullable ConnectionState connectionState) {
         ChannelAbstract channel = PacketEvents.getAPI().getPlayerManager().getChannel(player);
-        ServerConnectionInitializerLegacy.postInitChannel(channel.rawChannel());
+        if (connectionState == null) {
+            connectionState = ConnectionState.PLAY;
+        }
+        ServerConnectionInitializerLegacy.postInitChannel(channel.rawChannel(), connectionState);
     }
 
     private PacketDecoderLegacy getDecoder(ChannelAbstract ch) {
@@ -92,7 +96,11 @@ public class LateChannelInjectorLegacy implements LateInjector {
 
     @Override
     public ConnectionState getConnectionState(ChannelAbstract channel) {
-        return ConnectionState.PLAY;
+        PacketDecoderLegacy decoder = getDecoder(channel);
+        if (decoder != null) {
+            return decoder.connectionState;
+        }
+        return null;
     }
 
     @Override

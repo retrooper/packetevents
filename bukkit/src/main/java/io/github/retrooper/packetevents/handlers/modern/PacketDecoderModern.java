@@ -40,13 +40,13 @@ public class PacketDecoderModern extends ByteToMessageDecoder {
     public ByteToMessageDecoder mcDecoder = null;
     public List<ByteToMessageDecoder> decoders = new ArrayList<>();
     public volatile Player player;
-    public ConnectionState connectionState = ConnectionState.HANDSHAKING;
+    public ConnectionState connectionState;
     public boolean bypassCompression = false;
     public boolean handledCompression;
     public boolean skipDoubleTransform;
 
-    public PacketDecoderModern() {
-
+    public PacketDecoderModern(ConnectionState connectionState) {
+        this.connectionState = connectionState;
     }
 
     public PacketDecoderModern(PacketDecoderModern decoder) {

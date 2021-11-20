@@ -21,6 +21,7 @@ package io.github.retrooper.packetevents.handlers.legacy.early;
 import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.factory.bukkit.PacketEventsBuilder;
 import com.github.retrooper.packetevents.netty.channel.ChannelAbstract;
+import com.github.retrooper.packetevents.protocol.ConnectionState;
 import net.minecraft.util.io.netty.channel.Channel;
 import net.minecraft.util.io.netty.channel.ChannelInitializer;
 
@@ -30,7 +31,7 @@ public class PreChannelInitializerLegacy extends ChannelInitializer<Channel> {
         channel.pipeline().addLast(new ChannelInitializer<Channel>() {
             @Override
             protected void initChannel(Channel channel) {
-                ServerConnectionInitializerLegacy.postInitChannel(channel);
+                ServerConnectionInitializerLegacy.postInitChannel(channel, ConnectionState.HANDSHAKING);
             }
         });
     }

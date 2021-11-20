@@ -82,11 +82,11 @@ public class GlobalChannelInjector implements ChannelInjector {
     }
 
     @Override
-    public void injectPlayer(Object player) {
+    public void injectPlayer(Object player, @Nullable ConnectionState connectionState) {
         PlayerInjectEvent injectEvent = new PlayerInjectEvent(player);
         PacketEvents.getAPI().getEventManager().callEvent(injectEvent);
         if (!injectEvent.isCancelled()) {
-            injector.injectPlayer(player);
+            injector.injectPlayer(player, connectionState);
         }
     }
 
