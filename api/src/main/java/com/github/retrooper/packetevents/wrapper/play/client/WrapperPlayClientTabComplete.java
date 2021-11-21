@@ -126,7 +126,7 @@ public class WrapperPlayClientTabComplete extends PacketWrapper<WrapperPlayClien
         return transactionID;
     }
 
-    public void setTransactionID(@Nullable Integer transactionID) {
+    public void setTransactionId(@Nullable Integer transactionID) {
         if (transactionID != null) {
             this.transactionID = Optional.of(transactionID);
         }

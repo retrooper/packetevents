@@ -18,6 +18,7 @@
 
 package com.github.retrooper.packetevents.protocol.inventory;
 
+import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.protocol.chat.component.ComponentSerializer;
 import com.github.retrooper.packetevents.protocol.player.ClientVersion;
@@ -35,7 +36,8 @@ import java.util.*;
 public class ItemTypes {
     private static final Map<String, ItemType> ITEM_TYPE_MAP = new HashMap<>();
     private static final Map<Integer, ItemType> ITEM_TYPE_ID_MAP = new HashMap<>();
-    private static JsonObject ITEM_TYPES_JSON = null;
+    private static JsonObject MODERN_ITEM_TYPES_JSON = null;
+    private static JsonObject LEGACY_ITEM_TYPES_JSON = null;
 
     private enum ItemAttribute {
         //TODO Add more
@@ -43,7 +45,7 @@ public class ItemTypes {
     }
 
     public static void replaceJsonObject(JsonObject jsonObject) {
-        ITEM_TYPES_JSON = jsonObject;
+        MODERN_ITEM_TYPES_JSON = jsonObject;
     }
 
     public static ItemType define(int maxAmount, String key) {
@@ -51,11 +53,16 @@ public class ItemTypes {
     }
 
     public static ItemType define(int maxAmount, String key, ItemAttribute... attributesArr) {
-        Set<ItemAttribute> attributes = new HashSet<>(Arrays.asList(attributesArr));
-        if (ITEM_TYPES_JSON == null) {
-            ITEM_TYPES_JSON = MappingHelper.getJSONObject("modernitemtypes");
+        if (MODERN_ITEM_TYPES_JSON == null) {
+            MODERN_ITEM_TYPES_JSON = MappingHelper.getJSONObject("modernitemtypes");
         }
-        int id = ITEM_TYPES_JSON.get(key).getAsInt();
+        Set<ItemAttribute> attributes = new HashSet<>(Arrays.asList(attributesArr));
+        int latestID = MODERN_ITEM_TYPES_JSON.get(key).getAsInt();
+
+        int latestProtocolVersion = ServerVersion.getLatest().getProtocolVersion();
+        int serverProtocolVersion = PacketEvents.getAPI().getServerManager().getVersion().getProtocolVersion();
+
+        int id = transformItemTypeId(latestID, latestProtocolVersion, serverProtocolVersion);
         boolean musicDisc = attributes.contains(ItemAttribute.MUSIC_DISC);
         ResourceLocation identifier = ResourceLocation.minecraft(key);
 
@@ -111,19 +118,20 @@ public class ItemTypes {
 
     //TODO Look into transforming id from older versions to newer ones, now we only go down
     public static int transformItemTypeId(int id, int currentProtocolVersion, int targetProtocolVersion) {
+        if (LEGACY_ITEM_TYPES_JSON == null) {
+            LEGACY_ITEM_TYPES_JSON = MappingHelper.getJSONObject("legacyitemtypes");
+        }
         if (currentProtocolVersion == targetProtocolVersion) {
             return id;
         }
-        JsonObject jsonObject = MappingHelper.getJSONObject("legacyitemtypes");
-        //Assume currentProtocolVersion is 1.17.1=756
-        int i = 0;
+        //Current protocol version must always be the latest server version
         for (ClientVersion cv : ClientVersion.REVERSED_VALUES) {
             if (!cv.name().startsWith("V_")) {
                 continue;
             }
             String jsonName = cv.name().substring(2);
-            if (jsonObject.has(jsonName)) {
-                JsonObject mappings = jsonObject.getAsJsonObject(jsonName);
+            if (LEGACY_ITEM_TYPES_JSON.has(jsonName)) {
+                JsonObject mappings = LEGACY_ITEM_TYPES_JSON.getAsJsonObject(jsonName);
                 if (mappings.has(Integer.toString(id))) {
                     int newID = mappings.get(Integer.toString(id)).getAsInt();
                     id = newID;
@@ -140,8 +148,8 @@ public class ItemTypes {
         }
         ClientVersion cv = ClientVersion.values()[0];
         String jsonName = cv.name().substring(2);
-        if (jsonObject.has(jsonName)) {
-            JsonObject mappings = jsonObject.getAsJsonObject(jsonName);
+        if (LEGACY_ITEM_TYPES_JSON.has(jsonName)) {
+            JsonObject mappings = LEGACY_ITEM_TYPES_JSON.getAsJsonObject(jsonName);
             if (mappings.has(Integer.toString(id))) {
                 return mappings.get(Integer.toString(id)).getAsInt();
             }

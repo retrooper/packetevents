@@ -62,7 +62,7 @@ public enum PacketListenerPriority {
      */
     MONITOR;
 
-    public static PacketListenerPriority getByID(byte id) {
+    public static PacketListenerPriority getById(byte id) {
         return values()[id];
     }
 

@@ -136,7 +136,7 @@ public interface ServerManager {
 
     @Nullable
     public static Entity getEntityById(int entityID) {
-        return getEntityByID(null, entityID);
+        return getEntityById(null, entityID);
     }
 
     public static List<Entity> getEntityList(World world) {

@@ -159,7 +159,7 @@ public class InternalPacketListener implements PacketListener {
                                     new TabCompleteAttribute());
                     tabCompleteAttribute.setInput(text);
                     Optional<Integer> transactionID = tabComplete.getTransactionId();
-                    transactionID.ifPresent(tabComplete::setTransactionID);
+                    transactionID.ifPresent(tabComplete::setTransactionId);
                 } else if (event.getPacketType() == PacketType.Play.Client.INTERACT_ENTITY) {
                     WrapperPlayClientInteractEntity interactEntity = new WrapperPlayClientInteractEntity(event);
                     List<TextComponent> components = new ArrayList<>();

@@ -47,7 +47,7 @@ public class WrapperPlayServerTabComplete extends PacketWrapper<WrapperPlayServe
 
     public WrapperPlayServerTabComplete(@Nullable Integer transactionID, @NotNull CommandRange commandRange, List<CommandMatch> commandMatches) {
         super(PacketType.Play.Server.TAB_COMPLETE);
-        setTransactionID(transactionID);
+        setTransactionId(transactionID);
         setCommandRange(commandRange);
         this.commandMatches = commandMatches;
     }
@@ -56,7 +56,7 @@ public class WrapperPlayServerTabComplete extends PacketWrapper<WrapperPlayServe
         super(PacketType.Play.Server.TAB_COMPLETE);
         TabCompleteAttribute tabCompleteAttribute = PacketEvents.getAPI()
                 .getPlayerManager().getAttributeOrDefault(uuid, TabCompleteAttribute.class, new TabCompleteAttribute());
-        setTransactionID(tabCompleteAttribute.getTransactionId());
+        setTransactionId(tabCompleteAttribute.getTransactionId());
         int len = tabCompleteAttribute.getInput().length();
         setCommandRange(new CommandRange(len, len));
         this.commandMatches = commandMatches;
@@ -135,7 +135,7 @@ public class WrapperPlayServerTabComplete extends PacketWrapper<WrapperPlayServe
         return transactionID;
     }
 
-    public void setTransactionID(Integer transactionID) {
+    public void setTransactionId(Integer transactionID) {
         if (transactionID != null) {
             this.transactionID = Optional.of(transactionID);
         }

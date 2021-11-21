@@ -76,7 +76,7 @@ public class WrapperPlayClientKeepAlive extends PacketWrapper<WrapperPlayClientK
         return id;
     }
 
-    public void setID(long id) {
+    public void setId(long id) {
         this.id = id;
     }
 }

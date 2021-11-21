@@ -69,7 +69,8 @@ public enum ServerVersion {
     }
 
     public static ServerVersion getLatest() {
-        return reversedValues[0];
+        //We must skip ERROR, because it's not a real server version.
+        return reversedValues[1];
     }
 
     public static ServerVersion getOldest() {

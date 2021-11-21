@@ -86,7 +86,7 @@ public class WrapperPlayServerWindowConfirmation extends PacketWrapper<WrapperPl
         return windowID;
     }
 
-    public void setWindowID(byte windowID) {
+    public void setWindowId(byte windowID) {
         this.windowID = windowID;
     }
 
@@ -94,7 +94,7 @@ public class WrapperPlayServerWindowConfirmation extends PacketWrapper<WrapperPl
         return actionID;
     }
 
-    public void setActionID(short actionID) {
+    public void setActionId(short actionID) {
         this.actionID = actionID;
     }
 

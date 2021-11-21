@@ -94,7 +94,7 @@ public class WrapperLoginServerEncryptionRequest extends PacketWrapper<WrapperLo
         return serverID;
     }
 
-    public void setServerID(String serverID) {
+    public void setServerId(String serverID) {
         this.serverID = serverID;
     }
 
