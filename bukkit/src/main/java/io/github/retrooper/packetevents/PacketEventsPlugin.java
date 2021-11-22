@@ -44,6 +44,9 @@ public class PacketEventsPlugin extends JavaPlugin {
         net.minecraft.server.v1_9_R1.PacketPlayOutNamedEntitySpawn a8;
         net.minecraft.server.v1_8_R3.PacketPlayOutNamedEntitySpawn a9;
         net.minecraft.server.v1_7_R4.PacketPlayOutNamedEntitySpawn a10;
+        net.minecraft.server.v1_8_R3.PacketPlayOutSpawnEntityLiving eee;
+        net.minecraft.server.v1_8_R3.PacketPlayOutSetSlot em;
+
     }
 
     @Override

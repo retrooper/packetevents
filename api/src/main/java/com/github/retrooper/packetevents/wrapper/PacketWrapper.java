@@ -232,6 +232,7 @@ public class PacketWrapper<T extends PacketWrapper> {
             return ItemStack.NULL;
         }
         ItemType type = ItemTypes.getById(typeID);
+        System.out.println("ID: " + typeID + ", type null: " + (type == null));
         int amount = readByte();
         NBTCompound nbt = readNBT();
         int legacyData = v1_13_2 ? 0 : readShort();

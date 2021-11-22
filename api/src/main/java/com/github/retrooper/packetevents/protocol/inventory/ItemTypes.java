@@ -61,6 +61,7 @@ public class ItemTypes {
 
         int latestProtocolVersion = ServerVersion.getLatest().getProtocolVersion();
         int serverProtocolVersion = PacketEvents.getAPI().getServerManager().getVersion().getProtocolVersion();
+        System.out.println("LATEST: " + latestProtocolVersion + ", SERVER PV: " + serverProtocolVersion);
 
         int id = transformItemTypeId(latestID, latestProtocolVersion, serverProtocolVersion);
         boolean musicDisc = attributes.contains(ItemAttribute.MUSIC_DISC);

@@ -31,6 +31,7 @@ import com.github.retrooper.packetevents.protocol.chat.component.HoverEvent;
 import com.github.retrooper.packetevents.protocol.chat.component.TextComponent;
 import com.github.retrooper.packetevents.protocol.entity.EntityType;
 import com.github.retrooper.packetevents.protocol.entity.EntityTypes;
+import com.github.retrooper.packetevents.protocol.inventory.ItemStack;
 import com.github.retrooper.packetevents.protocol.inventory.ItemTypes;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.protocol.player.ClientVersion;
@@ -40,6 +41,7 @@ import com.github.retrooper.packetevents.wrapper.login.client.WrapperLoginClient
 import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientInteractEntity;
 import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientTabComplete;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerChatMessage;
+import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerSetSlot;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerSpawnLivingEntity;
 import org.bukkit.entity.Player;
 
@@ -74,6 +76,16 @@ public class InternalPacketListener implements PacketListener {
             }
             Vector3d position = spawnLivingEntity.getPosition();
             System.out.println("Spawned entity with ID " + entityID + " of type " + entityType.getIdentifier().getKey() + "=" + entityType.getId() + " at position " + position);
+            event.setLastUsedWrapper(null);
+        } else if (event.getPacketType() == PacketType.Play.Server.SET_SLOT) {
+            WrapperPlayServerSetSlot setSlot = new WrapperPlayServerSetSlot(event);
+            int slot = setSlot.getSlot();
+            ItemStack item = setSlot.getItem();
+            if (item.getType() == null) {
+                System.out.println("tf!");
+            }
+            System.out.println("Set slot " + slot + " to item " + item.toString());
+            event.setLastUsedWrapper(null);
         }
         /*
         else if (event.getPacketType() == PacketType.Play.Server.CHUNK_DATA) {
@@ -192,12 +204,8 @@ public class InternalPacketListener implements PacketListener {
                     //If we forget to do this, it will be done as soon as we send this wrapper for the first time.
                     cm.prepareForSend();
                     PacketEvents.getAPI().getPlayerManager().sendPacket(event.getChannel(), cm);
-                    int modernID = ItemTypes.DEEPSLATE.getId();
-                    int legacyID = ItemTypes.transformItemTypeId(modernID, 756, ClientVersion.V_1_15_2.getProtocolVersion());
-                    //1065 = 21 on 1.15.2
-                    player.sendMessage("" + ItemTypes.DEEPSLATE.getIdentifier() + ", modern id: " + modernID + ", legacy id: " + legacyID);
-
                 }
+
                 break;
         }
     }

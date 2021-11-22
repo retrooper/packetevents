@@ -85,6 +85,7 @@ public class WrapperPlayServerSpawnLivingEntity extends PacketWrapper<WrapperPla
         double velY = readShort() / VELOCITY_FACTOR;
         double velZ = readShort() / VELOCITY_FACTOR;
         this.velocity = new Vector3d(velX, velY, velZ);
+        //TODO Handle data watcher on older versions
     }
 
     @Override

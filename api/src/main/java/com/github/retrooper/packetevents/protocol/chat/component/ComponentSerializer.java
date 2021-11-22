@@ -26,6 +26,7 @@ import java.util.List;
 public class ComponentSerializer {
     public static Gson GSON = new GsonBuilder().create();
 
+    //TODO Support translate components
     public static List<TextComponent> parseJSONString(String jsonMessageRaw) {
         JsonObject parentJsonObject = GSON.fromJson(jsonMessageRaw, JsonObject.class);
         List<TextComponent> result = new ArrayList<>();
@@ -38,7 +39,15 @@ public class ComponentSerializer {
             if (parentJsonObject.has("extra")) {
                 JsonArray jsonExtraComponents = parentJsonObject.getAsJsonArray("extra");
                 for (JsonElement jsonElement : jsonExtraComponents) {
-                    jsonObjects.add(jsonElement.getAsJsonObject());
+                    if (jsonElement.isJsonPrimitive()) {
+                        JsonObject wrapperObject = new JsonObject();
+                        wrapperObject.addProperty("text", jsonElement.getAsString());
+                        jsonObjects.add(wrapperObject);
+                        System.out.println("Test: " + wrapperObject.toString());
+                    }
+                    else {
+                        jsonObjects.add(jsonElement.getAsJsonObject());
+                    }
                 }
             }
 

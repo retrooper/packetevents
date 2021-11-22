@@ -93,6 +93,17 @@ public class ItemStack {
         return false;
     }
 
+    @Override
+    public String toString() {
+        if (NULL.equals(this)) {
+            return "ItemStack[null]";
+        }
+        else {
+            return "ItemStack[type=" + type.getIdentifier().toString() + ", amount=" + amount + "/" + type.getMaxAmount()
+                    + ", nbt tag names: " + nbt.getTagNames() + "]";
+        }
+    }
+
     public boolean isEmpty() {
         return amount == 0;
     }
