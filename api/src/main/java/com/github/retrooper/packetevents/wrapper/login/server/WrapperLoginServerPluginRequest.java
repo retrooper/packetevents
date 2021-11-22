@@ -42,7 +42,7 @@ public class WrapperLoginServerPluginRequest extends PacketWrapper<WrapperLoginS
     public void readData() {
         this.messageID = readVarInt();
         this.channelName = readString();
-        this.data = readByteArray(byteBuf.readableBytes());
+        this.data = readByteArray(buffer.readableBytes());
     }
 
     @Override

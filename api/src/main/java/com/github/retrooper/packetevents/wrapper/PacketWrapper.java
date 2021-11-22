@@ -30,6 +30,7 @@ import com.github.retrooper.packetevents.protocol.nbt.NBTCompound;
 import com.github.retrooper.packetevents.protocol.nbt.codec.NBTCodec;
 import com.github.retrooper.packetevents.protocol.packettype.PacketTypeCommon;
 import com.github.retrooper.packetevents.protocol.player.ClientVersion;
+import com.github.retrooper.packetevents.protocol.resources.ResourceLocation;
 import com.github.retrooper.packetevents.util.StringUtil;
 import com.github.retrooper.packetevents.util.Vector3i;
 import org.jetbrains.annotations.NotNull;
@@ -43,22 +44,23 @@ import java.util.function.Function;
 
 
 public class PacketWrapper<T extends PacketWrapper> {
-    public final ByteBufAbstract byteBuf;
+    public final ByteBufAbstract buffer;
     protected final ClientVersion clientVersion;
     protected final ServerVersion serverVersion;
     private final int packetID;
     private boolean hasPreparedForSending;
-    public PacketWrapper(ClientVersion clientVersion, ServerVersion serverVersion, ByteBufAbstract byteBuf, int packetID) {
+
+    public PacketWrapper(ClientVersion clientVersion, ServerVersion serverVersion, ByteBufAbstract buffer, int packetID) {
         this.clientVersion = clientVersion;
         this.serverVersion = serverVersion;
-        this.byteBuf = byteBuf;
+        this.buffer = buffer;
         this.packetID = packetID;
     }
 
     public PacketWrapper(PacketReceiveEvent event) {
         this.clientVersion = event.getClientVersion();
         this.serverVersion = event.getServerVersion();
-        this.byteBuf = event.getByteBuf();
+        this.buffer = event.getByteBuf();
         this.packetID = event.getPacketId();
         if (event.getLastUsedWrapper() == null) {
             event.setLastUsedWrapper(this);
@@ -71,7 +73,7 @@ public class PacketWrapper<T extends PacketWrapper> {
     public PacketWrapper(PacketSendEvent event) {
         this.clientVersion = event.getClientVersion();
         this.serverVersion = event.getServerVersion();
-        this.byteBuf = event.getByteBuf();
+        this.buffer = event.getByteBuf();
         this.packetID = event.getPacketId();
         if (event.getLastUsedWrapper() == null) {
             event.setLastUsedWrapper(this);
@@ -136,8 +138,8 @@ public class PacketWrapper<T extends PacketWrapper> {
         return serverVersion;
     }
 
-    public ByteBufAbstract getByteBuf() {
-        return byteBuf;
+    public ByteBufAbstract getBuffer() {
+        return buffer;
     }
 
     public int getPacketId() {
@@ -145,16 +147,16 @@ public class PacketWrapper<T extends PacketWrapper> {
     }
 
     public void resetByteBuf() {
-        byteBuf.clear();
+        buffer.clear();
         writeVarInt(packetID);
     }
 
     public byte readByte() {
-        return byteBuf.readByte();
+        return buffer.readByte();
     }
 
     public void writeByte(int value) {
-        byteBuf.writeByte(value);
+        buffer.writeByte(value);
     }
 
     public short readUnsignedByte() {
@@ -170,11 +172,11 @@ public class PacketWrapper<T extends PacketWrapper> {
     }
 
     public int readInt() {
-        return byteBuf.readInt();
+        return buffer.readInt();
     }
 
     public void writeInt(int value) {
-        byteBuf.writeInt(value);
+        buffer.writeInt(value);
     }
 
     public int readVarInt() {
@@ -182,7 +184,7 @@ public class PacketWrapper<T extends PacketWrapper> {
         int i = 0;
         int j = 0;
         do {
-            b0 = byteBuf.readByte();
+            b0 = buffer.readByte();
             i |= (b0 & Byte.MAX_VALUE) << j++ * 7;
             if (j > 5)
                 throw new RuntimeException("VarInt too big");
@@ -192,11 +194,11 @@ public class PacketWrapper<T extends PacketWrapper> {
 
     public void writeVarInt(int value) {
         while ((value & -128) != 0) {
-            byteBuf.writeByte(value & 127 | 128);
+            buffer.writeByte(value & 127 | 128);
             value >>>= 7;
         }
 
-        byteBuf.writeByte(value);
+        buffer.writeByte(value);
     }
 
     public <K, V> Map<K, V> readMap(Function<PacketWrapper<?>, K> keyFunction, Function<PacketWrapper<?>, V> valueFunction) {
@@ -258,8 +260,7 @@ public class PacketWrapper<T extends PacketWrapper> {
                 writeByte(itemStack.getAmount());
                 writeNBT(itemStack.getNBT());
             }
-        }
-        else {
+        } else {
             int typeID = itemStack.getType().getId();
             if (typeID >= 0) {
                 writeShort(typeID);
@@ -271,11 +272,11 @@ public class PacketWrapper<T extends PacketWrapper> {
     }
 
     public NBTCompound readNBT() {
-        return NBTCodec.readNBT(byteBuf, serverVersion);
+        return NBTCodec.readNBT(buffer, serverVersion);
     }
 
     public void writeNBT(NBTCompound nbt) {
-        NBTCodec.writeNBT(byteBuf, serverVersion, nbt);
+        NBTCodec.writeNBT(buffer, serverVersion, nbt);
     }
 
     public String readString() {
@@ -289,8 +290,8 @@ public class PacketWrapper<T extends PacketWrapper> {
         } else if (j < 0) {
             throw new RuntimeException("The received encoded string buffer length is less than zero! Weird string!");
         } else {
-            String s = byteBuf.toString(byteBuf.readerIndex(), j, StandardCharsets.UTF_8);
-            byteBuf.readerIndex(byteBuf.readerIndex() + j);
+            String s = buffer.toString(buffer.readerIndex(), j, StandardCharsets.UTF_8);
+            buffer.readerIndex(buffer.readerIndex() + j);
             if (s.length() > maxLen) {
                 throw new RuntimeException("The received string length is longer than maximum allowed (" + j + " > " + maxLen + ")");
             } else {
@@ -316,54 +317,92 @@ public class PacketWrapper<T extends PacketWrapper> {
             throw new IllegalStateException("String too big (was " + bytes.length + " bytes encoded, max " + maxLen + ")");
         } else {
             writeVarInt(bytes.length);
-            byteBuf.writeBytes(bytes);
+            buffer.writeBytes(bytes);
         }
     }
 
+    public ResourceLocation readIdentifier(int maxLen) {
+        return new ResourceLocation(readString(maxLen));
+    }
+
+    public ResourceLocation readIdentifier() {
+        return readIdentifier(32767);
+    }
+
+    public void writeIdentifier(ResourceLocation identifier, int maxLen) {
+        writeString(identifier.toString(), maxLen);
+    }
+
+    public void writeIdentifier(ResourceLocation identifier) {
+        writeIdentifier(identifier, 32767);
+    }
+
     public int readUnsignedShort() {
-        return byteBuf.readUnsignedShort();
+        return buffer.readUnsignedShort();
     }
 
     public short readShort() {
-        return byteBuf.readShort();
+        return buffer.readShort();
     }
 
     public void writeShort(int value) {
-        byteBuf.writeShort(value);
+        buffer.writeShort(value);
+    }
+
+    public int readVarShort() {
+        int low = buffer.readUnsignedShort();
+        int high = 0;
+        if ((low & 0x8000) != 0) {
+            low = low & 0x7FFF;
+            high = buffer.readUnsignedByte();
+        }
+        return ((high & 0xFF) << 15) | low;
+    }
+
+    public void writeVarShort(int value) {
+        int low = value & 0x7FFF;
+        int high = (value & 0x7F8000) >> 15;
+        if (high != 0) {
+            low = low | 0x8000;
+        }
+        buffer.writeShort(low);
+        if (high != 0) {
+            buffer.writeByte(high);
+        }
     }
 
     public long readLong() {
-        return byteBuf.readLong();
+        return buffer.readLong();
     }
 
     public void writeLong(long value) {
-        byteBuf.writeLong(value);
+        buffer.writeLong(value);
     }
 
     public float readFloat() {
-        return byteBuf.readFloat();
+        return buffer.readFloat();
     }
 
     public void writeFloat(float value) {
-        byteBuf.writeFloat(value);
+        buffer.writeFloat(value);
     }
 
     public double readDouble() {
-        return byteBuf.readDouble();
+        return buffer.readDouble();
     }
 
     public void writeDouble(double value) {
-        byteBuf.writeDouble(value);
+        buffer.writeDouble(value);
     }
 
     public byte[] readByteArray(int length) {
         byte[] bytes = new byte[length];
-        byteBuf.readBytes(bytes);
+        buffer.readBytes(bytes);
         return bytes;
     }
 
     public void writeByteArray(byte[] array) {
-        byteBuf.writeBytes(array);
+        buffer.writeBytes(array);
     }
 
     public long[] readLongArray(int size) {
@@ -376,7 +415,7 @@ public class PacketWrapper<T extends PacketWrapper> {
     }
 
     public long[] readLongArray() {
-        int readableBytes = byteBuf.readableBytes() / 8;
+        int readableBytes = buffer.readableBytes() / 8;
         int size = readVarInt();
         if (size > readableBytes) {
             throw new IllegalStateException("LongArray with size " + size + " is bigger than allowed " + readableBytes);

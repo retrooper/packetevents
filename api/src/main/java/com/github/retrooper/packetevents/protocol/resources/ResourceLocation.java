@@ -27,6 +27,19 @@ public class ResourceLocation {
         this.key = key;
     }
 
+    public ResourceLocation(String location) {
+        String[] array = new String[]{"minecraft", location};
+        int index = location.indexOf(":");
+        if (index >= 0) {
+            array[1] = location.substring(index + 1);
+            if (index >= 1) {
+                array[0] = location.substring(0, index);
+            }
+        }
+        this.namespace = array[0];
+        this.key = array[1];
+    }
+
     public String getNamespace() {
         return namespace;
     }

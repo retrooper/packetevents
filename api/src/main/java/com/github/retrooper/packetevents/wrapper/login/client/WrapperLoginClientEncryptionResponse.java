@@ -40,8 +40,8 @@ public class WrapperLoginClientEncryptionResponse extends PacketWrapper<WrapperL
     @Override
     public void readData() {
         if (clientVersion.isNewerThanOrEquals(ClientVersion.V_1_10)) {
-            this.sharedSecret = readByteArray(byteBuf.readableBytes());
-            this.verifyToken = readByteArray(byteBuf.readableBytes());
+            this.sharedSecret = readByteArray(buffer.readableBytes());
+            this.verifyToken = readByteArray(buffer.readableBytes());
         } else {
             int sharedSecretLength = readVarInt();
             int verifyTokenLength = readVarInt();

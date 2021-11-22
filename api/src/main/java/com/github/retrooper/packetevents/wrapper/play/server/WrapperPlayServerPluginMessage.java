@@ -50,7 +50,7 @@ public class WrapperPlayServerPluginMessage extends PacketWrapper<WrapperPlaySer
         else {
             this.channelName = readString(20);
         }
-        int dataLength = serverVersion.isNewerThanOrEquals(ServerVersion.V_1_8) ? byteBuf.readableBytes() : readUnsignedShort();
+        int dataLength = serverVersion.isNewerThanOrEquals(ServerVersion.V_1_8) ? buffer.readableBytes() : readUnsignedShort();
         this.data = readByteArray(dataLength);
     }
 

@@ -44,7 +44,7 @@ public class WrapperLoginClientPluginResponse extends PacketWrapper<WrapperLogin
         this.messageID = readVarInt();
         this.successful = readBoolean();
         if (this.successful) {
-            this.data = readByteArray(byteBuf.readableBytes());
+            this.data = readByteArray(buffer.readableBytes());
         } else {
             this.data = new byte[0];
         }
