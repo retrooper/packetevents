@@ -99,7 +99,9 @@ public class ItemStack {
             return "ItemStack[null]";
         }
         else {
-            return "ItemStack[type=" + type.getIdentifier().toString() + ", amount=" + amount + "/" + type.getMaxAmount()
+            String identifier = type == null ? "null" : type.getIdentifier().toString();
+            int maxAmount = type == null ? -1 : type.getMaxAmount();
+            return "ItemStack[type=" + identifier + ", amount=" + amount + "/" + maxAmount
                     + ", nbt tag names: " + nbt.getTagNames() + "]";
         }
     }

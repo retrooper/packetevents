@@ -38,6 +38,7 @@ public class ItemTypes {
     private static final Map<Integer, ItemType> ITEM_TYPE_ID_MAP = new HashMap<>();
     private static JsonObject MODERN_ITEM_TYPES_JSON = null;
     private static JsonObject LEGACY_ITEM_TYPES_JSON = null;
+    private static JsonObject PRE_FLATTENING_ITEM_TYPES_JSON = null;
 
     private enum ItemAttribute {
         //TODO Add more
@@ -121,8 +122,30 @@ public class ItemTypes {
         if (LEGACY_ITEM_TYPES_JSON == null) {
             LEGACY_ITEM_TYPES_JSON = MappingHelper.getJSONObject("legacyitemtypes");
         }
+        if (PRE_FLATTENING_ITEM_TYPES_JSON == null) {
+            PRE_FLATTENING_ITEM_TYPES_JSON = MappingHelper.getJSONObject("preflatteningitemtypes");
+        }
         if (currentProtocolVersion == targetProtocolVersion) {
             return id;
+        }
+        if (targetProtocolVersion < ClientVersion.V_1_13.getProtocolVersion()) {
+            //Pre flattening ID
+
+            //Is it already pre-flattened?
+            if (currentProtocolVersion < ClientVersion.V_1_13.getProtocolVersion()) {
+                return id;
+            }
+            else {
+                String idStr = Integer.toString(id);
+                if (PRE_FLATTENING_ITEM_TYPES_JSON.has(idStr)) {
+                    int legacyCombinedID = PRE_FLATTENING_ITEM_TYPES_JSON.get(idStr).getAsInt();
+                    return legacyCombinedID >>> 16;
+                }
+                else {
+                    //This item does not exist on this older version, so we make it AIR
+                    return 0;
+                }
+            }
         }
         //Current protocol version must always be the latest server version
         for (ClientVersion cv : ClientVersion.REVERSED_VALUES) {
@@ -132,13 +155,12 @@ public class ItemTypes {
             String jsonName = cv.name().substring(2);
             if (LEGACY_ITEM_TYPES_JSON.has(jsonName)) {
                 JsonObject mappings = LEGACY_ITEM_TYPES_JSON.getAsJsonObject(jsonName);
-                if (mappings.has(Integer.toString(id))) {
-                    int newID = mappings.get(Integer.toString(id)).getAsInt();
-                    id = newID;
+                String idStr = Integer.toString(id);
+                if (mappings.has(idStr)) {
+                    id = mappings.get(idStr).getAsInt();
                 }
                 else {
                     continue;
-
                 }
             }
 

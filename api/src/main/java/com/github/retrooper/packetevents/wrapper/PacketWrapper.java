@@ -246,7 +246,10 @@ public class PacketWrapper<T extends PacketWrapper> {
                 .build();
     }
 
-    public void writeItemStack(@NotNull ItemStack itemStack) {
+    public void writeItemStack(ItemStack itemStack) {
+        if (itemStack == null) {
+            itemStack = ItemStack.NULL;
+        }
         boolean v1_13_2 = serverVersion.isNewerThanOrEquals(ServerVersion.V_1_13_2);
         if (v1_13_2) {
             if (itemStack.equals(ItemStack.NULL)) {

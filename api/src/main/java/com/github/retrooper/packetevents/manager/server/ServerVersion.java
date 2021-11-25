@@ -18,6 +18,8 @@
 
 package com.github.retrooper.packetevents.manager.server;
 
+import com.github.retrooper.packetevents.PacketEvents;
+
 /**
  * Server Version.
  * This is a nice wrapper over minecraft's protocol versions.
@@ -68,9 +70,14 @@ public enum ServerVersion {
         return array;
     }
 
+    public ServerVersion[] reversedValues() {
+        return reversedValues;
+    }
+
     public static ServerVersion getLatest() {
         //We must skip ERROR, because it's not a real server version.
-        return reversedValues[1];
+        ServerVersion version = PacketEvents.getAPI().getServerManager().getVersion();
+        return version.reversedValues()[1];
     }
 
     public static ServerVersion getOldest() {
