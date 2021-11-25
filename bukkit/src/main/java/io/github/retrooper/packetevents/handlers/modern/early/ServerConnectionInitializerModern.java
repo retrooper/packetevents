@@ -29,7 +29,6 @@ import io.netty.channel.ChannelHandler;
 import io.netty.handler.codec.ByteToMessageDecoder;
 import org.bukkit.entity.Player;
 
-import java.util.ArrayList;
 import java.util.List;
 
 
@@ -43,7 +42,7 @@ public class ServerConnectionInitializerModern {
     public static void postDestroyChannel(Object ch) {
         Channel channel = (Channel) ch;
         ChannelHandler viaDecoder = channel.pipeline().get("decoder");
-        if (ViaVersionUtil.getBukkitDecodeHandlerClass().isInstance(viaDecoder)) {
+        if (ViaVersionUtil.isAvailable() && ViaVersionUtil.getBukkitDecodeHandlerClass().isInstance(viaDecoder)) {
             ReflectionObject reflectMCDecoder = new ReflectionObject(viaDecoder);
             ByteToMessageDecoder decoder = reflectMCDecoder.readObject(0, ByteToMessageDecoder.class);
             if (decoder instanceof PacketDecoderModern) {
