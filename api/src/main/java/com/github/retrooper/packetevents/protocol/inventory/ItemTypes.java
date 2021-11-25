@@ -63,11 +63,16 @@ public class ItemTypes {
         int latestProtocolVersion = ServerVersion.getLatest().getProtocolVersion();
         int serverProtocolVersion = PacketEvents.getAPI().getServerManager().getVersion().getProtocolVersion();
 
-        int id = transformItemTypeId(latestID, latestProtocolVersion, serverProtocolVersion);
+        int[] itemData = transformItemTypeId(latestID, latestProtocolVersion, serverProtocolVersion);
+        if (key.equals("mutton")) {
+            System.out.println("mutton data: " + Arrays.toString(itemData));
+        }
         boolean musicDisc = attributes.contains(ItemAttribute.MUSIC_DISC);
         ResourceLocation identifier = ResourceLocation.minecraft(key);
 
         ItemType type = new ItemType() {
+            private final int legacyData = itemData.length == 2 ? itemData[1] : -1;
+
             @Override
             public int getMaxAmount() {
                 return maxAmount;
@@ -80,7 +85,7 @@ public class ItemTypes {
 
             @Override
             public int getId() {
-                return id;
+                return itemData[0];
             }
 
             @Override
@@ -89,9 +94,14 @@ public class ItemTypes {
             }
 
             @Override
+            public int getLegacyData() {
+                return legacyData;
+            }
+
+            @Override
             public boolean equals(Object obj) {
                 if (obj instanceof ItemType) {
-                    return getId() == ((ItemType)obj).getId();
+                    return getId() == ((ItemType) obj).getId();
                 }
                 return false;
             }
@@ -113,39 +123,43 @@ public class ItemTypes {
 
     @Nullable
     public static ItemType getById(int id, int currentProtocolVersion, int targetProtocolVersion) {
-        id = transformItemTypeId(id, currentProtocolVersion, targetProtocolVersion);
-        return getById(id);
+        int[] itemData = transformItemTypeId(id, currentProtocolVersion, targetProtocolVersion);
+        return getById(itemData[0]);
     }
 
-    //TODO Look into transforming id from older versions to newer ones, now we only go down
-    public static int transformItemTypeId(int id, int currentProtocolVersion, int targetProtocolVersion) {
-        if (LEGACY_ITEM_TYPES_JSON == null) {
-            LEGACY_ITEM_TYPES_JSON = MappingHelper.getJSONObject("legacyitemtypes");
+    public static int[] transformItemTypeId(int id, int latestProtocolVersion, int targetProtocolVersion) {
+        int tempID = transformFlattenedItemTypeId(id, latestProtocolVersion, targetProtocolVersion);
+        if (targetProtocolVersion < ClientVersion.V_1_13.getProtocolVersion()) {
+            return preFlattenItemTypeId(tempID);
         }
+        else {
+            return new int[] {tempID};
+        }
+    }
+
+    private static int[] preFlattenItemTypeId(int id) {
         if (PRE_FLATTENING_ITEM_TYPES_JSON == null) {
             PRE_FLATTENING_ITEM_TYPES_JSON = MappingHelper.getJSONObject("preflatteningitemtypes");
         }
-        if (currentProtocolVersion == targetProtocolVersion) {
-            return id;
+        String idStr = Integer.toString(id);
+        if (PRE_FLATTENING_ITEM_TYPES_JSON.has(idStr)) {
+            int legacyCombinedID = PRE_FLATTENING_ITEM_TYPES_JSON.get(idStr).getAsInt();
+            id = legacyCombinedID >>> 16;
+            int legacyData = legacyCombinedID & 0xFFFF;
+            return new int[]{id, legacyData};
+        } else {
+            //This item does not exist on this older version, so we make it AIR
+            return new int[]{0};
         }
-        if (targetProtocolVersion < ClientVersion.V_1_13.getProtocolVersion()) {
-            //Pre flattening ID
+    }
 
-            //Is it already pre-flattened?
-            if (currentProtocolVersion < ClientVersion.V_1_13.getProtocolVersion()) {
-                return id;
-            }
-            else {
-                String idStr = Integer.toString(id);
-                if (PRE_FLATTENING_ITEM_TYPES_JSON.has(idStr)) {
-                    int legacyCombinedID = PRE_FLATTENING_ITEM_TYPES_JSON.get(idStr).getAsInt();
-                    return legacyCombinedID >>> 16;
-                }
-                else {
-                    //This item does not exist on this older version, so we make it AIR
-                    return 0;
-                }
-            }
+    //TODO Look into transforming id from older versions to newer ones, now we only go down
+    private static int transformFlattenedItemTypeId(int id, int latestProtocolVersion, int targetProtocolVersion) {
+        if (LEGACY_ITEM_TYPES_JSON == null) {
+            LEGACY_ITEM_TYPES_JSON = MappingHelper.getJSONObject("legacyitemtypes");
+        }
+        if (latestProtocolVersion == targetProtocolVersion) {
+            return id;
         }
         //Current protocol version must always be the latest server version
         for (ClientVersion cv : ClientVersion.REVERSED_VALUES) {
@@ -158,8 +172,7 @@ public class ItemTypes {
                 String idStr = Integer.toString(id);
                 if (mappings.has(idStr)) {
                     id = mappings.get(idStr).getAsInt();
-                }
-                else {
+                } else {
                     continue;
                 }
             }
@@ -168,15 +181,7 @@ public class ItemTypes {
                 return id;
             }
         }
-        ClientVersion cv = ClientVersion.values()[0];
-        String jsonName = cv.name().substring(2);
-        if (LEGACY_ITEM_TYPES_JSON.has(jsonName)) {
-            JsonObject mappings = LEGACY_ITEM_TYPES_JSON.getAsJsonObject(jsonName);
-            if (mappings.has(Integer.toString(id))) {
-                return mappings.get(Integer.toString(id)).getAsInt();
-            }
-        }
-        return -1;
+        return id;
     }
 
     private static String paste(String content) throws IOException {

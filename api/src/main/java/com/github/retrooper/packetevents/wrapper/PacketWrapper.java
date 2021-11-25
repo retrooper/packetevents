@@ -234,9 +234,11 @@ public class PacketWrapper<T extends PacketWrapper> {
             return ItemStack.NULL;
         }
         ItemType type = ItemTypes.getById(typeID);
-        System.out.println("ID: " + typeID + ", type null: " + (type == null));
+        if (type == null) {
+            System.out.println("Why is type not detected, type id: " + typeID);
+        }
         int amount = readByte();
-        int legacyData = v1_13_2 ? 0 : readShort();
+        int legacyData = v1_13_2 ? -1 : readShort();
         NBTCompound nbt = readNBT();
         return ItemStack.builder()
                 .type(type)
@@ -256,9 +258,12 @@ public class PacketWrapper<T extends PacketWrapper> {
                 writeBoolean(false);
             } else {
                 writeBoolean(true);
-                int typeID = itemStack.getType().getId();
-                if (ItemStack.NULL.equals(itemStack)) {
+                int typeID;
+                if (itemStack.getType() == null || ItemStack.NULL.equals(itemStack)) {
                     typeID = -1;
+                }
+                else {
+                    typeID = itemStack.getType().getId();
                 }
                 writeVarInt(typeID);
                 if (typeID >= 0) {
@@ -267,9 +272,12 @@ public class PacketWrapper<T extends PacketWrapper> {
                 }
             }
         } else {
-            int typeID = itemStack.getType().getId();
-            if (ItemStack.NULL.equals(itemStack)) {
+            int typeID;
+            if (itemStack.getType() == null || ItemStack.NULL.equals(itemStack)) {
                 typeID = -1;
+            }
+            else {
+                typeID = itemStack.getType().getId();
             }
             writeShort(typeID);
             if (typeID >= 0) {

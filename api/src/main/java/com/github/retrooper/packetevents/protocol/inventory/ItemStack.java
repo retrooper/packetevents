@@ -21,12 +21,12 @@ package com.github.retrooper.packetevents.protocol.inventory;
 import com.github.retrooper.packetevents.protocol.nbt.NBTCompound;
 
 public class ItemStack {
-    public static final ItemStack NULL = new ItemStack(ItemTypes.AIR, -1);
-    //TODO Support legacy data
+    //TODO Rethink making NULL AIR
+    public static final ItemStack NULL = new ItemStack(ItemTypes.AIR, -1, new NBTCompound(), -1);
     private ItemType type;
     private int amount;
     private NBTCompound nbt;
-    private int legacyData;
+    private int legacyData = -1;
 
     private ItemStack(ItemType type, int amount) {
         this.type = type;
@@ -102,7 +102,7 @@ public class ItemStack {
             String identifier = type == null ? "null" : type.getIdentifier().toString();
             int maxAmount = type == null ? -1 : type.getMaxAmount();
             return "ItemStack[type=" + identifier + ", amount=" + amount + "/" + maxAmount
-                    + ", nbt tag names: " + nbt.getTagNames() + "]";
+                    + ", nbt tag names: " + nbt.getTagNames() + ", legacyData=" + legacyData + "]";
         }
     }
 
@@ -118,7 +118,7 @@ public class ItemStack {
         private ItemType type;
         private int amount;
         private NBTCompound nbt = new NBTCompound();
-        private int legacyData;
+        private int legacyData = -1;
 
         public Builder type(ItemType type) {
             this.type = type;

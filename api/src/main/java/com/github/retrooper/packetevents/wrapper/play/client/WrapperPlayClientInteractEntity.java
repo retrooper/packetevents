@@ -74,7 +74,7 @@ public class WrapperPlayClientInteractEntity extends PacketWrapper<WrapperPlayCl
                 this.target = Optional.empty();
             }
 
-            if (serverVersion.isNewerThan(ServerVersion.V_1_8) && (type == Type.INTERACT || type == Type.INTERACT_AT)) {
+            if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_9) && (type == Type.INTERACT || type == Type.INTERACT_AT)) {
                 int handID = readVarInt();
                 this.hand = Hand.getByLegacyId(handID);
             } else {
@@ -113,7 +113,7 @@ public class WrapperPlayClientInteractEntity extends PacketWrapper<WrapperPlayCl
                 writeFloat(targetVec.z);
             }
 
-            if (serverVersion.isNewerThan(ServerVersion.V_1_8) && (type == Type.INTERACT || type == Type.INTERACT_AT)) {
+            if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_9) && (type == Type.INTERACT || type == Type.INTERACT_AT)) {
                 writeVarInt(hand.getLegacyId());
             }
 
