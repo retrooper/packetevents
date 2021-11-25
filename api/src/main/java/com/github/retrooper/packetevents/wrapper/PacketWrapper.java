@@ -236,8 +236,8 @@ public class PacketWrapper<T extends PacketWrapper> {
         ItemType type = ItemTypes.getById(typeID);
         System.out.println("ID: " + typeID + ", type null: " + (type == null));
         int amount = readByte();
-        NBTCompound nbt = readNBT();
         int legacyData = v1_13_2 ? 0 : readShort();
+        NBTCompound nbt = readNBT();
         return ItemStack.builder()
                 .type(type)
                 .amount(amount)
@@ -252,25 +252,31 @@ public class PacketWrapper<T extends PacketWrapper> {
         }
         boolean v1_13_2 = serverVersion.isNewerThanOrEquals(ServerVersion.V_1_13_2);
         if (v1_13_2) {
-            if (itemStack.equals(ItemStack.NULL)) {
+            if (ItemStack.NULL.equals(itemStack)) {
                 writeBoolean(false);
             } else {
                 writeBoolean(true);
                 int typeID = itemStack.getType().getId();
-                if (typeID >= 0) {
-                    writeVarInt(typeID);
+                if (ItemStack.NULL.equals(itemStack)) {
+                    typeID = -1;
                 }
-                writeByte(itemStack.getAmount());
-                writeNBT(itemStack.getNBT());
+                writeVarInt(typeID);
+                if (typeID >= 0) {
+                    writeByte(itemStack.getAmount());
+                    writeNBT(itemStack.getNBT());
+                }
             }
         } else {
             int typeID = itemStack.getType().getId();
-            if (typeID >= 0) {
-                writeShort(typeID);
+            if (ItemStack.NULL.equals(itemStack)) {
+                typeID = -1;
             }
-            writeByte(itemStack.getAmount());
-            writeNBT(itemStack.getNBT());
-            writeShort(itemStack.getLegacyData());
+            writeShort(typeID);
+            if (typeID >= 0) {
+                writeByte(itemStack.getAmount());
+                writeShort(itemStack.getLegacyData());
+                writeNBT(itemStack.getNBT());
+            }
         }
     }
 

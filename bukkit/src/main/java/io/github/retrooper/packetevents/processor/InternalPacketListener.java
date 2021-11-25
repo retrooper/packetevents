@@ -89,7 +89,6 @@ public class InternalPacketListener implements PacketListener {
                 System.out.println("tf!");
             }
             System.out.println("Set slot " + slot + " to item " + item);
-            event.setLastUsedWrapper(null);
         } else if (event.getPacketType() == PacketType.Play.Server.PLUGIN_MESSAGE) {
             WrapperPlayServerPluginMessage pluginMessage = new WrapperPlayServerPluginMessage(event);
             String channel = pluginMessage.getChannelName();
