@@ -20,6 +20,7 @@ package io.github.retrooper.packetevents.handlers.modern.early;
 
 import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.protocol.ConnectionState;
+import com.github.retrooper.packetevents.util.reflection.ClassUtil;
 import com.github.retrooper.packetevents.util.reflection.ReflectionObject;
 import io.github.retrooper.packetevents.handlers.modern.PacketDecoderModern;
 import io.github.retrooper.packetevents.handlers.modern.PacketEncoderModern;
@@ -43,13 +44,13 @@ public class ServerConnectionInitializerModern {
         Channel channel = (Channel) ch;
         ChannelHandler viaDecoder = channel.pipeline().get("decoder");
         if (ViaVersionUtil.isAvailable() && ViaVersionUtil.getBukkitDecodeHandlerClass().isInstance(viaDecoder)) {
-            ReflectionObject reflectMCDecoder = new ReflectionObject(viaDecoder);
-            ByteToMessageDecoder decoder = reflectMCDecoder.readObject(0, ByteToMessageDecoder.class);
+            ReflectionObject reflectViaDecoder = new ReflectionObject(viaDecoder);
+            ByteToMessageDecoder decoder = reflectViaDecoder.readObject(0, ByteToMessageDecoder.class);
             if (decoder instanceof PacketDecoderModern) {
                 PacketDecoderModern decoderModern = (PacketDecoderModern) decoder;
                 //No decoders injected into our decoder
                 if (decoderModern.decoders.isEmpty()) {
-                    reflectMCDecoder.write(ByteToMessageDecoder.class, 0, decoderModern.mcDecoder);
+                    reflectViaDecoder.write(ByteToMessageDecoder.class, 0, decoderModern.mcDecoder);
                 }
                 //Some decoders injected into our decoder, lets do some cleaning up
                 else {
@@ -79,8 +80,9 @@ public class ServerConnectionInitializerModern {
                     //Write skipDoubleTransform
                     reflectNewDecoderModern.write(boolean.class, 2, decoderModern.skipDoubleTransform);
                 }
-            }
-            else {
+            } else if (ClassUtil.getClassSimpleName(decoder.getClass()).equals("PacketDecoderModern")) {
+                //Possibly another instance of packetevents has already injected into ViaVersion.
+                //Let us try to remove our own decoder without breaking the other instance.
                 ReflectionObject reflectDecoder = new ReflectionObject(decoder);
                 List<Object> decoders = reflectDecoder.readList(0);
                 int targetIndex = -1;
@@ -93,6 +95,9 @@ public class ServerConnectionInitializerModern {
                     decoders.remove(targetIndex);
                     reflectDecoder.writeList(0, decoders);
                 }
+            } else {
+                //ViaVersion is present, we didn't inject into ViaVersion yet, because we haven't needed to.
+                channel.pipeline().remove(PacketEvents.DECODER_NAME);
             }
         } else {
             channel.pipeline().remove(PacketEvents.DECODER_NAME);

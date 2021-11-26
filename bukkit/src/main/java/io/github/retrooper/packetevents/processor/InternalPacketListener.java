@@ -26,26 +26,19 @@ import com.github.retrooper.packetevents.manager.player.attributes.TabCompleteAt
 import com.github.retrooper.packetevents.protocol.ConnectionState;
 import com.github.retrooper.packetevents.protocol.chat.Color;
 import com.github.retrooper.packetevents.protocol.chat.component.BaseComponent;
-import com.github.retrooper.packetevents.protocol.chat.component.ComponentSerializer;
 import com.github.retrooper.packetevents.protocol.chat.component.HoverEvent;
 import com.github.retrooper.packetevents.protocol.chat.component.TextComponent;
-import com.github.retrooper.packetevents.protocol.entity.EntityType;
-import com.github.retrooper.packetevents.protocol.entity.EntityTypes;
 import com.github.retrooper.packetevents.protocol.inventory.ItemStack;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.protocol.player.ClientVersion;
-import com.github.retrooper.packetevents.protocol.resources.ResourceLocation;
-import com.github.retrooper.packetevents.util.Vector3d;
 import com.github.retrooper.packetevents.wrapper.handshaking.client.WrapperHandshakingClientHandshake;
 import com.github.retrooper.packetevents.wrapper.login.client.WrapperLoginClientLoginStart;
-import com.github.retrooper.packetevents.wrapper.login.server.WrapperLoginServerPluginRequest;
 import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientInteractEntity;
 import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientPluginMessage;
 import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientTabComplete;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerChatMessage;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerPluginMessage;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerSetSlot;
-import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerSpawnLivingEntity;
 import org.bukkit.entity.Player;
 
 import java.util.ArrayList;
@@ -159,7 +152,6 @@ public class InternalPacketListener implements PacketListener {
 
                     //Transition into the LOGIN OR STATUS connection state
                     PacketEvents.getAPI().getPlayerManager().changeConnectionState(event.getChannel(), handshake.getNextConnectionState());
-
                 }
                 break;
             case LOGIN:
@@ -212,8 +204,7 @@ public class InternalPacketListener implements PacketListener {
                     //If we forget to do this, it will be done as soon as we send this wrapper for the first time.
                     cm.prepareForSend();
                     PacketEvents.getAPI().getPlayerManager().sendPacket(event.getChannel(), cm);
-                }
-                else if (event.getPacketType() == PacketType.Play.Client.PLUGIN_MESSAGE) {
+                } else if (event.getPacketType() == PacketType.Play.Client.PLUGIN_MESSAGE) {
                     WrapperPlayClientPluginMessage pluginMessage = new WrapperPlayClientPluginMessage(event);
                     String channel = pluginMessage.getChannelName();
                     byte[] data = pluginMessage.getData();
