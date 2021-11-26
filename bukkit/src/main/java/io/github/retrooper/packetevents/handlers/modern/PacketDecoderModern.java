@@ -26,6 +26,7 @@ import com.github.retrooper.packetevents.protocol.ConnectionState;
 import io.github.retrooper.packetevents.handlers.compression.CustomPacketCompressor;
 import io.github.retrooper.packetevents.handlers.compression.CustomPacketDecompressor;
 import io.github.retrooper.packetevents.handlers.modern.early.CompressionManagerModern;
+import io.github.retrooper.packetevents.handlers.modern.early.ServerConnectionInitializerModern;
 import io.github.retrooper.packetevents.utils.dependencies.viaversion.CustomPipelineUtil;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
@@ -117,6 +118,13 @@ public class PacketDecoderModern extends ByteToMessageDecoder {
                 e.printStackTrace();
             }
         }
+    }
+
+    @Override
+    public void channelInactive(ChannelHandlerContext ctx) throws Exception {
+        System.out.println("Destroying channel...");
+        ServerConnectionInitializerModern.postDestroyChannel(ctx.channel());
+        super.channelInactive(ctx);
     }
 
     private boolean handleCompressionOrder(ChannelHandlerContextAbstract ctx, ByteBufAbstract buf) {

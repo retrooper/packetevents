@@ -2,12 +2,13 @@ package io.github.retrooper.packetevents.handlers.legacy;
 
 import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.event.impl.PacketReceiveEvent;
-import io.github.retrooper.packetevents.handlers.compression.CustomPacketCompressor;
-import io.github.retrooper.packetevents.handlers.compression.CustomPacketDecompressor;
-import com.github.retrooper.packetevents.protocol.ConnectionState;
 import com.github.retrooper.packetevents.netty.buffer.ByteBufAbstract;
 import com.github.retrooper.packetevents.netty.channel.ChannelHandlerContextAbstract;
+import com.github.retrooper.packetevents.protocol.ConnectionState;
+import io.github.retrooper.packetevents.handlers.compression.CustomPacketCompressor;
+import io.github.retrooper.packetevents.handlers.compression.CustomPacketDecompressor;
 import io.github.retrooper.packetevents.handlers.legacy.early.CompressionManagerLegacy;
+import io.github.retrooper.packetevents.handlers.legacy.early.ServerConnectionInitializerLegacy;
 import net.minecraft.util.io.netty.buffer.ByteBuf;
 import net.minecraft.util.io.netty.channel.ChannelHandlerContext;
 import net.minecraft.util.io.netty.handler.codec.ByteToMessageDecoder;
@@ -63,6 +64,13 @@ public class PacketDecoderLegacy extends ByteToMessageDecoder {
         handle(PacketEvents.getAPI().getNettyManager().wrapChannelHandlerContext(ctx), PacketEvents.getAPI().getNettyManager().wrapByteBuf(byteBuf), out);
     }
 
+    @Override
+    public void channelInactive(ChannelHandlerContext ctx) throws Exception {
+        System.out.println("Destroying channel...");
+        ServerConnectionInitializerLegacy.postDestroyChannel(ctx.channel());
+        super.channelInactive(ctx);
+    }
+
     private boolean handleCompressionOrder(ChannelHandlerContextAbstract ctx, ByteBufAbstract buf) {
         if (handledCompression) return false;
 
@@ -73,7 +81,7 @@ public class PacketDecoderLegacy extends ByteToMessageDecoder {
             // Need to decompress this packet due to bad order
             ByteBufAbstract decompressed = CustomPacketDecompressor.decompress(ctx, buf);
             return CompressionManagerLegacy.refactorHandlers((ChannelHandlerContext) ctx.rawChannelHandlerContext(),
-                    (ByteBuf)buf.rawByteBuf(), (ByteBuf)decompressed.rawByteBuf());
+                    (ByteBuf) buf.rawByteBuf(), (ByteBuf) decompressed.rawByteBuf());
         }
         return false;
     }

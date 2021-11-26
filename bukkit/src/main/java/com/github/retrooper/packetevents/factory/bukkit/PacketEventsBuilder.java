@@ -138,8 +138,6 @@ public class PacketEventsBuilder {
                         Bukkit.getPluginManager().registerEvents(internalBukkitListener, plugin);
                         for (final Player p : Bukkit.getOnlinePlayers()) {
                             try {
-                                //TODO Remove this debug message
-                                System.out.println("INJECTED: " + p.getName());
                                 injector.injectPlayer(p, ConnectionState.PLAY);
                                 getEventManager().callEvent(new PostPlayerInjectEvent(p));
                             } catch (Exception ex) {
@@ -170,8 +168,6 @@ public class PacketEventsBuilder {
                 if (initialized) {
                     //Eject all players
                     for (Player p : Bukkit.getOnlinePlayers()) {
-                        //TODO Remove this debug message
-                        System.out.println("EJECTING: " + p.getName());
                         injector.ejectPlayer(p);
                     }
                     //Eject the injector if needed
