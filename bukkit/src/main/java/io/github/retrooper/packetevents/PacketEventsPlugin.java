@@ -19,13 +19,13 @@
 package io.github.retrooper.packetevents;
 
 import com.github.retrooper.packetevents.PacketEvents;
-import com.github.retrooper.packetevents.factory.bukkit.PacketEventsBuilder;
+import com.github.retrooper.packetevents.factory.bukkit.BukkitPacketEventsBuilder;
 import org.bukkit.plugin.java.JavaPlugin;
 
 public class PacketEventsPlugin extends JavaPlugin {
     @Override
     public void onLoad() {
-        PacketEvents.setAPI(PacketEventsBuilder.build(this));
+        PacketEvents.setAPI(BukkitPacketEventsBuilder.build(this));
         PacketEvents.getAPI().load();
     }
 

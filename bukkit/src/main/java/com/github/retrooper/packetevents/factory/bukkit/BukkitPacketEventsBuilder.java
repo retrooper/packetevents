@@ -47,7 +47,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.logging.Logger;
 
-public class PacketEventsBuilder {
+public class BukkitPacketEventsBuilder {
     private static PacketEventsAPI<Plugin> API_INSTANCE;
 
     public static PacketEventsAPI<Plugin> build(Plugin plugin) {
