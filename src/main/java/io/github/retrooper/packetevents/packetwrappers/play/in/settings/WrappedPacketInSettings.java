@@ -130,20 +130,6 @@ public class WrappedPacketInSettings extends WrappedPacket {
         }
     }
 
-    //Added in 1.18
-    public Optional<Integer> getModelCustomization() {
-        if (v_1_18) {
-            return Optional.of(readInt(1));
-        }
-        return Optional.empty();
-    }
-
-    //Added in 1.18
-    public void setModelCustomization(int customization) {
-        if (v_1_18) {
-            writeInt(1, customization);
-        }
-    }
 
     public byte getDisplaySkinPartsMask() {
         byte mask = 0;
@@ -153,7 +139,7 @@ public class WrappedPacketInSettings extends WrappedPacket {
                 mask |= 0x01;
             }
         } else {
-            mask = (byte) readInt(v_1_17 ? 2 : 1);
+            mask = (byte) readInt((v_1_17 && !v_1_18) ? 2 : 1);
         }
         return mask;
     }
@@ -163,7 +149,7 @@ public class WrappedPacketInSettings extends WrappedPacket {
             boolean capeEnabled = (mask & 0x01) == 0x01;
             writeBoolean(1, capeEnabled);
         } else {
-            writeInt(v_1_17 ? 2 : 1, mask);
+            writeInt((v_1_17 && !v_1_18) ? 2 : 1, mask);
         }
     }
 
