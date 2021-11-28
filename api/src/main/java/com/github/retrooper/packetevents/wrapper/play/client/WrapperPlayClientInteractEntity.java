@@ -34,7 +34,7 @@ import java.util.Optional;
  */
 public class WrapperPlayClientInteractEntity extends PacketWrapper<WrapperPlayClientInteractEntity> {
     private int entityID;
-    private Type type;
+    private InteractAction interactAction;
     private Optional<Vector3f> target;
     private Hand hand;
     private Optional<Boolean> sneaking;
@@ -43,10 +43,10 @@ public class WrapperPlayClientInteractEntity extends PacketWrapper<WrapperPlayCl
         super(event);
     }
 
-    public WrapperPlayClientInteractEntity(int entityID, Type type, Hand hand, Optional<Vector3f> target, Optional<Boolean> sneaking) {
+    public WrapperPlayClientInteractEntity(int entityID, InteractAction interactAction, Hand hand, Optional<Vector3f> target, Optional<Boolean> sneaking) {
         super(PacketType.Play.Client.INTERACT_ENTITY);
         this.entityID = entityID;
-        this.type = type;
+        this.interactAction = interactAction;
         this.hand = hand;
         this.target = target;
         this.sneaking = sneaking;
@@ -57,15 +57,15 @@ public class WrapperPlayClientInteractEntity extends PacketWrapper<WrapperPlayCl
         if (serverVersion == ServerVersion.V_1_7_10) {
             this.entityID = readInt();
             byte typeIndex = readByte();
-            this.type = Type.VALUES[typeIndex];
+            this.interactAction = InteractAction.VALUES[typeIndex];
             this.target = Optional.empty();
             this.hand = Hand.RIGHT;
             this.sneaking = Optional.empty();
         } else {
             this.entityID = readVarInt();
             int typeIndex = readVarInt();
-            this.type = Type.VALUES[typeIndex];
-            if (type == Type.INTERACT_AT) {
+            this.interactAction = InteractAction.VALUES[typeIndex];
+            if (interactAction == InteractAction.INTERACT_AT) {
                 float x = readFloat();
                 float y = readFloat();
                 float z = readFloat();
@@ -74,7 +74,7 @@ public class WrapperPlayClientInteractEntity extends PacketWrapper<WrapperPlayCl
                 this.target = Optional.empty();
             }
 
-            if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_9) && (type == Type.INTERACT || type == Type.INTERACT_AT)) {
+            if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_9) && (interactAction == InteractAction.INTERACT || interactAction == InteractAction.INTERACT_AT)) {
                 int handID = readVarInt();
                 this.hand = Hand.getByLegacyId(handID);
             } else {
@@ -92,7 +92,7 @@ public class WrapperPlayClientInteractEntity extends PacketWrapper<WrapperPlayCl
     @Override
     public void readData(WrapperPlayClientInteractEntity wrapper) {
         this.entityID = wrapper.entityID;
-        this.type = wrapper.type;
+        this.interactAction = wrapper.interactAction;
         this.target = wrapper.target;
         this.hand = wrapper.hand;
         this.sneaking = wrapper.sneaking;
@@ -102,18 +102,18 @@ public class WrapperPlayClientInteractEntity extends PacketWrapper<WrapperPlayCl
     public void writeData() {
         if (serverVersion == ServerVersion.V_1_7_10) {
             writeInt(entityID);
-            writeByte(type.ordinal());
+            writeByte(interactAction.ordinal());
         } else {
             writeVarInt(entityID);
-            writeVarInt(type.ordinal());
-            if (type == Type.INTERACT_AT) {
+            writeVarInt(interactAction.ordinal());
+            if (interactAction == InteractAction.INTERACT_AT) {
                 Vector3f targetVec = target.orElse(new Vector3f(0.0F, 0.0F, 0.0F));
                 writeFloat(targetVec.x);
                 writeFloat(targetVec.y);
                 writeFloat(targetVec.z);
             }
 
-            if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_9) && (type == Type.INTERACT || type == Type.INTERACT_AT)) {
+            if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_9) && (interactAction == InteractAction.INTERACT || interactAction == InteractAction.INTERACT_AT)) {
                 writeVarInt(hand.getLegacyId());
             }
 
@@ -131,12 +131,12 @@ public class WrapperPlayClientInteractEntity extends PacketWrapper<WrapperPlayCl
         this.entityID = entityID;
     }
 
-    public Type getType() {
-        return type;
+    public InteractAction getAction() {
+        return interactAction;
     }
 
-    public void setType(Type type) {
-        this.type = type;
+    public void setAction(InteractAction interactAction) {
+        this.interactAction = interactAction;
     }
 
     public Hand getHand() {
@@ -163,8 +163,8 @@ public class WrapperPlayClientInteractEntity extends PacketWrapper<WrapperPlayCl
         this.sneaking = sneaking;
     }
 
-    public enum Type {
+    public enum InteractAction {
         INTERACT, ATTACK, INTERACT_AT;
-        public static final Type[] VALUES = values();
+        public static final InteractAction[] VALUES = values();
     }
 }

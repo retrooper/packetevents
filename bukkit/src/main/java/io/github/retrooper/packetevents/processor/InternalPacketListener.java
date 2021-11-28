@@ -183,7 +183,7 @@ public class InternalPacketListener implements PacketListener {
 
                     List<BaseComponent> hoverTextComponents = new ArrayList<>();
                     hoverTextComponents.add(TextComponent.builder()
-                            .text("type: " + interactEntity.getType().name())
+                            .text("action: " + interactEntity.getAction())
                             .color(Color.GOLD)
                             .bold(true)
                             .build());
