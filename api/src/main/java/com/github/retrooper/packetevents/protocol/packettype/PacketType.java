@@ -292,11 +292,12 @@ public final class PacketType {
             }
 
             private static void loadPacketIDs(ClientVersion version, Enum<?>[] enumConstants) {
+                int serverProtocolVersion = PacketEvents.getAPI().getServerManager().getVersion().getProtocolVersion();
                 Map<Integer, PacketTypeCommon> innerMap = new IdentityHashMap<>();
                 Map<PacketTypeCommon, Integer> secondInnerMap = new IdentityHashMap<>();
                 for (int id = 0; id < enumConstants.length; id++) {
                     Client value = Client.valueOf(enumConstants[id].name());
-                    if (version.getProtocolVersion() == PacketEvents.getAPI().getServerManager().getVersion().getProtocolVersion()) {
+                    if (version.getProtocolVersion() == serverProtocolVersion) {
                         value.id = id;
                     }
                     innerMap.put(id, value);

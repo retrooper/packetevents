@@ -61,11 +61,9 @@ public class WrapperLoginServerEncryptionRequest extends PacketWrapper<WrapperLo
     @Override
     public void readData() {
         this.serverID = readString(20);
-        int publicKeyLength = readVarInt();
-        byte[] publicKeyBytes = readByteArray(publicKeyLength);
+        byte[] publicKeyBytes = readByteArray(buffer.readableBytes());
         this.publicKey = encrypt(publicKeyBytes);
-        int verifyTokenLength = readVarInt();
-        this.verifyToken = readByteArray(verifyTokenLength);
+        this.verifyToken = readByteArray(buffer.readableBytes());
     }
 
     @Override
@@ -79,9 +77,7 @@ public class WrapperLoginServerEncryptionRequest extends PacketWrapper<WrapperLo
     public void writeData() {
         writeString(serverID, 20);
         byte[] encoded = publicKey.getEncoded();
-        writeVarInt(encoded.length);
         writeByteArray(encoded);
-        writeVarInt(verifyToken.length);
         writeByteArray(verifyToken);
     }
 

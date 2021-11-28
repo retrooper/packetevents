@@ -417,14 +417,27 @@ public class PacketWrapper<T extends PacketWrapper> {
         buffer.writeDouble(value);
     }
 
-    public byte[] readByteArray(int length) {
-        byte[] bytes = new byte[length];
+    public byte[] readBytes(int size) {
+        byte[] bytes = new byte[size];
         buffer.readBytes(bytes);
         return bytes;
     }
 
-    public void writeByteArray(byte[] array) {
+    public void writeBytes(byte[] array) {
         buffer.writeBytes(array);
+    }
+
+    public byte[] readByteArray(int maxLength) {
+        int len = readVarInt();
+        if (len > maxLength) {
+            throw new RuntimeException("The received byte array length is longer than maximum allowed (" + len + " > " + maxLength + ")");
+        }
+        return readBytes(len);
+    }
+
+    public void writeByteArray(byte[] array) {
+        writeVarInt(array.length);
+        writeBytes(array);
     }
 
     public long[] readLongArray(int size) {
