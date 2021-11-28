@@ -238,7 +238,6 @@ public class WrappedPacketOutExplosion extends WrappedPacket implements Sendable
         }
     }
 
-    //TODO Cut off at 1.8.1, and once you cut off, you can optimize the methods above. Also optimize the position part.
     @Deprecated
     public float getPlayerMotionX() {
         if (packet != null) {

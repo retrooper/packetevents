@@ -50,9 +50,7 @@ public final class EntityFinderUtils {
         try {
             craftWorldGetHandle = NMSUtils.craftWorldClass.getMethod("getHandle");
 
-            String getEntityByIdMethodName = (version.getProtocolVersion() == (short) 47)
-                    ? "a" : "getEntity";
-            getEntityByIdMethod = worldServerClass.getMethod(getEntityByIdMethodName, int.class);
+            getEntityByIdMethod = worldServerClass.getMethod("a", int.class);
         } catch (NoSuchMethodException e) {
             try {
                 getEntityByIdMethod = worldServerClass.getMethod("getEntity", int.class);

@@ -95,7 +95,6 @@ public final class WrappedPacketOutEntityVelocity extends WrappedPacketEntityAbs
         }
     }
 
-    //TODO Cut off at 1.8.1 and optimize the methods above.
     @Deprecated
     public double getVelocityX() {
         if (packet != null) {

@@ -37,7 +37,6 @@ public class WrappedPacketInVehicleMove extends WrappedPacket {
         writeDouble(2, position.z);
     }
 
-    //TODO Cut off at 1.8.1
     @Deprecated
     public double getX() {
         return readDouble(0);

@@ -171,7 +171,7 @@ public final class PlayerUtils {
                     int protocolVersion;
                     //Handle 1.7.10, luckily 1.7.10 provides a method for us to access a player's protocol version(because 1.7.10 servers support 1.8 clients too)
                     if (PacketEvents.get().getServerUtils().getVersion().isOlderThan(ServerVersion.v_1_8)) {
-                        protocolVersion = (short) SpigotVersionLookup_1_7.getProtocolVersion(player);
+                        protocolVersion = SpigotVersionLookup_1_7.getProtocolVersion(player);
                     } else {
                         //No dependency available, couldn't snatch the version from the packet AND server version is not 1.7.10
                         //We are pretty safe to assume the version is the same as the server, as ViaVersion AND ProtocolSupport could not be found.
@@ -268,30 +268,6 @@ public final class PlayerUtils {
     public void changeSkinProperty(Player player, Skin skin) {
         Object gameProfile = NMSUtils.getGameProfile(player);
         GameProfileUtil.setGameProfileSkin(gameProfile, skin);
-    }
-
-    //TODO FINISH APPLY SKIN. ITS NOT WORKING?
-    private void applySkinChangeAsync(Player player) {
-        Plugin plugin = PacketEvents.get().getPlugin();
-        CompletableFuture.runAsync(() -> {
-            System.out.println("STARTING");
-
-        }).thenRunAsync(() -> {
-            WrappedPacketOutEntityDestroy destroyPacket = new WrappedPacketOutEntityDestroy(player.getEntityId());
-            WrappedPacketOutNamedEntitySpawn spawnPacket = new WrappedPacketOutNamedEntitySpawn(player);
-            for (Player p : Bukkit.getOnlinePlayers()) {
-                if (p.getEntityId() != player.getEntityId()) {
-                    PacketEvents.get().getPlayerUtils().sendPacket(p, destroyPacket);
-                    PacketEvents.get().getPlayerUtils().sendPacket(p, spawnPacket);
-
-                    Bukkit.getServer().getScheduler().runTask(plugin, () -> p.hidePlayer(plugin, player));
-                    Bukkit.getServer().getScheduler().runTaskLater(plugin, () -> p.showPlayer(plugin, player), 4L);
-                }
-            }
-
-        }).thenRunAsync(() -> {
-            System.out.println("DONE");
-        });
     }
 
     public Skin getSkin(Player player) {

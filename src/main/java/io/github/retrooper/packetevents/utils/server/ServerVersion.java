@@ -78,7 +78,7 @@ public enum ServerVersion {
                     fallbackVersion = ServerVersion.v_1_8_8;
                 }
             }
-            PacketEvents.get().getPlugin().getLogger().warning("[packetevents] Your server software is preventing us from checking the server version. We will assume the server version is " + fallbackVersion.name() + "...");
+            PacketEvents.get().getPlugin().getLogger().warning("[packetevents] Your server software is preventing us from checking the server version. This is what we found: " + Bukkit.getBukkitVersion() + ". We will assume the server version is " + fallbackVersion.name() + "...");
             return fallbackVersion;
         }
         return ERROR;
@@ -176,7 +176,6 @@ public enum ServerVersion {
                 return false;
             }
             if (version == this) return true;
-            if (version == target) return false;
         }
 
         return false;
