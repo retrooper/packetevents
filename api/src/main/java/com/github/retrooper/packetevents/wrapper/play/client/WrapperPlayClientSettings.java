@@ -35,6 +35,7 @@ public class WrapperPlayClientSettings extends PacketWrapper<WrapperPlayClientSe
     private byte visibleSkinSectionMask;
     private Hand hand;
     private boolean disableTextFiltering;
+    private boolean allowServerListings;
 
     //Not accessible, only for 1.7
     private byte ignoredDifficulty;
@@ -79,7 +80,7 @@ public class WrapperPlayClientSettings extends PacketWrapper<WrapperPlayClientSe
 
     public WrapperPlayClientSettings(String locale, int viewDistance, ChatVisibility visibility,
                                      boolean chatColors, byte visibleSkinSectionMask, Hand hand,
-                                     boolean disableTextFiltering) {
+                                     boolean disableTextFiltering, boolean allowServerListings) {
         super(PacketType.Play.Client.CLIENT_SETTINGS);
         this.locale = locale;
         this.viewDistance = viewDistance;
@@ -88,6 +89,7 @@ public class WrapperPlayClientSettings extends PacketWrapper<WrapperPlayClientSe
         this.visibleSkinSectionMask = visibleSkinSectionMask;
         this.hand = hand;
         this.disableTextFiltering = disableTextFiltering;
+        this.allowServerListings = allowServerListings;
     }
 
     @Override
@@ -123,6 +125,13 @@ public class WrapperPlayClientSettings extends PacketWrapper<WrapperPlayClientSe
         }
         else {
             disableTextFiltering = true;
+        }
+
+        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_18)) {
+            allowServerListings = readBoolean();
+        }
+        else {
+            allowServerListings = true;
         }
     }
 
@@ -165,6 +174,10 @@ public class WrapperPlayClientSettings extends PacketWrapper<WrapperPlayClientSe
 
         if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_17)) {
             writeBoolean(disableTextFiltering);
+        }
+
+        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_18)) {
+            writeBoolean(allowServerListings);
         }
     }
 
@@ -243,5 +256,13 @@ public class WrapperPlayClientSettings extends PacketWrapper<WrapperPlayClientSe
 
     public void setTextFilteringDisabled(boolean disableTextFiltering) {
         this.disableTextFiltering = disableTextFiltering;
+    }
+
+    public boolean isServerListingAllowed() {
+        return allowServerListings;
+    }
+
+    public void setServerListingAllowed(boolean allowServerListings) {
+        this.allowServerListings = allowServerListings;
     }
 }
