@@ -116,7 +116,7 @@ public class WrappedPacketInSettings extends WrappedPacket {
     }
 
     //Added in 1.18
-    public boolean isListingAllowed() {
+    public boolean isServerListingsAllowed() {
         if (v_1_18) {
             return readBoolean(2);
         }
@@ -124,7 +124,7 @@ public class WrappedPacketInSettings extends WrappedPacket {
     }
 
     //Added in 1.18
-    public void setListingAllowed(boolean allowed) {
+    public void setServerListingsAllowed(boolean allowed) {
         if (v_1_18) {
             writeBoolean(2, allowed);
         }
