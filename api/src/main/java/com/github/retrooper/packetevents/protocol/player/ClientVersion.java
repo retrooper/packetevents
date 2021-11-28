@@ -102,7 +102,7 @@ public enum ClientVersion {
 
     UNKNOWN(-1);
 
-    public static final ClientVersion[] REVERSED_VALUES;
+    private static final ClientVersion[] REVERSED_VALUES;
 
     static {
         REVERSED_VALUES = values();
@@ -126,6 +126,10 @@ public enum ClientVersion {
 
     ClientVersion(int protocolVersion) {
         this.protocolVersion = (short) protocolVersion;
+    }
+
+    public static ClientVersion[] reversedValues() {
+        return REVERSED_VALUES;
     }
 
     /**

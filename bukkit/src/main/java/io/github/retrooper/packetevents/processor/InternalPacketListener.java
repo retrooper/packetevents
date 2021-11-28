@@ -28,9 +28,12 @@ import com.github.retrooper.packetevents.protocol.chat.Color;
 import com.github.retrooper.packetevents.protocol.chat.component.BaseComponent;
 import com.github.retrooper.packetevents.protocol.chat.component.HoverEvent;
 import com.github.retrooper.packetevents.protocol.chat.component.TextComponent;
+import com.github.retrooper.packetevents.protocol.entity.EntityType;
+import com.github.retrooper.packetevents.protocol.entity.EntityTypes;
 import com.github.retrooper.packetevents.protocol.inventory.ItemStack;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.protocol.player.ClientVersion;
+import com.github.retrooper.packetevents.util.Vector3d;
 import com.github.retrooper.packetevents.wrapper.handshaking.client.WrapperHandshakingClientHandshake;
 import com.github.retrooper.packetevents.wrapper.login.client.WrapperLoginClientLoginStart;
 import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientInteractEntity;
@@ -39,6 +42,7 @@ import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientTa
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerChatMessage;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerPluginMessage;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerSetSlot;
+import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerSpawnLivingEntity;
 import org.bukkit.entity.Player;
 
 import java.util.ArrayList;
@@ -64,7 +68,7 @@ public class InternalPacketListener implements PacketListener {
             String jsonMessage = ComponentSerializer.buildJSONString(components);
             System.out.println("JSON Message: " + jsonMessage);*/
         } else if (event.getPacketType() == PacketType.Play.Server.SPAWN_LIVING_ENTITY) {
-            /*WrapperPlayServerSpawnLivingEntity spawnLivingEntity = new WrapperPlayServerSpawnLivingEntity(event);
+            WrapperPlayServerSpawnLivingEntity spawnLivingEntity = new WrapperPlayServerSpawnLivingEntity(event);
             int entityID = spawnLivingEntity.getEntityId();
             EntityType entityType = spawnLivingEntity.getEntityType();
             if (entityType.equals(EntityTypes.PLAYER)) {
@@ -73,7 +77,7 @@ public class InternalPacketListener implements PacketListener {
             }
             Vector3d position = spawnLivingEntity.getPosition();
             System.out.println("Spawned entity with ID " + entityID + " of type " + entityType.getIdentifier().getKey() + "=" + entityType.getId() + " at position " + position);
-            event.setLastUsedWrapper(null);*/
+            event.setLastUsedWrapper(null);
         } else if (event.getPacketType() == PacketType.Play.Server.SET_SLOT) {
             WrapperPlayServerSetSlot setSlot = new WrapperPlayServerSetSlot(event);
             int slot = setSlot.getSlot();

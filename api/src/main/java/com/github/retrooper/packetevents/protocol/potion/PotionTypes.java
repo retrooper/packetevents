@@ -30,10 +30,6 @@ public class PotionTypes {
     private static final Map<Integer, PotionType> POTION_TYPE_ID_MAP = new HashMap<>();
     private static JsonObject POTION_TYPES_JSON;
 
-    public static void replaceJSONObject(JsonObject jsonObject) {
-        POTION_TYPES_JSON = jsonObject;
-    }
-
     public static PotionType define(String key) {
         if (POTION_TYPES_JSON == null) {
             POTION_TYPES_JSON = MappingHelper.getJSONObject("modernpotiontypes");

@@ -21,7 +21,6 @@ package com.github.retrooper.packetevents.protocol.inventory;
 import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.protocol.chat.component.ComponentSerializer;
-import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 import com.github.retrooper.packetevents.protocol.resources.ResourceLocation;
 import com.github.retrooper.packetevents.util.MappingHelper;
 import com.google.gson.JsonObject;
@@ -38,15 +37,10 @@ public class ItemTypes {
     private static final Map<Integer, ItemType> ITEM_TYPE_ID_MAP = new HashMap<>();
     private static JsonObject MODERN_ITEM_TYPES_JSON = null;
     private static JsonObject LEGACY_ITEM_TYPES_JSON = null;
-    private static JsonObject PRE_FLATTENING_ITEM_TYPES_JSON = null;
 
     private enum ItemAttribute {
         //TODO Add more
         MUSIC_DISC, EDIBLE;
-    }
-
-    public static void replaceJsonObject(JsonObject jsonObject) {
-        MODERN_ITEM_TYPES_JSON = jsonObject;
     }
 
     public static ItemType define(int maxAmount, String key) {
@@ -103,6 +97,18 @@ public class ItemTypes {
         return type;
     }
 
+    //TODO Look into transforming id from older versions to newer ones, now we only go down
+    public static int transformItemTypeId(int id, int currentProtocolVersion, int targetProtocolVersion) {
+        if (LEGACY_ITEM_TYPES_JSON == null) {
+            LEGACY_ITEM_TYPES_JSON = MappingHelper.getJSONObject("legacyitemtypes");
+        }
+        if (currentProtocolVersion == targetProtocolVersion) {
+            return id;
+        }
+        return MappingHelper.transformID(LEGACY_ITEM_TYPES_JSON, id, targetProtocolVersion);
+    }
+
+
     @Nullable
     public static ItemType getByKey(String key) {
         return ITEM_TYPE_MAP.get(key);
@@ -111,43 +117,6 @@ public class ItemTypes {
     @Nullable
     public static ItemType getById(int id) {
         return ITEM_TYPE_ID_MAP.get(id);
-    }
-
-    @Nullable
-    public static ItemType getById(int id, int currentProtocolVersion, int targetProtocolVersion) {
-        int targetID = transformItemTypeId(id, currentProtocolVersion, targetProtocolVersion);
-        return getById(targetID);
-    }
-
-    //TODO Look into transforming id from older versions to newer ones, now we only go down
-    private static int transformItemTypeId(int id, int latestProtocolVersion, int targetProtocolVersion) {
-        if (LEGACY_ITEM_TYPES_JSON == null) {
-            LEGACY_ITEM_TYPES_JSON = MappingHelper.getJSONObject("legacyitemtypes");
-        }
-        if (latestProtocolVersion == targetProtocolVersion) {
-            return id;
-        }
-        //Current protocol version must always be the latest server version
-        for (ClientVersion cv : ClientVersion.REVERSED_VALUES) {
-            if (!cv.name().startsWith("V_")) {
-                continue;
-            }
-            String jsonName = cv.name().substring(2);
-            if (LEGACY_ITEM_TYPES_JSON.has(jsonName)) {
-                JsonObject mappings = LEGACY_ITEM_TYPES_JSON.getAsJsonObject(jsonName);
-                String idStr = Integer.toString(id);
-                if (mappings.has(idStr)) {
-                    id = mappings.get(idStr).getAsInt();
-                } else {
-                    continue;
-                }
-            }
-
-            if (cv.getProtocolVersion() == targetProtocolVersion) {
-                return id;
-            }
-        }
-        return id;
     }
 
     private static String paste(String content) throws IOException {

@@ -18,6 +18,8 @@
 
 package com.github.retrooper.packetevents.protocol.entity;
 
+import com.github.retrooper.packetevents.PacketEvents;
+import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.protocol.resources.ResourceLocation;
 import com.github.retrooper.packetevents.util.MappingHelper;
 import com.google.gson.JsonObject;
@@ -28,17 +30,18 @@ import java.util.Map;
 public class EntityTypes {
     private static final Map<String, EntityType> ENTITY_TYPE_MAP = new HashMap<>();
     private static final Map<Integer, EntityType> ENTITY_TYPE_ID_MAP = new HashMap<>();
-    private static JsonObject ENTITY_TYPES_JSON;
-
-    public static void replaceJSONObject(JsonObject jsonObject) {
-        ENTITY_TYPES_JSON = jsonObject;
-    }
+    private static JsonObject MODERN_ENTITY_TYPES_JSON;
+    private static JsonObject LEGACY_ENTITY_TYPES_JSON;
 
     public static EntityType define(String key) {
-        if (ENTITY_TYPES_JSON == null) {
-            ENTITY_TYPES_JSON = MappingHelper.getJSONObject("modernentitytypes");
+        if (MODERN_ENTITY_TYPES_JSON == null) {
+            MODERN_ENTITY_TYPES_JSON = MappingHelper.getJSONObject("modernentitytypes");
         }
-        int id = ENTITY_TYPES_JSON.get(key).getAsInt();
+        int modernID = MODERN_ENTITY_TYPES_JSON.get(key).getAsInt();
+        int latestProtocolVersion = ServerVersion.getLatest().getProtocolVersion();
+        int serverProtocolVersion = PacketEvents.getAPI().getServerManager().getVersion().getProtocolVersion();
+
+        int transformedID = transformEntityTypeId(modernID, latestProtocolVersion, serverProtocolVersion);
         ResourceLocation identifier = ResourceLocation.minecraft(key);
         EntityType entityType = new EntityType() {
             @Override
@@ -48,7 +51,7 @@ public class EntityTypes {
 
             @Override
             public int getId() {
-                return id;
+                return transformedID;
             }
 
             @Override
@@ -63,6 +66,14 @@ public class EntityTypes {
         ENTITY_TYPE_MAP.put(entityType.getIdentifier().getKey(), entityType);
         ENTITY_TYPE_ID_MAP.put(entityType.getId(), entityType);
         return entityType;
+    }
+
+    public static int transformEntityTypeId(int id, int currentProtocolVersion, int targetProtocolVersion) {
+        if (currentProtocolVersion == targetProtocolVersion) {
+            return id;
+        }
+        //TODO Hard coded conversions
+        return MappingHelper.transformID(LEGACY_ENTITY_TYPES_JSON, id, targetProtocolVersion);
     }
 
     public static EntityType getByKey(String key) {

@@ -21,6 +21,7 @@ package com.github.retrooper.packetevents.util;
 import com.github.retrooper.packetevents.protocol.chat.component.ComponentSerializer;
 import com.github.retrooper.packetevents.protocol.entity.EntityTypes;
 import com.github.retrooper.packetevents.protocol.inventory.ItemTypes;
+import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 import com.github.retrooper.packetevents.protocol.potion.PotionTypes;
 import com.google.gson.JsonObject;
 
@@ -34,6 +35,29 @@ import java.util.Map;
 
 public class MappingHelper {
     public static final Map<String, JsonObject> MAPPING_JSON_OBJECTS = new HashMap<>();
+
+    public static int transformID(JsonObject mappingsJsonObject, int id, int targetProtocolVersion) {
+        for (ClientVersion version : ClientVersion.reversedValues()) {
+            if (!version.name().startsWith("V_")) {
+                continue;
+            }
+            String jsonName = version.name().substring(2);
+            if (mappingsJsonObject.has(jsonName)) {
+                JsonObject jsonObject = mappingsJsonObject.getAsJsonObject(jsonName);
+                String inputIDStr = String.valueOf(id);
+                if (jsonObject.has(inputIDStr)) {
+                    id = jsonObject.get(inputIDStr).getAsInt();
+                }
+                else {
+                    continue;
+                }
+            }
+            if (version.getProtocolVersion() <= targetProtocolVersion) {
+                return id;
+            }
+        }
+        return id;
+    }
 
     public static JsonObject getJSONObject(String id) {
         JsonObject result = MAPPING_JSON_OBJECTS.get(id);
@@ -61,13 +85,11 @@ public class MappingHelper {
         return ComponentSerializer.GSON.fromJson(sb.toString(), JsonObject.class);
     }
 
-    //TODO Load all mappings, although it isn't mandatory for now
+    //TODO (Re)Load all mappings, although it isn't mandatory for now
     public static void loadMappings() {
         MAPPING_JSON_OBJECTS.put("modernitemtypes", searchJSONObject("modernitemtypes"));
-        ItemTypes.replaceJsonObject(MappingHelper.getJSONObject("modernitemtypes"));
+        MAPPING_JSON_OBJECTS.put("legacyitemtypes", searchJSONObject("legacyitemtypes"));
         MAPPING_JSON_OBJECTS.put("modernentitytypes", searchJSONObject("modernentitytypes"));
-        EntityTypes.replaceJSONObject(MappingHelper.getJSONObject("modernentitytypes"));
         MAPPING_JSON_OBJECTS.put("modernpotiontypes", searchJSONObject("modernpotiontypes"));
-        PotionTypes.replaceJSONObject(MappingHelper.getJSONObject("modernpotiontypes"));
     }
 }
