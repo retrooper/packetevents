@@ -45,8 +45,8 @@ import java.util.function.Function;
 
 public class PacketWrapper<T extends PacketWrapper> {
     public final ByteBufAbstract buffer;
-    protected final ClientVersion clientVersion;
-    protected final ServerVersion serverVersion;
+    protected ClientVersion clientVersion;
+    protected ServerVersion serverVersion;
     private final int packetID;
     private boolean hasPreparedForSending;
 
@@ -134,8 +134,16 @@ public class PacketWrapper<T extends PacketWrapper> {
         return clientVersion;
     }
 
+    public void setClientVersion(ClientVersion clientVersion) {
+        this.clientVersion = clientVersion;
+    }
+
     public ServerVersion getServerVersion() {
         return serverVersion;
+    }
+
+    public void setServerVersion(ServerVersion serverVersion) {
+        this.serverVersion = serverVersion;
     }
 
     public ByteBufAbstract getBuffer() {
