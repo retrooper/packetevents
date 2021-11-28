@@ -105,8 +105,8 @@ public enum ClientVersion {
 
     UNKNOWN(-1);
 
-    private static final short LOWEST_SUPPORTED_PROTOCOL_VERSION = (short) (LOWER_THAN_SUPPORTED_VERSIONS.protocolVersion + 1);
-    private static final short HIGHEST_SUPPORTED_PROTOCOL_VERSION = (short) (HIGHER_THAN_SUPPORTED_VERSIONS.protocolVersion - 1);
+    private static final int LOWEST_SUPPORTED_PROTOCOL_VERSION = LOWER_THAN_SUPPORTED_VERSIONS.protocolVersion + 1;
+    private static final int HIGHEST_SUPPORTED_PROTOCOL_VERSION = HIGHER_THAN_SUPPORTED_VERSIONS.protocolVersion - 1;
 
     private static final Map<Short, ClientVersion> CLIENT_VERSION_CACHE = new IdentityHashMap<>();
     private static final int[] CLIENT_VERSIONS = new int[]{5, 47, 107, 108, 109, 110, 210, 315, 316, 335, 338,
