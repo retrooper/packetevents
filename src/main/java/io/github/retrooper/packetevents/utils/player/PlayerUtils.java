@@ -151,7 +151,8 @@ public final class PlayerUtils {
             return ClientVersion.UNKNOWN;
         }
         ClientVersion version = clientVersionsMap.get(player.getAddress());
-        if (version == null) {
+        // If a player's version didn't resolve, we should try and resolve it again
+        if (version == null || !version.isResolved()) {
             //Prioritize asking ViaVersion and ProtocolSupport as they modify the protocol version in the packet we access it from.
             if (VersionLookupUtils.isDependencyAvailable()) {
                 try {

@@ -161,12 +161,7 @@ public class Vector3i {
      */
     @Override
     public Vector3i clone() {
-        try {
-            super.clone();
-        } catch (CloneNotSupportedException e) {
-            e.printStackTrace();
-        }
-        return null;
+        return new Vector3i(getX(), getY(), getZ());
     }
 
     @Override

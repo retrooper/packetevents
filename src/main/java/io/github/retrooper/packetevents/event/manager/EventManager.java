@@ -157,6 +157,30 @@ public interface EventManager {
     }
 
     /**
+     * Unregister a PacketListenerAbstract listener.
+     *
+     * @param listener {@link PacketListenerAbstract}
+     * @return Same event manager instance.
+     */
+    default EventManager unregisterListener(PacketListenerAbstract listener) {
+        if (listener != null) {
+            PEEventManager.EVENT_MANAGER_MODERN.unregisterListener(listener);
+        }
+        return this;
+    }
+
+    /**
+     * Unregister multiple PacketListenerAbstract listeners.
+     *
+     * @param listeners {@link PacketListenerAbstract}
+     * @return Same event manager instance.
+     */
+    default EventManager unregisterListeners(PacketListenerAbstract... listeners) {
+        PEEventManager.EVENT_MANAGER_MODERN.unregisterListeners(listeners);
+        return this;
+    }
+
+    /**
      * Unregister all registered event listeners.
      * All the deprecated and the dynamic listeners will be unregistered.
      *

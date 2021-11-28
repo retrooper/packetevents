@@ -89,7 +89,7 @@ public enum ServerVersion {
      * If PacketEvents has already attempted resolving, return the cached version.
      * If PacketEvents hasn't already attempted resolving, it will resolve it, cache it and return the version.
      *
-     * @return Server Version. (possibly cached)
+     * @return Server Version. (always cached)
      */
     public static ServerVersion getVersion() {
         if (cachedVersion == null) {

@@ -45,10 +45,6 @@ class EventManagerModern {
      * @see EventManagerLegacy#callEvent(PacketEvent, byte)
      */
     public void callEvent(final PacketEvent event) {
-        boolean cancel = false;
-        if (event instanceof CancellableEvent) {
-            cancel = ((CancellableEvent) event).isCancelled();
-        }
         byte highestReachedPriority = (byte) (PacketListenerPriority.LOWEST.getId() - 1);
         for (byte priority = PacketListenerPriority.LOWEST.getId(); priority <= PacketListenerPriority.MONITOR.getId(); priority++) {
             HashSet<PacketListenerAbstract> listeners = listenersMap.get(priority);
@@ -63,16 +59,9 @@ class EventManagerModern {
                     //TODO Remove, because its redundant. We are only keeping it for compatibility with the legacy event manager.
                     if (event instanceof CancellableEvent) {
                         if (priority > highestReachedPriority) {
-                            CancellableEvent ce = (CancellableEvent) event;
-                            cancel = ce.isCancelled();
                             highestReachedPriority = priority;
                         }
                     }
-                }
-                //TODO Remove. This is also redundant. The listeners are always called in order, the event is always being modified by each listener. The last listener therefore has the last decision on the cancellation.
-                if (event instanceof CancellableEvent) {
-                    CancellableEvent ce = (CancellableEvent) event;
-                    ce.setCancelled(cancel);
                 }
             }
         }
@@ -102,6 +91,30 @@ class EventManagerModern {
     public synchronized void registerListeners(PacketListenerAbstract... listeners) {
         for (PacketListenerAbstract listener : listeners) {
             registerListener(listener);
+        }
+    }
+
+    /**
+     * Unregister the dynamic packet event listener.
+     *
+     * @param listener {@link PacketListenerAbstract}
+     */
+    public synchronized void unregisterListener(final PacketListenerAbstract listener) {
+        byte priority = listener.getPriority().getId();
+        HashSet<PacketListenerAbstract> listenerSet = listenersMap.get(priority);
+        if (listenerSet != null) {
+            listenerSet.remove(listener);
+        }
+    }
+
+    /**
+     * Unregister multiple dynamic packet event listeners with one method.
+     *
+     * @param listeners {@link PacketListenerAbstract}
+     */
+    public synchronized void unregisterListeners(PacketListenerAbstract... listeners) {
+        for (PacketListenerAbstract listener : listeners) {
+            unregisterListener(listener);
         }
     }
 
