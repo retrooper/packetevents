@@ -66,7 +66,6 @@ public class PacketDecoderLegacy extends ByteToMessageDecoder {
 
     @Override
     public void channelInactive(ChannelHandlerContext ctx) throws Exception {
-        System.out.println("Destroying channel...");
         ServerConnectionInitializerLegacy.postDestroyChannel(ctx.channel());
         super.channelInactive(ctx);
     }

@@ -234,9 +234,6 @@ public class PacketWrapper<T extends PacketWrapper> {
             return ItemStack.NULL;
         }
         ItemType type = ItemTypes.getById(typeID);
-        if (type == null) {
-            System.out.println("Why is type not detected, type id: " + typeID);
-        }
         int amount = readByte();
         int legacyData = v1_13_2 ? -1 : readShort();
         NBTCompound nbt = readNBT();

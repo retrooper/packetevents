@@ -21,7 +21,7 @@ package com.github.retrooper.packetevents.protocol.inventory;
 import com.github.retrooper.packetevents.protocol.nbt.NBTCompound;
 
 public class ItemStack {
-    //TODO Rethink making NULL AIR
+    //TODO Rethink my decision of making NULL = AIR
     public static final ItemStack NULL = new ItemStack(ItemTypes.AIR, -1, new NBTCompound(), -1);
     private ItemType type;
     private int amount;

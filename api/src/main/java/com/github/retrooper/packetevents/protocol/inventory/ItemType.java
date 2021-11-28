@@ -24,6 +24,4 @@ public interface ItemType extends MappedEntity {
     int getMaxAmount();
 
     boolean isMusicDisc();
-
-    int getLegacyData();
 }

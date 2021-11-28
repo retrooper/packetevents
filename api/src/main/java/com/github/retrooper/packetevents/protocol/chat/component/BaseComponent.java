@@ -158,8 +158,6 @@ public class BaseComponent {
             this.obfuscated = false;
         }
 
-        System.out.println("color: " + color.name());
-
         //Read click events if it has been specified
         JsonElement clickEventElement = jsonObject.get("clickEvent");
         if (clickEventElement != null) {
@@ -183,7 +181,6 @@ public class BaseComponent {
 
         JsonElement hoverEventElement = jsonObject.get("hoverEvent");
         if (hoverEventElement != null) {
-            System.out.println("we have hover event!");
             JsonObject hoverEventObject = hoverEventElement.getAsJsonObject();
             String action;
             if (hoverEventObject.has("action")) {
@@ -210,7 +207,6 @@ public class BaseComponent {
                         }
                         baseComponent.parseJSON(jsonElement.getAsJsonObject());
                         values.add(baseComponent);
-                        System.out.println("cope3");
                     }
                 }
                 else if (jsonHoverEventValueElement.isJsonObject()) {
@@ -224,10 +220,8 @@ public class BaseComponent {
                     }
                     baseComponent.parseJSON(jsonHoverEventValueElement.getAsJsonObject());
                     values.add(baseComponent);
-                    System.out.println("cope2");
                 }
                 else {
-                    System.out.println("cope1: " + hoverEventElement.getClass().getSimpleName());
                 }
             }
             this.hoverEvent = new HoverEvent(values.isEmpty() ? HoverType.EMPTY : HoverType.getByName(action), values);

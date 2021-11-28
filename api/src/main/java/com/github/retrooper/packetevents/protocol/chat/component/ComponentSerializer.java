@@ -43,7 +43,6 @@ public class ComponentSerializer {
                         JsonObject wrapperObject = new JsonObject();
                         wrapperObject.addProperty("text", jsonElement.getAsString());
                         jsonObjects.add(wrapperObject);
-                        System.out.println("Test: " + wrapperObject.toString());
                     }
                     else {
                         jsonObjects.add(jsonElement.getAsJsonObject());

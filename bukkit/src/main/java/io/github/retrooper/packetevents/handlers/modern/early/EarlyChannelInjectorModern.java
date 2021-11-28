@@ -267,11 +267,9 @@ public class EarlyChannelInjectorModern implements EarlyInjector {
         Channel channel = (Channel) ch.rawChannel();
         PacketDecoderModern decoder = getDecoder(ch);
         if (decoder != null) {
-            System.out.println("injing");
             decoder.player = (Player) player;
             if (newConnectionState == ConnectionState.PLAY) {
                 decoder.handledCompression = true;
-                System.out.println("decoder handled compr to true");
                 if (ViaVersionUtil.isAvailable()) {
                     channel.pipeline().remove(PacketEvents.DECODER_NAME);
                     addCustomViaDecoder(channel, new PacketDecoderModern(decoder));
@@ -284,21 +282,17 @@ public class EarlyChannelInjectorModern implements EarlyInjector {
             if (newConnectionState != null) {
                 decoder.connectionState = newConnectionState;
             }
-            System.out.println("done pt 1?");
         }
         PacketEncoderModern encoder = getEncoder(ch);
         if (encoder != null) {
             encoder.player = (Player) player;
             if (newConnectionState == ConnectionState.PLAY) {
                 encoder.handledCompression = true;
-                System.out.println("encoder handled compr to true");
                 if (ViaVersionUtil.isAvailable()) {
                     channel.pipeline().remove(PacketEvents.ENCODER_NAME);
                     addCustomViaEncoder(channel, encoder);
-                    System.out.println("via moment fixed");
                 }
             }
-            System.out.println("done pt 2?");
         }
     }
 
