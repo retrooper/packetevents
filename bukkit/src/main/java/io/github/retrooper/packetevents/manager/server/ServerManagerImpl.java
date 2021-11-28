@@ -26,6 +26,7 @@ import com.github.retrooper.packetevents.netty.channel.ChannelAbstract;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 import io.github.retrooper.packetevents.utils.MinecraftReflectionUtil;
 import org.bukkit.Bukkit;
+import org.bukkit.plugin.Plugin;
 
 public class ServerManagerImpl implements ServerManager {
     private ServerVersion serverVersion;
@@ -53,8 +54,8 @@ public class ServerManagerImpl implements ServerManager {
                     fallbackVersion = ServerVersion.V_1_8_8;
                 }
             }
-            Bukkit.getLogger().warning("[packetevents] Your server software is preventing us from checking the server version. We will assume the server version is " + fallbackVersion.name() + "...");
-            return fallbackVersion;
+            Plugin plugin = (Plugin) PacketEvents.getAPI().getPlugin();
+            plugin.getLogger().warning("[packetevents] Your server software is preventing us from checking the server version. This is what we found: " + Bukkit.getBukkitVersion() + ". We will assume the server version is " + fallbackVersion.name() + "...");            return fallbackVersion;
         }
         return ServerVersion.ERROR;
     }

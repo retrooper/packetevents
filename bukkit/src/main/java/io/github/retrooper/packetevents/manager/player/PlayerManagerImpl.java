@@ -130,10 +130,10 @@ public class PlayerManagerImpl implements PlayerManager {
                     return ClientVersion.TEMP_UNRESOLVED;
                 }
             } else {
-                short protocolVersion;
+                int protocolVersion;
                 //Luckily 1.7.10 provides a method for us to access a player's protocol version(because 1.7.10 servers support 1.8 clients too)
                 if (PacketEvents.getAPI().getServerManager().getVersion() == ServerVersion.V_1_7_10) {
-                    protocolVersion = (short) SpigotVersionLookup_1_7.getProtocolVersion(p);
+                    protocolVersion = SpigotVersionLookup_1_7.getProtocolVersion(p);
                 } else {
                     //No dependency available, couldn't snatch the version from the packet AND server version is not 1.7.10
                     //We are pretty safe to assume the version is the same as the server, as ViaVersion AND ProtocolSupport could not be found.

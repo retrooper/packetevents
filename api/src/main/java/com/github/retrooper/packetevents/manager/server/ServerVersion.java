@@ -30,26 +30,28 @@ import com.github.retrooper.packetevents.PacketEvents;
  * @since 1.6.9
  */
 public enum ServerVersion {
-    V_1_7_10((short) 5),
-    V_1_8((short) 47), V_1_8_3((short) 47), V_1_8_8((short) 47),
-    V_1_9((short) 107), V_1_9_2((short) 109), V_1_9_4((short) 110),
+    V_1_7_10(5),
+    V_1_8(47), V_1_8_3(47), V_1_8_8(47),
+    V_1_9(107), V_1_9_2(109), V_1_9_4(110),
     //1.10 and 1.10.1 are redundant
-    V_1_10((short) 210), V_1_10_1((short) 210), V_1_10_2((short) 210),
-    V_1_11((short) 315), V_1_11_2((short) 316),
-    V_1_12((short) 335), V_1_12_1((short) 338), V_1_12_2((short) 340),
-    V_1_13((short) 393), V_1_13_1((short) 401), V_1_13_2((short) 404),
-    V_1_14((short) 477), V_1_14_1((short) 480), V_1_14_2((short) 485), V_1_14_3((short) 490), V_1_14_4((short) 498),
-    V_1_15((short) 573), V_1_15_1((short) 575), V_1_15_2((short) 578),
-    V_1_16((short) 735), V_1_16_1((short) 736), V_1_16_2((short) 751), V_1_16_3((short) 753), V_1_16_4((short) 754), V_1_16_5((short) 754),
-    V_1_17((short) 755), V_1_17_1((short) 756),
-    ERROR((short) -1);
+    V_1_10(210), V_1_10_1(210), V_1_10_2(210),
+    V_1_11(315), V_1_11_2(316),
+    V_1_12(335), V_1_12_1(338), V_1_12_2(340),
+    V_1_13(393), V_1_13_1(401), V_1_13_2(404),
+    V_1_14(477), V_1_14_1(480), V_1_14_2(485), V_1_14_3(490), V_1_14_4(498),
+    V_1_15(573), V_1_15_1(575), V_1_15_2(578),
+    V_1_16(735), V_1_16_1(736), V_1_16_2(751), V_1_16_3(753), V_1_16_4(754), V_1_16_5(754),
+    V_1_17(755), V_1_17_1(756),
+    //TODO 1.18 SUPPORT, UPDATE THIS PV, THIS IS PROTOCOL VERSION OF release candidate 3
+    V_1_18(1073741883),
+    ERROR(-1);
 
     private static final ServerVersion[] VALUES = values();
     public static ServerVersion[] reversedValues = new ServerVersion[VALUES.length];
-    private final short protocolVersion;
+    private final int protocolVersion;
 
-    ServerVersion(short protocolId) {
-        this.protocolVersion = protocolId;
+    ServerVersion(int protocolVersion) {
+        this.protocolVersion = protocolVersion;
     }
 
     /**
@@ -89,7 +91,7 @@ public enum ServerVersion {
      *
      * @return Protocol version.
      */
-    public short getProtocolVersion() {
+    public int getProtocolVersion() {
         return protocolVersion;
     }
 
