@@ -167,7 +167,7 @@ public final class PlayerUtils {
                 version = tempClientVersionMap.get(player.getAddress());
                 if (version == null) {
                     //We couldn't snatch that version from the packet.
-                    short protocolVersion;
+                    int protocolVersion;
                     //Handle 1.7.10, luckily 1.7.10 provides a method for us to access a player's protocol version(because 1.7.10 servers support 1.8 clients too)
                     if (PacketEvents.get().getServerUtils().getVersion().isOlderThan(ServerVersion.v_1_8)) {
                         protocolVersion = (short) SpigotVersionLookup_1_7.getProtocolVersion(player);

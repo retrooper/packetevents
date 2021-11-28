@@ -31,37 +31,36 @@ import org.bukkit.Bukkit;
  * @since 1.6.9
  */
 public enum ServerVersion {
-    v_1_7_10((short) 5),
-    v_1_8((short) 47), v_1_8_3((short) 47), v_1_8_8((short) 47),
-    v_1_9((short) 107), v_1_9_2((short) 109), v_1_9_4((short) 110),
+    v_1_7_10(5),
+    v_1_8(47), v_1_8_3(47), v_1_8_8(47),
+    v_1_9(107), v_1_9_2(109), v_1_9_4(110),
     //1.10 and 1.10.1 are redundant
-    v_1_10((short) 210), v_1_10_1((short) 210), v_1_10_2((short) 210),
-    v_1_11((short) 315), v_1_11_2((short) 316),
-    v_1_12((short) 335), v_1_12_1((short) 338), v_1_12_2((short) 340),
-    v_1_13((short) 393), v_1_13_1((short) 401), v_1_13_2((short) 404),
-    v_1_14((short) 477), v_1_14_1((short) 480), v_1_14_2((short) 485), v_1_14_3((short) 490), v_1_14_4((short) 498),
-    v_1_15((short) 573), v_1_15_1((short) 575), v_1_15_2((short) 578),
-    v_1_16((short) 735), v_1_16_1((short) 736), v_1_16_2((short) 751), v_1_16_3((short) 753), v_1_16_4((short) 754), v_1_16_5((short) 754),
-    v_1_17((short) 755), v_1_17_1((short) 756),
-    ERROR((short) -1);
+    v_1_10(210), v_1_10_1(210), v_1_10_2(210),
+    v_1_11(315), v_1_11_2(316),
+    v_1_12(335), v_1_12_1(338), v_1_12_2(340),
+    v_1_13(393), v_1_13_1(401), v_1_13_2(404),
+    v_1_14(477), v_1_14_1(480), v_1_14_2(485), v_1_14_3(490), v_1_14_4(498),
+    v_1_15(573), v_1_15_1(575), v_1_15_2(578),
+    v_1_16(735), v_1_16_1(736), v_1_16_2(751), v_1_16_3(753), v_1_16_4(754), v_1_16_5(754),
+    v_1_17(755), v_1_17_1(756),
+    //TODO 1.18 SUPPORT, UPDATE THIS PV, THIS IS PROTOCOL VERSION OF release candidate 3
+    v_1_18(1073741883),
+    ERROR(-1);
 
     private static final String NMS_VERSION_SUFFIX = Bukkit.getServer().getClass().getPackage().getName()
             .replace(".", ",").split(",")[3];
     private static final ServerVersion[] VALUES = values();
     public static ServerVersion[] reversedValues = new ServerVersion[VALUES.length];
     private static ServerVersion cachedVersion;
-    private final short protocolVersion;
+    private final int protocolVersion;
 
-    ServerVersion(short protocolId) {
+    ServerVersion(int protocolId) {
         this.protocolVersion = protocolId;
     }
 
     private static ServerVersion getVersionNoCache() {
         if (reversedValues[0] == null) {
             reversedValues = ServerVersion.reverse();
-        }
-        if (reversedValues == null) {
-            throw new IllegalStateException("Failed to reverse the ServerVersion enum constant values.");
         }
         for (final ServerVersion val : reversedValues) {
             String valName = val.name().substring(2).replace("_", ".");
@@ -74,8 +73,7 @@ public enum ServerVersion {
             if (fallbackVersion == ServerVersion.v_1_7_10) {
                 try {
                     Class.forName("net.minecraft.util.io.netty.buffer.ByteBuf");
-                }
-                catch (Exception ex) {
+                } catch (Exception ex) {
                     //We will assume its 1.8.8
                     fallbackVersion = ServerVersion.v_1_8_8;
                 }
@@ -143,7 +141,7 @@ public enum ServerVersion {
      *
      * @return Protocol version.
      */
-    public short getProtocolVersion() {
+    public int getProtocolVersion() {
         return protocolVersion;
     }
 
