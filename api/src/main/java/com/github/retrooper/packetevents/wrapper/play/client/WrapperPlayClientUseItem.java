@@ -58,7 +58,6 @@ public class WrapperPlayClientUseItem extends PacketWrapper<WrapperPlayClientUse
             cursorPosition = new Vector3f(readFloat(), readFloat(), readFloat());
             insideBlock = Optional.of(readBoolean());
         } else {
-            insideBlock = Optional.empty();
             blockPosition = readBlockPosition();
             face = BlockFace.getBlockFaceByValue(readVarInt());
             hand = Hand.getByLegacyId(readVarInt());
@@ -67,6 +66,7 @@ public class WrapperPlayClientUseItem extends PacketWrapper<WrapperPlayClientUse
             } else {
                 cursorPosition = new Vector3f(readUnsignedByte() / 16.0F, readUnsignedByte() / 16.0F, readUnsignedByte() / 16.0F);
             }
+            insideBlock = Optional.empty();
         }
     }
 
