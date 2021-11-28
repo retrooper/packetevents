@@ -32,7 +32,7 @@ import java.util.Set;
 public class WrappedPacketInSettings extends WrappedPacket {
     private static Class<? extends Enum<?>> chatVisibilityEnumClass;
 
-    private static boolean isLowerThan_v_1_8, v_1_17;
+    private static boolean isLowerThan_v_1_8, v_1_17, v_1_18;
 
     public WrappedPacketInSettings(final NMSPacket packet) {
         super(packet);
@@ -42,6 +42,7 @@ public class WrappedPacketInSettings extends WrappedPacket {
     protected void load() {
         isLowerThan_v_1_8 = version.isOlderThan(ServerVersion.v_1_8);
         v_1_17 = version.isNewerThanOrEquals(ServerVersion.v_1_17);
+        v_1_18 = version.isNewerThanOrEquals(ServerVersion.v_1_18);
         chatVisibilityEnumClass = NMSUtils.getNMSEnumClassWithoutException("EnumChatVisibility");
         if (chatVisibilityEnumClass == null) {
             //They are on 1.17+
@@ -62,11 +63,11 @@ public class WrappedPacketInSettings extends WrappedPacket {
     }
 
     public int getViewDistance() {
-        return readInt(v_1_17 ? 1 : 0);
+        return readInt((v_1_17 && !v_1_18) ? 1 : 0);
     }
 
     public void setViewDistance(int viewDistance) {
-        writeInt(v_1_17 ? 1 : 0, viewDistance);
+        writeInt((v_1_17 && !v_1_18) ? 1 : 0, viewDistance);
     }
 
     public ChatVisibility getChatVisibility() {
@@ -87,16 +88,60 @@ public class WrappedPacketInSettings extends WrappedPacket {
         writeBoolean(0, chatColors);
     }
 
+    @Deprecated
     public Optional<Boolean> isTextFilteringEnabled() {
-        if (!v_1_17) {
-            return Optional.empty();
+        if (v_1_17) {
+            return Optional.of(!isTextFilteringDisabled());
         }
-        return Optional.of(!readBoolean(1));
+        return Optional.empty();
     }
 
-    public void setTextFilteringEnabled(boolean textFilteringEnabled) {
+    @Deprecated
+    public void setTextFilteringEnabled(boolean enabled) {
         if (v_1_17) {
-            writeBoolean(1, !textFilteringEnabled);
+            setTextFilteringDisabled(!enabled);
+        }
+    }
+
+    //Added in 1.17
+    public boolean isTextFilteringDisabled() {
+        return v_1_17 && readBoolean(1);
+    }
+
+    //Added in 1.17
+    public void setTextFilteringDisabled(boolean textFilteringDisabled) {
+        if (v_1_17) {
+            writeBoolean(1, textFilteringDisabled);
+        }
+    }
+
+    //Added in 1.18
+    public boolean isListingAllowed() {
+        if (v_1_18) {
+            return readBoolean(2);
+        }
+        return true;
+    }
+
+    //Added in 1.18
+    public void setListingAllowed(boolean allowed) {
+        if (v_1_18) {
+            writeBoolean(2, allowed);
+        }
+    }
+
+    //Added in 1.18
+    public Optional<Integer> getModelCustomization() {
+        if (v_1_18) {
+            return Optional.of(readInt(1));
+        }
+        return Optional.empty();
+    }
+
+    //Added in 1.18
+    public void setModelCustomization(int customization) {
+        if (v_1_18) {
+            writeInt(1, customization);
         }
     }
 
