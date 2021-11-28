@@ -19,41 +19,10 @@
 package com.github.retrooper.packetevents.protocol.packettype;
 
 public interface PacketTypeCommon {
+
     default String getName() {
-        return ((Enum<?>) this).name();
+        return ((Enum<?>)this).name();
     }
 
-    default int getId() {
-        if (this instanceof PacketType.Handshaking.Client) {
-            PacketType.Handshaking.Client client = (PacketType.Handshaking.Client) this;
-            return client.getId();
-        }
-        else if (this instanceof PacketType.Status.Client) {
-            PacketType.Status.Client client = (PacketType.Status.Client) this;
-            return client.getId();
-        }
-        else if (this instanceof PacketType.Status.Server) {
-            PacketType.Status.Server server = (PacketType.Status.Server) this;
-            return server.getId();
-        }
-        else if (this instanceof PacketType.Login.Client) {
-            PacketType.Login.Client client = (PacketType.Login.Client) this;
-            return client.getId();
-        }
-        else if (this instanceof PacketType.Login.Server) {
-            PacketType.Login.Server server = (PacketType.Login.Server) this;
-            return server.getId();
-        }
-        else if (this instanceof PacketType.Play.Client) {
-            PacketType.Play.Client client = (PacketType.Play.Client) this;
-            return client.getId();
-        }
-        else if (this instanceof PacketType.Play.Server) {
-            PacketType.Play.Server server = (PacketType.Play.Server) this;
-            return server.getId();
-        }
-        else {
-            return -1;
-        }
-    }
+    int getId();
 }
