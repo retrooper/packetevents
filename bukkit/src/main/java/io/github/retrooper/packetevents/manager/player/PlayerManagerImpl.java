@@ -49,8 +49,7 @@ public class PlayerManagerImpl implements PlayerManager {
         Map<Class<? extends PlayerAttributeObject>, PlayerAttributeObject> attributes = PLAYER_ATTRIBUTES.get(uuid);
         if (attributes != null) {
             return (T) attributes.get(clazz);
-        }
-        else {
+        } else {
             attributes = new HashMap<>();
             attributes.put(defaultReturnValue.getClass(), defaultReturnValue);
             PLAYER_ATTRIBUTES.put(uuid, attributes);
@@ -63,8 +62,7 @@ public class PlayerManagerImpl implements PlayerManager {
         Map<Class<? extends PlayerAttributeObject>, PlayerAttributeObject> attributes = PLAYER_ATTRIBUTES.get(uuid);
         if (attributes != null) {
             return (T) attributes.get(clazz);
-        }
-        else {
+        } else {
             PLAYER_ATTRIBUTES.put(uuid, new HashMap<>());
             return null;
         }
@@ -105,7 +103,7 @@ public class PlayerManagerImpl implements PlayerManager {
         if (MinecraftReflectionUtil.V_1_17_OR_HIGHER) {
             return PlayerPingAccessorModern.getPing((Player) player);
         } else {
-            return MinecraftReflectionUtil.getPlayerPing((Player) player);
+            return MinecraftReflectionUtil.getPlayerPingLegacy((Player) player);
         }
     }
 
@@ -150,7 +148,19 @@ public class PlayerManagerImpl implements PlayerManager {
 
     @Override
     public ClientVersion getClientVersion(ChannelAbstract channel) {
-        return CLIENT_VERSIONS.get(channel);
+        ClientVersion version = CLIENT_VERSIONS.get(channel);
+        if (version == null || !version.isResolved()) {
+            if (!DependencyUtil.isProtocolTranslationDependencyAvailable()) {
+                if (PacketEvents.getAPI().getServerManager().getVersion() == ServerVersion.V_1_7_10) {
+                    return version;
+                } else {
+                    int protocolVersion = PacketEvents.getAPI().getServerManager().getVersion().getProtocolVersion();
+                    version = ClientVersion.getClientVersionByProtocolVersion(protocolVersion);
+                    CLIENT_VERSIONS.put(channel, version);
+                }
+            }
+        }
+        return version;
     }
 
     @Override
@@ -204,7 +214,7 @@ public class PlayerManagerImpl implements PlayerManager {
 
     @Override
     public boolean isGeyserPlayer(@NotNull Object player) {
-        return isGeyserPlayer(((Player)player).getUniqueId());
+        return isGeyserPlayer(((Player) player).getUniqueId());
     }
 
     @Override

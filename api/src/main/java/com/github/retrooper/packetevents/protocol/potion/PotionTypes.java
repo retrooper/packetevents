@@ -21,6 +21,7 @@ package com.github.retrooper.packetevents.protocol.potion;
 import com.github.retrooper.packetevents.protocol.resources.ResourceLocation;
 import com.github.retrooper.packetevents.util.MappingHelper;
 import com.google.gson.JsonObject;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -61,10 +62,12 @@ public class PotionTypes {
         return potionType;
     }
 
+    @Nullable
     public static PotionType getByKey(String key) {
         return POTION_TYPE_MAP.get(key);
     }
 
+    @Nullable
     public static PotionType getById(int id) {
         return POTION_TYPE_ID_MAP.get(id);
     }

@@ -31,7 +31,6 @@ public class EntityTypes {
     private static final Map<String, EntityType> ENTITY_TYPE_MAP = new HashMap<>();
     private static final Map<Integer, EntityType> ENTITY_TYPE_ID_MAP = new HashMap<>();
     private static JsonObject MODERN_ENTITY_TYPES_JSON;
-    private static JsonObject LEGACY_ENTITY_TYPES_JSON;
 
     public static EntityType define(String key) {
         if (MODERN_ENTITY_TYPES_JSON == null) {
@@ -57,7 +56,7 @@ public class EntityTypes {
             @Override
             public boolean equals(Object obj) {
                 if (obj instanceof EntityType) {
-                    return getId() == ((EntityType)obj).getId();
+                    return getId() == ((EntityType) obj).getId();
                 }
                 return false;
             }
@@ -73,7 +72,7 @@ public class EntityTypes {
             return id;
         }
         //TODO Hard coded conversions
-        return MappingHelper.transformID(LEGACY_ENTITY_TYPES_JSON, id, targetProtocolVersion);
+        return id;
     }
 
     public static EntityType getByKey(String key) {

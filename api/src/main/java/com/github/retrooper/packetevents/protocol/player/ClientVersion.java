@@ -168,6 +168,14 @@ public enum ClientVersion {
         }
     }
 
+    public static ClientVersion getLatest() {
+        return REVERSED_VALUES[6];
+    }
+
+    public static ClientVersion getOldest() {
+        return values()[0];
+    }
+
     /**
      * Protocol version of this client version.
      *

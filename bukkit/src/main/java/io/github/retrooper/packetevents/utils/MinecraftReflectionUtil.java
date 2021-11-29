@@ -330,7 +330,7 @@ public final class MinecraftReflectionUtil {
 
     //TODO Inspect again
     @Deprecated
-    public static int getPlayerPing(Player player) {
+    public static int getPlayerPingLegacy(Player player) {
         if (ENTITY_PLAYER_PING_FIELD != null) {
             Object entityPlayer = getEntityPlayer(player);
             try {
