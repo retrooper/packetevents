@@ -87,8 +87,7 @@ public enum ClientVersion {
 
     v_1_17_1(756),
 
-    //TODO 1.18 SUPPORT, UPDATE THIS PV, THIS IS PROTOCOL VERSION OF release candidate 3
-    v_1_18(1073741883),
+    v_1_18(757),
 
     LOWER_THAN_SUPPORTED_VERSIONS(v_1_7_10.protocolVersion - 1),
     HIGHER_THAN_SUPPORTED_VERSIONS(v_1_18.protocolVersion + 1),
