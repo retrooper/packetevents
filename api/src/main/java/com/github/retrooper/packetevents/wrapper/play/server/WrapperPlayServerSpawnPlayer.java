@@ -28,7 +28,7 @@ import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 import java.util.UUID;
 
 public class WrapperPlayServerSpawnPlayer extends PacketWrapper<WrapperPlayServerSpawnPlayer> {
-    private static float ROTATION_DIVISOR = 256.0F / 360.0F;
+    private static final float ROTATION_DIVISOR = 256.0F / 360.0F;
     private int entityID;
     private UUID uuid;
     private Vector3d position;

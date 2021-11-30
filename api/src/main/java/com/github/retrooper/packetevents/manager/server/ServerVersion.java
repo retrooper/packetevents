@@ -42,8 +42,7 @@ public enum ServerVersion {
     V_1_15(573), V_1_15_1(575), V_1_15_2(578),
     V_1_16(735), V_1_16_1(736), V_1_16_2(751), V_1_16_3(753), V_1_16_4(754), V_1_16_5(754),
     V_1_17(755), V_1_17_1(756),
-    //TODO 1.18 SUPPORT, UPDATE THIS PV, THIS IS PROTOCOL VERSION OF release candidate 3
-    V_1_18(1073741883),
+    V_1_18(757),
     ERROR(-1);
 
     private static final ServerVersion[] VALUES = values();
