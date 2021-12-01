@@ -95,6 +95,8 @@ dependencies {
 publishing {
     publications {
         maven(MavenPublication) {
+            groupId = 'com.github.retrooper.packetevents'
+            artifactId = 'bukkit'
             from(components.java)
         }
     }

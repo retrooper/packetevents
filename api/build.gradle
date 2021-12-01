@@ -18,6 +18,8 @@ dependencies {
 publishing {
     publications {
         maven(MavenPublication) {
+            groupId = 'com.github.retrooper.packetevents'
+            artifactId = 'api'
             from(components.java)
         }
     }
