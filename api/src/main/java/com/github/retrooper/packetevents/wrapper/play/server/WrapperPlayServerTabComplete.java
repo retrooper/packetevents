@@ -22,7 +22,8 @@ import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.event.impl.PacketSendEvent;
 import com.github.retrooper.packetevents.manager.player.attributes.TabCompleteAttribute;
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
-import com.github.retrooper.packetevents.protocol.chat.component.ComponentSerializer;
+import com.github.retrooper.packetevents.protocol.chat.component.BaseComponent;
+import com.github.retrooper.packetevents.protocol.chat.component.serializer.ComponentSerializer;
 import com.github.retrooper.packetevents.protocol.chat.component.impl.TextComponent;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
@@ -74,11 +75,11 @@ public class WrapperPlayServerTabComplete extends PacketWrapper<WrapperPlayServe
             int maxMessageLength = serverVersion.isNewerThanOrEquals(ServerVersion.V_1_13) ? MODERN_MESSAGE_LENGTH : LEGACY_MESSAGE_LENGTH;
             for (int i = 0; i < matchLength; i++) {
                 String text = readString();
-                List<TextComponent> tooltip;
+                BaseComponent tooltip;
                 boolean hasTooltip = readBoolean();
                 if (hasTooltip) {
-                    String jsonMessage = readString(maxMessageLength);
-                    tooltip = ComponentSerializer.parseJSONString(jsonMessage);
+                    String tooltipJson = readString(maxMessageLength);
+                    tooltip = ComponentSerializer.parseJsonComponent(tooltipJson);
                 } else {
                     tooltip = null;
                 }
@@ -118,8 +119,8 @@ public class WrapperPlayServerTabComplete extends PacketWrapper<WrapperPlayServe
                 boolean hasTooltip = match.getTooltip().isPresent();
                 writeBoolean(hasTooltip);
                 if (hasTooltip) {
-                    String jsonMessage = ComponentSerializer.buildJSONString(match.getTooltip().get());
-                    writeString(jsonMessage, maxMessageLength);
+                    String tooltipJson = ComponentSerializer.buildJsonObject(match.getTooltip().get()).toString();
+                    writeString(tooltipJson, maxMessageLength);
                 }
             }
         }
@@ -167,9 +168,9 @@ public class WrapperPlayServerTabComplete extends PacketWrapper<WrapperPlayServe
 
     public static class CommandMatch {
         private String text;
-        private Optional<List<TextComponent>> tooltip;
+        private Optional<BaseComponent> tooltip;
 
-        public CommandMatch(String text, @Nullable List<TextComponent> tooltip) {
+        public CommandMatch(String text, BaseComponent tooltip) {
             this.text = text;
             setTooltip(tooltip);
         }
@@ -187,11 +188,11 @@ public class WrapperPlayServerTabComplete extends PacketWrapper<WrapperPlayServe
             this.text = text;
         }
 
-        public Optional<List<TextComponent>> getTooltip() {
+        public Optional<BaseComponent> getTooltip() {
             return tooltip;
         }
 
-        public void setTooltip(@Nullable List<TextComponent> tooltip) {
+        public void setTooltip(@Nullable BaseComponent tooltip) {
             if (tooltip != null) {
                 this.tooltip = Optional.of(tooltip);
             } else {

@@ -20,7 +20,8 @@ package com.github.retrooper.packetevents.wrapper.play.server;
 
 import com.github.retrooper.packetevents.event.impl.PacketSendEvent;
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
-import com.github.retrooper.packetevents.protocol.chat.component.ComponentSerializer;
+import com.github.retrooper.packetevents.protocol.chat.component.BaseComponent;
+import com.github.retrooper.packetevents.protocol.chat.component.serializer.ComponentSerializer;
 import com.github.retrooper.packetevents.protocol.chat.component.impl.TextComponent;
 import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
@@ -33,8 +34,8 @@ public class WrapperPlayServerChatMessage extends PacketWrapper<WrapperPlayServe
     public static boolean HANDLE_JSON = true;
     private static final int MODERN_MESSAGE_LENGTH = 262144;
     private static final int LEGACY_MESSAGE_LENGTH = 32767;
-    private String jsonMessageRaw;
-    private List<TextComponent> messageComponents;
+    private String chatComponentJson;
+    private BaseComponent chatComponent;
     private ChatPosition position;
     private UUID senderUUID;
 
@@ -42,24 +43,24 @@ public class WrapperPlayServerChatMessage extends PacketWrapper<WrapperPlayServe
         super(event);
     }
 
-    public WrapperPlayServerChatMessage(List<TextComponent> messageComponents, ChatPosition position) {
-        this(messageComponents, position, new UUID(0L, 0L));
+    public WrapperPlayServerChatMessage(BaseComponent chatComponent, ChatPosition position) {
+        this(chatComponent, position, new UUID(0L, 0L));
     }
 
-    public WrapperPlayServerChatMessage(List<TextComponent> messageComponents, ChatPosition position, UUID senderUUID) {
+    public WrapperPlayServerChatMessage(BaseComponent chatComponent, ChatPosition position, UUID senderUUID) {
         super(PacketType.Play.Server.CHAT_MESSAGE);
-        this.messageComponents = messageComponents;
+        this.chatComponent = chatComponent;
         this.position = position;
         this.senderUUID = senderUUID;
     }
 
-    public WrapperPlayServerChatMessage(String jsonMessageRaw, ChatPosition position) {
-        this(jsonMessageRaw, position, new UUID(0L, 0L));
+    public WrapperPlayServerChatMessage(String chatComponentJson, ChatPosition position) {
+        this(chatComponentJson, position, new UUID(0L, 0L));
     }
 
-    public WrapperPlayServerChatMessage(String jsonMessageRaw, ChatPosition position, UUID senderUUID) {
+    public WrapperPlayServerChatMessage(String chatComponentJson, ChatPosition position, UUID senderUUID) {
         super(PacketType.Play.Server.CHAT_MESSAGE);
-        this.jsonMessageRaw = jsonMessageRaw;
+        this.chatComponentJson = chatComponentJson;
         this.position = position;
         this.senderUUID = senderUUID;
     }
@@ -67,12 +68,12 @@ public class WrapperPlayServerChatMessage extends PacketWrapper<WrapperPlayServe
     @Override
     public void readData() {
         int maxMessageLength = serverVersion.isNewerThanOrEquals(ServerVersion.V_1_13) ? MODERN_MESSAGE_LENGTH : LEGACY_MESSAGE_LENGTH;
-        this.jsonMessageRaw = readString(maxMessageLength);
-        System.out.println("og json msg: " + jsonMessageRaw);
+        this.chatComponentJson = readString(maxMessageLength);
+        System.out.println("og json msg: " + chatComponentJson);
 
         //Parse JSON message
         if (HANDLE_JSON) {
-            messageComponents = ComponentSerializer.parseJSONString(this.jsonMessageRaw);
+            chatComponent = ComponentSerializer.parseJsonComponent(this.chatComponentJson);
         }
 
         //Is the server 1.8+ or is the client 1.8+? 1.7.10 servers support 1.8 clients, and send the chat position.
@@ -93,8 +94,8 @@ public class WrapperPlayServerChatMessage extends PacketWrapper<WrapperPlayServe
 
     @Override
     public void readData(WrapperPlayServerChatMessage wrapper) {
-        this.jsonMessageRaw = wrapper.jsonMessageRaw;
-        this.messageComponents = wrapper.messageComponents;
+        this.chatComponentJson = wrapper.chatComponentJson;
+        this.chatComponent = wrapper.chatComponent;
         this.position = wrapper.position;
         this.senderUUID = wrapper.senderUUID;
     }
@@ -103,9 +104,9 @@ public class WrapperPlayServerChatMessage extends PacketWrapper<WrapperPlayServe
     public void writeData() {
         int maxMessageLength = serverVersion.isNewerThanOrEquals(ServerVersion.V_1_13) ? MODERN_MESSAGE_LENGTH : LEGACY_MESSAGE_LENGTH;
         if (HANDLE_JSON) {
-            jsonMessageRaw = ComponentSerializer.buildJSONString(messageComponents);
+            chatComponentJson = ComponentSerializer.buildJsonObject(chatComponent).toString();
         }
-        writeString(jsonMessageRaw, maxMessageLength);
+        writeString(chatComponentJson, maxMessageLength);
 
         //Is the server 1.8+ or is the client 1.8+? (1.7.10 servers support 1.8 clients, and send the chat position for 1.8 clients)
         if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_8) || clientVersion.isNewerThanOrEquals(ClientVersion.V_1_8)) {
@@ -117,20 +118,20 @@ public class WrapperPlayServerChatMessage extends PacketWrapper<WrapperPlayServe
         }
     }
 
-    public List<TextComponent> getMessageComponents() {
-        return messageComponents;
+    public BaseComponent getChatComponent() {
+        return chatComponent;
     }
 
-    public void setMessageComponents(List<TextComponent> messageComponents) {
-        this.messageComponents = messageComponents;
+    public void setChatComponent(BaseComponent chatComponent) {
+        this.chatComponent = chatComponent;
     }
 
-    public String getJSONMessageRaw() {
-        return jsonMessageRaw;
+    public String getChatComponentJson() {
+        return chatComponentJson;
     }
 
-    public void setJSONMessageRaw(String jsonMessageRaw) {
-        this.jsonMessageRaw = jsonMessageRaw;
+    public void setChatComponentJson(String chatComponentJson) {
+        this.chatComponentJson = chatComponentJson;
     }
 
     public ChatPosition getPosition() {

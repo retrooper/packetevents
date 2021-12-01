@@ -27,7 +27,9 @@ import com.github.retrooper.packetevents.protocol.ConnectionState;
 import com.github.retrooper.packetevents.protocol.chat.Color;
 import com.github.retrooper.packetevents.protocol.chat.component.BaseComponent;
 import com.github.retrooper.packetevents.protocol.chat.component.HoverEvent;
+import com.github.retrooper.packetevents.protocol.chat.component.impl.ScoreComponent;
 import com.github.retrooper.packetevents.protocol.chat.component.impl.TextComponent;
+import com.github.retrooper.packetevents.protocol.chat.component.impl.TranslatableComponent;
 import com.github.retrooper.packetevents.protocol.entity.EntityType;
 import com.github.retrooper.packetevents.protocol.entity.EntityTypes;
 import com.github.retrooper.packetevents.protocol.inventory.ItemStack;
@@ -39,14 +41,9 @@ import com.github.retrooper.packetevents.wrapper.login.client.WrapperLoginClient
 import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientInteractEntity;
 import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientPluginMessage;
 import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientTabComplete;
-import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerChatMessage;
-import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerPluginMessage;
-import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerSetSlot;
-import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerSpawnLivingEntity;
+import com.github.retrooper.packetevents.wrapper.play.server.*;
 import org.bukkit.entity.Player;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -117,11 +114,26 @@ public class InternalPacketListener implements PacketListener {
                 }
             }
             event.setLastUsedWrapper(null);
-        }
+        }*/
         if (event.getPacketType() == PacketType.Play.Server.CHAT_MESSAGE) {
             WrapperPlayServerChatMessage msg = new WrapperPlayServerChatMessage(event);
-            for (TextComponent component : msg.getMessageComponents()) {
-                System.out.println("Text: " + component.getText() + ", color: " + component.getColor().name() + ", bold: " + component.isBold());
+            BaseComponent chatComponent = msg.getChatComponent();
+            if (chatComponent instanceof TextComponent) {
+                TextComponent textComponent = (TextComponent) chatComponent;
+                String message = textComponent.getText();
+                for (BaseComponent children : textComponent.getChildren()) {
+                    message += ((TextComponent) children).getText();
+                }
+                System.out.println("Outgoing chat message: " + message);
+            } else if (chatComponent instanceof TranslatableComponent) {
+                TranslatableComponent translatableComponent = (TranslatableComponent) chatComponent;
+                String translate = translatableComponent.getTranslate();
+                System.out.println("translate: " + translate);
+            } else if (chatComponent instanceof ScoreComponent) {
+                ScoreComponent scoreComponent = (ScoreComponent) chatComponent;
+                String name = scoreComponent.getName();
+                String objective = scoreComponent.getObjective();
+                System.out.println("score: " + name + " " + objective + ", value: " + scoreComponent.getValue());
             }
             //System.out.println("msg: " + msg.getJSONMessage());
         } else if (event.getPacketType() == PacketType.Play.Server.RESPAWN) {
@@ -129,7 +141,7 @@ public class InternalPacketListener implements PacketListener {
             System.out.println("dimension world type: " + respawn.getDimension().getType());
             System.out.println("world name: " + respawn.getWorldName());
 
-        } else if (event.getPacketType() == PacketType.Play.Server.TAB_COMPLETE) {
+        } /*else if (event.getPacketType() == PacketType.Play.Server.TAB_COMPLETE) {
             WrapperPlayServerTabComplete tabComplete = new WrapperPlayServerTabComplete(event);
             String lastInput = PacketEvents.getAPI().getPlayerManager().getAttribute(player.getUniqueId(), TabCompleteAttribute.class).getInput();
             System.out.println("Last input length: " + lastInput.length() + ", Last input: " + lastInput);
@@ -176,35 +188,31 @@ public class InternalPacketListener implements PacketListener {
                     tabCompleteAttribute.setInput(text);
                     Optional<Integer> transactionID = tabComplete.getTransactionId();
                     transactionID.ifPresent(tabComplete::setTransactionId);
-                }
-                else if (event.getPacketType() == PacketType.Play.Client.INTERACT_ENTITY) {
+                } else if (event.getPacketType() == PacketType.Play.Client.INTERACT_ENTITY) {
                     WrapperPlayClientInteractEntity interactEntity = new WrapperPlayClientInteractEntity(event);
-                    List<TextComponent> components = new ArrayList<>();
 
-
-                    List<BaseComponent> hoverTextComponents = new ArrayList<>();
-                    hoverTextComponents.add(TextComponent.builder()
+                    BaseComponent hoverTextComponent = TextComponent.builder()
                             .text("action: " + interactEntity.getAction())
                             .color(Color.GOLD)
                             .bold(true)
-                            .build());
-                    hoverTextComponents.add(TextComponent.builder()
-                            .text(" btw this chat packet was sent with packetevents")
-                            .color(Color.YELLOW)
-                            .italic(true)
-                            .bold(false)
-                            .build());
+                            .append(TextComponent.builder()
+                                    .text(" btw this chat packet was sent with packetevents")
+                                    .color(Color.YELLOW)
+                                    .italic(true)
+                                    .bold(false)
+                                    .build())
+                            .build();
 
-                    components.add(TextComponent.builder().text("id: " + interactEntity.getEntityId() + " ")
+                    TextComponent chatComponent = TextComponent.builder()
+                            .text("id: " + interactEntity.getEntityId() + " ")
                             .color(Color.BRIGHT_GREEN)
                             .italic(true)
-                            .hoverEvent(new HoverEvent(HoverEvent.HoverType.SHOW_TEXT,
-                                    hoverTextComponents))
-                            .build());
+                            .hoverEvent(new HoverEvent(HoverEvent.HoverType.SHOW_TEXT, hoverTextComponent))
+                            .build();
 
 
                     UUID uuid = player != null ? player.getUniqueId() : new UUID(0L, 0L);
-                    WrapperPlayServerChatMessage cm = new WrapperPlayServerChatMessage(components, WrapperPlayServerChatMessage.ChatPosition.CHAT, uuid);
+                    WrapperPlayServerChatMessage cm = new WrapperPlayServerChatMessage(chatComponent, WrapperPlayServerChatMessage.ChatPosition.CHAT, uuid);
                     //We may optionally serialize the packet into a ByteBuf before-hand.
                     //If we forget to do this, it will be done as soon as we send this wrapper for the first time.
                     cm.prepareForSend();

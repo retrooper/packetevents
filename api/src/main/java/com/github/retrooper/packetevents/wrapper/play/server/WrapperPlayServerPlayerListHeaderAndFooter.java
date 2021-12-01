@@ -20,7 +20,8 @@ package com.github.retrooper.packetevents.wrapper.play.server;
 
 import com.github.retrooper.packetevents.event.impl.PacketSendEvent;
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
-import com.github.retrooper.packetevents.protocol.chat.component.ComponentSerializer;
+import com.github.retrooper.packetevents.protocol.chat.component.BaseComponent;
+import com.github.retrooper.packetevents.protocol.chat.component.serializer.ComponentSerializer;
 import com.github.retrooper.packetevents.protocol.chat.component.impl.TextComponent;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
@@ -31,85 +32,85 @@ public class WrapperPlayServerPlayerListHeaderAndFooter extends PacketWrapper<Wr
     public static boolean HANDLE_JSON = true;
     private static final int MODERN_MESSAGE_LENGTH = 262144;
     private static final int LEGACY_MESSAGE_LENGTH = 32767;
-    private String jsonHeader;
-    private String jsonFooter;
-    private List<TextComponent> headerComponents;
-    private List<TextComponent> footerComponents;
+    private String headerJson;
+    private String footerJson;
+    private BaseComponent headerComponent;
+    private BaseComponent footerComponent;
     public WrapperPlayServerPlayerListHeaderAndFooter(PacketSendEvent event) {
         super(event);
     }
 
-    public WrapperPlayServerPlayerListHeaderAndFooter(List<TextComponent> headerComponents, List<TextComponent> footerComponents) {
+    public WrapperPlayServerPlayerListHeaderAndFooter(BaseComponent headerComponent, BaseComponent footerComponent) {
         super(PacketType.Play.Server.PLAYER_LIST_HEADER_AND_FOOTER);
-        this.headerComponents = headerComponents;
-        this.footerComponents = footerComponents;
+        this.headerComponent = headerComponent;
+        this.footerComponent = footerComponent;
     }
 
-    public WrapperPlayServerPlayerListHeaderAndFooter(String jsonHeader, String jsonFooter) {
+    public WrapperPlayServerPlayerListHeaderAndFooter(String headerJson, String footerJson) {
         super(PacketType.Play.Server.PLAYER_LIST_HEADER_AND_FOOTER);
-        this.jsonHeader = jsonHeader;
-        this.jsonFooter = jsonFooter;
+        this.headerJson = headerJson;
+        this.footerJson = footerJson;
     }
 
     @Override
     public void readData() {
         int maxMessageLength = serverVersion.isNewerThanOrEquals(ServerVersion.V_1_13) ? MODERN_MESSAGE_LENGTH : LEGACY_MESSAGE_LENGTH;
-        jsonHeader = readString(maxMessageLength);
-        jsonFooter = readString(maxMessageLength);
+        headerJson = readString(maxMessageLength);
+        footerJson = readString(maxMessageLength);
         if (HANDLE_JSON) {
-            headerComponents = ComponentSerializer.parseJSONString(jsonHeader);
-            footerComponents = ComponentSerializer.parseJSONString(jsonFooter);
+            headerComponent = ComponentSerializer.parseJsonComponent(headerJson);
+            footerComponent = ComponentSerializer.parseJsonComponent(footerJson);
         }
     }
 
     @Override
     public void readData(WrapperPlayServerPlayerListHeaderAndFooter wrapper) {
-        jsonHeader = wrapper.jsonHeader;
-        jsonFooter = wrapper.jsonFooter;
-        headerComponents = wrapper.headerComponents;
-        footerComponents = wrapper.footerComponents;
+        headerJson = wrapper.headerJson;
+        footerJson = wrapper.footerJson;
+        headerComponent = wrapper.headerComponent;
+        footerComponent = wrapper.footerComponent;
     }
 
     @Override
     public void writeData() {
         int maxMessageLength = serverVersion.isNewerThanOrEquals(ServerVersion.V_1_13) ? MODERN_MESSAGE_LENGTH : LEGACY_MESSAGE_LENGTH;
         if (HANDLE_JSON) {
-            jsonHeader = ComponentSerializer.buildJSONString(headerComponents);
-            jsonFooter = ComponentSerializer.buildJSONString(footerComponents);
+            headerJson = ComponentSerializer.buildJsonObject(headerComponent).toString();
+            footerJson = ComponentSerializer.buildJsonObject(footerComponent).toString();
         }
-        writeString(jsonHeader, maxMessageLength);
-        writeString(jsonFooter, maxMessageLength);
+        writeString(headerJson, maxMessageLength);
+        writeString(footerJson, maxMessageLength);
     }
 
-    public String getJSONHeader() {
-        return jsonHeader;
+    public String getHeaderJson() {
+        return headerJson;
     }
 
-    public void setJSONHeader(String jsonHeader) {
-        this.jsonHeader = jsonHeader;
+    public void setHeaderJson(String headerJson) {
+        this.headerJson = headerJson;
     }
 
-    public String getJSONFooter() {
-        return jsonFooter;
+    public String getFooterJson() {
+        return footerJson;
     }
 
-    public void setJSONFooter(String jsonFooter) {
-        this.jsonFooter = jsonFooter;
+    public void setFooterJson(String footerJson) {
+        this.footerJson = footerJson;
     }
 
-    public List<TextComponent> getHeaderComponents() {
-        return headerComponents;
+    public BaseComponent getHeaderComponent() {
+        return headerComponent;
     }
 
-    public void setHeaderComponents(List<TextComponent> headerComponents) {
-        this.headerComponents = headerComponents;
+    public void setHeaderComponent(BaseComponent headerComponent) {
+        this.headerComponent = headerComponent;
     }
 
-    public List<TextComponent> getFooterComponents() {
-        return footerComponents;
+    public BaseComponent getFooterComponent() {
+        return footerComponent;
     }
 
-    public void setFooterComponents(List<TextComponent> footerComponents) {
-        this.footerComponents = footerComponents;
+    public void setFooterComponent(BaseComponent footerComponent) {
+        this.footerComponent = footerComponent;
     }
 }

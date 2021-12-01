@@ -18,29 +18,27 @@
 
 package com.github.retrooper.packetevents.protocol.chat.component.impl;
 
-import com.github.retrooper.packetevents.protocol.chat.Color;
 import com.github.retrooper.packetevents.protocol.chat.component.BaseComponent;
-import com.github.retrooper.packetevents.protocol.chat.component.ClickEvent;
-import com.github.retrooper.packetevents.protocol.chat.component.HoverEvent;
 import com.google.gson.JsonObject;
 
-public class TextComponent extends BaseComponent {
-    private String text;
+public class SelectorComponent extends BaseComponent {
+    private String selector;
 
-    public String getText() {
-        return text;
+    public String getSelector() {
+        return selector;
     }
 
-    public void setText(String text) {
-        this.text = text;
+    public void setSelector(String selector) {
+        this.selector = selector;
     }
 
     @Override
     public void parseJson(JsonObject jsonObject) {
-        if (jsonObject.has("text")) {
-            text = jsonObject.get("text").getAsString();
-        } else {
-            text = "";
+        if (jsonObject.has("selector")) {
+            selector = jsonObject.get("selector").getAsString();
+        }
+        else {
+            selector = "";
         }
         super.parseJson(jsonObject);
     }
@@ -48,26 +46,7 @@ public class TextComponent extends BaseComponent {
     @Override
     public JsonObject buildJson() {
         JsonObject jsonObject = super.buildJson();
-        jsonObject.addProperty("text", text);
+        jsonObject.addProperty("selector", selector);
         return jsonObject;
-    }
-
-    public static TextComponent.Builder builder() {
-        return new Builder();
-    }
-
-    public static class Builder extends BaseComponent.Builder<Builder> {
-        public Builder() {
-            super(new TextComponent());
-        }
-
-        public Builder text(String text) {
-            ((TextComponent)component).setText(text);
-            return this;
-        }
-
-        public TextComponent build() {
-            return (TextComponent) component;
-        }
     }
 }

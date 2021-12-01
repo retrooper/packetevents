@@ -67,6 +67,13 @@ public class ScoreComponent extends BaseComponent {
             else {
                 objective = "";
             }
+
+            if (score.has("value") && !score.get("value").getAsString().isEmpty()) {
+                value = score.get("value").getAsString();
+            }
+            else {
+                value = "";
+            }
         }
         super.parseJson(jsonObject);
     }
@@ -77,6 +84,9 @@ public class ScoreComponent extends BaseComponent {
         JsonObject score = new JsonObject();
         score.addProperty("name", name);
         score.addProperty("objective", objective);
+        if (!value.isEmpty()) {
+            score.addProperty("value", value);
+        }
         jsonObject.add("score", score);
         return jsonObject;
     }

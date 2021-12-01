@@ -23,6 +23,7 @@ import com.github.retrooper.packetevents.protocol.chat.Color;
 import com.github.retrooper.packetevents.protocol.chat.component.ClickEvent.ClickType;
 import com.github.retrooper.packetevents.protocol.chat.component.HoverEvent.HoverType;
 import com.github.retrooper.packetevents.protocol.chat.component.impl.TextComponent;
+import com.github.retrooper.packetevents.protocol.chat.component.serializer.ComponentSerializer;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -40,6 +41,8 @@ public class BaseComponent {
     private boolean underlined = false;
     private boolean strikeThrough = false;
     private boolean obfuscated = false;
+
+    private List<BaseComponent> children = new ArrayList<>();
 
     public BaseComponent() {
     }
@@ -116,8 +119,16 @@ public class BaseComponent {
         this.obfuscated = obfuscated;
     }
 
+    public List<BaseComponent> getChildren() {
+        return children;
+    }
+
+    public void setChildren(List<BaseComponent> children) {
+        this.children = children;
+    }
+
     public static Builder builder() {
-        return new Builder();
+        return new Builder(new BaseComponent());
     }
 
     public void parseJson(JsonObject jsonObject) {
@@ -195,33 +206,20 @@ public class BaseComponent {
                 jsonHoverEventValueElement = hoverEventObject.get("contents");
             }
             if (jsonHoverEventValueElement != null) {
-                if (jsonHoverEventValueElement.isJsonArray()) {
+                if (jsonHoverEventValueElement.isJsonPrimitive()) {
+                    values.add(TextComponent.builder().text(jsonHoverEventValueElement.getAsString()).build());
+                }
+                else if (jsonHoverEventValueElement.isJsonArray()) {
                     for (JsonElement jsonElement : jsonHoverEventValueElement.getAsJsonArray()) {
                         JsonObject jsonObj = jsonElement.getAsJsonObject();
-                        BaseComponent baseComponent;
-                        if (jsonObj.has("text")) {
-                            baseComponent = new TextComponent();
-                        }
-                        else {
-                            baseComponent = new BaseComponent();
-                        }
-                        baseComponent.parseJson(jsonElement.getAsJsonObject());
+                        BaseComponent baseComponent = ComponentSerializer.parseJsonComponent(jsonObj);
                         values.add(baseComponent);
                     }
                 }
-                else if (jsonHoverEventValueElement.isJsonObject()) {
-                    JsonObject jsonObj = jsonHoverEventValueElement.getAsJsonObject();
-                    BaseComponent baseComponent;
-                    if (jsonObj.has("text")) {
-                        baseComponent = new TextComponent();
-                    }
-                    else {
-                        baseComponent = new BaseComponent();
-                    }
-                    baseComponent.parseJson(jsonHoverEventValueElement.getAsJsonObject());
-                    values.add(baseComponent);
-                }
                 else {
+                    JsonObject jsonObj = jsonHoverEventValueElement.getAsJsonObject();
+                    BaseComponent baseComponent = ComponentSerializer.parseJsonComponent(jsonObj);
+                    values.add(baseComponent);
                 }
             }
             this.hoverEvent = new HoverEvent(values.isEmpty() ? HoverType.EMPTY : HoverType.getByName(action), values);
@@ -229,8 +227,19 @@ public class BaseComponent {
             this.hoverEvent = new HoverEvent(HoverType.EMPTY);
         }
 
-        //TODO Other components such as the translation component, and the score component, and the selector component, and the keybind component
-
+        if (jsonObject.has("extra")) {
+            JsonArray jsonExtraComponents = jsonObject.getAsJsonArray("extra");
+            for (JsonElement jsonElement : jsonExtraComponents) {
+                BaseComponent child;
+                if (jsonElement.isJsonPrimitive()) {
+                    child = TextComponent.builder().text(jsonElement.getAsString()).build();
+                }
+                else {
+                    child = ComponentSerializer.parseJsonComponent(jsonElement.getAsJsonObject());
+                }
+                children.add(child);
+            }
+        }
     }
 
     public JsonObject buildJson() {
@@ -281,59 +290,78 @@ public class BaseComponent {
             }
             jsonObject.add("hoverEvent", hoverEventObject);
         }
+
+        JsonArray extraArray = new JsonArray();
+        for (BaseComponent child : children) {
+            JsonObject childJsonObject = child.buildJson();
+            extraArray.add(childJsonObject);
+        }
+        if (extraArray.size() > 0) {
+            jsonObject.add("extra", extraArray);
+        }
         return jsonObject;
     }
 
-    public static class Builder<T extends BaseComponent> {
-        private final BaseComponent component = new BaseComponent();
+    public static class Builder<T extends Builder> {
+        protected final BaseComponent component;
 
-        public Builder color(Color color) {
-            this.component.setColor(color);
-            return this;
+        public Builder(BaseComponent component) {
+            this.component = component;
         }
 
-        public Builder bold(boolean bold) {
-            this.component.setBold(bold);
-            return this;
+        public T color(Color color) {
+            component.setColor(color);
+            return (T) this;
         }
 
-        public Builder italic(boolean italic) {
-            this.component.setItalic(italic);
-            return this;
+        public T bold(boolean bold) {
+            component.setBold(bold);
+            return (T) this;
         }
 
-        public Builder underlined(boolean underlined) {
-            this.component.setUnderlined(underlined);
-            return this;
+        public T italic(boolean italic) {
+            component.setItalic(italic);
+            return (T) this;
         }
 
-        public Builder strikeThrough(boolean strikeThrough) {
-            this.component.setStrikeThrough(strikeThrough);
-            return this;
+        public T underlined(boolean underlined) {
+            component.setUnderlined(underlined);
+            return (T) this;
         }
 
-        public Builder obfuscated(boolean obfuscated) {
-            this.component.setObfuscated(obfuscated);
-            return this;
+        public T strikeThrough(boolean strikeThrough) {
+            component.setStrikeThrough(strikeThrough);
+            return (T) this;
         }
 
-        public Builder insertion(String insertion) {
-            this.component.setInsertion(insertion);
-            return this;
+        public T obfuscated(boolean obfuscated) {
+            component.setObfuscated(obfuscated);
+            return (T) this;
         }
 
-        public Builder clickEvent(ClickEvent event) {
-            this.component.setClickEvent(event);
-            return this;
+        public T insertion(String insertion) {
+            component.setInsertion(insertion);
+            return (T) this;
         }
 
-        public Builder hoverEvent(HoverEvent event) {
-            this.component.setHoverEvent(event);
-            return this;
+        public T clickEvent(ClickEvent event) {
+            component.setClickEvent(event);
+            return (T) this;
         }
 
-        public T build() {
-            return (T) component;
+        public T hoverEvent(HoverEvent event) {
+            component.setHoverEvent(event);
+            return (T) this;
+        }
+
+        public T append(BaseComponent component) {
+            this.component.children.add(component);
+            System.out.println("added child!");
+            return (T) this;
+        }
+
+        public BaseComponent buildBase() {
+            return component;
         }
     }
 }
