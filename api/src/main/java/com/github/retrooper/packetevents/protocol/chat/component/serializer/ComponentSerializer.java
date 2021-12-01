@@ -33,7 +33,7 @@ public class ComponentSerializer {
 
     public static JsonObject buildJsonObject(BaseComponent component) {
         JsonObject parentJsonObject = component.buildJson();
-        System.out.println("Built json object: " + parentJsonObject.toString());
+        //System.out.println("Built json object: " + parentJsonObject.toString());
         return parentJsonObject;
     }
 

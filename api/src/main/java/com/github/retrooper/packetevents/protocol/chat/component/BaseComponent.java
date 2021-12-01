@@ -356,7 +356,6 @@ public class BaseComponent {
 
         public T append(BaseComponent component) {
             this.component.children.add(component);
-            System.out.println("added child!");
             return (T) this;
         }
 

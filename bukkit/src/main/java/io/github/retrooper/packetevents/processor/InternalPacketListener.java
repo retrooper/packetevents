@@ -70,10 +70,10 @@ public class InternalPacketListener implements PacketListener {
             EntityType entityType = spawnLivingEntity.getEntityType();
             if (entityType.equals(EntityTypes.PLAYER)) {
                 //This is a player
-                System.out.println("Spawning a player...");
+                //System.out.println("Spawning a player...");
             }
             Vector3d position = spawnLivingEntity.getPosition();
-            System.out.println("Spawned entity with ID " + entityID + " of type " + entityType.getIdentifier().getKey() + "=" + entityType.getId() + " at position " + position);
+            //System.out.println("Spawned entity with ID " + entityID + " of type " + entityType.getIdentifier().getKey() + "=" + entityType.getId() + " at position " + position);
             event.setLastUsedWrapper(null);
         } else if (event.getPacketType() == PacketType.Play.Server.SET_SLOT) {
             WrapperPlayServerSetSlot setSlot = new WrapperPlayServerSetSlot(event);
@@ -82,12 +82,12 @@ public class InternalPacketListener implements PacketListener {
             if (item.getType() == null) {
                 System.out.println("tf!");
             }
-            System.out.println("Set slot " + slot + " to item " + item);
+            //System.out.println("Set slot " + slot + " to item " + item);
         } else if (event.getPacketType() == PacketType.Play.Server.PLUGIN_MESSAGE) {
             WrapperPlayServerPluginMessage pluginMessage = new WrapperPlayServerPluginMessage(event);
             String channel = pluginMessage.getChannelName();
             byte[] data = pluginMessage.getData();
-            System.out.println("Plugin message for channel " + channel + " with data from server to client: " + new String(data));
+            //System.out.println("Plugin message for channel " + channel + " with data from server to client: " + new String(data));
         }
         /*
         else if (event.getPacketType() == PacketType.Play.Server.CHUNK_DATA) {
@@ -124,22 +124,22 @@ public class InternalPacketListener implements PacketListener {
                 for (BaseComponent children : textComponent.getChildren()) {
                     message += ((TextComponent) children).getText();
                 }
-                System.out.println("Outgoing chat message: " + message);
+               // System.out.println("Outgoing chat message: " + message);
             } else if (chatComponent instanceof TranslatableComponent) {
                 TranslatableComponent translatableComponent = (TranslatableComponent) chatComponent;
                 String translate = translatableComponent.getTranslate();
-                System.out.println("translate: " + translate);
+                //System.out.println("translate: " + translate);
             } else if (chatComponent instanceof ScoreComponent) {
                 ScoreComponent scoreComponent = (ScoreComponent) chatComponent;
                 String name = scoreComponent.getName();
                 String objective = scoreComponent.getObjective();
-                System.out.println("score: " + name + " " + objective + ", value: " + scoreComponent.getValue());
+               // System.out.println("score: " + name + " " + objective + ", value: " + scoreComponent.getValue());
             }
             //System.out.println("msg: " + msg.getJSONMessage());
         } else if (event.getPacketType() == PacketType.Play.Server.RESPAWN) {
             WrapperPlayServerRespawn respawn = new WrapperPlayServerRespawn(event);
-            System.out.println("dimension world type: " + respawn.getDimension().getType());
-            System.out.println("world name: " + respawn.getWorldName());
+           // System.out.println("dimension world type: " + respawn.getDimension().getType());
+           // System.out.println("world name: " + respawn.getWorldName());
 
         } /*else if (event.getPacketType() == PacketType.Play.Server.TAB_COMPLETE) {
             WrapperPlayServerTabComplete tabComplete = new WrapperPlayServerTabComplete(event);
@@ -221,7 +221,7 @@ public class InternalPacketListener implements PacketListener {
                     WrapperPlayClientPluginMessage pluginMessage = new WrapperPlayClientPluginMessage(event);
                     String channel = pluginMessage.getChannelName();
                     byte[] data = pluginMessage.getData();
-                    System.out.println("Received plugin message from a client to this server: " + channel + " with data " + new String(data));
+                   // System.out.println("Received plugin message from a client to this server: " + channel + " with data " + new String(data));
                 }
                 break;
         }
