@@ -340,6 +340,16 @@ public final class NMSUtils {
             getBlockPosX = Reflection.getMethod(NMSUtils.blockPosClass.getSuperclass(), "getX", 0);
             getBlockPosY = Reflection.getMethod(NMSUtils.blockPosClass.getSuperclass(), "getY", 0);
             getBlockPosZ = Reflection.getMethod(NMSUtils.blockPosClass.getSuperclass(), "getZ", 0);
+            // Mappings changed with 1.18
+            if (getBlockPosX == null) {
+                getBlockPosX = Reflection.getMethod(NMSUtils.blockPosClass.getSuperclass(), "u", 0);
+            }
+            if (getBlockPosY == null) {
+                getBlockPosY = Reflection.getMethod(NMSUtils.blockPosClass.getSuperclass(), "v", 0);
+            }
+            if (getBlockPosZ == null) {
+                getBlockPosZ = Reflection.getMethod(NMSUtils.blockPosClass.getSuperclass(), "w", 0);
+            }
         }
         worldSettingsClass = NMSUtils.getNMSClassWithoutException("WorldSettings");
         if (worldServerClass == null) {
