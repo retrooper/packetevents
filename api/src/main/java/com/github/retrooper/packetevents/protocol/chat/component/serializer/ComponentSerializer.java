@@ -64,6 +64,7 @@ public class ComponentSerializer {
             //TODO Make NBT Component
             component = new BaseComponent();
         } else {
+            //TODO Handle properly
             return TextComponent.builder().text(jsonObject.toString()).build();
         }
         component.parseJson(jsonObject);

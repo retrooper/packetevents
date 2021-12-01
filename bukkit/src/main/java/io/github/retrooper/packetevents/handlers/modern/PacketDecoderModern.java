@@ -124,6 +124,7 @@ public class PacketDecoderModern extends ByteToMessageDecoder {
     public void channelInactive(ChannelHandlerContext ctx) throws Exception {
         System.out.println("Destroying channel...");
         ServerConnectionInitializerModern.postDestroyChannel(ctx.channel());
+        //TODO Check if this is necessary, because this might be causing issues!
         super.channelInactive(ctx);
     }
 
