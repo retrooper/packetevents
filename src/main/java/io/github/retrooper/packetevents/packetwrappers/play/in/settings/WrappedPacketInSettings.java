@@ -88,30 +88,18 @@ public class WrappedPacketInSettings extends WrappedPacket {
         writeBoolean(0, chatColors);
     }
 
-    @Deprecated
-    public Optional<Boolean> isTextFilteringEnabled() {
+    //Added in 1.17
+    public boolean isTextFilteringEnabled() {
         if (v_1_17) {
-            return Optional.of(!isTextFilteringDisabled());
+            return readBoolean(1);
         }
-        return Optional.empty();
+        return false;
     }
 
-    @Deprecated
+    //Added in 1.17
     public void setTextFilteringEnabled(boolean enabled) {
         if (v_1_17) {
-            setTextFilteringDisabled(!enabled);
-        }
-    }
-
-    //Added in 1.17
-    public boolean isTextFilteringDisabled() {
-        return v_1_17 && readBoolean(1);
-    }
-
-    //Added in 1.17
-    public void setTextFilteringDisabled(boolean textFilteringDisabled) {
-        if (v_1_17) {
-            writeBoolean(1, textFilteringDisabled);
+            writeBoolean(1, enabled);
         }
     }
 
