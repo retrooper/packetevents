@@ -16,17 +16,16 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.github.retrooper.packetevents.protocol.chat.component;
+package com.github.retrooper.packetevents.protocol.chat.component.impl;
 
 import com.github.retrooper.packetevents.protocol.chat.Color;
+import com.github.retrooper.packetevents.protocol.chat.component.BaseComponent;
+import com.github.retrooper.packetevents.protocol.chat.component.ClickEvent;
+import com.github.retrooper.packetevents.protocol.chat.component.HoverEvent;
 import com.google.gson.JsonObject;
 
 public class TextComponent extends BaseComponent {
     private String text;
-
-    public TextComponent() {
-
-    }
 
     public String getText() {
         return text;
@@ -37,18 +36,18 @@ public class TextComponent extends BaseComponent {
     }
 
     @Override
-    public void parseJSON(JsonObject jsonObject) {
+    public void parseJson(JsonObject jsonObject) {
         if (jsonObject.has("text")) {
             text = jsonObject.get("text").getAsString();
         } else {
             text = "";
         }
-        super.parseJSON(jsonObject);
+        super.parseJson(jsonObject);
     }
 
     @Override
-    public JsonObject buildJSON() {
-        JsonObject jsonObject = super.buildJSON();
+    public JsonObject buildJson() {
+        JsonObject jsonObject = super.buildJson();
         jsonObject.addProperty("text", text);
         return jsonObject;
     }

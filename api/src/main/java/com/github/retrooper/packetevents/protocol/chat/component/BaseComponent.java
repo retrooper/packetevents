@@ -22,10 +22,10 @@ package com.github.retrooper.packetevents.protocol.chat.component;
 import com.github.retrooper.packetevents.protocol.chat.Color;
 import com.github.retrooper.packetevents.protocol.chat.component.ClickEvent.ClickType;
 import com.github.retrooper.packetevents.protocol.chat.component.HoverEvent.HoverType;
+import com.github.retrooper.packetevents.protocol.chat.component.impl.TextComponent;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import com.google.gson.JsonPrimitive;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -120,7 +120,7 @@ public class BaseComponent {
         return new Builder();
     }
 
-    public void parseJSON(JsonObject jsonObject) {
+    public void parseJson(JsonObject jsonObject) {
         if (jsonObject.has("color")) {
             this.color = Color.getByName(jsonObject.get("color").getAsString());
         } else {
@@ -205,7 +205,7 @@ public class BaseComponent {
                         else {
                             baseComponent = new BaseComponent();
                         }
-                        baseComponent.parseJSON(jsonElement.getAsJsonObject());
+                        baseComponent.parseJson(jsonElement.getAsJsonObject());
                         values.add(baseComponent);
                     }
                 }
@@ -218,7 +218,7 @@ public class BaseComponent {
                     else {
                         baseComponent = new BaseComponent();
                     }
-                    baseComponent.parseJSON(jsonHoverEventValueElement.getAsJsonObject());
+                    baseComponent.parseJson(jsonHoverEventValueElement.getAsJsonObject());
                     values.add(baseComponent);
                 }
                 else {
@@ -233,7 +233,7 @@ public class BaseComponent {
 
     }
 
-    public JsonObject buildJSON() {
+    public JsonObject buildJson() {
         JsonObject jsonObject = new JsonObject();
         if (color != Color.WHITE && color != null) {
             jsonObject.addProperty("color", color.getName());
@@ -269,7 +269,7 @@ public class BaseComponent {
             hoverEventObject.addProperty("action", hoverEvent.getType().getName());
             JsonArray hoverEventValueArray = new JsonArray();
             for (BaseComponent value : hoverEvent.getValues()) {
-                hoverEventValueArray.add(value.buildJSON());
+                hoverEventValueArray.add(value.buildJson());
             }
 
             //We use "value" instead of "contents" because we can be sure it will work on every Spigot version.

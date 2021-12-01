@@ -18,6 +18,7 @@
 
 package com.github.retrooper.packetevents.protocol.chat.component;
 
+import com.github.retrooper.packetevents.protocol.chat.component.impl.TextComponent;
 import com.google.gson.*;
 
 import java.util.ArrayList;
@@ -26,10 +27,9 @@ import java.util.List;
 public class ComponentSerializer {
     public static Gson GSON = new GsonBuilder().create();
 
-    //TODO Support translate components
-    public static List<TextComponent> parseJSONString(String jsonMessageRaw) {
+    public static List<BaseComponent> parseJSONString(String jsonMessageRaw) {
         JsonObject parentJsonObject = GSON.fromJson(jsonMessageRaw, JsonObject.class);
-        List<TextComponent> result = new ArrayList<>();
+        List<BaseComponent> result = new ArrayList<>();
         if (parentJsonObject.isJsonPrimitive()) {
             result.add(TextComponent.builder().text(parentJsonObject.getAsString()).build());
             return result;
@@ -43,8 +43,7 @@ public class ComponentSerializer {
                         JsonObject wrapperObject = new JsonObject();
                         wrapperObject.addProperty("text", jsonElement.getAsString());
                         jsonObjects.add(wrapperObject);
-                    }
-                    else {
+                    } else {
                         jsonObjects.add(jsonElement.getAsJsonObject());
                     }
                 }
@@ -52,7 +51,8 @@ public class ComponentSerializer {
 
             for (JsonObject jsonObject : jsonObjects) {
                 TextComponent component = new TextComponent();
-                component.parseJSON(jsonObject);
+                component.parseJson(jsonObject);
+
                 result.add(component);
             }
         }
@@ -64,18 +64,49 @@ public class ComponentSerializer {
         boolean first = true;
         for (TextComponent component : messageComponents) {
             if (first) {
-                parentJsonObject = component.buildJSON();
+                parentJsonObject = component.buildJson();
                 if (messageComponents.size() > 1) {
                     parentJsonObject.add("extra", new JsonArray());
                 }
                 first = false;
-            }
-            else {
-                JsonObject extra = component.buildJSON();
+            } else {
+                JsonObject extra = component.buildJson();
                 JsonArray extraArray = parentJsonObject.getAsJsonArray("extra");
                 extraArray.add(extra);
             }
         }
         return parentJsonObject.toString();
+    }
+
+    public static BaseComponent parseJsonComponent(String json) {
+        JsonObject jsonObject = GSON.fromJson(json, JsonObject.class);
+        return parseJsonComponent(jsonObject);
+    }
+
+    public static BaseComponent parseJsonComponent(JsonObject jsonObject) {
+        BaseComponent component;
+        if (jsonObject.has("text")) {
+            component = new TextComponent();
+        } else if (jsonObject.has("translate")) {
+            component = null;
+        } else if (jsonObject.has("score")) {
+            component = null;
+        } else if (jsonObject.has("selector")) {
+            component = null;
+        } else if (jsonObject.has("keybind")) {
+            component = null;
+        } else if (jsonObject.has("nbt")) {
+            component = null;
+        } else {
+            component = null;
+        }
+
+        if (component != null) {
+            component.parseJson(jsonObject);
+            return component;
+        } else {
+            //TODO Maybe handle this differently
+            return null;
+        }
     }
 }
