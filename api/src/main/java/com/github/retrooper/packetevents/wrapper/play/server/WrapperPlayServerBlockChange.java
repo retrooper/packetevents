@@ -23,8 +23,8 @@ import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.util.Vector3i;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
-
-public class WrapperPlayServerBlockChange extends PacketWrapper<WrapperPlayServerBlockChange> {
+//TODO Finish
+class WrapperPlayServerBlockChange extends PacketWrapper<WrapperPlayServerBlockChange> {
     private Vector3i blockPosition;
     private int blockID;
     public WrapperPlayServerBlockChange(PacketSendEvent event) {
@@ -45,7 +45,7 @@ public class WrapperPlayServerBlockChange extends PacketWrapper<WrapperPlayServe
             int blockData = readUnsignedByte();
         }
         else {
-            blockPosition = readBlockPosition()
+            blockPosition = readBlockPosition();
             int block = readVarInt();
         }
     }

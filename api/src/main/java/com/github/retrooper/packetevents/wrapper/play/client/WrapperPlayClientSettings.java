@@ -31,10 +31,10 @@ public class WrapperPlayClientSettings extends PacketWrapper<WrapperPlayClientSe
     private String locale;
     private int viewDistance;
     private ChatVisibility visibility;
-    private boolean chatColors;
+    private boolean chatColorable;
     private byte visibleSkinSectionMask;
     private Hand hand;
-    private boolean disableTextFiltering;
+    private boolean textFilteringEnabled;
     private boolean allowServerListings;
 
     //Not accessible, only for 1.7
@@ -79,16 +79,16 @@ public class WrapperPlayClientSettings extends PacketWrapper<WrapperPlayClientSe
     }
 
     public WrapperPlayClientSettings(String locale, int viewDistance, ChatVisibility visibility,
-                                     boolean chatColors, byte visibleSkinSectionMask, Hand hand,
-                                     boolean disableTextFiltering, boolean allowServerListings) {
+                                     boolean chatColorable, byte visibleSkinSectionMask, Hand hand,
+                                     boolean textFilteringEnabled, boolean allowServerListings) {
         super(PacketType.Play.Client.CLIENT_SETTINGS);
         this.locale = locale;
         this.viewDistance = viewDistance;
         this.visibility = visibility;
-        this.chatColors = chatColors;
+        this.chatColorable = chatColorable;
         this.visibleSkinSectionMask = visibleSkinSectionMask;
         this.hand = hand;
-        this.disableTextFiltering = disableTextFiltering;
+        this.textFilteringEnabled = textFilteringEnabled;
         this.allowServerListings = allowServerListings;
     }
 
@@ -99,7 +99,7 @@ public class WrapperPlayClientSettings extends PacketWrapper<WrapperPlayClientSe
         viewDistance = readByte();
         int visibilityIndex = serverVersion.isNewerThanOrEquals(ServerVersion.V_1_9) ? readVarInt() : readByte();
         visibility = ChatVisibility.VALUES[visibilityIndex];
-        chatColors = readBoolean();
+        chatColorable = readBoolean();
         if (serverVersion == ServerVersion.V_1_7_10) {
             //Ignored
             ignoredDifficulty = readByte();
@@ -121,10 +121,10 @@ public class WrapperPlayClientSettings extends PacketWrapper<WrapperPlayClientSe
         }
 
         if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_17)) {
-            disableTextFiltering = readBoolean();
+            textFilteringEnabled = readBoolean();
         }
         else {
-            disableTextFiltering = true;
+            textFilteringEnabled = false;
         }
 
         if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_18)) {
@@ -140,10 +140,10 @@ public class WrapperPlayClientSettings extends PacketWrapper<WrapperPlayClientSe
         locale = wrapper.locale;
         viewDistance = wrapper.viewDistance;
         visibility = wrapper.visibility;
-        chatColors = wrapper.chatColors;
+        chatColorable = wrapper.chatColorable;
         visibleSkinSectionMask = wrapper.visibleSkinSectionMask;
         hand = wrapper.hand;
-        disableTextFiltering = wrapper.disableTextFiltering;
+        textFilteringEnabled = wrapper.textFilteringEnabled;
     }
 
     @Override
@@ -157,7 +157,7 @@ public class WrapperPlayClientSettings extends PacketWrapper<WrapperPlayClientSe
         else {
             writeByte(visibility.ordinal());
         }
-        writeBoolean(chatColors);
+        writeBoolean(chatColorable);
         if (serverVersion == ServerVersion.V_1_7_10) {
             writeByte(ignoredDifficulty);
             //Show cape
@@ -173,7 +173,7 @@ public class WrapperPlayClientSettings extends PacketWrapper<WrapperPlayClientSe
         }
 
         if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_17)) {
-            writeBoolean(disableTextFiltering);
+            writeBoolean(textFilteringEnabled);
         }
 
         if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_18)) {
@@ -205,14 +205,12 @@ public class WrapperPlayClientSettings extends PacketWrapper<WrapperPlayClientSe
         this.visibility = visibility;
     }
 
-    //TODO Rethink name
-    public boolean isChatColored() {
-        return chatColors;
+    public boolean isChatColorable() {
+        return chatColorable;
     }
 
-    //TODO Rethink name
-    public void setChatColored(boolean chatColors) {
-        this.chatColors = chatColors;
+    public void setChatColorable(boolean chatColorable) {
+        this.chatColorable = chatColorable;
     }
 
     public byte getVisibleSkinSectionMask() {
@@ -250,12 +248,12 @@ public class WrapperPlayClientSettings extends PacketWrapper<WrapperPlayClientSe
         this.hand = hand;
     }
 
-    public boolean isTextFilteringDisabled() {
-        return disableTextFiltering;
+    public boolean isTextFilteringEnabled() {
+        return textFilteringEnabled;
     }
 
-    public void setTextFilteringDisabled(boolean disableTextFiltering) {
-        this.disableTextFiltering = disableTextFiltering;
+    public void setTextFilteringEnabled(boolean textFilteringEnabled) {
+        this.textFilteringEnabled = textFilteringEnabled;
     }
 
     public boolean isServerListingAllowed() {
