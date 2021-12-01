@@ -399,8 +399,12 @@ public class PacketTypeClasses {
                 SET_SUBTITLE_TEXT = Reflection.getClassByNameWithoutException(PREFIX + "ClientboundSetSubtitleTextPacket");
                 SET_TITLES_ANIMATION = Reflection.getClassByNameWithoutException(PREFIX + "ClientboundSetTitlesAnimationPacket");
                 SET_TITLE_TEXT = Reflection.getClassByNameWithoutException(PREFIX + "ClientboundSetTitleTextPacket");
+
+                // 1.18
+                if (MAP_CHUNK == null) {
+                    MAP_CHUNK = Reflection.getClassByNameWithoutException(COMMON_PREFIX + "ClientboundLevelChunkWithLightPacket");
+                }
             }
         }
     }
-
 }
