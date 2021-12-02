@@ -74,7 +74,7 @@ public class WrapperPlayServerPluginMessage extends PacketWrapper<WrapperPlaySer
         if (serverVersion == ServerVersion.V_1_7_10) {
             writeShort(data.length);
         }
-        writeByteArray(data);
+        writeBytes(data);
     }
 
     /**

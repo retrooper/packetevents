@@ -120,9 +120,9 @@ public class InternalPacketListener implements PacketListener {
             BaseComponent chatComponent = msg.getChatComponent();
             if (chatComponent instanceof TextComponent) {
                 TextComponent textComponent = (TextComponent) chatComponent;
-                String message = textComponent.getText();
+                StringBuilder message = new StringBuilder(textComponent.getText());
                 for (BaseComponent children : textComponent.getChildren()) {
-                    message += ((TextComponent) children).getText();
+                    message.append(((TextComponent) children).getText());
                 }
                // System.out.println("Outgoing chat message: " + message);
             } else if (chatComponent instanceof TranslatableComponent) {
@@ -189,6 +189,7 @@ public class InternalPacketListener implements PacketListener {
                     Optional<Integer> transactionID = tabComplete.getTransactionId();
                     transactionID.ifPresent(tabComplete::setTransactionId);
                 } else if (event.getPacketType() == PacketType.Play.Client.INTERACT_ENTITY) {
+                    /*
                     WrapperPlayClientInteractEntity interactEntity = new WrapperPlayClientInteractEntity(event);
 
                     BaseComponent hoverTextComponent = TextComponent.builder()
@@ -217,11 +218,12 @@ public class InternalPacketListener implements PacketListener {
                     //If we forget to do this, it will be done as soon as we send this wrapper for the first time.
                     cm.prepareForSend();
                     PacketEvents.getAPI().getPlayerManager().sendPacket(event.getChannel(), cm);
+                     */
                 } else if (event.getPacketType() == PacketType.Play.Client.PLUGIN_MESSAGE) {
-                    WrapperPlayClientPluginMessage pluginMessage = new WrapperPlayClientPluginMessage(event);
+                   WrapperPlayClientPluginMessage pluginMessage = new WrapperPlayClientPluginMessage(event);
                     String channel = pluginMessage.getChannelName();
                     byte[] data = pluginMessage.getData();
-                   // System.out.println("Received plugin message from a client to this server: " + channel + " with data " + new String(data));
+                    System.out.println("Received plugin message from a client to this server: " + channel + " with data " + new String(data));
                 }
                 break;
         }
