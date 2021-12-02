@@ -26,8 +26,14 @@ jobs:
     - name: Build with Gradle
       run: gradle :clean :build api:clean api:build bukkit:clean bukkit:build bukkit:shadowJar
 
-    - name: Upload build artifacts
+    - name: Upload build artifacts api
       uses: actions/upload-artifact@v1
       with:
-        name: packetevents-dev-build.jar
-        path: **/build/libs
+        name: packetevents-api-dev-build.jar
+        path: api/build/libs
+
+    - name: Upload build artifacts bukkit
+      uses: actions/upload-artifact@v1
+      with:
+        name: packetevents-api-dev-build.jar
+        path: bukkit/build/libs
