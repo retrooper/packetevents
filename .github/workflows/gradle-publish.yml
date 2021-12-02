@@ -24,16 +24,10 @@ jobs:
         settings-path: ${{ github.workspace }} # location for the settings.xml file
 
     - name: Build with Gradle
-      run: gradle :clean :build api:clean api:build bukkit:clean bukkit:build bukkit:shadowJar
+      run: gradle :clean :build :shadowJar
 
-    - name: Upload build artifacts api
+    - name: Upload build artifacts
       uses: actions/upload-artifact@v1
       with:
-        name: packetevents-api-dev-build.jar
-        path: api/build/libs
-
-    - name: Upload build artifacts bukkit
-      uses: actions/upload-artifact@v1
-      with:
-        name: packetevents-api-dev-build.jar
-        path: bukkit/build/libs
+        name: packetevents-dev-build.jar
+        path: build/libs
