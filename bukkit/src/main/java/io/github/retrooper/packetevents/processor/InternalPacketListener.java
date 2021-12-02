@@ -223,7 +223,7 @@ public class InternalPacketListener implements PacketListener {
                    WrapperPlayClientPluginMessage pluginMessage = new WrapperPlayClientPluginMessage(event);
                     String channel = pluginMessage.getChannelName();
                     byte[] data = pluginMessage.getData();
-                    System.out.println("Received plugin message from a client to this server: " + channel + " with data " + new String(data));
+                    //System.out.println("Received plugin message from a client to this server: " + channel + " with data " + new String(data));
                 }
                 break;
         }
