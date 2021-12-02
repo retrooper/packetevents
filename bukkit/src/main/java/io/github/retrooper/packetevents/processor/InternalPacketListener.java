@@ -116,6 +116,7 @@ public class InternalPacketListener implements PacketListener {
             event.setLastUsedWrapper(null);
         }*/
         if (event.getPacketType() == PacketType.Play.Server.CHAT_MESSAGE) {
+            /*
             WrapperPlayServerChatMessage msg = new WrapperPlayServerChatMessage(event);
             BaseComponent chatComponent = msg.getChatComponent();
             if (chatComponent instanceof TextComponent) {
@@ -134,7 +135,7 @@ public class InternalPacketListener implements PacketListener {
                 String name = scoreComponent.getName();
                 String objective = scoreComponent.getObjective();
                // System.out.println("score: " + name + " " + objective + ", value: " + scoreComponent.getValue());
-            }
+            }*/
             //System.out.println("msg: " + msg.getJSONMessage());
         } else if (event.getPacketType() == PacketType.Play.Server.RESPAWN) {
             WrapperPlayServerRespawn respawn = new WrapperPlayServerRespawn(event);
@@ -220,9 +221,9 @@ public class InternalPacketListener implements PacketListener {
                     PacketEvents.getAPI().getPlayerManager().sendPacket(event.getChannel(), cm);
                      */
                 } else if (event.getPacketType() == PacketType.Play.Client.PLUGIN_MESSAGE) {
-                   WrapperPlayClientPluginMessage pluginMessage = new WrapperPlayClientPluginMessage(event);
-                    String channel = pluginMessage.getChannelName();
-                    byte[] data = pluginMessage.getData();
+                   //WrapperPlayClientPluginMessage pluginMessage = new WrapperPlayClientPluginMessage(event);
+                   // String channel = pluginMessage.getChannelName();
+                   // byte[] data = pluginMessage.getData();
                     //System.out.println("Received plugin message from a client to this server: " + channel + " with data " + new String(data));
                 }
                 break;
