@@ -54,7 +54,7 @@ public final class NMSUtils {
     public static Constructor<?> blockPosConstructor, minecraftKeyConstructor, vec3DConstructor, dataWatcherConstructor, packetDataSerializerConstructor, itemStackConstructor;
     public static Class<?> mobEffectListClass, nmsEntityClass, minecraftServerClass, craftWorldClass, playerInteractManagerClass, entityPlayerClass, playerConnectionClass, craftServerClass,
             craftPlayerClass, serverConnectionClass, craftEntityClass, nmsItemStackClass, networkManagerClass, nettyChannelClass, gameProfileClass, iChatBaseComponentClass,
-            blockPosClass, vec3DClass, channelFutureClass, blockClass, iBlockDataClass, nmsWorldClass, craftItemStackClass,
+            blockPosClass, sectionPositionClass, vec3DClass, channelFutureClass, blockClass, iBlockDataClass, nmsWorldClass, craftItemStackClass,
             soundEffectClass, minecraftKeyClass, chatSerializerClass, craftMagicNumbersClass, worldSettingsClass, worldServerClass, dataWatcherClass,
             dedicatedServerClass, entityHumanClass, packetDataSerializerClass, byteBufClass, dimensionManagerClass, nmsItemClass, iMaterialClass, movingObjectPositionBlockClass, boundingBoxClass,
     tileEntityCommandClass;
@@ -245,6 +245,8 @@ public final class NMSUtils {
                 blockPosClass = getNMClassWithoutException("core.BlockPosition");
             }
         }
+        // Added in 1.18
+        sectionPositionClass = getNMClassWithoutException("core.SectionPosition");
 
         if (version.isNewerThanOrEquals(ServerVersion.v_1_14)) {
             movingObjectPositionBlockClass = NMSUtils.getNMSClassWithoutException("MovingObjectPositionBlock");
