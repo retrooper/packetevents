@@ -76,12 +76,12 @@ public class InternalPacketListener implements PacketListener {
             //System.out.println("Spawned entity with ID " + entityID + " of type " + entityType.getIdentifier().getKey() + "=" + entityType.getId() + " at position " + position);
             event.setLastUsedWrapper(null);
         } else if (event.getPacketType() == PacketType.Play.Server.SET_SLOT) {
-            WrapperPlayServerSetSlot setSlot = new WrapperPlayServerSetSlot(event);
+           /* WrapperPlayServerSetSlot setSlot = new WrapperPlayServerSetSlot(event);
             int slot = setSlot.getSlot();
             ItemStack item = setSlot.getItem();
             if (item.getType() == null) {
                 System.out.println("tf!");
-            }
+            }*/
             //System.out.println("Set slot " + slot + " to item " + item);
         } else if (event.getPacketType() == PacketType.Play.Server.PLUGIN_MESSAGE) {
             WrapperPlayServerPluginMessage pluginMessage = new WrapperPlayServerPluginMessage(event);
