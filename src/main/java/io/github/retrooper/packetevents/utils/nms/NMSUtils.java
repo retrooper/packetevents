@@ -337,18 +337,18 @@ public final class NMSUtils {
         }
         //In case its null, these methods are not needed and would cause errors
         if (blockPosClass != null) {
-            getBlockPosX = Reflection.getMethod(NMSUtils.blockPosClass.getSuperclass(), "getX", 0);
-            getBlockPosY = Reflection.getMethod(NMSUtils.blockPosClass.getSuperclass(), "getY", 0);
-            getBlockPosZ = Reflection.getMethod(NMSUtils.blockPosClass.getSuperclass(), "getZ", 0);
+            getBlockPosX = Reflection.getMethod(NMSUtils.blockPosClass, "getX", int.class);
+            getBlockPosY = Reflection.getMethod(NMSUtils.blockPosClass, "getY", int.class);
+            getBlockPosZ = Reflection.getMethod(NMSUtils.blockPosClass, "getZ", int.class);
             // Mappings changed with 1.18
             if (getBlockPosX == null) {
-                getBlockPosX = Reflection.getMethod(NMSUtils.blockPosClass.getSuperclass(), "u", 0);
+                getBlockPosX = Reflection.getMethod(NMSUtils.blockPosClass, "u", int.class);
             }
             if (getBlockPosY == null) {
-                getBlockPosY = Reflection.getMethod(NMSUtils.blockPosClass.getSuperclass(), "v", 0);
+                getBlockPosY = Reflection.getMethod(NMSUtils.blockPosClass, "v", int.class);
             }
             if (getBlockPosZ == null) {
-                getBlockPosZ = Reflection.getMethod(NMSUtils.blockPosClass.getSuperclass(), "w", 0);
+                getBlockPosZ = Reflection.getMethod(NMSUtils.blockPosClass, "w", int.class);
             }
         }
         worldSettingsClass = NMSUtils.getNMSClassWithoutException("WorldSettings");
