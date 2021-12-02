@@ -24,7 +24,7 @@ jobs:
         settings-path: ${{ github.workspace }} # location for the settings.xml file
 
     - name: Build with Gradle
-      run: gradle :clean :build :shadowJar
+      run: gradle :clean :build
 
     - name: Upload build artifacts
       uses: actions/upload-artifact@v1
