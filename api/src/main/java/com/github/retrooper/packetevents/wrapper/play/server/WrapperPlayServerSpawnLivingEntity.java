@@ -35,7 +35,7 @@ public class WrapperPlayServerSpawnLivingEntity extends PacketWrapper<WrapperPla
     private static final float ROTATION_FACTOR = 256.0F / 360.0F;
     private static final double VELOCITY_FACTOR = 8000.0;
     private int entityID;
-    private Optional<UUID> entityUUID;
+    private UUID entityUUID;
     private EntityType entityType;
     private Vector3d position;
     private float yaw;
@@ -47,7 +47,7 @@ public class WrapperPlayServerSpawnLivingEntity extends PacketWrapper<WrapperPla
         super(event);
     }
 
-    public WrapperPlayServerSpawnLivingEntity(int entityID, Optional<UUID> entityUUID, EntityType entityType, Vector3d position, float yaw, float pitch, float headPitch, Vector3d velocity) {
+    public WrapperPlayServerSpawnLivingEntity(int entityID, UUID entityUUID, EntityType entityType, Vector3d position, float yaw, float pitch, float headPitch, Vector3d velocity) {
         super(PacketType.Play.Server.SPAWN_LIVING_ENTITY);
         this.entityID = entityID;
         this.entityUUID = entityUUID;
@@ -63,12 +63,12 @@ public class WrapperPlayServerSpawnLivingEntity extends PacketWrapper<WrapperPla
     public void readData() {
         this.entityID = readVarInt();
         if (serverVersion.isOlderThan(ServerVersion.V_1_9)) {
-            this.entityUUID = Optional.empty();
+            this.entityUUID = new UUID(0L, 0L);
             int entityTypeID = readByte() & 255;
             entityType = EntityTypes.getById(entityTypeID);
             this.position = new Vector3d(readInt() / POSITION_FACTOR, readInt() / POSITION_FACTOR, readInt() / POSITION_FACTOR);
         } else {
-            this.entityUUID = Optional.of(readUUID());
+            this.entityUUID = readUUID();
             int entityTypeID;
             if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_11)) {
                 entityTypeID = readVarInt();
@@ -110,7 +110,7 @@ public class WrapperPlayServerSpawnLivingEntity extends PacketWrapper<WrapperPla
             writeInt(MathUtil.floor(position.y * POSITION_FACTOR));
             writeInt(MathUtil.floor(position.z * POSITION_FACTOR));
         } else {
-            writeUUID(entityUUID.orElse(new UUID(0L, 0L)));
+            writeUUID(entityUUID);
             if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_11)) {
                 writeVarInt(entityType.getId());
             } else {
@@ -137,11 +137,11 @@ public class WrapperPlayServerSpawnLivingEntity extends PacketWrapper<WrapperPla
         this.entityID = entityID;
     }
 
-    public Optional<UUID> getEntityUUID() {
+    public UUID getEntityUUID() {
         return entityUUID;
     }
 
-    public void setEntityUUID(Optional<UUID> entityUUID) {
+    public void setEntityUUID(UUID entityUUID) {
         this.entityUUID = entityUUID;
     }
 

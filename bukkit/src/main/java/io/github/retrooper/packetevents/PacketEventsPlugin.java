@@ -25,12 +25,18 @@ import com.github.retrooper.packetevents.event.impl.PacketSendEvent;
 import com.github.retrooper.packetevents.factory.bukkit.BukkitPacketEventsBuilder;
 import com.github.retrooper.packetevents.protocol.chat.component.BaseComponent;
 import com.github.retrooper.packetevents.protocol.chat.component.impl.TextComponent;
+import com.github.retrooper.packetevents.protocol.inventory.ItemStack;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.protocol.player.Hand;
+import com.github.retrooper.packetevents.util.Vector3d;
 import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientInteractEntity;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerChatMessage;
+import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerSetSlot;
+import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerSpawnLivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
+
+import java.util.UUID;
 
 public class PacketEventsPlugin extends JavaPlugin {
     @Override
@@ -91,7 +97,24 @@ public class PacketEventsPlugin extends JavaPlugin {
                         }
                         System.out.println("Text: " + text);
                     }
+                } else if (event.getPacketType() == PacketType.Play.Server.SPAWN_LIVING_ENTITY) {
+                    WrapperPlayServerSpawnLivingEntity spawnMob = new WrapperPlayServerSpawnLivingEntity(event);
+                    int entityID = spawnMob.getEntityId();
+                    UUID uuid = spawnMob.getEntityUUID();
+                    Vector3d position = spawnMob.getPosition();
+                    if (player != null) {
+                        player.sendMessage("Spawned entity with id: " + entityID + ", with uuid: " + uuid + ", at position: " + position);
+                    }
+                } else if (event.getPacketType() == PacketType.Play.Server.SET_SLOT) {
+                    WrapperPlayServerSetSlot setSlot = new WrapperPlayServerSetSlot(event);
+                    int windowID = setSlot.getWindowId();
+                    int slot = setSlot.getSlot();
+                    ItemStack item = setSlot.getItem();
+                    if (player != null) {
+                        player.sendMessage("Set slot with window ID: " + windowID + ", slot: " + slot + ", item: " + (item != null ? item.toString() : "null item"));
+                    }
                 }
+                //TODO Complete chunk data packet
             }
         };
         PacketEvents.getAPI().getEventManager().registerListener(debugListener);
