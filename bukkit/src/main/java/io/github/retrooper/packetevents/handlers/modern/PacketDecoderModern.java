@@ -120,14 +120,6 @@ public class PacketDecoderModern extends ByteToMessageDecoder {
         }
     }
 
-    @Override
-    public void channelInactive(ChannelHandlerContext ctx) throws Exception {
-        //System.out.println("Destroying channel...");
-        ServerConnectionInitializerModern.postDestroyChannel(ctx.channel());
-        //TODO Check if this is necessary, because this might be causing issues!
-        super.channelInactive(ctx);
-    }
-
     private boolean handleCompressionOrder(ChannelHandlerContextAbstract ctx, ByteBufAbstract buf) {
         if (handledCompression) return false;
 

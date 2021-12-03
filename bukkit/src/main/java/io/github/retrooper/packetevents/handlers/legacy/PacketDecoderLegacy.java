@@ -64,12 +64,6 @@ public class PacketDecoderLegacy extends ByteToMessageDecoder {
         handle(PacketEvents.getAPI().getNettyManager().wrapChannelHandlerContext(ctx), PacketEvents.getAPI().getNettyManager().wrapByteBuf(byteBuf), out);
     }
 
-    @Override
-    public void channelInactive(ChannelHandlerContext ctx) throws Exception {
-        ServerConnectionInitializerLegacy.postDestroyChannel(ctx.channel());
-        super.channelInactive(ctx);
-    }
-
     private boolean handleCompressionOrder(ChannelHandlerContextAbstract ctx, ByteBufAbstract buf) {
         if (handledCompression) return false;
 

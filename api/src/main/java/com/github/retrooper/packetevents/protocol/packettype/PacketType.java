@@ -291,7 +291,7 @@ public final class PacketType {
                 return null;
             }
 
-            private static void loadPacketIDs(ClientVersion version, Enum<?>[] enumConstants) {
+            private static void loadPacketIds(ClientVersion version, Enum<?>[] enumConstants) {
                 int serverProtocolVersion = PacketEvents.getAPI().getServerManager().getVersion().getProtocolVersion();
                 Map<Integer, PacketTypeCommon> innerMap = new IdentityHashMap<>();
                 Map<PacketTypeCommon, Integer> secondInnerMap = new IdentityHashMap<>();
@@ -308,34 +308,35 @@ public final class PacketType {
             }
 
             public static void load() {
-                loadPacketIDs(ClientVersion.V_1_7_10, ServerboundPacketType_1_7_10.values());
-                loadPacketIDs(ClientVersion.V_1_8, ServerboundPacketType_1_8.values());
-                loadPacketIDs(ClientVersion.V_1_9, ServerboundPacketType_1_9.values());
-                loadPacketIDs(ClientVersion.V_1_9_1, ServerboundPacketType_1_9.values());
-                loadPacketIDs(ClientVersion.V_1_9_2, ServerboundPacketType_1_9.values());
-                loadPacketIDs(ClientVersion.V_1_9_3, ServerboundPacketType_1_9.values());
-                loadPacketIDs(ClientVersion.V_1_10, ServerboundPacketType_1_9.values());
-                loadPacketIDs(ClientVersion.V_1_11, ServerboundPacketType_1_9.values());
-                loadPacketIDs(ClientVersion.V_1_11_1, ServerboundPacketType_1_9.values());
-                loadPacketIDs(ClientVersion.V_1_12, ServerboundPacketType_1_12.values());
-                loadPacketIDs(ClientVersion.V_1_12_1, ServerboundPacketType_1_12_1.values());
-                loadPacketIDs(ClientVersion.V_1_12_2, ServerboundPacketType_1_12_1.values());
-                loadPacketIDs(ClientVersion.V_1_13, ServerboundPacketType_1_13.values());
-                loadPacketIDs(ClientVersion.V_1_14, ServerboundPacketType_1_14.values());
-                loadPacketIDs(ClientVersion.V_1_14_1, ServerboundPacketType_1_14.values());
-                loadPacketIDs(ClientVersion.V_1_14_2, ServerboundPacketType_1_14.values());
-                loadPacketIDs(ClientVersion.V_1_14_3, ServerboundPacketType_1_14.values());
-                loadPacketIDs(ClientVersion.V_1_14_4, ServerboundPacketType_1_14.values());
-                loadPacketIDs(ClientVersion.V_1_15, ServerboundPacketType_1_14.values());
-                loadPacketIDs(ClientVersion.V_1_15_1, ServerboundPacketType_1_14.values());
-                loadPacketIDs(ClientVersion.V_1_15_2, ServerboundPacketType_1_15_2.values());
-                loadPacketIDs(ClientVersion.V_1_16, ServerboundPacketType_1_16.values());
-                loadPacketIDs(ClientVersion.V_1_16_1, ServerboundPacketType_1_16.values());
-                loadPacketIDs(ClientVersion.V_1_16_2, ServerboundPacketType_1_16_2.values());
-                loadPacketIDs(ClientVersion.V_1_16_3, ServerboundPacketType_1_16_2.values());
-                loadPacketIDs(ClientVersion.V_1_16_4, ServerboundPacketType_1_16_2.values());
-                loadPacketIDs(ClientVersion.V_1_17, ServerboundPacketType_1_17.values());
-                loadPacketIDs(ClientVersion.V_1_17_1, ServerboundPacketType_1_17.values());
+                loadPacketIds(ClientVersion.V_1_7_10, ServerboundPacketType_1_7_10.values());
+                loadPacketIds(ClientVersion.V_1_8, ServerboundPacketType_1_8.values());
+                loadPacketIds(ClientVersion.V_1_9, ServerboundPacketType_1_9.values());
+                loadPacketIds(ClientVersion.V_1_9_1, ServerboundPacketType_1_9.values());
+                loadPacketIds(ClientVersion.V_1_9_2, ServerboundPacketType_1_9.values());
+                loadPacketIds(ClientVersion.V_1_9_3, ServerboundPacketType_1_9.values());
+                loadPacketIds(ClientVersion.V_1_10, ServerboundPacketType_1_9.values());
+                loadPacketIds(ClientVersion.V_1_11, ServerboundPacketType_1_9.values());
+                loadPacketIds(ClientVersion.V_1_11_1, ServerboundPacketType_1_9.values());
+                loadPacketIds(ClientVersion.V_1_12, ServerboundPacketType_1_12.values());
+                loadPacketIds(ClientVersion.V_1_12_1, ServerboundPacketType_1_12_1.values());
+                loadPacketIds(ClientVersion.V_1_12_2, ServerboundPacketType_1_12_1.values());
+                loadPacketIds(ClientVersion.V_1_13, ServerboundPacketType_1_13.values());
+                loadPacketIds(ClientVersion.V_1_14, ServerboundPacketType_1_14.values());
+                loadPacketIds(ClientVersion.V_1_14_1, ServerboundPacketType_1_14.values());
+                loadPacketIds(ClientVersion.V_1_14_2, ServerboundPacketType_1_14.values());
+                loadPacketIds(ClientVersion.V_1_14_3, ServerboundPacketType_1_14.values());
+                loadPacketIds(ClientVersion.V_1_14_4, ServerboundPacketType_1_14.values());
+                loadPacketIds(ClientVersion.V_1_15, ServerboundPacketType_1_14.values());
+                loadPacketIds(ClientVersion.V_1_15_1, ServerboundPacketType_1_14.values());
+                loadPacketIds(ClientVersion.V_1_15_2, ServerboundPacketType_1_15_2.values());
+                loadPacketIds(ClientVersion.V_1_16, ServerboundPacketType_1_16.values());
+                loadPacketIds(ClientVersion.V_1_16_1, ServerboundPacketType_1_16.values());
+                loadPacketIds(ClientVersion.V_1_16_2, ServerboundPacketType_1_16_2.values());
+                loadPacketIds(ClientVersion.V_1_16_3, ServerboundPacketType_1_16_2.values());
+                loadPacketIds(ClientVersion.V_1_16_4, ServerboundPacketType_1_16_2.values());
+                loadPacketIds(ClientVersion.V_1_17, ServerboundPacketType_1_17.values());
+                loadPacketIds(ClientVersion.V_1_17_1, ServerboundPacketType_1_17.values());
+                loadPacketIds(ClientVersion.V_1_18, ServerboundPacketType_1_17.values());
             }
 
             public int getId() {
@@ -447,6 +448,7 @@ public final class PacketType {
             SET_PASSENGERS,
             TEAMS,
             UPDATE_SCORE,
+            UPDATE_SIMULATION_DISTANCE,
             SET_TITLE_SUBTITLE,
             TIME_UPDATE,
             SET_TITLE_TEXT,
@@ -472,7 +474,7 @@ public final class PacketType {
                 return PACKET_ID_CACHE.get(packetID);
             }
 
-            private static void loadPacketIDs(Enum<?>[] enumConstants) {
+            private static void loadPacketIds(Enum<?>[] enumConstants) {
                 for (int id = 0; id < enumConstants.length; id++) {
                     Server value = Server.valueOf(enumConstants[id].name());
                     value.id = id;
@@ -484,60 +486,63 @@ public final class PacketType {
                 ServerVersion version = PacketEvents.getAPI().getServerManager().getVersion();
                 //1.7.10
                 if (version == ServerVersion.V_1_7_10) {
-                    loadPacketIDs(ClientboundPacketType_1_7_10.values());
+                    loadPacketIds(ClientboundPacketType_1_7_10.values());
                 }
                 //1.8 - 1.8.8
                 else if (version.isOlderThan(ServerVersion.V_1_9)) {
-                    loadPacketIDs(ClientboundPacketType_1_8.values());
+                    loadPacketIds(ClientboundPacketType_1_8.values());
                 }
                 //1.9 - 1.9.2
                 //(Should be 1.9 - 1.9.3, but I can't find a 1.9.3 build of Spigot)
                 else if (version.isOlderThan(ServerVersion.V_1_9_4)) {
-                    loadPacketIDs(ClientboundPacketType_1_9.values());
+                    loadPacketIds(ClientboundPacketType_1_9.values());
                 }
                 //1.10 - 1.11.2
                 else if (version.isOlderThan(ServerVersion.V_1_12)) {
-                    loadPacketIDs(ClientboundPacketType_1_9_3.values());
+                    loadPacketIds(ClientboundPacketType_1_9_3.values());
                 }
                 //1.12
                 else if (version.isOlderThan(ServerVersion.V_1_12_1)) {
-                    loadPacketIDs(ClientboundPacketType_1_12.values());
+                    loadPacketIds(ClientboundPacketType_1_12.values());
                 }
                 //1.12.1 - 1.12.2
                 else if (version.isOlderThan(ServerVersion.V_1_13)) {
-                    loadPacketIDs(ClientboundPacketType_1_12_1.values());
+                    loadPacketIds(ClientboundPacketType_1_12_1.values());
                 }
                 //1.13 - 1.13.2
                 else if (version.isOlderThan(ServerVersion.V_1_14)) {
-                    loadPacketIDs(ClientboundPacketType_1_13.values());
+                    loadPacketIds(ClientboundPacketType_1_13.values());
                 }
                 //1.14 - 1.14.3
                 else if (version.isOlderThan(ServerVersion.V_1_14_4)) {
-                    loadPacketIDs(ClientboundPacketType_1_14.values());
+                    loadPacketIds(ClientboundPacketType_1_14.values());
                 }
                 //1.14.4
                 else if (version.isOlderThan(ServerVersion.V_1_15)) {
-                    loadPacketIDs(ClientboundPacketType_1_14_4.values());
+                    loadPacketIds(ClientboundPacketType_1_14_4.values());
                 }
                 //1.15 - 1.15.1
                 else if (version.isOlderThan(ServerVersion.V_1_15_2)) {
-                    loadPacketIDs(ClientboundPacketType_1_15.values());
+                    loadPacketIds(ClientboundPacketType_1_15.values());
                 }
                 //1.15.2
                 else if (version.isOlderThan(ServerVersion.V_1_16)) {
-                    loadPacketIDs(ClientboundPacketType_1_15_2.values());
+                    loadPacketIds(ClientboundPacketType_1_15_2.values());
                 }
                 //1.16 - 1.16.1
                 else if (version.isOlderThan(ServerVersion.V_1_16_2)) {
-                    loadPacketIDs(ClientboundPacketType_1_16.values());
+                    loadPacketIds(ClientboundPacketType_1_16.values());
                 }
                 //1.16.2 - 1.16.5
                 else if (version.isOlderThan(ServerVersion.V_1_17)) {
-                    loadPacketIDs(ClientboundPacketType_1_16_2.values());
+                    loadPacketIds(ClientboundPacketType_1_16_2.values());
                 }
                 //1.17 - 1.17.1
+                else if (version.isOlderThan(ServerVersion.V_1_18)) {
+                    loadPacketIds(ClientboundPacketType_1_17.values());
+                }
                 else {
-                    loadPacketIDs(ClientboundPacketType_1_17.values());
+                    loadPacketIds(ClientboundPacketType_1_18.values());
                 }
             }
 
