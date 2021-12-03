@@ -24,28 +24,14 @@ import com.github.retrooper.packetevents.event.impl.PacketReceiveEvent;
 import com.github.retrooper.packetevents.event.impl.PacketSendEvent;
 import com.github.retrooper.packetevents.manager.player.attributes.TabCompleteAttribute;
 import com.github.retrooper.packetevents.protocol.ConnectionState;
-import com.github.retrooper.packetevents.protocol.chat.Color;
-import com.github.retrooper.packetevents.protocol.chat.component.BaseComponent;
-import com.github.retrooper.packetevents.protocol.chat.component.HoverEvent;
-import com.github.retrooper.packetevents.protocol.chat.component.impl.ScoreComponent;
-import com.github.retrooper.packetevents.protocol.chat.component.impl.TextComponent;
-import com.github.retrooper.packetevents.protocol.chat.component.impl.TranslatableComponent;
-import com.github.retrooper.packetevents.protocol.entity.EntityType;
-import com.github.retrooper.packetevents.protocol.entity.EntityTypes;
-import com.github.retrooper.packetevents.protocol.inventory.ItemStack;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.protocol.player.ClientVersion;
-import com.github.retrooper.packetevents.util.Vector3d;
 import com.github.retrooper.packetevents.wrapper.handshaking.client.WrapperHandshakingClientHandshake;
 import com.github.retrooper.packetevents.wrapper.login.client.WrapperLoginClientLoginStart;
-import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientInteractEntity;
-import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientPluginMessage;
 import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientTabComplete;
-import com.github.retrooper.packetevents.wrapper.play.server.*;
 import org.bukkit.entity.Player;
 
 import java.util.Optional;
-import java.util.UUID;
 
 public class InternalPacketListener implements PacketListener {
     //Make this specific event be at MONITOR priority
@@ -55,92 +41,7 @@ public class InternalPacketListener implements PacketListener {
         if (event.getPacketType() == PacketType.Login.Server.LOGIN_SUCCESS) {
             //Transition into the PLAY connection state
             PacketEvents.getAPI().getPlayerManager().changeConnectionState(event.getChannel(), ConnectionState.PLAY);
-        } else if (event.getPacketType() == PacketType.Play.Server.CHAT_MESSAGE) {
-            /*
-            WrapperPlayServerChatMessage chatMessage = new WrapperPlayServerChatMessage(event);
-            List<TextComponent> components = chatMessage.getMessageComponents();
-            for (TextComponent component : components) {
-                System.out.println("Component part: " + component.getText());
-            }
-            String jsonMessage = ComponentSerializer.buildJSONString(components);
-            System.out.println("JSON Message: " + jsonMessage);*/
-        } else if (event.getPacketType() == PacketType.Play.Server.SPAWN_LIVING_ENTITY) {
-            /*
-            WrapperPlayServerSpawnLivingEntity spawnLivingEntity = new WrapperPlayServerSpawnLivingEntity(event);
-            int entityID = spawnLivingEntity.getEntityId();
-            EntityType entityType = spawnLivingEntity.getEntityType();
-            if (entityType.equals(EntityTypes.PLAYER)) {
-                //This is a player
-                //System.out.println("Spawning a player...");
-            }
-            Vector3d position = spawnLivingEntity.getPosition();
-            //System.out.println("Spawned entity with ID " + entityID + " of type " + entityType.getIdentifier().getKey() + "=" + entityType.getId() + " at position " + position);
-            event.setLastUsedWrapper(null);*/
-        } else if (event.getPacketType() == PacketType.Play.Server.SET_SLOT) {
-           /* WrapperPlayServerSetSlot setSlot = new WrapperPlayServerSetSlot(event);
-            int slot = setSlot.getSlot();
-            ItemStack item = setSlot.getItem();
-            if (item.getType() == null) {
-                System.out.println("tf!");
-            }*/
-            //System.out.println("Set slot " + slot + " to item " + item);
         }
-        /*
-        else if (event.getPacketType() == PacketType.Play.Server.CHUNK_DATA) {
-            WrapperPlayServerChunkData chunkData = new WrapperPlayServerChunkData(event);
-            Column column = chunkData.getColumn();
-            int x = column.getX();
-            int z = column.getZ();
-            NBTCompound heightMaps = column.getHeightMaps();
-            if (player != null) {
-                //   player.sendMessage("X: " + x + ", Z: " + z);
-                //  player.sendMessage("HEIGHT MAPS: " + heightMaps.getTagNames());
-                //  player.sendMessage("CHUNKS:");
-                //TODO Credit in all chunk related classes
-                for (BaseChunk chunk : column.getChunks()) {
-                    try {
-                        BaseBlockState state = chunk.get(column.getX(), player.getLocation().getBlockY(), column.getZ());
-                        if (state != null) {
-                            //player.sendMessage("Jackpot!");
-                            //player.sendMessage("Block type: " + state.getCombinedId());
-                        }
-                    } catch (Exception ignored) {
-
-                    }
-                }
-            }
-            event.setLastUsedWrapper(null);
-        }*/
-        if (event.getPacketType() == PacketType.Play.Server.CHAT_MESSAGE) {
-            /*
-            WrapperPlayServerChatMessage msg = new WrapperPlayServerChatMessage(event);
-            BaseComponent chatComponent = msg.getChatComponent();
-            if (chatComponent instanceof TextComponent) {
-                TextComponent textComponent = (TextComponent) chatComponent;
-                StringBuilder message = new StringBuilder(textComponent.getText());
-                for (BaseComponent children : textComponent.getChildren()) {
-                    message.append(((TextComponent) children).getText());
-                }
-               // System.out.println("Outgoing chat message: " + message);
-            } else if (chatComponent instanceof TranslatableComponent) {
-                TranslatableComponent translatableComponent = (TranslatableComponent) chatComponent;
-                String translate = translatableComponent.getTranslate();
-                //System.out.println("translate: " + translate);
-            } else if (chatComponent instanceof ScoreComponent) {
-                ScoreComponent scoreComponent = (ScoreComponent) chatComponent;
-                String name = scoreComponent.getName();
-                String objective = scoreComponent.getObjective();
-               // System.out.println("score: " + name + " " + objective + ", value: " + scoreComponent.getValue());
-            }*/
-            //System.out.println("msg: " + msg.getJSONMessage());
-        } /*else if (event.getPacketType() == PacketType.Play.Server.TAB_COMPLETE) {
-            WrapperPlayServerTabComplete tabComplete = new WrapperPlayServerTabComplete(event);
-            String lastInput = PacketEvents.getAPI().getPlayerManager().getAttribute(player.getUniqueId(), TabCompleteAttribute.class).getInput();
-            System.out.println("Last input length: " + lastInput.length() + ", Last input: " + lastInput);
-            for (WrapperPlayServerTabComplete.CommandMatch match : tabComplete.getCommandMatches()) {
-                System.out.println("MATCH: " + match.getText());
-            }
-        }*/
     }
 
     @Override
@@ -180,42 +81,6 @@ public class InternalPacketListener implements PacketListener {
                     tabCompleteAttribute.setInput(text);
                     Optional<Integer> transactionID = tabComplete.getTransactionId();
                     transactionID.ifPresent(tabComplete::setTransactionId);
-                } else if (event.getPacketType() == PacketType.Play.Client.INTERACT_ENTITY) {
-                    /*
-                    WrapperPlayClientInteractEntity interactEntity = new WrapperPlayClientInteractEntity(event);
-
-                    BaseComponent hoverTextComponent = TextComponent.builder()
-                            .text("action: " + interactEntity.getAction())
-                            .color(Color.GOLD)
-                            .bold(true)
-                            .append(TextComponent.builder()
-                                    .text(" btw this chat packet was sent with packetevents")
-                                    .color(Color.YELLOW)
-                                    .italic(true)
-                                    .bold(false)
-                                    .build())
-                            .build();
-
-                    TextComponent chatComponent = TextComponent.builder()
-                            .text("id: " + interactEntity.getEntityId() + " ")
-                            .color(Color.BRIGHT_GREEN)
-                            .italic(true)
-                            .hoverEvent(new HoverEvent(HoverEvent.HoverType.SHOW_TEXT, hoverTextComponent))
-                            .build();
-
-
-                    UUID uuid = player != null ? player.getUniqueId() : new UUID(0L, 0L);
-                    WrapperPlayServerChatMessage cm = new WrapperPlayServerChatMessage(chatComponent, WrapperPlayServerChatMessage.ChatPosition.CHAT, uuid);
-                    //We may optionally serialize the packet into a ByteBuf before-hand.
-                    //If we forget to do this, it will be done as soon as we send this wrapper for the first time.
-                    cm.prepareForSend();
-                    PacketEvents.getAPI().getPlayerManager().sendPacket(event.getChannel(), cm);
-                     */
-                } else if (event.getPacketType() == PacketType.Play.Client.PLUGIN_MESSAGE) {
-                   //WrapperPlayClientPluginMessage pluginMessage = new WrapperPlayClientPluginMessage(event);
-                   // String channel = pluginMessage.getChannelName();
-                   // byte[] data = pluginMessage.getData();
-                    //System.out.println("Received plugin message from a client to this server: " + channel + " with data " + new String(data));
                 }
                 break;
         }

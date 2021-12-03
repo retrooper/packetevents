@@ -19,7 +19,17 @@
 package io.github.retrooper.packetevents;
 
 import com.github.retrooper.packetevents.PacketEvents;
+import com.github.retrooper.packetevents.event.PacketListenerAbstract;
+import com.github.retrooper.packetevents.event.impl.PacketReceiveEvent;
+import com.github.retrooper.packetevents.event.impl.PacketSendEvent;
 import com.github.retrooper.packetevents.factory.bukkit.BukkitPacketEventsBuilder;
+import com.github.retrooper.packetevents.protocol.chat.component.BaseComponent;
+import com.github.retrooper.packetevents.protocol.chat.component.impl.TextComponent;
+import com.github.retrooper.packetevents.protocol.packettype.PacketType;
+import com.github.retrooper.packetevents.protocol.player.Hand;
+import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientInteractEntity;
+import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerChatMessage;
+import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 
 public class PacketEventsPlugin extends JavaPlugin {
@@ -48,6 +58,43 @@ public class PacketEventsPlugin extends JavaPlugin {
 
 
         net.minecraft.server.v1_16_R2.PacketPlayOutBlockChange em;
+
+        PacketListenerAbstract debugListener = new PacketListenerAbstract() {
+            @Override
+            public void onPacketReceive(PacketReceiveEvent event) {
+                Player player = event.getPlayer() == null ? null : (Player) event.getPlayer();
+                if (event.getPacketType() == PacketType.Play.Client.INTERACT_ENTITY) {
+                    WrapperPlayClientInteractEntity interactEntity = new WrapperPlayClientInteractEntity(event);
+                    int entityID = interactEntity.getEntityId();
+                    WrapperPlayClientInteractEntity.InteractAction action = interactEntity.getAction();
+                    Hand hand = interactEntity.getHand();
+                    player.sendMessage("Entity ID: " + entityID);
+                    player.sendMessage("Action: " + action);
+                    player.sendMessage("Hand: " + hand);
+                }
+            }
+
+            @Override
+            public void onPacketSend(PacketSendEvent event) {
+                Player player = event.getPlayer() == null ? null : (Player) event.getPlayer();
+                if (event.getPacketType() == PacketType.Play.Server.CHAT_MESSAGE) {
+                    WrapperPlayServerChatMessage chatMessage = new WrapperPlayServerChatMessage(event);
+                    BaseComponent chatComponent = chatMessage.getChatComponent();
+                    if (chatComponent instanceof TextComponent) {
+                        TextComponent textComponent = (TextComponent) chatComponent;
+                        StringBuilder text = new StringBuilder(textComponent.getColor().getFullCode() + textComponent.getText());
+                        for (BaseComponent child : textComponent.getChildren()) {
+                            if (child instanceof TextComponent) {
+                                TextComponent textChild = (TextComponent) child;
+                                text.append(textChild.getColor().getFullCode()).append(textChild.getText());
+                            }
+                        }
+                        System.out.println("Text: " + text);
+                    }
+                }
+            }
+        };
+        PacketEvents.getAPI().getEventManager().registerListener(debugListener);
     }
 
     @Override
