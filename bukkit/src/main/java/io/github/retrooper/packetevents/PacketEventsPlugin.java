@@ -97,6 +97,7 @@ public class PacketEventsPlugin extends JavaPlugin {
                         }
                         System.out.println("Text: " + text);
                     }
+                    //TODO Fix translatable chat components
                 } else if (event.getPacketType() == PacketType.Play.Server.SPAWN_LIVING_ENTITY) {
                     WrapperPlayServerSpawnLivingEntity spawnMob = new WrapperPlayServerSpawnLivingEntity(event);
                     int entityID = spawnMob.getEntityId();
@@ -105,19 +106,21 @@ public class PacketEventsPlugin extends JavaPlugin {
                     if (player != null) {
                         player.sendMessage("Spawned entity with id: " + entityID + ", with uuid: " + uuid + ", at position: " + position);
                     }
+                    //TODO Complete spawn living entity for outdated versions
+                    event.setLastUsedWrapper(null);
                 } else if (event.getPacketType() == PacketType.Play.Server.SET_SLOT) {
                     WrapperPlayServerSetSlot setSlot = new WrapperPlayServerSetSlot(event);
                     int windowID = setSlot.getWindowId();
                     int slot = setSlot.getSlot();
                     ItemStack item = setSlot.getItem();
                     if (player != null) {
-                        player.sendMessage("Set slot with window ID: " + windowID + ", slot: " + slot + ", item: " + (item != null ? item.toString() : "null item"));
+                        player.sendMessage("Set slot with window ID: " + windowID + ", slot: " + slot + ", item: " + (item.getType() != null ? item.toString() : "null item"));
                     }
                 }
                 //TODO Complete chunk data packet
             }
         };
-        PacketEvents.getAPI().getEventManager().registerListener(debugListener);
+        //PacketEvents.getAPI().getEventManager().registerListener(debugListener);
     }
 
     @Override

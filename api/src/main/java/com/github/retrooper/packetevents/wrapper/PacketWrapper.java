@@ -278,7 +278,7 @@ public class PacketWrapper<T extends PacketWrapper> {
             }
         } else {
             int typeID;
-            if (itemStack.getType() == null || ItemStack.NULL.equals(itemStack)) {
+            if (itemStack.getType() == null || itemStack.getAmount() == -1) {
                 typeID = -1;
             }
             else {
