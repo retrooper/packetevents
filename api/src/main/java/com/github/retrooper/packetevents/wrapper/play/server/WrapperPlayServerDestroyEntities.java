@@ -90,11 +90,11 @@ public class WrapperPlayServerDestroyEntities extends PacketWrapper<WrapperPlayS
         }
     }
 
-    public int[] getEntityIDs() {
+    public int[] getEntityIds() {
         return entityIDs;
     }
 
-    public void setEntityIDs(int[] entityIDs) {
+    public void setEntityIds(int[] entityIDs) {
         this.entityIDs = entityIDs;
     }
 }

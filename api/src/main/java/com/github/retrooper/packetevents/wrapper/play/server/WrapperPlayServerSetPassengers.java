@@ -1,6 +1,7 @@
 package com.github.retrooper.packetevents.wrapper.play.server;
 
 import com.github.retrooper.packetevents.event.impl.PacketSendEvent;
+import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 
 public class WrapperPlayServerSetPassengers extends PacketWrapper<WrapperPlayServerSetPassengers> {
@@ -9,6 +10,12 @@ public class WrapperPlayServerSetPassengers extends PacketWrapper<WrapperPlaySer
 
     public WrapperPlayServerSetPassengers(PacketSendEvent event) {
         super(event);
+    }
+
+    public WrapperPlayServerSetPassengers(int entityId, int[] passengers) {
+        super(PacketType.Play.Server.SET_PASSENGERS);
+        this.entityId = entityId;
+        this.passengers = passengers;
     }
 
     @Override

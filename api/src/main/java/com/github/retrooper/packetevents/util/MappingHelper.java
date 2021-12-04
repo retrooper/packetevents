@@ -35,24 +35,15 @@ import java.util.Map;
 public class MappingHelper {
     public static final Map<String, JsonObject> MAPPING_JSON_OBJECTS = new HashMap<>();
 
-    public static int transformID(JsonObject mappingsJsonObject, int id, int targetProtocolVersion) {
-        for (ClientVersion version : ClientVersion.reversedValues()) {
-            if (!version.name().startsWith("V_")) {
-                continue;
-            }
-            String jsonName = version.name().substring(2);
-            if (mappingsJsonObject.has(jsonName)) {
-                JsonObject jsonObject = mappingsJsonObject.getAsJsonObject(jsonName);
-                String inputIDStr = String.valueOf(id);
-                if (jsonObject.has(inputIDStr)) {
-                    id = jsonObject.get(inputIDStr).getAsInt();
-                }
-                else {
-                    continue;
-                }
-            }
-            if (version.getProtocolVersion() == targetProtocolVersion) {
-                return id;
+    //TODO When updating legacyitemtypes, make sure to name 1_9_4 to 1_9_3
+    public static int transformId(JsonObject mappingsJsonObject, int id, int targetProtocolVersion) {
+        ClientVersion targetClientVersion = ClientVersion.getClientVersionByProtocolVersion(targetProtocolVersion);
+        String jsonName = targetClientVersion.name().substring(2);
+        if (mappingsJsonObject.has(jsonName)) {
+            JsonObject jsonObject = mappingsJsonObject.getAsJsonObject(jsonName);
+            String idString = String.valueOf(id);
+            if (jsonObject.has(idString)) {
+                return jsonObject.get(idString).getAsInt();
             }
         }
         return id;

@@ -2,6 +2,7 @@ package com.github.retrooper.packetevents.wrapper.play.server;
 
 import com.github.retrooper.packetevents.event.impl.PacketSendEvent;
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
+import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.protocol.potion.PotionType;
 import com.github.retrooper.packetevents.protocol.potion.PotionTypes;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
@@ -20,6 +21,25 @@ public class WrapperPlayServerEntityEffect extends PacketWrapper<WrapperPlayServ
 
     public WrapperPlayServerEntityEffect(PacketSendEvent event) {
         super(event);
+    }
+
+    public WrapperPlayServerEntityEffect(int entityID, int effectID, int amplifier, int duration, byte flags) {
+        super(PacketType.Play.Server.ENTITY_EFFECT);
+        this.entityID = entityID;
+        this.effectID = effectID;
+        this.effectAmplifier = amplifier;
+        this.effectDurationTicks = duration;
+        this.flags = flags;
+    }
+
+
+    public WrapperPlayServerEntityEffect(int entityID, PotionType effect, int amplifier, int duration, byte flags) {
+        super(PacketType.Play.Server.ENTITY_EFFECT);
+        this.entityID = entityID;
+        this.effectID = effect.getId();
+        this.effectAmplifier = amplifier;
+        this.effectDurationTicks = duration;
+        this.flags = flags;
     }
 
     @Override
@@ -58,22 +78,22 @@ public class WrapperPlayServerEntityEffect extends PacketWrapper<WrapperPlayServ
     }
 
     public void setPotionType(PotionType type) {
-        setEffectID(type.getId());
+        setEffectId(type.getId());
     }
 
-    public int getEntityID() {
+    public int getEntityId() {
         return entityID;
     }
 
-    public void setEntityID(int entityID) {
+    public void setEntityId(int entityID) {
         this.entityID = entityID;
     }
 
-    public int getEffectID() {
+    public int getEffectId() {
         return effectID;
     }
 
-    public void setEffectID(int effectID) {
+    public void setEffectId(int effectID) {
         this.effectID = effectID;
     }
 

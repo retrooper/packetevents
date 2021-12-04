@@ -15,7 +15,7 @@ public class WrapperPlayServerSetCooldown extends PacketWrapper<WrapperPlayServe
     }
 
     public WrapperPlayServerSetCooldown(ItemType item, int cooldownTicks) {
-        super(PacketType.Play.Server.SET_SLOT);
+        super(PacketType.Play.Server.SET_COOLDOWN);
         this.item = item;
         this.cooldownTicks = cooldownTicks;
     }

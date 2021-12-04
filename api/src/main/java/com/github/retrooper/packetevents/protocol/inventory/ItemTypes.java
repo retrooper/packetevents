@@ -21,6 +21,7 @@ package com.github.retrooper.packetevents.protocol.inventory;
 import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.protocol.chat.component.serializer.ComponentSerializer;
+import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 import com.github.retrooper.packetevents.protocol.resources.ResourceLocation;
 import com.github.retrooper.packetevents.util.MappingHelper;
 import com.google.gson.JsonObject;
@@ -57,7 +58,7 @@ public class ItemTypes {
 
         int latestProtocolVersion = ServerVersion.getLatest().getProtocolVersion();
         int serverProtocolVersion = PacketEvents.getAPI().getServerManager().getVersion().getProtocolVersion();
-
+        System.out.println("latest: " + latestProtocolVersion + ", target: " + serverProtocolVersion);
         int transformedID = transformItemTypeId(modernID, latestProtocolVersion, serverProtocolVersion);
         boolean musicDisc = attributes.contains(ItemAttribute.MUSIC_DISC);
         ResourceLocation identifier = ResourceLocation.minecraft(key);
@@ -97,15 +98,15 @@ public class ItemTypes {
         return type;
     }
 
-    //TODO Look into transforming id from older versions to newer ones, now we only go down
-    public static int transformItemTypeId(int id, int currentProtocolVersion, int targetProtocolVersion) {
+
+    public static int transformItemTypeId(int id, int latestProtocolVersion, int targetProtocolVersion) {
         if (LEGACY_ITEM_TYPES_JSON == null) {
             LEGACY_ITEM_TYPES_JSON = MappingHelper.getJSONObject("legacyitemtypes");
         }
-        if (currentProtocolVersion == targetProtocolVersion) {
+        if (latestProtocolVersion == targetProtocolVersion) {
             return id;
         }
-        return MappingHelper.transformID(LEGACY_ITEM_TYPES_JSON, id, targetProtocolVersion);
+        return MappingHelper.transformId(LEGACY_ITEM_TYPES_JSON, id, targetProtocolVersion);
     }
 
 

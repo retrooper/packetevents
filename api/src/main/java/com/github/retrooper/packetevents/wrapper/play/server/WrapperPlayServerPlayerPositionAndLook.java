@@ -2,13 +2,14 @@ package com.github.retrooper.packetevents.wrapper.play.server;
 
 import com.github.retrooper.packetevents.event.impl.PacketSendEvent;
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
+import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.protocol.teleport.RelativeFlags;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 
 /**
  * Teleporting a player directly with packets will cause issues on most server implementations and is discouraged!
  */
-public class WrapperPlayServerPositionAndLook extends PacketWrapper<WrapperPlayServerPositionAndLook> {
+public class WrapperPlayServerPlayerPositionAndLook extends PacketWrapper<WrapperPlayServerPlayerPositionAndLook> {
     double x;
     double y;
     double z;
@@ -18,8 +19,19 @@ public class WrapperPlayServerPositionAndLook extends PacketWrapper<WrapperPlayS
     int teleportId;
     boolean dismountVehicle = false;
 
-    public WrapperPlayServerPositionAndLook(PacketSendEvent event) {
+    public WrapperPlayServerPlayerPositionAndLook(PacketSendEvent event) {
         super(event);
+    }
+
+    public WrapperPlayServerPlayerPositionAndLook(double x, double y, double z, float yaw, float pitch, int flags, int teleportId) {
+        super(PacketType.Play.Server.PLAYER_POSITION_AND_LOOK);
+        this.x = x;
+        this.y = y;
+        this.z = z;
+        this.yaw = yaw;
+        this.pitch = pitch;
+        this.flags = flags;
+        this.teleportId = teleportId;
     }
 
     @Override
@@ -55,7 +67,7 @@ public class WrapperPlayServerPositionAndLook extends PacketWrapper<WrapperPlayS
     }
 
     @Override
-    public void readData(WrapperPlayServerPositionAndLook wrapper) {
+    public void readData(WrapperPlayServerPlayerPositionAndLook wrapper) {
         this.x = wrapper.x;
         this.y = wrapper.y;
         this.z = wrapper.z;
