@@ -20,11 +20,11 @@ package com.github.retrooper.packetevents.protocol.world.chunk.reader.impl;
 
 import com.github.retrooper.packetevents.protocol.stream.NetStreamInput;
 import com.github.retrooper.packetevents.protocol.world.chunk.BaseChunk;
-import com.github.retrooper.packetevents.protocol.world.chunk.ParsedChunkData;
 import com.github.retrooper.packetevents.protocol.world.chunk.impl.v1_9.Chunk_v1_9;
 import com.github.retrooper.packetevents.protocol.world.chunk.reader.ChunkReader;
 
 import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.util.BitSet;
 
 public class ChunkReader_v1_9 implements ChunkReader {
@@ -38,6 +38,20 @@ public class ChunkReader_v1_9 implements ChunkReader {
             if (set.get(index)) {
                 chunks[index] = new Chunk_v1_9(dataIn, hasSkyLight);
             }
+        }
+
+        try {
+            // Unfortunately, this is needed to detect whether the chunks contain skylight or not.
+            // Yes, this hack is required all the way from 1.9 through 1.12!
+            //
+            // Minimum is more than 256 bytes when it is a full chunks for biome data
+            // if not a full chunk, any leftover data means it has skylight
+            int minimum = fullChunk ? 256 : 0;
+            if ((dataIn.available() > minimum) && !hasSkyLight) {
+                return read(set, sevenExtendedMask, fullChunk, true, checkForSky, chunkSize, data);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
         }
 
         return chunks;
