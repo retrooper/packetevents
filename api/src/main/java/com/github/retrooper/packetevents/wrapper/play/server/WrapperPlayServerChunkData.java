@@ -21,15 +21,12 @@ package com.github.retrooper.packetevents.wrapper.play.server;
 import com.github.retrooper.packetevents.event.impl.PacketSendEvent;
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.protocol.nbt.NBTCompound;
+import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.protocol.stream.NetStreamOutput;
 import com.github.retrooper.packetevents.protocol.world.chunk.BaseChunk;
 import com.github.retrooper.packetevents.protocol.world.chunk.Column;
 import com.github.retrooper.packetevents.protocol.world.chunk.reader.ChunkReader;
-import com.github.retrooper.packetevents.protocol.world.chunk.reader.impl.ChunkReader_v1_16;
-import com.github.retrooper.packetevents.protocol.world.chunk.reader.impl.ChunkReader_v1_7;
-import com.github.retrooper.packetevents.protocol.world.chunk.reader.impl.ChunkReader_v1_8;
-import com.github.retrooper.packetevents.protocol.world.chunk.reader.impl.ChunkReader_v1_9;
-import com.github.retrooper.packetevents.protocol.packettype.PacketType;
+import com.github.retrooper.packetevents.protocol.world.chunk.reader.impl.*;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 
 import java.io.ByteArrayOutputStream;
@@ -41,7 +38,10 @@ public class WrapperPlayServerChunkData extends PacketWrapper<WrapperPlayServerC
     private static ChunkReader_v1_8 chunkReader_v1_8 = new ChunkReader_v1_8();
     private static ChunkReader_v1_9 chunkReader_v1_9 = new ChunkReader_v1_9();
     private static ChunkReader_v1_16 chunkReader_v1_16 = new ChunkReader_v1_16();
+    private static ChunkReader_v1_18 chunkReader_v1_18 = new ChunkReader_v1_18();
+
     private Column column;
+
     //TODO Make accessible??
     private boolean ignoreOldData;
 
@@ -105,16 +105,13 @@ public class WrapperPlayServerChunkData extends PacketWrapper<WrapperPlayServerC
         int chunkX = readInt();
         int chunkZ = readInt();
 
-        boolean v1_17 = serverVersion.isNewerThanOrEquals(ServerVersion.V_1_17);
-        boolean v1_16_2 = serverVersion.isNewerThanOrEquals(ServerVersion.V_1_16_2);
-        boolean v1_13_2 = serverVersion.isNewerThanOrEquals(ServerVersion.V_1_13_2);
-
         boolean fullChunk = readBoolean();
         boolean hasBiomeData;
         boolean hasReadBiomeData = false;
-        if (v1_17) {
+
+        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_17)) {
             hasBiomeData = true;
-        } else if (v1_13_2) {
+        } else if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_13_2)) {
             hasBiomeData = fullChunk;
         } else if (serverVersion.isOlderThanOrEquals(ServerVersion.V_1_11_2) && serverVersion.isNewerThanOrEquals(ServerVersion.V_1_9)) {
             hasBiomeData = fullChunk;
@@ -123,9 +120,7 @@ public class WrapperPlayServerChunkData extends PacketWrapper<WrapperPlayServerC
             hasBiomeData = false;
         }
 
-
-        if (serverVersion == ServerVersion.V_1_16 ||
-                serverVersion == ServerVersion.V_1_16_1) {
+        if (serverVersion == ServerVersion.V_1_16 || serverVersion == ServerVersion.V_1_16_1) {
             ignoreOldData = readBoolean();
         }
 
@@ -136,17 +131,22 @@ public class WrapperPlayServerChunkData extends PacketWrapper<WrapperPlayServerC
             heightMaps = readNBT();
         }
 
+        BitSet secondaryChunkMask = null;
+        if (serverVersion.isOlderThanOrEquals(ServerVersion.V_1_7_10)) {
+            secondaryChunkMask = readChunkMask();
+        }
+
         int[] biomeData = new int[0];
-        if (hasBiomeData && v1_13_2 && serverVersion.isNewerThanOrEquals(ServerVersion.V_1_15)) {
+        if (hasBiomeData && serverVersion.isNewerThanOrEquals(ServerVersion.V_1_13_2) && serverVersion.isNewerThanOrEquals(ServerVersion.V_1_15)) {
             int biomesLength;
-            if (v1_16_2) {
+            if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_16_2)) {
                 biomesLength = readVarInt();
             } else {
-                biomesLength = 1024;//Always 1024
+                biomesLength = 1024; //Always 1024
             }
             biomeData = new int[biomesLength];
             for (int index = 0; index < biomeData.length; index++) {
-                if (v1_16_2) {
+                if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_16_2)) {
                     biomeData[index] = readVarInt();
                 } else {
                     biomeData[index] = readInt();
@@ -157,7 +157,15 @@ public class WrapperPlayServerChunkData extends PacketWrapper<WrapperPlayServerC
 
         int dataLength = readVarInt();
         byte[] data = readByteArray(dataLength);
-        BaseChunk[] chunks = getChunkReader().read(chunkMask, chunkMask.size(), data);
+
+        int chunkSize = 16;
+        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_18)) {
+            chunkSize = 25;
+        } else if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_17)) {
+            chunkSize = chunkMask.size();
+        }
+
+        BaseChunk[] chunks = getChunkReader().read(chunkMask, secondaryChunkMask, fullChunk, true, true, chunkSize, data);
 
         if (hasBiomeData && !hasReadBiomeData) {
             byte[] biomeDataBytes = readByteArray(256);
@@ -172,7 +180,6 @@ public class WrapperPlayServerChunkData extends PacketWrapper<WrapperPlayServerC
         for (int i = 0; i < tileEntities.length; i++) {
             tileEntities[i] = readNBT();
         }
-
 
         if (hasBiomeData) {
             if (hasHeightMaps) {
@@ -247,7 +254,7 @@ public class WrapperPlayServerChunkData extends PacketWrapper<WrapperPlayServerC
             BaseChunk chunk = chunks[index];
             if (chunk != null && !chunk.isKnownEmpty()) {
                 chunkMask.set(index);
-               // Chunk_v1_15.write(dataOut, chunk);
+                // Chunk_v1_15.write(dataOut, chunk);
             }
         }
 
@@ -282,16 +289,15 @@ public class WrapperPlayServerChunkData extends PacketWrapper<WrapperPlayServerC
     }
 
     private ChunkReader getChunkReader() {
-        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_16)) {
+        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_18)) {
+            return chunkReader_v1_18;
+        } else if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_16)) {
             return chunkReader_v1_16;
-        }
-        else if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_9)) {
+        } else if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_9)) {
             return chunkReader_v1_9;
-        }
-        else if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_8)) {
+        } else if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_8)) {
             return chunkReader_v1_8;
-        }
-        else {
+        } else {
             return chunkReader_v1_7;
         }
     }

@@ -16,27 +16,28 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.github.retrooper.packetevents.protocol.world.chunk.impl.v1_12;
+package com.github.retrooper.packetevents.protocol.world.chunk.impl.v1_9;
 
 import com.github.retrooper.packetevents.protocol.stream.NetStreamInput;
 import com.github.retrooper.packetevents.protocol.stream.NetStreamOutput;
 import com.github.retrooper.packetevents.protocol.world.blockstate.MagicBlockState;
 import com.github.retrooper.packetevents.protocol.world.chunk.BaseChunk;
 import com.github.retrooper.packetevents.protocol.world.chunk.LegacyFlexibleStorage;
+import com.github.retrooper.packetevents.protocol.world.chunk.NibbleArray3d;
 
-import java.nio.ShortBuffer;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
-public class Chunk_v1_12 implements BaseChunk {
+public class Chunk_v1_9 implements BaseChunk {
     private static final MagicBlockState AIR = new MagicBlockState(0, 0);
     private final List<MagicBlockState> states;
     private int bitsPerEntry;
     private LegacyFlexibleStorage storage;
 
-    public Chunk_v1_12(NetStreamInput in) {
+    private NibbleArray3d blocklight;
+    private NibbleArray3d skylight;
+
+    public Chunk_v1_9(NetStreamInput in, boolean hasSkyLight) {
         this.bitsPerEntry = in.readUnsignedByte();
 
         this.states = new ArrayList<>();
@@ -46,66 +47,51 @@ public class Chunk_v1_12 implements BaseChunk {
         }
 
         this.storage = new LegacyFlexibleStorage(this.bitsPerEntry, in.readLongs(in.readVarInt()));
+
+        this.blocklight = new NibbleArray3d(in, 2048);
+        this.skylight = hasSkyLight ? new NibbleArray3d(in, 2048) : null;
     }
 
-    public Chunk_v1_12(ShortBuffer in) {
-        Map<Integer, Integer> reversePalette = new HashMap<>(32);
+    public Chunk_v1_9(int bitsPerEntry, List<MagicBlockState> states, LegacyFlexibleStorage storage) {
+        this.bitsPerEntry = bitsPerEntry;
+        this.states = states;
+        this.storage = storage;
+    }
 
-        states = new ArrayList<>();
-        states.add(AIR);
-        reversePalette.put(0, 0);
+    public static Chunk_v1_9 read(NetStreamInput in) {
+        int bitsPerEntry = in.readUnsignedByte();
 
-        this.bitsPerEntry = 4;
-        this.storage = new LegacyFlexibleStorage(bitsPerEntry, 4096);
-
-        int lastNext = -1;
-        int lastID = -1;
-
-        for (int i = 0; i < 4096; i++) {
-            int next = in.get();
-
-            if (next != lastNext) {
-                lastNext = next;
-                next = ((next & 15) << 12) | (next >> 4);
-                lastID = this.bitsPerEntry <= 8 ? reversePalette.getOrDefault(next, -1) : next;
-
-                if (lastID == -1) {
-                    reversePalette.put(next, reversePalette.size());
-                    states.add(new MagicBlockState(next));
-
-                    if (reversePalette.size() > 1 << this.bitsPerEntry) {
-                        this.bitsPerEntry++;
-
-                        List<MagicBlockState> oldStates = this.states;
-                        if (this.bitsPerEntry > 8) {
-                            oldStates = new ArrayList<>(this.states);
-                            this.states.clear();
-                            reversePalette.clear();
-                            this.bitsPerEntry = 16;
-                        }
-
-                        LegacyFlexibleStorage oldStorage = this.storage;
-                        this.storage = new LegacyFlexibleStorage(this.bitsPerEntry, this.storage.getSize());
-                        for (int index = 0; index < this.storage.getSize(); index++) {
-                            this.storage.set(index, this.bitsPerEntry <= 8 ? oldStorage.get(index) : oldStates.get(oldStorage.get(index)).getCombinedId());
-                        }
-                    }
-
-                    lastID = this.bitsPerEntry <= 8 ? reversePalette.getOrDefault(next, -1) : next;
-                }
-            }
-
-            this.storage.set(i, lastID);
+        List<MagicBlockState> states = new ArrayList<>();
+        int stateCount = bitsPerEntry > 8 ? 0 : in.readVarInt();
+        for (int i = 0; i < stateCount; i++) {
+            states.add(readBlockState(in));
         }
+
+        LegacyFlexibleStorage storage = new LegacyFlexibleStorage(bitsPerEntry, in.readLongs(in.readVarInt()));
+        return new Chunk_v1_9(bitsPerEntry, states, storage);
     }
 
-    public Chunk_v1_12() {
-        this.bitsPerEntry = 4;
+    public void write(NetStreamOutput out) {
+        out.writeByte(bitsPerEntry);
 
-        this.states = new ArrayList<>();
-        this.states.add(AIR);
+        if (bitsPerEntry <= 8) {
+            out.writeVarInt(states.size());
+            for (MagicBlockState state : states) {
+                writeBlockState(out, state);
+            }
+        }
 
-        this.storage = new LegacyFlexibleStorage(this.bitsPerEntry, 4096);
+        long[] data = storage.getData();
+        out.writeVarInt(data.length);
+        out.writeLongs(data);
+
+        out.writeVarInt(blocklight.getData().length);
+        out.writeBytes(blocklight.getData());
+
+        if (skylight != null) {
+            out.writeVarInt(skylight.getData().length);
+            out.writeBytes(skylight.getData());
+        }
     }
 
     private static int index(int x, int y, int z) {

@@ -25,8 +25,8 @@
 package com.github.retrooper.packetevents.protocol.world.chunk;
 
 
-import com.github.retrooper.packetevents.netty.buffer.ByteBufAbstractInputStream;
 import com.github.retrooper.packetevents.netty.buffer.ByteBufAbstractOutputStream;
+import com.github.retrooper.packetevents.protocol.stream.NetStreamInput;
 
 import java.io.IOException;
 
@@ -41,7 +41,7 @@ public class NibbleArray3d {
         this(new byte[size >> 1]);
     }
 
-    public NibbleArray3d(ByteBufAbstractInputStream in, int size) throws IOException {
+    public NibbleArray3d(NetStreamInput in, int size) {
         this(in.readBytes(size));
     }
 

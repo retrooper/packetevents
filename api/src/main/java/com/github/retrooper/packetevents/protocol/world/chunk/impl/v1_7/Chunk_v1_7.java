@@ -26,11 +26,21 @@ import com.github.retrooper.packetevents.protocol.world.chunk.NibbleArray3d;
 
 public class Chunk_v1_7 implements BaseChunk {
     private final ByteArray3d blocks;
-    private final NibbleArray3d extendedBlocks;
+    private NibbleArray3d metadata;
+    private NibbleArray3d blocklight;
+    private NibbleArray3d skylight;
+    private NibbleArray3d extendedBlocks;
 
-    public Chunk_v1_7() {
-        blocks = new ByteArray3d(4096);
-        extendedBlocks = new NibbleArray3d(4096);
+    public Chunk_v1_7(boolean skylight, boolean extended) {
+        this(new ByteArray3d(4096), new NibbleArray3d(4096), new NibbleArray3d(4096), skylight ? new NibbleArray3d(4096) : null, extended ? new NibbleArray3d(4096) : null);
+    }
+
+    public Chunk_v1_7(ByteArray3d blocks, NibbleArray3d metadata, NibbleArray3d blocklight, NibbleArray3d skylight, NibbleArray3d extendedBlocks) {
+        this.blocks = blocks;
+        this.metadata = metadata;
+        this.blocklight = blocklight;
+        this.skylight = skylight;
+        this.extendedBlocks = extendedBlocks;
     }
 
     @Override
@@ -50,10 +60,22 @@ public class Chunk_v1_7 implements BaseChunk {
     }
 
     public ByteArray3d getBlocks() {
-        return blocks;
+        return this.blocks;
     }
 
     public NibbleArray3d getMetadata() {
-        return extendedBlocks;
+        return this.metadata;
+    }
+
+    public NibbleArray3d getBlockLight() {
+        return this.blocklight;
+    }
+
+    public NibbleArray3d getSkyLight() {
+        return this.skylight;
+    }
+
+    public NibbleArray3d getExtendedBlocks() {
+        return this.extendedBlocks;
     }
 }

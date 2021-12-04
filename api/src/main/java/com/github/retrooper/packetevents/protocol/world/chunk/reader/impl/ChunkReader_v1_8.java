@@ -19,7 +19,9 @@
 package com.github.retrooper.packetevents.protocol.world.chunk.reader.impl;
 
 import com.github.retrooper.packetevents.protocol.world.chunk.BaseChunk;
-import com.github.retrooper.packetevents.protocol.world.chunk.impl.v1_12.Chunk_v1_12;
+import com.github.retrooper.packetevents.protocol.world.chunk.NibbleArray3d;
+import com.github.retrooper.packetevents.protocol.world.chunk.ShortArray3d;
+import com.github.retrooper.packetevents.protocol.world.chunk.impl.v1_8.Chunk_v1_8;
 import com.github.retrooper.packetevents.protocol.world.chunk.reader.ChunkReader;
 
 import java.nio.ByteBuffer;
@@ -28,16 +30,56 @@ import java.nio.ShortBuffer;
 import java.util.BitSet;
 
 public class ChunkReader_v1_8 implements ChunkReader {
+
     @Override
-    public BaseChunk[] read(BitSet primarySet, int chunkSize, byte[] data) {
-        BaseChunk[] chunks = new BaseChunk[chunkSize];
+    public BaseChunk[] read(BitSet set, BitSet sevenExtendedMask, boolean fullChunk, boolean hasSkyLight, boolean checkForSky, int chunkSize, byte[] data) {
+        Chunk_v1_8[] chunks = new Chunk_v1_8[16];
+        int pos = 0;
+        int expected = 0;
+        boolean sky = false;
+
         ShortBuffer buf = ByteBuffer.wrap(data).order(ByteOrder.LITTLE_ENDIAN).asShortBuffer();
-        for (int ind = 0; ind < 16; ind++) {
-            if (primarySet.get(ind)) {
-                Chunk_v1_12 compressed = new Chunk_v1_12(buf);
-                chunks[ind] = compressed;
+
+        // 0 = Calculate expected length and determine if the packet has skylight.
+        // 1 = Create chunks from mask and get blocks.
+        // 2 = Get block light.
+        // 3 = Get sky light.
+        for (int pass = 0; pass < 4; pass++) {
+            for (int ind = 0; ind < 16; ind++) {
+                if (set.get(ind)) {
+                    if (pass == 0) {
+                        // Block length + Blocklight length
+                        expected += (4096 * 2) + 2048;
+                    }
+
+                    if (pass == 1) {
+                        chunks[ind] = new Chunk_v1_8(sky || hasSkyLight);
+                        ShortArray3d blocks = chunks[ind].getBlocks();
+                        buf.position(pos / 2);
+                        buf.get(blocks.getData(), 0, blocks.getData().length);
+                        pos += blocks.getData().length * 2;
+                    }
+
+                    if (pass == 2) {
+                        NibbleArray3d blocklight = chunks[ind].getBlockLight();
+                        System.arraycopy(data, pos, blocklight.getData(), 0, blocklight.getData().length);
+                        pos += blocklight.getData().length;
+                    }
+
+                    if (pass == 3 && (sky || hasSkyLight)) {
+                        NibbleArray3d skylight = chunks[ind].getSkyLight();
+                        System.arraycopy(data, pos, skylight.getData(), 0, skylight.getData().length);
+                        pos += skylight.getData().length;
+                    }
+                }
+            }
+
+            if (pass == 0 && data.length > expected) {
+                // If we have more data than blocks and blocklight combined, there must be skylight data as well.
+                sky = checkForSky;
             }
         }
+
         return chunks;
     }
 }

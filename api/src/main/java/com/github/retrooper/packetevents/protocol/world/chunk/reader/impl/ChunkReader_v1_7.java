@@ -24,31 +24,70 @@ import com.github.retrooper.packetevents.protocol.world.chunk.NibbleArray3d;
 import com.github.retrooper.packetevents.protocol.world.chunk.impl.v1_7.Chunk_v1_7;
 import com.github.retrooper.packetevents.protocol.world.chunk.reader.ChunkReader;
 
-import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
 import java.util.BitSet;
 
 public class ChunkReader_v1_7 implements ChunkReader {
     @Override
-    public BaseChunk[] read(BitSet primarySet, int chunkSize, byte[] data) {
-        Chunk_v1_7[] chunks = new Chunk_v1_7[chunkSize];
-        ByteBuffer buf = ByteBuffer.wrap(data).order(ByteOrder.LITTLE_ENDIAN);
-        for (int pass = 1; pass < 3; pass++) {
+    public BaseChunk[] read(BitSet primarySet, BitSet sevenExtendedMask, boolean fullChunk, boolean hasSkyLight, boolean checkForSky, int chunkSize, byte[] data) {
+        Chunk_v1_7[] chunks = new Chunk_v1_7[16];
+        int pos = 0;
+        int expected = 0;
+        boolean sky = false;
+
+        // 0 = Calculate expected length and determine if the packet has skylight.
+        // 1 = Create chunks from mask and get blocks.
+        // 2 = Get metadata.
+        // 3 = Get block light.
+        // 4 = Get sky light.
+        // 5 = Get extended block data - This doesn't exist!
+        //
+        // Fun fact, a mojang dev (forgot who) wanted to do the flattening in 1.8
+        // So the extended block data was likely how mojang wanted to get around the 255 block id limit
+        // Before they decided to quite using magic values and instead went with the new 1.13 solution
+        //
+        // That's probably why extended block data exists, although yeah it was never used.
+        for (int pass = 0; pass < 5; pass++) {
             for (int ind = 0; ind < 16; ind++) {
                 if (primarySet.get(ind)) {
+                    if (pass == 0) {
+                        expected += 10240;
+                        if (sevenExtendedMask.get(ind)) {
+                            expected += 2048;
+                        }
+                    }
+
                     if (pass == 1) {
-                        chunks[ind] = new Chunk_v1_7();
+                        chunks[ind] = new Chunk_v1_7(sky, sevenExtendedMask.get(ind));
                         ByteArray3d blocks = chunks[ind].getBlocks();
-                        buf.get(blocks.getData(), 0, blocks.getData().length);
+                        System.arraycopy(data, pos, blocks.getData(), 0, blocks.getData().length);
+                        pos += blocks.getData().length;
                     }
 
                     if (pass == 2) {
                         NibbleArray3d metadata = chunks[ind].getMetadata();
-                        buf.get(metadata.getData(), 0, metadata.getData().length);
+                        System.arraycopy(data, pos, metadata.getData(), 0, metadata.getData().length);
+                        pos += metadata.getData().length;
+                    }
+
+                    if (pass == 3) {
+                        NibbleArray3d blocklight = chunks[ind].getBlockLight();
+                        System.arraycopy(data, pos, blocklight.getData(), 0, blocklight.getData().length);
+                        pos += blocklight.getData().length;
+                    }
+
+                    if (pass == 4 && sky) {
+                        NibbleArray3d skylight = chunks[ind].getSkyLight();
+                        System.arraycopy(data, pos, skylight.getData(), 0, skylight.getData().length);
+                        pos += skylight.getData().length;
                     }
                 }
             }
+
+            if (pass == 0 && data.length >= expected) {
+                sky = true;
+            }
         }
+
         return chunks;
     }
 }
