@@ -2,6 +2,7 @@ package com.github.retrooper.packetevents.wrapper.play.server;
 
 import com.github.retrooper.packetevents.event.impl.PacketSendEvent;
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
+import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 
 public class WrapperPlayServerAttachEntity extends PacketWrapper<WrapperPlayServerAttachEntity> {
@@ -11,6 +12,13 @@ public class WrapperPlayServerAttachEntity extends PacketWrapper<WrapperPlayServ
 
     public WrapperPlayServerAttachEntity(PacketSendEvent event) {
         super(event);
+    }
+
+    public WrapperPlayServerAttachEntity(int attachedId, int holdingId, boolean leash) {
+        super(PacketType.Play.Server.ATTACH_ENTITY);
+        this.attachedId = attachedId;
+        this.holdingId = holdingId;
+        this.leash = leash;
     }
 
     @Override
