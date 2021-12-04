@@ -25,6 +25,10 @@ import com.github.retrooper.packetevents.util.MathUtil;
 import com.github.retrooper.packetevents.util.Vector3d;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 
+/**
+ * This is not for teleporting players, but for teleporting other entities the player can see - such as mobs, animals, etc.
+ * If you want to teleport a player, use {@link WrapperPlayServerPositionAndLook} instead.
+ */
 public class WrapperPlayServerEntityTeleport extends PacketWrapper<WrapperPlayServerEntityTeleport> {
     private static final float ROTATION_FACTOR = 256.0F / 360.0F;
 
