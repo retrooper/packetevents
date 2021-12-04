@@ -35,7 +35,8 @@ import java.util.Map;
 public class MappingHelper {
     public static final Map<String, JsonObject> MAPPING_JSON_OBJECTS = new HashMap<>();
 
-    public static int transformID(JsonObject mappingsJsonObject, int id, int targetProtocolVersion) {
+    //TODO When updating legacyitemtypes, make sure to name 1_9_4 to 1_9_3
+    public static int transformId(JsonObject mappingsJsonObject, int id, int targetProtocolVersion) {
         for (ClientVersion version : ClientVersion.reversedValues()) {
             if (!version.name().startsWith("V_")) {
                 continue;
@@ -46,9 +47,7 @@ public class MappingHelper {
                 String inputIDStr = String.valueOf(id);
                 if (jsonObject.has(inputIDStr)) {
                     id = jsonObject.get(inputIDStr).getAsInt();
-                }
-                else {
-                    continue;
+                    System.out.println("version: " + version.name() + ", id: " + id);
                 }
             }
             if (version.getProtocolVersion() == targetProtocolVersion) {

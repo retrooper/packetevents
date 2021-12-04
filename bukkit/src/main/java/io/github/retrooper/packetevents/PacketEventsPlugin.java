@@ -85,7 +85,7 @@ public class PacketEventsPlugin extends JavaPlugin {
             public void onPacketSend(PacketSendEvent event) {
                 Player player = event.getPlayer() == null ? null : (Player) event.getPlayer();
                 if (event.getPacketType() == PacketType.Play.Server.CHAT_MESSAGE) {
-                    WrapperPlayServerChatMessage chatMessage = new WrapperPlayServerChatMessage(event);
+                    /*WrapperPlayServerChatMessage chatMessage = new WrapperPlayServerChatMessage(event);
                     BaseComponent chatComponent = chatMessage.getChatComponent();
                     if (chatComponent instanceof TextComponent) {
                         TextComponent textComponent = (TextComponent) chatComponent;
@@ -97,7 +97,7 @@ public class PacketEventsPlugin extends JavaPlugin {
                             }
                         }
                         System.out.println("Text: " + text);
-                    }
+                    }*/
                     //TODO Fix translatable chat components
                 } else if (event.getPacketType() == PacketType.Play.Server.SPAWN_LIVING_ENTITY) {
                     WrapperPlayServerSpawnLivingEntity spawnMob = new WrapperPlayServerSpawnLivingEntity(event);
@@ -115,7 +115,6 @@ public class PacketEventsPlugin extends JavaPlugin {
                     int slot = setSlot.getSlot();
                     ItemStack item = setSlot.getItem();
                     if (player != null) {
-                        item.setType(ItemTypes.BEACON);
                         player.sendMessage("Set slot with window ID: " + windowID + ", slot: " + slot + ", item: " + (item.getType() != null ? item.toString() : "null item"));
                     }
                 }
