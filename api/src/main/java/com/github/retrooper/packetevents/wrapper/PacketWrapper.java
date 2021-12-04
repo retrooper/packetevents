@@ -266,8 +266,7 @@ public class PacketWrapper<T extends PacketWrapper> {
                 int typeID;
                 if (itemStack.getType() == null || ItemStack.NULL.equals(itemStack)) {
                     typeID = -1;
-                }
-                else {
+                } else {
                     typeID = itemStack.getType().getId();
                 }
                 writeVarInt(typeID);
@@ -280,8 +279,7 @@ public class PacketWrapper<T extends PacketWrapper> {
             int typeID;
             if (itemStack.getType() == null || itemStack.getAmount() == -1) {
                 typeID = -1;
-            }
-            else {
+            } else {
                 typeID = itemStack.getType().getId();
             }
             writeShort(typeID);
@@ -438,6 +436,27 @@ public class PacketWrapper<T extends PacketWrapper> {
     public void writeByteArray(byte[] array) {
         writeVarInt(array.length);
         writeBytes(array);
+    }
+
+    public int[] readVarIntArray() {
+        int readableBytes = buffer.readableBytes();
+        int size = readVarInt();
+        if (size > readableBytes) {
+            throw new IllegalStateException("VarIntArray with size " + size + " is bigger than allowed " + readableBytes);
+        }
+
+        int[] array = new int[size];
+        for (int i = 0; i < size; i++) {
+            array[i] = readVarInt();
+        }
+        return array;
+    }
+
+    public void writeVarIntArray(int[] array) {
+        writeVarInt(array.length);
+        for (int i : array) {
+            writeVarInt(i);
+        }
     }
 
     public long[] readLongArray(int size) {
