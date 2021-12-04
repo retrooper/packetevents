@@ -28,6 +28,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -50,7 +51,7 @@ public class MappingHelper {
                     continue;
                 }
             }
-            if (version.getProtocolVersion() <= targetProtocolVersion) {
+            if (version.getProtocolVersion() == targetProtocolVersion) {
                 return id;
             }
         }
@@ -81,13 +82,5 @@ public class MappingHelper {
             e.printStackTrace();
         }
         return ComponentSerializer.GSON.fromJson(sb.toString(), JsonObject.class);
-    }
-
-    //TODO (Re)Load all mappings, although it isn't mandatory for now
-    public static void loadMappings() {
-        MAPPING_JSON_OBJECTS.put("modernitemtypes", searchJSONObject("modernitemtypes"));
-        MAPPING_JSON_OBJECTS.put("legacyitemtypes", searchJSONObject("legacyitemtypes"));
-        MAPPING_JSON_OBJECTS.put("modernentitytypes", searchJSONObject("modernentitytypes"));
-        MAPPING_JSON_OBJECTS.put("modernpotiontypes", searchJSONObject("modernpotiontypes"));
     }
 }
