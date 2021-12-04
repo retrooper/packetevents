@@ -383,6 +383,9 @@ public class WrappedPacket implements WrapperPacketReader, WrapperPacketWriter {
     public void writeAnyObject(int index, Object value) {
         try {
             Field f = packetClass.getDeclaredFields()[index];
+            if (!f.isAccessible()) {
+                f.setAccessible(true);
+            }
             f.set(packet.getRawNMSPacket(), value);
         } catch (Exception e) {
             throw new WrapperFieldNotFoundException("PacketEvents failed to find any field indexed " + index + " in the " + ClassUtil.getClassSimpleName(packetClass) + " class!");
