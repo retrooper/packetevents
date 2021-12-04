@@ -1,6 +1,7 @@
 package com.github.retrooper.packetevents.wrapper.play.server;
 
 import com.github.retrooper.packetevents.event.impl.PacketSendEvent;
+import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.protocol.potion.PotionType;
 import com.github.retrooper.packetevents.protocol.potion.PotionTypes;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
@@ -11,6 +12,12 @@ public class WrapperPlayServerRemoveEntityEffect extends PacketWrapper<WrapperPl
 
     public WrapperPlayServerRemoveEntityEffect(PacketSendEvent event) {
         super(event);
+    }
+
+    public WrapperPlayServerRemoveEntityEffect(int entityId, int effectId) {
+        super(PacketType.Play.Server.REMOVE_ENTITY_EFFECT);
+        this.entityId = entityId;
+        this.effectId = effectId;
     }
 
     @Override
