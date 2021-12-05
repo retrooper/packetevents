@@ -38,6 +38,8 @@ public class FlatBlockState implements BaseBlockState {
     public int getCombinedId() {
         return globalID;
     }
+
+    //TODO
     /*
 
     public BlockData getBlockData() {
