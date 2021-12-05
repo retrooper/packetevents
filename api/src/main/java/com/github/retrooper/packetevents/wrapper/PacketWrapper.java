@@ -433,6 +433,11 @@ public class PacketWrapper<T extends PacketWrapper> {
         return readBytes(len);
     }
 
+    public byte[] readByteArray() {
+        int len = readVarInt();
+        return readBytes(len);
+    }
+
     public void writeByteArray(byte[] array) {
         writeVarInt(array.length);
         writeBytes(array);

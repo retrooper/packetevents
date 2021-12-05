@@ -115,8 +115,7 @@ public class WrapperPlayServerChunkData extends PacketWrapper<WrapperPlayServerC
             secondaryChunkMask = readChunkMask();
         }
 
-        int dataLength = readVarInt();
-        byte[] data = readByteArray(dataLength);
+        byte[] data = readByteArray();
         data = deflate(data, chunkMask, fullChunk);
 
 
@@ -269,7 +268,6 @@ public class WrapperPlayServerChunkData extends PacketWrapper<WrapperPlayServerC
         }
 
         byte[] data = dataBytes.toByteArray();
-        writeVarInt(data.length);
         writeByteArray(data);
 
         if (column.hasBiomeData() && !hasWrittenBiomeData) {
