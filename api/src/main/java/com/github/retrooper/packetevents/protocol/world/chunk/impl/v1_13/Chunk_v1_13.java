@@ -16,7 +16,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.github.retrooper.packetevents.protocol.world.chunk.impl.v1_15;
+package com.github.retrooper.packetevents.protocol.world.chunk.impl.v1_13;
 
 import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
@@ -26,76 +26,79 @@ import com.github.retrooper.packetevents.protocol.world.blockstate.BaseBlockStat
 import com.github.retrooper.packetevents.protocol.world.blockstate.FlatBlockState;
 import com.github.retrooper.packetevents.protocol.world.chunk.BaseChunk;
 import com.github.retrooper.packetevents.protocol.world.chunk.LegacyFlexibleStorage;
+import com.github.retrooper.packetevents.protocol.world.chunk.NibbleArray3d;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class Chunk_v1_15 implements BaseChunk {
-    private static final BlockState AIR = new BlockState(0);
+public class Chunk_v1_13 implements BaseChunk {
+    // Air is ALWAYS 0
+    private static final FlatBlockState AIR = new FlatBlockState(0);
     private static final int AIR_ID = 0;
 
     private int blockCount;
     private int bitsPerEntry;
 
-    private List<BlockState> states;
+    private List<FlatBlockState> states;
     private LegacyFlexibleStorage storage;
 
-    public Chunk_v1_15() {
-        this.bitsPerEntry = 4;
+    private NibbleArray3d blocklight;
+    private NibbleArray3d skylight;
 
-        this.states = new ArrayList<>();
-        this.states.add(AIR);
+    public Chunk_v1_13(NetStreamInput in) {
+        blockCount = 0;
 
-        this.storage = new LegacyFlexibleStorage(this.bitsPerEntry, 4096);
-    }
+        boolean isFourteen = PacketEvents.getAPI().getServerManager().getVersion().isNewerThanOrEquals(ServerVersion.V_1_14);
 
-    public Chunk_v1_15(int blockCount, int bitsPerEntry, List<BlockState> states, LegacyFlexibleStorage storage) {
-        this.blockCount = blockCount;
-        this.bitsPerEntry = bitsPerEntry;
-        this.states = states;
-        this.storage = storage;
-    }
-
-    public static Chunk_v1_15 read(NetStreamInput in) {
-        int blockCount = 0;
         // 1.14 and 1.15 include block count in chunk data
         // In 1.13 we don't send that, so there is no need to keep track of it
-        //TODO Confirm if 1.13.2 counts too
-        if (PacketEvents.getAPI().getServerManager().getVersion().isNewerThanOrEquals(ServerVersion.V_1_14)) {
+        if (isFourteen) {
             blockCount = in.readShort();
         }
 
-        int bitsPerEntry = in.readUnsignedByte();
+        bitsPerEntry = in.readUnsignedByte();
 
-        List<BlockState> states = new ArrayList<>();
+        states = new ArrayList<>();
         int stateCount = bitsPerEntry > 8 ? 0 : in.readVarInt();
         for (int i = 0; i < stateCount; i++) {
-            states.add(BlockState.read(in));
+            states.add(new FlatBlockState(in.readVarInt()));
         }
 
-        LegacyFlexibleStorage storage = new LegacyFlexibleStorage(bitsPerEntry, in.readLongs(in.readVarInt()));
-        return new Chunk_v1_15(blockCount, bitsPerEntry, states, storage);
+        storage = new LegacyFlexibleStorage(bitsPerEntry, in.readLongs(in.readVarInt()));
+
+        blocklight = isFourteen ? null : new NibbleArray3d(in, 2048);
+        skylight = isFourteen ? null : new NibbleArray3d(in, 2048);
     }
 
-    public static void write(NetStreamOutput out, Chunk_v1_15 chunk) {
+    public void write(NetStreamOutput out) {
         // ViaVersion should handle not writing block count in 1.13, as vanilla doesn't include it
         // It would probably crash the client if we tried writing it
         if (PacketEvents.getAPI().getServerManager().getVersion().isNewerThanOrEquals(ServerVersion.V_1_14)) {
-            out.writeShort(chunk.getBlockCount());
+            out.writeShort(blockCount);
         }
 
-        out.writeByte(chunk.getBitsPerEntry());
+        out.writeByte(bitsPerEntry);
 
-        if (chunk.getBitsPerEntry() <= 8) {
-            out.writeVarInt(chunk.getStates().size());
-            for (BlockState state : chunk.getStates()) {
-                BlockState.write(out, state);
+        if (bitsPerEntry <= 8) {
+            out.writeVarInt(states.size());
+            for (FlatBlockState state : states) {
+                out.writeVarInt(state.getId());
             }
         }
 
-        long[] data = chunk.getStorage().getData();
+        long[] data = storage.getData();
         out.writeVarInt(data.length);
         out.writeLongs(data);
+
+        if (blocklight != null) {
+            out.writeVarInt(blocklight.getData().length);
+            out.writeBytes(blocklight.getData());
+        }
+
+        if (skylight != null) {
+            out.writeVarInt(skylight.getData().length);
+            out.writeBytes(skylight.getData());
+        }
     }
 
     private static int index(int x, int y, int z) {
@@ -112,17 +115,17 @@ public class Chunk_v1_15 implements BaseChunk {
     }
 
     public void set(int x, int y, int z, int state) {
-        set(x, y, z, new BlockState(state));
+        set(x, y, z, new FlatBlockState(state));
     }
 
-    public void set(int x, int y, int z, BlockState state) {
+    public void set(int x, int y, int z, FlatBlockState state) {
         int id = this.bitsPerEntry <= 8 ? this.states.indexOf(state) : state.getId();
         if (id == -1) {
             this.states.add(state);
             if (this.states.size() > 1 << this.bitsPerEntry) {
                 this.bitsPerEntry++;
 
-                List<BlockState> oldStates = this.states;
+                List<FlatBlockState> oldStates = this.states;
                 if (this.bitsPerEntry > 8) {
                     oldStates = new ArrayList<>(this.states);
                     this.states.clear();
@@ -150,39 +153,8 @@ public class Chunk_v1_15 implements BaseChunk {
         this.storage.set(ind, id);
     }
 
+    @Override
     public boolean isKnownEmpty() {
         return blockCount == 0 && PacketEvents.getAPI().getServerManager().getVersion().isNewerThanOrEquals(ServerVersion.V_1_14);
-    }
-
-    public int getBlockCount() {
-        return blockCount;
-    }
-
-    public void setBlockCount(int blockCount) {
-        this.blockCount = blockCount;
-    }
-
-    public int getBitsPerEntry() {
-        return bitsPerEntry;
-    }
-
-    public void setBitsPerEntry(int bitsPerEntry) {
-        this.bitsPerEntry = bitsPerEntry;
-    }
-
-    public List<BlockState> getStates() {
-        return states;
-    }
-
-    public void setStates(List<BlockState> states) {
-        this.states = states;
-    }
-
-    public LegacyFlexibleStorage getStorage() {
-        return storage;
-    }
-
-    public void setStorage(LegacyFlexibleStorage storage) {
-        this.storage = storage;
     }
 }

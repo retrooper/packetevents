@@ -23,5 +23,5 @@ import com.github.retrooper.packetevents.protocol.world.chunk.BaseChunk;
 import java.util.BitSet;
 
 public interface ChunkReader {
-    BaseChunk[] read(BitSet set, int chunkSize, byte[] data);
+    BaseChunk[] read(BitSet set, BitSet sevenExtendedMask, boolean fullChunk, boolean hasSkyLight, boolean checkForSky, int chunkSize, byte[] data);
 }

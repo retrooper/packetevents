@@ -23,18 +23,10 @@ import com.github.retrooper.packetevents.protocol.stream.NetStreamOutput;
 import com.github.retrooper.packetevents.protocol.world.blockstate.BaseBlockState;
 import com.github.retrooper.packetevents.protocol.world.blockstate.FlatBlockState;
 import com.github.retrooper.packetevents.protocol.world.chunk.BaseChunk;
-import com.github.retrooper.packetevents.protocol.world.chunk.palette.GlobalPalette;
-import com.github.retrooper.packetevents.protocol.world.chunk.palette.ListPalette;
-import com.github.retrooper.packetevents.protocol.world.chunk.palette.MapPalette;
-import com.github.retrooper.packetevents.protocol.world.chunk.palette.Palette;
+import com.github.retrooper.packetevents.protocol.world.chunk.palette.*;
 import com.github.retrooper.packetevents.protocol.world.chunk.storage.BitStorage;
 
 public class Chunk_v1_16 implements BaseChunk {
-    private static final int CHUNK_SIZE = 4096;
-    private static final int MIN_PALETTE_BITS_PER_ENTRY = 4;
-    private static final int MAX_PALETTE_BITS_PER_ENTRY = 8;
-    private static final int GLOBAL_PALETTE_BITS_PER_ENTRY = 14;
-    private static final int AIR = 0;
     private int blockCount;
     private Palette palette;
     private BitStorage storage;
@@ -49,18 +41,26 @@ public class Chunk_v1_16 implements BaseChunk {
         this.storage = storage;
     }
 
-    public static Chunk_v1_16 read(NetStreamInput in) {
-        int blockCount = in.readShort();
+    public Chunk_v1_16(NetStreamInput in) {
+        blockCount = in.readShort();
+
         int bitsPerEntry = in.readUnsignedByte();
-        Palette palette = readPalette(bitsPerEntry, in);
-        BitStorage storage = new BitStorage(bitsPerEntry, 4096, in.readLongs(in.readVarInt()));
-        return new Chunk_v1_16(blockCount, palette, storage);
+
+        palette = readPalette(bitsPerEntry, in);
+
+        long[] longs = in.readLongs(in.readVarInt());
+
+        // Size of global palette serialized is 0, linear/hashmap is size varInt, then read the varInt # of entries, single is one varInt
+        if (!(palette instanceof SingletonPalette)) {
+            storage = new BitStorage(bitsPerEntry, 4096, longs);
+        }
     }
 
     public static void write(NetStreamOutput out, Chunk_v1_16 chunk) {
         out.writeShort(chunk.blockCount);
         out.writeByte(chunk.storage.getBitsPerEntry());
-        if (!(chunk.palette instanceof GlobalPalette)) {
+
+        if (!(chunk.palette instanceof GlobalPalette) && !(chunk.palette instanceof SingletonPalette)) {
             int paletteLength = chunk.palette.size();
             out.writeVarInt(paletteLength);
 
@@ -83,7 +83,9 @@ public class Chunk_v1_16 implements BaseChunk {
     }
 
     private static Palette readPalette(int bitsPerEntry, NetStreamInput in) {
-        if (bitsPerEntry <= 4) {
+        if (bitsPerEntry == 0) {
+            return new SingletonPalette(in);
+        } else if (bitsPerEntry <= 4) {
             return new ListPalette(bitsPerEntry, in);
         } else {
             return bitsPerEntry <= 8 ? new MapPalette(bitsPerEntry, in) : new GlobalPalette();

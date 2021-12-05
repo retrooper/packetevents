@@ -21,19 +21,18 @@ package com.github.retrooper.packetevents.wrapper.play.server;
 import com.github.retrooper.packetevents.event.impl.PacketSendEvent;
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.protocol.nbt.NBTCompound;
+import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.protocol.stream.NetStreamOutput;
 import com.github.retrooper.packetevents.protocol.world.chunk.BaseChunk;
 import com.github.retrooper.packetevents.protocol.world.chunk.Column;
 import com.github.retrooper.packetevents.protocol.world.chunk.reader.ChunkReader;
-import com.github.retrooper.packetevents.protocol.world.chunk.reader.impl.ChunkReader_v1_16;
-import com.github.retrooper.packetevents.protocol.world.chunk.reader.impl.ChunkReader_v1_7;
-import com.github.retrooper.packetevents.protocol.world.chunk.reader.impl.ChunkReader_v1_8;
-import com.github.retrooper.packetevents.protocol.world.chunk.reader.impl.ChunkReader_v1_9;
-import com.github.retrooper.packetevents.protocol.packettype.PacketType;
+import com.github.retrooper.packetevents.protocol.world.chunk.reader.impl.*;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 
 import java.io.ByteArrayOutputStream;
 import java.util.BitSet;
+import java.util.zip.DataFormatException;
+import java.util.zip.Inflater;
 
 //TODO Finish
 public class WrapperPlayServerChunkData extends PacketWrapper<WrapperPlayServerChunkData> {
@@ -41,7 +40,10 @@ public class WrapperPlayServerChunkData extends PacketWrapper<WrapperPlayServerC
     private static ChunkReader_v1_8 chunkReader_v1_8 = new ChunkReader_v1_8();
     private static ChunkReader_v1_9 chunkReader_v1_9 = new ChunkReader_v1_9();
     private static ChunkReader_v1_16 chunkReader_v1_16 = new ChunkReader_v1_16();
+    private static ChunkReader_v1_18 chunkReader_v1_18 = new ChunkReader_v1_18();
+
     private Column column;
+
     //TODO Make accessible??
     private boolean ignoreOldData;
 
@@ -63,13 +65,8 @@ public class WrapperPlayServerChunkData extends PacketWrapper<WrapperPlayServerC
             //Read primary bit mask
             return new long[]{readVarInt()};
         } else {
-            if (serverVersion == ServerVersion.V_1_7_10) {
-                //Read primary bit mask and add bit mask
-                return new long[]{readUnsignedShort(), readUnsignedShort()};
-            } else {
-                //Read primary bit mask
-                return new long[]{readUnsignedShort()};
-            }
+            //Read primary bit mask
+            return new long[]{readUnsignedShort()};
         }
     }
 
@@ -87,45 +84,21 @@ public class WrapperPlayServerChunkData extends PacketWrapper<WrapperPlayServerC
             //Write primary bit mask
             writeVarInt((int) chunkMask.toLongArray()[0]);
         } else {
-            if (serverVersion == ServerVersion.V_1_7_10) {
-                //Write primary bit mask, add bit mask
-                long[] longArray = chunkMask.toLongArray();
-                writeShort((int) longArray[0]);
-                writeShort((int) longArray[1]);
-            } else {
-                //Write primary bit mask
-                writeShort((int) chunkMask.toLongArray()[0]);
-            }
+            writeShort((int) chunkMask.toLongArray()[0]);
         }
     }
 
     @Override
     public void readData() {
-        //TODO Add 1.7.10 support by decompressing and compressing data
         int chunkX = readInt();
         int chunkZ = readInt();
 
-        boolean v1_17 = serverVersion.isNewerThanOrEquals(ServerVersion.V_1_17);
-        boolean v1_16_2 = serverVersion.isNewerThanOrEquals(ServerVersion.V_1_16_2);
-        boolean v1_13_2 = serverVersion.isNewerThanOrEquals(ServerVersion.V_1_13_2);
+        // All chunks are full chunks in 1.17 and above to avoid issues with arbitrary world height
+        boolean checkFullChunk = serverVersion.isOlderThan(ServerVersion.V_1_17);
+        // Don't read a boolean if there isn't a boolean to be read
+        boolean fullChunk = !checkFullChunk || readBoolean();
 
-        boolean fullChunk = readBoolean();
-        boolean hasBiomeData;
-        boolean hasReadBiomeData = false;
-        if (v1_17) {
-            hasBiomeData = true;
-        } else if (v1_13_2) {
-            hasBiomeData = fullChunk;
-        } else if (serverVersion.isOlderThanOrEquals(ServerVersion.V_1_11_2) && serverVersion.isNewerThanOrEquals(ServerVersion.V_1_9)) {
-            hasBiomeData = fullChunk;
-        } else {
-            //Full chunk boolean exists, but the biome data is not present in the packet
-            hasBiomeData = false;
-        }
-
-
-        if (serverVersion == ServerVersion.V_1_16 ||
-                serverVersion == ServerVersion.V_1_16_1) {
+        if (serverVersion == ServerVersion.V_1_16 || serverVersion == ServerVersion.V_1_16_1) {
             ignoreOldData = readBoolean();
         }
 
@@ -136,43 +109,53 @@ public class WrapperPlayServerChunkData extends PacketWrapper<WrapperPlayServerC
             heightMaps = readNBT();
         }
 
-        int[] biomeData = new int[0];
-        if (hasBiomeData && v1_13_2 && serverVersion.isNewerThanOrEquals(ServerVersion.V_1_15)) {
-            int biomesLength;
-            if (v1_16_2) {
-                biomesLength = readVarInt();
-            } else {
-                biomesLength = 1024;//Always 1024
-            }
-            biomeData = new int[biomesLength];
-            for (int index = 0; index < biomeData.length; index++) {
-                if (v1_16_2) {
-                    biomeData[index] = readVarInt();
-                } else {
-                    biomeData[index] = readInt();
-                }
-            }
-            hasReadBiomeData = true;
+        // 1.7 sends a secondary bit mask for the block metadata
+        BitSet secondaryChunkMask = null;
+        if (serverVersion.isOlderThanOrEquals(ServerVersion.V_1_7_10)) {
+            secondaryChunkMask = readChunkMask();
         }
 
         int dataLength = readVarInt();
         byte[] data = readByteArray(dataLength);
-        BaseChunk[] chunks = getChunkReader().read(chunkMask, chunkMask.size(), data);
+        data = deflate(data, chunkMask, fullChunk);
 
-        if (hasBiomeData && !hasReadBiomeData) {
-            byte[] biomeDataBytes = readByteArray(256);
-            biomeData = new int[256];
-            for (int i = 0; i < biomeDataBytes.length; i++) {
-                biomeData[i] = biomeDataBytes[i];
-            }
+
+        int chunkSize = 16;
+        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_18)) {
+            chunkSize = 25;
+        } else if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_17)) {
+            chunkSize = chunkMask.size();
         }
 
+        BaseChunk[] chunks = getChunkReader().read(chunkMask, secondaryChunkMask, fullChunk, true, true, chunkSize, data);
+
+        int[] biomeData = null;
+
+        // TODO: This is wrong
+        boolean hasBiomeData = fullChunk;
+
+        // 1.7 sends the chunk data as a byte array of size 256 when it is a full chunk
+        // This also applies to 1.8 through 1.12
+        //
+        // 1.13 uses an integer array of size 256 at the end of chunk data
+        // This applies from 1.14
+        //
+        // 1.15-1.17 sends a varInt and then an integer array
+        if (fullChunk) {
+            if (serverVersion.isOlderThan(ServerVersion.V_1_13)) {
+                //biomeData = readByteArray(256);
+            }
+
+        }
+
+        // Tile entities are not sent with this packet on 1.8 and below
+        // on 1.9 and above for all versions, tile entities are sent with the chunk data
+        // (And can be sent with their own packet too!)
         int tileEntityCount = serverVersion.isOlderThan(ServerVersion.V_1_9) ? 0 : readVarInt();
         NBTCompound[] tileEntities = new NBTCompound[tileEntityCount];
         for (int i = 0; i < tileEntities.length; i++) {
             tileEntities[i] = readNBT();
         }
-
 
         if (hasBiomeData) {
             if (hasHeightMaps) {
@@ -187,6 +170,40 @@ public class WrapperPlayServerChunkData extends PacketWrapper<WrapperPlayServerC
                 column = new Column(chunkX, chunkZ, fullChunk, chunks, tileEntities);
             }
         }
+    }
+
+    private byte[] deflate(byte[] toDeflate, BitSet mask, boolean fullChunk) {
+        // The data is already decompressed! (step only needed for 1.7.x)
+        if (serverVersion.isNewerThan(ServerVersion.V_1_7_10)) {
+            return toDeflate;
+        }
+
+        // Determine inflated data length.
+        int chunkCount = 0;
+
+        for (int count = 0; count < 16; count++) {
+            chunkCount += mask.get(count) ? 1 : 0;
+        }
+
+        int len = 12288 * chunkCount;
+        if (fullChunk) {
+            len += 256;
+        }
+
+        byte[] data = new byte[len];
+        // Inflate chunk data.
+        Inflater inflater = new Inflater();
+        inflater.setInput(toDeflate, 0, toDeflate.length);
+
+        try {
+            inflater.inflate(data);
+        } catch (DataFormatException e) {
+            e.printStackTrace();
+        } finally {
+            inflater.end();
+        }
+
+        return data;
     }
 
     @Override
@@ -247,7 +264,7 @@ public class WrapperPlayServerChunkData extends PacketWrapper<WrapperPlayServerC
             BaseChunk chunk = chunks[index];
             if (chunk != null && !chunk.isKnownEmpty()) {
                 chunkMask.set(index);
-               // Chunk_v1_15.write(dataOut, chunk);
+                // Chunk_v1_15.write(dataOut, chunk);
             }
         }
 
@@ -282,16 +299,15 @@ public class WrapperPlayServerChunkData extends PacketWrapper<WrapperPlayServerC
     }
 
     private ChunkReader getChunkReader() {
-        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_16)) {
+        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_18)) {
+            return chunkReader_v1_18;
+        } else if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_16)) {
             return chunkReader_v1_16;
-        }
-        else if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_9)) {
+        } else if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_9)) {
             return chunkReader_v1_9;
-        }
-        else if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_8)) {
+        } else if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_8)) {
             return chunkReader_v1_8;
-        }
-        else {
+        } else {
             return chunkReader_v1_7;
         }
     }
