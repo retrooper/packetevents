@@ -23,6 +23,7 @@ import com.github.retrooper.packetevents.event.impl.PacketReceiveEvent;
 import com.github.retrooper.packetevents.event.impl.PacketSendEvent;
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.netty.buffer.ByteBufAbstract;
+import com.github.retrooper.packetevents.protocol.datawatcher.WatchableObject;
 import com.github.retrooper.packetevents.protocol.inventory.ItemStack;
 import com.github.retrooper.packetevents.protocol.inventory.ItemType;
 import com.github.retrooper.packetevents.protocol.inventory.ItemTypes;
@@ -32,13 +33,12 @@ import com.github.retrooper.packetevents.protocol.packettype.PacketTypeCommon;
 import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 import com.github.retrooper.packetevents.protocol.resources.ResourceLocation;
 import com.github.retrooper.packetevents.util.StringUtil;
+import com.github.retrooper.packetevents.util.Vector3f;
 import com.github.retrooper.packetevents.util.Vector3i;
 import org.jetbrains.annotations.NotNull;
 
 import java.nio.charset.StandardCharsets;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
 
@@ -508,5 +508,87 @@ public class PacketWrapper<T extends PacketWrapper> {
     public void writeBlockPosition(Vector3i pos) {
         long val = pos.getSerializedPosition(serverVersion);
         writeLong(val);
+    }
+
+    private List<WatchableObject> readWatchableObjectsLegacy() {
+        List<WatchableObject> list = new ArrayList<>();
+        //1.7.10 -> 1.8.8 code
+        for (byte b0 = readByte(); b0 != 127; b0 = readByte()) {
+            int i = (b0 & 224) >> 5;
+            int j = b0 & 31;
+            WatchableObject watchableObject = null;
+            switch (i) {
+                case 0:
+                    watchableObject = new WatchableObject(j, WatchableObject.Type.BYTE, readByte());
+                    break;
+                case 1:
+                    watchableObject = new WatchableObject(j, WatchableObject.Type.SHORT, readShort());
+                    break;
+                case 2:
+                    watchableObject = new WatchableObject(j, WatchableObject.Type.INTEGER, readInt());
+                    break;
+                case 3:
+                    watchableObject = new WatchableObject(j, WatchableObject.Type.FLOAT, readFloat());
+                    break;
+                case 4:
+                    watchableObject = new WatchableObject(j, WatchableObject.Type.STRING, readString());
+                    break;
+                case 5:
+                    watchableObject = new WatchableObject(j, WatchableObject.Type.ITEM_STACK, readItemStack());
+                    break;
+                case 6: {
+                    int x = readInt();
+                    int y = readInt();
+                    int z = readInt();
+                    watchableObject = new WatchableObject(j, WatchableObject.Type.POSITION, new Vector3i(x, y, z));
+                    break;
+                }
+                case 7: {
+                    float x = readFloat();
+                    float y = readFloat();
+                    float z = readFloat();
+                    watchableObject = new WatchableObject(j, WatchableObject.Type.ROTATION, new Vector3f(x, y, z));
+                    break;
+                }
+            }
+            list.add(watchableObject);
+        }
+        return list;
+    }
+
+    private void writeWatchableObjectsLegacy(List<WatchableObject> list) {
+        //TODO
+    }
+
+
+    public List<WatchableObject> readWatchableObjects() {
+        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_9)) {
+            List<WatchableObject> list = new ArrayList<>();
+            short index;
+            while ((index = readUnsignedByte()) != 255) {
+
+                short typeID = readUnsignedByte();
+                WatchableObject.Type type = WatchableObject.Type.values()[typeID];
+                Object value = type.getReadDataConsumer().apply(this);
+                list.add(new WatchableObject(index, type, value));
+            }
+            return list;
+        }
+        else {
+            return readWatchableObjectsLegacy();
+        }
+    }
+
+    public void writeWatchableObjects(List<WatchableObject> list) {
+        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_9)) {
+            for (WatchableObject watchableObject : list) {
+                writeByte(watchableObject.getIndex());
+                writeByte(watchableObject.getType().ordinal());
+                watchableObject.getType().getWriteDataConsumer().accept(this, watchableObject.getValue());
+            }
+        }
+        else {
+            writeWatchableObjectsLegacy(list);
+        }
     }
 }

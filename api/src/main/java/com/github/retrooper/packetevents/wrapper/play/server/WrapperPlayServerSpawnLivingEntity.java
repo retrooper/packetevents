@@ -20,6 +20,7 @@ package com.github.retrooper.packetevents.wrapper.play.server;
 
 import com.github.retrooper.packetevents.event.impl.PacketSendEvent;
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
+import com.github.retrooper.packetevents.protocol.datawatcher.WatchableObject;
 import com.github.retrooper.packetevents.protocol.entity.EntityType;
 import com.github.retrooper.packetevents.protocol.entity.EntityTypes;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
@@ -27,6 +28,8 @@ import com.github.retrooper.packetevents.util.MathUtil;
 import com.github.retrooper.packetevents.util.Vector3d;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -42,12 +45,13 @@ public class WrapperPlayServerSpawnLivingEntity extends PacketWrapper<WrapperPla
     private float pitch;
     private float headPitch;
     private Vector3d velocity;
+    private List<WatchableObject> watchableObjects;
 
     public WrapperPlayServerSpawnLivingEntity(PacketSendEvent event) {
         super(event);
     }
 
-    public WrapperPlayServerSpawnLivingEntity(int entityID, UUID entityUUID, EntityType entityType, Vector3d position, float yaw, float pitch, float headPitch, Vector3d velocity) {
+    public WrapperPlayServerSpawnLivingEntity(int entityID, UUID entityUUID, EntityType entityType, Vector3d position, float yaw, float pitch, float headPitch, Vector3d velocity, List<WatchableObject> watchableObjects) {
         super(PacketType.Play.Server.SPAWN_LIVING_ENTITY);
         this.entityID = entityID;
         this.entityUUID = entityUUID;
@@ -57,6 +61,7 @@ public class WrapperPlayServerSpawnLivingEntity extends PacketWrapper<WrapperPla
         this.pitch = pitch;
         this.headPitch = headPitch;
         this.velocity = velocity;
+        this.watchableObjects = watchableObjects;
     }
 
     @Override
@@ -85,7 +90,12 @@ public class WrapperPlayServerSpawnLivingEntity extends PacketWrapper<WrapperPla
         double velY = readShort() / VELOCITY_FACTOR;
         double velZ = readShort() / VELOCITY_FACTOR;
         this.velocity = new Vector3d(velX, velY, velZ);
-        //TODO Handle data watcher on older versions
+        if (serverVersion.isOlderThan(ServerVersion.V_1_15)) {
+            this.watchableObjects = readWatchableObjects();
+        }
+        else {
+            this.watchableObjects = new ArrayList<>();
+        }
     }
 
     @Override
@@ -98,6 +108,7 @@ public class WrapperPlayServerSpawnLivingEntity extends PacketWrapper<WrapperPla
         this.pitch = wrapper.pitch;
         this.headPitch = wrapper.headPitch;
         this.velocity = wrapper.velocity;
+        this.watchableObjects = wrapper.watchableObjects;
     }
 
 
@@ -127,6 +138,9 @@ public class WrapperPlayServerSpawnLivingEntity extends PacketWrapper<WrapperPla
         writeShort((int) (velocity.x * VELOCITY_FACTOR));
         writeShort((int) (velocity.y * VELOCITY_FACTOR));
         writeShort((int) (velocity.z * VELOCITY_FACTOR));
+        if (serverVersion.isOlderThan(ServerVersion.V_1_15)) {
+            writeWatchableObjects(watchableObjects);
+        }
     }
 
     public int getEntityId() {
@@ -191,5 +205,13 @@ public class WrapperPlayServerSpawnLivingEntity extends PacketWrapper<WrapperPla
 
     public void setVelocity(Vector3d velocity) {
         this.velocity = velocity;
+    }
+
+    public List<WatchableObject> getWatchableObjects() {
+        return watchableObjects;
+    }
+
+    public void setWatchableObjects(List<WatchableObject> watchableObjects) {
+        this.watchableObjects = watchableObjects;
     }
 }

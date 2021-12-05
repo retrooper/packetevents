@@ -170,7 +170,7 @@ public class BukkitPacketEventsBuilder {
                     for (Player p : Bukkit.getOnlinePlayers()) {
                         injector.ejectPlayer(p);
                     }
-                    //Eject the injector if needed
+                    //Eject the injector if needed(depends on the injector implementation)
                     injector.eject();
                     //Unregister all our listeners
                     getEventManager().unregisterAllListeners();

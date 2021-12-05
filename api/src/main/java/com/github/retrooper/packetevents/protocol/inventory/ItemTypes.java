@@ -38,6 +38,7 @@ public class ItemTypes {
     private static final Map<Integer, ItemType> ITEM_TYPE_ID_MAP = new HashMap<>();
     private static JsonObject MODERN_ITEM_TYPES_JSON = null;
     private static JsonObject LEGACY_ITEM_TYPES_JSON = null;
+    private static JsonObject PRE_FLATTEN_ITEM_TYPES_JSON = null;
 
     private enum ItemAttribute {
         //TODO Add more
@@ -103,10 +104,31 @@ public class ItemTypes {
         if (LEGACY_ITEM_TYPES_JSON == null) {
             LEGACY_ITEM_TYPES_JSON = MappingHelper.getJSONObject("legacyitemtypes");
         }
+        if (PRE_FLATTEN_ITEM_TYPES_JSON == null) {
+            PRE_FLATTEN_ITEM_TYPES_JSON = MappingHelper.getJSONObject("preflattenitemid");
+        }
         if (latestProtocolVersion == targetProtocolVersion) {
             return id;
         }
-        return MappingHelper.transformId(LEGACY_ITEM_TYPES_JSON, id, targetProtocolVersion);
+
+        //TODO get legacy one(eg. convert red beds to white beds)
+        int legacyItemTypeID = MappingHelper.transformId(LEGACY_ITEM_TYPES_JSON, id, targetProtocolVersion);
+        if (targetProtocolVersion < ClientVersion.V_1_13.getProtocolVersion()) {
+            //Pre-flatten
+            if (PRE_FLATTEN_ITEM_TYPES_JSON.has(String.valueOf(legacyItemTypeID))) {
+                int combinedLegacyID = PRE_FLATTEN_ITEM_TYPES_JSON.get(String.valueOf(legacyItemTypeID)).getAsInt();
+                //Extract ID from combined id
+                return combinedLegacyID >>> 16;
+            }
+            else {
+                return 0;
+            }
+        }
+        else {
+            //TODO Flatten
+        }
+
+        return id;
     }
 
 

@@ -52,6 +52,7 @@ public enum Color {
     private final boolean color;
     private final String name;
     private final String fullCode;
+    private final String str;
 
     Color(char code) {
         this(code, true);
@@ -62,6 +63,7 @@ public enum Color {
         this.color = color;
         this.name = name().toLowerCase();
         this.fullCode = new String(new char[] {PREFIX, code});
+        this.str = new String(new char[] {'\u00A7', code});
     }
 
     Color(char code, boolean color, String name) {
@@ -69,6 +71,7 @@ public enum Color {
         this.color = color;
         this.name = name;
         this.fullCode = new String(new char[] {PREFIX, code});
+        this.str = new String(new char[] {'\u00A7', code});
     }
 
     public boolean isColor() {
@@ -110,9 +113,8 @@ public enum Color {
         return fullCode;
     }
 
-
     @Override
     public String toString() {
-        return name;
+        return str;
     }
 }

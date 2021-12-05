@@ -23,6 +23,7 @@ import com.github.retrooper.packetevents.event.PacketListenerAbstract;
 import com.github.retrooper.packetevents.event.impl.PacketReceiveEvent;
 import com.github.retrooper.packetevents.event.impl.PacketSendEvent;
 import com.github.retrooper.packetevents.factory.bukkit.BukkitPacketEventsBuilder;
+import com.github.retrooper.packetevents.protocol.chat.Color;
 import com.github.retrooper.packetevents.protocol.inventory.ItemStack;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.protocol.player.Hand;
@@ -71,7 +72,7 @@ public class PacketEventsPlugin extends JavaPlugin {
                     int entityID = interactEntity.getEntityId();
                     WrapperPlayClientInteractEntity.InteractAction action = interactEntity.getAction();
                     Hand hand = interactEntity.getHand();
-                    player.sendMessage("Entity ID: " + entityID);
+                    player.sendMessage(Color.DARK_GREEN + "Entity ID: " + entityID + Color.CYAN + ", Action: " + action + Color.BLUE + ", Hand: " + hand);
                     player.sendMessage("Action: " + action);
                     player.sendMessage("Hand: " + hand);
                 }
@@ -103,12 +104,15 @@ public class PacketEventsPlugin extends JavaPlugin {
                     if (player != null) {
                         player.sendMessage("Spawned entity with id: " + entityID + ", with uuid: " + uuid + ", at position: " + position);
                     }
+                    net.minecraft.server.v1_14_R1.PacketPlayOutSpawnEntityLiving sel;
+                    net.minecraft.server.v1_8_R3.PacketPlayOutEntityMetadata em0;
                     //TODO Complete spawn living entity for outdated versions
                     event.setLastUsedWrapper(null);
                 } else if (event.getPacketType() == PacketType.Play.Server.SET_SLOT) {
                     WrapperPlayServerSetSlot setSlot = new WrapperPlayServerSetSlot(event);
                     int windowID = setSlot.getWindowId();
                     int slot = setSlot.getSlot();
+                    //TODO Fix ItemTypes on all versions
                     ItemStack item = setSlot.getItem();
                     System.out.println("Set slot with window ID: " + windowID + ", slot: " + slot + ", item: " + (item.getType() != null ? item.toString() : "null item"));
                 }
