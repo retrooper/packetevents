@@ -34,6 +34,7 @@ import io.github.retrooper.packetevents.utils.vector.Vector3i;
 import io.github.retrooper.packetevents.utils.world.Difficulty;
 import io.github.retrooper.packetevents.utils.world.Dimension;
 import org.bukkit.inventory.ItemStack;
+import org.jetbrains.annotations.Nullable;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -455,13 +456,19 @@ public class WrappedPacket implements WrapperPacketReader, WrapperPacketWriter {
         write(NMSUtils.nmsItemStackClass, index, nmsItemStack);
     }
 
+    @Nullable
     public GameMode readGameMode(int index) {
         Enum<?> enumConst = readEnumConstant(index, NMSUtils.enumGameModeClass);
-        return GameMode.values()[enumConst.ordinal() - 1];
+        int targetIndex = enumConst.ordinal() - 1;
+        if (targetIndex == -1) {
+            return null;
+        }
+        return GameMode.values()[targetIndex];
     }
 
-    public void writeGameMode(int index, GameMode gameMode) {
-        Enum<?> enumConst = EnumUtil.valueByIndex(NMSUtils.enumGameModeClass, gameMode.ordinal() + 1);
+    public void writeGameMode(int index, @Nullable GameMode gameMode) {
+        int i = gameMode != null ? (gameMode.ordinal() + 1) : (0);
+        Enum<?> enumConst = EnumUtil.valueByIndex(NMSUtils.enumGameModeClass, i);
         writeEnumConstant(index, enumConst);
     }
 
