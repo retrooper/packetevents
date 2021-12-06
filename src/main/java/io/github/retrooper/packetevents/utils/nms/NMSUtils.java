@@ -245,8 +245,11 @@ public final class NMSUtils {
                 blockPosClass = getNMClassWithoutException("core.BlockPosition");
             }
         }
-        // Added in 1.18
-        sectionPositionClass = getNMClassWithoutException("core.SectionPosition");
+
+        sectionPositionClass = getNMSClassWithoutException("SectionPosition");
+        if (sectionPositionClass == null) {
+            sectionPositionClass = getNMClassWithoutException("core.SectionPosition");
+        }
 
         if (version.isNewerThanOrEquals(ServerVersion.v_1_14)) {
             movingObjectPositionBlockClass = NMSUtils.getNMSClassWithoutException("MovingObjectPositionBlock");
