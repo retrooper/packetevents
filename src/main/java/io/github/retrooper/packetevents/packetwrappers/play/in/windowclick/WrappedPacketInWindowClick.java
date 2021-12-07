@@ -18,25 +18,16 @@
 
 package io.github.retrooper.packetevents.packetwrappers.play.in.windowclick;
 
-import io.github.retrooper.packetevents.packettype.PacketTypeClasses;
 import io.github.retrooper.packetevents.packetwrappers.NMSPacket;
 import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
 import io.github.retrooper.packetevents.utils.enums.EnumUtil;
 import io.github.retrooper.packetevents.utils.nms.NMSUtils;
-import io.github.retrooper.packetevents.utils.reflection.Reflection;
 import io.github.retrooper.packetevents.utils.server.ServerVersion;
 import org.bukkit.inventory.ItemStack;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Optional;
 
 public class WrappedPacketInWindowClick extends WrappedPacket {
     private static boolean v_1_17;
     private static Class<? extends Enum<?>> invClickTypeClass;
-    private static boolean isClickModePrimitive;
-
 
     public WrappedPacketInWindowClick(NMSPacket packet) {
         super(packet);
@@ -49,7 +40,6 @@ public class WrappedPacketInWindowClick extends WrappedPacket {
         if (invClickTypeClass == null) {
             invClickTypeClass = NMSUtils.getNMEnumClassWithoutException("world.inventory.InventoryClickType");
         }
-        isClickModePrimitive = Reflection.getField(PacketTypeClasses.Play.Client.WINDOW_CLICK, int.class, 3) != null;
     }
 
     // Unique ID for the inventory, 0 for player's inventory
@@ -97,7 +87,7 @@ public class WrappedPacketInWindowClick extends WrappedPacket {
 
     // Type of click - shift clicking, hotbar, drag, pickup...
     public int getMode() {
-        if (isClickModePrimitive) {
+        if (!v_1_17) {
             return readInt(3);
         } else {
             Enum<?> enumConst = readEnumConstant(0, invClickTypeClass);
@@ -106,7 +96,7 @@ public class WrappedPacketInWindowClick extends WrappedPacket {
     }
 
     public void setMode(int mode) {
-        if (isClickModePrimitive) {
+        if (!v_1_17) {
             writeInt(3, mode);
         } else {
             Enum<?> enumConst = EnumUtil.valueByIndex(invClickTypeClass, mode);
@@ -124,6 +114,6 @@ public class WrappedPacketInWindowClick extends WrappedPacket {
     }
 
     public void setClickedItemStack(ItemStack stack) {
-       writeItemStack(0, stack);
+        writeItemStack(0, stack);
     }
 }
