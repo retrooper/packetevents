@@ -52,43 +52,50 @@ public class WrappedPacketInWindowClick extends WrappedPacket {
         isClickModePrimitive = Reflection.getField(PacketTypeClasses.Play.Client.WINDOW_CLICK, int.class, 3) != null;
     }
 
+    // Unique ID for the inventory, 0 for player's inventory
     public int getWindowId() {
-        return readInt(0);
+        return readInt(v_1_17 ? 1 : 0);
     }
 
     public void setWindowId(int windowID) {
-        writeInt(0, windowID);
+        writeInt(v_1_17 ? 1 : 0, windowID);
     }
 
+    // Id of clicked slot
     public int getWindowSlot() {
-        return readInt(1);
+        return readInt(v_1_17 ? 3 : 1);
     }
 
     public void setWindowSlot(int slot) {
-        writeInt(1, slot);
+        writeInt(v_1_17 ? 3 : 1, slot);
     }
 
+    // Left or right click
     public int getWindowButton() {
-        return readInt(2);
+        return readInt(v_1_17 ? 4 : 2);
     }
 
     public void setWindowButton(int button) {
-        writeInt(2, button);
+        writeInt(v_1_17 ? 4 : 2, button);
     }
 
-    public Optional<Short> getActionNumber() {
+    // Used to sync together client and server
+    public int getActionNumber() {
         if (v_1_17) {
-            return Optional.empty();
+            return readInt(2);
         }
-        return Optional.of(readShort(0));
+        return readShort(0);
     }
 
-    public void setActionNumber(short actionNumber) {
-        if (!v_1_17) {
-            writeShort(0, actionNumber);
+    public void setActionNumber(int actionNumber) {
+        if (v_1_17) {
+            writeInt(2, actionNumber);
+        } else {
+            writeShort(0, (short) actionNumber);
         }
     }
 
+    // Type of click - shift clicking, hotbar, drag, pickup...
     public int getMode() {
         if (isClickModePrimitive) {
             return readInt(3);
