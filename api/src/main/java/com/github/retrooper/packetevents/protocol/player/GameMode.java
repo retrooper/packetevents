@@ -29,4 +29,15 @@ public enum GameMode {
     CREATIVE,
     ADVENTURE,
     SPECTATOR;
+
+    public int getId() {
+        return ordinal();
+    }
+
+    public static GameMode getById(int id) {
+        if (id == -1) {
+            return null;
+        }
+        return values()[id];
+    }
 }

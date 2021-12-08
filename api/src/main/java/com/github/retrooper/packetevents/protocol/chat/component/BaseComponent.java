@@ -127,6 +127,18 @@ public class BaseComponent {
         this.children = children;
     }
 
+    public void setModifier(BaseComponent modifier) {
+        this.color = modifier.color;
+        this.insertion = modifier.insertion;
+        this.clickEvent = modifier.clickEvent;
+        this.hoverEvent = modifier.hoverEvent;
+        this.bold = modifier.bold;
+        this.italic = modifier.italic;
+        this.underlined = modifier.underlined;
+        this.strikeThrough = modifier.strikeThrough;
+        this.obfuscated = modifier.obfuscated;
+    }
+
     public static Builder builder() {
         return new Builder(new BaseComponent());
     }

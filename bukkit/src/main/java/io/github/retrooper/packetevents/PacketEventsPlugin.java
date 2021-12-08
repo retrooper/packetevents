@@ -47,21 +47,6 @@ public class PacketEventsPlugin extends JavaPlugin {
     public void onEnable() {
         //Register your listeners
         PacketEvents.getAPI().init();
-        //net.minecraft.network.protocol.game.PacketPlayOutNamedEntitySpawn a0;
-        net.minecraft.server.v1_16_R2.PacketPlayOutNamedEntitySpawn a1;
-        net.minecraft.server.v1_15_R1.PacketPlayOutNamedEntitySpawn a2;
-        net.minecraft.server.v1_14_R1.PacketPlayOutNamedEntitySpawn a3;
-        net.minecraft.server.v1_13_R2.PacketPlayOutNamedEntitySpawn a4;
-        net.minecraft.server.v1_12_R1.PacketPlayOutNamedEntitySpawn a5;
-        net.minecraft.server.v1_11_R1.PacketPlayOutNamedEntitySpawn a6;
-        net.minecraft.server.v1_10_R1.PacketPlayOutNamedEntitySpawn a7;
-        net.minecraft.server.v1_9_R1.PacketPlayOutNamedEntitySpawn a8;
-        net.minecraft.server.v1_8_R3.PacketPlayOutNamedEntitySpawn a9;
-        net.minecraft.server.v1_7_R4.PacketPlayOutNamedEntitySpawn a10;
-        net.minecraft.server.v1_8_R3.PacketPlayOutSpawnEntityLiving eee;
-
-
-        net.minecraft.server.v1_16_R2.PacketPlayOutBlockChange em;
 
         PacketListenerAbstract debugListener = new PacketListenerAbstract() {
             @Override
@@ -72,9 +57,8 @@ public class PacketEventsPlugin extends JavaPlugin {
                     int entityID = interactEntity.getEntityId();
                     WrapperPlayClientInteractEntity.InteractAction action = interactEntity.getAction();
                     Hand hand = interactEntity.getHand();
-                    player.sendMessage(Color.DARK_GREEN + "Entity ID: " + entityID + Color.CYAN + ", Action: " + action + Color.BLUE + ", Hand: " + hand);
-                    player.sendMessage("Action: " + action);
-                    player.sendMessage("Hand: " + hand);
+                    PacketEvents.getAPI().getPlayerManager().sendMessage(event.getChannel(),
+                            Color.DARK_GREEN + "Entity ID: " + entityID + Color.CYAN + ", Action: " + action + Color.RED + ", Hand: " + hand);
                 }
             }
 
@@ -104,8 +88,6 @@ public class PacketEventsPlugin extends JavaPlugin {
                     if (player != null) {
                         player.sendMessage("Spawned entity with id: " + entityID + ", with uuid: " + uuid + ", at position: " + position);
                     }
-                    net.minecraft.server.v1_14_R1.PacketPlayOutSpawnEntityLiving sel;
-                    net.minecraft.server.v1_8_R3.PacketPlayOutEntityMetadata em0;
                     //TODO Complete spawn living entity for outdated versions
                     event.setLastUsedWrapper(null);
                 } else if (event.getPacketType() == PacketType.Play.Server.SET_SLOT) {

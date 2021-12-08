@@ -18,12 +18,16 @@
 
 package com.github.retrooper.packetevents.manager.player;
 
+import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.netty.buffer.ByteBufAbstract;
 import com.github.retrooper.packetevents.netty.channel.ChannelAbstract;
 import com.github.retrooper.packetevents.protocol.ConnectionState;
+import com.github.retrooper.packetevents.protocol.chat.component.BaseComponent;
+import com.github.retrooper.packetevents.protocol.chat.component.serializer.StringMessage;
 import com.github.retrooper.packetevents.protocol.gameprofile.WrappedGameProfile;
 import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
+import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerChatMessage;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Map;
@@ -64,6 +68,15 @@ public interface PlayerManager {
     void sendPacket(@NotNull Object player, ByteBufAbstract byteBuf);
 
     void sendPacket(@NotNull Object player, PacketWrapper<?> wrapper);
+
+    default void sendMessage(ChannelAbstract channel, String message) {
+        BaseComponent[] components = new StringMessage(message, false, false).getOutput();
+        for (BaseComponent component : components) {
+            //Send chat packet with component at index i
+            WrapperPlayServerChatMessage chatMessage = new WrapperPlayServerChatMessage(component, WrapperPlayServerChatMessage.ChatPosition.CHAT, new UUID(0L, 0L));
+            sendPacket(channel, chatMessage);
+        }
+    }
 
     WrappedGameProfile getGameProfile(@NotNull Object player);
 

@@ -31,11 +31,13 @@ import com.github.retrooper.packetevents.protocol.nbt.NBTCompound;
 import com.github.retrooper.packetevents.protocol.nbt.codec.NBTCodec;
 import com.github.retrooper.packetevents.protocol.packettype.PacketTypeCommon;
 import com.github.retrooper.packetevents.protocol.player.ClientVersion;
+import com.github.retrooper.packetevents.protocol.player.GameMode;
 import com.github.retrooper.packetevents.protocol.resources.ResourceLocation;
 import com.github.retrooper.packetevents.util.StringUtil;
 import com.github.retrooper.packetevents.util.Vector3f;
 import com.github.retrooper.packetevents.util.Vector3i;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.nio.charset.StandardCharsets;
 import java.util.*;
@@ -513,6 +515,15 @@ public class PacketWrapper<T extends PacketWrapper> {
     public void writeBlockPosition(Vector3i pos) {
         long val = pos.getSerializedPosition(serverVersion);
         writeLong(val);
+    }
+
+    public GameMode readGameMode() {
+        return GameMode.getById(readByte());
+    }
+
+    public void writeGameMode(@Nullable GameMode mode) {
+        int id = mode == null ? -1 : mode.getId();
+        writeByte(id);
     }
 
     private List<WatchableObject> readWatchableObjectsLegacy() {
