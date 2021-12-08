@@ -18,6 +18,8 @@
 
 package com.github.retrooper.packetevents.protocol.player;
 
+import org.jetbrains.annotations.Nullable;
+
 /**
  * Representation of a player's game mode.
  *
@@ -34,6 +36,7 @@ public enum GameMode {
         return ordinal();
     }
 
+    @Nullable
     public static GameMode getById(int id) {
         if (id == -1) {
             return null;
