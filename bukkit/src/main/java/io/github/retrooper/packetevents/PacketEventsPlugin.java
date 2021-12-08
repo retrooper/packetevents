@@ -57,8 +57,6 @@ public class PacketEventsPlugin extends JavaPlugin {
                     int entityID = interactEntity.getEntityId();
                     WrapperPlayClientInteractEntity.InteractAction action = interactEntity.getAction();
                     Hand hand = interactEntity.getHand();
-                    PacketEvents.getAPI().getPlayerManager().sendMessage(event.getChannel(),
-                            Color.DARK_GREEN + "Entity ID: " + entityID + Color.CYAN + ", Action: " + action + Color.RED + ", Hand: " + hand);
                 }
             }
 
