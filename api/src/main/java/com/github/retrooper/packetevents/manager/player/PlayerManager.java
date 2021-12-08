@@ -18,6 +18,7 @@
 
 package com.github.retrooper.packetevents.manager.player;
 
+import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.netty.buffer.ByteBufAbstract;
 import com.github.retrooper.packetevents.netty.channel.ChannelAbstract;
 import com.github.retrooper.packetevents.protocol.ConnectionState;
@@ -26,6 +27,7 @@ import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
@@ -36,15 +38,53 @@ public interface PlayerManager {
     Map<String, ChannelAbstract> CHANNELS = new ConcurrentHashMap<>();
     Map<UUID, Map<Class<? extends PlayerAttributeObject>, PlayerAttributeObject>> PLAYER_ATTRIBUTES = new ConcurrentHashMap<>();
 
-    <T extends PlayerAttributeObject> T getAttributeOrDefault(UUID uuid, Class<T> clazz, T defaultReturnValue);
-    <T extends PlayerAttributeObject> T getAttribute(UUID uuid, Class<T> clazz);
-    <T extends PlayerAttributeObject> void setAttribute(UUID uuid, T attribute);
+    default <T extends PlayerAttributeObject> T getAttributeOrDefault(UUID uuid, Class<T> clazz, T defaultReturnValue) {
+        Map<Class<? extends PlayerAttributeObject>, PlayerAttributeObject> attributes = PLAYER_ATTRIBUTES.get(uuid);
+        if (attributes != null) {
+            return (T) attributes.get(clazz);
+        } else {
+            attributes = new HashMap<>();
+            attributes.put(defaultReturnValue.getClass(), defaultReturnValue);
+            PLAYER_ATTRIBUTES.put(uuid, attributes);
+            return defaultReturnValue;
+        }
+    }
 
-    ConnectionState getConnectionState(@NotNull Object player);
+    default <T extends PlayerAttributeObject> T getAttribute(UUID uuid, Class<T> clazz) {
+        Map<Class<? extends PlayerAttributeObject>, PlayerAttributeObject> attributes = PLAYER_ATTRIBUTES.get(uuid);
+        if (attributes != null) {
+            return (T) attributes.get(clazz);
+        } else {
+            PLAYER_ATTRIBUTES.put(uuid, new HashMap<>());
+            return null;
+        }
+    }
 
-    ConnectionState getConnectionState(ChannelAbstract channel);
+    default <T extends PlayerAttributeObject> void setAttribute(UUID uuid, T attribute) {
+        Map<Class<? extends PlayerAttributeObject>, PlayerAttributeObject> attributes = PLAYER_ATTRIBUTES.computeIfAbsent(uuid, k -> new HashMap<>());
+        attributes.put(attribute.getClass(), attribute);
+    }
 
-    void changeConnectionState(ChannelAbstract channel, ConnectionState connectionState);
+    default ConnectionState getConnectionState(@NotNull Object player) {
+        return getConnectionState(getChannel(player));
+    }
+
+    default ConnectionState getConnectionState(ChannelAbstract channel) {
+        ConnectionState connectionState = CONNECTION_STATES.get(channel);
+        if (connectionState == null) {
+            connectionState = PacketEvents.getAPI().getInjector().getConnectionState(channel);
+            if (connectionState == null) {
+                connectionState = ConnectionState.PLAY;
+            }
+            CONNECTION_STATES.put(channel, connectionState);
+        }
+        return connectionState;
+    }
+
+    default void changeConnectionState(ChannelAbstract channel, ConnectionState connectionState) {
+        CONNECTION_STATES.put(channel, connectionState);
+        PacketEvents.getAPI().getInjector().changeConnectionState(channel, connectionState);
+    }
 
     int getPing(@NotNull Object player);
 
@@ -53,29 +93,41 @@ public interface PlayerManager {
 
     ClientVersion getClientVersion(ChannelAbstract channel);
 
-    void setClientVersion(ChannelAbstract channel, ClientVersion version);
+    default void setClientVersion(ChannelAbstract channel, ClientVersion version) {
+        CLIENT_VERSIONS.put(channel, version);
+    }
 
-    void setClientVersion(@NotNull Object player, ClientVersion version);
+    default void setClientVersion(@NotNull Object player, ClientVersion version) {
+        setClientVersion(getChannel(player), version);
+    }
 
     void sendPacket(ChannelAbstract channel, ByteBufAbstract byteBuf);
 
-    void sendPacket(ChannelAbstract channel, PacketWrapper<?> wrapper);
+    default void sendPacket(ChannelAbstract channel, PacketWrapper<?> wrapper) {
+        wrapper.prepareForSend();
+        sendPacket(channel, wrapper.buffer);
+    }
 
-    void sendPacket(@NotNull Object player, ByteBufAbstract byteBuf);
+    default void sendPacket(@NotNull Object player, ByteBufAbstract byteBuf) {
+        ChannelAbstract channel = getChannel(player);
+        sendPacket(channel, byteBuf);
+    }
 
-    void sendPacket(@NotNull Object player, PacketWrapper<?> wrapper);
+    default void sendPacket(@NotNull Object player, PacketWrapper<?> wrapper) {
+        wrapper.prepareForSend();
+        ChannelAbstract channel = getChannel(player);
+        sendPacket(channel, wrapper.buffer);
+    }
 
     WrappedGameProfile getGameProfile(@NotNull Object player);
 
-    boolean isGeyserPlayer(@NotNull Object player);
-
-    boolean isGeyserPlayer(UUID uuid);
-
     ChannelAbstract getChannel(@NotNull Object player);
 
-    ChannelAbstract getChannel(String username);
+    default ChannelAbstract getChannel(String username) {
+        return CHANNELS.get(username);
+    }
 
-    void setChannel(String username, ChannelAbstract channel);
-
-    void setChannel(@NotNull Object player, ChannelAbstract channel);
+    default void setChannel(String username, ChannelAbstract channel) {
+        CHANNELS.put(username, channel);
+    }
 }

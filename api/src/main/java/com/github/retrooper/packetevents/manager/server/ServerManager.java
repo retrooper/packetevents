@@ -23,8 +23,6 @@ import com.github.retrooper.packetevents.netty.channel.ChannelAbstract;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 
 public interface ServerManager {
-    ServerVersion resolveVersionNoCache();
-
     /**
      * Get the server version.
      *
@@ -48,6 +46,8 @@ public interface ServerManager {
     void receivePacket(Object player, PacketWrapper<?> wrapper);
 
     void receivePacket(ChannelAbstract channel, PacketWrapper<?> wrapper);
+
+    //TODO getEntityById
 
    /* private static Entity getEntityByIdWithWorldUnsafe(World world, int id) {
         if (world == null) {
@@ -164,7 +164,4 @@ public interface ServerManager {
             return world.getEntities();
         }
     }*/
-
-
-    boolean isGeyserAvailable();
 }

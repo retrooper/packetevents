@@ -43,61 +43,6 @@ import java.util.Map;
 import java.util.UUID;
 
 public class PlayerManagerImpl implements PlayerManager {
-
-    @Override
-    public <T extends PlayerAttributeObject> T getAttributeOrDefault(UUID uuid, Class<T> clazz, T defaultReturnValue) {
-        Map<Class<? extends PlayerAttributeObject>, PlayerAttributeObject> attributes = PLAYER_ATTRIBUTES.get(uuid);
-        if (attributes != null) {
-            return (T) attributes.get(clazz);
-        } else {
-            attributes = new HashMap<>();
-            attributes.put(defaultReturnValue.getClass(), defaultReturnValue);
-            PLAYER_ATTRIBUTES.put(uuid, attributes);
-            return defaultReturnValue;
-        }
-    }
-
-    @Override
-    public <T extends PlayerAttributeObject> T getAttribute(UUID uuid, Class<T> clazz) {
-        Map<Class<? extends PlayerAttributeObject>, PlayerAttributeObject> attributes = PLAYER_ATTRIBUTES.get(uuid);
-        if (attributes != null) {
-            return (T) attributes.get(clazz);
-        } else {
-            PLAYER_ATTRIBUTES.put(uuid, new HashMap<>());
-            return null;
-        }
-    }
-
-    @Override
-    public <T extends PlayerAttributeObject> void setAttribute(UUID uuid, T attribute) {
-        Map<Class<? extends PlayerAttributeObject>, PlayerAttributeObject> attributes = PLAYER_ATTRIBUTES.computeIfAbsent(uuid, k -> new HashMap<>());
-        attributes.put(attribute.getClass(), attribute);
-    }
-
-    @Override
-    public ConnectionState getConnectionState(@NotNull Object player) {
-        return getConnectionState(getChannel(player));
-    }
-
-    @Override
-    public ConnectionState getConnectionState(ChannelAbstract channel) {
-        ConnectionState connectionState = CONNECTION_STATES.get(channel);
-        if (connectionState == null) {
-            connectionState = PacketEvents.getAPI().getInjector().getConnectionState(channel);
-            if (connectionState == null) {
-                connectionState = ConnectionState.PLAY;
-            }
-            CONNECTION_STATES.put(channel, connectionState);
-        }
-        return connectionState;
-    }
-
-    @Override
-    public void changeConnectionState(ChannelAbstract channel, ConnectionState connectionState) {
-        CONNECTION_STATES.put(channel, connectionState);
-        PacketEvents.getAPI().getInjector().changeConnectionState(channel, connectionState);
-    }
-
     @Override
     public int getPing(@NotNull Object player) {
         if (MinecraftReflectionUtil.V_1_17_OR_HIGHER) {
@@ -164,20 +109,11 @@ public class PlayerManagerImpl implements PlayerManager {
     }
 
     @Override
-    public void setClientVersion(ChannelAbstract channel, ClientVersion version) {
-        CLIENT_VERSIONS.put(channel, version);
-    }
-
-    @Override
-    public void setClientVersion(@NotNull Object player, ClientVersion version) {
-        setClientVersion(getChannel(player), version);
-    }
-
-    @Override
     public void sendPacket(ChannelAbstract channel, ByteBufAbstract byteBuf) {
         if (channel.isOpen()) {
             //TODO Also check if our encoder is RIGHT before minecraft's,
             //if it is, then don't use context to writeflush, otherwise use it (to support multiple packetevents instances)
+
             if (ViaVersionUtil.isAvailable() && !ProtocolSupportUtil.isAvailable()) {
                 channel.writeAndFlush(byteBuf);
             } else {
@@ -187,42 +123,10 @@ public class PlayerManagerImpl implements PlayerManager {
     }
 
     @Override
-    public void sendPacket(ChannelAbstract channel, PacketWrapper<?> wrapper) {
-        wrapper.prepareForSend();
-        sendPacket(channel, wrapper.buffer);
-    }
-
-    @Override
-    public void sendPacket(@NotNull Object player, ByteBufAbstract byteBuf) {
-        ChannelAbstract channel = getChannel(player);
-        sendPacket(channel, byteBuf);
-    }
-
-    @Override
-    public void sendPacket(@NotNull Object player, PacketWrapper<?> wrapper) {
-        wrapper.prepareForSend();
-        ChannelAbstract channel = getChannel(player);
-        sendPacket(channel, wrapper.buffer);
-    }
-
-    @Override
     public WrappedGameProfile getGameProfile(@NotNull Object player) {
         Player p = (Player) player;
         Object gameProfile = DependencyUtil.getGameProfile(p.getUniqueId(), p.getName());
         return DependencyUtil.getWrappedGameProfile(gameProfile);
-    }
-
-    @Override
-    public boolean isGeyserPlayer(@NotNull Object player) {
-        return isGeyserPlayer(((Player) player).getUniqueId());
-    }
-
-    @Override
-    public boolean isGeyserPlayer(UUID uuid) {
-        if (!PacketEvents.getAPI().getServerManager().isGeyserAvailable()) {
-            return false;
-        }
-        return GeyserUtil.isGeyserPlayer(uuid);
     }
 
     @Override
@@ -237,20 +141,5 @@ public class PlayerManagerImpl implements PlayerManager {
             }
         }
         return channel;
-    }
-
-    @Override
-    public ChannelAbstract getChannel(String username) {
-        return CHANNELS.get(username);
-    }
-
-    @Override
-    public void setChannel(String username, ChannelAbstract channel) {
-        CHANNELS.put(username, channel);
-    }
-
-    @Override
-    public void setChannel(@NotNull Object player, ChannelAbstract channel) {
-        setChannel(((Player) player).getName(), channel);
     }
 }

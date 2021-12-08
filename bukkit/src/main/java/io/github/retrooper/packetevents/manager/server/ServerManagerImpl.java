@@ -31,8 +31,7 @@ import org.bukkit.plugin.Plugin;
 public class ServerManagerImpl implements ServerManager {
     private ServerVersion serverVersion;
 
-    @Override
-    public ServerVersion resolveVersionNoCache() {
+    private ServerVersion resolveVersionNoCache() {
         if (ServerVersion.reversedValues[0] == null) {
             ServerVersion.reversedValues = ServerVersion.reverse();
         }
@@ -86,10 +85,5 @@ public class ServerManagerImpl implements ServerManager {
     @Override
     public void receivePacket(ChannelAbstract channel, PacketWrapper<?> wrapper) {
 
-    }
-
-    @Override
-    public boolean isGeyserAvailable() {
-        return MinecraftReflectionUtil.GEYSER_CLASS != null;
     }
 }
