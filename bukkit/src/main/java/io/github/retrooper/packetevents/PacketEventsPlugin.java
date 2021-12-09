@@ -57,6 +57,7 @@ public class PacketEventsPlugin extends JavaPlugin {
                     int entityID = interactEntity.getEntityId();
                     WrapperPlayClientInteractEntity.InteractAction action = interactEntity.getAction();
                     Hand hand = interactEntity.getHand();
+                    player.sendMessage(Color.BRIGHT_GREEN + "Received packet: " + event.getPacketType().getName() + " from " + player.getName() + " with entityID: " + entityID + " and action: " + action.name() + " and hand: " + hand.name());
                 }
             }
 
@@ -99,7 +100,7 @@ public class PacketEventsPlugin extends JavaPlugin {
                 //TODO Complete chunk data packet
             }
         };
-        PacketEvents.getAPI().getEventManager().registerListener(debugListener);
+        //PacketEvents.getAPI().getEventManager().registerListener(debugListener);
     }
 
     @Override
