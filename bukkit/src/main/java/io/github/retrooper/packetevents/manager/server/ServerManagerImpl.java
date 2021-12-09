@@ -32,11 +32,8 @@ public class ServerManagerImpl implements ServerManager {
     private ServerVersion serverVersion;
 
     private ServerVersion resolveVersionNoCache() {
-        if (ServerVersion.reversedValues[0] == null) {
-            ServerVersion.reversedValues = ServerVersion.reverse();
-        }
-
-        for (final ServerVersion val : ServerVersion.reversedValues) {
+        for (final ServerVersion val : ServerVersion.reversedValues()) {
+            //For example "V_1_18" -> "1.18"
             String valName = val.name().substring(2).replace("_", ".");
             if (Bukkit.getBukkitVersion().contains(valName)) {
                 return val;

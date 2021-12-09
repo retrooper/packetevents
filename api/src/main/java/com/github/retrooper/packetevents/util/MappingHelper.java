@@ -35,20 +35,6 @@ import java.util.Map;
 public class MappingHelper {
     public static final Map<String, JsonObject> MAPPING_JSON_OBJECTS = new HashMap<>();
 
-    //TODO When updating legacyitemtypes, make sure to name 1_9_4 to 1_9_3
-    public static int transformId(JsonObject mappingsJsonObject, int id, int targetProtocolVersion) {
-        ClientVersion targetClientVersion = ClientVersion.getClientVersionByProtocolVersion(targetProtocolVersion);
-        String jsonName = targetClientVersion.name().substring(2);
-        if (mappingsJsonObject.has(jsonName)) {
-            JsonObject jsonObject = mappingsJsonObject.getAsJsonObject(jsonName);
-            String idString = String.valueOf(id);
-            if (jsonObject.has(idString)) {
-                return jsonObject.get(idString).getAsInt();
-            }
-        }
-        return id;
-    }
-
     public static JsonObject getJSONObject(String id) {
         JsonObject result = MAPPING_JSON_OBJECTS.get(id);
         if (result == null) {

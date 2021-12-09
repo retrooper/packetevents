@@ -36,13 +36,38 @@ import java.util.*;
 public class ItemTypes {
     private static final Map<String, ItemType> ITEM_TYPE_MAP = new HashMap<>();
     private static final Map<Integer, ItemType> ITEM_TYPE_ID_MAP = new HashMap<>();
-    private static JsonObject MODERN_ITEM_TYPES_JSON = null;
-    private static JsonObject LEGACY_ITEM_TYPES_JSON = null;
-    private static JsonObject PRE_FLATTEN_ITEM_TYPES_JSON = null;
+    private static JsonObject MAPPINGS;
 
     private enum ItemAttribute {
         //TODO Add more
         MUSIC_DISC, EDIBLE;
+    }
+
+    private static ServerVersion getMappingServerVersion(ServerVersion serverVersion) {
+        if (serverVersion.isOlderThan(ServerVersion.V_1_13)) {
+            return ServerVersion.V_1_12;
+        }
+        else if (serverVersion.isOlderThan(ServerVersion.V_1_13_2)) {
+            return ServerVersion.V_1_13;
+        }
+        else if (serverVersion.isOlderThan(ServerVersion.V_1_14)) {
+            return ServerVersion.V_1_13_2;
+        }
+        else if (serverVersion.isOlderThan(ServerVersion.V_1_15)) {
+            return ServerVersion.V_1_14;
+        }
+        else if (serverVersion.isOlderThan(ServerVersion.V_1_16)) {
+            return ServerVersion.V_1_15;
+        }
+        else if (serverVersion.isOlderThan(ServerVersion.V_1_17)) {
+            return ServerVersion.V_1_16;
+        }
+        else if (serverVersion.isOlderThan(ServerVersion.V_1_18)) {
+            return ServerVersion.V_1_17;
+        }
+        else {
+            return ServerVersion.V_1_18;
+        }
     }
 
     public static ItemType define(int maxAmount, String key) {
@@ -50,19 +75,29 @@ public class ItemTypes {
     }
 
     public static ItemType define(int maxAmount, String key, ItemAttribute... attributesArr) {
-        if (MODERN_ITEM_TYPES_JSON == null) {
-            MODERN_ITEM_TYPES_JSON = MappingHelper.getJSONObject("modernitemtypes");
+        if (MAPPINGS == null) {
+            MAPPINGS = MappingHelper.getJSONObject("item_mappings");
         }
         Set<ItemAttribute> attributes = new HashSet<>(Arrays.asList(attributesArr));
 
-        int modernID = MODERN_ITEM_TYPES_JSON.get(key).getAsInt();
-
-        int latestProtocolVersion = ServerVersion.getLatest().getProtocolVersion();
-        int serverProtocolVersion = PacketEvents.getAPI().getServerManager().getVersion().getProtocolVersion();
-        System.out.println("latest: " + latestProtocolVersion + ", target: " + serverProtocolVersion);
-        int transformedID = transformItemTypeId(modernID, latestProtocolVersion, serverProtocolVersion);
-        boolean musicDisc = attributes.contains(ItemAttribute.MUSIC_DISC);
         ResourceLocation identifier = ResourceLocation.minecraft(key);
+
+        final int id;
+        ServerVersion mappingsVersion = getMappingServerVersion(PacketEvents.getAPI().getServerManager().getVersion());
+        if (MAPPINGS.has(mappingsVersion.name())) {
+            JsonObject map = MAPPINGS.getAsJsonObject(mappingsVersion.name());
+            if (map.has(identifier.toString())) {
+                id = map.get(identifier.toString()).getAsInt();
+            }
+            else {
+                id = -1;
+            }
+        }
+        else {
+            throw new IllegalStateException("Failed to find mappings for the " + mappingsVersion.name() + " mappings version!");
+        }
+        boolean musicDisc = attributes.contains(ItemAttribute.MUSIC_DISC);
+
 
         ItemType type = new ItemType() {
             @Override
@@ -77,7 +112,7 @@ public class ItemTypes {
 
             @Override
             public int getId() {
-                return transformedID;
+                return id;
             }
 
             @Override
@@ -98,39 +133,6 @@ public class ItemTypes {
         ITEM_TYPE_ID_MAP.put(type.getId(), type);
         return type;
     }
-
-
-    public static int transformItemTypeId(int id, int latestProtocolVersion, int targetProtocolVersion) {
-        if (LEGACY_ITEM_TYPES_JSON == null) {
-            LEGACY_ITEM_TYPES_JSON = MappingHelper.getJSONObject("legacyitemtypes");
-        }
-        if (PRE_FLATTEN_ITEM_TYPES_JSON == null) {
-            PRE_FLATTEN_ITEM_TYPES_JSON = MappingHelper.getJSONObject("preflattenitemid");
-        }
-        if (latestProtocolVersion == targetProtocolVersion) {
-            return id;
-        }
-
-        //TODO get legacy one(eg. convert red beds to white beds)
-        int legacyItemTypeID = MappingHelper.transformId(LEGACY_ITEM_TYPES_JSON, id, targetProtocolVersion);
-        if (targetProtocolVersion < ClientVersion.V_1_13.getProtocolVersion()) {
-            //Pre-flatten
-            if (PRE_FLATTEN_ITEM_TYPES_JSON.has(String.valueOf(legacyItemTypeID))) {
-                int combinedLegacyID = PRE_FLATTEN_ITEM_TYPES_JSON.get(String.valueOf(legacyItemTypeID)).getAsInt();
-                //Extract ID from combined id
-                return combinedLegacyID >>> 16;
-            }
-            else {
-                return 0;
-            }
-        }
-        else {
-            //TODO Flatten
-        }
-
-        return id;
-    }
-
 
     @Nullable
     public static ItemType getByKey(String key) {

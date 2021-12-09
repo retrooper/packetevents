@@ -46,39 +46,31 @@ public enum ServerVersion {
     ERROR(-1);
 
     private static final ServerVersion[] VALUES = values();
-    public static ServerVersion[] reversedValues = new ServerVersion[VALUES.length];
+    private static final ServerVersion[] REVERSED_VALUES;
+
+    static {
+        REVERSED_VALUES = values();
+        int i = 0;
+        int j = REVERSED_VALUES.length - 1;
+        ServerVersion tmp;
+        while (j > i) {
+            tmp = REVERSED_VALUES[j];
+            REVERSED_VALUES[j--] = REVERSED_VALUES[i];
+            REVERSED_VALUES[i++] = tmp;
+        }
+    }
     private final int protocolVersion;
 
     ServerVersion(int protocolVersion) {
         this.protocolVersion = protocolVersion;
     }
 
-    /**
-     * The values in this enum in reverse.
-     *
-     * @return Reversed server version enum values.
-     */
-    public static ServerVersion[] reverse() {
-        ServerVersion[] array = values();
-        int i = 0;
-        int j = array.length - 1;
-        ServerVersion tmp;
-        while (j > i) {
-            tmp = array[j];
-            array[j--] = array[i];
-            array[i++] = tmp;
-        }
-        return array;
-    }
-
-    public ServerVersion[] reversedValues() {
-        return reversedValues;
+    public static ServerVersion[] reversedValues() {
+        return REVERSED_VALUES;
     }
 
     public static ServerVersion getLatest() {
-        //We must skip ERROR, because it's not a real server version.
-        ServerVersion version = PacketEvents.getAPI().getServerManager().getVersion();
-        return version.reversedValues()[1];
+        return reversedValues()[1];
     }
 
     public static ServerVersion getOldest() {
@@ -120,7 +112,7 @@ public enum ServerVersion {
          * I already made this variable a while ago for a different usage, you can check that out.
          * The first one we find in the array is the newer version.
          */
-        for (ServerVersion version : reversedValues) {
+        for (ServerVersion version : reversedValues()) {
             if (version == target) {
                 return false;
             }
