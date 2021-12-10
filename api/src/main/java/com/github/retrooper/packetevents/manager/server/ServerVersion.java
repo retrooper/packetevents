@@ -18,8 +18,6 @@
 
 package com.github.retrooper.packetevents.manager.server;
 
-import com.github.retrooper.packetevents.PacketEvents;
-
 /**
  * Server Version.
  * This is a nice wrapper over minecraft's protocol versions.
@@ -42,7 +40,7 @@ public enum ServerVersion {
     V_1_15(573), V_1_15_1(575), V_1_15_2(578),
     V_1_16(735), V_1_16_1(736), V_1_16_2(751), V_1_16_3(753), V_1_16_4(754), V_1_16_5(754),
     V_1_17(755), V_1_17_1(756),
-    V_1_18(757),
+    V_1_18(757), V_1_18_1(757),
     ERROR(-1);
 
     private static final ServerVersion[] VALUES = values();
@@ -59,6 +57,7 @@ public enum ServerVersion {
             REVERSED_VALUES[i++] = tmp;
         }
     }
+
     private final int protocolVersion;
 
     ServerVersion(int protocolVersion) {

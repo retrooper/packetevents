@@ -18,7 +18,6 @@
 
 package com.github.retrooper.packetevents.protocol.player;
 
-import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Arrays;
@@ -88,6 +87,9 @@ public enum ClientVersion {
 
     V_1_17_1(756),
 
+    /**
+     * 1.18 or 1.18.1 as they have the same protocol version.
+     */
     V_1_18(757),
 
     LOWER_THAN_SUPPORTED_VERSIONS(V_1_7_10.protocolVersion - 1),
