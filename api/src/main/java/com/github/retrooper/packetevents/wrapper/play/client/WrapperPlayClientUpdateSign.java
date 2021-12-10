@@ -28,7 +28,7 @@ import com.github.retrooper.packetevents.wrapper.PacketWrapper;
  * This message is sent from the client to the server when the “Done” button is pushed after placing a sign.
  */
 public class WrapperPlayClientUpdateSign extends PacketWrapper<WrapperPlayClientUpdateSign> {
-    private final String[] textLines = new String[4];
+    private String[] textLines;
     private Vector3i blockPosition;
 
     public WrapperPlayClientUpdateSign(PacketReceiveEvent event) {
@@ -38,7 +38,7 @@ public class WrapperPlayClientUpdateSign extends PacketWrapper<WrapperPlayClient
     public WrapperPlayClientUpdateSign(Vector3i blockPosition, String[] textLines) {
         super(PacketType.Play.Client.UPDATE_SIGN);
         this.blockPosition = blockPosition;
-        System.arraycopy(textLines, 0, this.textLines, 0, 4);
+        this.textLines = textLines;
     }
 
     @Override
@@ -51,6 +51,7 @@ public class WrapperPlayClientUpdateSign extends PacketWrapper<WrapperPlayClient
             int z = readInt();
             this.blockPosition = new Vector3i(x, y, z);
         }
+        textLines = new String[4];
         for (int i = 0; i < 4; i++) {
             this.textLines[i] = readString(384);
         }
@@ -59,7 +60,7 @@ public class WrapperPlayClientUpdateSign extends PacketWrapper<WrapperPlayClient
     @Override
     public void readData(WrapperPlayClientUpdateSign wrapper) {
         this.blockPosition = wrapper.blockPosition;
-        System.arraycopy(wrapper.textLines, 0, this.textLines, 0, 4);
+        this.textLines = wrapper.textLines;
     }
 
     @Override
@@ -110,6 +111,6 @@ public class WrapperPlayClientUpdateSign extends PacketWrapper<WrapperPlayClient
      * @param textLines Sign content
      */
     public void setTextLines(String[] textLines) {
-        System.arraycopy(textLines, 0, this.textLines, 0, 4);
+        this.textLines = textLines;
     }
 }

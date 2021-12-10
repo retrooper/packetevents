@@ -25,15 +25,19 @@ import com.github.retrooper.packetevents.event.impl.PacketSendEvent;
 import com.github.retrooper.packetevents.factory.bukkit.BukkitPacketEventsBuilder;
 import com.github.retrooper.packetevents.protocol.chat.Color;
 import com.github.retrooper.packetevents.protocol.inventory.ItemStack;
+import com.github.retrooper.packetevents.protocol.inventory.ItemTypes;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.protocol.player.Hand;
 import com.github.retrooper.packetevents.util.Vector3d;
+import com.github.retrooper.packetevents.util.Vector3i;
 import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientInteractEntity;
+import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientUpdateSign;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerSetSlot;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerSpawnLivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import java.util.Arrays;
 import java.util.UUID;
 
 public class PacketEventsPlugin extends JavaPlugin {
@@ -52,12 +56,19 @@ public class PacketEventsPlugin extends JavaPlugin {
             @Override
             public void onPacketReceive(PacketReceiveEvent event) {
                 Player player = event.getPlayer() == null ? null : (Player) event.getPlayer();
+                System.out.println("packet id: " + event.getPacketId());
                 if (event.getPacketType() == PacketType.Play.Client.INTERACT_ENTITY) {
                     WrapperPlayClientInteractEntity interactEntity = new WrapperPlayClientInteractEntity(event);
                     int entityID = interactEntity.getEntityId();
                     WrapperPlayClientInteractEntity.InteractAction action = interactEntity.getAction();
                     Hand hand = interactEntity.getHand();
                     player.sendMessage(Color.BRIGHT_GREEN + "Received packet: " + event.getPacketType().getName() + " from " + player.getName() + " with entityID: " + entityID + " and action: " + action.name() + " and hand: " + hand.name());
+                }
+                else if (event.getPacketType() == PacketType.Play.Client.UPDATE_SIGN) {
+                    WrapperPlayClientUpdateSign updateSign = new WrapperPlayClientUpdateSign(event);
+                    Vector3i pos = updateSign.getBlockPosition();
+                    String[] textLines = updateSign.getTextLines();
+                    player.sendMessage(Color.DARK_GREEN + "Received packet: " + event.getPacketType().getName() + " from " + player.getName() + " with pos: " + pos.toString() + " and textLines: " + Arrays.toString(textLines));
                 }
             }
 
@@ -90,6 +101,7 @@ public class PacketEventsPlugin extends JavaPlugin {
                     //TODO Complete spawn living entity for outdated versions
                     event.setLastUsedWrapper(null);
                 } else if (event.getPacketType() == PacketType.Play.Server.SET_SLOT) {
+                    System.out.println("id: " + ItemTypes.OAK_SIGN.getId() + ", identifier: " + ItemTypes.OAK_SIGN);
                     WrapperPlayServerSetSlot setSlot = new WrapperPlayServerSetSlot(event);
                     int windowID = setSlot.getWindowId();
                     int slot = setSlot.getSlot();

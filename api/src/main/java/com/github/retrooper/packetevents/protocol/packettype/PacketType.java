@@ -76,7 +76,7 @@ public final class PacketType {
              * Technically not part of the current protocol, but clients older than 1.7 will send this to initiate Server List Ping.
              * 1.8 and newer servers will handle it correctly though.
              */
-            LEGACY_SERVER_LIST_PING(254);//0XFE in hex
+            LEGACY_SERVER_LIST_PING(254);//0xFE in hex
 
             private final int id;
 
