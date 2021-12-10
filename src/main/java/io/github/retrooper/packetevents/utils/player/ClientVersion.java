@@ -87,6 +87,9 @@ public enum ClientVersion {
 
     v_1_17_1(756),
 
+    /**
+     * 1.18 or 1.18.1 as they have the same protocol version.
+     */
     v_1_18(757),
 
     LOWER_THAN_SUPPORTED_VERSIONS(v_1_7_10.protocolVersion - 1),
@@ -109,7 +112,7 @@ public enum ClientVersion {
 
     private static final Map<Integer, ClientVersion> CLIENT_VERSION_CACHE = new IdentityHashMap<>();
     private static final int[] CLIENT_VERSIONS = new int[]{5, 47, 107, 108, 109, 110, 210, 315, 316, 335, 338,
-            340, 393, 401, 404, 477, 480, 485, 490, 498, 573, 575, 578, 735, 736, 751, 753, 754, 755, 756, 1073741883};
+            340, 393, 401, 404, 477, 480, 485, 490, 498, 573, 575, 578, 735, 736, 751, 753, 754, 755, 756, 757};
     private int protocolVersion;
 
     ClientVersion(int protocolVersion) {
