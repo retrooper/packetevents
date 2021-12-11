@@ -57,10 +57,10 @@ public class TranslatableComponent extends BaseComponent {
             translate = "";
         }
 
-       //System.out.println("pre!");
+       //LogManager.debug("pre!");
         if (jsonObject.has("with")) {
             JsonArray withArray = jsonObject.get("with").getAsJsonArray();
-            //System.out.println("parsing: " + withArray.toString());
+            //LogManager.debug("parsing: " + withArray.toString());
             for (JsonElement withElement : withArray) {
                 JsonObject withObject = withElement.getAsJsonObject();
                 BaseComponent child = ComponentSerializer.parseJsonComponent(withObject);

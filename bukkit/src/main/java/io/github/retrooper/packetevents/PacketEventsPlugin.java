@@ -50,6 +50,8 @@ public class PacketEventsPlugin extends JavaPlugin {
         //Register your listeners
         PacketEvents.getAPI().init();
 
+        PacketEvents.getAPI().getSettings().debug(true).bStats(false);
+
         PacketListenerAbstract debugListener = new PacketListenerAbstract() {
             @Override
             public void onPacketReceive(PacketReceiveEvent event) {

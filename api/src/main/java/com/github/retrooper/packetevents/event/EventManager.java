@@ -19,6 +19,7 @@
 package com.github.retrooper.packetevents.event;
 
 import com.github.retrooper.packetevents.PacketEvents;
+import com.github.retrooper.packetevents.util.LogManager;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.HashSet;
@@ -54,7 +55,7 @@ public class EventManager {
                         }
                     }
                     catch (Exception ex) {
-                        PacketEvents.getAPI().getLogger().log(Level.SEVERE, "PacketEvents encountered an exception when calling your listener.", ex);
+                        LogManager.severe("PacketEvents encountered an exception when calling your listener.", ex);
                     }
                 }
             }

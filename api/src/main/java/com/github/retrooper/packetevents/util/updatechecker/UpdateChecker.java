@@ -20,6 +20,7 @@ package com.github.retrooper.packetevents.util.updatechecker;
 
 import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.protocol.chat.component.serializer.ComponentSerializer;
+import com.github.retrooper.packetevents.util.LogManager;
 import com.github.retrooper.packetevents.util.PEVersion;
 import com.google.gson.JsonObject;
 
@@ -79,7 +80,7 @@ public class UpdateChecker {
 
     public void handleUpdateCheck() {
         Thread thread = new Thread(() -> {
-            PacketEvents.getAPI().getLogger().info("[packetevents] Checking for an update, please wait...");
+            LogManager.info("Checking for an update, please wait...");
             UpdateChecker.UpdateCheckerStatus status = checkForUpdate();
             int waitTimeInSeconds = 5;
             int maxRetryCount = 5;
@@ -88,7 +89,7 @@ public class UpdateChecker {
                 if (status != UpdateChecker.UpdateCheckerStatus.FAILED) {
                     break;
                 }
-                PacketEvents.getAPI().getLogger().severe("[packetevents] Checking for an update again in " + waitTimeInSeconds + " seconds...");
+                LogManager.warn("[Checking for an update again in " + waitTimeInSeconds + " seconds...");
                 try {
                     Thread.sleep(waitTimeInSeconds * 1000L);
                 } catch (InterruptedException e) {
@@ -100,7 +101,7 @@ public class UpdateChecker {
                 status = checkForUpdate();
 
                 if (retries == (maxRetryCount - 1)) {
-                    PacketEvents.getAPI().getLogger().severe("[packetevents] packetevents failed to check for an update. No longer retrying.");
+                    LogManager.warn("packetevents failed to check for an update. No longer retrying.");
                     break;
                 }
 
@@ -117,7 +118,7 @@ public class UpdateChecker {
      * @param message Message
      */
     private void inform(String message) {
-        PacketEvents.getAPI().getLogger().info("[packetevents] " + message);
+        LogManager.info(message);
     }
 
     /**
@@ -127,7 +128,7 @@ public class UpdateChecker {
      */
     private void report(String message) {
         //TODO Maybe find some universal way to make it red
-        PacketEvents.getAPI().getLogger().warning("[packetevents] " + message);
+        LogManager.warn(message);
     }
 
     /**

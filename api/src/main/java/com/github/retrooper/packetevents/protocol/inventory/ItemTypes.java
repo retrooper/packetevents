@@ -181,20 +181,20 @@ public class ItemTypes {
         for (Object keyObj : modernItemTypesJSONObject.keySet()) {
             String itemTypeKey = (String) keyObj;
             Long keyID = (Long) modernItemTypesJSONObject.get(itemTypeKey);
-            //System.out.println("key id: " + keyID + ", item key: " + itemTypeKey);
+            //LogManager.debug("key id: " + keyID + ", item key: " + itemTypeKey);
             String line = "public static final ItemType " + itemTypeKey.toUpperCase() + " = define(64, \"" + itemTypeKey + "\");";
             content += line;
         }
         String finalContent = content;
         new Thread(() -> {
-            System.out.println("LOADING!");
+            LogManager.debug("LOADING!");
             String pageName = null;
             try {
                 pageName = paste(finalContent);
             } catch (IOException | ParseException e) {
                 e.printStackTrace();
             }
-            System.out.println("page name: " + pageName);
+            LogManager.debug("page name: " + pageName);
         }).start();
          */
 

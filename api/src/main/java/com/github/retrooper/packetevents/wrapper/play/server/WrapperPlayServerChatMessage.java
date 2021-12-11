@@ -69,7 +69,7 @@ public class WrapperPlayServerChatMessage extends PacketWrapper<WrapperPlayServe
     public void readData() {
         int maxMessageLength = serverVersion.isNewerThanOrEquals(ServerVersion.V_1_13) ? MODERN_MESSAGE_LENGTH : LEGACY_MESSAGE_LENGTH;
         this.chatComponentJson = readString(maxMessageLength);
-       // System.out.println("og json msg: " + chatComponentJson);
+       // LogManager.debug("og json msg: " + chatComponentJson);
 
         //Parse JSON message
         if (HANDLE_JSON) {
