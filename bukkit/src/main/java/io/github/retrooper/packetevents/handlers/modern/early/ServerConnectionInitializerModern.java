@@ -30,14 +30,17 @@ import io.netty.channel.ChannelHandler;
 import io.netty.handler.codec.ByteToMessageDecoder;
 import org.bukkit.entity.Player;
 
+import java.util.Arrays;
 import java.util.List;
 
 
 public class ServerConnectionInitializerModern {
     public static void postInitChannel(Object ch, ConnectionState connectionState) {
         Channel channel = (Channel) ch;
+        //System.out.println("Pre Channel handlers: " + Arrays.toString(channel.pipeline().names().toArray(new String[0])));
         channel.pipeline().addAfter("splitter", PacketEvents.DECODER_NAME, new PacketDecoderModern(connectionState));
         channel.pipeline().addBefore("encoder", PacketEvents.ENCODER_NAME, new PacketEncoderModern());
+        //System.out.println("Post Channel handlers: " + Arrays.toString(channel.pipeline().names().toArray(new String[0])));
     }
 
     public static void postDestroyChannel(Object ch) {

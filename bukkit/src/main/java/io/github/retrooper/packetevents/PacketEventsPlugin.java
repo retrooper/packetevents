@@ -23,9 +23,7 @@ import com.github.retrooper.packetevents.event.PacketListenerAbstract;
 import com.github.retrooper.packetevents.event.impl.PacketReceiveEvent;
 import com.github.retrooper.packetevents.event.impl.PacketSendEvent;
 import com.github.retrooper.packetevents.factory.bukkit.BukkitPacketEventsBuilder;
-import com.github.retrooper.packetevents.protocol.chat.Color;
 import com.github.retrooper.packetevents.protocol.inventory.ItemStack;
-import com.github.retrooper.packetevents.protocol.inventory.ItemTypes;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.protocol.player.Hand;
 import com.github.retrooper.packetevents.util.Vector3d;
@@ -56,63 +54,44 @@ public class PacketEventsPlugin extends JavaPlugin {
             @Override
             public void onPacketReceive(PacketReceiveEvent event) {
                 Player player = event.getPlayer() == null ? null : (Player) event.getPlayer();
-                System.out.println("packet id: " + event.getPacketId());
                 if (event.getPacketType() == PacketType.Play.Client.INTERACT_ENTITY) {
                     WrapperPlayClientInteractEntity interactEntity = new WrapperPlayClientInteractEntity(event);
                     int entityID = interactEntity.getEntityId();
                     WrapperPlayClientInteractEntity.InteractAction action = interactEntity.getAction();
                     Hand hand = interactEntity.getHand();
-                    player.sendMessage(Color.BRIGHT_GREEN + "Received packet: " + event.getPacketType().getName() + " from " + player.getName() + " with entityID: " + entityID + " and action: " + action.name() + " and hand: " + hand.name());
-                }
-                else if (event.getPacketType() == PacketType.Play.Client.UPDATE_SIGN) {
+                    player.sendMessage("Received packet: " + event.getPacketType().getName() + " from " + player.getName() + " with entityID: " + entityID + " and action: " + action.name() + " and hand: " + hand.name());
+                } else if (event.getPacketType() == PacketType.Play.Client.UPDATE_SIGN) {
                     WrapperPlayClientUpdateSign updateSign = new WrapperPlayClientUpdateSign(event);
                     Vector3i pos = updateSign.getBlockPosition();
                     String[] textLines = updateSign.getTextLines();
-                    player.sendMessage(Color.DARK_GREEN + "Received packet: " + event.getPacketType().getName() + " from " + player.getName() + " with pos: " + pos.toString() + " and textLines: " + Arrays.toString(textLines));
+                    player.sendMessage("Received packet: " + event.getPacketType().getName() + " from " + player.getName() + " with pos: " + pos.toString() + " and textLines: " + Arrays.toString(textLines));
                 }
             }
 
             @Override
             public void onPacketSend(PacketSendEvent event) {
                 Player player = event.getPlayer() == null ? null : (Player) event.getPlayer();
-                if (event.getPacketType() == PacketType.Play.Server.CHAT_MESSAGE) {
-                    /*WrapperPlayServerChatMessage chatMessage = new WrapperPlayServerChatMessage(event);
-                    BaseComponent chatComponent = chatMessage.getChatComponent();
-                    if (chatComponent instanceof TextComponent) {
-                        TextComponent textComponent = (TextComponent) chatComponent;
-                        StringBuilder text = new StringBuilder(textComponent.getColor().getFullCode() + textComponent.getText());
-                        for (BaseComponent child : textComponent.getChildren()) {
-                            if (child instanceof TextComponent) {
-                                TextComponent textChild = (TextComponent) child;
-                                text.append(textChild.getColor().getFullCode()).append(textChild.getText());
-                            }
-                        }
-                        System.out.println("Text: " + text);
-                    }*/
-                    //TODO Fix translatable chat components
-                } else if (event.getPacketType() == PacketType.Play.Server.SPAWN_LIVING_ENTITY) {
+                //TODO Fix translatable components, and check others for safety
+                if (event.getPacketType() == PacketType.Play.Server.SPAWN_LIVING_ENTITY) {
                     WrapperPlayServerSpawnLivingEntity spawnMob = new WrapperPlayServerSpawnLivingEntity(event);
                     int entityID = spawnMob.getEntityId();
                     UUID uuid = spawnMob.getEntityUUID();
                     Vector3d position = spawnMob.getPosition();
                     if (player != null) {
-                        player.sendMessage("Spawned entity with id: " + entityID + ", with uuid: " + uuid + ", at position: " + position);
+                        //player.sendMessage("Spawned entity with id: " + entityID + ", with uuid: " + uuid + ", at position: " + position);
                     }
                     //TODO Complete spawn living entity for outdated versions
-                    event.setLastUsedWrapper(null);
                 } else if (event.getPacketType() == PacketType.Play.Server.SET_SLOT) {
-                    System.out.println("id: " + ItemTypes.OAK_SIGN.getId() + ", identifier: " + ItemTypes.OAK_SIGN);
                     WrapperPlayServerSetSlot setSlot = new WrapperPlayServerSetSlot(event);
                     int windowID = setSlot.getWindowId();
                     int slot = setSlot.getSlot();
-                    //TODO Fix ItemTypes on all versions
                     ItemStack item = setSlot.getItem();
-                    System.out.println("Set slot with window ID: " + windowID + ", slot: " + slot + ", item: " + (item.getType() != null ? item.toString() : "null item"));
+                    player.sendMessage("Set slot with window ID: " + windowID + ", slot: " + slot + ", item: " + (item.getType() != null ? item.toString() : "null item"));
                 }
                 //TODO Complete chunk data packet
             }
         };
-        PacketEvents.getAPI().getEventManager().registerListener(debugListener);
+        //PacketEvents.getAPI().getEventManager().registerListener(debugListener);
     }
 
     @Override

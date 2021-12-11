@@ -142,11 +142,17 @@ public class EarlyChannelInjectorModern implements EarlyInjector {
 
     private void injectChannelFuture(ChannelFuture future) {
         ChannelPipeline pipeline = future.channel().pipeline();
+        //System.out.println("pre handlers: " + Arrays.toString(pipeline.names().toArray(new String[0])));
         if (pipeline.get("SpigotNettyServerChannelHandler#0") != null) {
             pipeline.addAfter("SpigotNettyServerChannelHandler#0", PacketEvents.CONNECTION_NAME, new ServerChannelHandlerModern());
-        } else {
+        }
+        else if (pipeline.get("floodgate-init") != null) {
+            pipeline.addAfter("floodgate-init", PacketEvents.CONNECTION_NAME, new ServerChannelHandlerModern());
+        }
+        else {
             pipeline.addFirst(PacketEvents.CONNECTION_NAME, new ServerChannelHandlerModern());
         }
+        //System.out.println("post handlers: " + Arrays.toString(pipeline.names().toArray(new String[0])));
 
         List<Object> networkManagers = MinecraftReflectionUtil.getNetworkManagers();
         synchronized (networkManagers) {

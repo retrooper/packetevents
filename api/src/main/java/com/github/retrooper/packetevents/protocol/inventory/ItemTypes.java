@@ -97,9 +97,6 @@ public class ItemTypes {
             throw new IllegalStateException("Failed to find mappings for the " + mappingsVersion.name() + " mappings version!");
         }
 
-        if (key.equals("oak_sign")) {
-            System.out.println("oak sign id: " + id);
-        }
         boolean musicDisc = attributes.contains(ItemAttribute.MUSIC_DISC);
 
 
