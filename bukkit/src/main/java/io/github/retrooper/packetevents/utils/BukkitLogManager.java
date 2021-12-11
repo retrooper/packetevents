@@ -1,6 +1,5 @@
 package io.github.retrooper.packetevents.utils;
 
-import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.util.LogManager;
 import org.bukkit.Bukkit;
 
