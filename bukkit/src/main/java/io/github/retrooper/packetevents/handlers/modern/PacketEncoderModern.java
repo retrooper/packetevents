@@ -40,7 +40,7 @@ import java.util.List;
 public class PacketEncoderModern extends MessageToMessageEncoder<Object> {
     public volatile Player player;
     public boolean handledCompression;
-    public MessageToByteEncoder mcEncoder;
+    public MessageToByteEncoder<?> mcEncoder;
 
     public void handle(ChannelHandlerContextAbstract ctx, ByteBufAbstract transformedBuf, List<Object> output) {
         try {
