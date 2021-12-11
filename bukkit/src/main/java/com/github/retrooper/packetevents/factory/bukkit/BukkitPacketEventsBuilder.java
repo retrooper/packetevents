@@ -85,7 +85,7 @@ public class BukkitPacketEventsBuilder {
             private boolean initialized;
             private boolean lateBind = false;
 
-            private LogManager logManager = new BukkitLogManager();
+            private final LogManager logManager = new BukkitLogManager();
 
             @Override
             public void load() {
