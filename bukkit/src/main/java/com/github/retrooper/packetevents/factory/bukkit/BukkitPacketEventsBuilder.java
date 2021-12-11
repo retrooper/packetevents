@@ -30,6 +30,7 @@ import com.github.retrooper.packetevents.netty.NettyManager;
 import com.github.retrooper.packetevents.protocol.ConnectionState;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.settings.PacketEventsSettings;
+import com.github.retrooper.packetevents.util.LogManager;
 import com.github.retrooper.packetevents.util.PEVersion;
 import com.github.retrooper.packetevents.util.updatechecker.UpdateChecker;
 import io.github.retrooper.packetevents.bstats.Metrics;
@@ -38,6 +39,7 @@ import io.github.retrooper.packetevents.manager.player.PlayerManagerImpl;
 import io.github.retrooper.packetevents.manager.server.ServerManagerImpl;
 import io.github.retrooper.packetevents.processor.InternalBukkitListener;
 import io.github.retrooper.packetevents.processor.InternalPacketListener;
+import io.github.retrooper.packetevents.utils.BukkitLogManager;
 import io.github.retrooper.packetevents.utils.MinecraftReflectionUtil;
 import io.github.retrooper.packetevents.utils.netty.NettyManagerImpl;
 import org.bukkit.Bukkit;
@@ -82,6 +84,8 @@ public class BukkitPacketEventsBuilder {
             private boolean loaded;
             private boolean initialized;
             private boolean lateBind = false;
+
+            private LogManager logManager = new BukkitLogManager();
 
             @Override
             public void load() {
@@ -226,6 +230,11 @@ public class BukkitPacketEventsBuilder {
             @Override
             public UpdateChecker getUpdateChecker() {
                 return updateChecker;
+            }
+
+            @Override
+            public LogManager getLogManager() {
+                return logManager;
             }
         };
     }

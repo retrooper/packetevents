@@ -55,7 +55,7 @@ public class EventManager {
                         }
                     }
                     catch (Exception ex) {
-                        LogManager.severe("PacketEvents encountered an exception when calling your listener.", ex);
+                        PacketEvents.getAPI().getLogManager().severe("PacketEvents encountered an exception when calling your listener.", ex);
                     }
                 }
             }

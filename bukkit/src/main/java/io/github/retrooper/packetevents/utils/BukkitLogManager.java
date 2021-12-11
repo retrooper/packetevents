@@ -1,11 +1,15 @@
-package com.github.retrooper.packetevents.util;
+package io.github.retrooper.packetevents.utils;
 
 import com.github.retrooper.packetevents.PacketEvents;
+import com.github.retrooper.packetevents.util.LogManager;
+import org.bukkit.Bukkit;
 
 import java.util.logging.Level;
 
-public class LogManager {
+public class BukkitLogManager extends LogManager {
+    private final String prefixText = "§b[PacketEvents] §f";;
 
+    @Override
     public void log(Level level, final String message) {
         String afterPrefixSuffix = "§f";
         if (level == Level.INFO) {
@@ -20,9 +24,11 @@ public class LogManager {
             level = Level.INFO;
         }
 
-        PacketEvents.getAPI().getLogger().log(level, afterPrefixSuffix + message);
+
+        Bukkit.getConsoleSender().sendMessage(prefixText + afterPrefixSuffix + message);
     }
 
+    @Override
     public void log(Level level, final String message, Throwable thrown) {
         String afterPrefixSuffix = "§f";
         if (level == Level.INFO) {
@@ -37,30 +43,7 @@ public class LogManager {
             level = Level.INFO;
         }
 
-        PacketEvents.getAPI().getLogger().log(level, afterPrefixSuffix + message, thrown);
-    }
-
-
-    public void info(final String message) {
-        log(Level.INFO, message);
-    }
-
-    public void warn(final String message) {
-        log(Level.WARNING, message);
-    }
-
-    public void severe(final String message) {
-        log(Level.SEVERE, message);
-    }
-
-    public void severe(final String message, final Throwable throwable) {
-        log(Level.SEVERE, message, throwable);
-    }
-
-    public void debug(final String message) {
-        if (PacketEvents.getAPI().getSettings().isDebugEnabled()) {
-            log(Level.FINE, message);
-        }
-
+        Bukkit.getConsoleSender().sendMessage(prefixText + afterPrefixSuffix + message);
+        thrown.printStackTrace();
     }
 }

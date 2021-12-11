@@ -24,6 +24,7 @@ import com.github.retrooper.packetevents.manager.player.PlayerManager;
 import com.github.retrooper.packetevents.manager.server.ServerManager;
 import com.github.retrooper.packetevents.netty.NettyManager;
 import com.github.retrooper.packetevents.settings.PacketEventsSettings;
+import com.github.retrooper.packetevents.util.LogManager;
 import com.github.retrooper.packetevents.util.PEVersion;
 import com.github.retrooper.packetevents.util.updatechecker.UpdateChecker;
 
@@ -59,4 +60,6 @@ public interface PacketEventsAPI<T> {
     ChannelInjector getInjector();
 
     UpdateChecker getUpdateChecker();
+
+    LogManager getLogManager();
 }

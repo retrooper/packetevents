@@ -80,7 +80,7 @@ public class UpdateChecker {
 
     public void handleUpdateCheck() {
         Thread thread = new Thread(() -> {
-            LogManager.info("Checking for an update, please wait...");
+            PacketEvents.getAPI().getLogManager().info("Checking for an update, please wait...");
             UpdateChecker.UpdateCheckerStatus status = checkForUpdate();
             int waitTimeInSeconds = 5;
             int maxRetryCount = 5;
@@ -89,7 +89,7 @@ public class UpdateChecker {
                 if (status != UpdateChecker.UpdateCheckerStatus.FAILED) {
                     break;
                 }
-                LogManager.warn("[Checking for an update again in " + waitTimeInSeconds + " seconds...");
+                PacketEvents.getAPI().getLogManager().warn("[Checking for an update again in " + waitTimeInSeconds + " seconds...");
                 try {
                     Thread.sleep(waitTimeInSeconds * 1000L);
                 } catch (InterruptedException e) {
@@ -101,7 +101,7 @@ public class UpdateChecker {
                 status = checkForUpdate();
 
                 if (retries == (maxRetryCount - 1)) {
-                    LogManager.warn("packetevents failed to check for an update. No longer retrying.");
+                    PacketEvents.getAPI().getLogManager().warn("packetevents failed to check for an update. No longer retrying.");
                     break;
                 }
 
@@ -118,7 +118,7 @@ public class UpdateChecker {
      * @param message Message
      */
     private void inform(String message) {
-        LogManager.info(message);
+        PacketEvents.getAPI().getLogManager().info(message);
     }
 
     /**
@@ -128,7 +128,7 @@ public class UpdateChecker {
      */
     private void report(String message) {
         //TODO Maybe find some universal way to make it red
-        LogManager.warn(message);
+        PacketEvents.getAPI().getLogManager().warn(message);
     }
 
     /**
