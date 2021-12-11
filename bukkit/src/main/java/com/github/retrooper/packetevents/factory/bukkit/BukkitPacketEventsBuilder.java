@@ -101,7 +101,7 @@ public class BukkitPacketEventsBuilder {
 
                     injector.load();
                     lateBind = !injector.isBound();
-                    //If late-bind is enabled or ViaVersion is present, we will inject a bit later.
+                    //If late-bind is enabled, we will inject a bit later.
                     if (!lateBind) {
                         injector.inject();
                     }
