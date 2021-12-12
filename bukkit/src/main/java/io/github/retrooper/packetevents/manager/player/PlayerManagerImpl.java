@@ -19,16 +19,12 @@
 package io.github.retrooper.packetevents.manager.player;
 
 import com.github.retrooper.packetevents.PacketEvents;
-import com.github.retrooper.packetevents.manager.player.PlayerAttributeObject;
 import com.github.retrooper.packetevents.manager.player.PlayerManager;
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.netty.buffer.ByteBufAbstract;
 import com.github.retrooper.packetevents.netty.channel.ChannelAbstract;
-import com.github.retrooper.packetevents.protocol.ConnectionState;
-import com.github.retrooper.packetevents.protocol.gameprofile.WrappedGameProfile;
+import com.github.retrooper.packetevents.protocol.gameprofile.GameProfile;
 import com.github.retrooper.packetevents.protocol.player.ClientVersion;
-import com.github.retrooper.packetevents.wrapper.PacketWrapper;
-import io.github.retrooper.packetevents.utils.GeyserUtil;
 import io.github.retrooper.packetevents.utils.MinecraftReflectionUtil;
 import io.github.retrooper.packetevents.utils.PlayerPingAccessorModern;
 import io.github.retrooper.packetevents.utils.dependencies.DependencyUtil;
@@ -37,10 +33,6 @@ import io.github.retrooper.packetevents.utils.dependencies.viaversion.ViaVersion
 import io.github.retrooper.packetevents.utils.v1_7.SpigotVersionLookup_1_7;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
-
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
 
 public class PlayerManagerImpl implements PlayerManager {
     @Override
@@ -124,10 +116,9 @@ public class PlayerManagerImpl implements PlayerManager {
     }
 
     @Override
-    public WrappedGameProfile getGameProfile(@NotNull Object player) {
+    public GameProfile getGameProfile(@NotNull Object player) {
         Player p = (Player) player;
-        Object gameProfile = DependencyUtil.getGameProfile(p.getUniqueId(), p.getName());
-        return DependencyUtil.getWrappedGameProfile(gameProfile);
+        return getGameProfile(p.getName());
     }
 
     @Override

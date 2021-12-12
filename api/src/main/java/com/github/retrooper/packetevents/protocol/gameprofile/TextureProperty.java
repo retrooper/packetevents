@@ -23,16 +23,16 @@ import org.jetbrains.annotations.Nullable;
 import java.security.*;
 import java.util.Base64;
 
-public class WrappedProperty {
+public class TextureProperty {
     private final String name;
     private final String value;
     private final String signature;
 
-    public WrappedProperty(String name, String value) {
+    public TextureProperty(String name, String value) {
         this(value, name, null);
     }
 
-    public WrappedProperty(String name, String value, @Nullable String signature) {
+    public TextureProperty(String name, String value, @Nullable String signature) {
         this.name = name;
         this.value = value;
         this.signature = signature;

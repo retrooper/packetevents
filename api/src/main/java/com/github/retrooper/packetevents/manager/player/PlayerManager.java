@@ -22,7 +22,7 @@ import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.netty.buffer.ByteBufAbstract;
 import com.github.retrooper.packetevents.netty.channel.ChannelAbstract;
 import com.github.retrooper.packetevents.protocol.ConnectionState;
-import com.github.retrooper.packetevents.protocol.gameprofile.WrappedGameProfile;
+import com.github.retrooper.packetevents.protocol.gameprofile.GameProfile;
 import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 import org.jetbrains.annotations.NotNull;
@@ -36,6 +36,7 @@ public interface PlayerManager {
     Map<ChannelAbstract, ClientVersion> CLIENT_VERSIONS = new ConcurrentHashMap<>();
     Map<ChannelAbstract, ConnectionState> CONNECTION_STATES = new ConcurrentHashMap<>();
     Map<String, ChannelAbstract> CHANNELS = new ConcurrentHashMap<>();
+    Map<String, GameProfile> GAME_PROFILES = new ConcurrentHashMap<>();
     Map<UUID, Map<Class<? extends PlayerAttributeObject>, PlayerAttributeObject>> PLAYER_ATTRIBUTES = new ConcurrentHashMap<>();
 
     default <T extends PlayerAttributeObject> T getAttributeOrDefault(UUID uuid, Class<T> clazz, T defaultReturnValue) {
@@ -86,13 +87,6 @@ public interface PlayerManager {
         PacketEvents.getAPI().getInjector().changeConnectionState(channel, connectionState);
     }
 
-    int getPing(@NotNull Object player);
-
-    @NotNull
-    ClientVersion getClientVersion(@NotNull Object player);
-
-    ClientVersion getClientVersion(ChannelAbstract channel);
-
     default void setClientVersion(ChannelAbstract channel, ClientVersion version) {
         CLIENT_VERSIONS.put(channel, version);
     }
@@ -100,8 +94,6 @@ public interface PlayerManager {
     default void setClientVersion(@NotNull Object player, ClientVersion version) {
         setClientVersion(getChannel(player), version);
     }
-
-    void sendPacket(ChannelAbstract channel, ByteBufAbstract byteBuf);
 
     default void sendPacket(ChannelAbstract channel, PacketWrapper<?> wrapper) {
         wrapper.prepareForSend();
@@ -119,9 +111,13 @@ public interface PlayerManager {
         sendPacket(channel, wrapper.buffer);
     }
 
-    WrappedGameProfile getGameProfile(@NotNull Object player);
+    default GameProfile getGameProfile(String username) {
+        return GAME_PROFILES.get(username);
+    }
 
-    ChannelAbstract getChannel(@NotNull Object player);
+    default void setGameProfile(String username, GameProfile gameProfile) {
+        GAME_PROFILES.put(username, gameProfile);
+    }
 
     default ChannelAbstract getChannel(String username) {
         return CHANNELS.get(username);
@@ -130,4 +126,17 @@ public interface PlayerManager {
     default void setChannel(String username, ChannelAbstract channel) {
         CHANNELS.put(username, channel);
     }
+
+    void sendPacket(ChannelAbstract channel, ByteBufAbstract byteBuf);
+
+    int getPing(@NotNull Object player);
+
+    @NotNull
+    ClientVersion getClientVersion(@NotNull Object player);
+
+    ClientVersion getClientVersion(ChannelAbstract channel);
+
+    GameProfile getGameProfile(@NotNull Object player);
+
+    ChannelAbstract getChannel(@NotNull Object player);
 }

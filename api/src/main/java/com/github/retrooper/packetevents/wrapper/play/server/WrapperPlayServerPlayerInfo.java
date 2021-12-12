@@ -19,17 +19,16 @@
 package com.github.retrooper.packetevents.wrapper.play.server;
 
 import com.github.retrooper.packetevents.event.impl.PacketSendEvent;
-import com.github.retrooper.packetevents.protocol.gameprofile.WrappedProperty;
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
-import com.github.retrooper.packetevents.protocol.player.GameMode;
-import com.github.retrooper.packetevents.protocol.gameprofile.WrappedGameProfile;
+import com.github.retrooper.packetevents.protocol.gameprofile.GameProfile;
+import com.github.retrooper.packetevents.protocol.gameprofile.TextureProperty;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
+import com.github.retrooper.packetevents.protocol.player.GameMode;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
 
@@ -90,14 +89,14 @@ public class WrapperPlayServerPlayerInfo extends PacketWrapper<WrapperPlayServer
                 switch (action) {
                     case ADD_PLAYER: {
                         String playerUsername = readString(16);
-                        WrappedGameProfile gameProfile = new WrappedGameProfile(uuid, playerUsername);
+                        GameProfile gameProfile = new GameProfile(uuid, playerUsername);
                         int propertyCount = readVarInt();
                         for (int j = 0; j < propertyCount; j++) {
                             String propertyName = readString();
                             String propertyValue = readString();
                             String propertySignature = readBoolean() ? readString() : null;
-                            WrappedProperty property = new WrappedProperty(propertyName, propertyValue, propertySignature);
-                            gameProfile.addProperty(propertyName, property);
+                            TextureProperty textureProperty = new TextureProperty(propertyName, propertyValue, propertySignature);
+                            gameProfile.getTextureProperties().add(textureProperty);
                         }
                         GameMode gameMode = GameMode.values()[readVarInt()];
                         int ping = readVarInt();
@@ -154,16 +153,14 @@ public class WrapperPlayServerPlayerInfo extends PacketWrapper<WrapperPlayServer
                 switch (action) {
                     case ADD_PLAYER: {
                         writeString(data.gameProfile.getName(), 16);
-                        writeVarInt(data.gameProfile.getProperties().size());
-                        for (Collection<WrappedProperty> properties : data.gameProfile.getProperties().values()) {
-                            for (WrappedProperty property : properties) {
-                                writeString(property.getName());
-                                writeString(property.getValue());
-                                boolean hasSignature = property.hasSignature();
-                                writeBoolean(hasSignature);
-                                if (hasSignature) {
-                                    writeString(property.getSignature());
-                                }
+                        writeVarInt(data.gameProfile.getTextureProperties().size());
+                        for (TextureProperty textureProperty : data.gameProfile.getTextureProperties()) {
+                            writeString(textureProperty.getName());
+                            writeString(textureProperty.getValue());
+                            boolean hasSignature = textureProperty.hasSignature();
+                            writeBoolean(hasSignature);
+                            if (hasSignature) {
+                                writeString(textureProperty.getSignature());
                             }
                         }
                         writeVarInt(data.gameMode.ordinal());
@@ -171,8 +168,7 @@ public class WrapperPlayServerPlayerInfo extends PacketWrapper<WrapperPlayServer
                         if (data.displayName != null) {
                             writeBoolean(true);
                             writeString(data.displayName);
-                        }
-                        else {
+                        } else {
                             writeBoolean(false);
                         }
                         break;
@@ -189,8 +185,7 @@ public class WrapperPlayServerPlayerInfo extends PacketWrapper<WrapperPlayServer
                         if (data.displayName != null) {
                             writeBoolean(true);
                             writeString(data.displayName);
-                        }
-                        else {
+                        } else {
                             writeBoolean(false);
                         }
                         break;
@@ -232,13 +227,13 @@ public class WrapperPlayServerPlayerInfo extends PacketWrapper<WrapperPlayServer
         @Nullable
         private String displayName;
         @Nullable
-        private WrappedGameProfile gameProfile;
+        private GameProfile gameProfile;
         @Nullable
         private GameMode gameMode;
 
         private int ping;
 
-        public PlayerData(@Nullable String displayName, @Nullable WrappedGameProfile gameProfile, @Nullable GameMode gameMode, int ping) {
+        public PlayerData(@Nullable String displayName, @Nullable GameProfile gameProfile, @Nullable GameMode gameMode, int ping) {
             this.displayName = displayName;
             this.gameProfile = gameProfile;
             this.gameMode = gameMode;
@@ -246,11 +241,11 @@ public class WrapperPlayServerPlayerInfo extends PacketWrapper<WrapperPlayServer
         }
 
         @Nullable
-        public WrappedGameProfile getGameProfile() {
+        public GameProfile getGameProfile() {
             return gameProfile;
         }
 
-        public void setGameProfile(@Nullable WrappedGameProfile gameProfile) {
+        public void setGameProfile(@Nullable GameProfile gameProfile) {
             this.gameProfile = gameProfile;
         }
 
