@@ -21,56 +21,72 @@ package com.github.retrooper.packetevents.wrapper.login.client;
 import com.github.retrooper.packetevents.event.impl.PacketReceiveEvent;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.protocol.player.ClientVersion;
+import com.github.retrooper.packetevents.util.MinecraftEncryptionUtil;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 
-import javax.crypto.BadPaddingException;
-import javax.crypto.Cipher;
-import javax.crypto.IllegalBlockSizeException;
-import javax.crypto.NoSuchPaddingException;
+import javax.crypto.*;
+import javax.crypto.spec.SecretKeySpec;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
 import java.security.PublicKey;
 
 public class WrapperLoginClientEncryptionResponse extends PacketWrapper<WrapperLoginClientEncryptionResponse> {
-    private byte[] sharedSecret;
+    private byte[] encryptedSharedSecret;
     private byte[] encryptedVerifyToken;
 
     public WrapperLoginClientEncryptionResponse(PacketReceiveEvent event) {
         super(event);
     }
 
-    public WrapperLoginClientEncryptionResponse(ClientVersion clientVersion, byte[] sharedSecret, byte[] encryptedVerifyToken) {
+    public WrapperLoginClientEncryptionResponse(ClientVersion clientVersion, byte[] encryptedSharedSecret, byte[] encryptedVerifyToken) {
         super(PacketType.Login.Client.ENCRYPTION_RESPONSE.getId(), clientVersion);
-        this.sharedSecret = sharedSecret;
+        this.encryptedSharedSecret = encryptedSharedSecret;
         this.encryptedVerifyToken = encryptedVerifyToken;
     }
 
     @Override
     public void readData() {
-        this.sharedSecret = readByteArray(buffer.readableBytes());
+        this.encryptedSharedSecret = readByteArray(buffer.readableBytes());
         this.encryptedVerifyToken = readByteArray(buffer.readableBytes());
     }
 
     @Override
     public void readData(WrapperLoginClientEncryptionResponse wrapper) {
-        this.sharedSecret = wrapper.sharedSecret;
+        this.encryptedSharedSecret = wrapper.encryptedSharedSecret;
         this.encryptedVerifyToken = wrapper.encryptedVerifyToken;
     }
 
     @Override
     public void writeData() {
-        writeByteArray(sharedSecret);
+        writeByteArray(encryptedSharedSecret);
         writeByteArray(encryptedVerifyToken);
     }
 
-    public byte[] getSharedSecret() {
-        return this.sharedSecret;
+    public byte[] getEncryptedSharedSecret() {
+        return this.encryptedSharedSecret;
     }
 
-    public void setSharedSecret(byte[] sharedSecret) {
-        this.sharedSecret = sharedSecret;
+    public void setEncryptedSharedSecret(byte[] encryptedSharedSecret) {
+        this.encryptedSharedSecret = encryptedSharedSecret;
     }
+
+    public SecretKey getSecretKey(PrivateKey key) {
+        byte[] data = getEncryptedSharedSecret();
+        byte[] decryptedData = MinecraftEncryptionUtil.decrypt(key.getAlgorithm(), key, data);
+        if (decryptedData != null) {
+            return new SecretKeySpec(decryptedData, "AES");
+        }
+        else {
+            return null;
+        }
+    }
+
+    //TODO Confirm is this is correct
+    public void setSharedKey(SecretKey key, PublicKey publicKey) {
+        this.encryptedSharedSecret = MinecraftEncryptionUtil.encrypt(publicKey.getAlgorithm(), publicKey, key.getEncoded());
+    }
+
 
     public byte[] getEncryptedVerifyToken() {
         return this.encryptedVerifyToken;
