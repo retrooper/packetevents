@@ -23,36 +23,45 @@ import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 
+import javax.crypto.BadPaddingException;
+import javax.crypto.Cipher;
+import javax.crypto.IllegalBlockSizeException;
+import javax.crypto.NoSuchPaddingException;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
+import java.security.PrivateKey;
+import java.security.PublicKey;
+
 public class WrapperLoginClientEncryptionResponse extends PacketWrapper<WrapperLoginClientEncryptionResponse> {
     private byte[] sharedSecret;
-    private byte[] verifyToken;
+    private byte[] encryptedVerifyToken;
 
     public WrapperLoginClientEncryptionResponse(PacketReceiveEvent event) {
         super(event);
     }
 
-    public WrapperLoginClientEncryptionResponse(ClientVersion clientVersion, byte[] sharedSecret, byte[] verifyToken) {
+    public WrapperLoginClientEncryptionResponse(ClientVersion clientVersion, byte[] sharedSecret, byte[] encryptedVerifyToken) {
         super(PacketType.Login.Client.ENCRYPTION_RESPONSE.getId(), clientVersion);
         this.sharedSecret = sharedSecret;
-        this.verifyToken = verifyToken;
+        this.encryptedVerifyToken = encryptedVerifyToken;
     }
 
     @Override
     public void readData() {
         this.sharedSecret = readByteArray(buffer.readableBytes());
-        this.verifyToken = readByteArray(buffer.readableBytes());
+        this.encryptedVerifyToken = readByteArray(buffer.readableBytes());
     }
 
     @Override
     public void readData(WrapperLoginClientEncryptionResponse wrapper) {
         this.sharedSecret = wrapper.sharedSecret;
-        this.verifyToken = wrapper.verifyToken;
+        this.encryptedVerifyToken = wrapper.encryptedVerifyToken;
     }
 
     @Override
     public void writeData() {
         writeByteArray(sharedSecret);
-        writeByteArray(verifyToken);
+        writeByteArray(encryptedVerifyToken);
     }
 
     public byte[] getSharedSecret() {
@@ -63,11 +72,42 @@ public class WrapperLoginClientEncryptionResponse extends PacketWrapper<WrapperL
         this.sharedSecret = sharedSecret;
     }
 
-    public byte[] getVerifyToken() {
-        return this.verifyToken;
+    public byte[] getEncryptedVerifyToken() {
+        return this.encryptedVerifyToken;
     }
 
-    public void setVerifyToken(byte[] verifyToken) {
-        this.verifyToken = verifyToken;
+    public void setEncryptedVerifyToken(byte[] encryptedVerifyToken) {
+        this.encryptedVerifyToken = encryptedVerifyToken;
     }
+
+
+    //PrivateKey should be generated from the server key pair
+    public static byte[] decrypt(PrivateKey privateKey, byte[] data) {
+        try {
+            Cipher cipher = Cipher.getInstance("RSA/ECB/PKCS1Padding");
+            cipher.init(Cipher.DECRYPT_MODE, privateKey);
+            return cipher.doFinal(data);
+        }
+        catch (NoSuchPaddingException | NoSuchAlgorithmException
+                | InvalidKeyException | IllegalBlockSizeException | BadPaddingException ex) {
+            ex.printStackTrace();
+            return null;
+        }
+    }
+
+    public static byte[] encrypt(PublicKey publicKey, byte[] data) {
+        try {
+            Cipher cipher = Cipher.getInstance("RSA/ECB/PKCS1Padding");
+            cipher.init(Cipher.ENCRYPT_MODE, publicKey);
+            return cipher.doFinal(data);
+        }
+        catch (NoSuchPaddingException | NoSuchAlgorithmException
+                | InvalidKeyException | IllegalBlockSizeException | BadPaddingException ex) {
+            ex.printStackTrace();
+            return null;
+        }
+    }
+
+
+
 }
