@@ -27,6 +27,5 @@ public class LogManager {
         if (PacketEvents.getAPI().getSettings().isDebugEnabled()) {
             log(Level.FINE, Color.GRAY, message);
         }
-
     }
 }
