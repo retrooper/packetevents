@@ -80,7 +80,7 @@ public class WrappedPacketOutSetSlot extends WrappedPacket implements SendableWr
 
     public int getWindowId() {
         if (packet != null) {
-            int index = v_1_17_1 ? 3 : v_1_17 ? 2 : 0;
+            int index = v_1_17 ? 2 : 0;
             return readInt(index);
         } else {
             return windowID;
@@ -89,7 +89,7 @@ public class WrappedPacketOutSetSlot extends WrappedPacket implements SendableWr
 
     public void setWindowId(int windowID) {
         if (packet != null) {
-            int index = v_1_17_1 ? 3 : v_1_17 ? 2 : 0;
+            int index = v_1_17 ? 2 : 0;
             writeInt(index, windowID);
         } else {
             this.windowID = windowID;
