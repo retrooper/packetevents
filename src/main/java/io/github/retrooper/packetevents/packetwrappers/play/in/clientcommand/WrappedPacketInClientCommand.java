@@ -37,9 +37,8 @@ public final class WrappedPacketInClientCommand extends WrappedPacket {
     @Override
     protected void load() {
         v_1_16 = version.isNewerThanOrEquals(ServerVersion.v_1_16);
-        try {
-            enumClientCommandClass = NMSUtils.getNMSEnumClass("EnumClientCommand");
-        } catch (ClassNotFoundException e) {
+        enumClientCommandClass = NMSUtils.getNMSEnumClassWithoutException("EnumClientCommand");
+        if (enumClientCommandClass == null) {
             //Probably a subclass
             enumClientCommandClass = SubclassUtil.getEnumSubClass(PacketTypeClasses.Play.Client.CLIENT_COMMAND, "EnumClientCommand");
         }

@@ -133,11 +133,12 @@ public final class WrappedPacketInUseEntity extends WrappedPacketEntityAbstracti
         return action;
     }
 
+    //TODO Finish this
     protected void setAction(EntityUseAction action) {
         this.action = action;
         Enum<?> enumConst = EnumUtil.valueByIndex((Class<? extends Enum<?>>) enumEntityUseActionClass, action.ordinal());
         if (v_1_17) {
-            //TODO Add 1.17 support
+            //TODO Add 1.17+ support
         }
         else {
             writeEnumConstant(0, enumConst);

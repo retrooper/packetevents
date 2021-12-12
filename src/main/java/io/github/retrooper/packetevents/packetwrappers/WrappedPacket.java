@@ -396,8 +396,7 @@ public class WrappedPacket implements WrapperPacketReader, WrapperPacketWriter {
     public void writeEnumConstant(int index, Enum<?> enumConstant) {
         try {
             write(enumConstant.getClass(), index, enumConstant);
-        }
-        catch (WrapperFieldNotFoundException ex) {
+        } catch (WrapperFieldNotFoundException ex) {
             write(enumConstant.getDeclaringClass(), index, enumConstant);
         }
     }

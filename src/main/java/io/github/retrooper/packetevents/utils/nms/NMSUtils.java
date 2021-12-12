@@ -329,11 +329,11 @@ public final class NMSUtils {
 
         try {
             if (mobEffectListClass != null) {
-                getMobEffectListId = mobEffectListClass.getMethod("getId", mobEffectListClass);
-                getMobEffectListById = mobEffectListClass.getMethod("fromId", int.class);
+                getMobEffectListId = Reflection.getMethod(mobEffectListClass, 0, mobEffectListClass);
+                getMobEffectListById = Reflection.getMethod(mobEffectListClass, 0, int.class);
             }
-        } catch (Exception ignored) {
-
+        } catch (Exception ex) {
+            ex.printStackTrace();
         }
         try {
             entityPlayerPingField = entityPlayerClass.getField("ping");
@@ -403,7 +403,10 @@ public final class NMSUtils {
     }
 
     public static double[] recentTPS() {
-        return new WrappedPacket(new NMSPacket(getMinecraftServerInstance(Bukkit.getServer())), minecraftServerClass).readDoubleArray(0);
+        WrappedPacket minecraftServerInstanceReader = new WrappedPacket(
+                new NMSPacket(getMinecraftServerInstance(Bukkit.getServer())),
+                minecraftServerClass);
+        return minecraftServerInstanceReader.readDoubleArray(0);
     }
 
     public static Class<?> getNMSClass(String name) throws ClassNotFoundException {
