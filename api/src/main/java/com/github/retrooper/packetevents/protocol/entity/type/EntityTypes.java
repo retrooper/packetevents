@@ -16,7 +16,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.github.retrooper.packetevents.protocol.entity;
+package com.github.retrooper.packetevents.protocol.entity.type;
 
 import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
@@ -30,18 +30,38 @@ import java.util.Map;
 public class EntityTypes {
     private static final Map<String, EntityType> ENTITY_TYPE_MAP = new HashMap<>();
     private static final Map<Integer, EntityType> ENTITY_TYPE_ID_MAP = new HashMap<>();
-    private static JsonObject MODERN_ENTITY_TYPES_JSON;
+    private static JsonObject MAPPINGS;
+
+    //TODO Support older than 1.16.2(next is 1.16)
+    private static ServerVersion getMappingServerVersion(ServerVersion serverVersion) {
+        if (serverVersion.isOlderThan(ServerVersion.V_1_17)) {
+            return ServerVersion.V_1_16_2;
+        }
+        else  {
+            return ServerVersion.V_1_17;
+        }
+    }
 
     public static EntityType define(String key) {
-        if (MODERN_ENTITY_TYPES_JSON == null) {
-            MODERN_ENTITY_TYPES_JSON = MappingHelper.getJSONObject("modernentitytypes");
+        if (MAPPINGS == null) {
+            MAPPINGS = MappingHelper.getJSONObject("entity_type_mappings");
         }
-        int modernID = MODERN_ENTITY_TYPES_JSON.get(key).getAsInt();
-        int latestProtocolVersion = ServerVersion.getLatest().getProtocolVersion();
-        int serverProtocolVersion = PacketEvents.getAPI().getServerManager().getVersion().getProtocolVersion();
-
-        int transformedID = transformEntityTypeId(modernID, latestProtocolVersion, serverProtocolVersion);
         ResourceLocation identifier = ResourceLocation.minecraft(key);
+        ServerVersion mappingsVersion = getMappingServerVersion(PacketEvents.getAPI().getServerManager().getVersion());
+        final int id;
+        if (MAPPINGS.has(mappingsVersion.name())) {
+            JsonObject map = MAPPINGS.getAsJsonObject(mappingsVersion.name());
+            if (map.has(identifier.getKey())) {
+                id = map.get(identifier.getKey()).getAsInt();
+            }
+            else {
+                id = -1;
+            }
+        }
+        else {
+            throw new IllegalStateException("Failed to find EntityType mappings for the " + mappingsVersion.name() + " mappings version!");
+        }
+
         EntityType entityType = new EntityType() {
             @Override
             public ResourceLocation getIdentifier() {
@@ -50,7 +70,7 @@ public class EntityTypes {
 
             @Override
             public int getId() {
-                return transformedID;
+                return id;
             }
 
             @Override
@@ -65,14 +85,6 @@ public class EntityTypes {
         ENTITY_TYPE_MAP.put(entityType.getIdentifier().getKey(), entityType);
         ENTITY_TYPE_ID_MAP.put(entityType.getId(), entityType);
         return entityType;
-    }
-
-    public static int transformEntityTypeId(int id, int currentProtocolVersion, int targetProtocolVersion) {
-        if (currentProtocolVersion == targetProtocolVersion) {
-            return id;
-        }
-        //TODO Hard coded conversions
-        return id;
     }
 
     public static EntityType getByKey(String key) {

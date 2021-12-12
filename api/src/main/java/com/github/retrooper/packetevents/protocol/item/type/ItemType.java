@@ -16,16 +16,12 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.github.retrooper.packetevents.protocol.entity;
+package com.github.retrooper.packetevents.protocol.item.type;
 
-public enum EntityPose {
-    STANDING,
-    FALL_FLYING,
-    SLEEPING,
-    SWIMMING,
-    SPIN_ATTACK,
-    CROUCHING,
-    DYING;
+import com.github.retrooper.packetevents.protocol.mapper.MappedEntity;
 
-   public static final EntityPose[] VALUES = values();
+public interface ItemType extends MappedEntity {
+    int getMaxAmount();
+
+    boolean isMusicDisc();
 }

@@ -18,8 +18,8 @@
 
 package com.github.retrooper.packetevents.protocol.datawatcher;
 
-import com.github.retrooper.packetevents.protocol.entity.EntityPose;
-import com.github.retrooper.packetevents.protocol.inventory.ItemStack;
+import com.github.retrooper.packetevents.protocol.entity.pose.EntityPose;
+import com.github.retrooper.packetevents.protocol.item.ItemStack;
 import com.github.retrooper.packetevents.protocol.nbt.NBTCompound;
 import com.github.retrooper.packetevents.protocol.world.BlockFace;
 import com.github.retrooper.packetevents.util.Vector3f;

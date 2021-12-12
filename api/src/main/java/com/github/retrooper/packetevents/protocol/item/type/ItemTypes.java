@@ -16,12 +16,11 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.github.retrooper.packetevents.protocol.inventory;
+package com.github.retrooper.packetevents.protocol.item.type;
 
 import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.protocol.chat.component.serializer.ComponentSerializer;
-import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 import com.github.retrooper.packetevents.protocol.resources.ResourceLocation;
 import com.github.retrooper.packetevents.util.MappingHelper;
 import com.google.gson.JsonObject;
@@ -94,7 +93,7 @@ public class ItemTypes {
             }
         }
         else {
-            throw new IllegalStateException("Failed to find mappings for the " + mappingsVersion.name() + " mappings version!");
+            throw new IllegalStateException("Failed to find ItemType mappings for the " + mappingsVersion.name() + " mappings version!");
         }
 
         boolean musicDisc = attributes.contains(ItemAttribute.MUSIC_DISC);
