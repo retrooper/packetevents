@@ -1,48 +1,16 @@
 package io.github.retrooper.packetevents.utils;
 
+import com.github.retrooper.packetevents.protocol.chat.Color;
 import com.github.retrooper.packetevents.util.LogManager;
 import org.bukkit.Bukkit;
 
 import java.util.logging.Level;
 
 public class BukkitLogManager extends LogManager {
-    private final String prefixText = "§b[PacketEvents] §f";;
+    private final String prefixText = Color.CYAN + "[packetevents] " + Color.WHITE;
 
     @Override
-    public void log(Level level, final String message) {
-        String afterPrefixSuffix = "§f";
-        if (level == Level.INFO) {
-            afterPrefixSuffix = "§a";
-
-        } else if (level == Level.WARNING) {
-            afterPrefixSuffix = "§e";
-        } else if (level == Level.SEVERE) {
-            afterPrefixSuffix = "§c";
-        } else if (level == Level.FINE) {
-            afterPrefixSuffix = "§7";
-            level = Level.INFO;
-        }
-
-
-        Bukkit.getConsoleSender().sendMessage(prefixText + afterPrefixSuffix + message);
-    }
-
-    @Override
-    public void log(Level level, final String message, Throwable thrown) {
-        String afterPrefixSuffix = "§f";
-        if (level == Level.INFO) {
-            afterPrefixSuffix = "§a";
-
-        } else if (level == Level.WARNING) {
-            afterPrefixSuffix = "§e";
-        } else if (level == Level.SEVERE) {
-            afterPrefixSuffix = "§c";
-        } else if (level == Level.FINE) {
-            afterPrefixSuffix = "§7";
-            level = Level.INFO;
-        }
-
-        Bukkit.getConsoleSender().sendMessage(prefixText + afterPrefixSuffix + message);
-        thrown.printStackTrace();
+    protected void log(Level level, Color color, String message) {
+        Bukkit.getConsoleSender().sendMessage(prefixText + color.toString() + message);
     }
 }

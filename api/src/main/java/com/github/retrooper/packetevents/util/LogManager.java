@@ -1,65 +1,31 @@
 package com.github.retrooper.packetevents.util;
 
 import com.github.retrooper.packetevents.PacketEvents;
+import com.github.retrooper.packetevents.protocol.chat.Color;
 
 import java.util.logging.Level;
 
 public class LogManager {
 
-    public void log(Level level, final String message) {
-        String afterPrefixSuffix = "§f";
-        if (level == Level.INFO) {
-            afterPrefixSuffix = "§a";
-
-        } else if (level == Level.WARNING) {
-            afterPrefixSuffix = "§e";
-        } else if (level == Level.SEVERE) {
-            afterPrefixSuffix = "§c";
-        } else if (level == Level.FINE) {
-            afterPrefixSuffix = "§7";
-            level = Level.INFO;
-        }
-
-        PacketEvents.getAPI().getLogger().log(level, afterPrefixSuffix + message);
+    protected void log(Level level, Color color, String message) {
+        PacketEvents.getAPI().getLogger().log(level, color.toString() + message);
     }
 
-    public void log(Level level, final String message, Throwable thrown) {
-        String afterPrefixSuffix = "§f";
-        if (level == Level.INFO) {
-            afterPrefixSuffix = "§a";
-
-        } else if (level == Level.WARNING) {
-            afterPrefixSuffix = "§e";
-        } else if (level == Level.SEVERE) {
-            afterPrefixSuffix = "§c";
-        } else if (level == Level.FINE) {
-            afterPrefixSuffix = "§7";
-            level = Level.INFO;
-        }
-
-        PacketEvents.getAPI().getLogger().log(level, afterPrefixSuffix + message, thrown);
-    }
-
-
-    public void info(final String message) {
-        log(Level.INFO, message);
+    public void info(String message) {
+        log(Level.INFO, Color.BRIGHT_GREEN, message);
     }
 
     public void warn(final String message) {
-        log(Level.WARNING, message);
+        log(Level.WARNING, Color.YELLOW, message);
     }
 
     public void severe(final String message) {
-        log(Level.SEVERE, message);
-    }
-
-    public void severe(final String message, final Throwable throwable) {
-        log(Level.SEVERE, message, throwable);
+        log(Level.SEVERE, Color.RED, message);
     }
 
     public void debug(final String message) {
         if (PacketEvents.getAPI().getSettings().isDebugEnabled()) {
-            log(Level.FINE, message);
+            log(Level.FINE, Color.GRAY, message);
         }
 
     }

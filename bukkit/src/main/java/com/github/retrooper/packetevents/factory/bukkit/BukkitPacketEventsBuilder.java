@@ -81,11 +81,10 @@ public class BukkitPacketEventsBuilder {
             private final GlobalChannelInjector injector = new GlobalChannelInjector();
             private final UpdateChecker updateChecker = new UpdateChecker();
             private final InternalBukkitListener internalBukkitListener = new InternalBukkitListener();
+            private final LogManager logManager = new BukkitLogManager();
             private boolean loaded;
             private boolean initialized;
             private boolean lateBind = false;
-
-            private final LogManager logManager = new BukkitLogManager();
 
             @Override
             public void load() {
