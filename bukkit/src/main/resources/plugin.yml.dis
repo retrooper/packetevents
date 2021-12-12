@@ -1,0 +1,9 @@
+name: packetevents
+version: 2.0.0
+main: io.github.retrooper.packetevents.PacketEventsPlugin
+author: retrooper
+softdepend:
+  - ProtocolLib
+  - ProtocolSupport
+  - ViaVersion
+  - Geyser-Spigot

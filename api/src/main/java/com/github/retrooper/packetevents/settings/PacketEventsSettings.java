@@ -43,6 +43,11 @@ public class PacketEventsSettings {
     private boolean bStatsEnabled = true;
 
     /**
+     * Should Packetevents spam debug messages to the console?
+     */
+    private boolean debugEnabled = false;
+
+    /**
      * This is the server version PacketEvents should assume the server is when detecting
      * the server version fails using the Bukkit API.
      * This seems to be most common on 1.7.10 paper forks.
@@ -78,6 +83,17 @@ public class PacketEventsSettings {
     }
 
     /**
+     * This decides if PacketEvents should spam debug messages
+     *
+     * @param debugEnabled Value
+     * @return Settings instance.
+     */
+    public PacketEventsSettings debug(boolean debugEnabled) {
+        this.debugEnabled = debugEnabled;
+        return this;
+    }
+
+    /**
      * Fallback server version.
      *
      * @return Getter for {@link #fallbackServerVersion}
@@ -104,5 +120,14 @@ public class PacketEventsSettings {
      */
     public boolean isbStatsEnabled() {
         return bStatsEnabled;
+    }
+
+    /**
+     * Should packetevents send debug Messages to the console?
+     *
+     * @return Getter for {@link #debugEnabled}
+     */
+    public boolean isDebugEnabled() {
+        return debugEnabled;
     }
 }
