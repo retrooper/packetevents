@@ -79,35 +79,4 @@ public class WrapperLoginClientEncryptionResponse extends PacketWrapper<WrapperL
     public void setEncryptedVerifyToken(byte[] encryptedVerifyToken) {
         this.encryptedVerifyToken = encryptedVerifyToken;
     }
-
-
-    //PrivateKey should be generated from the server key pair
-    public static byte[] decrypt(PrivateKey privateKey, byte[] data) {
-        try {
-            Cipher cipher = Cipher.getInstance("RSA/ECB/PKCS1Padding");
-            cipher.init(Cipher.DECRYPT_MODE, privateKey);
-            return cipher.doFinal(data);
-        }
-        catch (NoSuchPaddingException | NoSuchAlgorithmException
-                | InvalidKeyException | IllegalBlockSizeException | BadPaddingException ex) {
-            ex.printStackTrace();
-            return null;
-        }
-    }
-
-    public static byte[] encrypt(PublicKey publicKey, byte[] data) {
-        try {
-            Cipher cipher = Cipher.getInstance("RSA/ECB/PKCS1Padding");
-            cipher.init(Cipher.ENCRYPT_MODE, publicKey);
-            return cipher.doFinal(data);
-        }
-        catch (NoSuchPaddingException | NoSuchAlgorithmException
-                | InvalidKeyException | IllegalBlockSizeException | BadPaddingException ex) {
-            ex.printStackTrace();
-            return null;
-        }
-    }
-
-
-
 }
