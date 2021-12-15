@@ -22,18 +22,14 @@ import com.github.retrooper.packetevents.event.impl.PacketSendEvent;
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.protocol.chat.component.BaseComponent;
 import com.github.retrooper.packetevents.protocol.chat.component.serializer.ComponentSerializer;
-import com.github.retrooper.packetevents.protocol.chat.component.impl.TextComponent;
-import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
+import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 
-import java.util.List;
 import java.util.UUID;
 
 public class WrapperPlayServerChatMessage extends PacketWrapper<WrapperPlayServerChatMessage> {
     public static boolean HANDLE_JSON = true;
-    private static final int MODERN_MESSAGE_LENGTH = 262144;
-    private static final int LEGACY_MESSAGE_LENGTH = 32767;
     private String chatComponentJson;
     private BaseComponent chatComponent;
     private ChatPosition position;
@@ -67,9 +63,8 @@ public class WrapperPlayServerChatMessage extends PacketWrapper<WrapperPlayServe
 
     @Override
     public void readData() {
-        int maxMessageLength = serverVersion.isNewerThanOrEquals(ServerVersion.V_1_13) ? MODERN_MESSAGE_LENGTH : LEGACY_MESSAGE_LENGTH;
-        this.chatComponentJson = readString(maxMessageLength);
-       // LogManager.debug("og json msg: " + chatComponentJson);
+        this.chatComponentJson = readString(getMaxMessageLength());
+        // LogManager.debug("og json msg: " + chatComponentJson);
 
         //Parse JSON message
         if (HANDLE_JSON) {
@@ -102,11 +97,10 @@ public class WrapperPlayServerChatMessage extends PacketWrapper<WrapperPlayServe
 
     @Override
     public void writeData() {
-        int maxMessageLength = serverVersion.isNewerThanOrEquals(ServerVersion.V_1_13) ? MODERN_MESSAGE_LENGTH : LEGACY_MESSAGE_LENGTH;
         if (HANDLE_JSON) {
             chatComponentJson = ComponentSerializer.buildJsonObject(chatComponent).toString();
         }
-        writeString(chatComponentJson, maxMessageLength);
+        writeString(chatComponentJson, getMaxMessageLength());
 
         //Is the server 1.8+ or is the client 1.8+? (1.7.10 servers support 1.8 clients, and send the chat position for 1.8 clients)
         if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_8) || clientVersion.isNewerThanOrEquals(ClientVersion.V_1_8)) {
