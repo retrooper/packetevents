@@ -32,9 +32,18 @@ public class EntityTypes {
     private static final Map<Integer, EntityType> ENTITY_TYPE_ID_MAP = new HashMap<>();
     private static JsonObject MAPPINGS;
 
-    //TODO Support older than 1.16.2(next is 1.16)
+    //TODO We have 1.14->1.18 mappings support so far
     private static ServerVersion getMappingServerVersion(ServerVersion serverVersion) {
-        if (serverVersion.isOlderThan(ServerVersion.V_1_17)) {
+        if (serverVersion.isOlderThan(ServerVersion.V_1_15)) {
+            return ServerVersion.V_1_14;
+        }
+        else if (serverVersion.isOlderThan(ServerVersion.V_1_16)) {
+            return ServerVersion.V_1_15;
+        }
+        else if (serverVersion.isOlderThan(ServerVersion.V_1_16_2)) {
+            return ServerVersion.V_1_16;
+        }
+        else if (serverVersion.isOlderThan(ServerVersion.V_1_17)) {
             return ServerVersion.V_1_16_2;
         }
         else  {
