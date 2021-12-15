@@ -44,13 +44,15 @@ import java.util.*;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
 
-
 public class PacketWrapper<T extends PacketWrapper> {
     public final ByteBufAbstract buffer;
     protected ClientVersion clientVersion;
     protected ServerVersion serverVersion;
     private final int packetID;
     private boolean hasPreparedForSending;
+
+    private static final int MODERN_MESSAGE_LENGTH = 262144;
+    private static final int LEGACY_MESSAGE_LENGTH = 32767;
 
     public PacketWrapper(ClientVersion clientVersion, ServerVersion serverVersion, ByteBufAbstract buffer, int packetID) {
         this.clientVersion = clientVersion;
@@ -154,6 +156,10 @@ public class PacketWrapper<T extends PacketWrapper> {
 
     public int getPacketId() {
         return packetID;
+    }
+
+    public int getMaxMessageLength() {
+        return serverVersion.isNewerThanOrEquals(ServerVersion.V_1_13) ? MODERN_MESSAGE_LENGTH : LEGACY_MESSAGE_LENGTH;
     }
 
     public void resetByteBuf() {
@@ -589,8 +595,7 @@ public class PacketWrapper<T extends PacketWrapper> {
                 list.add(new WatchableObject(index, type, value));
             }
             return list;
-        }
-        else {
+        } else {
             return readWatchableObjectsLegacy();
         }
     }
@@ -602,8 +607,7 @@ public class PacketWrapper<T extends PacketWrapper> {
                 writeByte(watchableObject.getType().ordinal());
                 watchableObject.getType().getWriteDataConsumer().accept(this, watchableObject.getValue());
             }
-        }
-        else {
+        } else {
             writeWatchableObjectsLegacy(list);
         }
     }
