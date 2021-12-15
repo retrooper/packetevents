@@ -41,7 +41,7 @@ public enum ServerVersion {
     V_1_16(735), V_1_16_1(736), V_1_16_2(751), V_1_16_3(753), V_1_16_4(754), V_1_16_5(754),
     V_1_17(755), V_1_17_1(756),
     V_1_18(757), V_1_18_1(757),
-    ERROR(-1);
+    ERROR(-1, true);
 
     private static final ServerVersion[] VALUES = values();
     private static final ServerVersion[] REVERSED_VALUES;
@@ -59,9 +59,20 @@ public enum ServerVersion {
     }
 
     private final int protocolVersion;
+    private final String name;
 
     ServerVersion(int protocolVersion) {
         this.protocolVersion = protocolVersion;
+        this.name = name().substring(2).replace("_", ".");
+    }
+
+    ServerVersion(int protocolVersion, boolean isNotRelease) {
+        this.protocolVersion = protocolVersion;
+        if (isNotRelease) {
+            this.name = name();
+        } else {
+            this.name = name().substring(2).replace("_", ".");
+        }
     }
 
     public static ServerVersion[] reversedValues() {
@@ -74,6 +85,15 @@ public enum ServerVersion {
 
     public static ServerVersion getOldest() {
         return values()[0];
+    }
+
+    /**
+     * Get the release name of this server version.
+     * For example, for the V_1_18 enum constant, it would return "1.18".
+     * @return Release name
+     */
+    public String getReleaseName() {
+        return name;
     }
 
     /**

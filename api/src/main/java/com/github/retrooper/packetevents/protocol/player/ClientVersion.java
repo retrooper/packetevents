@@ -92,19 +92,19 @@ public enum ClientVersion {
      */
     V_1_18(757),
 
-    LOWER_THAN_SUPPORTED_VERSIONS(V_1_7_10.protocolVersion - 1),
-    HIGHER_THAN_SUPPORTED_VERSIONS(V_1_18.protocolVersion + 1),
+    LOWER_THAN_SUPPORTED_VERSIONS(V_1_7_10.protocolVersion - 1, true),
+    HIGHER_THAN_SUPPORTED_VERSIONS(V_1_18.protocolVersion + 1, true),
     /**
      * Pre releases just aren't supported, we would end up with so many enum constants.
      * This constant assures you they are on a pre-release.
      */
-    ANY_PRE_RELEASE_VERSION(0),
+    ANY_PRE_RELEASE_VERSION(0, true),
 
-    TEMP_UNRESOLVED(-1),
+    TEMP_UNRESOLVED(-1, true),
 
-    UNRESOLVED(-1),
+    UNRESOLVED(-1, true),
 
-    UNKNOWN(-1);
+    UNKNOWN(-1, true);
 
     private static final ClientVersion[] REVERSED_VALUES;
 
@@ -127,9 +127,31 @@ public enum ClientVersion {
     private static final int[] CLIENT_VERSIONS = new int[]{5, 47, 107, 108, 109, 110, 210, 315, 316, 335, 338,
             340, 393, 401, 404, 477, 480, 485, 490, 498, 573, 575, 578, 735, 736, 751, 753, 754, 755, 756, 757};
     private int protocolVersion;
+    private String name;
 
     ClientVersion(int protocolVersion) {
         this.protocolVersion = protocolVersion;
+        this.name = name().substring(2).replace("_", ".");
+    }
+
+    ClientVersion(int protocolVersion, boolean isNotRelease) {
+        this.protocolVersion = protocolVersion;
+        if (isNotRelease) {
+            this.name = name();
+        }
+        else {
+            this.name = name().substring(2).replace("_", ".");
+        }
+    }
+
+
+    /**
+     * Get the release name of this client version.
+     * For example, for the V_1_18 enum constant, it would return "1.18".
+     * @return Release name
+     */
+    public String getReleaseName() {
+        return name;
     }
 
     public static ClientVersion[] reversedValues() {

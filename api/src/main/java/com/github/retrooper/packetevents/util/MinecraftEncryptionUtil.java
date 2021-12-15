@@ -32,7 +32,14 @@ public class MinecraftEncryptionUtil {
         return encrypt("RSA/ECB/PKCS1Padding", publicKey, data);
     }
 
-
+    public static byte[] decrypt(Cipher cipher, byte[] data) {
+        try {
+            return cipher.doFinal(data);
+        } catch (IllegalBlockSizeException | BadPaddingException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
 
 
     public static byte[] decrypt(String algorithm, PrivateKey privateKey, byte[] data) {
@@ -55,5 +62,10 @@ public class MinecraftEncryptionUtil {
             ex.printStackTrace();
             return null;
         }
+    }
+
+    public static byte[] encrypt(Cipher cipher, byte[] data) {
+        //This is on purpose, they work the same way
+        return decrypt(cipher, data);
     }
 }

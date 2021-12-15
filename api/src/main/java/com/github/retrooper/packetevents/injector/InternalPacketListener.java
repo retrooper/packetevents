@@ -16,7 +16,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package io.github.retrooper.packetevents.processor;
+package com.github.retrooper.packetevents.injector;
 
 import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.event.PacketListener;
@@ -24,21 +24,28 @@ import com.github.retrooper.packetevents.event.impl.PacketReceiveEvent;
 import com.github.retrooper.packetevents.event.impl.PacketSendEvent;
 import com.github.retrooper.packetevents.manager.player.attributes.TabCompleteAttribute;
 import com.github.retrooper.packetevents.protocol.ConnectionState;
+import com.github.retrooper.packetevents.protocol.gameprofile.GameProfile;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 import com.github.retrooper.packetevents.wrapper.handshaking.client.WrapperHandshakingClientHandshake;
 import com.github.retrooper.packetevents.wrapper.login.client.WrapperLoginClientLoginStart;
+import com.github.retrooper.packetevents.wrapper.login.server.WrapperLoginServerLoginSuccess;
 import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientTabComplete;
-import org.bukkit.entity.Player;
-
 import java.util.Optional;
+import java.util.UUID;
 
 public class InternalPacketListener implements PacketListener {
     //Make this specific event be at MONITOR priority
     @Override
     public void onPacketSend(PacketSendEvent event) {
-        Player player = (Player) event.getPlayer();
         if (event.getPacketType() == PacketType.Login.Server.LOGIN_SUCCESS) {
+            //Process outgoing login success packet
+            WrapperLoginServerLoginSuccess loginSuccess = new WrapperLoginServerLoginSuccess(event);
+            String username = loginSuccess.getUsername();
+            UUID uuid = loginSuccess.getUUID();
+            //Create and store game profile
+            GameProfile profile = new GameProfile(uuid, username);
+            PacketEvents.getAPI().getPlayerManager().setGameProfile(event.getChannel(), profile);
             //Transition into the PLAY connection state
             PacketEvents.getAPI().getPlayerManager().changeConnectionState(event.getChannel(), ConnectionState.PLAY);
         }
@@ -46,7 +53,6 @@ public class InternalPacketListener implements PacketListener {
 
     @Override
     public void onPacketReceive(PacketReceiveEvent event) {
-        Player player = (Player) event.getPlayer();
         switch (event.getConnectionState()) {
             case HANDSHAKING:
                 if (event.getPacketType() == PacketType.Handshaking.Client.HANDSHAKE) {
@@ -74,8 +80,10 @@ public class InternalPacketListener implements PacketListener {
                 if (event.getPacketType() == PacketType.Play.Client.TAB_COMPLETE) {
                     WrapperPlayClientTabComplete tabComplete = new WrapperPlayClientTabComplete(event);
                     String text = tabComplete.getText();
+                    GameProfile profile = PacketEvents.getAPI().getPlayerManager().getGameProfile(event.getChannel());
+                    UUID uuid = profile.getId();
                     TabCompleteAttribute tabCompleteAttribute =
-                            PacketEvents.getAPI().getPlayerManager().getAttributeOrDefault(player.getUniqueId(),
+                            PacketEvents.getAPI().getPlayerManager().getAttributeOrDefault(uuid,
                                     TabCompleteAttribute.class,
                                     new TabCompleteAttribute());
                     tabCompleteAttribute.setInput(text);

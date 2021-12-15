@@ -118,7 +118,8 @@ public class PlayerManagerImpl implements PlayerManager {
     @Override
     public GameProfile getGameProfile(@NotNull Object player) {
         Player p = (Player) player;
-        return getGameProfile(p.getName());
+        ChannelAbstract channel = getChannel(p);
+        return getGameProfile(channel);
     }
 
     @Override

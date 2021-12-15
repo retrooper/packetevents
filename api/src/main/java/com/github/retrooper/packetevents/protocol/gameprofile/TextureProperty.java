@@ -55,15 +55,17 @@ public class TextureProperty {
     }
 
     public boolean isSignatureValid(PublicKey publicKey) {
+        if (!hasSignature()) {
+            return false;
+        }
         try {
             Signature signature = Signature.getInstance("SHA1withRSA");
             signature.initVerify(publicKey);
             signature.update(this.value.getBytes());
             return signature.verify(Base64.getDecoder().decode(this.signature));
-        } catch (NoSuchAlgorithmException | InvalidKeyException | SignatureException var3) {
-            var3.printStackTrace();
+        } catch (NoSuchAlgorithmException | InvalidKeyException | SignatureException ex) {
+            ex.printStackTrace();
         }
-
         return false;
     }
 }

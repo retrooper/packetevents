@@ -38,7 +38,7 @@ import io.github.retrooper.packetevents.handlers.GlobalChannelInjector;
 import io.github.retrooper.packetevents.manager.player.PlayerManagerImpl;
 import io.github.retrooper.packetevents.manager.server.ServerManagerImpl;
 import io.github.retrooper.packetevents.processor.InternalBukkitListener;
-import io.github.retrooper.packetevents.processor.InternalPacketListener;
+import com.github.retrooper.packetevents.injector.InternalPacketListener;
 import io.github.retrooper.packetevents.utils.BukkitLogManager;
 import io.github.retrooper.packetevents.utils.MinecraftReflectionUtil;
 import io.github.retrooper.packetevents.utils.netty.NettyManagerImpl;

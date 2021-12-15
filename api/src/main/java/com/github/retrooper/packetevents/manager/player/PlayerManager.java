@@ -36,7 +36,7 @@ public interface PlayerManager {
     Map<ChannelAbstract, ClientVersion> CLIENT_VERSIONS = new ConcurrentHashMap<>();
     Map<ChannelAbstract, ConnectionState> CONNECTION_STATES = new ConcurrentHashMap<>();
     Map<String, ChannelAbstract> CHANNELS = new ConcurrentHashMap<>();
-    Map<String, GameProfile> GAME_PROFILES = new ConcurrentHashMap<>();
+    Map<ChannelAbstract, GameProfile> GAME_PROFILES = new ConcurrentHashMap<>();
     Map<UUID, Map<Class<? extends PlayerAttributeObject>, PlayerAttributeObject>> PLAYER_ATTRIBUTES = new ConcurrentHashMap<>();
 
     default <T extends PlayerAttributeObject> T getAttributeOrDefault(UUID uuid, Class<T> clazz, T defaultReturnValue) {
@@ -111,12 +111,12 @@ public interface PlayerManager {
         sendPacket(channel, wrapper.buffer);
     }
 
-    default GameProfile getGameProfile(String username) {
-        return GAME_PROFILES.get(username);
+    default GameProfile getGameProfile(ChannelAbstract channel) {
+        return GAME_PROFILES.get(channel);
     }
 
-    default void setGameProfile(String username, GameProfile gameProfile) {
-        GAME_PROFILES.put(username, gameProfile);
+    default void setGameProfile(ChannelAbstract channel, GameProfile gameProfile) {
+        GAME_PROFILES.put(channel, gameProfile);
     }
 
     default ChannelAbstract getChannel(String username) {
