@@ -22,42 +22,42 @@ import com.github.retrooper.packetevents.event.impl.PacketReceiveEvent;
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.protocol.player.ClientVersion;
-import com.github.retrooper.packetevents.protocol.player.Hand;
+import com.github.retrooper.packetevents.protocol.player.InteractionHand;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 
 /**
  * This packet is sent when the client swings their arm.
  */
 public class WrapperPlayClientAnimation extends PacketWrapper<WrapperPlayClientAnimation> {
-    private Hand hand;
+    private InteractionHand interactionHand;
 
     public WrapperPlayClientAnimation(PacketReceiveEvent event) {
         super(event);
     }
 
-    public WrapperPlayClientAnimation(Hand hand) {
+    public WrapperPlayClientAnimation(InteractionHand interactionHand) {
         super(PacketType.Play.Client.ANIMATION);
-        this.hand = hand;
+        this.interactionHand = interactionHand;
     }
 
     @Override
     public void readData() {
         if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_9)) {
-            this.hand = Hand.getByLegacyId(readVarInt());
+            this.interactionHand = InteractionHand.getByLegacyId(readVarInt());
         } else {
-            this.hand = Hand.RIGHT;
+            this.interactionHand = InteractionHand.MAIN_HAND;
         }
     }
 
     @Override
     public void readData(WrapperPlayClientAnimation wrapper) {
-        this.hand = wrapper.hand;
+        this.interactionHand = wrapper.interactionHand;
     }
 
     @Override
     public void writeData() {
         if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_9)) {
-            writeVarInt(hand.getLegacyId());
+            writeVarInt(interactionHand.getLegacyId());
         }
     }
 
@@ -68,8 +68,8 @@ public class WrapperPlayClientAnimation extends PacketWrapper<WrapperPlayClientA
      *
      * @return Hand
      */
-    public Hand getHand() {
-        return hand;
+    public InteractionHand getHand() {
+        return interactionHand;
     }
 
     /**
@@ -78,9 +78,9 @@ public class WrapperPlayClientAnimation extends PacketWrapper<WrapperPlayClientA
      * For {@link ClientVersion#V_1_8} and {@link ClientVersion#V_1_7_10} clients only have a main hand.
      * Modifying the hand on 1.8 and 1.7 clients is redundant.
      *
-     * @param hand Hand used for the animation
+     * @param interactionHand Hand used for the animation
      */
-    public void setHand(Hand hand) {
-        this.hand = hand;
+    public void setHand(InteractionHand interactionHand) {
+        this.interactionHand = interactionHand;
     }
 }

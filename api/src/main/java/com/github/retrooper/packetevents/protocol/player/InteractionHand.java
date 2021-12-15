@@ -25,18 +25,17 @@ package com.github.retrooper.packetevents.protocol.player;
  * @see <a href="https://wiki.vg/Protocol#Open_Book">https://wiki.vg/Protocol#Open_Book</a>
  * @since 1.8
  */
-public enum Hand {
-    LEFT,
-
-    RIGHT;
+public enum InteractionHand {
+    MAIN_HAND,
+    OFF_HAND;
 
     public int getLegacyId() {
-        return this == RIGHT ? 0 : 1;
+        return this == MAIN_HAND ? 0 : 1;
     }
 
-    public static final Hand[] VALUES = values();
+    public static final InteractionHand[] VALUES = values();
 
-    public static Hand getByLegacyId(int handValue) {
-        return handValue == 0 ? RIGHT : LEFT;
+    public static InteractionHand getByLegacyId(int handValue) {
+        return handValue == 0 ? MAIN_HAND : OFF_HAND;
     }
 }
