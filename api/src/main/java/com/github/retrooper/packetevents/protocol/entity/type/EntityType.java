@@ -21,5 +21,5 @@ package com.github.retrooper.packetevents.protocol.entity.type;
 import com.github.retrooper.packetevents.protocol.mapper.MappedEntity;
 
 public interface EntityType extends MappedEntity {
-
+    EntityType getParent();
 }

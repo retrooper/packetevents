@@ -24,6 +24,6 @@ import java.util.UUID;
 
 public class GeyserUtil {
     public static boolean isGeyserPlayer(UUID uuid) {
-        return GeyserConnector.getInstance().getPlayerByUuid(uuid) != null;
+        return MinecraftReflectionUtil.GEYSER_CLASS != null && GeyserConnector.getInstance().getPlayerByUuid(uuid) != null;
     }
 }
