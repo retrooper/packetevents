@@ -41,10 +41,8 @@ public class InternalPacketListener implements PacketListener {
         if (event.getPacketType() == PacketType.Login.Server.LOGIN_SUCCESS) {
             //Process outgoing login success packet
             WrapperLoginServerLoginSuccess loginSuccess = new WrapperLoginServerLoginSuccess(event);
-            String username = loginSuccess.getUsername();
-            UUID uuid = loginSuccess.getUUID();
-            //Create and store game profile
-            GameProfile profile = new GameProfile(uuid, username);
+            //Store game profile
+            GameProfile profile = loginSuccess.getGameProfile();
             PacketEvents.getAPI().getPlayerManager().setGameProfile(event.getChannel(), profile);
             //Transition into the PLAY connection state
             PacketEvents.getAPI().getPlayerManager().changeConnectionState(event.getChannel(), ConnectionState.PLAY);

@@ -124,7 +124,7 @@ public class WrapperPlayServerSpawnLivingEntity extends PacketWrapper<WrapperPla
             if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_11)) {
                 writeVarInt(entityType.getId());
             } else {
-                //TODO Confirm if necessary / correct
+                //TODO Confirm if necessary
                 writeByte(entityType.getId() & 255);
             }
             writeDouble(position.x);
