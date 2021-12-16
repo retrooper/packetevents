@@ -23,55 +23,65 @@ import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.protocol.resources.ResourceLocation;
 import com.github.retrooper.packetevents.util.MappingHelper;
 import com.google.gson.JsonObject;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 public class EntityTypes {
     private static final Map<String, EntityType> ENTITY_TYPE_MAP = new HashMap<>();
     private static final Map<Integer, EntityType> ENTITY_TYPE_ID_MAP = new HashMap<>();
     private static JsonObject MAPPINGS;
+    private static ServerVersion mappingsVersion;
 
     //TODO We have 1.14->1.18 mappings support so far
+    @NotNull
     private static ServerVersion getMappingServerVersion(ServerVersion serverVersion) {
-        if (serverVersion.isOlderThan(ServerVersion.V_1_15)) {
+        if (serverVersion.isOlderThan(ServerVersion.V_1_11)) {
+            return ServerVersion.V_1_10;
+        } else if (serverVersion.isOlderThan(ServerVersion.V_1_12)) {
+            return ServerVersion.V_1_11;
+        } else if (serverVersion.isOlderThan(ServerVersion.V_1_13)) {
+            return ServerVersion.V_1_12;
+        } else if (serverVersion.isOlderThan(ServerVersion.V_1_14)) {
+            return ServerVersion.V_1_13;
+        } else if (serverVersion.isOlderThan(ServerVersion.V_1_15)) {
             return ServerVersion.V_1_14;
-        }
-        else if (serverVersion.isOlderThan(ServerVersion.V_1_16)) {
+        } else if (serverVersion.isOlderThan(ServerVersion.V_1_16)) {
             return ServerVersion.V_1_15;
-        }
-        else if (serverVersion.isOlderThan(ServerVersion.V_1_16_2)) {
+        } else if (serverVersion.isOlderThan(ServerVersion.V_1_16_2)) {
             return ServerVersion.V_1_16;
-        }
-        else if (serverVersion.isOlderThan(ServerVersion.V_1_17)) {
+        } else if (serverVersion.isOlderThan(ServerVersion.V_1_17)) {
             return ServerVersion.V_1_16_2;
-        }
-        else  {
+        } else {
             return ServerVersion.V_1_17;
         }
     }
 
-    public static EntityType define(String key, EntityType parent) {
+    public static EntityType define(String key, @Nullable EntityType parent) {
         if (MAPPINGS == null) {
             MAPPINGS = MappingHelper.getJSONObject("entity_type_mappings");
         }
 
         ResourceLocation identifier = ResourceLocation.minecraft(key);
-        ServerVersion mappingsVersion = getMappingServerVersion(PacketEvents.getAPI().getServerManager().getVersion());
+        if (mappingsVersion == null) {
+            mappingsVersion = getMappingServerVersion(PacketEvents.getAPI().getServerManager().getVersion());
+        }
         final int id;
 
         if (MAPPINGS.has(mappingsVersion.name())) {
             JsonObject map = MAPPINGS.getAsJsonObject(mappingsVersion.name());
             if (map.has(identifier.getKey())) {
                 id = map.get(identifier.getKey()).getAsInt();
-            }
-            else {
+            } else {
                 id = -1;
             }
-        }
-        else {
+        } else {
             throw new IllegalStateException("Failed to find EntityType mappings for the " + mappingsVersion.name() + " mappings version!");
         }
+        Optional<EntityType> optParent = parent != null ? Optional.of(parent) : Optional.empty();
 
         EntityType entityType = new EntityType() {
             @Override
@@ -85,8 +95,8 @@ public class EntityTypes {
             }
 
             @Override
-            public EntityType getParent() {
-                return parent;
+            public Optional<EntityType> getParent() {
+                return optParent;
             }
 
             @Override
@@ -103,12 +113,17 @@ public class EntityTypes {
         return entityType;
     }
 
-    public static boolean typeHasParent(EntityType type, EntityType parent) {
+    public static boolean isTypeInstanceOf(EntityType type, EntityType parent) {
         while (type != null) {
             if (type == parent) {
                 return true;
             }
-            type = type.getParent();
+            if (type.getParent().isPresent()) {
+                type = type.getParent().get();
+            }
+            else {
+                return false;
+            }
         }
         return false;
     }
@@ -149,7 +164,6 @@ public class EntityTypes {
     public static final EntityType PROJECTILE_ABSTRACT = define("projectile_abstract", ENTITY);
     public static final EntityType MINECART_ABSTRACT = define("minecart_abstract", ENTITY);
     public static final EntityType CHESTED_MINECART_ABSTRACT = define("chested_minecart_abstract", MINECART_ABSTRACT);
-
     public static final EntityType AREA_EFFECT_CLOUD = define("area_effect_cloud", ENTITY);
     public static final EntityType ARMOR_STAND = define("armor_stand", LIVINGENTITY);
     public static final EntityType ARROW = define("arrow", ABSTRACT_ARROW);

@@ -20,6 +20,8 @@ package com.github.retrooper.packetevents.protocol.entity.type;
 
 import com.github.retrooper.packetevents.protocol.mapper.MappedEntity;
 
+import java.util.Optional;
+
 public interface EntityType extends MappedEntity {
-    EntityType getParent();
+    Optional<EntityType> getParent();
 }

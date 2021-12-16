@@ -24,6 +24,7 @@ import com.github.retrooper.packetevents.protocol.chat.component.serializer.Comp
 import com.github.retrooper.packetevents.protocol.resources.ResourceLocation;
 import com.github.retrooper.packetevents.util.MappingHelper;
 import com.google.gson.JsonObject;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.*;
@@ -139,9 +140,13 @@ public class ItemTypes {
         return ITEM_TYPE_MAP.get(key);
     }
 
-    @Nullable
+    @NotNull
     public static ItemType getById(int id) {
-        return ITEM_TYPE_ID_MAP.get(id);
+        ItemType cache = ITEM_TYPE_ID_MAP.get(id);
+        if (cache == null) {
+            cache = ItemTypes.AIR;
+        }
+        return cache;
     }
 
     private static String paste(String content) throws IOException {
