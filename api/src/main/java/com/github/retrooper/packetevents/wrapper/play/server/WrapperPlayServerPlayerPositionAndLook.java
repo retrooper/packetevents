@@ -23,7 +23,8 @@ public class WrapperPlayServerPlayerPositionAndLook extends PacketWrapper<Wrappe
         super(event);
     }
 
-    public WrapperPlayServerPlayerPositionAndLook(double x, double y, double z, float yaw, float pitch, int flags, int teleportId) {
+    public WrapperPlayServerPlayerPositionAndLook(double x, double y, double z, float yaw, float pitch,
+                                                  int flags, int teleportId, boolean dismountVehicle) {
         super(PacketType.Play.Server.PLAYER_POSITION_AND_LOOK);
         this.x = x;
         this.y = y;
@@ -32,6 +33,7 @@ public class WrapperPlayServerPlayerPositionAndLook extends PacketWrapper<Wrappe
         this.pitch = pitch;
         this.flags = flags;
         this.teleportId = teleportId;
+        this.dismountVehicle = dismountVehicle;
     }
 
     @Override
