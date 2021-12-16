@@ -94,28 +94,30 @@ public class PacketDecoderModern extends ByteToMessageDecoder {
 
     @Override
     public void decode(ChannelHandlerContext ctx, ByteBuf byteBuf, List<Object> out) {
-        handle(PacketEvents.getAPI().getNettyManager().wrapChannelHandlerContext(ctx), PacketEvents.getAPI().getNettyManager().wrapByteBuf(byteBuf), out);
-        if (!decoders.isEmpty()) {
-            //Call custom decoders
-            try {
-                for (ByteToMessageDecoder decoder : decoders) {
-                    //Only support one output object
+        if (byteBuf.readableBytes() != 0) {
+            handle(PacketEvents.getAPI().getNettyManager().wrapChannelHandlerContext(ctx), PacketEvents.getAPI().getNettyManager().wrapByteBuf(byteBuf), out);
+            if (!decoders.isEmpty()) {
+                //Call custom decoders
+                try {
+                    for (ByteToMessageDecoder decoder : decoders) {
+                        //Only support one output object
+                        Object input = out.get(0);
+                        out.clear();
+                        out.addAll(CustomPipelineUtil.callDecode(decoder, ctx, input));
+                    }
+                } catch (InvocationTargetException e) {
+                    e.printStackTrace();
+                }
+            }
+            if (mcDecoder != null) {
+                //Call minecraft decoder to convert the ByteBuf to an NMS object for the next handlers
+                try {
                     Object input = out.get(0);
                     out.clear();
-                    out.addAll(CustomPipelineUtil.callDecode(decoder, ctx, input));
+                    out.addAll(CustomPipelineUtil.callDecode(mcDecoder, ctx, input));
+                } catch (InvocationTargetException e) {
+                    e.printStackTrace();
                 }
-            } catch (InvocationTargetException e) {
-                e.printStackTrace();
-            }
-        }
-        if (mcDecoder != null) {
-            //Call minecraft decoder to convert the ByteBuf to an NMS object for the next handlers
-            try {
-                Object input = out.get(0);
-                out.clear();
-                out.addAll(CustomPipelineUtil.callDecode(mcDecoder, ctx, input));
-            } catch (InvocationTargetException e) {
-                e.printStackTrace();
             }
         }
     }

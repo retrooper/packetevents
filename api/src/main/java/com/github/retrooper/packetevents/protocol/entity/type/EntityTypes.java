@@ -66,15 +66,14 @@ public class EntityTypes {
         }
 
         ResourceLocation identifier = ResourceLocation.minecraft(key);
-        if (mappingsVersion == null) {
-            mappingsVersion = getMappingServerVersion(PacketEvents.getAPI().getServerManager().getVersion());
-        }
+        ServerVersion mappingsVersion = getMappingServerVersion(PacketEvents.getAPI().getServerManager().getVersion());
+
         final int id;
 
         if (MAPPINGS.has(mappingsVersion.name())) {
             JsonObject map = MAPPINGS.getAsJsonObject(mappingsVersion.name());
-            if (map.has(identifier.getKey())) {
-                id = map.get(identifier.getKey()).getAsInt();
+            if (map.has(key)) {
+                id = map.get(key).getAsInt();
             } else {
                 id = -1;
             }
