@@ -19,7 +19,7 @@
 package com.github.retrooper.packetevents.protocol.world;
 
 /**
- * The {@code Direction} enum contains constants for the different valid faces in the minecraft protocol.
+ * The {@code BlockFace} enum contains constants for the different valid faces in the minecraft protocol.
  *
  * @author retrooper
  * @see <a href="https://wiki.vg/Protocol#Player_Digging">https://wiki.vg/Protocol#Player_Digging</a>
