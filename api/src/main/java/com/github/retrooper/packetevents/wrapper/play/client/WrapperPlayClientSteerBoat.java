@@ -22,6 +22,15 @@ import com.github.retrooper.packetevents.event.impl.PacketReceiveEvent;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 
+/**
+ * Not to be confused with {@link WrapperPlayClientSteerVehicle}
+ *
+ * This packet determines whether the boat will have its paddles turning
+ * Right paddle with left or forward button
+ * Left paddle with right or forward button
+ *
+ * It is unclear why this is needed when WrapperPlayClientSteerVehicle already gives the correct information
+ */
 public class WrapperPlayClientSteerBoat extends PacketWrapper<WrapperPlayClientSteerBoat> {
     private boolean leftPaddleTurning;
     private boolean rightPaddleTurning;

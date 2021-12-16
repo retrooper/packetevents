@@ -20,8 +20,8 @@ package com.github.retrooper.packetevents.wrapper.play.client;
 
 import com.github.retrooper.packetevents.event.impl.PacketReceiveEvent;
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
+import com.github.retrooper.packetevents.protocol.player.HumanoidArm;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
-import com.github.retrooper.packetevents.protocol.player.Hand;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 
 import java.util.HashSet;
@@ -33,7 +33,7 @@ public class WrapperPlayClientSettings extends PacketWrapper<WrapperPlayClientSe
     private ChatVisibility visibility;
     private boolean chatColorable;
     private byte visibleSkinSectionMask;
-    private Hand hand;
+    private HumanoidArm hand;
     private boolean textFilteringEnabled;
     private boolean allowServerListings;
 
@@ -79,7 +79,7 @@ public class WrapperPlayClientSettings extends PacketWrapper<WrapperPlayClientSe
     }
 
     public WrapperPlayClientSettings(String locale, int viewDistance, ChatVisibility visibility,
-                                     boolean chatColorable, byte visibleSkinSectionMask, Hand hand,
+                                     boolean chatColorable, byte visibleSkinSectionMask, HumanoidArm hand,
                                      boolean textFilteringEnabled, boolean allowServerListings) {
         super(PacketType.Play.Client.CLIENT_SETTINGS);
         this.locale = locale;
@@ -114,10 +114,10 @@ public class WrapperPlayClientSettings extends PacketWrapper<WrapperPlayClientSe
         }
 
         if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_9)) {
-            hand = Hand.VALUES[readVarInt()];
+            hand = HumanoidArm.VALUES[readVarInt()];
         }
         else {
-            hand = Hand.RIGHT;
+            hand = HumanoidArm.RIGHT;
         }
 
         if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_17)) {
@@ -240,11 +240,11 @@ public class WrapperPlayClientSettings extends PacketWrapper<WrapperPlayClientSe
         setVisibleSkinSectionMask(mask);
     }
 
-    public Hand getHand() {
+    public HumanoidArm getMainHand() {
         return hand;
     }
 
-    public void setHand(Hand hand) {
+    public void setMainHand(HumanoidArm hand) {
         this.hand = hand;
     }
 

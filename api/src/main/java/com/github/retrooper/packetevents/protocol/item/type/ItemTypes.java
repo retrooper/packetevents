@@ -390,7 +390,7 @@ public class ItemTypes {
     public static final ItemType MOSSY_STONE_BRICK_SLAB = define(64, "mossy_stone_brick_slab");
     public static final ItemType YELLOW_CARPET = define(64, "yellow_carpet");
     public static final ItemType TINTED_GLASS = define(64, "tinted_glass");
-    public static final ItemType AIR = define(1, "air");
+    public static final ItemType AIR = define(64, "air");
     public static final ItemType JUNGLE_FENCE_GATE = define(64, "jungle_fence_gate");
     public static final ItemType SANDSTONE = define(64, "sandstone");
     public static final ItemType BLUE_TERRACOTTA = define(64, "blue_terracotta");

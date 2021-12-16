@@ -21,7 +21,7 @@ package com.github.retrooper.packetevents.wrapper.play.client;
 import com.github.retrooper.packetevents.event.impl.PacketReceiveEvent;
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
-import com.github.retrooper.packetevents.protocol.player.Hand;
+import com.github.retrooper.packetevents.protocol.player.InteractionHand;
 import com.github.retrooper.packetevents.util.Vector3f;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 
@@ -36,18 +36,18 @@ public class WrapperPlayClientInteractEntity extends PacketWrapper<WrapperPlayCl
     private int entityID;
     private InteractAction interactAction;
     private Optional<Vector3f> target;
-    private Hand hand;
+    private InteractionHand interactionHand;
     private Optional<Boolean> sneaking;
 
     public WrapperPlayClientInteractEntity(PacketReceiveEvent event) {
         super(event);
     }
 
-    public WrapperPlayClientInteractEntity(int entityID, InteractAction interactAction, Hand hand, Optional<Vector3f> target, Optional<Boolean> sneaking) {
+    public WrapperPlayClientInteractEntity(int entityID, InteractAction interactAction, InteractionHand interactionHand, Optional<Vector3f> target, Optional<Boolean> sneaking) {
         super(PacketType.Play.Client.INTERACT_ENTITY);
         this.entityID = entityID;
         this.interactAction = interactAction;
-        this.hand = hand;
+        this.interactionHand = interactionHand;
         this.target = target;
         this.sneaking = sneaking;
     }
@@ -59,7 +59,7 @@ public class WrapperPlayClientInteractEntity extends PacketWrapper<WrapperPlayCl
             byte typeIndex = readByte();
             this.interactAction = InteractAction.VALUES[typeIndex];
             this.target = Optional.empty();
-            this.hand = Hand.RIGHT;
+            this.interactionHand = InteractionHand.MAIN_HAND;
             this.sneaking = Optional.empty();
         } else {
             this.entityID = readVarInt();
@@ -76,9 +76,9 @@ public class WrapperPlayClientInteractEntity extends PacketWrapper<WrapperPlayCl
 
             if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_9) && (interactAction == InteractAction.INTERACT || interactAction == InteractAction.INTERACT_AT)) {
                 int handID = readVarInt();
-                this.hand = Hand.getByLegacyId(handID);
+                this.interactionHand = InteractionHand.getByLegacyId(handID);
             } else {
-                this.hand = Hand.RIGHT;
+                this.interactionHand = InteractionHand.MAIN_HAND;
             }
 
             if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_16)) {
@@ -94,7 +94,7 @@ public class WrapperPlayClientInteractEntity extends PacketWrapper<WrapperPlayCl
         this.entityID = wrapper.entityID;
         this.interactAction = wrapper.interactAction;
         this.target = wrapper.target;
-        this.hand = wrapper.hand;
+        this.interactionHand = wrapper.interactionHand;
         this.sneaking = wrapper.sneaking;
     }
 
@@ -114,7 +114,7 @@ public class WrapperPlayClientInteractEntity extends PacketWrapper<WrapperPlayCl
             }
 
             if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_9) && (interactAction == InteractAction.INTERACT || interactAction == InteractAction.INTERACT_AT)) {
-                writeVarInt(hand.getLegacyId());
+                writeVarInt(interactionHand.getLegacyId());
             }
 
             if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_16)) {
@@ -139,12 +139,12 @@ public class WrapperPlayClientInteractEntity extends PacketWrapper<WrapperPlayCl
         this.interactAction = interactAction;
     }
 
-    public Hand getHand() {
-        return hand;
+    public InteractionHand getHand() {
+        return interactionHand;
     }
 
-    public void setHand(Hand hand) {
-        this.hand = hand;
+    public void setHand(InteractionHand interactionHand) {
+        this.interactionHand = interactionHand;
     }
 
     public Optional<Vector3f> getTarget() {

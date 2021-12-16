@@ -38,56 +38,56 @@ import com.github.retrooper.packetevents.wrapper.PacketWrapper;
  * @see WrapperPlayServerWindowConfirmation
  */
 public class WrapperPlayClientWindowConfirmation extends PacketWrapper<WrapperPlayClientWindowConfirmation> {
-    private int windowID;
-    private short actionNumber;
+    private int windowId;
+    private short actionId;
     private boolean accepted;
 
     public WrapperPlayClientWindowConfirmation(PacketReceiveEvent event) {
         super(event);
     }
 
-    public WrapperPlayClientWindowConfirmation(int windowID, short actionNumber, boolean accepted) {
+    public WrapperPlayClientWindowConfirmation(int windowId, short actionId, boolean accepted) {
         super(PacketType.Play.Client.WINDOW_CONFIRMATION);
-        this.windowID = windowID;
-        this.actionNumber = actionNumber;
+        this.windowId = windowId;
+        this.actionId = actionId;
         this.accepted = accepted;
     }
 
     @Override
     public void readData() {
-        windowID = readByte();
-        actionNumber = readShort();
+        windowId = readByte();
+        actionId = readShort();
         accepted = readBoolean();
     }
 
     @Override
     public void readData(WrapperPlayClientWindowConfirmation wrapper) {
-        windowID = wrapper.windowID;
-        actionNumber = wrapper.actionNumber;
+        windowId = wrapper.windowId;
+        actionId = wrapper.actionId;
         accepted = wrapper.accepted;
     }
 
     @Override
     public void writeData() {
-        writeByte(windowID);
-        writeShort(actionNumber);
+        writeByte(windowId);
+        writeShort(actionId);
         writeBoolean(accepted);
     }
 
     public int getWindowId() {
-        return windowID;
+        return windowId;
     }
 
     public void setWindowId(int windowID) {
-        this.windowID = windowID;
+        this.windowId = windowID;
     }
 
-    public short getActionNumber() {
-        return actionNumber;
+    public short getActionId() {
+        return actionId;
     }
 
-    public void setActionNumber(short actionNumber) {
-        this.actionNumber = actionNumber;
+    public void setActionId(short actionId) {
+        this.actionId = actionId;
     }
 
     public boolean isAccepted() {

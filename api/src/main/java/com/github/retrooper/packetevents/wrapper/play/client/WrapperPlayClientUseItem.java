@@ -20,7 +20,7 @@ package com.github.retrooper.packetevents.wrapper.play.client;
 
 import com.github.retrooper.packetevents.event.impl.PacketReceiveEvent;
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
-import com.github.retrooper.packetevents.protocol.player.Hand;
+import com.github.retrooper.packetevents.protocol.player.InteractionHand;
 import com.github.retrooper.packetevents.protocol.world.BlockFace;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.util.Vector3f;
@@ -30,7 +30,7 @@ import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 import java.util.Optional;
 
 public class WrapperPlayClientUseItem extends PacketWrapper<WrapperPlayClientUseItem> {
-    private Hand hand;
+    private InteractionHand interactionHand;
     private Vector3i blockPosition;
     private BlockFace face;
     private Vector3f cursorPosition;
@@ -40,9 +40,9 @@ public class WrapperPlayClientUseItem extends PacketWrapper<WrapperPlayClientUse
         super(event);
     }
 
-    public WrapperPlayClientUseItem(Hand hand, Vector3i blockPosition, BlockFace face, Vector3f cursorPosition, Optional<Boolean> insideBlock) {
+    public WrapperPlayClientUseItem(InteractionHand interactionHand, Vector3i blockPosition, BlockFace face, Vector3f cursorPosition, Optional<Boolean> insideBlock) {
         super(PacketType.Play.Client.USE_ITEM);
-        this.hand = hand;
+        this.interactionHand = interactionHand;
         this.blockPosition = blockPosition;
         this.face = face;
         this.cursorPosition= cursorPosition;
@@ -52,7 +52,7 @@ public class WrapperPlayClientUseItem extends PacketWrapper<WrapperPlayClientUse
     @Override
     public void readData() {
         if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_14)) {
-            hand = Hand.getByLegacyId(readVarInt());
+            interactionHand = InteractionHand.getByLegacyId(readVarInt());
             blockPosition = readBlockPosition();
             face = BlockFace.getBlockFaceByValue(readVarInt());
             cursorPosition = new Vector3f(readFloat(), readFloat(), readFloat());
@@ -60,7 +60,7 @@ public class WrapperPlayClientUseItem extends PacketWrapper<WrapperPlayClientUse
         } else {
             blockPosition = readBlockPosition();
             face = BlockFace.getBlockFaceByValue(readVarInt());
-            hand = Hand.getByLegacyId(readVarInt());
+            interactionHand = InteractionHand.getByLegacyId(readVarInt());
             if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_11)) {
                 cursorPosition = new Vector3f(readFloat(), readFloat(), readFloat());
             } else {
@@ -72,7 +72,7 @@ public class WrapperPlayClientUseItem extends PacketWrapper<WrapperPlayClientUse
 
     @Override
     public void readData(WrapperPlayClientUseItem wrapper) {
-        hand = wrapper.hand;
+        interactionHand = wrapper.interactionHand;
         blockPosition = wrapper.blockPosition;
         face = wrapper.face;
         cursorPosition = wrapper.cursorPosition;
@@ -82,7 +82,7 @@ public class WrapperPlayClientUseItem extends PacketWrapper<WrapperPlayClientUse
     @Override
     public void writeData() {
         if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_14)) {
-            writeVarInt(hand.getLegacyId());
+            writeVarInt(interactionHand.getLegacyId());
             writeBlockPosition(blockPosition);
             writeVarInt(face.getFaceValue());
             writeFloat(cursorPosition.x);
@@ -93,7 +93,7 @@ public class WrapperPlayClientUseItem extends PacketWrapper<WrapperPlayClientUse
         } else {
             writeBlockPosition(blockPosition);
             writeVarInt(face.getFaceValue());
-            writeVarInt(hand.getLegacyId());
+            writeVarInt(interactionHand.getLegacyId());
             if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_11)) {
                 writeFloat(cursorPosition.x);
                 writeFloat(cursorPosition.y);
@@ -106,12 +106,12 @@ public class WrapperPlayClientUseItem extends PacketWrapper<WrapperPlayClientUse
         }
     }
 
-    public Hand getHand() {
-        return hand;
+    public InteractionHand getHand() {
+        return interactionHand;
     }
 
-    public void setHand(Hand hand) {
-        this.hand = hand;
+    public void setHand(InteractionHand interactionHand) {
+        this.interactionHand = interactionHand;
     }
 
     public Vector3i getBlockPosition() {

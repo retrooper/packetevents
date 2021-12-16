@@ -38,8 +38,8 @@ import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientWi
  * @see WrapperPlayClientWindowConfirmation
  */
 public class WrapperPlayServerWindowConfirmation extends PacketWrapper<WrapperPlayServerWindowConfirmation> {
-    byte windowID;
-    short actionID;
+    byte windowId;
+    short actionId;
     boolean accepted;
 
     public WrapperPlayServerWindowConfirmation(PacketSendEvent event) {
@@ -47,55 +47,55 @@ public class WrapperPlayServerWindowConfirmation extends PacketWrapper<WrapperPl
     }
 
     /**
-     * @param windowID The ID of the window that the action occurred in. Use 0 for the player's inventory,
+     * @param windowId The ID of the window that the action occurred in. Use 0 for the player's inventory,
      *                 as to always get a response (in combination with accepted = false)
-     * @param actionID Every action that is to be accepted has a unique number.
+     * @param actionId Every action that is to be accepted has a unique number.
      *                 This number is an incrementing integer (starting at 1) with separate counts for each window ID.
      *                 Using non-positive numbers is recommended to avoid conflicting with vanilla transactions
      * @param accepted Whether the action was accepted. Use false to get a response from the client.
      */
-    public WrapperPlayServerWindowConfirmation(byte windowID, short actionID, boolean accepted) {
+    public WrapperPlayServerWindowConfirmation(byte windowId, short actionId, boolean accepted) {
         super(PacketType.Play.Server.WINDOW_CONFIRMATION);
-        this.windowID = windowID;
-        this.actionID = actionID;
+        this.windowId = windowId;
+        this.actionId = actionId;
         this.accepted = accepted;
     }
 
     @Override
     public void readData() {
-        this.windowID = readByte();
-        this.actionID = readShort();
+        this.windowId = readByte();
+        this.actionId = readShort();
         this.accepted = readBoolean();
     }
 
     @Override
     public void writeData() {
-        writeByte(windowID);
-        writeShort(actionID);
+        writeByte(windowId);
+        writeShort(actionId);
         writeBoolean(accepted);
     }
 
     @Override
     public void readData(WrapperPlayServerWindowConfirmation wrapper) {
-        this.windowID = wrapper.getWindowId();
-        this.actionID = wrapper.getActionId();
+        this.windowId = wrapper.getWindowId();
+        this.actionId = wrapper.getActionId();
         this.accepted = wrapper.isAccepted();
     }
 
     public byte getWindowId() {
-        return windowID;
+        return windowId;
     }
 
     public void setWindowId(byte windowID) {
-        this.windowID = windowID;
+        this.windowId = windowID;
     }
 
     public short getActionId() {
-        return actionID;
+        return actionId;
     }
 
     public void setActionId(short actionID) {
-        this.actionID = actionID;
+        this.actionId = actionID;
     }
 
     public boolean isAccepted() {

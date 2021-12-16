@@ -28,8 +28,32 @@ public class WrapperPlayServerOpenWindow extends PacketWrapper<WrapperPlayServer
         super(event);
     }
 
-    public WrapperPlayServerOpenWindow(int id) {
+    // For 1.14+
+    public WrapperPlayServerOpenWindow(int containerId, int type, String titleRawJson) {
         super(PacketType.Play.Server.OPEN_WINDOW);
+        this.containerId = containerId;
+        this.type = type;
+        this.titleRawJson = titleRawJson;
+    }
+
+    // 1.8 through 1.13
+    public WrapperPlayServerOpenWindow(int containerId, String legacyType, int legacySlots, int horseId) {
+        super(PacketType.Play.Server.OPEN_WINDOW);
+        this.containerId = containerId;
+        this.legacyType = legacyType;
+        this.legacySlots = legacySlots;
+        this.horseId = horseId;
+    }
+
+    // 1.7
+    public WrapperPlayServerOpenWindow(int containerId, int type, String title, int legacySlots, boolean useProvidedWindowTitle, int horseId) {
+        super(PacketType.Play.Server.OPEN_WINDOW);
+        this.containerId = containerId;
+        this.type = type;
+        this.titleRawJson = title;
+        this.legacySlots = legacySlots;
+        this.useProvidedWindowTitle = useProvidedWindowTitle;
+        this.horseId = horseId;
     }
 
     @Override
