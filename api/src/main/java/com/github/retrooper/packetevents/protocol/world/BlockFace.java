@@ -62,6 +62,7 @@ public enum BlockFace {
     OTHER((short) 255, -1, -1, -1);
 
     public static final BlockFace[] VALUES = values();
+    public static final BlockFace[] CARTESIAN_VALUES = new BlockFace[]{DOWN, UP, NORTH, SOUTH, WEST, EAST};
 
     final short faceValue;
     final int modX;
