@@ -23,6 +23,8 @@ import com.github.retrooper.packetevents.protocol.mapper.MappedEntity;
 public interface ItemType extends MappedEntity {
     int getMaxAmount();
 
+    int getMaxDurability();
+
     boolean isMusicDisc();
 
     ItemType getCraftRemainder();
