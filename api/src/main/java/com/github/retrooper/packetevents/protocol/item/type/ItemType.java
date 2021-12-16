@@ -24,4 +24,6 @@ public interface ItemType extends MappedEntity {
     int getMaxAmount();
 
     boolean isMusicDisc();
+
+    ItemType getCraftRemainder();
 }

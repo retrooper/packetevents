@@ -70,11 +70,11 @@ public class ItemTypes {
         }
     }
 
-    public static ItemType define(int maxAmount, String key) {
-        return define(maxAmount, key, new ItemAttribute[]{});
+    public static ItemType define(int maxAmount, String key, ItemAttribute... attributesArr) {
+        return define(maxAmount, key,null, attributesArr);
     }
 
-    public static ItemType define(int maxAmount, String key, ItemAttribute... attributesArr) {
+    public static ItemType define(int maxAmount, String key, ItemType craftRemainder, ItemAttribute... attributesArr) {
         if (MAPPINGS == null) {
             MAPPINGS = MappingHelper.getJSONObject("item_mappings");
         }
@@ -121,6 +121,10 @@ public class ItemTypes {
                 return musicDisc;
             }
 
+            @Override
+            public ItemType getCraftRemainder() {
+                return craftRemainder;
+            }
 
             @Override
             public boolean equals(Object obj) {
@@ -204,7 +208,7 @@ public class ItemTypes {
 
     }
 
-    // TODO: Add fire resistent, rarity, craft remainder, durability, is food, food use duration
+    // TODO: Add rarity, craft remainder, durability, is food, food use duration
     public static final ItemType GILDED_BLACKSTONE = define(64, "gilded_blackstone");
     public static final ItemType NETHER_BRICK_SLAB = define(64, "nether_brick_slab");
     public static final ItemType ANDESITE_SLAB = define(64, "andesite_slab");
@@ -252,7 +256,7 @@ public class ItemTypes {
     public static final ItemType BONE_BLOCK = define(64, "bone_block");
     public static final ItemType DEAD_TUBE_CORAL_FAN = define(64, "dead_tube_coral_fan");
     public static final ItemType TURTLE_SPAWN_EGG = define(64, "turtle_spawn_egg");
-    public static final ItemType MILK_BUCKET = define(1, "milk_bucket");
+    public static final ItemType MILK_BUCKET = define(1, "milk_bucket", ItemTypes.BUCKET);
     public static final ItemType BIRCH_FENCE = define(64, "birch_fence");
     public static final ItemType CYAN_TERRACOTTA = define(64, "cyan_terracotta");
     public static final ItemType PRISMARINE_STAIRS = define(64, "prismarine_stairs");
@@ -499,7 +503,7 @@ public class ItemTypes {
     public static final ItemType INFESTED_STONE_BRICKS = define(64, "infested_stone_bricks");
     public static final ItemType END_STONE_BRICK_SLAB = define(64, "end_stone_brick_slab");
     public static final ItemType LEATHER_BOOTS = define(1, "leather_boots");
-    public static final ItemType WATER_BUCKET = define(1, "water_bucket");
+    public static final ItemType WATER_BUCKET = define(1, "water_bucket", ItemTypes.BUCKET);
     public static final ItemType LIGHT_BLUE_DYE = define(64, "light_blue_dye");
     public static final ItemType WARPED_STAIRS = define(64, "warped_stairs");
     public static final ItemType DEAD_BUBBLE_CORAL = define(64, "dead_bubble_coral");
@@ -646,7 +650,7 @@ public class ItemTypes {
     public static final ItemType POLAR_BEAR_SPAWN_EGG = define(64, "polar_bear_spawn_egg");
     public static final ItemType STRIPPED_DARK_OAK_LOG = define(64, "stripped_dark_oak_log");
     public static final ItemType RED_BED = define(1, "red_bed");
-    public static final ItemType LAVA_BUCKET = define(1, "lava_bucket");
+    public static final ItemType LAVA_BUCKET = define(1, "lava_bucket", ItemTypes.BUCKET);
     public static final ItemType YELLOW_BANNER = define(16, "yellow_banner");
     public static final ItemType BARREL = define(64, "barrel");
     public static final ItemType CHAIN = define(64, "chain");
@@ -743,7 +747,7 @@ public class ItemTypes {
     public static final ItemType PURPUR_SLAB = define(64, "purpur_slab");
     public static final ItemType HOPPER = define(64, "hopper");
     public static final ItemType STRIDER_SPAWN_EGG = define(64, "strider_spawn_egg");
-    public static final ItemType DRAGON_BREATH = define(64, "dragon_breath");
+    public static final ItemType DRAGON_BREATH = define(64, "dragon_breath", ItemTypes.GLASS_BOTTLE);
     public static final ItemType POLISHED_DIORITE = define(64, "polished_diorite");
     public static final ItemType LIME_TERRACOTTA = define(64, "lime_terracotta");
     public static final ItemType BEEF = define(64, "beef", ItemAttribute.EDIBLE);
@@ -885,7 +889,7 @@ public class ItemTypes {
     public static final ItemType RED_STAINED_GLASS_PANE = define(64, "red_stained_glass_pane");
     public static final ItemType FEATHER = define(64, "feather");
     public static final ItemType TRADER_LLAMA_SPAWN_EGG = define(64, "trader_llama_spawn_egg");
-    public static final ItemType HONEY_BOTTLE = define(16, "honey_bottle", ItemAttribute.EDIBLE);
+    public static final ItemType HONEY_BOTTLE = define(16, "honey_bottle", ItemTypes.GLASS_BOTTLE, ItemAttribute.EDIBLE);
     public static final ItemType ACACIA_STAIRS = define(64, "acacia_stairs");
     public static final ItemType DROPPER = define(64, "dropper");
     public static final ItemType DEEPSLATE_BRICK_SLAB = define(64, "deepslate_brick_slab");
