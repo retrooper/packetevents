@@ -29,48 +29,57 @@ public enum BlockFace {
     /**
      * -Y offset
      */
-    DOWN,
+    DOWN(0, -1, 0),
 
     /**
      * +Y offset
      */
-    UP,
+    UP(0, 1, 0),
 
     /**
      * -Z offset
      */
-    NORTH,
+    NORTH(0, 0, -1),
 
     /**
      * +Z offset
      */
-    SOUTH,
+    SOUTH(0, 0, 1),
 
     /**
      * -X offset
      */
-    WEST,
+    WEST(-1, 0, 0),
 
     /**
      * +X offset
      */
-    EAST,
+    EAST(1, 0, 0),
 
     /**
      * Face is set to 255
      */
-    OTHER((short) 255);
+    OTHER((short) 255, -1, -1, -1);
 
     public static final BlockFace[] VALUES = values();
 
     final short faceValue;
+    final int modX;
+    final int modY;
+    final int modZ;
 
-    BlockFace(short faceValue) {
+    BlockFace(short faceValue, int modX, int modY, int modZ) {
         this.faceValue = faceValue;
+        this.modX = modX;
+        this.modY = modY;
+        this.modZ = modZ;
     }
 
-    BlockFace() {
+    BlockFace(int modX, int modY, int modZ) {
         this.faceValue = (short) ordinal();
+        this.modX = modX;
+        this.modY = modY;
+        this.modZ = modZ;
     }
 
     public static BlockFace getBlockFaceByValue(int face) {
@@ -78,6 +87,37 @@ public enum BlockFace {
             return OTHER;
         }
         return VALUES[face];
+    }
+
+    public int getModX() {
+        return modX;
+    }
+
+    public int getModY() {
+        return modY;
+    }
+
+    public int getModZ() {
+        return modZ;
+    }
+
+    public BlockFace getOppositeFace() {
+        switch (this) {
+            case DOWN:
+                return UP;
+            case UP:
+                return DOWN;
+            case NORTH:
+                return SOUTH;
+            case SOUTH:
+                return NORTH;
+            case WEST:
+                return EAST;
+            case EAST:
+                return WEST;
+            default:
+                return OTHER;
+        }
     }
 
     public short getFaceValue() {
