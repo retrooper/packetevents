@@ -40,7 +40,7 @@ public class ItemTypes {
 
     private enum ItemAttribute {
         //TODO Add more
-        MUSIC_DISC, EDIBLE;
+        MUSIC_DISC, EDIBLE, FIRE_RESISTANT;
     }
 
     private static ServerVersion getMappingServerVersion(ServerVersion serverVersion) {
@@ -279,7 +279,7 @@ public class ItemTypes {
     public static final ItemType STRIPPED_OAK_LOG = define(64, "stripped_oak_log");
     public static final ItemType LIGHT_GRAY_CONCRETE_POWDER = define(64, "light_gray_concrete_powder");
     public static final ItemType COOKED_PORKCHOP = define(64, "cooked_porkchop", ItemAttribute.EDIBLE);
-    public static final ItemType NETHERITE_HELMET = define(1, "netherite_helmet");
+    public static final ItemType NETHERITE_HELMET = define(1, "netherite_helmet", ItemAttribute.FIRE_RESISTANT);
     public static final ItemType BLACK_CANDLE = define(64, "black_candle");
     public static final ItemType CYAN_CONCRETE_POWDER = define(64, "cyan_concrete_powder");
     public static final ItemType SADDLE = define(1, "saddle");
@@ -307,7 +307,7 @@ public class ItemTypes {
     public static final ItemType GRAY_STAINED_GLASS = define(64, "gray_stained_glass");
     public static final ItemType LIGHT_GRAY_SHULKER_BOX = define(1, "light_gray_shulker_box");
     public static final ItemType DARK_OAK_BUTTON = define(64, "dark_oak_button");
-    public static final ItemType NETHERITE_AXE = define(1, "netherite_axe");
+    public static final ItemType NETHERITE_AXE = define(1, "netherite_axe", ItemAttribute.FIRE_RESISTANT);
     public static final ItemType SAND = define(64, "sand");
     public static final ItemType POLISHED_GRANITE_SLAB = define(64, "polished_granite_slab");
     public static final ItemType DARK_OAK_DOOR = define(64, "dark_oak_door");
@@ -495,7 +495,7 @@ public class ItemTypes {
     public static final ItemType LADDER = define(64, "ladder");
     public static final ItemType LODESTONE = define(64, "lodestone");
     public static final ItemType RAVAGER_SPAWN_EGG = define(64, "ravager_spawn_egg");
-    public static final ItemType NETHERITE_HOE = define(1, "netherite_hoe");
+    public static final ItemType NETHERITE_HOE = define(1, "netherite_hoe", ItemAttribute.FIRE_RESISTANT);
     public static final ItemType INFESTED_STONE_BRICKS = define(64, "infested_stone_bricks");
     public static final ItemType END_STONE_BRICK_SLAB = define(64, "end_stone_brick_slab");
     public static final ItemType LEATHER_BOOTS = define(1, "leather_boots");
@@ -631,7 +631,7 @@ public class ItemTypes {
     public static final ItemType LIGHT = define(64, "light");
     public static final ItemType SPECTRAL_ARROW = define(64, "spectral_arrow");
     public static final ItemType JUNGLE_STAIRS = define(64, "jungle_stairs");
-    public static final ItemType NETHERITE_SHOVEL = define(1, "netherite_shovel");
+    public static final ItemType NETHERITE_SHOVEL = define(1, "netherite_shovel", ItemAttribute.FIRE_RESISTANT);
     public static final ItemType PIGLIN_SPAWN_EGG = define(64, "piglin_spawn_egg");
     public static final ItemType OXEYE_DAISY = define(64, "oxeye_daisy");
     public static final ItemType WAXED_OXIDIZED_CUT_COPPER_STAIRS = define(64, "waxed_oxidized_cut_copper_stairs");
@@ -724,14 +724,14 @@ public class ItemTypes {
     public static final ItemType GREEN_GLAZED_TERRACOTTA = define(64, "green_glazed_terracotta");
     public static final ItemType SCUTE = define(64, "scute");
     public static final ItemType GOLDEN_CHESTPLATE = define(1, "golden_chestplate");
-    public static final ItemType NETHERITE_LEGGINGS = define(1, "netherite_leggings");
+    public static final ItemType NETHERITE_LEGGINGS = define(1, "netherite_leggings", ItemAttribute.FIRE_RESISTANT);
     public static final ItemType GOLDEN_SHOVEL = define(1, "golden_shovel");
     public static final ItemType SPRUCE_STAIRS = define(64, "spruce_stairs");
     public static final ItemType BIRCH_PLANKS = define(64, "birch_planks");
     public static final ItemType GRAY_WOOL = define(64, "gray_wool");
     public static final ItemType SILVERFISH_SPAWN_EGG = define(64, "silverfish_spawn_egg");
     public static final ItemType WHITE_STAINED_GLASS = define(64, "white_stained_glass");
-    public static final ItemType ANCIENT_DEBRIS = define(64, "ancient_debris");
+    public static final ItemType ANCIENT_DEBRIS = define(64, "ancient_debris", ItemAttribute.FIRE_RESISTANT);
     public static final ItemType GREEN_STAINED_GLASS_PANE = define(64, "green_stained_glass_pane");
     public static final ItemType SMOOTH_BASALT = define(64, "smooth_basalt");
     public static final ItemType DIAMOND = define(64, "diamond");
@@ -753,7 +753,7 @@ public class ItemTypes {
     public static final ItemType BRAIN_CORAL_BLOCK = define(64, "brain_coral_block");
     public static final ItemType BIRCH_FENCE_GATE = define(64, "birch_fence_gate");
     public static final ItemType MUSIC_DISC_CHIRP = define(1, "music_disc_chirp", ItemAttribute.MUSIC_DISC);
-    public static final ItemType NETHERITE_SWORD = define(1, "netherite_sword");
+    public static final ItemType NETHERITE_SWORD = define(1, "netherite_sword", ItemAttribute.FIRE_RESISTANT);
     public static final ItemType COBBLED_DEEPSLATE = define(64, "cobbled_deepslate");
     public static final ItemType BROWN_CANDLE = define(64, "brown_candle");
     public static final ItemType YELLOW_STAINED_GLASS_PANE = define(64, "yellow_stained_glass_pane");
@@ -777,7 +777,7 @@ public class ItemTypes {
     public static final ItemType BLAST_FURNACE = define(64, "blast_furnace");
     public static final ItemType SPONGE = define(64, "sponge");
     public static final ItemType CARTOGRAPHY_TABLE = define(64, "cartography_table");
-    public static final ItemType NETHERITE_INGOT = define(64, "netherite_ingot");
+    public static final ItemType NETHERITE_INGOT = define(64, "netherite_ingot", ItemAttribute.FIRE_RESISTANT);
     public static final ItemType LIGHT_GRAY_DYE = define(64, "light_gray_dye");
     public static final ItemType DAYLIGHT_DETECTOR = define(64, "daylight_detector");
     public static final ItemType SLIME_SPAWN_EGG = define(64, "slime_spawn_egg");
@@ -843,7 +843,7 @@ public class ItemTypes {
     public static final ItemType LIGHT_GRAY_BANNER = define(16, "light_gray_banner");
     public static final ItemType DIAMOND_SWORD = define(1, "diamond_sword");
     public static final ItemType RABBIT_FOOT = define(64, "rabbit_foot");
-    public static final ItemType NETHERITE_BLOCK = define(64, "netherite_block");
+    public static final ItemType NETHERITE_BLOCK = define(64, "netherite_block", ItemAttribute.FIRE_RESISTANT);
     public static final ItemType BAT_SPAWN_EGG = define(64, "bat_spawn_egg");
     public static final ItemType DIAMOND_HORSE_ARMOR = define(1, "diamond_horse_armor");
     public static final ItemType GLOWSTONE_DUST = define(64, "glowstone_dust");
@@ -929,12 +929,12 @@ public class ItemTypes {
     public static final ItemType MAGENTA_STAINED_GLASS = define(64, "magenta_stained_glass");
     public static final ItemType LAPIS_LAZULI = define(64, "lapis_lazuli");
     public static final ItemType MUSIC_DISC_WAIT = define(1, "music_disc_wait", ItemAttribute.MUSIC_DISC);
-    public static final ItemType NETHERITE_PICKAXE = define(1, "netherite_pickaxe");
+    public static final ItemType NETHERITE_PICKAXE = define(1, "netherite_pickaxe", ItemAttribute.FIRE_RESISTANT);
     public static final ItemType BUNDLE = define(1, "bundle");
     public static final ItemType MOOSHROOM_SPAWN_EGG = define(64, "mooshroom_spawn_egg");
     public static final ItemType MAP = define(64, "map");
     public static final ItemType DARK_OAK_SIGN = define(16, "dark_oak_sign");
-    public static final ItemType NETHERITE_BOOTS = define(1, "netherite_boots");
+    public static final ItemType NETHERITE_BOOTS = define(1, "netherite_boots", ItemAttribute.FIRE_RESISTANT);
     public static final ItemType BREAD = define(64, "bread", ItemAttribute.EDIBLE);
     public static final ItemType DEEPSLATE_TILE_SLAB = define(64, "deepslate_tile_slab");
     public static final ItemType POLISHED_BLACKSTONE_BUTTON = define(64, "polished_blackstone_button");
@@ -1017,7 +1017,7 @@ public class ItemTypes {
     public static final ItemType YELLOW_DYE = define(64, "yellow_dye");
     public static final ItemType CYAN_STAINED_GLASS = define(64, "cyan_stained_glass");
     public static final ItemType BRICKS = define(64, "bricks");
-    public static final ItemType NETHERITE_CHESTPLATE = define(1, "netherite_chestplate");
+    public static final ItemType NETHERITE_CHESTPLATE = define(1, "netherite_chestplate", ItemAttribute.FIRE_RESISTANT);
     public static final ItemType ORANGE_BED = define(1, "orange_bed");
     public static final ItemType PETRIFIED_OAK_SLAB = define(64, "petrified_oak_slab");
     public static final ItemType SALMON_SPAWN_EGG = define(64, "salmon_spawn_egg");
@@ -1066,7 +1066,7 @@ public class ItemTypes {
     public static final ItemType POINTED_DRIPSTONE = define(64, "pointed_dripstone");
     public static final ItemType ROOTED_DIRT = define(64, "rooted_dirt");
     public static final ItemType POPPY = define(64, "poppy");
-    public static final ItemType NETHERITE_SCRAP = define(64, "netherite_scrap");
+    public static final ItemType NETHERITE_SCRAP = define(64, "netherite_scrap", ItemAttribute.FIRE_RESISTANT);
     public static final ItemType RED_NETHER_BRICK_WALL = define(64, "red_nether_brick_wall");
     public static final ItemType ENDER_EYE = define(64, "ender_eye");
     public static final ItemType STONE_SWORD = define(1, "stone_sword");
