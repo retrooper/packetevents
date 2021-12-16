@@ -4,13 +4,13 @@ public enum HumanoidArm {
     LEFT,
     RIGHT;
 
-    public int getLegacyId() {
+    public int getId() {
         return this == RIGHT ? 0 : 1;
     }
 
     public static final HumanoidArm[] VALUES = values();
 
-    public static HumanoidArm getByLegacyId(int handValue) {
+    public static HumanoidArm getById(int handValue) {
         return handValue == 0 ? RIGHT : LEFT;
     }
 }
