@@ -35,6 +35,7 @@ import org.bukkit.entity.Player;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class PacketDecoderModern extends ByteToMessageDecoder {
@@ -95,6 +96,7 @@ public class PacketDecoderModern extends ByteToMessageDecoder {
     @Override
     public void decode(ChannelHandlerContext ctx, ByteBuf byteBuf, List<Object> out) {
         if (byteBuf.readableBytes() != 0) {
+            System.out.println("pipe: " + Arrays.toString(ctx.pipeline().names().toArray(new String[0])));
             handle(PacketEvents.getAPI().getNettyManager().wrapChannelHandlerContext(ctx), PacketEvents.getAPI().getNettyManager().wrapByteBuf(byteBuf), out);
             if (!decoders.isEmpty()) {
                 //Call custom decoders
@@ -120,6 +122,9 @@ public class PacketDecoderModern extends ByteToMessageDecoder {
                 }
             }
         }
+        else {
+            System.out.println("suii");
+    }
     }
 
     private boolean handleCompressionOrder(ChannelHandlerContextAbstract ctx, ByteBufAbstract buf) {

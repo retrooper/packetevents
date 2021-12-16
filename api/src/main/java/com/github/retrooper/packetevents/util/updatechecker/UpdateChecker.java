@@ -19,6 +19,7 @@
 package com.github.retrooper.packetevents.util.updatechecker;
 
 import com.github.retrooper.packetevents.PacketEvents;
+import com.github.retrooper.packetevents.protocol.chat.Color;
 import com.github.retrooper.packetevents.protocol.chat.component.serializer.ComponentSerializer;
 import com.github.retrooper.packetevents.util.LogManager;
 import com.github.retrooper.packetevents.util.PEVersion;
@@ -64,16 +65,16 @@ public class UpdateChecker {
             newVersion = null;
         }
         if (newVersion != null && localVersion.isOlderThan(newVersion)) {
-            inform("There is an update available for packetevents! Your build: (" + localVersion + ") | Latest released build: (" + newVersion + ")");
+            PacketEvents.getAPI().getLogManager().warn("There is an update available for packetevents! Your build: (" + Color.YELLOW + localVersion + Color.WHITE +  ") | Latest released build: (" + Color.BRIGHT_GREEN + newVersion + Color.RED + ")");
             return UpdateCheckerStatus.OUTDATED;
         } else if (newVersion != null && localVersion.isNewerThan(newVersion)) {
-            inform("You are on a dev or pre released build of packetevents. Your build: (" + localVersion + ") | Latest released build: (" + newVersion + ")");
+            PacketEvents.getAPI().getLogManager().info("You are on a dev or pre released build of packetevents. Your build: (" + Color.CYAN + localVersion + Color.WHITE + ") | Latest released build: (" + Color.DARK_CYAN + newVersion + Color.WHITE + ")");
             return UpdateCheckerStatus.PRE_RELEASE;
         } else if (localVersion.equals(newVersion)) {
-            inform("You are on the latest released version of packetevents. (" + newVersion + ")");
+            PacketEvents.getAPI().getLogManager().info("You are on the latest released version of packetevents. (" + Color.BRIGHT_GREEN + newVersion + Color.WHITE + ")");
             return UpdateCheckerStatus.UP_TO_DATE;
         } else {
-            report("Something went wrong while checking for an update. Your build: (" + localVersion + ")");
+            PacketEvents.getAPI().getLogManager().warn("Something went wrong while checking for an update. Your build: (" + localVersion + ")");
             return UpdateCheckerStatus.FAILED;
         }
     }
@@ -111,26 +112,6 @@ public class UpdateChecker {
         }, "packetevents-update-check-thread");
         thread.start();
     }
-
-    /**
-     * Log a positive message in the console.
-     *
-     * @param message Message
-     */
-    private void inform(String message) {
-        PacketEvents.getAPI().getLogManager().info(message);
-    }
-
-    /**
-     * Log a negative message in the console.
-     *
-     * @param message Message
-     */
-    private void report(String message) {
-        //TODO Maybe find some universal way to make it red
-        PacketEvents.getAPI().getLogManager().warn(message);
-    }
-
     /**
      * Result of an update check.
      *
