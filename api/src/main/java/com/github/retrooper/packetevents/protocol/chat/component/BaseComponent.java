@@ -256,7 +256,7 @@ public class BaseComponent {
 
     public JsonObject buildJson() {
         JsonObject jsonObject = new JsonObject();
-        if (color != Color.WHITE && color != null) {
+        if (color != null) {
             jsonObject.addProperty("color", color.getName());
         }
         if (insertion != null && !insertion.isEmpty()) {
