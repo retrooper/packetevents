@@ -32,11 +32,11 @@ import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientIn
 import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientUpdateSign;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerSetSlot;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerSpawnLivingEntity;
+import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerTags;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import java.util.Arrays;
-import java.util.UUID;
+import java.util.*;
 
 public class PacketEventsPlugin extends JavaPlugin {
     @Override
@@ -89,8 +89,17 @@ public class PacketEventsPlugin extends JavaPlugin {
                     int slot = setSlot.getSlot();
                     ItemStack item = setSlot.getItem();
                     player.sendMessage("Set slot with window ID: " + windowID + ", slot: " + slot + ", item: " + (item.getType() != null ? item.toString() : "null item"));
-                }
-                //TODO Complete chunk data packet
+                } else if (event.getPacketType() == PacketType.Play.Server.TAGS) {
+                    WrapperPlayServerTags tags = new WrapperPlayServerTags(event);
+                    HashMap<String, List<WrapperPlayServerTags.Tag>> tagsMap = tags.getTags();
+                    for (Map.Entry<String, List<WrapperPlayServerTags.Tag>> tag : tagsMap.entrySet()) {
+                        System.out.println("Tag: " + tag.getKey());
+
+                        for (WrapperPlayServerTags.Tag integer : tag.getValue()) {
+                            System.out.println("Name " + integer.getName() + " and size " + integer.getValues().size());
+                        }
+                    }
+                }//TODO Complete chunk data packet
             }
         };
         //PacketEvents.getAPI().getEventManager().registerListener(debugListener);
