@@ -2,13 +2,14 @@ package com.github.retrooper.packetevents.protocol.world.states;
 
 import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
+import com.github.retrooper.packetevents.protocol.world.states.type.StateType;
+import com.github.retrooper.packetevents.protocol.world.states.type.StateTypes;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashMap;
 
 /**
  * This class is designed to take advantage of modern minecraft versions
@@ -22,6 +23,26 @@ import java.util.List;
  * Mappings from modern versions are from ViaVersion, who have a similar (but a bit slower) system.
  */
 public class WrappedBlockState {
+    int globalID;
+    StateType type;
+    String[] data;
+
+    private static final HashMap<String, WrappedBlockState> BY_STRING = new HashMap<>();
+    private static final HashMap<Integer, WrappedBlockState> BY_ID = new HashMap<>();
+
+    public WrappedBlockState(int globalID, StateType type, String[] data) {
+        this.globalID = globalID;
+        this.type = type;
+        this.data = data;
+    }
+
+    public WrappedBlockState getByGlobalId(int globalID) {
+        return BY_ID.get(globalID);
+    }
+
+    public WrappedBlockState getByString(String string) {
+        return BY_STRING.get(string);
+    }
 
     // TODO: 1.16.0/1.16.1 and 1.13.0/1.13.1 support
     private static String getMappingServerVersion(ServerVersion serverVersion) {
@@ -41,7 +62,7 @@ public class WrappedBlockState {
     }
 
     static {
-        String mappingName = "17.txt";//getMappingServerVersion(PacketEvents.getAPI().getServerManager().getVersion());
+        String mappingName = getMappingServerVersion(PacketEvents.getAPI().getServerManager().getVersion());
         InputStream mappings = WrappedBlockState.class.getClassLoader().getResourceAsStream("assets/mappings/block/" + mappingName);
         BufferedReader paletteReader = new BufferedReader(new InputStreamReader(mappings));
 
@@ -53,33 +74,64 @@ public class WrappedBlockState {
     }
 
     private static void loadLegacy(BufferedReader reader) {
-
-    }
-
-    private static void loadModern(BufferedReader reader) {
-        List<String> globalPaletteToBlockData = new ArrayList<>();
-
         String line;
-
         try {
             while ((line = reader.readLine()) != null) {
-                // Example line:
-                // 109 minecraft:oak_wood[axis=x]
-                String number = line.substring(0, line.indexOf(" "));
+                String[] split = line.split(",");
+                int id = Integer.parseInt(split[0]);
+                int data = Integer.parseInt(split[1]);
+                int combinedID = id + (data << 12);
 
-                // This is the integer used when sending chunks
-                int globalPaletteID = Integer.parseInt(number);
+                int endIndex = split[2].indexOf("[");
 
-                String blockString = line.substring(line.indexOf(" ") + 1);
+                String blockString = split[2].substring(0, endIndex != -1 ? endIndex : split[2].length());
 
-                // Link this global palette ID to the blockdata for the second part of the script
-                globalPaletteToBlockData.add(globalPaletteID, blockString);
+                StateType type = StateTypes.getByName(blockString);
+                type.updateInternalBlockRepresentationsOptimization(id);
+
+                String[] dataStrings = null;
+                if (endIndex != -1) {
+                    dataStrings = split[2].substring(endIndex + 1, line.length() - 1).split(",");
+                }
+
+                WrappedBlockState state = new WrappedBlockState(id, type, dataStrings);
+
+                BY_STRING.put(state.toString(), state);
+                BY_ID.put(combinedID, state);
             }
+
         } catch (IOException e) {
             PacketEvents.getAPI().getLogManager().debug("Palette reading failed! Unsupported version?");
             e.printStackTrace();
         }
-        PacketEvents.getAPI().getLogManager().debug("Loaded " + globalPaletteToBlockData.size() + " mappings with state 21 being " + globalPaletteToBlockData.get(21));
+    }
 
+    private static void loadModern(BufferedReader reader) {
+        String line;
+        try {
+            while ((line = reader.readLine()) != null) {
+                int index = line.indexOf("[");
+                int afterID = line.indexOf(" ");
+                int id = Integer.parseInt(line.substring(0, line.indexOf(" ")));
+
+                String blockString = line.substring(afterID + 1, index == -1 ? line.length() : index);
+                StateType type = StateTypes.getByName(blockString);
+                type.updateInternalBlockRepresentationsOptimization(id);
+
+                String[] data = null;
+                if (index != -1) {
+                    data = line.substring(index + 1, line.length() - 1).split(",");
+                }
+
+                WrappedBlockState state = new WrappedBlockState(id, type, data);
+
+                BY_STRING.put(state.toString(), state);
+                BY_ID.put(id, state);
+            }
+
+        } catch (IOException e) {
+            PacketEvents.getAPI().getLogManager().debug("Palette reading failed! Unsupported version?");
+            e.printStackTrace();
+        }
     }
 }
