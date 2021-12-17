@@ -76,10 +76,10 @@ public class WrappedBlockState {
                 globalPaletteToBlockData.add(globalPaletteID, blockString);
             }
         } catch (IOException e) {
-            System.out.println("Palette reading failed! Unsupported version?");
+            PacketEvents.getAPI().getLogManager().debug("Palette reading failed! Unsupported version?");
             e.printStackTrace();
         }
+        PacketEvents.getAPI().getLogManager().debug("Loaded " + globalPaletteToBlockData.size() + " mappings with state 21 being " + globalPaletteToBlockData.get(21));
 
-        System.out.println("Loaded " + globalPaletteToBlockData.size() + " mappings with state 21 being " + globalPaletteToBlockData.get(21));
     }
 }

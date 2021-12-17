@@ -96,7 +96,7 @@ public class PacketDecoderModern extends ByteToMessageDecoder {
     @Override
     public void decode(ChannelHandlerContext ctx, ByteBuf byteBuf, List<Object> out) {
         if (byteBuf.readableBytes() != 0) {
-            System.out.println("pipe: " + Arrays.toString(ctx.pipeline().names().toArray(new String[0])));
+            PacketEvents.getAPI().getLogManager().debug("pipe: " + Arrays.toString(ctx.pipeline().names().toArray(new String[0])));
             handle(PacketEvents.getAPI().getNettyManager().wrapChannelHandlerContext(ctx), PacketEvents.getAPI().getNettyManager().wrapByteBuf(byteBuf), out);
             if (!decoders.isEmpty()) {
                 //Call custom decoders
