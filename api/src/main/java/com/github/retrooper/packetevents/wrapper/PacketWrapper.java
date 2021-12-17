@@ -23,6 +23,8 @@ import com.github.retrooper.packetevents.event.impl.PacketReceiveEvent;
 import com.github.retrooper.packetevents.event.impl.PacketSendEvent;
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.netty.buffer.ByteBufAbstract;
+import com.github.retrooper.packetevents.protocol.chat.component.BaseComponent;
+import com.github.retrooper.packetevents.protocol.chat.component.serializer.ComponentSerializer;
 import com.github.retrooper.packetevents.protocol.datawatcher.WatchableObject;
 import com.github.retrooper.packetevents.protocol.item.ItemStack;
 import com.github.retrooper.packetevents.protocol.item.type.ItemType;
@@ -347,6 +349,14 @@ public class PacketWrapper<T extends PacketWrapper> {
             writeVarInt(bytes.length);
             buffer.writeBytes(bytes);
         }
+    }
+
+    public BaseComponent readComponent() {
+        return ComponentSerializer.parseJsonComponent(readString(getMaxMessageLength()));
+    }
+
+    public void writeComponent(BaseComponent component) {
+        writeString(ComponentSerializer.buildJsonObject(component).toString());
     }
 
     public ResourceLocation readIdentifier(int maxLen) {

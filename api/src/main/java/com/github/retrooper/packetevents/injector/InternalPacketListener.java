@@ -44,6 +44,7 @@ public class InternalPacketListener implements PacketListener {
             //Store game profile
             GameProfile profile = loginSuccess.getGameProfile();
             PacketEvents.getAPI().getPlayerManager().setGameProfile(event.getChannel(), profile);
+            PacketEvents.getAPI().getLogManager().debug("Set game profile for player " + profile.getName());
             //Transition into the PLAY connection state
             PacketEvents.getAPI().getPlayerManager().changeConnectionState(event.getChannel(), ConnectionState.PLAY);
         }
@@ -87,6 +88,7 @@ public class InternalPacketListener implements PacketListener {
                     tabCompleteAttribute.setInput(text);
                     Optional<Integer> transactionID = tabComplete.getTransactionId();
                     transactionID.ifPresent(tabComplete::setTransactionId);
+                    PacketEvents.getAPI().getLogManager().debug("Tab complete received: " + text);
                 }
                 break;
         }

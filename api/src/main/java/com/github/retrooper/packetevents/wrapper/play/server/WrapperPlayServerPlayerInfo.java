@@ -20,6 +20,8 @@ package com.github.retrooper.packetevents.wrapper.play.server;
 
 import com.github.retrooper.packetevents.event.impl.PacketSendEvent;
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
+import com.github.retrooper.packetevents.protocol.chat.component.BaseComponent;
+import com.github.retrooper.packetevents.protocol.chat.component.impl.TextComponent;
 import com.github.retrooper.packetevents.protocol.gameprofile.GameProfile;
 import com.github.retrooper.packetevents.protocol.gameprofile.TextureProperty;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
@@ -67,7 +69,8 @@ public class WrapperPlayServerPlayerInfo extends PacketWrapper<WrapperPlayServer
         if (serverVersion == ServerVersion.V_1_7_10) {
             playerDataList = new ArrayList<>(1);
             //Only one player data
-            String username = readString();
+            String rawUsername = readString();
+            BaseComponent username = TextComponent.builder().text(rawUsername).build();
             boolean online = readBoolean();
             int ping = readShort();
             PlayerData data = new PlayerData(username, null, GameMode.SURVIVAL, ping);
@@ -100,7 +103,7 @@ public class WrapperPlayServerPlayerInfo extends PacketWrapper<WrapperPlayServer
                         }
                         GameMode gameMode = GameMode.values()[readVarInt()];
                         int ping = readVarInt();
-                        String displayName = readBoolean() ? readString() : null;
+                        BaseComponent displayName = readBoolean() ? readComponent() : null;
                         data = new PlayerData(displayName, gameProfile, gameMode, ping);
                         break;
                     }
@@ -115,7 +118,7 @@ public class WrapperPlayServerPlayerInfo extends PacketWrapper<WrapperPlayServer
                         break;
                     }
                     case UPDATE_DISPLAY_NAME:
-                        String displayName = readBoolean() ? readString() : null;
+                        BaseComponent displayName = readBoolean() ? readComponent() : null;
                         data = new PlayerData(displayName, null, null, -1);
                         break;
 
@@ -142,7 +145,10 @@ public class WrapperPlayServerPlayerInfo extends PacketWrapper<WrapperPlayServer
         if (serverVersion == ServerVersion.V_1_7_10) {
             //Only one player data can be sent
             PlayerData data = playerDataList.get(0);
-            writeString(data.displayName);
+            //We must convert the component string to a normal one
+            //TODO test
+            String rawUsername = ((TextComponent)data.displayName).getText();
+            writeString(rawUsername);
             writeBoolean(action != Action.REMOVE_PLAYER);
             writeShort(data.ping);
         } else {
@@ -167,7 +173,7 @@ public class WrapperPlayServerPlayerInfo extends PacketWrapper<WrapperPlayServer
                         writeVarInt(data.ping);
                         if (data.displayName != null) {
                             writeBoolean(true);
-                            writeString(data.displayName);
+                            writeComponent(data.displayName);
                         } else {
                             writeBoolean(false);
                         }
@@ -184,7 +190,7 @@ public class WrapperPlayServerPlayerInfo extends PacketWrapper<WrapperPlayServer
                     case UPDATE_DISPLAY_NAME:
                         if (data.displayName != null) {
                             writeBoolean(true);
-                            writeString(data.displayName);
+                            writeComponent(data.displayName);
                         } else {
                             writeBoolean(false);
                         }
@@ -225,7 +231,7 @@ public class WrapperPlayServerPlayerInfo extends PacketWrapper<WrapperPlayServer
 
     public static class PlayerData {
         @Nullable
-        private String displayName;
+        private BaseComponent displayName;
         @Nullable
         private GameProfile gameProfile;
         @Nullable
@@ -233,7 +239,7 @@ public class WrapperPlayServerPlayerInfo extends PacketWrapper<WrapperPlayServer
 
         private int ping;
 
-        public PlayerData(@Nullable String displayName, @Nullable GameProfile gameProfile, @Nullable GameMode gameMode, int ping) {
+        public PlayerData(@Nullable BaseComponent displayName, @Nullable GameProfile gameProfile, @Nullable GameMode gameMode, int ping) {
             this.displayName = displayName;
             this.gameProfile = gameProfile;
             this.gameMode = gameMode;
@@ -267,11 +273,11 @@ public class WrapperPlayServerPlayerInfo extends PacketWrapper<WrapperPlayServer
         }
 
         @Nullable
-        public String getDisplayName() {
+        public BaseComponent getDisplayName() {
             return displayName;
         }
 
-        public void setDisplayName(@Nullable String displayName) {
+        public void setDisplayName(@Nullable BaseComponent displayName) {
             this.displayName = displayName;
         }
     }
