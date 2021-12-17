@@ -16,38 +16,50 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.github.retrooper.packetevents.wrapper.play.client;
+package com.github.retrooper.packetevents.wrapper.play.server;
 
-import com.github.retrooper.packetevents.event.impl.PacketReceiveEvent;
+import com.github.retrooper.packetevents.event.impl.PacketSendEvent;
+import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.protocol.world.Difficulty;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 
-public class WrapperPlayClientSetDifficulty extends PacketWrapper<WrapperPlayClientSetDifficulty> {
+public class WrapperPlayServerDifficulty extends PacketWrapper<WrapperPlayServerDifficulty> {
     private Difficulty difficulty;
+    private boolean locked;
 
-    public WrapperPlayClientSetDifficulty(PacketReceiveEvent event) {
+    public WrapperPlayServerDifficulty(PacketSendEvent event) {
         super(event);
     }
 
-    public WrapperPlayClientSetDifficulty(Difficulty difficulty) {
-        super(PacketType.Play.Client.SET_DIFFICULTY);
+    public WrapperPlayServerDifficulty(Difficulty difficulty, boolean locked) {
+        super(PacketType.Play.Server.SERVER_DIFFICULTY);
         this.difficulty = difficulty;
+        this.locked = locked;
+
     }
 
     @Override
     public void readData() {
-        this.difficulty = Difficulty.getById(readByte());
+        difficulty = Difficulty.getById(readByte());
+        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_14)) {
+            locked = readBoolean();
+        }
+        //TODO On 1.8 locked theoretically is true?
     }
 
     @Override
-    public void readData(WrapperPlayClientSetDifficulty wrapper) {
-        this.difficulty = wrapper.difficulty;
+    public void readData(WrapperPlayServerDifficulty wrapper) {
+        difficulty = wrapper.difficulty;
+        locked = wrapper.locked;
     }
 
     @Override
     public void writeData() {
         writeByte(difficulty.getId());
+        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_14)) {
+            writeBoolean(locked);
+        }
     }
 
     public Difficulty getDifficulty() {
@@ -56,5 +68,13 @@ public class WrapperPlayClientSetDifficulty extends PacketWrapper<WrapperPlayCli
 
     public void setDifficulty(Difficulty difficulty) {
         this.difficulty = difficulty;
+    }
+
+    public boolean isLocked() {
+        return locked;
+    }
+
+    public void setLocked(boolean locked) {
+        this.locked = locked;
     }
 }

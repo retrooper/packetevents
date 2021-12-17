@@ -26,7 +26,6 @@ import com.github.retrooper.packetevents.protocol.ConnectionState;
 import io.github.retrooper.packetevents.handlers.compression.CustomPacketCompressor;
 import io.github.retrooper.packetevents.handlers.compression.CustomPacketDecompressor;
 import io.github.retrooper.packetevents.handlers.modern.early.CompressionManagerModern;
-import io.github.retrooper.packetevents.handlers.modern.early.ServerConnectionInitializerModern;
 import io.github.retrooper.packetevents.utils.dependencies.viaversion.CustomPipelineUtil;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
@@ -35,7 +34,6 @@ import org.bukkit.entity.Player;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 public class PacketDecoderModern extends ByteToMessageDecoder {
@@ -96,7 +94,6 @@ public class PacketDecoderModern extends ByteToMessageDecoder {
     @Override
     public void decode(ChannelHandlerContext ctx, ByteBuf byteBuf, List<Object> out) {
         if (byteBuf.readableBytes() != 0) {
-            PacketEvents.getAPI().getLogManager().debug("pipe: " + Arrays.toString(ctx.pipeline().names().toArray(new String[0])));
             handle(PacketEvents.getAPI().getNettyManager().wrapChannelHandlerContext(ctx), PacketEvents.getAPI().getNettyManager().wrapByteBuf(byteBuf), out);
             if (!decoders.isEmpty()) {
                 //Call custom decoders
@@ -122,9 +119,6 @@ public class PacketDecoderModern extends ByteToMessageDecoder {
                 }
             }
         }
-        else {
-            PacketEvents.getAPI().getLogManager().debug("suii");
-    }
     }
 
     private boolean handleCompressionOrder(ChannelHandlerContextAbstract ctx, ByteBufAbstract buf) {

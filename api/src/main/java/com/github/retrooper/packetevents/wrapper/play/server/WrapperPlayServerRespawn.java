@@ -205,7 +205,7 @@ public class WrapperPlayServerRespawn extends PacketWrapper<WrapperPlayServerRes
                 if (difficulty == null) {
                     difficulty = Difficulty.NORMAL;
                 }
-                writeByte(difficulty.ordinal());
+                writeByte(difficulty.getId());
             }
             //Note: SPECTATOR will not be expected from a 1.7 client.
             writeByte(gameMode.ordinal());
