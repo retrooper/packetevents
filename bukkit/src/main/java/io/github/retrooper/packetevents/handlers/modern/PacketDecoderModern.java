@@ -123,7 +123,7 @@ public class PacketDecoderModern extends ByteToMessageDecoder {
             }
         }
         else {
-            System.out.println("suii");
+            PacketEvents.getAPI().getLogManager().debug("suii");
     }
     }
 
