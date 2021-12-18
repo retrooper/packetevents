@@ -30,15 +30,16 @@ public class WrappedBlockState {
     StateType type;
     EnumMap<StateValue, Object> data = new EnumMap<>(StateValue.class);
 
-    private static final WrappedBlockState AIR = new WrappedBlockState(StateTypes.AIR, null);
+    private static final WrappedBlockState AIR = new WrappedBlockState(StateTypes.AIR, new EnumMap<>(StateValue.class), 0);
 
     private static final HashMap<String, WrappedBlockState> BY_STRING = new HashMap<>();
     private static final HashMap<Integer, WrappedBlockState> BY_ID = new HashMap<>();
     private static final HashMap<WrappedBlockState, String> INTO_STRING = new HashMap<>();
     private static final HashMap<WrappedBlockState, Integer> INTO_ID = new HashMap<>();
 
-    public WrappedBlockState(StateType type, String[] data) {
+    public WrappedBlockState(StateType type, String[] data, int globalID) {
         this.type = type;
+        this.globalID = globalID;
         if (data == null) return;
         for (String s : data) {
             String[] split = s.split("=");
@@ -47,11 +48,28 @@ public class WrappedBlockState {
         }
     }
 
+    public WrappedBlockState(StateType type, EnumMap<StateValue, Object> data, int globalID) {
+        this.globalID = globalID;
+        this.type = type;
+        this.data = data;
+    }
+
     @Override
     public WrappedBlockState clone() {
-        WrappedBlockState clone = new WrappedBlockState(type, null);
-        clone.data.putAll(data);
-        return clone;
+        return new WrappedBlockState(type, data, globalID);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        WrappedBlockState that = (WrappedBlockState) o;
+        return globalID == that.globalID;
+    }
+
+    @Override
+    public int hashCode() {
+        return globalID;
     }
 
     // Begin all block data types
@@ -719,14 +737,6 @@ public class WrappedBlockState {
         return BY_STRING.getOrDefault(string, AIR).clone();
     }
 
-    public boolean equals(WrappedBlockState that) {
-        return this.globalID == that.globalID;
-    }
-
-    @Override
-    public int hashCode() {
-        return globalID;
-    }
 
     // TODO: 1.16.0/1.16.1 and 1.13.0/1.13.1 support
     private static String getMappingServerVersion(ServerVersion serverVersion) {
@@ -777,7 +787,7 @@ public class WrappedBlockState {
                     dataStrings = split[2].substring(endIndex + 1, line.length() - 1).split(",");
                 }
 
-                WrappedBlockState state = new WrappedBlockState(type, dataStrings);
+                WrappedBlockState state = new WrappedBlockState(type, dataStrings, combinedID);
 
                 BY_STRING.put(split[2], state);
                 BY_ID.put(combinedID, state);
@@ -808,7 +818,7 @@ public class WrappedBlockState {
                     data = fullBlockString.substring(index + 1, fullBlockString.length() - 1).split(",");
                 }
 
-                WrappedBlockState state = new WrappedBlockState(type, data);
+                WrappedBlockState state = new WrappedBlockState(type, data, id);
 
                 BY_STRING.put(fullBlockString, state);
                 BY_ID.put(id, state);

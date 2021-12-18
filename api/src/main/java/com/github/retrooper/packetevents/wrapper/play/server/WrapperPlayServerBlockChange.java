@@ -21,12 +21,14 @@ package com.github.retrooper.packetevents.wrapper.play.server;
 import com.github.retrooper.packetevents.event.impl.PacketSendEvent;
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
+import com.github.retrooper.packetevents.protocol.world.states.WrappedBlockState;
 import com.github.retrooper.packetevents.util.Vector3i;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
-//TODO Finish
-class WrapperPlayServerBlockChange extends PacketWrapper<WrapperPlayServerBlockChange> {
+
+public class WrapperPlayServerBlockChange extends PacketWrapper<WrapperPlayServerBlockChange> {
     private Vector3i blockPosition;
     private int blockID;
+
     public WrapperPlayServerBlockChange(PacketSendEvent event) {
         super(event);
     }
@@ -43,20 +45,42 @@ class WrapperPlayServerBlockChange extends PacketWrapper<WrapperPlayServerBlockC
             blockPosition = new Vector3i(readInt(), readUnsignedByte(), readInt());
             int block = readVarInt();
             int blockData = readUnsignedByte();
-        }
-        else {
+            blockID = block | (blockData << 12);
+        } else {
             blockPosition = readBlockPosition();
-            int block = readVarInt();
+            blockID = readVarInt();
         }
     }
 
     @Override
     public void readData(WrapperPlayServerBlockChange wrapper) {
-        super.readData(wrapper);
+        wrapper.blockPosition = readBlockPosition();
+        wrapper.blockID = readVarInt();
     }
 
     @Override
     public void writeData() {
-        super.writeData();
+        if (serverVersion == ServerVersion.V_1_7_10) {
+            writeInt(blockPosition.getX());
+            writeByte(blockPosition.getY());
+            writeInt(blockPosition.getZ());
+            writeVarInt(blockID & 0xff);
+            writeByte(blockID >> 12);
+        } else {
+            writeBlockPosition(blockPosition);
+            writeVarInt(blockID);
+        }
+    }
+
+    public Vector3i getBlockPosition() {
+        return blockPosition;
+    }
+
+    public int getBlockId() {
+        return blockID;
+    }
+
+    public WrappedBlockState getBlockState() {
+        return WrappedBlockState.getByGlobalId(blockID);
     }
 }
