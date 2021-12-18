@@ -7,7 +7,6 @@ import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 
-// TODO: Push reaction and block speed
 public class StateTypes {
     private static final Map<String, StateType> BY_NAME = new HashMap<>();
 
@@ -280,7 +279,7 @@ public class StateTypes {
     public static StateType CARVED_PUMPKIN = StateTypes.builder().name("CARVED_PUMPKIN").blastResistance(1.0f).hardness(1.0f).isOccluding(true).isSolid(true).isBlocking(true).setMaterial(MaterialType.VEGETABLE).build();
     public static StateType JACK_O_LANTERN = StateTypes.builder().name("JACK_O_LANTERN").blastResistance(1.0f).hardness(1.0f).isOccluding(true).isSolid(true).isBlocking(true).setMaterial(MaterialType.VEGETABLE).build();
     public static StateType NETHERRACK = StateTypes.builder().name("NETHERRACK").blastResistance(0.4f).hardness(0.4f).isOccluding(true).isSolid(true).isBlocking(true).requiresCorrectTool(true).setMaterial(MaterialType.STONE).build();
-    public static StateType SOUL_SAND = StateTypes.builder().name("SOUL_SAND").blastResistance(0.5f).hardness(0.5f).isOccluding(true).isSolid(true).isBlocking(true).setMaterial(MaterialType.SAND).build();
+    public static StateType SOUL_SAND = StateTypes.builder().name("SOUL_SAND").blastResistance(0.5f).hardness(0.5f).speed(0.4f).isOccluding(true).isSolid(true).isBlocking(true).setMaterial(MaterialType.SAND).build();
     public static StateType SOUL_SOIL = StateTypes.builder().name("SOUL_SOIL").blastResistance(0.5f).hardness(0.5f).isOccluding(true).isSolid(true).isBlocking(true).setMaterial(MaterialType.DIRT).build();
     public static StateType BASALT = StateTypes.builder().name("BASALT").blastResistance(4.2f).hardness(1.25f).isOccluding(true).isSolid(true).isBlocking(true).requiresCorrectTool(true).setMaterial(MaterialType.STONE).build();
     public static StateType POLISHED_BASALT = StateTypes.builder().name("POLISHED_BASALT").blastResistance(4.2f).hardness(1.25f).isOccluding(true).isSolid(true).isBlocking(true).requiresCorrectTool(true).setMaterial(MaterialType.STONE).build();
@@ -603,7 +602,7 @@ public class StateTypes {
     public static StateType PISTON = StateTypes.builder().name("PISTON").blastResistance(1.5f).hardness(1.5f).isSolid(true).isBlocking(true).setMaterial(MaterialType.PISTON).build();
     public static StateType STICKY_PISTON = StateTypes.builder().name("STICKY_PISTON").blastResistance(1.5f).hardness(1.5f).isSolid(true).isBlocking(true).setMaterial(MaterialType.PISTON).build();
     public static StateType SLIME_BLOCK = StateTypes.builder().name("SLIME_BLOCK").slipperiness(0.8f).isOccluding(true).isSolid(true).isBlocking(true).setMaterial(MaterialType.CLAY).build();
-    public static StateType HONEY_BLOCK = StateTypes.builder().name("HONEY_BLOCK").isSolid(true).isBlocking(true).setMaterial(MaterialType.CLAY).build();
+    public static StateType HONEY_BLOCK = StateTypes.builder().name("HONEY_BLOCK").speed(0.4f).isSolid(true).isBlocking(true).setMaterial(MaterialType.CLAY).build();
     public static StateType OBSERVER = StateTypes.builder().name("OBSERVER").blastResistance(3.0f).hardness(3.0f).isSolid(true).isBlocking(true).requiresCorrectTool(true).setMaterial(MaterialType.STONE).build();
     public static StateType HOPPER = StateTypes.builder().name("HOPPER").blastResistance(4.8f).hardness(3.0f).isSolid(true).isBlocking(true).requiresCorrectTool(true).setMaterial(MaterialType.METAL).build();
     public static StateType DISPENSER = StateTypes.builder().name("DISPENSER").blastResistance(3.5f).hardness(3.5f).isOccluding(true).isSolid(true).isBlocking(true).requiresCorrectTool(true).setMaterial(MaterialType.STONE).build();
