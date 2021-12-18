@@ -4,12 +4,15 @@ import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.protocol.world.states.type.StateType;
 import com.github.retrooper.packetevents.protocol.world.states.type.StateTypes;
+import com.github.retrooper.packetevents.protocol.world.states.type.StateValue;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.HashMap;
+import java.util.Objects;
 
 /**
  * This class is designed to take advantage of modern minecraft versions
@@ -23,25 +26,63 @@ import java.util.HashMap;
  * Mappings from modern versions are from ViaVersion, who have a similar (but a bit slower) system.
  */
 public class WrappedBlockState {
-    int globalID;
     StateType type;
-    String[] data;
+    HashMap<StateValue, Object> data = new HashMap<>();
+
+    private static final WrappedBlockState AIR = new WrappedBlockState(StateTypes.AIR, null);
 
     private static final HashMap<String, WrappedBlockState> BY_STRING = new HashMap<>();
     private static final HashMap<Integer, WrappedBlockState> BY_ID = new HashMap<>();
+    private static final HashMap<WrappedBlockState, String> INTO_STRING = new HashMap<>();
+    private static final HashMap<WrappedBlockState, Integer> INTO_ID = new HashMap<>();
 
-    public WrappedBlockState(int globalID, StateType type, String[] data) {
-        this.globalID = globalID;
+    public WrappedBlockState(StateType type, String[] data) {
         this.type = type;
-        this.data = data;
+        if (data == null) return;
+        for (String s : data) {
+            String[] split = s.split("=");
+            StateValue value = StateValue.valueOf(split[0]);
+            this.data.put(value, value.getParser().apply(split[1]));
+        }
     }
 
+    // Begin all block data types
+    //public Object getAge(StateValue toGet) {
+    //    return (toGet.getReturnType()) data.get(toGet);
+    //}
+
+    // End all block data types
+
+    public int getGlobalId() {
+        return INTO_ID.get(this);
+    }
+
+    @Override
+    public String toString() {
+        return INTO_STRING.get(this);
+    }
+
+    @NotNull
     public WrappedBlockState getByGlobalId(int globalID) {
-        return BY_ID.get(globalID);
+        return BY_ID.getOrDefault(globalID, AIR);
     }
 
+    @NotNull
     public WrappedBlockState getByString(String string) {
-        return BY_STRING.get(string);
+        return BY_STRING.getOrDefault(string, AIR);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        WrappedBlockState that = (WrappedBlockState) o;
+        return this.type == that.type && this.data == that.data;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(type, data);
     }
 
     // TODO: 1.16.0/1.16.1 and 1.13.0/1.13.1 support
@@ -94,12 +135,13 @@ public class WrappedBlockState {
                     dataStrings = split[2].substring(endIndex + 1, line.length() - 1).split(",");
                 }
 
-                WrappedBlockState state = new WrappedBlockState(id, type, dataStrings);
+                WrappedBlockState state = new WrappedBlockState(type, dataStrings);
 
-                BY_STRING.put(state.toString(), state);
+                BY_STRING.put(split[2], state);
                 BY_ID.put(combinedID, state);
+                INTO_STRING.put(state, split[2]);
+                INTO_ID.put(state, combinedID);
             }
-
         } catch (IOException e) {
             PacketEvents.getAPI().getLogManager().debug("Palette reading failed! Unsupported version?");
             e.printStackTrace();
@@ -123,12 +165,13 @@ public class WrappedBlockState {
                     data = line.substring(index + 1, line.length() - 1).split(",");
                 }
 
-                WrappedBlockState state = new WrappedBlockState(id, type, data);
+                WrappedBlockState state = new WrappedBlockState(type, data);
 
-                BY_STRING.put(state.toString(), state);
+                BY_STRING.put(blockString, state);
                 BY_ID.put(id, state);
+                INTO_STRING.put(state, blockString);
+                INTO_ID.put(state, id);
             }
-
         } catch (IOException e) {
             PacketEvents.getAPI().getLogManager().debug("Palette reading failed! Unsupported version?");
             e.printStackTrace();
