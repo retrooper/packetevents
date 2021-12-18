@@ -12,9 +12,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 
 /**
  * This class is designed to take advantage of modern minecraft versions
@@ -29,7 +27,7 @@ import java.util.Objects;
  */
 public class WrappedBlockState {
     StateType type;
-    HashMap<StateValue, Object> data = new HashMap<>();
+    EnumMap<StateValue, Object> data = new EnumMap<>(StateValue.class);
 
     private static final WrappedBlockState AIR = new WrappedBlockState(StateTypes.AIR, null);
 
@@ -46,6 +44,13 @@ public class WrappedBlockState {
             StateValue value = StateValue.valueOf(split[0]);
             this.data.put(value, value.getParser().apply(split[1]));
         }
+    }
+
+    @Override
+    public WrappedBlockState clone() {
+        WrappedBlockState clone = new WrappedBlockState(type, null);
+        clone.data.putAll(data);
+        return clone;
     }
 
     // Begin all block data types
@@ -659,12 +664,12 @@ public class WrappedBlockState {
 
     @NotNull
     public WrappedBlockState getByGlobalId(int globalID) {
-        return BY_ID.getOrDefault(globalID, AIR);
+        return BY_ID.getOrDefault(globalID, AIR).clone();
     }
 
     @NotNull
     public WrappedBlockState getByString(String string) {
-        return BY_STRING.getOrDefault(string, AIR);
+        return BY_STRING.getOrDefault(string, AIR).clone();
     }
 
     @Override
@@ -672,7 +677,7 @@ public class WrappedBlockState {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         WrappedBlockState that = (WrappedBlockState) o;
-        return this.type == that.type && this.data == that.data;
+        return this.type == that.type && this.data.equals(that.data);
     }
 
     @Override

@@ -89,16 +89,6 @@ public class PacketEventsPlugin extends JavaPlugin {
                     int slot = setSlot.getSlot();
                     ItemStack item = setSlot.getItem();
                     player.sendMessage("Set slot with window ID: " + windowID + ", slot: " + slot + ", item: " + (item.getType() != null ? item.toString() : "null item"));
-                } else if (event.getPacketType() == PacketType.Play.Server.TAGS) {
-                    WrapperPlayServerTags tags = new WrapperPlayServerTags(event);
-                    HashMap<String, List<WrapperPlayServerTags.Tag>> tagsMap = tags.getTags();
-                    for (Map.Entry<String, List<WrapperPlayServerTags.Tag>> tag : tagsMap.entrySet()) {
-                        System.out.println("Tag: " + tag.getKey());
-
-                        for (WrapperPlayServerTags.Tag integer : tag.getValue()) {
-                            System.out.println("Name " + integer.getName() + " and size " + integer.getValues().size());
-                        }
-                    }
                 }//TODO Complete chunk data packet
             }
         };
