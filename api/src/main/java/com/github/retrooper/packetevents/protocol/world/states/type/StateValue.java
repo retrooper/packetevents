@@ -4,7 +4,7 @@ import com.github.retrooper.packetevents.protocol.world.states.enums.*;
 
 import java.util.function.Function;
 
-public enum StateValue {
+public enum StateValue{
     AGE("age", Integer::parseInt),
     ATTACHED("attached", Boolean::parseBoolean),
     ATTACHMENT("attachment", Attachment::valueOf),
@@ -40,7 +40,7 @@ public enum StateValue {
     INSTRUMENT("instrument", Instrument::valueOf),
     INVERTED("inverted", Boolean::parseBoolean),
     LAYERS("layers", Integer::parseInt),
-    LEAVES("leaves", Integer::parseInt),
+    LEAVES("leaves", Leaves::valueOf),
     LEVEL("level", Integer::parseInt),
     LIT("lit", Boolean::parseBoolean),
     LOCKED("locked", Boolean::parseBoolean),

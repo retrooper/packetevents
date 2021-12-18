@@ -851,7 +851,7 @@
 60,9,minecraft:farmland[moisture=1]
 60,10,minecraft:farmland[moisture=2]
 60,11,minecraft:farmland[moisture=3]
-60,12,minecraft:dirt
+60,12,minecraft:farmland[moisture=4]
 60,13,minecraft:farmland[moisture=5]
 60,14,minecraft:farmland[moisture=6]
 60,15,minecraft:farmland[moisture=7]

@@ -2,6 +2,7 @@ package com.github.retrooper.packetevents.protocol.world.states;
 
 import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
+import com.github.retrooper.packetevents.protocol.world.states.enums.*;
 import com.github.retrooper.packetevents.protocol.world.states.type.StateType;
 import com.github.retrooper.packetevents.protocol.world.states.type.StateTypes;
 import com.github.retrooper.packetevents.protocol.world.states.type.StateValue;
@@ -12,6 +13,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.Objects;
 
 /**
@@ -47,12 +49,605 @@ public class WrappedBlockState {
     }
 
     // Begin all block data types
-    //public Object getAge(StateValue toGet) {
-    //    return (toGet.getReturnType()) data.get(toGet);
-    //}
+    public int getAge() {
+        return (int) data.get(StateValue.AGE);
+    }
+
+    public void setAge(int age) {
+        data.put(StateValue.AGE, age);
+        checkIsStillValid();
+    }
+
+    public boolean getAttached() {
+        return (boolean) data.get(StateValue.ATTACHED);
+    }
+
+    public void setAttached(boolean attached) {
+        data.put(StateValue.ATTACHED, attached);
+        checkIsStillValid();
+    }
+
+    public Axis getAxis() {
+        return (Axis) data.get(StateValue.AXIS);
+    }
+
+    public void setAxis(Axis axis) {
+        data.put(StateValue.AXIS, axis);
+        checkIsStillValid();
+    }
+
+    public boolean getBerries() {
+        return (boolean) data.get(StateValue.BERRIES);
+    }
+
+    public void setBerries(boolean berries) {
+        data.put(StateValue.BERRIES, berries);
+        checkIsStillValid();
+    }
+
+    public int getBites() {
+        return (int) data.get(StateValue.BITES);
+    }
+
+    public void setBites(int bites) {
+        data.put(StateValue.BITES, bites);
+        checkIsStillValid();
+    }
+
+    public boolean getBottom() {
+        return (boolean) data.get(StateValue.BOTTOM);
+    }
+
+    public void setBottom(boolean bottom) {
+        data.put(StateValue.BOTTOM, bottom);
+        checkIsStillValid();
+    }
+
+    public int getCandles() {
+        return (int) data.get(StateValue.CANDLES);
+    }
+
+    public void setCandles(int candles) {
+        data.put(StateValue.CANDLES, candles);
+        checkIsStillValid();
+    }
+
+    public boolean getConditional() {
+        return (boolean) data.get(StateValue.CONDITIONAL);
+    }
+
+    public void setConditional(boolean conditional) {
+        data.put(StateValue.CONDITIONAL, conditional);
+        checkIsStillValid();
+    }
+
+    public int getDelay() {
+        return (int) data.get(StateValue.DELAY);
+    }
+
+    public void setDelay(int delay) {
+        data.put(StateValue.DELAY, delay);
+        checkIsStillValid();
+    }
+
+    public boolean getDisarmed() {
+        return (boolean) data.get(StateValue.DISARMED);
+    }
+
+    public void setDisarmed(boolean disarmed) {
+        data.put(StateValue.DISARMED, disarmed);
+        checkIsStillValid();
+    }
+
+    public int getDistance() {
+        return (int) data.get(StateValue.DISTANCE);
+    }
+
+    public void setDistance(int distance) {
+        data.put(StateValue.DISTANCE, distance);
+        checkIsStillValid();
+    }
+
+    public boolean getDown() {
+        return (boolean) data.get(StateValue.DOWN);
+    }
+
+    public void setDown(boolean down) {
+        data.put(StateValue.DOWN, down);
+        checkIsStillValid();
+    }
+
+    public boolean getDrag() {
+        return (boolean) data.get(StateValue.DRAG);
+    }
+
+    public void setDrag(boolean drag) {
+        data.put(StateValue.DRAG, drag);
+        checkIsStillValid();
+    }
+
+    public int getEggs() {
+        return (int) data.get(StateValue.EGGS);
+    }
+
+    public void setEggs(int eggs) {
+        data.put(StateValue.EGGS, eggs);
+        checkIsStillValid();
+    }
+
+    public boolean isEnabled() {
+        return (boolean) data.get(StateValue.ENABLED);
+    }
+
+    public void setEnabled(boolean enabled) {
+        data.put(StateValue.ENABLED, enabled);
+        checkIsStillValid();
+    }
+
+    public boolean isExtended() {
+        return (boolean) data.get(StateValue.EXTENDED);
+    }
+
+    public void setExtended(boolean extended) {
+        data.put(StateValue.EXTENDED, extended);
+        checkIsStillValid();
+    }
+
+    public boolean isEye() {
+        return (boolean) data.get(StateValue.EYE);
+    }
+
+    public void setEye(boolean eye) {
+        data.put(StateValue.EYE, eye);
+        checkIsStillValid();
+    }
+
+    public Face getFace() {
+        return (Face) data.get(StateValue.FACE);
+    }
+
+    public void setFace(Face face) {
+        data.put(StateValue.FACE, face);
+        checkIsStillValid();
+    }
+
+    public Facing getFacing() {
+        return (Facing) data.get(StateValue.FACING);
+    }
+
+    public void setFacing(Facing facing) {
+        data.put(StateValue.FACING, facing);
+        checkIsStillValid();
+    }
+
+    public Half getHalf() {
+        return (Half) data.get(StateValue.HALF);
+    }
+
+    public void setHalf(Half half) {
+        data.put(StateValue.HALF, half);
+        checkIsStillValid();
+    }
+
+    public boolean getHanging() {
+        return (boolean) data.get(StateValue.HANGING);
+    }
+
+    public void setHanging(boolean hanging) {
+        data.put(StateValue.HANGING, hanging);
+        checkIsStillValid();
+    }
+
+    public boolean getHasBook() {
+        return (boolean) data.get(StateValue.HAS_BOOK);
+    }
+
+    public void setHasBook(boolean hasBook) {
+        data.put(StateValue.HAS_BOOK, hasBook);
+        checkIsStillValid();
+    }
+
+    public boolean getHasBottle0() {
+        return (boolean) data.get(StateValue.HAS_BOTTLE_0);
+    }
+
+    public void setHasBottle0(boolean hasBottle0) {
+        data.put(StateValue.HAS_BOTTLE_0, hasBottle0);
+        checkIsStillValid();
+    }
+
+    public boolean getHasBottle1() {
+        return (boolean) data.get(StateValue.HAS_BOTTLE_1);
+    }
+
+    public void setHasBottle1(boolean hasBottle1) {
+        data.put(StateValue.HAS_BOTTLE_1, hasBottle1);
+        checkIsStillValid();
+    }
+
+    public boolean getHasBottle2() {
+        return (boolean) data.get(StateValue.HAS_BOTTLE_2);
+    }
+
+    public void setHasBottle2(boolean hasBottle2) {
+        data.put(StateValue.HAS_BOTTLE_2, hasBottle2);
+        checkIsStillValid();
+    }
+
+    public boolean getHasRecord() {
+        return (boolean) data.get(StateValue.HAS_RECORD);
+    }
+
+    public void setHasRecord(boolean hasRecord) {
+        data.put(StateValue.HAS_RECORD, hasRecord);
+        checkIsStillValid();
+    }
+
+    public int getHatch() {
+        return (int) data.get(StateValue.HATCH);
+    }
+
+    public void setHatch(int hatch) {
+        data.put(StateValue.HATCH, hatch);
+        checkIsStillValid();
+    }
+
+    public Hinge getHinge() {
+        return (Hinge) data.get(StateValue.HINGE);
+    }
+
+    public void setHinge(Hinge hinge) {
+        data.put(StateValue.HINGE, hinge);
+        checkIsStillValid();
+    }
+
+    public int getHoneyLevel() {
+        return (int) data.get(StateValue.HONEY_LEVEL);
+    }
+
+    public void setHoneyLevel(int honeyLevel) {
+        data.put(StateValue.HONEY_LEVEL, honeyLevel);
+        checkIsStillValid();
+    }
+
+    public boolean inWall() {
+        return (boolean) data.get(StateValue.IN_WALL);
+    }
+
+    public void setInWall(boolean inWall) {
+        data.put(StateValue.IN_WALL, inWall);
+        checkIsStillValid();
+    }
+
+    public Instrument getInstrument() {
+        return (Instrument) data.get(StateValue.INSTRUMENT);
+    }
+
+    public void setInstrument(Instrument instrument) {
+        data.put(StateValue.INSTRUMENT, instrument);
+        checkIsStillValid();
+    }
+
+    public boolean isInverted() {
+        return (boolean) data.get(StateValue.INVERTED);
+    }
+
+    public void setInverted(boolean inverted) {
+        data.put(StateValue.INVERTED, inverted);
+        checkIsStillValid();
+    }
+
+    public int getLayers() {
+        return (int) data.get(StateValue.LAYERS);
+    }
+
+    public void setLayers(int layers) {
+        data.put(StateValue.LAYERS, layers);
+        checkIsStillValid();
+    }
+
+    public Leaves getLeaves() {
+        return (Leaves) data.get(StateValue.LEAVES);
+    }
+
+    public void setLeaves(Leaves leaves) {
+        data.put(StateValue.LEAVES, leaves);
+        checkIsStillValid();
+    }
+
+    public int getLevel() {
+        return (int) data.get(StateValue.LEVEL);
+    }
+
+    public void setLevel(int level) {
+        data.put(StateValue.LEVEL, level);
+        checkIsStillValid();
+    }
+
+    public boolean getLit() {
+        return (boolean) data.get(StateValue.LIT);
+    }
+
+    public void setLit(boolean lit) {
+        data.put(StateValue.LIT, lit);
+        checkIsStillValid();
+    }
+
+    public boolean getLocked() {
+        return (boolean) data.get(StateValue.LOCKED);
+    }
+
+    public void setLocked(boolean locked) {
+        data.put(StateValue.LOCKED, locked);
+        checkIsStillValid();
+    }
+
+    public Mode getMode() {
+        return (Mode) data.get(StateValue.MODE);
+    }
+
+    public void setMode(Mode mode) {
+        data.put(StateValue.MODE, mode);
+        checkIsStillValid();
+    }
+
+    public int getMoisture() {
+        return (int) data.get(StateValue.MOISTURE);
+    }
+
+    public void setMoisture(int moisture) {
+        data.put(StateValue.MOISTURE, moisture);
+        checkIsStillValid();
+    }
+
+    public North getNorth() {
+        return (North) data.get(StateValue.NORTH);
+    }
+
+    public void setNorth(North north) {
+        data.put(StateValue.NORTH, north);
+        checkIsStillValid();
+    }
+
+    public int getNote() {
+        return (int) data.get(StateValue.NOTE);
+    }
+
+    public void setNote(int note) {
+        data.put(StateValue.NOTE, note);
+        checkIsStillValid();
+    }
+
+    public boolean getOccupied() {
+        return (boolean) data.get(StateValue.OCCUPIED);
+    }
+
+    public void setOccupied(boolean occupied) {
+        data.put(StateValue.OCCUPIED, occupied);
+        checkIsStillValid();
+    }
+
+    public boolean getOpen() {
+        return (boolean) data.get(StateValue.OPEN);
+    }
+
+    public void setOpen(boolean open) {
+        data.put(StateValue.OPEN, open);
+        checkIsStillValid();
+    }
+
+    public Orientation getOrientation() {
+        return (Orientation) data.get(StateValue.ORIENTATION);
+    }
+
+    public void setOrientation(Orientation orientation) {
+        data.put(StateValue.ORIENTATION, orientation);
+        checkIsStillValid();
+    }
+
+    public Part getPart() {
+        return (Part) data.get(StateValue.PART);
+    }
+
+    public void setPart(Part part) {
+        data.put(StateValue.PART, part);
+        checkIsStillValid();
+    }
+
+    public boolean getPersistent() {
+        return (boolean) data.get(StateValue.PERSISTENT);
+    }
+
+    public void setPersistent(boolean persistent) {
+        data.put(StateValue.PERSISTENT, persistent);
+        checkIsStillValid();
+    }
+
+    public int getPickles() {
+        return (int) data.get(StateValue.PICKLES);
+    }
+
+    public void setPickles(int pickles) {
+        data.put(StateValue.PICKLES, pickles);
+        checkIsStillValid();
+    }
+
+    public int getPower() {
+        return (int) data.get(StateValue.POWER);
+    }
+
+    public void setPower(int power) {
+        data.put(StateValue.POWER, power);
+        checkIsStillValid();
+    }
+
+    public boolean getPowered() {
+        return (boolean) data.get(StateValue.POWERED);
+    }
+
+    public void setPowered(boolean powered) {
+        data.put(StateValue.POWERED, powered);
+        checkIsStillValid();
+    }
+
+    public int getRotation() {
+        return (int) data.get(StateValue.ROTATION);
+    }
+
+    public void setRotation(int rotation) {
+        data.put(StateValue.ROTATION, rotation);
+        checkIsStillValid();
+    }
+
+    public SculkSensorPhase getSculkSensorPhase() {
+        return (SculkSensorPhase) data.get(StateValue.SCULK_SENSOR_PHASE);
+    }
+
+    public void setSculkSensorPhase(SculkSensorPhase sculkSensorPhase) {
+        data.put(StateValue.SCULK_SENSOR_PHASE, sculkSensorPhase);
+        checkIsStillValid();
+    }
+
+    public Shape getShape() {
+        return (Shape) data.get(StateValue.SHAPE);
+    }
+
+    public void setShape(Shape shape) {
+        data.put(StateValue.SHAPE, shape);
+        checkIsStillValid();
+    }
+
+    public boolean getShort() {
+        return (boolean) data.get(StateValue.SHORT);
+    }
+
+    public void setShort(boolean short_) {
+        data.put(StateValue.SHORT, short_);
+        checkIsStillValid();
+    }
+
+    public boolean getSignalFire() {
+        return (boolean) data.get(StateValue.SIGNAL_FIRE);
+    }
+
+    public void setSignalFire(boolean signalFire) {
+        data.put(StateValue.SIGNAL_FIRE, signalFire);
+        checkIsStillValid();
+    }
+
+    public boolean getSnowy() {
+        return (boolean) data.get(StateValue.SNOWY);
+    }
+
+    public void setSnowy(boolean snowy) {
+        data.put(StateValue.SNOWY, snowy);
+        checkIsStillValid();
+    }
+
+    public South getSouth() {
+        return (South) data.get(StateValue.SOUTH);
+    }
+
+    public void setSouth(South south) {
+        data.put(StateValue.SOUTH, south);
+        checkIsStillValid();
+    }
+
+    public Thickness getThickness() {
+        return (Thickness) data.get(StateValue.THICKNESS);
+    }
+
+    public void setThickness(Thickness thickness) {
+        data.put(StateValue.THICKNESS, thickness);
+        checkIsStillValid();
+    }
+
+    public Tilt getTilt() {
+        return (Tilt) data.get(StateValue.TILT);
+    }
+
+    public void setTilt(Tilt tilt) {
+        data.put(StateValue.TILT, tilt);
+        checkIsStillValid();
+    }
+
+    public boolean getTriggered() {
+        return (boolean) data.get(StateValue.TRIGGERED);
+    }
+
+    public void setTriggered(boolean triggered) {
+        data.put(StateValue.TRIGGERED, triggered);
+        checkIsStillValid();
+    }
+
+    public Type getType() {
+        return (Type) data.get(StateValue.TYPE);
+    }
+
+    public void setType(Type type) {
+        data.put(StateValue.TYPE, type);
+        checkIsStillValid();
+    }
+
+    public boolean getUnstable() {
+        return (boolean) data.get(StateValue.UNSTABLE);
+    }
+
+    public void setUnstable(boolean unstable) {
+        data.put(StateValue.UNSTABLE, unstable);
+        checkIsStillValid();
+    }
+
+    public boolean getUp() {
+        return (boolean) data.get(StateValue.UP);
+    }
+
+    public void setUp(boolean up) {
+        data.put(StateValue.UP, up);
+        checkIsStillValid();
+    }
+
+    public boolean getVerticalDirection() {
+        return (boolean) data.get(StateValue.VERTICAL_DIRECTION);
+    }
+
+    public void setVerticalDirection(boolean verticalDirection) {
+        data.put(StateValue.VERTICAL_DIRECTION, verticalDirection);
+        checkIsStillValid();
+    }
+
+    public boolean getWaterlogged() {
+        return (boolean) data.get(StateValue.WATERLOGGED);
+    }
+
+    public void setWaterlogged(boolean waterlogged) {
+        data.put(StateValue.WATERLOGGED, waterlogged);
+        checkIsStillValid();
+    }
+
+    public West getWest() {
+        return (West) data.get(StateValue.WEST);
+    }
+
+    public void setWest(West west) {
+        data.put(StateValue.WEST, west);
+        checkIsStillValid();
+    }
+
+    public void checkIsStillValid() {
+        if(type != StateTypes.AIR && getGlobalId() == 0) {
+            PacketEvents.getAPI().getLogger().warning("An invalid modification was made to a block!");
+            PacketEvents.getAPI().getLogger().warning("This will not crash anything, but the block will become air.");
+            PacketEvents.getAPI().getLogger().warning("You likely are modifying a property that doesn't exist for this version or block type");
+            PacketEvents.getAPI().getLogger().warning("Block: " + type.getName());
+            for (Map.Entry<StateValue, Object> entry : data.entrySet()) {
+                PacketEvents.getAPI().getLogger().warning(entry.getKey() + ": " + entry.getValue());
+            }
+            new IllegalStateException("An invalid modification was made to a block!").printStackTrace();
+        }
+    }
 
     // End all block data types
-
     public int getGlobalId() {
         return INTO_ID.get(this);
     }
@@ -128,7 +723,6 @@ public class WrappedBlockState {
                 String blockString = split[2].substring(0, endIndex != -1 ? endIndex : split[2].length());
 
                 StateType type = StateTypes.getByName(blockString);
-                type.updateInternalBlockRepresentationsOptimization(id);
 
                 String[] dataStrings = null;
                 if (endIndex != -1) {
@@ -158,7 +752,6 @@ public class WrappedBlockState {
 
                 String blockString = line.substring(afterID + 1, index == -1 ? line.length() : index);
                 StateType type = StateTypes.getByName(blockString);
-                type.updateInternalBlockRepresentationsOptimization(id);
 
                 String[] data = null;
                 if (index != -1) {
