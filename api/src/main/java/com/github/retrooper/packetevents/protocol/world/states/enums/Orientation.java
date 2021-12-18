@@ -10,6 +10,7 @@ public enum Orientation {
     SOUTH_UP,
     UP_EAST,
     UP_NORTH,
+    UP_SOUTH,
     UP_WEST,
     WEST_UP
 }

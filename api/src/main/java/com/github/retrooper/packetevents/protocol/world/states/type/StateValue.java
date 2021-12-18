@@ -2,9 +2,10 @@ package com.github.retrooper.packetevents.protocol.world.states.type;
 
 import com.github.retrooper.packetevents.protocol.world.states.enums.*;
 
+import java.util.HashMap;
 import java.util.function.Function;
 
-public enum StateValue{
+public enum StateValue {
     AGE("age", Integer::parseInt),
     ATTACHED("attached", Boolean::parseBoolean),
     ATTACHMENT("attachment", Attachment::valueOf),
@@ -13,6 +14,7 @@ public enum StateValue{
     BITES("bites", Integer::parseInt),
     BOTTOM("bottom", Boolean::parseBoolean),
     CANDLES("candles", Integer::parseInt),
+    CHARGES("charges", Integer::parseInt),
     CONDITIONAL("conditional", Boolean::parseBoolean),
     DELAY("delay", Integer::parseInt),
     DISARMED("disarmed", Boolean::parseBoolean),
@@ -62,6 +64,7 @@ public enum StateValue{
     SHORT("short", Boolean::parseBoolean),
     SIGNAL_FIRE("signal_fire", Boolean::parseBoolean),
     SNOWY("snowy", Boolean::parseBoolean),
+    STAGE("stage", Integer::parseInt),
     SOUTH("south", South::valueOf),
     THICKNESS("thickness", Thickness::valueOf),
     TILT("tilt", Tilt::valueOf),
@@ -75,21 +78,22 @@ public enum StateValue{
 
     private final String name;
     private final Function<String, Object> parser;
-    private final Class<?> returnType;
+
+    private static final HashMap<String, StateValue> values = new HashMap<>();
 
     StateValue(final String name, Function<String, Object> parser) {
-        Class<?> tempReturnType;
         this.name = name;
         this.parser = parser;
+    }
 
-        try {
-            tempReturnType = parser.getClass().getDeclaredMethod("apply", String.class).getReturnType();
-        } catch (NoSuchMethodException e) {
-            e.printStackTrace();
-            tempReturnType = Object.class;
+    public static StateValue byName(String name) {
+        return values.get(name);
+    }
+
+    static {
+        for (StateValue value : values()) {
+            values.put(value.name, value);
         }
-
-        returnType = tempReturnType;
     }
 
     public String getName() {
@@ -98,9 +102,5 @@ public enum StateValue{
 
     public Function<String, Object> getParser() {
         return parser;
-    }
-
-    public Class<?> getReturnType() {
-        return returnType;
     }
 }

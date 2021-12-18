@@ -42,8 +42,8 @@ public class WrappedBlockState {
         if (data == null) return;
         for (String s : data) {
             String[] split = s.split("=");
-            StateValue value = StateValue.valueOf(split[0]);
-            this.data.put(value, value.getParser().apply(split[1]));
+            StateValue value = StateValue.byName(split[0]);
+            this.data.put(value, value.getParser().apply(split[1].toUpperCase(Locale.ROOT)));
         }
     }
 
@@ -115,6 +115,15 @@ public class WrappedBlockState {
 
     public void setCandles(int candles) {
         data.put(StateValue.CANDLES, candles);
+        checkIsStillValid();
+    }
+
+    public int getCharges() {
+        return (int) data.get(StateValue.CHARGES);
+    }
+
+    public void setCharges(int charges) {
+        data.put(StateValue.CHARGES, charges);
         checkIsStillValid();
     }
 
@@ -550,6 +559,15 @@ public class WrappedBlockState {
         checkIsStillValid();
     }
 
+    public int getStage() {
+        return (int) data.get(StateValue.STAGE);
+    }
+
+    public void setStage(int stage) {
+        data.put(StateValue.STAGE, stage);
+        checkIsStillValid();
+    }
+
     public South getSouth() {
         return (South) data.get(StateValue.SOUTH);
     }
@@ -692,12 +710,12 @@ public class WrappedBlockState {
     }
 
     @NotNull
-    public WrappedBlockState getByGlobalId(int globalID) {
+    public static WrappedBlockState getByGlobalId(int globalID) {
         return BY_ID.getOrDefault(globalID, AIR).clone();
     }
 
     @NotNull
-    public WrappedBlockState getByString(String string) {
+    public static  WrappedBlockState getByString(String string) {
         return BY_STRING.getOrDefault(string, AIR).clone();
     }
 
@@ -776,23 +794,25 @@ public class WrappedBlockState {
         String line;
         try {
             while ((line = reader.readLine()) != null) {
-                int index = line.indexOf("[");
                 int afterID = line.indexOf(" ");
                 int id = Integer.parseInt(line.substring(0, line.indexOf(" ")));
 
-                String blockString = line.substring(afterID + 1, index == -1 ? line.length() : index);
+                String fullBlockString = line.substring(afterID + 1);
+                int index = fullBlockString.indexOf("[");
+
+                String blockString = fullBlockString.substring(0, index == -1 ? fullBlockString.length() : index);
                 StateType type = StateTypes.getByName(blockString);
 
                 String[] data = null;
                 if (index != -1) {
-                    data = line.substring(index + 1, line.length() - 1).split(",");
+                    data = fullBlockString.substring(index + 1, fullBlockString.length() - 1).split(",");
                 }
 
                 WrappedBlockState state = new WrappedBlockState(type, data);
 
-                BY_STRING.put(blockString, state);
+                BY_STRING.put(fullBlockString, state);
                 BY_ID.put(id, state);
-                INTO_STRING.put(state, blockString);
+                INTO_STRING.put(state, fullBlockString);
                 INTO_ID.put(state, id);
             }
         } catch (IOException e) {
