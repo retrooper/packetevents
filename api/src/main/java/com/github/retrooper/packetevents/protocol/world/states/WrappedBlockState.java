@@ -26,6 +26,7 @@ import java.util.*;
  * Mappings from modern versions are from ViaVersion, who have a similar (but a bit slower) system.
  */
 public class WrappedBlockState {
+    int globalID;
     StateType type;
     EnumMap<StateValue, Object> data = new EnumMap<>(StateValue.class);
 
@@ -639,21 +640,49 @@ public class WrappedBlockState {
         checkIsStillValid();
     }
 
+    /**
+     * This checks if the block state is still valid after modifying it
+     * If it isn't, then this block will be reverted to the previous state using the global id
+     * This is because I believe it's better to revert illegal modification than to simply set to air for doing so
+     * As multi-version makes block data still annoying
+     */
     public void checkIsStillValid() {
-        if(type != StateTypes.AIR && getGlobalId() == 0) {
-            PacketEvents.getAPI().getLogger().warning("An invalid modification was made to a block!");
-            PacketEvents.getAPI().getLogger().warning("This will not crash anything, but the block will become air.");
-            PacketEvents.getAPI().getLogger().warning("You likely are modifying a property that doesn't exist for this version or block type");
-            PacketEvents.getAPI().getLogger().warning("Block: " + type.getName());
-            for (Map.Entry<StateValue, Object> entry : data.entrySet()) {
-                PacketEvents.getAPI().getLogger().warning(entry.getKey() + ": " + entry.getValue());
+        int oldGlobalID = globalID;
+        globalID = getGlobalIDNoCache();
+        if(type != StateTypes.AIR && globalID == 0) {
+            WrappedBlockState blockState = getByGlobalId(oldGlobalID);
+            this.type = blockState.type;
+            this.data = blockState.data;
+            this.globalID = blockState.globalID;
+
+            // Stack tracing is expensive
+            if (PacketEvents.getAPI().getSettings().isDebugEnabled()) {
+                PacketEvents.getAPI().getLogManager().warn("Attempt to modify an unknown property for this game version and block!");;
+                PacketEvents.getAPI().getLogManager().warn("Block: " + type.getName());
+                for (Map.Entry<StateValue, Object> entry : data.entrySet()) {
+                    PacketEvents.getAPI().getLogManager().warn(entry.getKey() + ": " + entry.getValue());
+                }
+                new IllegalStateException("An invalid modification was made to a block!").printStackTrace();
             }
-            new IllegalStateException("An invalid modification was made to a block!").printStackTrace();
         }
     }
 
     // End all block data types
+
+    /**
+     * Global ID
+     * For pre-1.13: 4 bits of block data, 4 bits empty, 8 bits block type
+     * For post-1.13: Global ID
+     * @return
+     */
     public int getGlobalId() {
+        return globalID;
+    }
+
+    /**
+     * Internal method for determining if the block state is still valid
+     */
+    private int getGlobalIDNoCache() {
         return INTO_ID.get(this);
     }
 
@@ -672,17 +701,13 @@ public class WrappedBlockState {
         return BY_STRING.getOrDefault(string, AIR).clone();
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        WrappedBlockState that = (WrappedBlockState) o;
-        return this.type == that.type && this.data.equals(that.data);
+    public boolean equals(WrappedBlockState that) {
+        return this.globalID == that.globalID;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(type, data);
+        return globalID;
     }
 
     // TODO: 1.16.0/1.16.1 and 1.13.0/1.13.1 support
