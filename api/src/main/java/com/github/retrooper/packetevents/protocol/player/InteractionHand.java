@@ -19,23 +19,20 @@
 package com.github.retrooper.packetevents.protocol.player;
 
 /**
- * The {@code Hand} enum represents what hand was used in an interaction.
+ * The {@code InteractionHand} enum represents what hand was used in an interaction.
  *
  * @author retrooper
- * @see <a href="https://wiki.vg/Protocol#Open_Book">https://wiki.vg/Protocol#Open_Book</a>
- * @since 1.8
+ * @since 2.0
  */
 public enum InteractionHand {
     MAIN_HAND,
     OFF_HAND;
 
-    public int getLegacyId() {
+    public int getId() {
         return this == MAIN_HAND ? 0 : 1;
     }
 
-    public static final InteractionHand[] VALUES = values();
-
-    public static InteractionHand getByLegacyId(int handValue) {
+    public static InteractionHand getById(int handValue) {
         return handValue == 0 ? MAIN_HAND : OFF_HAND;
     }
 }

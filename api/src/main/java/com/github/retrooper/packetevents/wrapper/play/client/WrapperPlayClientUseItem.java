@@ -52,7 +52,7 @@ public class WrapperPlayClientUseItem extends PacketWrapper<WrapperPlayClientUse
     @Override
     public void readData() {
         if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_14)) {
-            interactionHand = InteractionHand.getByLegacyId(readVarInt());
+            interactionHand = InteractionHand.getById(readVarInt());
             blockPosition = readBlockPosition();
             face = BlockFace.getBlockFaceByValue(readVarInt());
             cursorPosition = new Vector3f(readFloat(), readFloat(), readFloat());
@@ -60,7 +60,7 @@ public class WrapperPlayClientUseItem extends PacketWrapper<WrapperPlayClientUse
         } else {
             blockPosition = readBlockPosition();
             face = BlockFace.getBlockFaceByValue(readVarInt());
-            interactionHand = InteractionHand.getByLegacyId(readVarInt());
+            interactionHand = InteractionHand.getById(readVarInt());
             if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_11)) {
                 cursorPosition = new Vector3f(readFloat(), readFloat(), readFloat());
             } else {
@@ -82,7 +82,7 @@ public class WrapperPlayClientUseItem extends PacketWrapper<WrapperPlayClientUse
     @Override
     public void writeData() {
         if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_14)) {
-            writeVarInt(interactionHand.getLegacyId());
+            writeVarInt(interactionHand.getId());
             writeBlockPosition(blockPosition);
             writeVarInt(face.getFaceValue());
             writeFloat(cursorPosition.x);
@@ -93,7 +93,7 @@ public class WrapperPlayClientUseItem extends PacketWrapper<WrapperPlayClientUse
         } else {
             writeBlockPosition(blockPosition);
             writeVarInt(face.getFaceValue());
-            writeVarInt(interactionHand.getLegacyId());
+            writeVarInt(interactionHand.getId());
             if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_11)) {
                 writeFloat(cursorPosition.x);
                 writeFloat(cursorPosition.y);

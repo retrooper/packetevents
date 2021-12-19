@@ -25,7 +25,9 @@ import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.netty.buffer.ByteBufAbstract;
 import com.github.retrooper.packetevents.protocol.chat.component.BaseComponent;
 import com.github.retrooper.packetevents.protocol.chat.component.serializer.ComponentSerializer;
-import com.github.retrooper.packetevents.protocol.datawatcher.WatchableObject;
+import com.github.retrooper.packetevents.protocol.entity.data.EntityData;
+import com.github.retrooper.packetevents.protocol.entity.data.EntityDataType;
+import com.github.retrooper.packetevents.protocol.entity.data.EntityDataTypes;
 import com.github.retrooper.packetevents.protocol.item.ItemStack;
 import com.github.retrooper.packetevents.protocol.item.type.ItemType;
 import com.github.retrooper.packetevents.protocol.item.type.ItemTypes;
@@ -36,7 +38,6 @@ import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 import com.github.retrooper.packetevents.protocol.player.GameMode;
 import com.github.retrooper.packetevents.protocol.resources.ResourceLocation;
 import com.github.retrooper.packetevents.util.StringUtil;
-import com.github.retrooper.packetevents.util.Vector3f;
 import com.github.retrooper.packetevents.util.Vector3i;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -542,83 +543,44 @@ public class PacketWrapper<T extends PacketWrapper> {
         writeByte(id);
     }
 
-    private List<WatchableObject> readWatchableObjectsLegacy() {
-        List<WatchableObject> list = new ArrayList<>();
-        //1.7.10 -> 1.8.8 code
-        for (byte b0 = readByte(); b0 != 127; b0 = readByte()) {
-            int i = (b0 & 224) >> 5;
-            int j = b0 & 31;
-            WatchableObject watchableObject = null;
-            switch (i) {
-                case 0:
-                    watchableObject = new WatchableObject(j, WatchableObject.Type.BYTE, readByte());
-                    break;
-                case 1:
-                    watchableObject = new WatchableObject(j, WatchableObject.Type.SHORT, readShort());
-                    break;
-                case 2:
-                    watchableObject = new WatchableObject(j, WatchableObject.Type.INTEGER, readInt());
-                    break;
-                case 3:
-                    watchableObject = new WatchableObject(j, WatchableObject.Type.FLOAT, readFloat());
-                    break;
-                case 4:
-                    watchableObject = new WatchableObject(j, WatchableObject.Type.STRING, readString());
-                    break;
-                case 5:
-                    watchableObject = new WatchableObject(j, WatchableObject.Type.ITEM_STACK, readItemStack());
-                    break;
-                case 6: {
-                    int x = readInt();
-                    int y = readInt();
-                    int z = readInt();
-                    watchableObject = new WatchableObject(j, WatchableObject.Type.POSITION, new Vector3i(x, y, z));
-                    break;
-                }
-                case 7: {
-                    float x = readFloat();
-                    float y = readFloat();
-                    float z = readFloat();
-                    watchableObject = new WatchableObject(j, WatchableObject.Type.ROTATION, new Vector3f(x, y, z));
-                    break;
-                }
+    public List<EntityData> readEntityMetadata() {
+        List<EntityData> list = new ArrayList<>();
+        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_9)) {
+            short index;
+            while ((index = readUnsignedByte()) != 255) {
+                short typeID = readUnsignedByte();
+                EntityDataType<?> type = EntityDataTypes.getById(typeID);
+                Object value = type.getDataDeserializer().apply(this);
+                list.add(new EntityData(index, type, value));
             }
-            list.add(watchableObject);
+        } else {
+            for (byte data = readByte(); data != 127; data = readByte()) {
+                int typeID = (data & 224) >> 5;
+                int index = data & 31;
+                EntityDataType<?> type = EntityDataTypes.getById(typeID);
+                Object value = type.getDataDeserializer().apply(this);
+                EntityData entityData = new EntityData(index, type, value);
+                list.add(entityData);
+            }
         }
         return list;
     }
 
-    private void writeWatchableObjectsLegacy(List<WatchableObject> list) {
-        //TODO
-    }
-
-
-    public List<WatchableObject> readWatchableObjects() {
+    public void writeEntityMetadata(List<EntityData> list) {
         if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_9)) {
-            List<WatchableObject> list = new ArrayList<>();
-            short index;
-            while ((index = readUnsignedByte()) != 255) {
-
-                short typeID = readUnsignedByte();
-                WatchableObject.Type type = WatchableObject.Type.values()[typeID];
-                Object value = type.getReadDataConsumer().apply(this);
-                list.add(new WatchableObject(index, type, value));
-            }
-            return list;
-        } else {
-            return readWatchableObjectsLegacy();
-        }
-    }
-
-    public void writeWatchableObjects(List<WatchableObject> list) {
-        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_9)) {
-            for (WatchableObject watchableObject : list) {
-                writeByte(watchableObject.getIndex());
-                writeByte(watchableObject.getType().ordinal());
-                watchableObject.getType().getWriteDataConsumer().accept(this, watchableObject.getValue());
+            for (EntityData entityData : list) {
+                writeByte(entityData.getIndex());
+                writeByte(entityData.getType().getId());
+                entityData.getType().getDataSerializer().accept(this, entityData.getValue());
             }
         } else {
-            writeWatchableObjectsLegacy(list);
+            for (EntityData entityData : list) {
+                int typeID = entityData.getType().getId();
+                int index = entityData.getIndex();
+                int data = (typeID << 5 | index & 31) & 255;
+                writeByte(data);
+                entityData.getType().getDataSerializer().accept(this, entityData.getValue());
+            }
         }
     }
 }

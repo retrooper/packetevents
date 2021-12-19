@@ -76,7 +76,7 @@ public class WrapperPlayClientInteractEntity extends PacketWrapper<WrapperPlayCl
 
             if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_9) && (interactAction == InteractAction.INTERACT || interactAction == InteractAction.INTERACT_AT)) {
                 int handID = readVarInt();
-                this.interactionHand = InteractionHand.getByLegacyId(handID);
+                this.interactionHand = InteractionHand.getById(handID);
             } else {
                 this.interactionHand = InteractionHand.MAIN_HAND;
             }
@@ -114,7 +114,7 @@ public class WrapperPlayClientInteractEntity extends PacketWrapper<WrapperPlayCl
             }
 
             if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_9) && (interactAction == InteractAction.INTERACT || interactAction == InteractAction.INTERACT_AT)) {
-                writeVarInt(interactionHand.getLegacyId());
+                writeVarInt(interactionHand.getId());
             }
 
             if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_16)) {

@@ -20,7 +20,7 @@ package com.github.retrooper.packetevents.wrapper.play.server;
 
 import com.github.retrooper.packetevents.event.impl.PacketSendEvent;
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
-import com.github.retrooper.packetevents.protocol.datawatcher.WatchableObject;
+import com.github.retrooper.packetevents.protocol.entity.data.EntityData;
 import com.github.retrooper.packetevents.protocol.entity.type.EntityType;
 import com.github.retrooper.packetevents.protocol.entity.type.EntityTypes;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
@@ -44,13 +44,13 @@ public class WrapperPlayServerSpawnLivingEntity extends PacketWrapper<WrapperPla
     private float pitch;
     private float headPitch;
     private Vector3d velocity;
-    private List<WatchableObject> watchableObjects;
+    private List<EntityData> entityMetadata;
 
     public WrapperPlayServerSpawnLivingEntity(PacketSendEvent event) {
         super(event);
     }
 
-    public WrapperPlayServerSpawnLivingEntity(int entityID, UUID entityUUID, EntityType entityType, Vector3d position, float yaw, float pitch, float headPitch, Vector3d velocity, List<WatchableObject> watchableObjects) {
+    public WrapperPlayServerSpawnLivingEntity(int entityID, UUID entityUUID, EntityType entityType, Vector3d position, float yaw, float pitch, float headPitch, Vector3d velocity, List<EntityData> entityMetadata) {
         super(PacketType.Play.Server.SPAWN_LIVING_ENTITY);
         this.entityID = entityID;
         this.entityUUID = entityUUID;
@@ -60,7 +60,7 @@ public class WrapperPlayServerSpawnLivingEntity extends PacketWrapper<WrapperPla
         this.pitch = pitch;
         this.headPitch = headPitch;
         this.velocity = velocity;
-        this.watchableObjects = watchableObjects;
+        this.entityMetadata = entityMetadata;
     }
 
     @Override
@@ -90,10 +90,10 @@ public class WrapperPlayServerSpawnLivingEntity extends PacketWrapper<WrapperPla
         double velZ = readShort() / VELOCITY_FACTOR;
         this.velocity = new Vector3d(velX, velY, velZ);
         if (serverVersion.isOlderThan(ServerVersion.V_1_15)) {
-            this.watchableObjects = readWatchableObjects();
+            this.entityMetadata = readEntityMetadata();
         }
         else {
-            this.watchableObjects = new ArrayList<>();
+            this.entityMetadata = new ArrayList<>();
         }
     }
 
@@ -107,7 +107,7 @@ public class WrapperPlayServerSpawnLivingEntity extends PacketWrapper<WrapperPla
         this.pitch = wrapper.pitch;
         this.headPitch = wrapper.headPitch;
         this.velocity = wrapper.velocity;
-        this.watchableObjects = wrapper.watchableObjects;
+        this.entityMetadata = wrapper.entityMetadata;
     }
 
 
@@ -138,7 +138,7 @@ public class WrapperPlayServerSpawnLivingEntity extends PacketWrapper<WrapperPla
         writeShort((int) (velocity.y * VELOCITY_FACTOR));
         writeShort((int) (velocity.z * VELOCITY_FACTOR));
         if (serverVersion.isOlderThan(ServerVersion.V_1_15)) {
-            writeWatchableObjects(watchableObjects);
+            writeEntityMetadata(entityMetadata);
         }
     }
 
@@ -206,11 +206,11 @@ public class WrapperPlayServerSpawnLivingEntity extends PacketWrapper<WrapperPla
         this.velocity = velocity;
     }
 
-    public List<WatchableObject> getWatchableObjects() {
-        return watchableObjects;
+    public List<EntityData> getEntityMetadata() {
+        return entityMetadata;
     }
 
-    public void setWatchableObjects(List<WatchableObject> watchableObjects) {
-        this.watchableObjects = watchableObjects;
+    public void setEntityMetadata(List<EntityData> entityMetadata) {
+        this.entityMetadata = entityMetadata;
     }
 }

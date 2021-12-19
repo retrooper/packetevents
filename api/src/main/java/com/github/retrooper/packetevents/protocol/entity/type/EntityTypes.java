@@ -34,7 +34,6 @@ public class EntityTypes {
     private static final Map<String, EntityType> ENTITY_TYPE_MAP = new HashMap<>();
     private static final Map<Integer, EntityType> ENTITY_TYPE_ID_MAP = new HashMap<>();
     private static JsonObject MAPPINGS;
-    private static ServerVersion mappingsVersion;
 
     //TODO We have 1.14->1.18 mappings support so far
     @NotNull
@@ -62,7 +61,7 @@ public class EntityTypes {
 
     public static EntityType define(String key, @Nullable EntityType parent) {
         if (MAPPINGS == null) {
-            MAPPINGS = MappingHelper.getJSONObject("entity_type_mappings");
+            MAPPINGS = MappingHelper.getJSONObject("entity/entity_type_mappings");
         }
 
         ResourceLocation identifier = ResourceLocation.minecraft(key);

@@ -19,45 +19,42 @@
 package com.github.retrooper.packetevents.wrapper.play.server;
 
 import com.github.retrooper.packetevents.event.impl.PacketSendEvent;
-import com.github.retrooper.packetevents.manager.server.ServerVersion;
-import com.github.retrooper.packetevents.protocol.datawatcher.WatchableObject;
+import com.github.retrooper.packetevents.protocol.entity.data.EntityData;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
-import com.github.retrooper.packetevents.util.Vector3f;
-import com.github.retrooper.packetevents.util.Vector3i;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 
-import java.util.ArrayList;
 import java.util.List;
 
+//TODO Test on 1.18 and look into
 public class WrapperPlayServerEntityMetadata extends PacketWrapper<WrapperPlayServerEntityMetadata> {
     private int entityID;
-    private List<WatchableObject> watchableObjects;
+    private List<EntityData> entityMetadata;
 
     public WrapperPlayServerEntityMetadata(PacketSendEvent event) {
         super(event);
     }
 
-    public WrapperPlayServerEntityMetadata(int entityID, List<WatchableObject> watchableObjects) {
+    public WrapperPlayServerEntityMetadata(int entityID, List<EntityData> entityMetadata) {
         super(PacketType.Play.Server.ENTITY_METADATA);
         this.entityID = entityID;
-        this.watchableObjects = watchableObjects;
+        this.entityMetadata = entityMetadata;
     }
     @Override
     public void readData() {
         entityID = readInt();
-        watchableObjects = readWatchableObjects();
+        entityMetadata = readEntityMetadata();
     }
 
     @Override
     public void readData(WrapperPlayServerEntityMetadata wrapper) {
         entityID = wrapper.entityID;
-        watchableObjects = wrapper.watchableObjects;
+        entityMetadata = wrapper.entityMetadata;
     }
 
     @Override
     public void writeData() {
         writeInt(entityID);
-        writeWatchableObjects(watchableObjects);
+        writeEntityMetadata(entityMetadata);
     }
 
     public int getEntityId() {
@@ -68,11 +65,11 @@ public class WrapperPlayServerEntityMetadata extends PacketWrapper<WrapperPlaySe
         this.entityID = entityID;
     }
 
-    public List<WatchableObject> getWatchableObjects() {
-        return watchableObjects;
+    public List<EntityData> getEntityMetadata() {
+        return entityMetadata;
     }
 
-    public void setWatchableObjects(List<WatchableObject> watchableObjects) {
-        this.watchableObjects = watchableObjects;
+    public void setEntityMetadata(List<EntityData> entityMetadata) {
+        this.entityMetadata = entityMetadata;
     }
 }

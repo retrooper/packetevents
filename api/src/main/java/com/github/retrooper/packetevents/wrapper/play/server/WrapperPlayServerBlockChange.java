@@ -54,8 +54,8 @@ public class WrapperPlayServerBlockChange extends PacketWrapper<WrapperPlayServe
 
     @Override
     public void readData(WrapperPlayServerBlockChange wrapper) {
-        wrapper.blockPosition = readBlockPosition();
-        wrapper.blockID = readVarInt();
+        blockPosition = wrapper.blockPosition;
+        blockID = wrapper.blockID;
     }
 
     @Override

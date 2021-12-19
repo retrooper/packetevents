@@ -16,24 +16,40 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.github.retrooper.packetevents.protocol.entity.pose;
+package com.github.retrooper.packetevents.protocol.entity.data;
 
-public enum EntityPose {
-    STANDING,
-    FALL_FLYING,
-    SLEEPING,
-    SWIMMING,
-    SPIN_ATTACK,
-    CROUCHING,
-    DYING;
+public class EntityData {
+    private int index;
+    private EntityDataType<?> type;
+    private Object value;
 
-   public static final EntityPose[] VALUES = values();
+    public EntityData(int index, EntityDataType<?> type, Object value) {
+        this.index = index;
+        this.type = type;
+        this.value = value;
+    }
 
-   public int getId() {
-       return ordinal();
-   }
+    public int getIndex() {
+        return index;
+    }
 
-   public static EntityPose getById(int id) {
-       return VALUES[id];
-   }
+    public void setIndex(int index) {
+        this.index = index;
+    }
+
+    public EntityDataType<?> getType() {
+        return type;
+    }
+
+    public void setType(EntityDataType<?> type) {
+        this.type = type;
+    }
+
+    public Object getValue() {
+        return value;
+    }
+
+    public void setValue(Object value) {
+        this.value = value;
+    }
 }

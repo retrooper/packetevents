@@ -81,7 +81,7 @@ public class ItemTypes {
 
     public static ItemType define(int maxAmount, String key, ItemType craftRemainder, int maxDurability, ItemAttribute... attributesArr) {
         if (MAPPINGS == null) {
-            MAPPINGS = MappingHelper.getJSONObject("item_mappings");
+            MAPPINGS = MappingHelper.getJSONObject("item/item_type_mappings");
         }
         Set<ItemAttribute> attributes = new HashSet<>(Arrays.asList(attributesArr));
 
