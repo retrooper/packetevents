@@ -66,7 +66,7 @@ public class WrapperPlayServerTags extends PacketWrapper<WrapperPlayServerTags> 
         }
     }
 
-    public HashMap<String, List<Tag>> getTags() {
+    public Map<String, List<Tag>> getTags() {
         return tags;
     }
 
