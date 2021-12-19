@@ -69,7 +69,7 @@ public class WatchableObject {
     public enum Type {
         BYTE(PacketWrapper::readByte,
                 (packetWrapper, o) -> {
-                    packetWrapper.writeByte((int) o);
+                    packetWrapper.writeByte((byte) o);
                 }
         ),
         INTEGER(PacketWrapper::readVarInt,
@@ -125,7 +125,7 @@ public class WatchableObject {
                 }),
         //blockposition
         POSITION(packetWrapper -> {
-            return new Vector3i(packetWrapper.readInt(), packetWrapper.readInt(), packetWrapper.readInt());
+            return packetWrapper.readBlockPosition();
         },
                 (packetWrapper, o) -> {
                     Vector3i vec = (Vector3i) o;
@@ -133,7 +133,7 @@ public class WatchableObject {
                 }),
         OPTIONAL_POSITION(packetWrapper -> {
             if (packetWrapper.readBoolean()) {
-                return Optional.of(new Vector3i(packetWrapper.readInt(), packetWrapper.readInt(), packetWrapper.readInt()));
+                return Optional.of(packetWrapper.readBlockPosition());
             } else {
                 return Optional.empty();
             }
@@ -148,7 +148,7 @@ public class WatchableObject {
                     }
                 }),
         //Var int
-        DIRECTION(packetWrapper -> {
+        BLOCK_FACE(packetWrapper -> {
             return BlockFace.getBlockFaceByValue(packetWrapper.readVarInt());
         },
                 (packetWrapper, o) -> {
