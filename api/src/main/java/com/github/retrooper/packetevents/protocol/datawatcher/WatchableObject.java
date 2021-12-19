@@ -69,11 +69,33 @@ public class WatchableObject {
     public enum Type {
         BYTE(PacketWrapper::readByte,
                 (packetWrapper, o) -> {
-                    packetWrapper.writeByte((byte) o);
+                    byte output = 0;
+                    if (o instanceof Long) {
+                        output =
+                                ((Long) o).byteValue();
+                    } else if (o instanceof Integer) {
+                        output = ((Integer) o).byteValue();
+                    } else if (o instanceof Short) {
+                        output = ((Short) o).byteValue();
+                    } else if (o instanceof Byte) {
+                        output = (byte) o;
+                    }
+                    packetWrapper.writeByte(output);
                 }
         ),
         INTEGER(PacketWrapper::readVarInt,
                 (packetWrapper, o) -> {
+                    int output = 0;
+                    if (o instanceof Long) {
+                        output =
+                                ((Long) o).intValue();
+                    } else if (o instanceof Integer) {
+                        output = ((Integer) o);
+                    } else if (o instanceof Short) {
+                        output = ((Short) o).intValue();
+                    } else if (o instanceof Byte) {
+                        output = ((Byte) o).intValue();
+                    }
                     packetWrapper.writeVarInt((int) o);
                 }),
         FLOAT(PacketWrapper::readFloat,
