@@ -170,15 +170,23 @@ public class EntityDataTypes {
     }
 
     private static <T> BiConsumer<PacketWrapper<?>, T> writeIntSerializer() {
-        if (PacketEvents.getAPI().getServerManager().getVersion().isNewerThanOrEquals(ServerVersion.V_1_9)) {
-            return (PacketWrapper<?> wrapper, T value) -> {
-                wrapper.writeVarInt((int) value);
-            };
-        } else {
-            return (PacketWrapper<?> wrapper, T value) -> {
-                wrapper.writeInt((int) value);
-            };
-        }
+        return (PacketWrapper<?> wrapper, T value) -> {
+            int output = 0;
+            if (value instanceof Byte) {
+                output = ((Byte) value).intValue();
+            } else if (value instanceof Short) {
+                output = ((Short) value).intValue();
+            } else if (value instanceof Integer) {
+                output = (Integer) value;
+            } else if (value instanceof Long) {
+                output = ((Long) value).intValue();
+            }
+            if (PacketEvents.getAPI().getServerManager().getVersion().isNewerThanOrEquals(ServerVersion.V_1_9)) {
+                wrapper.writeVarInt(output);
+            } else {
+                wrapper.writeInt(output);
+            }
+        };
     }
 
     private static <T> Function<PacketWrapper<?>, T> readOptionalComponentDeserializer() {
