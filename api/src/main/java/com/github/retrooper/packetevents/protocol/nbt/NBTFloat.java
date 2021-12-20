@@ -81,4 +81,8 @@ public class NBTFloat extends NBTNumber {
         return Float.hashCode(value);
     }
 
+    @Override
+    public NBTFloat copy() {
+        return this;
+    }
 }

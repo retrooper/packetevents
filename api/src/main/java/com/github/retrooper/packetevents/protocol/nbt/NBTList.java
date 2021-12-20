@@ -114,4 +114,12 @@ public class NBTList<T extends NBT> extends NBT {
         return Objects.hash(type, tags);
     }
 
+    @Override
+    public NBTList<T> copy() {
+        List<T> newTags = new ArrayList<>();
+        for (T tag : this.tags) {
+            newTags.add((T) tag.copy());
+        }
+        return new NBTList<>(type, newTags);
+    }
 }

@@ -192,6 +192,21 @@ public class NBTCompound extends NBT {
         }
     }
 
+    public NBTCompound copy() {
+        NBTCompound clone = new NBTCompound();
+        for (Map.Entry<String, NBT> entry : tags.entrySet()) {
+            clone.setTag(entry.getKey(), entry.getValue().copy());
+        }
+        return clone;
+    }
+
+    public boolean getBoolean(String string) {
+        NBTByte nbtByte = this.getTagOfTypeOrNull(string, NBTByte.class);
+        // Empty byte tags are considered 0
+        byte byteValue = nbtByte == null ? 0 : nbtByte.getAsByte();
+        return byteValue != 0;
+    }
+
     @Override
     public boolean equals(Object other) {
         if (other instanceof NBTCompound) {

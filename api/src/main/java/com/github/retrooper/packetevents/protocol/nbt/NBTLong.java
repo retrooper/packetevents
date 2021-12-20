@@ -81,4 +81,8 @@ public class NBTLong extends NBTNumber {
         return Long.hashCode(value);
     }
 
+    @Override
+    public NBTLong copy() {
+        return this;
+    }
 }

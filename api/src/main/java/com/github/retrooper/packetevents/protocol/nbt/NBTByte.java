@@ -85,4 +85,8 @@ public class NBTByte extends NBTNumber {
         return value == other.value;
     }
 
+    @Override
+    public NBTByte copy() {
+        return this;
+    }
 }

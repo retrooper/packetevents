@@ -80,4 +80,8 @@ public class NBTShort extends NBTNumber {
         return Short.hashCode(value);
     }
 
+    @Override
+    public NBTShort copy() {
+        return this;
+    }
 }

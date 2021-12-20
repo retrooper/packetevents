@@ -245,12 +245,12 @@ public class PacketWrapper<T extends PacketWrapper> {
         boolean v1_13_2 = serverVersion.isNewerThanOrEquals(ServerVersion.V_1_13_2);
         if (v1_13_2) {
             if (!readBoolean()) {
-                return ItemStack.NULL;
+                return ItemStack.EMPTY;
             }
         }
         int typeID = v1_13_2 ? readVarInt() : readShort();
         if (typeID < 0) {
-            return ItemStack.NULL;
+            return ItemStack.EMPTY;
         }
         ItemType type = ItemTypes.getById(typeID);
         int amount = readByte();
@@ -266,16 +266,16 @@ public class PacketWrapper<T extends PacketWrapper> {
 
     public void writeItemStack(ItemStack itemStack) {
         if (itemStack == null) {
-            itemStack = ItemStack.NULL;
+            itemStack = ItemStack.EMPTY;
         }
         boolean v1_13_2 = serverVersion.isNewerThanOrEquals(ServerVersion.V_1_13_2);
         if (v1_13_2) {
-            if (ItemStack.NULL.equals(itemStack)) {
+            if (ItemStack.EMPTY.equals(itemStack)) {
                 writeBoolean(false);
             } else {
                 writeBoolean(true);
                 int typeID;
-                if (itemStack.getType() == null || ItemStack.NULL.equals(itemStack)) {
+                if (itemStack.getType() == null || ItemStack.EMPTY.equals(itemStack)) {
                     typeID = -1;
                 } else {
                     typeID = itemStack.getType().getId();

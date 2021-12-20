@@ -57,4 +57,9 @@ public class NBTByteArray extends NBT {
         return Arrays.hashCode(array);
     }
 
+    public NBTByteArray copy() {
+        byte[] abyte = new byte[this.array.length];
+        System.arraycopy(this.array, 0, abyte, 0, this.array.length);
+        return new NBTByteArray(abyte);
+    }
 }

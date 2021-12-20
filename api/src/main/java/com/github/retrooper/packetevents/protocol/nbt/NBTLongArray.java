@@ -57,4 +57,10 @@ public class NBTLongArray extends NBT {
         return Arrays.hashCode(array);
     }
 
+    @Override
+    public NBTLongArray copy() {
+        long[] along = new long[this.array.length];
+        System.arraycopy(this.array, 0, along, 0, this.array.length);
+        return new NBTLongArray(along);
+    }
 }

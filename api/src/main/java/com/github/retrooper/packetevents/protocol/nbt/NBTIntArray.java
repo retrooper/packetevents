@@ -57,4 +57,10 @@ public class NBTIntArray extends NBT {
         return Arrays.hashCode(array);
     }
 
+    @Override
+    public NBTIntArray copy() {
+        int[] aint = new int[this.array.length];
+        System.arraycopy(this.array, 0, aint, 0, this.array.length);
+        return new NBTIntArray(aint);
+    }
 }

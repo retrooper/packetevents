@@ -18,28 +18,36 @@
 
 package com.github.retrooper.packetevents.protocol.item;
 
+import com.github.retrooper.packetevents.protocol.enchantment.Enchantment;
 import com.github.retrooper.packetevents.protocol.item.type.ItemType;
 import com.github.retrooper.packetevents.protocol.item.type.ItemTypes;
 import com.github.retrooper.packetevents.protocol.nbt.NBTCompound;
+import com.github.retrooper.packetevents.protocol.nbt.NBTInt;
+import com.github.retrooper.packetevents.protocol.nbt.NBTShort;
+import com.github.retrooper.packetevents.protocol.nbt.NBTString;
 
 public class ItemStack {
     //TODO Rethink my decision of making NULL = AIR
-    public static final ItemStack NULL = new ItemStack(ItemTypes.AIR, -1, new NBTCompound(), -1);
-    private ItemType type;
+    public static final ItemStack EMPTY = new ItemStack(ItemTypes.AIR, -1, new NBTCompound(), -1);
+    private final ItemType type;
     private int amount;
     private NBTCompound nbt;
     private int legacyData = -1;
+
+    private boolean cachedIsEmpty = false;
 
     private ItemStack(ItemType type, int amount) {
         this.type = type;
         this.amount = amount;
         this.nbt = new NBTCompound();
+        updateCachedEmptyStatus();
     }
 
     private ItemStack(ItemType type, int amount, NBTCompound nbt) {
         this.type = type;
         this.amount = amount;
         this.nbt = nbt;
+        updateCachedEmptyStatus();
     }
 
     private ItemStack(ItemType type, int amount, NBTCompound nbt, int legacyData) {
@@ -47,22 +55,87 @@ public class ItemStack {
         this.amount = amount;
         this.nbt = nbt;
         this.legacyData = legacyData;
+        updateCachedEmptyStatus();
+    }
+
+    public int getMaxStackSize() {
+        return getType().getMaxAmount();
+    }
+
+    public boolean isStackable() {
+        return this.getMaxStackSize() > 1 && (!this.isDamageableItem() || !this.isDamaged());
+    }
+
+    public boolean isDamageableItem() {
+        if (!this.cachedIsEmpty && this.getType().getMaxDurability() > 0) {
+            NBTCompound compoundtag = this.getNBT();
+            return compoundtag == null || !compoundtag.getBoolean("Unbreakable");
+        } else {
+            return false;
+        }
+    }
+
+    public boolean isDamaged() {
+        return this.isDamageableItem() && this.getDamageValue() > 0;
+    }
+
+    public int getDamageValue() {
+        if (nbt == null) return 0;
+        NBTInt damage = this.nbt.getTagOfTypeOrNull("Damage", NBTInt.class);
+        return damage == null ? 0 : damage.getAsInt();
+    }
+
+    public void setDamageValue(int damage) {
+        this.getOrCreateTag().setTag("Damage", new NBTInt(Math.max(0, damage)));
+    }
+
+    public int getMaxDamage() {
+        return this.getType().getMaxDurability();
+    }
+
+    public NBTCompound getOrCreateTag() {
+        if (this.nbt == null) {
+            this.nbt = new NBTCompound();
+        }
+
+        return this.nbt;
+    }
+
+    private void updateCachedEmptyStatus() {
+        cachedIsEmpty = isEmpty();
     }
 
     public ItemType getType() {
-        return type;
-    }
-
-    public void setType(ItemType type) {
-        this.type = type;
+        return cachedIsEmpty ? ItemTypes.AIR : type;
     }
 
     public int getAmount() {
-        return amount;
+        return cachedIsEmpty ? 0 : amount;
+    }
+
+    public void shrink(int amount) {
+        this.setAmount(this.getAmount() - amount);
+    }
+
+    public void grow(int amount) {
+        this.setAmount(this.getAmount() + amount);
     }
 
     public void setAmount(int amount) {
         this.amount = amount;
+        updateCachedEmptyStatus();
+    }
+
+    public ItemStack split(int toTake) {
+        int i = Math.min(toTake, getAmount());
+        ItemStack itemstack = this.copy();
+        itemstack.setAmount(i);
+        this.shrink(i);
+        return itemstack;
+    }
+
+    public ItemStack copy() {
+        return cachedIsEmpty ? EMPTY : new ItemStack(type, amount, nbt == null ? new NBTCompound() : nbt.copy(), legacyData);
     }
 
     public NBTCompound getNBT() {
@@ -81,13 +154,47 @@ public class ItemStack {
         this.legacyData = legacyData;
     }
 
+    public boolean isEnchantable() {
+        if (getType() == ItemTypes.BOOK) return getAmount() == 1;
+        if (getType() == ItemTypes.ENCHANTED_BOOK) return false;
+        return getMaxStackSize() == 1 && canBeDepleted() && !isEnchanted();
+    }
+
+    public boolean isEnchanted() {
+        if (this.nbt != null && this.nbt.getCompoundListTagOrNull("Enchantments") != null) {
+            return !this.nbt.getCompoundListTagOrNull("Enchantments").isEmpty();
+        } else {
+            return false;
+        }
+    }
+
+    // TODO: Probably broken on some outdated version
+    public int getEnchantmentLevel(Enchantment enchantment) {
+        if (isEmpty()) return 0;
+
+        if (nbt != null && nbt.getCompoundListTagOrNull("Enchantments") != null) {
+            for (NBTCompound base : nbt.getCompoundListTagOrNull("Enchantments").getTags()) {
+                NBTString string = base.getTagOfTypeOrNull("id", NBTString.class);
+                if (string != null && string.getValue().equals(enchantment.getIdentifier().toString())) {
+                    return base.getTagOfTypeOrNull("lvl", NBTShort.class).getAsInt();
+                }
+            }
+        }
+
+        return 0;
+    }
+
+    public boolean canBeDepleted() {
+        return this.getType().getMaxDurability() > 0;
+    }
+
     @Override
     public boolean equals(Object obj) {
         if (this == obj)
             return true;
         if (obj instanceof ItemStack) {
             ItemStack itemStack = (ItemStack) obj;
-            return type.equals(itemStack.type)
+            return getType().equals(itemStack.getType())
                     && amount == itemStack.amount
                     && nbt.equals(itemStack.nbt)
                     && legacyData == itemStack.legacyData;
@@ -97,19 +204,19 @@ public class ItemStack {
 
     @Override
     public String toString() {
-        if (NULL.equals(this)) {
+        if (cachedIsEmpty) {
             return "ItemStack[null]";
         }
         else {
             String identifier = type == null ? "null" : type.getIdentifier().toString();
-            int maxAmount = type == null ? -1 : type.getMaxAmount();
+            int maxAmount = getType().getMaxAmount();
             return "ItemStack[type=" + identifier + ", amount=" + amount + "/" + maxAmount
                     + ", nbt tag names: " + nbt.getTagNames() + ", legacyData=" + legacyData + "]";
         }
     }
 
     public boolean isEmpty() {
-        return amount == 0;
+        return type == null || type == ItemTypes.AIR || amount <= 0;
     }
 
     public static Builder builder() {

@@ -81,4 +81,8 @@ public class NBTDouble extends NBTNumber {
         return Double.doubleToLongBits(value) == Double.doubleToLongBits(other.value);
     }
 
+    @Override
+    public NBTDouble copy() {
+        return this;
+    }
 }

@@ -33,4 +33,5 @@ public abstract class NBT {
         return "nbt";
     }
 
+    public abstract NBT copy();
 }
