@@ -20,6 +20,8 @@ package com.github.retrooper.packetevents.protocol.item.type;
 
 import com.github.retrooper.packetevents.protocol.mapper.MappedEntity;
 
+import java.util.Set;
+
 public interface ItemType extends MappedEntity {
     int getMaxAmount();
 
@@ -28,4 +30,6 @@ public interface ItemType extends MappedEntity {
     boolean isMusicDisc();
 
     ItemType getCraftRemainder();
+
+    Set<ItemTypes.ItemAttribute> getAttributes();
 }

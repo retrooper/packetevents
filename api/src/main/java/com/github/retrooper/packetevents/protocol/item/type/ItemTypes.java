@@ -31,14 +31,16 @@ import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLConnection;
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
 
 public class ItemTypes {
     private static final Map<String, ItemType> ITEM_TYPE_MAP = new HashMap<>();
     private static final Map<Integer, ItemType> ITEM_TYPE_ID_MAP = new HashMap<>();
     private static JsonObject MAPPINGS;
 
-    private enum ItemAttribute {
+    public enum ItemAttribute {
         //TODO Add more
         MUSIC_DISC, EDIBLE, FIRE_RESISTANT, WOOD_TIER, STONE_TIER, IRON_TIER, DIAMOND_TIER, GOLD_TIER, NETHERITE_TIER, FUEL;
     }
@@ -83,7 +85,9 @@ public class ItemTypes {
         if (MAPPINGS == null) {
             MAPPINGS = MappingHelper.getJSONObject("item/item_type_mappings");
         }
-        Set<ItemAttribute> attributes = new HashSet<>(Arrays.asList(attributesArr));
+
+        // Creates an immutable set
+        Set<ItemAttribute> attributes = Set.of(attributesArr);
 
         ResourceLocation identifier = ResourceLocation.minecraft(key);
 
@@ -127,6 +131,11 @@ public class ItemTypes {
             @Override
             public boolean isMusicDisc() {
                 return musicDisc;
+            }
+
+            @Override
+            public Set<ItemAttribute> getAttributes() {
+                return attributes;
             }
 
             @Override
