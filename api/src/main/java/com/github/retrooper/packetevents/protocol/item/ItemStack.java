@@ -188,6 +188,18 @@ public class ItemStack {
         return this.getType().getMaxDurability() > 0;
     }
 
+    public boolean is(ItemType type) {
+        return this.getType() == type;
+    }
+
+    public static boolean isSameItemSameTags(ItemStack stack, ItemStack otherStack) {
+        return stack.is(otherStack.getType()) && ItemStack.tagMatches(stack, otherStack);
+    }
+
+    public static boolean tagMatches(ItemStack left, ItemStack right) {
+        return left.isEmpty() && right.isEmpty() ? true : (!left.isEmpty() && !right.isEmpty() ? (left.nbt == null && right.nbt != null ? false : left.nbt == null || left.nbt.equals(right.nbt)) : false);
+    }
+
     @Override
     public boolean equals(Object obj) {
         if (this == obj)
