@@ -19,44 +19,30 @@
 package com.github.retrooper.packetevents.wrapper.play.client;
 
 import com.github.retrooper.packetevents.event.impl.PacketReceiveEvent;
-import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
-import com.github.retrooper.packetevents.util.Vector3d;
 
-public class WrapperPlayClientPositionRotation extends WrapperPlayClientFlying<WrapperPlayClientPositionRotation> {
-    private Vector3d position;
+public class WrapperPlayClientPlayerRotation extends WrapperPlayClientPlayerFlying<WrapperPlayClientPlayerRotation> {
     private float yaw;
     private float pitch;
-
-    public WrapperPlayClientPositionRotation(PacketReceiveEvent event) {
+    public WrapperPlayClientPlayerRotation(PacketReceiveEvent event) {
         super(event);
     }
 
-    public WrapperPlayClientPositionRotation(Vector3d position, float yaw, float pitch, boolean onGround) {
-        super(PacketType.Play.Client.PLAYER_POSITION_AND_ROTATION, onGround);
-        this.position = position;
+    public WrapperPlayClientPlayerRotation(float yaw, float pitch, boolean onGround) {
+        super(PacketType.Play.Client.PLAYER_ROTATION, onGround);
         this.yaw = yaw;
         this.pitch = pitch;
     }
 
     @Override
     public void readData() {
-        double x = readDouble();
-        double y = readDouble();
-        if (serverVersion == ServerVersion.V_1_7_10) {
-            //Can be ignored, cause stance = (y + 1.62)
-            double stance = readDouble();
-        }
-        double z = readDouble();
-        position = new Vector3d(x, y, z);
         yaw = readFloat();
         pitch = readFloat();
         super.readData();
     }
 
     @Override
-    public void readData(WrapperPlayClientPositionRotation wrapper) {
-        position = wrapper.position;
+    public void readData(WrapperPlayClientPlayerRotation wrapper) {
         yaw = wrapper.yaw;
         pitch = wrapper.pitch;
         super.readData(wrapper);
@@ -64,23 +50,9 @@ public class WrapperPlayClientPositionRotation extends WrapperPlayClientFlying<W
 
     @Override
     public void writeData() {
-        writeDouble(position.x);
-        writeDouble(position.y);
-        if (serverVersion == ServerVersion.V_1_7_10) {
-            writeDouble(position.y + 1.62);
-        }
-        writeDouble(position.z);
         writeFloat(yaw);
         writeFloat(pitch);
         super.writeData();
-    }
-
-    public Vector3d getPosition() {
-        return position;
-    }
-
-    public void setPosition(Vector3d position) {
-        this.position = position;
     }
 
     public float getYaw() {

@@ -23,14 +23,14 @@ import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.util.Vector3d;
 
-public class WrapperPlayClientPosition extends WrapperPlayClientFlying<WrapperPlayClientPosition> {
+public class WrapperPlayClientPlayerPosition extends WrapperPlayClientPlayerFlying<WrapperPlayClientPlayerPosition> {
     private Vector3d position;
 
-    public WrapperPlayClientPosition(PacketReceiveEvent event) {
+    public WrapperPlayClientPlayerPosition(PacketReceiveEvent event) {
         super(event);
     }
 
-    public WrapperPlayClientPosition(Vector3d position, boolean onGround) {
+    public WrapperPlayClientPlayerPosition(Vector3d position, boolean onGround) {
         super(PacketType.Play.Client.PLAYER_POSITION, onGround);
         this.position = position;
     }
@@ -49,7 +49,7 @@ public class WrapperPlayClientPosition extends WrapperPlayClientFlying<WrapperPl
     }
 
     @Override
-    public void readData(WrapperPlayClientPosition wrapper) {
+    public void readData(WrapperPlayClientPlayerPosition wrapper) {
         position = wrapper.position;
         super.readData(wrapper);
     }

@@ -23,19 +23,19 @@ import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.protocol.packettype.PacketTypeCommon;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 
-public class WrapperPlayClientFlying<T extends WrapperPlayClientFlying> extends PacketWrapper<T> {
+public class WrapperPlayClientPlayerFlying<T extends WrapperPlayClientPlayerFlying> extends PacketWrapper<T> {
     private boolean onGround;
 
-    public WrapperPlayClientFlying(PacketReceiveEvent event) {
+    public WrapperPlayClientPlayerFlying(PacketReceiveEvent event) {
         super(event);
     }
 
-    public WrapperPlayClientFlying(boolean onGround) {
+    public WrapperPlayClientPlayerFlying(boolean onGround) {
         super(PacketType.Play.Client.PLAYER_FLYING);
         this.onGround = onGround;
     }
 
-    public WrapperPlayClientFlying(PacketTypeCommon type, boolean onGround) {
+    public WrapperPlayClientPlayerFlying(PacketTypeCommon type, boolean onGround) {
         super(type);
         this.onGround = onGround;
     }
@@ -55,7 +55,7 @@ public class WrapperPlayClientFlying<T extends WrapperPlayClientFlying> extends 
     }
 
     @Override
-    public void readData(WrapperPlayClientFlying wrapper) {
+    public void readData(WrapperPlayClientPlayerFlying wrapper) {
         onGround = wrapper.onGround;
     }
 
