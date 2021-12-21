@@ -32,4 +32,6 @@ public interface ItemType extends MappedEntity {
     ItemType getCraftRemainder();
 
     Set<ItemTypes.ItemAttribute> getAttributes();
+
+    boolean hasAttribute(ItemTypes.ItemAttribute attribute);
 }

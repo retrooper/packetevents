@@ -31,9 +31,7 @@ import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLConnection;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 public class ItemTypes {
     private static final Map<String, ItemType> ITEM_TYPE_MAP = new HashMap<>();
@@ -87,7 +85,7 @@ public class ItemTypes {
         }
 
         // Creates an immutable set
-        Set<ItemAttribute> attributes = Set.of(attributesArr);
+        Set<ItemAttribute> attributes = Collections.unmodifiableSet(new HashSet<>(Arrays.asList(attributesArr)));
 
         ResourceLocation identifier = ResourceLocation.minecraft(key);
 
@@ -136,6 +134,11 @@ public class ItemTypes {
             @Override
             public Set<ItemAttribute> getAttributes() {
                 return attributes;
+            }
+
+            @Override
+            public boolean hasAttribute(ItemAttribute attribute) {
+                return attributes.contains(attribute);
             }
 
             @Override
