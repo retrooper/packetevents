@@ -36,7 +36,7 @@ public class ChunkReader_v1_9 implements ChunkReader {
 
         for (int index = 0; index < chunks.length; ++index) {
             if (set.get(index)) {
-                chunks[index] = new Chunk_v1_9(dataIn, hasSkyLight);
+                chunks[index] = new Chunk_v1_9(dataIn, hasSkyLight, true);
             }
         }
 

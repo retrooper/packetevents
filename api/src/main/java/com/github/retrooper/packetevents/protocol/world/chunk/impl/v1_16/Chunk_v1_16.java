@@ -20,11 +20,10 @@ package com.github.retrooper.packetevents.protocol.world.chunk.impl.v1_16;
 
 import com.github.retrooper.packetevents.protocol.stream.NetStreamInput;
 import com.github.retrooper.packetevents.protocol.stream.NetStreamOutput;
-import com.github.retrooper.packetevents.protocol.world.blockstate.BaseBlockState;
-import com.github.retrooper.packetevents.protocol.world.blockstate.FlatBlockState;
 import com.github.retrooper.packetevents.protocol.world.chunk.BaseChunk;
 import com.github.retrooper.packetevents.protocol.world.chunk.palette.*;
 import com.github.retrooper.packetevents.protocol.world.chunk.storage.BitStorage;
+import com.github.retrooper.packetevents.protocol.world.states.WrappedBlockState;
 
 public class Chunk_v1_16 implements BaseChunk {
     private int blockCount;
@@ -96,9 +95,9 @@ public class Chunk_v1_16 implements BaseChunk {
         return y << 8 | z << 4 | x;
     }
 
-    public BaseBlockState get(int x, int y, int z) {
+    public WrappedBlockState get(int x, int y, int z) {
         int id = this.storage.get(index(x, y, z));
-        return new FlatBlockState(this.palette.idToState(id));
+        return WrappedBlockState.getByGlobalId(this.palette.idToState(id));
     }
 
     public void set(int x, int y, int z, int state) {

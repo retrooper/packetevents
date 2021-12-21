@@ -1,10 +1,9 @@
 package com.github.retrooper.packetevents.protocol.world.chunk.impl.v1_8;
 
-import com.github.retrooper.packetevents.protocol.world.blockstate.BaseBlockState;
-import com.github.retrooper.packetevents.protocol.world.blockstate.MagicBlockState;
 import com.github.retrooper.packetevents.protocol.world.chunk.BaseChunk;
 import com.github.retrooper.packetevents.protocol.world.chunk.NibbleArray3d;
 import com.github.retrooper.packetevents.protocol.world.chunk.ShortArray3d;
+import com.github.retrooper.packetevents.protocol.world.states.WrappedBlockState;
 
 public class Chunk_v1_8 implements BaseChunk {
     private ShortArray3d blocks;
@@ -43,16 +42,14 @@ public class Chunk_v1_8 implements BaseChunk {
     //
     // Thanks Mojang!
     @Override
-    public BaseBlockState get(int x, int y, int z) {
+    public WrappedBlockState get(int x, int y, int z) {
         int combinedID = this.blocks.get(x, y, z);
-        return new MagicBlockState(combinedID & 0xFF, combinedID >> 12);
+        return WrappedBlockState.getByGlobalId(((combinedID & 0xFF) << 8) | (combinedID >> 12));
     }
 
     @Override
     public void set(int x, int y, int z, int combinedID) {
-        MagicBlockState state = new MagicBlockState(combinedID);
-        combinedID = (state.getBlockData() << 12) | (state.getId() & 0xFF);
-        this.blocks.set(x, y, z, combinedID);
+        this.blocks.set(x, y, z, (combinedID >> 8) | ((combinedID & 0xF) << 12));
     }
 
     @Override

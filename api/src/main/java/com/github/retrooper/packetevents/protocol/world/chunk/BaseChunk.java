@@ -18,10 +18,10 @@
 
 package com.github.retrooper.packetevents.protocol.world.chunk;
 
-import com.github.retrooper.packetevents.protocol.world.blockstate.BaseBlockState;
+import com.github.retrooper.packetevents.protocol.world.states.WrappedBlockState;
 
 public interface BaseChunk {
-    BaseBlockState get(int x, int y, int z);
+    WrappedBlockState get(int x, int y, int z);
 
     void set(int x, int y, int z, int combinedID);
 

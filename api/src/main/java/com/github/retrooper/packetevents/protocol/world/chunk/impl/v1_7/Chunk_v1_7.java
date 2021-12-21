@@ -18,11 +18,10 @@
 
 package com.github.retrooper.packetevents.protocol.world.chunk.impl.v1_7;
 
-import com.github.retrooper.packetevents.protocol.world.blockstate.BaseBlockState;
-import com.github.retrooper.packetevents.protocol.world.blockstate.MagicBlockState;
 import com.github.retrooper.packetevents.protocol.world.chunk.BaseChunk;
 import com.github.retrooper.packetevents.protocol.world.chunk.ByteArray3d;
 import com.github.retrooper.packetevents.protocol.world.chunk.NibbleArray3d;
+import com.github.retrooper.packetevents.protocol.world.states.WrappedBlockState;
 
 public class Chunk_v1_7 implements BaseChunk {
     private final ByteArray3d blocks;
@@ -44,8 +43,9 @@ public class Chunk_v1_7 implements BaseChunk {
     }
 
     @Override
-    public BaseBlockState get(int x, int y, int z) {
-        return new MagicBlockState(blocks.get(x, y, z), extendedBlocks.get(x, y, z));
+    public WrappedBlockState get(int x, int y, int z) {
+        int combinedID = blocks.get(x, y, z) | (extendedBlocks.get(x, y, z) << 12);
+        return WrappedBlockState.getByGlobalId(combinedID);
     }
 
     @Override

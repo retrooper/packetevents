@@ -492,6 +492,30 @@ public class PacketWrapper<T extends PacketWrapper> {
         return array;
     }
 
+    public byte[] readByteArrayOfSize(int size) {
+        byte[] array = new byte[size];
+        buffer.readBytes(array);
+        return array;
+    }
+
+    public void writeByteArrayOfSize(byte[] array) {
+        buffer.writeBytes(array);
+    }
+
+    public int[] readVarIntArrayOfSize(int size) {
+        int[] array = new int[size];
+        for (int i = 0; i < array.length; i++) {
+            array[i] = readVarInt();
+        }
+        return array;
+    }
+
+    public void writeVarIntArrayOfSize(int[] array) {
+        for (int i : array) {
+            writeVarInt(i);
+        }
+    }
+
     public long[] readLongArray() {
         int readableBytes = buffer.readableBytes() / 8;
         int size = readVarInt();
