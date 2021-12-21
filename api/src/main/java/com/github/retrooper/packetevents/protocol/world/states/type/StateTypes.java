@@ -267,14 +267,14 @@ public class StateTypes {
     public static StateType CACTUS = StateTypes.builder().name("CACTUS").blastResistance(0.4f).hardness(0.4f).isSolid(true).isBlocking(true).setMaterial(MaterialType.CACTUS).build();
     public static StateType CLAY = StateTypes.builder().name("CLAY").blastResistance(0.6f).hardness(0.6f).isOccluding(true).isSolid(true).isBlocking(true).setMaterial(MaterialType.CLAY).build();
     public static StateType JUKEBOX = StateTypes.builder().name("JUKEBOX").blastResistance(6.0f).hardness(2.0f).isFlammable(true).isOccluding(true).isSolid(true).isBlocking(true).setMaterial(MaterialType.WOOD).build();
-    public static StateType OAK_FENCE = StateTypes.builder().name("OAK_FENCE").blastResistance(3.0f).hardness(2.0f).isBurnable(true).isFlammable(true).isSolid(true).isBlocking(true).setMaterial(MaterialType.WOOD).build();
-    public static StateType SPRUCE_FENCE = StateTypes.builder().name("SPRUCE_FENCE").blastResistance(3.0f).hardness(2.0f).isBurnable(true).isFlammable(true).isSolid(true).isBlocking(true).setMaterial(MaterialType.WOOD).build();
-    public static StateType BIRCH_FENCE = StateTypes.builder().name("BIRCH_FENCE").blastResistance(3.0f).hardness(2.0f).isBurnable(true).isFlammable(true).isSolid(true).isBlocking(true).setMaterial(MaterialType.WOOD).build();
-    public static StateType JUNGLE_FENCE = StateTypes.builder().name("JUNGLE_FENCE").blastResistance(3.0f).hardness(2.0f).isBurnable(true).isFlammable(true).isSolid(true).isBlocking(true).setMaterial(MaterialType.WOOD).build();
-    public static StateType ACACIA_FENCE = StateTypes.builder().name("ACACIA_FENCE").blastResistance(3.0f).hardness(2.0f).isBurnable(true).isFlammable(true).isSolid(true).isBlocking(true).setMaterial(MaterialType.WOOD).build();
-    public static StateType DARK_OAK_FENCE = StateTypes.builder().name("DARK_OAK_FENCE").blastResistance(3.0f).hardness(2.0f).isBurnable(true).isFlammable(true).isSolid(true).isBlocking(true).setMaterial(MaterialType.WOOD).build();
-    public static StateType CRIMSON_FENCE = StateTypes.builder().name("CRIMSON_FENCE").blastResistance(3.0f).hardness(2.0f).isSolid(true).isBlocking(true).setMaterial(MaterialType.NETHER_WOOD).build();
-    public static StateType WARPED_FENCE = StateTypes.builder().name("WARPED_FENCE").blastResistance(3.0f).hardness(2.0f).isSolid(true).isBlocking(true).setMaterial(MaterialType.NETHER_WOOD).build();
+    public static StateType OAK_FENCE = StateTypes.builder().name("OAK_FENCE").blastResistance(3.0f).hardness(2.0f).isBurnable(true).isFlammable(true).isSolid(true).isBlocking(true).isShapeExceedsCube(true).setMaterial(MaterialType.WOOD).build();
+    public static StateType SPRUCE_FENCE = StateTypes.builder().name("SPRUCE_FENCE").blastResistance(3.0f).hardness(2.0f).isBurnable(true).isFlammable(true).isSolid(true).isBlocking(true).isShapeExceedsCube(true).setMaterial(MaterialType.WOOD).build();
+    public static StateType BIRCH_FENCE = StateTypes.builder().name("BIRCH_FENCE").blastResistance(3.0f).hardness(2.0f).isBurnable(true).isFlammable(true).isSolid(true).isBlocking(true).isShapeExceedsCube(true).setMaterial(MaterialType.WOOD).build();
+    public static StateType JUNGLE_FENCE = StateTypes.builder().name("JUNGLE_FENCE").blastResistance(3.0f).hardness(2.0f).isBurnable(true).isFlammable(true).isSolid(true).isBlocking(true).isShapeExceedsCube(true).setMaterial(MaterialType.WOOD).build();
+    public static StateType ACACIA_FENCE = StateTypes.builder().name("ACACIA_FENCE").blastResistance(3.0f).hardness(2.0f).isBurnable(true).isFlammable(true).isSolid(true).isBlocking(true).isShapeExceedsCube(true).setMaterial(MaterialType.WOOD).build();
+    public static StateType DARK_OAK_FENCE = StateTypes.builder().name("DARK_OAK_FENCE").blastResistance(3.0f).hardness(2.0f).isBurnable(true).isFlammable(true).isSolid(true).isBlocking(true).isShapeExceedsCube(true).setMaterial(MaterialType.WOOD).build();
+    public static StateType CRIMSON_FENCE = StateTypes.builder().name("CRIMSON_FENCE").blastResistance(3.0f).hardness(2.0f).isSolid(true).isBlocking(true).isShapeExceedsCube(true).setMaterial(MaterialType.NETHER_WOOD).build();
+    public static StateType WARPED_FENCE = StateTypes.builder().name("WARPED_FENCE").blastResistance(3.0f).hardness(2.0f).isSolid(true).isBlocking(true).isShapeExceedsCube(true).setMaterial(MaterialType.NETHER_WOOD).build();
     public static StateType PUMPKIN = StateTypes.builder().name("PUMPKIN").blastResistance(1.0f).hardness(1.0f).isOccluding(true).isSolid(true).isBlocking(true).setMaterial(MaterialType.VEGETABLE).build();
     public static StateType CARVED_PUMPKIN = StateTypes.builder().name("CARVED_PUMPKIN").blastResistance(1.0f).hardness(1.0f).isOccluding(true).isSolid(true).isBlocking(true).setMaterial(MaterialType.VEGETABLE).build();
     public static StateType JACK_O_LANTERN = StateTypes.builder().name("JACK_O_LANTERN").blastResistance(1.0f).hardness(1.0f).isOccluding(true).isSolid(true).isBlocking(true).setMaterial(MaterialType.VEGETABLE).build();
@@ -318,7 +318,7 @@ public class StateTypes {
     public static StateType NETHER_BRICKS = StateTypes.builder().name("NETHER_BRICKS").blastResistance(6.0f).hardness(2.0f).isOccluding(true).isSolid(true).isBlocking(true).requiresCorrectTool(true).setMaterial(MaterialType.STONE).build();
     public static StateType CRACKED_NETHER_BRICKS = StateTypes.builder().name("CRACKED_NETHER_BRICKS").blastResistance(6.0f).hardness(2.0f).isOccluding(true).isSolid(true).isBlocking(true).requiresCorrectTool(true).setMaterial(MaterialType.STONE).build();
     public static StateType CHISELED_NETHER_BRICKS = StateTypes.builder().name("CHISELED_NETHER_BRICKS").blastResistance(6.0f).hardness(2.0f).isOccluding(true).isSolid(true).isBlocking(true).requiresCorrectTool(true).setMaterial(MaterialType.STONE).build();
-    public static StateType NETHER_BRICK_FENCE = StateTypes.builder().name("NETHER_BRICK_FENCE").blastResistance(6.0f).hardness(2.0f).isSolid(true).isBlocking(true).requiresCorrectTool(true).setMaterial(MaterialType.STONE).build();
+    public static StateType NETHER_BRICK_FENCE = StateTypes.builder().name("NETHER_BRICK_FENCE").blastResistance(6.0f).hardness(2.0f).isSolid(true).isBlocking(true).requiresCorrectTool(true).isShapeExceedsCube(true).setMaterial(MaterialType.STONE).build();
     public static StateType NETHER_BRICK_STAIRS = StateTypes.builder().name("NETHER_BRICK_STAIRS").blastResistance(6.0f).hardness(2.0f).isSolid(true).isBlocking(true).requiresCorrectTool(true).setMaterial(MaterialType.STONE).build();
     public static StateType ENCHANTING_TABLE = StateTypes.builder().name("ENCHANTING_TABLE").blastResistance(1200.0f).hardness(5.0f).isSolid(true).isBlocking(true).requiresCorrectTool(true).setMaterial(MaterialType.STONE).build();
     public static StateType END_PORTAL_FRAME = StateTypes.builder().name("END_PORTAL_FRAME").blastResistance(3600000.0f).hardness(-1.0f).isSolid(true).isBlocking(true).setMaterial(MaterialType.STONE).build();
@@ -335,27 +335,27 @@ public class StateTypes {
     public static StateType WARPED_STAIRS = StateTypes.builder().name("WARPED_STAIRS").blastResistance(3.0f).hardness(2.0f).isSolid(true).isBlocking(true).setMaterial(MaterialType.NETHER_WOOD).build();
     public static StateType COMMAND_BLOCK = StateTypes.builder().name("COMMAND_BLOCK").blastResistance(3600000.0f).hardness(-1.0f).isOccluding(true).isSolid(true).isBlocking(true).requiresCorrectTool(true).setMaterial(MaterialType.METAL).build();
     public static StateType BEACON = StateTypes.builder().name("BEACON").blastResistance(3.0f).hardness(3.0f).isSolid(true).isBlocking(true).setMaterial(MaterialType.GLASS).build();
-    public static StateType COBBLESTONE_WALL = StateTypes.builder().name("COBBLESTONE_WALL").blastResistance(6.0f).hardness(2.0f).isSolid(true).isBlocking(true).requiresCorrectTool(true).setMaterial(MaterialType.STONE).build();
-    public static StateType MOSSY_COBBLESTONE_WALL = StateTypes.builder().name("MOSSY_COBBLESTONE_WALL").blastResistance(6.0f).hardness(2.0f).isSolid(true).isBlocking(true).requiresCorrectTool(true).setMaterial(MaterialType.STONE).build();
-    public static StateType BRICK_WALL = StateTypes.builder().name("BRICK_WALL").blastResistance(6.0f).hardness(2.0f).isSolid(true).isBlocking(true).requiresCorrectTool(true).setMaterial(MaterialType.STONE).build();
-    public static StateType PRISMARINE_WALL = StateTypes.builder().name("PRISMARINE_WALL").blastResistance(6.0f).hardness(1.5f).isSolid(true).isBlocking(true).requiresCorrectTool(true).setMaterial(MaterialType.STONE).build();
-    public static StateType RED_SANDSTONE_WALL = StateTypes.builder().name("RED_SANDSTONE_WALL").blastResistance(0.8f).hardness(0.8f).isSolid(true).isBlocking(true).requiresCorrectTool(true).setMaterial(MaterialType.STONE).build();
-    public static StateType MOSSY_STONE_BRICK_WALL = StateTypes.builder().name("MOSSY_STONE_BRICK_WALL").blastResistance(6.0f).hardness(1.5f).isSolid(true).isBlocking(true).requiresCorrectTool(true).setMaterial(MaterialType.STONE).build();
-    public static StateType GRANITE_WALL = StateTypes.builder().name("GRANITE_WALL").blastResistance(6.0f).hardness(1.5f).isSolid(true).isBlocking(true).requiresCorrectTool(true).setMaterial(MaterialType.STONE).build();
-    public static StateType STONE_BRICK_WALL = StateTypes.builder().name("STONE_BRICK_WALL").blastResistance(6.0f).hardness(1.5f).isSolid(true).isBlocking(true).requiresCorrectTool(true).setMaterial(MaterialType.STONE).build();
-    public static StateType NETHER_BRICK_WALL = StateTypes.builder().name("NETHER_BRICK_WALL").blastResistance(6.0f).hardness(2.0f).isSolid(true).isBlocking(true).requiresCorrectTool(true).setMaterial(MaterialType.STONE).build();
-    public static StateType ANDESITE_WALL = StateTypes.builder().name("ANDESITE_WALL").blastResistance(6.0f).hardness(1.5f).isSolid(true).isBlocking(true).requiresCorrectTool(true).setMaterial(MaterialType.STONE).build();
-    public static StateType RED_NETHER_BRICK_WALL = StateTypes.builder().name("RED_NETHER_BRICK_WALL").blastResistance(6.0f).hardness(2.0f).isSolid(true).isBlocking(true).requiresCorrectTool(true).setMaterial(MaterialType.STONE).build();
-    public static StateType SANDSTONE_WALL = StateTypes.builder().name("SANDSTONE_WALL").blastResistance(0.8f).hardness(0.8f).isSolid(true).isBlocking(true).requiresCorrectTool(true).setMaterial(MaterialType.STONE).build();
-    public static StateType END_STONE_BRICK_WALL = StateTypes.builder().name("END_STONE_BRICK_WALL").blastResistance(9.0f).hardness(3.0f).isSolid(true).isBlocking(true).requiresCorrectTool(true).setMaterial(MaterialType.STONE).build();
-    public static StateType DIORITE_WALL = StateTypes.builder().name("DIORITE_WALL").blastResistance(6.0f).hardness(1.5f).isSolid(true).isBlocking(true).requiresCorrectTool(true).setMaterial(MaterialType.STONE).build();
-    public static StateType BLACKSTONE_WALL = StateTypes.builder().name("BLACKSTONE_WALL").blastResistance(6.0f).hardness(1.5f).isSolid(true).isBlocking(true).requiresCorrectTool(true).setMaterial(MaterialType.STONE).build();
-    public static StateType POLISHED_BLACKSTONE_WALL = StateTypes.builder().name("POLISHED_BLACKSTONE_WALL").blastResistance(6.0f).hardness(2.0f).isSolid(true).isBlocking(true).requiresCorrectTool(true).setMaterial(MaterialType.STONE).build();
-    public static StateType POLISHED_BLACKSTONE_BRICK_WALL = StateTypes.builder().name("POLISHED_BLACKSTONE_BRICK_WALL").blastResistance(6.0f).hardness(1.5f).isSolid(true).isBlocking(true).requiresCorrectTool(true).setMaterial(MaterialType.STONE).build();
-    public static StateType COBBLED_DEEPSLATE_WALL = StateTypes.builder().name("COBBLED_DEEPSLATE_WALL").blastResistance(6.0f).hardness(3.5f).isSolid(true).isBlocking(true).requiresCorrectTool(true).setMaterial(MaterialType.STONE).build();
-    public static StateType POLISHED_DEEPSLATE_WALL = StateTypes.builder().name("POLISHED_DEEPSLATE_WALL").blastResistance(6.0f).hardness(3.5f).isSolid(true).isBlocking(true).requiresCorrectTool(true).setMaterial(MaterialType.STONE).build();
-    public static StateType DEEPSLATE_BRICK_WALL = StateTypes.builder().name("DEEPSLATE_BRICK_WALL").blastResistance(6.0f).hardness(3.5f).isSolid(true).isBlocking(true).requiresCorrectTool(true).setMaterial(MaterialType.STONE).build();
-    public static StateType DEEPSLATE_TILE_WALL = StateTypes.builder().name("DEEPSLATE_TILE_WALL").blastResistance(6.0f).hardness(3.5f).isSolid(true).isBlocking(true).requiresCorrectTool(true).setMaterial(MaterialType.STONE).build();
+    public static StateType COBBLESTONE_WALL = StateTypes.builder().name("COBBLESTONE_WALL").blastResistance(6.0f).hardness(2.0f).isSolid(true).isBlocking(true).requiresCorrectTool(true).isShapeExceedsCube(true).setMaterial(MaterialType.STONE).build();
+    public static StateType MOSSY_COBBLESTONE_WALL = StateTypes.builder().name("MOSSY_COBBLESTONE_WALL").blastResistance(6.0f).hardness(2.0f).isSolid(true).isBlocking(true).requiresCorrectTool(true).isShapeExceedsCube(true).setMaterial(MaterialType.STONE).build();
+    public static StateType BRICK_WALL = StateTypes.builder().name("BRICK_WALL").blastResistance(6.0f).hardness(2.0f).isSolid(true).isBlocking(true).requiresCorrectTool(true).isShapeExceedsCube(true).setMaterial(MaterialType.STONE).build();
+    public static StateType PRISMARINE_WALL = StateTypes.builder().name("PRISMARINE_WALL").blastResistance(6.0f).hardness(1.5f).isSolid(true).isBlocking(true).requiresCorrectTool(true).isShapeExceedsCube(true).setMaterial(MaterialType.STONE).build();
+    public static StateType RED_SANDSTONE_WALL = StateTypes.builder().name("RED_SANDSTONE_WALL").blastResistance(0.8f).hardness(0.8f).isSolid(true).isBlocking(true).requiresCorrectTool(true).isShapeExceedsCube(true).setMaterial(MaterialType.STONE).build();
+    public static StateType MOSSY_STONE_BRICK_WALL = StateTypes.builder().name("MOSSY_STONE_BRICK_WALL").blastResistance(6.0f).hardness(1.5f).isSolid(true).isBlocking(true).requiresCorrectTool(true).isShapeExceedsCube(true).setMaterial(MaterialType.STONE).build();
+    public static StateType GRANITE_WALL = StateTypes.builder().name("GRANITE_WALL").blastResistance(6.0f).hardness(1.5f).isSolid(true).isBlocking(true).requiresCorrectTool(true).isShapeExceedsCube(true).setMaterial(MaterialType.STONE).build();
+    public static StateType STONE_BRICK_WALL = StateTypes.builder().name("STONE_BRICK_WALL").blastResistance(6.0f).hardness(1.5f).isSolid(true).isBlocking(true).requiresCorrectTool(true).isShapeExceedsCube(true).setMaterial(MaterialType.STONE).build();
+    public static StateType NETHER_BRICK_WALL = StateTypes.builder().name("NETHER_BRICK_WALL").blastResistance(6.0f).hardness(2.0f).isSolid(true).isBlocking(true).requiresCorrectTool(true).isShapeExceedsCube(true).setMaterial(MaterialType.STONE).build();
+    public static StateType ANDESITE_WALL = StateTypes.builder().name("ANDESITE_WALL").blastResistance(6.0f).hardness(1.5f).isSolid(true).isBlocking(true).requiresCorrectTool(true).isShapeExceedsCube(true).setMaterial(MaterialType.STONE).build();
+    public static StateType RED_NETHER_BRICK_WALL = StateTypes.builder().name("RED_NETHER_BRICK_WALL").blastResistance(6.0f).hardness(2.0f).isSolid(true).isBlocking(true).requiresCorrectTool(true).isShapeExceedsCube(true).setMaterial(MaterialType.STONE).build();
+    public static StateType SANDSTONE_WALL = StateTypes.builder().name("SANDSTONE_WALL").blastResistance(0.8f).hardness(0.8f).isSolid(true).isBlocking(true).requiresCorrectTool(true).isShapeExceedsCube(true).setMaterial(MaterialType.STONE).build();
+    public static StateType END_STONE_BRICK_WALL = StateTypes.builder().name("END_STONE_BRICK_WALL").blastResistance(9.0f).hardness(3.0f).isSolid(true).isBlocking(true).requiresCorrectTool(true).isShapeExceedsCube(true).setMaterial(MaterialType.STONE).build();
+    public static StateType DIORITE_WALL = StateTypes.builder().name("DIORITE_WALL").blastResistance(6.0f).hardness(1.5f).isSolid(true).isBlocking(true).requiresCorrectTool(true).isShapeExceedsCube(true).setMaterial(MaterialType.STONE).build();
+    public static StateType BLACKSTONE_WALL = StateTypes.builder().name("BLACKSTONE_WALL").blastResistance(6.0f).hardness(1.5f).isSolid(true).isBlocking(true).requiresCorrectTool(true).isShapeExceedsCube(true).setMaterial(MaterialType.STONE).build();
+    public static StateType POLISHED_BLACKSTONE_WALL = StateTypes.builder().name("POLISHED_BLACKSTONE_WALL").blastResistance(6.0f).hardness(2.0f).isSolid(true).isBlocking(true).requiresCorrectTool(true).isShapeExceedsCube(true).setMaterial(MaterialType.STONE).build();
+    public static StateType POLISHED_BLACKSTONE_BRICK_WALL = StateTypes.builder().name("POLISHED_BLACKSTONE_BRICK_WALL").blastResistance(6.0f).hardness(1.5f).isSolid(true).isBlocking(true).requiresCorrectTool(true).isShapeExceedsCube(true).setMaterial(MaterialType.STONE).build();
+    public static StateType COBBLED_DEEPSLATE_WALL = StateTypes.builder().name("COBBLED_DEEPSLATE_WALL").blastResistance(6.0f).hardness(3.5f).isSolid(true).isBlocking(true).requiresCorrectTool(true).isShapeExceedsCube(true).setMaterial(MaterialType.STONE).build();
+    public static StateType POLISHED_DEEPSLATE_WALL = StateTypes.builder().name("POLISHED_DEEPSLATE_WALL").blastResistance(6.0f).hardness(3.5f).isSolid(true).isBlocking(true).requiresCorrectTool(true).isShapeExceedsCube(true).setMaterial(MaterialType.STONE).build();
+    public static StateType DEEPSLATE_BRICK_WALL = StateTypes.builder().name("DEEPSLATE_BRICK_WALL").blastResistance(6.0f).hardness(3.5f).isSolid(true).isBlocking(true).requiresCorrectTool(true).isShapeExceedsCube(true).setMaterial(MaterialType.STONE).build();
+    public static StateType DEEPSLATE_TILE_WALL = StateTypes.builder().name("DEEPSLATE_TILE_WALL").blastResistance(6.0f).hardness(3.5f).isSolid(true).isBlocking(true).requiresCorrectTool(true).isShapeExceedsCube(true).setMaterial(MaterialType.STONE).build();
     public static StateType ANVIL = StateTypes.builder().name("ANVIL").blastResistance(1200.0f).hardness(5.0f).hasGravity(true).isSolid(true).isBlocking(true).requiresCorrectTool(true).setMaterial(MaterialType.HEAVY_METAL).build();
     public static StateType CHIPPED_ANVIL = StateTypes.builder().name("CHIPPED_ANVIL").blastResistance(1200.0f).hardness(5.0f).hasGravity(true).isSolid(true).isBlocking(true).requiresCorrectTool(true).setMaterial(MaterialType.HEAVY_METAL).build();
     public static StateType DAMAGED_ANVIL = StateTypes.builder().name("DAMAGED_ANVIL").blastResistance(1200.0f).hardness(5.0f).hasGravity(true).isSolid(true).isBlocking(true).requiresCorrectTool(true).setMaterial(MaterialType.HEAVY_METAL).build();
@@ -658,14 +658,14 @@ public class StateTypes {
     public static StateType DARK_OAK_TRAPDOOR = StateTypes.builder().name("DARK_OAK_TRAPDOOR").blastResistance(3.0f).hardness(3.0f).isFlammable(true).isSolid(true).isBlocking(true).setMaterial(MaterialType.WOOD).build();
     public static StateType CRIMSON_TRAPDOOR = StateTypes.builder().name("CRIMSON_TRAPDOOR").blastResistance(3.0f).hardness(3.0f).isSolid(true).isBlocking(true).setMaterial(MaterialType.NETHER_WOOD).build();
     public static StateType WARPED_TRAPDOOR = StateTypes.builder().name("WARPED_TRAPDOOR").blastResistance(3.0f).hardness(3.0f).isSolid(true).isBlocking(true).setMaterial(MaterialType.NETHER_WOOD).build();
-    public static StateType OAK_FENCE_GATE = StateTypes.builder().name("OAK_FENCE_GATE").blastResistance(3.0f).hardness(2.0f).isBurnable(true).isFlammable(true).isSolid(true).isBlocking(true).setMaterial(MaterialType.WOOD).build();
-    public static StateType SPRUCE_FENCE_GATE = StateTypes.builder().name("SPRUCE_FENCE_GATE").blastResistance(3.0f).hardness(2.0f).isBurnable(true).isFlammable(true).isSolid(true).isBlocking(true).setMaterial(MaterialType.WOOD).build();
-    public static StateType BIRCH_FENCE_GATE = StateTypes.builder().name("BIRCH_FENCE_GATE").blastResistance(3.0f).hardness(2.0f).isBurnable(true).isFlammable(true).isSolid(true).isBlocking(true).setMaterial(MaterialType.WOOD).build();
-    public static StateType JUNGLE_FENCE_GATE = StateTypes.builder().name("JUNGLE_FENCE_GATE").blastResistance(3.0f).hardness(2.0f).isBurnable(true).isFlammable(true).isSolid(true).isBlocking(true).setMaterial(MaterialType.WOOD).build();
-    public static StateType ACACIA_FENCE_GATE = StateTypes.builder().name("ACACIA_FENCE_GATE").blastResistance(3.0f).hardness(2.0f).isBurnable(true).isFlammable(true).isSolid(true).isBlocking(true).setMaterial(MaterialType.WOOD).build();
-    public static StateType DARK_OAK_FENCE_GATE = StateTypes.builder().name("DARK_OAK_FENCE_GATE").blastResistance(3.0f).hardness(2.0f).isBurnable(true).isFlammable(true).isSolid(true).isBlocking(true).setMaterial(MaterialType.WOOD).build();
-    public static StateType CRIMSON_FENCE_GATE = StateTypes.builder().name("CRIMSON_FENCE_GATE").blastResistance(3.0f).hardness(2.0f).isSolid(true).isBlocking(true).setMaterial(MaterialType.NETHER_WOOD).build();
-    public static StateType WARPED_FENCE_GATE = StateTypes.builder().name("WARPED_FENCE_GATE").blastResistance(3.0f).hardness(2.0f).isSolid(true).isBlocking(true).setMaterial(MaterialType.NETHER_WOOD).build();
+    public static StateType OAK_FENCE_GATE = StateTypes.builder().name("OAK_FENCE_GATE").blastResistance(3.0f).hardness(2.0f).isBurnable(true).isFlammable(true).isSolid(true).isBlocking(true).isShapeExceedsCube(true).setMaterial(MaterialType.WOOD).build();
+    public static StateType SPRUCE_FENCE_GATE = StateTypes.builder().name("SPRUCE_FENCE_GATE").blastResistance(3.0f).hardness(2.0f).isBurnable(true).isFlammable(true).isSolid(true).isBlocking(true).isShapeExceedsCube(true).setMaterial(MaterialType.WOOD).build();
+    public static StateType BIRCH_FENCE_GATE = StateTypes.builder().name("BIRCH_FENCE_GATE").blastResistance(3.0f).hardness(2.0f).isBurnable(true).isFlammable(true).isSolid(true).isBlocking(true).isShapeExceedsCube(true).setMaterial(MaterialType.WOOD).build();
+    public static StateType JUNGLE_FENCE_GATE = StateTypes.builder().name("JUNGLE_FENCE_GATE").blastResistance(3.0f).hardness(2.0f).isBurnable(true).isFlammable(true).isSolid(true).isBlocking(true).isShapeExceedsCube(true).setMaterial(MaterialType.WOOD).build();
+    public static StateType ACACIA_FENCE_GATE = StateTypes.builder().name("ACACIA_FENCE_GATE").blastResistance(3.0f).hardness(2.0f).isBurnable(true).isFlammable(true).isSolid(true).isBlocking(true).isShapeExceedsCube(true).setMaterial(MaterialType.WOOD).build();
+    public static StateType DARK_OAK_FENCE_GATE = StateTypes.builder().name("DARK_OAK_FENCE_GATE").blastResistance(3.0f).hardness(2.0f).isBurnable(true).isFlammable(true).isSolid(true).isBlocking(true).isShapeExceedsCube(true).setMaterial(MaterialType.WOOD).build();
+    public static StateType CRIMSON_FENCE_GATE = StateTypes.builder().name("CRIMSON_FENCE_GATE").blastResistance(3.0f).hardness(2.0f).isSolid(true).isBlocking(true).isShapeExceedsCube(true).setMaterial(MaterialType.NETHER_WOOD).build();
+    public static StateType WARPED_FENCE_GATE = StateTypes.builder().name("WARPED_FENCE_GATE").blastResistance(3.0f).hardness(2.0f).isSolid(true).isBlocking(true).isShapeExceedsCube(true).setMaterial(MaterialType.NETHER_WOOD).build();
     public static StateType POWERED_RAIL = StateTypes.builder().name("POWERED_RAIL").blastResistance(0.7f).hardness(0.7f).setMaterial(MaterialType.DECORATION).setPushReaction(PushReaction.NORMAL).build();
     public static StateType DETECTOR_RAIL = StateTypes.builder().name("DETECTOR_RAIL").blastResistance(0.7f).hardness(0.7f).setMaterial(MaterialType.DECORATION).setPushReaction(PushReaction.NORMAL).build();
     public static StateType RAIL = StateTypes.builder().name("RAIL").blastResistance(0.7f).hardness(0.7f).setMaterial(MaterialType.DECORATION).setPushReaction(PushReaction.NORMAL).build();
@@ -784,7 +784,7 @@ public class StateTypes {
     public static StateType WATER = StateTypes.builder().name("WATER").blastResistance(100.0f).hardness(100.0f).setMaterial(MaterialType.WATER).build();
     public static StateType LAVA = StateTypes.builder().name("LAVA").blastResistance(100.0f).hardness(100.0f).setMaterial(MaterialType.LAVA).build();
     public static StateType TALL_SEAGRASS = StateTypes.builder().name("TALL_SEAGRASS").setMaterial(MaterialType.REPLACEABLE_WATER_PLANT).build();
-    public static StateType PISTON_HEAD = StateTypes.builder().name("PISTON_HEAD").blastResistance(1.5f).hardness(1.5f).isSolid(true).isBlocking(true).setMaterial(MaterialType.PISTON).build();
+    public static StateType PISTON_HEAD = StateTypes.builder().name("PISTON_HEAD").blastResistance(1.5f).hardness(1.5f).isSolid(true).isBlocking(true).isShapeExceedsCube(true).setMaterial(MaterialType.PISTON).build();
     public static StateType MOVING_PISTON = StateTypes.builder().name("MOVING_PISTON").blastResistance(0.0f).hardness(-1.0f).isSolid(true).isBlocking(true).setMaterial(MaterialType.PISTON).build();
     public static StateType WALL_TORCH = StateTypes.builder().name("WALL_TORCH").setMaterial(MaterialType.DECORATION).build();
     public static StateType FIRE = StateTypes.builder().name("FIRE").setMaterial(MaterialType.FIRE).build();
@@ -934,6 +934,7 @@ public class StateTypes {
         boolean isBlocking;
         boolean requiresCorrectTool = false;
         boolean isReplaceable;
+        boolean isShapeExceedsCube;
         PushReaction pushReaction = null;
         MaterialType materialType;
 
@@ -1066,8 +1067,13 @@ public class StateTypes {
             return this;
         }
 
+        public Builder isShapeExceedsCube(boolean b) {
+            this.isShapeExceedsCube = b;
+            return this;
+        }
+
         public StateType build() {
-            StateType type = new StateType(name, blastResistance, hardness, slipperiness, friction, speed, hasGravity, isAir, isBurnable, isFlammable, isOccluding, isSolid, isLiquid, isBlocking, requiresCorrectTool, isReplaceable, pushReaction, materialType);
+            StateType type = new StateType(name, blastResistance, hardness, slipperiness, friction, speed, hasGravity, isAir, isBurnable, isFlammable, isOccluding, isSolid, isLiquid, isBlocking, requiresCorrectTool, isReplaceable, isShapeExceedsCube, pushReaction, materialType);
             BY_NAME.put(name, type);
             return type;
         }

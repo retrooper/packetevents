@@ -20,12 +20,13 @@ public class StateType {
     private final boolean isBlocking;
     private final boolean requiresCorrectTool;
     private final boolean isReplaceable;
+    private final boolean exceedsCube;
     private final PushReaction pushReaction;
     private final MaterialType materialType;
 
     public StateType(String name, float blastResistance, float hardness, float slipperiness, float friction, float speed, boolean hasGravity,
                      boolean isAir, boolean isBurnable, boolean isFlammable, boolean isOccluding, boolean isSolid, boolean isLiquid,
-                     boolean isBlocking, boolean requiresCorrectTool, boolean isReplaceable, PushReaction pushReaction, MaterialType materialType) {
+                     boolean isBlocking, boolean requiresCorrectTool, boolean isReplaceable, boolean exceedsCube, PushReaction pushReaction, MaterialType materialType) {
         this.name = name;
         this.blastResistance = blastResistance;
         this.hardness = hardness;
@@ -42,6 +43,7 @@ public class StateType {
         this.isBlocking = isBlocking;
         this.requiresCorrectTool = requiresCorrectTool;
         this.isReplaceable = isReplaceable;
+        this.exceedsCube = exceedsCube;
         this.pushReaction = pushReaction;
         this.materialType = materialType;
     }
@@ -108,6 +110,10 @@ public class StateType {
 
     public boolean isReplaceable() {
         return isReplaceable;
+    }
+
+    public boolean exceedsCube() {
+        return exceedsCube;
     }
 
     public PushReaction getPushReaction() {
