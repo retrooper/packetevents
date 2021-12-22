@@ -24,11 +24,7 @@
 
 package com.github.retrooper.packetevents.protocol.world.chunk;
 
-
-import com.github.retrooper.packetevents.netty.buffer.ByteBufAbstractOutputStream;
 import com.github.retrooper.packetevents.protocol.stream.NetStreamInput;
-
-import java.io.IOException;
 
 public class NibbleArray3d {
     private final byte[] data;
@@ -49,10 +45,6 @@ public class NibbleArray3d {
         return data;
     }
 
-    public void write(ByteBufAbstractOutputStream out) throws IOException {
-        out.write(this.data);
-    }
-
     public int get(int x, int y, int z) {
         int key = y << 8 | z << 4 | x;
         int index = key >> 1;
@@ -68,18 +60,6 @@ public class NibbleArray3d {
             this.data[index] = (byte) (this.data[index] & 240 | val & 15);
         } else {
             this.data[index] = (byte) (this.data[index] & 15 | (val & 15) << 4);
-        }
-    }
-
-    public void fill(int val) {
-        for (int index = 0; index < this.data.length << 1; index++) {
-            int ind = index >> 1;
-            int part = index & 1;
-            if (part == 0) {
-                this.data[ind] = (byte) (this.data[ind] & 240 | val & 15);
-            } else {
-                this.data[ind] = (byte) (this.data[ind] & 15 | (val & 15) << 4);
-            }
         }
     }
 }

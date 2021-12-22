@@ -16,11 +16,11 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.github.retrooper.packetevents.protocol.world.chunk;
+package com.github.retrooper.packetevents.protocol.world.chunk.storage;
 
 import java.util.Arrays;
 
-public class LegacyFlexibleStorage {
+public class LegacyFlexibleStorage extends BaseStorage {
     private final long[] data;
     private final int bitsPerEntry;
     private final int size;
@@ -57,6 +57,7 @@ public class LegacyFlexibleStorage {
         }
     }
 
+    @Override
     public int get(int index) {
         int bitIndex = index * this.bitsPerEntry;
         int startIndex = bitIndex / 64;
@@ -70,6 +71,7 @@ public class LegacyFlexibleStorage {
         }
     }
 
+    @Override
     public void set(int index, int value) {
         int bitIndex = index * this.bitsPerEntry;
         int startIndex = bitIndex / 64;
@@ -82,14 +84,17 @@ public class LegacyFlexibleStorage {
         }
     }
 
+    @Override
     public long[] getData() {
         return data;
     }
 
+    @Override
     public int getBitsPerEntry() {
         return bitsPerEntry;
     }
 
+    @Override
     public int getSize() {
         return size;
     }

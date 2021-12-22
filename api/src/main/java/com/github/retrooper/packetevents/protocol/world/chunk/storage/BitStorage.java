@@ -25,7 +25,7 @@
 package com.github.retrooper.packetevents.protocol.world.chunk.storage;
 
 //TODO Equals & hashcode
-public class BitStorage {
+public class BitStorage extends BaseStorage {
     private static final int[] MAGIC_VALUES = {
             -1, -1, 0, Integer.MIN_VALUE, 0, 0, 1431655765, 1431655765, 0, Integer.MIN_VALUE,
             0, 1, 858993459, 858993459, 0, 715827882, 715827882, 0, 613566756, 613566756,
@@ -90,57 +90,33 @@ public class BitStorage {
         this.divideShift = MAGIC_VALUES[magicIndex + 2];
     }
 
+    @Override
     public long[] getData() {
         return data;
     }
 
+    @Override
     public int getBitsPerEntry() {
         return bitsPerEntry;
     }
 
+    @Override
     public int getSize() {
         return size;
     }
 
+    @Override
     public int get(int index) {
-        if (index < 0 || index > this.size - 1) {
-            throw new IndexOutOfBoundsException();
-        }
-
         int cellIndex = cellIndex(index);
         int bitIndex = bitIndex(index, cellIndex);
         return (int) (this.data[cellIndex] >> bitIndex & this.maxValue);
     }
 
+    @Override
     public void set(int index, int value) {
-        if (index < 0 || index > this.size - 1) {
-            throw new IndexOutOfBoundsException();
-        }
-
-        if (value < 0 || value > this.maxValue) {
-            throw new IllegalArgumentException("Value cannot be outside of accepted range.");
-        }
-
         int cellIndex = cellIndex(index);
         int bitIndex = bitIndex(index, cellIndex);
         this.data[cellIndex] = this.data[cellIndex] & ~(this.maxValue << bitIndex) | ((long) value & this.maxValue) << bitIndex;
-    }
-
-    public int[] toIntArray() {
-        int[] result = new int[this.size];
-        int index = 0;
-        for (long cell : this.data) {
-            for (int bitIndex = 0; bitIndex < this.valuesPerLong; bitIndex++) {
-                result[index++] = (int) (cell & this.maxValue);
-                cell >>= this.bitsPerEntry;
-
-                if (index >= this.size) {
-                    return result;
-                }
-            }
-        }
-
-        return result;
     }
 
     private int cellIndex(int index) {

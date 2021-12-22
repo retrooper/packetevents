@@ -2,7 +2,7 @@ package com.github.retrooper.packetevents.protocol.world.chunk.reader.impl;
 
 import com.github.retrooper.packetevents.protocol.stream.NetStreamInput;
 import com.github.retrooper.packetevents.protocol.world.chunk.BaseChunk;
-import com.github.retrooper.packetevents.protocol.world.chunk.impl.v1_16.Chunk_v1_16;
+import com.github.retrooper.packetevents.protocol.world.chunk.impl.v1_16.Chunk_v1_9;
 import com.github.retrooper.packetevents.protocol.world.chunk.reader.ChunkReader;
 
 import java.io.ByteArrayInputStream;
@@ -16,7 +16,7 @@ public class ChunkReader_v1_16 implements ChunkReader {
 
         for (int index = 0; index < chunks.length; ++index) {
             if (set.get(index)) {
-                chunks[index] = new Chunk_v1_16(dataIn);
+                chunks[index] = new Chunk_v1_9(dataIn, false, false);
             }
         }
 

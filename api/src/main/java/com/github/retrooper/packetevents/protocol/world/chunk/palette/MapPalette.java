@@ -27,17 +27,16 @@ package com.github.retrooper.packetevents.protocol.world.chunk.palette;
 import com.github.retrooper.packetevents.protocol.stream.NetStreamInput;
 
 import java.util.HashMap;
-import java.util.Map;
 
 /**
  * A palette backed by a map.
  */
-//TODO Equals & hashcode
 public class MapPalette implements Palette {
     private final int maxId;
 
     private final int[] idToState;
-    private final Map<Object, Integer> stateToId = new HashMap<>();
+    // TODO: Can we use fastutils here?
+    private final HashMap<Object, Integer> stateToId = new HashMap<>();
     private int nextId = 0;
 
     public MapPalette(int bitsPerEntry) {
