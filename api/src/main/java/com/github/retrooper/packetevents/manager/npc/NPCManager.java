@@ -109,7 +109,8 @@ public class NPCManager {
     }
 
     public void updateNPCRotation(NPC npc, byte yaw, byte pitch) {
-        Location from = npc.getLocation();
+        npc.getLocation().setYaw(yaw);
+        npc.getLocation().setPitch(pitch);
         Set<ChannelAbstract> targetChannels = TARGET_CHANNELS.get(npc);
         if (targetChannels != null && !targetChannels.isEmpty()) {
             for (ChannelAbstract channel : targetChannels) {
