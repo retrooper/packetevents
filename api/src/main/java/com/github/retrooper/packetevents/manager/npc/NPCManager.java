@@ -101,11 +101,8 @@ public class NPCManager {
                     }
                     else if (rotationChanged) {
                         WrapperPlayServerEntityRotation entityRotation = new WrapperPlayServerEntityRotation(npc.getId(), (byte) to.getYaw(), (byte)to.getPitch(), true);
-                        PacketEvents.getAPI().getPlayerManager().sendPacket(targetChannels, entityRotation);
+                        PacketEvents.getAPI().getPlayerManager().sendPacket(channel, entityRotation);
                     }
-
-                    WrapperPlayServerEntityRelativeMove entityRelativeMove = new WrapperPlayServerEntityRelativeMove(npc.getId(), deltaX, deltaY, deltaZ, true);
-                    PacketEvents.getAPI().getPlayerManager().sendPacket(channel, entityRelativeMove);
                 }
             }
         }
