@@ -32,7 +32,6 @@ import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientIn
 import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientUpdateSign;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerSetSlot;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerSpawnLivingEntity;
-import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerTags;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -92,7 +91,7 @@ public class PacketEventsPlugin extends JavaPlugin {
                 }//TODO Complete chunk data packet
             }
         };
-        //PacketEvents.getAPI().getEventManager().registerListener(debugListener);
+        PacketEvents.getAPI().getEventManager().registerListener(debugListener);
     }
 
     @Override
