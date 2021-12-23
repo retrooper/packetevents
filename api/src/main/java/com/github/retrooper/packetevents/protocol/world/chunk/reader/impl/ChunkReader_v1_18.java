@@ -15,9 +15,7 @@ public class ChunkReader_v1_18 implements ChunkReader {
         BaseChunk[] chunks = new BaseChunk[chunkSize];
 
         for (int index = 0; index < chunkSize; ++index) {
-            if (set.get(index)) {
-                chunks[index] = Chunk_v1_18.read(dataIn);
-            }
+            chunks[index] = Chunk_v1_18.read(dataIn);
         }
 
         return chunks;

@@ -25,6 +25,8 @@ import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.protocol.stream.NetStreamOutput;
 import com.github.retrooper.packetevents.protocol.world.chunk.BaseChunk;
 import com.github.retrooper.packetevents.protocol.world.chunk.Column;
+import com.github.retrooper.packetevents.protocol.world.chunk.TileEntity;
+import com.github.retrooper.packetevents.protocol.world.chunk.impl.v_1_18.Chunk_v1_18;
 import com.github.retrooper.packetevents.protocol.world.chunk.reader.ChunkReader;
 import com.github.retrooper.packetevents.protocol.world.chunk.reader.impl.*;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
@@ -46,6 +48,18 @@ public class WrapperPlayServerChunkData extends PacketWrapper<WrapperPlayServerC
 
     //TODO Make accessible??
     private boolean ignoreOldData;
+
+    // 1.18 only (lighting) - for writing data
+    // TODO: Make accessible?? Include in chunk data?? What do we do with this?
+    boolean trustEdges;
+    BitSet blockLightMask;
+    BitSet skyLightMask;
+    BitSet emptyBlockLightMask;
+    BitSet emptySkyLightMask;
+    int skyLightCount;
+    int blockLightCount;
+    byte[][] skyLightArray;
+    byte[][] blockLightArray;
 
     public WrapperPlayServerChunkData(PacketSendEvent event) {
         super(event);
@@ -78,7 +92,6 @@ public class WrapperPlayServerChunkData extends PacketWrapper<WrapperPlayServerC
         if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_17)) {
             //Write primary bit mask
             long[] longArray = chunkMask.toLongArray();
-            writeVarInt(longArray.length);
             writeLongArray(longArray);
         } else if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_9)) {
             //Write primary bit mask
@@ -102,7 +115,8 @@ public class WrapperPlayServerChunkData extends PacketWrapper<WrapperPlayServerC
             ignoreOldData = readBoolean();
         }
 
-        BitSet chunkMask = readChunkMask();
+        // There is no bitset on 1.18 and above, instead the SingletonPalette is used to represent a chunk with all air
+        BitSet chunkMask = serverVersion.isNewerThanOrEquals(ServerVersion.V_1_18) ? null : readChunkMask();
         boolean hasHeightMaps = serverVersion.isNewerThanOrEquals(ServerVersion.V_1_14);
         NBTCompound heightMaps = null;
         if (hasHeightMaps) {
@@ -164,9 +178,37 @@ public class WrapperPlayServerChunkData extends PacketWrapper<WrapperPlayServerC
         // on 1.9 and above for all versions, tile entities are sent with the chunk data
         // (And can be sent with their own packet too!)
         int tileEntityCount = serverVersion.isOlderThan(ServerVersion.V_1_9) ? 0 : readVarInt();
-        NBTCompound[] tileEntities = new NBTCompound[tileEntityCount];
-        for (int i = 0; i < tileEntities.length; i++) {
-            tileEntities[i] = readNBT();
+        TileEntity[] tileEntities = new TileEntity[tileEntityCount];
+
+        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_18)) {
+            for (int i = 0; i < tileEntities.length; i++) {
+                tileEntities[i] = new TileEntity(readByte(), readShort(), readVarInt(), readNBT());
+            }
+        } else {
+            for (int i = 0; i < tileEntities.length; i++) {
+                tileEntities[i] = new TileEntity(readNBT());
+            }
+        }
+
+        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_18)) {
+            trustEdges = readBoolean();
+
+            skyLightMask = readChunkMask();
+            blockLightMask = readChunkMask();
+            emptySkyLightMask = readChunkMask();
+            emptyBlockLightMask = readChunkMask();
+
+            skyLightCount = readVarInt();
+            this.skyLightArray = new byte[skyLightCount][];
+            for (int x = 0; x < skyLightCount; x++) {
+                skyLightArray[x] = readByteArray();
+            }
+
+            blockLightCount = readVarInt();
+            this.blockLightArray = new byte[blockLightCount][];
+            for (int x = 0; x < blockLightCount; x++) {
+                blockLightArray[x] = readByteArray();
+            }
         }
 
         if (hasBiomeData) {
@@ -228,7 +270,17 @@ public class WrapperPlayServerChunkData extends PacketWrapper<WrapperPlayServerC
 
     @Override
     public void readData(WrapperPlayServerChunkData wrapper) {
-        column = wrapper.column;
+        this.column = wrapper.column;
+        this.ignoreOldData = wrapper.ignoreOldData;
+        this.trustEdges = wrapper.trustEdges;
+        this.blockLightMask = wrapper.blockLightMask;
+        this.skyLightMask = wrapper.skyLightMask;
+        this.emptyBlockLightMask = wrapper.emptyBlockLightMask;
+        this.emptySkyLightMask = wrapper.emptySkyLightMask;
+        this.skyLightCount = wrapper.skyLightCount;
+        this.blockLightCount = wrapper.blockLightCount;
+        this.skyLightArray = wrapper.skyLightArray;
+        this.blockLightArray = wrapper.blockLightArray;
     }
 
     @Override
@@ -236,10 +288,14 @@ public class WrapperPlayServerChunkData extends PacketWrapper<WrapperPlayServerC
         writeInt(column.getX());
         writeInt(column.getZ());
 
+        boolean v1_18 = serverVersion.isNewerThanOrEquals(ServerVersion.V_1_18);
         boolean v1_17 = serverVersion.isNewerThanOrEquals(ServerVersion.V_1_17);
         boolean v1_13_2 = serverVersion.isNewerThanOrEquals(ServerVersion.V_1_13_2);
 
-        writeBoolean(column.isFullChunk());
+        if (!v1_18) {
+            writeBoolean(column.isFullChunk());
+        }
+
         boolean hasWrittenBiomeData = false;
 
         if (serverVersion == ServerVersion.V_1_16 ||
@@ -254,7 +310,7 @@ public class WrapperPlayServerChunkData extends PacketWrapper<WrapperPlayServerC
             writeNBT(column.getHeightMaps());
         }
 
-        if (column.hasBiomeData() && v1_13_2 && serverVersion.isNewerThanOrEquals(ServerVersion.V_1_15)) {
+        if (column.hasBiomeData() && v1_13_2 && serverVersion.isNewerThanOrEquals(ServerVersion.V_1_15) && !v1_18) {
             int[] biomeData = column.getBiomeDataInts();
             int biomesLength = biomeData.length;
             if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_16_2)) {
@@ -280,10 +336,15 @@ public class WrapperPlayServerChunkData extends PacketWrapper<WrapperPlayServerC
         BaseChunk[] chunks = column.getChunks();
         for (int index = 0; index < chunks.length; index++) {
             BaseChunk chunk = chunks[index];
-            if (chunk != null && !chunk.isKnownEmpty()) {
+            if (v1_18) {
+                Chunk_v1_18.write(dataOut, (Chunk_v1_18) chunk);
+            } else if (chunk != null && !chunk.isKnownEmpty()) {
                 chunkMask.set(index);
-                // Chunk_v1_15.write(dataOut, chunk);
             }
+        }
+
+        if (!v1_18) {
+            writeChunkMask(chunkMask);
         }
 
         byte[] data = dataBytes.toByteArray();
@@ -298,11 +359,38 @@ public class WrapperPlayServerChunkData extends PacketWrapper<WrapperPlayServerC
             writeByteArray(biomeDataBytes);
         }
 
-        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_9)) {
-            NBTCompound[] tileEntities = column.getTileEntities();
+        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_18)) {
+            writeVarInt(column.getTileEntities().length);
+            for (TileEntity tileEntity : column.getTileEntities()) {
+                writeByte(tileEntity.getPackedByte());
+                writeShort(tileEntity.getYShort());
+                writeVarInt(tileEntity.getType());
+                writeNBT(tileEntity.getNBT());
+            }
+        } else if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_9)) {
+            TileEntity[] tileEntities = column.getTileEntities();
             writeVarInt(tileEntities.length);
-            for (int i = 0; i < tileEntities.length; i++) {
-                writeNBT(tileEntities[i]);
+
+            for (TileEntity tileEntity : tileEntities) {
+                writeNBT(tileEntity.getNBT());
+            }
+        }
+
+        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_18)) {
+            writeBoolean(trustEdges);
+            writeChunkMask(skyLightMask);
+            writeChunkMask(blockLightMask);
+            writeChunkMask(emptySkyLightMask);
+            writeChunkMask(emptyBlockLightMask);
+
+            writeVarInt(skyLightCount);
+            for (int x = 0; x < skyLightCount; x++) {
+                writeByteArray(skyLightArray[x]);
+            }
+
+            writeVarInt(blockLightCount);
+            for (int x = 0; x < blockLightCount; x++) {
+                writeByteArray(blockLightArray[x]);
             }
         }
     }
