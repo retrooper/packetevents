@@ -58,4 +58,9 @@ public class Location {
     public void setPitch(float pitch) {
         this.pitch = pitch;
     }
+
+    @Override
+    public Location clone() {
+        return new Location(position, yaw, pitch);
+    }
 }
