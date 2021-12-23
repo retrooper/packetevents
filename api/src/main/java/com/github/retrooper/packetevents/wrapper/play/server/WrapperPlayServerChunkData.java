@@ -26,6 +26,7 @@ import com.github.retrooper.packetevents.protocol.stream.NetStreamOutput;
 import com.github.retrooper.packetevents.protocol.world.chunk.BaseChunk;
 import com.github.retrooper.packetevents.protocol.world.chunk.Column;
 import com.github.retrooper.packetevents.protocol.world.chunk.TileEntity;
+import com.github.retrooper.packetevents.protocol.world.chunk.impl.v1_16.Chunk_v1_9;
 import com.github.retrooper.packetevents.protocol.world.chunk.impl.v_1_18.Chunk_v1_18;
 import com.github.retrooper.packetevents.protocol.world.chunk.reader.ChunkReader;
 import com.github.retrooper.packetevents.protocol.world.chunk.reader.impl.*;
@@ -72,9 +73,8 @@ public class WrapperPlayServerChunkData extends PacketWrapper<WrapperPlayServerC
 
     private long[] readBitSetLongs() {
         if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_17)) {
-            int bitMaskLength = readVarInt();
             //Read primary bit mask
-            return readLongArray(bitMaskLength);
+            return readLongArray();
         } else if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_9)) {
             //Read primary bit mask
             return new long[]{readVarInt()};
@@ -129,21 +129,10 @@ public class WrapperPlayServerChunkData extends PacketWrapper<WrapperPlayServerC
             secondaryChunkMask = readChunkMask();
         }
 
-        byte[] data = readByteArray();
-        data = deflate(data, chunkMask, fullChunk);
-
         int chunkSize = 16;
         if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_18)) {
             chunkSize = 25;
-        } else if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_17)) {
-            chunkSize = chunkMask.size();
         }
-
-        BaseChunk[] chunks = getChunkReader().read(chunkMask, secondaryChunkMask, fullChunk, true, true, chunkSize, data);
-
-        int[] biomeDataInts = null;
-        byte[] biomeDataBytes = null;
-        boolean bytesInsteadOfInts = serverVersion.isOlderThan(ServerVersion.V_1_13);
 
         // 1.7 logic is the same
         // 1.8 logic is the same, however, MCProtocolLib checks for remaining bytes... is this needed?
@@ -154,6 +143,10 @@ public class WrapperPlayServerChunkData extends PacketWrapper<WrapperPlayServerC
         // 1.17 logic ALWAYS sends biome data because it is always a full chunk
         // 1.18 logic makes it all a palette type system for biome data...
         boolean hasBiomeData = (fullChunk && serverVersion.isOlderThan(ServerVersion.V_1_18));
+
+        boolean bytesInsteadOfInts = serverVersion.isOlderThan(ServerVersion.V_1_13);
+        int[] biomeDataInts = null;
+        byte[] biomeDataBytes = null;
 
         // 1.7 sends the chunk data as a byte array of size 256 when it is a full chunk
         // This also applies to 1.8 through 1.12
@@ -173,6 +166,11 @@ public class WrapperPlayServerChunkData extends PacketWrapper<WrapperPlayServerC
                 }
             }
         }
+
+        byte[] data = readByteArray();
+        data = deflate(data, chunkMask, fullChunk);
+
+        BaseChunk[] chunks = getChunkReader().read(chunkMask, secondaryChunkMask, fullChunk, true, true, chunkSize, data);
 
         // Tile entities are not sent with this packet on 1.8 and below
         // on 1.9 and above for all versions, tile entities are sent with the chunk data
@@ -292,7 +290,7 @@ public class WrapperPlayServerChunkData extends PacketWrapper<WrapperPlayServerC
         boolean v1_17 = serverVersion.isNewerThanOrEquals(ServerVersion.V_1_17);
         boolean v1_13_2 = serverVersion.isNewerThanOrEquals(ServerVersion.V_1_13_2);
 
-        if (!v1_18) {
+        if (!v1_17) {
             writeBoolean(column.isFullChunk());
         }
 
@@ -303,27 +301,6 @@ public class WrapperPlayServerChunkData extends PacketWrapper<WrapperPlayServerC
             //Ignore old data = true, use existing lighting
             //TODO See what we can do with this field
             writeBoolean(ignoreOldData);
-        }
-
-        boolean hasHeightMaps = serverVersion.isNewerThanOrEquals(ServerVersion.V_1_14);
-        if (hasHeightMaps) {
-            writeNBT(column.getHeightMaps());
-        }
-
-        if (column.hasBiomeData() && v1_13_2 && serverVersion.isNewerThanOrEquals(ServerVersion.V_1_15) && !v1_18) {
-            int[] biomeData = column.getBiomeDataInts();
-            int biomesLength = biomeData.length;
-            if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_16_2)) {
-                writeVarInt(biomesLength);
-            }
-            for (int index = 0; index < column.getBiomeDataInts().length; index++) {
-                if (v1_17) {
-                    writeVarInt(biomeData[index]);
-                } else {
-                    writeInt(biomeData[index]);
-                }
-            }
-            hasWrittenBiomeData = true;
         }
 
         //TODO Decompress data on 1.7.10
@@ -340,11 +317,39 @@ public class WrapperPlayServerChunkData extends PacketWrapper<WrapperPlayServerC
                 Chunk_v1_18.write(dataOut, (Chunk_v1_18) chunk);
             } else if (chunk != null && !chunk.isKnownEmpty()) {
                 chunkMask.set(index);
+                Chunk_v1_9.write(dataOut, (Chunk_v1_9) chunk);
             }
         }
 
         if (!v1_18) {
             writeChunkMask(chunkMask);
+        }
+
+        boolean hasHeightMaps = serverVersion.isNewerThanOrEquals(ServerVersion.V_1_14);
+        if (hasHeightMaps) {
+            writeNBT(column.getHeightMaps());
+        }
+
+        if (column.hasBiomeData() && v1_13_2 && serverVersion.isNewerThanOrEquals(ServerVersion.V_1_15) && !v1_18) {
+            boolean bytesInsteadOfInts = serverVersion.isOlderThan(ServerVersion.V_1_13);
+            int[] biomeDataInts = column.getBiomeDataInts();
+            byte[] biomeDataByes = column.getBiomeDataBytes();
+
+            if (bytesInsteadOfInts) {
+                for (byte biomeDataBye : biomeDataByes) {
+                    writeByte(biomeDataBye);
+                }
+            } else {
+                if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_16_2)) {
+                    writeVarIntArray(biomeDataInts);
+                } else {
+                    for (int biomeDataInt : biomeDataInts) {
+                        writeInt(biomeDataInt);
+                    }
+                }
+            }
+
+            hasWrittenBiomeData = true;
         }
 
         byte[] data = dataBytes.toByteArray();

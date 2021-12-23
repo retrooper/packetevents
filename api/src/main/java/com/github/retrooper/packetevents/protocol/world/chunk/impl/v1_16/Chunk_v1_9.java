@@ -45,13 +45,13 @@ public class Chunk_v1_9 implements BaseChunk {
     // This handles 1.9 through 1.17 chunk data!
     public Chunk_v1_9(NetStreamInput in, boolean hasBlockLight, boolean hasSkyLight) {
         boolean isFourteen = PacketEvents.getAPI().getServerManager().getVersion().isNewerThanOrEquals(ServerVersion.V_1_14);
+        boolean isSixteen = PacketEvents.getAPI().getServerManager().getVersion().isNewerThanOrEquals(ServerVersion.V_1_16);
 
         // 1.14+ includes block count in chunk data
         if (isFourteen) {
             blockCount = in.readShort();
         }
 
-        boolean isSixteen = PacketEvents.getAPI().getServerManager().getVersion().isNewerThanOrEquals(ServerVersion.V_1_16);
         if (isSixteen) {
             dataPalette = DataPalette.read(in, PaletteType.CHUNK);
         } else {

@@ -148,4 +148,8 @@ public class Column {
     public int[] getBiomeDataInts() {
         return biomeDataInts;
     }
+
+    public byte[] getBiomeDataBytes() {
+        return biomeDataBytes;
+    }
 }
