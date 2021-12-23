@@ -25,7 +25,9 @@ import com.github.retrooper.packetevents.util.Vector3d;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 
 public class WrapperPlayServerEntityRelativeMove extends PacketWrapper<WrapperPlayServerEntityRelativeMove> {
+    //(Short.MAX_VALUE + 1) / 8.0
     private static double MODERN_DELTA_DIVISOR = 4096.0;
+    //(Byte.MAX_VALUE + 1) / 4.0
     private static double LEGACY_DELTA_DIVISOR = 32.0;
     private int entityID;
     private double deltaX;
@@ -37,7 +39,7 @@ public class WrapperPlayServerEntityRelativeMove extends PacketWrapper<WrapperPl
     }
 
     public WrapperPlayServerEntityRelativeMove(int entityID, double deltaX, double deltaY, double deltaZ, boolean onGround) {
-        super(PacketType.Play.Server.ENTITY_RELATIVE_MOVE_AND_ROTATION);
+        super(PacketType.Play.Server.ENTITY_RELATIVE_MOVE);
         this.entityID = entityID;
         this.deltaX = deltaX;
         this.deltaY = deltaY;
