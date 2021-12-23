@@ -115,8 +115,10 @@ public class NPCManager {
         Location from = npc.getLocation();
         Set<ChannelAbstract> targetChannels = TARGET_CHANNELS.get(npc);
         if (targetChannels != null && !targetChannels.isEmpty()) {
-            WrapperPlayServerEntityRotation entityRotation = new WrapperPlayServerEntityRotation(npc.getId(), yaw, pitch, true);
-            PacketEvents.getAPI().getPlayerManager().sendPacket(targetChannels, entityRotation);
+            for (ChannelAbstract channel : targetChannels) {
+                WrapperPlayServerEntityRotation entityRotation = new WrapperPlayServerEntityRotation(npc.getId(), yaw, pitch, true);
+                PacketEvents.getAPI().getPlayerManager().sendPacket(channel, entityRotation);
+            }
         }
     }
 }
