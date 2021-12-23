@@ -38,6 +38,7 @@ public abstract class ProtocolPacketEvent<T> extends PacketEvent implements Play
     private final ChannelAbstract channel;
     private final InetSocketAddress socketAddress;
     private final T player;
+    //TODO GameProfile
     private final ByteBufAbstract byteBuf;
     private final int packetID;
     private final PacketTypeCommon packetType;

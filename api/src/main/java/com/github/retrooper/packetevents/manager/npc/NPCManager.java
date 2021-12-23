@@ -111,12 +111,11 @@ public class NPCManager {
         }
     }
 
-    public void updateNPCRotation(NPC npc, Location to) {
+    public void updateNPCRotation(NPC npc, byte yaw, byte pitch) {
         Location from = npc.getLocation();
-        npc.setLocation(to);
         Set<ChannelAbstract> targetChannels = TARGET_CHANNELS.get(npc);
         if (targetChannels != null && !targetChannels.isEmpty()) {
-            WrapperPlayServerEntityRotation entityRotation = new WrapperPlayServerEntityRotation(npc.getId(), (byte) to.getYaw(), (byte)to.getPitch(), true);
+            WrapperPlayServerEntityRotation entityRotation = new WrapperPlayServerEntityRotation(npc.getId(), yaw, pitch, true);
             PacketEvents.getAPI().getPlayerManager().sendPacket(targetChannels, entityRotation);
         }
     }
