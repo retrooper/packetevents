@@ -26,7 +26,7 @@ import io.github.retrooper.packetevents.utils.server.ServerVersion;
 import org.bukkit.inventory.ItemStack;
 
 public class WrappedPacketInWindowClick extends WrappedPacket {
-    private static boolean v_1_17;
+    private static boolean legacy, v_1_17;
     private static Class<? extends Enum<?>> invClickTypeClass;
 
     public WrappedPacketInWindowClick(NMSPacket packet) {
@@ -35,6 +35,7 @@ public class WrappedPacketInWindowClick extends WrappedPacket {
 
     @Override
     protected void load() {
+        legacy = version.isOlderThanOrEquals(ServerVersion.v_1_8_8);
         v_1_17 = version.isNewerThanOrEquals(ServerVersion.v_1_17);
         invClickTypeClass = NMSUtils.getNMSEnumClassWithoutException("InventoryClickType");
         if (invClickTypeClass == null) {
@@ -87,7 +88,7 @@ public class WrappedPacketInWindowClick extends WrappedPacket {
 
     // Type of click - shift clicking, hotbar, drag, pickup...
     public int getMode() {
-        if (!v_1_17) {
+        if(legacy) {
             return readInt(3);
         } else {
             Enum<?> enumConst = readEnumConstant(0, invClickTypeClass);
@@ -96,7 +97,7 @@ public class WrappedPacketInWindowClick extends WrappedPacket {
     }
 
     public void setMode(int mode) {
-        if (!v_1_17) {
+        if(legacy) {
             writeInt(3, mode);
         } else {
             Enum<?> enumConst = EnumUtil.valueByIndex(invClickTypeClass, mode);
