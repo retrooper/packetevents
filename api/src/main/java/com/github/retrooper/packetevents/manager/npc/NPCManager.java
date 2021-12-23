@@ -67,6 +67,17 @@ public class NPCManager {
         return targetChannels != null && targetChannels.contains(channel);
     }
 
+    public void teleportNPC(NPC npc, Location to) {
+        npc.setLocation(to);
+        Set<ChannelAbstract> targetChannels = TARGET_CHANNELS.get(npc);
+        if (targetChannels != null) {
+            for (ChannelAbstract channel : targetChannels) {
+                WrapperPlayServerEntityTeleport entityTeleport = new WrapperPlayServerEntityTeleport(npc.getId(), to, true);
+                PacketEvents.getAPI().getPlayerManager().sendPacket(channel, entityTeleport);
+            }
+        }
+    }
+
     public void updateNPCLocation(NPC npc, Location to) {
         Location from = npc.getLocation();
         npc.setLocation(to);
@@ -80,7 +91,7 @@ public class NPCManager {
                     distZAbs > ENTITY_TELEPORT_THRESHOLD;
             for (ChannelAbstract channel : targetChannels) {
                 if (shouldUseEntityTeleport) {
-                    WrapperPlayServerEntityTeleport entityTeleport = new WrapperPlayServerEntityTeleport(npc.getId(), npc.getLocation(), true);
+                    WrapperPlayServerEntityTeleport entityTeleport = new WrapperPlayServerEntityTeleport(npc.getId(), to, true);
                     PacketEvents.getAPI().getPlayerManager().sendPacket(channel, entityTeleport);
                 }
                 else {
