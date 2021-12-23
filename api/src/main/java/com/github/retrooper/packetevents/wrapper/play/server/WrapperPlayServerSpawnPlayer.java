@@ -20,11 +20,17 @@ package com.github.retrooper.packetevents.wrapper.play.server;
 
 import com.github.retrooper.packetevents.event.impl.PacketSendEvent;
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
+import com.github.retrooper.packetevents.protocol.entity.data.EntityData;
+import com.github.retrooper.packetevents.protocol.item.type.ItemType;
+import com.github.retrooper.packetevents.protocol.item.type.ItemTypes;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
+import com.github.retrooper.packetevents.protocol.world.Location;
 import com.github.retrooper.packetevents.util.MathUtil;
 import com.github.retrooper.packetevents.util.Vector3d;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 public class WrapperPlayServerSpawnPlayer extends PacketWrapper<WrapperPlayServerSpawnPlayer> {
@@ -37,20 +43,26 @@ public class WrapperPlayServerSpawnPlayer extends PacketWrapper<WrapperPlayServe
 
     //TODO Make accessible, especially when we do itemstack abstraction
     @Deprecated
-    private int itemID;
-
+    private ItemType item;
+    private List<EntityData> entityMetadata;
 
     public WrapperPlayServerSpawnPlayer(PacketSendEvent event) {
         super(event);
     }
 
-    public WrapperPlayServerSpawnPlayer(int entityID, UUID uuid, Vector3d position, float yaw, float pitch) {
+    public WrapperPlayServerSpawnPlayer(int entityID, UUID uuid, Vector3d position, float yaw, float pitch, List<EntityData> entityMetadata) {
         super(PacketType.Play.Server.SPAWN_PLAYER);
         this.entityID = entityID;
         this.uuid = uuid;
         this.position = position;
         this.yaw = yaw;
         this.pitch = pitch;
+        this.entityMetadata = entityMetadata;
+        this.item = ItemTypes.AIR;
+    }
+
+    public WrapperPlayServerSpawnPlayer(int entityId, UUID uuid, Location location, List<EntityData> entityMetadata) {
+        this(entityId, uuid, location.getPosition(), location.getYaw(), location.getPitch(), entityMetadata);
     }
 
     @Override
@@ -67,10 +79,17 @@ public class WrapperPlayServerSpawnPlayer extends PacketWrapper<WrapperPlayServe
         yaw = readByte() /  ROTATION_DIVISOR;
         pitch = readByte() / ROTATION_DIVISOR;
         if (!v1_9) {
-            itemID = readByte();
+            item = ItemTypes.getById(readByte());
+        }
+        else {
+            item = ItemTypes.AIR;
         }
         if (serverVersion.isOlderThan(ServerVersion.V_1_15)) {
             //TODO Read metadata
+            entityMetadata = readEntityMetadata();
+        }
+        else {
+            entityMetadata = new ArrayList<>();
         }
     }
 
@@ -101,10 +120,10 @@ public class WrapperPlayServerSpawnPlayer extends PacketWrapper<WrapperPlayServe
         writeByte((byte) (yaw * ROTATION_DIVISOR));
         writeByte((byte) (pitch * ROTATION_DIVISOR));
         if (!v1_9) {
-            writeByte((byte) itemID);
+            writeByte(item.getId());
         }
         if (serverVersion.isOlderThan(ServerVersion.V_1_15)) {
-            //TODO Write metadata
+            writeEntityMetadata(entityMetadata);
         }
     }
 
@@ -146,5 +165,25 @@ public class WrapperPlayServerSpawnPlayer extends PacketWrapper<WrapperPlayServe
 
     public void setPitch(float pitch) {
         this.pitch = pitch;
+    }
+
+    @Deprecated
+    public List<EntityData> getEntityMetadata() {
+        return entityMetadata;
+    }
+
+    @Deprecated
+    public void setEntityMetadata(List<EntityData> entityMetadata) {
+        this.entityMetadata = entityMetadata;
+    }
+
+    @Deprecated
+    public ItemType getItem() {
+        return item;
+    }
+
+    @Deprecated
+    public void setItem(ItemType item) {
+        this.item = item;
     }
 }

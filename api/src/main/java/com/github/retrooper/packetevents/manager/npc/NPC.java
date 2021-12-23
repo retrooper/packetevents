@@ -1,0 +1,64 @@
+/*
+ * This file is part of packetevents - https://github.com/retrooper/packetevents
+ * Copyright (C) 2021 retrooper and contributors
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+package com.github.retrooper.packetevents.manager.npc;
+
+import com.github.retrooper.packetevents.protocol.gameprofile.GameProfile;
+import com.github.retrooper.packetevents.protocol.world.Location;
+
+public class NPC {
+    private final String displayName;
+    private final int id;
+    private final GameProfile profile;
+    private int displayPing = 0;
+    private Location location = new Location(0.0, 0.0, 0.0, 0.0f, 0.0f);
+
+    public NPC(String displayName, int entityId, GameProfile profile) {
+        this.displayName = displayName;
+        this.id = entityId;
+        this.profile = profile;
+    }
+
+    public String getDisplayName() {
+        return displayName;
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public GameProfile getProfile() {
+        return profile;
+    }
+
+    public int getDisplayPing() {
+        return displayPing;
+    }
+
+    public void setDisplayPing(int ping) {
+        this.displayPing = ping;
+    }
+
+    public Location getLocation() {
+        return location;
+    }
+
+    public void setLocation(Location location) {
+        this.location = location;
+    }
+}

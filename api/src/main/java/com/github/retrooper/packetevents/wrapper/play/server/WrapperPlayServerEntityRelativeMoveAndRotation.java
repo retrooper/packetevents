@@ -23,7 +23,7 @@ import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 
-public class WrapperPlayServerEntityRelativeMoveAndLook extends PacketWrapper<WrapperPlayServerEntityRelativeMoveAndLook> {
+public class WrapperPlayServerEntityRelativeMoveAndRotation extends PacketWrapper<WrapperPlayServerEntityRelativeMoveAndRotation> {
     private static double MODERN_DELTA_DIVISOR = 4096.0;
     private static double LEGACY_DELTA_DIVISOR = 32.0;
     private int entityID;
@@ -33,12 +33,12 @@ public class WrapperPlayServerEntityRelativeMoveAndLook extends PacketWrapper<Wr
     private byte yaw;
     private byte pitch;
     private boolean onGround;
-    public WrapperPlayServerEntityRelativeMoveAndLook(PacketSendEvent event) {
+    public WrapperPlayServerEntityRelativeMoveAndRotation(PacketSendEvent event) {
         super(event);
     }
 
-    public WrapperPlayServerEntityRelativeMoveAndLook(int entityID, double deltaX, double deltaY, double deltaZ, byte yaw, byte pitch, boolean onGround) {
-        super(PacketType.Play.Server.ENTITY_RELATIVE_MOVE_AND_LOOK);
+    public WrapperPlayServerEntityRelativeMoveAndRotation(int entityID, double deltaX, double deltaY, double deltaZ, byte yaw, byte pitch, boolean onGround) {
+        super(PacketType.Play.Server.ENTITY_RELATIVE_MOVE_AND_ROTATION);
         this.entityID = entityID;
         this.deltaX = deltaX;
         this.deltaY = deltaY;
@@ -67,7 +67,7 @@ public class WrapperPlayServerEntityRelativeMoveAndLook extends PacketWrapper<Wr
     }
 
     @Override
-    public void readData(WrapperPlayServerEntityRelativeMoveAndLook wrapper) {
+    public void readData(WrapperPlayServerEntityRelativeMoveAndRotation wrapper) {
         entityID = wrapper.entityID;
         deltaX = wrapper.deltaX;
         deltaY = wrapper.deltaY;

@@ -31,6 +31,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 
@@ -62,6 +63,22 @@ public class WrapperPlayServerPlayerInfo extends PacketWrapper<WrapperPlayServer
         this.action = action;
         this.uuid = uuid;
         this.playerDataList = playerDataList;
+    }
+
+    public WrapperPlayServerPlayerInfo(@NotNull Action action, UUID uuid, PlayerData... playerData) {
+        super(PacketType.Play.Server.PLAYER_INFO);
+        this.action = action;
+        this.uuid = uuid;
+        this.playerDataList = new ArrayList<>();
+        Collections.addAll(playerDataList, playerData);
+    }
+
+    public WrapperPlayServerPlayerInfo(@NotNull Action action, UUID uuid, PlayerData playerData) {
+        super(PacketType.Play.Server.PLAYER_INFO);
+        this.action = action;
+        this.uuid = uuid;
+        this.playerDataList = new ArrayList<>();
+        this.playerDataList.add(playerData);
     }
 
     @Override

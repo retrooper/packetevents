@@ -21,6 +21,7 @@ package com.github.retrooper.packetevents.wrapper.play.server;
 import com.github.retrooper.packetevents.event.impl.PacketSendEvent;
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
+import com.github.retrooper.packetevents.protocol.world.Location;
 import com.github.retrooper.packetevents.util.MathUtil;
 import com.github.retrooper.packetevents.util.Vector3d;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
@@ -48,6 +49,10 @@ public class WrapperPlayServerEntityTeleport extends PacketWrapper<WrapperPlaySe
         this.yaw = yaw;
         this.pitch = pitch;
         this.onGround = onGround;
+    }
+
+    public WrapperPlayServerEntityTeleport(int entityID, Location location, boolean onGround) {
+        this(entityID, location.getPosition(), location.getYaw(), location.getPitch(), onGround);
     }
 
     @Override

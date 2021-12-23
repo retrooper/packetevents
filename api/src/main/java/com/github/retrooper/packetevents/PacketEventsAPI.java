@@ -20,6 +20,7 @@ package com.github.retrooper.packetevents;
 
 import com.github.retrooper.packetevents.event.EventManager;
 import com.github.retrooper.packetevents.injector.ChannelInjector;
+import com.github.retrooper.packetevents.manager.npc.NPCManager;
 import com.github.retrooper.packetevents.manager.player.PlayerManager;
 import com.github.retrooper.packetevents.manager.server.ServerManager;
 import com.github.retrooper.packetevents.netty.NettyManager;
@@ -46,6 +47,10 @@ public interface PacketEventsAPI<T> {
     ServerManager getServerManager();
 
     PlayerManager getPlayerManager();
+
+    default NPCManager getNPCManager() {
+        return new NPCManager();
+    }
 
     EventManager getEventManager();
 

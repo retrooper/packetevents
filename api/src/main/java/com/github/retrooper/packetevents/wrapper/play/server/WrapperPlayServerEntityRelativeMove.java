@@ -21,6 +21,7 @@ package com.github.retrooper.packetevents.wrapper.play.server;
 import com.github.retrooper.packetevents.event.impl.PacketSendEvent;
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
+import com.github.retrooper.packetevents.util.Vector3d;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 
 public class WrapperPlayServerEntityRelativeMove extends PacketWrapper<WrapperPlayServerEntityRelativeMove> {
@@ -36,7 +37,7 @@ public class WrapperPlayServerEntityRelativeMove extends PacketWrapper<WrapperPl
     }
 
     public WrapperPlayServerEntityRelativeMove(int entityID, double deltaX, double deltaY, double deltaZ, boolean onGround) {
-        super(PacketType.Play.Server.ENTITY_RELATIVE_MOVE_AND_LOOK);
+        super(PacketType.Play.Server.ENTITY_RELATIVE_MOVE_AND_ROTATION);
         this.entityID = entityID;
         this.deltaX = deltaX;
         this.deltaY = deltaY;

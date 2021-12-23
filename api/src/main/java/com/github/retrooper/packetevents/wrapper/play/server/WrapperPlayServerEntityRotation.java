@@ -19,21 +19,20 @@
 package com.github.retrooper.packetevents.wrapper.play.server;
 
 import com.github.retrooper.packetevents.event.impl.PacketSendEvent;
-import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 
-public class WrapperPlayServerEntityLook extends PacketWrapper<WrapperPlayServerEntityLook> {
+public class WrapperPlayServerEntityRotation extends PacketWrapper<WrapperPlayServerEntityRotation> {
     private int entityID;
     private byte yaw;
     private byte pitch;
     private boolean onGround;
-    public WrapperPlayServerEntityLook(PacketSendEvent event) {
+    public WrapperPlayServerEntityRotation(PacketSendEvent event) {
         super(event);
     }
 
-    public WrapperPlayServerEntityLook(int entityID, byte yaw, byte pitch, boolean onGround) {
-        super(PacketType.Play.Server.ENTITY_RELATIVE_MOVE_AND_LOOK);
+    public WrapperPlayServerEntityRotation(int entityID, byte yaw, byte pitch, boolean onGround) {
+        super(PacketType.Play.Server.ENTITY_ROTATION);
         this.entityID = entityID;
         this.yaw = yaw;
         this.pitch = pitch;
@@ -49,7 +48,7 @@ public class WrapperPlayServerEntityLook extends PacketWrapper<WrapperPlayServer
     }
 
     @Override
-    public void readData(WrapperPlayServerEntityLook wrapper) {
+    public void readData(WrapperPlayServerEntityRotation wrapper) {
         entityID = wrapper.entityID;
         yaw = wrapper.yaw;
         pitch = wrapper.pitch;
