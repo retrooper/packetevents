@@ -674,6 +674,15 @@ public class WrappedBlockState {
         checkIsStillValid();
     }
 
+    public East getEast() {
+        return (East) data.get(StateValue.EAST);
+    }
+
+    public void setEast(East west) {
+        data.put(StateValue.EAST, west);
+        checkIsStillValid();
+    }
+
     public West getWest() {
         return (West) data.get(StateValue.WEST);
     }
