@@ -414,8 +414,27 @@ public class PacketWrapper<T extends PacketWrapper> {
         return buffer.readLong();
     }
 
+    public long readVarLong()  {
+        long value = 0;
+        int size = 0;
+        int b;
+        while(((b = this.readByte()) & 0x80) == 0x80) {
+            value |= (long) (b & 0x7F) << (size++ * 7);
+        }
+        return value | ((long) (b & 0x7F) << (size * 7));
+    }
+
     public void writeLong(long value) {
         buffer.writeLong(value);
+    }
+
+    public void writeVarLong(long l) {
+        while((l & ~0x7F) != 0) {
+            this.writeByte((int) (l & 0x7F) | 0x80);
+            l >>>= 7;
+        }
+
+        this.writeByte((int) l);
     }
 
     public float readFloat() {
