@@ -12,7 +12,10 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.util.*;
+import java.util.EnumMap;
+import java.util.HashMap;
+import java.util.Locale;
+import java.util.Map;
 
 /**
  * This class is designed to take advantage of modern minecraft versions
@@ -70,6 +73,10 @@ public class WrappedBlockState {
     @Override
     public int hashCode() {
         return globalID;
+    }
+
+    public StateType getType() {
+        return type;
     }
 
     // Begin all block data types
@@ -622,11 +629,11 @@ public class WrappedBlockState {
         checkIsStillValid();
     }
 
-    public Type getType() {
+    public Type getTypeData() {
         return (Type) data.get(StateValue.TYPE);
     }
 
-    public void setType(Type type) {
+    public void setTypeData(Type type) {
         data.put(StateValue.TYPE, type);
         checkIsStillValid();
     }
