@@ -199,27 +199,26 @@ public class PacketWrapper<T extends PacketWrapper> {
     }
 
     public int readVarInt() {
-        byte b0;
-        int i = 0;
+        int result = 0;
+        byte i;
         int j = 0;
         do {
-            b0 = buffer.readByte();
-            i |= (b0 & Byte.MAX_VALUE) << j++ * 7;
+            i = buffer.readByte();
+            result |= (i & Byte.MAX_VALUE) << j++ * 7;
             if (j > 5)
                 throw new RuntimeException("VarInt too big");
-        } while ((b0 & 0x80) == 128);
-        return i;
+        } while ((i & 0x80) == 128);
+        return result;
     }
 
     public void writeVarInt(int value) {
         while ((value & -128) != 0) {
-            buffer.writeByte(value & 127 | 128);
+            buffer.writeByte(value & Byte.MAX_VALUE | 128);
             value >>>= 7;
         }
 
         buffer.writeByte(value);
     }
-
     public <K, V> Map<K, V> readMap(Function<PacketWrapper<?>, K> keyFunction, Function<PacketWrapper<?>, V> valueFunction) {
         int size = readVarInt();
         Map<K, V> map = new HashMap<>(size);

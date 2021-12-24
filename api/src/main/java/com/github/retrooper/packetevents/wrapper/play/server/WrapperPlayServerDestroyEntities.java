@@ -72,6 +72,7 @@ public class WrapperPlayServerDestroyEntities extends PacketWrapper<WrapperPlayS
     public void writeData() {
         if (serverVersion == ServerVersion.V_1_17) {
             //TODO Inform them that they should use the single entityID constructor
+            //TODO Maybe convert into multiple packets?
             writeVarInt(entityIDs[0]);
         }
         else {
