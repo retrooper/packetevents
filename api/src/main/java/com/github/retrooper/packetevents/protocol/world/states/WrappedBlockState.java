@@ -135,7 +135,7 @@ public class WrappedBlockState {
         checkIsStillValid();
     }
 
-    public boolean getBottom() {
+    public boolean isBottom() {
         return (boolean) data.get(StateValue.BOTTOM);
     }
 
@@ -198,7 +198,7 @@ public class WrappedBlockState {
         checkIsStillValid();
     }
 
-    public boolean getDown() {
+    public boolean isDown() {
         return (boolean) data.get(StateValue.DOWN);
     }
 
@@ -504,7 +504,7 @@ public class WrappedBlockState {
         checkIsStillValid();
     }
 
-    public boolean getPersistent() {
+    public boolean isPersistent() {
         return (boolean) data.get(StateValue.PERSISTENT);
     }
 
@@ -585,7 +585,7 @@ public class WrappedBlockState {
         checkIsStillValid();
     }
 
-    public boolean getSnowy() {
+    public boolean isSnowy() {
         return (boolean) data.get(StateValue.SNOWY);
     }
 
@@ -666,11 +666,11 @@ public class WrappedBlockState {
         checkIsStillValid();
     }
 
-    public boolean getVerticalDirection() {
-        return (boolean) data.get(StateValue.VERTICAL_DIRECTION);
+    public VerticalDirection getVerticalDirection() {
+        return (VerticalDirection) data.get(StateValue.VERTICAL_DIRECTION);
     }
 
-    public void setVerticalDirection(boolean verticalDirection) {
+    public void setVerticalDirection(VerticalDirection verticalDirection) {
         data.put(StateValue.VERTICAL_DIRECTION, verticalDirection);
         checkIsStillValid();
     }

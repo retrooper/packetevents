@@ -73,7 +73,7 @@ public enum StateValue {
     TYPE("type", Type::valueOf),
     UNSTABLE("unstable", Boolean::parseBoolean),
     UP("up", Boolean::parseBoolean),
-    VERTICAL_DIRECTION("vertical_direction", Boolean::parseBoolean),
+    VERTICAL_DIRECTION("vertical_direction", VerticalDirection::valueOf),
     WATERLOGGED("waterlogged", Boolean::parseBoolean),
     WEST("west", West::valueOf);
 
