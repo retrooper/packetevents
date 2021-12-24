@@ -109,15 +109,20 @@ public class NPCManager {
                     if (positionChanged && rotationChanged) {
                         WrapperPlayServerEntityRelativeMoveAndRotation entityRelativeMoveAndRotation = new WrapperPlayServerEntityRelativeMoveAndRotation(npc.getId(), deltaX, deltaY, deltaZ, (byte)to.getYaw(), (byte)to.getPitch(), true);
                         PacketEvents.getAPI().getPlayerManager().sendPacket(channel, entityRelativeMoveAndRotation);
+
+                        WrapperPlayServerEntityHeadLook headYaw = new WrapperPlayServerEntityHeadLook(npc.getId(), (byte) to.getYaw());
+                        PacketEvents.getAPI().getPlayerManager().sendPacket(channel, headYaw);
                     }
                     else if (positionChanged) {
-                        //TODO Try replace with entity teleport, idk why its not workiing
                         WrapperPlayServerEntityRelativeMove entityRelativeMove = new WrapperPlayServerEntityRelativeMove(npc.getId(), deltaX, deltaY, deltaZ, true);
                         PacketEvents.getAPI().getPlayerManager().sendPacket(channel, entityRelativeMove);
                     }
                     else if (rotationChanged) {
                         WrapperPlayServerEntityRotation entityRotation = new WrapperPlayServerEntityRotation(npc.getId(), (byte) to.getYaw(), (byte)to.getPitch(), true);
                         PacketEvents.getAPI().getPlayerManager().sendPacket(channel, entityRotation);
+
+                        WrapperPlayServerEntityHeadLook headYaw = new WrapperPlayServerEntityHeadLook(npc.getId(), (byte) to.getYaw());
+                        PacketEvents.getAPI().getPlayerManager().sendPacket(channel, headYaw);
                     }
                 }
             }
@@ -132,6 +137,9 @@ public class NPCManager {
             for (ChannelAbstract channel : targetChannels) {
                 WrapperPlayServerEntityRotation entityRotation = new WrapperPlayServerEntityRotation(npc.getId(), yaw, pitch, true);
                 PacketEvents.getAPI().getPlayerManager().sendPacket(channel, entityRotation);
+
+                WrapperPlayServerEntityHeadLook headYaw = new WrapperPlayServerEntityHeadLook(npc.getId(), yaw);
+                PacketEvents.getAPI().getPlayerManager().sendPacket(channel, headYaw);
             }
         }
     }
