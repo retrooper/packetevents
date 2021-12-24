@@ -90,7 +90,7 @@ public class WrappedBlockState {
         checkIsStillValid();
     }
 
-    public boolean getAttached() {
+    public boolean isAttached() {
         return (boolean) data.get(StateValue.ATTACHED);
     }
 
@@ -117,7 +117,7 @@ public class WrappedBlockState {
         checkIsStillValid();
     }
 
-    public boolean getBerries() {
+    public boolean isBerries() {
         return (boolean) data.get(StateValue.BERRIES);
     }
 
@@ -162,7 +162,7 @@ public class WrappedBlockState {
         checkIsStillValid();
     }
 
-    public boolean getConditional() {
+    public boolean isConditional() {
         return (boolean) data.get(StateValue.CONDITIONAL);
     }
 
@@ -180,7 +180,7 @@ public class WrappedBlockState {
         checkIsStillValid();
     }
 
-    public boolean getDisarmed() {
+    public boolean isDisarmed() {
         return (boolean) data.get(StateValue.DISARMED);
     }
 
@@ -207,7 +207,7 @@ public class WrappedBlockState {
         checkIsStillValid();
     }
 
-    public boolean getDrag() {
+    public boolean isDrag() {
         return (boolean) data.get(StateValue.DRAG);
     }
 
@@ -279,7 +279,7 @@ public class WrappedBlockState {
         checkIsStillValid();
     }
 
-    public boolean getHanging() {
+    public boolean isHanging() {
         return (boolean) data.get(StateValue.HANGING);
     }
 
@@ -288,7 +288,7 @@ public class WrappedBlockState {
         checkIsStillValid();
     }
 
-    public boolean getHasBook() {
+    public boolean isHasBook() {
         return (boolean) data.get(StateValue.HAS_BOOK);
     }
 
@@ -297,7 +297,7 @@ public class WrappedBlockState {
         checkIsStillValid();
     }
 
-    public boolean getHasBottle0() {
+    public boolean isHasBottle0() {
         return (boolean) data.get(StateValue.HAS_BOTTLE_0);
     }
 
@@ -306,7 +306,7 @@ public class WrappedBlockState {
         checkIsStillValid();
     }
 
-    public boolean getHasBottle1() {
+    public boolean isHasBottle1() {
         return (boolean) data.get(StateValue.HAS_BOTTLE_1);
     }
 
@@ -315,7 +315,7 @@ public class WrappedBlockState {
         checkIsStillValid();
     }
 
-    public boolean getHasBottle2() {
+    public boolean isHasBottle2() {
         return (boolean) data.get(StateValue.HAS_BOTTLE_2);
     }
 
@@ -324,7 +324,7 @@ public class WrappedBlockState {
         checkIsStillValid();
     }
 
-    public boolean getHasRecord() {
+    public boolean isHasRecord() {
         return (boolean) data.get(StateValue.HAS_RECORD);
     }
 
@@ -360,7 +360,7 @@ public class WrappedBlockState {
         checkIsStillValid();
     }
 
-    public boolean inWall() {
+    public boolean isInWall() {
         return (boolean) data.get(StateValue.IN_WALL);
     }
 
@@ -414,7 +414,7 @@ public class WrappedBlockState {
         checkIsStillValid();
     }
 
-    public boolean getLit() {
+    public boolean isLit() {
         return (boolean) data.get(StateValue.LIT);
     }
 
@@ -423,7 +423,7 @@ public class WrappedBlockState {
         checkIsStillValid();
     }
 
-    public boolean getLocked() {
+    public boolean isLocked() {
         return (boolean) data.get(StateValue.LOCKED);
     }
 
@@ -468,7 +468,7 @@ public class WrappedBlockState {
         checkIsStillValid();
     }
 
-    public boolean getOccupied() {
+    public boolean isOccupied() {
         return (boolean) data.get(StateValue.OCCUPIED);
     }
 
@@ -477,7 +477,7 @@ public class WrappedBlockState {
         checkIsStillValid();
     }
 
-    public boolean getOpen() {
+    public boolean isOpen() {
         return (boolean) data.get(StateValue.OPEN);
     }
 
@@ -531,7 +531,7 @@ public class WrappedBlockState {
         checkIsStillValid();
     }
 
-    public boolean getPowered() {
+    public boolean isPowered() {
         return (boolean) data.get(StateValue.POWERED);
     }
 
@@ -567,7 +567,7 @@ public class WrappedBlockState {
         checkIsStillValid();
     }
 
-    public boolean getShort() {
+    public boolean isShort() {
         return (boolean) data.get(StateValue.SHORT);
     }
 
@@ -576,7 +576,7 @@ public class WrappedBlockState {
         checkIsStillValid();
     }
 
-    public boolean getSignalFire() {
+    public boolean isSignalFire() {
         return (boolean) data.get(StateValue.SIGNAL_FIRE);
     }
 
@@ -630,7 +630,7 @@ public class WrappedBlockState {
         checkIsStillValid();
     }
 
-    public boolean getTriggered() {
+    public boolean isTriggered() {
         return (boolean) data.get(StateValue.TRIGGERED);
     }
 
@@ -648,7 +648,7 @@ public class WrappedBlockState {
         checkIsStillValid();
     }
 
-    public boolean getUnstable() {
+    public boolean isUnstable() {
         return (boolean) data.get(StateValue.UNSTABLE);
     }
 
@@ -657,7 +657,7 @@ public class WrappedBlockState {
         checkIsStillValid();
     }
 
-    public boolean getUp() {
+    public boolean isUp() {
         return (boolean) data.get(StateValue.UP);
     }
 
@@ -675,7 +675,7 @@ public class WrappedBlockState {
         checkIsStillValid();
     }
 
-    public boolean getWaterlogged() {
+    public boolean isWaterlogged() {
         return (boolean) data.get(StateValue.WATERLOGGED);
     }
 
@@ -730,6 +730,18 @@ public class WrappedBlockState {
     }
 
     // End all block data types
+
+    /**
+     * This method is helpful if you want to check if a block can be
+     * waterlogged, or has other properties.
+     *
+     * Unless you know what you are doing exactly, don't touch this method!
+     * It can result in invalid block types when modified directly
+     */
+    @Deprecated
+    public EnumMap<StateValue, Object> getInternalData() {
+        return data;
+    }
 
     /**
      * Global ID
