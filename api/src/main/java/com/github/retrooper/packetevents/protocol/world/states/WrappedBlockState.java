@@ -2,6 +2,7 @@ package com.github.retrooper.packetevents.protocol.world.states;
 
 import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
+import com.github.retrooper.packetevents.protocol.world.BlockFace;
 import com.github.retrooper.packetevents.protocol.world.states.enums.*;
 import com.github.retrooper.packetevents.protocol.world.states.type.StateType;
 import com.github.retrooper.packetevents.protocol.world.states.type.StateTypes;
@@ -251,11 +252,11 @@ public class WrappedBlockState {
         checkIsStillValid();
     }
 
-    public Facing getFacing() {
-        return (Facing) data.get(StateValue.FACING);
+    public BlockFace getFacing() {
+        return (BlockFace) data.get(StateValue.FACING);
     }
 
-    public void setFacing(Facing facing) {
+    public void setFacing(BlockFace facing) {
         data.put(StateValue.FACING, facing);
         checkIsStillValid();
     }

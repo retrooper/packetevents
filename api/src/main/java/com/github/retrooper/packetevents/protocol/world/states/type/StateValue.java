@@ -1,5 +1,6 @@
 package com.github.retrooper.packetevents.protocol.world.states.type;
 
+import com.github.retrooper.packetevents.protocol.world.BlockFace;
 import com.github.retrooper.packetevents.protocol.world.states.enums.*;
 
 import java.util.HashMap;
@@ -27,7 +28,7 @@ public enum StateValue {
     EXTENDED("extended", Boolean::parseBoolean),
     EYE("eye", Boolean::parseBoolean),
     FACE("face", Face::valueOf),
-    FACING("facing", Facing::valueOf),
+    FACING("facing", BlockFace::valueOf),
     HALF("half", Half::valueOf),
     HANGING("hanging", Boolean::parseBoolean),
     HAS_BOOK("has_book", Boolean::parseBoolean),
