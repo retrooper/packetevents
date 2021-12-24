@@ -99,6 +99,15 @@ public class WrappedBlockState {
         checkIsStillValid();
     }
 
+    public Attachment getAttachment() {
+        return (Attachment) data.get(StateValue.ATTACHMENT);
+    }
+
+    public void setAttachment(Attachment attachment) {
+        data.put(StateValue.ATTACHMENT, attachment);
+        checkIsStillValid();
+    }
+
     public Axis getAxis() {
         return (Axis) data.get(StateValue.AXIS);
     }
