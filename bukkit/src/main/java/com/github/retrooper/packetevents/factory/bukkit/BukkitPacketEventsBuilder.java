@@ -40,7 +40,7 @@ import io.github.retrooper.packetevents.manager.server.ServerManagerImpl;
 import io.github.retrooper.packetevents.processor.InternalBukkitListener;
 import com.github.retrooper.packetevents.injector.InternalPacketListener;
 import io.github.retrooper.packetevents.utils.BukkitLogManager;
-import io.github.retrooper.packetevents.utils.MinecraftReflectionUtil;
+import io.github.retrooper.packetevents.utils.SpigotReflectionUtil;
 import io.github.retrooper.packetevents.utils.netty.NettyManagerImpl;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -96,7 +96,7 @@ public class BukkitPacketEventsBuilder {
                     PacketEvents.CONNECTION_NAME = "pe-connection-handler-" + plugin.getName().toLowerCase();
                     PacketEvents.SERVER_CHANNEL_HANDLER_NAME = "pe-connection-initializer-" + plugin.getName().toLowerCase();
                     try {
-                        MinecraftReflectionUtil.init();
+                        SpigotReflectionUtil.init();
                     } catch (Exception ex) {
                         throw new IllegalStateException(ex);
                     }

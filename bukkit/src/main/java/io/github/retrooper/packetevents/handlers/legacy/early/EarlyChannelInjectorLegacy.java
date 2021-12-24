@@ -26,7 +26,7 @@ import com.github.retrooper.packetevents.util.reflection.ReflectionObject;
 import io.github.retrooper.packetevents.handlers.EarlyInjector;
 import io.github.retrooper.packetevents.handlers.legacy.PacketDecoderLegacy;
 import io.github.retrooper.packetevents.handlers.legacy.PacketEncoderLegacy;
-import io.github.retrooper.packetevents.utils.MinecraftReflectionUtil;
+import io.github.retrooper.packetevents.utils.SpigotReflectionUtil;
 import io.github.retrooper.packetevents.utils.dependencies.protocolsupport.ProtocolSupportUtil;
 import net.minecraft.util.io.netty.channel.Channel;
 import net.minecraft.util.io.netty.channel.ChannelFuture;
@@ -48,7 +48,7 @@ public class EarlyChannelInjectorLegacy implements EarlyInjector {
     @Override
     public boolean isBound() {
         try {
-            Object connection = MinecraftReflectionUtil.getMinecraftServerConnectionInstance();
+            Object connection = SpigotReflectionUtil.getMinecraftServerConnectionInstance();
             if (connection == null) {
                 return false;
             }
@@ -76,7 +76,7 @@ public class EarlyChannelInjectorLegacy implements EarlyInjector {
     @Override
     public void inject() {
         try {
-            Object serverConnection = MinecraftReflectionUtil.getMinecraftServerConnectionInstance();
+            Object serverConnection = SpigotReflectionUtil.getMinecraftServerConnectionInstance();
             for (Field field : serverConnection.getClass().getDeclaredFields()) {
                 field.setAccessible(true);
                 Object value = null;
@@ -124,7 +124,7 @@ public class EarlyChannelInjectorLegacy implements EarlyInjector {
 
         //Player channels might have been registered already. Let us add our handlers. We are a little late though.
         //This only happens when you join extremely early on older versions of minecraft.
-        List<Object> networkManagers = MinecraftReflectionUtil.getNetworkManagers();
+        List<Object> networkManagers = SpigotReflectionUtil.getNetworkManagers();
         synchronized (networkManagers) {
             for (Object networkManager : networkManagers) {
                 ReflectionObject networkManagerWrapper = new ReflectionObject(networkManager);
@@ -146,7 +146,7 @@ public class EarlyChannelInjectorLegacy implements EarlyInjector {
             pipeline.addFirst(PacketEvents.CONNECTION_NAME, new ServerChannelHandlerLegacy());
         }
 
-        List<Object> networkManagers = MinecraftReflectionUtil.getNetworkManagers();
+        List<Object> networkManagers = SpigotReflectionUtil.getNetworkManagers();
         synchronized (networkManagers) {
             for (Object networkManager : networkManagers) {
                 ReflectionObject networkManagerWrapper = new ReflectionObject(networkManager);

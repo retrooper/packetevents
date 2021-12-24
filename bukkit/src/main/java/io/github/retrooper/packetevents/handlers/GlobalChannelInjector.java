@@ -28,7 +28,7 @@ import io.github.retrooper.packetevents.handlers.legacy.late.LateChannelInjector
 import io.github.retrooper.packetevents.handlers.modern.early.EarlyChannelInjectorModern;
 import io.github.retrooper.packetevents.handlers.modern.late.LateChannelInjectorModern;
 import com.github.retrooper.packetevents.protocol.ConnectionState;
-import io.github.retrooper.packetevents.utils.MinecraftReflectionUtil;
+import io.github.retrooper.packetevents.utils.SpigotReflectionUtil;
 import org.jetbrains.annotations.Nullable;
 
 public class GlobalChannelInjector implements ChannelInjector {
@@ -45,9 +45,9 @@ public class GlobalChannelInjector implements ChannelInjector {
 
     public void load() {
         if (injectEarly) {
-            injector = MinecraftReflectionUtil.USE_MODERN_NETTY_PACKAGE ? new EarlyChannelInjectorModern() : new EarlyChannelInjectorLegacy();
+            injector = SpigotReflectionUtil.USE_MODERN_NETTY_PACKAGE ? new EarlyChannelInjectorModern() : new EarlyChannelInjectorLegacy();
         } else {
-            injector = MinecraftReflectionUtil.USE_MODERN_NETTY_PACKAGE ? new LateChannelInjectorModern() : new LateChannelInjectorLegacy();
+            injector = SpigotReflectionUtil.USE_MODERN_NETTY_PACKAGE ? new LateChannelInjectorModern() : new LateChannelInjectorLegacy();
         }
     }
 

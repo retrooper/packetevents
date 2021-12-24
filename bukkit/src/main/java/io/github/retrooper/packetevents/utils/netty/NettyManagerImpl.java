@@ -22,7 +22,7 @@ import com.github.retrooper.packetevents.netty.buffer.ByteBufAbstract;
 import com.github.retrooper.packetevents.netty.NettyManager;
 import com.github.retrooper.packetevents.netty.channel.ChannelAbstract;
 import com.github.retrooper.packetevents.netty.channel.ChannelHandlerContextAbstract;
-import io.github.retrooper.packetevents.utils.MinecraftReflectionUtil;
+import io.github.retrooper.packetevents.utils.SpigotReflectionUtil;
 import io.github.retrooper.packetevents.utils.netty.buffer.ByteBufLegacy;
 import io.github.retrooper.packetevents.utils.netty.buffer.ByteBufModern;
 import io.github.retrooper.packetevents.utils.netty.buffer.ByteBufUtil;
@@ -84,7 +84,7 @@ public class NettyManagerImpl implements NettyManager {
 
     @Override
     public ByteBufAbstract wrapByteBuf(Object byteBuf) {
-        if (MinecraftReflectionUtil.USE_MODERN_NETTY_PACKAGE) {
+        if (SpigotReflectionUtil.USE_MODERN_NETTY_PACKAGE) {
             return new ByteBufModern(byteBuf);
         }
         else {
@@ -94,7 +94,7 @@ public class NettyManagerImpl implements NettyManager {
 
     @Override
     public ChannelAbstract wrapChannel(Object channel) {
-        if (MinecraftReflectionUtil.USE_MODERN_NETTY_PACKAGE) {
+        if (SpigotReflectionUtil.USE_MODERN_NETTY_PACKAGE) {
             return new ChannelModern(channel);
         }
         else {
@@ -104,7 +104,7 @@ public class NettyManagerImpl implements NettyManager {
 
     @Override
     public ChannelHandlerContextAbstract wrapChannelHandlerContext(Object ctx) {
-        if (MinecraftReflectionUtil.USE_MODERN_NETTY_PACKAGE) {
+        if (SpigotReflectionUtil.USE_MODERN_NETTY_PACKAGE) {
             return new ChannelHandlerContextModern(ctx);
         }
         else {

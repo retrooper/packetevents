@@ -111,6 +111,7 @@ public class NPCManager {
                         PacketEvents.getAPI().getPlayerManager().sendPacket(channel, entityRelativeMoveAndRotation);
                     }
                     else if (positionChanged) {
+                        //TODO Try replace with entity teleport, idk why its not workiing
                         WrapperPlayServerEntityRelativeMove entityRelativeMove = new WrapperPlayServerEntityRelativeMove(npc.getId(), deltaX, deltaY, deltaZ, true);
                         PacketEvents.getAPI().getPlayerManager().sendPacket(channel, entityRelativeMove);
                     }

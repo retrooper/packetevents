@@ -20,8 +20,13 @@ package io.github.retrooper.packetevents.utils;
 
 import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
+import com.github.retrooper.packetevents.netty.buffer.ByteBufAbstract;
+import com.github.retrooper.packetevents.protocol.item.type.ItemType;
+import com.github.retrooper.packetevents.protocol.item.type.ItemTypes;
 import com.github.retrooper.packetevents.util.reflection.Reflection;
 import com.github.retrooper.packetevents.util.reflection.ReflectionObject;
+import com.github.retrooper.packetevents.wrapper.PacketWrapper;
+import io.github.retrooper.packetevents.utils.netty.buffer.ByteBufUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.Server;
 import org.bukkit.World;
@@ -37,7 +42,7 @@ import java.lang.reflect.Method;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
-public final class MinecraftReflectionUtil {
+public final class SpigotReflectionUtil {
     private static final String MODIFIED_PACKAGE_NAME = Bukkit.getServer().getClass().getPackage().getName()
             .replace(".", ",").split(",")[3];
     //Example: net.minecraft.server.v1_8_R3.
@@ -63,7 +68,7 @@ public final class MinecraftReflectionUtil {
     public static Class<?> GEYSER_CLASS;
 
     //Fields
-    public static Field ENTITY_PLAYER_PING_FIELD, ENTITY_BOUNDING_BOX_FIELD;
+    public static Field ENTITY_PLAYER_PING_FIELD, ENTITY_BOUNDING_BOX_FIELD, BYTE_BUF_IN_PACKET_DATA_SERIALIZER;
 
     //Methods
     public static Method GET_CRAFT_PLAYER_HANDLE_METHOD, GET_CRAFT_ENTITY_HANDLE_METHOD, GET_CRAFT_WORLD_HANDLE_METHOD,
@@ -117,6 +122,7 @@ public final class MinecraftReflectionUtil {
     private static void initFields() {
         ENTITY_BOUNDING_BOX_FIELD = Reflection.getField(NMS_ENTITY_CLASS, BOUNDING_BOX_CLASS, 0, true);
         ENTITY_PLAYER_PING_FIELD = Reflection.getField(ENTITY_PLAYER_CLASS, "ping");
+        BYTE_BUF_IN_PACKET_DATA_SERIALIZER = Reflection.getField(BYTE_BUF_CLASS, NMS_PACKET_DATA_SERIALIZER_CLASS, 0, true);
     }
 
     private static void initClasses() {
@@ -289,13 +295,13 @@ public final class MinecraftReflectionUtil {
             return null;
         }
         ReflectionObject wrappedEntityPlayer = new ReflectionObject(entityPlayer);
-        return wrappedEntityPlayer.readObject(0, MinecraftReflectionUtil.PLAYER_CONNECTION_CLASS);
+        return wrappedEntityPlayer.readObject(0, SpigotReflectionUtil.PLAYER_CONNECTION_CLASS);
     }
 
     public static Object getGameProfile(Player player) {
         Object entityPlayer = getEntityPlayer(player);
-        ReflectionObject entityHumanWrapper = new ReflectionObject(entityPlayer, MinecraftReflectionUtil.ENTITY_HUMAN_CLASS);
-        return entityHumanWrapper.readObject(0, MinecraftReflectionUtil.GAME_PROFILE_CLASS);
+        ReflectionObject entityHumanWrapper = new ReflectionObject(entityPlayer, SpigotReflectionUtil.ENTITY_HUMAN_CLASS);
+        return entityHumanWrapper.readObject(0, SpigotReflectionUtil.GAME_PROFILE_CLASS);
     }
 
     public static Object getNetworkManager(Player player) {
@@ -453,6 +459,32 @@ public final class MinecraftReflectionUtil {
         }
         return null;
     }
+
+    public static com.github.retrooper.packetevents.protocol.item.ItemStack decodeBukkitItemStack(ItemStack in) {
+        Object packetDataSerializer = createPacketDataSerializer(ByteBufUtil.buffer().rawByteBuf());
+        Object nmsItemStack = toNMSItemStack(in);
+        writeNMSItemStackPacketDataSerializer(packetDataSerializer, nmsItemStack);
+        Object rawByteBuf = null;
+        try {
+            rawByteBuf = BYTE_BUF_IN_PACKET_DATA_SERIALIZER.get(packetDataSerializer);
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        }
+        ByteBufAbstract bb =  PacketEvents.getAPI().getNettyManager().wrapByteBuf(rawByteBuf);
+        PacketWrapper<?> wrapper = PacketWrapper.createUniversalPacketWrapper(bb);
+        return wrapper.readItemStack();
+    }
+
+    public static ItemStack encodeBukkitItemStack(com.github.retrooper.packetevents.protocol.item.ItemStack in) {
+        PacketWrapper<?> wrapper = PacketWrapper.createUniversalPacketWrapper(ByteBufUtil.buffer());
+        wrapper.writeItemStack(in);
+        Object packetDataSerializer = createPacketDataSerializer(wrapper.getBuffer().rawByteBuf());
+        Object nmsItemStack = readNMSItemStackPacketDataSerializer(packetDataSerializer);
+        ItemStack itemStack = toBukkitItemStack(nmsItemStack);
+        return itemStack;
+    }
+
+
 
     public static Object createNMSItemStack(int itemID, int count) {
         try {

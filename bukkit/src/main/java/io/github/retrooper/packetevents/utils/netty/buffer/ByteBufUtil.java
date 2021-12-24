@@ -19,11 +19,11 @@
 package io.github.retrooper.packetevents.utils.netty.buffer;
 
 import com.github.retrooper.packetevents.netty.buffer.ByteBufAbstract;
-import io.github.retrooper.packetevents.utils.MinecraftReflectionUtil;
+import io.github.retrooper.packetevents.utils.SpigotReflectionUtil;
 
 public final class ByteBufUtil {
     public static ByteBufAbstract wrappedBuffer(byte[] bytes) {
-        if (!MinecraftReflectionUtil.USE_MODERN_NETTY_PACKAGE) {
+        if (!SpigotReflectionUtil.USE_MODERN_NETTY_PACKAGE) {
             return ByteBufUtilLegacy.wrappedBuffer(bytes);
         } else {
             return ByteBufUtilModern.wrappedBuffer(bytes);
@@ -31,7 +31,7 @@ public final class ByteBufUtil {
     }
 
     public static ByteBufAbstract copiedBuffer(byte[] bytes) {
-        if (!MinecraftReflectionUtil.USE_MODERN_NETTY_PACKAGE) {
+        if (!SpigotReflectionUtil.USE_MODERN_NETTY_PACKAGE) {
             return ByteBufUtilLegacy.copiedBuffer(bytes);
         } else {
             return ByteBufUtilModern.copiedBuffer(bytes);
@@ -39,7 +39,7 @@ public final class ByteBufUtil {
     }
 
     public static ByteBufAbstract buffer() {
-        if (!MinecraftReflectionUtil.USE_MODERN_NETTY_PACKAGE) {
+        if (!SpigotReflectionUtil.USE_MODERN_NETTY_PACKAGE) {
             return ByteBufUtilLegacy.buffer();
         } else {
             return ByteBufUtilModern.buffer();
@@ -47,7 +47,7 @@ public final class ByteBufUtil {
     }
 
     public static ByteBufAbstract buffer(int initialCapacity) {
-        if (!MinecraftReflectionUtil.USE_MODERN_NETTY_PACKAGE) {
+        if (!SpigotReflectionUtil.USE_MODERN_NETTY_PACKAGE) {
             return ByteBufUtilLegacy.buffer(initialCapacity);
         } else {
             return ByteBufUtilModern.buffer(initialCapacity);
@@ -55,7 +55,7 @@ public final class ByteBufUtil {
     }
 
     public static ByteBufAbstract buffer(int initialCapacity, int maxCapacity) {
-        if (!MinecraftReflectionUtil.USE_MODERN_NETTY_PACKAGE) {
+        if (!SpigotReflectionUtil.USE_MODERN_NETTY_PACKAGE) {
             return ByteBufUtilLegacy.buffer(initialCapacity, maxCapacity);
         } else {
             return ByteBufUtilModern.buffer(initialCapacity, maxCapacity);
@@ -63,7 +63,7 @@ public final class ByteBufUtil {
     }
 
     public static ByteBufAbstract directBuffer() {
-        if (!MinecraftReflectionUtil.USE_MODERN_NETTY_PACKAGE) {
+        if (!SpigotReflectionUtil.USE_MODERN_NETTY_PACKAGE) {
             return ByteBufUtilLegacy.directBuffer();
         } else {
             return ByteBufUtilModern.directBuffer();
@@ -71,7 +71,7 @@ public final class ByteBufUtil {
     }
 
     public static ByteBufAbstract directBuffer(int initialCapacity) {
-        if (!MinecraftReflectionUtil.USE_MODERN_NETTY_PACKAGE) {
+        if (!SpigotReflectionUtil.USE_MODERN_NETTY_PACKAGE) {
             return ByteBufUtilLegacy.directBuffer(initialCapacity);
         } else {
             return ByteBufUtilModern.directBuffer(initialCapacity);
@@ -79,7 +79,7 @@ public final class ByteBufUtil {
     }
 
     public static ByteBufAbstract directBuffer(int initialCapacity, int maxCapacity) {
-        if (!MinecraftReflectionUtil.USE_MODERN_NETTY_PACKAGE) {
+        if (!SpigotReflectionUtil.USE_MODERN_NETTY_PACKAGE) {
             return ByteBufUtilLegacy.directBuffer(initialCapacity, maxCapacity);
         } else {
             return ByteBufUtilModern.directBuffer(initialCapacity, maxCapacity);
@@ -87,7 +87,7 @@ public final class ByteBufUtil {
     }
 
     public static ByteBufAbstract compositeBuffer() {
-        if (!MinecraftReflectionUtil.USE_MODERN_NETTY_PACKAGE) {
+        if (!SpigotReflectionUtil.USE_MODERN_NETTY_PACKAGE) {
             return ByteBufUtilLegacy.compositeBuffer();
         } else {
             return ByteBufUtilModern.compositeBuffer();
@@ -95,7 +95,7 @@ public final class ByteBufUtil {
     }
 
     public static ByteBufAbstract compositeBuffer(int maxNumComponents) {
-        if (!MinecraftReflectionUtil.USE_MODERN_NETTY_PACKAGE) {
+        if (!SpigotReflectionUtil.USE_MODERN_NETTY_PACKAGE) {
             return ByteBufUtilLegacy.compositeBuffer(maxNumComponents);
         } else {
             return ByteBufUtilModern.compositeBuffer(maxNumComponents);

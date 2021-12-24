@@ -20,7 +20,7 @@ package io.github.retrooper.packetevents.handlers.compression;
 
 import com.github.retrooper.packetevents.netty.buffer.ByteBufAbstract;
 import com.github.retrooper.packetevents.netty.channel.ChannelHandlerContextAbstract;
-import io.github.retrooper.packetevents.utils.MinecraftReflectionUtil;
+import io.github.retrooper.packetevents.utils.SpigotReflectionUtil;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 import io.github.retrooper.packetevents.utils.netty.buffer.ByteBufUtil;
 
@@ -34,7 +34,7 @@ public class CustomPacketDecompressor {
 
     public static ByteBufAbstract decompress(ChannelHandlerContextAbstract ctx, ByteBufAbstract byteBuf) {
         if (BYTE_TO_MESSAGE_DECODER == null) {
-            BYTE_TO_MESSAGE_DECODER = MinecraftReflectionUtil.getNettyClass("handler.codec.ByteToMessageDecoder");
+            BYTE_TO_MESSAGE_DECODER = SpigotReflectionUtil.getNettyClass("handler.codec.ByteToMessageDecoder");
         }
         Object decompressHandler = ctx.pipeline().get("decompress").rawChannelHandler();
         //If the decompress decoder is not an instance of the ByteToMessageDecoder

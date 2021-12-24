@@ -19,13 +19,13 @@
 package io.github.retrooper.packetevents.utils.netty.channel;
 
 
-import io.github.retrooper.packetevents.utils.MinecraftReflectionUtil;
+import io.github.retrooper.packetevents.utils.SpigotReflectionUtil;
 import io.github.retrooper.packetevents.utils.netty.ChannelInboundHandlerUtil_Legacy;
 import io.github.retrooper.packetevents.utils.netty.ChannelInboundHandlerUtil_Modern;
 
 public class ChannelInboundHandlerUtil {
     public static void handlerChannelRead(Object handler, Object ctx, Object msg) {
-        if (MinecraftReflectionUtil.USE_MODERN_NETTY_PACKAGE) {
+        if (SpigotReflectionUtil.USE_MODERN_NETTY_PACKAGE) {
             ChannelInboundHandlerUtil_Modern.handlerChannelRead(handler, ctx, msg);
         } else {
             ChannelInboundHandlerUtil_Legacy.handlerChannelRead(handler, ctx, msg);

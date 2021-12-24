@@ -18,7 +18,7 @@
 
 package io.github.retrooper.packetevents.utils.dependencies;
 
-import io.github.retrooper.packetevents.utils.MinecraftReflectionUtil;
+import io.github.retrooper.packetevents.utils.SpigotReflectionUtil;
 import io.github.retrooper.packetevents.utils.dependencies.google.GuavaUtils_7;
 import io.github.retrooper.packetevents.utils.dependencies.google.GuavaUtils_8;
 import io.github.retrooper.packetevents.utils.dependencies.protocolsupport.ProtocolSupportUtil;
@@ -43,7 +43,7 @@ public class DependencyUtil {
     }
 
     public static <T, K> ConcurrentMap<T, K> makeMap() {
-        if (MinecraftReflectionUtil.USE_MODERN_NETTY_PACKAGE) {
+        if (SpigotReflectionUtil.USE_MODERN_NETTY_PACKAGE) {
             return GuavaUtils_8.makeMap();
         } else {
             return GuavaUtils_7.makeMap();

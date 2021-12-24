@@ -24,7 +24,6 @@ import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.netty.buffer.ByteBufAbstract;
 import com.github.retrooper.packetevents.netty.channel.ChannelAbstract;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
-import io.github.retrooper.packetevents.utils.MinecraftReflectionUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.Plugin;
 

@@ -25,13 +25,12 @@ import com.github.retrooper.packetevents.netty.buffer.ByteBufAbstract;
 import com.github.retrooper.packetevents.netty.channel.ChannelAbstract;
 import com.github.retrooper.packetevents.protocol.gameprofile.GameProfile;
 import com.github.retrooper.packetevents.protocol.player.ClientVersion;
-import io.github.retrooper.packetevents.utils.MinecraftReflectionUtil;
+import io.github.retrooper.packetevents.utils.SpigotReflectionUtil;
 import io.github.retrooper.packetevents.utils.PlayerPingAccessorModern;
 import io.github.retrooper.packetevents.utils.dependencies.DependencyUtil;
 import io.github.retrooper.packetevents.utils.dependencies.protocolsupport.ProtocolSupportUtil;
 import io.github.retrooper.packetevents.utils.dependencies.viaversion.ViaVersionUtil;
 import io.github.retrooper.packetevents.utils.v1_7.SpigotVersionLookup_1_7;
-import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
@@ -39,10 +38,10 @@ public class PlayerManagerImpl implements PlayerManager {
     @Override
     public int getPing(@NotNull Object player) {
         //Yay, we contributed this to Spigot and now we can use it on 1.17+ servers.
-        if (MinecraftReflectionUtil.V_1_17_OR_HIGHER) {
+        if (SpigotReflectionUtil.V_1_17_OR_HIGHER) {
             return PlayerPingAccessorModern.getPing((Player) player);
         } else {
-            return MinecraftReflectionUtil.getPlayerPingLegacy((Player) player);
+            return SpigotReflectionUtil.getPlayerPingLegacy((Player) player);
         }
     }
 
@@ -128,7 +127,7 @@ public class PlayerManagerImpl implements PlayerManager {
         String username = ((Player) player).getName();
         ChannelAbstract channel = getChannel(username);
         if (channel == null) {
-            Object ch = MinecraftReflectionUtil.getChannel((Player) player);
+            Object ch = SpigotReflectionUtil.getChannel((Player) player);
             if (ch != null) {
                 channel = PacketEvents.getAPI().getNettyManager().wrapChannel(ch);
                 CHANNELS.put(username, channel);
