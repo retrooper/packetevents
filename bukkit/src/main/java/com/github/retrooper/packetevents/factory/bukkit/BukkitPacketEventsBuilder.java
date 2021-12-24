@@ -24,6 +24,7 @@ import com.github.retrooper.packetevents.event.EventManager;
 import com.github.retrooper.packetevents.event.PacketListenerPriority;
 import com.github.retrooper.packetevents.event.impl.PostPlayerInjectEvent;
 import com.github.retrooper.packetevents.injector.ChannelInjector;
+import com.github.retrooper.packetevents.manager.npc.NPCManager;
 import com.github.retrooper.packetevents.manager.player.PlayerManager;
 import com.github.retrooper.packetevents.manager.server.ServerManager;
 import com.github.retrooper.packetevents.netty.NettyManager;
@@ -77,6 +78,7 @@ public class BukkitPacketEventsBuilder {
             private final Logger logger = Logger.getLogger(PacketEventsAPI.class.getName());
             private final ServerManager serverManager = new ServerManagerImpl();
             private final PlayerManager playerManager = new PlayerManagerImpl();
+            private final NPCManager npcManager = new NPCManager();
             private final NettyManager nettyManager = new NettyManagerImpl();
             private final GlobalChannelInjector injector = new GlobalChannelInjector();
             private final UpdateChecker updateChecker = new UpdateChecker();
@@ -194,6 +196,11 @@ public class BukkitPacketEventsBuilder {
             @Override
             public PlayerManager getPlayerManager() {
                 return playerManager;
+            }
+
+            @Override
+            public NPCManager getNPCManager() {
+                return npcManager;
             }
 
             @Override

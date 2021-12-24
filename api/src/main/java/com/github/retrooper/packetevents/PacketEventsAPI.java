@@ -48,9 +48,7 @@ public interface PacketEventsAPI<T> {
 
     PlayerManager getPlayerManager();
 
-    default NPCManager getNPCManager() {
-        return new NPCManager();
-    }
+    NPCManager getNPCManager();
 
     EventManager getEventManager();
 
