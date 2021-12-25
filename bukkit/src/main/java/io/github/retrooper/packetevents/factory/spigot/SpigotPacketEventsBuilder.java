@@ -16,7 +16,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.github.retrooper.packetevents.factory.bukkit;
+package io.github.retrooper.packetevents.factory.spigot;
 
 import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.PacketEventsAPI;
@@ -24,6 +24,7 @@ import com.github.retrooper.packetevents.event.EventManager;
 import com.github.retrooper.packetevents.event.PacketListenerPriority;
 import com.github.retrooper.packetevents.event.impl.PostPlayerInjectEvent;
 import com.github.retrooper.packetevents.injector.ChannelInjector;
+import com.github.retrooper.packetevents.injector.InternalPacketListener;
 import com.github.retrooper.packetevents.manager.npc.NPCManager;
 import com.github.retrooper.packetevents.manager.player.PlayerManager;
 import com.github.retrooper.packetevents.manager.server.ServerManager;
@@ -39,7 +40,6 @@ import io.github.retrooper.packetevents.handlers.GlobalChannelInjector;
 import io.github.retrooper.packetevents.manager.player.PlayerManagerImpl;
 import io.github.retrooper.packetevents.manager.server.ServerManagerImpl;
 import io.github.retrooper.packetevents.processor.InternalBukkitListener;
-import com.github.retrooper.packetevents.injector.InternalPacketListener;
 import io.github.retrooper.packetevents.utils.BukkitLogManager;
 import io.github.retrooper.packetevents.utils.SpigotReflectionUtil;
 import io.github.retrooper.packetevents.utils.netty.NettyManagerImpl;
@@ -50,7 +50,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.logging.Logger;
 
-public class BukkitPacketEventsBuilder {
+public class SpigotPacketEventsBuilder {
     private static PacketEventsAPI<Plugin> API_INSTANCE;
 
     public static PacketEventsAPI<Plugin> build(Plugin plugin) {
@@ -114,7 +114,8 @@ public class BukkitPacketEventsBuilder {
                     loaded = true;
 
                     //Register internal packet listener (should be the first listener)
-                    getEventManager().registerListener(new InternalPacketListener(), PacketListenerPriority.LOWEST);
+                    //This listener doesn't do any modifications to the packets, just reads data
+                    getEventManager().registerListener(new InternalPacketListener(), PacketListenerPriority.LOWEST, true);
                 }
             }
 

@@ -22,7 +22,7 @@ import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.event.PacketListenerAbstract;
 import com.github.retrooper.packetevents.event.impl.PacketReceiveEvent;
 import com.github.retrooper.packetevents.event.impl.PacketSendEvent;
-import com.github.retrooper.packetevents.factory.bukkit.BukkitPacketEventsBuilder;
+import io.github.retrooper.packetevents.factory.spigot.SpigotPacketEventsBuilder;
 import com.github.retrooper.packetevents.protocol.item.ItemStack;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.protocol.player.InteractionHand;
@@ -40,7 +40,7 @@ import java.util.*;
 public class PacketEventsPlugin extends JavaPlugin {
     @Override
     public void onLoad() {
-        PacketEvents.setAPI(BukkitPacketEventsBuilder.build(this));
+        PacketEvents.setAPI(SpigotPacketEventsBuilder.build(this));
         PacketEvents.getAPI().load();
     }
 
@@ -91,7 +91,7 @@ public class PacketEventsPlugin extends JavaPlugin {
                 }//TODO Complete chunk data packet
             }
         };
-        PacketEvents.getAPI().getEventManager().registerListener(debugListener);
+        //PacketEvents.getAPI().getEventManager().registerListener(debugListener);
     }
 
     @Override
