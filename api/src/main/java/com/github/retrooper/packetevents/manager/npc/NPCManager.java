@@ -53,6 +53,9 @@ public class NPCManager {
     public void despawn(ChannelAbstract channel, NPC npc) {
         Set<ChannelAbstract> targetChannels = TARGET_CHANNELS.get(npc);
         if (targetChannels != null) {
+            WrapperPlayServerPlayerInfo playerInfoPacket = new WrapperPlayServerPlayerInfo(WrapperPlayServerPlayerInfo.Action.REMOVE_PLAYER, npc.getProfile().getId());
+            PacketEvents.getAPI().getPlayerManager().sendPacket(channel, playerInfoPacket);
+
             WrapperPlayServerDestroyEntities destroyEntities = new WrapperPlayServerDestroyEntities(npc.getId());
             PacketEvents.getAPI().getPlayerManager().sendPacket(channel, destroyEntities);
             targetChannels.remove(channel);
