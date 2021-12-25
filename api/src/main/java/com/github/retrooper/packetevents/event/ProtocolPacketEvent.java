@@ -29,6 +29,7 @@ import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.event.type.CancellableEvent;
 import com.github.retrooper.packetevents.event.type.PlayerEvent;
+import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -46,6 +47,7 @@ public abstract class ProtocolPacketEvent<T> extends PacketEvent implements Play
     private ClientVersion clientVersion;
     private ServerVersion serverVersion;
     private boolean cancel;
+    private PacketWrapper<?> lastUsedWrapper;
 
     public ProtocolPacketEvent(PacketSide packetSide, Object channel, T player, Object rawByteBuf) {
         this(packetSide,
@@ -201,5 +203,14 @@ public abstract class ProtocolPacketEvent<T> extends PacketEvent implements Play
     @Override
     public void setCancelled(boolean val) {
         this.cancel = val;
+    }
+
+    @Nullable
+    public PacketWrapper<?> getLastUsedWrapper() {
+        return lastUsedWrapper;
+    }
+
+    public void setLastUsedWrapper(@Nullable PacketWrapper<?> lastUsedWrapper) {
+        this.lastUsedWrapper = lastUsedWrapper;
     }
 }

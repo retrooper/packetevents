@@ -19,16 +19,13 @@
 package com.github.retrooper.packetevents.event.impl;
 
 import com.github.retrooper.packetevents.event.PacketListenerAbstract;
-import com.github.retrooper.packetevents.protocol.ConnectionState;
-import com.github.retrooper.packetevents.protocol.PacketSide;
-import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 import com.github.retrooper.packetevents.event.ProtocolPacketEvent;
 import com.github.retrooper.packetevents.netty.buffer.ByteBufAbstract;
 import com.github.retrooper.packetevents.netty.channel.ChannelAbstract;
+import com.github.retrooper.packetevents.protocol.ConnectionState;
+import com.github.retrooper.packetevents.protocol.PacketSide;
 
 public class PacketReceiveEvent extends ProtocolPacketEvent<Object> {
-    private PacketWrapper<?> lastUsedWrapper;
-
     public PacketReceiveEvent(ChannelAbstract channel, Object player, ByteBufAbstract byteBuf) {
         super(PacketSide.CLIENT, channel, player, byteBuf);
     }
@@ -48,15 +45,5 @@ public class PacketReceiveEvent extends ProtocolPacketEvent<Object> {
     @Override
     public void call(PacketListenerAbstract listener) {
         listener.onPacketReceive(this);
-    }
-
-    @Deprecated
-    public PacketWrapper<?> getLastUsedWrapper() {
-        return lastUsedWrapper;
-    }
-
-    @Deprecated
-    public void setLastUsedWrapper(PacketWrapper<?> currentPacketWrapper) {
-        this.lastUsedWrapper = currentPacketWrapper;
     }
 }

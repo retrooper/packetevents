@@ -19,13 +19,12 @@
 package com.github.retrooper.packetevents.event;
 
 import com.github.retrooper.packetevents.PacketEvents;
-import com.github.retrooper.packetevents.util.LogManager;
+import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.HashSet;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.logging.Level;
 
 public class EventManager {
     private final Map<Byte, HashSet<PacketListenerAbstract>> listenersMap = new ConcurrentHashMap<>();
@@ -49,12 +48,20 @@ public class EventManager {
             if (listeners != null) {
                 for (PacketListenerAbstract listener : listeners) {
                     try {
+                        PacketWrapper<?> lastUsedWrapper = null;
+                        boolean isPacketEvent = event instanceof ProtocolPacketEvent;
+                        if (event instanceof ProtocolPacketEvent) {
+                            lastUsedWrapper = ((ProtocolPacketEvent<?>) event).getLastUsedWrapper();
+                        }
+
                         event.call(listener);
+                        if (listener.isReadOnly()) {
+                            ((ProtocolPacketEvent<?>) event).setLastUsedWrapper(lastUsedWrapper);
+                        }
                         if (postCallListenerAction != null) {
                             postCallListenerAction.run();
                         }
-                    }
-                    catch (Exception ex) {
+                    } catch (Exception ex) {
                         PacketEvents.getAPI().getLogManager().severe("packetevents encountered an exception when calling your listener.");
                         ex.printStackTrace();
                     }
@@ -63,13 +70,13 @@ public class EventManager {
         }
     }
 
-    public void registerListener(PacketListener listener, PacketListenerPriority priority) {
-        PacketListenerAbstract packetListenerAbstract = listener.asAbstract(priority);
+    public void registerListener(PacketListener listener, PacketListenerPriority priority, boolean readOnly) {
+        PacketListenerAbstract packetListenerAbstract = listener.asAbstract(priority, readOnly);
         registerListener(packetListenerAbstract);
     }
 
-    public void registerListener(PacketListenerReflect listener, PacketListenerPriority priority) {
-        PacketListenerAbstract packetListenerAbstract = listener.asAbstract(priority);
+    public void registerListener(PacketListenerReflect listener, PacketListenerPriority priority, boolean readOnly) {
+        PacketListenerAbstract packetListenerAbstract = listener.asAbstract(priority, readOnly);
         registerListener(packetListenerAbstract);
     }
 

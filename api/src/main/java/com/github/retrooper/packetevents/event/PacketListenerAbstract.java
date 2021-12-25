@@ -34,10 +34,17 @@ import java.util.Map;
 public abstract class PacketListenerAbstract {
     protected final Map<Byte, List<Method>> methods;
     private final PacketListenerPriority priority;
+    private boolean readOnly;
 
     public PacketListenerAbstract(PacketListenerPriority priority) {
         this.priority = priority;
         this.methods = null;
+    }
+
+    public PacketListenerAbstract(PacketListenerPriority priority, boolean readOnly) {
+        this.priority = priority;
+        this.methods = null;
+        this.readOnly = readOnly;
     }
 
     public PacketListenerAbstract(PacketListenerPriority priority, Map<Byte, List<Method>> methods) {
@@ -45,13 +52,29 @@ public abstract class PacketListenerAbstract {
         this.methods = methods;
     }
 
+    public PacketListenerAbstract(PacketListenerPriority priority, Map<Byte, List<Method>> methods, boolean readOnly) {
+        this.priority = priority;
+        this.methods = methods;
+        this.readOnly = readOnly;
+    }
+
+
     public PacketListenerAbstract() {
         this.priority = PacketListenerPriority.NORMAL;
         this.methods = null;
+        this.readOnly = false;
     }
 
     public PacketListenerPriority getPriority() {
         return priority;
+    }
+
+    public boolean isReadOnly() {
+        return readOnly;
+    }
+
+    public void setReadOnly(boolean readOnly) {
+        this.readOnly = readOnly;
     }
 
     public void onPlayerInject(PlayerInjectEvent event) {

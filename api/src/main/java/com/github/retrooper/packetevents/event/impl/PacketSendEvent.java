@@ -28,7 +28,6 @@ import com.github.retrooper.packetevents.netty.channel.ChannelAbstract;
 
 public class PacketSendEvent extends ProtocolPacketEvent<Object> {
     private Runnable postTask = null;
-    private PacketWrapper<?> lastUsedWrapper;
 
     public PacketSendEvent(ChannelAbstract channel, Object player, ByteBufAbstract byteBuf, Runnable postTask) {
         super(PacketSide.SERVER, channel, player, byteBuf);
@@ -76,16 +75,6 @@ public class PacketSendEvent extends ProtocolPacketEvent<Object> {
 
     public void setPostTask(Runnable postTask) {
         this.postTask = postTask;
-    }
-
-    @Deprecated
-    public PacketWrapper<?> getLastUsedWrapper() {
-        return lastUsedWrapper;
-    }
-
-    @Deprecated
-    public void setLastUsedWrapper(PacketWrapper<?> currentPacketWrapper) {
-        this.lastUsedWrapper = currentPacketWrapper;
     }
 
     @Override
