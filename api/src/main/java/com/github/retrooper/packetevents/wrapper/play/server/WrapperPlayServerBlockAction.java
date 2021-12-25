@@ -21,6 +21,7 @@ package com.github.retrooper.packetevents.wrapper.play.server;
 import com.github.retrooper.packetevents.event.impl.PacketSendEvent;
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
+import com.github.retrooper.packetevents.protocol.world.states.WrappedBlockState;
 import com.github.retrooper.packetevents.util.Vector3i;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 
@@ -110,5 +111,13 @@ public class WrapperPlayServerBlockAction extends PacketWrapper<WrapperPlayServe
 
     public void setBlockTypeId(int blockTypeID) {
         this.blockTypeID = blockTypeID;
+    }
+
+    public WrappedBlockState getBlockType() {
+        return WrappedBlockState.getByGlobalId(blockTypeID);
+    }
+
+    public void setBlockType(WrappedBlockState blockType) {
+        this.blockTypeID = blockType.getGlobalId();
     }
 }
