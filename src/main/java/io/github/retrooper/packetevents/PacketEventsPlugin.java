@@ -27,7 +27,7 @@ public class PacketEventsPlugin extends JavaPlugin {
     public void onLoad() {
         PacketEventsSettings settings = PacketEvents.create(this).getSettings();
         settings
-                .fallbackServerVersion(ServerVersion.v_1_7_10)
+                .fallbackServerVersion(ServerVersion.getLatest())
                 .compatInjector(false)
                 .checkForUpdates(true)
                 .bStats(true);
