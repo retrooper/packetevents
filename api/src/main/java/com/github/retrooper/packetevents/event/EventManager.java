@@ -50,12 +50,11 @@ public class EventManager {
                     try {
                         PacketWrapper<?> lastUsedWrapper = null;
                         boolean isPacketEvent = event instanceof ProtocolPacketEvent;
-                        if (event instanceof ProtocolPacketEvent) {
+                        if (isPacketEvent) {
                             lastUsedWrapper = ((ProtocolPacketEvent<?>) event).getLastUsedWrapper();
                         }
-
                         event.call(listener);
-                        if (listener.isReadOnly()) {
+                        if (listener.isReadOnly() && isPacketEvent) {
                             ((ProtocolPacketEvent<?>) event).setLastUsedWrapper(lastUsedWrapper);
                         }
                         if (postCallListenerAction != null) {

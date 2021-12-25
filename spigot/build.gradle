@@ -46,7 +46,7 @@ repositories {
 }
 shadowJar {
     //Just for jitpack to work
-    archiveBaseName.set('bukkit')
+    archiveBaseName.set('spigot')
     archiveClassifier.set('')
     archiveVersion.set('')
 
@@ -96,7 +96,7 @@ publishing {
     publications {
         maven(MavenPublication) {
             groupId = 'com.github.retrooper.packetevents'
-            artifactId = 'bukkit'
+            artifactId = 'spigot'
             from(components.java)
         }
     }
