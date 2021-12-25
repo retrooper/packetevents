@@ -121,6 +121,36 @@ public enum BlockFace {
         }
     }
 
+    public BlockFace getCCW() {
+        switch (this) {
+            case NORTH:
+                return WEST;
+            case SOUTH:
+                return EAST;
+            case WEST:
+                return SOUTH;
+            case EAST:
+                return NORTH;
+            default:
+                return OTHER;
+        }
+    }
+
+    public BlockFace getCW() {
+        switch (this) {
+            case NORTH:
+                return EAST;
+            case SOUTH:
+                return WEST;
+            case WEST:
+                return NORTH;
+            case EAST:
+                return SOUTH;
+            default:
+                return OTHER;
+        }
+    }
+
     public short getFaceValue() {
         return faceValue;
     }
