@@ -27,10 +27,7 @@ import io.github.retrooper.packetevents.utils.server.ServerVersion;
 import io.github.retrooper.packetevents.utils.vector.Vector3d;
 import io.github.retrooper.packetevents.utils.vector.Vector3f;
 import io.github.retrooper.packetevents.utils.vector.Vector3i;
-import org.bukkit.Bukkit;
-import org.bukkit.Material;
-import org.bukkit.Server;
-import org.bukkit.World;
+import org.bukkit.*;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -57,7 +54,7 @@ public final class NMSUtils {
             blockPosClass, sectionPositionClass, vec3DClass, channelFutureClass, blockClass, iBlockDataClass, nmsWorldClass, craftItemStackClass,
             soundEffectClass, minecraftKeyClass, chatSerializerClass, craftMagicNumbersClass, worldSettingsClass, worldServerClass, dataWatcherClass,
             dedicatedServerClass, entityHumanClass, packetDataSerializerClass, byteBufClass, dimensionManagerClass, nmsItemClass, iMaterialClass, movingObjectPositionBlockClass, boundingBoxClass,
-    tileEntityCommandClass;
+            tileEntityCommandClass;
     public static Class<? extends Enum<?>> enumDirectionClass, enumHandClass, enumGameModeClass, enumDifficultyClass, tileEntityCommandTypeClass;
     public static Method getBlockPosX, getBlockPosY, getBlockPosZ;
     private static String nettyPrefix;
@@ -82,7 +79,7 @@ public final class NMSUtils {
             //Test if the selected netty location is valid
             getNettyClass("channel.Channel");
         } catch (Exception ex) {
-            System.err.println("[packetevents] Failed to locate the netty package location for your server version. Searching...");
+            Bukkit.getConsoleSender().sendMessage(ChatColor.DARK_RED + "[packetevents] Failed to locate the netty package location for your server version. Searching...");
             //Time to correct the netty location
             if (legacyNettyImportMode) {
                 legacyNettyImportMode = false;
@@ -465,7 +462,7 @@ public final class NMSUtils {
     @Nullable
     @Deprecated
     public static Entity getEntityById(@Nullable World world, int id) {
-       return PacketEvents.get().getServerUtils().getEntityById(world, id);
+        return PacketEvents.get().getServerUtils().getEntityById(world, id);
     }
 
     public static Entity getBukkitEntity(Object nmsEntity) {
