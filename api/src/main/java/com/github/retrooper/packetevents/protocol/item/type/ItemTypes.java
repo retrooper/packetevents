@@ -118,7 +118,7 @@ public class ItemTypes {
             }
 
             @Override
-            public ResourceLocation getIdentifier() {
+            public ResourceLocation getName() {
                 return identifier;
             }
 
@@ -155,13 +155,13 @@ public class ItemTypes {
                 return false;
             }
         };
-        ITEM_TYPE_MAP.put(type.getIdentifier().getKey(), type);
+        ITEM_TYPE_MAP.put(type.getName().toString(), type);
         ITEM_TYPE_ID_MAP.put(type.getId(), type);
         return type;
     }
 
     @Nullable
-    public static ItemType getByKey(String key) {
+    public static ItemType getByName(String key) {
         return ITEM_TYPE_MAP.get(key);
     }
 

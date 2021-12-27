@@ -18,13 +18,15 @@
 
 package com.github.retrooper.packetevents.protocol.item;
 
-import com.github.retrooper.packetevents.protocol.enchantment.Enchantment;
+import com.github.retrooper.packetevents.protocol.item.enchantment.Enchantment;
+import com.github.retrooper.packetevents.protocol.item.enchantment.type.EnchantmentType;
+import com.github.retrooper.packetevents.protocol.item.enchantment.type.EnchantmentTypes;
 import com.github.retrooper.packetevents.protocol.item.type.ItemType;
 import com.github.retrooper.packetevents.protocol.item.type.ItemTypes;
-import com.github.retrooper.packetevents.protocol.nbt.NBTCompound;
-import com.github.retrooper.packetevents.protocol.nbt.NBTInt;
-import com.github.retrooper.packetevents.protocol.nbt.NBTShort;
-import com.github.retrooper.packetevents.protocol.nbt.NBTString;
+import com.github.retrooper.packetevents.protocol.nbt.*;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class ItemStack {
     //TODO Rethink my decision of making NULL = AIR
@@ -35,20 +37,6 @@ public class ItemStack {
     private int legacyData = -1;
 
     private boolean cachedIsEmpty = false;
-
-    private ItemStack(ItemType type, int amount) {
-        this.type = type;
-        this.amount = amount;
-        this.nbt = new NBTCompound();
-        updateCachedEmptyStatus();
-    }
-
-    private ItemStack(ItemType type, int amount, NBTCompound nbt) {
-        this.type = type;
-        this.amount = amount;
-        this.nbt = nbt;
-        updateCachedEmptyStatus();
-    }
 
     private ItemStack(ItemType type, int amount, NBTCompound nbt, int legacyData) {
         this.type = type;
@@ -168,20 +156,36 @@ public class ItemStack {
         }
     }
 
-    // TODO: Probably broken on some outdated version
-    public int getEnchantmentLevel(Enchantment enchantment) {
-        if (isEmpty()) return 0;
-
-        if (nbt != null && nbt.getCompoundListTagOrNull("Enchantments") != null) {
-            for (NBTCompound base : nbt.getCompoundListTagOrNull("Enchantments").getTags()) {
-                NBTString string = base.getTagOfTypeOrNull("id", NBTString.class);
-                if (string != null && string.getValue().equals(enchantment.getIdentifier().toString())) {
-                    return base.getTagOfTypeOrNull("lvl", NBTShort.class).getAsInt();
+    //TODO Test on all versions
+    public List<Enchantment> getEnchantments() {
+        if (!isEmpty() && nbt != null && nbt.getCompoundListTagOrNull("Enchantments") != null) {
+            List<NBTCompound> compounds = nbt.getCompoundListTagOrNull("Enchantments").getTags();
+            List<Enchantment> enchantments = new ArrayList<>(compounds.size());
+            for (NBTCompound compound : compounds) {
+                String id = compound.getStringTagValueOrNull("id");
+                EnchantmentType type = EnchantmentTypes.getByName(id);
+                if (type != null) {
+                    int level = compound.getTagOfTypeOrNull("lvl", NBTShort.class).getAsInt();
+                    Enchantment enchantment = Enchantment.builder().type(type).level(level).build();
+                    enchantments.add(enchantment);
                 }
             }
+            return enchantments;
+        } else {
+            return new ArrayList<>(0);
         }
+    }
 
-        return 0;
+    //TODO Test on all versions
+    public void setEnchantments(List<Enchantment> enchantments) {
+        List<NBTCompound> list = new ArrayList<>();
+        for (Enchantment enchantment : enchantments) {
+            NBTCompound compound = new NBTCompound();
+            compound.setTag("id", new NBTString(enchantment.getType().getName().toString()));
+            compound.setTag("lvl", new NBTShort((short) enchantment.getLevel()));
+            list.add(compound);
+        }
+        nbt.setTag("Enchantments", new NBTList<>(NBTType.COMPOUND, list));
     }
 
     public boolean canBeDepleted() {
@@ -218,9 +222,8 @@ public class ItemStack {
     public String toString() {
         if (cachedIsEmpty) {
             return "ItemStack[null]";
-        }
-        else {
-            String identifier = type == null ? "null" : type.getIdentifier().toString();
+        } else {
+            String identifier = type == null ? "null" : type.getName().toString();
             int maxAmount = getType().getMaxAmount();
             return "ItemStack[type=" + identifier + ", amount=" + amount + "/" + maxAmount
                     + ", nbt tag names: " + nbt.getTagNames() + ", legacyData=" + legacyData + "]";

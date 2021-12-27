@@ -83,7 +83,7 @@ public class EntityTypes {
 
         EntityType entityType = new EntityType() {
             @Override
-            public ResourceLocation getIdentifier() {
+            public ResourceLocation getName() {
                 return identifier;
             }
 
@@ -106,7 +106,7 @@ public class EntityTypes {
             }
         };
 
-        ENTITY_TYPE_MAP.put(entityType.getIdentifier().getKey(), entityType);
+        ENTITY_TYPE_MAP.put(entityType.getName().toString(), entityType);
         ENTITY_TYPE_ID_MAP.put(entityType.getId(), entityType);
         return entityType;
     }
@@ -126,7 +126,7 @@ public class EntityTypes {
         return false;
     }
 
-    public static EntityType getByKey(String key) {
+    public static EntityType getByName(String key) {
         return ENTITY_TYPE_MAP.get(key);
     }
 

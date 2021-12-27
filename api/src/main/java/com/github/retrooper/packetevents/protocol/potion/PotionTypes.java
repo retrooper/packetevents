@@ -39,7 +39,7 @@ public class PotionTypes {
         ResourceLocation identifier = ResourceLocation.minecraft(key);
         PotionType potionType = new PotionType() {
             @Override
-            public ResourceLocation getIdentifier() {
+            public ResourceLocation getName() {
                 return identifier;
             }
 
@@ -57,13 +57,13 @@ public class PotionTypes {
             }
         };
 
-        POTION_TYPE_MAP.put(potionType.getIdentifier().getKey(), potionType);
+        POTION_TYPE_MAP.put(potionType.getName().toString(), potionType);
         POTION_TYPE_ID_MAP.put(potionType.getId(), potionType);
         return potionType;
     }
 
     @Nullable
-    public static PotionType getByKey(String key) {
+    public static PotionType getByName(String key) {
         return POTION_TYPE_MAP.get(key);
     }
 
