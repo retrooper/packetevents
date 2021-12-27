@@ -7,6 +7,8 @@ import com.github.retrooper.packetevents.protocol.world.states.enums.*;
 import com.github.retrooper.packetevents.protocol.world.states.type.StateType;
 import com.github.retrooper.packetevents.protocol.world.states.type.StateTypes;
 import com.github.retrooper.packetevents.protocol.world.states.type.StateValue;
+import com.github.retrooper.packetevents.util.MappingHelper;
+import com.google.gson.JsonObject;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.BufferedReader;
@@ -30,16 +32,23 @@ import java.util.Map;
  * Mappings from modern versions are from ViaVersion, who have a similar (but a bit slower) system.
  */
 public class WrappedBlockState {
-    int globalID;
-    StateType type;
-    EnumMap<StateValue, Object> data = new EnumMap<>(StateValue.class);
-
     private static final WrappedBlockState AIR = new WrappedBlockState(StateTypes.AIR, new EnumMap<>(StateValue.class), 0);
-
     private static final HashMap<String, WrappedBlockState> BY_STRING = new HashMap<>();
     private static final HashMap<Integer, WrappedBlockState> BY_ID = new HashMap<>();
     private static final HashMap<WrappedBlockState, String> INTO_STRING = new HashMap<>();
     private static final HashMap<WrappedBlockState, Integer> INTO_ID = new HashMap<>();
+
+    static {
+        if (PacketEvents.getAPI().getServerManager().getVersion().isOlderThan(ServerVersion.V_1_13)) {
+            loadLegacy();
+        } else {
+            loadModern();
+        }
+    }
+
+    int globalID;
+    StateType type;
+    EnumMap<StateValue, Object> data = new EnumMap<>(StateValue.class);
 
     public WrappedBlockState(StateType type, String[] data, int globalID) {
         this.type = type;
@@ -56,6 +65,102 @@ public class WrappedBlockState {
         this.globalID = globalID;
         this.type = type;
         this.data = data;
+    }
+
+    @NotNull
+    public static WrappedBlockState getByGlobalId(int globalID) {
+        return BY_ID.getOrDefault(globalID, AIR).clone();
+    }
+
+    @NotNull
+    public static WrappedBlockState getByString(String string) {
+        return BY_STRING.getOrDefault(string, AIR).clone();
+    }
+
+    private static String getModernJsonPath(ServerVersion serverVersion) {
+        if (serverVersion.isOlderThanOrEquals(ServerVersion.V_1_13_1)) {
+            return "1.13";
+        } else if (serverVersion.isOlderThanOrEquals(ServerVersion.V_1_13_2)) {
+            return "1.13.2";
+        } else if (serverVersion.isOlderThanOrEquals(ServerVersion.V_1_14_4)) {
+            return "1.14";
+        } else if (serverVersion.isOlderThanOrEquals(ServerVersion.V_1_15_2)) {
+            return "1.15";
+        } else if (serverVersion.isOlderThanOrEquals(ServerVersion.V_1_16_1)) {
+            return "1.16";
+        } else if (serverVersion.isOlderThanOrEquals(ServerVersion.V_1_16_5)) {
+            return "1.16.2";
+        } else {
+            return "1.17";
+        }
+    }
+
+    private static void loadLegacy() {
+        String line;
+        try {
+            InputStream mappings = WrappedBlockState.class.getClassLoader().getResourceAsStream("assets/mappings/block/legacy_block_mappings.txt");
+            BufferedReader reader = new BufferedReader(new InputStreamReader(mappings));
+
+            while ((line = reader.readLine()) != null) {
+                String[] split = line.split(",");
+                int id = Integer.parseInt(split[0]);
+                int data = Integer.parseInt(split[1]);
+                int combinedID = id + (data << 12);
+
+                int endIndex = split[2].indexOf("[");
+
+                String blockString = split[2].substring(0, endIndex != -1 ? endIndex : split[2].length());
+
+                StateType type = StateTypes.getByName(blockString);
+
+                String[] dataStrings = null;
+                if (endIndex != -1) {
+                    dataStrings = split[2].substring(endIndex + 1, line.length() - 1).split(",");
+                }
+
+                WrappedBlockState state = new WrappedBlockState(type, dataStrings, combinedID);
+
+                BY_STRING.put(split[2], state);
+                BY_ID.put(combinedID, state);
+                INTO_STRING.put(state, split[2]);
+                INTO_ID.put(state, combinedID);
+            }
+        } catch (IOException e) {
+            PacketEvents.getAPI().getLogManager().debug("Palette reading failed! Unsupported version?");
+            e.printStackTrace();
+        }
+    }
+
+    private static void loadModern() {
+        JsonObject MAPPINGS = MappingHelper.getJSONObject("block/modern_block_mappings");
+        String modernVersion = getModernJsonPath(PacketEvents.getAPI().getServerManager().getVersion());
+
+        if (MAPPINGS.has(modernVersion)) {
+            JsonObject map = MAPPINGS.getAsJsonObject(modernVersion);
+            map.entrySet().forEach(entry -> {
+                int id = Integer.parseInt(entry.getKey());
+
+                String fullBlockString = entry.getValue().getAsString();
+                int index = fullBlockString.indexOf("[");
+
+                String blockString = fullBlockString.substring(0, index == -1 ? fullBlockString.length() : index);
+                StateType type = StateTypes.getByName(blockString);
+
+                String[] data = null;
+                if (index != -1) {
+                    data = fullBlockString.substring(index + 1, fullBlockString.length() - 1).split(",");
+                }
+
+                WrappedBlockState state = new WrappedBlockState(type, data, id);
+
+                BY_STRING.put(fullBlockString, state);
+                BY_ID.put(id, state);
+                INTO_STRING.put(state, fullBlockString);
+                INTO_ID.put(state, id);
+            });
+        } else {
+            throw new IllegalStateException("Failed to find block palette mappings for the " + modernVersion + " mappings version!");
+        }
     }
 
     @Override
@@ -679,6 +784,8 @@ public class WrappedBlockState {
         return (boolean) data.get(StateValue.WATERLOGGED);
     }
 
+    // End all block data types
+
     public void setWaterlogged(boolean waterlogged) {
         data.put(StateValue.WATERLOGGED, waterlogged);
         checkIsStillValid();
@@ -711,7 +818,7 @@ public class WrappedBlockState {
     public void checkIsStillValid() {
         int oldGlobalID = globalID;
         globalID = getGlobalIDNoCache();
-        if(type != StateTypes.AIR && globalID == 0) {
+        if (type != StateTypes.AIR && globalID == 0) {
             WrappedBlockState blockState = getByGlobalId(oldGlobalID);
             this.type = blockState.type;
             this.data = blockState.data;
@@ -719,7 +826,7 @@ public class WrappedBlockState {
 
             // Stack tracing is expensive
             if (PacketEvents.getAPI().getSettings().isDebugEnabled()) {
-                PacketEvents.getAPI().getLogManager().warn("Attempt to modify an unknown property for this game version and block!");;
+                PacketEvents.getAPI().getLogManager().warn("Attempt to modify an unknown property for this game version and block!");
                 PacketEvents.getAPI().getLogManager().warn("Block: " + type.getName());
                 for (Map.Entry<StateValue, Object> entry : data.entrySet()) {
                     PacketEvents.getAPI().getLogManager().warn(entry.getKey() + ": " + entry.getValue());
@@ -729,12 +836,10 @@ public class WrappedBlockState {
         }
     }
 
-    // End all block data types
-
     /**
      * This method is helpful if you want to check if a block can be
      * waterlogged, or has other properties.
-     *
+     * <p>
      * Unless you know what you are doing exactly, don't touch this method!
      * It can result in invalid block types when modified directly
      */
@@ -747,6 +852,7 @@ public class WrappedBlockState {
      * Global ID
      * For pre-1.13: 4 bits of block data, 4 bits empty, 8 bits block type
      * For post-1.13: Global ID
+     *
      * @return
      */
     public int getGlobalId() {
@@ -763,109 +869,5 @@ public class WrappedBlockState {
     @Override
     public String toString() {
         return INTO_STRING.get(this);
-    }
-
-    @NotNull
-    public static WrappedBlockState getByGlobalId(int globalID) {
-        return BY_ID.getOrDefault(globalID, AIR).clone();
-    }
-
-    @NotNull
-    public static  WrappedBlockState getByString(String string) {
-        return BY_STRING.getOrDefault(string, AIR).clone();
-    }
-
-
-    // TODO: 1.16.0/1.16.1 and 1.13.0/1.13.1 support
-    private static String getMappingServerVersion(ServerVersion serverVersion) {
-        if (serverVersion.isOlderThan(ServerVersion.V_1_13)) {
-            return "legacy_block_mappings.txt";
-        } else if (serverVersion.isOlderThan(ServerVersion.V_1_14)) {
-            return "13.txt";
-        } else if (serverVersion.isOlderThan(ServerVersion.V_1_15)) {
-            return "14.txt";
-        } else if (serverVersion.isOlderThan(ServerVersion.V_1_16)) {
-            return "15.txt";
-        } else if (serverVersion.isOlderThan(ServerVersion.V_1_16_2)) {
-            return "16.txt";
-        } else {
-            return "17.txt";
-        }
-    }
-
-    static {
-        String mappingName = getMappingServerVersion(PacketEvents.getAPI().getServerManager().getVersion());
-        InputStream mappings = WrappedBlockState.class.getClassLoader().getResourceAsStream("assets/mappings/block/" + mappingName);
-        BufferedReader paletteReader = new BufferedReader(new InputStreamReader(mappings));
-
-        if (PacketEvents.getAPI().getServerManager().getVersion().isOlderThan(ServerVersion.V_1_13)) {
-            loadLegacy(paletteReader);
-        } else {
-            loadModern(paletteReader);
-        }
-    }
-
-    private static void loadLegacy(BufferedReader reader) {
-        String line;
-        try {
-            while ((line = reader.readLine()) != null) {
-                String[] split = line.split(",");
-                int id = Integer.parseInt(split[0]);
-                int data = Integer.parseInt(split[1]);
-                int combinedID = id + (data << 12);
-
-                int endIndex = split[2].indexOf("[");
-
-                String blockString = split[2].substring(0, endIndex != -1 ? endIndex : split[2].length());
-
-                StateType type = StateTypes.getByName(blockString);
-
-                String[] dataStrings = null;
-                if (endIndex != -1) {
-                    dataStrings = split[2].substring(endIndex + 1, line.length() - 1).split(",");
-                }
-
-                WrappedBlockState state = new WrappedBlockState(type, dataStrings, combinedID);
-
-                BY_STRING.put(split[2], state);
-                BY_ID.put(combinedID, state);
-                INTO_STRING.put(state, split[2]);
-                INTO_ID.put(state, combinedID);
-            }
-        } catch (IOException e) {
-            PacketEvents.getAPI().getLogManager().debug("Palette reading failed! Unsupported version?");
-            e.printStackTrace();
-        }
-    }
-
-    private static void loadModern(BufferedReader reader) {
-        String line;
-        try {
-            while ((line = reader.readLine()) != null) {
-                int afterID = line.indexOf(" ");
-                int id = Integer.parseInt(line.substring(0, line.indexOf(" ")));
-
-                String fullBlockString = line.substring(afterID + 1);
-                int index = fullBlockString.indexOf("[");
-
-                String blockString = fullBlockString.substring(0, index == -1 ? fullBlockString.length() : index);
-                StateType type = StateTypes.getByName(blockString);
-
-                String[] data = null;
-                if (index != -1) {
-                    data = fullBlockString.substring(index + 1, fullBlockString.length() - 1).split(",");
-                }
-
-                WrappedBlockState state = new WrappedBlockState(type, data, id);
-
-                BY_STRING.put(fullBlockString, state);
-                BY_ID.put(id, state);
-                INTO_STRING.put(state, fullBlockString);
-                INTO_ID.put(state, id);
-            }
-        } catch (IOException e) {
-            PacketEvents.getAPI().getLogManager().debug("Palette reading failed! Unsupported version?");
-            e.printStackTrace();
-        }
     }
 }
