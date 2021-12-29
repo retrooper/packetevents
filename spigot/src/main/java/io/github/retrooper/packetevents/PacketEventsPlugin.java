@@ -80,21 +80,21 @@ public class PacketEventsPlugin extends JavaPlugin {
                 //TODO Fix translatable components, and check others for safety
 
                 if (event.getPacketType() == PacketType.Play.Server.CHAT_MESSAGE) {
-                   /* WrapperPlayServerChatMessage cm = new WrapperPlayServerChatMessage(event);
+                    WrapperPlayServerChatMessage cm = new WrapperPlayServerChatMessage(event);
                     BaseComponent component = cm.getChatComponent();
                     if (component instanceof TextComponent) {
-                        System.out.println("text received: " + ((TextComponent) component).getText());
+                        PacketEvents.getAPI().getLogManager().debug("text received: " + ((TextComponent) component).getText());
                     }
                     else if (component instanceof TranslatableComponent) {
                         TranslatableComponent tc = (TranslatableComponent) component;
                         String translate = tc.getTranslate();
                         List<BaseComponent> with = tc.getWith();
-                        System.out.println("received translate: " + tc.getColor().getName() + ":" + translate);
+                        PacketEvents.getAPI().getLogManager().debug("received translate: " + tc.getColor().getName() + ":" + translate);
                         for (BaseComponent child : with) {
                             String content = child instanceof TextComponent ? ((TextComponent) child).getText() : child instanceof TranslatableComponent ? ((TranslatableComponent) child).getTranslate() : "";
-                            System.out.println("translate child: " + child.getColor().getName() + ":" + content);
+                            PacketEvents.getAPI().getLogManager().debug("translate child: " + child.getColor().getName() + ":" + content);
                         }
-                    }*/
+                    }
                 }
                 else if (event.getPacketType() == PacketType.Play.Server.SPAWN_LIVING_ENTITY) {
                     WrapperPlayServerSpawnLivingEntity spawnMob = new WrapperPlayServerSpawnLivingEntity(event);

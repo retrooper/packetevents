@@ -23,12 +23,6 @@ import com.github.retrooper.packetevents.protocol.chat.component.BaseComponent;
 import com.github.retrooper.packetevents.protocol.chat.component.impl.*;
 import com.google.gson.*;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.function.BiConsumer;
-import java.util.function.Consumer;
-import java.util.function.Function;
-
 public class ComponentSerializer {
     public static Gson GSON = new GsonBuilder().create();
 
@@ -42,50 +36,57 @@ public class ComponentSerializer {
         return parseJsonComponent(json, Color.WHITE);
     }
 
-    public static BaseComponent parseJsonComponent(JsonObject jsonObject) {
+    public static BaseComponent parseJsonComponent(JsonElement jsonObject) {
         return parseJsonComponent(jsonObject, Color.WHITE);
     }
 
     public static BaseComponent parseJsonComponent(String json, Color defaultColor) {
-        JsonObject jsonObject = GSON.fromJson(json, JsonObject.class);
+        JsonElement jsonObject = GSON.fromJson(json, JsonElement.class);
         return parseJsonComponent(jsonObject, defaultColor);
     }
 
-    public static BaseComponent parseJsonComponent(JsonObject jsonObject, Color defaultColor) {
-        if (jsonObject.isJsonPrimitive()) {
+    public static BaseComponent parseJsonComponent(JsonElement jsonElement, Color defaultColor) {
+        BaseComponent component = null;
+        if (jsonElement.isJsonPrimitive()) {
             //Convert to a text component
-            String content = jsonObject.getAsString();
-            jsonObject = new JsonObject();
-            jsonObject.addProperty("text", content);
+            component = TextComponent.builder().text(jsonElement.getAsString()).color(defaultColor).build();
+        } else if (jsonElement.isJsonObject()) {
+            JsonObject jsonObject = jsonElement.getAsJsonObject();
+            if (jsonObject.has("text")) {
+                component = new TextComponent();
+            } else if (jsonObject.has("translate")) {
+                component = new TranslatableComponent();
+            } else if (jsonObject.has("score")) {
+                component = new ScoreComponent();
+            } else if (jsonObject.has("selector")) {
+                component = new SelectorComponent();
+            } else if (jsonObject.has("keybind")) {
+                component = new KeybindComponent();
+            } else if (jsonObject.has("nbt")) {
+                if (jsonObject.has("block")) {
+                    component = new NBTBlockComponent();
+                } else if (jsonObject.has("entity")) {
+                    component = new NBTEntityComponent();
+                } else if (jsonObject.has("storage")) {
+                    component = new NBTStorageComponent();
+                } else {
+                    throw new IllegalStateException("Failed to parse an NBT chat component. It might be invalid!");
+                }
+            } else {
+                throw new IllegalStateException("Failed to parse a chat component! It might be invalid!");
+            }
+            component.parseJson(jsonObject, defaultColor);
+        } else if (jsonElement.isJsonArray()) {
+            JsonArray array = jsonElement.getAsJsonArray();
+            for (JsonElement element : array) {
+                BaseComponent child = ComponentSerializer.parseJsonComponent(element);
+                if (component == null) {
+                    component = child;
+                    continue;
+                }
+                component.getChildren().add(child);
+            }
         }
-        BaseComponent component;
-        if (jsonObject.has("text")) {
-            component = new TextComponent();
-        } else if (jsonObject.has("translate")) {
-            component = new TranslatableComponent();
-        } else if (jsonObject.has("score")) {
-            component = new ScoreComponent();
-        } else if (jsonObject.has("selector")) {
-            component = new SelectorComponent();
-        } else if (jsonObject.has("keybind")) {
-            component = new KeybindComponent();
-        } else if (jsonObject.has("nbt")) {
-            if (jsonObject.has("block")) {
-                component = new NBTBlockComponent();
-            }
-            else if (jsonObject.has("entity")) {
-                component = new NBTEntityComponent();
-            }
-            else if (jsonObject.has("storage")) {
-                component = new NBTStorageComponent();
-            }
-            else {
-                throw new IllegalStateException("Failed to parse an NBT chat component. It might be invalid!");
-            }
-        } else {
-            throw new IllegalStateException("Failed to parse a chat component! It might be invalid!");
-        }
-        component.parseJson(jsonObject, defaultColor);
         return component;
     }
 }
