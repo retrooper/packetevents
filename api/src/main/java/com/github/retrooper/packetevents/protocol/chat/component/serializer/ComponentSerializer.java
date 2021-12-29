@@ -33,19 +33,28 @@ public class ComponentSerializer {
     }
 
     public static BaseComponent parseJsonComponent(String json) {
-        return parseJsonComponent(json, Color.WHITE);
+        return parseJsonComponent(json, Color.WHITE, true);
     }
 
     public static BaseComponent parseJsonComponent(JsonElement jsonObject) {
-        return parseJsonComponent(jsonObject, Color.WHITE);
+        return parseJsonComponent(jsonObject, Color.WHITE, true);
     }
 
     public static BaseComponent parseJsonComponent(String json, Color defaultColor) {
         JsonElement jsonObject = GSON.fromJson(json, JsonElement.class);
-        return parseJsonComponent(jsonObject, defaultColor);
+        return parseJsonComponent(jsonObject, defaultColor, true);
     }
 
-    public static BaseComponent parseJsonComponent(JsonElement jsonElement, Color defaultColor) {
+    public static BaseComponent parseJsonComponent(String json, Color defaultColor, boolean throwException) {
+        JsonElement jsonObject = GSON.fromJson(json, JsonElement.class);
+        return parseJsonComponent(jsonObject, defaultColor, throwException);
+    }
+
+    public static BaseComponent parseJsonComponent(JsonElement jsonObject, Color defaultColor) {
+        return parseJsonComponent(jsonObject, defaultColor, true);
+    }
+
+    public static BaseComponent parseJsonComponent(JsonElement jsonElement, Color defaultColor, boolean throwException) {
         BaseComponent component = null;
         if (jsonElement.isJsonPrimitive()) {
             //Convert to a text component
@@ -70,10 +79,20 @@ public class ComponentSerializer {
                 } else if (jsonObject.has("storage")) {
                     component = new NBTStorageComponent();
                 } else {
-                    throw new IllegalStateException("Failed to parse an NBT chat component. It might be invalid!");
+                    if (throwException) {
+                        throw new IllegalStateException("Failed to parse an NBT chat component. It might be invalid: " + jsonObject.toString());
+                    }
+                    else {
+                        return null;
+                    }
                 }
             } else {
-                throw new IllegalStateException("Failed to parse a chat component! It might be invalid!");
+                if (throwException) {
+                    throw new IllegalStateException("Failed to parse a chat component! It might be invalid: " + jsonObject.toString());
+                }
+                else {
+                    return null;
+                }
             }
             component.parseJson(jsonObject, defaultColor);
         } else if (jsonElement.isJsonArray()) {

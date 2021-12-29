@@ -24,6 +24,7 @@ import com.github.retrooper.packetevents.protocol.chat.component.serializer.Comp
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import com.google.gson.JsonPrimitive;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -31,7 +32,7 @@ import java.util.function.Function;
 
 public class TranslatableComponent extends BaseComponent {
     private String translate;
-    private List<BaseComponent> with = new ArrayList<>();
+    private List<Object> with = new ArrayList<>();
 
     public String getTranslate() {
         return translate;
@@ -41,11 +42,11 @@ public class TranslatableComponent extends BaseComponent {
         this.translate = translate;
     }
 
-    public List<BaseComponent> getWith() {
+    public List<Object> getWith() {
         return with;
     }
 
-    public void setWith(List<BaseComponent> with) {
+    public void setWith(List<Object> with) {
         this.with = with;
     }
 
@@ -64,8 +65,13 @@ public class TranslatableComponent extends BaseComponent {
             JsonArray withArray = jsonObject.get("with").getAsJsonArray();
             for (JsonElement withElement : withArray) {
                 JsonObject withObject = withElement.getAsJsonObject();
-                BaseComponent child = ComponentSerializer.parseJsonComponent(withObject, getColor());
-                with.add(child);
+                BaseComponent child = ComponentSerializer.parseJsonComponent(withObject, getColor(), false);
+                if (child instanceof TextComponent) {
+                    with.add(((TextComponent) child).getText());
+                }
+                else {
+                    with.add(child);
+                }
             }
         }
     }
@@ -76,8 +82,13 @@ public class TranslatableComponent extends BaseComponent {
         jsonObject.addProperty("translate", translate);
         if (!with.isEmpty()) {
             JsonArray withArray = new JsonArray();
-            for (BaseComponent child : with) {
-                withArray.add(child.buildJson());
+            for (Object child : with) {
+                if (child instanceof BaseComponent) {
+                    withArray.add(((BaseComponent) child).buildJson());
+                }
+                else {
+                    withArray.add(new JsonPrimitive(String.valueOf(child)));
+                }
             }
             jsonObject.add("with", withArray);
         }

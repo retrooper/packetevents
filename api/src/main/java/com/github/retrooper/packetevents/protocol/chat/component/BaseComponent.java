@@ -221,21 +221,7 @@ public class BaseComponent {
                 jsonHoverEventValueElement = hoverEventObject.get("contents");
             }
             if (jsonHoverEventValueElement != null) {
-                if (jsonHoverEventValueElement.isJsonPrimitive()) {
-                    values.add(TextComponent.builder().text(jsonHoverEventValueElement.getAsString()).build());
-                }
-                else if (jsonHoverEventValueElement.isJsonArray()) {
-                    for (JsonElement jsonElement : jsonHoverEventValueElement.getAsJsonArray()) {
-                        JsonObject jsonObj = jsonElement.getAsJsonObject();
-                        BaseComponent baseComponent = ComponentSerializer.parseJsonComponent(jsonObj, defaultColor);
-                        values.add(baseComponent);
-                    }
-                }
-                else {
-                    JsonObject jsonObj = jsonHoverEventValueElement.getAsJsonObject();
-                    BaseComponent baseComponent = ComponentSerializer.parseJsonComponent(jsonObj, defaultColor);
-                    values.add(baseComponent);
-                }
+                values.add(ComponentSerializer.parseJsonComponent(jsonHoverEventValueElement));
             }
             this.hoverEvent = new HoverEvent(values.isEmpty() ? HoverType.EMPTY : HoverType.getByName(action), values);
         } else {
@@ -245,15 +231,7 @@ public class BaseComponent {
         if (jsonObject.has("extra")) {
             JsonArray jsonExtraComponents = jsonObject.getAsJsonArray("extra");
             for (JsonElement jsonElement : jsonExtraComponents) {
-                BaseComponent child;
-                if (jsonElement.isJsonPrimitive()) {
-                    child = TextComponent.builder().text(jsonElement.getAsString())
-                            .color(this.color)
-                            .build();
-                }
-                else {
-                    child = ComponentSerializer.parseJsonComponent(jsonElement.getAsJsonObject(), this.color);
-                }
+                BaseComponent child = ComponentSerializer.parseJsonComponent(jsonElement.getAsJsonObject(), this.color);
                 children.add(child);
             }
         }

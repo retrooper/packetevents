@@ -88,11 +88,12 @@ public class PacketEventsPlugin extends JavaPlugin {
                     else if (component instanceof TranslatableComponent) {
                         TranslatableComponent tc = (TranslatableComponent) component;
                         String translate = tc.getTranslate();
-                        List<BaseComponent> with = tc.getWith();
+                        List<Object> with = tc.getWith();
                         PacketEvents.getAPI().getLogManager().debug("received translate: " + tc.getColor().getName() + ":" + translate);
-                        for (BaseComponent child : with) {
-                            String content = child instanceof TextComponent ? ((TextComponent) child).getText() : child instanceof TranslatableComponent ? ((TranslatableComponent) child).getTranslate() : "";
-                            PacketEvents.getAPI().getLogManager().debug("translate child: " + child.getColor().getName() + ":" + content);
+                        for (Object child : with) {
+                            String content = child instanceof String ? child.toString() : child instanceof TranslatableComponent ? ((TranslatableComponent) child).getTranslate() : "";
+                            String colorName = child instanceof String ? "none" : child instanceof TranslatableComponent ? ((TranslatableComponent) child).getColor().getName() : "";
+                            PacketEvents.getAPI().getLogManager().debug("translate child: " + colorName + ":" + content);
                         }
                     }
                 }
