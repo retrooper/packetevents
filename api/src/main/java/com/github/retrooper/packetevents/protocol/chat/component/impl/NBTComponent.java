@@ -28,6 +28,7 @@ import java.util.Optional;
 public class NBTComponent extends BaseComponent {
     private String nbtPath;
     private Optional<BaseComponent> separator;
+    private boolean interpret;
 
     protected NBTComponent() {
     }
@@ -49,6 +50,13 @@ public class NBTComponent extends BaseComponent {
         else {
             separator = Optional.empty();
         }
+
+        if (jsonObject.has("interpret")) {
+            interpret = jsonObject.get("interpret").getAsBoolean();
+        }
+        else {
+            interpret = false;
+        }
     }
 
     @Override
@@ -56,6 +64,7 @@ public class NBTComponent extends BaseComponent {
         JsonObject jsonObject = super.buildJson();
         jsonObject.addProperty("nbt", nbtPath);
         separator.ifPresent(baseComponent -> jsonObject.add("separator", baseComponent.buildJson()));
+        jsonObject.addProperty("interpret", interpret);
         return jsonObject;
     }
 
@@ -73,5 +82,13 @@ public class NBTComponent extends BaseComponent {
 
     public void setSeparator(Optional<BaseComponent> separator) {
         this.separator = separator;
+    }
+
+    public boolean isInterpreting() {
+        return interpret;
+    }
+
+    public void setInterpreting(boolean interpret) {
+        this.interpret = interpret;
     }
 }
