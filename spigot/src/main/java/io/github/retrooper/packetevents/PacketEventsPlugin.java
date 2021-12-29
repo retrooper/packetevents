@@ -22,6 +22,11 @@ import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.event.PacketListenerAbstract;
 import com.github.retrooper.packetevents.event.impl.PacketReceiveEvent;
 import com.github.retrooper.packetevents.event.impl.PacketSendEvent;
+import com.github.retrooper.packetevents.protocol.chat.component.BaseComponent;
+import com.github.retrooper.packetevents.protocol.chat.component.impl.ScoreComponent;
+import com.github.retrooper.packetevents.protocol.chat.component.impl.TextComponent;
+import com.github.retrooper.packetevents.protocol.chat.component.impl.TranslatableComponent;
+import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerChatMessage;
 import io.github.retrooper.packetevents.factory.spigot.SpigotPacketEventsBuilder;
 import com.github.retrooper.packetevents.protocol.item.ItemStack;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
@@ -73,7 +78,25 @@ public class PacketEventsPlugin extends JavaPlugin {
             public void onPacketSend(PacketSendEvent event) {
                 Player player = event.getPlayer() == null ? null : (Player) event.getPlayer();
                 //TODO Fix translatable components, and check others for safety
-                if (event.getPacketType() == PacketType.Play.Server.SPAWN_LIVING_ENTITY) {
+
+                if (event.getPacketType() == PacketType.Play.Server.CHAT_MESSAGE) {
+                   /* WrapperPlayServerChatMessage cm = new WrapperPlayServerChatMessage(event);
+                    BaseComponent component = cm.getChatComponent();
+                    if (component instanceof TextComponent) {
+                        System.out.println("text received: " + ((TextComponent) component).getText());
+                    }
+                    else if (component instanceof TranslatableComponent) {
+                        TranslatableComponent tc = (TranslatableComponent) component;
+                        String translate = tc.getTranslate();
+                        List<BaseComponent> with = tc.getWith();
+                        System.out.println("received translate: " + tc.getColor().getName() + ":" + translate);
+                        for (BaseComponent child : with) {
+                            String content = child instanceof TextComponent ? ((TextComponent) child).getText() : child instanceof TranslatableComponent ? ((TranslatableComponent) child).getTranslate() : "";
+                            System.out.println("translate child: " + child.getColor().getName() + ":" + content);
+                        }
+                    }*/
+                }
+                else if (event.getPacketType() == PacketType.Play.Server.SPAWN_LIVING_ENTITY) {
                     WrapperPlayServerSpawnLivingEntity spawnMob = new WrapperPlayServerSpawnLivingEntity(event);
                     int entityID = spawnMob.getEntityId();
                     UUID uuid = spawnMob.getEntityUUID();
@@ -91,7 +114,7 @@ public class PacketEventsPlugin extends JavaPlugin {
                 }//TODO Complete chunk data packet
             }
         };
-        //PacketEvents.getAPI().getEventManager().registerListener(debugListener);
+        PacketEvents.getAPI().getEventManager().registerListener(debugListener);
     }
 
     @Override

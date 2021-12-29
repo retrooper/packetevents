@@ -18,6 +18,7 @@
 
 package com.github.retrooper.packetevents.protocol.chat.component.impl;
 
+import com.github.retrooper.packetevents.protocol.chat.Color;
 import com.github.retrooper.packetevents.protocol.chat.component.BaseComponent;
 import com.google.gson.JsonObject;
 
@@ -52,7 +53,7 @@ public class ScoreComponent extends BaseComponent {
     }
 
     @Override
-    public void parseJson(JsonObject jsonObject) {
+    public void parseJson(JsonObject jsonObject, Color defaultColor) {
         if (jsonObject.has("score")) {
             JsonObject score = jsonObject.getAsJsonObject("score");
             if (score.has("name")) {
@@ -75,7 +76,7 @@ public class ScoreComponent extends BaseComponent {
                 value = "";
             }
         }
-        super.parseJson(jsonObject);
+        super.parseJson(jsonObject, defaultColor);
     }
 
     @Override

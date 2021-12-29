@@ -18,6 +18,7 @@
 
 package com.github.retrooper.packetevents.protocol.chat.component.impl;
 
+import com.github.retrooper.packetevents.protocol.chat.Color;
 import com.github.retrooper.packetevents.protocol.chat.component.BaseComponent;
 import com.google.gson.JsonObject;
 
@@ -33,14 +34,14 @@ public class KeybindComponent extends BaseComponent {
     }
 
     @Override
-    public void parseJson(JsonObject jsonObject) {
+    public void parseJson(JsonObject jsonObject, Color defaultColor) {
         if (jsonObject.has("keybind")) {
             keybind = jsonObject.get("keybind").getAsString();
         }
         else {
             keybind = "";
         }
-        super.parseJson(jsonObject);
+        super.parseJson(jsonObject, defaultColor);
     }
 
     @Override

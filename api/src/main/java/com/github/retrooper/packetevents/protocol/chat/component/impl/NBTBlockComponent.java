@@ -19,55 +19,35 @@
 package com.github.retrooper.packetevents.protocol.chat.component.impl;
 
 import com.github.retrooper.packetevents.protocol.chat.Color;
-import com.github.retrooper.packetevents.protocol.chat.component.BaseComponent;
-import com.github.retrooper.packetevents.protocol.chat.component.ClickEvent;
-import com.github.retrooper.packetevents.protocol.chat.component.HoverEvent;
 import com.google.gson.JsonObject;
 
-public class TextComponent extends BaseComponent {
-    private String text;
-
-    public String getText() {
-        return text;
-    }
-
-    public void setText(String text) {
-        this.text = text;
-    }
+public class NBTBlockComponent extends NBTComponent {
+    //TODO Parse this pattern
+    private String positionPattern;
 
     @Override
     public void parseJson(JsonObject jsonObject, Color defaultColor) {
-        if (jsonObject.has("text")) {
-            text = jsonObject.get("text").getAsString();
-        } else {
-            text = "";
-        }
         super.parseJson(jsonObject, defaultColor);
+        if (jsonObject.has("block")) {
+            positionPattern = jsonObject.get("block").getAsString();
+        }
+        else {
+            positionPattern = "";
+        }
     }
 
     @Override
     public JsonObject buildJson() {
         JsonObject jsonObject = super.buildJson();
-        jsonObject.addProperty("text", text);
+        jsonObject.addProperty("block", positionPattern);
         return jsonObject;
     }
 
-    public static TextComponent.Builder builder() {
-        return new Builder();
+    public String getPositionPattern() {
+        return positionPattern;
     }
 
-    public static class Builder extends BaseComponent.Builder<Builder> {
-        public Builder() {
-            super(new TextComponent());
-        }
-
-        public Builder text(String text) {
-            ((TextComponent)component).setText(text);
-            return this;
-        }
-
-        public TextComponent build() {
-            return (TextComponent) component;
-        }
+    public void setPositionPattern(String positionPattern) {
+        this.positionPattern = positionPattern;
     }
 }

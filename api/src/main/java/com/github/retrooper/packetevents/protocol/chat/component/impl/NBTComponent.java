@@ -21,66 +21,57 @@ package com.github.retrooper.packetevents.protocol.chat.component.impl;
 import com.github.retrooper.packetevents.protocol.chat.Color;
 import com.github.retrooper.packetevents.protocol.chat.component.BaseComponent;
 import com.github.retrooper.packetevents.protocol.chat.component.serializer.ComponentSerializer;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.function.Function;
+import java.util.Optional;
 
-public class TranslatableComponent extends BaseComponent {
-    private String translate;
-    private List<BaseComponent> with = new ArrayList<>();
+public class NBTComponent extends BaseComponent {
+    private String nbtPath;
+    private Optional<BaseComponent> separator;
 
-    public String getTranslate() {
-        return translate;
-    }
-
-    public void setTranslate(String translate) {
-        this.translate = translate;
-    }
-
-    public List<BaseComponent> getWith() {
-        return with;
-    }
-
-    public void setWith(List<BaseComponent> with) {
-        this.with = with;
+    protected NBTComponent() {
     }
 
     @Override
     public void parseJson(JsonObject jsonObject, Color defaultColor) {
         super.parseJson(jsonObject, defaultColor);
-        if (jsonObject.has("translate")) {
-            translate = jsonObject.get("translate").getAsString();
+        if (jsonObject.has("nbt")) {
+            nbtPath = jsonObject.get("nbt").getAsString();
         }
         else {
-            translate = "";
+            nbtPath = "";
         }
 
-
-        if (jsonObject.has("with")) {
-            JsonArray withArray = jsonObject.get("with").getAsJsonArray();
-            for (JsonElement withElement : withArray) {
-                JsonObject withObject = withElement.getAsJsonObject();
-                BaseComponent child = ComponentSerializer.parseJsonComponent(withObject, getColor());
-                with.add(child);
-            }
+        if (jsonObject.has("separator")) {
+            JsonObject separatorJsonObject = jsonObject.get("separator").getAsJsonObject();
+            separator = Optional.of(ComponentSerializer.parseJsonComponent(separatorJsonObject));
+        }
+        else {
+            separator = Optional.empty();
         }
     }
 
     @Override
     public JsonObject buildJson() {
         JsonObject jsonObject = super.buildJson();
-        jsonObject.addProperty("translate", translate);
-        if (!with.isEmpty()) {
-            JsonArray withArray = new JsonArray();
-            for (BaseComponent child : with) {
-                withArray.add(child.buildJson());
-            }
-            jsonObject.add("with", withArray);
-        }
+        jsonObject.addProperty("nbt", nbtPath);
+        separator.ifPresent(baseComponent -> jsonObject.add("separator", baseComponent.buildJson()));
         return jsonObject;
+    }
+
+    public String getNBTPath() {
+        return nbtPath;
+    }
+
+    public void setNBTPath(String nbtPath) {
+        this.nbtPath = nbtPath;
+    }
+
+    public Optional<BaseComponent> getSeparator() {
+        return separator;
+    }
+
+    public void setSeparator(Optional<BaseComponent> separator) {
+        this.separator = separator;
     }
 }

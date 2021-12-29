@@ -18,6 +18,7 @@
 
 package com.github.retrooper.packetevents.protocol.chat.component.serializer;
 
+import com.github.retrooper.packetevents.protocol.chat.Color;
 import com.github.retrooper.packetevents.protocol.chat.component.BaseComponent;
 import com.github.retrooper.packetevents.protocol.chat.component.impl.*;
 import com.google.gson.*;
@@ -38,11 +39,19 @@ public class ComponentSerializer {
     }
 
     public static BaseComponent parseJsonComponent(String json) {
-        JsonObject jsonObject = GSON.fromJson(json, JsonObject.class);
-        return parseJsonComponent(jsonObject);
+        return parseJsonComponent(json, Color.WHITE);
     }
 
     public static BaseComponent parseJsonComponent(JsonObject jsonObject) {
+        return parseJsonComponent(jsonObject, Color.WHITE);
+    }
+
+    public static BaseComponent parseJsonComponent(String json, Color defaultColor) {
+        JsonObject jsonObject = GSON.fromJson(json, JsonObject.class);
+        return parseJsonComponent(jsonObject, defaultColor);
+    }
+
+    public static BaseComponent parseJsonComponent(JsonObject jsonObject, Color defaultColor) {
         if (jsonObject.isJsonPrimitive()) {
             //Convert to a text component
             String content = jsonObject.getAsString();
@@ -61,13 +70,13 @@ public class ComponentSerializer {
         } else if (jsonObject.has("keybind")) {
             component = new KeybindComponent();
         } else if (jsonObject.has("nbt")) {
-            //TODO Make NBT Component
+            //TODO Make NBT Component(new)
             component = new BaseComponent();
         } else {
             //TODO Handle properly
             return TextComponent.builder().text(jsonObject.toString()).build();
         }
-        component.parseJson(jsonObject);
+        component.parseJson(jsonObject, defaultColor);
         return component;
     }
 }

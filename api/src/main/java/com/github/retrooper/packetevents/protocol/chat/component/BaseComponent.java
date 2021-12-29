@@ -143,11 +143,14 @@ public class BaseComponent {
         return new Builder(new BaseComponent());
     }
 
-    public void parseJson(JsonObject jsonObject) {
+    public void parseJson(JsonObject jsonObject, Color defaultColor) {
         if (jsonObject.has("color")) {
             this.color = Color.getByName(jsonObject.get("color").getAsString());
         } else {
-            this.color = Color.WHITE;
+            if (defaultColor == null) {
+                defaultColor = Color.WHITE;
+            }
+            this.color = defaultColor;
         }
         if (jsonObject.has("insertion")) {
             this.insertion = jsonObject.get("insertion").getAsString();
@@ -224,13 +227,13 @@ public class BaseComponent {
                 else if (jsonHoverEventValueElement.isJsonArray()) {
                     for (JsonElement jsonElement : jsonHoverEventValueElement.getAsJsonArray()) {
                         JsonObject jsonObj = jsonElement.getAsJsonObject();
-                        BaseComponent baseComponent = ComponentSerializer.parseJsonComponent(jsonObj);
+                        BaseComponent baseComponent = ComponentSerializer.parseJsonComponent(jsonObj, defaultColor);
                         values.add(baseComponent);
                     }
                 }
                 else {
                     JsonObject jsonObj = jsonHoverEventValueElement.getAsJsonObject();
-                    BaseComponent baseComponent = ComponentSerializer.parseJsonComponent(jsonObj);
+                    BaseComponent baseComponent = ComponentSerializer.parseJsonComponent(jsonObj, defaultColor);
                     values.add(baseComponent);
                 }
             }
@@ -244,10 +247,12 @@ public class BaseComponent {
             for (JsonElement jsonElement : jsonExtraComponents) {
                 BaseComponent child;
                 if (jsonElement.isJsonPrimitive()) {
-                    child = TextComponent.builder().text(jsonElement.getAsString()).build();
+                    child = TextComponent.builder().text(jsonElement.getAsString())
+                            .color(this.color)
+                            .build();
                 }
                 else {
-                    child = ComponentSerializer.parseJsonComponent(jsonElement.getAsJsonObject());
+                    child = ComponentSerializer.parseJsonComponent(jsonElement.getAsJsonObject(), this.color);
                 }
                 children.add(child);
             }

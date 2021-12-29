@@ -18,11 +18,16 @@
 
 package com.github.retrooper.packetevents.protocol.chat.component.impl;
 
+import com.github.retrooper.packetevents.protocol.chat.Color;
 import com.github.retrooper.packetevents.protocol.chat.component.BaseComponent;
+import com.github.retrooper.packetevents.protocol.chat.component.serializer.ComponentSerializer;
 import com.google.gson.JsonObject;
+
+import java.util.Optional;
 
 public class SelectorComponent extends BaseComponent {
     private String selector;
+    private Optional<BaseComponent> separator;
 
     public String getSelector() {
         return selector;
@@ -32,21 +37,38 @@ public class SelectorComponent extends BaseComponent {
         this.selector = selector;
     }
 
+    public Optional<BaseComponent> getSeparator() {
+        return separator;
+    }
+
+    public void setSeparator(Optional<BaseComponent> separator) {
+        this.separator = separator;
+    }
+
     @Override
-    public void parseJson(JsonObject jsonObject) {
+    public void parseJson(JsonObject jsonObject, Color defaultColor) {
         if (jsonObject.has("selector")) {
             selector = jsonObject.get("selector").getAsString();
         }
         else {
             selector = "";
         }
-        super.parseJson(jsonObject);
+
+        if (jsonObject.has("separator")) {
+            JsonObject separatorJsonObject = jsonObject.get("separator").getAsJsonObject();
+            separator = Optional.of(ComponentSerializer.parseJsonComponent(separatorJsonObject));
+        }
+        else {
+            separator = Optional.empty();
+        }
+        super.parseJson(jsonObject, defaultColor);
     }
 
     @Override
     public JsonObject buildJson() {
         JsonObject jsonObject = super.buildJson();
         jsonObject.addProperty("selector", selector);
+        separator.ifPresent(baseComponent -> jsonObject.add("separator", baseComponent.buildJson()));
         return jsonObject;
     }
 }
