@@ -70,11 +70,20 @@ public class ComponentSerializer {
         } else if (jsonObject.has("keybind")) {
             component = new KeybindComponent();
         } else if (jsonObject.has("nbt")) {
-            //TODO Make NBT Component(new)
-            component = new BaseComponent();
+            if (jsonObject.has("block")) {
+                component = new NBTBlockComponent();
+            }
+            else if (jsonObject.has("entity")) {
+                component = new NBTEntityComponent();
+            }
+            else if (jsonObject.has("storage")) {
+                component = new NBTStorageComponent();
+            }
+            else {
+                throw new IllegalStateException("Failed to parse an NBT chat component. It might be invalid!");
+            }
         } else {
-            //TODO Handle properly
-            return TextComponent.builder().text(jsonObject.toString()).build();
+            throw new IllegalStateException("Failed to parse a chat component! It might be invalid!");
         }
         component.parseJson(jsonObject, defaultColor);
         return component;
