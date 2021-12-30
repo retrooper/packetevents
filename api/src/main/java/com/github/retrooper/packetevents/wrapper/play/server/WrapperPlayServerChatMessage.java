@@ -18,6 +18,7 @@
 
 package com.github.retrooper.packetevents.wrapper.play.server;
 
+import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.event.impl.PacketSendEvent;
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.protocol.chat.component.BaseComponent;
@@ -64,7 +65,7 @@ public class WrapperPlayServerChatMessage extends PacketWrapper<WrapperPlayServe
     @Override
     public void readData() {
         this.chatComponentJson = readString(getMaxMessageLength());
-        // LogManager.debug("og json msg: " + chatComponentJson);
+        PacketEvents.getAPI().getLogManager().debug("og json msg: " + chatComponentJson);
 
         //Parse JSON message
         if (HANDLE_JSON) {

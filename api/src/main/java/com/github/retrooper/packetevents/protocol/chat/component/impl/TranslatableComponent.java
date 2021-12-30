@@ -28,7 +28,6 @@ import com.google.gson.JsonPrimitive;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.function.Function;
 
 public class TranslatableComponent extends BaseComponent {
     private String translate;
@@ -55,8 +54,7 @@ public class TranslatableComponent extends BaseComponent {
         super.parseJson(jsonObject, defaultColor);
         if (jsonObject.has("translate")) {
             translate = jsonObject.get("translate").getAsString();
-        }
-        else {
+        } else {
             translate = "";
         }
 
@@ -64,14 +62,14 @@ public class TranslatableComponent extends BaseComponent {
         if (jsonObject.has("with")) {
             JsonArray withArray = jsonObject.get("with").getAsJsonArray();
             for (JsonElement withElement : withArray) {
-                JsonObject withObject = withElement.getAsJsonObject();
-                BaseComponent child = ComponentSerializer.parseJsonComponent(withObject, getColor(), false);
+                BaseComponent child = ComponentSerializer.parseJsonComponent(withElement, getColor(), false);
                 if (child instanceof TextComponent) {
-                    with.add(((TextComponent) child).getText());
+                    TextComponent childComp = (TextComponent) child;
+                    if (!childComp.hasStyling() && childComp.getChildren().isEmpty()) {
+                        with.add(((TextComponent) child).getText());
+                    }
                 }
-                else {
-                    with.add(child);
-                }
+                with.add(child);
             }
         }
     }
@@ -85,8 +83,7 @@ public class TranslatableComponent extends BaseComponent {
             for (Object child : with) {
                 if (child instanceof BaseComponent) {
                     withArray.add(((BaseComponent) child).buildJson());
-                }
-                else {
+                } else {
                     withArray.add(new JsonPrimitive(String.valueOf(child)));
                 }
             }

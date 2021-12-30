@@ -91,10 +91,11 @@ public class PacketEventsPlugin extends JavaPlugin {
                         List<Object> with = tc.getWith();
                         PacketEvents.getAPI().getLogManager().debug("received translate: " + tc.getColor().getName() + ":" + translate);
                         for (Object child : with) {
-                            String content = child instanceof String ? child.toString() : child instanceof TranslatableComponent ? ((TranslatableComponent) child).getTranslate() : "";
-                            String colorName = child instanceof String ? "none" : child instanceof TranslatableComponent ? ((TranslatableComponent) child).getColor().getName() : "";
+                            String content = child instanceof String ? child.toString() : child instanceof BaseComponent ? ((BaseComponent) child).buildJson().toString() : "";
+                            String colorName = child instanceof String ? "none" : child instanceof BaseComponent ? ((BaseComponent) child).getColor().getName() : "";
                             PacketEvents.getAPI().getLogManager().debug("translate child: " + colorName + ":" + content);
                         }
+                        System.out.println("output: " + tc.buildJson().toString());
                     }
                 }
                 else if (event.getPacketType() == PacketType.Play.Server.SPAWN_LIVING_ENTITY) {
@@ -115,7 +116,7 @@ public class PacketEventsPlugin extends JavaPlugin {
                 }//TODO Complete chunk data packet
             }
         };
-        //PacketEvents.getAPI().getEventManager().registerListener(debugListener);
+        PacketEvents.getAPI().getEventManager().registerListener(debugListener);
     }
 
     @Override

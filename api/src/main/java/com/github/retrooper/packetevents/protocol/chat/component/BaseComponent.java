@@ -27,6 +27,7 @@ import com.github.retrooper.packetevents.protocol.chat.component.serializer.Comp
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import com.google.gson.JsonPrimitive;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -117,6 +118,11 @@ public class BaseComponent {
 
     public void setObfuscated(boolean obfuscated) {
         this.obfuscated = obfuscated;
+    }
+
+    public boolean hasStyling() {
+        return (color != Color.WHITE) || (!insertion.isEmpty()) || (clickEvent.getType() != ClickType.EMPTY) || (hoverEvent.getType() != HoverType.EMPTY)
+                || bold || italic || underlined || strikeThrough || obfuscated;
     }
 
     public List<BaseComponent> getChildren() {
@@ -214,14 +220,27 @@ public class BaseComponent {
             } else {
                 action = "";
             }
-            List<BaseComponent> values = new ArrayList<>();
+            List<Object> values = new ArrayList<>();
 
             JsonElement jsonHoverEventValueElement = hoverEventObject.get("value");
             if (jsonHoverEventValueElement == null) {
                 jsonHoverEventValueElement = hoverEventObject.get("contents");
             }
             if (jsonHoverEventValueElement != null) {
-                values.add(ComponentSerializer.parseJsonComponent(jsonHoverEventValueElement));
+                if (jsonHoverEventValueElement.isJsonPrimitive()) {
+                    //Content can also be a string
+                    values.add(jsonHoverEventValueElement.getAsString());
+                }
+                else {
+                    //Content can also be a component, but here we make an exception
+                    if (action.equals("show_entity")) {
+                        String valueString = jsonHoverEventValueElement.toString();
+                        values.add(valueString);
+                    }
+                    else {
+                        values.add(ComponentSerializer.parseJsonComponent(jsonHoverEventValueElement));
+                    }
+                }
             }
             this.hoverEvent = new HoverEvent(values.isEmpty() ? HoverType.EMPTY : HoverType.getByName(action), values);
         } else {
@@ -272,8 +291,9 @@ public class BaseComponent {
             JsonObject hoverEventObject = new JsonObject();
             hoverEventObject.addProperty("action", hoverEvent.getType().getName());
             JsonArray hoverEventValueArray = new JsonArray();
-            for (BaseComponent value : hoverEvent.getValues()) {
-                hoverEventValueArray.add(value.buildJson());
+            for (Object value : hoverEvent.getValues()) {
+                JsonElement output = (value instanceof BaseComponent) ? ((BaseComponent) value).buildJson() : new JsonPrimitive(value.toString());
+                hoverEventValueArray.add(output);
             }
 
             //We use "value" instead of "contents" because we can be sure it will work on every Spigot version.
