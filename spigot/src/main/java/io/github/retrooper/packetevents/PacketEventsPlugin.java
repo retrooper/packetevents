@@ -78,6 +78,7 @@ public class PacketEventsPlugin extends JavaPlugin {
             public void onPacketSend(PacketSendEvent event) {
                 Player player = event.getPlayer() == null ? null : (Player) event.getPlayer();
                 //TODO Fix hoverEvent contents/value when its a component i believe
+                //TODO Work on copying styling properly from children components
 
                 if (event.getPacketType() == PacketType.Play.Server.CHAT_MESSAGE) {
                     WrapperPlayServerChatMessage cm = new WrapperPlayServerChatMessage(event);
