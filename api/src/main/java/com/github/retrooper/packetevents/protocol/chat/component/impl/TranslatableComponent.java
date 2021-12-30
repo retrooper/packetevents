@@ -92,4 +92,33 @@ public class TranslatableComponent extends BaseComponent {
         }
         return jsonObject;
     }
+
+    public static TranslatableComponent.Builder builder() {
+        return new Builder();
+    }
+
+    public static class Builder extends BaseComponent.Builder<Builder> {
+        public Builder() {
+            super(new TranslatableComponent());
+        }
+
+        public Builder translate(String translate) {
+            ((TranslatableComponent)component).setTranslate(translate);
+            return this;
+        }
+
+        public Builder with(List<Object> with) {
+            ((TranslatableComponent)component).setWith(with);
+            return this;
+        }
+
+        public Builder appendWith(Object obj) {
+            ((TranslatableComponent)component).getWith().add(obj);
+            return this;
+        }
+
+        public TranslatableComponent build() {
+            return (TranslatableComponent) component;
+        }
+    }
 }

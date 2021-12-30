@@ -91,4 +91,33 @@ public class ScoreComponent extends BaseComponent {
         jsonObject.add("score", score);
         return jsonObject;
     }
+
+    public static ScoreComponent.Builder builder() {
+        return new Builder();
+    }
+
+    public static class Builder extends BaseComponent.Builder<Builder> {
+        public Builder() {
+            super(new ScoreComponent());
+        }
+
+        public Builder name(String name) {
+            ((ScoreComponent)component).setName(name);
+            return this;
+        }
+
+        public Builder objective(String objective) {
+            ((ScoreComponent)component).setObjective(objective);
+            return this;
+        }
+
+        public Builder value(String value) {
+            ((ScoreComponent)component).setValue(value);
+            return this;
+        }
+
+        public ScoreComponent build() {
+            return (ScoreComponent) component;
+        }
+    }
 }

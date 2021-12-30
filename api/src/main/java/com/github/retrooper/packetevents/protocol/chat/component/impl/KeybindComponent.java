@@ -50,4 +50,23 @@ public class KeybindComponent extends BaseComponent {
         jsonObject.addProperty("keybind", keybind);
         return jsonObject;
     }
+
+    public static KeybindComponent.Builder builder() {
+        return new Builder();
+    }
+
+    public static class Builder extends BaseComponent.Builder<Builder> {
+        public Builder() {
+            super(new KeybindComponent());
+        }
+
+        public Builder keybind(String keybind) {
+            ((KeybindComponent)component).setKeybind(keybind);
+            return this;
+        }
+
+        public KeybindComponent build() {
+            return (KeybindComponent) component;
+        }
+    }
 }

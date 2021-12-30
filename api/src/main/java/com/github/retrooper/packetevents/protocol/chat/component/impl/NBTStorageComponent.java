@@ -19,8 +19,11 @@
 package com.github.retrooper.packetevents.protocol.chat.component.impl;
 
 import com.github.retrooper.packetevents.protocol.chat.Color;
+import com.github.retrooper.packetevents.protocol.chat.component.BaseComponent;
 import com.github.retrooper.packetevents.protocol.resources.ResourceLocation;
 import com.google.gson.JsonObject;
+
+import java.util.Optional;
 
 public class NBTStorageComponent extends NBTComponent {
     private ResourceLocation storage;
@@ -52,5 +55,39 @@ public class NBTStorageComponent extends NBTComponent {
 
     public void setStorage(ResourceLocation storage) {
         this.storage = storage;
+    }
+
+    public static NBTStorageComponent.Builder builder() {
+        return new Builder();
+    }
+
+    public static class Builder extends BaseComponent.Builder<Builder> {
+        public Builder() {
+            super(new NBTStorageComponent());
+        }
+
+        public Builder nbtPath(String nbtPath) {
+            ((NBTStorageComponent)component).setNBTPath(nbtPath);
+            return this;
+        }
+
+        public Builder separator(Optional<BaseComponent> separator) {
+            ((NBTStorageComponent)component).setSeparator(separator);
+            return this;
+        }
+
+        public Builder interpreting(boolean interpreting) {
+            ((NBTStorageComponent)component).setInterpreting(interpreting);
+            return this;
+        }
+
+        public Builder storage(ResourceLocation storage) {
+            ((NBTStorageComponent)component).setStorage(storage);
+            return this;
+        }
+
+        public NBTStorageComponent build() {
+            return (NBTStorageComponent) component;
+        }
     }
 }

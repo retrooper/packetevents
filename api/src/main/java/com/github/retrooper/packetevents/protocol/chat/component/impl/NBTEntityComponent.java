@@ -19,7 +19,10 @@
 package com.github.retrooper.packetevents.protocol.chat.component.impl;
 
 import com.github.retrooper.packetevents.protocol.chat.Color;
+import com.github.retrooper.packetevents.protocol.chat.component.BaseComponent;
 import com.google.gson.JsonObject;
+
+import java.util.Optional;
 
 public class NBTEntityComponent extends NBTComponent {
     private String selectorPattern;
@@ -48,5 +51,39 @@ public class NBTEntityComponent extends NBTComponent {
 
     public void setSelectorPattern(String selectorPattern) {
         this.selectorPattern = selectorPattern;
+    }
+
+    public static NBTEntityComponent.Builder builder() {
+        return new Builder();
+    }
+
+    public static class Builder extends BaseComponent.Builder<Builder> {
+        public Builder() {
+            super(new NBTEntityComponent());
+        }
+
+        public Builder nbtPath(String nbtPath) {
+            ((NBTEntityComponent)component).setNBTPath(nbtPath);
+            return this;
+        }
+
+        public Builder separator(Optional<BaseComponent> separator) {
+            ((NBTEntityComponent)component).setSeparator(separator);
+            return this;
+        }
+
+        public Builder interpreting(boolean interpreting) {
+            ((NBTEntityComponent)component).setInterpreting(interpreting);
+            return this;
+        }
+
+        public Builder selectorPattern(String selectorPattern) {
+            ((NBTEntityComponent)component).setSelectorPattern(selectorPattern);
+            return this;
+        }
+
+        public NBTEntityComponent build() {
+            return (NBTEntityComponent) component;
+        }
     }
 }

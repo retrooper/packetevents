@@ -71,4 +71,29 @@ public class SelectorComponent extends BaseComponent {
         separator.ifPresent(baseComponent -> jsonObject.add("separator", baseComponent.buildJson()));
         return jsonObject;
     }
+
+    public static SelectorComponent.Builder builder() {
+        return new Builder();
+    }
+
+    public static class Builder extends BaseComponent.Builder<Builder> {
+        public Builder() {
+            super(new SelectorComponent());
+        }
+
+        public Builder selector(String selector) {
+            ((SelectorComponent)component).setSelector(selector);
+            return this;
+        }
+
+        public Builder separator(Optional<BaseComponent> separator) {
+            ((SelectorComponent)component).setSeparator(separator);
+            return this;
+        }
+
+
+        public SelectorComponent build() {
+            return (SelectorComponent) component;
+        }
+    }
 }
