@@ -77,7 +77,7 @@ public class PacketEventsPlugin extends JavaPlugin {
             @Override
             public void onPacketSend(PacketSendEvent event) {
                 Player player = event.getPlayer() == null ? null : (Player) event.getPlayer();
-                //TODO Fix translatable components, and check others for safety
+                //TODO Fix hoverEvent contents/value when its a component i believe
 
                 if (event.getPacketType() == PacketType.Play.Server.CHAT_MESSAGE) {
                     WrapperPlayServerChatMessage cm = new WrapperPlayServerChatMessage(event);
@@ -95,7 +95,15 @@ public class PacketEventsPlugin extends JavaPlugin {
                             String colorName = child instanceof String ? "none" : child instanceof BaseComponent ? ((BaseComponent) child).getColor().getName() : "";
                             PacketEvents.getAPI().getLogManager().debug("translate child: " + colorName + ":" + content);
                         }
-                        System.out.println("output: " + tc.buildJson().toString());
+                        PacketEvents.getAPI().getLogManager().debug("output: " + tc.buildJson().toString());
+                        /*
+                        og json msg: {"color":"yellow","translate":"multiplayer.player.joined",
+                        "with":[{"insertion":"retrooper",
+                        "clickEvent":{"action":"suggest_command","value":"/tell retrooper "},
+                        "hoverEvent":{"action":"show_entity","contents":{"type":"minecraft:player",
+                        "id":"7fe54c65-80ba-45c8-8450-b45796aa0eb9","name":{"text":"retrooper"}}},
+                        "text":"retrooper"}]}
+                         */
                     }
                 }
                 else if (event.getPacketType() == PacketType.Play.Server.SPAWN_LIVING_ENTITY) {
@@ -116,7 +124,7 @@ public class PacketEventsPlugin extends JavaPlugin {
                 }//TODO Complete chunk data packet
             }
         };
-        PacketEvents.getAPI().getEventManager().registerListener(debugListener);
+        //PacketEvents.getAPI().getEventManager().registerListener(debugListener);
     }
 
     @Override
