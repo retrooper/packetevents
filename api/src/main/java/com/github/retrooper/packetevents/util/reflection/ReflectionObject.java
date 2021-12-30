@@ -24,7 +24,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-public class ReflectionObject implements ReflectionObjectReader, WrapperPacketWriter {
+public class ReflectionObject implements ReflectionObjectReader, ReflectionObjectWriter {
     private static final Map<Class<?>, Map<Class<?>, Field[]>> FIELD_CACHE = new ConcurrentHashMap<>();
     private static final Field[] EMPTY_FIELD_ARRAY = new Field[0];
     protected final Object object;
@@ -309,17 +309,5 @@ public class ReflectionObject implements ReflectionObjectReader, WrapperPacketWr
             }
         }
         return ret.toArray(EMPTY_FIELD_ARRAY);
-    }
-
-
-    /**
-     * Does the local server version support reading at-least one field with this packet wrapper?
-     * If it does, we can label this wrapper to be supported on the local server version.
-     * One example where it would not be supported would be if the packet the wrapper is wrapping doesn't even exist on the local server version.
-     *
-     * @return Is the wrapper supported on the local server version?
-     */
-    public boolean isSupported() {
-        return true;
     }
 }

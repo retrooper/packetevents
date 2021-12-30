@@ -18,7 +18,7 @@
 
 package com.github.retrooper.packetevents.util.reflection;
 
-public interface WrapperPacketWriter {
+public interface ReflectionObjectWriter {
     void writeBoolean(int index, boolean value);
 
     void writeByte(int index, byte value);
