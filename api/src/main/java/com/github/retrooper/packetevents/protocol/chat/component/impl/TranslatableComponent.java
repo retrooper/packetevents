@@ -67,6 +67,7 @@ public class TranslatableComponent extends BaseComponent {
                     TextComponent childComp = (TextComponent) child;
                     if (!childComp.hasStyling() && childComp.getChildren().isEmpty()) {
                         with.add(((TextComponent) child).getText());
+                        continue;
                     }
                 }
                 with.add(child);
