@@ -2,6 +2,7 @@ package com.github.retrooper.packetevents.protocol.world.states.type;
 
 import com.github.retrooper.packetevents.protocol.world.MaterialType;
 import com.github.retrooper.packetevents.protocol.world.PushReaction;
+import com.github.retrooper.packetevents.protocol.world.states.WrappedBlockState;
 
 public class StateType {
     private final String name;
@@ -46,6 +47,10 @@ public class StateType {
         this.exceedsCube = exceedsCube;
         this.pushReaction = pushReaction;
         this.materialType = materialType;
+    }
+
+    public WrappedBlockState createBlockState() {
+        return WrappedBlockState.getDefaultState(this);
     }
 
     public String getName() {

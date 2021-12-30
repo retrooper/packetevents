@@ -37,6 +37,7 @@ public class WrappedBlockState {
     private static final HashMap<Integer, WrappedBlockState> BY_ID = new HashMap<>();
     private static final HashMap<WrappedBlockState, String> INTO_STRING = new HashMap<>();
     private static final HashMap<WrappedBlockState, Integer> INTO_ID = new HashMap<>();
+    private static final HashMap<StateType, WrappedBlockState> DEFAULT_STATES = new HashMap<>();
 
     static {
         if (PacketEvents.getAPI().getServerManager().getVersion().isOlderThan(ServerVersion.V_1_13)) {
@@ -75,6 +76,16 @@ public class WrappedBlockState {
     @NotNull
     public static WrappedBlockState getByString(String string) {
         return BY_STRING.getOrDefault(string, AIR).clone();
+    }
+
+    @NotNull
+    public static WrappedBlockState getDefaultState(StateType type) {
+        WrappedBlockState state = DEFAULT_STATES.get(type);
+        if (state == null) {
+            PacketEvents.getAPI().getLogger().warning("Default state for " + type + " is null. Returning AIR");
+            return AIR;
+        }
+        return state;
     }
 
     private static String getModernJsonPath(ServerVersion serverVersion) {
@@ -141,6 +152,8 @@ public class WrappedBlockState {
                 int id = Integer.parseInt(entry.getKey());
 
                 String fullBlockString = entry.getValue().getAsString();
+                boolean isDefault = fullBlockString.startsWith("*");
+                fullBlockString = fullBlockString.replace("*", "");
                 int index = fullBlockString.indexOf("[");
 
                 String blockString = fullBlockString.substring(0, index == -1 ? fullBlockString.length() : index);
@@ -152,6 +165,10 @@ public class WrappedBlockState {
                 }
 
                 WrappedBlockState state = new WrappedBlockState(type, data, id);
+
+                if (isDefault) {
+                    DEFAULT_STATES.put(state.getType(), state);
+                }
 
                 BY_STRING.put(fullBlockString, state);
                 BY_ID.put(id, state);
