@@ -48,4 +48,11 @@ public interface NettyManager {
     ChannelAbstract wrapChannel(Object channel);
 
     ChannelHandlerContextAbstract wrapChannelHandlerContext(Object ctx);
+
+    default byte[] asByteArray(ByteBufAbstract byteBuf) {
+        int len = byteBuf.readableBytes();
+        byte[] bytes = new byte[len];
+        byteBuf.getBytes(byteBuf.readerIndex(), bytes);
+        return bytes;
+    }
 }
