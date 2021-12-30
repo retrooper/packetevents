@@ -23,16 +23,16 @@ import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.util.Vector3d;
 
-public class WrapperPlayClientPlayerPositionRotation extends WrapperPlayClientPlayerFlying<WrapperPlayClientPlayerPositionRotation> {
+public class WrapperPlayClientPlayerPositionAndRotation extends WrapperPlayClientPlayerFlying<WrapperPlayClientPlayerPositionAndRotation> {
     private Vector3d position;
     private float yaw;
     private float pitch;
 
-    public WrapperPlayClientPlayerPositionRotation(PacketReceiveEvent event) {
+    public WrapperPlayClientPlayerPositionAndRotation(PacketReceiveEvent event) {
         super(event);
     }
 
-    public WrapperPlayClientPlayerPositionRotation(Vector3d position, float yaw, float pitch, boolean onGround) {
+    public WrapperPlayClientPlayerPositionAndRotation(Vector3d position, float yaw, float pitch, boolean onGround) {
         super(PacketType.Play.Client.PLAYER_POSITION_AND_ROTATION, onGround);
         this.position = position;
         this.yaw = yaw;
@@ -55,7 +55,7 @@ public class WrapperPlayClientPlayerPositionRotation extends WrapperPlayClientPl
     }
 
     @Override
-    public void readData(WrapperPlayClientPlayerPositionRotation wrapper) {
+    public void readData(WrapperPlayClientPlayerPositionAndRotation wrapper) {
         position = wrapper.position;
         yaw = wrapper.yaw;
         pitch = wrapper.pitch;
