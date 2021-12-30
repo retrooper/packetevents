@@ -22,21 +22,12 @@ import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.event.impl.PostPlayerInjectEvent;
 import com.github.retrooper.packetevents.netty.channel.ChannelAbstract;
 import com.github.retrooper.packetevents.protocol.ConnectionState;
-import com.github.retrooper.packetevents.protocol.nbt.*;
-import com.github.retrooper.packetevents.protocol.player.GameMode;
-import com.github.retrooper.packetevents.protocol.world.Difficulty;
-import com.github.retrooper.packetevents.protocol.world.Dimension;
-import com.github.retrooper.packetevents.protocol.world.DimensionType;
-import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerChangeGameState;
-import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerRespawn;
-import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerUpdateViewDistance;
+import com.github.retrooper.packetevents.protocol.gameprofile.GameProfile;
 import io.github.retrooper.packetevents.handlers.GlobalChannelInjector;
-import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
-import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerLoginEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
@@ -45,7 +36,7 @@ public class InternalBukkitListener implements Listener {
     @EventHandler(priority = EventPriority.LOWEST)
     public void onLogin(PlayerLoginEvent e) {
         final Player player = e.getPlayer();
-        GlobalChannelInjector injector = (GlobalChannelInjector)PacketEvents.getAPI().getInjector();
+        GlobalChannelInjector injector = (GlobalChannelInjector) PacketEvents.getAPI().getInjector();
         if (injector.shouldInjectEarly()) {
             PacketEvents.getAPI().getInjector().injectPlayer(player, null);
         }
@@ -55,13 +46,20 @@ public class InternalBukkitListener implements Listener {
     public void onJoin(PlayerJoinEvent e) {
         Player player = e.getPlayer();
 
-        GlobalChannelInjector injector = (GlobalChannelInjector)PacketEvents.getAPI().getInjector();
+        GlobalChannelInjector injector = (GlobalChannelInjector) PacketEvents.getAPI().getInjector();
 
         boolean injectEarly = injector.shouldInjectEarly();
-        boolean shouldInject = !injectEarly || !PacketEvents.getAPI().getInjector().hasInjected(e.getPlayer());
+        boolean shouldInject = !injectEarly || !injector.hasInjected(e.getPlayer());
         //Inject now if we are using the compatibility-injector or inject if the early injector failed to inject them.
         if (shouldInject) {
-            PacketEvents.getAPI().getInjector().injectPlayer(player, ConnectionState.PLAY);
+            //Late injection, we missed early packets to cache the game profile
+            GameProfile profile = PacketEvents.getAPI().getPlayerManager().getGameProfile(player);
+            if (profile == null) {
+                profile = new GameProfile(player.getUniqueId(), player.getName());
+                ChannelAbstract channel = PacketEvents.getAPI().getPlayerManager().getChannel(player);
+                PacketEvents.getAPI().getPlayerManager().setGameProfile(channel, profile);
+            }
+            injector.injectPlayer(player, ConnectionState.PLAY);
         }
 
         PacketEvents.getAPI().getEventManager().callEvent(new PostPlayerInjectEvent(e.getPlayer()));
@@ -74,6 +72,8 @@ public class InternalBukkitListener implements Listener {
         //Cleanup user data
         PacketEvents.getAPI().getPlayerManager().CLIENT_VERSIONS.remove(channel);
         PacketEvents.getAPI().getPlayerManager().CONNECTION_STATES.remove(channel);
+        PacketEvents.getAPI().getPlayerManager().GAME_PROFILES.remove(channel);
         PacketEvents.getAPI().getPlayerManager().CHANNELS.remove(player.getName());
+        PacketEvents.getAPI().getPlayerManager().PLAYER_ATTRIBUTES.remove(player.getUniqueId());
     }
 }

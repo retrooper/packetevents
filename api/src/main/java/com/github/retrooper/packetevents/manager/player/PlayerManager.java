@@ -33,6 +33,9 @@ import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
 public interface PlayerManager {
+    //Job of implementations, clear these maps
+    //Cache game profile independently on late-injections(should only happen on Spigot legacy versions)
+    //
     Map<ChannelAbstract, ClientVersion> CLIENT_VERSIONS = new ConcurrentHashMap<>();
     Map<ChannelAbstract, ConnectionState> CONNECTION_STATES = new ConcurrentHashMap<>();
     Map<String, ChannelAbstract> CHANNELS = new ConcurrentHashMap<>();
