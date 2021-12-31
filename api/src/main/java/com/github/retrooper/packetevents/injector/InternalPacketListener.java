@@ -77,7 +77,7 @@ public class InternalPacketListener implements PacketListener {
                 break;
             case PLAY:
                 if (event.getPacketType() == PacketType.Play.Client.TAB_COMPLETE) {
-                    WrapperPlayClientTabComplete tabComplete = new WrapperPlayClientTabComplete(event);
+                    /*WrapperPlayClientTabComplete tabComplete = new WrapperPlayClientTabComplete(event);
                     String text = tabComplete.getText();
                     GameProfile profile = PacketEvents.getAPI().getPlayerManager().getGameProfile(event.getChannel());
                     UUID uuid = profile.getId();
@@ -88,7 +88,7 @@ public class InternalPacketListener implements PacketListener {
                     tabCompleteAttribute.setInput(text);
                     Optional<Integer> transactionID = tabComplete.getTransactionId();
                     transactionID.ifPresent(tabComplete::setTransactionId);
-                    PacketEvents.getAPI().getLogManager().debug("Tab complete received: " + text);
+                    PacketEvents.getAPI().getLogManager().debug("Tab complete received: " + text);*/
                 }
                 break;
         }

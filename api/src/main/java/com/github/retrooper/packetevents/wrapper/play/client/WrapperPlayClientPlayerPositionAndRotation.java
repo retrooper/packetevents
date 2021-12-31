@@ -21,6 +21,7 @@ package com.github.retrooper.packetevents.wrapper.play.client;
 import com.github.retrooper.packetevents.event.impl.PacketReceiveEvent;
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
+import com.github.retrooper.packetevents.protocol.world.Location;
 import com.github.retrooper.packetevents.util.Vector3d;
 
 public class WrapperPlayClientPlayerPositionAndRotation extends WrapperPlayClientPlayerFlying<WrapperPlayClientPlayerPositionAndRotation> {
@@ -37,6 +38,13 @@ public class WrapperPlayClientPlayerPositionAndRotation extends WrapperPlayClien
         this.position = position;
         this.yaw = yaw;
         this.pitch = pitch;
+    }
+
+    public WrapperPlayClientPlayerPositionAndRotation(Location location, boolean onGround) {
+        super(PacketType.Play.Client.PLAYER_POSITION_AND_ROTATION, onGround);
+        this.position = location.getPosition();
+        this.yaw = location.getYaw();
+        this.pitch = location.getPitch();
     }
 
     @Override
