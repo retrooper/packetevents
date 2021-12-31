@@ -20,17 +20,12 @@ package com.github.retrooper.packetevents.protocol.item.type;
 
 import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
-import com.github.retrooper.packetevents.protocol.chat.component.serializer.ComponentSerializer;
 import com.github.retrooper.packetevents.protocol.resources.ResourceLocation;
 import com.github.retrooper.packetevents.util.MappingHelper;
 import com.google.gson.JsonObject;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.io.*;
-import java.net.HttpURLConnection;
-import java.net.URL;
-import java.net.URLConnection;
 import java.util.*;
 
 public class ItemTypes {
@@ -1138,33 +1133,6 @@ public class ItemTypes {
     public static final ItemType PINK_CONCRETE = builder("pink_concrete").setMaxAmount(64).build();
     public static final ItemType CARROT = builder("carrot").setMaxAmount(64).setAttributes(ItemAttribute.EDIBLE).build();
 
-    static {
-        /*
-
-        String content = "";
-
-        for (Object keyObj : modernItemTypesJSONObject.keySet()) {
-            String itemTypeKey = (String) keyObj;
-            Long keyID = (Long) modernItemTypesJSONObject.get(itemTypeKey);
-            //LogManager.debug("key id: " + keyID + ", item key: " + itemTypeKey);
-            String line = "public static final ItemType " + itemTypeKey.toUpperCase() + " = define(64, \"" + itemTypeKey + "\");";
-            content += line;
-        }
-        String finalContent = content;
-        new Thread(() -> {
-            LogManager.debug("LOADING!");
-            String pageName = null;
-            try {
-                pageName = paste(finalContent);
-            } catch (IOException | ParseException e) {
-                e.printStackTrace();
-            }
-            LogManager.debug("page name: " + pageName);
-        }).start();
-         */
-
-    }
-
     private static ServerVersion getMappingServerVersion(ServerVersion serverVersion) {
         if (serverVersion.isOlderThan(ServerVersion.V_1_13)) {
             return ServerVersion.V_1_12;
@@ -1282,33 +1250,6 @@ public class ItemTypes {
             cache = ItemTypes.AIR;
         }
         return cache;
-    }
-
-    private static String paste(String content) throws IOException {
-        URL url = new URL("https://www.toptal.com/developers/hastebin/documents");
-        URLConnection con = url.openConnection();
-        con.addRequestProperty("User-Agent", "Mozilla/4.0");
-        HttpURLConnection http = (HttpURLConnection) con;
-        http.setRequestMethod("POST");
-        http.setDoOutput(true);
-
-        try (OutputStream out = http.getOutputStream()) {
-            out.write(content.getBytes());
-            out.flush();
-        }
-
-        InputStream in = new BufferedInputStream(http.getInputStream());
-        BufferedReader reader = new BufferedReader(new InputStreamReader(in));
-
-        StringBuilder entirePage = new StringBuilder();
-        String inputLine;
-        while ((inputLine = reader.readLine()) != null) {
-            entirePage.append(inputLine);
-        }
-        reader.close();
-        JsonObject jsonObj = ComponentSerializer.GSON.fromJson(entirePage.toString(), JsonObject.class);
-        String keyValue = jsonObj.get("key").getAsString();
-        return "https://www.toptal.com/developers/hastebin/raw/" + keyValue;
     }
 
     public enum ItemAttribute {
