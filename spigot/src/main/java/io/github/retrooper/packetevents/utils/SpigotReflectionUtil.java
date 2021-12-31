@@ -21,11 +21,10 @@ package io.github.retrooper.packetevents.utils;
 import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.netty.buffer.ByteBufAbstract;
-import com.github.retrooper.packetevents.protocol.item.type.ItemType;
-import com.github.retrooper.packetevents.protocol.item.type.ItemTypes;
 import com.github.retrooper.packetevents.util.reflection.Reflection;
 import com.github.retrooper.packetevents.util.reflection.ReflectionObject;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
+import io.github.retrooper.packetevents.utils.dependencies.google.GuavaUtil;
 import io.github.retrooper.packetevents.utils.netty.buffer.ByteBufUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.Server;
@@ -39,7 +38,10 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.ConcurrentModificationException;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public final class SpigotReflectionUtil {
@@ -82,6 +84,9 @@ public final class SpigotReflectionUtil {
 
     private static Object MINECRAFT_SERVER_INSTANCE;
     private static Object MINECRAFT_SERVER_CONNECTION_INSTANCE;
+
+    //Initialized in PacketEvents#load
+    public static Map<Integer, Entity> ENTITY_ID_CACHE;
 
     private static void initConstructors() {
         Class<?> itemClass = NMS_IMATERIAL_CLASS != null ? NMS_IMATERIAL_CLASS : NMS_ITEM_CLASS;
@@ -169,6 +174,8 @@ public final class SpigotReflectionUtil {
         V_1_17_OR_HIGHER = VERSION.isNewerThanOrEquals(ServerVersion.V_1_17);
         V_1_12_OR_HIGHER = VERSION.isNewerThanOrEquals(ServerVersion.V_1_12);
         USE_MODERN_NETTY_PACKAGE = VERSION.isNewerThan(ServerVersion.V_1_7_10);
+
+        SpigotReflectionUtil.ENTITY_ID_CACHE = GuavaUtil.makeMap(SpigotReflectionUtil.VERSION);
         try {
             //Check if the selected netty location is valid
             getNettyClass("channel.Channel");
@@ -470,7 +477,7 @@ public final class SpigotReflectionUtil {
         } catch (IllegalAccessException e) {
             e.printStackTrace();
         }
-        ByteBufAbstract bb =  PacketEvents.getAPI().getNettyManager().wrapByteBuf(rawByteBuf);
+        ByteBufAbstract bb = PacketEvents.getAPI().getNettyManager().wrapByteBuf(rawByteBuf);
         PacketWrapper<?> wrapper = PacketWrapper.createUniversalPacketWrapper(bb);
         return wrapper.readItemStack();
     }
@@ -483,7 +490,6 @@ public final class SpigotReflectionUtil {
         ItemStack itemStack = toBukkitItemStack(nmsItemStack);
         return itemStack;
     }
-
 
 
     public static Object createNMSItemStack(int itemID, int count) {
@@ -542,4 +548,119 @@ public final class SpigotReflectionUtil {
         return null;
     }
 
+    private static Entity getEntityByIdWithWorldUnsafe(World world, int id) {
+        if (world == null) {
+            return null;
+        }
+
+        Object craftWorld = CRAFT_WORLD_CLASS.cast(world);
+
+        try {
+            Object worldServer = GET_CRAFT_WORLD_HANDLE_METHOD.invoke(craftWorld);
+            Object nmsEntity = GET_ENTITY_BY_ID_METHOD.invoke(worldServer, id);
+            if (nmsEntity == null) {
+                return null;
+            }
+            return getBukkitEntity(nmsEntity);
+        } catch (IllegalAccessException | InvocationTargetException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    @Nullable
+    private static Entity getEntityByIdUnsafe(World origin, int id) {
+        Entity e = getEntityByIdWithWorldUnsafe(origin, id);
+        if (e != null) {
+            return e;
+        }
+        for (World world : Bukkit.getWorlds()) {
+            Entity entity = getEntityByIdWithWorldUnsafe(world, id);
+            if (entity != null) {
+                return entity;
+            }
+        }
+        for (World world : Bukkit.getWorlds()) {
+            try {
+                for (Entity entity : world.getEntities()) {
+                    if (entity.getEntityId() == id) {
+                        return entity;
+                    }
+                }
+            } catch (ConcurrentModificationException ex) {
+                return null;
+            }
+        }
+        return null;
+    }
+
+    @Nullable
+    public static Entity getEntityById(@Nullable World world, int entityID) {
+        Entity e = ENTITY_ID_CACHE.get(entityID);
+        if (e != null) {
+            return e;
+        }
+
+        if (V_1_17_OR_HIGHER) {
+            try {
+                if (world != null) {
+                    for (Entity entity : getEntityList(world)) {
+                        if (entity.getEntityId() == entityID) {
+                            ENTITY_ID_CACHE.putIfAbsent(entity.getEntityId(), entity);
+                            return entity;
+                        }
+                    }
+                }
+            } catch (Exception ex) {
+                //We are retrying below
+            }
+            try {
+                for (World w : Bukkit.getWorlds()) {
+                    for (Entity entity : getEntityList(w)) {
+                        if (entity.getEntityId() == entityID) {
+                            ENTITY_ID_CACHE.putIfAbsent(entity.getEntityId(), entity);
+                            return entity;
+                        }
+                    }
+                }
+            } catch (Exception ex) {
+                //No entity found
+                return null;
+            }
+        } else {
+            return getEntityByIdUnsafe(world, entityID);
+        }
+        return null;
+    }
+
+    @Nullable
+    public static Entity getEntityById(int entityID) {
+        return getEntityById(null, entityID);
+    }
+
+    public static List<Entity> getEntityList(World world) {
+        if (V_1_17_OR_HIGHER) {
+            Object worldServer = convertBukkitWorldToWorldServer(world);
+            ReflectionObject wrappedWorldServer = new ReflectionObject(worldServer);
+            Object persistentEntitySectionManager = wrappedWorldServer.readObject(0, PERSISTENT_ENTITY_SECTION_MANAGER_CLASS);
+            ReflectionObject wrappedPersistentEntitySectionManager = new ReflectionObject(persistentEntitySectionManager);
+            Object levelEntityGetter = wrappedPersistentEntitySectionManager.readObject(0, LEVEL_ENTITY_GETTER_CLASS);
+            Iterable<Object> nmsEntitiesIterable = null;
+            try {
+                nmsEntitiesIterable = (Iterable<Object>) GET_LEVEL_ENTITY_GETTER_ITERABLE_METHOD.invoke(levelEntityGetter);
+            } catch (IllegalAccessException | InvocationTargetException e) {
+                e.printStackTrace();
+            }
+            List<Entity> entityList = new ArrayList<>();
+            if (nmsEntitiesIterable != null) {
+                for (Object nmsEntity : nmsEntitiesIterable) {
+                    Entity bukkitEntity = getBukkitEntity(nmsEntity);
+                    entityList.add(bukkitEntity);
+                }
+            }
+            return entityList;
+        } else {
+            return world.getEntities();
+        }
+    }
 }

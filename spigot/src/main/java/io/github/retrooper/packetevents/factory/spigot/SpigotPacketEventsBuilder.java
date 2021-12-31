@@ -42,6 +42,7 @@ import io.github.retrooper.packetevents.manager.server.ServerManagerImpl;
 import io.github.retrooper.packetevents.processor.InternalBukkitListener;
 import io.github.retrooper.packetevents.utils.BukkitLogManager;
 import io.github.retrooper.packetevents.utils.SpigotReflectionUtil;
+import io.github.retrooper.packetevents.utils.dependencies.google.GuavaUtil;
 import io.github.retrooper.packetevents.utils.netty.NettyManagerImpl;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -102,7 +103,6 @@ public class SpigotPacketEventsBuilder {
                     } catch (Exception ex) {
                         throw new IllegalStateException(ex);
                     }
-
 
                     injector.load();
                     lateBind = !injector.isBound();
