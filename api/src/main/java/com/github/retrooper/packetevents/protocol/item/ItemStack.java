@@ -149,7 +149,7 @@ public class ItemStack {
     }
 
     public boolean isEnchanted() {
-        if (this.nbt != null && this.nbt.getCompoundListTagOrNull("Enchantments") != null) {
+        if (!isEmpty() && this.nbt != null && this.nbt.getCompoundListTagOrNull("Enchantments") != null) {
             return !this.nbt.getCompoundListTagOrNull("Enchantments").isEmpty();
         } else {
             return false;
@@ -158,7 +158,7 @@ public class ItemStack {
 
     //TODO Test on all versions
     public List<Enchantment> getEnchantments() {
-        if (!isEmpty() && nbt != null && nbt.getCompoundListTagOrNull("Enchantments") != null) {
+        if (isEnchanted()) {
             List<NBTCompound> compounds = nbt.getCompoundListTagOrNull("Enchantments").getTags();
             List<Enchantment> enchantments = new ArrayList<>(compounds.size());
             for (NBTCompound compound : compounds) {
@@ -175,6 +175,21 @@ public class ItemStack {
             return new ArrayList<>(0);
         }
     }
+
+    // TODO: Test on outdated versions
+    public int getEnchantmentLevel(EnchantmentType enchantment) {
+        if (isEnchanted()) {
+            for (NBTCompound base : nbt.getCompoundListTagOrNull("Enchantments").getTags()) {
+                NBTString string = base.getTagOfTypeOrNull("id", NBTString.class);
+                if (string != null && enchantment == EnchantmentTypes.getByName(string.getValue())) {
+                    return base.getTagOfTypeOrNull("lvl", NBTShort.class).getAsInt();
+                }
+            }
+        }
+
+        return 0;
+    }
+
 
     //TODO Test on all versions
     public void setEnchantments(List<Enchantment> enchantments) {

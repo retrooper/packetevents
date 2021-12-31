@@ -19,6 +19,8 @@
 package com.github.retrooper.packetevents.protocol.item.type;
 
 import com.github.retrooper.packetevents.protocol.mapper.MappedEntity;
+import com.github.retrooper.packetevents.protocol.world.states.type.StateType;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Set;
 
@@ -30,6 +32,9 @@ public interface ItemType extends MappedEntity {
     boolean isMusicDisc();
 
     ItemType getCraftRemainder();
+
+    @Nullable
+    StateType getPlacedType();
 
     Set<ItemTypes.ItemAttribute> getAttributes();
 
