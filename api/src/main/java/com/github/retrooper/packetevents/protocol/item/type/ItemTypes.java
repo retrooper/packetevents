@@ -29,6 +29,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class ItemTypes {
     private static final Map<String, ItemType> ITEM_TYPE_MAP = new HashMap<>();
@@ -1309,7 +1310,7 @@ public class ItemTypes {
         }
 
         public Builder setAttributes(ItemAttribute... attributes) {
-            this.attributes = Arrays.stream(attributes).toList();
+            this.attributes = Arrays.stream(attributes).collect(Collectors.toList());
             return this;
         }
 
