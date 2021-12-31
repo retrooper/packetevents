@@ -176,6 +176,21 @@ public class ItemStack {
         }
     }
 
+    // TODO: Test on outdated versions
+    public int getEnchantmentLevel(EnchantmentType enchantment) {
+        if (isEnchanted()) {
+            for (NBTCompound base : nbt.getCompoundListTagOrNull("Enchantments").getTags()) {
+                NBTString string = base.getTagOfTypeOrNull("id", NBTString.class);
+                if (string != null && enchantment == EnchantmentTypes.getByName(string.getValue())) {
+                    return base.getTagOfTypeOrNull("lvl", NBTShort.class).getAsInt();
+                }
+            }
+        }
+
+        return 0;
+    }
+
+
     //TODO Test on all versions
     public void setEnchantments(List<Enchantment> enchantments) {
         List<NBTCompound> list = new ArrayList<>();
