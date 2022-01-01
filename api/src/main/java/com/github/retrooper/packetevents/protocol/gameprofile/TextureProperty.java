@@ -46,16 +46,13 @@ public class TextureProperty {
         return this.value;
     }
 
+    @Nullable
     public String getSignature() {
         return this.signature;
     }
 
-    public boolean hasSignature() {
-        return this.signature != null;
-    }
-
     public boolean isSignatureValid(PublicKey publicKey) {
-        if (!hasSignature()) {
+        if (getSignature() == null) {
             return false;
         }
         try {

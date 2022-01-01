@@ -63,13 +63,15 @@ public class MojangAPIUtil {
 
                 String name = property.get("name").getAsString();
                 String value = property.get("value").getAsString();
-                String signature = property.get("signature").getAsString();
+                String signature = null;
+                if (property.has("signature")) {
+                    signature = property.get("signature").getAsString();
+                }
 
                 textureProperties.add(new TextureProperty(name, value, signature));
             }
             return textureProperties;
-        }
-        catch (IOException ex) {
+        } catch (IOException ex) {
             ex.printStackTrace();
         }
         return null;
@@ -98,8 +100,7 @@ public class MojangAPIUtil {
             in.close();
             JsonObject responseObject = ComponentSerializer.GSON.fromJson(sb.toString(), JsonObject.class);
             return responseObject.get("name").getAsString();
-        }
-        catch (IOException ex) {
+        } catch (IOException ex) {
             ex.printStackTrace();
         }
         return null;
@@ -128,8 +129,7 @@ public class MojangAPIUtil {
             String uuidStr = responseObject.get("id").getAsString();
             //Now we must add the "-"s to the UUID
             return UUIDUtil.fromStringWithoutDashes(uuidStr);
-        }
-        catch (IOException ex) {
+        } catch (IOException ex) {
             ex.printStackTrace();
         }
         return null;

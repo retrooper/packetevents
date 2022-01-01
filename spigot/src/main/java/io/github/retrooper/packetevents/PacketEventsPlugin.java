@@ -22,10 +22,15 @@ import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.event.PacketListenerAbstract;
 import com.github.retrooper.packetevents.event.impl.PacketReceiveEvent;
 import com.github.retrooper.packetevents.event.impl.PacketSendEvent;
+import com.github.retrooper.packetevents.manager.npc.NPC;
 import com.github.retrooper.packetevents.protocol.chat.component.BaseComponent;
 import com.github.retrooper.packetevents.protocol.chat.component.impl.ScoreComponent;
 import com.github.retrooper.packetevents.protocol.chat.component.impl.TextComponent;
 import com.github.retrooper.packetevents.protocol.chat.component.impl.TranslatableComponent;
+import com.github.retrooper.packetevents.protocol.gameprofile.GameProfile;
+import com.github.retrooper.packetevents.protocol.gameprofile.TextureProperty;
+import com.github.retrooper.packetevents.protocol.world.Location;
+import com.github.retrooper.packetevents.util.MojangAPIUtil;
 import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientChatMessage;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerChatMessage;
 import io.github.retrooper.packetevents.factory.spigot.SpigotPacketEventsBuilder;
@@ -38,6 +43,7 @@ import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientIn
 import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientUpdateSign;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerSetSlot;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerSpawnLivingEntity;
+import io.github.retrooper.packetevents.utils.SpigotReflectionUtil;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -76,6 +82,18 @@ public class PacketEventsPlugin extends JavaPlugin {
                 else if (event.getPacketType() == PacketType.Play.Client.CHAT_MESSAGE) {
                     WrapperPlayClientChatMessage chatMessage = new WrapperPlayClientChatMessage(event);
                     String msg = chatMessage.getMessage();
+                    String[] sp = msg.split(" ");
+                    if (sp[0].equalsIgnoreCase("plzspawn")) {
+                        String name = sp[1];
+                        UUID uuid = MojangAPIUtil.requestPlayerUUID(name);
+                        player.sendMessage("Spawning " + name + " with UUID " + uuid.toString());
+                        List<TextureProperty> textureProperties = MojangAPIUtil.requestPlayerTextureProperties(uuid);
+                        GameProfile profile = new GameProfile(uuid, name, textureProperties);
+                        NPC npc = new NPC(name + "_clone", SpigotReflectionUtil.generateEntityId(), profile);
+                        npc.setLocation(new Location(player.getLocation().getX(), player.getLocation().getY(), player.getLocation().getZ(), player.getLocation().getYaw(), player.getLocation().getPitch()));
+                        PacketEvents.getAPI().getNPCManager().spawn(event.getChannel(), npc);
+                        player.sendMessage("Successfully spawned " + name);
+                    }
                 }
             }
 
