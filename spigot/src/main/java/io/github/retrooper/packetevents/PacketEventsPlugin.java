@@ -123,8 +123,6 @@ public class PacketEventsPlugin extends JavaPlugin {
             }
         };
         PacketEvents.getAPI().getEventManager().registerListener(debugListener);
-        net.minecraft.server.v1_10_R1.PacketPlayOutEntityMetadata em0;
-        net.minecraft.network.protocol.game.PacketPlayOutEntityMetadata em;
     }
 
     @Override
