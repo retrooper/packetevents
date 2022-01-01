@@ -26,6 +26,7 @@ import com.github.retrooper.packetevents.protocol.chat.component.BaseComponent;
 import com.github.retrooper.packetevents.protocol.chat.component.impl.ScoreComponent;
 import com.github.retrooper.packetevents.protocol.chat.component.impl.TextComponent;
 import com.github.retrooper.packetevents.protocol.chat.component.impl.TranslatableComponent;
+import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientChatMessage;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerChatMessage;
 import io.github.retrooper.packetevents.factory.spigot.SpigotPacketEventsBuilder;
 import com.github.retrooper.packetevents.protocol.item.ItemStack;
@@ -72,6 +73,11 @@ public class PacketEventsPlugin extends JavaPlugin {
                     String[] textLines = updateSign.getTextLines();
                     player.sendMessage("Received packet: " + event.getPacketType().getName() + " from " + player.getName() + " with pos: " + pos.toString() + " and textLines: " + Arrays.toString(textLines));
                 }
+                else if (event.getPacketType() == PacketType.Play.Client.CHAT_MESSAGE) {
+                    WrapperPlayClientChatMessage chatMessage = new WrapperPlayClientChatMessage(event);
+                    String msg = chatMessage.getMessage();
+
+                }
             }
 
             @Override
@@ -107,25 +113,16 @@ public class PacketEventsPlugin extends JavaPlugin {
                          */
                     }
                 }
-                else if (event.getPacketType() == PacketType.Play.Server.SPAWN_LIVING_ENTITY) {
-                    WrapperPlayServerSpawnLivingEntity spawnMob = new WrapperPlayServerSpawnLivingEntity(event);
-                    int entityID = spawnMob.getEntityId();
-                    UUID uuid = spawnMob.getEntityUUID();
-                    Vector3d position = spawnMob.getPosition();
-                    if (player != null) {
-                        //player.sendMessage("Spawned entity with id: " + entityID + ", with uuid: " + uuid + ", at position: " + position);
-                    }
-                    //TODO Complete spawn living entity for outdated versions
-                } else if (event.getPacketType() == PacketType.Play.Server.SET_SLOT) {
+                else if (event.getPacketType() == PacketType.Play.Server.SET_SLOT) {
                     WrapperPlayServerSetSlot setSlot = new WrapperPlayServerSetSlot(event);
                     int windowID = setSlot.getWindowId();
                     int slot = setSlot.getSlot();
                     ItemStack item = setSlot.getItem();
                     player.sendMessage("Set slot with window ID: " + windowID + ", slot: " + slot + ", item: " + (item.getType() != null ? item.toString() : "null item"));
-                }//TODO Complete chunk data packet
+                }
             }
         };
-        //PacketEvents.getAPI().getEventManager().registerListener(debugListener);
+        PacketEvents.getAPI().getEventManager().registerListener(debugListener);
     }
 
     @Override

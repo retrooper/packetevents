@@ -30,6 +30,7 @@ import com.github.retrooper.packetevents.util.Vector3d;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 
@@ -41,7 +42,6 @@ public class WrapperPlayServerSpawnPlayer extends PacketWrapper<WrapperPlayServe
     private float yaw;
     private float pitch;
 
-    //TODO Make accessible, especially when we do itemstack abstraction
     @Deprecated
     private ItemType item;
     private List<EntityData> entityMetadata;
@@ -63,6 +63,10 @@ public class WrapperPlayServerSpawnPlayer extends PacketWrapper<WrapperPlayServe
 
     public WrapperPlayServerSpawnPlayer(int entityId, UUID uuid, Location location, List<EntityData> entityMetadata) {
         this(entityId, uuid, location.getPosition(), location.getYaw(), location.getPitch(), entityMetadata);
+    }
+
+    public WrapperPlayServerSpawnPlayer(int entityId, UUID uuid, Location location, EntityData... entityMetadata) {
+        this(entityId, uuid, location.getPosition(), location.getYaw(), location.getPitch(), Arrays.asList(entityMetadata));
     }
 
     @Override

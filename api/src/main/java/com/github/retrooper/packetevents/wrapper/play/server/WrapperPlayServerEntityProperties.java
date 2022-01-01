@@ -45,21 +45,25 @@ public class WrapperPlayServerEntityProperties extends PacketWrapper<WrapperPlay
     public void readData() {
         if (serverVersion == ServerVersion.V_1_7_10) {
             entityID = readInt();
-        }
-        else {
+        } else {
             entityID = readVarInt();
         }
 
-        int propertyCount = readInt();
+        int propertyCount;
+        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_17)) {
+            propertyCount = readVarInt();
+        } else {
+            propertyCount = readInt();
+        }
         properties = new ArrayList<>(propertyCount);
         for (int i = 0; i < propertyCount; i++) {
-            String key = readString(64);
+            int maxKeyLength = serverVersion.isNewerThanOrEquals(ServerVersion.V_1_16) ? 32767 : 64;
+            String key = readString(maxKeyLength);
             double value = readDouble();
             int modifiersLength;
             if (serverVersion == ServerVersion.V_1_7_10) {
-                 modifiersLength = readShort();
-            }
-            else {
+                modifiersLength = readShort();
+            } else {
                 modifiersLength = readVarInt();
             }
             List<PropertyModifier> modifiers = new ArrayList<>(modifiersLength);
@@ -86,19 +90,22 @@ public class WrapperPlayServerEntityProperties extends PacketWrapper<WrapperPlay
     public void writeData() {
         if (serverVersion == ServerVersion.V_1_7_10) {
             writeInt(entityID);
-        }
-        else {
+        } else {
             writeVarInt(entityID);
         }
 
-        writeInt(properties.size());
+        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_17)) {
+            writeVarInt(properties.size());
+        } else {
+            writeInt(properties.size());
+        }
         for (Property property : properties) {
-            writeString(property.key, 64);
+            int maxKeyLength = serverVersion.isNewerThanOrEquals(ServerVersion.V_1_16) ? 32767 : 64;
+            writeString(property.key, maxKeyLength);
             writeDouble(property.value);
             if (serverVersion == ServerVersion.V_1_7_10) {
                 writeShort(property.modifiers.size());
-            }
-            else {
+            } else {
                 writeVarInt(property.modifiers.size());
             }
             for (PropertyModifier modifier : property.modifiers) {
@@ -133,6 +140,7 @@ public class WrapperPlayServerEntityProperties extends PacketWrapper<WrapperPlay
 
             public static final Operation[] VALUES = values();
         }
+
         private UUID uuid;
         private double amount;
         private Operation operation;

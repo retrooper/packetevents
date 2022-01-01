@@ -27,10 +27,9 @@ import java.util.*;
  * @since 1.7
  */
 public class GameProfile {
-    //TODO Actually cache game profiles when players log in, and don't forget to destroy them.
     private final UUID id;
     private final String name;
-    private final List<TextureProperty> textureProperties;
+    private List<TextureProperty> textureProperties;
 
 
     public GameProfile(UUID id, String name) {
@@ -55,5 +54,9 @@ public class GameProfile {
 
     public List<TextureProperty> getTextureProperties() {
         return textureProperties;
+    }
+
+    public void setTextureProperties(List<TextureProperty> textureProperties) {
+        this.textureProperties = textureProperties;
     }
 }

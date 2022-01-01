@@ -22,6 +22,7 @@ import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.netty.channel.ChannelAbstract;
 import com.github.retrooper.packetevents.protocol.chat.component.impl.TextComponent;
 import com.github.retrooper.packetevents.protocol.entity.data.EntityData;
+import com.github.retrooper.packetevents.protocol.gameprofile.TextureProperty;
 import com.github.retrooper.packetevents.protocol.player.GameMode;
 import com.github.retrooper.packetevents.protocol.world.Location;
 import com.github.retrooper.packetevents.wrapper.play.server.*;
@@ -36,14 +37,12 @@ public class NPCManager {
 
     public void spawn(ChannelAbstract channel, NPC npc) {
         Set<ChannelAbstract> targetChannels = TARGET_CHANNELS.computeIfAbsent(npc, k -> new HashSet<>());
-        //Spawn with packets
-        WrapperPlayServerPlayerInfo.PlayerData tabData = new WrapperPlayServerPlayerInfo.PlayerData(TextComponent.builder().text(npc.getDisplayName()).build(), npc.getProfile(),
-                GameMode.SURVIVAL, npc.getDisplayPing());
-        WrapperPlayServerPlayerInfo playerInfoPacket = new WrapperPlayServerPlayerInfo(WrapperPlayServerPlayerInfo.Action.ADD_PLAYER, npc.getProfile().getId(), tabData);
+        WrapperPlayServerPlayerInfo playerInfoPacket = new WrapperPlayServerPlayerInfo(WrapperPlayServerPlayerInfo.Action.ADD_PLAYER, npc.getProfile().getId(), npc.getPlayerInfoData());
         PacketEvents.getAPI().getPlayerManager().sendPacket(channel, playerInfoPacket);
 
-        List<EntityData> entityMetadata = new ArrayList<>();
-        WrapperPlayServerSpawnPlayer spawnPlayer = new WrapperPlayServerSpawnPlayer(npc.getId(), npc.getProfile().getId(), npc.getLocation(), entityMetadata);
+        //TODO Later if we want entity metadata, its not supported on newer server versions though
+        //List<EntityData> entityMetadata = new ArrayList<>();
+        WrapperPlayServerSpawnPlayer spawnPlayer = new WrapperPlayServerSpawnPlayer(npc.getId(), npc.getProfile().getId(), npc.getLocation());
         PacketEvents.getAPI().getPlayerManager().sendPacket(channel, spawnPlayer);
         targetChannels.add(channel);
     }
@@ -143,6 +142,30 @@ public class NPCManager {
 
                 WrapperPlayServerEntityHeadLook headYaw = new WrapperPlayServerEntityHeadLook(npc.getId(), yaw);
                 PacketEvents.getAPI().getPlayerManager().sendPacket(channel, headYaw);
+            }
+        }
+    }
+
+    public void updateNPCDisplayPing(NPC npc, int ping) {
+        npc.setDisplayPing(ping);
+        Set<ChannelAbstract> targetChannels = TARGET_CHANNELS.get(npc);
+        if (targetChannels != null && !targetChannels.isEmpty()) {
+            for (ChannelAbstract channel : targetChannels) {
+                WrapperPlayServerPlayerInfo playerInfo =
+                        new WrapperPlayServerPlayerInfo(WrapperPlayServerPlayerInfo.Action.UPDATE_LATENCY,
+                        npc.getProfile().getId(), npc.getPlayerInfoData());
+                PacketEvents.getAPI().getPlayerManager().sendPacket(channel, playerInfo);
+            }
+        }
+    }
+
+    public void updateNPCSkin(NPC npc, List<TextureProperty> textureProperties) {
+        npc.getProfile().setTextureProperties(textureProperties);
+        Set<ChannelAbstract> targetChannels = TARGET_CHANNELS.get(npc);
+        if (targetChannels != null && !targetChannels.isEmpty()) {
+            for (ChannelAbstract channel : targetChannels) {
+                despawn(channel, npc);
+                spawn(channel, npc);
             }
         }
     }

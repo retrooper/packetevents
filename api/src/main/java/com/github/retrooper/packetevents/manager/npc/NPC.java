@@ -18,8 +18,11 @@
 
 package com.github.retrooper.packetevents.manager.npc;
 
+import com.github.retrooper.packetevents.protocol.chat.component.impl.TextComponent;
 import com.github.retrooper.packetevents.protocol.gameprofile.GameProfile;
+import com.github.retrooper.packetevents.protocol.player.GameMode;
 import com.github.retrooper.packetevents.protocol.world.Location;
+import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerPlayerInfo;
 
 public class NPC {
     private final String displayName;
@@ -44,6 +47,13 @@ public class NPC {
 
     public GameProfile getProfile() {
         return profile;
+    }
+
+    public WrapperPlayServerPlayerInfo.PlayerData getPlayerInfoData() {
+        return new WrapperPlayServerPlayerInfo.PlayerData(TextComponent.
+                builder().text(displayName).build(),
+                profile, GameMode.SURVIVAL,
+                displayPing);
     }
 
     public int getDisplayPing() {
