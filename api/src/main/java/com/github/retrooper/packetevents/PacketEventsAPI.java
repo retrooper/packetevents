@@ -54,7 +54,9 @@ public interface PacketEventsAPI<T> {
 
     PacketEventsSettings getSettings();
 
-    PEVersion getVersion();
+    default PEVersion getVersion() {
+        return PacketEvents.VERSION;
+    }
 
     Logger getLogger();
 

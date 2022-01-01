@@ -54,6 +54,10 @@ import java.util.logging.Logger;
 public class SpigotPacketEventsBuilder {
     private static PacketEventsAPI<Plugin> API_INSTANCE;
 
+    public static void clearBuildCache() {
+        API_INSTANCE = null;
+    }
+
     public static PacketEventsAPI<Plugin> build(Plugin plugin) {
         if (API_INSTANCE == null) {
             API_INSTANCE = buildNoCache(plugin);
@@ -212,11 +216,6 @@ public class SpigotPacketEventsBuilder {
             @Override
             public PacketEventsSettings getSettings() {
                 return settings;
-            }
-
-            @Override
-            public PEVersion getVersion() {
-                return PacketEvents.VERSION;
             }
 
             @Override
