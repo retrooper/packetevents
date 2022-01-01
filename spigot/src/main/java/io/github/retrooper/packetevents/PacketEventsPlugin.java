@@ -76,7 +76,6 @@ public class PacketEventsPlugin extends JavaPlugin {
                 else if (event.getPacketType() == PacketType.Play.Client.CHAT_MESSAGE) {
                     WrapperPlayClientChatMessage chatMessage = new WrapperPlayClientChatMessage(event);
                     String msg = chatMessage.getMessage();
-
                 }
             }
 
