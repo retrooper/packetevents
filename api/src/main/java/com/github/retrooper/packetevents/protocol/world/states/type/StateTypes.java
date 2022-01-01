@@ -3,6 +3,7 @@ package com.github.retrooper.packetevents.protocol.world.states.type;
 import com.github.retrooper.packetevents.protocol.world.MaterialType;
 import com.github.retrooper.packetevents.protocol.world.PushReaction;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
@@ -911,6 +912,10 @@ public class StateTypes {
 
     public static Builder builder() {
         return new Builder();
+    }
+
+    public static Collection<StateType> values() {
+        return BY_NAME.values();
     }
 
     public static StateType getByName(String blockString) {

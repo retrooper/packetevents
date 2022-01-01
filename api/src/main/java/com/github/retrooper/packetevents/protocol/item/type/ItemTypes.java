@@ -1139,6 +1139,10 @@ public class ItemTypes {
     public static final ItemType PINK_CONCRETE = builder("pink_concrete").setMaxAmount(64).setPlacedType(StateTypes.PINK_CONCRETE).build();
     public static final ItemType CARROT = builder("carrot").setMaxAmount(64).setAttributes(ItemAttribute.EDIBLE).setPlacedType(StateTypes.CARROTS).build();
 
+    public static Collection<ItemType> values() {
+        return ITEM_TYPE_MAP.values();
+    }
+
     private static ServerVersion getMappingServerVersion(ServerVersion serverVersion) {
         if (serverVersion.isOlderThan(ServerVersion.V_1_13)) {
             return ServerVersion.V_1_12;
