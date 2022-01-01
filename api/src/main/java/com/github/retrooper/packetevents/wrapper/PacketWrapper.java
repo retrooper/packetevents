@@ -588,9 +588,10 @@ public class PacketWrapper<T extends PacketWrapper> {
     public List<EntityData> readEntityMetadata() {
         List<EntityData> list = new ArrayList<>();
         if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_9)) {
+            boolean v1_10 = serverVersion.isNewerThanOrEquals(ServerVersion.V_1_10);
             short index;
             while ((index = readUnsignedByte()) != 255) {
-                short typeID = readUnsignedByte();
+                int typeID = v1_10 ? readVarInt() : readUnsignedByte();
                 EntityDataType<?> type = EntityDataTypes.getById(typeID);
                 Object value = type.getDataDeserializer().apply(this);
                 list.add(new EntityData(index, type, value));
@@ -610,9 +611,15 @@ public class PacketWrapper<T extends PacketWrapper> {
 
     public void writeEntityMetadata(List<EntityData> list) {
         if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_9)) {
+            boolean v1_10 = serverVersion.isNewerThanOrEquals(ServerVersion.V_1_10);
             for (EntityData entityData : list) {
                 writeByte(entityData.getIndex());
-                writeByte(entityData.getType().getId());
+                if (v1_10) {
+                    writeVarInt(entityData.getType().getId());
+                }
+                else {
+                    writeByte(entityData.getType().getId());
+                }
                 entityData.getType().getDataSerializer().accept(this, entityData.getValue());
             }
         } else {
