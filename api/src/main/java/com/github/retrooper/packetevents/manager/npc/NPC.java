@@ -25,7 +25,7 @@ import com.github.retrooper.packetevents.protocol.world.Location;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerPlayerInfo;
 
 public class NPC {
-    private final String displayName;
+    private String displayName;
     private final int id;
     private final GameProfile profile;
     private int displayPing = 0;
@@ -41,6 +41,10 @@ public class NPC {
         return displayName;
     }
 
+    public void setDisplayName(String displayName) {
+        this.displayName = displayName;
+    }
+
     public int getId() {
         return id;
     }
@@ -51,9 +55,9 @@ public class NPC {
 
     public WrapperPlayServerPlayerInfo.PlayerData getPlayerInfoData() {
         return new WrapperPlayServerPlayerInfo.PlayerData(TextComponent.
-                builder().text(displayName).build(),
-                profile, GameMode.SURVIVAL,
-                displayPing);
+                builder().text(getDisplayName()).build(),
+                getProfile(), GameMode.SURVIVAL,
+                getDisplayPing());
     }
 
     public int getDisplayPing() {

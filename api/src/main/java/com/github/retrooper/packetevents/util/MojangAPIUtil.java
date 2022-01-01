@@ -34,6 +34,12 @@ import java.util.List;
 import java.util.UUID;
 
 public class MojangAPIUtil {
+    //TODO use this in graphene
+    public static List<TextureProperty> requestPlayerTextureProperties(String name) {
+        UUID uuid = requestPlayerUUID(name);
+        return requestPlayerTextureProperties(uuid);
+    }
+
     public static List<TextureProperty> requestPlayerTextureProperties(UUID uuid) {
         //Remove the "-" from the UUID
         String uuidStr = uuid.toString().replace("-", "");

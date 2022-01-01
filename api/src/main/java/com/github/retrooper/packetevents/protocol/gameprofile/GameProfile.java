@@ -27,8 +27,8 @@ import java.util.*;
  * @since 1.7
  */
 public class GameProfile {
-    private final UUID id;
-    private final String name;
+    private UUID id;
+    private String name;
     private List<TextureProperty> textureProperties;
 
 
@@ -48,8 +48,16 @@ public class GameProfile {
         return id;
     }
 
+    public void setId(UUID id) {
+        this.id = id;
+    }
+
     public String getName() {
         return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 
     public List<TextureProperty> getTextureProperties() {

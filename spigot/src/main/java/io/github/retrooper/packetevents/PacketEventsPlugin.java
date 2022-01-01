@@ -24,30 +24,31 @@ import com.github.retrooper.packetevents.event.impl.PacketReceiveEvent;
 import com.github.retrooper.packetevents.event.impl.PacketSendEvent;
 import com.github.retrooper.packetevents.manager.npc.NPC;
 import com.github.retrooper.packetevents.protocol.chat.component.BaseComponent;
-import com.github.retrooper.packetevents.protocol.chat.component.impl.ScoreComponent;
 import com.github.retrooper.packetevents.protocol.chat.component.impl.TextComponent;
 import com.github.retrooper.packetevents.protocol.chat.component.impl.TranslatableComponent;
 import com.github.retrooper.packetevents.protocol.gameprofile.GameProfile;
 import com.github.retrooper.packetevents.protocol.gameprofile.TextureProperty;
-import com.github.retrooper.packetevents.protocol.world.Location;
-import com.github.retrooper.packetevents.util.MojangAPIUtil;
-import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientChatMessage;
-import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerChatMessage;
-import io.github.retrooper.packetevents.factory.spigot.SpigotPacketEventsBuilder;
 import com.github.retrooper.packetevents.protocol.item.ItemStack;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.protocol.player.InteractionHand;
-import com.github.retrooper.packetevents.util.Vector3d;
+import com.github.retrooper.packetevents.protocol.world.Location;
+import com.github.retrooper.packetevents.util.MojangAPIUtil;
 import com.github.retrooper.packetevents.util.Vector3i;
+import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientChatMessage;
 import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientInteractEntity;
 import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientUpdateSign;
+import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerChatMessage;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerSetSlot;
-import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerSpawnLivingEntity;
+import io.github.retrooper.packetevents.factory.spigot.SpigotPacketEventsBuilder;
 import io.github.retrooper.packetevents.utils.SpigotReflectionUtil;
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
+import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.List;
+import java.util.UUID;
 
 public class PacketEventsPlugin extends JavaPlugin {
     @Override
@@ -78,8 +79,7 @@ public class PacketEventsPlugin extends JavaPlugin {
                     Vector3i pos = updateSign.getBlockPosition();
                     String[] textLines = updateSign.getTextLines();
                     player.sendMessage("Received packet: " + event.getPacketType().getName() + " from " + player.getName() + " with pos: " + pos.toString() + " and textLines: " + Arrays.toString(textLines));
-                }
-                else if (event.getPacketType() == PacketType.Play.Client.CHAT_MESSAGE) {
+                } else if (event.getPacketType() == PacketType.Play.Client.CHAT_MESSAGE) {
                     WrapperPlayClientChatMessage chatMessage = new WrapperPlayClientChatMessage(event);
                     String msg = chatMessage.getMessage();
                     String[] sp = msg.split(" ");
@@ -93,6 +93,14 @@ public class PacketEventsPlugin extends JavaPlugin {
                         npc.setLocation(new Location(player.getLocation().getX(), player.getLocation().getY(), player.getLocation().getZ(), player.getLocation().getYaw(), player.getLocation().getPitch()));
                         PacketEvents.getAPI().getNPCManager().spawn(event.getChannel(), npc);
                         player.sendMessage("Successfully spawned " + name);
+
+                        Bukkit.getScheduler().runTaskLaterAsynchronously((Plugin) PacketEvents.getAPI().getPlugin(),
+                                () -> {
+                                    player.sendMessage("Turning the NPC into you!");
+                                    List<TextureProperty> newTextureProperties = MojangAPIUtil.requestPlayerTextureProperties("Dqgs");
+                                    PacketEvents.getAPI().getNPCManager().changeNPCSkin(npc, "Dqgs", MojangAPIUtil.requestPlayerUUID("Dqgs"), newTextureProperties);
+
+                                }, 120L);//120 ticks is 6 seconds
                     }
                 }
             }
@@ -108,8 +116,7 @@ public class PacketEventsPlugin extends JavaPlugin {
                     BaseComponent component = cm.getChatComponent();
                     if (component instanceof TextComponent) {
                         PacketEvents.getAPI().getLogManager().debug("text received: " + ((TextComponent) component).getText());
-                    }
-                    else if (component instanceof TranslatableComponent) {
+                    } else if (component instanceof TranslatableComponent) {
                         TranslatableComponent tc = (TranslatableComponent) component;
                         String translate = tc.getTranslate();
                         List<Object> with = tc.getWith();
@@ -129,8 +136,7 @@ public class PacketEventsPlugin extends JavaPlugin {
                         "text":"retrooper"}]}
                          */
                     }
-                }
-                else if (event.getPacketType() == PacketType.Play.Server.SET_SLOT) {
+                } else if (event.getPacketType() == PacketType.Play.Server.SET_SLOT) {
                     WrapperPlayServerSetSlot setSlot = new WrapperPlayServerSetSlot(event);
                     int windowID = setSlot.getWindowId();
                     int slot = setSlot.getSlot();
@@ -139,7 +145,7 @@ public class PacketEventsPlugin extends JavaPlugin {
                 }
             }
         };
-        PacketEvents.getAPI().getEventManager().registerListener(debugListener);
+        //PacketEvents.getAPI().getEventManager().registerListener(debugListener);
     }
 
     @Override

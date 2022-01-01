@@ -52,7 +52,7 @@ public class NPCManager {
     public void despawn(ChannelAbstract channel, NPC npc) {
         Set<ChannelAbstract> targetChannels = TARGET_CHANNELS.get(npc);
         if (targetChannels != null) {
-            WrapperPlayServerPlayerInfo playerInfoPacket = new WrapperPlayServerPlayerInfo(WrapperPlayServerPlayerInfo.Action.REMOVE_PLAYER, npc.getProfile().getId());
+            WrapperPlayServerPlayerInfo playerInfoPacket = new WrapperPlayServerPlayerInfo(WrapperPlayServerPlayerInfo.Action.REMOVE_PLAYER, npc.getProfile().getId(), npc.getPlayerInfoData());
             PacketEvents.getAPI().getPlayerManager().sendPacket(channel, playerInfoPacket);
 
             WrapperPlayServerDestroyEntities destroyEntities = new WrapperPlayServerDestroyEntities(npc.getId());
@@ -159,13 +159,25 @@ public class NPCManager {
         }
     }
 
-    public void updateNPCSkin(NPC npc, List<TextureProperty> textureProperties) {
-        npc.getProfile().setTextureProperties(textureProperties);
+    public void changeNPCSkin(NPC npc, String newDisplayName, UUID newUUID, List<TextureProperty> newTextureProperties) {
         Set<ChannelAbstract> targetChannels = TARGET_CHANNELS.get(npc);
         if (targetChannels != null && !targetChannels.isEmpty()) {
             for (ChannelAbstract channel : targetChannels) {
-                despawn(channel, npc);
-                spawn(channel, npc);
+                WrapperPlayServerPlayerInfo playerInfoRemove = new WrapperPlayServerPlayerInfo(WrapperPlayServerPlayerInfo.Action.REMOVE_PLAYER, npc.getProfile().getId(), npc.getPlayerInfoData());
+                PacketEvents.getAPI().getPlayerManager().sendPacket(channel, playerInfoRemove);
+
+                WrapperPlayServerDestroyEntities destroyEntities = new WrapperPlayServerDestroyEntities(npc.getId());
+                PacketEvents.getAPI().getPlayerManager().sendPacket(channel, destroyEntities);
+                npc.setDisplayName(newDisplayName);
+                npc.getProfile().setTextureProperties(newTextureProperties);
+                npc.getProfile().setId(newUUID);
+                WrapperPlayServerPlayerInfo playerInfoAdd = new WrapperPlayServerPlayerInfo(WrapperPlayServerPlayerInfo.Action.ADD_PLAYER, npc.getProfile().getId(), npc.getPlayerInfoData());
+                PacketEvents.getAPI().getPlayerManager().sendPacket(channel, playerInfoAdd);
+
+                //TODO Later if we want entity metadata, its not supported on newer server versions though
+                //List<EntityData> entityMetadata = new ArrayList<>();
+                WrapperPlayServerSpawnPlayer spawnPlayer = new WrapperPlayServerSpawnPlayer(npc.getId(), npc.getProfile().getId(), npc.getLocation());
+                PacketEvents.getAPI().getPlayerManager().sendPacket(channel, spawnPlayer);
             }
         }
     }

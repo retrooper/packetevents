@@ -180,7 +180,7 @@ public class WrapperPlayServerPlayerInfo extends PacketWrapper<WrapperPlayServer
                         for (TextureProperty textureProperty : data.gameProfile.getTextureProperties()) {
                             writeString(textureProperty.getName());
                             writeString(textureProperty.getValue());
-                            boolean hasSignature = textureProperty.hasSignature();
+                            boolean hasSignature = textureProperty.getSignature() != null;
                             writeBoolean(hasSignature);
                             if (hasSignature) {
                                 writeString(textureProperty.getSignature());
