@@ -20,8 +20,8 @@ package com.github.retrooper.packetevents.wrapper.play.server;
 
 import com.github.retrooper.packetevents.event.impl.PacketSendEvent;
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
-import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
+import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 
 public class WrapperPlayServerUpdateHealth extends PacketWrapper<WrapperPlayServerUpdateHealth> {
     private float health;
@@ -43,10 +43,10 @@ public class WrapperPlayServerUpdateHealth extends PacketWrapper<WrapperPlayServ
     public void readData() {
         health = readFloat();
         if (serverVersion == ServerVersion.V_1_7_10) {
-            food = readVarInt();
+            food = readShort();
         }
         else {
-            food = readShort();
+            food = readVarInt();
         }
         foodSaturation = readFloat();
     }
@@ -62,10 +62,10 @@ public class WrapperPlayServerUpdateHealth extends PacketWrapper<WrapperPlayServ
     public void writeData() {
         writeFloat(health);
         if (serverVersion == ServerVersion.V_1_7_10) {
-            writeVarInt(food);
+            writeShort(food);
         }
         else {
-            writeShort(food);
+            writeVarInt(food);
         }
         writeFloat(foodSaturation);
     }
