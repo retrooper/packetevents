@@ -116,10 +116,10 @@ public class CustomBukkitEncodeHandlerModern extends MessageToByteEncoder<Object
         //Call our custom encoders before ViaVersion translates the packet.
         for (Object customEncoder : customEncoders) {
             if (customEncoder instanceof MessageToByteEncoder) {
-                CustomPipelineUtil.callEncode((MessageToByteEncoder<?>) customEncoder, new ChannelHandlerContextWrapper(ctx, this), transformed, byteBuf);
+                CustomPipelineUtil.callEncode(customEncoder, new ChannelHandlerContextWrapper(ctx, this), transformed, byteBuf);
                 transformed.clear().writeBytes(byteBuf);
             } else if (customEncoder instanceof MessageToMessageEncoder) {
-                ByteBuf bb = (ByteBuf) CustomPipelineUtil.callEncode((MessageToMessageEncoder<?>) customEncoder, new ChannelHandlerContextWrapper(ctx, this), transformed).get(0);
+                ByteBuf bb = (ByteBuf) CustomPipelineUtil.callMTMEncode(customEncoder, new ChannelHandlerContextWrapper(ctx, this), transformed).get(0);
                 transformed.clear().writeBytes(bb);
             }
         }

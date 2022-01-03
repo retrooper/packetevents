@@ -82,9 +82,9 @@ public class CustomBukkitDecodeHandler extends ByteToMessageDecoder {
                 for (Object customDecoder : customDecoders) {
                     //We only support one output (except for ProtocolLib)
                     if (customDecoder instanceof ByteToMessageDecoder) {
-                        result = CustomPipelineUtil.callDecode((ByteToMessageDecoder) customDecoder, ctx, result).get(0);
+                        result = CustomPipelineUtil.callDecode(customDecoder, ctx, result).get(0);
                     } else if (customDecoder instanceof MessageToMessageDecoder) {
-                        result = CustomPipelineUtil.callDecode((MessageToMessageDecoder<?>) customDecoder, ctx, result).get(0);
+                        result = CustomPipelineUtil.callMTMDecode(customDecoder, ctx, result).get(0);
                     }
                 }
                 if (result instanceof ByteBuf) {

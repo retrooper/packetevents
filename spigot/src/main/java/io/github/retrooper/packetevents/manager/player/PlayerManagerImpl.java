@@ -23,16 +23,22 @@ import com.github.retrooper.packetevents.manager.player.PlayerManager;
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.netty.buffer.ByteBufAbstract;
 import com.github.retrooper.packetevents.netty.channel.ChannelAbstract;
+import com.github.retrooper.packetevents.netty.channel.ChannelHandlerAbstract;
+import com.github.retrooper.packetevents.netty.channel.ChannelHandlerContextAbstract;
 import com.github.retrooper.packetevents.protocol.player.GameProfile;
 import com.github.retrooper.packetevents.protocol.player.ClientVersion;
+import com.viaversion.viaversion.util.PipelineUtil;
 import io.github.retrooper.packetevents.utils.SpigotReflectionUtil;
 import io.github.retrooper.packetevents.utils.PlayerPingAccessorModern;
 import io.github.retrooper.packetevents.utils.dependencies.DependencyUtil;
 import io.github.retrooper.packetevents.utils.dependencies.protocolsupport.ProtocolSupportUtil;
+import io.github.retrooper.packetevents.utils.dependencies.viaversion.CustomPipelineUtil;
 import io.github.retrooper.packetevents.utils.dependencies.viaversion.ViaVersionUtil;
 import io.github.retrooper.packetevents.utils.v1_7.SpigotVersionLookup_1_7;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
+
+import java.lang.reflect.InvocationTargetException;
 
 public class PlayerManagerImpl implements PlayerManager {
     @Override
@@ -104,11 +110,15 @@ public class PlayerManagerImpl implements PlayerManager {
     @Override
     public void sendPacket(ChannelAbstract channel, ByteBufAbstract byteBuf) {
         if (channel.isOpen()) {
-            //TODO Also check if our encoder is RIGHT before minecraft's,
-            //if it is, then don't use context to writeflush, otherwise use it (to support multiple packetevents instances)
             if (ViaVersionUtil.isAvailable() && !ProtocolSupportUtil.isAvailable()) {
                 channel.writeAndFlush(byteBuf);
             } else {
+                //Call our own encoder
+                ChannelHandlerAbstract handler = channel.pipeline().get(PacketEvents.ENCODER_NAME);
+                ChannelHandlerContextAbstract ctx = channel.pipeline().context(PacketEvents.ENCODER_NAME);
+                Object outByteBuf = CustomPipelineUtil.callMTMEncode(handler.rawChannelHandler(), ctx.rawChannelHandlerContext(), byteBuf.rawByteBuf()).get(0);
+                byteBuf = PacketEvents.getAPI().getNettyManager().wrapByteBuf(outByteBuf);
+                //Call the encoders after ours
                 channel.pipeline().context(PacketEvents.ENCODER_NAME).writeAndFlush(byteBuf);
             }
         }

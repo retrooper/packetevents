@@ -32,11 +32,13 @@ import com.github.retrooper.packetevents.protocol.item.ItemStack;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.protocol.player.InteractionHand;
 import com.github.retrooper.packetevents.protocol.world.Location;
+import com.github.retrooper.packetevents.protocol.world.states.WrappedBlockState;
 import com.github.retrooper.packetevents.util.MojangAPIUtil;
 import com.github.retrooper.packetevents.util.Vector3i;
 import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientChatMessage;
 import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientInteractEntity;
 import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientUpdateSign;
+import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerBlockChange;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerChatMessage;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerSetSlot;
 import io.github.retrooper.packetevents.factory.spigot.SpigotPacketEventsBuilder;
@@ -74,6 +76,10 @@ public class PacketEventsPlugin extends JavaPlugin {
                     WrapperPlayClientInteractEntity.InteractAction action = interactEntity.getAction();
                     InteractionHand hand = interactEntity.getHand();
                     player.sendMessage("Received packet: " + event.getPacketType().getName() + " from " + player.getName() + " with entityID: " + entityID + " and action: " + action.name() + " and hand: " + hand.name());
+
+                    WrappedBlockState state = WrappedBlockState.getByString("minecraft:grass_block[snowy=true]");
+                    WrapperPlayServerBlockChange bc = new WrapperPlayServerBlockChange(new Vector3i(player.getLocation().getBlockX(), player.getLocation().getBlockY() - 1, player.getLocation().getBlockZ()), state.getGlobalId());
+                    PacketEvents.getAPI().getPlayerManager().sendPacket(event.getChannel(), bc);
                 } else if (event.getPacketType() == PacketType.Play.Client.UPDATE_SIGN) {
                     WrapperPlayClientUpdateSign updateSign = new WrapperPlayClientUpdateSign(event);
                     Vector3i pos = updateSign.getBlockPosition();
@@ -112,7 +118,13 @@ public class PacketEventsPlugin extends JavaPlugin {
                 //TODO Fix hoverEvent contents/value when its a component i believe
                 //TODO Work on copying styling properly from children components
 
-                if (event.getPacketType() == PacketType.Play.Server.CHAT_MESSAGE) {
+                if (event.getPacketType() == PacketType.Play.Server.BLOCK_CHANGE) {
+                    WrapperPlayServerBlockChange bc = new WrapperPlayServerBlockChange(event);
+                    Vector3i pos = bc.getBlockPosition();
+                    WrappedBlockState state = WrappedBlockState.getByGlobalId(bc.getBlockId());
+                    System.out.println("new state: " + state);
+                }
+                else if (event.getPacketType() == PacketType.Play.Server.CHAT_MESSAGE) {
                     WrapperPlayServerChatMessage cm = new WrapperPlayServerChatMessage(event);
                     BaseComponent component = cm.getChatComponent();
                     if (component instanceof TextComponent) {
@@ -146,7 +158,7 @@ public class PacketEventsPlugin extends JavaPlugin {
                 }
             }
         };
-        //PacketEvents.getAPI().getEventManager().registerListener(debugListener);
+        PacketEvents.getAPI().getEventManager().registerListener(debugListener);
     }
 
     @Override

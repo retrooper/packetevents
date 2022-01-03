@@ -18,13 +18,11 @@
 
 package io.github.retrooper.packetevents.utils.dependencies.viaversion;
 
+import com.github.retrooper.packetevents.netty.channel.ChannelHandlerContextAbstract;
+import com.github.retrooper.packetevents.netty.channel.pipeline.ChannelPipelineAbstract;
+import io.github.retrooper.packetevents.utils.SpigotReflectionUtil;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
-import io.netty.channel.ChannelPipeline;
-import io.netty.handler.codec.ByteToMessageDecoder;
-import io.netty.handler.codec.MessageToByteEncoder;
-import io.netty.handler.codec.MessageToMessageDecoder;
-import io.netty.handler.codec.MessageToMessageEncoder;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -39,26 +37,34 @@ public class CustomPipelineUtil {
 
     static {
         try {
-            DECODE_METHOD = ByteToMessageDecoder.class.getDeclaredMethod("decode", ChannelHandlerContext.class, ByteBuf.class, List.class);
+            Class<?> byteToMessageDecoderClass =
+                    SpigotReflectionUtil.getNettyClass("handler.codec.ByteToMessageDecoder");
+            DECODE_METHOD = byteToMessageDecoderClass.getDeclaredMethod("decode", ChannelHandlerContext.class, ByteBuf.class, List.class);
             DECODE_METHOD.setAccessible(true);
         } catch (NoSuchMethodException e) {
             e.printStackTrace();
         }
         try {
-            ENCODE_METHOD = MessageToByteEncoder.class.getDeclaredMethod("encode", ChannelHandlerContext.class, Object.class, ByteBuf.class);
+            Class<?> messageToByteEncoderClass =
+                    SpigotReflectionUtil.getNettyClass("handler.codec.MessageToByteEncoder");
+            ENCODE_METHOD = messageToByteEncoderClass.getDeclaredMethod("encode", ChannelHandlerContext.class, Object.class, ByteBuf.class);
             ENCODE_METHOD.setAccessible(true);
         } catch (NoSuchMethodException e) {
             e.printStackTrace();
         }
         try {
-            MTM_DECODE = MessageToMessageDecoder.class.getDeclaredMethod("decode", ChannelHandlerContext.class, Object.class, List.class);
+            Class<?> messageToMessageDecoderClass =
+                    SpigotReflectionUtil.getNettyClass("handler.codec.MessageToMessageDecoder");
+            MTM_DECODE = messageToMessageDecoderClass.getDeclaredMethod("decode", ChannelHandlerContext.class, Object.class, List.class);
             MTM_DECODE.setAccessible(true);
         } catch (NoSuchMethodException e) {
             e.printStackTrace();
         }
 
         try {
-            MTM_ENCODE = MessageToMessageEncoder.class.getDeclaredMethod("encode", ChannelHandlerContext.class, Object.class, List.class);
+            Class<?> messageToMessageEncoderClass =
+                    SpigotReflectionUtil.getNettyClass("handler.codec.MessageToMessageEncoder");
+            MTM_ENCODE = messageToMessageEncoderClass.getDeclaredMethod("encode", ChannelHandlerContext.class, Object.class, List.class);
             MTM_ENCODE.setAccessible(true);
         } catch (NoSuchMethodException e) {
             e.printStackTrace();
@@ -74,7 +80,7 @@ public class CustomPipelineUtil {
      * @return A list of the decoders output
      * @throws InvocationTargetException If an exception happens while executing
      */
-    public static List<Object> callDecode(ByteToMessageDecoder decoder, ChannelHandlerContext ctx, Object input) throws InvocationTargetException {
+    public static List<Object> callDecode(Object decoder, Object ctx, Object input) throws InvocationTargetException {
         List<Object> output = new ArrayList<>();
         try {
             CustomPipelineUtil.DECODE_METHOD.invoke(decoder, ctx, input, output);
@@ -93,7 +99,7 @@ public class CustomPipelineUtil {
      * @param output  The bytebuf to write the output to
      * @throws InvocationTargetException If an exception happens while executing
      */
-    public static void callEncode(MessageToByteEncoder encoder, ChannelHandlerContext ctx, Object msg, ByteBuf output) throws InvocationTargetException {
+    public static void callEncode(Object encoder, Object ctx, Object msg, Object output) throws InvocationTargetException {
         try {
             CustomPipelineUtil.ENCODE_METHOD.invoke(encoder, ctx, msg, output);
         } catch (IllegalAccessException e) {
@@ -101,7 +107,7 @@ public class CustomPipelineUtil {
         }
     }
 
-    public static List<Object> callEncode(MessageToMessageEncoder encoder, ChannelHandlerContext ctx, Object msg) {
+    public static List<Object> callMTMEncode(Object encoder, Object ctx, Object msg) {
         List<Object> output = new ArrayList<>();
         try {
             MTM_ENCODE.invoke(encoder, ctx, msg, output);
@@ -111,7 +117,7 @@ public class CustomPipelineUtil {
         return output;
     }
 
-    public static List<Object> callDecode(MessageToMessageDecoder decoder, ChannelHandlerContext ctx, Object msg) throws InvocationTargetException {
+    public static List<Object> callMTMDecode(Object decoder, Object ctx, Object msg) throws InvocationTargetException {
         List<Object> output = new ArrayList<>();
         try {
             MTM_DECODE.invoke(decoder, ctx, msg, output);
@@ -139,26 +145,20 @@ public class CustomPipelineUtil {
         return false;
     }
 
-    /**
-     * Get the context for a the channel handler before a certain name.
-     *
-     * @param name     The name of the channel handler
-     * @param pipeline The pipeline to target
-     * @return The ChannelHandler before the one requested.
-     */
-    public static ChannelHandlerContext getContextBefore(String name, ChannelPipeline pipeline) {
+
+    public static ChannelHandlerContextAbstract getNextContext(String name, ChannelPipelineAbstract pipeline) {
         boolean mark = false;
         for (String s : pipeline.names()) {
             if (mark) {
                 return pipeline.context(pipeline.get(s));
             }
-            if (s.equalsIgnoreCase(name))
+            if (s.equals(name))
                 mark = true;
         }
         return null;
     }
 
-    public static ChannelHandlerContext getPreviousContext(String name, ChannelPipeline pipeline) {
+    public static ChannelHandlerContextAbstract getPreviousContext(String name, ChannelPipelineAbstract pipeline) {
         String previous = null;
         for (String entry : pipeline.toMap().keySet()) {
             if (entry.equals(name)) {

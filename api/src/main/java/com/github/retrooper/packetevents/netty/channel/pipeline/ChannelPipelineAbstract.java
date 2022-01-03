@@ -24,6 +24,7 @@ import com.github.retrooper.packetevents.netty.channel.ChannelHandlerContextAbst
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
 public interface ChannelPipelineAbstract {
     Object rawChannelPipeline();
@@ -81,4 +82,8 @@ public interface ChannelPipelineAbstract {
     ChannelPipelineAbstract flush();
 
     ChannelHandlerContextAbstract context(String handlerName);
+
+    ChannelHandlerContextAbstract context(ChannelHandlerAbstract handler);
+
+    Map<String, ChannelHandlerAbstract> toMap();
 }

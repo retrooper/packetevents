@@ -26,7 +26,9 @@ import io.github.retrooper.packetevents.utils.netty.channel.ChannelHandlerModern
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelPipeline;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class ChannelPipelineModern implements ChannelPipelineAbstract {
     private final ChannelPipeline pipeline;
@@ -148,5 +150,21 @@ public class ChannelPipelineModern implements ChannelPipelineAbstract {
     @Override
     public ChannelHandlerContextAbstract context(String handlerName) {
         return new ChannelHandlerContextModern(pipeline.context(handlerName));
+    }
+
+    @Override
+    public ChannelHandlerContextAbstract context(ChannelHandlerAbstract handler) {
+        return new ChannelHandlerContextModern(pipeline.context((ChannelHandler) handler.rawChannelHandler()));
+    }
+
+    @Override
+    public Map<String, ChannelHandlerAbstract> toMap() {
+        Map<String, ChannelHandler> internalMap = pipeline.toMap();
+        Map<String, ChannelHandlerAbstract> wrapperMap = new HashMap<>();
+        for (String name : internalMap.keySet()) {
+            ChannelHandler rawHandler = internalMap.get(name);
+            wrapperMap.put(name, new ChannelHandlerModern(rawHandler));
+        }
+        return wrapperMap;
     }
 }
