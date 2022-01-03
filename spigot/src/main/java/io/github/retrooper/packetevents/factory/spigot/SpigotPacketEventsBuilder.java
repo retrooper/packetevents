@@ -43,6 +43,7 @@ import io.github.retrooper.packetevents.processor.InternalBukkitListener;
 import io.github.retrooper.packetevents.utils.BukkitLogManager;
 import io.github.retrooper.packetevents.utils.SpigotReflectionUtil;
 import io.github.retrooper.packetevents.utils.dependencies.google.GuavaUtil;
+import io.github.retrooper.packetevents.utils.dependencies.viaversion.CustomPipelineUtil;
 import io.github.retrooper.packetevents.utils.netty.NettyManagerImpl;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -104,6 +105,7 @@ public class SpigotPacketEventsBuilder {
                     PacketEvents.SERVER_CHANNEL_HANDLER_NAME = "pe-connection-initializer-" + plugin.getName().toLowerCase();
                     try {
                         SpigotReflectionUtil.init();
+                        CustomPipelineUtil.init();
                     } catch (Exception ex) {
                         throw new IllegalStateException(ex);
                     }

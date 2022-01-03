@@ -32,6 +32,7 @@ import com.github.retrooper.packetevents.protocol.item.ItemStack;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.protocol.player.InteractionHand;
 import com.github.retrooper.packetevents.protocol.world.Location;
+import com.github.retrooper.packetevents.protocol.world.chunk.BaseChunk;
 import com.github.retrooper.packetevents.protocol.world.states.WrappedBlockState;
 import com.github.retrooper.packetevents.util.MojangAPIUtil;
 import com.github.retrooper.packetevents.util.Vector3i;
@@ -40,6 +41,7 @@ import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientIn
 import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientUpdateSign;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerBlockChange;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerChatMessage;
+import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerChunkData;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerSetSlot;
 import io.github.retrooper.packetevents.factory.spigot.SpigotPacketEventsBuilder;
 import io.github.retrooper.packetevents.utils.SpigotReflectionUtil;
@@ -155,6 +157,13 @@ public class PacketEventsPlugin extends JavaPlugin {
                     int slot = setSlot.getSlot();
                     ItemStack item = setSlot.getItem();
                     player.sendMessage("Set slot with window ID: " + windowID + ", slot: " + slot + ", item: " + (item.getType() != null ? item.toString() : "null item"));
+                }
+                else if (event.getPacketType() == PacketType.Play.Server.CHUNK_DATA) {
+                    WrapperPlayServerChunkData cd = new WrapperPlayServerChunkData(event);
+                    for (BaseChunk chunk : cd.getColumn().getChunks()) {
+                        WrappedBlockState state = chunk.get(0, 0, 0);
+                        System.out.println("state: " + state.toString() + ", at " + cd.getColumn().getX() + ":" + cd.getColumn().getZ());
+                    }
                 }
             }
         };

@@ -21,8 +21,6 @@ package io.github.retrooper.packetevents.utils.dependencies.viaversion;
 import com.github.retrooper.packetevents.netty.channel.ChannelHandlerContextAbstract;
 import com.github.retrooper.packetevents.netty.channel.pipeline.ChannelPipelineAbstract;
 import io.github.retrooper.packetevents.utils.SpigotReflectionUtil;
-import io.netty.buffer.ByteBuf;
-import io.netty.channel.ChannelHandlerContext;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -35,11 +33,12 @@ public class CustomPipelineUtil {
     private static Method MTM_DECODE;
     private static Method MTM_ENCODE;
 
-    static {
+    public static void init() {
+        Class<?> channelHandlerContextClass = SpigotReflectionUtil.getNettyClass("channel.ChannelHandlerContext");
         try {
             Class<?> byteToMessageDecoderClass =
                     SpigotReflectionUtil.getNettyClass("handler.codec.ByteToMessageDecoder");
-            DECODE_METHOD = byteToMessageDecoderClass.getDeclaredMethod("decode", ChannelHandlerContext.class, ByteBuf.class, List.class);
+            DECODE_METHOD = byteToMessageDecoderClass.getDeclaredMethod("decode", channelHandlerContextClass, SpigotReflectionUtil.BYTE_BUF_CLASS, List.class);
             DECODE_METHOD.setAccessible(true);
         } catch (NoSuchMethodException e) {
             e.printStackTrace();
@@ -47,7 +46,7 @@ public class CustomPipelineUtil {
         try {
             Class<?> messageToByteEncoderClass =
                     SpigotReflectionUtil.getNettyClass("handler.codec.MessageToByteEncoder");
-            ENCODE_METHOD = messageToByteEncoderClass.getDeclaredMethod("encode", ChannelHandlerContext.class, Object.class, ByteBuf.class);
+            ENCODE_METHOD = messageToByteEncoderClass.getDeclaredMethod("encode", channelHandlerContextClass, Object.class, SpigotReflectionUtil.BYTE_BUF_CLASS);
             ENCODE_METHOD.setAccessible(true);
         } catch (NoSuchMethodException e) {
             e.printStackTrace();
@@ -55,7 +54,7 @@ public class CustomPipelineUtil {
         try {
             Class<?> messageToMessageDecoderClass =
                     SpigotReflectionUtil.getNettyClass("handler.codec.MessageToMessageDecoder");
-            MTM_DECODE = messageToMessageDecoderClass.getDeclaredMethod("decode", ChannelHandlerContext.class, Object.class, List.class);
+            MTM_DECODE = messageToMessageDecoderClass.getDeclaredMethod("decode", channelHandlerContextClass, Object.class, List.class);
             MTM_DECODE.setAccessible(true);
         } catch (NoSuchMethodException e) {
             e.printStackTrace();
@@ -64,7 +63,7 @@ public class CustomPipelineUtil {
         try {
             Class<?> messageToMessageEncoderClass =
                     SpigotReflectionUtil.getNettyClass("handler.codec.MessageToMessageEncoder");
-            MTM_ENCODE = messageToMessageEncoderClass.getDeclaredMethod("encode", ChannelHandlerContext.class, Object.class, List.class);
+            MTM_ENCODE = messageToMessageEncoderClass.getDeclaredMethod("encode", channelHandlerContextClass, Object.class, List.class);
             MTM_ENCODE.setAccessible(true);
         } catch (NoSuchMethodException e) {
             e.printStackTrace();
