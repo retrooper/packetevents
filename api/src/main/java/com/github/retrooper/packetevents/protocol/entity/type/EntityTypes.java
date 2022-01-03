@@ -20,7 +20,7 @@ package com.github.retrooper.packetevents.protocol.entity.type;
 
 import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
-import com.github.retrooper.packetevents.protocol.resources.ResourceLocation;
+import com.github.retrooper.packetevents.resources.ResourceLocation;
 import com.github.retrooper.packetevents.util.MappingHelper;
 import com.google.gson.JsonObject;
 import org.jetbrains.annotations.NotNull;

@@ -18,7 +18,7 @@
 
 package com.github.retrooper.packetevents.protocol.entity.villager.type;
 
-import com.github.retrooper.packetevents.protocol.resources.ResourceLocation;
+import com.github.retrooper.packetevents.resources.ResourceLocation;
 
 import java.util.HashMap;
 import java.util.Map;

@@ -19,7 +19,7 @@
 package com.github.retrooper.packetevents.manager.npc;
 
 import com.github.retrooper.packetevents.protocol.chat.component.impl.TextComponent;
-import com.github.retrooper.packetevents.protocol.gameprofile.GameProfile;
+import com.github.retrooper.packetevents.protocol.player.GameProfile;
 import com.github.retrooper.packetevents.protocol.player.GameMode;
 import com.github.retrooper.packetevents.protocol.world.Location;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerPlayerInfo;

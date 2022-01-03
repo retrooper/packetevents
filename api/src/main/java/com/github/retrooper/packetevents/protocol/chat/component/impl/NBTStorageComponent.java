@@ -20,7 +20,7 @@ package com.github.retrooper.packetevents.protocol.chat.component.impl;
 
 import com.github.retrooper.packetevents.protocol.chat.Color;
 import com.github.retrooper.packetevents.protocol.chat.component.BaseComponent;
-import com.github.retrooper.packetevents.protocol.resources.ResourceLocation;
+import com.github.retrooper.packetevents.resources.ResourceLocation;
 import com.google.gson.JsonObject;
 
 import java.util.Optional;

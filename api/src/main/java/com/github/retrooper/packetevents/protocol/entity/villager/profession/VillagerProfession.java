@@ -18,12 +18,7 @@
 
 package com.github.retrooper.packetevents.protocol.entity.villager.profession;
 
-import com.github.retrooper.packetevents.protocol.entity.villager.type.VillagerType;
 import com.github.retrooper.packetevents.protocol.mapper.MappedEntity;
-import com.github.retrooper.packetevents.protocol.resources.ResourceLocation;
-
-import java.util.HashMap;
-import java.util.Map;
 
 public interface VillagerProfession extends MappedEntity {
 

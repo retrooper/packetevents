@@ -18,7 +18,7 @@
 
 package com.github.retrooper.packetevents.protocol.mapper;
 
-import com.github.retrooper.packetevents.protocol.resources.ResourceLocation;
+import com.github.retrooper.packetevents.resources.ResourceLocation;
 
 public interface MappedEntity {
     ResourceLocation getName();

@@ -18,7 +18,7 @@
 
 package com.github.retrooper.packetevents.protocol.potion;
 
-import com.github.retrooper.packetevents.protocol.resources.ResourceLocation;
+import com.github.retrooper.packetevents.resources.ResourceLocation;
 import com.github.retrooper.packetevents.util.MappingHelper;
 import com.google.gson.JsonObject;
 import org.jetbrains.annotations.Nullable;
