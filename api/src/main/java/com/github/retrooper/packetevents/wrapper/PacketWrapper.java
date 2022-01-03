@@ -28,6 +28,7 @@ import com.github.retrooper.packetevents.protocol.chat.component.serializer.Comp
 import com.github.retrooper.packetevents.protocol.entity.data.EntityData;
 import com.github.retrooper.packetevents.protocol.entity.data.EntityDataType;
 import com.github.retrooper.packetevents.protocol.entity.data.EntityDataTypes;
+import com.github.retrooper.packetevents.protocol.entity.villager.VillagerData;
 import com.github.retrooper.packetevents.protocol.item.ItemStack;
 import com.github.retrooper.packetevents.protocol.item.type.ItemType;
 import com.github.retrooper.packetevents.protocol.item.type.ItemTypes;
@@ -237,6 +238,19 @@ public class PacketWrapper<T extends PacketWrapper> {
             keyConsumer.accept(this, key);
             valueConsumer.accept(this, value);
         }
+    }
+
+    public VillagerData readVillagerData() {
+        int villagerTypeId = readVarInt();
+        int villagerProfessionId = readVarInt();
+        int level = readVarInt();
+        return new VillagerData(villagerTypeId, villagerProfessionId, level);
+    }
+
+    public void writeVillagerData(VillagerData data) {
+        writeVarInt(data.getType().getId());
+        writeVarInt(data.getProfession().getId());
+        writeVarInt(data.getLevel());
     }
 
     @NotNull

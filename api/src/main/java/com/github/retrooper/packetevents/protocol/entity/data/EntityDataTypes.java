@@ -22,6 +22,7 @@ import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.protocol.chat.component.BaseComponent;
 import com.github.retrooper.packetevents.protocol.entity.pose.EntityPose;
+import com.github.retrooper.packetevents.protocol.entity.villager.VillagerData;
 import com.github.retrooper.packetevents.protocol.item.ItemStack;
 import com.github.retrooper.packetevents.protocol.nbt.NBTCompound;
 import com.github.retrooper.packetevents.protocol.world.BlockFace;
@@ -93,7 +94,7 @@ public class EntityDataTypes {
 
     public static final EntityDataType<NBTCompound> NBT = define("nbt", PacketWrapper::readNBT, PacketWrapper::writeNBT);
     //TODO Complete villager data, its readint 3 var ints
-    public static final EntityDataType<Integer> VILLAGER_DATA = define("villager_data", PacketWrapper::readVarInt, PacketWrapper::writeVarInt);
+    public static final EntityDataType<VillagerData> VILLAGER_DATA = define("villager_data", PacketWrapper::readVillagerData, PacketWrapper::writeVillagerData);
     public static final EntityDataType<Optional<Integer>> OPTIONAL_INT = define("optional_int", (PacketWrapper<?> wrapper) -> {
         if (wrapper.readBoolean()) {
             return Optional.of(wrapper.readVarInt());

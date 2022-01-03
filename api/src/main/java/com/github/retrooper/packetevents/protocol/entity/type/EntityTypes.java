@@ -126,8 +126,8 @@ public class EntityTypes {
         return false;
     }
 
-    public static EntityType getByName(String key) {
-        return ENTITY_TYPE_MAP.get(key);
+    public static EntityType getByName(String name) {
+        return ENTITY_TYPE_MAP.get(name);
     }
 
     public static EntityType getById(int id) {

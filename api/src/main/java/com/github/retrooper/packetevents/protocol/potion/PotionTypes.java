@@ -63,8 +63,8 @@ public class PotionTypes {
     }
 
     @Nullable
-    public static PotionType getByName(String key) {
-        return POTION_TYPE_MAP.get(key);
+    public static PotionType getByName(String name) {
+        return POTION_TYPE_MAP.get(name);
     }
 
     @Nullable

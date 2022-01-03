@@ -94,8 +94,8 @@ public class EnchantmentTypes {
     }
 
     @Nullable
-    public static EnchantmentType getByName(String key) {
-        return ENCHANTMENT_TYPE_MAPPINGS.get(key);
+    public static EnchantmentType getByName(String name) {
+        return ENCHANTMENT_TYPE_MAPPINGS.get(name);
     }
 
     @Nullable

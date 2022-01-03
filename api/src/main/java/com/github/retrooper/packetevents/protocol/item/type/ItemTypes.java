@@ -1255,8 +1255,8 @@ public class ItemTypes {
     }
 
     @Nullable
-    public static ItemType getByName(String key) {
-        return ITEM_TYPE_MAP.get(key);
+    public static ItemType getByName(String name) {
+        return ITEM_TYPE_MAP.get(name);
     }
 
     @NotNull
