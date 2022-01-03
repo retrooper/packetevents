@@ -1018,11 +1018,6 @@ public class StateTypes {
             return this;
         }
 
-        public Builder isReplaceable(boolean isReplaceable) {
-            this.isReplaceable = isReplaceable;
-            return this;
-        }
-
         public Builder pushReaction(PushReaction pushReaction) {
             this.pushReaction = pushReaction;
             return this;
@@ -1032,6 +1027,20 @@ public class StateTypes {
             this.materialType = materialType;
 
             if (pushReaction != null) return this;
+
+            switch (materialType) {
+                case AIR:
+                case STRUCTURAL_AIR:
+                case REPLACEABLE_PLANT:
+                case REPLACEABLE_FIREPROOF_PLANT:
+                case REPLACEABLE_WATER_PLANT:
+                case WATER:
+                case BUBBLE_COLUMN:
+                case LAVA:
+                case TOP_SNOW:
+                case FIRE:
+                    this.isReplaceable = true;
+            }
 
             switch (materialType) {
                 case PLANT:
