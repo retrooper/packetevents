@@ -97,8 +97,9 @@ public class PacketEventsPlugin extends JavaPlugin {
                         Bukkit.getScheduler().runTaskLaterAsynchronously((Plugin) PacketEvents.getAPI().getPlugin(),
                                 () -> {
                                     player.sendMessage("Turning the NPC into you!");
-                                    List<TextureProperty> newTextureProperties = MojangAPIUtil.requestPlayerTextureProperties("Dqgs");
-                                    PacketEvents.getAPI().getNPCManager().changeNPCSkin(npc, "Dqgs", MojangAPIUtil.requestPlayerUUID("Dqgs"), newTextureProperties);
+                                    UUID dogsUUID = MojangAPIUtil.requestPlayerUUID("Dqgs");
+                                    List<TextureProperty> newTextureProperties = MojangAPIUtil.requestPlayerTextureProperties(dogsUUID);
+                                    PacketEvents.getAPI().getNPCManager().changeNPCSkin(npc, "Dqgs", dogsUUID, newTextureProperties);
 
                                 }, 120L);//120 ticks is 6 seconds
                     }
