@@ -636,6 +636,7 @@ public class PacketWrapper<T extends PacketWrapper> {
                 }
                 entityData.getType().getDataSerializer().accept(this, entityData.getValue());
             }
+            writeByte(255); // End of metadata array
         } else {
             for (EntityData entityData : list) {
                 int typeID = entityData.getType().getId();
@@ -644,6 +645,7 @@ public class PacketWrapper<T extends PacketWrapper> {
                 writeByte(data);
                 entityData.getType().getDataSerializer().accept(this, entityData.getValue());
             }
+            writeByte(127); // End of metadata array
         }
     }
 }

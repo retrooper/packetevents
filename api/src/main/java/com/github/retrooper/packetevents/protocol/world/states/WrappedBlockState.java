@@ -157,7 +157,11 @@ public class WrappedBlockState {
                 int index = fullBlockString.indexOf("[");
 
                 String blockString = fullBlockString.substring(0, index == -1 ? fullBlockString.length() : index);
-                StateType type = StateTypes.getByName(blockString);
+                StateType type = StateTypes.getByName(blockString.replace("minecraft:", ""));
+
+                if (type == null) {
+                    PacketEvents.getAPI().getLogger().warning("Unknown block type: " + fullBlockString);
+                }
 
                 String[] data = null;
                 if (index != -1) {

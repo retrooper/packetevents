@@ -2,6 +2,7 @@ package com.github.retrooper.packetevents.protocol.world.states.defaulttags;
 
 import com.github.retrooper.packetevents.protocol.item.type.ItemType;
 import com.github.retrooper.packetevents.protocol.item.type.ItemTypes;
+import com.github.retrooper.packetevents.protocol.world.states.type.StateType;
 
 import java.util.Collections;
 import java.util.HashMap;
@@ -9,6 +10,8 @@ import java.util.HashSet;
 import java.util.Set;
 
 public class ItemTags {
+    private static final HashMap<String, ItemTags> byName = new HashMap<>();
+
     public static final ItemTags WOOL = bind("wool");
     public static final ItemTags PLANKS = bind("planks");
     public static final ItemTags STONE_BRICKS = bind("stone_bricks");
@@ -78,49 +81,6 @@ public class ItemTags {
     public static final ItemTags AXOLOTL_TEMPT_ITEMS = bind("axolotl_tempt_items");
     public static final ItemTags OCCLUDES_VIBRATION_SIGNALS = bind("occludes_vibration_signals");
     public static final ItemTags CLUSTER_MAX_HARVESTABLES = bind("cluster_max_harvestables");
-
-    
-    private static final HashMap<String, ItemTags> byName = new HashMap<>();
-    String name;
-    Set<ItemType> states = new HashSet<>(); // o(1)
-    public ItemTags(final String name) {
-        byName.put(name, this);
-        this.name = name;
-    }
-
-    private static ItemTags bind(final String s) {
-        return new ItemTags(s);
-    }
-
-    private ItemTags add(ItemType... state) {
-        Collections.addAll(this.states, state);
-        return this;
-    }
-
-    private ItemTags addTag(ItemTags tags) {
-        this.states.addAll(tags.states);
-        return this;
-    }
-
-    public boolean contains(ItemType state) {
-        return this.states.contains(state);
-    }
-
-    public String getName() {
-        return this.name;
-    }
-
-    public ItemTags getByName(String name) {
-        return byName.get(name);
-    }
-
-    public Set<ItemType> getStates() {
-        return this.states;
-    }
-
-    private static void copy(BlockTags tag, ItemTags itemTag) {
-        // TODO: Link together block tags and item tags
-    }
 
     static {
         copy(BlockTags.WOOL, ItemTags.WOOL);
@@ -192,5 +152,50 @@ public class ItemTags {
         ItemTags.FREEZE_IMMUNE_WEARABLES.add(ItemTypes.LEATHER_BOOTS, ItemTypes.LEATHER_LEGGINGS, ItemTypes.LEATHER_CHESTPLATE, ItemTypes.LEATHER_HELMET, ItemTypes.LEATHER_HORSE_ARMOR);
         ItemTags.AXOLOTL_TEMPT_ITEMS.add(ItemTypes.TROPICAL_FISH_BUCKET);
         ItemTags.CLUSTER_MAX_HARVESTABLES.add(ItemTypes.DIAMOND_PICKAXE, ItemTypes.GOLDEN_PICKAXE, ItemTypes.IRON_PICKAXE, ItemTypes.NETHERITE_PICKAXE, ItemTypes.STONE_PICKAXE, ItemTypes.WOODEN_PICKAXE);
-   }
+    }
+
+    String name;
+    Set<ItemType> states = new HashSet<>(); // o(1);
+
+    public ItemTags(final String name) {
+        byName.put(name, this);
+        this.name = name;
+    }
+
+    private static ItemTags bind(final String s) {
+        return new ItemTags(s);
+    }
+
+    private static void copy(BlockTags tag, ItemTags itemTag) {
+        for (StateType state : tag.getStates()) {
+            itemTag.states.add(ItemTypes.getTypePlacingState(state));
+        }
+        itemTag.states.remove(null); // In case getTypePlacingState returned null
+    }
+
+    private ItemTags add(ItemType... state) {
+        Collections.addAll(this.states, state);
+        return this;
+    }
+
+    private ItemTags addTag(ItemTags tags) {
+        this.states.addAll(tags.states);
+        return this;
+    }
+
+    public boolean contains(ItemType state) {
+        return this.states.contains(state);
+    }
+
+    public String getName() {
+        return this.name;
+    }
+
+    public ItemTags getByName(String name) {
+        return byName.get(name);
+    }
+
+    public Set<ItemType> getStates() {
+        return this.states;
+    }
 }
