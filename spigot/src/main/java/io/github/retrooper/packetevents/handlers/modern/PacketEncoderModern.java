@@ -20,77 +20,73 @@ package io.github.retrooper.packetevents.handlers.modern;
 
 import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.event.impl.PacketSendEvent;
-import io.github.retrooper.packetevents.handlers.compression.CustomPacketCompressor;
-import io.github.retrooper.packetevents.handlers.compression.CustomPacketDecompressor;
 import com.github.retrooper.packetevents.netty.buffer.ByteBufAbstract;
 import com.github.retrooper.packetevents.netty.channel.ChannelHandlerContextAbstract;
+import io.github.retrooper.packetevents.handlers.compression.CustomPacketCompressor;
+import io.github.retrooper.packetevents.handlers.compression.CustomPacketDecompressor;
 import io.github.retrooper.packetevents.handlers.modern.early.CompressionManagerModern;
 import io.github.retrooper.packetevents.utils.dependencies.viaversion.CustomPipelineUtil;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.MessageToByteEncoder;
-import io.netty.handler.codec.MessageToMessageEncoder;
 import org.bukkit.entity.Player;
 
 import java.lang.reflect.InvocationTargetException;
-import java.util.List;
 
 @ChannelHandler.Sharable
-public class PacketEncoderModern extends MessageToMessageEncoder<Object> {
+public class PacketEncoderModern extends MessageToByteEncoder<Object> {
     public volatile Player player;
     public boolean handledCompression;
     public MessageToByteEncoder<?> mcEncoder;
 
-    public void handle(ChannelHandlerContextAbstract ctx, ByteBufAbstract transformedBuf, List<Object> output) {
-        try {
-            boolean needsCompress = handleCompressionOrder(ctx, transformedBuf);
+    public void handle(ChannelHandlerContextAbstract ctx, ByteBufAbstract byteBuf) {
+        boolean needsCompress = handleCompressionOrder(ctx, byteBuf);
 
-            int firstReaderIndex = transformedBuf.readerIndex();
-            PacketSendEvent packetSendEvent = new PacketSendEvent(ctx.channel(), player, transformedBuf);
-            int readerIndex = transformedBuf.readerIndex();
-            PacketEvents.getAPI().getEventManager().callEvent(packetSendEvent, () -> {
-                transformedBuf.readerIndex(readerIndex);
-            });
-            if (!packetSendEvent.isCancelled()) {
-                if (packetSendEvent.getLastUsedWrapper() != null) {
-                    packetSendEvent.getByteBuf().clear();
-                    packetSendEvent.getLastUsedWrapper().writeVarInt(packetSendEvent.getPacketId());
-                    packetSendEvent.getLastUsedWrapper().writeData();
-                }
-                transformedBuf.readerIndex(firstReaderIndex);
-                if (needsCompress) {
-                    recompress(ctx, transformedBuf);
-                }
-                output.add(transformedBuf.retain().rawByteBuf());
-                if (packetSendEvent.getPostTask() != null) {
-                    ((ChannelHandlerContext) ctx.rawChannelHandlerContext()).newPromise().addListener(f -> {
-                        packetSendEvent.getPostTask().run();
-                    });
-                }
+        int firstReaderIndex = byteBuf.readerIndex();
+        PacketSendEvent packetSendEvent = new PacketSendEvent(ctx.channel(), player, byteBuf);
+        int readerIndex = byteBuf.readerIndex();
+        PacketEvents.getAPI().getEventManager().callEvent(packetSendEvent, () -> {
+            byteBuf.readerIndex(readerIndex);
+        });
+        if (!packetSendEvent.isCancelled()) {
+            if (packetSendEvent.getLastUsedWrapper() != null) {
+                packetSendEvent.getByteBuf().clear();
+                packetSendEvent.getLastUsedWrapper().writeVarInt(packetSendEvent.getPacketId());
+                packetSendEvent.getLastUsedWrapper().writeData();
             }
-        } finally {
-            transformedBuf.release();
+            byteBuf.readerIndex(firstReaderIndex);
+            if (needsCompress) {
+                recompress(ctx, byteBuf);
+            }
+            if (packetSendEvent.getPostTask() != null) {
+                ((ChannelHandlerContext) ctx.rawChannelHandlerContext()).newPromise().addListener(f -> {
+                    packetSendEvent.getPostTask().run();
+                });
+            }
+        } else {
+            //Make the buffer unreadable for the next handlers
+            byteBuf.clear();
         }
     }
 
     @Override
-    protected void encode(ChannelHandlerContext ctx, Object o, List<Object> out) {
-        ByteBuf byteBuf = ctx.alloc().buffer();
+    protected void encode(ChannelHandlerContext ctx, Object o, ByteBuf out) {
         if (!(o instanceof ByteBuf)) {
             //Call mc encoder
-            if (mcEncoder == null)return;
+            if (mcEncoder == null) return;
             try {
-                CustomPipelineUtil.callEncode(mcEncoder, ctx, o, byteBuf);
+                CustomPipelineUtil.callEncode(mcEncoder, ctx, o, out);
             } catch (InvocationTargetException e) {
                 e.printStackTrace();
             }
+        } else {
+            out.writeBytes((ByteBuf) o);
         }
-        else {
-            byteBuf.writeBytes((ByteBuf) o);
+        if (out.isReadable()) {
+            //byteBuf is released in the handle method
+            handle(PacketEvents.getAPI().getNettyManager().wrapChannelHandlerContext(ctx), PacketEvents.getAPI().getNettyManager().wrapByteBuf(out));
         }
-        //byteBuf is released in the handle method
-        handle(PacketEvents.getAPI().getNettyManager().wrapChannelHandlerContext(ctx), PacketEvents.getAPI().getNettyManager().wrapByteBuf(byteBuf), out);
     }
 
     private boolean handleCompressionOrder(ChannelHandlerContextAbstract ctx, ByteBufAbstract buf) {

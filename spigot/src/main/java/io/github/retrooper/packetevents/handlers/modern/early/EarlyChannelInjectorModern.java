@@ -295,7 +295,7 @@ public class EarlyChannelInjectorModern implements EarlyInjector {
                 encoder.handledCompression = true;
                 if (ViaVersionUtil.isAvailable()) {
                     channel.pipeline().remove(PacketEvents.ENCODER_NAME);
-                    addCustomViaEncoder(channel, encoder);
+                    initViaEncoder(channel, encoder);
                 }
             }
         }
@@ -311,11 +311,11 @@ public class EarlyChannelInjectorModern implements EarlyInjector {
         }
     }
 
-    private void addCustomViaEncoder(Object ch, PacketEncoderModern encoder) {
+    private void initViaEncoder(Object ch, PacketEncoderModern encoder) {
         Channel channel = (Channel) ch;
-        ChannelHandler mcEncoder = channel.pipeline().get("encoder");
-        ReflectionObject reflectMCEncoder = new ReflectionObject(mcEncoder);
-        encoder.mcEncoder = reflectMCEncoder.read(0, MessageToByteEncoder.class);
+        MessageToByteEncoder<?> viaEncoder = (MessageToByteEncoder<?>) channel.pipeline().get("encoder");
+        encoder.mcEncoder = new ReflectionObject(viaEncoder).read(0, MessageToByteEncoder.class);
+        //We let our encoder get called before viaversion, but we will therefore transform the packets to bytebufs
         channel.pipeline().addAfter("encoder", PacketEvents.ENCODER_NAME, encoder);
     }
 
@@ -348,7 +348,7 @@ public class EarlyChannelInjectorModern implements EarlyInjector {
             if (connectionState == ConnectionState.PLAY) {
                 if (ViaVersionUtil.isAvailable()) {
                     PacketEncoderModern encoder = (PacketEncoderModern) channel.pipeline().remove(PacketEvents.ENCODER_NAME);
-                    addCustomViaEncoder(channel, encoder);
+                    initViaEncoder(channel, encoder);
                     channel.pipeline().remove(PacketEvents.DECODER_NAME);
                     decoder.bypassCompression = true;
                     addCustomViaDecoder(channel, new PacketDecoderModern(decoder));
