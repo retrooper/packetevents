@@ -23,14 +23,17 @@ import com.github.retrooper.packetevents.event.PacketListenerAbstract;
 import com.github.retrooper.packetevents.event.impl.PacketReceiveEvent;
 import com.github.retrooper.packetevents.event.impl.PacketSendEvent;
 import com.github.retrooper.packetevents.manager.npc.NPC;
+import com.github.retrooper.packetevents.protocol.chat.Color;
 import com.github.retrooper.packetevents.protocol.chat.component.BaseComponent;
 import com.github.retrooper.packetevents.protocol.chat.component.impl.TextComponent;
 import com.github.retrooper.packetevents.protocol.chat.component.impl.TranslatableComponent;
-import com.github.retrooper.packetevents.protocol.player.GameProfile;
-import com.github.retrooper.packetevents.protocol.player.TextureProperty;
+import com.github.retrooper.packetevents.protocol.entity.type.EntityTypes;
 import com.github.retrooper.packetevents.protocol.item.ItemStack;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
+import com.github.retrooper.packetevents.protocol.player.GameMode;
+import com.github.retrooper.packetevents.protocol.player.GameProfile;
 import com.github.retrooper.packetevents.protocol.player.InteractionHand;
+import com.github.retrooper.packetevents.protocol.player.TextureProperty;
 import com.github.retrooper.packetevents.protocol.world.Location;
 import com.github.retrooper.packetevents.protocol.world.chunk.BaseChunk;
 import com.github.retrooper.packetevents.protocol.world.states.WrappedBlockState;
@@ -39,10 +42,7 @@ import com.github.retrooper.packetevents.util.Vector3i;
 import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientChatMessage;
 import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientInteractEntity;
 import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientUpdateSign;
-import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerBlockChange;
-import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerChatMessage;
-import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerChunkData;
-import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerSetSlot;
+import com.github.retrooper.packetevents.wrapper.play.server.*;
 import io.github.retrooper.packetevents.factory.spigot.SpigotPacketEventsBuilder;
 import io.github.retrooper.packetevents.utils.SpigotReflectionUtil;
 import org.bukkit.Bukkit;
@@ -125,8 +125,24 @@ public class PacketEventsPlugin extends JavaPlugin {
                     Vector3i pos = bc.getBlockPosition();
                     WrappedBlockState state = WrappedBlockState.getByGlobalId(bc.getBlockId());
                     System.out.println("new state: " + state);
-                }
-                else if (event.getPacketType() == PacketType.Play.Server.CHAT_MESSAGE) {
+                } else if (event.getPacketType() == PacketType.Play.Server.SPAWN_LIVING_ENTITY) {
+                    WrapperPlayServerSpawnLivingEntity spawnLivingEntity = new WrapperPlayServerSpawnLivingEntity(event);
+                    if (spawnLivingEntity.getEntityType().equals(EntityTypes.PIG)) {
+                        event.setCancelled(true);
+                        /*int entityId = spawnLivingEntity.getEntityId();
+                        UUID uuid = spawnLivingEntity.getEntityUUID();
+                        UUID textureUUID = MojangAPIUtil.requestPlayerUUID("md_5");
+                        List<TextureProperty> textures = MojangAPIUtil.requestPlayerTextureProperties(textureUUID);
+                        GameProfile gp = new GameProfile(uuid, "Player_pig", textures);
+                        WrapperPlayServerPlayerInfo playerInfo = new WrapperPlayServerPlayerInfo(WrapperPlayServerPlayerInfo.Action.ADD_PLAYER, new WrapperPlayServerPlayerInfo.PlayerData(TextComponent.builder().text("Player_pig").color(Color.RED).build(), gp, GameMode.SURVIVAL,
+                                10));
+                        PacketEvents.getAPI().getPlayerManager().sendPacket(event.getChannel(), playerInfo);
+                        Location targetLocation = new Location(spawnLivingEntity.getPosition(), spawnLivingEntity.getYaw(), spawnLivingEntity.getPitch());
+                        WrapperPlayServerSpawnPlayer spawnPlayer = new WrapperPlayServerSpawnPlayer(entityId, uuid,
+                                targetLocation);
+                        PacketEvents.getAPI().getPlayerManager().sendPacket(event.getChannel(), spawnPlayer);*/
+                    }
+                } else if (event.getPacketType() == PacketType.Play.Server.CHAT_MESSAGE) {
                     WrapperPlayServerChatMessage cm = new WrapperPlayServerChatMessage(event);
                     BaseComponent component = cm.getChatComponent();
                     if (component instanceof TextComponent) {
@@ -157,12 +173,11 @@ public class PacketEventsPlugin extends JavaPlugin {
                     int slot = setSlot.getSlot();
                     ItemStack item = setSlot.getItem();
                     player.sendMessage("Set slot with window ID: " + windowID + ", slot: " + slot + ", item: " + (item.getType() != null ? item.toString() : "null item"));
-                }
-                else if (event.getPacketType() == PacketType.Play.Server.CHUNK_DATA) {
+                } else if (event.getPacketType() == PacketType.Play.Server.CHUNK_DATA) {
                     WrapperPlayServerChunkData cd = new WrapperPlayServerChunkData(event);
                     for (BaseChunk chunk : cd.getColumn().getChunks()) {
                         WrappedBlockState state = chunk.get(0, 0, 0);
-                        System.out.println("state: " + state.toString() + ", at " + cd.getColumn().getX() + ":" + cd.getColumn().getZ());
+                        //System.out.println("state: " + state.toString() + ", at " + cd.getColumn().getX() + ":" + cd.getColumn().getZ());
                     }
                 }
             }

@@ -38,9 +38,6 @@ import java.util.UUID;
 public class WrapperPlayServerPlayerInfo extends PacketWrapper<WrapperPlayServerPlayerInfo> {
     @Nullable
     private Action action;
-
-    private UUID uuid;
-
     private List<PlayerData> playerDataList;
 
     public enum Action {
@@ -58,25 +55,22 @@ public class WrapperPlayServerPlayerInfo extends PacketWrapper<WrapperPlayServer
         super(event);
     }
 
-    public WrapperPlayServerPlayerInfo(@NotNull Action action, UUID uuid, List<PlayerData> playerDataList) {
+    public WrapperPlayServerPlayerInfo(@NotNull Action action, List<PlayerData> playerDataList) {
         super(PacketType.Play.Server.PLAYER_INFO);
         this.action = action;
-        this.uuid = uuid;
         this.playerDataList = playerDataList;
     }
 
-    public WrapperPlayServerPlayerInfo(@NotNull Action action, UUID uuid, PlayerData... playerData) {
+    public WrapperPlayServerPlayerInfo(@NotNull Action action, PlayerData... playerData) {
         super(PacketType.Play.Server.PLAYER_INFO);
         this.action = action;
-        this.uuid = uuid;
         this.playerDataList = new ArrayList<>();
         Collections.addAll(playerDataList, playerData);
     }
 
-    public WrapperPlayServerPlayerInfo(@NotNull Action action, UUID uuid, PlayerData playerData) {
+    public WrapperPlayServerPlayerInfo(@NotNull Action action, PlayerData playerData) {
         super(PacketType.Play.Server.PLAYER_INFO);
         this.action = action;
-        this.uuid = uuid;
         this.playerDataList = new ArrayList<>();
         this.playerDataList.add(playerData);
     }
@@ -98,14 +92,13 @@ public class WrapperPlayServerPlayerInfo extends PacketWrapper<WrapperPlayServer
             } else {
                 action = Action.REMOVE_PLAYER;
             }
-            uuid = new UUID(0L, 0L);
         } else {
             action = Action.VALUES[readVarInt()];
             int playerDataCount = readVarInt();
-            uuid = readUUID();
             playerDataList = new ArrayList<>(playerDataCount);
             for (int i = 0; i < playerDataCount; i++) {
                 PlayerData data = null;
+                UUID uuid = readUUID();
                 switch (action) {
                     case ADD_PLAYER: {
                         String playerUsername = readString(16);
@@ -126,21 +119,21 @@ public class WrapperPlayServerPlayerInfo extends PacketWrapper<WrapperPlayServer
                     }
                     case UPDATE_GAME_MODE: {
                         GameMode gameMode = GameMode.values()[readVarInt()];
-                        data = new PlayerData(null, null, gameMode, -1);
+                        data = new PlayerData(null, new GameProfile(uuid, null), gameMode, -1);
                         break;
                     }
                     case UPDATE_LATENCY: {
                         int ping = readVarInt();
-                        data = new PlayerData(null, null, null, ping);
+                        data = new PlayerData(null, new GameProfile(uuid, null), null, ping);
                         break;
                     }
                     case UPDATE_DISPLAY_NAME:
                         BaseComponent displayName = readBoolean() ? readComponent() : null;
-                        data = new PlayerData(displayName, null, null, -1);
+                        data = new PlayerData(displayName, new GameProfile(uuid, null), null, -1);
                         break;
 
                     case REMOVE_PLAYER:
-                        data = new PlayerData(null, null, null, -1);
+                        data = new PlayerData(null, new GameProfile(uuid, null), null, -1);
                         break;
                 }
                 if (data != null) {
@@ -153,7 +146,6 @@ public class WrapperPlayServerPlayerInfo extends PacketWrapper<WrapperPlayServer
     @Override
     public void readData(WrapperPlayServerPlayerInfo wrapper) {
         action = wrapper.action;
-        uuid = wrapper.uuid;
         playerDataList = wrapper.playerDataList;
     }
 
@@ -171,8 +163,8 @@ public class WrapperPlayServerPlayerInfo extends PacketWrapper<WrapperPlayServer
         } else {
             writeVarInt(action.ordinal());
             writeVarInt(playerDataList.size());
-            writeUUID(uuid);
             for (PlayerData data : playerDataList) {
+                writeUUID(data.gameProfile.getId());
                 switch (action) {
                     case ADD_PLAYER: {
                         writeString(data.gameProfile.getName(), 16);
@@ -186,7 +178,7 @@ public class WrapperPlayServerPlayerInfo extends PacketWrapper<WrapperPlayServer
                                 writeString(textureProperty.getSignature());
                             }
                         }
-                        writeVarInt(data.gameMode.ordinal());
+                        writeGameMode(data.gameMode);
                         writeVarInt(data.ping);
                         if (data.displayName != null) {
                             writeBoolean(true);
@@ -228,14 +220,6 @@ public class WrapperPlayServerPlayerInfo extends PacketWrapper<WrapperPlayServer
 
     public void setAction(@NotNull Action action) {
         this.action = action;
-    }
-
-    public UUID getUUID() {
-        return uuid;
-    }
-
-    public void setUUID(UUID uuid) {
-        this.uuid = uuid;
     }
 
     public List<PlayerData> getPlayerDataList() {

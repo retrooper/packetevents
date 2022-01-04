@@ -34,7 +34,7 @@ public class NPCManager {
 
     public void spawn(ChannelAbstract channel, NPC npc) {
         Set<ChannelAbstract> targetChannels = TARGET_CHANNELS.computeIfAbsent(npc, k -> new HashSet<>());
-        WrapperPlayServerPlayerInfo playerInfoPacket = new WrapperPlayServerPlayerInfo(WrapperPlayServerPlayerInfo.Action.ADD_PLAYER, npc.getProfile().getId(), npc.getPlayerInfoData());
+        WrapperPlayServerPlayerInfo playerInfoPacket = new WrapperPlayServerPlayerInfo(WrapperPlayServerPlayerInfo.Action.ADD_PLAYER, npc.getPlayerInfoData());
         PacketEvents.getAPI().getPlayerManager().sendPacket(channel, playerInfoPacket);
 
         //TODO Later if we want entity metadata, its not supported on newer server versions though
@@ -49,7 +49,7 @@ public class NPCManager {
     public void despawn(ChannelAbstract channel, NPC npc) {
         Set<ChannelAbstract> targetChannels = TARGET_CHANNELS.get(npc);
         if (targetChannels != null) {
-            WrapperPlayServerPlayerInfo playerInfoPacket = new WrapperPlayServerPlayerInfo(WrapperPlayServerPlayerInfo.Action.REMOVE_PLAYER, npc.getProfile().getId(), npc.getPlayerInfoData());
+            WrapperPlayServerPlayerInfo playerInfoPacket = new WrapperPlayServerPlayerInfo(WrapperPlayServerPlayerInfo.Action.REMOVE_PLAYER, npc.getPlayerInfoData());
             PacketEvents.getAPI().getPlayerManager().sendPacket(channel, playerInfoPacket);
 
             WrapperPlayServerDestroyEntities destroyEntities = new WrapperPlayServerDestroyEntities(npc.getId());
@@ -149,8 +149,7 @@ public class NPCManager {
         if (targetChannels != null && !targetChannels.isEmpty()) {
             for (ChannelAbstract channel : targetChannels) {
                 WrapperPlayServerPlayerInfo playerInfo =
-                        new WrapperPlayServerPlayerInfo(WrapperPlayServerPlayerInfo.Action.UPDATE_LATENCY,
-                        npc.getProfile().getId(), npc.getPlayerInfoData());
+                        new WrapperPlayServerPlayerInfo(WrapperPlayServerPlayerInfo.Action.UPDATE_LATENCY, npc.getPlayerInfoData());
                 PacketEvents.getAPI().getPlayerManager().sendPacket(channel, playerInfo);
             }
         }
@@ -160,7 +159,7 @@ public class NPCManager {
         Set<ChannelAbstract> targetChannels = TARGET_CHANNELS.get(npc);
         if (targetChannels != null && !targetChannels.isEmpty()) {
             for (ChannelAbstract channel : targetChannels) {
-                WrapperPlayServerPlayerInfo playerInfoRemove = new WrapperPlayServerPlayerInfo(WrapperPlayServerPlayerInfo.Action.REMOVE_PLAYER, npc.getProfile().getId(), npc.getPlayerInfoData());
+                WrapperPlayServerPlayerInfo playerInfoRemove = new WrapperPlayServerPlayerInfo(WrapperPlayServerPlayerInfo.Action.REMOVE_PLAYER, npc.getPlayerInfoData());
                 PacketEvents.getAPI().getPlayerManager().sendPacket(channel, playerInfoRemove);
 
                 WrapperPlayServerDestroyEntities destroyEntities = new WrapperPlayServerDestroyEntities(npc.getId());
@@ -168,7 +167,7 @@ public class NPCManager {
                 npc.setDisplayName(newDisplayName);
                 npc.getProfile().setTextureProperties(newTextureProperties);
                 npc.getProfile().setId(newUUID);
-                WrapperPlayServerPlayerInfo playerInfoAdd = new WrapperPlayServerPlayerInfo(WrapperPlayServerPlayerInfo.Action.ADD_PLAYER, npc.getProfile().getId(), npc.getPlayerInfoData());
+                WrapperPlayServerPlayerInfo playerInfoAdd = new WrapperPlayServerPlayerInfo(WrapperPlayServerPlayerInfo.Action.ADD_PLAYER, npc.getPlayerInfoData());
                 PacketEvents.getAPI().getPlayerManager().sendPacket(channel, playerInfoAdd);
 
                 //TODO Later if we want entity metadata, its not supported on newer server versions though
