@@ -140,6 +140,10 @@ public class EarlyChannelInjectorLegacy implements EarlyInjector {
 
     private void injectChannelFuture(ChannelFuture future) {
         ChannelPipeline pipeline = future.channel().pipeline();
+        ChannelHandler connectionHandler = pipeline.get(PacketEvents.CONNECTION_NAME);
+        if (connectionHandler != null) {
+            pipeline.remove(PacketEvents.CONNECTION_NAME);
+        }
         if (pipeline.get("SpigotNettyServerChannelHandler#0") != null) {
             pipeline.addAfter("SpigotNettyServerChannelHandler#0", PacketEvents.CONNECTION_NAME, new ServerChannelHandlerLegacy());
         } else {

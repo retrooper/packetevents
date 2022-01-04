@@ -142,6 +142,10 @@ public class EarlyChannelInjectorModern implements EarlyInjector {
     private void injectChannelFuture(ChannelFuture future) {
         ChannelPipeline pipeline = future.channel().pipeline();
         //System.out.println("pre handlers: " + Arrays.toString(pipeline.names().toArray(new String[0])));
+        ChannelHandler connectionHandler = pipeline.get(PacketEvents.CONNECTION_NAME);
+        if (connectionHandler != null) {
+            pipeline.remove(PacketEvents.CONNECTION_NAME);
+        }
         if (pipeline.get("SpigotNettyServerChannelHandler#0") != null) {
             pipeline.addAfter("SpigotNettyServerChannelHandler#0", PacketEvents.CONNECTION_NAME, new ServerChannelHandlerModern());
         }
