@@ -85,7 +85,7 @@ public class WrappedBlockState {
             PacketEvents.getAPI().getLogger().warning("Default state for " + type + " is null. Returning AIR");
             return AIR;
         }
-        return state;
+        return state.clone();
     }
 
     private static String getModernJsonPath(ServerVersion serverVersion) {
