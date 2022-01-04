@@ -27,6 +27,7 @@ import com.github.retrooper.packetevents.protocol.chat.Color;
 import com.github.retrooper.packetevents.protocol.chat.component.BaseComponent;
 import com.github.retrooper.packetevents.protocol.chat.component.impl.TextComponent;
 import com.github.retrooper.packetevents.protocol.chat.component.impl.TranslatableComponent;
+import com.github.retrooper.packetevents.protocol.entity.data.EntityData;
 import com.github.retrooper.packetevents.protocol.entity.type.EntityTypes;
 import com.github.retrooper.packetevents.protocol.item.ItemStack;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
@@ -106,7 +107,9 @@ public class PacketEventsPlugin extends JavaPlugin {
                                     player.sendMessage("Turning the NPC into you!");
                                     UUID dogsUUID = MojangAPIUtil.requestPlayerUUID("Dqgs");
                                     List<TextureProperty> newTextureProperties = MojangAPIUtil.requestPlayerTextureProperties(dogsUUID);
-                                    PacketEvents.getAPI().getNPCManager().changeNPCSkin(npc, TextComponent.builder().text("Dqgs").color(Color.BRIGHT_GREEN).build(), dogsUUID, newTextureProperties);
+                                    PacketEvents.getAPI().getNPCManager().changeNPCSkin(npc, dogsUUID, newTextureProperties);
+
+
 
                                 }, 120L);//120 ticks is 6 seconds
                     }
@@ -123,7 +126,7 @@ public class PacketEventsPlugin extends JavaPlugin {
                     WrapperPlayServerBlockChange bc = new WrapperPlayServerBlockChange(event);
                     Vector3i pos = bc.getBlockPosition();
                     WrappedBlockState state = WrappedBlockState.getByGlobalId(bc.getBlockId());
-                } else if (event.getPacketType() == PacketType.Play.Server.SPAWN_LIVING_ENTITY) {
+                }/* else if (event.getPacketType() == PacketType.Play.Server.SPAWN_LIVING_ENTITY) {
                     WrapperPlayServerSpawnLivingEntity spawnLivingEntity = new WrapperPlayServerSpawnLivingEntity(event);
                     if (spawnLivingEntity.getEntityType().equals(EntityTypes.PIG)) {
                         event.setCancelled(true);
@@ -141,7 +144,7 @@ public class PacketEventsPlugin extends JavaPlugin {
                         npc.setLocation(targetLocation);
                         PacketEvents.getAPI().getNPCManager().spawn(event.getChannel(), npc);
                     }
-                } else if (event.getPacketType() == PacketType.Play.Server.CHAT_MESSAGE) {
+                }*/ else if (event.getPacketType() == PacketType.Play.Server.CHAT_MESSAGE) {
                     WrapperPlayServerChatMessage cm = new WrapperPlayServerChatMessage(event);
                     BaseComponent component = cm.getChatComponent();
                     if (component instanceof TextComponent) {
@@ -179,9 +182,17 @@ public class PacketEventsPlugin extends JavaPlugin {
                         //System.out.println("state: " + state.toString() + ", at " + cd.getColumn().getX() + ":" + cd.getColumn().getZ());
                     }
                 }
+                else if (event.getPacketType()== PacketType.Play.Server.ENTITY_METADATA) {
+                    WrapperPlayServerEntityMetadata m = new WrapperPlayServerEntityMetadata(event);
+                    int entityId = m.getEntityId();
+                    List<EntityData> metadata = m.getEntityMetadata();
+                    for (EntityData data : metadata) {
+                        System.out.println("index: " + data.getIndex() + ", type: " + data.getType().getName() + ", value: " + data.getValue().toString());
+                    }
+                }
             }
         };
-        //PacketEvents.getAPI().getEventManager().registerListener(debugListener);
+        PacketEvents.getAPI().getEventManager().registerListener(debugListener);
     }
 
     @Override

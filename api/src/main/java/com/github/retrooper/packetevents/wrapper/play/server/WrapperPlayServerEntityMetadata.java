@@ -26,7 +26,6 @@ import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 
 import java.util.List;
 
-//TODO Test on 1.18 and look into
 public class WrapperPlayServerEntityMetadata extends PacketWrapper<WrapperPlayServerEntityMetadata> {
     private int entityID;
     private List<EntityData> entityMetadata;
