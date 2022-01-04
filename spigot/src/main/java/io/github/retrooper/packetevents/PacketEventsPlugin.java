@@ -129,7 +129,7 @@ public class PacketEventsPlugin extends JavaPlugin {
                     WrapperPlayServerSpawnLivingEntity spawnLivingEntity = new WrapperPlayServerSpawnLivingEntity(event);
                     if (spawnLivingEntity.getEntityType().equals(EntityTypes.PIG)) {
                         event.setCancelled(true);
-                        /*int entityId = spawnLivingEntity.getEntityId();
+                        int entityId = spawnLivingEntity.getEntityId();
                         UUID uuid = spawnLivingEntity.getEntityUUID();
                         UUID textureUUID = MojangAPIUtil.requestPlayerUUID("md_5");
                         List<TextureProperty> textures = MojangAPIUtil.requestPlayerTextureProperties(textureUUID);
@@ -140,7 +140,7 @@ public class PacketEventsPlugin extends JavaPlugin {
                         Location targetLocation = new Location(spawnLivingEntity.getPosition(), spawnLivingEntity.getYaw(), spawnLivingEntity.getPitch());
                         WrapperPlayServerSpawnPlayer spawnPlayer = new WrapperPlayServerSpawnPlayer(entityId, uuid,
                                 targetLocation);
-                        PacketEvents.getAPI().getPlayerManager().sendPacket(event.getChannel(), spawnPlayer);*/
+                        PacketEvents.getAPI().getPlayerManager().sendPacket(event.getChannel(), spawnPlayer);
                     }
                 } else if (event.getPacketType() == PacketType.Play.Server.CHAT_MESSAGE) {
                     WrapperPlayServerChatMessage cm = new WrapperPlayServerChatMessage(event);
