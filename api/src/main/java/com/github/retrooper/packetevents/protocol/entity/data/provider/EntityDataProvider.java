@@ -226,7 +226,7 @@ public class EntityDataProvider implements DataProvider {
         metadata.add(new EntityData(4, EntityDataTypes.BOOLEAN, silent));
         metadata.add(new EntityData(5, EntityDataTypes.BOOLEAN, !hasGravity));
         metadata.add(new EntityData(6, EntityDataTypes.ENTITY_POSE, pose));
-        metadata.add(new EntityData(7, EntityDataTypes.INT, ticksFrozenInPowderedSnow))
+        metadata.add(new EntityData(7, EntityDataTypes.INT, ticksFrozenInPowderedSnow));
         return metadata;
     }
 
