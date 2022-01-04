@@ -38,6 +38,6 @@ public class UUIDUtil {
     }
 
     public static String toStringWithoutDashes(UUID uuid) {
-        return uuid.toString().replace('-', ' ');
+        return uuid.toString().replace("-", "");
     }
 }

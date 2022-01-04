@@ -97,7 +97,7 @@ public class PacketEventsPlugin extends JavaPlugin {
                         player.sendMessage("Spawning " + name + " with UUID " + uuid.toString());
                         List<TextureProperty> textureProperties = MojangAPIUtil.requestPlayerTextureProperties(uuid);
                         GameProfile profile = new GameProfile(uuid, name, textureProperties);
-                        NPC npc = new NPC(name + "_clone", SpigotReflectionUtil.generateEntityId(), profile);
+                        NPC npc = new NPC(TextComponent.builder().text(name + "_clone").color(Color.RED).build(), SpigotReflectionUtil.generateEntityId(), profile);
                         npc.setLocation(new Location(player.getLocation().getX(), player.getLocation().getY(), player.getLocation().getZ(), player.getLocation().getYaw(), player.getLocation().getPitch()));
                         PacketEvents.getAPI().getNPCManager().spawn(event.getChannel(), npc);
                         player.sendMessage("Successfully spawned " + name);
@@ -107,7 +107,7 @@ public class PacketEventsPlugin extends JavaPlugin {
                                     player.sendMessage("Turning the NPC into you!");
                                     UUID dogsUUID = MojangAPIUtil.requestPlayerUUID("Dqgs");
                                     List<TextureProperty> newTextureProperties = MojangAPIUtil.requestPlayerTextureProperties(dogsUUID);
-                                    PacketEvents.getAPI().getNPCManager().changeNPCSkin(npc, "Dqgs", dogsUUID, newTextureProperties);
+                                    PacketEvents.getAPI().getNPCManager().changeNPCSkin(npc, TextComponent.builder().text("Dqgs").color(Color.BRIGHT_GREEN).build(), dogsUUID, newTextureProperties);
 
                                 }, 120L);//120 ticks is 6 seconds
                     }
@@ -133,14 +133,15 @@ public class PacketEventsPlugin extends JavaPlugin {
                         UUID uuid = spawnLivingEntity.getEntityUUID();
                         UUID textureUUID = MojangAPIUtil.requestPlayerUUID("md_5");
                         List<TextureProperty> textures = MojangAPIUtil.requestPlayerTextureProperties(textureUUID);
-                        GameProfile gp = new GameProfile(uuid, "Player_pig", textures);
-                        WrapperPlayServerPlayerInfo playerInfo = new WrapperPlayServerPlayerInfo(WrapperPlayServerPlayerInfo.Action.ADD_PLAYER, new WrapperPlayServerPlayerInfo.PlayerData(TextComponent.builder().text("Player_pig").color(Color.RED).build(), gp, GameMode.SURVIVAL,
-                                10));
-                        PacketEvents.getAPI().getPlayerManager().sendPacket(event.getChannel(), playerInfo);
+                        //Note, textureUUID must be in the game profile!
+                        GameProfile gp = new GameProfile(textureUUID, "Player_pig", textures);
+                        NPC npc = new NPC(TextComponent.builder().text("Player_pig").color(Color.RED).build(),
+                                entityId, gp);
                         Location targetLocation = new Location(spawnLivingEntity.getPosition(), spawnLivingEntity.getYaw(), spawnLivingEntity.getPitch());
                         WrapperPlayServerSpawnPlayer spawnPlayer = new WrapperPlayServerSpawnPlayer(entityId, uuid,
                                 targetLocation);
-                        PacketEvents.getAPI().getPlayerManager().sendPacket(event.getChannel(), spawnPlayer);
+                        npc.setLocation(targetLocation);
+                        PacketEvents.getAPI().getNPCManager().spawn(event.getChannel(), npc);
                     }
                 } else if (event.getPacketType() == PacketType.Play.Server.CHAT_MESSAGE) {
                     WrapperPlayServerChatMessage cm = new WrapperPlayServerChatMessage(event);

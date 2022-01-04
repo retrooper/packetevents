@@ -18,6 +18,7 @@
 
 package com.github.retrooper.packetevents.manager.npc;
 
+import com.github.retrooper.packetevents.protocol.chat.component.BaseComponent;
 import com.github.retrooper.packetevents.protocol.chat.component.impl.TextComponent;
 import com.github.retrooper.packetevents.protocol.player.GameProfile;
 import com.github.retrooper.packetevents.protocol.player.GameMode;
@@ -25,23 +26,23 @@ import com.github.retrooper.packetevents.protocol.world.Location;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerPlayerInfo;
 
 public class NPC {
-    private String displayName;
+    private BaseComponent displayName;
     private final int id;
     private final GameProfile profile;
     private int displayPing = 0;
     private Location location = new Location(0.0, 0.0, 0.0, 0.0f, 0.0f);
 
-    public NPC(String displayName, int entityId, GameProfile profile) {
+    public NPC(BaseComponent displayName, int entityId, GameProfile profile) {
         this.displayName = displayName;
         this.id = entityId;
         this.profile = profile;
     }
 
-    public String getDisplayName() {
+    public BaseComponent getDisplayName() {
         return displayName;
     }
 
-    public void setDisplayName(String displayName) {
+    public void setDisplayName(BaseComponent displayName) {
         this.displayName = displayName;
     }
 
@@ -54,8 +55,7 @@ public class NPC {
     }
 
     public WrapperPlayServerPlayerInfo.PlayerData getPlayerInfoData() {
-        return new WrapperPlayServerPlayerInfo.PlayerData(TextComponent.
-                builder().text(getDisplayName()).build(),
+        return new WrapperPlayServerPlayerInfo.PlayerData(getDisplayName(),
                 getProfile(), GameMode.SURVIVAL,
                 getDisplayPing());
     }

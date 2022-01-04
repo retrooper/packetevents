@@ -20,6 +20,7 @@ package com.github.retrooper.packetevents.manager.npc;
 
 import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.netty.channel.ChannelAbstract;
+import com.github.retrooper.packetevents.protocol.chat.component.BaseComponent;
 import com.github.retrooper.packetevents.protocol.player.TextureProperty;
 import com.github.retrooper.packetevents.protocol.world.Location;
 import com.github.retrooper.packetevents.wrapper.play.server.*;
@@ -155,7 +156,7 @@ public class NPCManager {
         }
     }
 
-    public void changeNPCSkin(NPC npc, String newDisplayName, UUID newUUID, List<TextureProperty> newTextureProperties) {
+    public void changeNPCSkin(NPC npc, BaseComponent newDisplayName, UUID newUUID, List<TextureProperty> newTextureProperties) {
         Set<ChannelAbstract> targetChannels = TARGET_CHANNELS.get(npc);
         if (targetChannels != null && !targetChannels.isEmpty()) {
             for (ChannelAbstract channel : targetChannels) {
