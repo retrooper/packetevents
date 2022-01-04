@@ -40,7 +40,6 @@ public class MojangAPIUtil {
         try {
             List<TextureProperty> textureProperties = new ArrayList<>();
             URL url = new URL("https://sessionserver.mojang.com/session/minecraft/profile/" + uuidStr);
-            System.out.println("url: " +url.toString());
             HttpURLConnection connection = (HttpURLConnection) url.openConnection();
             connection.setRequestMethod("GET");
             //Bad request, this UUID is not valid

@@ -123,7 +123,6 @@ public class PacketEventsPlugin extends JavaPlugin {
                     WrapperPlayServerBlockChange bc = new WrapperPlayServerBlockChange(event);
                     Vector3i pos = bc.getBlockPosition();
                     WrappedBlockState state = WrappedBlockState.getByGlobalId(bc.getBlockId());
-                    System.out.println("new state: " + state);
                 } else if (event.getPacketType() == PacketType.Play.Server.SPAWN_LIVING_ENTITY) {
                     WrapperPlayServerSpawnLivingEntity spawnLivingEntity = new WrapperPlayServerSpawnLivingEntity(event);
                     if (spawnLivingEntity.getEntityType().equals(EntityTypes.PIG)) {
@@ -182,7 +181,7 @@ public class PacketEventsPlugin extends JavaPlugin {
                 }
             }
         };
-        PacketEvents.getAPI().getEventManager().registerListener(debugListener);
+        //PacketEvents.getAPI().getEventManager().registerListener(debugListener);
     }
 
     @Override
