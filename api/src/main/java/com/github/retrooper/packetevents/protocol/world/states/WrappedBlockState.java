@@ -186,7 +186,7 @@ public class WrappedBlockState {
 
     @Override
     public WrappedBlockState clone() {
-        return new WrappedBlockState(type, data, globalID);
+        return new WrappedBlockState(type, data.clone(), globalID);
     }
 
     @Override
