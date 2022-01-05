@@ -842,8 +842,8 @@ public class WrappedBlockState {
         if (type != StateTypes.AIR && globalID == 0) {
             WrappedBlockState blockState = getByGlobalId(oldGlobalID);
             this.type = blockState.type;
-            this.data = blockState.data;
             this.globalID = blockState.globalID;
+            this.data = blockState.data.clone();
 
             // Stack tracing is expensive
             if (PacketEvents.getAPI().getSettings().isDebugEnabled()) {
