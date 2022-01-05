@@ -29,7 +29,9 @@ import java.util.List;
 import java.util.Optional;
 
 public class EntityDataProvider implements DataProvider {
+    @Nullable
     private BaseComponent customName;
+
     private boolean customNameVisible;
     private EntityPose pose = EntityPose.STANDING;
     private int airTicks = 300;
@@ -226,12 +228,47 @@ public class EntityDataProvider implements DataProvider {
         metadata.add(new EntityData(4, EntityDataTypes.BOOLEAN, silent));
         metadata.add(new EntityData(5, EntityDataTypes.BOOLEAN, !hasGravity));
         metadata.add(new EntityData(6, EntityDataTypes.ENTITY_POSE, pose));
-        metadata.add(new EntityData(7, EntityDataTypes.INT, ticksFrozenInPowderedSnow))
+        metadata.add(new EntityData(7, EntityDataTypes.INT, ticksFrozenInPowderedSnow));
         return metadata;
     }
 
     @Override
     public void decode(List<EntityData> data) {
-
+        for (EntityData entityData : data) {
+            switch (entityData.getIndex()) {
+                case 0:
+                    byte mask = (byte) entityData.getValue();
+                    onFire = (mask & 0x01) != 0;
+                    crouching = (mask & 0x02) != 0;
+                    riding = (mask & 0x04) != 0;
+                    sprinting = (mask & 0x08) != 0;
+                    swimming = (mask & 0x10) != 0;
+                    invisible = (mask & 0x20) != 0;
+                    glowing = (mask & 0x40) != 0;
+                    flyingWithElytra = (mask & 0x80) != 0;
+                    break;
+                case 1:
+                    airTicks = (int) entityData.getValue();
+                    break;
+                case 2:
+                    customName = ((Optional<BaseComponent>) entityData.getValue()).orElse(null);
+                    break;
+                case 3:
+                    customNameVisible = (boolean) entityData.getValue();
+                    break;
+                case 4:
+                    silent = (boolean) entityData.getValue();
+                    break;
+                case 5:
+                    hasGravity = !(boolean) entityData.getValue();
+                    break;
+                case 6:
+                    pose = (EntityPose) entityData.getValue();
+                    break;
+                case 7:
+                    ticksFrozenInPowderedSnow = (int) entityData.getValue();
+                    break;
+            }
+        }
     }
 }

@@ -23,24 +23,42 @@ import com.github.retrooper.packetevents.protocol.entity.data.EntityData;
 import com.github.retrooper.packetevents.protocol.entity.data.EntityDataTypes;
 import com.github.retrooper.packetevents.protocol.entity.pose.EntityPose;
 import com.github.retrooper.packetevents.protocol.player.InteractionHand;
+import com.github.retrooper.packetevents.util.Vector3i;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
+import java.util.Optional;
 
 public class LivingEntityDataProvider extends EntityDataProvider{
     private boolean handActive;
     private InteractionHand hand;
     private boolean isInRiptideSpinAttack;
+    private float health = 1.0f;
+    private int potionEffectColor;
+    private boolean potionEffectAmbient;
+    private int arrowInBodyCount;
+    private int beeStingsInBodyCount;
+    @Nullable
+    private Vector3i sleepingPosition;
     //TODO Finish
     public LivingEntityDataProvider(@Nullable BaseComponent customName, boolean customNameVisible, EntityPose pose,
                                     int airTicks, int ticksFrozenInPowderedSnow, boolean onFire, boolean crouching,
                                     boolean riding, boolean sprinting, boolean swimming, boolean invisible, boolean glowing,
-                                    boolean flyingWithElytra, boolean silent, boolean hasGravity, boolean handActive, InteractionHand hand, boolean isInRiptideSpinAttack) {
+                                    boolean flyingWithElytra, boolean silent, boolean hasGravity, boolean handActive,
+                                    InteractionHand hand, boolean isInRiptideSpinAttack, float health,
+                                    int potionEffectColor, boolean potionEffectAmbient,
+                                    int arrowInBodyCount, int beeStingsInBodyCount, @Nullable Vector3i sleepingPosition) {
         super(customName, customNameVisible, pose, airTicks, ticksFrozenInPowderedSnow, onFire, crouching,
                 riding, sprinting, swimming, invisible, glowing, flyingWithElytra, silent, hasGravity);
         this.handActive = handActive;
         this.hand = hand;
         this.isInRiptideSpinAttack = isInRiptideSpinAttack;
+        this.health = health;
+        this.potionEffectColor = potionEffectColor;
+        this.potionEffectAmbient = potionEffectAmbient;
+        this.arrowInBodyCount = arrowInBodyCount;
+        this.beeStingsInBodyCount = beeStingsInBodyCount;
+        this.sleepingPosition = sleepingPosition;
     }
 
     public boolean isHandActive() {
@@ -67,6 +85,55 @@ public class LivingEntityDataProvider extends EntityDataProvider{
         isInRiptideSpinAttack = inRiptideSpinAttack;
     }
 
+    public float getHealth() {
+        return health;
+    }
+
+    public void setHealth(float health) {
+        this.health = health;
+    }
+
+    public int getPotionEffectColor() {
+        return potionEffectColor;
+    }
+
+    public void setPotionEffectColor(int potionEffectColor) {
+        this.potionEffectColor = potionEffectColor;
+    }
+
+    public boolean isPotionEffectAmbient() {
+        return potionEffectAmbient;
+    }
+
+    public void setPotionEffectAmbient(boolean potionEffectAmbient) {
+        this.potionEffectAmbient = potionEffectAmbient;
+    }
+
+    public int getArrowInBodyCount() {
+        return arrowInBodyCount;
+    }
+
+    public void setArrowInBodyCount(int arrowInBodyCount) {
+        this.arrowInBodyCount = arrowInBodyCount;
+    }
+
+    public int getBeeStingsInBodyCount() {
+        return beeStingsInBodyCount;
+    }
+
+    public void setBeeStingsInBodyCount(int beeStingsInBodyCount) {
+        this.beeStingsInBodyCount = beeStingsInBodyCount;
+    }
+
+    @Nullable
+    public Vector3i getSleepingPosition() {
+        return sleepingPosition;
+    }
+
+    public void setSleepingPosition(@Nullable Vector3i sleepingPosition) {
+        this.sleepingPosition = sleepingPosition;
+    }
+
     @Override
     public List<EntityData> encode() {
         List<EntityData> metadata = super.encode();
@@ -84,13 +151,48 @@ public class LivingEntityDataProvider extends EntityDataProvider{
             mask |= 0x04;
         }
 
+
         metadata.add(new EntityData(8, EntityDataTypes.BYTE, mask));
+        metadata.add(new EntityData(9, EntityDataTypes.FLOAT, health));
+        metadata.add(new EntityData(10, EntityDataTypes.INT, potionEffectColor));
+        metadata.add(new EntityData(11, EntityDataTypes.BOOLEAN, potionEffectAmbient));
+        metadata.add(new EntityData(12, EntityDataTypes.INT, arrowInBodyCount));
+        metadata.add(new EntityData(13, EntityDataTypes.INT, beeStingsInBodyCount));
+        metadata.add(new EntityData(14, EntityDataTypes.OPTIONAL_BLOCK_POSITION, Optional.ofNullable(sleepingPosition)));
         return metadata;
     }
 
     @Override
     public void decode(List<EntityData> data) {
         super.decode(data);
-        //more code
+        for (EntityData entityData : data) {
+            switch (entityData.getIndex()) {
+                case 8:
+                    byte mask = (byte) entityData.getValue();
+                    handActive = (mask & 0x01) != 0;
+                    //TODO Test, look into
+                    hand = (mask & 0x02) != 0 ? InteractionHand.OFF_HAND : InteractionHand.MAIN_HAND;
+                    isInRiptideSpinAttack = (mask & 0x04) != 0;
+                    break;
+                case 9:
+                    health = (float) entityData.getValue();
+                    break;
+                case 10:
+                    potionEffectColor = (int) entityData.getValue();
+                    break;
+                case 11:
+                    potionEffectAmbient = (boolean) entityData.getValue();
+                    break;
+                case 12:
+                    arrowInBodyCount = (int) entityData.getValue();
+                    break;
+                case 13:
+                    beeStingsInBodyCount = (int) entityData.getValue();
+                    break;
+                case 14:
+                    sleepingPosition = ((Optional<Vector3i>)entityData.getValue()).orElse(null);
+                    break;
+            }
+        }
     }
 }
