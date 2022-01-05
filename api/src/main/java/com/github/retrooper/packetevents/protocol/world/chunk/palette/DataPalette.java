@@ -148,10 +148,7 @@ public class DataPalette {
         this.storage = new BitStorage(bitsPerEntry, paletteType.getStorageSize());
 
         if (oldPalette instanceof SingletonPalette) {
-            for (int i = 0; i < paletteType.getStorageSize(); i++) {
-                // TODO necessary?
-                this.storage.set(i, 0);
-            }
+            this.palette.stateToId(oldPalette.idToState(0));
         } else {
             for (int i = 0; i < paletteType.getStorageSize(); i++) {
                 this.storage.set(i, this.palette.stateToId(oldPalette.idToState(oldData.get(i))));

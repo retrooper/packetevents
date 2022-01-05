@@ -15,10 +15,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.util.EnumMap;
-import java.util.HashMap;
-import java.util.Locale;
-import java.util.Map;
+import java.util.*;
 
 /**
  * This class is designed to take advantage of modern minecraft versions
@@ -85,7 +82,7 @@ public class WrappedBlockState {
             PacketEvents.getAPI().getLogger().warning("Default state for " + type + " is null. Returning AIR");
             return AIR;
         }
-        return state;
+        return state.clone();
     }
 
     private static String getModernJsonPath(ServerVersion serverVersion) {
@@ -186,7 +183,7 @@ public class WrappedBlockState {
 
     @Override
     public WrappedBlockState clone() {
-        return new WrappedBlockState(type, data, globalID);
+        return new WrappedBlockState(type, data.clone(), globalID);
     }
 
     @Override
@@ -194,12 +191,14 @@ public class WrappedBlockState {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         WrappedBlockState that = (WrappedBlockState) o;
-        return globalID == that.globalID;
+        // Don't check the global ID, it is determined by the other data types
+        return type == that.type && data.equals(that.data);
     }
 
     @Override
     public int hashCode() {
-        return globalID;
+        // Don't hash the global ID, it is determined by the other data types
+        return Objects.hash(type, data);
     }
 
     public StateType getType() {
@@ -842,8 +841,8 @@ public class WrappedBlockState {
         if (type != StateTypes.AIR && globalID == 0) {
             WrappedBlockState blockState = getByGlobalId(oldGlobalID);
             this.type = blockState.type;
-            this.data = blockState.data;
             this.globalID = blockState.globalID;
+            this.data = blockState.data.clone();
 
             // Stack tracing is expensive
             if (PacketEvents.getAPI().getSettings().isDebugEnabled()) {
