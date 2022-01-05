@@ -19,25 +19,34 @@
 package com.github.retrooper.packetevents.wrapper.play.client;
 
 import com.github.retrooper.packetevents.event.impl.PacketReceiveEvent;
+import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.protocol.packettype.PacketTypeCommon;
+import com.github.retrooper.packetevents.protocol.world.Location;
+import com.github.retrooper.packetevents.util.Vector3d;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 
-public class WrapperPlayClientPlayerFlying<T extends WrapperPlayClientPlayerFlying<?>> extends PacketWrapper<T> {
+public class WrapperPlayClientPlayerFlying extends PacketWrapper<WrapperPlayClientPlayerFlying> {
+    private boolean positionChanged;
+    private boolean rotationChanged;
+    private Location location;
     private boolean onGround;
 
     public WrapperPlayClientPlayerFlying(PacketReceiveEvent event) {
         super(event);
+        positionChanged = event.getPacketType() == PacketType.Play.Client.PLAYER_POSITION ||
+                event.getPacketType() == PacketType.Play.Client.PLAYER_POSITION_AND_ROTATION;
+        rotationChanged = event.getPacketType() == PacketType.Play.Client.PLAYER_ROTATION ||
+                event.getPacketType() == PacketType.Play.Client.PLAYER_POSITION_AND_ROTATION;
     }
 
-    public WrapperPlayClientPlayerFlying(boolean onGround) {
-        super(PacketType.Play.Client.PLAYER_FLYING);
+    public WrapperPlayClientPlayerFlying(boolean positionChanged, boolean rotationChanged, boolean onGround, Location location) {
+        super((positionChanged && rotationChanged) ? PacketType.Play.Client.PLAYER_FLYING :
+                (positionChanged ? PacketType.Play.Client.PLAYER_POSITION : PacketType.Play.Client.PLAYER_ROTATION));
+        this.positionChanged = positionChanged;
+        this.rotationChanged = rotationChanged;
         this.onGround = onGround;
-    }
-
-    public WrapperPlayClientPlayerFlying(PacketTypeCommon type, boolean onGround) {
-        super(type);
-        this.onGround = onGround;
+        this.location = location;
     }
 
     //TODO Rethink, should this be somewhere else?
@@ -50,17 +59,62 @@ public class WrapperPlayClientPlayerFlying<T extends WrapperPlayClientPlayerFlyi
 
     @Override
     public void readData() {
+        Vector3d position = new Vector3d();
+        float yaw = 0.0f;
+        float pitch = 0.0f;
+        if (positionChanged) {
+            double x = readDouble();
+            double y = readDouble();
+            if (serverVersion == ServerVersion.V_1_7_10) {
+                //Can be ignored, cause stance = (y + 1.62)
+                double stance = readDouble();
+            }
+            double z = readDouble();
+            position.setX(x);
+            position.setY(y);
+            position.setZ(z);
+        }
+        if (rotationChanged) {
+            yaw = readFloat();
+            pitch = readFloat();
+        }
+        location = new Location(position, yaw, pitch);
         onGround = readBoolean();
     }
 
     @Override
     public void readData(WrapperPlayClientPlayerFlying wrapper) {
+        setPacketId(wrapper.getPacketId());
+        positionChanged = wrapper.positionChanged;
+        rotationChanged = wrapper.rotationChanged;
+        location = wrapper.location;
         onGround = wrapper.onGround;
     }
 
     @Override
     public void writeData() {
+        if (positionChanged) {
+            writeDouble(location.getPosition().getX());
+            if (serverVersion == ServerVersion.V_1_7_10) {
+                //Can be ignored, cause stance = (y + 1.62)
+                writeDouble(location.getPosition().getY() + 1.62);
+            }
+            writeDouble(location.getPosition().getY());
+            writeDouble(location.getPosition().getZ());
+        }
+        if (rotationChanged) {
+            writeFloat(location.getYaw());
+            writeFloat(location.getPitch());
+        }
         writeBoolean(onGround);
+    }
+
+    public Location getLocation() {
+        return location;
+    }
+
+    public void setLocation(Location location) {
+        this.location = location;
     }
 
     public boolean isOnGround() {

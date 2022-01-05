@@ -20,39 +20,42 @@ package com.github.retrooper.packetevents.wrapper.play.client;
 
 import com.github.retrooper.packetevents.event.impl.PacketReceiveEvent;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
+import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 
-public class WrapperPlayClientPlayerRotation extends WrapperPlayClientPlayerFlying<WrapperPlayClientPlayerRotation> {
+public class WrapperPlayClientPlayerRotation extends PacketWrapper<WrapperPlayClientPlayerRotation> {
     private float yaw;
     private float pitch;
+    private boolean onGround;
     public WrapperPlayClientPlayerRotation(PacketReceiveEvent event) {
         super(event);
     }
 
     public WrapperPlayClientPlayerRotation(float yaw, float pitch, boolean onGround) {
-        super(PacketType.Play.Client.PLAYER_ROTATION, onGround);
+        super(PacketType.Play.Client.PLAYER_ROTATION);
         this.yaw = yaw;
         this.pitch = pitch;
+        this.onGround = onGround;
     }
 
     @Override
     public void readData() {
         yaw = readFloat();
         pitch = readFloat();
-        super.readData();
+        onGround = readBoolean();
     }
 
     @Override
     public void readData(WrapperPlayClientPlayerRotation wrapper) {
         yaw = wrapper.yaw;
         pitch = wrapper.pitch;
-        super.readData(wrapper);
+        onGround = wrapper.onGround;
     }
 
     @Override
     public void writeData() {
         writeFloat(yaw);
         writeFloat(pitch);
-        super.writeData();
+        writeBoolean(onGround);
     }
 
     public float getYaw() {
@@ -69,5 +72,13 @@ public class WrapperPlayClientPlayerRotation extends WrapperPlayClientPlayerFlyi
 
     public void setPitch(float pitch) {
         this.pitch = pitch;
+    }
+
+    public boolean isOnGround() {
+        return onGround;
+    }
+
+    public void setOnGround(boolean onGround) {
+        this.onGround = onGround;
     }
 }

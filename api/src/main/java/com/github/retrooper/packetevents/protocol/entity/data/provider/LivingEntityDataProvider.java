@@ -18,10 +18,8 @@
 
 package com.github.retrooper.packetevents.protocol.entity.data.provider;
 
-import com.github.retrooper.packetevents.protocol.chat.component.BaseComponent;
 import com.github.retrooper.packetevents.protocol.entity.data.EntityData;
 import com.github.retrooper.packetevents.protocol.entity.data.EntityDataTypes;
-import com.github.retrooper.packetevents.protocol.entity.pose.EntityPose;
 import com.github.retrooper.packetevents.protocol.player.InteractionHand;
 import com.github.retrooper.packetevents.util.Vector3i;
 import org.jetbrains.annotations.Nullable;
@@ -29,7 +27,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.List;
 import java.util.Optional;
 
-public class LivingEntityDataProvider extends EntityDataProvider{
+public class LivingEntityDataProvider extends EntityDataProvider {
     private boolean handActive;
     private InteractionHand hand;
     private boolean isInRiptideSpinAttack;
@@ -40,26 +38,7 @@ public class LivingEntityDataProvider extends EntityDataProvider{
     private int beeStingsInBodyCount;
     @Nullable
     private Vector3i sleepingPosition;
-    //TODO Finish
-    public LivingEntityDataProvider(@Nullable BaseComponent customName, boolean customNameVisible, EntityPose pose,
-                                    int airTicks, int ticksFrozenInPowderedSnow, boolean onFire, boolean crouching,
-                                    boolean riding, boolean sprinting, boolean swimming, boolean invisible, boolean glowing,
-                                    boolean flyingWithElytra, boolean silent, boolean hasGravity, boolean handActive,
-                                    InteractionHand hand, boolean isInRiptideSpinAttack, float health,
-                                    int potionEffectColor, boolean potionEffectAmbient,
-                                    int arrowInBodyCount, int beeStingsInBodyCount, @Nullable Vector3i sleepingPosition) {
-        super(customName, customNameVisible, pose, airTicks, ticksFrozenInPowderedSnow, onFire, crouching,
-                riding, sprinting, swimming, invisible, glowing, flyingWithElytra, silent, hasGravity);
-        this.handActive = handActive;
-        this.hand = hand;
-        this.isInRiptideSpinAttack = isInRiptideSpinAttack;
-        this.health = health;
-        this.potionEffectColor = potionEffectColor;
-        this.potionEffectAmbient = potionEffectAmbient;
-        this.arrowInBodyCount = arrowInBodyCount;
-        this.beeStingsInBodyCount = beeStingsInBodyCount;
-        this.sleepingPosition = sleepingPosition;
-    }
+
 
     public boolean isHandActive() {
         return handActive;
@@ -134,6 +113,10 @@ public class LivingEntityDataProvider extends EntityDataProvider{
         this.sleepingPosition = sleepingPosition;
     }
 
+    public static Builder builder() {
+        return new Builder<>(new LivingEntityDataProvider());
+    }
+
     @Override
     public List<EntityData> encode() {
         List<EntityData> metadata = super.encode();
@@ -190,9 +173,64 @@ public class LivingEntityDataProvider extends EntityDataProvider{
                     beeStingsInBodyCount = (int) entityData.getValue();
                     break;
                 case 14:
-                    sleepingPosition = ((Optional<Vector3i>)entityData.getValue()).orElse(null);
+                    sleepingPosition = ((Optional<Vector3i>) entityData.getValue()).orElse(null);
                     break;
             }
+        }
+    }
+
+    public static class Builder<T extends Builder, K extends LivingEntityDataProvider> extends EntityDataProvider.Builder<T, K> {
+        public Builder(K livingEntityDataProvider) {
+            super(livingEntityDataProvider);
+        }
+
+        public T handActive(boolean handActive) {
+            provider.setHandActive(handActive);
+            return (T) this;
+        }
+
+        public T hand(InteractionHand hand) {
+            provider.setHand(hand);
+            return (T) this;
+        }
+
+        public T isInRiptideSpinAttack(boolean isInRiptideSpinAttack) {
+            provider.setInRiptideSpinAttack(isInRiptideSpinAttack);
+            return (T) this;
+        }
+
+        public T health(float health) {
+            provider.setHealth(health);
+            return (T) this;
+        }
+
+        public T potionEffectColor(int potionEffectColor) {
+            provider.setPotionEffectColor(potionEffectColor);
+            return (T) this;
+        }
+
+        public T potionEffectAmbient(boolean potionEffectAmbient) {
+            provider.setPotionEffectAmbient(potionEffectAmbient);
+            return (T) this;
+        }
+
+        public T arrowInBodyCount(int arrowInBodyCount) {
+            provider.setArrowInBodyCount(arrowInBodyCount);
+            return (T) this;
+        }
+
+        public T beeStingsInBodyCount(int beeStingsInBodyCount) {
+            provider.setBeeStingsInBodyCount(beeStingsInBodyCount);
+            return (T) this;
+        }
+
+        public T sleepingPosition(@Nullable Vector3i sleepingPosition) {
+            provider.setSleepingPosition(sleepingPosition);
+            return (T) this;
+        }
+
+        public K build() {
+            return provider;
         }
     }
 }

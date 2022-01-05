@@ -52,7 +52,7 @@ public class PacketWrapper<T extends PacketWrapper> {
     public final ByteBufAbstract buffer;
     protected ClientVersion clientVersion;
     protected ServerVersion serverVersion;
-    private final int packetID;
+    private int packetID;
     private boolean hasPreparedForSending;
 
     private static final int MODERN_MESSAGE_LENGTH = 262144;
@@ -160,6 +160,10 @@ public class PacketWrapper<T extends PacketWrapper> {
 
     public int getPacketId() {
         return packetID;
+    }
+
+    public void setPacketId(int packetID) {
+        this.packetID = packetID;
     }
 
     public int getMaxMessageLength() {

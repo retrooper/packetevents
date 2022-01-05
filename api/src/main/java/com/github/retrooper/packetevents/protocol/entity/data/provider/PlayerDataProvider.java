@@ -25,10 +25,12 @@ import com.github.retrooper.packetevents.protocol.entity.pose.EntityPose;
 import com.github.retrooper.packetevents.protocol.nbt.NBTCompound;
 import com.github.retrooper.packetevents.protocol.player.HumanoidArm;
 import com.github.retrooper.packetevents.protocol.player.InteractionHand;
+import com.github.retrooper.packetevents.protocol.player.SkinSection;
 import com.github.retrooper.packetevents.util.Vector3i;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
+import java.util.Set;
 
 public class PlayerDataProvider extends LivingEntityDataProvider {
     private float additionalHealth;
@@ -37,27 +39,6 @@ public class PlayerDataProvider extends LivingEntityDataProvider {
     private HumanoidArm mainArm;
     private NBTCompound leftShoulderNBT;
     private NBTCompound rightShoulderNBT;
-
-    public PlayerDataProvider(@Nullable BaseComponent customName, boolean customNameVisible, EntityPose pose, int airTicks,
-                              int ticksFrozenInPowderedSnow, boolean onFire, boolean crouching, boolean riding,
-                              boolean sprinting, boolean swimming, boolean invisible, boolean glowing, boolean flyingWithElytra,
-                              boolean silent, boolean hasGravity, boolean handActive, InteractionHand hand,
-                              boolean isInRiptideSpinAttack, float health, int potionEffectColor,
-                              boolean potionEffectAmbient, int arrowInBodyCount, int beeStingsInBodyCount,
-                              @Nullable Vector3i sleepingPosition, float additionalHealth, int score,
-                              byte skinPartsMask, HumanoidArm mainArm, NBTCompound leftShoulderNBT, NBTCompound rightShoulderNBT) {
-        super(customName, customNameVisible, pose, airTicks, ticksFrozenInPowderedSnow, onFire,
-                crouching, riding, sprinting, swimming, invisible, glowing, flyingWithElytra,
-                silent, hasGravity, handActive, hand, isInRiptideSpinAttack, health, potionEffectColor,
-                potionEffectAmbient, arrowInBodyCount, beeStingsInBodyCount, sleepingPosition);
-        this.additionalHealth = additionalHealth;
-        this.score = score;
-        this.skinPartsMask = skinPartsMask;
-        this.mainArm = mainArm;
-        this.leftShoulderNBT = leftShoulderNBT;
-        this.rightShoulderNBT = rightShoulderNBT;
-
-    }
 
     public float getAdditionalHealth() {
         return additionalHealth;
@@ -107,15 +88,19 @@ public class PlayerDataProvider extends LivingEntityDataProvider {
         this.rightShoulderNBT = rightShoulderNBT;
     }
 
+    public static Builder builder() {
+        return new Builder(new PlayerDataProvider());
+    }
+
     @Override
     public List<EntityData> encode() {
         List<EntityData> metadata = super.encode();
         metadata.add(new EntityData(15, EntityDataTypes.FLOAT, additionalHealth));
         metadata.add(new EntityData(16, EntityDataTypes.INT, score));
         metadata.add(new EntityData(17, EntityDataTypes.BYTE, skinPartsMask));
-        metadata.add(new EntityData(18, EntityDataTypes.BYTE, (byte)mainArm.ordinal()));
+        metadata.add(new EntityData(18, EntityDataTypes.BYTE, (byte) mainArm.ordinal()));
         metadata.add(new EntityData(19, EntityDataTypes.NBT, leftShoulderNBT));
-        metadata.add(new EntityData(19, EntityDataTypes.NBT, rightShoulderNBT));
+        metadata.add(new EntityData(20, EntityDataTypes.NBT, rightShoulderNBT));
         return metadata;
     }
 
@@ -143,6 +128,51 @@ public class PlayerDataProvider extends LivingEntityDataProvider {
                     rightShoulderNBT = (NBTCompound) entityData.getValue();
                     break;
             }
+        }
+    }
+
+    public static class Builder<K extends PlayerDataProvider> extends LivingEntityDataProvider.Builder<Builder, PlayerDataProvider> {
+        public Builder(PlayerDataProvider entityDataProvider) {
+            super(entityDataProvider);
+        }
+
+        public Builder additionalHealth(float additionalHealth) {
+            provider.setAdditionalHealth(additionalHealth);
+            return this;
+        }
+
+        public Builder score(int score) {
+            provider.setScore(score);
+            return this;
+        }
+
+        public Builder skinPartsMask(byte skinPartsMask) {
+            provider.setSkinPartsMask(skinPartsMask);
+            return this;
+        }
+
+        public Builder skinParts(Set<SkinSection> skinSections) {
+            provider.setSkinPartsMask(SkinSection.getMaskBySections(skinSections));
+            return this;
+        }
+
+        public Builder mainArm(HumanoidArm mainArm) {
+            provider.setMainArm(mainArm);
+            return this;
+        }
+
+        public Builder leftShoulderNBT(NBTCompound leftShoulderNBT) {
+            provider.setLeftShoulderNBT(leftShoulderNBT);
+            return this;
+        }
+
+        public Builder rightShoulderNBT(NBTCompound rightShoulderNBT) {
+            provider.setRightShoulderNBT(rightShoulderNBT);
+            return this;
+        }
+
+        public PlayerDataProvider build() {
+            return provider;
         }
     }
 }

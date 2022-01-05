@@ -27,11 +27,14 @@ import com.github.retrooper.packetevents.protocol.chat.Color;
 import com.github.retrooper.packetevents.protocol.chat.component.BaseComponent;
 import com.github.retrooper.packetevents.protocol.chat.component.impl.TextComponent;
 import com.github.retrooper.packetevents.protocol.chat.component.impl.TranslatableComponent;
-import com.github.retrooper.packetevents.protocol.entity.data.EntityData;
-import com.github.retrooper.packetevents.protocol.entity.type.EntityTypes;
+import com.github.retrooper.packetevents.protocol.entity.data.provider.LivingEntityDataProvider;
+import com.github.retrooper.packetevents.protocol.entity.data.provider.PlayerDataProvider;
+import com.github.retrooper.packetevents.protocol.entity.pose.EntityPose;
 import com.github.retrooper.packetevents.protocol.item.ItemStack;
+import com.github.retrooper.packetevents.protocol.nbt.NBTCompound;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.protocol.player.GameProfile;
+import com.github.retrooper.packetevents.protocol.player.HumanoidArm;
 import com.github.retrooper.packetevents.protocol.player.InteractionHand;
 import com.github.retrooper.packetevents.protocol.player.TextureProperty;
 import com.github.retrooper.packetevents.protocol.world.Location;
@@ -108,7 +111,14 @@ public class PacketEventsPlugin extends JavaPlugin {
                                     UUID dogsUUID = MojangAPIUtil.requestPlayerUUID("Dqgs");
                                     List<TextureProperty> newTextureProperties = MojangAPIUtil.requestPlayerTextureProperties(dogsUUID);
                                     PacketEvents.getAPI().getNPCManager().changeNPCSkin(npc, dogsUUID, newTextureProperties);
-
+                                    PlayerDataProvider playerDataProvider =
+                                            PlayerDataProvider.builder().invisible(true)
+                                                    .pose(EntityPose.CROUCHING)
+                                                    .crouching(true)
+                                                    .build();
+                                    WrapperPlayServerEntityMetadata metadataPacket = new WrapperPlayServerEntityMetadata(npc.getId(),
+                                            playerMetadataProvider.encode());
+                                    PacketEvents.getAPI().getPlayerManager().sendPacket(event.getChannel(), metadataPacket);
 
 
                                 }, 120L);//120 ticks is 6 seconds
@@ -121,7 +131,6 @@ public class PacketEventsPlugin extends JavaPlugin {
                 Player player = event.getPlayer() == null ? null : (Player) event.getPlayer();
                 //TODO Fix hoverEvent contents/value when its a component i believe
                 //TODO Work on copying styling properly from children components
-
                 if (event.getPacketType() == PacketType.Play.Server.BLOCK_CHANGE) {
                     WrapperPlayServerBlockChange bc = new WrapperPlayServerBlockChange(event);
                     Vector3i pos = bc.getBlockPosition();
@@ -180,14 +189,6 @@ public class PacketEventsPlugin extends JavaPlugin {
                     for (BaseChunk chunk : cd.getColumn().getChunks()) {
                         WrappedBlockState state = chunk.get(0, 0, 0);
                         //System.out.println("state: " + state.toString() + ", at " + cd.getColumn().getX() + ":" + cd.getColumn().getZ());
-                    }
-                }
-                else if (event.getPacketType()== PacketType.Play.Server.ENTITY_METADATA) {
-                    WrapperPlayServerEntityMetadata m = new WrapperPlayServerEntityMetadata(event);
-                    int entityId = m.getEntityId();
-                    List<EntityData> metadata = m.getEntityMetadata();
-                    for (EntityData data : metadata) {
-                        System.out.println("index: " + data.getIndex() + ", type: " + data.getType().getName() + ", value: " + data.getValue().toString());
                     }
                 }
             }

@@ -33,8 +33,8 @@ public class EntityDataProvider implements DataProvider {
     private BaseComponent customName;
 
     private boolean customNameVisible;
-    private EntityPose pose = EntityPose.STANDING;
-    private int airTicks = 300;
+    private EntityPose pose;
+    private int airTicks;
     private int ticksFrozenInPowderedSnow = 0;
     private boolean onFire;
     private boolean crouching;
@@ -48,28 +48,6 @@ public class EntityDataProvider implements DataProvider {
     private boolean flyingWithElytra;
     private boolean silent;
     private boolean hasGravity;
-
-
-    public EntityDataProvider(@Nullable BaseComponent customName, boolean customNameVisible, EntityPose pose,
-                              int airTicks, int ticksFrozenInPowderedSnow, boolean onFire, boolean crouching,
-                              boolean riding, boolean sprinting, boolean swimming, boolean invisible,
-                              boolean glowing, boolean flyingWithElytra, boolean silent, boolean hasGravity) {
-        this.customName = customName;
-        this.customNameVisible = customNameVisible;
-        this.pose = pose;
-        this.airTicks = airTicks;
-        this.ticksFrozenInPowderedSnow = ticksFrozenInPowderedSnow;
-        this.onFire = onFire;
-        this.crouching = crouching;
-        this.riding = riding;
-        this.sprinting = sprinting;
-        this.swimming = swimming;
-        this.invisible = invisible;
-        this.glowing = glowing;
-        this.flyingWithElytra = flyingWithElytra;
-        this.silent = silent;
-        this.hasGravity = hasGravity;
-    }
 
     @Nullable
     public BaseComponent getCustomName() {
@@ -269,6 +247,97 @@ public class EntityDataProvider implements DataProvider {
                     ticksFrozenInPowderedSnow = (int) entityData.getValue();
                     break;
             }
+        }
+    }
+
+    public static Builder<Builder, EntityDataProvider> builder() {
+        return new Builder<>(new EntityDataProvider());
+    }
+
+    public static class Builder<T extends Builder, K extends EntityDataProvider> {
+        protected K provider;
+
+        public Builder(K provider) {
+            this.provider = provider;
+        }
+
+        public T customName(@Nullable BaseComponent customName) {
+            provider.setCustomName(customName);
+            return (T) this;
+        }
+
+        public T customNameVisible(boolean customNameVisible) {
+            provider.setCustomNameVisible(customNameVisible);
+            return (T) this;
+        }
+
+        public T pose(EntityPose pose) {
+            provider.setPose(pose);
+            return (T) this;
+        }
+
+        public T onFire(boolean onFire) {
+            provider.setOnFire(onFire);
+            return (T) this;
+        }
+
+        public T crouching(boolean crouching) {
+            provider.setCrouching(crouching);
+            return (T) this;
+        }
+
+        public T riding(boolean riding) {
+            provider.setRiding(riding);
+            return (T) this;
+        }
+
+        public T sprinting(boolean sprinting) {
+            provider.setSprinting(sprinting);
+            return (T) this;
+        }
+
+        public T swimming(boolean swimming) {
+            provider.setSwimming(swimming);
+            return (T) this;
+        }
+
+        public T invisible(boolean invisible) {
+            provider.setInvisible(invisible);
+            return (T) this;
+        }
+
+        public T glowing(boolean glowing) {
+            provider.setGlowing(glowing);
+            return (T) this;
+        }
+
+        public T flyingWithElytra(boolean flyingWithElytra) {
+            provider.setFlyingWithElytra(flyingWithElytra);
+            return (T) this;
+        }
+
+        public T silent(boolean silent) {
+            provider.setSilent(silent);
+            return (T) this;
+        }
+
+        public T hasGravity(boolean hasGravity) {
+            provider.setHasGravity(hasGravity);
+            return (T) this;
+        }
+
+        public T airTicks(int airTicks) {
+            provider.setAirTicks(airTicks);
+            return (T) this;
+        }
+
+        public T ticksFrozenInPowderedSnow(int ticksFrozenInPowderedSnow) {
+            provider.setTicksFrozenInPowderedSnow(ticksFrozenInPowderedSnow);
+            return (T) this;
+        }
+
+        public K build() {
+            return provider;
         }
     }
 }

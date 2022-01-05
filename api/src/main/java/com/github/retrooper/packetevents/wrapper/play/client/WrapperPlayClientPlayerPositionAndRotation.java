@@ -23,28 +23,32 @@ import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.protocol.world.Location;
 import com.github.retrooper.packetevents.util.Vector3d;
+import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 
-public class WrapperPlayClientPlayerPositionAndRotation extends WrapperPlayClientPlayerFlying<WrapperPlayClientPlayerPositionAndRotation> {
+public class WrapperPlayClientPlayerPositionAndRotation extends PacketWrapper<WrapperPlayClientPlayerPositionAndRotation> {
     private Vector3d position;
     private float yaw;
     private float pitch;
+    private boolean onGround;
 
     public WrapperPlayClientPlayerPositionAndRotation(PacketReceiveEvent event) {
         super(event);
     }
 
     public WrapperPlayClientPlayerPositionAndRotation(Vector3d position, float yaw, float pitch, boolean onGround) {
-        super(PacketType.Play.Client.PLAYER_POSITION_AND_ROTATION, onGround);
+        super(PacketType.Play.Client.PLAYER_POSITION_AND_ROTATION);
         this.position = position;
         this.yaw = yaw;
         this.pitch = pitch;
+        this.onGround = onGround;
     }
 
     public WrapperPlayClientPlayerPositionAndRotation(Location location, boolean onGround) {
-        super(PacketType.Play.Client.PLAYER_POSITION_AND_ROTATION, onGround);
+        super(PacketType.Play.Client.PLAYER_POSITION_AND_ROTATION);
         this.position = location.getPosition();
         this.yaw = location.getYaw();
         this.pitch = location.getPitch();
+        this.onGround = onGround;
     }
 
     @Override
@@ -59,7 +63,7 @@ public class WrapperPlayClientPlayerPositionAndRotation extends WrapperPlayClien
         position = new Vector3d(x, y, z);
         yaw = readFloat();
         pitch = readFloat();
-        super.readData();
+        onGround = readBoolean();
     }
 
     @Override
@@ -67,7 +71,7 @@ public class WrapperPlayClientPlayerPositionAndRotation extends WrapperPlayClien
         position = wrapper.position;
         yaw = wrapper.yaw;
         pitch = wrapper.pitch;
-        super.readData(wrapper);
+        onGround = wrapper.onGround;
     }
 
     @Override
@@ -80,7 +84,7 @@ public class WrapperPlayClientPlayerPositionAndRotation extends WrapperPlayClien
         writeDouble(position.z);
         writeFloat(yaw);
         writeFloat(pitch);
-        super.writeData();
+        writeBoolean(onGround);
     }
 
     public Vector3d getPosition() {
@@ -105,5 +109,13 @@ public class WrapperPlayClientPlayerPositionAndRotation extends WrapperPlayClien
 
     public void setPitch(float pitch) {
         this.pitch = pitch;
+    }
+
+    public boolean isOnGround() {
+        return onGround;
+    }
+
+    public void setOnGround(boolean onGround) {
+        this.onGround = onGround;
     }
 }

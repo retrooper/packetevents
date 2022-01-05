@@ -22,17 +22,20 @@ import com.github.retrooper.packetevents.event.impl.PacketReceiveEvent;
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.util.Vector3d;
+import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 
-public class WrapperPlayClientPlayerPosition extends WrapperPlayClientPlayerFlying<WrapperPlayClientPlayerPosition> {
+public class WrapperPlayClientPlayerPosition extends PacketWrapper<WrapperPlayClientPlayerPosition> {
     private Vector3d position;
+    private boolean onGround;
 
     public WrapperPlayClientPlayerPosition(PacketReceiveEvent event) {
         super(event);
     }
 
     public WrapperPlayClientPlayerPosition(Vector3d position, boolean onGround) {
-        super(PacketType.Play.Client.PLAYER_POSITION, onGround);
+        super(PacketType.Play.Client.PLAYER_POSITION);
         this.position = position;
+        this.onGround = onGround;
     }
 
     @Override
@@ -45,13 +48,13 @@ public class WrapperPlayClientPlayerPosition extends WrapperPlayClientPlayerFlyi
         }
         double z = readDouble();
         position = new Vector3d(x, y, z);
-        super.readData();
+        onGround = readBoolean();
     }
 
     @Override
     public void readData(WrapperPlayClientPlayerPosition wrapper) {
         position = wrapper.position;
-        super.readData(wrapper);
+        onGround = wrapper.onGround;
     }
 
     @Override
@@ -62,7 +65,7 @@ public class WrapperPlayClientPlayerPosition extends WrapperPlayClientPlayerFlyi
             writeDouble(position.y + 1.62);
         }
         writeDouble(position.z);
-        super.writeData();
+        writeBoolean(onGround);
     }
 
     public Vector3d getPosition() {
@@ -71,5 +74,13 @@ public class WrapperPlayClientPlayerPosition extends WrapperPlayClientPlayerFlyi
 
     public void setPosition(Vector3d position) {
         this.position = position;
+    }
+
+    public boolean isOnGround() {
+        return onGround;
+    }
+
+    public void setOnGround(boolean onGround) {
+        this.onGround = onGround;
     }
 }

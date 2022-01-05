@@ -21,6 +21,7 @@ package com.github.retrooper.packetevents.wrapper.play.client;
 import com.github.retrooper.packetevents.event.impl.PacketReceiveEvent;
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.protocol.player.HumanoidArm;
+import com.github.retrooper.packetevents.protocol.player.SkinSection;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 
@@ -44,34 +45,6 @@ public class WrapperPlayClientSettings extends PacketWrapper<WrapperPlayClientSe
         FULL, SYSTEM, HIDDEN;
 
         public static final ChatVisibility[] VALUES = values();
-    }
-
-    public enum SkinSection {
-        CAPE(0x01),
-
-        JACKET(0x02),
-
-        LEFT_SLEEVE(0x04),
-
-        RIGHT_SLEEVE(0x08),
-
-        LEFT_PANTS(0x10),
-
-        RIGHT_PANTS(0x20),
-
-        HAT(0x40);
-
-        public static final SkinSection[] VALUES = values();
-
-        final byte maskFlag;
-
-        SkinSection(int maskFlag) {
-            this.maskFlag = (byte) maskFlag;
-        }
-
-        public static boolean isSectionPresent(byte mask, SkinSection section) {
-            return (mask & section.maskFlag) != 0;
-        }
     }
 
     public WrapperPlayClientSettings(PacketReceiveEvent event) {
@@ -106,7 +79,7 @@ public class WrapperPlayClientSettings extends PacketWrapper<WrapperPlayClientSe
             //We use this for the skin sections
             boolean showCape = readBoolean();
             if (showCape) {
-                visibleSkinSectionMask = SkinSection.CAPE.maskFlag;
+                visibleSkinSectionMask = SkinSection.CAPE.getMaskFlag();
             }
         }
         else {
@@ -223,21 +196,11 @@ public class WrapperPlayClientSettings extends PacketWrapper<WrapperPlayClientSe
 
     public Set<SkinSection> getVisibleSkinSections() {
         byte mask = getVisibleSkinSectionMask();
-        Set<SkinSection> visibleSkinSections = new HashSet<>();
-        for (SkinSection skinSection : SkinSection.VALUES) {
-            if (SkinSection.isSectionPresent(mask, skinSection)) {
-                visibleSkinSections.add(skinSection);
-            }
-        }
-        return visibleSkinSections;
+        return SkinSection.getSectionsByMask(mask);
     }
 
     public void setVisibleSkinSections(Set<SkinSection> visibleSkinSections) {
-        byte mask = 0x00;
-        for (SkinSection skinSection : visibleSkinSections) {
-            mask |= skinSection.maskFlag;
-        }
-        setVisibleSkinSectionMask(mask);
+        this.visibleSkinSectionMask = SkinSection.getMaskBySections(visibleSkinSections);
     }
 
     public HumanoidArm getMainHand() {

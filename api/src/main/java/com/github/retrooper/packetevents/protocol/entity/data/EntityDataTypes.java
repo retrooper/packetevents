@@ -202,10 +202,10 @@ public class EntityDataTypes {
     private static <T> BiConsumer<PacketWrapper<?>, T> writeOptionalComponentSerializer() {
         return (PacketWrapper<?> wrapper, T value) -> {
             if (value instanceof Optional) {
-                Optional<?> optional = (Optional<?>) value;
+                Optional<BaseComponent> optional = (Optional<BaseComponent>) value;
                 if (optional.isPresent()) {
                     wrapper.writeBoolean(true);
-                    wrapper.writeComponent((BaseComponent) optional.get());
+                    wrapper.writeComponent(optional.get());
                 } else {
                     wrapper.writeBoolean(false);
                 }
