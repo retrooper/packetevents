@@ -113,10 +113,6 @@ public class TranslatableComponent extends BaseComponent {
         }
 
         public Builder appendWith(Object obj) {
-            if (obj instanceof BaseComponent) {
-                //TODO Do same for the rest of the styling i think
-                //((TranslatableComponent)obj).setColor(component.getColor());
-            }
             ((TranslatableComponent)component).getWith().add(obj);
             return this;
         }

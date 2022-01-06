@@ -1273,7 +1273,6 @@ public class ItemTypes {
     }
 
     public enum ItemAttribute {
-        //TODO Add more
         MUSIC_DISC, EDIBLE, FIRE_RESISTANT, WOOD_TIER, STONE_TIER, IRON_TIER, DIAMOND_TIER, GOLD_TIER, NETHERITE_TIER, FUEL,
         SWORD, SHOVEL, AXE, PICKAXE, HOE;
     }

@@ -36,7 +36,6 @@ import java.net.InetSocketAddress;
  * @since 1.3
  */
 public class PostPlayerInjectEvent extends PacketEvent implements PlayerEvent<Object> {
-    //TODO Rethink this event
     private final Object player;
     private final ChannelAbstract channel;
 
@@ -45,23 +44,12 @@ public class PostPlayerInjectEvent extends PacketEvent implements PlayerEvent<Ob
         this.channel = PacketEvents.getAPI().getPlayerManager().getChannel(player);
     }
 
-    /**
-     * This method returns the bukkit player object of the player that has been injected.
-     * The player is guaranteed to not be null.
-     *
-     * @return Injected Player.
-     */
     @NotNull
     @Override
     public Object getPlayer() {
         return player;
     }
 
-    /**
-     * This method returns the cached netty channel of the player.
-     *
-     * @return Netty channel of the injected player.
-     */
     @NotNull
     public ChannelAbstract getChannel() {
         return channel;

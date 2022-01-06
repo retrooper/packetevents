@@ -89,7 +89,6 @@ public class WrapperPlayServerSpawnPlayer extends PacketWrapper<WrapperPlayServe
             item = ItemTypes.AIR;
         }
         if (serverVersion.isOlderThan(ServerVersion.V_1_15)) {
-            //TODO Read metadata
             entityMetadata = readEntityMetadata();
         }
         else {

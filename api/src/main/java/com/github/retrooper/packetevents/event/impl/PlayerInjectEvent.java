@@ -24,6 +24,7 @@ import com.github.retrooper.packetevents.event.PacketEvent;
 import com.github.retrooper.packetevents.event.PacketListenerAbstract;
 import com.github.retrooper.packetevents.event.type.CancellableEvent;
 import com.github.retrooper.packetevents.event.type.PlayerEvent;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.net.InetSocketAddress;
@@ -37,16 +38,14 @@ import java.net.InetSocketAddress;
  * @see <a href="https://github.com/retrooper/packetevents/blob/dev/src/main/java/io/github/retrooper/packetevents/handler/PacketHandlerInternal.java">https://github.com/retrooper/packetevents/blob/dev/src/main/java/io/github/retrooper/packetevents/handler/PacketHandlerInternal.java</a>
  * @since 1.6.9
  */
-//TODO Recode this event, looks questionable :0
 public final class PlayerInjectEvent extends PacketEvent implements CancellableEvent, PlayerEvent<Object> {
     private final Object player;
-    private final InetSocketAddress address;
+    private final ChannelAbstract channel;
     private boolean cancelled;
 
     public PlayerInjectEvent(Object player) {
         this.player = player;
-        ChannelAbstract channel = PacketEvents.getAPI().getPlayerManager().getChannel(player);
-        this.address = (InetSocketAddress) channel.remoteAddress();
+        this.channel = PacketEvents.getAPI().getPlayerManager().getChannel(player);
     }
 
     @Override
@@ -59,26 +58,20 @@ public final class PlayerInjectEvent extends PacketEvent implements CancellableE
         cancelled = value;
     }
 
-    /**
-     * This method returns the bukkit player object of the player being injected.
-     * This player might not be fully initialized.
-     *
-     * @return Injected Player.
-     */
     @Nullable
     @Override
     public Object getPlayer() {
         return player;
     }
 
-    /**
-     * This method returns the socket address injecting player.
-     *
-     * @return Socket address of the injecting player.
-     */
     @Nullable
+    public ChannelAbstract getChannel() {
+        return channel;
+    }
+
+    @NotNull
     public InetSocketAddress getSocketAddress() {
-        return address;
+        return (InetSocketAddress) channel.remoteAddress();
     }
 
     @Override

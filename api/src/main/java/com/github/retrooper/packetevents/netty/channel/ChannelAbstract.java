@@ -39,7 +39,6 @@ public interface ChannelAbstract {
 
     ChannelPipelineAbstract pipeline();
 
-    //TODO Support ChannelFuture for write and writeandflush
     void write(Object msg);
     //void write(Object msg, ChannelPromiseAbstract promise);
 

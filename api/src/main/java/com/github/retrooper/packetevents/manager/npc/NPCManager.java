@@ -38,8 +38,7 @@ public class NPCManager {
                 npc.getPlayerInfoData());
         PacketEvents.getAPI().getPlayerManager().sendPacket(channel, playerInfoPacket);
 
-        //TODO Later if we want entity metadata, its not supported on newer server versions though
-        //List<EntityData> entityMetadata = new ArrayList<>();
+        //TODO Later if we want entity metadata, its not supported on newer server versions though(confirm if its mandatory on older versions)
         WrapperPlayServerSpawnPlayer spawnPlayer = new WrapperPlayServerSpawnPlayer(npc.getId(), npc.getProfile().getId(), npc.getLocation());
         PacketEvents.getAPI().getPlayerManager().sendPacket(channel, spawnPlayer);
 

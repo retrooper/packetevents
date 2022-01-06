@@ -341,7 +341,6 @@ public final class SpigotReflectionUtil {
         return wrapper.readObject(0, CHANNEL_CLASS);
     }
 
-    //TODO Inspect again
     @Deprecated
     public static int getPlayerPingLegacy(Player player) {
         if (ENTITY_PLAYER_PING_FIELD != null) {

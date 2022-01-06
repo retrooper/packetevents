@@ -21,7 +21,6 @@ package com.github.retrooper.packetevents.protocol.chat;
 import org.jetbrains.annotations.Nullable;
 
 public enum Color {
-    //TODO maybe make it a class with constants
     BLACK('0'),
     DARK_BLUE('1'),
     DARK_GREEN('2'),

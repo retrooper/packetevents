@@ -155,7 +155,6 @@ public class WrapperPlayServerPlayerInfo extends PacketWrapper<WrapperPlayServer
             //Only one player data can be sent
             PlayerData data = playerDataList.get(0);
             //We must convert the component string to a normal one
-            //TODO test
             String rawUsername = ((TextComponent)data.displayName).getText();
             writeString(rawUsername);
             writeBoolean(action != Action.REMOVE_PLAYER);

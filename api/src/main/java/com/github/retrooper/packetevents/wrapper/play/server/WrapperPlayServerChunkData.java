@@ -37,7 +37,6 @@ import java.util.BitSet;
 import java.util.zip.DataFormatException;
 import java.util.zip.Inflater;
 
-//TODO Finish
 public class WrapperPlayServerChunkData extends PacketWrapper<WrapperPlayServerChunkData> {
     private static ChunkReader_v1_7 chunkReader_v1_7 = new ChunkReader_v1_7();
     private static ChunkReader_v1_8 chunkReader_v1_8 = new ChunkReader_v1_8();

@@ -29,7 +29,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ItemStack {
-    //TODO Rethink my decision of making NULL = AIR
     public static final ItemStack EMPTY = new ItemStack(ItemTypes.AIR, -1, new NBTCompound(), -1);
     private final ItemType type;
     private int amount;
@@ -156,7 +155,6 @@ public class ItemStack {
         }
     }
 
-    //TODO Test on all versions
     public List<Enchantment> getEnchantments() {
         if (isEnchanted()) {
             List<NBTCompound> compounds = nbt.getCompoundListTagOrNull("Enchantments").getTags();
@@ -191,7 +189,6 @@ public class ItemStack {
     }
 
 
-    //TODO Test on all versions
     public void setEnchantments(List<Enchantment> enchantments) {
         List<NBTCompound> list = new ArrayList<>();
         for (Enchantment enchantment : enchantments) {

@@ -45,7 +45,6 @@ public interface ByteBufAllocatorAbstract {
 
     ByteBufAbstract directBuffer(int initialCapacity, int maxCapacity);
 
-    //TODO Make CompositeByteBufAbstract for the rest of the composite prefixed methods
     ByteBufAbstract compositeBuffer();
 
     ByteBufAbstract compositeBuffer(int maxNumComponents);

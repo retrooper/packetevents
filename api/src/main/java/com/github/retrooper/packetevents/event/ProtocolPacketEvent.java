@@ -39,7 +39,6 @@ public abstract class ProtocolPacketEvent<T> extends PacketEvent implements Play
     private final ChannelAbstract channel;
     private final InetSocketAddress socketAddress;
     private final T player;
-    //TODO GameProfile
     private final ByteBufAbstract byteBuf;
     private final int packetID;
     private final PacketTypeCommon packetType;
@@ -88,8 +87,6 @@ public abstract class ProtocolPacketEvent<T> extends PacketEvent implements Play
         this.serverVersion = PacketEvents.getAPI().getServerManager().getVersion();
 
         this.byteBuf = byteBuf;
-        //TODO Look at this, for some reason on geyser this breaks. maybe cause we disconnected but we still tryna read packets.
-        //Assumption is cause we removed channelInactive thing.
         this.packetID = readVarInt(byteBuf);
         this.packetType = PacketType.getById(packetSide, connectionState, this.serverVersion, packetID);
     }
