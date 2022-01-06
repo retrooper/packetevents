@@ -43,8 +43,7 @@ public enum ServerVersion {
     v_1_15(573), v_1_15_1(575), v_1_15_2(578),
     v_1_16(735), v_1_16_1(736), v_1_16_2(751), v_1_16_3(753), v_1_16_4(754), v_1_16_5(754),
     v_1_17(755), v_1_17_1(756),
-    //TODO 1.18 SUPPORT, UPDATE THIS PV, THIS IS PROTOCOL VERSION OF release candidate 3
-    v_1_18(1073741883),
+    v_1_18_RC3(1073741883), /* 1.18 & 1.18.1 have the same PVN (redundant) */ v_1_18(757), v_1_18_1(757),
     ERROR(-1);
 
     private static final String NMS_VERSION_SUFFIX = Bukkit.getServer().getClass().getPackage().getName()
