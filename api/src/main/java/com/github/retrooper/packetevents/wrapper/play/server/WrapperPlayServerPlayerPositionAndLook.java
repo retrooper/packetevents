@@ -3,8 +3,9 @@ package com.github.retrooper.packetevents.wrapper.play.server;
 import com.github.retrooper.packetevents.event.impl.PacketSendEvent;
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
-import com.github.retrooper.packetevents.protocol.teleport.RelativeFlags;
+import com.github.retrooper.packetevents.protocol.teleport.RelativeFlag;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
+import java.util.Set;
 
 /**
  * Teleporting a player directly with packets will cause issues on most server implementations and is discouraged!
@@ -128,12 +129,20 @@ public class WrapperPlayServerPlayerPositionAndLook extends PacketWrapper<Wrappe
         this.relativeMask = relativeMask;
     }
 
-    public boolean isRelativeFlag(RelativeFlags flag) {
+    public boolean isRelativeFlag(RelativeFlag flag) {
         return flag.isSet(relativeMask);
     }
 
-    public void setRelative(RelativeFlags flag, boolean relative) {
+    public void setRelative(RelativeFlag flag, boolean relative) {
         relativeMask = flag.set(relativeMask, relative);
+    }
+
+    public Set<RelativeFlag> getRelativeFlags() {
+        return RelativeFlag.getRelativeFlagsByMask(relativeMask);
+    }
+
+    public void setRelativeFlags(Set<RelativeFlag> flags) {
+        relativeMask = RelativeFlag.getMaskByRelativeFlags(flags);
     }
 
     public int getTeleportId() {

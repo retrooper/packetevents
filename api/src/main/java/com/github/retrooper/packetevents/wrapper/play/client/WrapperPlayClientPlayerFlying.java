@@ -117,6 +117,22 @@ public class WrapperPlayClientPlayerFlying extends PacketWrapper<WrapperPlayClie
         this.location = location;
     }
 
+    public boolean hasPositionChanged() {
+        return positionChanged;
+    }
+
+    public void setPositionChanged(boolean positionChanged) {
+        this.positionChanged = positionChanged;
+    }
+
+    public boolean hasRotationChanged() {
+        return rotationChanged;
+    }
+
+    public void setRotationChanged(boolean rotationChanged) {
+        this.rotationChanged = rotationChanged;
+    }
+
     public boolean isOnGround() {
         return onGround;
     }
