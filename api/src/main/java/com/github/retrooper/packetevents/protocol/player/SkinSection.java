@@ -18,6 +18,7 @@
 
 package com.github.retrooper.packetevents.protocol.player;
 
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -36,7 +37,12 @@ public enum SkinSection {
 
     HAT(0x40);
 
-    public static final SkinSection[] VALUES = values();
+    private static final Set<SkinSection> SECTIONS;
+
+    static {
+        SECTIONS = new HashSet<>(values().length);
+        SECTIONS.addAll(Arrays.asList(values()));
+    }
 
     final byte maskFlag;
 
@@ -52,9 +58,13 @@ public enum SkinSection {
         return (mask & section.maskFlag) != 0;
     }
 
+    public static Set<SkinSection> getAllSections() {
+        return SECTIONS;
+    }
+
     public static Set<SkinSection> getSectionsByMask(byte mask) {
         Set<SkinSection> visibleSkinSections = new HashSet<>();
-        for (SkinSection skinSection : SkinSection.VALUES) {
+        for (SkinSection skinSection : SkinSection.values()) {
             if (SkinSection.isSectionPresent(mask, skinSection)) {
                 visibleSkinSections.add(skinSection);
             }

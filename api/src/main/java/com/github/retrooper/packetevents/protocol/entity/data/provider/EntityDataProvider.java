@@ -250,94 +250,94 @@ public class EntityDataProvider implements DataProvider {
         }
     }
 
-    public static Builder<Builder, EntityDataProvider> builder() {
-        return new Builder<>(new EntityDataProvider());
+    public static EntityBuilder<EntityBuilder> builderEntity() {
+        return new EntityBuilder<>(new EntityDataProvider());
     }
 
-    public static class Builder<T extends Builder, K extends EntityDataProvider> {
-        protected K provider;
+    public static class EntityBuilder<T extends EntityBuilder> {
+        protected EntityDataProvider provider;
 
-        public Builder(K provider) {
+        public EntityBuilder(EntityDataProvider provider) {
             this.provider = provider;
         }
 
         public T customName(@Nullable BaseComponent customName) {
-            provider.setCustomName(customName);
+            ((EntityDataProvider)provider).setCustomName(customName);
             return (T) this;
         }
 
         public T customNameVisible(boolean customNameVisible) {
-            provider.setCustomNameVisible(customNameVisible);
+            ((EntityDataProvider)provider).setCustomNameVisible(customNameVisible);
             return (T) this;
         }
 
         public T pose(EntityPose pose) {
-            provider.setPose(pose);
+            ((EntityDataProvider)provider).setPose(pose);
             return (T) this;
         }
 
         public T onFire(boolean onFire) {
-            provider.setOnFire(onFire);
+            ((EntityDataProvider)provider).setOnFire(onFire);
             return (T) this;
         }
 
         public T crouching(boolean crouching) {
-            provider.setCrouching(crouching);
+            ((EntityDataProvider)provider).setCrouching(crouching);
             return (T) this;
         }
 
         public T riding(boolean riding) {
-            provider.setRiding(riding);
+            ((EntityDataProvider)provider).setRiding(riding);
             return (T) this;
         }
 
         public T sprinting(boolean sprinting) {
-            provider.setSprinting(sprinting);
+            ((EntityDataProvider)provider).setSprinting(sprinting);
             return (T) this;
         }
 
         public T swimming(boolean swimming) {
-            provider.setSwimming(swimming);
+            ((EntityDataProvider)provider).setSwimming(swimming);
             return (T) this;
         }
 
         public T invisible(boolean invisible) {
-            provider.setInvisible(invisible);
+            ((EntityDataProvider)provider).setInvisible(invisible);
             return (T) this;
         }
 
         public T glowing(boolean glowing) {
-            provider.setGlowing(glowing);
+            ((EntityDataProvider)provider).setGlowing(glowing);
             return (T) this;
         }
 
         public T flyingWithElytra(boolean flyingWithElytra) {
-            provider.setFlyingWithElytra(flyingWithElytra);
+            ((EntityDataProvider)provider).setFlyingWithElytra(flyingWithElytra);
             return (T) this;
         }
 
         public T silent(boolean silent) {
-            provider.setSilent(silent);
+            ((EntityDataProvider)provider).setSilent(silent);
             return (T) this;
         }
 
         public T hasGravity(boolean hasGravity) {
-            provider.setHasGravity(hasGravity);
+            ((EntityDataProvider)provider).setHasGravity(hasGravity);
             return (T) this;
         }
 
         public T airTicks(int airTicks) {
-            provider.setAirTicks(airTicks);
+            ((EntityDataProvider)provider).setAirTicks(airTicks);
             return (T) this;
         }
 
         public T ticksFrozenInPowderedSnow(int ticksFrozenInPowderedSnow) {
-            provider.setTicksFrozenInPowderedSnow(ticksFrozenInPowderedSnow);
+            ((EntityDataProvider)provider).setTicksFrozenInPowderedSnow(ticksFrozenInPowderedSnow);
             return (T) this;
         }
 
-        public K build() {
-            return provider;
+        public <K extends EntityDataProvider> K build() {
+            return (K) provider;
         }
     }
 }

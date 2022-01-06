@@ -431,11 +431,11 @@ public class PacketWrapper<T extends PacketWrapper> {
         return buffer.readLong();
     }
 
-    public long readVarLong()  {
+    public long readVarLong() {
         long value = 0;
         int size = 0;
         int b;
-        while(((b = this.readByte()) & 0x80) == 0x80) {
+        while (((b = this.readByte()) & 0x80) == 0x80) {
             value |= (long) (b & 0x7F) << (size++ * 7);
         }
         return value | ((long) (b & 0x7F) << (size * 7));
@@ -446,7 +446,7 @@ public class PacketWrapper<T extends PacketWrapper> {
     }
 
     public void writeVarLong(long l) {
-        while((l & ~0x7F) != 0) {
+        while ((l & ~0x7F) != 0) {
             this.writeByte((int) (l & 0x7F) | 0x80);
             l >>>= 7;
         }
@@ -634,8 +634,7 @@ public class PacketWrapper<T extends PacketWrapper> {
                 writeByte(entityData.getIndex());
                 if (v1_10) {
                     writeVarInt(entityData.getType().getId());
-                }
-                else {
+                } else {
                     writeByte(entityData.getType().getId());
                 }
                 entityData.getType().getDataSerializer().accept(this, entityData.getValue());

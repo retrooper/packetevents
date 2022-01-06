@@ -88,8 +88,8 @@ public class PlayerDataProvider extends LivingEntityDataProvider {
         this.rightShoulderNBT = rightShoulderNBT;
     }
 
-    public static Builder builder() {
-        return new Builder(new PlayerDataProvider());
+    public static PlayerBuilder<PlayerBuilder> builderPlayer() {
+        return new PlayerBuilder<>(new PlayerDataProvider());
     }
 
     @Override
@@ -131,48 +131,44 @@ public class PlayerDataProvider extends LivingEntityDataProvider {
         }
     }
 
-    public static class Builder<K extends PlayerDataProvider> extends LivingEntityDataProvider.Builder<Builder, PlayerDataProvider> {
-        public Builder(PlayerDataProvider entityDataProvider) {
+    public static class PlayerBuilder<T extends PlayerBuilder> extends LivingEntityDataProvider.LivingEntityBuilder<T> {
+        public PlayerBuilder(PlayerDataProvider entityDataProvider) {
             super(entityDataProvider);
         }
 
-        public Builder additionalHealth(float additionalHealth) {
-            provider.setAdditionalHealth(additionalHealth);
-            return this;
+        public T additionalHealth(float additionalHealth) {
+            ((PlayerDataProvider)provider).setAdditionalHealth(additionalHealth);
+            return (T) this;
         }
 
-        public Builder score(int score) {
-            provider.setScore(score);
-            return this;
+        public T score(int score) {
+            ((PlayerDataProvider)provider).setScore(score);
+            return (T) this;
         }
 
-        public Builder skinPartsMask(byte skinPartsMask) {
-            provider.setSkinPartsMask(skinPartsMask);
-            return this;
+        public T skinPartsMask(byte skinPartsMask) {
+            ((PlayerDataProvider)provider).setSkinPartsMask(skinPartsMask);
+            return (T)this;
         }
 
-        public Builder skinParts(Set<SkinSection> skinSections) {
-            provider.setSkinPartsMask(SkinSection.getMaskBySections(skinSections));
-            return this;
+        public T skinParts(Set<SkinSection> skinSections) {
+            ((PlayerDataProvider)provider).setSkinPartsMask(SkinSection.getMaskBySections(skinSections));
+            return (T)this;
         }
 
-        public Builder mainArm(HumanoidArm mainArm) {
-            provider.setMainArm(mainArm);
-            return this;
+        public T mainArm(HumanoidArm mainArm) {
+            ((PlayerDataProvider)provider).setMainArm(mainArm);
+            return (T)this;
         }
 
-        public Builder leftShoulderNBT(NBTCompound leftShoulderNBT) {
-            provider.setLeftShoulderNBT(leftShoulderNBT);
-            return this;
+        public T leftShoulderNBT(NBTCompound leftShoulderNBT) {
+            ((PlayerDataProvider)provider).setLeftShoulderNBT(leftShoulderNBT);
+            return (T)this;
         }
 
-        public Builder rightShoulderNBT(NBTCompound rightShoulderNBT) {
-            provider.setRightShoulderNBT(rightShoulderNBT);
-            return this;
-        }
-
-        public PlayerDataProvider build() {
-            return provider;
+        public T rightShoulderNBT(NBTCompound rightShoulderNBT) {
+            ((PlayerDataProvider)provider).setRightShoulderNBT(rightShoulderNBT);
+            return (T)this;
         }
     }
 }

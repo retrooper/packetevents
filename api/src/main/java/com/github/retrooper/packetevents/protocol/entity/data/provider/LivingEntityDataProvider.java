@@ -113,8 +113,8 @@ public class LivingEntityDataProvider extends EntityDataProvider {
         this.sleepingPosition = sleepingPosition;
     }
 
-    public static Builder builder() {
-        return new Builder<>(new LivingEntityDataProvider());
+    public static LivingEntityBuilder<LivingEntityBuilder> builderLivingEntity() {
+        return new LivingEntityBuilder<>(new LivingEntityDataProvider());
     }
 
     @Override
@@ -179,58 +179,54 @@ public class LivingEntityDataProvider extends EntityDataProvider {
         }
     }
 
-    public static class Builder<T extends Builder, K extends LivingEntityDataProvider> extends EntityDataProvider.Builder<T, K> {
-        public Builder(K livingEntityDataProvider) {
+    public static class LivingEntityBuilder<T extends LivingEntityBuilder> extends EntityDataProvider.EntityBuilder<T> {
+        public LivingEntityBuilder(LivingEntityDataProvider livingEntityDataProvider) {
             super(livingEntityDataProvider);
         }
 
         public T handActive(boolean handActive) {
-            provider.setHandActive(handActive);
+            ((LivingEntityDataProvider) provider).setHandActive(handActive);
             return (T) this;
         }
 
         public T hand(InteractionHand hand) {
-            provider.setHand(hand);
+            ((LivingEntityDataProvider) provider).setHand(hand);
             return (T) this;
         }
 
         public T isInRiptideSpinAttack(boolean isInRiptideSpinAttack) {
-            provider.setInRiptideSpinAttack(isInRiptideSpinAttack);
+            ((LivingEntityDataProvider) provider).setInRiptideSpinAttack(isInRiptideSpinAttack);
             return (T) this;
         }
 
         public T health(float health) {
-            provider.setHealth(health);
+            ((LivingEntityDataProvider) provider).setHealth(health);
             return (T) this;
         }
 
         public T potionEffectColor(int potionEffectColor) {
-            provider.setPotionEffectColor(potionEffectColor);
+            ((LivingEntityDataProvider) provider).setPotionEffectColor(potionEffectColor);
             return (T) this;
         }
 
         public T potionEffectAmbient(boolean potionEffectAmbient) {
-            provider.setPotionEffectAmbient(potionEffectAmbient);
+            ((LivingEntityDataProvider) provider).setPotionEffectAmbient(potionEffectAmbient);
             return (T) this;
         }
 
         public T arrowInBodyCount(int arrowInBodyCount) {
-            provider.setArrowInBodyCount(arrowInBodyCount);
+            ((LivingEntityDataProvider) provider).setArrowInBodyCount(arrowInBodyCount);
             return (T) this;
         }
 
         public T beeStingsInBodyCount(int beeStingsInBodyCount) {
-            provider.setBeeStingsInBodyCount(beeStingsInBodyCount);
+            ((LivingEntityDataProvider) provider).setBeeStingsInBodyCount(beeStingsInBodyCount);
             return (T) this;
         }
 
         public T sleepingPosition(@Nullable Vector3i sleepingPosition) {
-            provider.setSleepingPosition(sleepingPosition);
+            ((LivingEntityDataProvider) provider).setSleepingPosition(sleepingPosition);
             return (T) this;
-        }
-
-        public K build() {
-            return provider;
         }
     }
 }

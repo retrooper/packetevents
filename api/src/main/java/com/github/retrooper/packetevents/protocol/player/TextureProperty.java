@@ -28,10 +28,6 @@ public class TextureProperty {
     private final String value;
     private final String signature;
 
-    public TextureProperty(String name, String value) {
-        this(value, name, null);
-    }
-
     public TextureProperty(String name, String value, @Nullable String signature) {
         this.name = name;
         this.value = value;

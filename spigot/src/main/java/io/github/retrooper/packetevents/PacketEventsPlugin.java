@@ -27,15 +27,13 @@ import com.github.retrooper.packetevents.protocol.chat.Color;
 import com.github.retrooper.packetevents.protocol.chat.component.BaseComponent;
 import com.github.retrooper.packetevents.protocol.chat.component.impl.TextComponent;
 import com.github.retrooper.packetevents.protocol.chat.component.impl.TranslatableComponent;
-import com.github.retrooper.packetevents.protocol.entity.data.provider.LivingEntityDataProvider;
+import com.github.retrooper.packetevents.protocol.entity.data.provider.EntityDataProvider;
 import com.github.retrooper.packetevents.protocol.entity.data.provider.PlayerDataProvider;
-import com.github.retrooper.packetevents.protocol.entity.pose.EntityPose;
 import com.github.retrooper.packetevents.protocol.item.ItemStack;
-import com.github.retrooper.packetevents.protocol.nbt.NBTCompound;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.protocol.player.GameProfile;
-import com.github.retrooper.packetevents.protocol.player.HumanoidArm;
 import com.github.retrooper.packetevents.protocol.player.InteractionHand;
+import com.github.retrooper.packetevents.protocol.player.SkinSection;
 import com.github.retrooper.packetevents.protocol.player.TextureProperty;
 import com.github.retrooper.packetevents.protocol.world.Location;
 import com.github.retrooper.packetevents.protocol.world.chunk.BaseChunk;
@@ -53,9 +51,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 public class PacketEventsPlugin extends JavaPlugin {
     @Override
@@ -111,11 +107,13 @@ public class PacketEventsPlugin extends JavaPlugin {
                                     UUID dogsUUID = MojangAPIUtil.requestPlayerUUID("Dqgs");
                                     List<TextureProperty> newTextureProperties = MojangAPIUtil.requestPlayerTextureProperties(dogsUUID);
                                     PacketEvents.getAPI().getNPCManager().changeNPCSkin(npc, dogsUUID, newTextureProperties);
-                                    PlayerDataProvider playerDataProvider =
-                                            PlayerDataProvider.builder().invisible(true)
-                                                    .pose(EntityPose.CROUCHING)
-                                                    .crouching(true)
+                                    EntityDataProvider playerMetadataProvider =
+                                            PlayerDataProvider.builderPlayer()
+                                                    .additionalHealth(20)
+                                                    .skinParts(SkinSection.getAllSections())
                                                     .build();
+
+
                                     WrapperPlayServerEntityMetadata metadataPacket = new WrapperPlayServerEntityMetadata(npc.getId(),
                                             playerMetadataProvider.encode());
                                     PacketEvents.getAPI().getPlayerManager().sendPacket(event.getChannel(), metadataPacket);
@@ -193,7 +191,7 @@ public class PacketEventsPlugin extends JavaPlugin {
                 }
             }
         };
-        PacketEvents.getAPI().getEventManager().registerListener(debugListener);
+        //PacketEvents.getAPI().getEventManager().registerListener(debugListener);
     }
 
     @Override
