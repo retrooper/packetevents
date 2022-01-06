@@ -19,12 +19,14 @@
 package com.github.retrooper.packetevents.manager.player;
 
 import com.github.retrooper.packetevents.PacketEvents;
+import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.netty.buffer.ByteBufAbstract;
 import com.github.retrooper.packetevents.netty.channel.ChannelAbstract;
 import com.github.retrooper.packetevents.protocol.ConnectionState;
 import com.github.retrooper.packetevents.protocol.player.GameProfile;
 import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
+import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerDestroyEntities;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.HashMap;
@@ -99,8 +101,23 @@ public interface PlayerManager {
     }
 
     default void sendPacket(ChannelAbstract channel, PacketWrapper<?> wrapper) {
-        wrapper.prepareForSend();
-        sendPacket(channel, wrapper.buffer);
+        boolean shouldSend = true;
+        if (wrapper instanceof WrapperPlayServerDestroyEntities) {
+            WrapperPlayServerDestroyEntities destroyEntities = (WrapperPlayServerDestroyEntities) wrapper;
+            if (destroyEntities.getEntityIds().length > 1 && wrapper.getServerVersion() == ServerVersion.V_1_17) {
+                //Transform into multiple packets
+                for (int entityId : destroyEntities.getEntityIds()) {
+                    WrapperPlayServerDestroyEntities newPacket = new WrapperPlayServerDestroyEntities(entityId);
+                    newPacket.prepareForSend();
+                    sendPacket(channel, newPacket.buffer);
+                    shouldSend = false;
+                }
+            }
+        }
+        if (shouldSend) {
+            wrapper.prepareForSend();
+            sendPacket(channel, wrapper.buffer);
+        }
     }
 
     default void sendPacket(@NotNull Object player, ByteBufAbstract byteBuf) {
@@ -109,9 +126,8 @@ public interface PlayerManager {
     }
 
     default void sendPacket(@NotNull Object player, PacketWrapper<?> wrapper) {
-        wrapper.prepareForSend();
         ChannelAbstract channel = getChannel(player);
-        sendPacket(channel, wrapper.buffer);
+        sendPacket(channel, wrapper);
     }
 
     default GameProfile getGameProfile(ChannelAbstract channel) {

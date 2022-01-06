@@ -39,6 +39,30 @@ public class Location {
         return position;
     }
 
+    public double getX() {
+        return position.getX();
+    }
+
+    public void setX(double x) {
+        position.setX(x);
+    }
+
+    public double getY() {
+        return position.getY();
+    }
+
+    public void setY(double y) {
+        position.setY(y);
+    }
+
+    public double getZ() {
+        return position.getZ();
+    }
+
+    public void setZ(double z) {
+        position.setZ(z);
+    }
+
     public void setPosition(Vector3d position) {
         this.position = position;
     }
