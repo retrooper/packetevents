@@ -25,7 +25,6 @@ import com.github.retrooper.packetevents.protocol.player.SkinSection;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 
-import java.util.HashSet;
 import java.util.Set;
 
 public class WrapperPlayClientSettings extends PacketWrapper<WrapperPlayClientSettings> {
@@ -79,7 +78,7 @@ public class WrapperPlayClientSettings extends PacketWrapper<WrapperPlayClientSe
             //We use this for the skin sections
             boolean showCape = readBoolean();
             if (showCape) {
-                visibleSkinSectionMask = SkinSection.CAPE.getMaskFlag();
+                visibleSkinSectionMask = SkinSection.CAPE.getBit();
             }
         }
         else {
@@ -134,7 +133,7 @@ public class WrapperPlayClientSettings extends PacketWrapper<WrapperPlayClientSe
         if (serverVersion == ServerVersion.V_1_7_10) {
             writeByte(ignoredDifficulty);
             //Show cape
-            boolean showCape = SkinSection.isSectionPresent(visibleSkinSectionMask, SkinSection.CAPE);
+            boolean showCape = SkinSection.CAPE.isSet(visibleSkinSectionMask);
             writeBoolean(showCape);
         }
         else {
@@ -201,6 +200,14 @@ public class WrapperPlayClientSettings extends PacketWrapper<WrapperPlayClientSe
 
     public void setVisibleSkinSections(Set<SkinSection> visibleSkinSections) {
         this.visibleSkinSectionMask = SkinSection.getMaskBySections(visibleSkinSections);
+    }
+
+    public boolean isSkinSectionVisible(SkinSection section) {
+        return section.isSet(visibleSkinSectionMask);
+    }
+
+    public void setSkinSectionVisible(SkinSection section, boolean visible) {
+        visibleSkinSectionMask = section.set(visibleSkinSectionMask, visible);
     }
 
     public HumanoidArm getMainHand() {

@@ -44,18 +44,27 @@ public enum SkinSection {
         SECTIONS.addAll(Arrays.asList(values()));
     }
 
-    final byte maskFlag;
+    private final byte bit;
 
-    SkinSection(int maskFlag) {
-        this.maskFlag = (byte) maskFlag;
+    SkinSection(int bit) {
+        this.bit = (byte) bit;
     }
 
-    public byte getMaskFlag() {
-        return maskFlag;
+    public byte getBit() {
+        return bit;
     }
 
-    public static boolean isSectionPresent(byte mask, SkinSection section) {
-        return (mask & section.maskFlag) != 0;
+    public boolean isSet(byte mask) {
+        return (mask & bit) != 0;
+    }
+
+    public byte set(byte mask, boolean present) {
+        if (present) {
+            mask |= bit;
+        } else {
+            mask &= ~bit;
+        }
+        return mask;
     }
 
     public static Set<SkinSection> getAllSections() {
@@ -64,8 +73,8 @@ public enum SkinSection {
 
     public static Set<SkinSection> getSectionsByMask(byte mask) {
         Set<SkinSection> visibleSkinSections = new HashSet<>();
-        for (SkinSection skinSection : SkinSection.values()) {
-            if (SkinSection.isSectionPresent(mask, skinSection)) {
+        for (SkinSection skinSection : values()) {
+            if (skinSection.isSet(mask)) {
                 visibleSkinSections.add(skinSection);
             }
         }
@@ -75,7 +84,7 @@ public enum SkinSection {
     public static byte getMaskBySections(Set<SkinSection> sections) {
         byte mask = 0;
         for (SkinSection section : sections) {
-            mask |= section.maskFlag;
+            mask |= section.bit;
         }
         return mask;
     }

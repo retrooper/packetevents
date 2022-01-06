@@ -10,28 +10,28 @@ import com.github.retrooper.packetevents.wrapper.PacketWrapper;
  * Teleporting a player directly with packets will cause issues on most server implementations and is discouraged!
  */
 public class WrapperPlayServerPlayerPositionAndLook extends PacketWrapper<WrapperPlayServerPlayerPositionAndLook> {
-    double x;
-    double y;
-    double z;
-    float yaw;
-    float pitch;
-    int flags;
-    int teleportId;
-    boolean dismountVehicle = false;
+    private double x;
+    private double y;
+    private double z;
+    private float yaw;
+    private float pitch;
+    private byte relativeMask;
+    private int teleportId;
+    private boolean dismountVehicle = false;
 
     public WrapperPlayServerPlayerPositionAndLook(PacketSendEvent event) {
         super(event);
     }
 
     public WrapperPlayServerPlayerPositionAndLook(double x, double y, double z, float yaw, float pitch,
-                                                  int flags, int teleportId, boolean dismountVehicle) {
+                                                  byte flags, int teleportId, boolean dismountVehicle) {
         super(PacketType.Play.Server.PLAYER_POSITION_AND_LOOK);
         this.x = x;
         this.y = y;
         this.z = z;
         this.yaw = yaw;
         this.pitch = pitch;
-        this.flags = flags;
+        this.relativeMask = flags;
         this.teleportId = teleportId;
         this.dismountVehicle = dismountVehicle;
     }
@@ -43,7 +43,7 @@ public class WrapperPlayServerPlayerPositionAndLook extends PacketWrapper<Wrappe
         this.z = readDouble();
         this.yaw = readFloat();
         this.pitch = readFloat();
-        this.flags = readUnsignedByte();
+        this.relativeMask = readByte();
         if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_9)) {
             this.teleportId = readVarInt();
         }
@@ -59,7 +59,7 @@ public class WrapperPlayServerPlayerPositionAndLook extends PacketWrapper<Wrappe
         writeDouble(z);
         writeFloat(yaw);
         writeFloat(pitch);
-        writeByte(flags);
+        writeByte(relativeMask);
         if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_9)) {
             writeVarInt(teleportId);
         }
@@ -75,7 +75,7 @@ public class WrapperPlayServerPlayerPositionAndLook extends PacketWrapper<Wrappe
         this.z = wrapper.z;
         this.yaw = wrapper.yaw;
         this.pitch = wrapper.pitch;
-        this.flags = wrapper.flags;
+        this.relativeMask = wrapper.relativeMask;
         this.teleportId = wrapper.teleportId;
         this.dismountVehicle = wrapper.dismountVehicle;
     }
@@ -120,20 +120,20 @@ public class WrapperPlayServerPlayerPositionAndLook extends PacketWrapper<Wrappe
         this.pitch = pitch;
     }
 
-    public int getFlags() {
-        return flags;
+    public byte getRelativeMask() {
+        return relativeMask;
     }
 
-    public void setFlags(int flags) {
-        this.flags = flags;
+    public void setRelativeMask(byte relativeMask) {
+        this.relativeMask = relativeMask;
     }
 
     public boolean isRelativeFlag(RelativeFlags flag) {
-        return flag.isSet(flags);
+        return flag.isSet(relativeMask);
     }
 
     public void setRelative(RelativeFlags flag, boolean relative) {
-        flags = flag.set(relative, flags);
+        relativeMask = flag.set(relativeMask, relative);
     }
 
     public int getTeleportId() {

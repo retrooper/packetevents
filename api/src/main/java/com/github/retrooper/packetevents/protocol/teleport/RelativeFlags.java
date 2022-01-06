@@ -1,27 +1,31 @@
 package com.github.retrooper.packetevents.protocol.teleport;
 
 public enum RelativeFlags {
-    X(0),
-    Y(1),
-    Z(2),
-    YAW(3),
-    PITCH(4);
+    X(0x01),
+    Y(0x02),
+    Z(0x04),
+    YAW(0x08),
+    PITCH(0x10);
 
-    int bit;
+    private final byte bit;
 
     RelativeFlags(int bit) {
-        this.bit = bit;
+        this.bit = (byte)bit;
     }
 
-    public boolean isSet(int flags) {
-        return (flags & (1 << bit)) != 0;
+    public byte getBit() {
+        return bit;
     }
 
-    public int set(boolean relative, int flags) {
+    public boolean isSet(byte mask) {
+        return (mask & (1 << bit)) != 0;
+    }
+
+    public byte set(byte mask, boolean relative) {
         if (relative) {
-            return flags | (1 << bit);
+            return (byte) (mask | bit);
         } else {
-            return flags & ~(1 << bit);
+            return (byte) (mask & ~bit);
         }
     }
 }
