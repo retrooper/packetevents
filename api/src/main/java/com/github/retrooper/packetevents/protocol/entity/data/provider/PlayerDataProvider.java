@@ -37,8 +37,8 @@ public class PlayerDataProvider extends LivingEntityDataProvider {
     private int score;
     private byte skinPartsMask = SkinSection.getMaskBySections(SkinSection.getAllSections());
     private HumanoidArm mainArm = HumanoidArm.RIGHT;
-    private NBTCompound leftShoulderNBT;
-    private NBTCompound rightShoulderNBT;
+    private NBTCompound leftShoulderNBT = new NBTCompound();
+    private NBTCompound rightShoulderNBT = new NBTCompound();
 
     public float getAdditionalHealth() {
         return additionalHealth;
