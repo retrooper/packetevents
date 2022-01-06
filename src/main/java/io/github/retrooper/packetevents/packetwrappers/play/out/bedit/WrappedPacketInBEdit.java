@@ -30,7 +30,6 @@ import java.util.Optional;
 
 /**
  * @author Tecnio
- * @see <a href="https://wiki.vg/Protocol#Edit_Book"</a>
  */
 public class WrappedPacketInBEdit extends WrappedPacket {
     private static boolean v_1_13, v_1_17;

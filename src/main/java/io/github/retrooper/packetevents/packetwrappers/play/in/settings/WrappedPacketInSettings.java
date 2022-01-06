@@ -32,7 +32,7 @@ import java.util.Set;
 public class WrappedPacketInSettings extends WrappedPacket {
     private static Class<? extends Enum<?>> chatVisibilityEnumClass;
 
-    private static boolean isLowerThan_v_1_8, v_1_17;
+    private static boolean isLowerThan_v_1_8, v_1_17, v_1_18;
 
     public WrappedPacketInSettings(final NMSPacket packet) {
         super(packet);
@@ -42,6 +42,7 @@ public class WrappedPacketInSettings extends WrappedPacket {
     protected void load() {
         isLowerThan_v_1_8 = version.isOlderThan(ServerVersion.v_1_8);
         v_1_17 = version.isNewerThanOrEquals(ServerVersion.v_1_17);
+        v_1_18 = version.isNewerThanOrEquals(ServerVersion.v_1_18);
         chatVisibilityEnumClass = NMSUtils.getNMSEnumClassWithoutException("EnumChatVisibility");
         if (chatVisibilityEnumClass == null) {
             //They are on 1.17+
@@ -62,11 +63,11 @@ public class WrappedPacketInSettings extends WrappedPacket {
     }
 
     public int getViewDistance() {
-        return readInt(v_1_17 ? 1 : 0);
+        return readInt((v_1_17 && !v_1_18) ? 1 : 0);
     }
 
     public void setViewDistance(int viewDistance) {
-        writeInt(v_1_17 ? 1 : 0, viewDistance);
+        writeInt((v_1_17 && !v_1_18) ? 1 : 0, viewDistance);
     }
 
     public ChatVisibility getChatVisibility() {
@@ -87,18 +88,36 @@ public class WrappedPacketInSettings extends WrappedPacket {
         writeBoolean(0, chatColors);
     }
 
-    public Optional<Boolean> isTextFilteringEnabled() {
-        if (!v_1_17) {
-            return Optional.empty();
+    //Added in 1.17
+    public boolean isTextFilteringEnabled() {
+        if (v_1_17) {
+            return readBoolean(1);
         }
-        return Optional.of(!readBoolean(1));
+        return false;
     }
 
-    public void setTextFilteringEnabled(boolean textFilteringEnabled) {
+    //Added in 1.17
+    public void setTextFilteringEnabled(boolean enabled) {
         if (v_1_17) {
-            writeBoolean(1, !textFilteringEnabled);
+            writeBoolean(1, enabled);
         }
     }
+
+    //Added in 1.18
+    public boolean isServerListingsAllowed() {
+        if (v_1_18) {
+            return readBoolean(2);
+        }
+        return true;
+    }
+
+    //Added in 1.18
+    public void setServerListingsAllowed(boolean allowed) {
+        if (v_1_18) {
+            writeBoolean(2, allowed);
+        }
+    }
+
 
     public byte getDisplaySkinPartsMask() {
         byte mask = 0;
@@ -108,7 +127,7 @@ public class WrappedPacketInSettings extends WrappedPacket {
                 mask |= 0x01;
             }
         } else {
-            mask = (byte) readInt(v_1_17 ? 2 : 1);
+            mask = (byte) readInt((v_1_17 && !v_1_18) ? 2 : 1);
         }
         return mask;
     }
@@ -118,7 +137,7 @@ public class WrappedPacketInSettings extends WrappedPacket {
             boolean capeEnabled = (mask & 0x01) == 0x01;
             writeBoolean(1, capeEnabled);
         } else {
-            writeInt(v_1_17 ? 2 : 1, mask);
+            writeInt((v_1_17 && !v_1_18) ? 2 : 1, mask);
         }
     }
 

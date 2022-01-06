@@ -43,8 +43,7 @@ public enum ServerVersion {
     v_1_15(573), v_1_15_1(575), v_1_15_2(578),
     v_1_16(735), v_1_16_1(736), v_1_16_2(751), v_1_16_3(753), v_1_16_4(754), v_1_16_5(754),
     v_1_17(755), v_1_17_1(756),
-    //TODO 1.18 SUPPORT, UPDATE THIS PV, THIS IS PROTOCOL VERSION OF release candidate 3
-    v_1_18(1073741883),
+    v_1_18(757), v_1_18_1(757),
     ERROR(-1);
 
     private static final String NMS_VERSION_SUFFIX = Bukkit.getServer().getClass().getPackage().getName()
@@ -78,7 +77,7 @@ public enum ServerVersion {
                     fallbackVersion = ServerVersion.v_1_8_8;
                 }
             }
-            PacketEvents.get().getPlugin().getLogger().warning("[packetevents] Your server software is preventing us from checking the server version. We will assume the server version is " + fallbackVersion.name() + "...");
+            PacketEvents.get().getPlugin().getLogger().warning("[packetevents] Your server software is preventing us from checking the server version. This is what we found: " + Bukkit.getBukkitVersion() + ". We will assume the server version is " + fallbackVersion.name() + "...");
             return fallbackVersion;
         }
         return ERROR;
@@ -176,7 +175,6 @@ public enum ServerVersion {
                 return false;
             }
             if (version == this) return true;
-            if (version == target) return false;
         }
 
         return false;

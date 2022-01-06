@@ -87,14 +87,16 @@ public enum ClientVersion {
 
     v_1_17_1(756),
 
-    //TODO 1.18 SUPPORT, UPDATE THIS PV, THIS IS PROTOCOL VERSION OF release candidate 3
-    v_1_18(1073741883),
+    /**
+     * 1.18 or 1.18.1 as they have the same protocol version.
+     */
+    v_1_18(757),
 
     LOWER_THAN_SUPPORTED_VERSIONS(v_1_7_10.protocolVersion - 1),
     HIGHER_THAN_SUPPORTED_VERSIONS(v_1_18.protocolVersion + 1),
     /**
      * Pre releases just aren't supported, we would end up with so many enum constants.
-     * This constant assures you they are on a pre release.
+     * This constant assures you they are on a pre-release.
      */
     ANY_PRE_RELEASE_VERSION(0),
 
@@ -108,13 +110,13 @@ public enum ClientVersion {
     private static final int LOWEST_SUPPORTED_PROTOCOL_VERSION = LOWER_THAN_SUPPORTED_VERSIONS.protocolVersion + 1;
     private static final int HIGHEST_SUPPORTED_PROTOCOL_VERSION = HIGHER_THAN_SUPPORTED_VERSIONS.protocolVersion - 1;
 
-    private static final Map<Short, ClientVersion> CLIENT_VERSION_CACHE = new IdentityHashMap<>();
+    private static final Map<Integer, ClientVersion> CLIENT_VERSION_CACHE = new IdentityHashMap<>();
     private static final int[] CLIENT_VERSIONS = new int[]{5, 47, 107, 108, 109, 110, 210, 315, 316, 335, 338,
-            340, 393, 401, 404, 477, 480, 485, 490, 498, 573, 575, 578, 735, 736, 751, 753, 754, 755, 756, 1073741883};
+            340, 393, 401, 404, 477, 480, 485, 490, 498, 573, 575, 578, 735, 736, 751, 753, 754, 755, 756, 757};
     private int protocolVersion;
 
     ClientVersion(int protocolVersion) {
-        this.protocolVersion = (short) protocolVersion;
+        this.protocolVersion = protocolVersion;
     }
 
     /**
@@ -132,19 +134,19 @@ public enum ClientVersion {
         } else if (protocolVersion > HIGHEST_SUPPORTED_PROTOCOL_VERSION) {
             return HIGHER_THAN_SUPPORTED_VERSIONS;
         } else {
-            ClientVersion cached = CLIENT_VERSION_CACHE.get((short) protocolVersion);
+            ClientVersion cached = CLIENT_VERSION_CACHE.get(protocolVersion);
             if (cached == null) {
                 for (ClientVersion version : values()) {
                     if (version.protocolVersion > protocolVersion) {
                         break;
                     } else if (version.protocolVersion == protocolVersion) {
                         //Cache for next time
-                        CLIENT_VERSION_CACHE.put((short) protocolVersion, version);
+                        CLIENT_VERSION_CACHE.put(protocolVersion, version);
                         return version;
                     }
                 }
                 cached = UNKNOWN;
-                cached.protocolVersion = (short) protocolVersion;
+                cached.protocolVersion = protocolVersion;
             }
             return cached;
         }

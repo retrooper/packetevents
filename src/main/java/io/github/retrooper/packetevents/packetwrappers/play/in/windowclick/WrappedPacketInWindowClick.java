@@ -18,25 +18,16 @@
 
 package io.github.retrooper.packetevents.packetwrappers.play.in.windowclick;
 
-import io.github.retrooper.packetevents.packettype.PacketTypeClasses;
 import io.github.retrooper.packetevents.packetwrappers.NMSPacket;
 import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
 import io.github.retrooper.packetevents.utils.enums.EnumUtil;
 import io.github.retrooper.packetevents.utils.nms.NMSUtils;
-import io.github.retrooper.packetevents.utils.reflection.Reflection;
 import io.github.retrooper.packetevents.utils.server.ServerVersion;
 import org.bukkit.inventory.ItemStack;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Optional;
-
 public class WrappedPacketInWindowClick extends WrappedPacket {
-    private static boolean v_1_17;
+    private static boolean legacy, v_1_17;
     private static Class<? extends Enum<?>> invClickTypeClass;
-    private static boolean isClickModePrimitive;
-
 
     public WrappedPacketInWindowClick(NMSPacket packet) {
         super(packet);
@@ -44,53 +35,60 @@ public class WrappedPacketInWindowClick extends WrappedPacket {
 
     @Override
     protected void load() {
+        legacy = version.isOlderThanOrEquals(ServerVersion.v_1_8_8);
         v_1_17 = version.isNewerThanOrEquals(ServerVersion.v_1_17);
         invClickTypeClass = NMSUtils.getNMSEnumClassWithoutException("InventoryClickType");
         if (invClickTypeClass == null) {
             invClickTypeClass = NMSUtils.getNMEnumClassWithoutException("world.inventory.InventoryClickType");
         }
-        isClickModePrimitive = Reflection.getField(PacketTypeClasses.Play.Client.WINDOW_CLICK, int.class, 3) != null;
     }
 
+    // Unique ID for the inventory, 0 for player's inventory
     public int getWindowId() {
-        return readInt(0);
+        return readInt(v_1_17 ? 1 : 0);
     }
 
     public void setWindowId(int windowID) {
-        writeInt(0, windowID);
+        writeInt(v_1_17 ? 1 : 0, windowID);
     }
 
+    // Id of clicked slot
     public int getWindowSlot() {
-        return readInt(1);
+        return readInt(v_1_17 ? 3 : 1);
     }
 
     public void setWindowSlot(int slot) {
-        writeInt(1, slot);
+        writeInt(v_1_17 ? 3 : 1, slot);
     }
 
+    // Left or right click
     public int getWindowButton() {
-        return readInt(2);
+        return readInt(v_1_17 ? 4 : 2);
     }
 
     public void setWindowButton(int button) {
-        writeInt(2, button);
+        writeInt(v_1_17 ? 4 : 2, button);
     }
 
-    public Optional<Short> getActionNumber() {
+    // Used to sync together client and server
+    public int getActionNumber() {
         if (v_1_17) {
-            return Optional.empty();
+            return readInt(2);
         }
-        return Optional.of(readShort(0));
+        return readShort(0);
     }
 
-    public void setActionNumber(short actionNumber) {
-        if (!v_1_17) {
-            writeShort(0, actionNumber);
+    public void setActionNumber(int actionNumber) {
+        if (v_1_17) {
+            writeInt(2, actionNumber);
+        } else {
+            writeShort(0, (short) actionNumber);
         }
     }
 
+    // Type of click - shift clicking, hotbar, drag, pickup...
     public int getMode() {
-        if (isClickModePrimitive) {
+        if(legacy) {
             return readInt(3);
         } else {
             Enum<?> enumConst = readEnumConstant(0, invClickTypeClass);
@@ -99,7 +97,7 @@ public class WrappedPacketInWindowClick extends WrappedPacket {
     }
 
     public void setMode(int mode) {
-        if (isClickModePrimitive) {
+        if(legacy) {
             writeInt(3, mode);
         } else {
             Enum<?> enumConst = EnumUtil.valueByIndex(invClickTypeClass, mode);
@@ -117,6 +115,6 @@ public class WrappedPacketInWindowClick extends WrappedPacket {
     }
 
     public void setClickedItemStack(ItemStack stack) {
-       writeItemStack(0, stack);
+        writeItemStack(0, stack);
     }
 }

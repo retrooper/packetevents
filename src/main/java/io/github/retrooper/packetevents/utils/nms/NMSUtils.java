@@ -27,10 +27,7 @@ import io.github.retrooper.packetevents.utils.server.ServerVersion;
 import io.github.retrooper.packetevents.utils.vector.Vector3d;
 import io.github.retrooper.packetevents.utils.vector.Vector3f;
 import io.github.retrooper.packetevents.utils.vector.Vector3i;
-import org.bukkit.Bukkit;
-import org.bukkit.Material;
-import org.bukkit.Server;
-import org.bukkit.World;
+import org.bukkit.*;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -54,10 +51,10 @@ public final class NMSUtils {
     public static Constructor<?> blockPosConstructor, minecraftKeyConstructor, vec3DConstructor, dataWatcherConstructor, packetDataSerializerConstructor, itemStackConstructor;
     public static Class<?> mobEffectListClass, nmsEntityClass, minecraftServerClass, craftWorldClass, playerInteractManagerClass, entityPlayerClass, playerConnectionClass, craftServerClass,
             craftPlayerClass, serverConnectionClass, craftEntityClass, nmsItemStackClass, networkManagerClass, nettyChannelClass, gameProfileClass, iChatBaseComponentClass,
-            blockPosClass, vec3DClass, channelFutureClass, blockClass, iBlockDataClass, nmsWorldClass, craftItemStackClass,
+            blockPosClass, sectionPositionClass, vec3DClass, channelFutureClass, blockClass, iBlockDataClass, nmsWorldClass, craftItemStackClass,
             soundEffectClass, minecraftKeyClass, chatSerializerClass, craftMagicNumbersClass, worldSettingsClass, worldServerClass, dataWatcherClass,
             dedicatedServerClass, entityHumanClass, packetDataSerializerClass, byteBufClass, dimensionManagerClass, nmsItemClass, iMaterialClass, movingObjectPositionBlockClass, boundingBoxClass,
-    tileEntityCommandClass;
+            tileEntityCommandClass;
     public static Class<? extends Enum<?>> enumDirectionClass, enumHandClass, enumGameModeClass, enumDifficultyClass, tileEntityCommandTypeClass;
     public static Method getBlockPosX, getBlockPosY, getBlockPosZ;
     private static String nettyPrefix;
@@ -82,7 +79,7 @@ public final class NMSUtils {
             //Test if the selected netty location is valid
             getNettyClass("channel.Channel");
         } catch (Exception ex) {
-            System.err.println("[packetevents] Failed to locate the netty package location for your server version. Searching...");
+            Bukkit.getConsoleSender().sendMessage(ChatColor.DARK_RED + "[packetevents] Failed to locate the netty package location for your server version. Searching...");
             //Time to correct the netty location
             if (legacyNettyImportMode) {
                 legacyNettyImportMode = false;
@@ -246,6 +243,11 @@ public final class NMSUtils {
             }
         }
 
+        sectionPositionClass = getNMSClassWithoutException("SectionPosition");
+        if (sectionPositionClass == null) {
+            sectionPositionClass = getNMClassWithoutException("core.SectionPosition");
+        }
+
         if (version.isNewerThanOrEquals(ServerVersion.v_1_14)) {
             movingObjectPositionBlockClass = NMSUtils.getNMSClassWithoutException("MovingObjectPositionBlock");
 
@@ -324,11 +326,11 @@ public final class NMSUtils {
 
         try {
             if (mobEffectListClass != null) {
-                getMobEffectListId = mobEffectListClass.getMethod("getId", mobEffectListClass);
-                getMobEffectListById = mobEffectListClass.getMethod("fromId", int.class);
+                getMobEffectListId = Reflection.getMethod(mobEffectListClass, 0, mobEffectListClass);
+                getMobEffectListById = Reflection.getMethod(mobEffectListClass, 0, int.class);
             }
-        } catch (Exception ignored) {
-
+        } catch (Exception ex) {
+            ex.printStackTrace();
         }
         try {
             entityPlayerPingField = entityPlayerClass.getField("ping");
@@ -337,9 +339,19 @@ public final class NMSUtils {
         }
         //In case its null, these methods are not needed and would cause errors
         if (blockPosClass != null) {
-            getBlockPosX = Reflection.getMethod(NMSUtils.blockPosClass.getSuperclass(), "getX", 0);
-            getBlockPosY = Reflection.getMethod(NMSUtils.blockPosClass.getSuperclass(), "getY", 0);
-            getBlockPosZ = Reflection.getMethod(NMSUtils.blockPosClass.getSuperclass(), "getZ", 0);
+            getBlockPosX = Reflection.getMethod(NMSUtils.blockPosClass, "getX", int.class);
+            getBlockPosY = Reflection.getMethod(NMSUtils.blockPosClass, "getY", int.class);
+            getBlockPosZ = Reflection.getMethod(NMSUtils.blockPosClass, "getZ", int.class);
+            // Mappings changed with 1.18
+            if (getBlockPosX == null) {
+                getBlockPosX = Reflection.getMethod(NMSUtils.blockPosClass, "u", int.class);
+            }
+            if (getBlockPosY == null) {
+                getBlockPosY = Reflection.getMethod(NMSUtils.blockPosClass, "v", int.class);
+            }
+            if (getBlockPosZ == null) {
+                getBlockPosZ = Reflection.getMethod(NMSUtils.blockPosClass, "w", int.class);
+            }
         }
         worldSettingsClass = NMSUtils.getNMSClassWithoutException("WorldSettings");
         if (worldServerClass == null) {
@@ -388,7 +400,10 @@ public final class NMSUtils {
     }
 
     public static double[] recentTPS() {
-        return new WrappedPacket(new NMSPacket(getMinecraftServerInstance(Bukkit.getServer())), minecraftServerClass).readDoubleArray(0);
+        WrappedPacket minecraftServerInstanceReader = new WrappedPacket(
+                new NMSPacket(getMinecraftServerInstance(Bukkit.getServer())),
+                minecraftServerClass);
+        return minecraftServerInstanceReader.readDoubleArray(0);
     }
 
     public static Class<?> getNMSClass(String name) throws ClassNotFoundException {
@@ -447,7 +462,7 @@ public final class NMSUtils {
     @Nullable
     @Deprecated
     public static Entity getEntityById(@Nullable World world, int id) {
-       return PacketEvents.get().getServerUtils().getEntityById(world, id);
+        return PacketEvents.get().getServerUtils().getEntityById(world, id);
     }
 
     public static Entity getBukkitEntity(Object nmsEntity) {

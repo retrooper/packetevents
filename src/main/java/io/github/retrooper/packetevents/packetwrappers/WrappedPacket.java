@@ -34,6 +34,7 @@ import io.github.retrooper.packetevents.utils.vector.Vector3i;
 import io.github.retrooper.packetevents.utils.world.Difficulty;
 import io.github.retrooper.packetevents.utils.world.Dimension;
 import org.bukkit.inventory.ItemStack;
+import org.jetbrains.annotations.Nullable;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -50,7 +51,6 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
 
 public class WrappedPacket implements WrapperPacketReader, WrapperPacketWriter {
-
     private static final Map<Class<? extends WrappedPacket>, Boolean> LOADED_WRAPPERS = new ConcurrentHashMap<>();
     private static final Map<Class<?>, Map<Class<?>, Field[]>> FIELD_CACHE = new ConcurrentHashMap<>();
     private static final Field[] EMPTY_FIELD_ARRAY = new Field[0];
@@ -383,6 +383,9 @@ public class WrappedPacket implements WrapperPacketReader, WrapperPacketWriter {
     public void writeAnyObject(int index, Object value) {
         try {
             Field f = packetClass.getDeclaredFields()[index];
+            if (!f.isAccessible()) {
+                f.setAccessible(true);
+            }
             f.set(packet.getRawNMSPacket(), value);
         } catch (Exception e) {
             throw new WrapperFieldNotFoundException("PacketEvents failed to find any field indexed " + index + " in the " + ClassUtil.getClassSimpleName(packetClass) + " class!");
@@ -393,8 +396,7 @@ public class WrappedPacket implements WrapperPacketReader, WrapperPacketWriter {
     public void writeEnumConstant(int index, Enum<?> enumConstant) {
         try {
             write(enumConstant.getClass(), index, enumConstant);
-        }
-        catch (WrapperFieldNotFoundException ex) {
+        } catch (WrapperFieldNotFoundException ex) {
             write(enumConstant.getDeclaringClass(), index, enumConstant);
         }
     }
@@ -414,9 +416,22 @@ public class WrappedPacket implements WrapperPacketReader, WrapperPacketWriter {
     public Vector3i readBlockPosition(int index) {
         Object blockPosObj = readObject(index, NMSUtils.blockPosClass);
         try {
-            int x = (int) NMSUtils.getBlockPosX.invoke(blockPosObj);
-            int y = (int) NMSUtils.getBlockPosY.invoke(blockPosObj);
-            int z = (int) NMSUtils.getBlockPosZ.invoke(blockPosObj);
+            int x = (Integer) NMSUtils.getBlockPosX.invoke(blockPosObj);
+            int y = (Integer) NMSUtils.getBlockPosY.invoke(blockPosObj);
+            int z = (Integer) NMSUtils.getBlockPosZ.invoke(blockPosObj);
+            return new Vector3i(x, y, z);
+        } catch (IllegalAccessException | InvocationTargetException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    public Vector3i readSectionPosition(int index) {
+        Object blockPosObj = readObject(index, NMSUtils.sectionPositionClass);
+        try {
+            int x = (Integer) NMSUtils.getBlockPosX.invoke(blockPosObj);
+            int y = (Integer) NMSUtils.getBlockPosY.invoke(blockPosObj);
+            int z = (Integer) NMSUtils.getBlockPosZ.invoke(blockPosObj);
             return new Vector3i(x, y, z);
         } catch (IllegalAccessException | InvocationTargetException e) {
             e.printStackTrace();
@@ -439,13 +454,19 @@ public class WrappedPacket implements WrapperPacketReader, WrapperPacketWriter {
         write(NMSUtils.nmsItemStackClass, index, nmsItemStack);
     }
 
+    @Nullable
     public GameMode readGameMode(int index) {
         Enum<?> enumConst = readEnumConstant(index, NMSUtils.enumGameModeClass);
-        return GameMode.values()[enumConst.ordinal() - 1];
+        int targetIndex = enumConst.ordinal() - 1;
+        if (targetIndex == -1) {
+            return null;
+        }
+        return GameMode.values()[targetIndex];
     }
 
-    public void writeGameMode(int index, GameMode gameMode) {
-        Enum<?> enumConst = EnumUtil.valueByIndex(NMSUtils.enumGameModeClass, gameMode.ordinal() + 1);
+    public void writeGameMode(int index, @Nullable GameMode gameMode) {
+        int i = gameMode != null ? (gameMode.ordinal() + 1) : (0);
+        Enum<?> enumConst = EnumUtil.valueByIndex(NMSUtils.enumGameModeClass, i);
         writeEnumConstant(index, enumConst);
     }
 

@@ -32,7 +32,6 @@ import java.lang.reflect.Constructor;
  * This packet is used for a number of actions and animations performed by blocks, usually non-persistent.
  *
  * @author Tecnio
- * @see <a href="https://wiki.vg/Protocol#Block_Action"</a>
  */
 public class WrappedPacketOutBlockAction extends WrappedPacket implements SendableWrapper {
 

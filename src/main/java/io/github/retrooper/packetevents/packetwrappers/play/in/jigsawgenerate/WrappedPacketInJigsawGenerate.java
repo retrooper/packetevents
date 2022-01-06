@@ -26,7 +26,6 @@ import io.github.retrooper.packetevents.utils.vector.Vector3i;
  * Sent when Generate is pressed on the Jigsaw Block interface.
  *
  * @author Tecnio
- * @see <a href="https://wiki.vg/Protocol#Generate_Structure"</a>
  */
 public class WrappedPacketInJigsawGenerate extends WrappedPacket {
 
