@@ -29,7 +29,7 @@ import java.util.Optional;
 
 public class LivingEntityDataProvider extends EntityDataProvider {
     private boolean handActive;
-    private InteractionHand hand;
+    private InteractionHand hand = InteractionHand.MAIN_HAND;
     private boolean isInRiptideSpinAttack;
     private float health = 1.0f;
     private int potionEffectColor;

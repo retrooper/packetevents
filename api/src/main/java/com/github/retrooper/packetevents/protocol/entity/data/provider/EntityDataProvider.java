@@ -33,7 +33,7 @@ public class EntityDataProvider implements DataProvider {
     private BaseComponent customName;
 
     private boolean customNameVisible;
-    private EntityPose pose;
+    private EntityPose pose = EntityPose.STANDING;
     private int airTicks;
     private int ticksFrozenInPowderedSnow = 0;
     private boolean onFire;
@@ -47,7 +47,7 @@ public class EntityDataProvider implements DataProvider {
     private boolean glowing;
     private boolean flyingWithElytra;
     private boolean silent;
-    private boolean hasGravity;
+    private boolean hasGravity = true;
 
     @Nullable
     public BaseComponent getCustomName() {
