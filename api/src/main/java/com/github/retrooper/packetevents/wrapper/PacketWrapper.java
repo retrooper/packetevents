@@ -72,7 +72,9 @@ public class PacketWrapper<T extends PacketWrapper> {
         this.packetID = event.getPacketId();
         if (event.getLastUsedWrapper() == null) {
             event.setLastUsedWrapper(this);
+            int bufferIndex = getBuffer().readerIndex();
             readData();
+            getBuffer().readerIndex(bufferIndex);
         } else {
             readData((T) event.getLastUsedWrapper());
         }
@@ -85,7 +87,9 @@ public class PacketWrapper<T extends PacketWrapper> {
         this.packetID = event.getPacketId();
         if (event.getLastUsedWrapper() == null) {
             event.setLastUsedWrapper(this);
+            int bufferIndex = getBuffer().readerIndex();
             readData();
+            getBuffer().readerIndex(bufferIndex);
         } else {
             readData((T) event.getLastUsedWrapper());
         }
