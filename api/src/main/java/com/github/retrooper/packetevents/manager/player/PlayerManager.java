@@ -130,6 +130,36 @@ public interface PlayerManager {
         sendPacket(channel, wrapper);
     }
 
+    default void sendPacketSilently(ChannelAbstract channel, PacketWrapper<?> wrapper) {
+        boolean shouldSend = true;
+        if (wrapper instanceof WrapperPlayServerDestroyEntities) {
+            WrapperPlayServerDestroyEntities destroyEntities = (WrapperPlayServerDestroyEntities) wrapper;
+            if (destroyEntities.getEntityIds().length > 1 && wrapper.getServerVersion() == ServerVersion.V_1_17) {
+                //Transform into multiple packets
+                for (int entityId : destroyEntities.getEntityIds()) {
+                    WrapperPlayServerDestroyEntities newPacket = new WrapperPlayServerDestroyEntities(entityId);
+                    newPacket.prepareForSend();
+                    sendPacketSilently(channel, newPacket.buffer);
+                    shouldSend = false;
+                }
+            }
+        }
+        if (shouldSend) {
+            wrapper.prepareForSend();
+            sendPacketSilently(channel, wrapper.buffer);
+        }
+    }
+
+    default void sendPacketSilently(@NotNull Object player, ByteBufAbstract byteBuf) {
+        ChannelAbstract channel = getChannel(player);
+        sendPacketSilently(channel, byteBuf);
+    }
+
+    default void sendPacketSilently(@NotNull Object player, PacketWrapper<?> wrapper) {
+        ChannelAbstract channel = getChannel(player);
+        sendPacketSilently(channel, wrapper);
+    }
+
     default GameProfile getGameProfile(ChannelAbstract channel) {
         return GAME_PROFILES.get(channel);
     }
@@ -147,6 +177,8 @@ public interface PlayerManager {
     }
 
     void sendPacket(ChannelAbstract channel, ByteBufAbstract byteBuf);
+
+    void sendPacketSilently(ChannelAbstract channel, ByteBufAbstract byteBuf);
 
     int getPing(@NotNull Object player);
 

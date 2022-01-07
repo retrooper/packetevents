@@ -116,8 +116,16 @@ public class PlayerManagerImpl implements PlayerManager {
             } catch (InvocationTargetException e) {
                 e.printStackTrace();
             }
-            //Call the encoders after ours
-            channel.pipeline().context(PacketEvents.ENCODER_NAME).writeAndFlush(output);
+            //Now call the encoders after ours
+            channel.pipeline().context(PacketEvents.ENCODER_NAME).writeAndFlush(byteBuf);
+        }
+    }
+
+    @Override
+    public void sendPacketSilently(ChannelAbstract channel, ByteBufAbstract byteBuf) {
+        if (channel.isOpen()) {
+            //Only call the encoders after ours
+            channel.pipeline().context(PacketEvents.ENCODER_NAME).writeAndFlush(byteBuf);
         }
     }
 
