@@ -110,7 +110,7 @@ public interface PlayerManager {
                     WrapperPlayServerDestroyEntities newPacket = new WrapperPlayServerDestroyEntities(entityId);
                     newPacket.prepareForSend();
                     //Duplicate buffer
-                    sendPacket(channel, newPacket.buffer.duplicate());
+                    sendPacket(channel, newPacket.buffer);
                     shouldSend = false;
                 }
             }
@@ -118,7 +118,7 @@ public interface PlayerManager {
         if (shouldSend) {
             wrapper.prepareForSend();
             //We duplicate the buffer, so the user can send the same wrapper object multiple times
-            sendPacket(channel, wrapper.buffer.duplicate());
+            sendPacket(channel, wrapper.buffer);
         }
     }
 
