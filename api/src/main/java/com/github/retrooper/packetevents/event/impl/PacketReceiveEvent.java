@@ -53,14 +53,13 @@ public class PacketReceiveEvent extends ProtocolPacketEvent<Object> {
 
     @Override
     public PacketReceiveEvent clone() {
-        return new PacketReceiveEvent(getPacketId(), getPacketType(), getServerVersion(), getClientVersion(), getSocketAddress(), getConnectionState(), getChannel(), getPlayer(), getByteBuf());
+        return new PacketReceiveEvent(getPacketId(), getPacketType(), getServerVersion(), getClientVersion(), getSocketAddress(), getConnectionState(), getChannel(), getPlayer(), getByteBuf().duplicate());
     }
 
     @Override
     public void call(PacketListenerAbstract listener) {
         if (listener.isPreProcessed()) {
             PacketReceiveEvent preProcessedEvent = clone();
-            preProcessedEvent.setByteBuf(preProcessedEvent.getByteBuf().duplicate());
             listener.onPacketReceive(preProcessedEvent);
         }
         else {

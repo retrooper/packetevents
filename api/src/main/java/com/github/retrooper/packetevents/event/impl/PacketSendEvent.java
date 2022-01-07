@@ -87,14 +87,15 @@ public class PacketSendEvent extends ProtocolPacketEvent<Object> {
 
     @Override
     public PacketSendEvent clone() {
-        return new PacketSendEvent(getPacketId(), getPacketType(), getServerVersion(), getClientVersion(), getSocketAddress(), getConnectionState(), getChannel(), getPlayer(), getByteBuf());
+        return new PacketSendEvent(getPacketId(), getPacketType(), getServerVersion(), getClientVersion(), getSocketAddress(), getConnectionState(), getChannel(), getPlayer(), getByteBuf().duplicate());
     }
 
     @Override
     public void call(PacketListenerAbstract listener) {
         if (listener.isPreProcessed()) {
-            PacketSendEvent preProcessedEvent = new PacketSendEvent(getPacketId(), getPacketType(), getServerVersion(), getClientVersion(), getSocketAddress(), getConnectionState(), getChannel(), getPlayer(), getByteBuf());
-            preProcessedEvent.setByteBuf(preProcessedEvent.getByteBuf().duplicate());
+            System.out.println("here: " + getPacketId());
+            PacketSendEvent preProcessedEvent = clone();
+            System.out.println("pre processed id: " + preProcessedEvent.getPacketId());
             listener.onPacketSend(preProcessedEvent);
         } else {
             listener.onPacketSend(this);
