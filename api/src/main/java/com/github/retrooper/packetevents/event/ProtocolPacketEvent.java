@@ -118,7 +118,7 @@ public abstract class ProtocolPacketEvent<T> extends PacketEvent implements Play
         this.packetType = PacketType.getById(packetSide, connectionState, this.serverVersion, packetID);
     }
 
-    public ProtocolPacketEvent(int packetID, PacketTypeCommon packetType, ServerVersion serverVersion, ClientVersion clientVersion, InetSocketAddress socketAddress, PacketSide packetSide, ConnectionState connectionState, ChannelAbstract channel, T player, ByteBufAbstract byteBuf) {
+    public ProtocolPacketEvent(int packetID, PacketTypeCommon packetType, ServerVersion serverVersion, ClientVersion clientVersion, InetSocketAddress socketAddress, ConnectionState connectionState, ChannelAbstract channel, T player, ByteBufAbstract byteBuf) {
         this.channel = channel;
         this.socketAddress = socketAddress;
         this.player = player;

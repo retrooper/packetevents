@@ -74,7 +74,7 @@ public class PacketSendEvent extends ProtocolPacketEvent<Object> {
     }
 
     public PacketSendEvent(int packetID, PacketTypeCommon packetType, ServerVersion serverVersion, ClientVersion clientVersion, InetSocketAddress socketAddress, ConnectionState connectionState, ChannelAbstract channel, Object player, ByteBufAbstract byteBuf) {
-        super(packetID, packetType, serverVersion, clientVersion, socketAddress, PacketSide.SERVER, connectionState, channel, player, byteBuf);
+        super(packetID, packetType, serverVersion, clientVersion, socketAddress, connectionState, channel, player, byteBuf);
     }
 
     public Runnable getPostTask() {
@@ -93,7 +93,7 @@ public class PacketSendEvent extends ProtocolPacketEvent<Object> {
     @Override
     public void call(PacketListenerAbstract listener) {
         if (listener.isPreProcessed()) {
-            PacketSendEvent preProcessedEvent = clone();
+            PacketSendEvent preProcessedEvent = new PacketSendEvent(getPacketId(), getPacketType(), getServerVersion(), getClientVersion(), getSocketAddress(), getConnectionState(), getChannel(), getPlayer(), getByteBuf());
             preProcessedEvent.setByteBuf(preProcessedEvent.getByteBuf().duplicate());
             listener.onPacketSend(preProcessedEvent);
         } else {

@@ -48,7 +48,7 @@ public class PacketReceiveEvent extends ProtocolPacketEvent<Object> {
     }
 
     public PacketReceiveEvent(int packetID, PacketTypeCommon packetType, ServerVersion serverVersion, ClientVersion clientVersion, InetSocketAddress socketAddress, ConnectionState connectionState, ChannelAbstract channel, Object player, ByteBufAbstract byteBuf) {
-        super(packetID, packetType, serverVersion, clientVersion, socketAddress, PacketSide.CLIENT, connectionState, channel, player, byteBuf);
+        super(packetID, packetType, serverVersion, clientVersion, socketAddress, connectionState, channel, player, byteBuf);
     }
 
     @Override
