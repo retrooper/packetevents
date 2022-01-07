@@ -20,10 +20,15 @@ package com.github.retrooper.packetevents.event.impl;
 
 import com.github.retrooper.packetevents.event.PacketListenerAbstract;
 import com.github.retrooper.packetevents.event.ProtocolPacketEvent;
+import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.netty.buffer.ByteBufAbstract;
 import com.github.retrooper.packetevents.netty.channel.ChannelAbstract;
 import com.github.retrooper.packetevents.protocol.ConnectionState;
 import com.github.retrooper.packetevents.protocol.PacketSide;
+import com.github.retrooper.packetevents.protocol.packettype.PacketTypeCommon;
+import com.github.retrooper.packetevents.protocol.player.ClientVersion;
+
+import java.net.InetSocketAddress;
 
 public class PacketReceiveEvent extends ProtocolPacketEvent<Object> {
     public PacketReceiveEvent(ChannelAbstract channel, Object player, ByteBufAbstract byteBuf) {
@@ -42,10 +47,20 @@ public class PacketReceiveEvent extends ProtocolPacketEvent<Object> {
         super(PacketSide.CLIENT, connectionState, channel, player, rawByteBuf);
     }
 
+    public PacketReceiveEvent(int packetID, PacketTypeCommon packetType, ServerVersion serverVersion, ClientVersion clientVersion, InetSocketAddress socketAddress, ConnectionState connectionState, ChannelAbstract channel, Object player, ByteBufAbstract byteBuf) {
+        super(packetID, packetType, serverVersion, clientVersion, socketAddress, PacketSide.CLIENT, connectionState, channel, player, byteBuf);
+    }
+
+    @Override
+    public PacketReceiveEvent clone() {
+        return new PacketReceiveEvent(getPacketId(), getPacketType(), getServerVersion(), getClientVersion(), getSocketAddress(), getConnectionState(), getChannel(), getPlayer(), getByteBuf());
+    }
+
     @Override
     public void call(PacketListenerAbstract listener) {
         if (listener.isPreProcessed()) {
-            PacketReceiveEvent preProcessedEvent = new PacketReceiveEvent(getConnectionState(), getChannel(), getPlayer(), getByteBuf().duplicate());
+            PacketReceiveEvent preProcessedEvent = clone();
+            preProcessedEvent.setByteBuf(preProcessedEvent.getByteBuf().duplicate());
             listener.onPacketReceive(preProcessedEvent);
         }
         else {

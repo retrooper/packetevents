@@ -19,16 +19,16 @@
 package com.github.retrooper.packetevents.event;
 
 import com.github.retrooper.packetevents.PacketEvents;
-import com.github.retrooper.packetevents.manager.server.ServerVersion;
-import com.github.retrooper.packetevents.protocol.ConnectionState;
-import com.github.retrooper.packetevents.protocol.PacketSide;
-import com.github.retrooper.packetevents.protocol.packettype.PacketTypeCommon;
-import com.github.retrooper.packetevents.netty.buffer.ByteBufAbstract;
-import com.github.retrooper.packetevents.netty.channel.ChannelAbstract;
-import com.github.retrooper.packetevents.protocol.player.ClientVersion;
-import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.event.type.CancellableEvent;
 import com.github.retrooper.packetevents.event.type.PlayerEvent;
+import com.github.retrooper.packetevents.manager.server.ServerVersion;
+import com.github.retrooper.packetevents.netty.buffer.ByteBufAbstract;
+import com.github.retrooper.packetevents.netty.channel.ChannelAbstract;
+import com.github.retrooper.packetevents.protocol.ConnectionState;
+import com.github.retrooper.packetevents.protocol.PacketSide;
+import com.github.retrooper.packetevents.protocol.packettype.PacketType;
+import com.github.retrooper.packetevents.protocol.packettype.PacketTypeCommon;
+import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -116,6 +116,18 @@ public abstract class ProtocolPacketEvent<T> extends PacketEvent implements Play
         this.byteBuf = byteBuf;
         this.packetID = readVarInt(byteBuf);
         this.packetType = PacketType.getById(packetSide, connectionState, this.serverVersion, packetID);
+    }
+
+    public ProtocolPacketEvent(int packetID, PacketTypeCommon packetType, ServerVersion serverVersion, ClientVersion clientVersion, InetSocketAddress socketAddress, PacketSide packetSide, ConnectionState connectionState, ChannelAbstract channel, T player, ByteBufAbstract byteBuf) {
+        this.channel = channel;
+        this.socketAddress = socketAddress;
+        this.player = player;
+        this.connectionState = connectionState;
+        this.clientVersion = clientVersion;
+        this.serverVersion = serverVersion;
+        this.byteBuf = byteBuf;
+        this.packetID = packetID;
+        this.packetType = packetType;
     }
 
     private static int readVarInt(ByteBufAbstract byteBuf) {

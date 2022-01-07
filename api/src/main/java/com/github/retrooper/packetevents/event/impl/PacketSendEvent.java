@@ -19,12 +19,16 @@
 package com.github.retrooper.packetevents.event.impl;
 
 import com.github.retrooper.packetevents.event.PacketListenerAbstract;
-import com.github.retrooper.packetevents.protocol.ConnectionState;
-import com.github.retrooper.packetevents.protocol.PacketSide;
-import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 import com.github.retrooper.packetevents.event.ProtocolPacketEvent;
+import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.netty.buffer.ByteBufAbstract;
 import com.github.retrooper.packetevents.netty.channel.ChannelAbstract;
+import com.github.retrooper.packetevents.protocol.ConnectionState;
+import com.github.retrooper.packetevents.protocol.PacketSide;
+import com.github.retrooper.packetevents.protocol.packettype.PacketTypeCommon;
+import com.github.retrooper.packetevents.protocol.player.ClientVersion;
+
+import java.net.InetSocketAddress;
 
 public class PacketSendEvent extends ProtocolPacketEvent<Object> {
     private Runnable postTask = null;
@@ -69,6 +73,10 @@ public class PacketSendEvent extends ProtocolPacketEvent<Object> {
         this.postTask = null;
     }
 
+    public PacketSendEvent(int packetID, PacketTypeCommon packetType, ServerVersion serverVersion, ClientVersion clientVersion, InetSocketAddress socketAddress, ConnectionState connectionState, ChannelAbstract channel, Object player, ByteBufAbstract byteBuf) {
+        super(packetID, packetType, serverVersion, clientVersion, socketAddress, PacketSide.SERVER, connectionState, channel, player, byteBuf);
+    }
+
     public Runnable getPostTask() {
         return postTask;
     }
@@ -78,12 +86,17 @@ public class PacketSendEvent extends ProtocolPacketEvent<Object> {
     }
 
     @Override
+    public PacketSendEvent clone() {
+        return new PacketSendEvent(getPacketId(), getPacketType(), getServerVersion(), getClientVersion(), getSocketAddress(), getConnectionState(), getChannel(), getPlayer(), getByteBuf());
+    }
+
+    @Override
     public void call(PacketListenerAbstract listener) {
         if (listener.isPreProcessed()) {
-            PacketSendEvent preProcessedEvent = new PacketSendEvent(getConnectionState(), getChannel(), getPlayer(), getByteBuf().duplicate());
+            PacketSendEvent preProcessedEvent = clone();
+            preProcessedEvent.setByteBuf(preProcessedEvent.getByteBuf().duplicate());
             listener.onPacketSend(preProcessedEvent);
-        }
-        else {
+        } else {
             listener.onPacketSend(this);
         }
     }

@@ -46,11 +46,11 @@ public abstract class PacketListenerAbstract {
         this.readOnly = readOnly;
     }
 
-    public PacketListenerAbstract(PacketListenerPriority priority, boolean readOnly, boolean cached) {
+    public PacketListenerAbstract(PacketListenerPriority priority, boolean readOnly, boolean preProcessed) {
         this.priority = priority;
         this.methods = null;
         this.readOnly = readOnly;
-        this.preProcessed = cached;
+        this.preProcessed = preProcessed;
     }
 
     public PacketListenerAbstract(PacketListenerPriority priority, Map<Byte, List<Method>> methods) {
@@ -64,11 +64,11 @@ public abstract class PacketListenerAbstract {
         this.readOnly = readOnly;
     }
 
-    public PacketListenerAbstract(PacketListenerPriority priority, Map<Byte, List<Method>> methods, boolean readOnly, boolean cached) {
+    public PacketListenerAbstract(PacketListenerPriority priority, Map<Byte, List<Method>> methods, boolean readOnly, boolean preProcessed) {
         this.priority = priority;
         this.methods = methods;
         this.readOnly = readOnly;
-        this.preProcessed = cached;
+        this.preProcessed = preProcessed;
     }
 
 
