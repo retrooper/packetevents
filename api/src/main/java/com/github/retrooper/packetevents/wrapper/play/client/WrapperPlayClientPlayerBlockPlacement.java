@@ -28,19 +28,19 @@ import com.github.retrooper.packetevents.util.Vector3i;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 
 import java.util.Optional;
-
-public class WrapperPlayClientBlockPlacement extends PacketWrapper<WrapperPlayClientBlockPlacement> {
+//TODO Test on 1.8 and later versions. Make sure its not mixed up with Use Item
+public class WrapperPlayClientPlayerBlockPlacement extends PacketWrapper<WrapperPlayClientPlayerBlockPlacement> {
     private InteractionHand interactionHand;
     private Vector3i blockPosition;
     private BlockFace face;
     private Vector3f cursorPosition;
     private Optional<Boolean> insideBlock;
 
-    public WrapperPlayClientBlockPlacement(PacketReceiveEvent event) {
+    public WrapperPlayClientPlayerBlockPlacement(PacketReceiveEvent event) {
         super(event);
     }
 
-    public WrapperPlayClientBlockPlacement(InteractionHand interactionHand, Vector3i blockPosition, BlockFace face, Vector3f cursorPosition, Optional<Boolean> insideBlock) {
+    public WrapperPlayClientPlayerBlockPlacement(InteractionHand interactionHand, Vector3i blockPosition, BlockFace face, Vector3f cursorPosition, Optional<Boolean> insideBlock) {
         super(PacketType.Play.Client.PLAYER_BLOCK_PLACEMENT);
         this.interactionHand = interactionHand;
         this.blockPosition = blockPosition;
@@ -71,7 +71,7 @@ public class WrapperPlayClientBlockPlacement extends PacketWrapper<WrapperPlayCl
     }
 
     @Override
-    public void readData(WrapperPlayClientBlockPlacement wrapper) {
+    public void readData(WrapperPlayClientPlayerBlockPlacement wrapper) {
         interactionHand = wrapper.interactionHand;
         blockPosition = wrapper.blockPosition;
         face = wrapper.face;

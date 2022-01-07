@@ -44,6 +44,12 @@ public class PacketReceiveEvent extends ProtocolPacketEvent<Object> {
 
     @Override
     public void call(PacketListenerAbstract listener) {
-        listener.onPacketReceive(this);
+        if (listener.isPreProcessed()) {
+            PacketReceiveEvent preProcessedEvent = new PacketReceiveEvent(getConnectionState(), getChannel(), getPlayer(), getByteBuf().duplicate());
+            listener.onPacketReceive(preProcessedEvent);
+        }
+        else {
+            listener.onPacketReceive(this);
+        }
     }
 }

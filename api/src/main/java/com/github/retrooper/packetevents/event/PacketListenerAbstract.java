@@ -19,7 +19,6 @@
 package com.github.retrooper.packetevents.event;
 
 import com.github.retrooper.packetevents.event.impl.*;
-import com.github.retrooper.packetevents.event.impl.*;
 
 import java.lang.reflect.Method;
 import java.util.List;
@@ -35,7 +34,7 @@ public abstract class PacketListenerAbstract {
     protected final Map<Byte, List<Method>> methods;
     private final PacketListenerPriority priority;
     private boolean readOnly;
-
+    private boolean preProcessed;
     public PacketListenerAbstract(PacketListenerPriority priority) {
         this.priority = priority;
         this.methods = null;
@@ -45,6 +44,13 @@ public abstract class PacketListenerAbstract {
         this.priority = priority;
         this.methods = null;
         this.readOnly = readOnly;
+    }
+
+    public PacketListenerAbstract(PacketListenerPriority priority, boolean readOnly, boolean cached) {
+        this.priority = priority;
+        this.methods = null;
+        this.readOnly = readOnly;
+        this.preProcessed = cached;
     }
 
     public PacketListenerAbstract(PacketListenerPriority priority, Map<Byte, List<Method>> methods) {
@@ -58,11 +64,17 @@ public abstract class PacketListenerAbstract {
         this.readOnly = readOnly;
     }
 
+    public PacketListenerAbstract(PacketListenerPriority priority, Map<Byte, List<Method>> methods, boolean readOnly, boolean cached) {
+        this.priority = priority;
+        this.methods = methods;
+        this.readOnly = readOnly;
+        this.preProcessed = cached;
+    }
+
 
     public PacketListenerAbstract() {
         this.priority = PacketListenerPriority.NORMAL;
         this.methods = null;
-        this.readOnly = false;
     }
 
     public PacketListenerPriority getPriority() {
@@ -75,6 +87,14 @@ public abstract class PacketListenerAbstract {
 
     public void setReadOnly(boolean readOnly) {
         this.readOnly = readOnly;
+    }
+
+    public boolean isPreProcessed() {
+        return preProcessed;
+    }
+
+    public void setPreProcessed(boolean preProcess) {
+        this.preProcessed = preProcess;
     }
 
     public void onPlayerInject(PlayerInjectEvent event) {

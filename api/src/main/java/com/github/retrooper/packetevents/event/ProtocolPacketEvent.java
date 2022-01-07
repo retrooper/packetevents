@@ -39,7 +39,7 @@ public abstract class ProtocolPacketEvent<T> extends PacketEvent implements Play
     private final ChannelAbstract channel;
     private final InetSocketAddress socketAddress;
     private final T player;
-    private final ByteBufAbstract byteBuf;
+    private ByteBufAbstract byteBuf;
     private final int packetID;
     private final PacketTypeCommon packetType;
     private ConnectionState connectionState;
@@ -174,7 +174,7 @@ public abstract class ProtocolPacketEvent<T> extends PacketEvent implements Play
     }
 
     public void setByteBuf(ByteBufAbstract byteBuf) {
-        this.byteBuf.clear().writeBytes(byteBuf.readBytes(byteBuf.readableBytes()));
+        this.byteBuf = byteBuf;
     }
 
     @Deprecated

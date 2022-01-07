@@ -79,6 +79,12 @@ public class PacketSendEvent extends ProtocolPacketEvent<Object> {
 
     @Override
     public void call(PacketListenerAbstract listener) {
-        listener.onPacketSend(this);
+        if (listener.isPreProcessed()) {
+            PacketSendEvent preProcessedEvent = new PacketSendEvent(getConnectionState(), getChannel(), getPlayer(), getByteBuf().duplicate());
+            listener.onPacketSend(preProcessedEvent);
+        }
+        else {
+            listener.onPacketSend(this);
+        }
     }
 }
