@@ -52,7 +52,6 @@ public class EventManager {
                         boolean isPacketEvent = event instanceof ProtocolPacketEvent;
                         if (isPacketEvent) {
                             lastUsedWrapper = ((ProtocolPacketEvent<?>) event).getLastUsedWrapper();
-                            System.out.println("id: " + ((ProtocolPacketEvent)event).getPacketId());
                         }
                         event.call(listener);
                         if (listener.isReadOnly() && isPacketEvent) {
