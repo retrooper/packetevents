@@ -41,8 +41,9 @@ public class WrapperPlayClientPlayerFlying extends PacketWrapper<WrapperPlayClie
     }
 
     public WrapperPlayClientPlayerFlying(boolean positionChanged, boolean rotationChanged, boolean onGround, Location location) {
-        super((positionChanged && rotationChanged) ? PacketType.Play.Client.PLAYER_FLYING :
-                (positionChanged ? PacketType.Play.Client.PLAYER_POSITION : PacketType.Play.Client.PLAYER_ROTATION));
+        super((positionChanged && rotationChanged) ? PacketType.Play.Client.PLAYER_POSITION_AND_ROTATION :
+                (positionChanged ? PacketType.Play.Client.PLAYER_POSITION : rotationChanged ? PacketType.Play.Client.PLAYER_ROTATION
+                        : PacketType.Play.Client.PLAYER_FLYING));
         this.positionChanged = positionChanged;
         this.rotationChanged = rotationChanged;
         this.onGround = onGround;
@@ -79,6 +80,7 @@ public class WrapperPlayClientPlayerFlying extends PacketWrapper<WrapperPlayClie
             pitch = readFloat();
         }
         location = new Location(position, yaw, pitch);
+        System.out.println("pos changed: " + positionChanged + ", rot changed: " + rotationChanged);
         onGround = readBoolean();
     }
 
