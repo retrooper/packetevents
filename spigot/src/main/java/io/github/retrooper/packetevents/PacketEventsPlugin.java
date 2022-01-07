@@ -69,7 +69,7 @@ public class PacketEventsPlugin extends JavaPlugin {
 
         PacketEvents.getAPI().getSettings().debug(true).bStats(false);
 
-        PacketListenerAbstract debugListener = new PacketListenerAbstract(PacketListenerPriority.NORMAL, true, true) {
+        PacketListenerAbstract debugListener = new PacketListenerAbstract(PacketListenerPriority.NORMAL, true) {
             @Override
             public void onPacketReceive(PacketReceiveEvent event) {
                 Player player = event.getPlayer() == null ? null : (Player) event.getPlayer();
