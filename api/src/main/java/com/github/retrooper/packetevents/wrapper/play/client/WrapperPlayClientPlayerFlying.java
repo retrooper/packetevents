@@ -80,7 +80,6 @@ public class WrapperPlayClientPlayerFlying extends PacketWrapper<WrapperPlayClie
             pitch = readFloat();
         }
         location = new Location(position, yaw, pitch);
-        //System.out.println("pos changed: " + positionChanged + ", rot changed: " + rotationChanged);
         onGround = readBoolean();
     }
 

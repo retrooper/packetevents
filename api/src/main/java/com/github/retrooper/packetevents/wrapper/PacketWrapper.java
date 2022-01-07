@@ -70,11 +70,18 @@ public class PacketWrapper<T extends PacketWrapper> {
         this.serverVersion = event.getServerVersion();
         this.buffer = event.getByteBuf();
         this.packetID = event.getPacketId();
-        if (event.getLastUsedWrapper() == null) {
-            event.setLastUsedWrapper(this);
+        if (event.isCloned()) {
+            int bufferIndex = getBuffer().readerIndex();
             readData();
-        } else {
-            readData((T) event.getLastUsedWrapper());
+            getBuffer().readerIndex(bufferIndex);
+        }
+        else {
+            if (event.getLastUsedWrapper() == null) {
+                event.setLastUsedWrapper(this);
+                readData();
+            } else {
+                readData((T) event.getLastUsedWrapper());
+            }
         }
     }
 
@@ -83,11 +90,18 @@ public class PacketWrapper<T extends PacketWrapper> {
         this.serverVersion = event.getServerVersion();
         this.buffer = event.getByteBuf();
         this.packetID = event.getPacketId();
-        if (event.getLastUsedWrapper() == null) {
-            event.setLastUsedWrapper(this);
+        if (event.isCloned()) {
+            int bufferIndex = getBuffer().readerIndex();
             readData();
-        } else {
-            readData((T) event.getLastUsedWrapper());
+            getBuffer().readerIndex(bufferIndex);
+        }
+        else {
+            if (event.getLastUsedWrapper() == null) {
+                event.setLastUsedWrapper(this);
+                readData();
+            } else {
+                readData((T) event.getLastUsedWrapper());
+            }
         }
     }
 

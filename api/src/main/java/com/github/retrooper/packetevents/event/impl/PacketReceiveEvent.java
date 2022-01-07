@@ -31,6 +31,7 @@ import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 import java.net.InetSocketAddress;
 
 public class PacketReceiveEvent extends ProtocolPacketEvent<Object> {
+    private boolean cloned;
     public PacketReceiveEvent(ChannelAbstract channel, Object player, ByteBufAbstract byteBuf) {
         super(PacketSide.CLIENT, channel, player, byteBuf);
     }
@@ -47,13 +48,18 @@ public class PacketReceiveEvent extends ProtocolPacketEvent<Object> {
         super(PacketSide.CLIENT, connectionState, channel, player, rawByteBuf);
     }
 
-    public PacketReceiveEvent(int packetID, PacketTypeCommon packetType, ServerVersion serverVersion, ClientVersion clientVersion, InetSocketAddress socketAddress, ConnectionState connectionState, ChannelAbstract channel, Object player, ByteBufAbstract byteBuf) {
+    public PacketReceiveEvent(boolean cloned, int packetID, PacketTypeCommon packetType, ServerVersion serverVersion, ClientVersion clientVersion, InetSocketAddress socketAddress, ConnectionState connectionState, ChannelAbstract channel, Object player, ByteBufAbstract byteBuf) {
         super(packetID, packetType, serverVersion, clientVersion, socketAddress, connectionState, channel, player, byteBuf);
+        this.cloned = cloned;
+    }
+
+    public boolean isCloned() {
+        return cloned;
     }
 
     @Override
     public PacketReceiveEvent clone() {
-        return new PacketReceiveEvent(getPacketId(), getPacketType(), getServerVersion(), getClientVersion(), getSocketAddress(), getConnectionState(), getChannel(), getPlayer(), getByteBuf().duplicate());
+        return new PacketReceiveEvent(true, getPacketId(), getPacketType(), getServerVersion(), getClientVersion(), getSocketAddress(), getConnectionState(), getChannel(), getPlayer(), getByteBuf().duplicate());
     }
 
     @Override

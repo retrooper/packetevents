@@ -31,6 +31,7 @@ import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 import java.net.InetSocketAddress;
 
 public class PacketSendEvent extends ProtocolPacketEvent<Object> {
+    private boolean cloned;
     private Runnable postTask = null;
 
     public PacketSendEvent(ChannelAbstract channel, Object player, ByteBufAbstract byteBuf, Runnable postTask) {
@@ -73,7 +74,7 @@ public class PacketSendEvent extends ProtocolPacketEvent<Object> {
         this.postTask = null;
     }
 
-    public PacketSendEvent(int packetID, PacketTypeCommon packetType, ServerVersion serverVersion, ClientVersion clientVersion, InetSocketAddress socketAddress, ConnectionState connectionState, ChannelAbstract channel, Object player, ByteBufAbstract byteBuf) {
+    public PacketSendEvent(boolean cloned, int packetID, PacketTypeCommon packetType, ServerVersion serverVersion, ClientVersion clientVersion, InetSocketAddress socketAddress, ConnectionState connectionState, ChannelAbstract channel, Object player, ByteBufAbstract byteBuf) {
         super(packetID, packetType, serverVersion, clientVersion, socketAddress, connectionState, channel, player, byteBuf);
     }
 
@@ -85,9 +86,13 @@ public class PacketSendEvent extends ProtocolPacketEvent<Object> {
         this.postTask = postTask;
     }
 
+    public boolean isCloned() {
+        return cloned;
+    }
+
     @Override
     public PacketSendEvent clone() {
-        return new PacketSendEvent(getPacketId(), getPacketType(), getServerVersion(), getClientVersion(), getSocketAddress(), getConnectionState(), getChannel(), getPlayer(), getByteBuf().duplicate());
+        return new PacketSendEvent(true, getPacketId(), getPacketType(), getServerVersion(), getClientVersion(), getSocketAddress(), getConnectionState(), getChannel(), getPlayer(), getByteBuf().duplicate());
     }
 
     @Override

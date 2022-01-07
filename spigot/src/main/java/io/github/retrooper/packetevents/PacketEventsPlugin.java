@@ -20,6 +20,7 @@ package io.github.retrooper.packetevents;
 
 import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.event.PacketListenerAbstract;
+import com.github.retrooper.packetevents.event.PacketListenerPriority;
 import com.github.retrooper.packetevents.event.impl.PacketReceiveEvent;
 import com.github.retrooper.packetevents.event.impl.PacketSendEvent;
 import com.github.retrooper.packetevents.manager.npc.NPC;
@@ -42,6 +43,7 @@ import com.github.retrooper.packetevents.util.MojangAPIUtil;
 import com.github.retrooper.packetevents.util.Vector3i;
 import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientChatMessage;
 import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientInteractEntity;
+import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientPlayerFlying;
 import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientUpdateSign;
 import com.github.retrooper.packetevents.wrapper.play.server.*;
 import io.github.retrooper.packetevents.factory.spigot.SpigotPacketEventsBuilder;
@@ -67,11 +69,22 @@ public class PacketEventsPlugin extends JavaPlugin {
 
         PacketEvents.getAPI().getSettings().debug(true).bStats(false);
 
-        PacketListenerAbstract debugListener = new PacketListenerAbstract() {
+        PacketListenerAbstract debugListener = new PacketListenerAbstract(PacketListenerPriority.NORMAL, true, true) {
             @Override
             public void onPacketReceive(PacketReceiveEvent event) {
                 Player player = event.getPlayer() == null ? null : (Player) event.getPlayer();
-                if (event.getPacketType() == PacketType.Play.Client.INTERACT_ENTITY) {
+                if (WrapperPlayClientPlayerFlying.isFlying(event.getPacketType())) {
+                    new Thread(new Runnable() {
+                        @Override
+                        public void run() {
+                            WrapperPlayClientPlayerFlying flying = new WrapperPlayClientPlayerFlying(event);
+                            Location location = flying.getLocation();
+                            boolean onGround = flying.isOnGround();
+                            System.out.println("Player " + player.getName() + " sent flying at " + location.getX() + " " + location.getY() + " " + location.getZ() + " onGround: " + onGround);
+                        }
+                    }).start();
+                }
+                else if (event.getPacketType() == PacketType.Play.Client.INTERACT_ENTITY) {
                     WrapperPlayClientInteractEntity interactEntity = new WrapperPlayClientInteractEntity(event);
                     int entityID = interactEntity.getEntityId();
                     WrapperPlayClientInteractEntity.InteractAction action = interactEntity.getAction();
@@ -191,7 +204,7 @@ public class PacketEventsPlugin extends JavaPlugin {
                 }
             }
         };
-        //PacketEvents.getAPI().getEventManager().registerListener(debugListener);
+        PacketEvents.getAPI().getEventManager().registerListener(debugListener);
     }
 
     @Override
