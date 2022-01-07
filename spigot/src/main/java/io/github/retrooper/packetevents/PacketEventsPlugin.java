@@ -73,18 +73,7 @@ public class PacketEventsPlugin extends JavaPlugin {
             @Override
             public void onPacketReceive(PacketReceiveEvent event) {
                 Player player = event.getPlayer() == null ? null : (Player) event.getPlayer();
-                if (WrapperPlayClientPlayerFlying.isFlying(event.getPacketType())) {
-                    new Thread(new Runnable() {
-                        @Override
-                        public void run() {
-                            WrapperPlayClientPlayerFlying flying = new WrapperPlayClientPlayerFlying(event);
-                            Location location = flying.getLocation();
-                            boolean onGround = flying.isOnGround();
-                            System.out.println("Player " + player.getName() + " sent flying at " + location.getX() + " " + location.getY() + " " + location.getZ() + " onGround: " + onGround);
-                        }
-                    }).start();
-                }
-                else if (event.getPacketType() == PacketType.Play.Client.INTERACT_ENTITY) {
+                if (event.getPacketType() == PacketType.Play.Client.INTERACT_ENTITY) {
                     WrapperPlayClientInteractEntity interactEntity = new WrapperPlayClientInteractEntity(event);
                     int entityID = interactEntity.getEntityId();
                     WrapperPlayClientInteractEntity.InteractAction action = interactEntity.getAction();
@@ -204,7 +193,7 @@ public class PacketEventsPlugin extends JavaPlugin {
                 }
             }
         };
-        PacketEvents.getAPI().getEventManager().registerListener(debugListener);
+        //PacketEvents.getAPI().getEventManager().registerListener(debugListener);
     }
 
     @Override
