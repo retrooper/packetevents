@@ -194,6 +194,7 @@ public class PacketEventsPlugin extends JavaPlugin {
             }
         };
         //PacketEvents.getAPI().getEventManager().registerListener(debugListener);
+
     }
 
     @Override

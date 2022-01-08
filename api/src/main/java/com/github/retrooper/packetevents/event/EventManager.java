@@ -69,13 +69,13 @@ public class EventManager {
         }
     }
 
-    public void registerListener(PacketListener listener, PacketListenerPriority priority, boolean readOnly, boolean preProcessed) {
-        PacketListenerAbstract packetListenerAbstract = listener.asAbstract(priority, readOnly, preProcessed);
+    public void registerListener(PacketListener listener, PacketListenerPriority priority, boolean readOnly) {
+        PacketListenerAbstract packetListenerAbstract = listener.asAbstract(priority, readOnly);
         registerListener(packetListenerAbstract);
     }
 
-    public void registerListener(PacketListenerReflect listener, PacketListenerPriority priority, boolean readOnly, boolean preProcessed) {
-        PacketListenerAbstract packetListenerAbstract = listener.asAbstract(priority, readOnly, preProcessed);
+    public void registerListener(PacketListenerReflect listener, PacketListenerPriority priority, boolean readOnly) {
+        PacketListenerAbstract packetListenerAbstract = listener.asAbstract(priority, readOnly);
         registerListener(packetListenerAbstract);
     }
 

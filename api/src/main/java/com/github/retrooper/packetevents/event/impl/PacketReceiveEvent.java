@@ -32,6 +32,7 @@ import java.net.InetSocketAddress;
 
 public class PacketReceiveEvent extends ProtocolPacketEvent<Object> {
     private boolean cloned;
+
     public PacketReceiveEvent(ChannelAbstract channel, Object player, ByteBufAbstract byteBuf) {
         super(PacketSide.CLIENT, channel, player, byteBuf);
     }
@@ -64,12 +65,6 @@ public class PacketReceiveEvent extends ProtocolPacketEvent<Object> {
 
     @Override
     public void call(PacketListenerAbstract listener) {
-        if (listener.isPreProcessed()) {
-            PacketReceiveEvent preProcessedEvent = clone();
-            listener.onPacketReceive(preProcessedEvent);
-        }
-        else {
-            listener.onPacketReceive(this);
-        }
+        listener.onPacketReceive(this);
     }
 }

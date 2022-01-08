@@ -34,7 +34,6 @@ public abstract class PacketListenerAbstract {
     protected final Map<Byte, List<Method>> methods;
     private final PacketListenerPriority priority;
     private boolean readOnly;
-    private boolean preProcessed;
     public PacketListenerAbstract(PacketListenerPriority priority) {
         this.priority = priority;
         this.methods = null;
@@ -44,13 +43,6 @@ public abstract class PacketListenerAbstract {
         this.priority = priority;
         this.methods = null;
         this.readOnly = readOnly;
-    }
-
-    public PacketListenerAbstract(PacketListenerPriority priority, boolean readOnly, boolean preProcessed) {
-        this.priority = priority;
-        this.methods = null;
-        this.readOnly = readOnly;
-        this.preProcessed = preProcessed;
     }
 
     public PacketListenerAbstract(PacketListenerPriority priority, Map<Byte, List<Method>> methods) {
@@ -63,14 +55,6 @@ public abstract class PacketListenerAbstract {
         this.methods = methods;
         this.readOnly = readOnly;
     }
-
-    public PacketListenerAbstract(PacketListenerPriority priority, Map<Byte, List<Method>> methods, boolean readOnly, boolean preProcessed) {
-        this.priority = priority;
-        this.methods = methods;
-        this.readOnly = readOnly;
-        this.preProcessed = preProcessed;
-    }
-
 
     public PacketListenerAbstract() {
         this.priority = PacketListenerPriority.NORMAL;
@@ -89,13 +73,6 @@ public abstract class PacketListenerAbstract {
         this.readOnly = readOnly;
     }
 
-    public boolean isPreProcessed() {
-        return preProcessed;
-    }
-
-    public void setPreProcessed(boolean preProcess) {
-        this.preProcessed = preProcess;
-    }
 
     public void onPlayerInject(PlayerInjectEvent event) {
     }

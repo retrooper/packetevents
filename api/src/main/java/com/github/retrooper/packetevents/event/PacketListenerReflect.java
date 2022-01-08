@@ -29,7 +29,7 @@ import java.util.List;
 import java.util.Map;
 
 public interface PacketListenerReflect {
-    default PacketListenerAbstract asAbstract(PacketListenerPriority priority, boolean readOnly, boolean preProcessed) {
+    default PacketListenerAbstract asAbstract(PacketListenerPriority priority, boolean readOnly) {
         Map<Byte, List<Method>> methods = new HashMap<>();
         for (byte i = 0; i < 6; i++) {
             methods.put(i, new ArrayList<>());
@@ -72,7 +72,7 @@ public interface PacketListenerReflect {
                 }
             }
         }
-        return new PacketListenerAbstract(priority, methods, readOnly, preProcessed) {
+        return new PacketListenerAbstract(priority, methods, readOnly) {
             private void callEventByIndex(byte index, PacketEvent event) {
                 if (methods != null) {
                     List<Method> targets = methods.get(index);

@@ -97,11 +97,6 @@ public class PacketSendEvent extends ProtocolPacketEvent<Object> {
 
     @Override
     public void call(PacketListenerAbstract listener) {
-        if (listener.isPreProcessed()) {
-            PacketSendEvent preProcessedEvent = clone();
-            listener.onPacketSend(preProcessedEvent);
-        } else {
-            listener.onPacketSend(this);
-        }
+        listener.onPacketSend(this);
     }
 }
