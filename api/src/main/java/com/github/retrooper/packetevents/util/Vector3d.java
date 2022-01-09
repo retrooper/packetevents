@@ -196,6 +196,10 @@ public class Vector3d {
         return distX + distY + distZ;
     }
 
+    public Vector3i toVector3i() {
+        return new Vector3i((int) x, (int) y, (int) z);
+    }
+
     @Override
     public String toString() {
         return "X: " + x + ", Y: " + y + ", Z: " + z;

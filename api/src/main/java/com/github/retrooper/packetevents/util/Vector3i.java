@@ -180,6 +180,10 @@ public class Vector3i {
         return false;
     }
 
+    public Vector3d toVector3d() {
+        return new Vector3d(x, y, z);
+    }
+
     /**
      * Simply clone an instance of this class.
      *

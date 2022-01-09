@@ -252,9 +252,10 @@ public class ItemStack {
 
     public static class Builder {
         private ItemType type;
-        private int amount;
+        private int amount = 1;
         private NBTCompound nbt = new NBTCompound();
         private int legacyData = -1;
+        private List<Enchantment> enchantments = new ArrayList<>();
 
         public Builder type(ItemType type) {
             this.type = type;
@@ -279,8 +280,20 @@ public class ItemStack {
             return this;
         }
 
+        public Builder enchantments(List<Enchantment> enchantments) {
+            this.enchantments = enchantments;
+            return this;
+        }
+
+        public Builder addEnchantment(Enchantment enchantment) {
+            this.enchantments.add(enchantment);
+            return this;
+        }
+
         public ItemStack build() {
-            return new ItemStack(type, amount, nbt, legacyData);
+            ItemStack stack = new ItemStack(type, amount, nbt, legacyData);
+            stack.setEnchantments(enchantments);
+            return stack;
         }
 
     }
