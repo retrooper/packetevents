@@ -222,6 +222,7 @@ public class NPCManager {
                 WrapperPlayServerEntityEquipment equipmentPacket
                         = new WrapperPlayServerEntityEquipment(npc.getId(),
                         equipmentList);
+                PacketEvents.getAPI().getPlayerManager().sendPacket(channel, equipmentPacket);
             }
         }
     }

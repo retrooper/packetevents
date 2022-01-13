@@ -149,6 +149,7 @@ public class ItemStack {
     }
 
     public boolean isEnchanted() {
+        //TODO It might have been called StoredEnchantments on legacy versions, we might consider contributing to wiki.vg
         if (!isEmpty() && this.nbt != null && this.nbt.getCompoundListTagOrNull("Enchantments") != null) {
             return !this.nbt.getCompoundListTagOrNull("Enchantments").isEmpty();
         } else {

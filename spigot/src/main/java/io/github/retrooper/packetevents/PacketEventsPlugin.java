@@ -25,13 +25,12 @@ import com.github.retrooper.packetevents.event.impl.PacketReceiveEvent;
 import com.github.retrooper.packetevents.event.impl.PacketSendEvent;
 import com.github.retrooper.packetevents.manager.npc.NPC;
 import com.github.retrooper.packetevents.protocol.chat.Color;
-import com.github.retrooper.packetevents.protocol.chat.component.BaseComponent;
 import com.github.retrooper.packetevents.protocol.chat.component.impl.TextComponent;
-import com.github.retrooper.packetevents.protocol.chat.component.impl.TranslatableComponent;
 import com.github.retrooper.packetevents.protocol.entity.data.provider.EntityDataProvider;
 import com.github.retrooper.packetevents.protocol.entity.data.provider.PlayerDataProvider;
 import com.github.retrooper.packetevents.protocol.entity.type.EntityTypes;
 import com.github.retrooper.packetevents.protocol.item.ItemStack;
+import com.github.retrooper.packetevents.protocol.item.type.ItemTypes;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.protocol.player.GameProfile;
 import com.github.retrooper.packetevents.protocol.player.InteractionHand;
@@ -44,7 +43,6 @@ import com.github.retrooper.packetevents.util.MojangAPIUtil;
 import com.github.retrooper.packetevents.util.Vector3i;
 import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientChatMessage;
 import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientInteractEntity;
-import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientPlayerFlying;
 import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientUpdateSign;
 import com.github.retrooper.packetevents.wrapper.play.server.*;
 import io.github.retrooper.packetevents.factory.spigot.SpigotPacketEventsBuilder;
@@ -54,7 +52,9 @@ import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.List;
+import java.util.UUID;
 
 public class PacketEventsPlugin extends JavaPlugin {
     @Override
@@ -153,10 +153,11 @@ public class PacketEventsPlugin extends JavaPlugin {
                                 targetLocation);
                         npc.setLocation(targetLocation);
                         PacketEvents.getAPI().getNPCManager().spawn(event.getChannel(), npc);
-
-                        //npc.setMainHand(handItem);
+                        ItemStack handItem = ItemStack.builder().type(ItemTypes.DIAMOND_SWORD).build();
+                        npc.setMainHand(handItem);
+                        PacketEvents.getAPI().getNPCManager().updateEquipment(npc);
                     }
-                } else if (event.getPacketType() == PacketType.Play.Server.CHAT_MESSAGE) {
+                } /*else if (event.getPacketType() == PacketType.Play.Server.CHAT_MESSAGE) {
                     WrapperPlayServerChatMessage cm = new WrapperPlayServerChatMessage(event);
                     BaseComponent component = cm.getChatComponent();
                     if (component instanceof TextComponent) {
@@ -179,9 +180,9 @@ public class PacketEventsPlugin extends JavaPlugin {
                         "hoverEvent":{"action":"show_entity","contents":{"type":"minecraft:player",
                         "id":"7fe54c65-80ba-45c8-8450-b45796aa0eb9","name":{"text":"retrooper"}}},
                         "text":"retrooper"}]}
-                         */
+                         *
                     }
-                } else if (event.getPacketType() == PacketType.Play.Server.SET_SLOT) {
+                } */ else if (event.getPacketType() == PacketType.Play.Server.SET_SLOT) {
                     WrapperPlayServerSetSlot setSlot = new WrapperPlayServerSetSlot(event);
                     int windowID = setSlot.getWindowId();
                     int slot = setSlot.getSlot();
@@ -196,7 +197,7 @@ public class PacketEventsPlugin extends JavaPlugin {
                 }
             }
         };
-        PacketEvents.getAPI().getEventManager().registerListener(debugListener);
+        //PacketEvents.getAPI().getEventManager().registerListener(debugListener);
 
     }
 
