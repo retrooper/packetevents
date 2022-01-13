@@ -107,17 +107,7 @@ public class PlayerManagerImpl implements PlayerManager {
     @Override
     public void sendPacket(ChannelAbstract channel, ByteBufAbstract byteBuf) {
         if (channel.isOpen()) {
-            //Call our own encoder
-            ChannelHandlerAbstract handler = channel.pipeline().get(PacketEvents.ENCODER_NAME);
-            ChannelHandlerContextAbstract ctx = channel.pipeline().context(PacketEvents.ENCODER_NAME);
-            ByteBufAbstract output = PacketEvents.getAPI().getNettyManager().buffer();
-            try {
-                CustomPipelineUtil.callEncode(handler.rawChannelHandler(), ctx.rawChannelHandlerContext(), byteBuf.rawByteBuf(), output.rawByteBuf());
-            } catch (InvocationTargetException e) {
-                e.printStackTrace();
-            }
-            //Now call the encoders after ours
-            channel.pipeline().context(PacketEvents.ENCODER_NAME).writeAndFlush(byteBuf);
+            channel.writeAndFlush(byteBuf);
         }
     }
 

@@ -59,11 +59,12 @@ public class PacketEncoderModern extends MessageToByteEncoder<Object> {
             if (needsCompress) {
                 recompress(ctx, byteBuf);
             }
-            if (packetSendEvent.getPostTask() != null) {
+            //TODO Post-task
+            /*if (packetSendEvent.getPostTask() != null) {
                 ((ChannelHandlerContext) ctx.rawChannelHandlerContext()).newPromise().addListener(f -> {
                     packetSendEvent.getPostTask().run();
                 });
-            }
+            }*/
         } else {
             //Make the buffer unreadable for the next handlers
             byteBuf.clear();
@@ -81,12 +82,14 @@ public class PacketEncoderModern extends MessageToByteEncoder<Object> {
                 e.printStackTrace();
             }
         } else {
-            out.writeBytes((ByteBuf) o);
+            ByteBuf in = (ByteBuf) o;
+            if (in.isReadable()) {
+                out.writeBytes(in);
+            } else {
+                return;
+            }
         }
-        if (out.isReadable()) {
-            //byteBuf is released in the handle method
-            handle(PacketEvents.getAPI().getNettyManager().wrapChannelHandlerContext(ctx), PacketEvents.getAPI().getNettyManager().wrapByteBuf(out));
-        }
+        handle(PacketEvents.getAPI().getNettyManager().wrapChannelHandlerContext(ctx), PacketEvents.getAPI().getNettyManager().wrapByteBuf(out));
     }
 
     private boolean handleCompressionOrder(ChannelHandlerContextAbstract ctx, ByteBufAbstract buf) {

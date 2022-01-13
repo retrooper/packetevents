@@ -19,7 +19,11 @@
 package com.github.retrooper.packetevents.manager.npc;
 
 import com.github.retrooper.packetevents.PacketEvents;
+import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.netty.channel.ChannelAbstract;
+import com.github.retrooper.packetevents.protocol.item.ItemStack;
+import com.github.retrooper.packetevents.protocol.player.Equipment;
+import com.github.retrooper.packetevents.protocol.player.EquipmentSlot;
 import com.github.retrooper.packetevents.protocol.player.TextureProperty;
 import com.github.retrooper.packetevents.protocol.world.Location;
 import com.github.retrooper.packetevents.wrapper.play.server.*;
@@ -166,6 +170,58 @@ public class NPCManager {
 
                 WrapperPlayServerSpawnPlayer spawnPlayer = new WrapperPlayServerSpawnPlayer(npc.getId(), npc.getProfile().getId(), npc.getLocation());
                 PacketEvents.getAPI().getPlayerManager().sendPacket(channel, spawnPlayer);
+            }
+        }
+    }
+
+    public void updateEquipment(NPC npc) {
+        Set<ChannelAbstract> targetChannels = TARGET_CHANNELS.get(npc);
+        if (targetChannels != null && !targetChannels.isEmpty()) {
+            for (ChannelAbstract channel : targetChannels) {
+                List<Equipment> equipmentList = new ArrayList<>();
+                ItemStack handItem = npc.getMainHand();
+                if (handItem == null) {
+                    handItem = ItemStack.AIR;
+                }
+                equipmentList.add(new Equipment(EquipmentSlot.MAINHAND,
+                        handItem));
+                if (PacketEvents.getAPI().getServerManager().getVersion().isNewerThanOrEquals(ServerVersion.V_1_9)) {
+                    ItemStack offHandItem = npc.getOffHand();
+                    if (offHandItem == null) {
+                        offHandItem = ItemStack.AIR;
+                    }
+                    equipmentList.add(new Equipment(EquipmentSlot.OFFHAND,
+                            offHandItem));
+                }
+                ItemStack helmetItem = npc.getHelmet();
+                if (helmetItem == null) {
+                    helmetItem = ItemStack.AIR;
+                }
+                equipmentList.add(new Equipment(EquipmentSlot.HELMET,
+                        helmetItem));
+
+                ItemStack chestPlateItem = npc.getChestplate();
+                if (chestPlateItem == null) {
+                    chestPlateItem = ItemStack.AIR;
+                }
+                equipmentList.add(new Equipment(EquipmentSlot.CHESTPLATE,
+                        chestPlateItem));
+                ItemStack leggingsItem = npc.getLeggings();
+                if (leggingsItem == null) {
+                    leggingsItem = ItemStack.AIR;
+                }
+                equipmentList.add(new Equipment(EquipmentSlot.LEGGINGS,
+                        leggingsItem));
+                ItemStack bootsItem = npc.getBoots();
+                if (bootsItem == null) {
+                    bootsItem = ItemStack.AIR;
+                }
+                equipmentList.add(new Equipment(EquipmentSlot.BOOTS,
+                        bootsItem));
+
+                WrapperPlayServerEntityEquipment equipmentPacket
+                        = new WrapperPlayServerEntityEquipment(npc.getId(),
+                        equipmentList);
             }
         }
     }

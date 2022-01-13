@@ -22,7 +22,10 @@ import com.github.retrooper.packetevents.event.impl.PacketSendEvent;
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.protocol.item.ItemStack;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
+import com.github.retrooper.packetevents.protocol.player.Equipment;
+import com.github.retrooper.packetevents.protocol.player.EquipmentSlot;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -58,7 +61,7 @@ public class WrapperPlayServerEntityEquipment extends PacketWrapper<WrapperPlayS
             byte value;
             do {
                 value = readByte();
-                EquipmentSlot equipmentSlot = EquipmentSlot.getById(value & Byte.MAX_VALUE);
+                EquipmentSlot equipmentSlot = EquipmentSlot.getById(serverVersion, value & Byte.MAX_VALUE);
                 ItemStack itemStack = readItemStack();
                 equipment.add(new Equipment(equipmentSlot, itemStack));
             } while ((value & Byte.MIN_VALUE) != 0);
@@ -66,10 +69,10 @@ public class WrapperPlayServerEntityEquipment extends PacketWrapper<WrapperPlayS
         else {
             EquipmentSlot slot;
             if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_9)) {
-                slot = EquipmentSlot.getById(readVarInt());
+                slot = EquipmentSlot.getById(serverVersion, readVarInt());
             }
             else {
-                slot = EquipmentSlot.getById(readShort());
+                slot = EquipmentSlot.getById(serverVersion, readShort());
             }
             equipment.add(new Equipment(slot, readItemStack()));
         }
@@ -93,17 +96,17 @@ public class WrapperPlayServerEntityEquipment extends PacketWrapper<WrapperPlayS
             for (int i = 0; i < this.equipment.size(); i++) {
                 Equipment equipment = this.equipment.get(i);
                 boolean last = i == (this.equipment.size() - 1);
-                writeByte(last ? equipment.getSlot().getId() : (equipment.getSlot().getId() | Byte.MIN_VALUE));
+                writeByte(last ? equipment.getSlot().getId(serverVersion) : (equipment.getSlot().getId(serverVersion) | Byte.MIN_VALUE));
                 writeItemStack(equipment.getItem());
             }
         }
         else {
             Equipment equipment = this.equipment.get(0);
             if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_9)) {
-                writeVarInt(equipment.getSlot().getId());
+                writeVarInt(equipment.getSlot().getId(serverVersion));
             }
             else {
-                writeShort(equipment.getSlot().getId());
+                writeShort(equipment.getSlot().getId(serverVersion));
             }
             writeItemStack(equipment.getItem());
         }
@@ -123,49 +126,5 @@ public class WrapperPlayServerEntityEquipment extends PacketWrapper<WrapperPlayS
 
     public void setEquipment(List<Equipment> equipment) {
         this.equipment = equipment;
-    }
-
-
-    public enum EquipmentSlot {
-        MAINHAND,
-        OFFHAND,
-        BOOTS,
-        LEGGINGS,
-        CHESTPLATE,
-        HELMET;
-
-        public int getId() {
-            return ordinal();
-        }
-
-        public static EquipmentSlot getById(int id) {
-            return values()[id];
-        }
-    }
-
-    public static class Equipment {
-        private EquipmentSlot slot;
-        private ItemStack item;
-
-        public Equipment(EquipmentSlot slot, ItemStack item) {
-            this.slot = slot;
-            this.item = item;
-        }
-
-        public EquipmentSlot getSlot() {
-            return slot;
-        }
-
-        public void setSlot(EquipmentSlot slot) {
-            this.slot = slot;
-        }
-
-        public ItemStack getItem() {
-            return item;
-        }
-
-        public void setItem(ItemStack item) {
-            this.item = item;
-        }
     }
 }

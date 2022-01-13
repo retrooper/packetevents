@@ -23,10 +23,13 @@ import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.netty.buffer.ByteBufAbstract;
 import com.github.retrooper.packetevents.netty.channel.ChannelAbstract;
 import com.github.retrooper.packetevents.protocol.ConnectionState;
-import com.github.retrooper.packetevents.protocol.player.GameProfile;
 import com.github.retrooper.packetevents.protocol.player.ClientVersion;
+import com.github.retrooper.packetevents.protocol.player.Equipment;
+import com.github.retrooper.packetevents.protocol.player.GameProfile;
+import com.github.retrooper.packetevents.util.PacketTransformationUtil;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerDestroyEntities;
+import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerEntityEquipment;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.HashMap;
@@ -101,24 +104,10 @@ public interface PlayerManager {
     }
 
     default void sendPacket(ChannelAbstract channel, PacketWrapper<?> wrapper) {
-        boolean shouldSend = true;
-        if (wrapper instanceof WrapperPlayServerDestroyEntities) {
-            WrapperPlayServerDestroyEntities destroyEntities = (WrapperPlayServerDestroyEntities) wrapper;
-            if (destroyEntities.getEntityIds().length > 1 && wrapper.getServerVersion() == ServerVersion.V_1_17) {
-                //Transform into multiple packets
-                for (int entityId : destroyEntities.getEntityIds()) {
-                    WrapperPlayServerDestroyEntities newPacket = new WrapperPlayServerDestroyEntities(entityId);
-                    newPacket.prepareForSend();
-                    //Duplicate buffer
-                    sendPacket(channel, newPacket.buffer);
-                    shouldSend = false;
-                }
-            }
-        }
-        if (shouldSend) {
-            wrapper.prepareForSend();
-            //We duplicate the buffer, so the user can send the same wrapper object multiple times
-            sendPacket(channel, wrapper.buffer);
+        PacketWrapper<?>[] wrappers = PacketTransformationUtil.transform(wrapper);
+        for (PacketWrapper<?> packet : wrappers) {
+            packet.prepareForSend();
+            sendPacket(channel, packet.buffer);
         }
     }
 
@@ -133,22 +122,10 @@ public interface PlayerManager {
     }
 
     default void sendPacketSilently(ChannelAbstract channel, PacketWrapper<?> wrapper) {
-        boolean shouldSend = true;
-        if (wrapper instanceof WrapperPlayServerDestroyEntities) {
-            WrapperPlayServerDestroyEntities destroyEntities = (WrapperPlayServerDestroyEntities) wrapper;
-            if (destroyEntities.getEntityIds().length > 1 && wrapper.getServerVersion() == ServerVersion.V_1_17) {
-                //Transform into multiple packets
-                for (int entityId : destroyEntities.getEntityIds()) {
-                    WrapperPlayServerDestroyEntities newPacket = new WrapperPlayServerDestroyEntities(entityId);
-                    newPacket.prepareForSend();
-                    sendPacketSilently(channel, newPacket.buffer);
-                    shouldSend = false;
-                }
-            }
-        }
-        if (shouldSend) {
-            wrapper.prepareForSend();
-            sendPacketSilently(channel, wrapper.buffer);
+        PacketWrapper<?>[] wrappers = PacketTransformationUtil.transform(wrapper);
+        for (PacketWrapper<?> packet : wrappers) {
+            packet.prepareForSend();
+            sendPacketSilently(channel, packet.buffer);
         }
     }
 

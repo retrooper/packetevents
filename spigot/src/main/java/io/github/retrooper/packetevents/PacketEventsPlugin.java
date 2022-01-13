@@ -30,6 +30,7 @@ import com.github.retrooper.packetevents.protocol.chat.component.impl.TextCompon
 import com.github.retrooper.packetevents.protocol.chat.component.impl.TranslatableComponent;
 import com.github.retrooper.packetevents.protocol.entity.data.provider.EntityDataProvider;
 import com.github.retrooper.packetevents.protocol.entity.data.provider.PlayerDataProvider;
+import com.github.retrooper.packetevents.protocol.entity.type.EntityTypes;
 import com.github.retrooper.packetevents.protocol.item.ItemStack;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.protocol.player.GameProfile;
@@ -69,7 +70,7 @@ public class PacketEventsPlugin extends JavaPlugin {
 
         PacketEvents.getAPI().getSettings().debug(true).bStats(false);
 
-        PacketListenerAbstract debugListener = new PacketListenerAbstract(PacketListenerPriority.NORMAL, true) {
+        PacketListenerAbstract debugListener = new PacketListenerAbstract(PacketListenerPriority.NORMAL, false) {
             @Override
             public void onPacketReceive(PacketReceiveEvent event) {
                 Player player = event.getPlayer() == null ? null : (Player) event.getPlayer();
@@ -135,7 +136,7 @@ public class PacketEventsPlugin extends JavaPlugin {
                     WrapperPlayServerBlockChange bc = new WrapperPlayServerBlockChange(event);
                     Vector3i pos = bc.getBlockPosition();
                     WrappedBlockState state = WrappedBlockState.getByGlobalId(bc.getBlockId());
-                }/* else if (event.getPacketType() == PacketType.Play.Server.SPAWN_LIVING_ENTITY) {
+                } else if (event.getPacketType() == PacketType.Play.Server.SPAWN_LIVING_ENTITY) {
                     WrapperPlayServerSpawnLivingEntity spawnLivingEntity = new WrapperPlayServerSpawnLivingEntity(event);
                     if (spawnLivingEntity.getEntityType().equals(EntityTypes.PIG)) {
                         event.setCancelled(true);
@@ -152,8 +153,10 @@ public class PacketEventsPlugin extends JavaPlugin {
                                 targetLocation);
                         npc.setLocation(targetLocation);
                         PacketEvents.getAPI().getNPCManager().spawn(event.getChannel(), npc);
+
+                        //npc.setMainHand(handItem);
                     }
-                }*/ else if (event.getPacketType() == PacketType.Play.Server.CHAT_MESSAGE) {
+                } else if (event.getPacketType() == PacketType.Play.Server.CHAT_MESSAGE) {
                     WrapperPlayServerChatMessage cm = new WrapperPlayServerChatMessage(event);
                     BaseComponent component = cm.getChatComponent();
                     if (component instanceof TextComponent) {
@@ -193,7 +196,7 @@ public class PacketEventsPlugin extends JavaPlugin {
                 }
             }
         };
-        //PacketEvents.getAPI().getEventManager().registerListener(debugListener);
+        PacketEvents.getAPI().getEventManager().registerListener(debugListener);
 
     }
 
