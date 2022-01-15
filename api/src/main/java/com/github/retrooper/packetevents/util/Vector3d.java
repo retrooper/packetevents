@@ -27,6 +27,7 @@ package com.github.retrooper.packetevents.util;
  * @since 1.8
  */
 public class Vector3d {
+    public static final Vector3d ZERO = new Vector3d();
     /**
      * X (coordinate/angle/whatever you wish)
      */

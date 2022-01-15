@@ -43,8 +43,8 @@ public class WrapperPlayClientPlayerPosition extends PacketWrapper<WrapperPlayCl
         double x = readDouble();
         double y = readDouble();
         if (serverVersion == ServerVersion.V_1_7_10) {
-            //Can be ignored, cause stance = (y + 1.62)
-            double stance = readDouble();
+            //headY = (y + 1.62), this is kind of constant
+            double headY = readDouble();
         }
         double z = readDouble();
         position = new Vector3d(x, y, z);
@@ -62,6 +62,7 @@ public class WrapperPlayClientPlayerPosition extends PacketWrapper<WrapperPlayCl
         writeDouble(position.x);
         writeDouble(position.y);
         if (serverVersion == ServerVersion.V_1_7_10) {
+            //Writing head Y
             writeDouble(position.y + 1.62);
         }
         writeDouble(position.z);

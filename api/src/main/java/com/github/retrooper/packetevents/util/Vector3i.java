@@ -31,6 +31,7 @@ import com.github.retrooper.packetevents.manager.server.ServerVersion;
  * @since 1.7
  */
 public class Vector3i {
+    public static final Vector3i ZERO = new Vector3i();
     /**
      * X (coordinate/angle/whatever you wish)
      */
