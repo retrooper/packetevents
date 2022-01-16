@@ -127,7 +127,7 @@ public final class SpigotReflectionUtil {
     private static void initFields() {
         ENTITY_BOUNDING_BOX_FIELD = Reflection.getField(NMS_ENTITY_CLASS, BOUNDING_BOX_CLASS, 0, true);
         ENTITY_PLAYER_PING_FIELD = Reflection.getField(ENTITY_PLAYER_CLASS, "ping");
-        BYTE_BUF_IN_PACKET_DATA_SERIALIZER = Reflection.getField(BYTE_BUF_CLASS, NMS_PACKET_DATA_SERIALIZER_CLASS, 0, true);
+        BYTE_BUF_IN_PACKET_DATA_SERIALIZER = Reflection.getField(NMS_PACKET_DATA_SERIALIZER_CLASS, BYTE_BUF_CLASS, 0, true);
     }
 
     private static void initClasses() {

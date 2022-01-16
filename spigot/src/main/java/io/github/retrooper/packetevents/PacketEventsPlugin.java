@@ -68,7 +68,8 @@ public class PacketEventsPlugin extends JavaPlugin {
         //Register your listeners
         PacketEvents.getAPI().init();
 
-        PacketEvents.getAPI().getSettings().debug(true).bStats(false);
+        PacketEvents.getAPI().getSettings().debug(true).bStats(true);
+        Bukkit.getVersion()
 
         PacketListenerAbstract debugListener = new PacketListenerAbstract(PacketListenerPriority.NORMAL, false) {
             @Override

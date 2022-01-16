@@ -50,7 +50,8 @@ public class ServerManagerImpl implements ServerManager {
                 }
             }
             Plugin plugin = (Plugin) PacketEvents.getAPI().getPlugin();
-            plugin.getLogger().warning("[packetevents] Your server software is preventing us from checking the server version. This is what we found: " + Bukkit.getBukkitVersion() + ". We will assume the server version is " + fallbackVersion.name() + "...");            return fallbackVersion;
+            plugin.getLogger().warning("[packetevents] Your server software is preventing us from checking the server version. This is what we found: " + Bukkit.getBukkitVersion() + ". We will assume the server version is " + fallbackVersion.name() + "...");
+            return fallbackVersion;
         }
         return ServerVersion.ERROR;
     }

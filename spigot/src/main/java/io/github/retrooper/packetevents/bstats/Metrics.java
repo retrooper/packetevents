@@ -108,6 +108,7 @@ public class Metrics {
     }
 
     private void appendServiceData(JsonObjectBuilder builder) {
+        //TODO Remove
         builder.appendField("pluginVersion", plugin.getDescription().getVersion());
     }
 

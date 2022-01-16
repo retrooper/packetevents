@@ -19,7 +19,6 @@
 package io.github.retrooper.packetevents.utils;
 
 import com.github.retrooper.packetevents.protocol.item.ItemStack;
-import com.github.retrooper.packetevents.protocol.item.type.ItemType;
 import com.github.retrooper.packetevents.protocol.player.GameMode;
 import com.github.retrooper.packetevents.protocol.potion.PotionType;
 import com.github.retrooper.packetevents.protocol.potion.PotionTypes;
@@ -49,7 +48,9 @@ public class SpigotDataHelper {
     public static org.bukkit.GameMode toBukkitGameMode(GameMode gameMode) {
         return org.bukkit.GameMode.getByValue(gameMode.getId());
     }
-    
+
+    //TODO Material conversions
+
     public static ItemStack fromBukkitItemStack(org.bukkit.inventory.ItemStack itemStack) {
         return SpigotReflectionUtil.decodeBukkitItemStack(itemStack);
     }
