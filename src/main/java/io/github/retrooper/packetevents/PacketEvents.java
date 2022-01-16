@@ -191,6 +191,9 @@ public final class PacketEvents implements Listener, EventManager {
 
             if (settings.isbStatsEnabled()) {
                 Metrics metrics = new Metrics((JavaPlugin) getPlugin(), 11327);
+                //Just to have an idea what versions of packetevents people use
+                //TODO Change version to correct version
+                metrics.addCustomChart(new Metrics.SimplePie("packetevents_version", () -> "1.8-pre-19"));
             }
 
             //We must wait for the injector to initialize.
