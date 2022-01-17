@@ -27,7 +27,6 @@ package com.github.retrooper.packetevents.util;
  * @since 1.8
  */
 public class Vector3d {
-    public static final Vector3d ZERO = new Vector3d();
     /**
      * X (coordinate/angle/whatever you wish)
      */
@@ -204,5 +203,9 @@ public class Vector3d {
     @Override
     public String toString() {
         return "X: " + x + ", Y: " + y + ", Z: " + z;
+    }
+
+    public static Vector3d zero() {
+        return new Vector3d();
     }
 }

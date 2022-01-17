@@ -31,7 +31,6 @@ import com.github.retrooper.packetevents.manager.server.ServerVersion;
  * @since 1.7
  */
 public class Vector3i {
-    public static final Vector3i ZERO = new Vector3i();
     /**
      * X (coordinate/angle/whatever you wish)
      */
@@ -198,5 +197,9 @@ public class Vector3i {
     @Override
     public String toString() {
         return "X: " + x + ", Y: " + y + ", Z: " + z;
+    }
+
+    public static Vector3i zero() {
+        return new Vector3i();
     }
 }
