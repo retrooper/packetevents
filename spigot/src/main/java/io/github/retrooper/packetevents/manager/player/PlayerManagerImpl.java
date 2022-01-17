@@ -104,7 +104,7 @@ public class PlayerManagerImpl implements PlayerManager {
     public void sendPacket(ChannelAbstract channel, ByteBufAbstract byteBuf) {
         if (channel.isOpen()) {
             if (ProtocolSupportUtil.isAvailable()) {
-                //ProtocolSupport has a MessageToMessageCodec handler named "ps_logic" in the way.
+                //ProtocolSupport has a MessageToMessageCodec handler named "ps_logic" in the pipeline.
                 //The Netty documentation explicitly mentions that you need to retain buffers before passing them through such handlers.
                 byteBuf.retain();
             }
