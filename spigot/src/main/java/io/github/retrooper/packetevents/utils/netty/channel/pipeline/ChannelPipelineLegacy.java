@@ -128,7 +128,7 @@ public class ChannelPipelineLegacy implements ChannelPipelineAbstract {
     }
 
     @Override
-    public ChannelPipelineAbstract fireChannelRead(Object msg) {
+    public ChannelPipelineAbstract fireChannelRead0(Object msg) {
         return new ChannelPipelineLegacy(pipeline.fireChannelRead(msg));
     }
 

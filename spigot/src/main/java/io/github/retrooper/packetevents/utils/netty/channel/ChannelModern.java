@@ -18,7 +18,6 @@
 
 package io.github.retrooper.packetevents.utils.netty.channel;
 
-import com.github.retrooper.packetevents.netty.buffer.ByteBufAbstract;
 import com.github.retrooper.packetevents.netty.channel.ChannelAbstract;
 import com.github.retrooper.packetevents.netty.channel.pipeline.ChannelPipelineAbstract;
 import io.github.retrooper.packetevents.utils.netty.channel.pipeline.ChannelPipelineModern;
@@ -74,18 +73,12 @@ public class ChannelModern implements ChannelAbstract {
     }
 
     @Override
-    public void write(Object msg) {
-        if (msg instanceof ByteBufAbstract) {
-            msg = ((ByteBufAbstract) msg).rawByteBuf();
-        }
+    public void write0(Object msg) {
         channel.write(msg);
     }
 
     @Override
-    public void writeAndFlush(Object msg) {
-        if (msg instanceof ByteBufAbstract) {
-            msg = ((ByteBufAbstract) msg).rawByteBuf();
-        }
+    public void writeAndFlush0(Object msg) {
         channel.writeAndFlush(msg);
     }
 

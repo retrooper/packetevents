@@ -18,6 +18,7 @@
 
 package com.github.retrooper.packetevents.netty.channel;
 
+import com.github.retrooper.packetevents.netty.buffer.ByteBufAbstract;
 import com.github.retrooper.packetevents.netty.buffer.ByteBufAllocatorAbstract;
 import com.github.retrooper.packetevents.netty.channel.pipeline.ChannelPipelineAbstract;
 
@@ -40,11 +41,18 @@ public interface ChannelHandlerContextAbstract {
 
     ChannelHandlerContextAbstract fireChannelInactive();
 
-    ChannelHandlerContextAbstract fireExceptionCaught(Throwable var1);
+    ChannelHandlerContextAbstract fireExceptionCaught(Throwable throwable);
 
-    ChannelHandlerContextAbstract fireUserEventTriggered(Object var1);
+    ChannelHandlerContextAbstract fireUserEventTriggered(Object event);
 
-    ChannelHandlerContextAbstract fireChannelRead(Object var1);
+    ChannelHandlerContextAbstract fireChannelRead0(Object msg);
+
+    default ChannelHandlerContextAbstract fireChannelRead(Object msg) {
+        if (msg instanceof ByteBufAbstract) {
+            msg = ((ByteBufAbstract) msg).rawByteBuf();
+        }
+        return fireChannelRead0(msg);
+    }
 
     ChannelHandlerContextAbstract fireChannelReadComplete();
 
@@ -59,9 +67,22 @@ public interface ChannelHandlerContextAbstract {
     ByteBufAllocatorAbstract alloc();
 
     //TODO Support ChannelFuture for write and writeandflush
-    void write(Object msg);
+    void write0(Object msg);
+    default void write(Object msg) {
+        if (msg instanceof ByteBufAbstract) {
+            msg = ((ByteBufAbstract) msg).rawByteBuf();
+        }
+        write0(msg);
+    }
     //TODO void write(Object msg, ChannelPromiseAbstract promise);
 
-    void writeAndFlush(Object msg);
+    void writeAndFlush0(Object msg);
+    default void writeAndFlush(Object msg) {
+        if (msg instanceof ByteBufAbstract) {
+            msg = ((ByteBufAbstract) msg).rawByteBuf();
+        }
+        writeAndFlush0(msg);
+    }
+
     //TODO void writeAndFlush(Object msg, ChannelPromiseAbstract promise);
 }

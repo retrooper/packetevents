@@ -18,8 +18,10 @@
 
 package com.github.retrooper.packetevents.manager.server;
 
+import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.netty.buffer.ByteBufAbstract;
 import com.github.retrooper.packetevents.netty.channel.ChannelAbstract;
+import com.github.retrooper.packetevents.util.PacketTransformationUtil;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 
 public interface ServerManager {
@@ -41,9 +43,21 @@ public interface ServerManager {
 
     void receivePacket(ChannelAbstract channel, ByteBufAbstract byteBuf);
 
-    void receivePacket(Object player, ByteBufAbstract byteBuf);
+    default void receivePacket(Object player, ByteBufAbstract byteBuf) {
+        ChannelAbstract channel = PacketEvents.getAPI().getPlayerManager().getChannel(player);
+        receivePacket(channel, byteBuf);
+    }
 
-    void receivePacket(Object player, PacketWrapper<?> wrapper);
+    default void receivePacket(Object player, PacketWrapper<?> wrapper) {
+        ChannelAbstract channel = PacketEvents.getAPI().getPlayerManager().getChannel(player);
+        receivePacket(channel, wrapper);
+    }
 
-    void receivePacket(ChannelAbstract channel, PacketWrapper<?> wrapper);
+    default void receivePacket(ChannelAbstract channel, PacketWrapper<?> wrapper) {
+        PacketWrapper<?>[] wrappers = PacketTransformationUtil.transform(wrapper);
+        for (PacketWrapper<?> packet : wrappers) {
+            packet.prepareForSend();
+            receivePacket(channel, packet.buffer);
+        }
+    }
 }

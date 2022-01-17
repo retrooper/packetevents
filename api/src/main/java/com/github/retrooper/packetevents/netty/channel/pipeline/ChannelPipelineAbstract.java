@@ -19,6 +19,7 @@
 package com.github.retrooper.packetevents.netty.channel.pipeline;
 
 
+import com.github.retrooper.packetevents.netty.buffer.ByteBufAbstract;
 import com.github.retrooper.packetevents.netty.channel.ChannelHandlerAbstract;
 import com.github.retrooper.packetevents.netty.channel.ChannelHandlerContextAbstract;
 
@@ -73,7 +74,14 @@ public interface ChannelPipelineAbstract {
 
     ChannelPipelineAbstract fireUserEventTriggered(Object event);
 
-    ChannelPipelineAbstract fireChannelRead(Object msg);
+    ChannelPipelineAbstract fireChannelRead0(Object msg);
+
+    default ChannelPipelineAbstract fireChannelRead(Object msg) {
+        if (msg instanceof ByteBufAbstract) {
+            msg = ((ByteBufAbstract) msg).rawByteBuf();
+        }
+        return fireChannelRead0(msg);
+    }
 
     ChannelPipelineAbstract fireChannelReadComplete();
 

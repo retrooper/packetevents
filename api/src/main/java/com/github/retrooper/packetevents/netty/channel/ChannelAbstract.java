@@ -18,6 +18,7 @@
 
 package com.github.retrooper.packetevents.netty.channel;
 
+import com.github.retrooper.packetevents.netty.buffer.ByteBufAbstract;
 import com.github.retrooper.packetevents.netty.channel.pipeline.ChannelPipelineAbstract;
 
 import java.net.SocketAddress;
@@ -39,10 +40,22 @@ public interface ChannelAbstract {
 
     ChannelPipelineAbstract pipeline();
 
-    void write(Object msg);
+    void write0(Object msg);
+    default void write(Object msg) {
+        if (msg instanceof ByteBufAbstract) {
+            msg = ((ByteBufAbstract) msg).rawByteBuf();
+        }
+        write0(msg);
+    }
     //void write(Object msg, ChannelPromiseAbstract promise);
 
-    void writeAndFlush(Object msg);
+    void writeAndFlush0(Object msg);
+    default void writeAndFlush(Object msg) {
+        if (msg instanceof ByteBufAbstract) {
+            msg = ((ByteBufAbstract) msg).rawByteBuf();
+        }
+        writeAndFlush0(msg);
+    }
     //void writeAndFlush(Object msg, ChannelPromiseAbstract promise);
 
     ChannelAbstract flush();

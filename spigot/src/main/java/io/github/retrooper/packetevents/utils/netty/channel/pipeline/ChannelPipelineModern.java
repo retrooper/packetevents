@@ -128,7 +128,7 @@ public class ChannelPipelineModern implements ChannelPipelineAbstract {
     }
 
     @Override
-    public ChannelPipelineAbstract fireChannelRead(Object msg) {
+    public ChannelPipelineAbstract fireChannelRead0(Object msg) {
         return new ChannelPipelineModern(pipeline.fireChannelRead(msg));
     }
 
