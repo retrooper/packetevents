@@ -18,7 +18,9 @@
 
 package io.github.retrooper.packetevents.handlers.compression;
 
+import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.netty.buffer.ByteBufAbstract;
+import com.github.retrooper.packetevents.netty.channel.ChannelAbstract;
 import com.github.retrooper.packetevents.netty.channel.ChannelHandlerContextAbstract;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 import io.github.retrooper.packetevents.utils.SpigotReflectionUtil;
@@ -38,6 +40,40 @@ public class CustomPacketCompressor {
         } finally {
             compressed.release();
         }
+    }
+
+
+    public static ByteBufAbstract compress(ChannelAbstract channel, ByteBufAbstract byteBuf) {
+        if (MESSAGE_TO_BYTE_ENCODER == null) {
+            MESSAGE_TO_BYTE_ENCODER = SpigotReflectionUtil.getNettyClass("handler.codec.MessageToByteEncoder");
+        }
+        ByteBufAbstract output = PacketEvents.getAPI().getNettyManager().buffer();
+        Object compressHandler = channel.pipeline().get("compress").rawChannelHandler();
+        if (!MESSAGE_TO_BYTE_ENCODER.isInstance(compressHandler)) {
+            //ViaRewind replaced the compressor with an empty handler, so we can just skip the compression process.
+            return output.writeBytes(byteBuf);
+        }
+        int dataLength = byteBuf.readableBytes();
+        PacketWrapper<?> outputWrapper = PacketWrapper.createUniversalPacketWrapper(output);
+        if (dataLength < THRESHOLD) {
+            //Set data length to 0
+            outputWrapper.writeVarInt(0);
+            output.writeBytes(byteBuf);
+        } else {
+            byte[] decompressedData = new byte[dataLength];
+            byteBuf.readBytes(decompressedData);
+            outputWrapper.writeVarInt(decompressedData.length);
+            DEFLATER.setInput(decompressedData, 0, dataLength);
+            DEFLATER.finish();
+
+            while (!DEFLATER.finished()) {
+                int deflateResult = DEFLATER.deflate(COMPRESSED_DATA);
+                output.writeBytes(COMPRESSED_DATA, 0, deflateResult);
+            }
+
+            DEFLATER.reset();
+        }
+        return output;
     }
 
     public static ByteBufAbstract compress(ChannelHandlerContextAbstract ctx, ByteBufAbstract byteBuf) {

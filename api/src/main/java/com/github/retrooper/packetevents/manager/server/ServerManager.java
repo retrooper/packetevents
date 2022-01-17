@@ -60,4 +60,24 @@ public interface ServerManager {
             receivePacket(channel, packet.buffer);
         }
     }
+
+    void receivePacketSilently(ChannelAbstract channel, ByteBufAbstract byteBuf);
+
+    default void receivePacketSilently(Object player, ByteBufAbstract byteBuf) {
+        ChannelAbstract channel = PacketEvents.getAPI().getPlayerManager().getChannel(player);
+        receivePacketSilently(channel, byteBuf);
+    }
+
+    default void receivePacketSilently(Object player, PacketWrapper<?> wrapper) {
+        ChannelAbstract channel = PacketEvents.getAPI().getPlayerManager().getChannel(player);
+        receivePacketSilently(channel, wrapper);
+    }
+
+    default void receivePacketSilently(ChannelAbstract channel, PacketWrapper<?> wrapper) {
+        PacketWrapper<?>[] wrappers = PacketTransformationUtil.transform(wrapper);
+        for (PacketWrapper<?> packet : wrappers) {
+            packet.prepareForSend();
+            receivePacketSilently(channel, packet.buffer);
+        }
+    }
 }

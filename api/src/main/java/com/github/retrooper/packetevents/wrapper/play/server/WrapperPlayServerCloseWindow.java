@@ -16,6 +16,10 @@ public class WrapperPlayServerCloseWindow extends PacketWrapper<WrapperPlayServe
         this.windowId = id;
     }
 
+    public WrapperPlayServerCloseWindow() {
+        this((byte)0);
+    }
+
     @Override
     public void readData() {
         this.windowId = readUnsignedByte();

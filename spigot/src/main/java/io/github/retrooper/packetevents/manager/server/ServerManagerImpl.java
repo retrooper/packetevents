@@ -23,8 +23,11 @@ import com.github.retrooper.packetevents.manager.server.ServerManager;
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.netty.buffer.ByteBufAbstract;
 import com.github.retrooper.packetevents.netty.channel.ChannelAbstract;
+import io.github.retrooper.packetevents.utils.dependencies.protocolsupport.ProtocolSupportUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.Plugin;
+
+import java.util.List;
 
 public class ServerManagerImpl implements ServerManager {
     private ServerVersion serverVersion;
@@ -64,9 +67,40 @@ public class ServerManagerImpl implements ServerManager {
     }
 
     @Override
+    public void receivePacketSilently(ChannelAbstract channel, ByteBufAbstract byteBuf) {
+        //Receive the packet for all handlers after our decoder
+        channel.pipeline().context(PacketEvents.DECODER_NAME).fireChannelRead(byteBuf);
+    }
+
+    @Override
     public void receivePacket(ChannelAbstract channel, ByteBufAbstract byteBuf) {
         if (channel.isOpen()) {
-            channel.pipeline().fireChannelRead(byteBuf);
+            if (ProtocolSupportUtil.isAvailable()) {
+                //We want to skip ProtocolSupport's translation handlers,
+                //because the buffer is fit for the current server-version
+            }
+            List<String> handlerNames = channel.pipeline().names();
+            System.out.println("handler names: " + channel.pipeline().namesToString());
+
+            if (handlerNames.contains("ps_decoder_transformer")) {
+                //We want to skip ProtocolSupport's translation handlers,
+                //because the buffer is fit for the current server-version
+                channel.pipeline().context("ps_decoder_transformer").fireChannelRead(byteBuf);
+            } else if (handlerNames.contains("decompress")) {
+                //We will have to just skip through the minecraft server's decompression handler
+                channel.pipeline().context("decompress").fireChannelRead(byteBuf);
+            } else {
+                if (handlerNames.contains("decrypt")) {
+                    //We will have to just skip through the minecraft server's decryption handler
+                    //We don't have to deal with decompressing, as that handler isn't currently in the pipeline
+                    channel.pipeline().context("decrypt").fireChannelRead(byteBuf);
+                } else {
+                    //No decompressing nor decrypting handlers are present
+                    //You cannot fill this buffer up with chunks of packets,
+                    //since we skip the packet-splitter handler.
+                    channel.pipeline().context("splitter").fireChannelRead(byteBuf);
+                }
+            }
         }
     }
 }

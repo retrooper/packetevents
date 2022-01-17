@@ -37,7 +37,6 @@ import com.github.retrooper.packetevents.protocol.player.InteractionHand;
 import com.github.retrooper.packetevents.protocol.player.SkinSection;
 import com.github.retrooper.packetevents.protocol.player.TextureProperty;
 import com.github.retrooper.packetevents.protocol.world.Location;
-import com.github.retrooper.packetevents.protocol.world.chunk.BaseChunk;
 import com.github.retrooper.packetevents.protocol.world.states.WrappedBlockState;
 import com.github.retrooper.packetevents.util.MojangAPIUtil;
 import com.github.retrooper.packetevents.util.Vector3i;
@@ -54,6 +53,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 public class PacketEventsPlugin extends JavaPlugin {
@@ -124,6 +124,17 @@ public class PacketEventsPlugin extends JavaPlugin {
 
                                 }, 120L);//120 ticks is 6 seconds
                     }
+                    else if (msg.equals("attack!")) {
+                        int randomEntityId = 3;
+                        WrapperPlayClientInteractEntity interactEntity = new WrapperPlayClientInteractEntity(randomEntityId,
+                                WrapperPlayClientInteractEntity.InteractAction.ATTACK,
+                                InteractionHand.MAIN_HAND,
+                                Optional.empty(),
+                                Optional.empty());
+                        System.out.println("spoofing incoming interact entity");
+                        PacketEvents.getAPI().getServerManager().receivePacket(event.getPlayer(),
+                                interactEntity);
+                    }
                 }
             }
 
@@ -132,11 +143,8 @@ public class PacketEventsPlugin extends JavaPlugin {
                 Player player = event.getPlayer() == null ? null : (Player) event.getPlayer();
                 //TODO Fix hoverEvent contents/value when its a component i believe
                 //TODO Work on copying styling properly from children components
-                if (event.getPacketType() == PacketType.Play.Server.BLOCK_CHANGE) {
-                    WrapperPlayServerBlockChange bc = new WrapperPlayServerBlockChange(event);
-                    Vector3i pos = bc.getBlockPosition();
-                    WrappedBlockState state = WrappedBlockState.getByGlobalId(bc.getBlockId());
-                } else if (event.getPacketType() == PacketType.Play.Server.SPAWN_LIVING_ENTITY) {
+
+                if (event.getPacketType() == PacketType.Play.Server.SPAWN_LIVING_ENTITY) {
                     WrapperPlayServerSpawnLivingEntity spawnLivingEntity = new WrapperPlayServerSpawnLivingEntity(event);
                     if (spawnLivingEntity.getEntityType().equals(EntityTypes.PIG)) {
                         event.setCancelled(true);
@@ -188,12 +196,6 @@ public class PacketEventsPlugin extends JavaPlugin {
                     int slot = setSlot.getSlot();
                     ItemStack item = setSlot.getItem();
                     player.sendMessage("Set slot with window ID: " + windowID + ", slot: " + slot + ", item: " + (item.getType() != null ? item.toString() : "null item"));
-                } else if (event.getPacketType() == PacketType.Play.Server.CHUNK_DATA) {
-                    WrapperPlayServerChunkData cd = new WrapperPlayServerChunkData(event);
-                    for (BaseChunk chunk : cd.getColumn().getChunks()) {
-                        WrappedBlockState state = chunk.get(0, 0, 0);
-                        //System.out.println("state: " + state.toString() + ", at " + cd.getColumn().getX() + ":" + cd.getColumn().getZ());
-                    }
                 }
             }
         };

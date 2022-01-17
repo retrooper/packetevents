@@ -93,7 +93,7 @@ public class PacketDecoderModern extends ByteToMessageDecoder {
 
     @Override
     public void decode(ChannelHandlerContext ctx, ByteBuf byteBuf, List<Object> out) {
-        if (byteBuf.readableBytes() != 0) {
+        if (byteBuf.isReadable()) {
             handle(PacketEvents.getAPI().getNettyManager().wrapChannelHandlerContext(ctx), PacketEvents.getAPI().getNettyManager().wrapByteBuf(byteBuf), out);
             if (!decoders.isEmpty()) {
                 //Call custom decoders
