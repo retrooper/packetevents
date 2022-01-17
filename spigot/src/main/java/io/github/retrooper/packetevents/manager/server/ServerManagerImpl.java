@@ -80,7 +80,6 @@ public class ServerManagerImpl implements ServerManager {
                 //because the buffer is fit for the current server-version
             }
             List<String> handlerNames = channel.pipeline().names();
-            System.out.println("handler names: " + channel.pipeline().namesToString());
 
             if (handlerNames.contains("ps_decoder_transformer")) {
                 //We want to skip ProtocolSupport's translation handlers,
