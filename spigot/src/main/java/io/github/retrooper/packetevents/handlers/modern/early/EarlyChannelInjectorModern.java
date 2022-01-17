@@ -154,8 +154,6 @@ public class EarlyChannelInjectorModern implements EarlyInjector {
         else {
             pipeline.addFirst(PacketEvents.CONNECTION_NAME, new ServerChannelHandlerModern());
         }
-        //System.out.println("post handlers: " + Arrays.toString(pipeline.names().toArray(new String[0])));
-
         List<Object> networkManagers = SpigotReflectionUtil.getNetworkManagers();
         synchronized (networkManagers) {
             for (Object networkManager : networkManagers) {
@@ -317,8 +315,9 @@ public class EarlyChannelInjectorModern implements EarlyInjector {
     private void initViaEncoder(Object ch, PacketEncoderModern encoder) {
         Channel channel = (Channel) ch;
         MessageToByteEncoder<?> viaEncoder = (MessageToByteEncoder<?>) channel.pipeline().get("encoder");
+        //Read the mcEncoder stored in "encoder" by viaversion
         encoder.mcEncoder = new ReflectionObject(viaEncoder).read(0, MessageToByteEncoder.class);
-        //We let our encoder get called before viaversion, but we will therefore transform the packets to bytebufs
+        //We let our encoder get called before viaversion, but we will therefore transform the NMS packets to bytebufs
         channel.pipeline().addAfter("encoder", PacketEvents.ENCODER_NAME, encoder);
     }
 

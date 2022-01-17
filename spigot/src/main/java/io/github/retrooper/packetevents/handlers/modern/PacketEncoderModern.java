@@ -83,11 +83,10 @@ public class PacketEncoderModern extends MessageToByteEncoder<Object> {
             }
         } else {
             ByteBuf in = (ByteBuf) o;
-            if (in.isReadable()) {
-                out.writeBytes(in);
-            } else {
+            if (!in.isReadable()) {
                 return;
             }
+            out.writeBytes(in);
         }
         handle(PacketEvents.getAPI().getNettyManager().wrapChannelHandlerContext(ctx), PacketEvents.getAPI().getNettyManager().wrapByteBuf(out));
     }

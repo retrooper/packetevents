@@ -23,19 +23,15 @@ import com.github.retrooper.packetevents.manager.player.PlayerManager;
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.netty.buffer.ByteBufAbstract;
 import com.github.retrooper.packetevents.netty.channel.ChannelAbstract;
-import com.github.retrooper.packetevents.netty.channel.ChannelHandlerAbstract;
-import com.github.retrooper.packetevents.netty.channel.ChannelHandlerContextAbstract;
 import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 import com.github.retrooper.packetevents.protocol.player.GameProfile;
 import io.github.retrooper.packetevents.utils.PlayerPingAccessorModern;
 import io.github.retrooper.packetevents.utils.SpigotReflectionUtil;
 import io.github.retrooper.packetevents.utils.dependencies.DependencyUtil;
-import io.github.retrooper.packetevents.utils.dependencies.viaversion.CustomPipelineUtil;
+import io.github.retrooper.packetevents.utils.dependencies.protocolsupport.ProtocolSupportUtil;
 import io.github.retrooper.packetevents.utils.v1_7.SpigotVersionLookup_1_7;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
-
-import java.lang.reflect.InvocationTargetException;
 
 public class PlayerManagerImpl implements PlayerManager {
     @Override
@@ -107,6 +103,11 @@ public class PlayerManagerImpl implements PlayerManager {
     @Override
     public void sendPacket(ChannelAbstract channel, ByteBufAbstract byteBuf) {
         if (channel.isOpen()) {
+            if (ProtocolSupportUtil.isAvailable()) {
+                //ProtocolSupport has a MessageToMessageCodec handler named "ps_logic" in the way.
+                //The Netty documentation explicitly mentions that you need to retain buffers before passing them through such handlers.
+                byteBuf.retain();
+            }
             channel.writeAndFlush(byteBuf);
         }
     }
@@ -114,7 +115,7 @@ public class PlayerManagerImpl implements PlayerManager {
     @Override
     public void sendPacketSilently(ChannelAbstract channel, ByteBufAbstract byteBuf) {
         if (channel.isOpen()) {
-            //Only call the encoders after ours
+            //Only call the encoders after ours in the pipeline
             channel.pipeline().context(PacketEvents.ENCODER_NAME).writeAndFlush(byteBuf);
         }
     }
