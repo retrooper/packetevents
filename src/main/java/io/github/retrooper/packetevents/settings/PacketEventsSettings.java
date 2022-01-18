@@ -124,6 +124,7 @@ public class PacketEventsSettings {
      * @param compatInjector Value
      * @return Settings instance.
      */
+    @Deprecated
     public PacketEventsSettings compatInjector(boolean compatInjector) {
         if (!locked) {
             this.compatInjector = compatInjector;
@@ -175,6 +176,7 @@ public class PacketEventsSettings {
      *
      * @return Getter for {@link #compatInjector}
      */
+    @Deprecated
     public boolean shouldUseCompatibilityInjector() {
         return compatInjector;
     }

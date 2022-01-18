@@ -54,6 +54,7 @@ public class WrappedPacketOutGameStateChange extends WrappedPacket implements Se
     @Override
     protected void load() {
         reasonClassType = SubclassUtil.getSubClass(PacketTypeClasses.Play.Server.GAME_STATE_CHANGE, 0);
+        net.minecraft.server.v1_8_R3.PacketPlayOutGameStateChange gsc;
         if (reasonClassType != null) {
             try {
                 reasonClassConstructor = reasonClassType.getConstructor(int.class);
@@ -140,7 +141,7 @@ public class WrappedPacketOutGameStateChange extends WrappedPacket implements Se
 
     @Override
     public Object asNMSPacket() throws Exception {
-        if (reasonClassType == null) {
+        if (reasonIntMode) {
             if (valueFloatMode) {
                 return packetConstructor.newInstance(getReason(), (float) getValue());
             } else {

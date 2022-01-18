@@ -37,12 +37,12 @@ public class PEChannelInitializerModern extends ChannelInitializer<Channel> {
 
     public static void postInitChannel(Channel channel) {
         PlayerChannelHandlerModern channelHandler = new PlayerChannelHandlerModern();
-        if (channel.pipeline().get("packet_handler") != null) {
+        if (channel.pipeline().get("encoder") != null) {
             String handlerName = PacketEvents.get().getHandlerName();
             if (channel.pipeline().get(handlerName) != null) {
                 PacketEvents.get().getPlugin().getLogger().warning("[PacketEvents] Attempted to initialize a channel twice!");
             } else {
-                channel.pipeline().addBefore("packet_handler", handlerName, channelHandler);
+                channel.pipeline().addAfter("encoder", handlerName, channelHandler);
             }
         }
     }

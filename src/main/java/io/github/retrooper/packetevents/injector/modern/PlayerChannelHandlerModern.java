@@ -21,10 +21,11 @@ package io.github.retrooper.packetevents.injector.modern;
 import io.github.retrooper.packetevents.PacketEvents;
 import io.github.retrooper.packetevents.processor.PacketProcessorInternal;
 import io.netty.channel.ChannelDuplexHandler;
+import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelPromise;
 import org.bukkit.entity.Player;
-
+@ChannelHandler.Sharable
 public class PlayerChannelHandlerModern extends ChannelDuplexHandler {
     /**
      * Associated player.

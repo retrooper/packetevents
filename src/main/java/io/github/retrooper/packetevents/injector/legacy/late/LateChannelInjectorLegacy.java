@@ -40,7 +40,7 @@ public class LateChannelInjectorLegacy implements LateInjector {
         PlayerChannelHandlerLegacy playerChannelHandlerLegacy = new PlayerChannelHandlerLegacy();
         playerChannelHandlerLegacy.player = player;
         Channel channel = (Channel) PacketEvents.get().getPlayerUtils().getChannel(player);
-        channel.pipeline().addBefore("packet_handler", PacketEvents.get().getHandlerName(), playerChannelHandlerLegacy);
+        channel.pipeline().addAfter("encoder", PacketEvents.get().getHandlerName(), playerChannelHandlerLegacy);
     }
 
     @Override
