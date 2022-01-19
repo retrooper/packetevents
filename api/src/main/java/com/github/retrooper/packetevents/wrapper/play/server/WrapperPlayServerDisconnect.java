@@ -20,7 +20,6 @@ package com.github.retrooper.packetevents.wrapper.play.server;
 
 import com.github.retrooper.packetevents.event.impl.PacketSendEvent;
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
-import com.github.retrooper.packetevents.protocol.chat.component.BaseComponent;
 import com.github.retrooper.packetevents.protocol.chat.component.serializer.AdventureSerializer;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
@@ -35,11 +34,6 @@ public class WrapperPlayServerDisconnect extends PacketWrapper<WrapperPlayServer
 
     public WrapperPlayServerDisconnect(PacketSendEvent event) {
         super(event);
-    }
-
-    public WrapperPlayServerDisconnect(BaseComponent reasonComponent) {
-        super(PacketType.Play.Server.DISCONNECT);
-        this.reasonComponent = AdventureSerializer.asAdventure(reasonComponent);
     }
 
     public WrapperPlayServerDisconnect(Component reasonComponent) {
@@ -88,15 +82,7 @@ public class WrapperPlayServerDisconnect extends PacketWrapper<WrapperPlayServer
         return reasonComponent;
     }
 
-    public BaseComponent getReasonBaseComponent() {
-        return AdventureSerializer.asBaseComponent(reasonComponent);
-    }
-
     public void setReasonComponent(Component reasonComponent) {
         this.reasonComponent = reasonComponent;
-    }
-
-    public void setReasonComponent(BaseComponent reasonComponent) {
-        this.reasonComponent = AdventureSerializer.asAdventure(reasonComponent);
     }
 }

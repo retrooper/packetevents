@@ -20,7 +20,6 @@ package com.github.retrooper.packetevents.protocol.entity.data;
 
 import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
-import com.github.retrooper.packetevents.protocol.chat.component.BaseComponent;
 import com.github.retrooper.packetevents.protocol.entity.pose.EntityPose;
 import com.github.retrooper.packetevents.protocol.entity.villager.VillagerData;
 import com.github.retrooper.packetevents.protocol.item.ItemStack;
@@ -201,7 +200,7 @@ public class EntityDataTypes {
     private static <T> BiConsumer<PacketWrapper<?>, T> writeOptionalComponentSerializer() {
         return (PacketWrapper<?> wrapper, T value) -> {
             if (value instanceof Optional) {
-                Optional<BaseComponent> optional = (Optional<BaseComponent>) value;
+                Optional<Component> optional = (Optional<Component>) value;
                 if (optional.isPresent()) {
                     wrapper.writeBoolean(true);
                     wrapper.writeComponent(optional.get());

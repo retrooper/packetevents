@@ -20,12 +20,10 @@ package com.github.retrooper.packetevents.wrapper.play.server;
 
 import com.github.retrooper.packetevents.event.impl.PacketSendEvent;
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
-import com.github.retrooper.packetevents.protocol.chat.component.BaseComponent;
-import com.github.retrooper.packetevents.protocol.chat.component.serializer.AdventureSerializer;
-import com.github.retrooper.packetevents.protocol.player.GameProfile;
-import com.github.retrooper.packetevents.protocol.player.TextureProperty;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.protocol.player.GameMode;
+import com.github.retrooper.packetevents.protocol.player.GameProfile;
+import com.github.retrooper.packetevents.protocol.player.TextureProperty;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
@@ -157,7 +155,7 @@ public class WrapperPlayServerPlayerInfo extends PacketWrapper<WrapperPlayServer
             //Only one player data can be sent
             PlayerData data = playerDataList.get(0);
             //We must convert the component string to a normal one
-            String rawUsername = ((TextComponent)data.displayName).content();
+            String rawUsername = ((TextComponent) data.displayName).content();
             writeString(rawUsername);
             writeBoolean(action != Action.REMOVE_PLAYER);
             writeShort(data.ping);
@@ -248,13 +246,6 @@ public class WrapperPlayServerPlayerInfo extends PacketWrapper<WrapperPlayServer
             this.ping = ping;
         }
 
-        public PlayerData(@Nullable BaseComponent displayName, @Nullable GameProfile gameProfile, @Nullable GameMode gameMode, int ping) {
-            this.displayName = displayName == null ? null : AdventureSerializer.asAdventure(displayName);
-            this.gameProfile = gameProfile;
-            this.gameMode = gameMode;
-            this.ping = ping;
-        }
-
         @Nullable
         public GameProfile getGameProfile() {
             return gameProfile;
@@ -286,17 +277,8 @@ public class WrapperPlayServerPlayerInfo extends PacketWrapper<WrapperPlayServer
             return displayName;
         }
 
-        @Nullable
-        public BaseComponent getBaseDisplayName() {
-            return AdventureSerializer.asBaseComponent(displayName);
-        }
-
         public void setDisplayName(@Nullable Component displayName) {
             this.displayName = displayName;
-        }
-
-        public void setDisplayName(@Nullable BaseComponent displayName) {
-            this.displayName = displayName == null ? null : AdventureSerializer.asAdventure(displayName);
         }
     }
 }

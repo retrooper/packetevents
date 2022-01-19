@@ -2,7 +2,6 @@ package com.github.retrooper.packetevents.wrapper.play.server;
 
 import com.github.retrooper.packetevents.event.impl.PacketSendEvent;
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
-import com.github.retrooper.packetevents.protocol.chat.component.BaseComponent;
 import com.github.retrooper.packetevents.protocol.chat.component.serializer.AdventureSerializer;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
@@ -21,7 +20,7 @@ public class WrapperPlayServerOpenWindow extends PacketWrapper<WrapperPlayServer
     private int horseId; // 1.13-
 
     private String titleRawJson;
-    private Component chatComponentJson; // 1.8 and above
+    private Component titleComponent; // 1.8 and above
 
     private boolean useProvidedWindowTitle; // 1.7 only
 
@@ -90,7 +89,7 @@ public class WrapperPlayServerOpenWindow extends PacketWrapper<WrapperPlayServer
         this.titleRawJson = readString(getMaxMessageLength());
 
         if (HANDLE_JSON) {
-            chatComponentJson = AdventureSerializer.parseComponent(this.titleRawJson);
+            titleComponent = AdventureSerializer.parseComponent(this.titleRawJson);
         }
     }
 
@@ -102,7 +101,7 @@ public class WrapperPlayServerOpenWindow extends PacketWrapper<WrapperPlayServer
         this.legacySlots = wrapper.legacySlots;
         this.horseId = wrapper.horseId;
         this.titleRawJson = wrapper.titleRawJson;
-        this.chatComponentJson = wrapper.chatComponentJson;
+        this.titleComponent = wrapper.titleComponent;
         this.useProvidedWindowTitle = wrapper.useProvidedWindowTitle;
     }
 
@@ -137,7 +136,7 @@ public class WrapperPlayServerOpenWindow extends PacketWrapper<WrapperPlayServer
         }
 
         if (HANDLE_JSON) {
-            titleRawJson = AdventureSerializer.toJson(chatComponentJson);
+            titleRawJson = AdventureSerializer.toJson(titleComponent);
         }
         writeString(titleRawJson, getMaxMessageLength());
     }
@@ -190,20 +189,12 @@ public class WrapperPlayServerOpenWindow extends PacketWrapper<WrapperPlayServer
         this.titleRawJson = titleRawJson;
     }
 
-    public Component getChatComponent() {
-        return chatComponentJson;
+    public Component getTitleComponent() {
+        return titleComponent;
     }
 
-    public BaseComponent getChatComponentJson() {
-        return AdventureSerializer.asBaseComponent(chatComponentJson);
-    }
-
-    public void setChatComponentJson(Component chatComponentJson) {
-        this.chatComponentJson = chatComponentJson;
-    }
-
-    public void setChatComponentJson(BaseComponent chatComponentJson) {
-        this.chatComponentJson = AdventureSerializer.asAdventure(chatComponentJson);
+    public void setTitleComponent(Component titleComponent) {
+        this.titleComponent = titleComponent;
     }
 
     public boolean isUseProvidedWindowTitle() {

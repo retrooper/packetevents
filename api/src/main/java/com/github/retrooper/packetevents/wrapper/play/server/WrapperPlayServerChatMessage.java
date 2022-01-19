@@ -20,7 +20,6 @@ package com.github.retrooper.packetevents.wrapper.play.server;
 
 import com.github.retrooper.packetevents.event.impl.PacketSendEvent;
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
-import com.github.retrooper.packetevents.protocol.chat.component.BaseComponent;
 import com.github.retrooper.packetevents.protocol.chat.component.serializer.AdventureSerializer;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.protocol.player.ClientVersion;
@@ -44,10 +43,6 @@ public class WrapperPlayServerChatMessage extends PacketWrapper<WrapperPlayServe
         this(chatComponent, position, new UUID(0L, 0L));
     }
 
-    public WrapperPlayServerChatMessage(BaseComponent chatComponent, ChatPosition position) {
-        this(chatComponent, position, new UUID(0L, 0L));
-    }
-
     public WrapperPlayServerChatMessage(Component chatComponent, ChatPosition position, UUID senderUUID) {
         super(PacketType.Play.Server.CHAT_MESSAGE);
         this.chatComponent = chatComponent;
@@ -55,12 +50,6 @@ public class WrapperPlayServerChatMessage extends PacketWrapper<WrapperPlayServe
         this.senderUUID = senderUUID;
     }
 
-    public WrapperPlayServerChatMessage(BaseComponent chatComponent, ChatPosition position, UUID senderUUID) {
-        super(PacketType.Play.Server.CHAT_MESSAGE);
-        this.chatComponent = AdventureSerializer.asAdventure(chatComponent);
-        this.position = position;
-        this.senderUUID = senderUUID;
-    }
 
     public WrapperPlayServerChatMessage(String chatComponentJson, ChatPosition position) {
         this(chatComponentJson, position, new UUID(0L, 0L));
@@ -124,16 +113,8 @@ public class WrapperPlayServerChatMessage extends PacketWrapper<WrapperPlayServe
         }
     }
 
-    public BaseComponent getChatBaseComponent() {
-        return AdventureSerializer.asBaseComponent(chatComponent);
-    }
-
     public Component getChatComponent() {
         return chatComponent;
-    }
-
-    public void setChatComponent(BaseComponent chatComponent) {
-        this.chatComponent = AdventureSerializer.asAdventure(chatComponent);
     }
 
     public void setChatComponent(Component chatComponent) {

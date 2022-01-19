@@ -18,8 +18,6 @@
 
 package com.github.retrooper.packetevents.protocol.entity.data.provider;
 
-import com.github.retrooper.packetevents.protocol.chat.component.BaseComponent;
-import com.github.retrooper.packetevents.protocol.chat.component.serializer.AdventureSerializer;
 import com.github.retrooper.packetevents.protocol.entity.data.EntityData;
 import com.github.retrooper.packetevents.protocol.entity.data.EntityDataTypes;
 import com.github.retrooper.packetevents.protocol.entity.pose.EntityPose;
@@ -52,17 +50,8 @@ public class EntityDataProvider implements DataProvider {
     private boolean hasGravity = true;
 
     @Nullable
-    public BaseComponent getBaseCustomName() {
-        return AdventureSerializer.asBaseComponent(customName);
-    }
-
-    @Nullable
     public Component getCustomName() {
         return customName;
-    }
-
-    public void setCustomName(@Nullable BaseComponent customName) {
-        this.customName = AdventureSerializer.asAdventure(customName);
     }
 
     public void setCustomName(@Nullable Component customName) {
@@ -272,78 +261,78 @@ public class EntityDataProvider implements DataProvider {
             this.provider = provider;
         }
 
-        public T customName(@Nullable BaseComponent customName) {
-            ((EntityDataProvider)provider).setCustomName(customName);
+        public T customName(@Nullable Component customName) {
+            ((EntityDataProvider) provider).setCustomName(customName);
             return (T) this;
         }
 
         public T customNameVisible(boolean customNameVisible) {
-            ((EntityDataProvider)provider).setCustomNameVisible(customNameVisible);
+            ((EntityDataProvider) provider).setCustomNameVisible(customNameVisible);
             return (T) this;
         }
 
         public T pose(EntityPose pose) {
-            ((EntityDataProvider)provider).setPose(pose);
+            ((EntityDataProvider) provider).setPose(pose);
             return (T) this;
         }
 
         public T onFire(boolean onFire) {
-            ((EntityDataProvider)provider).setOnFire(onFire);
+            ((EntityDataProvider) provider).setOnFire(onFire);
             return (T) this;
         }
 
         public T crouching(boolean crouching) {
-            ((EntityDataProvider)provider).setCrouching(crouching);
+            ((EntityDataProvider) provider).setCrouching(crouching);
             return (T) this;
         }
 
         public T riding(boolean riding) {
-            ((EntityDataProvider)provider).setRiding(riding);
+            ((EntityDataProvider) provider).setRiding(riding);
             return (T) this;
         }
 
         public T sprinting(boolean sprinting) {
-            ((EntityDataProvider)provider).setSprinting(sprinting);
+            ((EntityDataProvider) provider).setSprinting(sprinting);
             return (T) this;
         }
 
         public T swimming(boolean swimming) {
-            ((EntityDataProvider)provider).setSwimming(swimming);
+            ((EntityDataProvider) provider).setSwimming(swimming);
             return (T) this;
         }
 
         public T invisible(boolean invisible) {
-            ((EntityDataProvider)provider).setInvisible(invisible);
+            ((EntityDataProvider) provider).setInvisible(invisible);
             return (T) this;
         }
 
         public T glowing(boolean glowing) {
-            ((EntityDataProvider)provider).setGlowing(glowing);
+            ((EntityDataProvider) provider).setGlowing(glowing);
             return (T) this;
         }
 
         public T flyingWithElytra(boolean flyingWithElytra) {
-            ((EntityDataProvider)provider).setFlyingWithElytra(flyingWithElytra);
+            ((EntityDataProvider) provider).setFlyingWithElytra(flyingWithElytra);
             return (T) this;
         }
 
         public T silent(boolean silent) {
-            ((EntityDataProvider)provider).setSilent(silent);
+            ((EntityDataProvider) provider).setSilent(silent);
             return (T) this;
         }
 
         public T hasGravity(boolean hasGravity) {
-            ((EntityDataProvider)provider).setHasGravity(hasGravity);
+            ((EntityDataProvider) provider).setHasGravity(hasGravity);
             return (T) this;
         }
 
         public T airTicks(int airTicks) {
-            ((EntityDataProvider)provider).setAirTicks(airTicks);
+            ((EntityDataProvider) provider).setAirTicks(airTicks);
             return (T) this;
         }
 
         public T ticksFrozenInPowderedSnow(int ticksFrozenInPowderedSnow) {
-            ((EntityDataProvider)provider).setTicksFrozenInPowderedSnow(ticksFrozenInPowderedSnow);
+            ((EntityDataProvider) provider).setTicksFrozenInPowderedSnow(ticksFrozenInPowderedSnow);
             return (T) this;
         }
 

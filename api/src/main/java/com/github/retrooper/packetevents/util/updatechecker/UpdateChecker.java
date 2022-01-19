@@ -19,11 +19,11 @@
 package com.github.retrooper.packetevents.util.updatechecker;
 
 import com.github.retrooper.packetevents.PacketEvents;
-import com.github.retrooper.packetevents.protocol.chat.Color;
-import com.github.retrooper.packetevents.protocol.chat.component.serializer.ComponentSerializer;
-import com.github.retrooper.packetevents.util.LogManager;
+import com.github.retrooper.packetevents.protocol.chat.component.serializer.AdventureSerializer;
+import com.github.retrooper.packetevents.util.ColorUtil;
 import com.github.retrooper.packetevents.util.PEVersion;
 import com.google.gson.JsonObject;
+import net.kyori.adventure.text.format.NamedTextColor;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -45,7 +45,7 @@ public class UpdateChecker {
             BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
             String jsonResponse = reader.readLine();
             reader.close();
-            JsonObject jsonObject = ComponentSerializer.GSON.fromJson(jsonResponse, JsonObject.class);
+            JsonObject jsonObject = AdventureSerializer.GSON.serializer().fromJson(jsonResponse, JsonObject.class);
             return jsonObject.get("tag_name").getAsString();
         } catch (IOException e) {
             throw new IllegalStateException("Failed to parse packetevents version!", e);
@@ -65,13 +65,22 @@ public class UpdateChecker {
             newVersion = null;
         }
         if (newVersion != null && localVersion.isOlderThan(newVersion)) {
-            PacketEvents.getAPI().getLogManager().warn("There is an update available for packetevents! Your build: (" + Color.YELLOW + localVersion + Color.WHITE +  ") | Latest released build: (" + Color.BRIGHT_GREEN + newVersion + Color.RED + ")");
+            PacketEvents.getAPI().getLogManager().warn("There is an update available for packetevents! Your build: ("
+                    + ColorUtil.toString(NamedTextColor.YELLOW) + localVersion
+                    + ColorUtil.toString(NamedTextColor.WHITE) + ") | Latest released build: ("
+                    + ColorUtil.toString(NamedTextColor.GREEN) + newVersion
+                    + ColorUtil.toString(NamedTextColor.RED) + ")");
             return UpdateCheckerStatus.OUTDATED;
         } else if (newVersion != null && localVersion.isNewerThan(newVersion)) {
-            PacketEvents.getAPI().getLogManager().info("You are on a dev or pre released build of packetevents. Your build: (" + Color.CYAN + localVersion + Color.WHITE + ") | Latest released build: (" + Color.DARK_CYAN + newVersion + Color.WHITE + ")");
+            PacketEvents.getAPI().getLogManager().info("You are on a dev or pre released build of packetevents. Your build: ("
+                    + ColorUtil.toString(NamedTextColor.AQUA) + localVersion
+                    + ColorUtil.toString(NamedTextColor.WHITE) + ") | Latest released build: ("
+                    + ColorUtil.toString(NamedTextColor.DARK_AQUA) + newVersion
+                    + ColorUtil.toString(NamedTextColor.WHITE) + ")");
             return UpdateCheckerStatus.PRE_RELEASE;
         } else if (localVersion.equals(newVersion)) {
-            PacketEvents.getAPI().getLogManager().info("You are on the latest released version of packetevents. (" + Color.BRIGHT_GREEN + newVersion + Color.WHITE + ")");
+            PacketEvents.getAPI().getLogManager().info("You are on the latest released version of packetevents. ("
+                    + ColorUtil.toString(NamedTextColor.GREEN) + newVersion + ColorUtil.toString(NamedTextColor.WHITE) + ")");
             return UpdateCheckerStatus.UP_TO_DATE;
         } else {
             PacketEvents.getAPI().getLogManager().warn("Something went wrong while checking for an update. Your build: (" + localVersion + ")");
@@ -112,6 +121,7 @@ public class UpdateChecker {
         }, "packetevents-update-check-thread");
         thread.start();
     }
+
     /**
      * Result of an update check.
      *

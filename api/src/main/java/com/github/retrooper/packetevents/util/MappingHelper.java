@@ -18,7 +18,7 @@
 
 package com.github.retrooper.packetevents.util;
 
-import com.github.retrooper.packetevents.protocol.chat.component.serializer.ComponentSerializer;
+import com.github.retrooper.packetevents.protocol.chat.component.serializer.AdventureSerializer;
 import com.github.retrooper.packetevents.protocol.item.type.ItemTypes;
 import com.google.gson.JsonObject;
 
@@ -56,6 +56,6 @@ public class MappingHelper {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        return ComponentSerializer.GSON.fromJson(sb.toString(), JsonObject.class);
+        return AdventureSerializer.GSON.serializer().fromJson(sb.toString(), JsonObject.class);
     }
 }

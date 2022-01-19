@@ -22,7 +22,6 @@ import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.event.impl.PacketSendEvent;
 import com.github.retrooper.packetevents.manager.player.attributes.TabCompleteAttribute;
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
-import com.github.retrooper.packetevents.protocol.chat.component.BaseComponent;
 import com.github.retrooper.packetevents.protocol.chat.component.serializer.AdventureSerializer;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
@@ -86,8 +85,7 @@ public class WrapperPlayServerTabComplete extends PacketWrapper<WrapperPlayServe
                 CommandMatch commandMatch = new CommandMatch(text, tooltip);
                 commandMatches.add(commandMatch);
             }
-        }
-        else {
+        } else {
             int matchLength = readVarInt();
             commandMatches = new ArrayList<>(matchLength);
             for (int i = 0; i < matchLength; i++) {
@@ -123,8 +121,7 @@ public class WrapperPlayServerTabComplete extends PacketWrapper<WrapperPlayServe
                     writeString(tooltipJson, maxMessageLength);
                 }
             }
-        }
-        else {
+        } else {
             writeVarInt(commandMatches.size());
             for (CommandMatch match : commandMatches) {
                 writeString(match.getText());
@@ -139,8 +136,7 @@ public class WrapperPlayServerTabComplete extends PacketWrapper<WrapperPlayServe
     public void setTransactionId(Integer transactionID) {
         if (transactionID != null) {
             this.transactionID = Optional.of(transactionID);
-        }
-        else {
+        } else {
             this.transactionID = Optional.empty();
         }
     }
@@ -152,8 +148,7 @@ public class WrapperPlayServerTabComplete extends PacketWrapper<WrapperPlayServe
     public void setCommandRange(@Nullable CommandRange commandRange) {
         if (commandRange != null) {
             this.commandRange = Optional.of(commandRange);
-        }
-        else {
+        } else {
             this.commandRange = Optional.empty();
         }
     }
@@ -170,12 +165,7 @@ public class WrapperPlayServerTabComplete extends PacketWrapper<WrapperPlayServe
         private String text;
         private Optional<Component> tooltip;
 
-        public CommandMatch(String text, Component tooltip) {
-            this.text = text;
-            setTooltip(tooltip);
-        }
-
-        public CommandMatch(String text, BaseComponent tooltip) {
+        public CommandMatch(String text, @Nullable Component tooltip) {
             this.text = text;
             setTooltip(tooltip);
         }
@@ -193,20 +183,8 @@ public class WrapperPlayServerTabComplete extends PacketWrapper<WrapperPlayServe
             this.text = text;
         }
 
-        public Optional<BaseComponent> getTooltipBase() {
-            return Optional.ofNullable(AdventureSerializer.asBaseComponent(tooltip.orElse(null)));
-        }
-
         public Optional<Component> getTooltip() {
             return tooltip;
-        }
-
-        public void setTooltip(@Nullable BaseComponent tooltip) {
-            if (tooltip != null) {
-                this.tooltip = Optional.of(AdventureSerializer.asAdventure(tooltip));
-            } else {
-                this.tooltip = Optional.empty();
-            }
         }
 
         public void setTooltip(@Nullable Component tooltip) {

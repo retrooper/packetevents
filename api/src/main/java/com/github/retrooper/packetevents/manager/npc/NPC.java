@@ -18,8 +18,6 @@
 
 package com.github.retrooper.packetevents.manager.npc;
 
-import com.github.retrooper.packetevents.protocol.chat.component.BaseComponent;
-import com.github.retrooper.packetevents.protocol.chat.component.serializer.AdventureSerializer;
 import com.github.retrooper.packetevents.protocol.item.ItemStack;
 import com.github.retrooper.packetevents.protocol.player.GameMode;
 import com.github.retrooper.packetevents.protocol.player.GameProfile;
@@ -42,12 +40,6 @@ public class NPC {
 
     public NPC(Component displayName, int entityId, GameProfile profile) {
         this.displayName = displayName;
-        this.id = entityId;
-        this.profile = profile;
-    }
-
-    public NPC(BaseComponent displayName, int entityId, GameProfile profile) {
-        this.displayName = AdventureSerializer.asAdventure(displayName);
         this.id = entityId;
         this.profile = profile;
     }
@@ -104,16 +96,8 @@ public class NPC {
         return displayName;
     }
 
-    public BaseComponent getBaseDisplayName() {
-        return AdventureSerializer.asBaseComponent(displayName);
-    }
-
     public void setDisplayName(Component displayName) {
         this.displayName = displayName;
-    }
-
-    public void setDisplayName(BaseComponent displayName) {
-        this.displayName = AdventureSerializer.asAdventure(displayName);
     }
 
     public int getId() {
