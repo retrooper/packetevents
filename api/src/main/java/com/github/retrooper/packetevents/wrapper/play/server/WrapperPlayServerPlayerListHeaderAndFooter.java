@@ -21,12 +21,10 @@ package com.github.retrooper.packetevents.wrapper.play.server;
 import com.github.retrooper.packetevents.event.impl.PacketSendEvent;
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.protocol.chat.component.BaseComponent;
-import com.github.retrooper.packetevents.protocol.chat.component.serializer.ComponentSerializer;
-import com.github.retrooper.packetevents.protocol.chat.component.impl.TextComponent;
+import com.github.retrooper.packetevents.protocol.chat.component.serializer.AdventureSerializer;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
-
-import java.util.List;
+import net.kyori.adventure.text.Component;
 
 public class WrapperPlayServerPlayerListHeaderAndFooter extends PacketWrapper<WrapperPlayServerPlayerListHeaderAndFooter> {
     public static boolean HANDLE_JSON = true;
@@ -34,16 +32,22 @@ public class WrapperPlayServerPlayerListHeaderAndFooter extends PacketWrapper<Wr
     private static final int LEGACY_MESSAGE_LENGTH = 32767;
     private String headerJson;
     private String footerJson;
-    private BaseComponent headerComponent;
-    private BaseComponent footerComponent;
+    private Component headerComponent;
+    private Component footerComponent;
     public WrapperPlayServerPlayerListHeaderAndFooter(PacketSendEvent event) {
         super(event);
     }
 
-    public WrapperPlayServerPlayerListHeaderAndFooter(BaseComponent headerComponent, BaseComponent footerComponent) {
+    public WrapperPlayServerPlayerListHeaderAndFooter(Component headerComponent, Component footerComponent) {
         super(PacketType.Play.Server.PLAYER_LIST_HEADER_AND_FOOTER);
         this.headerComponent = headerComponent;
         this.footerComponent = footerComponent;
+    }
+
+    public WrapperPlayServerPlayerListHeaderAndFooter(BaseComponent headerComponent, BaseComponent footerComponent) {
+        super(PacketType.Play.Server.PLAYER_LIST_HEADER_AND_FOOTER);
+        this.headerComponent = AdventureSerializer.asAdventure(headerComponent);
+        this.footerComponent = AdventureSerializer.asAdventure(footerComponent);
     }
 
     public WrapperPlayServerPlayerListHeaderAndFooter(String headerJson, String footerJson) {
@@ -58,8 +62,8 @@ public class WrapperPlayServerPlayerListHeaderAndFooter extends PacketWrapper<Wr
         headerJson = readString(maxMessageLength);
         footerJson = readString(maxMessageLength);
         if (HANDLE_JSON) {
-            headerComponent = ComponentSerializer.parseJsonComponent(headerJson);
-            footerComponent = ComponentSerializer.parseJsonComponent(footerJson);
+            headerComponent = AdventureSerializer.parseComponent(headerJson);
+            footerComponent = AdventureSerializer.parseComponent(footerJson);
         }
     }
 
@@ -75,8 +79,8 @@ public class WrapperPlayServerPlayerListHeaderAndFooter extends PacketWrapper<Wr
     public void writeData() {
         int maxMessageLength = serverVersion.isNewerThanOrEquals(ServerVersion.V_1_13) ? MODERN_MESSAGE_LENGTH : LEGACY_MESSAGE_LENGTH;
         if (HANDLE_JSON) {
-            headerJson = ComponentSerializer.buildJsonObject(headerComponent).toString();
-            footerJson = ComponentSerializer.buildJsonObject(footerComponent).toString();
+            headerJson = AdventureSerializer.toJson(headerComponent);
+            footerJson = AdventureSerializer.toJson(footerComponent);
         }
         writeString(headerJson, maxMessageLength);
         writeString(footerJson, maxMessageLength);
@@ -98,19 +102,35 @@ public class WrapperPlayServerPlayerListHeaderAndFooter extends PacketWrapper<Wr
         this.footerJson = footerJson;
     }
 
-    public BaseComponent getHeaderComponent() {
+    public Component getHeaderComponent() {
         return headerComponent;
     }
 
-    public void setHeaderComponent(BaseComponent headerComponent) {
+    public BaseComponent getHeaderBaseComponent() {
+        return AdventureSerializer.asBaseComponent(headerComponent);
+    }
+
+    public void setHeaderComponent(Component headerComponent) {
         this.headerComponent = headerComponent;
     }
 
-    public BaseComponent getFooterComponent() {
+    public void setHeaderComponent(BaseComponent headerComponent) {
+        this.headerComponent = AdventureSerializer.asAdventure(headerComponent);
+    }
+
+    public Component getFooterComponent() {
         return footerComponent;
     }
 
-    public void setFooterComponent(BaseComponent footerComponent) {
+    public BaseComponent getFooterBaseComponent() {
+        return AdventureSerializer.asBaseComponent(footerComponent);
+    }
+
+    public void setFooterComponent(Component footerComponent) {
         this.footerComponent = footerComponent;
+    }
+
+    public void setFooterComponent(BaseComponent footerComponent) {
+        this.footerComponent = AdventureSerializer.asAdventure(footerComponent);
     }
 }

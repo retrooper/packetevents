@@ -18,21 +18,21 @@
 
 package com.github.retrooper.packetevents.wrapper.play.server;
 
-import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.event.impl.PacketSendEvent;
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.protocol.chat.component.BaseComponent;
-import com.github.retrooper.packetevents.protocol.chat.component.serializer.ComponentSerializer;
+import com.github.retrooper.packetevents.protocol.chat.component.serializer.AdventureSerializer;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
+import net.kyori.adventure.text.Component;
 
 import java.util.UUID;
 
 public class WrapperPlayServerChatMessage extends PacketWrapper<WrapperPlayServerChatMessage> {
     public static boolean HANDLE_JSON = true;
     private String chatComponentJson;
-    private BaseComponent chatComponent;
+    private Component chatComponent;
     private ChatPosition position;
     private UUID senderUUID;
 
@@ -40,13 +40,24 @@ public class WrapperPlayServerChatMessage extends PacketWrapper<WrapperPlayServe
         super(event);
     }
 
+    public WrapperPlayServerChatMessage(Component chatComponent, ChatPosition position) {
+        this(chatComponent, position, new UUID(0L, 0L));
+    }
+
     public WrapperPlayServerChatMessage(BaseComponent chatComponent, ChatPosition position) {
         this(chatComponent, position, new UUID(0L, 0L));
     }
 
-    public WrapperPlayServerChatMessage(BaseComponent chatComponent, ChatPosition position, UUID senderUUID) {
+    public WrapperPlayServerChatMessage(Component chatComponent, ChatPosition position, UUID senderUUID) {
         super(PacketType.Play.Server.CHAT_MESSAGE);
         this.chatComponent = chatComponent;
+        this.position = position;
+        this.senderUUID = senderUUID;
+    }
+
+    public WrapperPlayServerChatMessage(BaseComponent chatComponent, ChatPosition position, UUID senderUUID) {
+        super(PacketType.Play.Server.CHAT_MESSAGE);
+        this.chatComponent = AdventureSerializer.asAdventure(chatComponent);
         this.position = position;
         this.senderUUID = senderUUID;
     }
@@ -69,7 +80,7 @@ public class WrapperPlayServerChatMessage extends PacketWrapper<WrapperPlayServe
 
         //Parse JSON message
         if (HANDLE_JSON) {
-            chatComponent = ComponentSerializer.parseJsonComponent(this.chatComponentJson);
+            chatComponent = AdventureSerializer.parseComponent(this.chatComponentJson);
         }
 
         //Is the server 1.8+ or is the client 1.8+? 1.7.10 servers support 1.8 clients, and send the chat position.
@@ -99,7 +110,7 @@ public class WrapperPlayServerChatMessage extends PacketWrapper<WrapperPlayServe
     @Override
     public void writeData() {
         if (HANDLE_JSON) {
-            chatComponentJson = ComponentSerializer.buildJsonObject(chatComponent).toString();
+            chatComponentJson = AdventureSerializer.toJson(chatComponent);
         }
         writeString(chatComponentJson, getMaxMessageLength());
 
@@ -113,11 +124,19 @@ public class WrapperPlayServerChatMessage extends PacketWrapper<WrapperPlayServe
         }
     }
 
-    public BaseComponent getChatComponent() {
+    public BaseComponent getChatBaseComponent() {
+        return AdventureSerializer.asBaseComponent(chatComponent);
+    }
+
+    public Component getChatComponent() {
         return chatComponent;
     }
 
     public void setChatComponent(BaseComponent chatComponent) {
+        this.chatComponent = AdventureSerializer.asAdventure(chatComponent);
+    }
+
+    public void setChatComponent(Component chatComponent) {
         this.chatComponent = chatComponent;
     }
 

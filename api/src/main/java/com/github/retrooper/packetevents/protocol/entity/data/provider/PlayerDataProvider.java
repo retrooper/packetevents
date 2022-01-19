@@ -18,16 +18,11 @@
 
 package com.github.retrooper.packetevents.protocol.entity.data.provider;
 
-import com.github.retrooper.packetevents.protocol.chat.component.BaseComponent;
 import com.github.retrooper.packetevents.protocol.entity.data.EntityData;
 import com.github.retrooper.packetevents.protocol.entity.data.EntityDataTypes;
-import com.github.retrooper.packetevents.protocol.entity.pose.EntityPose;
 import com.github.retrooper.packetevents.protocol.nbt.NBTCompound;
 import com.github.retrooper.packetevents.protocol.player.HumanoidArm;
-import com.github.retrooper.packetevents.protocol.player.InteractionHand;
 import com.github.retrooper.packetevents.protocol.player.SkinSection;
-import com.github.retrooper.packetevents.util.Vector3i;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 import java.util.Set;

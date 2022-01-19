@@ -19,15 +19,16 @@
 package com.github.retrooper.packetevents.manager.npc;
 
 import com.github.retrooper.packetevents.protocol.chat.component.BaseComponent;
-import com.github.retrooper.packetevents.protocol.chat.component.impl.TextComponent;
+import com.github.retrooper.packetevents.protocol.chat.component.serializer.AdventureSerializer;
 import com.github.retrooper.packetevents.protocol.item.ItemStack;
-import com.github.retrooper.packetevents.protocol.player.GameProfile;
 import com.github.retrooper.packetevents.protocol.player.GameMode;
+import com.github.retrooper.packetevents.protocol.player.GameProfile;
 import com.github.retrooper.packetevents.protocol.world.Location;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerPlayerInfo;
+import net.kyori.adventure.text.Component;
 
 public class NPC {
-    private BaseComponent displayName;
+    private Component displayName;
     private final int id;
     private final GameProfile profile;
     private int displayPing = 0;
@@ -39,8 +40,14 @@ public class NPC {
     private ItemStack leggings = null;
     private ItemStack boots = null;
 
-    public NPC(BaseComponent displayName, int entityId, GameProfile profile) {
+    public NPC(Component displayName, int entityId, GameProfile profile) {
         this.displayName = displayName;
+        this.id = entityId;
+        this.profile = profile;
+    }
+
+    public NPC(BaseComponent displayName, int entityId, GameProfile profile) {
+        this.displayName = AdventureSerializer.asAdventure(displayName);
         this.id = entityId;
         this.profile = profile;
     }
@@ -93,12 +100,20 @@ public class NPC {
         this.boots = boots;
     }
 
-    public BaseComponent getDisplayName() {
+    public Component getDisplayName() {
         return displayName;
     }
 
-    public void setDisplayName(BaseComponent displayName) {
+    public BaseComponent getBaseDisplayName() {
+        return AdventureSerializer.asBaseComponent(displayName);
+    }
+
+    public void setDisplayName(Component displayName) {
         this.displayName = displayName;
+    }
+
+    public void setDisplayName(BaseComponent displayName) {
+        this.displayName = AdventureSerializer.asAdventure(displayName);
     }
 
     public int getId() {

@@ -19,9 +19,11 @@
 package com.github.retrooper.packetevents.protocol.entity.data.provider;
 
 import com.github.retrooper.packetevents.protocol.chat.component.BaseComponent;
+import com.github.retrooper.packetevents.protocol.chat.component.serializer.AdventureSerializer;
 import com.github.retrooper.packetevents.protocol.entity.data.EntityData;
 import com.github.retrooper.packetevents.protocol.entity.data.EntityDataTypes;
 import com.github.retrooper.packetevents.protocol.entity.pose.EntityPose;
+import net.kyori.adventure.text.Component;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
@@ -30,7 +32,7 @@ import java.util.Optional;
 
 public class EntityDataProvider implements DataProvider {
     @Nullable
-    private BaseComponent customName;
+    private Component customName;
 
     private boolean customNameVisible;
     private EntityPose pose = EntityPose.STANDING;
@@ -50,11 +52,20 @@ public class EntityDataProvider implements DataProvider {
     private boolean hasGravity = true;
 
     @Nullable
-    public BaseComponent getCustomName() {
+    public BaseComponent getBaseCustomName() {
+        return AdventureSerializer.asBaseComponent(customName);
+    }
+
+    @Nullable
+    public Component getCustomName() {
         return customName;
     }
 
     public void setCustomName(@Nullable BaseComponent customName) {
+        this.customName = AdventureSerializer.asAdventure(customName);
+    }
+
+    public void setCustomName(@Nullable Component customName) {
         this.customName = customName;
     }
 
@@ -229,7 +240,7 @@ public class EntityDataProvider implements DataProvider {
                     airTicks = (int) entityData.getValue();
                     break;
                 case 2:
-                    customName = ((Optional<BaseComponent>) entityData.getValue()).orElse(null);
+                    customName = ((Optional<Component>) entityData.getValue()).orElse(null);
                     break;
                 case 3:
                     customNameVisible = (boolean) entityData.getValue();

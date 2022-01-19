@@ -3,9 +3,10 @@ package com.github.retrooper.packetevents.wrapper.play.server;
 import com.github.retrooper.packetevents.event.impl.PacketSendEvent;
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.protocol.chat.component.BaseComponent;
-import com.github.retrooper.packetevents.protocol.chat.component.serializer.ComponentSerializer;
+import com.github.retrooper.packetevents.protocol.chat.component.serializer.AdventureSerializer;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
+import net.kyori.adventure.text.Component;
 
 // TODO: Test on outdated versions
 public class WrapperPlayServerOpenWindow extends PacketWrapper<WrapperPlayServerOpenWindow> {
@@ -20,7 +21,7 @@ public class WrapperPlayServerOpenWindow extends PacketWrapper<WrapperPlayServer
     private int horseId; // 1.13-
 
     private String titleRawJson;
-    private BaseComponent chatComponentJson; // 1.8 and above
+    private Component chatComponentJson; // 1.8 and above
 
     private boolean useProvidedWindowTitle; // 1.7 only
 
@@ -89,7 +90,7 @@ public class WrapperPlayServerOpenWindow extends PacketWrapper<WrapperPlayServer
         this.titleRawJson = readString(getMaxMessageLength());
 
         if (HANDLE_JSON) {
-            chatComponentJson = ComponentSerializer.parseJsonComponent(this.titleRawJson);
+            chatComponentJson = AdventureSerializer.parseComponent(this.titleRawJson);
         }
     }
 
@@ -136,7 +137,7 @@ public class WrapperPlayServerOpenWindow extends PacketWrapper<WrapperPlayServer
         }
 
         if (HANDLE_JSON) {
-            titleRawJson = ComponentSerializer.buildJsonObject(chatComponentJson).toString();
+            titleRawJson = AdventureSerializer.toJson(chatComponentJson);
         }
         writeString(titleRawJson, getMaxMessageLength());
     }
@@ -189,12 +190,20 @@ public class WrapperPlayServerOpenWindow extends PacketWrapper<WrapperPlayServer
         this.titleRawJson = titleRawJson;
     }
 
-    public BaseComponent getChatComponentJson() {
+    public Component getChatComponent() {
         return chatComponentJson;
     }
 
-    public void setChatComponentJson(BaseComponent chatComponentJson) {
+    public BaseComponent getChatComponentJson() {
+        return AdventureSerializer.asBaseComponent(chatComponentJson);
+    }
+
+    public void setChatComponentJson(Component chatComponentJson) {
         this.chatComponentJson = chatComponentJson;
+    }
+
+    public void setChatComponentJson(BaseComponent chatComponentJson) {
+        this.chatComponentJson = AdventureSerializer.asAdventure(chatComponentJson);
     }
 
     public boolean isUseProvidedWindowTitle() {

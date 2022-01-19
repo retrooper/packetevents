@@ -23,10 +23,10 @@ import com.github.retrooper.packetevents.event.impl.PacketSendEvent;
 import com.github.retrooper.packetevents.manager.player.attributes.TabCompleteAttribute;
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.protocol.chat.component.BaseComponent;
-import com.github.retrooper.packetevents.protocol.chat.component.serializer.ComponentSerializer;
-import com.github.retrooper.packetevents.protocol.chat.component.impl.TextComponent;
+import com.github.retrooper.packetevents.protocol.chat.component.serializer.AdventureSerializer;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
+import net.kyori.adventure.text.Component;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -75,11 +75,11 @@ public class WrapperPlayServerTabComplete extends PacketWrapper<WrapperPlayServe
             int maxMessageLength = serverVersion.isNewerThanOrEquals(ServerVersion.V_1_13) ? MODERN_MESSAGE_LENGTH : LEGACY_MESSAGE_LENGTH;
             for (int i = 0; i < matchLength; i++) {
                 String text = readString();
-                BaseComponent tooltip;
+                Component tooltip;
                 boolean hasTooltip = readBoolean();
                 if (hasTooltip) {
                     String tooltipJson = readString(maxMessageLength);
-                    tooltip = ComponentSerializer.parseJsonComponent(tooltipJson);
+                    tooltip = AdventureSerializer.parseComponent(tooltipJson);
                 } else {
                     tooltip = null;
                 }
@@ -92,7 +92,7 @@ public class WrapperPlayServerTabComplete extends PacketWrapper<WrapperPlayServe
             commandMatches = new ArrayList<>(matchLength);
             for (int i = 0; i < matchLength; i++) {
                 String text = readString();
-                CommandMatch commandMatch = new CommandMatch(text, null);
+                CommandMatch commandMatch = new CommandMatch(text, (Component) null);
                 commandMatches.add(commandMatch);
             }
         }
@@ -119,7 +119,7 @@ public class WrapperPlayServerTabComplete extends PacketWrapper<WrapperPlayServe
                 boolean hasTooltip = match.getTooltip().isPresent();
                 writeBoolean(hasTooltip);
                 if (hasTooltip) {
-                    String tooltipJson = ComponentSerializer.buildJsonObject(match.getTooltip().get()).toString();
+                    String tooltipJson = AdventureSerializer.toJson(match.getTooltip().get());
                     writeString(tooltipJson, maxMessageLength);
                 }
             }
@@ -168,7 +168,12 @@ public class WrapperPlayServerTabComplete extends PacketWrapper<WrapperPlayServe
 
     public static class CommandMatch {
         private String text;
-        private Optional<BaseComponent> tooltip;
+        private Optional<Component> tooltip;
+
+        public CommandMatch(String text, Component tooltip) {
+            this.text = text;
+            setTooltip(tooltip);
+        }
 
         public CommandMatch(String text, BaseComponent tooltip) {
             this.text = text;
@@ -188,11 +193,23 @@ public class WrapperPlayServerTabComplete extends PacketWrapper<WrapperPlayServe
             this.text = text;
         }
 
-        public Optional<BaseComponent> getTooltip() {
+        public Optional<BaseComponent> getTooltipBase() {
+            return Optional.ofNullable(AdventureSerializer.asBaseComponent(tooltip.orElse(null)));
+        }
+
+        public Optional<Component> getTooltip() {
             return tooltip;
         }
 
         public void setTooltip(@Nullable BaseComponent tooltip) {
+            if (tooltip != null) {
+                this.tooltip = Optional.of(AdventureSerializer.asAdventure(tooltip));
+            } else {
+                this.tooltip = Optional.empty();
+            }
+        }
+
+        public void setTooltip(@Nullable Component tooltip) {
             if (tooltip != null) {
                 this.tooltip = Optional.of(tooltip);
             } else {
