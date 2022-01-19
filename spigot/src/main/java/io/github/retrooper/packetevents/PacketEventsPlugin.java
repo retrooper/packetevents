@@ -24,6 +24,7 @@ import com.github.retrooper.packetevents.event.PacketListenerPriority;
 import com.github.retrooper.packetevents.event.impl.PacketReceiveEvent;
 import com.github.retrooper.packetevents.event.impl.PacketSendEvent;
 import com.github.retrooper.packetevents.manager.npc.NPC;
+import com.github.retrooper.packetevents.protocol.chat.component.serializer.AdventureSerializer;
 import com.github.retrooper.packetevents.protocol.entity.data.provider.EntityDataProvider;
 import com.github.retrooper.packetevents.protocol.entity.data.provider.PlayerDataProvider;
 import com.github.retrooper.packetevents.protocol.entity.type.EntityTypes;
@@ -46,6 +47,8 @@ import io.github.retrooper.packetevents.factory.spigot.SpigotPacketEventsBuilder
 import io.github.retrooper.packetevents.utils.SpigotReflectionUtil;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.TextDecoration;
+import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
@@ -123,15 +126,17 @@ public class PacketEventsPlugin extends JavaPlugin {
 
 
                                 }, 120L);//120 ticks is 6 seconds
-                    }
-                    else if (msg.equals("attack!")) {
+                    } else if (msg.equals("attack!")) {
                         int randomEntityId = 3;
                         WrapperPlayClientInteractEntity interactEntity = new WrapperPlayClientInteractEntity(randomEntityId,
                                 WrapperPlayClientInteractEntity.InteractAction.ATTACK,
                                 InteractionHand.MAIN_HAND,
                                 Optional.empty(),
                                 Optional.empty());
-                        System.out.println("spoofing incoming interact entity");
+                        Component component = Component.text("Hello, World!").color(NamedTextColor.RED).decorate(TextDecoration.BOLD).asComponent();
+                        WrapperPlayServerChatMessage cm = new WrapperPlayServerChatMessage(component,
+                                WrapperPlayServerChatMessage.ChatPosition.CHAT);
+                        PacketEvents.getAPI().getPlayerManager().sendPacket(event.getChannel(), cm);
                         PacketEvents.getAPI().getServerManager().receivePacket(event.getPlayer(),
                                 interactEntity);
                     }
@@ -143,7 +148,6 @@ public class PacketEventsPlugin extends JavaPlugin {
                 Player player = event.getPlayer() == null ? null : (Player) event.getPlayer();
                 //TODO Fix hoverEvent contents/value when its a component i believe
                 //TODO Work on copying styling properly from children components
-
                 if (event.getPacketType() == PacketType.Play.Server.SPAWN_LIVING_ENTITY) {
                     WrapperPlayServerSpawnLivingEntity spawnLivingEntity = new WrapperPlayServerSpawnLivingEntity(event);
                     if (spawnLivingEntity.getEntityType().equals(EntityTypes.PIG)) {
@@ -165,7 +169,8 @@ public class PacketEventsPlugin extends JavaPlugin {
                         npc.setMainHand(handItem);
                         PacketEvents.getAPI().getNPCManager().updateEquipment(npc);
                     }
-                } /*else if (event.getPacketType() == PacketType.Play.Server.CHAT_MESSAGE) {
+                }
+                /*else if (event.getPacketType() == PacketType.Play.Server.CHAT_MESSAGE) {
                     WrapperPlayServerChatMessage cm = new WrapperPlayServerChatMessage(event);
                     BaseComponent component = cm.getChatComponent();
                     if (component instanceof TextComponent) {
@@ -190,7 +195,8 @@ public class PacketEventsPlugin extends JavaPlugin {
                         "text":"retrooper"}]}
                          *
                     }
-                } */ else if (event.getPacketType() == PacketType.Play.Server.SET_SLOT) {
+                } */
+                else if (event.getPacketType() == PacketType.Play.Server.SET_SLOT) {
                     WrapperPlayServerSetSlot setSlot = new WrapperPlayServerSetSlot(event);
                     int windowID = setSlot.getWindowId();
                     int slot = setSlot.getSlot();
@@ -199,7 +205,7 @@ public class PacketEventsPlugin extends JavaPlugin {
                 }
             }
         };
-        //PacketEvents.getAPI().getEventManager().registerListener(debugListener);
+        PacketEvents.getAPI().getEventManager().registerListener(debugListener);
 
     }
 
