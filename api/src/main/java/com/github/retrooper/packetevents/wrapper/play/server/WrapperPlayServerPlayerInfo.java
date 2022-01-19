@@ -21,12 +21,14 @@ package com.github.retrooper.packetevents.wrapper.play.server;
 import com.github.retrooper.packetevents.event.impl.PacketSendEvent;
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.protocol.chat.component.BaseComponent;
-import com.github.retrooper.packetevents.protocol.chat.component.impl.TextComponent;
+import com.github.retrooper.packetevents.protocol.chat.component.serializer.AdventureSerializer;
 import com.github.retrooper.packetevents.protocol.player.GameProfile;
 import com.github.retrooper.packetevents.protocol.player.TextureProperty;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.protocol.player.GameMode;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.TextComponent;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -81,7 +83,7 @@ public class WrapperPlayServerPlayerInfo extends PacketWrapper<WrapperPlayServer
             playerDataList = new ArrayList<>(1);
             //Only one player data
             String rawUsername = readString();
-            BaseComponent username = TextComponent.builder().text(rawUsername).build();
+            Component username = Component.text(rawUsername);
             boolean online = readBoolean();
             int ping = readShort();
             PlayerData data = new PlayerData(username, null, GameMode.SURVIVAL, ping);
@@ -113,27 +115,27 @@ public class WrapperPlayServerPlayerInfo extends PacketWrapper<WrapperPlayServer
                         }
                         GameMode gameMode = GameMode.values()[readVarInt()];
                         int ping = readVarInt();
-                        BaseComponent displayName = readBoolean() ? readComponent() : null;
+                        Component displayName = readBoolean() ? readComponent() : null;
                         data = new PlayerData(displayName, gameProfile, gameMode, ping);
                         break;
                     }
                     case UPDATE_GAME_MODE: {
                         GameMode gameMode = GameMode.values()[readVarInt()];
-                        data = new PlayerData(null, new GameProfile(uuid, null), gameMode, -1);
+                        data = new PlayerData((Component) null, new GameProfile(uuid, null), gameMode, -1);
                         break;
                     }
                     case UPDATE_LATENCY: {
                         int ping = readVarInt();
-                        data = new PlayerData(null, new GameProfile(uuid, null), null, ping);
+                        data = new PlayerData((Component) null, new GameProfile(uuid, null), null, ping);
                         break;
                     }
                     case UPDATE_DISPLAY_NAME:
-                        BaseComponent displayName = readBoolean() ? readComponent() : null;
+                        Component displayName = readBoolean() ? readComponent() : null;
                         data = new PlayerData(displayName, new GameProfile(uuid, null), null, -1);
                         break;
 
                     case REMOVE_PLAYER:
-                        data = new PlayerData(null, new GameProfile(uuid, null), null, -1);
+                        data = new PlayerData((Component) null, new GameProfile(uuid, null), null, -1);
                         break;
                 }
                 if (data != null) {
@@ -155,7 +157,7 @@ public class WrapperPlayServerPlayerInfo extends PacketWrapper<WrapperPlayServer
             //Only one player data can be sent
             PlayerData data = playerDataList.get(0);
             //We must convert the component string to a normal one
-            String rawUsername = ((TextComponent)data.displayName).getText();
+            String rawUsername = ((TextComponent)data.displayName).content();
             writeString(rawUsername);
             writeBoolean(action != Action.REMOVE_PLAYER);
             writeShort(data.ping);
@@ -231,7 +233,7 @@ public class WrapperPlayServerPlayerInfo extends PacketWrapper<WrapperPlayServer
 
     public static class PlayerData {
         @Nullable
-        private BaseComponent displayName;
+        private Component displayName;
         @Nullable
         private GameProfile gameProfile;
         @Nullable
@@ -239,8 +241,15 @@ public class WrapperPlayServerPlayerInfo extends PacketWrapper<WrapperPlayServer
 
         private int ping;
 
-        public PlayerData(@Nullable BaseComponent displayName, @Nullable GameProfile gameProfile, @Nullable GameMode gameMode, int ping) {
+        public PlayerData(@Nullable Component displayName, @Nullable GameProfile gameProfile, @Nullable GameMode gameMode, int ping) {
             this.displayName = displayName;
+            this.gameProfile = gameProfile;
+            this.gameMode = gameMode;
+            this.ping = ping;
+        }
+
+        public PlayerData(@Nullable BaseComponent displayName, @Nullable GameProfile gameProfile, @Nullable GameMode gameMode, int ping) {
+            this.displayName = displayName == null ? null : AdventureSerializer.asAdventure(displayName);
             this.gameProfile = gameProfile;
             this.gameMode = gameMode;
             this.ping = ping;
@@ -273,12 +282,21 @@ public class WrapperPlayServerPlayerInfo extends PacketWrapper<WrapperPlayServer
         }
 
         @Nullable
-        public BaseComponent getDisplayName() {
+        public Component getDisplayName() {
             return displayName;
         }
 
-        public void setDisplayName(@Nullable BaseComponent displayName) {
+        @Nullable
+        public BaseComponent getBaseDisplayName() {
+            return AdventureSerializer.asBaseComponent(displayName);
+        }
+
+        public void setDisplayName(@Nullable Component displayName) {
             this.displayName = displayName;
+        }
+
+        public void setDisplayName(@Nullable BaseComponent displayName) {
+            this.displayName = displayName == null ? null : AdventureSerializer.asAdventure(displayName);
         }
     }
 }

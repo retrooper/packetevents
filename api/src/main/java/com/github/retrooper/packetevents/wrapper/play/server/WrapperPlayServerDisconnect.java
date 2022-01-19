@@ -21,25 +21,28 @@ package com.github.retrooper.packetevents.wrapper.play.server;
 import com.github.retrooper.packetevents.event.impl.PacketSendEvent;
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.protocol.chat.component.BaseComponent;
-import com.github.retrooper.packetevents.protocol.chat.component.serializer.ComponentSerializer;
-import com.github.retrooper.packetevents.protocol.chat.component.impl.TextComponent;
+import com.github.retrooper.packetevents.protocol.chat.component.serializer.AdventureSerializer;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
-
-import java.util.List;
+import net.kyori.adventure.text.Component;
 
 public class WrapperPlayServerDisconnect extends PacketWrapper<WrapperPlayServerDisconnect> {
     public static boolean HANDLE_JSON = true;
     private static final int MODERN_MESSAGE_LENGTH = 262144;
     private static final int LEGACY_MESSAGE_LENGTH = 32767;
     private String reasonJson;
-    private BaseComponent reasonComponent;
+    private Component reasonComponent;
 
     public WrapperPlayServerDisconnect(PacketSendEvent event) {
         super(event);
     }
 
     public WrapperPlayServerDisconnect(BaseComponent reasonComponent) {
+        super(PacketType.Play.Server.DISCONNECT);
+        this.reasonComponent = AdventureSerializer.asAdventure(reasonComponent);
+    }
+
+    public WrapperPlayServerDisconnect(Component reasonComponent) {
         super(PacketType.Play.Server.DISCONNECT);
         this.reasonComponent = reasonComponent;
     }
@@ -54,7 +57,7 @@ public class WrapperPlayServerDisconnect extends PacketWrapper<WrapperPlayServer
         int maxMessageLength = serverVersion.isNewerThanOrEquals(ServerVersion.V_1_13) ? MODERN_MESSAGE_LENGTH : LEGACY_MESSAGE_LENGTH;
         reasonJson = readString(maxMessageLength);
         if (HANDLE_JSON) {
-            reasonComponent = ComponentSerializer.parseJsonComponent(reasonJson);
+            reasonComponent = AdventureSerializer.parseComponent(reasonJson);
         }
     }
 
@@ -68,7 +71,7 @@ public class WrapperPlayServerDisconnect extends PacketWrapper<WrapperPlayServer
     public void writeData() {
         int maxMessageLength = serverVersion.isNewerThanOrEquals(ServerVersion.V_1_13) ? MODERN_MESSAGE_LENGTH : LEGACY_MESSAGE_LENGTH;
         if (HANDLE_JSON) {
-            reasonJson = ComponentSerializer.buildJsonObject(reasonComponent).toString();
+            reasonJson = AdventureSerializer.toJson(reasonComponent);
         }
         writeString(reasonJson, maxMessageLength);
     }
@@ -81,11 +84,19 @@ public class WrapperPlayServerDisconnect extends PacketWrapper<WrapperPlayServer
         this.reasonJson = reasonJson;
     }
 
-    public BaseComponent getReasonComponent() {
+    public Component getReasonComponent() {
         return reasonComponent;
     }
 
-    public void setReasonComponent(BaseComponent reasonComponent) {
+    public BaseComponent getReasonBaseComponent() {
+        return AdventureSerializer.asBaseComponent(reasonComponent);
+    }
+
+    public void setReasonComponent(Component reasonComponent) {
         this.reasonComponent = reasonComponent;
+    }
+
+    public void setReasonComponent(BaseComponent reasonComponent) {
+        this.reasonComponent = AdventureSerializer.asAdventure(reasonComponent);
     }
 }

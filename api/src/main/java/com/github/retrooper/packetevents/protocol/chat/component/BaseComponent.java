@@ -22,7 +22,6 @@ package com.github.retrooper.packetevents.protocol.chat.component;
 import com.github.retrooper.packetevents.protocol.chat.Color;
 import com.github.retrooper.packetevents.protocol.chat.component.ClickEvent.ClickType;
 import com.github.retrooper.packetevents.protocol.chat.component.HoverEvent.HoverType;
-import com.github.retrooper.packetevents.protocol.chat.component.impl.TextComponent;
 import com.github.retrooper.packetevents.protocol.chat.component.serializer.ComponentSerializer;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;

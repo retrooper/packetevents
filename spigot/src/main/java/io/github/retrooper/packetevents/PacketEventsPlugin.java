@@ -24,8 +24,6 @@ import com.github.retrooper.packetevents.event.PacketListenerPriority;
 import com.github.retrooper.packetevents.event.impl.PacketReceiveEvent;
 import com.github.retrooper.packetevents.event.impl.PacketSendEvent;
 import com.github.retrooper.packetevents.manager.npc.NPC;
-import com.github.retrooper.packetevents.protocol.chat.Color;
-import com.github.retrooper.packetevents.protocol.chat.component.impl.TextComponent;
 import com.github.retrooper.packetevents.protocol.entity.data.provider.EntityDataProvider;
 import com.github.retrooper.packetevents.protocol.entity.data.provider.PlayerDataProvider;
 import com.github.retrooper.packetevents.protocol.entity.type.EntityTypes;
@@ -46,6 +44,8 @@ import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientUp
 import com.github.retrooper.packetevents.wrapper.play.server.*;
 import io.github.retrooper.packetevents.factory.spigot.SpigotPacketEventsBuilder;
 import io.github.retrooper.packetevents.utils.SpigotReflectionUtil;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
@@ -99,7 +99,7 @@ public class PacketEventsPlugin extends JavaPlugin {
                         player.sendMessage("Spawning " + name + " with UUID " + uuid.toString());
                         List<TextureProperty> textureProperties = MojangAPIUtil.requestPlayerTextureProperties(uuid);
                         GameProfile profile = new GameProfile(uuid, name, textureProperties);
-                        NPC npc = new NPC(TextComponent.builder().text(name + "_clone").color(Color.RED).build(), SpigotReflectionUtil.generateEntityId(), profile);
+                        NPC npc = new NPC(Component.text(name + "_clone", NamedTextColor.RED), SpigotReflectionUtil.generateEntityId(), profile);
                         npc.setLocation(new Location(player.getLocation().getX(), player.getLocation().getY(), player.getLocation().getZ(), player.getLocation().getYaw(), player.getLocation().getPitch()));
                         PacketEvents.getAPI().getNPCManager().spawn(event.getChannel(), npc);
                         player.sendMessage("Successfully spawned " + name);
@@ -154,7 +154,7 @@ public class PacketEventsPlugin extends JavaPlugin {
                         List<TextureProperty> textures = MojangAPIUtil.requestPlayerTextureProperties(textureUUID);
                         //Note, textureUUID must be in the game profile!
                         GameProfile gp = new GameProfile(textureUUID, "Player_pig", textures);
-                        NPC npc = new NPC(TextComponent.builder().text("Player_pig").color(Color.RED).build(),
+                        NPC npc = new NPC(Component.text("Player_pig", NamedTextColor.RED),
                                 entityId, gp);
                         Location targetLocation = new Location(spawnLivingEntity.getPosition(), spawnLivingEntity.getYaw(), spawnLivingEntity.getPitch());
                         WrapperPlayServerSpawnPlayer spawnPlayer = new WrapperPlayServerSpawnPlayer(entityId, uuid,

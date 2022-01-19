@@ -24,6 +24,7 @@ import com.github.retrooper.packetevents.event.impl.PacketSendEvent;
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.netty.buffer.ByteBufAbstract;
 import com.github.retrooper.packetevents.protocol.chat.component.BaseComponent;
+import com.github.retrooper.packetevents.protocol.chat.component.serializer.AdventureSerializer;
 import com.github.retrooper.packetevents.protocol.chat.component.serializer.ComponentSerializer;
 import com.github.retrooper.packetevents.protocol.entity.data.EntityData;
 import com.github.retrooper.packetevents.protocol.entity.data.EntityDataType;
@@ -40,6 +41,7 @@ import com.github.retrooper.packetevents.protocol.player.GameMode;
 import com.github.retrooper.packetevents.resources.ResourceLocation;
 import com.github.retrooper.packetevents.util.StringUtil;
 import com.github.retrooper.packetevents.util.Vector3i;
+import net.kyori.adventure.text.Component;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -383,12 +385,20 @@ public class PacketWrapper<T extends PacketWrapper> {
         }
     }
 
-    public BaseComponent readComponent() {
+    public BaseComponent readBaseComponent() {
         return ComponentSerializer.parseJsonComponent(readString(getMaxMessageLength()));
+    }
+
+    public Component readComponent() {
+        return AdventureSerializer.parseComponent(readString(getMaxMessageLength()));
     }
 
     public void writeComponent(BaseComponent component) {
         writeString(ComponentSerializer.buildJsonObject(component).toString());
+    }
+
+    public void writeComponent(Component component) {
+        writeString(AdventureSerializer.toJson(component));
     }
 
     public ResourceLocation readIdentifier(int maxLen) {

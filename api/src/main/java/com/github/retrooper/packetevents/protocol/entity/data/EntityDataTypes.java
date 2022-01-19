@@ -31,6 +31,7 @@ import com.github.retrooper.packetevents.util.Vector3f;
 import com.github.retrooper.packetevents.util.Vector3i;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 import com.google.gson.JsonObject;
+import net.kyori.adventure.text.Component;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -53,8 +54,8 @@ public class EntityDataTypes {
     public static final EntityDataType<Integer> INT = define("int", readIntDeserializer(), writeIntSerializer());
     public static final EntityDataType<Float> FLOAT = define("float", PacketWrapper::readFloat, PacketWrapper::writeFloat);
     public static final EntityDataType<String> STRING = define("string", PacketWrapper::readString, PacketWrapper::writeString);
-    public static final EntityDataType<BaseComponent> COMPONENT = define("component", PacketWrapper::readComponent, PacketWrapper::writeComponent);
-    public static final EntityDataType<Optional<BaseComponent>> OPTIONAL_COMPONENT = define("optional_component", readOptionalComponentDeserializer(), writeOptionalComponentSerializer());
+    public static final EntityDataType<Component> COMPONENT = define("component", PacketWrapper::readComponent, PacketWrapper::writeComponent);
+    public static final EntityDataType<Optional<Component>> OPTIONAL_COMPONENT = define("optional_component", readOptionalComponentDeserializer(), writeOptionalComponentSerializer());
     public static final EntityDataType<ItemStack> ITEMSTACK = define("itemstack", PacketWrapper::readItemStack, PacketWrapper::writeItemStack);
     public static final EntityDataType<Optional<Object>> OPTIONAL_BLOCK_STATE = define("optional_block_state", readIntDeserializer(), writeIntSerializer());
     public static final EntityDataType<Boolean> BOOLEAN = define("boolean", PacketWrapper::readBoolean, PacketWrapper::writeBoolean);
