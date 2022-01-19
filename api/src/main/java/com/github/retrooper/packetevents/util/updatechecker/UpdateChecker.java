@@ -19,7 +19,7 @@
 package com.github.retrooper.packetevents.util.updatechecker;
 
 import com.github.retrooper.packetevents.PacketEvents;
-import com.github.retrooper.packetevents.protocol.chat.component.serializer.AdventureSerializer;
+import com.github.retrooper.packetevents.util.AdventureSerializer;
 import com.github.retrooper.packetevents.util.ColorUtil;
 import com.github.retrooper.packetevents.util.PEVersion;
 import com.google.gson.JsonObject;

@@ -18,7 +18,6 @@
 
 package com.github.retrooper.packetevents.util;
 
-import com.github.retrooper.packetevents.protocol.chat.component.serializer.AdventureSerializer;
 import com.github.retrooper.packetevents.protocol.item.type.ItemTypes;
 import com.google.gson.JsonObject;
 
