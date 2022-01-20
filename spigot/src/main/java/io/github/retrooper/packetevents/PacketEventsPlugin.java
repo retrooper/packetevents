@@ -107,36 +107,17 @@ public class PacketEventsPlugin extends JavaPlugin {
 
                         Bukkit.getScheduler().runTaskLaterAsynchronously((Plugin) PacketEvents.getAPI().getPlugin(),
                                 () -> {
-                                    player.sendMessage("Turning the NPC into you!");
+                                    player.sendMessage("Turning the NPC into Dqgs!");
                                     UUID dogsUUID = MojangAPIUtil.requestPlayerUUID("Dqgs");
                                     List<TextureProperty> newTextureProperties = MojangAPIUtil.requestPlayerTextureProperties(dogsUUID);
                                     PacketEvents.getAPI().getNPCManager().changeNPCSkin(npc, dogsUUID, newTextureProperties);
-                                    EntityDataProvider playerMetadataProvider =
-                                            PlayerDataProvider.builderPlayer()
-                                                    .additionalHealth(20)
-                                                    .skinParts(SkinSection.getAllSections())
-                                                    .build();
-
-
-                                    WrapperPlayServerEntityMetadata metadataPacket = new WrapperPlayServerEntityMetadata(npc.getId(),
-                                            playerMetadataProvider.encode());
-                                    PacketEvents.getAPI().getPlayerManager().sendPacket(event.getChannel(), metadataPacket);
+                                    npc.setDisplayName(Component.text("Dqgs").color(NamedTextColor.RED).asComponent());
+                                    WrapperPlayServerPlayerInfo pInfo = new WrapperPlayServerPlayerInfo(WrapperPlayServerPlayerInfo.Action.UPDATE_DISPLAY_NAME,
+                                            npc.getPlayerInfoData());
+                                    PacketEvents.getAPI().getPlayerManager().sendPacket(event.getChannel(), pInfo);
 
 
                                 }, 120L);//120 ticks is 6 seconds
-                    } else if (msg.equals("attack!")) {
-                        int randomEntityId = 3;
-                        WrapperPlayClientInteractEntity interactEntity = new WrapperPlayClientInteractEntity(randomEntityId,
-                                WrapperPlayClientInteractEntity.InteractAction.ATTACK,
-                                InteractionHand.MAIN_HAND,
-                                Optional.empty(),
-                                Optional.empty());
-                        Component component = Component.text("Hello, World!").color(NamedTextColor.RED).decorate(TextDecoration.BOLD).asComponent();
-                        WrapperPlayServerChatMessage cm = new WrapperPlayServerChatMessage(component,
-                                WrapperPlayServerChatMessage.ChatPosition.CHAT);
-                        PacketEvents.getAPI().getPlayerManager().sendPacket(event.getChannel(), cm);
-                        PacketEvents.getAPI().getServerManager().receivePacket(event.getPlayer(),
-                                interactEntity);
                     }
                 }
             }
@@ -144,57 +125,7 @@ public class PacketEventsPlugin extends JavaPlugin {
             @Override
             public void onPacketSend(PacketSendEvent event) {
                 Player player = event.getPlayer() == null ? null : (Player) event.getPlayer();
-                //TODO Fix hoverEvent contents/value when its a component i believe
-                //TODO Work on copying styling properly from children components
-                if (event.getPacketType() == PacketType.Play.Server.SPAWN_LIVING_ENTITY) {
-                    WrapperPlayServerSpawnLivingEntity spawnLivingEntity = new WrapperPlayServerSpawnLivingEntity(event);
-                    if (spawnLivingEntity.getEntityType().equals(EntityTypes.PIG)) {
-                        event.setCancelled(true);
-                        int entityId = spawnLivingEntity.getEntityId();
-                        UUID uuid = spawnLivingEntity.getEntityUUID();
-                        UUID textureUUID = MojangAPIUtil.requestPlayerUUID("md_5");
-                        List<TextureProperty> textures = MojangAPIUtil.requestPlayerTextureProperties(textureUUID);
-                        //Note, textureUUID must be in the game profile!
-                        GameProfile gp = new GameProfile(textureUUID, "Player_pig", textures);
-                        NPC npc = new NPC(Component.text("Player_pig", NamedTextColor.RED),
-                                entityId, gp);
-                        Location targetLocation = new Location(spawnLivingEntity.getPosition(), spawnLivingEntity.getYaw(), spawnLivingEntity.getPitch());
-                        WrapperPlayServerSpawnPlayer spawnPlayer = new WrapperPlayServerSpawnPlayer(entityId, uuid,
-                                targetLocation);
-                        npc.setLocation(targetLocation);
-                        PacketEvents.getAPI().getNPCManager().spawn(event.getChannel(), npc);
-                        ItemStack handItem = ItemStack.builder().type(ItemTypes.DIAMOND_SWORD).build();
-                        npc.setMainHand(handItem);
-                        PacketEvents.getAPI().getNPCManager().updateEquipment(npc);
-                    }
-                }
-                /*else if (event.getPacketType() == PacketType.Play.Server.CHAT_MESSAGE) {
-                    WrapperPlayServerChatMessage cm = new WrapperPlayServerChatMessage(event);
-                    BaseComponent component = cm.getChatComponent();
-                    if (component instanceof TextComponent) {
-                        PacketEvents.getAPI().getLogManager().debug("text received: " + ((TextComponent) component).getText());
-                    } else if (component instanceof TranslatableComponent) {
-                        TranslatableComponent tc = (TranslatableComponent) component;
-                        String translate = tc.getTranslate();
-                        List<Object> with = tc.getWith();
-                        PacketEvents.getAPI().getLogManager().debug("received translate: " + tc.getColor().getName() + ":" + translate);
-                        for (Object child : with) {
-                            String content = child instanceof String ? child.toString() : child instanceof BaseComponent ? ((BaseComponent) child).buildJson().toString() : "";
-                            String colorName = child instanceof String ? "none" : child instanceof BaseComponent ? ((BaseComponent) child).getColor().getName() : "";
-                            PacketEvents.getAPI().getLogManager().debug("translate child: " + colorName + ":" + content);
-                        }
-                        PacketEvents.getAPI().getLogManager().debug("output: " + tc.buildJson().toString());
-                        /*
-                        og json msg: {"color":"yellow","translate":"multiplayer.player.joined",
-                        "with":[{"insertion":"retrooper",
-                        "clickEvent":{"action":"suggest_command","value":"/tell retrooper "},
-                        "hoverEvent":{"action":"show_entity","contents":{"type":"minecraft:player",
-                        "id":"7fe54c65-80ba-45c8-8450-b45796aa0eb9","name":{"text":"retrooper"}}},
-                        "text":"retrooper"}]}
-                         *
-                    }
-                } */
-                else if (event.getPacketType() == PacketType.Play.Server.SET_SLOT) {
+                if (event.getPacketType() == PacketType.Play.Server.SET_SLOT) {
                     WrapperPlayServerSetSlot setSlot = new WrapperPlayServerSetSlot(event);
                     int windowID = setSlot.getWindowId();
                     int slot = setSlot.getSlot();
