@@ -21,10 +21,20 @@ package com.github.retrooper.packetevents.util;
 import com.google.gson.JsonElement;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer;
+import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 
 public class AdventureSerializer {
 
     public static final GsonComponentSerializer GSON = GsonComponentSerializer.gson();
+    public static final LegacyComponentSerializer LEGACY = LegacyComponentSerializer.legacySection();
+
+    public static String asVanilla(Component component) {
+        return LEGACY.serialize(component);
+    }
+
+    public static Component asAdventure(String vanilla) {
+        return LEGACY.deserialize(vanilla);
+    }
 
     public static Component parseComponent(String json) {
         return GSON.deserialize(json);
