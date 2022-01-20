@@ -24,15 +24,10 @@ import com.github.retrooper.packetevents.event.PacketListenerPriority;
 import com.github.retrooper.packetevents.event.impl.PacketReceiveEvent;
 import com.github.retrooper.packetevents.event.impl.PacketSendEvent;
 import com.github.retrooper.packetevents.manager.npc.NPC;
-import com.github.retrooper.packetevents.protocol.entity.data.provider.EntityDataProvider;
-import com.github.retrooper.packetevents.protocol.entity.data.provider.PlayerDataProvider;
-import com.github.retrooper.packetevents.protocol.entity.type.EntityTypes;
 import com.github.retrooper.packetevents.protocol.item.ItemStack;
-import com.github.retrooper.packetevents.protocol.item.type.ItemTypes;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.protocol.player.GameProfile;
 import com.github.retrooper.packetevents.protocol.player.InteractionHand;
-import com.github.retrooper.packetevents.protocol.player.SkinSection;
 import com.github.retrooper.packetevents.protocol.player.TextureProperty;
 import com.github.retrooper.packetevents.protocol.world.Location;
 import com.github.retrooper.packetevents.protocol.world.states.WrappedBlockState;
@@ -46,16 +41,14 @@ import io.github.retrooper.packetevents.factory.spigot.SpigotPacketEventsBuilder
 import io.github.retrooper.packetevents.utils.SpigotReflectionUtil;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
-import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.scoreboard.Team;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 public class PacketEventsPlugin extends JavaPlugin {
     @Override
@@ -75,49 +68,36 @@ public class PacketEventsPlugin extends JavaPlugin {
             @Override
             public void onPacketReceive(PacketReceiveEvent event) {
                 Player player = event.getPlayer() == null ? null : (Player) event.getPlayer();
-                if (event.getPacketType() == PacketType.Play.Client.INTERACT_ENTITY) {
-                    WrapperPlayClientInteractEntity interactEntity = new WrapperPlayClientInteractEntity(event);
-                    int entityID = interactEntity.getEntityId();
-                    WrapperPlayClientInteractEntity.InteractAction action = interactEntity.getAction();
-                    InteractionHand hand = interactEntity.getHand();
-                    player.sendMessage("Received packet: " + event.getPacketType().getName() + " from " + player.getName() + " with entityID: " + entityID + " and action: " + action.name() + " and hand: " + hand.name());
-
-                    WrappedBlockState state = WrappedBlockState.getByString("minecraft:grass_block[snowy=true]");
-                    WrapperPlayServerBlockChange bc = new WrapperPlayServerBlockChange(new Vector3i(player.getLocation().getBlockX(), player.getLocation().getBlockY() - 1, player.getLocation().getBlockZ()), state.getGlobalId());
-                    PacketEvents.getAPI().getPlayerManager().sendPacket(event.getChannel(), bc);
-                } else if (event.getPacketType() == PacketType.Play.Client.UPDATE_SIGN) {
-                    WrapperPlayClientUpdateSign updateSign = new WrapperPlayClientUpdateSign(event);
-                    Vector3i pos = updateSign.getBlockPosition();
-                    String[] textLines = updateSign.getTextLines();
-                    player.sendMessage("Received packet: " + event.getPacketType().getName() + " from " + player.getName() + " with pos: " + pos.toString() + " and textLines: " + Arrays.toString(textLines));
-                } else if (event.getPacketType() == PacketType.Play.Client.CHAT_MESSAGE) {
+                if (event.getPacketType() == PacketType.Play.Client.CHAT_MESSAGE) {
                     WrapperPlayClientChatMessage chatMessage = new WrapperPlayClientChatMessage(event);
                     String msg = chatMessage.getMessage();
                     String[] sp = msg.split(" ");
-                    if (sp[0].equalsIgnoreCase("plzspawn")) {
+                   if (sp[0].equalsIgnoreCase("plzspawn")) {
                         String name = sp[1];
                         UUID uuid = MojangAPIUtil.requestPlayerUUID(name);
                         player.sendMessage("Spawning " + name + " with UUID " + uuid.toString());
                         List<TextureProperty> textureProperties = MojangAPIUtil.requestPlayerTextureProperties(uuid);
                         GameProfile profile = new GameProfile(uuid, name, textureProperties);
-                        NPC npc = new NPC(Component.text(name + "_clone", NamedTextColor.RED), SpigotReflectionUtil.generateEntityId(), profile);
+                        Component nameTag = Component.text("Doggy").color(NamedTextColor.GOLD).asComponent();
+                        NPC npc = new NPC(profile, SpigotReflectionUtil.generateEntityId(), null,
+                                NamedTextColor.GOLD,
+                                Component.text("Nice prefix").color(NamedTextColor.GRAY).asComponent(),
+                                Component.text("Nice suffix").color(NamedTextColor.AQUA).asComponent()
+                                );
                         npc.setLocation(new Location(player.getLocation().getX(), player.getLocation().getY(), player.getLocation().getZ(), player.getLocation().getYaw(), player.getLocation().getPitch()));
                         PacketEvents.getAPI().getNPCManager().spawn(event.getChannel(), npc);
                         player.sendMessage("Successfully spawned " + name);
-
+/*
                         Bukkit.getScheduler().runTaskLaterAsynchronously((Plugin) PacketEvents.getAPI().getPlugin(),
                                 () -> {
                                     player.sendMessage("Turning the NPC into Dqgs!");
-                                    UUID dogsUUID = MojangAPIUtil.requestPlayerUUID("Dqgs");
+                                    UUID dogsUUID = MojangAPIUtil.requestPlayerUUID("");
                                     List<TextureProperty> newTextureProperties = MojangAPIUtil.requestPlayerTextureProperties(dogsUUID);
                                     PacketEvents.getAPI().getNPCManager().changeNPCSkin(npc, dogsUUID, newTextureProperties);
-                                    npc.setDisplayName(Component.text("Dqgs").color(NamedTextColor.RED).asComponent());
-                                    WrapperPlayServerPlayerInfo pInfo = new WrapperPlayServerPlayerInfo(WrapperPlayServerPlayerInfo.Action.UPDATE_DISPLAY_NAME,
-                                            npc.getPlayerInfoData());
-                                    PacketEvents.getAPI().getPlayerManager().sendPacket(event.getChannel(), pInfo);
+                                    npc.setPrefixName(Component.text("New prefix").color(NamedTextColor.GOLD).asComponent());
+                                    PacketEvents.getAPI().getNPCManager().updateNPCNameTag(npc);
 
-
-                                }, 120L);//120 ticks is 6 seconds
+                                }, 120L);//120 ticks is 6 seconds*/
                     }
                 }
             }
@@ -134,7 +114,7 @@ public class PacketEventsPlugin extends JavaPlugin {
                 }
             }
         };
-        //PacketEvents.getAPI().getEventManager().registerListener(debugListener);
+        PacketEvents.getAPI().getEventManager().registerListener(debugListener);
 
     }
 

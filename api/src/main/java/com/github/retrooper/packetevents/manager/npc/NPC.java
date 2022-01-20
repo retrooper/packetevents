@@ -23,12 +23,20 @@ import com.github.retrooper.packetevents.protocol.player.GameMode;
 import com.github.retrooper.packetevents.protocol.player.GameProfile;
 import com.github.retrooper.packetevents.protocol.world.Location;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerPlayerInfo;
+import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerTeams;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
+import org.jetbrains.annotations.Nullable;
+
+import java.util.Optional;
 
 public class NPC {
-    private Component displayName;
     private final int id;
     private final GameProfile profile;
+    private Component tabName;
+    private NamedTextColor nameColor;
+    private Component prefixName;
+    private Component suffixName;
     private int displayPing = 0;
     private Location location = new Location(0.0, 0.0, 0.0, 0.0f, 0.0f);
     private ItemStack mainHand = null;
@@ -38,10 +46,23 @@ public class NPC {
     private ItemStack leggings = null;
     private ItemStack boots = null;
 
-    public NPC(Component displayName, int entityId, GameProfile profile) {
-        this.displayName = displayName;
-        this.id = entityId;
+    public NPC(GameProfile profile, int entityId, @Nullable Component tabName, @Nullable NamedTextColor nameColor,
+               @Nullable Component prefixName, @Nullable Component suffixName) {
         this.profile = profile;
+        this.id = entityId;
+
+        this.tabName = tabName;
+        this.nameColor = nameColor;
+        this.prefixName = prefixName;
+        this.suffixName = suffixName;
+    }
+
+    public NPC(GameProfile profile, int entityId, @Nullable Component tabName) {
+        this(profile, entityId, tabName, null, null, null);
+    }
+
+    public NPC(GameProfile profile, int entityId) {
+        this(profile, entityId, null);
     }
 
     public ItemStack getMainHand() {
@@ -92,12 +113,40 @@ public class NPC {
         this.boots = boots;
     }
 
-    public Component getDisplayName() {
-        return displayName;
+    @Nullable
+    public NamedTextColor getNameColor() {
+        return nameColor;
     }
 
-    public void setDisplayName(Component displayName) {
-        this.displayName = displayName;
+    public void setNameColor(@Nullable NamedTextColor nameColor) {
+        this.nameColor = nameColor;
+    }
+
+    @Nullable
+    public Component getPrefixName() {
+        return prefixName;
+    }
+
+    public void setPrefixName(@Nullable Component namePrefix) {
+        this.prefixName = namePrefix;
+    }
+
+    @Nullable
+    public Component getSuffixName() {
+        return suffixName;
+    }
+
+    public void setSuffixName(@Nullable Component nameSuffix) {
+        this.suffixName = nameSuffix;
+    }
+
+    @Nullable
+    public Component getTabName() {
+        return tabName;
+    }
+
+    public void setTabName(@Nullable Component tabName) {
+        this.tabName = tabName;
     }
 
     public int getId() {
@@ -108,8 +157,24 @@ public class NPC {
         return profile;
     }
 
+    public WrapperPlayServerTeams getTeamData() {
+        return new WrapperPlayServerTeams("custom_name_team",
+                WrapperPlayServerTeams.TeamMode.CREATE,
+                Optional.of(
+                        new WrapperPlayServerTeams.ScoreBoardTeamInfo(
+                                Component.text("custom_name_team"),
+                                prefixName,
+                                suffixName,
+                                WrapperPlayServerTeams.NameTagVisibility.ALWAYS,
+                                WrapperPlayServerTeams.CollisionRule.ALWAYS,
+                                nameColor,
+                                WrapperPlayServerTeams.OptionData.NONE
+                        )),
+                getProfile().getName());
+    }
+
     public WrapperPlayServerPlayerInfo.PlayerData getPlayerInfoData() {
-        return new WrapperPlayServerPlayerInfo.PlayerData(getDisplayName(),
+        return new WrapperPlayServerPlayerInfo.PlayerData(getTabName(),
                 getProfile(), GameMode.SURVIVAL,
                 getDisplayPing());
     }
