@@ -29,16 +29,20 @@ import io.github.retrooper.packetevents.utils.dependencies.viaversion.CustomPipe
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
+import io.netty.channel.ChannelPromise;
 import io.netty.handler.codec.MessageToByteEncoder;
 import org.bukkit.entity.Player;
 
 import java.lang.reflect.InvocationTargetException;
+import java.util.ArrayList;
+import java.util.List;
 
 @ChannelHandler.Sharable
 public class PacketEncoderModern extends MessageToByteEncoder<Object> {
     public volatile Player player;
     public boolean handledCompression;
     public MessageToByteEncoder<?> mcEncoder;
+    private List<Runnable> postTasks = new ArrayList<>();
 
     public void handle(ChannelHandlerContextAbstract ctx, ByteBufAbstract byteBuf) {
         boolean needsCompress = handleCompressionOrder(ctx, byteBuf);
@@ -59,16 +63,25 @@ public class PacketEncoderModern extends MessageToByteEncoder<Object> {
             if (needsCompress) {
                 recompress(ctx, byteBuf);
             }
-            //TODO Post-task
-            /*if (packetSendEvent.getPostTask() != null) {
-                ((ChannelHandlerContext) ctx.rawChannelHandlerContext()).newPromise().addListener(f -> {
-                    packetSendEvent.getPostTask().run();
-                });
-            }*/
+            postTasks.addAll(packetSendEvent.getPostTasks());
         } else {
             //Make the buffer unreadable for the next handlers
             byteBuf.clear();
         }
+    }
+
+    @Override
+    public void write(ChannelHandlerContext ctx, Object msg, ChannelPromise promise) throws Exception {
+        if (!postTasks.isEmpty()) {
+            List<Runnable> postTasks = new ArrayList<>(this.postTasks);
+            promise.addListener(f -> {
+                for (Runnable task : postTasks) {
+                    task.run();
+                }
+            });
+        }
+        postTasks.clear();
+        super.write(ctx, msg, promise);
     }
 
     @Override

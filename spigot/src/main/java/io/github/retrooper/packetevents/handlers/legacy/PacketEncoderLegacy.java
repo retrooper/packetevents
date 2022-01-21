@@ -28,14 +28,18 @@ import io.github.retrooper.packetevents.handlers.legacy.early.CompressionManager
 import net.minecraft.util.io.netty.buffer.ByteBuf;
 import net.minecraft.util.io.netty.channel.ChannelHandler;
 import net.minecraft.util.io.netty.channel.ChannelHandlerContext;
+import net.minecraft.util.io.netty.channel.ChannelPromise;
 import net.minecraft.util.io.netty.handler.codec.MessageToByteEncoder;
 import org.bukkit.entity.Player;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @ChannelHandler.Sharable
 public class PacketEncoderLegacy extends MessageToByteEncoder {
     public volatile Player player;
     private boolean handledCompression;
-
+    private List<Runnable> postTasks = new ArrayList<>();
     public void handle(ChannelHandlerContextAbstract ctx, ByteBufAbstract byteBuf) {
         boolean needsCompress = handleCompressionOrder(ctx, byteBuf);
 
@@ -56,15 +60,25 @@ public class PacketEncoderLegacy extends MessageToByteEncoder {
             if (needsCompress) {
                 recompress(ctx, byteBuf);
             }
-            if (packetSendEvent.getPostTask() != null) {
-                ((ChannelHandlerContext) ctx.rawChannelHandlerContext()).newPromise().addListener(f -> {
-                    packetSendEvent.getPostTask().run();
-                });
-            }
+            postTasks.addAll(packetSendEvent.getPostTasks());
         } else {
             //Make the buffer unreadable for the next handlers
             byteBuf.clear();
         }
+    }
+
+    @Override
+    public void write(ChannelHandlerContext ctx, Object msg, ChannelPromise promise) throws Exception {
+        if (!postTasks.isEmpty()) {
+            List<Runnable> postTasks = new ArrayList<>(this.postTasks);
+            promise.addListener(f -> {
+                for (Runnable task : postTasks) {
+                    task.run();
+                }
+            });
+        }
+        postTasks.clear();
+        super.write(ctx, msg, promise);
     }
 
     @Override

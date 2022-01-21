@@ -24,32 +24,25 @@ import com.github.retrooper.packetevents.event.PacketListenerPriority;
 import com.github.retrooper.packetevents.event.impl.PacketReceiveEvent;
 import com.github.retrooper.packetevents.event.impl.PacketSendEvent;
 import com.github.retrooper.packetevents.manager.npc.NPC;
+import com.github.retrooper.packetevents.netty.channel.ChannelAbstract;
 import com.github.retrooper.packetevents.protocol.item.ItemStack;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.protocol.player.GameProfile;
-import com.github.retrooper.packetevents.protocol.player.InteractionHand;
 import com.github.retrooper.packetevents.protocol.player.TextureProperty;
 import com.github.retrooper.packetevents.protocol.world.Location;
-import com.github.retrooper.packetevents.protocol.world.states.WrappedBlockState;
-import com.github.retrooper.packetevents.util.AdventureSerializer;
 import com.github.retrooper.packetevents.util.MojangAPIUtil;
-import com.github.retrooper.packetevents.util.Vector3i;
 import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientChatMessage;
-import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientInteractEntity;
-import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientUpdateSign;
-import com.github.retrooper.packetevents.wrapper.play.server.*;
+import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerChatMessage;
+import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerSetSlot;
 import io.github.retrooper.packetevents.factory.spigot.SpigotPacketEventsBuilder;
 import io.github.retrooper.packetevents.utils.SpigotReflectionUtil;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
-import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
-import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
-import org.bukkit.scoreboard.Team;
 
-import java.util.*;
+import java.util.List;
+import java.util.UUID;
 
 public class PacketEventsPlugin extends JavaPlugin {
     @Override
@@ -73,7 +66,7 @@ public class PacketEventsPlugin extends JavaPlugin {
                     WrapperPlayClientChatMessage chatMessage = new WrapperPlayClientChatMessage(event);
                     String msg = chatMessage.getMessage();
                     String[] sp = msg.split(" ");
-                   if (sp[0].equalsIgnoreCase("plzspawn")) {
+                    if (sp[0].equalsIgnoreCase("plzspawn")) {
                         String name = sp[1];
                         UUID uuid = MojangAPIUtil.requestPlayerUUID(name);
                         player.sendMessage("Spawning " + name + " with UUID " + uuid.toString());
@@ -84,7 +77,7 @@ public class PacketEventsPlugin extends JavaPlugin {
                                 NamedTextColor.GOLD,
                                 Component.text("Nice prefix").color(NamedTextColor.GRAY).asComponent(),
                                 Component.text("Nice suffix").color(NamedTextColor.AQUA).asComponent()
-                                );
+                        );
                         npc.setLocation(new Location(player.getLocation().getX(), player.getLocation().getY(), player.getLocation().getZ(), player.getLocation().getYaw(), player.getLocation().getPitch()));
                         PacketEvents.getAPI().getNPCManager().spawn(event.getChannel(), npc);
                         player.sendMessage("Successfully spawned " + name);
@@ -112,6 +105,14 @@ public class PacketEventsPlugin extends JavaPlugin {
                     int slot = setSlot.getSlot();
                     ItemStack item = setSlot.getItem();
                     player.sendMessage("Set slot with window ID: " + windowID + ", slot: " + slot + ", item: " + (item.getType() != null ? item.toString() : "null item"));
+                } else if (event.getPacketType() == PacketType.Play.Server.ENTITY_TELEPORT) {
+                    System.out.println("teleporot!");
+                    final ChannelAbstract channel = event.getChannel();
+                    event.getPostTasks().add(() -> {
+                        WrapperPlayServerChatMessage cm = new WrapperPlayServerChatMessage(Component.text("2.0 processed spawn pig it in a post task"),
+                                WrapperPlayServerChatMessage.ChatPosition.CHAT);
+                        PacketEvents.getAPI().getPlayerManager().sendPacket(channel, cm);
+                    });
                 }
             }
         };
