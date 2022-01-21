@@ -50,8 +50,6 @@ shadowJar {
     archiveClassifier.set('')
     archiveVersion.set('')
 
-    // Do not relocate 'net.kyori' because this is a issue for api users
-//    relocate("com.google.gson", "com.github.retrooper.packetevents.libs.gson")
     minimize()
 }
 
