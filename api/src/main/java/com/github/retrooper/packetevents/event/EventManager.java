@@ -68,14 +68,14 @@ public class EventManager {
         }
     }
 
-    public void registerListener(PacketListener listener, PacketListenerPriority priority, boolean readOnly) {
+    public PacketListenerAbstract registerListener(PacketListener listener, PacketListenerPriority priority, boolean readOnly) {
         PacketListenerAbstract packetListenerAbstract = listener.asAbstract(priority, readOnly);
-        registerListener(packetListenerAbstract);
+        return registerListener(packetListenerAbstract);
     }
 
-    public void registerListener(PacketListenerReflect listener, PacketListenerPriority priority, boolean readOnly) {
+    public PacketListenerAbstract registerListener(PacketListenerReflect listener, PacketListenerPriority priority, boolean readOnly) {
         PacketListenerAbstract packetListenerAbstract = listener.asAbstract(priority, readOnly);
-        registerListener(packetListenerAbstract);
+        return registerListener(packetListenerAbstract);
     }
 
     /**
@@ -83,7 +83,7 @@ public class EventManager {
      *
      * @param listener {@link PacketListenerAbstract}
      */
-    public void registerListener(PacketListenerAbstract listener) {
+    public PacketListenerAbstract registerListener(PacketListenerAbstract listener) {
         byte priority = listener.getPriority().getId();
         HashSet<PacketListenerAbstract> listenerSet = listenersMap.get(priority);
         if (listenerSet == null) {
@@ -91,6 +91,7 @@ public class EventManager {
         }
         listenerSet.add(listener);
         listenersMap.put(priority, listenerSet);
+        return listener;
     }
 
     /**
@@ -98,10 +99,11 @@ public class EventManager {
      *
      * @param listeners {@link PacketListenerAbstract}
      */
-    public void registerListeners(PacketListenerAbstract... listeners) {
+    public PacketListenerAbstract[] registerListeners(PacketListenerAbstract... listeners) {
         for (PacketListenerAbstract listener : listeners) {
             registerListener(listener);
         }
+        return listeners;
     }
 
     public void unregisterListeners(PacketListenerAbstract... listenerAbstract) {
