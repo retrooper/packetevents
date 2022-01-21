@@ -46,6 +46,11 @@ public class NPCManager {
         WrapperPlayServerSpawnPlayer spawnPlayer = new WrapperPlayServerSpawnPlayer(npc.getId(), npc.getProfile().getId(), npc.getLocation());
         PacketEvents.getAPI().getPlayerManager().sendPacket(channel, spawnPlayer);
 
+        //Create team
+        if (npc.getNameColor() != null || npc.getPrefixName() != null
+        || npc.getSuffixName() != null) {
+            PacketEvents.getAPI().getPlayerManager().sendPacket(channel, npc.getTeamData());
+        }
         targetChannels.add(channel);
     }
 
@@ -53,6 +58,7 @@ public class NPCManager {
     public void despawn(ChannelAbstract channel, NPC npc) {
         Set<ChannelAbstract> targetChannels = TARGET_CHANNELS.get(npc);
         if (targetChannels != null) {
+            //TODO Confirm if we need to destroy the team too
             WrapperPlayServerDestroyEntities destroyEntities = new WrapperPlayServerDestroyEntities(npc.getId());
             PacketEvents.getAPI().getPlayerManager().sendPacket(channel, destroyEntities);
             targetChannels.remove(channel);
@@ -141,7 +147,7 @@ public class NPCManager {
         }
     }
 
-    public void updateNPCDisplayPing(NPC npc, int ping) {
+    public void updateNPCTabPing(NPC npc, int ping) {
         npc.setDisplayPing(ping);
         Set<ChannelAbstract> targetChannels = TARGET_CHANNELS.get(npc);
         if (targetChannels != null && !targetChannels.isEmpty()) {
@@ -170,6 +176,25 @@ public class NPCManager {
 
                 WrapperPlayServerSpawnPlayer spawnPlayer = new WrapperPlayServerSpawnPlayer(npc.getId(), npc.getProfile().getId(), npc.getLocation());
                 PacketEvents.getAPI().getPlayerManager().sendPacket(channel, spawnPlayer);
+            }
+        }
+    }
+
+    public void updateNPCNameTag(NPC npc) {
+        Set<ChannelAbstract> targetChannels = TARGET_CHANNELS.get(npc);
+        if (targetChannels != null && !targetChannels.isEmpty()) {
+            for (ChannelAbstract channel : targetChannels) {
+                //Destroy team
+                WrapperPlayServerTeams removeTeam =
+                        new WrapperPlayServerTeams("custom_name_team",
+                                WrapperPlayServerTeams.TeamMode.REMOVE,
+                                Optional.empty());
+                PacketEvents.getAPI().getPlayerManager().sendPacket(channel, removeTeam);
+
+                if (npc.getNameColor() != null || npc.getPrefixName() != null
+                        || npc.getSuffixName() != null) {
+                    PacketEvents.getAPI().getPlayerManager().sendPacket(channel, npc.getTeamData());
+                }
             }
         }
     }
