@@ -57,22 +57,18 @@ public class WrapperPlayServerEntityTeleport extends PacketWrapper<WrapperPlaySe
 
     @Override
     public void readData() {
-        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_9)) {
+        if (serverVersion == ServerVersion.V_1_7_10) {
+             entityID = readInt();
+            position = new Vector3d((readInt() / 32.0), (readInt() / 32.0), (readInt() / 32.0));
+            yaw = readByte() / ROTATION_FACTOR;
+            pitch = readByte() / ROTATION_FACTOR;
+            onGround = false;
+        } else {
             entityID = readVarInt();
             position = new Vector3d(readDouble(), readDouble(), readDouble());
             yaw = readByte() / ROTATION_FACTOR;
             pitch = readByte() / ROTATION_FACTOR;
             onGround = readBoolean();
-        } else {
-            entityID = readInt();
-            position = new Vector3d((readInt() / 32.0), (readInt() / 32.0), (readInt() / 32.0));
-            yaw = readByte() / ROTATION_FACTOR;
-            pitch = readByte() / ROTATION_FACTOR;
-            if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_8)) {
-                onGround = readBoolean();
-            } else {
-                onGround = false;
-            }
         }
     }
 
@@ -87,23 +83,21 @@ public class WrapperPlayServerEntityTeleport extends PacketWrapper<WrapperPlaySe
 
     @Override
     public void writeData() {
-        writeVarInt(entityID);
-        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_9)) {
+        if (serverVersion == ServerVersion.V_1_7_10) {
+            writeInt(entityID);
+            writeInt(MathUtil.floor(position.x * 32.0));
+            writeInt(MathUtil.floor(position.y * 32.0));
+            writeInt(MathUtil.floor(position.z * 32.0));
+            writeByte((int) (yaw * ROTATION_FACTOR));
+            writeByte((int) (pitch * ROTATION_FACTOR));
+        } else {
+            writeVarInt(entityID);
             writeDouble(position.x);
             writeDouble(position.y);
             writeDouble(position.z);
             writeByte((int) (yaw * ROTATION_FACTOR));
             writeByte((int) (pitch * ROTATION_FACTOR));
             writeBoolean(onGround);
-        } else {
-            writeInt(MathUtil.floor(position.x * 32.0));
-            writeInt(MathUtil.floor(position.y * 32.0));
-            writeInt(MathUtil.floor(position.z * 32.0));
-            writeByte((int) (yaw * ROTATION_FACTOR));
-            writeByte((int) (pitch * ROTATION_FACTOR));
-            if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_8)) {
-                writeBoolean(onGround);
-            }
         }
     }
 
