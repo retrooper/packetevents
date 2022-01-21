@@ -22,8 +22,7 @@ import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.HashSet;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class EventManager {
@@ -104,6 +103,20 @@ public class EventManager {
             registerListener(listener);
         }
     }
+
+    public void unregisterListeners(PacketListenerAbstract... listenerAbstract) {
+        for (PacketListenerAbstract listener : listenerAbstract) {
+            unregisterListeners(listener.getPriority(), listener);
+        }
+    }
+
+    public void unregisterListeners(PacketListenerPriority priority, PacketListenerAbstract... listenerAbstracts) {
+        HashSet<PacketListenerAbstract> abstractSet =  listenersMap.get(priority.getId());
+        if (abstractSet == null) return;
+        Arrays.asList(listenerAbstracts).forEach(abstractSet::remove);
+    }
+
+
 
     /**
      * Unregister all dynamic packet event listeners.
