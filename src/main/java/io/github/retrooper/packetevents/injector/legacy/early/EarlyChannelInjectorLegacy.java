@@ -135,6 +135,7 @@ public class EarlyChannelInjectorLegacy implements EarlyInjector {
                     channel.pipeline().remove(PacketEvents.get().getHandlerName());
                 }
 
+                //TODO Look into why this apparently doesn't work
                 if (channel.pipeline().get("encoder") != null) {
                     channel.pipeline().addAfter("encoder", PacketEvents.get().getHandlerName(), new PlayerChannelHandlerLegacy());
                 }
