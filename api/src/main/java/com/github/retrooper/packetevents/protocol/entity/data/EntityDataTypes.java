@@ -32,10 +32,7 @@ import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 import com.google.gson.JsonObject;
 import net.kyori.adventure.text.Component;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
 
@@ -93,18 +90,10 @@ public class EntityDataTypes {
     public static final EntityDataType<NBTCompound> NBT = define("nbt", PacketWrapper::readNBT, PacketWrapper::writeNBT);
     public static final EntityDataType<VillagerData> VILLAGER_DATA = define("villager_data", PacketWrapper::readVillagerData, PacketWrapper::writeVillagerData);
     public static final EntityDataType<Optional<Integer>> OPTIONAL_INT = define("optional_int", (PacketWrapper<?> wrapper) -> {
-        if (wrapper.readBoolean()) {
-            return Optional.of(wrapper.readVarInt());
-        } else {
-            return Optional.empty();
-        }
+        int i = wrapper.readVarInt();
+        return i == 0 ? Optional.empty() : Optional.of(i - 1);
     }, (PacketWrapper<?> wrapper, Optional<Integer> value) -> {
-        if (value.isPresent()) {
-            wrapper.writeBoolean(true);
-            wrapper.writeVarInt(value.get());
-        } else {
-            wrapper.writeBoolean(false);
-        }
+        wrapper.writeVarInt(value.orElse(-1) + 1);
     });
 
     public static final EntityDataType<EntityPose> ENTITY_POSE = define("entity_pose", (PacketWrapper<?> wrapper) -> {

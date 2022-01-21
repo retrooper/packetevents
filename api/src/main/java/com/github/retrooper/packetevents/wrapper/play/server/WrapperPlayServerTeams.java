@@ -9,6 +9,7 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Arrays;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Optional;
@@ -106,17 +107,22 @@ public class WrapperPlayServerTeams extends PacketWrapper<WrapperPlayServerTeams
         CREATE,
         REMOVE,
         UPDATE,
-        ADD_PLAYERS,
-        REMOVE_PLAYERS;
+        ADD_ENTITIES,
+        REMOVE_ENTITIES;
     }
 
-    public WrapperPlayServerTeams(String teamName, TeamMode teamMode, Collection<String> players, Optional<ScoreBoardTeamInfo> teamInfo) {
+    public WrapperPlayServerTeams(String teamName, TeamMode teamMode, Optional<ScoreBoardTeamInfo> teamInfo, Collection<String> entities) {
         super(PacketType.Play.Server.TEAMS);
         this.teamName = teamName;
         this.teamMode = teamMode;
-        this.players = players;
+        this.players = entities;
         this.teamInfo = teamInfo;
     }
+
+    public WrapperPlayServerTeams(String teamName, TeamMode teamMode, Optional<ScoreBoardTeamInfo> teamInfo, String... entities) {
+        this(teamName, teamMode, teamInfo, Arrays.asList(entities));
+    }
+
 
     @Override
     public void readData() {
@@ -156,7 +162,7 @@ public class WrapperPlayServerTeams extends PacketWrapper<WrapperPlayServerTeams
         }
         teamInfo = Optional.ofNullable(info);
         players = new ArrayList<>();
-        if (teamMode == TeamMode.CREATE || teamMode == TeamMode.ADD_PLAYERS || teamMode == TeamMode.REMOVE_PLAYERS) {
+        if (teamMode == TeamMode.CREATE || teamMode == TeamMode.ADD_ENTITIES || teamMode == TeamMode.REMOVE_ENTITIES) {
             int size;
             if (serverVersion == ServerVersion.V_1_7_10)
                 size = readShort();
@@ -208,7 +214,7 @@ public class WrapperPlayServerTeams extends PacketWrapper<WrapperPlayServerTeams
             }
         }
 
-        if (teamMode == TeamMode.CREATE || teamMode == TeamMode.ADD_PLAYERS || teamMode == TeamMode.REMOVE_PLAYERS) {
+        if (teamMode == TeamMode.CREATE || teamMode == TeamMode.ADD_ENTITIES || teamMode == TeamMode.REMOVE_ENTITIES) {
             if (serverVersion == ServerVersion.V_1_7_10)
                 writeShort(players.size());
             else
@@ -262,8 +268,14 @@ public class WrapperPlayServerTeams extends PacketWrapper<WrapperPlayServerTeams
         private NamedTextColor color;
         private OptionData optionData;
 
-        public ScoreBoardTeamInfo(Component displayName, Component prefix, Component suffix, NameTagVisibility tagVisibility, CollisionRule collisionRule, NamedTextColor color, OptionData optionData) {
+        public ScoreBoardTeamInfo(Component displayName, @Nullable Component prefix, @Nullable Component suffix, NameTagVisibility tagVisibility, CollisionRule collisionRule, NamedTextColor color, OptionData optionData) {
             this.displayName = displayName;
+            if (prefix == null) {
+                prefix = Component.empty();
+            }
+            if (suffix == null) {
+                suffix = Component.empty();
+            }
             this.prefix = prefix;
             this.suffix = suffix;
             this.tagVisibility = tagVisibility;
