@@ -105,19 +105,18 @@ public class EventManager {
         }
         return listeners;
     }
+    
+    public void unregisterListener(PacketListenerAbstract listener) {
+        HashSet<PacketListenerAbstract> listenerSet = listenersMap.get(listener.getPriority().getId());
+        if (listenerSet == null) return;
+        listenerSet.remove(listener);
+    }
 
-    public void unregisterListeners(PacketListenerAbstract... listenerAbstract) {
-        for (PacketListenerAbstract listener : listenerAbstract) {
-            unregisterListeners(listener.getPriority(), listener);
+    public void unregisterListeners(PacketListenerAbstract... listeners) {
+        for (PacketListenerAbstract listener : listeners) {
+            unregisterListener(listener);
         }
     }
-
-    public void unregisterListeners(PacketListenerPriority priority, PacketListenerAbstract... listenerAbstracts) {
-        HashSet<PacketListenerAbstract> abstractSet =  listenersMap.get(priority.getId());
-        if (abstractSet == null) return;
-        Arrays.asList(listenerAbstracts).forEach(abstractSet::remove);
-    }
-
 
 
     /**
