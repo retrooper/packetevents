@@ -57,19 +57,23 @@ public class WrapperPlayServerEntityTeleport extends PacketWrapper<WrapperPlaySe
 
     @Override
     public void readData() {
-        if (serverVersion == ServerVersion.V_1_7_10) {
-             entityID = readInt();
-            position = new Vector3d((readInt() / 32.0), (readInt() / 32.0), (readInt() / 32.0));
-            yaw = readByte() / ROTATION_FACTOR;
-            pitch = readByte() / ROTATION_FACTOR;
-            onGround = false;
-        } else {
+        if (serverVersion == ServerVersion.V_1_7_10)
+            entityID = readInt();
+        else
             entityID = readVarInt();
+
+        if (serverVersion.isOlderThanOrEquals(ServerVersion.V_1_8_8)) {
+            position = new Vector3d((readInt() / 32.0), (readInt() / 32.0), (readInt() / 32.0));
+        } else {
             position = new Vector3d(readDouble(), readDouble(), readDouble());
-            yaw = readByte() / ROTATION_FACTOR;
-            pitch = readByte() / ROTATION_FACTOR;
-            onGround = readBoolean();
         }
+
+        yaw = readByte() / ROTATION_FACTOR;
+        pitch = readByte() / ROTATION_FACTOR;
+        if (serverVersion != ServerVersion.V_1_7_10)
+            onGround = readBoolean();
+        else
+            onGround = false;
     }
 
     @Override
@@ -83,22 +87,23 @@ public class WrapperPlayServerEntityTeleport extends PacketWrapper<WrapperPlaySe
 
     @Override
     public void writeData() {
-        if (serverVersion == ServerVersion.V_1_7_10) {
+        if (serverVersion == ServerVersion.V_1_7_10)
             writeInt(entityID);
+        else
+            writeVarInt(entityID);
+        if (serverVersion.isOlderThanOrEquals(ServerVersion.V_1_8_8)) {
             writeInt(MathUtil.floor(position.x * 32.0));
             writeInt(MathUtil.floor(position.y * 32.0));
             writeInt(MathUtil.floor(position.z * 32.0));
-            writeByte((int) (yaw * ROTATION_FACTOR));
-            writeByte((int) (pitch * ROTATION_FACTOR));
         } else {
-            writeVarInt(entityID);
             writeDouble(position.x);
             writeDouble(position.y);
             writeDouble(position.z);
-            writeByte((int) (yaw * ROTATION_FACTOR));
-            writeByte((int) (pitch * ROTATION_FACTOR));
-            writeBoolean(onGround);
         }
+        writeByte((int) (yaw * ROTATION_FACTOR));
+        writeByte((int) (pitch * ROTATION_FACTOR));
+        if (serverVersion != ServerVersion.V_1_7_10)
+            writeBoolean(onGround);
     }
 
     public int getEntityId() {
