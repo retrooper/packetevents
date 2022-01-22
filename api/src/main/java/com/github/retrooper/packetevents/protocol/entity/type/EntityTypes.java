@@ -124,7 +124,7 @@ public class EntityTypes {
         }
         return false;
     }
-
+    //with minecraft:key
     public static EntityType getByName(String name) {
         return ENTITY_TYPE_MAP.get(name);
     }

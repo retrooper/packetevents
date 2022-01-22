@@ -49,6 +49,15 @@ public class ResourceLocation {
     }
 
     @Override
+    public boolean equals(Object obj) {
+        if (obj instanceof ResourceLocation) {
+            ResourceLocation other = (ResourceLocation) obj;
+            return other.namespace.equals(namespace) && other.key.equals(key);
+        }
+        return false;
+    }
+
+    @Override
     public String toString() {
         return namespace + ":" + key;
     }

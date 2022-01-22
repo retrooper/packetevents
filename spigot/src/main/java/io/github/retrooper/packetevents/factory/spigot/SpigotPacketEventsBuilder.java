@@ -142,7 +142,6 @@ public class SpigotPacketEventsBuilder {
                     if (settings.isbStatsEnabled()) {
                         Metrics metrics = new Metrics((JavaPlugin) plugin, 11327);
                         //Just to have an idea what versions of packetevents people use
-                        //TODO Drilldown pie soon_tm
                         metrics.addCustomChart(new Metrics.SimplePie("packetevents_version", () -> {
                             return getVersion().toString() + "-beta";//TODO Cut off "-beta" once 2.0 releases
                         }));

@@ -227,7 +227,6 @@ public class EarlyChannelInjectorModern implements EarlyInjector {
     }
 
     private PacketDecoderModern getDecoder(ChannelAbstract ch) {
-        //TODO Adjust legacy modern early injector
         Channel channel = (Channel) ch.rawChannel();
         ChannelHandler decoder = channel.pipeline().get(PacketEvents.DECODER_NAME);
         if (decoder != null) {
