@@ -30,6 +30,10 @@ public class Particle {
         this.data = data;
     }
 
+    public Particle(ParticleType type) {
+        this(type, new ParticleData());
+    }
+
     public ParticleType getType() {
         return type;
     }

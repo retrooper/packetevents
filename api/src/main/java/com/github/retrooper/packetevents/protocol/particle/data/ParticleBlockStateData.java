@@ -51,10 +51,10 @@ public class ParticleBlockStateData extends ParticleData {
 
     public static void write(PacketWrapper<?> wrapper, ParticleBlockStateData data) {
         if (wrapper.getServerVersion().isNewerThanOrEquals(ServerVersion.V_1_9)) {
-            wrapper.writeVarInt(data.blockState.getGlobalId());
+            wrapper.writeVarInt(data.getBlockState().getGlobalId());
         }
         else {
-            wrapper.writeInt(data.blockState.getGlobalId());
+            wrapper.writeInt(data.getBlockState().getGlobalId());
         }
     }
 

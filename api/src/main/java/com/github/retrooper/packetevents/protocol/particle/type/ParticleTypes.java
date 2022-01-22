@@ -20,14 +20,18 @@ package com.github.retrooper.packetevents.protocol.particle.type;
 
 import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
+import com.github.retrooper.packetevents.protocol.particle.data.*;
 import com.github.retrooper.packetevents.resources.ResourceLocation;
 import com.github.retrooper.packetevents.util.MappingHelper;
+import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.function.BiConsumer;
+import java.util.function.Function;
 
 public class ParticleTypes {
     private static final Map<String, ParticleType> PARTICLE_TYPE_MAP = new HashMap<>();
@@ -37,31 +41,24 @@ public class ParticleTypes {
     private static ServerVersion getMappingsVersion(ServerVersion serverVersion) {
         if (serverVersion.isOlderThan(ServerVersion.V_1_13_2)) {
             return ServerVersion.V_1_13;
-        }
-        else if (serverVersion.isOlderThan(ServerVersion.V_1_14)) {
+        } else if (serverVersion.isOlderThan(ServerVersion.V_1_14)) {
             return ServerVersion.V_1_13_2;
-        }
-        else if (serverVersion.isOlderThan(ServerVersion.V_1_15)) {
+        } else if (serverVersion.isOlderThan(ServerVersion.V_1_15)) {
             return ServerVersion.V_1_14;
-        }
-        else if (serverVersion.isOlderThan(ServerVersion.V_1_16)) {
+        } else if (serverVersion.isOlderThan(ServerVersion.V_1_16)) {
             return ServerVersion.V_1_15;
-        }
-        else if (serverVersion.isOlderThan(ServerVersion.V_1_16_2)) {
+        } else if (serverVersion.isOlderThan(ServerVersion.V_1_16_2)) {
             return ServerVersion.V_1_16;
-        }
-        else if (serverVersion.isOlderThan(ServerVersion.V_1_17)) {
+        } else if (serverVersion.isOlderThan(ServerVersion.V_1_17)) {
             return ServerVersion.V_1_16_2;
-        }
-        else if (serverVersion.isOlderThan(ServerVersion.V_1_18)) {
+        } else if (serverVersion.isOlderThan(ServerVersion.V_1_18)) {
             return ServerVersion.V_1_17;
-        }
-        else {
+        } else {
             return ServerVersion.V_1_18;
         }
     }
 
-    public static ParticleType define(String key) {
+    public static ParticleType define(String key, Function<PacketWrapper<?>, ParticleData> readDataFunction, BiConsumer<PacketWrapper<?>, ParticleData> writeDataFunction) {
         if (MAPPINGS == null) {
             MAPPINGS = MappingHelper.getJSONObject("particle/particle_type_mappings");
         }
@@ -84,8 +81,7 @@ public class ParticleTypes {
                 }
                 index++;
             }
-        }
-        else {
+        } else {
             throw new IllegalStateException("Failed to find ParticleType mappings for the " + mappingsVersion.name() + " mappings version!");
         }
 
@@ -102,6 +98,16 @@ public class ParticleTypes {
             }
 
             @Override
+            public Function<PacketWrapper<?>, ParticleData> readDataFunction() {
+                return readDataFunction;
+            }
+
+            @Override
+            public BiConsumer<PacketWrapper<?>, ParticleData> writeDataFunction() {
+                return writeDataFunction;
+            }
+
+            @Override
             public boolean equals(Object obj) {
                 if (obj instanceof ParticleType) {
                     return ((ParticleType) obj).getId() == getId();
@@ -115,6 +121,19 @@ public class ParticleTypes {
         return particleType;
     }
 
+    public static ParticleType define(String key) {
+        //Define the particle type with empty functions
+        return define(key, wrapper -> {
+            //Empty particle data
+            return new ParticleData();
+        }, new BiConsumer<PacketWrapper<?>, ParticleData>() {
+            @Override
+            public void accept(PacketWrapper<?> wrapper, ParticleData data) {
+                //By default don't write any particle data
+            }
+        });
+    }
+
     //with minecraft:key
     public static ParticleType getByName(String name) {
         return PARTICLE_TYPE_MAP.get(name);
@@ -126,8 +145,8 @@ public class ParticleTypes {
 
     public static final ParticleType AMBIENT_ENTITY_EFFECT = define("ambient_entity_effect");
     public static final ParticleType ANGRY_VILLAGER = define("angry_villager");
-    public static final ParticleType BLOCK = define("block");
-    public static final ParticleType BLOCK_MARKER = define("block_marker");
+    public static final ParticleType BLOCK = define("block", ParticleBlockStateData::read, (wrapper, data) -> ParticleBlockStateData.write(wrapper, (ParticleBlockStateData)data));
+    public static final ParticleType BLOCK_MARKER = define("block_marker", ParticleBlockStateData::read, (wrapper, data) -> ParticleBlockStateData.write(wrapper, (ParticleBlockStateData)data));
     public static final ParticleType BUBBLE = define("bubble");
     public static final ParticleType CLOUD = define("cloud");
     public static final ParticleType CRIT = define("crit");
@@ -138,8 +157,8 @@ public class ParticleTypes {
     public static final ParticleType LANDING_LAVA = define("landing_lava");
     public static final ParticleType DRIPPING_WATER = define("dripping_water");
     public static final ParticleType FALLING_WATER = define("falling_water");
-    public static final ParticleType DUST = define("dust");
-    public static final ParticleType DUST_COLOR_TRANSITION = define("dust_color_transition");
+    public static final ParticleType DUST = define("dust", ParticleDustData::read, (wrapper, data) -> ParticleDustData.write(wrapper, (ParticleDustData) data));
+    public static final ParticleType DUST_COLOR_TRANSITION = define("dust_color_transition", ParticleDustColorTransitionData::read, (wrapper, data) -> ParticleDustColorTransitionData.write(wrapper, (ParticleDustColorTransitionData) data));
     public static final ParticleType EFFECT = define("effect");
     public static final ParticleType ELDER_GUARDIAN = define("elder_guardian");
     public static final ParticleType ENCHANTED_HIT = define("enchanted_hit");
@@ -148,7 +167,7 @@ public class ParticleTypes {
     public static final ParticleType ENTITY_EFFECT = define("entity_effect");
     public static final ParticleType EXPLOSION_EMITTER = define("explosion_emitter");
     public static final ParticleType EXPLOSION = define("explosion");
-    public static final ParticleType FALLING_DUST = define("falling_dust");
+    public static final ParticleType FALLING_DUST = define("falling_dust", ParticleBlockStateData::read, (wrapper, data) -> ParticleBlockStateData.write(wrapper, (ParticleBlockStateData)data));
     public static final ParticleType FIREWORK = define("firework");
     public static final ParticleType FISHING = define("fishing");
     public static final ParticleType FLAME = define("flame");
@@ -159,8 +178,8 @@ public class ParticleTypes {
     public static final ParticleType COMPOSTER = define("composter");
     public static final ParticleType HEART = define("heart");
     public static final ParticleType INSTANT_EFFECT = define("instant_effect");
-    public static final ParticleType ITEM = define("item");
-    public static final ParticleType VIBRATION = define("vibration");
+    public static final ParticleType ITEM = define("item", ParticleItemStackData::read, (wrapper, data) -> ParticleItemStackData.write(wrapper, (ParticleItemStackData) data));
+    public static final ParticleType VIBRATION = define("vibration", ParticleVibrationData::read, (wrapper, data) -> ParticleVibrationData.write(wrapper, (ParticleVibrationData) data));
     public static final ParticleType ITEM_SLIME = define("item_slime");
     public static final ParticleType ITEM_SNOWBALL = define("item_snowball");
     public static final ParticleType LARGE_SMOKE = define("large_smoke");

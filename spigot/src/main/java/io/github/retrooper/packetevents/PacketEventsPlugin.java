@@ -24,17 +24,21 @@ import com.github.retrooper.packetevents.event.PacketListenerPriority;
 import com.github.retrooper.packetevents.event.impl.PacketReceiveEvent;
 import com.github.retrooper.packetevents.event.impl.PacketSendEvent;
 import com.github.retrooper.packetevents.manager.npc.NPC;
-import com.github.retrooper.packetevents.netty.channel.ChannelAbstract;
 import com.github.retrooper.packetevents.protocol.item.ItemStack;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
+import com.github.retrooper.packetevents.protocol.particle.Particle;
+import com.github.retrooper.packetevents.protocol.particle.type.ParticleTypes;
 import com.github.retrooper.packetevents.protocol.player.GameProfile;
 import com.github.retrooper.packetevents.protocol.player.TextureProperty;
 import com.github.retrooper.packetevents.protocol.world.Location;
 import com.github.retrooper.packetevents.util.MojangAPIUtil;
+import com.github.retrooper.packetevents.util.Vector3d;
+import com.github.retrooper.packetevents.util.Vector3f;
 import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientChatMessage;
-import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerChatMessage;
+import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerParticle;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerSetSlot;
 import io.github.retrooper.packetevents.factory.spigot.SpigotPacketEventsBuilder;
+import io.github.retrooper.packetevents.utils.SpigotDataHelper;
 import io.github.retrooper.packetevents.utils.SpigotReflectionUtil;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -66,7 +70,15 @@ public class PacketEventsPlugin extends JavaPlugin {
                     WrapperPlayClientChatMessage chatMessage = new WrapperPlayClientChatMessage(event);
                     String msg = chatMessage.getMessage();
                     String[] sp = msg.split(" ");
-                    if (sp[0].equalsIgnoreCase("plzspawn")) {
+                    if (sp[0].equalsIgnoreCase("plzparticles")) {
+                        Vector3f rgb = new Vector3f(0.3f, 0.0f, 0.6f);
+                        Particle particle = new Particle(ParticleTypes.ANGRY_VILLAGER);
+                        Vector3d position = SpigotDataHelper.fromBukkitLocation(player.getLocation()).getPosition().add(0, 2, 0);
+                        WrapperPlayServerParticle particlePacket
+                                = new WrapperPlayServerParticle(particle, true, position,
+                                new Vector3f(0.4f, 0.4f, 0.4f), 0, 25);
+                        PacketEvents.getAPI().getPlayerManager().sendPacket(player, particlePacket);
+                    } else if (sp[0].equalsIgnoreCase("plzspawn")) {
                         String name = sp[1];
                         UUID uuid = MojangAPIUtil.requestPlayerUUID(name);
                         player.sendMessage("Spawning " + name + " with UUID " + uuid.toString());
@@ -105,17 +117,11 @@ public class PacketEventsPlugin extends JavaPlugin {
                     int slot = setSlot.getSlot();
                     ItemStack item = setSlot.getItem();
                     player.sendMessage("Set slot with window ID: " + windowID + ", slot: " + slot + ", item: " + (item.getType() != null ? item.toString() : "null item"));
-                } else if (event.getPacketType() == PacketType.Play.Server.ENTITY_TELEPORT) {
-                    System.out.println("teleporot!");
-                    final ChannelAbstract channel = event.getChannel();
-                    event.getPostTasks().add(() -> {
-                        WrapperPlayServerChatMessage cm = new WrapperPlayServerChatMessage(Component.text("2.0 processed spawn pig it in a post task"),
-                                WrapperPlayServerChatMessage.ChatPosition.CHAT);
-                        PacketEvents.getAPI().getPlayerManager().sendPacket(channel, cm);
-                    });
                 }
             }
         };
+
+        // net.minecraft.server.v1_7_R4.PacketPlayOutWorldParticles w1;
         //PacketEvents.getAPI().getEventManager().registerListener(debugListener);
     }
 

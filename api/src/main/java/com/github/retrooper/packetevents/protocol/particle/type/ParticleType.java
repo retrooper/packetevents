@@ -19,6 +19,15 @@
 package com.github.retrooper.packetevents.protocol.particle.type;
 
 import com.github.retrooper.packetevents.protocol.mapper.MappedEntity;
+import com.github.retrooper.packetevents.protocol.particle.data.ParticleData;
+import com.github.retrooper.packetevents.wrapper.PacketWrapper;
+
+import java.util.function.BiConsumer;
+import java.util.function.Consumer;
+import java.util.function.Function;
 
 public interface ParticleType extends MappedEntity {
+    Function<PacketWrapper<?>, ParticleData> readDataFunction();
+
+    BiConsumer<PacketWrapper<?>, ParticleData> writeDataFunction();
 }
