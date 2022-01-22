@@ -83,22 +83,23 @@ public class WrapperPlayServerEntityTeleport extends PacketWrapper<WrapperPlaySe
 
     @Override
     public void writeData() {
-        if (serverVersion == ServerVersion.V_1_7_10) {
+        if (serverVersion == ServerVersion.V_1_7_10)
             writeInt(entityID);
+        else
+            writeVarInt(entityID);
+        if (serverVersion.isOlderThanOrEquals(ServerVersion.V_1_8_8)) {
             writeInt(MathUtil.floor(position.x * 32.0));
             writeInt(MathUtil.floor(position.y * 32.0));
             writeInt(MathUtil.floor(position.z * 32.0));
-            writeByte((int) (yaw * ROTATION_FACTOR));
-            writeByte((int) (pitch * ROTATION_FACTOR));
         } else {
-            writeVarInt(entityID);
             writeDouble(position.x);
             writeDouble(position.y);
             writeDouble(position.z);
-            writeByte((int) (yaw * ROTATION_FACTOR));
-            writeByte((int) (pitch * ROTATION_FACTOR));
-            writeBoolean(onGround);
         }
+        writeByte((int) (yaw * ROTATION_FACTOR));
+        writeByte((int) (pitch * ROTATION_FACTOR));
+        if (serverVersion != ServerVersion.V_1_7_10)
+            writeBoolean(onGround);
     }
 
     public int getEntityId() {
