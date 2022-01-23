@@ -20,6 +20,7 @@ package com.github.retrooper.packetevents.wrapper.play.server;
 
 import com.github.retrooper.packetevents.event.impl.PacketSendEvent;
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
+import com.github.retrooper.packetevents.protocol.chat.ChatPosition;
 import com.github.retrooper.packetevents.util.AdventureSerializer;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.protocol.player.ClientVersion;
@@ -75,7 +76,7 @@ public class WrapperPlayServerChatMessage extends PacketWrapper<WrapperPlayServe
         //Is the server 1.8+ or is the client 1.8+? 1.7.10 servers support 1.8 clients, and send the chat position.
         if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_8) || clientVersion.isNewerThanOrEquals(ClientVersion.V_1_8)) {
             byte positionIndex = readByte();
-            position = ChatPosition.VALUES[positionIndex];
+            position = ChatPosition.getById(positionIndex);
         } else {
             //Always chat in 1.7.10 protocol.
             position = ChatPosition.CHAT;
@@ -105,7 +106,7 @@ public class WrapperPlayServerChatMessage extends PacketWrapper<WrapperPlayServe
 
         //Is the server 1.8+ or is the client 1.8+? (1.7.10 servers support 1.8 clients, and send the chat position for 1.8 clients)
         if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_8) || clientVersion.isNewerThanOrEquals(ClientVersion.V_1_8)) {
-            writeByte(position.ordinal());
+            writeByte(position.getId());
         }
 
         if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_16)) {
@@ -143,11 +144,5 @@ public class WrapperPlayServerChatMessage extends PacketWrapper<WrapperPlayServe
 
     public void setSenderUUID(UUID senderUUID) {
         this.senderUUID = senderUUID;
-    }
-
-    public enum ChatPosition {
-        CHAT, SYSTEM_MESSAGE, GAME_INFO;
-
-        public static final ChatPosition[] VALUES = values();
     }
 }

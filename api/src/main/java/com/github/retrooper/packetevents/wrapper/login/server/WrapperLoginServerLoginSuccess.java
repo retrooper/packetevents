@@ -21,7 +21,7 @@ package com.github.retrooper.packetevents.wrapper.login.server;
 import com.github.retrooper.packetevents.protocol.ConnectionState;
 import com.github.retrooper.packetevents.event.impl.PacketSendEvent;
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
-import com.github.retrooper.packetevents.protocol.player.GameProfile;
+import com.github.retrooper.packetevents.protocol.player.UserProfile;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 
@@ -31,7 +31,7 @@ import java.util.UUID;
  * This packet switches the connection state to {@link ConnectionState#PLAY}.
  */
 public class WrapperLoginServerLoginSuccess extends PacketWrapper<WrapperLoginServerLoginSuccess> {
-    private GameProfile gameProfile;
+    private UserProfile userProfile;
 
     public WrapperLoginServerLoginSuccess(PacketSendEvent event) {
         super(event);
@@ -39,12 +39,12 @@ public class WrapperLoginServerLoginSuccess extends PacketWrapper<WrapperLoginSe
 
     public WrapperLoginServerLoginSuccess(UUID uuid, String username) {
         super(PacketType.Login.Server.LOGIN_SUCCESS);
-        this.gameProfile = new GameProfile(uuid, username);
+        this.userProfile = new UserProfile(uuid, username);
     }
 
-    public WrapperLoginServerLoginSuccess(GameProfile gameProfile) {
+    public WrapperLoginServerLoginSuccess(UserProfile userProfile) {
         super(PacketType.Login.Server.LOGIN_SUCCESS);
-        this.gameProfile = gameProfile;
+        this.userProfile = userProfile;
     }
 
     public static int[] serializeUUID(UUID uuid) {
@@ -66,36 +66,36 @@ public class WrapperLoginServerLoginSuccess extends PacketWrapper<WrapperLoginSe
             uuid = UUID.fromString(readString(36));
         }
         String username = readString(16);
-        this.gameProfile = new GameProfile(uuid, username);
+        this.userProfile = new UserProfile(uuid, username);
     }
 
     @Override
     public void readData(WrapperLoginServerLoginSuccess wrapper) {
-        this.gameProfile = wrapper.gameProfile;
+        this.userProfile = wrapper.userProfile;
     }
 
     @Override
     public void writeData() {
         if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_16)) {
-            int[] data = serializeUUID(gameProfile.getId());
+            int[] data = serializeUUID(userProfile.getUUID());
             for (int i = 0; i < 4; i++) {
                 writeInt(data[i]);
             }
         } else {
-            writeString(gameProfile.getId().toString(), 36);
+            writeString(userProfile.getUUID().toString(), 36);
         }
-        writeString(gameProfile.getName(), 16);
+        writeString(userProfile.getName(), 16);
     }
 
     private UUID deserializeUUID(int[] data) {
         return new UUID((long) data[0] << 32 | data[1] & 4294967295L, (long) data[2] << 32 | data[3] & 4294967295L);
     }
 
-    public GameProfile getGameProfile() {
-        return gameProfile;
+    public UserProfile getUser() {
+        return userProfile;
     }
 
-    public void setGameProfile(GameProfile gameProfile) {
-        this.gameProfile = gameProfile;
+    public void setUser(UserProfile userProfile) {
+        this.userProfile = userProfile;
     }
 }

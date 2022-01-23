@@ -23,7 +23,8 @@ import com.github.retrooper.packetevents.event.PacketListener;
 import com.github.retrooper.packetevents.event.impl.PacketReceiveEvent;
 import com.github.retrooper.packetevents.event.impl.PacketSendEvent;
 import com.github.retrooper.packetevents.protocol.ConnectionState;
-import com.github.retrooper.packetevents.protocol.player.GameProfile;
+import com.github.retrooper.packetevents.protocol.player.User;
+import com.github.retrooper.packetevents.protocol.player.UserProfile;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 import com.github.retrooper.packetevents.wrapper.handshaking.client.WrapperHandshakingClientHandshake;
@@ -38,9 +39,10 @@ public class InternalPacketListener implements PacketListener {
             //Process outgoing login success packet
             WrapperLoginServerLoginSuccess loginSuccess = new WrapperLoginServerLoginSuccess(event);
             //Store game profile
-            GameProfile profile = loginSuccess.getGameProfile();
-            PacketEvents.getAPI().getPlayerManager().setGameProfile(event.getChannel(), profile);
-            PacketEvents.getAPI().getLogManager().debug("Set game profile for player " + profile.getName());
+            UserProfile profile = loginSuccess.getUser();
+            User user = new User(event.getChannel(), profile);
+            PacketEvents.getAPI().getPlayerManager().setUser(event.getChannel(), user);
+            PacketEvents.getAPI().getLogManager().debug("Set user(profile) for player " + profile.getName());
             //Transition into the PLAY connection state
             PacketEvents.getAPI().getPlayerManager().changeConnectionState(event.getChannel(), ConnectionState.PLAY);
         }

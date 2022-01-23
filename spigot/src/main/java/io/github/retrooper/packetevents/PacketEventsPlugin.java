@@ -28,8 +28,8 @@ import com.github.retrooper.packetevents.protocol.item.ItemStack;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.protocol.particle.Particle;
 import com.github.retrooper.packetevents.protocol.particle.type.ParticleTypes;
-import com.github.retrooper.packetevents.protocol.player.GameProfile;
 import com.github.retrooper.packetevents.protocol.player.TextureProperty;
+import com.github.retrooper.packetevents.protocol.player.UserProfile;
 import com.github.retrooper.packetevents.protocol.world.Location;
 import com.github.retrooper.packetevents.util.MojangAPIUtil;
 import com.github.retrooper.packetevents.util.Vector3d;
@@ -88,7 +88,7 @@ public class PacketEventsPlugin extends JavaPlugin {
                                     UUID uuid = MojangAPIUtil.requestPlayerUUID(name);
                                     player.sendMessage("Spawning " + name + " with UUID " + uuid.toString());
                                     List<TextureProperty> textureProperties = MojangAPIUtil.requestPlayerTextureProperties(uuid);
-                                    GameProfile profile = new GameProfile(uuid, name, textureProperties);
+                                    UserProfile profile = new UserProfile(uuid, name, textureProperties);
                                     Component nameTag = Component.text("Doggy").color(NamedTextColor.GOLD).asComponent();
                                     NPC npc = new NPC(profile, SpigotReflectionUtil.generateEntityId(), null,
                                             NamedTextColor.GOLD,
@@ -123,7 +123,6 @@ public class PacketEventsPlugin extends JavaPlugin {
                                     player.sendMessage("position: " + location.getPosition());
                                 }
                                 //System.out.println("Player flying position: " + flying.hasPositionChanged() + ", rotation: " + flying.hasRotationChanged());
-                                event.setLastUsedWrapper(null);
                                 break;
                         }
                     }
@@ -133,6 +132,7 @@ public class PacketEventsPlugin extends JavaPlugin {
             @Override
             public void onPacketSend(PacketSendEvent event) {
                 Player player = event.getPlayer() == null ? null : (Player) event.getPlayer();
+                player.showDemoScreen();
                 if (event.getPacketType() == PacketType.Play.Server.SET_SLOT) {
                     WrapperPlayServerSetSlot setSlot = new WrapperPlayServerSetSlot(event);
                     int windowID = setSlot.getWindowId();

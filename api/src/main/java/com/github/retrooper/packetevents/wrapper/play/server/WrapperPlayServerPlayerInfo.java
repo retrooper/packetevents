@@ -22,7 +22,7 @@ import com.github.retrooper.packetevents.event.impl.PacketSendEvent;
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.protocol.player.GameMode;
-import com.github.retrooper.packetevents.protocol.player.GameProfile;
+import com.github.retrooper.packetevents.protocol.player.UserProfile;
 import com.github.retrooper.packetevents.protocol.player.TextureProperty;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 import net.kyori.adventure.text.Component;
@@ -102,38 +102,38 @@ public class WrapperPlayServerPlayerInfo extends PacketWrapper<WrapperPlayServer
                 switch (action) {
                     case ADD_PLAYER: {
                         String playerUsername = readString(16);
-                        GameProfile gameProfile = new GameProfile(uuid, playerUsername);
+                        UserProfile userProfile = new UserProfile(uuid, playerUsername);
                         int propertyCount = readVarInt();
                         for (int j = 0; j < propertyCount; j++) {
                             String propertyName = readString();
                             String propertyValue = readString();
                             String propertySignature = readBoolean() ? readString() : null;
                             TextureProperty textureProperty = new TextureProperty(propertyName, propertyValue, propertySignature);
-                            gameProfile.getTextureProperties().add(textureProperty);
+                            userProfile.getTextureProperties().add(textureProperty);
                         }
                         GameMode gameMode = GameMode.values()[readVarInt()];
                         int ping = readVarInt();
                         Component displayName = readBoolean() ? readComponent() : null;
-                        data = new PlayerData(displayName, gameProfile, gameMode, ping);
+                        data = new PlayerData(displayName, userProfile, gameMode, ping);
                         break;
                     }
                     case UPDATE_GAME_MODE: {
                         GameMode gameMode = GameMode.values()[readVarInt()];
-                        data = new PlayerData((Component) null, new GameProfile(uuid, null), gameMode, -1);
+                        data = new PlayerData((Component) null, new UserProfile(uuid, null), gameMode, -1);
                         break;
                     }
                     case UPDATE_LATENCY: {
                         int ping = readVarInt();
-                        data = new PlayerData((Component) null, new GameProfile(uuid, null), null, ping);
+                        data = new PlayerData((Component) null, new UserProfile(uuid, null), null, ping);
                         break;
                     }
                     case UPDATE_DISPLAY_NAME:
                         Component displayName = readBoolean() ? readComponent() : null;
-                        data = new PlayerData(displayName, new GameProfile(uuid, null), null, -1);
+                        data = new PlayerData(displayName, new UserProfile(uuid, null), null, -1);
                         break;
 
                     case REMOVE_PLAYER:
-                        data = new PlayerData((Component) null, new GameProfile(uuid, null), null, -1);
+                        data = new PlayerData((Component) null, new UserProfile(uuid, null), null, -1);
                         break;
                 }
                 if (data != null) {
@@ -163,12 +163,12 @@ public class WrapperPlayServerPlayerInfo extends PacketWrapper<WrapperPlayServer
             writeVarInt(action.ordinal());
             writeVarInt(playerDataList.size());
             for (PlayerData data : playerDataList) {
-                writeUUID(data.gameProfile.getId());
+                writeUUID(data.userProfile.getUUID());
                 switch (action) {
                     case ADD_PLAYER: {
-                        writeString(data.gameProfile.getName(), 16);
-                        writeVarInt(data.gameProfile.getTextureProperties().size());
-                        for (TextureProperty textureProperty : data.gameProfile.getTextureProperties()) {
+                        writeString(data.userProfile.getName(), 16);
+                        writeVarInt(data.userProfile.getTextureProperties().size());
+                        for (TextureProperty textureProperty : data.userProfile.getTextureProperties()) {
                             writeString(textureProperty.getName());
                             writeString(textureProperty.getValue());
                             boolean hasSignature = textureProperty.getSignature() != null;
@@ -233,26 +233,26 @@ public class WrapperPlayServerPlayerInfo extends PacketWrapper<WrapperPlayServer
         @Nullable
         private Component displayName;
         @Nullable
-        private GameProfile gameProfile;
+        private UserProfile userProfile;
         @Nullable
         private GameMode gameMode;
 
         private int ping;
 
-        public PlayerData(@Nullable Component displayName, @Nullable GameProfile gameProfile, @Nullable GameMode gameMode, int ping) {
+        public PlayerData(@Nullable Component displayName, @Nullable UserProfile userProfile, @Nullable GameMode gameMode, int ping) {
             this.displayName = displayName;
-            this.gameProfile = gameProfile;
+            this.userProfile = userProfile;
             this.gameMode = gameMode;
             this.ping = ping;
         }
 
         @Nullable
-        public GameProfile getGameProfile() {
-            return gameProfile;
+        public UserProfile getUser() {
+            return userProfile;
         }
 
-        public void setGameProfile(@Nullable GameProfile gameProfile) {
-            this.gameProfile = gameProfile;
+        public void setUser(@Nullable UserProfile userProfile) {
+            this.userProfile = userProfile;
         }
 
         @Nullable

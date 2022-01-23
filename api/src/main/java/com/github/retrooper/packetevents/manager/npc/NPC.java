@@ -20,7 +20,7 @@ package com.github.retrooper.packetevents.manager.npc;
 
 import com.github.retrooper.packetevents.protocol.item.ItemStack;
 import com.github.retrooper.packetevents.protocol.player.GameMode;
-import com.github.retrooper.packetevents.protocol.player.GameProfile;
+import com.github.retrooper.packetevents.protocol.player.UserProfile;
 import com.github.retrooper.packetevents.protocol.world.Location;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerPlayerInfo;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerTeams;
@@ -32,7 +32,7 @@ import java.util.Optional;
 
 public class NPC {
     private final int id;
-    private final GameProfile profile;
+    private final UserProfile profile;
     private Component tabName;
     private NamedTextColor nameColor;
     private Component prefixName;
@@ -46,7 +46,7 @@ public class NPC {
     private ItemStack leggings = null;
     private ItemStack boots = null;
 
-    public NPC(GameProfile profile, int entityId, @Nullable Component tabName, @Nullable NamedTextColor nameColor,
+    public NPC(UserProfile profile, int entityId, @Nullable Component tabName, @Nullable NamedTextColor nameColor,
                @Nullable Component prefixName, @Nullable Component suffixName) {
         this.profile = profile;
         this.id = entityId;
@@ -57,11 +57,11 @@ public class NPC {
         this.suffixName = suffixName;
     }
 
-    public NPC(GameProfile profile, int entityId, @Nullable Component tabName) {
+    public NPC(UserProfile profile, int entityId, @Nullable Component tabName) {
         this(profile, entityId, tabName, null, null, null);
     }
 
-    public NPC(GameProfile profile, int entityId) {
+    public NPC(UserProfile profile, int entityId) {
         this(profile, entityId, null);
     }
 
@@ -153,7 +153,7 @@ public class NPC {
         return id;
     }
 
-    public GameProfile getProfile() {
+    public UserProfile getProfile() {
         return profile;
     }
 

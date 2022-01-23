@@ -43,7 +43,7 @@ public class NPCManager {
         PacketEvents.getAPI().getPlayerManager().sendPacket(channel, playerInfoPacket);
 
         //TODO Later if we want entity metadata, its not supported on newer server versions though(confirm if its mandatory on older versions)
-        WrapperPlayServerSpawnPlayer spawnPlayer = new WrapperPlayServerSpawnPlayer(npc.getId(), npc.getProfile().getId(), npc.getLocation());
+        WrapperPlayServerSpawnPlayer spawnPlayer = new WrapperPlayServerSpawnPlayer(npc.getId(), npc.getProfile().getUUID(), npc.getLocation());
         PacketEvents.getAPI().getPlayerManager().sendPacket(channel, spawnPlayer);
 
         //Create team
@@ -170,11 +170,11 @@ public class NPCManager {
                 PacketEvents.getAPI().getPlayerManager().sendPacket(channel, destroyEntities);
 
                 npc.getProfile().setTextureProperties(skinTextureProperties);
-                npc.getProfile().setId(skinUUID);
+                npc.getProfile().setUUID(skinUUID);
                 WrapperPlayServerPlayerInfo playerInfoAdd = new WrapperPlayServerPlayerInfo(WrapperPlayServerPlayerInfo.Action.ADD_PLAYER, npc.getPlayerInfoData());
                 PacketEvents.getAPI().getPlayerManager().sendPacket(channel, playerInfoAdd);
 
-                WrapperPlayServerSpawnPlayer spawnPlayer = new WrapperPlayServerSpawnPlayer(npc.getId(), npc.getProfile().getId(), npc.getLocation());
+                WrapperPlayServerSpawnPlayer spawnPlayer = new WrapperPlayServerSpawnPlayer(npc.getId(), npc.getProfile().getUUID(), npc.getLocation());
                 PacketEvents.getAPI().getPlayerManager().sendPacket(channel, spawnPlayer);
             }
         }

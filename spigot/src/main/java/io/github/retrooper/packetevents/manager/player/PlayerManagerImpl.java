@@ -24,7 +24,8 @@ import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.netty.buffer.ByteBufAbstract;
 import com.github.retrooper.packetevents.netty.channel.ChannelAbstract;
 import com.github.retrooper.packetevents.protocol.player.ClientVersion;
-import com.github.retrooper.packetevents.protocol.player.GameProfile;
+import com.github.retrooper.packetevents.protocol.player.User;
+import com.github.retrooper.packetevents.protocol.player.UserProfile;
 import io.github.retrooper.packetevents.utils.PlayerPingAccessorModern;
 import io.github.retrooper.packetevents.utils.SpigotReflectionUtil;
 import io.github.retrooper.packetevents.utils.dependencies.DependencyUtil;
@@ -32,6 +33,8 @@ import io.github.retrooper.packetevents.utils.dependencies.protocolsupport.Proto
 import io.github.retrooper.packetevents.utils.v1_7.SpigotVersionLookup_1_7;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
+
+import java.util.UUID;
 
 public class PlayerManagerImpl implements PlayerManager {
     @Override
@@ -121,10 +124,16 @@ public class PlayerManagerImpl implements PlayerManager {
     }
 
     @Override
-    public GameProfile getGameProfile(@NotNull Object player) {
+    public User getUser(@NotNull Object player) {
         Player p = (Player) player;
         ChannelAbstract channel = getChannel(p);
-        return getGameProfile(channel);
+        User user = getUser(channel);
+        if (user == null && channel != null) {
+            //TODO Extract texture properties and pass into user profile(not priority)
+            user = new User(channel, new UserProfile(p.getUniqueId(), p.getName()));
+            USERS.put(channel, user);
+        }
+        return user;
     }
 
     @Override

@@ -19,17 +19,14 @@
 package com.github.retrooper.packetevents.manager.player;
 
 import com.github.retrooper.packetevents.PacketEvents;
-import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.netty.buffer.ByteBufAbstract;
 import com.github.retrooper.packetevents.netty.channel.ChannelAbstract;
 import com.github.retrooper.packetevents.protocol.ConnectionState;
 import com.github.retrooper.packetevents.protocol.player.ClientVersion;
-import com.github.retrooper.packetevents.protocol.player.Equipment;
-import com.github.retrooper.packetevents.protocol.player.GameProfile;
+import com.github.retrooper.packetevents.protocol.player.User;
+import com.github.retrooper.packetevents.protocol.player.UserProfile;
 import com.github.retrooper.packetevents.util.PacketTransformationUtil;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
-import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerDestroyEntities;
-import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerEntityEquipment;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.HashMap;
@@ -44,7 +41,7 @@ public interface PlayerManager {
     Map<ChannelAbstract, ClientVersion> CLIENT_VERSIONS = new ConcurrentHashMap<>();
     Map<ChannelAbstract, ConnectionState> CONNECTION_STATES = new ConcurrentHashMap<>();
     Map<String, ChannelAbstract> CHANNELS = new ConcurrentHashMap<>();
-    Map<ChannelAbstract, GameProfile> GAME_PROFILES = new ConcurrentHashMap<>();
+    Map<ChannelAbstract, User> USERS = new ConcurrentHashMap<>();
     Map<UUID, Map<Class<? extends PlayerAttributeObject>, PlayerAttributeObject>> PLAYER_ATTRIBUTES = new ConcurrentHashMap<>();
 
     default <T extends PlayerAttributeObject> T getAttributeOrDefault(UUID uuid, Class<T> clazz, T defaultReturnValue) {
@@ -139,12 +136,12 @@ public interface PlayerManager {
         sendPacketSilently(channel, wrapper);
     }
 
-    default GameProfile getGameProfile(ChannelAbstract channel) {
-        return GAME_PROFILES.get(channel);
+    default User getUser(ChannelAbstract channel) {
+        return USERS.get(channel);
     }
 
-    default void setGameProfile(ChannelAbstract channel, GameProfile gameProfile) {
-        GAME_PROFILES.put(channel, gameProfile);
+    default void setUser(ChannelAbstract channel, User user) {
+        USERS.put(channel, user);
     }
 
     default ChannelAbstract getChannel(String username) {
@@ -166,7 +163,7 @@ public interface PlayerManager {
 
     ClientVersion getClientVersion(ChannelAbstract channel);
 
-    GameProfile getGameProfile(@NotNull Object player);
+    User getUser(@NotNull Object player);
 
     ChannelAbstract getChannel(@NotNull Object player);
 }

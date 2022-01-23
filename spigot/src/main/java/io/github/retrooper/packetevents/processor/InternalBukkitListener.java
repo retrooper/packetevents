@@ -22,7 +22,8 @@ import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.event.impl.PostPlayerInjectEvent;
 import com.github.retrooper.packetevents.netty.channel.ChannelAbstract;
 import com.github.retrooper.packetevents.protocol.ConnectionState;
-import com.github.retrooper.packetevents.protocol.player.GameProfile;
+import com.github.retrooper.packetevents.protocol.player.User;
+import com.github.retrooper.packetevents.protocol.player.UserProfile;
 import io.github.retrooper.packetevents.handlers.GlobalChannelInjector;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -50,15 +51,12 @@ public class InternalBukkitListener implements Listener {
 
         boolean injectEarly = injector.shouldInjectEarly();
         boolean shouldInject = !injectEarly || !injector.hasInjected(e.getPlayer());
+        //By accessing user with the player object, we ensure that a valid user is cached.
+        User user = PacketEvents.getAPI().getPlayerManager().getUser(player);
+
         //Inject now if we are using the compatibility-injector or inject if the early injector failed to inject them.
         if (shouldInject) {
-            //Late injection, we missed early packets to cache the game profile
-            GameProfile profile = PacketEvents.getAPI().getPlayerManager().getGameProfile(player);
-            if (profile == null) {
-                profile = new GameProfile(player.getUniqueId(), player.getName());
-                ChannelAbstract channel = PacketEvents.getAPI().getPlayerManager().getChannel(player);
-                PacketEvents.getAPI().getPlayerManager().setGameProfile(channel, profile);
-            }
+            //Late injection
             injector.injectPlayer(player, ConnectionState.PLAY);
         }
 
@@ -72,7 +70,7 @@ public class InternalBukkitListener implements Listener {
         //Cleanup user data
         PacketEvents.getAPI().getPlayerManager().CLIENT_VERSIONS.remove(channel);
         PacketEvents.getAPI().getPlayerManager().CONNECTION_STATES.remove(channel);
-        PacketEvents.getAPI().getPlayerManager().GAME_PROFILES.remove(channel);
+        PacketEvents.getAPI().getPlayerManager().USERS.remove(channel);
         PacketEvents.getAPI().getPlayerManager().CHANNELS.remove(player.getName());
         PacketEvents.getAPI().getPlayerManager().PLAYER_ATTRIBUTES.remove(player.getUniqueId());
     }

@@ -26,30 +26,29 @@ import java.util.*;
  * @author retrooper
  * @since 1.7
  */
-public class GameProfile {
-    private UUID id;
+public class UserProfile {
+    private UUID uuid;
     private String name;
     private List<TextureProperty> textureProperties;
 
-
-    public GameProfile(UUID id, String name) {
-        this.id = id;
+    public UserProfile(UUID uuid, String name) {
+        this.uuid = uuid;
         this.name = name;
         textureProperties = new ArrayList<>();
     }
 
-    public GameProfile(UUID id, String name, List<TextureProperty> textureProperties) {
-        this.id = id;
+    public UserProfile(UUID uuid, String name, List<TextureProperty> textureProperties) {
+        this.uuid = uuid;
         this.name = name;
         this.textureProperties = textureProperties;
     }
 
-    public UUID getId() {
-        return id;
+    public UUID getUUID() {
+        return uuid;
     }
 
-    public void setId(UUID id) {
-        this.id = id;
+    public void setUUID(UUID uuid) {
+        this.uuid = uuid;
     }
 
     public String getName() {
