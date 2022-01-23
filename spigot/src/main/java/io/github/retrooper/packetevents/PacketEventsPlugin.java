@@ -62,7 +62,7 @@ public class PacketEventsPlugin extends JavaPlugin {
         //Register your listeners
         PacketEvents.getAPI().init();
 
-        PacketEvents.getAPI().getSettings().debug(true).bStats(true);
+        PacketEvents.getAPI().getSettings().debug(false).bStats(true);
 
         PacketListenerAbstract debugListener = new PacketListenerAbstract(PacketListenerPriority.NORMAL, false) {
             @Override
@@ -143,7 +143,7 @@ public class PacketEventsPlugin extends JavaPlugin {
         };
 
         // net.minecraft.server.v1_7_R4.PacketPlayOutWorldParticles w1;
-        PacketEvents.getAPI().getEventManager().registerListener(debugListener);
+        //PacketEvents.getAPI().getEventManager().registerListener(debugListener);
     }
 
     @Override
