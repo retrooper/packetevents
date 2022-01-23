@@ -20,33 +20,22 @@ package com.github.retrooper.packetevents.wrapper.play.client;
 
 import com.github.retrooper.packetevents.event.impl.PacketReceiveEvent;
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
+import com.github.retrooper.packetevents.protocol.player.DiggingAction;
 import com.github.retrooper.packetevents.protocol.world.BlockFace;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.util.Vector3i;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 
 public class WrapperPlayClientPlayerDigging extends PacketWrapper<WrapperPlayClientPlayerDigging> {
-    private Action action;
+    private DiggingAction action;
     private Vector3i blockPosition;
     private BlockFace blockFace;
-
-    public enum Action {
-        START_DIGGING,
-        CANCELLED_DIGGING,
-        FINISHED_DIGGING,
-        DROP_ITEM_STACK,
-        DROP_ITEM,
-        RELEASE_USE_ITEM,
-        SWAP_ITEM_WITH_OFFHAND;
-
-        public static final Action[] VALUES = values();
-    }
 
     public WrapperPlayClientPlayerDigging(PacketReceiveEvent event) {
         super(event);
     }
 
-    public WrapperPlayClientPlayerDigging(Action action, Vector3i blockPosition, BlockFace blockFace) {
+    public WrapperPlayClientPlayerDigging(DiggingAction action, Vector3i blockPosition, BlockFace blockFace) {
         super(PacketType.Play.Client.PLAYER_DIGGING);
         this.action = action;
         this.blockPosition = blockPosition;
@@ -56,10 +45,10 @@ public class WrapperPlayClientPlayerDigging extends PacketWrapper<WrapperPlayCli
     @Override
     public void readData() {
         if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_8)) {
-            action = Action.VALUES[readVarInt()];
+            action = DiggingAction.getById(readVarInt());
             blockPosition = readBlockPosition();
         } else {
-            action = Action.VALUES[readByte()];
+            action = DiggingAction.getById(readByte());
             int x = readInt();
             int y = readUnsignedByte();
             int z = readInt();
@@ -79,10 +68,10 @@ public class WrapperPlayClientPlayerDigging extends PacketWrapper<WrapperPlayCli
     @Override
     public void writeData() {
         if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_8)) {
-            writeVarInt(action.ordinal());
+            writeVarInt(action.getId());
             writeBlockPosition(blockPosition);
         } else {
-            writeByte(action.ordinal());
+            writeByte(action.getId());
             writeInt(blockPosition.x);
             writeByte(blockPosition.y);
             writeInt(blockPosition.z);
@@ -90,11 +79,11 @@ public class WrapperPlayClientPlayerDigging extends PacketWrapper<WrapperPlayCli
         writeByte(blockFace.getFaceValue());
     }
 
-    public Action getAction() {
+    public DiggingAction getAction() {
         return action;
     }
 
-    public void setAction(Action action) {
+    public void setAction(DiggingAction action) {
         this.action = action;
     }
 

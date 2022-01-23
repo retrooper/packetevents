@@ -71,13 +71,13 @@ public class PacketEncoderLegacy extends MessageToByteEncoder {
     public void write(ChannelHandlerContext ctx, Object msg, ChannelPromise promise) throws Exception {
         if (!postTasks.isEmpty()) {
             List<Runnable> postTasks = new ArrayList<>(this.postTasks);
+            postTasks.clear();
             promise.addListener(f -> {
                 for (Runnable task : postTasks) {
                     task.run();
                 }
             });
         }
-        postTasks.clear();
         super.write(ctx, msg, promise);
     }
 
