@@ -88,7 +88,6 @@ public class WrapperPlayClientPlayerFlying extends PacketWrapper<WrapperPlayClie
             position.setX(x);
             position.setY(y);
             position.setZ(z);
-            System.out.println("Position allocated: " + position);
         }
         if (rotationChanged) {
             yaw = readFloat();
