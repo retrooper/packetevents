@@ -21,6 +21,7 @@ package io.github.retrooper.packetevents.handlers.modern.early;
 import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.netty.channel.ChannelAbstract;
 import com.github.retrooper.packetevents.protocol.ConnectionState;
+import com.github.retrooper.packetevents.protocol.player.User;
 import com.github.retrooper.packetevents.util.ListWrapper;
 import com.github.retrooper.packetevents.util.reflection.ClassUtil;
 import com.github.retrooper.packetevents.util.reflection.ReflectionObject;
@@ -196,6 +197,19 @@ public class EarlyChannelInjectorModern implements EarlyInjector {
         }
 
         injectedLists.clear();
+    }
+
+    @Override
+    public void updateUser(ChannelAbstract channel, User user) {
+        PacketEncoderModern encoder = getEncoder(channel);
+        if (encoder != null) {
+            encoder.user = user;
+        }
+
+        PacketDecoderModern decoder = getDecoder(channel);
+        if (decoder != null) {
+            decoder.user = user;
+        }
     }
 
     @Override

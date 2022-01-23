@@ -22,6 +22,7 @@ import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.event.impl.PacketSendEvent;
 import com.github.retrooper.packetevents.netty.buffer.ByteBufAbstract;
 import com.github.retrooper.packetevents.netty.channel.ChannelHandlerContextAbstract;
+import com.github.retrooper.packetevents.protocol.player.User;
 import io.github.retrooper.packetevents.handlers.compression.CustomPacketCompressor;
 import io.github.retrooper.packetevents.handlers.compression.CustomPacketDecompressor;
 import io.github.retrooper.packetevents.handlers.modern.early.CompressionManagerModern;
@@ -39,16 +40,21 @@ import java.util.List;
 
 @ChannelHandler.Sharable
 public class PacketEncoderModern extends MessageToByteEncoder<Object> {
+    public User user;
     public volatile Player player;
     public boolean handledCompression;
     public MessageToByteEncoder<?> mcEncoder;
     private List<Runnable> postTasks = new ArrayList<>();
 
+    public PacketEncoderModern(User user) {
+        this.user = user;
+    }
+
     public void handle(ChannelHandlerContextAbstract ctx, ByteBufAbstract byteBuf) {
         boolean needsCompress = handleCompressionOrder(ctx, byteBuf);
 
         int firstReaderIndex = byteBuf.readerIndex();
-        PacketSendEvent packetSendEvent = new PacketSendEvent(ctx.channel(), player, byteBuf);
+        PacketSendEvent packetSendEvent = new PacketSendEvent(ctx.channel(), user, player, byteBuf);
         int readerIndex = byteBuf.readerIndex();
         PacketEvents.getAPI().getEventManager().callEvent(packetSendEvent, () -> {
             byteBuf.readerIndex(readerIndex);

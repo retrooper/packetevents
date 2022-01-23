@@ -27,30 +27,34 @@ import com.github.retrooper.packetevents.protocol.ConnectionState;
 import com.github.retrooper.packetevents.protocol.PacketSide;
 import com.github.retrooper.packetevents.protocol.packettype.PacketTypeCommon;
 import com.github.retrooper.packetevents.protocol.player.ClientVersion;
+import com.github.retrooper.packetevents.protocol.player.User;
 
 import java.net.InetSocketAddress;
 
 public class PacketReceiveEvent extends ProtocolPacketEvent<Object> {
     private boolean cloned;
 
-    public PacketReceiveEvent(ChannelAbstract channel, Object player, ByteBufAbstract byteBuf) {
-        super(PacketSide.CLIENT, channel, player, byteBuf);
+    public PacketReceiveEvent(ChannelAbstract channel, User user, Object player, ByteBufAbstract byteBuf) {
+        super(PacketSide.CLIENT, channel, user, player, byteBuf);
     }
 
-    public PacketReceiveEvent(ConnectionState connectionState, ChannelAbstract channel, Object player, ByteBufAbstract byteBuf) {
-        super(PacketSide.CLIENT, connectionState, channel, player, byteBuf);
+    public PacketReceiveEvent(ConnectionState connectionState, ChannelAbstract channel, User user, Object player, ByteBufAbstract byteBuf) {
+        super(PacketSide.CLIENT, connectionState, channel, user, player, byteBuf);
     }
 
-    public PacketReceiveEvent(Object channel, Object player, Object rawByteBuf) {
-        super(PacketSide.CLIENT, channel, player, rawByteBuf);
+    public PacketReceiveEvent(Object channel, User user, Object player, Object rawByteBuf) {
+        super(PacketSide.CLIENT, channel, user, player, rawByteBuf);
     }
 
-    public PacketReceiveEvent(ConnectionState connectionState, Object channel, Object player, Object rawByteBuf) {
-        super(PacketSide.CLIENT, connectionState, channel, player, rawByteBuf);
+    public PacketReceiveEvent(ConnectionState connectionState, Object channel, User user, Object player, Object rawByteBuf) {
+        super(PacketSide.CLIENT, connectionState, channel, user, player, rawByteBuf);
     }
 
-    public PacketReceiveEvent(boolean cloned, int packetID, PacketTypeCommon packetType, ServerVersion serverVersion, ClientVersion clientVersion, InetSocketAddress socketAddress, ConnectionState connectionState, ChannelAbstract channel, Object player, ByteBufAbstract byteBuf) {
-        super(packetID, packetType, serverVersion, clientVersion, socketAddress, connectionState, channel, player, byteBuf);
+    public PacketReceiveEvent(boolean cloned, int packetID, PacketTypeCommon packetType, ServerVersion serverVersion,
+                              ClientVersion clientVersion, InetSocketAddress socketAddress, ConnectionState connectionState,
+                              ChannelAbstract channel, User user, Object player, ByteBufAbstract byteBuf) {
+        super(packetID, packetType, serverVersion, clientVersion, socketAddress,
+                connectionState, channel, user, player, byteBuf);
         this.cloned = cloned;
     }
 
@@ -60,7 +64,9 @@ public class PacketReceiveEvent extends ProtocolPacketEvent<Object> {
 
     @Override
     public PacketReceiveEvent clone() {
-        return new PacketReceiveEvent(true, getPacketId(), getPacketType(), getServerVersion(), getClientVersion(), getSocketAddress(), getConnectionState(), getChannel(), getPlayer(), getByteBuf().duplicate());
+        return new PacketReceiveEvent(true, getPacketId(), getPacketType(), getServerVersion(), getClientVersion(),
+                getSocketAddress(), getConnectionState(), getChannel(),
+                getUser(), getPlayer(), getByteBuf().duplicate());
     }
 
     @Override

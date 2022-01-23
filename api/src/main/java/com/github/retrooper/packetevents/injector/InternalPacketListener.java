@@ -22,6 +22,7 @@ import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.event.PacketListener;
 import com.github.retrooper.packetevents.event.impl.PacketReceiveEvent;
 import com.github.retrooper.packetevents.event.impl.PacketSendEvent;
+import com.github.retrooper.packetevents.netty.channel.ChannelAbstract;
 import com.github.retrooper.packetevents.protocol.ConnectionState;
 import com.github.retrooper.packetevents.protocol.player.User;
 import com.github.retrooper.packetevents.protocol.player.UserProfile;
@@ -36,12 +37,14 @@ public class InternalPacketListener implements PacketListener {
     @Override
     public void onPacketSend(PacketSendEvent event) {
         if (event.getPacketType() == PacketType.Login.Server.LOGIN_SUCCESS) {
+            ChannelAbstract channel = event.getChannel();
             //Process outgoing login success packet
             WrapperLoginServerLoginSuccess loginSuccess = new WrapperLoginServerLoginSuccess(event);
             //Store game profile
             UserProfile profile = loginSuccess.getUser();
-            User user = new User(event.getChannel(), profile);
-            PacketEvents.getAPI().getPlayerManager().setUser(event.getChannel(), user);
+            User user = new User(channel, profile);
+            PacketEvents.getAPI().getPlayerManager().setUser(channel, user);
+            PacketEvents.getAPI().getInjector().updateUser(channel, user);
             PacketEvents.getAPI().getLogManager().debug("Set user(profile) for player " + profile.getName());
             //Transition into the PLAY connection state
             PacketEvents.getAPI().getPlayerManager().changeConnectionState(event.getChannel(), ConnectionState.PLAY);

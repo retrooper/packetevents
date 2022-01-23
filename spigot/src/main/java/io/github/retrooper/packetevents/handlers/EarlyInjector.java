@@ -21,6 +21,7 @@ package io.github.retrooper.packetevents.handlers;
 import com.github.retrooper.packetevents.injector.ChannelInjector;
 import com.github.retrooper.packetevents.netty.channel.ChannelAbstract;
 import com.github.retrooper.packetevents.protocol.ConnectionState;
+import com.github.retrooper.packetevents.protocol.player.User;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.Nullable;
 

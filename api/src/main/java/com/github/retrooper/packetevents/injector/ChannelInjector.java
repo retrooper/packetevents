@@ -20,6 +20,8 @@ package com.github.retrooper.packetevents.injector;
 
 import com.github.retrooper.packetevents.netty.channel.ChannelAbstract;
 import com.github.retrooper.packetevents.protocol.ConnectionState;
+import com.github.retrooper.packetevents.protocol.player.User;
+import com.github.retrooper.packetevents.protocol.player.UserProfile;
 import org.jetbrains.annotations.Nullable;
 
 public interface ChannelInjector {
@@ -37,6 +39,8 @@ public interface ChannelInjector {
     void eject();
 
     void injectPlayer(Object player, @Nullable ConnectionState connectionState);
+
+    void updateUser(ChannelAbstract channel, User user);
 
     void ejectPlayer(Object player);
 

@@ -23,6 +23,7 @@ import com.github.retrooper.packetevents.event.impl.PacketReceiveEvent;
 import com.github.retrooper.packetevents.netty.buffer.ByteBufAbstract;
 import com.github.retrooper.packetevents.netty.channel.ChannelHandlerContextAbstract;
 import com.github.retrooper.packetevents.protocol.ConnectionState;
+import com.github.retrooper.packetevents.protocol.player.User;
 import io.github.retrooper.packetevents.handlers.compression.CustomPacketCompressor;
 import io.github.retrooper.packetevents.handlers.compression.CustomPacketDecompressor;
 import io.github.retrooper.packetevents.handlers.modern.early.CompressionManagerModern;
@@ -39,19 +40,22 @@ import java.util.List;
 public class PacketDecoderModern extends ByteToMessageDecoder {
     public ByteToMessageDecoder mcDecoder = null;
     public List<ByteToMessageDecoder> decoders = new ArrayList<>();
+    public User user;
     public volatile Player player;
     public ConnectionState connectionState;
     public boolean bypassCompression = false;
     public boolean handledCompression;
     public boolean skipDoubleTransform;
 
-    public PacketDecoderModern(ConnectionState connectionState) {
+    public PacketDecoderModern(User user, ConnectionState connectionState) {
+        this.user = user;
         this.connectionState = connectionState;
     }
 
     public PacketDecoderModern(PacketDecoderModern decoder) {
         mcDecoder = decoder.mcDecoder;
         decoders = decoder.decoders;
+        this.user = decoder.user;
         player = decoder.player;
         connectionState = decoder.connectionState;
         bypassCompression = decoder.bypassCompression;
@@ -68,7 +72,7 @@ public class PacketDecoderModern extends ByteToMessageDecoder {
         try {
             boolean needsCompress = !bypassCompression && handleCompressionOrder(ctx, transformedBuf);
             int firstReaderIndex = transformedBuf.readerIndex();
-            PacketReceiveEvent packetReceiveEvent = new PacketReceiveEvent(connectionState, ctx.channel(), player, transformedBuf);
+            PacketReceiveEvent packetReceiveEvent = new PacketReceiveEvent(connectionState, ctx.channel(), user, player, transformedBuf);
             int readerIndex = transformedBuf.readerIndex();
             PacketEvents.getAPI().getEventManager().callEvent(packetReceiveEvent, () -> {
                 transformedBuf.readerIndex(readerIndex);

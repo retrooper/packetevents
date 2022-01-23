@@ -5,6 +5,7 @@ import com.github.retrooper.packetevents.event.impl.PacketReceiveEvent;
 import com.github.retrooper.packetevents.netty.buffer.ByteBufAbstract;
 import com.github.retrooper.packetevents.netty.channel.ChannelHandlerContextAbstract;
 import com.github.retrooper.packetevents.protocol.ConnectionState;
+import com.github.retrooper.packetevents.protocol.player.User;
 import io.github.retrooper.packetevents.handlers.compression.CustomPacketCompressor;
 import io.github.retrooper.packetevents.handlers.compression.CustomPacketDecompressor;
 import io.github.retrooper.packetevents.handlers.legacy.early.CompressionManagerLegacy;
@@ -18,12 +19,14 @@ import java.util.List;
 
 public class PacketDecoderLegacy extends ByteToMessageDecoder {
     public volatile Player player;
+    public User user;
     public ConnectionState connectionState;
     public boolean bypassCompression = false;
     private boolean handledCompression;
     private boolean skipDoubleTransform;
 
-    public PacketDecoderLegacy(ConnectionState connectionState) {
+    public PacketDecoderLegacy(User user, ConnectionState connectionState) {
+        this.user = user;
         this.connectionState = connectionState;
     }
 
@@ -36,7 +39,7 @@ public class PacketDecoderLegacy extends ByteToMessageDecoder {
         try {
             boolean needsCompress = !bypassCompression && handleCompressionOrder(ctx, transformedBuf);
             int firstReaderIndex = transformedBuf.readerIndex();
-            PacketReceiveEvent packetReceiveEvent = new PacketReceiveEvent(ctx.channel(), player, transformedBuf);
+            PacketReceiveEvent packetReceiveEvent = new PacketReceiveEvent(ctx.channel(), user, player, transformedBuf);
             int readerIndex = transformedBuf.readerIndex();
             PacketEvents.getAPI().getEventManager().callEvent(packetReceiveEvent, () -> {
                 transformedBuf.readerIndex(readerIndex);

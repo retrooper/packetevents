@@ -23,6 +23,7 @@ import com.github.retrooper.packetevents.injector.ChannelInjector;
 import com.github.retrooper.packetevents.event.impl.PlayerEjectEvent;
 import com.github.retrooper.packetevents.event.impl.PlayerInjectEvent;
 import com.github.retrooper.packetevents.netty.channel.ChannelAbstract;
+import com.github.retrooper.packetevents.protocol.player.User;
 import io.github.retrooper.packetevents.handlers.legacy.early.EarlyChannelInjectorLegacy;
 import io.github.retrooper.packetevents.handlers.legacy.late.LateChannelInjectorLegacy;
 import io.github.retrooper.packetevents.handlers.modern.early.EarlyChannelInjectorModern;
@@ -31,7 +32,7 @@ import com.github.retrooper.packetevents.protocol.ConnectionState;
 import io.github.retrooper.packetevents.utils.SpigotReflectionUtil;
 import org.jetbrains.annotations.Nullable;
 
-public class GlobalChannelInjector implements ChannelInjector {
+public class SpigotChannelInjector implements ChannelInjector {
     public boolean injectEarly = true;
     private ChannelInjector injector;
 
@@ -79,6 +80,11 @@ public class GlobalChannelInjector implements ChannelInjector {
     @Override
     public void eject() {
         injector.eject();
+    }
+
+    @Override
+    public void updateUser(ChannelAbstract channel, User user) {
+        injector.updateUser(channel, user);
     }
 
     @Override

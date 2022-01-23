@@ -29,6 +29,7 @@ import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.protocol.particle.Particle;
 import com.github.retrooper.packetevents.protocol.particle.type.ParticleTypes;
 import com.github.retrooper.packetevents.protocol.player.TextureProperty;
+import com.github.retrooper.packetevents.protocol.player.User;
 import com.github.retrooper.packetevents.protocol.player.UserProfile;
 import com.github.retrooper.packetevents.protocol.world.Location;
 import com.github.retrooper.packetevents.util.MojangAPIUtil;
@@ -66,39 +67,42 @@ public class PacketEventsPlugin extends JavaPlugin {
         PacketListenerAbstract debugListener = new PacketListenerAbstract(PacketListenerPriority.NORMAL, false) {
             @Override
             public void onPacketReceive(PacketReceiveEvent event) {
-                if (event.getPlayer() instanceof Player) {
-                    Player player = (Player) event.getPlayer();
-                    if (event.getPacketType() instanceof PacketType.Play.Client) {
-                        PacketType.Play.Client type = (PacketType.Play.Client) event.getPacketType();
-                        switch (type) {
-                            case CHAT_MESSAGE: {
-                                WrapperPlayClientChatMessage chatMessage = new WrapperPlayClientChatMessage(event);
-                                String msg = chatMessage.getMessage();
-                                String[] sp = msg.split(" ");
-                                if (sp[0].equalsIgnoreCase("plzparticles")) {
-                                    Vector3f rgb = new Vector3f(0.3f, 0.0f, 0.6f);
-                                    Particle particle = new Particle(ParticleTypes.ANGRY_VILLAGER);
-                                    Vector3d position = SpigotDataHelper.fromBukkitLocation(player.getLocation()).getPosition().add(0, 2, 0);
-                                    WrapperPlayServerParticle particlePacket
-                                            = new WrapperPlayServerParticle(particle, true, position,
-                                            new Vector3f(0.4f, 0.4f, 0.4f), 0, 25);
-                                    PacketEvents.getAPI().getPlayerManager().sendPacket(player, particlePacket);
-                                } else if (sp[0].equalsIgnoreCase("plzspawn")) {
-                                    String name = sp[1];
-                                    UUID uuid = MojangAPIUtil.requestPlayerUUID(name);
-                                    player.sendMessage("Spawning " + name + " with UUID " + uuid.toString());
-                                    List<TextureProperty> textureProperties = MojangAPIUtil.requestPlayerTextureProperties(uuid);
-                                    UserProfile profile = new UserProfile(uuid, name, textureProperties);
-                                    Component nameTag = Component.text("Doggy").color(NamedTextColor.GOLD).asComponent();
-                                    NPC npc = new NPC(profile, SpigotReflectionUtil.generateEntityId(), null,
-                                            NamedTextColor.GOLD,
-                                            Component.text("Nice prefix").color(NamedTextColor.GRAY).asComponent(),
-                                            Component.text("Nice suffix").color(NamedTextColor.AQUA).asComponent()
-                                    );
-                                    npc.setLocation(new Location(player.getLocation().getX(), player.getLocation().getY(), player.getLocation().getZ(), player.getLocation().getYaw(), player.getLocation().getPitch()));
-                                    PacketEvents.getAPI().getNPCManager().spawn(event.getChannel(), npc);
-                                    player.sendMessage("Successfully spawned " + name);
-                                }
+                User user = event.getUser();
+                if (event.getPacketType() instanceof PacketType.Play.Client) {
+                    PacketType.Play.Client type = (PacketType.Play.Client) event.getPacketType();
+                    switch (type) {
+                        case CHAT_MESSAGE: {
+                            WrapperPlayClientChatMessage chatMessage = new WrapperPlayClientChatMessage(event);
+                            String msg = chatMessage.getMessage();
+                            String[] sp = msg.split(" ");
+                            if (sp[0].equalsIgnoreCase("plzparticles")) {
+                                Vector3f rgb = new Vector3f(0.3f, 0.0f, 0.6f);
+                                Particle particle = new Particle(ParticleTypes.ANGRY_VILLAGER);
+                                Vector3d position = SpigotDataHelper
+                                        .fromBukkitLocation(((Player)event.getPlayer()).getLocation())
+                                        .getPosition().add(0, 2, 0);
+                                WrapperPlayServerParticle particlePacket
+                                        = new WrapperPlayServerParticle(particle, true, position,
+                                        new Vector3f(0.4f, 0.4f, 0.4f), 0, 25);
+                                user.sendPacket(particlePacket);
+                            } else if (sp[0].equalsIgnoreCase("plzspawn")) {
+                                String name = sp[1];
+                                UUID uuid = MojangAPIUtil.requestPlayerUUID(name);
+                                user.sendMessage("Now spawning " + name + " with UUID " + uuid);
+                                List<TextureProperty> textureProperties = MojangAPIUtil.requestPlayerTextureProperties(uuid);
+                                UserProfile profile = new UserProfile(uuid, name, textureProperties);
+                                NPC npc = new NPC(profile, SpigotReflectionUtil.generateEntityId(), null,
+                                        NamedTextColor.GOLD,
+                                        Component.text("Nice prefix").color(NamedTextColor.GRAY).asComponent(),
+                                        Component.text("Nice suffix").color(NamedTextColor.AQUA).asComponent()
+                                );
+                                Location location = SpigotDataHelper
+                                        .fromBukkitLocation(((Player)event.getPlayer())
+                                                .getLocation());
+                                npc.setLocation(location);
+                                PacketEvents.getAPI().getNPCManager().spawn(event.getChannel(), npc);
+                                user.sendMessage("Successfully spawned " + name);
+                            }
 /*
                         Bukkit.getScheduler().runTaskLaterAsynchronously((Plugin) PacketEvents.getAPI().getPlugin(),
                                 () -> {
@@ -110,41 +114,36 @@ public class PacketEventsPlugin extends JavaPlugin {
                                     PacketEvents.getAPI().getNPCManager().updateNPCNameTag(npc);
 
                                 }, 120L);//120 ticks is 6 seconds*/
-                                break;
-                            }
-                            case PLAYER_FLYING:
-                            case PLAYER_POSITION:
-                            case PLAYER_ROTATION:
-                            case PLAYER_POSITION_AND_ROTATION:
-                                WrapperPlayClientPlayerFlying flying
-                                        = new WrapperPlayClientPlayerFlying(event);
-                                Location location = flying.getLocation();
-                                if (flying.hasPositionChanged()) {
-                                    player.sendMessage("position: " + location.getPosition());
-                                }
-                                //System.out.println("Player flying position: " + flying.hasPositionChanged() + ", rotation: " + flying.hasRotationChanged());
-                                break;
+                            break;
                         }
+                        case PLAYER_FLYING:
+                        case PLAYER_POSITION:
+                        case PLAYER_ROTATION:
+                        case PLAYER_POSITION_AND_ROTATION:
+                            WrapperPlayClientPlayerFlying flying
+                                    = new WrapperPlayClientPlayerFlying(event);
+                            Location location = flying.getLocation();
+                            break;
                     }
                 }
             }
 
             @Override
             public void onPacketSend(PacketSendEvent event) {
-                Player player = event.getPlayer() == null ? null : (Player) event.getPlayer();
-                player.showDemoScreen();
+                User user = event.getUser();
                 if (event.getPacketType() == PacketType.Play.Server.SET_SLOT) {
                     WrapperPlayServerSetSlot setSlot = new WrapperPlayServerSetSlot(event);
                     int windowID = setSlot.getWindowId();
                     int slot = setSlot.getSlot();
                     ItemStack item = setSlot.getItem();
-                    player.sendMessage("Set slot with window ID: " + windowID + ", slot: " + slot + ", item: " + (item.getType() != null ? item.toString() : "null item"));
+                    user.sendMessage("Set slot: " + slot + ", to item: "
+                            + (item.getType() != null ? item.toString() : "null item"));
                 }
             }
         };
 
         // net.minecraft.server.v1_7_R4.PacketPlayOutWorldParticles w1;
-        //PacketEvents.getAPI().getEventManager().registerListener(debugListener);
+        PacketEvents.getAPI().getEventManager().registerListener(debugListener);
     }
 
     @Override

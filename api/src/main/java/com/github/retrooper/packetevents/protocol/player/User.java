@@ -19,9 +19,11 @@
 package com.github.retrooper.packetevents.protocol.player;
 
 import com.github.retrooper.packetevents.PacketEvents;
+import com.github.retrooper.packetevents.netty.buffer.ByteBufAbstract;
 import com.github.retrooper.packetevents.netty.channel.ChannelAbstract;
 import com.github.retrooper.packetevents.protocol.chat.ChatPosition;
 import com.github.retrooper.packetevents.util.AdventureSerializer;
+import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientChatMessage;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerChatMessage;
 import net.kyori.adventure.text.Component;
@@ -40,6 +42,15 @@ public class User {
 
     public UserProfile getProfile() {
         return profile;
+    }
+
+    public void sendPacket(ByteBufAbstract buffer) {
+        PacketEvents.getAPI().getPlayerManager().sendPacket(channel, buffer);
+    }
+
+
+    public void sendPacket(PacketWrapper<?> wrapper) {
+        PacketEvents.getAPI().getPlayerManager().sendPacket(channel, wrapper);
     }
 
     public void chat(String message) {

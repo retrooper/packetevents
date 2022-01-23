@@ -19,7 +19,10 @@
 package io.github.retrooper.packetevents.handlers.modern.early;
 
 import com.github.retrooper.packetevents.PacketEvents;
+import com.github.retrooper.packetevents.netty.channel.ChannelAbstract;
 import com.github.retrooper.packetevents.protocol.ConnectionState;
+import com.github.retrooper.packetevents.protocol.player.User;
+import com.github.retrooper.packetevents.protocol.player.UserProfile;
 import com.github.retrooper.packetevents.util.reflection.ClassUtil;
 import com.github.retrooper.packetevents.util.reflection.ReflectionObject;
 import io.github.retrooper.packetevents.handlers.modern.PacketDecoderModern;
@@ -38,8 +41,11 @@ public class ServerConnectionInitializerModern {
     public static void postInitChannel(Object ch, ConnectionState connectionState) {
         Channel channel = (Channel) ch;
         //System.out.println("Pre Channel handlers: " + Arrays.toString(channel.pipeline().names().toArray(new String[0])));
-        channel.pipeline().addAfter("splitter", PacketEvents.DECODER_NAME, new PacketDecoderModern(connectionState));
-        channel.pipeline().addBefore("encoder", PacketEvents.ENCODER_NAME, new PacketEncoderModern());
+        ChannelAbstract channelAbstract = PacketEvents.getAPI().getNettyManager().wrapChannel(channel);
+        User user = new User(channelAbstract, new UserProfile(null, null));
+        PacketEvents.getAPI().getPlayerManager().setUser(channelAbstract, user);
+        channel.pipeline().addAfter("splitter", PacketEvents.DECODER_NAME, new PacketDecoderModern(user, connectionState));
+        channel.pipeline().addBefore("encoder", PacketEvents.ENCODER_NAME, new PacketEncoderModern(user));
         //System.out.println("Post Channel handlers: " + Arrays.toString(channel.pipeline().names().toArray(new String[0])));
     }
 

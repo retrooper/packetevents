@@ -132,6 +132,7 @@ public class PlayerManagerImpl implements PlayerManager {
             //TODO Extract texture properties and pass into user profile(not priority)
             user = new User(channel, new UserProfile(p.getUniqueId(), p.getName()));
             USERS.put(channel, user);
+            PacketEvents.getAPI().getInjector().updateUser(channel, user);
         }
         return user;
     }

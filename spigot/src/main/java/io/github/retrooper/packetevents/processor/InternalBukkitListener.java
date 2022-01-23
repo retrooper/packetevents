@@ -23,8 +23,7 @@ import com.github.retrooper.packetevents.event.impl.PostPlayerInjectEvent;
 import com.github.retrooper.packetevents.netty.channel.ChannelAbstract;
 import com.github.retrooper.packetevents.protocol.ConnectionState;
 import com.github.retrooper.packetevents.protocol.player.User;
-import com.github.retrooper.packetevents.protocol.player.UserProfile;
-import io.github.retrooper.packetevents.handlers.GlobalChannelInjector;
+import io.github.retrooper.packetevents.handlers.SpigotChannelInjector;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -37,7 +36,7 @@ public class InternalBukkitListener implements Listener {
     @EventHandler(priority = EventPriority.LOWEST)
     public void onLogin(PlayerLoginEvent e) {
         final Player player = e.getPlayer();
-        GlobalChannelInjector injector = (GlobalChannelInjector) PacketEvents.getAPI().getInjector();
+        SpigotChannelInjector injector = (SpigotChannelInjector) PacketEvents.getAPI().getInjector();
         if (injector.shouldInjectEarly()) {
             PacketEvents.getAPI().getInjector().injectPlayer(player, null);
         }
@@ -47,7 +46,7 @@ public class InternalBukkitListener implements Listener {
     public void onJoin(PlayerJoinEvent e) {
         Player player = e.getPlayer();
 
-        GlobalChannelInjector injector = (GlobalChannelInjector) PacketEvents.getAPI().getInjector();
+        SpigotChannelInjector injector = (SpigotChannelInjector) PacketEvents.getAPI().getInjector();
 
         boolean injectEarly = injector.shouldInjectEarly();
         boolean shouldInject = !injectEarly || !injector.hasInjected(e.getPlayer());

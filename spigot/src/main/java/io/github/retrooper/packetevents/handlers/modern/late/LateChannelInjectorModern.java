@@ -20,6 +20,7 @@ package io.github.retrooper.packetevents.handlers.modern.late;
 
 import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.netty.channel.ChannelAbstract;
+import com.github.retrooper.packetevents.protocol.player.User;
 import io.github.retrooper.packetevents.handlers.LateInjector;
 import io.github.retrooper.packetevents.handlers.modern.PacketDecoderModern;
 import io.github.retrooper.packetevents.handlers.modern.PacketEncoderModern;
@@ -38,6 +39,19 @@ public class LateChannelInjectorModern implements LateInjector {
     @Override
     public void eject() {
 
+    }
+
+    @Override
+    public void updateUser(ChannelAbstract channel, User user) {
+        PacketEncoderModern encoder = getEncoder(channel);
+        if (encoder != null) {
+            encoder.user = user;
+        }
+
+        PacketDecoderModern decoder = getDecoder(channel);
+        if (decoder != null) {
+            decoder.user = user;
+        }
     }
 
     @Override
