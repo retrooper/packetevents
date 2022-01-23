@@ -46,6 +46,7 @@ import org.jetbrains.annotations.Nullable;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.function.BiConsumer;
+import java.util.function.Consumer;
 import java.util.function.Function;
 
 public class PacketWrapper<T extends PacketWrapper> {
@@ -66,21 +67,26 @@ public class PacketWrapper<T extends PacketWrapper> {
     }
 
     public PacketWrapper(PacketReceiveEvent event) {
+        this(event, true);
+    }
+
+    public PacketWrapper(PacketReceiveEvent event, boolean readData) {
         this.clientVersion = event.getClientVersion();
         this.serverVersion = event.getServerVersion();
         this.buffer = event.getByteBuf();
         this.packetID = event.getPacketId();
-        if (event.isCloned()) {
-            int bufferIndex = getBuffer().readerIndex();
-            readData();
-            getBuffer().readerIndex(bufferIndex);
-        }
-        else {
-            if (event.getLastUsedWrapper() == null) {
-                event.setLastUsedWrapper(this);
+        if (readData) {
+            if (event.isCloned()) {
+                int bufferIndex = getBuffer().readerIndex();
                 readData();
+                getBuffer().readerIndex(bufferIndex);
             } else {
-                readData((T) event.getLastUsedWrapper());
+                if (event.getLastUsedWrapper() == null) {
+                    event.setLastUsedWrapper(this);
+                    readData();
+                } else {
+                    readData((T) event.getLastUsedWrapper());
+                }
             }
         }
     }

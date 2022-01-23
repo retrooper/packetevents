@@ -26,6 +26,8 @@ import com.github.retrooper.packetevents.protocol.world.Location;
 import com.github.retrooper.packetevents.util.Vector3d;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 
+import java.util.function.Consumer;
+
 public class WrapperPlayClientPlayerFlying extends PacketWrapper<WrapperPlayClientPlayerFlying> {
     private boolean positionChanged;
     private boolean rotationChanged;
@@ -33,11 +35,23 @@ public class WrapperPlayClientPlayerFlying extends PacketWrapper<WrapperPlayClie
     private boolean onGround;
 
     public WrapperPlayClientPlayerFlying(PacketReceiveEvent event) {
-        super(event);
+        super(event, false);
         positionChanged = event.getPacketType() == PacketType.Play.Client.PLAYER_POSITION ||
                 event.getPacketType() == PacketType.Play.Client.PLAYER_POSITION_AND_ROTATION;
         rotationChanged = event.getPacketType() == PacketType.Play.Client.PLAYER_ROTATION ||
                 event.getPacketType() == PacketType.Play.Client.PLAYER_POSITION_AND_ROTATION;
+        if (event.isCloned()) {
+            int bufferIndex = getBuffer().readerIndex();
+            readData();
+            getBuffer().readerIndex(bufferIndex);
+        } else {
+            if (event.getLastUsedWrapper() == null) {
+                event.setLastUsedWrapper(this);
+                readData();
+            } else {
+                readData((WrapperPlayClientPlayerFlying) event.getLastUsedWrapper());
+            }
+        }
     }
 
     public WrapperPlayClientPlayerFlying(boolean positionChanged, boolean rotationChanged, boolean onGround, Location location) {
@@ -74,6 +88,7 @@ public class WrapperPlayClientPlayerFlying extends PacketWrapper<WrapperPlayClie
             position.setX(x);
             position.setY(y);
             position.setZ(z);
+            System.out.println("Position allocated: " + position);
         }
         if (rotationChanged) {
             yaw = readFloat();
