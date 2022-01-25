@@ -21,8 +21,8 @@ package com.github.retrooper.packetevents.protocol.player;
 import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.netty.buffer.ByteBufAbstract;
 import com.github.retrooper.packetevents.netty.channel.ChannelAbstract;
+import com.github.retrooper.packetevents.protocol.ConnectionState;
 import com.github.retrooper.packetevents.protocol.chat.ChatPosition;
-import com.github.retrooper.packetevents.util.AdventureSerializer;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientChatMessage;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerChatMessage;
@@ -30,14 +30,37 @@ import net.kyori.adventure.text.Component;
 
 public class User {
     private final ChannelAbstract channel;
+    private ConnectionState connectionState;
+    private ClientVersion clientVersion;
     private final UserProfile profile;
-    public User(ChannelAbstract channel, UserProfile profile) {
+
+    public User(ChannelAbstract channel,
+                ConnectionState connectionState, ClientVersion clientVersion,
+                UserProfile profile) {
         this.channel = channel;
+        this.connectionState = connectionState;
+        this.clientVersion = clientVersion;
         this.profile = profile;
     }
 
     public ChannelAbstract getChannel() {
         return channel;
+    }
+
+    public ConnectionState getConnectionState() {
+        return connectionState;
+    }
+
+    public void setConnectionState(ConnectionState connectionState) {
+        this.connectionState = connectionState;
+    }
+
+    public ClientVersion getClientVersion() {
+        return clientVersion;
+    }
+
+    public void setClientVersion(ClientVersion clientVersion) {
+        this.clientVersion = clientVersion;
     }
 
     public UserProfile getProfile() {
@@ -47,7 +70,6 @@ public class User {
     public void sendPacket(ByteBufAbstract buffer) {
         PacketEvents.getAPI().getPlayerManager().sendPacket(channel, buffer);
     }
-
 
     public void sendPacket(PacketWrapper<?> wrapper) {
         PacketEvents.getAPI().getPlayerManager().sendPacket(channel, wrapper);

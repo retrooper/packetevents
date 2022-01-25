@@ -31,9 +31,9 @@ public class ServerConnectionInitializerLegacy {
     public static void postInitChannel(Object ch, ConnectionState connectionState) {
         Channel channel = (Channel) ch;
         ChannelAbstract channelAbstract = PacketEvents.getAPI().getNettyManager().wrapChannel(channel);
-        User user = new User(channelAbstract, new UserProfile(null, null));
-        PacketEvents.getAPI().getPlayerManager().setUser(channelAbstract, user);
-        channel.pipeline().addAfter("splitter", PacketEvents.DECODER_NAME, new PacketDecoderLegacy(user, connectionState));
+        User user = new User(channelAbstract, connectionState, null, new UserProfile(null, null));
+        PacketEvents.getAPI().getPlayerManager().USERS.put(channelAbstract, user);
+        channel.pipeline().addAfter("splitter", PacketEvents.DECODER_NAME, new PacketDecoderLegacy(user));
         channel.pipeline().addBefore("encoder", PacketEvents.ENCODER_NAME, new PacketEncoderLegacy(user));
     }
 

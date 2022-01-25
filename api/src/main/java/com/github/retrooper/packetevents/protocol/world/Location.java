@@ -85,6 +85,11 @@ public class Location {
 
     @Override
     public Location clone() {
-        return new Location(position, yaw, pitch);
+        return new Location(position.clone(), yaw, pitch);
+    }
+
+    @Override
+    public String toString() {
+        return "Location {[" + position.toString() + "]," + " yaw: " + yaw + ", pitch: " + pitch + "}";
     }
 }

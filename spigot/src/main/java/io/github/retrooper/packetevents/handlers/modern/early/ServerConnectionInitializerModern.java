@@ -33,7 +33,6 @@ import io.netty.channel.ChannelHandler;
 import io.netty.handler.codec.ByteToMessageDecoder;
 import org.bukkit.entity.Player;
 
-import java.util.Arrays;
 import java.util.List;
 
 
@@ -42,9 +41,9 @@ public class ServerConnectionInitializerModern {
         Channel channel = (Channel) ch;
         //System.out.println("Pre Channel handlers: " + Arrays.toString(channel.pipeline().names().toArray(new String[0])));
         ChannelAbstract channelAbstract = PacketEvents.getAPI().getNettyManager().wrapChannel(channel);
-        User user = new User(channelAbstract, new UserProfile(null, null));
+        User user = new User(channelAbstract, connectionState, null, new UserProfile(null, null));
         PacketEvents.getAPI().getPlayerManager().setUser(channelAbstract, user);
-        channel.pipeline().addAfter("splitter", PacketEvents.DECODER_NAME, new PacketDecoderModern(user, connectionState));
+        channel.pipeline().addAfter("splitter", PacketEvents.DECODER_NAME, new PacketDecoderModern(user));
         channel.pipeline().addBefore("encoder", PacketEvents.ENCODER_NAME, new PacketEncoderModern(user));
         //System.out.println("Post Channel handlers: " + Arrays.toString(channel.pipeline().names().toArray(new String[0])));
     }
@@ -74,11 +73,10 @@ public class ServerConnectionInitializerModern {
                     //Write mc decoder
                     reflectNewDecoderModern.write(ByteToMessageDecoder.class, 0, decoderModern.mcDecoder);
 
+                    //TODO Write user, and check whats left
+
                     //Write player
                     reflectNewDecoderModern.write(Player.class, 0, decoderModern.player);
-
-                    //Write connection state
-                    reflectNewDecoderModern.write(ConnectionState.class, 0, decoderModern.connectionState);
 
                     //Write bypassCompression
                     reflectNewDecoderModern.write(boolean.class, 0, decoderModern.bypassCompression);

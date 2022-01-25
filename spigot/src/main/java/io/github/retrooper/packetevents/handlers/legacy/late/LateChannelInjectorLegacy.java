@@ -20,12 +20,12 @@ package io.github.retrooper.packetevents.handlers.legacy.late;
 
 import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.netty.channel.ChannelAbstract;
+import com.github.retrooper.packetevents.protocol.ConnectionState;
 import com.github.retrooper.packetevents.protocol.player.User;
 import io.github.retrooper.packetevents.handlers.LateInjector;
 import io.github.retrooper.packetevents.handlers.legacy.PacketDecoderLegacy;
 import io.github.retrooper.packetevents.handlers.legacy.PacketEncoderLegacy;
 import io.github.retrooper.packetevents.handlers.legacy.early.ServerConnectionInitializerLegacy;
-import com.github.retrooper.packetevents.protocol.ConnectionState;
 import net.minecraft.util.io.netty.channel.Channel;
 import net.minecraft.util.io.netty.channel.ChannelHandler;
 import org.jetbrains.annotations.Nullable;
@@ -110,18 +110,18 @@ public class LateChannelInjectorLegacy implements LateInjector {
 
     @Override
     public ConnectionState getConnectionState(ChannelAbstract channel) {
-        PacketDecoderLegacy decoder = getDecoder(channel);
-        if (decoder != null) {
-            return decoder.connectionState;
+        PacketEncoderLegacy encoder = getEncoder(channel);
+        if (encoder != null) {
+            return encoder.user.getConnectionState();
         }
         return null;
     }
 
     @Override
     public void changeConnectionState(ChannelAbstract channel, ConnectionState connectionState) {
-        PacketDecoderLegacy decoder = getDecoder(channel);
-        if (decoder != null) {
-            decoder.connectionState = connectionState;
+        PacketEncoderLegacy encoder = getEncoder(channel);
+        if (encoder != null) {
+            encoder.user.setConnectionState(connectionState);
         }
     }
 }

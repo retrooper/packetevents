@@ -299,7 +299,7 @@ public class EarlyChannelInjectorModern implements EarlyInjector {
                 }
             }
             if (newConnectionState != null) {
-                decoder.connectionState = newConnectionState;
+                decoder.user.setConnectionState(newConnectionState);
             }
         }
         PacketEncoderModern encoder = getEncoder(ch);
@@ -317,12 +317,11 @@ public class EarlyChannelInjectorModern implements EarlyInjector {
 
     @Override
     public ConnectionState getConnectionState(ChannelAbstract channel) {
-        PacketDecoderModern decoder = getDecoder(channel);
-        if (decoder != null) {
-            return decoder.connectionState;
-        } else {
-            return null;
-        }
+       PacketEncoderModern encoder = getEncoder(channel);
+       if (encoder != null) {
+           return encoder.user.getConnectionState();
+       }
+       return null;
     }
 
     private void initViaEncoder(Object ch, PacketEncoderModern encoder) {
@@ -359,7 +358,7 @@ public class EarlyChannelInjectorModern implements EarlyInjector {
         PacketDecoderModern decoder = getDecoder(ch);
         if (decoder != null) {
             //Change connection state in decoder
-            decoder.connectionState = connectionState;
+            decoder.user.setConnectionState(connectionState);
             if (connectionState == ConnectionState.PLAY) {
                 if (ViaVersionUtil.isAvailable()) {
                     PacketEncoderModern encoder = (PacketEncoderModern) channel.pipeline().remove(PacketEvents.ENCODER_NAME);

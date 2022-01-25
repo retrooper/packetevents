@@ -54,7 +54,7 @@ public class PacketEncoderModern extends MessageToByteEncoder<Object> {
         boolean needsCompress = handleCompressionOrder(ctx, byteBuf);
 
         int firstReaderIndex = byteBuf.readerIndex();
-        PacketSendEvent packetSendEvent = new PacketSendEvent(ctx.channel(), user, player, byteBuf);
+        PacketSendEvent packetSendEvent = new PacketSendEvent(user.getConnectionState(), ctx.channel(), user, player, byteBuf);
         int readerIndex = byteBuf.readerIndex();
         PacketEvents.getAPI().getEventManager().callEvent(packetSendEvent, () -> {
             byteBuf.readerIndex(readerIndex);

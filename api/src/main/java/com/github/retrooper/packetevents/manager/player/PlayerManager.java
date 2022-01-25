@@ -24,7 +24,6 @@ import com.github.retrooper.packetevents.netty.channel.ChannelAbstract;
 import com.github.retrooper.packetevents.protocol.ConnectionState;
 import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 import com.github.retrooper.packetevents.protocol.player.User;
-import com.github.retrooper.packetevents.protocol.player.UserProfile;
 import com.github.retrooper.packetevents.util.PacketTransformationUtil;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 import org.jetbrains.annotations.NotNull;
@@ -38,8 +37,6 @@ public interface PlayerManager {
     //Job of implementations, clear these maps
     //Cache game profile independently on late-injections(should only happen on Spigot legacy versions)
     //
-    Map<ChannelAbstract, ClientVersion> CLIENT_VERSIONS = new ConcurrentHashMap<>();
-    Map<ChannelAbstract, ConnectionState> CONNECTION_STATES = new ConcurrentHashMap<>();
     Map<String, ChannelAbstract> CHANNELS = new ConcurrentHashMap<>();
     Map<ChannelAbstract, User> USERS = new ConcurrentHashMap<>();
     Map<UUID, Map<Class<? extends PlayerAttributeObject>, PlayerAttributeObject>> PLAYER_ATTRIBUTES = new ConcurrentHashMap<>();
@@ -76,24 +73,15 @@ public interface PlayerManager {
     }
 
     default ConnectionState getConnectionState(ChannelAbstract channel) {
-        ConnectionState connectionState = CONNECTION_STATES.get(channel);
-        if (connectionState == null) {
-            connectionState = PacketEvents.getAPI().getInjector().getConnectionState(channel);
-            if (connectionState == null) {
-                connectionState = ConnectionState.PLAY;
-            }
-            CONNECTION_STATES.put(channel, connectionState);
-        }
-        return connectionState;
+        return getUser(channel).getConnectionState();
     }
 
     default void changeConnectionState(ChannelAbstract channel, ConnectionState connectionState) {
-        CONNECTION_STATES.put(channel, connectionState);
-        PacketEvents.getAPI().getInjector().changeConnectionState(channel, connectionState);
+        getUser(channel).setConnectionState(connectionState);
     }
 
     default void setClientVersion(ChannelAbstract channel, ClientVersion version) {
-        CLIENT_VERSIONS.put(channel, version);
+        getUser(channel).setClientVersion(version);
     }
 
     default void setClientVersion(@NotNull Object player, ClientVersion version) {
@@ -142,6 +130,7 @@ public interface PlayerManager {
 
     default void setUser(ChannelAbstract channel, User user) {
         USERS.put(channel, user);
+        PacketEvents.getAPI().getInjector().updateUser(channel, user);
     }
 
     default ChannelAbstract getChannel(String username) {

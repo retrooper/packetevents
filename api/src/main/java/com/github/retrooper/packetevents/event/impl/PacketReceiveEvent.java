@@ -26,7 +26,6 @@ import com.github.retrooper.packetevents.netty.channel.ChannelAbstract;
 import com.github.retrooper.packetevents.protocol.ConnectionState;
 import com.github.retrooper.packetevents.protocol.PacketSide;
 import com.github.retrooper.packetevents.protocol.packettype.PacketTypeCommon;
-import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 import com.github.retrooper.packetevents.protocol.player.User;
 
 import java.net.InetSocketAddress;
@@ -50,11 +49,11 @@ public class PacketReceiveEvent extends ProtocolPacketEvent<Object> {
         super(PacketSide.CLIENT, connectionState, channel, user, player, rawByteBuf);
     }
 
-    public PacketReceiveEvent(boolean cloned, int packetID, PacketTypeCommon packetType, ServerVersion serverVersion,
-                              ClientVersion clientVersion, InetSocketAddress socketAddress, ConnectionState connectionState,
+    public PacketReceiveEvent(boolean cloned, int packetID, PacketTypeCommon packetType,
+                              ServerVersion serverVersion, InetSocketAddress socketAddress,
                               ChannelAbstract channel, User user, Object player, ByteBufAbstract byteBuf) {
-        super(packetID, packetType, serverVersion, clientVersion, socketAddress,
-                connectionState, channel, user, player, byteBuf);
+        super(packetID, packetType, serverVersion, socketAddress,
+                channel, user, player, byteBuf);
         this.cloned = cloned;
     }
 
@@ -64,8 +63,9 @@ public class PacketReceiveEvent extends ProtocolPacketEvent<Object> {
 
     @Override
     public PacketReceiveEvent clone() {
-        return new PacketReceiveEvent(true, getPacketId(), getPacketType(), getServerVersion(), getClientVersion(),
-                getSocketAddress(), getConnectionState(), getChannel(),
+        return new PacketReceiveEvent(true, getPacketId(),
+                getPacketType(), getServerVersion(),
+                getSocketAddress(), getChannel(),
                 getUser(), getPlayer(), getByteBuf().duplicate());
     }
 

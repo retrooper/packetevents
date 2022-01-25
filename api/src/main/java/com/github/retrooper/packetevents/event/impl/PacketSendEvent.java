@@ -26,7 +26,6 @@ import com.github.retrooper.packetevents.netty.channel.ChannelAbstract;
 import com.github.retrooper.packetevents.protocol.ConnectionState;
 import com.github.retrooper.packetevents.protocol.PacketSide;
 import com.github.retrooper.packetevents.protocol.packettype.PacketTypeCommon;
-import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 import com.github.retrooper.packetevents.protocol.player.User;
 
 import java.net.InetSocketAddress;
@@ -79,11 +78,12 @@ public class PacketSendEvent extends ProtocolPacketEvent<Object> {
     }
 
     public PacketSendEvent(boolean cloned, int packetID, PacketTypeCommon packetType,
-                           ServerVersion serverVersion, ClientVersion clientVersion, InetSocketAddress socketAddress,
-                           ConnectionState connectionState, ChannelAbstract channel,
-                           User user, Object player, ByteBufAbstract byteBuf) {
-        super(packetID, packetType, serverVersion, clientVersion, socketAddress,
-                connectionState, channel, user, player, byteBuf);
+                           ServerVersion serverVersion, InetSocketAddress socketAddress,
+                           ChannelAbstract channel, User user,
+                           Object player, ByteBufAbstract byteBuf) {
+        super(packetID, packetType,
+                serverVersion, socketAddress,
+                channel, user, player, byteBuf);
         this.cloned = cloned;
     }
 
@@ -101,9 +101,11 @@ public class PacketSendEvent extends ProtocolPacketEvent<Object> {
 
     @Override
     public PacketSendEvent clone() {
-        return new PacketSendEvent(true, getPacketId(), getPacketType(), getServerVersion(), getClientVersion(),
-                getSocketAddress(), getConnectionState(), getChannel(),
-                getUser(), getPlayer(), getByteBuf().duplicate());
+        return new PacketSendEvent(true, getPacketId(), getPacketType(),
+                getServerVersion(),
+                getSocketAddress(), getChannel(),
+                getUser(), getPlayer(),
+                getByteBuf().duplicate());
     }
 
     @Override

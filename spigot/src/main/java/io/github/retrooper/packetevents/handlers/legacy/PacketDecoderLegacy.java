@@ -20,14 +20,12 @@ import java.util.List;
 public class PacketDecoderLegacy extends ByteToMessageDecoder {
     public volatile Player player;
     public User user;
-    public ConnectionState connectionState;
     public boolean bypassCompression = false;
     private boolean handledCompression;
     private boolean skipDoubleTransform;
 
-    public PacketDecoderLegacy(User user, ConnectionState connectionState) {
+    public PacketDecoderLegacy(User user) {
         this.user = user;
-        this.connectionState = connectionState;
     }
 
     public void handle(ChannelHandlerContextAbstract ctx, ByteBufAbstract byteBuf, List<Object> output) {
@@ -39,7 +37,7 @@ public class PacketDecoderLegacy extends ByteToMessageDecoder {
         try {
             boolean needsCompress = !bypassCompression && handleCompressionOrder(ctx, transformedBuf);
             int firstReaderIndex = transformedBuf.readerIndex();
-            PacketReceiveEvent packetReceiveEvent = new PacketReceiveEvent(ctx.channel(), user, player, transformedBuf);
+            PacketReceiveEvent packetReceiveEvent = new PacketReceiveEvent(user.getConnectionState(), ctx.channel(), user, player, transformedBuf);
             int readerIndex = transformedBuf.readerIndex();
             PacketEvents.getAPI().getEventManager().callEvent(packetReceiveEvent, () -> {
                 transformedBuf.readerIndex(readerIndex);

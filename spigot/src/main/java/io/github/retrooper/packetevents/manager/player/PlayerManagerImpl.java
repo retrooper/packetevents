@@ -23,6 +23,7 @@ import com.github.retrooper.packetevents.manager.player.PlayerManager;
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.netty.buffer.ByteBufAbstract;
 import com.github.retrooper.packetevents.netty.channel.ChannelAbstract;
+import com.github.retrooper.packetevents.protocol.ConnectionState;
 import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 import com.github.retrooper.packetevents.protocol.player.User;
 import com.github.retrooper.packetevents.protocol.player.UserProfile;
@@ -33,8 +34,6 @@ import io.github.retrooper.packetevents.utils.dependencies.protocolsupport.Proto
 import io.github.retrooper.packetevents.utils.v1_7.SpigotVersionLookup_1_7;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
-
-import java.util.UUID;
 
 public class PlayerManagerImpl implements PlayerManager {
     @Override
@@ -54,14 +53,15 @@ public class PlayerManagerImpl implements PlayerManager {
             return ClientVersion.UNKNOWN;
         }
         ChannelAbstract channel = getChannel(p);
-        ClientVersion version = CLIENT_VERSIONS.get(channel);
-        if (version == null || !version.isResolved()) {
+        User user = getUser(channel);
+        if (user.getClientVersion() == null
+                || !user.getClientVersion().isResolved()) {
             //Asking ViaVersion or ProtocolSupport for the protocol version.
             if (DependencyUtil.isProtocolTranslationDependencyAvailable()) {
                 try {
-                    version = ClientVersion.getClientVersionByProtocolVersion(DependencyUtil.getProtocolVersion(p));
-                    CLIENT_VERSIONS.put(channel, version);
-                    return version;
+                    user.setClientVersion(ClientVersion
+                            .getClientVersionByProtocolVersion(DependencyUtil
+                                    .getProtocolVersion(p)));
                 } catch (Exception ex) {
                     //Try ask the dependency again the next time, for now it is temporarily unresolved...
                     //Temporary unresolved means there is still hope, an exception was thrown on the dependency's end.
@@ -78,29 +78,28 @@ public class PlayerManagerImpl implements PlayerManager {
                     //If you aren't using ViaVersion or ProtocolSupport, how are you supporting multiple protocol versions?
                     protocolVersion = PacketEvents.getAPI().getServerManager().getVersion().getProtocolVersion();
                 }
-                version = ClientVersion.getClientVersionByProtocolVersion(protocolVersion);
-                CLIENT_VERSIONS.put(channel, version);
+                user.setClientVersion(ClientVersion
+                        .getClientVersionByProtocolVersion(protocolVersion));
             }
         }
-        return version;
+        return user.getClientVersion();
     }
 
 
     @Override
     public ClientVersion getClientVersion(ChannelAbstract channel) {
-        ClientVersion version = CLIENT_VERSIONS.get(channel);
-        if (version == null || !version.isResolved()) {
+        User user = getUser(channel);
+        if (user.getClientVersion() == null || !user.getClientVersion().isResolved()) {
             if (!DependencyUtil.isProtocolTranslationDependencyAvailable()) {
                 if (PacketEvents.getAPI().getServerManager().getVersion() == ServerVersion.V_1_7_10) {
-                    return version;
+                    return user.getClientVersion();
                 } else {
                     int protocolVersion = PacketEvents.getAPI().getServerManager().getVersion().getProtocolVersion();
-                    version = ClientVersion.getClientVersionByProtocolVersion(protocolVersion);
-                    CLIENT_VERSIONS.put(channel, version);
+                    user.setClientVersion(ClientVersion.getClientVersionByProtocolVersion(protocolVersion));
                 }
             }
         }
-        return version;
+        return user.getClientVersion();
     }
 
     @Override
@@ -130,7 +129,9 @@ public class PlayerManagerImpl implements PlayerManager {
         User user = getUser(channel);
         if (user == null && channel != null) {
             //TODO Extract texture properties and pass into user profile(not priority)
-            user = new User(channel, new UserProfile(p.getUniqueId(), p.getName()));
+            user = new User(channel, ConnectionState.PLAY,
+                    null, new UserProfile(p.getUniqueId(),
+                    p.getName()));
             USERS.put(channel, user);
             PacketEvents.getAPI().getInjector().updateUser(channel, user);
         }

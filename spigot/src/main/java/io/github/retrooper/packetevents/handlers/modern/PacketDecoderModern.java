@@ -42,22 +42,19 @@ public class PacketDecoderModern extends ByteToMessageDecoder {
     public List<ByteToMessageDecoder> decoders = new ArrayList<>();
     public User user;
     public volatile Player player;
-    public ConnectionState connectionState;
     public boolean bypassCompression = false;
     public boolean handledCompression;
     public boolean skipDoubleTransform;
 
-    public PacketDecoderModern(User user, ConnectionState connectionState) {
+    public PacketDecoderModern(User user) {
         this.user = user;
-        this.connectionState = connectionState;
     }
 
     public PacketDecoderModern(PacketDecoderModern decoder) {
         mcDecoder = decoder.mcDecoder;
         decoders = decoder.decoders;
-        this.user = decoder.user;
+        user = decoder.user;
         player = decoder.player;
-        connectionState = decoder.connectionState;
         bypassCompression = decoder.bypassCompression;
         handledCompression = decoder.handledCompression;
         skipDoubleTransform = decoder.skipDoubleTransform;
@@ -72,7 +69,8 @@ public class PacketDecoderModern extends ByteToMessageDecoder {
         try {
             boolean needsCompress = !bypassCompression && handleCompressionOrder(ctx, transformedBuf);
             int firstReaderIndex = transformedBuf.readerIndex();
-            PacketReceiveEvent packetReceiveEvent = new PacketReceiveEvent(connectionState, ctx.channel(), user, player, transformedBuf);
+            PacketReceiveEvent packetReceiveEvent = new PacketReceiveEvent(user.getConnectionState(),
+                    ctx.channel(), user, player, transformedBuf);
             int readerIndex = transformedBuf.readerIndex();
             PacketEvents.getAPI().getEventManager().callEvent(packetReceiveEvent, () -> {
                 transformedBuf.readerIndex(readerIndex);

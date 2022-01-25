@@ -274,7 +274,7 @@ public class EarlyChannelInjectorLegacy implements EarlyInjector {
         if (decoder != null) {
             decoder.player = (Player) player;
             if (newConnectionState != null) {
-                decoder.connectionState = newConnectionState;
+                decoder.user.setConnectionState(newConnectionState);
             }
         }
 
@@ -286,12 +286,11 @@ public class EarlyChannelInjectorLegacy implements EarlyInjector {
 
     @Override
     public ConnectionState getConnectionState(ChannelAbstract channel) {
-        PacketDecoderLegacy decoder = getDecoder(channel);
-        if (decoder != null) {
-            return decoder.connectionState;
-        } else {
-            return null;
+        PacketEncoderLegacy encoder = getEncoder(channel);
+        if (encoder != null) {
+            return encoder.user.getConnectionState();
         }
+        return null;
     }
 
     @Override
@@ -300,7 +299,7 @@ public class EarlyChannelInjectorLegacy implements EarlyInjector {
         PacketDecoderLegacy decoder = getDecoder(ch);
         if (decoder != null) {
             //Change connection state in decoder
-            decoder.connectionState = connectionState;
+            decoder.user.setConnectionState(connectionState);
             if (connectionState == ConnectionState.PLAY) {
                 if (ProtocolSupportUtil.isAvailable()) {
                     channel.pipeline().remove(PacketEvents.DECODER_NAME);

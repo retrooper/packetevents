@@ -44,8 +44,6 @@ public abstract class ProtocolPacketEvent<T> extends PacketEvent implements Play
     private ByteBufAbstract byteBuf;
     private final int packetID;
     private final PacketTypeCommon packetType;
-    private ConnectionState connectionState;
-    private ClientVersion clientVersion;
     private ServerVersion serverVersion;
     private boolean cancel;
     private PacketWrapper<?> lastUsedWrapper;
@@ -74,27 +72,26 @@ public abstract class ProtocolPacketEvent<T> extends PacketEvent implements Play
         this.socketAddress = (InetSocketAddress) channel.remoteAddress();
         this.user = user;
         this.player = player;
-
-        this.connectionState = PacketEvents.getAPI().getPlayerManager().getConnectionState(channel);
-
-        ClientVersion version = PacketEvents.getAPI().getPlayerManager().getClientVersion(channel);
-        if (version == null) {
+        if (user.getClientVersion() == null) {
+            ClientVersion version = null;
             if (player != null) {
                 //Possibly ask a soft-dependency(for example, ViaVersion) for the client version.
                 version = PacketEvents.getAPI().getPlayerManager().getClientVersion(player);
             }
-        }
+            if (version == null) {
+                version = ClientVersion.UNKNOWN;
+            }
 
-        if (version == null) {
-            version = ClientVersion.UNKNOWN;
+            if (version != null) {
+                user.setClientVersion(version);
+            }
         }
-        this.clientVersion = version;
 
         this.serverVersion = PacketEvents.getAPI().getServerManager().getVersion();
 
         this.byteBuf = byteBuf;
         this.packetID = readVarInt(byteBuf);
-        this.packetType = PacketType.getById(packetSide, connectionState, this.serverVersion, packetID);
+        this.packetType = PacketType.getById(packetSide, user.getConnectionState(), this.serverVersion, packetID);
     }
 
     public ProtocolPacketEvent(PacketSide packetSide, ConnectionState connectionState, ChannelAbstract channel,
@@ -104,20 +101,21 @@ public abstract class ProtocolPacketEvent<T> extends PacketEvent implements Play
         this.user = user;
         this.player = player;
 
-        this.connectionState = connectionState;
-
-        ClientVersion version = PacketEvents.getAPI().getPlayerManager().getClientVersion(channel);
-        if (version == null) {
+        if (user.getClientVersion() == null) {
+            ClientVersion version = null;
             if (player != null) {
                 //Possibly ask a soft-dependency(for example, ViaVersion) for the client version.
                 version = PacketEvents.getAPI().getPlayerManager().getClientVersion(player);
             }
+            if (version == null) {
+                version = ClientVersion.UNKNOWN;
+            }
+
+            if (version != null) {
+                user.setClientVersion(version);
+            }
         }
 
-        if (version == null) {
-            version = ClientVersion.UNKNOWN;
-        }
-        this.clientVersion = version;
 
         this.serverVersion = PacketEvents.getAPI().getServerManager().getVersion();
 
@@ -126,16 +124,12 @@ public abstract class ProtocolPacketEvent<T> extends PacketEvent implements Play
         this.packetType = PacketType.getById(packetSide, connectionState, this.serverVersion, packetID);
     }
 
-    public ProtocolPacketEvent(int packetID, PacketTypeCommon packetType, ServerVersion serverVersion,
-                               ClientVersion clientVersion, InetSocketAddress socketAddress,
-                               ConnectionState connectionState, ChannelAbstract channel,
+    public ProtocolPacketEvent(int packetID, PacketTypeCommon packetType, ServerVersion serverVersion, InetSocketAddress socketAddress, ChannelAbstract channel,
                                User user, T player, ByteBufAbstract byteBuf) {
         this.channel = channel;
         this.socketAddress = socketAddress;
         this.user = user;
         this.player = player;
-        this.connectionState = connectionState;
-        this.clientVersion = clientVersion;
         this.serverVersion = serverVersion;
         this.byteBuf = byteBuf;
         this.packetID = packetID;
@@ -175,19 +169,16 @@ public abstract class ProtocolPacketEvent<T> extends PacketEvent implements Play
     }
 
     public ConnectionState getConnectionState() {
-        return connectionState;
+        return user.getConnectionState();
     }
 
-    public void setConnectionState(ConnectionState connectionState) {
-        this.connectionState = connectionState;
-    }
-
+    //TODO Possibly put clientversion inside User class and remove here
     public ClientVersion getClientVersion() {
-        return clientVersion;
+        return user.getClientVersion();
     }
 
     public void setClientVersion(@NotNull ClientVersion clientVersion) {
-        this.clientVersion = clientVersion;
+        user.setClientVersion(clientVersion);
     }
 
     public ServerVersion getServerVersion() {

@@ -109,18 +109,18 @@ public class LateChannelInjectorModern implements LateInjector {
 
     @Override
     public ConnectionState getConnectionState(ChannelAbstract channel) {
-        PacketDecoderModern decoder = getDecoder(channel);
-        if (decoder != null) {
-            return decoder.connectionState;
+        PacketEncoderModern encoder = getEncoder(channel);
+        if (encoder != null) {
+            return encoder.user.getConnectionState();
         }
         return null;
     }
 
     @Override
     public void changeConnectionState(ChannelAbstract channel, ConnectionState connectionState) {
-        PacketDecoderModern decoder = getDecoder(channel);
-        if (decoder != null) {
-            decoder.connectionState = connectionState;
+        PacketEncoderModern encoder = getEncoder(channel);
+        if (encoder != null) {
+            encoder.user.setConnectionState(connectionState);
         }
     }
 }
