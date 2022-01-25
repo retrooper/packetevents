@@ -838,7 +838,7 @@ public class WrappedBlockState {
     public void checkIsStillValid() {
         int oldGlobalID = globalID;
         globalID = getGlobalIDNoCache();
-        if (type != StateTypes.AIR && globalID == 0) {
+        if (globalID == -1) { // -1 maps to no block as negative ID are impossible
             WrappedBlockState blockState = getByGlobalId(oldGlobalID);
             this.type = blockState.type;
             this.globalID = blockState.globalID;
@@ -883,7 +883,7 @@ public class WrappedBlockState {
      * Internal method for determining if the block state is still valid
      */
     private int getGlobalIDNoCache() {
-        return INTO_ID.get(this);
+        return INTO_ID.getOrDefault(this, -1);
     }
 
     @Override
