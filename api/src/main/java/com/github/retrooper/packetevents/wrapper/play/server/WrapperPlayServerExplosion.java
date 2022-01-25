@@ -19,9 +19,10 @@
 package com.github.retrooper.packetevents.wrapper.play.server;
 
 import com.github.retrooper.packetevents.event.impl.PacketSendEvent;
-import com.github.retrooper.packetevents.util.Vector3i;
+import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.util.Vector3f;
+import com.github.retrooper.packetevents.util.Vector3i;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 
 import java.util.ArrayList;
@@ -33,6 +34,7 @@ public class WrapperPlayServerExplosion extends PacketWrapper<WrapperPlayServerE
     //Chunk posiitons?
     private List<Vector3i> records;
     private Vector3f playerMotion;
+
     public WrapperPlayServerExplosion(PacketSendEvent event) {
         super(event);
     }
@@ -52,12 +54,12 @@ public class WrapperPlayServerExplosion extends PacketWrapper<WrapperPlayServerE
         float z = readFloat();
         position = new Vector3f(x, y, z);
         strength = readFloat();
-        int recordsLength = readInt();
+        int recordsLength = serverVersion.isNewerThanOrEquals(ServerVersion.V_1_17) ? readVarInt() : readInt();
         records = new ArrayList<>(recordsLength);
         for (int i = 0; i < recordsLength; i++) {
-            int chunkPosX = readByte() + (int)position.x;
-            int chunkPosY = readByte() + (int)position.y;
-            int chunkPosZ = readByte() + (int)position.z;
+            int chunkPosX = readByte() + (int) position.x;
+            int chunkPosY = readByte() + (int) position.y;
+            int chunkPosZ = readByte() + (int) position.z;
             records.add(new Vector3i(chunkPosX, chunkPosY, chunkPosZ));
         }
 
@@ -80,12 +82,18 @@ public class WrapperPlayServerExplosion extends PacketWrapper<WrapperPlayServerE
         writeFloat(position.x);
         writeFloat(position.y);
         writeFloat(position.z);
-       writeFloat(strength);
-       writeInt(records.size());
+        writeFloat(strength);
+
+        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_17)) {
+            writeVarInt(records.size());
+        } else {
+            writeInt(records.size());
+        }
+
         for (Vector3i record : records) {
-            writeByte(record.x - (int)position.x);
-            writeByte(record.y - (int)position.y);
-            writeByte(record.z - (int)position.z);
+            writeByte(record.x - (int) position.x);
+            writeByte(record.y - (int) position.y);
+            writeByte(record.z - (int) position.z);
         }
 
         writeFloat(playerMotion.x);
