@@ -38,7 +38,6 @@ import java.net.InetSocketAddress;
 
 public abstract class ProtocolPacketEvent<T> extends PacketEvent implements PlayerEvent<T>, CancellableEvent {
     private final ChannelAbstract channel;
-    private final InetSocketAddress socketAddress;
     private final User user;
     private final T player;
     private ByteBufAbstract byteBuf;
@@ -69,7 +68,6 @@ public abstract class ProtocolPacketEvent<T> extends PacketEvent implements Play
 
     public ProtocolPacketEvent(PacketSide packetSide, ChannelAbstract channel, User user, T player, ByteBufAbstract byteBuf) {
         this.channel = channel;
-        this.socketAddress = (InetSocketAddress) channel.remoteAddress();
         this.user = user;
         this.player = player;
         if (user.getClientVersion() == null) {
@@ -97,7 +95,6 @@ public abstract class ProtocolPacketEvent<T> extends PacketEvent implements Play
     public ProtocolPacketEvent(PacketSide packetSide, ConnectionState connectionState, ChannelAbstract channel,
                                User user, T player, ByteBufAbstract byteBuf) {
         this.channel = channel;
-        this.socketAddress = (InetSocketAddress) channel.remoteAddress();
         this.user = user;
         this.player = player;
 
@@ -127,7 +124,6 @@ public abstract class ProtocolPacketEvent<T> extends PacketEvent implements Play
     public ProtocolPacketEvent(int packetID, PacketTypeCommon packetType, ServerVersion serverVersion, InetSocketAddress socketAddress, ChannelAbstract channel,
                                User user, T player, ByteBufAbstract byteBuf) {
         this.channel = channel;
-        this.socketAddress = socketAddress;
         this.user = user;
         this.player = player;
         this.serverVersion = serverVersion;
@@ -154,7 +150,7 @@ public abstract class ProtocolPacketEvent<T> extends PacketEvent implements Play
     }
 
     public InetSocketAddress getSocketAddress() {
-        return socketAddress;
+        return ((InetSocketAddress) channel.remoteAddress());
     }
 
     @NotNull
