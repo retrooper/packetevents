@@ -42,9 +42,9 @@ public class PacketDecoderLegacy extends ByteToMessageDecoder {
             int preProcessIndex = transformed.readerIndex();
             PacketReceiveEvent packetReceiveEvent = new PacketReceiveEvent(user.getConnectionState(),
                     ctx.channel(), user, player, transformed);
-            int readerIndex = transformed.readerIndex();
+            int processIndex = transformed.readerIndex();
             PacketEvents.getAPI().getEventManager().callEvent(packetReceiveEvent, () -> {
-                transformed.readerIndex(readerIndex);
+                transformed.readerIndex(processIndex);
             });
             if (!packetReceiveEvent.isCancelled()) {
                 if (packetReceiveEvent.getLastUsedWrapper() != null) {

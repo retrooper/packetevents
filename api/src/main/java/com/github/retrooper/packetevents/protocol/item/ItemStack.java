@@ -149,7 +149,6 @@ public class ItemStack {
     }
 
     public boolean isEnchanted() {
-        //TODO It might have been called StoredEnchantments on legacy versions, we might consider contributing to wiki.vg
         if (!isEmpty() && this.nbt != null && this.nbt.getCompoundListTagOrNull("Enchantments") != null) {
             return !this.nbt.getCompoundListTagOrNull("Enchantments").isEmpty();
         } else {
@@ -192,14 +191,22 @@ public class ItemStack {
 
 
     public void setEnchantments(List<Enchantment> enchantments) {
-        List<NBTCompound> list = new ArrayList<>();
-        for (Enchantment enchantment : enchantments) {
-            NBTCompound compound = new NBTCompound();
-            compound.setTag("id", new NBTString(enchantment.getType().getName().toString()));
-            compound.setTag("lvl", new NBTShort((short) enchantment.getLevel()));
-            list.add(compound);
+        if (enchantments.isEmpty()) {
+            //Let us clear the enchantments
+            if (nbt.getTagOrNull("Enchantments") != null) {
+                nbt.removeTag("Enchantments");
+            }
         }
-        nbt.setTag("Enchantments", new NBTList<>(NBTType.COMPOUND, list));
+        else {
+            List<NBTCompound> list = new ArrayList<>();
+            for (Enchantment enchantment : enchantments) {
+                NBTCompound compound = new NBTCompound();
+                compound.setTag("id", new NBTString(enchantment.getType().getName().toString()));
+                compound.setTag("lvl", new NBTShort((short) enchantment.getLevel()));
+                list.add(compound);
+            }
+            nbt.setTag("Enchantments", new NBTList<>(NBTType.COMPOUND, list));
+        }
     }
 
     public boolean canBeDepleted() {
