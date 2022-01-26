@@ -49,7 +49,6 @@ public class InternalPacketListener implements PacketListener {
             //Map username with channel
             PacketEvents.getAPI().getPlayerManager().CHANNELS.put(profile.getName(), event.getChannel());
             PacketEvents.getAPI().getLogManager().debug("Mapped player username with their channel.");
-            System.out.println("here: " + event.getConnectionState());
 
             //Update connection state(injectors might do some adjustments when we transition into PLAY state)
             //This also updates it for the user instance
