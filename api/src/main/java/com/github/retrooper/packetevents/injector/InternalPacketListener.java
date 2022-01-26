@@ -52,10 +52,10 @@ public class InternalPacketListener implements PacketListener {
 
             //Update connection state(injectors might do some adjustments when we transition into PLAY state)
             //This also updates it for the user instance
-            PacketEvents.getAPI().getInjector().changeConnectionState(channel, ConnectionState.PLAY);
-            PacketEvents.getAPI().getLogManager().debug("Transitioned user " + profile.getName() + " into the play state!");
-
-            //Transition into the PLAY connection state
+            event.getPostTasks().add(() -> {
+                PacketEvents.getAPI().getInjector().changeConnectionState(channel, ConnectionState.PLAY);
+                PacketEvents.getAPI().getLogManager().debug("Transitioned user " + profile.getName() + " into the play state!");
+            });
         }
     }
 
