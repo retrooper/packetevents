@@ -116,7 +116,6 @@ public class PacketEventsPlugin extends JavaPlugin {
                     WrapperPlayClientPlayerFlying flying
                             = new WrapperPlayClientPlayerFlying(event);
                     Location location = flying.getLocation();
-                    System.out.println("Loc: " + location);
                 }
             }
 
@@ -135,7 +134,7 @@ public class PacketEventsPlugin extends JavaPlugin {
         };
 
         // net.minecraft.server.v1_7_R4.PacketPlayOutWorldParticles w1;
-        //PacketEvents.getAPI().getEventManager().registerListener(debugListener);
+        PacketEvents.getAPI().getEventManager().registerListener(debugListener);
     }
 
     @Override

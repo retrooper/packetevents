@@ -52,8 +52,8 @@ public class CustomPacketDecompressor {
                     throw new RuntimeException("Badly compressed packet - size of " + dataLength + " is below server threshold of " + THRESHOLD);
                 }
 
-                if (dataLength > 2097152) {
-                    throw new RuntimeException("Badly compressed packet - size of " + dataLength + " is larger than protocol maximum of " + 2097152);
+                if (dataLength > PacketCompressionUtil.MAXIMUM) {
+                    throw new RuntimeException("Badly compressed packet - size of " + dataLength + " is larger than protocol maximum of " + PacketCompressionUtil.MAXIMUM);
                 }
 
                 byte[] compressedData = new byte[byteBuf.readableBytes()];

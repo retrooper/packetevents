@@ -23,7 +23,6 @@ import com.github.retrooper.packetevents.event.impl.PacketReceiveEvent;
 import com.github.retrooper.packetevents.event.impl.PacketSendEvent;
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.netty.buffer.ByteBufAbstract;
-import com.github.retrooper.packetevents.util.AdventureSerializer;
 import com.github.retrooper.packetevents.protocol.entity.data.EntityData;
 import com.github.retrooper.packetevents.protocol.entity.data.EntityDataType;
 import com.github.retrooper.packetevents.protocol.entity.data.EntityDataTypes;
@@ -37,6 +36,7 @@ import com.github.retrooper.packetevents.protocol.packettype.PacketTypeCommon;
 import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 import com.github.retrooper.packetevents.protocol.player.GameMode;
 import com.github.retrooper.packetevents.resources.ResourceLocation;
+import com.github.retrooper.packetevents.util.AdventureSerializer;
 import com.github.retrooper.packetevents.util.StringUtil;
 import com.github.retrooper.packetevents.util.Vector3i;
 import net.kyori.adventure.text.Component;
@@ -46,7 +46,6 @@ import org.jetbrains.annotations.Nullable;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.function.BiConsumer;
-import java.util.function.Consumer;
 import java.util.function.Function;
 
 public class PacketWrapper<T extends PacketWrapper> {
@@ -100,8 +99,7 @@ public class PacketWrapper<T extends PacketWrapper> {
             int bufferIndex = getBuffer().readerIndex();
             readData();
             getBuffer().readerIndex(bufferIndex);
-        }
-        else {
+        } else {
             if (event.getLastUsedWrapper() == null) {
                 event.setLastUsedWrapper(this);
                 readData();
@@ -224,26 +222,31 @@ public class PacketWrapper<T extends PacketWrapper> {
     }
 
     public int readVarInt() {
-        int result = 0;
-        byte i;
-        int j = 0;
+        int value = 0;
+        int length = 0;
+        byte currentByte;
         do {
-            i = buffer.readByte();
-            result |= (i & Byte.MAX_VALUE) << j++ * 7;
-            if (j > 5)
-                throw new RuntimeException("VarInt too big");
-        } while ((i & 0x80) == 128);
-        return result;
+            currentByte = buffer.readByte();
+            value |= (currentByte & 0x7F) << (length * 7);
+            length++;
+            if (length > 5) {
+                throw new RuntimeException("VarInt is too large. Must be smaller than 5 bytes.");
+            }
+        } while ((currentByte & 0x80) == 0x80);
+        return value;
     }
 
     public void writeVarInt(int value) {
-        while ((value & -128) != 0) {
-            buffer.writeByte(value & Byte.MAX_VALUE | 128);
+        while (true) {
+            if ((value & ~0x7F) == 0) {
+                buffer.writeByte(value);
+                return;
+            }
+            buffer.writeByte((value & 0x7F) | 0x80);
             value >>>= 7;
         }
-
-        buffer.writeByte(value);
     }
+
     public <K, V> Map<K, V> readMap(Function<PacketWrapper<?>, K> keyFunction, Function<PacketWrapper<?>, V> valueFunction) {
         int size = readVarInt();
         Map<K, V> map = new HashMap<>(size);

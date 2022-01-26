@@ -93,7 +93,7 @@ public class NettyManagerImpl implements NettyManager {
     }
 
     @Override
-    public ChannelAbstract wrapChannel(Object channel) {
+    public ChannelAbstract wrapChannel0(Object channel) {
         if (SpigotReflectionUtil.USE_MODERN_NETTY_PACKAGE) {
             return new ChannelModern(channel);
         }

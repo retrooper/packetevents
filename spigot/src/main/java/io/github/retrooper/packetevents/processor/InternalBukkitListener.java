@@ -66,7 +66,8 @@ public class InternalBukkitListener implements Listener {
     public void onQuit(PlayerQuitEvent e) {
         Player player = e.getPlayer();
         ChannelAbstract channel = PacketEvents.getAPI().getPlayerManager().getChannel(player);
-        //Cleanup user data
+        //Cleanup user data, maybe make some abstraction method for this in the API module.
+        PacketEvents.getAPI().getNettyManager().CHANNEL_MAP.remove(channel.rawChannel());
         PacketEvents.getAPI().getPlayerManager().USERS.remove(channel);
         PacketEvents.getAPI().getPlayerManager().CHANNELS.remove(player.getName());
         PacketEvents.getAPI().getPlayerManager().PLAYER_ATTRIBUTES.remove(player.getUniqueId());

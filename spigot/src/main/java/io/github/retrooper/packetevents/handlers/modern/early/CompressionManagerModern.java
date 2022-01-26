@@ -36,10 +36,8 @@ public class CompressionManagerModern {
         } finally {
             decompressed.release();
         }
-        PacketEncoderModern encoder = (PacketEncoderModern) ctx.pipeline().get(PacketEvents.ENCODER_NAME);
-        PacketDecoderModern decoder = (PacketDecoderModern) ctx.pipeline().get(PacketEvents.DECODER_NAME);
-        ctx.pipeline().remove(encoder);
-        ctx.pipeline().remove(decoder);
+        PacketEncoderModern encoder = (PacketEncoderModern) ctx.pipeline().remove(PacketEvents.ENCODER_NAME);
+        PacketDecoderModern decoder = (PacketDecoderModern) ctx.pipeline().remove(PacketEvents.DECODER_NAME);
         ctx.pipeline().addAfter("compress", PacketEvents.ENCODER_NAME, encoder);
         ctx.pipeline().addAfter("decompress", PacketEvents.DECODER_NAME, new PacketDecoderModern(decoder));
         return true;

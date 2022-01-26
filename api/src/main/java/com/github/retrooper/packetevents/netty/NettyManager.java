@@ -22,7 +22,11 @@ import com.github.retrooper.packetevents.netty.buffer.ByteBufAbstract;
 import com.github.retrooper.packetevents.netty.channel.ChannelAbstract;
 import com.github.retrooper.packetevents.netty.channel.ChannelHandlerContextAbstract;
 
+import java.util.HashMap;
+import java.util.Map;
+
 public interface NettyManager {
+    public static final Map<Object, ChannelAbstract> CHANNEL_MAP = new HashMap<>();
     ByteBufAbstract wrappedBuffer(byte[] bytes);
 
     ByteBufAbstract copiedBuffer(byte[] bytes);
@@ -45,7 +49,15 @@ public interface NettyManager {
 
     ByteBufAbstract wrapByteBuf(Object byteBuf);
 
-    ChannelAbstract wrapChannel(Object channel);
+    default ChannelAbstract wrapChannel(Object channel) {
+        ChannelAbstract result = CHANNEL_MAP.get(channel);
+        if (result == null) {
+            result = wrapChannel0(channel);
+            CHANNEL_MAP.put(channel, result);
+        }
+        return result;
+    }
+    ChannelAbstract wrapChannel0(Object channel);
 
     ChannelHandlerContextAbstract wrapChannelHandlerContext(Object ctx);
 
