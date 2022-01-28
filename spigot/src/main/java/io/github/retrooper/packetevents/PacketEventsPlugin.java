@@ -28,6 +28,7 @@ import com.github.retrooper.packetevents.protocol.item.ItemStack;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.protocol.particle.Particle;
 import com.github.retrooper.packetevents.protocol.particle.type.ParticleTypes;
+import com.github.retrooper.packetevents.protocol.player.InteractionHand;
 import com.github.retrooper.packetevents.protocol.player.TextureProperty;
 import com.github.retrooper.packetevents.protocol.player.User;
 import com.github.retrooper.packetevents.protocol.player.UserProfile;
@@ -35,7 +36,9 @@ import com.github.retrooper.packetevents.protocol.world.Location;
 import com.github.retrooper.packetevents.util.MojangAPIUtil;
 import com.github.retrooper.packetevents.util.Vector3d;
 import com.github.retrooper.packetevents.util.Vector3f;
+import com.github.retrooper.packetevents.util.Vector3i;
 import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientChatMessage;
+import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientPlayerBlockPlacement;
 import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientPlayerFlying;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerParticle;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerSetSlot;
@@ -117,19 +120,26 @@ public class PacketEventsPlugin extends JavaPlugin {
                             = new WrapperPlayClientPlayerFlying(event);
                     Location location = flying.getLocation();
                 }
+                else if (event.getPacketType()
+                == PacketType.Play.Client.PLAYER_BLOCK_PLACEMENT) {
+                    WrapperPlayClientPlayerBlockPlacement blockPlacement = new WrapperPlayClientPlayerBlockPlacement(event);
+                    InteractionHand hand = blockPlacement.getHand();
+                    Vector3i blockPos = blockPlacement.getBlockPosition();
+                    event.getUser().sendMessage("Hand: " + hand + ", Block pos: " + blockPos + ", block face: " + blockPlacement.getFace());
+                }
             }
 
             @Override
             public void onPacketSend(PacketSendEvent event) {
                 User user = event.getUser();
-                if (event.getPacketType() == PacketType.Play.Server.SET_SLOT) {
+                /*if (event.getPacketType() == PacketType.Play.Server.SET_SLOT) {
                     WrapperPlayServerSetSlot setSlot = new WrapperPlayServerSetSlot(event);
                     int windowID = setSlot.getWindowId();
                     int slot = setSlot.getSlot();
                     ItemStack item = setSlot.getItem();
                     user.sendMessage("Set slot: " + slot + ", to item: "
                             + (item.getType() != null ? item.toString() : "null item"));
-                }
+                }*/
             }
         };
 
