@@ -96,12 +96,13 @@ public class PacketEncoderLegacy extends MessageToByteEncoder {
         out.writeBytes(in);
         read(ctx, out);
     }
+
     private boolean handleCompressionOrder(ChannelHandlerContext ctx, ByteBuf buffer) {
         if (handledCompression) return false;
-        int decoderIndex = ctx.pipeline().names().indexOf("decompress");
-        if (decoderIndex == -1) return false;
+        int encoderIndex = ctx.pipeline().names().indexOf("compress");
+        if (encoderIndex == -1) return false;
         handledCompression = true;
-        if (decoderIndex > ctx.pipeline().names().indexOf(PacketEvents.DECODER_NAME)) {
+        if (encoderIndex > ctx.pipeline().names().indexOf(PacketEvents.ENCODER_NAME)) {
             // Need to decompress this packet due to bad order
             ByteBuf decompressed = ctx.alloc().buffer();
             PacketCompressionUtil.decompress(ctx.pipeline(), buffer, decompressed);
