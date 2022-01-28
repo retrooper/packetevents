@@ -49,15 +49,10 @@ shadowJar {
     archiveBaseName.set('spigot')
     archiveClassifier.set('')
     archiveVersion.set('')
-
     minimize()
 }
 
 dependencies {
-    implementation 'net.kyori:adventure-api:4.9.3'
-    implementation 'net.kyori:adventure-text-serializer-gson:4.9.3'
-    implementation 'net.kyori:adventure-text-serializer-legacy:4.9.3'
-    implementation 'com.google.code.gson:gson:2.8.9'
     api project(':api')
     compileOnly 'org.jetbrains:annotations:22.0.0'
 
