@@ -67,29 +67,7 @@ public abstract class ProtocolPacketEvent<T> extends PacketEvent implements Play
 
 
     public ProtocolPacketEvent(PacketSide packetSide, ChannelAbstract channel, User user, T player, ByteBufAbstract byteBuf) {
-        this.channel = channel;
-        this.user = user;
-        this.player = player;
-        if (user.getClientVersion() == null) {
-            ClientVersion version = null;
-            if (player != null) {
-                //Possibly ask a soft-dependency(for example, ViaVersion) for the client version.
-                version = PacketEvents.getAPI().getPlayerManager().getClientVersion(player);
-            }
-            if (version == null) {
-                version = ClientVersion.UNKNOWN;
-            }
-
-            if (version != null) {
-                user.setClientVersion(version);
-            }
-        }
-
-        this.serverVersion = PacketEvents.getAPI().getServerManager().getVersion();
-
-        this.byteBuf = byteBuf;
-        this.packetID = readVarInt(byteBuf);
-        this.packetType = PacketType.getById(packetSide, user.getConnectionState(), this.serverVersion, packetID);
+        this(packetSide, user.getConnectionState(), channel, user, player, byteBuf);
     }
 
     public ProtocolPacketEvent(PacketSide packetSide, ConnectionState connectionState, ChannelAbstract channel,
