@@ -57,8 +57,15 @@ public class WrapperPlayServerParticle extends PacketWrapper<WrapperPlayServerPa
     @Override
     public void readData() {
         //TODO on 1.7 we get particle type by 64 len string: https://wiki.vg/index.php?title=Protocol&oldid=6003#Particle_2
-        int particleTypeId = readInt();
-        ParticleType particleType = ParticleTypes.getById(particleTypeId);
+        ParticleType particleType;
+        if (serverVersion == ServerVersion.V_1_7_10) {
+            String particleName = readString(64);
+            particleType = ParticleTypes.getByName("minecraft:" + particleName);
+        }
+        else {
+            int particleTypeId = readInt();
+            particleType = ParticleTypes.getById(particleTypeId);
+        }
         longDistance = readBoolean();
         if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_15)) {
             position = new Vector3d(readDouble(), readDouble(), readDouble());
@@ -98,7 +105,12 @@ public class WrapperPlayServerParticle extends PacketWrapper<WrapperPlayServerPa
     @Override
     public void writeData() {
         //TODO on 1.7 we get particle type by 64 len string
-        writeInt(particle.getType().getId());
+        if (serverVersion==ServerVersion.V_1_7_10) {
+            writeString(particle.getType().getName().getKey(), 64);
+        }
+        else {
+            writeInt(particle.getType().getId());
+        }
         writeBoolean(longDistance);
         if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_15)) {
             writeDouble(position.getX());
