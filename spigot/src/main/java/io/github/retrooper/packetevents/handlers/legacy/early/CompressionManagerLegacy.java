@@ -41,7 +41,7 @@ public class CompressionManagerLegacy {
         ctx.pipeline().remove(encoder);
         ctx.pipeline().remove(decoder);
         ctx.pipeline().addAfter("compress", PacketEvents.ENCODER_NAME, encoder);
-        ctx.pipeline().addAfter("decompress", PacketEvents.DECODER_NAME, decoder);
+        ctx.pipeline().addAfter("decompress", PacketEvents.DECODER_NAME, new PacketDecoderLegacy(decoder));
         return true;
     }
 

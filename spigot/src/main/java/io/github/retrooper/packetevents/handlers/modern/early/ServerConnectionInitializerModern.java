@@ -39,13 +39,11 @@ import java.util.List;
 public class ServerConnectionInitializerModern {
     public static void postInitChannel(Object ch, ConnectionState connectionState) {
         Channel channel = (Channel) ch;
-        //System.out.println("Pre Channel handlers: " + Arrays.toString(channel.pipeline().names().toArray(new String[0])));
         ChannelAbstract channelAbstract = PacketEvents.getAPI().getNettyManager().wrapChannel(channel);
         User user = new User(channelAbstract, connectionState, null, new UserProfile(null, null));
-        PacketEvents.getAPI().getPlayerManager().setUser(channelAbstract, user);
+        PacketEvents.getAPI().getPlayerManager().USERS.put(channelAbstract, user);
         channel.pipeline().addAfter("splitter", PacketEvents.DECODER_NAME, new PacketDecoderModern(user));
         channel.pipeline().addBefore("encoder", PacketEvents.ENCODER_NAME, new PacketEncoderModern(user));
-        //System.out.println("Post Channel handlers: " + Arrays.toString(channel.pipeline().names().toArray(new String[0])));
     }
 
     public static void postDestroyChannel(Object ch) {

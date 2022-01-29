@@ -243,14 +243,10 @@ public class EarlyChannelInjectorModern implements EarlyInjector {
     private PacketDecoderModern getDecoder(ChannelAbstract ch) {
         Channel channel = (Channel) ch.rawChannel();
         ChannelHandler decoder = channel.pipeline().get(PacketEvents.DECODER_NAME);
-        if (decoder != null) {
-            if (decoder instanceof PacketDecoderModern) {
-                return (PacketDecoderModern) decoder;
-            }
-            else {
-                return null;
-            }
-        } else if (ViaVersionUtil.isAvailable()) {
+        if (decoder instanceof PacketDecoderModern) {
+            return (PacketDecoderModern) decoder;
+        }
+        else if (ViaVersionUtil.isAvailable()) {
             ChannelHandler mcDecoder = channel.pipeline().get("decoder");
             if (ViaVersionUtil.getBukkitDecodeHandlerClass().isInstance(mcDecoder)) {
                 ReflectionObject reflectMCDecoder = new ReflectionObject(mcDecoder);
@@ -290,8 +286,14 @@ public class EarlyChannelInjectorModern implements EarlyInjector {
             if (newConnectionState == ConnectionState.PLAY) {
                 decoder.handledCompression = true;
                 if (ViaVersionUtil.isAvailable()) {
-                    channel.pipeline().remove(PacketEvents.DECODER_NAME);
-                    addCustomViaDecoder(channel, new PacketDecoderModern(decoder));
+                    ChannelHandler handler = channel.pipeline().get(PacketEvents.DECODER_NAME);
+                    if (handler != null) {
+                        channel.pipeline().remove(PacketEvents.DECODER_NAME);
+                        addCustomViaDecoder(channel, new PacketDecoderModern(decoder));
+                    }
+                    else {
+                        System.out.println("We would have run into an exception!");
+                    }
                 }
                 else if (ProtocolSupportUtil.isAvailable()) {
                     channel.pipeline().remove(PacketEvents.DECODER_NAME);

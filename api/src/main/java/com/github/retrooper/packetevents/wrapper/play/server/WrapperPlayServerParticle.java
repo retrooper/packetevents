@@ -28,6 +28,7 @@ import com.github.retrooper.packetevents.protocol.particle.type.ParticleTypes;
 import com.github.retrooper.packetevents.util.Vector3d;
 import com.github.retrooper.packetevents.util.Vector3f;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
+
 //Might be worthy to document
 //TODO Check changelog through out the versions
 public class WrapperPlayServerParticle extends PacketWrapper<WrapperPlayServerParticle> {
@@ -38,6 +39,7 @@ public class WrapperPlayServerParticle extends PacketWrapper<WrapperPlayServerPa
     private float particleData;
     private int particleCount;
     private int[] legacyData;
+
     public WrapperPlayServerParticle(PacketSendEvent event) {
         super(event);
     }
@@ -61,16 +63,14 @@ public class WrapperPlayServerParticle extends PacketWrapper<WrapperPlayServerPa
         if (serverVersion == ServerVersion.V_1_7_10) {
             String particleName = readString(64);
             particleType = ParticleTypes.getByName("minecraft:" + particleName);
-        }
-        else {
+        } else {
             int particleTypeId = readInt();
             particleType = ParticleTypes.getById(particleTypeId);
         }
         longDistance = readBoolean();
         if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_15)) {
             position = new Vector3d(readDouble(), readDouble(), readDouble());
-        }
-        else {
+        } else {
             position = new Vector3d(readFloat(), readFloat(), readFloat());
         }
         offset = new Vector3f(readFloat(), readFloat(), readFloat());
@@ -80,8 +80,7 @@ public class WrapperPlayServerParticle extends PacketWrapper<WrapperPlayServerPa
         if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_13)) {
             data = particleType.readDataFunction().apply(this);
             legacyData = new int[0];
-        }
-        else {
+        } else {
             data = new ParticleData();
             if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_8)) {
                 //TODO Understand the legacy data: https://wiki.vg/index.php?title=Protocol&oldid=14204
@@ -105,10 +104,9 @@ public class WrapperPlayServerParticle extends PacketWrapper<WrapperPlayServerPa
     @Override
     public void writeData() {
         //TODO on 1.7 we get particle type by 64 len string
-        if (serverVersion==ServerVersion.V_1_7_10) {
+        if (serverVersion == ServerVersion.V_1_7_10) {
             writeString(particle.getType().getName().getKey(), 64);
-        }
-        else {
+        } else {
             writeInt(particle.getType().getId());
         }
         writeBoolean(longDistance);
@@ -116,8 +114,7 @@ public class WrapperPlayServerParticle extends PacketWrapper<WrapperPlayServerPa
             writeDouble(position.getX());
             writeDouble(position.getY());
             writeDouble(position.getZ());
-        }
-        else {
+        } else {
             writeFloat((float) position.getX());
             writeFloat((float) position.getY());
             writeFloat((float) position.getZ());
@@ -129,8 +126,7 @@ public class WrapperPlayServerParticle extends PacketWrapper<WrapperPlayServerPa
         writeInt(particleCount);
         if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_13)) {
             particle.getType().writeDataFunction().accept(this, particle.getData());
-        }
-        else {
+        } else {
             if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_8)) {
                 writeVarIntArray(legacyData);
             }
