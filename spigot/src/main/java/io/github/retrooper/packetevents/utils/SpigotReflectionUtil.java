@@ -65,7 +65,7 @@ public final class SpigotReflectionUtil {
             LEVEL_ENTITY_GETTER_CLASS, PERSISTENT_ENTITY_SECTION_MANAGER_CLASS;
 
     //Netty classes
-    public static Class<?> CHANNEL_CLASS, BYTE_BUF_CLASS;
+    public static Class<?> CHANNEL_CLASS, BYTE_BUF_CLASS, BYTE_TO_MESSAGE_DECODER, MESSAGE_TO_BYTE_ENCODER;;
 
     //External classes
     public static Class<?> GEYSER_CLASS;
@@ -166,6 +166,8 @@ public final class SpigotReflectionUtil {
 
         CHANNEL_CLASS = getNettyClass("channel.Channel");
         BYTE_BUF_CLASS = getNettyClass("buffer.ByteBuf");
+        BYTE_TO_MESSAGE_DECODER = getNettyClass("handler.codec.ByteToMessageDecoder");
+        MESSAGE_TO_BYTE_ENCODER = getNettyClass("handler.codec.MessageToByteEncoder");
 
         GEYSER_CLASS = Reflection.getClassByNameWithoutException("org.geysermc.connector.GeyserConnector");
     }

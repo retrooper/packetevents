@@ -120,13 +120,6 @@ public class PacketEventsPlugin extends JavaPlugin {
                             = new WrapperPlayClientPlayerFlying(event);
                     Location location = flying.getLocation();
                 }
-                else if (event.getPacketType()
-                == PacketType.Play.Client.PLAYER_BLOCK_PLACEMENT) {
-                    WrapperPlayClientPlayerBlockPlacement blockPlacement = new WrapperPlayClientPlayerBlockPlacement(event);
-                    InteractionHand hand = blockPlacement.getHand();
-                    Vector3i blockPos = blockPlacement.getBlockPosition();
-                    event.getUser().sendMessage("Hand: " + hand + ", Block pos: " + blockPos + ", block face: " + blockPlacement.getFace());
-                }
             }
 
             @Override

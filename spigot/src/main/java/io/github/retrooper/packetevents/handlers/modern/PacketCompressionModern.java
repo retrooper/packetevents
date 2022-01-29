@@ -21,14 +21,12 @@ package io.github.retrooper.packetevents.handlers.modern;
 import com.github.retrooper.packetevents.PacketEvents;
 import io.github.retrooper.packetevents.handlers.compression.PacketCompressionManager;
 import io.github.retrooper.packetevents.handlers.compression.PacketCompressionUtil;
+import io.github.retrooper.packetevents.utils.SpigotReflectionUtil;
 import io.github.retrooper.packetevents.utils.netty.RawNettyUtil;
 import io.netty.buffer.ByteBuf;
-import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelPipeline;
-import io.netty.handler.codec.ByteToMessageDecoder;
-import io.netty.handler.codec.MessageToByteEncoder;
 
 import java.util.zip.DataFormatException;
 
@@ -37,37 +35,37 @@ public class PacketCompressionModern implements PacketCompressionManager {
     public void decompress(Object rawPipeline, Object rawBuffer, Object rawOutput) {
         ChannelPipeline pipeline = (ChannelPipeline) rawPipeline;
         ByteBuf buffer = (ByteBuf) rawBuffer;
-        if (!buffer.isReadable()) return;
+        if (buffer.readableBytes() == 0) return;
         ByteBuf output = (ByteBuf) rawOutput;
         ChannelHandler decompressionHandler = pipeline.get("decompress");
-        if (decompressionHandler instanceof ByteToMessageDecoder) {
-            int dataLength = RawNettyUtil.readVarInt(buffer);
-            if (dataLength == 0) {
-                output.writeBytes(buffer.readBytes(buffer.readableBytes()));
-            } else {
-                if (dataLength < PacketCompressionUtil.THRESHOLD) {
-                    throw new RuntimeException("Badly compressed packet - size of " + dataLength + " is below server threshold of " + PacketCompressionUtil.THRESHOLD);
-                }
-
-                if (dataLength > PacketCompressionUtil.MAXIMUM) {
-                    throw new RuntimeException("Badly compressed packet - size of " + dataLength + " is larger than protocol maximum of " + PacketCompressionUtil.MAXIMUM);
-                }
-
-                byte[] compressedData = new byte[buffer.readableBytes()];
-                buffer.readBytes(compressedData);
-                PacketCompressionUtil.INFLATER.setInput(compressedData);
-                byte[] decompressedData = new byte[dataLength];
-                try {
-                    PacketCompressionUtil.INFLATER.inflate(decompressedData);
-                } catch (DataFormatException e) {
-                    e.printStackTrace();
-                }
-                output.writeBytes(decompressedData);
-                PacketCompressionUtil.INFLATER.reset();
-            }
-        } else {
+        if (!SpigotReflectionUtil.BYTE_TO_MESSAGE_DECODER.isInstance(decompressionHandler)) {
             //ViaRewind might have replaced the decompressor with an empty handler, so we can just skip the decompression process.
             output.writeBytes(buffer);
+            return;
+        }
+        int dataLength = RawNettyUtil.readVarInt(buffer);
+        if (dataLength == 0) {
+            output.writeBytes(buffer.readBytes(buffer.readableBytes()));
+        } else {
+            if (dataLength < PacketCompressionUtil.THRESHOLD) {
+                throw new RuntimeException("Badly compressed packet - size of " + dataLength + " is below server threshold of " + PacketCompressionUtil.THRESHOLD);
+            }
+
+            if (dataLength > PacketCompressionUtil.MAXIMUM) {
+                throw new RuntimeException("Badly compressed packet - size of " + dataLength + " is larger than protocol maximum of " + PacketCompressionUtil.MAXIMUM);
+            }
+
+            byte[] compressedData = new byte[buffer.readableBytes()];
+            buffer.readBytes(compressedData);
+            PacketCompressionUtil.INFLATER.setInput(compressedData);
+            byte[] decompressedData = new byte[dataLength];
+            try {
+                PacketCompressionUtil.INFLATER.inflate(decompressedData);
+            } catch (DataFormatException e) {
+                e.printStackTrace();
+            }
+            output.writeBytes(decompressedData);
+            PacketCompressionUtil.INFLATER.reset();
         }
     }
 
@@ -75,27 +73,30 @@ public class PacketCompressionModern implements PacketCompressionManager {
     public void compress(Object rawPipeline, Object rawBuffer, Object rawOutput) {
         ChannelPipeline pipeline = (ChannelPipeline) rawPipeline;
         ByteBuf buffer = (ByteBuf) rawBuffer;
-        if (!buffer.isReadable()) return;
+        if (buffer.readableBytes() == 0) return;
         ByteBuf output = (ByteBuf) rawOutput;
         ChannelHandler compressionHandler = pipeline.get("compress");
-        if (compressionHandler instanceof MessageToByteEncoder) {
-            int dataLength = buffer.readableBytes();
-            if (dataLength < PacketCompressionUtil.THRESHOLD) {
-                RawNettyUtil.writeVarInt(output, dataLength);
-                output.writeBytes(buffer);
-            } else {
-                byte[] decompressedData = new byte[dataLength];
-                buffer.readBytes(decompressedData);
-                RawNettyUtil.writeVarInt(output, decompressedData.length);
-                PacketCompressionUtil.DEFLATER.setInput(decompressedData, 0, decompressedData.length);
-                PacketCompressionUtil.DEFLATER.finish();
+        if (!SpigotReflectionUtil.MESSAGE_TO_BYTE_ENCODER.isInstance(compressionHandler)) {
+            //ViaRewind might have replaced the compressor with an empty handler, so we can just skip the compression process.
+            output.writeBytes(buffer);
+            return;
+        }
+        int dataLength = buffer.readableBytes();
+        if (dataLength < PacketCompressionUtil.THRESHOLD) {
+            RawNettyUtil.writeVarInt(output, 0);
+            output.writeBytes(buffer);
+        } else {
+            byte[] decompressedData = new byte[dataLength];
+            buffer.readBytes(decompressedData);
+            RawNettyUtil.writeVarInt(output, decompressedData.length);
+            PacketCompressionUtil.DEFLATER.setInput(decompressedData, 0, decompressedData.length);
+            PacketCompressionUtil.DEFLATER.finish();
 
-                while (!PacketCompressionUtil.DEFLATER.finished()) {
-                    int deflateResult = PacketCompressionUtil.DEFLATER.deflate(PacketCompressionUtil.COMPRESSED_DATA);
-                    output.writeBytes(PacketCompressionUtil.COMPRESSED_DATA, 0, deflateResult);
-                }
-                PacketCompressionUtil.DEFLATER.reset();
+            while (!PacketCompressionUtil.DEFLATER.finished()) {
+                int deflateResult = PacketCompressionUtil.DEFLATER.deflate(PacketCompressionUtil.COMPRESSED_DATA);
+                output.writeBytes(PacketCompressionUtil.COMPRESSED_DATA, 0, deflateResult);
             }
+            PacketCompressionUtil.DEFLATER.reset();
         }
     }
 
@@ -107,8 +108,7 @@ public class PacketCompressionModern implements PacketCompressionManager {
         compress(ctx.pipeline(), buffer, compressed);
         try {
             buffer.clear().writeBytes(compressed);
-        }
-        finally {
+        } finally {
             compressed.release();
         }
     }

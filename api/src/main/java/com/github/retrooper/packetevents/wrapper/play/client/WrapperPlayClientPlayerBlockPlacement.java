@@ -20,6 +20,7 @@ package com.github.retrooper.packetevents.wrapper.play.client;
 
 import com.github.retrooper.packetevents.event.impl.PacketReceiveEvent;
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
+import com.github.retrooper.packetevents.protocol.item.ItemStack;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.protocol.player.InteractionHand;
 import com.github.retrooper.packetevents.protocol.world.BlockFace;
@@ -34,6 +35,7 @@ public class WrapperPlayClientPlayerBlockPlacement extends PacketWrapper<Wrapper
     private Vector3i blockPosition;
     private BlockFace face;
     private Vector3f cursorPosition;
+    private Optional<ItemStack> itemStack;
     private Optional<Boolean> insideBlock;
 
     public WrapperPlayClientPlayerBlockPlacement(PacketReceiveEvent event) {
@@ -58,9 +60,23 @@ public class WrapperPlayClientPlayerBlockPlacement extends PacketWrapper<Wrapper
             cursorPosition = new Vector3f(readFloat(), readFloat(), readFloat());
             insideBlock = Optional.of(readBoolean());
         } else {
-            blockPosition = readBlockPosition();
-            face = BlockFace.getBlockFaceByValue(readVarInt());
-            interactionHand = InteractionHand.getById(readVarInt());
+            if (serverVersion == ServerVersion.V_1_7_10) {
+                blockPosition = new Vector3i(readInt(), readUnsignedByte(), readInt());
+            }
+            else {
+                blockPosition = readBlockPosition();
+            }
+            if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_9)) {
+                //Unsigned byte, itemstack
+                face = BlockFace.getBlockFaceByValue(readVarInt());
+                interactionHand = InteractionHand.getById(readVarInt());
+            }
+            else {
+                face = BlockFace.getBlockFaceByValue(readUnsignedByte());
+                //Optional itemstack
+                itemStack = Optional.of(readItemStack());
+                interactionHand = InteractionHand.MAIN_HAND;
+            }
             if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_11)) {
                 cursorPosition = new Vector3f(readFloat(), readFloat(), readFloat());
             } else {
@@ -91,9 +107,23 @@ public class WrapperPlayClientPlayerBlockPlacement extends PacketWrapper<Wrapper
             writeBoolean(insideBlock.orElse(false));
             insideBlock = Optional.of(readBoolean());
         } else {
-            writeBlockPosition(blockPosition);
-            writeVarInt(face.getFaceValue());
-            writeVarInt(interactionHand.getId());
+            if (serverVersion == ServerVersion.V_1_7_10) {
+                writeInt(blockPosition.x);
+                writeByte(blockPosition.x);
+                writeInt(blockPosition.z);
+            }
+            else {
+                writeBlockPosition(blockPosition);
+            }
+            if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_9)) {
+                writeVarInt(face.getFaceValue());
+                writeVarInt(interactionHand.getId());
+            }
+            else {
+                writeByte(face.getFaceValue());
+                writeItemStack(itemStack.orElse(ItemStack.AIR));
+                //Hand is always the main hand
+            }
             if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_11)) {
                 writeFloat(cursorPosition.x);
                 writeFloat(cursorPosition.y);
@@ -136,6 +166,14 @@ public class WrapperPlayClientPlayerBlockPlacement extends PacketWrapper<Wrapper
 
     public void setCursorPosition(Vector3f cursorPosition) {
         this.cursorPosition = cursorPosition;
+    }
+
+    public Optional<ItemStack> getItemStack() {
+        return itemStack;
+    }
+
+    public void setItemStack(Optional<ItemStack> itemStack) {
+        this.itemStack = itemStack;
     }
 
     public Optional<Boolean> getInsideBlock() {
