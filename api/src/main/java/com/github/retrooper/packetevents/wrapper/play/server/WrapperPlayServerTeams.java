@@ -1,5 +1,6 @@
 package com.github.retrooper.packetevents.wrapper.play.server;
 
+import com.github.retrooper.packetevents.event.PacketSendEvent;
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.util.AdventureSerializer;
@@ -123,6 +124,9 @@ public class WrapperPlayServerTeams extends PacketWrapper<WrapperPlayServerTeams
         this(teamName, teamMode, teamInfo, Arrays.asList(entities));
     }
 
+    public WrapperPlayServerTeams(PacketSendEvent event) {
+        super(event);
+    }
 
     @Override
     public void readData() {
