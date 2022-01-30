@@ -21,6 +21,9 @@ package io.github.retrooper.packetevents;
 import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.event.SimplePacketListenerAbstract;
 import com.github.retrooper.packetevents.event.simple.PacketPlayReceiveEvent;
+import com.github.retrooper.packetevents.event.simple.PacketPlaySendEvent;
+import com.github.retrooper.packetevents.protocol.ConnectionState;
+import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.protocol.particle.Particle;
 import com.github.retrooper.packetevents.protocol.particle.type.ParticleTypes;
 import com.github.retrooper.packetevents.protocol.player.DiggingAction;
@@ -90,9 +93,20 @@ public class PacketEventsPlugin extends JavaPlugin {
                         break;
                 }
             }
+
+            @Override
+            public void onPacketPlaySend(PacketPlaySendEvent event) {
+                if (event.getConnectionState() == ConnectionState.PLAY) {
+                    System.out.println("id: " + event.getPacketId());
+                }
+                if (event.getPacketType() == PacketType.Play.Server.JOIN_GAME) {
+                    Player player = (Player) event.getPlayer();
+                    player.sendMessage("Hello " + player.getName());
+                }
+            }
         };
         // net.minecraft.server.v1_7_R4.PacketPlayOutWorldParticles w1;
-        //PacketEvents.getAPI().getEventManager().registerListener(listener);
+        PacketEvents.getAPI().getEventManager().registerListener(listener);
     }
 
     @Override

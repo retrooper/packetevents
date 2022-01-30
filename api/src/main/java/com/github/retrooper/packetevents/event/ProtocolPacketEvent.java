@@ -46,7 +46,7 @@ public abstract class ProtocolPacketEvent<T> extends PacketEvent implements Play
     private ServerVersion serverVersion;
     private boolean cancel;
     private PacketWrapper<?> lastUsedWrapper;
-    private final List<Runnable> postTasks = new ArrayList<>();
+    private List<Runnable> postTasks = null;
 
     public ProtocolPacketEvent(PacketSide packetSide, Object channel, User user, T player, Object rawByteBuf) {
         this(packetSide,
@@ -205,6 +205,13 @@ public abstract class ProtocolPacketEvent<T> extends PacketEvent implements Play
     }
 
     public List<Runnable> getPostTasks() {
+        if (postTasks == null) {
+            postTasks = new ArrayList<>();
+        }
         return postTasks;
+    }
+
+    public boolean hasPostTasks() {
+        return postTasks != null && !postTasks.isEmpty();
     }
 }

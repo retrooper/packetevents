@@ -32,6 +32,7 @@ import java.util.List;
 
 public class PacketSendEvent extends ProtocolPacketEvent<Object> {
     private boolean cloned;
+    private List<Runnable> promisedTasks = null;
 
     protected PacketSendEvent(ChannelAbstract channel, User user, Object player, ByteBufAbstract byteBuf) {
         super(PacketSide.SERVER, channel, user, player, byteBuf);
@@ -78,5 +79,13 @@ public class PacketSendEvent extends ProtocolPacketEvent<Object> {
     @Override
     public void call(PacketListenerCommon listener) {
         listener.onPacketSend(this);
+    }
+
+    //TODO Remove this, and find out what the difference is.
+    public List<Runnable> getPromisedTasks() {
+        if (promisedTasks == null) {
+            promisedTasks = new ArrayList<>();
+        }
+        return promisedTasks;
     }
 }

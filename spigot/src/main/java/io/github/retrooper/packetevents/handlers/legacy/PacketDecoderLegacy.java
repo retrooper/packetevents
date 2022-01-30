@@ -61,8 +61,10 @@ public class PacketDecoderLegacy extends ByteToMessageDecoder {
                     PacketCompressionUtil.recompress(ctx, transformed);
                     skipDoubleTransform = true;
                 }
-                for (Runnable task : packetReceiveEvent.getPostTasks()) {
-                    task.run();
+                if (packetReceiveEvent.hasPostTasks()) {
+                    for (Runnable task : packetReceiveEvent.getPostTasks()) {
+                        task.run();
+                    }
                 }
                 output.add(transformed.retain());
             }

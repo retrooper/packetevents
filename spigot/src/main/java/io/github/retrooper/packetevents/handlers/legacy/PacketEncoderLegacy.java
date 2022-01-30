@@ -63,6 +63,11 @@ public class PacketEncoderLegacy extends MessageToByteEncoder {
             if (doCompression) {
                 PacketCompressionUtil.recompress(ctx, buffer);
             }
+            if (packetSendEvent.hasPostTasks()) {
+                for (Runnable task : packetSendEvent.getPostTasks()) {
+                    task.run();
+                }
+            }
             postTasks.addAll(packetSendEvent.getPostTasks());
         } else {
             //Make the buffer unreadable for the next handlers

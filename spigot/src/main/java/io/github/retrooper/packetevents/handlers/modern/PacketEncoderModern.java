@@ -41,7 +41,7 @@ public class PacketEncoderModern extends MessageToByteEncoder<Object> {
     public volatile Player player;
     public boolean handledCompression;
     public MessageToByteEncoder<?> mcEncoder;
-    private final List<Runnable> postTasks = new ArrayList<>();
+    private final List<Runnable> promisedTasks = new ArrayList<>();
 
     public PacketEncoderModern(User user) {
         this.user = user;
@@ -66,7 +66,12 @@ public class PacketEncoderModern extends MessageToByteEncoder<Object> {
             if (doCompression) {
                 PacketCompressionUtil.recompress(ctx, buffer);
             }
-            postTasks.addAll(packetSendEvent.getPostTasks());
+            if (packetSendEvent.hasPostTasks()) {
+                for (Runnable task : packetSendEvent.getPostTasks()) {
+                    task.run();
+                }
+            }
+            promisedTasks.addAll(packetSendEvent.getPostTasks());
         } else {
             //Make the buffer unreadable for the next handlers
             buffer.clear();
@@ -75,9 +80,9 @@ public class PacketEncoderModern extends MessageToByteEncoder<Object> {
 
     @Override
     public void write(ChannelHandlerContext ctx, Object msg, ChannelPromise promise) throws Exception {
-        if (!this.postTasks.isEmpty()) {
-            List<Runnable> clonedPostTasks = new ArrayList<>(this.postTasks);
-            this.postTasks.clear();
+        if (!this.promisedTasks.isEmpty()) {
+            List<Runnable> clonedPostTasks = new ArrayList<>(this.promisedTasks);
+            this.promisedTasks.clear();
             promise.addListener(f -> {
                 for (Runnable task : clonedPostTasks) {
                     task.run();
