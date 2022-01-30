@@ -22,7 +22,6 @@ import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.event.SimplePacketListenerAbstract;
 import com.github.retrooper.packetevents.event.simple.PacketPlayReceiveEvent;
 import com.github.retrooper.packetevents.event.simple.PacketPlaySendEvent;
-import com.github.retrooper.packetevents.protocol.ConnectionState;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.protocol.particle.Particle;
 import com.github.retrooper.packetevents.protocol.particle.type.ParticleTypes;
@@ -99,14 +98,13 @@ public class PacketEventsPlugin extends JavaPlugin {
                     if (event.getPlayer() instanceof Player) {
                         Player player = (Player) event.getPlayer();
                         player.sendMessage("Hello " + player.getName());
-                    }
-                    else {
+                    } else {
                         event.getUser().sendMessage("player null, but hey!");
                     }
                 }
             }
         };
-         //net.minecraft.server.v1_8_R3.PacketPlayOutWorldParticles w1;
+        //net.minecraft.server.v1_8_R3.PacketPlayOutWorldParticles w1;
         //PacketEvents.getAPI().getEventManager().registerListener(listener);
     }
 

@@ -66,15 +66,15 @@ public class PacketEncoderModern extends MessageToByteEncoder<Object> {
             if (doCompression) {
                 PacketCompressionUtil.recompress(ctx, buffer);
             }
-            if (packetSendEvent.hasPostTasks()) {
-                for (Runnable task : packetSendEvent.getPostTasks()) {
-                    task.run();
-                }
-            }
             promisedTasks.addAll(packetSendEvent.getPromisedTasks());
         } else {
             //Make the buffer unreadable for the next handlers
             buffer.clear();
+        }
+        if (packetSendEvent.hasPostTasks()) {
+            for (Runnable task : packetSendEvent.getPostTasks()) {
+                task.run();
+            }
         }
     }
 
