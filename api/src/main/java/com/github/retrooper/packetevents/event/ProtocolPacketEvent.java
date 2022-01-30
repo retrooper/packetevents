@@ -19,8 +19,6 @@
 package com.github.retrooper.packetevents.event;
 
 import com.github.retrooper.packetevents.PacketEvents;
-import com.github.retrooper.packetevents.event.type.CancellableEvent;
-import com.github.retrooper.packetevents.event.type.PlayerEvent;
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.netty.buffer.ByteBufAbstract;
 import com.github.retrooper.packetevents.netty.channel.ChannelAbstract;
@@ -35,6 +33,8 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.net.InetSocketAddress;
+import java.util.ArrayList;
+import java.util.List;
 
 public abstract class ProtocolPacketEvent<T> extends PacketEvent implements PlayerEvent<T>, CancellableEvent {
     private final ChannelAbstract channel;
@@ -46,6 +46,7 @@ public abstract class ProtocolPacketEvent<T> extends PacketEvent implements Play
     private ServerVersion serverVersion;
     private boolean cancel;
     private PacketWrapper<?> lastUsedWrapper;
+    private final List<Runnable> postTasks = new ArrayList<>();
 
     public ProtocolPacketEvent(PacketSide packetSide, Object channel, User user, T player, Object rawByteBuf) {
         this(packetSide,
@@ -176,7 +177,6 @@ public abstract class ProtocolPacketEvent<T> extends PacketEvent implements Play
         return packetID;
     }
 
-    @Nullable
     public PacketTypeCommon getPacketType() {
         return packetType;
     }
@@ -203,5 +203,9 @@ public abstract class ProtocolPacketEvent<T> extends PacketEvent implements Play
 
     public void setLastUsedWrapper(@Nullable PacketWrapper<?> lastUsedWrapper) {
         this.lastUsedWrapper = lastUsedWrapper;
+    }
+
+    public List<Runnable> getPostTasks() {
+        return postTasks;
     }
 }

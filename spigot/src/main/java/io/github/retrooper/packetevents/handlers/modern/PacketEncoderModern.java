@@ -19,14 +19,10 @@
 package io.github.retrooper.packetevents.handlers.modern;
 
 import com.github.retrooper.packetevents.PacketEvents;
-import com.github.retrooper.packetevents.event.impl.PacketSendEvent;
-import com.github.retrooper.packetevents.netty.buffer.ByteBufAbstract;
-import com.github.retrooper.packetevents.netty.channel.ChannelHandlerContextAbstract;
+import com.github.retrooper.packetevents.event.PacketSendEvent;
 import com.github.retrooper.packetevents.protocol.player.User;
-import io.github.retrooper.packetevents.handlers.compression.CustomPacketCompressor;
-import io.github.retrooper.packetevents.handlers.compression.CustomPacketDecompressor;
+import com.github.retrooper.packetevents.util.EventCreationUtil;
 import io.github.retrooper.packetevents.handlers.compression.PacketCompressionUtil;
-import io.github.retrooper.packetevents.handlers.modern.early.CompressionManagerModern;
 import io.github.retrooper.packetevents.utils.dependencies.viaversion.CustomPipelineUtil;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandler;
@@ -55,8 +51,7 @@ public class PacketEncoderModern extends MessageToByteEncoder<Object> {
         boolean doCompression = handleCompressionOrder(ctx, buffer);
 
         int preProcessIndex = buffer.readerIndex();
-        PacketSendEvent packetSendEvent =
-                new PacketSendEvent(ctx.channel(), user, player, buffer);
+        PacketSendEvent packetSendEvent = EventCreationUtil.createSendEvent(ctx.channel(), user, player, buffer);
         int processIndex = buffer.readerIndex();
         PacketEvents.getAPI().getEventManager().callEvent(packetSendEvent, () -> {
             buffer.readerIndex(processIndex);
@@ -80,11 +75,11 @@ public class PacketEncoderModern extends MessageToByteEncoder<Object> {
 
     @Override
     public void write(ChannelHandlerContext ctx, Object msg, ChannelPromise promise) throws Exception {
-        if (!postTasks.isEmpty()) {
-            List<Runnable> postTasks = new ArrayList<>(this.postTasks);
+        if (!this.postTasks.isEmpty()) {
+            List<Runnable> clonedPostTasks = new ArrayList<>(this.postTasks);
             this.postTasks.clear();
             promise.addListener(f -> {
-                for (Runnable task : postTasks) {
+                for (Runnable task : clonedPostTasks) {
                     task.run();
                 }
             });

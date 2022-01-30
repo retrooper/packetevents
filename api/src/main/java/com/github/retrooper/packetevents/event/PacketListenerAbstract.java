@@ -18,78 +18,38 @@
 
 package com.github.retrooper.packetevents.event;
 
-import com.github.retrooper.packetevents.event.impl.*;
-
 import java.lang.reflect.Method;
 import java.util.List;
 import java.util.Map;
 
-/**
- * Abstract packet listener.
- *
- * @author retrooper
- * @since 1.8
- */
-public abstract class PacketListenerAbstract {
-    protected final Map<Byte, List<Method>> methods;
-    private final PacketListenerPriority priority;
-    private boolean readOnly;
+public abstract class PacketListenerAbstract extends PacketListenerCommon {
     public PacketListenerAbstract(PacketListenerPriority priority) {
-        this.priority = priority;
-        this.methods = null;
+        super(priority);
     }
 
     public PacketListenerAbstract(PacketListenerPriority priority, boolean readOnly) {
-        this.priority = priority;
-        this.methods = null;
-        this.readOnly = readOnly;
+        super(priority, readOnly);
     }
 
     public PacketListenerAbstract(PacketListenerPriority priority, Map<Byte, List<Method>> methods) {
-        this.priority = priority;
-        this.methods = methods;
+        super(priority, methods);
     }
 
     public PacketListenerAbstract(PacketListenerPriority priority, Map<Byte, List<Method>> methods, boolean readOnly) {
-        this.priority = priority;
-        this.methods = methods;
-        this.readOnly = readOnly;
+        super(priority, methods, readOnly);
     }
 
     public PacketListenerAbstract() {
-        this.priority = PacketListenerPriority.NORMAL;
-        this.methods = null;
+        super();
     }
 
-    public PacketListenerPriority getPriority() {
-        return priority;
-    }
-
-    public boolean isReadOnly() {
-        return readOnly;
-    }
-
-    public void setReadOnly(boolean readOnly) {
-        this.readOnly = readOnly;
-    }
-
-
-    public void onPlayerInject(PlayerInjectEvent event) {
-    }
-
-    public void onPostPlayerInject(PostPlayerInjectEvent event) {
-    }
-
-    public void onPlayerEject(PlayerEjectEvent event) {
-    }
-
+    @Override
     public void onPacketReceive(PacketReceiveEvent event) {
+
     }
 
+    @Override
     public void onPacketSend(PacketSendEvent event) {
-    }
 
-    public void onPacketEventExternal(PacketEvent event) {
     }
-
 }

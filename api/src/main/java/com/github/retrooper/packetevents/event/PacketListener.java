@@ -18,9 +18,6 @@
 
 package com.github.retrooper.packetevents.event;
 
-import com.github.retrooper.packetevents.event.impl.*;
-import com.github.retrooper.packetevents.event.impl.*;
-
 public interface PacketListener {
     default PacketListenerAbstract asAbstract(PacketListenerPriority priority, boolean readOnly) {
         return new PacketListenerAbstract(priority, readOnly) {

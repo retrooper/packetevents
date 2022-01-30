@@ -19,14 +19,10 @@
 package io.github.retrooper.packetevents.handlers.modern;
 
 import com.github.retrooper.packetevents.PacketEvents;
-import com.github.retrooper.packetevents.event.impl.PacketReceiveEvent;
-import com.github.retrooper.packetevents.netty.buffer.ByteBufAbstract;
-import com.github.retrooper.packetevents.netty.channel.ChannelHandlerContextAbstract;
+import com.github.retrooper.packetevents.event.PacketReceiveEvent;
 import com.github.retrooper.packetevents.protocol.player.User;
-import io.github.retrooper.packetevents.handlers.compression.CustomPacketCompressor;
-import io.github.retrooper.packetevents.handlers.compression.CustomPacketDecompressor;
+import com.github.retrooper.packetevents.util.EventCreationUtil;
 import io.github.retrooper.packetevents.handlers.compression.PacketCompressionUtil;
-import io.github.retrooper.packetevents.handlers.modern.early.CompressionManagerModern;
 import io.github.retrooper.packetevents.utils.dependencies.viaversion.CustomPipelineUtil;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
@@ -45,6 +41,7 @@ public class PacketDecoderModern extends ByteToMessageDecoder {
     public boolean bypassCompression = false;
     public boolean handledCompression;
     public boolean skipDoubleTransform;
+    private final List<Runnable> postTasks = new ArrayList<>();
 
     public PacketDecoderModern(User user) {
         this.user = user;
@@ -58,6 +55,8 @@ public class PacketDecoderModern extends ByteToMessageDecoder {
         bypassCompression = decoder.bypassCompression;
         handledCompression = decoder.handledCompression;
         skipDoubleTransform = decoder.skipDoubleTransform;
+        postTasks.clear();
+        postTasks.addAll(decoder.postTasks);
     }
 
     public void read(ChannelHandlerContext ctx, ByteBuf input, List<Object> output) {
@@ -70,8 +69,7 @@ public class PacketDecoderModern extends ByteToMessageDecoder {
             boolean doCompression =
                     !bypassCompression && handleCompressionOrder(ctx, transformed);
             int preProcessIndex = transformed.readerIndex();
-            PacketReceiveEvent packetReceiveEvent = new PacketReceiveEvent(user.getConnectionState(),
-                    ctx.channel(), user, player, transformed);
+            PacketReceiveEvent packetReceiveEvent = EventCreationUtil.createReceiveEvent(ctx.channel(), user, player, transformed);
             int processIndex = transformed.readerIndex();
             PacketEvents.getAPI().getEventManager().callEvent(packetReceiveEvent, () -> {
                 transformed.readerIndex(processIndex);
@@ -86,6 +84,9 @@ public class PacketDecoderModern extends ByteToMessageDecoder {
                 if (doCompression) {
                     PacketCompressionUtil.recompress(ctx, transformed);
                     skipDoubleTransform = true;
+                }
+                for (Runnable task : packetReceiveEvent.getPostTasks()) {
+                    task.run();
                 }
                 output.add(transformed.retain());
             }

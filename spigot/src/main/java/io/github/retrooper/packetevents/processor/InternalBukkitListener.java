@@ -19,7 +19,7 @@
 package io.github.retrooper.packetevents.processor;
 
 import com.github.retrooper.packetevents.PacketEvents;
-import com.github.retrooper.packetevents.event.impl.PostPlayerInjectEvent;
+import com.github.retrooper.packetevents.event.PostPlayerInjectEvent;
 import com.github.retrooper.packetevents.netty.channel.ChannelAbstract;
 import com.github.retrooper.packetevents.protocol.ConnectionState;
 import com.github.retrooper.packetevents.protocol.player.User;

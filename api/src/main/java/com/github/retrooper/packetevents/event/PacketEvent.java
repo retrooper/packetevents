@@ -19,8 +19,6 @@
 package com.github.retrooper.packetevents.event;
 
 
-import com.github.retrooper.packetevents.event.type.CallableEvent;
-
 /**
  * An event in both of PacketEvents' event systems.
  *
@@ -49,7 +47,7 @@ public abstract class PacketEvent implements CallableEvent {
         this.timestamp = timestamp;
     }
 
-    public void callPacketEventExternal(PacketListenerAbstract listener) {
+    public void callPacketEventExternal(PacketListenerCommon listener) {
         listener.onPacketEventExternal(this);
     }
 

@@ -273,6 +273,8 @@ public class EarlyChannelInjectorLegacy implements EarlyInjector {
 
         if (decoder != null) {
             decoder.player = (Player) player;
+            decoder.user.getProfile().setUUID(((Player) player).getUniqueId());
+            decoder.user.getProfile().setName(((Player) player).getName());
             if (newConnectionState != null) {
                 decoder.user.setConnectionState(newConnectionState);
             }

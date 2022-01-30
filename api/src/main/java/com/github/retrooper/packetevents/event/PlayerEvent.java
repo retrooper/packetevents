@@ -16,7 +16,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.github.retrooper.packetevents.event.type;
+package com.github.retrooper.packetevents.event;
 
 /**
  * Every event that has an associated player is recommended to implement this interface.

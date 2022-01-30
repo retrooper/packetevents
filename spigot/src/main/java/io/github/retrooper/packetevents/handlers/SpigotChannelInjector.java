@@ -20,8 +20,8 @@ package io.github.retrooper.packetevents.handlers;
 
 import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.injector.ChannelInjector;
-import com.github.retrooper.packetevents.event.impl.PlayerEjectEvent;
-import com.github.retrooper.packetevents.event.impl.PlayerInjectEvent;
+import com.github.retrooper.packetevents.event.PlayerEjectEvent;
+import com.github.retrooper.packetevents.event.PlayerInjectEvent;
 import com.github.retrooper.packetevents.netty.channel.ChannelAbstract;
 import com.github.retrooper.packetevents.protocol.player.User;
 import io.github.retrooper.packetevents.handlers.legacy.early.EarlyChannelInjectorLegacy;

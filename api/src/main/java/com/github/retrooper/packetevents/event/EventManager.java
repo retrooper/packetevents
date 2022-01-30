@@ -26,7 +26,7 @@ import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class EventManager {
-    private final Map<Byte, HashSet<PacketListenerAbstract>> listenersMap = new ConcurrentHashMap<>();
+    private final Map<Byte, HashSet<PacketListenerCommon>> listenersMap = new ConcurrentHashMap<>();
 
     /**
      * Call the PacketEvent.
@@ -43,9 +43,9 @@ public class EventManager {
 
     public void callEvent(PacketEvent event, @Nullable Runnable postCallListenerAction) {
         for (byte priority = PacketListenerPriority.LOWEST.getId(); priority <= PacketListenerPriority.MONITOR.getId(); priority++) {
-            HashSet<PacketListenerAbstract> listeners = listenersMap.get(priority);
+            HashSet<PacketListenerCommon> listeners = listenersMap.get(priority);
             if (listeners != null) {
-                for (PacketListenerAbstract listener : listeners) {
+                for (PacketListenerCommon listener : listeners) {
                     try {
                         PacketWrapper<?> lastUsedWrapper = null;
                         boolean isPacketEvent = event instanceof ProtocolPacketEvent;
@@ -68,24 +68,24 @@ public class EventManager {
         }
     }
 
-    public PacketListenerAbstract registerListener(PacketListener listener, PacketListenerPriority priority, boolean readOnly) {
-        PacketListenerAbstract packetListenerAbstract = listener.asAbstract(priority, readOnly);
+    public PacketListenerCommon registerListener(PacketListener listener, PacketListenerPriority priority, boolean readOnly) {
+        PacketListenerCommon packetListenerAbstract = listener.asAbstract(priority, readOnly);
         return registerListener(packetListenerAbstract);
     }
 
-    public PacketListenerAbstract registerListener(PacketListenerReflect listener, PacketListenerPriority priority, boolean readOnly) {
-        PacketListenerAbstract packetListenerAbstract = listener.asAbstract(priority, readOnly);
+    public PacketListenerCommon registerListener(PacketListenerReflect listener, PacketListenerPriority priority, boolean readOnly) {
+        PacketListenerCommon packetListenerAbstract = listener.asAbstract(priority, readOnly);
         return registerListener(packetListenerAbstract);
     }
 
     /**
      * Register the dynamic packet event listener.
      *
-     * @param listener {@link PacketListenerAbstract}
+     * @param listener {@link PacketListenerCommon}
      */
-    public PacketListenerAbstract registerListener(PacketListenerAbstract listener) {
+    public PacketListenerCommon registerListener(PacketListenerCommon listener) {
         byte priority = listener.getPriority().getId();
-        HashSet<PacketListenerAbstract> listenerSet = listenersMap.get(priority);
+        HashSet<PacketListenerCommon> listenerSet = listenersMap.get(priority);
         if (listenerSet == null) {
             listenerSet = new HashSet<>();
         }
@@ -97,23 +97,23 @@ public class EventManager {
     /**
      * Register multiple dynamic packet event listeners with one method.
      *
-     * @param listeners {@link PacketListenerAbstract}
+     * @param listeners {@link PacketListenerCommon}
      */
-    public PacketListenerAbstract[] registerListeners(PacketListenerAbstract... listeners) {
-        for (PacketListenerAbstract listener : listeners) {
+    public PacketListenerCommon[] registerListeners(PacketListenerCommon... listeners) {
+        for (PacketListenerCommon listener : listeners) {
             registerListener(listener);
         }
         return listeners;
     }
     
-    public void unregisterListener(PacketListenerAbstract listener) {
-        HashSet<PacketListenerAbstract> listenerSet = listenersMap.get(listener.getPriority().getId());
+    public void unregisterListener(PacketListenerCommon listener) {
+        HashSet<PacketListenerCommon> listenerSet = listenersMap.get(listener.getPriority().getId());
         if (listenerSet == null) return;
         listenerSet.remove(listener);
     }
 
-    public void unregisterListeners(PacketListenerAbstract... listeners) {
-        for (PacketListenerAbstract listener : listeners) {
+    public void unregisterListeners(PacketListenerCommon... listeners) {
+        for (PacketListenerCommon listener : listeners) {
             unregisterListener(listener);
         }
     }

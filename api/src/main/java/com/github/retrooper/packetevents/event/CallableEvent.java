@@ -16,23 +16,23 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.github.retrooper.packetevents.event.type;
+package com.github.retrooper.packetevents.event;
 
 import com.github.retrooper.packetevents.event.PacketEvent;
 import com.github.retrooper.packetevents.event.PacketListenerAbstract;
 
 /**
  * The {@link PacketEvent} implements this interface.
- * Every inbuilt event should implement the {@link #call(PacketListenerAbstract)} method.
+ * Every inbuilt event should implement the {@link #call(PacketListenerCommon)} method.
  * If you are making a custom event, don't implement this.
- * The {@link PacketListenerAbstract#onPacketEventExternal(PacketEvent)} method is called for every event that is not in-built.
+ * The {@link PacketListenerCommon#onPacketEventExternal(PacketEvent)} method is called for every event that is not in-built.
  * including custom events.
  *
  * @author retrooper
  * @since 1.8
  */
 public interface CallableEvent {
-    default void call(PacketListenerAbstract listener) {
+    default void call(PacketListenerCommon listener) {
         listener.onPacketEventExternal((PacketEvent) this);
     }
 }

@@ -20,8 +20,8 @@ package com.github.retrooper.packetevents.injector;
 
 import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.event.PacketListener;
-import com.github.retrooper.packetevents.event.impl.PacketReceiveEvent;
-import com.github.retrooper.packetevents.event.impl.PacketSendEvent;
+import com.github.retrooper.packetevents.event.PacketReceiveEvent;
+import com.github.retrooper.packetevents.event.PacketSendEvent;
 import com.github.retrooper.packetevents.netty.channel.ChannelAbstract;
 import com.github.retrooper.packetevents.protocol.ConnectionState;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
@@ -54,7 +54,7 @@ public class InternalPacketListener implements PacketListener {
             //This also updates it for the user instance
             event.getPostTasks().add(() -> {
                 PacketEvents.getAPI().getInjector().changeConnectionState(channel, ConnectionState.PLAY);
-                PacketEvents.getAPI().getLogManager().debug("Transitioned user " + profile.getName() + " into the play state!");
+                PacketEvents.getAPI().getLogManager().debug("Transitioned user " + profile.getName() + " into the PLAY state!");
             });
         }
     }
@@ -64,13 +64,19 @@ public class InternalPacketListener implements PacketListener {
         switch (event.getConnectionState()) {
             case HANDSHAKING:
                 if (event.getPacketType() == PacketType.Handshaking.Client.HANDSHAKE) {
+                    ChannelAbstract channel = event.getChannel();
+                    System.out.println("inc handshake?");
                     WrapperHandshakingClientHandshake handshake = new WrapperHandshakingClientHandshake(event);
                     ClientVersion clientVersion = handshake.getClientVersion();
 
                     //Update client version for this event call(and user)
                     event.setClientVersion(clientVersion);
-                    //Transition into the LOGIN OR STATUS connection state
-                    event.getUser().setConnectionState(handshake.getNextConnectionState());
+                    PacketEvents.getAPI().getLogManager().debug("Storing a user's client version(protocol-version)");
+                    event.getPostTasks().add(() -> {
+                        //Transition into the LOGIN OR STATUS connection state
+                        PacketEvents.getAPI().getInjector().changeConnectionState(channel, handshake.getNextConnectionState());
+                        PacketEvents.getAPI().getLogManager().debug("Transitioned into the " + handshake.getNextConnectionState() + " state!");
+                    });
                 }
                 break;
             case PLAY:

@@ -283,6 +283,9 @@ public class EarlyChannelInjectorModern implements EarlyInjector {
         PacketDecoderModern decoder = getDecoder(ch);
         if (decoder != null) {
             decoder.player = (Player) player;
+            decoder.user.getProfile().setUUID(((Player) player).getUniqueId());
+            decoder.user.getProfile().setName(((Player) player).getName());
+            //TODO Perhaps client-version?
             if (newConnectionState == ConnectionState.PLAY) {
                 decoder.handledCompression = true;
                 if (ViaVersionUtil.isAvailable()) {

@@ -16,13 +16,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.github.retrooper.packetevents.event.impl;
+package com.github.retrooper.packetevents.event;
 
 import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.netty.channel.ChannelAbstract;
-import com.github.retrooper.packetevents.event.PacketEvent;
-import com.github.retrooper.packetevents.event.PacketListenerAbstract;
-import com.github.retrooper.packetevents.event.type.PlayerEvent;
 import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 import org.jetbrains.annotations.NotNull;
 
@@ -72,7 +69,7 @@ public class PostPlayerInjectEvent extends PacketEvent implements PlayerEvent<Ob
     }
 
     @Override
-    public void call(PacketListenerAbstract listener) {
+    public void call(PacketListenerCommon listener) {
         listener.onPostPlayerInject(this);
     }
 

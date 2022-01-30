@@ -19,14 +19,10 @@
 package io.github.retrooper.packetevents.handlers.legacy;
 
 import com.github.retrooper.packetevents.PacketEvents;
-import com.github.retrooper.packetevents.event.impl.PacketSendEvent;
-import com.github.retrooper.packetevents.netty.buffer.ByteBufAbstract;
-import com.github.retrooper.packetevents.netty.channel.ChannelHandlerContextAbstract;
+import com.github.retrooper.packetevents.event.PacketSendEvent;
 import com.github.retrooper.packetevents.protocol.player.User;
-import io.github.retrooper.packetevents.handlers.compression.CustomPacketCompressor;
-import io.github.retrooper.packetevents.handlers.compression.CustomPacketDecompressor;
+import com.github.retrooper.packetevents.util.EventCreationUtil;
 import io.github.retrooper.packetevents.handlers.compression.PacketCompressionUtil;
-import io.github.retrooper.packetevents.handlers.legacy.early.CompressionManagerLegacy;
 import net.minecraft.util.io.netty.buffer.ByteBuf;
 import net.minecraft.util.io.netty.channel.ChannelHandler;
 import net.minecraft.util.io.netty.channel.ChannelHandlerContext;
@@ -52,8 +48,7 @@ public class PacketEncoderLegacy extends MessageToByteEncoder {
         boolean doCompression = handleCompressionOrder(ctx, buffer);
 
         int preProcessIndex = buffer.readerIndex();
-        PacketSendEvent packetSendEvent =
-                new PacketSendEvent(user.getConnectionState(), ctx.channel(), user, player, buffer);
+        PacketSendEvent packetSendEvent = EventCreationUtil.createSendEvent(ctx.channel(), user, player, buffer);
         int processIndex = buffer.readerIndex();
         PacketEvents.getAPI().getEventManager().callEvent(packetSendEvent, () -> {
             buffer.readerIndex(processIndex);

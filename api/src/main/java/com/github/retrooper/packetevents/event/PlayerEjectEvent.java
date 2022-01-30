@@ -16,12 +16,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.github.retrooper.packetevents.event.impl;
+package com.github.retrooper.packetevents.event;
 
-import com.github.retrooper.packetevents.event.PacketEvent;
-import com.github.retrooper.packetevents.event.PacketListenerAbstract;
-import com.github.retrooper.packetevents.event.type.CancellableEvent;
-import com.github.retrooper.packetevents.event.type.PlayerEvent;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -62,7 +58,7 @@ public final class PlayerEjectEvent extends PacketEvent implements CancellableEv
     }
 
     @Override
-    public void call(PacketListenerAbstract listener) {
+    public void call(PacketListenerCommon listener) {
         listener.onPlayerEject(this);
     }
 

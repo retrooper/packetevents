@@ -28,6 +28,7 @@ import io.github.retrooper.packetevents.handlers.modern.early.ServerConnectionIn
 import com.github.retrooper.packetevents.protocol.ConnectionState;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandler;
+import org.bukkit.entity.Player;
 import org.jetbrains.annotations.Nullable;
 
 public class LateChannelInjectorModern implements LateInjector {
@@ -61,6 +62,11 @@ public class LateChannelInjectorModern implements LateInjector {
             connectionState = ConnectionState.PLAY;
         }
         ServerConnectionInitializerModern.postInitChannel(channel.rawChannel(), connectionState);
+        PacketDecoderModern decoder = getDecoder(channel);
+        if (decoder != null) {
+            decoder.user.getProfile().setName(((Player)player).getName());
+            decoder.user.getProfile().setUUID(((Player)player).getUniqueId());
+        }
     }
 
     private PacketDecoderModern getDecoder(ChannelAbstract ch) {

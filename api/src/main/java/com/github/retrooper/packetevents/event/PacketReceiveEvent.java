@@ -16,10 +16,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.github.retrooper.packetevents.event.impl;
+package com.github.retrooper.packetevents.event;
 
-import com.github.retrooper.packetevents.event.PacketListenerAbstract;
-import com.github.retrooper.packetevents.event.ProtocolPacketEvent;
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.netty.buffer.ByteBufAbstract;
 import com.github.retrooper.packetevents.netty.channel.ChannelAbstract;
@@ -29,27 +27,28 @@ import com.github.retrooper.packetevents.protocol.packettype.PacketTypeCommon;
 import com.github.retrooper.packetevents.protocol.player.User;
 
 import java.net.InetSocketAddress;
+import java.util.ArrayList;
 
 public class PacketReceiveEvent extends ProtocolPacketEvent<Object> {
     private boolean cloned;
 
-    public PacketReceiveEvent(ChannelAbstract channel, User user, Object player, ByteBufAbstract byteBuf) {
+    protected PacketReceiveEvent(ChannelAbstract channel, User user, Object player, ByteBufAbstract byteBuf) {
         super(PacketSide.CLIENT, channel, user, player, byteBuf);
     }
 
-    public PacketReceiveEvent(ConnectionState connectionState, ChannelAbstract channel, User user, Object player, ByteBufAbstract byteBuf) {
+    protected PacketReceiveEvent(ConnectionState connectionState, ChannelAbstract channel, User user, Object player, ByteBufAbstract byteBuf) {
         super(PacketSide.CLIENT, connectionState, channel, user, player, byteBuf);
     }
 
-    public PacketReceiveEvent(Object channel, User user, Object player, Object rawByteBuf) {
+    protected PacketReceiveEvent(Object channel, User user, Object player, Object rawByteBuf) {
         super(PacketSide.CLIENT, channel, user, player, rawByteBuf);
     }
 
-    public PacketReceiveEvent(ConnectionState connectionState, Object channel, User user, Object player, Object rawByteBuf) {
+    protected PacketReceiveEvent(ConnectionState connectionState, Object channel, User user, Object player, Object rawByteBuf) {
         super(PacketSide.CLIENT, connectionState, channel, user, player, rawByteBuf);
     }
 
-    public PacketReceiveEvent(boolean cloned, int packetID, PacketTypeCommon packetType,
+    protected PacketReceiveEvent(boolean cloned, int packetID, PacketTypeCommon packetType,
                               ServerVersion serverVersion, InetSocketAddress socketAddress,
                               ChannelAbstract channel, User user, Object player, ByteBufAbstract byteBuf) {
         super(packetID, packetType, serverVersion, socketAddress,
@@ -70,7 +69,7 @@ public class PacketReceiveEvent extends ProtocolPacketEvent<Object> {
     }
 
     @Override
-    public void call(PacketListenerAbstract listener) {
+    public void call(PacketListenerCommon listener) {
         listener.onPacketReceive(this);
     }
 }

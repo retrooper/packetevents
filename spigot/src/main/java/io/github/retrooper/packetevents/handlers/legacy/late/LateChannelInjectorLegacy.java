@@ -28,6 +28,7 @@ import io.github.retrooper.packetevents.handlers.legacy.PacketEncoderLegacy;
 import io.github.retrooper.packetevents.handlers.legacy.early.ServerConnectionInitializerLegacy;
 import net.minecraft.util.io.netty.channel.Channel;
 import net.minecraft.util.io.netty.channel.ChannelHandler;
+import org.bukkit.entity.Player;
 import org.jetbrains.annotations.Nullable;
 
 public class LateChannelInjectorLegacy implements LateInjector {
@@ -61,6 +62,12 @@ public class LateChannelInjectorLegacy implements LateInjector {
             connectionState = ConnectionState.PLAY;
         }
         ServerConnectionInitializerLegacy.postInitChannel(channel.rawChannel(), connectionState);
+        PacketDecoderLegacy decoder = getDecoder(channel);
+        if (decoder != null) {
+            decoder.player = (Player) player;
+            decoder.user.getProfile().setName(((Player) player).getName());
+            decoder.user.getProfile().setUUID(((Player) player).getUniqueId());
+        }
     }
 
     private PacketDecoderLegacy getDecoder(ChannelAbstract ch) {

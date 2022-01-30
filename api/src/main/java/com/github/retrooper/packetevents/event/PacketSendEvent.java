@@ -16,10 +16,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.github.retrooper.packetevents.event.impl;
+package com.github.retrooper.packetevents.event;
 
-import com.github.retrooper.packetevents.event.PacketListenerAbstract;
-import com.github.retrooper.packetevents.event.ProtocolPacketEvent;
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.netty.buffer.ByteBufAbstract;
 import com.github.retrooper.packetevents.netty.channel.ChannelAbstract;
@@ -34,50 +32,27 @@ import java.util.List;
 
 public class PacketSendEvent extends ProtocolPacketEvent<Object> {
     private boolean cloned;
-    private List<Runnable> postTasks = new ArrayList<>();
 
-    public PacketSendEvent(ChannelAbstract channel, User user, Object player, ByteBufAbstract byteBuf, List<Runnable> postTasks) {
+    protected PacketSendEvent(ChannelAbstract channel, User user, Object player, ByteBufAbstract byteBuf) {
         super(PacketSide.SERVER, channel, user, player, byteBuf);
-        this.postTasks = postTasks;
     }
 
-    public PacketSendEvent(ConnectionState connectionState, ChannelAbstract channel,
+    protected PacketSendEvent(ConnectionState connectionState, ChannelAbstract channel,
                            User user, Object player,
-                           ByteBufAbstract byteBuf, List<Runnable> postTasks) {
-        super(PacketSide.SERVER, connectionState, channel, user, player, byteBuf);
-        this.postTasks = postTasks;
-    }
-
-    public PacketSendEvent(Object channel, User user, Object player, Object rawByteBuf, List<Runnable> postTasks) {
-        super(PacketSide.SERVER, channel, user, player, rawByteBuf);
-        this.postTasks = postTasks;
-    }
-
-    public PacketSendEvent(ConnectionState connectionState, Object channel, User user,
-                           Object player, Object rawByteBuf, List<Runnable> postTasks) {
-        super(PacketSide.SERVER, connectionState, channel, user, player, rawByteBuf);
-        this.postTasks = postTasks;
-    }
-
-    public PacketSendEvent(ChannelAbstract channel, User user, Object player, ByteBufAbstract byteBuf) {
-        super(PacketSide.SERVER, channel, user, player, byteBuf);
-    }
-
-    public PacketSendEvent(ConnectionState connectionState, ChannelAbstract channel,
-                           User user, Object player, ByteBufAbstract byteBuf) {
+                           ByteBufAbstract byteBuf) {
         super(PacketSide.SERVER, connectionState, channel, user, player, byteBuf);
     }
 
-    public PacketSendEvent(Object channel, User user, Object player, Object rawByteBuf) {
+    protected PacketSendEvent(Object channel, User user, Object player, Object rawByteBuf) {
         super(PacketSide.SERVER, channel, user, player, rawByteBuf);
     }
 
-    public PacketSendEvent(ConnectionState connectionState, Object channel,
-                           User user, Object player, Object rawByteBuf) {
+    protected PacketSendEvent(ConnectionState connectionState, Object channel, User user,
+                           Object player, Object rawByteBuf) {
         super(PacketSide.SERVER, connectionState, channel, user, player, rawByteBuf);
     }
 
-    public PacketSendEvent(boolean cloned, int packetID, PacketTypeCommon packetType,
+    protected PacketSendEvent(boolean cloned, int packetID, PacketTypeCommon packetType,
                            ServerVersion serverVersion, InetSocketAddress socketAddress,
                            ChannelAbstract channel, User user,
                            Object player, ByteBufAbstract byteBuf) {
@@ -85,14 +60,6 @@ public class PacketSendEvent extends ProtocolPacketEvent<Object> {
                 serverVersion, socketAddress,
                 channel, user, player, byteBuf);
         this.cloned = cloned;
-    }
-
-    public List<Runnable> getPostTasks() {
-        return postTasks;
-    }
-
-    public void setPostTasks(List<Runnable> postTasks) {
-        this.postTasks = postTasks;
     }
 
     public boolean isCloned() {
@@ -109,7 +76,7 @@ public class PacketSendEvent extends ProtocolPacketEvent<Object> {
     }
 
     @Override
-    public void call(PacketListenerAbstract listener) {
+    public void call(PacketListenerCommon listener) {
         listener.onPacketSend(this);
     }
 }
