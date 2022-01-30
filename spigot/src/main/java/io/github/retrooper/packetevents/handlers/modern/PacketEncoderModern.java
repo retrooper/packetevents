@@ -71,7 +71,7 @@ public class PacketEncoderModern extends MessageToByteEncoder<Object> {
                     task.run();
                 }
             }
-            promisedTasks.addAll(packetSendEvent.getPostTasks());
+            promisedTasks.addAll(packetSendEvent.getPromisedTasks());
         } else {
             //Make the buffer unreadable for the next handlers
             buffer.clear();

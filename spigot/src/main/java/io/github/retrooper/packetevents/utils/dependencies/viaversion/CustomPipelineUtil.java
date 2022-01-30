@@ -36,17 +36,13 @@ public class CustomPipelineUtil {
     public static void init() {
         Class<?> channelHandlerContextClass = SpigotReflectionUtil.getNettyClass("channel.ChannelHandlerContext");
         try {
-            Class<?> byteToMessageDecoderClass =
-                    SpigotReflectionUtil.getNettyClass("handler.codec.ByteToMessageDecoder");
-            DECODE_METHOD = byteToMessageDecoderClass.getDeclaredMethod("decode", channelHandlerContextClass, SpigotReflectionUtil.BYTE_BUF_CLASS, List.class);
+            DECODE_METHOD = SpigotReflectionUtil.BYTE_TO_MESSAGE_DECODER.getDeclaredMethod("decode", channelHandlerContextClass, SpigotReflectionUtil.BYTE_BUF_CLASS, List.class);
             DECODE_METHOD.setAccessible(true);
         } catch (NoSuchMethodException e) {
             e.printStackTrace();
         }
         try {
-            Class<?> messageToByteEncoderClass =
-                    SpigotReflectionUtil.getNettyClass("handler.codec.MessageToByteEncoder");
-            ENCODE_METHOD = messageToByteEncoderClass.getDeclaredMethod("encode", channelHandlerContextClass, Object.class, SpigotReflectionUtil.BYTE_BUF_CLASS);
+            ENCODE_METHOD = SpigotReflectionUtil.MESSAGE_TO_BYTE_ENCODER.getDeclaredMethod("encode", channelHandlerContextClass, Object.class, SpigotReflectionUtil.BYTE_BUF_CLASS);
             ENCODE_METHOD.setAccessible(true);
         } catch (NoSuchMethodException e) {
             e.printStackTrace();

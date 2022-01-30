@@ -58,13 +58,13 @@ public class WrapperPlayServerParticle extends PacketWrapper<WrapperPlayServerPa
 
     @Override
     public void readData() {
-        //TODO on 1.7 we get particle type by 64 len string: https://wiki.vg/index.php?title=Protocol&oldid=6003#Particle_2
+        int particleTypeId = 0;
         ParticleType particleType;
         if (serverVersion == ServerVersion.V_1_7_10) {
             String particleName = readString(64);
             particleType = ParticleTypes.getByName("minecraft:" + particleName);
         } else {
-            int particleTypeId = readInt();
+            particleTypeId = readInt();
             particleType = ParticleTypes.getById(particleTypeId);
         }
         longDistance = readBoolean();
@@ -84,7 +84,20 @@ public class WrapperPlayServerParticle extends PacketWrapper<WrapperPlayServerPa
             data = new ParticleData();
             if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_8)) {
                 //TODO Understand the legacy data: https://wiki.vg/index.php?title=Protocol&oldid=14204
-                legacyData = readVarIntArray();
+                int count;
+                if (particleTypeId == 37 || particleTypeId == 38 || particleTypeId == 46) {
+                    count = 1;
+                }
+                else if (particleTypeId == 36) {
+                    count = 2;
+                }
+                else {
+                    count = 0;
+                }
+                legacyData = new int[count];
+                for (int i = 0; i < count; i++) {
+                    legacyData[i] = readVarInt();
+                }
             }
         }
         particle = new Particle(particleType, data);
@@ -128,7 +141,19 @@ public class WrapperPlayServerParticle extends PacketWrapper<WrapperPlayServerPa
             particle.getType().writeDataFunction().accept(this, particle.getData());
         } else {
             if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_8)) {
-                writeVarIntArray(legacyData);
+                int count;
+                if (particle.getType().getId() == 37 || particle.getType().getId() == 38 || particle.getType().getId() == 46) {
+                    count = 1;
+                }
+                else if (particle.getType().getId() == 36) {
+                    count = 2;
+                }
+                else {
+                    count = 0;
+                }
+                for (int i = 0; i < count; i++) {
+                    writeVarInt(legacyData[i]);
+                }
             }
         }
     }

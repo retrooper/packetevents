@@ -38,7 +38,7 @@ public class PacketEncoderLegacy extends MessageToByteEncoder {
     public volatile Player player;
     public User user;
     private boolean handledCompression;
-    private List<Runnable> postTasks = new ArrayList<>();
+    private List<Runnable> promisedTasks = new ArrayList<>();
 
     public PacketEncoderLegacy(User user) {
         this.user = user;
@@ -68,7 +68,7 @@ public class PacketEncoderLegacy extends MessageToByteEncoder {
                     task.run();
                 }
             }
-            postTasks.addAll(packetSendEvent.getPostTasks());
+            promisedTasks.addAll(packetSendEvent.getPromisedTasks());
         } else {
             //Make the buffer unreadable for the next handlers
             buffer.clear();
@@ -77,9 +77,9 @@ public class PacketEncoderLegacy extends MessageToByteEncoder {
 
     @Override
     public void write(ChannelHandlerContext ctx, Object msg, ChannelPromise promise) throws Exception {
-        if (!postTasks.isEmpty()) {
-            List<Runnable> postTasks = new ArrayList<>(this.postTasks);
-            this.postTasks.clear();
+        if (!promisedTasks.isEmpty()) {
+            List<Runnable> postTasks = new ArrayList<>(this.promisedTasks);
+            this.promisedTasks.clear();
             promise.addListener(f -> {
                 for (Runnable task : postTasks) {
                     task.run();

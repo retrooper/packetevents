@@ -39,7 +39,9 @@ public class ParticleTypes {
     private static JsonObject MAPPINGS;
 
     private static ServerVersion getMappingsVersion(ServerVersion serverVersion) {
-        if (serverVersion.isOlderThan(ServerVersion.V_1_13_2)) {
+        if (serverVersion.isOlderThan(ServerVersion.V_1_13)) {
+            return ServerVersion.V_1_12_2;
+        } else if (serverVersion.isOlderThan(ServerVersion.V_1_13_2)) {
             return ServerVersion.V_1_13;
         } else if (serverVersion.isOlderThan(ServerVersion.V_1_14)) {
             return ServerVersion.V_1_13_2;
@@ -145,8 +147,8 @@ public class ParticleTypes {
 
     public static final ParticleType AMBIENT_ENTITY_EFFECT = define("ambient_entity_effect");
     public static final ParticleType ANGRY_VILLAGER = define("angry_villager");
-    public static final ParticleType BLOCK = define("block", ParticleBlockStateData::read, (wrapper, data) -> ParticleBlockStateData.write(wrapper, (ParticleBlockStateData)data));
-    public static final ParticleType BLOCK_MARKER = define("block_marker", ParticleBlockStateData::read, (wrapper, data) -> ParticleBlockStateData.write(wrapper, (ParticleBlockStateData)data));
+    public static final ParticleType BLOCK = define("block", ParticleBlockStateData::read, (wrapper, data) -> ParticleBlockStateData.write(wrapper, (ParticleBlockStateData) data));
+    public static final ParticleType BLOCK_MARKER = define("block_marker", ParticleBlockStateData::read, (wrapper, data) -> ParticleBlockStateData.write(wrapper, (ParticleBlockStateData) data));
     public static final ParticleType BUBBLE = define("bubble");
     public static final ParticleType CLOUD = define("cloud");
     public static final ParticleType CRIT = define("crit");
@@ -167,7 +169,7 @@ public class ParticleTypes {
     public static final ParticleType ENTITY_EFFECT = define("entity_effect");
     public static final ParticleType EXPLOSION_EMITTER = define("explosion_emitter");
     public static final ParticleType EXPLOSION = define("explosion");
-    public static final ParticleType FALLING_DUST = define("falling_dust", ParticleBlockStateData::read, (wrapper, data) -> ParticleBlockStateData.write(wrapper, (ParticleBlockStateData)data));
+    public static final ParticleType FALLING_DUST = define("falling_dust", ParticleBlockStateData::read, (wrapper, data) -> ParticleBlockStateData.write(wrapper, (ParticleBlockStateData) data));
     public static final ParticleType FIREWORK = define("firework");
     public static final ParticleType FISHING = define("fishing");
     public static final ParticleType FLAME = define("flame");

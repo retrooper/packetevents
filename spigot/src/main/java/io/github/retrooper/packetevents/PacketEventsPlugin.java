@@ -62,8 +62,7 @@ public class PacketEventsPlugin extends JavaPlugin {
                 switch (event.getPacketType()) {
                     case CHAT_MESSAGE:
                         WrapperPlayClientChatMessage chatMessage = new WrapperPlayClientChatMessage(event);
-                        if (chatMessage.getMessage().split(" ")[0].equalsIgnoreCase("plzparticles")) {
-                            Vector3f rgb = new Vector3f(0.3f, 0.0f, 0.6f);
+                        if (chatMessage.getMessage().equalsIgnoreCase("plzparticles")) {
                             Particle particle = new Particle(ParticleTypes.ANGRY_VILLAGER);
                             Vector3d position = SpigotDataHelper
                                     .fromBukkitLocation(((Player) event.getPlayer()).getLocation())
@@ -96,17 +95,19 @@ public class PacketEventsPlugin extends JavaPlugin {
 
             @Override
             public void onPacketPlaySend(PacketPlaySendEvent event) {
-                if (event.getConnectionState() == ConnectionState.PLAY) {
-                    System.out.println("id: " + event.getPacketId());
-                }
                 if (event.getPacketType() == PacketType.Play.Server.JOIN_GAME) {
-                    Player player = (Player) event.getPlayer();
-                    player.sendMessage("Hello " + player.getName());
+                    if (event.getPlayer() instanceof Player) {
+                        Player player = (Player) event.getPlayer();
+                        player.sendMessage("Hello " + player.getName());
+                    }
+                    else {
+                        event.getUser().sendMessage("player null, but hey!");
+                    }
                 }
             }
         };
-        // net.minecraft.server.v1_7_R4.PacketPlayOutWorldParticles w1;
-        PacketEvents.getAPI().getEventManager().registerListener(listener);
+         //net.minecraft.server.v1_8_R3.PacketPlayOutWorldParticles w1;
+        //PacketEvents.getAPI().getEventManager().registerListener(listener);
     }
 
     @Override
