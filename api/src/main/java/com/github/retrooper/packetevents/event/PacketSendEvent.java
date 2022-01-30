@@ -82,6 +82,10 @@ public class PacketSendEvent extends ProtocolPacketEvent<Object> {
     }
 
     //TODO Remove this, and find out what the difference is.
+    public boolean hasPromisedTasks() {
+        return promisedTasks != null && !promisedTasks.isEmpty();
+    }
+
     public List<Runnable> getPromisedTasks() {
         if (promisedTasks == null) {
             promisedTasks = new ArrayList<>();
