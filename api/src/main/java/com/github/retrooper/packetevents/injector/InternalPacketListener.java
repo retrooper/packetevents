@@ -31,6 +31,8 @@ import com.github.retrooper.packetevents.protocol.player.UserProfile;
 import com.github.retrooper.packetevents.wrapper.handshaking.client.WrapperHandshakingClientHandshake;
 import com.github.retrooper.packetevents.wrapper.login.server.WrapperLoginServerLoginSuccess;
 
+import java.net.InetSocketAddress;
+
 public class InternalPacketListener implements PacketListener {
     //Make this specific event be at MONITOR priority
     @Override
@@ -65,22 +67,23 @@ public class InternalPacketListener implements PacketListener {
             case HANDSHAKING:
                 if (event.getPacketType() == PacketType.Handshaking.Client.HANDSHAKE) {
                     ChannelAbstract channel = event.getChannel();
+                    InetSocketAddress address = event.getSocketAddress();
                     WrapperHandshakingClientHandshake handshake = new WrapperHandshakingClientHandshake(event);
                     ClientVersion clientVersion = handshake.getClientVersion();
 
                     //Update client version for this event call(and user)
                     event.setClientVersion(clientVersion);
-                    PacketEvents.getAPI().getLogManager().debug("Storing a user's client version(protocol-version)");
+                    PacketEvents.getAPI().getLogManager().debug("Processed " + address.getHostString() + ":" + address.getPort() + "'s client version. Client Version: " + clientVersion.getReleaseName());
                     event.getPostTasks().add(() -> {
                         //Transition into the LOGIN OR STATUS connection state
                         PacketEvents.getAPI().getInjector().changeConnectionState(channel, handshake.getNextConnectionState());
-                        PacketEvents.getAPI().getLogManager().debug("Transitioned into the " + handshake.getNextConnectionState() + " state!");
+                        PacketEvents.getAPI().getLogManager().debug("Transitioned " + address.getHostString() + ":" + address.getPort() + " into the " + handshake.getNextConnectionState() + " state!");
                     });
                 }
                 break;
             case PLAY:
-                if (event.getPacketType() == PacketType.Play.Client.TAB_COMPLETE) {
-                    /*WrapperPlayClientTabComplete tabComplete = new WrapperPlayClientTabComplete(event);
+                /*if (event.getPacketType() == PacketType.Play.Client.TAB_COMPLETE) {
+                    WrapperPlayClientTabComplete tabComplete = new WrapperPlayClientTabComplete(event);
                     String text = tabComplete.getText();
                     GameProfile profile = PacketEvents.getAPI().getPlayerManager().getGameProfile(event.getChannel());
                     UUID uuid = profile.getId();
@@ -91,8 +94,8 @@ public class InternalPacketListener implements PacketListener {
                     tabCompleteAttribute.setInput(text);
                     Optional<Integer> transactionID = tabComplete.getTransactionId();
                     transactionID.ifPresent(tabComplete::setTransactionId);
-                    PacketEvents.getAPI().getLogManager().debug("Tab complete received: " + text);*/
-                }
+                    PacketEvents.getAPI().getLogManager().debug("Tab complete received: " + text);
+                }*/
                 break;
         }
     }

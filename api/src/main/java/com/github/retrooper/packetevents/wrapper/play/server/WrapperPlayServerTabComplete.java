@@ -18,12 +18,10 @@
 
 package com.github.retrooper.packetevents.wrapper.play.server;
 
-import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.event.PacketSendEvent;
-import com.github.retrooper.packetevents.manager.player.attributes.TabCompleteAttribute;
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
-import com.github.retrooper.packetevents.util.AdventureSerializer;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
+import com.github.retrooper.packetevents.util.AdventureSerializer;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 import net.kyori.adventure.text.Component;
 import org.jetbrains.annotations.NotNull;
@@ -32,7 +30,6 @@ import org.jetbrains.annotations.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
 
 public class WrapperPlayServerTabComplete extends PacketWrapper<WrapperPlayServerTabComplete> {
     private static final int MODERN_MESSAGE_LENGTH = 262144;
@@ -51,7 +48,7 @@ public class WrapperPlayServerTabComplete extends PacketWrapper<WrapperPlayServe
         setCommandRange(commandRange);
         this.commandMatches = commandMatches;
     }
-
+/*
     public WrapperPlayServerTabComplete(UUID uuid, List<CommandMatch> commandMatches) {
         super(PacketType.Play.Server.TAB_COMPLETE);
         TabCompleteAttribute tabCompleteAttribute = PacketEvents.getAPI()
@@ -60,7 +57,7 @@ public class WrapperPlayServerTabComplete extends PacketWrapper<WrapperPlayServe
         int len = tabCompleteAttribute.getInput().length();
         setCommandRange(new CommandRange(len, len));
         this.commandMatches = commandMatches;
-    }
+    }*/
 
     @Override
     public void readData() {
