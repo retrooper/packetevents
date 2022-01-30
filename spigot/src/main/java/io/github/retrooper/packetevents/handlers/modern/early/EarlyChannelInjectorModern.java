@@ -309,10 +309,6 @@ public class EarlyChannelInjectorModern implements EarlyInjector {
             encoder.player = (Player) player;
             if (newConnectionState == ConnectionState.PLAY) {
                 encoder.handledCompression = true;
-                if (ViaVersionUtil.isAvailable()) {
-                    channel.pipeline().remove(PacketEvents.ENCODER_NAME);
-                    initViaEncoder(channel, encoder);
-                }
             }
         }
     }
@@ -324,15 +320,6 @@ public class EarlyChannelInjectorModern implements EarlyInjector {
            return encoder.user.getConnectionState();
        }
        return null;
-    }
-
-    private void initViaEncoder(Object ch, PacketEncoderModern encoder) {
-        Channel channel = (Channel) ch;
-        MessageToByteEncoder<?> viaEncoder = (MessageToByteEncoder<?>) channel.pipeline().get("encoder");
-        //Read the mcEncoder stored in "encoder" by viaversion
-        encoder.mcEncoder = new ReflectionObject(viaEncoder).read(0, MessageToByteEncoder.class);
-        //We let our encoder get called before viaversion, but we will therefore transform the NMS packets to bytebufs
-        channel.pipeline().addAfter("encoder", PacketEvents.ENCODER_NAME, encoder);
     }
 
     private void addCustomViaDecoder(Object ch, PacketDecoderModern decoder) {
@@ -363,8 +350,6 @@ public class EarlyChannelInjectorModern implements EarlyInjector {
             decoder.user.setConnectionState(connectionState);
             if (connectionState == ConnectionState.PLAY) {
                 if (ViaVersionUtil.isAvailable()) {
-                    PacketEncoderModern encoder = (PacketEncoderModern) channel.pipeline().remove(PacketEvents.ENCODER_NAME);
-                    initViaEncoder(channel, encoder);
                     channel.pipeline().remove(PacketEvents.DECODER_NAME);
                     decoder.bypassCompression = true;
                     addCustomViaDecoder(channel, new PacketDecoderModern(decoder));

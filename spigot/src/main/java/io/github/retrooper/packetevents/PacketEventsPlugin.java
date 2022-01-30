@@ -21,7 +21,6 @@ package io.github.retrooper.packetevents;
 import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.event.SimplePacketListenerAbstract;
 import com.github.retrooper.packetevents.event.simple.PacketPlayReceiveEvent;
-import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.protocol.particle.Particle;
 import com.github.retrooper.packetevents.protocol.particle.type.ParticleTypes;
 import com.github.retrooper.packetevents.protocol.player.DiggingAction;

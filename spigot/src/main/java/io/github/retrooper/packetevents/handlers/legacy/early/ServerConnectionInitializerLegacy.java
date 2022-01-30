@@ -34,6 +34,7 @@ public class ServerConnectionInitializerLegacy {
         User user = new User(channelAbstract, connectionState, null, new UserProfile(null, null));
         PacketEvents.getAPI().getPlayerManager().USERS.put(channelAbstract, user);
         channel.pipeline().addAfter("splitter", PacketEvents.DECODER_NAME, new PacketDecoderLegacy(user));
+        //No need to account for ViaVersion, as they don't support 1.7.10
         channel.pipeline().addBefore("encoder", PacketEvents.ENCODER_NAME, new PacketEncoderLegacy(user));
     }
 

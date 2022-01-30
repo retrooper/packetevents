@@ -31,6 +31,7 @@ import io.github.retrooper.packetevents.utils.dependencies.viaversion.ViaVersion
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandler;
 import io.netty.handler.codec.ByteToMessageDecoder;
+import io.netty.handler.codec.MessageToByteEncoder;
 import org.bukkit.entity.Player;
 
 import java.util.List;
@@ -43,7 +44,17 @@ public class ServerConnectionInitializerModern {
         User user = new User(channelAbstract, connectionState, null, new UserProfile(null, null));
         PacketEvents.getAPI().getPlayerManager().USERS.put(channelAbstract, user);
         channel.pipeline().addAfter("splitter", PacketEvents.DECODER_NAME, new PacketDecoderModern(user));
-        channel.pipeline().addBefore("encoder", PacketEvents.ENCODER_NAME, new PacketEncoderModern(user));
+        PacketEncoderModern encoder = new PacketEncoderModern(user);
+        ChannelHandler vanillaEncoder = channel.pipeline().get("encoder");
+        if (ViaVersionUtil.isAvailable() && ViaVersionUtil.getBukkitEncodeHandlerClass().isInstance(vanillaEncoder)) {
+            //Read the minecraft encoder stored in ViaVersion's encoder.
+            encoder.mcEncoder = new ReflectionObject(vanillaEncoder).read(0, MessageToByteEncoder.class);
+        }
+        else {
+            //Read the minecraft encoder exposed in the pipeline
+            encoder.mcEncoder = (MessageToByteEncoder<?>) vanillaEncoder;
+        }
+        channel.pipeline().addAfter("encoder", PacketEvents.ENCODER_NAME, encoder);
     }
 
     public static void postDestroyChannel(Object ch) {
@@ -107,6 +118,7 @@ public class ServerConnectionInitializerModern {
         } else {
             channel.pipeline().remove(PacketEvents.DECODER_NAME);
         }
+
         channel.pipeline().remove(PacketEvents.ENCODER_NAME);
     }
 }
