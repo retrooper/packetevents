@@ -65,7 +65,6 @@ public class InternalPacketListener implements PacketListener {
             case HANDSHAKING:
                 if (event.getPacketType() == PacketType.Handshaking.Client.HANDSHAKE) {
                     ChannelAbstract channel = event.getChannel();
-                    System.out.println("inc handshake?");
                     WrapperHandshakingClientHandshake handshake = new WrapperHandshakingClientHandshake(event);
                     ClientVersion clientVersion = handshake.getClientVersion();
 

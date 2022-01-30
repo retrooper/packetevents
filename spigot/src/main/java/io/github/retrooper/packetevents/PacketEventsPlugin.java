@@ -21,14 +21,18 @@ package io.github.retrooper.packetevents;
 import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.event.SimplePacketListenerAbstract;
 import com.github.retrooper.packetevents.event.simple.PacketPlayReceiveEvent;
+import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.protocol.particle.Particle;
 import com.github.retrooper.packetevents.protocol.particle.type.ParticleTypes;
 import com.github.retrooper.packetevents.protocol.player.DiggingAction;
 import com.github.retrooper.packetevents.protocol.player.User;
+import com.github.retrooper.packetevents.protocol.world.BlockFace;
 import com.github.retrooper.packetevents.protocol.world.Location;
 import com.github.retrooper.packetevents.util.Vector3d;
 import com.github.retrooper.packetevents.util.Vector3f;
+import com.github.retrooper.packetevents.util.Vector3i;
 import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientChatMessage;
+import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientPlayerBlockPlacement;
 import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientPlayerDigging;
 import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientPlayerFlying;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerParticle;
@@ -48,19 +52,15 @@ public class PacketEventsPlugin extends JavaPlugin {
     public void onEnable() {
         //Register your listeners
         PacketEvents.getAPI().init();
-
         PacketEvents.getAPI().getSettings().debug(false).bStats(true);
-
-        SimplePacketListenerAbstract simple = new SimplePacketListenerAbstract() {
+        SimplePacketListenerAbstract listener = new SimplePacketListenerAbstract() {
             @Override
             public void onPacketPlayReceive(PacketPlayReceiveEvent event) {
                 User user = event.getUser();
                 switch (event.getPacketType()) {
                     case CHAT_MESSAGE:
                         WrapperPlayClientChatMessage chatMessage = new WrapperPlayClientChatMessage(event);
-                        String msg = chatMessage.getMessage();
-                        String[] sp = msg.split(" ");
-                        if (sp[0].equalsIgnoreCase("plzparticles")) {
+                        if (chatMessage.getMessage().split(" ")[0].equalsIgnoreCase("plzparticles")) {
                             Vector3f rgb = new Vector3f(0.3f, 0.0f, 0.6f);
                             Particle particle = new Particle(ParticleTypes.ANGRY_VILLAGER);
                             Vector3d position = SpigotDataHelper
@@ -83,12 +83,17 @@ public class PacketEventsPlugin extends JavaPlugin {
                         WrapperPlayClientPlayerDigging digging = new WrapperPlayClientPlayerDigging(event);
                         DiggingAction action = digging.getAction();
                         break;
+                    case PLAYER_BLOCK_PLACEMENT:
+                        WrapperPlayClientPlayerBlockPlacement blockPlacement = new WrapperPlayClientPlayerBlockPlacement(event);
+                        BlockFace face = blockPlacement.getFace();
+                        Vector3i bp = blockPlacement.getBlockPosition();
+                        //user.sendMessage("Face: " + face + ", bp: " + bp);
+                        break;
                 }
             }
         };
-
         // net.minecraft.server.v1_7_R4.PacketPlayOutWorldParticles w1;
-        //PacketEvents.getAPI().getEventManager().registerListener(simple);
+        //PacketEvents.getAPI().getEventManager().registerListener(listener);
     }
 
     @Override

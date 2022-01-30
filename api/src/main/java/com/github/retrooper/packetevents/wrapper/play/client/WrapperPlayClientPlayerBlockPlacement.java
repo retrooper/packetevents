@@ -67,7 +67,6 @@ public class WrapperPlayClientPlayerBlockPlacement extends PacketWrapper<Wrapper
                 blockPosition = readBlockPosition();
             }
             if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_9)) {
-                //Unsigned byte, itemstack
                 face = BlockFace.getBlockFaceByValue(readVarInt());
                 interactionHand = InteractionHand.getById(readVarInt());
             }

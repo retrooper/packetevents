@@ -137,7 +137,6 @@ public abstract class ProtocolPacketEvent<T> extends PacketEvent implements Play
         return user;
     }
 
-    @Nullable
     @Override
     public T getPlayer() {
         return player;

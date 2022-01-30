@@ -294,9 +294,6 @@ public class EarlyChannelInjectorModern implements EarlyInjector {
                         channel.pipeline().remove(PacketEvents.DECODER_NAME);
                         addCustomViaDecoder(channel, new PacketDecoderModern(decoder));
                     }
-                    else {
-                        System.out.println("We would have run into an exception!");
-                    }
                 }
                 else if (ProtocolSupportUtil.isAvailable()) {
                     channel.pipeline().remove(PacketEvents.DECODER_NAME);
