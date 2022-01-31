@@ -38,7 +38,6 @@ public class PacketDecoderModern extends ByteToMessageDecoder {
     public List<ByteToMessageDecoder> decoders = new ArrayList<>();
     public User user;
     public volatile Player player;
-    public boolean bypassCompression = false;
     public boolean handledCompression;
     public boolean skipDoubleTransform;
     private final List<Runnable> postTasks = new ArrayList<>();
@@ -52,7 +51,6 @@ public class PacketDecoderModern extends ByteToMessageDecoder {
         decoders = decoder.decoders;
         user = decoder.user;
         player = decoder.player;
-        bypassCompression = decoder.bypassCompression;
         handledCompression = decoder.handledCompression;
         skipDoubleTransform = decoder.skipDoubleTransform;
         postTasks.clear();
@@ -67,7 +65,7 @@ public class PacketDecoderModern extends ByteToMessageDecoder {
         ByteBuf transformed = ctx.alloc().buffer().writeBytes(input);
         try {
             boolean doCompression =
-                    !bypassCompression && handleCompressionOrder(ctx, transformed);
+                    handleCompressionOrder(ctx, transformed);
             int preProcessIndex = transformed.readerIndex();
             PacketReceiveEvent packetReceiveEvent = EventCreationUtil.createReceiveEvent(ctx.channel(), user, player, transformed);
             int processIndex = transformed.readerIndex();

@@ -287,7 +287,7 @@ public class EarlyChannelInjectorModern implements EarlyInjector {
             decoder.user.getProfile().setName(((Player) player).getName());
             //TODO Perhaps client-version?
             if (newConnectionState == ConnectionState.PLAY) {
-                decoder.handledCompression = true;
+                //decoder.handledCompression = true;
                 if (ViaVersionUtil.isAvailable()) {
                     ChannelHandler handler = channel.pipeline().get(PacketEvents.DECODER_NAME);
                     if (handler != null) {
@@ -351,7 +351,7 @@ public class EarlyChannelInjectorModern implements EarlyInjector {
             if (connectionState == ConnectionState.PLAY) {
                 if (ViaVersionUtil.isAvailable()) {
                     channel.pipeline().remove(PacketEvents.DECODER_NAME);
-                    decoder.bypassCompression = true;
+                    decoder.handledCompression = true;
                     addCustomViaDecoder(channel, new PacketDecoderModern(decoder));
                 } else if (ProtocolSupportUtil.isAvailable()) {
                     channel.pipeline().remove(PacketEvents.DECODER_NAME);

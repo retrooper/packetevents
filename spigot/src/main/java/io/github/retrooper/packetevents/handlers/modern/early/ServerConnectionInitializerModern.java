@@ -83,18 +83,16 @@ public class ServerConnectionInitializerModern {
                     reflectNewDecoderModern.write(ByteToMessageDecoder.class, 0, decoderModern.mcDecoder);
 
                     //TODO Write user, and check whats left
+                    reflectNewDecoderModern.write(User.class, 0, decoderModern.user);
 
                     //Write player
                     reflectNewDecoderModern.write(Player.class, 0, decoderModern.player);
 
-                    //Write bypassCompression
-                    reflectNewDecoderModern.write(boolean.class, 0, decoderModern.bypassCompression);
-
                     //Write handledCompression
-                    reflectNewDecoderModern.write(boolean.class, 1, decoderModern.handledCompression);
+                    reflectNewDecoderModern.write(boolean.class, 0, decoderModern.handledCompression);
 
                     //Write skipDoubleTransform
-                    reflectNewDecoderModern.write(boolean.class, 2, decoderModern.skipDoubleTransform);
+                    reflectNewDecoderModern.write(boolean.class, 1, decoderModern.skipDoubleTransform);
                 }
             } else if (ClassUtil.getClassSimpleName(decoder.getClass()).equals("PacketDecoderModern")) {
                 //Possibly another instance of packetevents has already injected into ViaVersion.
