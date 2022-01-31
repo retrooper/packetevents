@@ -33,7 +33,10 @@ import org.bukkit.entity.Player;
 import org.bukkit.plugin.PluginDescriptionFile;
 
 import java.lang.reflect.Field;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class EarlyChannelInjectorModern implements EarlyInjector {
     private final List<ChannelFuture> injectedFutures = new ArrayList<>();
@@ -135,8 +138,8 @@ public class EarlyChannelInjectorModern implements EarlyInjector {
                     channel.pipeline().remove(PacketEvents.get().getHandlerName());
                 }
 
-                if (channel.pipeline().get("encoder") != null) {
-                    channel.pipeline().addAfter("encoder", PacketEvents.get().getHandlerName(), new PlayerChannelHandlerModern());
+                if (channel.pipeline().get("packet_handler") != null) {
+                    channel.pipeline().addBefore("packet_handler", PacketEvents.get().getHandlerName(), new PlayerChannelHandlerModern());
                 }
             }
         }
@@ -318,12 +321,6 @@ public class EarlyChannelInjectorModern implements EarlyInjector {
         PlayerChannelHandlerModern handler = getHandler(rawChannel);
         if (handler != null) {
             handler.player = player;
-            Channel channel = (Channel) rawChannel;
-            if (channel.pipeline().get("protocol_lib_encoder") != null) {
-                channel.pipeline().remove(PacketEvents.get().getHandlerName());
-                //Make sure from now on we process outgoing packets after protocollib
-                channel.pipeline().addBefore("protocol_lib_encoder", PacketEvents.get().getHandlerName(), handler);
-            }
         }
     }
 }

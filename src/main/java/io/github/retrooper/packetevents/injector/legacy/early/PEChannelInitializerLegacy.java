@@ -47,12 +47,12 @@ public class PEChannelInitializerLegacy extends ChannelInitializer<Channel> {
     protected void initChannel(Channel channel) throws Exception {
         initChannelMethod.invoke(oldChannelInitializer, channel);
         PlayerChannelHandlerLegacy channelHandler = new PlayerChannelHandlerLegacy();
-        if (channel.pipeline().get("encoder") != null) {
+        if (channel.pipeline().get("packet_handler") != null) {
             String handlerName = PacketEvents.get().getHandlerName();
             if (channel.pipeline().get(handlerName) != null) {
                 PacketEvents.get().getPlugin().getLogger().warning("[PacketEvents] Attempted to initialize a channel twice!");
             } else {
-                channel.pipeline().addAfter("encoder", handlerName, channelHandler);
+                channel.pipeline().addBefore("packet_handler", handlerName, channelHandler);
             }
         }
     }

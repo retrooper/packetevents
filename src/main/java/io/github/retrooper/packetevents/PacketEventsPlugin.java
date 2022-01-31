@@ -18,9 +18,19 @@
 
 package io.github.retrooper.packetevents;
 
+import io.github.retrooper.packetevents.event.PacketListenerAbstract;
+import io.github.retrooper.packetevents.event.impl.PacketPlayReceiveEvent;
+import io.github.retrooper.packetevents.event.impl.PacketPlaySendEvent;
+import io.github.retrooper.packetevents.packettype.PacketType;
+import io.github.retrooper.packetevents.packetwrappers.play.in.useentity.WrappedPacketInUseEntity;
+import io.github.retrooper.packetevents.packetwrappers.play.out.entityeffect.WrappedPacketOutEntityEffect;
+import io.github.retrooper.packetevents.packetwrappers.play.out.explosion.WrappedPacketOutExplosion;
 import io.github.retrooper.packetevents.settings.PacketEventsSettings;
 import io.github.retrooper.packetevents.utils.server.ServerVersion;
+import io.netty.channel.Channel;
 import org.bukkit.plugin.java.JavaPlugin;
+
+import java.util.Arrays;
 
 public class PacketEventsPlugin extends JavaPlugin {
     @Override
@@ -37,6 +47,31 @@ public class PacketEventsPlugin extends JavaPlugin {
 
     @Override
     public void onEnable() {
+        /*PacketEvents.get().getEventManager().registerListener(new PacketListenerAbstract() {
+            @Override
+            public void onPacketPlayReceive(PacketPlayReceiveEvent event) {
+                if (event.getPacketId() == PacketType.Play.Client.USE_ENTITY) {
+                    WrappedPacketInUseEntity ue = new WrappedPacketInUseEntity(event.getNMSPacket());
+                    event.getPlayer().sendMessage("You interacted with entity " + ue.getEntity().getName());
+                    System.out.println("Handlers: " + Arrays.toString(((Channel)event.getChannel()).pipeline().names().toArray(new String[0])));
+                }
+            }
+
+            @Override
+            public void onPacketPlaySend(PacketPlaySendEvent event) {
+                if (event.getPacketId() == PacketType.Play.Server.EXPLOSION) {
+                    WrappedPacketOutExplosion explosion = new WrappedPacketOutExplosion(event.getNMSPacket());
+                    event.getPlayer().sendMessage("explosion: " + explosion.getPosition() + ", velocity: " + explosion.getPlayerVelocity());
+                }
+                else if (event.getPacketId() == PacketType.Play.Server.ENTITY_EFFECT) {
+                    WrappedPacketOutEntityEffect effect = new WrappedPacketOutEntityEffect(event.getNMSPacket());
+                    int id = effect.getEffectId();
+                    int amplifier = effect.getAmplifier();
+                    int duration = effect.getDuration();
+                    event.getPlayer().sendMessage("id: " + id + ", amplifier: " + amplifier + ", duration: " + duration);
+                }
+            }
+        });*/
         PacketEvents.get().init();
     }
 

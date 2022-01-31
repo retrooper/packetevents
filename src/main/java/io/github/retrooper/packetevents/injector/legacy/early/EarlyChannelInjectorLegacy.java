@@ -135,9 +135,8 @@ public class EarlyChannelInjectorLegacy implements EarlyInjector {
                     channel.pipeline().remove(PacketEvents.get().getHandlerName());
                 }
 
-                //TODO Look into why this apparently doesn't work
-                if (channel.pipeline().get("encoder") != null) {
-                    channel.pipeline().addAfter("encoder", PacketEvents.get().getHandlerName(), new PlayerChannelHandlerLegacy());
+                if (channel.pipeline().get("packet_handler") != null) {
+                    channel.pipeline().addBefore("packet_handler", PacketEvents.get().getHandlerName(), new PlayerChannelHandlerLegacy());
                 }
             }
         }
@@ -313,12 +312,6 @@ public class EarlyChannelInjectorLegacy implements EarlyInjector {
         PlayerChannelHandlerLegacy handler = getHandler(rawChannel);
         if (handler != null) {
             handler.player = player;
-            Channel channel = (Channel) rawChannel;
-            if (channel.pipeline().get("protocol_lib_encoder") != null) {
-                channel.pipeline().remove(PacketEvents.get().getHandlerName());
-                //Make sure from now on we process outgoing packets after protocollib
-                channel.pipeline().addBefore("protocol_lib_encoder", PacketEvents.get().getHandlerName(), handler);
-            }
         }
     }
 }
