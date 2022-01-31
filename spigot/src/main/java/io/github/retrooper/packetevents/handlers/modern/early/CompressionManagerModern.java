@@ -40,7 +40,6 @@ public class CompressionManagerModern {
         PacketDecoderModern decoder = (PacketDecoderModern) ctx.pipeline().remove(PacketEvents.DECODER_NAME);
         ctx.pipeline().addAfter("compress", PacketEvents.ENCODER_NAME, encoder);
         ctx.pipeline().addAfter("decompress", PacketEvents.DECODER_NAME, new PacketDecoderModern(decoder));
-        System.out.println("Relocated handlers!");
         return true;
     }
 
