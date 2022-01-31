@@ -35,7 +35,7 @@ import org.bukkit.event.player.PlayerQuitEvent;
 public class InternalBukkitListener implements Listener {
     @EventHandler(priority = EventPriority.LOWEST)
     public void onLogin(PlayerLoginEvent e) {
-        final Player player = e.getPlayer();
+        Player player = e.getPlayer();
         SpigotChannelInjector injector = (SpigotChannelInjector) PacketEvents.getAPI().getInjector();
         if (injector.shouldInjectEarly()) {
             PacketEvents.getAPI().getInjector().injectPlayer(player, null);
@@ -45,9 +45,7 @@ public class InternalBukkitListener implements Listener {
     @EventHandler(priority = EventPriority.HIGH)
     public void onJoin(PlayerJoinEvent e) {
         Player player = e.getPlayer();
-
         SpigotChannelInjector injector = (SpigotChannelInjector) PacketEvents.getAPI().getInjector();
-
         boolean injectEarly = injector.shouldInjectEarly();
         boolean shouldInject = !injectEarly || !injector.hasInjected(e.getPlayer());
         //By accessing user with the player object, we ensure that a valid user is cached.
@@ -67,9 +65,6 @@ public class InternalBukkitListener implements Listener {
         Player player = e.getPlayer();
         ChannelAbstract channel = PacketEvents.getAPI().getPlayerManager().getChannel(player);
         //Cleanup user data, maybe make some abstraction method for this in the API module.
-        PacketEvents.getAPI().getNettyManager().CHANNEL_MAP.remove(channel.rawChannel());
-        PacketEvents.getAPI().getPlayerManager().USERS.remove(channel);
-        PacketEvents.getAPI().getPlayerManager().CHANNELS.remove(player.getName());
-        PacketEvents.getAPI().getPlayerManager().PLAYER_ATTRIBUTES.remove(player.getUniqueId());
+        PacketEvents.getAPI().getPlayerManager().clearUserData(channel, player.getName(), player.getUniqueId());
     }
 }

@@ -19,6 +19,7 @@
 package com.github.retrooper.packetevents.manager.player;
 
 import com.github.retrooper.packetevents.PacketEvents;
+import com.github.retrooper.packetevents.netty.NettyManager;
 import com.github.retrooper.packetevents.netty.buffer.ByteBufAbstract;
 import com.github.retrooper.packetevents.netty.channel.ChannelAbstract;
 import com.github.retrooper.packetevents.protocol.ConnectionState;
@@ -139,6 +140,13 @@ public interface PlayerManager {
 
     default void setChannel(String username, ChannelAbstract channel) {
         CHANNELS.put(username, channel);
+    }
+
+    default void clearUserData(ChannelAbstract channel, String name, UUID uuid) {
+        NettyManager.CHANNEL_MAP.remove(channel.rawChannel());
+        USERS.remove(channel);
+        CHANNELS.remove(name);
+        PLAYER_ATTRIBUTES.remove(uuid);
     }
 
     void sendPacket(ChannelAbstract channel, ByteBufAbstract byteBuf);
