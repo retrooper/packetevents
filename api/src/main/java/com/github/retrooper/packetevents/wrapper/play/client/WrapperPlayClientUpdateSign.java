@@ -25,7 +25,7 @@ import com.github.retrooper.packetevents.util.Vector3i;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 
 /**
- * This message is sent from the client to the server when the “Done” button is pushed after placing a sign.
+ * This message is sent from the client to the server when the "Done" button is pushed after placing a sign.
  */
 public class WrapperPlayClientUpdateSign extends PacketWrapper<WrapperPlayClientUpdateSign> {
     private String[] textLines;
