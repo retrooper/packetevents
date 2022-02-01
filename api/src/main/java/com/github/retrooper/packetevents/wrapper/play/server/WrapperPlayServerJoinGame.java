@@ -227,7 +227,6 @@ public class WrapperPlayServerJoinGame extends PacketWrapper<WrapperPlayServerJo
             }
             if (!v1_14) {
                 writeByte(difficulty.getId());
-                difficulty = Difficulty.getById(readByte());
             }
         }
         if (v1_14) {
