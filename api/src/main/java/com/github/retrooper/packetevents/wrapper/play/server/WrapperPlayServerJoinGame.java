@@ -219,13 +219,15 @@ public class WrapperPlayServerJoinGame extends PacketWrapper<WrapperPlayServerJo
             writeString(worldName);
         } else {
             previousGameMode = gameMode;
-            DimensionType dimensionType = DimensionType.getById(serverVersion.isNewerThanOrEquals(ServerVersion.V_1_9_2) ?
-                    readInt() : readByte());
-            dimension = new Dimension(dimensionType);
+            if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_9)) {
+                writeInt(dimension.getType().getId());
+            }
+            else {
+                writeByte(dimension.getType().getId());
+            }
             if (!v1_14) {
+                writeByte(difficulty.getId());
                 difficulty = Difficulty.getById(readByte());
-            } else {
-                difficulty = Difficulty.NORMAL;
             }
         }
         if (v1_14) {
