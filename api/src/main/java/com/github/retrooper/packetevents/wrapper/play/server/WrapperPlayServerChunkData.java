@@ -52,14 +52,14 @@ public class WrapperPlayServerChunkData extends PacketWrapper<WrapperPlayServerC
     // 1.18 only (lighting) - for writing data
     // TODO: Make accessible?? Include in chunk data?? What do we do with this?
     boolean trustEdges;
-    BitSet blockLightMask;
-    BitSet skyLightMask;
-    BitSet emptyBlockLightMask;
-    BitSet emptySkyLightMask;
+    BitSet blockLightMask = new BitSet(0);
+    BitSet skyLightMask = new BitSet(0);
+    BitSet emptyBlockLightMask = new BitSet(0);
+    BitSet emptySkyLightMask = new BitSet(0);
     int skyLightCount;
     int blockLightCount;
-    byte[][] skyLightArray;
-    byte[][] blockLightArray;
+    byte[][] skyLightArray = new byte[0][0];
+    byte[][] blockLightArray = new byte[0][0];
 
     public WrapperPlayServerChunkData(PacketSendEvent event) {
         super(event);
