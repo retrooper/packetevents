@@ -28,6 +28,7 @@ import com.github.retrooper.packetevents.protocol.player.User;
 import com.github.retrooper.packetevents.util.PacketTransformationUtil;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -142,11 +143,16 @@ public interface PlayerManager {
         CHANNELS.put(username, channel);
     }
 
-    default void clearUserData(ChannelAbstract channel, String name, UUID uuid) {
+    default void clearUserData(ChannelAbstract channel, @Nullable String name, @Nullable UUID uuid) {
         NettyManager.CHANNEL_MAP.remove(channel.rawChannel());
         USERS.remove(channel);
-        CHANNELS.remove(name);
-        PLAYER_ATTRIBUTES.remove(uuid);
+        //Name is only accessible if the server sends the LOGIN_SUCCESS packet which contains name and UUID
+        if (name != null) {
+            CHANNELS.remove(name);
+        }
+        if (uuid != null) {
+            PLAYER_ATTRIBUTES.remove(uuid);
+        }
     }
 
     void sendPacket(ChannelAbstract channel, ByteBufAbstract byteBuf);
