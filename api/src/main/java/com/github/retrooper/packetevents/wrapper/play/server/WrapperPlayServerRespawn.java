@@ -105,9 +105,15 @@ public class WrapperPlayServerRespawn extends PacketWrapper<WrapperPlayServerRes
             levelType = readString(16);
             if (WorldType.FLAT.getName().equals(levelType)) {
                 worldFlat = true;
+                worldDebug = false;
             }
             else if (WorldType.DEBUG_ALL_BLOCK_STATES.getName().equals(levelType)) {
                 worldDebug = true;
+                worldFlat = false;
+            }
+            else {
+                worldFlat = false;
+                worldDebug = false;
             }
         }
         else {
@@ -129,9 +135,15 @@ public class WrapperPlayServerRespawn extends PacketWrapper<WrapperPlayServerRes
             levelType = readString(16);
             if (WorldType.FLAT.getName().equals(levelType)) {
                 worldFlat = true;
+                worldDebug = false;
             }
             else if (WorldType.DEBUG_ALL_BLOCK_STATES.getName().equals(levelType)) {
                 worldDebug = true;
+                worldFlat = false;
+            }
+            else {
+                worldFlat = false;
+                worldDebug = false;
             }
         }
     }
