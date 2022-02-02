@@ -34,6 +34,7 @@ public class EntityTypes {
     private static final Map<String, EntityType> ENTITY_TYPE_MAP = new HashMap<>();
     private static final Map<Integer, EntityType> ENTITY_TYPE_ID_MAP = new HashMap<>();
     private static JsonObject MAPPINGS;
+    private static JsonObject LEGACY_MAPPINGS;
 
     @NotNull
     private static ServerVersion getMappingServerVersion(ServerVersion serverVersion) {
@@ -58,15 +59,39 @@ public class EntityTypes {
         }
     }
 
+    @Nullable
+    private static ServerVersion getLegacyMappingServerVersion(ServerVersion serverVersion) {
+        if (serverVersion.isOlderThanOrEquals(ServerVersion.V_1_8_8)) {
+            return ServerVersion.V_1_8;
+        } else if (serverVersion.isOlderThanOrEquals(ServerVersion.V_1_9_4)) {
+            return ServerVersion.V_1_9;
+        } else if (serverVersion.isOlderThanOrEquals(ServerVersion.V_1_10_2)) {
+            return ServerVersion.V_1_10;
+        } else if (serverVersion.isOlderThanOrEquals(ServerVersion.V_1_11_2)) {
+            return ServerVersion.V_1_11;
+        } else if (serverVersion.isOlderThanOrEquals(ServerVersion.V_1_12_2)) {
+            return ServerVersion.V_1_12;
+        } else if (serverVersion.isOlderThanOrEquals(ServerVersion.V_1_13_2)) {
+            return ServerVersion.V_1_13;
+        } else {
+            return null;
+        }
+    }
+
     public static EntityType define(String key, @Nullable EntityType parent) {
         if (MAPPINGS == null) {
             MAPPINGS = MappingHelper.getJSONObject("entity/entity_type_mappings");
         }
+        if (LEGACY_MAPPINGS == null) {
+            LEGACY_MAPPINGS = MappingHelper.getJSONObject("entity/legacy_entity_type_mappings");
+        }
 
         ResourceLocation identifier = ResourceLocation.minecraft(key);
         ServerVersion mappingsVersion = getMappingServerVersion(PacketEvents.getAPI().getServerManager().getVersion());
+        ServerVersion legacyMapping = getLegacyMappingServerVersion(PacketEvents.getAPI().getServerManager().getVersion());
 
         final int id;
+        final int legacy_id;
 
         if (MAPPINGS.has(mappingsVersion.name())) {
             JsonObject map = MAPPINGS.getAsJsonObject(mappingsVersion.name());
@@ -77,6 +102,19 @@ public class EntityTypes {
             }
         } else {
             throw new IllegalStateException("Failed to find EntityType mappings for the " + mappingsVersion.name() + " mappings version!");
+        }
+        if (legacyMapping != null && LEGACY_MAPPINGS.has(legacyMapping.name())) {
+            JsonObject map = LEGACY_MAPPINGS.getAsJsonObject(legacyMapping.name());
+            if (map.has(key)) {
+                legacy_id = map.get(key).getAsInt();
+            } else {
+                legacy_id = -1;
+            }
+        } else {
+            if (mappingsVersion.isOlderThan(ServerVersion.V_1_14)) {
+                throw new IllegalStateException("Failed to find Legacy EntityType mappings for the " + mappingsVersion.name() + " mappings version!");
+            }
+            legacy_id = -1;
         }
         Optional<EntityType> optParent = parent != null ? Optional.of(parent) : Optional.empty();
 
@@ -89,6 +127,11 @@ public class EntityTypes {
             @Override
             public int getId() {
                 return id;
+            }
+
+            @Override
+            public int getLegacyId() {
+                return legacy_id;
             }
 
             @Override
@@ -131,6 +174,15 @@ public class EntityTypes {
 
     public static EntityType getById(int id) {
         return ENTITY_TYPE_ID_MAP.get(id);
+    }
+
+    public static EntityType getByLegacyId(int id) {
+        for (EntityType type : ENTITY_TYPE_MAP.values()) {
+            if (type.getLegacyId() == id) {
+                return type;
+            }
+        }
+        return null;
     }
 
     // Credit to ViaVersion for these categories
