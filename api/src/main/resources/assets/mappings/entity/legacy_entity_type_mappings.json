@@ -25,7 +25,7 @@
     "falling_block": 70,
     "armor_stand": 78,
     "item_frame": 71,
-    "leash": 77
+    "leash_knot": 77
   },
   "V_1_9": {
     "dropped_item": 2,
@@ -44,7 +44,7 @@
     "experience_bottle": 75,
     "ender_pearl": 65,
     "ender_signal": 72,
-    "fireworks": 76,
+    "firework_rocket": 76,
     "fireball": 63,
     "small_fireball": 64,
     "dragon_fireball": 93,
@@ -56,7 +56,7 @@
     "falling_block": 70,
     "armor_stand": 78,
     "item_frame": 71,
-    "leash": 77,
+    "leash_knot": 77,
     "area_effect_cloud": 3
   },
   "V_1_10": {
@@ -75,7 +75,7 @@
     "experience_bottle": 75,
     "ender_pearl": 65,
     "ender_signal": 72,
-    "fireworks": 76,
+    "firework_rocket": 76,
     "fireball": 63,
     "small_fireball": 64,
     "dragon_fireball": 93,
@@ -87,7 +87,7 @@
     "falling_block": 70,
     "armor_stand": 78,
     "item_frame": 71,
-    "leash": 77,
+    "leash_knot": 77,
     "area_effect_cloud": 3
   },
   "V_1_11": {
@@ -107,7 +107,7 @@
     "experience_bottle": 75,
     "ender_pearl": 65,
     "ender_signal": 72,
-    "fireworks": 76,
+    "firework_rocket": 76,
     "fireball": 63,
     "small_fireball": 64,
     "dragon_fireball": 93,
@@ -120,7 +120,7 @@
     "falling_block": 70,
     "armor_stand": 78,
     "item_frame": 71,
-    "leash": 77,
+    "leash_knot": 77,
     "area_effect_cloud": 3
   },
   "V_1_12": {
@@ -141,7 +141,7 @@
     "experience_bottle": 75,
     "ender_pearl": 65,
     "ender_signal": 72,
-    "fireworks": 76,
+    "firework_rocket": 76,
     "fireball": 63,
     "small_fireball": 64,
     "dragon_fireball": 93,
@@ -154,7 +154,7 @@
     "falling_block": 70,
     "armor_stand": 78,
     "item_frame": 71,
-    "leash": 77,
+    "leash_knot": 77,
     "area_effect_cloud": 3
   },
   "V_1_13": {
@@ -175,7 +175,7 @@
     "experience_bottle": 75,
     "ender_pearl": 65,
     "ender_signal": 72,
-    "fireworks": 76,
+    "firework_rocket": 76,
     "fireball": 63,
     "small_fireball": 64,
     "dragon_fireball": 93,
@@ -188,7 +188,7 @@
     "falling_block": 70,
     "armor_stand": 78,
     "item_frame": 71,
-    "leash": 77,
+    "leash_knot": 77,
     "area_effect_cloud": 3
   }
 }
