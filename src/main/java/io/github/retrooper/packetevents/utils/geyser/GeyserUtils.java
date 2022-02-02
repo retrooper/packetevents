@@ -18,12 +18,13 @@
 
 package io.github.retrooper.packetevents.utils.geyser;
 
-import org.geysermc.connector.GeyserConnector;
+
+import org.geysermc.api.Geyser;
 
 import java.util.UUID;
 
 public class GeyserUtils {
     public static boolean isGeyserPlayer(UUID uuid) {
-        return GeyserConnector.getInstance().getPlayerByUuid(uuid) != null;
+        return Geyser.api().connectionByUuid(uuid) != null;
     }
 }
