@@ -293,8 +293,8 @@ public class ReflectionObject implements ReflectionObjectReader, ReflectionObjec
         List<Field> ret = new ArrayList<>();
         Class<?> clas = clazz;
         while (clas != null) {
-            clas = clazz.getSuperclass();
             ret.addAll(Arrays.asList(clas.getDeclaredFields()));
+            clas = clazz.getSuperclass();
         }
         return ret.toArray(new Field[0]);
     }
