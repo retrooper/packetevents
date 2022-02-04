@@ -40,7 +40,9 @@ public class LateChannelInjectorLegacy implements LateInjector {
         PlayerChannelHandlerLegacy playerChannelHandlerLegacy = new PlayerChannelHandlerLegacy();
         playerChannelHandlerLegacy.player = player;
         Channel channel = (Channel) PacketEvents.get().getPlayerUtils().getChannel(player);
-        channel.pipeline().addBefore("packet_handler", PacketEvents.get().getHandlerName(), playerChannelHandlerLegacy);
+        if (channel.getClass().equals(net.minecraft.util.io.netty.channel.socket.nio.NioSocketChannel.class)) {
+            channel.pipeline().addBefore("packet_handler", PacketEvents.get().getHandlerName(), playerChannelHandlerLegacy);
+        }
     }
 
     @Override

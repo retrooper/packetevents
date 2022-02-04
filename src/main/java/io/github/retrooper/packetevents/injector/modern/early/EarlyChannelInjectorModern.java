@@ -130,7 +130,7 @@ public class EarlyChannelInjectorModern implements EarlyInjector {
             for (Object networkManager : networkManagers) {
                 WrappedPacket networkManagerWrapper = new WrappedPacket(new NMSPacket(networkManager), NMSUtils.networkManagerClass);
                 Channel channel = (Channel) networkManagerWrapper.readObject(0, NMSUtils.nettyChannelClass);
-                if (channel == null) {
+                if (channel == null || !(channel.getClass().equals(io.netty.channel.socket.nio.NioSocketChannel.class))) {
                     continue;
                 }
 

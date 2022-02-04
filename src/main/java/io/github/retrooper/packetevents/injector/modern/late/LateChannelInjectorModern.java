@@ -40,7 +40,9 @@ public class LateChannelInjectorModern implements LateInjector {
         PlayerChannelHandlerModern playerChannelHandlerModern = new PlayerChannelHandlerModern();
         playerChannelHandlerModern.player = player;
         Channel channel = (Channel) PacketEvents.get().getPlayerUtils().getChannel(player);
-        channel.pipeline().addBefore("packet_handler", PacketEvents.get().getHandlerName(), playerChannelHandlerModern);
+        if (channel.getClass().equals(io.netty.channel.socket.nio.NioSocketChannel.class)) {
+            channel.pipeline().addBefore("packet_handler", PacketEvents.get().getHandlerName(), playerChannelHandlerModern);
+        }
     }
 
     @Override
