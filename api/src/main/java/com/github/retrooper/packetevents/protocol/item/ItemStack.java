@@ -156,23 +156,25 @@ public class ItemStack {
         }
     }
 
-    public List<Enchantment> getEnchantments() {
-        if (isEnchanted()) {
-            List<NBTCompound> compounds = nbt.getCompoundListTagOrNull("Enchantments").getTags();
-            List<Enchantment> enchantments = new ArrayList<>(compounds.size());
-            for (NBTCompound compound : compounds) {
-                String id = compound.getStringTagValueOrNull("id");
-                EnchantmentType type = EnchantmentTypes.getByName(id);
-                if (type != null) {
-                    int level = compound.getTagOfTypeOrNull("lvl", NBTShort.class).getAsInt();
-                    Enchantment enchantment = Enchantment.builder().type(type).level(level).build();
-                    enchantments.add(enchantment);
-                }
+    private static List<Enchantment> getEnchantments(NBTCompound nbt) {
+        if (nbt.getCompoundListTagOrNull("Enchantments") == null) return new ArrayList<>();
+
+        List<NBTCompound> compounds = nbt.getCompoundListTagOrNull("Enchantments").getTags();
+        List<Enchantment> enchantments = new ArrayList<>(compounds.size());
+        for (NBTCompound compound : compounds) {
+            String id = compound.getStringTagValueOrNull("id");
+            EnchantmentType type = EnchantmentTypes.getByName(id);
+            if (type != null) {
+                int level = compound.getTagOfTypeOrNull("lvl", NBTShort.class).getAsInt();
+                Enchantment enchantment = Enchantment.builder().type(type).level(level).build();
+                enchantments.add(enchantment);
             }
-            return enchantments;
-        } else {
-            return new ArrayList<>(0);
         }
+        return enchantments;
+    }
+
+    public List<Enchantment> getEnchantments() {
+        return getEnchantments(this.nbt);
     }
 
     // TODO: Test on outdated versions
@@ -188,7 +190,6 @@ public class ItemStack {
 
         return 0;
     }
-
 
     public void setEnchantments(List<Enchantment> enchantments) {
         if (enchantments.isEmpty()) {
@@ -281,6 +282,13 @@ public class ItemStack {
                 nbt = new NBTCompound();
             }
             this.nbt = nbt;
+
+            List<Enchantment> nbtEnchantments = getEnchantments(nbt);
+            // This assumes logically, if already set enchants before NBT, then they would still want the enchants
+            if (!nbtEnchantments.isEmpty()) {
+                this.enchantments = nbtEnchantments;
+            }
+
             return this;
         }
 
