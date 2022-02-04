@@ -36,7 +36,6 @@ public class GeyserUtils {
             GEYSER_CLASS = Reflection.getClassByNameWithoutException("org.geysermc.api.Geyser");
         }
         if (GEYSER_CLASS == null) {
-            System.err.println("Geyser class not found!");
             return false;
         }
 
