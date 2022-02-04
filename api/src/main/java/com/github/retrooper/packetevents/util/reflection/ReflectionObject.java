@@ -20,6 +20,7 @@ package com.github.retrooper.packetevents.util.reflection;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -288,9 +289,19 @@ public class ReflectionObject implements ReflectionObjectReader, ReflectionObjec
         write(List.class, index, list);
     }
 
+    private Field[] getClassFields() {
+        List<Field> ret = new ArrayList<>();
+        Class<?> clas = clazz;
+        while (clas != null) {
+            ret.addAll(Arrays.asList(clas.getDeclaredFields()));
+            clas = clazz.getSuperclass();
+        }
+        return ret.toArray(new Field[0]);
+    }
+
     private Field getField(Class<?> type, int index) {
         Map<Class<?>, Field[]> cached = FIELD_CACHE.computeIfAbsent(clazz, k -> new ConcurrentHashMap<>());
-        Field[] fields = cached.computeIfAbsent(type, typeClass -> getFields(typeClass, clazz.getDeclaredFields()));
+        Field[] fields = cached.computeIfAbsent(type, typeClass -> getFields(typeClass, getClassFields()));
         if (fields.length >= index + 1) {
             return fields[index];
         } else {
