@@ -31,40 +31,59 @@ import com.github.retrooper.packetevents.util.updatechecker.UpdateChecker;
 
 import java.util.logging.Logger;
 
-public interface PacketEventsAPI<T> {
-    void load();
+public abstract class PacketEventsAPI<T> {
+    private static final NPCManager NPC_MANAGER = new NPCManager();
+    private static final EventManager EVENT_MANAGER = new EventManager();
+    private static final PacketEventsSettings SETTINGS = new PacketEventsSettings();
+    private static final UpdateChecker UPDATE_CHECKER = new UpdateChecker();
+    private final Logger LOGGER = Logger.getLogger(PacketEventsAPI.class.getName());
+    private static final LogManager LOG_MANAGER = new LogManager();
 
-    boolean isLoaded();
+    public NPCManager getNPCManager() {
+        return NPC_MANAGER;
+    }
 
-    void init();
+    public EventManager getEventManager() {
+        return EVENT_MANAGER;
+    }
 
-    boolean isInitialized();
+    public PacketEventsSettings getSettings() {
+        return SETTINGS;
+    }
 
-    void terminate();
+    public UpdateChecker getUpdateChecker() {
+        return UPDATE_CHECKER;
+    }
 
-    T getPlugin();
-
-    ServerManager getServerManager();
-
-    PlayerManager getPlayerManager();
-
-    NPCManager getNPCManager();
-
-    EventManager getEventManager();
-
-    PacketEventsSettings getSettings();
-
-    default PEVersion getVersion() {
+    public PEVersion getVersion() {
         return PacketEvents.VERSION;
     }
 
-    Logger getLogger();
+    public Logger getLogger() {
+        return LOGGER;
+    }
 
-    NettyManager getNettyManager();
+    public LogManager getLogManager() {
+        return LOG_MANAGER;
+    }
 
-    ChannelInjector getInjector();
+    public abstract void load();
 
-    UpdateChecker getUpdateChecker();
+    public abstract boolean isLoaded();
 
-    LogManager getLogManager();
+    public abstract void init();
+
+    public abstract boolean isInitialized();
+
+    public abstract void terminate();
+
+    public abstract T getPlugin();
+
+    public abstract ServerManager getServerManager();
+
+    public abstract PlayerManager getPlayerManager();
+
+    public abstract NettyManager getNettyManager();
+
+    public abstract ChannelInjector getInjector();
 }

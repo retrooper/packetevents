@@ -26,7 +26,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public interface NettyManager {
-    public static final Map<Object, ChannelAbstract> CHANNEL_MAP = new HashMap<>();
+    Map<Object, ChannelAbstract> CHANNEL_MAP = new HashMap<>();
     ByteBufAbstract wrappedBuffer(byte[] bytes);
 
     ByteBufAbstract copiedBuffer(byte[] bytes);

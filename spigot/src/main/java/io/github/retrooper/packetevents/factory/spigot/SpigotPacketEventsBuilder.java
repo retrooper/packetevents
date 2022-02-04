@@ -20,12 +20,10 @@ package io.github.retrooper.packetevents.factory.spigot;
 
 import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.PacketEventsAPI;
-import com.github.retrooper.packetevents.event.EventManager;
 import com.github.retrooper.packetevents.event.PacketListenerPriority;
 import com.github.retrooper.packetevents.event.PostPlayerInjectEvent;
 import com.github.retrooper.packetevents.injector.ChannelInjector;
 import com.github.retrooper.packetevents.injector.InternalPacketListener;
-import com.github.retrooper.packetevents.manager.npc.NPCManager;
 import com.github.retrooper.packetevents.manager.player.PlayerManager;
 import com.github.retrooper.packetevents.manager.server.ServerManager;
 import com.github.retrooper.packetevents.netty.NettyManager;
@@ -33,7 +31,6 @@ import com.github.retrooper.packetevents.protocol.ConnectionState;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.settings.PacketEventsSettings;
 import com.github.retrooper.packetevents.util.LogManager;
-import com.github.retrooper.packetevents.util.updatechecker.UpdateChecker;
 import io.github.retrooper.packetevents.bstats.Metrics;
 import io.github.retrooper.packetevents.handlers.SpigotChannelInjector;
 import io.github.retrooper.packetevents.manager.player.PlayerManagerImpl;
@@ -47,8 +44,6 @@ import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
-
-import java.util.logging.Logger;
 
 public class SpigotPacketEventsBuilder {
     private static PacketEventsAPI<Plugin> API_INSTANCE;
@@ -77,15 +72,11 @@ public class SpigotPacketEventsBuilder {
 
     public static PacketEventsAPI<Plugin> buildNoCache(Plugin plugin, PacketEventsSettings inSettings) {
         return new PacketEventsAPI<Plugin>() {
-            private final EventManager eventManager = new EventManager();
             private final PacketEventsSettings settings = inSettings;
-            private final Logger logger = Logger.getLogger(PacketEventsAPI.class.getName());
             private final ServerManager serverManager = new ServerManagerImpl();
             private final PlayerManager playerManager = new PlayerManagerImpl();
-            private final NPCManager npcManager = new NPCManager();
             private final NettyManager nettyManager = new NettyManagerImpl();
             private final SpigotChannelInjector injector = new SpigotChannelInjector();
-            private final UpdateChecker updateChecker = new UpdateChecker();
             private final InternalBukkitListener internalBukkitListener = new InternalBukkitListener();
             private final LogManager logManager = new BukkitLogManager();
             private boolean loaded;
@@ -119,7 +110,8 @@ public class SpigotPacketEventsBuilder {
 
                     //Register internal packet listener (should be the first listener)
                     //This listener doesn't do any modifications to the packets, just reads data
-                    getEventManager().registerListener(new InternalPacketListener(), PacketListenerPriority.LOWEST, true);
+                    getEventManager().registerListener(new InternalPacketListener(),
+                            PacketListenerPriority.LOWEST, true);
                 }
             }
 
@@ -134,7 +126,7 @@ public class SpigotPacketEventsBuilder {
                 load();
                 if (!initialized) {
                     if (settings.shouldCheckForUpdates()) {
-                        updateChecker.handleUpdateCheck();
+                        getUpdateChecker().handleUpdateCheck();
                     }
 
                     if (settings.isbStatsEnabled()) {
@@ -208,23 +200,8 @@ public class SpigotPacketEventsBuilder {
             }
 
             @Override
-            public NPCManager getNPCManager() {
-                return npcManager;
-            }
-
-            @Override
-            public EventManager getEventManager() {
-                return eventManager;
-            }
-
-            @Override
             public PacketEventsSettings getSettings() {
                 return settings;
-            }
-
-            @Override
-            public Logger getLogger() {
-                return logger;
             }
 
             @Override
@@ -235,11 +212,6 @@ public class SpigotPacketEventsBuilder {
             @Override
             public ChannelInjector getInjector() {
                 return injector;
-            }
-
-            @Override
-            public UpdateChecker getUpdateChecker() {
-                return updateChecker;
             }
 
             @Override
