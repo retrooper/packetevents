@@ -56,10 +56,15 @@ public class WrapperPlayServerExplosion extends PacketWrapper<WrapperPlayServerE
         strength = readFloat();
         int recordsLength = serverVersion.isNewerThanOrEquals(ServerVersion.V_1_17) ? readVarInt() : readInt();
         records = new ArrayList<>(recordsLength);
+
+        int floorX = (int) Math.floor(position.x);
+        int floorY = (int) Math.floor(position.y);
+        int floorZ = (int) Math.floor(position.z);
+
         for (int i = 0; i < recordsLength; i++) {
-            int chunkPosX = readByte() + (int) position.x;
-            int chunkPosY = readByte() + (int) position.y;
-            int chunkPosZ = readByte() + (int) position.z;
+            int chunkPosX = readByte() + floorX;
+            int chunkPosY = readByte() + floorY;
+            int chunkPosZ = readByte() + floorZ;
             records.add(new Vector3i(chunkPosX, chunkPosY, chunkPosZ));
         }
 
@@ -90,10 +95,14 @@ public class WrapperPlayServerExplosion extends PacketWrapper<WrapperPlayServerE
             writeInt(records.size());
         }
 
+        int floorX = (int) Math.floor(position.x);
+        int floorY = (int) Math.floor(position.y);
+        int floorZ = (int) Math.floor(position.z);
+
         for (Vector3i record : records) {
-            writeByte(record.x - (int) position.x);
-            writeByte(record.y - (int) position.y);
-            writeByte(record.z - (int) position.z);
+            writeByte(record.x - floorX);
+            writeByte(record.y - floorY);
+            writeByte(record.z - floorZ);
         }
 
         writeFloat(playerMotion.x);
