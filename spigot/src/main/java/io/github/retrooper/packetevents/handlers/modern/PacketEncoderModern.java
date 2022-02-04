@@ -104,7 +104,7 @@ public class PacketEncoderModern extends MessageToByteEncoder<Object> {
             }
         } else {
             ByteBuf in = (ByteBuf) o;
-            if (!in.isReadable()) return;
+            if (in.readableBytes() == 0) return;
             out.writeBytes(in);
         }
         read(ctx, out);

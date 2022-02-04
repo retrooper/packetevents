@@ -108,21 +108,14 @@ public class PacketEventsPlugin extends JavaPlugin {
                     } else {
                         event.getUser().sendMessage("player null, but hey!");
                     }
-                } else if (event.getPacketType() == PacketType.Play.Server.WINDOW_ITEMS) {
-                    WrapperPlayServerWindowItems windowItems = new WrapperPlayServerWindowItems(event);
-                    List<ItemStack> items = windowItems.getItems();
-                    int windowId = windowItems.getWindowId();
-                    int stateId = windowItems.getStateId();
-                    Optional<ItemStack> carried = windowItems.getCarriedItem();
-                    event.getUser().sendMessage("window id: " + windowId + ", state id: " + stateId + ", carried: " + carried.orElse(ItemStack.AIR));
-                    for (ItemStack item : items) {
-                        event.getUser().sendMessage("item: " + item.toString());
-                    }
+                }
+                else if (event.getPacketType() == PacketType.Play.Server.ENTITY_EFFECT) {
+                    event.getUser().sendMessage("Cope!");
                 }
             }
         };
         //net.minecraft.server.v1_8_R3.PacketPlayOutWorldParticles w1;
-        //PacketEvents.getAPI().getEventManager().registerListener(listener);
+        PacketEvents.getAPI().getEventManager().registerListener(listener);
     }
 
     @Override

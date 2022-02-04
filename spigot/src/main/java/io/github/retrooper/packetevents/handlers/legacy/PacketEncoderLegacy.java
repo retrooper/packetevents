@@ -92,7 +92,7 @@ public class PacketEncoderLegacy extends MessageToByteEncoder {
     @Override
     protected void encode(ChannelHandlerContext ctx, Object o, ByteBuf out) {
         ByteBuf in = (ByteBuf) o;
-        if (!in.isReadable()) return;
+        if (in.readableBytes() == 0) return;
         out.writeBytes(in);
         read(ctx, out);
     }
