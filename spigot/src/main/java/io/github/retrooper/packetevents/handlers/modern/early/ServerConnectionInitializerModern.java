@@ -38,6 +38,7 @@ import java.util.List;
 
 
 public class ServerConnectionInitializerModern {
+    //TODO Only inject NioSocketChannels(check v1.8 packetevents)
     public static void postInitChannel(Object ch, ConnectionState connectionState) {
         Channel channel = (Channel) ch;
         ChannelAbstract channelAbstract = PacketEvents.getAPI().getNettyManager().wrapChannel(channel);

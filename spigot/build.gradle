@@ -6,21 +6,8 @@ plugins {
 
 repositories {
     mavenLocal()
-
     maven {
         url 'https://hub.spigotmc.org/nexus/content/repositories/snapshots/'
-    }
-
-    maven {
-        url 'https://papermc.io/repo/repository/maven-public/'
-    }
-
-    maven {
-        url 'https://repo.opencollab.dev/maven-snapshots/'
-    }
-
-    maven {
-        url 'https://repo.opencollab.dev/maven-releases/'
     }
 
     maven {
@@ -33,14 +20,6 @@ repositories {
 
     maven {
         url 'https://repo.viaversion.com/'
-    }
-
-    maven {
-        url 'https://oss.sonatype.org/content/repositories/releases/'
-    }
-
-    maven {
-        url 'https://repo.maven.apache.org/maven2/'
     }
     mavenCentral()
 }
@@ -57,7 +36,6 @@ dependencies {
     compileOnly 'org.jetbrains:annotations:22.0.0'
 
     compileOnly 'org.spigotmc:spigot-api:1.18-R0.1-SNAPSHOT'
-    compileOnly 'org.geysermc:connector:1.2.1-SNAPSHOT'
     compileOnly 'com.viaversion:viaversion:4.0.1'
     compileOnly 'com.github.ProtocolSupport:ProtocolSupport:3d24efeda6'
 

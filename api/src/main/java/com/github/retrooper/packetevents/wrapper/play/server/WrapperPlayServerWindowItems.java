@@ -5,26 +5,28 @@ import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.protocol.item.ItemStack;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 public class WrapperPlayServerWindowItems extends PacketWrapper<WrapperPlayServerWindowItems> {
     private int windowID;
     private int stateID;
     private List<ItemStack> items;
-    private ItemStack carriedItem;
+    private Optional<ItemStack> carriedItem;
 
     public WrapperPlayServerWindowItems(PacketSendEvent event) {
         super(event);
     }
 
-    public WrapperPlayServerWindowItems(int windowID, int stateID, List<ItemStack> items, ItemStack carriedItem) {
+    public WrapperPlayServerWindowItems(int windowID, int stateID, List<ItemStack> items, @Nullable ItemStack carriedItem) {
         super(PacketType.Play.Server.WINDOW_ITEMS);
         this.windowID = windowID;
         this.stateID = stateID;
         this.items = items;
-        this.carriedItem = carriedItem;
+        this.carriedItem = Optional.ofNullable(carriedItem);
     }
 
     @Override
@@ -40,7 +42,12 @@ public class WrapperPlayServerWindowItems extends PacketWrapper<WrapperPlayServe
             items.add(readItemStack());
         }
 
-        carriedItem = readItemStack();
+        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_17_1)) {
+            carriedItem = Optional.of(readItemStack());
+        }
+        else {
+            carriedItem = Optional.empty();
+        }
     }
 
     @Override
@@ -62,8 +69,9 @@ public class WrapperPlayServerWindowItems extends PacketWrapper<WrapperPlayServe
         for (ItemStack item : items) {
             writeItemStack(item);
         }
-
-        writeItemStack(carriedItem);
+        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_17_1)) {
+            writeItemStack(carriedItem.orElse(ItemStack.AIR));
+        }
     }
 
     public int getWindowId() {
@@ -90,11 +98,11 @@ public class WrapperPlayServerWindowItems extends PacketWrapper<WrapperPlayServe
         this.items = items;
     }
 
-    public ItemStack getCarriedItem() {
+    public Optional<ItemStack> getCarriedItem() {
         return carriedItem;
     }
 
-    public void setCarriedItem(ItemStack carriedItem) {
-        this.carriedItem = carriedItem;
+    public void setCarriedItem(@Nullable ItemStack carriedItem) {
+        this.carriedItem = Optional.ofNullable(carriedItem);
     }
 }

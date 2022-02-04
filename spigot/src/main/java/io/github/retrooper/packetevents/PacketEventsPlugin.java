@@ -22,6 +22,7 @@ import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.event.SimplePacketListenerAbstract;
 import com.github.retrooper.packetevents.event.simple.PacketPlayReceiveEvent;
 import com.github.retrooper.packetevents.event.simple.PacketPlaySendEvent;
+import com.github.retrooper.packetevents.protocol.item.ItemStack;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.protocol.particle.Particle;
 import com.github.retrooper.packetevents.protocol.particle.type.ParticleTypes;
@@ -37,10 +38,15 @@ import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientPl
 import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientPlayerDigging;
 import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientPlayerFlying;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerParticle;
+import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerWindowItems;
 import io.github.retrooper.packetevents.factory.spigot.SpigotPacketEventsBuilder;
+import io.github.retrooper.packetevents.utils.GeyserUtil;
 import io.github.retrooper.packetevents.utils.SpigotDataHelper;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
+
+import java.util.List;
+import java.util.Optional;
 
 public class PacketEventsPlugin extends JavaPlugin {
     @Override
@@ -88,6 +94,7 @@ public class PacketEventsPlugin extends JavaPlugin {
                         BlockFace face = blockPlacement.getFace();
                         Vector3i bp = blockPlacement.getBlockPosition();
                         user.sendMessage("Face: " + face + ", bp: " + bp);
+                        user.sendMessage("Are geyser: " + GeyserUtil.isGeyserPlayer(user.getProfile().getUUID()));
                         break;
                 }
             }
@@ -100,6 +107,16 @@ public class PacketEventsPlugin extends JavaPlugin {
                         player.sendMessage("Hello " + player.getName());
                     } else {
                         event.getUser().sendMessage("player null, but hey!");
+                    }
+                } else if (event.getPacketType() == PacketType.Play.Server.WINDOW_ITEMS) {
+                    WrapperPlayServerWindowItems windowItems = new WrapperPlayServerWindowItems(event);
+                    List<ItemStack> items = windowItems.getItems();
+                    int windowId = windowItems.getWindowId();
+                    int stateId = windowItems.getStateId();
+                    Optional<ItemStack> carried = windowItems.getCarriedItem();
+                    event.getUser().sendMessage("window id: " + windowId + ", state id: " + stateId + ", carried: " + carried.orElse(ItemStack.AIR));
+                    for (ItemStack item : items) {
+                        event.getUser().sendMessage("item: " + item.toString());
                     }
                 }
             }
