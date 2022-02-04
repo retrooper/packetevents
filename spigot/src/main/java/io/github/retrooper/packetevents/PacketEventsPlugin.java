@@ -106,7 +106,7 @@ public class PacketEventsPlugin extends JavaPlugin {
                         Player player = (Player) event.getPlayer();
                         player.sendMessage("Hii " + player.getName());
                     } else {
-                        event.getUser().sendMessage("player null, but hey!!");
+                        event.getUser().sendMessage("player null, but hey!!!");
                     }
                 }
                 else if (event.getPacketType() == PacketType.Play.Server.ENTITY_EFFECT) {
@@ -115,7 +115,7 @@ public class PacketEventsPlugin extends JavaPlugin {
             }
         };
         //net.minecraft.server.v1_8_R3.PacketPlayOutWorldParticles w1;
-        PacketEvents.getAPI().getEventManager().registerListener(listener);
+        //PacketEvents.getAPI().getEventManager().registerListener(listener);
     }
 
     @Override
