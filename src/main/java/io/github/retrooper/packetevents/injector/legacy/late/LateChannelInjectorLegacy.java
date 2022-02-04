@@ -21,7 +21,9 @@ package io.github.retrooper.packetevents.injector.legacy.late;
 import io.github.retrooper.packetevents.PacketEvents;
 import io.github.retrooper.packetevents.injector.LateInjector;
 import io.github.retrooper.packetevents.injector.legacy.PlayerChannelHandlerLegacy;
+import io.netty.channel.epoll.EpollSocketChannel;
 import net.minecraft.util.io.netty.channel.Channel;
+import net.minecraft.util.io.netty.channel.socket.nio.NioSocketChannel;
 import org.bukkit.entity.Player;
 
 public class LateChannelInjectorLegacy implements LateInjector {
@@ -40,7 +42,8 @@ public class LateChannelInjectorLegacy implements LateInjector {
         PlayerChannelHandlerLegacy playerChannelHandlerLegacy = new PlayerChannelHandlerLegacy();
         playerChannelHandlerLegacy.player = player;
         Channel channel = (Channel) PacketEvents.get().getPlayerUtils().getChannel(player);
-        if (channel.getClass().equals(net.minecraft.util.io.netty.channel.socket.nio.NioSocketChannel.class)) {
+        if (channel.getClass().equals(NioSocketChannel.class)
+        || channel.getClass().equals(EpollSocketChannel.class)) {
             channel.pipeline().addBefore("packet_handler", PacketEvents.get().getHandlerName(), playerChannelHandlerLegacy);
         }
     }

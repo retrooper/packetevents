@@ -21,8 +21,10 @@ package io.github.retrooper.packetevents.injector.legacy.early;
 import io.github.retrooper.packetevents.PacketEvents;
 import io.github.retrooper.packetevents.injector.legacy.PlayerChannelHandlerLegacy;
 import io.github.retrooper.packetevents.utils.reflection.Reflection;
+import io.netty.channel.epoll.EpollSocketChannel;
 import net.minecraft.util.io.netty.channel.Channel;
 import net.minecraft.util.io.netty.channel.ChannelInitializer;
+import net.minecraft.util.io.netty.channel.socket.nio.NioSocketChannel;
 
 import java.lang.reflect.Method;
 
@@ -47,7 +49,8 @@ public class PEChannelInitializerLegacy extends ChannelInitializer<Channel> {
     protected void initChannel(Channel channel) throws Exception {
         initChannelMethod.invoke(oldChannelInitializer, channel);
         PlayerChannelHandlerLegacy channelHandler = new PlayerChannelHandlerLegacy();
-        if (channel.getClass().equals(net.minecraft.util.io.netty.channel.socket.nio.NioSocketChannel.class)) {
+        if (channel.getClass().equals(NioSocketChannel.class)
+                || channel.getClass().equals(EpollSocketChannel.class)) {
             if (channel.pipeline().get("packet_handler") != null) {
                 String handlerName = PacketEvents.get().getHandlerName();
                 if (channel.pipeline().get(handlerName) != null) {
