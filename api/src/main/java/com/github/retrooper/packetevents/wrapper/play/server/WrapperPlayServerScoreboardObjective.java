@@ -15,7 +15,7 @@ public class WrapperPlayServerScoreboardObjective extends PacketWrapper<WrapperP
     private Optional<String> displayName;
     private Optional<HealthDisplay> display;
 
-    enum HealthDisplay {
+    public enum HealthDisplay {
         INTEGER,
         HEARTS;
 
@@ -31,7 +31,7 @@ public class WrapperPlayServerScoreboardObjective extends PacketWrapper<WrapperP
         }
     }
 
-    enum ObjectiveMode {
+    public enum ObjectiveMode {
         CREATE,
         REMOVE,
         UPDATE;

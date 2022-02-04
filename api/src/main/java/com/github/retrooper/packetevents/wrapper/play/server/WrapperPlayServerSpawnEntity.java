@@ -67,14 +67,15 @@ public class WrapperPlayServerSpawnEntity extends PacketWrapper<WrapperPlayServe
         else {
             uuid = Optional.empty();
         }
-        int entityTypeID;
         if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_14)) {
-            entityTypeID = readVarInt();
+            entityType = EntityTypes.getById(readVarInt());
         }
         else {
-            entityTypeID = readByte();
+            int id = readByte();
+            entityType = EntityTypes.getByLegacyId(id);
+            if (entityType == null) // Should not happen but anyway
+                entityType = EntityTypes.getById(id);
         }
-        entityType = EntityTypes.getById(entityTypeID);
         double x;
         double y;
         double z;
@@ -138,7 +139,11 @@ public class WrapperPlayServerSpawnEntity extends PacketWrapper<WrapperPlayServe
             writeVarInt(entityType.getId());
         }
         else {
-            writeByte(entityType.getId());
+            if (entityType.getLegacyId() != -1) { // Will always be true if they use correct EntityTypes for this packet
+                writeByte(entityType.getLegacyId());
+            } else {
+                writeByte(entityType.getId());
+            }
         }
 
         if (v1_9) {

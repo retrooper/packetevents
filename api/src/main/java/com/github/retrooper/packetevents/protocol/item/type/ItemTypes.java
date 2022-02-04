@@ -1144,7 +1144,9 @@ public class ItemTypes {
     }
 
     private static ServerVersion getMappingServerVersion(ServerVersion serverVersion) {
-        if (serverVersion.isOlderThan(ServerVersion.V_1_13)) {
+        if (serverVersion.isOlderThan(ServerVersion.V_1_9)) {
+            return ServerVersion.V_1_8;
+        } else if (serverVersion.isOlderThan(ServerVersion.V_1_13)) {
             return ServerVersion.V_1_12;
         } else if (serverVersion.isOlderThan(ServerVersion.V_1_13_2)) {
             return ServerVersion.V_1_13;
