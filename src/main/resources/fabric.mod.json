@@ -3,14 +3,14 @@
   "id": "modid",
   "version": "${version}",
 
-  "name": "Example Mod",
+  "name": "PacketEvents Fabric",
   "description": "This is an example description! Tell everyone what your mod is about!",
   "authors": [
     "Me!"
   ],
   "contact": {
-    "homepage": "https://fabricmc.net/",
-    "sources": "https://github.com/FabricMC/fabric-example-mod"
+    "homepage": "https://github.com/retrooper/packetevents-fabric",
+    "sources": "https://github.com/retrooper/packetevents-fabric"
   },
 
   "license": "CC0-1.0",
