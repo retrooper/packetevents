@@ -22,6 +22,7 @@ import com.github.retrooper.packetevents.event.PacketSendEvent;
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.protocol.nbt.NBTCompound;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
+import com.github.retrooper.packetevents.protocol.stream.NetStreamInput;
 import com.github.retrooper.packetevents.protocol.stream.NetStreamOutput;
 import com.github.retrooper.packetevents.protocol.world.chunk.BaseChunk;
 import com.github.retrooper.packetevents.protocol.world.chunk.Column;
@@ -32,6 +33,7 @@ import com.github.retrooper.packetevents.protocol.world.chunk.reader.ChunkReader
 import com.github.retrooper.packetevents.protocol.world.chunk.reader.impl.*;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.util.BitSet;
 import java.util.zip.DataFormatException;
@@ -175,12 +177,14 @@ public class WrapperPlayServerChunkData extends PacketWrapper<WrapperPlayServerC
         boolean hasSkyLight = serverVersion.isNewerThanOrEquals(ServerVersion.V_1_16);
         boolean checkForSky = serverVersion.isNewerThanOrEquals(ServerVersion.V_1_16);
 
-        BaseChunk[] chunks = getChunkReader().read(chunkMask, secondaryChunkMask, fullChunk, hasSkyLight, checkForSky, chunkSize, data);
+        // 1.7/1.8 don't use this NetStreamInput
+        NetStreamInput dataIn = serverVersion.isNewerThanOrEquals(ServerVersion.V_1_9) ? new NetStreamInput(new ByteArrayInputStream(data)) : null;
+        BaseChunk[] chunks = getChunkReader().read(chunkMask, secondaryChunkMask, fullChunk, hasSkyLight, checkForSky, chunkSize, data, dataIn);
 
         if (hasBiomeData && serverVersion.isOlderThan(ServerVersion.V_1_15)) {
             biomeDataInts = new int[256];
             for (int i = 0; i < biomeDataInts.length; i++) {
-                biomeDataInts[i] = readInt();
+                biomeDataInts[i] = dataIn.readInt();
             }
         }
 
@@ -333,6 +337,13 @@ public class WrapperPlayServerChunkData extends PacketWrapper<WrapperPlayServerC
             }
         }
 
+        if (column.isFullChunk() && serverVersion.isOlderThan(ServerVersion.V_1_15)) {
+            for (int i : column.getBiomeDataInts()) {
+                dataOut.writeInt(i);
+            }
+            hasWrittenBiomeData = true;
+        }
+
         if (!v1_18) {
             writeChunkMask(chunkMask);
         }
@@ -342,7 +353,7 @@ public class WrapperPlayServerChunkData extends PacketWrapper<WrapperPlayServerC
             writeNBT(column.getHeightMaps());
         }
 
-        if (column.hasBiomeData() && v1_13_2 && serverVersion.isNewerThanOrEquals(ServerVersion.V_1_15) && !v1_18) {
+        if (column.hasBiomeData() && serverVersion.isNewerThanOrEquals(ServerVersion.V_1_15) && !v1_18) {
             boolean bytesInsteadOfInts = serverVersion.isOlderThan(ServerVersion.V_1_13);
             int[] biomeDataInts = column.getBiomeDataInts();
             byte[] biomeDataByes = column.getBiomeDataBytes();

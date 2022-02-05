@@ -18,6 +18,7 @@
 
 package com.github.retrooper.packetevents.protocol.world.chunk.reader.impl;
 
+import com.github.retrooper.packetevents.protocol.stream.NetStreamInput;
 import com.github.retrooper.packetevents.protocol.world.chunk.BaseChunk;
 import com.github.retrooper.packetevents.protocol.world.chunk.NibbleArray3d;
 import com.github.retrooper.packetevents.protocol.world.chunk.ShortArray3d;
@@ -32,7 +33,7 @@ import java.util.BitSet;
 public class ChunkReader_v1_8 implements ChunkReader {
 
     @Override
-    public BaseChunk[] read(BitSet set, BitSet sevenExtendedMask, boolean fullChunk, boolean hasSkyLight, boolean checkForSky, int chunkSize, byte[] data) {
+    public BaseChunk[] read(BitSet set, BitSet sevenExtendedMask, boolean fullChunk, boolean hasSkyLight, boolean checkForSky, int chunkSize, byte[] data, NetStreamInput dataIn) {
         Chunk_v1_8[] chunks = new Chunk_v1_8[16];
         int pos = 0;
         int expected = 0;

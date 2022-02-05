@@ -25,15 +25,13 @@ import com.github.retrooper.packetevents.protocol.world.chunk.BaseChunk;
 import com.github.retrooper.packetevents.protocol.world.chunk.impl.v1_16.Chunk_v1_9;
 import com.github.retrooper.packetevents.protocol.world.chunk.reader.ChunkReader;
 
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.util.BitSet;
 
 public class ChunkReader_v1_9 implements ChunkReader {
 
     @Override
-    public BaseChunk[] read(BitSet set, BitSet sevenExtendedMask, boolean fullChunk, boolean hasSkyLight, boolean checkForSky, int chunkSize, byte[] data) {
-        NetStreamInput dataIn = new NetStreamInput(new ByteArrayInputStream(data));
+    public BaseChunk[] read(BitSet set, BitSet sevenExtendedMask, boolean fullChunk, boolean hasSkyLight, boolean checkForSky, int chunkSize, byte[] data, NetStreamInput dataIn) {
         BaseChunk[] chunks = new BaseChunk[chunkSize];
 
         for (int index = 0; index < chunks.length; ++index) {
@@ -52,7 +50,7 @@ public class ChunkReader_v1_9 implements ChunkReader {
             // if not a full chunk, any leftover data means it has skylight
             int minimum = fullChunk ? 256 : 0;
             if ((dataIn.available() > minimum) && !hasSkyLight) {
-                return read(set, sevenExtendedMask, fullChunk, true, checkForSky, chunkSize, data);
+                return read(set, sevenExtendedMask, fullChunk, true, checkForSky, chunkSize, data, dataIn);
             }
         } catch (IOException e) {
             e.printStackTrace();
