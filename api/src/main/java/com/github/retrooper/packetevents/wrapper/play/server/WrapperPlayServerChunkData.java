@@ -174,12 +174,12 @@ public class WrapperPlayServerChunkData extends PacketWrapper<WrapperPlayServerC
         byte[] data = readByteArray();
         data = deflate(data, chunkMask, fullChunk);
 
-        boolean hasSkyLight = serverVersion.isNewerThanOrEquals(ServerVersion.V_1_16);
+        boolean hasBlocklight = serverVersion.isNewerThanOrEquals(ServerVersion.V_1_16) || serverVersion.isOlderThan(ServerVersion.V_1_14);
         boolean checkForSky = serverVersion.isNewerThanOrEquals(ServerVersion.V_1_16);
 
         // 1.7/1.8 don't use this NetStreamInput
         NetStreamInput dataIn = serverVersion.isNewerThanOrEquals(ServerVersion.V_1_9) ? new NetStreamInput(new ByteArrayInputStream(data)) : null;
-        BaseChunk[] chunks = getChunkReader().read(chunkMask, secondaryChunkMask, fullChunk, hasSkyLight, checkForSky, chunkSize, data, dataIn);
+        BaseChunk[] chunks = getChunkReader().read(chunkMask, secondaryChunkMask, fullChunk, hasBlocklight, checkForSky, chunkSize, data, dataIn);
 
         if (hasBiomeData && serverVersion.isOlderThan(ServerVersion.V_1_15)) {
             biomeDataInts = new int[256];
@@ -331,7 +331,7 @@ public class WrapperPlayServerChunkData extends PacketWrapper<WrapperPlayServerC
             BaseChunk chunk = chunks[index];
             if (v1_18) {
                 Chunk_v1_18.write(dataOut, (Chunk_v1_18) chunk);
-            } else if (chunk != null && !chunk.isKnownEmpty()) {
+            } else if (chunk != null) {
                 chunkMask.set(index);
                 Chunk_v1_9.write(dataOut, (Chunk_v1_9) chunk);
             }

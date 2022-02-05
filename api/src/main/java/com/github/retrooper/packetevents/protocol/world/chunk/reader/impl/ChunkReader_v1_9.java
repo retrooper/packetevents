@@ -31,26 +31,33 @@ import java.util.BitSet;
 public class ChunkReader_v1_9 implements ChunkReader {
 
     @Override
-    public BaseChunk[] read(BitSet set, BitSet sevenExtendedMask, boolean fullChunk, boolean hasSkyLight, boolean checkForSky, int chunkSize, byte[] data, NetStreamInput dataIn) {
+    public BaseChunk[] read(BitSet set, BitSet sevenExtendedMask, boolean fullChunk, boolean hasBlockLight, boolean hasSkyLight, int chunkSize, byte[] data, NetStreamInput dataIn) {
         BaseChunk[] chunks = new BaseChunk[chunkSize];
 
-        for (int index = 0; index < chunks.length; ++index) {
-            if (set.get(index)) {
-                chunks[index] = new Chunk_v1_9(dataIn, hasSkyLight, checkForSky);
+        Throwable throwable = null;
+
+        try {
+            for (int index = 0; index < chunks.length; ++index) {
+                if (set.get(index)) {
+                    chunks[index] = new Chunk_v1_9(dataIn, hasBlockLight, hasSkyLight);
+                }
             }
+        } catch (Throwable e) {
+            throwable = e;
         }
 
-        if (PacketEvents.getAPI().getServerManager().getVersion().isNewerThanOrEquals(ServerVersion.V_1_13)) return chunks;
+        if (PacketEvents.getAPI().getServerManager().getVersion().isNewerThanOrEquals(ServerVersion.V_1_14)) return chunks;
 
         try {
             // Unfortunately, this is needed to detect whether the chunks contain skylight or not.
-            // Yes, this hack is required all the way from 1.9 through 1.12!
+            // Yes, this hack is required all the way from 1.9 through 1.13!
             //
             // Minimum is more than 256 bytes when it is a full chunks for biome data
             // if not a full chunk, any leftover data means it has skylight
             int minimum = fullChunk ? 256 : 0;
-            if ((dataIn.available() > minimum) && !hasSkyLight) {
-                return read(set, sevenExtendedMask, fullChunk, true, checkForSky, chunkSize, data, dataIn);
+            if ((dataIn.available() > minimum || throwable != null ) && !hasSkyLight) {
+                dataIn.reset();
+                return read(set, sevenExtendedMask, fullChunk, hasBlockLight, true, chunkSize, data, dataIn);
             }
         } catch (IOException e) {
             e.printStackTrace();
