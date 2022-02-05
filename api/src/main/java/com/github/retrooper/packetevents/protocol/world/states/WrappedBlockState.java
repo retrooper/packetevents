@@ -36,7 +36,11 @@ public class WrappedBlockState {
     private static final HashMap<WrappedBlockState, Integer> INTO_ID = new HashMap<>();
     private static final HashMap<StateType, WrappedBlockState> DEFAULT_STATES = new HashMap<>();
 
+    private static final HashMap<String, String> STRING_UPDATER = new HashMap<>();
+
     static {
+        STRING_UPDATER.put("minecraft:grass_path", "minecraft:dirt_path"); // 1.16 -> 1.17
+
         if (PacketEvents.getAPI().getServerManager().getVersion().isOlderThan(ServerVersion.V_1_13)) {
             loadLegacy();
         } else {
@@ -157,7 +161,16 @@ public class WrappedBlockState {
                 StateType type = StateTypes.getByName(blockString.replace("minecraft:", ""));
 
                 if (type == null) {
-                    PacketEvents.getAPI().getLogger().warning("Unknown block type: " + fullBlockString);
+                    // Let's update the state type to a modern version
+                    for (Map.Entry<String, String> stringEntry : STRING_UPDATER.entrySet()) {
+                        blockString = blockString.replace(stringEntry.getKey(), stringEntry.getValue());
+                    }
+
+                    type = StateTypes.getByName(blockString.replace("minecraft:", ""));
+
+                    if (type == null) {
+                        PacketEvents.getAPI().getLogger().warning("Unknown block type: " + fullBlockString);
+                    }
                 }
 
                 String[] data = null;

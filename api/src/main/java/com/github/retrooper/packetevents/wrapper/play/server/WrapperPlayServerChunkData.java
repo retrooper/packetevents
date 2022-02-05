@@ -141,7 +141,7 @@ public class WrapperPlayServerChunkData extends PacketWrapper<WrapperPlayServerC
         // 1.16 logic is the same
         // 1.17 logic ALWAYS sends biome data because it is always a full chunk
         // 1.18 logic makes it all a palette type system for biome data...
-        boolean hasBiomeData = (fullChunk && serverVersion.isOlderThan(ServerVersion.V_1_18));
+        boolean hasBiomeData = fullChunk && serverVersion.isOlderThan(ServerVersion.V_1_18);
 
         boolean bytesInsteadOfInts = serverVersion.isOlderThan(ServerVersion.V_1_13);
         int[] biomeDataInts = null;
@@ -160,8 +160,11 @@ public class WrapperPlayServerChunkData extends PacketWrapper<WrapperPlayServerC
             } else {
                 if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_16_2)) {
                     biomeDataInts = readVarIntArray();
-                } else {
-                    biomeDataInts = readVarIntArrayOfSize(256);
+                } else if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_15)) {
+                    biomeDataInts = new int[1024];
+                    for (int i = 0; i < biomeDataInts.length; i++) {
+                        biomeDataInts[i] = readInt();
+                    }
                 }
             }
         }
@@ -169,7 +172,17 @@ public class WrapperPlayServerChunkData extends PacketWrapper<WrapperPlayServerC
         byte[] data = readByteArray();
         data = deflate(data, chunkMask, fullChunk);
 
-        BaseChunk[] chunks = getChunkReader().read(chunkMask, secondaryChunkMask, fullChunk, true, true, chunkSize, data);
+        boolean hasSkyLight = serverVersion.isNewerThanOrEquals(ServerVersion.V_1_16);
+        boolean checkForSky = serverVersion.isNewerThanOrEquals(ServerVersion.V_1_16);
+
+        BaseChunk[] chunks = getChunkReader().read(chunkMask, secondaryChunkMask, fullChunk, hasSkyLight, checkForSky, chunkSize, data);
+
+        if (hasBiomeData && serverVersion.isOlderThan(ServerVersion.V_1_15)) {
+            biomeDataInts = new int[256];
+            for (int i = 0; i < biomeDataInts.length; i++) {
+                biomeDataInts[i] = readInt();
+            }
+        }
 
         // Tile entities are not sent with this packet on 1.8 and below
         // on 1.9 and above for all versions, tile entities are sent with the chunk data

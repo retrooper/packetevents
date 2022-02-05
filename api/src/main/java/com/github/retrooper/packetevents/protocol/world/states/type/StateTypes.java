@@ -919,7 +919,7 @@ public class StateTypes {
     }
 
     public static StateType getByName(String blockString) {
-        return BY_NAME.get(blockString);
+        return BY_NAME.get(blockString.toLowerCase(Locale.ROOT));
     }
 
     public static class Builder {

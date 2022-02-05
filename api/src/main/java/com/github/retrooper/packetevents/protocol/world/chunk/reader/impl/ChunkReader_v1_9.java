@@ -18,6 +18,8 @@
 
 package com.github.retrooper.packetevents.protocol.world.chunk.reader.impl;
 
+import com.github.retrooper.packetevents.PacketEvents;
+import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.protocol.stream.NetStreamInput;
 import com.github.retrooper.packetevents.protocol.world.chunk.BaseChunk;
 import com.github.retrooper.packetevents.protocol.world.chunk.impl.v1_16.Chunk_v1_9;
@@ -36,9 +38,11 @@ public class ChunkReader_v1_9 implements ChunkReader {
 
         for (int index = 0; index < chunks.length; ++index) {
             if (set.get(index)) {
-                chunks[index] = new Chunk_v1_9(dataIn, hasSkyLight, true);
+                chunks[index] = new Chunk_v1_9(dataIn, hasSkyLight, checkForSky);
             }
         }
+
+        if (PacketEvents.getAPI().getServerManager().getVersion().isNewerThanOrEquals(ServerVersion.V_1_13)) return chunks;
 
         try {
             // Unfortunately, this is needed to detect whether the chunks contain skylight or not.
