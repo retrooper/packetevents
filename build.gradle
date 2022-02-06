@@ -7,9 +7,11 @@ plugins {
 group = 'com.github.retrooper'
 version = '2.0.0'
 description = 'packetevents'
+java.sourceCompatibility = JavaVersion.VERSION_1_8
 
 repositories {
     mavenCentral()
+    mavenLocal()
 }
 
 tasks {
