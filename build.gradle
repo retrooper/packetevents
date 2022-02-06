@@ -1,15 +1,32 @@
 plugins {
-    id 'java'
+    id 'java-library'
     id 'maven-publish'
 }
 
-group = 'io.github.retrooper'
+group = 'com.github.retrooper'
 version = '2.0.0'
 description = 'packetevents'
-java.sourceCompatibility = JavaVersion.VERSION_1_8
+
+repositories {
+    mavenCentral()
+}
+
+tasks {
+}
+
+dependencies {
+    api 'net.kyori:adventure-api:4.9.3'
+    api 'net.kyori:adventure-text-serializer-gson:4.9.3'
+    api 'net.kyori:adventure-text-serializer-legacy:4.9.3'
+    api 'com.google.code.gson:gson:2.8.9'
+    compileOnly 'org.jetbrains:annotations:22.0.0'
+}
+
 publishing {
     publications {
         maven(MavenPublication) {
+            groupId = 'com.github.retrooper'
+            artifactId = 'packetevents'
             from(components.java)
         }
     }
@@ -17,9 +34,4 @@ publishing {
 
 tasks.withType(JavaCompile) {
     options.encoding = 'UTF-8'
-}
-
-wrapper {
-    gradleVersion = "7.3.1"
-    distributionType = Wrapper.DistributionType.ALL
 }

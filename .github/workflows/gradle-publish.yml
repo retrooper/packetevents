@@ -21,16 +21,10 @@ jobs:
         settings-path: ${{ github.workspace }} # location for the settings.xml file
 
     - name: Build with Gradle
-      run: gradle :clean :build api:clean api:build spigot:clean spigot:build spigot:shadowJar
+      run: gradle :clean :build
 
     - name: Upload build artifacts api
       uses: actions/upload-artifact@v1
       with:
-        name: packetevents-api-dev-build.jar
-        path: api/build/libs
-        
-    - name: Upload build artifacts spigot
-      uses: actions/upload-artifact@v1
-      with:
-        name: packetevents-spigot-dev-build.jar
-        path: spigot/build/libs
+        name: packetevents-2.0.0.jar
+        path: build/libs
