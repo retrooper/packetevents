@@ -32,24 +32,25 @@ public class Chunk_v1_8 implements BaseChunk {
         return this.skylight;
     }
 
-    // Special 1.8 magic ID format:
-    // 0xF000 = block data
-    // 0x00FF = block material ID
-    //
-    // Usual magic ID format:
-    // 0x000F = block data
-    // 0xFF00 = block material ID
-    //
-    // Thanks Mojang!
+    public boolean isEmpty() {
+        for(short block : this.blocks.getData()) {
+            if(block != 0) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
     @Override
     public WrappedBlockState get(int x, int y, int z) {
         int combinedID = this.blocks.get(x, y, z);
-        return WrappedBlockState.getByGlobalId(((combinedID & 0xFF) << 8) | (combinedID >> 12));
+        return WrappedBlockState.getByGlobalId(combinedID);
     }
 
     @Override
     public void set(int x, int y, int z, int combinedID) {
-        this.blocks.set(x, y, z, (combinedID >> 8) | ((combinedID & 0xF) << 12));
+        this.blocks.set(x, y, z, combinedID);
     }
 
     @Override

@@ -20,6 +20,7 @@ package com.github.retrooper.packetevents.protocol.world.chunk.reader.impl;
 
 import com.github.retrooper.packetevents.protocol.stream.NetStreamInput;
 import com.github.retrooper.packetevents.protocol.world.chunk.BaseChunk;
+import com.github.retrooper.packetevents.protocol.world.chunk.NetworkChunkData;
 import com.github.retrooper.packetevents.protocol.world.chunk.NibbleArray3d;
 import com.github.retrooper.packetevents.protocol.world.chunk.ShortArray3d;
 import com.github.retrooper.packetevents.protocol.world.chunk.impl.v1_8.Chunk_v1_8;
@@ -83,4 +84,68 @@ public class ChunkReader_v1_8 implements ChunkReader {
 
         return chunks;
     }
+
+    public static NetworkChunkData chunksToData(Chunk_v1_8[] chunks, byte[] biomes) {
+        int chunkMask = 0;
+        boolean fullChunk = biomes != null;
+        boolean sky = false;
+        int length = fullChunk ? biomes.length : 0;
+        byte[] data = null;
+        int pos = 0;
+        ShortBuffer buf = null;
+
+        // 0 = Determine length and masks.
+        // 1 = Add blocks.
+        // 2 = Add block light.
+        // 3 = Add sky light.
+        for(int pass = 0; pass < 4; pass++) {
+            for(int ind = 0; ind < chunks.length; ++ind) {
+                Chunk_v1_8 chunk = chunks[ind];
+                if(chunk != null && (!fullChunk || !chunk.isEmpty())) {
+                    if(pass == 0) {
+                        chunkMask |= 1 << ind;
+                        length += chunk.getBlocks().getData().length * 2;
+                        length += chunk.getBlockLight().getData().length;
+                        if(chunk.getSkyLight() != null) {
+                            length += chunk.getSkyLight().getData().length;
+                        }
+                    }
+
+                    if(pass == 1) {
+                        short blocks[] = chunk.getBlocks().getData();
+                        buf.position(pos / 2);
+                        buf.put(blocks, 0, blocks.length);
+                        pos += blocks.length * 2;
+                    }
+
+                    if(pass == 2) {
+                        byte blocklight[] = chunk.getBlockLight().getData();
+                        System.arraycopy(blocklight, 0, data, pos, blocklight.length);
+                        pos += blocklight.length;
+                    }
+
+                    if(pass == 3 && chunk.getSkyLight() != null) {
+                        byte skylight[] = chunk.getSkyLight().getData();
+                        System.arraycopy(skylight, 0, data, pos, skylight.length);
+                        pos += skylight.length;
+                        sky = true;
+                    }
+                }
+            }
+
+            if(pass == 0) {
+                data = new byte[length];
+                buf = ByteBuffer.wrap(data).order(ByteOrder.LITTLE_ENDIAN).asShortBuffer();
+            }
+        }
+
+        // Add biomes.
+        if(fullChunk) {
+            System.arraycopy(biomes, 0, data, pos, biomes.length);
+            pos += biomes.length;
+        }
+
+        return new NetworkChunkData(chunkMask, fullChunk, sky, data);
+    }
 }
+

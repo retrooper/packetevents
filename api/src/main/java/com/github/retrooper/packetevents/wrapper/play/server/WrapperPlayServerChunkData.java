@@ -26,8 +26,10 @@ import com.github.retrooper.packetevents.protocol.stream.NetStreamInput;
 import com.github.retrooper.packetevents.protocol.stream.NetStreamOutput;
 import com.github.retrooper.packetevents.protocol.world.chunk.BaseChunk;
 import com.github.retrooper.packetevents.protocol.world.chunk.Column;
+import com.github.retrooper.packetevents.protocol.world.chunk.NetworkChunkData;
 import com.github.retrooper.packetevents.protocol.world.chunk.TileEntity;
 import com.github.retrooper.packetevents.protocol.world.chunk.impl.v1_16.Chunk_v1_9;
+import com.github.retrooper.packetevents.protocol.world.chunk.impl.v1_8.Chunk_v1_8;
 import com.github.retrooper.packetevents.protocol.world.chunk.impl.v_1_18.Chunk_v1_18;
 import com.github.retrooper.packetevents.protocol.world.chunk.reader.ChunkReader;
 import com.github.retrooper.packetevents.protocol.world.chunk.reader.impl.*;
@@ -35,6 +37,7 @@ import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.util.Arrays;
 import java.util.BitSet;
 import java.util.zip.DataFormatException;
 import java.util.zip.Inflater;
@@ -181,11 +184,13 @@ public class WrapperPlayServerChunkData extends PacketWrapper<WrapperPlayServerC
                 for (int i = 0; i < biomeDataInts.length; i++) {
                     biomeDataInts[i] = dataIn.readInt();
                 }
-            } else { // Uses bytes
+            } else if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_9)) { // Uses bytes
                 biomeDataBytes = new byte[256];
                 for (int i = 0; i < biomeDataBytes.length; i++) {
                     biomeDataBytes[i] = dataIn.readByte();
                 }
+            } else {
+                biomeDataBytes = Arrays.copyOfRange(data, data.length - 256, data.length); // let's hope the server knows the right data length
             }
         }
 
@@ -305,7 +310,8 @@ public class WrapperPlayServerChunkData extends PacketWrapper<WrapperPlayServerC
 
         boolean v1_18 = serverVersion.isNewerThanOrEquals(ServerVersion.V_1_18);
         boolean v1_17 = serverVersion.isNewerThanOrEquals(ServerVersion.V_1_17);
-        boolean v1_13_2 = serverVersion.isNewerThanOrEquals(ServerVersion.V_1_13_2);
+        boolean v1_9 = serverVersion.isNewerThanOrEquals(ServerVersion.V_1_9);
+        boolean v1_8 = serverVersion.isNewerThanOrEquals(ServerVersion.V_1_8);
 
         if (!v1_17) {
             writeBoolean(column.isFullChunk());
@@ -328,14 +334,25 @@ public class WrapperPlayServerChunkData extends PacketWrapper<WrapperPlayServerC
 
         BitSet chunkMask = new BitSet();
         BaseChunk[] chunks = column.getChunks();
-        for (int index = 0; index < chunks.length; index++) {
-            BaseChunk chunk = chunks[index];
-            if (v1_18) {
-                Chunk_v1_18.write(dataOut, (Chunk_v1_18) chunk);
-            } else if (chunk != null) {
-                chunkMask.set(index);
-                Chunk_v1_9.write(dataOut, (Chunk_v1_9) chunk);
+
+        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_9)) {
+            for (int index = 0; index < chunks.length; index++) {
+                BaseChunk chunk = chunks[index];
+                if (v1_18) {
+                    Chunk_v1_18.write(dataOut, (Chunk_v1_18) chunk);
+                } else if (v1_9 && chunk != null) {
+                    chunkMask.set(index);
+                    Chunk_v1_9.write(dataOut, (Chunk_v1_9) chunk);
+                } else if (chunk != null) {
+                    chunkMask.set(index);
+                    // TODO: 1.7 support
+                }
             }
+        } else if (v1_8) {
+            NetworkChunkData data = ChunkReader_v1_8.chunksToData((Chunk_v1_8[]) chunks, column.getBiomeDataBytes());
+            writeShort(data.getMask());
+            writeByteArray(data.getData());
+            return;
         }
 
         if (column.isFullChunk() && serverVersion.isOlderThan(ServerVersion.V_1_15)) {

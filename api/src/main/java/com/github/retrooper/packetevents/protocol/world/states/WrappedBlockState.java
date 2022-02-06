@@ -120,8 +120,7 @@ public class WrappedBlockState {
                 String[] split = line.split(",");
                 int id = Integer.parseInt(split[0]);
                 int data = Integer.parseInt(split[1]);
-                // 1.8 flips the format for some weird reason
-                int combinedID = isPointEight ? (id | (data << 12)) : ((id << 4) | data);
+                int combinedID = (id << 4) | data;
 
                 String fullString = line.substring(split[0].length() + split[1].length() + 2);
 
