@@ -32,16 +32,6 @@ public class Chunk_v1_8 implements BaseChunk {
         return this.skylight;
     }
 
-    public boolean isEmpty() {
-        for(short block : this.blocks.getData()) {
-            if(block != 0) {
-                return false;
-            }
-        }
-
-        return true;
-    }
-
     @Override
     public WrappedBlockState get(int x, int y, int z) {
         int combinedID = this.blocks.get(x, y, z);
@@ -54,7 +44,13 @@ public class Chunk_v1_8 implements BaseChunk {
     }
 
     @Override
-    public boolean isKnownEmpty() {
-        return false;
+    public boolean isEmpty() {
+        for(short block : this.blocks.getData()) {
+            if(block != 0) {
+                return false;
+            }
+        }
+
+        return true;
     }
 }

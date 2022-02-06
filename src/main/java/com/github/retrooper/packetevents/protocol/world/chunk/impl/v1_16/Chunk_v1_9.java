@@ -50,6 +50,8 @@ public class Chunk_v1_9 implements BaseChunk {
         // 1.14+ includes block count in chunk data
         if (isFourteen) {
             blockCount = in.readShort();
+        } else {
+            blockCount = Integer.MAX_VALUE;
         }
 
         if (isSixteen) {
@@ -86,6 +88,8 @@ public class Chunk_v1_9 implements BaseChunk {
 
     public void set(int x, int y, int z, int state) {
         int curr = this.dataPalette.set(x, y, z, state);
+        // Pre-1.14 we don't get block counts
+        if (blockCount == Integer.MAX_VALUE) return;
         if (state != AIR && curr == AIR) {
             this.blockCount++;
         } else if (state == AIR && curr != AIR) {
@@ -94,7 +98,21 @@ public class Chunk_v1_9 implements BaseChunk {
     }
 
     @Override
-    public boolean isKnownEmpty() {
+    public boolean isEmpty() {
+        // Pre-1.14 we have to calculate the value
+        if (blockCount == Integer.MAX_VALUE) {
+            for (int x = 0; x < 16; x++) {
+                for (int y = 0; y < 16; y++) {
+                    for (int z = 0; z < 16; z++) {
+                        if (this.dataPalette.get(x, y, z) != AIR) {
+                            return false;
+                        }
+                    }
+                }
+            }
+            return true;
+        }
+        // 1.14+, we can rely on the value
         return this.blockCount == 0;
     }
 }

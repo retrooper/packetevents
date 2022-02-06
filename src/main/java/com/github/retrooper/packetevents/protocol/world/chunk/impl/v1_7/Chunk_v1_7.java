@@ -55,8 +55,13 @@ public class Chunk_v1_7 implements BaseChunk {
     }
 
     @Override
-    public boolean isKnownEmpty() {
-        return false;
+    public boolean isEmpty() {
+        for(byte block : this.blocks.getData()) {
+            if(block != 0) {
+                return false;
+            }
+        }
+        return true;
     }
 
     public ByteArray3d getBlocks() {
@@ -77,15 +82,5 @@ public class Chunk_v1_7 implements BaseChunk {
 
     public NibbleArray3d getExtendedBlocks() {
         return this.extendedBlocks;
-    }
-
-    public boolean isEmpty() {
-        for(byte block : this.blocks.getData()) {
-            if(block != 0) {
-                return false;
-            }
-        }
-
-        return true;
     }
 }

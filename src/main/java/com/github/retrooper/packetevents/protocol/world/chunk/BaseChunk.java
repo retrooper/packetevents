@@ -25,5 +25,5 @@ public interface BaseChunk {
 
     void set(int x, int y, int z, int combinedID);
 
-    boolean isKnownEmpty();
+    boolean isEmpty();
 }

@@ -57,7 +57,7 @@ public class Chunk_v1_18 implements BaseChunk {
     }
 
     @Override
-    public boolean isKnownEmpty() {
+    public boolean isEmpty() {
         return this.blockCount == 0;
     }
 }
