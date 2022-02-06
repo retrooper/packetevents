@@ -113,11 +113,15 @@ public class WrappedBlockState {
             InputStream mappings = WrappedBlockState.class.getClassLoader().getResourceAsStream("assets/mappings/block/legacy_block_mappings.txt");
             BufferedReader reader = new BufferedReader(new InputStreamReader(mappings));
 
+            boolean isPointEight = PacketEvents.getAPI().getServerManager().getVersion().isNewerThanOrEquals(ServerVersion.V_1_8) &&
+                    PacketEvents.getAPI().getServerManager().getVersion().isOlderThan(ServerVersion.V_1_9);
+
             while ((line = reader.readLine()) != null) {
                 String[] split = line.split(",");
                 int id = Integer.parseInt(split[0]);
                 int data = Integer.parseInt(split[1]);
-                int combinedID = id + (data << 12);
+                // 1.8 flips the format for some weird reason
+                int combinedID = isPointEight ? (id | (data << 12)) : ((id << 4) | data);
 
                 String fullString = line.substring(split[0].length() + split[1].length() + 2);
 

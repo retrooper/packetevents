@@ -156,18 +156,12 @@ public class WrapperPlayServerChunkData extends PacketWrapper<WrapperPlayServerC
         // This applies from 1.14
         //
         // 1.16.2+ send a var int array instead of an int array
-        if (hasBiomeData) {
-            if (bytesInsteadOfInts) {
-                biomeDataBytes = readByteArrayOfSize(256);
-            } else {
-                if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_16_2)) {
-                    biomeDataInts = readVarIntArray();
-                } else if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_15)) {
-                    biomeDataInts = new int[1024];
-                    for (int i = 0; i < biomeDataInts.length; i++) {
-                        biomeDataInts[i] = readInt();
-                    }
-                }
+        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_16_2)) {
+            biomeDataInts = readVarIntArray();
+        } else if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_15)) {
+            biomeDataInts = new int[1024];
+            for (int i = 0; i < biomeDataInts.length; i++) {
+                biomeDataInts[i] = readInt();
             }
         }
 
@@ -182,9 +176,16 @@ public class WrapperPlayServerChunkData extends PacketWrapper<WrapperPlayServerC
         BaseChunk[] chunks = getChunkReader().read(chunkMask, secondaryChunkMask, fullChunk, hasBlocklight, checkForSky, chunkSize, data, dataIn);
 
         if (hasBiomeData && serverVersion.isOlderThan(ServerVersion.V_1_15)) {
-            biomeDataInts = new int[256];
-            for (int i = 0; i < biomeDataInts.length; i++) {
-                biomeDataInts[i] = dataIn.readInt();
+            if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_13)) { // Uses ints
+                biomeDataInts = new int[256];
+                for (int i = 0; i < biomeDataInts.length; i++) {
+                    biomeDataInts[i] = dataIn.readInt();
+                }
+            } else { // Uses bytes
+                biomeDataBytes = new byte[256];
+                for (int i = 0; i < biomeDataBytes.length; i++) {
+                    biomeDataBytes[i] = dataIn.readByte();
+                }
             }
         }
 
@@ -338,8 +339,14 @@ public class WrapperPlayServerChunkData extends PacketWrapper<WrapperPlayServerC
         }
 
         if (column.isFullChunk() && serverVersion.isOlderThan(ServerVersion.V_1_15)) {
-            for (int i : column.getBiomeDataInts()) {
-                dataOut.writeInt(i);
+            if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_13)) {
+                for (int i : column.getBiomeDataInts()) {
+                    dataOut.writeInt(i);
+                }
+            } else {
+                for (byte i : column.getBiomeDataBytes()) {
+                    dataOut.writeByte(i);
+                }
             }
             hasWrittenBiomeData = true;
         }
