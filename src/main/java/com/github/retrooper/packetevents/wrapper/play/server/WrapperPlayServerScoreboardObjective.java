@@ -1,6 +1,7 @@
 package com.github.retrooper.packetevents.wrapper.play.server;
 
 import com.github.retrooper.packetevents.event.PacketReceiveEvent;
+import com.github.retrooper.packetevents.event.PacketSendEvent;
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
@@ -37,7 +38,7 @@ public class WrapperPlayServerScoreboardObjective extends PacketWrapper<WrapperP
         UPDATE;
     }
 
-    public WrapperPlayServerScoreboardObjective(PacketReceiveEvent event) {
+    public WrapperPlayServerScoreboardObjective(PacketSendEvent event) {
         super(event);
     }
 
