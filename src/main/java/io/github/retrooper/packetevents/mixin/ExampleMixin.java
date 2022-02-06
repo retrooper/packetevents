@@ -28,13 +28,13 @@ public class ExampleMixin {
         ChannelAbstract ch = PacketEvents.getAPI().getNettyManager().wrapChannel(channel);
         User user = new User(ch, ConnectionState.HANDSHAKING, ClientVersion.getLatest(),
                 new UserProfile(null, null));
-        System.out.println("state: " + user.getConnectionState());
         PacketEvents.getAPI().getPlayerManager().USERS.put(ch, user);
         ClientPlayerEntity player = MinecraftClient.getInstance().player;
         PacketDecoder decoder = new PacketDecoder(user, player);
         PacketEncoder encoder = new PacketEncoder(user, player);
         channel.pipeline().addAfter("splitter", PacketEvents.DECODER_NAME, decoder);
         channel.pipeline().addAfter("prepender", PacketEvents.ENCODER_NAME, encoder);
+        //TODO Handle compression
         ExampleMod.LOGGER.info("Pipeline: " + ch.pipeline().namesToString());
     }
 

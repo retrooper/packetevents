@@ -5,8 +5,6 @@ import com.github.retrooper.packetevents.event.PacketListenerAbstract;
 import com.github.retrooper.packetevents.event.PacketReceiveEvent;
 import com.github.retrooper.packetevents.event.PacketSendEvent;
 import com.github.retrooper.packetevents.injector.ChannelInjector;
-import com.github.retrooper.packetevents.manager.player.PlayerManager;
-import com.github.retrooper.packetevents.manager.server.ServerManager;
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.netty.channel.ChannelAbstract;
 import com.github.retrooper.packetevents.protocol.ConnectionState;
@@ -44,6 +42,8 @@ public class ExampleMod implements ModInitializer {
         // This code runs as soon as Minecraft is in a mod-load-ready state.
         // However, some things (like resources) may still be uninitialized.
         // Proceed with mild caution.
+        //TODO Mod idea, every 30 seconds or so, on a new port, establish a new connection to the server, get a server list response and
+        //that is your ping
         BuildData data = new BuildData("fabric");
         ChannelInjector injector = new ChannelInjector() {
             @Override
@@ -105,13 +105,12 @@ public class ExampleMod implements ModInitializer {
         PlayerManagerImpl playerManager = new PlayerManagerImpl() {
             @Override
             public int getPing(@NotNull Object player) {
-                //TODO
                 return 0;
             }
 
             @Override
             public ChannelAbstract getChannel(@NotNull Object player) {
-                ClientConnection connection = ((ClientPlayerEntity)player).networkHandler.getConnection();
+                ClientConnection connection = ((ClientPlayerEntity) player).networkHandler.getConnection();
                 ReflectionObject reflectConnection = new ReflectionObject(connection);
                 Channel channel = reflectConnection.readObject(0, Channel.class);
                 return PacketEvents.getAPI().getNettyManager().wrapChannel(channel);
