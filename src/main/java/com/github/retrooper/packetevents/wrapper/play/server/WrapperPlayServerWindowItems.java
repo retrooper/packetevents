@@ -51,7 +51,7 @@ public class WrapperPlayServerWindowItems extends PacketWrapper<WrapperPlayServe
     }
 
     @Override
-    public void readData(TestWrapper wrapper) {
+    public void readData(WrapperPlayServerWindowItems wrapper) {
         windowID = wrapper.windowID;
         stateID = wrapper.stateID;
         items = wrapper.items;

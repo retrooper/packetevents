@@ -28,7 +28,7 @@ import java.util.Map;
  * @author retrooper
  * @since 1.8
  */
-abstract class PacketListenerCommon {
+public abstract class PacketListenerCommon {
     protected final Map<Byte, List<Method>> methods;
     private final PacketListenerPriority priority;
     private boolean readOnly;
