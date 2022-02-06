@@ -83,7 +83,7 @@ public class WrappedBlockState {
     public static WrappedBlockState getDefaultState(StateType type) {
         WrappedBlockState state = DEFAULT_STATES.get(type);
         if (state == null) {
-            PacketEvents.getAPI().getLogger().warning("Default state for " + type + " is null. Returning AIR");
+            PacketEvents.getAPI().getLogger().warning("Default state for " + type.getName() + " is null. Returning AIR");
             return AIR;
         }
         return state.clone();
@@ -119,23 +119,30 @@ public class WrappedBlockState {
                 int data = Integer.parseInt(split[1]);
                 int combinedID = id + (data << 12);
 
+                String fullString = line.substring(split[0].length() + split[1].length() + 2);
+
                 int endIndex = split[2].indexOf("[");
 
                 String blockString = split[2].substring(0, endIndex != -1 ? endIndex : split[2].length());
 
-                StateType type = StateTypes.getByName(blockString);
+                StateType type = StateTypes.getByName(blockString.replace("minecraft:", ""));
 
                 String[] dataStrings = null;
                 if (endIndex != -1) {
-                    dataStrings = split[2].substring(endIndex + 1, line.length() - 1).split(",");
+                    dataStrings = line.substring(split[0].length() + split[1].length() + 2 + blockString.length() + 1, line.length() - 1).split(",");
                 }
 
                 WrappedBlockState state = new WrappedBlockState(type, dataStrings, combinedID);
 
-                BY_STRING.put(split[2], state);
+                BY_STRING.put(fullString, state);
                 BY_ID.put(combinedID, state);
-                INTO_STRING.put(state, split[2]);
+                INTO_STRING.put(state, fullString);
                 INTO_ID.put(state, combinedID);
+
+                // 1.12's data type system doesn't support "default states" so I guess this works...
+                if (!DEFAULT_STATES.containsKey(type)) {
+                    DEFAULT_STATES.put(type, state);
+                }
             }
         } catch (IOException e) {
             PacketEvents.getAPI().getLogManager().debug("Palette reading failed! Unsupported version?");
