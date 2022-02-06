@@ -37,6 +37,7 @@ tasks.withType(JavaCompile) {
     options.encoding = 'UTF-8'
 }
 
+
 tasks.jar.configure {
     classifier = 'default'
 }
