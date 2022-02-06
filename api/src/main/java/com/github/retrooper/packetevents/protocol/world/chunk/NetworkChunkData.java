@@ -5,7 +5,7 @@ public class NetworkChunkData {
     private int extendedChunkMask; // 1.7 only
     private boolean fullChunk;
     private boolean sky;
-    private byte data[];
+    private byte[] data;
 
     public NetworkChunkData(int mask, boolean fullChunk, boolean sky, byte data[]) {
         this.mask = mask;
@@ -37,5 +37,9 @@ public class NetworkChunkData {
 
     public byte[] getData() {
         return this.data;
+    }
+
+    public void setData(byte[] data) {
+        this.data = data;
     }
 }
