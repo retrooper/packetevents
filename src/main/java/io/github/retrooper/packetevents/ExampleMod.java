@@ -22,7 +22,6 @@ import io.github.retrooper.packetevents.manager.server.ServerManagerImpl;
 import io.netty.channel.Channel;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.event.player.AttackBlockCallback;
-import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.network.ClientConnection;
 import net.minecraft.util.ActionResult;
