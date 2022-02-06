@@ -91,6 +91,7 @@ public class WrapperPlayServerJoinGame extends PacketWrapper<WrapperPlayServerJo
     @Override
     public void readData() {
         entityID = readInt();
+        boolean v1_18 = serverVersion.isNewerThanOrEquals(ServerVersion.V_1_18);
         boolean v1_16 = serverVersion.isNewerThanOrEquals(ServerVersion.V_1_16);
         boolean v1_14 = serverVersion.isNewerThanOrEquals(ServerVersion.V_1_14);
         if (v1_16) {
@@ -133,7 +134,7 @@ public class WrapperPlayServerJoinGame extends PacketWrapper<WrapperPlayServerJo
         if (v1_16) {
             maxPlayers = readVarInt();
             viewDistance = readVarInt();
-            simulationDistance = readVarInt();
+            if (v1_18) simulationDistance = readVarInt();
             reducedDebugInfo = readBoolean();
             enableRespawnScreen = readBoolean();
             isDebug = readBoolean();
@@ -189,6 +190,7 @@ public class WrapperPlayServerJoinGame extends PacketWrapper<WrapperPlayServerJo
     @Override
     public void writeData() {
         writeInt(entityID);
+        boolean v1_18 = serverVersion.isNewerThanOrEquals(ServerVersion.V_1_18);
         boolean v1_16 = serverVersion.isNewerThanOrEquals(ServerVersion.V_1_16);
         boolean v1_14 = serverVersion.isNewerThanOrEquals(ServerVersion.V_1_14);
         if (v1_16) {
@@ -235,7 +237,7 @@ public class WrapperPlayServerJoinGame extends PacketWrapper<WrapperPlayServerJo
         if (v1_16) {
             writeVarInt(maxPlayers);
             writeVarInt(viewDistance);
-            writeVarInt(simulationDistance);
+            if (v1_18) writeVarInt(simulationDistance);
             writeBoolean(reducedDebugInfo);
             writeBoolean(enableRespawnScreen);
             writeBoolean(isDebug);
