@@ -11,7 +11,8 @@ import com.github.retrooper.packetevents.wrapper.handshaking.client.WrapperHands
 import io.github.retrooper.packetevents.factory.fabric.FabricPacketEventsBuilder;
 import net.fabricmc.api.ModInitializer;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.network.ClientPlayerEntity;
+import net.minecraft.text.LiteralText;
+import net.minecraft.text.Text;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -31,7 +32,7 @@ public class ExampleMod implements ModInitializer {
         PacketEvents.setAPI(FabricPacketEventsBuilder.build("modid"));
         PacketEvents.getAPI().getSettings().debug(true).bStats(true);
         PacketEvents.getAPI().load();
-        PacketEvents.getAPI().getEventManager().registerListener(new PacketListenerAbstract() {
+        /*PacketEvents.getAPI().getEventManager().registerListener(new PacketListenerAbstract() {
             @Override
             public void onPacketReceive(PacketReceiveEvent event) {
                 if (event.getPacketType() == PacketType.Handshaking.Client.HANDSHAKE) {
@@ -41,8 +42,9 @@ public class ExampleMod implements ModInitializer {
                     int port = handshake.getServerPort();
                     System.out.println("Sent handshaking packet: " + version + " " + address + ":" + port);
                 } else if (event.getConnectionState() == ConnectionState.PLAY) {
-                    ClientPlayerEntity player = (ClientPlayerEntity) event.getPlayer();
-                    MinecraftClient.getInstance().currentScreen.sendMessage("Packet sent: " + event.getPacketType());
+                    Text text = new LiteralText("Packet sent: " + event.getPacketType());
+                    MinecraftClient.getInstance().inGameHud.getChatHud()
+                            .addMessage(text);
                 }
             }
 
@@ -50,9 +52,7 @@ public class ExampleMod implements ModInitializer {
             public void onPacketSend(PacketSendEvent event) {
                 super.onPacketSend(event);
             }
-        });
+        });*/
         PacketEvents.getAPI().init();
     }
-
-
 }
