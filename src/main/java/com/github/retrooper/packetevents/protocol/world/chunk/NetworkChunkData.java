@@ -38,4 +38,8 @@ public class NetworkChunkData {
     public byte[] getData() {
         return this.data;
     }
+
+    public void setData(byte[] data) {
+        this.data = data;
+    }
 }
