@@ -63,8 +63,13 @@ public class Vector3i {
         int z;
 
         // 1.14 method for this is storing X Z Y
-        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_14)) {
-            y = (int) (val & 0xFFF);
+        // 1.17 added support for negative values
+        // 1.15+ might all be the same but let's be safe with not producing negative values on 1.14-1.16...
+        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_17)) {
+            y = (int) (val << 52 >> 52);
+            z = (int) (val << 26 >> 38);
+        } else if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_14)) {
+            y = (int) (val << 52 >> 52);
             z = (int) (val << 26 >> 38);
         } else {
             // 1.13 and below store X Y Z
@@ -122,6 +127,14 @@ public class Vector3i {
     }
 
     public long getSerializedPosition(ServerVersion serverVersion) {
+        // 1.17 adds support for negative values
+        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_17)) {
+            long x = getX() & 0x3FFFFFF;
+            long y = getY() & 0xFFF;
+            long z = getZ() & 0x3FFFFFF;
+
+            return x << 38 | z << 12 | y;
+        }
         // 1.14 method for this is storing X Z Y
         if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_14)) {
             return ((long) (getX() & 0x3FFFFFF) << 38) | ((long) (getZ() & 0x3FFFFFF) << 12) | (getY() & 0xFFF);
