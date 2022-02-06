@@ -38,6 +38,7 @@ public abstract class PacketEventsAPI<T> {
     private static final UpdateChecker UPDATE_CHECKER = new UpdateChecker();
     private final Logger LOGGER = Logger.getLogger(PacketEventsAPI.class.getName());
     private static final LogManager LOG_MANAGER = new LogManager();
+    private static final PEVersion VERSION = new PEVersion(2, 0, 0);
 
     public NPCManager getNPCManager() {
         return NPC_MANAGER;
@@ -56,7 +57,7 @@ public abstract class PacketEventsAPI<T> {
     }
 
     public PEVersion getVersion() {
-        return PacketEvents.VERSION;
+        return VERSION;
     }
 
     public Logger getLogger() {
