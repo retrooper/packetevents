@@ -31,12 +31,13 @@ public class WrapperPlayServerWindowItems extends PacketWrapper<WrapperPlayServe
 
     @Override
     public void readData() {
-        windowID = readByte();
-        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_17_1)) {
+        windowID = readUnsignedByte();
+        boolean v1_17_1 = serverVersion.isNewerThanOrEquals(ServerVersion.V_1_17_1);
+        if (v1_17_1) {
             stateID = readVarInt();
         }
 
-        int count = readVarInt();
+        int count = v1_17_1 ? readVarInt() : readShort();
         items = new ArrayList<>(count);
         for (int i = 0; i < count; i++) {
             items.add(readItemStack());
@@ -44,14 +45,13 @@ public class WrapperPlayServerWindowItems extends PacketWrapper<WrapperPlayServe
 
         if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_17_1)) {
             carriedItem = Optional.of(readItemStack());
-        }
-        else {
+        } else {
             carriedItem = Optional.empty();
         }
     }
 
     @Override
-    public void readData(WrapperPlayServerWindowItems wrapper) {
+    public void readData(TestWrapper wrapper) {
         windowID = wrapper.windowID;
         stateID = wrapper.stateID;
         items = wrapper.items;
@@ -61,15 +61,19 @@ public class WrapperPlayServerWindowItems extends PacketWrapper<WrapperPlayServe
     @Override
     public void writeData() {
         writeByte(windowID);
-        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_17_1)) {
+        boolean v1_17_1 = serverVersion.isNewerThanOrEquals(ServerVersion.V_1_17_1);
+        if (v1_17_1) {
             writeVarInt(stateID);
         }
-
-        writeVarInt(items.size());
+        if (v1_17_1) {
+            writeVarInt(items.size());
+        } else {
+            writeShort(items.size());
+        }
         for (ItemStack item : items) {
             writeItemStack(item);
         }
-        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_17_1)) {
+        if (v1_17_1) {
             writeItemStack(carriedItem.orElse(ItemStack.AIR));
         }
     }
