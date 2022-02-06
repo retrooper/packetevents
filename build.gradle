@@ -1,6 +1,7 @@
 plugins {
     id 'java-library'
     id 'maven-publish'
+    id 'com.github.johnrengelman.shadow' version '7.1.0'
 }
 
 group = 'com.github.retrooper'
@@ -12,6 +13,10 @@ repositories {
 }
 
 tasks {
+}
+
+shadowJar {
+    minimize()
 }
 
 dependencies {
@@ -34,4 +39,12 @@ publishing {
 
 tasks.withType(JavaCompile) {
     options.encoding = 'UTF-8'
+}
+
+tasks.jar.configure {
+    classifier = 'default'
+}
+
+tasks.shadowJar.configure {
+    classifier = null
 }
