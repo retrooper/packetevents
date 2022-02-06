@@ -29,6 +29,7 @@ import com.github.retrooper.packetevents.protocol.world.chunk.Column;
 import com.github.retrooper.packetevents.protocol.world.chunk.NetworkChunkData;
 import com.github.retrooper.packetevents.protocol.world.chunk.TileEntity;
 import com.github.retrooper.packetevents.protocol.world.chunk.impl.v1_16.Chunk_v1_9;
+import com.github.retrooper.packetevents.protocol.world.chunk.impl.v1_7.Chunk_v1_7;
 import com.github.retrooper.packetevents.protocol.world.chunk.impl.v1_8.Chunk_v1_8;
 import com.github.retrooper.packetevents.protocol.world.chunk.impl.v_1_18.Chunk_v1_18;
 import com.github.retrooper.packetevents.protocol.world.chunk.reader.ChunkReader;
@@ -40,6 +41,7 @@ import java.io.ByteArrayOutputStream;
 import java.util.Arrays;
 import java.util.BitSet;
 import java.util.zip.DataFormatException;
+import java.util.zip.Deflater;
 import java.util.zip.Inflater;
 
 public class WrapperPlayServerChunkData extends PacketWrapper<WrapperPlayServerChunkData> {
@@ -343,15 +345,32 @@ public class WrapperPlayServerChunkData extends PacketWrapper<WrapperPlayServerC
                 } else if (v1_9 && chunk != null) {
                     chunkMask.set(index);
                     Chunk_v1_9.write(dataOut, (Chunk_v1_9) chunk);
-                } else if (chunk != null) {
-                    chunkMask.set(index);
-                    // TODO: 1.7 support
                 }
             }
         } else if (v1_8) {
             NetworkChunkData data = ChunkReader_v1_8.chunksToData((Chunk_v1_8[]) chunks, column.getBiomeDataBytes());
             writeShort(data.getMask());
             writeByteArray(data.getData());
+            return;
+        } else {
+            NetworkChunkData data = ChunkReader_v1_7.chunksToData((Chunk_v1_7[]) chunks, column.getBiomeDataBytes());
+            Deflater deflater = new Deflater(-1);
+
+            byte deflated[] = new byte[data.getData().length];
+            int len = deflated.length;
+            try {
+                deflater.setInput(data.getData(), 0, data.getData().length);
+                deflater.finish();
+                len = deflater.deflate(deflated);
+            } finally {
+                deflater.end();
+            }
+            writeShort(data.getMask());
+            writeShort(data.getExtendedChunkMask());
+            writeInt(len);
+            for (int i = 0; i < len; i++) {
+                dataOut.writeByte(deflated[i]);
+            }
             return;
         }
 

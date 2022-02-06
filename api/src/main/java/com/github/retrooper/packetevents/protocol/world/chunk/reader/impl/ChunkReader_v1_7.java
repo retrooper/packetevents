@@ -21,6 +21,7 @@ package com.github.retrooper.packetevents.protocol.world.chunk.reader.impl;
 import com.github.retrooper.packetevents.protocol.stream.NetStreamInput;
 import com.github.retrooper.packetevents.protocol.world.chunk.BaseChunk;
 import com.github.retrooper.packetevents.protocol.world.chunk.ByteArray3d;
+import com.github.retrooper.packetevents.protocol.world.chunk.NetworkChunkData;
 import com.github.retrooper.packetevents.protocol.world.chunk.NibbleArray3d;
 import com.github.retrooper.packetevents.protocol.world.chunk.impl.v1_7.Chunk_v1_7;
 import com.github.retrooper.packetevents.protocol.world.chunk.reader.ChunkReader;
@@ -90,5 +91,88 @@ public class ChunkReader_v1_7 implements ChunkReader {
         }
 
         return chunks;
+    }
+
+    public static NetworkChunkData chunksToData(Chunk_v1_7[] chunks, byte[] biomes) {
+        int chunkMask = 0;
+        int extendedChunkMask = 0;
+        boolean fullChunk = biomes != null;
+        boolean sky = false;
+        int length = fullChunk ? biomes.length : 0;
+        byte[] data = null;
+        int pos = 0;
+        // 0 = Determine length and masks.
+        // 1 = Add blocks.
+        // 2 = Add metadata.
+        // 3 = Add block light.
+        // 4 = Add sky light.
+        // 5 = Add extended block data.
+        for(int pass = 0; pass < 6; pass++) {
+            for(int ind = 0; ind < chunks.length; ++ind) {
+                Chunk_v1_7 chunk = chunks[ind];
+                if(chunk != null && (!fullChunk || !chunk.isEmpty())) {
+                    if(pass == 0) {
+                        chunkMask |= 1 << ind;
+                        if(chunk.getExtendedBlocks() != null) {
+                            extendedChunkMask |= 1 << ind;
+                        }
+
+                        length += chunk.getBlocks().getData().length;
+                        length += chunk.getMetadata().getData().length;
+                        length += chunk.getBlockLight().getData().length;
+                        if(chunk.getSkyLight() != null) {
+                            length += chunk.getSkyLight().getData().length;
+                        }
+
+                        if(chunk.getExtendedBlocks() != null) {
+                            length += chunk.getExtendedBlocks().getData().length;
+                        }
+                    }
+
+                    if(pass == 1) {
+                        ByteArray3d blocks = chunk.getBlocks();
+                        System.arraycopy(blocks.getData(), 0, data, pos, blocks.getData().length);
+                        pos += blocks.getData().length;
+                    }
+
+                    if(pass == 2) {
+                        byte meta[] = chunk.getMetadata().getData();
+                        System.arraycopy(meta, 0, data, pos, meta.length);
+                        pos += meta.length;
+                    }
+
+                    if(pass == 3) {
+                        byte blocklight[] = chunk.getBlockLight().getData();
+                        System.arraycopy(blocklight, 0, data, pos, blocklight.length);
+                        pos += blocklight.length;
+                    }
+
+                    if(pass == 4 && chunk.getSkyLight() != null) {
+                        byte skylight[] = chunk.getSkyLight().getData();
+                        System.arraycopy(skylight, 0, data, pos, skylight.length);
+                        pos += skylight.length;
+                        sky = true;
+                    }
+
+                    if(pass == 5 && chunk.getExtendedBlocks() != null) {
+                        byte extended[] = chunk.getExtendedBlocks().getData();
+                        System.arraycopy(extended, 0, data, pos, extended.length);
+                        pos += extended.length;
+                    }
+                }
+            }
+
+            if(pass == 0) {
+                data = new byte[length];
+            }
+        }
+
+        // Add biomes.
+        if(fullChunk) {
+            System.arraycopy(biomes, 0, data, pos, biomes.length);
+            pos += biomes.length;
+        }
+
+        return new NetworkChunkData(chunkMask, extendedChunkMask, fullChunk, sky, data);
     }
 }
