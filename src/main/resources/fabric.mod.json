@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "id": "modid",
+  "id": "packetevents-fabric",
   "version": "${version}",
 
   "name": "PacketEvents Fabric",
@@ -13,7 +13,7 @@
     "sources": "https://github.com/retrooper/packetevents-fabric"
   },
 
-  "license": "CC0-1.0",
+  "license": "GPLv3",
   "icon": "assets/modid/icon.png",
 
   "environment": "*",

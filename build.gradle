@@ -16,8 +16,10 @@ repositories {
 }
 
 dependencies {
-	implementation 'com.github.retrooper:packetevents:api-SNAPSHOT'
+	implementation 'com.github.retrooper.packetevents:api:2.0-SNAPSHOT'
 	implementation 'com.github.retrooper:packetevents-netty-impl:master-SNAPSHOT'
+	//include('com.github.retrooper:packetevents:api-SNAPSHOT')
+	//include('com.github.retrooper:packetevents-netty-impl:master-SNAPSHOT')
 
 	// To change the versions see the gradle.properties file
 	minecraft "com.mojang:minecraft:${project.minecraft_version}"

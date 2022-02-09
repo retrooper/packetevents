@@ -20,7 +20,7 @@ public class ExampleMod implements ModInitializer {
     // This logger is used to write text to the console and the log file.
     // It is considered best practice to use your mod id as the logger's name.
     // That way, it's clear which mod wrote info, warnings, and errors.
-    public static final Logger LOGGER = LoggerFactory.getLogger("modid");
+    public static final Logger LOGGER = LoggerFactory.getLogger("packetevents-fabric");
 
     @Override
     public void onInitialize() {
@@ -29,10 +29,10 @@ public class ExampleMod implements ModInitializer {
         // Proceed with mild caution.
         //TODO Mod idea, every 30 seconds or so, on a new port, establish a new connection to the server, get a server list response and
         //that is your ping
-        PacketEvents.setAPI(FabricPacketEventsBuilder.build("modid"));
+        PacketEvents.setAPI(FabricPacketEventsBuilder.build("packetevents_fabric"));
         PacketEvents.getAPI().getSettings().debug(true).bStats(true);
         PacketEvents.getAPI().load();
-        /*PacketEvents.getAPI().getEventManager().registerListener(new PacketListenerAbstract() {
+        PacketEvents.getAPI().getEventManager().registerListener(new PacketListenerAbstract() {
             @Override
             public void onPacketReceive(PacketReceiveEvent event) {
                 if (event.getPacketType() == PacketType.Handshaking.Client.HANDSHAKE) {
@@ -52,7 +52,7 @@ public class ExampleMod implements ModInitializer {
             public void onPacketSend(PacketSendEvent event) {
                 super.onPacketSend(event);
             }
-        });*/
+        });
         PacketEvents.getAPI().init();
     }
 }
