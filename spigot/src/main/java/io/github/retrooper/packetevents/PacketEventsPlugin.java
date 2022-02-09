@@ -38,7 +38,6 @@ import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientPl
 import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientPlayerFlying;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerParticle;
 import io.github.retrooper.packetevents.factory.spigot.SpigotPacketEventsBuilder;
-import io.github.retrooper.packetevents.utils.GeyserUtil;
 import io.github.retrooper.packetevents.utils.SpigotDataHelper;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;

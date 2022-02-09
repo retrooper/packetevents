@@ -10,10 +10,8 @@ version = '2.0.0'
 repositories {
     mavenLocal()
     mavenCentral()
-    maven {
-        name = 'sonatype'
-        url = 'https://oss.sonatype.org/content/groups/public/'
-    }
+    maven { url 'https://jitpack.io' }
+    maven { url = 'https://oss.sonatype.org/content/groups/public/' }
 }
 
 shadowJar {
@@ -24,6 +22,8 @@ shadowJar {
 
 dependencies {
     api project(':api')
+    compileOnly 'org.jetbrains:annotations:22.0.0'
+
     compileOnly 'net.md-5:bungeecord-api:1.18-R0.1-SNAPSHOT'
 }
 
