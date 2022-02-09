@@ -1,0 +1,3 @@
+name: packetevents
+version: '${version}'
+main: io.github.retrooper.packetevents.PacketEventsPlugin
