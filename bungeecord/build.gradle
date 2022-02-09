@@ -1,0 +1,48 @@
+plugins {
+    id 'java-library'
+    id 'maven-publish'
+    id 'com.github.johnrengelman.shadow' version '7.1.0'
+}
+
+group = 'com.github.retrooper'
+version = '2.0.0'
+
+repositories {
+    mavenLocal()
+    mavenCentral()
+    maven {
+        name = 'sonatype'
+        url = 'https://oss.sonatype.org/content/groups/public/'
+    }
+}
+
+shadowJar {
+    //Just for jitpack to work
+    archiveVersion.set('')
+    minimize()
+}
+
+dependencies {
+    api project(':api')
+    compileOnly 'net.md-5:bungeecord-api:1.18-R0.1-SNAPSHOT'
+}
+
+publishing {
+    publications {
+        maven(MavenPublication) {
+            groupId = 'com.github.retrooper.packetevents'
+            artifactId = 'bungeecord'
+            from(components.java)
+        }
+    }
+}
+
+//So that SNAPSHOT is always the latest SNAPSHOT
+configurations.all {
+    resolutionStrategy.cacheDynamicVersionsFor 0, 'seconds'
+}
+
+//So we only produce one jar with shadowJar. No suffixes. Just replace what the original jar would be named.
+tasks.shadowJar.configure {
+    classifier = null
+}
