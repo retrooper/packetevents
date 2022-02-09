@@ -45,6 +45,10 @@ configurations.all {
 }
 
 //So we only produce one jar with shadowJar. No suffixes. Just replace what the original jar would be named.
+tasks.jar.configure {
+    classifier = 'default'
+}
+
 tasks.shadowJar.configure {
     classifier = null
 }
