@@ -1,1 +1,3 @@
 rootProject.name = 'packetevents'
+include ':api'
+include ':spigot'

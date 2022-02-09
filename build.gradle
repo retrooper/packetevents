@@ -1,30 +1,12 @@
 plugins {
-    id 'java-library'
+    id 'java'
     id 'maven-publish'
-    id 'com.github.johnrengelman.shadow' version '7.1.0'
 }
 
-group = 'com.github.retrooper'
+group = 'io.github.retrooper'
 version = '2.0.0'
 description = 'packetevents'
 java.sourceCompatibility = JavaVersion.VERSION_1_8
-
-repositories {
-    mavenCentral()
-}
-
-shadowJar {
-    minimize()
-}
-
-dependencies {
-    compileOnly 'org.jetbrains:annotations:23.0.0'
-    api 'net.kyori:adventure-api:4.9.3'
-    api 'net.kyori:adventure-text-serializer-gson:4.9.3'
-    api 'net.kyori:adventure-text-serializer-legacy:4.9.3'
-    api 'com.google.code.gson:gson:2.8.9'
-}
-
 publishing {
     publications {
         maven(MavenPublication) {
@@ -37,11 +19,7 @@ tasks.withType(JavaCompile) {
     options.encoding = 'UTF-8'
 }
 
-
-tasks.jar.configure {
-    classifier = 'default'
-}
-
-tasks.shadowJar.configure {
-    classifier = null
+wrapper {
+    gradleVersion = "7.3.1"
+    distributionType = Wrapper.DistributionType.ALL
 }
