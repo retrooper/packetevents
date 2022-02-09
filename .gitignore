@@ -1,5 +1,5 @@
 # User-specific stuff
-.idea/
+/.idea
 
 *.iml
 *.ipr
@@ -117,3 +117,4 @@ run/
 # Avoid ignoring Gradle wrapper jar file (.jar files are usually ignored)
 !gradle-wrapper.jar
 /src/main/resources/plugin.yml
+/.idea/
