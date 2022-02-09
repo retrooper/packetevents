@@ -23,24 +23,36 @@ import com.github.retrooper.packetevents.PacketEventsAPI;
 import com.github.retrooper.packetevents.event.PacketListenerPriority;
 import com.github.retrooper.packetevents.injector.ChannelInjector;
 import com.github.retrooper.packetevents.injector.InternalPacketListener;
+import com.github.retrooper.packetevents.manager.player.PlayerManager;
 import com.github.retrooper.packetevents.manager.server.ServerManager;
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.netty.NettyManager;
 import com.github.retrooper.packetevents.netty.channel.ChannelAbstract;
 import com.github.retrooper.packetevents.protocol.ConnectionState;
+import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.protocol.player.User;
 import com.github.retrooper.packetevents.settings.PacketEventsSettings;
+import com.github.retrooper.packetevents.util.LogManager;
+import io.github.retrooper.packetevents.handlers.PacketDecoder;
+import io.github.retrooper.packetevents.handlers.PacketEncoder;
+import io.github.retrooper.packetevents.injector.BungeePipelineInjector;
 import io.github.retrooper.packetevents.manager.netty.NettyManagerImpl;
 import io.github.retrooper.packetevents.manager.player.PlayerManagerImpl;
 import io.github.retrooper.packetevents.manager.server.ServerManagerImpl;
 import io.netty.channel.Channel;
+import net.kyori.adventure.text.format.NamedTextColor;
 import net.md_5.bungee.api.ProxyServer;
+import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.plugin.Plugin;
+import net.md_5.bungee.protocol.ProtocolConstants;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.logging.Level;
+import java.util.regex.Pattern;
+
 public class BungeePacketEventsBuilder {
-    /*
+
     private static PacketEventsAPI<Plugin> INSTANCE;
 
     public static void clearBuildCache() {
@@ -68,95 +80,60 @@ public class BungeePacketEventsBuilder {
 
 
     public static PacketEventsAPI<Plugin> buildNoCache(Plugin plugin, PacketEventsSettings inSettings) {
-        return new PacketEventsAPI<>() {
+        return new PacketEventsAPI<Plugin>() {
             private final PacketEventsSettings settings = inSettings;
             private final ServerManager serverManager = new ServerManagerImpl() {
-                private static ServerVersion VERSION;
-
+                private ServerVersion version;
                 @Override
                 public ServerVersion getVersion() {
                     //TODO Not perfect, as this is on the client! Might be inaccurate by a few patch versions.
-                    if (VERSION == null) {
-                        int targetPV = SharedConstants.getProtocolVersion();
-                        for (ServerVersion version : ServerVersion.reversedValues()) {
-                            if (version.getProtocolVersion() == targetPV) {
-                                VERSION = version;
+                    if (version == null) {
+                        String bungeeVersion =
+                                ProxyServer.getInstance().getVersion();
+                        for (final ServerVersion val : ServerVersion.reversedValues()) {
+                            if (bungeeVersion.contains(val.getReleaseName())) {
+                                return version = val;
                             }
                         }
+                        if (version == null) {
+                            version = PacketEvents.getAPI().getSettings().getFallbackServerVersion();
+                        }
                     }
-                    return VERSION;
+                    return version;
                 }
             };
 
             private final PlayerManagerImpl playerManager = new PlayerManagerImpl() {
                 @Override
                 public int getPing(@NotNull Object player) {
-                    return 0;
+                    return ((ProxiedPlayer) player).getPing();
                 }
 
                 @Override
                 public ChannelAbstract getChannel(@NotNull Object player) {
-                    //TODO ProxiedPlayer
+                    return getChannel(((ProxiedPlayer) player).getName());
                 }
             };
 
-            private final ChannelInjector injector = new ChannelInjector() {
-                @Override
-                public @Nullable ConnectionState getConnectionState(ChannelAbstract ch) {
-                    Channel channel = (Channel) ch.rawChannel();
-                    PacketDecoder decoder = (PacketDecoder) channel.pipeline().get(PacketEvents.DECODER_NAME);
-                    return decoder.user.getConnectionState();
-                }
-
-                @Override
-                public void changeConnectionState(ChannelAbstract ch, @Nullable ConnectionState packetState) {
-                    Channel channel = (Channel) ch.rawChannel();
-                    PacketDecoder decoder = (PacketDecoder) channel.pipeline().get(PacketEvents.DECODER_NAME);
-                    decoder.user.setConnectionState(packetState);
-                }
-
-                @Override
-                public void inject() {
-
-                }
-
-                @Override
-                public void eject() {
-
-                }
-
-                @Override
-                public void injectPlayer(Object player, @Nullable ConnectionState connectionState) {
-
-                }
-
-                @Override
-                public void updateUser(ChannelAbstract ch, User user) {
-                    Channel channel = (Channel) ch.rawChannel();
-                    PacketDecoder decoder = (PacketDecoder) channel.pipeline().get(PacketEvents.DECODER_NAME);
-                    decoder.user = user;
-                    PacketEncoder encoder = (PacketEncoder) channel.pipeline().get(PacketEvents.ENCODER_NAME);
-                    encoder.user = user;
-                }
-
-                @Override
-                public void ejectPlayer(Object player) {
-
-                }
-
-                @Override
-                public boolean hasInjected(Object player) {
-                    return false;
-                }
-            };
+            private final ChannelInjector injector = new BungeePipelineInjector();
             private final NettyManager nettyManager = new NettyManagerImpl();
+            private final Pattern STRIP_COLOR_PATTERN = Pattern.compile("(?i)" + '\u00A7' + "[0-9A-FK-ORX]");
+            private final LogManager logManager = new LogManager() {
+                @Override
+                protected void log(Level level, @Nullable NamedTextColor color, String message) {
+                    //First we must strip away the color codes that might be in this message
+                    message = STRIP_COLOR_PATTERN.matcher(message).replaceAll("");
+                    System.out.println(message);
+                    //TODO This doesn't work in bungee console PacketEvents.getAPI().getLogger().log(level, color != null ? (color.toString()) : "" + message);
+                }
+            };
             private boolean loaded;
             private boolean initialized;
 
             @Override
             public void load() {
                 if (!loaded) {
-                    final String id = "";
+                    final String id = plugin.getDescription().getName();
                     //Resolve server version and cache
                     PacketEvents.IDENTIFIER = "pe-" + id;
                     PacketEvents.ENCODER_NAME = "pe-encoder-" + id;
@@ -216,8 +193,13 @@ public class BungeePacketEventsBuilder {
             }
 
             @Override
-            public MinecraftClient getPlugin() {
-                return MinecraftClient.getInstance();
+            public Plugin getPlugin() {
+                return plugin;
+            }
+
+            @Override
+            public LogManager getLogManager() {
+                return logManager;
             }
 
             @Override
@@ -245,5 +227,5 @@ public class BungeePacketEventsBuilder {
                 return nettyManager;
             }
         };
-    }*/
+    }
 }

@@ -19,22 +19,50 @@
 package io.github.retrooper.packetevents;
 
 import com.github.retrooper.packetevents.PacketEvents;
+import com.github.retrooper.packetevents.event.PacketListenerAbstract;
+import com.github.retrooper.packetevents.event.PacketReceiveEvent;
+import com.github.retrooper.packetevents.event.PacketSendEvent;
+import com.github.retrooper.packetevents.protocol.packettype.PacketType;
+import io.github.retrooper.packetevents.bungee.BungeePacketEventsBuilder;
+import io.github.retrooper.packetevents.handlers.PacketDecoder;
+import io.github.retrooper.packetevents.handlers.PacketEncoder;
+import io.github.retrooper.packetevents.injector.ServerConnectionInitializer;
+import io.netty.channel.Channel;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.plugin.Plugin;
 
 public final class PacketEventsPlugin extends Plugin {
     @Override
     public void onLoad() {
-        //ProxyServer.getInstance()
-        //PacketEvents.setAPI(SpigotPacketEventsBuilder.build(this));
+        PacketEvents.setAPI(BungeePacketEventsBuilder.build(this));
         PacketEvents.getAPI().load();
+        PacketEvents.getAPI().getSettings().debug(true);
     }
 
     @Override
     public void onEnable() {
         //Register your listeners
+        PacketEvents.getAPI().getEventManager().registerListener(new PacketListenerAbstract() {
+            @Override
+            public void onPacketReceive(PacketReceiveEvent event) {
+                System.out.println("Receiving: " + event.getPacketType().getName());
+            }
+
+            @Override
+            public void onPacketSend(PacketSendEvent event) {
+                if (event.getPacketType() == PacketType.Login.Server.SET_COMPRESSION) {
+                    event.getPostTasks().add(() -> {
+                        Channel channel = (Channel) event.getChannel().rawChannel();
+                        PacketEncoder encoder = (PacketEncoder) channel.pipeline().remove(PacketEvents.ENCODER_NAME);
+                        PacketDecoder decoder = (PacketDecoder) channel.pipeline().remove(PacketEvents.DECODER_NAME);
+                        ServerConnectionInitializer.initChannel(channel, new PacketDecoder(decoder), encoder);
+                        System.out.println("Pipeline: " + PacketEvents.getAPI().getNettyManager().wrapChannel(channel).pipeline().namesToString());
+                    });
+                }
+                System.out.println("Sending: " + event.getPacketType().getName());
+            }
+        });
         PacketEvents.getAPI().init();
-        PacketEvents.getAPI().getSettings().debug(false).bStats(true);
     }
 
 
