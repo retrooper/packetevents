@@ -39,6 +39,7 @@ import io.github.retrooper.packetevents.injector.BungeePipelineInjector;
 import io.github.retrooper.packetevents.manager.netty.NettyManagerImpl;
 import io.github.retrooper.packetevents.manager.player.PlayerManagerImpl;
 import io.github.retrooper.packetevents.manager.server.ServerManagerImpl;
+import io.github.retrooper.packetevents.processor.InternalBungeeProcessor;
 import io.netty.channel.Channel;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.md_5.bungee.api.ProxyServer;
@@ -162,6 +163,7 @@ public class BungeePacketEventsBuilder {
                 //Load if we haven't loaded already
                 load();
                 if (!initialized) {
+                    ProxyServer.getInstance().getPluginManager().registerListener(plugin, new InternalBungeeProcessor());
                     if (settings.shouldCheckForUpdates()) {
                         getUpdateChecker().handleUpdateCheck();
                     }
