@@ -19,16 +19,7 @@
 package io.github.retrooper.packetevents;
 
 import com.github.retrooper.packetevents.PacketEvents;
-import com.github.retrooper.packetevents.event.PacketListenerAbstract;
-import com.github.retrooper.packetevents.event.PacketReceiveEvent;
-import com.github.retrooper.packetevents.event.PacketSendEvent;
-import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import io.github.retrooper.packetevents.bungee.BungeePacketEventsBuilder;
-import io.github.retrooper.packetevents.handlers.PacketDecoder;
-import io.github.retrooper.packetevents.handlers.PacketEncoder;
-import io.github.retrooper.packetevents.injector.ServerConnectionInitializer;
-import io.netty.channel.Channel;
-import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.plugin.Plugin;
 
 public final class PacketEventsPlugin extends Plugin {
@@ -42,7 +33,7 @@ public final class PacketEventsPlugin extends Plugin {
     @Override
     public void onEnable() {
         //Register your listeners
-        PacketEvents.getAPI().getEventManager().registerListener(new PacketListenerAbstract() {
+        /*PacketEvents.getAPI().getEventManager().registerListener(new PacketListenerAbstract() {
             @Override
             public void onPacketReceive(PacketReceiveEvent event) {
                 System.out.println("Receiving: " + event.getPacketType().getName());
@@ -50,10 +41,13 @@ public final class PacketEventsPlugin extends Plugin {
 
             @Override
             public void onPacketSend(PacketSendEvent event) {
-                System.out.println("Sending: " + event.getPacketType().getName());
-                Channel channel = (Channel) event.getChannel().rawChannel();
+                if (event.getPacketType() == PacketType.Play.Server.CHUNK_DATA) {
+                    System.out.println("Sending chunk data: " + event.getPacketType().getName());
+                }
+                //System.out.println("Sending: " + event.getPacketType().getName());
+                //Channel channel = (Channel) event.getChannel().rawChannel();
             }
-        });
+        });*/
         PacketEvents.getAPI().init();
     }
 
