@@ -24,6 +24,7 @@ import net.md_5.bungee.api.plugin.Listener;
 import net.md_5.bungee.event.EventHandler;
 
 public class InternalBungeeProcessor implements Listener {
+    //Called right after LoginSuccess is sent to the user.
     @EventHandler
     public void onPostLogin(PostLoginEvent event) {
         PacketEvents.getAPI().getInjector().injectPlayer(event.getPlayer(), null);

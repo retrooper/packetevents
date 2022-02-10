@@ -26,8 +26,6 @@ import com.github.retrooper.packetevents.protocol.player.UserProfile;
 import io.github.retrooper.packetevents.handlers.PacketDecoder;
 import io.github.retrooper.packetevents.handlers.PacketEncoder;
 import io.netty.channel.Channel;
-import net.md_5.bungee.api.event.PostLoginEvent;
-import net.md_5.bungee.api.event.PreLoginEvent;
 
 public class ServerConnectionInitializer {
     public static void initChannel(Channel channel, PacketDecoder decoder, PacketEncoder encoder) {
@@ -46,5 +44,11 @@ public class ServerConnectionInitializer {
     public static void destroyChannel(Channel channel) {
         channel.pipeline().remove(PacketEvents.DECODER_NAME);
         channel.pipeline().remove(PacketEvents.ENCODER_NAME);
+    }
+
+    public static void reloadChannel(Channel channel) {
+        PacketDecoder decoder = (PacketDecoder) channel.pipeline().remove(PacketEvents.DECODER_NAME);
+        PacketEncoder encoder = (PacketEncoder) channel.pipeline().remove(PacketEvents.ENCODER_NAME);
+        initChannel(channel, new PacketDecoder(decoder), encoder);
     }
 }

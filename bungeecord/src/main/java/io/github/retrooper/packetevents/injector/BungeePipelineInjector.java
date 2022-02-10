@@ -15,7 +15,6 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-//Thanks to ViaVersion for this bungeecord injector
 package io.github.retrooper.packetevents.injector;
 
 import com.github.retrooper.packetevents.PacketEvents;
@@ -23,37 +22,38 @@ import com.github.retrooper.packetevents.injector.ChannelInjector;
 import com.github.retrooper.packetevents.netty.channel.ChannelAbstract;
 import com.github.retrooper.packetevents.protocol.ConnectionState;
 import com.github.retrooper.packetevents.protocol.player.User;
+import com.github.retrooper.packetevents.util.reflection.Reflection;
+import com.github.retrooper.packetevents.util.reflection.ReflectionObject;
 import io.github.retrooper.packetevents.handlers.PacketDecoder;
 import io.github.retrooper.packetevents.handlers.PacketEncoder;
 import io.netty.channel.Channel;
-import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
-import net.md_5.bungee.protocol.DefinedPacket;
 import org.jetbrains.annotations.Nullable;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
+//Thanks to ViaVersion for helping us design this injector.
 public class BungeePipelineInjector implements ChannelInjector {
     private static final Field LISTENERS_FIELD;
+    private static final Field CONNECTIONS_FIELD;
+    private static final Class<?> CHANNEL_WRAPPER_CLASS;
 
     static {
-        Field tempField = null;
-        try {
-            tempField = ProxyServer.getInstance().getClass().getDeclaredField("listeners");
-        } catch (NoSuchFieldException e) {
-            e.printStackTrace();
-        }
-        LISTENERS_FIELD = tempField;
+        LISTENERS_FIELD = Reflection.getField(ProxyServer.getInstance().getClass(), "listeners");
         LISTENERS_FIELD.setAccessible(true);
+        CONNECTIONS_FIELD = Reflection.getField(ProxyServer.getInstance().getClass(), "connections");
+        CONNECTIONS_FIELD.setAccessible(true);
+        CHANNEL_WRAPPER_CLASS = Reflection.getClassByNameWithoutException("net.md_5.bungee.netty.ChannelWrapper");
     }
 
-    private final List<ChannelFuture> injectedFutures = new ArrayList<>();
+    private final List<Channel> injectedChannels = new ArrayList<>();
 
     @Override
     public @Nullable ConnectionState getConnectionState(ChannelAbstract ch) {
@@ -80,20 +80,22 @@ public class BungeePipelineInjector implements ChannelInjector {
                     }
                 });
 
-       /*
-        List<Object> networkManagers = SpigotReflectionUtil.getNetworkManagers();
-        synchronized (networkManagers) {
-            for (Object networkManager : networkManagers) {
-                ReflectionObject networkManagerWrapper = new ReflectionObject(networkManager);
-                Channel channel = networkManagerWrapper.readObject(0, Channel.class);
-                if (channel.isOpen()) {
-                    if (channel.localAddress().equals(future.channel().localAddress())) {
-                        channel.close();
-                    }
+        try {
+            Map<?, ?> connectionsMap = (Map<?, ?>) CONNECTIONS_FIELD.get(ProxyServer.getInstance());
+            for (Object connection : connectionsMap.values()) {
+                ReflectionObject reflectUserConnection = new ReflectionObject(connection);
+                Object channelWrapper = reflectUserConnection.readObject(0, CHANNEL_WRAPPER_CLASS);
+                ReflectionObject reflectChannelWrapper = new ReflectionObject(channelWrapper);
+                Channel connectionChannel = reflectChannelWrapper.readObject(0, Channel.class);
+                if (connectionChannel != null &&
+                        connectionChannel.localAddress().equals(channel.localAddress())) {
+                    connectionChannel.close();
                 }
             }
-        }*/
-        //injectedFutures.add(future);
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        }
+        injectedChannels.add(channel);
     }
 
     @Override
@@ -115,7 +117,9 @@ public class BungeePipelineInjector implements ChannelInjector {
 
     @Override
     public void eject() {
-
+        for (Channel channel : injectedChannels) {
+            channel.pipeline().remove(PacketEvents.CONNECTION_NAME);
+        }
     }
 
     @Override

@@ -50,16 +50,8 @@ public final class PacketEventsPlugin extends Plugin {
 
             @Override
             public void onPacketSend(PacketSendEvent event) {
-                if (event.getPacketType() == PacketType.Login.Server.SET_COMPRESSION) {
-                    event.getPostTasks().add(() -> {
-                        Channel channel = (Channel) event.getChannel().rawChannel();
-                        PacketEncoder encoder = (PacketEncoder) channel.pipeline().remove(PacketEvents.ENCODER_NAME);
-                        PacketDecoder decoder = (PacketDecoder) channel.pipeline().remove(PacketEvents.DECODER_NAME);
-                        ServerConnectionInitializer.initChannel(channel, new PacketDecoder(decoder), encoder);
-                        System.out.println("Pipeline: " + PacketEvents.getAPI().getNettyManager().wrapChannel(channel).pipeline().namesToString());
-                    });
-                }
                 System.out.println("Sending: " + event.getPacketType().getName());
+                Channel channel = (Channel) event.getChannel().rawChannel();
             }
         });
         PacketEvents.getAPI().init();

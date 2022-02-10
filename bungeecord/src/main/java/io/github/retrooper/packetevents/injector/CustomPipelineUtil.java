@@ -16,11 +16,16 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package io.github.retrooper.packetevents.utils.dependencies.viaversion;
+package io.github.retrooper.packetevents.injector;
 
 import com.github.retrooper.packetevents.netty.channel.ChannelHandlerContextAbstract;
 import com.github.retrooper.packetevents.netty.channel.pipeline.ChannelPipelineAbstract;
-import io.github.retrooper.packetevents.utils.SpigotReflectionUtil;
+import io.netty.buffer.ByteBuf;
+import io.netty.channel.ChannelHandlerContext;
+import io.netty.handler.codec.ByteToMessageDecoder;
+import io.netty.handler.codec.MessageToByteEncoder;
+import io.netty.handler.codec.MessageToMessageDecoder;
+import io.netty.handler.codec.MessageToMessageEncoder;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -31,35 +36,40 @@ public class CustomPipelineUtil {
     private static Method DECODE_METHOD;
     private static Method ENCODE_METHOD;
     private static Method MTM_DECODE;
+    private static Method BUNGEE_PACKET_DECODE_BYTEBUF;
+    private static Method BUNGEE_PACKET_ENCODE_BYTEBUF;
     private static Method MTM_ENCODE;
 
     public static void init() {
-        Class<?> channelHandlerContextClass = SpigotReflectionUtil.getNettyClass("channel.ChannelHandlerContext");
         try {
-            DECODE_METHOD = SpigotReflectionUtil.BYTE_TO_MESSAGE_DECODER.getDeclaredMethod("decode", channelHandlerContextClass, SpigotReflectionUtil.BYTE_BUF_CLASS, List.class);
+            DECODE_METHOD = ByteToMessageDecoder.class
+                    .getDeclaredMethod("decode", ChannelHandlerContext.class,
+                            ByteBuf.class, List.class);
             DECODE_METHOD.setAccessible(true);
         } catch (NoSuchMethodException e) {
             e.printStackTrace();
         }
         try {
-            ENCODE_METHOD = SpigotReflectionUtil.MESSAGE_TO_BYTE_ENCODER.getDeclaredMethod("encode", channelHandlerContextClass, Object.class, SpigotReflectionUtil.BYTE_BUF_CLASS);
+            ENCODE_METHOD = MessageToByteEncoder.class
+                    .getDeclaredMethod("encode", ChannelHandlerContext.class, Object.class,
+                            ByteBuf.class);
             ENCODE_METHOD.setAccessible(true);
         } catch (NoSuchMethodException e) {
             e.printStackTrace();
         }
         try {
-            Class<?> messageToMessageDecoderClass =
-                    SpigotReflectionUtil.getNettyClass("handler.codec.MessageToMessageDecoder");
-            MTM_DECODE = messageToMessageDecoderClass.getDeclaredMethod("decode", channelHandlerContextClass, Object.class, List.class);
+            MTM_DECODE = MessageToMessageDecoder.class
+                    .getDeclaredMethod("decode", ChannelHandlerContext.class,
+                            Object.class, List.class);
             MTM_DECODE.setAccessible(true);
         } catch (NoSuchMethodException e) {
             e.printStackTrace();
         }
 
         try {
-            Class<?> messageToMessageEncoderClass =
-                    SpigotReflectionUtil.getNettyClass("handler.codec.MessageToMessageEncoder");
-            MTM_ENCODE = messageToMessageEncoderClass.getDeclaredMethod("encode", channelHandlerContextClass, Object.class, List.class);
+            MTM_ENCODE = MessageToMessageEncoder.class
+                    .getDeclaredMethod("encode", ChannelHandlerContext.class,
+                            Object.class, List.class);
             MTM_ENCODE.setAccessible(true);
         } catch (NoSuchMethodException e) {
             e.printStackTrace();
@@ -116,6 +126,43 @@ public class CustomPipelineUtil {
         List<Object> output = new ArrayList<>();
         try {
             MTM_DECODE.invoke(decoder, ctx, msg, output);
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        }
+        return output;
+    }
+
+    public static void callPacketEncodeByteBuf(Object encoder, Object ctx, Object msg, Object output) throws InvocationTargetException {
+        if (BUNGEE_PACKET_ENCODE_BYTEBUF == null) {
+            try {
+                BUNGEE_PACKET_ENCODE_BYTEBUF = encoder.getClass()
+                        .getDeclaredMethod("encode", ChannelHandlerContext.class, ByteBuf.class,
+                                ByteBuf.class);
+                BUNGEE_PACKET_ENCODE_BYTEBUF.setAccessible(true);
+            } catch (NoSuchMethodException e) {
+                e.printStackTrace();
+            }
+        }
+        try {
+            BUNGEE_PACKET_ENCODE_BYTEBUF.invoke(encoder, ctx, msg, output);
+        } catch (IllegalAccessException e){
+            e.printStackTrace();
+        }
+    }
+
+    public static List<Object> callPacketDecodeByteBuf(Object decoder, Object ctx, Object msg) throws InvocationTargetException {
+        List<Object> output = new ArrayList<>();
+        if (BUNGEE_PACKET_DECODE_BYTEBUF == null) {
+            try {
+                BUNGEE_PACKET_DECODE_BYTEBUF = decoder.getClass().getDeclaredMethod("decode", ChannelHandlerContext.class,
+                        ByteBuf.class, List.class);
+                BUNGEE_PACKET_DECODE_BYTEBUF.setAccessible(true);
+            } catch (NoSuchMethodException e) {
+                e.printStackTrace();
+            }
+        }
+        try {
+            BUNGEE_PACKET_DECODE_BYTEBUF.invoke(decoder, ctx, msg, output);
         } catch (IllegalAccessException e) {
             e.printStackTrace();
         }
