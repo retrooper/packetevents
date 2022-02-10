@@ -83,7 +83,7 @@ public class BungeePacketEventsBuilder {
         return new PacketEventsAPI<Plugin>() {
             private final PacketEventsSettings settings = inSettings;
             private final ServerManager serverManager = new ServerManagerImpl() {
-                private ServerVersion version = ServerVersion.V_1_8_8;
+                private ServerVersion version;
                 @Override
                 public ServerVersion getVersion() {
                     //TODO Not perfect, as this is on the client! Might be inaccurate by a few patch versions.
