@@ -22,27 +22,27 @@ import io.github.retrooper.packetevents.manager.player.PlayerManagerImpl;
 import io.github.retrooper.packetevents.manager.server.ServerManagerImpl;
 import io.netty.channel.Channel;
 import net.minecraft.SharedConstants;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.network.ClientPlayerEntity;
-import net.minecraft.network.ClientConnection;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.player.LocalPlayer;
+import net.minecraft.network.Connection;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 public class FabricPacketEventsBuilder {
-    private static PacketEventsAPI<MinecraftClient> INSTANCE;
+    private static PacketEventsAPI<Minecraft> INSTANCE;
 
     public static void clearBuildCache() {
         INSTANCE = null;
     }
 
-    public static PacketEventsAPI<MinecraftClient> build(String modId) {
+    public static PacketEventsAPI<Minecraft> build(String modId) {
         if (INSTANCE == null) {
             INSTANCE = buildNoCache(modId);
         }
         return INSTANCE;
     }
 
-    public static PacketEventsAPI<MinecraftClient> build(String modId, PacketEventsSettings settings) {
+    public static PacketEventsAPI<Minecraft> build(String modId, PacketEventsSettings settings) {
         if (INSTANCE == null) {
             INSTANCE = buildNoCache(modId, settings);
         }
@@ -50,11 +50,11 @@ public class FabricPacketEventsBuilder {
     }
 
 
-    public static PacketEventsAPI<MinecraftClient> buildNoCache(String modId) {
+    public static PacketEventsAPI<Minecraft> buildNoCache(String modId) {
         return buildNoCache(modId, new PacketEventsSettings());
     }
 
-    public static PacketEventsAPI<MinecraftClient> buildNoCache(String modId, PacketEventsSettings inSettings) {
+    public static PacketEventsAPI<Minecraft> buildNoCache(String modId, PacketEventsSettings inSettings) {
         return new PacketEventsAPI<>() {
             private final PacketEventsSettings settings = inSettings;
             private final ServerManager serverManager = new ServerManagerImpl() {
@@ -83,7 +83,7 @@ public class FabricPacketEventsBuilder {
 
                 @Override
                 public ChannelAbstract getChannel(@NotNull Object player) {
-                    ClientConnection connection = ((ClientPlayerEntity) player).networkHandler.getConnection();
+                    Connection connection = ((LocalPlayer) player).connection.getConnection();
                     ReflectionObject reflectConnection = new ReflectionObject(connection);
                     Channel channel = reflectConnection.readObject(0, Channel.class);
                     return PacketEvents.getAPI().getNettyManager().wrapChannel(channel);
@@ -211,8 +211,8 @@ public class FabricPacketEventsBuilder {
             }
 
             @Override
-            public MinecraftClient getPlugin() {
-                return MinecraftClient.getInstance();
+            public Minecraft getPlugin() {
+                return Minecraft.getInstance();
             }
 
             @Override

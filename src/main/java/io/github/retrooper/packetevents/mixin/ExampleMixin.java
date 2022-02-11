@@ -11,15 +11,15 @@ import io.github.retrooper.packetevents.handler.PacketDecoder;
 import io.github.retrooper.packetevents.handler.PacketEncoder;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.network.ClientPlayerEntity;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.player.LocalPlayer;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 
-@Mixin(net.minecraft.network.ClientConnection.class)
+@Mixin(net.minecraft.network.Connection.class)
 public class ExampleMixin {
     @Inject(method = "channelActive", at = @At("HEAD"))
     private void channelActive(ChannelHandlerContext ctx, CallbackInfo info) throws Exception {
@@ -29,7 +29,7 @@ public class ExampleMixin {
         User user = new User(ch, ConnectionState.HANDSHAKING, ClientVersion.getLatest(),
                 new UserProfile(null, null));
         PacketEvents.getAPI().getPlayerManager().USERS.put(ch, user);
-        ClientPlayerEntity player = MinecraftClient.getInstance().player;
+        LocalPlayer player = Minecraft.getInstance().player;
         PacketDecoder decoder = new PacketDecoder(user, player);
         PacketEncoder encoder = new PacketEncoder(user, player);
         channel.pipeline().addAfter("splitter", PacketEvents.DECODER_NAME, decoder);
