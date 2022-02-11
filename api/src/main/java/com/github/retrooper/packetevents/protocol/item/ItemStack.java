@@ -29,8 +29,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ItemStack {
-    public static final ItemStack EMPTY = new ItemStack(ItemTypes.AIR, -1, new NBTCompound(), -1);
-    public static final ItemStack AIR = new ItemStack(ItemTypes.AIR, ItemTypes.AIR.getMaxAmount(), new NBTCompound(), 0);
+    public static final ItemStack EMPTY = new ItemStack(ItemTypes.AIR, 0, new NBTCompound(), 0);
     private final ItemType type;
     private int amount;
     private NBTCompound nbt;

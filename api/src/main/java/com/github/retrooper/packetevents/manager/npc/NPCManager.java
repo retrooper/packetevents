@@ -206,40 +206,40 @@ public class NPCManager {
                 List<Equipment> equipmentList = new ArrayList<>();
                 ItemStack handItem = npc.getMainHand();
                 if (handItem == null) {
-                    handItem = ItemStack.AIR;
+                    handItem = ItemStack.EMPTY;
                 }
                 equipmentList.add(new Equipment(EquipmentSlot.MAINHAND,
                         handItem));
                 if (PacketEvents.getAPI().getServerManager().getVersion().isNewerThanOrEquals(ServerVersion.V_1_9)) {
                     ItemStack offHandItem = npc.getOffHand();
                     if (offHandItem == null) {
-                        offHandItem = ItemStack.AIR;
+                        offHandItem = ItemStack.EMPTY;
                     }
                     equipmentList.add(new Equipment(EquipmentSlot.OFFHAND,
                             offHandItem));
                 }
                 ItemStack helmetItem = npc.getHelmet();
                 if (helmetItem == null) {
-                    helmetItem = ItemStack.AIR;
+                    helmetItem = ItemStack.EMPTY;
                 }
                 equipmentList.add(new Equipment(EquipmentSlot.HELMET,
                         helmetItem));
 
                 ItemStack chestPlateItem = npc.getChestplate();
                 if (chestPlateItem == null) {
-                    chestPlateItem = ItemStack.AIR;
+                    chestPlateItem = ItemStack.EMPTY;
                 }
                 equipmentList.add(new Equipment(EquipmentSlot.CHESTPLATE,
                         chestPlateItem));
                 ItemStack leggingsItem = npc.getLeggings();
                 if (leggingsItem == null) {
-                    leggingsItem = ItemStack.AIR;
+                    leggingsItem = ItemStack.EMPTY;
                 }
                 equipmentList.add(new Equipment(EquipmentSlot.LEGGINGS,
                         leggingsItem));
                 ItemStack bootsItem = npc.getBoots();
                 if (bootsItem == null) {
-                    bootsItem = ItemStack.AIR;
+                    bootsItem = ItemStack.EMPTY;
                 }
                 equipmentList.add(new Equipment(EquipmentSlot.BOOTS,
                         bootsItem));

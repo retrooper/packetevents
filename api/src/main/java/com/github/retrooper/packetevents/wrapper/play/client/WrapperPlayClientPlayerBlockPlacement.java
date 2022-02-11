@@ -120,7 +120,7 @@ public class WrapperPlayClientPlayerBlockPlacement extends PacketWrapper<Wrapper
             }
             else {
                 writeByte(face.getFaceValue());
-                writeItemStack(itemStack.orElse(ItemStack.AIR));
+                writeItemStack(itemStack.orElse(ItemStack.EMPTY));
                 //Hand is always the main hand
             }
             if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_11)) {

@@ -74,7 +74,7 @@ public class WrapperPlayServerWindowItems extends PacketWrapper<WrapperPlayServe
             writeItemStack(item);
         }
         if (v1_17_1) {
-            writeItemStack(carriedItem.orElse(ItemStack.AIR));
+            writeItemStack(carriedItem.orElse(ItemStack.EMPTY));
         }
     }
 
