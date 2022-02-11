@@ -1,13 +1,21 @@
 plugins {
     id 'java-library'
     id 'maven-publish'
+    id 'com.github.johnrengelman.shadow' version '7.1.0'
 }
+
+group = 'com.github.retrooper'
+version = '2.0.0'
 
 repositories {
     mavenCentral()
 }
 
-tasks {
+shadowJar {
+    //Just for jitpack to work
+    archiveVersion.set('')
+
+    minimize()
 }
 
 dependencies {
@@ -30,4 +38,13 @@ publishing {
 
 tasks.withType(JavaCompile) {
     options.encoding = 'UTF-8'
+}
+
+//So we only produce one jar with shadowJar. No suffixes. Just replace what the original jar would be named.
+tasks.jar.configure {
+    classifier = 'default'
+}
+
+tasks.shadowJar.configure {
+    classifier = null
 }
